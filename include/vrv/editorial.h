@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_EDITORIAL_H__
 #define __VRV_EDITORIAL_H__
 
@@ -24,12 +23,9 @@ class Staff;
 class StaffDef;
 class StaffGrp;
 class TextElement;
-    
-enum VisibilityType {
-    Hidden = 0,
-    Visible
-};
-    
+
+enum VisibilityType { Hidden = 0, Visible };
+
 //----------------------------------------------------------------------------
 // EditorialElement
 //----------------------------------------------------------------------------
@@ -39,9 +35,7 @@ enum VisibilityType {
  * content. For example <rgd> or <add>.
  * It is not an abstract class but should not be instantiated directly.
  */
-class EditorialElement: public DocObject,
-    public AttCommon
-{
+class EditorialElement : public DocObject, public AttCommon {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -69,37 +63,31 @@ public:
     void AddStaffDef(StaffDef *child);
     void AddStaffGrp(StaffGrp *child);
     ///@}
-    
-    
+
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * Fill a page by adding systems with the appropriate length
      * For EditorialElement, this means only moving them since their width is not
      * taken into account. Only system children EditorialElement are processed.
      */
     virtual int CastOffSystems(ArrayPtrVoid *params);
-    
+
 protected:
-    
 private:
-    
 public:
     VisibilityType m_visibility;
-    
+
 private:
-    
 };
-    
+
 //----------------------------------------------------------------------------
 // Abbr
 //----------------------------------------------------------------------------
 
-class Abbr: public EditorialElement,
-    public AttSource
-{
+class Abbr : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -112,24 +100,19 @@ public:
     virtual std::string GetClassName() { return "Abbr"; };
     virtual ClassId Is() { return ABBR; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
-    
+
 //----------------------------------------------------------------------------
 // Add
 //----------------------------------------------------------------------------
 
-class Add: public EditorialElement,
-    public AttSource
-{
+class Add : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -142,25 +125,19 @@ public:
     virtual std::string GetClassName() { return "Add"; };
     virtual ClassId Is() { return ADD; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
-    
+
 //----------------------------------------------------------------------------
 // Annot
 //----------------------------------------------------------------------------
 
-class Annot: public EditorialElement,
-    public AttPlist,
-    public AttSource
-{
+class Annot : public EditorialElement, public AttPlist, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -173,27 +150,23 @@ public:
     virtual std::string GetClassName() { return "Annot"; };
     virtual ClassId Is() { return ANNOT; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
     /**
      * A copy of the annot content tree stored as pugi::xml_document
      */
     pugi::xml_document m_content;
-    
+
 private:
-    
 };
 
 //----------------------------------------------------------------------------
 // App
 //----------------------------------------------------------------------------
 
-class App: public EditorialElement
-{
+class App : public EditorialElement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -207,35 +180,32 @@ public:
     virtual std::string GetClassName() { return "App"; };
     virtual ClassId Is() { return APP; };
     ///@}
-    
+
     /** Getter for level **/
     EditorialLevel GetLevel() { return m_level; };
-    
+
     /**
      * Add children to a apparatus.
      * Tests if lemOrRdg is Lem or Rdg.
      */
     void AddLemOrRdg(EditorialElement *lemOrRdg);
-    
+
 protected:
     /** We store the level of the <app> for integrity check */
     EditorialLevel m_level;
 
 private:
-    
+    //
 public:
-    
+    //
 private:
-
 };
-    
+
 //----------------------------------------------------------------------------
 // Corr
 //----------------------------------------------------------------------------
 
-class Corr: public EditorialElement,
-    public AttSource
-{
+class Corr : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -248,24 +218,19 @@ public:
     virtual std::string GetClassName() { return "Corr"; };
     virtual ClassId Is() { return CORR; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
-    
+
 //----------------------------------------------------------------------------
 // Damage
 //----------------------------------------------------------------------------
 
-class Damage: public EditorialElement,
-    public AttSource
-{
+class Damage : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -278,24 +243,19 @@ public:
     virtual std::string GetClassName() { return "Damage"; };
     virtual ClassId Is() { return DAMAGE; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
 
 //----------------------------------------------------------------------------
 // Del
 //----------------------------------------------------------------------------
 
-class Del: public EditorialElement,
-    public AttSource
-{
+class Del : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -308,24 +268,19 @@ public:
     virtual std::string GetClassName() { return "Del"; };
     virtual ClassId Is() { return DEL; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
 
 //----------------------------------------------------------------------------
 // Expan
 //----------------------------------------------------------------------------
 
-class Expan: public EditorialElement,
-    public AttSource
-{
+class Expan : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -338,24 +293,19 @@ public:
     virtual std::string GetClassName() { return "Expan"; };
     virtual ClassId Is() { return EXPAN; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
-    
+
 //----------------------------------------------------------------------------
 // Lem
 //----------------------------------------------------------------------------
 
-class Lem: public EditorialElement,
-    public AttSource
-{
+class Lem : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -368,24 +318,19 @@ public:
     virtual std::string GetClassName() { return "Lem"; };
     virtual ClassId Is() { return LEM; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
-    
+
 //----------------------------------------------------------------------------
 // Orig
 //----------------------------------------------------------------------------
 
-class Orig: public EditorialElement,
-    public AttSource
-{
+class Orig : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -398,24 +343,19 @@ public:
     virtual std::string GetClassName() { return "Orig"; };
     virtual ClassId Is() { return ORIG; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
 
 //----------------------------------------------------------------------------
 // Rdg
 //----------------------------------------------------------------------------
 
-class Rdg: public EditorialElement,
-    public AttSource
-{
+class Rdg : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -428,24 +368,19 @@ public:
     virtual std::string GetClassName() { return "Rdg"; };
     virtual ClassId Is() { return RDG; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
-    
+
 //----------------------------------------------------------------------------
 // Reg
 //----------------------------------------------------------------------------
 
-class Reg: public EditorialElement,
-    public AttSource
-{
+class Reg : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -458,24 +393,19 @@ public:
     virtual std::string GetClassName() { return "Reg"; };
     virtual ClassId Is() { return REG; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
 
 //----------------------------------------------------------------------------
 // Restore
 //----------------------------------------------------------------------------
 
-class Restore: public EditorialElement,
-    public AttSource
-{
+class Restore : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -488,24 +418,19 @@ public:
     virtual std::string GetClassName() { return "Restore"; };
     virtual ClassId Is() { return RESTORE; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
 
 //----------------------------------------------------------------------------
 // Sic
 //----------------------------------------------------------------------------
 
-class Sic: public EditorialElement,
-    public AttSource
-{
+class Sic : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -518,24 +443,19 @@ public:
     virtual std::string GetClassName() { return "Sic"; };
     virtual ClassId Is() { return SIC; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
 
 //----------------------------------------------------------------------------
 // Supplied
 //----------------------------------------------------------------------------
 
-class Supplied: public EditorialElement,
-    public AttSource
-{
+class Supplied : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -548,24 +468,19 @@ public:
     virtual std::string GetClassName() { return "Supplied"; };
     virtual ClassId Is() { return SUPPLIED; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
-    
+
 //----------------------------------------------------------------------------
 // Unclear
 //----------------------------------------------------------------------------
 
-class Unclear: public EditorialElement,
-    public AttSource
-{
+class Unclear : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -578,17 +493,14 @@ public:
     virtual std::string GetClassName() { return "Unclear"; };
     virtual ClassId Is() { return UNCLEAR; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
 
 } // namespace vrv
-    
+
 #endif

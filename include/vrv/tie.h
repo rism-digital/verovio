@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_TIE_H__
 #define __VRV_TIE_H__
 
@@ -18,9 +17,7 @@ namespace vrv {
 // Tie
 //----------------------------------------------------------------------------
 
-class Tie: public FloatingElement, public TimeSpanningInterface,
-    public AttCurvature
-{
+class Tie : public FloatingElement, public TimeSpanningInterface, public AttCurvature {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -33,15 +30,14 @@ public:
     virtual std::string GetClassName() { return "Tie"; };
     virtual ClassId Is() { return TIE; };
     ///@}
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
 
 } // namespace vrv
-    
+
 #endif

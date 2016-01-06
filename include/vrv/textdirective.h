@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_TEXT_DIRECTIVE_H__
 #define __VRV_TEXT_DIRECTIVE_H__
 
@@ -13,9 +12,9 @@
 #include "textdirinterface.h"
 
 namespace vrv {
-    
+
 class TextElement;
-    
+
 //----------------------------------------------------------------------------
 // AnchoredText
 //----------------------------------------------------------------------------
@@ -23,8 +22,7 @@ class TextElement;
 /**
  * This class is an interface for <anchoredText> elements at the measure level
  */
-class AnchoredText: public FloatingElement, public TextDirInterface
-{
+class AnchoredText : public FloatingElement, public TextDirInterface {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -37,23 +35,20 @@ public:
     virtual std::string GetClassName() { return "AnchoredText"; };
     virtual ClassId Is() { return ANCHORED_TEXT; };
     ///@}
-    
+
     /**
      * Add an element (text, rend. etc.) to a tempo.
      * Only supported elements will be actually added to the child list.
      */
     void AddTextElement(TextElement *element);
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
-    
+
 //----------------------------------------------------------------------------
 // Tempo
 //----------------------------------------------------------------------------
@@ -61,9 +56,7 @@ private:
 /**
  * This class is an interface for <tempo> elements at the measure level
  */
-class Tempo: public FloatingElement, public TextDirInterface,
-    public AttTimestampMusical
-{
+class Tempo : public FloatingElement, public TextDirInterface, public AttTimestampMusical {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -76,23 +69,19 @@ public:
     virtual std::string GetClassName() { return "Tempo"; };
     virtual ClassId Is() { return TEMPO; };
     ///@}
-    
+
     /**
      * Add an element (text, rend. etc.) to a tempo.
      * Only supported elements will be actually added to the child list.
      */
     void AddTextElement(TextElement *element);
-    
+
 protected:
-    
 private:
-    
 public:
-    
 private:
-    
 };
-    
-} // namespace vrv 
+
+} // namespace vrv
 
 #endif

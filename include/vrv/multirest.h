@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_MULTIREST_H__
 #define __VRV_MULTIREST_H__
 
@@ -18,12 +17,10 @@ namespace vrv {
 // MultiRest
 //----------------------------------------------------------------------------
 
-/** 
- * This class models the MEI <multiRest> element. 
+/**
+ * This class models the MEI <multiRest> element.
  */
-class MultiRest: public LayerElement,
-    public AttNumbered
-{
+class MultiRest : public LayerElement, public AttNumbered {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -31,19 +28,16 @@ public:
      */
     ///@{
     MultiRest();
-    //MultiRest(int number);
+    // MultiRest(int number);
     virtual ~MultiRest();
     virtual void Reset();
     virtual std::string GetClassName() { return "MultiRest"; };
     virtual ClassId Is() { return MULTIREST; };
     ///@}
-    
-private:
-    
-public:
 
 private:
-    
+public:
+private:
 };
 
 } // namespace vrv

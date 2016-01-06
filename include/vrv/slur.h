@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_SLUR_H__
 #define __VRV_SLUR_H__
 
@@ -18,9 +17,7 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-class Slur: public FloatingElement, public TimeSpanningInterface,
-    public AttCurvature
-{
+class Slur : public FloatingElement, public TimeSpanningInterface, public AttCurvature {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -33,15 +30,14 @@ public:
     virtual std::string GetClassName() { return "Slur"; };
     virtual ClassId Is() { return SLUR; };
     ///@}
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
 
 } // namespace vrv
-    
+
 #endif

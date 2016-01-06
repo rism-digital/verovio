@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_MEASURE_H__
 #define __VRV_MEASURE_H__
 
@@ -28,12 +27,8 @@ class FloatingElement;
  * It contains Layer objects.
  * For internally simplication of processing, unmeasure music is contained in one single measure object
  */
-class Measure: public DocObject,
-    public AttCommon,
-    public AttMeasureLog,
-    public AttPointing
-{
-    
+class Measure : public DocObject, public AttCommon, public AttMeasureLog, public AttPointing {
+
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -46,28 +41,28 @@ public:
     virtual std::string GetClassName() { return "Measure"; };
     virtual ClassId Is() { return MEASURE; };
     ///@}
-    
+
     /**
      * Return true if measured music (otherwise we have fakes measures)
      */
     bool IsMeasuredMusic() { return m_measuredMusic; };
-    
+
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-	void AddStaff(Staff *staff);
+    void AddStaff(Staff *staff);
     void AddFloatingElement(FloatingElement *element);
     ///@}
-	    
+
     /**
      * Return the index position of the measure in its system parent
      */
     int GetMeasureIdx() const { return Object::GetIdx(); };
-    
+
     /**
      * @name Set and get the left and right barLine types
-     * This somehow conflicts with AttMeasureLog, which are transfered from and to the 
+     * This somehow conflicts with AttMeasureLog, which are transfered from and to the
      * BarLine object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
      * MeiOutput::ReadMeiMeasure
      * Alternatively, we could keep them in sync here:
@@ -80,45 +75,45 @@ public:
     data_BARRENDITION GetRightBarLineType() const { return m_rightBarLine.GetForm(); };
     void SetRightBarLineType(data_BARRENDITION type) { m_rightBarLine.SetForm(type); };
     ///@}
-    
+
     /**
-     * @name Set and get the barlines. 
+     * @name Set and get the barlines.
      * Careful - the barlines are owned by the measure and will be destroy by it.
-     * This method should be used only for acessing them (e.g., when drawing) and 
+     * This method should be used only for acessing them (e.g., when drawing) and
      * not for creating other measure objects.
      */
     ///@{
     BarLine *GetLeftBarLine() { return &m_leftBarLine; };
     BarLine *GetRightBarLine() { return &m_rightBarLine; };
     ///@}
-    
+
     int GetXRel();
 
     /**
      * Return the non justifiable with for the measure
      */
     int GetNonJustifiableLeftMargin() { return m_measureAligner.GetNonJustifiableMargin(); }
-    
-    /** 
+
+    /**
      * Return the X rel position of the right barLine (without its width)
      */
     int GetRightBarLineX();
-    
+
     /**
      * Return the width of the measure, including the barLine width
      */
     int GetWidth();
-    
+
     //----------//
     // Functors //
     //----------//
-        
+
     /**
      * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
      * Called by AlignHorizontally
      */
     virtual void ResetHorizontalAlignment();
-    
+
     /**
      * AlignHorizontally the content of a measure.
      */
@@ -134,63 +129,62 @@ public:
      * Special case that redirects the functor to the GraceAligner.
      */
     virtual int IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params);
-    
+
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the MeasureAligner.
      */
     virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params);
-    
+
     /**
      * Set the position of the Alignment.
      * Special case that redirects the functor to the MeasureAligner.
      */
     virtual int SetAlignmentXPos(ArrayPtrVoid *params);
-    
+
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * This method also moves the end position of the measure according to the barLine width.
      */
     virtual int AlignMeasures(ArrayPtrVoid *params);
-    
+
     /**
      * Justify the X positions
      * Special case that redirects the functor to the MeasureAligner.
      */
     virtual int JustifyX(ArrayPtrVoid *params);
-    
+
     /**
      * Fill a page by adding systems with the appropriate length
      *
      */
     virtual int CastOffSystems(ArrayPtrVoid *params);
-    
+
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
     virtual int SetDrawingXY(ArrayPtrVoid *params);
-    
-        
+
 public:
-	/**
-     * The X absolute position of the measure for facsimile (transcription) encodings.
-     * This is the top left position of the measure.
-     */
+    /**
+ * The X absolute position of the measure for facsimile (transcription) encodings.
+ * This is the top left position of the measure.
+ */
     int m_xAbs;
     /**
      * The X relative position of the measure.
      * It is used internally when calculating the layout and it is not stored in the file.
      */
     int m_drawingXRel;
-    
+
     /**
      * The measure aligner that holds the x positions of the content of the measure
      */
     MeasureAligner m_measureAligner;
-    
+
 private:
     bool m_measuredMusic;
-    
+
     /**
      * @name The measure barlines (left and right) used when drawing
      */

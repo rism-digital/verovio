@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_MREST_H__
 #define __VRV_MREST_H__
 
@@ -17,11 +16,10 @@ namespace vrv {
 // MRest
 //----------------------------------------------------------------------------
 
-/** 
+/**
  * This class models the MEI <mRest>
  */
-class MRest: public LayerElement
-{
+class MRest : public LayerElement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -31,16 +29,14 @@ public:
     MRest();
     virtual ~MRest();
     virtual void Reset();
-    virtual std::string GetClassName(){ return "MRest"; }; ;
+    virtual std::string GetClassName() { return "MRest"; };
+    ;
     virtual ClassId Is() { return MREST; };
     ///@}
 
 private:
-    
 public:
-
 private:
-    
 };
 
 } // namespace vrv

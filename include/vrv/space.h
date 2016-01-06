@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_SPACE_H__
 #define __VRV_SPACE_H__
 
@@ -18,11 +17,10 @@ namespace vrv {
 // Space
 //----------------------------------------------------------------------------
 
-/** 
+/**
  * This class models the MEI <space>
  */
-class Space: public LayerElement, public DurationInterface
-{
+class Space : public LayerElement, public DurationInterface {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -32,16 +30,14 @@ public:
     Space();
     virtual ~Space();
     virtual void Reset();
-    virtual std::string GetClassName(){ return "Space"; }; ;
+    virtual std::string GetClassName() { return "Space"; };
+    ;
     virtual ClassId Is() { return SPACE; };
     ///@}
 
 private:
-    
 public:
-
 private:
-    
 };
 
 } // namespace vrv

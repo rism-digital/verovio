@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_DEF_H__
 #define __VRV_DEF_H__
 
@@ -19,7 +18,7 @@
 #include "attdef.h"
 
 namespace vrv {
- 
+
 //----------------------------------------------------------------------------
 // Version
 //----------------------------------------------------------------------------
@@ -33,7 +32,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 // Typedefs
 //----------------------------------------------------------------------------
- 
+
 class AttComparison;
 class BeamElementCoord;
 class LayerElement;
@@ -42,21 +41,21 @@ class Object;
 class Point;
 class Staff;
 
-typedef std::vector<Object*> ArrayOfObjects;
+typedef std::vector<Object *> ArrayOfObjects;
 
-typedef std::list<Object*> ListOfObjects;
+typedef std::list<Object *> ListOfObjects;
 
-typedef std::vector<void*> ArrayPtrVoid;
+typedef std::vector<void *> ArrayPtrVoid;
 
-typedef std::vector<AttComparison*> ArrayOfAttComparisons;
+typedef std::vector<AttComparison *> ArrayOfAttComparisons;
 
-typedef std::vector<Note*> ChordCluster;
-    
-typedef std::vector<BeamElementCoord*> ArrayOfBeamElementCoords;
-    
-typedef std::map<Staff*, std::vector<char> > MapOfLedgerLineFlags;
-    
-typedef std::vector<std::pair<LayerElement*, Point> > ArrayOfLayerElementPointPairs;
+typedef std::vector<Note *> ChordCluster;
+
+typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
+
+typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
+
+typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
 
 //----------------------------------------------------------------------------
 // Object defines
@@ -176,11 +175,11 @@ enum InterfaceId {
 //----------------------------------------------------------------------------
 // Global defines
 //----------------------------------------------------------------------------
-    
+
 #define DEFINITON_FACTOR 10
 #define PARAM_DENOMINATOR 10
-    
-#define is_in(x,a,b) (((x) >= std::min((a),(b))) && ((x) <= std::max((a),(b))))
+
+#define is_in(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
 /**
  * Codes returned by Functors.
@@ -188,53 +187,49 @@ enum InterfaceId {
  * FUNCTOR_SIBLINGS will no go any deeper in the tree.
  * FUNCTOR_STOP wil stop the tree processing.
  */
-enum FunctorCode {
-    FUNCTOR_CONTINUE = 0,
-    FUNCTOR_SIBLINGS,
-    FUNCTOR_STOP
-};
+enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 
 //----------------------------------------------------------------------------
 // Maximum number of levels between parent and children for optimizing search
 //----------------------------------------------------------------------------
-    
+
 /** All values set to -1 (no limit) since this has not major incidence **/
-    
+
 /** Define the maximum levels between a note and its accids **/
 #define MAX_ACCID_DEPTH -1
-    
+
 /** Define the maximum levels between a beam and its notes **/
 #define MAX_BEAM_DEPTH -1
-    
+
 /** Define the maximum levels between a beam and its notes **/
 #define MAX_CHORD_DEPTH -1
-    
+
 /** Define the maximum levels between a fTrem and its notes **/
 #define MAX_FTREM_DEPTH -1
-    
+
 /** Define the maximum levels between a tuplet and its notes **/
 #define MAX_TUPLET_DEPTH -1
-    
+
 /** Define the maximum levels of staffGrp within a scoreDef **/
 #define MAX_STAFFGRP_DEPTH -1
 
 /** Define the maximum levels between a note and its syls **/
 #define MAX_NOTE_DEPTH -1
-    
+
 //----------------------------------------------------------------------------
 // VerovioText codpoints
 //----------------------------------------------------------------------------
-   
+
 /**
- * These are SMuFL codepoints for the VerovioText font used for embedding 
+ * These are SMuFL codepoints for the VerovioText font used for embedding
  * SMuFL text glyph within text, as for example with <annot> or <syl>
  * Verovio uses a very small subset of glyph defined below (for now)
  */
-    
+
 #define VRV_TEXT_E550 0xE550
 #define VRV_TEXT_E551 0xE551
 #define VRV_TEXT_E552 0xE552
-    
+
 //----------------------------------------------------------------------------
 // Types for editorial element
 //----------------------------------------------------------------------------
@@ -255,12 +250,12 @@ enum EditorialLevel {
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
-  
+
 #define OCTAVE_OFFSET 4
 
 #define ON 1
 #define OFF 0
-    
+
 /* This is used for fast clef offset calculation.
  * It uses 4 bytes with, from right to left
  * - line
@@ -271,7 +266,7 @@ enum EditorialLevel {
 enum ClefId {
     G1 = CLEFSHAPE_G << 8 | 1,
     G2 = CLEFSHAPE_G << 8 | 2,
-    G2_8va =  PLACE_above << 24 | OCTAVE_DIS_8 << 16 | G2,
+    G2_8va = PLACE_above << 24 | OCTAVE_DIS_8 << 16 | G2,
     G2_8vb = PLACE_below << 24 | OCTAVE_DIS_8 << 16 | G2,
     F3 = CLEFSHAPE_F << 8 | 3,
     F4 = CLEFSHAPE_F << 8 | 4,
@@ -283,25 +278,25 @@ enum ClefId {
     C5 = CLEFSHAPE_C << 8 | 5,
     perc = CLEFSHAPE_perc << 8 | 1
 };
-    
-//The next four macros were tuned using the Leipzig font.
-    
-//Width (in half-drawing units) of an accidental; used to prevent overlap on complex chords
+
+// The next four macros were tuned using the Leipzig font.
+
+// Width (in half-drawing units) of an accidental; used to prevent overlap on complex chords
 #define ACCID_WIDTH 4
-    
-//Height
+
+// Height
 #define ACCID_HEIGHT 12
-    
-//Only keeps track of this much of the top of flats so that their bottom can be drawn more concisely
-//This can also be thought of as height(sharp)*F_B_H_M = height(flat)
+
+// Only keeps track of this much of the top of flats so that their bottom can be drawn more concisely
+// This can also be thought of as height(sharp)*F_B_H_M = height(flat)
 #define FLAT_BOTTOM_HEIGHT_MULTIPLIER .75
-    
-//Ignores this much of the top/right of an accid for same purposes (empty space in top right of drawing)
+
+// Ignores this much of the top/right of an accid for same purposes (empty space in top right of drawing)
 #define FLAT_CORNER_HEIGHT_IGNORE .25
 #define FLAT_CORNER_WIDTH_IGNORE .5
 #define NATURAL_CORNER_HEIGHT_IGNORE .25
 #define NATURAL_CORNER_WIDTH_IGNORE .5
-    
+
 // in half staff spaces (but should be 6 in two-voice notation)
 #define STANDARD_STEMLENGTH 7
 

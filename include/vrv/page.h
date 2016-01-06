@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_PAGE_H__
 #define __VRV_PAGE_H__
 
@@ -18,7 +17,6 @@ class DeviceContext;
 class Staff;
 class System;
 
-    
 //----------------------------------------------------------------------------
 // Page
 //----------------------------------------------------------------------------
@@ -28,8 +26,7 @@ class System;
  * A Page is contained in a Doc.
  * It contains System objects.
 */
-class Page: public DocObject
-{
+class Page : public DocObject {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -47,33 +44,33 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-	void AddSystem(System *system);
+    void AddSystem(System *system);
     ///@}
-	
-	int GetSystemCount() const { return (int)m_children.size(); };
-    
+
+    int GetSystemCount() const { return (int)m_children.size(); };
+
     /**
      * Return the index position of the page in its document parent
      */
     int GetPageIdx() const { return Object::GetIdx(); };
-    
+
     /**
      * Return the position of the staff on the page, from top to bottom
      */
     int GetStaffPosOnPage(Staff *staff);
-    
+
     /**
      * Do the layout of the page, whichi means aligning is content horizontally
      * and vertically, and justify horizontally and vertically if wanted.
      * This will be done only if m_layoutDone is false or force is true.
      */
     void LayOut(bool force = false);
-    
+
     /**
      * Lay out the content of the page (measures and their content) horizontally
      */
     void LayOutHorizontally();
-    
+
     /**
      * Justifiy the content of the page (measures and their content) horizontally
      */
@@ -83,12 +80,12 @@ public:
      * Lay out the content of the page (system/staves) vertically.
      */
     void LayOutVertically();
-    
+
     /**
      * Justifiy the content of the page (system/staves) vertically
      */
     void JustifyVertically();
-    
+
     /**
      * Return the height of the content by looking at the last system of the page.
      * This is used for adjusting the page height when this is the expected behaviour,
@@ -100,16 +97,15 @@ public:
      * Return the width of the content by looking at the first system of the page.
      * This is used for adjusting the page with when this is the expected behaviour,
      * typically with the --no_layout option in the commandline tool
-     * 
+     *
      */
     int GetContentWidth();
 
     //----------//
     // Functors //
     //----------//
-    
+
 private:
-    
 public:
     /** Page width (MEI scoredef@page.width). Saved if != -1 */
     int m_pageWidth;
@@ -121,12 +117,12 @@ public:
     short m_pageRightMar;
     /** Page top margin (MEI scoredef@page.topmar). Saved if != 0 */
     short m_pageTopMar;
-    /** 
+    /**
      * Surface (MEI @surface). Saved as facsimile for transciption layout.
      * For now, the target of the <graphic> element within surface is loaded here.
      */
     std::string m_surface;
-    
+
     /**
      * Hold the top scoreDef of the page.
      * The value must be initialized by going through the whole score for finding
@@ -142,7 +138,6 @@ private:
      * the force parameter is set.
      */
     bool m_layoutDone;
-    
 };
 
 } // namespace vrv

@@ -79,7 +79,6 @@ class Tuplet;
 class Unclear;
 class Verse;
 
-
 //----------------------------------------------------------------------------
 // MeiOutput
 //----------------------------------------------------------------------------
@@ -89,44 +88,42 @@ class Verse;
  * It uses the libmei C++ library.
  * Not implemented.
 */
-class MeiOutput: public FileOutputStream
-{
+class MeiOutput : public FileOutputStream {
 public:
     /** @name Constructors and destructor */
     ///@{
     MeiOutput(Doc *doc, std::string filename);
     virtual ~MeiOutput();
     ///@}
-    
+
     /**
      * The main method for exporting the file to MEI.
-     */ 
+     */
     virtual bool ExportFile();
 
     /**
      * The main method for write objects.
      */
     virtual bool WriteObject(Object *object);
-    
+
     /**
      * Writing object method that must be overriden in child class.
      */
     virtual bool WriteObjectEnd(Object *object);
-    
+
     /**
      * Return the output as a string by writing it to the stringstream member.
      */
     std::string GetOutput(int page = -1);
-    
+
     /**
      * Setter for score-based MEI output (non implemented)
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; };
 
 private:
-    
     bool WriteMeiDoc(Doc *doc);
-    
+
     /**
      * @name Methods for writing MEI containers (measures, staff, etc) scoreDef and related.
      */
@@ -140,7 +137,7 @@ private:
     bool WriteMeiStaff(pugi::xml_node currentNode, Staff *staff);
     bool WriteMeiLayer(pugi::xml_node currentNode, Layer *layer);
     ///@}
-    
+
     /**
      * @name Methods for writing LayerElement children.
      * Called from WriteLayerElement.
@@ -170,7 +167,7 @@ private:
     void WriteMeiSpace(pugi::xml_node currentNode, Space *space);
     void WriteMeiTuplet(pugi::xml_node currentNode, Tuplet *tuplet);
     ///@}
-    
+
     /**
      * @name Methods for writing FloatingElement
      */
@@ -180,7 +177,7 @@ private:
     void WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteMeiTie(pugi::xml_node currentNode, Tie *tie);
     ///@}
-    
+
     /**
      * @name Methods for writing TextElement
      */
@@ -188,7 +185,7 @@ private:
     void WriteMeiRend(pugi::xml_node currentNode, Rend *rend);
     void WriteMeiText(pugi::xml_node currentNode, Text *text);
     ///@}
-    
+
     /**
      * @name Methods for writing editorial markup
      */
@@ -210,7 +207,7 @@ private:
     bool WriteMeiSupplied(pugi::xml_node currentNode, Supplied *supplied);
     bool WriteMeiUnclear(pugi::xml_node currentNode, Unclear *unclear);
     ///@}
-    
+
     /**
      * @name Methods for wrinting other mei elements
      */
@@ -218,19 +215,19 @@ private:
     void WriteMeiVerse(pugi::xml_node currentNode, Verse *verse);
     void WriteMeiSyl(pugi::xml_node currentNode, Syl *syl);
     ///@}
-    
+
     /**
      * @name Methods for wrinting a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
      * To be changed to Att
      */
     void WriteSameAsAttr(pugi::xml_node currentNode, Object *object);
-    
+
     /**
      * Write unsupported attributes stored in Object::m_unsupported (not tested)
      */
     void WriteUnsupportedAttr(pugi::xml_node currentNode, Object *object);
-    
+
     /**
      * @name Methods for wrinting LayerElement, EditorialElement and interfaces.
      * Call WriteDurationInferface from WriteNote, for example.
@@ -245,24 +242,21 @@ private:
     void WriteTextDirInterface(pugi::xml_node currentNode, TextDirInterface *interface);
     void WriteTimeSpanningInterface(pugi::xml_node currentNode, TimeSpanningInterface *interface);
     ///@}
-    
+
     /**
      * Escapes SMuFL characters to entities (e.g., &#xe1e7;).
      * Must me used in conjunction with (pugi::format_default | pugi::format_no_escapes).
      * Unused for now (see WriteMeiText) because it of un-escaped entities in the header.
      */
     std::wstring EscapeSMuFL(std::wstring data);
-	
+
     /** @name Methods for converting members into MEI attributes. */
     ///@{
     std::string UuidToMeiStr(Object *element);
     std::string DocTypeToStr(DocType type);
     ///@}
 
-    
 public:
-
-
 private:
     std::string m_filename;
     std::stringstream m_streamStringOutput;
@@ -275,7 +269,6 @@ private:
     std::list<pugi::xml_node> m_nodeStack;
 };
 
-
 //----------------------------------------------------------------------------
 // MeiInput
 //----------------------------------------------------------------------------
@@ -285,16 +278,15 @@ private:
  * It uses the libmei C++ library.
  * Under development.
 */
-class MeiInput: public FileInputStream
-{
+class MeiInput : public FileInputStream {
 public:
     // constructors and destructors
     MeiInput(Doc *doc, std::string filename);
     virtual ~MeiInput();
-    
+
     virtual bool ImportFile();
     virtual bool ImportString(std::string mei);
-    
+
     /**
      * Set an xPath query for selecting specific <rdg>.
      * By default, the first <lem> or <rdg> is loaded.
@@ -302,24 +294,24 @@ public:
      * query will be selected (if any, otherwise the first one will be used).
      */
     virtual void SetAppXPathQuery(std::string appXPathQuery) { m_appXPathQuery = appXPathQuery; };
-    
+
 private:
     bool ReadMei(pugi::xml_node root);
     bool ReadMeiHeader(pugi::xml_node meihead);
-    
+
     /**
-     * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related. 
-     * For each container (page, system, measure, staff and layer) there is one method for 
+     * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related.
+     * For each container (page, system, measure, staff and layer) there is one method for
      * reading the element and one method for reading it children. The method for reading
      * the children can also be called when reading EditorialElement objects (<lem> or <rdg>
-     * for example. The filter object is optionnal and can be set for filtering the allowed 
+     * for example. The filter object is optionnal and can be set for filtering the allowed
      * children (see MeiInput::IsAllowed)
      */
     ///@{
     bool ReadMeiPage(pugi::xml_node page);
-    bool ReadMeiPageChildren(Object* parent, pugi::xml_node parentNode);
-    bool ReadMeiSystem(Object* parent, pugi::xml_node system);
-    bool ReadMeiSystemChildren(Object* parent, pugi::xml_node parentNode);
+    bool ReadMeiPageChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiSystem(Object *parent, pugi::xml_node system);
+    bool ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiScoreDef(Object *parent, pugi::xml_node scoreDef);
     bool ReadMeiScoreDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp);
@@ -343,7 +335,7 @@ private:
     bool ReadMeiBeam(Object *parent, pugi::xml_node beam);
     bool ReadMeiBeatRpt(Object *parent, pugi::xml_node beatRpt);
     bool ReadMeiBTrem(Object *parent, pugi::xml_node bTrem);
-    bool ReadMeiChord(Object* parent, pugi::xml_node chord);
+    bool ReadMeiChord(Object *parent, pugi::xml_node chord);
     bool ReadMeiClef(Object *parent, pugi::xml_node clef);
     bool ReadMeiCustos(Object *parent, pugi::xml_node custos);
     bool ReadMeiDot(Object *parent, pugi::xml_node dot);
@@ -364,7 +356,7 @@ private:
     bool ReadMeiTuplet(Object *parent, pugi::xml_node tuplet);
     bool ReadMeiVerse(Object *parent, pugi::xml_node verse);
     ///@}
-    
+
     /**
      * @name Methods for reading MEI floating elements
      */
@@ -374,7 +366,7 @@ private:
     bool ReadMeiTempo(Object *parent, pugi::xml_node tempo);
     bool ReadMeiTie(Object *parent, pugi::xml_node tie);
     ///@}
-    
+
     /**
      * @name Methods for reading MEI text elements
      */
@@ -382,7 +374,7 @@ private:
     bool ReadMeiRend(Object *parent, pugi::xml_node rend);
     bool ReadMeiText(Object *parent, pugi::xml_node text, bool trimLeft, bool trimRight);
     ///@}
-  
+
     /**
      * @name Methods for reading critical apparatus, other editorial markup and <annot>.
      * The filter is propagated (if any)
@@ -409,7 +401,7 @@ private:
     bool ReadMeiEditorialChildren(Object *parent, pugi::xml_node supplied, EditorialLevel level, Object *filter = NULL);
     ///@}
     ///@}
-    
+
     /**
      * @name Methods for reading MEI LayerElement, EidtorialElement and interfaces
      */
@@ -431,18 +423,18 @@ private:
     bool ReadAccidAsAttr(Note *note, pugi::xml_node verse);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
     ///@}
-    
+
     /**
      * Read a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
      */
     void ReadSameAsAttr(pugi::xml_node element, Object *object);
-    
+
     /**
      * Write unsupported attributes and store them in Object::m_unsupported (not tested)
      */
     void ReadUnsupportedAttr(pugi::xml_node element, Object *object);
-    
+
     /**
      * Method for adding the element to the appropriate parent (e.g., Layer, Beam).
      * This used for any element that supports different types of child.
@@ -456,17 +448,17 @@ private:
     void AddScoreDef(Object *parent, ScoreDef *element);
     void AddStaffGrp(Object *parent, StaffGrp *element);
     ///@}
-    
+
     /**
      * Returns true if the element is name is an editorial element (e.g., "app", "supplied", etc.)
      */
     bool IsEditorialElementName(std::string elementName);
-    
+
     /**
      * Read score-based MEI
      */
-    bool ReadScoreBasedMei(pugi::xml_node element);    
-    
+    bool ReadScoreBasedMei(pugi::xml_node element);
+
     /**
      * @name Various methods for reading / converting values.
      */
@@ -478,32 +470,32 @@ private:
     std::wstring LeftTrim(std::wstring str);
     std::wstring RightTrim(std::wstring str);
     ///@}
-     
+
 public:
-    
+    //
 private:
     std::string m_filename;
-    
+
     /** The current page when reading score-based MEI */
     Page *m_page;
     /** The current system when reading score-based MEI */
     System *m_system;
-    
+
     /**
      *
      */
     std::string m_appXPathQuery;
-    
+
     /**
      * This is used when reading a standard MEI file to specify if a scoreDef has already been read or not.
      */
     bool m_hasScoreDef;
-    
+
     /**
      * Check if an element is allowed within a given parent
      */
     bool IsAllowed(std::string element, Object *filterParent);
-    
+
     /**
      * A static array for storing the implemented editorial elements
      */

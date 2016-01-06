@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_REST_H__
 #define __VRV_REST_H__
 
@@ -19,11 +18,10 @@ namespace vrv {
 // Rest
 //----------------------------------------------------------------------------
 
-/** 
- * This class models the MEI <rest> element. 
+/**
+ * This class models the MEI <rest> element.
  */
-class Rest: public LayerElement, public DurationInterface, public PositionInterface
-{
+class Rest : public LayerElement, public DurationInterface, public PositionInterface {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -36,16 +34,13 @@ public:
     virtual std::string GetClassName() { return "Rest"; };
     virtual ClassId Is() { return REST; };
     ///@}
-    
+
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() { return true; };
-    
-private:
-    
-public:
 
 private:
-    
+public:
+private:
 };
 
 } // namespace vrv
