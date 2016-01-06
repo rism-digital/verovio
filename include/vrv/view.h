@@ -416,7 +416,7 @@ private:
     /**
      * Calculate the position of a point after a rotation of rot_alpha around the center
      */
-    static Point CalcPositionAfterRotation(Point point , float rot_alpha, Point center);
+    static Point CalcPositionAfterRotation(Point point, float rot_alpha, Point center);
     
     /**
      * Calculate the position of a point after a rotation of rot_alpha around the center

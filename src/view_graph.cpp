@@ -29,7 +29,7 @@ void View::DrawVerticalLine (DeviceContext *dc, int y1, int y2, int x1, int nbr)
     dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(nbr)), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-	dc->DrawLine(ToDeviceContextX(x1) , ToDeviceContextY(y1), ToDeviceContextX(x1), ToDeviceContextY(y2));
+	dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x1), ToDeviceContextY(y2));
 
     dc->ResetPen();
     dc->ResetBrush();
@@ -43,7 +43,7 @@ void View::DrawHorizontalLine (DeviceContext *dc, int x1, int x2, int y1, int nb
     dc->SetPen(m_currentColour, std::max(1, ToDeviceContextX(nbr)), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-	dc->DrawLine(ToDeviceContextX(x1) , ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+	dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
 
     dc->ResetPen();
     dc->ResetBrush();
@@ -64,7 +64,7 @@ void View::DrawHorizontalLine (DeviceContext *dc, int x1, int x2, int y1, int nb
         dc->SetPen(AxBLUE, 0, AxSOLID );
         dc->SetBrush(AxRED, AxTRANSPARENT);
         
-        dc->DrawRectangle(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1) , ToDeviceContextX(y1 - y2));
+        dc->DrawRectangle(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2));
         
         dc->ResetPen();
         dc->ResetBrush();
@@ -82,7 +82,7 @@ void View::DrawHorizontalLine (DeviceContext *dc, int x1, int x2, int y1, int nb
     dc->SetPen(m_currentColour, 0, AxSOLID );
     dc->SetBrush(m_currentColour, AxSOLID);
 
-	dc->DrawRectangle(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1) , ToDeviceContextX(y1 - y2));
+	dc->DrawRectangle(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2 - x1), ToDeviceContextX(y1 - y2));
 
     dc->ResetPen();
     dc->ResetBrush();
@@ -121,7 +121,7 @@ void View::DrawDot (DeviceContext *dc, int x, int y, int staffSize)
     dc->SetPen(m_currentColour, 1, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-	dc->DrawCircle(ToDeviceContextX(x) , ToDeviceContextY(y), r);
+	dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(y), r);
 		
     dc->ResetPen();
     dc->ResetBrush();

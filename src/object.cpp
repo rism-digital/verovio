@@ -565,7 +565,7 @@ DocObject::~DocObject()
 
 void DocObject::UpdateContentBB(int x1, int y1, int x2, int y2) 
 {
-    //LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2 ,m_contentBB_y2);
+    //LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
     
     int min_x = std::min(x1, x2);
     int max_x = std::max(x1, x2);
@@ -588,7 +588,7 @@ void DocObject::UpdateContentBB(int x1, int y1, int x2, int y2)
 
 void DocObject::UpdateSelfBB(int x1, int y1, int x2, int y2) 
 {
-    //LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2 ,m_selfBB_y2);
+    //LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
     
     int min_x = std::min(x1, x2);
     int max_x = std::max(x1, x2);
@@ -607,7 +607,7 @@ void DocObject::UpdateSelfBB(int x1, int y1, int x2, int y2)
     
     m_updatedBB = true;
     
-    //LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2 ,m_selfBB_y2);
+    //LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
     
 }
 

@@ -106,7 +106,7 @@ bool Resources::LoadFont(std::string fontName)
             }
             std::string codeStr = pdir->d_name;
             codeStr = codeStr.substr(0, 4);
-            Glyph glyph(Resources::GetPath() + "/" + fontName + "/" + pdir->d_name , codeStr);
+            Glyph glyph(Resources::GetPath() + "/" + fontName + "/" + pdir->d_name, codeStr);
             m_font[smuflCode] = glyph;
         }
     }

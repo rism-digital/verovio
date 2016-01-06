@@ -158,7 +158,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
         // We should also have a better way to specify if the number has to be displayed or not
         if ((measure->GetN() != VRV_UNSET) && (measure->GetN() > 1)) {
             dc->SetFont(m_doc->GetDrawingSmuflFont(100, false));
-            dc->DrawMusicText(IntToTupletFigures(measure->GetN()) , ToDeviceContextX(system->GetDrawingX()), ToDeviceContextY(system->GetDrawingY() - m_doc->GetSpacingStaff() * m_doc->GetDrawingUnit(100)));
+            dc->DrawMusicText(IntToTupletFigures(measure->GetN()), ToDeviceContextX(system->GetDrawingX()), ToDeviceContextY(system->GetDrawingY() - m_doc->GetSpacingStaff() * m_doc->GetDrawingUnit(100)));
             dc->ResetFont();
         }
     }
@@ -323,11 +323,11 @@ void View::DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     
     // actually draw the line, the brace or the bracket
     if (topStaffGrp && ((firstDef != lastDef) || (staffGrp->GetSymbol() != staffgroupingsym_SYMBOL_NONE))) {
-        DrawVerticalLine(dc , y_top, y_bottom, x, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
     }
     // this will need to be changed with the next version of MEI will line means additional thick line 
     if (staffGrp->GetSymbol() == staffgroupingsym_SYMBOL_line) {
-        DrawVerticalLine(dc , y_top, y_bottom, x, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
     }
     else if (staffGrp->GetSymbol() == staffgroupingsym_SYMBOL_brace) {
         DrawBrace (dc, x, y_top, y_bottom, last->m_drawingStaffSize);
@@ -438,7 +438,7 @@ void View::DrawBracket (DeviceContext *dc, int x, int y1, int y2, int staffSize)
     // the glyphs and the line
     y1 += m_doc->GetDrawingStemWidth(100);
     y2 -= m_doc->GetDrawingStemWidth(100);
-    DrawFullRectangle(dc, x1 , y1, x2, y2);
+    DrawFullRectangle(dc, x1, y1, x2, y2);
 
 	return;
 }
@@ -495,14 +495,14 @@ void View::DrawBrace (DeviceContext *dc, int x, int y1, int y2, int staffSize)
     new_coords[1][5] = points[3].y;
     
     dc->SetPen(m_currentColour, std::max(1, penWidth), AxSOLID);
-    dc->SetBrush(m_currentColour , AxSOLID);
+    dc->SetBrush(m_currentColour, AxSOLID);
     
     dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y1), new_coords[0], new_coords[1]);
     
 	// on produit l'image reflet vers le bas: 0 est identique 
-	points[1].y = points[0].y - ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize)*2);
+	points[1].y = points[0].y - ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) * 2);
 	points[3].y = ToDeviceContextY(y2);
-	points[2].y = points[3].y + ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize)*3);
+	points[2].y = points[3].y + ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) * 3);
     
     new_coords[0][0] = points[1].x;
     new_coords[0][1] = points[1].y;
@@ -638,35 +638,35 @@ void View::DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barL
     
 	if (barLine->GetForm() == BARRENDITION_single)
     {
-        DrawVerticalLine(dc , y_top, y_bottom, x, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
     }
     else if (barLine->GetForm() == BARRENDITION_rptboth)
     {
-        DrawVerticalLine(dc , y_top, y_bottom, x1, barLineWidth);
-        DrawVerticalLine(dc , y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
-        DrawVerticalLine(dc , y_top, y_bottom, x2, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
+        DrawVerticalLine(dc, y_top, y_bottom, x2, barLineWidth);
     }
     else if (barLine->GetForm()  == BARRENDITION_rptstart)
     {
-        DrawVerticalLine(dc , y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
-        DrawVerticalLine(dc , y_top, y_bottom, x2, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
+        DrawVerticalLine(dc, y_top, y_bottom, x2, barLineWidth);
     }
     else if (barLine->GetForm() == BARRENDITION_rptend)
 	{
-        DrawVerticalLine(dc , y_top, y_bottom, x1, barLineWidth);
-        DrawVerticalLine(dc , y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
+        DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
 	}
 	else if (barLine->GetForm()  == BARRENDITION_dbl)
 	{
         // Narrow the bars a little bit - should be centered?
         x1 += barLineWidth;
-        DrawVerticalLine(dc , y_top, y_bottom, x, barLineWidth);
-        DrawVerticalLine(dc , y_top, y_bottom, x1, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
 	}
 	else if (barLine->GetForm()  == BARRENDITION_end)
     {
-        DrawVerticalLine(dc , y_top, y_bottom, x1, barLineWidth);
-        DrawVerticalLine(dc , y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
+        DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x, m_doc->GetDrawingBeamWidth(100, false));
     }
     else {
         barLine->SetEmptyBB();
@@ -748,7 +748,7 @@ int View::CalculatePitchPosY (Staff *staff, data_PITCHNAME pname, int dec_clef, 
 
     // Old Wolfgang code with octave stored in an unsigned char - this could be refactored
     oct -= OCTAVE_OFFSET;
-	y_int = ((dec_clef + oct*7) - 9) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+	y_int = ((dec_clef + oct * 7) - 9) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     if (staff->m_drawingLines > 5) {
 		y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
@@ -757,7 +757,7 @@ int View::CalculatePitchPosY (Staff *staff, data_PITCHNAME pname, int dec_clef, 
 	position 1e Si, corrigee par dec_clef et oct. Elle est additionnee
 	ensuite, donc elle doit etre NEGATIVE si plus bas que m_drawingY */
     for (i=0; i<(signed)sizeof(touches); i++) {
-		if (*(ptouche+i) == pname) return (y_int += ((i+1)*m_doc->GetDrawingUnit(staff->m_drawingStaffSize)));
+		if (*(ptouche+i) == pname) return (y_int += ((i + 1) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)));
     }
 	return 0;
 }
@@ -841,11 +841,11 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     if (true) lineWidth = lineWidth * MENSURAL_LINEWIDTH_FACTOR;            // ??DON'T DO IF NOT MENSURAL NOTATION!
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
     //dc->SetPen(m_currentColour, ToDeviceContextX(m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize)), AxSOLID);
-    dc->SetBrush(m_currentColour , AxSOLID);
+    dc->SetBrush(m_currentColour, AxSOLID);
     
     for (j = 0;j < staff->m_drawingLines; j++)
     {
-        dc->DrawLine(ToDeviceContextX (x1) , ToDeviceContextY (yy) , ToDeviceContextX (x2) , ToDeviceContextY (yy));
+        dc->DrawLine(ToDeviceContextX (x1), ToDeviceContextY (yy), ToDeviceContextX (x2), ToDeviceContextY (yy));
         // For drawing rectangles insteam of line
         yy -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     }
@@ -881,7 +881,7 @@ int View::CalculatePitchCode (Layer *layer, int y_n, int x_pos, int *octave)
 
     int staffSize = parentStaff->m_drawingStaffSize;
 	// calculer position du do central en fonction clef
-	//y_n += (int) m_doc->GetDrawingUnit(staffSize)/4;
+	//y_n += (int) m_doc->GetDrawingUnit(staffSize) / 4;
 	yb = parentStaff->GetDrawingY() -  m_doc->GetDrawingStaffSize(staffSize); // UT1 default
 	
 
@@ -992,11 +992,11 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
     {
         if (current->Is() == MEASURE) {
             // cast to Measure check in DrawMeasure
-            DrawMeasure(dc , dynamic_cast<Measure*>(current), system);
+            DrawMeasure(dc, dynamic_cast<Measure*>(current), system);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawSystemEditorial element
-            DrawSystemEditorialElement(dc , dynamic_cast<EditorialElement*>(current), system);
+            DrawSystemEditorialElement(dc, dynamic_cast<EditorialElement*>(current), system);
         }
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (current->Is() == SCOREDEF) {
@@ -1027,11 +1027,11 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
         }
         else if (current->IsFloatingElement()) {
             // cast to FloatingElement check in DrawFloatingElement
-            DrawFloatingElement(dc , dynamic_cast<FloatingElement*>(current), measure, system);
+            DrawFloatingElement(dc, dynamic_cast<FloatingElement*>(current), measure, system);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawMeasureEditorialElement
-            DrawMeasureEditorialElement(dc , dynamic_cast<EditorialElement*>(current), measure, system);
+            DrawMeasureEditorialElement(dc, dynamic_cast<EditorialElement*>(current), measure, system);
         }
         else {
             LogDebug("Current is %s", current->GetClassName().c_str());
@@ -1052,11 +1052,11 @@ void View::DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff,  M
     {
         if (current->Is() == LAYER) {
             // cast to Layer check in DrawLayer
-            DrawLayer(dc , dynamic_cast<Layer*>(current), staff, measure);
+            DrawLayer(dc, dynamic_cast<Layer*>(current), staff, measure);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawStaffEditorialElement
-            DrawStaffEditorialElement(dc , dynamic_cast<EditorialElement*>(current), staff, measure);
+            DrawStaffEditorialElement(dc, dynamic_cast<EditorialElement*>(current), staff, measure);
         }
         else {
             assert(false);
@@ -1080,7 +1080,7 @@ void View::DrawLayerChildren(DeviceContext *dc, Object *parent, Layer *layer, St
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawLayerEditorialElement
-            DrawLayerEditorialElement(dc , dynamic_cast<EditorialElement*>(current), layer, staff, measure);
+            DrawLayerEditorialElement(dc, dynamic_cast<EditorialElement*>(current), layer, staff, measure);
         }
         else {
             assert(false);
@@ -1101,7 +1101,7 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, boo
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawLayerEditorialElement
-            DrawTextEditorialElement(dc , dynamic_cast<EditorialElement*>(current), x, y, setX, setY);
+            DrawTextEditorialElement(dc, dynamic_cast<EditorialElement*>(current), x, y, setX, setY);
         }
         else {
             assert(false);

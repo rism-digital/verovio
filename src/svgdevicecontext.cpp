@@ -296,7 +296,7 @@ void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6],
 
 void SvgDeviceContext::DrawCircle(int x, int y, int radius)
 {
-    DrawEllipse(x - radius, y - radius, 2*radius, 2*radius);
+    DrawEllipse(x - radius, y - radius, 2 * radius, 2 * radius);
 }
 
 

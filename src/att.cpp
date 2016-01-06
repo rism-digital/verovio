@@ -38,7 +38,7 @@ std::string Att::StrToStr(std::string str)
     return str;
 }
 
-// Basic converters for writing    
+// Basic converters for writing 
 
 std::string Att::DblToStr(double data)
 {

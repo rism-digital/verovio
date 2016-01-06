@@ -984,7 +984,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         x2 -= 2 * (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         
         //if (x1 > x2) {
-        //    DrawFullRectangle(dc, x1, y + 2* m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), x2, y + 3 * m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+        //    DrawFullRectangle(dc, x1, y + 2 * m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), x2, y + 3 * m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
         //    LogDebug("x1 > x2 (%d %d)", x1, x2);
         //}
         

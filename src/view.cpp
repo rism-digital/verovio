@@ -174,7 +174,7 @@ std::wstring View::IntToSmuflFigures(unsigned short number, int offset)
     return str;
 }
     
-Point View::CalcPositionAfterRotation(Point point , float rot_alpha, Point center)
+Point View::CalcPositionAfterRotation(Point point, float rot_alpha, Point center)
 {
     float s = sin(rot_alpha);
     float c = cos(rot_alpha);
