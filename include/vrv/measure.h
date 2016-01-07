@@ -167,9 +167,9 @@ public:
 
 public:
     /**
- * The X absolute position of the measure for facsimile (transcription) encodings.
- * This is the top left position of the measure.
- */
+     * The X absolute position of the measure for facsimile (transcription) encodings.
+     * This is the top left position of the measure.
+     */
     int m_xAbs;
     /**
      * The X relative position of the measure.

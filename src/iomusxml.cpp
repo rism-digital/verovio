@@ -20,8 +20,8 @@
 #include "doc.h"
 #include "layer.h"
 #include "measure.h"
-#include "note.h"
 #include "mrest.h"
+#include "note.h"
 #include "page.h"
 #include "rest.h"
 #include "slur.h"
@@ -345,12 +345,15 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 StaffGrp *staffGrp = new StaffGrp();
                 // read the group-symbol (MEI @symbol)
                 std::string groupGymbol = GetContentOfChild(xpathNode.node(), "group-symbol");
-                if (groupGymbol == "bracket")
+                if (groupGymbol == "bracket") {
                     staffGrp->SetSymbol(staffgroupingsym_SYMBOL_bracket);
-                else if (groupGymbol == "brace")
+                }
+                else if (groupGymbol == "brace") {
                     staffGrp->SetSymbol(staffgroupingsym_SYMBOL_brace);
-                else if (groupGymbol == "line")
+                }
+                else if (groupGymbol == "line") {
                     staffGrp->SetSymbol(staffgroupingsym_SYMBOL_line);
+                }
                 // now stack it
                 m_staffGrpStack.back()->AddStaffGrp(staffGrp);
                 m_staffGrpStack.push_back(staffGrp);
@@ -624,10 +627,12 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, i
     data_BARRENDITION barRendition = BARRENDITION_NONE;
     std::string barStyle = GetContentOfChild(node, "bar-style");
     if (!barStyle.empty()) {
-        if (barStyle == "light-light")
+        if (barStyle == "light-light") {
             barRendition = BARRENDITION_dbl;
-        else if (barStyle == "light-heavy")
+        }
+        else if (barStyle == "light-heavy") {
             barRendition = BARRENDITION_end;
+        }
         // we need to handle more style
         else {
             barRendition = BARRENDITION_single;
@@ -720,10 +725,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         // Stem direction - taken into account below for the chord or the note
         data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
         std::string stemDirStr = GetContentOfChild(node, "stem");
-        if (stemDirStr == "down")
+        if (stemDirStr == "down") {
             stemDir = STEMDIRECTION_down;
-        else if (stemDirStr == "up")
+        }
+        else if (stemDirStr == "up") {
             stemDir = STEMDIRECTION_up;
+        }
 
         // Pitch and octave
         pugi::xpath_node pitch = node.select_single_node("pitch");
@@ -760,12 +767,15 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         pugi::xpath_node grace = node.select_single_node("grace");
         if (grace) {
             std::string slashStr = GetAttributeValue(grace.node(), "slash");
-            if (slashStr == "yes")
+            if (slashStr == "yes") {
                 note->SetGrace(GRACE_acc);
-            else if (slashStr == "no")
+            }
+            else if (slashStr == "no") {
                 note->SetGrace(GRACE_unacc);
-            else
+            }
+            else {
                 note->SetGrace(GRACE_unknown);
+            }
         }
 
         // Set the duration to the note if we are not in a chord
@@ -842,10 +852,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         if (HasAttributeWithValue(slur, "type", "start")) {
             Slur *meiSlur = new Slur();
             // placement
-            if (HasAttributeWithValue(slur, "placement", "above"))
+            if (HasAttributeWithValue(slur, "placement", "above")) {
                 meiSlur->SetCurvedir(curvature_CURVEDIR_above);
-            else if (HasAttributeWithValue(slur, "placement", "below"))
+            }
+            else if (HasAttributeWithValue(slur, "placement", "below")) {
                 meiSlur->SetCurvedir(curvature_CURVEDIR_below);
+            }
             // add it to the stack
             m_floatingElements.push_back(std::make_pair(measureNb, meiSlur));
             OpenSlur(staff, layer, slurNumber, element, meiSlur);
@@ -873,96 +885,56 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 
 data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAccidentalToAccid(std::string value)
 {
-    if (value == "sharp")
-        return ACCIDENTAL_EXPLICIT_s;
-    else if (value == "flat")
-        return ACCIDENTAL_EXPLICIT_f;
-    else if (value == "sharp-sharp")
-        return ACCIDENTAL_EXPLICIT_ss;
-    else if (value == "double-sharp")
-        return ACCIDENTAL_EXPLICIT_ss;
-    else if (value == "flat-flat")
-        return ACCIDENTAL_EXPLICIT_ff;
-    else if (value == "double-flat")
-        return ACCIDENTAL_EXPLICIT_ff;
-    else if (value == "natural")
-        return ACCIDENTAL_EXPLICIT_n;
-    else {
-        LogWarning("Unsupported accidental value '%s'", value.c_str());
-    }
+    if (value == "sharp") return ACCIDENTAL_EXPLICIT_s;
+    if (value == "flat") return ACCIDENTAL_EXPLICIT_f;
+    if (value == "sharp-sharp") return ACCIDENTAL_EXPLICIT_ss;
+    if (value == "double-sharp") return ACCIDENTAL_EXPLICIT_ss;
+    if (value == "flat-flat") return ACCIDENTAL_EXPLICIT_ff;
+    if (value == "double-flat") return ACCIDENTAL_EXPLICIT_ff;
+    if (value == "natural") return ACCIDENTAL_EXPLICIT_n;
+    LogWarning("Unsupported accidental value '%s'", value.c_str());
     return ACCIDENTAL_EXPLICIT_NONE;
 }
 
 data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAlterToAccid(std::string value)
 {
-    if (value == "1")
-        return ACCIDENTAL_EXPLICIT_s;
-    else if (value == "-1")
-        return ACCIDENTAL_EXPLICIT_f;
-    else if (value == "2")
-        return ACCIDENTAL_EXPLICIT_ss;
-    else if (value == "-2")
-        return ACCIDENTAL_EXPLICIT_ff;
-    else if (value == "0")
-        return ACCIDENTAL_EXPLICIT_n;
-    else {
-        LogWarning("Unsupported alter value '%s'", value.c_str());
-    }
+    if (value == "1") return ACCIDENTAL_EXPLICIT_s;
+    if (value == "-1") return ACCIDENTAL_EXPLICIT_f;
+    if (value == "2") return ACCIDENTAL_EXPLICIT_ss;
+    if (value == "-2") return ACCIDENTAL_EXPLICIT_ff;
+    if (value == "0") return ACCIDENTAL_EXPLICIT_n;
+    LogWarning("Unsupported alter value '%s'", value.c_str());
     return ACCIDENTAL_EXPLICIT_NONE;
 }
 
 data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
 {
-    if (value == "maxima")
-        return DURATION_maxima; // this is a mensural MEI value
-    else if (value == "longa")
-        return DURATION_long;
-    else if (value == "breve")
-        return DURATION_breve;
-    else if (value == "whole")
-        return DURATION_1;
-    else if (value == "half")
-        return DURATION_2;
-    else if (value == "quarter")
-        return DURATION_4;
-    else if (value == "eighth")
-        return DURATION_8;
-    else if (value == "16th")
-        return DURATION_16;
-    else if (value == "32nd")
-        return DURATION_32;
-    else if (value == "64th")
-        return DURATION_64;
-    else if (value == "128th")
-        return DURATION_128;
-    else if (value == "256th")
-        return DURATION_256;
-    else {
-        LogWarning("Unsupported type '%s'", value.c_str());
-    }
+    if (value == "maxima") return DURATION_maxima; // this is a mensural MEI value
+    if (value == "longa") return DURATION_long;
+    if (value == "breve") return DURATION_breve;
+    if (value == "whole") return DURATION_1;
+    if (value == "half") return DURATION_2;
+    if (value == "quarter") return DURATION_4;
+    if (value == "eighth") return DURATION_8;
+    if (value == "16th") return DURATION_16;
+    if (value == "32nd") return DURATION_32;
+    if (value == "64th") return DURATION_64;
+    if (value == "128th") return DURATION_128;
+    if (value == "256th") return DURATION_256;
+    LogWarning("Unsupported type '%s'", value.c_str());
     return DURATION_NONE;
 }
 
 data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
 {
-    if (value == "C")
-        return PITCHNAME_c;
-    else if (value == "D")
-        return PITCHNAME_d;
-    else if (value == "E")
-        return PITCHNAME_e;
-    else if (value == "F")
-        return PITCHNAME_f;
-    else if (value == "G")
-        return PITCHNAME_g;
-    else if (value == "A")
-        return PITCHNAME_a;
-    else if (value == "B")
-        return PITCHNAME_b;
-    else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str());
-    }
-    // default
+    if (value == "C") return PITCHNAME_c;
+    if (value == "D") return PITCHNAME_d;
+    if (value == "E") return PITCHNAME_e;
+    if (value == "F") return PITCHNAME_f;
+    if (value == "G") return PITCHNAME_g;
+    if (value == "A") return PITCHNAME_a;
+    if (value == "B") return PITCHNAME_b;
+    LogWarning("Unsupported pitch name '%s'", value.c_str());
     return PITCHNAME_NONE;
 }
 

@@ -29,8 +29,8 @@
 #include "smufl.h"
 #include "staff.h"
 #include "style.h"
-#include "system.h"
 #include "syl.h"
+#include "system.h"
 #include "text.h"
 #include "tuplet.h"
 #include "vrv.h"
@@ -269,8 +269,8 @@ void View::DrawStaffGrp(
 
     int y_top = first->GetDrawingY();
     // for the bottom position we need to take into account the number of lines and the staff size
-    int y_bottom = last->GetDrawingY()
-        - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+    int y_bottom
+        = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
     int barLineWidth = m_doc->GetDrawingBarLineWidth(100);
 
     // ajdust the top and bottom according to staffline width
@@ -572,7 +572,6 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         }
     }
     else {
-
         ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
         if (staffDefs->empty()) {
             return;
@@ -601,8 +600,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         int y_top = first->GetDrawingY();
         // for the bottom position we need to take into account the number of lines and the staff size
-        int y_bottom = last->GetDrawingY()
-            - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+        int y_bottom
+            = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
 
         DrawBarLine(dc, y_top, y_bottom, barLine);
 
@@ -780,7 +779,9 @@ int View::CalculateRestPosY(Staff *staff, char duration)
         case DUR_64: offset = 10; break;
         case DUR_128: offset = 10; break;
         case DUR_256: offset = 9; break;
-        default: offset = 12; break; // Signal an error, put the clef up high
+        default:
+            offset = 12;
+            break; // Signal an error, put the clef up high
     }
     return base + staff_space * offset;
 }

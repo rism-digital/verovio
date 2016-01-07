@@ -116,13 +116,13 @@ public:
 
 public:
     /**
- * Number of lines copied from the staffDef for fast access when drawing
- */
+     * Number of lines copied from the staffDef for fast access when drawing
+     */
     int m_drawingLines;
 
     /**
- * Notation type (CMN, mensural, black mensural, etc.), from the staffDef
- */
+     * Notation type (CMN, mensural, black mensural, etc.), from the staffDef
+     */
     int m_drawingNotationType;
 
     /**

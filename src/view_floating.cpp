@@ -267,13 +267,16 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     }
     //  the look if in a chord
     else if (startParentChord) {
-        if (startParentChord->PositionInChord(startNote) < 0)
+        if (startParentChord->PositionInChord(startNote) < 0) {
             up = false;
-        else if (startParentChord->PositionInChord(startNote) > 0)
+        }
+        else if (startParentChord->PositionInChord(startNote) > 0) {
             up = true;
+        }
         // away from the stem if odd number (center note)
-        else
+        else {
             up = (stemDir != STEMDIRECTION_up);
+        }
     }
     else if (stemDir == STEMDIRECTION_up) {
         up = false;
@@ -292,10 +295,12 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     int yChordMax, yChordMin;
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         // first get the min max of the chord (if any)
-        if (startParentChord)
+        if (startParentChord) {
             startParentChord->GetYExtremes(&yChordMax, &yChordMin);
-        else if (startChord)
+        }
+        else if (startChord) {
             startChord->GetYExtremes(&yChordMax, &yChordMin);
+        }
         // slur is up
         if (up) {
             // P(^)
@@ -335,10 +340,12 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     }
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         // get the min max of the chord if any
-        if (endParentChord)
+        if (endParentChord) {
             endParentChord->GetYExtremes(&yChordMax, &yChordMin);
-        else if (endChord)
+        }
+        else if (endChord) {
             endChord->GetYExtremes(&yChordMax, &yChordMin);
+        }
         // get the stem direction of the end
         // slur is up
         if (up) {
@@ -606,10 +613,12 @@ void View::GetSpanningPointPositions(
         // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
         itPoint->second = View::CalcPositionAfterRotation(p, -angle, p1);
         // This would add it after
-        if (up)
+        if (up) {
             itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 2;
-        else
+        }
+        else {
             itPoint->second.y -= m_doc->GetDrawingUnit(staffSize) * 2;
+        }
     }
 }
 
@@ -896,13 +905,16 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     }
     //  the look if in a chord
     else if (parentChord1) {
-        if (parentChord1->PositionInChord(note1) < 0)
+        if (parentChord1->PositionInChord(note1) < 0) {
             up = false;
-        else if (parentChord1->PositionInChord(note1) > 0)
+        }
+        else if (parentChord1->PositionInChord(note1) > 0) {
             up = true;
+        }
         // away from the stem if odd number (center note)
-        else
+        else {
             up = (noteStemDir != STEMDIRECTION_up);
+        }
     }
     else if (noteStemDir == STEMDIRECTION_up) {
         up = false;

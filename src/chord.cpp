@@ -244,10 +244,12 @@ void Chord::GetYExtremes(int *yMax, int *yMin)
             passed = true;
         }
         else {
-            if (y1 > *yMax)
+            if (y1 > *yMax) {
                 *yMax = y1;
-            else if (y1 < *yMin)
+            }
+            else if (y1 < *yMin) {
                 *yMin = y1;
+            }
         }
     }
 }

@@ -10,8 +10,8 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <dirent.h>
 #include <cmath>
+#include <dirent.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <vector>
@@ -408,24 +408,30 @@ std::wstring UTF8to16(const char *in)
     unsigned int codepoint;
     while (*in != 0) {
         unsigned char ch = static_cast<unsigned char>(*in);
-        if (ch <= 0x7f)
+        if (ch <= 0x7f) {
             codepoint = ch;
-        else if (ch <= 0xbf)
+        }
+        else if (ch <= 0xbf) {
             codepoint = (codepoint << 6) | (ch & 0x3f);
-        else if (ch <= 0xdf)
+        }
+        else if (ch <= 0xdf) {
             codepoint = ch & 0x1f;
-        else if (ch <= 0xef)
+        }
+        else if (ch <= 0xef) {
             codepoint = ch & 0x0f;
-        else
+        }
+        else {
             codepoint = ch & 0x07;
+        }
         ++in;
         if (((*in & 0xc0) != 0x80) && (codepoint <= 0x10ffff)) {
             if (codepoint > 0xffff) {
                 out.append(1, static_cast<wchar_t>(0xd800 + (codepoint >> 10)));
                 out.append(1, static_cast<wchar_t>(0xdc00 + (codepoint & 0x03ff)));
             }
-            else if (codepoint < 0xd800 || codepoint >= 0xe000)
+            else if (codepoint < 0xd800 || codepoint >= 0xe000) {
                 out.append(1, static_cast<wchar_t>(codepoint));
+            }
         }
     }
     return out;

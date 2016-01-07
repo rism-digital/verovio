@@ -15,15 +15,15 @@
 
 #include "iodarms.h"
 #include "iomei.h"
-#include "iopae.h"
 #include "iomusxml.h"
+#include "iopae.h"
 #include "layer.h"
-#include "page.h"
 #include "measure.h"
 #include "note.h"
+#include "page.h"
 #include "slur.h"
-#include "svgdevicecontext.h"
 #include "style.h"
+#include "svgdevicecontext.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -169,14 +169,18 @@ bool Toolkit::SetSpacingNonLinear(float spacingNonLinear)
 
 bool Toolkit::SetFormat(std::string const &informat)
 {
-    if (informat == "pae")
+    if (informat == "pae") {
         m_format = PAE;
-    else if (informat == "darms")
+    }
+    else if (informat == "darms") {
         m_format = DARMS;
-    else if (informat == "mei")
+    }
+    else if (informat == "mei") {
         m_format = MEI;
-    else if (informat == "musicxml")
+    }
+    else if (informat == "musicxml") {
         m_format = MUSICXML;
+    }
     else {
         LogError("Input format can only be: mei, pae, xml or darms");
         return false;

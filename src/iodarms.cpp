@@ -356,7 +356,6 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         m_layer->AddLayerElement(rest);
     }
     else {
-
         if ((position + m_clef_offset) > sizeof(PitchMap)) position = 0;
 
         Note *note = new Note;

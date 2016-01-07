@@ -89,22 +89,20 @@ void View::SetPage(int pageIdx, bool doLayout)
 
 bool View::HasNext(bool forward)
 {
-    if (forward)
-        return (m_doc && (m_doc->HasPage(m_pageIdx + 1)));
-    else
-        return (m_doc && (m_doc->HasPage(m_pageIdx - 1)));
-    return false;
+    if (forward) return (m_doc && (m_doc->HasPage(m_pageIdx + 1)));
+    return (m_doc && (m_doc->HasPage(m_pageIdx - 1)));
 }
 
 void View::Next(bool forward)
 {
     if (!m_doc) return;
 
-    if (forward && this->HasNext(true))
+    if (forward && this->HasNext(true)) {
         m_pageIdx++;
-    else if (!forward && this->HasNext(false))
+    }
+    else if (!forward && this->HasNext(false)) {
         m_pageIdx--;
-
+    }
     SetPage(m_pageIdx);
 }
 

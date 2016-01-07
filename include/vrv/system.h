@@ -167,9 +167,9 @@ public:
      */
     int m_drawingYRel;
     /**
- * The x absolute position of the  system for facsimile layouts.
- * This is the top left corner of the system.
- */
+     * The x absolute position of the  system for facsimile layouts.
+     * This is the top left corner of the system.
+     */
     int m_xAbs;
     /**
      * The X relative position of the system.

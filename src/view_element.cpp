@@ -33,8 +33,8 @@
 #include "proport.h"
 #include "rest.h"
 #include "rpt.h"
-#include "space.h"
 #include "smufl.h"
+#include "space.h"
 #include "staff.h"
 #include "style.h"
 #include "syl.h"
@@ -206,8 +206,12 @@ void View::DrawAccid(
         case ACCIDENTAL_EXPLICIT_s: symc = SMUFL_E262_accidentalSharp; break;
         case ACCIDENTAL_EXPLICIT_ff: symc = SMUFL_E264_accidentalDoubleFlat;
         case ACCIDENTAL_EXPLICIT_f: symc = SMUFL_E260_accidentalFlat; break;
-        case ACCIDENTAL_EXPLICIT_su: symc = SMUFL_E268_accidentalNaturalSharp; break; // Not sure this is correct...
-        case ACCIDENTAL_EXPLICIT_fu: symc = SMUFL_E267_accidentalNaturalFlat; break; // Same
+        case ACCIDENTAL_EXPLICIT_su:
+            symc = SMUFL_E268_accidentalNaturalSharp;
+            break; // Not sure this is correct...
+        case ACCIDENTAL_EXPLICIT_fu:
+            symc = SMUFL_E267_accidentalNaturalFlat;
+            break; // Same
         default: break;
     }
 
@@ -264,8 +268,8 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
     else {
         DrawSmuflCode(dc, xSymbol, y, SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false);
         int additionalSlash = beatRpt->GetForm() - BEATRPT_REND_8;
-        int halfWidth = m_doc->GetGlyphWidth(SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false)
-            / 2;
+        int halfWidth
+            = m_doc->GetGlyphWidth(SMUFL_E101_noteheadSlashHorizontalEnds, staff->m_drawingStaffSize, false) / 2;
         int i;
         for (i = 0; i < additionalSlash; i++) {
             xSymbol += halfWidth;
@@ -784,8 +788,8 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     x = element->GetDrawingX();
     // HARDCODED
-    int step = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false)
-        * TEMP_STYLE_KEYSIG_STEP;
+    int step
+        = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_STYLE_KEYSIG_STEP;
 
     // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by
     // default)
@@ -1688,8 +1692,8 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned c
     y1 = y;
     vertic = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-    int off = m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, cueSize) * 2
-        / 3; // i.e., la moitie de la ronde
+    int off
+        = m_doc->GetDrawingLedgerLineLength(staff->m_drawingStaffSize, cueSize) * 2 / 3; // i.e., la moitie de la ronde
 
     x1 = x - off;
     x2 = x + off;
@@ -1835,10 +1839,12 @@ void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff)
     x = element->GetDrawingX() - m_doc->GetGlyphWidth(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false);
 
     // HARDCODED
-    if ((element->GetDrawingY()) < staff->GetDrawingY())
+    if ((element->GetDrawingY()) < staff->GetDrawingY()) {
         y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    else
+    }
+    else {
         y = (element->GetDrawingY()) + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    }
 
     DrawSmuflCode(dc, x, y, SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false);
 }
@@ -1899,21 +1905,29 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         accidBot = accidTop + (accidHeightDiff * FLAT_BOTTOM_HEIGHT_MULTIPLIER);
         assert(accidBot < accidSpaceSize);
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop + (ACCID_HEIGHT * FLAT_CORNER_HEIGHT_IGNORE)).at(currentX - accidWidthDiff))
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * FLAT_CORNER_HEIGHT_IGNORE)).at(currentX - accidWidthDiff)) {
                 currentX += 1;
+            }
             // just in case
-            else if (currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE) >= xLength)
+            else if (currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE) >= xLength) {
                 break;
-            else if (accidSpace->at(accidTop).at(currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE)))
+            }
+            else if (accidSpace->at(accidTop).at(
+                         currentX - accidWidthDiff + (ACCID_WIDTH * FLAT_CORNER_WIDTH_IGNORE))) {
                 currentX += 1;
-            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff))
+            }
+            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff)) {
                 currentX += 1;
-            else if (accidSpace->at(accidTop).at(currentX))
+            }
+            else if (accidSpace->at(accidTop).at(currentX)) {
                 currentX += 1;
-            else if (accidSpace->at(accidBot).at(currentX))
+            }
+            else if (accidSpace->at(accidBot).at(currentX)) {
                 currentX += 1;
-            else
+            }
+            else {
                 break;
+            }
         };
     }
     else if (type == ACCIDENTAL_EXPLICIT_n) {
@@ -1924,26 +1938,36 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         // a flat
         int accidMid = accidTop + (accidBot - accidTop) / 2;
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop + (ACCID_HEIGHT * NATURAL_CORNER_HEIGHT_IGNORE)).at(currentX - accidWidthDiff))
+            if (accidSpace->at(accidTop + (ACCID_HEIGHT * NATURAL_CORNER_HEIGHT_IGNORE))
+                    .at(currentX - accidWidthDiff)) {
                 currentX += 1;
+            }
             // just in case
-            else if (currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE) >= xLength)
+            else if (currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE) >= xLength) {
                 break;
+            }
             else if (accidSpace->at(accidTop).at(
-                         currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE)))
+                         currentX - accidWidthDiff + (ACCID_WIDTH * NATURAL_CORNER_WIDTH_IGNORE))) {
                 currentX += 1;
-            else if (accidSpace->at(accidMid).at(currentX - accidWidthDiff))
+            }
+            else if (accidSpace->at(accidMid).at(currentX - accidWidthDiff)) {
                 currentX += 1;
-            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff))
+            }
+            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff)) {
                 currentX += 1;
-            else if (accidSpace->at(accidTop).at(currentX))
+            }
+            else if (accidSpace->at(accidTop).at(currentX)) {
                 currentX += 1;
-            else if (accidSpace->at(accidMid).at(currentX))
+            }
+            else if (accidSpace->at(accidMid).at(currentX)) {
                 currentX += 1;
-            else if (accidSpace->at(accidBot).at(currentX))
+            }
+            else if (accidSpace->at(accidBot).at(currentX)) {
                 currentX += 1;
-            else
+            }
+            else {
                 break;
+            }
         };
     }
     else if (type == ACCIDENTAL_EXPLICIT_s) {
@@ -1953,20 +1977,27 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         // a flat
         int accidMid = accidTop + (accidBot - accidTop) / 2;
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop).at(currentX - accidWidthDiff))
+            if (accidSpace->at(accidTop).at(currentX - accidWidthDiff)) {
                 currentX += 1;
-            else if (accidSpace->at(accidMid).at(currentX - accidWidthDiff))
+            }
+            else if (accidSpace->at(accidMid).at(currentX - accidWidthDiff)) {
                 currentX += 1;
-            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff))
+            }
+            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff)) {
                 currentX += 1;
-            else if (accidSpace->at(accidTop).at(currentX))
+            }
+            else if (accidSpace->at(accidTop).at(currentX)) {
                 currentX += 1;
-            else if (accidSpace->at(accidMid).at(currentX))
+            }
+            else if (accidSpace->at(accidMid).at(currentX)) {
                 currentX += 1;
-            else if (accidSpace->at(accidBot).at(currentX))
+            }
+            else if (accidSpace->at(accidBot).at(currentX)) {
                 currentX += 1;
-            else
+            }
+            else {
                 break;
+            }
         };
     }
     else {
@@ -1978,20 +2009,27 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         int accidMid = accidTop + (accidBot - accidTop) / 2;
         assert(accidMid < accidSpaceSize);
         while (currentX < xLength) {
-            if (accidSpace->at(accidTop).at(currentX - accidWidthDiff))
+            if (accidSpace->at(accidTop).at(currentX - accidWidthDiff)) {
                 currentX += 1;
-            else if (accidSpace->at(accidMid).at(currentX - accidWidthDiff))
+            }
+            else if (accidSpace->at(accidMid).at(currentX - accidWidthDiff)) {
                 currentX += 1;
-            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff))
+            }
+            else if (accidSpace->at(accidBot).at(currentX - accidWidthDiff)) {
                 currentX += 1;
-            else if (accidSpace->at(accidTop).at(currentX))
+            }
+            else if (accidSpace->at(accidTop).at(currentX)) {
                 currentX += 1;
-            else if (accidSpace->at(accidMid).at(currentX))
+            }
+            else if (accidSpace->at(accidMid).at(currentX)) {
                 currentX += 1;
-            else if (accidSpace->at(accidBot).at(currentX))
+            }
+            else if (accidSpace->at(accidBot).at(currentX)) {
                 currentX += 1;
-            else
+            }
+            else {
                 break;
+            }
         };
     }
 
@@ -2001,8 +2039,9 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         int yComp = accidTop - alignmentThreshold;
         assert(yComp < accidSpaceSize);
         assert(yComp >= 0);
-        if ((accidSpace->at(yComp).at(currentX + 1) == false) && (accidSpace->at(yComp).at(currentX) == true))
+        if ((accidSpace->at(yComp).at(currentX + 1) == false) && (accidSpace->at(yComp).at(currentX) == true)) {
             currentX += 1;
+        }
     }
 
     // If the accidental is lined up with the one below it, move it left by a halfunit to avoid visual confusion
@@ -2011,8 +2050,9 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
         int yComp = accidBot;
         assert(yComp < accidSpaceSize);
         assert(yComp >= 0);
-        if ((accidSpace->at(yComp).at(currentX + 1) == false) && (accidSpace->at(yComp).at(currentX) == true))
+        if ((accidSpace->at(yComp).at(currentX + 1) == false) && (accidSpace->at(yComp).at(currentX) == true)) {
             currentX += 1;
+        }
     }
 
     // Just to make sure.
@@ -2095,15 +2135,17 @@ void View::PrepareChordDots(DeviceContext *dc, Chord *chord, int x, int y, unsig
     if (IsOnStaffLine(y, staff)) {
         // defaults to the space above the staffline first
         // if that position is not on the list already, we're good to go
-        if (std::find(dotsList->begin(), dotsList->end(), y + fullUnit) == dotsList->end()) y += fullUnit;
-
+        if (std::find(dotsList->begin(), dotsList->end(), y + fullUnit) == dotsList->end()) {
+            y += fullUnit;
+        }
         // if it is on the list, we should try the spot a doubleUnit below
-        else if (std::find(dotsList->begin(), dotsList->end(), y - fullUnit) == dotsList->end())
+        else if (std::find(dotsList->begin(), dotsList->end(), y - fullUnit) == dotsList->end()) {
             y -= fullUnit;
-
+        }
         // otherwise, any other space looks weird so let's not draw it
-        else
+        else {
             return;
+        }
     }
     // similar if it's not on a staff line
     else {
@@ -2111,14 +2153,17 @@ void View::PrepareChordDots(DeviceContext *dc, Chord *chord, int x, int y, unsig
         if (std::find(dotsList->begin(), dotsList->end(), y) == dotsList->end()) {
         }
         // if it does, then look up a space first
-        else if (std::find(dotsList->begin(), dotsList->end(), y + doubleUnit) == dotsList->end())
+        else if (std::find(dotsList->begin(), dotsList->end(), y + doubleUnit) == dotsList->end()) {
             y += doubleUnit;
+        }
         // then look down a space
-        else if (std::find(dotsList->begin(), dotsList->end(), y - doubleUnit) == dotsList->end())
+        else if (std::find(dotsList->begin(), dotsList->end(), y - doubleUnit) == dotsList->end()) {
             y -= doubleUnit;
+        }
         // otherwise let's not draw it
-        else
+        else {
             return;
+        }
     }
 
     // finally, make sure it's not outside the acceptable extremes of the chord

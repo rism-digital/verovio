@@ -196,19 +196,19 @@ public:
     void RefreshViews(){};
 
     /**
- * Set drawing values (page size, etc) when drawing a page.
- * By default, the page size of the document is taken.
- * If a page is given, the size of the page is taken.
- * calculFormatPapier() in Wolfgang
- */
+     * Set drawing values (page size, etc) when drawing a page.
+     * By default, the page size of the document is taken.
+     * If a page is given, the size of the page is taken.
+     * calculFormatPapier() in Wolfgang
+     */
     Page *SetDrawingPage(int pageIdx);
 
     /**
- * Reset drawing page to NULL.
- * This might be necessary if we have replaced a page in the document.
- * We need to call this because otherwise looking at the page idx will fail.
- * See Doc::LayOut for an example.
- */
+     * Reset drawing page to NULL.
+     * This might be necessary if we have replaced a page in the document.
+     * We need to call this because otherwise looking at the page idx will fail.
+     * See Doc::LayOut for an example.
+     */
     void ResetDrawingPage() { m_drawingPage = NULL; };
 
     /**

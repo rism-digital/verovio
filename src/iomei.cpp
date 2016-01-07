@@ -1141,16 +1141,21 @@ std::wstring MeiOutput::EscapeSMuFL(std::wstring data)
     // approximate that we won't have a 1.1 longer string (for optimization)
     buffer.reserve(data.size() * 1.1);
     for (size_t pos = 0; pos != data.size(); ++pos) {
-        if (data[pos] == '&')
+        if (data[pos] == '&') {
             buffer.append(L"&amp;");
-        else if (data[pos] == '\"')
+        }
+        else if (data[pos] == '\"') {
             buffer.append(L"&quot;");
-        else if (data[pos] == '\'')
+        }
+        else if (data[pos] == '\'') {
             buffer.append(L"&apos;");
-        else if (data[pos] == '<')
+        }
+        else if (data[pos] == '<') {
             buffer.append(L"&lt;");
-        else if (data[pos] == '>')
+        }
+        else if (data[pos] == '>') {
             buffer.append(L"&gt;");
+        }
         // Unicode private area for SMuFL characters
         else if ((data[pos] > 0xE000) && (data[pos] < 0xF8FF)) {
             std::wostringstream ss;
@@ -2987,16 +2992,10 @@ void MeiInput::SetMeiUuid(pugi::xml_node element, Object *object)
 
 DocType MeiInput::StrToDocType(std::string type)
 {
-    if (type == "raw")
-        return Raw;
-    else if (type == "rendering")
-        return Rendering;
-    else if (type == "transcription")
-        return Transcription;
-    else {
-        LogWarning("Unknown layout type '%s'", type.c_str());
-    }
-    // default
+    if (type == "raw") return Raw;
+    if (type == "rendering") return Rendering;
+    if (type == "transcription") return Transcription;
+    LogWarning("Unknown layout type '%s'", type.c_str());
     return Raw;
 }
 

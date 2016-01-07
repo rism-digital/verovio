@@ -49,8 +49,9 @@ void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int nbr
     return;
 }
 
-/* Draw rectangle partly filled in, as specified by <fillSection>: 1=top, 2=bottom, 3=left side,
-    4=right side; 0=don't fill in any part. ??SO FAR, <fillSection> IS IGNORED.
+/*
+ * Draw rectangle partly filled in, as specified by <fillSection>: 1=top, 2=bottom, 3=left side,
+ * 4=right side; 0=don't fill in any part. ??SO FAR, <fillSection> IS IGNORED.
  */
 void View::DrawPartFullRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection)
 {

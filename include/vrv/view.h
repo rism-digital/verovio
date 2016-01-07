@@ -15,9 +15,9 @@
 namespace vrv {
 
 class Accid;
+class BarLine;
 class Beam;
 class BeamParams;
-class BarLine;
 class Chord;
 class DeviceContext;
 class Doc;
@@ -81,8 +81,8 @@ public:
     ///@}
 
     /**
- * Simply returns the value of the last note-type element (mensural or neume)
- */
+     * Simply returns the value of the last note-type element (mensural or neume)
+     */
     bool GetNotationMode();
 
     /**

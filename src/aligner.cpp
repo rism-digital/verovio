@@ -174,10 +174,12 @@ Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type, b
     if (idx == -1) {
         // this is tricky! Because we want m_rightAlignment to always stay at the end (with hasEndAlignment),
         // we always to insert _before_ the last one - m_rightAlignment is added in Reset()
-        if (hasEndAlignment)
+        if (hasEndAlignment) {
             idx = GetAlignmentCount() - 1;
-        else
+        }
+        else {
             idx = GetAlignmentCount();
+        }
     }
     Alignment *newAlignment = new Alignment(time, type);
     AddAlignment(newAlignment, idx);
@@ -301,8 +303,8 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     // take into account the number of lyrics
     if (this->GetVerseCount() > 0) {
         // We need + 1 lyric line space
-        m_yShift -= (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (*interlineSize / 2)
-            / PARAM_DENOMINATOR;
+        m_yShift
+            -= (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (*interlineSize / 2) / PARAM_DENOMINATOR;
     }
 
     int min_shift = (*staffMargin) + (*previousStaffHeight);

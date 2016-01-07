@@ -124,7 +124,6 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         direction = firstNote->GetDrawingStemDir(); // stem direction is same for all notes
     }
     else {
-
         // There are unbeamed notes of two different beams
         // treat all the notes as unbeames
         int ups = 0, downs = 0; // quantity of up- and down-stems
@@ -289,8 +288,8 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     int txt_x = center.x - (txt_length / 2);
     // we need to move down the figure of half of it height, which is about an accid width;
     // also, cue size is not supported. Does it has to?
-    int txt_y = center.y
-        - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, tuplet->IsCueSize());
+    int txt_y
+        = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, tuplet->IsCueSize());
 
     if (tuplet->GetNum() && (tuplet->GetNumVisible() != BOOLEAN_false)) {
         DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->m_drawingStaffSize);

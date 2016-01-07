@@ -82,125 +82,76 @@ std::string Att::BeatrptRendToStr(data_BEATRPT_REND data)
 
 data_BEATRPT_REND Att::StrToBeatrptRend(std::string value)
 {
-    if (value == "4")
-        return BEATRPT_REND_4;
-    else if (value == "8")
-        return BEATRPT_REND_8;
-    else if (value == "16")
-        return BEATRPT_REND_16;
-    else if (value == "32")
-        return BEATRPT_REND_32;
-    else if (value == "64")
-        return BEATRPT_REND_64;
-    else if (value == "128")
-        return BEATRPT_REND_128;
-    else if (value == "mixed")
-        return BEATRPT_REND_mixed;
-    else {
-        LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
-    }
+    if (value == "4") return BEATRPT_REND_4;
+    if (value == "8") return BEATRPT_REND_8;
+    if (value == "16") return BEATRPT_REND_16;
+    if (value == "32") return BEATRPT_REND_32;
+    if (value == "64") return BEATRPT_REND_64;
+    if (value == "128") return BEATRPT_REND_128;
+    if (value == "mixed") return BEATRPT_REND_mixed;
+    LogWarning("Unsupported beatrpt rend '%s'", value.c_str());
     return BEATRPT_REND_NONE;
 }
 
 std::string Att::DurationToStr(data_DURATION data)
 {
     std::string value;
-    if (data == DURATION_maxima)
-        value = "maxima";
-    else if (data == DURATION_longa)
-        value = "longa";
-    else if (data == DURATION_brevis)
-        value = "brevis";
-    else if (data == DURATION_semibrevis)
-        value = "semibrevis";
-    else if (data == DURATION_minima)
-        value = "minima";
-    else if (data == DURATION_semiminima)
-        value = "semiminima";
-    else if (data == DURATION_fusa)
-        value = "fusa";
-    else if (data == DURATION_semifusa)
-        value = "semifusa";
-    else if (data == DURATION_long)
-        value = "long";
-    else if (data == DURATION_breve)
-        value = "breve";
-    else if (data == DURATION_1)
-        value = "1";
-    else if (data == DURATION_2)
-        value = "2";
-    else if (data == DURATION_4)
-        value = "4";
-    else if (data == DURATION_8)
-        value = "8";
-    else if (data == DURATION_16)
-        value = "16";
-    else if (data == DURATION_32)
-        value = "32";
-    else if (data == DURATION_64)
-        value = "64";
-    else if (data == DURATION_128)
-        value = "128";
-    else if (data == DURATION_256)
-        value = "256";
-    else {
-        LogWarning("Unknown dur '%d'", data);
-        value = "4";
+    switch (data) {
+        case DURATION_maxima: value = "maxima"; break;
+        case DURATION_longa: value = "longa"; break;
+        case DURATION_brevis: value = "brevis"; break;
+        case DURATION_semibrevis: value = "semibrevis"; break;
+        case DURATION_minima: value = "minima"; break;
+        case DURATION_semiminima: value = "semiminima"; break;
+        case DURATION_fusa: value = "fusa"; break;
+        case DURATION_semifusa: value = "semifusa"; break;
+        case DURATION_long: value = "long"; break;
+        case DURATION_breve: value = "breve"; break;
+        case DURATION_1: value = "1"; break;
+        case DURATION_2: value = "2"; break;
+        case DURATION_4: value = "4"; break;
+        case DURATION_8: value = "8"; break;
+        case DURATION_16: value = "16"; break;
+        case DURATION_32: value = "32"; break;
+        case DURATION_64: value = "64"; break;
+        case DURATION_128: value = "128"; break;
+        case DURATION_256: value = "256"; break;
+        default:
+            LogWarning("Unknown dur '%d'", data);
+            value = "4";
+            break;
     }
     return value;
 }
 
 data_DURATION Att::StrToDuration(std::string value)
 {
-    data_DURATION dur;
-    if (value == "maxima")
-        dur = DURATION_maxima;
-    else if (value == "longa")
-        dur = DURATION_longa;
-    else if (value == "brevis")
-        dur = DURATION_brevis;
-    else if (value == "semibrevis")
-        dur = DURATION_semibrevis;
-    else if (value == "minima")
-        dur = DURATION_minima;
-    else if (value == "semiminima")
-        dur = DURATION_semiminima;
-    else if (value == "fusa")
-        dur = DURATION_fusa;
-    else if (value == "semifusa")
-        dur = DURATION_semifusa;
-    else if (value == "long")
-        dur = DURATION_long;
-    else if (value == "breve")
-        dur = DURATION_breve;
-    else if (value == "1")
-        dur = DURATION_1;
-    else if (value == "2")
-        dur = DURATION_2;
-    else if (value == "4")
-        dur = DURATION_4;
-    else if (value == "8")
-        dur = DURATION_8;
-    else if (value == "16")
-        dur = DURATION_16;
-    else if (value == "32")
-        dur = DURATION_32;
-    else if (value == "64")
-        dur = DURATION_64;
-    else if (value == "128")
-        dur = DURATION_128;
-    else if (value == "256")
-        dur = DURATION_256;
-    else {
-        if ((value.length() > 0) && (value[value.length() - 1] == 'p')) {
-            // LogWarning("PPQ duration dur_s are not supported"); // remove it for now
-        }
-        else {
-            LogWarning("Unknown dur '%s'", value.c_str());
-        }
-        dur = DURATION_NONE;
+    if (value == "maxima") return DURATION_maxima;
+    if (value == "longa") return DURATION_longa;
+    if (value == "brevis") return DURATION_brevis;
+    if (value == "semibrevis") return DURATION_semibrevis;
+    if (value == "minima") return DURATION_minima;
+    if (value == "semiminima") return DURATION_semiminima;
+    if (value == "fusa") return DURATION_fusa;
+    if (value == "semifusa") return DURATION_semifusa;
+    if (value == "long") return DURATION_long;
+    if (value == "breve") return DURATION_breve;
+    if (value == "1") return DURATION_1;
+    if (value == "2") return DURATION_2;
+    if (value == "4") return DURATION_4;
+    if (value == "8") return DURATION_8;
+    if (value == "16") return DURATION_16;
+    if (value == "32") return DURATION_32;
+    if (value == "64") return DURATION_64;
+    if (value == "128") return DURATION_128;
+    if (value == "256") return DURATION_256;
+    if ((value.length() > 0) && (value[value.length() - 1] == 'p')) {
+        // LogWarning("PPQ duration dur_s are not supported"); // remove it for now
     }
-    return dur;
+    else {
+        LogWarning("Unknown dur '%s'", value.c_str());
+    }
+    return DURATION_NONE;
 }
 
 std::string Att::KeysignatureToStr(data_KEYSIGNATURE data)
@@ -233,41 +184,23 @@ std::string Att::KeysignatureToStr(data_KEYSIGNATURE data)
 
 data_KEYSIGNATURE Att::StrToKeysignature(std::string value)
 {
-    if (value == "7f")
-        return KEYSIGNATURE_7f;
-    else if (value == "6f")
-        return KEYSIGNATURE_6f;
-    else if (value == "5f")
-        return KEYSIGNATURE_5f;
-    else if (value == "4f")
-        return KEYSIGNATURE_4f;
-    else if (value == "3f")
-        return KEYSIGNATURE_3f;
-    else if (value == "2f")
-        return KEYSIGNATURE_2f;
-    else if (value == "1f")
-        return KEYSIGNATURE_1f;
-    else if (value == "0")
-        return KEYSIGNATURE_0;
-    else if (value == "1s")
-        return KEYSIGNATURE_1s;
-    else if (value == "2s")
-        return KEYSIGNATURE_2s;
-    else if (value == "3s")
-        return KEYSIGNATURE_3s;
-    else if (value == "4s")
-        return KEYSIGNATURE_4s;
-    else if (value == "5s")
-        return KEYSIGNATURE_5s;
-    else if (value == "6s")
-        return KEYSIGNATURE_6s;
-    else if (value == "7s")
-        return KEYSIGNATURE_7s;
-    else if (value == "mixed")
-        return KEYSIGNATURE_mixed;
-    else {
-        LogWarning("Unsupported key signature '%s'", value.c_str());
-    }
+    if (value == "7f") return KEYSIGNATURE_7f;
+    if (value == "6f") return KEYSIGNATURE_6f;
+    if (value == "5f") return KEYSIGNATURE_5f;
+    if (value == "4f") return KEYSIGNATURE_4f;
+    if (value == "3f") return KEYSIGNATURE_3f;
+    if (value == "2f") return KEYSIGNATURE_2f;
+    if (value == "1f") return KEYSIGNATURE_1f;
+    if (value == "0") return KEYSIGNATURE_0;
+    if (value == "1s") return KEYSIGNATURE_1s;
+    if (value == "2s") return KEYSIGNATURE_2s;
+    if (value == "3s") return KEYSIGNATURE_3s;
+    if (value == "4s") return KEYSIGNATURE_4s;
+    if (value == "5s") return KEYSIGNATURE_5s;
+    if (value == "6s") return KEYSIGNATURE_6s;
+    if (value == "7s") return KEYSIGNATURE_7s;
+    if (value == "mixed") return KEYSIGNATURE_mixed;
+    LogWarning("Unsupported key signature '%s'", value.c_str());
     return KEYSIGNATURE_NONE;
 }
 
@@ -297,14 +230,9 @@ std::string Att::ModusmaiorToStr(data_MODUSMAIOR data)
 
 data_MODUSMAIOR Att::StrToModusmaior(std::string value)
 {
-    if (value == "2")
-        return MODUSMAIOR_2;
-    else if (value == "3")
-        return MODUSMAIOR_3;
-    else {
-        LogWarning("Unsupported modusmaior '%s'", value.c_str());
-    }
-    // default
+    if (value == "2") return MODUSMAIOR_2;
+    if (value == "3") return MODUSMAIOR_3;
+    LogWarning("Unsupported modusmaior '%s'", value.c_str());
     return MODUSMAIOR_NONE;
 }
 
@@ -324,14 +252,9 @@ std::string Att::ModusminorToStr(data_MODUSMINOR data)
 
 data_MODUSMINOR Att::StrToModusminor(std::string value)
 {
-    if (value == "2")
-        return MODUSMINOR_2;
-    else if (value == "3")
-        return MODUSMINOR_3;
-    else {
-        LogWarning("Unsupported modusmaior '%s'", value.c_str());
-    }
-    // default
+    if (value == "2") return MODUSMINOR_2;
+    if (value == "3") return MODUSMINOR_3;
+    LogWarning("Unsupported modusmaior '%s'", value.c_str());
     return MODUSMINOR_NONE;
 }
 
@@ -356,24 +279,14 @@ std::string Att::PitchnameToStr(data_PITCHNAME data)
 
 data_PITCHNAME Att::StrToPitchname(std::string value)
 {
-    if (value == "c")
-        return PITCHNAME_c;
-    else if (value == "d")
-        return PITCHNAME_d;
-    else if (value == "e")
-        return PITCHNAME_e;
-    else if (value == "f")
-        return PITCHNAME_f;
-    else if (value == "g")
-        return PITCHNAME_g;
-    else if (value == "a")
-        return PITCHNAME_a;
-    else if (value == "b")
-        return PITCHNAME_b;
-    else {
-        LogWarning("Unsupported pitch name '%s'", value.c_str());
-    }
-    // default
+    if (value == "c") return PITCHNAME_c;
+    if (value == "d") return PITCHNAME_d;
+    if (value == "e") return PITCHNAME_e;
+    if (value == "f") return PITCHNAME_f;
+    if (value == "g") return PITCHNAME_g;
+    if (value == "a") return PITCHNAME_a;
+    if (value == "b") return PITCHNAME_b;
+    LogWarning("Unsupported pitch name '%s'", value.c_str());
     return PITCHNAME_NONE;
 }
 
@@ -394,16 +307,10 @@ std::string Att::OctaveDisToStr(data_OCTAVE_DIS data)
 
 data_OCTAVE_DIS Att::StrToOctaveDis(std::string value)
 {
-    if (value == "8")
-        return OCTAVE_DIS_8;
-    else if (value == "15")
-        return OCTAVE_DIS_15;
-    else if (value == "22")
-        return OCTAVE_DIS_22;
-    else {
-        LogWarning("Unsupported octave dis '%s'", value.c_str());
-    }
-    // default
+    if (value == "8") return OCTAVE_DIS_8;
+    if (value == "15") return OCTAVE_DIS_15;
+    if (value == "22") return OCTAVE_DIS_22;
+    LogWarning("Unsupported octave dis '%s'", value.c_str());
     return OCTAVE_DIS_NONE;
 }
 
@@ -424,15 +331,10 @@ std::string Att::OrientationToStr(data_ORIENTATION data)
 
 data_ORIENTATION Att::StrToOrientation(std::string value)
 {
-    if (value == "reversed")
-        return ORIENTATION_reversed;
-    else if (value == "90CW")
-        return ORIENTATION_90CW;
-    else if (value == "90CCW")
-        return ORIENTATION_90CCW;
-    else {
-        LogWarning("Unsupported orientation '%s'", value.c_str());
-    }
+    if (value == "reversed") return ORIENTATION_reversed;
+    if (value == "90CW") return ORIENTATION_90CW;
+    if (value == "90CCW") return ORIENTATION_90CCW;
+    LogWarning("Unsupported orientation '%s'", value.c_str());
     return ORIENTATION_NONE;
 }
 
@@ -452,14 +354,9 @@ std::string Att::ProlatioToStr(data_PROLATIO data)
 
 data_PROLATIO Att::StrToProlatio(std::string value)
 {
-    if (value == "2")
-        return PROLATIO_2;
-    else if (value == "3")
-        return PROLATIO_3;
-    else {
-        LogWarning("Unsupported prolatio '%s'", value.c_str());
-    }
-    // default
+    if (value == "2") return PROLATIO_2;
+    if (value == "3") return PROLATIO_3;
+    LogWarning("Unsupported prolatio '%s'", value.c_str());
     return PROLATIO_NONE;
 }
 
@@ -479,13 +376,9 @@ std::string Att::StemdirectionToStr(data_STEMDIRECTION data)
 
 data_STEMDIRECTION Att::StrToStemdirection(std::string value)
 {
-    if (value == "up")
-        return STEMDIRECTION_up;
-    else if (value == "down")
-        return STEMDIRECTION_down;
-    else {
-        LogWarning("Unsupported stem direction '%s'", value.c_str());
-    }
+    if (value == "up") return STEMDIRECTION_up;
+    if (value == "down") return STEMDIRECTION_down;
+    LogWarning("Unsupported stem direction '%s'", value.c_str());
     return STEMDIRECTION_NONE;
 }
 
@@ -505,14 +398,9 @@ std::string Att::TempusToStr(data_TEMPUS data)
 
 data_TEMPUS Att::StrToTempus(std::string value)
 {
-    if (value == "2")
-        return TEMPUS_2;
-    else if (value == "3")
-        return TEMPUS_3;
-    else {
-        LogWarning("Unsupported tempus '%s'", value.c_str());
-    }
-    // default
+    if (value == "2") return TEMPUS_2;
+    if (value == "3") return TEMPUS_3;
+    LogWarning("Unsupported tempus '%s'", value.c_str());
     return TEMPUS_NONE;
 }
 
@@ -533,15 +421,10 @@ std::string Att::TieToStr(data_TIE data)
 
 data_TIE Att::StrToTie(std::string value)
 {
-    if (value == "i")
-        return TIE_i;
-    else if (value == "m")
-        return TIE_m;
-    else if (value == "t")
-        return TIE_t;
-    else {
-        LogWarning("Unsupported tie '%s'", value.c_str());
-    }
+    if (value == "i") return TIE_i;
+    if (value == "m") return TIE_m;
+    if (value == "t") return TIE_t;
+    LogWarning("Unsupported tie '%s'", value.c_str());
     return TIE_NONE;
 }
 

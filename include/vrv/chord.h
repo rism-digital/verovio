@@ -24,7 +24,7 @@ namespace vrv {
 
 /**
  * This class represents a collection of notes in the same layer with the
- *    same onset time.
+ * same onset time.
  * A chord is contained in a layer.
  * It contains notes.
  */

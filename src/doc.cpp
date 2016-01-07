@@ -534,71 +534,41 @@ FontInfo *Doc::GetDrawingLyricFont(int staffSize)
 char Doc::GetLeftMargin(const ClassId classId)
 {
 
-    if (classId == ACCID)
-        return m_style->m_leftMarginAccid;
-    else if (classId == BARLINE)
-        return m_style->m_leftMarginBarLine;
-    else if (classId == BARLINE_ATTR)
-        return m_style->m_leftMarginBarLineAttr;
-    else if (classId == BEATRPT)
-        return m_style->m_leftMarginBeatRpt;
-    else if (classId == CHORD)
-        return m_style->m_leftMarginChord;
-    else if (classId == CLEF)
-        return m_style->m_leftMarginClef;
-    else if (classId == KEYSIG)
-        return m_style->m_leftMarginKeySig;
-    else if (classId == MENSUR)
-        return m_style->m_leftMarginMensur;
-    else if (classId == METERSIG)
-        return m_style->m_leftMarginMeterSig;
-    else if (classId == MREST)
-        return m_style->m_leftMarginMRest;
-    else if (classId == MRPT2)
-        return m_style->m_leftMarginMRpt2;
-    else if (classId == MULTIREST)
-        return m_style->m_leftMarginMultiRest;
-    else if (classId == MULTIRPT)
-        return m_style->m_leftMarginMultiRpt;
-    else if (classId == NOTE)
-        return m_style->m_leftMarginNote;
-    else if (classId == REST)
-        return m_style->m_leftMarginRest;
+    if (classId == ACCID) return m_style->m_leftMarginAccid;
+    if (classId == BARLINE) return m_style->m_leftMarginBarLine;
+    if (classId == BARLINE_ATTR) return m_style->m_leftMarginBarLineAttr;
+    if (classId == BEATRPT) return m_style->m_leftMarginBeatRpt;
+    if (classId == CHORD) return m_style->m_leftMarginChord;
+    if (classId == CLEF) return m_style->m_leftMarginClef;
+    if (classId == KEYSIG) return m_style->m_leftMarginKeySig;
+    if (classId == MENSUR) return m_style->m_leftMarginMensur;
+    if (classId == METERSIG) return m_style->m_leftMarginMeterSig;
+    if (classId == MREST) return m_style->m_leftMarginMRest;
+    if (classId == MRPT2) return m_style->m_leftMarginMRpt2;
+    if (classId == MULTIREST) return m_style->m_leftMarginMultiRest;
+    if (classId == MULTIRPT) return m_style->m_leftMarginMultiRpt;
+    if (classId == NOTE) return m_style->m_leftMarginNote;
+    if (classId == REST) return m_style->m_leftMarginRest;
     return m_style->m_leftMarginDefault;
 }
 
 char Doc::GetRightMargin(const ClassId classId)
 {
-    if (classId == ACCID)
-        return m_style->m_rightMarginAccid;
-    else if (classId == BARLINE)
-        return m_style->m_rightMarginBarLine;
-    else if (classId == BARLINE_ATTR)
-        return m_style->m_rightMarginBarLineAttr;
-    else if (classId == BEATRPT)
-        return m_style->m_rightMarginBeatRpt;
-    else if (classId == CHORD)
-        return m_style->m_rightMarginChord;
-    else if (classId == CLEF)
-        return m_style->m_rightMarginClef;
-    else if (classId == KEYSIG)
-        return m_style->m_rightMarginKeySig;
-    else if (classId == MENSUR)
-        return m_style->m_rightMarginMensur;
-    else if (classId == METERSIG)
-        return m_style->m_rightMarginMeterSig;
-    else if (classId == MREST)
-        return m_style->m_rightMarginMRest;
-    else if (classId == MRPT2)
-        return m_style->m_rightMarginMRpt2;
-    else if (classId == MULTIREST)
-        return m_style->m_rightMarginMultiRest;
-    else if (classId == MULTIRPT)
-        return m_style->m_rightMarginMultiRpt;
-    else if (classId == NOTE)
-        return m_style->m_rightMarginNote;
-    else if (classId == REST)
-        return m_style->m_rightMarginRest;
+    if (classId == ACCID) return m_style->m_rightMarginAccid;
+    if (classId == BARLINE) return m_style->m_rightMarginBarLine;
+    if (classId == BARLINE_ATTR) return m_style->m_rightMarginBarLineAttr;
+    if (classId == BEATRPT) return m_style->m_rightMarginBeatRpt;
+    if (classId == CHORD) return m_style->m_rightMarginChord;
+    if (classId == CLEF) return m_style->m_rightMarginClef;
+    if (classId == KEYSIG) return m_style->m_rightMarginKeySig;
+    if (classId == MENSUR) return m_style->m_rightMarginMensur;
+    if (classId == METERSIG) return m_style->m_rightMarginMeterSig;
+    if (classId == MREST) return m_style->m_rightMarginMRest;
+    if (classId == MRPT2) return m_style->m_rightMarginMRpt2;
+    if (classId == MULTIREST) return m_style->m_rightMarginMultiRest;
+    if (classId == MULTIRPT) return m_style->m_rightMarginMultiRpt;
+    if (classId == NOTE) return m_style->m_rightMarginNote;
+    if (classId == REST) return m_style->m_rightMarginRest;
     return m_style->m_rightMarginDefault;
 }
 
