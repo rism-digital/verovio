@@ -27,7 +27,8 @@ namespace vrv {
 // Measure
 //----------------------------------------------------------------------------
 
-Measure::Measure(bool measureMusic, int logMeasureNb) : DocObject("measure-"), AttCommon(), AttMeasureLog(), AttPointing()
+Measure::Measure(bool measureMusic, int logMeasureNb)
+    : DocObject("measure-"), AttCommon(), AttMeasureLog(), AttPointing()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_MEASURELOG);
@@ -276,7 +277,8 @@ int Measure::CastOffSystems(ArrayPtrVoid *params)
     int *systemWidth = static_cast<int *>((*params).at(4));
     int *currentScoreDefWidth = static_cast<int *>((*params).at(5));
 
-    if (((*currentSystem)->GetChildCount() > 0) && (this->m_drawingXRel + this->GetWidth() + (*currentScoreDefWidth) - (*shift) > (*systemWidth))) {
+    if (((*currentSystem)->GetChildCount() > 0)
+        && (this->m_drawingXRel + this->GetWidth() + (*currentScoreDefWidth) - (*shift) > (*systemWidth))) {
         (*currentSystem) = new System();
         page->AddSystem(*currentSystem);
         (*shift) = this->m_drawingXRel;

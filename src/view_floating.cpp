@@ -122,11 +122,13 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
         // takes into account the scoreDef
         Note *firstNote = dynamic_cast<Note *>(staff->FindChildByType(NOTE));
 
-        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : first->GetDrawingX();
+        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
+                       : first->GetDrawingX();
         x2 = interface->GetEnd()->GetDrawingX();
         spanningType = SPANNING_END;
     }
-    // Rare case where neither the first note and the last note are in the current system - draw the connector throughout the system
+    // Rare case where neither the first note and the last note are in the current system - draw the connector
+    // throughout the system
     else {
         // We need the first measure of the system for x1
         Measure *first = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
@@ -149,7 +151,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
             return;
         }
 
-        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) : first->GetDrawingX();
+        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
+                       : first->GetDrawingX();
         x2 = last->GetDrawingX() + last->GetRightBarLineX();
         spanningType = SPANNING_MIDDLE;
     }
@@ -452,9 +455,11 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
     }
     else {
         int dist = abs(p2->x - p1->x);
-        height = std::max(
-            m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITON_FACTOR, dist / TEMP_STYLE_SLUR_HEIGHT_FACTOR);
-        height = std::min(m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITON_FACTOR, height);
+        height
+            = std::max(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITON_FACTOR,
+                dist / TEMP_STYLE_SLUR_HEIGHT_FACTOR);
+        height = std::min(
+            m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITON_FACTOR, height);
     }
 
     // the height of the control points
@@ -505,21 +510,26 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
     Point adjustedRotatedC2 = rotatedC2;
 
     if (!spanningContentPoints.empty()) {
-        AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, slurAngle);
+        AdjustSlurCurve(
+            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, slurAngle);
         // Use the adjusted control points for ajusting the position (p1, p2 and angle will be updated)
-        AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, &slurAngle, true);
+        AdjustSlurPosition(
+            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, &slurAngle, true);
         // Now readjust the curvature with the new p1 and p2 with the original control points
         GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, height, staff->m_drawingStaffSize);
 
         GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, up, staff->m_drawingStaffSize);
-        int maxHeight = AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, slurAngle, false);
+        int maxHeight = AdjustSlurCurve(
+            slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, slurAngle, false);
 
         if (maxHeight) {
             // Something went wrong since now all spanning points should be gone...
-            // LogDebug("### %d notes for %s will need position adjustment", spanningContentPoints.size(), slur->GetUuid().c_str());
+            // LogDebug("### %d notes for %s will need position adjustment", spanningContentPoints.size(),
+            // slur->GetUuid().c_str());
             // Use the normal control points for ajusting the position (p1, p2 and angle will be updated)
             // Move it and forcing both side to move
-            AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, &slurAngle, true);
+            AdjustSlurPosition(
+                slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, &slurAngle, true);
             GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, maxHeight, staff->m_drawingStaffSize);
         }
     }
@@ -578,7 +588,8 @@ void View::GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up,
     }
 }
 
-void View::GetSpanningPointPositions(ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize)
+void View::GetSpanningPointPositions(
+    ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize)
 {
     ArrayOfLayerElementPointPairs::iterator itPoint;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); itPoint++) {
@@ -602,8 +613,8 @@ void View::GetSpanningPointPositions(ArrayOfLayerElementPointPairs *spanningPoin
     }
 }
 
-int View::AdjustSlurCurve(
-    Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float angle, bool posRatio)
+int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
+    Point *c2, bool up, float angle, bool posRatio)
 {
     Point bezier[4];
     bezier[0] = *p1;
@@ -620,7 +631,8 @@ int View::AdjustSlurCurve(
 
     // 0.2 for avoiding / by 0 (below)
     float maxHeightFactor = std::max(0.2, fabs(angle));
-    maxHeight = dist / (maxHeightFactor * (TEMP_STYLE_SLUR_CURVE_FACTOR + 5)); // 5 is the minimum - can be increased for limiting curvature
+    maxHeight = dist / (maxHeightFactor * (TEMP_STYLE_SLUR_CURVE_FACTOR
+                                              + 5)); // 5 is the minimum - can be increased for limiting curvature
     if (posRatio) {
         // Do we want to set a max height?
         // maxHeight = std::min(maxHeight, m_doc->GetDrawingStaffSize(100));
@@ -714,8 +726,8 @@ int View::AdjustSlurCurve(
         return 0;
 }
 
-void View::AdjustSlurPosition(
-    Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float *angle, bool forceBothSides)
+void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2,
+    Point *c1, Point *c2, bool up, float *angle, bool forceBothSides)
 {
     Point bezier[4];
     bezier[0] = *p1;
@@ -967,7 +979,8 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         dc->EndGraphic(tie, this);
 }
 
-void View::DrawSylConnector(DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic)
+void View::DrawSylConnector(
+    DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic)
 {
     assert(syl);
     assert(syl->GetStart() && syl->GetEnd());
@@ -996,7 +1009,8 @@ void View::DrawSylConnector(DeviceContext *dc, Syl *syl, int x1, int x2, Staff *
     else if (spanningType == SPANNING_END) {
         // nothing to adjust
     }
-    // Rare case where neither the first note and the last note are in the current system - draw the connector throughout the system
+    // Rare case where neither the first note and the last note are in the current system - draw the connector
+    // throughout the system
     else {
         // nothing to adjust
     }
@@ -1048,7 +1062,8 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         int i, x;
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i * dashSpace);
-            DrawFullRectangle(dc, x - halfDashLength, y, x + halfDashLength, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+            DrawFullRectangle(dc, x - halfDashLength, y, x + halfDashLength,
+                y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
         }
     }
     else if (syl->GetCon() == sylLog_CON_u) {
@@ -1076,7 +1091,8 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     int x = measure->GetDrawingX();
     // First try to see if we have a meter sig attribute for this measure
     AttMeasureAlignerType alignmentComparison(ALIGNMENT_METERSIG_ATTR);
-    Alignment *pos = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+    Alignment *pos
+        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
     if (!pos) {
         // if not, try to get the first beat element
         alignmentComparison.SetType(ALIGNMENT_DEFAULT);

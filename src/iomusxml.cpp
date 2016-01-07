@@ -287,12 +287,13 @@ void MusicXmlInput::CloseTie(Staff *staff, Layer *layer, Note *note, bool isClos
 {
     std::vector<std::pair<Tie *, musicxml::OpenTie> >::iterator iter;
     for (iter = m_tieStack.begin(); iter != m_tieStack.end(); iter++) {
-        if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN()) && (iter->second.m_pname == note->GetPname())
-            && iter->second.m_oct == note->GetOct()) {
+        if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN())
+            && (iter->second.m_pname == note->GetPname()) && iter->second.m_oct == note->GetOct()) {
             iter->first->SetEndid(note->GetUuid());
             m_tieStack.erase(iter);
             if (!isClosingTie) {
-                LogWarning("Closing tie for note '%s' even thought tie /tie@[type='stop'] is missing in the MusicXML", note->GetUuid().c_str());
+                LogWarning("Closing tie for note '%s' even thought tie /tie@[type='stop'] is missing in the MusicXML",
+                    note->GetUuid().c_str());
             }
             return;
         }
@@ -310,7 +311,8 @@ void MusicXmlInput::CloseSlur(Staff *staff, Layer *layer, int number, LayerEleme
 {
     std::vector<std::pair<Slur *, musicxml::OpenSlur> >::iterator iter;
     for (iter = m_slurStack.begin(); iter != m_slurStack.end(); iter++) {
-        if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN()) && (iter->second.m_number == number)) {
+        if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN())
+            && (iter->second.m_number == number)) {
             iter->first->SetEndid(element->GetUuid());
             m_slurStack.erase(iter);
             return;
@@ -370,7 +372,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             std::string partName = GetContentOfChild(xpathNode.node(), "part-name");
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
-            int nbStaves = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasureAttributes.node(), partStaffGrp, staffOffset);
+            int nbStaves
+                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasureAttributes.node(), partStaffGrp, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
                 partStaffGrp->SetLabel(partName);
@@ -409,7 +412,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             measure = dynamic_cast<Measure *>(system->FindChildByAttComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
-            LogWarning("Element '%s' could not be added to measure '%d'", iter->second->GetClassName().c_str(), iter->first);
+            LogWarning(
+                "Element '%s' could not be added to measure '%d'", iter->second->GetClassName().c_str(), iter->first);
             continue;
         }
         measure->AddFloatingElement(iter->second);
@@ -511,7 +515,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (time) {
                 pugi::xpath_node symbol = time.node().select_single_node("symbol");
                 if (symbol && HasContent(symbol.node())) {
-                    staffDef->SetMeterSym(staffDef->AttMeterSigDefaultVis::StrToMetersign(symbol.node().text().as_string()));
+                    staffDef->SetMeterSym(
+                        staffDef->AttMeterSigDefaultVis::StrToMetersign(symbol.node().text().as_string()));
                 }
                 pugi::xpath_node beats = time.node().select_single_node("beats");
                 if (beats && HasContent(beats.node())) {
@@ -519,7 +524,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 }
                 pugi::xpath_node beatType = time.node().select_single_node("beat-type");
                 if (beatType && HasContent(beatType.node())) {
-                    staffDef->SetMeterUnit(staffDef->AttMeterSigDefaultLog::StrToInt(beatType.node().text().as_string()));
+                    staffDef->SetMeterUnit(
+                        staffDef->AttMeterSigDefaultLog::StrToInt(beatType.node().text().as_string()));
                 }
             }
         }

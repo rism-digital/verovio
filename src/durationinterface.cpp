@@ -93,7 +93,9 @@ double DurationInterface::GetAlignmentMensuralDuration(int num, int numbase, Men
     double ratio = 0.0;
     double duration = (double)DUR_MENSURAL_REF;
     switch (note_dur) {
-        case DUR_MX: duration *= (double)abs(currentMensur->GetModusminor()) * (double)abs(currentMensur->GetModusmaior()); break;
+        case DUR_MX:
+            duration *= (double)abs(currentMensur->GetModusminor()) * (double)abs(currentMensur->GetModusmaior());
+            break;
         case DUR_LG: duration *= (double)abs(currentMensur->GetModusminor()); break;
         case DUR_BR: break;
         case DUR_1: duration /= (double)abs(currentMensur->GetTempus()); break;

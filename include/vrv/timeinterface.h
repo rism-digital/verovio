@@ -24,7 +24,11 @@ class LayerElement;
  * This class is an interface for spanning elements, such as slur, hairpin, etc..
  * It is not an abstract class but should not be instanciate directly.
  */
-class TimeSpanningInterface : public Interface, public AttStartendid, public AttStartid, public AttTimestampMusical, public AttTimestamp2Musical {
+class TimeSpanningInterface : public Interface,
+                              public AttStartendid,
+                              public AttStartid,
+                              public AttTimestampMusical,
+                              public AttTimestamp2Musical {
 public:
     /**
      * @name Constructors, destructors, reset methods

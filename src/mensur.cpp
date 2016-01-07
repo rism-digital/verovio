@@ -17,7 +17,8 @@ int Mensur::s_numBase = 2;
 // Mensur
 //----------------------------------------------------------------------------
 
-Mensur::Mensur() : LayerElement("mensur-"), AttDurationRatio(), AttMensuralShared(), AttMensurLog(), AttMensurVis(), AttSlashcount()
+Mensur::Mensur()
+    : LayerElement("mensur-"), AttDurationRatio(), AttMensuralShared(), AttMensurLog(), AttMensurVis(), AttSlashcount()
 {
     Init();
 }

@@ -210,8 +210,8 @@ int System::JustifyX(ArrayPtrVoid *params)
     assert(m_parent);
     assert(m_parent->m_parent);
 
-    (*ratio) = (double)((*systemFullWidth) - this->GetDrawingLabelsWidth() - this->m_systemLeftMar - this->m_systemRightMar)
-        / ((double)m_drawingTotalWidth - this->GetDrawingLabelsWidth());
+    (*ratio) = (double)((*systemFullWidth) - this->GetDrawingLabelsWidth() - this->m_systemLeftMar
+                   - this->m_systemRightMar) / ((double)m_drawingTotalWidth - this->GetDrawingLabelsWidth());
 
     // LogDebug("System::JustifyX: *ratio=%lf", (*ratio));
 
@@ -222,7 +222,8 @@ int System::JustifyX(ArrayPtrVoid *params)
     }
 
     // Check if we are on the last page and on the last system - do no justify it if ratio > 1.0
-    if ((m_parent->GetIdx() == m_parent->m_parent->GetChildCount() - 1) && (this->GetIdx() == m_parent->GetChildCount() - 1)) {
+    if ((m_parent->GetIdx() == m_parent->m_parent->GetChildCount() - 1)
+        && (this->GetIdx() == m_parent->GetChildCount() - 1)) {
         if ((*ratio) > 1.0) {
             return FUNCTOR_STOP;
         }
@@ -254,7 +255,8 @@ int System::CastOffPages(ArrayPtrVoid *params)
     int *shift = static_cast<int *>((*params).at(3));
     int *pageHeight = static_cast<int *>((*params).at(4));
 
-    if (((*currentPage)->GetChildCount() > 0) && (this->m_drawingYRel - this->GetHeight() - (*shift) < 0)) { //(*pageHeight))) {
+    if (((*currentPage)->GetChildCount() > 0)
+        && (this->m_drawingYRel - this->GetHeight() - (*shift) < 0)) { //(*pageHeight))) {
         (*currentPage) = new Page();
         doc->AddPage(*currentPage);
         (*shift) = this->m_drawingYRel - (*pageHeight);

@@ -301,7 +301,8 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     // take into account the number of lyrics
     if (this->GetVerseCount() > 0) {
         // We need + 1 lyric line space
-        m_yShift -= (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (*interlineSize / 2) / PARAM_DENOMINATOR;
+        m_yShift -= (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (*interlineSize / 2)
+            / PARAM_DENOMINATOR;
     }
 
     int min_shift = (*staffMargin) + (*previousStaffHeight);
@@ -448,7 +449,8 @@ duration if the user wishes, and standard engravers' rules would waste a lot of 
 flexible solution might be to get ideal spacing from a user-definable table, but using a
 formula with parameters can come close and has other advantages. */
 
-int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
+int Alignment::HorizontalSpaceForDuration(
+    double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)
 {
     /* If the longest duration interval in the score is longer than semibreve, adjust spacing so
        that interval gets the space a semibreve would ordinarily get. */
@@ -472,7 +474,8 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
     if (intervalTime > 0.0) {
-        intervalXRel = HorizontalSpaceForDuration(intervalTime, *maxActualDur, doc->GetSpacingLinear(), doc->GetSpacingNonLinear());
+        intervalXRel = HorizontalSpaceForDuration(
+            intervalTime, *maxActualDur, doc->GetSpacingLinear(), doc->GetSpacingNonLinear());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
     m_xRel = (*previousXRel) + (intervalXRel)*DEFINITON_FACTOR;

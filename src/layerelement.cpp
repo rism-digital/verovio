@@ -388,7 +388,8 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
             // Grace notes, also take into account the GraceAlignment
             Note *note = dynamic_cast<Note *>(this);
             if (note && note->HasGraceAlignment()) {
-                this->SetDrawingX(this->GetDrawingX() - note->GetAlignment()->GetGraceAligner()->GetWidth() + note->GetGraceAlignment()->GetXRel());
+                this->SetDrawingX(this->GetDrawingX() - note->GetAlignment()->GetGraceAligner()->GetWidth()
+                    + note->GetGraceAlignment()->GetXRel());
             }
         }
         else {
@@ -408,8 +409,8 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
         m_crossStaff = dynamic_cast<Staff *>((*currentMeasure)->FindChildByAttComparison(&comparisonFirst, 1));
         if (m_crossStaff) {
             if (m_crossStaff == (*currentStaff))
-                LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff", durElement->GetStaff().at(0),
-                    this->GetUuid().c_str());
+                LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff",
+                    durElement->GetStaff().at(0), this->GetUuid().c_str());
             // Now try to get the corresponding layer - for now look for the same layer @n
             int layerN = (*currentLayer)->GetN();
             // When we will have allowed @layer in <note>, we will have to do:
@@ -417,18 +418,21 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
             AttCommonNComparison comparisonFirstLayer(LAYER, layerN);
             m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
             if (m_crossLayer) {
-                // Now we need to yet the element at the same position in the cross-staff layer of getting the right clef
+                // Now we need to yet the element at the same position in the cross-staff layer of getting the right
+                // clef
                 layerElementY = m_crossLayer->GetAtPos(this->GetDrawingX());
             }
             else {
-                LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'", durElement->GetStaff().at(0),
-                    this->GetUuid().c_str());
+                LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
+                    durElement->GetStaff().at(0), this->GetUuid().c_str());
             }
         }
         else {
-            LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0), this->GetUuid().c_str());
+            LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0),
+                this->GetUuid().c_str());
         }
-        // If we have a @layer we probably also want to change the layer element (for getting the right clef if different)
+        // If we have a @layer we probably also want to change the layer element (for getting the right clef if
+        // different)
     }
     else {
         m_crossStaff = NULL;
@@ -452,8 +456,8 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
     if (this->Is() == NOTE) {
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
-        this->SetDrawingY(
-            this->GetDrawingY() + view->CalculatePitchPosY(staffY, note->GetPname(), layerY->GetClefOffset(layerElementY), note->GetOct()));
+        this->SetDrawingY(this->GetDrawingY()
+            + view->CalculatePitchPosY(staffY, note->GetPname(), layerY->GetClefOffset(layerElementY), note->GetOct()));
     }
     else if (this->Is() == REST) {
         Rest *rest = dynamic_cast<Rest *>(this);
@@ -463,8 +467,9 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
             this->SetDrawingY(this->GetDrawingY() + view->CalculateRestPosY(staffY, rest->GetActualDur()));
         }
         else {
-            this->SetDrawingY(
-                this->GetDrawingY() + view->CalculatePitchPosY(staffY, rest->GetPloc(), layerY->GetClefOffset(layerElementY), rest->GetOloc()));
+            this->SetDrawingY(this->GetDrawingY()
+                + view->CalculatePitchPosY(
+                      staffY, rest->GetPloc(), layerY->GetClefOffset(layerElementY), rest->GetOloc()));
         }
     }
 

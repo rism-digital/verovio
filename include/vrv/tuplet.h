@@ -20,7 +20,11 @@ class Note;
 // Tuplet
 //----------------------------------------------------------------------------
 
-class Tuplet : public LayerElement, public ObjectListInterface, public AttDurationRatio, public AttNumberplacement, public AttTupletVis {
+class Tuplet : public LayerElement,
+               public ObjectListInterface,
+               public AttDurationRatio,
+               public AttNumberplacement,
+               public AttTupletVis {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

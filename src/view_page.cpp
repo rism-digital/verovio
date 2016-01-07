@@ -124,9 +124,11 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
 
     int width = 0;
     // G-clef as default width
-    width += m_doc->GetLeftMargin(CLEF) + m_doc->GetGlyphWidth(SMUFL_E050_gClef, 100, false) + m_doc->GetRightMargin(CLEF);
+    width += m_doc->GetLeftMargin(CLEF) + m_doc->GetGlyphWidth(SMUFL_E050_gClef, 100, false)
+        + m_doc->GetRightMargin(CLEF);
     if (numAlteration > 0) {
-        width += m_doc->GetLeftMargin(KEYSIG) + m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_STYLE_KEYSIG_STEP
+        width += m_doc->GetLeftMargin(KEYSIG)
+            + m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_STYLE_KEYSIG_STEP
             + m_doc->GetRightMargin(KEYSIG);
     }
 
@@ -230,7 +232,8 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
     return;
 }
 
-void View::DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp, bool abbreviations)
+void View::DrawStaffGrp(
+    DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp, bool abbreviations)
 {
     assert(dc);
     assert(measure);
@@ -259,13 +262,15 @@ void View::DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
     Staff *last = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonLast, 1));
 
     if (!first || !last) {
-        LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(), lastDef->GetN());
+        LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(),
+            lastDef->GetN());
         return;
     }
 
     int y_top = first->GetDrawingY();
     // for the bottom position we need to take into account the number of lines and the staff size
-    int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+    int y_bottom = last->GetDrawingY()
+        - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
     int barLineWidth = m_doc->GetDrawingBarLineWidth(100);
 
     // ajdust the top and bottom according to staffline width
@@ -392,7 +397,8 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         // HARDCODED
         int space = 3 * m_doc->GetDrawingBeamWidth(100, false);
         int x = system->GetDrawingX() - space;
-        int y = staff->GetDrawingY() - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
+        int y = staff->GetDrawingY()
+            - (staffDef->GetLines() * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(m_doc->GetDrawingLyricFont(100));
@@ -550,12 +556,14 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                 AttCommonNComparison comparison(STAFF, childStaffDef->GetN());
                 Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
                 if (!staff) {
-                    LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarLines", childStaffDef->GetN());
+                    LogDebug(
+                        "Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarLines", childStaffDef->GetN());
                     continue;
                 }
                 int y_top = staff->GetDrawingY();
                 // for the bottom position we need to take into account the number of lines and the staff size
-                int y_bottom = staff->GetDrawingY() - (childStaffDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+                int y_bottom = staff->GetDrawingY()
+                    - (childStaffDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
                 DrawBarLine(dc, y_top, y_bottom, barLine);
                 if (barLine->HasRepetitionDots()) {
                     DrawBarLineDots(dc, childStaffDef, staff, barLine);
@@ -586,13 +594,15 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         Staff *last = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonLast, 1));
 
         if (!first || !last) {
-            LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(), lastDef->GetN());
+            LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(),
+                lastDef->GetN());
             return;
         }
 
         int y_top = first->GetDrawingY();
         // for the bottom position we need to take into account the number of lines and the staff size
-        int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
+        int y_bottom = last->GetDrawingY()
+            - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
 
         DrawBarLine(dc, y_top, y_bottom, barLine);
 
@@ -606,7 +616,8 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
                     AttCommonNComparison comparison(STAFF, childStaffDef->GetN());
                     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
                     if (!staff) {
-                        LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarLines", childStaffDef->GetN());
+                        LogDebug("Could not get staff (%d) while drawing staffGrp - Vrv::DrawBarLines",
+                            childStaffDef->GetN());
                         continue;
                     }
                     DrawBarLineDots(dc, childStaffDef, staff, barLine);
@@ -669,8 +680,10 @@ void View::DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, 
     assert(barLine);
 
     int x = barLine->GetDrawingX();
-    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
-    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
+        - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
+        + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
 
     int y_bottom = staff->GetDrawingY() - staffDef->GetLines() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y_top = y_bottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -708,7 +721,8 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
         DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX(), measure->GetLeftBarLine());
     }
     if (measure->GetRightBarLineType() != BARRENDITION_NONE) {
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarLineX(), measure->GetRightBarLine());
+        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarLineX(),
+            measure->GetRightBarLine());
     }
 
     if (measure->IsMeasuredMusic()) {
@@ -724,7 +738,8 @@ int View::CalculatePitchPosY(Staff *staff, data_PITCHNAME pname, int dec_clef, i
 {
     assert(staff); // Pointer to staff cannot be NULL"
 
-    static char touches[] = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a, PITCHNAME_b };
+    static char touches[]
+        = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a, PITCHNAME_b };
     int y_int;
     char *ptouche, i;
     ptouche = &touches[0];
@@ -812,7 +827,8 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     yy = staff->GetDrawingY();
 
     // x1 = system->m_systemLeftMar;
-    // x2 = m_doc->m_drawingPageWidth - m_doc->m_drawingPageLeftMar - m_doc->m_drawingPageRightMar - system->m_systemRightMar;
+    // x2 = m_doc->m_drawingPageWidth - m_doc->m_drawingPageLeftMar - m_doc->m_drawingPageRightMar -
+    // system->m_systemRightMar;
 
     x1 = measure->GetDrawingX();
     x2 = x1 + measure->GetWidth();
@@ -821,7 +837,8 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     int lineWidth = (int)(m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize));
     if (true) lineWidth = lineWidth * MENSURAL_LINEWIDTH_FACTOR; // ??DON'T DO IF NOT MENSURAL NOTATION!
     dc->SetPen(m_currentColour, ToDeviceContextX(lineWidth), AxSOLID);
-    // dc->SetPen(m_currentColour, ToDeviceContextX(m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize)), AxSOLID);
+    // dc->SetPen(m_currentColour, ToDeviceContextX(m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize)),
+    // AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     for (j = 0; j < staff->m_drawingLines; j++) {
@@ -853,7 +870,8 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
     Staff *parentStaff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
     assert(parentStaff); // Pointer to parent has to be a staff
 
-    static int touches[] = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a, PITCHNAME_b };
+    static int touches[]
+        = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a, PITCHNAME_b };
     int y_dec, yb, plafond;
     int degres, octaves, position, code;
     char clefId = 0;
@@ -1123,7 +1141,8 @@ void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *elemen
     dc->EndGraphic(element, this);
 }
 
-void View::DrawLayerEditorialElement(DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawLayerEditorialElement(
+    DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(element);
     if (element->Is() == APP) {

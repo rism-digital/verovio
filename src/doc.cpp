@@ -235,7 +235,8 @@ void Doc::PrepareDrawing()
         }
     }
 
-    // Once <slur>, <ties> and @ties are matched but also syl connectors, we need to set them as running TimeSpanningInterface
+    // Once <slur>, <ties> and @ties are matched but also syl connectors, we need to set them as running
+    // TimeSpanningInterface
     // to each staff they are extended. This does not need to be done staff by staff because we can just check the
     // staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
     params.clear();
@@ -345,8 +346,8 @@ void Doc::CastOff()
     System *currentSystem = new System();
     contentPage->AddSystem(currentSystem);
     int shift = -contentSystem->GetDrawingLabelsWidth();
-    int systemFullWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar - this->m_drawingPageRightMar - currentSystem->m_systemLeftMar
-        - currentSystem->m_systemRightMar;
+    int systemFullWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar - this->m_drawingPageRightMar
+        - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
     // The width of the initial scoreDef is stored in the page scoreDef
     int scoreDefWidth = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
     ArrayPtrVoid params;

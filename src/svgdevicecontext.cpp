@@ -151,7 +151,8 @@ void SvgDeviceContext::StartGraphic(DocObject *object, std::string gClass, std::
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = baseClass.c_str();
     m_currentNode.append_attribute("id") = gId.c_str();
-    // m_currentNode.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity: %f;",
+    // m_currentNode.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity:
+    // %f;",
     // GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(),
     // currentBrush.GetOpacity()).c_str();
 }
@@ -209,13 +210,15 @@ void SvgDeviceContext::StartPage()
     m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("id") = "definition-scale";
-    m_currentNode.append_attribute("viewBox") = StringFormat("0 0 %d %d", m_width * DEFINITON_FACTOR, m_height * DEFINITON_FACTOR).c_str();
+    m_currentNode.append_attribute("viewBox")
+        = StringFormat("0 0 %d %d", m_width * DEFINITON_FACTOR, m_height * DEFINITON_FACTOR).c_str();
 
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = "page-margin";
-    m_currentNode.append_attribute("transform") = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
+    m_currentNode.append_attribute("transform")
+        = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
     m_currentNode.append_attribute("style") = "stroke: #000; stroke-opacity: 1.0; fill: #000; fill-opacity: 1.0";
 }
 
@@ -275,18 +278,21 @@ Point SvgDeviceContext::GetLogicalOrigin()
 void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
 {
     pugi::xml_node pathChild = m_currentNode.append_child("path");
-    pathChild.append_attribute("d")
-        = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", x, y, // M command
-              bezier1_coord[0], bezier1_coord[1], bezier1_coord[2], bezier1_coord[3], bezier1_coord[4], bezier1_coord[5], // First bezier
-              bezier2_coord[0], bezier2_coord[1], bezier2_coord[2], bezier2_coord[3], bezier2_coord[4], bezier2_coord[5] // Second Bezier
-              )
-              .c_str();
-    // pathChild.append_attribute("style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000; stroke-linecap:round; stroke-linejoin:round;
+    pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", x, y, // M command
+                                          bezier1_coord[0], bezier1_coord[1], bezier1_coord[2], bezier1_coord[3],
+                                          bezier1_coord[4], bezier1_coord[5], // First bezier
+                                          bezier2_coord[0], bezier2_coord[1], bezier2_coord[2], bezier2_coord[3],
+                                          bezier2_coord[4], bezier2_coord[5] // Second Bezier
+                                          )
+                                          .c_str();
+    // pathChild.append_attribute("style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000;
+    // stroke-linecap:round; stroke-linejoin:round;
     // stroke-opacity:1.0; stroke-width: %d", m_penStack.top().GetWidth()).c_str();
     // without colour
     pathChild.append_attribute("style")
         = StringFormat(
-              "fill-opacity:1.0; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width: %d", m_penStack.top().GetWidth())
+              "fill-opacity:1.0; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width: %d",
+              m_penStack.top().GetWidth())
               .c_str();
 }
 
@@ -312,13 +318,15 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     ellipseChild.append_attribute("rx") = rw;
     ellipseChild.append_attribute("ry") = rh;
 
-    // ellipseChild.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; stroke-width: %d; fill: #%s; fill-opacity: %f;",
+    // ellipseChild.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; stroke-width: %d; fill:
+    // #%s; fill-opacity: %f;",
     // GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), currentPen.GetWidth(),
     //    GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
     // without colour
-    ellipseChild.append_attribute("style") = StringFormat("stroke-opacity: %f; stroke-width: %d; fill-opacity: %f;", currentPen.GetOpacity(),
-                                                 currentPen.GetWidth(), currentBrush.GetOpacity())
-                                                 .c_str();
+    ellipseChild.append_attribute("style")
+        = StringFormat("stroke-opacity: %f; stroke-width: %d; fill-opacity: %f;", currentPen.GetOpacity(),
+              currentPen.GetWidth(), currentBrush.GetOpacity())
+              .c_str();
 }
 
 void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, double start, double end)
@@ -380,14 +388,17 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
         fSweep = 0;
 
     pugi::xml_node pathChild = m_currentNode.append_child("path");
-    pathChild.append_attribute("d")
-        = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)), abs(int(ry)), fArc, fSweep, int(xe), int(ye)).c_str();
-    // pathChild.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; stroke-width: %d; fill: #%s; fill-opacity: %f;",
+    pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)),
+                                          abs(int(ry)), fArc, fSweep, int(xe), int(ye))
+                                          .c_str();
+    // pathChild.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; stroke-width: %d; fill: #%s;
+    // fill-opacity: %f;",
     // GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), currentPen.GetWidth(),
-    //                                                        GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
+    //                                                        GetColour(currentBrush.GetColour()).c_str(),
+    //                                                        currentBrush.GetOpacity()).c_str();
     // without colour
-    pathChild.append_attribute("style") = StringFormat("stroke-opacity: %f; stroke-width: %d; fill-opacity: %f;", currentPen.GetOpacity(),
-                                              currentPen.GetWidth(), currentBrush.GetOpacity())
+    pathChild.append_attribute("style") = StringFormat("stroke-opacity: %f; stroke-width: %d; fill-opacity: %f;",
+                                              currentPen.GetOpacity(), currentPen.GetWidth(), currentBrush.GetOpacity())
                                               .c_str();
 }
 
@@ -636,7 +647,8 @@ void SvgDeviceContext::DrawSvgBoundingBox(DocObject *object, View *view)
                     - view->ToDeviceContextX(object->GetDrawingX() + object->m_contentBB_x1),
                 view->ToDeviceContextY(object->GetDrawingY() + object->m_contentBB_y2)
                     - view->ToDeviceContextY(object->GetDrawingY() + object->m_contentBB_y1));
-            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX()), view->ToDeviceContextY(object->GetDrawingY()), 5, 300);
+            this->DrawRectangle(
+                view->ToDeviceContextX(object->GetDrawingX()), view->ToDeviceContextY(object->GetDrawingY()), 5, 300);
         }
         EndGraphic(object, NULL);
 

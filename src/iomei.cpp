@@ -47,8 +47,8 @@
 namespace vrv {
 
 #define EDIT_NAMES 14
-std::string MeiInput::s_editorialElementNames[] = { "abbr", "add", "app", "annot", "corr", "damage", "del", "expan", "orig", "reg", "restore", "sic",
-    "supplied", "unclear" }; // update EDIT_NAMES (above) accordingly
+std::string MeiInput::s_editorialElementNames[] = { "abbr", "add", "app", "annot", "corr", "damage", "del", "expan",
+    "orig", "reg", "restore", "sic", "supplied", "unclear" }; // update EDIT_NAMES (above) accordingly
 
 //----------------------------------------------------------------------------
 // MeiOutput
@@ -438,13 +438,14 @@ bool MeiOutput::WriteMeiDoc(Doc *doc)
         pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
         pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
         pugi::xml_node p1 = projectDesc.append_child("p");
-        p1.append_child(pugi::node_pcdata).set_value(StringFormat("Encoded with Verovio version %s", GetVersion().c_str()).c_str());
+        p1.append_child(pugi::node_pcdata)
+            .set_value(StringFormat("Encoded with Verovio version %s", GetVersion().c_str()).c_str());
 
         // date
         time_t t = time(0); // get time now
         struct tm *now = localtime(&t);
-        std::string dateStr
-            = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1, now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+        std::string dateStr = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+            now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
         date.append_child(pugi::node_pcdata).set_value(dateStr.c_str());
     }
 

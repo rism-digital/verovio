@@ -65,7 +65,8 @@ void BTrem::Reset()
 
 void BTrem::AddLayerElement(LayerElement *element)
 {
-    assert(dynamic_cast<Note *>(element) || dynamic_cast<Chord *>(element) || dynamic_cast<EditorialElement *>(element));
+    assert(
+        dynamic_cast<Note *>(element) || dynamic_cast<Chord *>(element) || dynamic_cast<EditorialElement *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();
@@ -94,7 +95,8 @@ void FTrem::Reset()
 
 void FTrem::AddLayerElement(LayerElement *element)
 {
-    assert(dynamic_cast<Note *>(element) || dynamic_cast<Chord *>(element) || dynamic_cast<EditorialElement *>(element));
+    assert(
+        dynamic_cast<Note *>(element) || dynamic_cast<Chord *>(element) || dynamic_cast<EditorialElement *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();

@@ -320,9 +320,10 @@ void Object::SetParent(Object *parent)
 
 void Object::AddEditorialElement(EditorialElement *child)
 {
-    assert(dynamic_cast<Layer *>(this) || dynamic_cast<LayerElement *>(this) || dynamic_cast<Lem *>(this) || dynamic_cast<Measure *>(this)
-        || dynamic_cast<Note *>(this) || dynamic_cast<Staff *>(this) || dynamic_cast<System *>(this) || dynamic_cast<Tempo *>(this)
-        || dynamic_cast<EditorialElement *>(this) || dynamic_cast<TextElement *>(this));
+    assert(dynamic_cast<Layer *>(this) || dynamic_cast<LayerElement *>(this) || dynamic_cast<Lem *>(this)
+        || dynamic_cast<Measure *>(this) || dynamic_cast<Note *>(this) || dynamic_cast<Staff *>(this)
+        || dynamic_cast<System *>(this) || dynamic_cast<Tempo *>(this) || dynamic_cast<EditorialElement *>(this)
+        || dynamic_cast<TextElement *>(this));
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
@@ -423,7 +424,8 @@ bool Object::GetSameAs(std::string *id, std::string *filename, int idx)
     return false;
 }
 
-void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor, ArrayOfAttComparisons *filters, int deepness, bool direction)
+void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor, ArrayOfAttComparisons *filters,
+    int deepness, bool direction)
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -558,7 +560,8 @@ void DocObject::UpdateContentBB(int x1, int y1, int x2, int y2)
     if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
 
     m_updatedBB = true;
-    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2, GetClassName().c_str());
+    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
+    // GetClassName().c_str());
 }
 
 void DocObject::UpdateSelfBB(int x1, int y1, int x2, int y2)
@@ -615,12 +618,14 @@ void DocObject::SetEmptyBB()
 
 bool DocObject::HasEmptyBB()
 {
-    return (m_updatedBB && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0) && (m_contentBB_y2 == 0));
+    return (m_updatedBB && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
+        && (m_contentBB_y2 == 0));
 }
 
 bool DocObject::HasContentBB()
 {
-    return ((m_contentBB_x1 != 0xFFFF) && (m_contentBB_y1 != 0xFFFF) && (m_contentBB_x2 != -0xFFFF) && (m_contentBB_y2 != -0xFFFF));
+    return ((m_contentBB_x1 != 0xFFFF) && (m_contentBB_y1 != 0xFFFF) && (m_contentBB_x2 != -0xFFFF)
+        && (m_contentBB_y2 != -0xFFFF));
 }
 
 bool DocObject::HasSelfBB()
@@ -1010,7 +1015,8 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    int negative_offset = -(note->m_contentBB_x1) + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    int negative_offset = -(note->m_contentBB_x1)
+        + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
     if ((*min_pos) > 0) {
         //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
@@ -1030,7 +1036,8 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2
         + doc->GetRightMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     //(*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
-    // note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) * doc->GetDrawingUnit(100) /
+    // note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) *
+    // doc->GetDrawingUnit(100) /
     // PARAM_DENOMINATOR);
     note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2);
 
@@ -1114,7 +1121,8 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     // |____x_____|
     //  ---- = negative offset
     int negative_offset = -(current->m_contentBB_x1);
-    if (!current->IsGraceNote()) negative_offset += (doc->GetLeftMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    if (!current->IsGraceNote())
+        negative_offset += (doc->GetLeftMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
     if (negative_offset < 0) negative_offset = 0;
@@ -1148,7 +1156,8 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
 
     // the next minimal position is given by the right side of the bounding box + the spacing of the element
     int width = current->m_contentBB_x2;
-    if (!current->HasEmptyBB()) width += doc->GetRightMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    if (!current->HasEmptyBB())
+        width += doc->GetRightMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     (*min_pos) = current->GetAlignment()->GetXRel() + width;
     current->GetAlignment()->SetMaxWidth(width);
 
@@ -1233,7 +1242,8 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
         current->GetAlignment()->SetYShift(overlap);
     }
 
-    // LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d", current->GetClassName().c_str(), (*min_pos), negative_offset,
+    // LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d", current->GetClassName().c_str(),
+    // (*min_pos), negative_offset,
     // current->GetAlignment()->GetXRel(), overlap);
 
     // the next minimal position if given by the bottom side of the bounding box + the spacing of the element

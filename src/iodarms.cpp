@@ -28,22 +28,22 @@ namespace vrv {
 
 // Ok, this is ugly, but since this is static data, why not?
 pitchmap DarmsInput::PitchMap[] = {
-    /* 00 */ { 1, PITCHNAME_c }, { 1, PITCHNAME_d }, { 1, PITCHNAME_e }, { 1, PITCHNAME_f }, { 1, PITCHNAME_g }, { 1, PITCHNAME_a },
-    { 1, PITCHNAME_b },
-    /* 07 */ { 2, PITCHNAME_c }, { 2, PITCHNAME_d }, { 2, PITCHNAME_e }, { 2, PITCHNAME_f }, { 2, PITCHNAME_g }, { 2, PITCHNAME_a },
-    { 2, PITCHNAME_b },
-    /* 14 */ { 3, PITCHNAME_c }, { 3, PITCHNAME_d }, { 3, PITCHNAME_e }, { 3, PITCHNAME_f }, { 3, PITCHNAME_g }, { 3, PITCHNAME_a },
-    { 3, PITCHNAME_b },
-    /* 21 */ { 4, PITCHNAME_c }, { 4, PITCHNAME_d }, { 4, PITCHNAME_e }, { 4, PITCHNAME_f }, { 4, PITCHNAME_g }, { 4, PITCHNAME_a },
-    { 4, PITCHNAME_b },
-    /* 28 */ { 5, PITCHNAME_c }, { 5, PITCHNAME_d }, { 5, PITCHNAME_e }, { 5, PITCHNAME_f }, { 5, PITCHNAME_g }, { 5, PITCHNAME_a },
-    { 5, PITCHNAME_b },
-    /* 35 */ { 6, PITCHNAME_c }, { 6, PITCHNAME_d }, { 6, PITCHNAME_e }, { 6, PITCHNAME_f }, { 6, PITCHNAME_g }, { 6, PITCHNAME_a },
-    { 6, PITCHNAME_b },
-    /* 42 */ { 7, PITCHNAME_c }, { 7, PITCHNAME_d }, { 7, PITCHNAME_e }, { 7, PITCHNAME_f }, { 7, PITCHNAME_g }, { 7, PITCHNAME_a },
-    { 7, PITCHNAME_b },
-    /* 49 */ { 8, PITCHNAME_c }, { 8, PITCHNAME_d }, { 8, PITCHNAME_e }, { 8, PITCHNAME_f }, { 8, PITCHNAME_g }, { 8, PITCHNAME_a },
-    { 8, PITCHNAME_b },
+    /* 00 */ { 1, PITCHNAME_c }, { 1, PITCHNAME_d }, { 1, PITCHNAME_e }, { 1, PITCHNAME_f }, { 1, PITCHNAME_g },
+    { 1, PITCHNAME_a }, { 1, PITCHNAME_b },
+    /* 07 */ { 2, PITCHNAME_c }, { 2, PITCHNAME_d }, { 2, PITCHNAME_e }, { 2, PITCHNAME_f }, { 2, PITCHNAME_g },
+    { 2, PITCHNAME_a }, { 2, PITCHNAME_b },
+    /* 14 */ { 3, PITCHNAME_c }, { 3, PITCHNAME_d }, { 3, PITCHNAME_e }, { 3, PITCHNAME_f }, { 3, PITCHNAME_g },
+    { 3, PITCHNAME_a }, { 3, PITCHNAME_b },
+    /* 21 */ { 4, PITCHNAME_c }, { 4, PITCHNAME_d }, { 4, PITCHNAME_e }, { 4, PITCHNAME_f }, { 4, PITCHNAME_g },
+    { 4, PITCHNAME_a }, { 4, PITCHNAME_b },
+    /* 28 */ { 5, PITCHNAME_c }, { 5, PITCHNAME_d }, { 5, PITCHNAME_e }, { 5, PITCHNAME_f }, { 5, PITCHNAME_g },
+    { 5, PITCHNAME_a }, { 5, PITCHNAME_b },
+    /* 35 */ { 6, PITCHNAME_c }, { 6, PITCHNAME_d }, { 6, PITCHNAME_e }, { 6, PITCHNAME_f }, { 6, PITCHNAME_g },
+    { 6, PITCHNAME_a }, { 6, PITCHNAME_b },
+    /* 42 */ { 7, PITCHNAME_c }, { 7, PITCHNAME_d }, { 7, PITCHNAME_e }, { 7, PITCHNAME_f }, { 7, PITCHNAME_g },
+    { 7, PITCHNAME_a }, { 7, PITCHNAME_b },
+    /* 49 */ { 8, PITCHNAME_c }, { 8, PITCHNAME_d }, { 8, PITCHNAME_e }, { 8, PITCHNAME_f }, { 8, PITCHNAME_g },
+    { 8, PITCHNAME_a }, { 8, PITCHNAME_b },
 };
 
 DarmsInput::DarmsInput(Doc *doc, std::string filename) : FileInputStream(doc)
@@ -61,8 +61,10 @@ DarmsInput::~DarmsInput()
 
 void DarmsInput::UnrollKeysig(int quantity, char alter)
 {
-    data_PITCHNAME flats[] = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
-    data_PITCHNAME sharps[] = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
+    data_PITCHNAME flats[]
+        = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
+    data_PITCHNAME sharps[]
+        = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
     data_PITCHNAME *alteration_set;
     data_ACCIDENTAL_EXPLICIT accid = ACCIDENTAL_EXPLICIT_NONE;
 

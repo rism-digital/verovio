@@ -31,7 +31,8 @@ namespace vrv {
 // Layer
 //----------------------------------------------------------------------------
 
-Layer::Layer() : DocObject("layer-"), DrawingListInterface(), ObjectListInterface(), StaffDefDrawingInterface(), AttCommon()
+Layer::Layer()
+    : DocObject("layer-"), DrawingListInterface(), ObjectListInterface(), StaffDefDrawingInterface(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
@@ -264,7 +265,8 @@ int Layer::SetDrawingXY(ArrayPtrVoid *params)
         this->GetDrawingMensur()->SetDrawingX(this->GetDrawingMensur()->GetXRel() + (*currentMeasure)->GetDrawingX());
     }
     if (this->GetDrawingMeterSig()) {
-        this->GetDrawingMeterSig()->SetDrawingX(this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX());
+        this->GetDrawingMeterSig()->SetDrawingX(
+            this->GetDrawingMeterSig()->GetXRel() + (*currentMeasure)->GetDrawingX());
     }
 
     return FUNCTOR_CONTINUE;

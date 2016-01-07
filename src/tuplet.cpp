@@ -13,7 +13,8 @@ namespace vrv {
 // Tuplet
 //----------------------------------------------------------------------------
 
-Tuplet::Tuplet() : LayerElement("tuplet-"), ObjectListInterface(), AttDurationRatio(), AttNumberplacement(), AttTupletVis()
+Tuplet::Tuplet()
+    : LayerElement("tuplet-"), ObjectListInterface(), AttDurationRatio(), AttNumberplacement(), AttTupletVis()
 {
     RegisterAttClass(ATT_DURATIONRATIO);
     RegisterAttClass(ATT_NUMBERPLACEMENT);

@@ -132,7 +132,9 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         bool aboveStaff = (noteY > staffTop);
 
         distance = (aboveStaff ? (noteY - staffY) : staffY - m_doc->GetDrawingStaffSize(staffSize) - noteY);
-        highestNewLine = ((distance % m_doc->GetDrawingDoubleUnit(staffSize) > 0) ? (distance - m_doc->GetDrawingUnit(staffSize)) : distance);
+        highestNewLine
+            = ((distance % m_doc->GetDrawingDoubleUnit(staffSize) > 0) ? (distance - m_doc->GetDrawingUnit(staffSize))
+                                                                       : distance);
         numLines = highestNewLine / m_doc->GetDrawingDoubleUnit(staffSize);
 
         DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
@@ -170,7 +172,8 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     if ((mensur->GetSign() == MENSURATIONSIGN_O) || (mensur->GetTempus() == TEMPUS_3)) {
         DrawMensurCircle(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
-    else if (((mensur->GetSign() == MENSURATIONSIGN_C) && (mensur->GetOrient() != ORIENTATION_reversed)) || (mensur->GetTempus() == TEMPUS_2)) {
+    else if (((mensur->GetSign() == MENSURATIONSIGN_C) && (mensur->GetOrient() != ORIENTATION_reversed))
+        || (mensur->GetTempus() == TEMPUS_2)) {
         DrawMensurHalfCircle(dc, element->GetDrawingX(), staff->GetDrawingY(), staff);
     }
     else if (mensur->GetSign() == MENSURATIONSIGN_C && mensur->GetOrient() == ORIENTATION_reversed) {
@@ -188,7 +191,8 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     if (mensur->HasNum()) {
         x = element->GetDrawingX();
         if (mensur->GetSign() || mensur->HasTempus()) {
-            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a sign or a meter symbol
+            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+                * 5; // step forward because we have a sign or a meter symbol
         }
         int numbase = mensur->HasNumbase() ? mensur->GetNumbase() : 0;
         DrawProportFigures(dc, x, staff->GetDrawingY(), mensur->GetNum(), numbase, staff);
@@ -458,7 +462,8 @@ void View::DrawLigature(DeviceContext *dc, int y, LayerElement *element, Layer *
 
      y1 = *View::s_drawingLigY - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);	// ligat_y contient y original
      yy2 = y2;
-     y5 = y1+ m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize); y2 += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);	// on monte d'un
+     y5 = y1+ m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize); y2 +=
+     m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);	// on monte d'un
      INTERL
 
      if (note->GetColored()==BOOLEAN_true)
@@ -467,7 +472,8 @@ void View::DrawLigature(DeviceContext *dc, int y, LayerElement *element, Layer *
      {	DrawObliquePolygon (dc,  x1,  y1,  x2,  yy2, 5);
      DrawObliquePolygon (dc,  x1,  y5,  x2,  y2, -5);
      }
-     DrawVerticalLine (dc,y3,y4,x2,m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));	//cloture flagStemHeighte
+     DrawVerticalLine (dc,y3,y4,x2,m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));	//cloture
+     flagStemHeighte
 
      View::s_drawingLigObliqua = false;
      //			queue_lig = OFF;	//desamorce alg.queue DUR_BR
@@ -477,10 +483,12 @@ void View::DrawLigature(DeviceContext *dc, int y, LayerElement *element, Layer *
 
      if (note->m_lig)	// memoriser positions d'une note a l'autre; relier notes par barres
      {
-     *(View::s_drawingLigX+1) = x2; *(View::s_drawingLigY+1) = y;	// relie notes ligaturees par barres flagStemHeightes
+     *(View::s_drawingLigX+1) = x2; *(View::s_drawingLigY+1) = y;	// relie notes ligaturees par barres
+     flagStemHeightes
      //if (in(x1,(*View::s_drawingLigX)-2,(*View::s_drawingLigX)+2) || (this->fligat && this->lat && !Note1::marq_obl))
      // les dernieres conditions pour permettre ligature flagStemHeighte ancienne
-     //	DrawVerticalLine (dc, *ligat_y, y1, (this->fligat && this->lat) ? x2: x1, m_doc->m_parameters.m_stemWidth); // ax2 - drawing flagStemHeight
+     //	DrawVerticalLine (dc, *ligat_y, y1, (this->fligat && this->lat) ? x2: x1, m_doc->m_parameters.m_stemWidth); //
+     ax2 - drawing flagStemHeight
      lines missing
      *View::s_drawingLigX = *(View::s_drawingLigX + 1);
      *View::s_drawingLigY = *(View::s_drawingLigY + 1);
@@ -491,12 +499,14 @@ void View::DrawLigature(DeviceContext *dc, int y, LayerElement *element, Layer *
 
      if (note->m_lig)
      {
-     if (note->m_dur == DUR_BR) //  && this->queue_lig)	// queue gauche bas: DUR_BR initiale descendante // ax2 - no support of queue_lig (see WG
+     if (note->m_dur == DUR_BR) //  && this->queue_lig)	// queue gauche bas: DUR_BR initiale descendante // ax2 - no
+     support of queue_lig (see WG
      corrigeLigature)
      {
      DrawVerticalLine (dc, y2, y3, x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
      }
-     else if (note->m_dur == DUR_LG) // && !this->queue_lig) // DUR_LG en ligature, queue droite bas // ax2 - no support of queue_lig
+     else if (note->m_dur == DUR_LG) // && !this->queue_lig) // DUR_LG en ligature, queue droite bas // ax2 - no support
+     of queue_lig
      {
      DrawVerticalLine (dc, y2, y3, x2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
      }
@@ -597,7 +607,8 @@ void View::DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, S
         x = element->GetDrawingX();
         // if (proport->GetSign() || proport->HasTempus())           // ??WHAT SHOULD THIS BE?
         {
-            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5; // step forward because we have a sign or a meter symbol
+            x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+                * 5; // step forward because we have a sign or a meter symbol
         }
         int numbase = proport->HasNumbase() ? proport->GetNumbase() : 0;
         DrawProportFigures(dc, x, staff->GetDrawingY(), proport->GetNum(), numbase, staff);

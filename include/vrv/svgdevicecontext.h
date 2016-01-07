@@ -162,11 +162,13 @@ public:
 private:
     /**
      * Flag for indicating if the VerovioText font is currently used.
-     * If used, it has to be initialized to false (e.g., in the overriden version of StartPage) and will be changed in DeviceContext::VrvTextFont
+     * If used, it has to be initialized to false (e.g., in the overriden version of StartPage) and will be changed in
+     * DeviceContext::VrvTextFont
      */
     bool m_vrvTextFont;
 
-    // we use a std::stringstream because we want to prepend the <defs> which will know only when we reach the end of the page
+    // we use a std::stringstream because we want to prepend the <defs> which will know only when we reach the end of
+    // the page
     // some viewer seem to support to have the <defs> at the end, but some do not (pdf2svg, for example)
     // for this reason, the full svg is finally written a string from the destructor or when Flush() is called
     std::stringstream m_outdata;

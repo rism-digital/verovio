@@ -100,7 +100,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
     if (OneBeamInTuplet(tuplet)) {
 
         // yes they are in a beam
-        x = firstElement->GetDrawingX() + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->m_selfBB_x2) / 2;
+        x = firstElement->GetDrawingX()
+            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->m_selfBB_x2) / 2;
 
         // align the center point at the exact center of the first an last stem
         // TUPLET_OFFSET is summed so it does not collide with the stem
@@ -110,9 +111,11 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         y = firstElement->GetDrawingY();
         if (firstNote && lastNote) {
             if (firstNote->GetDrawingStemDir() == STEMDIRECTION_up)
-                y = lastNote->GetDrawingStemEnd().y + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 + TUPLET_OFFSET;
+                y = lastNote->GetDrawingStemEnd().y
+                    + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 + TUPLET_OFFSET;
             else
-                y = lastNote->GetDrawingStemEnd().y + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 - TUPLET_OFFSET;
+                y = lastNote->GetDrawingStemEnd().y
+                    + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 - TUPLET_OFFSET;
         }
 
         // Copy the generated coordinates
@@ -128,7 +131,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
 
         // In this case use the center of the notehead to calculate the exact center
         // as it looks better
-        x = firstElement->GetDrawingX() + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->m_selfBB_x2) / 2;
+        x = firstElement->GetDrawingX()
+            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->m_selfBB_x2) / 2;
 
         // Return the start and end position for the brackes
         // starting from the first edge and last of the BBoxes
@@ -163,12 +167,14 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             y = firstElement->GetDrawingY();
             if (firstNote && lastNote) {
                 if (direction == STEMDIRECTION_up) { // up
-                    y = lastNote->GetDrawingStemEnd().y + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 + TUPLET_OFFSET;
+                    y = lastNote->GetDrawingStemEnd().y
+                        + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 + TUPLET_OFFSET;
                     start->y = firstNote->GetDrawingStemEnd().y + TUPLET_OFFSET;
                     end->y = lastNote->GetDrawingStemEnd().y + TUPLET_OFFSET;
                 }
                 else {
-                    y = lastNote->GetDrawingStemEnd().y + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 - TUPLET_OFFSET;
+                    y = lastNote->GetDrawingStemEnd().y
+                        + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 - TUPLET_OFFSET;
                     start->y = firstNote->GetDrawingStemEnd().y - TUPLET_OFFSET;
                     end->y = lastNote->GetDrawingStemEnd().y - TUPLET_OFFSET;
                 }
@@ -283,7 +289,8 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     int txt_x = center.x - (txt_length / 2);
     // we need to move down the figure of half of it height, which is about an accid width;
     // also, cue size is not supported. Does it has to?
-    int txt_y = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, tuplet->IsCueSize());
+    int txt_y = center.y
+        - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, tuplet->IsCueSize());
 
     if (tuplet->GetNum() && (tuplet->GetNumVisible() != BOOLEAN_false)) {
         DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->m_drawingStaffSize);

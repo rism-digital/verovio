@@ -126,8 +126,8 @@ Point BBoxDeviceContext::GetLogicalOrigin()
 void BBoxDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
 {
     int vals[4];
-    FindPointsForBounds(Point(x, y), Point(bezier1_coord[0], bezier1_coord[1]), Point(bezier1_coord[2], bezier1_coord[3]),
-        Point(bezier1_coord[4], bezier1_coord[5]), vals);
+    FindPointsForBounds(Point(x, y), Point(bezier1_coord[0], bezier1_coord[1]),
+        Point(bezier1_coord[2], bezier1_coord[3]), Point(bezier1_coord[4], bezier1_coord[5]), vals);
 
     UpdateBB(vals[0], vals[1], vals[2], vals[3]);
 }
@@ -365,13 +365,17 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
     // the array should not be empty
     assert(!m_objects.empty());
 
-    // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View object)
-    (m_objects.back())->UpdateSelfBB(m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2));
+    // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View
+    // object)
+    (m_objects.back())
+        ->UpdateSelfBB(m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2));
 
     int i;
     // Stretch the content BB of the other objects
     for (i = 0; i < (int)m_objects.size(); i++) {
-        (m_objects.at(i))->UpdateContentBB(m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2));
+        (m_objects.at(i))
+            ->UpdateContentBB(
+                m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2));
     }
 }
 

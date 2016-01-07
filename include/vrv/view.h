@@ -142,7 +142,8 @@ protected:
     void DrawSystem(DeviceContext *dc, System *system);
     void DrawSystemList(DeviceContext *dc, System *system, const ClassId classId);
     void DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure, int x, BarLine *barLine = NULL);
-    void DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp = false, bool abbreviations = false);
+    void DrawStaffGrp(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, int x, bool topStaffGrp = false,
+        bool abbreviations = false);
     void DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *scoreDef, bool abbreviations = false);
     void DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize);
     void DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize);
@@ -180,7 +181,8 @@ protected:
     void DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *element, System *system);
     void DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *element, Measure *measure, System *system);
     void DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *element, Staff *staff, Measure *measure);
-    void DrawLayerEditorialElement(DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawLayerEditorialElement(
+        DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY);
     ///@}
 
@@ -202,7 +204,8 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid = NULL);
+    void DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure,
+        Accid *prevAccid = NULL);
     void DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -236,15 +239,16 @@ protected:
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
     void DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
-    void DrawLedgerLines(DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
+    void DrawLedgerLines(
+        DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     void DrawMRptPart(DeviceContext *dc, int x, wchar_t smulfCode, int num, bool line, Staff *staff, Measure *measure);
     void DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff);
     void DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff);
     void DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
     void DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
-    void DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, bool isMensural, data_STEMDIRECTION dir, int radius, int xn, int originY,
-        int heightY = 0);
+    void DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, bool isMensural, data_STEMDIRECTION dir,
+        int radius, int xn, int originY, int heightY = 0);
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff);
     ///@}
 
@@ -275,7 +279,8 @@ protected:
     ///@{
     void DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
-    void CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount, BeamParams *params);
+    void CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount,
+        BeamParams *params);
     ///@}
 
     /**
@@ -286,12 +291,15 @@ protected:
      */
     ///@{
     void DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Measure *measure, System *system);
-    void DrawSylConnector(DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
+    void DrawSylConnector(
+        DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
     void DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff);
     void DrawTimeSpanningElement(DeviceContext *dc, DocObject *object, System *system);
-    void DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
+    void DrawSlur(
+        DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
-    void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
+    void DrawTie(
+        DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
 
     ///@}
 
@@ -339,7 +347,8 @@ protected:
     void DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int nbr);
     void DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int nbr);
     void DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin);
-    void DrawThickBezierCurve(DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle = 0.0);
+    void DrawThickBezierCurve(
+        DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle = 0.0);
     void DrawPartFullRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100);
     void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
@@ -350,7 +359,8 @@ protected:
 
     /**
      * Calculate the ScoreDef width by taking into account its widest key signature
-     * This is used in justifiation for anticipating the width of initial scoreDefs that are not drawn in the un-casted system
+     * This is used in justifiation for anticipating the width of initial scoreDefs that are not drawn in the un-casted
+     * system
      */
     void SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef);
 
@@ -372,13 +382,14 @@ private:
      * @name Internal methods used for calculating slurs
      */
     float AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point points[]);
-    int AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up, float angle,
-        bool posRatio = true);
-    void AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1, Point *c2, bool up,
-        float *angle, bool forceBothSides);
+    int AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
+        Point *c2, bool up, float angle, bool posRatio = true);
+    void AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
+        Point *c2, bool up, float *angle, bool forceBothSides);
     float GetAdjustedSlurAngle(Point *p1, Point *p2, bool up);
     void GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up, int height, int staffSize);
-    void GetSpanningPointPositions(ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize);
+    void GetSpanningPointPositions(
+        ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize);
     ///@}
 
     /**

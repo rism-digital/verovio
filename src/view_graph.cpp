@@ -186,7 +186,8 @@ void View::DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int 
     }
 }
 
-void View::DrawThickBezierCurve(DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle)
+void View::DrawThickBezierCurve(
+    DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle)
 {
     assert(dc);
 

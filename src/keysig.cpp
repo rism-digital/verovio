@@ -19,8 +19,10 @@ namespace vrv {
 // Static members with some default values
 //----------------------------------------------------------------------------
 
-data_PITCHNAME KeySig::flats[] = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
-data_PITCHNAME KeySig::sharps[] = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
+data_PITCHNAME KeySig::flats[]
+    = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
+data_PITCHNAME KeySig::sharps[]
+    = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
 
 int KeySig::octave_map[2][9][7] = {
     {
@@ -60,7 +62,8 @@ KeySig::KeySig() : LayerElement("ksig-"), AttAccidental(), AttPitch()
     Init();
 }
 
-KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType) : LayerElement("ksig-"), AttAccidental(), AttPitch()
+KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType)
+    : LayerElement("ksig-"), AttAccidental(), AttPitch()
 {
     Init();
 

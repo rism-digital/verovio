@@ -183,7 +183,8 @@ int Chord::PositionInChord(Note *note)
 }
 
 /**
- * Creates a 2D grid of width (# of accidentals + 1) * 4 and of height (highest accid - lowest accid) / (half a drawing unit)
+ * Creates a 2D grid of width (# of accidentals + 1) * 4 and of height (highest accid - lowest accid) / (half a drawing
+ * unit)
  */
 void Chord::ResetAccidSpace(int fullUnit)
 {
@@ -200,7 +201,8 @@ void Chord::ResetAccidSpace(int fullUnit)
 
     /*
      * Prepare for the situation where every accidental conflicts horizontally:
-     *    -Assume each accidental to be 2 drawing units wide, drawn to 1/2-unit detail (ACCID_WIDTH should be represented in half-units)
+     *    -Assume each accidental to be 2 drawing units wide, drawn to 1/2-unit detail (ACCID_WIDTH should be
+     * represented in half-units)
      *    -Prepare each line to account for one extra accidental so we can guarantee the grid has enough space
      *    -Set m_accidSpaceLeft to be used for asserts during drawing
      */

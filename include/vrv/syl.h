@@ -27,7 +27,11 @@ class TextElement;
  * pointers will be populated in Object::PrepareLyrics and Object::PrepareLyricsEnd
  */
 
-class Syl : public LayerElement, public TextListInterface, public TimeSpanningInterface, public AttTypography, public AttSylLog {
+class Syl : public LayerElement,
+            public TextListInterface,
+            public TimeSpanningInterface,
+            public AttTypography,
+            public AttSylLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

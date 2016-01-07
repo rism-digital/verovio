@@ -92,9 +92,15 @@ public:
      */
     ///@{
     void RegisterAttClass(AttClassId attClassId) { m_attClasses.push_back(attClassId); };
-    bool HasAttClass(AttClassId attClassId) { return std::find(m_attClasses.begin(), m_attClasses.end(), attClassId) != m_attClasses.end(); };
+    bool HasAttClass(AttClassId attClassId)
+    {
+        return std::find(m_attClasses.begin(), m_attClasses.end(), attClassId) != m_attClasses.end();
+    };
     void RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId interfaceId);
-    bool HasInterface(InterfaceId interfaceId) { return std::find(m_interfaces.begin(), m_interfaces.end(), interfaceId) != m_interfaces.end(); };
+    bool HasInterface(InterfaceId interfaceId)
+    {
+        return std::find(m_interfaces.begin(), m_interfaces.end(), interfaceId) != m_interfaces.end();
+    };
     ///@}
 
     /**
@@ -231,13 +237,15 @@ public:
      * Return the first element matching the AttComparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildByAttComparison(AttComparison *attComparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindChildByAttComparison(
+        AttComparison *attComparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
      * Return the element matching the extreme value with an AttComparison functor
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
-    Object *FindChildExtremeByAttComparison(AttComparison *attComparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    Object *FindChildExtremeByAttComparison(
+        AttComparison *attComparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -311,8 +319,8 @@ public:
      * Deepness allow to specify how many child levels should be processed UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
      */
-    virtual void Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor = NULL, ArrayOfAttComparisons *filters = NULL,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+    virtual void Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor = NULL,
+        ArrayOfAttComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     //----------//
     // Functors //
