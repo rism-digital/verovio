@@ -984,6 +984,7 @@ void MeiOutput::WriteEditorialElement(pugi::xml_node currentNode, EditorialEleme
     this->WriteSameAsAttr(currentNode, element);
     currentNode.append_attribute("xml:id") = UuidToMeiStr(element).c_str();
     element->WriteCommon(currentNode);
+    element->WriteCommonPart(currentNode);
 }
 
 bool MeiOutput::WriteMeiAbbr(pugi::xml_node currentNode, Abbr *abbr)
@@ -2423,9 +2424,11 @@ bool MeiInput::ReadMeiEditorialElement(Object *parent, pugi::xml_node current, E
 
 bool MeiInput::ReadEditorialElement(pugi::xml_node element, EditorialElement *object)
 {
-    object->ReadCommon(element);
     ReadSameAsAttr(element, object);
     SetMeiUuid(element, object);
+
+    object->ReadCommon(element);
+    object->ReadCommonPart(element);
 
     return true;
 }

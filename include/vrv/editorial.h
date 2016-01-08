@@ -35,7 +35,7 @@ enum VisibilityType { Hidden = 0, Visible };
  * content. For example <rgd> or <add>.
  * It is not an abstract class but should not be instantiated directly.
  */
-class EditorialElement : public DocObject, public AttCommon {
+class EditorialElement : public DocObject, public AttCommon, public AttCommonPart {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

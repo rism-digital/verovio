@@ -28,9 +28,10 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() : DocObject("ee-"), AttCommon()
+EditorialElement::EditorialElement() : DocObject("ee-"), AttCommon(), AttCommonPart()
 {
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_COMMONPART);
 
     Reset();
 }
@@ -38,6 +39,7 @@ EditorialElement::EditorialElement() : DocObject("ee-"), AttCommon()
 EditorialElement::EditorialElement(std::string classid) : DocObject(classid), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_COMMONPART);
 
     Reset();
 }
@@ -46,6 +48,7 @@ void EditorialElement::Reset()
 {
     DocObject::Reset();
     ResetCommon();
+    ResetCommonPart();
 
     m_visibility = Visible;
 }
