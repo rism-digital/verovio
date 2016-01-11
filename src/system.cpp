@@ -27,7 +27,6 @@ namespace vrv {
 System::System() : DocObject("system-"), DrawingListInterface()
 {
     // We set parent to it because we want to access the parent doc from the aligners
-    // See Object::SetParentDoc()
     m_systemAligner.SetParent(this);
 
     Reset();
@@ -210,8 +209,9 @@ int System::JustifyX(ArrayPtrVoid *params)
     assert(m_parent);
     assert(m_parent->m_parent);
 
-    (*ratio) = (double)((*systemFullWidth) - this->GetDrawingLabelsWidth() - this->m_systemLeftMar
-                   - this->m_systemRightMar) / ((double)m_drawingTotalWidth - this->GetDrawingLabelsWidth());
+    (*ratio)
+        = (double)((*systemFullWidth) - this->GetDrawingLabelsWidth() - this->m_systemLeftMar - this->m_systemRightMar)
+        / ((double)m_drawingTotalWidth - this->GetDrawingLabelsWidth());
 
     // LogDebug("System::JustifyX: *ratio=%lf", (*ratio));
 
