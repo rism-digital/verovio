@@ -149,7 +149,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
 //----------------------------------------------------------------------------
 // View - LayerElement
 //----------------------------------------------------------------------------
-
+    
 void View::DrawAccid(
     DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid)
 {
@@ -163,6 +163,15 @@ void View::DrawAccid(
     assert(accid);
 
     dc->StartGraphic(element, "", element->GetUuid());
+
+    bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
+                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
+                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+
+    // Mensural accidentals may be quite a bit smaller than CMN accidentals; use _pseudoStaffSize_ to force this.
+    int pseudoStaffSize;
+    if (isMensural) pseudoStaffSize = (int)(MACCID_SIZE_FACTOR * staff->m_drawingStaffSize);
+    else pseudoStaffSize = staff->m_drawingStaffSize;
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if (accid->m_parent) {
@@ -215,7 +224,7 @@ void View::DrawAccid(
         default: break;
     }
 
-    DrawSmuflCode(dc, x, y, symc, staff->m_drawingStaffSize, accid->m_drawingCueSize);
+    DrawSmuflCode(dc, x, y, symc, pseudoStaffSize, accid->m_drawingCueSize);
 
     dc->EndGraphic(element, this);
 }
