@@ -126,17 +126,22 @@ private:
     bool WriteMeiDoc(Doc *doc);
 
     /**
+     * Write the @xml:id to the currentNode
+     */
+    void WriteXmlId(pugi::xml_node currentNode, Object *object);
+
+    /**
      * @name Methods for writing MEI containers (measures, staff, etc) scoreDef and related.
      */
     ///@{
-    bool WriteMeiPage(pugi::xml_node currentNode, Page *page);
-    bool WriteMeiSystem(pugi::xml_node currentNode, System *system);
-    bool WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
-    bool WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
-    bool WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
-    bool WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure);
-    bool WriteMeiStaff(pugi::xml_node currentNode, Staff *staff);
-    bool WriteMeiLayer(pugi::xml_node currentNode, Layer *layer);
+    void WriteMeiPage(pugi::xml_node currentNode, Page *page);
+    void WriteMeiSystem(pugi::xml_node currentNode, System *system);
+    void WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
+    void WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
+    void WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
+    void WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure);
+    void WriteMeiStaff(pugi::xml_node currentNode, Staff *staff);
+    void WriteMeiLayer(pugi::xml_node currentNode, Layer *layer);
     ///@}
 
     /**
@@ -191,22 +196,22 @@ private:
      * @name Methods for writing editorial markup
      */
     ///@{
-    bool WriteMeiAbbr(pugi::xml_node currentNode, Abbr *abbr);
-    bool WriteMeiAdd(pugi::xml_node currentNode, Add *add);
-    bool WriteMeiAnnot(pugi::xml_node currentNode, Annot *annot);
-    bool WriteMeiApp(pugi::xml_node currentNode, App *app);
-    bool WriteMeiCorr(pugi::xml_node currentNode, Corr *corr);
-    bool WriteMeiDamage(pugi::xml_node currentNode, Damage *damage);
-    bool WriteMeiDel(pugi::xml_node currentNode, Del *del);
-    bool WriteMeiExpan(pugi::xml_node currentNode, Expan *expan);
-    bool WriteMeiLem(pugi::xml_node currentNode, Lem *lem);
-    bool WriteMeiOrig(pugi::xml_node currentNode, Orig *orig);
-    bool WriteMeiRdg(pugi::xml_node currentNode, Rdg *rdg);
-    bool WriteMeiReg(pugi::xml_node currentNode, Reg *Reg);
-    bool WriteMeiRestore(pugi::xml_node currentNode, Restore *restore);
-    bool WriteMeiSic(pugi::xml_node currentNode, Sic *sic);
-    bool WriteMeiSupplied(pugi::xml_node currentNode, Supplied *supplied);
-    bool WriteMeiUnclear(pugi::xml_node currentNode, Unclear *unclear);
+    void WriteMeiAbbr(pugi::xml_node currentNode, Abbr *abbr);
+    void WriteMeiAdd(pugi::xml_node currentNode, Add *add);
+    void WriteMeiAnnot(pugi::xml_node currentNode, Annot *annot);
+    void WriteMeiApp(pugi::xml_node currentNode, App *app);
+    void WriteMeiCorr(pugi::xml_node currentNode, Corr *corr);
+    void WriteMeiDamage(pugi::xml_node currentNode, Damage *damage);
+    void WriteMeiDel(pugi::xml_node currentNode, Del *del);
+    void WriteMeiExpan(pugi::xml_node currentNode, Expan *expan);
+    void WriteMeiLem(pugi::xml_node currentNode, Lem *lem);
+    void WriteMeiOrig(pugi::xml_node currentNode, Orig *orig);
+    void WriteMeiRdg(pugi::xml_node currentNode, Rdg *rdg);
+    void WriteMeiReg(pugi::xml_node currentNode, Reg *Reg);
+    void WriteMeiRestore(pugi::xml_node currentNode, Restore *restore);
+    void WriteMeiSic(pugi::xml_node currentNode, Sic *sic);
+    void WriteMeiSupplied(pugi::xml_node currentNode, Supplied *supplied);
+    void WriteMeiUnclear(pugi::xml_node currentNode, Unclear *unclear);
     ///@}
 
     /**
@@ -216,13 +221,6 @@ private:
     void WriteMeiVerse(pugi::xml_node currentNode, Verse *verse);
     void WriteMeiSyl(pugi::xml_node currentNode, Syl *syl);
     ///@}
-
-    /**
-     * @name Methods for wrinting a sameAs attribute
-     * The method has to be called by classed that support it (e.g., LayerElement)
-     * To be changed to Att
-     */
-    void WriteSameAsAttr(pugi::xml_node currentNode, Object *object);
 
     /**
      * Write unsupported attributes stored in Object::m_unsupported (not tested)
@@ -423,15 +421,8 @@ private:
      * @name Methods for reading other MEI elements.
      */
     ///@{
-    bool ReadAccidAsAttr(Note *note, pugi::xml_node verse);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
     ///@}
-
-    /**
-     * Read a sameAs attribute
-     * The method has to be called by classed that support it (e.g., LayerElement)
-     */
-    void ReadSameAsAttr(pugi::xml_node element, Object *object);
 
     /**
      * Write unsupported attributes and store them in Object::m_unsupported (not tested)

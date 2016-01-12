@@ -130,6 +130,7 @@ bool MeiOutput::ExportFile()
         LogError("%s", str);
         return false;
     }
+
     return true;
 }
 
@@ -140,6 +141,7 @@ std::string MeiOutput::GetOutput(int page)
     this->ExportFile();
     m_writeToStreamString = false;
     m_page = -1;
+
     return m_streamStringOutput.str();
 }
 
@@ -414,6 +416,11 @@ std::string MeiOutput::UuidToMeiStr(Object *element)
     return out;
 }
 
+void MeiOutput::WriteXmlId(pugi::xml_node currentNode, Object *object)
+{
+    currentNode.append_attribute("xml:id") = UuidToMeiStr(object).c_str();
+}
+
 bool MeiOutput::WriteMeiDoc(Doc *doc)
 {
     assert(doc);
@@ -472,11 +479,11 @@ bool MeiOutput::WriteMeiDoc(Doc *doc)
     return true;
 }
 
-bool MeiOutput::WriteMeiPage(pugi::xml_node currentNode, Page *page)
+void MeiOutput::WriteMeiPage(pugi::xml_node currentNode, Page *page)
 {
     assert(page);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(page).c_str();
+    WriteXmlId(currentNode, page);
     // size and margins but only if any - we rely on page.height only to check this
     if (page->m_pageHeight != -1) {
         currentNode.append_attribute("page.width") = StringFormat("%d", page->m_pageWidth).c_str();
@@ -488,14 +495,13 @@ bool MeiOutput::WriteMeiPage(pugi::xml_node currentNode, Page *page)
     if (!page->m_surface.empty()) {
         currentNode.append_attribute("surface") = page->m_surface.c_str();
     }
-    return true;
 }
 
-bool MeiOutput::WriteMeiSystem(pugi::xml_node currentNode, System *system)
+void MeiOutput::WriteMeiSystem(pugi::xml_node currentNode, System *system)
 {
     assert(system);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(system).c_str();
+    WriteXmlId(currentNode, system);
     // margins
     currentNode.append_attribute("system.leftmar") = StringFormat("%d", system->m_systemLeftMar).c_str();
     currentNode.append_attribute("system.rightmar") = StringFormat("%d", system->m_systemRightMar).c_str();
@@ -503,147 +509,111 @@ bool MeiOutput::WriteMeiSystem(pugi::xml_node currentNode, System *system)
     if (system->m_yAbs != VRV_UNSET) {
         currentNode.append_attribute("uly") = StringFormat("%d", system->m_yAbs).c_str();
     }
-
-    return true;
 }
 
-bool MeiOutput::WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
+void MeiOutput::WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
 {
     assert(scoreDef);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(scoreDef).c_str();
-
+    WriteXmlId(currentNode, scoreDef);
     WriteScoreDefInterface(currentNode, scoreDef);
-
-    return true;
 }
 
-bool MeiOutput::WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp)
+void MeiOutput::WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp)
 {
     assert(staffGrp);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(staffGrp).c_str();
-
+    WriteXmlId(currentNode, staffGrp);
     staffGrp->WriteCommon(currentNode);
     staffGrp->WriteCommonPart(currentNode);
     staffGrp->WriteLabelsAddl(currentNode);
     staffGrp->WriteStaffgroupingsym(currentNode);
     staffGrp->WriteStaffGrpVis(currentNode);
-
-    return true;
 }
 
-bool MeiOutput::WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
+void MeiOutput::WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
 {
     assert(staffDef);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(staffDef).c_str();
-
+    WriteXmlId(currentNode, staffDef);
+    WriteScoreDefInterface(currentNode, staffDef);
     staffDef->WriteCommon(currentNode);
     staffDef->WriteCommonPart(currentNode);
     staffDef->WriteLabelsAddl(currentNode);
     staffDef->WriteNotationtype(currentNode);
     staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefVis(currentNode);
-
-    WriteScoreDefInterface(currentNode, staffDef);
-
-    return true;
 }
 
-bool MeiOutput::WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure)
+void MeiOutput::WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure)
 {
     assert(measure);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(measure).c_str();
-
+    WriteXmlId(currentNode, measure);
     measure->WriteCommon(currentNode);
     measure->WriteMeasureLog(currentNode);
     measure->WritePointing(currentNode);
-
-    return true;
 }
 
 void MeiOutput::WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText)
 {
     assert(anchoredText);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(anchoredText).c_str();
+    WriteXmlId(currentNode, anchoredText);
     WriteTextDirInterface(currentNode, anchoredText);
-    return;
 }
 
 void MeiOutput::WriteMeiSlur(pugi::xml_node currentNode, Slur *slur)
 {
     assert(slur);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(slur).c_str();
-
-    slur->WriteCurvature(currentNode);
-
+    WriteXmlId(currentNode, slur);
     WriteTimeSpanningInterface(currentNode, slur);
-
-    return;
+    slur->WriteCurvature(currentNode);
 };
 
-bool MeiOutput::WriteMeiStaff(pugi::xml_node currentNode, Staff *staff)
+void MeiOutput::WriteMeiStaff(pugi::xml_node currentNode, Staff *staff)
 {
     assert(staff);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(staff).c_str();
-
+    WriteXmlId(currentNode, staff);
     staff->WriteCommon(currentNode);
-
     // y position
     if (staff->m_yAbs != VRV_UNSET) {
         currentNode.append_attribute("uly") = StringFormat("%d", staff->m_yAbs).c_str();
     }
-
-    return true;
 }
 
 void MeiOutput::WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo)
 {
     assert(tempo);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(tempo).c_str();
-
+    WriteXmlId(currentNode, tempo);
     WriteTextDirInterface(currentNode, tempo);
     WriteTimePointInterface(currentNode, tempo);
-
-    return;
 }
 
 void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
 {
     assert(tie);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(tie).c_str();
-
+    WriteXmlId(currentNode, tie);
     WriteTimeSpanningInterface(currentNode, tie);
-
-    return;
 };
 
-bool MeiOutput::WriteMeiLayer(pugi::xml_node currentNode, Layer *layer)
+void MeiOutput::WriteMeiLayer(pugi::xml_node currentNode, Layer *layer)
 {
     assert(layer);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(layer).c_str();
-
+    WriteXmlId(currentNode, layer);
     layer->WriteCommon(currentNode);
-
-    return true;
 }
 
 void MeiOutput::WriteLayerElement(pugi::xml_node currentNode, LayerElement *element)
 {
     assert(element);
 
-    this->WriteSameAsAttr(currentNode, element);
-
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(element).c_str();
-
+    WriteXmlId(currentNode, element);
     if (element->m_xAbs != VRV_UNSET) {
         currentNode.append_attribute("ulx") = StringFormat("%d", element->m_xAbs).c_str();
     }
@@ -665,7 +635,6 @@ void MeiOutput::WriteMeiBarLine(pugi::xml_node currentNode, BarLine *barLine)
 
     WriteLayerElement(currentNode, barLine);
     barLine->WriteBarLineLog(currentNode);
-    return;
 }
 
 void MeiOutput::WriteMeiBeam(pugi::xml_node currentNode, Beam *beam)
@@ -673,7 +642,6 @@ void MeiOutput::WriteMeiBeam(pugi::xml_node currentNode, Beam *beam)
     assert(beam);
 
     WriteLayerElement(currentNode, beam);
-    return;
 }
 
 void MeiOutput::WriteMeiBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt)
@@ -701,8 +669,6 @@ void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
     chord->WriteStems(currentNode);
     chord->WriteStemsCmn(currentNode);
     chord->WriteTiepresent(currentNode);
-
-    return;
 }
 
 void MeiOutput::WriteMeiClef(pugi::xml_node currentNode, Clef *clef)
@@ -713,7 +679,6 @@ void MeiOutput::WriteMeiClef(pugi::xml_node currentNode, Clef *clef)
     clef->WriteClefshape(currentNode);
     clef->WriteLineloc(currentNode);
     clef->WriteOctavedisplacement(currentNode);
-    return;
 }
 
 void MeiOutput::WriteMeiCustos(pugi::xml_node currentNode, Custos *custos)
@@ -747,7 +712,6 @@ void MeiOutput::WriteMeiKeySig(pugi::xml_node currentNode, KeySig *keySig)
     WriteLayerElement(currentNode, keySig);
     keySig->WriteAccidental(currentNode);
     keySig->WritePitch(currentNode);
-    return;
 }
 
 void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
@@ -760,7 +724,6 @@ void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
     mensur->WriteSlashcount(currentNode);
-    return;
 }
 
 void MeiOutput::WriteMeiMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
@@ -769,7 +732,6 @@ void MeiOutput::WriteMeiMeterSig(pugi::xml_node currentNode, MeterSig *meterSig)
 
     WriteLayerElement(currentNode, meterSig);
     meterSig->WriteMeterSigLog(currentNode);
-    return;
 }
 
 void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
@@ -777,7 +739,6 @@ void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
     assert(mRest);
 
     WriteLayerElement(currentNode, mRest);
-    return;
 }
 
 void MeiOutput::WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt)
@@ -800,7 +761,6 @@ void MeiOutput::WriteMeiMultiRest(pugi::xml_node currentNode, MultiRest *multiRe
 
     WriteLayerElement(currentNode, multiRest);
     multiRest->WriteNumbered(currentNode);
-    return;
 }
 
 void MeiOutput::WriteMeiMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt)
@@ -824,8 +784,6 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
     note->WriteTiepresent(currentNode);
-
-    return;
 }
 
 void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
@@ -835,14 +793,13 @@ void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
     WriteLayerElement(currentNode, rest);
     WriteDurationInterface(currentNode, rest);
     WritePositionInterface(currentNode, rest);
-    return;
 }
 
 void MeiOutput::WriteMeiProport(pugi::xml_node currentNode, Proport *proport)
 {
+    assert(proport);
+
     WriteLayerElement(currentNode, proport);
-    // meterSig->WriteMeterSigLog(currentNode);
-    return;
 }
 
 void MeiOutput::WriteMeiSpace(pugi::xml_node currentNode, Space *space)
@@ -851,7 +808,6 @@ void MeiOutput::WriteMeiSpace(pugi::xml_node currentNode, Space *space)
 
     WriteLayerElement(currentNode, space);
     WriteDurationInterface(currentNode, space);
-    return;
 }
 
 void MeiOutput::WriteMeiTuplet(pugi::xml_node currentNode, Tuplet *tuplet)
@@ -862,36 +818,32 @@ void MeiOutput::WriteMeiTuplet(pugi::xml_node currentNode, Tuplet *tuplet)
     tuplet->WriteDurationRatio(currentNode);
     tuplet->WriteNumberplacement(currentNode);
     tuplet->WriteTupletVis(currentNode);
-    return;
 }
 
 void MeiOutput::WriteMeiVerse(pugi::xml_node currentNode, Verse *verse)
 {
     assert(verse);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(verse).c_str();
+    WriteLayerElement(currentNode, verse);
     verse->WriteCommon(currentNode);
-    return;
 }
 
 void MeiOutput::WriteMeiSyl(pugi::xml_node currentNode, Syl *syl)
 {
     assert(syl);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(syl).c_str();
+    WriteLayerElement(currentNode, syl);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
-    return;
 }
 
 void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 {
     assert(rend);
 
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(rend).c_str();
+    WriteXmlId(currentNode, rend);
     rend->WriteCommon(currentNode);
     rend->WriteTypography(currentNode);
-    return;
 }
 
 void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
@@ -974,13 +926,6 @@ void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningI
     interface->WriteTimestamp2Musical(element);
 }
 
-void MeiOutput::WriteSameAsAttr(pugi::xml_node element, Object *object)
-{
-    if (!object->m_sameAs.empty()) {
-        element.append_attribute("sameas") = object->m_sameAs.c_str();
-    }
-}
-
 void MeiOutput::WriteUnsupportedAttr(pugi::xml_node element, Object *object)
 {
     ArrayOfStrAttr::iterator iter;
@@ -993,159 +938,143 @@ void MeiOutput::WriteEditorialElement(pugi::xml_node currentNode, EditorialEleme
 {
     assert(element);
 
-    this->WriteSameAsAttr(currentNode, element);
-    currentNode.append_attribute("xml:id") = UuidToMeiStr(element).c_str();
+    WriteXmlId(currentNode, element);
     element->WriteCommon(currentNode);
     element->WriteCommonPart(currentNode);
 }
 
-bool MeiOutput::WriteMeiAbbr(pugi::xml_node currentNode, Abbr *abbr)
+void MeiOutput::WriteMeiAbbr(pugi::xml_node currentNode, Abbr *abbr)
 {
     assert(abbr);
 
     WriteEditorialElement(currentNode, abbr);
     abbr->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiAdd(pugi::xml_node currentNode, Add *add)
+void MeiOutput::WriteMeiAdd(pugi::xml_node currentNode, Add *add)
 {
     assert(add);
 
     WriteEditorialElement(currentNode, add);
     add->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiAnnot(pugi::xml_node currentNode, Annot *annot)
+void MeiOutput::WriteMeiAnnot(pugi::xml_node currentNode, Annot *annot)
 {
     assert(annot);
 
     WriteEditorialElement(currentNode, annot);
     annot->WritePlist(currentNode);
     annot->WriteSource(currentNode);
-
+    // special case where we keep the pugi::nodes
     for (pugi::xml_node child = annot->m_content.first_child(); child; child = child.next_sibling()) {
         currentNode.append_copy(child);
     }
-
-    return true;
 };
 
-bool MeiOutput::WriteMeiApp(pugi::xml_node currentNode, App *app)
+void MeiOutput::WriteMeiApp(pugi::xml_node currentNode, App *app)
 {
     assert(app);
 
     WriteEditorialElement(currentNode, app);
-    return true;
 };
 
-bool MeiOutput::WriteMeiCorr(pugi::xml_node currentNode, Corr *corr)
+void MeiOutput::WriteMeiCorr(pugi::xml_node currentNode, Corr *corr)
 {
     assert(corr);
 
     WriteEditorialElement(currentNode, corr);
     corr->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiDamage(pugi::xml_node currentNode, Damage *damage)
+void MeiOutput::WriteMeiDamage(pugi::xml_node currentNode, Damage *damage)
 {
     assert(damage);
 
     WriteEditorialElement(currentNode, damage);
     damage->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiDel(pugi::xml_node currentNode, Del *del)
+void MeiOutput::WriteMeiDel(pugi::xml_node currentNode, Del *del)
 {
     assert(del);
 
     WriteEditorialElement(currentNode, del);
     del->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiExpan(pugi::xml_node currentNode, Expan *expan)
+void MeiOutput::WriteMeiExpan(pugi::xml_node currentNode, Expan *expan)
 {
     assert(expan);
 
     WriteEditorialElement(currentNode, expan);
     expan->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiLem(pugi::xml_node currentNode, Lem *lem)
+void MeiOutput::WriteMeiLem(pugi::xml_node currentNode, Lem *lem)
 {
     assert(lem);
 
     WriteEditorialElement(currentNode, lem);
     lem->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiOrig(pugi::xml_node currentNode, Orig *orig)
+void MeiOutput::WriteMeiOrig(pugi::xml_node currentNode, Orig *orig)
 {
     assert(orig);
 
     WriteEditorialElement(currentNode, orig);
     orig->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiRdg(pugi::xml_node currentNode, Rdg *rdg)
+void MeiOutput::WriteMeiRdg(pugi::xml_node currentNode, Rdg *rdg)
 {
     assert(rdg);
 
     WriteEditorialElement(currentNode, rdg);
     rdg->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiReg(pugi::xml_node currentNode, Reg *reg)
+void MeiOutput::WriteMeiReg(pugi::xml_node currentNode, Reg *reg)
 {
     assert(reg);
 
     WriteEditorialElement(currentNode, reg);
     reg->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiRestore(pugi::xml_node currentNode, Restore *restore)
+void MeiOutput::WriteMeiRestore(pugi::xml_node currentNode, Restore *restore)
 {
     assert(restore);
 
     WriteEditorialElement(currentNode, restore);
     restore->WriteSource(currentNode);
-    return true;
+
+    return;
 };
 
-bool MeiOutput::WriteMeiSic(pugi::xml_node currentNode, Sic *sic)
+void MeiOutput::WriteMeiSic(pugi::xml_node currentNode, Sic *sic)
 {
     assert(sic);
 
     WriteEditorialElement(currentNode, sic);
     sic->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiSupplied(pugi::xml_node currentNode, Supplied *supplied)
+void MeiOutput::WriteMeiSupplied(pugi::xml_node currentNode, Supplied *supplied)
 {
     assert(supplied);
 
     WriteEditorialElement(currentNode, supplied);
     supplied->WriteSource(currentNode);
-    return true;
 };
 
-bool MeiOutput::WriteMeiUnclear(pugi::xml_node currentNode, Unclear *unclear)
+void MeiOutput::WriteMeiUnclear(pugi::xml_node currentNode, Unclear *unclear)
 {
     assert(unclear);
 
     WriteEditorialElement(currentNode, unclear);
     unclear->WriteSource(currentNode);
-    return true;
 };
 
 std::wstring MeiOutput::EscapeSMuFL(std::wstring data)
@@ -1193,6 +1122,7 @@ std::string MeiOutput::DocTypeToStr(DocType type)
             value = "";
             break;
     }
+
     return value;
 }
 
@@ -1432,6 +1362,7 @@ bool MeiInput::ReadMeiPageChildren(Object *parent, pugi::xml_node parentNode)
             LogWarning("Unsupported '<%s>' within <page>", current.name());
         }
     }
+
     return true;
 }
 
@@ -1934,7 +1865,6 @@ bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
         object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITON_FACTOR;
     }
 
-    ReadSameAsAttr(element, object);
     SetMeiUuid(element, object);
 
     return true;
@@ -2068,6 +1998,7 @@ bool MeiInput::ReadMeiKeySig(Object *parent, pugi::xml_node keySig)
     vrvKeySig->ReadAccidental(keySig);
     vrvKeySig->ReadPitch(keySig);
 
+    // special processing required
     vrvKeySig->ConvertToInternal();
 
     AddLayerElement(parent, vrvKeySig);
@@ -2218,7 +2149,6 @@ bool MeiInput::ReadMeiTuplet(Object *parent, pugi::xml_node tuplet)
     Tuplet *vrvTuplet = new Tuplet();
     ReadLayerElement(tuplet, vrvTuplet);
 
-    // Read in the numerator and denominator properties
     vrvTuplet->ReadDurationRatio(tuplet);
     vrvTuplet->ReadNumberplacement(tuplet);
     vrvTuplet->ReadTupletVis(tuplet);
@@ -2227,6 +2157,8 @@ bool MeiInput::ReadMeiTuplet(Object *parent, pugi::xml_node tuplet)
 
     bool success = ReadMeiLayerChildren(vrvTuplet, tuplet);
 
+    // Not very precise: looks at the children count, will not be correct with one beam or an editorial single child,
+    // for example
     if (vrvTuplet->GetNoteCount() == 1) {
         LogWarning("<tuplet> with only one note");
     }
@@ -2371,22 +2303,6 @@ bool MeiInput::ReadTimeSpanningInterface(pugi::xml_node element, TimeSpanningInt
     return true;
 }
 
-bool MeiInput::ReadAccidAsAttr(Note *note, pugi::xml_node accid)
-{
-    Accid vrvAccid;
-    vrvAccid.ReadAccidental(accid);
-    note->SetAccid(vrvAccid.GetAccid());
-    return true;
-}
-
-void MeiInput::ReadSameAsAttr(pugi::xml_node element, Object *object)
-{
-    if (!element.attribute("sameas")) {
-        return;
-    }
-    object->m_sameAs = element.attribute("sameas").value();
-}
-
 void MeiInput::ReadUnsupportedAttr(pugi::xml_node element, Object *object)
 {
     for (pugi::xml_attribute_iterator ait = element.attributes_begin(); ait != element.attributes_end(); ++ait) {
@@ -2446,7 +2362,6 @@ bool MeiInput::ReadMeiEditorialElement(Object *parent, pugi::xml_node current, E
 
 bool MeiInput::ReadEditorialElement(pugi::xml_node element, EditorialElement *object)
 {
-    ReadSameAsAttr(element, object);
     SetMeiUuid(element, object);
 
     object->ReadCommon(element);

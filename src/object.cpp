@@ -358,20 +358,6 @@ void Object::FillFlatList(ListOfObjects *flatList)
     this->Process(&addToFlatList, &params);
 }
 
-void Object::AddSameAs(std::string id, std::string filename)
-{
-    std::string sameAs = filename;
-    if (!filename.empty()) {
-        sameAs += "#";
-    }
-    sameAs += id;
-
-    if (!m_sameAs.empty()) {
-        m_sameAs += " ";
-    }
-    m_sameAs += sameAs;
-}
-
 Object *Object::GetFirstParent(const ClassId classId, int maxSteps)
 {
     if ((maxSteps == 0) || !m_parent) {
@@ -398,30 +384,6 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxSteps)
     else {
         return (m_parent->GetLastParentNot(classId, maxSteps - 1));
     }
-}
-
-bool Object::GetSameAs(std::string *id, std::string *filename, int idx)
-{
-    int i = 0;
-
-    std::istringstream iss(m_sameAs);
-    std::string token;
-    while (getline(iss, token, ' ')) {
-        if (i == idx) {
-            size_t pos = token.find("#");
-            if (pos != std::string::npos) {
-                (*filename) = token.substr(0, pos);
-                (*id) = token.substr(pos + 1, std::string::npos);
-            }
-            else {
-                (*filename) = "";
-                (*id) = token;
-            }
-            return true;
-        }
-        i++;
-    }
-    return false;
 }
 
 void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor, ArrayOfAttComparisons *filters,

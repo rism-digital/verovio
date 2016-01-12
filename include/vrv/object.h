@@ -282,13 +282,6 @@ public:
     void FillFlatList(ListOfObjects *list);
 
     /**
-     * Add a sameAs attribute to the object.
-     * If a filename is given, the attribute will be filename#id.
-     * If several value are added, they will be separated by a whitespace.
-     */
-    void AddSameAs(std::string id, std::string filename = "");
-
-    /**
      * Parse the sameAs attribute and return the one at the #idx position (if any).
      */
     bool GetSameAs(std::string *id, std::string *filename, int idx = 0);
@@ -647,7 +640,6 @@ protected:
 public:
     ArrayOfObjects m_children;
     Object *m_parent;
-    std::string m_sameAs;
 
     /**
      * Keep an array of unsupported attributes as pairs.
@@ -914,7 +906,9 @@ public:
     }
 
 private:
+    //
 public:
+    //
 private:
     ClassId m_classId;
 };
