@@ -129,6 +129,7 @@ public:
     virtual int PreparePointersByLayer(ArrayPtrVoid *params);
 
     /**
+     * Processes The FloatingElement owned by the note (e.g, @tie).
      */
     virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);
 

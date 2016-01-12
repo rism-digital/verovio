@@ -134,6 +134,7 @@ enum ClassId {
     REST,
     SPACE,
     SYL,
+    TIMESTAMP_ATTR,
     TUPLET,
     VERSE,
     LAYER_ELEMENT_max,

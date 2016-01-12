@@ -147,6 +147,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/textelement.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/timeinterface.cpp \
+	$VEROVIO_ROOT/src/timestamp.cpp \
 	$VEROVIO_ROOT/src/toolkit.cpp \
 	$VEROVIO_ROOT/src/tuplet.cpp \
 	$VEROVIO_ROOT/src/verse.cpp \
