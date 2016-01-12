@@ -10,6 +10,7 @@
 
 #include "floatingelement.h"
 #include "textdirinterface.h"
+#include "timeinterface.h"
 
 namespace vrv {
 
@@ -56,7 +57,7 @@ private:
 /**
  * This class is an interface for <tempo> elements at the measure level
  */
-class Tempo : public FloatingElement, public TextDirInterface, public AttTimestampMusical {
+class Tempo : public FloatingElement, public TextDirInterface, public TimePointInterface {
 public:
     /**
      * @name Constructors, destructors, reset methods

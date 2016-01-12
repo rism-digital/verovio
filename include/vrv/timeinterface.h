@@ -25,6 +25,7 @@ class LayerElement;
  * It is not an abstract class but should not be instanciate directly.
  */
 class TimeSpanningInterface : public Interface,
+                              public AttStaffident,
                               public AttStartendid,
                               public AttStartid,
                               public AttTimestampMusical,
@@ -94,16 +95,78 @@ public:
     virtual int InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object);
 
 private:
-    /**
-     *
-     */
-    std::string ExtractUuidFragment(std::string refUuid);
-
+    //
 public:
+    //
 private:
     LayerElement *m_start;
     LayerElement *m_end;
     std::string m_startUuid, m_endUuid;
+};
+
+//----------------------------------------------------------------------------
+// TimePointInterface
+//----------------------------------------------------------------------------
+
+/**
+ * This class is an interface for elements having a single time point, such as tempo, reh, etc..
+ * It is not an abstract class but should not be instanciate directly.
+ */
+class TimePointInterface : public Interface, public AttStaffident, public AttStartid, public AttTimestampMusical {
+public:
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    TimePointInterface();
+    virtual ~TimePointInterface();
+    virtual void Reset();
+    virtual InterfaceId IsInterface() { return INTERFACE_TIME_POINT; };
+    ///@}
+
+    /**
+     * @name Set and get the first LayerElement
+     * The setter asserts that no LayerElement was previously set.
+     */
+    ///@{
+    bool SetStart(LayerElement *start);
+    LayerElement *GetStart() { return m_start; };
+    ///@}
+
+    /**
+     *
+     */
+    bool HasStart() { return (m_start); };
+
+    /**
+     *
+     */
+    void SetUuidStr();
+
+    //-----------------//
+    // Pseudo functors //
+    //-----------------//
+
+    /**
+     * We have functor in the interface for avoiding code duplication in each implementation class.
+     * Since we are in an interface, we need to pass the DocObject (implementation) to
+     * the functor method. These not called by the Process/Call loop but by the implementaion
+     * classes explicitely. See FloatingElement::FillStaffCurrentTimeSpanning for an example.
+     */
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object);
+
+private:
+    //
+public:
+    //
+private:
+    LayerElement *m_start;
+    std::string m_startUuid;
 };
 
 } // namespace vrv

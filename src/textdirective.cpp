@@ -52,10 +52,10 @@ void AnchoredText::AddTextElement(TextElement *element)
 // Tempo
 //----------------------------------------------------------------------------
 
-Tempo::Tempo() : FloatingElement("tempo-"), TextDirInterface(), AttTimestampMusical()
+Tempo::Tempo() : FloatingElement("tempo-"), TextDirInterface(), TimePointInterface()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
-    RegisterAttClass(ATT_TIMESTAMPMUSICAL);
+    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
 
     Reset();
 }
@@ -68,8 +68,7 @@ void Tempo::Reset()
 {
     FloatingElement::Reset();
     TextDirInterface::Reset();
-
-    ResetTimestampMusical();
+    TimePointInterface::Reset();
 }
 
 void Tempo::AddTextElement(TextElement *element)

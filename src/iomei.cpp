@@ -608,8 +608,9 @@ void MeiOutput::WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo)
 
     currentNode.append_attribute("xml:id") = UuidToMeiStr(tempo).c_str();
 
-    tempo->WriteTimestampMusical(currentNode);
     WriteTextDirInterface(currentNode, tempo);
+    WriteTimePointInterface(currentNode, tempo);
+
     return;
 }
 
@@ -951,15 +952,26 @@ void MeiOutput::WriteTextDirInterface(pugi::xml_node element, TextDirInterface *
 
     interface->WriteCommon(element);
     interface->WritePlacement(element);
+}
+
+void MeiOutput::WriteTimePointInterface(pugi::xml_node element, TimePointInterface *interface)
+{
+    assert(interface);
+
     interface->WriteStaffident(element);
+    interface->WriteStartid(element);
+    interface->WriteTimestampMusical(element);
 }
 
 void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface)
 {
     assert(interface);
 
+    interface->WriteStaffident(element);
     interface->WriteStartendid(element);
     interface->WriteStartid(element);
+    interface->WriteTimestampMusical(element);
+    interface->WriteTimestamp2Musical(element);
 }
 
 void MeiOutput::WriteSameAsAttr(pugi::xml_node element, Object *object)
@@ -1719,7 +1731,7 @@ bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
     SetMeiUuid(tempo, vrvTempo);
 
     ReadTextDirInterface(tempo, vrvTempo);
-    vrvTempo->ReadTimestampMusical(tempo);
+    ReadTimePointInterface(tempo, vrvTempo);
 
     AddFloatingElement(parent, vrvTempo);
     return ReadMeiTextChildren(vrvTempo, tempo);
@@ -2338,14 +2350,24 @@ bool MeiInput::ReadTextDirInterface(pugi::xml_node element, TextDirInterface *in
 {
     interface->ReadCommon(element);
     interface->ReadPlacement(element);
+    return true;
+}
+
+bool MeiInput::ReadTimePointInterface(pugi::xml_node element, TimePointInterface *interface)
+{
     interface->ReadStaffident(element);
+    interface->ReadStartid(element);
+    interface->ReadTimestampMusical(element);
     return true;
 }
 
 bool MeiInput::ReadTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface)
 {
+    interface->ReadStaffident(element);
     interface->ReadStartendid(element);
     interface->ReadStartid(element);
+    interface->ReadTimestampMusical(element);
+    interface->ReadTimestamp2Musical(element);
     return true;
 }
 

@@ -74,6 +74,7 @@ class Text;
 class TextDirInterface;
 class TextElement;
 class Tie;
+class TimePointInterface;
 class TimeSpanningInterface;
 class Tuplet;
 class Unclear;
@@ -240,6 +241,7 @@ private:
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
     void WriteScoreDefInterface(pugi::xml_node currentNode, ScoreDefInterface *interface);
     void WriteTextDirInterface(pugi::xml_node currentNode, TextDirInterface *interface);
+    void WriteTimePointInterface(pugi::xml_node currentNode, TimePointInterface *interface);
     void WriteTimeSpanningInterface(pugi::xml_node currentNode, TimeSpanningInterface *interface);
     ///@}
 
@@ -413,6 +415,7 @@ private:
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);
     bool ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface);
     bool ReadTextDirInterface(pugi::xml_node element, TextDirInterface *interface);
+    bool ReadTimePointInterface(pugi::xml_node element, TimePointInterface *interface);
     bool ReadTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface);
     ///@}
 

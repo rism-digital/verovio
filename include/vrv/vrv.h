@@ -106,6 +106,11 @@ void LogElapsedTimeEnd(const char *msg = "unspecified operation");
  */
 bool Check(Object *object);
 
+/**
+ * Extract the uuid from a string
+ */
+std::string ExtractUuidFragment(std::string refUuid);
+
 //----------------------------------------------------------------------------
 // Resources
 //----------------------------------------------------------------------------
