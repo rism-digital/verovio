@@ -1,0 +1,26 @@
+var classvrv_1_1_page =
+[
+    [ "Page", "classvrv_1_1_page.html#aef17cc516b80dce4f3cc8c86a417e4b8", null ],
+    [ "~Page", "classvrv_1_1_page.html#a49c908159583beb6bc58706fc34f9bb6", null ],
+    [ "AddSystem", "classvrv_1_1_page.html#a0017b67ad07d943f20792b82c7ba35ec", null ],
+    [ "GetClassName", "classvrv_1_1_page.html#ae7e557914143ef53268757a6fcef21f9", null ],
+    [ "GetContentHeight", "classvrv_1_1_page.html#acb155b61c97a9872aff95e86fddca9a0", null ],
+    [ "GetContentWidth", "classvrv_1_1_page.html#a79e0a3969e35dd1cd462c0e19086b15f", null ],
+    [ "GetPageIdx", "classvrv_1_1_page.html#af483cff77663ec475795f0791e312953", null ],
+    [ "GetStaffPosOnPage", "classvrv_1_1_page.html#ae9f9287d86c4b13612129c4342015d9b", null ],
+    [ "GetSystemCount", "classvrv_1_1_page.html#abb75ac85141247794ff01f09b3f4f1d1", null ],
+    [ "Is", "classvrv_1_1_page.html#adba0be59a1fa9d7248901d00eda6b7ae", null ],
+    [ "JustifyHorizontally", "classvrv_1_1_page.html#a01e27bb8082d59453406dd7848a8d1b2", null ],
+    [ "JustifyVertically", "classvrv_1_1_page.html#a677cbec6a571326d624fe812a0c432fa", null ],
+    [ "LayOut", "classvrv_1_1_page.html#a29a3f02e9620a674f4f1f1ebdf818089", null ],
+    [ "LayOutHorizontally", "classvrv_1_1_page.html#a81afdc28b7093b3c034b30b9d2177d7a", null ],
+    [ "LayOutVertically", "classvrv_1_1_page.html#ab16b3f4c2bcc87738e77032c393d638d", null ],
+    [ "Reset", "classvrv_1_1_page.html#ac858909c078a4a4c7c3879aad83e45d7", null ],
+    [ "m_drawingScoreDef", "classvrv_1_1_page.html#a93ad65400a74b61fa5ab692018038361", null ],
+    [ "m_pageHeight", "classvrv_1_1_page.html#a6e2bf8197d1f54f8977efbc15ea5765c", null ],
+    [ "m_pageLeftMar", "classvrv_1_1_page.html#a74d2379cd116e92cd95e71c14e1f1205", null ],
+    [ "m_pageRightMar", "classvrv_1_1_page.html#a6bdcf44210efe9a10ea59effb1d5482a", null ],
+    [ "m_pageTopMar", "classvrv_1_1_page.html#a697f8633ba089e69ce34f7735a5efe7b", null ],
+    [ "m_pageWidth", "classvrv_1_1_page.html#a7915248836b2e53973c22840963fc8a9", null ],
+    [ "m_surface", "classvrv_1_1_page.html#a2f188b167ed93af6d53128faa4b3dc90", null ]
+];
