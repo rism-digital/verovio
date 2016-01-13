@@ -90,6 +90,8 @@ All member names must be in lower camelCase. Instance members must be prefixed w
         static std::string s_systemPath;
     };
     
+In the class declaration, the methods are declared first, and then the member variables. For both, the declaration order is ```public```, ```protected```, and ```private```.
+    
 ## Comments
 
 Comments for describing methods can be grouped using `///@{` and `///@}` delimiters together with the `@name` indication:
