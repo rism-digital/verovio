@@ -27,8 +27,7 @@ Style::Style()
     m_stemWidth = (unsigned short)(DEFAULT_STEM_WITDH * DEFINITON_FACTOR);
 
     /**
-     * Wolfgang legacy code used for initialiazing Doc::m_drawingBeamMin/MaxSlope
-     * and used in View::DrawBeamPostponed
+     * Used for initialiazing Doc::m_drawingBeamMin/MaxSlope and used in View::DrawBeamPostponed
      */
     m_beamMaxSlope = 10;
     m_beamMinSlope = 0;
