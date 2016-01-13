@@ -23,7 +23,7 @@ namespace vrv {
 // AnchoredText
 //----------------------------------------------------------------------------
 
-AnchoredText::AnchoredText() : FloatingElement("anchtext-"), TextDirInterface()
+AnchoredText::AnchoredText() : FloatingElement("anchtxt-"), TextDirInterface()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
 

@@ -43,7 +43,9 @@ public:
     virtual bool HasToBeAligned() { return true; };
 
 private:
+    //
 public:
+    //
 private:
 };
 

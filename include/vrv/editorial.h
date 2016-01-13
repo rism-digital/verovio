@@ -75,9 +75,14 @@ public:
      */
     virtual int CastOffSystems(ArrayPtrVoid *params);
 
-protected:
 private:
+    //
 public:
+    /**
+     * Holds the visibility (hidden or visible) for an editorial element.
+     * By defautl, all editorial elements are visible. However, in an <app>, only one <rdg> is visible at the time. When
+     * loading the file, the first <rdg> (or the <lem>) is made visible.
+     */
     VisibilityType m_visibility;
 
 private:

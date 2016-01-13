@@ -106,6 +106,7 @@ public:
     //----------//
 
 private:
+    //
 public:
     /** Page width (MEI scoredef@page.width). Saved if != -1 */
     int m_pageWidth;

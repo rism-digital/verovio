@@ -41,7 +41,9 @@ public:
     bool HasIdenticalPositionInterface(PositionInterface *otherPitchInterface);
 
 private:
+    //
 public:
+    //
 private:
 };
 

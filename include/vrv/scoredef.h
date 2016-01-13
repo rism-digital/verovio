@@ -73,7 +73,6 @@ public:
     MeterSig *GetMeterSigCopy();
     ///@}
 
-protected:
 private:
     /**
      * @name Methods for checking if clef info is available at the attribute level.
@@ -179,7 +178,9 @@ protected:
     virtual void FilterList(ListOfObjects *childList);
 
 private:
+    //
 public:
+    //
 private:
     /** Flags for indicating whether lables needs to be drawn or not */
     bool m_drawLabels;

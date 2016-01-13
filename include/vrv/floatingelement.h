@@ -55,7 +55,9 @@ public:
     ///@}
 
 private:
+    //
 public:
+    //
 private:
 };
 

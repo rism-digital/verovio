@@ -40,7 +40,9 @@ public:
     bool HasIdenticalPitchInterface(PitchInterface *otherPitchInterface);
 
 private:
+    //
 public:
+    //
 private:
 };
 

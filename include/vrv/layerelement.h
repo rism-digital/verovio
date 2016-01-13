@@ -131,6 +131,7 @@ public:
     virtual int TimeSpanningLayerElements(ArrayPtrVoid *params);
 
 private:
+    //
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;

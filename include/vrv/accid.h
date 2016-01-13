@@ -43,8 +43,8 @@ public:
      */
     virtual int PreparePointersByLayer(ArrayPtrVoid *params);
 
-protected:
 private:
+    //
 public:
     /**
      * Indicates if is cue size for accid object created for @accid.

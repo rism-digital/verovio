@@ -49,6 +49,7 @@ public:
     virtual bool HasToBeAligned() { return true; };
 
 private:
+    //
 public:
     /**
      * Static member for setting a value from a controller.

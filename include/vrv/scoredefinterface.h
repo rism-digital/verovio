@@ -44,9 +44,10 @@ public:
     virtual InterfaceId IsInterface() { return INTERFACE_SCOREDEF; };
     ///@}
 
-protected:
 private:
+    //
 public:
+    //
 private:
 };
 

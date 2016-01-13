@@ -35,9 +35,10 @@ public:
     virtual InterfaceId IsInterface() { return INTERFACE_TEXT_DIR; };
     ///@}
 
-protected:
 private:
+    //
 public:
+    //
 private:
 };
 

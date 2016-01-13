@@ -257,6 +257,7 @@ private:
     ///@}
 
 public:
+    //
 private:
     std::string m_filename;
     std::stringstream m_streamStringOutput;

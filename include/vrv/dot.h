@@ -50,8 +50,8 @@ public:
      */
     virtual int ResetDrawing(ArrayPtrVoid *params);
 
-protected:
 private:
+    //
 public:
     /**
      * A pointer to the note the point relates to.

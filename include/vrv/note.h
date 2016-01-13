@@ -139,6 +139,7 @@ public:
     virtual int ResetDrawing(ArrayPtrVoid *params);
 
 private:
+    //
 public:
     /** embellishment on this note **/
     unsigned int m_embellishment; // To be changed to Att

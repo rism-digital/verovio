@@ -77,9 +77,10 @@ public:
      */
     void AddTextElement(TextElement *element);
 
-protected:
 private:
+    //
 public:
+    //
 private:
 };
 

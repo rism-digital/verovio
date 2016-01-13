@@ -73,6 +73,7 @@ public:
     virtual int ResetDrawing(ArrayPtrVoid *params);
 
 private:
+    //
 public:
     /**
      * The verse number with multiple verses

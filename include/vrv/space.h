@@ -36,7 +36,9 @@ public:
     ///@}
 
 private:
+    //
 public:
+    //
 private:
 };
 

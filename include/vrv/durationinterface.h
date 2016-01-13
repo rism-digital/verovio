@@ -89,7 +89,9 @@ public:
     bool HasIdenticalDurationInterface(DurationInterface *otherDurationInterface);
 
 private:
+    //
 public:
+    //
 private:
 };
 

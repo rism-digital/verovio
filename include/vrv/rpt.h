@@ -162,6 +162,7 @@ public:
     virtual int PrepareRpt(ArrayPtrVoid *params);
 
 private:
+    //
 public:
     /** measure count */
     int m_drawingMeasureCount;

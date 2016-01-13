@@ -70,6 +70,7 @@ public:
     static int GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, int clefId);
 
 private:
+    //
 public:
     /**
      * Variables for storing cancellation introduced by the key sig.

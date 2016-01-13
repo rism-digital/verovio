@@ -60,7 +60,9 @@ public:
     void ResetDrawingList();
 
 private:
+    //
 public:
+    //
 private:
     /** The list of object for which drawing is postponed */
     ListOfObjects m_drawingList;

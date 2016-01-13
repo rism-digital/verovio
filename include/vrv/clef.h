@@ -54,7 +54,9 @@ public:
     int GetClefId();
 
 private:
+    //
 public:
+    //
 private:
 };
 
