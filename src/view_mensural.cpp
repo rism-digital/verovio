@@ -337,12 +337,15 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
-    // Mensural noteheads are quite a bit smaller than CMN noteheads; use _pseudoStaffSize_ to force this.
+    // Mensural noteheads are usually quite a bit smaller than CMN noteheads; use
+    //  _pseudoStaffSize_ to force this.
     int pseudoStaffSize = (int)(MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
     int xn, x1, x2, y1, y2, y3, y4;
     // int yy2, y5; // unused
     int verticalCenter, up, height;
-
+    bool mensural_black = (staff->m_drawingNotationType==NOTATIONTYPE_mensural_black);
+    bool fillNotehead = (mensural_black || note->GetColored()) &&
+                        !(mensural_black && note->GetColored());
     height = m_doc->GetDrawingBeamWidth(pseudoStaffSize, false) / 2;
     xn = element->GetDrawingX();
 
@@ -359,7 +362,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     y3 = (int)(y1 + m_doc->GetDrawingUnit(pseudoStaffSize) / 2); // partie d'encadrement qui depasse
     y4 = (int)(y2 - m_doc->GetDrawingUnit(pseudoStaffSize) / 2);
 
-    if (note->GetColored() != BOOLEAN_true) {
+    if (!fillNotehead) {
         //	double base des carrees
         DrawObliquePolygon(dc, x1, y1, x2, y1, -height);
         DrawObliquePolygon(dc, x1, y2, x2, y2, height);
