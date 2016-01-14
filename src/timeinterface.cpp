@@ -20,74 +20,6 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// TimeSpanningInterface
-//----------------------------------------------------------------------------
-
-TimeSpanningInterface::TimeSpanningInterface()
-    : Interface(), AttStaffident(), AttStartendid(), AttStartid(), AttTimestampMusical(), AttTimestamp2Musical()
-{
-    RegisterInterfaceAttClass(ATT_STAFFIDENT);
-    RegisterInterfaceAttClass(ATT_STARTENDID);
-    RegisterInterfaceAttClass(ATT_STARTID);
-    RegisterInterfaceAttClass(ATT_TIMESTAMPMUSICAL);
-    RegisterInterfaceAttClass(ATT_TIMESTAMP2MUSICAL);
-
-    Reset();
-}
-
-TimeSpanningInterface::~TimeSpanningInterface()
-{
-}
-
-void TimeSpanningInterface::Reset()
-{
-    ResetStaffident();
-    ResetStartendid();
-    ResetStartid();
-    ResetTimestampMusical();
-    ResetTimestamp2Musical();
-
-    m_start = NULL;
-    m_end = NULL;
-    m_startUuid = "";
-    m_endUuid = "";
-}
-
-void TimeSpanningInterface::SetStart(LayerElement *start)
-{
-    assert(!m_start);
-    m_start = start;
-}
-
-void TimeSpanningInterface::SetEnd(LayerElement *end)
-{
-    assert(!m_end);
-    m_end = end;
-}
-
-void TimeSpanningInterface::SetUuidStr()
-{
-    if (this->HasStartid()) {
-        m_startUuid = vrv::ExtractUuidFragment(this->GetStartid());
-    }
-    if (this->HasEndid()) {
-        m_endUuid = vrv::ExtractUuidFragment(this->GetEndid());
-    }
-}
-
-bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
-{
-    // LogDebug("%s - %s - %s", element->GetUuid().c_str(), m_startUuid.c_str(), m_endUuid.c_str());
-    if (!m_start && (element->GetUuid() == m_startUuid)) {
-        this->SetStart(element);
-    }
-    else if (!m_end && (element->GetUuid() == m_endUuid)) {
-        this->SetEnd(element);
-    }
-    return (m_start && m_end);
-}
-
-//----------------------------------------------------------------------------
 // TimePointInterface
 //----------------------------------------------------------------------------
 
@@ -114,25 +46,90 @@ void TimePointInterface::Reset()
     m_startUuid = "";
 }
 
-bool TimePointInterface::SetStart(LayerElement *start)
+void TimePointInterface::SetStart(LayerElement *start)
 {
-    if (!m_start && (start->GetUuid() == m_startUuid)) {
-        assert(!m_start);
-        m_start = start;
-    }
-    return (m_start);
+    assert(!m_start);
+    m_start = start;
 }
 
 void TimePointInterface::SetUuidStr()
 {
     if (this->HasStartid()) {
-        m_startUuid = vrv::ExtractUuidFragment(this->GetStartid());
+        m_startUuid = this->ExtractUuidFragment(this->GetStartid());
     }
+}
+
+std::string TimePointInterface::ExtractUuidFragment(std::string refUuid)
+{
+    size_t pos = refUuid.find_last_of("#");
+    if ((pos != std::string::npos) && (pos < refUuid.length() - 1)) {
+        refUuid = refUuid.substr(pos + 1);
+    }
+    return refUuid;
+}
+
+//----------------------------------------------------------------------------
+// TimeSpanningInterface
+//----------------------------------------------------------------------------
+
+TimeSpanningInterface::TimeSpanningInterface() : TimePointInterface(), AttStartendid(), AttTimestamp2Musical()
+{
+    RegisterInterfaceAttClass(ATT_STARTENDID);
+    RegisterInterfaceAttClass(ATT_TIMESTAMP2MUSICAL);
+
+    Reset();
+}
+
+TimeSpanningInterface::~TimeSpanningInterface()
+{
+}
+
+void TimeSpanningInterface::Reset()
+{
+    TimePointInterface::Reset();
+    ResetStartendid();
+    ResetTimestamp2Musical();
+
+    m_end = NULL;
+    m_endUuid = "";
+}
+
+void TimeSpanningInterface::SetEnd(LayerElement *end)
+{
+    assert(!m_end);
+    m_end = end;
+}
+
+void TimeSpanningInterface::SetUuidStr()
+{
+    TimePointInterface::SetUuidStr();
+    if (this->HasEndid()) {
+        m_endUuid = this->ExtractUuidFragment(this->GetEndid());
+    }
+}
+
+bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
+{
+    // LogDebug("%s - %s - %s", element->GetUuid().c_str(), m_startUuid.c_str(), m_endUuid.c_str() );
+    if (!m_start && (element->GetUuid() == m_startUuid)) {
+        this->SetStart(element);
+    }
+    else if (!m_end && (element->GetUuid() == m_endUuid)) {
+        this->SetEnd(element);
+    }
+    return (m_start && m_end);
 }
 
 //----------------------------------------------------------------------------
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
+
+int TimePointInterface::InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object)
+{
+    m_start = NULL;
+    m_startUuid = "";
+    return FUNCTOR_CONTINUE;
+}
 
 int TimeSpanningInterface::InterfacePrepareTimeSpanning(ArrayPtrVoid *params, DocObject *object)
 {
@@ -167,18 +164,10 @@ int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *p
 
 int TimeSpanningInterface::InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object)
 {
-    m_start = NULL;
     m_end = NULL;
-    m_startUuid = "";
     m_endUuid = "";
-    return FUNCTOR_CONTINUE;
-}
-
-int TimePointInterface::InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object)
-{
-    m_start = NULL;
-    m_startUuid = "";
-    return FUNCTOR_CONTINUE;
+    // Special case where we have interface inheritance
+    return TimePointInterface::InterfaceResetDrawing(params, object);
 }
 
 } // namespace vrv

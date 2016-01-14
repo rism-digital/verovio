@@ -919,10 +919,8 @@ void MeiOutput::WriteTimeSpanningInterface(pugi::xml_node element, TimeSpanningI
 {
     assert(interface);
 
-    interface->WriteStaffident(element);
+    WriteTimePointInterface(element, interface);
     interface->WriteStartendid(element);
-    interface->WriteStartid(element);
-    interface->WriteTimestampMusical(element);
     interface->WriteTimestamp2Musical(element);
 }
 
@@ -2295,10 +2293,8 @@ bool MeiInput::ReadTimePointInterface(pugi::xml_node element, TimePointInterface
 
 bool MeiInput::ReadTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface)
 {
-    interface->ReadStaffident(element);
+    ReadTimePointInterface(element, interface);
     interface->ReadStartendid(element);
-    interface->ReadStartid(element);
-    interface->ReadTimestampMusical(element);
     interface->ReadTimestamp2Musical(element);
     return true;
 }
