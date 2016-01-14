@@ -106,6 +106,8 @@ $(document).ready(function(){initNavTree('classvrv_1_1_time_point_interface.html
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classvrv_1_1_time_point_interface-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">vrv::TimePointInterface Class Reference</div>  </div>
@@ -122,8 +124,12 @@ Inheritance diagram for vrv::TimePointInterface:</div>
  <div class="center">
   <img src="classvrv_1_1_time_point_interface.png" usemap="#vrv::TimePointInterface_map" alt=""/>
   <map id="vrv::TimePointInterface_map" name="vrv::TimePointInterface_map">
-<area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="0,0,141,24"/>
-<area href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. " alt="vrv::Tempo" shape="rect" coords="226,112,367,136"/>
+<area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="0,0,166,24"/>
+<area href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. " alt="vrv::Tempo" shape="rect" coords="176,112,342,136"/>
+<area href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. " alt="vrv::TimeSpanningInterface" shape="rect" coords="352,112,518,136"/>
+<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="176,168,342,192"/>
+<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="352,168,518,192"/>
+<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="528,168,694,192"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -156,9 +162,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Reset</b> ()<
 <tr><td colspan="2"><div class="groupHeader">Set and get the first LayerElement</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>The setter asserts that no <a class="el" href="classvrv_1_1_layer_element.html" title="This class is a base class for the Layer (<layer>) content. ">LayerElement</a> was previously set. </p>
 </div></td></tr>
-<tr class="memitem:a5f5cd397914696bc72ad21d07b759851"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f5cd397914696bc72ad21d07b759851"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>SetStart</b> (<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *start)</td></tr>
-<tr class="separator:a5f5cd397914696bc72ad21d07b759851"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a657ad24cb9280451b4a5f2b914be0644"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a657ad24cb9280451b4a5f2b914be0644"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetStart</b> (<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *start)</td></tr>
+<tr class="separator:a657ad24cb9280451b4a5f2b914be0644"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3cd14634c9ef2903e83a560ba52788a9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3cd14634c9ef2903e83a560ba52788a9"></a>
 <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetStart</b> ()</td></tr>
 <tr class="separator:a3cd14634c9ef2903e83a560ba52788a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -177,6 +183,22 @@ std::vector&lt; AttClassId &gt; *&#160;</td><td class="memItemRight" valign="bot
 <tr class="memitem:a1fbabd3b506190dc2f1b4584a49a85ea inherit pub_methods_classvrv_1_1_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1fbabd3b506190dc2f1b4584a49a85ea"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()</td></tr>
 <tr class="separator:a1fbabd3b506190dc2f1b4584a49a85ea inherit pub_methods_classvrv_1_1_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a84852fde24469edca530034c261ef1fa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a84852fde24469edca530034c261ef1fa"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#a84852fde24469edca530034c261ef1fa">ExtractUuidFragment</a> (std::string refUuid)</td></tr>
+<tr class="memdesc:a84852fde24469edca530034c261ef1fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract the uuid from a string. <br /></td></tr>
+<tr class="separator:a84852fde24469edca530034c261ef1fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a0acc50cd71a220b0142a0ec22377c88a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0acc50cd71a220b0142a0ec22377c88a"></a>
+<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_start</b></td></tr>
+<tr class="separator:a0acc50cd71a220b0142a0ec22377c88a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47eee38f4a8b1420cf041e74b171d7a9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a47eee38f4a8b1420cf041e74b171d7a9"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b></td></tr>
+<tr class="separator:a47eee38f4a8b1420cf041e74b171d7a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class is an interface for elements having a single time point, such as tempo, reh, etc. </p>
@@ -217,6 +239,8 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 <p>We have functor in the interface for avoiding code duplication in each implementation class. </p>
 <p>Since we are in an interface, we need to pass the <a class="el" href="classvrv_1_1_doc_object.html" title="This class represents a basic object in the layout domain. ">DocObject</a> (implementation) to the functor method. These not called by the Process/Call loop but by the implementaion classes explicitely. See <a class="el" href="classvrv_1_1_floating_element.html#a94f0edd34ef5d1da2213f9045705a298" title="See Object::FillStaffCurrentTimeSpanning. ">FloatingElement::FillStaffCurrentTimeSpanning</a> for an example. See <a class="el" href="classvrv_1_1_object.html#a9598e16dc9e257a164e15592587379af" title="Reset the drawing values before calling PrepareDrawing after changes. ">Object::ResetDrawing</a> </p>
 
+<p>Reimplemented in <a class="el" href="classvrv_1_1_time_spanning_interface.html#ae23a2db40a4a670a99eee82b76985869">vrv::TimeSpanningInterface</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a37f500cfc23ea2606a9dd7bfd64f202a"></a>
@@ -245,6 +269,8 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 
 <p>Reimplemented from <a class="el" href="classvrv_1_1_interface.html#a5a6818097ffc4a990e6e6e004cf1aaa3">vrv::Interface</a>.</p>
 
+<p>Reimplemented in <a class="el" href="classvrv_1_1_time_spanning_interface.html#a7e1fb3e22189d76e195c11e88301f2de">vrv::TimeSpanningInterface</a>.</p>
+
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
@@ -256,7 +282,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_time_point_interface.html">TimePointInterface</a></li>
-    <li class="footer">Generated on Wed Jan 13 2016 14:55:28 by
+    <li class="footer">Generated on Thu Jan 14 2016 16:03:51 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

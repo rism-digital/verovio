@@ -128,7 +128,6 @@ Inheritance diagram for vrv::Interface:</div>
 <area href="classvrv_1_1_score_def_interface.html" title="This class is an interface for elements implementing score attributes, such as <scoreDef>, or <staffDef> It is not an abstract class but should not be instanciate directly. " alt="vrv::ScoreDefInterface" shape="rect" coords="880,56,1046,80"/>
 <area href="classvrv_1_1_text_dir_interface.html" title="This class is an interface for elements implementing a text directive, such as <dir>, <tempo>, or <dynam> It is not an abstract class but should not be instanciate directly. " alt="vrv::TextDirInterface" shape="rect" coords="1056,56,1222,80"/>
 <area href="classvrv_1_1_time_point_interface.html" title="This class is an interface for elements having a single time point, such as tempo, reh, etc. " alt="vrv::TimePointInterface" shape="rect" coords="1408,56,1574,80"/>
-<area href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. " alt="vrv::TimeSpanningInterface" shape="rect" coords="1584,56,1750,80"/>
 <area href="classvrv_1_1_chord.html" title="This class represents a collection of notes in the same layer with the same onset time..." alt="vrv::Chord" shape="rect" coords="176,112,342,136"/>
 <area href="classvrv_1_1_note.html" alt="vrv::Note" shape="rect" coords="176,168,342,192"/>
 <area href="classvrv_1_1_rest.html" title="This class models the MEI <rest> element. " alt="vrv::Rest" shape="rect" coords="176,224,342,248"/>
@@ -141,10 +140,8 @@ Inheritance diagram for vrv::Interface:</div>
 <area href="classvrv_1_1_score_def_element.html" title="This class is a base class for MEI scoreDef or staffDef elements. " alt="vrv::ScoreDefElement" shape="rect" coords="880,112,1046,136"/>
 <area href="classvrv_1_1_anchored_text.html" title="This class is an interface for <anchoredText> elements at the measure level. " alt="vrv::AnchoredText" shape="rect" coords="1232,112,1398,136"/>
 <area href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. " alt="vrv::Tempo" shape="rect" coords="1232,168,1398,192"/>
-<area href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. " alt="vrv::Tempo" shape="rect" coords="1408,112,1574,136"/>
-<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="1760,112,1926,136"/>
-<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="1760,168,1926,192"/>
-<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="1760,224,1926,248"/>
+<area href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. " alt="vrv::Tempo" shape="rect" coords="1584,112,1750,136"/>
+<area href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. " alt="vrv::TimeSpanningInterface" shape="rect" coords="1584,168,1750,192"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -199,7 +196,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 <p>Virtual method returning the InterfaceId of the interface. </p>
 <p>Needs to be overwritten in child classes. </p>
 
-<p>Reimplemented in <a class="el" href="classvrv_1_1_time_point_interface.html#a37f500cfc23ea2606a9dd7bfd64f202a">vrv::TimePointInterface</a>, <a class="el" href="classvrv_1_1_duration_interface.html#a3c58d1f63c78fb509576ecefce5ea5ab">vrv::DurationInterface</a>, <a class="el" href="classvrv_1_1_score_def_interface.html#a8508fdc45f34b3126fa1afa7fcadf35a">vrv::ScoreDefInterface</a>, <a class="el" href="classvrv_1_1_time_spanning_interface.html#a7e1fb3e22189d76e195c11e88301f2de">vrv::TimeSpanningInterface</a>, <a class="el" href="classvrv_1_1_text_dir_interface.html#a02ed2e54e7752890c28f7b58fc74baad">vrv::TextDirInterface</a>, <a class="el" href="classvrv_1_1_position_interface.html#ae5d7e19319bcf359fc2119512e720004">vrv::PositionInterface</a>, and <a class="el" href="classvrv_1_1_pitch_interface.html#a41ec055c958eb670dda01b89974e3232">vrv::PitchInterface</a>.</p>
+<p>Reimplemented in <a class="el" href="classvrv_1_1_time_spanning_interface.html#a7e1fb3e22189d76e195c11e88301f2de">vrv::TimeSpanningInterface</a>, <a class="el" href="classvrv_1_1_duration_interface.html#a3c58d1f63c78fb509576ecefce5ea5ab">vrv::DurationInterface</a>, <a class="el" href="classvrv_1_1_score_def_interface.html#a8508fdc45f34b3126fa1afa7fcadf35a">vrv::ScoreDefInterface</a>, <a class="el" href="classvrv_1_1_time_point_interface.html#a37f500cfc23ea2606a9dd7bfd64f202a">vrv::TimePointInterface</a>, <a class="el" href="classvrv_1_1_text_dir_interface.html#a02ed2e54e7752890c28f7b58fc74baad">vrv::TextDirInterface</a>, <a class="el" href="classvrv_1_1_position_interface.html#ae5d7e19319bcf359fc2119512e720004">vrv::PositionInterface</a>, and <a class="el" href="classvrv_1_1_pitch_interface.html#a41ec055c958eb670dda01b89974e3232">vrv::PitchInterface</a>.</p>
 
 </div>
 </div>
@@ -212,7 +209,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_interface.html">Interface</a></li>
-    <li class="footer">Generated on Wed Jan 13 2016 14:55:27 by
+    <li class="footer">Generated on Thu Jan 14 2016 16:03:49 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

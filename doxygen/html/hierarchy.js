@@ -219,12 +219,12 @@ var hierarchy =
     [ "AttStaffident", null, [
       [ "vrv::DurationInterface", "classvrv_1_1_duration_interface.html", null ],
       [ "vrv::TimePointInterface", "classvrv_1_1_time_point_interface.html", [
-        [ "vrv::Tempo", "classvrv_1_1_tempo.html", null ]
-      ] ],
-      [ "vrv::TimeSpanningInterface", "classvrv_1_1_time_spanning_interface.html", [
-        [ "vrv::Slur", "classvrv_1_1_slur.html", null ],
-        [ "vrv::Syl", "classvrv_1_1_syl.html", null ],
-        [ "vrv::Tie", "classvrv_1_1_tie.html", null ]
+        [ "vrv::Tempo", "classvrv_1_1_tempo.html", null ],
+        [ "vrv::TimeSpanningInterface", "classvrv_1_1_time_spanning_interface.html", [
+          [ "vrv::Slur", "classvrv_1_1_slur.html", null ],
+          [ "vrv::Syl", "classvrv_1_1_syl.html", null ],
+          [ "vrv::Tie", "classvrv_1_1_tie.html", null ]
+        ] ]
       ] ]
     ] ],
     [ "AttStafflocPitched", null, [
@@ -239,8 +239,7 @@ var hierarchy =
       [ "vrv::TimeSpanningInterface", "classvrv_1_1_time_spanning_interface.html", null ]
     ] ],
     [ "AttStartid", null, [
-      [ "vrv::TimePointInterface", "classvrv_1_1_time_point_interface.html", null ],
-      [ "vrv::TimeSpanningInterface", "classvrv_1_1_time_spanning_interface.html", null ]
+      [ "vrv::TimePointInterface", "classvrv_1_1_time_point_interface.html", null ]
     ] ],
     [ "AttStems", null, [
       [ "vrv::Chord", "classvrv_1_1_chord.html", null ],
@@ -261,8 +260,7 @@ var hierarchy =
       [ "vrv::TimeSpanningInterface", "classvrv_1_1_time_spanning_interface.html", null ]
     ] ],
     [ "AttTimestampMusical", null, [
-      [ "vrv::TimePointInterface", "classvrv_1_1_time_point_interface.html", null ],
-      [ "vrv::TimeSpanningInterface", "classvrv_1_1_time_spanning_interface.html", null ]
+      [ "vrv::TimePointInterface", "classvrv_1_1_time_point_interface.html", null ]
     ] ],
     [ "AttTupletVis", null, [
       [ "vrv::Tuplet", "classvrv_1_1_tuplet.html", null ]
@@ -298,8 +296,7 @@ var hierarchy =
       [ "vrv::PositionInterface", "classvrv_1_1_position_interface.html", null ],
       [ "vrv::ScoreDefInterface", "classvrv_1_1_score_def_interface.html", null ],
       [ "vrv::TextDirInterface", "classvrv_1_1_text_dir_interface.html", null ],
-      [ "vrv::TimePointInterface", "classvrv_1_1_time_point_interface.html", null ],
-      [ "vrv::TimeSpanningInterface", "classvrv_1_1_time_spanning_interface.html", null ]
+      [ "vrv::TimePointInterface", "classvrv_1_1_time_point_interface.html", null ]
     ] ],
     [ "vrv::IntTree", "structvrv_1_1_int_tree.html", null ],
     [ "vrv::Object", "classvrv_1_1_object.html", [

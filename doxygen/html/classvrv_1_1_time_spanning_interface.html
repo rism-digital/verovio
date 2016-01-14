@@ -122,10 +122,11 @@ Inheritance diagram for vrv::TimeSpanningInterface:</div>
  <div class="center">
   <img src="classvrv_1_1_time_spanning_interface.png" usemap="#vrv::TimeSpanningInterface_map" alt=""/>
   <map id="vrv::TimeSpanningInterface_map" name="vrv::TimeSpanningInterface_map">
+<area href="classvrv_1_1_time_point_interface.html" title="This class is an interface for elements having a single time point, such as tempo, reh, etc. " alt="vrv::TimePointInterface" shape="rect" coords="264,56,430,80"/>
 <area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="0,0,166,24"/>
-<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="264,112,430,136"/>
-<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="440,112,606,136"/>
-<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="616,112,782,136"/>
+<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="264,168,430,192"/>
+<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="440,168,606,192"/>
+<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="616,168,782,192"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -169,18 +170,31 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Reset</b> ()<
 <tr><td colspan="2"><div class="groupHeader">Set and get the first and second LayerElement</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>The setter asserts that no <a class="el" href="classvrv_1_1_layer_element.html" title="This class is a base class for the Layer (<layer>) content. ">LayerElement</a> was previously set. </p>
 </div></td></tr>
-<tr class="memitem:a6d968bcb8f8c0755183db2b693a312de"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6d968bcb8f8c0755183db2b693a312de"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetStart</b> (<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *start)</td></tr>
-<tr class="separator:a6d968bcb8f8c0755183db2b693a312de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c3289cd6592a1ea9280b21e41382576"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2c3289cd6592a1ea9280b21e41382576"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetEnd</b> (<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *end)</td></tr>
 <tr class="separator:a2c3289cd6592a1ea9280b21e41382576"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae2d2fdb13e02a5b0d23383a7c9681405"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae2d2fdb13e02a5b0d23383a7c9681405"></a>
-<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetStart</b> ()</td></tr>
-<tr class="separator:ae2d2fdb13e02a5b0d23383a7c9681405"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae3bf35a85b17a514c8559bf5e8385fc2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae3bf35a85b17a514c8559bf5e8385fc2"></a>
 <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetEnd</b> ()</td></tr>
 <tr class="separator:ae3bf35a85b17a514c8559bf5e8385fc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_methods_classvrv_1_1_time_point_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrv_1_1_time_point_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrv_1_1_time_point_interface.html">vrv::TimePointInterface</a></td></tr>
+<tr class="memitem:a645c1d24917af2fe9687bd41589a53b8 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a645c1d24917af2fe9687bd41589a53b8"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>HasStart</b> ()</td></tr>
+<tr class="separator:a645c1d24917af2fe9687bd41589a53b8 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf47474d192a6a9c14732c4055605a6d inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf47474d192a6a9c14732c4055605a6d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetUuidStr</b> ()</td></tr>
+<tr class="separator:acf47474d192a6a9c14732c4055605a6d inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a470841fa6a90f560e791882bd0d7ff3d inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a470841fa6a90f560e791882bd0d7ff3d"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>TimePointInterface</b> ()</td></tr>
+<tr class="separator:a470841fa6a90f560e791882bd0d7ff3d inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af09ee1866e7e88461f21fae70f267862 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af09ee1866e7e88461f21fae70f267862"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~TimePointInterface</b> ()</td></tr>
+<tr class="separator:af09ee1866e7e88461f21fae70f267862 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a657ad24cb9280451b4a5f2b914be0644 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a657ad24cb9280451b4a5f2b914be0644"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetStart</b> (<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *start)</td></tr>
+<tr class="separator:a657ad24cb9280451b4a5f2b914be0644 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3cd14634c9ef2903e83a560ba52788a9 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3cd14634c9ef2903e83a560ba52788a9"></a>
+<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetStart</b> ()</td></tr>
+<tr class="separator:a3cd14634c9ef2903e83a560ba52788a9 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrv_1_1_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrv_1_1_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrv_1_1_interface.html">vrv::Interface</a></td></tr>
 <tr class="memitem:a57c9a4f18b81a07ef0d14dc040f84257 inherit pub_methods_classvrv_1_1_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a57c9a4f18b81a07ef0d14dc040f84257"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_interface.html#a57c9a4f18b81a07ef0d14dc040f84257">RegisterInterfaceAttClass</a> (AttClassId attClassId)</td></tr>
@@ -196,6 +210,21 @@ std::vector&lt; AttClassId &gt; *&#160;</td><td class="memItemRight" valign="bot
 <tr class="memitem:a1fbabd3b506190dc2f1b4584a49a85ea inherit pub_methods_classvrv_1_1_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1fbabd3b506190dc2f1b4584a49a85ea"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()</td></tr>
 <tr class="separator:a1fbabd3b506190dc2f1b4584a49a85ea inherit pub_methods_classvrv_1_1_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_methods_classvrv_1_1_time_point_interface"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classvrv_1_1_time_point_interface')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classvrv_1_1_time_point_interface.html">vrv::TimePointInterface</a></td></tr>
+<tr class="memitem:a84852fde24469edca530034c261ef1fa inherit pro_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a84852fde24469edca530034c261ef1fa"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#a84852fde24469edca530034c261ef1fa">ExtractUuidFragment</a> (std::string refUuid)</td></tr>
+<tr class="memdesc:a84852fde24469edca530034c261ef1fa inherit pro_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract the uuid from a string. <br /></td></tr>
+<tr class="separator:a84852fde24469edca530034c261ef1fa inherit pro_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classvrv_1_1_time_point_interface"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classvrv_1_1_time_point_interface')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classvrv_1_1_time_point_interface.html">vrv::TimePointInterface</a></td></tr>
+<tr class="memitem:a0acc50cd71a220b0142a0ec22377c88a inherit pro_attribs_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0acc50cd71a220b0142a0ec22377c88a"></a>
+<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_start</b></td></tr>
+<tr class="separator:a0acc50cd71a220b0142a0ec22377c88a inherit pro_attribs_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47eee38f4a8b1420cf041e74b171d7a9 inherit pro_attribs_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a47eee38f4a8b1420cf041e74b171d7a9"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b></td></tr>
+<tr class="separator:a47eee38f4a8b1420cf041e74b171d7a9 inherit pro_attribs_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class is an interface for spanning elements, such as slur, hairpin, etc. </p>
@@ -262,7 +291,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 <p>Virtual method returning the InterfaceId of the interface. </p>
 <p>Needs to be overwritten in child classes. </p>
 
-<p>Reimplemented from <a class="el" href="classvrv_1_1_interface.html#a5a6818097ffc4a990e6e6e004cf1aaa3">vrv::Interface</a>.</p>
+<p>Reimplemented from <a class="el" href="classvrv_1_1_time_point_interface.html#a37f500cfc23ea2606a9dd7bfd64f202a">vrv::TimePointInterface</a>.</p>
 
 </div>
 </div>
@@ -275,7 +304,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_time_spanning_interface.html">TimeSpanningInterface</a></li>
-    <li class="footer">Generated on Wed Jan 13 2016 14:55:28 by
+    <li class="footer">Generated on Thu Jan 14 2016 16:03:51 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>
