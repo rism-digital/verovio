@@ -128,7 +128,7 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
         + m_doc->GetRightMargin(CLEF);
     if (numAlteration > 0) {
         width += m_doc->GetLeftMargin(KEYSIG)
-            + m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_STYLE_KEYSIG_STEP
+            + m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_KEYSIG_STEP
             + m_doc->GetRightMargin(KEYSIG);
     }
 

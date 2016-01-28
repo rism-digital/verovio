@@ -464,7 +464,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
         int dist = abs(p2->x - p1->x);
         height
             = std::max(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITON_FACTOR,
-                dist / TEMP_STYLE_SLUR_HEIGHT_FACTOR);
+                dist / TEMP_SLUR_HEIGHT_FACTOR);
         height = std::min(
             m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITON_FACTOR, height);
     }
@@ -557,21 +557,21 @@ float View::GetAdjustedSlurAngle(Point *p1, Point *p2, bool up)
     float slurAngle = atan2(p2->y - p1->y, p2->x - p1->x);
 
     // the slope of the slur is high and needs to be corrected
-    if (fabs(slurAngle) > TEMP_STYLE_SLUR_MAX_SLOPE) {
-        int side = (p2->x - p1->x) * sin(TEMP_STYLE_SLUR_MAX_SLOPE) / sin(M_PI / 2 - TEMP_STYLE_SLUR_MAX_SLOPE);
+    if (fabs(slurAngle) > TEMP_SLUR_MAX_SLOPE) {
+        int side = (p2->x - p1->x) * sin(TEMP_SLUR_MAX_SLOPE) / sin(M_PI / 2 - TEMP_SLUR_MAX_SLOPE);
         if (p2->y > p1->y) {
             if (up)
                 p1->y = p2->y - side;
             else
                 p2->y = p1->y + side;
-            slurAngle = TEMP_STYLE_SLUR_MAX_SLOPE;
+            slurAngle = TEMP_SLUR_MAX_SLOPE;
         }
         else {
             if (up)
                 p2->y = p1->y - side;
             else
                 p1->y = p2->y + side;
-            slurAngle = -TEMP_STYLE_SLUR_MAX_SLOPE;
+            slurAngle = -TEMP_SLUR_MAX_SLOPE;
         }
     }
 
@@ -581,7 +581,7 @@ float View::GetAdjustedSlurAngle(Point *p1, Point *p2, bool up)
 void View::GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up, int height, int staffSize)
 {
     // Set the x position of the control points
-    int cPos = std::min((p2->x - p1->x) / TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR, m_doc->GetDrawingStaffSize(staffSize));
+    int cPos = std::min((p2->x - p1->x) / TEMP_SLUR_CONTROL_POINT_FACTOR, m_doc->GetDrawingStaffSize(staffSize));
     c1->x = p1->x + cPos;
     c2->x = p2->x - cPos;
 
@@ -640,7 +640,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 
     // 0.2 for avoiding / by 0 (below)
     float maxHeightFactor = std::max(0.2, fabs(angle));
-    maxHeight = dist / (maxHeightFactor * (TEMP_STYLE_SLUR_CURVE_FACTOR
+    maxHeight = dist / (maxHeightFactor * (TEMP_SLUR_CURVE_FACTOR
                                               + 5)); // 5 is the minimum - can be increased for limiting curvature
     if (posRatio) {
         // Do we want to set a max height?

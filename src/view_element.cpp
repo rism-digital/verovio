@@ -170,7 +170,7 @@ void View::DrawAccid(
 
     // Mensural accidentals may be quite a bit smaller than CMN accidentals; use _pseudoStaffSize_ to force this.
     int pseudoStaffSize;
-    if (isMensural) pseudoStaffSize = (int)(MACCID_SIZE_FACTOR * staff->m_drawingStaffSize);
+    if (isMensural) pseudoStaffSize = (int)(TEMP_MACCID_SIZE_FACTOR * staff->m_drawingStaffSize);
     else pseudoStaffSize = staff->m_drawingStaffSize;
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
@@ -202,7 +202,7 @@ void View::DrawAccid(
             accid->SetDrawingX(accid->GetDrawingX() + radius / 2);
         }
         accid->SetDrawingY(
-            y + TEMP_STYLE_ACCID_EDIT_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR);
+            y + TEMP_ACCID_EDIT_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR);
     }
 
     int x = accid->GetDrawingX();
@@ -798,7 +798,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     x = element->GetDrawingX();
     // HARDCODED
     int step
-        = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_STYLE_KEYSIG_STEP;
+        = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_KEYSIG_STEP;
 
     // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by
     // default)
@@ -1446,16 +1446,29 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     dc->ResetPen();
     dc->ResetBrush();
 }
-
+    
+bool IsMensuralStaff(Staff *staff);
+bool IsMensuralStaff(Staff *staff)
+{
+    bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
+                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
+                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    return isMensural;
+}
+    
 void View::DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
 {
     int i;
+    int useStaffSize = staff->m_drawingStaffSize;
+    if (IsMensuralStaff(staff))
+        useStaffSize *= TEMP_MAUGDOT_SIZE_FACTOR;
+    
     if (IsOnStaffLine(y, staff)) {
-        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y += m_doc->GetDrawingUnit(useStaffSize);
     }
     for (i = 0; i < dots; i++) {
-        DrawDot(dc, x, y, staff->m_drawingStaffSize);
-        x += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        DrawDot(dc, x, y, useStaffSize);
+        x += m_doc->GetDrawingDoubleUnit(useStaffSize);
     }
 }
 
@@ -2113,7 +2126,7 @@ int View::GetSylY(Syl *syl, Staff *staff)
     int y = syl->GetStart()->GetDrawingY();
     if (staff->GetAlignment()) {
         y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight()
-            - syl->m_drawingVerse * TEMP_STYLE_LYIRC_LINE_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+            - syl->m_drawingVerse * TEMP_LYIRC_LINE_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
                 / PARAM_DENOMINATOR;
     }
     return y;

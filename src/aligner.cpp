@@ -304,7 +304,7 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     if (this->GetVerseCount() > 0) {
         // We need + 1 lyric line space
         m_yShift
-            -= (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (*interlineSize / 2) / PARAM_DENOMINATOR;
+            -= (this->GetVerseCount() + 1) * TEMP_LYIRC_LINE_SPACE * (*interlineSize / 2) / PARAM_DENOMINATOR;
     }
 
     int min_shift = (*staffMargin) + (*previousStaffHeight);

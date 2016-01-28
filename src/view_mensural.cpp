@@ -45,7 +45,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     int staffSize = staff->m_drawingStaffSize;
     // Mensural noteheads are quite a bit smaller than CMN noteheads; use _pseudoStaffSize_ to force this.
-    int pseudoStaffSize = (int)(MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
+    int pseudoStaffSize = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
     int noteY = element->GetDrawingY();
     int xLedger, xNote, xStem;
     int drawingDur;
@@ -143,7 +143,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     /************** dots **************/
 
     if (note->GetDots()) {
-        int mensDrawingUnit = (int)(MNOTEHEAD_SIZE_FACTOR * m_doc->GetDrawingUnit(staffSize));
+        int mensDrawingUnit = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * m_doc->GetDrawingUnit(staffSize));
         int xDot;
         if (note->GetDur() < DUR_2 || (note->GetDur() > DUR_8 && (note->GetDrawingStemDir() == STEMDIRECTION_up)))
             xDot = xStem + mensDrawingUnit * 7 / 2;
@@ -339,7 +339,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
 
     // Mensural noteheads are usually quite a bit smaller than CMN noteheads; use
     //  _pseudoStaffSize_ to force this.
-    int pseudoStaffSize = (int)(MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
+    int pseudoStaffSize = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
     int xn, x1, x2, y1, y2, y3, y4;
     // int yy2, y5; // unused
     int verticalCenter, up, height;
