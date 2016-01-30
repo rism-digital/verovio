@@ -206,12 +206,29 @@ data_KEYSIGNATURE Att::StrToKeysignature(std::string value)
 
 std::string Att::MeasurebeatToStr(data_MEASUREBEAT data)
 {
-    return "0m0.0";
+    return StringFormat("%dm+%.1f", data.first, data.second);
 }
 
 data_MEASUREBEAT Att::StrToMeasurebeat(std::string value)
 {
-    return std::make_pair(0, 1.0);
+    for (size_t i = 0; i < value.length(); i++) {
+        if (iswspace(value[i])) {
+            value.erase(i, 1);
+            i--;
+        }
+    }
+    int measure = 0;
+    double timePoint = 0.0;
+    size_t m = value.find_first_of('m');
+    size_t plus = value.find_last_of('+');
+    if (m != -1) measure = atoi(value.substr(0, m).c_str());
+    if (plus != -1) {
+        timePoint = atof(value.substr(plus).c_str());
+    }
+    else {
+        timePoint = atof(value.c_str());
+    }
+    return std::make_pair(measure, timePoint);
 }
 
 std::string Att::ModusmaiorToStr(data_MODUSMAIOR data)
