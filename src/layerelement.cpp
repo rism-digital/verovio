@@ -214,7 +214,7 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         assert(beatRpt);
         int meterUnit = 4;
         if (meterSig) meterSig->GetUnit();
-        return beatRpt->GetAlignmentDuration(meterUnit);
+        return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else {
         return 0.0;
@@ -351,6 +351,7 @@ int LayerElement::PrepareTimeSpanning(ArrayPtrVoid *params)
         TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(*iter);
         assert(interface);
         if (interface->SetStartAndEnd(this)) {
+            // Check that there is no timestamp?
             iter = elements->erase(iter);
         }
         else {

@@ -40,11 +40,9 @@ public:
     virtual bool HasToBeAligned() { return true; };
 
     /**
-     * Returns the duration (in double) for the element.
-     * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
-     * LayerElement and DurationInterface have no inheritance link.
+     * Returns the duration (in double) for the BeatRpt.
      */
-    virtual double GetAlignmentDuration(int meterUnit);
+    virtual double GetBeatRptAlignmentDuration(int meterUnit);
 
 private:
     //
