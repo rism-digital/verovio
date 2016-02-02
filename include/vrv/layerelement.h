@@ -48,12 +48,6 @@ public:
     LayerElement &operator=(const LayerElement &element);
 
     /**
-     * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
-     * Called by AlignHorizontally
-     */
-    virtual void ResetHorizontalAlignment();
-
-    /**
      * Adjust the pname and the octave for values outside the range
      */
     static void AdjustPname(int *pname, int *oct);
@@ -112,6 +106,13 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * @name Reset the horizontal alignment
+     */
+    ///@{
+    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params);
+    ///@}
 
     /**
      * See Object::AlignHorizontally

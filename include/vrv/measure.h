@@ -109,10 +109,11 @@ public:
     //----------//
 
     /**
-     * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
-     * Called by AlignHorizontally
+     * @name Reset the horizontal alignment
      */
-    virtual void ResetHorizontalAlignment();
+    ///@{
+    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params);
+    ///@}
 
     /**
      * AlignHorizontally the content of a measure.

@@ -192,15 +192,6 @@ public:
     void AddEditorialElement(EditorialElement *child);
 
     /**
-     * @name Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
-     * Called by AlignHorizontally and AlignVertically
-     */
-    ///@{
-    virtual void ResetHorizontalAlignment(){};
-    virtual void ResetVerticalAlignment(){};
-    ///@}
-
-    /**
      * Return the index position of the object in its parent (-1 if not found)
      */
     int GetIdx() const;
@@ -363,12 +354,16 @@ public:
     ///@{
 
     /**
+     * Reset the horizontal alignment environment for various types for object.
+     */
+    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
      * Align horizontally the content of a page.
      * For each LayerElement, instanciate its Alignment.
      * It creates it if no other note or event occurs at its position.
-     * Any functor overriding this one needs to call ResetHorizontalAlignment
      */
-    virtual int AlignHorizontally(ArrayPtrVoid *params);
+    virtual int AlignHorizontally(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
      * For each Layer, align the grace note stacked in GraceAlignment
@@ -431,11 +426,15 @@ public:
     ///@{
 
     /**
+     * Reset the verticall alignment environment for various types for object.
+     */
+    virtual int ResetVerticalAlignment(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
      * Align vertically the content of a page.
      * For each Staff, instanciate its StaffAlignment.
-     * Any functor overriding this one needs to call ResetVerticalAlignment
      */
-    virtual int AlignVertically(ArrayPtrVoid *params);
+    virtual int AlignVertically(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
      * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.

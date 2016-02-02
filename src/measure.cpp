@@ -95,18 +95,6 @@ void Measure::AddStaff(Staff *staff)
     }
 }
 
-void Measure::ResetHorizontalAlignment()
-{
-    m_drawingXRel = 0;
-    m_drawingX = 0;
-    if (m_measureAligner.GetLeftAlignment()) {
-        m_measureAligner.GetLeftAlignment()->SetXRel(0);
-    }
-    if (m_measureAligner.GetRightAlignment()) {
-        m_measureAligner.GetRightAlignment()->SetXRel(0);
-    }
-}
-
 int Measure::GetXRel()
 {
     if (m_measureAligner.GetLeftAlignment()) {
@@ -135,6 +123,20 @@ int Measure::GetWidth()
 // Measure functor methods
 //----------------------------------------------------------------------------
 
+int Measure::ResetHorizontalAlignment(ArrayPtrVoid *params)
+{
+    m_drawingXRel = 0;
+    m_drawingX = 0;
+    if (m_measureAligner.GetLeftAlignment()) {
+        m_measureAligner.GetLeftAlignment()->SetXRel(0);
+    }
+    if (m_measureAligner.GetRightAlignment()) {
+        m_measureAligner.GetRightAlignment()->SetXRel(0);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::AlignHorizontally(ArrayPtrVoid *params)
 {
     // param 0: the measureAligner
@@ -142,9 +144,6 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
     // param 2: the current Mensur (unused)
     // param 3: the current MeterSig (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner **>((*params).at(0));
-
-    // we need to call it because we are overriding Object::AlignHorizontally
-    this->ResetHorizontalAlignment();
 
     // clear the content of the measureAligner
     m_measureAligner.Reset();
@@ -176,9 +175,6 @@ int Measure::AlignVertically(ArrayPtrVoid *params)
     // param 0: the systemAligner (unused)
     // param 1: the staffNb
     int *staffNb = static_cast<int *>((*params).at(1));
-
-    // we need to call it because we are overriding Object::AlignVertically
-    this->ResetVerticalAlignment();
 
     // we also need to reset the staffNb
     (*staffNb) = 0;

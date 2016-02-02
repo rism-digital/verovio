@@ -920,32 +920,6 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::AlignHorizontally(ArrayPtrVoid *params)
-{
-    // param 0: the measureAligner (unused)
-    // param 1: the time (unused)
-    // param 2: the current Mensur (unused)
-    // param 3: the current MeterSig (unused)
-
-    // reset all the drawing values - this also need to be called
-    // from any functor overriding this one!
-    this->ResetHorizontalAlignment();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::AlignVertically(ArrayPtrVoid *params)
-{
-    // param 0: the systemAligner (unused)
-    // param 1: the staffNb (unused
-
-    // reset all the drawing values - this also need to be called
-    // from any functor overriding this one!
-    this->ResetVerticalAlignment();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
 {
     // param 0: the minimum position (i.e., the width of the previous element)

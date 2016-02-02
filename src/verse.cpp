@@ -61,9 +61,6 @@ int Verse::AlignVertically(ArrayPtrVoid *params)
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
     int *staffNb = static_cast<int *>((*params).at(1));
 
-    // we need to call it because we are overriding Object::AlignVertically
-    this->ResetVerticalAlignment();
-
     // this gets (or creates) the measureAligner for the measure
     StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffNb);
 

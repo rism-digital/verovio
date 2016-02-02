@@ -85,17 +85,6 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
     return *this;
 }
 
-void LayerElement::ResetHorizontalAlignment()
-{
-    m_drawingX = 0;
-    m_alignment = NULL;
-    if (this->Is() == NOTE) {
-        Note *note = dynamic_cast<Note *>(this);
-        assert(note);
-        note->ResetGraceAlignment();
-    }
-}
-
 bool LayerElement::IsGraceNote()
 {
     Note *note = dynamic_cast<Note *>(this);
@@ -233,6 +222,19 @@ int LayerElement::GetXRel()
 // LayerElement functors methods
 //----------------------------------------------------------------------------
 
+int LayerElement::ResetHorizontalAlignment(ArrayPtrVoid *params)
+{
+    m_drawingX = 0;
+    m_alignment = NULL;
+    if (this->Is() == NOTE) {
+        Note *note = dynamic_cast<Note *>(this);
+        assert(note);
+        note->ResetGraceAlignment();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
 {
     // param 0: the measureAligner
@@ -243,9 +245,6 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     double *time = static_cast<double *>((*params).at(1));
     Mensur **currentMensur = static_cast<Mensur **>((*params).at(2));
     MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(3));
-
-    // we need to call it because we are overriding Object::AlignHorizontally
-    this->ResetHorizontalAlignment();
 
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
     if (chordParent) {

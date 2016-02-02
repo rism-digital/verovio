@@ -175,9 +175,6 @@ int Layer::AlignHorizontally(ArrayPtrVoid *params)
     Mensur **currentMensur = static_cast<Mensur **>((*params).at(2));
     MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(3));
 
-    // we need to call it because we are overriding Object::AlignHorizontally
-    this->ResetHorizontalAlignment();
-
     // we are starting a new layer, reset the time;
     (*time) = 0.0;
 

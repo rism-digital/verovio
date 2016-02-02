@@ -73,20 +73,6 @@ int System::GetVerticalSpacing()
     return 0; // arbitrary generic value
 }
 
-void System::ResetHorizontalAlignment()
-{
-    m_drawingXRel = 0;
-    m_drawingX = 0;
-    m_drawingLabelsWidth = 0;
-    m_drawingAbbrLabelsWidth = 0;
-}
-
-void System::ResetVerticalAlignment()
-{
-    m_drawingYRel = 0;
-    m_drawingY = 0;
-}
-
 int System::GetHeight()
 {
     if (m_systemAligner.GetBottomAlignment()) {
@@ -113,14 +99,29 @@ void System::SetDrawingAbbrLabelsWidth(int width)
 // System functor methods
 //----------------------------------------------------------------------------
 
+int System::ResetHorizontalAlignment(ArrayPtrVoid *params)
+{
+    m_drawingXRel = 0;
+    m_drawingX = 0;
+    m_drawingLabelsWidth = 0;
+    m_drawingAbbrLabelsWidth = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::ResetVerticalAlignment(ArrayPtrVoid *params)
+{
+    m_drawingYRel = 0;
+    m_drawingY = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int System::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
     // param 1: the staffNb (unused)
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
-
-    // we need to call it because we are overriding Object::AlignVertically
-    this->ResetVerticalAlignment();
 
     // When calculating the alignment, the position has to be 0
     m_drawingYRel = 0;

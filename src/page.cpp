@@ -98,6 +98,10 @@ void Page::LayOutHorizontally()
 
     ArrayPtrVoid params;
 
+    // Reset the horizontal alignment
+    Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
+    this->Process(&resetHorizontalAlignment, &params);
+
     // Align the content of the page using measure aligners
     // After this:
     // - each LayerElement object will have its Alignment pointer initialized
@@ -211,6 +215,10 @@ void Page::LayOutVertically()
     assert(this == doc->GetDrawingPage());
 
     ArrayPtrVoid params;
+
+    // Reset the vertical alignment
+    Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
+    this->Process(&resetVerticalAlignment, &params);
 
     // Align the content of the page using system aligners
     // After this:

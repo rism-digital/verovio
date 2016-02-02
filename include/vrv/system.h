@@ -50,15 +50,6 @@ public:
     ///@}
 
     /**
-     * @name Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
-     * Called by AlignHorizontally and AlignVertically
-     */
-    ///@{
-    virtual void ResetHorizontalAlignment();
-    virtual void ResetVerticalAlignment();
-    ///@}
-
-    /**
      * @name Set and get the labels drawing width (normal and abbreviated)
      */
     ///@{
@@ -86,6 +77,14 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * @name Reset the horizontal and vertical alignment
+     */
+    ///@{
+    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params);
+    virtual int ResetVerticalAlignment(ArrayPtrVoid *params);
+    ///@}
 
     /**
      * Align the content of a system vertically.
