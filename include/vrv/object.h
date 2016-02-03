@@ -575,6 +575,12 @@ public:
     virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
+     * Remove the TimeSpanningInterface element from the list when the last measure is reached.
+     * param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
+     */
+    virtual int FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
     virtual int ResetDrawing(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };

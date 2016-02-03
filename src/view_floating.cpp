@@ -76,98 +76,76 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
     System *parentSystem2 = dynamic_cast<System *>(interface->GetEnd()->GetFirstParent(SYSTEM));
 
     int x1, x2;
-    Staff *staff = NULL;
+    // Staff *staff = NULL;
+    Measure *measure = NULL;
     DocObject *graphic = NULL;
     char spanningType = SPANNING_START_END;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
-        // Get the parent staff for calculating the y position
-        staff = dynamic_cast<Staff *>(interface->GetStart()->GetFirstParent(STAFF));
-        if (!Check(staff)) return;
-
+        // we use the start measure
+        measure = interface->GetStartMeasure();
+        if (!Check(measure)) return;
         x1 = interface->GetStart()->GetDrawingX();
         x2 = interface->GetEnd()->GetDrawingX();
         graphic = element;
     }
     // Only the first parent is the same, this means that the element is "open" at the end of the system
     else if (system == parentSystem1) {
-        // We need the last measure of the system for x2
-        Measure *last = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
-        if (!Check(last)) return;
-        staff = dynamic_cast<Staff *>(interface->GetStart()->GetFirstParent(STAFF));
-        if (!Check(staff)) return;
-
+        // We need the last measure of the system for x2 - we also use it for getting the staves later
+        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
+        if (!Check(measure)) return;
         x1 = interface->GetStart()->GetDrawingX();
-        x2 = last->GetDrawingX() + last->GetRightBarLineX();
+        x2 = measure->GetDrawingX() + measure->GetRightBarLineX();
         graphic = element;
         spanningType = SPANNING_START;
     }
     // We are in the system of the last note - draw the element from the beginning of the system
     else if (system == parentSystem2) {
-        // We need the first measure of the system for x1
-        Measure *first = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
-        if (!Check(first)) return;
-        // Get the staff of the first note - however, not the staff we need
-        Staff *lastStaff = dynamic_cast<Staff *>(interface->GetEnd()->GetFirstParent(STAFF));
-        if (!Check(lastStaff)) return;
-        // We need the first staff from the current system, i.e., the first measure.
-        AttCommonNComparison comparison(STAFF, lastStaff->GetN());
-        staff = dynamic_cast<Staff *>(system->FindChildByAttComparison(&comparison, 2));
-        if (!staff) {
-            LogDebug("Could not get staff (%d) while drawing staffGrp - View::DrawSylConnector", lastStaff->GetN());
-            return;
-        }
-        // Also try to get a first note - we should change this once we have a x position in measure that
-        // takes into account the scoreDef
-        Note *firstNote = dynamic_cast<Note *>(staff->FindChildByType(NOTE));
-
-        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
-                       : first->GetDrawingX();
+        // We need the first measure of the system for x1 - we also use it for getting the staves later
+        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        if (!Check(measure)) return;
+        // We need the position of the first default in the first measure for x1
+        AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
+        Alignment *pos
+            = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+        x1 = pos ? pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100) : measure->GetDrawingX();
         x2 = interface->GetEnd()->GetDrawingX();
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note and the last note are in the current system - draw the connector
     // throughout the system
     else {
-        // We need the first measure of the system for x1
-        Measure *first = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
-        if (!Check(first)) return;
-        // Also try to get a first note - we should change this once we have a x position in measure that
-        // takes into account the scoreDef
-        Note *firstNote = dynamic_cast<Note *>(first->FindChildByType(NOTE));
+        // We need the first measure of the system for x1 - we also use it for getting the staves later
+        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        if (!Check(measure)) return;
+        // We need the position of the first default in the first measure for x1
+        AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
+        Alignment *pos
+            = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+        x1 = pos ? pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100) : measure->GetDrawingX();
         // We need the last measure of the system for x2
         Measure *last = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(last)) return;
-        // Get the staff of the first note - however, not the staff we need
-        Staff *firstStaff = dynamic_cast<Staff *>(interface->GetStart()->GetFirstParent(STAFF));
-        if (!Check(firstStaff)) return;
-
-        // We need the staff from the current system, i.e., the first measure.
-        AttCommonNComparison comparison(STAFF, firstStaff->GetN());
-        staff = dynamic_cast<Staff *>(first->FindChildByAttComparison(&comparison, 1));
-        if (!staff) {
-            LogDebug("Could not get staff (%d) while drawing staffGrp - View::DrawSylConnector", firstStaff->GetN());
-            return;
-        }
-
-        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
-                       : first->GetDrawingX();
         x2 = last->GetDrawingX() + last->GetRightBarLineX();
         spanningType = SPANNING_MIDDLE;
     }
 
-    if (element->Is() == SLUR) {
-        // cast to Slur check in DrawTieOrSlur
-        DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, staff, spanningType, graphic);
-    }
-    else if (element->Is() == SYL) {
-        // cast to Syl check in DrawSylConnector
-        DrawSylConnector(dc, dynamic_cast<Syl *>(element), x1, x2, staff, spanningType, graphic);
-    }
-    else if (element->Is() == TIE) {
-        // cast to Slur check in DrawTieOrSlur
-        DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, staff, spanningType, graphic);
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = interface->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        if (element->Is() == SLUR) {
+            // cast to Slur check in DrawTieOrSlur
+            DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is() == SYL) {
+            // cast to Syl check in DrawSylConnector
+            DrawSylConnector(dc, dynamic_cast<Syl *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is() == TIE) {
+            // cast to Slur check in DrawTieOrSlur
+            DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
     }
 }
 
@@ -200,7 +178,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     end = dynamic_cast<LayerElement *>(slur->GetEnd());
 
     if (!start || !end) {
-        // no note, obviously nothing to do...
+        // no start and end, obviously nothing to do...
         return;
     }
 
@@ -833,6 +811,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 
     if (!note1 || !note2) {
         // no note, obviously nothing to do...
+        // this also means that notes with tstamp events are not supported
         return;
     }
 
@@ -1118,18 +1097,12 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     bool setX = false;
     bool setY = false;
 
-    std::vector<int>::iterator iter;
-    std::vector<int> staffList = tempo->GetStaff();
-    for (iter = staffList.begin(); iter != staffList.end(); iter++) {
-        AttCommonNComparison comparison(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
-        if (!staff) {
-            LogWarning("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
-            continue;
-        }
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
 
         // Basic method that use bounding box
-        int y = GetTempoY(staff);
+        int y = GetTempoY(*staffIter);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);

@@ -166,6 +166,11 @@ public:
      */
     virtual int SetDrawingXY(ArrayPtrVoid *params);
 
+    /**
+     * See Object::FillStaffCurrentTimeSpanningEnd
+     */
+    virtual int FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params);
+
 public:
     /**
      * The X absolute position of the measure for facsimile (transcription) encodings.

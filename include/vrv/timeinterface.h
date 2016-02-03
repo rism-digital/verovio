@@ -15,6 +15,7 @@ namespace vrv {
 
 class DocObject;
 class LayerElement;
+class Measure;
 
 //----------------------------------------------------------------------------
 // TimePointInterface
@@ -47,14 +48,25 @@ public:
     ///@}
 
     /**
-     *
+     * Return true if a start is given (@startid or @tstamp)
      */
     bool HasStart() { return (m_start); };
 
     /**
-     *
+     * Return the start measure of the TimePointInterface
      */
-    void SetUuidStr();
+    Measure *GetStartMeasure();
+
+    /**
+     * Return true if the TimePointInterface occurs on the staff @n
+     * Looks that the parent staff if the using @stardid or at the @staff values.
+     */
+    bool IsOnStaff(int n);
+
+    /**
+     * Return a vector of staves looking at the @staff attribute or at the parent staff or the @startid
+     */
+    std::vector<Staff *> GetTstampStaves(Measure *measure);
 
     //-----------------//
     // Pseudo functors //
@@ -73,6 +85,11 @@ public:
     virtual int InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object);
 
 protected:
+    /**
+     * Extract the fragment of the start or end @xml:id if given
+     */
+    void SetUuidStr();
+
     /**
      * Extract the uuid from a string
      */
@@ -128,6 +145,16 @@ public:
      *
      */
     bool HasStartAndEnd() { return (m_start && m_end); };
+
+    /**
+     * Return the end measure of the TimePointInterface
+     */
+    Measure *GetEndMeasure();
+
+    /**
+     * Return true if the element is spanning over two or more measures
+     */
+    bool IsSpanningMeasures();
 
     /**
      *

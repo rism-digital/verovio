@@ -19,6 +19,7 @@
 #include "page.h"
 #include "staff.h"
 #include "system.h"
+#include "timeinterface.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -325,6 +326,28 @@ int Measure::SetDrawingXY(ArrayPtrVoid *params)
     // For avoiding unused variable warning in non debug mode
     doc = NULL;
 
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
+{
+    // param 0: the current Syl
+    std::vector<DocObject *> *elements = static_cast<std::vector<DocObject *> *>((*params).at(0));
+
+    std::vector<DocObject *>::iterator iter = elements->begin();
+    while (iter != elements->end()) {
+        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(*iter);
+        assert(interface);
+        Measure *endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstParent(MEASURE));
+        assert(endParent);
+        // We have reached the end of the spanning - remove it from the list of running elements
+        if (endParent == this) {
+            iter = elements->erase(iter);
+        }
+        else {
+            iter++;
+        }
+    }
     return FUNCTOR_CONTINUE;
 }
 

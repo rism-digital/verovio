@@ -15,6 +15,7 @@
 
 #include "doc.h"
 #include "layer.h"
+#include "measure.h"
 #include "note.h"
 #include "syl.h"
 #include "system.h"
@@ -138,22 +139,14 @@ int Staff::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
     while (iter != elements->end()) {
         TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(*iter);
         assert(interface);
-        Staff *endParent = dynamic_cast<Staff *>(interface->GetEnd()->GetFirstParent(STAFF));
-        assert(endParent);
-        // Because we are not processing following staff @n, we need to check it here.
-        // this might cause problem with cross-staves slurs if the end is on a lower staff than the start:
-        // this will be true for the staff below the start in the same measure - a fix would be to check if
-        // we are still in the same measure (compare this->m_parent and start->m_parent)
-        if (endParent->GetN() == this->GetN()) {
+        Measure *currentMeasure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+        assert(currentMeasure);
+        // We need to make sure we are in the next measure (and not just a staff below because of some cross staff
+        // notation
+        if ((interface->GetStartMeasure() != currentMeasure) && (interface->IsOnStaff(this->GetN()))) {
             m_timeSpanningElements.push_back(*iter);
         }
-        // We have reached the end of the spanning - remove it from the list of running elements
-        if (endParent == this) {
-            iter = elements->erase(iter);
-        }
-        else {
-            iter++;
-        }
+        iter++;
     }
     return FUNCTOR_CONTINUE;
 }

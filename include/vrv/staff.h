@@ -88,6 +88,7 @@ public:
     virtual int AlignVertically(ArrayPtrVoid *params);
 
     /**
+     * See Object::FillStaffCurrentTimeSpanning
      */
     virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);
 

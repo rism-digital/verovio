@@ -242,7 +242,8 @@ void Doc::PrepareDrawing()
     timeSpanningElements.clear();
     params.push_back(&timeSpanningElements);
     Functor fillStaffCurrentTimeSpanning(&Object::FillStaffCurrentTimeSpanning);
-    this->Process(&fillStaffCurrentTimeSpanning, &params);
+    Functor fillStaffCurrentTimeSpanningEnd(&Object::FillStaffCurrentTimeSpanningEnd);
+    this->Process(&fillStaffCurrentTimeSpanning, &params, &fillStaffCurrentTimeSpanningEnd);
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
     if (!timeSpanningElements.empty()) {
