@@ -1,5 +1,7 @@
-<?xml-model href="../../../../../tags/MEI2012_v2.0.0/schemata/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?><?xml-model href="../../../../../tags/MEI2012_v2.0.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2012">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2013">
     <meiHead>
         <fileDesc>
             <titleStmt>
@@ -74,9 +76,6 @@
                             <persName role="editor">Jürgen Knuth</persName>
                         </respStmt>
                     </titleStmt>
-                    <pubStmt>
-                        <geogName>Altena</geogName>
-                    </pubStmt>
                 </source>
                 <source n="2" label="electronic">
                     <identifier type="URI">http://www.hausmusik.ch/notenregal/a/ahle_johann-rudolf%281625-1673%29/jesu_meines_%20herzens_%20freud/jesu_meines_herzens_freud.xml</identifier>
@@ -84,7 +83,7 @@
                         <title>Jesu, meines Herzens Freud</title>
                     </titleStmt>
                     <pubStmt>
-                        <date reg="2011-05-12"/>
+                        <date isodate="2011-05-12"/>
                         <respStmt>
                             <corpName>Verein zur Förderung der Hausmusik</corpName>
                         </respStmt>
@@ -123,9 +122,6 @@
                 <langUsage>
                     <language>German</language>
                 </langUsage>
-                <key pname="a" mode="minor">A minor</key>
-                <tempo>undefined</tempo>
-                <meter count="4" unit="4" sym="common"/>
                 <perfMedium>
                     <instrumentation>
                         <instrVoice code="va">Sopran</instrVoice>
@@ -148,98 +144,6 @@
                     <classCode xml:id="OCLC_DDC" authority="OCLC" authURI="http://www.oclc.org/dewey/resources/summaries/default.htm#700"/>
                     <classCode xml:id="OSWD" authURI="BSZ" authority="http://www.bsz-bw.de/cgi-bin/oswd-suche.pl"/>
                 </classification>
-                <incip>
-                    <incipCode form="plaineAndEasie">%G-2@c 4A4B4C{8B8A}/x4G.8A2B/4C{8B16C16D}2B/1A</incipCode>
-                    <incipCode form="parsons">*uuuddduuuduudd</incipCode>
-                    <incipText>
-                        <p>Jesu meines Herzens Freud süßer Jesu, meiner Seelen Seligkeit</p>
-                    </incipText>
-                    <score>
-                        <scoreDef key.sig="0" key.mode="minor" meter.count="4" meter.unit="4" meter.sym="common">
-                            <staffGrp barthru="true" symbol="line">
-                                <staffGrp n="1" barthru="false" symbol="bracket">
-                                    <staffDef n="1" lines="5" clef.line="2" clef.shape="G"/>
-                                    <staffDef n="2" lines="5" clef.line="4" clef.shape="F"/>
-                                </staffGrp>
-                            </staffGrp>
-                        </scoreDef>
-                        <section>
-                            <measure n="1">
-                                <staff n="1">
-                                    <layer n="1">
-                                        <note pname="a" oct="4" dur="4" stem.dir="up"/>
-                                        <note pname="b" oct="4" dur="4" stem.dir="up"/>
-                                        <note pname="c" oct="5" dur="4" stem.dir="up"/>
-                                        <beam>
-                                            <note pname="b" oct="4" dur="8" stem.dir="up"/>
-                                            <note pname="a" oct="4" dur="8" stem.dir="up"/>
-                                        </beam>
-                                    </layer>
-                                    <layer n="2">
-                                        <note pname="e" oct="4" dur="4" stem.dir="down">
-                                            <verse n="1">
-                                                <syl>1. Je-</syl>
-                                            </verse>
-                                            <verse n="2">
-                                                <syl>2. Tau-</syl>
-                                            </verse>
-                                            <verse n="3">
-                                                <syl>3. Wei-</syl>
-                                            </verse>
-                                        </note>
-                                        <note pname="e" oct="4" dur="4" stem.dir="down">
-                                            <verse n="1">
-                                                <syl>su,</syl>
-                                            </verse>
-                                            <verse n="2">
-                                                <syl>send-</syl>
-                                            </verse>
-                                            <verse n="3">
-                                                <syl>de</syl>
-                                            </verse>
-                                        </note>
-                                        <note pname="e" oct="4" dur="4" stem.dir="down">
-                                            <verse n="1">
-                                                <syl>mei-</syl>
-                                            </verse>
-                                            <verse n="2">
-                                                <syl>mal</syl>
-                                            </verse>
-                                            <verse n="3">
-                                                <syl>mich</syl>
-                                            </verse>
-                                        </note>
-                                        <note pname="f" oct="4" dur="4" stem.dir="down">
-                                            <verse n="1">
-                                                <syl>nes</syl>
-                                            </verse>
-                                            <verse n="2">
-                                                <syl>ge-</syl>
-                                            </verse>
-                                            <verse n="3">
-                                                <syl>und</syl>
-                                            </verse>
-                                        </note>
-                                    </layer>
-                                </staff>
-                                <staff n="2">
-                                    <layer n="1">
-                                        <note pname="c" oct="4" dur="4" stem.dir="up"/>
-                                        <note pname="b" oct="3" dur="4" stem.dir="up"/>
-                                        <note pname="a" oct="3" dur="4" stem.dir="up"/>
-                                        <note pname="d" oct="4" dur="4" stem.dir="up"/>
-                                    </layer>
-                                    <layer n="2">
-                                        <note pname="a" oct="3" dur="4" stem.dir="down"/>
-                                        <note pname="g" accid="s" oct="3" dur="4" stem.dir="down" accid.ges="s"/>
-                                        <note pname="a" oct="3" dur="4" stem.dir="down"/>
-                                        <note pname="d" oct="3" dur="4" stem.dir="down"/>
-                                    </layer>
-                                </staff>
-                            </measure>
-                        </section>
-                    </score>
-                </incip>
             </work>
         </workDesc>
         <revisionDesc>
@@ -248,7 +152,7 @@
                 <changeDesc>
                     <p>The original MusicXML file was generated using capella Media Producer 5.</p>
                 </changeDesc>
-                <date reg="2006-10-18"/>
+                <date isodate="2006-10-18"/>
             </change>
             <change n="2">
                 <respStmt>
@@ -257,7 +161,7 @@
                 <changeDesc>
                     <p>Transcoded from a MusicXML version 1.0 file on 2011-05-12 using the <ref target="#xsl_mxl2mei_2.2.3">musicxml2mei</ref> stylesheet. </p>
                 </changeDesc>
-                <date reg="2011-05-12"/>
+                <date isodate="2011-05-12"/>
             </change>
             <change n="3">
                 <respStmt>
@@ -267,7 +171,7 @@
                     <p> Cleaned up MEI file automatically using <ref target="#xsl_ppq">ppq.xsl</ref>.
                </p>
                 </changeDesc>
-                <date reg="2011-10-22"/>
+                <date isodate="2011-10-22"/>
             </change>
             <change n="4">
                 <respStmt>
@@ -276,7 +180,16 @@
                 <changeDesc>
                     <p> Cleaned up MEI file automatically using <ref target="#xsl_header">Header.xsl</ref>. </p>
                 </changeDesc>
-                <date reg="2011-12-01"/>
+                <date isodate="2011-12-01"/>
+            </change>
+            <change n="5">
+                <respStmt>
+                    <persName resp="#LP"/>
+                </respStmt>
+                <changeDesc>
+                    <p> Removing @staff, @timestamp and @timestamp2 and @dur in slurs when duplicating @startid / @endid.</p>
+                </changeDesc>
+                <date isodate="2016-02-02"/>
             </change>
         </revisionDesc>
     </meiHead>
@@ -497,12 +410,12 @@
                                 <rend fontfam="Times New Roman" fontsize="11" fontweight="bold">Johann R.
                            Ahle</rend>
                             </dir>
-                            <slur tstamp="3" dur="0m+4" curvedir="below" startid="#d23378e835" endid="#d23378e917" staff="1"/>
+                            <slur curvedir="below" startid="#d23378e835" endid="#d23378e917"/>
                             <dir tstamp="4" place="above" staff="1">
                                 <rend fontfam="Times New Roman" fontsize="10" fontweight="bold">Satz: J.
                            Knuth</rend>
                             </dir>
-                            <slur tstamp="3" dur="0m+4" curvedir="above" startid="#d23378e964" endid="#d23378e980" staff="2"/>
+                            <slur curvedir="above" startid="#d23378e964" endid="#d23378e980"/>
                         </measure>
                         <measure n="4" xml:id="d23378e1041">
                             <staff n="1">
@@ -727,9 +640,9 @@
                                     <note xml:id="d23378e2041" pname="b" oct="2" dur="4" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <slur tstamp="3" dur="0m+4" curvedir="below" startid="#d23378e1838" endid="#d23378e1915" staff="1"/>
-                            <slur tstamp="3" dur="0m+4" curvedir="above" startid="#d23378e1962" endid="#d23378e1978" staff="2"/>
-                            <slur tstamp="3" dur="0m+4" curvedir="below" startid="#d23378e2025" endid="#d23378e2041" staff="2"/>
+                            <slur curvedir="below" startid="#d23378e1838" endid="#d23378e1915"/>
+                            <slur curvedir="above" startid="#d23378e1962" endid="#d23378e1978"/>
+                            <slur curvedir="below" startid="#d23378e2025" endid="#d23378e2041"/>
                         </measure>
                         <measure n="8" xml:id="d23378e2058">
                             <staff n="1">
@@ -889,7 +802,7 @@
                                     <note xml:id="d23378e2720" pname="e" oct="3" dur="2" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <slur tstamp="1" dur="0m+1.5" curvedir="below" startid="#d23378e2529" endid="#d23378e2560" staff="1"/>
+                            <slur curvedir="below" startid="#d23378e2529" endid="#d23378e2560"/>
                         </measure>
                         <measure n="11" xml:id="d23378e2734">
                             <staff n="1">
@@ -955,8 +868,8 @@
                                     <note xml:id="d23378e3044" pname="e" oct="3" dur="2" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <slur tstamp="3" dur="0m+4" curvedir="below" startid="#d23378e2857" endid="#d23378e2934" staff="1"/>
-                            <slur tstamp="3" dur="0m+4" curvedir="above" startid="#d23378e2981" endid="#d23378e2997" staff="2"/>
+                            <slur curvedir="below" startid="#d23378e2857" endid="#d23378e2934"/>
+                            <slur curvedir="above" startid="#d23378e2981" endid="#d23378e2997"/>
                         </measure>
                         <measure n="12" xml:id="d23378e3058">
                             <staff n="1">
@@ -1106,8 +1019,8 @@
                                     <note xml:id="d23378e3680" pname="a" oct="2" dur="2" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <slur tstamp="1" dur="0m+2" curvedir="below" startid="#d23378e3511" endid="#d23378e3564" staff="1"/>
-                            <slur tstamp="1" dur="0m+2" curvedir="above" startid="#d23378e3617" endid="#d23378e3633" staff="2"/>
+                            <slur curvedir="below" startid="#d23378e3511" endid="#d23378e3564"/>
+                            <slur curvedir="above" startid="#d23378e3617" endid="#d23378e3633"/>
                         </measure>
                     </section>
                 </score>

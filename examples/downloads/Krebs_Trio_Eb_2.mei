@@ -1,5 +1,7 @@
-<?xml-model href="../../../../../tags/MEI2012_v2.0.0/schemata/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?><?xml-model href="../../../../../tags/MEI2012_v2.0.0/schemata/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
-<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2012">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink" meiversion="2013">
     <meiHead>
         <fileDesc>
             <titleStmt>
@@ -195,6 +197,15 @@
                 </changeDesc>
                 <date isodate="2014-01-31"/>
             </change>
+            <change n="7">
+                <respStmt>
+                    <persName resp="Laurent Pugin"/>
+                </respStmt>
+                <changeDesc>
+                    <p> Removing @staff, @timestamp and @timestamp2 and @dur in slurs and ties when duplicating @startid / @endid.</p>
+                </changeDesc>
+                <date isodate="2016-02-02"/>
+            </change>
         </revisionDesc>
     </meiHead>
     <music>
@@ -273,7 +284,7 @@
                                     <note xml:id="d1e715" pname="b" oct="2" dur="8" stem.dir="up" accid.ges="f"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="4.5" staff="2" curvedir="below" startid="#d1e569" endid="#d1e913"/>
+                            <tie curvedir="below" startid="#d1e569" endid="#d1e913"/>
                         </measure>
                         <measure n="2" xml:id="d1e731" width="246.97">
                             <staff n="1">
@@ -328,7 +339,7 @@
                                     <note xml:id="d1e1155" pname="e" oct="3" dur="8" stem.dir="down" accid.ges="f"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="4.5" staff="1" curvedir="above" startid="#d1e891" endid="#d1e1173"/>
+                            <tie curvedir="above" startid="#d1e891" endid="#d1e1173"/>
                             <trill staff="1" place="above" tstamp="1" startid="#d1e733"/>
                         </measure>
                         <measure n="3" xml:id="d1e1171" width="329.52">
@@ -367,7 +378,7 @@
                                     <beam>
                                         <note xml:id="d1e1490" pname="e" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
                                         <note xml:id="d1e1510" pname="b" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d1e1530" pname="d" accid="f" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e1530" pname="d" accid="f" oct="5" dur="16" stem.dir="down"/>
                                     </beam>
                                 </layer>
                             </staff>
@@ -387,7 +398,7 @@
                                     <note xml:id="d1e1657" pname="g" oct="3" dur="8" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="4" staff="1" curvedir="above" startid="#d1e1342" endid="#d1e1682"/>
+                            <tie curvedir="above" startid="#d1e1342" endid="#d1e1682"/>
                             <trill startid="#d1e1308" staff="1" place="above"/>
                         </measure>
                         <sb/>
@@ -466,9 +477,9 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="2" staff="1" curvedir="below" startid="#d1e1831" endid="#d1e1850"/>
-                            <tie tstamp="1" staff="2" curvedir="above" startid="#d1e2059" endid="#d1e2076"/>
-                            <tie tstamp="3" staff="2" curvedir="above" startid="#d1e2199" endid="#d1e2218"/>
+                            <tie curvedir="below" startid="#d1e1831" endid="#d1e1850"/>
+                            <tie curvedir="above" startid="#d1e2059" endid="#d1e2076"/>
+                            <tie curvedir="above" startid="#d1e2199" endid="#d1e2218"/>
                             <mordent staff="1" startid="#d1e1308" place="above" form="norm"/>
                         </measure>
                         <measure n="5" xml:id="d1e2441" width="421.70">
@@ -494,13 +505,13 @@
                                         <note xml:id="d1e2591" pname="e" oct="5" dur="8" stem.dir="down" accid.ges="f"/>
                                         <note xml:id="d1e2609" pname="d" oct="5" dur="8" stem.dir="down"/>
                                     </beam>
-                                    <note xml:id="d1e2625" pname="c" accid="s" oct="5" dur="4" tie="i" stem.dir="down" accid.ges="s"/>
+                                    <note xml:id="d1e2625" pname="c" accid="s" oct="5" dur="4" tie="i" stem.dir="down"/>
                                     <beam>
                                         <note xml:id="d1e2646" pname="c" oct="5" dur="8" tie="t" stem.dir="down" accid.ges="s"/>
                                         <note xml:id="d1e2667" pname="c" accid="n" oct="5" dur="16" stem.dir="down"/>
-                                        <note xml:id="d1e2687" pname="d" accid="f" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e2687" pname="d" accid="f" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e2709" pname="e" oct="5" dur="8" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d1e2727" pname="d" accid="f" oct="4" dur="8" tie="i" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e2727" pname="d" accid="f" oct="4" dur="8" tie="i" stem.dir="down"/>
                                     </beam>
                                 </layer>
                             </staff>
@@ -524,10 +535,10 @@
                                     <note xml:id="d1e2897" pname="e" oct="3" dur="8" stem.dir="down" accid.ges="f"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="2" staff="1" curvedir="above" startid="#d1e2475" endid="#d1e2494"/>
-                            <tie tstamp="4.5" staff="1" curvedir="above" startid="#d1e2571" endid="#d1e2924"/>
-                            <tie tstamp="2" staff="2" curvedir="above" startid="#d1e2625" endid="#d1e2646"/>
-                            <tie tstamp="4.5" staff="2" curvedir="above" startid="#d1e2727" endid="#d1e3081"/>
+                            <tie curvedir="above" startid="#d1e2475" endid="#d1e2494"/>
+                            <tie curvedir="above" startid="#d1e2571" endid="#d1e2924"/>
+                            <tie curvedir="above" startid="#d1e2625" endid="#d1e2646"/>
+                            <tie curvedir="above" startid="#d1e2727" endid="#d1e3081"/>
                             <trill startid="#d1e2443" staff="1" tstamp="1" place="above"/>
                             <trill staff="2" tstamp="1" startid="#d1e2591" place="above"/>
                         </measure>
@@ -585,10 +596,10 @@
                                     <note xml:id="d1e3358" pname="f" oct="3" dur="8" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="2" staff="1" curvedir="above" startid="#d1e2961" endid="#d1e2980"/>
-                            <tie tstamp="4.5" staff="1" curvedir="above" startid="#d1e3055" endid="#d1e3374"/>
-                            <tie tstamp="2" staff="2" curvedir="above" startid="#d1e3118" endid="#d1e3135"/>
-                            <tie tstamp="4.5" staff="2" curvedir="above" startid="#d1e3208" endid="#d1e3503"/>
+                            <tie curvedir="above" startid="#d1e2961" endid="#d1e2980"/>
+                            <tie curvedir="above" startid="#d1e3055" endid="#d1e3374"/>
+                            <tie curvedir="above" startid="#d1e3118" endid="#d1e3135"/>
+                            <tie curvedir="above" startid="#d1e3208" endid="#d1e3503"/>
                         </measure>
                         <measure n="7" xml:id="d1e3372" width="342.68">
                             <staff n="1">
@@ -642,10 +653,10 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="2" staff="1" curvedir="above" startid="#d1e3411" endid="#d1e3428"/>
-                            <tie tstamp="4" staff="1" curvedir="above" startid="#d1e3485" endid="#d1e3822"/>
-                            <tie tstamp="2" staff="2" curvedir="above" startid="#d1e3540" endid="#d1e3559"/>
-                            <tie tstamp="4" staff="2" curvedir="above" startid="#d1e3616" endid="#d1e3989"/>
+                            <tie curvedir="above" startid="#d1e3411" endid="#d1e3428"/>
+                            <tie curvedir="above" startid="#d1e3485" endid="#d1e3822"/>
+                            <tie curvedir="above" startid="#d1e3540" endid="#d1e3559"/>
+                            <tie curvedir="above" startid="#d1e3616" endid="#d1e3989"/>
                         </measure>
                         <measure n="8" xml:id="d1e3820" width="335.69">
                             <staff n="1">
@@ -702,10 +713,10 @@
                                     <note xml:id="d1e4308" pname="b" oct="2" dur="8" stem.dir="up" accid.ges="f"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="2" staff="1" curvedir="above" startid="#d1e3879" endid="#d1e3896"/>
-                            <tie tstamp="4.5" staff="1" curvedir="above" startid="#d1e3969" endid="#d1e4336"/>
-                            <tie tstamp="2" staff="2" curvedir="above" startid="#d1e4046" endid="#d1e4065"/>
-                            <tie tstamp="4.5" staff="2" curvedir="above" startid="#d1e4140" endid="#d1e4495"/>
+                            <tie curvedir="above" startid="#d1e3879" endid="#d1e3896"/>
+                            <tie curvedir="above" startid="#d1e3969" endid="#d1e4336"/>
+                            <tie curvedir="above" startid="#d1e4046" endid="#d1e4065"/>
+                            <tie curvedir="above" startid="#d1e4140" endid="#d1e4495"/>
                         </measure>
                         <sb/>
                         <scoreDef/>
@@ -735,7 +746,7 @@
                                         <note xml:id="d1e4516" pname="g" oct="4" dur="8" stem.dir="up"/>
                                     </beam>
                                     <rest xml:id="d1e4532" dur="8"/>
-                                    <note xml:id="d1e4540" pname="d" accid="f" oct="5" dur="8" stem.dir="down" accid.ges="f"/>
+                                    <note xml:id="d1e4540" pname="d" accid="f" oct="5" dur="8" stem.dir="down"/>
                                     <note xml:id="d1e4558" pname="c" oct="5" dur="4" tie="i" stem.dir="down"/>
                                     <beam>
                                         <note xml:id="d1e4575" pname="c" oct="5" dur="16" tie="t" stem.dir="down"/>
@@ -761,9 +772,8 @@
                                     <note xml:id="d1e4759" pname="f" oct="3" dur="8" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="2" staff="1" curvedir="above" startid="#d1e4373" endid="#d1e4392"/>
-                            <tie tstamp="1.25" staff="1 2" curvedir="below" startid="#d1e4471" endid="#d1e4495"/>
-                            <tie tstamp="3" staff="2" curvedir="above" startid="#d1e4558" endid="#d1e4575"/>
+                            <tie curvedir="above" startid="#d1e4373" endid="#d1e4392"/>
+                            <tie curvedir="above" startid="#d1e4558" endid="#d1e4575"/>
                         </measure>
                         <measure n="10" xml:id="d1e4773" width="361.26">
                             <staff n="1">
@@ -818,9 +828,9 @@
                                     <note xml:id="d1e5262" pname="d" oct="3" dur="8" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="2" staff="1" curvedir="below" startid="#d1e4854" endid="#d1e4871"/>
-                            <tie tstamp="1" staff="2" curvedir="above" startid="#d1e4965" endid="#d1e4984"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e5065" endid="#d1e5084"/>
+                            <tie curvedir="below" startid="#d1e4854" endid="#d1e4871"/>
+                            <tie curvedir="above" startid="#d1e4965" endid="#d1e4984"/>
+                            <tie curvedir="below" startid="#d1e5065" endid="#d1e5084"/>
                         </measure>
                         <measure n="11" xml:id="d1e5276" width="334.65">
                             <staff n="1">
@@ -877,7 +887,7 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="4" staff="1" curvedir="above" startid="#d1e5452" endid="#d1e5814"/>
+                            <tie curvedir="above" startid="#d1e5452" endid="#d1e5814"/>
                             <trill startid="#d1e5354" staff="1" place="above"/>
                             <trill staff="2" startid="#d1e5548" place="above"/>
                         </measure>
@@ -890,7 +900,7 @@
                                 <layer n="1">
                                     <beam>
                                         <note xml:id="d1e5814" pname="b" oct="4" dur="16" tie="t" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d1e5837" pname="d" accid="f" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e5837" pname="d" accid="f" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e5859" pname="c" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e5877" pname="b" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
                                     </beam>
@@ -921,7 +931,7 @@
                                         <note xml:id="d1e6150" pname="e" oct="4" dur="16" tie="t" stem.dir="up"/>
                                         <note xml:id="d1e6171" pname="g" oct="4" dur="16" stem.dir="up"/>
                                         <note xml:id="d1e6189" pname="f" oct="4" dur="16" stem.dir="up"/>
-                                        <note xml:id="d1e6207" pname="e" accid="f" oct="4" dur="16" stem.dir="up" accid.ges="f"/>
+                                        <note xml:id="d1e6207" pname="e" accid="f" oct="4" dur="16" stem.dir="up"/>
                                     </beam>
                                     <note xml:id="d1e6229" pname="f" oct="4" dur="4" tie="i" stem.dir="up"/>
                                     <beam>
@@ -948,8 +958,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="1" staff="2" curvedir="below" startid="#d1e6131" endid="#d1e6150"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e6229" endid="#d1e6246"/>
+                            <tie curvedir="below" startid="#d1e6131" endid="#d1e6150"/>
+                            <tie curvedir="below" startid="#d1e6229" endid="#d1e6246"/>
                         </measure>
                         <measure n="13" xml:id="d1e6460" width="469.24">
                             <staff n="1">
@@ -1009,8 +1019,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="4" staff="1" curvedir="below" startid="#d1e6648" endid="#d1e6998"/>
-                            <tie tstamp="1" staff="2" curvedir="below" startid="#d1e6668" endid="#d1e6687"/>
+                            <tie curvedir="below" startid="#d1e6648" endid="#d1e6998"/>
+                            <tie curvedir="below" startid="#d1e6668" endid="#d1e6687"/>
                             <trill startid="#d1e6616" staff="1" place="above"/>
                             <trill staff="2" startid="#d1e6766" place="above"/>
                         </measure>
@@ -1030,7 +1040,7 @@
                                         <note xml:id="d1e7057" pname="b" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
                                         <note xml:id="d1e7077" pname="c" oct="5" dur="16" stem.dir="down"/>
                                     </beam>
-                                    <note xml:id="d1e7095" pname="d" accid="f" oct="5" dur="4" stem.dir="down" accid.ges="f"/>
+                                    <note xml:id="d1e7095" pname="d" accid="f" oct="5" dur="4" stem.dir="down"/>
                                     <beam>
                                         <note xml:id="d1e7113" pname="c" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e7131" pname="d" accid="n" oct="5" dur="16" stem.dir="down"/>
@@ -1077,8 +1087,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="4" staff="1" curvedir="above" startid="#d1e7151" endid="#d1e7507"/>
-                            <tie tstamp="4" staff="2" curvedir="above" startid="#d1e7323" endid="#d1e7796"/>
+                            <tie curvedir="above" startid="#d1e7151" endid="#d1e7507"/>
+                            <tie curvedir="above" startid="#d1e7323" endid="#d1e7796"/>
                         </measure>
                         <measure n="15" xml:id="d1e7505" width="343.05">
                             <staff n="1">
@@ -1283,10 +1293,10 @@
                                     <note xml:id="d1e9475" pname="b" oct="2" dur="8" stem.dir="up" accid.ges="f"/>
                                     <note xml:id="d1e9491" pname="e" oct="3" dur="4" stem.dir="down" accid.ges="f"/>
                                     <rest xml:id="d1e9507" dur="8"/>
-                                    <note xml:id="d1e9515" pname="d" accid="f" oct="3" dur="8" stem.dir="down" accid.ges="f"/>
+                                    <note xml:id="d1e9515" pname="d" accid="f" oct="3" dur="8" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="4.5" staff="1" curvedir="above" startid="#d1e9141" endid="#d1e9535"/>
+                            <tie curvedir="above" startid="#d1e9141" endid="#d1e9535"/>
                         </measure>
                         <measure n="18" xml:id="d1e9533" width="522.22">
                             <staff n="1">
@@ -1294,7 +1304,7 @@
                                     <beam>
                                         <note xml:id="d1e9535" pname="e" oct="5" dur="16" tie="t" stem.dir="down" accid.ges="f"/>
                                         <note xml:id="d1e9558" pname="e" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d1e9578" pname="d" accid="f" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e9578" pname="d" accid="f" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e9600" pname="c" oct="5" dur="16" stem.dir="down"/>
                                     </beam>
                                     <beam>
@@ -1334,7 +1344,7 @@
                                 <layer n="1">
                                     <beam>
                                         <note xml:id="d1e9983" pname="c" oct="3" dur="8" stem.dir="up"/>
-                                        <note xml:id="d1e9999" pname="d" accid="f" oct="3" dur="8" stem.dir="up" accid.ges="f"/>
+                                        <note xml:id="d1e9999" pname="d" accid="f" oct="3" dur="8" stem.dir="up"/>
                                         <note xml:id="d1e10019" pname="e" oct="3" dur="8" stem.dir="up" accid.ges="f"/>
                                         <note xml:id="d1e10037" pname="e" oct="2" dur="8" stem.dir="up" accid.ges="f"/>
                                     </beam>
@@ -1342,13 +1352,13 @@
                                     <rest xml:id="d1e10071" dur="16"/>
                                     <beam>
                                         <note xml:id="d1e10079" pname="a" oct="3" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d1e10099" pname="g" accid="f" oct="3" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e10099" pname="g" accid="f" oct="3" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e10121" pname="a" oct="3" dur="16" stem.dir="down" accid.ges="f"/>
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="4" staff="1" curvedir="above" startid="#d1e9773" endid="#d1e10152"/>
-                            <tie tstamp="4" staff="2" curvedir="above" startid="#d1e9965" endid="#d1e10406"/>
+                            <tie curvedir="above" startid="#d1e9773" endid="#d1e10152"/>
+                            <tie curvedir="above" startid="#d1e9965" endid="#d1e10406"/>
                         </measure>
                         <sb/>
                         <scoreDef/>
@@ -1360,12 +1370,12 @@
                                     <beam>
                                         <note xml:id="d1e10152" pname="e" oct="5" dur="8" tie="m" stem.dir="down" accid.ges="f"/>
                                         <note xml:id="d1e10175" pname="e" oct="5" dur="16" tie="t" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d1e10198" pname="g" accid="f" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e10198" pname="g" accid="f" oct="5" dur="16" stem.dir="down"/>
                                     </beam>
                                     <beam>
                                         <note xml:id="d1e10220" pname="f" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e10238" pname="e" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d1e10258" pname="d" accid="f" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e10258" pname="d" accid="f" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e10280" pname="c" oct="5" dur="16" stem.dir="down"/>
                                     </beam>
                                     <note xml:id="d1e10298" pname="d" oct="5" dur="4" tie="i" stem.dir="down" accid.ges="f"/>
@@ -1381,12 +1391,12 @@
                                 <layer n="1">
                                     <beam>
                                         <note xml:id="d1e10406" pname="c" oct="5" dur="16" tie="t" stem.dir="down"/>
-                                        <note xml:id="d1e10427" pname="g" accid="f" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e10427" pname="g" accid="f" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e10449" pname="f" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e10467" pname="e" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
                                     </beam>
                                     <beam>
-                                        <note xml:id="d1e10487" pname="d" accid="f" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e10487" pname="d" accid="f" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e10509" pname="c" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e10527" pname="b" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
                                         <note xml:id="d1e10547" pname="a" accid="n" oct="4" dur="16" stem.dir="down"/>
@@ -1414,9 +1424,9 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="1" staff="1" curvedir="above" startid="#d1e10152" endid="#d1e10175"/>
-                            <tie tstamp="3" staff="1" curvedir="above" startid="#d1e10298" endid="#d1e10317"/>
-                            <tie tstamp="4.5" staff="2" curvedir="above" startid="#d1e10662" endid="#d1e11021"/>
+                            <tie curvedir="above" startid="#d1e10152" endid="#d1e10175"/>
+                            <tie curvedir="above" startid="#d1e10298" endid="#d1e10317"/>
+                            <tie curvedir="above" startid="#d1e10662" endid="#d1e11021"/>
                         </measure>
                         <measure n="20" xml:id="d1e10793" width="462.54">
                             <staff n="1">
@@ -1432,7 +1442,7 @@
                                         <note xml:id="d1e10885" pname="e" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
                                     </beam>
                                     <beam>
-                                        <note xml:id="d1e10905" pname="d" accid="f" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e10905" pname="d" accid="f" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e10927" pname="c" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e10945" pname="e" accid="n" oct="5" dur="16" stem.dir="down"/>
                                         <note xml:id="d1e10965" pname="f" oct="5" dur="16" stem.dir="down"/>
@@ -1529,7 +1539,7 @@
                                     <note xml:id="d1e11780" pname="b" accid="n" oct="2" dur="8" stem.dir="up"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="4.5" staff="1" curvedir="above" startid="#d1e11521" endid="#d1e11798"/>
+                            <tie curvedir="above" startid="#d1e11521" endid="#d1e11798"/>
                             <trill startid="#d1e11363" staff="1" place="above"/>
                             <trill staff="2" startid="#d1e11545" place="above"/>
                         </measure>
@@ -1649,7 +1659,7 @@
                                     <note xml:id="d1e12816" pname="c" oct="3" dur="8" stem.dir="up"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="4.5" staff="2" curvedir="below" startid="#d1e12698" endid="#d1e13019"/>
+                            <tie curvedir="below" startid="#d1e12698" endid="#d1e13019"/>
                         </measure>
                         <pb n="3"/>
                         <scoreDef/>
@@ -1711,8 +1721,8 @@
                                     <note xml:id="d1e13284" pname="b" oct="2" dur="8" stem.dir="up" accid.ges="f"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="4.5" staff="1" curvedir="below" startid="#d1e12995" endid="#d1e13302"/>
-                            <tie tstamp="4.5" staff="2" curvedir="below" startid="#d1e13174" endid="#d1e13505"/>
+                            <tie curvedir="below" startid="#d1e12995" endid="#d1e13302"/>
+                            <tie curvedir="below" startid="#d1e13174" endid="#d1e13505"/>
                             <trill staff="1" startid="#d1e12841" place="above"/>
                         </measure>
                         <measure n="25" xml:id="d1e13300" width="359.28">
@@ -1775,7 +1785,7 @@
                                     <note xml:id="d1e13837" pname="e" oct="3" dur="8" stem.dir="down" accid.ges="f"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="4.5" staff="1" curvedir="above" startid="#d1e13483" endid="#d1e13855"/>
+                            <tie curvedir="above" startid="#d1e13483" endid="#d1e13855"/>
                         </measure>
                         <measure n="26" xml:id="d1e13853" width="350.36">
                             <staff n="1">
@@ -1810,7 +1820,7 @@
                                     <note xml:id="d1e14134" pname="d" oct="5" dur="4" stem.dir="down"/>
                                     <note xml:id="d1e14148" pname="e" oct="5" dur="8" stem.dir="down" accid.ges="f"/>
                                     <rest xml:id="d1e14164" dur="8"/>
-                                    <note xml:id="d1e14172" pname="d" accid="f" oct="5" dur="8" stem.dir="down" accid.ges="f"/>
+                                    <note xml:id="d1e14172" pname="d" accid="f" oct="5" dur="8" stem.dir="down"/>
                                 </layer>
                             </staff>
                             <staff n="3">
@@ -1832,7 +1842,7 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="4" staff="1" curvedir="above" startid="#d1e14024" endid="#d1e14344"/>
+                            <tie curvedir="above" startid="#d1e14024" endid="#d1e14344"/>
                         </measure>
                         <sb/>
                         <scoreDef/>
@@ -1902,15 +1912,15 @@
                                     <beam>
                                         <note xml:id="d1e14986" pname="b" oct="3" dur="8" stem.dir="down" accid.ges="f"/>
                                         <note xml:id="d1e15004" pname="d" oct="3" dur="8" stem.dir="down"/>
-                                        <note xml:id="d1e15020" pname="e" accid="f" oct="3" dur="8" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e15020" pname="e" accid="f" oct="3" dur="8" stem.dir="down"/>
                                         <note xml:id="d1e15040" pname="g" oct="3" dur="8" stem.dir="down"/>
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="2" staff="1" curvedir="below" startid="#d1e14493" endid="#d1e14512"/>
-                            <tie tstamp="4.5" staff="1" curvedir="below" startid="#d1e14678" endid="#d1e15058"/>
-                            <tie tstamp="1" staff="2" curvedir="above" startid="#d1e14704" endid="#d1e14721"/>
-                            <tie tstamp="3.5" staff="2" curvedir="above" startid="#d1e14814" endid="#d1e14833"/>
+                            <tie curvedir="below" startid="#d1e14493" endid="#d1e14512"/>
+                            <tie curvedir="below" startid="#d1e14678" endid="#d1e15058"/>
+                            <tie curvedir="above" startid="#d1e14704" endid="#d1e14721"/>
+                            <tie curvedir="above" startid="#d1e14814" endid="#d1e14833"/>
                         </measure>
                         <measure n="28" xml:id="d1e15056" width="485.94">
                             <staff n="1">
@@ -1965,16 +1975,16 @@
                                     </beam>
                                     <beam>
                                         <note xml:id="d1e15604" pname="f" oct="3" dur="8" stem.dir="down"/>
-                                        <note xml:id="d1e15620" pname="e" accid="f" oct="3" dur="8" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d1e15640" pname="d" accid="f" oct="3" dur="8" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d1e15660" pname="d" accid="f" oct="4" dur="8" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e15620" pname="e" accid="f" oct="3" dur="8" stem.dir="down"/>
+                                        <note xml:id="d1e15640" pname="d" accid="f" oct="3" dur="8" stem.dir="down"/>
+                                        <note xml:id="d1e15660" pname="d" accid="f" oct="4" dur="8" stem.dir="down"/>
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="2" staff="1" curvedir="below" startid="#d1e15185" endid="#d1e15204"/>
-                            <tie tstamp="4" staff="1" curvedir="above" startid="#d1e15286" endid="#d1e15307"/>
-                            <tie tstamp="1" staff="2" curvedir="above" startid="#d1e15347" endid="#d1e15364"/>
-                            <tie tstamp="3" staff="2" curvedir="above" startid="#d1e15441" endid="#d1e15458"/>
+                            <tie curvedir="below" startid="#d1e15185" endid="#d1e15204"/>
+                            <tie curvedir="above" startid="#d1e15286" endid="#d1e15307"/>
+                            <tie curvedir="above" startid="#d1e15347" endid="#d1e15364"/>
+                            <tie curvedir="above" startid="#d1e15441" endid="#d1e15458"/>
                             <mordent startid="#d1e15307" staff="1" place="above" form="inv"/>
                         </measure>
                         <sb/>
@@ -2021,8 +2031,8 @@
                                     <beam>
                                         <note xml:id="d1e16071" pname="f" oct="5" dur="16" tie="t" stem.dir="down"/>
                                         <note xml:id="d1e16092" pname="b" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d1e16113" pname="e" accid="f" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d1e16135" pname="d" accid="f" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d1e16113" pname="e" accid="f" oct="5" dur="16" stem.dir="down"/>
+                                        <note xml:id="d1e16135" pname="d" accid="f" oct="5" dur="16" stem.dir="down"/>
                                     </beam>
                                 </layer>
                             </staff>
@@ -2037,14 +2047,14 @@
                                     <beam>
                                         <note xml:id="d1e16228" pname="b" oct="2" dur="8" stem.dir="up" accid.ges="f"/>
                                         <note xml:id="d1e16246" pname="d" oct="3" dur="8" stem.dir="up"/>
-                                        <note xml:id="d1e16262" pname="e" accid="f" oct="3" dur="8" stem.dir="up" accid.ges="f"/>
+                                        <note xml:id="d1e16262" pname="e" accid="f" oct="3" dur="8" stem.dir="up"/>
                                         <note xml:id="d1e16282" pname="g" oct="2" dur="8" stem.dir="up"/>
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="1.5" staff="1" curvedir="above" startid="#d1e15707" endid="#d1e15726"/>
-                            <tie tstamp="4.5" staff="1" curvedir="above" startid="#d1e15896" endid="#d1e16300"/>
-                            <tie tstamp="3.5" staff="2" curvedir="above" startid="#d1e16052" endid="#d1e16071"/>
+                            <tie curvedir="above" startid="#d1e15707" endid="#d1e15726"/>
+                            <tie curvedir="above" startid="#d1e15896" endid="#d1e16300"/>
+                            <tie curvedir="above" startid="#d1e16052" endid="#d1e16071"/>
                         </measure>
                         <measure n="30" xml:id="d1e16298" width="486.98">
                             <staff n="1">
@@ -2110,9 +2120,9 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="2.5" staff="1" curvedir="below" startid="#d1e16397" endid="#d1e16416"/>
-                            <tie tstamp="1" staff="2" curvedir="above" startid="#d1e16573" endid="#d1e16592"/>
-                            <tie tstamp="3.5" staff="2" curvedir="below" startid="#d1e16745" endid="#d1e16766"/>
+                            <tie curvedir="below" startid="#d1e16397" endid="#d1e16416"/>
+                            <tie curvedir="above" startid="#d1e16573" endid="#d1e16592"/>
+                            <tie curvedir="below" startid="#d1e16745" endid="#d1e16766"/>
                         </measure>
                         <measure n="31" xml:id="d1e16960" width="424.32">
                             <staff n="1">
@@ -2182,8 +2192,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="4.5" staff="1" curvedir="below" startid="#d1e17216" endid="#d1e17237"/>
-                            <tie tstamp="4.5" staff="2" curvedir="below" startid="#d1e17530" endid="#d1e17551"/>
+                            <tie curvedir="below" startid="#d1e17216" endid="#d1e17237"/>
+                            <tie curvedir="below" startid="#d1e17530" endid="#d1e17551"/>
                         </measure>
                         <sb/>
                     </section>
@@ -2418,14 +2428,14 @@
                                     <note xml:id="d1e18935" pname="b" oct="3" dur="8" stem.dir="down" accid.ges="f"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e18899" endid="#d1e19070"/>
+                            <tie curvedir="below" startid="#d1e18899" endid="#d1e19070"/>
                         </measure>
                         <measure n="41" xml:id="d1e18951" width="156.98">
                             <staff n="1">
                                 <layer n="1">
                                     <beam>
                                         <note xml:id="d1e18953" pname="g" oct="4" dur="16" stem.dir="up"/>
-                                        <note xml:id="d1e18971" pname="d" accid="f" oct="5" dur="16" stem.dir="up" accid.ges="f"/>
+                                        <note xml:id="d1e18971" pname="d" accid="f" oct="5" dur="16" stem.dir="up"/>
                                         <note xml:id="d1e18993" pname="c" oct="5" dur="16" stem.dir="up"/>
                                         <note xml:id="d1e19011" pname="b" oct="4" dur="16" stem.dir="up" accid.ges="f"/>
                                         <note xml:id="d1e19031" pname="a" oct="4" dur="16" stem.dir="up" accid.ges="f"/>
@@ -2634,8 +2644,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="below" startid="#d1e20300" endid="#d1e20450"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e20356" endid="#d1e20566"/>
+                            <tie curvedir="below" startid="#d1e20300" endid="#d1e20450"/>
+                            <tie curvedir="below" startid="#d1e20356" endid="#d1e20566"/>
                         </measure>
                         <measure n="48" xml:id="d1e20448" width="171.77">
                             <staff n="1">
@@ -3345,8 +3355,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="above" startid="#d1e24942" endid="#d1e25052"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e24978" endid="#d1e25148"/>
+                            <tie curvedir="above" startid="#d1e24942" endid="#d1e25052"/>
+                            <tie curvedir="below" startid="#d1e24978" endid="#d1e25148"/>
                         </measure>
                         <measure n="72" xml:id="d1e25050" width="131.03">
                             <staff n="1">
@@ -3403,8 +3413,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="above" startid="#d1e25312" endid="#d1e25422"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e25348" endid="#d1e25518"/>
+                            <tie curvedir="above" startid="#d1e25312" endid="#d1e25422"/>
+                            <tie curvedir="below" startid="#d1e25348" endid="#d1e25518"/>
                         </measure>
                         <measure n="74" xml:id="d1e25420" width="131.03">
                             <staff n="1">
@@ -3464,8 +3474,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="above" startid="#d1e25681" endid="#d1e25813"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e25735" endid="#d1e25907"/>
+                            <tie curvedir="above" startid="#d1e25681" endid="#d1e25813"/>
+                            <tie curvedir="below" startid="#d1e25735" endid="#d1e25907"/>
                         </measure>
                         <measure n="76" xml:id="d1e25811" width="139.90">
                             <staff n="1">
@@ -3522,8 +3532,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="above" startid="#d1e26065" endid="#d1e26184"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e26101" endid="#d1e26282"/>
+                            <tie curvedir="above" startid="#d1e26065" endid="#d1e26184"/>
+                            <tie curvedir="below" startid="#d1e26101" endid="#d1e26282"/>
                         </measure>
                         <sb/>
                         <scoreDef/>
@@ -3587,8 +3597,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="below" startid="#d1e26446" endid="#d1e26576"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e26502" endid="#d1e26674"/>
+                            <tie curvedir="below" startid="#d1e26446" endid="#d1e26576"/>
+                            <tie curvedir="below" startid="#d1e26502" endid="#d1e26674"/>
                         </measure>
                         <measure n="80" xml:id="d1e26574" width="148.05">
                             <staff n="1">
@@ -3608,7 +3618,7 @@
                                         <note xml:id="d1e26674" pname="c" oct="4" dur="8" tie="t" stem.dir="up"/>
                                         <note xml:id="d1e26693" pname="b" oct="3" dur="16" stem.dir="up" accid.ges="f"/>
                                         <note xml:id="d1e26713" pname="c" oct="4" dur="16" stem.dir="up"/>
-                                        <note xml:id="d1e26731" pname="d" accid="f" oct="4" dur="16" stem.dir="up" accid.ges="f"/>
+                                        <note xml:id="d1e26731" pname="d" accid="f" oct="4" dur="16" stem.dir="up"/>
                                         <note xml:id="d1e26753" pname="b" oct="3" dur="16" stem.dir="up" accid.ges="f"/>
                                     </beam>
                                 </layer>
@@ -3645,8 +3655,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="below" startid="#d1e26844" endid="#d1e26954"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e26880" endid="#d1e27052"/>
+                            <tie curvedir="below" startid="#d1e26844" endid="#d1e26954"/>
+                            <tie curvedir="below" startid="#d1e26880" endid="#d1e27052"/>
                         </measure>
                         <measure n="82" xml:id="d1e26952" width="148.05">
                             <staff n="1">
@@ -3666,7 +3676,7 @@
                                         <note xml:id="d1e27052" pname="c" oct="4" dur="8" tie="t" stem.dir="up"/>
                                         <note xml:id="d1e27071" pname="b" oct="3" dur="16" stem.dir="up" accid.ges="f"/>
                                         <note xml:id="d1e27091" pname="c" oct="4" dur="16" stem.dir="up"/>
-                                        <note xml:id="d1e27109" pname="d" accid="f" oct="4" dur="16" stem.dir="up" accid.ges="f"/>
+                                        <note xml:id="d1e27109" pname="d" accid="f" oct="4" dur="16" stem.dir="up"/>
                                         <note xml:id="d1e27131" pname="b" oct="3" dur="16" stem.dir="up" accid.ges="f"/>
                                     </beam>
                                 </layer>
@@ -3700,8 +3710,8 @@
                                     <rest xml:id="d1e27292" dur="8"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="below" startid="#d1e27222" endid="#d1e27302"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e27256" endid="#d1e27358"/>
+                            <tie curvedir="below" startid="#d1e27222" endid="#d1e27302"/>
+                            <tie curvedir="below" startid="#d1e27256" endid="#d1e27358"/>
                         </measure>
                         <measure n="84" xml:id="d1e27300" width="102.33">
                             <staff n="1">
@@ -3807,8 +3817,8 @@
                                     <rest xml:id="d1e27818" dur="8"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="above" startid="#d1e27726" endid="#d1e27828"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e27780" endid="#d1e27882"/>
+                            <tie curvedir="above" startid="#d1e27726" endid="#d1e27828"/>
+                            <tie curvedir="below" startid="#d1e27780" endid="#d1e27882"/>
                         </measure>
                         <measure n="88" xml:id="d1e27826" width="93.17">
                             <staff n="1">
@@ -3861,8 +3871,8 @@
                                     <rest xml:id="d1e28088" dur="8"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="above" startid="#d1e27996" endid="#d1e28098"/>
-                            <tie tstamp="3" staff="2" curvedir="above" startid="#d1e28050" endid="#d1e28152"/>
+                            <tie curvedir="above" startid="#d1e27996" endid="#d1e28098"/>
+                            <tie curvedir="above" startid="#d1e28050" endid="#d1e28152"/>
                         </measure>
                         <measure n="90" xml:id="d1e28096" width="93.17">
                             <staff n="1">
@@ -3921,7 +3931,7 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="above" startid="#d1e28266" endid="#d1e28453"/>
+                            <tie curvedir="above" startid="#d1e28266" endid="#d1e28453"/>
                         </measure>
                         <measure n="92" xml:id="d1e28451" width="109.87">
                             <staff n="1">
@@ -3978,8 +3988,8 @@
                                     <rest xml:id="d1e28760" dur="8"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="above" startid="#d1e28668" endid="#d1e28770"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e28724" endid="#d1e28824"/>
+                            <tie curvedir="above" startid="#d1e28668" endid="#d1e28770"/>
+                            <tie curvedir="below" startid="#d1e28724" endid="#d1e28824"/>
                         </measure>
                         <measure n="94" xml:id="d1e28768" width="92.70">
                             <staff n="1">
@@ -4029,8 +4039,8 @@
                                     <note xml:id="d1e29014" pname="g" oct="3" dur="8" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="1" staff="2" curvedir="below" startid="#d1e28957" endid="#d1e28976"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e28976" endid="#d1e29138"/>
+                            <tie curvedir="below" startid="#d1e28957" endid="#d1e28976"/>
+                            <tie curvedir="below" startid="#d1e28976" endid="#d1e29138"/>
                         </measure>
                         <pb n="6"/>
                         <scoreDef/>
@@ -4170,8 +4180,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="below" startid="#d1e29647" endid="#d1e29773"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e29703" endid="#d1e29871"/>
+                            <tie curvedir="below" startid="#d1e29647" endid="#d1e29773"/>
+                            <tie curvedir="below" startid="#d1e29703" endid="#d1e29871"/>
                         </measure>
                         <measure n="101" xml:id="d1e29771" width="137.70">
                             <staff n="1">
@@ -4259,11 +4269,11 @@
                             <staff n="3">
                                 <layer n="1">
                                     <note xml:id="d1e30323" pname="e" oct="3" dur="4" stem.dir="down" accid.ges="f"/>
-                                    <note xml:id="d1e30339" pname="d" accid="f" oct="3" dur="8" stem.dir="down" accid.ges="f"/>
+                                    <note xml:id="d1e30339" pname="d" accid="f" oct="3" dur="8" stem.dir="down"/>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="below" startid="#d1e30247" endid="#d1e30359"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e30303" endid="#d1e30457"/>
+                            <tie curvedir="below" startid="#d1e30247" endid="#d1e30359"/>
+                            <tie curvedir="below" startid="#d1e30303" endid="#d1e30457"/>
                         </measure>
                         <measure n="104" xml:id="d1e30357" width="137.70">
                             <staff n="1">
@@ -5032,8 +5042,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="above" startid="#d1e36095" endid="#d1e36205"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e36131" endid="#d1e36301"/>
+                            <tie curvedir="above" startid="#d1e36095" endid="#d1e36205"/>
+                            <tie curvedir="below" startid="#d1e36131" endid="#d1e36301"/>
                         </measure>
                         <measure n="128" xml:id="d1e36203" width="129.33">
                             <staff n="1">
@@ -5090,8 +5100,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie tstamp="3" staff="1" curvedir="above" startid="#d1e36465" endid="#d1e36576"/>
-                            <tie tstamp="3" staff="2" curvedir="below" startid="#d1e36501" endid="#d1e36672"/>
+                            <tie curvedir="above" startid="#d1e36465" endid="#d1e36576"/>
+                            <tie curvedir="below" startid="#d1e36501" endid="#d1e36672"/>
                         </measure>
                         <measure n="130" xml:id="d1e36574" width="129.33">
                             <staff n="1">
