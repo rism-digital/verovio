@@ -16,7 +16,9 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "chord.h"
 #include "mensur.h"
+#include "note.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -142,6 +144,23 @@ int DurationInterface::GetActualDur()
     // maxima (-1) is a mensural only value
     if (this->GetDur() == DURATION_maxima) return DUR_MX;
     return (this->GetDur() & DUR_MENSURAL_MASK);
+}
+
+int DurationInterface::GetNoteOrChordDur(LayerElement *element)
+{
+    if (element->Is() == CHORD) {
+        return this->GetActualDur();
+    }
+    else if (element->Is() == NOTE) {
+        Note *note = dynamic_cast<Note *>(element);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord)
+            return chord->GetActualDur();
+        else
+            return this->GetActualDur();
+    }
+    return this->GetActualDur();
 }
 
 bool DurationInterface::IsMensural()

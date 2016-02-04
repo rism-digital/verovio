@@ -109,7 +109,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
         AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
         Alignment *pos
             = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
-        x1 = pos ? pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100) : measure->GetDrawingX();
+        x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
+                 : measure->GetDrawingX();
         x2 = interface->GetEnd()->GetDrawingX();
         spanningType = SPANNING_END;
     }
@@ -123,7 +124,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
         AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
         Alignment *pos
             = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
-        x1 = pos ? pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100) : measure->GetDrawingX();
+        x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
+                 : measure->GetDrawingX();
         // We need the last measure of the system for x2
         Measure *last = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(last)) return;

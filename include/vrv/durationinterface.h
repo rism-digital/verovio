@@ -78,6 +78,12 @@ public:
     int GetActualDur();
 
     /**
+     * If the element is part of a chord, return the chord actual duration, otherwise the note actual duration.
+     * Since we need to check what the element is, we need to pass it as parameter.
+     */
+    int GetNoteOrChordDur(LayerElement *element);
+
+    /**
      * Return true if the value is a mensural (DURATION_longa, brevis, etc.)
      */
     bool IsMensural();
