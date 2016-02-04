@@ -260,7 +260,7 @@ public:
     //
 private:
     std::string m_filename;
-    std::stringstream m_streamStringOutput;
+    std::ostringstream m_streamStringOutput;
     bool m_writeToStreamString;
     int m_page;
     bool m_scoreBasedMEI;

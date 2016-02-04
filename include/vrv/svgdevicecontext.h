@@ -171,7 +171,7 @@ private:
     // the page
     // some viewer seem to support to have the <defs> at the end, but some do not (pdf2svg, for example)
     // for this reason, the full svg is finally written a string from the destructor or when Flush() is called
-    std::stringstream m_outdata;
+    std::ostringstream m_outdata;
 
     bool m_committed; // did we flushed the file?
     int m_width, m_height;

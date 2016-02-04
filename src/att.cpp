@@ -447,7 +447,7 @@ data_TIE Att::StrToTie(std::string value)
 
 std::string Att::XsdPosintlistToStr(xsd_posIntList data)
 {
-    std::stringstream ss;
+    std::ostringstream ss;
     for (size_t i = 0; i < data.size(); ++i) {
         if (i != 0) ss << " ";
         ss << data[i];
@@ -458,7 +458,7 @@ std::string Att::XsdPosintlistToStr(xsd_posIntList data)
 xsd_posIntList Att::StrToXsdPosintlist(std::string value)
 {
     xsd_posIntList list;
-    std::stringstream iss(value);
+    std::istringstream iss(value);
     std::string token;
     while (std::getline(iss, token, ' ')) {
         list.push_back(atoi(token.c_str()));

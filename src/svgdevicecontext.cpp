@@ -592,7 +592,7 @@ void SvgDeviceContext::DrawBackgroundImage(int x, int y)
 
 std::string SvgDeviceContext::GetColour(int colour)
 {
-    std::stringstream ss;
+    std::ostringstream ss;
     ss << std::hex;
 
     switch (colour) {
