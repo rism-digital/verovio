@@ -4,7 +4,7 @@
 
 
 <p>
-    Verovio supports basic <code>&lt;app&gt;</code> and <code>&lt;rdg&gt;</code>/<code>&lt;lem&gt;</code> elements. During rendering, the lemma or the first reading is selected by default. A specific reading can easily be selected using the <code>--rdg-xpath-query=QUERY</code> option (<code>rdgXPathQuery</code> with the JavaScript toolkit).
+    Verovio supports basic <code>&lt;app&gt;</code> and <code>&lt;rdg&gt;</code>/<code>&lt;lem&gt;</code> elements. During rendering, the lemma or the first reading is selected by default. A specific reading can easily be selected using the <code>--rdg-xpath-query=QUERY</code> option (<code>appXPathQuery</code> with the JavaScript toolkit).
 </p>
 
 <p>
@@ -13,12 +13,12 @@
 <div id="svg_output-1" style="overflow:auto;"/>
 
 <p>
-    By passing the a <code>./rdg[contains(@source, '1570')]</code> value to the <code>--rdg-xpath-query</code> option, we can display the reading encoded with <code>&lt;rdg&gt;</code> elements with a <code>@source</code> attribute with value "1570". In this particular case, this will render alternate lyrics and notes in the fourth measure. It will also render an alternate <code>&lt;scoreDef&gt;</code> with a <code>&lt;staffDef&gt;</code> where some of the attributes are different (<code>@label</code>). Non redefined attributes (e.g. <code>@clef.line</code> or <code>@clef.shape</code>) are preserved from the original <code>&lt;staffDef&gt;</code>.
+    By passing the a <code>./rdg[contains(@source, '1570')]</code> value to the <code>--app-xpath-query</code> option, we can display the reading encoded with <code>&lt;rdg&gt;</code> elements with a <code>@source</code> attribute with value "1570". In this particular case, this will render alternate lyrics and notes in the fourth measure. It will also render an alternate <code>&lt;scoreDef&gt;</code> with a <code>&lt;staffDef&gt;</code> where some of the attributes are different (<code>@label</code>). Non redefined attributes (e.g. <code>@clef.line</code> or <code>@clef.shape</code>) are preserved from the original <code>&lt;staffDef&gt;</code>.
 </p>
 <div id="svg_output-2" style="overflow:auto;"/>
 
 <p>
-    Similarly, the <code>--rdg-xpath-query</code> option can be used to select a specific <code>&lt;scoreDef&gt;</code>, here with the <code>./rdg[contains(@label, 'original')]</code> value.
+    Similarly, the <code>--app-xpath-query</code> option can be used to select a specific <code>&lt;scoreDef&gt;</code>, here with the <code>./rdg[contains(@label, 'original')]</code> value.
 </p>
 <div id="svg_output-3" style="overflow:auto;"/>
 <script type="text/javascript">
