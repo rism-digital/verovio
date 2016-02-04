@@ -168,7 +168,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     bool up = true;
     data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
     data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
-    data_STEMDIRECTION stemDir;
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
 

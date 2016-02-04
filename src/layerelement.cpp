@@ -119,6 +119,9 @@ Beam *LayerElement::IsInBeam()
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
 {
     if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
+        DurationInterface *durationInterface = dynamic_cast<DurationInterface *>(this);
+        assert(durationInterface);
+        if (durationInterface->GetActualDur() < DUR_2) return this->GetDrawingY() + doc->GetDrawingUnit(staffSize);
         // We should also take into accound the stem shift to the right
         StemmedDrawingInterface *stemmedDrawingInterface = dynamic_cast<StemmedDrawingInterface *>(this);
         assert(stemmedDrawingInterface);
@@ -135,6 +138,9 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
 int LayerElement::GetDrawingBottom(Doc *doc, int staffSize)
 {
     if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
+        DurationInterface *durationInterface = dynamic_cast<DurationInterface *>(this);
+        assert(durationInterface);
+        if (durationInterface->GetActualDur() < DUR_2) return this->GetDrawingY() - doc->GetDrawingUnit(staffSize);
         // We should also take into accound the stem shift to the right
         StemmedDrawingInterface *stemmedDrawingInterface = dynamic_cast<StemmedDrawingInterface *>(this);
         assert(stemmedDrawingInterface);
