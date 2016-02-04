@@ -316,6 +316,7 @@
                                     <note xml:id="d648110e483" pname="a" oct="3" dur="4" stem.dir="down" accid.ges="f"/>
                                 </layer>
                             </staff>
+                            <tempo staff="1" place="above" tstamp="0">Poco Adagio</tempo>
                             <dynam tstamp="3.417" place="below" startto="-2" staff="1">p</dynam>
                             <slur curvedir="below" startid="#d648110e110" endid="d648110e518" />
                             <dynam tstamp="1" place="below" staff="4">p</dynam>
