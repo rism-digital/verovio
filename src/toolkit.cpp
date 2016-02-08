@@ -172,7 +172,7 @@ bool Toolkit::SetFormat( std::string const &informat )
     else if(informat == "musicxml")
         m_format = MUSICXML;
     else {
-        LogError("Input format can only be: mei, pae, xml or darms");
+        LogError("Input format can only be: mei, pae, musicxml or darms");
         return false;
     }
     return true;
