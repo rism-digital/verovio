@@ -85,7 +85,7 @@ void display_usage() {
     
     cerr << " -b, --border=BORDER        Add border (default is " << DEFAULT_PAGE_LEFT_MAR << ")" << endl;
     
-    cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae, xml (default is pae)" << endl;
+    cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae, musicxml (default is pae)" << endl;
     
     cerr << " -h, --page-height=HEIGHT   Specify the page height (default is " << DEFAULT_PAGE_HEIGHT << ")" << endl;
     
