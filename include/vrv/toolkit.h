@@ -14,7 +14,8 @@
 #include "jsonxx.h"
 #endif
 
-#include "utf8.h"
+#include "checked.h"
+#include "unchecked.h"
 
 //----------------------------------------------------------------------------
 

@@ -10,7 +10,7 @@ add_definitions(-g)
 
 EXEC_PROGRAM(../tools/get_git_commit.sh ARGS OUTPUT_VARIABLE GIT_COMMIT)
 
-include_directories(/usr/local/include ../include ../include/vrv ../libmei)
+include_directories(/usr/local/include ../include ../include/midi ../include/pugi ../include/utf8 ../include/vrv ../libmei)
 
 if(NO_PAE_SUPPORT)
   add_definitions(-DNO_PAE_SUPPORT)
@@ -84,7 +84,12 @@ add_executable (verovio
 	../src/view_text.cpp
 	../src/view_tuplet.cpp
 	../src/vrv.cpp
-	../src/pugixml.cpp
+	../src/pugi/pugixml.cpp
+	../src/midi/Binasc.cpp
+	../src/midi/MidiEvent.cpp
+	../src/midi/MidiEventList.cpp
+	../src/midi/MidiFile.cpp
+	../src/midi/MidiMessage.cpp
 	../libmei/attconverter.cpp
 	../libmei/atts_cmn.cpp
 	../libmei/atts_critapp.cpp
