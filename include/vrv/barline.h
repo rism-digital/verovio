@@ -27,7 +27,7 @@ class Barline: public LayerElement,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
+     * Reset method resets all attribute classes.
      */
     ///@{
     Barline();
@@ -72,8 +72,7 @@ class BarlineAttr: public Barline
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
-     * No Reset() method required.
+     * No Reset() method is required.
      */
     ///@{
     BarlineAttr();

@@ -26,7 +26,7 @@ class SystemAligner;
  * this to avoid notes aligning to it
  */
 enum AlignmentType {
-    // Non-justiable
+    // Non-justifiable
     ALIGNMENT_MEASURE_START = 0,
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF_ATTR,
@@ -151,7 +151,7 @@ private:
     int m_yRel;
     int m_yShift;
     /**
-     * Stores temporally the maximum height of the of the staff pointing to it.
+     * Stores temporally the maximum height of the staff pointing to it.
      * It is set and integrated as m_yShift.
      */
     int m_maxHeight;
@@ -204,7 +204,7 @@ public:
     
     /**
      * Returns the GraceAligner for the Alignment.
-     * Creates it if necessary.
+     * Create it if necessary.
      */
     GraceAligner *GetGraceAligner( );
     
@@ -214,13 +214,13 @@ public:
     bool HasGraceAligner( ) { return (m_graceAligner != NULL); };
     
     /**
-     * Correct the X alignment of grace notes once the the content of a system has been aligned and laid out.
+     * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the GraceAligner.
      */
     virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params );
     
     /**
-     * Correct the X alignment once the the content of a system has been aligned and laid out.
+     * Correct the X alignment once the content of a system has been aligned and laid out.
      * Special case of functor redirected from Measure.
      */
     virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params );
@@ -312,13 +312,13 @@ public:
     
     /**
      * Keep the maximum time of the measure.
-     * This correspond to the whole duration of the measure and 
+     * This corresponds to the whole duration of the measure and
      * should be the same for all staves/layers.
      */
     void SetMaxTime( double time );
     
     /**
-     * @name Set and get the non justifiable margin
+     * @name Set and get the non-justifiable margin
      */
     ///@{
     void SetNonJustifiableMargin( int margin ) { m_nonJustifiableLeftMargin = margin; };
@@ -328,7 +328,7 @@ public:
     /**
      * Get left Alignment for the measure.
      * For each MeasureAligner, we keep and Alignment for the left position.
-     * The Alignment time will be always stay 0.0 and be the first in the list.
+     * The Alignment time will be always 0.0 and will appear first in the list.
      */
     Alignment *GetLeftAlignment( ) { return m_leftAlignment; };
     
@@ -375,7 +375,7 @@ private:
     Alignment *m_rightAlignment;
     
     /**
-     * Store the measure non justifiable margin used by the scoreDef attributes.
+     * Store measure's non-justifiable margin used by the scoreDef attributes.
      */
     int m_nonJustifiableLeftMargin;
 };
@@ -410,7 +410,7 @@ public:
     void AlignStack( );
     
     /**
-     * @name Setter and getter for the width ofthe group of grace notes
+     * @name Setter and getter for the width of the group of grace notes
      */
     ///@{
     void SetWidth( int totalWidth ) { m_totalWidth = totalWidth; };
@@ -423,7 +423,7 @@ public:
     
 private:
     /**
-     * The stack of notes where the are piled up before getting aligned
+     * The stack of notes where they are piled up before getting aligned
      */
     ArrayOfObjects m_noteStack;
     /**

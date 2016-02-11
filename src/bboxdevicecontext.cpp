@@ -123,7 +123,7 @@ Point BBoxDeviceContext::GetLogicalOrigin( )
     return Point( 0, 0 );
 }
 
-// claculated better
+// calculated better
 void BBoxDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
 {
     int vals[4];

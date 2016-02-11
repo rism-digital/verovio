@@ -63,7 +63,7 @@ public:
     int GetStaffPosOnPage( Staff *staff );
     
     /**
-     * Do the layout of the page, whichi means aligning is content horizontally
+     * Do the layout of the page, which means aligning its content horizontally
      * and vertically, and justify horizontally and vertically if wanted.
      * This will be done only if m_layoutDone is false or force is true.
      */
@@ -131,13 +131,13 @@ public:
      * Hold the top scoreDef of the page.
      * The value must be initialized by going through the whole score for finding
      * all the clef or key changes that might occur within the text.
-     * The value is initialized with by the Object::SetCurrentScoreDef functor.
+     * The value is initialized by the Object::SetCurrentScoreDef functor.
      */
     ScoreDef m_drawingScoreDef;
 
 private:
     /**
-     * A flag for indicating whether the layout has been done or not
+     * A flag for indicating whether the layout has been done or not.
      * If yes, Layout will not layout the page (again) unless
      * the force parameter is set.
      */

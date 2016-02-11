@@ -456,8 +456,8 @@ to keep consecutive symbols from overlapping or nearly overlapping: we assume sp
 will be increased as necessary later to avoid that. For modern notation (CMN), ideal space
 is a function of time interval.
  
-The power function we currently use is isn't quite right; see _Behind Bars_, p. 39. We also
-need more flexibility: for example, for some purposes, spacing propoortional to duration is
+The power function we currently use isn't quite right; see _Behind Bars_, p. 39. We also
+need more flexibility: for example, for some purposes, spacing proportional to duration is
 desirable. The best solution is probably to get ideal spacing from a user-definable table. */
 
 int Alignment::HorizontalSpaceForDuration(double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)

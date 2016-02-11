@@ -56,7 +56,7 @@ int       quiet2Q = 0;               // used with -Q option
 
 // Global variables:
 char data_line[10001] = {0};
-#define MAX_DATA_LEN 1024 // One line of the pae file whould not be this long!
+#define MAX_DATA_LEN 1024 // One line of the pae file would not be that long!
 char data_key[MAX_DATA_LEN]; 
 char data_value[MAX_DATA_LEN]; //ditto as above
 
@@ -377,7 +377,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         measure_count++;
     }
 
-    // add miniaml scoreDef
+    // add minimal scoreDef
     StaffGrp *staffGrp = new StaffGrp();
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN( 1 );
@@ -1202,7 +1202,7 @@ void PaeInput::parseNote(pae::Note *note) {
         element = mnote;
     }
     
-    // Does this note have a clef change? push it before everyting else
+    // Does this note have a clef change? push it before everything else
     if (note->clef) {
         addLayerElement(note->clef);
     }
@@ -1398,7 +1398,7 @@ void PaeInput::getAtRecordKeyValue(char *key, char* value,
     
     strcpy(value, &input[index]);
     
-    // Thruncate string to first space
+    // Truncate string to first space
     size_t i;
     for (i = strlen(value) - 2; i > 0; i--) {
         if (isspace(value[i])) {

@@ -94,7 +94,7 @@ public:
     virtual bool WriteObject( Object *object );
     
     /**
-     * Writing object method that must be overriden in child class.
+     * Writing object method that must be overriden in the child class.
      */
     virtual bool WriteObjectEnd( Object *object );
     
@@ -104,7 +104,7 @@ public:
     std::string GetOutput( int page = -1 );
     
     /**
-     * Setter for score-based MEI output (non implemented)
+     * Setter for score-based MEI output (not implemented)
      */
     void SetScoreBasedMEI( bool scoreBasedMEI ) { m_scoreBasedMEI = scoreBasedMEI; };
 
@@ -113,7 +113,7 @@ private:
     bool WriteMeiDoc( Doc *doc );
     
     /**
-     * @name Methods for wrinting MEI containers (measures, staff, etc) scoreDef and related.
+     * @name Methods for writing MEI containers (measures, staff, etc) scoreDef and related.
      */
     ///@{
     bool WriteMeiPage( pugi::xml_node currentNode, Page *page );
@@ -127,7 +127,7 @@ private:
     ///@}
     
     /**
-     * @name Methods for wrinting LayerElement children.
+     * @name Methods for writing LayerElement children.
      * Called from WriteLayerElement.
      */
     ///@{
@@ -157,7 +157,7 @@ private:
     ///@}
     
     /**
-     * @name Methods for wrining FloatingElement
+     * @name Methods for writing FloatingElement
      */
     ///@{
     void WriteMeiSlur( pugi::xml_node currentNode, Slur *slur );
@@ -177,7 +177,7 @@ private:
     ///@}
     
     /**
-     * @name Methods for wrinting other mei elements
+     * @name Methods for writing other mei elements
      */
     ///@{
     void WriteMeiVerse( pugi::xml_node currentNode, Verse *verse );
@@ -185,7 +185,7 @@ private:
     ///@}
     
     /**
-     * @name Methods for wrinting a sameAs attribute
+     * @name Methods for writing a sameAs attribute
      * The method has to be called by classed that support it (e.g., LayerElement)
      * To be changed to Att
      */
@@ -197,7 +197,7 @@ private:
     void WriteUnsupportedAttr( pugi::xml_node currentNode, Object *object );
     
     /**
-     * @name Methods for wrinting LayerElement, EditorialElement and interfaces.
+     * @name Methods for writing LayerElement, EditorialElement and interfaces.
      * Call WriteDurationInferface from WriteNote, for example.
      */
     ///@{
@@ -212,7 +212,7 @@ private:
     ///@}
     
     /**
-     * @name Methods for wrinting the XML text content
+     * @name Methods for writing the XML text content
      */
     void WriteText( pugi::xml_node currentNode, Object *object );
 	
@@ -261,7 +261,7 @@ public:
     /**
      * Set an xPath query for selecting specific <rdg>.
      * By default, the first <lem> or <rdg> is loaded.
-     * If a query is provided, the element retieved by the specified xPath
+     * If a query is provided, the element retrieved by the specified xPath
      * query will be selected (if any, otherwise the first one will be used).
      */
     virtual void SetRdgXPathQuery( std::string rdgXPathQuery ) { m_rdgXPathQuery = rdgXPathQuery; };
@@ -273,9 +273,9 @@ private:
     /**
      * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related. 
      * For each container (page, system, measure, staff and layer) there is one method for 
-     * reading the element and one method for reading it children. The method for reading
+     * reading the element and one method for reading its children. The method for reading
      * the children can also be called when reading EditorialElement objects (<lem> or <rdg>
-     * for example. The filter object is optionnal and can be set for filtering the allowed 
+     * for example. The filter object is optional and can be set for filtering the allowed
      * children (see MeiInput::IsAllowed)
      */
     ///@{

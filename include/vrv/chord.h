@@ -25,7 +25,7 @@ namespace vrv {
 
 /**
  * This class represents a collection of notes in the same layer with the
- *    same onset time.
+ * same onset time.
  * A chord is contained in a layer.
  * It contains notes.
  */
@@ -39,7 +39,7 @@ class Chord: public LayerElement, public ObjectListInterface, public StemmedDraw
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Chord( );
@@ -70,18 +70,18 @@ public:
      * Return information about the position in the chord
      */
     ///@{
-    /** Return 0 if the note id the middle note, -1 if below it and 1 if above */
+    /** Return 0 if the note id is the middle note, -1 if below it and 1 if above */
     int PositionInChord(Note *note);
     ///@}
     
     /**
      * Prepares a 2D grid of booleans to track where accidentals are placed.
-     * Further documentation in chord.cpp comments.
+     * For further documentation, see comments in chord.cpp
      */
     void ResetAccidSpace(int fullUnit);
     
     /**
-     * @name Set and get the stem direction and stem positions
+     * @name Set and get stem direction and stem positions
      * The methods are overriding the interface because we want to apply it to child notes
      */
     ///@{

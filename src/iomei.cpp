@@ -1231,7 +1231,7 @@ bool MeiInput::ReadMeiSystem( Object *parent, pugi::xml_node system )
         vrvSystem->m_yAbs = atoi ( system.attribute( "uly" ).value() ) * DEFINITON_FACTOR;
     }
     
-    // This could me moved to an AddSystem method for consistency with AddLayerElement
+    // This could be moved to an AddSystem method for consistency with AddLayerElement
     if ( parent->Is() == PAGE ) {
         Page *page = dynamic_cast<Page*>( parent );
         assert( page );
@@ -1426,7 +1426,7 @@ bool MeiInput::ReadMeiStaffDef( Object *parent, pugi::xml_node staffDef )
     
     ReadScoreDefInterface(staffDef, vrvStaffDef);
     
-    // This could me moved to an AddMeasure method for consistency with AddLayerElement
+    // This could be moved to an AddMeasure method for consistency with AddLayerElement
     if ( parent->Is() == STAFFGRP ) {
         StaffGrp *staffGrp = dynamic_cast<StaffGrp*>( parent );
         assert( staffGrp );
@@ -1449,7 +1449,7 @@ bool MeiInput::ReadMeiMeasure( Object *parent, pugi::xml_node measure )
     vrvMeasure->ReadCommon(measure);
     vrvMeasure->ReadMeasureLog(measure);
     
-    // This could me moved to an AddMeasure method for consistency with AddLayerElement
+    // This could be moved to an AddMeasure method for consistency with AddLayerElement
     if ( parent->Is() == SYSTEM ) {
         System *system = dynamic_cast<System*>( parent );
         assert( system );
@@ -1553,7 +1553,7 @@ bool MeiInput::ReadMeiStaff( Object *parent, pugi::xml_node staff )
         LogWarning("No @n on <staff> might yield unpredictable results");
     }
     
-    // This could me moved to an AddLayer method for consistency with AddLayerElement
+    // This could be moved to an AddLayer method for consistency with AddLayerElement
     if ( parent->Is() == MEASURE ) {
         Measure *measure = dynamic_cast<Measure*>( parent );
         assert( measure );
@@ -1610,7 +1610,7 @@ bool MeiInput::ReadMeiLayer( Object *parent, pugi::xml_node layer )
         LogWarning("No @n on <layer> might yield unpredictable results");
     }
     
-    // This could me moved to an AddLayer method for consistency with AddLayerElement
+    // This could be moved to an AddLayer method for consistency with AddLayerElement
     if ( parent->Is() == STAFF ) {
         Staff *staff = dynamic_cast<Staff*>( parent );
         assert( staff );

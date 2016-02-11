@@ -50,7 +50,7 @@ public:
     
     /**
      * @name Setters
-     * Non virtual methods cannot be overriden and manage the Pen, Brush and FontInfo stacks
+     * Non-virtual methods cannot be overriden and manage the Pen, Brush and FontInfo stacks
      */
     ///@{
     void SetBrush( int colour, int opacity );
@@ -68,7 +68,7 @@ public:
     ///}
 
     /**
-     * @name Getters for text extend (non virtual)
+     * @name Getters for text extend (non-virtual)
      */
     ///@{
     virtual void GetTextExtent( const std::string& string, int *w, int *h );
@@ -120,8 +120,8 @@ public:
      * @name Temporarily deactivate a graphic
      * This can be used for example for not taking into account the bounding box of parts of the graphic.
      * One example is the connectors in lyrics.
-     * This is not a virtual method and cannot be overriden. In only changes a flag. The effect of the flag
-     * has to be defined in the child class. It should not be call twice in a row.
+     * This is a non-virtual method and hence cannot be overriden. In only changes a flag. The effect of the flag
+     * has to be defined in the child class. It should not be called twice in a row.
      */
     ///@{
     void DeactivateGraphic( );

@@ -23,7 +23,7 @@ class Object;
 
 /** 
  * This class is an interface for elements with duration, such as notes and rests.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class DurationInterface: public Interface,
     public AttAugmentdots,
@@ -37,7 +37,7 @@ class DurationInterface: public Interface,
 public:
     /**
      * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     DurationInterface();
@@ -57,7 +57,7 @@ public:
     /**
      * Returns the duration (in double) for the element for mensural notation
      * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
-     * need to be modifiy for shorter equality in later repertoire.
+     * need to be modified for shorter equality in later repertoire.
      */
     virtual double GetAlignmentMensuralDuration( int num, int numbase, Mensur *currentMensur );
     
@@ -86,7 +86,7 @@ public:
     bool IsMensural();
     
     /**
-     * Inteface comparison operator. 
+     * Interface comparison operator.
      * Check if the LayerElement has a DurationInterface and compare attributes
      */
     bool HasIdenticalDurationInterface(DurationInterface  *otherDurationInterface);
