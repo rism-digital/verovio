@@ -24,7 +24,7 @@ class Object;
 //----------------------------------------------------------------------------
 
 /**
- * This base class for all MEI att classes.
+ * This is the base class for all MEI att classes.
  * It is not an abstract class but it should not be instanciated directly.
  * The att classes are generated with the libmei parser for Verovio.
 */
@@ -157,7 +157,7 @@ public:
 /**
  * This is a base class for regrouping MEI att classes.
  * It is not an abstract class but it should not be instanciated directly.
- * The inherited classes should overwrite the InterfaceId method for returning
+ * The inherited classes should override the InterfaceId method for returning
  * their own InterfaceId.
  */
 
@@ -185,7 +185,7 @@ public:
 
     /**
      * Virtual method returning the InterfaceId of the interface.
-     * Needs to be overwritten in child classes.
+     * Needs to be overriden in child classes.
      */
     virtual InterfaceId IsInterface() { return INTERFACE; };
 

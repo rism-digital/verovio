@@ -501,7 +501,7 @@ p. 39. But we need something more flexible, because, for example: (1) We're inte
 music with notes of very long duration: say, music in mensural notation containing longas
 or maximas; such music is usually not spaced by duration, but we support spacing by
 duration if the user wishes, and standard engravers' rules would waste a lot of space.
-(2) For some purposes, spacing strictly propoortional to duration is desirable. The most
+(2) For some purposes, spacing strictly proportional to duration is desirable. The most
 flexible solution might be to get ideal spacing from a user-definable table, but using a
 formula with parameters can come close and has other advantages. */
 

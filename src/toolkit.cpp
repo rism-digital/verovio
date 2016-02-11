@@ -666,12 +666,12 @@ bool Toolkit::Insert(std::string elementType, std::string startid, std::string e
     if (!m_doc.GetDrawingPage()) return false;
     Object *start = m_doc.GetDrawingPage()->FindChildByUuid(startid);
     Object *end = m_doc.GetDrawingPage()->FindChildByUuid(endid);
-    // Check that start and end element exists
+    // Check if both start and end elements exist
     if (!start || !end) {
         LogMessage("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
         return false;
     }
-    // Check that it is a LayerElement
+    // Check if it is a LayerElement
     if (!dynamic_cast<LayerElement *>(start)) {
         LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
         return false;

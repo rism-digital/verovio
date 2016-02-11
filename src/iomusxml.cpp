@@ -216,7 +216,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
     staffNb--;
     Staff *staff = dynamic_cast<Staff *>(measure->m_children.at(staffNb));
     assert(staff);
-    // Now look for the layer with the correpsonding voice
+    // Now look for the layer with the corresponding voice
     int layerNb = 1;
     std::string layerNbStr = GetContentOfChild(node, "voice");
     if (!layerNbStr.empty()) {
@@ -553,7 +553,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, System *system, int nb
         pugi::xpath_node xmlMeasure = *it;
         Measure *measure = new Measure();
         ReadMusicXmlMeasure(xmlMeasure.node(), measure, nbStaves, staffOffset);
-        // Add the measure to the system - if already there from a previous part will just merge the content
+        // Add the measure to the system - if already there from a previous part we'll just merge the content
         AddMeasure(system, measure, i);
         i++;
     }
@@ -681,7 +681,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     // tuplet start
     // For now tuplet with beam if starting at the same time. However, this will quite likely not
     // work if we have a tuplet over serveral beams. We would need to check which one is ending first
-    // in order to determin which one is on top of the hierarchy. Also, it is not 100% sure that we
+    // in order to determine which one is on top of the hierarchy. Also, it is not 100% sure that we
     // can represent them as tuplet and beam elements.
     pugi::xpath_node tupletStart = notations.node().select_single_node("tuplet[@type='start']");
     if (tupletStart) {

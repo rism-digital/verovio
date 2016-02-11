@@ -21,7 +21,7 @@ class Accid : public LayerElement, public PositionInterface, public AttAccidenta
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Accid();

@@ -105,7 +105,7 @@ public:
 
     /**
      * Reset the object, that is 1) removing all childs and 2) resetting all attributes.
-     * The method is virual, so _always_ call the parent in the method overriding it.
+     * The method is virtual, so _always_ call the parent in the method overriding it.
      */
     virtual void Reset() { ClearChildren(); };
 
@@ -736,7 +736,7 @@ public:
 
     /**
      * Is true if the bounding box (self or content) has been updated at least once.
-     * We need this to avoid not updating bounding boxes to screw up the layout with their intial values.
+     * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
      */
     bool HasUpdatedBB() { return m_updatedBB; };
 

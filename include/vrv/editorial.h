@@ -32,14 +32,14 @@ enum VisibilityType { Hidden = 0, Visible };
 
 /**
  * This class is a base class for the editorial element containing musical
- * content. For example <rgd> or <add>.
+ * content, for example <rgd> or <add>.
  * It is not an abstract class but should not be instantiated directly.
  */
 class EditorialElement : public DocObject, public AttCommon, public AttCommonPart {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     EditorialElement();
@@ -175,7 +175,7 @@ class App : public EditorialElement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     App();
@@ -314,7 +314,7 @@ class Lem : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Lem();
@@ -364,7 +364,7 @@ class Rdg : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Rdg();
@@ -464,7 +464,7 @@ class Supplied : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Supplied();
@@ -489,7 +489,7 @@ class Unclear : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Unclear();
