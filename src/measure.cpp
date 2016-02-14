@@ -240,7 +240,7 @@ int Measure::JustifyX(ArrayPtrVoid *params)
 {
     // param 0: the justification ratio
     // param 1: the justification ratio for the measure (depends on the margin) (unused)
-    // param 2: the non justifiable margin (unused)
+    // param 2: the non-justifiable margin (unused)
     // param 3: the system full width (without system margins) (unused)
     // param 4: the functor to be redirected to the MeasureAligner
     double *ratio = static_cast<double *>((*params).at(0));

@@ -700,7 +700,7 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, int index)
         return 0;
     }
 
-    // find the end of time signature end
+    // find the end of time signature
     i++; // the time signature length is a least 1
     while (i < length) {
         if (!isdigit(incipit[i]) && (incipit[i] != '/') && (incipit[i] != '.')) {
@@ -1039,7 +1039,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     // write back the values we need to save
     note->octave = oct; // save octave
 
-    // tuplets. Decrease the current number is we are in a tuplet
+    // tuplets. Decrease the current number if we are in a tuplet
     // i.e. tuplet_num > 0
     // al the other values just need to be in the first note
     if (tuplet_num > 0) {

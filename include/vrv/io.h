@@ -21,7 +21,7 @@ class Object;
 
 /**
  * This class is a base class for file output stream classes.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class FileOutputStream : public std::ofstream {
 public:
@@ -60,7 +60,7 @@ private:
 
 /**
  * This class is a base class for file input stream classes.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class FileInputStream : public std::ifstream {
 public:
@@ -86,7 +86,7 @@ public:
 
     /**
      * Getter for <app> level flag that is set to true during import
-     * if <measure> within editorial markup are found
+     * if <measure> within editorial markup has been found
      */
     bool HasMeasureWithinEditoMarkup() { return m_hasMeasureWithinEditMarkup; };
 
@@ -97,7 +97,7 @@ public:
 
 private:
     /**
-     * Init values (called by the constructors
+     * Init values (called by the constructors)
      */
     void Init();
 

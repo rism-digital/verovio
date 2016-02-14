@@ -338,7 +338,7 @@ bool Toolkit::LoadString(const std::string &data)
         // LogElapsedTimeEnd("layout");
     }
 
-    // disable justification if no layout or no justification
+    // disable justification if there's no layout or no justification
     if (m_noLayout || m_noJustification) {
         m_doc.SetJustificationX(false);
     }
@@ -422,7 +422,7 @@ bool Toolkit::ParseOptions(const std::string &json_options)
     return true;
 
 #else
-    // The non js version of the app should not use this function.
+    // The non-js version of the app should not use this function.
     return false;
 #endif
 }
@@ -439,7 +439,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
         return o.json();
     }
 
-    // Fill the attribute array (pair of string) by looking by attributes for all available MEI modules
+    // Fill the attribute array (pair of string) by looking at attributes for all available MEI modules
     ArrayOfStrAttr attributes;
     element->GetAttributes(&attributes);
 
@@ -452,7 +452,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     return o.json();
 
 #else
-    // The non js version of the app should not use this function.
+    // The non-js version of the app should not use this function.
     return "";
 #endif
 }
@@ -498,7 +498,7 @@ bool Toolkit::Edit(const std::string &json_editorAction)
     return false;
 
 #else
-    // The non js version of the app should not use this function.
+    // The non-js version of the app should not use this function.
     return false;
 #endif
 }
@@ -513,7 +513,7 @@ std::string Toolkit::GetLogString()
     }
     return str;
 #else
-    // The non js version of the app should not use this function.
+    // The non-js version of the app should not use this function.
     return "";
 #endif
 }

@@ -393,7 +393,7 @@ int MeasureAligner::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
-    // param 2: the minimum measure with (unused)
+    // param 2: the minimum measure width (unused)
     // param 3: the doc for accessing drawing parameters
     // param 4: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int *>((*params).at(0));
@@ -554,7 +554,7 @@ int MeasureAligner::JustifyX(ArrayPtrVoid *params)
 
     int width = GetRightAlignment()->GetXRel() + GetRightAlignment()->GetMaxWidth();
 
-    // the ratio in the measure has to take into account the non justifiable width
+    // the ratio in the measure has to take into account the non-justifiable width
     // for elements within the margin, we do not move them
     // for after the margin (right) we have a position that is given by:
     // (m_xRel - margin) * measureRatio + margin, where measureRatio is given by:
@@ -570,7 +570,7 @@ int Alignment::JustifyX(ArrayPtrVoid *params)
 {
     // param 0: the justification ratio
     // param 1: the justification ratio for the measure (depends on the margin)
-    // param 2: the non justifiable margin
+    // param 2: the non-justifiable margin
     // param 3: the system full width (without system margins) (unused)
     // param 4: the functor to be redirected to the MeasureAligner (unused)
     double *ratio = static_cast<double *>((*params).at(0));
@@ -585,7 +585,7 @@ int Alignment::JustifyX(ArrayPtrVoid *params)
         return FUNCTOR_CONTINUE;
     }
 
-    // the ratio in the measure has to take into account the non justifiable width
+    // the ratio in the measure has to take into account the non-justifiable width
     // for elements within the margin, we do not move them
     // for after the margin (right) we have a position that is given by:
     // (m_xRel - margin) * measureRatio + margin, where measureRatio is given by:

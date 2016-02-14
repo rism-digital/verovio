@@ -32,7 +32,7 @@ class LayerElement : public DocObject {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     LayerElement();
@@ -78,7 +78,7 @@ public:
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
-     * Look for the fist beam parent and check is the note is in is content list.
+     * Look for the first beam parent and check is the note is in is content list.
      * Looking in the content list is necessary for grace notes or imbricated beams.
      */
     Beam *IsInBeam();
@@ -137,11 +137,11 @@ public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
     /**
-     * This store a pointer to the corresponding BeamElementCoord(currentDur > DUR_4)
+     * This stores a pointer to the corresponding BeamElementCoord(currentDur > DUR_4)
      */
     BeamElementCoord *m_beamElementCoord;
     /**
-     * This store a pointer to the cross-staff (if any) and the appropriate layer
+     * This stores a pointer to the cross-staff (if any) and the appropriate layer
      * Initialized in LayerElement::SetDrawingXY
      */
     Staff *m_crossStaff;

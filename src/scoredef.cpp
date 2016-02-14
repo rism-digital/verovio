@@ -72,7 +72,7 @@ bool ScoreDefElement::HasClefAttrInfo()
     // We need at least a @clef.shape and a @clef.line ?
     return (this->HasClefShape() && this->HasClefLine());
 
-    // Eventually we can look a child clef element
+    // Eventually we can look for a child clef element
     // We would probably need to take into account app and rdg?
     return false;
 }
@@ -95,7 +95,7 @@ bool ScoreDefElement::HasMeterSigAttrInfo()
 
 bool ScoreDefElement::HasClefElementInfo()
 {
-    // Eventually we can look a child clef element
+    // Eventually we can look for a child clef element
     // We would probably need to take into account app and rdg?
     return false;
 }
@@ -466,8 +466,8 @@ int ScoreDef::CastOffSystems(ArrayPtrVoid *params)
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(contentSystem->Relinquish(this->GetIdx()));
     (*currentSystem)->AddScoreDef(scoreDef);
-    // This is not perfect since now the scoreDefWith is the one of the intermediate scoreDef (and not
-    // the initial one - for this to be corrected, we would need to parameters, one for the current initial
+    // This is not perfect since now the scoreDefWith is the one of the intermediate scoreDefs (and not
+    // the initial one - for this to be corrected, we would need two parameters, one for the current initial
     // scoreDef and one for the current that will be the initial one at the next system
     // Also, the abbr label (width) changes would not be taken into account
     (*currentScoreDefWidth) = this->GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();

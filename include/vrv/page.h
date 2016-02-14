@@ -30,7 +30,7 @@ class Page : public DocObject {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Page();
@@ -95,7 +95,7 @@ public:
 
     /**
      * Return the width of the content by looking at the first system of the page.
-     * This is used for adjusting the page with when this is the expected behaviour,
+     * This is used for adjusting the page width when this is the expected behaviour,
      * typically with the --no_layout option in the commandline tool
      *
      */

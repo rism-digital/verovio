@@ -35,7 +35,7 @@ class KeySig : public LayerElement, public AttAccidental, public AttPitch {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
+     * Reset method resets all attribute classes.
      */
     ///@{
     KeySig();

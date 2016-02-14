@@ -218,7 +218,7 @@ int TimePointInterface::InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *o
 int TimeSpanningInterface::InterfacePrepareTimeSpanning(ArrayPtrVoid *params, DocObject *object)
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match
-    // param 1: bool* fillList for indicating whether the elements have to be stack or not
+    // param 1: bool* fillList for indicating whether the elements have to be stacked or not
     std::vector<DocObject *> *elements = static_cast<std::vector<DocObject *> *>((*params).at(0));
     bool *fillList = static_cast<bool *>((*params).at(1));
 

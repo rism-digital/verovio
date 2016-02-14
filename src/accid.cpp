@@ -44,7 +44,7 @@ void Accid::Reset()
 }
 
 //----------------------------------------------------------------------------
-// Functors methods
+// Functor methods
 //----------------------------------------------------------------------------
 
 int Accid::PreparePointersByLayer(ArrayPtrVoid *params)

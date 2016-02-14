@@ -145,7 +145,7 @@ void Object::ClearChildren()
 {
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
-        // we need to check if the this is the parent
+        // we need to check if this is the parent
         // ownership might have been given up with Relinquish
         if ((*iter)->m_parent == this) {
             delete *iter;
@@ -422,7 +422,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor
     // We need a pointer to the array for the option to work on a reversed copy
     ArrayOfObjects *children = &this->m_children;
     ArrayOfObjects reversed;
-    // For processing backward, we operated on a copied reversed version
+    // For processing backwards, we operated on a copied reversed version
     // Since we hold pointers, only addresses are copied
     if (direction == BACKWARD) {
         reversed = (*children);
@@ -927,7 +927,7 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     int *min_pos = static_cast<int *>((*params).at(0));
     Doc *doc = static_cast<Doc *>((*params).at(1));
 
-    // starting an new layer
+    // starting new layer
     if (this->Is() == LAYER) {
         (*min_pos) = 0;
         return FUNCTOR_CONTINUE;
@@ -948,7 +948,7 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     // we should have processed aligned before
     assert(note->GetGraceAlignment());
 
-    // the negative offset it the part of the bounding box that overflows on the left
+    // the negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     int negative_offset = -(note->m_contentBB_x1)
@@ -958,7 +958,7 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
         //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }
 
-    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
+    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used)
     if (negative_offset < 0) negative_offset = 0;
 
     // check if the element overlaps with the preceeding one given by (*min_pos)
@@ -1002,7 +1002,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
         return FUNCTOR_CONTINUE;
     }
 
-    // starting an new layer
+    // starting new layer
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer *>(this);
         assert(current_layer);
@@ -1060,7 +1060,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     if (!current->IsGraceNote())
         negative_offset += (doc->GetLeftMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
-    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
+    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used)
     if (negative_offset < 0) negative_offset = 0;
 
     // with a grace note, also take into account the full width of the group given by the GraceAligner
@@ -1122,7 +1122,7 @@ int Object::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
     // ending a layer
     if (this->Is() == LAYER) {
         // mininimum position is the with the layer
-        // we keep it if is higher than what we had so far
+        // we keep it if it's higher than what we had so far
         // this will be used for shifting the right barLine
         (*measure_width) = std::max((*measure_width), (*min_pos));
         return FUNCTOR_CONTINUE;

@@ -223,7 +223,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define MAX_NOTE_DEPTH -1
 
 //----------------------------------------------------------------------------
-// VerovioText codpoints
+// VerovioText codepoints
 //----------------------------------------------------------------------------
 
 /**
