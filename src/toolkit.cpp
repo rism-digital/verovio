@@ -342,7 +342,7 @@ bool Toolkit::LoadString( const std::string &data )
 
 std::string Toolkit::GetMEI( int pageNo, bool scoreBased )
 {
-    // Page number is one-based - correction to 0-based first
+    // Page number is one-based - correct it to 0-based first
     pageNo--;
     
     MeiOutput meioutput( &m_doc, "" );
@@ -408,7 +408,7 @@ bool Toolkit::ParseOptions( const std::string &json_options ) {
     
     // Parse the various flags
     // Note: it seems that there is a bug with jsonxx and emscripten
-    // Boolean value false do not parse properly. We have to use Number instead
+    // Boolean value false won't be parsed properly. We have to use Number instead
     
     if (json.has<jsonxx::Number>("noLayout"))
         SetNoLayout(json.get<jsonxx::Number>("noLayout"));
@@ -537,7 +537,7 @@ void  Toolkit::ResetLogBuffer() {
 
 std::string Toolkit::RenderToSvg( int pageNo, bool xml_declaration )
 {
-    // Page number is one-based - correction to 0-based first
+    // Page number is one-based - correct it to 0-based first
     pageNo--;
     
     // Get the current system for the SVG clipping size

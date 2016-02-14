@@ -191,7 +191,7 @@ public:
     
     /**
      * @name Set and get the stem direction and stem positions
-     * The methods are virtual because they need to be overriden for Chords.
+     * The methods are virtual because they need to be overridden for Chords.
      */
     ///@{
     virtual void SetDrawingStemDir(data_STEMDIRECTION stemDir);

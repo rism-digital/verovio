@@ -50,7 +50,7 @@ public:
     
     /**
      * @name Setters
-     * Non-virtual methods cannot be overriden and manage the Pen, Brush and FontInfo stacks
+     * Non-virtual methods cannot be overridden and manage the Pen, Brush and FontInfo stacks
      */
     ///@{
     void SetBrush( int colour, int opacity );
@@ -120,7 +120,7 @@ public:
      * @name Temporarily deactivate a graphic
      * This can be used for example for not taking into account the bounding box of parts of the graphic.
      * One example is the connectors in lyrics.
-     * This is a non-virtual method and hence cannot be overriden. In only changes a flag. The effect of the flag
+     * This is a non-virtual method and hence cannot be overridden. In only changes a flag. The effect of the flag
      * has to be defined in the child class. It should not be called twice in a row.
      */
     ///@{
@@ -175,7 +175,7 @@ protected:
     bool m_drawingBoundingBoxes;
     /**
      * Flag for indicating if the VerovioText font is currently used.
-     * If used, it has to be initialized to false (e.g., in the overriden version of StartPage) and will be changed in DeviceContext::VrvTextFont
+     * If used, it has to be initialized to false (e.g., in the overridden version of StartPage) and will be changed in DeviceContext::VrvTextFont
      */
     bool m_vrvTextFont;
     

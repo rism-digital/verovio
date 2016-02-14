@@ -121,7 +121,7 @@ void View::DrawTimeSpanningElement( DeviceContext *dc, DocObject *element, Syste
         x2 = interface->GetEnd()->GetDrawingX();
         spanningType = SPANNING_END;
     }
-    // Rare case where neither the first note and the last note are in the current system - draw the connector throughout the system
+    // Rare case where neither the first note nor the last note are in the current system - draw the connector throughout the system
     else {
         // We need the first measure of the system for x1
         Measure *first = dynamic_cast<Measure*>( system->FindChildByType( MEASURE, 1, FORWARD ) );
@@ -954,7 +954,7 @@ void View::DrawSylConnector( DeviceContext *dc, Syl *syl, int x1, int x2, Staff 
     else if ( spanningType ==  SPANNING_END ) {
         // nothing to adjust
     }
-    // Rare case where neither the first note and the last note are in the current system - draw the connector throughout the system
+    // Rare case where neither the first note nor the last note are in the current system - draw the connector throughout the system
     else {
         // nothing to adjust
     }

@@ -65,7 +65,7 @@ typedef std::vector<std::pair<LayerElement*, Point> > ArrayOfLayerElementPointPa
 
 /**
  * The ClassIds are used to identify Object child classes through the Object::Is virtual method.
- * Each Object child class has to have its own id and has to overwrite the Is() method.
+ * Each Object child class has to have its own id and has to override the Is() method.
  * Base classes (e.g., LayerElement) that are never instanciated have boundary ids
  * used for checking if an Object is child of a base class. See for example
  * Object::IsLayerElement.
@@ -145,7 +145,7 @@ enum ClassId {
 
 /**
  * The InterfaceIds are used to identify Interface child classes through the Interface::IsInterface virtual method.
- * Each Interface child class has to have its own id and has to overwrite the IsInterface() method.
+ * Each Interface child class has to have its own id and has to override the IsInterface() method.
  */
 enum InterfaceId {
     INTERFACE,
@@ -169,7 +169,7 @@ enum InterfaceId {
 /**
  * Codes returned by Functors.
  * Default is FUNCTOR_CONTINUE.
- * FUNCTOR_SIBLINGS will no go any deeper in the tree.
+ * FUNCTOR_SIBLINGS won't go any deeper in the tree.
  * FUNCTOR_STOP wil stop the tree processing.
  */
 enum FunctorCode {

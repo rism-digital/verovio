@@ -33,17 +33,17 @@ public:
     virtual ~FileOutputStream();
     
     /**
-     * Writing start export method that must be overriden in child class.
+     * Dummy export method that must be overridden in child class.
      */
     virtual bool ExportFile( ) { return true; }
     
     /**
-     * Writing object method that must be overriden in child class.
+     * Dummy object method that must be overridden in child class.
      */
     virtual bool WriteObject( Object *object ) { return true; };
     
     /**
-     * Writing object method that must be overriden in child class.
+     * Dummy object method that must be overridden in child class.
      */
     virtual bool WriteObjectEnd( Object *object ) { return true; };
     
