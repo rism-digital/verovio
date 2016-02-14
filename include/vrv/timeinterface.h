@@ -23,7 +23,7 @@ class LayerElement;
 
 /** 
  * This class is an interface for elements with duration, such as notes and rests.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class TimeSpanningInterface: public Interface,
     public AttStartendid,
@@ -34,7 +34,7 @@ class TimeSpanningInterface: public Interface,
 public:
     /**
      * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     TimeSpanningInterface();

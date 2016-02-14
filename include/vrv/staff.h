@@ -28,7 +28,7 @@ class TimeSpanningInterface;
  * This class represents a staff in a laid-out score (Doc).
  * A Staff is contained in a System.
  * It contains Measure objects.
- * For unmeasured music, on single Measure is added for simplifying internal processing
+ * For unmeasured music, one single Measure is added for simplifying internal processing
 */
 class Staff: public DocObject,
     public AttCommon
@@ -37,7 +37,7 @@ class Staff: public DocObject,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Staff( int n = -1 );
@@ -97,7 +97,7 @@ public:
     /**
      * Functor for setting running lyrics in staves
      * This is necessary for <syl> that starts in one measure and ends in another one
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
     virtual int FillStaffCurrentLyrics( ArrayPtrVoid *params );
     

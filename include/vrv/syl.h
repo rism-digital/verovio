@@ -34,7 +34,7 @@ class Syl: public LayerElement, public TimeSpanningInterface,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Syl();
@@ -50,7 +50,7 @@ public:
     
     /**
      * Functor for setting wordpos and connector ends
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter
+     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter
      * See PrepareDarwing
      */
     virtual int PrepareLyrics( ArrayPtrVoid *params );

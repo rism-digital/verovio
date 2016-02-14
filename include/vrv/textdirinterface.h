@@ -21,7 +21,7 @@ namespace vrv {
 /** 
  * This class is an interface for elements implementing a text directive, such
  * as <dir>, <tempo>, or <dynam>
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class TextDirInterface: public Interface,
     public AttCommon,
@@ -31,7 +31,7 @@ class TextDirInterface: public Interface,
 public:
     /**
      * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     TextDirInterface();

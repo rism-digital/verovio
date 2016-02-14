@@ -41,7 +41,7 @@ void Dot::Reset()
 }
     
 //----------------------------------------------------------------------------
-// Functors methods
+// Functor methods
 //----------------------------------------------------------------------------
     
 int Dot::PreparePointersByLayer( ArrayPtrVoid *params )

@@ -53,7 +53,7 @@ class Note: public LayerElement, public StemmedDrawingInterface, public Duration
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Note();
@@ -98,7 +98,7 @@ public:
     ///@{
     Chord* IsChordTone( );
     int GetDrawingDur( );
-    bool IsClusterExtreme( ); //used to find if is the highest or lowest note in a cluster
+    bool IsClusterExtreme( ); //used to find if it is the highest or lowest note in a cluster
     ///@}
 
     /**
@@ -117,7 +117,7 @@ public:
     
     /**
      * Functor for setting wordpos and connector ends
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
     virtual int PrepareLyrics( ArrayPtrVoid *params );
  
@@ -161,7 +161,7 @@ private:
     /**
      * Tie attributes are represented a pointers to Tie objects.
      * There is one pointer for the initial attribute (TIE_i or TIE_m).
-     * The note with the initial attribute owns the Tie object and take care of deleting it
+     * The note with the initial attribute owns the Tie object and takes care of deleting it
      */
     Tie *m_drawingTieAttr;
     /**

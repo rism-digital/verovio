@@ -30,7 +30,7 @@ class Functor;
  * For example, we want to process all staves one by one, and within each staff
  * all layer one by one, and so one (lyrics, etc.). In IntTree, we can store 
  * @n with all existing values (1 => 1 => 1; 2 => 1 => 1)
- * The stucture must be filled first an can then be use by instanciating a vector
+ * The stucture must be filled first and can then be used by instanciating a vector
  * of corresponding AttComparison (typically AttCommonNComparison for @n attribute).
  * See Doc::PrepareDrawing for an example.
  */
@@ -41,7 +41,7 @@ struct IntTree {
 typedef std::map<int, IntTree> IntTree_t;
  
 /**
- * This is a alternate way of representing map of maps. With this solution,
+ * This is the alternate way for representing map of maps. With this solution,
  * we can easily have different types of key (attribute) at each level. We could
  * mix int, string, or even MEI data_* types. The drawback is that a type has to 
  * be defined at each level. Also see Doc::PrepareDrawing for an example.
@@ -66,7 +66,7 @@ class Object
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Object();
@@ -152,13 +152,13 @@ public:
     Object *GetChild( int idx );
     
     /**
-     * Fill an array of pair with all attributes and their value.
-     * Return the number of attribute found.
+     * Fill an array of pairs with all attributes and their values.
+     * Return the number of attributes found.
      */
     int GetAttributes( ArrayOfStrAttr *attributes );
     
     /**
-     * Check if an Object has an attribute with the specified values
+     * Check if an Object has an attribute with the specified value
      */
     bool HasAttribute( std::string attribute, std::string value );
     
@@ -182,7 +182,7 @@ public:
     
     /**
      * Add an EditorialElement as child.
-     * This can happen at many level.
+     * This can happen at many levels.
      */
     void AddEditorialElement( EditorialElement *child );
     
@@ -206,7 +206,7 @@ public:
     int GetChildIndex( const Object *child );
     
     /**
-     * Insert a element at the idx position.
+     * Insert an element at the idx position.
      */
     void InsertChild( Object *element, int idx );
     
@@ -262,13 +262,13 @@ public:
     
     /**
      * Return the first parent of the specified type.
-     * The maxSteps parameter limit the search to a certain number of level if not -1.
+     * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
     Object *GetFirstParent( const ClassId classId, int maxSteps = -1 );
 
     /**
      * Return the last parent that is NOT of the specified type.
-     * The maxSteps parameter limit the search to a certain number of level if not -1.
+     * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
     Object *GetLastParentNot( const ClassId classId, int maxSteps = -1 );
     
@@ -279,9 +279,9 @@ public:
     void FillFlatList( ListOfObjects *list );
     
     /**
-     * Add a sameAs attribute to the object.
+     * Add the sameAs attribute to the object.
      * If a filename is given, the attribute will be filename#id.
-     * If several value are added, they will be separated by a whitespace.
+     * If several values are added, they will be separated by a whitespace.
      */
     void AddSameAs( std::string id, std::string filename = "" );
     
@@ -312,7 +312,7 @@ public:
     
     /**
      * Saves the object (and its children) using the specified output stream.
-     * Creates a functors that will parse the tree.
+     * Creates functors that will parse the tree.
      */
     virtual int Save( FileOutputStream *output );
     
@@ -362,13 +362,13 @@ public:
 
     
     /**
-     * Save the content of and object by calling the appropriate FileOutputStream method
+     * Save the content of any object by calling the appropriate FileOutputStream method
      * param 0: a pointer to the FileOutputStream.
      */
     virtual int Save( ArrayPtrVoid *params );
     
     /**
-     * Save the content of and object by calling the appropriate FileOutputStream method
+     * Save the content of any object by calling the appropriate FileOutputStream method
      * param 0: a pointer to the FileOutputStream.
      */
     virtual int SaveEnd( ArrayPtrVoid *params );
@@ -404,13 +404,13 @@ public:
     virtual int AlignMeasuresEnd( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Correct the X alignment once the the content of a system has been aligned and laid out
+     * Correct the X alignment once the content of a system has been aligned and laid out
      * See Measure::IntegrateBoundingBoxXShift for actual implementation
      */
     virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Correct the X alignment once the the content of a system has been aligned and laid out
+     * Correct the X alignment once the content of a system has been aligned and laid out
      * See Measure::IntegrateBoundingBoxXShift for actual implementation
      */
     virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };    
@@ -422,19 +422,19 @@ public:
     virtual int SetAlignmentXPos( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Lay out the X positions of the grace notes looking that the bounding boxes.
+     * Lay out the X positions of the grace notes looking at the bounding boxes.
      * The m_xShift is updated appropriately
      */
     virtual int SetBoundingBoxGraceXShift( ArrayPtrVoid *params );
     
     /**
-     * Lay out the X positions of the staff content looking that the bounding boxes.
+     * Lay out the X positions of the staff content looking at the bounding boxes.
      * The m_xShift is updated appropriately
      */
     virtual int SetBoundingBoxXShift( ArrayPtrVoid *params );
     
     /**
-     * Lay out the X positions of the staff content looking that the bounding boxes.
+     * Lay out the X positions of the staff content looking at the bounding boxes.
      * This is the Functor called at the end of the measure or a layer.
      */
     virtual int SetBoundingBoxXShiftEnd( ArrayPtrVoid *params );
@@ -465,7 +465,7 @@ public:
     virtual int AlignSystemsEnd( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Correct the Y alignment once the the content of a system has been aligned and laid out
+     * Correct the Y alignment once the content of a system has been aligned and laid out
      * See System::IntegrateBoundingBoxYShift for actual implementation
      */
     virtual int IntegrateBoundingBoxYShift( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
@@ -476,14 +476,14 @@ public:
     virtual int SetAligmentYPos( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Lay out the Y positions of the staff looking that the bounding box of each staff.
+     * Lay out the Y positions of the staff looking at the bounding box of each staff.
      * The m_yShift is updated appropriately
      */
     virtual int SetBoundingBoxYShift( ArrayPtrVoid *params );
     
     
     /**
-     * Lay out the Y positions of the staff looking that the bounding boxes of each staff
+     * Lay out the Y positions of the staff looking at the bounding boxes of each staff.
      * This is the Functor called at the end of the system or a measure.
      */
     virtual int SetBoundingBoxYShiftEnd( ArrayPtrVoid *params );
@@ -524,7 +524,7 @@ public:
     ///@}
     
     /**
-     * Builds a tree of int (IntTree) with the staff/layer/verse numbers
+     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
      * and for staff/layer to be then processed.
      * param 0: IntTree*
      * param 1: IntTree*
@@ -533,10 +533,10 @@ public:
     
     /**
      * Matches start and end for TimeSpanningInterface elements (such as tie or slur)
-     * If fillList is set to false, the only the remaining elements will be matched.
+     * If fillList is set to false, only the remaining elements will be matched.
      * This is used when processing a second time in the other direction
      * param 0: std::vector<DocObject*>* that holds the current elements to match
-     * param 1: bool* fillList for indicating whether the elements have to be stack or not
+     * param 1: bool* fillList for indicating whether the elements have to be stacked or not
      */
     virtual int PrepareTimeSpanning( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
@@ -566,19 +566,19 @@ public:
     
     /**
      * Functor for setting wordpos and connector ends
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
     virtual int PrepareLyrics( ArrayPtrVoid *params )  { return FUNCTOR_CONTINUE; };
     
     /**
      * Functor for setting wordpos and connector ends
-     * The functor is process by doc at the end of a document of closing opened syl.
+     * The functor is processed by doc at the end of a document of closing opened syl.
      */
     virtual int PrepareLyricsEnd( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
      * Functor for setting mRpt drawing numbers (if required)
-     * The functor is process by staff/layer using an ArrayOfAttComparisons filter.
+     * The functor is processed by staff/layer using an ArrayOfAttComparisons filter.
      * param 0: MRpt **currentMRpt
      * param 1: data_BOOLEAN for indicating if the MRpt::m_drawingNumber has to be set or not
      * param 2: ScoreDef * doc scoreDef
@@ -586,8 +586,8 @@ public:
     virtual int PrepareRpt( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Goes through all the TimeSpanningInterface element and set them a current to each staff
-     * where require. For Note with DrawingTieAttr, the functor is redireted to the tie object
+     * Goes through all the TimeSpanningInterface elements and set them a current to each staff
+     * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
      * param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
      */
     virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
@@ -636,8 +636,8 @@ public:
     virtual int CastOffPages( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
     
     /**
-     * Undo the cast of of both pages and system.
-     * This is used by Doc::ContinuousLayout for putting all pages / system continously.
+     * Undo the cast of both pages and system.
+     * This is used by Doc::ContinuousLayout for putting all pages / systems continously.
      */
     virtual int UnCastOff( ArrayPtrVoid *params ) { return FUNCTOR_CONTINUE; };
 
@@ -676,10 +676,10 @@ private:
     void Init(std::string);
     
     /**
-     * Indicated whether the object content is up-to-date or not.
-     * This is usefull for object using sub-lists of objects when drawing.
+     * Indicates whether the object content is up-to-date or not.
+     * This is useful for object using sub-lists of objects when drawing.
      * For example, Beam has a list of children notes and this value indicates if the
-     * list needs to be updated or not. Is is moslty and optimization feature.
+     * list needs to be updated or not. Is is mostly an optimization feature.
      */
     bool m_isModified;
     
@@ -771,7 +771,7 @@ public:
  * This class is an pseudo interface for elements maintaining a flat list of
  * children LayerElement for processing.
  * The list is a flatten list of pointers to children elements.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class ObjectListInterface
 {

@@ -206,7 +206,7 @@ int System::JustifyX( ArrayPtrVoid *params )
 {
     // param 0: the justification ratio
     // param 1: the justification ratio for the measure (depends on the margin) (unused)
-    // param 2: the non justifiable margin (unused)
+    // param 2: the non-justifiable margin (unused)
     // param 3: the system full width (without system margins)
     // param 4: the functor to be redirected to the MeasureAligner
     double *ratio = static_cast<double*>((*params).at(0));
@@ -282,7 +282,7 @@ int System::UnCastOff( ArrayPtrVoid *params )
     System *currentSystem = static_cast<System*>((*params).at(0));
     
     // Just move all the content of the system to the continous one (parameter)
-    // Use the MoveChildren method that move the and relinquishes them
+    // Use the MoveChildren method that moves and relinquishes them
     // See Object::Relinquish
     currentSystem->MoveChildren( this );
     

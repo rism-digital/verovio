@@ -64,7 +64,7 @@ public:
     ///}
 
     /**
-     * Get the the SVG into a string
+     * Get the SVG into a string.
      * Add the xml tag if necessary.
      */
     std::string GetStringSVG( bool xml_declaration = false );

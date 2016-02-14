@@ -26,7 +26,7 @@ class Tempo: public FloatingElement, public TextDirInterface
 public:
     /**
      * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Tempo();

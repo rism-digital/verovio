@@ -186,7 +186,7 @@ private:
     
     /**
      * @name Methods for writing a sameAs attribute
-     * The method has to be called by classed that support it (e.g., LayerElement)
+     * The method has to be called by classes that support it (e.g., LayerElement)
      * To be changed to Att
      */
     void WriteSameAsAttr( pugi::xml_node currentNode, Object *object );
@@ -375,7 +375,7 @@ private:
     
     /**
      * Read a sameAs attribute
-     * The method has to be called by classed that support it (e.g., LayerElement)
+     * The method has to be called by classes that support it (e.g., LayerElement)
      */
     void ReadSameAsAttr( pugi::xml_node element, Object *object );
     

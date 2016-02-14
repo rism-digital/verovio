@@ -628,7 +628,7 @@ void MusicXmlInput::ReadMusicXmlBarline(pugi::xml_node node, Measure *measure, i
     if (!barStyle.empty()) {
         if (barStyle == "light-light") barRendition = BARRENDITION_dbl;
         else if (barStyle ==  "light-heavy") barRendition = BARRENDITION_end;
-        // we need to handle more style
+        // we need to handle more styles
         else {
             barRendition = BARRENDITION_single;
         }

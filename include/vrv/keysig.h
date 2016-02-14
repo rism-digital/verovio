@@ -39,7 +39,7 @@ class KeySig: public LayerElement,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
+     * Reset method resets all attribute classes.
      */
     ///@{
     KeySig();

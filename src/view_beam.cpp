@@ -93,8 +93,8 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
     // This could be moved to Beam::InitCoord for optimization because there should be no
-    // need of redoing it everytime it is drawn.
-    
+    // need for redoing it everytime it is drawn.
+
     data_STEMDIRECTION currentStemDir;
     
     ListOfObjects::iterator iter = beamChildren->begin();
@@ -164,7 +164,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
 	last = elementCount - 1;
     
-    // We look only at the last note for checking if cuesized. Somehow arbitrarily
+    // We look only at the last note for checking if cue-sized. Somehow arbitrarily
     params.m_cueSize = (*beamElementCoords).at(last)->m_element->IsCueSize();
 
     /******************************************************************/
@@ -237,7 +237,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 	}
     
     /******************************************************************/
-    // Draw the beam partial bars (if any)
+    // Draw the beam for partial bars (if any)
 
 	/* calcul des x en cas de beaming multiple */
 	/* parcours horizontal ajoutant barres en fonction de m_dur la plus 
@@ -286,7 +286,7 @@ void View::DrawBeam( DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                         }
                     }
                 }
-                // not we are in a group
+                // we are not in a group
                 if (breakSec) {
                     start = true;
                 }
@@ -418,7 +418,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert( dynamic_cast<AttStemmed*>(firstElement.m_element) );
     params.m_stemDir =  dynamic_cast<AttStemmed*>(firstElement.m_element)->GetStemDir();
     
-    // We look only at the first note for checking if cuesized. Somehow arbitrarily
+    // We look only at the first note for checking if cue-sized. Somehow arbitrarily
     params.m_cueSize = firstElement.m_element->IsCueSize();
     
     // x positions
@@ -480,7 +480,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dy2 = shiftY;
     
     int space = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, params.m_cueSize);
-    // for non stem notes the bar should be shortenend
+    // for non-stem notes the bar should be shortenend
     if (dur < DUR_2) {
         x1 += 2 * space;
         y1 += 2 * space * params.m_beamSlope;
@@ -526,7 +526,7 @@ void View::CalcBeam(Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *
     // loop
     int i;
     
-    // position x for the stem (normal and cue size)
+    // position x for the stem (normal and cue-sized)
     int stemX[2];
     
     // For slope calculation and linear regression

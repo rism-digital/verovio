@@ -960,7 +960,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     int num = std::min( multiRest->GetNum(), 999);
     
     if (num > 2 ) {
-        // This is 1/2 the length of th black rectangle
+        // This is 1/2 the length of the black rectangle
         length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         
         // a is the central point, claculate x and x2
@@ -976,8 +976,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // these are the two 4 substracted and added
         DrawFullRectangle(dc, x1, y2, x2, y1);
         
-        //Draw the to lines at beginning and end
-        // make it 8 pixesl longers, and 4 pixels width
+        // Draw two lines at beginning and end
+        // make it 8 pixels longer, and 4 pixels width
         int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         DrawVerticalLine(dc, y1 - border, y2 + border, x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2);
         DrawVerticalLine(dc, y1 - border, y2 + border, x2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2);
@@ -1106,7 +1106,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
                 flippedNotehead = (note->m_clusterPosition % 2 == 0);
             }
             
-            //if stem goes down, move ledger start to the left and expand it a full radius
+            //if stem goes down, move ledger start to the left and expand it to the full radius
             if(!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
                 xLedger -= radius;
                 doubleLengthLedger = true;
@@ -1116,7 +1116,7 @@ void View::DrawNote ( DeviceContext *dc, LayerElement *element, Layer *layer, St
             //flipped noteheads start on normal side no matter what
             flippedNotehead = (note->m_clusterPosition % 2 == 0);
             
-            //if stem goes up, move ledger start to the right and expand it a full radius
+            //if stem goes up, move ledger start to the right and expand it to the full radius
             if(!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
                 xLedger += radius;
                 doubleLengthLedger = true;
@@ -1464,7 +1464,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, S
     
     // First case, notes
     if ((element->Is() == NOTE) || (element->Is() == CHORD)) {
-        // To be fix once m_embellishment is removed
+        // To be fixed once m_embellishment is removed
         if (element->Is() == NOTE)  {
             Note *note = dynamic_cast<Note*>(element);
             assert( note );
@@ -1474,7 +1474,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, S
         }
         
         if (place == PLACE_above) {
-            // check that the notehead is in the staff.
+            // check if the notehead is in the staff.
             if (element->GetDrawingTop(m_doc, staff->m_drawingStaffSize) < staff->GetDrawingY()) {
                 // in the staff, set the fermata 20 pixels above the last line (+ embellishment offset)
                 y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + emb_offset;

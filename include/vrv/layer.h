@@ -37,7 +37,7 @@ class Layer: public DocObject, public DrawingListInterface, public ObjectListInt
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Layer( );
@@ -62,7 +62,7 @@ public:
     
 	LayerElement *GetPrevious( LayerElement *element );
 	LayerElement *GetAtPos( int x );
-	LayerElement *Insert( LayerElement *element, int x ); // return a pointer on the inserted element
+	LayerElement *Insert( LayerElement *element, int x ); // return a pointer to the inserted element
     
     /** 
      * Get the current clef for the test element.
@@ -109,7 +109,7 @@ public:
     virtual int AlignHorizontallyEnd( ArrayPtrVoid *params );
     
     /**
-     * Builds a tree of int (IntTree) with the staff/layer/verse numbers
+     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
      * and for staff/layer to be then processed.
      */
     virtual int PrepareProcessingLists( ArrayPtrVoid *params );

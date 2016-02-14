@@ -98,7 +98,7 @@ void SvgDeviceContext::Commit( bool xml_declaration ) {
     m_svgNode.prepend_attribute( "height" ) = StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str();
     m_svgNode.prepend_attribute( "width" ) = StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str();
     
-    // add the woff VerovioText font in needed
+    // add the woff VerovioText font if needed
     if (m_vrvTextFont) {
         std::string woff = Resources::GetPath() + "/woff.xml";
         pugi::xml_document woffDoc;
