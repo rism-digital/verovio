@@ -49,7 +49,7 @@ Object::Object(std::string classid)
 
 Object *Object::Clone()
 {
-    // This should never happen because the method should be overwritten
+    // This should never happen because the method should be overridden
     assert(false);
     return NULL;
 }
@@ -109,7 +109,7 @@ void Object::Init(std::string classid)
 
 ClassId Object::Is()
 {
-    // we should always have the method overwritten
+    // we should always have the method overridden
     assert(false);
     return OBJECT;
 };
@@ -301,7 +301,7 @@ void Object::GenerateUuid()
 {
     int nr = std::rand();
     char str[17];
-    // I do not want to use a stream to do this!
+    // I do not want to use a stream for doing this!
     snprintf(str, 16, "%016d", nr);
 
     m_uuid = m_classid + std::string(str);
@@ -409,7 +409,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor
         return;
     }
     else if (this->IsEditorialElement()) {
-        // since editorial object do not count, we re-increase the deepness limit
+        // since editorial object doesn't count, we increase the deepness limit
         deepness++;
     }
     if (deepness == 0) {

@@ -1407,7 +1407,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
         }
         // content
         else if (std::string(current.name()) == "scoreDef") {
-            // we should not have scoredef with unmeasured within a system... (?)
+            // we should not have scoredef with unmeasured music within a system... (?)
             assert(!unmeasured);
             ReadMeiScoreDef(parent, current);
         }
@@ -1428,7 +1428,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadMeiStaff(unmeasured, current);
         }
         else if (parentNode.child("measure")) {
-            // we should not mix measured and unmeasured within a system...
+            // we should not mix measured and unmeasured music within a system...
             assert(!unmeasured);
             if (parent->IsEditorialElement()) {
                 if (!m_ignoreLayoutInformation) {

@@ -185,7 +185,7 @@ public:
 
     /**
      * Virtual method returning the InterfaceId of the interface.
-     * Needs to be overriden in child classes.
+     * Needs to be overridden in child classes.
      */
     virtual InterfaceId IsInterface() { return INTERFACE; };
 

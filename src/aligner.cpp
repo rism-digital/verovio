@@ -54,7 +54,7 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx)
         this->m_children.push_back(m_bottomAlignment);
         return dynamic_cast<StaffAlignment *>(m_children.at(idx));
     }
-    // check that we are searching for the next one (not gap)
+    // check that we are searching for the next one (not a gap)
     assert(idx == GetStaffAlignmentCount());
     // LogDebug("Creating staff alignment");
 

@@ -565,7 +565,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
             // move until we find the ;
             while ((t < length) && (incipit[t] != ';')) {
 
-                // we should not find the parens before the ';' !
+                // we should not find any close paren before the ';' !
                 // FIXME find a graceful way to exit signaling this to user
                 if (incipit[t] == ')') {
                     LogDebug("You have a) before the ; in a tuplet!");
@@ -625,7 +625,7 @@ int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int inde
     int i = index;
     // int length = strlen(incipit);
 
-    // TODO currently fermatas inside tuplets won't be handled correctly
+    // TODO: fermatas inside tuplets won't be currently handled correctly
     note->fermata = false;
 
     return i - index;

@@ -25,11 +25,11 @@ class ScoreDefInterface;
  * Since it is unclear how to encode the logical key signature in keySig, an
  * internal representation is used (there is no equivalent of staffDef @key
  * within keySig. Currently the @accid and @pname are used for this. The
- * @pname store the value of the latest accidental, which is doubtfully the
+ * @pname stores the value of the latest accidental, which is doubtfully the
  * expected use of it.
- * Two temporary method KeySig::ConvertToMei and KeySig::ConvertToInternal
+ * Two temporary methods KeySig::ConvertToMei and KeySig::ConvertToInternal
  * are available for converting from and to the MEI representation to the
- * internal (and reverse)
+ * internal (and vice versa)
  */
 class KeySig : public LayerElement, public AttAccidental, public AttPitch {
 public:

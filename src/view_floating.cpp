@@ -114,7 +114,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
         x2 = interface->GetEnd()->GetDrawingX();
         spanningType = SPANNING_END;
     }
-    // Rare case where neither the first note and the last note are in the current system - draw the connector
+    // Rare case where neither the first note nor the last note are in the current system - draw the connector
     // throughout the system
     else {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
@@ -1015,7 +1015,7 @@ void View::DrawSylConnector(
     else if (spanningType == SPANNING_END) {
         // nothing to adjust
     }
-    // Rare case where neither the first note and the last note are in the current system - draw the connector
+    // Rare case where neither the first note nor the last note are in the current system - draw the connector
     // throughout the system
     else {
         // nothing to adjust

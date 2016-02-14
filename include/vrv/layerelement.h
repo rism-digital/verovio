@@ -54,9 +54,9 @@ public:
 
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
-     * The value is false by default. Is it set to true of ScoreDef and StaffDef and used when
+     * The value is false by default. It is set to true by ScoreDef and StaffDef and used when
      * drawing the element.
-     * NB In the scoreDef or staffDef itself, it can be attributes or an element.
+     * NB In the scoreDef or staffDef itself, it can be either an attribute or an element.
      */
     ///@{
     bool GetScoreOrStaffDefAttr() const { return m_isScoreOrStaffDefAttr; };
@@ -78,7 +78,7 @@ public:
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
-     * Look for the first beam parent and check is the note is in is content list.
+     * Look for the first beam parent and check if the note is in its content list.
      * Looking in the content list is necessary for grace notes or imbricated beams.
      */
     Beam *IsInBeam();

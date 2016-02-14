@@ -112,8 +112,8 @@ public:
     /**
      * Copy constructor that also copy the children.
      * The children are copied using the Object::Clone virtual method that
-     * Needs to be overwritten in the child class - we make it crash otherwise,
-     * Because this will create problem if we don't check this (the parents will
+     * needs to be overridden in the child class - otherwise, it will crash.
+     * Because this will create a problem if we don't check this (the parents will
      * one the same child...)
      * UUID: the uuid is copied, is needs to be reset later if this is not wished
      */
@@ -133,7 +133,7 @@ public:
 
     /**
      * Method call for copying child classes.
-     * The method has to be overwritten.
+     * The method has to be overridden.
      */
     virtual Object *Clone();
 
@@ -214,13 +214,13 @@ public:
 
     /**
      * Look for a child with the specified uuid (returns NULL if not found)
-     * This method is a wrapper to a Object::FindByUuid functor.
+     * This method is a wrapper for the Object::FindByUuid functor.
      */
     Object *FindChildByUuid(std::string uuid, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
      * Look for a child with the specified type (returns NULL if not found)
-     * This method is a wrapper to a Object::FindByType functor.
+     * This method is a wrapper for the Object::FindByType functor.
      */
     Object *FindChildByType(ClassId classId, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
@@ -240,7 +240,7 @@ public:
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
-     * This is a method to used only in very particular case where the child
+     * This is a method to be used only in the very particular case where the child
      * object cannot be detached straight away. It is typically the case
      * when this has to be done within an iterator. The parent of the object
      * will be set to NULL but the object will not be removed. If the parent
@@ -298,9 +298,9 @@ public:
      * For each object, it will call the functor.
      * Depending on the code returned by the functor, it will also process it for all children.
      * The ArrayOfAttComparisons filter parameter makes is possible to process only objects of a
-     * type that match the attribute value given in the AttComparison object.
-     * This is a generic way for parsing the tree, e.g., for extracting one single staff, or layer.
-     * Deepness allow to specify how many child levels should be processed UNLIMITED_DEPTH means no
+     * type that matches the attribute value given in the AttComparison object.
+     * This is the generic way for parsing the tree, e.g., for extracting one single staff or layer.
+     * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
      */
     virtual void Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor = NULL,

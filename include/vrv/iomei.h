@@ -108,7 +108,7 @@ public:
     virtual bool WriteObject(Object *object);
 
     /**
-     * Writing object method that must be overriden in the child class.
+     * Writing object method that must be overridden in the child class.
      */
     virtual bool WriteObjectEnd(Object *object);
 

@@ -362,7 +362,7 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
         return;
     }
 
-    // the array should not be empty
+    // the array may not be empty
     assert(!m_objects.empty());
 
     // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View
