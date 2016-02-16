@@ -179,6 +179,8 @@ void Page::LayOutHorizontally()
     params.push_back(doc);
     Functor setBoundingBoxXShift(&Object::SetBoundingBoxXShift);
     Functor setBoundingBoxXShiftEnd(&Object::SetBoundingBoxXShiftEnd);
+    // Special case: because we redirect the functor, pass it a parameter to itself (!)
+    params.push_back(&setBoundingBoxXShift);
     this->Process(&setBoundingBoxXShift, &params, &setBoundingBoxXShiftEnd);
 
     // Integrate the X bounding box shift of the elements

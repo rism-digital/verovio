@@ -8,8 +8,8 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
@@ -951,8 +951,8 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     // the negative offset it the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    int negative_offset = -(note->m_contentBB_x1)
-        + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    int negative_offset
+        = -(note->m_contentBB_x1) + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
     if ((*min_pos) > 0) {
         //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
@@ -988,40 +988,6 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     int *min_pos = static_cast<int *>((*params).at(0));
     int *measure_width = static_cast<int *>((*params).at(1));
     Doc *doc = static_cast<Doc *>((*params).at(2));
-
-    // starting a new measure
-    if (this->Is() == MEASURE) {
-        Measure *current_measure = dynamic_cast<Measure *>(this);
-        assert(current_measure);
-        // we reset the measure width and the minimum position
-        (*measure_width) = 0;
-        (*min_pos) = 0;
-        if (current_measure->GetLeftBarLineType() != BARRENDITION_NONE) {
-            current_measure->GetLeftBarLine()->SetBoundingBoxXShift(params);
-        }
-        return FUNCTOR_CONTINUE;
-    }
-
-    // starting an new layer
-    if (this->Is() == LAYER) {
-        Layer *current_layer = dynamic_cast<Layer *>(this);
-        assert(current_layer);
-        (*min_pos) = 0;
-        // set scoreDef attr
-        if (current_layer->GetDrawingClef()) {
-            current_layer->GetDrawingClef()->SetBoundingBoxXShift(params);
-        }
-        if (current_layer->GetDrawingKeySig()) {
-            current_layer->GetDrawingKeySig()->SetBoundingBoxXShift(params);
-        }
-        if (current_layer->GetDrawingMensur()) {
-            current_layer->GetDrawingMensur()->SetBoundingBoxXShift(params);
-        }
-        if (current_layer->GetDrawingMeterSig()) {
-            current_layer->GetDrawingMeterSig()->SetBoundingBoxXShift(params);
-        }
-        return FUNCTOR_CONTINUE;
-    }
 
     if (!this->IsLayerElement()) {
         return FUNCTOR_CONTINUE;
@@ -1094,7 +1060,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     int width = current->m_contentBB_x2;
     if (!current->HasEmptyBB())
         width += doc->GetRightMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    (*min_pos) = current->GetAlignment()->GetXRel() + width;
+    //(*min_pos) = current->GetAlignment()->GetXRel() + width;
     current->GetAlignment()->SetMaxWidth(width);
 
     return FUNCTOR_CONTINUE;

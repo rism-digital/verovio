@@ -235,6 +235,21 @@ void GraceAligner::AlignStack()
 
 Alignment::Alignment() : Object()
 {
+    Reset();
+}
+
+Alignment::Alignment(double time, AlignmentType type) : Object()
+{
+    Reset();
+    m_time = time;
+    m_type = type;
+}
+
+void Alignment::Reset()
+{
+    Object::Reset();
+
+    m_layerElementsRef.clear();
     m_xRel = 0;
     m_xShift = 0;
     m_maxWidth = 0;
@@ -243,21 +258,17 @@ Alignment::Alignment() : Object()
     m_graceAligner = NULL;
 }
 
-Alignment::Alignment(double time, AlignmentType type) : Object()
-{
-    m_xRel = 0;
-    m_xShift = 0;
-    m_maxWidth = 0;
-    m_time = time;
-    m_type = type;
-    m_graceAligner = NULL;
-}
-
 Alignment::~Alignment()
 {
     if (m_graceAligner) {
         delete m_graceAligner;
     }
+}
+
+void Alignment::AddLayerElementRef(LayerElement *element)
+{
+    assert(element->IsLayerElement());
+    m_layerElementsRef.push_back(element);
 }
 
 void Alignment::SetXRel(int x_rel)
@@ -470,6 +481,26 @@ int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 
     // reset member to 0
     m_xShift = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Alignment::SetBoundingBoxXShift(ArrayPtrVoid *params)
+{
+    // param 0: the minimum position (i.e., the width of the previous element)
+    // param 1: the maximum width in the current measure
+    // param 2: the Doc
+    int *min_pos = static_cast<int *>((*params).at(0));
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+
+    ArrayOfObjects::iterator iter;
+
+    for (iter = m_layerElementsRef.begin(); iter != m_layerElementsRef.end(); iter++) {
+        //(*iter)->Process(setBoundingBoxXShift, params);
+        setBoundingBoxXShift->Call((*iter), params);
+    }
+
+    (*min_pos) = this->GetXRel() + this->GetMaxWidth();
 
     return FUNCTOR_CONTINUE;
 }

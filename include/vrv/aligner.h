@@ -168,11 +168,17 @@ private:
  */
 class Alignment : public Object {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Alignment();
     Alignment(double time, AlignmentType type = ALIGNMENT_DEFAULT);
     virtual ~Alignment();
+    virtual void Reset();
     virtual ClassId Is() { return ALIGNMENT; }
+    ///@}
 
     void SetXRel(int x_rel);
     int GetXRel() { return m_xRel; };
@@ -190,6 +196,11 @@ public:
     void SetTime(double time) { m_time = time; };
     double GetTime() { return m_time; };
     ///@}
+
+    /**
+     *
+     */
+    void AddLayerElementRef(LayerElement *element);
 
     /**
      * @name Set and get the type of the alignment
@@ -237,6 +248,12 @@ public:
      */
     virtual int JustifyX(ArrayPtrVoid *params);
 
+    /**
+     * Lay out the X positions of the staff content looking that the bounding boxes.
+     * The m_xShift is updated appropriately
+     */
+    virtual int SetBoundingBoxXShift(ArrayPtrVoid *params);
+
 private:
     //
 public:
@@ -279,6 +296,10 @@ private:
      * The Alignment owns it.
      */
     GraceAligner *m_graceAligner;
+    /**
+     *
+     */
+    ArrayOfObjects m_layerElementsRef;
 };
 
 //----------------------------------------------------------------------------

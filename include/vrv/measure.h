@@ -154,6 +154,12 @@ public:
     virtual int SetAlignmentXPos(ArrayPtrVoid *params);
 
     /**
+     * Lay out the X positions of the staff content looking that the bounding boxes.
+     * The m_xShift is updated appropriately
+     */
+    virtual int SetBoundingBoxXShift(ArrayPtrVoid *params);
+
+    /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * This method also moves the end position of the measure according to the barLine width.
      */

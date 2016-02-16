@@ -185,6 +185,7 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         return 0.0;
     }
 
+    return 0.0;
     if (this->HasInterface(INTERFACE_DURATION)) {
         int num = 1;
         int numbase = 1;
@@ -333,6 +334,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     (*measureAligner)->SetMaxTime((*time) + duration);
 
     m_alignment = (*measureAligner)->GetAlignmentAtTime(*time, type);
+    m_alignment->AddLayerElementRef(this);
 
     if (this->IsGraceNote()) {
         GraceAligner *graceAligner = m_alignment->GetGraceAligner();

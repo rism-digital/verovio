@@ -194,6 +194,25 @@ int Measure::AlignVertically(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::SetBoundingBoxXShift(ArrayPtrVoid *params)
+{
+    // param 0: the minimum position (i.e., the width of the previous element)
+    // param 1: the maximum width in the current measure
+    // param 2: the Doc (unused)
+    // param 3: the functor to be redirected to Aligner
+    int *min_pos = static_cast<int *>((*params).at(0));
+    int *measure_width = static_cast<int *>((*params).at(1));
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+
+    // we reset the measure width and the minimum position
+    (*measure_width) = 0;
+    (*min_pos) = 0;
+
+    m_measureAligner.Process(setBoundingBoxXShift, params);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int Measure::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
 {
     // param 0: the functor to be redirected to Aligner
