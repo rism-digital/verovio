@@ -39,6 +39,11 @@ public:
     void SetDrawingPos(double pos) { m_actualDurPos = pos; };
     ///@}
 
+    /**
+     * Returns the duration (in double) for the Timestamp.
+     */
+    virtual double GetTimestampAttrAlignmentDuration(int meterUnit);
+
 private:
     //
 public:

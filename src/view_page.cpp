@@ -63,6 +63,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     params.push_back(this);
     params.push_back(&processLayerElement);
     Functor setDrawingXY(&Object::SetDrawingXY);
+    params.push_back(&setDrawingXY);
     // First pass without processing the LayerElements - we need this for cross-staff going down because
     // the elements will need the position of the staff below to have been set before
     m_currentPage->Process(&setDrawingXY, &params);

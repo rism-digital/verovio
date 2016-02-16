@@ -111,7 +111,7 @@ void Doc::PrepareDrawing()
     Functor prepareTimeSpanning(&Object::PrepareTimeSpanning);
     this->Process(&prepareTimeSpanning, &params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
 
-    // First we tried backward because nomrally the spanning elements are at the end of
+    // First we try backward because nomrally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
     // in the encoding. For these, the previous iteration will not have resolved the link and
     // the spanning elements will remain in the timeSpanningElements array. We try again forward
@@ -121,6 +121,7 @@ void Doc::PrepareDrawing()
         this->Process(&prepareTimeSpanning, &params);
     }
 
+    // Now try to match the @tstamp and @tstamp2 attributes.
     params.clear();
     ArrayOfDocObjectBeatPairs tstamps;
     params.push_back(&timeSpanningElements);

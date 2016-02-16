@@ -207,8 +207,21 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         endStemDir = endChord->GetDrawingStemDir();
     }
 
-    Layer *layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
-    Layer *layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+    Layer *layer1 = NULL;
+    Layer *layer2 = NULL;
+
+    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
+    if (start->Is() == TIMESTAMP_ATTR)
+        layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    else
+        layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+
+    // idem
+    if (end->Is() == TIMESTAMP_ATTR)
+        layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    else
+        layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+
     assert(layer1 && layer2);
 
     if (layer1->GetN() != layer2->GetN()) {
@@ -364,13 +377,13 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     }
 
     // Positions not attached to a note
-    if (spanningType == SPANNING_START) {
+    if ((spanningType == SPANNING_START) || (end->Is() == TIMESTAMP_ATTR)) {
         if (up)
             y2 = std::max(staff->GetDrawingY(), y1);
         else
             y2 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
     }
-    else if (spanningType == SPANNING_END) {
+    else if ((spanningType == SPANNING_END) || (start->Is() == TIMESTAMP_ATTR)) {
         if (up)
             y1 = std::max(staff->GetDrawingY(), y2);
         else

@@ -35,4 +35,9 @@ void TimestampAttr::Reset()
     m_actualDurPos = 0.0;
 }
 
+double TimestampAttr::GetTimestampAttrAlignmentDuration(int meterUnit)
+{
+    return DUR_MAX / meterUnit * m_actualDurPos;
+}
+
 } // namespace vrv

@@ -242,6 +242,7 @@ int Layer::SetDrawingXY(ArrayPtrVoid *params)
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view (unused)
     // param 6: a bool indicating if we are processing layer elements or not
+    // param 7: a pointer to the functor for passing it to the timestamps (unused)
     Measure **currentMeasure = static_cast<Measure **>((*params).at(2));
     Layer **currentLayer = static_cast<Layer **>((*params).at(4));
     bool *processLayerElements = static_cast<bool *>((*params).at(6));

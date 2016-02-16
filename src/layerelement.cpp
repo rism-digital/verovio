@@ -36,6 +36,7 @@
 #include "syl.h"
 #include "tie.h"
 #include "timeinterface.h"
+#include "timestamp.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "view.h"
@@ -213,6 +214,13 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         if (meterSig) meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
+    else if (this->Is() == TIMESTAMP_ATTR) {
+        TimestampAttr *timestampAttr = dynamic_cast<TimestampAttr *>(this);
+        assert(timestampAttr);
+        int meterUnit = 4;
+        if (meterSig) meterSig->GetUnit();
+        return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
+    }
     else {
         return 0.0;
     }
@@ -330,7 +338,13 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     // get the duration of the event
     double duration = this->GetAlignmentDuration(*currentMensur);
 
-    (*measureAligner)->SetMaxTime((*time) + duration);
+    // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
+    // So use it as current time - we can do this because the timestamp loop is redirected from the measure
+    // The time will be reset to 0.0 when starting a new layer anyway
+    if (this->Is() == TIMESTAMP_ATTR)
+        (*time) = duration;
+    else
+        (*measureAligner)->SetMaxTime((*time) + duration);
 
     m_alignment = (*measureAligner)->GetAlignmentAtTime(*time, type);
 
@@ -341,8 +355,10 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
 
     // LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str());
 
-    // increase the time position
-    (*time) += duration;
+    // increase the time position, but only when not a timestamp (it would actually do nothing)
+    if (this->Is() != TIMESTAMP_ATTR) {
+        (*time) += duration;
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -378,6 +394,7 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view
     // param 6: a bool indicating if we are processing layer elements or not
+    // param 7: a pointer to the functor for passing it to the timestamps (unused)
     Doc *doc = static_cast<Doc *>((*params).at(0));
     Measure **currentMeasure = static_cast<Measure **>((*params).at(2));
     Staff **currentStaff = static_cast<Staff **>((*params).at(3));

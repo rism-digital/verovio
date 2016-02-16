@@ -186,6 +186,7 @@ int Staff::SetDrawingXY(ArrayPtrVoid *params)
     // param 4: a pointer to the current layer (unused)
     // param 5: a pointer to the view (unused)
     // param 6: a bool indicating if we are processing layer elements or not
+    // param 7: a pointer to the functor for passing it to the timestamps (unused)
     Doc *doc = static_cast<Doc *>((*params).at(0));
     System **currentSystem = static_cast<System **>((*params).at(1));
     Staff **currentStaff = static_cast<Staff **>((*params).at(3));

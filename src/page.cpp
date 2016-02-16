@@ -115,6 +115,8 @@ void Page::LayOutHorizontally()
     params.push_back(&currentMeterSig);
     Functor alignHorizontally(&Object::AlignHorizontally);
     Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
+    // Pass the functor for processing the timestamps
+    params.push_back(&alignHorizontally);
     this->Process(&alignHorizontally, &params, &alignHorizontallyEnd);
 
     // Unless duration-based spacing is disabled, set the X position of each Alignment.

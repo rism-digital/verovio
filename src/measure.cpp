@@ -156,6 +156,7 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
     // param 2: the current Mensur (unused)
     // param 3: the current MeterSig (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner **>((*params).at(0));
+    Functor *alignHorizontally = static_cast<Functor *>((*params).at(4));
 
     // clear the content of the measureAligner
     m_measureAligner.Reset();
@@ -166,6 +167,9 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
 
     // point to it
     (*measureAligner) = &m_measureAligner;
+
+    // We also need to align the timestamps
+    m_timestampAligner.Process(alignHorizontally, params);
 
     if (m_leftBarLine.GetForm() != BARRENDITION_NONE) {
         m_leftBarLine.SetAlignment(m_measureAligner.GetLeftAlignment());
@@ -318,15 +322,21 @@ int Measure::SetDrawingXY(ArrayPtrVoid *params)
     // param 4: a pointer to the current layer (unused)
     // param 5: a pointer to the view (unused)
     // param 6: a bool indicating if we are processing layer elements or not
+    // param 7: a pointer to the functor for passing it to the timestamps
     Doc *doc = static_cast<Doc *>((*params).at(0));
     System **currentSystem = static_cast<System **>((*params).at(1));
     Measure **currentMeasure = static_cast<Measure **>((*params).at(2));
     bool *processLayerElements = static_cast<bool *>((*params).at(6));
+    Functor *setDrawingXY = static_cast<Functor *>((*params).at(7));
 
     (*currentMeasure) = this;
 
     // Second pass where we do just process layer elements
-    if ((*processLayerElements)) return FUNCTOR_CONTINUE;
+    if ((*processLayerElements)) {
+        // However, we need to process the timestamps
+        m_timestampAligner.Process(setDrawingXY, params);
+        return FUNCTOR_CONTINUE;
+    }
 
     // Here we set the appropriate y value to be used for drawing
     // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
@@ -339,6 +349,10 @@ int Measure::SetDrawingXY(ArrayPtrVoid *params)
         assert(doc->GetType() == Transcription);
         this->SetDrawingX(this->m_xAbs);
     }
+
+    // Process the timestamps - we can do it already since the first pass in only taking care of X position for the
+    // LayerElements
+    m_timestampAligner.Process(setDrawingXY, params);
 
     // For avoiding unused variable warning in non debug mode
     doc = NULL;
@@ -384,6 +398,15 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
             assert(interface);
             TimestampAttr *timestampAttr = m_timestampAligner.GetTimestampAtTime((*iter).second.second);
             interface->SetStart(timestampAttr);
+            // purge the list of unmatched element is this is a TimeSpanningInterface element
+            if ((*iter).first->HasInterface(INTERFACE_TIME_SPANNING)) {
+                TimeSpanningInterface *tsInterface = dynamic_cast<TimeSpanningInterface *>((*iter).first);
+                assert(tsInterface);
+                if (tsInterface->HasStartAndEnd()) {
+                    elements->erase(std::remove(elements->begin(), elements->end(), (*iter).first), elements->end());
+                }
+            }
+            // remove it
             iter = tstamps->erase(iter);
         }
         // 0 means that we have a @tstamp2 (end) to add to the current measure
@@ -392,7 +415,7 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
             assert(interface);
             TimestampAttr *timestampAttr = m_timestampAligner.GetTimestampAtTime((*iter).second.second);
             interface->SetEnd(timestampAttr);
-            // We can check if the interface is now fully mapped (start / end)
+            // We can check if the interface is now fully mapped (start / end) and purge the list of unmatched elements
             if (interface->HasStartAndEnd()) {
                 elements->erase(std::remove(elements->begin(), elements->end(), (*iter).first), elements->end());
             }
@@ -404,8 +427,6 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
             iter++;
         }
     }
-
-    LogMessage("%d", tstamps->size());
 
     return FUNCTOR_CONTINUE;
 };
