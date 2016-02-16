@@ -185,6 +185,29 @@ bool TimeSpanningInterface::IsSpanningMeasures()
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
+int TimePointInterface::InterfacePrepareTimestamps(ArrayPtrVoid *params, DocObject *object)
+{
+    // param 0: std::vector<DocObject*>* that holds the current elements to match (unused)
+    // param 1: ArrayOfDocObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
+    ArrayOfDocObjectBeatPairs *tstamps = static_cast<ArrayOfDocObjectBeatPairs *>((*params).at(1));
+
+    // First we check if the object has already a mapped @startid (it should not)
+    if (this->HasStart()) {
+        if (this->HasTstamp())
+            LogWarning("%s with @xml:id %s has both a @startid and an @tstamp; @tstamp is ignored",
+                object->GetClassName().c_str(), object->GetUuid().c_str());
+        return FUNCTOR_CONTINUE;
+    }
+    else if (!HasTstamp()) {
+        return FUNCTOR_CONTINUE; // This file is quite likely invalid?
+    }
+
+    // We set -1 to the data_MEASUREBEAT for @tstamp
+    tstamps->push_back(std::make_pair(object, data_MEASUREBEAT(-1, this->GetTstamp())));
+
+    return FUNCTOR_CONTINUE;
+}
+
 int TimePointInterface::InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object)
 {
     m_start = NULL;
@@ -207,6 +230,30 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(ArrayPtrVoid *params, Do
     elements->push_back(object);
 
     return FUNCTOR_CONTINUE;
+}
+
+int TimeSpanningInterface::InterfacePrepareTimestamps(ArrayPtrVoid *params, DocObject *object)
+{
+    // param 0: std::vector<DocObject*>* that holds the current elements to match (unused)
+    // param 1: ArrayOfDocObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
+    ArrayOfDocObjectBeatPairs *tstamps = static_cast<ArrayOfDocObjectBeatPairs *>((*params).at(1));
+
+    // First we check if the object has already a mapped @endid (it should not)
+    if (this->HasEndid()) {
+        if (this->HasTstamp2())
+            LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
+                object->GetClassName().c_str(), object->GetUuid().c_str());
+        return TimePointInterface::InterfacePrepareTimestamps(params, object);
+    }
+    else if (!HasTstamp2()) {
+        // We won't be able to do anything, just try to prepare the tstamp (start)
+        return TimePointInterface::InterfacePrepareTimestamps(params, object);
+    }
+
+    // We can now add the pair to our stack
+    tstamps->push_back(std::make_pair(object, data_MEASUREBEAT(this->GetTstamp2())));
+
+    return TimePointInterface::InterfacePrepareTimestamps(params, object);
 }
 
 int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params, DocObject *object)

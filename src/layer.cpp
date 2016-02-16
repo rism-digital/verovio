@@ -176,7 +176,7 @@ int Layer::AlignHorizontally(ArrayPtrVoid *params)
     MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(3));
 
     // we are starting a new layer, reset the time;
-    (*time) = 0.0;
+    (*time) = -2.0;
 
     (*currentMensur) = GetCurrentMensur();
     (*currentMeterSig) = GetCurrentMeterSig();
@@ -193,6 +193,8 @@ int Layer::AlignHorizontally(ArrayPtrVoid *params)
     if (DrawMeterSig() && GetCurrentMeterSig()) {
         GetCurrentMeterSig()->AlignHorizontally(params);
     }
+
+    (*time) = 0.0;
 
     return FUNCTOR_CONTINUE;
 }

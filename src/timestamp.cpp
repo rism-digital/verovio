@@ -31,6 +31,8 @@ TimestampAttr::~TimestampAttr()
 void TimestampAttr::Reset()
 {
     LayerElement::Reset();
+
+    m_actualDurPos = 0.0;
 }
 
 } // namespace vrv

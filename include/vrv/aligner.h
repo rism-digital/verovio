@@ -17,6 +17,7 @@ class MeasureAligner;
 class Note;
 class StaffAlignment;
 class SystemAligner;
+class TimestampAttr;
 
 /**
  * Alignment types for aligning types together.
@@ -424,6 +425,42 @@ private:
      * boxes X are integrated in Alignment::IntegrateBoundingBoxGraceXShift
      */
     int m_totalWidth;
+};
+
+//----------------------------------------------------------------------------
+// TimestampAligner
+//----------------------------------------------------------------------------
+
+/**
+ * This class stores the timestamps (TimestampsAttr) in a measure.
+ * It does not itself perform any alignment but only stores them and avoids duplicates
+ * (i.e., having two objects at the same position.
+ * It contains a vector of TimestampsAttr.
+ */
+class TimestampAligner : public Object {
+public:
+    // constructors and destructors
+    TimestampAligner();
+    virtual ~TimestampAligner();
+    virtual ClassId Is() { return TIMESTAMP_ALIGNER; }
+
+    /**
+     * Reset the aligner (clear the content)
+     */
+    virtual void Reset();
+
+    /**
+     * Look for an existing TimestampAttr at a certain time.
+     * Creates it if not found
+     */
+    TimestampAttr *GetTimestampAtTime(double time);
+
+private:
+    //
+public:
+    //
+private:
+    //
 };
 
 } // namespace vrv

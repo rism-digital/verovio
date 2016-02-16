@@ -54,6 +54,22 @@ int FloatingElement::PrepareTimeSpanning(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int FloatingElement::PrepareTimestamps(ArrayPtrVoid *params)
+{
+    // Pass it to the pseudo functor of the interface
+    if (this->HasInterface(INTERFACE_TIME_POINT)) {
+        TimePointInterface *interface = dynamic_cast<TimePointInterface *>(this);
+        assert(interface);
+        return interface->InterfacePrepareTimestamps(params, this);
+    }
+    else if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
+        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(this);
+        assert(interface);
+        return interface->InterfacePrepareTimestamps(params, this);
+    }
+    return FUNCTOR_CONTINUE;
+}
+
 int FloatingElement::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
 {
     // Pass it to the pseudo functor of the interface

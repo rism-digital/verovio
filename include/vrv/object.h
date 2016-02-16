@@ -514,13 +514,27 @@ public:
     virtual int PrepareProcessingLists(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Matches start and end for TimeSpanningInterface elements (such as tie or slur)
+     * Matches start and end for TimeSpanningInterface elements (such as tie or slur).
      * If fillList is set to false, the only the remaining elements will be matched.
      * This is used when processing a second time in the other direction
      * param 0: std::vector<DocObject*>* that holds the current elements to match
      * param 1: bool* fillList for indicating whether the elements have to be stack or not
      */
     virtual int PrepareTimeSpanning(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * Matches start and end for TimeSpanningInterface elements with tstamp(2) attributes.
+     * It is performed only on TimeSpanningInterface elements withouth @startid (or @endid).
+     * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.
+     * param 0: std::vector<DocObject*>* that holds the current elements to match
+     * param 1: ArrayOfDocObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
+     */
+    virtual int PrepareTimestamps(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * See Object::PrepareTimestamps.
+     */
+    virtual int PrepareTimestampsEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
      * Processes Chord and Note for matching @tie by processing by Layer and by looking

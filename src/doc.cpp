@@ -121,6 +121,14 @@ void Doc::PrepareDrawing()
         this->Process(&prepareTimeSpanning, &params);
     }
 
+    params.clear();
+    ArrayOfDocObjectBeatPairs tstamps;
+    params.push_back(&timeSpanningElements);
+    params.push_back(&tstamps);
+    Functor prepareTimestamps(&Object::PrepareTimestamps);
+    Functor prepareTimestampsEnd(&Object::PrepareTimestampsEnd);
+    this->Process(&prepareTimestamps, &params, &prepareTimestampsEnd);
+
     // If some are still there, then it is probably an issue in the encoding
     if (!timeSpanningElements.empty()) {
         LogWarning("%d time spanning elements could not be matched", timeSpanningElements.size());

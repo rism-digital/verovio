@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "note.h"
 #include "style.h"
+#include "timestamp.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -127,7 +128,7 @@ MeasureAligner::~MeasureAligner()
 void MeasureAligner::Reset()
 {
     Object::Reset();
-    m_leftAlignment = new Alignment(0.0, ALIGNMENT_MEASURE_START);
+    m_leftAlignment = new Alignment(-1.0, ALIGNMENT_MEASURE_START);
     AddAlignment(m_leftAlignment);
     m_rightAlignment = new Alignment(0.0, ALIGNMENT_MEASURE_END);
     AddAlignment(m_rightAlignment);
@@ -284,6 +285,59 @@ GraceAligner *Alignment::GetGraceAligner()
         m_graceAligner = new GraceAligner();
     }
     return m_graceAligner;
+}
+
+//----------------------------------------------------------------------------
+// TimestampAligner
+//----------------------------------------------------------------------------
+
+TimestampAligner::TimestampAligner() : Object()
+{
+    Reset();
+}
+
+TimestampAligner::~TimestampAligner()
+{
+}
+
+void TimestampAligner::Reset()
+{
+    Object::Reset();
+}
+
+TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
+{
+    int i;
+    int idx = -1; // the index if we reach the end.
+    // We need to adjust the position since timestamp 0 to 1.0 are before 0 musical time
+    time = time - 1.0;
+    TimestampAttr *timestampAttr = NULL;
+    // First try to see if we already have something at the time position
+    for (i = 0; i < GetChildCount(); i++) {
+        timestampAttr = dynamic_cast<TimestampAttr *>(m_children.at(i));
+        assert(timestampAttr);
+
+        double alignmentTime = timestampAttr->GetActualDurPos();
+        if (vrv::AreEqual(alignmentTime, time)) {
+            return timestampAttr;
+        }
+        // nothing found, do not go any further but keep the index
+        if (alignmentTime > time) {
+            idx = i;
+            break;
+        }
+    }
+    // nothing found
+    timestampAttr = new TimestampAttr();
+    timestampAttr->SetDrawingPos(time);
+    timestampAttr->SetParent(this);
+    if (idx == -1) {
+        m_children.push_back(timestampAttr);
+    }
+    else {
+        InsertChild(timestampAttr, idx);
+    }
+    return timestampAttr;
 }
 
 //----------------------------------------------------------------------------

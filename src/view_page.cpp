@@ -717,7 +717,8 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     DrawMeasureChildren(dc, measure, measure, system);
 
     if (measure->GetLeftBarLineType() != BARRENDITION_NONE) {
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX(), measure->GetLeftBarLine());
+        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetLeftBarLineX(),
+            measure->GetLeftBarLine());
     }
     if (measure->GetRightBarLineType() != BARRENDITION_NONE) {
         DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarLineX(),

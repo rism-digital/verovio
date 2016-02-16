@@ -80,6 +80,11 @@ public:
      */
 
     /**
+     * See Object::PrepareTimestamps
+     */
+    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params, DocObject *object);
+
+    /**
      * See Object::ResetDrawing
      */
     virtual int InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object);
@@ -181,6 +186,11 @@ public:
      * See Object::PrepareTimeSpanning
      */
     virtual int InterfacePrepareTimeSpanning(ArrayPtrVoid *params, DocObject *object);
+
+    /**
+     * See Object::PrepareTimestamps
+     */
+    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params, DocObject *object);
 
     /**
      * See Object::ResetDrawing

@@ -20,6 +20,7 @@
 #include "staff.h"
 #include "system.h"
 #include "timeinterface.h"
+#include "timestamp.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -38,6 +39,8 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     m_measuredMusic = measureMusic;
     // We set parent to it because we want to access the parent doc from the aligners
     m_measureAligner.SetParent(this);
+    // Idem for timestamps
+    m_timestampAligner.SetParent(this);
 
     Reset();
 }
@@ -53,7 +56,7 @@ void Measure::Reset()
     ResetMeasureLog();
     ResetPointing();
 
-    m_parent = NULL;
+    m_timestampAligner.Reset();
     m_measuredMusic = true;
     m_xAbs = VRV_UNSET;
     m_drawingXRel = 0;
@@ -97,6 +100,14 @@ void Measure::AddStaff(Staff *staff)
 }
 
 int Measure::GetXRel()
+{
+    if (m_measureAligner.GetLeftAlignment()) {
+        return m_measureAligner.GetLeftAlignment()->GetXRel();
+    }
+    return 0;
+}
+
+int Measure::GetLeftBarLineX()
 {
     if (m_measureAligner.GetLeftAlignment()) {
         return m_measureAligner.GetLeftAlignment()->GetXRel();
@@ -258,6 +269,12 @@ int Measure::AlignMeasures(ArrayPtrVoid *params)
     return FUNCTOR_SIBLINGS;
 }
 
+int Measure::ResetDrawing(ArrayPtrVoid *params)
+{
+    this->m_timestampAligner.Reset();
+    return FUNCTOR_CONTINUE;
+};
+
 int Measure::CastOffSystems(ArrayPtrVoid *params)
 {
     // param 0: a pointer to the system we are taking the content from
@@ -350,5 +367,47 @@ int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
     }
     return FUNCTOR_CONTINUE;
 }
+
+int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
+{
+    // param 0: std::vector<DocObject*>* that holds the current elements to match
+    // param 1: ArrayOfDocObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
+    std::vector<DocObject *> *elements = static_cast<std::vector<DocObject *> *>((*params).at(0));
+    ArrayOfDocObjectBeatPairs *tstamps = static_cast<ArrayOfDocObjectBeatPairs *>((*params).at(1));
+
+    ArrayOfDocObjectBeatPairs::iterator iter = tstamps->begin();
+    // Loop throught the object/beat pairs and create the TimestampAttr when necessary
+    while (iter != tstamps->end()) {
+        // -1 means that we have a @tstamp (start) to add to the current measure
+        if ((*iter).second.first == -1) {
+            TimePointInterface *interface = dynamic_cast<TimePointInterface *>((*iter).first);
+            assert(interface);
+            TimestampAttr *timestampAttr = m_timestampAligner.GetTimestampAtTime((*iter).second.second);
+            interface->SetStart(timestampAttr);
+            iter = tstamps->erase(iter);
+        }
+        // 0 means that we have a @tstamp2 (end) to add to the current measure
+        else if ((*iter).second.first == 0) {
+            TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>((*iter).first);
+            assert(interface);
+            TimestampAttr *timestampAttr = m_timestampAligner.GetTimestampAtTime((*iter).second.second);
+            interface->SetEnd(timestampAttr);
+            // We can check if the interface is now fully mapped (start / end)
+            if (interface->HasStartAndEnd()) {
+                elements->erase(std::remove(elements->begin(), elements->end(), (*iter).first), elements->end());
+            }
+            iter = tstamps->erase(iter);
+        }
+        // we have not reached the correct end measure yet
+        else {
+            (*iter).second.first--;
+            iter++;
+        }
+    }
+
+    LogMessage("%d", tstamps->size());
+
+    return FUNCTOR_CONTINUE;
+};
 
 } // namespace vrv

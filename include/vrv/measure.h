@@ -16,6 +16,7 @@
 namespace vrv {
 
 class FloatingElement;
+class TimestampAttr;
 
 //----------------------------------------------------------------------------
 // Measure
@@ -54,6 +55,12 @@ public:
     void AddStaff(Staff *staff);
     void AddFloatingElement(FloatingElement *element);
     ///@}
+
+    /**
+     * Add a TimestampAttr to the measure.
+     * The TimestampAttr it not added as child of the measure but to the Measure::m_timestamps array.
+     */
+    void AddTimestamp(TimestampAttr *timestampAttr);
 
     /**
      * Return the index position of the measure in its system parent
@@ -95,9 +102,12 @@ public:
     int GetNonJustifiableLeftMargin() { return m_measureAligner.GetNonJustifiableMargin(); }
 
     /**
-     * Return the X rel position of the right barLine (without its width)
+     * @name Return the X rel position of the right and left barLine (without their width)
      */
+    ///@{
+    int GetLeftBarLineX();
     int GetRightBarLineX();
+    ///@}
 
     /**
      * Return the width of the measure, including the barLine width
@@ -167,9 +177,19 @@ public:
     virtual int SetDrawingXY(ArrayPtrVoid *params);
 
     /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDrawing(ArrayPtrVoid *params);
+
+    /**
      * See Object::FillStaffCurrentTimeSpanningEnd
      */
     virtual int FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params);
+
+    /**
+     * See Object::PrepareTimestamps.
+     */
+    virtual int PrepareTimestampsEnd(ArrayPtrVoid *params);
 
 public:
     /**
@@ -187,6 +207,8 @@ public:
      * The measure aligner that holds the x positions of the content of the measure
      */
     MeasureAligner m_measureAligner;
+
+    TimestampAligner m_timestampAligner;
 
 private:
     bool m_measuredMusic;

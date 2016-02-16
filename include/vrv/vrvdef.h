@@ -35,6 +35,7 @@ namespace vrv {
 
 class AttComparison;
 class BeamElementCoord;
+class DocObject;
 class LayerElement;
 class Note;
 class Object;
@@ -56,6 +57,8 @@ typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
 
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
+
+typedef std::vector<std::pair<DocObject *, data_MEASUREBEAT> > ArrayOfDocObjectBeatPairs;
 
 //----------------------------------------------------------------------------
 // Object defines
@@ -89,6 +92,7 @@ enum ClassId {
     SYSTEM,
     SYSTEM_ALIGNER,
     SYSTEM_ALIGNMENT,
+    TIMESTAMP_ALIGNER,
     // Ids for EditorialElement child classes
     EDITORIAL_ELEMENT,
     ABBR,

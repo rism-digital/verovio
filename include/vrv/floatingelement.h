@@ -47,7 +47,12 @@ public:
      * See Object::PrepareTimeSpanning
      */
     virtual int PrepareTimeSpanning(ArrayPtrVoid *params);
-
+    
+    /**
+     * See Object::PrepareTimestamps
+     */
+    virtual int PrepareTimestamps(ArrayPtrVoid *params);
+    
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
