@@ -96,7 +96,7 @@ void display_usage() {
     
     cerr << " -s, --scale=FACTOR         Scale percent (default is " << DEFAULT_SCALE << ")" << endl;
     
-    cerr << " -t, --type=OUTPUT_TYPE     Select output format: mei, svg (default is svg)" << endl;
+    cerr << " -t, --type=OUTPUT_TYPE     Select output format: mei, svg, or midi (default is svg)" << endl;
     
     cerr << " -v, --version              Display the version number" << endl;
 
@@ -354,8 +354,8 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    if (outformat != "svg" && outformat != "mei") {
-        cerr << "Output format can only be 'mei' or 'svg'." << endl;
+    if (outformat != "svg" && outformat != "mei" && outformat != "midi") {
+        cerr << "Output format can only be 'mei', 'svg', or 'midi'." << endl;
         exit(1);
     }
     
@@ -430,6 +430,20 @@ int main(int argc, char** argv)
                 cerr << "Output written to " << cur_outfile << "." << endl;
             }
         }
+    }
+    else if (outformat == "midi"){		
+      outfile += ".mid";
+      if (std_output) {
+          cerr << "Midi cannot write to standard output." << endl;
+          exit(1);
+      }
+      else if ( !toolkit.RenderToMidiFile( outfile ) ) {
+          cerr << "Unable to write MIDI to " << outfile << "." << endl;
+          exit(1);
+      }
+      else {
+          cerr << "Output written to " << outfile << "." << endl;
+      }			
     }
     else {
         if (all_pages) {
