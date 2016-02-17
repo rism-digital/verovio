@@ -171,6 +171,16 @@ public:
      */
     virtual int FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params);
 
+    /**
+     * See Object:ExportMIDI
+     */
+    virtual int ExportMIDI(ArrayPtrVoid *params);
+
+    /**
+     * See Object:ExportMIDI
+     */
+    virtual int ExportMIDIEnd(ArrayPtrVoid *params);
+
 public:
     /**
      * The X absolute position of the measure for facsimile (transcription) encodings.

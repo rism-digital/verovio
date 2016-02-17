@@ -283,4 +283,23 @@ int Layer::PrepareRpt(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int Layer::ExportMIDI(ArrayPtrVoid *params)
+{
+    // param 0: MidiFile*: the MidiFile we are writing to
+    // param 1: int*: the midi track number
+    // param 2: MeterSig** the current meterSig
+    // param 3: int*: the current time in the measure (incremented by each element)
+    // param 4: int*: the current total measure time (incremented by each measure
+    MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
+    int *midiTrack = static_cast<int *>((*params).at(1));
+    MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
+    int *currentMeasureTime = static_cast<int *>((*params).at(3));
+    int *totalTime = static_cast<int *>((*params).at(4));
+
+    // Here we set the current meterSig
+    (*currentMeterSig) = GetCurrentMeterSig();
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

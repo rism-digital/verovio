@@ -604,6 +604,9 @@ bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
 bool Toolkit::RenderToMidiFile(const std::string &filename)
 {
     MidiFile outputfile; // create an empty MIDI file with one track
+
+    m_doc.ExportMIDI(&outputfile);
+
     outputfile.absoluteTicks(); // time information stored as absolute time
     // (will be coverted to delta time when written)
     outputfile.addTrack(2); // Add another two tracks to the MIDI file

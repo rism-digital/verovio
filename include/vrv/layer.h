@@ -125,6 +125,11 @@ public:
      */
     virtual int PrepareRpt(ArrayPtrVoid *params);
 
+    /**
+     * See Object:ExportMIDI
+     */
+    virtual int ExportMIDI(ArrayPtrVoid *params);
+
 private:
     //
 public:

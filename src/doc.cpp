@@ -35,6 +35,10 @@
 #include "verse.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -92,6 +96,63 @@ void Doc::AddPage(Page *page)
 void Doc::Refresh()
 {
     RefreshViews();
+}
+
+void Doc::ExportMIDI(MidiFile *midiFile)
+{
+    ArrayPtrVoid params;
+
+    // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
+    IntTree verseTree;
+    IntTree layerTree;
+    params.push_back(&verseTree);
+    params.push_back(&layerTree);
+    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
+    // StaffN_LayerN_VerseN_t staffLayerVerseTree;
+    // params.push_back(&staffLayerVerseTree);
+
+    // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &params);
+
+    // The tree is used to process each staff/layer/verse separatly
+    // For this, we use a array of AttCommmonNComparison that looks for each object if it is of the type
+    // and with @n specified
+
+    IntTree_t::iterator staves;
+    IntTree_t::iterator layers;
+
+    // Process notes and chords, rests, spaces layer by layer
+    int midiTrack = 0;
+    std::vector<AttComparison *> filters;
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            filters.clear();
+            // Create ad comparison object for each type / @n
+            AttCommonNComparison matchStaff(STAFF, staves->first);
+            AttCommonNComparison matchLayer(LAYER, layers->first);
+            filters.push_back(&matchStaff);
+            filters.push_back(&matchLayer);
+
+            MeterSig *currentMeterSig = NULL;
+            int currentMeasureTime = 0;
+            int totalTime = 0;
+
+            params.clear();
+            params.push_back(midiFile);
+            params.push_back(&midiTrack);
+            params.push_back(&currentMeterSig);
+            params.push_back(&currentMeasureTime);
+            params.push_back(&totalTime);
+            Functor exportMIDI(&Object::ExportMIDI);
+            Functor exportMIDIEnd(&Object::ExportMIDIEnd);
+
+            LogMessage("Exporting track %d ----------------", midiTrack);
+            this->Process(&exportMIDI, &params, &exportMIDIEnd, &filters);
+
+            midiTrack++;
+        }
+    }
 }
 
 void Doc::PrepareDrawing()

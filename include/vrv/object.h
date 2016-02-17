@@ -636,6 +636,21 @@ public:
      */
     virtual int TimeSpanningLayerElements(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
+    /**
+     * Export the object to a MidiFile
+     * param 0: MidiFile*: the MidiFile we are writing to
+     * param 1: int*: the midi track number
+     * param 2: MeterSig
+     * param 3: int*: the current time in the measure (incremented by each element)
+     * param 4: int*: the current total measure time (incremented by each measure
+     */
+    virtual int ExportMIDI(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * Export the object to a MidiFile (end method)
+     */
+    virtual int ExportMIDIEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
 protected:
     /**
      * Clear the children vector and delete all the objects.

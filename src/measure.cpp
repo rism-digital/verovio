@@ -351,4 +351,44 @@ int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::ExportMIDI(ArrayPtrVoid *params)
+{
+    // param 0: MidiFile*: the MidiFile we are writing to
+    // param 1: int*: the midi track number
+    // param 2: MeterSig** the current meterSig
+    // param 3: int*: the current time in the measure (incremented by each element)
+    // param 4: int*: the current total measure time (incremented by each measure
+    MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
+    int *midiTrack = static_cast<int *>((*params).at(1));
+    MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
+    int *currentMeasureTime = static_cast<int *>((*params).at(3));
+    int *totalTime = static_cast<int *>((*params).at(4));
+
+    // Here we need to reset the currentMeasureTime because we are starting a new measure
+    (*currentMeasureTime) = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::ExportMIDIEnd(ArrayPtrVoid *params)
+{
+    // param 0: MidiFile*: the MidiFile we are writing to
+    // param 1: int*: the midi track number
+    // param 2: MeterSig** the current meterSig
+    // param 3: int*: the current time in the measure (incremented by each element)
+    // param 4: int*: the current total measure time (incremented by each measure
+    MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
+    int *midiTrack = static_cast<int *>((*params).at(1));
+    MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
+    int *currentMeasureTime = static_cast<int *>((*params).at(3));
+    int *totalTime = static_cast<int *>((*params).at(4));
+
+    // Here we need to reset the increment the totalTime because we are endin a measure
+    // I am not sure what will/should happen if the currentMeterSig is not set, e.g., if a layer
+    // it not in the measure
+    (*totalTime) += 0; //  value ????
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

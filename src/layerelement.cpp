@@ -41,6 +41,10 @@
 #include "view.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -501,6 +505,69 @@ int LayerElement::TimeSpanningLayerElements(ArrayPtrVoid *params)
     }
     else if (this->GetDrawingX() > (*max_pos)) {
         return FUNCTOR_STOP;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::ExportMIDI(ArrayPtrVoid *params)
+{
+    // param 0: MidiFile*: the MidiFile we are writing to
+    // param 1: int*: the midi track number
+    // param 2: MeterSig** the current meterSig
+    // param 3: int*: the current time in the measure (incremented by each element)
+    // param 4: int*: the current total measure time (incremented by each measure
+    MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
+    int *midiTrack = static_cast<int *>((*params).at(1));
+    MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
+    int *currentMeasureTime = static_cast<int *>((*params).at(3));
+    int *totalTime = static_cast<int *>((*params).at(4));
+
+    // Here we need to check if the LayerElement as a duration, otherwise we can continue
+    if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
+
+    // Now deal with the different elements
+    if (this->Is() == REST) {
+        Rest *rest = dynamic_cast<Rest *>(this);
+        assert(rest);
+        LogMessage("Rest %f", GetAlignmentDuration(NULL, *currentMeterSig));
+        // increase the currentTime accordingly
+    }
+    else if (this->Is() == NOTE) {
+        Note *note = dynamic_cast<Note *>(this);
+        assert(note);
+        LogMessage("Note %f - Track %d", GetAlignmentDuration(NULL, *currentMeterSig), *midiTrack);
+        // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
+        // - get the duration with note->GetNoteOrChordDur()
+        // - get the MIDI code with note->GetOct, GetPname and GetAccid (GetAccidGet is currently missing)
+    }
+    else if (this->Is() == SPACE) {
+        Space *space = dynamic_cast<Space *>(this);
+        assert(space);
+        LogMessage("Space %f", GetAlignmentDuration(NULL, *currentMeterSig));
+        // increase the currentTime accordingly
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::ExportMIDIEnd(ArrayPtrVoid *params)
+{
+    // param 0: MidiFile*: the MidiFile we are writing to
+    // param 1: int*: the midi track number
+    // param 2: MeterSig** the current meterSig
+    // param 3: int*: the current time in the measure (incremented by each element)
+    // param 4: int*: the current total measure time (incremented by each measure
+    MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
+    int *midiTrack = static_cast<int *>((*params).at(1));
+    MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
+    int *currentMeasureTime = static_cast<int *>((*params).at(3));
+    int *totalTime = static_cast<int *>((*params).at(4));
+
+    if (this->Is() == CHORD) {
+        Chord *chord = dynamic_cast<Chord *>(this);
+        assert(chord);
+        LogMessage("Chord %f", GetAlignmentDuration(NULL, *currentMeterSig));
+        // increase the currentTime accordingly.
     }
 
     return FUNCTOR_CONTINUE;

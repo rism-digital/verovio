@@ -131,6 +131,16 @@ public:
 
     virtual int TimeSpanningLayerElements(ArrayPtrVoid *params);
 
+    /**
+     * See Object:ExportMIDI
+     */
+    virtual int ExportMIDI(ArrayPtrVoid *params);
+
+    /**
+     *  See Object:ExportMIDI
+     */
+    virtual int ExportMIDIEnd(ArrayPtrVoid *params);
+
 private:
     //
 public:
