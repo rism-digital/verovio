@@ -105,6 +105,12 @@ public:
      */
     bool RenderToSvgFile(const std::string &filename, int pageNo = 1);
 
+    /**		
+     * Creates a midi file, opens it, and writes to it.		
+     * currently generates a dummy midi file.		
+     */		
+    bool RenderToMidiFile( const std::string &filename );
+
     /**
      * Get the MEI as a string.
      * Get all the pages unless a page number (1-based) is specified
