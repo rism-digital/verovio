@@ -175,11 +175,14 @@ int Layer::AlignHorizontally(ArrayPtrVoid *params)
     Mensur **currentMensur = static_cast<Mensur **>((*params).at(2));
     MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(3));
 
-    // we are starting a new layer, reset the time;
-    (*time) = -2.0;
-
     (*currentMensur) = GetCurrentMensur();
     (*currentMeterSig) = GetCurrentMeterSig();
+
+    // We are starting a new layer, reset the time;
+    int meterUnit = 4;
+    if (*currentMeterSig) meterUnit = (*currentMeterSig)->GetUnit();
+    // We set it to -1.5 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
+    (*time) = DUR_MAX / meterUnit * -1.5;
 
     if (DrawClef() && GetCurrentClef()) {
         GetCurrentClef()->AlignHorizontally(params);
@@ -194,6 +197,7 @@ int Layer::AlignHorizontally(ArrayPtrVoid *params)
         GetCurrentMeterSig()->AlignHorizontally(params);
     }
 
+    // Now we have to set it to 0.0 since we will start aligning muscial content
     (*time) = 0.0;
 
     return FUNCTOR_CONTINUE;

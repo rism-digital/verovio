@@ -304,8 +304,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             }
             // d(^)
             else {
-                // put it on the side, move it left
-                x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 2;
+                // put it on the side, move it left, but not if we have a @stamp
+                if (start->Is() != TIMESTAMP_ATTR) x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 2;
                 if (startChord || startParentChord)
                     y1 = yChordMin + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
                 else
@@ -366,8 +366,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             }
             // (_)P
             else {
-                // put it on the side, move it right
-                x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                // put it on the side, move it right, but not if we have a @stamp2
+                if (end->Is() != TIMESTAMP_ATTR) x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 if (endChord || endParentChord)
                     y2 = yChordMin - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
                 else
