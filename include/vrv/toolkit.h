@@ -10,17 +10,19 @@
 
 #include <string>
 
+//----------------------------------------------------------------------------
+
+#include "doc.h"
+#include "view.h"
+
+//----------------------------------------------------------------------------
+
 #ifdef USE_EMSCRIPTEN
 #include "jsonxx.h"
 #endif
 
 #include "checked.h"
 #include "unchecked.h"
-
-//----------------------------------------------------------------------------
-
-#include "doc.h"
-#include "view.h"
 
 namespace vrv {
 
@@ -105,11 +107,11 @@ public:
      */
     bool RenderToSvgFile(const std::string &filename, int pageNo = 1);
 
-    /**		
-     * Creates a midi file, opens it, and writes to it.		
-     * currently generates a dummy midi file.		
-     */		
-    bool RenderToMidiFile( const std::string &filename );
+    /**
+     * Creates a midi file, opens it, and writes to it.
+     * currently generates a dummy midi file.
+     */
+    bool RenderToMidiFile(const std::string &filename);
 
     /**
      * Get the MEI as a string.
