@@ -377,20 +377,32 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     }
 
     // Positions not attached to a note
-    if ((spanningType == SPANNING_START) || (end->Is() == TIMESTAMP_ATTR)) {
+    if (spanningType == SPANNING_START) {
         if (up)
             y2 = std::max(staff->GetDrawingY(), y1);
         else
             y2 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
     }
-    else if ((spanningType == SPANNING_END) || (start->Is() == TIMESTAMP_ATTR)) {
+    if (end->Is() == TIMESTAMP_ATTR) {
+        if (up)
+            y2 = std::max(staff->GetDrawingY(), y1);
+        else
+            y2 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
+    }
+    if (spanningType == SPANNING_END) {
+        if (up)
+            y1 = std::max(staff->GetDrawingY(), y2);
+        else
+            y1 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
+    }
+    if (start->Is() == TIMESTAMP_ATTR) {
         if (up)
             y1 = std::max(staff->GetDrawingY(), y2);
         else
             y1 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
     }
     // slur accross an entire system; use the staff position
-    else if (spanningType != SPANNING_START_END) {
+    else if (spanningType == SPANNING_MIDDLE) {
         // To be adjusted
         if (up)
             y1 = staff->GetDrawingY();
