@@ -1104,7 +1104,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 flippedNotehead = (note->m_clusterPosition % 2 == 0);
             }
 
-            // if stem goes down, move ledger start to the left and expand it to the full radius
+            // if stem goes down, move ledger start to the left and expand it by a full radius
             if (!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
                 xLedger -= radius;
                 doubleLengthLedger = true;
@@ -1114,7 +1114,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             // flipped noteheads start on normal side no matter what
             flippedNotehead = (note->m_clusterPosition % 2 == 0);
 
-            // if stem goes up, move ledger start to the right and expand it to the full radius
+            // if stem goes up, move ledger start to the right and expand it by a full radius
             if (!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
                 xLedger += radius;
                 doubleLengthLedger = true;
