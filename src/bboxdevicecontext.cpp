@@ -122,7 +122,7 @@ Point BBoxDeviceContext::GetLogicalOrigin()
     return Point(0, 0);
 }
 
-// claculated better
+// calculated better
 void BBoxDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
 {
     int vals[4];
@@ -223,7 +223,7 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     int p1 = penWidth / 2;
     int p2 = p1;
     // how odd line width is handled might depend on the implementation of the device context.
-    // however, we expect the actualy with to be shifted on the left/top
+    // however, we expect the actualy width to be shifted on the left/top
     // e.g. with 7, 4 on the left and 3 on the right
     if (penWidth % 2) {
         p1++;
@@ -340,11 +340,11 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y)
         glyph->GetBoundingBox(&g_x, &g_y, &g_w, &g_h);
 
         int x_off = x + g_x * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
-        // because we are in the drawing context, y position are already flipped
+        // because we are in the drawing context, y position is already flipped
         int y_off = y - g_y * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
 
         UpdateBB(x_off, y_off, x_off + g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(),
-            // idem, y position are flipped
+            // idem, y position is flipped
             y_off - g_h * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm());
 
         lastCharWidth = g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
@@ -362,7 +362,7 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
         return;
     }
 
-    // the array should not be empty
+    // the array may not be empty
     assert(!m_objects.empty());
 
     // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View

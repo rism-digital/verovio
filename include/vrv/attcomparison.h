@@ -34,7 +34,7 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
-        // This should not happen but, but just in case
+        // This should not happen, but just in case
         if (!object->HasAttClass(ATT_COMMON)) return false;
         AttCommon *element = dynamic_cast<AttCommon *>(object);
         assert(element);

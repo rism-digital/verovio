@@ -23,7 +23,7 @@ class Measure;
 
 /**
  * This class is an interface for elements having a single time point, such as tempo, reh, etc..
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class TimePointInterface : public Interface, public AttStaffident, public AttStartid, public AttTimestampMusical {
 public:
@@ -117,13 +117,13 @@ private:
 
 /**
  * This class is an interface for spanning elements, such as slur, hairpin, etc..
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class TimeSpanningInterface : public TimePointInterface, public AttStartendid, public AttTimestamp2Musical {
 public:
     /**
      * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     TimeSpanningInterface();
@@ -171,9 +171,9 @@ public:
     //-----------------//
 
     /**
-     * We have functor in the interface for avoiding code duplication in each implementation class.
+     * We have functors in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the DocObject (implementation) to
-     * the functor method. These not called by the Process/Call loop but by the implementaion
+     * the functor methods. These are not called by the Process/Call loop but by the implementation
      * classes explicitely. See FloatingElement::FillStaffCurrentTimeSpanning for an example.
      */
 

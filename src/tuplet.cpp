@@ -48,7 +48,7 @@ void Tuplet::AddLayerElement(LayerElement *element)
 
 void Tuplet::FilterList(ListOfObjects *childList)
 {
-    // We want to keep only notes and rest
+    // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
     ListOfObjects::iterator iter = childList->begin();
 

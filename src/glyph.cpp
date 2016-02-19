@@ -59,7 +59,7 @@ Glyph::Glyph(std::string path, std::string codeStr)
     }
 
     std::string viewBox(root.attribute("viewBox").value());
-    // the viewBox attribute is expected to be the for "0 0 2048 2048"
+    // the viewBox attribute is expected to contain four coordinates: "0 0 2048 2048"
     // we are looking for the last value
     if (std::count(viewBox.begin(), viewBox.end(), ' ') < 3) {
         LogMessage("Font file viewBox attribute '%s' is not valid", viewBox.c_str());

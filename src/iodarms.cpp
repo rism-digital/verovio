@@ -342,7 +342,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         dot = 1;
     }
 
-    // tie with following note
+    // tie with the following note
     if (data[pos + 1] == 'L' || data[pos + 1] == 'J') {
         pos++;
         tie = 1;
@@ -368,8 +368,8 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         m_layer->AddLayerElement(note);
 
         // Ties are between two notes and have a reference to the two notes
-        // if more than two notes are ties, the m_second note of the first
-        // tie will containn the same note as the m_first in the second tie:
+        // if more than two notes are tied, the m_second note of the first
+        // tie will contain the same note as the m_first in the second tie:
         // NOTE1 tie1 NOTE2 tie2 NOTE3
         // tie1->m_first = NOTE1, tie1->m_second = NOTE2
         // tie2->m_first = NOTE2, tie2->m_second = NOTE3

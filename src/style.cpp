@@ -27,13 +27,13 @@ Style::Style()
     m_stemWidth = (unsigned short)(DEFAULT_STEM_WITDH * DEFINITON_FACTOR);
 
     /**
-     * Used for initialiazing Doc::m_drawingBeamMin/MaxSlope and used in View::DrawBeamPostponed
+     * Used for initializing Doc::m_drawingBeamMin/MaxSlope and used in View::DrawBeamPostponed
      */
     m_beamMaxSlope = 10;
     m_beamMinSlope = 0;
 
     /**
-     * graceNum and Den for cue sized notes.
+     * graceNum and Den for cue-sized notes.
      */
     m_graceNum = 5;
     m_graceDen = 7;

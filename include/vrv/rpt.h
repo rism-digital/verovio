@@ -25,7 +25,7 @@ class BeatRpt : public LayerElement, public AttBeatRptVis {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     BeatRpt();
@@ -62,7 +62,7 @@ class BTrem : public LayerElement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     BTrem();
@@ -97,7 +97,7 @@ class FTrem : public LayerElement, public ObjectListInterface, public AttSlashco
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     FTrem();
@@ -138,7 +138,7 @@ class MRpt : public LayerElement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     MRpt();
@@ -179,7 +179,7 @@ class MRpt2 : public LayerElement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     MRpt2();
@@ -208,7 +208,7 @@ class MultiRpt : public LayerElement, public AttNumbered {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     MultiRpt();

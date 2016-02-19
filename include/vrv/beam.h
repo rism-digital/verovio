@@ -13,7 +13,7 @@
 
 namespace vrv {
 
-// maximum number of partials allow
+// the maximum allowed number of partials
 #define MAX_DURATION_PARTIALS 16
 
 enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
@@ -26,7 +26,7 @@ class Beam : public LayerElement, public ObjectListInterface, public DrawingList
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
+     * Reset method resets all attribute classes.
      */
     ///@{
     Beam();
@@ -81,7 +81,7 @@ public:
     //
 private:
     /**
-     * An array of the coordinates for each element
+     * An array of coordinates for each element
      **/
     ArrayOfBeamElementCoords m_beamElementCoords;
 };
