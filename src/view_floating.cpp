@@ -48,7 +48,7 @@ void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Meas
     assert(element);
 
     if (element->HasInterface(INTERFACE_TIME_SPANNING)) {
-        // creating placeholder
+        // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
         system->AddToDrawingList(element);
@@ -114,7 +114,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
         x2 = interface->GetEnd()->GetDrawingX();
         spanningType = SPANNING_END;
     }
-    // Rare case where neither the first note and the last note are in the current system - draw the connector
+    // Rare case where neither the first note nor the last note are in the current system - draw the connector
     // throughout the system
     else {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
@@ -258,7 +258,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
         up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
     }
-    //  the look if in a chord
+    // look if in a chord
     else if (startParentChord) {
         if (startParentChord->PositionInChord(startNote) < 0) {
             up = false;
@@ -427,7 +427,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     points[1] = Point(x2, y2);
 
     float angle = 0.0;
-    // We do not want to ajdust the position when calculating bounding boxes (at least for now)
+    // We do not want to adjust the position when calculating bounding boxes (at least for now)
     if (dynamic_cast<BBoxDeviceContext *>(dc) == NULL) angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
 
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR;
@@ -524,7 +524,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
     if (!spanningContentPoints.empty()) {
         AdjustSlurCurve(
             slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, slurAngle);
-        // Use the adjusted control points for ajusting the position (p1, p2 and angle will be updated)
+        // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
         AdjustSlurPosition(
             slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, &slurAngle, true);
         // Now readjust the curvature with the new p1 and p2 with the original control points
@@ -538,8 +538,8 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
             // Something went wrong since now all spanning points should be gone...
             // LogDebug("### %d notes for %s will need position adjustment", spanningContentPoints.size(),
             // slur->GetUuid().c_str());
-            // Use the normal control points for ajusting the position (p1, p2 and angle will be updated)
-            // Move it and forcing both side to move
+            // Use the normal control points for adjusting the position (p1, p2 and angle will be updated)
+            // Move it and force both sides to move
             AdjustSlurPosition(
                 slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, &slurAngle, true);
             GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, maxHeight, staff->m_drawingStaffSize);
@@ -713,7 +713,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
         }
     }
 
-    // Check if we need further adjustment the points with the adjusted curve
+    // Check if we need further adjustment of the points with the adjusted curve
     /*
     bezier[1] = *c1;
     bezier[2] = *c2;
@@ -909,7 +909,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
         up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
     }
-    //  the look if in a chord
+    // look if in a chord
     else if (parentChord1) {
         if (parentChord1->PositionInChord(note1) < 0) {
             up = false;
@@ -1027,7 +1027,7 @@ void View::DrawSylConnector(
     else if (spanningType == SPANNING_END) {
         // nothing to adjust
     }
-    // Rare case where neither the first note and the last note are in the current system - draw the connector
+    // Rare case where neither the first note nor the last note are in the current system - draw the connector
     // throughout the system
     else {
         // nothing to adjust

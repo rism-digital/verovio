@@ -21,7 +21,7 @@ class Tie : public FloatingElement, public TimeSpanningInterface, public AttCurv
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Tie();

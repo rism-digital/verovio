@@ -22,7 +22,7 @@ class Glyph;
 class Object;
 
 /**
- * The following functions are helpers for formating, conversion, or loging
+ * The following functions are helpers for formatting, conversion, or logging.
  * Most of them differ if they are used in the command line tool or in emscripten
  */
 
@@ -71,7 +71,7 @@ std::string StringFormatVariable(const char *format, va_list arg);
 std::string GetFileVersion(int vmaj, int vmin, int vrev);
 
 /**
- * Return a the filename (without extension) extracted from the fullpath
+ * Return the filename (without extension) extracted from the fullpath
  */
 std::string GetFilename(std::string fullpath);
 

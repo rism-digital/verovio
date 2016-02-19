@@ -141,7 +141,7 @@ void Page::LayOutHorizontally()
         params.push_back(&longestActualDur);
         params.push_back(doc);
         Functor setAlignmentX(&Object::SetAlignmentXPos);
-        // Special case: because we redirect the functor, pass it a parameter to itself (!)
+        // Special case: because we redirect the functor, pass it as parameter to itself (!)
         params.push_back(&setAlignmentX);
         this->Process(&setAlignmentX, &params);
     }
@@ -167,7 +167,7 @@ void Page::LayOutHorizontally()
     // Once the m_xShift have been calculated, move all positions accordingly
     params.clear();
     Functor integrateBoundingBoxGraceXShift(&Object::IntegrateBoundingBoxGraceXShift);
-    // Special case: because we redirect the functor, pass it a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it as parameter to itself (!)
     params.push_back(&integrateBoundingBoxGraceXShift);
     this->Process(&integrateBoundingBoxGraceXShift, &params);
 
@@ -194,7 +194,7 @@ void Page::LayOutHorizontally()
     params.push_back(&minMeasureWidth);
     params.push_back(doc);
     Functor integrateBoundingBoxXShift(&Object::IntegrateBoundingBoxXShift);
-    // Special case: because we redirect the functor, pass it a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it as parameter to itself (!)
     params.push_back(&integrateBoundingBoxXShift);
     this->Process(&integrateBoundingBoxXShift, &params);
 
@@ -263,7 +263,7 @@ void Page::LayOutVertically()
     params.push_back(&staffMargin);
     params.push_back(&interlineSize);
     Functor setAlignmentY(&Object::SetAligmentYPos);
-    // Special case: because we redirect the functor, pass it a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it as parameter to itself (!)
     params.push_back(&setAlignmentY);
     this->Process(&setAlignmentY, &params);
 
@@ -273,7 +273,7 @@ void Page::LayOutVertically()
     int shift = 0;
     params.push_back(&shift);
     Functor integrateBoundingBoxYShift(&Object::IntegrateBoundingBoxYShift);
-    // Special case: because we redirect the functor, pass it a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it as parameter to itself (!)
     params.push_back(&integrateBoundingBoxYShift);
     this->Process(&integrateBoundingBoxYShift, &params);
 
@@ -314,7 +314,7 @@ void Page::JustifyHorizontally()
     params.push_back(&margin);
     params.push_back(&systemFullWidth);
     Functor justifyX(&Object::JustifyX);
-    // Special case: because we redirect the functor, pass it a parameter to itself (!)
+    // Special case: because we redirect the functor, pass it as parameter to itself (!)
     params.push_back(&justifyX);
     this->Process(&justifyX, &params);
 }

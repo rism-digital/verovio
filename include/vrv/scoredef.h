@@ -61,7 +61,7 @@ public:
     /**
      * @name Get a copy of the clef, keysig, mensur and meterSig.
      * These methods create new objects (heap) that will need to be deleted.
-     * The also convert attribute value object to an object. For example,
+     * They also convert attribute value objects to an object. For example,
      * if a staffDef has a @key.sig, the copy will be a KeySig object.
      * The conversion from attribute to element is performed in the appropriate
      * constructor of each corresponding class (Clef, KeySig, etc.)
@@ -108,7 +108,7 @@ class ScoreDef : public ScoreDefElement, public ObjectListInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     ScoreDef();
@@ -127,7 +127,7 @@ public:
 
     /**
      * Replace the corresponding staffDef with the content of the newStaffDef.
-     * Looks for the staffDef with the same m_n (@n) and replace the attribute set.
+     * Looks for the staffDef with the same m_n (@n) and replaces the attribute set.
      * Attribute set is provided by the ScoreOrStaffDefInterface.
      */
     void ReplaceDrawingValues(StaffDef *newStaffDef);
@@ -164,7 +164,7 @@ public:
     //----------//
 
     /**
-     * Fill a page by adding systems with the appropriate length
+     * Fill a page by adding systems with the appropriate length.
      * For ScoreDef, this means only moving them since their width is not taken into
      * account
      */
@@ -182,7 +182,7 @@ private:
 public:
     //
 private:
-    /** Flags for indicating whether lables needs to be drawn or not */
+    /** Flags for indicating whether labels need to be drawn or not */
     bool m_drawLabels;
     /** Store the drawing width (clef and key sig) of the scoreDef */
     int m_drawingWidth;
@@ -206,7 +206,7 @@ class StaffGrp : public Object,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     StaffGrp();
@@ -261,7 +261,7 @@ class StaffDef : public ScoreDefElement,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     StaffDef();
@@ -284,7 +284,7 @@ public:
     virtual int ReplaceDrawingValuesInStaffDef(ArrayPtrVoid *params);
 
     /**
-     * Set drawing flags for the StaffDef for indicating whether clefs, keysig, etc. needs
+     * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
      * to be redrawn.
      * This typically occurs when a new System or a new  ScoreDef is encountered.
      * See implementation and Object::SetStaffDefRedrawFlags for the parameters.

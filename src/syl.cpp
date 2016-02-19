@@ -57,7 +57,7 @@ void Syl::AddTextElement(TextElement *element)
 }
 
 //----------------------------------------------------------------------------
-// Functors methods
+// Functor methods
 //----------------------------------------------------------------------------
 
 int Syl::PrepareLyrics(ArrayPtrVoid *params)

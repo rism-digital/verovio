@@ -103,7 +103,7 @@ void Doc::PrepareDrawing()
         this->Process(&resetDrawing, &params);
     }
 
-    // Try to match all spanning elements (slur, tie, etc) by processing backward
+    // Try to match all spanning elements (slur, tie, etc) by processing backwards
     std::vector<DocObject *> timeSpanningElements;
     bool fillList = true;
     params.push_back(&timeSpanningElements);
@@ -111,10 +111,10 @@ void Doc::PrepareDrawing()
     Functor prepareTimeSpanning(&Object::PrepareTimeSpanning);
     this->Process(&prepareTimeSpanning, &params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
 
-    // First we try backward because nomrally the spanning elements are at the end of
+    // First we try backwards because normally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
     // in the encoding. For these, the previous iteration will not have resolved the link and
-    // the spanning elements will remain in the timeSpanningElements array. We try again forward
+    // the spanning elements will remain in the timeSpanningElements array. We try again forwards
     // but this time without filling the list (that is only will the remaining elements)
     if (!timeSpanningElements.empty()) {
         fillList = false;
@@ -146,13 +146,13 @@ void Doc::PrepareDrawing()
     // StaffN_LayerN_VerseN_t staffLayerVerseTree;
     // params.push_back(&staffLayerVerseTree);
 
-    // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
+    // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
     // LogElapsedTimeStart();
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
     this->Process(&prepareProcessingLists, &params);
 
-    // The tree is used to process each staff/layer/verse separatly
-    // For this, we use a array of AttCommmonNComparison that looks for each object if it is of the type
+    // The tree is used to process each staff/layer/verse separately
+    // For this, we use an array of AttCommmonNComparison that looks for each object if it is of the type
     // and with @n specified
 
     IntTree_t::iterator staves;
@@ -228,7 +228,7 @@ void Doc::PrepareDrawing()
                 filters.push_back(&matchLayer);
                 filters.push_back(&matchVerse);
 
-                // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+                // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
                 // m_drawingLastNote is set only if the syl has a forward connector
                 currentSyl = NULL;
                 lastNote = NULL;
@@ -271,7 +271,7 @@ void Doc::PrepareDrawing()
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
-            // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+            // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
             // m_drawingLastNote is set only if the syl has a forward connector
             currentMRpt = NULL;
             // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
@@ -669,7 +669,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     }
 
     // From here we could check if values have changed
-    // Since  m_style->m_interlDefin stays the same, it useless to do it
+    // Since  m_style->m_interlDefin stays the same, it's useless to do it
     // every time for now.
 
     m_drawingBeamMaxSlope = this->m_style->m_beamMaxSlope;
