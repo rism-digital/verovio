@@ -20,7 +20,7 @@ namespace vrv {
  * as possible, they are 10 times the original values. Since the unit
  * per em value is also 10 times the original, there is no incident on
  * calculations elsewhere. However, it does increase the precision because
- * units are always multiplied by a point size before being devided by the
+ * units are always multiplied by a point size before being divided by the
  * unit per em. See 
  * Ex: 10.2 become 102, with a unit per em of 20480 (instead of 2048)
  */

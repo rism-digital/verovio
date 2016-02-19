@@ -50,7 +50,7 @@ void Beam::AddLayerElement(LayerElement *element)
 void Beam::FilterList( ListOfObjects *childList )
 {
     bool firstNoteGrace = false;
-    // We want to keep only notes and rest
+    // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
     ListOfObjects::iterator iter = childList->begin();
     
@@ -103,7 +103,7 @@ bool Beam::IsFirstInBeam(LayerElement *element)
     int position = this->GetListIndex(element);
     // This method should be called only if the note is part of a beam
     assert( position != -1 );
-    // this is this first one
+    // this is the first one
     if (position == 0) return true;
     return false;
 }

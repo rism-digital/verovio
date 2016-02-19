@@ -208,7 +208,7 @@ void Chord::ResetAccidSpace(int fullUnit)
     
     /*
      * Each accidental's Y position will be its vertical center; set the grid extremes to account for that
-     * Resize m_accidSpace to be as tall as is possibly necessary; must accomodate every accidental stacked vertically.
+     * Resize m_accidSpace to be as tall as possibly necessary; must accomodate every accidental stacked vertically.
      */
     int accidHeight = ACCID_HEIGHT * halfUnit;
     int yMax, yMin;

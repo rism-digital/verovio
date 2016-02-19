@@ -24,13 +24,13 @@ class Object;
 //----------------------------------------------------------------------------
 
 /** 
- * This class calculates the bouding box of the object that are drawn.
+ * This class calculates the bouding box of the object being drawn.
  * It can be used when doing the layout of the object in order to manage object spacing.
  * The drawing primitives do not draw anything but update the bounding box values of the 
  * layout objects currently drawn. The layout objects store their own bounding box and a
  * bounding box of their content. The own bouding box is updated only for the object being
  * drawn (the top one on the stack). The content bounding box is updated for all objects
- * the stack
+ * on the stack
  */
 class BBoxDeviceContext: public DeviceContext
 {

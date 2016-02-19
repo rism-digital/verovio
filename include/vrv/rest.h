@@ -27,7 +27,7 @@ class Rest: public LayerElement, public DurationInterface, public PositionInterf
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Rest();

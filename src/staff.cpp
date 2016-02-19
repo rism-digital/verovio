@@ -236,7 +236,7 @@ int Staff::PrepareRpt( ArrayPtrVoid *params )
     ScoreDef *scoreDef = static_cast<ScoreDef*>((*params).at(2));
     
     // If multiNumber is set, we already know that nothing needs to be done
-    // Futhermore, if @multi.number is false, the functor should have stop (see below)
+    // Futhermore, if @multi.number is false, the functor should have stopped (see below)
     if ((*multiNumber) != BOOLEAN_NONE) {
         return FUNCTOR_CONTINUE;
     }

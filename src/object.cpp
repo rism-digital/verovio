@@ -47,7 +47,7 @@ Object::Object(std::string classid)
 
 Object *Object::Clone( )
 {
-    // This should never happen because the method should be overwritten
+    // This should never happen because the method should be overridden
     assert( false );
     return NULL;
 }
@@ -109,7 +109,7 @@ void Object::Init(std::string classid)
     
 ClassId Object::Is()
 {
-    // we should always have the method overwritten
+    // we should always have the method overridden
     assert( false );
     return OBJECT;
 };
@@ -147,7 +147,7 @@ void Object::ClearChildren()
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); ++iter)
     {
-        // we need to check if the this is the parent
+        // we need to check if this is the parent
         // ownership might have been given up with Relinquish
         if ((*iter)->m_parent == this) {
             delete *iter;
@@ -307,7 +307,7 @@ void Object::GenerateUuid()
 {
     int nr = std::rand();
     char str[17];
-    // I do not want to use a stream to do this!
+    // I do not want to use a stream for doing this!
     snprintf (str, 16, "%016d", nr);
     
     m_uuid = m_classid + std::string(str);
@@ -470,7 +470,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor
         return;
     }
     else if (this->IsEditorialElement()) {
-        // since editorial object do not count, we re-increase the deepness limit
+        // since editorial object doesn't count, we increase the deepness limit
         deepness++;
     }
     if (deepness == 0) {
@@ -483,7 +483,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor
     // We need a pointer to the array for the option to work on a reversed copy
     ArrayOfObjects *children = &this->m_children;
     ArrayOfObjects reversed;
-    // For processing backward, we operated on a copied reversed version
+    // For processing backwards, we operated on a copied reversed version
     // Since we hold pointers, only addresses are copied
     if ( direction == BACKWARD ) {
         reversed = (*children);
@@ -982,7 +982,7 @@ int Object::AlignHorizontally( ArrayPtrVoid *params )
 int Object::AlignVertically( ArrayPtrVoid *params )
 {
     // param 0: the systemAligner (unused)
-    // param 1: the staffNb (unused
+    // param 1: the staffNb (unused)
     
     // reset all the drawing values - this also need to be called
     // from any functor overriding this one!
@@ -993,12 +993,12 @@ int Object::AlignVertically( ArrayPtrVoid *params )
     
 int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
 {
-    // param 0: the minimu position (i.e., the width of the previous element)
+    // param 0: the minimum position (i.e., the width of the previous element)
     // param 1: the Doc
     int *min_pos = static_cast<int*>((*params).at(0));
     Doc *doc = static_cast<Doc*>((*params).at(1));
     
-    // starting an new layer
+    // starting new layer
     if (this->Is() == LAYER) {
         (*min_pos) = 0;
         return FUNCTOR_CONTINUE;
@@ -1019,7 +1019,7 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
     // we should have processed aligned before
     assert( note->GetGraceAlignment() );
     
-    // the negative offset it the part of the bounding box that overflows on the left
+    // the negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     int negative_offset = - (note->m_contentBB_x1) + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
@@ -1028,7 +1028,7 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
         //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }
     
-    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
+    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used)
     if ( negative_offset < 0 ) negative_offset = 0;
     
     // check if the element overlaps with the preceeding one given by (*min_pos)
@@ -1050,7 +1050,7 @@ int Object::SetBoundingBoxGraceXShift( ArrayPtrVoid *params )
 
 int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
 {
-    // param 0: the minimu position (i.e., the width of the previous element)
+    // param 0: the minimum position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
     // param 2: the Doc
     int *min_pos = static_cast<int*>((*params).at(0));
@@ -1070,7 +1070,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
         return FUNCTOR_CONTINUE;
     }
     
-    // starting an new layer
+    // starting new layer
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer*>(this);
         assert( current_layer );
@@ -1120,13 +1120,13 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
         return FUNCTOR_CONTINUE;
     }
     
-    // the negative offset it the part of the bounding box that overflows on the left
+    // the negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     int negative_offset = - (current->m_contentBB_x1);
     if (!current->IsGraceNote()) negative_offset += (doc->GetLeftMargin( current->Is() ) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     
-    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
+    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used)
     if ( negative_offset < 0 ) negative_offset = 0;
 
     // with a grace note, also take into account the full with of the group given by the GraceAligner
@@ -1167,7 +1167,7 @@ int Object::SetBoundingBoxXShift( ArrayPtrVoid *params )
 
 int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid *params )
 {
-    // param 0: the minimu position (i.e., the width of the previous element)
+    // param 0: the minimum position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
     int *min_pos = static_cast<int*>((*params).at(0));
     int *measure_width = static_cast<int*>((*params).at(1));
@@ -1189,7 +1189,7 @@ int Object::SetBoundingBoxXShiftEnd( ArrayPtrVoid *params )
         Layer *current_layer = dynamic_cast<Layer*>(this);
         assert( current_layer );
         // mininimum position is the with the layer
-        // we keep it if is higher than what we had so far
+        // we keep it if it's higher than what we had so far
         // this will be used for shifting the right barLine
         (*measure_width) = std::max( (*measure_width), (*min_pos) );
         return FUNCTOR_CONTINUE;

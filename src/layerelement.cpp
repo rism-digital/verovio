@@ -118,7 +118,7 @@ Beam* LayerElement::IsInBeam()
     if ((this->Is() != NOTE) && (this->Is() != CHORD)) return NULL;
     Beam *beamParent = dynamic_cast<Beam*>(this->GetFirstParent( BEAM, MAX_BEAM_DEPTH) );
     if (beamParent != NULL) {
-        // This note is beamed and cue sized
+        // This note is beamed and cue-sized
         if (this->IsCueSize()) {
             // If the note is part of the beam parent, this means we
             // have a beam of graced notes
@@ -284,7 +284,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
         }
         else {
             //type = ALIGNMENT_KEYSIG;
-            // We force this because they should appear only at the beginning of a measure and should be non justifiable
+            // We force this because they should appear only at the beginning of a measure and should be non-justifiable
             // We also need it because the PAE importer creates keySig (and not staffDef @key.sig)
             type = ALIGNMENT_KEYSIG_ATTR;
         }
@@ -309,7 +309,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
             (*currentMeterSig) = dynamic_cast<MeterSig*>(this);
             assert( *currentMeterSig );
             //type = ALIGNMENT_METERSIG
-            // We force this because they should appear only at the beginning of a measure and should be non justifiable
+            // We force this because they should appear only at the beginning of a measure and should be non-justifiable
             // We also need it because the PAE importer creates meterSig (and not staffDef @meter)
             type = ALIGNMENT_METERSIG_ATTR;
         }
@@ -354,7 +354,7 @@ int LayerElement::AlignHorizontally( ArrayPtrVoid *params )
 int LayerElement::PrepareTimeSpanning( ArrayPtrVoid *params )
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match
-    // param 1: bool* fillList for indicating whether the elements have to be stack or not (unused)
+    // param 1: bool* fillList for indicating whether the elements have to be stacked or not (unused)
     std::vector<DocObject*> *elements = static_cast<std::vector<DocObject*>*>((*params).at(0));
     
     std::vector<DocObject*>::iterator iter = elements->begin();

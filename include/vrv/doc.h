@@ -162,7 +162,7 @@ public:
     ///@}
     
     /*
-     * @name Setter and getter linear and non linear spacing parameters
+     * @name Setter and getter for linear and non-linear spacing parameters
      */
     ///@{
     void SetSpacingLinear( double drawingSpacingLinear ) { m_drawingSpacingLinear = drawingSpacingLinear; };
@@ -294,7 +294,7 @@ public:
 private:
     /**
      * The type of document indicates how to deal with the layout information.
-     * A Transcription document types means that the layout information is included
+     * A Transcription document type means that the layout information is included
      * and that no layout algorithm should be applied.
      */
     DocType m_type;

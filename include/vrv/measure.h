@@ -26,7 +26,7 @@ class FloatingElement;
  * This class represents a measure in a page-based score (Doc).
  * A Measure is contained in a Staff.
  * It contains Layer objects.
- * For internally simplication of processing, unmeasure music is contained in one single measure object
+ * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
 class Measure: public DocObject,
     public AttCommon,
@@ -36,7 +36,7 @@ class Measure: public DocObject,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Measure( bool measuredMusic = true, int logMeasureNb = -1 );
@@ -47,7 +47,7 @@ public:
     ///@}
     
     /**
-     * Return true if measured music (otherwise we have fakes measures)
+     * Return true if measured music (otherwise we have fake measures)
      */
     bool IsMeasuredMusic() { return m_measuredMusic; };
     
@@ -66,7 +66,7 @@ public:
     
     /**
      * @name Set and get the left and right barLine types
-     * This somehow conflicts with AttMeasureLog, which are transfered from and to the 
+     * This somehow conflicts with AttMeasureLog, which is transfered from and to the
      * Barline object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
      * MeiOutput::ReadMeiMeasure
      * Alternatively, we could keep them in sync here:
@@ -82,7 +82,7 @@ public:
     
     /**
      * @name Set and get the barlines. 
-     * Careful - the barlines are owned by the measure and will be destroy by it.
+     * Careful - the barlines are owned by the measure and will be destroyed by it.
      * This method should be used only for acessing them (e.g., when drawing) and 
      * not for creating other measure objects.
      */
@@ -94,7 +94,7 @@ public:
     int GetXRel( );
 
     /**
-     * Return the non justifiable with for the measure
+     * Return the non-justifiable left margin for the measure
      */
     int GetNonJustifiableLeftMargin() { return m_measureAligner.GetNonJustifiableMargin(); }
     
@@ -129,13 +129,13 @@ public:
     virtual int AlignVertically( ArrayPtrVoid *params );
 
     /**
-     * Correct the X alignment of grace notes once the the content of a system has been aligned and laid out.
+     * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the GraceAligner.
      */
     virtual int IntegrateBoundingBoxGraceXShift( ArrayPtrVoid *params );
     
     /**
-     * Correct the X alignment once the the content of a system has been aligned and laid out.
+     * Correct the X alignment once the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the MeasureAligner.
      */
     virtual int IntegrateBoundingBoxXShift( ArrayPtrVoid *params );

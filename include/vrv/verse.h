@@ -26,7 +26,7 @@ class Verse: public LayerElement,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Verse();
@@ -53,7 +53,7 @@ public:
     virtual int AlignVertically( ArrayPtrVoid *params );
     
     /**
-     * Builds a tree of int (IntTree) with the staff/layer/verse numbers
+     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
      * and for staff/layer to be then processed.
      */
     virtual int PrepareProcessingLists( ArrayPtrVoid *params );

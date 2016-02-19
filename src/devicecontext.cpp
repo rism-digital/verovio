@@ -37,7 +37,7 @@ void DeviceContext::SetPen( int colour, int width, int opacity )
             opacityValue = 0.0;
             break ;
         default :
-            opacityValue = 1.0; // solid brush as default
+            opacityValue = 1.0; // solid brush by default
     }
     
     m_penStack.push(Pen(colour, width, opacityValue));
@@ -56,7 +56,7 @@ void DeviceContext::SetBrush( int colour, int opacity )
             opacityValue = 0.0;
             break ;
         default :
-            opacityValue = 1.0; // solid brush as default
+            opacityValue = 1.0; // solid brush by default
     }
     
     m_brushStack.push(Brush(colour, opacityValue));

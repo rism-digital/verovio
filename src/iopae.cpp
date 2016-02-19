@@ -56,7 +56,7 @@ int       quiet2Q = 0;               // used with -Q option
 
 // Global variables:
 char data_line[10001] = {0};
-#define MAX_DATA_LEN 1024 // One line of the pae file whould not be this long!
+#define MAX_DATA_LEN 1024 // One line of the pae file would not be that long!
 char data_key[MAX_DATA_LEN]; 
 char data_value[MAX_DATA_LEN]; //ditto as above
 
@@ -377,7 +377,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile) {
         measure_count++;
     }
 
-    // add miniaml scoreDef
+    // add minimal scoreDef
     StaffGrp *staffGrp = new StaffGrp();
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN( 1 );
@@ -576,7 +576,7 @@ int PaeInput::getTupletFermata(const char* incipit, pae::Note* note, int index )
             // move until we find the ;
             while ((t < length) && (incipit[t] != ';')) {
                 
-                // we should not find the parens before the ';' !
+                // we should not find any close paren before the ';' !
                 // FIXME find a graceful way to exit signaling this to user
                 if (incipit[t] == ')') {
                     LogDebug("You have a ) before the ; in a tuplet!");
@@ -641,7 +641,7 @@ int PaeInput::getTupletFermataEnd(const char* incipit, pae::Note *note, int inde
     int i = index;
     //int length = strlen(incipit);
         
-    // TODO currently fermatas inside tuplets won't be handled correctly
+    // TODO: fermatas inside tuplets won't be currently handled correctly
     note->fermata = false;
         
     return i - index;
@@ -735,7 +735,7 @@ int PaeInput::getTimeInfo( const char* incipit, MeterSig *meter, int index) {
         return 0;
     }
     
-    // find the end of time signature end
+    // find the end of time signature
     i++; // the time signature length is a least 1
     while (i < length) {
         if (!isdigit(incipit[i]) && (incipit[i] != '/') && (incipit[i] != '.')) {
@@ -1088,7 +1088,7 @@ int PaeInput::getNote( const char* incipit, pae::Note *note, pae::Measure *measu
     // write back the values we need to save
     note->octave = oct; // save octave
     
-    // tuplets. Decrease the current number is we are in a tuplet
+    // tuplets. Decrease the current number if we are in a tuplet
     // i.e. tuplet_num > 0
     // al the other values just need to be in the first note
     if (tuplet_num > 0) {
@@ -1202,7 +1202,7 @@ void PaeInput::parseNote(pae::Note *note) {
         element = mnote;
     }
     
-    // Does this note have a clef change? push it before everyting else
+    // Does this note have a clef change? push it before everything else
     if (note->clef) {
         addLayerElement(note->clef);
     }
@@ -1398,7 +1398,7 @@ void PaeInput::getAtRecordKeyValue(char *key, char* value,
     
     strcpy(value, &input[index]);
     
-    // Thruncate string to first space
+    // Truncate string to first space
     size_t i;
     for (i = strlen(value) - 2; i > 0; i--) {
         if (isspace(value[i])) {

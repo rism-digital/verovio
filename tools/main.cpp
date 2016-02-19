@@ -344,7 +344,7 @@ int main(int argc, char** argv)
         exit(1);
     }
 
-    // Loaded the music font from the resource diretory
+    // Loaded the music font from the resource directory
     if (!Resources::InitFonts()) {
         cerr << "The music font could not be loaded; please check the contents of the resource directory." << endl;
         exit(1);

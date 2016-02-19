@@ -29,7 +29,7 @@ class Tuplet: public LayerElement, public ObjectListInterface,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Tuplet();

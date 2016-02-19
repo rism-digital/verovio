@@ -270,7 +270,7 @@ void View::DrawStaffGrp( DeviceContext *dc, Measure *measure, StaffGrp *staffGrp
     int y_bottom = last->GetDrawingY() - (lastDef->GetLines() - 1) * m_doc->GetDrawingDoubleUnit(last->m_drawingStaffSize);
     int barLineWidth = m_doc->GetDrawingBarLineWidth(100);
     
-    // ajdust the top and bottom according to staffline width
+    // adjust the top and bottom according to staffline width
     y_top += m_doc->GetDrawingStaffLineWidth(100) / 2;
     y_bottom -= m_doc->GetDrawingStaffLineWidth(100) / 2;
     
@@ -433,7 +433,7 @@ void View::DrawBracket ( DeviceContext *dc, int x, int y1, int y2, int staffSize
     DrawSmuflCode( dc, x1, y1,SMUFL_E003_bracketTop, staffSize, false );
     DrawSmuflCode( dc, x1, y2,SMUFL_E004_bracketBottom, staffSize, false );
     
-    // adjust to top and bottom position so we make sure the is not white space between
+    // adjust to top and bottom position so we make sure there is no white space between
     // the glyphs and the line
     y1 += m_doc->GetDrawingStemWidth(100);
     y2 -= m_doc->GetDrawingStemWidth(100);
@@ -712,7 +712,7 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
     assert( measure );
     assert( system );
     
-    // This is a special case where we do not draw (SVG, Bounding boxes, etc.) the measure if un-measured music
+    // This is a special case where we do not draw (SVG, Bounding boxes, etc.) the measure for unmeasured music
     if ( measure->IsMeasuredMusic()) {
         dc->StartGraphic( measure, "", measure->GetUuid() );
     }
@@ -738,7 +738,7 @@ void View::DrawMeasure( DeviceContext *dc, Measure *measure, System *system )
 
 int View::CalculatePitchPosY ( Staff *staff, data_PITCHNAME pname, int dec_clef, int oct)
 {
-    assert(staff); // Pointer to staff cannot be NULL"
+    assert(staff); // Pointer to staff cannot be NULL
 	
     static char touches[] = {PITCHNAME_c,PITCHNAME_d,PITCHNAME_e,PITCHNAME_f,PITCHNAME_g,PITCHNAME_a,PITCHNAME_b};
 	int y_int;
@@ -763,7 +763,7 @@ int View::CalculatePitchPosY ( Staff *staff, data_PITCHNAME pname, int dec_clef,
 
 int View::CalculateRestPosY ( Staff *staff, char duration)
 {
-    assert(staff); // Pointer to staff cannot be NULL"
+    assert(staff); // Pointer to staff cannot be NULL
 
 	int staff_space = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int base = -17 * staff_space; // -17 is a magic number copied from above
@@ -850,7 +850,7 @@ void View::DrawStaffLines( DeviceContext *dc, Staff *staff, Measure *measure, Sy
     for(j = 0;j < staff->m_drawingLines; j++)
     {
         dc->DrawLine( ToDeviceContextX (x1) , ToDeviceContextY ( yy ) , ToDeviceContextX (x2) , ToDeviceContextY ( yy ) );
-        // For drawing rectangles insteam of line
+        // For drawing rectangles instead of lines
         yy -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     }
     
@@ -932,7 +932,7 @@ void View::DrawLayer( DeviceContext *dc, Layer *layer, Staff *staff, Measure *me
     // first we need to clear the drawing list of postponed elements
     layer->ResetDrawingList();
     
-    // the draw the scoreDef when required
+    // draw the scoreDef if required
     if (layer->GetDrawingClef()) {
         DrawLayerElement(dc, layer->GetDrawingClef(), layer, staff, measure);
     }
