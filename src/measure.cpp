@@ -361,8 +361,8 @@ int Measure::ExportMIDI(ArrayPtrVoid *params)
     MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
     int *midiTrack = static_cast<int *>((*params).at(1));
     MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
-    int *currentMeasureTime = static_cast<int *>((*params).at(3));
-    int *totalTime = static_cast<int *>((*params).at(4));
+    double *currentMeasureTime = static_cast<double *>((*params).at(3));
+    double *totalTime = static_cast<double *>((*params).at(4));
 
     // Here we need to reset the currentMeasureTime because we are starting a new measure
     (*currentMeasureTime) = 0;
@@ -380,8 +380,8 @@ int Measure::ExportMIDIEnd(ArrayPtrVoid *params)
     MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
     int *midiTrack = static_cast<int *>((*params).at(1));
     MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
-    int *currentMeasureTime = static_cast<int *>((*params).at(3));
-    int *totalTime = static_cast<int *>((*params).at(4));
+    double *currentMeasureTime = static_cast<double *>((*params).at(3));
+    double *totalTime = static_cast<double *>((*params).at(4));
 
     // Here we need to reset the increment the totalTime because we are endin a measure
     // I am not sure what will/should happen if the currentMeterSig is not set, e.g., if a layer

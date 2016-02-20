@@ -135,8 +135,8 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             filters.push_back(&matchLayer);
 
             MeterSig *currentMeterSig = NULL;
-            int currentMeasureTime = 0;
-            int totalTime = 0;
+            double currentMeasureTime = 0.0;
+            double totalTime = 0.0;
 
             params.clear();
             params.push_back(midiFile);

@@ -520,8 +520,8 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
     MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
     int *midiTrack = static_cast<int *>((*params).at(1));
     MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
-    int *currentMeasureTime = static_cast<int *>((*params).at(3));
-    int *totalTime = static_cast<int *>((*params).at(4));
+    double *currentMeasureTime = static_cast<double *>((*params).at(3));
+    double *totalTime = static_cast<double *>((*params).at(4));
 
     // Here we need to check if the LayerElement as a duration, otherwise we can continue
     if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
@@ -560,8 +560,8 @@ int LayerElement::ExportMIDIEnd(ArrayPtrVoid *params)
     MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
     int *midiTrack = static_cast<int *>((*params).at(1));
     MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
-    int *currentMeasureTime = static_cast<int *>((*params).at(3));
-    int *totalTime = static_cast<int *>((*params).at(4));
+    double *currentMeasureTime = static_cast<double *>((*params).at(3));
+    double *totalTime = static_cast<double *>((*params).at(4));
 
     if (this->Is() == CHORD) {
         Chord *chord = dynamic_cast<Chord *>(this);
