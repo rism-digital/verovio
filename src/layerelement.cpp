@@ -532,20 +532,44 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
         assert(rest);
         LogMessage("Rest %f", GetAlignmentDuration(NULL, *currentMeterSig));
         // increase the currentTime accordingly
+        (*currentMeasureTime) += GetAlignmentDuration(NULL, *currentMeterSig);
     }
     else if (this->Is() == NOTE) {
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
-        LogMessage("Note %f - Track %d", GetAlignmentDuration(NULL, *currentMeterSig), *midiTrack);
-        // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
-        // - get the duration with note->GetNoteOrChordDur()
+
+        LogMessage("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d",
+            GetAlignmentDuration(NULL, *currentMeterSig), note->GetNoteOrChordDur(this), note->GetDiatonicPitch(),
+            *midiTrack);
+        LogMessage("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
+        // - get the duration with note->GetNoteOrChordDur() ?
         // - get the MIDI code with note->GetOct, GetPname and GetAccid (GetAccidGet is currently missing)
+        int oct = note->GetOct();
+        int pname = note->GetPname() - 1;
+        int pindex = (pname <= 2) ? pname * 2 : pname * 2 - 1;
+        int pitch = 12 * (oct + 1) + pindex; // how to to take into account accidental??
+
+        vector<uchar> midievent;
+        midievent.resize(3);
+        midievent[0] = 0x90; // note on
+        midievent[1] = pitch;
+        midievent[2] = 64; // store attack/release velocity for note command
+        midiFile->addEvent(*midiTrack, *totalTime + *currentMeasureTime, midievent);
+        midievent[0] = 0x80; // note off
+        midiFile->addEvent(
+            *midiTrack, *totalTime + *currentMeasureTime + GetAlignmentDuration(NULL, *currentMeterSig), midievent);
+
+        // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
+        if (!(note->IsChordTone())) {
+            (*currentMeasureTime) += GetAlignmentDuration(NULL, *currentMeterSig);
+        }
     }
     else if (this->Is() == SPACE) {
         Space *space = dynamic_cast<Space *>(this);
         assert(space);
         LogMessage("Space %f", GetAlignmentDuration(NULL, *currentMeterSig));
         // increase the currentTime accordingly
+        (*currentMeasureTime) += GetAlignmentDuration(NULL, *currentMeterSig);
     }
     return FUNCTOR_CONTINUE;
 }
@@ -568,6 +592,7 @@ int LayerElement::ExportMIDIEnd(ArrayPtrVoid *params)
         assert(chord);
         LogMessage("Chord %f", GetAlignmentDuration(NULL, *currentMeterSig));
         // increase the currentTime accordingly.
+        (*currentMeasureTime) += GetAlignmentDuration(NULL, *currentMeterSig);
     }
 
     return FUNCTOR_CONTINUE;

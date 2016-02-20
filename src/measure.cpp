@@ -386,7 +386,7 @@ int Measure::ExportMIDIEnd(ArrayPtrVoid *params)
     // Here we need to reset the increment the totalTime because we are endin a measure
     // I am not sure what will/should happen if the currentMeterSig is not set, e.g., if a layer
     // it not in the measure
-    (*totalTime) += 0; //  value ????
+    (*totalTime) += *currentMeasureTime; //  value ????
 
     return FUNCTOR_CONTINUE;
 }
