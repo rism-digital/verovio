@@ -123,10 +123,12 @@ void Doc::ExportMIDI(MidiFile *midiFile)
     IntTree_t::iterator layers;
 
     // Process notes and chords, rests, spaces layer by layer
-    int midiTrack = 0;
+    // track 0 (included by default) is reserved for meta messages common to all tracks
+    int midiTrack = 1;
     std::vector<AttComparison *> filters;
     for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            midiFile->addTrack(1);
             filters.clear();
             // Create ad comparison object for each type / @n
             AttCommonNComparison matchStaff(STAFF, staves->first);
