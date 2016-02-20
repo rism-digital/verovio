@@ -200,9 +200,9 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         DurationInterface *duration = dynamic_cast<DurationInterface *>(this);
         assert(duration);
         if (duration->IsMensural()) {
-            return duration->GetAlignmentMensuralDuration(num, numbase, mensur);
+            return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
-        double durationValue = duration->GetAlignmentDuration(num, numbase);
+        double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
         // With fTrem we need to divide the duration by two
         FTrem *fTrem = dynamic_cast<FTrem *>(this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
         if (fTrem) {

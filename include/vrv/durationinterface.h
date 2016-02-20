@@ -50,14 +50,14 @@ public:
      * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
      * LayerElement and DurationInterface have no inheritance link.
      */
-    virtual double GetAlignmentDuration(int num, int numbase);
+    double GetInterfaceAlignmentDuration(int num, int numbase);
 
     /**
      * Returns the duration (in double) for the element for mensural notation
      * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
      * need to be modifiy for shorter equality in later repertoire.
      */
-    virtual double GetAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur);
+    double GetInterfaceAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur);
 
     /**
      * Return true if the note or rest is the first of a beam.
