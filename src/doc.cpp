@@ -102,7 +102,16 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 {
     ArrayPtrVoid params;
 
+    // We first calculate the maximum duration of each measure
+    std::vector<double> maxValues;
+    double currentValue;
+    params.push_back(&maxValues);
+    params.push_back(&currentValue);
+    Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
+    this->Process(&calcMaxMeasureDuration, &params);
+
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
+    params.clear();
     IntTree verseTree;
     IntTree layerTree;
     params.push_back(&verseTree);
@@ -136,16 +145,16 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
-            MeterSig *currentMeterSig = NULL;
             double currentMeasureTime = 0.0;
             double totalTime = 0.0;
+            std::vector<double> maxValuesLayer = maxValues;
 
             params.clear();
             params.push_back(midiFile);
             params.push_back(&midiTrack);
-            params.push_back(&currentMeterSig);
             params.push_back(&currentMeasureTime);
             params.push_back(&totalTime);
+            params.push_back(&maxValuesLayer);
             Functor exportMIDI(&Object::ExportMIDI);
             Functor exportMIDIEnd(&Object::ExportMIDIEnd);
 

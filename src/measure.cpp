@@ -353,16 +353,12 @@ int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
 
 int Measure::ExportMIDI(ArrayPtrVoid *params)
 {
-    // param 0: MidiFile*: the MidiFile we are writing to
-    // param 1: int*: the midi track number
-    // param 2: MeterSig** the current meterSig
-    // param 3: int*: the current time in the measure (incremented by each element)
-    // param 4: int*: the current total measure time (incremented by each measure
-    MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
-    int *midiTrack = static_cast<int *>((*params).at(1));
-    MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
-    double *currentMeasureTime = static_cast<double *>((*params).at(3));
-    double *totalTime = static_cast<double *>((*params).at(4));
+    // param 0: MidiFile*: the MidiFile we are writing to (unused)
+    // param 1: int*: the midi track number (unused)
+    // param 2: int*: the current time in the measure (incremented by each element)
+    // param 3: int*: the current total measure time (incremented by each measure (unused)
+    // param 4: std::vector<double>: a stack of maximum duration filled by the functor (unused)
+    double *currentMeasureTime = static_cast<double *>((*params).at(2));
 
     // Here we need to reset the currentMeasureTime because we are starting a new measure
     (*currentMeasureTime) = 0;
@@ -372,21 +368,31 @@ int Measure::ExportMIDI(ArrayPtrVoid *params)
 
 int Measure::ExportMIDIEnd(ArrayPtrVoid *params)
 {
-    // param 0: MidiFile*: the MidiFile we are writing to
-    // param 1: int*: the midi track number
-    // param 2: MeterSig** the current meterSig
-    // param 3: int*: the current time in the measure (incremented by each element)
-    // param 4: int*: the current total measure time (incremented by each measure
-    MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
-    int *midiTrack = static_cast<int *>((*params).at(1));
-    MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
-    double *currentMeasureTime = static_cast<double *>((*params).at(3));
-    double *totalTime = static_cast<double *>((*params).at(4));
+    // param 0: MidiFile*: the MidiFile we are writing to (unused)
+    // param 1: int*: the midi track number (unused)
+    // param 2: int*: the current time in the measure (incremented by each element) (unused)
+    // param 3: int*: the current total measure time (incremented by each measure
+    // param 4: std::vector<double>: a stack of maximum duration filled by the functor
+    double *totalTime = static_cast<double *>((*params).at(3));
+    std::vector<double> *maxValues = static_cast<std::vector<double> *>((*params).at(4));
 
-    // Here we need to reset the increment the totalTime because we are endin a measure
-    // I am not sure what will/should happen if the currentMeterSig is not set, e.g., if a layer
-    // it not in the measure
-    (*totalTime) += *currentMeasureTime; //  value ????
+    // We a to the total time the maximum duration of the measure so if there is no layer, if the layer is not full or
+    // if there is an encoding error in the measure, the next one will be properly aligned
+    assert(!maxValues->empty());
+    (*totalTime) += maxValues->front();
+    maxValues->erase(maxValues->begin());
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::CalcMaxMeasureDuration(ArrayPtrVoid *params)
+{
+    // param 0: std::vector<double>: a stack of maximum duration filled by the functor
+    // param 1: double: the duration of the current measure (unused)
+    std::vector<double> *maxValues = static_cast<std::vector<double> *>((*params).at(0));
+
+    // We just need to add a value to the stack
+    maxValues->push_back(0.0);
 
     return FUNCTOR_CONTINUE;
 }

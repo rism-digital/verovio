@@ -640,9 +640,9 @@ public:
      * Export the object to a MidiFile
      * param 0: MidiFile*: the MidiFile we are writing to
      * param 1: int*: the midi track number
-     * param 2: MeterSig
-     * param 3: int*: the current time in the measure (incremented by each element)
-     * param 4: int*: the current total measure time (incremented by each measure
+     * param 2: int*: the current time in the measure (incremented by each element)
+     * param 3: int*: the current total measure time (incremented by each measure
+     * param 4: std::vector<double>: a stack of maximum duration of each measure (emptied by the functor)
      */
     virtual int ExportMIDI(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
@@ -650,6 +650,18 @@ public:
      * Export the object to a MidiFile (end method)
      */
     virtual int ExportMIDIEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * Calculate the maximum duration of each measure.
+     * param 0: std::vector<double>: a stack of maximum duration filled by the functor
+     * param 1: double: the maximum duration of the current measure
+     */
+    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * See Object::CalcMaxMeasureDuration
+     */
+    virtual int CalcMaxMeasureDurationEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
 protected:
     /**

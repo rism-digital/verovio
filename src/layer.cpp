@@ -283,21 +283,14 @@ int Layer::PrepareRpt(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::ExportMIDI(ArrayPtrVoid *params)
+int Layer::CalcMaxMeasureDuration(ArrayPtrVoid *params)
 {
-    // param 0: MidiFile*: the MidiFile we are writing to
-    // param 1: int*: the midi track number
-    // param 2: MeterSig** the current meterSig
-    // param 3: int*: the current time in the measure (incremented by each element)
-    // param 4: int*: the current total measure time (incremented by each measure
-    MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
-    int *midiTrack = static_cast<int *>((*params).at(1));
-    MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(2));
-    double *currentMeasureTime = static_cast<double *>((*params).at(3));
-    double *totalTime = static_cast<double *>((*params).at(4));
+    // param 0: std::vector<double>: a stack of maximum duration filled by the functor (unused)
+    // param 1: double: the duration of the current measure
+    double *currentValue = static_cast<double *>((*params).at(1));
 
-    // Here we set the current meterSig
-    (*currentMeterSig) = GetCurrentMeterSig();
+    // reset it
+    (*currentValue) = 0.0;
 
     return FUNCTOR_CONTINUE;
 }

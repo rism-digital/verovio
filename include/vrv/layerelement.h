@@ -140,6 +140,11 @@ public:
      *  See Object:ExportMIDI
      */
     virtual int ExportMIDIEnd(ArrayPtrVoid *params);
+    
+    /**
+     * See Object::CalcMaxMeasureDuration
+     */
+    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
 
 private:
     //

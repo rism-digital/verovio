@@ -126,9 +126,9 @@ public:
     virtual int PrepareRpt(ArrayPtrVoid *params);
 
     /**
-     * See Object:ExportMIDI
+     * See Object::CalcMaxMeasureDuration
      */
-    virtual int ExportMIDI(ArrayPtrVoid *params);
+    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
 
 private:
     //
