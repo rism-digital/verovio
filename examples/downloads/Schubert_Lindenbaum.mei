@@ -170,6 +170,12 @@
                 </changeDesc>
                 <date>2015-09-12</date>
             </change> 
+            <change n="7" resp="LP">
+                <changeDesc>
+                    <p>Fixing a few duration errors (mes. 15, 17 and 19)</p>
+                </changeDesc>
+                <date>2015-09-12</date>
+            </change> 
         </revisionDesc>
     </meiHead>
     <music>
@@ -220,7 +226,7 @@
                                 </layer>
                             </staff>
                             <dynam label="direction" tstamp="1" tstamp.ges="0" place="below" staff="2">p</dynam>
-                            <tempo staff="1" place="above" tstamp="0">Mässig.</tempo>
+                            <tempo staff="1" place="above" tstamp="1">Mässig.</tempo>
                             <dir staff="1" place="above" tstamp="0">205.</dir>
                         </measure>
                         <measure n="2" xml:id="d1e192">
@@ -1412,7 +1418,7 @@
                                             <note xml:id="d1e5913" pname="a" oct="4"/>
                                             <note xml:id="d1e5934" pname="f" oct="4"/>
                                         </chord>
-                                        <chord xml:id="d531e1" dur="8" stem.dir="up">
+                                        <chord xml:id="d531e1" dur="16" stem.dir="up">
                                             <note xml:id="d1e5976" pname="b" oct="4" accid.ges="f"/>
                                             <note xml:id="d1e5997" pname="g" oct="4"/>
                                         </chord>
@@ -1601,7 +1607,7 @@
                                     </chord>
                                     <tuplet num="3" numbase="2" num.format="count">
                                         <beam>
-                                            <chord xml:id="d618e1" dur="8" dots="1" stem.dir="up">
+                                            <chord xml:id="d618e1" dur="8" stem.dir="up">
                                                 <note xml:id="d1e6958" pname="c" oct="5"/>
                                                 <note xml:id="d1e6980" pname="f" oct="4"/>
                                                 <note xml:id="d1e7001" pname="c" oct="4"/>
@@ -1848,7 +1854,7 @@
                                     </beam>
                                     <beam>
                                         <note xml:id="d1e8505" pname="c" oct="4" dur="8" dots="1" stem.dir="down"/>
-                                        <chord xml:id="d732e1" dur="8" stem.dir="down">
+                                        <chord xml:id="d732e1" dur="16" stem.dir="down">
                                             <note xml:id="d1e8526" pname="b" oct="3" accid.ges="f"/>
                                             <note xml:id="d1e8548" pname="c" oct="3"/>
                                         </chord>
