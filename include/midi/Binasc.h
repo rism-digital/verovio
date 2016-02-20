@@ -14,6 +14,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -70,15 +71,27 @@ class Binasc {
       static ostream& writeLittleEndianDouble (ostream& out, double value);
       static ostream& writeBigEndianDouble    (ostream& out, double value);
 
+      static string   keyToPitchName          (int key);
+
    protected:
       // helper functions for reading ASCII content to conver to binary:
-      int      processLine        (ostream& out, char* word, int lineNum);
-      int      processAsciiWord   (ostream& out, const char* word, int lineNum);
-      int      processBinaryWord  (ostream& out, const char* word, int lineNum);
-      int      processDecimalWord (ostream& out, const char* word, int lineNum);
-      int      processHexWord     (ostream& out, const char* word, int lineNum);
-      int      processVlvWord     (ostream& out, const char* word, int lineNum);
-      int      processMidiPitchBendWord(ostream& out, const char* word, 
+      int      processLine        (ostream& out, const string& input, 
+                                   int lineNum);
+      int      processAsciiWord   (ostream& out, const string& input, 
+                                   int lineNum);
+      int      processStringWord  (ostream& out, const string& input, 
+                                   int lineNum);
+      int      processBinaryWord  (ostream& out, const string& input, 
+                                   int lineNum);
+      int      processDecimalWord (ostream& out, const string& input, 
+                                   int lineNum);
+      int      processHexWord     (ostream& out, const string& input, 
+                                   int lineNum);
+      int      processVlvWord     (ostream& out, const string& input, 
+                                   int lineNum);
+      int      processMidiPitchBendWord(ostream& out, const string& input, 
+                                   int lineNum);
+      int      processMidiTempoWord(ostream& out, const string& input,
                                    int lineNum);
 
       // helper functions for reading binary content to convert to ASCII:
@@ -91,6 +104,9 @@ class Binasc {
       int      readMidiEvent  (ostream& out, istream& infile, int& trackbytes, 
                                int& command);
       int      getVLV         (istream& infile, int& trackbytes);
+      int      getWord        (string& word, const string& input, 
+                               const string& terminators, int index);
+     
 
    private:
       int bytesQ;        // option for printing hex bytes in ASCII output.

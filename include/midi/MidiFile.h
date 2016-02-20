@@ -54,6 +54,8 @@ class MidiFile {
                 MidiFile                  (const char* aFile);
                 MidiFile                  (const string& aFile);
                 MidiFile                  (istream& input);
+                MidiFile                  (const MidiFile& other);
+                MidiFile                  (MidiFile&& other);
                ~MidiFile                  ();
 
       // reading/writing functions:
@@ -69,6 +71,9 @@ class MidiFile {
       int       writeBinasc               (const char* aFile);
       int       writeBinasc               (const string& aFile);
       int       writeBinasc               (ostream& out);
+      int       writeBinascWithComments   (const char* aFile);
+      int       writeBinascWithComments   (const string& aFile);
+      int       writeBinascWithComments   (ostream& out);
       int       status                    (void);
 
       // track-related functions:
@@ -80,6 +85,7 @@ class MidiFile {
       // join/split track functionality:
       void      joinTracks                (void);
       void      splitTracks               (void);
+      void      splitTracksByChannel      (void);
       int       getTrackState             (void);
       int       hasJoinedTracks           (void);
       int       hasSplitTracks            (void);
@@ -91,6 +97,7 @@ class MidiFile {
 
       int       addTrack                  (void);
       int       addTrack                  (int count);
+      int       addTracks(int count) { return addTrack(count); }
       void      deleteTrack               (int aTrack);
       void      mergeTracks               (int aTrack1, int aTrack2);
       int       getTrackCountAsType1      (void);
@@ -130,19 +137,47 @@ class MidiFile {
 
 
 
-      int       addEvent                  (int aTrack, int aTime, 
+      int       addEvent                  (int aTrack, int aTick,
                                              vector<uchar>& midiData);
       int       addEvent                  (MidiEvent& mfevent);
-      int       addMetaEvent              (int aTrack, int aTime, int aType,
-                                             vector<uchar>& metaData);
-      int       addMetaEvent              (int aTrack, int aTime, int aType,
-                                             const char* metaData);
-      int       addPitchBend              (int aTrack, int aTime,
+
+
+      // MIDI message adding convenience functions:
+      int       addNoteOn                 (int aTrack, int aTick,
+                                           int aChannel, int key, int vel);
+      int       addNoteOff                (int aTrack, int aTick,
+                                           int aChannel, int key, int vel);
+      int       addNoteOff                (int aTrack, int aTick,
+                                           int aChannel, int key);
+      int       addPatchChange            (int aTrack, int aTick,
+                                           int aChannel, int patchnum);
+      int       addTimbre                 (int aTrack, int aTick,
+                                           int aChannel, int patchnum);
+      int       addPitchBend              (int aTrack, int aTick,
                                            int aChannel, double amount);
+
+      // Meta-event adding convenience functions:
+      int       addMetaEvent              (int aTrack, int aTick, int aType,
+                                             vector<uchar>& metaData);
+      int       addMetaEvent              (int aTrack, int aTick, int aType,
+                                           const char* metaData);
+      int       addCopyright              (int aTrack, int aTick,
+                                           const string& text);
+      int       addTrackName              (int aTrack, int aTick,
+                                           const string& name);
+      int       addInstrumentName         (int aTrack, int aTick,
+                                           const string& name);
+      int       addLyric                  (int aTrack, int aTick,
+                                           const string& text);
+      int       addTempo                  (int aTrack, int aTick,
+                                           double aTempo);
+
       void      erase                     (void);
       void      clear                     (void);
       void      clear_no_deallocate       (void);
       MidiEvent&  getEvent                (int aTrack, int anIndex);
+
+      MidiFile& operator=(MidiFile other);
 
 
 
@@ -171,12 +206,12 @@ class MidiFile {
       int              theTimeState;             // absolute or delta
       vector<char>     readFileName;             // read file name
 
-      int               timemapvalid;    
+      int               timemapvalid;
       vector<_TickTime> timemap;
       int               rwstatus;                // read/write success flag
 
    private:
-      int        extractMidiData  (istream& inputfile, vector<uchar>& array, 
+      int        extractMidiData  (istream& inputfile, vector<uchar>& array,
                                        uchar& runningCommand);
       ulong      readVLValue      (istream& inputfile);
       ulong      unpackVLV        (uchar a, uchar b, uchar c, uchar d, uchar e);
@@ -186,6 +221,7 @@ class MidiFile {
       static int secondsearch     (const void* A, const void* B);
       void       buildTimeMap     (void);
       int        linearTickInterpolationAtSecond  (double seconds);
+      double     linearSecondInterpolationAtTick  (int ticktime);
 };
 
 

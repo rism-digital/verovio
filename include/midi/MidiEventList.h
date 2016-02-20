@@ -24,6 +24,9 @@ class MidiEventList {
 
                  ~MidiEventList    ();
 
+                 MidiEventList     (const MidiEventList& other);
+                 MidiEventList     (MidiEventList&& other);
+
       MidiEvent&  operator[]       (int index);
       MidiEvent&  back             (void);
       MidiEvent&  last             (void);
@@ -43,6 +46,8 @@ class MidiEventList {
       // careful when using these, intended for internal use in MidiFile class:
       void        detach              (void);
       int         push_back_no_copy   (MidiEvent* event);
+
+      MidiEventList& operator=(MidiEventList other);
 
    private:
       vector<MidiEvent*>     list;

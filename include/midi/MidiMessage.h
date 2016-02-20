@@ -15,6 +15,7 @@
 #define _MIDIMESSAGE_H_INCLUDED
 
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -92,16 +93,25 @@ class MidiMessage : public vector<uchar> {
       void           setMessage           (vector<int>& message);
 
       // helper functions to create various MidiMessages
-      void           makeNoteOn           (int key, int velocity, 
-                                           int channel = 0);
-      void           makeNoteOff          (int key, int velocity, 
-                                           int channel = 0);
+      void           makeNoteOn           (int channel, int key, int velocity);
+      void           makeNoteOff          (int channel, int key, int velocity);
+      void           makeNoteOff          (int channel, int key);
       void           makeNoteOff          (void);
+      void           makePatchChange      (int channel, int patchnum);
+      void           makeTimbre           (int channel, int patchnum);
+
+      // meta-message creation helper functions:
+      void           makeMetaMessage      (int mnum, const string& data);
+      void           makeTrackName        (const string& name);
+      void           makeInstrumentName   (const string& name);
+      void           makeLyric            (const string& text);
+      void           makeCopyright        (const string& text);
 
       // meta-message related functions:
       int            getMetaType          (void);
       int            isTempo              (void);
       void           setTempo             (double tempo);
+      void makeTempo(double tempo) { setTempo(tempo); }
       void           setMetaTempo         (double tempo);
       int            isEndOfTrack         (void);
 

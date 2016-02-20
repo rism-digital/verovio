@@ -1,11 +1,11 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Mon Feb 16 12:26:32 PST 2015 Adapted from binasc program.
-// Last Modified: Wed Feb 18 14:06:34 PST 2015
+// Last Modified: Thu Feb 18 21:03:54 PST 2016 Added quoted string literals.
 // Filename:      midifile/src-library/Binasc.cpp
 // Syntax:        C++11
 // vim:           ts=3 expandtab
-// 
+//
 // description:   Interface to convert bytes between binary and ASCII forms.
 //
 
@@ -42,7 +42,7 @@ Binasc::~Binasc() {
 //////////////////////////////
 //
 // Binasc::setLineLength -- Set the maximum length of a line when converting
-//    binary content into ASCII bytes.  If the input size is less than one, 
+//    binary content into ASCII bytes.  If the input size is less than one,
 //    set to the default value of 75 characters per line.
 //
 
@@ -100,7 +100,7 @@ int Binasc::getLineBytes(void) {
 
 //////////////////////////////
 //
-// Binasc::setComments -- Display or not display printable characters 
+// Binasc::setComments -- Display or not display printable characters
 //    as comments when converting binary files to ASCII byte codes.
 //
 
@@ -139,7 +139,7 @@ int Binasc::getComments(void) {
 //
 
 void Binasc::setBytes(int state) {
-   commentsQ = state ? 1 : 0;
+   bytesQ = state ? 1 : 0;
 }
 
 
@@ -204,19 +204,19 @@ int Binasc::getMidi(void) {
 
 int Binasc::writeToBinary(const string& outfile, const string& infile) {
    ifstream input;
-   input.open(infile.data());
+   input.open(infile.c_str());
    if (!input.is_open()) {
       cerr << "Cannot open " << infile << " for reading in binasc." << endl;
       return 0;
    }
-   
+
    ofstream output;
-   output.open(outfile.data());
+   output.open(outfile.c_str());
    if (!output.is_open()) {
       cerr << "Cannot open " << outfile << " for reading in binasc." << endl;
       return 0;
    }
-  
+
    int status = writeToBinary(output, input);
    input.close();
    output.close();
@@ -226,12 +226,12 @@ int Binasc::writeToBinary(const string& outfile, const string& infile) {
 
 int Binasc::writeToBinary(const string& outfile, istream& input) {
    ofstream output;
-   output.open(outfile.data());
+   output.open(outfile.c_str());
    if (!output.is_open()) {
       cerr << "Cannot open " << outfile << " for reading in binasc." << endl;
       return 0;
    }
-  
+
    int status = writeToBinary(output, input);
    output.close();
    return status;
@@ -240,12 +240,12 @@ int Binasc::writeToBinary(const string& outfile, istream& input) {
 
 int Binasc::writeToBinary(ostream& out, const string& infile) {
    ifstream input;
-   input.open(infile.data());
+   input.open(infile.c_str());
    if (!input.is_open()) {
       cerr << "Cannot open " << infile << " for reading in binasc." << endl;
       return 0;
    }
-   
+
    int status = writeToBinary(out, input);
    input.close();
    return status;
@@ -274,16 +274,16 @@ int Binasc::writeToBinary(ostream& out, istream& input) {
 //     the binary file that it describes.
 //
 
-int Binasc::readFromBinary(const string& outfile, const string& infile) { 
+int Binasc::readFromBinary(const string& outfile, const string& infile) {
    ifstream input;
-   input.open(infile.data());
+   input.open(infile.c_str());
    if (!input.is_open()) {
       cerr << "Cannot open " << infile << " for reading in binasc." << endl;
       return 0;
    }
 
    ofstream output;
-   output.open(outfile.data());
+   output.open(outfile.c_str());
    if (!output.is_open()) {
       cerr << "Cannot open " << outfile << " for reading in binasc." << endl;
       return 0;
@@ -296,9 +296,9 @@ int Binasc::readFromBinary(const string& outfile, const string& infile) {
 }
 
 
-int Binasc::readFromBinary(const string& outfile, istream& input) { 
+int Binasc::readFromBinary(const string& outfile, istream& input) {
    ofstream output;
-   output.open(outfile.data());
+   output.open(outfile.c_str());
    if (!output.is_open()) {
       cerr << "Cannot open " << outfile << " for reading in binasc." << endl;
       return 0;
@@ -310,9 +310,9 @@ int Binasc::readFromBinary(const string& outfile, istream& input) {
 }
 
 
-int Binasc::readFromBinary(ostream& out, const string& infile) { 
+int Binasc::readFromBinary(ostream& out, const string& infile) {
    ifstream input;
-   input.open(infile.data());
+   input.open(infile.c_str());
    if (!input.is_open()) {
       cerr << "Cannot open " << infile << " for reading in binasc." << endl;
       return 0;
@@ -324,7 +324,7 @@ int Binasc::readFromBinary(ostream& out, const string& infile) {
 }
 
 
-int Binasc::readFromBinary(ostream& out, istream& input) { 
+int Binasc::readFromBinary(ostream& out, istream& input) {
    int status;
    if (midiQ) {
       status = outputStyleMidi(out, input);
@@ -400,7 +400,7 @@ int Binasc::outputStyleAscii(ostream& out, istream& input) {
 
 //////////////////////////////
 //
-// Binasc::outputStyleBinary -- read an input binary file and output bytes 
+// Binasc::outputStyleBinary -- read an input binary file and output bytes
 //     in ascii form, hexadecimal numbers only.
 //
 
@@ -494,34 +494,93 @@ int Binasc::outputStyleBoth(ostream& out, istream& input) {
 // processLine -- read a line of input and output any specified bytes
 //
 
-int Binasc::processLine(ostream& out, char* inputLine, int lineCount) {
-   const char* WORD_SEPARATORS = " \n\t";
-   char* word = strtok(inputLine, WORD_SEPARATORS);
+int Binasc::processLine(ostream& out, const string& input, int lineCount) {
    int status = 1;
-   while (word != NULL) {
-      if ((word[0] == ';') || (word[0] == '#')) {
-         // comment to end of line.
+   int i = 0;
+   int length = (int)input.size();
+   string word;
+   while (i<length) {
+      if ((input[i] == ';') || (input[i] == '#') || (input[i] == '/')) {
+         // comment to end of line, so ignore
          return 1;
-      }
-      if (word[0] == '+') {
+      } else if ((input[i] == ' ') || (input[i] == '\n')
+            || (input[i] == '\t')) {
+         // ignore whitespace
+         i++;
+         continue;
+      } else if (input[i] == '+') {
+         i = getWord(word, input, " \n\t", i);
          status = processAsciiWord(out, word, lineCount);
-      } else if (word[0] == 'v') {
+      } else if (input[i] == '"') {
+         i = getWord(word, input, "\"", i);
+         status = processStringWord(out, word, lineCount);
+      } else if (input[i] == 'v') {
+         i = getWord(word, input, " \n\t", i);
          status = processVlvWord(out, word, lineCount);
-      } else if (word[0] == 'p') {
+      } else if (input[i] == 'p') {
+         i = getWord(word, input, " \n\t", i);
          status = processMidiPitchBendWord(out, word, lineCount);
-      } else if (strchr(word, '\'')) {
-         status = processDecimalWord(out, word, lineCount);
-      } else if (strchr(word, ',') || strlen(word) > 2) {
-         status = processBinaryWord(out, word, lineCount);
+      } else if (input[i] == 't') {
+         i = getWord(word, input, " \n\t", i);
+         status = processMidiTempoWord(out, word, lineCount);
       } else {
-         status = processHexWord(out, word, lineCount);
+         i = getWord(word, input, " \n\t", i);
+         if (word.find('\'') != string::npos) {
+            status = processDecimalWord(out, word, lineCount);
+         } else if ((word.find(',') != string::npos) || (word.size() > 2)) {
+            status = processBinaryWord(out, word, lineCount);
+         } else {
+            status = processHexWord(out, word, lineCount);
+         }
       }
+
       if (status == 0) {
          return 0;
       }
-      word = strtok(NULL, WORD_SEPARATORS);
+
    }
+
    return 1;
+}
+
+
+
+//////////////////////////////
+//
+// Binasc::getWord -- extract a sub string, stopping at any of the given
+//   terminator characters.
+//
+
+int Binasc::getWord(string& word, const string& input,
+      const string& terminators, int index) {
+   word.resize(0);
+   int i = index;
+   int escape = 0;
+   int ecount = 0;
+   if (terminators.find('"') != string::npos) {
+      escape = 1;
+   }
+   while (i < (int)input.size()) {
+      if (escape && input[i] == '\"') {
+         ecount++;
+         i++;
+         if (ecount >= 2) {
+            break;
+         }
+      }
+      if (escape && (i<(int)input.size()-1) && (input[i] == '\\')
+            && (input[i+1] == '"')) {
+         word.push_back(input[i+1]);
+         i += 2;
+      } else if (terminators.find(input[i]) == string::npos) {
+         word.push_back(input[i]);
+         i++;
+      } else {
+         i++;
+         return i;
+      }
+   }
+   return i;
 }
 
 
@@ -549,27 +608,34 @@ int Binasc::getVLV(istream& infile, int& trackbytes) {
 
 //////////////////////////////
 //
-// Binasc::readMidiEvent -- read a delta time and then a MIDI message 
-//     (or meta message).  returns 1 if not end-of-track meta message; 
+// Binasc::readMidiEvent -- Read a delta time and then a MIDI message
+//     (or meta message).  Returns 1 if not end-of-track meta message;
 //     0 otherwise.
 //
 
-int Binasc::readMidiEvent(ostream& out, istream& infile, int& trackbytes, 
+int Binasc::readMidiEvent(ostream& out, istream& infile, int& trackbytes,
       int& command) {
-   // read and print Variable Length Value for delta ticks
+
+   // Read and print Variable Length Value for delta ticks
    int vlv = getVLV(infile, trackbytes);
-   out << "v" << dec << vlv << "\t";
-  
-   char byte1, byte2;
+
+   stringstream output;
+
+   output << "v" << dec << vlv << "\t";
+
+   string comment;
+
+   int status = 1;
    uchar ch;
+   char byte1, byte2;
    infile.read((char*)&ch, 1);
    trackbytes++;
    if (ch < 0x80) {
       // running status: command byte is previous one in data stream
-      out << "   ";
+      output << "   ";
    } else {
       // midi command byte
-      out << hex << (int)ch;
+      output << hex << (int)ch;
       command = ch;
       infile.read((char*)&ch, 1);
       trackbytes++;
@@ -577,89 +643,122 @@ int Binasc::readMidiEvent(ostream& out, istream& infile, int& trackbytes,
    byte1 = ch;
    int i;
    int metatype = 0;
-
-if (command == 0) {
-exit(1);
-}
-
    switch (command & 0xf0) {
       case 0x80:    // note-off: 2 bytes
-         out << " '" << dec << (int)byte1;
+         output << " '" << dec << (int)byte1;
          infile.read((char*)&ch, 1);
          trackbytes++;
          byte2 = ch;
-         out << " '" << dec << (int)byte2;
+         output << " '" << dec << (int)byte2;
+         if (commentsQ) {
+            comment += "note-off " + keyToPitchName(byte1);
+         }
          break;
       case 0x90:    // note-on: 2 bytes
-         out << " '" << dec << (int)byte1;
+         output << " '" << dec << (int)byte1;
          infile.read((char*)&ch, 1);
          trackbytes++;
          byte2 = ch;
-         out << " '" << dec << (int)byte2;
+         output << " '" << dec << (int)byte2;
+         if (commentsQ) {
+            if (byte2 == 0) {
+               comment += "note-off " + keyToPitchName(byte1);
+            } else {
+               comment += "note-on " + keyToPitchName(byte1);
+            }
+         }
          break;
       case 0xA0:    // aftertouch: 2 bytes
-         out << " '" << dec << (int)byte1;
+         output << " '" << dec << (int)byte1;
          infile.read((char*)&ch, 1);
          trackbytes++;
          byte2 = ch;
-         out << " '" << dec << (int)byte2;
+         output << " '" << dec << (int)byte2;
+         if (commentsQ) {
+            comment += "after-touch";
+         }
          break;
       case 0xB0:    // continuous controller: 2 bytes
-         out << " '" << dec << (int)byte1;
+         output << " '" << dec << (int)byte1;
          infile.read((char*)&ch, 1);
          trackbytes++;
          byte2 = ch;
-         out << " '" << dec << (int)byte2;
+         output << " '" << dec << (int)byte2;
+         if (commentsQ) {
+            comment += "controller";
+         }
          break;
       case 0xE0:    // pitch-bend: 2 bytes
-         out << " '" << dec << (int)byte1;
+         output << " '" << dec << (int)byte1;
          infile.read((char*)&ch, 1);
          trackbytes++;
          byte2 = ch;
-         out << " '" << dec << (int)byte2;
+         output << " '" << dec << (int)byte2;
+         if (commentsQ) {
+            comment += "pitch-bend";
+         }
          break;
       case 0xC0:    // patch change: 1 bytes
-         out << " '" << dec << (int)byte1;
+         output << " '" << dec << (int)byte1;
+         if (commentsQ) {
+            comment += "patch-change";
+         }
          break;
       case 0xD0:    // channel pressure: 1 bytes
-         out << " '" << dec << (int)byte1;
+         output << " '" << dec << (int)byte1;
+         if (commentsQ) {
+            comment += "channel pressure";
+         }
          break;
       case 0xF0:    // various system bytes: variable bytes
          switch (command) {
             case 0xf0:
+               break;
             case 0xf7:
                // Read the first byte which is either 0xf0 or 0xf7.
-               // Then a VLV byte count for the number of bytes 
+               // Then a VLV byte count for the number of bytes
                // that remain in the message will follow.
                // Then read that number of bytes.
                {
                infile.putback(byte1);
                trackbytes--;
                int length = getVLV(infile, trackbytes);
-               out << " v" << dec << length;
+               output << " v" << dec << length;
                for (i=0; i<length; i++) {
                   infile.read((char*)&ch, 1);
                   trackbytes++;
                   if (ch < 0x10) {
-                     out << " 0" << hex << (int)ch;
+                     output << " 0" << hex << (int)ch;
                   } else {
-                     out << " " << hex << (int)ch;
+                     output << " " << hex << (int)ch;
                   }
                }
                }
                break;
             case 0xf1:
+               break;
             case 0xf2:
+               break;
             case 0xf3:
+               break;
             case 0xf4:
+               break;
             case 0xf5:
+               break;
             case 0xf6:
+               break;
             case 0xf8:
+               break;
             case 0xf9:
+               break;
             case 0xfa:
+               break;
             case 0xfb:
+               break;
             case 0xfc:
+               break;
             case 0xfd:
+               break;
             case 0xfe:
                cerr << "Error command not yet handled" << endl;
                exit(1);
@@ -667,33 +766,196 @@ exit(1);
             case 0xff:  // meta message
                {
                metatype = ch;
-               out << " " << hex << metatype;
+               output << " " << hex << metatype;
                int length = getVLV(infile, trackbytes);
-               out << " v" << dec << length;
-               for (i=0; i<length; i++) {
-                  infile.read((char*)&ch, 1);
-                  trackbytes++;
-                  out << " " << hex << (int)ch;
+               output << " v" << dec << length;
+               switch (metatype) {
+
+                  case 0x00:  // sequence number
+                     // display two-byte big-endian decimal value.
+                     {
+                     infile.read((char*)&ch, 1);
+                     trackbytes++;
+                     int number = ch;
+                     infile.read((char*)&ch, 1);
+                     trackbytes++;
+                     number = (number << 8) | ch;
+                     output << " 2'" << number;
+                     }
+                     break;
+
+                  case 0x20: // MIDI channel prefix
+                  case 0x21: // MIDI port
+                     // display single-byte decimal number
+                     infile.read((char*)&ch, 1);
+                     trackbytes++;
+                     output << " '" << (int)ch;
+                     break;
+
+                  case 0x51: // Tempo
+                      // display tempo as "t" word.
+                      {
+                      int number = 0;
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      number = (number << 8) | ch;
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      number = (number << 8) | ch;
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      number = (number << 8) | ch;
+                      double tempo = 1000000.0 / number * 60.0;
+                      output << " t" << tempo;
+                      }
+                      break;
+
+                  case 0x54: // SMPTE offset
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      output << " '" << (int)ch;  // hour
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      output << " '" << (int)ch;  // minutes
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      output << " '" << (int)ch;  // seconds
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      output << " '" << (int)ch;  // frames
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      output << " '" << (int)ch;  // subframes
+                      break;
+
+                  case 0x58: // time signature
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      output << " '" << (int)ch;  // numerator
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      output << " '" << (int)ch;  // denominator power
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      output << " '" << (int)ch;  // clocks per beat
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      output << " '" << (int)ch;  // 32nd notes per beat
+                      break;
+
+                  case 0x59: // key signature
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      output << " '" << (int)ch;  // accidentals
+                      infile.read((char*)&ch, 1);
+                      trackbytes++;
+                      output << " '" << (int)ch;  // mode
+                      break;
+
+                  case 0x01: // text
+                  case 0x02: // copyright
+                  case 0x03: // track name
+                  case 0x04: // instrument name
+                  case 0x05: // lyric
+                  case 0x06: // marker
+                  case 0x07: // cue point
+                  case 0x08: // program name
+                  case 0x09: // device name
+                     output << " \"";
+                     for (i=0; i<length; i++) {
+                        infile.read((char*)&ch, 1);
+                        trackbytes++;
+                        output << (char)ch;
+                     }
+                     output << "\"";
+                     break;
+                  default:
+                     for (i=0; i<length; i++) {
+                        infile.read((char*)&ch, 1);
+                        trackbytes++;
+                        output << " ";
+                        if (ch < 0x10) {
+                           output << "0";
+                        }
+                        output << hex << (int)ch;
+                     }
                }
-               if (metatype == 0x2f) {
-                  return 0;
+               switch (metatype) {
+                  case 0x00: comment += "sequence number";     break;
+                  case 0x01: comment += "text";                break;
+                  case 0x02: comment += "copyright notice";    break;
+                  case 0x03: comment += "track name";          break;
+                  case 0x04: comment += "instrument name";     break;
+                  case 0x05: comment += "lyric";               break;
+                  case 0x06: comment += "marker";              break;
+                  case 0x07: comment += "cue point";           break;
+                  case 0x08: comment += "program name";        break;
+                  case 0x09: comment += "device name";         break;
+                  case 0x20: comment += "MIDI channel prefix"; break;
+                  case 0x21: comment += "MIDI port";           break;
+                  case 0x51: comment += "tempo";               break;
+                  case 0x54: comment += "SMPTE offset";        break;
+                  case 0x58: comment += "time signature";      break;
+                  case 0x59: comment += "key signature";       break;
+                  case 0x7f: comment += "system exclusive";    break;
+                  case 0x2f:
+                     status = 0;
+                     comment += "end-of-track";
+                     break;
+                  default:
+                     comment += "meta-message";
                }
                }
                break;
-               
+
          }
          break;
    }
 
-   return 1;
+   out << output.str();
+   if (commentsQ) {
+      out << "\t; " << comment;
+   }
+
+   return status;
+}
+
+
+
+/////////////////////////////
+//
+// Binasc::keyToPitchName -- Convert a MIDI key number to scientific
+//     pitch notation.
+//
+
+string Binasc::keyToPitchName(int key) {
+   int pc = key % 12;
+   int octave = key / 12 - 1;
+   stringstream output;
+   switch (pc) {
+      case  0: output << "C";  break;
+      case  1: output << "C#"; break;
+      case  2: output << "D";  break;
+      case  3: output << "D#"; break;
+      case  4: output << "E";  break;
+      case  5: output << "F";  break;
+      case  6: output << "F#"; break;
+      case  7: output << "G";  break;
+      case  8: output << "G#"; break;
+      case  9: output << "A";  break;
+      case 10: output << "A#"; break;
+      case 11: output << "B";  break;
+   }
+   output << octave;
+   return output.str().c_str();
 }
 
 
 
 //////////////////////////////
 //
-// Binasc::outputStyleMidi -- read an input file and output bytes parsed
-//     as a MIDI file (exit with error if not a MIDI file.
+// Binasc::outputStyleMidi -- Read an input file and output bytes parsed
+//     as a MIDI file (exit with error if not a MIDI file).
 //
 
 int Binasc::outputStyleMidi(ostream& out, istream& input) {
@@ -702,10 +964,10 @@ int Binasc::outputStyleMidi(ostream& out, istream& input) {
    input.read((char*)&ch, 1);
 
    if (input.eof()) {
-      cerr << "End of the file right away!" << endl; 
+      cerr << "End of the file right away!" << endl;
    }
 
-   // Read the MIDI file header
+   // Read the MIDI file header:
 
    // The first four bytes must be the characters "MThd"
    if (ch != 'M') { cerr << "Not a MIDI file M" << endl; return 0; }
@@ -715,14 +977,14 @@ int Binasc::outputStyleMidi(ostream& out, istream& input) {
    if (ch != 'h') { cerr << "Not a MIDI file h" << endl; return 0; }
    input.read((char*)&ch, 1);
    if (ch != 'd') { cerr << "Not a MIDI file d" << endl; return 0; }
-   tempout << "+M +T +h +d";
+   tempout << "\"MThd\"";
    if (commentsQ) {
-      tempout << "\t\t; MIDI header chunk marker";
+      tempout << "\t\t\t; MIDI header chunk marker";
    }
    tempout << endl;
 
    // The next four bytes are a big-endian byte count for the header
-   // which should nearly always be "6"
+   // which should nearly always be "6".
    int headersize = 0;
    input.read((char*)&ch, 1); headersize = (headersize << 8) | ch;
    input.read((char*)&ch, 1); headersize = (headersize << 8) | ch;
@@ -734,7 +996,7 @@ int Binasc::outputStyleMidi(ostream& out, istream& input) {
    }
    tempout << endl;
 
-   // first number in header is two-byte file type
+   // First number in header is two-byte file type.
    int filetype = 0;
    input.read((char*)&ch, 1);
    filetype = (filetype << 8) | ch;
@@ -753,7 +1015,7 @@ int Binasc::outputStyleMidi(ostream& out, istream& input) {
    }
    tempout << endl;
 
-   // second number in header is two-byte trackcount
+   // Second number in header is two-byte trackcount.
    int trackcount = 0;
    input.read((char*)&ch, 1);
    trackcount = (trackcount << 8) | ch;
@@ -764,8 +1026,8 @@ int Binasc::outputStyleMidi(ostream& out, istream& input) {
       tempout << "\t\t\t; number of tracks";
    }
    tempout << endl;
-   
-   // third number is divisions.  This can be one of two types:
+
+   // Third number is divisions.  This can be one of two types:
    // regular: top bit is 0: number of ticks per quarter note
    // SMPTE:   top bit is 1: first byte is negative frames, second is
    //          ticks per frame.
@@ -795,9 +1057,9 @@ int Binasc::outputStyleMidi(ostream& out, istream& input) {
          tempout << "\t\t\t; ticks per quarter note";
       }
       tempout << endl;
-   }   
-   
-   // print any strange bytes in header:
+   }
+
+   // Print any strange bytes in header:
    int i;
    for (i=0; i<headersize - 6; i++) {
       input.read((char*)&ch, 1);
@@ -813,8 +1075,8 @@ int Binasc::outputStyleMidi(ostream& out, istream& input) {
 
    int trackbytes;
    for (i=0; i<trackcount; i++) {
-      tempout << "\n; TRACK " 
-              << i << " ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;" << endl;
+      tempout << "\n;;; TRACK "
+              << i << " ----------------------------------" << endl;
 
       input.read((char*)&ch, 1);
       // The first four bytes of a track must be the characters "MTrk"
@@ -825,9 +1087,9 @@ int Binasc::outputStyleMidi(ostream& out, istream& input) {
       if (ch != 'r') { cerr << "Not a MIDI file r" << endl; return 0; }
       input.read((char*)&ch, 1);
       if (ch != 'k') { cerr << "Not a MIDI file k" << endl; return 0; }
-      tempout << "+M +T +r +k";
+      tempout << "\"MTrk\"";
       if (commentsQ) {
-         tempout << "\t\t; MIDI track chunk marker";
+         tempout << "\t\t\t; MIDI track chunk marker";
       }
       tempout << endl;
 
@@ -845,24 +1107,23 @@ int Binasc::outputStyleMidi(ostream& out, istream& input) {
 
       trackbytes = 0;
       int command = 0;
-   
+
       // process MIDI events until the end of the track
-      while (readMidiEvent(tempout, input, trackbytes, command)) { 
-         tempout << "\n"; 
+      while (readMidiEvent(tempout, input, trackbytes, command)) {
+         tempout << "\n";
       };
       tempout << "\n";
-  
+
       if (trackbytes != tracksize) {
          tempout << "; TRACK SIZE ERROR, ACTUAL SIZE: " << trackbytes << endl;
-      }      
+      }
    }
 
    // print #define definitions if requested.
 
 
    // print main content of MIDI file parsing:
-   tempout << ends;
-   out << tempout.str() << endl;
+   out << tempout.str();
    return 1;
 }
 
@@ -874,9 +1135,8 @@ int Binasc::outputStyleMidi(ostream& out, istream& input) {
 //     constituent bytes
 //
 
-int Binasc::processDecimalWord(ostream& out, const char* word, 
-      int lineNum) {
-   int length = (int)strlen(word);       // length of ascii binary number
+int Binasc::processDecimalWord(ostream& out, const string& word, int lineNum) {
+   int length = (int)word.size();        // length of ascii binary number
    int byteCount = -1;              // number of bytes to output
    int quoteIndex = -1;             // index of decimal specifier
    int signIndex = -1;              // index of any sign for number
@@ -1164,8 +1424,8 @@ int Binasc::processDecimalWord(ostream& out, const char* word,
 //     its binary byte form.
 //
 
-int Binasc::processHexWord(ostream& out, const char* word, int lineNum) {
-   int length = (int)strlen(word);
+int Binasc::processHexWord(ostream& out, const string& word, int lineNum) {
+   int length = (int)word.size();
    uchar outputByte;
 
    if (length > 2) {
@@ -1180,8 +1440,21 @@ int Binasc::processHexWord(ostream& out, const char* word, int lineNum) {
       return 0;
    }
 
-   outputByte = (uchar)strtol(word, (char**)NULL, 16);
+   outputByte = (uchar)strtol(word.c_str(), (char**)NULL, 16);
    out << outputByte;
+   return 1;
+}
+
+
+
+//////////////////////////////
+//
+// Binasc::processStringWord -- interprets a binary word into
+//     its constituent byte
+//
+
+int Binasc::processStringWord(ostream& out, const string& word, int lineNum) {
+   out << word;
    return 1;
 }
 
@@ -1193,8 +1466,8 @@ int Binasc::processHexWord(ostream& out, const char* word, int lineNum) {
 //     its constituent byte
 //
 
-int Binasc::processAsciiWord(ostream& out, const char* word, int lineNum) {
-   int length = (int)strlen(word);
+int Binasc::processAsciiWord(ostream& out, const string& word, int lineNum) {
+   int length = (int)word.size();
    uchar outputByte;
 
    if (word[0] != '+') {
@@ -1227,9 +1500,8 @@ int Binasc::processAsciiWord(ostream& out, const char* word, int lineNum) {
 //     its constituent byte
 //
 
-int Binasc::processBinaryWord(ostream& out, const char* word, 
-      int lineNum) {
-   int length = (int)strlen(word);       // length of ascii binary number
+int Binasc::processBinaryWord(ostream& out, const string& word, int lineNum) {
+   int length = (int)word.size();        // length of ascii binary number
    int commaIndex = -1;             // index location of comma in number
    int leftDigits = -1;             // number of digits to left of comma
    int rightDigits = -1;            // number of digits to right of comma
@@ -1335,8 +1607,8 @@ int Binasc::processBinaryWord(ostream& out, const char* word,
 //   without space by an integer.
 //
 
-int Binasc::processVlvWord(ostream& out, const char* word, int lineNum) {
-   if (strlen(word) < 2) {
+int Binasc::processVlvWord(ostream& out, const string& word, int lineNum) {
+   if (word.size() < 2) {
       cerr << "Error on line: " << lineNum
            << ": 'v' needs to be followed immediately by a decimal digit"
            << endl;
@@ -1381,16 +1653,54 @@ int Binasc::processVlvWord(ostream& out, const char* word, int lineNum) {
 
 ////////////////////////////
 //
-// Binasc::processMidiPitchBendWord -- convert a floating point number in 
+// Binasc::processMidiTempoWord -- convert a floating point tempo into
+//   a three-byte number of microseconds per beat per minute value.
+//
+
+int Binasc::processMidiTempoWord(ostream& out, const string& word,
+      int lineNum) {
+   if (word.size() < 2) {
+      cerr << "Error on line: " << lineNum
+           << ": 't' needs to be followed immediately by "
+           << "a floating-point number" << endl;
+      return 0;
+   }
+   if (!(isdigit(word[1]) || word[1] == '.' || word[1] == '-'
+         || word[1] == '+')) {
+      cerr << "Error on line: " << lineNum
+           << ": 't' needs to be followed immediately by "
+           << "a floating-point number" << endl;
+      return 0;
+   }
+   double value = strtod(&word[1], NULL);
+
+   if (value < 0.0) {
+      value = -value;
+   }
+
+   int intval = int(60.0 * 1000000.0 / value + 0.5);
+
+   uchar byte0 = intval & 0xff;
+   uchar byte1 = (intval >>  8) & 0xff;
+   uchar byte2 = (intval >> 16) & 0xff;
+   out << byte2 << byte1 << byte0;
+   return 1;
+}
+
+
+
+////////////////////////////
+//
+// Binasc::processMidiPitchBendWord -- convert a floating point number in
 //   the range from +1.0 to -1.0 into a 14-point integer with -1.0 mapping
 //   to 0 and +1.0 mapping to 2^15-1.  This integer will be packed into
 //   two bytes, with the LSB coming first and containing the bottom
 //   7-bits of the 14-bit value, then the MSB coming second and containing
 //   the top 7-bits of the 14-bit value.
 
-int Binasc::processMidiPitchBendWord(ostream& out, const char* word, 
+int Binasc::processMidiPitchBendWord(ostream& out, const string& word,
       int lineNum) {
-   if (strlen(word) < 2) {
+   if (word.size() < 2) {
       cerr << "Error on line: " << lineNum
            << ": 'p' needs to be followed immediately by "
            << "a floating-point number" << endl;

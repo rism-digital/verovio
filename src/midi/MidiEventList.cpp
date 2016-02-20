@@ -15,6 +15,8 @@
 
 #include <vector>
 #include <iostream>
+#include <algorithm>
+#include <iterator>
 
 using namespace std;
 
@@ -26,6 +28,33 @@ using namespace std;
 
 MidiEventList::MidiEventList(void) {
    reserve(1000);
+}
+
+
+
+//////////////////////////////
+//
+// MidiEventList::MidiEventList(MidiEventList&) -- Copy constructor.
+//
+
+MidiEventList::MidiEventList(const MidiEventList& other) {
+   list.reserve(other.list.size());
+   auto it = other.list.begin();
+   std::generate_n(std::back_inserter(list), other.list.size(), [&]() -> MidiEvent* {
+      return new MidiEvent(**it++);
+   });
+}
+
+
+
+//////////////////////////////
+//
+// MidiEventList::MidiEventList(MidiEventList&&) -- Move constructor.
+//
+
+MidiEventList::MidiEventList(MidiEventList&& other) {
+    list = std::move(other.list);
+    other.list.clear();
 }
 
 
@@ -89,7 +118,7 @@ MidiEvent& MidiEventList::getEvent(int index) {
 //
 
 void MidiEventList::clear(void) {
-   for (int i=0; i<list.size(); i++) {
+   for (int i=0; i<(int)list.size(); i++) {
       if (list[i] != NULL) {
          delete list[i];
          list[i] = NULL;
@@ -118,7 +147,7 @@ MidiEvent** MidiEventList::data(void) {
 //
 
 void MidiEventList::reserve(int rsize) {
-   if (rsize > list.size()) {
+   if (rsize > (int)list.size()) {
       list.reserve(rsize);
    }
 }
@@ -182,7 +211,7 @@ int MidiEventList::linkNotePairs(void) {
    vector<vector<vector<MidiEvent*> > > noteons;
    noteons.resize(16);
    int i;
-   for (i=0; i<noteons.size(); i++) {
+   for (i=0; i<(int)noteons.size(); i++) {
       noteons[i].resize(128);
    }
 
@@ -223,7 +252,7 @@ int MidiEventList::linkNotePairs(void) {
 //
 
 void MidiEventList::clearLinks(void) {
-   for (int i=0; i<getSize(); i++) {
+   for (int i=0; i<(int)getSize(); i++) {
       getEvent(i).unlinkEvent();
    }
 }
@@ -261,5 +290,15 @@ int MidiEventList::push_back_no_copy(MidiEvent* event) {
 }
 
 
+
+//////////////////////////////
+//
+// MidiEventList::operator=(MidiEventList) -- Assignment.
+//
+
+MidiEventList& MidiEventList::operator=(MidiEventList other) {
+   list.swap(other.list);
+   return *this;
+}
 
 
