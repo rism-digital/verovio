@@ -96,7 +96,7 @@ verovio_module = Extension('_verovio',
              'verovio.i'],
                 swig_opts=['-c++'],
                 include_dirs=['/usr/local/include', '../include', '../include/vrv', '../include/midi', '../include/pugi', '../include/utf8', '../libmei'],
-                extra_compile_args=['-Wno-write-strings', '-Wno-overloaded-virtual', '-Wno-unused-private-field'])
+                extra_compile_args=['-std=c++11', '-Wno-write-strings', '-Wno-overloaded-virtual', '-Wno-unused-private-field'])
 
 setup (name = 'verovio',
        version = '0.9.9',

@@ -7,6 +7,7 @@ SET(CMAKE_BUILD_TYPE Release)
 option(NO_PAE_SUPPORT "Disable Plain and Easy support" OFF)
 
 add_definitions(-g)
+add_definitions(-std=c++11)
 
 EXEC_PROGRAM(../tools/get_git_commit.sh ARGS OUTPUT_VARIABLE GIT_COMMIT)
 
