@@ -32,9 +32,11 @@ add_executable (verovio
 	../src/dot.cpp
 	../src/drawinginterface.cpp
 	../src/durationinterface.cpp
+	../src/dynam.cpp
 	../src/editorial.cpp
 	../src/floatingelement.cpp
 	../src/glyph.cpp
+	../src/hairpin.cpp
 	../src/io.cpp
 	../src/iodarms.cpp
 	../src/iomei.cpp

@@ -108,9 +108,11 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/dot.cpp \
 	$VEROVIO_ROOT/src/drawinginterface.cpp \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
+	$VEROVIO_ROOT/src/dynam.cpp \
 	$VEROVIO_ROOT/src/editorial.cpp \
 	$VEROVIO_ROOT/src/floatingelement.cpp \
 	$VEROVIO_ROOT/src/glyph.cpp \
+	$VEROVIO_ROOT/src/hairpin.cpp \
 	$VEROVIO_ROOT/src/io.cpp \
 	$VEROVIO_ROOT/src/iodarms.cpp \
 	$VEROVIO_ROOT/src/iomei.cpp \
