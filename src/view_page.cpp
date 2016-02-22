@@ -170,6 +170,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
 
     // first draw the beams
     DrawSystemList(dc, system, SYL);
+    DrawSystemList(dc, system, HAIRPIN);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
 
@@ -191,6 +192,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         element = dynamic_cast<DocObject *>(*iter);
         if (!element) continue;
 
+        if ((element->Is() == classId) && (classId == HAIRPIN)) {
+            DrawTimeSpanningElement(dc, element, system);
+        }
         if ((element->Is() == classId) && (classId == SYL)) {
             DrawTimeSpanningElement(dc, element, system);
         }

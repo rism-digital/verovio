@@ -20,6 +20,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "floatingelement.h"
+#include "hairpin.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "measure.h"
@@ -136,7 +137,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = interface->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        if (element->Is() == SLUR) {
+        if (element->Is() == HAIRPIN) {
+            // cast to Slur check in DrawTieOrSlur
+            DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is() == SLUR) {
             // cast to Slur check in DrawTieOrSlur
             DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
@@ -149,6 +154,114 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
             DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
     }
+}
+
+void View::DrawHairpin(
+    DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic)
+{
+    assert(dc);
+    assert(hairpin);
+    assert(staff);
+
+    LayerElement *start = NULL;
+    LayerElement *end = NULL;
+
+    data_PLACE place = PLACE_NONE;
+    hairpinLog_FORM form = hairpinLog_FORM_NONE;
+
+    int y1 = staff->GetDrawingY();
+    int y2 = staff->GetDrawingY();
+
+    /************** parent layers **************/
+
+    start = dynamic_cast<LayerElement *>(hairpin->GetStart());
+    end = dynamic_cast<LayerElement *>(hairpin->GetEnd());
+
+    if (!start || !end) {
+        // no start and end, obviously nothing to do...
+        return;
+    }
+
+    Layer *layer1 = NULL;
+    Layer *layer2 = NULL;
+
+    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
+    if (start->Is() == TIMESTAMP_ATTR)
+        layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    else
+        layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+
+    // idem
+    if (end->Is() == TIMESTAMP_ATTR)
+        layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    else
+        layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+
+    assert(layer1 && layer2);
+
+    if (layer1->GetN() != layer2->GetN()) {
+        LogWarning("Slurs between different layers may not be fully supported.");
+    }
+
+    /************** direction **************/
+
+    /*
+    // first should be the tie @curvedir
+    if (slur->HasCurvedir()) {
+        up = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? true : false;
+    }
+    // then layer direction trumps note direction
+    else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+        up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
+    }
+    // look if in a chord
+    else if (startParentChord) {
+        if (startParentChord->PositionInChord(startNote) < 0) {
+            up = false;
+        }
+        else if (startParentChord->PositionInChord(startNote) > 0) {
+            up = true;
+        }
+        // away from the stem if odd number (center note)
+        else {
+            up = (stemDir != STEMDIRECTION_up);
+        }
+    }
+    else if (stemDir == STEMDIRECTION_up) {
+        up = false;
+    }
+    else if (stemDir == STEMDIRECTION_NONE) {
+        // no information from the note stem directions, look at the position in the notes
+        int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+        up = (start->GetDrawingY() > center) ? true : false;
+    }
+    */
+
+    /************** adjusting y position **************/
+
+    if (place == PLACE_above) {
+        y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+    else {
+        y1 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y2 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+
+    /************** draw it **************/
+
+    if (graphic)
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else
+        dc->StartGraphic(hairpin, "spanning-hairpin", "");
+    dc->DeactivateGraphic();
+    // DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize,
+    // angle);
+    dc->ReactivateGraphic();
+    if (graphic)
+        dc->EndResumedGraphic(graphic, this);
+    else
+        dc->EndGraphic(hairpin, this);
 }
 
 void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic)

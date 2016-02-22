@@ -23,6 +23,7 @@ class DeviceContext;
 class Doc;
 class EditorialElement;
 class FloatingElement;
+class Hairpin;
 class Layer;
 class LayerElement;
 class Measure;
@@ -295,6 +296,8 @@ protected:
         DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
     void DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff);
     void DrawTimeSpanningElement(DeviceContext *dc, DocObject *object, System *system);
+    void DrawHairpin(DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType,
+        DocObject *graphic = NULL);
     void DrawSlur(
         DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
