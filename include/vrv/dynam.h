@@ -31,6 +31,7 @@ public:
     virtual ~Dynam();
     virtual void Reset();
     virtual std::string GetClassName() { return "Dynam"; };
+    virtual ClassId Is() { return DYNAM; };
     ///@}
 
     /**

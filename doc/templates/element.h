@@ -30,6 +30,7 @@ public:
     virtual ~Element();
     virtual void Reset();
     virtual std::string GetClassName() { return "Element"; };
+    virtual ClassId Is() { return ELEMENT; };
     ///@}
 
     /**

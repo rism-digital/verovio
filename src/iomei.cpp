@@ -19,7 +19,9 @@
 #include "chord.h"
 #include "custos.h"
 #include "dot.h"
+#include "dynam.h"
 #include "editorial.h"
+#include "hairpin.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -197,6 +199,14 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == ANCHORED_TEXT) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         WriteMeiAnchoredText(m_currentNode, dynamic_cast<AnchoredText *>(object));
+    }
+    else if (object->Is() == DYNAM) {
+        m_currentNode = m_currentNode.append_child("dynam");
+        WriteMeiDynam(m_currentNode, dynamic_cast<Dynam *>(object));
+    }
+    else if (object->Is() == HAIRPIN) {
+        m_currentNode = m_currentNode.append_child("hairpin");
+        WriteMeiHairpin(m_currentNode, dynamic_cast<Hairpin *>(object));
     }
     else if (object->Is() == SLUR) {
         m_currentNode = m_currentNode.append_child("slur");
@@ -562,6 +572,23 @@ void MeiOutput::WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *a
     WriteXmlId(currentNode, anchoredText);
     WriteTextDirInterface(currentNode, anchoredText);
 }
+
+void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
+{
+    assert(dynam);
+
+    WriteXmlId(currentNode, dynam);
+    WriteTextDirInterface(currentNode, dynam);
+    WriteTimeSpanningInterface(currentNode, dynam);
+};
+
+void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
+{
+    assert(hairpin);
+
+    WriteXmlId(currentNode, hairpin);
+    WriteTimeSpanningInterface(currentNode, hairpin);
+};
 
 void MeiOutput::WriteMeiSlur(pugi::xml_node currentNode, Slur *slur)
 {
@@ -1607,6 +1634,12 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "anchoredText") {
             success = ReadMeiAnchoredText(parent, current);
         }
+        else if (std::string(current.name()) == "dynam") {
+            success = ReadMeiDynam(parent, current);
+        }
+        else if (std::string(current.name()) == "hairpin") {
+            success = ReadMeiHairpin(parent, current);
+        }
         else if (std::string(current.name()) == "slur") {
             success = ReadMeiSlur(parent, current);
         }
@@ -1640,6 +1673,29 @@ bool MeiInput::ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText)
 
     AddFloatingElement(parent, vrvAnchoredText);
     return ReadMeiTextChildren(vrvAnchoredText, anchoredText);
+}
+
+bool MeiInput::ReadMeiDynam(Object *parent, pugi::xml_node dynam)
+{
+    Dynam *vrvDynam = new Dynam();
+    SetMeiUuid(dynam, vrvDynam);
+
+    ReadTextDirInterface(dynam, vrvDynam);
+    ReadTimeSpanningInterface(dynam, vrvDynam);
+
+    AddFloatingElement(parent, vrvDynam);
+    return true;
+}
+
+bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
+{
+    Hairpin *vrvHairpin = new Hairpin();
+    SetMeiUuid(hairpin, vrvHairpin);
+
+    ReadTimeSpanningInterface(hairpin, vrvHairpin);
+
+    AddFloatingElement(parent, vrvHairpin);
+    return true;
 }
 
 bool MeiInput::ReadMeiSlur(Object *parent, pugi::xml_node slur)

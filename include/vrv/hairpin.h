@@ -28,6 +28,7 @@ public:
     virtual ~Hairpin();
     virtual void Reset();
     virtual std::string GetClassName() { return "Hairpin"; };
+    virtual ClassId Is() { return HAIRPIN; };
     ///@}
 
 protected:
