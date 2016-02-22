@@ -588,6 +588,8 @@ void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
 
     WriteXmlId(currentNode, hairpin);
     WriteTimeSpanningInterface(currentNode, hairpin);
+    hairpin->WriteHairpinLog(currentNode);
+    hairpin->WritePlacement(currentNode);
 };
 
 void MeiOutput::WriteMeiSlur(pugi::xml_node currentNode, Slur *slur)
@@ -1693,6 +1695,8 @@ bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
     SetMeiUuid(hairpin, vrvHairpin);
 
     ReadTimeSpanningInterface(hairpin, vrvHairpin);
+    vrvHairpin->ReadHairpinLog(hairpin);
+    vrvHairpin->ReadPlacement(hairpin);
 
     AddFloatingElement(parent, vrvHairpin);
     return true;

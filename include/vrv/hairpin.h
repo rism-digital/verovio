@@ -8,6 +8,7 @@
 #ifndef __VRV_HAIRPIN_H__
 #define __VRV_HAIRPIN_H__
 
+#include "atts_cmn.h"
 #include "floatingelement.h"
 #include "timeinterface.h"
 
@@ -17,7 +18,7 @@ namespace vrv {
 // Hairpin
 //----------------------------------------------------------------------------
 
-class Hairpin : public FloatingElement, public TimeSpanningInterface {
+class Hairpin : public FloatingElement, public TimeSpanningInterface, public AttHairpinLog, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
