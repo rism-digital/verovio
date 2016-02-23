@@ -716,8 +716,10 @@ public:
     virtual ~DocObject();
     virtual ClassId Is() { return DOC_OBJECT; }
 
-    void UpdateContentBB(int x1, int y1, int x2, int y2);
-    void UpdateSelfBB(int x1, int y1, int x2, int y2);
+    void UpdateContentBBoxX(int x1, int x2);
+    void UpdateContentBBoxY(int y1, int y2);
+    void UpdateSelfBBoxX(int x1, int x2);
+    void UpdateSelfBBoxY(int y1, int y2);
     bool HasContentBB();
     bool HasSelfBB();
     void ResetBB();
@@ -738,10 +740,11 @@ public:
      * Is true if the bounding box (self or content) has been updated at least once.
      * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
      */
-    bool HasUpdatedBB() { return m_updatedBB; };
+    bool HasUpdatedBB() { return (m_updatedBBoxX && m_updatedBBoxY); };
 
 private:
-    bool m_updatedBB;
+    bool m_updatedBBoxX;
+    bool m_updatedBBoxY;
 
 protected:
     /**

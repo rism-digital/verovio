@@ -8,8 +8,8 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
@@ -502,50 +502,74 @@ DocObject::~DocObject()
 {
 }
 
-void DocObject::UpdateContentBB(int x1, int y1, int x2, int y2)
+void DocObject::UpdateContentBBoxX(int x1, int x2)
 {
     // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
 
     int min_x = std::min(x1, x2);
     int max_x = std::max(x1, x2);
-    int min_y = std::min(y1, y2);
-    int max_y = std::max(y1, y2);
 
     min_x -= m_drawingX;
     max_x -= m_drawingX;
-    min_y -= m_drawingY;
-    max_y -= m_drawingY;
 
     if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
-    if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
     if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
-    if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
 
-    m_updatedBB = true;
+    m_updatedBBoxX = true;
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
     // GetClassName().c_str());
 }
 
-void DocObject::UpdateSelfBB(int x1, int y1, int x2, int y2)
+void DocObject::UpdateContentBBoxY(int y1, int y2)
+{
+    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
+
+    int min_y = std::min(y1, y2);
+    int max_y = std::max(y1, y2);
+
+    min_y -= m_drawingY;
+    max_y -= m_drawingY;
+
+    if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
+    if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
+
+    m_updatedBBoxY = true;
+    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
+    // GetClassName().c_str());
+}
+
+void DocObject::UpdateSelfBBoxX(int x1, int x2)
 {
     // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 
     int min_x = std::min(x1, x2);
     int max_x = std::max(x1, x2);
-    int min_y = std::min(y1, y2);
-    int max_y = std::max(y1, y2);
 
     min_x -= m_drawingX;
     max_x -= m_drawingX;
+
+    if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
+    if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
+
+    m_updatedBBoxX = true;
+
+    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+}
+
+void DocObject::UpdateSelfBBoxY(int y1, int y2)
+{
+    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+
+    int min_y = std::min(y1, y2);
+    int max_y = std::max(y1, y2);
+
     min_y -= m_drawingY;
     max_y -= m_drawingY;
 
-    if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
     if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
-    if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
     if (m_selfBB_y2 < max_y) m_selfBB_y2 = max_y;
 
-    m_updatedBB = true;
+    m_updatedBBoxY = true;
 
     // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
@@ -561,7 +585,8 @@ void DocObject::ResetBB()
     m_selfBB_x2 = -0xFFFFFFF;
     m_selfBB_y2 = -0xFFFFFFF;
 
-    m_updatedBB = false;
+    m_updatedBBoxX = false;
+    m_updatedBBoxY = false;
 }
 
 void DocObject::SetEmptyBB()
@@ -575,12 +600,13 @@ void DocObject::SetEmptyBB()
     m_selfBB_x2 = 0;
     m_selfBB_y2 = 0;
 
-    m_updatedBB = true;
+    m_updatedBBoxX = true;
+    m_updatedBBoxY = true;
 }
 
 bool DocObject::HasEmptyBB()
 {
-    return (m_updatedBB && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
+    return (HasUpdatedBB() && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
         && (m_contentBB_y2 == 0));
 }
 
@@ -951,8 +977,8 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     // the negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    int negative_offset = -(note->m_contentBB_x1)
-        + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    int negative_offset
+        = -(note->m_contentBB_x1) + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
     if ((*min_pos) > 0) {
         //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
