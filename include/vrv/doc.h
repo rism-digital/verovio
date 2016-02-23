@@ -76,6 +76,7 @@ public:
     int GetDrawingBarLineWidth(int staffSize);
     int GetDrawingStaffLineWidth(int staffSize);
     int GetDrawingStemWidth(int staffSize);
+    int GetDrawingHairpinSize(int staffSize);
     int GetDrawingBeamWidth(int staffSize, bool graceSize);
     int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize);
     int GetDrawingLedgerLineLength(int staffSize, bool graceSize);

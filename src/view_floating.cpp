@@ -174,6 +174,12 @@ void View::DrawHairpin(
     data_STAFFREL place = hairpin->GetPlace();
     hairpinLog_FORM form = hairpin->GetForm();
 
+    int startY = 0;
+    int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize);
+
+    // We calculate points for cresc by default. Start/End have to be swapped
+    if (form == hairpinLog_FORM_dim) View::SwapY(&startY, &endY);
+
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
 
@@ -204,8 +210,45 @@ void View::DrawHairpin(
 
     assert(layer1 && layer2);
 
-    if (layer1->GetN() != layer2->GetN()) {
-        LogWarning("Slurs between different layers may not be fully supported.");
+    /************** start / end opening **************/
+
+    if (form == hairpinLog_FORM_cres) {
+        // the normal case
+        if (spanningType == SPANNING_START_END) {
+            // nothing to adjust
+        }
+        // In this case, we are drawing the first half a a cresc. Reduce the openning end
+        else if (spanningType == SPANNING_START) {
+            endY = endY / 2;
+        }
+        // Now this is the case we are drawing the end of a cresc. Increase the openning start
+        else if (spanningType == SPANNING_END) {
+            startY = endY / 2;
+        }
+        // Finally, cres accross the system, increase the start and reduce the end
+        else {
+            startY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 3;
+            endY = 2 * startY;
+        }
+    }
+    else {
+        // the normal case
+        if (spanningType == SPANNING_START_END) {
+            // nothing to adjust
+        }
+        // In this case, we are drawing the first half a a dim. Increase the openning end
+        else if (spanningType == SPANNING_START) {
+            endY = startY / 2;
+        }
+        // Now this is the case we are drawing the end of a dim. Reduce the openning start
+        else if (spanningType == SPANNING_END) {
+            startY = startY / 2;
+        }
+        // Finally, dim accross the system, reduce the start and increase the end
+        else {
+            endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 3;
+            startY = 2 * endY;
+        }
     }
 
     /************** direction **************/
@@ -265,10 +308,10 @@ void View::DrawHairpin(
     dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
     dc->SetBrush(AxBLACK, AxSOLID);
 
-    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2),
-        ToDeviceContextY(y1 - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
-    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2),
-        ToDeviceContextY(y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
+    dc->DrawLine(
+        ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2), ToDeviceContextX(x2), ToDeviceContextY(y1 - endY / 2));
+    dc->DrawLine(
+        ToDeviceContextX(x1), ToDeviceContextY(y1 + startY / 2), ToDeviceContextX(x2), ToDeviceContextY(y1 + endY / 2));
 
     dc->ResetBrush();
     dc->ResetPen();

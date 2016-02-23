@@ -500,6 +500,11 @@ int Doc::GetDrawingStemWidth(int staffSize)
     return m_style->m_stemWidth * staffSize / 100;
 }
 
+int Doc::GetDrawingHairpinSize(int staffSize)
+{
+    return m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITON_FACTOR;
+}
+
 int Doc::GetDrawingBeamWidth(int staffSize, bool graceSize)
 {
     int value = m_drawingBeamWidth * staffSize / 100;

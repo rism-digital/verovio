@@ -74,6 +74,10 @@ namespace vrv {
 #define MIN_SPACING_SYSTEM 0
 #define MAX_SPACING_SYSTEM 12
 
+#define DEFAULT_HAIRPIN_SIZE 4.0
+#define MIN_HAIRPIN_SIZE 2.0
+#define MAX_HAIRPIN_SIZE 8.0
+
 #define DEFAULT_LYRIC_SIZE 4.5
 #define MIN_LYRIC_SIZE 2.0
 #define MAX_LYRIC_SIZE 8.0
@@ -216,6 +220,8 @@ public:
     short m_minMeasureWidth;
     /** The lyrics size (in units / PARAM_DENOMINATOR) */
     int m_lyricSize;
+    /** haripin size (in units / PARAM_DENOMINATOR) */
+    int m_hairpinSize;
 
     /** ties and slurs */
     char m_tieThickness;

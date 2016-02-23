@@ -81,6 +81,8 @@ StaffAlignment::StaffAlignment() : Object()
     m_yShift = 0;
     m_maxHeight = 0;
     m_verseCount = 0;
+    m_dynamAbove = false;
+    m_dynamBelow = false;
 }
 
 StaffAlignment::~StaffAlignment()

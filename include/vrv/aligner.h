@@ -127,6 +127,16 @@ public:
     int GetVerseCount() { return m_verseCount; };
 
     /**
+     * @name Setter and getter for above or below dynam/hairpin
+     */
+    ///@{
+    void SetDynamAbove() { m_dynamAbove = true; };
+    bool GetDynamAbove() { return m_dynamAbove; };
+    void SetDynamBelow() { m_dynamBelow = true; };
+    bool GetDynamBelow() { return m_dynamBelow; };
+    ///@}
+
+    /**
      * Set the position of the StaffAlignment.
      * Functor redirected from System.
      */
@@ -157,6 +167,13 @@ private:
      * Stores the number of verse of the staves attached to the aligner
      */
     int m_verseCount;
+    /**
+     * @name indicator for the presence of above and below dynam/hairpin
+     */
+    ///@{
+    bool m_dynamAbove;
+    bool m_dynamBelow;
+    ///@}
 };
 
 //----------------------------------------------------------------------------

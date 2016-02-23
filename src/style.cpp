@@ -48,6 +48,7 @@ Style::Style()
     m_spacingSystem = DEFAULT_SPACING_SYSTEM;
 
     m_lyricSize = DEFAULT_LYRIC_SIZE * PARAM_DENOMINATOR;
+    m_hairpinSize = DEFAULT_HAIRPIN_SIZE * PARAM_DENOMINATOR;
 
     m_minMeasureWidth = (short)(DEFAULT_MEASURE_WIDTH * PARAM_DENOMINATOR);
 
