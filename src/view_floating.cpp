@@ -163,11 +163,16 @@ void View::DrawHairpin(
     assert(hairpin);
     assert(staff);
 
+    if (!hairpin->HasForm()) {
+        // we cannot draw a hairpin that has no form
+        return;
+    }
+
     LayerElement *start = NULL;
     LayerElement *end = NULL;
 
-    data_PLACE place = PLACE_NONE;
-    hairpinLog_FORM form = hairpinLog_FORM_NONE;
+    data_STAFFREL place = hairpin->GetPlace();
+    hairpinLog_FORM form = hairpin->GetForm();
 
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
@@ -239,7 +244,7 @@ void View::DrawHairpin(
 
     /************** adjusting y position **************/
 
-    if (place == PLACE_above) {
+    if (place == STAFFREL_above) {
         y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
@@ -257,6 +262,17 @@ void View::DrawHairpin(
     dc->DeactivateGraphic();
     // DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize,
     // angle);
+    dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
+    dc->SetBrush(AxBLACK, AxSOLID);
+
+    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2),
+        ToDeviceContextY(y1 - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
+    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2),
+        ToDeviceContextY(y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
+
+    dc->ResetBrush();
+    dc->ResetPen();
+
     dc->ReactivateGraphic();
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
