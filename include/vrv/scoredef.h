@@ -47,6 +47,8 @@ public:
     virtual ClassId Is() { return SCOREDEF_ELEMENT; };
     ///@}
 
+    virtual ScoreDefInterface *GetScoreDefInterface() { return vrv_cast2(ScoreDefInterface *)(this); }
+
     /**
      * @name Methods for checking the presence of clef, key signature, etc. information.
      * Look both at the attributes (e.g., @key.sig) and at child elements (not implemented)

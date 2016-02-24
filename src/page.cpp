@@ -89,7 +89,7 @@ void Page::LayOut(bool force)
 
 void Page::LayOutHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = vrv_cast(Doc *)(m_parent);
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -127,7 +127,7 @@ void Page::LayOutHorizontally()
         AttDurExtreme durExtremeComparison(LONGEST);
         Object *longestDur = this->FindChildExtremeByAttComparison(&durExtremeComparison);
         if (longestDur) {
-            DurationInterface *interface = dynamic_cast<DurationInterface *>(longestDur);
+            DurationInterface *interface = longestDur->GetDurationInterface();
             assert(interface);
             longestActualDur = interface->GetActualDur();
             // LogDebug("Longest duration is DUR_* code %d", longestActualDur);
@@ -209,7 +209,7 @@ void Page::LayOutHorizontally()
 
 void Page::LayOutVertically()
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = vrv_cast(Doc *)(m_parent);
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -290,7 +290,7 @@ void Page::LayOutVertically()
 
 void Page::JustifyHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = vrv_cast(Doc *)(m_parent);
     assert(doc);
 
     if (!doc->GetJustificationX()) {
@@ -321,14 +321,14 @@ void Page::JustifyHorizontally()
 
 int Page::GetContentHeight()
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = vrv_cast(Doc *)(m_parent);
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    System *last = dynamic_cast<System *>(m_children.back());
+    System *last = vrv_cast(System *)(m_children.back());
     if (!last) {
         return 0;
     }
@@ -337,14 +337,14 @@ int Page::GetContentHeight()
 
 int Page::GetContentWidth()
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = vrv_cast(Doc *)(m_parent);
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    System *first = dynamic_cast<System *>(m_children.front());
+    System *first = vrv_cast(System *)(m_children.front());
     if (!first) {
         return 0;
     }

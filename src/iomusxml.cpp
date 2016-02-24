@@ -162,11 +162,11 @@ void MusicXmlInput::AddMeasure(System *system, Measure *measure, int i)
     }
     // otherwise copy the content to the corresponding existing measure
     else if (system->GetChildCount() > i) {
-        Measure *existingMeasure = dynamic_cast<Measure *>(system->m_children[i]);
+        Measure *existingMeasure = vrv_cast(Measure *)(system->m_children[i]);
         assert(existingMeasure);
         ArrayOfObjects::iterator sIter = measure->m_children.begin();
         for (sIter = measure->m_children.begin(); sIter != measure->m_children.end(); sIter++) {
-            Staff *staff = dynamic_cast<Staff *>(measure->Relinquish((*sIter)->GetIdx()));
+            Staff *staff = vrv_cast(Staff *)(measure->Relinquish((*sIter)->GetIdx()));
             assert(staff);
             existingMeasure->AddStaff(staff);
         }
@@ -186,17 +186,17 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
         layer->AddLayerElement(element);
     }
     else if (m_elementStack.back()->Is() == BEAM) {
-        Beam *beam = dynamic_cast<Beam *>(m_elementStack.back());
+        Beam *beam = vrv_cast(Beam *)(m_elementStack.back());
         assert(beam);
         beam->AddLayerElement(element);
     }
     else if (m_elementStack.back()->Is() == CHORD) {
-        Chord *chord = dynamic_cast<Chord *>(m_elementStack.back());
+        Chord *chord = vrv_cast(Chord *)(m_elementStack.back());
         assert(chord);
         chord->AddLayerElement(element);
     }
     else if (m_elementStack.back()->Is() == TUPLET) {
-        Tuplet *tuplet = dynamic_cast<Tuplet *>(m_elementStack.back());
+        Tuplet *tuplet = vrv_cast(Tuplet *)(m_elementStack.back());
         assert(tuplet);
         tuplet->AddLayerElement(element);
     }
@@ -214,7 +214,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
         staffNb = 1;
     }
     staffNb--;
-    Staff *staff = dynamic_cast<Staff *>(measure->m_children.at(staffNb));
+    Staff *staff = vrv_cast(Staff *)(measure->m_children.at(staffNb));
     assert(staff);
     // Now look for the layer with the corresponding voice
     int layerNb = 1;
@@ -232,7 +232,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
 Layer *MusicXmlInput::SelectLayer(int staffNb, vrv::Measure *measure)
 {
     staffNb--;
-    Staff *staff = dynamic_cast<Staff *>(measure->m_children.at(staffNb));
+    Staff *staff = vrv_cast(Staff *)(measure->m_children.at(staffNb));
     assert(staff);
     // layer -1 means the first one
     return SelectLayer(-1, staff);
@@ -244,14 +244,14 @@ Layer *MusicXmlInput::SelectLayer(int layerNb, Staff *staff)
     // no layer specified, return the first one (if any)
     if (layerNb == -1) {
         if (staff->m_children.size() > 0) {
-            layer = dynamic_cast<Layer *>(staff->m_children.at(0));
+            layer = vrv_cast(Layer *)(staff->m_children.at(0));
         }
         // otherwise set @n to 1
         layerNb = 1;
     }
     else {
         AttCommonNComparison comparisonLayer(LAYER, layerNb);
-        layer = dynamic_cast<Layer *>(staff->FindChildByAttComparison(&comparisonLayer, 1));
+        layer = vrv_cast(Layer *)(staff->FindChildByAttComparison(&comparisonLayer, 1));
     }
     if (layer) return layer;
     // else add it
@@ -385,7 +385,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 m_staffGrpStack.back()->AddStaffGrp(partStaffGrp);
             }
             else {
-                StaffDef *staffDef = dynamic_cast<StaffDef *>(partStaffGrp->FindChildByType(STAFFDEF));
+                StaffDef *staffDef = vrv_cast(StaffDef *)(partStaffGrp->FindChildByType(STAFFDEF));
                 if (staffDef) {
                     staffDef->SetLabel(partName);
                 }
@@ -412,7 +412,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     for (iter = m_floatingElements.begin(); iter != m_floatingElements.end(); iter++) {
         if (!measure || (measure->GetN() != iter->first)) {
             AttCommonNComparison comparisonMeasure(MEASURE, iter->first);
-            measure = dynamic_cast<Measure *>(system->FindChildByAttComparison(&comparisonMeasure, 1));
+            measure = vrv_cast(Measure *)(system->FindChildByAttComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
             LogWarning(
@@ -462,7 +462,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             // Find or create the staffDef
             StaffDef *staffDef = NULL;
             AttCommonNComparison comparisonStaffDef(STAFFDEF, i + 1 + staffOffset);
-            staffDef = dynamic_cast<StaffDef *>(staffGrp->FindChildByAttComparison(&comparisonStaffDef, 1));
+            staffDef = vrv_cast(StaffDef *)(staffGrp->FindChildByAttComparison(&comparisonStaffDef, 1));
             if (!staffDef) {
                 staffDef = new StaffDef();
                 staffDef->SetN(i + 1 + staffOffset);
@@ -659,7 +659,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     Layer *layer = SelectLayer(node, measure);
     assert(layer);
 
-    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+    Staff *staff = vrv_cast(Staff *)(layer->GetFirstParent(STAFF));
     assert(staff);
 
     LayerElement *element = NULL;

@@ -49,7 +49,7 @@ int FloatingElement::PrepareTimeSpanning(ArrayPtrVoid *params)
     // For now we don't consider dynam since the time spanning is not relevant for display
     // Eventually, we could consider them but only if a @tstamp2 (or @endid) is provided
     if (this->HasInterface(INTERFACE_TIME_SPANNING) && (this->Is() != DYNAM)) {
-        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(this);
+        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
         return interface->InterfacePrepareTimeSpanning(params, this);
     }
@@ -60,12 +60,12 @@ int FloatingElement::PrepareTimestamps(ArrayPtrVoid *params)
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_POINT)) {
-        TimePointInterface *interface = dynamic_cast<TimePointInterface *>(this);
+        TimePointInterface *interface = this->GetTimePointInterface();
         assert(interface);
         return interface->InterfacePrepareTimestamps(params, this);
     }
     else if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(this);
+        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
         return interface->InterfacePrepareTimestamps(params, this);
     }
@@ -76,7 +76,7 @@ int FloatingElement::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(this);
+        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
         return interface->InterfaceFillStaffCurrentTimeSpanning(params, this);
     }
@@ -87,7 +87,7 @@ int FloatingElement::ResetDrawing(ArrayPtrVoid *params)
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
-        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(this);
+        TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
         return interface->InterfaceResetDrawing(params, this);
     }

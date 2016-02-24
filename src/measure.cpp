@@ -77,7 +77,7 @@ void Measure::AddFloatingElement(FloatingElement *element)
     m_children.push_back(element);
 
     if (element->Is() == STAFF) {
-        Staff *staff = dynamic_cast<Staff *>(element);
+        Staff *staff = vrv_cast(Staff *)(element);
         assert(staff);
         if (staff->GetN() < 1) {
             // This is not 100% safe if we have a <app> and <rdg> with more than
@@ -306,7 +306,7 @@ int Measure::CastOffSystems(ArrayPtrVoid *params)
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    Measure *measure = dynamic_cast<Measure *>(contentSystem->Relinquish(this->GetIdx()));
+    Measure *measure = vrv_cast(Measure *)(contentSystem->Relinquish(this->GetIdx()));
     assert(measure);
     (*currentSystem)->AddMeasure(measure);
 
@@ -367,9 +367,9 @@ int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
 
     std::vector<DocObject *>::iterator iter = elements->begin();
     while (iter != elements->end()) {
-        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(*iter);
+        TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
         assert(interface);
-        Measure *endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstParent(MEASURE));
+        Measure *endParent = vrv_cast(Measure *)(interface->GetEnd()->GetFirstParent(MEASURE));
         assert(endParent);
         // We have reached the end of the spanning - remove it from the list of running elements
         if (endParent == this) {
@@ -394,13 +394,13 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
     while (iter != tstamps->end()) {
         // -1 means that we have a @tstamp (start) to add to the current measure
         if ((*iter).second.first == -1) {
-            TimePointInterface *interface = dynamic_cast<TimePointInterface *>((*iter).first);
+            TimePointInterface *interface = ((*iter).first)->GetTimePointInterface();
             assert(interface);
             TimestampAttr *timestampAttr = m_timestampAligner.GetTimestampAtTime((*iter).second.second);
             interface->SetStart(timestampAttr);
             // purge the list of unmatched element is this is a TimeSpanningInterface element
             if ((*iter).first->HasInterface(INTERFACE_TIME_SPANNING)) {
-                TimeSpanningInterface *tsInterface = dynamic_cast<TimeSpanningInterface *>((*iter).first);
+                TimeSpanningInterface *tsInterface = ((*iter).first)->GetTimeSpanningInterface();
                 assert(tsInterface);
                 if (tsInterface->HasStartAndEnd()) {
                     elements->erase(std::remove(elements->begin(), elements->end(), (*iter).first), elements->end());
@@ -411,7 +411,7 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
         }
         // 0 means that we have a @tstamp2 (end) to add to the current measure
         else if ((*iter).second.first == 0) {
-            TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>((*iter).first);
+            TimeSpanningInterface *interface = ((*iter).first)->GetTimeSpanningInterface();
             assert(interface);
             TimestampAttr *timestampAttr = m_timestampAligner.GetTimestampAtTime((*iter).second.second);
             interface->SetEnd(timestampAttr);

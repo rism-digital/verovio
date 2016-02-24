@@ -221,7 +221,7 @@ App::~App()
 
 void App::AddLemOrRdg(EditorialElement *child)
 {
-    assert(dynamic_cast<Lem *>(child) || dynamic_cast<Rdg *>(child));
+    assert(vrv_cast(Lem *)(child) || vrv_cast(Rdg *)(child));
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
@@ -495,13 +495,13 @@ int EditorialElement::CastOffSystems(ArrayPtrVoid *params)
     System **currentSystem = static_cast<System **>((*params).at(2));
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->m_parent));
+    assert(vrv_cast(System *)(this->m_parent));
 
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(contentSystem->Relinquish(this->GetIdx()));
+    EditorialElement *editorialElement = vrv_cast(EditorialElement *)(contentSystem->Relinquish(this->GetIdx()));
     assert(editorialElement);
     (*currentSystem)->AddEditorialElement(editorialElement);
 

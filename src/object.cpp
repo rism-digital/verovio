@@ -320,10 +320,10 @@ void Object::SetParent(Object *parent)
 
 void Object::AddEditorialElement(EditorialElement *child)
 {
-    assert(dynamic_cast<Layer *>(this) || dynamic_cast<LayerElement *>(this) || dynamic_cast<Lem *>(this)
-        || dynamic_cast<Measure *>(this) || dynamic_cast<Note *>(this) || dynamic_cast<Staff *>(this)
-        || dynamic_cast<System *>(this) || dynamic_cast<Tempo *>(this) || dynamic_cast<EditorialElement *>(this)
-        || dynamic_cast<TextElement *>(this));
+    assert(vrv_cast(Layer *)(this) || vrv_cast(LayerElement *)(this) || vrv_cast(Lem *)(this)
+        || vrv_cast(Measure *)(this) || vrv_cast(Note *)(this) || vrv_cast(Staff *)(this)
+        || vrv_cast(System *)(this) || vrv_cast(Tempo *)(this) || vrv_cast(EditorialElement *)(this)
+        || vrv_cast(TextElement *)(this));
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
@@ -394,7 +394,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor
     }
 
     if (functor->m_visibleOnly && this->IsEditorialElement()) {
-        EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(this);
+        EditorialElement *editorialElement = vrv_cast(EditorialElement *)(this);
         assert(editorialElement);
         if (editorialElement->m_visibility == Hidden) {
             return;
@@ -732,7 +732,7 @@ std::wstring TextListInterface::GetText(Object *node)
     std::wstring concatText;
     ListOfObjects *childList = this->GetList(node); // make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Text *text = dynamic_cast<Text *>(*it);
+        Text *text = vrv_cast(Text *)(*it);
         assert(text);
         concatText += text->GetText();
     }
@@ -785,7 +785,7 @@ int Object::AddLayerElementToFlatList(ArrayPtrVoid *params)
 {
     // param 0: the ListOfObjects
     ListOfObjects **list = static_cast<ListOfObjects **>((*params).at(0));
-    // if (dynamic_cast<LayerElement*>(this)) {
+    // if (vrv_cast(LayerElement*)(this)) {
     (*list)->push_back(this);
     //}
     return FUNCTOR_CONTINUE;
@@ -862,7 +862,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     if (this->Is() == PAGE) {
         // The keySig cancellation is set to false, which means that a scoreDef change has to occur
         // after a page break if right at the begining. This is the same for systems below
-        Page *page = dynamic_cast<Page *>(this);
+        Page *page = vrv_cast(Page *)(this);
         assert(page);
         if (page->m_parent->GetChildIndex(page) == 0) {
             currentScoreDef->SetRedrawFlags(true, true, true, true, false);
@@ -884,7 +884,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
 
     // starting a new scoreDef
     if (this->Is() == SCOREDEF) {
-        ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(this);
+        ScoreDef *scoreDef = vrv_cast(ScoreDef *)(this);
         assert(scoreDef);
         // Replace the current scoreDef with the new one, including its content (staffDef)
         currentScoreDef->ReplaceDrawingValues(scoreDef);
@@ -893,14 +893,14 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
 
     // starting a new staffDef
     if (this->Is() == STAFFDEF) {
-        StaffDef *staffDef = dynamic_cast<StaffDef *>(this);
+        StaffDef *staffDef = vrv_cast(StaffDef *)(this);
         assert(staffDef);
         currentScoreDef->ReplaceDrawingValues(staffDef);
     }
 
     // starting a new staff
     if (this->Is() == STAFF) {
-        Staff *staff = dynamic_cast<Staff *>(this);
+        Staff *staff = vrv_cast(Staff *)(this);
         assert(staff);
         (*currentStaffDef) = currentScoreDef->GetStaffDef(staff->GetN());
         return FUNCTOR_CONTINUE;
@@ -908,7 +908,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
 
     // starting a new layer
     if (this->Is() == LAYER) {
-        Layer *layer = dynamic_cast<Layer *>(this);
+        Layer *layer = vrv_cast(Layer *)(this);
         assert(layer);
         // setting the layer stem direction. Alternatively, this could be done in
         // View::DrawLayer. If this (and other things) is kept here, renaming the method to something
@@ -927,7 +927,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
 
     // starting a new clef
     if (this->Is() == CLEF) {
-        Clef *clef = dynamic_cast<Clef *>(this);
+        Clef *clef = vrv_cast(Clef *)(this);
         assert(clef);
         assert(*currentStaffDef);
         (*currentStaffDef)->SetCurrentClef(new Clef(*clef));
@@ -936,7 +936,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
 
     // starting a new keysig
     if (this->Is() == KEYSIG) {
-        KeySig *keysig = dynamic_cast<KeySig *>(this);
+        KeySig *keysig = vrv_cast(KeySig *)(this);
         assert(keysig);
         assert(*currentStaffDef);
         (*currentStaffDef)->SetCurrentKeySig(new KeySig(*keysig));
@@ -963,7 +963,7 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
         return FUNCTOR_CONTINUE;
     }
 
-    Note *note = dynamic_cast<Note *>(this);
+    Note *note = vrv_cast(Note *)(this);
     assert(note);
 
     if (!note->IsGraceNote()) {
@@ -1017,7 +1017,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
 
     // starting a new measure
     if (this->Is() == MEASURE) {
-        Measure *current_measure = dynamic_cast<Measure *>(this);
+        Measure *current_measure = vrv_cast(Measure *)(this);
         assert(current_measure);
         // we reset the measure width and the minimum position
         (*measure_width) = 0;
@@ -1030,7 +1030,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
 
     // starting new layer
     if (this->Is() == LAYER) {
-        Layer *current_layer = dynamic_cast<Layer *>(this);
+        Layer *current_layer = vrv_cast(Layer *)(this);
         assert(current_layer);
         (*min_pos) = 0;
         // set scoreDef attr
@@ -1053,7 +1053,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
         return FUNCTOR_CONTINUE;
     }
 
-    LayerElement *current = dynamic_cast<LayerElement *>(this);
+    LayerElement *current = vrv_cast(LayerElement *)(this);
     assert(current);
 
     // we should have processed aligned before
@@ -1097,7 +1097,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     int currentX = current->GetAlignment()->GetXRel();
     // with grace note, take into account the position of the note in the grace group
     if (current->IsGraceNote()) {
-        Note *note = dynamic_cast<Note *>(current);
+        Note *note = vrv_cast(Note *)(current);
         currentX += note->GetGraceAlignment()->GetXRel();
     }
 
@@ -1135,7 +1135,7 @@ int Object::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
 
     // ending a measure
     if (this->Is() == MEASURE) {
-        Measure *current_measure = dynamic_cast<Measure *>(this);
+        Measure *current_measure = vrv_cast(Measure *)(this);
         assert(current_measure);
         // use the measure width as minimum position of the barLine
         (*min_pos) = (*measure_width);
@@ -1183,7 +1183,7 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
         return FUNCTOR_CONTINUE;
     }
 
-    Staff *current = dynamic_cast<Staff *>(this);
+    Staff *current = vrv_cast(Staff *)(this);
     assert(current);
 
     // at this stage we assume we have instantiated the alignment pointer

@@ -35,6 +35,8 @@ public:
     virtual ClassId Is() { return SPACE; };
     ///@}
 
+    virtual DurationInterface *GetDurationInterface() { return vrv_cast2(DurationInterface *)(this); }
+
 private:
     //
 public:

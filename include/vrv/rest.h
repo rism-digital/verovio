@@ -35,6 +35,10 @@ public:
     virtual ClassId Is() { return REST; };
     ///@}
 
+    virtual PositionInterface *GetPositionInterface() { return vrv_cast2(PositionInterface *)(this); }
+
+    virtual DurationInterface *GetDurationInterface() { return vrv_cast2(DurationInterface *)(this); }
+
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() { return true; };
 

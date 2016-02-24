@@ -70,16 +70,16 @@ LayerElement *Layer::GetPrevious(LayerElement *element)
     this->ResetList(this);
     if (!element || this->GetList(this)->empty()) return NULL;
 
-    return dynamic_cast<LayerElement *>(GetListPrevious(element));
+    return vrv_cast(LayerElement *)(GetListPrevious(element));
 }
 
 LayerElement *Layer::GetAtPos(int x)
 {
-    LayerElement *element = dynamic_cast<LayerElement *>(this->GetFirst());
+    LayerElement *element = vrv_cast(LayerElement *)(this->GetFirst());
     if (!element || element->GetDrawingX() > x) return NULL;
 
     LayerElement *next = NULL;
-    while ((next = dynamic_cast<LayerElement *>(this->GetNext()))) {
+    while ((next = vrv_cast(LayerElement *)(this->GetNext()))) {
         if (next->GetDrawingX() > x) return element;
         element = next;
     }
@@ -146,7 +146,7 @@ Clef *Layer::GetClef(LayerElement *test)
     }
 
     if (testObject && testObject->Is() == CLEF) {
-        Clef *clef = dynamic_cast<Clef *>(testObject);
+        Clef *clef = vrv_cast(Clef *)(testObject);
         assert(clef);
         return clef;
     }
@@ -213,7 +213,7 @@ int Layer::AlignHorizontallyEnd(ArrayPtrVoid *params)
 
     int i;
     for (i = 0; i < (int)(*measureAligner)->m_children.size(); i++) {
-        Alignment *alignment = dynamic_cast<Alignment *>((*measureAligner)->m_children.at(i));
+        Alignment *alignment = vrv_cast(Alignment *)((*measureAligner)->m_children.at(i));
         if (alignment && alignment->HasGraceAligner()) {
             alignment->GetGraceAligner()->AlignStack();
         }
@@ -230,7 +230,7 @@ int Layer::PrepareProcessingLists(ArrayPtrVoid *params)
     // Alternate solution with StaffN_LayerN_VerseN_t
     // StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    Staff *staff = vrv_cast(Staff *)(this->GetFirstParent(STAFF));
     assert(staff);
     tree->child[staff->GetN()].child[this->GetN()];
 

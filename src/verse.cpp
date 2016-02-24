@@ -44,7 +44,7 @@ void Verse::Reset()
 
 void Verse::AddLayerElement(vrv::LayerElement *element)
 {
-    assert(dynamic_cast<Syl *>(element) || dynamic_cast<EditorialElement *>(element));
+    assert(vrv_cast(Syl *)(element) || vrv_cast(EditorialElement *)(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();
@@ -80,8 +80,8 @@ int Verse::PrepareProcessingLists(ArrayPtrVoid *params)
     // Alternate solution with StaffN_LayerN_VerseN_t
     // StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 
-    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
-    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    Staff *staff = vrv_cast(Staff *)(this->GetFirstParent(STAFF));
+    Layer *layer = vrv_cast(Layer *)(this->GetFirstParent(LAYER));
     assert(staff && layer);
 
     tree->child[staff->GetN()].child[layer->GetN()].child[this->GetN()];

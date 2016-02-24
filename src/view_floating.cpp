@@ -55,7 +55,7 @@ void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Meas
         system->AddToDrawingList(element);
     }
     else if (element->Is() == TEMPO) {
-        Tempo *tempo = dynamic_cast<Tempo *>(element);
+        Tempo *tempo = vrv_cast(Tempo *)(element);
         assert(tempo);
         DrawTempo(dc, tempo, measure, system);
     }
@@ -67,14 +67,14 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
     assert(element);
     assert(system);
 
-    TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(element);
+    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
 
     if (!interface->HasStartAndEnd()) return;
 
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System *>(interface->GetStart()->GetFirstParent(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(interface->GetEnd()->GetFirstParent(SYSTEM));
+    System *parentSystem1 = vrv_cast(System *)(interface->GetStart()->GetFirstParent(SYSTEM));
+    System *parentSystem2 = vrv_cast(System *)(interface->GetEnd()->GetFirstParent(SYSTEM));
 
     int x1, x2;
     // Staff *staff = NULL;
@@ -94,7 +94,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
     // Only the first parent is the same, this means that the element is "open" at the end of the system
     else if (system == parentSystem1) {
         // We need the last measure of the system for x2 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
+        measure = vrv_cast(Measure *)(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
         x1 = interface->GetStart()->GetDrawingX();
         x2 = measure->GetDrawingX() + measure->GetRightBarLineX();
@@ -104,12 +104,12 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
     // We are in the system of the last note - draw the element from the beginning of the system
     else if (system == parentSystem2) {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        measure = vrv_cast(Measure *)(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
         AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
         Alignment *pos
-            = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+            = vrv_cast(Alignment *)(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
         x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
                  : measure->GetDrawingX();
         x2 = interface->GetEnd()->GetDrawingX();
@@ -119,16 +119,16 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
     // throughout the system
     else {
         // We need the first measure of the system for x1 - we also use it for getting the staves later
-        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        measure = vrv_cast(Measure *)(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
         AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
         Alignment *pos
-            = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+            = vrv_cast(Alignment *)(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
         x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
                  : measure->GetDrawingX();
         // We need the last measure of the system for x2
-        Measure *last = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
+        Measure *last = vrv_cast(Measure *)(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(last)) return;
         x2 = last->GetDrawingX() + last->GetRightBarLineX();
         spanningType = SPANNING_MIDDLE;
@@ -139,19 +139,19 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         if (element->Is() == HAIRPIN) {
             // cast to Slur check in DrawTieOrSlur
-            DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
+            DrawHairpin(dc, vrv_cast(Hairpin *)(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is() == SLUR) {
             // cast to Slur check in DrawTieOrSlur
-            DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, *staffIter, spanningType, graphic);
+            DrawSlur(dc, vrv_cast(Slur *)(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is() == SYL) {
             // cast to Syl check in DrawSylConnector
-            DrawSylConnector(dc, dynamic_cast<Syl *>(element), x1, x2, *staffIter, spanningType, graphic);
+            DrawSylConnector(dc, vrv_cast(Syl *)(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is() == TIE) {
             // cast to Slur check in DrawTieOrSlur
-            DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, *staffIter, spanningType, graphic);
+            DrawTie(dc, vrv_cast(Tie *)(element), x1, x2, *staffIter, spanningType, graphic);
         }
     }
 }
@@ -185,8 +185,8 @@ void View::DrawHairpin(
 
     /************** parent layers **************/
 
-    start = dynamic_cast<LayerElement *>(hairpin->GetStart());
-    end = dynamic_cast<LayerElement *>(hairpin->GetEnd());
+    start = vrv_cast(LayerElement *)(hairpin->GetStart());
+    end = vrv_cast(LayerElement *)(hairpin->GetEnd());
 
     if (!start || !end) {
         // no start and end, obviously nothing to do...
@@ -198,15 +198,15 @@ void View::DrawHairpin(
 
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
     if (start->Is() == TIMESTAMP_ATTR)
-        layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+        layer1 = vrv_cast(Layer *)(staff->FindChildByType(LAYER));
     else
-        layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+        layer1 = vrv_cast(Layer *)(start->GetFirstParent(LAYER));
 
     // idem
     if (end->Is() == TIMESTAMP_ATTR)
-        layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+        layer2 = vrv_cast(Layer *)(staff->FindChildByType(LAYER));
     else
-        layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+        layer2 = vrv_cast(Layer *)(end->GetFirstParent(LAYER));
 
     assert(layer1 && layer2);
 
@@ -353,8 +353,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     /************** parent layers **************/
 
-    start = dynamic_cast<LayerElement *>(slur->GetStart());
-    end = dynamic_cast<LayerElement *>(slur->GetEnd());
+    start = vrv_cast(LayerElement *)(slur->GetStart());
+    end = vrv_cast(LayerElement *)(slur->GetEnd());
 
     if (!start || !end) {
         // no start and end, obviously nothing to do...
@@ -362,24 +362,24 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     }
 
     if (start->Is() == NOTE) {
-        startNote = dynamic_cast<Note *>(start);
+        startNote = vrv_cast(Note *)(start);
         assert(startNote);
         startParentChord = startNote->IsChordTone();
         startStemDir = startNote->GetDrawingStemDir();
     }
     else if (start->Is() == CHORD) {
-        startChord = dynamic_cast<Chord *>(start);
+        startChord = vrv_cast(Chord *)(start);
         assert(startChord);
         startStemDir = startChord->GetDrawingStemDir();
     }
     if (end->Is() == NOTE) {
-        endNote = dynamic_cast<Note *>(end);
+        endNote = vrv_cast(Note *)(end);
         assert(endNote);
         endParentChord = endNote->IsChordTone();
         endStemDir = endNote->GetDrawingStemDir();
     }
     else if (end->Is() == CHORD) {
-        endChord = dynamic_cast<Chord *>(end);
+        endChord = vrv_cast(Chord *)(end);
         assert(endChord);
         endStemDir = endChord->GetDrawingStemDir();
     }
@@ -389,15 +389,15 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
     if (start->Is() == TIMESTAMP_ATTR)
-        layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+        layer1 = vrv_cast(Layer *)(staff->FindChildByType(LAYER));
     else
-        layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+        layer1 = vrv_cast(Layer *)(start->GetFirstParent(LAYER));
 
     // idem
     if (end->Is() == TIMESTAMP_ATTR)
-        layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+        layer2 = vrv_cast(Layer *)(staff->FindChildByType(LAYER));
     else
-        layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+        layer2 = vrv_cast(Layer *)(end->GetFirstParent(LAYER));
 
     assert(layer1 && layer2);
 
@@ -605,7 +605,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     float angle = 0.0;
     // We do not want to adjust the position when calculating bounding boxes (at least for now)
-    if (dynamic_cast<BBoxDeviceContext *>(dc) == NULL) angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
+    if (vrv_cast(BBoxDeviceContext *)(dc) == NULL) angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
 
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR;
 
@@ -661,7 +661,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
 
     /************** content **************/
 
-    System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
+    System *system = vrv_cast(System *)(staff->GetFirstParent(SYSTEM));
     assert(system);
     std::vector<LayerElement *> spanningContent;
     ArrayPtrVoid params;
@@ -687,7 +687,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
         // We keep only notes and chords for now
         if (((*it)->Is() != NOTE) && ((*it)->Is() != CHORD)) continue;
         // Also skip notes that are part of a chords since we already have the chord
-        if ((note = dynamic_cast<Note *>(*it)) && note->IsChordTone()) continue;
+        if ((note = vrv_cast(Note *)(*it)) && note->IsChordTone()) continue;
         Point p;
         spanningContentPoints.push_back(std::make_pair((*it), p));
     }
@@ -1010,8 +1010,8 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 
     /************** parent layers **************/
 
-    note1 = dynamic_cast<Note *>(tie->GetStart());
-    note2 = dynamic_cast<Note *>(tie->GetEnd());
+    note1 = vrv_cast(Note *)(tie->GetStart());
+    note2 = vrv_cast(Note *)(tie->GetEnd());
 
     if (!note1 || !note2) {
         // no note, obviously nothing to do...
@@ -1021,8 +1021,8 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 
     parentChord1 = note1->IsChordTone();
 
-    Layer *layer1 = dynamic_cast<Layer *>(note1->GetFirstParent(LAYER));
-    Layer *layer2 = dynamic_cast<Layer *>(note2->GetFirstParent(LAYER));
+    Layer *layer1 = vrv_cast(Layer *)(note1->GetFirstParent(LAYER));
+    Layer *layer2 = vrv_cast(Layer *)(note2->GetFirstParent(LAYER));
     assert(layer1 && layer2);
 
     if (layer1->GetN() != layer2->GetN()) {
@@ -1286,12 +1286,11 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     int x = measure->GetDrawingX();
     // First try to see if we have a meter sig attribute for this measure
     AttMeasureAlignerType alignmentComparison(ALIGNMENT_METERSIG_ATTR);
-    Alignment *pos
-        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+    Alignment *pos = vrv_cast(Alignment *)(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
     if (!pos) {
         // if not, try to get the first beat element
         alignmentComparison.SetType(ALIGNMENT_DEFAULT);
-        pos = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+        pos = vrv_cast(Alignment *)(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
     }
     // if we found one, use it
     if (pos) {

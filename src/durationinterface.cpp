@@ -113,7 +113,7 @@ double DurationInterface::GetAlignmentMensuralDuration(int num, int numbase, Men
 
 bool DurationInterface::IsFirstInBeam(LayerElement *noteOrRest)
 {
-    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+    Beam *beam = vrv_cast(Beam *)(noteOrRest->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
     if (!beam) {
         return false;
     }
@@ -127,7 +127,7 @@ bool DurationInterface::IsFirstInBeam(LayerElement *noteOrRest)
 
 bool DurationInterface::IsLastInBeam(LayerElement *noteOrRest)
 {
-    Beam *beam = dynamic_cast<Beam *>(noteOrRest->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
+    Beam *beam = vrv_cast(Beam *)(noteOrRest->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
     if (!beam) {
         return false;
     }
@@ -152,7 +152,7 @@ int DurationInterface::GetNoteOrChordDur(LayerElement *element)
         return this->GetActualDur();
     }
     else if (element->Is() == NOTE) {
-        Note *note = dynamic_cast<Note *>(element);
+        Note *note = vrv_cast(Note *)(element);
         assert(note);
         Chord *chord = note->IsChordTone();
         if (chord)

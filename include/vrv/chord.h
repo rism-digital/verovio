@@ -50,6 +50,9 @@ public:
     virtual ClassId Is() { return CHORD; };
     ///@}
 
+    virtual DurationInterface *GetDurationInterface() { return vrv_cast2(DurationInterface *)(this); }
+    virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return vrv_cast2(StemmedDrawingInterface *)(this); }
+
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() { return true; };
 

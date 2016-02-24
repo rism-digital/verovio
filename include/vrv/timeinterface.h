@@ -132,6 +132,8 @@ public:
     virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; };
     ///@}
 
+    virtual TimePointInterface *GetTimePointInterface() { return vrv_cast2(TimePointInterface *)(this); }
+
     /**
      * @name Set and get the first and second LayerElement
      * The setter asserts that no LayerElement was previously set.

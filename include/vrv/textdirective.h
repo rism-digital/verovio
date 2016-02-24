@@ -37,6 +37,8 @@ public:
     virtual ClassId Is() { return ANCHORED_TEXT; };
     ///@}
 
+    virtual TextDirInterface *GetTextDirInterface() { return vrv_cast2(TextDirInterface *)(this); }
+
     /**
      * Add an element (text, rend. etc.) to a tempo.
      * Only supported elements will be actually added to the child list.
@@ -70,6 +72,9 @@ public:
     virtual std::string GetClassName() { return "Tempo"; };
     virtual ClassId Is() { return TEMPO; };
     ///@}
+
+    virtual TextDirInterface *GetTextDirInterface() { return vrv_cast2(TextDirInterface *)(this); }
+    virtual TimePointInterface *GetTimePointInterface() { return vrv_cast2(TimePointInterface *)(this); }
 
     /**
      * Add an element (text, rend. etc.) to a tempo.

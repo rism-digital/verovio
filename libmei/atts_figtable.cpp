@@ -90,7 +90,7 @@ bool AttTabular::HasRowspan()
 bool Att::SetFigtable(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_TABULAR)) {
-        AttTabular *att = dynamic_cast<AttTabular *>(element);
+        AttTabular *att = vrv_cast(AttTabular *)(element);
         assert(att);
         if (attrType == "colspan") {
             att->SetColspan(att->StrToInt(attrValue));
@@ -108,7 +108,7 @@ bool Att::SetFigtable(Object *element, std::string attrType, std::string attrVal
 void Att::GetFigtable(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_TABULAR)) {
-        AttTabular *att = dynamic_cast<AttTabular *>(element);
+        AttTabular *att = vrv_cast(AttTabular *)(element);
         assert(att);
         if (att->HasColspan()) {
             attributes->push_back(std::make_pair("colspan", att->IntToStr(att->GetColspan())));

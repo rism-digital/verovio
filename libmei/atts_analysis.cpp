@@ -426,7 +426,7 @@ bool AttSolfa::HasPsolfa()
 bool Att::SetAnalysis(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_COMMONANL)) {
-        AttCommonAnl *att = dynamic_cast<AttCommonAnl *>(element);
+        AttCommonAnl *att = vrv_cast(AttCommonAnl *)(element);
         assert(att);
         if (attrType == "copyof") {
             att->SetCopyof(att->StrToStr(attrValue));
@@ -454,7 +454,7 @@ bool Att::SetAnalysis(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_HARMONICFUNCTION)) {
-        AttHarmonicfunction *att = dynamic_cast<AttHarmonicfunction *>(element);
+        AttHarmonicfunction *att = vrv_cast(AttHarmonicfunction *)(element);
         assert(att);
         if (attrType == "deg") {
             att->SetDeg(att->StrToScaledegree(attrValue));
@@ -462,7 +462,7 @@ bool Att::SetAnalysis(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_INTERVALHARMONIC)) {
-        AttIntervalharmonic *att = dynamic_cast<AttIntervalharmonic *>(element);
+        AttIntervalharmonic *att = vrv_cast(AttIntervalharmonic *)(element);
         assert(att);
         if (attrType == "inth") {
             att->SetInth(att->StrToStr(attrValue));
@@ -470,7 +470,7 @@ bool Att::SetAnalysis(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_INTERVALLICDESC)) {
-        AttIntervallicdesc *att = dynamic_cast<AttIntervallicdesc *>(element);
+        AttIntervallicdesc *att = vrv_cast(AttIntervallicdesc *)(element);
         assert(att);
         if (attrType == "intm") {
             att->SetIntm(att->StrToIntervalAmount(attrValue));
@@ -478,7 +478,7 @@ bool Att::SetAnalysis(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_MELODICFUNCTION)) {
-        AttMelodicfunction *att = dynamic_cast<AttMelodicfunction *>(element);
+        AttMelodicfunction *att = vrv_cast(AttMelodicfunction *)(element);
         assert(att);
         if (attrType == "mfunc") {
             att->SetMfunc(att->StrToMelodicfunction(attrValue));
@@ -486,7 +486,7 @@ bool Att::SetAnalysis(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_PITCHCLASS)) {
-        AttPitchclass *att = dynamic_cast<AttPitchclass *>(element);
+        AttPitchclass *att = vrv_cast(AttPitchclass *)(element);
         assert(att);
         if (attrType == "pclass") {
             att->SetPclass(att->StrToPitchclass(attrValue));
@@ -494,7 +494,7 @@ bool Att::SetAnalysis(Object *element, std::string attrType, std::string attrVal
         }
     }
     if (element->HasAttClass(ATT_SOLFA)) {
-        AttSolfa *att = dynamic_cast<AttSolfa *>(element);
+        AttSolfa *att = vrv_cast(AttSolfa *)(element);
         assert(att);
         if (attrType == "psolfa") {
             att->SetPsolfa(att->StrToStr(attrValue));
@@ -508,7 +508,7 @@ bool Att::SetAnalysis(Object *element, std::string attrType, std::string attrVal
 void Att::GetAnalysis(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_COMMONANL)) {
-        AttCommonAnl *att = dynamic_cast<AttCommonAnl *>(element);
+        AttCommonAnl *att = vrv_cast(AttCommonAnl *)(element);
         assert(att);
         if (att->HasCopyof()) {
             attributes->push_back(std::make_pair("copyof", att->StrToStr(att->GetCopyof())));
@@ -530,42 +530,42 @@ void Att::GetAnalysis(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_HARMONICFUNCTION)) {
-        AttHarmonicfunction *att = dynamic_cast<AttHarmonicfunction *>(element);
+        AttHarmonicfunction *att = vrv_cast(AttHarmonicfunction *)(element);
         assert(att);
         if (att->HasDeg()) {
             attributes->push_back(std::make_pair("deg", att->ScaledegreeToStr(att->GetDeg())));
         }
     }
     if (element->HasAttClass(ATT_INTERVALHARMONIC)) {
-        AttIntervalharmonic *att = dynamic_cast<AttIntervalharmonic *>(element);
+        AttIntervalharmonic *att = vrv_cast(AttIntervalharmonic *)(element);
         assert(att);
         if (att->HasInth()) {
             attributes->push_back(std::make_pair("inth", att->StrToStr(att->GetInth())));
         }
     }
     if (element->HasAttClass(ATT_INTERVALLICDESC)) {
-        AttIntervallicdesc *att = dynamic_cast<AttIntervallicdesc *>(element);
+        AttIntervallicdesc *att = vrv_cast(AttIntervallicdesc *)(element);
         assert(att);
         if (att->HasIntm()) {
             attributes->push_back(std::make_pair("intm", att->IntervalAmountToStr(att->GetIntm())));
         }
     }
     if (element->HasAttClass(ATT_MELODICFUNCTION)) {
-        AttMelodicfunction *att = dynamic_cast<AttMelodicfunction *>(element);
+        AttMelodicfunction *att = vrv_cast(AttMelodicfunction *)(element);
         assert(att);
         if (att->HasMfunc()) {
             attributes->push_back(std::make_pair("mfunc", att->MelodicfunctionToStr(att->GetMfunc())));
         }
     }
     if (element->HasAttClass(ATT_PITCHCLASS)) {
-        AttPitchclass *att = dynamic_cast<AttPitchclass *>(element);
+        AttPitchclass *att = vrv_cast(AttPitchclass *)(element);
         assert(att);
         if (att->HasPclass()) {
             attributes->push_back(std::make_pair("pclass", att->PitchclassToStr(att->GetPclass())));
         }
     }
     if (element->HasAttClass(ATT_SOLFA)) {
-        AttSolfa *att = dynamic_cast<AttSolfa *>(element);
+        AttSolfa *att = vrv_cast(AttSolfa *)(element);
         assert(att);
         if (att->HasPsolfa()) {
             attributes->push_back(std::make_pair("psolfa", att->StrToStr(att->GetPsolfa())));

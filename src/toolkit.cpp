@@ -608,7 +608,7 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
     if (!element) {
         return 0;
     }
-    Page *page = dynamic_cast<Page *>(element->GetFirstParent(PAGE));
+    Page *page = vrv_cast(Page *)(element->GetFirstParent(PAGE));
     if (!page) {
         return 0;
     }
@@ -646,9 +646,9 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
     if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
     if (element->Is() == NOTE) {
-        Note *note = dynamic_cast<Note *>(element);
+        Note *note = vrv_cast(Note *)(element);
         assert(note);
-        Layer *layer = dynamic_cast<Layer *>(note->GetFirstParent(LAYER));
+        Layer *layer = vrv_cast(Layer *)(note->GetFirstParent(LAYER));
         if (!layer) return false;
         int oct;
         data_PITCHNAME pname
@@ -672,16 +672,16 @@ bool Toolkit::Insert(std::string elementType, std::string startid, std::string e
         return false;
     }
     // Check if it is a LayerElement
-    if (!dynamic_cast<LayerElement *>(start)) {
+    if (!vrv_cast(LayerElement *)(start)) {
         LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
         return false;
     }
-    if (!dynamic_cast<LayerElement *>(end)) {
+    if (!vrv_cast(LayerElement *)(end)) {
         LogMessage("Element '%s' is not supported as end element", start->GetClassName().c_str());
         return false;
     }
 
-    Measure *measure = dynamic_cast<Measure *>(start->GetFirstParent(MEASURE));
+    Measure *measure = vrv_cast(Measure *)(start->GetFirstParent(MEASURE));
     assert(measure);
     if (elementType == "slur") {
         Slur *slur = new Slur();

@@ -95,7 +95,7 @@ void Note::Reset()
 void Note::AddLayerElement(vrv::LayerElement *element)
 {
     assert(
-        dynamic_cast<Accid *>(element) || dynamic_cast<Verse *>(element) || dynamic_cast<EditorialElement *>(element));
+        vrv_cast(Accid *)(element) || vrv_cast(Verse *)(element) || vrv_cast(EditorialElement *)(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();
@@ -143,12 +143,12 @@ void Note::ResetDrawingAccid()
 
 Chord *Note::IsChordTone()
 {
-    return dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    return vrv_cast(Chord *)(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
 }
 
 int Note::GetDrawingDur()
 {
-    Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
+    Chord *chordParent = vrv_cast(Chord *)(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
     if (chordParent) {
         return chordParent->GetActualDur();
     }

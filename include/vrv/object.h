@@ -20,9 +20,17 @@
 namespace vrv {
 
 class Doc;
+class DurationInterface;
 class EditorialElement;
 class FileOutputStream;
 class Functor;
+class PitchInterface;
+class PositionInterface;
+class ScoreDefInterface;
+class StemmedDrawingInterface;
+class TextDirInterface;
+class TimePointInterface;
+class TimeSpanningInterface;
 
 /**
  * Generic int map recursive structure for storing hierachy of values
@@ -102,6 +110,15 @@ public:
         return std::find(m_interfaces.begin(), m_interfaces.end(), interfaceId) != m_interfaces.end();
     };
     ///@}
+
+    virtual DurationInterface *GetDurationInterface() { return NULL; }
+    virtual PitchInterface *GetPitchInterface() { return NULL; }
+    virtual PositionInterface *GetPositionInterface() { return NULL; }
+    virtual ScoreDefInterface *GetScoreDefInterface() { return NULL; }
+    virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return NULL; }
+    virtual TextDirInterface *GetTextDirInterface() { return NULL; }
+    virtual TimePointInterface *GetTimePointInterface() { return NULL; }
+    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return NULL; }
 
     /**
      * Reset the object, that is 1) removing all childs and 2) resetting all attributes.

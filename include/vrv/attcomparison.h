@@ -36,7 +36,7 @@ public:
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
         if (!object->HasAttClass(ATT_COMMON)) return false;
-        AttCommon *element = dynamic_cast<AttCommon *>(object);
+        AttCommon *element = vrv_cast(AttCommon *)(object);
         assert(element);
         return (element->GetN() == m_n);
     }
@@ -69,7 +69,7 @@ public:
     virtual bool operator()(Object *object)
     {
         if (!object->HasInterface(INTERFACE_DURATION)) return false;
-        DurationInterface *interface = dynamic_cast<DurationInterface *>(object);
+        DurationInterface *interface = vrv_cast(DurationInterface *)(object);
         assert(interface);
         if (interface->HasDur()) {
             if ((m_extremeType == LONGEST) && (interface->GetActualDur() < m_extremeDur)) {
@@ -105,7 +105,7 @@ public:
 
     virtual bool operator()(Object *object)
     {
-        Alignment *alignment = dynamic_cast<Alignment *>(object);
+        Alignment *alignment = vrv_cast(Alignment *)(object);
         if (!alignment) return false;
         return (alignment->GetType() == m_type);
     }

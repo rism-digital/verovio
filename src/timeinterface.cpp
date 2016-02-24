@@ -73,7 +73,7 @@ std::string TimePointInterface::ExtractUuidFragment(std::string refUuid)
 Measure *TimePointInterface::GetStartMeasure()
 {
     if (!m_start) return NULL;
-    return dynamic_cast<Measure *>(this->m_start->GetFirstParent(MEASURE));
+    return vrv_cast(Measure *)(this->m_start->GetFirstParent(MEASURE));
 }
 
 bool TimePointInterface::IsOnStaff(int n)
@@ -87,7 +87,7 @@ bool TimePointInterface::IsOnStaff(int n)
         return false;
     }
     else if (m_start) {
-        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstParent(STAFF));
+        Staff *staff = vrv_cast(Staff *)(m_start->GetFirstParent(STAFF));
         if (staff && (staff->GetN() == n)) return true;
     }
     return false;
@@ -102,12 +102,12 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
         staffList = this->GetStaff();
     }
     else if (m_start) {
-        Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstParent(STAFF));
+        Staff *staff = vrv_cast(Staff *)(m_start->GetFirstParent(STAFF));
         if (staff) staffList.push_back(staff->GetN());
     }
     for (iter = staffList.begin(); iter != staffList.end(); iter++) {
         AttCommonNComparison comparison(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
+        Staff *staff = vrv_cast(Staff *)(measure->FindChildByAttComparison(&comparison, 1));
         if (!staff) {
             // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
             continue;
@@ -172,7 +172,7 @@ bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
 Measure *TimeSpanningInterface::GetEndMeasure()
 {
     if (!m_end) return NULL;
-    return dynamic_cast<Measure *>(this->m_end->GetFirstParent(MEASURE));
+    return vrv_cast(Measure *)(this->m_end->GetFirstParent(MEASURE));
 }
 
 bool TimeSpanningInterface::IsSpanningMeasures()

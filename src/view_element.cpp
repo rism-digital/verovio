@@ -160,7 +160,7 @@ void View::DrawAccid(
     assert(staff);
     assert(measure);
 
-    Accid *accid = dynamic_cast<Accid *>(element);
+    Accid *accid = vrv_cast(Accid *)(element);
     assert(accid);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -178,7 +178,7 @@ void View::DrawAccid(
         // position is currently only above the staff
         int y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
-        Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
+        Note *note = vrv_cast(Note *)(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
         if (note) {
             if (note->GetDrawingY() > y) {
                 y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -229,7 +229,7 @@ void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, S
     assert(staff);
     assert(measure);
 
-    BarLine *barLine = dynamic_cast<BarLine *>(element);
+    BarLine *barLine = vrv_cast(BarLine *)(element);
     assert(barLine);
 
     if (barLine->GetForm() == BARRENDITION_invis) {
@@ -253,7 +253,7 @@ void View::DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, S
     assert(staff);
     assert(measure);
 
-    BeatRpt *beatRpt = dynamic_cast<BeatRpt *>(element);
+    BeatRpt *beatRpt = vrv_cast(BeatRpt *)(element);
     assert(beatRpt);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -289,7 +289,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    BTrem *bTrem = dynamic_cast<BTrem *>(element);
+    BTrem *bTrem = vrv_cast(BTrem *)(element);
     assert(bTrem);
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
@@ -302,14 +302,14 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     bool drawingCueSize = false;
     int x, y, yUnused;
 
-    childChord = dynamic_cast<Chord *>(bTrem->FindChildByType(CHORD));
+    childChord = vrv_cast(Chord *)(bTrem->FindChildByType(CHORD));
     // Get from the chord or note child
     if (childChord) {
         drawingDur = childChord->GetDur();
         childElement = childChord;
     }
     else {
-        childNote = dynamic_cast<Note *>(bTrem->FindChildByType(NOTE));
+        childNote = vrv_cast(Note *)(bTrem->FindChildByType(NOTE));
         if (childNote) {
             drawingDur = childNote->GetDur();
             childElement = childNote;
@@ -399,7 +399,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    Chord *chord = dynamic_cast<Chord *>(element);
+    Chord *chord = vrv_cast(Chord *)(element);
     assert(chord);
 
     int staffSize = staff->m_drawingStaffSize;
@@ -477,7 +477,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         // Prep where the dots will go by preventing overlaps and using space efficiently
         for (ListOfObjects::reverse_iterator rit = chord->GetList(chord)->rbegin();
              rit != chord->GetList(chord)->rend(); rit++) {
-            Note *note = dynamic_cast<Note *>(*rit);
+            Note *note = vrv_cast(Note *)(*rit);
             PrepareChordDots(dc, chord, dotsX, note->GetDrawingY(), numDots, staff);
         }
 
@@ -594,7 +594,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    Clef *clef = dynamic_cast<Clef *>(element);
+    Clef *clef = vrv_cast(Clef *)(element);
     assert(clef);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -679,7 +679,7 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    Custos *custos = dynamic_cast<Custos *>(element);
+    Custos *custos = vrv_cast(Custos *)(element);
     assert(custos);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -706,7 +706,7 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     assert(staff);
     assert(measure);
 
-    Dot *dot = dynamic_cast<Dot *>(element);
+    Dot *dot = vrv_cast(Dot *)(element);
     assert(dot);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -736,17 +736,17 @@ void View::DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *
     assert(staff);
     assert(measure);
 
-    if (dynamic_cast<Chord *>(element)) {
+    if (vrv_cast(Chord *)(element)) {
         dc->StartGraphic(element, "", element->GetUuid());
         DrawChord(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this);
     }
-    else if (dynamic_cast<Note *>(element)) {
+    else if (vrv_cast(Note *)(element)) {
         dc->StartGraphic(element, "", element->GetUuid());
         DrawNote(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this);
     }
-    else if (dynamic_cast<Rest *>(element)) {
+    else if (vrv_cast(Rest *)(element)) {
         dc->StartGraphic(element, "", element->GetUuid());
         DrawRest(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this);
@@ -761,7 +761,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    KeySig *keySig = dynamic_cast<KeySig *>(element);
+    KeySig *keySig = vrv_cast(KeySig *)(element);
     assert(keySig);
 
     int symb;
@@ -849,7 +849,7 @@ void View::DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(staff);
     assert(measure);
 
-    MeterSig *meterSig = dynamic_cast<MeterSig *>(element);
+    MeterSig *meterSig = vrv_cast(MeterSig *)(element);
     assert(meterSig);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -880,7 +880,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    assert(dynamic_cast<MRest *>(element)); // Element must be a MultiRest"
+    assert(vrv_cast(MRest *)(element)); // Element must be a MultiRest"
 
     dc->StartGraphic(element, "", element->GetUuid());
 
@@ -905,7 +905,7 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    MRpt *mRpt = dynamic_cast<MRpt *>(element);
+    MRpt *mRpt = vrv_cast(MRpt *)(element);
     assert(mRpt);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -923,7 +923,7 @@ void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    MRpt2 *mRpt2 = dynamic_cast<MRpt2 *>(element);
+    MRpt2 *mRpt2 = vrv_cast(MRpt2 *)(element);
     assert(mRpt2);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -944,7 +944,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     assert(staff);
     assert(measure);
 
-    MultiRest *multiRest = dynamic_cast<MultiRest *>(element);
+    MultiRest *multiRest = vrv_cast(MultiRest *)(element);
     assert(multiRest);
 
     int x1, x2, y1, y2, length;
@@ -1016,7 +1016,7 @@ void View::DrawMultiRpt(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(staff);
     assert(measure);
 
-    MultiRpt *multiRpt = dynamic_cast<MultiRpt *>(element);
+    MultiRpt *multiRpt = vrv_cast(MultiRpt *)(element);
     assert(multiRpt);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1036,7 +1036,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    Note *note = dynamic_cast<Note *>(element);
+    Note *note = vrv_cast(Note *)(element);
     assert(note);
 
     if (note->IsMensural()) {
@@ -1237,7 +1237,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     if (note->GetDrawingTieAttr()) {
-        System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+        System *system = vrv_cast(System *)(measure->GetFirstParent(SYSTEM));
         // create a placeholder for the tie attribute that will be drawn from the system
         dc->StartGraphic(note->GetDrawingTieAttr(), "", note->GetDrawingTieAttr()->GetUuid().c_str());
         dc->EndGraphic(note->GetDrawingTieAttr(), this);
@@ -1264,7 +1264,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    Rest *rest = dynamic_cast<Rest *>(element);
+    Rest *rest = vrv_cast(Rest *)(element);
     assert(rest);
 
     bool drawingCueSize = rest->IsCueSize();
@@ -1311,7 +1311,7 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
 void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
-    Syl *syl = dynamic_cast<Syl *>(element);
+    Syl *syl = vrv_cast(Syl *)(element);
     assert(syl);
 
     if (!syl->GetStart()) {
@@ -1350,7 +1350,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->ResetBrush();
 
     if (syl->GetStart() && syl->GetEnd()) {
-        System *currentSystem = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
+        System *currentSystem = vrv_cast(System *)(measure->GetFirstParent(SYSTEM));
         // Postpone the drawing of the syl to the end of the system; this will call DrawSylConnector
         // that will look if the last note is in the same system (or not) and draw the connectors accordingly
         if (currentSystem) {
@@ -1369,7 +1369,7 @@ void View::DrawTuplet(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    Tuplet *tuplet = dynamic_cast<Tuplet *>(element);
+    Tuplet *tuplet = vrv_cast(Tuplet *)(element);
     assert(tuplet);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1391,7 +1391,7 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(staff);
     assert(measure);
 
-    Verse *verse = dynamic_cast<Verse *>(element);
+    Verse *verse = vrv_cast(Verse *)(element);
     assert(verse);
 
     dc->StartGraphic(verse, "", verse->GetUuid());
@@ -1407,10 +1407,10 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
 void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
 {
-    Note *note = dynamic_cast<Note *>(element);
+    Note *note = vrv_cast(Note *)(element);
     assert(note);
 
-    Staff *staff = dynamic_cast<Staff *>(note->GetFirstParent(STAFF));
+    Staff *staff = vrv_cast(Staff *)(note->GetFirstParent(STAFF));
     assert(staff);
 
     if (note->GetActualDur() < DUR_8) return;
@@ -1468,7 +1468,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, S
     if ((element->Is() == NOTE) || (element->Is() == CHORD)) {
         // To be fixed once m_embellishment is removed
         if (element->Is() == NOTE) {
-            Note *note = dynamic_cast<Note *>(element);
+            Note *note = vrv_cast(Note *)(element);
             assert(note);
             if (note->m_embellishment) {
                 emb_offset = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -1535,7 +1535,7 @@ void View::DrawLedgerLines(
     // prep start and end positions of ledger line depending on stem direction and doubleLength
     int xLedgerStart, xLedgerEnd;
     if (doubleLength) {
-        Chord *chord = dynamic_cast<Chord *>(element);
+        Chord *chord = vrv_cast(Chord *)(element);
         assert(chord);
         if (chord->GetDrawingStemDir() == STEMDIRECTION_down) {
             xLedgerStart = element->GetDrawingX() - ledge - noteDiameter;
@@ -1729,12 +1729,12 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned c
 void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, bool isMensural, data_STEMDIRECTION dir,
     int radius, int xn, int originY, int heightY)
 {
-    assert(dynamic_cast<DurationInterface *>(object));
+    assert(object->GetDurationInterface());
 
     int staffSize = staff->m_drawingStaffSize;
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
-    int drawingDur = dynamic_cast<DurationInterface *>(object)->GetActualDur();
+    int drawingDur = (object->GetDurationInterface())->GetActualDur();
     bool drawingCueSize = object->IsCueSize();
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
 
@@ -1817,14 +1817,14 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, bool 
     }
 
     // Store the start and end values
-    StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface *>(object);
+    StemmedDrawingInterface *interface = object->GetStemmedDrawingInterface();
     assert(interface);
     interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
     interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
     interface->SetDrawingStemDir(dir);
 
     // cast to note is check when setting drawingCueSize value
-    if (drawingCueSize && (dynamic_cast<Note *>(object)->GetGrace() == GRACE_acc)) {
+    if (drawingCueSize && ((vrv_cast(Note *)(object))->GetGrace() == GRACE_acc)) {
         DrawAcciaccaturaSlash(dc, object);
     }
 }

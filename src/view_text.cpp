@@ -33,12 +33,12 @@ void View::DrawTextElement(DeviceContext *dc, TextElement *element, int x, int y
     assert(element);
 
     if (element->Is() == REND) {
-        Rend *rend = dynamic_cast<Rend *>(element);
+        Rend *rend = vrv_cast(Rend *)(element);
         assert(rend);
         DrawRend(dc, rend, x, y, setX, setY);
     }
     else if (element->Is() == TEXT) {
-        Text *text = dynamic_cast<Text *>(element);
+        Text *text = vrv_cast(Text *)(element);
         assert(text);
         DrawText(dc, text, x, y, setX, setY);
     }
