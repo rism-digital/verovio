@@ -21,6 +21,7 @@ class BeamParams;
 class Chord;
 class DeviceContext;
 class Doc;
+class Dynam;
 class EditorialElement;
 class FloatingElement;
 class Hairpin;
@@ -377,8 +378,10 @@ private:
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet *tuplet);
+    int GetDynamY(Dynam *dynam, Staff *);
+    int GetHairpinY(Hairpin *hairpin, Staff *staff);
     int GetSylY(Syl *syl, Staff *staff);
-    int GetTempoY(Staff *staff);
+    int GetTempoY(Tempo *tempo, Staff *staff);
     ///@}
 
     /**

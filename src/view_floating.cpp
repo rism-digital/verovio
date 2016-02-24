@@ -180,8 +180,8 @@ void View::DrawHairpin(
     // We calculate points for cresc by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) View::SwapY(&startY, &endY);
 
-    int y1 = staff->GetDrawingY();
-    int y2 = staff->GetDrawingY();
+    int y1 = GetHairpinY(hairpin, staff);
+    int y2 = y1;
 
     /************** parent layers **************/
 
@@ -305,16 +305,21 @@ void View::DrawHairpin(
     dc->DeactivateGraphic();
     // DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize,
     // angle);
-    dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
-    dc->SetBrush(AxBLACK, AxSOLID);
+    // dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
+    // dc->SetBrush(AxBLACK, AxSOLID);
 
-    dc->DrawLine(
-        ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2), ToDeviceContextX(x2), ToDeviceContextY(y1 - endY / 2));
-    dc->DrawLine(
-        ToDeviceContextX(x1), ToDeviceContextY(y1 + startY / 2), ToDeviceContextX(x2), ToDeviceContextY(y1 + endY / 2));
+    DrawObliquePolygon(
+        dc, x1, y1 - startY / 2, x2, y2 - endY / 2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+    DrawObliquePolygon(
+        dc, x1, y1 + startY / 2, x2, y2 + endY / 2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
 
-    dc->ResetBrush();
-    dc->ResetPen();
+    // dc->DrawLine(
+    //  ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2), ToDeviceContextX(x2), ToDeviceContextY(y1 - endY / 2));
+    // dc->DrawLine(
+    //  ToDeviceContextX(x1), ToDeviceContextY(y1 + startY / 2), ToDeviceContextX(x2), ToDeviceContextY(y1 + endY / 2));
+
+    // dc->ResetBrush();
+    // dc->ResetPen();
 
     dc->ReactivateGraphic();
     if (graphic)
@@ -1301,7 +1306,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
 
         // Basic method that use bounding box
-        int y = GetTempoY(*staffIter);
+        int y = GetTempoY(tempo, *staffIter);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);
@@ -1315,6 +1320,45 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     }
 
     dc->EndGraphic(tempo, this);
+}
+
+int View::GetDynamY(Dynam *dynam, Staff *staff)
+{
+    assert(dynam && staff);
+
+    // Temporary basic method for positionning dynam
+    int y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    y += staff->m_contentBB_y2;
+    return y;
+}
+
+int View::GetHairpinY(Hairpin *hairpin, Staff *staff)
+{
+    assert(hairpin && staff);
+
+    // Temporary basic method for positionning tempo elements
+    int y = hairpin->GetStart()->GetDrawingY();
+    if (staff->GetAlignment()) {
+        if (hairpin->GetPlace() == STAFFREL_above) {
+            y = staff->GetDrawingY() + staff->m_contentBB_y2
+                + m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 2;
+        }
+        else {
+            y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight()
+                - m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 2;
+        }
+    }
+    return y;
+}
+
+int View::GetTempoY(Tempo *tempo, Staff *staff)
+{
+    assert(tempo && staff);
+
+    // Temporary basic method for positionning tempo elements
+    int y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    y += staff->m_contentBB_y2;
+    return y;
 }
 
 } // namespace vrv
