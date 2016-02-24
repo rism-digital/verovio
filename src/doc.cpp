@@ -104,9 +104,9 @@ void Doc::PrepareDrawing()
     }
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
-    std::vector<DocObject *> timeSpanningElements;
+    std::vector<TimeSpanningInterface *> timeSpanningInterfaces;
     bool fillList = true;
-    params.push_back(&timeSpanningElements);
+    params.push_back(&timeSpanningInterfaces);
     params.push_back(&fillList);
     Functor prepareTimeSpanning(&Object::PrepareTimeSpanning);
     this->Process(&prepareTimeSpanning, &params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
@@ -116,7 +116,7 @@ void Doc::PrepareDrawing()
     // in the encoding. For these, the previous iteration will not have resolved the link and
     // the spanning elements will remain in the timeSpanningElements array. We try again forwards
     // but this time without filling the list (that is only will the remaining elements)
-    if (!timeSpanningElements.empty()) {
+    if (!timeSpanningInterfaces.empty()) {
         fillList = false;
         this->Process(&prepareTimeSpanning, &params);
     }
@@ -124,15 +124,15 @@ void Doc::PrepareDrawing()
     // Now try to match the @tstamp and @tstamp2 attributes.
     params.clear();
     ArrayOfDocObjectBeatPairs tstamps;
-    params.push_back(&timeSpanningElements);
+    params.push_back(&timeSpanningInterfaces);
     params.push_back(&tstamps);
     Functor prepareTimestamps(&Object::PrepareTimestamps);
     Functor prepareTimestampsEnd(&Object::PrepareTimestampsEnd);
     this->Process(&prepareTimestamps, &params, &prepareTimestampsEnd);
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!timeSpanningElements.empty()) {
-        LogWarning("%d time spanning elements could not be matched", timeSpanningElements.size());
+    if (!timeSpanningInterfaces.empty()) {
+        LogWarning("%d time spanning elements could not be matched", timeSpanningInterfaces.size());
     }
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
@@ -248,7 +248,7 @@ void Doc::PrepareDrawing()
     // TimeSpanningInterface to each staff they are extended. This does not need to be done staff by staff because we
     // can just check the staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
     params.clear();
-    timeSpanningElements.clear();
+    std::vector<TimeSpanningInterface *> timeSpanningElements;
     params.push_back(&timeSpanningElements);
     Functor fillStaffCurrentTimeSpanning(&Object::FillStaffCurrentTimeSpanning);
     Functor fillStaffCurrentTimeSpanningEnd(&Object::FillStaffCurrentTimeSpanningEnd);
