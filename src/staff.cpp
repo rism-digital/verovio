@@ -10,16 +10,19 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <vector>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "hairpin.h"
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
 #include "syl.h"
 #include "system.h"
 #include "timeinterface.h"
+#include "verse.h"
 
 namespace vrv {
 
@@ -123,6 +126,19 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
 
     // Set the pointer of the m_alignment
     m_staffAlignment = alignment;
+
+    std::vector<DocObject *>::iterator it;
+    it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(VERSE));
+    if (it != m_timeSpanningElements.end()) {
+        Verse *v = dynamic_cast<Verse *>(*it);
+        alignment->SetVerseCount(v->GetN());
+    }
+    it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(HAIRPIN));
+    if (it != m_timeSpanningElements.end()) {
+        Hairpin *h = dynamic_cast<Hairpin *>(*it);
+        if (h->GetPlace() == STAFFREL_above) alignment->SetDynamAbove();
+        if (h->GetPlace() == STAFFREL_below) alignment->SetDynamBelow();
+    }
 
     // for next staff
     (*staffNb)++;

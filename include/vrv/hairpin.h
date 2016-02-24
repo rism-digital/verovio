@@ -32,6 +32,16 @@ public:
     virtual ClassId Is() { return HAIRPIN; };
     ///@}
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Align the content of a staff vertically.
+     * See Object::AlignVertically
+     */
+    virtual int AlignVertically(ArrayPtrVoid *params);
+
 protected:
     //
 private:
