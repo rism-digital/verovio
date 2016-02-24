@@ -43,7 +43,7 @@ void Rend::Reset()
 
 void Rend::AddTextElement(TextElement *element)
 {
-    assert(vrv_cast(Rend *)(element) || vrv_cast(Text *)(element) || vrv_cast(EditorialElement *)(element));
+    //assert(dynamic_cast<Rend *>(element) || dynamic_cast<Text *>(element) || dynamic_cast<EditorialElement *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();

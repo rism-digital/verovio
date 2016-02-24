@@ -1174,7 +1174,7 @@ void PaeInput::parseNote(pae::Note *note)
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
     // Acciaccatura rests do not exist
     if (note->acciaccatura && (element->Is() == NOTE)) {
-        Note *mnote = vrv_cast(Note *)(element);
+        Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         mnote->SetDur(DURATION_8);
         mnote->SetGrace(GRACE_acc);
@@ -1182,7 +1182,7 @@ void PaeInput::parseNote(pae::Note *note)
     }
 
     if ((note->appoggiatura > 0) && (element->Is() == NOTE)) {
-        Note *mnote = vrv_cast(Note *)(element);
+        Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         mnote->SetGrace(GRACE_unacc);
         mnote->SetStemDir(STEMDIRECTION_up);
@@ -1203,7 +1203,7 @@ void PaeInput::parseNote(pae::Note *note)
 
     // note in a chord
     if ((note->chord)) {
-        Note *mnote = vrv_cast(Note *)(element);
+        Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         // first note?
         if (!m_is_in_chord) {
@@ -1259,17 +1259,17 @@ void PaeInput::addLayerElement(LayerElement *element)
         LayerElement *bottom = m_nested_objects.back();
 
         if (bottom->Is() == BEAM) {
-            Beam *beam = vrv_cast(Beam *)(bottom);
+            Beam *beam = dynamic_cast<Beam *>(bottom);
             assert(beam);
             beam->AddLayerElement(element);
         }
         else if (bottom->Is() == TUPLET) {
-            Tuplet *tuplet = vrv_cast(Tuplet *)(bottom);
+            Tuplet *tuplet = dynamic_cast<Tuplet *>(bottom);
             assert(tuplet);
             tuplet->AddLayerElement(element);
         }
         else if (bottom->Is() == CHORD) {
-            Chord *chord = vrv_cast(Chord *)(bottom);
+            Chord *chord = dynamic_cast<Chord *>(bottom);
             assert(chord);
             chord->AddLayerElement(element);
         }

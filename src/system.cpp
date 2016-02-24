@@ -267,7 +267,8 @@ int System::CastOffPages(ArrayPtrVoid *params)
     // We want to move the system to the currentPage. However, we cannot use DetachChild
     // from the contentPage because this screws up the iterator. Relinquish gives up
     // the ownership of the system - the contentPage itself will be deleted afterwards.
-    System *system = vrv_cast(System *)(contentPage->Relinquish(this->GetIdx()));
+    System *system = dynamic_cast<System *>(contentPage->Relinquish(this->GetIdx()));
+    assert(system);
     (*currentPage)->AddSystem(system);
 
     return FUNCTOR_SIBLINGS;

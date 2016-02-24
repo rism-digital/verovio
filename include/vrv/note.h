@@ -65,9 +65,9 @@ public:
     virtual ClassId Is() { return NOTE; };
     ///@}
 
-    virtual DurationInterface *GetDurationInterface() { return vrv_cast2(DurationInterface *)(this); }
-    virtual PitchInterface *GetPitchInterface() { return vrv_cast2(PitchInterface *)(this); }
-    virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return vrv_cast2(StemmedDrawingInterface *)(this); }
+    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
+    virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return dynamic_cast<StemmedDrawingInterface *>(this); }
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() { return true; };

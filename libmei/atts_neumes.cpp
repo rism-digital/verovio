@@ -151,7 +151,7 @@ bool AttUneumeLog::HasName()
 bool Att::SetNeumes(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_INEUMELOG)) {
-        AttIneumeLog *att = vrv_cast(AttIneumeLog *)(element);
+        AttIneumeLog *att = dynamic_cast<AttIneumeLog *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToIneumeform(attrValue));
@@ -163,7 +163,7 @@ bool Att::SetNeumes(Object *element, std::string attrType, std::string attrValue
         }
     }
     if (element->HasAttClass(ATT_UNEUMELOG)) {
-        AttUneumeLog *att = vrv_cast(AttUneumeLog *)(element);
+        AttUneumeLog *att = dynamic_cast<AttUneumeLog *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToUneumeform(attrValue));
@@ -181,7 +181,7 @@ bool Att::SetNeumes(Object *element, std::string attrType, std::string attrValue
 void Att::GetNeumes(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_INEUMELOG)) {
-        AttIneumeLog *att = vrv_cast(AttIneumeLog *)(element);
+        AttIneumeLog *att = dynamic_cast<AttIneumeLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->IneumeformToStr(att->GetForm())));
@@ -191,7 +191,7 @@ void Att::GetNeumes(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_UNEUMELOG)) {
-        AttUneumeLog *att = vrv_cast(AttUneumeLog *)(element);
+        AttUneumeLog *att = dynamic_cast<AttUneumeLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->UneumeformToStr(att->GetForm())));

@@ -60,11 +60,6 @@ typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointP
 
 typedef std::vector<std::pair<DocObject *, data_MEASUREBEAT> > ArrayOfDocObjectBeatPairs;
 
-//#define vrv_cast(T) (T)
-#define vrv_cast(T) dynamic_cast<T>
-#define vrv_cast2(T) dynamic_cast<T>
-//#define vrv_cast2(T) (T)
-
 //----------------------------------------------------------------------------
 // Object defines
 //----------------------------------------------------------------------------

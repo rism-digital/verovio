@@ -57,7 +57,7 @@ void Beam::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        LayerElement *currentElement = vrv_cast(LayerElement *)(*iter);
+        LayerElement *currentElement = dynamic_cast<LayerElement *>(*iter);
         assert(currentElement);
         if (!currentElement->HasInterface(INTERFACE_DURATION)) {
             // remove anything that has not a DurationInterface
@@ -65,9 +65,10 @@ void Beam::FilterList(ListOfObjects *childList)
         }
         else {
             // Drop notes that are signaled as grace notes
-            Note *n = vrv_cast(Note *)(currentElement);
 
-            if (n) {
+            if (currentElement->Is() == NOTE) {
+                Note *n = dynamic_cast<Note *>(currentElement);
+                assert(n);
                 // if we are at the beginning of the beam
                 // and the note is cueSize
                 // assume all the beam is of grace notes

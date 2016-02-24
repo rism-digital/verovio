@@ -292,8 +292,7 @@ void ScoreDef::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        StaffDef *currentStaffDef = vrv_cast(StaffDef *)(*iter);
-        if (!currentStaffDef) {
+        if ((*iter)->Is() != STAFFDEF) {
             iter = childList->erase(iter);
         }
         else {
@@ -311,8 +310,10 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     ListOfObjects::iterator iter;
 
     for (iter = childList->begin(); iter != childList->end(); ++iter) {
-        staffDef = vrv_cast(StaffDef *)(*iter);
-        if (staffDef && (staffDef->GetN() == n)) {
+        if ((*iter)->Is() != STAFFDEF) continue;
+        staffDef = dynamic_cast<StaffDef *>(*iter);
+        assert(staffDef);
+        if (staffDef->GetN() == n) {
             return staffDef;
         }
     }
@@ -393,8 +394,7 @@ void StaffGrp::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        StaffDef *currentStaffDef = vrv_cast(StaffDef *)(*iter);
-        if (!currentStaffDef) {
+        if ((*iter)->Is() != STAFFDEF) {
             iter = childList->erase(iter);
         }
         else {
@@ -458,13 +458,13 @@ int ScoreDef::CastOffSystems(ArrayPtrVoid *params)
     int *currentScoreDefWidth = static_cast<int *>((*params).at(5));
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(vrv_cast(System *)(this->m_parent));
+    assert(dynamic_cast<System *>(this->m_parent));
 
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    ScoreDef *scoreDef = vrv_cast(ScoreDef *)(contentSystem->Relinquish(this->GetIdx()));
+    ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(contentSystem->Relinquish(this->GetIdx()));
     (*currentSystem)->AddScoreDef(scoreDef);
     // This is not perfect since now the scoreDefWith is the one of the intermediate scoreDefs (and not
     // the initial one - for this to be corrected, we would need two parameters, one for the current initial

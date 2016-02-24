@@ -42,7 +42,7 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
 
     // No we contain a beam? Go on and search for it in the children
     for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {
-        currentBeam = vrv_cast(Beam *)(tuplet->m_children.at(i));
+        currentBeam = dynamic_cast<Beam *>(tuplet->m_children.at(i));
 
         // first child is not a beam, or it is a beam but we have more than one child
         if (!currentBeam || tuplet->GetChildCount() > 1) {
@@ -93,8 +93,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
     data_STEMDIRECTION direction = STEMDIRECTION_up;
 
     ListOfObjects *tupletChildren = tuplet->GetList(tuplet);
-    LayerElement *firstElement = vrv_cast(LayerElement *)(tupletChildren->front());
-    LayerElement *lastElement = vrv_cast(LayerElement *)(tupletChildren->back());
+    LayerElement *firstElement = dynamic_cast<LayerElement *>(tupletChildren->front());
+    LayerElement *lastElement = dynamic_cast<LayerElement *>(tupletChildren->back());
 
     // AllNotesBeamed tries to figure out if all the notes are in the same beam
     if (OneBeamInTuplet(tuplet)) {
@@ -105,8 +105,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
 
         // align the center point at the exact center of the first an last stem
         // TUPLET_OFFSET is summed so it does not collide with the stem
-        Note *firstNote = vrv_cast(Note *)(tuplet->FindChildByType(NOTE));
-        Note *lastNote = vrv_cast(Note *)(tuplet->FindChildByType(NOTE, UNLIMITED_DEPTH, BACKWARD));
+        Note *firstNote = dynamic_cast<Note *>(tuplet->FindChildByType(NOTE));
+        Note *lastNote = dynamic_cast<Note *>(tuplet->FindChildByType(NOTE, UNLIMITED_DEPTH, BACKWARD));
 
         y = firstElement->GetDrawingY();
         if (firstNote && lastNote) {
@@ -143,7 +143,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         ListOfObjects::iterator iter = tupletChildren->begin();
         while (iter != tupletChildren->end()) {
             if ((*iter)->Is() == NOTE) {
-                Note *currentNote = vrv_cast(Note *)(*iter);
+                Note *currentNote = dynamic_cast<Note *>(*iter);
                 assert(currentNote);
                 if (currentNote->GetDrawingStemDir() == STEMDIRECTION_up)
                     ups++;
@@ -158,8 +158,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         // if ups or downs are 0, it means all the stems go in the same direction
         if (ups == 0 || downs == 0) {
 
-            Note *firstNote = vrv_cast(Note *)(tuplet->FindChildByType(NOTE));
-            Note *lastNote = vrv_cast(Note *)(tuplet->FindChildByType(NOTE, UNLIMITED_DEPTH, BACKWARD));
+            Note *firstNote = dynamic_cast<Note *>(tuplet->FindChildByType(NOTE));
+            Note *lastNote = dynamic_cast<Note *>(tuplet->FindChildByType(NOTE, UNLIMITED_DEPTH, BACKWARD));
 
             // Calculate the average between the first and last stem
             // set center, start and end too.
@@ -186,7 +186,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             iter = tupletChildren->begin();
             while (iter != tupletChildren->end()) {
                 if ((*iter)->Is() == NOTE) {
-                    Note *currentNote = vrv_cast(Note *)(*iter);
+                    Note *currentNote = dynamic_cast<Note *>(*iter);
                     assert(currentNote);
 
                     if (direction == STEMDIRECTION_up) {
@@ -221,7 +221,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             iter = tupletChildren->begin();
             while (iter != tupletChildren->end()) {
                 if ((*iter)->Is() == NOTE) {
-                    Note *currentNote = vrv_cast(Note *)(*iter);
+                    Note *currentNote = dynamic_cast<Note *>(*iter);
                     assert(currentNote);
 
                     if (currentNote->GetDrawingStemDir() == direction) {

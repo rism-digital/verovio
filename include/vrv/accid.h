@@ -31,7 +31,7 @@ public:
     virtual ClassId Is() { return ACCID; };
     ///@}
 
-    virtual PositionInterface *GetPositionInterface() { return vrv_cast2(PositionInterface *)(this); }
+    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() { return true; };

@@ -349,7 +349,7 @@ void Doc::CastOff()
     assert(contentPage);
     contentPage->LayOutHorizontally();
 
-    System *contentSystem = vrv_cast(System *)(contentPage->DetachChild(0));
+    System *contentSystem = dynamic_cast<System *>(contentPage->DetachChild(0));
     assert(contentSystem);
 
     System *currentSystem = new System();
@@ -636,7 +636,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     if (m_drawingPage && m_drawingPage->GetIdx() == pageIdx) {
         return m_drawingPage;
     }
-    m_drawingPage = vrv_cast(Page *)(this->GetChild(pageIdx));
+    m_drawingPage = dynamic_cast<Page *>(this->GetChild(pageIdx));
     assert(m_drawingPage);
 
     int glyph_size;

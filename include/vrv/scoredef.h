@@ -47,7 +47,7 @@ public:
     virtual ClassId Is() { return SCOREDEF_ELEMENT; };
     ///@}
 
-    virtual ScoreDefInterface *GetScoreDefInterface() { return vrv_cast2(ScoreDefInterface *)(this); }
+    virtual ScoreDefInterface *GetScoreDefInterface() { return dynamic_cast<ScoreDefInterface *>(this); }
 
     /**
      * @name Methods for checking the presence of clef, key signature, etc. information.

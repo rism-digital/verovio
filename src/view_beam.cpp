@@ -37,7 +37,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(staff);
     assert(measure);
 
-    Beam *beam = vrv_cast(Beam *)(element);
+    Beam *beam = dynamic_cast<Beam *>(element);
     assert(beam);
 
     LayerElement *current;
@@ -81,7 +81,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     const ArrayOfBeamElementCoords *beamElementCoords = beam->GetElementCoords();
 
     // current point to the first Note in the layed out layer
-    current = vrv_cast(LayerElement *)(beamChildren->front());
+    current = dynamic_cast<LayerElement *>(beamChildren->front());
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());
 
@@ -113,7 +113,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
             // Look at beam breaks
             (*beamElementCoords).at(elementCount)->m_breaksec = 0;
-            AttBeamsecondary *beamsecondary = vrv_cast(AttBeamsecondary *)(current);
+            AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary *>(current);
             if (elementCount && beamsecondary && beamsecondary->HasBreaksec()) {
                 if (!params.m_changingDur) params.m_changingDur = ON;
                 (*beamElementCoords).at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
@@ -123,8 +123,8 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             if ((current->Is() == NOTE) || (current->Is() == CHORD)) {
                 // look at the stemDir to see if we have multiple stem Dir
                 if (!params.m_hasMultipleStemDir) {
-                    assert(vrv_cast(AttStems *)(current));
-                    currentStemDir = (vrv_cast(AttStems *)(current))->GetStemDir();
+                    assert(dynamic_cast<AttStems *>(current));
+                    currentStemDir = (dynamic_cast<AttStems *>(current))->GetStemDir();
                     if (currentStemDir != STEMDIRECTION_NONE) {
                         if ((params.m_stemDir != STEMDIRECTION_NONE) && (params.m_stemDir != currentStemDir)) {
                             params.m_hasMultipleStemDir = ON;
@@ -145,7 +145,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (iter == beamChildren->end()) {
             break;
         }
-        current = vrv_cast(LayerElement *)(*iter);
+        current = dynamic_cast<LayerElement *>(*iter);
         if (current == NULL) {
             LogDebug("Error accessing element in Beam list");
             return;
@@ -184,7 +184,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     for (i = 0; i < elementCount; i++) {
         LayerElement *el = (*beamElementCoords).at(i)->m_element;
-        if (((el->Is() == NOTE) && !(vrv_cast(Note *)(el))->IsChordTone()) || (el->Is() == CHORD)) {
+        if (((el->Is() == NOTE) && !(dynamic_cast<Note *>(el))->IsChordTone()) || (el->Is() == CHORD)) {
             StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
             assert(interface);
 
@@ -361,7 +361,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // loop
     int i, j;
 
-    FTrem *fTrem = vrv_cast(FTrem *)(element);
+    FTrem *fTrem = dynamic_cast<FTrem *>(element);
     assert(fTrem);
 
     ArrayOfBeamElementCoords beamElementCoords;
@@ -379,11 +379,11 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         return;
     }
     // current point to the first Note in the layed out layer
-    firstElement.m_element = vrv_cast(LayerElement *)(fTremChildren->front());
+    firstElement.m_element = dynamic_cast<LayerElement *>(fTremChildren->front());
     // fTrem list should contain only DurationInterface objects
     assert(firstElement.m_element->GetDurationInterface());
     // current point to the first Note in the layed out layer
-    secondElement.m_element = vrv_cast(LayerElement *)(fTremChildren->back());
+    secondElement.m_element = dynamic_cast<LayerElement *>(fTremChildren->back());
     // fTrem list should contain only DurationInterface objects
     assert(secondElement.m_element->GetDurationInterface());
     // Should we assert this at the beginning?
@@ -401,24 +401,24 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     params.m_stemDir = STEMDIRECTION_NONE;
 
     // We look only at the first one for the duration since both are expected to be the same
-    assert(vrv_cast(AttDurationMusical *)(firstElement.m_element));
-    int dur = (vrv_cast(AttDurationMusical *)(firstElement.m_element))->GetDur();
+    assert(dynamic_cast<AttDurationMusical *>(firstElement.m_element));
+    int dur = (dynamic_cast<AttDurationMusical *>(firstElement.m_element))->GetDur();
 
     Chord *childChord1 = NULL;
     Chord *childChord2 = NULL;
 
     if (firstElement.m_element->Is() == CHORD) {
-        childChord1 = vrv_cast(Chord *)(firstElement.m_element);
+        childChord1 = dynamic_cast<Chord *>(firstElement.m_element);
         params.m_beamHasChord = ON;
     }
     if (secondElement.m_element->Is() == CHORD) {
-        childChord2 = vrv_cast(Chord *)(secondElement.m_element);
+        childChord2 = dynamic_cast<Chord *>(secondElement.m_element);
         params.m_beamHasChord = ON;
     }
 
     // For now look at the stemDir only on the first note
-    assert(vrv_cast(AttStems *)(firstElement.m_element));
-    params.m_stemDir = (vrv_cast(AttStems *)(firstElement.m_element))->GetStemDir();
+    assert(dynamic_cast<AttStems *>(firstElement.m_element));
+    params.m_stemDir = (dynamic_cast<AttStems *>(firstElement.m_element))->GetStemDir();
 
     // We look only at the first note for checking if cue-sized. Somehow arbitrarily
     params.m_cueSize = firstElement.m_element->IsCueSize();
@@ -448,7 +448,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     if (dur > DUR_1) {
         for (i = 0; i < elementCount; i++) {
             LayerElement *el = beamElementCoords.at(i)->m_element;
-            if (((el->Is() == NOTE) && !(vrv_cast(Note *)(el))->IsChordTone()) || (el->Is() == CHORD)) {
+            if (((el->Is() == NOTE) && !(dynamic_cast<Note *>(el))->IsChordTone()) || (el->Is() == CHORD)) {
                 StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
                 assert(interface);
                 DrawVerticalLine(dc, interface->GetDrawingStemStart().y, interface->GetDrawingStemEnd().y,
@@ -566,7 +566,7 @@ void View::CalcBeam(
     for (i = 0; i < elementCount; i++) {
 
         if ((*beamElementCoords).at(i)->m_element->Is() == CHORD) {
-            Chord *chord = vrv_cast(Chord *)((*beamElementCoords).at(i)->m_element);
+            Chord *chord = dynamic_cast<Chord *>((*beamElementCoords).at(i)->m_element);
             assert(chord);
             chord->GetYExtremes(&yMax, &yMin);
             (*beamElementCoords).at(i)->m_yTop = yMax;

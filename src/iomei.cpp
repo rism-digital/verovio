@@ -104,7 +104,7 @@ bool MeiOutput::ExportFile()
                 LogError("Page %d does not exist", m_page);
                 return false;
             }
-            Page *page = vrv_cast(Page *)(m_doc->m_children.at(m_page));
+            Page *page = dynamic_cast<Page *>(m_doc->m_children.at(m_page));
             assert(page);
             if (m_scoreBasedMEI) {
                 m_currentNode = meiDoc.append_child("score");
@@ -151,7 +151,7 @@ bool MeiOutput::WriteObject(Object *object)
 {
     // Containers and scoreDef related
     if (object->Is() == DOC) {
-        WriteMeiDoc(vrv_cast(Doc *)(object));
+        WriteMeiDoc(dynamic_cast<Doc *>(object));
         m_nodeStack.push_back(m_currentNode);
         return true;
     }
@@ -159,243 +159,243 @@ bool MeiOutput::WriteObject(Object *object)
     if (object->Is() == PAGE) {
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("page");
-            WriteMeiPage(m_currentNode, vrv_cast(Page *)(object));
+            WriteMeiPage(m_currentNode, dynamic_cast<Page *>(object));
         }
         // Here we could add a <pb> element
     }
     else if (object->Is() == SYSTEM) {
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("system");
-            WriteMeiSystem(m_currentNode, vrv_cast(System *)(object));
+            WriteMeiSystem(m_currentNode, dynamic_cast<System *>(object));
         }
         // Here we could add a <sb> element (but not for the first system of the page?)
     }
     else if (object->Is() == SCOREDEF) {
         m_currentNode = m_currentNode.append_child("scoreDef");
-        WriteMeiScoreDef(m_currentNode, vrv_cast(ScoreDef *)(object));
+        WriteMeiScoreDef(m_currentNode, dynamic_cast<ScoreDef *>(object));
     }
     else if (object->Is() == STAFFGRP) {
         m_currentNode = m_currentNode.append_child("staffGrp");
-        WriteMeiStaffGrp(m_currentNode, vrv_cast(StaffGrp *)(object));
+        WriteMeiStaffGrp(m_currentNode, dynamic_cast<StaffGrp *>(object));
     }
     else if (object->Is() == STAFFDEF) {
         m_currentNode = m_currentNode.append_child("staffDef");
-        WriteMeiStaffDef(m_currentNode, vrv_cast(StaffDef *)(object));
+        WriteMeiStaffDef(m_currentNode, dynamic_cast<StaffDef *>(object));
     }
     else if (object->Is() == MEASURE) {
         m_currentNode = m_currentNode.append_child("measure");
-        WriteMeiMeasure(m_currentNode, vrv_cast(Measure *)(object));
+        WriteMeiMeasure(m_currentNode, dynamic_cast<Measure *>(object));
     }
     else if (object->Is() == STAFF) {
         m_currentNode = m_currentNode.append_child("staff");
-        WriteMeiStaff(m_currentNode, vrv_cast(Staff *)(object));
+        WriteMeiStaff(m_currentNode, dynamic_cast<Staff *>(object));
     }
     else if (object->Is() == LAYER) {
         m_currentNode = m_currentNode.append_child("layer");
-        WriteMeiLayer(m_currentNode, vrv_cast(Layer *)(object));
+        WriteMeiLayer(m_currentNode, dynamic_cast<Layer *>(object));
     }
 
     // Measure elements
     else if (object->Is() == ANCHORED_TEXT) {
         m_currentNode = m_currentNode.append_child("anchoredText");
-        WriteMeiAnchoredText(m_currentNode, vrv_cast(AnchoredText *)(object));
+        WriteMeiAnchoredText(m_currentNode, dynamic_cast<AnchoredText *>(object));
     }
     else if (object->Is() == DYNAM) {
         m_currentNode = m_currentNode.append_child("dynam");
-        WriteMeiDynam(m_currentNode, vrv_cast(Dynam *)(object));
+        WriteMeiDynam(m_currentNode, dynamic_cast<Dynam *>(object));
     }
     else if (object->Is() == HAIRPIN) {
         m_currentNode = m_currentNode.append_child("hairpin");
-        WriteMeiHairpin(m_currentNode, vrv_cast(Hairpin *)(object));
+        WriteMeiHairpin(m_currentNode, dynamic_cast<Hairpin *>(object));
     }
     else if (object->Is() == SLUR) {
         m_currentNode = m_currentNode.append_child("slur");
-        WriteMeiSlur(m_currentNode, vrv_cast(Slur *)(object));
+        WriteMeiSlur(m_currentNode, dynamic_cast<Slur *>(object));
     }
     else if (object->Is() == TEMPO) {
         m_currentNode = m_currentNode.append_child("tempo");
-        WriteMeiTempo(m_currentNode, vrv_cast(Tempo *)(object));
+        WriteMeiTempo(m_currentNode, dynamic_cast<Tempo *>(object));
     }
     else if (object->Is() == TIE) {
         m_currentNode = m_currentNode.append_child("tie");
-        WriteMeiTie(m_currentNode, vrv_cast(Tie *)(object));
+        WriteMeiTie(m_currentNode, dynamic_cast<Tie *>(object));
     }
 
     // Layer elements
     else if (object->Is() == ACCID) {
         m_currentNode = m_currentNode.append_child("accid");
-        WriteMeiAccid(m_currentNode, vrv_cast(Accid *)(object));
+        WriteMeiAccid(m_currentNode, dynamic_cast<Accid *>(object));
     }
     else if (object->Is() == BARLINE) {
         m_currentNode = m_currentNode.append_child("barLine");
-        WriteMeiBarLine(m_currentNode, vrv_cast(BarLine *)(object));
+        WriteMeiBarLine(m_currentNode, dynamic_cast<BarLine *>(object));
     }
     else if (object->Is() == BEAM) {
         m_currentNode = m_currentNode.append_child("beam");
-        WriteMeiBeam(m_currentNode, vrv_cast(Beam *)(object));
+        WriteMeiBeam(m_currentNode, dynamic_cast<Beam *>(object));
     }
     else if (object->Is() == BEATRPT) {
         m_currentNode = m_currentNode.append_child("beatRpt");
-        WriteMeiBeatRpt(m_currentNode, vrv_cast(BeatRpt *)(object));
+        WriteMeiBeatRpt(m_currentNode, dynamic_cast<BeatRpt *>(object));
     }
     else if (object->Is() == BTREM) {
         m_currentNode = m_currentNode.append_child("bTrem");
-        WriteMeiBTrem(m_currentNode, vrv_cast(BTrem *)(object));
+        WriteMeiBTrem(m_currentNode, dynamic_cast<BTrem *>(object));
     }
     else if (object->Is() == CHORD) {
         m_currentNode = m_currentNode.append_child("chord");
-        WriteMeiChord(m_currentNode, vrv_cast(Chord *)(object));
+        WriteMeiChord(m_currentNode, dynamic_cast<Chord *>(object));
     }
     else if (object->Is() == CLEF) {
         m_currentNode = m_currentNode.append_child("clef");
-        WriteMeiClef(m_currentNode, vrv_cast(Clef *)(object));
+        WriteMeiClef(m_currentNode, dynamic_cast<Clef *>(object));
     }
     else if (object->Is() == CUSTOS) {
         m_currentNode = m_currentNode.append_child("custos");
-        WriteMeiCustos(m_currentNode, vrv_cast(Custos *)(object));
+        WriteMeiCustos(m_currentNode, dynamic_cast<Custos *>(object));
     }
     else if (object->Is() == DOT) {
         m_currentNode = m_currentNode.append_child("dot");
-        WriteMeiDot(m_currentNode, vrv_cast(Dot *)(object));
+        WriteMeiDot(m_currentNode, dynamic_cast<Dot *>(object));
     }
     else if (object->Is() == FTREM) {
         m_currentNode = m_currentNode.append_child("fTrem");
-        WriteMeiFTrem(m_currentNode, vrv_cast(FTrem *)(object));
+        WriteMeiFTrem(m_currentNode, dynamic_cast<FTrem *>(object));
     }
     else if (object->Is() == KEYSIG) {
         m_currentNode = m_currentNode.append_child("keySig");
-        WriteMeiKeySig(m_currentNode, vrv_cast(KeySig *)(object));
+        WriteMeiKeySig(m_currentNode, dynamic_cast<KeySig *>(object));
     }
     else if (object->Is() == MENSUR) {
         m_currentNode = m_currentNode.append_child("mensur");
-        WriteMeiMensur(m_currentNode, vrv_cast(Mensur *)(object));
+        WriteMeiMensur(m_currentNode, dynamic_cast<Mensur *>(object));
     }
     else if (object->Is() == METERSIG) {
         m_currentNode = m_currentNode.append_child("meterSig");
-        WriteMeiMeterSig(m_currentNode, vrv_cast(MeterSig *)(object));
+        WriteMeiMeterSig(m_currentNode, dynamic_cast<MeterSig *>(object));
     }
     else if (object->Is() == MREST) {
         m_currentNode = m_currentNode.append_child("mRest");
-        WriteMeiMRest(m_currentNode, vrv_cast(MRest *)(object));
+        WriteMeiMRest(m_currentNode, dynamic_cast<MRest *>(object));
     }
     else if (object->Is() == MRPT) {
         m_currentNode = m_currentNode.append_child("mRpt");
-        WriteMeiMRpt(m_currentNode, vrv_cast(MRpt *)(object));
+        WriteMeiMRpt(m_currentNode, dynamic_cast<MRpt *>(object));
     }
     else if (object->Is() == MRPT2) {
         m_currentNode = m_currentNode.append_child("mRpt2");
-        WriteMeiMRpt2(m_currentNode, vrv_cast(MRpt2 *)(object));
+        WriteMeiMRpt2(m_currentNode, dynamic_cast<MRpt2 *>(object));
     }
     else if (object->Is() == MULTIREST) {
         m_currentNode = m_currentNode.append_child("multiRest");
-        WriteMeiMultiRest(m_currentNode, vrv_cast(MultiRest *)(object));
+        WriteMeiMultiRest(m_currentNode, dynamic_cast<MultiRest *>(object));
     }
     else if (object->Is() == MULTIRPT) {
         m_currentNode = m_currentNode.append_child("multiRpt");
-        WriteMeiMultiRpt(m_currentNode, vrv_cast(MultiRpt *)(object));
+        WriteMeiMultiRpt(m_currentNode, dynamic_cast<MultiRpt *>(object));
     }
     else if (object->Is() == NOTE) {
         m_currentNode = m_currentNode.append_child("note");
-        WriteMeiNote(m_currentNode, vrv_cast(Note *)(object));
+        WriteMeiNote(m_currentNode, dynamic_cast<Note *>(object));
     }
     else if (object->Is() == PROPORT) {
         m_currentNode = m_currentNode.append_child("proport");
-        WriteMeiProport(m_currentNode, vrv_cast(Proport *)(object));
+        WriteMeiProport(m_currentNode, dynamic_cast<Proport *>(object));
     }
     else if (object->Is() == REST) {
         m_currentNode = m_currentNode.append_child("rest");
-        WriteMeiRest(m_currentNode, vrv_cast(Rest *)(object));
+        WriteMeiRest(m_currentNode, dynamic_cast<Rest *>(object));
     }
     else if (object->Is() == SPACE) {
         m_currentNode = m_currentNode.append_child("space");
-        WriteMeiSpace(m_currentNode, vrv_cast(Space *)(object));
+        WriteMeiSpace(m_currentNode, dynamic_cast<Space *>(object));
     }
     else if (object->Is() == SYL) {
         m_currentNode = m_currentNode.append_child("syl");
-        WriteMeiSyl(m_currentNode, vrv_cast(Syl *)(object));
+        WriteMeiSyl(m_currentNode, dynamic_cast<Syl *>(object));
     }
     else if (object->Is() == TUPLET) {
         m_currentNode = m_currentNode.append_child("tuplet");
-        WriteMeiTuplet(m_currentNode, vrv_cast(Tuplet *)(object));
+        WriteMeiTuplet(m_currentNode, dynamic_cast<Tuplet *>(object));
     }
     else if (object->Is() == VERSE) {
         m_currentNode = m_currentNode.append_child("verse");
-        WriteMeiVerse(m_currentNode, vrv_cast(Verse *)(object));
+        WriteMeiVerse(m_currentNode, dynamic_cast<Verse *>(object));
     }
 
     // Text elements
     else if (object->Is() == REND) {
         m_currentNode = m_currentNode.append_child("rend");
-        WriteMeiRend(m_currentNode, vrv_cast(Rend *)(object));
+        WriteMeiRend(m_currentNode, dynamic_cast<Rend *>(object));
     }
     else if (object->Is() == TEXT) {
-        WriteMeiText(m_currentNode, vrv_cast(Text *)(object));
+        WriteMeiText(m_currentNode, dynamic_cast<Text *>(object));
     }
 
     // Editorial markup
     else if (object->Is() == ABBR) {
         m_currentNode = m_currentNode.append_child("abbr");
-        WriteMeiAbbr(m_currentNode, vrv_cast(Abbr *)(object));
+        WriteMeiAbbr(m_currentNode, dynamic_cast<Abbr *>(object));
     }
     else if (object->Is() == ADD) {
         m_currentNode = m_currentNode.append_child("add");
-        WriteMeiAdd(m_currentNode, vrv_cast(Add *)(object));
+        WriteMeiAdd(m_currentNode, dynamic_cast<Add *>(object));
     }
     else if (object->Is() == ANNOT) {
         m_currentNode = m_currentNode.append_child("annot");
-        WriteMeiAnnot(m_currentNode, vrv_cast(Annot *)(object));
+        WriteMeiAnnot(m_currentNode, dynamic_cast<Annot *>(object));
     }
     else if (object->Is() == APP) {
         m_currentNode = m_currentNode.append_child("app");
-        WriteMeiApp(m_currentNode, vrv_cast(App *)(object));
+        WriteMeiApp(m_currentNode, dynamic_cast<App *>(object));
     }
     else if (object->Is() == CORR) {
         m_currentNode = m_currentNode.append_child("corr");
-        WriteMeiCorr(m_currentNode, vrv_cast(Corr *)(object));
+        WriteMeiCorr(m_currentNode, dynamic_cast<Corr *>(object));
     }
     else if (object->Is() == DAMAGE) {
         m_currentNode = m_currentNode.append_child("damage");
-        WriteMeiDamage(m_currentNode, vrv_cast(Damage *)(object));
+        WriteMeiDamage(m_currentNode, dynamic_cast<Damage *>(object));
     }
     else if (object->Is() == DEL) {
         m_currentNode = m_currentNode.append_child("del");
-        WriteMeiDel(m_currentNode, vrv_cast(Del *)(object));
+        WriteMeiDel(m_currentNode, dynamic_cast<Del *>(object));
     }
     else if (object->Is() == EXPAN) {
         m_currentNode = m_currentNode.append_child("epxan");
-        WriteMeiExpan(m_currentNode, vrv_cast(Expan *)(object));
+        WriteMeiExpan(m_currentNode, dynamic_cast<Expan *>(object));
     }
     else if (object->Is() == LEM) {
         m_currentNode = m_currentNode.append_child("lem");
-        WriteMeiLem(m_currentNode, vrv_cast(Lem *)(object));
+        WriteMeiLem(m_currentNode, dynamic_cast<Lem *>(object));
     }
     else if (object->Is() == ORIG) {
         m_currentNode = m_currentNode.append_child("orig");
-        WriteMeiOrig(m_currentNode, vrv_cast(Orig *)(object));
+        WriteMeiOrig(m_currentNode, dynamic_cast<Orig *>(object));
     }
     else if (object->Is() == RDG) {
         m_currentNode = m_currentNode.append_child("rdg");
-        WriteMeiRdg(m_currentNode, vrv_cast(Rdg *)(object));
+        WriteMeiRdg(m_currentNode, dynamic_cast<Rdg *>(object));
     }
     else if (object->Is() == REG) {
         m_currentNode = m_currentNode.append_child("reg");
-        WriteMeiReg(m_currentNode, vrv_cast(Reg *)(object));
+        WriteMeiReg(m_currentNode, dynamic_cast<Reg *>(object));
     }
     else if (object->Is() == RESTORE) {
         m_currentNode = m_currentNode.append_child("restore");
-        WriteMeiRestore(m_currentNode, vrv_cast(Restore *)(object));
+        WriteMeiRestore(m_currentNode, dynamic_cast<Restore *>(object));
     }
     else if (object->Is() == SIC) {
         m_currentNode = m_currentNode.append_child("sic");
-        WriteMeiSic(m_currentNode, vrv_cast(Sic *)(object));
+        WriteMeiSic(m_currentNode, dynamic_cast<Sic *>(object));
     }
     else if (object->Is() == SUPPLIED) {
         m_currentNode = m_currentNode.append_child("supplied");
-        WriteMeiSupplied(m_currentNode, vrv_cast(Supplied *)(object));
+        WriteMeiSupplied(m_currentNode, dynamic_cast<Supplied *>(object));
     }
     else if (object->Is() == UNCLEAR) {
         m_currentNode = m_currentNode.append_child("unclear");
-        WriteMeiUnclear(m_currentNode, vrv_cast(Unclear *)(object));
+        WriteMeiUnclear(m_currentNode, dynamic_cast<Unclear *>(object));
     }
 
     else {
@@ -1366,8 +1366,8 @@ bool MeiInput::ReadMeiPage(pugi::xml_node page)
 bool MeiInput::ReadMeiPageChildren(Object *parent, pugi::xml_node parentNode)
 {
     // If we allow <app> between <page> elements
-    // assert(vrv_cast(Page*)(parent) || vrv_cast(EditorialElement*)(parent));
-    assert(vrv_cast(Page *)(parent));
+    // assert(dynamic_cast<Page*>(parent) || dynamic_cast<EditorialElement*>(parent));
+    assert(dynamic_cast<Page *>(parent));
 
     pugi::xml_node current;
     for (current = parentNode.first_child(); current; current = current.next_sibling()) {
@@ -1396,8 +1396,8 @@ bool MeiInput::ReadMeiPageChildren(Object *parent, pugi::xml_node parentNode)
 bool MeiInput::ReadMeiSystem(Object *parent, pugi::xml_node system)
 {
     // If we allow <app> between <page> elements
-    // assert(vrv_cast(Page*)(parent) || vrv_cast(EditorialElement*)(parent));
-    assert(vrv_cast(Page *)(parent));
+    // assert(dynamic_cast<Page*>(parent) || dynamic_cast<EditorialElement*>(parent));
+    assert(dynamic_cast<Page *>(parent));
 
     System *vrvSystem = new System();
     SetMeiUuid(system, vrvSystem);
@@ -1414,7 +1414,7 @@ bool MeiInput::ReadMeiSystem(Object *parent, pugi::xml_node system)
 
     // This could be moved to an AddSystem method for consistency with AddLayerElement
     if (parent->Is() == PAGE) {
-        Page *page = vrv_cast(Page *)(parent);
+        Page *page = dynamic_cast<Page *>(parent);
         assert(page);
         page->AddSystem(vrvSystem);
     }
@@ -1423,7 +1423,7 @@ bool MeiInput::ReadMeiSystem(Object *parent, pugi::xml_node system)
 
 bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
 {
-    assert(vrv_cast(System *)(parent) || vrv_cast(EditorialElement *)(parent));
+    assert(dynamic_cast<System *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     bool success = true;
     pugi::xml_node current;
@@ -1444,7 +1444,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
         else if (parentNode.child("staff")) {
             if (!unmeasured) {
                 if (parent->Is() == SYSTEM) {
-                    System *system = vrv_cast(System *)(parent);
+                    System *system = dynamic_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(false);
                     system->AddMeasure(unmeasured);
@@ -1480,7 +1480,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
 
 bool MeiInput::ReadMeiScoreDef(Object *parent, pugi::xml_node scoreDef)
 {
-    assert(vrv_cast(System *)(parent) || vrv_cast(EditorialElement *)(parent));
+    assert(dynamic_cast<System *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     ScoreDef *vrvScoreDef;
     if (!m_hasScoreDef) {
@@ -1499,7 +1499,7 @@ bool MeiInput::ReadMeiScoreDef(Object *parent, pugi::xml_node scoreDef)
 
 bool MeiInput::ReadMeiScoreDefChildren(Object *parent, pugi::xml_node parentNode)
 {
-    assert(vrv_cast(ScoreDef *)(parent) || vrv_cast(EditorialElement *)(parent));
+    assert(dynamic_cast<ScoreDef *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     bool success = true;
     pugi::xml_node current;
@@ -1522,7 +1522,7 @@ bool MeiInput::ReadMeiScoreDefChildren(Object *parent, pugi::xml_node parentNode
 
 bool MeiInput::ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp)
 {
-    assert(vrv_cast(ScoreDef *)(parent) || vrv_cast(StaffGrp *)(parent));
+    assert(dynamic_cast<ScoreDef *>(parent) || dynamic_cast<StaffGrp *>(parent));
 
     StaffGrp *vrvStaffGrp = new StaffGrp();
     SetMeiUuid(staffGrp, vrvStaffGrp);
@@ -1539,7 +1539,7 @@ bool MeiInput::ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp)
 
 bool MeiInput::ReadMeiStaffGrpChildren(Object *parent, pugi::xml_node parentNode)
 {
-    assert(vrv_cast(StaffGrp *)(parent) || vrv_cast(EditorialElement *)(parent));
+    assert(dynamic_cast<StaffGrp *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     bool success = true;
     pugi::xml_node current;
@@ -1565,7 +1565,7 @@ bool MeiInput::ReadMeiStaffGrpChildren(Object *parent, pugi::xml_node parentNode
 
 bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
 {
-    assert(vrv_cast(StaffGrp *)(parent) || vrv_cast(EditorialElement *)(parent));
+    assert(dynamic_cast<StaffGrp *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     StaffDef *vrvStaffDef = new StaffDef();
     SetMeiUuid(staffDef, vrvStaffDef);
@@ -1585,12 +1585,12 @@ bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
 
     // This could be moved to an AddMeasure method for consistency with AddLayerElement
     if (parent->Is() == STAFFGRP) {
-        StaffGrp *staffGrp = vrv_cast(StaffGrp *)(parent);
+        StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(parent);
         assert(staffGrp);
         staffGrp->AddStaffDef(vrvStaffDef);
     }
     else if (parent->IsEditorialElement()) {
-        EditorialElement *element = vrv_cast(EditorialElement *)(parent);
+        EditorialElement *element = dynamic_cast<EditorialElement *>(parent);
         assert(element);
         element->AddStaffDef(vrvStaffDef);
     }
@@ -1608,12 +1608,12 @@ bool MeiInput::ReadMeiMeasure(Object *parent, pugi::xml_node measure)
 
     // This could be moved to an AddMeasure method for consistency with AddLayerElement
     if (parent->Is() == SYSTEM) {
-        System *system = vrv_cast(System *)(parent);
+        System *system = dynamic_cast<System *>(parent);
         assert(system);
         system->AddMeasure(vrvMeasure);
     }
     else if (parent->IsEditorialElement()) {
-        EditorialElement *element = vrv_cast(EditorialElement *)(parent);
+        EditorialElement *element = dynamic_cast<EditorialElement *>(parent);
         assert(element);
         element->AddMeasure(vrvMeasure);
     }
@@ -1622,7 +1622,7 @@ bool MeiInput::ReadMeiMeasure(Object *parent, pugi::xml_node measure)
 
 bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
 {
-    assert(vrv_cast(Measure *)(parent) || vrv_cast(EditorialElement *)(parent));
+    assert(dynamic_cast<Measure *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     bool success = true;
     pugi::xml_node current;
@@ -1655,7 +1655,7 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadMeiTie(parent, current);
         }
         else if (std::string(current.name()) == "tupletSpan") {
-            if (!ReadTupletSpanAsTuplet(vrv_cast(Measure *)(parent), current)) {
+            if (!ReadTupletSpanAsTuplet(dynamic_cast<Measure *>(parent), current)) {
                 LogWarning("<tupletSpan> not readable as <tuplet> and ignored");
             }
         }
@@ -1755,12 +1755,12 @@ bool MeiInput::ReadMeiStaff(Object *parent, pugi::xml_node staff)
 
     // This could be moved to an AddLayer method for consistency with AddLayerElement
     if (parent->Is() == MEASURE) {
-        Measure *measure = vrv_cast(Measure *)(parent);
+        Measure *measure = dynamic_cast<Measure *>(parent);
         assert(measure);
         measure->AddStaff(vrvStaff);
     }
     else if (parent->IsEditorialElement()) {
-        EditorialElement *element = vrv_cast(EditorialElement *)(parent);
+        EditorialElement *element = dynamic_cast<EditorialElement *>(parent);
         assert(element);
         element->AddStaff(vrvStaff);
     }
@@ -1769,7 +1769,7 @@ bool MeiInput::ReadMeiStaff(Object *parent, pugi::xml_node staff)
 
 bool MeiInput::ReadMeiStaffChildren(Object *parent, pugi::xml_node parentNode)
 {
-    assert(vrv_cast(Staff *)(parent) || vrv_cast(EditorialElement *)(parent));
+    assert(dynamic_cast<Staff *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     bool success = true;
     pugi::xml_node current;
@@ -1803,12 +1803,12 @@ bool MeiInput::ReadMeiLayer(Object *parent, pugi::xml_node layer)
 
     // This could be moved to an AddLayer method for consistency with AddLayerElement
     if (parent->Is() == STAFF) {
-        Staff *staff = vrv_cast(Staff *)(parent);
+        Staff *staff = dynamic_cast<Staff *>(parent);
         assert(staff);
         staff->AddLayer(vrvLayer);
     }
     else if (parent->IsEditorialElement()) {
-        EditorialElement *element = vrv_cast(EditorialElement *)(parent);
+        EditorialElement *element = dynamic_cast<EditorialElement *>(parent);
         assert(element);
         element->AddLayer(vrvLayer);
     }
@@ -2482,7 +2482,7 @@ bool MeiInput::ReadMeiApp(Object *parent, pugi::xml_node app, EditorialLevel lev
 
 bool MeiInput::ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter)
 {
-    assert(vrv_cast(App *)(parent));
+    assert(dynamic_cast<App *>(parent));
 
     // Check if one child node matches the m_appXPathQuery
     pugi::xml_node selectedLemOrRdg;
@@ -2508,7 +2508,7 @@ bool MeiInput::ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, Edi
         // Now we check if the xpath selection (if any) matches the current node.
         // If yes, make it visible
         if (selectedLemOrRdg == current) {
-            EditorialElement *last = vrv_cast(EditorialElement *)(parent->m_children.back());
+            EditorialElement *last = dynamic_cast<EditorialElement *>(parent->m_children.back());
             if (last) {
                 last->m_visibility = Visible;
                 hasXPathSelected = true;
@@ -2518,7 +2518,7 @@ bool MeiInput::ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, Edi
 
     // If no child was made visible through the xpath selection, make the first one visible
     if (!hasXPathSelected) {
-        EditorialElement *first = vrv_cast(EditorialElement *)(parent->m_children.front());
+        EditorialElement *first = dynamic_cast<EditorialElement *>(parent->m_children.front());
         if (first) {
             first->m_visibility = Visible;
         }
@@ -2575,7 +2575,7 @@ bool MeiInput::ReadMeiExpan(Object *parent, pugi::xml_node expan, EditorialLevel
 
 bool MeiInput::ReadMeiLem(Object *parent, pugi::xml_node lem, EditorialLevel level, Object *filter)
 {
-    assert(vrv_cast(App *)(parent));
+    assert(dynamic_cast<App *>(parent));
 
     Lem *vrvLem = new Lem();
     // By default make them all hidden. MeiInput::ReadMeiAppChildren will make one visible.
@@ -2584,7 +2584,7 @@ bool MeiInput::ReadMeiLem(Object *parent, pugi::xml_node lem, EditorialLevel lev
 
     vrvLem->ReadSource(lem);
 
-    (vrv_cast(App *)(parent))->AddLemOrRdg(vrvLem);
+    (dynamic_cast<App *>(parent))->AddLemOrRdg(vrvLem);
     return ReadMeiEditorialChildren(vrvLem, lem, level, filter);
 }
 
@@ -2601,7 +2601,7 @@ bool MeiInput::ReadMeiOrig(Object *parent, pugi::xml_node orig, EditorialLevel l
 
 bool MeiInput::ReadMeiRdg(Object *parent, pugi::xml_node rdg, EditorialLevel level, Object *filter)
 {
-    assert(vrv_cast(App *)(parent));
+    assert(dynamic_cast<App *>(parent));
 
     Rdg *vrvRdg = new Rdg();
     // By default make them all hidden. MeiInput::ReadMeiAppChildren will make one visible.
@@ -2610,7 +2610,7 @@ bool MeiInput::ReadMeiRdg(Object *parent, pugi::xml_node rdg, EditorialLevel lev
 
     vrvRdg->ReadSource(rdg);
 
-    (vrv_cast(App *)(parent))->AddLemOrRdg(vrvRdg);
+    (dynamic_cast<App *>(parent))->AddLemOrRdg(vrvRdg);
     return ReadMeiEditorialChildren(vrvRdg, rdg, level, filter);
 }
 
@@ -2671,7 +2671,7 @@ bool MeiInput::ReadMeiUnclear(Object *parent, pugi::xml_node unclear, EditorialL
 
 bool MeiInput::ReadMeiEditorialChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter)
 {
-    assert(vrv_cast(EditorialElement *)(parent));
+    assert(dynamic_cast<EditorialElement *>(parent));
 
     if (level == EDITORIAL_SYSTEM) {
         return ReadMeiSystemChildren(parent, parentNode);
@@ -2705,12 +2705,12 @@ void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
         m_hasScoreDef = true;
     }
     else if (parent->IsEditorialElement()) {
-        EditorialElement *element = vrv_cast(EditorialElement *)(parent);
+        EditorialElement *element = dynamic_cast<EditorialElement *>(parent);
         assert(element);
         element->AddScoreDef(scoreDef);
     }
     else if (parent->Is() == SYSTEM) {
-        System *system = vrv_cast(System *)(parent);
+        System *system = dynamic_cast<System *>(parent);
         assert(system);
         system->AddScoreDef(scoreDef);
     }
@@ -2723,15 +2723,15 @@ void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
 void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp)
 {
     if (parent->IsEditorialElement()) {
-        EditorialElement *element = vrv_cast(EditorialElement *)(parent);
+        EditorialElement *element = dynamic_cast<EditorialElement *>(parent);
         assert(element);
         element->AddStaffGrp(staffGrp);
     }
     else if (parent->Is() == SCOREDEF) {
-        (vrv_cast(ScoreDef *)(parent))->AddStaffGrp(staffGrp);
+        (dynamic_cast<ScoreDef *>(parent))->AddStaffGrp(staffGrp);
     }
     else if (parent->Is() == STAFFGRP) {
-        (vrv_cast(StaffGrp *)(parent))->AddStaffGrp(staffGrp);
+        (dynamic_cast<StaffGrp *>(parent))->AddStaffGrp(staffGrp);
     }
     else {
         LogWarning("'%s' not supported within '%s'", staffGrp->GetClassName().c_str(), parent->GetClassName().c_str());
@@ -2742,48 +2742,48 @@ void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp)
 void MeiInput::AddLayerElement(Object *parent, LayerElement *element)
 {
     if (parent->IsEditorialElement()) {
-        EditorialElement *editorialElement = vrv_cast(EditorialElement *)(parent);
+        EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(parent);
         assert(editorialElement);
         editorialElement->AddLayerElement(element);
     }
     else if (parent->Is() == LAYER) {
-        Layer *layer = vrv_cast(Layer *)(parent);
+        Layer *layer = dynamic_cast<Layer *>(parent);
         assert(layer);
         layer->AddLayerElement(element);
     }
     // LayerElements
     else if (parent->Is() == BEAM) {
-        Beam *beam = vrv_cast(Beam *)(parent);
+        Beam *beam = dynamic_cast<Beam *>(parent);
         assert(beam);
         beam->AddLayerElement(element);
     }
     else if (parent->Is() == BTREM) {
-        BTrem *bTrem = vrv_cast(BTrem *)(parent);
+        BTrem *bTrem = dynamic_cast<BTrem *>(parent);
         assert(bTrem);
         bTrem->AddLayerElement(element);
     }
     else if (parent->Is() == CHORD) {
-        Chord *chord = vrv_cast(Chord *)(parent);
+        Chord *chord = dynamic_cast<Chord *>(parent);
         assert(chord);
         chord->AddLayerElement(element);
     }
     else if (parent->Is() == NOTE) {
-        Note *note = vrv_cast(Note *)(parent);
+        Note *note = dynamic_cast<Note *>(parent);
         assert(note);
         note->AddLayerElement(element);
     }
     else if (parent->Is() == FTREM) {
-        FTrem *fTrem = vrv_cast(FTrem *)(parent);
+        FTrem *fTrem = dynamic_cast<FTrem *>(parent);
         assert(fTrem);
         fTrem->AddLayerElement(element);
     }
     else if (parent->Is() == TUPLET) {
-        Tuplet *tuplet = vrv_cast(Tuplet *)(parent);
+        Tuplet *tuplet = dynamic_cast<Tuplet *>(parent);
         assert(tuplet);
         tuplet->AddLayerElement(element);
     }
     else if (parent->Is() == VERSE) {
-        Verse *verse = vrv_cast(Verse *)(parent);
+        Verse *verse = dynamic_cast<Verse *>(parent);
         assert(verse);
         verse->AddLayerElement(element);
     }
@@ -2796,12 +2796,12 @@ void MeiInput::AddLayerElement(Object *parent, LayerElement *element)
 void MeiInput::AddFloatingElement(Object *parent, FloatingElement *element)
 {
     if (parent->IsEditorialElement()) {
-        EditorialElement *editorialElement = vrv_cast(EditorialElement *)(parent);
+        EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(parent);
         assert(editorialElement);
         editorialElement->AddFloatingElement(element);
     }
     else if (parent->Is() == MEASURE) {
-        Measure *measure = vrv_cast(Measure *)(parent);
+        Measure *measure = dynamic_cast<Measure *>(parent);
         assert(measure);
         measure->AddFloatingElement(element);
     }
@@ -2814,27 +2814,27 @@ void MeiInput::AddFloatingElement(Object *parent, FloatingElement *element)
 void MeiInput::AddTextElement(Object *parent, TextElement *element)
 {
     if (parent->IsEditorialElement()) {
-        EditorialElement *editorialElement = vrv_cast(EditorialElement *)(parent);
+        EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(parent);
         assert(editorialElement);
         editorialElement->AddTextElement(element);
     }
     else if (parent->Is() == ANCHORED_TEXT) {
-        AnchoredText *anchoredText = vrv_cast(AnchoredText *)(parent);
+        AnchoredText *anchoredText = dynamic_cast<AnchoredText *>(parent);
         assert(anchoredText);
         anchoredText->AddTextElement(element);
     }
     else if (parent->Is() == REND) {
-        Rend *rend = vrv_cast(Rend *)(parent);
+        Rend *rend = dynamic_cast<Rend *>(parent);
         assert(rend);
         rend->AddTextElement(element);
     }
     else if (parent->Is() == SYL) {
-        Syl *syl = vrv_cast(Syl *)(parent);
+        Syl *syl = dynamic_cast<Syl *>(parent);
         assert(syl);
         syl->AddTextElement(element);
     }
     else if (parent->Is() == TEMPO) {
-        Tempo *tempo = vrv_cast(Tempo *)(parent);
+        Tempo *tempo = dynamic_cast<Tempo *>(parent);
         assert(tempo);
         tempo->AddTextElement(element);
     }
@@ -2933,14 +2933,14 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     // position (pitch)
     if (tupletSpan.attribute("startid")) {
         std::string refId = ExtractUuidFragment(tupletSpan.attribute("startid").value());
-        start = vrv_cast(LayerElement *)(measure->FindChildByUuid(refId));
+        start = dynamic_cast<LayerElement *>(measure->FindChildByUuid(refId));
         if (!start) {
             LogWarning("Element with @startid '%s' not found when trying to read the <tupletSpan>", refId.c_str());
         }
     }
     if (tupletSpan.attribute("endid")) {
         std::string refId = ExtractUuidFragment(tupletSpan.attribute("endid").value());
-        end = vrv_cast(LayerElement *)(measure->FindChildByUuid(refId));
+        end = dynamic_cast<LayerElement *>(measure->FindChildByUuid(refId));
         if (!end) {
             LogWarning("Element with @endid '%s' not found when trying to read the <tupletSpan>", refId.c_str());
         }
@@ -2950,8 +2950,8 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
         return false;
     }
 
-    LayerElement *startChild = vrv_cast(LayerElement *)(start->GetLastParentNot(LAYER));
-    LayerElement *endChild = vrv_cast(LayerElement *)(end->GetLastParentNot(LAYER));
+    LayerElement *startChild = dynamic_cast<LayerElement *>(start->GetLastParentNot(LAYER));
+    LayerElement *endChild = dynamic_cast<LayerElement *>(end->GetLastParentNot(LAYER));
 
     if (!startChild || !endChild || (startChild->m_parent != endChild->m_parent)) {
         LogWarning("Start and end elements for <tupletSpan> '%s' not in the same layer", tuplet->GetUuid().c_str());
@@ -2959,7 +2959,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
         return false;
     }
 
-    Layer *parentLayer = vrv_cast(Layer *)(startChild->m_parent);
+    Layer *parentLayer = dynamic_cast<Layer *>(startChild->m_parent);
     assert(parentLayer);
 
     int startIdx = startChild->GetIdx();
@@ -2967,7 +2967,7 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     // LogDebug("%d %d %s!", startIdx, endIdx, start->GetUuid().c_str());
     int i;
     for (i = endIdx; i >= startIdx; i--) {
-        LayerElement *element = vrv_cast(LayerElement *)(parentLayer->DetachChild(i));
+        LayerElement *element = dynamic_cast<LayerElement *>(parentLayer->DetachChild(i));
         if (element) tuplet->AddLayerElement(element);
     }
     tuplet->SetParent(parentLayer);

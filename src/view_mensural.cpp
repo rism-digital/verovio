@@ -40,7 +40,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(staff);
     assert(measure);
 
-    Note *note = vrv_cast(Note *)(element);
+    Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
     int staffSize = staff->m_drawingStaffSize;
@@ -162,7 +162,7 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    Mensur *mensur = vrv_cast(Mensur *)(element);
+    Mensur *mensur = dynamic_cast<Mensur *>(element);
     assert(mensur);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -314,7 +314,7 @@ void View::CalculateLigaturePosX(LayerElement *element, Layer *layer, Staff *sta
      {
      return;
      }
-     Note *previousNote = vrv_cast(Note*)(previous);
+     Note *previousNote = dynamic_cast<Note*>(previous);
      if (previousNote->m_lig==LIG_TERMINAL)
      {
      return;
@@ -334,7 +334,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     assert(layer);
     assert(staff);
 
-    Note *note = vrv_cast(Note *)(element);
+    Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
     // Mensural noteheads are quite a bit smaller than CMN noteheads; use _pseudoStaffSize_ to force this.
@@ -405,7 +405,7 @@ void View::DrawLigature(DeviceContext *dc, int y, LayerElement *element, Layer *
     assert(layer);
     assert(staff);
 
-    Note *note = vrv_cast(Note *)(element);
+    Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
     int xn, x1, x2, y1, y2, y3, y4;
@@ -585,11 +585,11 @@ void View::DrawProport(DeviceContext *dc, LayerElement *element, Layer *layer, S
 {
     assert(layer);
     assert(staff);
-    assert(vrv_cast(Proport *)(element)); // Element must be a Proport"
+    assert(dynamic_cast<Proport *>(element)); // Element must be a Proport"
 
     int x1, x2, y1, y2;
 
-    Proport *proport = vrv_cast(Proport *)(element);
+    Proport *proport = dynamic_cast<Proport *>(element);
 
     dc->StartGraphic(element, "", element->GetUuid());
 

@@ -167,7 +167,7 @@ bool AttHarmVis::HasRendgrid()
 bool Att::SetHarmony(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_FRETLOCATION)) {
-        AttFretlocation *att = vrv_cast(AttFretlocation *)(element);
+        AttFretlocation *att = dynamic_cast<AttFretlocation *>(element);
         assert(att);
         if (attrType == "fret") {
             att->SetFret(att->StrToFret(attrValue));
@@ -175,7 +175,7 @@ bool Att::SetHarmony(Object *element, std::string attrType, std::string attrValu
         }
     }
     if (element->HasAttClass(ATT_HARMLOG)) {
-        AttHarmLog *att = vrv_cast(AttHarmLog *)(element);
+        AttHarmLog *att = dynamic_cast<AttHarmLog *>(element);
         assert(att);
         if (attrType == "chordref") {
             att->SetChordref(att->StrToStr(attrValue));
@@ -183,7 +183,7 @@ bool Att::SetHarmony(Object *element, std::string attrType, std::string attrValu
         }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {
-        AttHarmVis *att = vrv_cast(AttHarmVis *)(element);
+        AttHarmVis *att = dynamic_cast<AttHarmVis *>(element);
         assert(att);
         if (attrType == "rendgrid") {
             att->SetRendgrid(att->StrToHarmVisRendgrid(attrValue));
@@ -197,21 +197,21 @@ bool Att::SetHarmony(Object *element, std::string attrType, std::string attrValu
 void Att::GetHarmony(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_FRETLOCATION)) {
-        AttFretlocation *att = vrv_cast(AttFretlocation *)(element);
+        AttFretlocation *att = dynamic_cast<AttFretlocation *>(element);
         assert(att);
         if (att->HasFret()) {
             attributes->push_back(std::make_pair("fret", att->FretToStr(att->GetFret())));
         }
     }
     if (element->HasAttClass(ATT_HARMLOG)) {
-        AttHarmLog *att = vrv_cast(AttHarmLog *)(element);
+        AttHarmLog *att = dynamic_cast<AttHarmLog *>(element);
         assert(att);
         if (att->HasChordref()) {
             attributes->push_back(std::make_pair("chordref", att->StrToStr(att->GetChordref())));
         }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {
-        AttHarmVis *att = vrv_cast(AttHarmVis *)(element);
+        AttHarmVis *att = dynamic_cast<AttHarmVis *>(element);
         assert(att);
         if (att->HasRendgrid()) {
             attributes->push_back(std::make_pair("rendgrid", att->HarmVisRendgridToStr(att->GetRendgrid())));

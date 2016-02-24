@@ -77,7 +77,7 @@ void Chord::ClearClusters()
 
 void Chord::AddLayerElement(LayerElement *element)
 {
-    assert(vrv_cast(Note *)(element));
+    assert(dynamic_cast<Note *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();
@@ -85,8 +85,8 @@ void Chord::AddLayerElement(LayerElement *element)
 
 bool compare_pitch(Object *first, Object *second)
 {
-    Note *n1 = vrv_cast(Note *)(first);
-    Note *n2 = vrv_cast(Note *)(second);
+    Note *n1 = dynamic_cast<Note *>(first);
+    Note *n2 = dynamic_cast<Note *>(second);
     assert(n1 && n2);
     return (n1->GetDiatonicPitch() < n2->GetDiatonicPitch());
 }
@@ -102,15 +102,13 @@ void Chord::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        LayerElement *currentElement = vrv_cast(LayerElement *)(*iter);
+        LayerElement *currentElement = dynamic_cast<LayerElement *>(*iter);
         assert(currentElement);
         if (!currentElement->HasInterface(INTERFACE_DURATION)) {
             iter = childList->erase(iter);
         }
         else {
-            Note *n = vrv_cast(Note *)(currentElement);
-
-            if (n) {
+            if (currentElement->Is() == NOTE) {
                 iter++;
             }
             else {
@@ -126,7 +124,7 @@ void Chord::FilterList(ListOfObjects *childList)
 
     this->ClearClusters();
 
-    Note *curNote, *lastNote = vrv_cast(Note *)(*iter);
+    Note *curNote, *lastNote = dynamic_cast<Note *>(*iter);
     assert(lastNote);
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
     ChordCluster *curCluster = NULL;
@@ -134,7 +132,7 @@ void Chord::FilterList(ListOfObjects *childList)
     iter++;
 
     while (iter != childList->end()) {
-        curNote = vrv_cast(Note *)(*iter);
+        curNote = dynamic_cast<Note *>(*iter);
         assert(curNote);
         curPitch = curNote->GetDiatonicPitch();
 
@@ -163,7 +161,7 @@ void Chord::ResetAccidList()
     m_accidList.clear();
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
-        Note *note = vrv_cast(Note *)(*it);
+        Note *note = dynamic_cast<Note *>(*it);
         assert(note);
         if (note->m_drawingAccid != NULL) {
             m_accidList.push_back(note);
@@ -235,7 +233,7 @@ void Chord::GetYExtremes(int *yMax, int *yMin)
     int y1;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = vrv_cast(Note *)(*it);
+        Note *note = dynamic_cast<Note *>(*it);
         if (!note) continue;
         y1 = note->GetDrawingY();
         if (!passed) {
@@ -259,8 +257,9 @@ void Chord::SetDrawingStemDir(data_STEMDIRECTION stemDir)
     m_drawingStemDir = stemDir;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = vrv_cast(Note *)(*it);
-        if (!note) continue;
+        if ((*it)->Is() != NOTE) continue;
+        Note *note = dynamic_cast<Note *>(*it);
+        assert(note);
         note->SetDrawingStemDir(stemDir);
     }
 }
@@ -270,8 +269,9 @@ void Chord::SetDrawingStemStart(Point stemStart)
     m_drawingStemStart = stemStart;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = vrv_cast(Note *)(*it);
-        if (!note) continue;
+        if ((*it)->Is() != NOTE) continue;
+        Note *note = dynamic_cast<Note *>(*it);
+        assert(note);
         note->SetDrawingStemStart(stemStart);
     }
 }
@@ -281,8 +281,9 @@ void Chord::SetDrawingStemEnd(Point stemEnd)
     m_drawingStemEnd = stemEnd;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = vrv_cast(Note *)(*it);
-        if (!note) continue;
+        if ((*it)->Is() != NOTE) continue;
+        Note *note = dynamic_cast<Note *>(*it);
+        assert(note);
         note->SetDrawingStemEnd(stemEnd);
     }
 }

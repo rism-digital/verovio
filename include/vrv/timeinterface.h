@@ -132,7 +132,7 @@ public:
     virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; };
     ///@}
 
-    virtual TimePointInterface *GetTimePointInterface() { return vrv_cast2(TimePointInterface *)(this); }
+    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
 
     /**
      * @name Set and get the first and second LayerElement

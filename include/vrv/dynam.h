@@ -34,9 +34,9 @@ public:
     virtual ClassId Is() { return DYNAM; };
     ///@}
 
-    virtual TextDirInterface *GetTextDirInterface() { return vrv_cast2(TextDirInterface *)(this); }
-    virtual TimePointInterface *GetTimePointInterface() { return vrv_cast2(TimePointInterface *)(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return vrv_cast2(TimeSpanningInterface *)(this); }
+    virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
+    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
 
     /**
     * Add an element (text, rend. etc.) to a dynam.

@@ -75,7 +75,7 @@ bool AttAltsym::HasAltsym()
 bool Att::SetUsersymbols(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_ALTSYM)) {
-        AttAltsym *att = vrv_cast(AttAltsym *)(element);
+        AttAltsym *att = dynamic_cast<AttAltsym *>(element);
         assert(att);
         if (attrType == "altsym") {
             att->SetAltsym(att->StrToStr(attrValue));
@@ -89,7 +89,7 @@ bool Att::SetUsersymbols(Object *element, std::string attrType, std::string attr
 void Att::GetUsersymbols(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ALTSYM)) {
-        AttAltsym *att = vrv_cast(AttAltsym *)(element);
+        AttAltsym *att = dynamic_cast<AttAltsym *>(element);
         assert(att);
         if (att->HasAltsym()) {
             attributes->push_back(std::make_pair("altsym", att->StrToStr(att->GetAltsym())));

@@ -1864,7 +1864,7 @@ bool AttTupletVis::HasNumFormat()
 bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_ARPEGLOG)) {
-        AttArpegLog *att = vrv_cast(AttArpegLog *)(element);
+        AttArpegLog *att = dynamic_cast<AttArpegLog *>(element);
         assert(att);
         if (attrType == "order") {
             att->SetOrder(att->StrToArpegLogOrder(attrValue));
@@ -1872,7 +1872,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_ARPEGVIS)) {
-        AttArpegVis *att = vrv_cast(AttArpegVis *)(element);
+        AttArpegVis *att = dynamic_cast<AttArpegVis *>(element);
         assert(att);
         if (attrType == "arrow") {
             att->SetArrow(att->StrToBoolean(attrValue));
@@ -1880,7 +1880,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_BTREMLOG)) {
-        AttBTremLog *att = vrv_cast(AttBTremLog *)(element);
+        AttBTremLog *att = dynamic_cast<AttBTremLog *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToBTremLogForm(attrValue));
@@ -1888,7 +1888,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_BEAMED)) {
-        AttBeamed *att = vrv_cast(AttBeamed *)(element);
+        AttBeamed *att = dynamic_cast<AttBeamed *>(element);
         assert(att);
         if (attrType == "beam") {
             att->SetBeam(att->StrToStr(attrValue));
@@ -1896,7 +1896,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_BEAMEDWITH)) {
-        AttBeamedwith *att = vrv_cast(AttBeamedwith *)(element);
+        AttBeamedwith *att = dynamic_cast<AttBeamedwith *>(element);
         assert(att);
         if (attrType == "beam.with") {
             att->SetBeamWith(att->StrToOtherstaff(attrValue));
@@ -1904,7 +1904,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_BEAMINGLOG)) {
-        AttBeamingLog *att = vrv_cast(AttBeamingLog *)(element);
+        AttBeamingLog *att = dynamic_cast<AttBeamingLog *>(element);
         assert(att);
         if (attrType == "beam.group") {
             att->SetBeamGroup(att->StrToStr(attrValue));
@@ -1916,7 +1916,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_BEAMREND)) {
-        AttBeamrend *att = vrv_cast(AttBeamrend *)(element);
+        AttBeamrend *att = dynamic_cast<AttBeamrend *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToBeamrendForm(attrValue));
@@ -1928,7 +1928,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_BEAMSECONDARY)) {
-        AttBeamsecondary *att = vrv_cast(AttBeamsecondary *)(element);
+        AttBeamsecondary *att = dynamic_cast<AttBeamsecondary *>(element);
         assert(att);
         if (attrType == "breaksec") {
             att->SetBreaksec(att->StrToInt(attrValue));
@@ -1936,7 +1936,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_BEATRPTLOG)) {
-        AttBeatRptLog *att = vrv_cast(AttBeatRptLog *)(element);
+        AttBeatRptLog *att = dynamic_cast<AttBeatRptLog *>(element);
         assert(att);
         if (attrType == "beatDef") {
             att->SetBeatDef(att->StrToDuration(attrValue));
@@ -1944,7 +1944,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_BEATRPTVIS)) {
-        AttBeatRptVis *att = vrv_cast(AttBeatRptVis *)(element);
+        AttBeatRptVis *att = dynamic_cast<AttBeatRptVis *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToBeatrptRend(attrValue));
@@ -1952,7 +1952,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_BENDGES)) {
-        AttBendGes *att = vrv_cast(AttBendGes *)(element);
+        AttBendGes *att = dynamic_cast<AttBendGes *>(element);
         assert(att);
         if (attrType == "amount") {
             att->SetAmount(att->StrToStr(attrValue));
@@ -1960,7 +1960,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_CUTOUT)) {
-        AttCutout *att = vrv_cast(AttCutout *)(element);
+        AttCutout *att = dynamic_cast<AttCutout *>(element);
         assert(att);
         if (attrType == "cutout") {
             att->SetCutout(att->StrToCutoutCutout(attrValue));
@@ -1968,7 +1968,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_EXPANDABLE)) {
-        AttExpandable *att = vrv_cast(AttExpandable *)(element);
+        AttExpandable *att = dynamic_cast<AttExpandable *>(element);
         assert(att);
         if (attrType == "expand") {
             att->SetExpand(att->StrToBoolean(attrValue));
@@ -1976,7 +1976,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_FTREMLOG)) {
-        AttFTremLog *att = vrv_cast(AttFTremLog *)(element);
+        AttFTremLog *att = dynamic_cast<AttFTremLog *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToFTremLogForm(attrValue));
@@ -1984,7 +1984,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_FERMATAVIS)) {
-        AttFermataVis *att = vrv_cast(AttFermataVis *)(element);
+        AttFermataVis *att = dynamic_cast<AttFermataVis *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToFermataVisForm(attrValue));
@@ -1996,7 +1996,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_GRACED)) {
-        AttGraced *att = vrv_cast(AttGraced *)(element);
+        AttGraced *att = dynamic_cast<AttGraced *>(element);
         assert(att);
         if (attrType == "grace") {
             att->SetGrace(att->StrToGrace(attrValue));
@@ -2008,7 +2008,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_HAIRPINLOG)) {
-        AttHairpinLog *att = vrv_cast(AttHairpinLog *)(element);
+        AttHairpinLog *att = dynamic_cast<AttHairpinLog *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToHairpinLogForm(attrValue));
@@ -2020,7 +2020,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_HAIRPINVIS)) {
-        AttHairpinVis *att = vrv_cast(AttHairpinVis *)(element);
+        AttHairpinVis *att = dynamic_cast<AttHairpinVis *>(element);
         assert(att);
         if (attrType == "opening") {
             att->SetOpening(att->StrToStr(attrValue));
@@ -2028,7 +2028,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_HARPPEDALLOG)) {
-        AttHarpPedalLog *att = vrv_cast(AttHarpPedalLog *)(element);
+        AttHarpPedalLog *att = dynamic_cast<AttHarpPedalLog *>(element);
         assert(att);
         if (attrType == "c") {
             att->SetC(att->StrToHarpPedalLogC(attrValue));
@@ -2060,7 +2060,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_LVPRESENT)) {
-        AttLvpresent *att = vrv_cast(AttLvpresent *)(element);
+        AttLvpresent *att = dynamic_cast<AttLvpresent *>(element);
         assert(att);
         if (attrType == "lv") {
             att->SetLv(att->StrToBoolean(attrValue));
@@ -2068,7 +2068,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_MULTIRESTVIS)) {
-        AttMultiRestVis *att = vrv_cast(AttMultiRestVis *)(element);
+        AttMultiRestVis *att = dynamic_cast<AttMultiRestVis *>(element);
         assert(att);
         if (attrType == "block") {
             att->SetBlock(att->StrToBoolean(attrValue));
@@ -2076,7 +2076,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_NOTEGESCMN)) {
-        AttNoteGesCmn *att = vrv_cast(AttNoteGesCmn *)(element);
+        AttNoteGesCmn *att = dynamic_cast<AttNoteGesCmn *>(element);
         assert(att);
         if (attrType == "gliss") {
             att->SetGliss(att->StrToGlissando(attrValue));
@@ -2084,7 +2084,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_NUMBERED)) {
-        AttNumbered *att = vrv_cast(AttNumbered *)(element);
+        AttNumbered *att = dynamic_cast<AttNumbered *>(element);
         assert(att);
         if (attrType == "num") {
             att->SetNum(att->StrToInt(attrValue));
@@ -2092,7 +2092,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_NUMBERPLACEMENT)) {
-        AttNumberplacement *att = vrv_cast(AttNumberplacement *)(element);
+        AttNumberplacement *att = dynamic_cast<AttNumberplacement *>(element);
         assert(att);
         if (attrType == "num.place") {
             att->SetNumPlace(att->StrToPlace(attrValue));
@@ -2104,7 +2104,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_OCTAVELOG)) {
-        AttOctaveLog *att = vrv_cast(AttOctaveLog *)(element);
+        AttOctaveLog *att = dynamic_cast<AttOctaveLog *>(element);
         assert(att);
         if (attrType == "coll") {
             att->SetColl(att->StrToOctaveLogColl(attrValue));
@@ -2112,7 +2112,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_PEDALLOG)) {
-        AttPedalLog *att = vrv_cast(AttPedalLog *)(element);
+        AttPedalLog *att = dynamic_cast<AttPedalLog *>(element);
         assert(att);
         if (attrType == "dir") {
             att->SetDir(att->StrToPedalLogDir(attrValue));
@@ -2120,7 +2120,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_PEDALVIS)) {
-        AttPedalVis *att = vrv_cast(AttPedalVis *)(element);
+        AttPedalVis *att = dynamic_cast<AttPedalVis *>(element);
         assert(att);
         if (attrType == "form") {
             att->SetForm(att->StrToPedalVisForm(attrValue));
@@ -2128,7 +2128,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_PIANOPEDALS)) {
-        AttPianopedals *att = vrv_cast(AttPianopedals *)(element);
+        AttPianopedals *att = dynamic_cast<AttPianopedals *>(element);
         assert(att);
         if (attrType == "pedal.style") {
             att->SetPedalStyle(att->StrToPianopedalsPedalstyle(attrValue));
@@ -2136,7 +2136,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_REHEARSAL)) {
-        AttRehearsal *att = vrv_cast(AttRehearsal *)(element);
+        AttRehearsal *att = dynamic_cast<AttRehearsal *>(element);
         assert(att);
         if (attrType == "reh.enclose") {
             att->SetRehEnclose(att->StrToRehearsalRehenclose(attrValue));
@@ -2144,7 +2144,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_SCOREDEFVISCMN)) {
-        AttScoreDefVisCmn *att = vrv_cast(AttScoreDefVisCmn *)(element);
+        AttScoreDefVisCmn *att = dynamic_cast<AttScoreDefVisCmn *>(element);
         assert(att);
         if (attrType == "grid.show") {
             att->SetGridShow(att->StrToBoolean(attrValue));
@@ -2152,7 +2152,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_SLURREND)) {
-        AttSlurrend *att = vrv_cast(AttSlurrend *)(element);
+        AttSlurrend *att = dynamic_cast<AttSlurrend *>(element);
         assert(att);
         if (attrType == "slur.rend") {
             att->SetSlurRend(att->StrToCurverendition(attrValue));
@@ -2160,7 +2160,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_STEMSCMN)) {
-        AttStemsCmn *att = vrv_cast(AttStemsCmn *)(element);
+        AttStemsCmn *att = dynamic_cast<AttStemsCmn *>(element);
         assert(att);
         if (attrType == "stem.with") {
             att->SetStemWith(att->StrToOtherstaff(attrValue));
@@ -2168,7 +2168,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_TIEREND)) {
-        AttTierend *att = vrv_cast(AttTierend *)(element);
+        AttTierend *att = dynamic_cast<AttTierend *>(element);
         assert(att);
         if (attrType == "tie.rend") {
             att->SetTieRend(att->StrToCurverendition(attrValue));
@@ -2176,7 +2176,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_TREMMEASURED)) {
-        AttTremmeasured *att = vrv_cast(AttTremmeasured *)(element);
+        AttTremmeasured *att = dynamic_cast<AttTremmeasured *>(element);
         assert(att);
         if (attrType == "measperf") {
             att->SetMeasperf(att->StrToDuration(attrValue));
@@ -2184,7 +2184,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         }
     }
     if (element->HasAttClass(ATT_TUPLETVIS)) {
-        AttTupletVis *att = vrv_cast(AttTupletVis *)(element);
+        AttTupletVis *att = dynamic_cast<AttTupletVis *>(element);
         assert(att);
         if (attrType == "bracket.place") {
             att->SetBracketPlace(att->StrToPlace(attrValue));
@@ -2210,42 +2210,42 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
 void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ARPEGLOG)) {
-        AttArpegLog *att = vrv_cast(AttArpegLog *)(element);
+        AttArpegLog *att = dynamic_cast<AttArpegLog *>(element);
         assert(att);
         if (att->HasOrder()) {
             attributes->push_back(std::make_pair("order", att->ArpegLogOrderToStr(att->GetOrder())));
         }
     }
     if (element->HasAttClass(ATT_ARPEGVIS)) {
-        AttArpegVis *att = vrv_cast(AttArpegVis *)(element);
+        AttArpegVis *att = dynamic_cast<AttArpegVis *>(element);
         assert(att);
         if (att->HasArrow()) {
             attributes->push_back(std::make_pair("arrow", att->BooleanToStr(att->GetArrow())));
         }
     }
     if (element->HasAttClass(ATT_BTREMLOG)) {
-        AttBTremLog *att = vrv_cast(AttBTremLog *)(element);
+        AttBTremLog *att = dynamic_cast<AttBTremLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->BTremLogFormToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_BEAMED)) {
-        AttBeamed *att = vrv_cast(AttBeamed *)(element);
+        AttBeamed *att = dynamic_cast<AttBeamed *>(element);
         assert(att);
         if (att->HasBeam()) {
             attributes->push_back(std::make_pair("beam", att->StrToStr(att->GetBeam())));
         }
     }
     if (element->HasAttClass(ATT_BEAMEDWITH)) {
-        AttBeamedwith *att = vrv_cast(AttBeamedwith *)(element);
+        AttBeamedwith *att = dynamic_cast<AttBeamedwith *>(element);
         assert(att);
         if (att->HasBeamWith()) {
             attributes->push_back(std::make_pair("beam.with", att->OtherstaffToStr(att->GetBeamWith())));
         }
     }
     if (element->HasAttClass(ATT_BEAMINGLOG)) {
-        AttBeamingLog *att = vrv_cast(AttBeamingLog *)(element);
+        AttBeamingLog *att = dynamic_cast<AttBeamingLog *>(element);
         assert(att);
         if (att->HasBeamGroup()) {
             attributes->push_back(std::make_pair("beam.group", att->StrToStr(att->GetBeamGroup())));
@@ -2255,7 +2255,7 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_BEAMREND)) {
-        AttBeamrend *att = vrv_cast(AttBeamrend *)(element);
+        AttBeamrend *att = dynamic_cast<AttBeamrend *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->BeamrendFormToStr(att->GetForm())));
@@ -2265,56 +2265,56 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_BEAMSECONDARY)) {
-        AttBeamsecondary *att = vrv_cast(AttBeamsecondary *)(element);
+        AttBeamsecondary *att = dynamic_cast<AttBeamsecondary *>(element);
         assert(att);
         if (att->HasBreaksec()) {
             attributes->push_back(std::make_pair("breaksec", att->IntToStr(att->GetBreaksec())));
         }
     }
     if (element->HasAttClass(ATT_BEATRPTLOG)) {
-        AttBeatRptLog *att = vrv_cast(AttBeatRptLog *)(element);
+        AttBeatRptLog *att = dynamic_cast<AttBeatRptLog *>(element);
         assert(att);
         if (att->HasBeatDef()) {
             attributes->push_back(std::make_pair("beatDef", att->DurationToStr(att->GetBeatDef())));
         }
     }
     if (element->HasAttClass(ATT_BEATRPTVIS)) {
-        AttBeatRptVis *att = vrv_cast(AttBeatRptVis *)(element);
+        AttBeatRptVis *att = dynamic_cast<AttBeatRptVis *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->BeatrptRendToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_BENDGES)) {
-        AttBendGes *att = vrv_cast(AttBendGes *)(element);
+        AttBendGes *att = dynamic_cast<AttBendGes *>(element);
         assert(att);
         if (att->HasAmount()) {
             attributes->push_back(std::make_pair("amount", att->StrToStr(att->GetAmount())));
         }
     }
     if (element->HasAttClass(ATT_CUTOUT)) {
-        AttCutout *att = vrv_cast(AttCutout *)(element);
+        AttCutout *att = dynamic_cast<AttCutout *>(element);
         assert(att);
         if (att->HasCutout()) {
             attributes->push_back(std::make_pair("cutout", att->CutoutCutoutToStr(att->GetCutout())));
         }
     }
     if (element->HasAttClass(ATT_EXPANDABLE)) {
-        AttExpandable *att = vrv_cast(AttExpandable *)(element);
+        AttExpandable *att = dynamic_cast<AttExpandable *>(element);
         assert(att);
         if (att->HasExpand()) {
             attributes->push_back(std::make_pair("expand", att->BooleanToStr(att->GetExpand())));
         }
     }
     if (element->HasAttClass(ATT_FTREMLOG)) {
-        AttFTremLog *att = vrv_cast(AttFTremLog *)(element);
+        AttFTremLog *att = dynamic_cast<AttFTremLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->FTremLogFormToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_FERMATAVIS)) {
-        AttFermataVis *att = vrv_cast(AttFermataVis *)(element);
+        AttFermataVis *att = dynamic_cast<AttFermataVis *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->FermataVisFormToStr(att->GetForm())));
@@ -2324,7 +2324,7 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_GRACED)) {
-        AttGraced *att = vrv_cast(AttGraced *)(element);
+        AttGraced *att = dynamic_cast<AttGraced *>(element);
         assert(att);
         if (att->HasGrace()) {
             attributes->push_back(std::make_pair("grace", att->GraceToStr(att->GetGrace())));
@@ -2334,7 +2334,7 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_HAIRPINLOG)) {
-        AttHairpinLog *att = vrv_cast(AttHairpinLog *)(element);
+        AttHairpinLog *att = dynamic_cast<AttHairpinLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->HairpinLogFormToStr(att->GetForm())));
@@ -2344,14 +2344,14 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_HAIRPINVIS)) {
-        AttHairpinVis *att = vrv_cast(AttHairpinVis *)(element);
+        AttHairpinVis *att = dynamic_cast<AttHairpinVis *>(element);
         assert(att);
         if (att->HasOpening()) {
             attributes->push_back(std::make_pair("opening", att->StrToStr(att->GetOpening())));
         }
     }
     if (element->HasAttClass(ATT_HARPPEDALLOG)) {
-        AttHarpPedalLog *att = vrv_cast(AttHarpPedalLog *)(element);
+        AttHarpPedalLog *att = dynamic_cast<AttHarpPedalLog *>(element);
         assert(att);
         if (att->HasC()) {
             attributes->push_back(std::make_pair("c", att->HarpPedalLogCToStr(att->GetC())));
@@ -2376,35 +2376,35 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_LVPRESENT)) {
-        AttLvpresent *att = vrv_cast(AttLvpresent *)(element);
+        AttLvpresent *att = dynamic_cast<AttLvpresent *>(element);
         assert(att);
         if (att->HasLv()) {
             attributes->push_back(std::make_pair("lv", att->BooleanToStr(att->GetLv())));
         }
     }
     if (element->HasAttClass(ATT_MULTIRESTVIS)) {
-        AttMultiRestVis *att = vrv_cast(AttMultiRestVis *)(element);
+        AttMultiRestVis *att = dynamic_cast<AttMultiRestVis *>(element);
         assert(att);
         if (att->HasBlock()) {
             attributes->push_back(std::make_pair("block", att->BooleanToStr(att->GetBlock())));
         }
     }
     if (element->HasAttClass(ATT_NOTEGESCMN)) {
-        AttNoteGesCmn *att = vrv_cast(AttNoteGesCmn *)(element);
+        AttNoteGesCmn *att = dynamic_cast<AttNoteGesCmn *>(element);
         assert(att);
         if (att->HasGliss()) {
             attributes->push_back(std::make_pair("gliss", att->GlissandoToStr(att->GetGliss())));
         }
     }
     if (element->HasAttClass(ATT_NUMBERED)) {
-        AttNumbered *att = vrv_cast(AttNumbered *)(element);
+        AttNumbered *att = dynamic_cast<AttNumbered *>(element);
         assert(att);
         if (att->HasNum()) {
             attributes->push_back(std::make_pair("num", att->IntToStr(att->GetNum())));
         }
     }
     if (element->HasAttClass(ATT_NUMBERPLACEMENT)) {
-        AttNumberplacement *att = vrv_cast(AttNumberplacement *)(element);
+        AttNumberplacement *att = dynamic_cast<AttNumberplacement *>(element);
         assert(att);
         if (att->HasNumPlace()) {
             attributes->push_back(std::make_pair("num.place", att->PlaceToStr(att->GetNumPlace())));
@@ -2414,77 +2414,77 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_OCTAVELOG)) {
-        AttOctaveLog *att = vrv_cast(AttOctaveLog *)(element);
+        AttOctaveLog *att = dynamic_cast<AttOctaveLog *>(element);
         assert(att);
         if (att->HasColl()) {
             attributes->push_back(std::make_pair("coll", att->OctaveLogCollToStr(att->GetColl())));
         }
     }
     if (element->HasAttClass(ATT_PEDALLOG)) {
-        AttPedalLog *att = vrv_cast(AttPedalLog *)(element);
+        AttPedalLog *att = dynamic_cast<AttPedalLog *>(element);
         assert(att);
         if (att->HasDir()) {
             attributes->push_back(std::make_pair("dir", att->PedalLogDirToStr(att->GetDir())));
         }
     }
     if (element->HasAttClass(ATT_PEDALVIS)) {
-        AttPedalVis *att = vrv_cast(AttPedalVis *)(element);
+        AttPedalVis *att = dynamic_cast<AttPedalVis *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->PedalVisFormToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_PIANOPEDALS)) {
-        AttPianopedals *att = vrv_cast(AttPianopedals *)(element);
+        AttPianopedals *att = dynamic_cast<AttPianopedals *>(element);
         assert(att);
         if (att->HasPedalStyle()) {
             attributes->push_back(std::make_pair("pedal.style", att->PianopedalsPedalstyleToStr(att->GetPedalStyle())));
         }
     }
     if (element->HasAttClass(ATT_REHEARSAL)) {
-        AttRehearsal *att = vrv_cast(AttRehearsal *)(element);
+        AttRehearsal *att = dynamic_cast<AttRehearsal *>(element);
         assert(att);
         if (att->HasRehEnclose()) {
             attributes->push_back(std::make_pair("reh.enclose", att->RehearsalRehencloseToStr(att->GetRehEnclose())));
         }
     }
     if (element->HasAttClass(ATT_SCOREDEFVISCMN)) {
-        AttScoreDefVisCmn *att = vrv_cast(AttScoreDefVisCmn *)(element);
+        AttScoreDefVisCmn *att = dynamic_cast<AttScoreDefVisCmn *>(element);
         assert(att);
         if (att->HasGridShow()) {
             attributes->push_back(std::make_pair("grid.show", att->BooleanToStr(att->GetGridShow())));
         }
     }
     if (element->HasAttClass(ATT_SLURREND)) {
-        AttSlurrend *att = vrv_cast(AttSlurrend *)(element);
+        AttSlurrend *att = dynamic_cast<AttSlurrend *>(element);
         assert(att);
         if (att->HasSlurRend()) {
             attributes->push_back(std::make_pair("slur.rend", att->CurverenditionToStr(att->GetSlurRend())));
         }
     }
     if (element->HasAttClass(ATT_STEMSCMN)) {
-        AttStemsCmn *att = vrv_cast(AttStemsCmn *)(element);
+        AttStemsCmn *att = dynamic_cast<AttStemsCmn *>(element);
         assert(att);
         if (att->HasStemWith()) {
             attributes->push_back(std::make_pair("stem.with", att->OtherstaffToStr(att->GetStemWith())));
         }
     }
     if (element->HasAttClass(ATT_TIEREND)) {
-        AttTierend *att = vrv_cast(AttTierend *)(element);
+        AttTierend *att = dynamic_cast<AttTierend *>(element);
         assert(att);
         if (att->HasTieRend()) {
             attributes->push_back(std::make_pair("tie.rend", att->CurverenditionToStr(att->GetTieRend())));
         }
     }
     if (element->HasAttClass(ATT_TREMMEASURED)) {
-        AttTremmeasured *att = vrv_cast(AttTremmeasured *)(element);
+        AttTremmeasured *att = dynamic_cast<AttTremmeasured *>(element);
         assert(att);
         if (att->HasMeasperf()) {
             attributes->push_back(std::make_pair("measperf", att->DurationToStr(att->GetMeasperf())));
         }
     }
     if (element->HasAttClass(ATT_TUPLETVIS)) {
-        AttTupletVis *att = vrv_cast(AttTupletVis *)(element);
+        AttTupletVis *att = dynamic_cast<AttTupletVis *>(element);
         assert(att);
         if (att->HasBracketPlace()) {
             attributes->push_back(std::make_pair("bracket.place", att->PlaceToStr(att->GetBracketPlace())));

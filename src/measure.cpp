@@ -77,7 +77,7 @@ void Measure::AddFloatingElement(FloatingElement *element)
     m_children.push_back(element);
 
     if (element->Is() == STAFF) {
-        Staff *staff = vrv_cast(Staff *)(element);
+        Staff *staff = dynamic_cast<Staff *>(element);
         assert(staff);
         if (staff->GetN() < 1) {
             // This is not 100% safe if we have a <app> and <rdg> with more than
@@ -306,7 +306,7 @@ int Measure::CastOffSystems(ArrayPtrVoid *params)
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    Measure *measure = vrv_cast(Measure *)(contentSystem->Relinquish(this->GetIdx()));
+    Measure *measure = dynamic_cast<Measure *>(contentSystem->Relinquish(this->GetIdx()));
     assert(measure);
     (*currentSystem)->AddMeasure(measure);
 
@@ -369,7 +369,7 @@ int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
     while (iter != elements->end()) {
         TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
         assert(interface);
-        Measure *endParent = vrv_cast(Measure *)(interface->GetEnd()->GetFirstParent(MEASURE));
+        Measure *endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstParent(MEASURE));
         assert(endParent);
         // We have reached the end of the spanning - remove it from the list of running elements
         if (endParent == this) {

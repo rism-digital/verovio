@@ -136,7 +136,7 @@ bool AttStaffDefGesTablature::HasTabStrings()
 bool Att::SetTablature(Object *element, std::string attrType, std::string attrValue)
 {
     if (element->HasAttClass(ATT_NOTEGESTABLATURE)) {
-        AttNoteGesTablature *att = vrv_cast(AttNoteGesTablature *)(element);
+        AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature *>(element);
         assert(att);
         if (attrType == "tab.fret") {
             att->SetTabFret(att->StrToFretnumber(attrValue));
@@ -148,7 +148,7 @@ bool Att::SetTablature(Object *element, std::string attrType, std::string attrVa
         }
     }
     if (element->HasAttClass(ATT_STAFFDEFGESTABLATURE)) {
-        AttStaffDefGesTablature *att = vrv_cast(AttStaffDefGesTablature *)(element);
+        AttStaffDefGesTablature *att = dynamic_cast<AttStaffDefGesTablature *>(element);
         assert(att);
         if (attrType == "tab.strings") {
             att->SetTabStrings(att->StrToStr(attrValue));
@@ -162,7 +162,7 @@ bool Att::SetTablature(Object *element, std::string attrType, std::string attrVa
 void Att::GetTablature(Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_NOTEGESTABLATURE)) {
-        AttNoteGesTablature *att = vrv_cast(AttNoteGesTablature *)(element);
+        AttNoteGesTablature *att = dynamic_cast<AttNoteGesTablature *>(element);
         assert(att);
         if (att->HasTabFret()) {
             attributes->push_back(std::make_pair("tab.fret", att->FretnumberToStr(att->GetTabFret())));
@@ -172,7 +172,7 @@ void Att::GetTablature(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_STAFFDEFGESTABLATURE)) {
-        AttStaffDefGesTablature *att = vrv_cast(AttStaffDefGesTablature *)(element);
+        AttStaffDefGesTablature *att = dynamic_cast<AttStaffDefGesTablature *>(element);
         assert(att);
         if (att->HasTabStrings()) {
             attributes->push_back(std::make_pair("tab.strings", att->StrToStr(att->GetTabStrings())));

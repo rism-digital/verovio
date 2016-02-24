@@ -89,7 +89,7 @@ void Page::LayOut(bool force)
 
 void Page::LayOutHorizontally()
 {
-    Doc *doc = vrv_cast(Doc *)(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(m_parent);
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -209,7 +209,7 @@ void Page::LayOutHorizontally()
 
 void Page::LayOutVertically()
 {
-    Doc *doc = vrv_cast(Doc *)(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(m_parent);
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -290,7 +290,7 @@ void Page::LayOutVertically()
 
 void Page::JustifyHorizontally()
 {
-    Doc *doc = vrv_cast(Doc *)(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(m_parent);
     assert(doc);
 
     if (!doc->GetJustificationX()) {
@@ -321,33 +321,29 @@ void Page::JustifyHorizontally()
 
 int Page::GetContentHeight()
 {
-    Doc *doc = vrv_cast(Doc *)(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(m_parent);
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    System *last = vrv_cast(System *)(m_children.back());
-    if (!last) {
-        return 0;
-    }
+    System *last = dynamic_cast<System *>(m_children.back());
+    assert(last);
     return doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->m_drawingYRel + last->GetHeight();
 }
 
 int Page::GetContentWidth()
 {
-    Doc *doc = vrv_cast(Doc *)(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(m_parent);
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    System *first = vrv_cast(System *)(m_children.front());
-    if (!first) {
-        return 0;
-    }
+    System *first = dynamic_cast<System *>(m_children.front());
+    assert(first);
 
     // For avoiding unused variable warning in non debug mode
     doc = NULL;

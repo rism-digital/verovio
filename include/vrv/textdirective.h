@@ -37,7 +37,7 @@ public:
     virtual ClassId Is() { return ANCHORED_TEXT; };
     ///@}
 
-    virtual TextDirInterface *GetTextDirInterface() { return vrv_cast2(TextDirInterface *)(this); }
+    virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
 
     /**
      * Add an element (text, rend. etc.) to a tempo.
@@ -73,8 +73,8 @@ public:
     virtual ClassId Is() { return TEMPO; };
     ///@}
 
-    virtual TextDirInterface *GetTextDirInterface() { return vrv_cast2(TextDirInterface *)(this); }
-    virtual TimePointInterface *GetTimePointInterface() { return vrv_cast2(TimePointInterface *)(this); }
+    virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
+    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
 
     /**
      * Add an element (text, rend. etc.) to a tempo.

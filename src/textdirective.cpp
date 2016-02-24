@@ -42,7 +42,7 @@ void AnchoredText::Reset()
 
 void AnchoredText::AddTextElement(TextElement *element)
 {
-    assert(vrv_cast(TextElement *)(element) || vrv_cast(EditorialElement *)(element));
+    // assert(dynamic_cast<TextElement *>(element) || dynamic_cast<EditorialElement *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();
@@ -73,7 +73,7 @@ void Tempo::Reset()
 
 void Tempo::AddTextElement(TextElement *element)
 {
-    assert(vrv_cast(TextElement *)(element) || vrv_cast(EditorialElement *)(element));
+    // assert(dynamic_cast<TextElement *>(element) || dynamic_cast<EditorialElement *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();

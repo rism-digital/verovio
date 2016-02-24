@@ -70,18 +70,25 @@ LayerElement *Layer::GetPrevious(LayerElement *element)
     this->ResetList(this);
     if (!element || this->GetList(this)->empty()) return NULL;
 
-    return vrv_cast(LayerElement *)(GetListPrevious(element));
+    return dynamic_cast<LayerElement *>(GetListPrevious(element));
 }
 
 LayerElement *Layer::GetAtPos(int x)
 {
-    LayerElement *element = vrv_cast(LayerElement *)(this->GetFirst());
-    if (!element || element->GetDrawingX() > x) return NULL;
+    Object *first = this->GetFirst();
+    if (!first || !first->IsLayerElement()) return NULL;
 
-    LayerElement *next = NULL;
-    while ((next = vrv_cast(LayerElement *)(this->GetNext()))) {
-        if (next->GetDrawingX() > x) return element;
-        element = next;
+    LayerElement *element = dynamic_cast<LayerElement *>(first);
+    assert(element);
+    if (element->GetDrawingX() > x) return NULL;
+
+    Object *next;
+    while ((next = this->GetNext())) {
+        if (!next->IsLayerElement()) continue;
+        LayerElement *nextLayerElement = dynamic_cast<LayerElement *>(next);
+        assert(nextLayerElement);
+        if (nextLayerElement->GetDrawingX() > x) return element;
+        element = nextLayerElement;
     }
     return element;
 }
@@ -146,7 +153,7 @@ Clef *Layer::GetClef(LayerElement *test)
     }
 
     if (testObject && testObject->Is() == CLEF) {
-        Clef *clef = vrv_cast(Clef *)(testObject);
+        Clef *clef = dynamic_cast<Clef *>(testObject);
         assert(clef);
         return clef;
     }
@@ -213,8 +220,9 @@ int Layer::AlignHorizontallyEnd(ArrayPtrVoid *params)
 
     int i;
     for (i = 0; i < (int)(*measureAligner)->m_children.size(); i++) {
-        Alignment *alignment = vrv_cast(Alignment *)((*measureAligner)->m_children.at(i));
-        if (alignment && alignment->HasGraceAligner()) {
+        Alignment *alignment = dynamic_cast<Alignment *>((*measureAligner)->m_children.at(i));
+        assert(alignment);
+        if (alignment->HasGraceAligner()) {
             alignment->GetGraceAligner()->AlignStack();
         }
     }
@@ -230,7 +238,7 @@ int Layer::PrepareProcessingLists(ArrayPtrVoid *params)
     // Alternate solution with StaffN_LayerN_VerseN_t
     // StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 
-    Staff *staff = vrv_cast(Staff *)(this->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
     tree->child[staff->GetN()].child[this->GetN()];
 

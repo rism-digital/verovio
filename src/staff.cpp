@@ -130,12 +130,14 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
     std::vector<DocObject *>::iterator it;
     it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(VERSE));
     if (it != m_timeSpanningElements.end()) {
-        Verse *v = vrv_cast(Verse *)(*it);
+        Verse *v = dynamic_cast<Verse *>(*it);
+        assert(v);
         alignment->SetVerseCount(v->GetN());
     }
     it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(HAIRPIN));
     if (it != m_timeSpanningElements.end()) {
-        Hairpin *h = vrv_cast(Hairpin *)(*it);
+        Hairpin *h = dynamic_cast<Hairpin *>(*it);
+        assert(h);
         if (h->GetPlace() == STAFFREL_above) alignment->SetDynamAbove();
         if (h->GetPlace() == STAFFREL_below) alignment->SetDynamBelow();
     }
@@ -155,7 +157,7 @@ int Staff::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
     while (iter != elements->end()) {
         TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
         assert(interface);
-        Measure *currentMeasure = vrv_cast(Measure *)(this->GetFirstParent(MEASURE));
+        Measure *currentMeasure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
         assert(currentMeasure);
         // We need to make sure we are in the next measure (and not just a staff below because of some cross staff
         // notation

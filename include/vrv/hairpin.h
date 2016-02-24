@@ -32,8 +32,8 @@ public:
     virtual ClassId Is() { return HAIRPIN; };
     ///@}
 
-    virtual TimePointInterface *GetTimePointInterface() { return vrv_cast2(TimePointInterface *)(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return vrv_cast2(TimeSpanningInterface *)(this); }
+    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
 
     //----------//
     // Functors //
