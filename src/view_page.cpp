@@ -279,8 +279,9 @@ void View::DrawStaffGrp(
     int barLineWidth = m_doc->GetDrawingBarLineWidth(100);
 
     // adjust the top and bottom according to staffline width
-    y_top += m_doc->GetDrawingStaffLineWidth(100) / 2;
-    y_bottom -= m_doc->GetDrawingStaffLineWidth(100) / 2;
+    x += barLineWidth / 2;
+    // y_top += m_doc->GetDrawingStaffLineWidth(100) / 1;
+    // y_bottom -= m_doc->GetDrawingStaffLineWidth(100) / 4;
 
     if (staffGrp->HasLabel()) {
         std::string abbrLabel;
@@ -637,8 +638,8 @@ void View::DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barL
     assert(barLine);
 
     // adjust the top and bottom
-    y_top += m_doc->GetDrawingStaffLineWidth(100) / 2;
-    y_bottom -= m_doc->GetDrawingStaffLineWidth(100) / 2;
+    // y_top += m_doc->GetDrawingStaffLineWidth(100) / 2;
+    // y_bottom -= m_doc->GetDrawingStaffLineWidth(100) / 2;
 
     int x = barLine->GetDrawingX();
     int barLineWidth = m_doc->GetDrawingBarLineWidth(100);
