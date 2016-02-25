@@ -8,8 +8,8 @@
 #ifndef __VRV_DC_H__
 #define __VRV_DC_H__
 
-#include <string>
 #include <stack>
+#include <string>
 
 //----------------------------------------------------------------------------
 
@@ -45,7 +45,8 @@ public:
     DeviceContext()
     {
         m_drawingBoundingBoxes = false;
-        m_isDeactivated = false;
+        m_isDeactivatedX = false;
+        m_isDeactivatedY = false;
     };
     virtual ~DeviceContext(){};
     ///@}
@@ -131,9 +132,12 @@ public:
      * One example is the connectors in lyrics.
      * This is a non-virtual method and hence cannot be overridden. In only changes a flag. The effect of the flag
      * has to be defined in the child class. It should not be called twice in a row.
+     * Is it also possible to deactivate only X or Y axis. Reactivate will reactivate both axis.
      */
     ///@{
     void DeactivateGraphic();
+    void DeactivateGraphicX();
+    void DeactivateGraphicY();
     void ReactivateGraphic();
     ///@}
 
@@ -194,7 +198,8 @@ protected:
     std::stack<FontInfo *> m_fontStack;
 
     /** flag for indicating if the graphic is deactivated */
-    bool m_isDeactivated;
+    bool m_isDeactivatedX;
+    bool m_isDeactivatedY;
 };
 
 } // namespace vrv
