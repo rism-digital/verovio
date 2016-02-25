@@ -256,8 +256,10 @@ void Page::LayOutVertically()
     // Set the Y position of each StaffAlignment
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
     params.clear();
-    int previousStaffHeight = 0; // 0 for the first staff, reset for each system (see System::SetAlignmentYPos)
+    int previousStaffHeight = 0;
+    int extraStaffHeight = 0;
     params.push_back(&previousStaffHeight);
+    params.push_back(&extraStaffHeight);
     params.push_back(doc);
     Functor setAlignmentY(&Object::SetAligmentYPos);
     // Special case: because we redirect the functor, pass it as parameter to itself (!)
@@ -277,7 +279,7 @@ void Page::LayOutVertically()
     // Adjust system Y position
     params.clear();
     shift = doc->m_drawingPageHeight - doc->m_drawingPageTopMar;
-    int systemMargin = doc->GetSpacingSystem() * doc->GetDrawingDoubleUnit(100);
+    int systemMargin = (doc->GetSpacingSystem()) * doc->GetDrawingDoubleUnit(100);
     params.push_back(&shift);
     params.push_back(&systemMargin);
     Functor alignSystems(&Object::AlignSystems);

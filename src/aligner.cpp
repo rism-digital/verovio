@@ -16,6 +16,7 @@
 
 #include "doc.h"
 #include "note.h"
+#include "staff.h"
 #include "style.h"
 #include "timestamp.h"
 #include "vrv.h"
@@ -39,10 +40,10 @@ void SystemAligner::Reset()
 {
     Object::Reset();
     m_bottomAlignment = NULL;
-    m_bottomAlignment = GetStaffAlignment(0, 0);
+    m_bottomAlignment = GetStaffAlignment(0, NULL);
 }
 
-StaffAlignment *SystemAligner::GetStaffAlignment(int idx, int staffN)
+StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff)
 {
     // The last one is always the bottomAlignment (unless if not created)
     if (m_bottomAlignment) {
@@ -60,7 +61,8 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, int staffN)
 
     // This is the first time we are looking for it (e.g., first staff)
     // We create the StaffAlignment
-    StaffAlignment *alignment = new StaffAlignment(staffN);
+    StaffAlignment *alignment = new StaffAlignment();
+    alignment->SetStaff(staff);
     alignment->SetParent(this);
     m_children.push_back(alignment);
 
@@ -79,7 +81,7 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN)
         alignment = dynamic_cast<StaffAlignment *>(m_children.at(i));
         assert(alignment);
 
-        if (alignment->GetStaffN() == staffN) return alignment;
+        if ((alignment->GetStaff()) && (alignment->GetStaff()->GetN() == staffN)) return alignment;
     }
     LogDebug("Staff alignment for staff %d not found", staffN);
     return NULL;
@@ -89,13 +91,13 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN)
 // StaffAlignment
 //----------------------------------------------------------------------------
 
-StaffAlignment::StaffAlignment(int staffN) : Object()
+StaffAlignment::StaffAlignment() : Object()
 {
     m_yRel = 0;
     m_yShift = 0;
     m_maxHeight = 0;
     m_verseCount = 0;
-    m_staffN = staffN;
+    m_staff = NULL;
     m_dynamAbove = false;
     m_dynamBelow = false;
 }
@@ -364,34 +366,57 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
 {
     // param 0: the previous staff height
-    // param 1: the doc (unused)
-    // param 2: the functor to be redirected to SystemAligner (unused)
+    // param 1: the extra staff height
+    // param 2: the doc
+    // param 3: the functor to be redirected to SystemAligner (unused)
     int *previousStaffHeight = static_cast<int *>((*params).at(0));
-    Doc *doc = static_cast<Doc *>((*params).at(1));
+    int *extraStaffHeight = static_cast<int *>((*params).at(1));
+    Doc *doc = static_cast<Doc *>((*params).at(2));
 
-    int staffMargin = doc->GetSpacingStaff()
-        * doc->GetDrawingDoubleUnit(100); // the minimal space we want to have between each staff
-    int interlineSize
-        = doc->GetDrawingDoubleUnit(100); // the interline sizes to be used for calculating the (previous) staff height
+    int staffSize = m_staff ? m_staff->m_drawingStaffSize : 100;
+    int lines = m_staff ? m_staff->m_drawingLines : 5;
 
-    int min_shift = staffMargin + (*previousStaffHeight);
+    // m_yShift -= (*previousStaffHeight);
 
-    if (m_yShift > -min_shift) {
-        m_yShift = -min_shift;
+    // When starting a new system, previousStaffHeight value is VRV_UNSET so we know we don't want to add extra spacing
+    int minShift = 0;
+    if ((*previousStaffHeight) == VRV_UNSET)
+        (*previousStaffHeight) = 0;
+    else
+        minShift = doc->GetSpacingStaff() * doc->GetDrawingUnit(100) + (*previousStaffHeight);
+
+    // We need to insert extra elements (lyrics, dynam)
+    if ((*extraStaffHeight) > 0) {
+        int missingExtraHeight = (*extraStaffHeight);
+        // The extra space we have with the minimal spacing
+        int existingExtraHeight = minShift - (-m_yShift);
+        // If we have existing extra height, we don't need to add all, only what is missing
+        if (existingExtraHeight > 0) {
+            missingExtraHeight -= existingExtraHeight;
+        }
+        // Add what is actually missing (if anything is missing)
+        if (missingExtraHeight > 0) {
+            m_yShift -= missingExtraHeight;
+        }
     }
 
-    // for now always four interlines, eventually should be taken from the staffDef, so should the staff size
-    (*previousStaffHeight) = 4 * interlineSize;
+    // Now ajust the shift if we have less than the minimum required
+    if (minShift > -m_yShift) {
+        m_yShift = -minShift;
+    }
 
+    (*previousStaffHeight) = (lines - 1) * doc->GetDrawingDoubleUnit(staffSize);
+
+    (*extraStaffHeight) = 0;
+    // Ajust the max height looking at the lyrics and / or dynam below
     if (this->GetVerseCount() > 0) {
         // We need + 1 lyric line space
-        (*previousStaffHeight)
-            += (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (interlineSize / 2) / PARAM_DENOMINATOR;
+        (*extraStaffHeight) += (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE
+            * (doc->GetDrawingUnit(staffSize)) / PARAM_DENOMINATOR;
     }
-    // take into account the number of lyrics
     if (this->GetDynamBelow()) {
         // We need + 1 lyric line space
-        //(*previousStaffHeight) += DEFAULT_HAIRPIN_SIZE * (*interlineSize);
+        (*extraStaffHeight) += doc->GetDrawingHairpinSize(staffSize);
     }
 
     return FUNCTOR_CONTINUE;

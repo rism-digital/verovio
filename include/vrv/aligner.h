@@ -80,8 +80,9 @@ public:
      * Get the StaffAlignment at index idx.
      * Creates the StaffAlignment if not there yet.
      * Checks the they are created incrementally (without gap).
+     * If a staff is passed, it will be used for initializing m_staffN and m_staffSize of the aligner.
      */
-    StaffAlignment *GetStaffAlignment(int idx, int staffN);
+    StaffAlignment *GetStaffAlignment(int idx, Staff *staff = NULL);
 
     /**
      * Get the StaffAlignment for the staffN.
@@ -109,10 +110,15 @@ private:
  */
 class StaffAlignment : public Object {
 public:
-    // constructors and destructors
-    StaffAlignment(int staffN);
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    StaffAlignment();
     virtual ~StaffAlignment();
     virtual ClassId Is() { return STAFF_ALIGNMENT; }
+    ///@}
 
     void SetYRel(int yRel) { m_yRel = yRel; };
     int GetYRel() { return m_yRel; };
@@ -143,9 +149,13 @@ public:
     ///@}
 
     /**
-     * Get the staffN of the alignment
+     * Setter and getter of the staff from which the alignment is created alignment.
+     * Used for accessing the staff @n, the size, etc.
      */
-    int GetStaffN() { return m_staffN; };
+    ///@{
+    Staff *GetStaff() { return m_staff; };
+    void SetStaff(Staff *staff) { m_staff = staff; };
+    ///@}
 
     /**
      * Set the position of the StaffAlignment.
@@ -165,10 +175,10 @@ public:
     //
 private:
     /**
-     * Stores the staffN (@n) to which the aligner correspond.
+     * Stores a pointer to the staff from which the aligner was created.
      * This is necessary since we don't always have all the staves.
      */
-    int m_staffN;
+    Staff *m_staff;
     /**
      * Stores the position relative to the system.
      */

@@ -124,7 +124,7 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
     *staffN = this->GetN();
 
     // this gets (or creates) the measureAligner for the measure
-    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffIdx, this->GetN());
+    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffIdx, this);
 
     assert(alignment);
 

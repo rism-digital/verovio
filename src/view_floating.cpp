@@ -298,6 +298,9 @@ void View::DrawHairpin(
 
     /************** draw it **************/
 
+    y1 -= m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+    y2 -= m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
