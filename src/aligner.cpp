@@ -39,10 +39,10 @@ void SystemAligner::Reset()
 {
     Object::Reset();
     m_bottomAlignment = NULL;
-    m_bottomAlignment = GetStaffAlignment(0);
+    m_bottomAlignment = GetStaffAlignment(0, 0);
 }
 
-StaffAlignment *SystemAligner::GetStaffAlignment(int idx)
+StaffAlignment *SystemAligner::GetStaffAlignment(int idx, int staffN)
 {
     // The last one is always the bottomAlignment (unless if not created)
     if (m_bottomAlignment) {
@@ -60,7 +60,7 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx)
 
     // This is the first time we are looking for it (e.g., first staff)
     // We create the StaffAlignment
-    StaffAlignment *alignment = new StaffAlignment();
+    StaffAlignment *alignment = new StaffAlignment(staffN);
     alignment->SetParent(this);
     m_children.push_back(alignment);
 
@@ -71,16 +71,31 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx)
     return alignment;
 }
 
+StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN)
+{
+    StaffAlignment *alignment = NULL;
+    int i;
+    for (i = 0; i < this->GetStaffAlignmentCount(); i++) {
+        alignment = dynamic_cast<StaffAlignment *>(m_children.at(i));
+        assert(alignment);
+
+        if (alignment->GetStaffN() == staffN) return alignment;
+    }
+    LogDebug("Staff alignment for staff %d not found", staffN);
+    return NULL;
+}
+
 //----------------------------------------------------------------------------
 // StaffAlignment
 //----------------------------------------------------------------------------
 
-StaffAlignment::StaffAlignment() : Object()
+StaffAlignment::StaffAlignment(int staffN) : Object()
 {
     m_yRel = 0;
     m_yShift = 0;
     m_maxHeight = 0;
     m_verseCount = 0;
+    m_staffN = staffN;
     m_dynamAbove = false;
     m_dynamBelow = false;
 }
@@ -356,13 +371,6 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     int *staffMargin = static_cast<int *>((*params).at(1));
     int *interlineSize = static_cast<int *>((*params).at(2));
 
-    // take into account the number of lyrics
-    if (this->GetVerseCount() > 0) {
-        // We need + 1 lyric line space
-        m_yShift
-            -= (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (*interlineSize / 2) / PARAM_DENOMINATOR;
-    }
-
     int min_shift = (*staffMargin) + (*previousStaffHeight);
 
     if (m_yShift > -min_shift) {
@@ -371,6 +379,17 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
 
     // for now always four interlines, eventually should be taken from the staffDef, so should the staff size
     (*previousStaffHeight) = 4 * (*interlineSize);
+
+    if (this->GetVerseCount() > 0) {
+        // We need + 1 lyric line space
+        (*previousStaffHeight)
+            += (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (*interlineSize / 2) / PARAM_DENOMINATOR;
+    }
+    // take into account the number of lyrics
+    if (this->GetDynamBelow()) {
+        // We need + 1 lyric line space
+        //(*previousStaffHeight) += DEFAULT_HAIRPIN_SIZE * (*interlineSize);
+    }
 
     return FUNCTOR_CONTINUE;
 }

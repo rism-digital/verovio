@@ -112,15 +112,19 @@ int Staff::GetYRel()
 int Staff::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
-    // param 1: the staffNb
+    // param 1: the staffIdx
+    // param 2: the staffN
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
-    int *staffNb = static_cast<int *>((*params).at(1));
+    int *staffIdx = static_cast<int *>((*params).at(1));
+    int *staffN = static_cast<int *>((*params).at(2));
 
     // we need to call it because we are overriding Object::AlignVertically
     this->ResetVerticalAlignment();
 
+    *staffN = this->GetN();
+
     // this gets (or creates) the measureAligner for the measure
-    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffNb);
+    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffIdx, this->GetN());
 
     assert(alignment);
 
@@ -143,7 +147,7 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
     }
 
     // for next staff
-    (*staffNb)++;
+    (*staffIdx)++;
 
     return FUNCTOR_CONTINUE;
 }

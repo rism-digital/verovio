@@ -74,7 +74,7 @@ namespace vrv {
 #define MIN_SPACING_SYSTEM 0
 #define MAX_SPACING_SYSTEM 12
 
-#define DEFAULT_HAIRPIN_SIZE 4.0
+#define DEFAULT_HAIRPIN_SIZE 3.0
 #define MIN_HAIRPIN_SIZE 2.0
 #define MAX_HAIRPIN_SIZE 8.0
 

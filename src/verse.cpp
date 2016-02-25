@@ -57,14 +57,15 @@ void Verse::AddLayerElement(vrv::LayerElement *element)
 int Verse::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
-    // param 1: the staffNb
+    // param 1: the staffIdx (unused)
+    // param 2: the staffN
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
-    int *staffNb = static_cast<int *>((*params).at(1));
+    int *staffN = static_cast<int *>((*params).at(2));
 
     // this gets (or creates) the measureAligner for the measure
-    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffNb);
+    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignmentForStaffN(*staffN);
 
-    assert(alignment);
+    if (!alignment) return FUNCTOR_CONTINUE;
 
     // Add the number count
     alignment->SetVerseCount(this->GetN());

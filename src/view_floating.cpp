@@ -288,12 +288,12 @@ void View::DrawHairpin(
     /************** adjusting y position **************/
 
     if (place == STAFFREL_above) {
-        y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        // y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        // y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     else {
-        y1 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-        y2 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        // y1 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        // y2 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
     /************** draw it **************/
@@ -1286,7 +1286,8 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     int x = measure->GetDrawingX();
     // First try to see if we have a meter sig attribute for this measure
     AttMeasureAlignerType alignmentComparison(ALIGNMENT_METERSIG_ATTR);
-    Alignment *pos = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+    Alignment *pos
+        = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
     if (!pos) {
         // if not, try to get the first beat element
         alignmentComparison.SetType(ALIGNMENT_DEFAULT);

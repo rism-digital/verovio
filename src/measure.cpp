@@ -189,11 +189,12 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
 int Measure::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner (unused)
-    // param 1: the staffNb
-    int *staffNb = static_cast<int *>((*params).at(1));
+    // param 1: the staffIdx
+    // param 2: the staffN (unused)
+    int *staffIdx = static_cast<int *>((*params).at(1));
 
     // we also need to reset the staffNb
-    (*staffNb) = 0;
+    (*staffIdx) = 0;
 
     return FUNCTOR_CONTINUE;
 }

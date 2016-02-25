@@ -226,9 +226,11 @@ void Page::LayOutVertically()
     // After this:
     // - each Staff object will then have its StaffAlignment pointer initialized
     SystemAligner *systemAlignerPtr = NULL;
-    int staffNb = 0;
+    int staffIdx = 0;
+    int staffN = 0;
     params.push_back(&systemAlignerPtr);
-    params.push_back(&staffNb);
+    params.push_back(&staffIdx);
+    params.push_back(&staffN);
     Functor alignVertically(&Object::AlignVertically);
     this->Process(&alignVertically, &params);
 

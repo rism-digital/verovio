@@ -120,7 +120,8 @@ int System::ResetVerticalAlignment(ArrayPtrVoid *params)
 int System::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
-    // param 1: the staffNb (unused)
+    // param 1: the staffIdx (unused)
+    // param 2: the staffN (unused)
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
 
     // When calculating the alignment, the position has to be 0

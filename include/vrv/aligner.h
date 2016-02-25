@@ -81,7 +81,13 @@ public:
      * Creates the StaffAlignment if not there yet.
      * Checks the they are created incrementally (without gap).
      */
-    StaffAlignment *GetStaffAlignment(int idx);
+    StaffAlignment *GetStaffAlignment(int idx, int staffN);
+
+    /**
+     * Get the StaffAlignment for the staffN.
+     * Return NULL if not found.
+     */
+    StaffAlignment *GetStaffAlignmentForStaffN(int staffN);
 
 private:
     //
@@ -104,7 +110,7 @@ private:
 class StaffAlignment : public Object {
 public:
     // constructors and destructors
-    StaffAlignment();
+    StaffAlignment(int staffN);
     virtual ~StaffAlignment();
     virtual ClassId Is() { return STAFF_ALIGNMENT; }
 
@@ -137,6 +143,11 @@ public:
     ///@}
 
     /**
+     * Get the staffN of the alignment
+     */
+    int GetStaffN() { return m_staffN; };
+
+    /**
      * Set the position of the StaffAlignment.
      * Functor redirected from System.
      */
@@ -153,6 +164,11 @@ private:
 public:
     //
 private:
+    /**
+     * Stores the staffN (@n) to which the aligner correspond.
+     * This is necessary since we don't always have all the staves.
+     */
+    int m_staffN;
     /**
      * Stores the position relative to the system.
      */

@@ -47,18 +47,21 @@ void Hairpin::Reset()
 int Hairpin::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
-    // param 1: the staffNb
+    // param 1: the staffIdx (unused)
+    // param 2: the staffN (unused)
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
-    int *staffNb = static_cast<int *>((*params).at(1));
 
-    // this gets (or creates) the measureAligner for the measure
-    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffNb);
+    std::vector<int> staffList = this->GetStaff();
+    std::vector<int>::iterator iter;
+    for (iter = staffList.begin(); iter != staffList.end(); iter++) {
+        // this gets (or creates) the measureAligner for the measure
+        StaffAlignment *alignment = (*systemAligner)->GetStaffAlignmentForStaffN(*iter);
 
-    assert(alignment);
+        if (!alignment) continue;
 
-    // Add the number count
-    if (this->GetPlace() == STAFFREL_above) alignment->SetDynamAbove();
-    if (this->GetPlace() == STAFFREL_below) alignment->SetDynamBelow();
+        if (this->GetPlace() == STAFFREL_above) alignment->SetDynamAbove();
+        if (this->GetPlace() == STAFFREL_below) alignment->SetDynamBelow();
+    }
 
     return FUNCTOR_CONTINUE;
 }
