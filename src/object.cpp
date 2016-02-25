@@ -15,6 +15,7 @@
 
 #include "chord.h"
 #include "doc.h"
+#include "dynam.h"
 #include "editorial.h"
 #include "io.h"
 #include "keysig.h"
@@ -320,10 +321,10 @@ void Object::SetParent(Object *parent)
 
 void Object::AddEditorialElement(EditorialElement *child)
 {
-    assert(dynamic_cast<Layer *>(this) || dynamic_cast<LayerElement *>(this) || dynamic_cast<Lem *>(this)
-        || dynamic_cast<Measure *>(this) || dynamic_cast<Note *>(this) || dynamic_cast<Staff *>(this)
-        || dynamic_cast<System *>(this) || dynamic_cast<Tempo *>(this) || dynamic_cast<EditorialElement *>(this)
-        || dynamic_cast<TextElement *>(this));
+    assert(dynamic_cast<Dynam *>(this) || dynamic_cast<Layer *>(this) || dynamic_cast<LayerElement *>(this)
+        || dynamic_cast<Lem *>(this) || dynamic_cast<Measure *>(this) || dynamic_cast<Note *>(this)
+        || dynamic_cast<Staff *>(this) || dynamic_cast<System *>(this) || dynamic_cast<Tempo *>(this)
+        || dynamic_cast<EditorialElement *>(this) || dynamic_cast<TextElement *>(this));
     child->SetParent(this);
     m_children.push_back(child);
     Modify();

@@ -19,6 +19,7 @@
 #include "bboxdevicecontext.h"
 #include "devicecontext.h"
 #include "doc.h"
+#include "dynam.h"
 #include "floatingelement.h"
 #include "hairpin.h"
 #include "layer.h"
@@ -48,11 +49,16 @@ void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Meas
     assert(measure);
     assert(element);
 
-    if (element->HasInterface(INTERFACE_TIME_SPANNING)) {
+    if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DYNAM)) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
         system->AddToDrawingList(element);
+    }
+    else if (element->Is() == DYNAM) {
+        Dynam *dynam = dynamic_cast<Dynam *>(element);
+        assert(dynam);
+        DrawDynam(dc, dynam, measure, system);
     }
     else if (element->Is() == TEMPO) {
         Tempo *tempo = dynamic_cast<Tempo *>(element);
@@ -616,9 +622,9 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(slur, "spanning-slur", "");
-    dc->DeactivateGraphic();
+    // dc->DeactivateGraphic();
     DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize, angle);
-    dc->ReactivateGraphic();
+    // dc->ReactivateGraphic();
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
@@ -1270,6 +1276,52 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
     }
 }
 
+void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(dynam);
+
+    // We cannot draw a return that has no start position
+    if (!dynam->GetStart()) return;
+
+    dc->StartGraphic(dynam, "", dynam->GetUuid());
+
+    // Use Romam bold for tempo
+    FontInfo dynamTxt;
+    dynamTxt.SetFaceName("Times");
+    if (dynam->IsSymbolOnly()) dynamTxt.SetWeight(FONTWEIGHT_bold);
+    dynamTxt.SetStyle(FONTSTYLE_italic);
+    dynamTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
+
+    // If we have not timestamp
+    int x = dynam->GetStart()->GetDrawingX();
+
+    bool setX = false;
+    bool setY = false;
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+
+        // Basic method that use bounding box
+        int y = GetDynamY(dynam, *staffIter);
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&dynamTxt);
+
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        DrawTextChildren(dc, dynam, x, y, setX, setY);
+        dc->EndText();
+
+        dc->ResetFont();
+        dc->ResetBrush();
+    }
+
+    dc->EndGraphic(dynam, this);
+}
+
 void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system)
 {
     assert(dc);
@@ -1330,8 +1382,19 @@ int View::GetDynamY(Dynam *dynam, Staff *staff)
     assert(dynam && staff);
 
     // Temporary basic method for positionning dynam
-    int y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    y += staff->m_contentBB_y2;
+    int y = dynam->GetStart()->GetDrawingY();
+    if (staff->GetAlignment()) {
+        if (dynam->GetPlace() == STAFFREL_above) {
+            // For now is is position according to the staff and not the staff aligner. To be changed once we introduce
+            // the dynamic aligner within the staff aligner
+            y = staff->GetDrawingY() + staff->m_contentBB_y2
+                + (1 * m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 5);
+        }
+        else {
+            y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight()
+                - (4 * m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 5);
+        }
+    }
     return y;
 }
 
@@ -1339,7 +1402,7 @@ int View::GetHairpinY(Hairpin *hairpin, Staff *staff)
 {
     assert(hairpin && staff);
 
-    // Temporary basic method for positionning tempo elements
+    // Temporary basic method for positionning hairpin elements
     int y = hairpin->GetStart()->GetDrawingY();
     if (staff->GetAlignment()) {
         if (hairpin->GetPlace() == STAFFREL_above) {

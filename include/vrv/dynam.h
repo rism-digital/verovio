@@ -20,7 +20,7 @@ class TextElement;
 // Dynam
 //----------------------------------------------------------------------------
 
-class Dynam : public FloatingElement, public TextDirInterface, public TimeSpanningInterface {
+class Dynam : public FloatingElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -43,6 +43,21 @@ public:
     * Only supported elements will be actually added to the child list.
     */
     void AddTextElement(TextElement *element);
+
+    /**
+     * Return true if the dynam text is only composed of f, p, r, z, etc. letters (e.g. sfz)
+     */
+    bool IsSymbolOnly();
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * Align the content of a staff vertically.
+     * See Object::AlignVertically
+     */
+    virtual int AlignVertically(ArrayPtrVoid *params);
 
 protected:
     //

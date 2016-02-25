@@ -297,6 +297,7 @@ protected:
         DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
     void DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff);
     void DrawTimeSpanningElement(DeviceContext *dc, DocObject *object, System *system);
+    void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
     void DrawHairpin(DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType,
         DocObject *graphic = NULL);
     void DrawSlur(

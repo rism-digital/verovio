@@ -416,7 +416,7 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     // Ajust the max height looking at the lyrics and / or dynam below
     if (this->GetVerseCount() > 0) {
         // We need + 1 lyric line space
-        (*extraStaffHeight) += (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE
+        (*extraStaffHeight) += (this->GetVerseCount() + 0.8) * TEMP_STYLE_LYIRC_LINE_SPACE
             * (doc->GetDrawingUnit(staffSize)) / PARAM_DENOMINATOR;
     }
     if (this->GetDynamBelow()) {

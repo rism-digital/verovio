@@ -2106,7 +2106,8 @@ int View::GetSylY(Syl *syl, Staff *staff)
     if (staff->GetAlignment()) {
         y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight()
             - syl->m_drawingVerse * TEMP_STYLE_LYIRC_LINE_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-                / PARAM_DENOMINATOR;
+                / PARAM_DENOMINATOR
+            + 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     return y;
 }

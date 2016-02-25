@@ -1686,7 +1686,7 @@ bool MeiInput::ReadMeiDynam(Object *parent, pugi::xml_node dynam)
     ReadTimeSpanningInterface(dynam, vrvDynam);
 
     AddFloatingElement(parent, vrvDynam);
-    return true;
+    return ReadMeiTextChildren(vrvDynam, dynam);
 }
 
 bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
@@ -2822,6 +2822,11 @@ void MeiInput::AddTextElement(Object *parent, TextElement *element)
         AnchoredText *anchoredText = dynamic_cast<AnchoredText *>(parent);
         assert(anchoredText);
         anchoredText->AddTextElement(element);
+    }
+    else if (parent->Is() == DYNAM) {
+        Dynam *dynam = dynamic_cast<Dynam *>(parent);
+        assert(dynam);
+        dynam->AddTextElement(element);
     }
     else if (parent->Is() == REND) {
         Rend *rend = dynamic_cast<Rend *>(parent);
