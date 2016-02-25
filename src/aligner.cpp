@@ -364,26 +364,29 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
 {
     // param 0: the previous staff height
-    // param 1: the staff margin
-    // param 2: the staff interline sizes (int[2])
-    // param 3: the functor to be redirected to SystemAligner (unused)
+    // param 1: the doc (unused)
+    // param 2: the functor to be redirected to SystemAligner (unused)
     int *previousStaffHeight = static_cast<int *>((*params).at(0));
-    int *staffMargin = static_cast<int *>((*params).at(1));
-    int *interlineSize = static_cast<int *>((*params).at(2));
+    Doc *doc = static_cast<Doc *>((*params).at(1));
 
-    int min_shift = (*staffMargin) + (*previousStaffHeight);
+    int staffMargin = doc->GetSpacingStaff()
+        * doc->GetDrawingDoubleUnit(100); // the minimal space we want to have between each staff
+    int interlineSize
+        = doc->GetDrawingDoubleUnit(100); // the interline sizes to be used for calculating the (previous) staff height
+
+    int min_shift = staffMargin + (*previousStaffHeight);
 
     if (m_yShift > -min_shift) {
         m_yShift = -min_shift;
     }
 
     // for now always four interlines, eventually should be taken from the staffDef, so should the staff size
-    (*previousStaffHeight) = 4 * (*interlineSize);
+    (*previousStaffHeight) = 4 * interlineSize;
 
     if (this->GetVerseCount() > 0) {
         // We need + 1 lyric line space
         (*previousStaffHeight)
-            += (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (*interlineSize / 2) / PARAM_DENOMINATOR;
+            += (this->GetVerseCount() + 1) * TEMP_STYLE_LYIRC_LINE_SPACE * (interlineSize / 2) / PARAM_DENOMINATOR;
     }
     // take into account the number of lyrics
     if (this->GetDynamBelow()) {

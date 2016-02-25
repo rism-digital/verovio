@@ -135,11 +135,10 @@ int System::AlignVertically(ArrayPtrVoid *params)
 int System::SetAligmentYPos(ArrayPtrVoid *params)
 {
     // param 0: the previous staff height
-    // param 1: the staff margin (unused)
-    // param 2: the staff interline sizes (int[2]) (unused)
+    // param 1: the doc (unused)
     // param 2: the functor to be redirected to SystemAligner
     int *previousStaffHeight = static_cast<int *>((*params).at(0));
-    Functor *setAligmnentPosY = static_cast<Functor *>((*params).at(3));
+    Functor *setAligmnentPosY = static_cast<Functor *>((*params).at(2));
 
     (*previousStaffHeight) = 0;
 

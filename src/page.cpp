@@ -257,13 +257,8 @@ void Page::LayOutVertically()
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
     params.clear();
     int previousStaffHeight = 0; // 0 for the first staff, reset for each system (see System::SetAlignmentYPos)
-    int staffMargin = doc->GetSpacingStaff()
-        * doc->GetDrawingDoubleUnit(100); // the minimal space we want to have between each staff
-    int interlineSize
-        = doc->GetDrawingDoubleUnit(100); // the interline sizes to be used for calculating the (previous) staff height
     params.push_back(&previousStaffHeight);
-    params.push_back(&staffMargin);
-    params.push_back(&interlineSize);
+    params.push_back(doc);
     Functor setAlignmentY(&Object::SetAligmentYPos);
     // Special case: because we redirect the functor, pass it as parameter to itself (!)
     params.push_back(&setAlignmentY);
