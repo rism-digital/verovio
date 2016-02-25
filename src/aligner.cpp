@@ -385,6 +385,11 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     else
         minShift = doc->GetSpacingStaff() * doc->GetDrawingUnit(100) + (*previousStaffHeight);
 
+    if (this->GetDynamAbove()) {
+        // We need + 1 lyric line space
+        (*extraStaffHeight) += doc->GetDrawingHairpinSize(staffSize);
+    }
+
     // We need to insert extra elements (lyrics, dynam)
     if ((*extraStaffHeight) > 0) {
         int missingExtraHeight = (*extraStaffHeight);

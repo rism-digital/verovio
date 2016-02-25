@@ -1343,6 +1343,8 @@ int View::GetHairpinY(Hairpin *hairpin, Staff *staff)
     int y = hairpin->GetStart()->GetDrawingY();
     if (staff->GetAlignment()) {
         if (hairpin->GetPlace() == STAFFREL_above) {
+            // For now is is position according to the staff and not the staff aligner. To be changed once we introduce
+            // the dynamic aligner within the staff aligner
             y = staff->GetDrawingY() + staff->m_contentBB_y2
                 + m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 2;
         }
