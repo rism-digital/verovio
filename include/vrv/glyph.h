@@ -54,6 +54,14 @@ public:
     /** Get the code string */
     std::string GetCodeStr() { return m_codeStr; };
 
+    /**
+     * @name Setter and getter for the horizAdvX
+     */
+    ///@{
+    int GetHorizAdvX() { return m_horizAdvX; };
+    void SetHorizAdvX(double horizAdvX) { m_horizAdvX = (int)(horizAdvX * 10.0); };
+    ///@}
+
 private:
     //
 public:
@@ -64,6 +72,8 @@ private:
     int m_y;
     int m_width;
     int m_height;
+    /** The horizontal adv x (if any) */
+    int m_horizAdvX;
     /** Units per EM for the glyph */
     int m_unitsPerEm;
     /** Path to the file */

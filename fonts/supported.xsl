@@ -1227,7 +1227,7 @@
             <glyph glyph-code="E523" smufl-name="dynamicRinforzando"/>
             <glyph glyph-code="E524" smufl-name="dynamicSforzando"/>
             <glyph glyph-code="E525" smufl-name="dynamicZ"/>
-            <!--<glyph glyph-code="E526" smufl-name="dynamicNiente"/>-->
+            <glyph glyph-code="E526" smufl-name="dynamicNiente"/>
             <!--<glyph glyph-code="E527" smufl-name="dynamicPPPPPP"/>-->
             <!--<glyph glyph-code="E528" smufl-name="dynamicPPPPP"/>-->
             <!--<glyph glyph-code="E529" smufl-name="dynamicPPPP"/>-->

@@ -577,8 +577,12 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y)
         useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
 
         // Get the bounds of the char
-        glyph->GetBoundingBox(&gx, &gy, &w, &h);
-        x += w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        if (glyph->GetHorizAdvX() > 0)
+            x += glyph->GetHorizAdvX() * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        else {
+            glyph->GetBoundingBox(&gx, &gy, &w, &h);
+            x += w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        }
     }
 }
 

@@ -42,6 +42,9 @@ function serialize() {
         impl += "y=\"" + r.y.toFixed(1) + "\" ";
         impl += "w=\"" + r.width.toFixed(1) + "\" ";
         impl += "h=\"" + r.height.toFixed(1) + "\" ";
+        if (item.getAttribute("horiz-adv-x")) {
+            impl += "h-a-x=\"" + item.getAttribute("horiz-adv-x") + "\" ";
+        }
         
         impl += "/>\n";
     }

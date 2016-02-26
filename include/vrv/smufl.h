@@ -100,6 +100,7 @@ enum {
     SMUFL_E523_dynamicRinforzando = 0xE523,
     SMUFL_E524_dynamicSforzando = 0xE524,
     SMUFL_E525_dynamicZ = 0xE525,
+    SMUFL_E526_dynamicNiente = 0xE526,
     SMUFL_E52F_dynamicFF = 0xE52F,
     SMUFL_E530_dynamicFFF = 0xE530,
     SMUFL_E531_dynamicFFFF = 0xE531,
@@ -135,7 +136,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 110
+#define SMUFL_COUNT 111
 
 } // vrv namespace
 
