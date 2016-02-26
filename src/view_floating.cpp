@@ -1295,10 +1295,15 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     dc->StartGraphic(dynam, "", dynam->GetUuid());
 
+    bool isSymbolOnly = dynam->IsSymbolOnly();
+    std::wstring dynamSymbol;
+    if (isSymbolOnly) {
+        dynamSymbol = dynam->GetSymbolStr();
+    }
+
     // Use Romam bold for tempo
     FontInfo dynamTxt;
     dynamTxt.SetFaceName("Times");
-    if (dynam->IsSymbolOnly()) dynamTxt.SetWeight(FONTWEIGHT_bold);
     dynamTxt.SetStyle(FONTSTYLE_italic);
     dynamTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
 
@@ -1311,24 +1316,27 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-
         // Basic method that use bounding box
         int y = GetDynamY(dynam, *staffIter);
 
-        dc->SetBrush(m_currentColour, AxSOLID);
-        dc->SetFont(&dynamTxt);
+        // If the dynamic is a symbol (pp, mf, etc.) draw it as one smufl string. This will not take into account
+        // editorial element within the dynam as it would with text
+        if (isSymbolOnly) {
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, dynamSymbol, true);
+            dc->ResetFont();
+        }
+        else {
+            dc->SetBrush(m_currentColour, AxSOLID);
+            dc->SetFont(&dynamTxt);
 
-        // dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
-        std::wstring ws;
-        ws += 0xE521;
-        ws += 0xE520;
-        DrawSmuflString(dc, x, y, ws, true);
+            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+            DrawTextChildren(dc, dynam, x, y, setX, setY);
+            dc->EndText();
 
-        // DrawTextChildren(dc, dynam, x, y, setX, setY);
-        // dc->EndText();
-
-        dc->ResetFont();
-        dc->ResetBrush();
+            dc->ResetFont();
+            dc->ResetBrush();
+        }
     }
 
     dc->EndGraphic(dynam, this);
