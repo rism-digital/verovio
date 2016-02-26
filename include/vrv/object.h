@@ -719,24 +719,22 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// DocObject
+// BoundingBox
 //----------------------------------------------------------------------------
 
 /**
  * This class represents a basic object in the layout domain
  */
-class DocObject : public Object {
+class BoundingBox {
 public:
     // constructors and destructors
-    DocObject();
-    DocObject(std::string classid);
-    virtual ~DocObject();
-    virtual ClassId Is() { return DOC_OBJECT; }
+    BoundingBox() { ResetBB(); };
+    virtual ~BoundingBox(){};
 
-    void UpdateContentBBoxX(int x1, int x2);
-    void UpdateContentBBoxY(int y1, int y2);
-    void UpdateSelfBBoxX(int x1, int x2);
-    void UpdateSelfBBoxY(int y1, int y2);
+    virtual void UpdateContentBBoxX(int x1, int x2);
+    virtual void UpdateContentBBoxY(int y1, int y2);
+    virtual void UpdateSelfBBoxX(int x1, int x2);
+    virtual void UpdateSelfBBoxY(int y1, int y2);
     bool HasContentBB();
     bool HasSelfBB();
     void ResetBB();
@@ -778,6 +776,29 @@ protected:
 public:
     int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
     int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
+};
+
+//----------------------------------------------------------------------------
+// DocObject
+//----------------------------------------------------------------------------
+
+/**
+ * This class represents a basic object in the layout domain
+ */
+class DocObject : public Object, public BoundingBox {
+public:
+    // constructors and destructors
+    DocObject();
+    DocObject(std::string classid);
+    virtual ~DocObject();
+    virtual ClassId Is() { return DOC_OBJECT; }
+
+private:
+    //
+protected:
+    //
+public:
+    //
 };
 
 //----------------------------------------------------------------------------
