@@ -485,25 +485,19 @@ int Object::Save(FileOutputStream *output)
 // DocObject
 //----------------------------------------------------------------------------
 
-// Note: since it is one line of code
-// I am not making a new function for the two
-// constructors.
-DocObject::DocObject() : Object("md-")
+DocObject::DocObject() : Object("md-"), BoundingBox()
 {
-    ResetBB();
 }
 
-DocObject::DocObject(std::string classid) : Object(classid)
+DocObject::DocObject(std::string classid) : Object(classid), BoundingBox()
 {
-    // m_doc = NULL;
-    ResetBB();
 }
 
 DocObject::~DocObject()
 {
 }
 
-void DocObject::UpdateContentBBoxX(int x1, int x2)
+void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 {
     // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
 
@@ -521,7 +515,7 @@ void DocObject::UpdateContentBBoxX(int x1, int x2)
     // GetClassName().c_str());
 }
 
-void DocObject::UpdateContentBBoxY(int y1, int y2)
+void BoundingBox::UpdateContentBBoxY(int y1, int y2)
 {
     // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
 
@@ -539,7 +533,7 @@ void DocObject::UpdateContentBBoxY(int y1, int y2)
     // GetClassName().c_str());
 }
 
-void DocObject::UpdateSelfBBoxX(int x1, int x2)
+void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
 {
     // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 
@@ -557,7 +551,7 @@ void DocObject::UpdateSelfBBoxX(int x1, int x2)
     // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
 
-void DocObject::UpdateSelfBBoxY(int y1, int y2)
+void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
 {
     // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 
@@ -575,7 +569,7 @@ void DocObject::UpdateSelfBBoxY(int y1, int y2)
     // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
 
-void DocObject::ResetBB()
+void BoundingBox::ResetBB()
 {
     m_contentBB_x1 = 0xFFFFFFF;
     m_contentBB_y1 = 0xFFFFFFF;
@@ -590,7 +584,7 @@ void DocObject::ResetBB()
     m_updatedBBoxY = false;
 }
 
-void DocObject::SetEmptyBB()
+void BoundingBox::SetEmptyBB()
 {
     m_contentBB_x1 = 0;
     m_contentBB_y1 = 0;
@@ -605,19 +599,19 @@ void DocObject::SetEmptyBB()
     m_updatedBBoxY = true;
 }
 
-bool DocObject::HasEmptyBB()
+bool BoundingBox::HasEmptyBB()
 {
     return (HasUpdatedBB() && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
         && (m_contentBB_y2 == 0));
 }
 
-bool DocObject::HasContentBB()
+bool BoundingBox::HasContentBB()
 {
     return ((m_contentBB_x1 != 0xFFFF) && (m_contentBB_y1 != 0xFFFF) && (m_contentBB_x2 != -0xFFFF)
         && (m_contentBB_y2 != -0xFFFF));
 }
 
-bool DocObject::HasSelfBB()
+bool BoundingBox::HasSelfBB()
 {
     return ((m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF));
 }
