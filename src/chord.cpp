@@ -102,13 +102,13 @@ void Chord::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        LayerElement *currentElement = dynamic_cast<LayerElement *>(*iter);
-        assert(currentElement);
-        if (!currentElement->HasInterface(INTERFACE_DURATION)) {
+        if (!(*iter)->HasInterface(INTERFACE_DURATION)) {
+            // remove anything that has not a DurationInterface
             iter = childList->erase(iter);
+            continue;
         }
         else {
-            if (currentElement->Is() == NOTE) {
+            if ((*iter)->Is() == NOTE) {
                 iter++;
             }
             else {
