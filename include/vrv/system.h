@@ -147,7 +147,7 @@ public:
      */
     virtual int SetDrawingXY(ArrayPtrVoid *params);
 
-private:
+public:
     SystemAligner m_systemAligner;
 
 public:

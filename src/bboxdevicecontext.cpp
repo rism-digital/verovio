@@ -129,6 +129,22 @@ void BBoxDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6]
     FindPointsForBounds(Point(x, y), Point(bezier1_coord[0], bezier1_coord[1]),
         Point(bezier1_coord[2], bezier1_coord[3]), Point(bezier1_coord[4], bezier1_coord[5]), vals);
 
+    Point p[4];
+    p[0].x = x;
+    p[0].y = y;
+    p[1].x = bezier1_coord[0];
+    p[1].y = bezier1_coord[1];
+    p[2].x = bezier1_coord[2];
+    p[2].y = bezier1_coord[3];
+    p[3].x = bezier1_coord[4];
+    p[3].y = bezier1_coord[5];
+    Point pos;
+    int width, height;
+    View::ApproximateBezierBoundingBox(p, &pos, &width, &height);
+    LogDebug("ME x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    LogDebug("RZ x %d, y %d, width %d, height %d", vals[0], vals[1], vals[2] - vals[0], vals[3] - vals[1]);
+    // DrawRectangle(pos.x, pos.y, width, height);
+
     UpdateBB(vals[0], vals[1], vals[2], vals[3]);
 }
 
@@ -398,7 +414,7 @@ void BBoxDeviceContext::FindPointsForBounds(Point P0, Point P1, Point P2, Point 
     float xMax = 0;
     float yMax = 0;
 
-    for (float t = 0.0f; t <= 1.0f; t += 0.01f) {
+    for (float t = 0.0f; t <= 1.0f; t += 0.025f) {
         x = A * t * t * t + B * t * t + C * t + D;
         if (x < xMin) xMin = x;
         if (x > xMax) xMax = x;

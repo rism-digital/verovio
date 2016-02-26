@@ -294,6 +294,23 @@ void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6],
               "fill-opacity:1.0; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width: %d",
               m_penStack.top().GetWidth())
               .c_str();
+
+    /*
+    Point p[4];
+    p[0].x = x;
+    p[0].y = y;
+    p[1].x = bezier1_coord[0];
+    p[1].y = bezier1_coord[1];
+    p[2].x = bezier1_coord[2];
+    p[2].y = bezier1_coord[3];
+    p[3].x = bezier1_coord[4];
+    p[3].y = bezier1_coord[5];
+    Point pos;
+    int width, height;
+    View::ApproximateBezierBoundingBox(p, &pos, &width, &height);
+    LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    DrawRectangle(pos.x, pos.y, width, height);
+    */
 }
 
 void SvgDeviceContext::DrawCircle(int x, int y, int radius)

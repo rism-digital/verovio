@@ -134,6 +134,11 @@ public:
     int CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave);
     ///@}
 
+    /**
+     * Approximate the bounding box of a bezier
+     */
+    static void ApproximateBezierBoundingBox(Point bezier[], Point *pos, int *width, int *height);
+
 protected:
     /**
      * @name Methods for drawing System, ScoreDef, StaffDef, Staff, and Layer.

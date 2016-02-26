@@ -35,12 +35,14 @@ namespace vrv {
 
 class AttComparison;
 class BeamElementCoord;
+class BoundingBox;
 class DocObject;
 class LayerElement;
 class Note;
 class Object;
 class Point;
 class Staff;
+class System;
 
 typedef std::vector<Object *> ArrayOfObjects;
 
@@ -59,6 +61,10 @@ typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
 
 typedef std::vector<std::pair<DocObject *, data_MEASUREBEAT> > ArrayOfDocObjectBeatPairs;
+
+typedef std::vector<std::pair<Staff *, BoundingBox> > ArrayOfStaffBoundingBoxPairs;
+
+typedef std::map<System *, ArrayOfStaffBoundingBoxPairs> MapOfArrayOfStaffBoundingBoxPairs;
 
 //----------------------------------------------------------------------------
 // Object defines

@@ -140,6 +140,12 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
         spanningType = SPANNING_MIDDLE;
     }
 
+    if (element->Is() == SLUR) {
+        Slur *slur = dynamic_cast<Slur *>(element);
+        assert(slur);
+        slur->ClearBoundingBoxes(system);
+    }
+
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = interface->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
@@ -614,7 +620,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     float angle = 0.0;
     // We do not want to adjust the position when calculating bounding boxes (at least for now)
-    if (dynamic_cast<BBoxDeviceContext *>(dc) == NULL) angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
+    if (dynamic_cast<BBoxDeviceContext *>(dc) == NULL);
+    angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
 
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR;
 
@@ -623,6 +630,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     else
         dc->StartGraphic(slur, "spanning-slur", "");
     // dc->DeactivateGraphic();
+    slur->AddBoundingBox(staff, points[0].x, points[0].y);
+    // slur->AddBoundingBox(staff, staff->GetDrawingX(), 0);
     DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize, angle);
     // dc->ReactivateGraphic();
     if (graphic)

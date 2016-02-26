@@ -25,6 +25,7 @@
 #include "metersig.h"
 #include "note.h"
 #include "page.h"
+#include "slur.h"
 #include "staff.h"
 #include "system.h"
 #include "text.h"
@@ -1164,6 +1165,28 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
         // we reset the system height
         (*system_height) = 0;
         (*min_pos) = 0;
+
+        System *system = dynamic_cast<System *>(this);
+        assert(system);
+
+        ListOfObjects *drawingList = system->GetDrawingList();
+        ListOfObjects::iterator iter;
+
+        for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
+            if ((*iter)->Is() != SLUR) continue;
+            Slur *slur = dynamic_cast<Slur *>(*iter);
+            assert(slur);
+            ArrayOfStaffBoundingBoxPairs *pairs = slur->GetStaffBoundingBoxPairs(system);
+            if (!pairs) continue;
+            ArrayOfStaffBoundingBoxPairs::iterator piter;
+            for (piter = pairs->begin(); piter != pairs->end(); piter++) {
+                assert(piter->first);
+                StaffAlignment *alignment = system->m_systemAligner.GetStaffAlignmentForStaffN(piter->first->GetN());
+                assert(alignment);
+                // if (piter->second.m_selfBB_y2 > 0) alignment->SetYShift(piter->second.m_selfBB_y2);
+            }
+        }
+
         return FUNCTOR_CONTINUE;
     }
 

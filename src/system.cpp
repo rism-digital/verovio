@@ -16,6 +16,8 @@
 #include "doc.h"
 #include "measure.h"
 #include "page.h"
+#include "slur.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -238,6 +240,25 @@ int System::SetBoundingBoxYShiftEnd(ArrayPtrVoid *params)
 {
     // param 0: the height of the previous staff
     int *system_height = static_cast<int *>((*params).at(1));
+
+
+    ListOfObjects *drawingList = this->GetDrawingList();
+    ListOfObjects::iterator iter;
+
+    for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
+        if ((*iter)->Is() != SLUR) continue;
+        Slur *slur = dynamic_cast<Slur *>(*iter);
+        assert(slur);
+        ArrayOfStaffBoundingBoxPairs *pairs = slur->GetStaffBoundingBoxPairs(this);
+        if (!pairs) continue;
+        ArrayOfStaffBoundingBoxPairs::iterator piter;
+        for (piter = pairs->begin(); piter != pairs->end(); piter++) {
+            assert(piter->first);
+            StaffAlignment *alignment = this->m_systemAligner.GetStaffAlignmentForStaffN(piter->first->GetN());
+            assert(alignment);
+        }
+    }
+
 
     m_systemAligner.GetBottomAlignment()->SetYShift((*system_height));
 
