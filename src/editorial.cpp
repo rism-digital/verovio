@@ -221,7 +221,7 @@ App::~App()
 
 void App::AddLemOrRdg(EditorialElement *child)
 {
-    // assert(dynamic_cast<Lem *>(child) || dynamic_cast<Rdg *>(child));
+    assert(dynamic_cast<Lem *>(child) || dynamic_cast<Rdg *>(child));
     child->SetParent(this);
     m_children.push_back(child);
     Modify();

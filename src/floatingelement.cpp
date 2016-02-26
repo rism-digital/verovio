@@ -46,9 +46,11 @@ void FloatingElement::Reset()
 int FloatingElement::PrepareTimeSpanning(ArrayPtrVoid *params)
 {
     // Pass it to the pseudo functor of the interface
-    // For now we don't consider dynam since the time spanning is not relevant for display
-    // Eventually, we could consider them but only if a @tstamp2 (or @endid) is provided
-    if (this->HasInterface(INTERFACE_TIME_SPANNING) && (this->Is() != DYNAM)) {
+    if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
+        // For now we don't consider dir and  dynam since the time spanning is not relevant for display
+        // Eventually, we could consider them but only if a @tstamp2 (or @endid) is provided
+        if ((this->Is() == DIR) || (this->Is() == DYNAM)) return FUNCTOR_CONTINUE;
+
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
         return interface->InterfacePrepareTimeSpanning(params, this);

@@ -11,6 +11,7 @@ swig -c++ -java -package org.rismch.verovio -outdir src/main/java/org/rismch/ver
 
 FILES="../src/accid.cpp \
              ../src/aligner.cpp \
+             ../src/anchoredtext.cpp \
              ../src/att.cpp \
              ../src/barline.cpp \
              ../src/bboxdevicecontext.cpp \
@@ -19,6 +20,7 @@ FILES="../src/accid.cpp \
              ../src/clef.cpp \
              ../src/custos.cpp \
              ../src/devicecontext.cpp \
+             ../src/dir.cpp \
              ../src/doc.cpp \
              ../src/dot.cpp \
              ../src/drawinginterface.cpp \
@@ -58,8 +60,8 @@ FILES="../src/accid.cpp \
              ../src/svgdevicecontext.cpp \
              ../src/syl.cpp \
              ../src/system.cpp \
+             ../src/tempo.cpp \
              ../src/text.cpp \
-             ../src/textdirective.cpp \
              ../src/textdirinterface.cpp \
              ../src/textelement.cpp \
              ../src/tie.cpp \

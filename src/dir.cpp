@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        dynam.cpp
+// Name:        dir.h
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "dynam.h"
+#include "dir.h"
 
 //----------------------------------------------------------------------------
 
@@ -20,10 +20,10 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Dynam
+// Dir
 //----------------------------------------------------------------------------
 
-Dynam::Dynam() : FloatingElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
+Dir::Dir() : FloatingElement("dir-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -31,18 +31,18 @@ Dynam::Dynam() : FloatingElement("dynam-"), TextListInterface(), TextDirInterfac
     Reset();
 }
 
-Dynam::~Dynam()
+Dir::~Dir()
 {
 }
 
-void Dynam::Reset()
+void Dir::Reset()
 {
     FloatingElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
 }
 
-void Dynam::AddTextElement(TextElement *element)
+void Dir::AddTextElement(TextElement *element)
 {
     assert(dynamic_cast<TextElement *>(element) || dynamic_cast<EditorialElement *>(element));
     element->SetParent(this);
@@ -50,17 +50,11 @@ void Dynam::AddTextElement(TextElement *element)
     Modify();
 }
 
-bool Dynam::IsSymbolOnly()
-{
-    std::wstring str = this->GetText(this);
-    return str.find_first_not_of(L"fpmrsz") == std::string::npos;
-}
-
 //----------------------------------------------------------------------------
-// Dynam functor methods
+// Dir functor methods
 //----------------------------------------------------------------------------
 
-int Dynam::AlignVertically(ArrayPtrVoid *params)
+int Dir::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
     // param 1: the staffIdx (unused)

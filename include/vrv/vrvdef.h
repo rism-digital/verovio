@@ -145,6 +145,7 @@ enum ClassId {
     // Ids for FloatingElement child classes
     FLOATING_ELEMENT,
     ANCHORED_TEXT,
+    DIR,
     DYNAM,
     HAIRPIN,
     SLUR,

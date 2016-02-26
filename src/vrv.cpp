@@ -82,7 +82,7 @@ Glyph *Resources::GetTextGlyph(wchar_t code)
 
 bool Resources::LoadFont(std::string fontName)
 {
-    DIR *dir;
+    ::DIR *dir;
     dirent *pdir;
     std::string dirname = Resources::GetPath() + "/" + fontName;
     dir = opendir(dirname.c_str());

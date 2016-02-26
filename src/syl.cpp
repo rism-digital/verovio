@@ -50,7 +50,7 @@ void Syl::Reset()
 
 void Syl::AddTextElement(TextElement *element)
 {
-    // assert(dynamic_cast<TextElement *>(element) || dynamic_cast<EditorialElement *>(element));
+    assert(dynamic_cast<TextElement *>(element) || dynamic_cast<EditorialElement *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();

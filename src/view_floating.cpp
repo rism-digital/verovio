@@ -18,6 +18,7 @@
 #include "attcomparison.h"
 #include "bboxdevicecontext.h"
 #include "devicecontext.h"
+#include "dir.h"
 #include "doc.h"
 #include "dynam.h"
 #include "floatingelement.h"
@@ -31,7 +32,7 @@
 #include "style.h"
 #include "syl.h"
 #include "system.h"
-#include "textdirective.h"
+#include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
 #include "vrv.h"
@@ -49,11 +50,17 @@ void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Meas
     assert(measure);
     assert(element);
 
-    if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DYNAM)) {
+    // For dir and dynam, we do not consider the @tstamp2 for rendering
+    if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DIR) && (element->Is() != DYNAM)) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
         system->AddToDrawingList(element);
+    }
+    else if (element->Is() == DIR) {
+        Dir *dir = dynamic_cast<Dir *>(element);
+        assert(dir);
+        // DrawDir(dc, dir, measure, system);
     }
     else if (element->Is() == DYNAM) {
         Dynam *dynam = dynamic_cast<Dynam *>(element);
@@ -1311,9 +1318,14 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dynamTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
-        DrawTextChildren(dc, dynam, x, y, setX, setY);
-        dc->EndText();
+        // dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        std::wstring ws;
+        ws += 0xE521;
+        ws += 0xE520;
+        DrawSmuflString(dc, x, y, ws, true);
+
+        // DrawTextChildren(dc, dynam, x, y, setX, setY);
+        // dc->EndText();
 
         dc->ResetFont();
         dc->ResetBrush();
