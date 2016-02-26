@@ -29,7 +29,7 @@ if [ ! -d data ]; then mkdir data; fi
 # We can disable this for a light version that uses the default memory settings 	
 ASM="\
 	-O3 --memory-init-file 0 \
-	-s ASM_JS=1 \
+	-s ASM_JS=1 -s EMCC_DEBUG=0 \
 	-s OUTLINING_LIMIT=10000 \
 	-s TOTAL_MEMORY=128*1024*1024 \
 	-s TOTAL_STACK=64*1024*1024"
@@ -96,6 +96,7 @@ python $EMCC $CHATTY \
 	./emscripten_main.cpp \
 	$VEROVIO_ROOT/src/accid.cpp \
 	$VEROVIO_ROOT/src/aligner.cpp \
+	$VEROVIO_ROOT/src/anchoredtext.cpp \
 	$VEROVIO_ROOT/src/att.cpp \
 	$VEROVIO_ROOT/src/barline.cpp \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
@@ -104,6 +105,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/clef.cpp \
 	$VEROVIO_ROOT/src/custos.cpp \
 	$VEROVIO_ROOT/src/devicecontext.cpp \
+	$VEROVIO_ROOT/src/dir.cpp \
 	$VEROVIO_ROOT/src/doc.cpp \
 	$VEROVIO_ROOT/src/dot.cpp \
 	$VEROVIO_ROOT/src/drawinginterface.cpp \
@@ -143,8 +145,8 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/svgdevicecontext.cpp \
 	$VEROVIO_ROOT/src/syl.cpp \
 	$VEROVIO_ROOT/src/system.cpp \
+	$VEROVIO_ROOT/src/tempo.cpp \
 	$VEROVIO_ROOT/src/text.cpp \
-	$VEROVIO_ROOT/src/textdirective.cpp \
 	$VEROVIO_ROOT/src/textdirinterface.cpp \
 	$VEROVIO_ROOT/src/textelement.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
