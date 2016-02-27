@@ -68,6 +68,7 @@ public:
     ///@{
     int GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize);
     int GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize);
+    int GetGlyphDescender(wchar_t smuflCode, int staffSize, bool graceSize);
     int GetDrawingUnit(int staffSize);
     int GetDrawingDoubleUnit(int staffSize);
     int GetDrawingStaffSize(int staffSize);
@@ -76,7 +77,9 @@ public:
     int GetDrawingBarLineWidth(int staffSize);
     int GetDrawingStaffLineWidth(int staffSize);
     int GetDrawingStemWidth(int staffSize);
-    int GetDrawingHairpinSize(int staffSize);
+    int GetDrawingDirHeight(int staffSize, bool withMargin);
+    int GetDrawingDynamHeight(int staffSize, bool withMargin);
+    int GetDrawingHairpinSize(int staffSize, bool withMargin);
     int GetDrawingBeamWidth(int staffSize, bool graceSize);
     int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize);
     int GetDrawingLedgerLineLength(int staffSize, bool graceSize);

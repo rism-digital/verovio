@@ -20,6 +20,7 @@ class Beam;
 class BeamParams;
 class Chord;
 class DeviceContext;
+class Dir;
 class Doc;
 class Dynam;
 class EditorialElement;
@@ -297,6 +298,7 @@ protected:
         DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
     void DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff);
     void DrawTimeSpanningElement(DeviceContext *dc, DocObject *object, System *system);
+    void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
     void DrawHairpin(DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType,
         DocObject *graphic = NULL);
@@ -379,10 +381,11 @@ private:
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet *tuplet);
-    int GetDynamY(Dynam *dynam, Staff *);
-    int GetHairpinY(Hairpin *hairpin, Staff *staff);
+    int GetDirY(data_STAFFREL place, Staff *staff);
+    int GetDynamY(data_STAFFREL place, Staff *staff, bool baseline);
+    int GetHairpinY(data_STAFFREL place, Staff *staff);
     int GetSylY(Syl *syl, Staff *staff);
-    int GetTempoY(Tempo *tempo, Staff *staff);
+    int GetTempoY(data_STAFFREL place, Staff *staff);
     ///@}
 
     /**

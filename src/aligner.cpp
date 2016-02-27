@@ -98,8 +98,12 @@ StaffAlignment::StaffAlignment() : Object()
     m_maxHeight = 0;
     m_verseCount = 0;
     m_staff = NULL;
+    m_dirAbove = false;
+    m_dirBelow = false;
     m_dynamAbove = false;
     m_dynamBelow = false;
+    m_hairpinAbove = false;
+    m_hairpinBelow = false;
 }
 
 StaffAlignment::~StaffAlignment()
@@ -385,9 +389,13 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     else
         minShift = doc->GetSpacingStaff() * doc->GetDrawingUnit(100) + (*previousStaffHeight);
 
-    if (this->GetDynamAbove()) {
+    if (this->GetDynamAbove() || this->GetDirAbove()) {
         // We need + 1 lyric line space
-        (*extraStaffHeight) += doc->GetDrawingHairpinSize(staffSize);
+        (*extraStaffHeight) += doc->GetDrawingDynamHeight(staffSize, true);
+    }
+    else if (this->GetHairpinAbove()) {
+        // We need + 1 lyric line space
+        (*extraStaffHeight) += doc->GetDrawingHairpinSize(staffSize, true);
     }
 
     // We need to insert extra elements (lyrics, dynam)
@@ -419,9 +427,13 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
         (*extraStaffHeight) += (this->GetVerseCount() + 0.8) * TEMP_STYLE_LYIRC_LINE_SPACE
             * (doc->GetDrawingUnit(staffSize)) / PARAM_DENOMINATOR;
     }
-    if (this->GetDynamBelow()) {
+    if (this->GetDynamBelow() || this->GetDirBelow()) {
         // We need + 1 lyric line space
-        (*extraStaffHeight) += doc->GetDrawingHairpinSize(staffSize);
+        (*extraStaffHeight) += doc->GetDrawingDynamHeight(staffSize, true);
+    }
+    else if (this->GetHairpinBelow()) {
+        // We need + 1 lyric line space
+        (*extraStaffHeight) += doc->GetDrawingHairpinSize(staffSize, true);
     }
 
     return FUNCTOR_CONTINUE;

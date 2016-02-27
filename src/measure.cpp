@@ -155,8 +155,8 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
     // param 1: the time (unused)
     // param 2: the current Mensur (unused)
     // param 3: the current MeterSig (unused)
+    // param 4: the functor for passing it to the TimeStampAligner (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner **>((*params).at(0));
-    Functor *alignHorizontally = static_cast<Functor *>((*params).at(4));
 
     // clear the content of the measureAligner
     m_measureAligner.Reset();
@@ -167,9 +167,6 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
 
     // point to it
     (*measureAligner) = &m_measureAligner;
-
-    // We also need to align the timestamps
-    m_timestampAligner.Process(alignHorizontally, params);
 
     if (m_leftBarLine.GetForm() != BARRENDITION_NONE) {
         m_leftBarLine.SetAlignment(m_measureAligner.GetLeftAlignment());
@@ -182,6 +179,23 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
     // LogDebug("\n ***** Align measure %d", this->GetN());
 
     assert(*measureAligner);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::AlignHorizontallyEnd(ArrayPtrVoid *params)
+{
+    // param 0: the measureAligner (unused)
+    // param 1: the time (unused)
+    // param 2: the current Mensur (unused)
+    // param 3: the current MeterSig (unused)
+    // param 4: the functor for passing it to the TimeStampAligner
+    Functor *alignHorizontally = static_cast<Functor *>((*params).at(4));
+
+    // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a
+    // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work in
+    // MEI anyway.
+    m_timestampAligner.Process(alignHorizontally, params);
 
     return FUNCTOR_CONTINUE;
 }
@@ -416,7 +430,8 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
             assert(interface);
             TimestampAttr *timestampAttr = m_timestampAligner.GetTimestampAtTime((*iter).second.second);
             interface->SetEnd(timestampAttr);
-            // We can check if the interface is now fully mapped (start / end) and purge the list of unmatched elements
+            // We can check if the interface is now fully mapped (start / end) and purge the list of unmatched
+            // elements
             if (interface->HasStartAndEnd()) {
                 elements->erase(std::remove(elements->begin(), elements->end(), (*iter).first), elements->end());
             }

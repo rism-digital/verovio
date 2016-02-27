@@ -44,6 +44,10 @@ public:
      */
     virtual double GetTimestampAttrAlignmentDuration(int meterUnit);
 
+    //----------//
+    // Functors //
+    //----------//
+
 private:
     //
 public:

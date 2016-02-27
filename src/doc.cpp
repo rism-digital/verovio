@@ -460,6 +460,19 @@ int Doc::GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize)
     return w;
 }
 
+int Doc::GetGlyphDescender(wchar_t smuflCode, int staffSize, bool graceSize)
+{
+    int x, y, w, h;
+    Glyph *glyph;
+    glyph = Resources::GetGlyph(smuflCode);
+    assert(glyph);
+    glyph->GetBoundingBox(&x, &y, &w, &h);
+    y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    if (graceSize) y = y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    y = y * staffSize / 100;
+    return y;
+}
+
 int Doc::GetDrawingUnit(int staffSize)
 {
     return m_drawingUnit * staffSize / 100;
@@ -500,7 +513,12 @@ int Doc::GetDrawingStemWidth(int staffSize)
     return m_style->m_stemWidth * staffSize / 100;
 }
 
-int Doc::GetDrawingHairpinSize(int staffSize)
+int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin)
+{
+    return GetGlyphHeight(SMUFL_E522_dynamicForte, staffSize, false);
+}
+
+int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin)
 {
     return m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITON_FACTOR;
 }

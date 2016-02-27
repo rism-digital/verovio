@@ -131,6 +131,11 @@ public:
     virtual int AlignHorizontally(ArrayPtrVoid *params);
 
     /**
+     * Align horizontally the content of a layer.
+     */
+    virtual int AlignHorizontallyEnd(ArrayPtrVoid *params);
+
+    /**
      * AlignVertically the content of a measure.
      */
     virtual int AlignVertically(ArrayPtrVoid *params);

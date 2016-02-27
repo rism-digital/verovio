@@ -160,10 +160,10 @@ void TimeSpanningInterface::SetUuidStr()
 bool TimeSpanningInterface::SetStartAndEnd(LayerElement *element)
 {
     // LogDebug("%s - %s - %s", element->GetUuid().c_str(), m_startUuid.c_str(), m_endUuid.c_str() );
-    if (!m_start && (element->GetUuid() == m_startUuid)) {
+    if (!m_start && !m_startUuid.empty() && (element->GetUuid() == m_startUuid)) {
         this->SetStart(element);
     }
-    else if (!m_end && (element->GetUuid() == m_endUuid)) {
+    else if (!m_end && !m_endUuid.empty() && (element->GetUuid() == m_endUuid)) {
         this->SetEnd(element);
     }
     return (m_start && m_end);

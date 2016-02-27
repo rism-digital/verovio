@@ -161,7 +161,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
         if ((measure->GetN() != VRV_UNSET) && (measure->GetN() > 1)) {
             dc->SetFont(m_doc->GetDrawingSmuflFont(100, false));
             dc->DrawMusicText(IntToTupletFigures(measure->GetN()), ToDeviceContextX(system->GetDrawingX()),
-                ToDeviceContextY(system->GetDrawingY() - m_doc->GetSpacingStaff() * m_doc->GetDrawingUnit(100)));
+                ToDeviceContextY(system->GetDrawingY() + 2 * m_doc->GetDrawingUnit(100)));
             dc->ResetFont();
         }
     }

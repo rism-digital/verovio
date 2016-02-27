@@ -480,6 +480,26 @@ void SvgDeviceContext::StartText(int x, int y, char alignement)
     // font-size seems to be required in <text> in FireFox and also we set it to 0px so space
     // is not added between tspan elements
     m_currentNode.append_attribute("font-size") = "0px";
+    //
+    if (!m_fontStack.top()->GetFaceName().empty()) {
+        m_currentNode.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
+    }
+    if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
+        if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
+            m_currentNode.append_attribute("font-style") = "italic";
+        }
+        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
+            m_currentNode.append_attribute("font-style") = "normal";
+        }
+        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_oblique) {
+            m_currentNode.append_attribute("font-style") = "oblique";
+        }
+    }
+    if (m_fontStack.top()->GetWeight() != FONTWEIGHT_NONE) {
+        if (m_fontStack.top()->GetWeight() == FONTWEIGHT_bold) {
+            m_currentNode.append_attribute("font-weight") = "bold";
+        }
+    }
 }
 
 void SvgDeviceContext::MoveTextTo(int x, int y)

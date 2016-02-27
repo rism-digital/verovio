@@ -69,8 +69,8 @@ int Dir::AlignVertically(ArrayPtrVoid *params)
 
         if (!alignment) continue;
 
-        if (this->GetPlace() == STAFFREL_above) alignment->SetDynamAbove();
-        if (this->GetPlace() == STAFFREL_below) alignment->SetDynamBelow();
+        if (this->GetPlace() == STAFFREL_above) alignment->SetDirAbove();
+        if (this->GetPlace() == STAFFREL_below) alignment->SetDirBelow();
     }
 
     return FUNCTOR_CONTINUE;

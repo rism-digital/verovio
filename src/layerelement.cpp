@@ -220,7 +220,7 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         TimestampAttr *timestampAttr = dynamic_cast<TimestampAttr *>(this);
         assert(timestampAttr);
         int meterUnit = 4;
-        if (meterSig) meterSig->GetUnit();
+        if (meterSig) meterUnit = meterSig->GetUnit();
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     else {
@@ -258,7 +258,8 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     // param 0: the measureAligner
     // param 1: the time
     // param 2: the current Mensur
-    // param 3: the current MeterSig (unused)
+    // param 3: the current MeterSig
+    // param 4: the functor for passing it to the TimeStampAligner (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner **>((*params).at(0));
     double *time = static_cast<double *>((*params).at(1));
     Mensur **currentMensur = static_cast<Mensur **>((*params).at(2));
@@ -338,7 +339,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     }
 
     // get the duration of the event
-    double duration = this->GetAlignmentDuration(*currentMensur);
+    double duration = this->GetAlignmentDuration(*currentMensur, *currentMeterSig);
 
     // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
     // So use it as current time - we can do this because the timestamp loop is redirected from the measure

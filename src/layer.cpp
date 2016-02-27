@@ -178,6 +178,7 @@ int Layer::AlignHorizontally(ArrayPtrVoid *params)
     // param 1: the time
     // param 2: the current Mensur
     // param 3: the current MeterSig
+    // param 4: the functor for passing it to the TimeStampAligner (unused)
     double *time = static_cast<double *>((*params).at(1));
     Mensur **currentMensur = static_cast<Mensur **>((*params).at(2));
     MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(3));
