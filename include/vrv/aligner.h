@@ -165,6 +165,10 @@ public:
     void SetStaff(Staff *staff) { m_staff = staff; };
     ///@}
 
+    //----------//
+    // Functors //
+    //----------//
+
     /**
      * Set the position of the StaffAlignment.
      * Functor redirected from System.

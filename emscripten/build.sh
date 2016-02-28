@@ -29,7 +29,7 @@ if [ ! -d data ]; then mkdir data; fi
 # We can disable this for a light version that uses the default memory settings 	
 ASM="\
 	-O3 --memory-init-file 0 \
-	-s ASM_JS=1 -s EMCC_DEBUG=0 \
+	-s ASM_JS=1 \
 	-s OUTLINING_LIMIT=10000 \
 	-s TOTAL_MEMORY=128*1024*1024 \
 	-s TOTAL_STACK=64*1024*1024"
@@ -200,6 +200,8 @@ if [ $? -eq 0 ]; then
 	else
 		cat build/verovio.js verovio-proxy.js verovio-unload-listener.js > "build/$FILENAME"
 	fi
+	# create a gz version
+	gzip -c build/$FILENAME > build/$FILENAME.gz
 	# all good
 	echo "build/$FILENAME written"
 	# create also a zip file if version name is given

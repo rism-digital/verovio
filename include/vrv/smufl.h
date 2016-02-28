@@ -101,10 +101,29 @@ enum {
     SMUFL_E524_dynamicSforzando = 0xE524,
     SMUFL_E525_dynamicZ = 0xE525,
     SMUFL_E526_dynamicNiente = 0xE526,
+    SMUFL_E527_dynamicPPPPPP = 0xE527,
+    SMUFL_E528_dynamicPPPPP = 0xE528,
+    SMUFL_E529_dynamicPPPP = 0xE529,
+    SMUFL_E52A_dynamicPPP = 0xE52A,
+    SMUFL_E52B_dynamicPP = 0xE52B,
+    SMUFL_E52C_dynamicMP = 0xE52C,
+    SMUFL_E52D_dynamicMF = 0xE52D,
+    SMUFL_E52E_dynamicPF = 0xE52E,
     SMUFL_E52F_dynamicFF = 0xE52F,
     SMUFL_E530_dynamicFFF = 0xE530,
     SMUFL_E531_dynamicFFFF = 0xE531,
     SMUFL_E532_dynamicFFFFF = 0xE532,
+    SMUFL_E533_dynamicFFFFFF = 0xE533,
+    SMUFL_E534_dynamicFortePiano = 0xE534,
+    SMUFL_E535_dynamicForzando = 0xE535,
+    SMUFL_E536_dynamicSforzando1 = 0xE536,
+    SMUFL_E537_dynamicSforzandoPiano = 0xE537,
+    SMUFL_E538_dynamicSforzandoPianissimo = 0xE538,
+    SMUFL_E539_dynamicSforzato = 0xE539,
+    SMUFL_E53A_dynamicSforzatoPiano = 0xE53A,
+    SMUFL_E53B_dynamicSforzatoFF = 0xE53B,
+    SMUFL_E53C_dynamicRinforzando1 = 0xE53C,
+    SMUFL_E53D_dynamicRinforzando2 = 0xE53D,
     SMUFL_E566_ornamentTrill = 0xE566,
     SMUFL_E567_ornamentTurn = 0xE567,
     SMUFL_E568_ornamentTurnInverted = 0xE568,
@@ -136,7 +155,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 111
+#define SMUFL_COUNT 130
 
 } // vrv namespace
 
