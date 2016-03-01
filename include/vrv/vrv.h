@@ -49,12 +49,12 @@ bool AreEqual(double dFirstVal, double dSecondVal);
 /**
  * Utility for converting UTF16 (std::wstring) to UTF-8
  */
-std::string UTF16to8(const wchar_t *in);
+std::string UTF16to8(const std::wstring in);
 
 /**
  * Utility for converting UTF-8 to UTF16 (std::wstring)
  */
-std::wstring UTF8to16(const char *in);
+std::wstring UTF8to16(const std::string in);
 
 /**
  * Format a string using vsnprintf.

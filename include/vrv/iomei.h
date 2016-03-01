@@ -14,6 +14,9 @@
 
 #include "doc.h"
 #include "io.h"
+
+//----------------------------------------------------------------------------
+
 #include "pugixml.hpp"
 
 namespace vrv {

@@ -15,8 +15,11 @@
 
 #include "attdef.h"
 #include "io.h"
-#include "pugixml.hpp"
 #include "vrvdef.h"
+
+//----------------------------------------------------------------------------
+
+#include "pugixml.hpp"
 
 namespace vrv {
 

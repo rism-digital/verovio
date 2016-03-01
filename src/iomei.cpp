@@ -895,7 +895,7 @@ void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
     if (!text->GetText().empty()) {
         pugi::xml_node nodechild = element.append_child(pugi::node_pcdata);
         // nodechild.text() =  UTF16to8(EscapeSMuFL(text->GetText()).c_str()).c_str();
-        nodechild.text() = UTF16to8(text->GetText().c_str()).c_str();
+        nodechild.text() = UTF16to8(text->GetText()).c_str();
     }
 }
 
