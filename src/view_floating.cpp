@@ -1339,8 +1339,6 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     // We cannot draw a return that has no start position
     if (!dynam->GetStart()) return;
 
-    LogMessage("DYNAM START %s %s", dynam->GetStart()->GetClassName().c_str(), dynam->GetStart()->GetUuid().c_str());
-
     dc->StartGraphic(dynam, "", dynam->GetUuid());
 
     bool isSymbolOnly = dynam->IsSymbolOnly();

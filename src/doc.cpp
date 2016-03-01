@@ -515,12 +515,18 @@ int Doc::GetDrawingStemWidth(int staffSize)
 
 int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin)
 {
-    return GetGlyphHeight(SMUFL_E522_dynamicForte, staffSize, false);
+    int height = GetGlyphHeight(SMUFL_E522_dynamicForte, staffSize, false);
+    // This should be styled
+    if (withMargin) height += GetDrawingUnit(staffSize);
+    return height;
 }
 
 int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin)
 {
-    return m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITON_FACTOR;
+    int size = m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITON_FACTOR;
+    // This should be styled
+    if (withMargin) size += GetDrawingUnit(staffSize);
+    return size;
 }
 
 int Doc::GetDrawingBeamWidth(int staffSize, bool graceSize)
