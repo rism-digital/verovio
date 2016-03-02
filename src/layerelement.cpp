@@ -564,6 +564,27 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
             case PITCHNAME_b: midiBase = 11; break;
             case PITCHNAME_NONE: break;
         }
+        // Check for accidentals
+        if (note->HasAccidGes()) {
+            data_ACCIDENTAL_IMPLICIT acc_imp = note->GetAccidGes();
+            switch (acc_imp) {
+                case ACCIDENTAL_IMPLICIT_s: midiBase += 1; break;
+                case ACCIDENTAL_IMPLICIT_f: midiBase -= 1; break;
+                case ACCIDENTAL_IMPLICIT_ss: midiBase += 2; break;
+                case ACCIDENTAL_IMPLICIT_ff: midiBase -= 2; break;
+                default: break;
+            }
+        }
+        else if (note->m_drawingAccid) {
+            data_ACCIDENTAL_EXPLICIT acc_exp = note->GetAccid();
+            switch (acc_exp) {
+                case ACCIDENTAL_IMPLICIT_s: midiBase += 1; break;
+                case ACCIDENTAL_IMPLICIT_f: midiBase -= 1; break;
+                case ACCIDENTAL_IMPLICIT_ss: midiBase += 2; break;
+                case ACCIDENTAL_IMPLICIT_ff: midiBase -= 2; break;
+                default: break;
+            }
+        }
         int pitch = midiBase + (note->GetOct() + 1) * 12;
         int channel = 0;
         int velocity = 64;
