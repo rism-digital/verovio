@@ -530,7 +530,7 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
         assert(rest);
         LogMessage("Rest %f", GetAlignmentDuration());
         // increase the currentTime accordingly
-        (*currentMeasureTime) += GetAlignmentDuration();
+        (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
     }
     else if (this->Is() == NOTE) {
         Note *note = dynamic_cast<Note *>(this);
@@ -546,6 +546,7 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
             dur = chord->GetAlignmentDuration();
         else
             dur = note->GetAlignmentDuration();
+        dur = dur * 120 / (DUR_MAX / DURATION_4);
 
         LogMessage("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
             note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
@@ -576,7 +577,7 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
             }
         }
         else if (note->m_drawingAccid) {
-            data_ACCIDENTAL_EXPLICIT acc_exp = note->GetAccid();
+            data_ACCIDENTAL_EXPLICIT acc_exp = note->m_drawingAccid->GetAccid();
             switch (acc_exp) {
                 case ACCIDENTAL_IMPLICIT_s: midiBase += 1; break;
                 case ACCIDENTAL_IMPLICIT_f: midiBase -= 1; break;
@@ -593,7 +594,7 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
 
         // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
         if (!(note->IsChordTone())) {
-            (*currentMeasureTime) += GetAlignmentDuration();
+            (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
         }
     }
     else if (this->Is() == SPACE) {
@@ -601,7 +602,7 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
         assert(space);
         LogMessage("Space %f", GetAlignmentDuration());
         // increase the currentTime accordingly
-        (*currentMeasureTime) += GetAlignmentDuration();
+        (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
     }
     return FUNCTOR_CONTINUE;
 }
@@ -620,7 +621,7 @@ int LayerElement::ExportMIDIEnd(ArrayPtrVoid *params)
         assert(chord);
         LogMessage("Chord %f", GetAlignmentDuration());
         // increase the currentTime accordingly.
-        (*currentMeasureTime) += GetAlignmentDuration();
+        (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
     }
 
     return FUNCTOR_CONTINUE;
@@ -648,7 +649,7 @@ int LayerElement::CalcMaxMeasureDuration(ArrayPtrVoid *params)
     }
 
     // increase the currentTime accordingly
-    (*currentValue) += GetAlignmentDuration();
+    (*currentValue) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
 
     // now if we have cummulated in the layer a longer duration for the current measure, replace it
     if (maxValues->back() < (*currentValue)) maxValues->back() = (*currentValue);
