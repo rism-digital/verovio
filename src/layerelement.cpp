@@ -550,12 +550,21 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
         LogMessage("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
             note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
         LogMessage("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
-        // - get the duration with note->GetNoteOrChordDur() ?
-        // - get the MIDI code with note->GetOct, GetPname and GetAccid (GetAccidGet is currently missing)
-        int oct = note->GetOct();
-        int pname = note->GetPname() - 1;
-        int pindex = (pname <= 2) ? pname * 2 : pname * 2 - 1;
-        int pitch = 12 * (oct + 1) + pindex; // how to to take into account accidental??
+
+        // Create midi note
+        int midiBase = 0;
+        data_PITCHNAME pname = note->GetPname();
+        switch (pname) {
+            case PITCHNAME_c: midiBase = 0; break;
+            case PITCHNAME_d: midiBase = 2; break;
+            case PITCHNAME_e: midiBase = 4; break;
+            case PITCHNAME_f: midiBase = 5; break;
+            case PITCHNAME_g: midiBase = 7; break;
+            case PITCHNAME_a: midiBase = 9; break;
+            case PITCHNAME_b: midiBase = 11; break;
+            case PITCHNAME_NONE: break;
+        }
+        int pitch = midiBase + (note->GetOct() + 1) * 12;
         int channel = 0;
         int velocity = 64;
         midiFile->addNoteOn(*midiTrack, *totalTime + *currentMeasureTime, channel, pitch, velocity);
