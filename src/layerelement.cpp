@@ -556,15 +556,10 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
         int pname = note->GetPname() - 1;
         int pindex = (pname <= 2) ? pname * 2 : pname * 2 - 1;
         int pitch = 12 * (oct + 1) + pindex; // how to to take into account accidental??
-
-        vector<uchar> midievent;
-        midievent.resize(3);
-        midievent[0] = 0x90; // note on
-        midievent[1] = pitch;
-        midievent[2] = 64; // store attack/release velocity for note command
-        midiFile->addEvent(*midiTrack, *totalTime + *currentMeasureTime, midievent);
-        midievent[0] = 0x80; // note off
-        midiFile->addEvent(*midiTrack, *totalTime + *currentMeasureTime + dur, midievent);
+        int channel = 0;
+        int velocity = 64;
+        midiFile->addNoteOn(*midiTrack, *totalTime + *currentMeasureTime, channel, pitch, velocity);
+        midiFile->addNoteOff(*midiTrack, *totalTime + *currentMeasureTime + dur, channel, pitch);
 
         // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
         if (!(note->IsChordTone())) {
