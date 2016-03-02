@@ -80,7 +80,12 @@ FILES="../src/accid.cpp \
              ../src/view_text.cpp \
              ../src/view_tuplet.cpp \
              ../src/vrv.cpp \
-             ../src/pugixml.cpp \
+             ../src/pugi/pugixml.cpp \
+             ../src/midi/Binasc.cpp \
+             ../src/midi/MidiEvent.cpp \
+             ../src/midi/MidiEventList.cpp \
+             ../src/midi/MidiFile.cpp \
+             ../src/midi/MidiMessage.cpp \
              ../libmei/attconverter.cpp \
              ../libmei/atts_cmn.cpp \
              ../libmei/atts_critapp.cpp \
@@ -89,7 +94,7 @@ FILES="../src/accid.cpp \
              ../libmei/atts_pagebased.cpp \
              ../libmei/atts_shared.cpp"
 
-CXXOPTS="-g -fpic -I../include -I../include/vrv -I../libmei -I/opt/local/include/ -I/System/Library/Frameworks/JavaVM.framework/Headers/"
+CXXOPTS="-g -fpic -std=c++11 -I../include -I../include/vrv -I../include/midi -I../include/pugi -I../include/utf8 -I../libmei -I/opt/local/include/ -I/System/Library/Frameworks/JavaVM.framework/Headers/"
 g++ -shared -o target/libverovio.jnilib $CXXOPTS $FILES verovio_wrap.cxx
 cp target/libverovio.jnilib target/classes/META-INF/lib
 

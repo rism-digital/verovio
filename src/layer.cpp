@@ -299,4 +299,16 @@ int Layer::PrepareRpt(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int Layer::CalcMaxMeasureDuration(ArrayPtrVoid *params)
+{
+    // param 0: std::vector<double>: a stack of maximum duration filled by the functor (unused)
+    // param 1: double: the duration of the current measure
+    double *currentValue = static_cast<double *>((*params).at(1));
+
+    // reset it
+    (*currentValue) = 0.0;
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

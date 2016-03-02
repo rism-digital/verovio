@@ -196,6 +196,21 @@ public:
      */
     virtual int PrepareTimestampsEnd(ArrayPtrVoid *params);
 
+    /**
+     * See Object:ExportMIDI
+     */
+    virtual int ExportMIDI(ArrayPtrVoid *params);
+
+    /**
+     * See Object:ExportMIDI
+     */
+    virtual int ExportMIDIEnd(ArrayPtrVoid *params);
+
+    /**
+     * See Object::CalcMaxMeasureDuration
+     */
+    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
+
 public:
     /**
      * The X absolute position of the measure for facsimile (transcription) encodings.

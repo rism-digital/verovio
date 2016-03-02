@@ -26,8 +26,9 @@
 
 //----------------------------------------------------------------------------
 
+#include "checked.h"
 #include "pugixml.hpp"
-#include "utf8.h"
+#include "unchecked.h"
 
 #define STRING_FORMAT_MAX_LEN 2048
 

@@ -101,7 +101,7 @@ public:
     /**
      * Returns the duration if the child element has a DurationInterface
      */
-    virtual double GetAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true);
+    double GetAlignmentDuration(Mensur *mensur = NULL, MeterSig *meterSig = NULL, bool notGraceOnly = true);
 
     //----------//
     // Functors //
@@ -130,6 +130,21 @@ public:
     virtual int SetDrawingXY(ArrayPtrVoid *params);
 
     virtual int TimeSpanningLayerElements(ArrayPtrVoid *params);
+
+    /**
+     * See Object:ExportMIDI
+     */
+    virtual int ExportMIDI(ArrayPtrVoid *params);
+
+    /**
+     *  See Object:ExportMIDI
+     */
+    virtual int ExportMIDIEnd(ArrayPtrVoid *params);
+    
+    /**
+     * See Object::CalcMaxMeasureDuration
+     */
+    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
 
 private:
     //

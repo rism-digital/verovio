@@ -12,6 +12,8 @@
 #include "scoredef.h"
 #include "style.h"
 
+class MidiFile;
+
 namespace vrv {
 
 class FontInfo;
@@ -166,6 +168,12 @@ public:
     void SetSpacingNonLinear(double drawingSpacingNonLinear) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; };
     double GetSpacingNonLinear() { return m_drawingSpacingNonLinear; };
     ///@}
+
+    /**
+     * Export the document to a MIDI file.
+     * Run trough all the layer and fill the midi file content.
+     */
+    void ExportMIDI(MidiFile *midifile);
 
     /**
      * Set the initial scoreDef of each page.

@@ -8,9 +8,12 @@ function print_help {
 -c		Turns on \"Chatty\" compiling; Will print the compiler progress" >&2 ; 
 } 
 
-VEROVIO_ROOT=../
+VEROVIO_ROOT=..
 VEROVIO_INCLUDE=../include
 VEROVIO_INCLUDE_VRV=../include/vrv
+VEROVIO_INCLUDE_MIDI=../include/midi
+VEROVIO_INCLUDE_PUGI=../include/pugi
+VEROVIO_INCLUDE_UTF8=../include/utf8
 VEROVIO_LIBMEI=../libmei
 if command -v emcc >/dev/null 2>&1 ; then
 	EMCC=`command -v emcc`
@@ -28,7 +31,7 @@ if [ ! -d data ]; then mkdir data; fi
 # Empirically, the memory amount required is approx. 5 times the file size (as an indication).
 # We can disable this for a light version that uses the default memory settings 	
 ASM="\
-	-O3 --memory-init-file 0 \
+	-O3 --memory-init-file 0 -std=c++11 \
 	-s ASM_JS=1 \
 	-s OUTLINING_LIMIT=10000 \
 	-s TOTAL_MEMORY=128*1024*1024 \
@@ -90,6 +93,9 @@ python $EMCC $CHATTY \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
 	-I$VEROVIO_INCLUDE_VRV \
+	-I$VEROVIO_INCLUDE_MIDI \
+	-I$VEROVIO_INCLUDE_PUGI \
+	-I$VEROVIO_INCLUDE_UTF8 \
 	-I$VEROVIO_LIBMEI \
 	-DUSE_EMSCRIPTEN \
 	$ASM \
@@ -165,7 +171,12 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/view_text.cpp \
 	$VEROVIO_ROOT/src/view_tuplet.cpp \
 	$VEROVIO_ROOT/src/vrv.cpp \
-	$VEROVIO_ROOT/src/pugixml.cpp \
+	$VEROVIO_ROOT/src/pugi/pugixml.cpp \
+	$VEROVIO_ROOT/src/midi/Binasc.cpp \
+	$VEROVIO_ROOT/src/midi/MidiEvent.cpp \
+	$VEROVIO_ROOT/src/midi/MidiEventList.cpp \
+	$VEROVIO_ROOT/src/midi/MidiFile.cpp \
+	$VEROVIO_ROOT/src/midi/MidiMessage.cpp \
 	$VEROVIO_ROOT/libmei/attconverter.cpp \
 	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
 	$VEROVIO_ROOT/libmei/atts_critapp.cpp \

@@ -125,6 +125,11 @@ public:
      */
     virtual int PrepareRpt(ArrayPtrVoid *params);
 
+    /**
+     * See Object::CalcMaxMeasureDuration
+     */
+    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
+
 private:
     //
 public:
