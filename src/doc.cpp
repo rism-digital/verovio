@@ -79,7 +79,7 @@ void Doc::Reset(DocType type)
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
-    m_drawingLyricFont.SetFaceName("Garamond");
+    m_drawingLyricFont.SetFaceName("Times");
 }
 
 void Doc::AddPage(Page *page)

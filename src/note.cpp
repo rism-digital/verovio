@@ -94,8 +94,9 @@ void Note::Reset()
 
 void Note::AddLayerElement(vrv::LayerElement *element)
 {
-    //assert(
-    //    dynamic_cast<Accid *>(element) || dynamic_cast<Verse *>(element) || dynamic_cast<EditorialElement *>(element));
+    // assert(
+    //    dynamic_cast<Accid *>(element) || dynamic_cast<Verse *>(element) || dynamic_cast<EditorialElement
+    //    *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();
