@@ -30,43 +30,6 @@ namespace vrv {
 #define VERSION_DEV true
 
 //----------------------------------------------------------------------------
-// Typedefs
-//----------------------------------------------------------------------------
-
-class AttComparison;
-class BeamElementCoord;
-class BoundingBox;
-class DocObject;
-class LayerElement;
-class Note;
-class Object;
-class Point;
-class Staff;
-class System;
-
-typedef std::vector<Object *> ArrayOfObjects;
-
-typedef std::list<Object *> ListOfObjects;
-
-typedef std::vector<void *> ArrayPtrVoid;
-
-typedef std::vector<AttComparison *> ArrayOfAttComparisons;
-
-typedef std::vector<Note *> ChordCluster;
-
-typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
-
-typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
-
-typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
-
-typedef std::vector<std::pair<DocObject *, data_MEASUREBEAT> > ArrayOfDocObjectBeatPairs;
-
-typedef std::vector<std::pair<Staff *, BoundingBox> > ArrayOfStaffBoundingBoxPairs;
-
-typedef std::map<System *, ArrayOfStaffBoundingBoxPairs> MapOfArrayOfStaffBoundingBoxPairs;
-
-//----------------------------------------------------------------------------
 // Object defines
 //----------------------------------------------------------------------------
 
@@ -193,12 +156,14 @@ enum InterfaceId {
 
 class AttComparison;
 class BeamElementCoord;
+class BoundingBox;
 class DocObject;
 class LayerElement;
 class Note;
 class Object;
 class Point;
 class Staff;
+class System;
 class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
@@ -220,6 +185,10 @@ typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointP
 typedef std::vector<std::pair<DocObject *, data_MEASUREBEAT> > ArrayOfDocObjectBeatPairs;
 
 typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfInterfaceClassIdPairs;
+
+typedef std::vector<std::pair<Staff *, BoundingBox> > ArrayOfStaffBoundingBoxPairs;
+
+typedef std::map<System *, ArrayOfStaffBoundingBoxPairs> MapOfArrayOfStaffBoundingBoxPairs;
 
 //----------------------------------------------------------------------------
 // Global defines
