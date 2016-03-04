@@ -26,6 +26,10 @@
 #include "svgdevicecontext.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
+
 namespace vrv {
 
 const char *UTF_16_BE_BOM = "\xFE\xFF";
@@ -594,6 +598,16 @@ bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
 
     outfile << output;
     outfile.close();
+    return true;
+}
+
+bool Toolkit::RenderToMidiFile(const std::string &filename)
+{
+    MidiFile outputfile;
+    outputfile.absoluteTicks();
+    m_doc.ExportMIDI(&outputfile);
+    outputfile.sortTracks();
+    outputfile.write(filename);
     return true;
 }
 

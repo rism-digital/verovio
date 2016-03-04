@@ -807,7 +807,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             }
 
             Text *text = new Text();
-            text->SetText(UTF8to16(textStr.c_str()));
+            text->SetText(UTF8to16(textStr));
             syl->AddTextElement(text);
             verse->AddLayerElement(syl);
             note->AddLayerElement(verse);

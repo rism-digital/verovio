@@ -15,9 +15,14 @@
 
 #include "aligner.h"
 #include "editorial.h"
+#include "smufl.h"
 #include "text.h"
 
 namespace vrv {
+
+#define DYNAM_CHARS 7
+std::wstring dynamChars[] = { L"p", L"m", L"f", L"r", L"s", L"z", L"n" };
+std::wstring dynamSmufl[] = { L"\uE520", L"\uE521", L"\uE522", L"\uE523", L"\uE524", L"\uE525", L"\uE526" };
 
 //----------------------------------------------------------------------------
 // Dynam
@@ -44,7 +49,7 @@ void Dynam::Reset()
 
 void Dynam::AddTextElement(TextElement *element)
 {
-    // assert(dynamic_cast<TextElement *>(element) || dynamic_cast<EditorialElement *>(element));
+    assert(dynamic_cast<TextElement *>(element) || dynamic_cast<EditorialElement *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();
@@ -52,8 +57,92 @@ void Dynam::AddTextElement(TextElement *element)
 
 bool Dynam::IsSymbolOnly()
 {
+    m_symbolStr = L"";
     std::wstring str = this->GetText(this);
-    return str.find_first_not_of(L"fpmrsz") == std::string::npos;
+    if (str.find_first_not_of(L"fpmrszn") == std::string::npos) {
+        m_symbolStr = str;
+        return true;
+    }
+    return false;
+}
+
+std::wstring Dynam::GetSymbolStr()
+{
+    std::wstring dynam;
+    if (m_symbolStr == L"p")
+        dynam.push_back(SMUFL_E520_dynamicPiano);
+    else if (m_symbolStr == L"m")
+        dynam.push_back(SMUFL_E521_dynamicMezzo);
+    else if (m_symbolStr == L"f")
+        dynam.push_back(SMUFL_E522_dynamicForte);
+    else if (m_symbolStr == L"r")
+        dynam.push_back(SMUFL_E523_dynamicRinforzando);
+    else if (m_symbolStr == L"s")
+        dynam.push_back(SMUFL_E524_dynamicSforzando);
+    else if (m_symbolStr == L"z")
+        dynam.push_back(SMUFL_E525_dynamicZ);
+    else if (m_symbolStr == L"n")
+        dynam.push_back(SMUFL_E526_dynamicNiente);
+    else if (m_symbolStr == L"pppppp")
+        dynam.push_back(SMUFL_E527_dynamicPPPPPP);
+    else if (m_symbolStr == L"ppppp")
+        dynam.push_back(SMUFL_E528_dynamicPPPPP);
+    else if (m_symbolStr == L"pppp")
+        dynam.push_back(SMUFL_E529_dynamicPPPP);
+    else if (m_symbolStr == L"ppp")
+        dynam.push_back(SMUFL_E52A_dynamicPPP);
+    else if (m_symbolStr == L"pp")
+        dynam.push_back(SMUFL_E52B_dynamicPP);
+    else if (m_symbolStr == L"mp")
+        dynam.push_back(SMUFL_E52C_dynamicMP);
+    else if (m_symbolStr == L"mf")
+        dynam.push_back(SMUFL_E52D_dynamicMF);
+    else if (m_symbolStr == L"pf")
+        dynam.push_back(SMUFL_E52E_dynamicPF);
+    else if (m_symbolStr == L"ff")
+        dynam.push_back(SMUFL_E52F_dynamicFF);
+    else if (m_symbolStr == L"fff")
+        dynam.push_back(SMUFL_E530_dynamicFFF);
+    else if (m_symbolStr == L"ffff")
+        dynam.push_back(SMUFL_E531_dynamicFFFF);
+    else if (m_symbolStr == L"fffff")
+        dynam.push_back(SMUFL_E532_dynamicFFFFF);
+    else if (m_symbolStr == L"ffffff")
+        dynam.push_back(SMUFL_E533_dynamicFFFFFF);
+    else if (m_symbolStr == L"fp")
+        dynam.push_back(SMUFL_E534_dynamicFortePiano);
+    else if (m_symbolStr == L"fz")
+        dynam.push_back(SMUFL_E535_dynamicForzando);
+    else if (m_symbolStr == L"sf")
+        dynam.push_back(SMUFL_E536_dynamicSforzando1);
+    else if (m_symbolStr == L"sfp")
+        dynam.push_back(SMUFL_E537_dynamicSforzandoPiano);
+    else if (m_symbolStr == L"sfpp")
+        dynam.push_back(SMUFL_E538_dynamicSforzandoPianissimo);
+    else if (m_symbolStr == L"sfz")
+        dynam.push_back(SMUFL_E539_dynamicSforzato);
+    else if (m_symbolStr == L"sfzp")
+        dynam.push_back(SMUFL_E53A_dynamicSforzatoPiano);
+    else if (m_symbolStr == L"sffz")
+        dynam.push_back(SMUFL_E53B_dynamicSforzatoFF);
+    else if (m_symbolStr == L"rf")
+        dynam.push_back(SMUFL_E53C_dynamicRinforzando1);
+    else if (m_symbolStr == L"rfz")
+        dynam.push_back(SMUFL_E53D_dynamicRinforzando2);
+
+    if (!dynam.empty()) return dynam;
+
+    // Otherwise replace it letter by letter
+    dynam = m_symbolStr;
+    int i;
+    std::wstring from, to;
+    for (i = 0; i < DYNAM_CHARS; i++) {
+        from = dynamChars[i];
+        to = dynamSmufl[i];
+        for (size_t pos = 0; (pos = dynam.find(from, pos)) != std::string::npos; pos += to.size())
+            dynam.replace(pos, from.size(), to);
+    }
+    return dynam;
 }
 
 //----------------------------------------------------------------------------

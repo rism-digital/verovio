@@ -49,6 +49,8 @@ public:
      */
     bool IsSymbolOnly();
 
+    std::wstring GetSymbolStr();
+
     //----------//
     // Functors //
     //----------//
@@ -66,7 +68,8 @@ private:
 public:
     //
 private:
-    //
+    /** A cached version of the symbol str instanciated by IsSymbolOnly() */
+    std::wstring m_symbolStr;
 };
 
 } // namespace vrv

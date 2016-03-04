@@ -35,6 +35,10 @@
 #include "verse.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -79,7 +83,7 @@ void Doc::Reset(DocType type)
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
-    m_drawingLyricFont.SetFaceName("Garamond");
+    m_drawingLyricFont.SetFaceName("Times");
 }
 
 void Doc::AddPage(Page *page)
@@ -94,6 +98,74 @@ void Doc::Refresh()
     RefreshViews();
 }
 
+void Doc::ExportMIDI(MidiFile *midiFile)
+{
+    ArrayPtrVoid params;
+
+    // We first calculate the maximum duration of each measure
+    std::vector<double> maxValues;
+    double currentValue;
+    params.push_back(&maxValues);
+    params.push_back(&currentValue);
+    Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
+    this->Process(&calcMaxMeasureDuration, &params);
+
+    // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
+    params.clear();
+    IntTree verseTree;
+    IntTree layerTree;
+    params.push_back(&verseTree);
+    params.push_back(&layerTree);
+    // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
+    // StaffN_LayerN_VerseN_t staffLayerVerseTree;
+    // params.push_back(&staffLayerVerseTree);
+
+    // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &params);
+
+    // The tree is used to process each staff/layer/verse separatly
+    // For this, we use a array of AttCommmonNComparison that looks for each object if it is of the type
+    // and with @n specified
+
+    IntTree_t::iterator staves;
+    IntTree_t::iterator layers;
+
+    // Process notes and chords, rests, spaces layer by layer
+    // track 0 (included by default) is reserved for meta messages common to all tracks
+    int midiTrack = 1;
+    std::vector<AttComparison *> filters;
+    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            midiFile->addTrack(1);
+            filters.clear();
+            // Create ad comparison object for each type / @n
+            AttCommonNComparison matchStaff(STAFF, staves->first);
+            AttCommonNComparison matchLayer(LAYER, layers->first);
+            filters.push_back(&matchStaff);
+            filters.push_back(&matchLayer);
+
+            double currentMeasureTime = 0.0;
+            double totalTime = 0.0;
+            std::vector<double> maxValuesLayer = maxValues;
+
+            params.clear();
+            params.push_back(midiFile);
+            params.push_back(&midiTrack);
+            params.push_back(&currentMeasureTime);
+            params.push_back(&totalTime);
+            params.push_back(&maxValuesLayer);
+            Functor exportMIDI(&Object::ExportMIDI);
+            Functor exportMIDIEnd(&Object::ExportMIDIEnd);
+
+            LogMessage("Exporting track %d ----------------", midiTrack);
+            this->Process(&exportMIDI, &params, &exportMIDIEnd, &filters);
+
+            midiTrack++;
+        }
+    }
+}
+
 void Doc::PrepareDrawing()
 {
     ArrayPtrVoid params;
@@ -104,12 +176,13 @@ void Doc::PrepareDrawing()
     }
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
-    std::vector<TimeSpanningInterface *> timeSpanningInterfaces;
+    ArrayOfInterfaceClassIdPairs timeSpanningInterfaces;
     bool fillList = true;
     params.push_back(&timeSpanningInterfaces);
     params.push_back(&fillList);
     Functor prepareTimeSpanning(&Object::PrepareTimeSpanning);
-    this->Process(&prepareTimeSpanning, &params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    Functor prepareTimeSpanningEnd(&Object::PrepareTimeSpanningEnd);
+    this->Process(&prepareTimeSpanning, &params, &prepareTimeSpanningEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
 
     // First we try backwards because normally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
@@ -460,6 +533,19 @@ int Doc::GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize)
     return w;
 }
 
+int Doc::GetGlyphDescender(wchar_t smuflCode, int staffSize, bool graceSize)
+{
+    int x, y, w, h;
+    Glyph *glyph;
+    glyph = Resources::GetGlyph(smuflCode);
+    assert(glyph);
+    glyph->GetBoundingBox(&x, &y, &w, &h);
+    y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    if (graceSize) y = y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    y = y * staffSize / 100;
+    return y;
+}
+
 int Doc::GetDrawingUnit(int staffSize)
 {
     return m_drawingUnit * staffSize / 100;
@@ -500,9 +586,20 @@ int Doc::GetDrawingStemWidth(int staffSize)
     return m_style->m_stemWidth * staffSize / 100;
 }
 
-int Doc::GetDrawingHairpinSize(int staffSize)
+int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin)
 {
-    return m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITON_FACTOR;
+    int height = GetGlyphHeight(SMUFL_E522_dynamicForte, staffSize, false);
+    // This should be styled
+    if (withMargin) height += GetDrawingUnit(staffSize);
+    return height;
+}
+
+int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin)
+{
+    int size = m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITON_FACTOR;
+    // This should be styled
+    if (withMargin) size += GetDrawingUnit(staffSize);
+    return size;
 }
 
 int Doc::GetDrawingBeamWidth(int staffSize, bool graceSize)

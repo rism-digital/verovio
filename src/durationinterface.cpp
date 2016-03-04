@@ -63,7 +63,7 @@ void DurationInterface::Reset()
     ResetStaffident();
 }
 
-double DurationInterface::GetAlignmentDuration(int num, int numbase)
+double DurationInterface::GetInterfaceAlignmentDuration(int num, int numbase)
 {
     int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
 
@@ -78,7 +78,7 @@ double DurationInterface::GetAlignmentDuration(int num, int numbase)
     return duration;
 }
 
-double DurationInterface::GetAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur)
+double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur)
 {
     int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
 

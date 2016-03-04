@@ -131,6 +131,11 @@ public:
     virtual int AlignHorizontally(ArrayPtrVoid *params);
 
     /**
+     * Align horizontally the content of a layer.
+     */
+    virtual int AlignHorizontallyEnd(ArrayPtrVoid *params);
+
+    /**
      * AlignVertically the content of a measure.
      */
     virtual int AlignVertically(ArrayPtrVoid *params);
@@ -185,6 +190,26 @@ public:
      * See Object::FillStaffCurrentTimeSpanningEnd
      */
     virtual int FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params);
+
+    /**
+     * See Object::PrepareTimeSpanning.
+     */
+    virtual int PrepareTimeSpanningEnd(ArrayPtrVoid *params);
+
+    /**
+     * See Object:ExportMIDI
+     */
+    virtual int ExportMIDI(ArrayPtrVoid *params);
+
+    /**
+     * See Object:ExportMIDI
+     */
+    virtual int ExportMIDIEnd(ArrayPtrVoid *params);
+
+    /**
+     * See Object::CalcMaxMeasureDuration
+     */
+    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
 
     /**
      * See Object::PrepareTimestamps.

@@ -178,6 +178,7 @@ int Layer::AlignHorizontally(ArrayPtrVoid *params)
     // param 1: the time
     // param 2: the current Mensur
     // param 3: the current MeterSig
+    // param 4: the functor for passing it to the TimeStampAligner (unused)
     double *time = static_cast<double *>((*params).at(1));
     Mensur **currentMensur = static_cast<Mensur **>((*params).at(2));
     MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(3));
@@ -295,6 +296,18 @@ int Layer::PrepareRpt(ArrayPtrVoid *params)
     if ((*currentMRpt) && !this->FindChildByType(MRPT)) {
         (*currentMRpt) = NULL;
     }
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::CalcMaxMeasureDuration(ArrayPtrVoid *params)
+{
+    // param 0: std::vector<double>: a stack of maximum duration filled by the functor (unused)
+    // param 1: double: the duration of the current measure
+    double *currentValue = static_cast<double *>((*params).at(1));
+
+    // reset it
+    (*currentValue) = 0.0;
+
     return FUNCTOR_CONTINUE;
 }
 

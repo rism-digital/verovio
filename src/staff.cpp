@@ -142,8 +142,8 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
     if (it != m_timeSpanningElements.end()) {
         Hairpin *h = dynamic_cast<Hairpin *>(*it);
         assert(h);
-        if (h->GetPlace() == STAFFREL_above) alignment->SetDynamAbove();
-        if (h->GetPlace() == STAFFREL_below) alignment->SetDynamBelow();
+        if (h->GetPlace() == STAFFREL_above) alignment->SetHairpinAbove();
+        if (h->GetPlace() == STAFFREL_below) alignment->SetHairpinBelow();
     }
 
     // for next staff

@@ -18,6 +18,7 @@
 #include "attcomparison.h"
 #include "bboxdevicecontext.h"
 #include "devicecontext.h"
+#include "dir.h"
 #include "doc.h"
 #include "dynam.h"
 #include "floatingelement.h"
@@ -27,11 +28,12 @@
 #include "measure.h"
 #include "note.h"
 #include "slur.h"
+#include "smufl.h"
 #include "staff.h"
 #include "style.h"
 #include "syl.h"
 #include "system.h"
-#include "textdirective.h"
+#include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
 #include "vrv.h"
@@ -49,11 +51,17 @@ void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Meas
     assert(measure);
     assert(element);
 
-    if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DYNAM)) {
+    // For dir and dynam, we do not consider the @tstamp2 for rendering
+    if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DIR) && (element->Is() != DYNAM)) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
         system->AddToDrawingList(element);
+    }
+    else if (element->Is() == DIR) {
+        Dir *dir = dynamic_cast<Dir *>(element);
+        assert(dir);
+        DrawDir(dc, dir, measure, system);
     }
     else if (element->Is() == DYNAM) {
         Dynam *dynam = dynamic_cast<Dynam *>(element);
@@ -187,12 +195,12 @@ void View::DrawHairpin(
     hairpinLog_FORM form = hairpin->GetForm();
 
     int startY = 0;
-    int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize);
+    int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
     // We calculate points for cresc by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) View::SwapY(&startY, &endY);
 
-    int y1 = GetHairpinY(hairpin, staff);
+    int y1 = GetHairpinY(hairpin->GetPlace(), staff);
     int y2 = y1;
 
     /************** parent layers **************/
@@ -239,7 +247,7 @@ void View::DrawHairpin(
         }
         // Finally, cres accross the system, increase the start and reduce the end
         else {
-            startY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 3;
+            startY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false) / 3;
             endY = 2 * startY;
         }
     }
@@ -258,7 +266,7 @@ void View::DrawHairpin(
         }
         // Finally, dim accross the system, reduce the start and increase the end
         else {
-            endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 3;
+            endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false) / 3;
             startY = 2 * endY;
         }
     }
@@ -1285,6 +1293,51 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
     }
 }
 
+void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(dir);
+
+    // We cannot draw a dir that has no start position
+    if (!dir->GetStart()) return;
+
+    dc->StartGraphic(dir, "", dir->GetUuid());
+
+    // Use Romam bold for tempo
+    FontInfo dirTxt;
+    dirTxt.SetFaceName("Times");
+    dirTxt.SetStyle(FONTSTYLE_italic);
+
+    // If we have not timestamp
+    int x = dir->GetStart()->GetDrawingX();
+
+    bool setX = false;
+    bool setY = false;
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        // Basic method that use bounding box
+        int y = GetDirY(dir->GetPlace(), *staffIter);
+
+        dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&dirTxt);
+
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        DrawTextChildren(dc, dir, x, y, setX, setY);
+        dc->EndText();
+
+        dc->ResetFont();
+        dc->ResetBrush();
+    }
+
+    dc->EndGraphic(dir, this);
+}
+
 void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system)
 {
     assert(dc);
@@ -1297,12 +1350,16 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     dc->StartGraphic(dynam, "", dynam->GetUuid());
 
+    bool isSymbolOnly = dynam->IsSymbolOnly();
+    std::wstring dynamSymbol;
+    if (isSymbolOnly) {
+        dynamSymbol = dynam->GetSymbolStr();
+    }
+
     // Use Romam bold for tempo
     FontInfo dynamTxt;
     dynamTxt.SetFaceName("Times");
-    if (dynam->IsSymbolOnly()) dynamTxt.SetWeight(FONTWEIGHT_bold);
     dynamTxt.SetStyle(FONTSTYLE_italic);
-    dynamTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
 
     // If we have not timestamp
     int x = dynam->GetStart()->GetDrawingX();
@@ -1313,19 +1370,29 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-
         // Basic method that use bounding box
-        int y = GetDynamY(dynam, *staffIter);
+        int y = GetDynamY(dynam->GetPlace(), *staffIter, true);
 
-        dc->SetBrush(m_currentColour, AxSOLID);
-        dc->SetFont(&dynamTxt);
+        dynamTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
-        DrawTextChildren(dc, dynam, x, y, setX, setY);
-        dc->EndText();
+        // If the dynamic is a symbol (pp, mf, etc.) draw it as one smufl string. This will not take into account
+        // editorial element within the dynam as it would with text
+        if (isSymbolOnly) {
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, dynamSymbol, true, (*staffIter)->m_drawingStaffSize);
+            dc->ResetFont();
+        }
+        else {
+            dc->SetBrush(m_currentColour, AxSOLID);
+            dc->SetFont(&dynamTxt);
 
-        dc->ResetFont();
-        dc->ResetBrush();
+            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+            DrawTextChildren(dc, dynam, x, y, setX, setY);
+            dc->EndText();
+
+            dc->ResetFont();
+            dc->ResetBrush();
+        }
     }
 
     dc->EndGraphic(dynam, this);
@@ -1344,7 +1411,6 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     FontInfo tempoTxt;
     tempoTxt.SetFaceName("Times");
     tempoTxt.SetWeight(FONTWEIGHT_bold);
-    tempoTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
 
     // If we have not timestamp
     int x = measure->GetDrawingX();
@@ -1369,8 +1435,10 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
 
+        tempoTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+
         // Basic method that use bounding box
-        int y = GetTempoY(tempo, *staffIter);
+        int y = GetTempoY(tempo->GetPlace(), *staffIter);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);
@@ -1386,51 +1454,77 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     dc->EndGraphic(tempo, this);
 }
 
-int View::GetDynamY(Dynam *dynam, Staff *staff)
+int View::GetDirY(data_STAFFREL place, Staff *staff)
 {
-    assert(dynam && staff);
+    assert(staff);
+
+    if (!staff->GetAlignment()) return staff->GetDrawingY();
+
+    // For now we use the same Y / baseline as dynam
+    return this->GetDynamY(place, staff, true);
+}
+
+int View::GetDynamY(data_STAFFREL place, Staff *staff, bool baseline)
+{
+    assert(staff);
+
+    if (!staff->GetAlignment()) return staff->GetDrawingY();
+
+    int baselineShift = 0;
+    if (baseline) {
+        int descender = m_doc->GetGlyphDescender(SMUFL_E522_dynamicForte, staff->m_drawingStaffSize, false);
+        int height = m_doc->GetGlyphHeight(SMUFL_E522_dynamicForte, staff->m_drawingStaffSize, false);
+        baselineShift = height / 2 + descender;
+    }
 
     // Temporary basic method for positionning dynam
-    int y = dynam->GetStart()->GetDrawingY();
-    if (staff->GetAlignment()) {
-        if (dynam->GetPlace() == STAFFREL_above) {
-            // For now is is position according to the staff and not the staff aligner. To be changed once we introduce
-            // the dynamic aligner within the staff aligner
-            y = staff->GetDrawingY() + staff->m_contentBB_y2
-                + (1 * m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 5);
-        }
-        else {
-            y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight()
-                - (4 * m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 5);
-        }
+    int y;
+    if (place == STAFFREL_above) {
+        // For now is is position according to the staff and not the staff aligner. To be changed once we introduce
+        // the dynamic aligner within the staff aligner
+        y = staff->GetDrawingY() + staff->m_contentBB_y2;
+        if (baseline)
+            return y + m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2 - baselineShift;
+        else
+            return y + m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2;
+    }
+    else {
+        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight();
+        if (baseline)
+            return y - m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2 - baselineShift;
+        else
+            return y - m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2;
     }
     return y;
 }
 
-int View::GetHairpinY(Hairpin *hairpin, Staff *staff)
+int View::GetHairpinY(data_STAFFREL place, Staff *staff)
 {
-    assert(hairpin && staff);
+    assert(staff);
 
-    // Temporary basic method for positionning hairpin elements
-    int y = hairpin->GetStart()->GetDrawingY();
-    if (staff->GetAlignment()) {
-        if (hairpin->GetPlace() == STAFFREL_above) {
-            // For now is is position according to the staff and not the staff aligner. To be changed once we introduce
-            // the dynamic aligner within the staff aligner
-            y = staff->GetDrawingY() + staff->m_contentBB_y2
-                + m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 2;
-        }
-        else {
-            y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight()
-                - m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize) / 2;
-        }
+    if (!staff->GetAlignment()) return staff->GetDrawingY();
+
+    int y;
+    if (place == STAFFREL_above) {
+        if (staff->GetAlignment()->GetDynamAbove()) return this->GetDynamY(place, staff, false);
+        // For now is is position according to the staff and not the staff aligner. To be changed once we introduce
+        // the dynamic aligner within the staff aligner
+        y = staff->GetDrawingY() + staff->m_contentBB_y2
+            + m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, true) / 2;
+    }
+    else {
+        if (staff->GetAlignment()->GetDynamBelow()) return this->GetDynamY(place, staff, false);
+        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight()
+            - m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, true) / 2;
     }
     return y;
 }
 
-int View::GetTempoY(Tempo *tempo, Staff *staff)
+int View::GetTempoY(data_STAFFREL place, Staff *staff)
 {
-    assert(tempo && staff);
+    assert(staff);
+
+    if (!staff->GetAlignment()) return staff->GetDrawingY();
 
     // Temporary basic method for positionning tempo elements
     int y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);

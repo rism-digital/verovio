@@ -7,10 +7,11 @@ SET(CMAKE_BUILD_TYPE Release)
 option(NO_PAE_SUPPORT "Disable Plain and Easy support" OFF)
 
 add_definitions(-g)
+add_definitions(-std=c++11)
 
 EXEC_PROGRAM(../tools/get_git_commit.sh ARGS OUTPUT_VARIABLE GIT_COMMIT)
 
-include_directories(/usr/local/include ../include ../include/vrv ../libmei)
+include_directories(/usr/local/include ../include ../include/midi ../include/pugi ../include/utf8 ../include/vrv ../libmei)
 
 if(NO_PAE_SUPPORT)
   add_definitions(-DNO_PAE_SUPPORT)
@@ -20,6 +21,7 @@ add_executable (verovio
 	main.cpp
 	../src/accid.cpp
 	../src/aligner.cpp
+	../src/anchoredtext.cpp
 	../src/att.cpp
 	../src/barline.cpp
 	../src/bboxdevicecontext.cpp
@@ -28,6 +30,7 @@ add_executable (verovio
 	../src/clef.cpp
 	../src/custos.cpp
 	../src/devicecontext.cpp
+	../src/dir.cpp
 	../src/doc.cpp	
 	../src/dot.cpp
 	../src/drawinginterface.cpp
@@ -67,8 +70,8 @@ add_executable (verovio
 	../src/svgdevicecontext.cpp
 	../src/syl.cpp
 	../src/system.cpp
+	../src/tempo.cpp
 	../src/text.cpp
-	../src/textdirective.cpp
 	../src/textdirinterface.cpp
 	../src/textelement.cpp
 	../src/tie.cpp
@@ -87,7 +90,12 @@ add_executable (verovio
 	../src/view_text.cpp
 	../src/view_tuplet.cpp
 	../src/vrv.cpp
-	../src/pugixml.cpp
+	../src/pugi/pugixml.cpp
+	../src/midi/Binasc.cpp
+	../src/midi/MidiEvent.cpp
+	../src/midi/MidiEventList.cpp
+	../src/midi/MidiFile.cpp
+	../src/midi/MidiMessage.cpp
 	../libmei/attconverter.cpp
 	../libmei/atts_cmn.cpp
 	../libmei/atts_critapp.cpp

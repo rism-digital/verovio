@@ -159,10 +159,14 @@ void View::DrawSystem(DeviceContext *dc, System *system)
         // This needs to be improved because we are now using (tuplet) oblique figures.
         // We should also have a better way to specify if the number has to be displayed or not
         if ((measure->GetN() != VRV_UNSET) && (measure->GetN() > 1)) {
-            dc->SetFont(m_doc->GetDrawingSmuflFont(100, false));
-            dc->DrawMusicText(IntToTupletFigures(measure->GetN()), ToDeviceContextX(system->GetDrawingX()),
-                ToDeviceContextY(system->GetDrawingY() - m_doc->GetSpacingStaff() * m_doc->GetDrawingUnit(100)));
-            dc->ResetFont();
+            Staff *staff = dynamic_cast<Staff *>(measure->FindChildByType(STAFF));
+            if (staff) {
+                dc->SetFont(m_doc->GetDrawingSmuflFont(100, false));
+                dc->DrawMusicText(IntToTupletFigures(measure->GetN()), ToDeviceContextX(system->GetDrawingX()),
+                    ToDeviceContextY(staff->GetDrawingY()
+                                      + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
+                dc->ResetFont();
+            }
         }
     }
 

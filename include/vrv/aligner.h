@@ -139,13 +139,21 @@ public:
     int GetVerseCount() { return m_verseCount; };
 
     /**
-     * @name Setter and getter for above or below dynam/hairpin
+     * @name Setter and getter for above or below dir/dynam/hairpin
      */
     ///@{
+    void SetDirAbove() { m_dirAbove = true; };
+    bool GetDirAbove() { return m_dirAbove; };
+    void SetDirBelow() { m_dirBelow = true; };
+    bool GetDirBelow() { return m_dirBelow; };
     void SetDynamAbove() { m_dynamAbove = true; };
     bool GetDynamAbove() { return m_dynamAbove; };
     void SetDynamBelow() { m_dynamBelow = true; };
     bool GetDynamBelow() { return m_dynamBelow; };
+    void SetHairpinAbove() { m_hairpinAbove = true; };
+    bool GetHairpinAbove() { return m_hairpinAbove; };
+    void SetHairpinBelow() { m_hairpinBelow = true; };
+    bool GetHairpinBelow() { return m_hairpinBelow; };
     ///@}
 
     /**
@@ -156,6 +164,10 @@ public:
     Staff *GetStaff() { return m_staff; };
     void SetStaff(Staff *staff) { m_staff = staff; };
     ///@}
+
+    //----------//
+    // Functors //
+    //----------//
 
     /**
      * Set the position of the StaffAlignment.
@@ -197,8 +209,12 @@ private:
      * @name indicator for the presence of above and below dynam/hairpin
      */
     ///@{
+    bool m_dirAbove;
+    bool m_dirBelow;
     bool m_dynamAbove;
     bool m_dynamBelow;
+    bool m_hairpinAbove;
+    bool m_hairpinBelow;
     ///@}
 };
 

@@ -1227,30 +1227,30 @@
             <glyph glyph-code="E523" smufl-name="dynamicRinforzando"/>
             <glyph glyph-code="E524" smufl-name="dynamicSforzando"/>
             <glyph glyph-code="E525" smufl-name="dynamicZ"/>
-            <!--<glyph glyph-code="E526" smufl-name="dynamicNiente"/>-->
-            <!--<glyph glyph-code="E527" smufl-name="dynamicPPPPPP"/>-->
-            <!--<glyph glyph-code="E528" smufl-name="dynamicPPPPP"/>-->
-            <!--<glyph glyph-code="E529" smufl-name="dynamicPPPP"/>-->
-            <!--<glyph glyph-code="E52A" smufl-name="dynamicPPP"/>-->
-            <!--<glyph glyph-code="E52B" smufl-name="dynamicPP"/>-->
-            <!--<glyph glyph-code="E52C" smufl-name="dynamicMP"/>-->
-            <!--<glyph glyph-code="E52D" smufl-name="dynamicMF"/>-->
-            <!--<glyph glyph-code="E52E" smufl-name="dynamicPF"/>-->
+            <glyph glyph-code="E526" smufl-name="dynamicNiente"/>
+            <glyph glyph-code="E527" smufl-name="dynamicPPPPPP"/>
+            <glyph glyph-code="E528" smufl-name="dynamicPPPPP"/>
+            <glyph glyph-code="E529" smufl-name="dynamicPPPP"/>
+            <glyph glyph-code="E52A" smufl-name="dynamicPPP"/>
+            <glyph glyph-code="E52B" smufl-name="dynamicPP"/>
+            <glyph glyph-code="E52C" smufl-name="dynamicMP"/>
+            <glyph glyph-code="E52D" smufl-name="dynamicMF"/>
+            <glyph glyph-code="E52E" smufl-name="dynamicPF"/>
             <glyph glyph-code="E52F" smufl-name="dynamicFF"/>
             <glyph glyph-code="E530" smufl-name="dynamicFFF"/>
             <glyph glyph-code="E531" smufl-name="dynamicFFFF"/>
             <glyph glyph-code="E532" smufl-name="dynamicFFFFF"/>
-            <!--<glyph glyph-code="E533" smufl-name="dynamicFFFFFF"/>-->
-            <!--<glyph glyph-code="E534" smufl-name="dynamicFortePiano"/>-->
-            <!--<glyph glyph-code="E535" smufl-name="dynamicForzando"/>-->
-            <!--<glyph glyph-code="E536" smufl-name="dynamicSforzando1"/>-->
-            <!--<glyph glyph-code="E537" smufl-name="dynamicSforzandoPiano"/>-->
-            <!--<glyph glyph-code="E538" smufl-name="dynamicSforzandoPianissimo"/>-->
-            <!--<glyph glyph-code="E539" smufl-name="dynamicSforzato"/>-->
-            <!--<glyph glyph-code="E53A" smufl-name="dynamicSforzatoPiano"/>-->
-            <!--<glyph glyph-code="E53B" smufl-name="dynamicSforzatoFF"/>-->
-            <!--<glyph glyph-code="E53C" smufl-name="dynamicRinforzando1"/>-->
-            <!--<glyph glyph-code="E53D" smufl-name="dynamicRinforzando2"/>-->
+            <glyph glyph-code="E533" smufl-name="dynamicFFFFFF"/>
+            <glyph glyph-code="E534" smufl-name="dynamicFortePiano"/>
+            <glyph glyph-code="E535" smufl-name="dynamicForzando"/>
+            <glyph glyph-code="E536" smufl-name="dynamicSforzando1"/>
+            <glyph glyph-code="E537" smufl-name="dynamicSforzandoPiano"/>
+            <glyph glyph-code="E538" smufl-name="dynamicSforzandoPianissimo"/>
+            <glyph glyph-code="E539" smufl-name="dynamicSforzato"/>
+            <glyph glyph-code="E53A" smufl-name="dynamicSforzatoPiano"/>
+            <glyph glyph-code="E53B" smufl-name="dynamicSforzatoFF"/>
+            <glyph glyph-code="E53C" smufl-name="dynamicRinforzando1"/>
+            <glyph glyph-code="E53D" smufl-name="dynamicRinforzando2"/>
             <!--<glyph glyph-code="E53E" smufl-name="dynamicCrescendoHairpin"/>-->
             <!--<glyph glyph-code="E53F" smufl-name="dynamicDiminuendoHairpin"/>-->
             <!--<glyph glyph-code="E540" smufl-name="dynamicMessaDiVoce"/>-->

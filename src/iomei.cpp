@@ -15,9 +15,11 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "anchoredtext.h"
 #include "beam.h"
 #include "chord.h"
 #include "custos.h"
+#include "dir.h"
 #include "dot.h"
 #include "dynam.h"
 #include "editorial.h"
@@ -39,8 +41,8 @@
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
+#include "tempo.h"
 #include "text.h"
-#include "textdirective.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -199,6 +201,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == ANCHORED_TEXT) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         WriteMeiAnchoredText(m_currentNode, dynamic_cast<AnchoredText *>(object));
+    }
+    else if (object->Is() == DIR) {
+        m_currentNode = m_currentNode.append_child("dir");
+        WriteMeiDir(m_currentNode, dynamic_cast<Dir *>(object));
     }
     else if (object->Is() == DYNAM) {
         m_currentNode = m_currentNode.append_child("dynam");
@@ -573,6 +579,15 @@ void MeiOutput::WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *a
     WriteTextDirInterface(currentNode, anchoredText);
 }
 
+void MeiOutput::WriteMeiDir(pugi::xml_node currentNode, Dir *dir)
+{
+    assert(dir);
+
+    WriteXmlId(currentNode, dir);
+    WriteTextDirInterface(currentNode, dir);
+    WriteTimeSpanningInterface(currentNode, dir);
+};
+
 void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
 {
     assert(dynam);
@@ -807,6 +822,7 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     WriteLayerElement(currentNode, note);
     WriteDurationInterface(currentNode, note);
     WritePitchInterface(currentNode, note);
+    note->WriteAccidentalPerformed(currentNode);
     note->WriteColoration(currentNode);
     note->WriteGraced(currentNode);
     note->WriteNoteLogMensural(currentNode);
@@ -880,7 +896,7 @@ void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
     if (!text->GetText().empty()) {
         pugi::xml_node nodechild = element.append_child(pugi::node_pcdata);
         // nodechild.text() =  UTF16to8(EscapeSMuFL(text->GetText()).c_str()).c_str();
-        nodechild.text() = UTF16to8(text->GetText().c_str()).c_str();
+        nodechild.text() = UTF16to8(text->GetText()).c_str();
     }
 }
 
@@ -1636,6 +1652,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "anchoredText") {
             success = ReadMeiAnchoredText(parent, current);
         }
+        else if (std::string(current.name()) == "dir") {
+            success = ReadMeiDir(parent, current);
+        }
         else if (std::string(current.name()) == "dynam") {
             success = ReadMeiDynam(parent, current);
         }
@@ -1675,6 +1694,18 @@ bool MeiInput::ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText)
 
     AddFloatingElement(parent, vrvAnchoredText);
     return ReadMeiTextChildren(vrvAnchoredText, anchoredText);
+}
+
+bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
+{
+    Dir *vrvDir = new Dir();
+    SetMeiUuid(dir, vrvDir);
+
+    ReadTextDirInterface(dir, vrvDir);
+    ReadTimeSpanningInterface(dir, vrvDir);
+
+    AddFloatingElement(parent, vrvDir);
+    return ReadMeiTextChildren(vrvDir, dir);
 }
 
 bool MeiInput::ReadMeiDynam(Object *parent, pugi::xml_node dynam)
@@ -2145,6 +2176,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
 
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
+    vrvNote->ReadAccidentalPerformed(note);
     vrvNote->ReadColoration(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadNoteLogMensural(note);
@@ -2822,6 +2854,11 @@ void MeiInput::AddTextElement(Object *parent, TextElement *element)
         AnchoredText *anchoredText = dynamic_cast<AnchoredText *>(parent);
         assert(anchoredText);
         anchoredText->AddTextElement(element);
+    }
+    else if (parent->Is() == DIR) {
+        Dir *dir = dynamic_cast<Dir *>(parent);
+        assert(dir);
+        dir->AddTextElement(element);
     }
     else if (parent->Is() == DYNAM) {
         Dynam *dynam = dynamic_cast<Dynam *>(parent);

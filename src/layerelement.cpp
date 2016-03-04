@@ -42,6 +42,10 @@
 #include "view.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -199,9 +203,9 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
         if (duration->IsMensural()) {
-            return duration->GetAlignmentMensuralDuration(num, numbase, mensur);
+            return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
         }
-        double durationValue = duration->GetAlignmentDuration(num, numbase);
+        double durationValue = duration->GetInterfaceAlignmentDuration(num, numbase);
         // With fTrem we need to divide the duration by two
         FTrem *fTrem = dynamic_cast<FTrem *>(this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
         if (fTrem) {
@@ -220,7 +224,7 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         TimestampAttr *timestampAttr = dynamic_cast<TimestampAttr *>(this);
         assert(timestampAttr);
         int meterUnit = 4;
-        if (meterSig) meterSig->GetUnit();
+        if (meterSig) meterUnit = meterSig->GetUnit();
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     else {
@@ -258,7 +262,8 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     // param 0: the measureAligner
     // param 1: the time
     // param 2: the current Mensur
-    // param 3: the current MeterSig (unused)
+    // param 3: the current MeterSig
+    // param 4: the functor for passing it to the TimeStampAligner (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner **>((*params).at(0));
     double *time = static_cast<double *>((*params).at(1));
     Mensur **currentMensur = static_cast<Mensur **>((*params).at(2));
@@ -338,7 +343,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     }
 
     // get the duration of the event
-    double duration = this->GetAlignmentDuration(*currentMensur);
+    double duration = this->GetAlignmentDuration(*currentMensur, *currentMeterSig);
 
     // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
     // So use it as current time - we can do this because the timestamp loop is redirected from the measure
@@ -370,13 +375,12 @@ int LayerElement::PrepareTimeSpanning(ArrayPtrVoid *params)
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match
     // param 1: bool* fillList for indicating whether the elements have to be stacked or not (unused)
-    std::vector<TimeSpanningInterface *> *elements
-        = static_cast<std::vector<TimeSpanningInterface *> *>((*params).at(0));
+    ArrayOfInterfaceClassIdPairs *elements = static_cast<ArrayOfInterfaceClassIdPairs *>((*params).at(0));
 
-    std::vector<TimeSpanningInterface *>::iterator iter = elements->begin();
+    ArrayOfInterfaceClassIdPairs::iterator iter = elements->begin();
     while (iter != elements->end()) {
-        if ((*iter)->SetStartAndEnd(this)) {
-            // Check that there is no timestamp?
+        if (iter->first->SetStartAndEnd(this)) {
+            // We have both the start and the end that are matched
             iter = elements->erase(iter);
         }
         else {
@@ -524,6 +528,153 @@ int LayerElement::TimeSpanningLayerElements(ArrayPtrVoid *params)
     else if (this->GetDrawingX() > (*max_pos)) {
         return FUNCTOR_STOP;
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::ExportMIDI(ArrayPtrVoid *params)
+{
+    // param 0: MidiFile*: the MidiFile we are writing to
+    // param 1: int*: the midi track number
+    // param 2: int*: the current time in the measure (incremented by each element)
+    // param 3: int*: the current total measure time (incremented by each measure
+    MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
+    int *midiTrack = static_cast<int *>((*params).at(1));
+    double *currentMeasureTime = static_cast<double *>((*params).at(2));
+    double *totalTime = static_cast<double *>((*params).at(3));
+
+    // Here we need to check if the LayerElement as a duration, otherwise we can continue
+    if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
+
+    // Now deal with the different elements
+    if (this->Is() == REST) {
+        Rest *rest = dynamic_cast<Rest *>(this);
+        assert(rest);
+        LogMessage("Rest %f", GetAlignmentDuration());
+        // increase the currentTime accordingly
+        (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
+    }
+    else if (this->Is() == NOTE) {
+        Note *note = dynamic_cast<Note *>(this);
+        assert(note);
+
+        // Fow just ignore grace notes
+        if (note->HasGrace()) return FUNCTOR_CONTINUE;
+
+        Chord *chord = note->IsChordTone();
+
+        double dur;
+        if (chord)
+            dur = chord->GetAlignmentDuration();
+        else
+            dur = note->GetAlignmentDuration();
+        dur = dur * 120 / (DUR_MAX / DURATION_4);
+
+        LogMessage("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
+            note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
+        LogMessage("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
+
+        // Create midi note
+        int midiBase = 0;
+        data_PITCHNAME pname = note->GetPname();
+        switch (pname) {
+            case PITCHNAME_c: midiBase = 0; break;
+            case PITCHNAME_d: midiBase = 2; break;
+            case PITCHNAME_e: midiBase = 4; break;
+            case PITCHNAME_f: midiBase = 5; break;
+            case PITCHNAME_g: midiBase = 7; break;
+            case PITCHNAME_a: midiBase = 9; break;
+            case PITCHNAME_b: midiBase = 11; break;
+            case PITCHNAME_NONE: break;
+        }
+        // Check for accidentals
+        if (note->HasAccidGes()) {
+            data_ACCIDENTAL_IMPLICIT acc_imp = note->GetAccidGes();
+            switch (acc_imp) {
+                case ACCIDENTAL_IMPLICIT_s: midiBase += 1; break;
+                case ACCIDENTAL_IMPLICIT_f: midiBase -= 1; break;
+                case ACCIDENTAL_IMPLICIT_ss: midiBase += 2; break;
+                case ACCIDENTAL_IMPLICIT_ff: midiBase -= 2; break;
+                default: break;
+            }
+        }
+        else if (note->m_drawingAccid) {
+            data_ACCIDENTAL_EXPLICIT acc_exp = note->m_drawingAccid->GetAccid();
+            switch (acc_exp) {
+                case ACCIDENTAL_IMPLICIT_s: midiBase += 1; break;
+                case ACCIDENTAL_IMPLICIT_f: midiBase -= 1; break;
+                case ACCIDENTAL_IMPLICIT_ss: midiBase += 2; break;
+                case ACCIDENTAL_IMPLICIT_ff: midiBase -= 2; break;
+                default: break;
+            }
+        }
+        int pitch = midiBase + (note->GetOct() + 1) * 12;
+        int channel = 0;
+        int velocity = 64;
+        midiFile->addNoteOn(*midiTrack, *totalTime + *currentMeasureTime, channel, pitch, velocity);
+        midiFile->addNoteOff(*midiTrack, *totalTime + *currentMeasureTime + dur, channel, pitch);
+
+        // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
+        if (!(note->IsChordTone())) {
+            (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
+        }
+    }
+    else if (this->Is() == SPACE) {
+        Space *space = dynamic_cast<Space *>(this);
+        assert(space);
+        LogMessage("Space %f", GetAlignmentDuration());
+        // increase the currentTime accordingly
+        (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
+    }
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::ExportMIDIEnd(ArrayPtrVoid *params)
+{
+    // param 0: MidiFile*: the MidiFile we are writing to (unused)
+    // param 1: int*: the midi track number (unused)
+    // param 2: int*: the current time in the measure (incremented by each element)
+    // param 3: int*: the current total measure time (incremented by each measure (unused)
+    // param 4: std::vector<double>: a stack of maximum duration filled by the functor (unused)
+    double *currentMeasureTime = static_cast<double *>((*params).at(2));
+
+    if (this->Is() == CHORD) {
+        Chord *chord = dynamic_cast<Chord *>(this);
+        assert(chord);
+        LogMessage("Chord %f", GetAlignmentDuration());
+        // increase the currentTime accordingly.
+        (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::CalcMaxMeasureDuration(ArrayPtrVoid *params)
+{
+    // param 0: std::vector<double>: a stack of maximum duration filled by the functor
+    // param 1: double: the duration of the current measure
+    std::vector<double> *maxValues = static_cast<std::vector<double> *>((*params).at(0));
+    double *currentValue = static_cast<double *>((*params).at(1));
+
+    // Here we need to check if the LayerElement as a duration, otherwise we can continue
+    if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
+
+    if (this->Is() == NOTE) {
+        Note *note = dynamic_cast<Note *>(this);
+        assert(note);
+
+        // Fow just ignore grace notes
+        if (note->HasGrace()) return FUNCTOR_CONTINUE;
+
+        // The is increased by the chord element
+        if (note->IsChordTone()) return FUNCTOR_CONTINUE;
+    }
+
+    // increase the currentTime accordingly
+    (*currentValue) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
+
+    // now if we have cummulated in the layer a longer duration for the current measure, replace it
+    if (maxValues->back() < (*currentValue)) maxValues->back() = (*currentValue);
 
     return FUNCTOR_CONTINUE;
 }

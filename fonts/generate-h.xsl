@@ -20,12 +20,12 @@
         <xsl:text>&#10;</xsl:text>
         
         <!-- end of vrv namespace and of #ifdef -->
-        <xsl:text>&#10;} // vrv namespace&#10;&#10;#endif&#10;&#10;</xsl:text>
+        <xsl:text>&#10;} // vrv namespace&#10;&#10;#endif&#10;</xsl:text>
         
     </xsl:template>
 
     <xsl:template match="glyph">
-        <xsl:text>  SMUFL_</xsl:text>
+        <xsl:text>    SMUFL_</xsl:text>
         <xsl:value-of select="@glyph-code"/>_<xsl:value-of select="@smufl-name"/>
         <xsl:text disable-output-escaping="yes"> = 0x</xsl:text><xsl:value-of select="@glyph-code"/><xsl:text>,&#10;</xsl:text>
     </xsl:template>

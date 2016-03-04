@@ -14,6 +14,9 @@
 
 #include "doc.h"
 #include "io.h"
+
+//----------------------------------------------------------------------------
+
 #include "pugixml.hpp"
 
 namespace vrv {
@@ -35,6 +38,7 @@ class Custos;
 class Damage;
 class Del;
 class Dot;
+class Dir;
 class DurationInterface;
 class Dynam;
 class Expan;
@@ -181,6 +185,7 @@ private:
      */
     ///@{
     void WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
+    void WriteMeiDir(pugi::xml_node currentNode, Dir *dir);
     void WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteMeiSlur(pugi::xml_node currentNode, Slur *slur);
@@ -367,6 +372,7 @@ private:
      */
     ///@{
     bool ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText);
+    bool ReadMeiDir(Object *parent, pugi::xml_node dir);
     bool ReadMeiDynam(Object *parent, pugi::xml_node dynam);
     bool ReadMeiHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadMeiSlur(Object *parent, pugi::xml_node slur);

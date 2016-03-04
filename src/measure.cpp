@@ -155,8 +155,8 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
     // param 1: the time (unused)
     // param 2: the current Mensur (unused)
     // param 3: the current MeterSig (unused)
+    // param 4: the functor for passing it to the TimeStampAligner (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner **>((*params).at(0));
-    Functor *alignHorizontally = static_cast<Functor *>((*params).at(4));
 
     // clear the content of the measureAligner
     m_measureAligner.Reset();
@@ -167,9 +167,6 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
 
     // point to it
     (*measureAligner) = &m_measureAligner;
-
-    // We also need to align the timestamps
-    m_timestampAligner.Process(alignHorizontally, params);
 
     if (m_leftBarLine.GetForm() != BARRENDITION_NONE) {
         m_leftBarLine.SetAlignment(m_measureAligner.GetLeftAlignment());
@@ -182,6 +179,23 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
     // LogDebug("\n ***** Align measure %d", this->GetN());
 
     assert(*measureAligner);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::AlignHorizontallyEnd(ArrayPtrVoid *params)
+{
+    // param 0: the measureAligner (unused)
+    // param 1: the time (unused)
+    // param 2: the current Mensur (unused)
+    // param 3: the current MeterSig (unused)
+    // param 4: the functor for passing it to the TimeStampAligner
+    Functor *alignHorizontally = static_cast<Functor *>((*params).at(4));
+
+    // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a
+    // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work in
+    // MEI anyway.
+    m_timestampAligner.Process(alignHorizontally, params);
 
     return FUNCTOR_CONTINUE;
 }
@@ -383,6 +397,28 @@ int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::PrepareTimeSpanningEnd(ArrayPtrVoid *params)
+{
+    // param 0: std::vector<DocObject*>* that holds the current elements to match
+    // param 1: bool* fillList for indicating whether the elements have to be stacked or not (unused)
+    ArrayOfInterfaceClassIdPairs *elements = static_cast<ArrayOfInterfaceClassIdPairs *>((*params).at(0));
+
+    ArrayOfInterfaceClassIdPairs::iterator iter = elements->begin();
+    while (iter != elements->end()) {
+        // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
+        // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
+        // midi output
+        if ((iter->second == DIR) || (iter->second == DYNAM)) {
+            iter = elements->erase(iter);
+        }
+        else {
+            iter++;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match
@@ -416,7 +452,8 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
             assert(interface);
             TimestampAttr *timestampAttr = m_timestampAligner.GetTimestampAtTime((*iter).second.second);
             interface->SetEnd(timestampAttr);
-            // We can check if the interface is now fully mapped (start / end) and purge the list of unmatched elements
+            // We can check if the interface is now fully mapped (start / end) and purge the list of unmatched
+            // elements
             if (interface->HasStartAndEnd()) {
                 elements->erase(std::remove(elements->begin(), elements->end(), (*iter).first), elements->end());
             }
@@ -431,5 +468,51 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
 
     return FUNCTOR_CONTINUE;
 };
+
+int Measure::ExportMIDI(ArrayPtrVoid *params)
+{
+    // param 0: MidiFile*: the MidiFile we are writing to (unused)
+    // param 1: int*: the midi track number (unused)
+    // param 2: int*: the current time in the measure (incremented by each element)
+    // param 3: int*: the current total measure time (incremented by each measure (unused)
+    // param 4: std::vector<double>: a stack of maximum duration filled by the functor (unused)
+    double *currentMeasureTime = static_cast<double *>((*params).at(2));
+
+    // Here we need to reset the currentMeasureTime because we are starting a new measure
+    (*currentMeasureTime) = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::ExportMIDIEnd(ArrayPtrVoid *params)
+{
+    // param 0: MidiFile*: the MidiFile we are writing to (unused)
+    // param 1: int*: the midi track number (unused)
+    // param 2: int*: the current time in the measure (incremented by each element) (unused)
+    // param 3: int*: the current total measure time (incremented by each measure
+    // param 4: std::vector<double>: a stack of maximum duration filled by the functor
+    double *totalTime = static_cast<double *>((*params).at(3));
+    std::vector<double> *maxValues = static_cast<std::vector<double> *>((*params).at(4));
+
+    // We a to the total time the maximum duration of the measure so if there is no layer, if the layer is not full or
+    // if there is an encoding error in the measure, the next one will be properly aligned
+    assert(!maxValues->empty());
+    (*totalTime) += maxValues->front();
+    maxValues->erase(maxValues->begin());
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::CalcMaxMeasureDuration(ArrayPtrVoid *params)
+{
+    // param 0: std::vector<double>: a stack of maximum duration filled by the functor
+    // param 1: double: the duration of the current measure (unused)
+    std::vector<double> *maxValues = static_cast<std::vector<double> *>((*params).at(0));
+
+    // We just need to add a value to the stack
+    maxValues->push_back(0.0);
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv
