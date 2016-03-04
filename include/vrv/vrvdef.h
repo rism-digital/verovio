@@ -30,37 +30,6 @@ namespace vrv {
 #define VERSION_DEV true
 
 //----------------------------------------------------------------------------
-// Typedefs
-//----------------------------------------------------------------------------
-
-class AttComparison;
-class BeamElementCoord;
-class DocObject;
-class LayerElement;
-class Note;
-class Object;
-class Point;
-class Staff;
-
-typedef std::vector<Object *> ArrayOfObjects;
-
-typedef std::list<Object *> ListOfObjects;
-
-typedef std::vector<void *> ArrayPtrVoid;
-
-typedef std::vector<AttComparison *> ArrayOfAttComparisons;
-
-typedef std::vector<Note *> ChordCluster;
-
-typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
-
-typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
-
-typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
-
-typedef std::vector<std::pair<DocObject *, data_MEASUREBEAT> > ArrayOfDocObjectBeatPairs;
-
-//----------------------------------------------------------------------------
 // Object defines
 //----------------------------------------------------------------------------
 
@@ -180,6 +149,40 @@ enum InterfaceId {
     INTERFACE_TIME_POINT,
     INTERFACE_TIME_SPANNING
 };
+
+//----------------------------------------------------------------------------
+// Typedefs
+//----------------------------------------------------------------------------
+
+class AttComparison;
+class BeamElementCoord;
+class DocObject;
+class LayerElement;
+class Note;
+class Object;
+class Point;
+class Staff;
+class TimeSpanningInterface;
+
+typedef std::vector<Object *> ArrayOfObjects;
+
+typedef std::list<Object *> ListOfObjects;
+
+typedef std::vector<void *> ArrayPtrVoid;
+
+typedef std::vector<AttComparison *> ArrayOfAttComparisons;
+
+typedef std::vector<Note *> ChordCluster;
+
+typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
+
+typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
+
+typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
+
+typedef std::vector<std::pair<DocObject *, data_MEASUREBEAT> > ArrayOfDocObjectBeatPairs;
+
+typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfInterfaceClassIdPairs;
 
 //----------------------------------------------------------------------------
 // Global defines

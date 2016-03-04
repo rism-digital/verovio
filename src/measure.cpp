@@ -397,6 +397,28 @@ int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::PrepareTimeSpanningEnd(ArrayPtrVoid *params)
+{
+    // param 0: std::vector<DocObject*>* that holds the current elements to match
+    // param 1: bool* fillList for indicating whether the elements have to be stacked or not (unused)
+    ArrayOfInterfaceClassIdPairs *elements = static_cast<ArrayOfInterfaceClassIdPairs *>((*params).at(0));
+
+    ArrayOfInterfaceClassIdPairs::iterator iter = elements->begin();
+    while (iter != elements->end()) {
+        // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
+        // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
+        // midi output
+        if ((iter->second == DIR) || (iter->second == DYNAM)) {
+            iter = elements->erase(iter);
+        }
+        else {
+            iter++;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match

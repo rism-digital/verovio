@@ -219,8 +219,7 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(ArrayPtrVoid *params, Do
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match
     // param 1: bool* fillList for indicating whether the elements have to be stacked or not
-    std::vector<TimeSpanningInterface *> *elements
-        = static_cast<std::vector<TimeSpanningInterface *> *>((*params).at(0));
+    ArrayOfInterfaceClassIdPairs *elements = static_cast<ArrayOfInterfaceClassIdPairs *>((*params).at(0));
     bool *fillList = static_cast<bool *>((*params).at(1));
 
     if ((*fillList) == false) {
@@ -228,7 +227,7 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(ArrayPtrVoid *params, Do
     }
 
     this->SetUuidStr();
-    elements->push_back(this);
+    elements->push_back(std::make_pair(this, object->Is()));
 
     return FUNCTOR_CONTINUE;
 }

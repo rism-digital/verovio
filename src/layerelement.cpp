@@ -375,13 +375,12 @@ int LayerElement::PrepareTimeSpanning(ArrayPtrVoid *params)
 {
     // param 0: std::vector<DocObject*>* that holds the current elements to match
     // param 1: bool* fillList for indicating whether the elements have to be stacked or not (unused)
-    std::vector<TimeSpanningInterface *> *elements
-        = static_cast<std::vector<TimeSpanningInterface *> *>((*params).at(0));
+    ArrayOfInterfaceClassIdPairs *elements = static_cast<ArrayOfInterfaceClassIdPairs *>((*params).at(0));
 
-    std::vector<TimeSpanningInterface *>::iterator iter = elements->begin();
+    ArrayOfInterfaceClassIdPairs::iterator iter = elements->begin();
     while (iter != elements->end()) {
-        if ((*iter)->SetStartAndEnd(this)) {
-            // Check that there is no timestamp?
+        if (iter->first->SetStartAndEnd(this)) {
+            // We have both the start and the end that are matched
             iter = elements->erase(iter);
         }
         else {

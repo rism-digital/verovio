@@ -192,9 +192,9 @@ public:
     virtual int FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params);
 
     /**
-     * See Object::PrepareTimestamps.
+     * See Object::PrepareTimeSpanning.
      */
-    virtual int PrepareTimestampsEnd(ArrayPtrVoid *params);
+    virtual int PrepareTimeSpanningEnd(ArrayPtrVoid *params);
 
     /**
      * See Object:ExportMIDI
@@ -210,6 +210,11 @@ public:
      * See Object::CalcMaxMeasureDuration
      */
     virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
+
+    /**
+     * See Object::PrepareTimestamps.
+     */
+    virtual int PrepareTimestampsEnd(ArrayPtrVoid *params);
 
 public:
     /**

@@ -540,6 +540,11 @@ public:
     virtual int PrepareTimeSpanning(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
+     * See Object::PrepareTimeSpanning.
+     */
+    virtual int PrepareTimeSpanningEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
      * Matches start and end for TimeSpanningInterface elements with tstamp(2) attributes.
      * It is performed only on TimeSpanningInterface elements withouth @startid (or @endid).
      * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.

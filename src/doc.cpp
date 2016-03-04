@@ -176,12 +176,13 @@ void Doc::PrepareDrawing()
     }
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
-    std::vector<TimeSpanningInterface *> timeSpanningInterfaces;
+    ArrayOfInterfaceClassIdPairs timeSpanningInterfaces;
     bool fillList = true;
     params.push_back(&timeSpanningInterfaces);
     params.push_back(&fillList);
     Functor prepareTimeSpanning(&Object::PrepareTimeSpanning);
-    this->Process(&prepareTimeSpanning, &params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    Functor prepareTimeSpanningEnd(&Object::PrepareTimeSpanningEnd);
+    this->Process(&prepareTimeSpanning, &params, &prepareTimeSpanningEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
 
     // First we try backwards because normally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
