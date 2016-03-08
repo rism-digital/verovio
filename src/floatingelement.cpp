@@ -28,6 +28,8 @@ FloatingElement::FloatingElement() : DocObject("fe")
 FloatingElement::FloatingElement(std::string classid) : DocObject(classid)
 {
     Reset();
+
+    m_currentBoundingBox = NULL;
 }
 
 FloatingElement::~FloatingElement()
@@ -37,6 +39,25 @@ FloatingElement::~FloatingElement()
 void FloatingElement::Reset()
 {
     DocObject::Reset();
+}
+
+void FloatingElement::UpdateSelfBBoxX(int x1, int x2)
+{
+    // assert(m_currentBoundingBox);
+    if (!m_currentBoundingBox) return;
+    m_currentBoundingBox->UpdateSelfBBoxX(x1, x2);
+}
+
+void FloatingElement::UpdateSelfBBoxY(int y1, int y2)
+{
+    // assert(m_currentBoundingBox);
+    if (!m_currentBoundingBox) return;
+    m_currentBoundingBox->UpdateSelfBBoxY(y1, y2);
+}
+
+void FloatingElement::SetCurrentBoundingBox(BoundingBox *boundingBox)
+{
+    m_currentBoundingBox = boundingBox;
 }
 
 //----------------------------------------------------------------------------
@@ -83,6 +104,7 @@ int FloatingElement::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
 
 int FloatingElement::ResetDrawing(ArrayPtrVoid *params)
 {
+    m_currentBoundingBox = NULL;
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();

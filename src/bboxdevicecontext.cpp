@@ -141,8 +141,8 @@ void BBoxDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6]
     Point pos;
     int width, height;
     View::ApproximateBezierBoundingBox(p, &pos, &width, &height);
-    LogDebug("ME x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
-    LogDebug("RZ x %d, y %d, width %d, height %d", vals[0], vals[1], vals[2] - vals[0], vals[3] - vals[1]);
+    // LogDebug("ME x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    // LogDebug("RZ x %d, y %d, width %d, height %d", vals[0], vals[1], vals[2] - vals[0], vals[3] - vals[1]);
     // DrawRectangle(pos.x, pos.y, width, height);
 
     UpdateBB(vals[0], vals[1], vals[2], vals[3]);

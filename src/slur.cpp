@@ -39,48 +39,40 @@ void Slur::Reset()
     TimeSpanningInterface::Reset();
     ResetCurvature();
 
-    m_systemStaffBoundingBoxes.clear();
+    //m_systemStaffBoundingBoxes.clear();
 }
 
-void Slur::UpdateSelfBBoxX(int x1, int x2)
-{
-    m_currentStaffBoundingBox->second.UpdateSelfBBoxX(x1, x2);
-}
-
-void Slur::UpdateSelfBBoxY(int y1, int y2)
-{
-    m_currentStaffBoundingBox->second.UpdateSelfBBoxY(y1, y2);
-}
-
+/*
 void Slur::ClearBoundingBoxes(System *system)
 {
-    if (m_systemStaffBoundingBoxes.count(system)) {
-        m_currentSystemStaffBoundingBoxes = &m_systemStaffBoundingBoxes.at(system);
-        m_currentSystemStaffBoundingBoxes->clear();
-    }
-    else {
-        m_systemStaffBoundingBoxes[system];
-        m_currentSystemStaffBoundingBoxes = &m_systemStaffBoundingBoxes.at(system);
-    }
+if (m_systemStaffBoundingBoxes.count(system)) {
+    m_currentSystemStaffBoundingBoxes = &m_systemStaffBoundingBoxes.at(system);
+    m_currentSystemStaffBoundingBoxes->clear();
+}
+else {
+    m_systemStaffBoundingBoxes[system];
+    m_currentSystemStaffBoundingBoxes = &m_systemStaffBoundingBoxes.at(system);
+}
 }
 
 void Slur::AddBoundingBox(Staff *staff, int x, int y)
 {
-    m_currentSystemStaffBoundingBoxes->push_back(std::make_pair(staff, BoundingBox()));
-    m_currentStaffBoundingBox = &m_currentSystemStaffBoundingBoxes->back();
-    m_currentStaffBoundingBox->second.SetDrawingX(x);
-    m_currentStaffBoundingBox->second.SetDrawingY(y);
-    LogDebug("%d bb for this slur", m_currentSystemStaffBoundingBoxes->size());
+m_currentSystemStaffBoundingBoxes->push_back(std::make_pair(staff, BoundingBox()));
+m_currentStaffBoundingBox = &m_currentSystemStaffBoundingBoxes->back();
+m_currentStaffBoundingBox->second.SetDrawingX(x);
+m_currentStaffBoundingBox->second.SetDrawingY(y);
+LogDebug("%d bb for this slur", m_currentSystemStaffBoundingBoxes->size());
 }
 
 ArrayOfStaffBoundingBoxPairs *Slur::GetStaffBoundingBoxPairs(System *system)
 {
-    if (m_systemStaffBoundingBoxes.count(system)) {
-        return &m_systemStaffBoundingBoxes.at(system);
-    }
-    LogDebug("ArrayOfStaffBoundingBoxPairs not found");
-    return NULL;
+if (m_systemStaffBoundingBoxes.count(system)) {
+    return &m_systemStaffBoundingBoxes.at(system);
 }
+LogDebug("ArrayOfStaffBoundingBoxPairs not found");
+return NULL;
+}
+*/
 
 //----------------------------------------------------------------------------
 // Functor methods
@@ -88,7 +80,6 @@ ArrayOfStaffBoundingBoxPairs *Slur::GetStaffBoundingBoxPairs(System *system)
 
 int Slur::ResetDrawing(ArrayPtrVoid *params)
 {
-    m_systemStaffBoundingBoxes.clear();
     return FUNCTOR_CONTINUE;
 };
 

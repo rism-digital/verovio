@@ -74,6 +74,8 @@ public:
      */
     int GetSystemIdx() const { return Object::GetIdx(); };
 
+    void SetCurrentBoundingBox(int staffN, FloatingElement *element, int x, int y);
+
     //----------//
     // Functors //
     //----------//

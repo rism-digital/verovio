@@ -31,18 +31,8 @@ public:
     virtual ClassId Is() { return SLUR; };
     ///@}
 
-    virtual void UpdateContentBBoxX(int x1, int x2){};
-    virtual void UpdateContentBBoxY(int y1, int y2){};
-    virtual void UpdateSelfBBoxX(int x1, int x2);
-    virtual void UpdateSelfBBoxY(int y1, int y2);
-
-    void ClearBoundingBoxes(System *system);
-    void AddBoundingBox(Staff *staff, int x, int y);
-
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
-
-    ArrayOfStaffBoundingBoxPairs *GetStaffBoundingBoxPairs(System *system);
 
     //----------//
     // Functors //
@@ -54,20 +44,8 @@ public:
     virtual int ResetDrawing(ArrayPtrVoid *params);
 
 private:
-    /**
-     *
-     */
-    MapOfArrayOfStaffBoundingBoxPairs m_systemStaffBoundingBoxes;
-    /**
-     *
-     */
-    ArrayOfStaffBoundingBoxPairs *m_currentSystemStaffBoundingBoxes;
-
+    //
 public:
-    /**
-     *
-     */
-    std::pair<Staff *, BoundingBox> *m_currentStaffBoundingBox;
     //
 private:
 };

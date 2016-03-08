@@ -114,6 +114,8 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
         }
         staves.push_back(staff);
     }
+    if (staves.empty())
+        LogDebug("Empty @staff array");
     return staves;
 }
 

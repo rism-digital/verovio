@@ -1173,6 +1173,7 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
         ListOfObjects *drawingList = system->GetDrawingList();
         ListOfObjects::iterator iter;
 
+        /*
         for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
             if ((*iter)->Is() != SLUR) continue;
             Slur *slur = dynamic_cast<Slur *>(*iter);
@@ -1187,6 +1188,7 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
                 // if (piter->second.m_selfBB_y2 > 0) alignment->SetYShift(piter->second.m_selfBB_y2);
             }
         }
+        */
 
         return FUNCTOR_CONTINUE;
     }

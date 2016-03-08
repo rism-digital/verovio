@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "floatingelement.h"
 #include "note.h"
 #include "staff.h"
 #include "style.h"
@@ -131,6 +132,24 @@ void StaffAlignment::SetVerseCount(int verse_count)
     if (verse_count > m_verseCount) {
         m_verseCount = verse_count;
     }
+}
+
+void StaffAlignment::SetCurrentBoundingBox(FloatingElement *element, int x, int y)
+{
+    // m_floatingElementBoundingBoxPairs;
+    auto item = std::find_if(m_floatingElementBoundingBoxPairs.begin(), m_floatingElementBoundingBoxPairs.end(),
+        [element](std::pair<FloatingElement *, BoundingBox> const &elem) { return elem.first == element; });
+    if (item != m_floatingElementBoundingBoxPairs.end()) {
+        LogDebug("Found it!");
+    }
+    else {
+        BoundingBox box;
+        box.m_contentBB_x1 = x;
+        m_floatingElementBoundingBoxPairs.push_back(std::make_pair(element, box));
+        item = m_floatingElementBoundingBoxPairs.end() - 1;
+    }
+    // LogDebug("BB %d", item->second.m_contentBB_x1);
+    element->SetCurrentBoundingBox(&item->second);
 }
 
 //----------------------------------------------------------------------------

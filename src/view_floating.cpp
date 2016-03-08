@@ -148,15 +148,15 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
         spanningType = SPANNING_MIDDLE;
     }
 
-    if (element->Is() == SLUR) {
-        Slur *slur = dynamic_cast<Slur *>(element);
-        assert(slur);
-        slur->ClearBoundingBoxes(system);
-    }
-
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = interface->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+
+        // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
+        if (element->IsFloatingElement())
+            system->SetCurrentBoundingBox(
+                (*staffIter)->GetN(), dynamic_cast<FloatingElement *>(element), x1, (*staffIter)->GetDrawingY());
+
         if (element->Is() == HAIRPIN) {
             // cast to Slur check in DrawTieOrSlur
             DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
@@ -628,7 +628,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     float angle = 0.0;
     // We do not want to adjust the position when calculating bounding boxes (at least for now)
-    if (dynamic_cast<BBoxDeviceContext *>(dc) == NULL);
+    if (dynamic_cast<BBoxDeviceContext *>(dc) == NULL)
+        ;
     angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
 
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR;
@@ -638,8 +639,6 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     else
         dc->StartGraphic(slur, "spanning-slur", "");
     // dc->DeactivateGraphic();
-    slur->AddBoundingBox(staff, points[0].x, points[0].y);
-    // slur->AddBoundingBox(staff, staff->GetDrawingX(), 0);
     DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize, angle);
     // dc->ReactivateGraphic();
     if (graphic)
@@ -1322,6 +1321,8 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         // Basic method that use bounding box
         int y = GetDirY(dir->GetPlace(), *staffIter);
 
+        system->SetCurrentBoundingBox((*staffIter)->GetN(), dir, x, y);
+
         dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
         dc->SetBrush(m_currentColour, AxSOLID);
@@ -1372,6 +1373,8 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         // Basic method that use bounding box
         int y = GetDynamY(dynam->GetPlace(), *staffIter, true);
+
+        system->SetCurrentBoundingBox((*staffIter)->GetN(), dynam, x, y);
 
         dynamTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
@@ -1439,6 +1442,8 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
         // Basic method that use bounding box
         int y = GetTempoY(tempo->GetPlace(), *staffIter);
+
+        system->SetCurrentBoundingBox((*staffIter)->GetN(), tempo, x, y);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);

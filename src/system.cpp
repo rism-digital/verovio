@@ -97,6 +97,17 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
+void System::SetCurrentBoundingBox(int staffN, FloatingElement *element, int x, int y)
+{
+    assert(element);
+
+    // If we have only the bottom alignment, then nothing to do (yet)
+    if (m_systemAligner.GetChildCount() == 1) return;
+    StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
+    assert(alignment);
+    alignment->SetCurrentBoundingBox(element, x, y);
+}
+
 //----------------------------------------------------------------------------
 // System functor methods
 //----------------------------------------------------------------------------
@@ -241,10 +252,10 @@ int System::SetBoundingBoxYShiftEnd(ArrayPtrVoid *params)
     // param 0: the height of the previous staff
     int *system_height = static_cast<int *>((*params).at(1));
 
-
     ListOfObjects *drawingList = this->GetDrawingList();
     ListOfObjects::iterator iter;
 
+    /*
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
         if ((*iter)->Is() != SLUR) continue;
         Slur *slur = dynamic_cast<Slur *>(*iter);
@@ -258,7 +269,7 @@ int System::SetBoundingBoxYShiftEnd(ArrayPtrVoid *params)
             assert(alignment);
         }
     }
-
+    */
 
     m_systemAligner.GetBottomAlignment()->SetYShift((*system_height));
 

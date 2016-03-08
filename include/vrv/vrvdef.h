@@ -158,12 +158,12 @@ class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
 class DocObject;
+class FloatingElement;
 class LayerElement;
 class Note;
 class Object;
 class Point;
 class Staff;
-class System;
 class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
@@ -186,9 +186,7 @@ typedef std::vector<std::pair<DocObject *, data_MEASUREBEAT> > ArrayOfDocObjectB
 
 typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfInterfaceClassIdPairs;
 
-typedef std::vector<std::pair<Staff *, BoundingBox> > ArrayOfStaffBoundingBoxPairs;
-
-typedef std::map<System *, ArrayOfStaffBoundingBoxPairs> MapOfArrayOfStaffBoundingBoxPairs;
+typedef std::vector<std::pair<FloatingElement *, BoundingBox> > ArrayOfFloatingElementBoundingBoxPairs;
 
 //----------------------------------------------------------------------------
 // Global defines

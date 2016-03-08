@@ -34,6 +34,14 @@ public:
     virtual ClassId Is() { return FLOATING_ELEMENT; };
     ///@}
 
+    virtual void UpdateContentBBoxX(int x1, int x2){};
+    virtual void UpdateContentBBoxY(int y1, int y2){};
+    virtual void UpdateSelfBBoxX(int x1, int x2);
+    virtual void UpdateSelfBBoxY(int y1, int y2);
+
+    void SetCurrentBoundingBox(BoundingBox *boundingBox);
+    BoundingBox *GetCurrentBoundingBox() { return m_currentBoundingBox; };
+
     //----------//
     // Functors //
     //----------//
@@ -47,12 +55,12 @@ public:
      * See Object::PrepareTimeSpanning
      */
     virtual int PrepareTimeSpanning(ArrayPtrVoid *params);
-    
+
     /**
      * See Object::PrepareTimestamps
      */
     virtual int PrepareTimestamps(ArrayPtrVoid *params);
-    
+
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
@@ -64,6 +72,7 @@ private:
 public:
     //
 private:
+    BoundingBox *m_currentBoundingBox;
 };
 
 } // namespace vrv

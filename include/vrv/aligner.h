@@ -156,6 +156,8 @@ public:
     bool GetHairpinBelow() { return m_hairpinBelow; };
     ///@}
 
+    void SetCurrentBoundingBox(FloatingElement *element, int x, int y);
+
     /**
      * Setter and getter of the staff from which the alignment is created alignment.
      * Used for accessing the staff @n, the size, etc.
@@ -186,6 +188,10 @@ private:
 public:
     //
 private:
+    /**
+     *
+     */
+    ArrayOfFloatingElementBoundingBoxPairs m_floatingElementBoundingBoxPairs;
     /**
      * Stores a pointer to the staff from which the aligner was created.
      * This is necessary since we don't always have all the staves.
