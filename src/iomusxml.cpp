@@ -162,11 +162,11 @@ void MusicXmlInput::AddMeasure(System *system, Measure *measure, int i)
     }
     // otherwise copy the content to the corresponding existing measure
     else if (system->GetChildCount() > i) {
-        Measure *existingMeasure = dynamic_cast<Measure *>(system->m_children[i]);
+        Measure *existingMeasure = dynamic_cast<Measure *>(system->GetChild(i));
         assert(existingMeasure);
-        ArrayOfObjects::iterator sIter = measure->m_children.begin();
-        for (sIter = measure->m_children.begin(); sIter != measure->m_children.end(); sIter++) {
-            Staff *staff = dynamic_cast<Staff *>(measure->Relinquish((*sIter)->GetIdx()));
+        Object *current;
+        for (current = measure->GetFirst(); current; current = measure->GetNext()) {
+            Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
             existingMeasure->AddStaff(staff);
         }
@@ -209,12 +209,12 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
     if (!staffNbStr.empty()) {
         staffNb = atoi(staffNbStr.c_str());
     }
-    if ((staffNb < 1) || (staffNb > measure->m_children.size())) {
+    if ((staffNb < 1) || (staffNb > measure->GetChildCount())) {
         LogWarning("Staff %d cannot be found", staffNb);
         staffNb = 1;
     }
     staffNb--;
-    Staff *staff = dynamic_cast<Staff *>(measure->m_children.at(staffNb));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNb));
     assert(staff);
     // Now look for the layer with the corresponding voice
     int layerNb = 1;
@@ -232,7 +232,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
 Layer *MusicXmlInput::SelectLayer(int staffNb, vrv::Measure *measure)
 {
     staffNb--;
-    Staff *staff = dynamic_cast<Staff *>(measure->m_children.at(staffNb));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNb));
     assert(staff);
     // layer -1 means the first one
     return SelectLayer(-1, staff);
@@ -243,8 +243,8 @@ Layer *MusicXmlInput::SelectLayer(int layerNb, Staff *staff)
     Layer *layer = NULL;
     // no layer specified, return the first one (if any)
     if (layerNb == -1) {
-        if (staff->m_children.size() > 0) {
-            layer = dynamic_cast<Layer *>(staff->m_children.at(0));
+        if (staff->GetChildCount() > 0) {
+            layer = dynamic_cast<Layer *>(staff->GetChild(0));
         }
         // otherwise set @n to 1
         layerNb = 1;

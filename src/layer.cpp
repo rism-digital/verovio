@@ -32,7 +32,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Layer::Layer()
-    :  Object("layer-"), DrawingListInterface(), ObjectListInterface(), StaffDefDrawingInterface(), AttCommon()
+    : Object("layer-"), DrawingListInterface(), ObjectListInterface(), StaffDefDrawingInterface(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
@@ -220,8 +220,8 @@ int Layer::AlignHorizontallyEnd(ArrayPtrVoid *params)
     MeasureAligner **measureAligner = static_cast<MeasureAligner **>((*params).at(0));
 
     int i;
-    for (i = 0; i < (int)(*measureAligner)->m_children.size(); i++) {
-        Alignment *alignment = dynamic_cast<Alignment *>((*measureAligner)->m_children.at(i));
+    for (i = 0; i < (*measureAligner)->GetChildCount(); i++) {
+        Alignment *alignment = dynamic_cast<Alignment *>((*measureAligner)->GetChild(i));
         assert(alignment);
         if (alignment->HasGraceAligner()) {
             alignment->GetGraceAligner()->AlignStack();

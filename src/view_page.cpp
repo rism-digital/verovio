@@ -89,7 +89,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 
     for (i = 0; i < m_currentPage->GetSystemCount(); i++) {
         // cast to System check in DrawSystem
-        system = dynamic_cast<System *>(m_currentPage->m_children.at(i));
+        system = dynamic_cast<System *>(m_currentPage->GetChild(i));
         DrawSystem(dc, system);
     }
 
@@ -193,7 +193,7 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
         // We need to cast to  Object for calling DrawTimeSpanningElement
-        element = dynamic_cast< Object *>(*iter);
+        element = dynamic_cast<Object *>(*iter);
         if (!element) continue;
 
         if ((element->Is() == classId) && (classId == HAIRPIN)) {
@@ -819,7 +819,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     DrawStaffChildren(dc, staff, staff, measure);
 
-    std::vector< Object *>::iterator iter;
+    std::vector<Object *>::iterator iter;
     for (iter = staff->m_timeSpanningElements.begin(); iter != staff->m_timeSpanningElements.end(); ++iter) {
         system->AddToDrawingList(*iter);
     }

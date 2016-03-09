@@ -8,8 +8,8 @@
 #ifndef __VRV_BEAM_H__
 #define __VRV_BEAM_H__
 
-#include "layerelement.h"
 #include "drawinginterface.h"
+#include "layerelement.h"
 
 namespace vrv {
 
@@ -36,7 +36,7 @@ public:
     virtual ClassId Is() { return BEAM; };
     ///@}
 
-    int GetNoteCount() const { return (int)m_children.size(); };
+    int GetNoteCount() { return this->GetChildCount(NOTE); };
 
     /**
      * Add an element (a note or a rest) to a beam.

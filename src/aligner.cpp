@@ -502,18 +502,18 @@ int Alignment::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
 
     int i;
     int shift = 0;
-    for (i = 0; i < (int)m_graceAligner->m_children.size(); i++) {
-        Alignment *alignment = dynamic_cast<Alignment *>(m_graceAligner->m_children.at(i));
+    for (i = 0; i < m_graceAligner->GetChildCount(); i++) {
+        Alignment *alignment = dynamic_cast<Alignment *>(m_graceAligner->GetChild(i));
         assert(alignment);
         alignment->SetXRel(alignment->GetXShift() + shift);
         shift += alignment->GetXShift();
     }
 
     // Set the total width by looking at the position and maximum width of the last alignment
-    if (m_graceAligner->m_children.empty()) {
+    if (m_graceAligner->GetChildCount() == 0) {
         return FUNCTOR_CONTINUE;
     }
-    Alignment *alignment = dynamic_cast<Alignment *>(m_graceAligner->m_children.back());
+    Alignment *alignment = dynamic_cast<Alignment *>(m_graceAligner->GetLast());
     assert(alignment);
     m_graceAligner->SetWidth(alignment->GetXRel() + alignment->GetMaxWidth());
 

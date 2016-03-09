@@ -8,8 +8,8 @@
 #ifndef __VRV_TUPLET_H__
 #define __VRV_TUPLET_H__
 
-#include "atts_shared.h"
 #include "atts_cmn.h"
+#include "atts_shared.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -38,7 +38,7 @@ public:
     virtual ClassId Is() { return TUPLET; };
     ///@}
 
-    int GetNoteCount() const { return (int)m_children.size(); };
+    int GetNoteCount() { return this->GetChildCount(NOTE); };
 
     /**
      * Add an element (a note or a rest) to a tuplet.

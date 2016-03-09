@@ -43,7 +43,7 @@ namespace vrv {
 BoundingBox::BoundingBox()
 {
     ResetBB();
-};
+}
 
 void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 {
@@ -172,7 +172,6 @@ bool BoundingBox::HasSelfBB()
 //----------------------------------------------------------------------------
 
 Object::Object() : BoundingBox()
-
 {
     Init("m-");
 }
@@ -181,12 +180,6 @@ Object::Object(std::string classid) : BoundingBox()
 {
     Init(classid);
 }
-
-void Object::Reset()
-{
-    ResetBB();
-    ClearChildren();
-};
 
 Object *Object::Clone()
 {
@@ -247,8 +240,9 @@ void Object::Init(std::string classid)
     m_parent = NULL;
     m_isModified = true;
     m_classid = classid;
-    ResetBB();
     this->GenerateUuid();
+
+    Reset();
 }
 
 ClassId Object::Is()
@@ -256,6 +250,12 @@ ClassId Object::Is()
     // we should always have the method overridden
     assert(false);
     return OBJECT;
+};
+
+void Object::Reset()
+{
+    ClearChildren();
+    ResetBB();
 };
 
 void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId interfaceId)
@@ -340,6 +340,12 @@ Object *Object::GetNext()
     m_iteratorCurrent++;
     m_iteratorCurrent = std::find_if(m_iteratorCurrent, m_iteratorEnd, ObjectComparison(m_iteratorElementType));
     return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
+}
+
+Object *Object::GetLast()
+{
+    if (m_children.empty()) return NULL;
+    return m_children.back();
 }
 
 int Object::GetIdx() const

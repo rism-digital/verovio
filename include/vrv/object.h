@@ -261,6 +261,11 @@ public:
     ///@}
 
     /**
+     * Return the last child of the object (if any, NULL otherwise)
+     */
+    Object *GetLast();
+
+    /**
      * Set the parent of the Object.
      * The current parent is expected to be NULL.
      */
@@ -769,24 +774,26 @@ protected:
      */
     void ClearChildren();
 
-public:
-    ArrayOfObjects m_children;
-    Object *m_parent;
+private:
+    void GenerateUuid();
+    void Init(std::string);
 
+public:
     /**
      * Keep an array of unsupported attributes as pairs.
      * This can be used for writing back data
      */
     ArrayOfStrAttr m_unsupported;
 
+    Object *m_parent;
+
 protected:
+    ArrayOfObjects m_children;
+
     std::string m_uuid;
     std::string m_classid;
 
 private:
-    void GenerateUuid();
-    void Init(std::string);
-
     /**
      * Indicates whether the object content is up-to-date or not.
      * This is useful for object using sub-lists of objects when drawing.

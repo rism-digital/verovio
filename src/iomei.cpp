@@ -106,7 +106,7 @@ bool MeiOutput::ExportFile()
                 LogError("Page %d does not exist", m_page);
                 return false;
             }
-            Page *page = dynamic_cast<Page *>(m_doc->m_children.at(m_page));
+            Page *page = dynamic_cast<Page *>(m_doc->GetChild(m_page));
             assert(page);
             if (m_scoreBasedMEI) {
                 m_currentNode = meiDoc.append_child("score");
@@ -2540,7 +2540,7 @@ bool MeiInput::ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, Edi
         // Now we check if the xpath selection (if any) matches the current node.
         // If yes, make it visible
         if (selectedLemOrRdg == current) {
-            EditorialElement *last = dynamic_cast<EditorialElement *>(parent->m_children.back());
+            EditorialElement *last = dynamic_cast<EditorialElement *>(parent->GetLast());
             if (last) {
                 last->m_visibility = Visible;
                 hasXPathSelected = true;
@@ -2550,7 +2550,7 @@ bool MeiInput::ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, Edi
 
     // If no child was made visible through the xpath selection, make the first one visible
     if (!hasXPathSelected) {
-        EditorialElement *first = dynamic_cast<EditorialElement *>(parent->m_children.front());
+        EditorialElement *first = dynamic_cast<EditorialElement *>(parent->GetFirst());
         if (first) {
             first->m_visibility = Visible;
         }
