@@ -46,7 +46,7 @@ EditorialElement::EditorialElement(std::string classid) :  Object(classid), AttC
 
 void EditorialElement::Reset()
 {
-     Object::Reset();
+    Object::Reset();
     ResetCommon();
     ResetCommonPart();
 

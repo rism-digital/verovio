@@ -300,18 +300,17 @@ protected:
     ///@{
     void DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Measure *measure, System *system);
     void DrawSylConnector(
-        DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType,  Object *graphic = NULL);
+        DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff);
-    void DrawTimeSpanningElement(DeviceContext *dc,  Object *object, System *system);
+    void DrawTimeSpanningElement(DeviceContext *dc, Object *object, System *system);
     void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
-    void DrawHairpin(DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType,
-         Object *graphic = NULL);
+    void DrawHairpin(
+        DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawSlur(
-        DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType,  Object *graphic = NULL);
+        DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
-    void DrawTie(
-        DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType,  Object *graphic = NULL);
+    void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
 
     ///@}
 

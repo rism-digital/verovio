@@ -187,7 +187,7 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     assert(system);
 
     ListOfObjects *drawingList = system->GetDrawingList();
-     Object *element = NULL;
+    Object *element = NULL;
 
     ListOfObjects::iterator iter;
 

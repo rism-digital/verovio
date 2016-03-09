@@ -35,7 +35,7 @@ TextElement::~TextElement()
 
 void TextElement::Reset()
 {
-     Object::Reset();
+    Object::Reset();
 }
 
 } // namespace vrv

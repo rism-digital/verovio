@@ -44,7 +44,7 @@ Staff::~Staff()
 
 void Staff::Reset()
 {
-     Object::Reset();
+    Object::Reset();
     ResetCommon();
 
     m_drawingStaffSize = 100;

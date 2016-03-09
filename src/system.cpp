@@ -40,7 +40,7 @@ System::~System()
 
 void System::Reset()
 {
-     Object::Reset();
+    Object::Reset();
     DrawingListInterface::Reset();
 
     m_systemLeftMar = 0;

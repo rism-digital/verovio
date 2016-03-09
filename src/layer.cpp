@@ -45,7 +45,7 @@ Layer::~Layer()
 
 void Layer::Reset()
 {
-     Object::Reset();
+    Object::Reset();
     DrawingListInterface::Reset();
     StaffDefDrawingInterface::Reset();
     ResetCommon();

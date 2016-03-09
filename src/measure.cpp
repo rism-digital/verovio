@@ -51,7 +51,7 @@ Measure::~Measure()
 
 void Measure::Reset()
 {
-     Object::Reset();
+    Object::Reset();
     ResetCommon();
     ResetMeasureLog();
     ResetPointing();

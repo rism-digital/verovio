@@ -64,7 +64,7 @@ LayerElement::LayerElement(std::string classid) :  Object(classid)
 
 void LayerElement::Reset()
 {
-     Object::Reset();
+    Object::Reset();
 
     m_xAbs = VRV_UNSET;
     m_drawingX = 0;

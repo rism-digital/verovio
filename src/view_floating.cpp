@@ -75,7 +75,7 @@ void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Meas
     }
 }
 
-void View::DrawTimeSpanningElement(DeviceContext *dc,  Object *element, System *system)
+void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *system)
 {
     assert(dc);
     assert(element);
@@ -93,7 +93,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc,  Object *element, System *
     int x1, x2;
     // Staff *staff = NULL;
     Measure *measure = NULL;
-     Object *graphic = NULL;
+    Object *graphic = NULL;
     char spanningType = SPANNING_START_END;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
@@ -177,7 +177,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc,  Object *element, System *
 }
 
 void View::DrawHairpin(
-    DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType,  Object *graphic)
+    DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(dc);
     assert(hairpin);
@@ -351,7 +351,7 @@ void View::DrawHairpin(
         dc->EndGraphic(hairpin, this);
 }
 
-void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType,  Object *graphic)
+void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(dc);
     assert(slur);
@@ -628,9 +628,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     float angle = 0.0;
     // We do not want to adjust the position when calculating bounding boxes (at least for now)
-    if (dynamic_cast<BBoxDeviceContext *>(dc) == NULL)
-        ;
-    angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
+    if (dynamic_cast<BBoxDeviceContext *>(dc) == NULL) angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
 
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR;
 
@@ -1019,7 +1017,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
     *p2 = View::CalcPositionAfterRotation(*p2, -(*angle), *p1);
 }
 
-void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType,  Object *graphic)
+void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(dc);
     assert(tie);
@@ -1200,7 +1198,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 }
 
 void View::DrawSylConnector(
-    DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType,  Object *graphic)
+    DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(syl);
     assert(syl->GetStart() && syl->GetEnd());
