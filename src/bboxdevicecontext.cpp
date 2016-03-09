@@ -54,14 +54,14 @@ BBoxDeviceContext::~BBoxDeviceContext()
 void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId)
 {
     // add the object object
-    object->BoundingBox::Reset();
+    object->BoundingBox::ResetBB();
     m_objects.push_back(object);
 }
 
 void BBoxDeviceContext::ResumeGraphic(Object *object, std::string gId)
 {
     // I am not sure we actually have to reset the bounding box here...
-    object->BoundingBox::Reset();
+    object->BoundingBox::ResetBB();
     m_objects.push_back(object);
 }
 

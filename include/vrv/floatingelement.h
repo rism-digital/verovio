@@ -90,7 +90,7 @@ public:
     FloatingBoundingBox();
     virtual ~FloatingBoundingBox(){};
 
-    virtual void Reset();
+    virtual void ResetBB();
 
     /**
      * @name Get and set the Y drawing relative position

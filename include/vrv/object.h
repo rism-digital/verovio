@@ -86,7 +86,7 @@ public:
     /**
      * Reset the bounding box values
      */
-    virtual void Reset();
+    virtual void ResetBB();
 
     /**
      * @name Get and set the X and Y drawing position

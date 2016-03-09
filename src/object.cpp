@@ -42,7 +42,7 @@ namespace vrv {
 
 BoundingBox::BoundingBox()
 {
-    Reset();
+    ResetBB();
 };
 
 void BoundingBox::UpdateContentBBoxX(int x1, int x2)
@@ -117,7 +117,7 @@ void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
     // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
 
-void BoundingBox::Reset()
+void BoundingBox::ResetBB()
 {
     m_contentBB_x1 = 0xFFFFFFF;
     m_contentBB_y1 = 0xFFFFFFF;
@@ -184,7 +184,7 @@ Object::Object(std::string classid) : BoundingBox()
 
 void Object::Reset()
 {
-    BoundingBox::Reset();
+    BoundingBox::ResetBB();
     ClearChildren();
 };
 
@@ -198,7 +198,7 @@ Object *Object::Clone()
 Object::Object(const Object &object)
 {
     ClearChildren();
-    BoundingBox::Reset();
+    BoundingBox::ResetBB();
     m_parent = NULL;
     m_classid = object.m_classid;
     m_uuid = object.m_uuid; // for now copy the uuid - to be decided
@@ -219,7 +219,7 @@ Object &Object::operator=(const Object &object)
     // not self assignement
     if (this != &object) {
         ClearChildren();
-        BoundingBox::Reset();
+        BoundingBox::ResetBB();
         m_parent = NULL;
         m_classid = object.m_classid;
         m_uuid = object.m_uuid; // for now copy the uuid - to be decided
@@ -247,7 +247,7 @@ void Object::Init(std::string classid)
     m_parent = NULL;
     m_isModified = true;
     m_classid = classid;
-    BoundingBox::Reset();
+    BoundingBox::ResetBB();
     this->GenerateUuid();
 }
 
