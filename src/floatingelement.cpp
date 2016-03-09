@@ -38,7 +38,6 @@ FloatingElement::~FloatingElement()
 
 void FloatingElement::Reset()
 {
-    FloatingBoundingBox::BoundingBox::ResetBB();
     Object::Reset();
 }
 

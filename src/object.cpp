@@ -184,7 +184,7 @@ Object::Object(std::string classid) : BoundingBox()
 
 void Object::Reset()
 {
-    BoundingBox::ResetBB();
+    ResetBB();
     ClearChildren();
 };
 
@@ -198,7 +198,7 @@ Object *Object::Clone()
 Object::Object(const Object &object)
 {
     ClearChildren();
-    BoundingBox::ResetBB();
+    ResetBB();
     m_parent = NULL;
     m_classid = object.m_classid;
     m_uuid = object.m_uuid; // for now copy the uuid - to be decided
@@ -219,7 +219,7 @@ Object &Object::operator=(const Object &object)
     // not self assignement
     if (this != &object) {
         ClearChildren();
-        BoundingBox::ResetBB();
+        ResetBB();
         m_parent = NULL;
         m_classid = object.m_classid;
         m_uuid = object.m_uuid; // for now copy the uuid - to be decided
@@ -247,7 +247,7 @@ void Object::Init(std::string classid)
     m_parent = NULL;
     m_isModified = true;
     m_classid = classid;
-    BoundingBox::ResetBB();
+    ResetBB();
     this->GenerateUuid();
 }
 
