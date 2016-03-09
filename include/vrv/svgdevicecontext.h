@@ -105,24 +105,24 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    virtual void StartGraphic(DocObject *object, std::string gClass, std::string gId);
-    virtual void EndGraphic(DocObject *object, View *view);
+    virtual void StartGraphic( Object *object, std::string gClass, std::string gId);
+    virtual void EndGraphic( Object *object, View *view);
     ///@}
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      */
     ///@{
-    virtual void ResumeGraphic(DocObject *object, std::string gId);
-    virtual void EndResumedGraphic(DocObject *object, View *view);
+    virtual void ResumeGraphic( Object *object, std::string gId);
+    virtual void EndResumedGraphic( Object *object, View *view);
     ///@}
 
     /**
      * @name Method for starting and ending a text (<tspan>) text graphic.
      */
     ///@{
-    virtual void StartTextGraphic(DocObject *object, std::string gClass, std::string gId);
-    virtual void EndTextGraphic(DocObject *object, View *view);
+    virtual void StartTextGraphic( Object *object, std::string gClass, std::string gId);
+    virtual void EndTextGraphic( Object *object, View *view);
     ///@}
 
     /**
@@ -143,7 +143,7 @@ private:
     /**
      * Internal method for drawing debug SVG bounding box
      */
-    void DrawSvgBoundingBox(DocObject *object, View *view);
+    void DrawSvgBoundingBox( Object *object, View *view);
 
     /**
      * Change the flag for indicating the use of the VerovioText font

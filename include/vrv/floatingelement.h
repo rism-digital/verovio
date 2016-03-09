@@ -22,7 +22,7 @@ class FloatingBoundingBox;
  * This class is an interface for elements appearing within measure.
  * It is not an abstract class but should not be instanciated directly.
  */
-class FloatingElement : public DocObject {
+class FloatingElement : public Object {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -90,7 +90,7 @@ public:
     FloatingBoundingBox();
     virtual ~FloatingBoundingBox(){};
 
-    void ResetFloatingBB();
+    virtual void Reset();
 
     /**
      * @name Get and set the Y drawing relative position

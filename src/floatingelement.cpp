@@ -20,12 +20,12 @@ namespace vrv {
 // FloatingElement
 //----------------------------------------------------------------------------
 
-FloatingElement::FloatingElement() : DocObject("fe")
+FloatingElement::FloatingElement() : Object("fe")
 {
     Reset();
 }
 
-FloatingElement::FloatingElement(std::string classid) : DocObject(classid)
+FloatingElement::FloatingElement(std::string classid) : Object(classid)
 {
     Reset();
 
@@ -38,7 +38,7 @@ FloatingElement::~FloatingElement()
 
 void FloatingElement::Reset()
 {
-    DocObject::Reset();
+    Object::Reset();
 }
 
 void FloatingElement::UpdateSelfBBoxX(int x1, int x2)
@@ -66,12 +66,13 @@ void FloatingElement::SetCurrentBoundingBox(FloatingBoundingBox *boundingBox)
 
 FloatingBoundingBox::FloatingBoundingBox() : BoundingBox()
 {
-    ResetFloatingBB();
+    Reset();
 };
 
-void FloatingBoundingBox::ResetFloatingBB()
+void FloatingBoundingBox::Reset()
 {
-    ResetBB();
+    BoundingBox::Reset();
+
     m_drawingYRel = 0;
 }
 

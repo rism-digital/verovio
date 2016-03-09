@@ -30,7 +30,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Measure::Measure(bool measureMusic, int logMeasureNb)
-    : DocObject("measure-"), AttCommon(), AttMeasureLog(), AttPointing()
+    :  Object("measure-"), AttCommon(), AttMeasureLog(), AttPointing()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_MEASURELOG);
@@ -51,7 +51,7 @@ Measure::~Measure()
 
 void Measure::Reset()
 {
-    DocObject::Reset();
+     Object::Reset();
     ResetCommon();
     ResetMeasureLog();
     ResetPointing();
@@ -378,9 +378,9 @@ int Measure::SetDrawingXY(ArrayPtrVoid *params)
 int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
 {
     // param 0: the current Syl
-    std::vector<DocObject *> *elements = static_cast<std::vector<DocObject *> *>((*params).at(0));
+    std::vector< Object *> *elements = static_cast<std::vector< Object *> *>((*params).at(0));
 
-    std::vector<DocObject *>::iterator iter = elements->begin();
+    std::vector< Object *>::iterator iter = elements->begin();
     while (iter != elements->end()) {
         TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
         assert(interface);
@@ -399,7 +399,7 @@ int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
 
 int Measure::PrepareTimeSpanningEnd(ArrayPtrVoid *params)
 {
-    // param 0: std::vector<DocObject*>* that holds the current elements to match
+    // param 0: std::vector< Object*>* that holds the current elements to match
     // param 1: bool* fillList for indicating whether the elements have to be stacked or not (unused)
     ArrayOfInterfaceClassIdPairs *elements = static_cast<ArrayOfInterfaceClassIdPairs *>((*params).at(0));
 
@@ -421,12 +421,12 @@ int Measure::PrepareTimeSpanningEnd(ArrayPtrVoid *params)
 
 int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
 {
-    // param 0: std::vector<DocObject*>* that holds the current elements to match
-    // param 1: ArrayOfDocObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
-    std::vector<DocObject *> *elements = static_cast<std::vector<DocObject *> *>((*params).at(0));
-    ArrayOfDocObjectBeatPairs *tstamps = static_cast<ArrayOfDocObjectBeatPairs *>((*params).at(1));
+    // param 0: std::vector< Object*>* that holds the current elements to match
+    // param 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
+    std::vector< Object *> *elements = static_cast<std::vector< Object *> *>((*params).at(0));
+     ArrayOfObjectBeatPairs *tstamps = static_cast< ArrayOfObjectBeatPairs *>((*params).at(1));
 
-    ArrayOfDocObjectBeatPairs::iterator iter = tstamps->begin();
+     ArrayOfObjectBeatPairs::iterator iter = tstamps->begin();
     // Loop throught the object/beat pairs and create the TimestampAttr when necessary
     while (iter != tstamps->end()) {
         // -1 means that we have a @tstamp (start) to add to the current measure

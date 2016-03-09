@@ -30,7 +30,7 @@ class StaffDef;
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
 */
-class Layer : public DocObject,
+class Layer : public Object,
               public DrawingListInterface,
               public ObjectListInterface,
               public StaffDefDrawingInterface,

@@ -13,7 +13,7 @@
 
 namespace vrv {
 
-class DocObject;
+class  Object;
 class LayerElement;
 class Measure;
 
@@ -74,7 +74,7 @@ public:
 
     /**
      * We have functor in the interface for avoiding code duplication in each implementation class.
-     * Since we are in an interface, we need to pass the DocObject (implementation) to
+     * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor method. These not called by the Process/Call loop but by the implementaion
      * classes explicitely. See FloatingElement::FillStaffCurrentTimeSpanning for an example.
      */
@@ -82,12 +82,12 @@ public:
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params, DocObject *object);
+    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object);
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object);
+    virtual int InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object);
 
 protected:
     /**
@@ -174,7 +174,7 @@ public:
 
     /**
      * We have functors in the interface for avoiding code duplication in each implementation class.
-     * Since we are in an interface, we need to pass the DocObject (implementation) to
+     * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor methods. These are not called by the Process/Call loop but by the implementation
      * classes explicitely. See FloatingElement::FillStaffCurrentTimeSpanning for an example.
      */
@@ -182,22 +182,22 @@ public:
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params, DocObject *object);
+    virtual int InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params,  Object *object);
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int InterfacePrepareTimeSpanning(ArrayPtrVoid *params, DocObject *object);
+    virtual int InterfacePrepareTimeSpanning(ArrayPtrVoid *params,  Object *object);
 
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params, DocObject *object);
+    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object);
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object);
+    virtual int InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object);
 
 private:
     //

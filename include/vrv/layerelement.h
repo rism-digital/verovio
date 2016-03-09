@@ -28,7 +28,7 @@ class Staff;
  * This class is a base class for the Layer (<layer>) content.
  * It is not an abstract class but should not be instantiated directly.
  */
-class LayerElement : public DocObject {
+class LayerElement : public Object {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

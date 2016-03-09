@@ -32,7 +32,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Layer::Layer()
-    : DocObject("layer-"), DrawingListInterface(), ObjectListInterface(), StaffDefDrawingInterface(), AttCommon()
+    :  Object("layer-"), DrawingListInterface(), ObjectListInterface(), StaffDefDrawingInterface(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
@@ -45,7 +45,7 @@ Layer::~Layer()
 
 void Layer::Reset()
 {
-    DocObject::Reset();
+     Object::Reset();
     DrawingListInterface::Reset();
     StaffDefDrawingInterface::Reset();
     ResetCommon();

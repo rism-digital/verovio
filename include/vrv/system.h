@@ -27,7 +27,7 @@ class ScoreDef;
  * A System is contained in a Page.
  * It contains Staff objects.
 */
-class System : public DocObject, public DrawingListInterface {
+class System : public Object, public DrawingListInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

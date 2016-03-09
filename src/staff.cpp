@@ -30,7 +30,7 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n) : DocObject("staff-"), AttCommon()
+Staff::Staff(int n) :  Object("staff-"), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
@@ -44,7 +44,7 @@ Staff::~Staff()
 
 void Staff::Reset()
 {
-    DocObject::Reset();
+     Object::Reset();
     ResetCommon();
 
     m_drawingStaffSize = 100;
@@ -131,7 +131,7 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
     // Set the pointer of the m_alignment
     m_staffAlignment = alignment;
 
-    std::vector<DocObject *>::iterator it;
+    std::vector< Object *>::iterator it;
     it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(VERSE));
     if (it != m_timeSpanningElements.end()) {
         Verse *v = dynamic_cast<Verse *>(*it);
@@ -155,9 +155,9 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
 int Staff::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
 {
     // param 0: the current Syl
-    std::vector<DocObject *> *elements = static_cast<std::vector<DocObject *> *>((*params).at(0));
+    std::vector< Object *> *elements = static_cast<std::vector< Object *> *>((*params).at(0));
 
-    std::vector<DocObject *>::iterator iter = elements->begin();
+    std::vector< Object *>::iterator iter = elements->begin();
     while (iter != elements->end()) {
         TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
         assert(interface);

@@ -196,7 +196,7 @@ void Doc::PrepareDrawing()
 
     // Now try to match the @tstamp and @tstamp2 attributes.
     params.clear();
-    ArrayOfDocObjectBeatPairs tstamps;
+     ArrayOfObjectBeatPairs tstamps;
     params.push_back(&timeSpanningInterfaces);
     params.push_back(&tstamps);
     Functor prepareTimestamps(&Object::PrepareTimestamps);

@@ -26,7 +26,7 @@ class System;
  * A Page is contained in a Doc.
  * It contains System objects.
 */
-class Page : public DocObject {
+class Page : public Object {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

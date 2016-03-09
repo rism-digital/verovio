@@ -18,7 +18,7 @@
 
 namespace vrv {
 
-class DocObject;
+class  Object;
 class View;
 
 // ---------------------------------------------------------------------------
@@ -146,8 +146,8 @@ public:
      * For example, the method can be used for grouping shapes in <g></g> in SVG
      */
     ///@{
-    virtual void StartGraphic(DocObject *object, std::string gClass, std::string gId) = 0;
-    virtual void EndGraphic(DocObject *object, View *view) = 0;
+    virtual void StartGraphic( Object *object, std::string gClass, std::string gId) = 0;
+    virtual void EndGraphic( Object *object, View *view) = 0;
     ///@}
 
     /**
@@ -155,8 +155,8 @@ public:
      * The methods can be used to the output together, for example for a Beam
      */
     ///@{
-    virtual void ResumeGraphic(DocObject *object, std::string gId) = 0;
-    virtual void EndResumedGraphic(DocObject *object, View *view) = 0;
+    virtual void ResumeGraphic( Object *object, std::string gId) = 0;
+    virtual void EndResumedGraphic( Object *object, View *view) = 0;
     ///@}
 
     /**
@@ -164,11 +164,11 @@ public:
      * For example, in SVG, a text graphic is a <tspan> (and not a <g>)
      */
     ///@{
-    virtual void StartTextGraphic(DocObject *object, std::string gClass, std::string gId)
+    virtual void StartTextGraphic( Object *object, std::string gClass, std::string gId)
     {
         StartGraphic(object, gClass, gId);
     }
-    virtual void EndTextGraphic(DocObject *object, View *view) { EndGraphic(object, view); }
+    virtual void EndTextGraphic( Object *object, View *view) { EndGraphic(object, view); }
     ///@}
 
     /**

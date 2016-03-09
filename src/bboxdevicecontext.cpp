@@ -51,28 +51,28 @@ BBoxDeviceContext::~BBoxDeviceContext()
 {
 }
 
-void BBoxDeviceContext::StartGraphic(DocObject *object, std::string gClass, std::string gId)
+void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId)
 {
-    // add object
-    object->ResetBB();
+    // add the object object
+    object->BoundingBox::Reset();
     m_objects.push_back(object);
 }
 
-void BBoxDeviceContext::ResumeGraphic(DocObject *object, std::string gId)
+void BBoxDeviceContext::ResumeGraphic(Object *object, std::string gId)
 {
-    // add object
-    object->ResetBB();
+    // I am not sure we actually have to reset the bounding box here...
+    object->BoundingBox::Reset();
     m_objects.push_back(object);
 }
 
-void BBoxDeviceContext::EndGraphic(DocObject *object, View *view)
+void BBoxDeviceContext::EndGraphic(Object *object, View *view)
 {
     // detach the object
     assert(m_objects.back() == object);
     m_objects.pop_back();
 }
 
-void BBoxDeviceContext::EndResumedGraphic(DocObject *object, View *view)
+void BBoxDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
     // detach the object
     assert(m_objects.back() == object);

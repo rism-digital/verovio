@@ -19,12 +19,12 @@ namespace vrv {
 // TextElement
 //----------------------------------------------------------------------------
 
-TextElement::TextElement() : DocObject("te-")
+TextElement::TextElement() :  Object("te-")
 {
     Reset();
 }
 
-TextElement::TextElement(std::string classid) : DocObject(classid)
+TextElement::TextElement(std::string classid) :  Object(classid)
 {
     Reset();
 }
@@ -35,7 +35,7 @@ TextElement::~TextElement()
 
 void TextElement::Reset()
 {
-    DocObject::Reset();
+     Object::Reset();
 }
 
 } // namespace vrv

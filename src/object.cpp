@@ -37,18 +37,156 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// BoundingBox
+//----------------------------------------------------------------------------
+
+BoundingBox::BoundingBox()
+{
+    Reset();
+};
+
+void BoundingBox::UpdateContentBBoxX(int x1, int x2)
+{
+    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
+
+    int min_x = std::min(x1, x2);
+    int max_x = std::max(x1, x2);
+
+    min_x -= m_drawingX;
+    max_x -= m_drawingX;
+
+    if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
+    if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
+
+    m_updatedBBoxX = true;
+    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
+    // GetClassName().c_str());
+}
+
+void BoundingBox::UpdateContentBBoxY(int y1, int y2)
+{
+    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
+
+    int min_y = std::min(y1, y2);
+    int max_y = std::max(y1, y2);
+
+    min_y -= m_drawingY;
+    max_y -= m_drawingY;
+
+    if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
+    if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
+
+    m_updatedBBoxY = true;
+    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
+    // GetClassName().c_str());
+}
+
+void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
+{
+    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+
+    int min_x = std::min(x1, x2);
+    int max_x = std::max(x1, x2);
+
+    min_x -= m_drawingX;
+    max_x -= m_drawingX;
+
+    if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
+    if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
+
+    m_updatedBBoxX = true;
+
+    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+}
+
+void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
+{
+    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+
+    int min_y = std::min(y1, y2);
+    int max_y = std::max(y1, y2);
+
+    min_y -= m_drawingY;
+    max_y -= m_drawingY;
+
+    if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
+    if (m_selfBB_y2 < max_y) m_selfBB_y2 = max_y;
+
+    m_updatedBBoxY = true;
+
+    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+}
+
+void BoundingBox::Reset()
+{
+    m_contentBB_x1 = 0xFFFFFFF;
+    m_contentBB_y1 = 0xFFFFFFF;
+    m_contentBB_x2 = -0xFFFFFFF;
+    m_contentBB_y2 = -0xFFFFFFF;
+    m_selfBB_x1 = 0xFFFFFFF;
+    m_selfBB_y1 = 0xFFFFFFF;
+    m_selfBB_x2 = -0xFFFFFFF;
+    m_selfBB_y2 = -0xFFFFFFF;
+
+    m_updatedBBoxX = false;
+    m_updatedBBoxY = false;
+
+    m_drawingX = 0;
+    m_drawingY = 0;
+}
+
+void BoundingBox::SetEmptyBB()
+{
+    m_contentBB_x1 = 0;
+    m_contentBB_y1 = 0;
+    m_contentBB_x2 = 0;
+    m_contentBB_y2 = 0;
+    m_selfBB_x1 = 0;
+    m_selfBB_y1 = 0;
+    m_selfBB_x2 = 0;
+    m_selfBB_y2 = 0;
+
+    m_updatedBBoxX = true;
+    m_updatedBBoxY = true;
+}
+
+bool BoundingBox::HasEmptyBB()
+{
+    return (HasUpdatedBB() && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
+        && (m_contentBB_y2 == 0));
+}
+
+bool BoundingBox::HasContentBB()
+{
+    return ((m_contentBB_x1 != 0xFFFF) && (m_contentBB_y1 != 0xFFFF) && (m_contentBB_x2 != -0xFFFF)
+        && (m_contentBB_y2 != -0xFFFF));
+}
+
+bool BoundingBox::HasSelfBB()
+{
+    return ((m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF));
+}
+
+//----------------------------------------------------------------------------
 // Object
 //----------------------------------------------------------------------------
 
-Object::Object()
+Object::Object() : BoundingBox()
+
 {
     Init("m-");
 }
 
-Object::Object(std::string classid)
+Object::Object(std::string classid) : BoundingBox()
 {
     Init(classid);
 }
+
+void Object::Reset()
+{
+    BoundingBox::Reset();
+    ClearChildren();
+};
 
 Object *Object::Clone()
 {
@@ -60,6 +198,7 @@ Object *Object::Clone()
 Object::Object(const Object &object)
 {
     ClearChildren();
+    BoundingBox::Reset();
     m_parent = NULL;
     m_classid = object.m_classid;
     m_uuid = object.m_uuid; // for now copy the uuid - to be decided
@@ -80,6 +219,7 @@ Object &Object::operator=(const Object &object)
     // not self assignement
     if (this != &object) {
         ClearChildren();
+        BoundingBox::Reset();
         m_parent = NULL;
         m_classid = object.m_classid;
         m_uuid = object.m_uuid; // for now copy the uuid - to be decided
@@ -107,6 +247,7 @@ void Object::Init(std::string classid)
     m_parent = NULL;
     m_isModified = true;
     m_classid = classid;
+    BoundingBox::Reset();
     this->GenerateUuid();
 }
 
@@ -481,148 +622,6 @@ int Object::Save(FileOutputStream *output)
     this->Process(&save, &params, &saveEnd);
 
     return true;
-}
-
-//----------------------------------------------------------------------------
-// DocObject
-//----------------------------------------------------------------------------
-
-DocObject::DocObject() : Object("md-"), BoundingBox()
-{
-}
-
-DocObject::DocObject(std::string classid) : Object(classid), BoundingBox()
-{
-}
-
-DocObject::~DocObject()
-{
-}
-
-//----------------------------------------------------------------------------
-// BoundingBox
-//----------------------------------------------------------------------------
-
-void BoundingBox::UpdateContentBBoxX(int x1, int x2)
-{
-    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
-
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
-
-    min_x -= m_drawingX;
-    max_x -= m_drawingX;
-
-    if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
-    if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
-
-    m_updatedBBoxX = true;
-    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // GetClassName().c_str());
-}
-
-void BoundingBox::UpdateContentBBoxY(int y1, int y2)
-{
-    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
-
-    int min_y = std::min(y1, y2);
-    int max_y = std::max(y1, y2);
-
-    min_y -= m_drawingY;
-    max_y -= m_drawingY;
-
-    if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
-    if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
-
-    m_updatedBBoxY = true;
-    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // GetClassName().c_str());
-}
-
-void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
-{
-    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
-
-    min_x -= m_drawingX;
-    max_x -= m_drawingX;
-
-    if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
-    if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
-
-    m_updatedBBoxX = true;
-
-    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-}
-
-void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
-{
-    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-
-    int min_y = std::min(y1, y2);
-    int max_y = std::max(y1, y2);
-
-    min_y -= m_drawingY;
-    max_y -= m_drawingY;
-
-    if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
-    if (m_selfBB_y2 < max_y) m_selfBB_y2 = max_y;
-
-    m_updatedBBoxY = true;
-
-    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-}
-
-void BoundingBox::ResetBB()
-{
-    m_contentBB_x1 = 0xFFFFFFF;
-    m_contentBB_y1 = 0xFFFFFFF;
-    m_contentBB_x2 = -0xFFFFFFF;
-    m_contentBB_y2 = -0xFFFFFFF;
-    m_selfBB_x1 = 0xFFFFFFF;
-    m_selfBB_y1 = 0xFFFFFFF;
-    m_selfBB_x2 = -0xFFFFFFF;
-    m_selfBB_y2 = -0xFFFFFFF;
-
-    m_updatedBBoxX = false;
-    m_updatedBBoxY = false;
-
-    m_drawingX = 0;
-    m_drawingY = 0;
-}
-
-void BoundingBox::SetEmptyBB()
-{
-    m_contentBB_x1 = 0;
-    m_contentBB_y1 = 0;
-    m_contentBB_x2 = 0;
-    m_contentBB_y2 = 0;
-    m_selfBB_x1 = 0;
-    m_selfBB_y1 = 0;
-    m_selfBB_x2 = 0;
-    m_selfBB_y2 = 0;
-
-    m_updatedBBoxX = true;
-    m_updatedBBoxY = true;
-}
-
-bool BoundingBox::HasEmptyBB()
-{
-    return (HasUpdatedBB() && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
-        && (m_contentBB_y2 == 0));
-}
-
-bool BoundingBox::HasContentBB()
-{
-    return ((m_contentBB_x1 != 0xFFFF) && (m_contentBB_y1 != 0xFFFF) && (m_contentBB_x2 != -0xFFFF)
-        && (m_contentBB_y2 != -0xFFFF));
-}
-
-bool BoundingBox::HasSelfBB()
-{
-    return ((m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF));
 }
 
 //----------------------------------------------------------------------------
@@ -1071,7 +1070,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     if (!current->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
         assert(false); // quite drastic but this should never happen. If nothing has to be drawn
-        // then the BB should be set to empty with DocObject::SetEmptyBB()
+        // then the BB should be set to empty with  Object::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
 

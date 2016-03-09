@@ -46,7 +46,6 @@ enum ClassId {
     ALIGNMENT,
     CLEF_ATTR,
     DOC,
-    DOC_OBJECT,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
     LAYER,
@@ -156,7 +155,7 @@ enum InterfaceId {
 
 class AttComparison;
 class BeamElementCoord;
-class DocObject;
+class Object;
 class FloatingBoundingBox;
 class FloatingElement;
 class LayerElement;
@@ -182,7 +181,7 @@ typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
 
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
 
-typedef std::vector<std::pair<DocObject *, data_MEASUREBEAT> > ArrayOfDocObjectBeatPairs;
+typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;
 
 typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfInterfaceClassIdPairs;
 

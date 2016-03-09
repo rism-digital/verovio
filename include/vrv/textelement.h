@@ -16,7 +16,7 @@ namespace vrv {
 // TextElement
 //----------------------------------------------------------------------------
 
-class TextElement : public DocObject {
+class TextElement : public Object {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

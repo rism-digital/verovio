@@ -26,7 +26,7 @@ namespace vrv {
 // System
 //----------------------------------------------------------------------------
 
-System::System() : DocObject("system-"), DrawingListInterface()
+System::System() :  Object("system-"), DrawingListInterface()
 {
     // We set parent to it because we want to access the parent doc from the aligners
     m_systemAligner.SetParent(this);
@@ -40,7 +40,7 @@ System::~System()
 
 void System::Reset()
 {
-    DocObject::Reset();
+     Object::Reset();
     DrawingListInterface::Reset();
 
     m_systemLeftMar = 0;

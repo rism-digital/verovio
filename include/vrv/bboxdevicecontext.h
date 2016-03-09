@@ -102,16 +102,16 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    virtual void StartGraphic(DocObject *object, std::string gClass, std::string gId);
-    virtual void EndGraphic(DocObject *object, View *view);
+    virtual void StartGraphic( Object *object, std::string gClass, std::string gId);
+    virtual void EndGraphic( Object *object, View *view);
     ///@}
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      */
     ///@{
-    virtual void ResumeGraphic(DocObject *object, std::string gId);
-    virtual void EndResumedGraphic(DocObject *object, View *view);
+    virtual void ResumeGraphic( Object *object, std::string gId);
+    virtual void EndResumedGraphic( Object *object, View *view);
     ///@}
 
     /**
@@ -136,7 +136,7 @@ private:
     /**
      * The array containing the object for which the bounding box needs to be updated
      */
-    std::vector<DocObject *> m_objects;
+    std::vector< Object *> m_objects;
 
     /**
      * The view are calling from - used to flip back the Y coordinates

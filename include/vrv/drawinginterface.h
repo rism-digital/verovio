@@ -14,7 +14,7 @@
 namespace vrv {
 
 class Clef;
-class DocObject;
+class  Object;
 class KeySig;
 class Mensur;
 class MeterSig;
@@ -45,7 +45,7 @@ public:
      * that need to be drawn in a particular order.
      * For example, we need to draw beams before tuplets
      */
-    void AddToDrawingList(DocObject *element);
+    void AddToDrawingList( Object *element);
 
     /**
      * Return the drawing list.

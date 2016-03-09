@@ -187,13 +187,13 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     assert(system);
 
     ListOfObjects *drawingList = system->GetDrawingList();
-    DocObject *element = NULL;
+     Object *element = NULL;
 
     ListOfObjects::iterator iter;
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
-        // We need to cast to DocObject for calling DrawTimeSpanningElement
-        element = dynamic_cast<DocObject *>(*iter);
+        // We need to cast to  Object for calling DrawTimeSpanningElement
+        element = dynamic_cast< Object *>(*iter);
         if (!element) continue;
 
         if ((element->Is() == classId) && (classId == HAIRPIN)) {
@@ -819,7 +819,7 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     DrawStaffChildren(dc, staff, staff, measure);
 
-    std::vector<DocObject *>::iterator iter;
+    std::vector< Object *>::iterator iter;
     for (iter = staff->m_timeSpanningElements.begin(); iter != staff->m_timeSpanningElements.end(); ++iter) {
         system->AddToDrawingList(*iter);
     }

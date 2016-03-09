@@ -29,7 +29,7 @@ class TimeSpanningInterface;
  * It contains Measure objects.
  * For unmeasured music, one single Measure is added for simplifying internal processing
 */
-class Staff : public DocObject, public AttCommon {
+class Staff : public Object, public AttCommon {
 
 public:
     /**
@@ -136,7 +136,7 @@ public:
      */
     int m_drawingStaffSize;
 
-    std::vector<DocObject *> m_timeSpanningElements;
+    std::vector< Object *> m_timeSpanningElements;
 
     /**
  * The Y absolute position of the staff for facsimile (transcription) encodings.

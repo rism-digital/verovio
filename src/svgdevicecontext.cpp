@@ -140,7 +140,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     m_committed = true;
 }
 
-void SvgDeviceContext::StartGraphic(DocObject *object, std::string gClass, std::string gId)
+void SvgDeviceContext::StartGraphic( Object *object, std::string gClass, std::string gId)
 {
     std::string baseClass = object->GetClassName();
     std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
@@ -158,7 +158,7 @@ void SvgDeviceContext::StartGraphic(DocObject *object, std::string gClass, std::
     // currentBrush.GetOpacity()).c_str();
 }
 
-void SvgDeviceContext::StartTextGraphic(DocObject *object, std::string gClass, std::string gId)
+void SvgDeviceContext::StartTextGraphic( Object *object, std::string gClass, std::string gId)
 {
     std::string baseClass = object->GetClassName();
     std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
@@ -172,7 +172,7 @@ void SvgDeviceContext::StartTextGraphic(DocObject *object, std::string gClass, s
     m_currentNode.append_attribute("id") = gId.c_str();
 }
 
-void SvgDeviceContext::ResumeGraphic(DocObject *object, std::string gId)
+void SvgDeviceContext::ResumeGraphic( Object *object, std::string gId)
 {
     std::string xpath = "//g[@id=\"" + gId + "\"]";
     pugi::xpath_node selection = m_currentNode.select_single_node(xpath.c_str());
@@ -182,21 +182,21 @@ void SvgDeviceContext::ResumeGraphic(DocObject *object, std::string gId)
     m_svgNodeStack.push_back(m_currentNode);
 }
 
-void SvgDeviceContext::EndGraphic(DocObject *object, View *view)
+void SvgDeviceContext::EndGraphic( Object *object, View *view)
 {
     DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
 
-void SvgDeviceContext::EndResumedGraphic(DocObject *object, View *view)
+void SvgDeviceContext::EndResumedGraphic( Object *object, View *view)
 {
     DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
 
-void SvgDeviceContext::EndTextGraphic(DocObject *object, View *view)
+void SvgDeviceContext::EndTextGraphic( Object *object, View *view)
 {
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
@@ -662,7 +662,7 @@ std::string SvgDeviceContext::GetStringSVG(bool xml_declaration)
     return m_outdata.str();
 }
 
-void SvgDeviceContext::DrawSvgBoundingBox(DocObject *object, View *view)
+void SvgDeviceContext::DrawSvgBoundingBox( Object *object, View *view)
 {
     bool drawBoundingBox = false;
     if (drawBoundingBox && view) {

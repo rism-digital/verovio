@@ -62,13 +62,77 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 #define BACKWARD false
 
 //----------------------------------------------------------------------------
+// BoundingBox
+//----------------------------------------------------------------------------
+
+/**
+ * This class represents a basic object in the layout domain
+ */
+class BoundingBox {
+public:
+    // constructors and destructors
+    BoundingBox();
+    virtual ~BoundingBox(){};
+
+    virtual void UpdateContentBBoxX(int x1, int x2);
+    virtual void UpdateContentBBoxY(int y1, int y2);
+    virtual void UpdateSelfBBoxX(int x1, int x2);
+    virtual void UpdateSelfBBoxY(int y1, int y2);
+    bool HasContentBB();
+    bool HasSelfBB();
+    void SetEmptyBB();
+    bool HasEmptyBB();
+
+    /**
+     * Reset the bounding box values
+     */
+    virtual void Reset();
+
+    /**
+     * @name Get and set the X and Y drawing position
+     */
+    ///@{
+    int GetDrawingX() { return m_drawingX; };
+    int GetDrawingY() { return m_drawingY; };
+    void SetDrawingX(int drawingX) { m_drawingX = drawingX; };
+    void SetDrawingY(int drawingY) { m_drawingY = drawingY; };
+    ///@}
+
+    /**
+     * Is true if the bounding box (self or content) has been updated at least once.
+     * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
+     */
+    bool HasUpdatedBB() { return (m_updatedBBoxX && m_updatedBBoxY); };
+
+private:
+    bool m_updatedBBoxX;
+    bool m_updatedBBoxY;
+
+protected:
+    /**
+     * The Y drawing position of the object.
+     * It is re-computed everytime the object is drawn and it is not stored in the file.
+     */
+    int m_drawingY;
+    /**
+     * The X drawing position of the object.
+     * It is re-computed everytime the object is drawn and it is not stored in the file.
+     */
+    int m_drawingX;
+
+public:
+    int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
+    int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
+};
+
+//----------------------------------------------------------------------------
 // Object
 //----------------------------------------------------------------------------
 
 /**
  * This class represents a basic object
  */
-class Object {
+class Object : public BoundingBox {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -124,7 +188,7 @@ public:
      * Reset the object, that is 1) removing all childs and 2) resetting all attributes.
      * The method is virtual, so _always_ call the parent in the method overriding it.
      */
-    virtual void Reset() { ClearChildren(); };
+    virtual void Reset();
 
     /**
      * Copy constructor that also copy the children.
@@ -534,7 +598,7 @@ public:
      * Matches start and end for TimeSpanningInterface elements (such as tie or slur).
      * If fillList is set to false, only the remaining elements will be matched.
      * This is used when processing a second time in the other direction
-     * param 0: std::vector<DocObject*>* that holds the current elements to match
+     * param 0: std::vector< Object*>* that holds the current elements to match
      * param 1: bool* fillList for indicating whether the elements have to be stacked or not
      */
     virtual int PrepareTimeSpanning(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
@@ -548,8 +612,8 @@ public:
      * Matches start and end for TimeSpanningInterface elements with tstamp(2) attributes.
      * It is performed only on TimeSpanningInterface elements withouth @startid (or @endid).
      * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.
-     * param 0: std::vector<DocObject*>* that holds the current elements to match
-     * param 1: ArrayOfDocObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
+     * param 0: std::vector< Object*>* that holds the current elements to match
+     * param 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
      */
     virtual int PrepareTimestamps(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
@@ -606,13 +670,13 @@ public:
     /**
      * Goes through all the TimeSpanningInterface elements and set them a current to each staff
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
-     * param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
+     * param 0: std::vector< Object*>* of the current running TimeSpanningInterface elements
      */
     virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
      * Remove the TimeSpanningInterface element from the list when the last measure is reached.
-     * param 0: std::vector<DocObject*>* of the current running TimeSpanningInterface elements
+     * param 0: std::vector< Object*>* of the current running TimeSpanningInterface elements
      */
     virtual int FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
@@ -748,89 +812,6 @@ private:
      * A vector for storing the list of InterfaceId (group of MEI att classes) implemented.
      */
     std::vector<InterfaceId> m_interfaces;
-};
-
-//----------------------------------------------------------------------------
-// BoundingBox
-//----------------------------------------------------------------------------
-
-/**
- * This class represents a basic object in the layout domain
- */
-class BoundingBox {
-public:
-    // constructors and destructors
-    BoundingBox() { ResetBB(); };
-    virtual ~BoundingBox(){};
-
-    virtual void UpdateContentBBoxX(int x1, int x2);
-    virtual void UpdateContentBBoxY(int y1, int y2);
-    virtual void UpdateSelfBBoxX(int x1, int x2);
-    virtual void UpdateSelfBBoxY(int y1, int y2);
-    bool HasContentBB();
-    bool HasSelfBB();
-    void ResetBB();
-    void SetEmptyBB();
-    bool HasEmptyBB();
-
-    /**
-     * @name Get and set the X and Y drawing position
-     */
-    ///@{
-    int GetDrawingX() { return m_drawingX; };
-    int GetDrawingY() { return m_drawingY; };
-    void SetDrawingX(int drawingX) { m_drawingX = drawingX; };
-    void SetDrawingY(int drawingY) { m_drawingY = drawingY; };
-    ///@}
-
-    /**
-     * Is true if the bounding box (self or content) has been updated at least once.
-     * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
-     */
-    bool HasUpdatedBB() { return (m_updatedBBoxX && m_updatedBBoxY); };
-
-private:
-    bool m_updatedBBoxX;
-    bool m_updatedBBoxY;
-
-protected:
-    /**
-     * The Y drawing position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingY;
-    /**
-     * The X drawing position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingX;
-
-public:
-    int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
-    int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
-};
-
-//----------------------------------------------------------------------------
-// DocObject
-//----------------------------------------------------------------------------
-
-/**
- * This class represents a basic object in the layout domain
- */
-class DocObject : public Object, public BoundingBox {
-public:
-    // constructors and destructors
-    DocObject();
-    DocObject(std::string classid);
-    virtual ~DocObject();
-    virtual ClassId Is() { return DOC_OBJECT; }
-
-private:
-    //
-protected:
-    //
-public:
-    //
 };
 
 //----------------------------------------------------------------------------

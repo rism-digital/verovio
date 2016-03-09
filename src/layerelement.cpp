@@ -52,19 +52,19 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : DocObject("le-")
+LayerElement::LayerElement() :  Object("le-")
 {
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : DocObject(classid)
+LayerElement::LayerElement(std::string classid) :  Object(classid)
 {
     Reset();
 }
 
 void LayerElement::Reset()
 {
-    DocObject::Reset();
+     Object::Reset();
 
     m_xAbs = VRV_UNSET;
     m_drawingX = 0;
@@ -373,7 +373,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
 
 int LayerElement::PrepareTimeSpanning(ArrayPtrVoid *params)
 {
-    // param 0: std::vector<DocObject*>* that holds the current elements to match
+    // param 0: std::vector< Object*>* that holds the current elements to match
     // param 1: bool* fillList for indicating whether the elements have to be stacked or not (unused)
     ArrayOfInterfaceClassIdPairs *elements = static_cast<ArrayOfInterfaceClassIdPairs *>((*params).at(0));
 

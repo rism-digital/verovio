@@ -26,7 +26,7 @@ namespace vrv {
 // Page
 //----------------------------------------------------------------------------
 
-Page::Page() : DocObject("page-")
+Page::Page() :  Object("page-")
 {
     Reset();
 }
@@ -37,7 +37,7 @@ Page::~Page()
 
 void Page::Reset()
 {
-    DocObject::Reset();
+     Object::Reset();
 
     m_drawingScoreDef.Reset();
     m_layoutDone = false;
