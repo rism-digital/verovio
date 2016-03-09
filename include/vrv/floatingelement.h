@@ -12,6 +12,8 @@
 
 namespace vrv {
 
+class FloatingBoundingBox;
+
 //----------------------------------------------------------------------------
 // FloatingElement
 //----------------------------------------------------------------------------
@@ -39,8 +41,8 @@ public:
     virtual void UpdateSelfBBoxX(int x1, int x2);
     virtual void UpdateSelfBBoxY(int y1, int y2);
 
-    void SetCurrentBoundingBox(BoundingBox *boundingBox);
-    BoundingBox *GetCurrentBoundingBox() { return m_currentBoundingBox; };
+    void SetCurrentBoundingBox(FloatingBoundingBox *boundingBox);
+    FloatingBoundingBox *GetCurrentBoundingBox() { return m_currentBoundingBox; };
 
     //----------//
     // Functors //
@@ -72,7 +74,38 @@ private:
 public:
     //
 private:
-    BoundingBox *m_currentBoundingBox;
+    FloatingBoundingBox *m_currentBoundingBox;
+};
+
+//----------------------------------------------------------------------------
+// FloatingBoundingBox
+//----------------------------------------------------------------------------
+
+/**
+ * This class represents a basic object in the layout domain
+ */
+class FloatingBoundingBox : public BoundingBox {
+public:
+    // constructors and destructors
+    FloatingBoundingBox();
+    virtual ~FloatingBoundingBox(){};
+
+    void ResetFloatingBB();
+
+    /**
+     * @name Get and set the Y drawing relative position
+     */
+    ///@{
+    int GetDrawingYRel() { return m_drawingYRel; };
+    void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; };
+    ///@}
+
+protected:
+    /**
+     * The Y drawing relative position of the object.
+     * It is re-computed everytime the object is drawn and it is not stored in the file.
+     */
+    int m_drawingYRel;
 };
 
 } // namespace vrv

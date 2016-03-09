@@ -55,9 +55,24 @@ void FloatingElement::UpdateSelfBBoxY(int y1, int y2)
     m_currentBoundingBox->UpdateSelfBBoxY(y1, y2);
 }
 
-void FloatingElement::SetCurrentBoundingBox(BoundingBox *boundingBox)
+void FloatingElement::SetCurrentBoundingBox(FloatingBoundingBox *boundingBox)
 {
     m_currentBoundingBox = boundingBox;
+}
+
+//----------------------------------------------------------------------------
+// FloatingBoundingBox
+//----------------------------------------------------------------------------
+
+FloatingBoundingBox::FloatingBoundingBox() : BoundingBox()
+{
+    ResetFloatingBB();
+};
+
+void FloatingBoundingBox::ResetFloatingBB()
+{
+    ResetBB();
+    m_drawingYRel = 0;
 }
 
 //----------------------------------------------------------------------------

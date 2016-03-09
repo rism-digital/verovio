@@ -499,6 +499,10 @@ DocObject::~DocObject()
 {
 }
 
+//----------------------------------------------------------------------------
+// BoundingBox
+//----------------------------------------------------------------------------
+
 void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 {
     // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
@@ -584,6 +588,9 @@ void BoundingBox::ResetBB()
 
     m_updatedBBoxX = false;
     m_updatedBBoxY = false;
+
+    m_drawingX = 0;
+    m_drawingY = 0;
 }
 
 void BoundingBox::SetEmptyBB()

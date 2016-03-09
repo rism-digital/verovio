@@ -143,7 +143,7 @@ void StaffAlignment::SetCurrentBoundingBox(FloatingElement *element, int x, int 
         LogDebug("Found it!");
     }
     else {
-        BoundingBox box;
+        FloatingBoundingBox box;
         box.m_contentBB_x1 = x;
         m_floatingElementBoundingBoxPairs.push_back(std::make_pair(element, box));
         item = m_floatingElementBoundingBoxPairs.end() - 1;

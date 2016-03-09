@@ -156,8 +156,8 @@ enum InterfaceId {
 
 class AttComparison;
 class BeamElementCoord;
-class BoundingBox;
 class DocObject;
+class FloatingBoundingBox;
 class FloatingElement;
 class LayerElement;
 class Note;
@@ -186,7 +186,7 @@ typedef std::vector<std::pair<DocObject *, data_MEASUREBEAT> > ArrayOfDocObjectB
 
 typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfInterfaceClassIdPairs;
 
-typedef std::vector<std::pair<FloatingElement *, BoundingBox> > ArrayOfFloatingElementBoundingBoxPairs;
+typedef std::vector<std::pair<FloatingElement *, FloatingBoundingBox> > ArrayOfFloatingElementBoundingBoxPairs;
 
 //----------------------------------------------------------------------------
 // Global defines
