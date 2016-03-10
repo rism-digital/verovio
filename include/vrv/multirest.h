@@ -31,8 +31,8 @@ public:
     // MultiRest(int number);
     virtual ~MultiRest();
     virtual void Reset();
-    virtual std::string GetClassName() { return "MultiRest"; };
-    virtual ClassId Is() { return MULTIREST; };
+    virtual std::string GetClassName() const { return "MultiRest"; };
+    virtual ClassId Is() const { return MULTIREST; };
     ///@}
 
 private:

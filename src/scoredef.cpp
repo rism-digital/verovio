@@ -43,31 +43,31 @@ void ScoreDefElement::Reset()
     ScoreDefInterface::Reset();
 }
 
-bool ScoreDefElement::HasClefInfo()
+bool ScoreDefElement::HasClefInfo() const
 {
     if (this->HasClefAttrInfo()) return true;
     return (this->HasClefElementInfo());
 }
 
-bool ScoreDefElement::HasKeySigInfo()
+bool ScoreDefElement::HasKeySigInfo() const
 {
     if (this->HasKeySigAttrInfo()) return true;
     return (this->HasKeySigElementInfo());
 }
 
-bool ScoreDefElement::HasMensurInfo()
+bool ScoreDefElement::HasMensurInfo() const
 {
     if (this->HasMensurAttrInfo()) return true;
     return (this->HasMensurElementInfo());
 }
 
-bool ScoreDefElement::HasMeterSigInfo()
+bool ScoreDefElement::HasMeterSigInfo() const
 {
     if (this->HasMeterSigAttrInfo()) return true;
     return (this->HasMeterSigElementInfo());
 }
 
-bool ScoreDefElement::HasClefAttrInfo()
+bool ScoreDefElement::HasClefAttrInfo() const
 {
     // We need at least a @clef.shape and a @clef.line ?
     return (this->HasClefShape() && this->HasClefLine());
@@ -77,45 +77,45 @@ bool ScoreDefElement::HasClefAttrInfo()
     return false;
 }
 
-bool ScoreDefElement::HasKeySigAttrInfo()
+bool ScoreDefElement::HasKeySigAttrInfo() const
 {
     return (this->HasKeySig());
 }
 
-bool ScoreDefElement::HasMensurAttrInfo()
+bool ScoreDefElement::HasMensurAttrInfo() const
 {
     // What is the minimum we need? Checking only some for now. Need clarification
     return (this->HasProlatio() || this->HasTempus() || this->HasProportNum() || this->HasProportNumbase());
 }
 
-bool ScoreDefElement::HasMeterSigAttrInfo()
+bool ScoreDefElement::HasMeterSigAttrInfo() const
 {
     return (this->HasMeterCount() || this->HasMeterSym() || this->HasMeterUnit());
 }
 
-bool ScoreDefElement::HasClefElementInfo()
+bool ScoreDefElement::HasClefElementInfo() const
 {
     // Eventually we can look for a child clef element
     // We would probably need to take into account app and rdg?
     return false;
 }
 
-bool ScoreDefElement::HasKeySigElementInfo()
+bool ScoreDefElement::HasKeySigElementInfo() const
 {
     return false;
 }
 
-bool ScoreDefElement::HasMensurElementInfo()
+bool ScoreDefElement::HasMensurElementInfo() const
 {
     return false;
 }
 
-bool ScoreDefElement::HasMeterSigElementInfo()
+bool ScoreDefElement::HasMeterSigElementInfo() const
 {
     return false;
 }
 
-Clef *ScoreDefElement::GetClefCopy()
+Clef *ScoreDefElement::GetClefCopy() const
 {
     Clef *copy = NULL;
     if (this->HasClefAttrInfo()) {
@@ -130,7 +130,7 @@ Clef *ScoreDefElement::GetClefCopy()
     return copy;
 }
 
-KeySig *ScoreDefElement::GetKeySigCopy()
+KeySig *ScoreDefElement::GetKeySigCopy() const
 {
     KeySig *copy = NULL;
     if (this->HasKeySigAttrInfo()) {
@@ -145,7 +145,7 @@ KeySig *ScoreDefElement::GetKeySigCopy()
     return copy;
 }
 
-Mensur *ScoreDefElement::GetMensurCopy()
+Mensur *ScoreDefElement::GetMensurCopy() const
 {
     Mensur *copy = NULL;
     if (this->HasMensurAttrInfo()) {
@@ -160,7 +160,7 @@ Mensur *ScoreDefElement::GetMensurCopy()
     return copy;
 }
 
-MeterSig *ScoreDefElement::GetMeterSigCopy()
+MeterSig *ScoreDefElement::GetMeterSigCopy() const
 {
     MeterSig *copy = NULL;
     if (this->HasMeterSigAttrInfo()) {

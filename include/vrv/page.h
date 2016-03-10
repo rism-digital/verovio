@@ -36,8 +36,8 @@ public:
     Page();
     virtual ~Page();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Page"; };
-    virtual ClassId Is() { return PAGE; };
+    virtual std::string GetClassName() const { return "Page"; };
+    virtual ClassId Is() const { return PAGE; };
     ///@}
 
     /**
@@ -57,7 +57,7 @@ public:
     /**
      * Return the position of the staff on the page, from top to bottom
      */
-    int GetStaffPosOnPage(Staff *staff);
+    int GetStaffPosOnPage(Staff *staff) const;
 
     /**
      * Do the layout of the page, which means aligning its content horizontally
@@ -91,7 +91,7 @@ public:
      * This is used for adjusting the page height when this is the expected behaviour,
      * typically with the --adjust-page-height option in the commandline tool
      */
-    int GetContentHeight();
+    int GetContentHeight() const;
 
     /**
      * Return the width of the content by looking at the first system of the page.
@@ -99,7 +99,7 @@ public:
      * typically with the --no_layout option in the commandline tool
      *
      */
-    int GetContentWidth();
+    int GetContentWidth() const;
 
     //----------//
     // Functors //

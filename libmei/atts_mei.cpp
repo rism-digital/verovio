@@ -75,12 +75,12 @@ bool AttNotationtype::WriteNotationtype(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttNotationtype::HasNotationtype()
+bool AttNotationtype::HasNotationtype() const
 {
     return (m_notationtype != NOTATIONTYPE_NONE);
 }
 
-bool AttNotationtype::HasNotationsubtype()
+bool AttNotationtype::HasNotationsubtype() const
 {
     return (m_notationsubtype != "");
 }
@@ -105,10 +105,10 @@ bool Att::SetMei(Object *element, std::string attrType, std::string attrValue)
     return false;
 }
 
-void Att::GetMei(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetMei(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_NOTATIONTYPE)) {
-        AttNotationtype *att = dynamic_cast<AttNotationtype *>(element);
+        const AttNotationtype *att = dynamic_cast<const AttNotationtype *>(element);
         assert(att);
         if (att->HasNotationtype()) {
             attributes->push_back(std::make_pair("notationtype", att->NotationtypeToStr(att->GetNotationtype())));

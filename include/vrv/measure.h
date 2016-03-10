@@ -39,14 +39,14 @@ public:
     Measure(bool measuredMusic = true, int logMeasureNb = -1);
     virtual ~Measure();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Measure"; };
-    virtual ClassId Is() { return MEASURE; };
+    virtual std::string GetClassName() const { return "Measure"; };
+    virtual ClassId Is() const { return MEASURE; };
     ///@}
 
     /**
      * Return true if measured music (otherwise we have fake measures)
      */
-    bool IsMeasuredMusic() { return m_measuredMusic; };
+    bool IsMeasuredMusic() const { return m_measuredMusic; };
 
     /**
      * @name Methods for adding allowed content
@@ -90,29 +90,29 @@ public:
      * not for creating other measure objects.
      */
     ///@{
-    BarLine *GetLeftBarLine() { return &m_leftBarLine; };
-    BarLine *GetRightBarLine() { return &m_rightBarLine; };
+    BarLine *const GetLeftBarLine() { return &m_leftBarLine; };
+    BarLine *const GetRightBarLine() { return &m_rightBarLine; };
     ///@}
 
-    int GetXRel();
+    int GetXRel() const;
 
     /**
      * Return the non-justifiable left margin for the measure
      */
-    int GetNonJustifiableLeftMargin() { return m_measureAligner.GetNonJustifiableMargin(); }
+    int GetNonJustifiableLeftMargin() const { return m_measureAligner.GetNonJustifiableMargin(); }
 
     /**
      * @name Return the X rel position of the right and left barLine (without their width)
      */
     ///@{
-    int GetLeftBarLineX();
-    int GetRightBarLineX();
+    int GetLeftBarLineX() const;
+    int GetRightBarLineX() const;
     ///@}
 
     /**
      * Return the width of the measure, including the barLine width
      */
-    int GetWidth();
+    int GetWidth() const;
 
     //----------//
     // Functors //

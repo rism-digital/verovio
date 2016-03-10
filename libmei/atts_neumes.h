@@ -51,11 +51,11 @@ public:
     ///@{
     void SetForm(data_INEUMEFORM form_) { m_form = form_; };
     data_INEUMEFORM GetForm() const { return m_form; };
-    bool HasForm();
+    bool HasForm() const;
     //
     void SetName(data_INEUMENAME name_) { m_name = name_; };
     data_INEUMENAME GetName() const { return m_name; };
-    bool HasName();
+    bool HasName() const;
     ///@}
 
 private:
@@ -93,11 +93,11 @@ public:
     ///@{
     void SetForm(data_UNEUMEFORM form_) { m_form = form_; };
     data_UNEUMEFORM GetForm() const { return m_form; };
-    bool HasForm();
+    bool HasForm() const;
     //
     void SetName(data_UNEUMENAME name_) { m_name = name_; };
     data_UNEUMENAME GetName() const { return m_name; };
-    bool HasName();
+    bool HasName() const;
     ///@}
 
 private:

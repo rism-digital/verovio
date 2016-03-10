@@ -161,7 +161,7 @@ int Note::GetDrawingDur()
     }
 }
 
-bool Note::IsClusterExtreme()
+bool Note::IsClusterExtreme() const
 {
     ChordCluster *cluster = this->m_cluster;
     if (this == cluster->at(0)) return true;

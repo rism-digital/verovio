@@ -51,7 +51,7 @@ public:
     ///@{
     void SetForm(data_LIGATUREFORM form_) { m_form = form_; };
     data_LIGATUREFORM GetForm() const { return m_form; };
-    bool HasForm();
+    bool HasForm() const;
     ///@}
 
 private:
@@ -87,11 +87,11 @@ public:
     ///@{
     void SetForm(mensurVis_FORM form_) { m_form = form_; };
     mensurVis_FORM GetForm() const { return m_form; };
-    bool HasForm();
+    bool HasForm() const;
     //
     void SetOrient(data_ORIENTATION orient_) { m_orient = orient_; };
     data_ORIENTATION GetOrient() const { return m_orient; };
-    bool HasOrient();
+    bool HasOrient() const;
     ///@}
 
 private:
@@ -129,23 +129,23 @@ public:
     ///@{
     void SetMensurDot(data_BOOLEAN mensurDot_) { m_mensurDot = mensurDot_; };
     data_BOOLEAN GetMensurDot() const { return m_mensurDot; };
-    bool HasMensurDot();
+    bool HasMensurDot() const;
     //
     void SetMensurSign(data_MENSURATIONSIGN mensurSign_) { m_mensurSign = mensurSign_; };
     data_MENSURATIONSIGN GetMensurSign() const { return m_mensurSign; };
-    bool HasMensurSign();
+    bool HasMensurSign() const;
     //
     void SetMensurSlash(int mensurSlash_) { m_mensurSlash = mensurSlash_; };
     int GetMensurSlash() const { return m_mensurSlash; };
-    bool HasMensurSlash();
+    bool HasMensurSlash() const;
     //
     void SetProportNum(int proportNum_) { m_proportNum = proportNum_; };
     int GetProportNum() const { return m_proportNum; };
-    bool HasProportNum();
+    bool HasProportNum() const;
     //
     void SetProportNumbase(int proportNumbase_) { m_proportNumbase = proportNumbase_; };
     int GetProportNumbase() const { return m_proportNumbase; };
-    bool HasProportNumbase();
+    bool HasProportNumbase() const;
     ///@}
 
 private:
@@ -200,19 +200,19 @@ public:
     ///@{
     void SetModusmaior(data_MODUSMAIOR modusmaior_) { m_modusmaior = modusmaior_; };
     data_MODUSMAIOR GetModusmaior() const { return m_modusmaior; };
-    bool HasModusmaior();
+    bool HasModusmaior() const;
     //
     void SetModusminor(data_MODUSMINOR modusminor_) { m_modusminor = modusminor_; };
     data_MODUSMINOR GetModusminor() const { return m_modusminor; };
-    bool HasModusminor();
+    bool HasModusminor() const;
     //
     void SetProlatio(data_PROLATIO prolatio_) { m_prolatio = prolatio_; };
     data_PROLATIO GetProlatio() const { return m_prolatio; };
-    bool HasProlatio();
+    bool HasProlatio() const;
     //
     void SetTempus(data_TEMPUS tempus_) { m_tempus = tempus_; };
     data_TEMPUS GetTempus() const { return m_tempus; };
-    bool HasTempus();
+    bool HasTempus() const;
     ///@}
 
 private:
@@ -254,23 +254,23 @@ public:
     ///@{
     void SetMensurColor(std::string mensurColor_) { m_mensurColor = mensurColor_; };
     std::string GetMensurColor() const { return m_mensurColor; };
-    bool HasMensurColor();
+    bool HasMensurColor() const;
     //
     void SetMensurForm(mensuralVis_MENSURFORM mensurForm_) { m_mensurForm = mensurForm_; };
     mensuralVis_MENSURFORM GetMensurForm() const { return m_mensurForm; };
-    bool HasMensurForm();
+    bool HasMensurForm() const;
     //
     void SetMensurLoc(int mensurLoc_) { m_mensurLoc = mensurLoc_; };
     int GetMensurLoc() const { return m_mensurLoc; };
-    bool HasMensurLoc();
+    bool HasMensurLoc() const;
     //
     void SetMensurOrient(data_ORIENTATION mensurOrient_) { m_mensurOrient = mensurOrient_; };
     data_ORIENTATION GetMensurOrient() const { return m_mensurOrient; };
-    bool HasMensurOrient();
+    bool HasMensurOrient() const;
     //
     void SetMensurSize(data_SIZE mensurSize_) { m_mensurSize = mensurSize_; };
     data_SIZE GetMensurSize() const { return m_mensurSize; };
-    bool HasMensurSize();
+    bool HasMensurSize() const;
     ///@}
 
 private:
@@ -317,7 +317,7 @@ public:
     ///@{
     void SetLig(noteLogMensural_LIG lig_) { m_lig = lig_; };
     noteLogMensural_LIG GetLig() const { return m_lig; };
-    bool HasLig();
+    bool HasLig() const;
     ///@}
 
 private:
@@ -353,7 +353,7 @@ public:
     ///@{
     void SetSpaces(int spaces_) { m_spaces = spaces_; };
     int GetSpaces() const { return m_spaces; };
-    bool HasSpaces();
+    bool HasSpaces() const;
     ///@}
 
 private:

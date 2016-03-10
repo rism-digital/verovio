@@ -97,7 +97,7 @@ bool Staff::GetPosOnPage(ArrayPtrVoid *params)
     return false;
 }
 
-int Staff::GetYRel()
+int Staff::GetYRel() const
 {
     if (m_staffAlignment) {
         return m_staffAlignment->GetYRel();

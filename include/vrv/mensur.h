@@ -36,17 +36,17 @@ public:
      */
     ///@{
     Mensur();
-    Mensur(ScoreDefInterface *mensurAttr);
+    Mensur(const ScoreDefInterface *mensurAttr);
     void Init();
     virtual ~Mensur();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Mensur"; };
-    virtual ClassId Is() { return MENSUR; };
-    virtual Object *Clone() { return new Mensur(*this); };
+    virtual std::string GetClassName() const { return "Mensur"; };
+    virtual ClassId Is() const { return MENSUR; };
+    virtual Object *Clone() const { return new Mensur(*this); };
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
 private:
     //

@@ -51,11 +51,11 @@ public:
     ///@{
     void SetTabFret(data_FRETNUMBER tabFret_) { m_tabFret = tabFret_; };
     data_FRETNUMBER GetTabFret() const { return m_tabFret; };
-    bool HasTabFret();
+    bool HasTabFret() const;
     //
     void SetTabString(data_STRINGNUMBER tabString_) { m_tabString = tabString_; };
     data_STRINGNUMBER GetTabString() const { return m_tabString; };
-    bool HasTabString();
+    bool HasTabString() const;
     ///@}
 
 private:
@@ -93,7 +93,7 @@ public:
     ///@{
     void SetTabStrings(std::string tabStrings_) { m_tabStrings = tabStrings_; };
     std::string GetTabStrings() const { return m_tabStrings; };
-    bool HasTabStrings();
+    bool HasTabStrings() const;
     ///@}
 
 private:

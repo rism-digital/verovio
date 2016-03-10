@@ -44,7 +44,7 @@ public:
     ScoreDefElement(std::string classid);
     virtual ~ScoreDefElement();
     virtual void Reset();
-    virtual ClassId Is() { return SCOREDEF_ELEMENT; };
+    virtual ClassId Is() const { return SCOREDEF_ELEMENT; };
     ///@}
 
     virtual ScoreDefInterface *GetScoreDefInterface() { return dynamic_cast<ScoreDefInterface *>(this); }
@@ -54,10 +54,10 @@ public:
      * Look both at the attributes (e.g., @key.sig) and at child elements (not implemented)
      */
     ///@{
-    bool HasClefInfo();
-    bool HasKeySigInfo();
-    bool HasMensurInfo();
-    bool HasMeterSigInfo();
+    bool HasClefInfo() const;
+    bool HasKeySigInfo() const;
+    bool HasMensurInfo() const;
+    bool HasMeterSigInfo() const;
     ///@}
 
     /**
@@ -69,10 +69,10 @@ public:
      * constructor of each corresponding class (Clef, KeySig, etc.)
      */
     ///@{
-    Clef *GetClefCopy();
-    KeySig *GetKeySigCopy();
-    Mensur *GetMensurCopy();
-    MeterSig *GetMeterSigCopy();
+    Clef *GetClefCopy() const;
+    KeySig *GetKeySigCopy() const;
+    Mensur *GetMensurCopy() const;
+    MeterSig *GetMeterSigCopy() const;
     ///@}
 
 private:
@@ -80,10 +80,10 @@ private:
      * @name Methods for checking if clef info is available at the attribute level.
      */
     ///@{
-    bool HasClefAttrInfo();
-    bool HasKeySigAttrInfo();
-    bool HasMensurAttrInfo();
-    bool HasMeterSigAttrInfo();
+    bool HasClefAttrInfo() const;
+    bool HasKeySigAttrInfo() const;
+    bool HasMensurAttrInfo() const;
+    bool HasMeterSigAttrInfo() const;
     ///@}
 
     /**
@@ -91,10 +91,10 @@ private:
      * To be implemented.
      */
     ///@{
-    bool HasClefElementInfo();
-    bool HasKeySigElementInfo();
-    bool HasMensurElementInfo();
-    bool HasMeterSigElementInfo();
+    bool HasClefElementInfo() const;
+    bool HasKeySigElementInfo() const;
+    bool HasMensurElementInfo() const;
+    bool HasMeterSigElementInfo() const;
     ///@}
 };
 
@@ -116,8 +116,8 @@ public:
     ScoreDef();
     virtual ~ScoreDef();
     virtual void Reset();
-    virtual std::string GetClassName() { return "ScoreDef"; };
-    virtual ClassId Is() { return SCOREDEF; };
+    virtual std::string GetClassName() const { return "ScoreDef"; };
+    virtual ClassId Is() const { return SCOREDEF; };
     ///@}
 
     void AddStaffGrp(StaffGrp *staffGrp);
@@ -213,10 +213,10 @@ public:
     ///@{
     StaffGrp();
     virtual ~StaffGrp();
-    virtual Object *Clone() { return new StaffGrp(*this); };
+    virtual Object *Clone() const { return new StaffGrp(*this); };
     virtual void Reset();
-    virtual std::string GetClassName() { return "StaffGrp"; };
-    virtual ClassId Is() { return STAFFGRP; };
+    virtual std::string GetClassName() const { return "StaffGrp"; };
+    virtual ClassId Is() const { return STAFFGRP; };
     ///@}
 
     /**
@@ -268,10 +268,10 @@ public:
     ///@{
     StaffDef();
     virtual ~StaffDef();
-    virtual Object *Clone() { return new StaffDef(*this); };
+    virtual Object *Clone() const { return new StaffDef(*this); };
     virtual void Reset();
-    virtual std::string GetClassName() { return "StaffDef"; };
-    virtual ClassId Is() { return STAFFDEF; };
+    virtual std::string GetClassName() const { return "StaffDef"; };
+    virtual ClassId Is() const { return STAFFDEF; };
     ///@}
 
     //----------//

@@ -74,7 +74,7 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff)
     return alignment;
 }
 
-StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN)
+StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
 {
     StaffAlignment *alignment = NULL;
     int i;

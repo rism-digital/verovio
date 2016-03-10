@@ -37,8 +37,8 @@ public:
     System();
     virtual ~System();
     virtual void Reset();
-    virtual std::string GetClassName() { return "System"; };
-    virtual ClassId Is() { return SYSTEM; };
+    virtual std::string GetClassName() const { return "System"; };
+    virtual ClassId Is() const { return SYSTEM; };
     ///@}
 
     /**
@@ -62,12 +62,12 @@ public:
     /**
      * Return the height of the system
      */
-    int GetHeight();
+    int GetHeight() const;
 
     /**
      * Return the default horizontal spacing of system.
      */
-    int GetVerticalSpacing();
+    int GetVerticalSpacing() const;
 
     /**
      * Return the index position of the system in its page parent

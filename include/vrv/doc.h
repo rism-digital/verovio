@@ -34,7 +34,7 @@ public:
     // constructors and destructors
     Doc();
     virtual ~Doc();
-    virtual ClassId Is() { return DOC; }
+    virtual ClassId Is() const { return DOC; }
 
     void AddPage(Page *page);
 
@@ -52,44 +52,45 @@ public:
      * Getter for the DocType.
      * The setter is Doc::Reset.
      */
-    DocType GetType() { return m_type; };
+    DocType GetType() const { return m_type; };
 
     /**
      * Check if the document has a page with the specified value
      */
-    bool HasPage(int pageIdx);
+    bool HasPage(int pageIdx) const;
 
     /**
     * Get the total page count
     */
-    int GetPageCount();
+    int GetPageCount() const;
 
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
      */
     ///@{
-    int GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize);
-    int GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize);
-    int GetGlyphDescender(wchar_t smuflCode, int staffSize, bool graceSize);
-    int GetDrawingUnit(int staffSize);
-    int GetDrawingDoubleUnit(int staffSize);
-    int GetDrawingStaffSize(int staffSize);
-    int GetDrawingOctaveSize(int staffSize);
-    int GetDrawingBrevisWidth(int staffSize);
-    int GetDrawingBarLineWidth(int staffSize);
-    int GetDrawingStaffLineWidth(int staffSize);
-    int GetDrawingStemWidth(int staffSize);
-    int GetDrawingDirHeight(int staffSize, bool withMargin);
-    int GetDrawingDynamHeight(int staffSize, bool withMargin);
-    int GetDrawingHairpinSize(int staffSize, bool withMargin);
-    int GetDrawingBeamWidth(int staffSize, bool graceSize);
-    int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize);
-    int GetDrawingLedgerLineLength(int staffSize, bool graceSize);
-    int GetGraceSize(int value);
+    int GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize) const;
+    int GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize) const;
+    int GetGlyphDescender(wchar_t smuflCode, int staffSize, bool graceSize) const;
+    int GetDrawingUnit(int staffSize) const;
+    int GetDrawingDoubleUnit(int staffSize) const;
+    int GetDrawingStaffSize(int staffSize) const;
+    int GetDrawingOctaveSize(int staffSize) const;
+    int GetDrawingBrevisWidth(int staffSize) const;
+    int GetDrawingBarLineWidth(int staffSize) const;
+    int GetDrawingStaffLineWidth(int staffSize) const;
+    int GetDrawingStemWidth(int staffSize) const;
+    int GetDrawingDirHeight(int staffSize, bool withMargin) const;
+    int GetDrawingDynamHeight(int staffSize, bool withMargin) const;
+    int GetDrawingHairpinSize(int staffSize, bool withMargin) const;
+    int GetDrawingBeamWidth(int staffSize, bool graceSize) const;
+    int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const;
+    int GetDrawingLedgerLineLength(int staffSize, bool graceSize) const;
+    int GetGraceSize(int value) const;
     ///@}
 
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
+     * (no const because the size of the member font is changed)
      */
     ///@{
     FontInfo *GetDrawingSmuflFont(int staffSize, bool graceSize);
@@ -113,18 +114,18 @@ public:
      * @name Getters for tie and slur parameters
      */
     ///@{
-    char GetTieThickness() { return m_style->m_tieThickness; };
-    char GetSlurMinHeight() { return m_style->m_minSlurHeight; };
-    char GetSlurMaxHeight() { return m_style->m_maxSlurHeight; };
-    char GetSlurThickness() { return m_style->m_slurThickness; };
+    char GetTieThickness() const { return m_style->m_tieThickness; };
+    char GetSlurMinHeight() const { return m_style->m_minSlurHeight; };
+    char GetSlurMaxHeight() const { return m_style->m_maxSlurHeight; };
+    char GetSlurThickness() const { return m_style->m_slurThickness; };
     ///@}
 
     /**
      * @name Getters for the page dimensions and margins
      */
     ///@{
-    short GetSpacingStaff() { return m_spacingStaff; };
-    short GetSpacingSystem() { return m_spacingSystem; };
+    short GetSpacingStaff() const { return m_spacingStaff; };
+    short GetSpacingSystem() const { return m_spacingSystem; };
     ///@}
 
     /**
@@ -134,9 +135,9 @@ public:
      * These should eventually be set at parameters.
      */
     ///@{
-    char GetLeftMargin(const ClassId classId);
-    char GetRightMargin(const ClassId classId);
-    char GetLeftPosition();
+    char GetLeftMargin(const ClassId classId) const;
+    char GetRightMargin(const ClassId classId) const;
+    char GetLeftPosition() const;
     ///@}
 
     /*
@@ -146,7 +147,7 @@ public:
      */
     ///@{
     void SetJustificationX(bool drawingJustifyX) { m_drawingJustifyX = drawingJustifyX; };
-    bool GetJustificationX() { return m_drawingJustifyX; };
+    bool GetJustificationX() const { return m_drawingJustifyX; };
     ///@}
 
     /*
@@ -156,7 +157,7 @@ public:
      */
     ///@{
     void SetEvenSpacing(bool drawingEvenSpacing) { m_drawingEvenSpacing = drawingEvenSpacing; };
-    bool GetEvenSpacing() { return m_drawingEvenSpacing; };
+    bool GetEvenSpacing() const { return m_drawingEvenSpacing; };
     ///@}
 
     /*
@@ -164,9 +165,9 @@ public:
      */
     ///@{
     void SetSpacingLinear(double drawingSpacingLinear) { m_drawingSpacingLinear = drawingSpacingLinear; };
-    double GetSpacingLinear() { return m_drawingSpacingLinear; };
+    double GetSpacingLinear() const { return m_drawingSpacingLinear; };
     void SetSpacingNonLinear(double drawingSpacingNonLinear) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; };
-    double GetSpacingNonLinear() { return m_drawingSpacingNonLinear; };
+    double GetSpacingNonLinear() const { return m_drawingSpacingNonLinear; };
     ///@}
 
     /**
@@ -227,19 +228,19 @@ public:
      * be done with Doc::SetDrawingPage. This is only a method for
      * asserting that currently have the right page.
      */
-    Page *GetDrawingPage() { return m_drawingPage; };
+    Page *GetDrawingPage() const { return m_drawingPage; };
 
     /**
      * Return the width adjusted to the content of the current drawing page.
      * This includes the appropriate left and right margins.
      */
-    int GetAdjustedDrawingPageWidth();
+    int GetAdjustedDrawingPageWidth() const;
 
     /**
      * Return the height adjusted to the content of the current drawing page.
      * This includes the appropriate top and bottom margin (using top as bottom).
      */
-    int GetAdjustedDrawingPageHeight();
+    int GetAdjustedDrawingPageHeight() const;
 
     //----------//
     // Functors //

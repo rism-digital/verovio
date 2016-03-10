@@ -51,7 +51,7 @@ public:
     ///@{
     void SetAltsym(std::string altsym_) { m_altsym = altsym_; };
     std::string GetAltsym() const { return m_altsym; };
-    bool HasAltsym();
+    bool HasAltsym() const;
     ///@}
 
 private:

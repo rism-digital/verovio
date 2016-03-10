@@ -181,7 +181,7 @@ Object::Object(std::string classid) : BoundingBox()
     Init(classid);
 }
 
-Object *Object::Clone()
+Object *Object::Clone() const
 {
     // This should never happen because the method should be overridden
     assert(false);
@@ -245,7 +245,7 @@ void Object::Init(std::string classid)
     Reset();
 }
 
-ClassId Object::Is()
+ClassId Object::Is() const
 {
     // we should always have the method overridden
     assert(false);
@@ -298,12 +298,12 @@ void Object::ClearChildren()
     m_children.clear();
 }
 
-int Object::GetChildCount(const ClassId classId)
+int Object::GetChildCount(const ClassId classId) const
 {
     return (int)count_if(m_children.begin(), m_children.end(), ObjectComparison(classId));
 }
 
-int Object::GetAttributes(ArrayOfStrAttr *attributes)
+int Object::GetAttributes(ArrayOfStrAttr *attributes) const
 {
     assert(attributes);
     attributes->clear();
@@ -316,7 +316,7 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes)
     return (int)attributes->size();
 }
 
-bool Object::HasAttribute(std::string attribute, std::string value)
+bool Object::HasAttribute(std::string attribute, std::string value) const
 {
     ArrayOfStrAttr attributes;
     this->GetAttributes(&attributes);
@@ -342,7 +342,7 @@ Object *Object::GetNext()
     return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
 }
 
-Object *Object::GetLast()
+Object *Object::GetLast() const
 {
     if (m_children.empty()) return NULL;
     return m_children.back();
@@ -429,7 +429,7 @@ Object *Object::FindChildExtremeByAttComparison(AttComparison *attComparison, in
     return element;
 }
 
-Object *Object::GetChild(int idx)
+Object *Object::GetChild(int idx) const
 {
     if ((idx < 0) || (idx >= (int)m_children.size())) {
         return NULL;
@@ -697,7 +697,7 @@ Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const Class
     return (rit == m_list.rend()) ? NULL : *rit;
 }
 
-Object *ObjectListInterface::GetListPrevious(const Object *listElement)
+Object *ObjectListInterface::GetListPrevious(Object *listElement)
 {
     ListOfObjects::iterator iter;
     int i;
@@ -714,7 +714,7 @@ Object *ObjectListInterface::GetListPrevious(const Object *listElement)
     return NULL;
 }
 
-Object *ObjectListInterface::GetListNext(const Object *listElement)
+Object *ObjectListInterface::GetListNext(Object *listElement)
 {
     ListOfObjects::reverse_iterator iter;
     int i;

@@ -44,8 +44,8 @@ public:
     Layer();
     virtual ~Layer();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Layer"; };
-    virtual ClassId Is() { return LAYER; };
+    virtual std::string GetClassName() const { return "Layer"; };
+    virtual ClassId Is() const { return LAYER; };
     ///@}
 
     /**
@@ -91,7 +91,7 @@ public:
      */
     ///@{
     void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; };
-    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; };
+    data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; };
     ///@}
 
     //----------//

@@ -33,7 +33,7 @@ public:
     FloatingElement(std::string classid);
     virtual ~FloatingElement();
     virtual void Reset();
-    virtual ClassId Is() { return FLOATING_ELEMENT; };
+    virtual ClassId Is() const { return FLOATING_ELEMENT; };
     ///@}
 
     virtual void UpdateContentBBoxX(int x1, int x2){};
@@ -96,7 +96,7 @@ public:
      * @name Get and set the Y drawing relative position
      */
     ///@{
-    int GetDrawingYRel() { return m_drawingYRel; };
+    int GetDrawingYRel() const { return m_drawingYRel; };
     void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; };
     ///@}
 

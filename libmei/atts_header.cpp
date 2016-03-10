@@ -65,7 +65,7 @@ bool AttRegularmethod::WriteRegularmethod(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttRegularmethod::HasMethod()
+bool AttRegularmethod::HasMethod() const
 {
     return (m_method != regularmethod_METHOD_NONE);
 }
@@ -86,10 +86,10 @@ bool Att::SetHeader(Object *element, std::string attrType, std::string attrValue
     return false;
 }
 
-void Att::GetHeader(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetHeader(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_REGULARMETHOD)) {
-        AttRegularmethod *att = dynamic_cast<AttRegularmethod *>(element);
+        const AttRegularmethod *att = dynamic_cast<const AttRegularmethod *>(element);
         assert(att);
         if (att->HasMethod()) {
             attributes->push_back(std::make_pair("method", att->RegularmethodMethodToStr(att->GetMethod())));

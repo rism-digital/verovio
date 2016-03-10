@@ -31,8 +31,8 @@ public:
     Rest();
     virtual ~Rest();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Rest"; };
-    virtual ClassId Is() { return REST; };
+    virtual std::string GetClassName() const { return "Rest"; };
+    virtual ClassId Is() const { return REST; };
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
@@ -40,7 +40,7 @@ public:
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
 private:
     //

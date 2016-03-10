@@ -65,7 +65,7 @@ bool AttAlignment::WriteAlignment(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttAlignment::HasWhen()
+bool AttAlignment::HasWhen() const
 {
     return (m_when != "");
 }
@@ -86,10 +86,10 @@ bool Att::SetPerformance(Object *element, std::string attrType, std::string attr
     return false;
 }
 
-void Att::GetPerformance(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetPerformance(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ALIGNMENT)) {
-        AttAlignment *att = dynamic_cast<AttAlignment *>(element);
+        const AttAlignment *att = dynamic_cast<const AttAlignment *>(element);
         assert(att);
         if (att->HasWhen()) {
             attributes->push_back(std::make_pair("when", att->StrToStr(att->GetWhen())));

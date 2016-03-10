@@ -40,8 +40,8 @@ public:
     Staff(int n = -1);
     virtual ~Staff();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Staff"; };
-    virtual ClassId Is() { return STAFF; };
+    virtual std::string GetClassName() const { return "Staff"; };
+    virtual ClassId Is() const { return STAFF; };
     ///@}
 
     /**
@@ -69,9 +69,9 @@ public:
      */
     virtual void ResetVerticalAlignment();
 
-    StaffAlignment *GetAlignment() { return m_staffAlignment; };
+    StaffAlignment *GetAlignment() const { return m_staffAlignment; };
 
-    int GetYRel();
+    int GetYRel() const;
 
     //----------//
     // Functors //
@@ -136,7 +136,7 @@ public:
      */
     int m_drawingStaffSize;
 
-    std::vector< Object *> m_timeSpanningElements;
+    std::vector<Object *> m_timeSpanningElements;
 
     /**
  * The Y absolute position of the staff for facsimile (transcription) encodings.

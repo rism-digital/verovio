@@ -92,8 +92,8 @@ public:
      * @name Get and set the X and Y drawing position
      */
     ///@{
-    int GetDrawingX() { return m_drawingX; };
-    int GetDrawingY() { return m_drawingY; };
+    int GetDrawingX() const { return m_drawingX; };
+    int GetDrawingY() const { return m_drawingY; };
     void SetDrawingX(int drawingX) { m_drawingX = drawingX; };
     void SetDrawingY(int drawingY) { m_drawingY = drawingY; };
     ///@}
@@ -102,7 +102,7 @@ public:
      * Is true if the bounding box (self or content) has been updated at least once.
      * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
      */
-    bool HasUpdatedBB() { return (m_updatedBBoxX && m_updatedBBoxY); };
+    bool HasUpdatedBB() const { return (m_updatedBBoxX && m_updatedBBoxY); };
 
 private:
     bool m_updatedBBoxX;
@@ -142,8 +142,8 @@ public:
     Object();
     Object(std::string classid);
     virtual ~Object();
-    virtual ClassId Is();
-    virtual std::string GetClassName() { return "[MISSING]"; };
+    virtual ClassId Is() const;
+    virtual std::string GetClassName() const { return "[MISSING]"; };
     ///@}
 
     /**
@@ -152,11 +152,11 @@ public:
      * See classId enum.
      */
     ///@{
-    bool IsEditorialElement() { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); };
-    bool IsLayerElement() { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); };
-    bool IsFloatingElement() { return (this->Is() > FLOATING_ELEMENT && this->Is() < FLOATING_ELEMENT_max); };
-    bool IsScoreDefElement() { return (this->Is() > SCOREDEF_ELEMENT && this->Is() < SCOREDEF_ELEMENT_max); };
-    bool IsTextElement() { return (this->Is() > TEXT_ELEMENT && this->Is() < TEXT_ELEMENT_max); };
+    bool IsEditorialElement() const { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); };
+    bool IsLayerElement() const { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); };
+    bool IsFloatingElement() const { return (this->Is() > FLOATING_ELEMENT && this->Is() < FLOATING_ELEMENT_max); };
+    bool IsScoreDefElement() const { return (this->Is() > SCOREDEF_ELEMENT && this->Is() < SCOREDEF_ELEMENT_max); };
+    bool IsTextElement() const { return (this->Is() > TEXT_ELEMENT && this->Is() < TEXT_ELEMENT_max); };
     ///@}
 
     /**
@@ -164,12 +164,12 @@ public:
      */
     ///@{
     void RegisterAttClass(AttClassId attClassId) { m_attClasses.push_back(attClassId); };
-    bool HasAttClass(AttClassId attClassId)
+    bool HasAttClass(AttClassId attClassId) const
     {
         return std::find(m_attClasses.begin(), m_attClasses.end(), attClassId) != m_attClasses.end();
     };
     void RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId interfaceId);
-    bool HasInterface(InterfaceId interfaceId)
+    bool HasInterface(InterfaceId interfaceId) const
     {
         return std::find(m_interfaces.begin(), m_interfaces.end(), interfaceId) != m_interfaces.end();
     };
@@ -216,9 +216,9 @@ public:
      * Method call for copying child classes.
      * The method has to be overridden.
      */
-    virtual Object *Clone();
+    virtual Object *Clone() const;
 
-    std::string GetUuid() { return m_uuid; };
+    std::string GetUuid() const { return m_uuid; };
     void SetUuid(std::string uuid);
     void ResetUuid();
 
@@ -228,25 +228,25 @@ public:
      * The method with a ClassId only searches at the first level.
      */
     ///@{
-    int GetChildCount() { return (int)m_children.size(); };
-    int GetChildCount(const ClassId classId);
+    int GetChildCount() const { return (int)m_children.size(); };
+    int GetChildCount(const ClassId classId) const;
     ///@}
 
     /**
      * Child access (generic)
      */
-    Object *GetChild(int idx);
+    Object *GetChild(int idx) const;
 
     /**
      * Fill an array of pairs with all attributes and their values.
      * Return the number of attributes found.
      */
-    int GetAttributes(ArrayOfStrAttr *attributes);
+    int GetAttributes(ArrayOfStrAttr *attributes) const;
 
     /**
      * Check if an Object has an attribute with the specified value
      */
-    bool HasAttribute(std::string attribute, std::string value);
+    bool HasAttribute(std::string attribute, std::string value) const;
 
     /**
      * @name Iterator methods for accessing children.
@@ -263,7 +263,7 @@ public:
     /**
      * Return the last child of the object (if any, NULL otherwise)
      */
-    Object *GetLast();
+    Object *GetLast() const;
 
     /**
      * Set the parent of the Object.
@@ -359,14 +359,9 @@ public:
     void FillFlatList(ListOfObjects *list);
 
     /**
-     * Parse the sameAs attribute and return the one at the #idx position (if any).
-     */
-    bool GetSameAs(std::string *id, std::string *filename, int idx = 0);
-
-    /**
      * Check if the content was modified or not
      */
-    bool IsModified() { return m_isModified; };
+    bool IsModified() const { return m_isModified; };
 
     /**
      * Mark the object and its parent (if any) as modified
@@ -790,17 +785,17 @@ public:
 protected:
     ArrayOfObjects m_children;
 
+private:
     std::string m_uuid;
     std::string m_classid;
 
-private:
     /**
      * Indicates whether the object content is up-to-date or not.
      * This is useful for object using sub-lists of objects when drawing.
      * For example, Beam has a list of children notes and this value indicates if the
      * list needs to be updated or not. Is is mostly an optimization feature.
      */
-    bool m_isModified;
+    mutable bool m_isModified;
 
     /**
      * Members used for caching iterator values.
@@ -853,12 +848,12 @@ public:
     /**
      * Returns the previous object in the list (NULL if not found)
      */
-    Object *GetListPrevious(const Object *listElement);
+    Object *GetListPrevious(Object *listElement);
 
     /**
      * Returns the next object in the list (NULL if not found)
      */
-    Object *GetListNext(const Object *listElement);
+    Object *GetListNext(Object *listElement);
 
     /**
      * Return the list.
@@ -877,7 +872,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ListOfObjects *childList){};
+    virtual void FilterList(ListOfObjects *childList) {};
 
 public:
     /**

@@ -51,7 +51,7 @@ public:
     ///@{
     void SetWhen(std::string when_) { m_when = when_; };
     std::string GetWhen() const { return m_when; };
-    bool HasWhen();
+    bool HasWhen() const;
     ///@}
 
 private:

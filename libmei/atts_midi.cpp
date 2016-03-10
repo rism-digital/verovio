@@ -95,22 +95,22 @@ bool AttChannelized::WriteChannelized(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttChannelized::HasMidiChannel()
+bool AttChannelized::HasMidiChannel() const
 {
     return (m_midiChannel != MIDICHANNEL_NONE);
 }
 
-bool AttChannelized::HasMidiDuty()
+bool AttChannelized::HasMidiDuty() const
 {
     return (m_midiDuty != 0);
 }
 
-bool AttChannelized::HasMidiPort()
+bool AttChannelized::HasMidiPort() const
 {
     return (m_midiPort != MIDIVALUE_NONE);
 }
 
-bool AttChannelized::HasMidiTrack()
+bool AttChannelized::HasMidiTrack() const
 {
     return (m_midiTrack != 0);
 }
@@ -186,22 +186,22 @@ bool AttMidiinstrument::WriteMidiinstrument(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttMidiinstrument::HasMidiInstrnum()
+bool AttMidiinstrument::HasMidiInstrnum() const
 {
     return (m_midiInstrnum != MIDIVALUE_NONE);
 }
 
-bool AttMidiinstrument::HasMidiInstrname()
+bool AttMidiinstrument::HasMidiInstrname() const
 {
     return (m_midiInstrname != MIDINAMES_NONE);
 }
 
-bool AttMidiinstrument::HasMidiPan()
+bool AttMidiinstrument::HasMidiPan() const
 {
     return (m_midiPan != MIDIVALUE_NONE);
 }
 
-bool AttMidiinstrument::HasMidiVolume()
+bool AttMidiinstrument::HasMidiVolume() const
 {
     return (m_midiVolume != MIDIVALUE_NONE);
 }
@@ -247,7 +247,7 @@ bool AttMidinumber::WriteMidinumber(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttMidinumber::HasNum()
+bool AttMidinumber::HasNum() const
 {
     return (m_num != 0);
 }
@@ -293,7 +293,7 @@ bool AttMiditempo::WriteMiditempo(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttMiditempo::HasMidiTempo()
+bool AttMiditempo::HasMidiTempo() const
 {
     return (m_midiTempo != MIDITEMPO_NONE);
 }
@@ -339,7 +339,7 @@ bool AttMidivalue::WriteMidivalue(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttMidivalue::HasVal()
+bool AttMidivalue::HasVal() const
 {
     return (m_val != MIDIVALUE_NONE);
 }
@@ -385,7 +385,7 @@ bool AttMidivalue2::WriteMidivalue2(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttMidivalue2::HasVal2()
+bool AttMidivalue2::HasVal2() const
 {
     return (m_val2 != MIDIVALUE_NONE);
 }
@@ -431,7 +431,7 @@ bool AttMidivelocity::WriteMidivelocity(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttMidivelocity::HasVel()
+bool AttMidivelocity::HasVel() const
 {
     return (m_vel != MIDIVALUE_NONE);
 }
@@ -477,7 +477,7 @@ bool AttTimebase::WriteTimebase(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttTimebase::HasPpq()
+bool AttTimebase::HasPpq() const
 {
     return (m_ppq != 0);
 }
@@ -578,10 +578,10 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
     return false;
 }
 
-void Att::GetMidi(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_CHANNELIZED)) {
-        AttChannelized *att = dynamic_cast<AttChannelized *>(element);
+        const AttChannelized *att = dynamic_cast<const AttChannelized *>(element);
         assert(att);
         if (att->HasMidiChannel()) {
             attributes->push_back(std::make_pair("midi.channel", att->MidichannelToStr(att->GetMidiChannel())));
@@ -597,7 +597,7 @@ void Att::GetMidi(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_MIDIINSTRUMENT)) {
-        AttMidiinstrument *att = dynamic_cast<AttMidiinstrument *>(element);
+        const AttMidiinstrument *att = dynamic_cast<const AttMidiinstrument *>(element);
         assert(att);
         if (att->HasMidiInstrnum()) {
             attributes->push_back(std::make_pair("midi.instrnum", att->MidivalueToStr(att->GetMidiInstrnum())));
@@ -613,42 +613,42 @@ void Att::GetMidi(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_MIDINUMBER)) {
-        AttMidinumber *att = dynamic_cast<AttMidinumber *>(element);
+        const AttMidinumber *att = dynamic_cast<const AttMidinumber *>(element);
         assert(att);
         if (att->HasNum()) {
             attributes->push_back(std::make_pair("num", att->IntToStr(att->GetNum())));
         }
     }
     if (element->HasAttClass(ATT_MIDITEMPO)) {
-        AttMiditempo *att = dynamic_cast<AttMiditempo *>(element);
+        const AttMiditempo *att = dynamic_cast<const AttMiditempo *>(element);
         assert(att);
         if (att->HasMidiTempo()) {
             attributes->push_back(std::make_pair("midi.tempo", att->MiditempoToStr(att->GetMidiTempo())));
         }
     }
     if (element->HasAttClass(ATT_MIDIVALUE)) {
-        AttMidivalue *att = dynamic_cast<AttMidivalue *>(element);
+        const AttMidivalue *att = dynamic_cast<const AttMidivalue *>(element);
         assert(att);
         if (att->HasVal()) {
             attributes->push_back(std::make_pair("val", att->MidivalueToStr(att->GetVal())));
         }
     }
     if (element->HasAttClass(ATT_MIDIVALUE2)) {
-        AttMidivalue2 *att = dynamic_cast<AttMidivalue2 *>(element);
+        const AttMidivalue2 *att = dynamic_cast<const AttMidivalue2 *>(element);
         assert(att);
         if (att->HasVal2()) {
             attributes->push_back(std::make_pair("val2", att->MidivalueToStr(att->GetVal2())));
         }
     }
     if (element->HasAttClass(ATT_MIDIVELOCITY)) {
-        AttMidivelocity *att = dynamic_cast<AttMidivelocity *>(element);
+        const AttMidivelocity *att = dynamic_cast<const AttMidivelocity *>(element);
         assert(att);
         if (att->HasVel()) {
             attributes->push_back(std::make_pair("vel", att->MidivalueToStr(att->GetVel())));
         }
     }
     if (element->HasAttClass(ATT_TIMEBASE)) {
-        AttTimebase *att = dynamic_cast<AttTimebase *>(element);
+        const AttTimebase *att = dynamic_cast<const AttTimebase *>(element);
         assert(att);
         if (att->HasPpq()) {
             attributes->push_back(std::make_pair("ppq", att->IntToStr(att->GetPpq())));

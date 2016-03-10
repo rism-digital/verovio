@@ -30,8 +30,8 @@ public:
     Dir();
     virtual ~Dir();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Dir"; };
-    virtual ClassId Is() { return DIR; };
+    virtual std::string GetClassName() const { return "Dir"; };
+    virtual ClassId Is() const { return DIR; };
     ///@}
 
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }

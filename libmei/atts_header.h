@@ -51,7 +51,7 @@ public:
     ///@{
     void SetMethod(regularmethod_METHOD method_) { m_method = method_; };
     regularmethod_METHOD GetMethod() const { return m_method; };
-    bool HasMethod();
+    bool HasMethod() const;
     ///@}
 
 private:

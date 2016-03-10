@@ -65,7 +65,7 @@ bool AttFretlocation::WriteFretlocation(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttFretlocation::HasFret()
+bool AttFretlocation::HasFret() const
 {
     return (m_fret != FRET_NONE);
 }
@@ -111,7 +111,7 @@ bool AttHarmLog::WriteHarmLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttHarmLog::HasChordref()
+bool AttHarmLog::HasChordref() const
 {
     return (m_chordref != "");
 }
@@ -157,7 +157,7 @@ bool AttHarmVis::WriteHarmVis(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttHarmVis::HasRendgrid()
+bool AttHarmVis::HasRendgrid() const
 {
     return (m_rendgrid != harmVis_RENDGRID_NONE);
 }
@@ -194,24 +194,24 @@ bool Att::SetHarmony(Object *element, std::string attrType, std::string attrValu
     return false;
 }
 
-void Att::GetHarmony(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetHarmony(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_FRETLOCATION)) {
-        AttFretlocation *att = dynamic_cast<AttFretlocation *>(element);
+        const AttFretlocation *att = dynamic_cast<const AttFretlocation *>(element);
         assert(att);
         if (att->HasFret()) {
             attributes->push_back(std::make_pair("fret", att->FretToStr(att->GetFret())));
         }
     }
     if (element->HasAttClass(ATT_HARMLOG)) {
-        AttHarmLog *att = dynamic_cast<AttHarmLog *>(element);
+        const AttHarmLog *att = dynamic_cast<const AttHarmLog *>(element);
         assert(att);
         if (att->HasChordref()) {
             attributes->push_back(std::make_pair("chordref", att->StrToStr(att->GetChordref())));
         }
     }
     if (element->HasAttClass(ATT_HARMVIS)) {
-        AttHarmVis *att = dynamic_cast<AttHarmVis *>(element);
+        const AttHarmVis *att = dynamic_cast<const AttHarmVis *>(element);
         assert(att);
         if (att->HasRendgrid()) {
             attributes->push_back(std::make_pair("rendgrid", att->HarmVisRendgridToStr(att->GetRendgrid())));

@@ -28,8 +28,8 @@ public:
     Hairpin();
     virtual ~Hairpin();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Hairpin"; };
-    virtual ClassId Is() { return HAIRPIN; };
+    virtual std::string GetClassName() const { return "Hairpin"; };
+    virtual ClassId Is() const { return HAIRPIN; };
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

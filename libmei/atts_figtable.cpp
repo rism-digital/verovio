@@ -75,12 +75,12 @@ bool AttTabular::WriteTabular(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttTabular::HasColspan()
+bool AttTabular::HasColspan() const
 {
     return (m_colspan != 0);
 }
 
-bool AttTabular::HasRowspan()
+bool AttTabular::HasRowspan() const
 {
     return (m_rowspan != 0);
 }
@@ -105,10 +105,10 @@ bool Att::SetFigtable(Object *element, std::string attrType, std::string attrVal
     return false;
 }
 
-void Att::GetFigtable(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetFigtable(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_TABULAR)) {
-        AttTabular *att = dynamic_cast<AttTabular *>(element);
+        const AttTabular *att = dynamic_cast<const AttTabular *>(element);
         assert(att);
         if (att->HasColspan()) {
             attributes->push_back(std::make_pair("colspan", att->IntToStr(att->GetColspan())));

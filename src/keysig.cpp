@@ -71,7 +71,7 @@ KeySig::KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType)
     m_alterationType = alterationType;
 }
 
-KeySig::KeySig(ScoreDefInterface *keySigAttr) : LayerElement("ksig-"), AttAccidental(), AttPitch()
+KeySig::KeySig(const ScoreDefInterface *keySigAttr) : LayerElement("ksig-"), AttAccidental(), AttPitch()
 {
     Init();
 

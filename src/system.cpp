@@ -26,7 +26,7 @@ namespace vrv {
 // System
 //----------------------------------------------------------------------------
 
-System::System() :  Object("system-"), DrawingListInterface()
+System::System() : Object("system-"), DrawingListInterface()
 {
     // We set parent to it because we want to access the parent doc from the aligners
     m_systemAligner.SetParent(this);
@@ -70,12 +70,12 @@ void System::AddScoreDef(ScoreDef *scoreDef)
     Modify();
 }
 
-int System::GetVerticalSpacing()
+int System::GetVerticalSpacing() const
 {
     return 0; // arbitrary generic value
 }
 
-int System::GetHeight()
+int System::GetHeight() const
 {
     if (m_systemAligner.GetBottomAlignment()) {
         return -m_systemAligner.GetBottomAlignment()->GetYRel();

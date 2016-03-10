@@ -62,16 +62,16 @@ public:
     Note();
     virtual ~Note();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Note"; };
-    virtual ClassId Is() { return NOTE; };
+    virtual std::string GetClassName() const { return "Note"; };
+    virtual ClassId Is() const { return NOTE; };
     ///@}
 
-    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    virtual DurationInterface * GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
     virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
     virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return dynamic_cast<StemmedDrawingInterface *>(this); }
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
     /**
      * Add an element (a verse or an accid) to a note.
@@ -86,7 +86,7 @@ public:
     void ResetDrawingAccid();
     void ResetDrawingTieAttr();
     void SetDrawingTieAttr();
-    Tie *GetDrawingTieAttr() { return m_drawingTieAttr; };
+    Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; };
     ///@}
 
     /**
@@ -95,7 +95,7 @@ public:
     ///@{
     Alignment *GetGraceAlignment();
     void SetGraceAlignment(Alignment *graceAlignment);
-    bool HasGraceAlignment() { return (m_graceAlignment != NULL); };
+    bool HasGraceAlignment() const { return (m_graceAlignment != NULL); };
     void ResetGraceAlignment() { m_graceAlignment = NULL; };
     ///@}
 
@@ -105,13 +105,13 @@ public:
     ///@{
     Chord *IsChordTone();
     int GetDrawingDur();
-    bool IsClusterExtreme(); // used to find if it is the highest or lowest note in a cluster
+    bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
 
     /**
      * Returns a single integer representing pitch and octave.
      */
-    int GetDiatonicPitch() { return this->GetPname() + (int)this->GetOct() * 7; };
+    int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; };
 
     //----------//
     // Functors //

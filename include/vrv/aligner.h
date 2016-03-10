@@ -61,7 +61,7 @@ public:
     // constructors and destructors
     SystemAligner();
     virtual ~SystemAligner();
-    virtual ClassId Is() { return SYSTEM_ALIGNER; }
+    virtual ClassId Is() const { return SYSTEM_ALIGNER; }
 
     int GetStaffAlignmentCount() const { return (int)m_children.size(); };
 
@@ -74,13 +74,14 @@ public:
      * Get bottom StaffAlignment for the system.
      * For each SystemAligner, we keep a StaffAlignment for the bottom position.
      */
-    StaffAlignment *GetBottomAlignment() { return m_bottomAlignment; };
+    StaffAlignment *GetBottomAlignment() const { return m_bottomAlignment; };
 
     /**
      * Get the StaffAlignment at index idx.
      * Creates the StaffAlignment if not there yet.
      * Checks the they are created incrementally (without gap).
      * If a staff is passed, it will be used for initializing m_staffN and m_staffSize of the aligner.
+     * (no const since the bottom alignment is temporarily removed)
      */
     StaffAlignment *GetStaffAlignment(int idx, Staff *staff = NULL);
 
@@ -88,7 +89,7 @@ public:
      * Get the StaffAlignment for the staffN.
      * Return NULL if not found.
      */
-    StaffAlignment *GetStaffAlignmentForStaffN(int staffN);
+    StaffAlignment *GetStaffAlignmentForStaffN(int staffN) const;
 
 private:
     //
@@ -117,17 +118,17 @@ public:
     ///@{
     StaffAlignment();
     virtual ~StaffAlignment();
-    virtual ClassId Is() { return STAFF_ALIGNMENT; }
+    virtual ClassId Is() const { return STAFF_ALIGNMENT; }
     ///@}
 
     void SetYRel(int yRel) { m_yRel = yRel; };
-    int GetYRel() { return m_yRel; };
+    int GetYRel() const { return m_yRel; };
 
     void SetYShift(int yShift);
-    int GetYShift() { return m_yShift; };
+    int GetYShift() const { return m_yShift; };
 
     void SetMaxHeight(int max_height);
-    int GetMaxHeight() { return m_maxHeight; };
+    int GetMaxHeight() const { return m_maxHeight; };
 
     /**
      * @name Set and get verse count.
@@ -136,24 +137,24 @@ public:
      */
     ///@{
     void SetVerseCount(int verse_count);
-    int GetVerseCount() { return m_verseCount; };
+    int GetVerseCount() const { return m_verseCount; };
 
     /**
      * @name Setter and getter for above or below dir/dynam/hairpin
      */
     ///@{
     void SetDirAbove() { m_dirAbove = true; };
-    bool GetDirAbove() { return m_dirAbove; };
+    bool GetDirAbove() const { return m_dirAbove; };
     void SetDirBelow() { m_dirBelow = true; };
-    bool GetDirBelow() { return m_dirBelow; };
+    bool GetDirBelow() const { return m_dirBelow; };
     void SetDynamAbove() { m_dynamAbove = true; };
-    bool GetDynamAbove() { return m_dynamAbove; };
+    bool GetDynamAbove() const { return m_dynamAbove; };
     void SetDynamBelow() { m_dynamBelow = true; };
-    bool GetDynamBelow() { return m_dynamBelow; };
+    bool GetDynamBelow() const { return m_dynamBelow; };
     void SetHairpinAbove() { m_hairpinAbove = true; };
-    bool GetHairpinAbove() { return m_hairpinAbove; };
+    bool GetHairpinAbove() const { return m_hairpinAbove; };
     void SetHairpinBelow() { m_hairpinBelow = true; };
-    bool GetHairpinBelow() { return m_hairpinBelow; };
+    bool GetHairpinBelow() const { return m_hairpinBelow; };
     ///@}
 
     void SetCurrentBoundingBox(FloatingElement *element, int x, int y);
@@ -163,7 +164,7 @@ public:
      * Used for accessing the staff @n, the size, etc.
      */
     ///@{
-    Staff *GetStaff() { return m_staff; };
+    Staff *GetStaff() const { return m_staff; };
     void SetStaff(Staff *staff) { m_staff = staff; };
     ///@}
 
@@ -237,23 +238,23 @@ public:
     Alignment();
     Alignment(double time, AlignmentType type = ALIGNMENT_DEFAULT);
     virtual ~Alignment();
-    virtual ClassId Is() { return ALIGNMENT; }
+    virtual ClassId Is() const { return ALIGNMENT; }
 
     void SetXRel(int x_rel);
-    int GetXRel() { return m_xRel; };
+    int GetXRel() const { return m_xRel; };
 
     void SetXShift(int xShift);
-    int GetXShift() { return m_xShift; };
+    int GetXShift() const { return m_xShift; };
 
     void SetMaxWidth(int maxWidth);
-    int GetMaxWidth() { return m_maxWidth; };
+    int GetMaxWidth() const { return m_maxWidth; };
 
     /**
      * @name Set and get the time value of the alignment
      */
     ///@{
     void SetTime(double time) { m_time = time; };
-    double GetTime() { return m_time; };
+    double GetTime() const { return m_time; };
     ///@}
 
     /**
@@ -261,7 +262,7 @@ public:
      */
     ///@{
     void SetType(AlignmentType type) { m_type = type; };
-    AlignmentType GetType() { return m_type; };
+    AlignmentType GetType() const { return m_type; };
     ///@}
 
     /**
@@ -273,7 +274,7 @@ public:
     /**
      * Returns true if the aligner has a GraceAligner
      */
-    bool HasGraceAligner() { return (m_graceAligner != NULL); };
+    bool HasGraceAligner() const { return (m_graceAligner != NULL); };
 
     /**
      * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
@@ -359,7 +360,7 @@ public:
     // constructors and destructors
     MeasureAligner();
     virtual ~MeasureAligner();
-    virtual ClassId Is() { return MEASURE_ALIGNER; }
+    virtual ClassId Is() const { return MEASURE_ALIGNER; }
 
     int GetAlignmentCount() const { return (int)m_children.size(); };
 
@@ -382,7 +383,7 @@ public:
      */
     ///@{
     void SetNonJustifiableMargin(int margin) { m_nonJustifiableLeftMargin = margin; };
-    int GetNonJustifiableMargin() { return m_nonJustifiableLeftMargin; };
+    int GetNonJustifiableMargin() const { return m_nonJustifiableLeftMargin; };
     ///@}
 
     /**
@@ -390,14 +391,14 @@ public:
      * For each MeasureAligner, we keep and Alignment for the left position.
      * The Alignment time will be always 0.0 and will appear first in the list.
      */
-    Alignment *GetLeftAlignment() { return m_leftAlignment; };
+    Alignment *GetLeftAlignment() const { return m_leftAlignment; };
 
     /**
      * Get right Alignment for the measure.
      * For each MeasureAligner, we keep and Alignment for the right position.
      * The Alignment time will be increased whenever necessary when values are added.
      */
-    Alignment *GetRightAlignment() { return m_rightAlignment; };
+    Alignment *GetRightAlignment() const { return m_rightAlignment; };
 
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.
@@ -453,7 +454,7 @@ public:
     // constructors and destructors
     GraceAligner();
     virtual ~GraceAligner();
-    virtual ClassId Is() { return GRACE_ALIGNER; }
+    virtual ClassId Is() const { return GRACE_ALIGNER; }
 
     /**
      * Because the grace notes appear from left to right but need to be aligned
@@ -473,7 +474,7 @@ public:
      */
     ///@{
     void SetWidth(int totalWidth) { m_totalWidth = totalWidth; };
-    int GetWidth() { return m_totalWidth; };
+    int GetWidth() const { return m_totalWidth; };
     ///@}
 
 private:
@@ -507,7 +508,7 @@ public:
     // constructors and destructors
     TimestampAligner();
     virtual ~TimestampAligner();
-    virtual ClassId Is() { return TIMESTAMP_ALIGNER; }
+    virtual ClassId Is() const { return TIMESTAMP_ALIGNER; }
 
     /**
      * Reset the aligner (clear the content)

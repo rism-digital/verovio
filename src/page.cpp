@@ -58,7 +58,7 @@ void Page::AddSystem(System *system)
     Modify();
 }
 
-int Page::GetStaffPosOnPage(Staff *staff)
+int Page::GetStaffPosOnPage(Staff *staff) const
 {
     /*
     int position = -1;
@@ -318,7 +318,7 @@ void Page::JustifyHorizontally()
     this->Process(&justifyX, &params);
 }
 
-int Page::GetContentHeight()
+int Page::GetContentHeight() const
 {
     Doc *doc = dynamic_cast<Doc *>(m_parent);
     assert(doc);
@@ -332,7 +332,7 @@ int Page::GetContentHeight()
     return doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->m_drawingYRel + last->GetHeight();
 }
 
-int Page::GetContentWidth()
+int Page::GetContentWidth() const
 {
     Doc *doc = dynamic_cast<Doc *>(m_parent);
     assert(doc);

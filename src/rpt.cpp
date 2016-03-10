@@ -40,7 +40,7 @@ void BeatRpt::Reset()
     ResetBeatRptVis();
 }
 
-double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit)
+double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit) const
 {
     return DUR_MAX / meterUnit;
 }

@@ -39,7 +39,7 @@ public:
     LayerElement(std::string classid);
     virtual ~LayerElement();
     virtual void Reset();
-    virtual ClassId Is() { return LAYER_ELEMENT; };
+    virtual ClassId Is() const { return LAYER_ELEMENT; };
     ///@}
 
     /**
@@ -68,13 +68,13 @@ public:
      */
     ///@{
     /** Return true if the element is a grace note */
-    bool IsGraceNote();
+    bool IsGraceNote() const;
     /** Return true if the element is a note or a note child and the note has a @grace */
     bool IsCueSize();
     /** Return true if the element is a note or a chord within a fTrem */
     bool IsInFTrem();
     /** Return true if the element has to be aligned horizontally */
-    virtual bool HasToBeAligned() { return false; };
+    virtual bool HasToBeAligned() const { return false; };
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
@@ -94,9 +94,9 @@ public:
     /**
      * Alignment getter
      */
-    Alignment *GetAlignment() { return m_alignment; };
+    Alignment *GetAlignment() const { return m_alignment; };
 
-    int GetXRel();
+    int GetXRel() const;
 
     /**
      * Returns the duration if the child element has a DurationInterface
@@ -140,7 +140,7 @@ public:
      *  See Object:ExportMIDI
      */
     virtual int ExportMIDIEnd(ArrayPtrVoid *params);
-    
+
     /**
      * See Object::CalcMaxMeasureDuration
      */

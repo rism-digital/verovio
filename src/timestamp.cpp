@@ -35,7 +35,7 @@ void TimestampAttr::Reset()
     m_actualDurPos = 0.0;
 }
 
-double TimestampAttr::GetTimestampAttrAlignmentDuration(int meterUnit)
+double TimestampAttr::GetTimestampAttrAlignmentDuration(int meterUnit) const
 {
     return DUR_MAX / meterUnit * m_actualDurPos;
 }

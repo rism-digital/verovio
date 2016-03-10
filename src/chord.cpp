@@ -62,7 +62,7 @@ void Chord::Reset()
     ClearClusters();
 }
 
-void Chord::ClearClusters()
+void Chord::ClearClusters() const
 {
     std::list<ChordCluster *>::iterator iter;
     for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter) {

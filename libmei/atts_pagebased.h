@@ -51,7 +51,7 @@ public:
     ///@{
     void SetSurface(std::string surface_) { m_surface = surface_; };
     std::string GetSurface() const { return m_surface; };
-    bool HasSurface();
+    bool HasSurface() const;
     ///@}
 
 private:

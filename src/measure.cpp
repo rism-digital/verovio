@@ -99,7 +99,7 @@ void Measure::AddStaff(Staff *staff)
     }
 }
 
-int Measure::GetXRel()
+int Measure::GetXRel() const
 {
     if (m_measureAligner.GetLeftAlignment()) {
         return m_measureAligner.GetLeftAlignment()->GetXRel();
@@ -107,7 +107,7 @@ int Measure::GetXRel()
     return 0;
 }
 
-int Measure::GetLeftBarLineX()
+int Measure::GetLeftBarLineX() const
 {
     if (m_measureAligner.GetLeftAlignment()) {
         return m_measureAligner.GetLeftAlignment()->GetXRel();
@@ -115,7 +115,7 @@ int Measure::GetLeftBarLineX()
     return 0;
 }
 
-int Measure::GetRightBarLineX()
+int Measure::GetRightBarLineX() const
 {
     if (m_measureAligner.GetRightAlignment()) {
         return m_measureAligner.GetRightAlignment()->GetXRel();
@@ -123,7 +123,7 @@ int Measure::GetRightBarLineX()
     return 0;
 }
 
-int Measure::GetWidth()
+int Measure::GetWidth() const
 {
     if (m_measureAligner.GetRightAlignment()) {
         return GetRightBarLineX() + m_measureAligner.GetRightAlignment()->GetMaxWidth();

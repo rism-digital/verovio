@@ -52,12 +52,12 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() :  Object("le-")
+LayerElement::LayerElement() : Object("le-")
 {
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) :  Object(classid)
+LayerElement::LayerElement(std::string classid) : Object(classid)
 {
     Reset();
 }
@@ -90,10 +90,10 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
     return *this;
 }
 
-bool LayerElement::IsGraceNote()
+bool LayerElement::IsGraceNote() const
 {
     if (this->Is() != NOTE) return false;
-    Note *note = dynamic_cast<Note *>(this);
+    Note const *note = dynamic_cast<Note const *>(this);
     assert(note);
     return (note && note->HasGrace());
 }
@@ -166,7 +166,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize)
 bool LayerElement::IsCueSize()
 {
     if (this->Is() == NOTE) {
-        Note *note = dynamic_cast<Note *>(this);
+        const Note *note = dynamic_cast<const Note *>(this);
         assert(note);
         return (note->HasGrace());
     }
@@ -232,7 +232,7 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
     }
 }
 
-int LayerElement::GetXRel()
+int LayerElement::GetXRel() const
 {
     if (m_alignment) {
         return m_alignment->GetXRel();

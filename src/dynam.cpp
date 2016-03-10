@@ -66,7 +66,7 @@ bool Dynam::IsSymbolOnly()
     return false;
 }
 
-std::wstring Dynam::GetSymbolStr()
+std::wstring Dynam::GetSymbolStr() const
 {
     std::wstring dynam;
     if (m_symbolStr == L"p")

@@ -75,7 +75,7 @@ public:
      * For CMN, it is the same (DURATION_1 == DUR_1)
      * For mensural, we need to apply the DUR_MENSURAL_MASK
      */
-    int GetActualDur();
+    int GetActualDur() const;
 
     /**
      * If the element is part of a chord, return the chord actual duration, otherwise the note actual duration.

@@ -497,17 +497,17 @@ void Doc::UnCastOff()
     this->SetCurrentScoreDef(true);
 }
 
-bool Doc::HasPage(int pageIdx)
+bool Doc::HasPage(int pageIdx) const
 {
     return ((pageIdx >= 0) && (pageIdx < GetChildCount()));
 }
 
-int Doc::GetPageCount()
+int Doc::GetPageCount() const
 {
     return GetChildCount();
 }
 
-int Doc::GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize)
+int Doc::GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     Glyph *glyph;
@@ -520,7 +520,7 @@ int Doc::GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize)
     return h;
 }
 
-int Doc::GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize)
+int Doc::GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     Glyph *glyph;
@@ -533,7 +533,7 @@ int Doc::GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize)
     return w;
 }
 
-int Doc::GetGlyphDescender(wchar_t smuflCode, int staffSize, bool graceSize)
+int Doc::GetGlyphDescender(wchar_t smuflCode, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
     Glyph *glyph;
@@ -546,47 +546,47 @@ int Doc::GetGlyphDescender(wchar_t smuflCode, int staffSize, bool graceSize)
     return y;
 }
 
-int Doc::GetDrawingUnit(int staffSize)
+int Doc::GetDrawingUnit(int staffSize) const
 {
     return m_drawingUnit * staffSize / 100;
 }
 
-int Doc::GetDrawingDoubleUnit(int staffSize)
+int Doc::GetDrawingDoubleUnit(int staffSize) const
 {
     return m_drawingDoubleUnit * staffSize / 100;
 }
 
-int Doc::GetDrawingStaffSize(int staffSize)
+int Doc::GetDrawingStaffSize(int staffSize) const
 {
     return m_drawingStaffSize * staffSize / 100;
 }
 
-int Doc::GetDrawingOctaveSize(int staffSize)
+int Doc::GetDrawingOctaveSize(int staffSize) const
 {
     return m_drawingOctaveSize * staffSize / 100;
 }
 
-int Doc::GetDrawingBrevisWidth(int staffSize)
+int Doc::GetDrawingBrevisWidth(int staffSize) const
 {
     return m_drawingBrevisWidth * staffSize / 100;
 }
 
-int Doc::GetDrawingBarLineWidth(int staffSize)
+int Doc::GetDrawingBarLineWidth(int staffSize) const
 {
     return m_style->m_barLineWidth * staffSize / 100;
 }
 
-int Doc::GetDrawingStaffLineWidth(int staffSize)
+int Doc::GetDrawingStaffLineWidth(int staffSize) const
 {
     return m_style->m_staffLineWidth * staffSize / 100;
 }
 
-int Doc::GetDrawingStemWidth(int staffSize)
+int Doc::GetDrawingStemWidth(int staffSize) const
 {
     return m_style->m_stemWidth * staffSize / 100;
 }
 
-int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin)
+int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin) const
 {
     int height = GetGlyphHeight(SMUFL_E522_dynamicForte, staffSize, false);
     // This should be styled
@@ -594,7 +594,7 @@ int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin)
     return height;
 }
 
-int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin)
+int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin) const
 {
     int size = m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITON_FACTOR;
     // This should be styled
@@ -602,28 +602,28 @@ int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin)
     return size;
 }
 
-int Doc::GetDrawingBeamWidth(int staffSize, bool graceSize)
+int Doc::GetDrawingBeamWidth(int staffSize, bool graceSize) const
 {
     int value = m_drawingBeamWidth * staffSize / 100;
     if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
 }
 
-int Doc::GetDrawingBeamWhiteWidth(int staffSize, bool graceSize)
+int Doc::GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const
 {
     int value = m_drawingBeamWhiteWidth * staffSize / 100;
     if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
 }
 
-int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize)
+int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize) const
 {
     int value = m_drawingLedgerLine * staffSize / 100;
     if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
 }
 
-int Doc::GetGraceSize(int value)
+int Doc::GetGraceSize(int value) const
 {
     return value * this->m_style->m_graceNum / this->m_style->m_graceDen;
 }
@@ -642,7 +642,7 @@ FontInfo *Doc::GetDrawingLyricFont(int staffSize)
     return &m_drawingLyricFont;
 }
 
-char Doc::GetLeftMargin(const ClassId classId)
+char Doc::GetLeftMargin(const ClassId classId) const
 {
 
     if (classId == ACCID) return m_style->m_leftMarginAccid;
@@ -663,7 +663,7 @@ char Doc::GetLeftMargin(const ClassId classId)
     return m_style->m_leftMarginDefault;
 }
 
-char Doc::GetRightMargin(const ClassId classId)
+char Doc::GetRightMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_style->m_rightMarginAccid;
     if (classId == BARLINE) return m_style->m_rightMarginBarLine;
@@ -683,7 +683,7 @@ char Doc::GetRightMargin(const ClassId classId)
     return m_style->m_rightMarginDefault;
 }
 
-char Doc::GetLeftPosition()
+char Doc::GetLeftPosition() const
 {
     return m_style->m_leftPosition;
 }
@@ -813,14 +813,14 @@ int Doc::CalcMusicFontSize()
     return m_style->m_unit * 8;
 }
 
-int Doc::GetAdjustedDrawingPageHeight()
+int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
     int contentHeight = m_drawingPage->GetContentHeight();
     return (contentHeight + m_drawingPageTopMar * 2) / DEFINITON_FACTOR;
 }
 
-int Doc::GetAdjustedDrawingPageWidth()
+int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
     int contentWidth = m_drawingPage->GetContentWidth();
