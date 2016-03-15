@@ -534,6 +534,20 @@ void Toolkit::ResetLogBuffer()
 #endif
 }
 
+void Toolkit::RedoLayout()
+{
+    m_doc.SetPageHeight(this->GetPageHeight());
+    m_doc.SetPageWidth(this->GetPageWidth());
+    m_doc.SetPageRightMar(this->GetBorder());
+    m_doc.SetPageLeftMar(this->GetBorder());
+    m_doc.SetPageTopMar(this->GetBorder());
+    m_doc.SetSpacingStaff(this->GetSpacingStaff());
+    m_doc.SetSpacingSystem(this->GetSpacingSystem());
+
+    m_doc.UnCastOff();
+    m_doc.CastOff();
+}
+
 std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
 {
     // Page number is one-based - correction to 0-based first
@@ -570,20 +584,6 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     return out_str;
 }
 
-void Toolkit::RedoLayout()
-{
-    m_doc.SetPageHeight(this->GetPageHeight());
-    m_doc.SetPageWidth(this->GetPageWidth());
-    m_doc.SetPageRightMar(this->GetBorder());
-    m_doc.SetPageLeftMar(this->GetBorder());
-    m_doc.SetPageTopMar(this->GetBorder());
-    m_doc.SetSpacingStaff(this->GetSpacingStaff());
-    m_doc.SetSpacingSystem(this->GetSpacingSystem());
-
-    m_doc.UnCastOff();
-    m_doc.CastOff();
-}
-
 bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
 {
     std::string output = RenderToSvg(pageNo, true);
@@ -599,6 +599,21 @@ bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
     outfile << output;
     outfile.close();
     return true;
+}
+
+std::string Toolkit::RenderToMidi()
+{
+    MidiFile outputfile;
+    outputfile.absoluteTicks();
+    m_doc.ExportMIDI(&outputfile);
+    outputfile.sortTracks();
+
+    stringstream strstrem;
+    outputfile.write(strstrem);
+    std::string outputstr = Base64Encode(
+        reinterpret_cast<const unsigned char *>(strstrem.str().c_str()), (unsigned int)strstrem.str().length());
+
+    return outputstr;
 }
 
 bool Toolkit::RenderToMidiFile(const std::string &filename)

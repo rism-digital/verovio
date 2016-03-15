@@ -114,6 +114,11 @@ public:
     bool RenderToMidiFile(const std::string &filename);
 
     /**
+     * Creates a midi file, opens it, and returns it (base64 encoded).
+     */
+    std::string RenderToMidi();
+
+    /**
      * Get the MEI as a string.
      * Get all the pages unless a page number (1-based) is specified
      */
