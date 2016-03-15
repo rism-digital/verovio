@@ -194,6 +194,7 @@ python $EMCC $CHATTY \
 		'_vrvToolkit_redoLayout',\
 		'_vrvToolkit_renderData',\
 		'_vrvToolkit_renderPage',\
+		'_vrvToolkit_renderToMidi',\
 		'_vrvToolkit_setOptions',\
 		'_vrvToolkit_edit',\
 		'_vrvToolkit_getElementAttr']" \
