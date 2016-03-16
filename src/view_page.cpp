@@ -459,8 +459,10 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
 {
     assert(dc);
 
-    int new_coords[2][6];
+    // int new_coords[2][6];
     Point points[4];
+    Point bez1[4];
+    Point bez2[4];
 
     int penWidth = m_doc->GetDrawingStemWidth(100);
     y1 -= penWidth;
@@ -484,12 +486,10 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     points[2].x = ToDeviceContextX(x + m_doc->GetDrawingUnit(staffSize));
     points[2].y = points[3].y + ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize));
 
-    new_coords[0][0] = points[1].x;
-    new_coords[0][1] = points[1].y;
-    new_coords[0][2] = points[2].x;
-    new_coords[0][3] = points[2].y;
-    new_coords[0][4] = points[3].x;
-    new_coords[0][5] = points[3].y;
+    bez1[0] = points[0];
+    bez1[1] = points[1];
+    bez1[2] = points[2];
+    bez1[3] = points[3];
 
     View::SwapPoints(&points[0], &points[3]);
     View::SwapPoints(&points[1], &points[2]);
@@ -498,29 +498,25 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     points[2].x += xdec;
     points[1].y = points[0].y + ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) * 2);
 
-    new_coords[1][0] = points[1].x;
-    new_coords[1][1] = points[1].y;
-    new_coords[1][2] = points[2].x;
-    new_coords[1][3] = points[2].y;
-    new_coords[1][4] = points[3].x;
-    new_coords[1][5] = points[3].y;
+    bez2[0] = points[0];
+    bez2[1] = points[1];
+    bez2[2] = points[2];
+    bez2[3] = points[3];
 
     dc->SetPen(m_currentColour, std::max(1, penWidth), AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
-    dc->DrawComplexBezierPath(ToDeviceContextX(x), ToDeviceContextY(y1), new_coords[0], new_coords[1]);
+    dc->DrawComplexBezierPath(bez1, bez2);
 
     // on produit l'image reflet vers le bas: 0 est identique
     points[1].y = points[0].y - ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) * 2);
     points[3].y = ToDeviceContextY(y2);
     points[2].y = points[3].y + ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) * 3);
 
-    new_coords[0][0] = points[1].x;
-    new_coords[0][1] = points[1].y;
-    new_coords[0][2] = points[2].x;
-    new_coords[0][3] = points[2].y;
-    new_coords[0][4] = points[3].x;
-    new_coords[0][5] = points[3].y;
+    bez1[0] = points[0];
+    bez1[1] = points[1];
+    bez1[2] = points[2];
+    bez1[3] = points[3];
 
     View::SwapPoints(&points[0], &points[3]);
     View::SwapPoints(&points[1], &points[2]);
@@ -529,14 +525,12 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     points[2].x -= xdec;
     points[2].y = points[3].y - ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize));
 
-    new_coords[1][0] = points[1].x;
-    new_coords[1][1] = points[1].y;
-    new_coords[1][2] = points[2].x;
-    new_coords[1][3] = points[2].y;
-    new_coords[1][4] = points[3].x;
-    new_coords[1][5] = points[3].y;
+    bez2[0] = points[0];
+    bez2[1] = points[1];
+    bez2[2] = points[2];
+    bez2[3] = points[3];
 
-    dc->DrawComplexBezierPath(points[3].x, points[3].y, new_coords[0], new_coords[1]);
+    dc->DrawComplexBezierPath(bez1, bez2);
 
     dc->ResetPen();
     dc->ResetBrush();

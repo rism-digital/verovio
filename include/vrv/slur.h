@@ -34,15 +34,6 @@ public:
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
 
-    //----------//
-    // Functors //
-    //----------//
-
-    /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
-     */
-    virtual int ResetDrawing(ArrayPtrVoid *params);
-
 private:
     //
 public:

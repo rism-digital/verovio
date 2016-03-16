@@ -276,16 +276,15 @@ Point SvgDeviceContext::GetLogicalOrigin()
 }
 
 // Drawing mething
-void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
+void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
     pugi::xml_node pathChild = m_currentNode.append_child("path");
-    pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", x, y, // M command
-                                          bezier1_coord[0], bezier1_coord[1], bezier1_coord[2], bezier1_coord[3],
-                                          bezier1_coord[4], bezier1_coord[5], // First bezier
-                                          bezier2_coord[0], bezier2_coord[1], bezier2_coord[2], bezier2_coord[3],
-                                          bezier2_coord[4], bezier2_coord[5] // Second Bezier
-                                          )
-                                          .c_str();
+    pathChild.append_attribute("d")
+        = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
+              bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
+              bezier2[1].x, bezier2[1].y, bezier2[2].x, bezier2[2].y, bezier2[3].x, bezier2[3].y // Second Bezier
+              )
+              .c_str();
     // pathChild.append_attribute("style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000;
     // stroke-linecap:round; stroke-linejoin:round;
     // stroke-opacity:1.0; stroke-width: %d", m_penStack.top().GetWidth()).c_str();
@@ -295,23 +294,6 @@ void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6],
               "fill-opacity:1.0; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width: %d",
               m_penStack.top().GetWidth())
               .c_str();
-
-    /*
-    Point p[4];
-    p[0].x = x;
-    p[0].y = y;
-    p[1].x = bezier1_coord[0];
-    p[1].y = bezier1_coord[1];
-    p[2].x = bezier1_coord[2];
-    p[2].y = bezier1_coord[3];
-    p[3].x = bezier1_coord[4];
-    p[3].y = bezier1_coord[5];
-    Point pos;
-    int width, height;
-    View::ApproximateBezierBoundingBox(p, &pos, &width, &height);
-    LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
-    DrawRectangle(pos.x, pos.y, width, height);
-    */
 }
 
 void SvgDeviceContext::DrawCircle(int x, int y, int radius)

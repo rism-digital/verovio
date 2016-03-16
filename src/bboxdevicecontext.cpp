@@ -123,29 +123,16 @@ Point BBoxDeviceContext::GetLogicalOrigin()
 }
 
 // calculated better
-void BBoxDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
+void BBoxDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
-    int vals[4];
-    FindPointsForBounds(Point(x, y), Point(bezier1_coord[0], bezier1_coord[1]),
-        Point(bezier1_coord[2], bezier1_coord[3]), Point(bezier1_coord[4], bezier1_coord[5]), vals);
-
-    Point p[4];
-    p[0].x = x;
-    p[0].y = y;
-    p[1].x = bezier1_coord[0];
-    p[1].y = bezier1_coord[1];
-    p[2].x = bezier1_coord[2];
-    p[2].y = bezier1_coord[3];
-    p[3].x = bezier1_coord[4];
-    p[3].y = bezier1_coord[5];
     Point pos;
     int width, height;
-    View::ApproximateBezierBoundingBox(p, &pos, &width, &height);
-    // LogDebug("ME x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
-    // LogDebug("RZ x %d, y %d, width %d, height %d", vals[0], vals[1], vals[2] - vals[0], vals[3] - vals[1]);
-    // DrawRectangle(pos.x, pos.y, width, height);
 
-    UpdateBB(vals[0], vals[1], vals[2], vals[3]);
+    ApproximateBezierBoundingBox(bezier1, &pos, &width, &height);
+
+    LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+
+    UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
 
 void BBoxDeviceContext::DrawCircle(int x, int y, int radius)
@@ -394,40 +381,63 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
     }
 }
 
-// Ok, shame on me, found off the internet and modified, but for now it works
-void BBoxDeviceContext::FindPointsForBounds(Point P0, Point P1, Point P2, Point P3, int *ret)
+void BBoxDeviceContext::ApproximateBezierBoundingBox(Point bezier[], Point *pos, int *width, int *height)
 {
+    int ax = bezier[0].x;
+    int ay = bezier[0].y;
+    int bx = bezier[1].x;
+    int by = bezier[1].y;
+    int cx = bezier[2].x;
+    int cy = bezier[2].y;
+    int dx = bezier[3].x;
+    int dy = bezier[3].y;
 
-    int A = P3.x - 3 * P2.x + 3 * P1.x - P0.x;
-    int B = 3 * P2.x - 6 * P1.x + 3 * P0.x;
-    int C = 3 * P1.x - 3 * P0.x;
-    int D = P0.x;
+    double px, py, qx, qy, rx, ry, sx, sy, tx, ty, tobx, toby, tocx, tocy, todx, tody, toqx, toqy, torx, tory, totx,
+        toty;
+    int x, y, minx, miny, maxx, maxy;
 
-    int E = P3.y - 3 * P2.y + 3 * P1.y - P0.y;
-    int F = 3 * P2.y - 6 * P1.y + 3 * P0.y;
-    int G = 3 * P1.y - 3 * P0.y;
-    int H = P0.y;
+    minx = miny = -VRV_UNSET;
+    maxx = maxy = VRV_UNSET;
 
-    float x, y;
-    float xMin = 0xFFFF;
-    float yMin = 0xFFFF;
-    float xMax = 0;
-    float yMax = 0;
+    tobx = bx - ax;
+    toby = by - ay; // directions
+    tocx = cx - bx;
+    tocy = cy - by;
+    todx = dx - cx;
+    tody = dy - cy;
+    double step = 1.0 / 40.0; // precision
+    int i;
+    for (i = 0; i < 41; i++) {
+        double d = i * step;
+        px = ax + d * tobx;
+        py = ay + d * toby;
+        qx = bx + d * tocx;
+        qy = by + d * tocy;
+        rx = cx + d * todx;
+        ry = cy + d * tody;
+        toqx = qx - px;
+        toqy = qy - py;
+        torx = rx - qx;
+        tory = ry - qy;
 
-    for (float t = 0.0f; t <= 1.0f; t += 0.025f) {
-        x = A * t * t * t + B * t * t + C * t + D;
-        if (x < xMin) xMin = x;
-        if (x > xMax) xMax = x;
-        y = E * t * t * t + F * t * t + G * t + H;
-        if (y < yMin) yMin = y;
-        if (y > yMax) yMax = y;
+        sx = px + d * toqx;
+        sy = py + d * toqy;
+        tx = qx + d * torx;
+        ty = qy + d * tory;
+        totx = tx - sx;
+        toty = ty - sy;
+
+        x = sx + d * totx;
+        y = sy + d * toty;
+        minx = std::min(minx, x);
+        miny = std::min(miny, y);
+        maxx = std::max(maxx, x);
+        maxy = std::max(maxy, y);
     }
-
-    ret[0] = (int)xMin;
-    ret[1] = (int)yMin;
-
-    ret[2] = (int)xMax;
-    ret[3] = (int)yMax;
+    pos->x = minx;
+    pos->y = miny;
+    (*width) = maxx - minx;
+    (*height) = maxy - miny;
 }
 
 } // namespace vrv

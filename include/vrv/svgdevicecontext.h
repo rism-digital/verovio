@@ -74,7 +74,7 @@ public:
      * @name Drawing methods
      */
     ///@{
-    virtual void DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6]);
+    virtual void DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]);
     virtual void DrawCircle(int x, int y, int radius);
     virtual void DrawEllipse(int x, int y, int width, int height);
     virtual void DrawEllipticArc(int x, int y, int width, int height, double start, double end);
@@ -105,24 +105,24 @@ public:
      * @name Method for starting and ending a graphic
      */
     ///@{
-    virtual void StartGraphic( Object *object, std::string gClass, std::string gId);
-    virtual void EndGraphic( Object *object, View *view);
+    virtual void StartGraphic(Object *object, std::string gClass, std::string gId);
+    virtual void EndGraphic(Object *object, View *view);
     ///@}
 
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      */
     ///@{
-    virtual void ResumeGraphic( Object *object, std::string gId);
-    virtual void EndResumedGraphic( Object *object, View *view);
+    virtual void ResumeGraphic(Object *object, std::string gId);
+    virtual void EndResumedGraphic(Object *object, View *view);
     ///@}
 
     /**
      * @name Method for starting and ending a text (<tspan>) text graphic.
      */
     ///@{
-    virtual void StartTextGraphic( Object *object, std::string gClass, std::string gId);
-    virtual void EndTextGraphic( Object *object, View *view);
+    virtual void StartTextGraphic(Object *object, std::string gClass, std::string gId);
+    virtual void EndTextGraphic(Object *object, View *view);
     ///@}
 
     /**
@@ -143,7 +143,7 @@ private:
     /**
      * Internal method for drawing debug SVG bounding box
      */
-    void DrawSvgBoundingBox( Object *object, View *view);
+    void DrawSvgBoundingBox(Object *object, View *view);
 
     /**
      * Change the flag for indicating the use of the VerovioText font

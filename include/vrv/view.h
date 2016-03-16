@@ -105,6 +105,8 @@ public:
     int ToLogicalX(int i);
     int ToDeviceContextY(int i);
     int ToLogicalY(int i);
+    Point ToDeviceContext(Point p);
+    Point ToLogical(Point p);
     ///@}
 
     /**
@@ -134,11 +136,6 @@ public:
     int CalculateRestPosY(Staff *staff, char duration);
     int CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave);
     ///@}
-
-    /**
-     * Approximate the bounding box of a bezier
-     */
-    static void ApproximateBezierBoundingBox(Point bezier[], Point *pos, int *width, int *height);
 
 protected:
     /**
