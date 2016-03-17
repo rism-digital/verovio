@@ -1167,34 +1167,65 @@ int Object::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
 
 int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
 {
-    // param 0: the position of the previous staff
-    // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int *>((*params).at(0));
-    int *system_height = static_cast<int *>((*params).at(1));
+    // param 0: the maximum height in the current system
+    int *systemHeight = static_cast<int *>((*params).at(0));
+    StaffAlignment **staffAlignment = static_cast<StaffAlignment **>((*params).at(1));
+    Doc *doc = static_cast<Doc *>((*params).at(2));
 
     // starting a new system
     if (this->Is() == SYSTEM) {
         // we reset the system height
-        (*system_height) = 0;
-        (*min_pos) = 0;
+        (*systemHeight) = 0;
+        //(*min_pos) = 0;
 
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new measure
     if (this->Is() == MEASURE) {
-        (*min_pos) = 0;
+        //(*min_pos) = 0;
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new staff
-    if (this->Is() != STAFF) {
+    if (this->Is() == STAFF) {
+        Staff *current = dynamic_cast<Staff *>(this);
+        assert(current);
+
+        // at this stage we assume we have instantiated the alignment pointer
+        assert(current->GetAlignment());
+
+        (*staffAlignment) = current->GetAlignment();
+
         return FUNCTOR_CONTINUE;
     }
 
-    Staff *current = dynamic_cast<Staff *>(this);
+    if (!this->IsLayerElement()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    LayerElement *current = dynamic_cast<LayerElement *>(this);
     assert(current);
 
+    if (!current->HasToBeAligned()) {
+        // if nothing to do with this type of element
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (!current->HasUpdatedBB()) {
+        // if nothing was drawn, do not take it into account
+        assert(false); // quite drastic but this should never happen. If nothing has to be drawn
+        // then the BB should be set to empty with  Object::SetEmptyBB()
+        return FUNCTOR_CONTINUE;
+    }
+
+    Staff *staff = (*staffAlignment)->GetStaff();
+    int staffSize = staff ? staff->m_drawingStaffSize : 100;
+    int lines = staff ? staff->m_drawingLines : 5;
+
+    (lines - 1) * doc->GetDrawingDoubleUnit(staffSize);
+
+    /*
     // at this stage we assume we have instantiated the alignment pointer
     assert(current->GetAlignment());
 
@@ -1220,6 +1251,7 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
     // the next minimal position if given by the bottom side of the bounding box + the spacing of the element
     (*min_pos) = current->m_contentBB_y1;
     current->GetAlignment()->SetMaxHeight(current->m_contentBB_y1);
+    */
 
     // do not go further down the tree in this case
     return FUNCTOR_SIBLINGS;

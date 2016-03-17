@@ -247,8 +247,8 @@ int System::JustifyX(ArrayPtrVoid *params)
 
 int System::SetBoundingBoxYShiftEnd(ArrayPtrVoid *params)
 {
-    // param 0: the height of the previous staff
-    int *system_height = static_cast<int *>((*params).at(1));
+    // param 0: the maximum height in the current system
+    int *system_height = static_cast<int *>((*params).at(0));
 
     m_systemAligner.GetBottomAlignment()->SetYShift((*system_height));
 

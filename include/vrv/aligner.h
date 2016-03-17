@@ -194,6 +194,11 @@ private:
      */
     ArrayOfFloatingElementBoundingBoxPairs m_floatingElementBoundingBoxPairs;
     /**
+     *
+     */
+    std::vector<BoundingBox *> m_overflowAbove;
+    std::vector<BoundingBox *> m_overflowBelow;
+    /**
      * Stores a pointer to the staff from which the aligner was created.
      * This is necessary since we don't always have all the staves.
      */

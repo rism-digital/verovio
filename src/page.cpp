@@ -245,10 +245,13 @@ void Page::LayOutVertically()
     // Adjust the Y shift of the StaffAlignment looking at the bounding boxes
     // Look at each Staff and change the m_yShift if the bounding box is overlapping
     params.clear();
-    int previous_height = 0;
-    int system_height = 0;
-    params.push_back(&previous_height);
-    params.push_back(&system_height);
+    int systemHeight = 0;
+    StaffAlignment *staffAlignment = NULL;
+    // int previous_height = 0;
+    // params.push_back(&previous_height);
+    params.push_back(&systemHeight);
+    params.push_back(&staffAlignment);
+    params.push_back(doc);
     Functor setBoundingBoxYShift(&Object::SetBoundingBoxYShift);
     Functor setBoundingBoxYShiftEnd(&Object::SetBoundingBoxYShiftEnd);
     this->Process(&setBoundingBoxYShift, &params, &setBoundingBoxYShiftEnd);
@@ -264,7 +267,7 @@ void Page::LayOutVertically()
     Functor setAlignmentY(&Object::SetAligmentYPos);
     // Special case: because we redirect the functor, pass it as parameter to itself (!)
     params.push_back(&setAlignmentY);
-    this->Process(&setAlignmentY, &params);
+    // this->Process(&setAlignmentY, &params);
 
     // Integrate the Y shift of the staves
     // Once the m_yShift have been calculated, move all positions accordingly
