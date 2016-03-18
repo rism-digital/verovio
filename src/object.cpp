@@ -1226,7 +1226,7 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
 
     if (!current->HasToBeAligned()) {
         // if nothing to do with this type of element
-        return FUNCTOR_CONTINUE;
+        // return FUNCTOR_CONTINUE;
     }
 
     if (!current->HasUpdatedBB()) {
@@ -1238,16 +1238,19 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
 
     Staff *staff = (*staffAlignment)->GetStaff();
     int staffSize = staff ? staff->m_drawingStaffSize : 100;
-    int lines = staff ? staff->m_drawingLines : 5;
 
-    int overflowTop = current->GetDrawingY() + current->m_contentBB_y2;
-    if (overflowTop > doc->GetDrawingStaffLineWidth(staffSize) / 2)
-        LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowTop);
+    int topOverflow = current->GetDrawingY() + current->m_contentBB_y2;
+    if (topOverflow > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+        LogMessage("%s top overflow: %d", current->GetUuid().c_str(), topOverflow);
+        // overlap = (*min_pos) - current->GetAlignment()->GetYRel() + negative_offset;
+        (*staffAlignment)->SetTopOverflow(topOverflow);
+    }
 
-    int staffHeight = (lines - 1) * doc->GetDrawingDoubleUnit(staffSize);
-    int overflowBottom = current->GetDrawingY() + current->m_contentBB_y1 + staffHeight;
-    if (overflowBottom < -doc->GetDrawingStaffLineWidth(staffSize) / 2)
-        LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBottom);
+    int bottomOverflow = current->GetDrawingY() + current->m_contentBB_y1 + (*staffAlignment)->m_staffHeight;
+    if (bottomOverflow < -doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+        LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), bottomOverflow);
+        (*staffAlignment)->SetBottomOverflow(-bottomOverflow);
+    }
 
     /*
     // at this stage we assume we have instantiated the alignment pointer

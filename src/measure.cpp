@@ -205,6 +205,7 @@ int Measure::AlignVertically(ArrayPtrVoid *params)
     // param 0: the systemAligner (unused)
     // param 1: the staffIdx
     // param 2: the staffN (unused)
+    // param 3: the doc (unused)
     int *staffIdx = static_cast<int *>((*params).at(1));
 
     // we also need to reset the staffNb

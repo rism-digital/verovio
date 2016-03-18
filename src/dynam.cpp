@@ -154,6 +154,7 @@ int Dynam::AlignVertically(ArrayPtrVoid *params)
     // param 0: the systemAligner
     // param 1: the staffIdx (unused)
     // param 2: the staffN (unused)
+    // param 3: the doc (unused)
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
 
     std::vector<int> staffList = this->GetStaff();

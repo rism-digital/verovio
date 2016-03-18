@@ -133,6 +133,7 @@ int System::AlignVertically(ArrayPtrVoid *params)
     // param 0: the systemAligner
     // param 1: the staffIdx (unused)
     // param 2: the staffN (unused)
+    // param 3: the doc (unused)
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
 
     // When calculating the alignment, the position has to be 0
@@ -146,13 +147,16 @@ int System::AlignVertically(ArrayPtrVoid *params)
 int System::SetAligmentYPos(ArrayPtrVoid *params)
 {
     // param 0: the previous staff height
-    // param 1: the extra staff height (unused)
-    // param 2: the doc (unused)
+    // param 1: the extra staff height
+    // param 2: the doc
     // param 3: the functor to be redirected to SystemAligner
     int *previousStaffHeight = static_cast<int *>((*params).at(0));
+    int *extraStaffHeight = static_cast<int *>((*params).at(1));
+    Doc *doc = static_cast<Doc *>((*params).at(2));
     Functor *setAligmnentPosY = static_cast<Functor *>((*params).at(3));
 
-    (*previousStaffHeight) = VRV_UNSET;
+    (*previousStaffHeight) = 0;
+    (*extraStaffHeight) = doc->GetSpacingStaff() * doc->GetDrawingUnit(100);
 
     m_systemAligner.Process(setAligmnentPosY, params);
 
@@ -251,6 +255,10 @@ int System::SetBoundingBoxYShiftEnd(ArrayPtrVoid *params)
     int *system_height = static_cast<int *>((*params).at(0));
 
     m_systemAligner.GetBottomAlignment()->SetYShift((*system_height));
+
+    ArrayPtrVoid paramAligner;
+    Functor setBoundingBoxYShiftAligner(&Object::SetBoundingBoxYShiftAligner);
+    m_systemAligner.Process(&setBoundingBoxYShiftAligner, &paramAligner);
 
     return FUNCTOR_CONTINUE;
 }

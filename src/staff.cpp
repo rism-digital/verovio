@@ -30,7 +30,7 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n) :  Object("staff-"), AttCommon()
+Staff::Staff(int n) : Object("staff-"), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
@@ -114,9 +114,11 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
     // param 0: the systemAligner
     // param 1: the staffIdx
     // param 2: the staffN
+    // param 3: the doc
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
     int *staffIdx = static_cast<int *>((*params).at(1));
     int *staffN = static_cast<int *>((*params).at(2));
+    Doc *doc = static_cast<Doc *>((*params).at(3));
 
     // we need to call it because we are overriding Object::AlignVertically
     this->ResetVerticalAlignment();
@@ -124,14 +126,14 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
     *staffN = this->GetN();
 
     // this gets (or creates) the measureAligner for the measure
-    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffIdx, this);
+    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffIdx, this, doc);
 
     assert(alignment);
 
     // Set the pointer of the m_alignment
     m_staffAlignment = alignment;
 
-    std::vector< Object *>::iterator it;
+    std::vector<Object *>::iterator it;
     it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(VERSE));
     if (it != m_timeSpanningElements.end()) {
         Verse *v = dynamic_cast<Verse *>(*it);
@@ -155,9 +157,9 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
 int Staff::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
 {
     // param 0: the current Syl
-    std::vector< Object *> *elements = static_cast<std::vector< Object *> *>((*params).at(0));
+    std::vector<Object *> *elements = static_cast<std::vector<Object *> *>((*params).at(0));
 
-    std::vector< Object *>::iterator iter = elements->begin();
+    std::vector<Object *>::iterator iter = elements->begin();
     while (iter != elements->end()) {
         TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
         assert(interface);

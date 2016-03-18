@@ -41,10 +41,10 @@ void SystemAligner::Reset()
 {
     Object::Reset();
     m_bottomAlignment = NULL;
-    m_bottomAlignment = GetStaffAlignment(0, NULL);
+    m_bottomAlignment = GetStaffAlignment(0, NULL, NULL);
 }
 
-StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff)
+StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, Doc *doc)
 {
     // The last one is always the bottomAlignment (unless if not created)
     if (m_bottomAlignment) {
@@ -63,7 +63,7 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff)
     // This is the first time we are looking for it (e.g., first staff)
     // We create the StaffAlignment
     StaffAlignment *alignment = new StaffAlignment();
-    alignment->SetStaff(staff);
+    alignment->SetStaff(staff, doc);
     alignment->SetParent(this);
     m_children.push_back(alignment);
 
@@ -105,10 +105,23 @@ StaffAlignment::StaffAlignment() : Object()
     m_dynamBelow = false;
     m_hairpinAbove = false;
     m_hairpinBelow = false;
+
+    m_topOverflow = 0;
+    m_bottomOverflow = 0;
+    m_staffHeight = 0;
+    m_overlap = 0;
 }
 
 StaffAlignment::~StaffAlignment()
 {
+}
+
+void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
+{
+    m_staff = staff;
+    if (staff && doc) {
+        m_staffHeight = (staff->m_drawingLines - 1) * doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    }
 }
 
 void StaffAlignment::SetYShift(int yShift)
@@ -122,6 +135,20 @@ void StaffAlignment::SetMaxHeight(int max_height)
 {
     if (max_height < m_maxHeight) {
         m_maxHeight = max_height;
+    }
+}
+
+void StaffAlignment::SetTopOverflow(int topOverflow)
+{
+    if (topOverflow > m_topOverflow) {
+        m_topOverflow = topOverflow;
+    }
+}
+
+void StaffAlignment::SetBottomOverflow(int bottomOverflow)
+{
+    if (bottomOverflow > m_bottomOverflow) {
+        m_bottomOverflow = bottomOverflow;
     }
 }
 
@@ -414,6 +441,13 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 // Functors methods
 //----------------------------------------------------------------------------
 
+int StaffAlignment::SetBoundingBoxYShiftAligner(ArrayPtrVoid *params)
+{
+    // SetYShift(-m_topOverflow);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
 {
     // param 0: the previous staff height
@@ -424,18 +458,16 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     int *extraStaffHeight = static_cast<int *>((*params).at(1));
     Doc *doc = static_cast<Doc *>((*params).at(2));
 
-    int staffSize = m_staff ? m_staff->m_drawingStaffSize : 100;
-    int lines = m_staff ? m_staff->m_drawingLines : 5;
+    int maxTopOverlfow = std::max((*extraStaffHeight), m_topOverflow);
 
-    // m_yShift -= (*previousStaffHeight);
+    SetYShift(-maxTopOverlfow - (*previousStaffHeight));
 
-    // When starting a new system, previousStaffHeight value is VRV_UNSET so we know we don't want to add extra spacing
-    int minShift = 0;
-    if ((*previousStaffHeight) == VRV_UNSET)
-        (*previousStaffHeight) = 0;
-    else
-        minShift = doc->GetSpacingStaff() * doc->GetDrawingUnit(100) + (*previousStaffHeight);
+    (*previousStaffHeight) = m_staffHeight;
+    (*extraStaffHeight) = std::max(m_bottomOverflow, doc->GetSpacingStaff() * doc->GetDrawingUnit(100));
 
+    return FUNCTOR_CONTINUE;
+
+    /*
     if (this->GetDynamAbove() || this->GetDirAbove()) {
         // We need + 1 lyric line space
         (*extraStaffHeight) += doc->GetDrawingDynamHeight(staffSize, true);
@@ -444,7 +476,9 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
         // We need + 1 lyric line space
         (*extraStaffHeight) += doc->GetDrawingHairpinSize(staffSize, true);
     }
+    */
 
+    /*
     // We need to insert extra elements (lyrics, dynam)
     if ((*extraStaffHeight) > 0) {
         int missingExtraHeight = (*extraStaffHeight);
@@ -459,14 +493,11 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
             m_yShift -= missingExtraHeight;
         }
     }
+    */
 
-    // Now ajust the shift if we have less than the minimum required
-    if (minShift > -m_yShift) {
-        m_yShift = -minShift;
-    }
+    //(*previousStaffHeight) = (lines - 1) * doc->GetDrawingDoubleUnit(staffSize);
 
-    (*previousStaffHeight) = (lines - 1) * doc->GetDrawingDoubleUnit(staffSize);
-
+    /*
     (*extraStaffHeight) = 0;
     // Ajust the max height looking at the lyrics and / or dynam below
     if (this->GetVerseCount() > 0) {
@@ -482,6 +513,7 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
         // We need + 1 lyric line space
         (*extraStaffHeight) += doc->GetDrawingHairpinSize(staffSize, true);
     }
+    */
 
     return FUNCTOR_CONTINUE;
 }
@@ -516,7 +548,7 @@ int MeasureAligner::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
     // We start a new MeasureAligner
     // Reset the accumulated shift to 0;
     (*shift) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    ;
+
     (*justifiable_shift) = -1;
 
     return FUNCTOR_CONTINUE;

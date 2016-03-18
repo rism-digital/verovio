@@ -261,6 +261,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     assert(staff);
 
     if ((tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
+        tuplet->SetEmptyBB();
         return;
     }
 

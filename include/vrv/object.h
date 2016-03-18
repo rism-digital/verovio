@@ -551,6 +551,12 @@ public:
      */
     virtual int SetBoundingBoxYShiftEnd(ArrayPtrVoid *params);
 
+    /**
+     * Lay out the Y positions of the staff looking at the bounding box of each staff.
+     * The m_yShift is updated appropriately
+     */
+    virtual int SetBoundingBoxYShiftAligner(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
     ///@}
 
     /**
@@ -872,7 +878,7 @@ protected:
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      */
-    virtual void FilterList(ListOfObjects *childList) {};
+    virtual void FilterList(ListOfObjects *childList){};
 
 public:
     /**

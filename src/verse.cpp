@@ -59,6 +59,7 @@ int Verse::AlignVertically(ArrayPtrVoid *params)
     // param 0: the systemAligner
     // param 1: the staffIdx (unused)
     // param 2: the staffN
+    // param 3: the doc (unused)
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
     int *staffN = static_cast<int *>((*params).at(2));
 

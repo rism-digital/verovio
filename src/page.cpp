@@ -231,6 +231,7 @@ void Page::LayOutVertically()
     params.push_back(&systemAlignerPtr);
     params.push_back(&staffIdx);
     params.push_back(&staffN);
+    params.push_back(doc);
     Functor alignVertically(&Object::AlignVertically);
     this->Process(&alignVertically, &params);
 
@@ -267,7 +268,7 @@ void Page::LayOutVertically()
     Functor setAlignmentY(&Object::SetAligmentYPos);
     // Special case: because we redirect the functor, pass it as parameter to itself (!)
     params.push_back(&setAlignmentY);
-    // this->Process(&setAlignmentY, &params);
+    this->Process(&setAlignmentY, &params);
 
     // Integrate the Y shift of the staves
     // Once the m_yShift have been calculated, move all positions accordingly
@@ -282,7 +283,7 @@ void Page::LayOutVertically()
     // Adjust system Y position
     params.clear();
     shift = doc->m_drawingPageHeight - doc->m_drawingPageTopMar;
-    int systemMargin = (doc->GetSpacingSystem()) * doc->GetDrawingDoubleUnit(100);
+    int systemMargin = (doc->GetSpacingSystem()) * doc->GetDrawingUnit(100);
     params.push_back(&shift);
     params.push_back(&systemMargin);
     Functor alignSystems(&Object::AlignSystems);

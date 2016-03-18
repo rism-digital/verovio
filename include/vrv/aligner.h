@@ -83,7 +83,7 @@ public:
      * If a staff is passed, it will be used for initializing m_staffN and m_staffSize of the aligner.
      * (no const since the bottom alignment is temporarily removed)
      */
-    StaffAlignment *GetStaffAlignment(int idx, Staff *staff = NULL);
+    StaffAlignment *GetStaffAlignment(int idx, Staff *staff, Doc *doc);
 
     /**
      * Get the StaffAlignment for the staffN.
@@ -165,7 +165,7 @@ public:
      */
     ///@{
     Staff *GetStaff() const { return m_staff; };
-    void SetStaff(Staff *staff) { m_staff = staff; };
+    void SetStaff(Staff *staff, Doc *doc);
     ///@}
 
     //----------//
@@ -177,6 +177,8 @@ public:
      * Functor redirected from System.
      */
     virtual int SetAligmentYPos(ArrayPtrVoid *params);
+
+    virtual int SetBoundingBoxYShiftAligner(ArrayPtrVoid *params);
 
     /**
      * Correct the Y alignment once the the content of a system has been aligned and laid out.
@@ -228,6 +230,15 @@ private:
     bool m_hairpinAbove;
     bool m_hairpinBelow;
     ///@}
+
+public:
+    int m_topOverflow;
+    int m_bottomOverflow;
+    int m_overlap;
+    int m_staffHeight;
+
+    void SetTopOverflow(int topOverflow);
+    void SetBottomOverflow(int topOverflow);
 };
 
 //----------------------------------------------------------------------------
