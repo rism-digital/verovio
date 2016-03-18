@@ -682,8 +682,6 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                     - view->ToDeviceContextX(object->GetDrawingX() + box->m_contentBB_x1),
                 view->ToDeviceContextY(object->GetDrawingY() + box->m_contentBB_y2)
                     - view->ToDeviceContextY(object->GetDrawingY() + box->m_contentBB_y1));
-            this->DrawRectangle(
-                view->ToDeviceContextX(object->GetDrawingX()), view->ToDeviceContextY(object->GetDrawingY()), 5, 300);
         }
         EndGraphic(object, NULL);
 
