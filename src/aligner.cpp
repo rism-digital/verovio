@@ -145,6 +145,13 @@ void StaffAlignment::SetTopOverflow(int topOverflow)
     }
 }
 
+void StaffAlignment::SetOverlap(int overlap)
+{
+    if (overlap > m_overlap) {
+        m_overlap = overlap;
+    }
+}
+
 void StaffAlignment::SetBottomOverflow(int bottomOverflow)
 {
     if (bottomOverflow > m_bottomOverflow) {
@@ -161,36 +168,18 @@ void StaffAlignment::SetVerseCount(int verse_count)
     }
 }
 
+int StaffAlignment::CalcTopOverflow(BoundingBox *box)
+{
+    return box->GetDrawingY() + box->m_contentBB_y2;
+}
+
+int StaffAlignment::CalcBottomOverflow(BoundingBox *box)
+{
+    return -(box->GetDrawingY() + box->m_contentBB_y1 + m_staffHeight);
+}
+
 void StaffAlignment::SetCurrentBoundingBox(FloatingElement *element, int x, int y)
 {
-    /*
-     TESTING CODE
-    std::vector<std::tuple<int, int, int> > prout;
-    prout.push_back(std::make_tuple(1, 1, 1));
-    prout.push_back(std::make_tuple(2, 1, 4));
-    prout.push_back(std::make_tuple(1, 1, 1));
-    prout.push_back(std::make_tuple(2, 1, 1));
-
-    std::tuple<int, int, int> value = std::make_tuple(2, 1, 1);
-
-    auto overlap = std::find_if(prout.begin(), prout.end(),
-        [&value](std::tuple<int, int, int> const &elem) { return std::get<0>(elem) == std::get<0>(value); });
-    if (overlap != prout.end()) {
-        LogDebug("Tuple it!");
-    }
-
-    // std::vector<std::list<int>::const_iterator> matches;
-    auto i = prout.begin(), end = prout.end();
-    while (i != end) {
-        i = std::find_if(i, end,
-            [&value](std::tuple<int, int, int> const &elem) { return std::get<1>(elem) == std::get<1>(value); });
-        if (i != end) {
-            LogDebug("Tuple XXX it! %d", std::get<2>(*i));
-            i++;
-        }
-    }
-     */
-
     // m_floatingElementBoundingBoxPairs;
     auto item = std::find_if(m_floatingElementBoundingBoxPairs.begin(), m_floatingElementBoundingBoxPairs.end(),
         [element](std::pair<FloatingElement *, BoundingBox> const &elem) { return elem.first == element; });
@@ -443,7 +432,39 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 
 int StaffAlignment::SetBoundingBoxYShiftAligner(ArrayPtrVoid *params)
 {
-    // SetYShift(-m_topOverflow);
+    StaffAlignment **previous = static_cast<StaffAlignment **>((*params).at(0));
+
+    // This is the bottom alignment (or something is wrong)
+    if (!this->m_staff) return FUNCTOR_STOP;
+
+    if ((*previous) == NULL) {
+        (*previous) = this;
+        return FUNCTOR_SIBLINGS;
+    }
+
+    ArrayOfBoundingBoxes::iterator iter;
+    // go through all the elements of the top staff that have an overflow below
+    for (iter = (*previous)->m_overflowBelow.begin(); iter != (*previous)->m_overflowBelow.end(); iter++) {
+        auto i = m_overflowAbove.begin();
+        auto end = m_overflowAbove.end();
+        while (i != end) {
+            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
+            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalOverlap(elem); });
+            if (i != end) {
+                // calculate the vertical overlap and see if this is more than the expected space
+                int bottomOverflow = (*previous)->CalcBottomOverflow(*iter);
+                int topOverflow = this->CalcTopOverflow(*i);
+                int spacing = std::max((*previous)->m_bottomOverflow, this->m_topOverflow);
+                if (spacing < (bottomOverflow + topOverflow)) {
+                    // LogDebug("Overlap %d", (bottomOverflow + topOverflow) - spacing);
+                    this->SetOverlap((bottomOverflow + topOverflow) - spacing);
+                }
+                i++;
+            }
+        }
+    }
+
+    (*previous) = this;
 
     return FUNCTOR_SIBLINGS;
 }
@@ -459,6 +480,8 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     Doc *doc = static_cast<Doc *>((*params).at(2));
 
     int maxTopOverlfow = std::max((*extraStaffHeight), m_topOverflow);
+
+    if (m_overlap) maxTopOverlfow += m_overlap;
 
     SetYShift(-maxTopOverlfow - (*previousStaffHeight));
 

@@ -257,6 +257,8 @@ int System::SetBoundingBoxYShiftEnd(ArrayPtrVoid *params)
     m_systemAligner.GetBottomAlignment()->SetYShift((*system_height));
 
     ArrayPtrVoid paramAligner;
+    StaffAlignment *previous = NULL;
+    paramAligner.push_back(&previous);
     Functor setBoundingBoxYShiftAligner(&Object::SetBoundingBoxYShiftAligner);
     m_systemAligner.Process(&setBoundingBoxYShiftAligner, &paramAligner);
 

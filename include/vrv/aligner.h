@@ -168,6 +168,9 @@ public:
     void SetStaff(Staff *staff, Doc *doc);
     ///@}
 
+    int CalcTopOverflow(BoundingBox *box);
+    int CalcBottomOverflow(BoundingBox *box);
+
     //----------//
     // Functors //
     //----------//
@@ -195,11 +198,6 @@ private:
      *
      */
     ArrayOfFloatingElementBoundingBoxPairs m_floatingElementBoundingBoxPairs;
-    /**
-     *
-     */
-    std::vector<BoundingBox *> m_overflowAbove;
-    std::vector<BoundingBox *> m_overflowBelow;
     /**
      * Stores a pointer to the staff from which the aligner was created.
      * This is necessary since we don't always have all the staves.
@@ -239,6 +237,13 @@ public:
 
     void SetTopOverflow(int topOverflow);
     void SetBottomOverflow(int topOverflow);
+    void SetOverlap(int overlap);
+
+    /**
+     *
+     */
+    std::vector<BoundingBox *> m_overflowAbove;
+    std::vector<BoundingBox *> m_overflowBelow;
 };
 
 //----------------------------------------------------------------------------

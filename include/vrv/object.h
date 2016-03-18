@@ -104,6 +104,13 @@ public:
      */
     bool HasUpdatedBB() const { return (m_updatedBBoxX && m_updatedBBoxY); };
 
+    /**
+     * Returns true if the bounding box has a horizontal overlap with the other one.
+     */
+    bool HorizontalOverlap(const BoundingBox *other) const;
+
+    int CalcVerticalOverlap(const BoundingBox *other) const;
+
 private:
     bool m_updatedBBoxX;
     bool m_updatedBBoxY;

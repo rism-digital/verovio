@@ -163,6 +163,24 @@ bool BoundingBox::HasSelfBB()
     return ((m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF));
 }
 
+bool BoundingBox::HorizontalOverlap(const BoundingBox *other) const
+{
+    assert(other);
+
+    if (m_drawingX + m_contentBB_x2 < other->GetDrawingX() + other->m_contentBB_x1) return false;
+    if (m_drawingX + m_contentBB_x1 > other->GetDrawingX() + other->m_contentBB_x2) return false;
+    return true;
+}
+
+int BoundingBox::CalcVerticalOverlap(const BoundingBox *other) const
+{
+    assert(other);
+
+    if (m_contentBB_x2 < other->m_contentBB_x1) return false;
+    if (m_contentBB_x1 > other->m_contentBB_x2) return false;
+    return true;
+}
+
 //----------------------------------------------------------------------------
 // Object
 //----------------------------------------------------------------------------
@@ -1239,17 +1257,19 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
     Staff *staff = (*staffAlignment)->GetStaff();
     int staffSize = staff ? staff->m_drawingStaffSize : 100;
 
-    int topOverflow = current->GetDrawingY() + current->m_contentBB_y2;
+    int topOverflow = (*staffAlignment)->CalcTopOverflow(current);
     if (topOverflow > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-        LogMessage("%s top overflow: %d", current->GetUuid().c_str(), topOverflow);
+        // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), topOverflow);
         // overlap = (*min_pos) - current->GetAlignment()->GetYRel() + negative_offset;
         (*staffAlignment)->SetTopOverflow(topOverflow);
+        (*staffAlignment)->m_overflowAbove.push_back(current);
     }
 
-    int bottomOverflow = current->GetDrawingY() + current->m_contentBB_y1 + (*staffAlignment)->m_staffHeight;
-    if (bottomOverflow < -doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-        LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), bottomOverflow);
-        (*staffAlignment)->SetBottomOverflow(-bottomOverflow);
+    int bottomOverflow = (*staffAlignment)->CalcBottomOverflow(current);
+    if (bottomOverflow > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+        // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), bottomOverflow);
+        (*staffAlignment)->SetBottomOverflow(bottomOverflow);
+        (*staffAlignment)->m_overflowBelow.push_back(current);
     }
 
     /*
