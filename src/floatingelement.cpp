@@ -66,12 +66,12 @@ void FloatingElement::SetCurrentBoundingBox(FloatingBoundingBox *boundingBox)
 
 FloatingBoundingBox::FloatingBoundingBox() : BoundingBox()
 {
-    ResetBB();
+    ResetBoundingBox();
 };
 
-void FloatingBoundingBox::ResetBB()
+void FloatingBoundingBox::ResetBoundingBox()
 {
-    BoundingBox::ResetBB();
+    BoundingBox::ResetBoundingBox();
 
     m_drawingYRel = 0;
 }

@@ -41,7 +41,7 @@ namespace vrv {
 
 BoundingBox::BoundingBox()
 {
-    ResetBB();
+    ResetBoundingBox();
 }
 
 void BoundingBox::UpdateContentBBoxX(int x1, int x2)
@@ -116,7 +116,7 @@ void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
     // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
 
-void BoundingBox::ResetBB()
+void BoundingBox::ResetBoundingBox()
 {
     m_contentBB_x1 = 0xFFFFFFF;
     m_contentBB_y1 = 0xFFFFFFF;
@@ -129,9 +129,6 @@ void BoundingBox::ResetBB()
 
     m_updatedBBoxX = false;
     m_updatedBBoxY = false;
-
-    m_drawingX = 0;
-    m_drawingY = 0;
 }
 
 void BoundingBox::SetEmptyBB()
@@ -187,10 +184,10 @@ Object *Object::Clone() const
     return NULL;
 }
 
-Object::Object(const Object &object)
+Object::Object(const Object &object) : BoundingBox(object)
 {
     ClearChildren();
-    ResetBB();
+    ResetBoundingBox(); // It does not make sense to keep the values of the BBox
     m_parent = NULL;
     m_classid = object.m_classid;
     m_uuid = object.m_uuid; // for now copy the uuid - to be decided
@@ -211,7 +208,7 @@ Object &Object::operator=(const Object &object)
     // not self assignement
     if (this != &object) {
         ClearChildren();
-        ResetBB();
+        ResetBoundingBox(); // It does not make sense to keep the values of the BBox
         m_parent = NULL;
         m_classid = object.m_classid;
         m_uuid = object.m_uuid; // for now copy the uuid - to be decided
@@ -254,7 +251,7 @@ ClassId Object::Is() const
 void Object::Reset()
 {
     ClearChildren();
-    ResetBB();
+    ResetBoundingBox();
 };
 
 void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId interfaceId)
@@ -1189,14 +1186,34 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
 
     // starting a new staff
     if (this->Is() == STAFF) {
-        Staff *current = dynamic_cast<Staff *>(this);
-        assert(current);
+        Staff *currentStaff = dynamic_cast<Staff *>(this);
+        assert(currentStaff);
+        assert(currentStaff->GetAlignment());
 
-        // at this stage we assume we have instantiated the alignment pointer
-        assert(current->GetAlignment());
+        (*staffAlignment) = currentStaff->GetAlignment();
 
-        (*staffAlignment) = current->GetAlignment();
+        // currentStaff->GetAlignment()->SetMaxHeight(currentStaff->m_contentBB_y1);
 
+        return FUNCTOR_CONTINUE;
+    }
+
+    // starting new layer
+    if (this->Is() == LAYER) {
+        Layer *currentLayer = dynamic_cast<Layer *>(this);
+        assert(currentLayer);
+        // set scoreDef attr
+        if (currentLayer->GetDrawingClef()) {
+            currentLayer->GetDrawingClef()->SetBoundingBoxYShift(params);
+        }
+        if (currentLayer->GetDrawingKeySig()) {
+            currentLayer->GetDrawingKeySig()->SetBoundingBoxYShift(params);
+        }
+        if (currentLayer->GetDrawingMensur()) {
+            currentLayer->GetDrawingMensur()->SetBoundingBoxYShift(params);
+        }
+        if (currentLayer->GetDrawingMeterSig()) {
+            currentLayer->GetDrawingMeterSig()->SetBoundingBoxYShift(params);
+        }
         return FUNCTOR_CONTINUE;
     }
 
@@ -1223,7 +1240,14 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
     int staffSize = staff ? staff->m_drawingStaffSize : 100;
     int lines = staff ? staff->m_drawingLines : 5;
 
-    (lines - 1) * doc->GetDrawingDoubleUnit(staffSize);
+    int overflowTop = current->GetDrawingY() + current->m_contentBB_y2;
+    if (overflowTop > doc->GetDrawingStaffLineWidth(staffSize) / 2)
+        LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowTop);
+
+    int staffHeight = (lines - 1) * doc->GetDrawingDoubleUnit(staffSize);
+    int overflowBottom = current->GetDrawingY() + current->m_contentBB_y1 + staffHeight;
+    if (overflowBottom < -doc->GetDrawingStaffLineWidth(staffSize) / 2)
+        LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBottom);
 
     /*
     // at this stage we assume we have instantiated the alignment pointer
