@@ -148,11 +148,11 @@ void Page::LayOutHorizontally()
 
     // Render it for filling the bounding box
     View view;
-    BBoxDeviceContext bb_dc(&view, 0, 0);
+    BBoxDeviceContext bBoxDC(&view, 0, 0);
     view.SetDoc(doc);
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
-    view.DrawCurrentPage(&bb_dc, false);
+    view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
@@ -237,25 +237,28 @@ void Page::LayOutVertically()
 
     // Render it for filling the bounding box
     View view;
-    BBoxDeviceContext bb_dc(&view, 0, 0);
+    BBoxDeviceContext bBoxDC(&view, 0, 0);
     view.SetDoc(doc);
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
-    view.DrawCurrentPage(&bb_dc, false);
+    view.DrawCurrentPage(&bBoxDC, false);
 
-    // Adjust the Y shift of the StaffAlignment looking at the bounding boxes
-    // Look at each Staff and change the m_yShift if the bounding box is overlapping
+    // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     params.clear();
-    int systemHeight = 0;
     StaffAlignment *staffAlignment = NULL;
-    // int previous_height = 0;
-    // params.push_back(&previous_height);
-    params.push_back(&systemHeight);
     params.push_back(&staffAlignment);
     params.push_back(doc);
-    Functor setBoundingBoxYShift(&Object::SetBoundingBoxYShift);
-    Functor setBoundingBoxYShiftEnd(&Object::SetBoundingBoxYShiftEnd);
-    this->Process(&setBoundingBoxYShift, &params, &setBoundingBoxYShiftEnd);
+    Functor setOverflowBBoxes(&Object::SetOverflowBBoxes);
+    this->Process(&setOverflowBBoxes, &params);
+
+    // Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes params.clear();
+    params.clear();
+    StaffAlignment *previous = NULL;
+    params.push_back(&previous);
+    Functor calcStaffOverlap(&Object::CalcStaffOverlap);
+    // Special case: because we redirect the functor, pass it as parameter to itself (!)
+    params.push_back(&calcStaffOverlap);
+    this->Process(&calcStaffOverlap, &params);
 
     // Set the Y position of each StaffAlignment
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff

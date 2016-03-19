@@ -249,18 +249,15 @@ int System::JustifyX(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int System::SetBoundingBoxYShiftEnd(ArrayPtrVoid *params)
+int System::CalcStaffOverlap(ArrayPtrVoid *params)
 {
-    // param 0: the maximum height in the current system
-    int *system_height = static_cast<int *>((*params).at(0));
+    // param 0: a pointer to the previous staff alignment
+    // param 1: a pointer to the functor for passing it to the system aligner
+    StaffAlignment **previous = static_cast<StaffAlignment **>((*params).at(0));
+    Functor *calcStaffOverlap = static_cast<Functor *>((*params).at(1));
 
-    m_systemAligner.GetBottomAlignment()->SetYShift((*system_height));
-
-    ArrayPtrVoid paramAligner;
-    StaffAlignment *previous = NULL;
-    paramAligner.push_back(&previous);
-    Functor setBoundingBoxYShiftAligner(&Object::SetBoundingBoxYShiftAligner);
-    m_systemAligner.Process(&setBoundingBoxYShiftAligner, &paramAligner);
+    (*previous) = NULL;
+    m_systemAligner.Process(calcStaffOverlap, params);
 
     return FUNCTOR_CONTINUE;
 }

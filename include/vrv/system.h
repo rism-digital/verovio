@@ -128,13 +128,12 @@ public:
     virtual int JustifyX(ArrayPtrVoid *params);
 
     /**
-     * Lay out the Y positions of the staff looking at the bounding boxes of each staff.
-     * This is the Functor called at the end of the system or a measure.
+     * See Object::CalcStaffOverlap
      */
-    virtual int SetBoundingBoxYShiftEnd(ArrayPtrVoid *params);
+    virtual int CalcStaffOverlap(ArrayPtrVoid *params);
 
     /**
-     *
+     * See Object::CastOffPages
      */
     virtual int CastOffPages(ArrayPtrVoid *params);
 

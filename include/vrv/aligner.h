@@ -168,8 +168,8 @@ public:
     void SetStaff(Staff *staff, Doc *doc);
     ///@}
 
-    int CalcTopOverflow(BoundingBox *box);
-    int CalcBottomOverflow(BoundingBox *box);
+    int CalcOverflowAbove(BoundingBox *box);
+    int CalcOverflowBelow(BoundingBox *box);
 
     //----------//
     // Functors //
@@ -181,7 +181,10 @@ public:
      */
     virtual int SetAligmentYPos(ArrayPtrVoid *params);
 
-    virtual int SetBoundingBoxYShiftAligner(ArrayPtrVoid *params);
+    /**
+     * See Object::CalcStaffOverlap
+     */
+    virtual int CalcStaffOverlap(ArrayPtrVoid *params);
 
     /**
      * Correct the Y alignment once the the content of a system has been aligned and laid out.
@@ -230,20 +233,20 @@ private:
     ///@}
 
 public:
-    int m_topOverflow;
-    int m_bottomOverflow;
+    int m_overflowAbove;
+    int m_overflowBelow;
     int m_overlap;
     int m_staffHeight;
 
-    void SetTopOverflow(int topOverflow);
-    void SetBottomOverflow(int topOverflow);
+    void SetOverflowAbove(int overflowAbove);
+    void SetOverflowBelow(int overflowBottom);
     void SetOverlap(int overlap);
 
     /**
      *
      */
-    std::vector<BoundingBox *> m_overflowAbove;
-    std::vector<BoundingBox *> m_overflowBelow;
+    std::vector<BoundingBox *> m_overflowAboveBBoxes;
+    std::vector<BoundingBox *> m_overflowBelowBBoxes;
 };
 
 //----------------------------------------------------------------------------

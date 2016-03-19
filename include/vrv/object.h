@@ -547,22 +547,14 @@ public:
     virtual int SetAligmentYPos(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Lay out the Y positions of the staff looking at the bounding box of each staff.
-     * The m_yShift is updated appropriately
+     * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
      */
-    virtual int SetBoundingBoxYShift(ArrayPtrVoid *params);
+    virtual int SetOverflowBBoxes(ArrayPtrVoid *params);
 
     /**
-     * Lay out the Y positions of the staff looking at the bounding boxes of each staff.
-     * This is the Functor called at the end of the system or a measure.
+     * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
      */
-    virtual int SetBoundingBoxYShiftEnd(ArrayPtrVoid *params);
-
-    /**
-     * Lay out the Y positions of the staff looking at the bounding box of each staff.
-     * The m_yShift is updated appropriately
-     */
-    virtual int SetBoundingBoxYShiftAligner(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int CalcStaffOverlap(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     ///@}
 

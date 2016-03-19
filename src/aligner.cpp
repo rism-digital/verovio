@@ -106,8 +106,8 @@ StaffAlignment::StaffAlignment() : Object()
     m_hairpinAbove = false;
     m_hairpinBelow = false;
 
-    m_topOverflow = 0;
-    m_bottomOverflow = 0;
+    m_overflowAbove = 0;
+    m_overflowBelow = 0;
     m_staffHeight = 0;
     m_overlap = 0;
 }
@@ -138,10 +138,10 @@ void StaffAlignment::SetMaxHeight(int max_height)
     }
 }
 
-void StaffAlignment::SetTopOverflow(int topOverflow)
+void StaffAlignment::SetOverflowAbove(int overflowAbove)
 {
-    if (topOverflow > m_topOverflow) {
-        m_topOverflow = topOverflow;
+    if (overflowAbove > m_overflowAbove) {
+        m_overflowAbove = overflowAbove;
     }
 }
 
@@ -152,10 +152,10 @@ void StaffAlignment::SetOverlap(int overlap)
     }
 }
 
-void StaffAlignment::SetBottomOverflow(int bottomOverflow)
+void StaffAlignment::SetOverflowBelow(int overflowBottom)
 {
-    if (bottomOverflow > m_bottomOverflow) {
-        m_bottomOverflow = bottomOverflow;
+    if (overflowBottom > m_overflowBelow) {
+        m_overflowBelow = overflowBottom;
     }
 }
 
@@ -168,12 +168,12 @@ void StaffAlignment::SetVerseCount(int verse_count)
     }
 }
 
-int StaffAlignment::CalcTopOverflow(BoundingBox *box)
+int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
 {
     return box->GetDrawingY() + box->m_contentBB_y2;
 }
 
-int StaffAlignment::CalcBottomOverflow(BoundingBox *box)
+int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
 {
     return -(box->GetDrawingY() + box->m_contentBB_y1 + m_staffHeight);
 }
@@ -430,8 +430,10 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int StaffAlignment::SetBoundingBoxYShiftAligner(ArrayPtrVoid *params)
+int StaffAlignment::CalcStaffOverlap(ArrayPtrVoid *params)
 {
+    // param 0: a pointer to the previous staff alignment
+    // param 1: a pointer to the functor for passing it to the system aligner (unused)
     StaffAlignment **previous = static_cast<StaffAlignment **>((*params).at(0));
 
     // This is the bottom alignment (or something is wrong)
@@ -444,20 +446,20 @@ int StaffAlignment::SetBoundingBoxYShiftAligner(ArrayPtrVoid *params)
 
     ArrayOfBoundingBoxes::iterator iter;
     // go through all the elements of the top staff that have an overflow below
-    for (iter = (*previous)->m_overflowBelow.begin(); iter != (*previous)->m_overflowBelow.end(); iter++) {
-        auto i = m_overflowAbove.begin();
-        auto end = m_overflowAbove.end();
+    for (iter = (*previous)->m_overflowBelowBBoxes.begin(); iter != (*previous)->m_overflowBelowBBoxes.end(); iter++) {
+        auto i = m_overflowAboveBBoxes.begin();
+        auto end = m_overflowAboveBBoxes.end();
         while (i != end) {
             // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
             i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalOverlap(elem); });
             if (i != end) {
                 // calculate the vertical overlap and see if this is more than the expected space
-                int bottomOverflow = (*previous)->CalcBottomOverflow(*iter);
-                int topOverflow = this->CalcTopOverflow(*i);
-                int spacing = std::max((*previous)->m_bottomOverflow, this->m_topOverflow);
-                if (spacing < (bottomOverflow + topOverflow)) {
-                    // LogDebug("Overlap %d", (bottomOverflow + topOverflow) - spacing);
-                    this->SetOverlap((bottomOverflow + topOverflow) - spacing);
+                int overflowBelow = (*previous)->CalcOverflowBelow(*iter);
+                int overflowAbove = this->CalcOverflowAbove(*i);
+                int spacing = std::max((*previous)->m_overflowBelow, this->m_overflowAbove);
+                if (spacing < (overflowBelow + overflowAbove)) {
+                    // LogDebug("Overlap %d", (overflowBelow + overflowAbove) - spacing);
+                    this->SetOverlap((overflowBelow + overflowAbove) - spacing);
                 }
                 i++;
             }
@@ -479,14 +481,14 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     int *extraStaffHeight = static_cast<int *>((*params).at(1));
     Doc *doc = static_cast<Doc *>((*params).at(2));
 
-    int maxTopOverlfow = std::max((*extraStaffHeight), m_topOverflow);
+    int maxTopOverlfow = std::max((*extraStaffHeight), m_overflowAbove);
 
     if (m_overlap) maxTopOverlfow += m_overlap;
 
     SetYShift(-maxTopOverlfow - (*previousStaffHeight));
 
     (*previousStaffHeight) = m_staffHeight;
-    (*extraStaffHeight) = std::max(m_bottomOverflow, doc->GetSpacingStaff() * doc->GetDrawingUnit(100));
+    (*extraStaffHeight) = std::max(m_overflowBelow, doc->GetSpacingStaff() * doc->GetDrawingUnit(100));
 
     return FUNCTOR_CONTINUE;
 

@@ -66,7 +66,7 @@ namespace vrv {
 #define MIN_SCALE 1
 #define MAX_SCALE 1000
 
-#define DEFAULT_SPACING_STAFF 12
+#define DEFAULT_SPACING_STAFF 10
 #define MIN_SPACING_STAFF 0
 #define MAX_SPACING_STAFF 24
 

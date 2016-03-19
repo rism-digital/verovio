@@ -1180,27 +1180,11 @@ int Object::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
+int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
 {
     // param 0: the maximum height in the current system
-    int *systemHeight = static_cast<int *>((*params).at(0));
-    StaffAlignment **staffAlignment = static_cast<StaffAlignment **>((*params).at(1));
-    Doc *doc = static_cast<Doc *>((*params).at(2));
-
-    // starting a new system
-    if (this->Is() == SYSTEM) {
-        // we reset the system height
-        (*systemHeight) = 0;
-        //(*min_pos) = 0;
-
-        return FUNCTOR_CONTINUE;
-    }
-
-    // starting a new measure
-    if (this->Is() == MEASURE) {
-        //(*min_pos) = 0;
-        return FUNCTOR_CONTINUE;
-    }
+    StaffAlignment **staffAlignment = static_cast<StaffAlignment **>((*params).at(0));
+    Doc *doc = static_cast<Doc *>((*params).at(1));
 
     // starting a new staff
     if (this->Is() == STAFF) {
@@ -1221,16 +1205,16 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
         assert(currentLayer);
         // set scoreDef attr
         if (currentLayer->GetDrawingClef()) {
-            currentLayer->GetDrawingClef()->SetBoundingBoxYShift(params);
+            currentLayer->GetDrawingClef()->SetOverflowBBoxes(params);
         }
         if (currentLayer->GetDrawingKeySig()) {
-            currentLayer->GetDrawingKeySig()->SetBoundingBoxYShift(params);
+            currentLayer->GetDrawingKeySig()->SetOverflowBBoxes(params);
         }
         if (currentLayer->GetDrawingMensur()) {
-            currentLayer->GetDrawingMensur()->SetBoundingBoxYShift(params);
+            currentLayer->GetDrawingMensur()->SetOverflowBBoxes(params);
         }
         if (currentLayer->GetDrawingMeterSig()) {
-            currentLayer->GetDrawingMeterSig()->SetBoundingBoxYShift(params);
+            currentLayer->GetDrawingMeterSig()->SetOverflowBBoxes(params);
         }
         return FUNCTOR_CONTINUE;
     }
@@ -1257,70 +1241,23 @@ int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
     Staff *staff = (*staffAlignment)->GetStaff();
     int staffSize = staff ? staff->m_drawingStaffSize : 100;
 
-    int topOverflow = (*staffAlignment)->CalcTopOverflow(current);
-    if (topOverflow > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-        // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), topOverflow);
-        // overlap = (*min_pos) - current->GetAlignment()->GetYRel() + negative_offset;
-        (*staffAlignment)->SetTopOverflow(topOverflow);
-        (*staffAlignment)->m_overflowAbove.push_back(current);
+    int overflowAbove = (*staffAlignment)->CalcOverflowAbove(current);
+    if (overflowAbove > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+        // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+        (*staffAlignment)->SetOverflowAbove(overflowAbove);
+        (*staffAlignment)->m_overflowAboveBBoxes.push_back(current);
     }
 
-    int bottomOverflow = (*staffAlignment)->CalcBottomOverflow(current);
-    if (bottomOverflow > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-        // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), bottomOverflow);
-        (*staffAlignment)->SetBottomOverflow(bottomOverflow);
-        (*staffAlignment)->m_overflowBelow.push_back(current);
+    int overflowBelow = (*staffAlignment)->CalcOverflowBelow(current);
+    if (overflowBelow > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+        // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+        (*staffAlignment)->SetOverflowBelow(overflowBelow);
+        (*staffAlignment)->m_overflowBelowBBoxes.push_back(current);
     }
 
-    /*
-    // at this stage we assume we have instantiated the alignment pointer
-    assert(current->GetAlignment());
-
-    // This is the value that needs to be removed to fit everything
-    int negative_offset = -current->m_contentBB_y2;
-
-    // this will probably never happen
-    if (negative_offset > 0) {
-        negative_offset = 0;
-    }
-
-    // check if the staff overlaps with the preceding one given by (*min_pos)
-    int overlap = 0;
-    if ((current->GetAlignment()->GetYRel() - negative_offset) > (*min_pos)) {
-        overlap = (*min_pos) - current->GetAlignment()->GetYRel() + negative_offset;
-        current->GetAlignment()->SetYShift(overlap);
-    }
-
-    // LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d", current->GetClassName().c_str(),
-    // (*min_pos), negative_offset,
-    // current->GetAlignment()->GetXRel(), overlap);
-
-    // the next minimal position if given by the bottom side of the bounding box + the spacing of the element
-    (*min_pos) = current->m_contentBB_y1;
-    current->GetAlignment()->SetMaxHeight(current->m_contentBB_y1);
-    */
-
-    // do not go further down the tree in this case
+    // do not go further down the tree in this case since the bounding box of the first element is already taken into
+    // account?
     return FUNCTOR_SIBLINGS;
-}
-
-int Object::SetBoundingBoxYShiftEnd(ArrayPtrVoid *params)
-{
-    // param 0: the position of the previous staff
-    // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int *>((*params).at(0));
-    int *system_height = static_cast<int *>((*params).at(1));
-
-    // ending a measure
-    if (this->Is() == MEASURE) {
-        // mininimum position is the height for the last (previous) staff
-        // we keep it if it is higher than what we had so far
-        (*system_height) = std::min((*system_height), (*min_pos));
-        return FUNCTOR_CONTINUE;
-    }
-
-    // ending a system: see System::SetBoundingBoxYShiftEnd
-    return FUNCTOR_CONTINUE;
 }
 
 int Object::Save(ArrayPtrVoid *params)
