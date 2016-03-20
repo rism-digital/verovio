@@ -114,6 +114,16 @@ StaffAlignment::StaffAlignment() : Object()
 
 StaffAlignment::~StaffAlignment()
 {
+    ClearPositioners();
+}
+
+void StaffAlignment::ClearPositioners()
+{
+    ArrayOfFloatingPositioners::iterator iter;
+    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
+        delete *iter;
+    }
+    m_floatingPositioners.clear();
 }
 
 void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
@@ -178,22 +188,22 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     return -(box->GetDrawingY() + box->m_contentBB_y1 + m_staffHeight);
 }
 
-void StaffAlignment::SetCurrentBoundingBox(FloatingElement *element, int x, int y)
+void StaffAlignment::SetCurrentFloatingPositioner(FloatingElement *element, int x, int y)
 {
-    // m_floatingElementBoundingBoxPairs;
-    auto item = std::find_if(m_floatingElementBoundingBoxPairs.begin(), m_floatingElementBoundingBoxPairs.end(),
-        [element](std::pair<FloatingElement *, BoundingBox> const &elem) { return elem.first == element; });
-    if (item != m_floatingElementBoundingBoxPairs.end()) {
-        LogDebug("Found it!");
+    auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
+        [element](FloatingPositioner *positioner) { return positioner->GetElement() == element; });
+    if (item != m_floatingPositioners.end()) {
+        // LogDebug("Found it!");
     }
     else {
-        FloatingBoundingBox box;
-        box.m_contentBB_x1 = x;
-        m_floatingElementBoundingBoxPairs.push_back(std::make_pair(element, box));
-        item = m_floatingElementBoundingBoxPairs.end() - 1;
+        FloatingPositioner *box = new FloatingPositioner(element);
+        m_floatingPositioners.push_back(box);
+        item = m_floatingPositioners.end() - 1;
     }
+    (*item)->SetDrawingX(x);
+    (*item)->SetDrawingY(y);
     // LogDebug("BB %d", item->second.m_contentBB_x1);
-    element->SetCurrentBoundingBox(&item->second);
+    element->SetCurrentFloatingPositioner((*item));
 }
 
 //----------------------------------------------------------------------------
@@ -471,6 +481,46 @@ int StaffAlignment::CalcStaffOverlap(ArrayPtrVoid *params)
     return FUNCTOR_SIBLINGS;
 }
 
+int StaffAlignment::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
+{
+    // param X: a pointer to the functor for passing it to the system aligner (unused)
+
+    ClassId classId = DYNAM;
+
+    ArrayOfFloatingPositioners::iterator iter;
+    for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
+        if ((*iter)->GetElement()->Is() != classId) continue;
+
+        Object *object = (*iter)->GetElement();
+        assert(object);
+        LogDebug("BBox %s - %s", object->GetClassName().c_str(), object->GetUuid().c_str());
+        int overflowAbove = this->CalcOverflowAbove(*iter);
+        int overflowBelow = this->CalcOverflowBelow(*iter);
+        LogDebug("BBox %s - %d %d", object->GetUuid().c_str(), overflowAbove, overflowBelow);
+
+        ArrayOfBoundingBoxes *overflowBoxes = &m_overflowBelowBBoxes;
+        auto i = overflowBoxes->begin();
+        auto end = overflowBoxes->end();
+        while (i != end) {
+            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
+            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalOverlap(elem); });
+            if (i != end) {
+                // calculate the vertical overlap and see if this is more than the expected space
+                int overflowBelow = this->CalcOverflowBelow((*iter));
+                // int overflowAbove = this->CalcOverflowAbove(*i);
+                // int spacing = std::max((*previous)->m_overflowBelow, this->m_overflowAbove);
+                // if (spacing < (overflowBelow + overflowAbove)) {
+                LogDebug("Overlap %d", (overflowBelow));
+                // this->SetOverlap((overflowBelow + overflowAbove) - spacing);
+                //}
+                i++;
+            }
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
 {
     // param 0: the previous staff height
@@ -489,56 +539,6 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
 
     (*previousStaffHeight) = m_staffHeight;
     (*extraStaffHeight) = std::max(m_overflowBelow, doc->GetSpacingStaff() * doc->GetDrawingUnit(100));
-
-    return FUNCTOR_CONTINUE;
-
-    /*
-    if (this->GetDynamAbove() || this->GetDirAbove()) {
-        // We need + 1 lyric line space
-        (*extraStaffHeight) += doc->GetDrawingDynamHeight(staffSize, true);
-    }
-    else if (this->GetHairpinAbove()) {
-        // We need + 1 lyric line space
-        (*extraStaffHeight) += doc->GetDrawingHairpinSize(staffSize, true);
-    }
-    */
-
-    /*
-    // We need to insert extra elements (lyrics, dynam)
-    if ((*extraStaffHeight) > 0) {
-        int missingExtraHeight = (*extraStaffHeight);
-        // The extra space we have with the minimal spacing
-        int existingExtraHeight = minShift - (-m_yShift);
-        // If we have existing extra height, we don't need to add all, only what is missing
-        if (existingExtraHeight > 0) {
-            missingExtraHeight -= existingExtraHeight;
-        }
-        // Add what is actually missing (if anything is missing)
-        if (missingExtraHeight > 0) {
-            m_yShift -= missingExtraHeight;
-        }
-    }
-    */
-
-    //(*previousStaffHeight) = (lines - 1) * doc->GetDrawingDoubleUnit(staffSize);
-
-    /*
-    (*extraStaffHeight) = 0;
-    // Ajust the max height looking at the lyrics and / or dynam below
-    if (this->GetVerseCount() > 0) {
-        // We need + 1 lyric line space
-        (*extraStaffHeight) += (this->GetVerseCount() + 0.8) * TEMP_STYLE_LYIRC_LINE_SPACE
-            * (doc->GetDrawingUnit(staffSize)) / PARAM_DENOMINATOR;
-    }
-    if (this->GetDynamBelow() || this->GetDirBelow()) {
-        // We need + 1 lyric line space
-        (*extraStaffHeight) += doc->GetDrawingDynamHeight(staffSize, true);
-    }
-    else if (this->GetHairpinBelow()) {
-        // We need + 1 lyric line space
-        (*extraStaffHeight) += doc->GetDrawingHairpinSize(staffSize, true);
-    }
-    */
 
     return FUNCTOR_CONTINUE;
 }

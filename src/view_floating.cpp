@@ -154,7 +154,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsFloatingElement())
-            system->SetCurrentBoundingBox(
+            system->SetCurrentFloatingPositioner(
                 (*staffIter)->GetN(), dynamic_cast<FloatingElement *>(element), x1, (*staffIter)->GetDrawingY());
 
         if (element->Is() == HAIRPIN) {
@@ -1316,10 +1316,10 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, x, (*staffIter)->GetDrawingY());
+
         // Basic method that use bounding box
         int y = GetDirY(dir->GetPlace(), *staffIter);
-
-        system->SetCurrentBoundingBox((*staffIter)->GetN(), dir, x, y);
 
         dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
@@ -1369,10 +1369,11 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        // Basic method that use bounding box
-        int y = GetDynamY(dynam->GetPlace(), *staffIter, true);
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, x, (*staffIter)->GetDrawingY());
 
-        system->SetCurrentBoundingBox((*staffIter)->GetN(), dynam, x, y);
+        // Basic method that use bounding box
+        // int y = GetDynamY(dynam->GetPlace(), *staffIter, true);
+        int y = dynam->GetDrawingY();
 
         dynamTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
@@ -1435,13 +1436,12 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, x, (*staffIter)->GetDrawingY());
 
         tempoTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
         // Basic method that use bounding box
         int y = GetTempoY(tempo->GetPlace(), *staffIter);
-
-        system->SetCurrentBoundingBox((*staffIter)->GetN(), tempo, x, y);
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);

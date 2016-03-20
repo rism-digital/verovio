@@ -41,35 +41,62 @@ void FloatingElement::Reset()
     Object::Reset();
 }
 
+void FloatingElement::UpdateContentBBoxX(int x1, int x2)
+{
+    // assert(m_currentBoundingBox);
+    if (!m_currentBoundingBox) return;
+    m_currentBoundingBox->BoundingBox::UpdateContentBBoxX(x1, x2);
+}
+
+void FloatingElement::UpdateContentBBoxY(int y1, int y2)
+{
+    // assert(m_currentBoundingBox);
+    if (!m_currentBoundingBox) return;
+    m_currentBoundingBox->BoundingBox::UpdateContentBBoxY(y1, y2);
+}
+
 void FloatingElement::UpdateSelfBBoxX(int x1, int x2)
 {
     // assert(m_currentBoundingBox);
     if (!m_currentBoundingBox) return;
-    m_currentBoundingBox->UpdateSelfBBoxX(x1, x2);
+    m_currentBoundingBox->BoundingBox::UpdateSelfBBoxX(x1, x2);
 }
 
 void FloatingElement::UpdateSelfBBoxY(int y1, int y2)
 {
     // assert(m_currentBoundingBox);
     if (!m_currentBoundingBox) return;
-    m_currentBoundingBox->UpdateSelfBBoxY(y1, y2);
+    m_currentBoundingBox->BoundingBox::UpdateSelfBBoxY(y1, y2);
 }
 
-void FloatingElement::SetCurrentBoundingBox(FloatingBoundingBox *boundingBox)
+int FloatingElement::GetDrawingX() const
+{
+    return m_drawingX;
+}
+
+int FloatingElement::GetDrawingY() const
+{
+    // assert(m_currentBoundingBox);
+    if (!m_currentBoundingBox) return 0;
+    return m_currentBoundingBox->GetDrawingY() + m_currentBoundingBox->GetDrawingYRel();
+}
+
+void FloatingElement::SetCurrentFloatingPositioner(FloatingPositioner *boundingBox)
 {
     m_currentBoundingBox = boundingBox;
 }
 
 //----------------------------------------------------------------------------
-// FloatingBoundingBox
+// FloatingPositioner
 //----------------------------------------------------------------------------
 
-FloatingBoundingBox::FloatingBoundingBox() : BoundingBox()
+FloatingPositioner::FloatingPositioner(FloatingElement *element) : BoundingBox()
 {
+    m_element = element;
     ResetBoundingBox();
 };
 
-void FloatingBoundingBox::ResetBoundingBox()
+void FloatingPositioner::ResetBoundingBox()
 {
     BoundingBox::ResetBoundingBox();
 

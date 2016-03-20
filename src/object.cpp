@@ -44,6 +44,13 @@ BoundingBox::BoundingBox()
     ResetBoundingBox();
 }
 
+ClassId BoundingBox::Is() const
+{
+    // we should always have the method overridden
+    assert(false);
+    return BOUNDING_BOX;
+};
+
 void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 {
     // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
@@ -175,10 +182,7 @@ bool BoundingBox::HorizontalOverlap(const BoundingBox *other) const
 int BoundingBox::CalcVerticalOverlap(const BoundingBox *other) const
 {
     assert(other);
-
-    if (m_contentBB_x2 < other->m_contentBB_x1) return false;
-    if (m_contentBB_x1 > other->m_contentBB_x2) return false;
-    return true;
+    return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -1216,6 +1220,10 @@ int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
         if (currentLayer->GetDrawingMeterSig()) {
             currentLayer->GetDrawingMeterSig()->SetOverflowBBoxes(params);
         }
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (this->IsFloatingElement()) {
         return FUNCTOR_CONTINUE;
     }
 

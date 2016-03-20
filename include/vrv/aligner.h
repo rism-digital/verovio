@@ -157,7 +157,7 @@ public:
     bool GetHairpinBelow() const { return m_hairpinBelow; };
     ///@}
 
-    void SetCurrentBoundingBox(FloatingElement *element, int x, int y);
+    void SetCurrentFloatingPositioner(FloatingElement *element, int x, int y);
 
     /**
      * Setter and getter of the staff from which the alignment is created alignment.
@@ -170,6 +170,11 @@ public:
 
     int CalcOverflowAbove(BoundingBox *box);
     int CalcOverflowBelow(BoundingBox *box);
+
+    /**
+     *
+     */
+    void ClearPositioners();
 
     //----------//
     // Functors //
@@ -192,6 +197,11 @@ public:
      */
     virtual int IntegrateBoundingBoxYShift(ArrayPtrVoid *params);
 
+    /**
+     *
+     */
+    virtual int AdjustFloatingBoundingBoxes(ArrayPtrVoid *params);
+
 private:
     //
 public:
@@ -200,7 +210,7 @@ private:
     /**
      *
      */
-    ArrayOfFloatingElementBoundingBoxPairs m_floatingElementBoundingBoxPairs;
+    ArrayOfFloatingPositioners m_floatingPositioners;
     /**
      * Stores a pointer to the staff from which the aligner was created.
      * This is necessary since we don't always have all the staves.

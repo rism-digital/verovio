@@ -41,11 +41,13 @@ namespace vrv {
  * Object::IsLayerElement.
  */
 enum ClassId {
-    OBJECT = 0,
+    BOUNDING_BOX = 0, // Should not be instanciated as is
+    OBJECT, // Should not be instanciated as is
     //
     ALIGNMENT,
     CLEF_ATTR,
     DOC,
+    FLOATING_POSITIONER,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
     LAYER,
@@ -156,7 +158,7 @@ enum InterfaceId {
 class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
-class FloatingBoundingBox;
+class FloatingPositioner;
 class FloatingElement;
 class LayerElement;
 class Note;
@@ -185,7 +187,7 @@ typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPai
 
 typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfInterfaceClassIdPairs;
 
-typedef std::vector<std::pair<FloatingElement *, FloatingBoundingBox> > ArrayOfFloatingElementBoundingBoxPairs;
+typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 
 typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 

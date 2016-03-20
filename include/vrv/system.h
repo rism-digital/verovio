@@ -74,7 +74,7 @@ public:
      */
     int GetSystemIdx() const { return Object::GetIdx(); };
 
-    void SetCurrentBoundingBox(int staffN, FloatingElement *element, int x, int y);
+    void SetCurrentFloatingPositioner(int staffN, FloatingElement *element, int x, int y);
 
     //----------//
     // Functors //
@@ -131,6 +131,11 @@ public:
      * See Object::CalcStaffOverlap
      */
     virtual int CalcStaffOverlap(ArrayPtrVoid *params);
+
+    /**
+     *
+     */
+    virtual int AdjustFloatingBoundingBoxes(ArrayPtrVoid *params);
 
     /**
      * See Object::CastOffPages

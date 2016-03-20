@@ -95,7 +95,7 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-void System::SetCurrentBoundingBox(int staffN, FloatingElement *element, int x, int y)
+void System::SetCurrentFloatingPositioner(int staffN, FloatingElement *element, int x, int y)
 {
     assert(element);
 
@@ -103,7 +103,7 @@ void System::SetCurrentBoundingBox(int staffN, FloatingElement *element, int x, 
     if (m_systemAligner.GetChildCount() == 1) return;
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
     assert(alignment);
-    alignment->SetCurrentBoundingBox(element, x, y);
+    alignment->SetCurrentFloatingPositioner(element, x, y);
 }
 
 //----------------------------------------------------------------------------
@@ -259,7 +259,17 @@ int System::CalcStaffOverlap(ArrayPtrVoid *params)
     (*previous) = NULL;
     m_systemAligner.Process(calcStaffOverlap, params);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
+}
+
+int System::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
+{
+    // param X: a pointer to the functor for passing it to the system aligner
+    Functor *adjustFloatingBoundingBoxes = static_cast<Functor *>((*params).at(0));
+
+    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int System::CastOffPages(ArrayPtrVoid *params)

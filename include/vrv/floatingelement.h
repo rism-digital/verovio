@@ -12,7 +12,7 @@
 
 namespace vrv {
 
-class FloatingBoundingBox;
+class FloatingPositioner;
 
 //----------------------------------------------------------------------------
 // FloatingElement
@@ -36,13 +36,21 @@ public:
     virtual ClassId Is() const { return FLOATING_ELEMENT; };
     ///@}
 
-    virtual void UpdateContentBBoxX(int x1, int x2){};
-    virtual void UpdateContentBBoxY(int y1, int y2){};
+    virtual void UpdateContentBBoxX(int x1, int x2);
+    virtual void UpdateContentBBoxY(int y1, int y2);
     virtual void UpdateSelfBBoxX(int x1, int x2);
     virtual void UpdateSelfBBoxY(int y1, int y2);
 
-    void SetCurrentBoundingBox(FloatingBoundingBox *boundingBox);
-    FloatingBoundingBox *GetCurrentBoundingBox() { return m_currentBoundingBox; };
+    /**
+     * @name Get and set the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
+
+    void SetCurrentFloatingPositioner(FloatingPositioner *boundingBox);
+    FloatingPositioner *GetCurrentBoundingBox() { return m_currentBoundingBox; };
 
     //----------//
     // Functors //
@@ -74,23 +82,26 @@ private:
 public:
     //
 private:
-    FloatingBoundingBox *m_currentBoundingBox;
+    FloatingPositioner *m_currentBoundingBox;
 };
 
 //----------------------------------------------------------------------------
-// FloatingBoundingBox
+// FloatingPositioner
 //----------------------------------------------------------------------------
 
 /**
  * This class represents a basic object in the layout domain
  */
-class FloatingBoundingBox : public BoundingBox {
+class FloatingPositioner : public BoundingBox {
 public:
     // constructors and destructors
-    FloatingBoundingBox();
-    virtual ~FloatingBoundingBox(){};
+    FloatingPositioner(FloatingElement *element);
+    virtual ~FloatingPositioner(){};
+    virtual ClassId Is() const { return FLOATING_POSITIONER; };
 
     virtual void ResetBoundingBox();
+
+    FloatingElement *GetElement() const { return m_element; };
 
     /**
      * @name Get and set the Y drawing relative position
@@ -106,6 +117,8 @@ protected:
      * It is re-computed everytime the object is drawn and it is not stored in the file.
      */
     int m_drawingYRel;
+
+    FloatingElement *m_element;
 };
 
 } // namespace vrv

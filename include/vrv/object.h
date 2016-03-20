@@ -73,6 +73,7 @@ public:
     // constructors and destructors
     BoundingBox();
     virtual ~BoundingBox(){};
+    virtual ClassId Is() const;
 
     virtual void UpdateContentBBoxX(int x1, int x2);
     virtual void UpdateContentBBoxY(int y1, int y2);
@@ -92,8 +93,8 @@ public:
      * @name Get and set the X and Y drawing position
      */
     ///@{
-    int GetDrawingX() const { return m_drawingX; };
-    int GetDrawingY() const { return m_drawingY; };
+    virtual int GetDrawingX() const { return m_drawingX; };
+    virtual int GetDrawingY() const { return m_drawingY; };
     void SetDrawingX(int drawingX) { m_drawingX = drawingX; };
     void SetDrawingY(int drawingY) { m_drawingY = drawingY; };
     ///@}
@@ -442,9 +443,9 @@ public:
     ///@{
 
     /**
-     * Reset the horizontal alignment environment for various types for object.
+     *
      */
-    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustFloatingBoundingBoxes(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
      * Align horizontally the content of a page.
@@ -483,6 +484,11 @@ public:
     virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
+     * Reset the horizontal alignment environment for various types for object.
+     */
+    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
      * Set the position of the Alignment.
      * Looks at the time difference from the previous Alignment.
      */
@@ -514,11 +520,6 @@ public:
     ///@{
 
     /**
-     * Reset the verticall alignment environment for various types for object.
-     */
-    virtual int ResetVerticalAlignment(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
-
-    /**
      * Align vertically the content of a page.
      * For each Staff, instanciate its StaffAlignment.
      */
@@ -536,10 +537,20 @@ public:
     virtual int AlignSystemsEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
+     * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
+     */
+    virtual int CalcStaffOverlap(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
      * Correct the Y alignment once the content of a system has been aligned and laid out
      * See System::IntegrateBoundingBoxYShift for actual implementation
      */
     virtual int IntegrateBoundingBoxYShift(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * Reset the verticall alignment environment for various types for object.
+     */
+    virtual int ResetVerticalAlignment(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
      * Set the position of the StaffAlignment.
@@ -550,11 +561,6 @@ public:
      * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
      */
     virtual int SetOverflowBBoxes(ArrayPtrVoid *params);
-
-    /**
-     * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
-     */
-    virtual int CalcStaffOverlap(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     ///@}
 

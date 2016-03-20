@@ -649,7 +649,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
     bool drawBoundingBox = false;
     if (drawBoundingBox && view) {
         BoundingBox *box = object;
-        // For floating elements, get the current bounding box set by System::SetCurrentBoundingBox
+        // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
         if (object->IsFloatingElement()) {
             FloatingElement *floatingElement = dynamic_cast<FloatingElement *>(object);
             assert(floatingElement);
