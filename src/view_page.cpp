@@ -187,26 +187,20 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     assert(system);
 
     ListOfObjects *drawingList = system->GetDrawingList();
-    Object *element = NULL;
-
     ListOfObjects::iterator iter;
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
-        // We need to cast to  Object for calling DrawTimeSpanningElement
-        element = dynamic_cast<Object *>(*iter);
-        if (!element) continue;
-
-        if ((element->Is() == classId) && (classId == HAIRPIN)) {
-            DrawTimeSpanningElement(dc, element, system);
+        if (((*iter)->Is() == classId) && (classId == HAIRPIN)) {
+            DrawTimeSpanningElement(dc, *iter, system);
         }
-        if ((element->Is() == classId) && (classId == SYL)) {
-            DrawTimeSpanningElement(dc, element, system);
+        if (((*iter)->Is() == classId) && (classId == SYL)) {
+            DrawTimeSpanningElement(dc, *iter, system);
         }
-        if ((element->Is() == classId) && (classId == TIE)) {
-            DrawTimeSpanningElement(dc, element, system);
+        if (((*iter)->Is() == classId) && (classId == TIE)) {
+            DrawTimeSpanningElement(dc, *iter, system);
         }
-        if ((element->Is() == classId) && (classId == SLUR)) {
-            DrawTimeSpanningElement(dc, element, system);
+        if (((*iter)->Is() == classId) && (classId == SLUR)) {
+            DrawTimeSpanningElement(dc, *iter, system);
         }
     }
 }
