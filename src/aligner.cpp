@@ -480,7 +480,7 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
             intervalTime, *maxActualDur, doc->GetSpacingLinear(), doc->GetSpacingNonLinear());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
-    m_xRel = (*previousXRel) + (intervalXRel)*DEFINITON_FACTOR;
+    m_xRel = (*previousXRel) + (intervalXRel)*DEFINITION_FACTOR;
     (*previousTime) = m_time;
     (*previousXRel) = m_xRel;
 
