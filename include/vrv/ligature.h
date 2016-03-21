@@ -1,0 +1,136 @@
+/////////////////////////////////////////////////////////////////////////////
+// Name:        ligature.h
+// Author:      Donald Byrd
+// Created:     2016
+// Copyright (c) Authors and others. All rights reserved.
+/////////////////////////////////////////////////////////////////////////////
+
+#ifndef __VRV_LIGATURE_H__
+#define __VRV_LIGATURE_H__
+
+#include "atts_shared.h"
+#include "drawinginterface.h"
+#include "durationinterface.h"
+#include "layerelement.h"
+
+namespace vrv {
+
+//----------------------------------------------------------------------------
+// Ligature
+//----------------------------------------------------------------------------
+
+/**
+ * This class represents a collection of notes in the same layer with successive
+ * onset times, as used in mensural notation.
+ * A ligature is contained in a layer.
+ * It contains notes.
+ */
+
+class Ligature : public LayerElement,
+              public ObjectListInterface,
+              public StemmedDrawingInterface,
+              public DurationInterface,
+              public AttCommon,
+              public AttStems,
+              public AttStemsCmn,
+              public AttTiepresent {
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    Ligature();
+    virtual ~Ligature();
+    virtual void Reset();
+    virtual std::string GetClassName() { return "Ligature"; };
+    virtual ClassId Is() { return LIGATURE; };
+    ///@}
+
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() { return true; };
+
+    /**
+     * Add an element (only notes are supported) to a ligature.
+     */
+    void AddLayerElement(LayerElement *element);
+
+    virtual void FilterList(ListOfObjects *childlist);
+
+    /**
+     * Returns list of notes that have accidentals
+     */
+    void ResetAccidList();
+
+    /**
+     * Return information about the note's position in the ligature ??
+     */
+    ///@{
+    /** Return 0 if the note is the middle note, -1 if below it and 1 if above */
+    int PositionInLigature(Note *note);
+    ///@}
+
+    /**
+     * Prepares a 2D grid of booleans to track where accidentals are placed. ??
+     * Further documentation is in chord.cpp comments. ??
+     */
+    void ResetAccidSpace(int fullUnit);
+
+    /**
+     * @name Set and get the stem direction and stem positions
+     * The methods are overriding the interface because we want to apply it to child notes
+     */
+    ///@{
+    virtual void SetDrawingStemDir(data_STEMDIRECTION stemDir);
+    virtual void SetDrawingStemStart(Point stemStart);
+    virtual void SetDrawingStemEnd(Point stemEnd);
+    ///@}
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::PrepareTieAttr
+     */
+    virtual int PrepareTieAttr(ArrayPtrVoid *params);
+
+    /**
+     * See Object::PrepareTieAttr
+     */
+    virtual int PrepareTieAttrEnd(ArrayPtrVoid *params);
+
+protected:
+    /**
+     * Clear the m_clusters vector and delete all the objects.
+     */
+    void ClearClusters();
+
+public:
+    std::list<LigatureCluster *> m_clusters;
+
+    /**
+     * Number of ledger lines for the chord where:
+     * Staff * is each staff for which the chord has notes and maps to:
+     * a four char vector acting as a 2D array (2x2) where:
+     * [0][x] is single-length, [1][x] is double-length
+     * [x][0] is below staff, [x][1] is above staff
+     */
+    MapOfLedgerLineFlags m_drawingLedgerLines;
+
+    /**
+     * Positions of dots in the chord to avoid overlapping
+     */
+    std::list<int> m_dots;
+
+    /**
+     * Variables related to preventing overlapping in the X dimension for accidentals
+     */
+    std::vector<Note *> m_accidList;
+    std::vector<std::vector<bool> > m_accidSpace;
+    int m_accidSpaceTop, m_accidSpaceBot, m_accidSpaceLeft;
+};
+
+} // namespace vrv
+
+#endif
