@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		152886C51C9CA86100B515BB /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
 		4D1D733C1A1D0390001E08F6 /* smufl.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1D733B1A1D0390001E08F6 /* smufl.h */; };
@@ -231,10 +232,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		152886C11C9CA2E000B515BB /* ligature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ligature.h; path = include/vrv/ligature.h; sourceTree = "<group>"; };
+		152886C41C9CA86100B515BB /* ligature.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ligature.cpp; path = src/ligature.cpp; sourceTree = "<group>"; };
 		1579B3411B15031D00B16F5C /* proport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = proport.h; path = include/vrv/proport.h; sourceTree = "<group>"; };
 		1579B3421B15033100B16F5C /* proport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = proport.cpp; path = src/proport.cpp; sourceTree = "<group>"; };
 		2D2A79991A69812C000A441B /* chord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chord.cpp; path = src/chord.cpp; sourceTree = "<group>"; };
-		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; };
+		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; usesTabs = 0; };
 		4D1D733B1A1D0390001E08F6 /* smufl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; name = smufl.h; path = include/vrv/smufl.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		4D1D733D1A1D08CD001E08F6 /* glyph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glyph.h; path = include/vrv/glyph.h; sourceTree = "<group>"; };
 		4D1D733F1A1D08DC001E08F6 /* glyph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = glyph.cpp; path = src/glyph.cpp; sourceTree = "<group>"; };
@@ -708,6 +711,8 @@
 				8F59291C18854BF800FE51AD /* keysig.h */,
 				8F086EC7188539540037FD8E /* layerelement.cpp */,
 				8F59291E18854BF800FE51AD /* layerelement.h */,
+				152886C11C9CA2E000B515BB /* ligature.h */,
+				152886C41C9CA86100B515BB /* ligature.cpp */,
 				8F086ECA188539540037FD8E /* mensur.cpp */,
 				8F59292118854BF800FE51AD /* mensur.h */,
 				4D763EC51987D04D003FCAB5 /* metersig.cpp */,
@@ -955,6 +960,7 @@
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4D22C42018891D6D00D0831F /* pugixml.cpp in Sources */,
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
+				152886C51C9CA86100B515BB /* ligature.cpp in Sources */,
 				4D983005192E959E00320037 /* main.cpp in Sources */,
 				4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */,
 				4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */,

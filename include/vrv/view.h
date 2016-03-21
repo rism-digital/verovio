@@ -215,6 +215,7 @@ protected:
     void DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -241,6 +242,7 @@ protected:
     void DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
     void DrawLedgerLines(
         DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
+    void DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
     void DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     void DrawMRptPart(DeviceContext *dc, int x, wchar_t smulfCode, int num, bool line, Staff *staff, Measure *measure);
     void DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff);
@@ -326,7 +328,6 @@ protected:
     void DrawMensurReversedHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMensurSlash(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff);
-    void DrawLigature(DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff);
     void CalculateLigaturePosX(LayerElement *element, Layer *layer, Staff *staff);
     void DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
     ///@}

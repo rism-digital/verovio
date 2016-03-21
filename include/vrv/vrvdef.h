@@ -122,6 +122,7 @@ enum ClassId {
     DOT,
     FTREM,
     KEYSIG,
+    LIGATURE,
     MENSUR,
     METERSIG,
     MREST,

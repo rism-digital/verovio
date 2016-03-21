@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "view.h"
+#include "vrv.h"
 
 //----------------------------------------------------------------------------
 
@@ -44,7 +45,8 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(note);
 
     int staffSize = staff->m_drawingStaffSize;
-    // Mensural noteheads are quite a bit smaller than CMN noteheads; use _pseudoStaffSize_ to force this.
+    // Mensural noteheads are quite a bit smaller than CMN noteheads; use _pseudoStaffSize_
+    // to allow forcing this for fonts that don't consider this.
     int pseudoStaffSize = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
     int noteY = element->GetDrawingY();
     int xLedger, xNote, xStem;
@@ -88,7 +90,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     // Ligature, maxima,longa, brevis, and semibrevis
     if ((note->GetLig() != noteLogMensural_LIG_NONE) && (drawingDur <= DUR_1)) {
-        DrawLigature(dc, noteY, element, layer, staff);
+        DrawLigatureNote(dc, element, layer, staff);
     }
     else if (drawingDur < DUR_1) {
         DrawMaximaToBrevis(dc, noteY, element, layer, staff);
@@ -401,72 +403,88 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     return;
 }
 
-void View::DrawLigature(DeviceContext *dc, int y, LayerElement *element, Layer *layer, Staff *staff)
+
+void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    
+    // ??WHAT DO WE NEED TO DO? SMTHG LIKE WHAT DrawChord() DOES?
+}
+
+    
+void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff)
 {
     assert(dc);
     assert(element);
     assert(layer);
     assert(staff);
 
+    LogDebug("DrawLigatureNote");
     Note *note = dynamic_cast<Note *>(element);
     assert(note);
 
-    int xn, x1, x2, y1, y2, y3, y4;
+    int xn, x1, x2, y, y1, y2, y3, y4;
     // int yy2, y5; // unused
     int verticalCenter, up, epaisseur;
 
     epaisseur = std::max(2, m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2);
     xn = element->GetDrawingX();
+    y = 99;
+    LogDebug("DrawLigatureNote: drawingX=%d y=%d", xn, y);
 
     /*
      if ((note->m_lig==LIG_MEDIAL) || (note->m_lig==LIG_TERMINAL))
      {
-     CalculateLigaturePosX (element, layer, staff);
+     CalculateLigaturePosX(element, layer, staff);
      }
      else
      */ {
         xn = element->GetDrawingX();
     }
 
-    // calcul des dimensions du rectangle
+    // Compute the dimensions of the rectangle
     x1 = xn - m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
     x2 = xn + m_doc->GetDrawingBrevisWidth(staff->m_drawingStaffSize);
     y1 = y + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     y2 = y - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    y3 = (int)(y1 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2); // partie d'encadrement qui depasse
+    y3 = (int)(y1 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2); // part of the frame that overflows
     y4 = (int)(y2 - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2);
 
-    // if (!note->m_ligObliqua && (!View::s_drawingLigObliqua))	// notes rectangulaires, y c. en ligature
+    // if (!note->m_ligObliqua && (!View::s_drawingLigObliqua))	// rectangular notes, incl. ligature
     {
-        if (note->GetColored() != BOOLEAN_true) { //	double base des carrees
+        if (note->GetColored() != BOOLEAN_true) { //	double the base of squares
             DrawObliquePolygon(dc, x1, y1, x2, y1, -epaisseur);
             DrawObliquePolygon(dc, x1, y2, x2, y2, epaisseur);
         }
         else
-            DrawFullRectangle(dc, x1, y1, x2, y2); // dessine val carree pleine // ENZ correction de x2
+            DrawFullRectangle(dc, x1, y1, x2, y2); //
+        // ENZ correction of x2
 
-        DrawVerticalLine(dc, y3, y4, x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)); // corset lateral
+        DrawVerticalLine(dc, y3, y4, x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)); // lateral brace
         DrawVerticalLine(dc, y3, y4, x2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
     }
     /*
-     else			// traitement des obliques
+     else			// handle obliques
      {
-     if (!View::s_drawingLigObliqua)	// 1e passage: ligne flagStemHeighte initiale
+     if (!View::s_drawingLigObliqua)	// 1st pass: Initial flagStemHeighte
      {
      DrawVerticalLine (dc,y3,y4,x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
      View::s_drawingLigObliqua = true;
      //oblique = OFF;
-     //			if (val == DUR_1)	// queue gauche haut si DUR_1
+     //			if (val == DUR_1)	// left tail up if DUR_1
      //				queue_lig = ON;
      }
-     else	// 2e passage: lignes obl. et flagStemHeighte finale
+     else	// 2nd pass: oblique lines and final flagStemHeighte
      {
-     x1 -=  m_doc->m_drawingBrevisWidth[staff->m_drawingStaffSize] * 2;	// avance auto
+     x1 -=  m_doc->m_drawingBrevisWidth[staff->m_drawingStaffSize] * 2;	// auto advance
 
-     y1 = *View::s_drawingLigY - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);	// ligat_y contient y original
+     y1 = *View::s_drawingLigY - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);	// ligat_y contains original y
      yy2 = y2;
      y5 = y1+ m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize); y2 +=
-     m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);	// on monte d'un
+     m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);            // go up a
      INTERL
 
      if (note->GetColored()==BOOLEAN_true)
@@ -475,21 +493,21 @@ void View::DrawLigature(DeviceContext *dc, int y, LayerElement *element, Layer *
      {	DrawObliquePolygon (dc,  x1,  y1,  x2,  yy2, 5);
      DrawObliquePolygon (dc,  x1,  y5,  x2,  y2, -5);
      }
-     DrawVerticalLine (dc,y3,y4,x2,m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));	//cloture
+     DrawVerticalLine (dc,y3,y4,x2,m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));	// enclosure
      flagStemHeighte
 
      View::s_drawingLigObliqua = false;
-     //			queue_lig = OFF;	//desamorce alg.queue DUR_BR
+     //			queue_lig = OFF;	// ??defuses alg.queue DUR_BR??
 
      }
      }
 
-     if (note->m_lig)	// memoriser positions d'une note a l'autre; relier notes par barres
+     if (note->m_lig)	// remember positions from one note to another; connect notes by bars
      {
-     *(View::s_drawingLigX+1) = x2; *(View::s_drawingLigY+1) = y;	// relie notes ligaturees par barres
+     *(View::s_drawingLigX+1) = x2; *(View::s_drawingLigY+1) = y;	// connect ligature beamed notes by bar
      flagStemHeightes
      //if (in(x1,(*View::s_drawingLigX)-2,(*View::s_drawingLigX)+2) || (this->fligat && this->lat && !Note1::marq_obl))
-     // les dernieres conditions pour permettre ligature flagStemHeighte ancienne
+     // the latest conditions to allow previous ligature flagStemHeighte
      //	DrawVerticalLine (dc, *ligat_y, y1, (this->fligat && this->lat) ? x2: x1, m_doc->m_parameters.m_stemWidth); //
      ax2 - drawing flagStemHeight
      lines missing
@@ -502,24 +520,24 @@ void View::DrawLigature(DeviceContext *dc, int y, LayerElement *element, Layer *
 
      if (note->m_lig)
      {
-     if (note->m_dur == DUR_BR) //  && this->queue_lig)	// queue gauche bas: DUR_BR initiale descendante // ax2 - no
-     support of queue_lig (see WG
+     if (note->m_dur == DUR_BR) //  && this->queue_lig)	// tail left bottom: initial downward DUR_BR // ax2 - no
+     support for queue_lig (see WG
      corrigeLigature)
      {
      DrawVerticalLine (dc, y2, y3, x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
      }
-     else if (note->m_dur == DUR_LG) // && !this->queue_lig) // DUR_LG en ligature, queue droite bas // ax2 - no support
-     of queue_lig
+     else if (note->m_dur == DUR_LG) // && !this->queue_lig) // DUR_LG ligature, tail right down // ax2 - no support
+     for queue_lig
      {
      DrawVerticalLine (dc, y2, y3, x2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
      }
-     else if (note->m_dur == DUR_1) // && this->queue_lig)	// queue gauche haut // ax2 - no support of queue_lig
+     else if (note->m_dur == DUR_1) // && this->queue_lig)	// queue gauche haut // ax2 - no support for queue_lig
      {
      y2 = y1 + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)*6;
      DrawVerticalLine (dc, y1, y2, x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
      }
      }
-     else if (note->m_dur == DUR_LG)		// DUR_LG isolee: queue comme notes normales
+     else if (note->m_dur == DUR_LG)		// isolated DUR_LG: tail like normal notes
      */
     if (note->GetActualDur() == DUR_LG) {
         verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;

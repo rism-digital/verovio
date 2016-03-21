@@ -41,7 +41,6 @@ Ligature::Ligature()
     Reset();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
-    m_drawingLedgerLines.clear();
 }
 
 Ligature::~Ligature()
@@ -64,15 +63,6 @@ void Ligature::Reset()
 
 void Ligature::ClearClusters()
 {
-    std::list<LigatureCluster *>::iterator iter;
-    for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter) {
-        for (std::vector<Note *>::iterator clIter = (*iter)->begin(); clIter != (*iter)->end(); ++clIter) {
-            (*clIter)->m_cluster = NULL;
-            (*clIter)->m_clusterPosition = 0;
-        }
-        delete *iter;
-    }
-    m_clusters.clear();
 }
 
 void Ligature::AddLayerElement(LayerElement *element)
@@ -83,7 +73,7 @@ void Ligature::AddLayerElement(LayerElement *element)
     Modify();
 }
 
-bool compare_pitch(Object *first, Object *second)
+bool compare_pitchL(Object *first, Object *second)
 {
     Note *n1 = dynamic_cast<Note *>(first);
     Note *n2 = dynamic_cast<Note *>(second);
@@ -120,7 +110,7 @@ void Ligature::FilterList(ListOfObjects *childList)
         }
     }
 
-    childList->sort(compare_pitch);
+    childList->sort(compare_pitchL);
 
     iter = childList->begin();
 
@@ -129,7 +119,6 @@ void Ligature::FilterList(ListOfObjects *childList)
     Note *curNote, *lastNote = dynamic_cast<Note *>(*iter);
     assert(lastNote);
     int curPitch, lastPitch = lastNote->GetDiatonicPitch();
-    LigatureCluster *curCluster = NULL;
 
     iter++;
 
@@ -139,16 +128,6 @@ void Ligature::FilterList(ListOfObjects *childList)
         curPitch = curNote->GetDiatonicPitch();
 
         if (curPitch - lastPitch == 1) {
-            if (!lastNote->m_cluster) {
-                curCluster = new LigatureCluster();
-                m_clusters.push_back(curCluster);
-                curCluster->push_back(lastNote);
-                lastNote->m_cluster = curCluster;
-                lastNote->m_clusterPosition = (int)curCluster->size();
-            }
-            curCluster->push_back(curNote);
-            curNote->m_cluster = curCluster;
-            curNote->m_clusterPosition = (int)curCluster->size();
         }
 
         lastNote = curNote;
@@ -160,13 +139,11 @@ void Ligature::FilterList(ListOfObjects *childList)
 
 void Ligature::ResetAccidList()
 {
-    m_accidList.clear();
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
         Note *note = dynamic_cast<Note *>(*it);
         assert(note);
         if (note->m_drawingAccid != NULL) {
-            m_accidList.push_back(note);
         }
     }
 }
@@ -182,30 +159,6 @@ int Ligature::PositionInLigature(Note *note)
     return 1;
 }
 
-void Ligature::GetYExtremes(int *yMax, int *yMin)
-{
-    bool passed = false;
-    int y1;
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = dynamic_cast<Note *>(*it);
-        if (!note) continue;
-        y1 = note->GetDrawingY();
-        if (!passed) {
-            *yMax = y1;
-            *yMin = y1;
-            passed = true;
-        }
-        else {
-            if (y1 > *yMax) {
-                *yMax = y1;
-            }
-            else if (y1 < *yMin) {
-                *yMin = y1;
-            }
-        }
-    }
-}
 
 void Ligature::SetDrawingStemDir(data_STEMDIRECTION stemDir)
 {
@@ -247,7 +200,7 @@ void Ligature::SetDrawingStemEnd(Point stemEnd)
 int Ligature::PrepareTieAttr(ArrayPtrVoid *params)
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
-    ???NO SUCH
+    //???NO SUCH
     // param 1: Ligature** currentLigature for the current ligature if in a ligature
     Ligature **currentLigature = static_cast<Ligature **>((*params).at(1));
 
@@ -260,7 +213,7 @@ int Ligature::PrepareTieAttr(ArrayPtrVoid *params)
 int Ligature::PrepareTieAttrEnd(ArrayPtrVoid *params)
 {
     // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
-    ???NO SUCH
+    //???NO SUCH
     // param 1: Ligature** currentLigature for the current ligature if in a ligature
     Ligature **currentLigature = static_cast<Ligature **>((*params).at(1));
 
