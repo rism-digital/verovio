@@ -89,21 +89,21 @@ downloads:
         console.time("loading");
         try {
             vrvToolkit.loadData(data);
+            
+            if (log) {
+                str = vrvToolkit.getLog();
+                $("#log_p").html( str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, "<br/>") );
+            }
+
+            $("#total_text").html(vrvToolkit.getPageCount());
+            page = 1;
+            load_page();
         }
         catch(err) {
             $('#err').html(err);
             $('#errorDialog').modal();
         }
         console.timeEnd("loading");
-        
-        if (log) {
-            str = vrvToolkit.getLog();
-            $("#log_p").html( str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, "<br/>") );
-        }
-
-        $("#total_text").html(vrvToolkit.getPageCount());
-        page = 1;
-        load_page();
     }
 
     function load_page() {
