@@ -412,6 +412,8 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(staff);
     
     // ??WHAT DO WE NEED TO DO? SMTHG LIKE WHAT DrawChord() DOES?
+    // ANYWAY, TRY TO AVOID PROBLEM IN SetBoundingBoxXShift()...
+    element->DocObject::SetEmptyBB();
 }
 
     
