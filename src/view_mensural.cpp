@@ -17,6 +17,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "layer.h"
+#include "ligature.h"
 #include "mensur.h"
 #include "note.h"
 #include "proport.h"
@@ -411,9 +412,15 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(layer);
     assert(staff);
     
-    // ??WHAT DO WE NEED TO DO? SMTHG LIKE WHAT DrawChord() DOES?
-    // ANYWAY, TRY TO AVOID PROBLEM IN SetBoundingBoxXShift()...
-    element->DocObject::SetEmptyBB();
+    Ligature *ligature = dynamic_cast<Ligature *>(element);
+    assert(ligature);
+    
+    dc->StartGraphic(ligature, "", ligature->GetUuid());
+
+    // Draw children (notes)
+    DrawLayerChildren(dc, ligature, layer, staff, measure);
+    // dc->SetEmptyBB();    ...really shouldn't be needed.
+    dc->EndGraphic(ligature, this);
 }
 
     
