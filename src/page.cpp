@@ -276,9 +276,9 @@ void Page::LayOutVertically()
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
     params.clear();
     int previousStaffHeight = 0;
-    int extraStaffHeight = 0;
+    int previousOverflowBelow = 0;
     params.push_back(&previousStaffHeight);
-    params.push_back(&extraStaffHeight);
+    params.push_back(&previousOverflowBelow);
     params.push_back(doc);
     Functor setAlignmentY(&Object::SetAligmentYPos);
     // Special case: because we redirect the functor, pass it as parameter to itself (!)

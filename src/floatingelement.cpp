@@ -129,6 +129,8 @@ FloatingPositioner::FloatingPositioner(FloatingElement *element) : BoundingBox()
         m_place = STAFFREL_NONE;
     }
     ResetBoundingBox();
+
+    m_drawingYRel = 0;
 };
 
 void FloatingPositioner::ResetBoundingBox()
@@ -227,5 +229,12 @@ int FloatingElement::ResetDrawing(ArrayPtrVoid *params)
     }
     return FUNCTOR_CONTINUE;
 };
+
+int FloatingElement::UnCastOff(ArrayPtrVoid *params)
+{
+    m_currentBoundingBox = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

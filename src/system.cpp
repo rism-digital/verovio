@@ -151,12 +151,12 @@ int System::SetAligmentYPos(ArrayPtrVoid *params)
     // param 2: the doc
     // param 3: the functor to be redirected to SystemAligner
     int *previousStaffHeight = static_cast<int *>((*params).at(0));
-    int *extraStaffHeight = static_cast<int *>((*params).at(1));
+    int *previousOverflowBelow = static_cast<int *>((*params).at(1));
     Doc *doc = static_cast<Doc *>((*params).at(2));
     Functor *setAligmnentPosY = static_cast<Functor *>((*params).at(3));
 
     (*previousStaffHeight) = 0;
-    (*extraStaffHeight) = doc->GetSpacingStaff() * doc->GetDrawingUnit(100);
+    (*previousOverflowBelow) = doc->GetSpacingStaff() * doc->GetDrawingUnit(100);
 
     m_systemAligner.Process(setAligmnentPosY, params);
 
@@ -323,8 +323,7 @@ int System::UnCastOff(ArrayPtrVoid *params)
     // See Object::Relinquish
     currentSystem->MoveChildren(this);
 
-    // No need to go deeper
-    return FUNCTOR_SIBLINGS;
+    return FUNCTOR_CONTINUE;
 }
 
 int System::SetDrawingXY(ArrayPtrVoid *params)

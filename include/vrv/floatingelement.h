@@ -76,7 +76,12 @@ public:
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
     virtual int ResetDrawing(ArrayPtrVoid *params);
-    ///@}
+
+    /**
+     * Undo the cast of the system.
+     * This is used by Doc::ContinuousLayout
+     */
+    virtual int UnCastOff(ArrayPtrVoid *params);
 
 private:
     //

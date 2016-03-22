@@ -551,17 +551,23 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     // param 2: the doc
     // param 3: the functor to be redirected to SystemAligner (unused)
     int *previousStaffHeight = static_cast<int *>((*params).at(0));
-    int *extraStaffHeight = static_cast<int *>((*params).at(1));
+    int *previousOverflowBelow = static_cast<int *>((*params).at(1));
     Doc *doc = static_cast<Doc *>((*params).at(2));
 
-    int maxTopOverlfow = std::max((*extraStaffHeight), m_overflowAbove);
+    // The maximum between the overflow below of the previous staff and the overflow above of the current
+    int maxOverlfowAbove = std::max((*previousOverflowBelow), m_overflowAbove);
 
-    if (m_overlap) maxTopOverlfow += m_overlap;
+    // If we have some overlap, add it
+    if (m_overlap) maxOverlfowAbove += m_overlap;
 
-    SetYShift(-maxTopOverlfow - (*previousStaffHeight));
+    // Is the maximum the overflow (+ overlap) shift, or the default ?
+    int shift = std::max(maxOverlfowAbove, doc->GetSpacingStaff() * doc->GetDrawingUnit(100));
+
+    // Shift, including the previous staff height
+    SetYShift(-shift - (*previousStaffHeight));
 
     (*previousStaffHeight) = m_staffHeight;
-    (*extraStaffHeight) = std::max(m_overflowBelow, doc->GetSpacingStaff() * doc->GetDrawingUnit(100));
+    (*previousOverflowBelow) = m_overflowBelow;
 
     return FUNCTOR_CONTINUE;
 }
