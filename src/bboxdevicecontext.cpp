@@ -293,6 +293,8 @@ void BBoxDeviceContext::StartText(int x, int y, char alignment)
     m_textY = y;
     m_textWidth = 0;
     m_textHeight = 0;
+    m_textAscent = 0;
+    m_textDescent = 0;
     m_alignment = alignment;
 }
 
@@ -312,22 +314,20 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
 {
     assert(m_fontStack.top());
 
-    // unsigned long length = wtext.length();
     TextExtend extend;
     GetTextExtent(wtext, &extend);
     m_textWidth += extend.m_width;
-    m_textHeight = std::max(m_textHeight, extend.m_height);
-    // very approximative, we should use GetTextExtend once implemented
-    // m_textWidth += length * m_fontStack.top()->GetPointSize() / 7;
-    // ignore y bounding boxes for text
-    // m_textHeight = m_fontStack.top()->GetPointSize();
+    // keep that maximum values for ascent and descent
+    m_textAscent = std::max(m_textAscent, extend.m_ascent);
+    m_textDescent = std::max(m_textDescent, extend.m_descent);
+    m_textHeight = m_textAscent + m_textDescent;
     if (m_alignment == RIGHT) {
         m_textX -= extend.m_width;
     }
     else if (m_alignment == CENTER) {
         m_textX -= (extend.m_width / 2);
     }
-    UpdateBB(m_textX, m_textY, m_textX + m_textWidth, m_textY - m_textHeight);
+    UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);
 }
 
 void BBoxDeviceContext::DrawRotatedText(const std::string &text, int x, int y, double angle)

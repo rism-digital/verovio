@@ -133,9 +133,13 @@ void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend
         partial_w /= glyph->GetUnitsPerEm();
         partial_h *= m_fontStack.top()->GetPointSize();
         partial_h /= glyph->GetUnitsPerEm();
+        y *= m_fontStack.top()->GetPointSize();
+        y /= glyph->GetUnitsPerEm();
 
         extend->m_width += partial_w;
         extend->m_height = std::max(partial_h, extend->m_height);
+        extend->m_ascent = std::max(partial_h + y, extend->m_ascent);
+        extend->m_descent = std::max(-y, extend->m_descent);
     }
 }
 

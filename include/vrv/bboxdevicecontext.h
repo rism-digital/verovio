@@ -130,7 +130,7 @@ private:
      * members for keeping track of the text bounding box.
      * Set values are reset in StartText
      */
-    int m_textX, m_textY, m_textWidth, m_textHeight;
+    int m_textX, m_textY, m_textWidth, m_textHeight, m_textAscent, m_textDescent;
     bool m_drawingText;
     char m_alignment;
 
