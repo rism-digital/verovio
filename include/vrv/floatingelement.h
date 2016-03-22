@@ -13,6 +13,7 @@
 namespace vrv {
 
 class FloatingPositioner;
+class StaffAlignment;
 
 //----------------------------------------------------------------------------
 // FloatingElement
@@ -103,6 +104,10 @@ public:
 
     FloatingElement *GetElement() const { return m_element; };
 
+    bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
+
+    data_STAFFREL GetPlace() const { return m_place; };
+
     /**
      * @name Get and set the Y drawing relative position
      */
@@ -119,6 +124,8 @@ protected:
     int m_drawingYRel;
 
     FloatingElement *m_element;
+
+    data_STAFFREL m_place;
 };
 
 } // namespace vrv

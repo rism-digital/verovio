@@ -200,7 +200,8 @@ void View::DrawHairpin(
     // We calculate points for cresc by default. Start/End have to be swapped
     if (form == hairpinLog_FORM_dim) View::SwapY(&startY, &endY);
 
-    int y1 = GetHairpinY(hairpin->GetPlace(), staff);
+    // int y1 = GetHairpinY(hairpin->GetPlace(), staff);
+    int y1 = hairpin->GetDrawingY();
     int y2 = y1;
 
     /************** parent layers **************/
@@ -325,26 +326,14 @@ void View::DrawHairpin(
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(hairpin, "spanning-hairpin", "");
-    dc->DeactivateGraphic();
-    // DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize,
-    // angle);
-    // dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
-    // dc->SetBrush(AxBLACK, AxSOLID);
+    // dc->DeactivateGraphic();
 
     DrawObliquePolygon(
         dc, x1, y1 - startY / 2, x2, y2 - endY / 2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
     DrawObliquePolygon(
         dc, x1, y1 + startY / 2, x2, y2 + endY / 2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
 
-    // dc->DrawLine(
-    //  ToDeviceContextX(x1), ToDeviceContextY(y1 - startY / 2), ToDeviceContextX(x2), ToDeviceContextY(y1 - endY / 2));
-    // dc->DrawLine(
-    //  ToDeviceContextX(x1), ToDeviceContextY(y1 + startY / 2), ToDeviceContextX(x2), ToDeviceContextY(y1 + endY / 2));
-
-    // dc->ResetBrush();
-    // dc->ResetPen();
-
-    dc->ReactivateGraphic();
+    // dc->ReactivateGraphic();
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
@@ -1319,7 +1308,8 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, x, (*staffIter)->GetDrawingY());
 
         // Basic method that use bounding box
-        int y = GetDirY(dir->GetPlace(), *staffIter);
+        int y = dir->GetDrawingY();
+        // int y = GetDirY(dir->GetPlace(), *staffIter);
 
         dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
@@ -1371,8 +1361,6 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, x, (*staffIter)->GetDrawingY());
 
-        // Basic method that use bounding box
-        // int y = GetDynamY(dynam->GetPlace(), *staffIter, true);
         int y = dynam->GetDrawingY();
 
         dynamTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());

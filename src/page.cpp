@@ -255,6 +255,9 @@ void Page::LayOutVertically()
     // Adjust / add bounding boxes for hairpin
     // Adjust / add bounding boxes for dynam
     params.clear();
+    ClassId classId = OBJECT;
+    params.push_back(&classId);
+    params.push_back(doc);
     Functor adjustFloatingBoundingBoxes(&Object::AdjustFloatingBoundingBoxes);
     // Special case: because we redirect the functor, pass it as parameter to itself (!)
     params.push_back(&adjustFloatingBoundingBoxes);

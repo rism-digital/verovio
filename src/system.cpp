@@ -264,9 +264,19 @@ int System::CalcStaffOverlap(ArrayPtrVoid *params)
 
 int System::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
 {
+    // param 0: the classId
+    // param X: the doc (unused)
     // param X: a pointer to the functor for passing it to the system aligner
-    Functor *adjustFloatingBoundingBoxes = static_cast<Functor *>((*params).at(0));
+    ClassId *classId = static_cast<ClassId *>((*params).at(0));
+    Functor *adjustFloatingBoundingBoxes = static_cast<Functor *>((*params).at(2));
 
+    (*classId) = SLUR;
+    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
+    (*classId) = HAIRPIN;
+    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
+    (*classId) = DYNAM;
+    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
+    (*classId) = DIR;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
 
     return FUNCTOR_SIBLINGS;

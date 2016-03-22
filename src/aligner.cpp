@@ -180,11 +180,21 @@ void StaffAlignment::SetVerseCount(int verse_count)
 
 int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
 {
+    if (box->Is() == FLOATING_POSITIONER) {
+        FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
+        assert(positioner);
+        return positioner->GetDrawingY() - positioner->GetDrawingYRel() + positioner->m_contentBB_y2;
+    }
     return box->GetDrawingY() + box->m_contentBB_y2;
 }
 
 int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
 {
+    if (box->Is() == FLOATING_POSITIONER) {
+        FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
+        assert(positioner);
+        return -(positioner->GetDrawingY() - positioner->GetDrawingYRel() + positioner->m_contentBB_y1 + m_staffHeight);
+    }
     return -(box->GetDrawingY() + box->m_contentBB_y1 + m_staffHeight);
 }
 
@@ -483,38 +493,51 @@ int StaffAlignment::CalcStaffOverlap(ArrayPtrVoid *params)
 
 int StaffAlignment::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
 {
+    // param 0: the classId
+    // param X: the doc
     // param X: a pointer to the functor for passing it to the system aligner (unused)
-
-    ClassId classId = DYNAM;
+    ClassId *classId = static_cast<ClassId *>((*params).at(0));
+    Doc *doc = static_cast<Doc *>((*params).at(1));
 
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
-        if ((*iter)->GetElement()->Is() != classId) continue;
+        if ((*iter)->GetElement()->Is() != (*classId)) continue;
 
-        Object *object = (*iter)->GetElement();
-        assert(object);
-        LogDebug("BBox %s - %s", object->GetClassName().c_str(), object->GetUuid().c_str());
-        int overflowAbove = this->CalcOverflowAbove(*iter);
-        int overflowBelow = this->CalcOverflowBelow(*iter);
-        LogDebug("BBox %s - %d %d", object->GetUuid().c_str(), overflowAbove, overflowBelow);
+        if ((*classId) == SLUR) {
+            // for slur we do not need to adjust them, only add them to the overflow boxes if required
+            continue;
+        }
+
+        // This sets the default position (without considering any overflowing box)
+        (*iter)->CalcDrawingYRel(doc, this, NULL);
 
         ArrayOfBoundingBoxes *overflowBoxes = &m_overflowBelowBBoxes;
+        // above?
+        if ((*iter)->GetPlace() == STAFFREL_above) {
+            overflowBoxes = &m_overflowAboveBBoxes;
+        }
         auto i = overflowBoxes->begin();
         auto end = overflowBoxes->end();
         while (i != end) {
-            // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
+            // find all the overflowing elements from the staff that overlap horizonatally
             i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalOverlap(elem); });
             if (i != end) {
-                // calculate the vertical overlap and see if this is more than the expected space
-                int overflowBelow = this->CalcOverflowBelow((*iter));
-                // int overflowAbove = this->CalcOverflowAbove(*i);
-                // int spacing = std::max((*previous)->m_overflowBelow, this->m_overflowAbove);
-                // if (spacing < (overflowBelow + overflowAbove)) {
-                LogDebug("Overlap %d", (overflowBelow));
-                // this->SetOverlap((overflowBelow + overflowAbove) - spacing);
-                //}
+                // update the yRel accordingly
+                (*iter)->CalcDrawingYRel(doc, this, *i);
                 i++;
             }
+        }
+        //  Now update the staffAlignment max overflow (above or below) and add the positioner to the list of
+        //  overflowing elements
+        if ((*iter)->GetPlace() == STAFFREL_above) {
+            int overflowAbove = this->CalcOverflowAbove((*iter));
+            overflowBoxes->push_back((*iter));
+            this->SetOverflowAbove(overflowAbove);
+        }
+        else {
+            int overflowBelow = this->CalcOverflowBelow((*iter));
+            overflowBoxes->push_back((*iter));
+            this->SetOverflowBelow(overflowBelow);
         }
     }
 
