@@ -42,6 +42,7 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height) : Device
     m_userScaleY = 1.0;
 
     m_drawingText = false;
+    m_alignment = LEFT;
 
     SetBrush(AxBLACK, AxSOLID);
     SetPen(AxBLACK, 1, AxSOLID);
@@ -284,7 +285,7 @@ void BBoxDeviceContext::DrawPlaceholder(int x, int y)
     UpdateBB(x, y, x, y);
 }
 
-void BBoxDeviceContext::StartText(int x, int y, char alignement)
+void BBoxDeviceContext::StartText(int x, int y, char alignment)
 {
     assert(!m_drawingText);
     m_drawingText = true;
@@ -292,6 +293,7 @@ void BBoxDeviceContext::StartText(int x, int y, char alignement)
     m_textY = y;
     m_textWidth = 0;
     m_textHeight = 0;
+    m_alignment = alignment;
 }
 
 void BBoxDeviceContext::EndText()
@@ -311,14 +313,20 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
     assert(m_fontStack.top());
 
     // unsigned long length = wtext.length();
-    int w, h;
-    GetTextExtent(wtext, &w, &h);
-    m_textWidth += w;
-    m_textHeight = std::max(m_textHeight, h);
+    TextExtend extend;
+    GetTextExtent(wtext, &extend);
+    m_textWidth += extend.m_width;
+    m_textHeight = std::max(m_textHeight, extend.m_height);
     // very approximative, we should use GetTextExtend once implemented
     // m_textWidth += length * m_fontStack.top()->GetPointSize() / 7;
     // ignore y bounding boxes for text
     // m_textHeight = m_fontStack.top()->GetPointSize();
+    if (m_alignment == RIGHT) {
+        m_textX -= extend.m_width;
+    }
+    else if (m_alignment == CENTER) {
+        m_textX -= (extend.m_width / 2);
+    }
     UpdateBB(m_textX, m_textY, m_textX + m_textWidth, m_textY - m_textHeight);
 }
 

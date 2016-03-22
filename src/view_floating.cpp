@@ -1205,23 +1205,23 @@ void View::DrawSylConnector(
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
     int y = GetSylY(syl, staff);
-    int w, h;
+    TextExtend extend;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
         dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
-        dc->GetTextExtent(syl->GetText(syl), &w, &h);
+        dc->GetTextExtent(syl->GetText(syl), &extend);
         dc->ResetFont();
         // x position of the syl is two units back
-        x1 += w - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else if (spanningType == SPANNING_START) {
         dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
-        dc->GetTextExtent(syl->GetText(syl), &w, &h);
+        dc->GetTextExtent(syl->GetText(syl), &extend);
         dc->ResetFont();
         // idem
-        x1 += w - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {

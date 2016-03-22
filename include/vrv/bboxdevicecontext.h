@@ -132,6 +132,7 @@ private:
      */
     int m_textX, m_textY, m_textWidth, m_textHeight;
     bool m_drawingText;
+    char m_alignment;
 
     /**
      * The array containing the object for which the bounding box needs to be updated

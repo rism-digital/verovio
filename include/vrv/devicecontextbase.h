@@ -174,6 +174,24 @@ public:
 
     Point operator-() const { return Point(-x, -y); }
 };
+    
+// ---------------------------------------------------------------------------
+// TextExtend
+// ---------------------------------------------------------------------------
+
+/**
+ * Simple class for representing text extends
+ */
+
+class TextExtend {
+public:
+    int m_width, m_height, m_bearingX, m_bearingY, m_advX;
+    
+    TextExtend() : m_width(0), m_height(0), m_bearingX(0), m_bearingY(0), m_advX(0) {}
+    
+    // no copy ctor or assignment operator - the defaults are ok
+    
+};
 
 } // namespace vrv
 

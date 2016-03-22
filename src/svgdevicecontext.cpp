@@ -456,15 +456,15 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     // rectChild.append_attribute("fill-opacity") = "0.0"; // for empty rectangles with bounding boxes
 }
 
-void SvgDeviceContext::StartText(int x, int y, char alignement)
+void SvgDeviceContext::StartText(int x, int y, char alignment)
 {
     std::string s;
     std::string anchor;
 
-    if (alignement == RIGHT) {
+    if (alignment == RIGHT) {
         anchor = "end";
     }
-    if (alignement == CENTER) {
+    if (alignment == CENTER) {
         anchor = "middle";
     }
 

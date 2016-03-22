@@ -242,7 +242,7 @@ void View::DrawStaffGrp(
     assert(measure);
     assert(staffGrp);
 
-    int w, h;
+    TextExtend extend;
 
     ListOfObjects *staffDefs = staffGrp->GetList(staffGrp);
     if (staffDefs->empty()) {
@@ -301,7 +301,7 @@ void View::DrawStaffGrp(
             dc->SetBrush(m_currentColour, AxSOLID);
             dc->SetFont(m_doc->GetDrawingLyricFont(100));
 
-            dc->GetTextExtent(label, &w, &h);
+            dc->GetTextExtent(label, &extend);
 
             // keep the widest width for the system
             System *system = dynamic_cast<System *>(measure->GetFirstParent(SYSTEM));
@@ -309,7 +309,7 @@ void View::DrawStaffGrp(
                 LogDebug("Staff or System missing in View::DrawStaffDefLabels");
             }
             else {
-                system->SetDrawingLabelsWidth(w + space);
+                system->SetDrawingLabelsWidth(extend.m_width + space);
             }
 
             dc->StartText(ToDeviceContextX(x_label), ToDeviceContextY(y_label), RIGHT);
@@ -318,8 +318,8 @@ void View::DrawStaffGrp(
 
             // also store in the system the maximum width with abbreviations
             if (!abbreviations && (abbrLabel.length() > 0)) {
-                dc->GetTextExtent(abbrLabel, &w, &h);
-                system->SetDrawingAbbrLabelsWidth(w + space);
+                dc->GetTextExtent(abbrLabel, &extend);
+                system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
             }
 
             dc->ResetFont();
@@ -360,7 +360,7 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
     assert(measure);
     assert(scoreDef);
 
-    int w, h;
+    TextExtend extend;
 
     ListOfObjects *scoreDefChildren = scoreDef->GetList(scoreDef);
     ListOfObjects::iterator iter = scoreDefChildren->begin();
@@ -408,8 +408,8 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
         dc->SetFont(m_doc->GetDrawingLyricFont(100));
 
         // keep the widest width for the system
-        dc->GetTextExtent(label, &w, &h);
-        system->SetDrawingLabelsWidth(w + space);
+        dc->GetTextExtent(label, &extend);
+        system->SetDrawingLabelsWidth(extend.m_width + space);
 
         dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), RIGHT);
         dc->DrawText(label);
@@ -417,8 +417,8 @@ void View::DrawStaffDefLabels(DeviceContext *dc, Measure *measure, ScoreDef *sco
 
         // also store in the system the maximum width with abbreviations for justification
         if (!abbreviations && (abbrLabel.length() > 0)) {
-            dc->GetTextExtent(abbrLabel, &w, &h);
-            system->SetDrawingAbbrLabelsWidth(w + space);
+            dc->GetTextExtent(abbrLabel, &extend);
+            system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
         }
 
         dc->ResetFont();
