@@ -138,6 +138,16 @@ void FloatingPositioner::ResetBoundingBox()
     m_drawingYRel = 0;
 }
 
+void FloatingPositioner::SetDrawingYRel(int drawingYRel)
+{
+    if (m_place == STAFFREL_above) {
+        if (drawingYRel < m_drawingYRel) m_drawingYRel = drawingYRel;
+    }
+    else {
+        if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
+    }
+};
+
 bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
 {
     if (horizOverlapingBBox == NULL) {

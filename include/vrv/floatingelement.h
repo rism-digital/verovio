@@ -113,7 +113,7 @@ public:
      */
     ///@{
     int GetDrawingYRel() const { return m_drawingYRel; };
-    void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; };
+    void SetDrawingYRel(int drawingYRel);
     ///@}
 
 protected:
