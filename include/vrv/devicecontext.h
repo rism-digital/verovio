@@ -49,6 +49,7 @@ public:
         m_isDeactivatedY = false;
     };
     virtual ~DeviceContext(){};
+    virtual ClassId Is() const;
     ///@}
 
     /**

@@ -282,7 +282,7 @@ void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
     pathChild.append_attribute("d")
         = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
               bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
-              bezier2[1].x, bezier2[1].y, bezier2[2].x, bezier2[2].y, bezier2[3].x, bezier2[3].y // Second Bezier
+              bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
               )
               .c_str();
     // pathChild.append_attribute("style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000;

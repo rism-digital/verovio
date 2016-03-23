@@ -32,7 +32,7 @@ static inline double DegToRad(double deg)
 // BBoxDeviceContext
 //----------------------------------------------------------------------------
 
-BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height) : DeviceContext()
+BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned char update) : DeviceContext()
 {
     m_view = view;
     m_width = width;
@@ -42,10 +42,12 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height) : Device
     m_userScaleY = 1.0;
 
     m_drawingText = false;
-    m_alignment = LEFT;
+    m_textAlignment = LEFT;
 
     SetBrush(AxBLACK, AxSOLID);
     SetPen(AxBLACK, 1, AxSOLID);
+
+    m_update = update;
 }
 
 BBoxDeviceContext::~BBoxDeviceContext()
@@ -130,9 +132,10 @@ void BBoxDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]
     int width, height;
 
     ApproximateBezierBoundingBox(bezier1, &pos, &width, &height);
-
     LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
-
+    UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
+    ApproximateBezierBoundingBox(bezier2, &pos, &width, &height);
+    LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
     UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
 
@@ -295,7 +298,7 @@ void BBoxDeviceContext::StartText(int x, int y, char alignment)
     m_textHeight = 0;
     m_textAscent = 0;
     m_textDescent = 0;
-    m_alignment = alignment;
+    m_textAlignment = alignment;
 }
 
 void BBoxDeviceContext::EndText()
@@ -321,10 +324,10 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
     m_textAscent = std::max(m_textAscent, extend.m_ascent);
     m_textDescent = std::max(m_textDescent, extend.m_descent);
     m_textHeight = m_textAscent + m_textDescent;
-    if (m_alignment == RIGHT) {
+    if (m_textAlignment == RIGHT) {
         m_textX -= extend.m_width;
     }
-    else if (m_alignment == CENTER) {
+    else if (m_textAlignment == CENTER) {
         m_textX -= (extend.m_width / 2);
     }
     UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);

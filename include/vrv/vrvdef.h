@@ -43,6 +43,7 @@ namespace vrv {
 enum ClassId {
     BOUNDING_BOX = 0, // Should not be instanciated as is
     OBJECT, // Should not be instanciated as is
+    DEVICE_CONTEXT, // Should not be instanciated as is
     //
     ALIGNMENT,
     CLEF_ATTR,
@@ -132,6 +133,9 @@ enum ClassId {
     REND,
     TEXT,
     TEXT_ELEMENT_max,
+    //
+    BBOX_DEVICE_CONTEXT,
+    SVG_DEVICE_CONTEXT,
     //
     UNSPECIFIED
 };

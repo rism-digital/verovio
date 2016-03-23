@@ -23,6 +23,13 @@ namespace vrv {
 // DeviceContext
 //----------------------------------------------------------------------------
 
+ClassId DeviceContext::Is() const
+{
+    // we should always have the method overridden
+    assert(false);
+    return DEVICE_CONTEXT;
+};
+
 void DeviceContext::SetPen(int colour, int width, int opacity)
 {
     float opacityValue;

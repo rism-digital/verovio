@@ -14,6 +14,10 @@
 
 #include "devicecontext.h"
 
+#define BBOX_BOTH 0
+#define BBOX_HORIZONTAL_ONLY 1
+#define BBOX_VERTICAL_ONLY 2
+
 namespace vrv {
 
 class Object;
@@ -37,8 +41,9 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    BBoxDeviceContext(View *view, int width, int height);
+    BBoxDeviceContext(View *view, int width, int height, unsigned char update = BBOX_BOTH);
     virtual ~BBoxDeviceContext();
+    virtual ClassId Is() const { return BBOX_DEVICE_CONTEXT; };
     ///@}
 
     /**
@@ -122,9 +127,14 @@ public:
     virtual void EndPage();
     ///@}
 
+    bool UpdateHorizontalValues() { return (m_update != BBOX_VERTICAL_ONLY); }
+    bool UpdateVerticalValues() { return (m_update != BBOX_HORIZONTAL_ONLY); }
+
 private:
     int m_width, m_height;
     double m_userScaleX, m_userScaleY;
+
+    unsigned char m_update;
 
     /**
      * members for keeping track of the text bounding box.
@@ -132,7 +142,7 @@ private:
      */
     int m_textX, m_textY, m_textWidth, m_textHeight, m_textAscent, m_textDescent;
     bool m_drawingText;
-    char m_alignment;
+    char m_textAlignment;
 
     /**
      * The array containing the object for which the bounding box needs to be updated

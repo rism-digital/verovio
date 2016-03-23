@@ -81,6 +81,14 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     assert(element);
     assert(system);
 
+    if (dc->Is() == BBOX_DEVICE_CONTEXT) {
+        BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
+        assert(bBoxDC);
+        if (!bBoxDC->UpdateVerticalValues()) {
+            if ((element->Is() == SLUR) || (element->Is() == HAIRPIN) || (element->Is() == TIE)) return;
+        }
+    }
+
     TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
 
@@ -615,9 +623,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     points[0] = Point(x1, y1);
     points[1] = Point(x2, y2);
 
-    float angle = 0.0;
-    // We do not want to adjust the position when calculating bounding boxes (at least for now)
-    if (dynamic_cast<BBoxDeviceContext *>(dc) == NULL) angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
+    float angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
 
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR;
 

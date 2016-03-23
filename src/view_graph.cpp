@@ -220,9 +220,9 @@ void View::DrawThickBezierCurve(
     }
 
     // second bez. goes back
-    bez2[1] = ToDeviceContext(c2Rotated);
-    bez2[2] = ToDeviceContext(c1Rotated);
-    bez2[3] = ToDeviceContext(p1);
+    bez2[1] = ToDeviceContext(c1Rotated);
+    bez2[2] = ToDeviceContext(c2Rotated);
+    bez2[3] = ToDeviceContext(p2);
 
     // Actually draw it
     dc->SetPen(m_currentColour, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), AxSOLID);

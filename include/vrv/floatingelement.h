@@ -114,7 +114,7 @@ public:
 
     data_STAFFREL GetDrawingPlace() const { return m_place; };
 
-    void UpdateSlurPosition(Point points, float angle);
+    void UpdateSlurPosition(Point points[], float angle);
 
     /**
      * @name Get and set the Y drawing relative position
