@@ -653,7 +653,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         if (object->IsFloatingElement()) {
             FloatingElement *floatingElement = dynamic_cast<FloatingElement *>(object);
             assert(floatingElement);
-            box = floatingElement->GetCurrentBoundingBox();
+            box = floatingElement->GetCurrentFloatingPositioner();
             // No bounding box found, ignore the object - this happens when the @staff is missing because the element is
             // never drawn but there is still a EndGraphic call.
             if (!box) return;

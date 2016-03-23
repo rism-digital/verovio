@@ -364,7 +364,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     Chord *startChord = NULL;
     Chord *endChord = NULL;
 
-    bool up = true;
+    curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
     data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
@@ -449,32 +449,34 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     // first should be the tie @curvedir
     if (slur->HasCurvedir()) {
-        up = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? true : false;
+        drawingCurveDir
+            = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
+        drawingCurveDir
+            = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
     else if (startParentChord) {
         if (startParentChord->PositionInChord(startNote) < 0) {
-            up = false;
+            drawingCurveDir = curvature_CURVEDIR_below;
         }
         else if (startParentChord->PositionInChord(startNote) > 0) {
-            up = true;
+            drawingCurveDir = curvature_CURVEDIR_above;
         }
         // away from the stem if odd number (center note)
         else {
-            up = (stemDir != STEMDIRECTION_up);
+            drawingCurveDir = (stemDir != STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
         }
     }
     else if (stemDir == STEMDIRECTION_up) {
-        up = false;
+        drawingCurveDir = curvature_CURVEDIR_below;
     }
     else if (stemDir == STEMDIRECTION_NONE) {
         // no information from the note stem directions, look at the position in the notes
         int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-        up = (start->GetDrawingY() > center) ? true : false;
+        drawingCurveDir = (start->GetDrawingY() > center) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
 
     /************** adjusting y position **************/
@@ -492,7 +494,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             startChord->GetYExtremes(&yChordMax, &yChordMin);
         }
         // slur is up
-        if (up) {
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
             // P(^)
             if (startStemDir == STEMDIRECTION_down) y1 = start->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             //  d(^)d
@@ -538,7 +540,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         }
         // get the stem direction of the end
         // slur is up
-        if (up) {
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
             // (^)P
             if (endStemDir == STEMDIRECTION_down) y2 = end->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             // d(^)d
@@ -575,25 +577,25 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     // Positions not attached to a note
     if (spanningType == SPANNING_START) {
-        if (up)
+        if (drawingCurveDir == curvature_CURVEDIR_above)
             y2 = std::max(staff->GetDrawingY(), y1);
         else
             y2 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
     }
     if (end->Is() == TIMESTAMP_ATTR) {
-        if (up)
+        if (drawingCurveDir == curvature_CURVEDIR_above)
             y2 = std::max(staff->GetDrawingY(), y1);
         else
             y2 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
     }
     if (spanningType == SPANNING_END) {
-        if (up)
+        if (drawingCurveDir == curvature_CURVEDIR_above)
             y1 = std::max(staff->GetDrawingY(), y2);
         else
             y1 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
     }
     if (start->Is() == TIMESTAMP_ATTR) {
-        if (up)
+        if (drawingCurveDir == curvature_CURVEDIR_above)
             y1 = std::max(staff->GetDrawingY(), y2);
         else
             y1 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
@@ -601,7 +603,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     // slur accross an entire system; use the staff position
     else if (spanningType == SPANNING_MIDDLE) {
         // To be adjusted
-        if (up)
+        if (drawingCurveDir == curvature_CURVEDIR_above)
             y1 = staff->GetDrawingY();
         else
             y1 = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
@@ -610,7 +612,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     /************** y position **************/
 
-    if (up) {
+    if (drawingCurveDir == curvature_CURVEDIR_above) {
         y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
@@ -623,9 +625,12 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     points[0] = Point(x1, y1);
     points[1] = Point(x2, y2);
 
-    float angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
+    float angle = AdjustSlur(slur, staff, layer1->GetN(), drawingCurveDir, points);
 
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITON_FACTOR;
+
+    assert(slur->GetCurrentFloatingPositioner());
+    slur->GetCurrentFloatingPositioner()->UpdateSlurPosition(points, angle, thickness, drawingCurveDir);
 
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
@@ -640,7 +645,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         dc->EndGraphic(slur, this);
 }
 
-float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point points[])
+float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[])
 {
     // For readability makes them p1 and p2
     Point *p1 = &points[0];
@@ -648,7 +653,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
 
     /************** angle **************/
 
-    float slurAngle = GetAdjustedSlurAngle(p1, p2, up);
+    float slurAngle = GetAdjustedSlurAngle(p1, p2, curveDir);
 
     Point rotatedP2 = View::CalcPositionAfterRotation(*p2, -slurAngle, *p1);
     // LogDebug("P1 %d %d, P2 %d %d, Angle %f, Pres %d %d", x1, y1, x2, y2, slurAnge, rotadedP2.x, rotatedP2.y);
@@ -675,7 +680,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
     /************** control points **************/
 
     Point rotatedC1, rotatedC2;
-    GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, height, staff->m_drawingStaffSize);
+    GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, height, staff->m_drawingStaffSize);
 
     /************** content **************/
 
@@ -710,7 +715,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
         spanningContentPoints.push_back(std::make_pair((*it), p));
     }
 
-    GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, up, staff->m_drawingStaffSize);
+    GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
 
     // We need to keep the original control points
     Point adjustedRotatedC1 = rotatedC1;
@@ -718,16 +723,16 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
 
     if (!spanningContentPoints.empty()) {
         AdjustSlurCurve(
-            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, slurAngle);
+            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, curveDir, slurAngle);
         // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
-        AdjustSlurPosition(
-            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, &slurAngle, true);
+        AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2,
+            curveDir, &slurAngle, true);
         // Now readjust the curvature with the new p1 and p2 with the original control points
-        GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, height, staff->m_drawingStaffSize);
+        GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, height, staff->m_drawingStaffSize);
 
-        GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, up, staff->m_drawingStaffSize);
+        GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
         int maxHeight = AdjustSlurCurve(
-            slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, slurAngle, false);
+            slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, slurAngle, false);
 
         if (maxHeight) {
             // Something went wrong since now all spanning points should be gone...
@@ -736,8 +741,8 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
             // Use the normal control points for adjusting the position (p1, p2 and angle will be updated)
             // Move it and force both sides to move
             AdjustSlurPosition(
-                slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, &slurAngle, true);
-            GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, maxHeight, staff->m_drawingStaffSize);
+                slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, true);
+            GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, maxHeight, staff->m_drawingStaffSize);
         }
     }
     else {
@@ -752,7 +757,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
     return slurAngle;
 }
 
-float View::GetAdjustedSlurAngle(Point *p1, Point *p2, bool up)
+float View::GetAdjustedSlurAngle(Point *p1, Point *p2, curvature_CURVEDIR curveDir)
 {
     float slurAngle = atan2(p2->y - p1->y, p2->x - p1->x);
 
@@ -760,14 +765,14 @@ float View::GetAdjustedSlurAngle(Point *p1, Point *p2, bool up)
     if (fabs(slurAngle) > TEMP_STYLE_SLUR_MAX_SLOPE) {
         int side = (p2->x - p1->x) * sin(TEMP_STYLE_SLUR_MAX_SLOPE) / sin(M_PI / 2 - TEMP_STYLE_SLUR_MAX_SLOPE);
         if (p2->y > p1->y) {
-            if (up)
+            if (curveDir == curvature_CURVEDIR_above)
                 p1->y = p2->y - side;
             else
                 p2->y = p1->y + side;
             slurAngle = TEMP_STYLE_SLUR_MAX_SLOPE;
         }
         else {
-            if (up)
+            if (curveDir == curvature_CURVEDIR_above)
                 p2->y = p1->y - side;
             else
                 p1->y = p2->y + side;
@@ -778,14 +783,15 @@ float View::GetAdjustedSlurAngle(Point *p1, Point *p2, bool up)
     return slurAngle;
 }
 
-void View::GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up, int height, int staffSize)
+void View::GetControlPoints(
+    Point *p1, Point *p2, Point *c1, Point *c2, curvature_CURVEDIR curveDir, int height, int staffSize)
 {
     // Set the x position of the control points
     int cPos = std::min((p2->x - p1->x) / TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR, m_doc->GetDrawingStaffSize(staffSize));
     c1->x = p1->x + cPos;
     c2->x = p2->x - cPos;
 
-    if (up) {
+    if (curveDir == curvature_CURVEDIR_above) {
         c1->y = p1->y + height;
         c2->y = p2->y + height;
     }
@@ -796,12 +802,12 @@ void View::GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up,
 }
 
 void View::GetSpanningPointPositions(
-    ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize)
+    ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, curvature_CURVEDIR curveDir, int staffSize)
 {
     ArrayOfLayerElementPointPairs::iterator itPoint;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); itPoint++) {
         Point p;
-        if (up) {
+        if (curveDir == curvature_CURVEDIR_above) {
             p.y = itPoint->first->GetDrawingTop(m_doc, staffSize);
         }
         else {
@@ -813,7 +819,7 @@ void View::GetSpanningPointPositions(
         // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
         itPoint->second = View::CalcPositionAfterRotation(p, -angle, p1);
         // This would add it after
-        if (up) {
+        if (curveDir == curvature_CURVEDIR_above) {
             itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 2;
         }
         else {
@@ -823,7 +829,7 @@ void View::GetSpanningPointPositions(
 }
 
 int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
-    Point *c2, bool up, float angle, bool posRatio)
+    Point *c2, curvature_CURVEDIR curveDir, float angle, bool posRatio)
 {
     Point bezier[4];
     bezier[0] = *p1;
@@ -865,7 +871,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
             }
 
             // Keep the maximum desired ratio
-            if (up) {
+            if (curveDir == curvature_CURVEDIR_above) {
                 if (y < itPoint->second.y) {
                     float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y) * posXRatio;
                     maxRatio = ratio > maxRatio ? ratio : maxRatio;
@@ -897,7 +903,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
         }
 
         if (maxRatio > 1.0) {
-            if (up) {
+            if (curveDir == curvature_CURVEDIR_above) {
                 c1->y = p1->y + currentHeight * maxRatio;
                 c2->y = c1->y;
             }
@@ -936,7 +942,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 }
 
 void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2,
-    Point *c1, Point *c2, bool up, float *angle, bool forceBothSides)
+    Point *c1, Point *c2, curvature_CURVEDIR curveDir, float *angle, bool forceBothSides)
 {
     Point bezier[4];
     bezier[0] = *p1;
@@ -970,7 +976,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
 
         shift = 0;
         // Keep the maximum shift on the left and right
-        if (up) {
+        if (curveDir == curvature_CURVEDIR_above) {
             if (y < itPoint->second.y) {
                 shift = (itPoint->second.y - p1->y) - (y - p1->y);
             }
@@ -999,7 +1005,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
     // Unrotated the slur
     *p2 = View::CalcPositionAfterRotation(*p2, (*angle), *p1);
 
-    if (up) {
+    if (curveDir == curvature_CURVEDIR_above) {
         p1->y += maxShiftLeft;
         p2->y += maxShiftRight;
     }
@@ -1008,7 +1014,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
         p2->y -= maxShiftRight;
     }
 
-    *angle = GetAdjustedSlurAngle(p1, p2, up);
+    *angle = GetAdjustedSlurAngle(p1, p2, curveDir);
     *p2 = View::CalcPositionAfterRotation(*p2, -(*angle), *p1);
 }
 
@@ -1022,7 +1028,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     Note *note2 = NULL;
     Chord *parentChord1 = NULL;
 
-    bool up = true;
+    curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
     int y1, y2;
 
@@ -1098,37 +1104,39 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 
     // first should be the tie @curvedir
     if (tie->HasCurvedir()) {
-        up = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? true : false;
+        drawingCurveDir
+            = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
+        drawingCurveDir
+            = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
     else if (parentChord1) {
         if (parentChord1->PositionInChord(note1) < 0) {
-            up = false;
+            drawingCurveDir = curvature_CURVEDIR_below;
         }
         else if (parentChord1->PositionInChord(note1) > 0) {
-            up = true;
+            drawingCurveDir = curvature_CURVEDIR_above;
         }
         // away from the stem if odd number (center note)
         else {
-            up = (noteStemDir != STEMDIRECTION_up);
+            drawingCurveDir = (noteStemDir != STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
         }
     }
     else if (noteStemDir == STEMDIRECTION_up) {
-        up = false;
+        drawingCurveDir = curvature_CURVEDIR_below;
     }
     else if (noteStemDir == STEMDIRECTION_NONE) {
         // no information from the note stem directions, look at the position in the notes
         int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-        up = (y1 > center) ? true : false;
+        drawingCurveDir = (y1 > center) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
 
     /************** y position **************/
 
-    if (up) {
+    if (drawingCurveDir == curvature_CURVEDIR_above) {
         y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         if (isShortTie) {
@@ -1170,7 +1178,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     c1.x = x1 + (x2 - x1) / 4; // point at 1/4
     c2.x = x1 + (x2 - x1) / 4 * 3; // point at 3/4
 
-    if (up) {
+    if (drawingCurveDir == curvature_CURVEDIR_above) {
         c1.y = y1 + height;
         c2.y = y2 + height;
     }

@@ -148,7 +148,7 @@ void Page::LayOutHorizontally()
 
     // Render it for filling the bounding box
     View view;
-    BBoxDeviceContext bBoxDC(&view, 0, 0);
+    BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     view.SetDoc(doc);
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);

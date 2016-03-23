@@ -52,7 +52,7 @@ public:
     ///@}
 
     void SetCurrentFloatingPositioner(FloatingPositioner *boundingBox);
-    FloatingPositioner *GetCurrentBoundingBox() { return m_currentPositioner; };
+    FloatingPositioner *GetCurrentFloatingPositioner() { return m_currentPositioner; };
 
     //----------//
     // Functors //
@@ -114,7 +114,7 @@ public:
 
     data_STAFFREL GetDrawingPlace() const { return m_place; };
 
-    void UpdateSlurPosition(Point points[], float angle);
+    void UpdateSlurPosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
     /**
      * @name Get and set the Y drawing relative position
@@ -137,6 +137,8 @@ protected:
 
     Point m_slurPoints[4];
     float m_slurAngle;
+    int m_slurThickness;
+    curvature_CURVEDIR m_slurDir;
 };
 
 } // namespace vrv

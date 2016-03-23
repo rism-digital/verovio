@@ -136,6 +136,20 @@ void FloatingPositioner::ResetPositioner()
     m_slurPoints[2] = Point(0, 0);
     m_slurPoints[3] = Point(0, 0);
     m_slurAngle = 0.0;
+    m_slurThickness = 0;
+    m_slurDir = curvature_CURVEDIR_NONE;
+}
+
+void FloatingPositioner::UpdateSlurPosition(
+    const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir)
+{
+    m_slurPoints[0] = points[0];
+    m_slurPoints[1] = points[1];
+    m_slurPoints[2] = points[2];
+    m_slurPoints[3] = points[3];
+    m_slurAngle = angle;
+    m_slurThickness = thickness;
+    m_slurDir = curveDir;
 }
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)

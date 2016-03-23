@@ -392,15 +392,16 @@ private:
     /**
      * @name Internal methods used for calculating slurs
      */
-    float AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point points[]);
+    float AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[]);
     int AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
-        Point *c2, bool up, float angle, bool posRatio = true);
+        Point *c2, curvature_CURVEDIR curveDir, float angle, bool posRatio = true);
     void AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
-        Point *c2, bool up, float *angle, bool forceBothSides);
-    float GetAdjustedSlurAngle(Point *p1, Point *p2, bool up);
-    void GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up, int height, int staffSize);
-    void GetSpanningPointPositions(
-        ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize);
+        Point *c2, curvature_CURVEDIR curveDir, float *angle, bool forceBothSides);
+    float GetAdjustedSlurAngle(Point *p1, Point *p2, curvature_CURVEDIR curveDir);
+    void GetControlPoints(
+        Point *p1, Point *p2, Point *c1, Point *c2, curvature_CURVEDIR curveDir, int height, int staffSize);
+    void GetSpanningPointPositions(ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle,
+        curvature_CURVEDIR curveDir, int staffSize);
     ///@}
 
     /**
