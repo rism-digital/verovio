@@ -513,7 +513,7 @@ int StaffAlignment::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
 
         ArrayOfBoundingBoxes *overflowBoxes = &m_overflowBelowBBoxes;
         // above?
-        if ((*iter)->GetPlace() == STAFFREL_above) {
+        if ((*iter)->GetDrawingPlace() == STAFFREL_above) {
             overflowBoxes = &m_overflowAboveBBoxes;
         }
         auto i = overflowBoxes->begin();
@@ -529,7 +529,7 @@ int StaffAlignment::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
         }
         //  Now update the staffAlignment max overflow (above or below) and add the positioner to the list of
         //  overflowing elements
-        if ((*iter)->GetPlace() == STAFFREL_above) {
+        if ((*iter)->GetDrawingPlace() == STAFFREL_above) {
             int overflowAbove = this->CalcOverflowAbove((*iter));
             overflowBoxes->push_back((*iter));
             this->SetOverflowAbove(overflowAbove);

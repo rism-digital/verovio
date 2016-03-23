@@ -276,6 +276,8 @@ int System::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     (*classId) = DYNAM;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
+    (*classId) = TEMPO;
+    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     (*classId) = DIR;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
 

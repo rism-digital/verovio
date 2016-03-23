@@ -35,7 +35,7 @@ FloatingElement::FloatingElement(std::string classid) : Object(classid)
 {
     Reset();
 
-    m_currentBoundingBox = NULL;
+    m_currentPositioner = NULL;
 }
 
 FloatingElement::~FloatingElement()
@@ -49,30 +49,26 @@ void FloatingElement::Reset()
 
 void FloatingElement::UpdateContentBBoxX(int x1, int x2)
 {
-    // assert(m_currentBoundingBox);
-    if (!m_currentBoundingBox) return;
-    m_currentBoundingBox->BoundingBox::UpdateContentBBoxX(x1, x2);
+    if (!m_currentPositioner) return;
+    m_currentPositioner->BoundingBox::UpdateContentBBoxX(x1, x2);
 }
 
 void FloatingElement::UpdateContentBBoxY(int y1, int y2)
 {
-    // assert(m_currentBoundingBox);
-    if (!m_currentBoundingBox) return;
-    m_currentBoundingBox->BoundingBox::UpdateContentBBoxY(y1, y2);
+    if (!m_currentPositioner) return;
+    m_currentPositioner->BoundingBox::UpdateContentBBoxY(y1, y2);
 }
 
 void FloatingElement::UpdateSelfBBoxX(int x1, int x2)
 {
-    // assert(m_currentBoundingBox);
-    if (!m_currentBoundingBox) return;
-    m_currentBoundingBox->BoundingBox::UpdateSelfBBoxX(x1, x2);
+    if (!m_currentPositioner) return;
+    m_currentPositioner->BoundingBox::UpdateSelfBBoxX(x1, x2);
 }
 
 void FloatingElement::UpdateSelfBBoxY(int y1, int y2)
 {
-    // assert(m_currentBoundingBox);
-    if (!m_currentBoundingBox) return;
-    m_currentBoundingBox->BoundingBox::UpdateSelfBBoxY(y1, y2);
+    if (!m_currentPositioner) return;
+    m_currentPositioner->BoundingBox::UpdateSelfBBoxY(y1, y2);
 }
 
 int FloatingElement::GetDrawingX() const
@@ -82,14 +78,13 @@ int FloatingElement::GetDrawingX() const
 
 int FloatingElement::GetDrawingY() const
 {
-    // assert(m_currentBoundingBox);
-    if (!m_currentBoundingBox) return 0;
-    return m_currentBoundingBox->GetDrawingY() - m_currentBoundingBox->GetDrawingYRel();
+    if (!m_currentPositioner) return 0;
+    return m_currentPositioner->GetDrawingY() - m_currentPositioner->GetDrawingYRel();
 }
 
 void FloatingElement::SetCurrentFloatingPositioner(FloatingPositioner *boundingBox)
 {
-    m_currentBoundingBox = boundingBox;
+    m_currentPositioner = boundingBox;
 }
 
 //----------------------------------------------------------------------------
@@ -128,16 +123,19 @@ FloatingPositioner::FloatingPositioner(FloatingElement *element) : BoundingBox()
     else {
         m_place = STAFFREL_NONE;
     }
-    ResetBoundingBox();
-
-    m_drawingYRel = 0;
+    ResetPositioner();
 };
 
-void FloatingPositioner::ResetBoundingBox()
+void FloatingPositioner::ResetPositioner()
 {
     BoundingBox::ResetBoundingBox();
 
     m_drawingYRel = 0;
+    m_slurPoints[0] = Point(0, 0);
+    m_slurPoints[1] = Point(0, 0);
+    m_slurPoints[2] = Point(0, 0);
+    m_slurPoints[3] = Point(0, 0);
+    m_slurAngle = 0.0;
 }
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)
@@ -220,7 +218,7 @@ int FloatingElement::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
 
 int FloatingElement::ResetDrawing(ArrayPtrVoid *params)
 {
-    m_currentBoundingBox = NULL;
+    m_currentPositioner = NULL;
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
@@ -232,7 +230,7 @@ int FloatingElement::ResetDrawing(ArrayPtrVoid *params)
 
 int FloatingElement::UnCastOff(ArrayPtrVoid *params)
 {
-    m_currentBoundingBox = NULL;
+    m_currentPositioner = NULL;
 
     return FUNCTOR_CONTINUE;
 }

@@ -1429,7 +1429,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         tempoTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
         // Basic method that use bounding box
-        int y = GetTempoY(tempo->GetPlace(), *staffIter);
+        int y = tempo->GetDrawingY();
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);

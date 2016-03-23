@@ -8,6 +8,7 @@
 #ifndef __VRV_FLOATING_ELEMENT_H__
 #define __VRV_FLOATING_ELEMENT_H__
 
+#include "devicecontextbase.h"
 #include "object.h"
 
 namespace vrv {
@@ -51,7 +52,7 @@ public:
     ///@}
 
     void SetCurrentFloatingPositioner(FloatingPositioner *boundingBox);
-    FloatingPositioner *GetCurrentBoundingBox() { return m_currentBoundingBox; };
+    FloatingPositioner *GetCurrentBoundingBox() { return m_currentPositioner; };
 
     //----------//
     // Functors //
@@ -88,7 +89,7 @@ private:
 public:
     //
 private:
-    FloatingPositioner *m_currentBoundingBox;
+    FloatingPositioner *m_currentPositioner;
 };
 
 //----------------------------------------------------------------------------
@@ -105,13 +106,15 @@ public:
     virtual ~FloatingPositioner(){};
     virtual ClassId Is() const { return FLOATING_POSITIONER; };
 
-    virtual void ResetBoundingBox();
+    virtual void ResetPositioner();
 
     FloatingElement *GetElement() const { return m_element; };
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
 
-    data_STAFFREL GetPlace() const { return m_place; };
+    data_STAFFREL GetDrawingPlace() const { return m_place; };
+
+    void UpdateSlurPosition(Point points, float angle);
 
     /**
      * @name Get and set the Y drawing relative position
@@ -131,6 +134,9 @@ protected:
     FloatingElement *m_element;
 
     data_STAFFREL m_place;
+
+    Point m_slurPoints[4];
+    float m_slurAngle;
 };
 
 } // namespace vrv
