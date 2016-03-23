@@ -505,6 +505,21 @@ int StaffAlignment::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
 
         if ((*classId) == SLUR) {
             // for slur we do not need to adjust them, only add them to the overflow boxes if required
+            int staffSize = m_staff ? m_staff->m_drawingStaffSize : 100;
+
+            int overflowAbove = this->CalcOverflowAbove((*iter));
+            if (overflowAbove > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+                // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+                this->SetOverflowAbove(overflowAbove);
+                this->m_overflowAboveBBoxes.push_back((*iter));
+            }
+
+            int overflowBelow = this->CalcOverflowBelow((*iter));
+            if (overflowBelow > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+                // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+                this->SetOverflowBelow(overflowBelow);
+                this->m_overflowBelowBBoxes.push_back((*iter));
+            }
             continue;
         }
 
