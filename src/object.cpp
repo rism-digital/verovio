@@ -1231,6 +1231,11 @@ int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
         return FUNCTOR_CONTINUE;
     }
 
+    if (this->Is() == SYL) {
+        // We don't want to add the syl to the overflow since lyrics require a full line anyway
+        return FUNCTOR_CONTINUE;
+    }
+
     LayerElement *current = dynamic_cast<LayerElement *>(this);
     assert(current);
 

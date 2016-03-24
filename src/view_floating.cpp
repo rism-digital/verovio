@@ -1459,16 +1459,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     dc->EndGraphic(tempo, this);
 }
 
-int View::GetDirY(data_STAFFREL place, Staff *staff)
-{
-    assert(staff);
-
-    if (!staff->GetAlignment()) return staff->GetDrawingY();
-
-    // For now we use the same Y / baseline as dynam
-    return this->GetDynamY(place, staff, true);
-}
-
+/*
 int View::GetDynamY(data_STAFFREL place, Staff *staff, bool baseline)
 {
     assert(staff);
@@ -1502,7 +1493,9 @@ int View::GetDynamY(data_STAFFREL place, Staff *staff, bool baseline)
     }
     return y;
 }
+*/
 
+/*
 int View::GetHairpinY(data_STAFFREL place, Staff *staff)
 {
     assert(staff);
@@ -1524,17 +1517,6 @@ int View::GetHairpinY(data_STAFFREL place, Staff *staff)
     }
     return y;
 }
-
-int View::GetTempoY(data_STAFFREL place, Staff *staff)
-{
-    assert(staff);
-
-    if (!staff->GetAlignment()) return staff->GetDrawingY();
-
-    // Temporary basic method for positionning tempo elements
-    int y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    y += staff->m_contentBB_y2;
-    return y;
-}
+*/
 
 } // namespace vrv

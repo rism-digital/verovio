@@ -147,7 +147,7 @@ namespace vrv {
 #define TEMP_STYLE_ACCID_EDIT_SPACE 3.5 * PARAM_DENOMINATOR
 
 // the space between each lyric line in units
-#define TEMP_STYLE_LYIRC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
+#define TEMP_STYLE_LYIRC_LINE_SPACE 4.0 * PARAM_DENOMINATOR
 
 // the key signature spacing factor
 #define TEMP_STYLE_KEYSIG_STEP 1.3

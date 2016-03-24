@@ -68,9 +68,9 @@ public:
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
      */
     ///@{
-    int GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize) const;
-    int GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize) const;
-    int GetGlyphDescender(wchar_t smuflCode, int staffSize, bool graceSize) const;
+    int GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const;
+    int GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const;
+    int GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const;
     int GetDrawingUnit(int staffSize) const;
     int GetDrawingDoubleUnit(int staffSize) const;
     int GetDrawingStaffSize(int staffSize) const;
@@ -86,6 +86,16 @@ public:
     int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const;
     int GetDrawingLedgerLineLength(int staffSize, bool graceSize) const;
     int GetGraceSize(int value) const;
+    ///@}
+
+    /**
+     * @name Get the height or width for a text glyph taking into account the grace size.
+     * The staff size must already be taken into account in the FontInfo
+     */
+    ///@{
+    int GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const;
+    int GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const;
+    int GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const;
     ///@}
 
     /**

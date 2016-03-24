@@ -141,6 +141,7 @@ public:
 
     /**
      * @name Setter and getter for above or below dir/dynam/hairpin
+     * Currently unused
      */
     ///@{
     void SetDirAbove() { m_dirAbove = true; };

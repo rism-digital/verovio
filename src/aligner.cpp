@@ -499,13 +499,27 @@ int StaffAlignment::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
     ClassId *classId = static_cast<ClassId *>((*params).at(0));
     Doc *doc = static_cast<Doc *>((*params).at(1));
 
+    // for slur we do not need to adjust them, only add them to the overflow boxes if required
+    int staffSize = m_staff ? m_staff->m_drawingStaffSize : 100;
+
+    if ((*classId) == SYL) {
+        if (this->GetVerseCount() > 0) {
+            FontInfo *lyricFont = doc->GetDrawingLyricFont(m_staff->m_drawingStaffSize);
+            int descender = doc->GetTextGlyphDescender(L'g', lyricFont, false);
+            int height = doc->GetTextGlyphHeight(L'M', lyricFont, false);
+            this->SetOverflowBelow(this->m_overflowBelow + this->GetVerseCount() * (height - descender));
+            // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep them
+            // and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
+            m_overflowBelowBBoxes.clear();
+        }
+        return FUNCTOR_SIBLINGS;
+    }
+
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
         if ((*iter)->GetElement()->Is() != (*classId)) continue;
 
         if ((*classId) == SLUR) {
-            // for slur we do not need to adjust them, only add them to the overflow boxes if required
-            int staffSize = m_staff ? m_staff->m_drawingStaffSize : 100;
 
             int overflowAbove = this->CalcOverflowAbove((*iter));
             if (overflowAbove > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
@@ -563,17 +577,25 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
 {
     // param 0: the previous staff height
     // param 1: the extra staff height
-    // param 2: the doc
-    // param 3: the functor to be redirected to SystemAligner (unused)
+    // param 2  the previous verse count
+    // param 3: the doc
+    // param 4: the functor to be redirected to SystemAligner (unused)
     int *previousStaffHeight = static_cast<int *>((*params).at(0));
     int *previousOverflowBelow = static_cast<int *>((*params).at(1));
-    Doc *doc = static_cast<Doc *>((*params).at(2));
+    int *previousVerseCount = static_cast<int *>((*params).at(2));
+    Doc *doc = static_cast<Doc *>((*params).at(3));
 
-    // The maximum between the overflow below of the previous staff and the overflow above of the current
-    int maxOverlfowAbove = std::max((*previousOverflowBelow), m_overflowAbove);
+    int maxOverlfowAbove;
+    if ((*previousVerseCount) > 0) {
+        maxOverlfowAbove = (*previousOverflowBelow) + m_overflowAbove;
+    }
+    else {
+        // The maximum between the overflow below of the previous staff and the overflow above of the current
+        maxOverlfowAbove = std::max((*previousOverflowBelow), m_overflowAbove);
 
-    // If we have some overlap, add it
-    if (m_overlap) maxOverlfowAbove += m_overlap;
+        // If we have some overlap, add it
+        if (m_overlap) maxOverlfowAbove += m_overlap;
+    }
 
     // Is the maximum the overflow (+ overlap) shift, or the default ?
     int shift = std::max(maxOverlfowAbove, doc->GetSpacingStaff() * doc->GetDrawingUnit(100));
@@ -583,6 +605,7 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
 
     (*previousStaffHeight) = m_staffHeight;
     (*previousOverflowBelow) = m_overflowBelow;
+    (*previousVerseCount) = this->GetVerseCount();
 
     return FUNCTOR_CONTINUE;
 }

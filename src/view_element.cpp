@@ -1324,6 +1324,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     syl->SetDrawingY(GetSylY(syl, staff));
 
     dc->StartGraphic(syl, "", syl->GetUuid());
+    dc->DeactivateGraphicY();
 
     dc->SetBrush(m_currentColour, AxSOLID);
 
@@ -1358,6 +1359,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         }
     }
 
+    dc->ReactivateGraphic();
     dc->EndGraphic(syl, this);
 }
 
@@ -2103,11 +2105,14 @@ int View::GetSylY(Syl *syl, Staff *staff)
     assert(syl && staff);
 
     int y = syl->GetStart()->GetDrawingY();
-    if (staff->GetAlignment()) {
-        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight()
-            - syl->m_drawingVerse * TEMP_STYLE_LYIRC_LINE_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-                / PARAM_DENOMINATOR
-            + 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    StaffAlignment *aligment = staff->GetAlignment();
+    if (aligment) {
+        FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+        int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+        int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+
+        y = staff->GetDrawingY() - aligment->m_staffHeight - aligment->m_overflowBelow
+            + (aligment->GetVerseCount() - syl->m_drawingVerse) * (height + descender) + (descender);
     }
     return y;
 }

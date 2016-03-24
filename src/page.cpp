@@ -277,8 +277,10 @@ void Page::LayOutVertically()
     params.clear();
     int previousStaffHeight = 0;
     int previousOverflowBelow = 0;
+    int previousVerseCount = 0;
     params.push_back(&previousStaffHeight);
     params.push_back(&previousOverflowBelow);
+    params.push_back(&previousVerseCount);
     params.push_back(doc);
     Functor setAlignmentY(&Object::SetAligmentYPos);
     // Special case: because we redirect the functor, pass it as parameter to itself (!)

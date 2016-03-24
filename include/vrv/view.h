@@ -382,11 +382,7 @@ private:
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet *tuplet);
-    int GetDirY(data_STAFFREL place, Staff *staff);
-    int GetDynamY(data_STAFFREL place, Staff *staff, bool baseline);
-    int GetHairpinY(data_STAFFREL place, Staff *staff);
     int GetSylY(Syl *syl, Staff *staff);
-    int GetTempoY(data_STAFFREL place, Staff *staff);
     ///@}
 
     /**

@@ -196,7 +196,7 @@ void Doc::PrepareDrawing()
 
     // Now try to match the @tstamp and @tstamp2 attributes.
     params.clear();
-     ArrayOfObjectBeatPairs tstamps;
+    ArrayOfObjectBeatPairs tstamps;
     params.push_back(&timeSpanningInterfaces);
     params.push_back(&tstamps);
     Functor prepareTimestamps(&Object::PrepareTimestamps);
@@ -507,11 +507,10 @@ int Doc::GetPageCount() const
     return GetChildCount();
 }
 
-int Doc::GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize) const
+int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
-    Glyph *glyph;
-    glyph = Resources::GetGlyph(smuflCode);
+    Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(&x, &y, &w, &h);
     h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -520,11 +519,10 @@ int Doc::GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize) const
     return h;
 }
 
-int Doc::GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize) const
+int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
-    Glyph *glyph;
-    glyph = Resources::GetGlyph(smuflCode);
+    Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(&x, &y, &w, &h);
     w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -533,16 +531,54 @@ int Doc::GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize) const
     return w;
 }
 
-int Doc::GetGlyphDescender(wchar_t smuflCode, int staffSize, bool graceSize) const
+int Doc::GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
-    Glyph *glyph;
-    glyph = Resources::GetGlyph(smuflCode);
+    Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(&x, &y, &w, &h);
     y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) y = y * this->m_style->m_graceNum / this->m_style->m_graceDen;
     y = y * staffSize / 100;
+    return y;
+}
+
+int Doc::GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const
+{
+    assert(font);
+
+    int x, y, w, h;
+    Glyph *glyph = Resources::GetTextGlyph(code);
+    assert(glyph);
+    glyph->GetBoundingBox(&x, &y, &w, &h);
+    h = h * font->GetPointSize() / glyph->GetUnitsPerEm();
+    if (graceSize) h = h * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return h;
+}
+
+int Doc::GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const
+{
+    assert(font);
+
+    int x, y, w, h;
+    Glyph *glyph = Resources::GetTextGlyph(code);
+    assert(glyph);
+    glyph->GetBoundingBox(&x, &y, &w, &h);
+    w = w * font->GetPointSize() / glyph->GetUnitsPerEm();
+    if (graceSize) w = w * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return w;
+}
+
+int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const
+{
+    assert(font);
+
+    int x, y, w, h;
+    Glyph *glyph = Resources::GetTextGlyph(code);
+    assert(glyph);
+    glyph->GetBoundingBox(&x, &y, &w, &h);
+    y = y * font->GetPointSize() / glyph->GetUnitsPerEm();
+    if (graceSize) y = y * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return y;
 }
 

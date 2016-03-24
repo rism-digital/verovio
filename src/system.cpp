@@ -148,14 +148,17 @@ int System::SetAligmentYPos(ArrayPtrVoid *params)
 {
     // param 0: the previous staff height
     // param 1: the extra staff height
-    // param 2: the doc
-    // param 3: the functor to be redirected to SystemAligner
+    // param 2  the previous verse count
+    // param 3: the doc
+    // param 4: the functor to be redirected to SystemAligner
     int *previousStaffHeight = static_cast<int *>((*params).at(0));
     int *previousOverflowBelow = static_cast<int *>((*params).at(1));
-    Doc *doc = static_cast<Doc *>((*params).at(2));
-    Functor *setAligmnentPosY = static_cast<Functor *>((*params).at(3));
+    int *previousVerseCount = static_cast<int *>((*params).at(2));
+    Doc *doc = static_cast<Doc *>((*params).at(3));
+    Functor *setAligmnentPosY = static_cast<Functor *>((*params).at(4));
 
     (*previousStaffHeight) = 0;
+    (*previousVerseCount) = 0;
     (*previousOverflowBelow) = doc->GetSpacingStaff() * doc->GetDrawingUnit(100);
 
     m_systemAligner.Process(setAligmnentPosY, params);
@@ -279,6 +282,9 @@ int System::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
     (*classId) = TEMPO;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     (*classId) = DIR;
+    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
+    // SYL check if they are some lyrics and make space for them if any
+    (*classId) = SYL;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
 
     return FUNCTOR_SIBLINGS;
