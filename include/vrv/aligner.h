@@ -169,6 +169,8 @@ public:
     void SetStaff(Staff *staff, Doc *doc);
     ///@}
 
+    int GetStaffHeight() const;
+
     int CalcOverflowAbove(BoundingBox *box);
     int CalcOverflowBelow(BoundingBox *box);
 

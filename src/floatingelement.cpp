@@ -15,6 +15,7 @@
 
 #include "aligner.h"
 #include "dir.h"
+#include "doc.h"
 #include "dynam.h"
 #include "hairpin.h"
 #include "tempo.h"
@@ -164,24 +165,33 @@ void FloatingPositioner::SetDrawingYRel(int drawingYRel)
 
 bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox)
 {
+    assert(doc);
+    assert(staffAlignment);
+
+    int staffSize = staffAlignment->GetStaffHeight();
+
     if (horizOverlapingBBox == NULL) {
         if (this->m_place == STAFFREL_above) {
             int yRel = m_contentBB_y1;
+            yRel -= doc->GetBottomMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
         else {
             int yRel = staffAlignment->m_staffHeight + m_contentBB_y2;
+            yRel += doc->GetTopMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
     }
     else {
         if (this->m_place == STAFFREL_above) {
             int yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + m_contentBB_y1;
+            yRel -= doc->GetBottomMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
         else {
             int yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->m_staffHeight
                 + m_contentBB_y2;
+            yRel += doc->GetTopMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
     }

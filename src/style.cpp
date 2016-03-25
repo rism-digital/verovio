@@ -99,6 +99,12 @@ Style::Style()
     m_rightMarginRest = DEFAULT_RIGHT_MARGIN_REST * DEFINITON_FACTOR;
     /** The default right margin */
     m_rightMarginDefault = DEFAULT_RIGHT_MARGIN_DEFAULT * DEFINITON_FACTOR;
+
+    /** The default right margin */
+    m_bottomMarginDefault = DEFAULT_BOTTOM_MARGIN_DEFAULT * DEFINITON_FACTOR;
+
+    /** The default right margin */
+    m_topMarginDefault = DEFAULT_TOP_MARGIN_DEFAULT * DEFINITON_FACTOR;
 }
 
 Style::~Style()

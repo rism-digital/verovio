@@ -1253,8 +1253,7 @@ int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
         return FUNCTOR_CONTINUE;
     }
 
-    Staff *staff = (*staffAlignment)->GetStaff();
-    int staffSize = staff ? staff->m_drawingStaffSize : 100;
+    int staffSize = (*staffAlignment)->GetStaffHeight();
 
     int overflowAbove = (*staffAlignment)->CalcOverflowAbove(current);
     if (overflowAbove > doc->GetDrawingStaffLineWidth(staffSize) / 2) {

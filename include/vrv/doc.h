@@ -148,6 +148,8 @@ public:
     char GetLeftMargin(const ClassId classId) const;
     char GetRightMargin(const ClassId classId) const;
     char GetLeftPosition() const;
+    char GetBottomMargin(const ClassId classId) const;
+    char GetTopMargin(const ClassId classId) const;
     ///@}
 
     /*

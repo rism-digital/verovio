@@ -139,6 +139,18 @@ namespace vrv {
 #define DEFAULT_RIGHT_MARGIN_NOTE 0.0
 #define DEFAULT_RIGHT_MARGIN_REST 0.0
 
+/** Bottom margins */
+
+#define DEFAULT_BOTTOM_MARGIN_DEFAULT 0.5
+#define MIN_BOTTOM_MARGIN_DEFAULT 0.0
+#define MAX_BOTTOM_MARGIN_DEFAULT 5.0
+
+/** Top margins */
+
+#define DEFAULT_TOP_MARGIN_DEFAULT 0.5
+#define MIN_TOP_MARGIN_DEFAULT 0.0
+#define MAX_TOP_MARGIN_DEFAULT 5.0
+
 //----------------------------------------------------------------------------
 // Style
 //----------------------------------------------------------------------------
@@ -270,6 +282,12 @@ public:
 
     /** The default right margin */
     char m_rightMarginDefault;
+
+    /** The default right margin */
+    char m_bottomMarginDefault;
+
+    /** The default right margin */
+    char m_topMarginDefault;
 };
 
 } // namespace vrv

@@ -134,6 +134,11 @@ void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
     }
 }
 
+int StaffAlignment::GetStaffHeight() const
+{
+    return m_staff ? m_staff->m_drawingStaffSize : 100;
+}
+
 void StaffAlignment::SetYShift(int yShift)
 {
     if (yShift < m_yShift) {
@@ -500,14 +505,15 @@ int StaffAlignment::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
     Doc *doc = static_cast<Doc *>((*params).at(1));
 
     // for slur we do not need to adjust them, only add them to the overflow boxes if required
-    int staffSize = m_staff ? m_staff->m_drawingStaffSize : 100;
+    int staffSize = this->GetStaffHeight();
 
     if ((*classId) == SYL) {
         if (this->GetVerseCount() > 0) {
             FontInfo *lyricFont = doc->GetDrawingLyricFont(m_staff->m_drawingStaffSize);
-            int descender = doc->GetTextGlyphDescender(L'g', lyricFont, false);
-            int height = doc->GetTextGlyphHeight(L'M', lyricFont, false);
-            this->SetOverflowBelow(this->m_overflowBelow + this->GetVerseCount() * (height - descender));
+            int descender = doc->GetTextGlyphDescender(L'q', lyricFont, false);
+            int height = doc->GetTextGlyphHeight(L'I', lyricFont, false);
+            int margin = doc->GetBottomMargin(SYL) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            this->SetOverflowBelow(this->m_overflowBelow + this->GetVerseCount() * (height - descender + margin));
             // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep them
             // and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
             m_overflowBelowBBoxes.clear();
@@ -599,6 +605,9 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
 
     // Is the maximum the overflow (+ overlap) shift, or the default ?
     int shift = std::max(maxOverlfowAbove, doc->GetSpacingStaff() * doc->GetDrawingUnit(100));
+
+    // Add a margin
+    shift += doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(this->GetStaffHeight()) / PARAM_DENOMINATOR;
 
     // Shift, including the previous staff height
     SetYShift(-shift - (*previousStaffHeight));
