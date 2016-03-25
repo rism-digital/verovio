@@ -726,6 +726,7 @@ void View::CalcBeam(
     }
     minDistToCenter += (params->m_beamWidthBlack / 2) + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
     if (minDistToCenter < 0) {
+        params->m_startingY += (params->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
         for (i = 0; i < elementCount; i++) {
             (*beamElementCoords).at(i)->m_yBeam
                 += (params->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
