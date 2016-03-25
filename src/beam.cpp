@@ -62,6 +62,11 @@ void Beam::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
+        if ((*iter)->Is() == REST) {
+            // remove anything that has not a DurationInterface
+            iter = childList->erase(iter);
+            continue;
+        }
         else {
             // Drop notes that are signaled as grace notes
 
