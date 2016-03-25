@@ -372,9 +372,9 @@ void Object::AddSameAs(std::string id, std::string filename)
     m_sameAs += sameAs;
 }
 
-Object *Object::GetFirstParent(const ClassId classId, int maxSteps)
+Object *Object::GetFirstParent(const ClassId classId, int maxDepth)
 {
-    if ((maxSteps == 0) || !m_parent) {
+    if ((maxDepth == 0) || !m_parent) {
         return NULL;
     }
 
@@ -382,13 +382,13 @@ Object *Object::GetFirstParent(const ClassId classId, int maxSteps)
         return m_parent;
     }
     else {
-        return (m_parent->GetFirstParent(classId, maxSteps - 1));
+        return (m_parent->GetFirstParent(classId, maxDepth - 1));
     }
 }
 
-Object *Object::GetLastParentNot(const ClassId classId, int maxSteps)
+Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
 {
-    if ((maxSteps == 0) || !m_parent) {
+    if ((maxDepth == 0) || !m_parent) {
         return NULL;
     }
 
@@ -396,7 +396,7 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxSteps)
         return this;
     }
     else {
-        return (m_parent->GetLastParentNot(classId, maxSteps - 1));
+        return (m_parent->GetLastParentNot(classId, maxDepth - 1));
     }
 }
 
@@ -1117,14 +1117,14 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
         return FUNCTOR_CONTINUE;
     }
 
-    // the negative offset is the part of the bounding box that overflows on the left
+    // The negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     int negative_offset = -(current->m_contentBB_x1);
     if (!current->IsGraceNote())
         negative_offset += (doc->GetLeftMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
-    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
+    // This should never happen but can with glyphs not exactly registered at x=0 in the SMuFL font used
     if (negative_offset < 0) negative_offset = 0;
 
     // with a grace note, also take into account the full width of the group given by the GraceAligner
