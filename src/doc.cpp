@@ -83,7 +83,7 @@ void Doc::Reset(DocType type)
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
-    m_drawingLyricFont.SetFaceName("Garamond");
+    m_drawingLyricFont.SetFaceName("Times");
 }
 
 void Doc::AddPage(Page *page)
@@ -175,27 +175,37 @@ void Doc::PrepareDrawing()
         this->Process(&resetDrawing, &params);
     }
 
-    // Try to match all spanning elements (slur, tie, etc) by processing backward
-    std::vector<DocObject *> timeSpanningElements;
+    // Try to match all spanning elements (slur, tie, etc) by processing backwards
+    ArrayOfInterfaceClassIdPairs timeSpanningInterfaces;
     bool fillList = true;
-    params.push_back(&timeSpanningElements);
+    params.push_back(&timeSpanningInterfaces);
     params.push_back(&fillList);
     Functor prepareTimeSpanning(&Object::PrepareTimeSpanning);
-    this->Process(&prepareTimeSpanning, &params, NULL, NULL, UNLIMITED_DEPTH, BACKWARD);
+    Functor prepareTimeSpanningEnd(&Object::PrepareTimeSpanningEnd);
+    this->Process(&prepareTimeSpanning, &params, &prepareTimeSpanningEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
 
-    // First we tried backward because nomrally the spanning elements are at the end of
+    // First we try backwards because normally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
     // in the encoding. For these, the previous iteration will not have resolved the link and
-    // the spanning elements will remain in the timeSpanningElements array. We try again forward
+    // the spanning elements will remain in the timeSpanningElements array. We try again forwards
     // but this time without filling the list (that is only will the remaining elements)
-    if (!timeSpanningElements.empty()) {
+    if (!timeSpanningInterfaces.empty()) {
         fillList = false;
         this->Process(&prepareTimeSpanning, &params);
     }
 
+    // Now try to match the @tstamp and @tstamp2 attributes.
+    params.clear();
+    ArrayOfObjectBeatPairs tstamps;
+    params.push_back(&timeSpanningInterfaces);
+    params.push_back(&tstamps);
+    Functor prepareTimestamps(&Object::PrepareTimestamps);
+    Functor prepareTimestampsEnd(&Object::PrepareTimestampsEnd);
+    this->Process(&prepareTimestamps, &params, &prepareTimestampsEnd);
+
     // If some are still there, then it is probably an issue in the encoding
-    if (!timeSpanningElements.empty()) {
-        LogWarning("%d time spanning elements could not be matched", timeSpanningElements.size());
+    if (!timeSpanningInterfaces.empty()) {
+        LogWarning("%d time spanning elements could not be matched", timeSpanningInterfaces.size());
     }
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
@@ -209,13 +219,13 @@ void Doc::PrepareDrawing()
     // StaffN_LayerN_VerseN_t staffLayerVerseTree;
     // params.push_back(&staffLayerVerseTree);
 
-    // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
+    // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
     // LogElapsedTimeStart();
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
     this->Process(&prepareProcessingLists, &params);
 
-    // The tree is used to process each staff/layer/verse separatly
-    // For this, we use a array of AttCommmonNComparison that looks for each object if it is of the type
+    // The tree is used to process each staff/layer/verse separately
+    // For this, we use an array of AttCommmonNComparison that looks for each object if it is of the type
     // and with @n specified
 
     IntTree_t::iterator staves;
@@ -291,7 +301,7 @@ void Doc::PrepareDrawing()
                 filters.push_back(&matchLayer);
                 filters.push_back(&matchVerse);
 
-                // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+                // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
                 // m_drawingLastNote is set only if the syl has a forward connector
                 currentSyl = NULL;
                 lastNote = NULL;
@@ -311,7 +321,7 @@ void Doc::PrepareDrawing()
     // TimeSpanningInterface to each staff they are extended. This does not need to be done staff by staff because we
     // can just check the staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
     params.clear();
-    timeSpanningElements.clear();
+    std::vector<TimeSpanningInterface *> timeSpanningElements;
     params.push_back(&timeSpanningElements);
     Functor fillStaffCurrentTimeSpanning(&Object::FillStaffCurrentTimeSpanning);
     Functor fillStaffCurrentTimeSpanningEnd(&Object::FillStaffCurrentTimeSpanningEnd);
@@ -334,7 +344,7 @@ void Doc::PrepareDrawing()
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
-            // The first pass set m_drawingFirstNote and m_drawingLastNote for each syl
+            // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
             // m_drawingLastNote is set only if the syl has a forward connector
             currentMRpt = NULL;
             // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
@@ -487,21 +497,20 @@ void Doc::UnCastOff()
     this->SetCurrentScoreDef(true);
 }
 
-bool Doc::HasPage(int pageIdx)
+bool Doc::HasPage(int pageIdx) const
 {
     return ((pageIdx >= 0) && (pageIdx < GetChildCount()));
 }
 
-int Doc::GetPageCount()
+int Doc::GetPageCount() const
 {
     return GetChildCount();
 }
 
-int Doc::GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize)
+int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
-    Glyph *glyph;
-    glyph = Resources::GetGlyph(smuflCode);
+    Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(&x, &y, &w, &h);
     h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -510,11 +519,10 @@ int Doc::GetGlyphHeight(wchar_t smuflCode, int staffSize, bool graceSize)
     return h;
 }
 
-int Doc::GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize)
+int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
-    Glyph *glyph;
-    glyph = Resources::GetGlyph(smuflCode);
+    Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
     glyph->GetBoundingBox(&x, &y, &w, &h);
     w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
@@ -523,68 +531,135 @@ int Doc::GetGlyphWidth(wchar_t smuflCode, int staffSize, bool graceSize)
     return w;
 }
 
-int Doc::GetDrawingUnit(int staffSize)
+int Doc::GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const
+{
+    int x, y, w, h;
+    Glyph *glyph = Resources::GetGlyph(code);
+    assert(glyph);
+    glyph->GetBoundingBox(&x, &y, &w, &h);
+    y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    if (graceSize) y = y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    y = y * staffSize / 100;
+    return y;
+}
+
+int Doc::GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const
+{
+    assert(font);
+
+    int x, y, w, h;
+    Glyph *glyph = Resources::GetTextGlyph(code);
+    assert(glyph);
+    glyph->GetBoundingBox(&x, &y, &w, &h);
+    h = h * font->GetPointSize() / glyph->GetUnitsPerEm();
+    if (graceSize) h = h * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return h;
+}
+
+int Doc::GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const
+{
+    assert(font);
+
+    int x, y, w, h;
+    Glyph *glyph = Resources::GetTextGlyph(code);
+    assert(glyph);
+    glyph->GetBoundingBox(&x, &y, &w, &h);
+    w = w * font->GetPointSize() / glyph->GetUnitsPerEm();
+    if (graceSize) w = w * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return w;
+}
+
+int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) const
+{
+    assert(font);
+
+    int x, y, w, h;
+    Glyph *glyph = Resources::GetTextGlyph(code);
+    assert(glyph);
+    glyph->GetBoundingBox(&x, &y, &w, &h);
+    y = y * font->GetPointSize() / glyph->GetUnitsPerEm();
+    if (graceSize) y = y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return y;
+}
+
+int Doc::GetDrawingUnit(int staffSize) const
 {
     return m_drawingUnit * staffSize / 100;
 }
 
-int Doc::GetDrawingDoubleUnit(int staffSize)
+int Doc::GetDrawingDoubleUnit(int staffSize) const
 {
     return m_drawingDoubleUnit * staffSize / 100;
 }
 
-int Doc::GetDrawingStaffSize(int staffSize)
+int Doc::GetDrawingStaffSize(int staffSize) const
 {
     return m_drawingStaffSize * staffSize / 100;
 }
 
-int Doc::GetDrawingOctaveSize(int staffSize)
+int Doc::GetDrawingOctaveSize(int staffSize) const
 {
     return m_drawingOctaveSize * staffSize / 100;
 }
 
-int Doc::GetDrawingBrevisWidth(int staffSize)
+int Doc::GetDrawingBrevisWidth(int staffSize) const
 {
     return m_drawingBrevisWidth * staffSize / 100;
 }
 
-int Doc::GetDrawingBarLineWidth(int staffSize)
+int Doc::GetDrawingBarLineWidth(int staffSize) const
 {
     return m_style->m_barLineWidth * staffSize / 100;
 }
 
-int Doc::GetDrawingStaffLineWidth(int staffSize)
+int Doc::GetDrawingStaffLineWidth(int staffSize) const
 {
     return m_style->m_staffLineWidth * staffSize / 100;
 }
 
-int Doc::GetDrawingStemWidth(int staffSize)
+int Doc::GetDrawingStemWidth(int staffSize) const
 {
     return m_style->m_stemWidth * staffSize / 100;
 }
 
-int Doc::GetDrawingBeamWidth(int staffSize, bool graceSize)
+int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin) const
+{
+    int height = GetGlyphHeight(SMUFL_E522_dynamicForte, staffSize, false);
+    // This should be styled
+    if (withMargin) height += GetDrawingUnit(staffSize);
+    return height;
+}
+
+int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin) const
+{
+    int size = m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITON_FACTOR;
+    // This should be styled
+    if (withMargin) size += GetDrawingUnit(staffSize);
+    return size;
+}
+
+int Doc::GetDrawingBeamWidth(int staffSize, bool graceSize) const
 {
     int value = m_drawingBeamWidth * staffSize / 100;
     if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
 }
 
-int Doc::GetDrawingBeamWhiteWidth(int staffSize, bool graceSize)
+int Doc::GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const
 {
     int value = m_drawingBeamWhiteWidth * staffSize / 100;
     if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
 }
 
-int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize)
+int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize) const
 {
     int value = m_drawingLedgerLine * staffSize / 100;
     if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
     return value;
 }
 
-int Doc::GetGraceSize(int value)
+int Doc::GetGraceSize(int value) const
 {
     return value * this->m_style->m_graceNum / this->m_style->m_graceDen;
 }
@@ -603,9 +678,8 @@ FontInfo *Doc::GetDrawingLyricFont(int staffSize)
     return &m_drawingLyricFont;
 }
 
-char Doc::GetLeftMargin(const ClassId classId)
+char Doc::GetLeftMargin(const ClassId classId) const
 {
-
     if (classId == ACCID) return m_style->m_leftMarginAccid;
     if (classId == BARLINE) return m_style->m_leftMarginBarLine;
     if (classId == BARLINE_ATTR) return m_style->m_leftMarginBarLineAttr;
@@ -624,7 +698,7 @@ char Doc::GetLeftMargin(const ClassId classId)
     return m_style->m_leftMarginDefault;
 }
 
-char Doc::GetRightMargin(const ClassId classId)
+char Doc::GetRightMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_style->m_rightMarginAccid;
     if (classId == BARLINE) return m_style->m_rightMarginBarLine;
@@ -644,7 +718,17 @@ char Doc::GetRightMargin(const ClassId classId)
     return m_style->m_rightMarginDefault;
 }
 
-char Doc::GetLeftPosition()
+char Doc::GetBottomMargin(const ClassId classId) const
+{
+    return m_style->m_bottomMarginDefault;
+}
+
+char Doc::GetTopMargin(const ClassId classId) const
+{
+    return m_style->m_topMarginDefault;
+}
+
+char Doc::GetLeftPosition() const
 {
     return m_style->m_leftPosition;
 }
@@ -732,7 +816,7 @@ Page *Doc::SetDrawingPage(int pageIdx)
     }
 
     // From here we could check if values have changed
-    // Since  m_style->m_interlDefin stays the same, it useless to do it
+    // Since  m_style->m_interlDefin stays the same, it's useless to do it
     // every time for now.
 
     m_drawingBeamMaxSlope = this->m_style->m_beamMaxSlope;
@@ -774,14 +858,14 @@ int Doc::CalcMusicFontSize()
     return m_style->m_unit * 8;
 }
 
-int Doc::GetAdjustedDrawingPageHeight()
+int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
     int contentHeight = m_drawingPage->GetContentHeight();
     return (contentHeight + m_drawingPageTopMar * 2) / DEFINITON_FACTOR;
 }
 
-int Doc::GetAdjustedDrawingPageWidth()
+int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
     int contentWidth = m_drawingPage->GetContentWidth();

@@ -25,38 +25,38 @@ class ScoreDefInterface;
  * Since it is unclear how to encode the logical key signature in keySig, an
  * internal representation is used (there is no equivalent of staffDef @key
  * within keySig. Currently the @accid and @pname are used for this. The
- * @pname store the value of the latest accidental, which is doubtfully the
+ * @pname stores the value of the latest accidental, which is doubtfully the
  * expected use of it.
- * Two temporary method KeySig::ConvertToMei and KeySig::ConvertToInternal
+ * Two temporary methods KeySig::ConvertToMei and KeySig::ConvertToInternal
  * are available for converting from and to the MEI representation to the
- * internal (and reverse)
+ * internal (and vice versa)
  */
 class KeySig : public LayerElement, public AttAccidental, public AttPitch {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
+     * Reset method resets all attribute classes.
      */
     ///@{
     KeySig();
     KeySig(int alterationNumber, data_ACCIDENTAL_EXPLICIT alterationType);
-    KeySig(ScoreDefInterface *keySigAttr);
+    KeySig(const ScoreDefInterface *keySigAttr);
     void Init();
     virtual ~KeySig();
     virtual void Reset();
-    virtual Object *Clone() { return new KeySig(*this); };
-    virtual std::string GetClassName() { return "KeySig"; };
-    virtual ClassId Is() { return KEYSIG; };
+    virtual Object *Clone() const { return new KeySig(*this); };
+    virtual std::string GetClassName() const { return "KeySig"; };
+    virtual ClassId Is() const { return KEYSIG; };
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
     /* Alteration number getter/setter */
-    int GetAlterationNumber() { return m_alterationNumber; };
+    int GetAlterationNumber() const { return m_alterationNumber; };
     void SetAlterationNumber(int alterationNumber) { m_alterationNumber = alterationNumber; };
 
     /* Alteration number getter/setter */
-    data_ACCIDENTAL_EXPLICIT GetAlterationType() { return m_alterationType; };
+    data_ACCIDENTAL_EXPLICIT GetAlterationType() const { return m_alterationType; };
     void SetAlterationType(data_ACCIDENTAL_EXPLICIT alterationType) { m_alterationType = alterationType; };
 
     /* Temporary methods for turning @accid and @pitch into num_alter and alter */

@@ -28,18 +28,18 @@ class Staff;
  * This class is a base class for the Layer (<layer>) content.
  * It is not an abstract class but should not be instantiated directly.
  */
-class LayerElement : public DocObject {
+class LayerElement : public Object {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     LayerElement();
     LayerElement(std::string classid);
     virtual ~LayerElement();
     virtual void Reset();
-    virtual ClassId Is() { return LAYER_ELEMENT; };
+    virtual ClassId Is() const { return LAYER_ELEMENT; };
     ///@}
 
     /**
@@ -54,9 +54,9 @@ public:
 
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
-     * The value is false by default. Is it set to true of ScoreDef and StaffDef and used when
+     * The value is false by default. It is set to true by ScoreDef and StaffDef and used when
      * drawing the element.
-     * NB In the scoreDef or staffDef itself, it can be attributes or an element.
+     * NB In the scoreDef or staffDef itself, it can be either an attribute or an element.
      */
     ///@{
     bool GetScoreOrStaffDefAttr() const { return m_isScoreOrStaffDefAttr; };
@@ -68,17 +68,17 @@ public:
      */
     ///@{
     /** Return true if the element is a grace note */
-    bool IsGraceNote();
+    bool IsGraceNote() const;
     /** Return true if the element is a note or a note child and the note has a @grace */
     bool IsCueSize();
     /** Return true if the element is a note or a chord within a fTrem */
     bool IsInFTrem();
     /** Return true if the element has to be aligned horizontally */
-    virtual bool HasToBeAligned() { return false; };
+    virtual bool HasToBeAligned() const { return false; };
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
-     * Look for the fist beam parent and check is the note is in is content list.
+     * Look for the first beam parent and check if the note is in its content list.
      * Looking in the content list is necessary for grace notes or imbricated beams.
      */
     Beam *IsInBeam();
@@ -94,9 +94,9 @@ public:
     /**
      * Alignment getter
      */
-    Alignment *GetAlignment() { return m_alignment; };
+    Alignment *GetAlignment() const { return m_alignment; };
 
-    int GetXRel();
+    int GetXRel() const;
 
     /**
      * Returns the duration if the child element has a DurationInterface
@@ -140,7 +140,7 @@ public:
      *  See Object:ExportMIDI
      */
     virtual int ExportMIDIEnd(ArrayPtrVoid *params);
-    
+
     /**
      * See Object::CalcMaxMeasureDuration
      */
@@ -152,11 +152,11 @@ public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
     /**
-     * This store a pointer to the corresponding BeamElementCoord(currentDur > DUR_4)
+     * This stores a pointer to the corresponding BeamElementCoord(currentDur > DUR_4)
      */
     BeamElementCoord *m_beamElementCoord;
     /**
-     * This store a pointer to the cross-staff (if any) and the appropriate layer
+     * This stores a pointer to the cross-staff (if any) and the appropriate layer
      * Initialized in LayerElement::SetDrawingXY
      */
     Staff *m_crossStaff;

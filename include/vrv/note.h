@@ -56,18 +56,22 @@ class Note : public LayerElement,
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Note();
     virtual ~Note();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Note"; };
-    virtual ClassId Is() { return NOTE; };
+    virtual std::string GetClassName() const { return "Note"; };
+    virtual ClassId Is() const { return NOTE; };
     ///@}
 
+    virtual DurationInterface * GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
+    virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return dynamic_cast<StemmedDrawingInterface *>(this); }
+
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
     /**
      * Add an element (a verse or an accid) to a note.
@@ -82,7 +86,7 @@ public:
     void ResetDrawingAccid();
     void ResetDrawingTieAttr();
     void SetDrawingTieAttr();
-    Tie *GetDrawingTieAttr() { return m_drawingTieAttr; };
+    Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; };
     ///@}
 
     /**
@@ -91,7 +95,7 @@ public:
     ///@{
     Alignment *GetGraceAlignment();
     void SetGraceAlignment(Alignment *graceAlignment);
-    bool HasGraceAlignment() { return (m_graceAlignment != NULL); };
+    bool HasGraceAlignment() const { return (m_graceAlignment != NULL); };
     void ResetGraceAlignment() { m_graceAlignment = NULL; };
     ///@}
 
@@ -101,13 +105,13 @@ public:
     ///@{
     Chord *IsChordTone();
     int GetDrawingDur();
-    bool IsClusterExtreme(); // used to find if is the highest or lowest note in a cluster
+    bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
 
     /**
      * Returns a single integer representing pitch and octave.
      */
-    int GetDiatonicPitch() { return this->GetPname() + (int)this->GetOct() * 7; };
+    int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; };
 
     //----------//
     // Functors //
@@ -120,7 +124,7 @@ public:
 
     /**
      * Functor for setting wordpos and connector ends
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
     virtual int PrepareLyrics(ArrayPtrVoid *params);
 
@@ -165,7 +169,7 @@ private:
     /**
      * Tie attributes are represented a pointers to Tie objects.
      * There is one pointer for the initial attribute (TIE_i or TIE_m).
-     * The note with the initial attribute owns the Tie object and take care of deleting it
+     * The note with the initial attribute owns the Tie object and takes care of deleting it
      */
     Tie *m_drawingTieAttr;
     /**

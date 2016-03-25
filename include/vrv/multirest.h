@@ -24,15 +24,15 @@ class MultiRest : public LayerElement, public AttNumbered {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     MultiRest();
     // MultiRest(int number);
     virtual ~MultiRest();
     virtual void Reset();
-    virtual std::string GetClassName() { return "MultiRest"; };
-    virtual ClassId Is() { return MULTIREST; };
+    virtual std::string GetClassName() const { return "MultiRest"; };
+    virtual ClassId Is() const { return MULTIREST; };
     ///@}
 
 private:

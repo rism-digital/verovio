@@ -22,6 +22,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "dot.h"
+#include "dynam.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -957,7 +958,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     int num = std::min(multiRest->GetNum(), 999);
 
     if (num > 2) {
-        // This is 1/2 the length of th black rectangle
+        // This is 1/2 the length of the black rectangle
         length = width - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
         // a is the central point, claculate x and x2
@@ -973,8 +974,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // these are the two 4 substracted and added
         DrawFullRectangle(dc, x1, y2, x2, y1);
 
-        // Draw the to lines at beginning and end
-        // make it 8 pixesl longers, and 4 pixels width
+        // Draw two lines at beginning and end
+        // make it 8 pixels longer, and 4 pixels width
         int border = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         DrawVerticalLine(dc, y1 - border, y2 + border, x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2);
         DrawVerticalLine(dc, y1 - border, y2 + border, x2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) * 2);
@@ -1104,7 +1105,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 flippedNotehead = (note->m_clusterPosition % 2 == 0);
             }
 
-            // if stem goes down, move ledger start to the left and expand it a full radius
+            // if stem goes down, move ledger start to the left and expand it by a full radius
             if (!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
                 xLedger -= radius;
                 doubleLengthLedger = true;
@@ -1114,7 +1115,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             // flipped noteheads start on normal side no matter what
             flippedNotehead = (note->m_clusterPosition % 2 == 0);
 
-            // if stem goes up, move ledger start to the right and expand it a full radius
+            // if stem goes up, move ledger start to the right and expand it by a full radius
             if (!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
                 xLedger += radius;
                 doubleLengthLedger = true;
@@ -1323,6 +1324,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     syl->SetDrawingY(GetSylY(syl, staff));
 
     dc->StartGraphic(syl, "", syl->GetUuid());
+    dc->DeactivateGraphicY();
 
     dc->SetBrush(m_currentColour, AxSOLID);
 
@@ -1357,6 +1359,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         }
     }
 
+    dc->ReactivateGraphic();
     dc->EndGraphic(syl, this);
 }
 
@@ -1465,7 +1468,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, S
 
     // First case, notes
     if ((element->Is() == NOTE) || (element->Is() == CHORD)) {
-        // To be fix once m_embellishment is removed
+        // To be fixed once m_embellishment is removed
         if (element->Is() == NOTE) {
             Note *note = dynamic_cast<Note *>(element);
             assert(note);
@@ -1475,7 +1478,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, S
         }
 
         if (place == PLACE_above) {
-            // check that the notehead is in the staff.
+            // check if the notehead is in the staff.
             if (element->GetDrawingTop(m_doc, staff->m_drawingStaffSize) < staff->GetDrawingY()) {
                 // in the staff, set the fermata 20 pixels above the last line (+ embellishment offset)
                 y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + emb_offset;
@@ -1728,12 +1731,12 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned c
 void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, bool isMensural, data_STEMDIRECTION dir,
     int radius, int xn, int originY, int heightY)
 {
-    assert(dynamic_cast<DurationInterface *>(object));
+    assert(object->GetDurationInterface());
 
     int staffSize = staff->m_drawingStaffSize;
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
-    int drawingDur = dynamic_cast<DurationInterface *>(object)->GetActualDur();
+    int drawingDur = (object->GetDurationInterface())->GetActualDur();
     bool drawingCueSize = object->IsCueSize();
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
 
@@ -1816,14 +1819,14 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, bool 
     }
 
     // Store the start and end values
-    StemmedDrawingInterface *interface = dynamic_cast<StemmedDrawingInterface *>(object);
+    StemmedDrawingInterface *interface = object->GetStemmedDrawingInterface();
     assert(interface);
     interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
     interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
     interface->SetDrawingStemDir(dir);
 
     // cast to note is check when setting drawingCueSize value
-    if (drawingCueSize && (dynamic_cast<Note *>(object)->GetGrace() == GRACE_acc)) {
+    if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_acc)) {
         DrawAcciaccaturaSlash(dc, object);
     }
 }
@@ -2102,21 +2105,16 @@ int View::GetSylY(Syl *syl, Staff *staff)
     assert(syl && staff);
 
     int y = syl->GetStart()->GetDrawingY();
-    if (staff->GetAlignment()) {
-        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight()
-            - syl->m_drawingVerse * TEMP_STYLE_LYIRC_LINE_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
-                / PARAM_DENOMINATOR;
+    StaffAlignment *aligment = staff->GetAlignment();
+    if (aligment) {
+        FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+        int descender = -m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+        int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+        int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
+
+        y = staff->GetDrawingY() - aligment->GetStaffHeight() - aligment->GetOverflowBelow()
+            + (aligment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
     }
-    return y;
-}
-
-int View::GetTempoY(Staff *staff)
-{
-    assert(staff);
-
-    // Temporary basic method for positionning tempo elements
-    int y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    y += staff->m_contentBB_y2;
     return y;
 }
 

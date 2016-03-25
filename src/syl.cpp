@@ -13,11 +13,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "editorial.h"
 #include "note.h"
-#include "verse.h"
 #include "staff.h"
 #include "textelement.h"
-#include "editorial.h"
+#include "verse.h"
 
 namespace vrv {
 
@@ -57,7 +57,7 @@ void Syl::AddTextElement(TextElement *element)
 }
 
 //----------------------------------------------------------------------------
-// Functors methods
+// Functor methods
 //----------------------------------------------------------------------------
 
 int Syl::PrepareLyrics(ArrayPtrVoid *params)

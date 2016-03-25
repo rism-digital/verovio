@@ -21,6 +21,7 @@ add_executable (verovio
 	main.cpp
 	../src/accid.cpp
 	../src/aligner.cpp
+	../src/anchoredtext.cpp
 	../src/att.cpp
 	../src/barline.cpp
 	../src/bboxdevicecontext.cpp
@@ -29,13 +30,16 @@ add_executable (verovio
 	../src/clef.cpp
 	../src/custos.cpp
 	../src/devicecontext.cpp
+	../src/dir.cpp
 	../src/doc.cpp	
 	../src/dot.cpp
 	../src/drawinginterface.cpp
 	../src/durationinterface.cpp
+	../src/dynam.cpp
 	../src/editorial.cpp
 	../src/floatingelement.cpp
 	../src/glyph.cpp
+	../src/hairpin.cpp
 	../src/io.cpp
 	../src/iodarms.cpp
 	../src/iomei.cpp
@@ -66,12 +70,13 @@ add_executable (verovio
 	../src/svgdevicecontext.cpp
 	../src/syl.cpp
 	../src/system.cpp
+	../src/tempo.cpp
 	../src/text.cpp
-	../src/textdirective.cpp
 	../src/textdirinterface.cpp
 	../src/textelement.cpp
 	../src/tie.cpp
 	../src/timeinterface.cpp
+	../src/timestamp.cpp
 	../src/toolkit.cpp
 	../src/tuplet.cpp
 	../src/verse.cpp

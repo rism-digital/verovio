@@ -36,6 +36,7 @@
 #include "syl.h"
 #include "tie.h"
 #include "timeinterface.h"
+#include "timestamp.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "view.h"
@@ -51,19 +52,19 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : DocObject("le-")
+LayerElement::LayerElement() : Object("le-")
 {
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : DocObject(classid)
+LayerElement::LayerElement(std::string classid) : Object(classid)
 {
     Reset();
 }
 
 void LayerElement::Reset()
 {
-    DocObject::Reset();
+    Object::Reset();
 
     m_xAbs = VRV_UNSET;
     m_drawingX = 0;
@@ -89,9 +90,11 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
     return *this;
 }
 
-bool LayerElement::IsGraceNote()
+bool LayerElement::IsGraceNote() const
 {
-    Note *note = dynamic_cast<Note *>(this);
+    if (this->Is() != NOTE) return false;
+    Note const *note = dynamic_cast<Note const *>(this);
+    assert(note);
     return (note && note->HasGrace());
 }
 
@@ -106,7 +109,7 @@ Beam *LayerElement::IsInBeam()
     if ((this->Is() != NOTE) && (this->Is() != CHORD)) return NULL;
     Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
     if (beamParent != NULL) {
-        // This note is beamed and cue sized
+        // This note is beamed and cue-sized
         if (this->IsCueSize()) {
             // If the note is part of the beam parent, this means we
             // have a beam of graced notes
@@ -123,12 +126,12 @@ Beam *LayerElement::IsInBeam()
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
 {
     if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
-        DurationInterface *durationInterface = dynamic_cast<DurationInterface *>(this);
+        DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2)
             return this->GetDrawingY() + doc->GetDrawingUnit(staffSize);
         // We should also take into accound the stem shift to the right
-        StemmedDrawingInterface *stemmedDrawingInterface = dynamic_cast<StemmedDrawingInterface *>(this);
+        StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
         if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
             return stemmedDrawingInterface->GetDrawingStemEnd().y;
@@ -143,12 +146,12 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
 int LayerElement::GetDrawingBottom(Doc *doc, int staffSize)
 {
     if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
-        DurationInterface *durationInterface = dynamic_cast<DurationInterface *>(this);
+        DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2)
             return this->GetDrawingY() - doc->GetDrawingUnit(staffSize);
         // We should also take into accound the stem shift to the right
-        StemmedDrawingInterface *stemmedDrawingInterface = dynamic_cast<StemmedDrawingInterface *>(this);
+        StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
         if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
             return stemmedDrawingInterface->GetDrawingStemStart().y - doc->GetDrawingUnit(staffSize);
@@ -163,7 +166,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize)
 bool LayerElement::IsCueSize()
 {
     if (this->Is() == NOTE) {
-        Note *note = dynamic_cast<Note *>(this);
+        const Note *note = dynamic_cast<const Note *>(this);
         assert(note);
         return (note->HasGrace());
     }
@@ -197,7 +200,7 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
             num = tuplet->GetNum();
             numbase = tuplet->GetNumbase();
         }
-        DurationInterface *duration = dynamic_cast<DurationInterface *>(this);
+        DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
         if (duration->IsMensural()) {
             return duration->GetInterfaceAlignmentMensuralDuration(num, numbase, mensur);
@@ -217,12 +220,19 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         if (meterSig) meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
+    else if (this->Is() == TIMESTAMP_ATTR) {
+        TimestampAttr *timestampAttr = dynamic_cast<TimestampAttr *>(this);
+        assert(timestampAttr);
+        int meterUnit = 4;
+        if (meterSig) meterUnit = meterSig->GetUnit();
+        return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
+    }
     else {
         return 0.0;
     }
 }
 
-int LayerElement::GetXRel()
+int LayerElement::GetXRel() const
 {
     if (m_alignment) {
         return m_alignment->GetXRel();
@@ -252,7 +262,8 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     // param 0: the measureAligner
     // param 1: the time
     // param 2: the current Mensur
-    // param 3: the current MeterSig (unused)
+    // param 3: the current MeterSig
+    // param 4: the functor for passing it to the TimeStampAligner (unused)
     MeasureAligner **measureAligner = static_cast<MeasureAligner **>((*params).at(0));
     double *time = static_cast<double *>((*params).at(1));
     Mensur **currentMensur = static_cast<Mensur **>((*params).at(2));
@@ -282,7 +293,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
         }
         else {
             // type = ALIGNMENT_KEYSIG;
-            // We force this because they should appear only at the beginning of a measure and should be non justifiable
+            // We force this because they should appear only at the beginning of a measure and should be non-justifiable
             // We also need it because the PAE importer creates keySig (and not staffDef @key.sig)
             type = ALIGNMENT_KEYSIG_ATTR;
         }
@@ -307,7 +318,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
             (*currentMeterSig) = dynamic_cast<MeterSig *>(this);
             assert(*currentMeterSig);
             // type = ALIGNMENT_METERSIG
-            // We force this because they should appear only at the beginning of a measure and should be non justifiable
+            // We force this because they should appear only at the beginning of a measure and should be non-justifiable
             // We also need it because the PAE importer creates meterSig (and not staffDef @meter)
             type = ALIGNMENT_METERSIG_ATTR;
         }
@@ -332,37 +343,44 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     }
 
     // get the duration of the event
-    double duration = this->GetAlignmentDuration(*currentMensur);
+    double duration = this->GetAlignmentDuration(*currentMensur, *currentMeterSig);
 
-    (*measureAligner)->SetMaxTime((*time) + duration);
+    // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
+    // So use it as current time - we can do this because the timestamp loop is redirected from the measure
+    // The time will be reset to 0.0 when starting a new layer anyway
+    if (this->Is() == TIMESTAMP_ATTR)
+        (*time) = duration;
+    else
+        (*measureAligner)->SetMaxTime((*time) + duration);
 
     m_alignment = (*measureAligner)->GetAlignmentAtTime(*time, type);
 
     if (this->IsGraceNote()) {
         GraceAligner *graceAligner = m_alignment->GetGraceAligner();
+        // We know that this is a note
         graceAligner->StackNote(dynamic_cast<Note *>(this));
     }
 
     // LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str());
 
-    // increase the time position
-    (*time) += duration;
+    // increase the time position, but only when not a timestamp (it would actually do nothing)
+    if (this->Is() != TIMESTAMP_ATTR) {
+        (*time) += duration;
+    }
 
     return FUNCTOR_CONTINUE;
 }
 
 int LayerElement::PrepareTimeSpanning(ArrayPtrVoid *params)
 {
-    // param 0: std::vector<DocObject*>* that holds the current elements to match
-    // param 1: bool* fillList for indicating whether the elements have to be stack or not (unused)
-    std::vector<DocObject *> *elements = static_cast<std::vector<DocObject *> *>((*params).at(0));
+    // param 0: std::vector< Object*>* that holds the current elements to match
+    // param 1: bool* fillList for indicating whether the elements have to be stacked or not (unused)
+    ArrayOfInterfaceClassIdPairs *elements = static_cast<ArrayOfInterfaceClassIdPairs *>((*params).at(0));
 
-    std::vector<DocObject *>::iterator iter = elements->begin();
+    ArrayOfInterfaceClassIdPairs::iterator iter = elements->begin();
     while (iter != elements->end()) {
-        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(*iter);
-        assert(interface);
-        if (interface->SetStartAndEnd(this)) {
-            // Check that there is no timestamp?
+        if (iter->first->SetStartAndEnd(this)) {
+            // We have both the start and the end that are matched
             iter = elements->erase(iter);
         }
         else {
@@ -382,6 +400,7 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view
     // param 6: a bool indicating if we are processing layer elements or not
+    // param 7: a pointer to the functor for passing it to the timestamps (unused)
     Doc *doc = static_cast<Doc *>((*params).at(0));
     Measure **currentMeasure = static_cast<Measure **>((*params).at(2));
     Staff **currentStaff = static_cast<Staff **>((*params).at(3));
@@ -398,10 +417,13 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
             assert(doc->GetType() == Raw);
             this->SetDrawingX(this->GetXRel() + (*currentMeasure)->GetDrawingX());
             // Grace notes, also take into account the GraceAlignment
-            Note *note = dynamic_cast<Note *>(this);
-            if (note && note->HasGraceAlignment()) {
-                this->SetDrawingX(this->GetDrawingX() - note->GetAlignment()->GetGraceAligner()->GetWidth()
-                    + note->GetGraceAlignment()->GetXRel());
+            if (this->Is() == NOTE) {
+                Note *note = dynamic_cast<Note *>(this);
+                assert(note);
+                if (note->HasGraceAlignment()) {
+                    this->SetDrawingX(this->GetDrawingX() - note->GetAlignment()->GetGraceAligner()->GetWidth()
+                        + note->GetGraceAlignment()->GetXRel());
+                }
             }
         }
         else {
@@ -415,7 +437,7 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
 
     // Look for cross-staff situations
     // If we have one, make is available in m_crossStaff
-    DurationInterface *durElement = dynamic_cast<DurationInterface *>(this);
+    DurationInterface *durElement = this->GetDurationInterface();
     if (durElement && durElement->HasStaff()) {
         AttCommonNComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
         m_crossStaff = dynamic_cast<Staff *>((*currentMeasure)->FindChildByAttComparison(&comparisonFirst, 1));

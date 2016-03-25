@@ -14,6 +14,9 @@
 
 #include "doc.h"
 #include "io.h"
+
+//----------------------------------------------------------------------------
+
 #include "pugixml.hpp"
 
 namespace vrv {
@@ -35,10 +38,13 @@ class Custos;
 class Damage;
 class Del;
 class Dot;
+class Dir;
 class DurationInterface;
+class Dynam;
 class Expan;
 class FloatingElement;
 class FTrem;
+class Hairpin;
 class Layer;
 class LayerElement;
 class Lem;
@@ -108,7 +114,7 @@ public:
     virtual bool WriteObject(Object *object);
 
     /**
-     * Writing object method that must be overriden in child class.
+     * Writing object method that must be overridden in the child class.
      */
     virtual bool WriteObjectEnd(Object *object);
 
@@ -118,7 +124,7 @@ public:
     std::string GetOutput(int page = -1);
 
     /**
-     * Setter for score-based MEI output (non implemented)
+     * Setter for score-based MEI output (not implemented)
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; };
 
@@ -179,6 +185,9 @@ private:
      */
     ///@{
     void WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
+    void WriteMeiDir(pugi::xml_node currentNode, Dir *dir);
+    void WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam);
+    void WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteMeiSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteMeiTie(pugi::xml_node currentNode, Tie *tie);
@@ -215,7 +224,7 @@ private:
     ///@}
 
     /**
-     * @name Methods for wrinting other mei elements
+     * @name Methods for writing other mei elements
      */
     ///@{
     void WriteMeiVerse(pugi::xml_node currentNode, Verse *verse);
@@ -228,7 +237,7 @@ private:
     void WriteUnsupportedAttr(pugi::xml_node currentNode, Object *object);
 
     /**
-     * @name Methods for wrinting LayerElement, EditorialElement and interfaces.
+     * @name Methods for writing LayerElement, EditorialElement and interfaces.
      * Call WriteDurationInferface from WriteNote, for example.
      */
     ///@{
@@ -245,8 +254,8 @@ private:
 
     /**
      * Escapes SMuFL characters to entities (e.g., &#xe1e7;).
-     * Must me used in conjunction with (pugi::format_default | pugi::format_no_escapes).
-     * Unused for now (see WriteMeiText) because it of un-escaped entities in the header.
+     * Must be used in conjunction with (pugi::format_default | pugi::format_no_escapes).
+     * Unused for now (see WriteMeiText) because of un-escaped entities in the header.
      */
     std::wstring EscapeSMuFL(std::wstring data);
 
@@ -291,7 +300,7 @@ public:
     /**
      * Set an xPath query for selecting specific <rdg>.
      * By default, the first <lem> or <rdg> is loaded.
-     * If a query is provided, the element retieved by the specified xPath
+     * If a query is provided, the element retrieved by the specified xPath
      * query will be selected (if any, otherwise the first one will be used).
      */
     virtual void SetAppXPathQuery(std::string appXPathQuery) { m_appXPathQuery = appXPathQuery; };
@@ -303,9 +312,9 @@ private:
     /**
      * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related.
      * For each container (page, system, measure, staff and layer) there is one method for
-     * reading the element and one method for reading it children. The method for reading
+     * reading the element and one method for reading its children. The method for reading
      * the children can also be called when reading EditorialElement objects (<lem> or <rdg>
-     * for example. The filter object is optionnal and can be set for filtering the allowed
+     * for example. The filter object is optional and can be set for filtering the allowed
      * children (see MeiInput::IsAllowed)
      */
     ///@{
@@ -363,6 +372,9 @@ private:
      */
     ///@{
     bool ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText);
+    bool ReadMeiDir(Object *parent, pugi::xml_node dir);
+    bool ReadMeiDynam(Object *parent, pugi::xml_node dynam);
+    bool ReadMeiHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadMeiSlur(Object *parent, pugi::xml_node slur);
     bool ReadMeiTempo(Object *parent, pugi::xml_node tempo);
     bool ReadMeiTie(Object *parent, pugi::xml_node tie);

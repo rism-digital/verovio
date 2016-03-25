@@ -26,7 +26,7 @@ The simplest way to fullfil the Verovio coding style is to use a clang-format to
 
 ## Includes and forward declarations
 
-Includes in the header files must list first the system includes followed by the Verovio includes, if any. All includes have to be ordered alphabetically:
+Includes in the header files must list first the system includes followed by the Verovio includes, if any, and then the includes for the libraries included in Verovio. All includes have to be ordered alphabetically:
 
     #include <string>
     #include <utility>
@@ -36,7 +36,11 @@ Includes in the header files must list first the system includes followed by the
     
     #include "attclasses.h"
     #include "atttypes.h"
+
+    //----------------------------------------------------------------------------  
     
+    #include "pugixml.hpp"
+    #include "utf8.h"
 
 In the header files, always use forward declarations (and not includes) whenever possible. Forward declaration have to be ordered alphabetically:
 
@@ -47,7 +51,7 @@ In the header files, always use forward declarations (and not includes) whenever
     class TimeSpanningInterface;
 
 
-In the implementation files, the first include in always the include of the corresponding header file, followed by the system includes and then the other Verovio includes, if any, also ordered alphabetically:
+In the implementation files, the first include in always the include of the corresponding header file, followed by the system includes and then the other Verovio includes with libraries at the end too, if any, also ordered alphabetically:
 
     #include "att.h"
     
@@ -60,6 +64,10 @@ In the implementation files, the first include in always the include of the corr
     
     #include "object.h"
     #include "vrv.h"
+    
+    //----------------------------------------------------------------------------  
+    
+    #include "pugixml.hpp"
     
 ## Null and boolean
 

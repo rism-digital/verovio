@@ -80,7 +80,7 @@ void View::DrawText(DeviceContext *dc, Text *text, int x, int y, bool &setX, boo
         DrawLyricString(dc, x, y, text->GetText());
     }
     else {
-        dc->DrawText(UTF16to8(text->GetText().c_str()), text->GetText());
+        dc->DrawText(UTF16to8(text->GetText()), text->GetText());
     }
 }
 

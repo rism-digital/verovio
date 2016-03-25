@@ -35,15 +35,18 @@ class Syl : public LayerElement,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Syl();
     virtual ~Syl();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Syl"; };
-    virtual ClassId Is() { return SYL; };
+    virtual std::string GetClassName() const { return "Syl"; };
+    virtual ClassId Is() const { return SYL; };
     ///@}
+
+    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
 
     /**
      * Add an element (text, rend. etc.) to a syl.
@@ -57,7 +60,7 @@ public:
 
     /**
      * Functor for setting wordpos and connector ends
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter
+     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter
      * See PrepareDarwing
      */
     virtual int PrepareLyrics(ArrayPtrVoid *params);

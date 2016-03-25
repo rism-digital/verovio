@@ -31,6 +31,13 @@ TimestampAttr::~TimestampAttr()
 void TimestampAttr::Reset()
 {
     LayerElement::Reset();
+
+    m_actualDurPos = 0.0;
+}
+
+double TimestampAttr::GetTimestampAttrAlignmentDuration(int meterUnit) const
+{
+    return DUR_MAX / meterUnit * m_actualDurPos;
 }
 
 } // namespace vrv

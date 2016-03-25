@@ -18,13 +18,13 @@ namespace vrv {
 
 /**
  * This class is an interface for elements with pitch, such as notes and neumes.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class PitchInterface : public Interface, public AttAccidental, public AttOctave, public AttPitch {
 public:
     /**
      * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     PitchInterface();
@@ -35,7 +35,7 @@ public:
 
     /**
      * Interface comparison operator.
-     * Check if the LayerElement has a PitchInterface and compare attributes
+     * Checks if the LayerElement has a PitchInterface and compares attributes
      */
     bool HasIdenticalPitchInterface(PitchInterface *otherPitchInterface);
 

@@ -75,12 +75,12 @@ bool AttIneumeLog::WriteIneumeLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttIneumeLog::HasForm()
+bool AttIneumeLog::HasForm() const
 {
     return (m_form != INEUMEFORM_NONE);
 }
 
-bool AttIneumeLog::HasName()
+bool AttIneumeLog::HasName() const
 {
     return (m_name != INEUMENAME_NONE);
 }
@@ -136,12 +136,12 @@ bool AttUneumeLog::WriteUneumeLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttUneumeLog::HasForm()
+bool AttUneumeLog::HasForm() const
 {
     return (m_form != UNEUMEFORM_NONE);
 }
 
-bool AttUneumeLog::HasName()
+bool AttUneumeLog::HasName() const
 {
     return (m_name != UNEUMENAME_NONE);
 }
@@ -178,10 +178,10 @@ bool Att::SetNeumes(Object *element, std::string attrType, std::string attrValue
     return false;
 }
 
-void Att::GetNeumes(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetNeumes(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_INEUMELOG)) {
-        AttIneumeLog *att = dynamic_cast<AttIneumeLog *>(element);
+        const AttIneumeLog *att = dynamic_cast<const AttIneumeLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->IneumeformToStr(att->GetForm())));
@@ -191,7 +191,7 @@ void Att::GetNeumes(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_UNEUMELOG)) {
-        AttUneumeLog *att = dynamic_cast<AttUneumeLog *>(element);
+        const AttUneumeLog *att = dynamic_cast<const AttUneumeLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->UneumeformToStr(att->GetForm())));

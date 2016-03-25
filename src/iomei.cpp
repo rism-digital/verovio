@@ -15,11 +15,15 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "anchoredtext.h"
 #include "beam.h"
 #include "chord.h"
 #include "custos.h"
+#include "dir.h"
 #include "dot.h"
+#include "dynam.h"
 #include "editorial.h"
+#include "hairpin.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -37,8 +41,8 @@
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
+#include "tempo.h"
 #include "text.h"
-#include "textdirective.h"
 #include "tie.h"
 #include "tuplet.h"
 #include "verse.h"
@@ -102,7 +106,7 @@ bool MeiOutput::ExportFile()
                 LogError("Page %d does not exist", m_page);
                 return false;
             }
-            Page *page = dynamic_cast<Page *>(m_doc->m_children.at(m_page));
+            Page *page = dynamic_cast<Page *>(m_doc->GetChild(m_page));
             assert(page);
             if (m_scoreBasedMEI) {
                 m_currentNode = meiDoc.append_child("score");
@@ -197,6 +201,18 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == ANCHORED_TEXT) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         WriteMeiAnchoredText(m_currentNode, dynamic_cast<AnchoredText *>(object));
+    }
+    else if (object->Is() == DIR) {
+        m_currentNode = m_currentNode.append_child("dir");
+        WriteMeiDir(m_currentNode, dynamic_cast<Dir *>(object));
+    }
+    else if (object->Is() == DYNAM) {
+        m_currentNode = m_currentNode.append_child("dynam");
+        WriteMeiDynam(m_currentNode, dynamic_cast<Dynam *>(object));
+    }
+    else if (object->Is() == HAIRPIN) {
+        m_currentNode = m_currentNode.append_child("hairpin");
+        WriteMeiHairpin(m_currentNode, dynamic_cast<Hairpin *>(object));
     }
     else if (object->Is() == SLUR) {
         m_currentNode = m_currentNode.append_child("slur");
@@ -563,6 +579,34 @@ void MeiOutput::WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *a
     WriteTextDirInterface(currentNode, anchoredText);
 }
 
+void MeiOutput::WriteMeiDir(pugi::xml_node currentNode, Dir *dir)
+{
+    assert(dir);
+
+    WriteXmlId(currentNode, dir);
+    WriteTextDirInterface(currentNode, dir);
+    WriteTimeSpanningInterface(currentNode, dir);
+};
+
+void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
+{
+    assert(dynam);
+
+    WriteXmlId(currentNode, dynam);
+    WriteTextDirInterface(currentNode, dynam);
+    WriteTimeSpanningInterface(currentNode, dynam);
+};
+
+void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
+{
+    assert(hairpin);
+
+    WriteXmlId(currentNode, hairpin);
+    WriteTimeSpanningInterface(currentNode, hairpin);
+    hairpin->WriteHairpinLog(currentNode);
+    hairpin->WritePlacement(currentNode);
+};
+
 void MeiOutput::WriteMeiSlur(pugi::xml_node currentNode, Slur *slur)
 {
     assert(slur);
@@ -852,7 +896,7 @@ void MeiOutput::WriteMeiText(pugi::xml_node element, Text *text)
     if (!text->GetText().empty()) {
         pugi::xml_node nodechild = element.append_child(pugi::node_pcdata);
         // nodechild.text() =  UTF16to8(EscapeSMuFL(text->GetText()).c_str()).c_str();
-        nodechild.text() = UTF16to8(text->GetText().c_str()).c_str();
+        nodechild.text() = UTF16to8(text->GetText()).c_str();
     }
 }
 
@@ -1384,7 +1428,7 @@ bool MeiInput::ReadMeiSystem(Object *parent, pugi::xml_node system)
         vrvSystem->m_yAbs = atoi(system.attribute("uly").value()) * DEFINITON_FACTOR;
     }
 
-    // This could me moved to an AddSystem method for consistency with AddLayerElement
+    // This could be moved to an AddSystem method for consistency with AddLayerElement
     if (parent->Is() == PAGE) {
         Page *page = dynamic_cast<Page *>(parent);
         assert(page);
@@ -1408,7 +1452,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
         }
         // content
         else if (std::string(current.name()) == "scoreDef") {
-            // we should not have scoredef with unmeasured within a system... (?)
+            // we should not have scoredef with unmeasured music within a system... (?)
             assert(!unmeasured);
             ReadMeiScoreDef(parent, current);
         }
@@ -1429,7 +1473,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadMeiStaff(unmeasured, current);
         }
         else if (parentNode.child("measure")) {
-            // we should not mix measured and unmeasured within a system...
+            // we should not mix measured and unmeasured music within a system...
             assert(!unmeasured);
             if (parent->IsEditorialElement()) {
                 if (!m_ignoreLayoutInformation) {
@@ -1555,7 +1599,7 @@ bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
 
     ReadScoreDefInterface(staffDef, vrvStaffDef);
 
-    // This could me moved to an AddMeasure method for consistency with AddLayerElement
+    // This could be moved to an AddMeasure method for consistency with AddLayerElement
     if (parent->Is() == STAFFGRP) {
         StaffGrp *staffGrp = dynamic_cast<StaffGrp *>(parent);
         assert(staffGrp);
@@ -1578,7 +1622,7 @@ bool MeiInput::ReadMeiMeasure(Object *parent, pugi::xml_node measure)
     vrvMeasure->ReadMeasureLog(measure);
     vrvMeasure->ReadPointing(measure);
 
-    // This could me moved to an AddMeasure method for consistency with AddLayerElement
+    // This could be moved to an AddMeasure method for consistency with AddLayerElement
     if (parent->Is() == SYSTEM) {
         System *system = dynamic_cast<System *>(parent);
         assert(system);
@@ -1607,6 +1651,15 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         // content
         else if (std::string(current.name()) == "anchoredText") {
             success = ReadMeiAnchoredText(parent, current);
+        }
+        else if (std::string(current.name()) == "dir") {
+            success = ReadMeiDir(parent, current);
+        }
+        else if (std::string(current.name()) == "dynam") {
+            success = ReadMeiDynam(parent, current);
+        }
+        else if (std::string(current.name()) == "hairpin") {
+            success = ReadMeiHairpin(parent, current);
         }
         else if (std::string(current.name()) == "slur") {
             success = ReadMeiSlur(parent, current);
@@ -1641,6 +1694,43 @@ bool MeiInput::ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText)
 
     AddFloatingElement(parent, vrvAnchoredText);
     return ReadMeiTextChildren(vrvAnchoredText, anchoredText);
+}
+
+bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
+{
+    Dir *vrvDir = new Dir();
+    SetMeiUuid(dir, vrvDir);
+
+    ReadTextDirInterface(dir, vrvDir);
+    ReadTimeSpanningInterface(dir, vrvDir);
+
+    AddFloatingElement(parent, vrvDir);
+    return ReadMeiTextChildren(vrvDir, dir);
+}
+
+bool MeiInput::ReadMeiDynam(Object *parent, pugi::xml_node dynam)
+{
+    Dynam *vrvDynam = new Dynam();
+    SetMeiUuid(dynam, vrvDynam);
+
+    ReadTextDirInterface(dynam, vrvDynam);
+    ReadTimeSpanningInterface(dynam, vrvDynam);
+
+    AddFloatingElement(parent, vrvDynam);
+    return ReadMeiTextChildren(vrvDynam, dynam);
+}
+
+bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
+{
+    Hairpin *vrvHairpin = new Hairpin();
+    SetMeiUuid(hairpin, vrvHairpin);
+
+    ReadTimeSpanningInterface(hairpin, vrvHairpin);
+    vrvHairpin->ReadHairpinLog(hairpin);
+    vrvHairpin->ReadPlacement(hairpin);
+
+    AddFloatingElement(parent, vrvHairpin);
+    return true;
 }
 
 bool MeiInput::ReadMeiSlur(Object *parent, pugi::xml_node slur)
@@ -1694,7 +1784,7 @@ bool MeiInput::ReadMeiStaff(Object *parent, pugi::xml_node staff)
         LogWarning("No @n on <staff> might yield unpredictable results");
     }
 
-    // This could me moved to an AddLayer method for consistency with AddLayerElement
+    // This could be moved to an AddLayer method for consistency with AddLayerElement
     if (parent->Is() == MEASURE) {
         Measure *measure = dynamic_cast<Measure *>(parent);
         assert(measure);
@@ -1742,7 +1832,7 @@ bool MeiInput::ReadMeiLayer(Object *parent, pugi::xml_node layer)
         LogWarning("No @n on <layer> might yield unpredictable results");
     }
 
-    // This could me moved to an AddLayer method for consistency with AddLayerElement
+    // This could be moved to an AddLayer method for consistency with AddLayerElement
     if (parent->Is() == STAFF) {
         Staff *staff = dynamic_cast<Staff *>(parent);
         assert(staff);
@@ -2450,7 +2540,7 @@ bool MeiInput::ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, Edi
         // Now we check if the xpath selection (if any) matches the current node.
         // If yes, make it visible
         if (selectedLemOrRdg == current) {
-            EditorialElement *last = dynamic_cast<EditorialElement *>(parent->m_children.back());
+            EditorialElement *last = dynamic_cast<EditorialElement *>(parent->GetLast());
             if (last) {
                 last->m_visibility = Visible;
                 hasXPathSelected = true;
@@ -2460,7 +2550,7 @@ bool MeiInput::ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, Edi
 
     // If no child was made visible through the xpath selection, make the first one visible
     if (!hasXPathSelected) {
-        EditorialElement *first = dynamic_cast<EditorialElement *>(parent->m_children.front());
+        EditorialElement *first = dynamic_cast<EditorialElement *>(parent->GetFirst());
         if (first) {
             first->m_visibility = Visible;
         }
@@ -2526,7 +2616,7 @@ bool MeiInput::ReadMeiLem(Object *parent, pugi::xml_node lem, EditorialLevel lev
 
     vrvLem->ReadSource(lem);
 
-    dynamic_cast<App *>(parent)->AddLemOrRdg(vrvLem);
+    (dynamic_cast<App *>(parent))->AddLemOrRdg(vrvLem);
     return ReadMeiEditorialChildren(vrvLem, lem, level, filter);
 }
 
@@ -2552,7 +2642,7 @@ bool MeiInput::ReadMeiRdg(Object *parent, pugi::xml_node rdg, EditorialLevel lev
 
     vrvRdg->ReadSource(rdg);
 
-    dynamic_cast<App *>(parent)->AddLemOrRdg(vrvRdg);
+    (dynamic_cast<App *>(parent))->AddLemOrRdg(vrvRdg);
     return ReadMeiEditorialChildren(vrvRdg, rdg, level, filter);
 }
 
@@ -2670,10 +2760,10 @@ void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp)
         element->AddStaffGrp(staffGrp);
     }
     else if (parent->Is() == SCOREDEF) {
-        dynamic_cast<ScoreDef *>(parent)->AddStaffGrp(staffGrp);
+        (dynamic_cast<ScoreDef *>(parent))->AddStaffGrp(staffGrp);
     }
     else if (parent->Is() == STAFFGRP) {
-        dynamic_cast<StaffGrp *>(parent)->AddStaffGrp(staffGrp);
+        (dynamic_cast<StaffGrp *>(parent))->AddStaffGrp(staffGrp);
     }
     else {
         LogWarning("'%s' not supported within '%s'", staffGrp->GetClassName().c_str(), parent->GetClassName().c_str());
@@ -2764,6 +2854,16 @@ void MeiInput::AddTextElement(Object *parent, TextElement *element)
         AnchoredText *anchoredText = dynamic_cast<AnchoredText *>(parent);
         assert(anchoredText);
         anchoredText->AddTextElement(element);
+    }
+    else if (parent->Is() == DIR) {
+        Dir *dir = dynamic_cast<Dir *>(parent);
+        assert(dir);
+        dir->AddTextElement(element);
+    }
+    else if (parent->Is() == DYNAM) {
+        Dynam *dynam = dynamic_cast<Dynam *>(parent);
+        assert(dynam);
+        dynam->AddTextElement(element);
     }
     else if (parent->Is() == REND) {
         Rend *rend = dynamic_cast<Rend *>(parent);

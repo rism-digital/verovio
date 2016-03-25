@@ -40,18 +40,24 @@ class Chord : public LayerElement,
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Chord();
     virtual ~Chord();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Chord"; };
-    virtual ClassId Is() { return CHORD; };
+    virtual std::string GetClassName() const { return "Chord"; };
+    virtual ClassId Is() const { return CHORD; };
     ///@}
 
+    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
+    {
+        return dynamic_cast<StemmedDrawingInterface *>(this);
+    }
+
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
     /**
      * Add an element (only note supported) to a chord.
@@ -71,18 +77,18 @@ public:
      * Return information about the position in the chord
      */
     ///@{
-    /** Return 0 if the note id the middle note, -1 if below it and 1 if above */
+    /** Return 0 if the note id is the middle note, -1 if below it and 1 if above */
     int PositionInChord(Note *note);
     ///@}
 
     /**
      * Prepares a 2D grid of booleans to track where accidentals are placed.
-     * Further documentation in chord.cpp comments.
+     * For further documentation, see comments in chord.cpp
      */
     void ResetAccidSpace(int fullUnit);
 
     /**
-     * @name Set and get the stem direction and stem positions
+     * @name Set and get stem direction and stem positions
      * The methods are overriding the interface because we want to apply it to child notes
      */
     ///@{
@@ -109,10 +115,10 @@ protected:
     /**
      * Clear the m_clusters vector and delete all the objects.
      */
-    void ClearClusters();
+    void ClearClusters() const;
 
 public:
-    std::list<ChordCluster *> m_clusters;
+    mutable std::list<ChordCluster *> m_clusters;
 
     /**
      * Number of ledger lines for the chord where:

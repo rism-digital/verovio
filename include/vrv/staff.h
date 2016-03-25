@@ -27,21 +27,21 @@ class TimeSpanningInterface;
  * This class represents a staff in a laid-out score (Doc).
  * A Staff is contained in a System.
  * It contains Measure objects.
- * For unmeasured music, on single Measure is added for simplifying internal processing
+ * For unmeasured music, one single Measure is added for simplifying internal processing
 */
-class Staff : public DocObject, public AttCommon {
+class Staff : public Object, public AttCommon {
 
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Staff(int n = -1);
     virtual ~Staff();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Staff"; };
-    virtual ClassId Is() { return STAFF; };
+    virtual std::string GetClassName() const { return "Staff"; };
+    virtual ClassId Is() const { return STAFF; };
     ///@}
 
     /**
@@ -69,9 +69,9 @@ public:
      */
     virtual void ResetVerticalAlignment();
 
-    StaffAlignment *GetAlignment() { return m_staffAlignment; };
+    StaffAlignment *GetAlignment() const { return m_staffAlignment; };
 
-    int GetYRel();
+    int GetYRel() const;
 
     //----------//
     // Functors //
@@ -95,7 +95,7 @@ public:
     /**
      * Functor for setting running lyrics in staves
      * This is necessary for <syl> that starts in one measure and ends in another one
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
     virtual int FillStaffCurrentLyrics(ArrayPtrVoid *params);
 
@@ -127,7 +127,7 @@ public:
     int m_drawingNotationType;
 
     /**
-     * Total drawing height from top of top line to bottom of bottom line
+     * Total drawing height from top of the top line to bottom of the bottom line
      */
     int m_drawingHeight;
 
@@ -136,7 +136,7 @@ public:
      */
     int m_drawingStaffSize;
 
-    std::vector<DocObject *> m_timeSpanningElements;
+    std::vector<Object *> m_timeSpanningElements;
 
     /**
  * The Y absolute position of the staff for facsimile (transcription) encodings.

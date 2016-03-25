@@ -13,7 +13,7 @@
 
 namespace vrv {
 
-class DocObject;
+class  Object;
 class LayerElement;
 class Measure;
 
@@ -23,7 +23,7 @@ class Measure;
 
 /**
  * This class is an interface for elements having a single time point, such as tempo, reh, etc..
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class TimePointInterface : public Interface, public AttStaffident, public AttStartid, public AttTimestampMusical {
 public:
@@ -74,15 +74,20 @@ public:
 
     /**
      * We have functor in the interface for avoiding code duplication in each implementation class.
-     * Since we are in an interface, we need to pass the DocObject (implementation) to
+     * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor method. These not called by the Process/Call loop but by the implementaion
      * classes explicitely. See FloatingElement::FillStaffCurrentTimeSpanning for an example.
      */
 
     /**
+     * See Object::PrepareTimestamps
+     */
+    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object);
+
+    /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object);
+    virtual int InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object);
 
 protected:
     /**
@@ -112,13 +117,13 @@ private:
 
 /**
  * This class is an interface for spanning elements, such as slur, hairpin, etc..
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class TimeSpanningInterface : public TimePointInterface, public AttStartendid, public AttTimestamp2Musical {
 public:
     /**
      * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     TimeSpanningInterface();
@@ -126,6 +131,8 @@ public:
     virtual void Reset();
     virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; };
     ///@}
+
+    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
 
     /**
      * @name Set and get the first and second LayerElement
@@ -166,26 +173,31 @@ public:
     //-----------------//
 
     /**
-     * We have functor in the interface for avoiding code duplication in each implementation class.
-     * Since we are in an interface, we need to pass the DocObject (implementation) to
-     * the functor method. These not called by the Process/Call loop but by the implementaion
+     * We have functors in the interface for avoiding code duplication in each implementation class.
+     * Since we are in an interface, we need to pass the  Object (implementation) to
+     * the functor methods. These are not called by the Process/Call loop but by the implementation
      * classes explicitely. See FloatingElement::FillStaffCurrentTimeSpanning for an example.
      */
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params, DocObject *object);
+    virtual int InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params,  Object *object);
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int InterfacePrepareTimeSpanning(ArrayPtrVoid *params, DocObject *object);
+    virtual int InterfacePrepareTimeSpanning(ArrayPtrVoid *params,  Object *object);
+
+    /**
+     * See Object::PrepareTimestamps
+     */
+    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object);
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params, DocObject *object);
+    virtual int InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object);
 
 private:
     //

@@ -28,7 +28,7 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() : DocObject("ee-"), AttCommon(), AttCommonPart()
+EditorialElement::EditorialElement() :  Object("ee-"), AttCommon(), AttCommonPart()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
@@ -36,7 +36,7 @@ EditorialElement::EditorialElement() : DocObject("ee-"), AttCommon(), AttCommonP
     Reset();
 }
 
-EditorialElement::EditorialElement(std::string classid) : DocObject(classid), AttCommon()
+EditorialElement::EditorialElement(std::string classid) :  Object(classid), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
@@ -46,7 +46,7 @@ EditorialElement::EditorialElement(std::string classid) : DocObject(classid), At
 
 void EditorialElement::Reset()
 {
-    DocObject::Reset();
+    Object::Reset();
     ResetCommon();
     ResetCommonPart();
 

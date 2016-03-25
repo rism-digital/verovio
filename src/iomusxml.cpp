@@ -162,11 +162,11 @@ void MusicXmlInput::AddMeasure(System *system, Measure *measure, int i)
     }
     // otherwise copy the content to the corresponding existing measure
     else if (system->GetChildCount() > i) {
-        Measure *existingMeasure = dynamic_cast<Measure *>(system->m_children[i]);
+        Measure *existingMeasure = dynamic_cast<Measure *>(system->GetChild(i));
         assert(existingMeasure);
-        ArrayOfObjects::iterator sIter = measure->m_children.begin();
-        for (sIter = measure->m_children.begin(); sIter != measure->m_children.end(); sIter++) {
-            Staff *staff = dynamic_cast<Staff *>(measure->Relinquish((*sIter)->GetIdx()));
+        Object *current;
+        for (current = measure->GetFirst(); current; current = measure->GetNext()) {
+            Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
             existingMeasure->AddStaff(staff);
         }
@@ -209,14 +209,14 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
     if (!staffNbStr.empty()) {
         staffNb = atoi(staffNbStr.c_str());
     }
-    if ((staffNb < 1) || (staffNb > measure->m_children.size())) {
+    if ((staffNb < 1) || (staffNb > measure->GetChildCount())) {
         LogWarning("Staff %d cannot be found", staffNb);
         staffNb = 1;
     }
     staffNb--;
-    Staff *staff = dynamic_cast<Staff *>(measure->m_children.at(staffNb));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNb));
     assert(staff);
-    // Now look for the layer with the correpsonding voice
+    // Now look for the layer with the corresponding voice
     int layerNb = 1;
     std::string layerNbStr = GetContentOfChild(node, "voice");
     if (!layerNbStr.empty()) {
@@ -232,7 +232,7 @@ Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
 Layer *MusicXmlInput::SelectLayer(int staffNb, vrv::Measure *measure)
 {
     staffNb--;
-    Staff *staff = dynamic_cast<Staff *>(measure->m_children.at(staffNb));
+    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(staffNb));
     assert(staff);
     // layer -1 means the first one
     return SelectLayer(-1, staff);
@@ -243,8 +243,8 @@ Layer *MusicXmlInput::SelectLayer(int layerNb, Staff *staff)
     Layer *layer = NULL;
     // no layer specified, return the first one (if any)
     if (layerNb == -1) {
-        if (staff->m_children.size() > 0) {
-            layer = dynamic_cast<Layer *>(staff->m_children.at(0));
+        if (staff->GetChildCount() > 0) {
+            layer = dynamic_cast<Layer *>(staff->GetChild(0));
         }
         // otherwise set @n to 1
         layerNb = 1;
@@ -553,7 +553,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, System *system, int nb
         pugi::xpath_node xmlMeasure = *it;
         Measure *measure = new Measure();
         ReadMusicXmlMeasure(xmlMeasure.node(), measure, nbStaves, staffOffset);
-        // Add the measure to the system - if already there from a previous part will just merge the content
+        // Add the measure to the system - if already there from a previous part we'll just merge the content
         AddMeasure(system, measure, i);
         i++;
     }
@@ -633,7 +633,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, i
         else if (barStyle == "light-heavy") {
             barRendition = BARRENDITION_end;
         }
-        // we need to handle more style
+        // we need to handle more styles
         else {
             barRendition = BARRENDITION_single;
         }
@@ -681,7 +681,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     // tuplet start
     // For now tuplet with beam if starting at the same time. However, this will quite likely not
     // work if we have a tuplet over serveral beams. We would need to check which one is ending first
-    // in order to determin which one is on top of the hierarchy. Also, it is not 100% sure that we
+    // in order to determine which one is on top of the hierarchy. Also, it is not 100% sure that we
     // can represent them as tuplet and beam elements.
     pugi::xpath_node tupletStart = notations.node().select_single_node("tuplet[@type='start']");
     if (tupletStart) {
@@ -807,7 +807,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             }
 
             Text *text = new Text();
-            text->SetText(UTF8to16(textStr.c_str()));
+            text->SetText(UTF8to16(textStr));
             syl->AddTextElement(text);
             verse->AddLayerElement(syl);
             note->AddLayerElement(verse);

@@ -65,7 +65,7 @@ bool AttFacsimile::WriteFacsimile(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttFacsimile::HasFacs()
+bool AttFacsimile::HasFacs() const
 {
     return (m_facs != URIS_NONE);
 }
@@ -86,10 +86,10 @@ bool Att::SetFacsimile(Object *element, std::string attrType, std::string attrVa
     return false;
 }
 
-void Att::GetFacsimile(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetFacsimile(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_FACSIMILE)) {
-        AttFacsimile *att = dynamic_cast<AttFacsimile *>(element);
+        const AttFacsimile *att = dynamic_cast<const AttFacsimile *>(element);
         assert(att);
         if (att->HasFacs()) {
             attributes->push_back(std::make_pair("facs", att->UrisToStr(att->GetFacs())));

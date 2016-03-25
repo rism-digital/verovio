@@ -137,6 +137,16 @@ int View::ToLogicalY(int i)
     return m_doc->m_drawingPageHeight - i; // flipped
 }
 
+Point View::ToDeviceContext(Point p)
+{
+    return Point(ToDeviceContextX(p.x), ToDeviceContextY(p.y));
+}
+
+Point View::ToLogical(Point p)
+{
+    return Point(ToLogicalX(p.x), ToLogicalY(p.y));
+}
+
 void View::SwapPoints(Point *x1, Point *x2)
 {
     Point a;

@@ -26,15 +26,35 @@ public:
     TimestampAttr();
     virtual ~TimestampAttr();
     virtual void Reset();
-    virtual std::string GetClassName() { return "TimestampAttr"; };
-    virtual ClassId Is() { return TIMESTAMP_ATTR; };
+    virtual std::string GetClassName() const { return "TimestampAttr"; };
+    virtual ClassId Is() const { return TIMESTAMP_ATTR; };
     ///@}
+
+    /**
+     * @name Setter and getter for the timestamp actual duration position.
+     * The actual duration position is the timestamp position - 1.0.
+     */
+    ///@{
+    double GetActualDurPos() const { return m_actualDurPos; };
+    void SetDrawingPos(double pos) { m_actualDurPos = pos; };
+    ///@}
+
+    /**
+     * Returns the duration (in double) for the Timestamp.
+     */
+    double GetTimestampAttrAlignmentDuration(int meterUnit) const;
+
+    //----------//
+    // Functors //
+    //----------//
 
 private:
     //
 public:
     //
 private:
+    /** The actual duration postion where 0.0 correspond to the first beat and -1.0 the beginning of the measure */
+    double m_actualDurPos;
 };
 
 } // namespace vrv

@@ -19,7 +19,7 @@ namespace vrv {
  * as possible, they are 10 times the original values. Since the unit
  * per em value is also 10 times the original, there is no incident on
  * calculations elsewhere. However, it does increase the precision because
- * units are always multiplied by a point size before being devided by the
+ * units are always multiplied by a point size before being divided by the
  * unit per em. See
  * Ex: 10.2 become 102, with a unit per em of 20480 (instead of 2048)
  */
@@ -54,6 +54,14 @@ public:
     /** Get the code string */
     std::string GetCodeStr() { return m_codeStr; };
 
+    /**
+     * @name Setter and getter for the horizAdvX
+     */
+    ///@{
+    int GetHorizAdvX() { return m_horizAdvX; };
+    void SetHorizAdvX(double horizAdvX) { m_horizAdvX = (int)(horizAdvX * 10.0); };
+    ///@}
+
 private:
     //
 public:
@@ -64,6 +72,8 @@ private:
     int m_y;
     int m_width;
     int m_height;
+    /** The horizontal adv x (if any) */
+    int m_horizAdvX;
     /** Units per EM for the glyph */
     int m_unitsPerEm;
     /** Path to the file */

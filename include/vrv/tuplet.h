@@ -8,8 +8,8 @@
 #ifndef __VRV_TUPLET_H__
 #define __VRV_TUPLET_H__
 
-#include "atts_shared.h"
 #include "atts_cmn.h"
+#include "atts_shared.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -28,17 +28,17 @@ class Tuplet : public LayerElement,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Tuplet();
     virtual ~Tuplet();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Tuplet"; };
-    virtual ClassId Is() { return TUPLET; };
+    virtual std::string GetClassName() const { return "Tuplet"; };
+    virtual ClassId Is() const { return TUPLET; };
     ///@}
 
-    int GetNoteCount() const { return (int)m_children.size(); };
+    int GetNoteCount() const { return this->GetChildCount(NOTE); };
 
     /**
      * Add an element (a note or a rest) to a tuplet.

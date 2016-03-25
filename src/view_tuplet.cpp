@@ -38,11 +38,11 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
     ArrayOfObjects elems;
 
     // Are we contained in a beam?
-    if (tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH) && !tuplet->m_children.empty()) return true;
+    if (tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH) && (tuplet->GetNoteCount() != 0)) return true;
 
     // No we contain a beam? Go on and search for it in the children
-    for (unsigned int i = 0; i < tuplet->m_children.size(); i++) {
-        currentBeam = dynamic_cast<Beam *>(tuplet->m_children.at(i));
+    for (unsigned int i = 0; i < tuplet->GetChildCount(); i++) {
+        currentBeam = dynamic_cast<Beam *>(tuplet->GetChild(i));
 
         // first child is not a beam, or it is a beam but we have more than one child
         if (!currentBeam || tuplet->GetChildCount() > 1) {
@@ -65,18 +65,18 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
  * 2) All notes unbeamed
  * 3) a mixture of the above
  *
- * The first type are the simplest to calculate, as we just need the
+ * The first type is the simplest to calculate, as we just need the
  * start and end of the beam
- * types 2 and 3 are threaed in the same manner to calculate the points:
+ * types 2 and 3 are treated in the same manner to calculate the points:
  * - if all the stems are in the same direction, the bracket goes from the
  *   first to the last stem and the number is centered. If a stem in the
- *   middle il longher than the first or last, the y positions are offsetted
+ *   middle is longer than the first or last, the y positions are offsetted
  *   accordingly to evitate collisions
  * - if stems go in two different directions, the bracket and number are
  *   placed in the side that has more stems in that direction. If the
- *   stems are equal, if goes up. In this case the bracket is orizontal
+ *   stems are equal, if goes up. In this case the bracket is horizontal
  *   so we just need the tallnes of the most tall stem. If a notehead
- *   il lower (or upper) than this stem, we compensate that too with an offset
+ *   is lower (or upper) than this stem, we compensate that too with an offset
 
  */
 
@@ -121,11 +121,11 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         // Copy the generated coordinates
         center->x = x;
         center->y = y;
-        direction = firstNote->GetDrawingStemDir(); // stem direction is same for all notes
+        direction = firstNote->GetDrawingStemDir(); // stem direction is the same for all notes
     }
     else {
         // There are unbeamed notes of two different beams
-        // treat all the notes as unbeames
+        // treat all the notes as unbeamed
         int ups = 0, downs = 0; // quantity of up- and down-stems
 
         // In this case use the center of the notehead to calculate the exact center
@@ -138,7 +138,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         start->x = firstElement->m_selfBB_x1 + firstElement->GetDrawingX();
         end->x = lastElement->m_selfBB_x2 + lastElement->GetDrawingX();
 
-        // THe first step is to calculate all the stem directions
+        // The first step is to calculate all the stem directions
         // cycle into the elements and count the up and down dirs
         ListOfObjects::iterator iter = tupletChildren->begin();
         while (iter != tupletChildren->end()) {
@@ -155,7 +155,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         // true means up
         direction = ups > downs ? STEMDIRECTION_up : STEMDIRECTION_down;
 
-        // if ups or downs is 0, it means all the stems go in the same direction
+        // if ups or downs are 0, it means all the stems go in the same direction
         if (ups == 0 || downs == 0) {
 
             Note *firstNote = dynamic_cast<Note *>(tuplet->FindChildByType(NOTE));
@@ -212,8 +212,8 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             }
         }
         else {
-            // two directional beams
-            // this case is similar to the above, but the bracket is only orizontal
+            // two-directional beams
+            // this case is similar to the above, but the bracket is only horizontal
             // y is 0 because the final y pos is above the tallest stem
             y = 0;
 
@@ -261,6 +261,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     assert(staff);
 
     if ((tuplet->GetBracketVisible() == BOOLEAN_false) && (tuplet->GetNumVisible() == BOOLEAN_false)) {
+        tuplet->SetEmptyBB();
         return;
     }
 

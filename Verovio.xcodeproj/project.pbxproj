@@ -70,10 +70,7 @@
 		4DA1448D1C2AB29400CB7CEE /* textelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA1448C1C2AB29400CB7CEE /* textelement.h */; };
 		4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
 		4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
-		4DA60EE01B6307A8006E2DFC /* textdirective.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA60EDE1B6307A8006E2DFC /* textdirective.h */; };
 		4DA60EE11B6307A8006E2DFC /* textdirinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */; };
-		4DA60EE41B6307B9006E2DFC /* textdirective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA60EE21B6307B9006E2DFC /* textdirective.cpp */; };
-		4DA60EE51B6307B9006E2DFC /* textdirective.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA60EE21B6307B9006E2DFC /* textdirective.cpp */; };
 		4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */; };
 		4DA60EE71B6307B9006E2DFC /* textdirinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */; };
 		4DA80D961A6ACF5D0089802D /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA80D951A6ACF5D0089802D /* style.cpp */; };
@@ -82,6 +79,9 @@
 		4DB0B0171C44129300DBDCC3 /* timestamp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB0B0151C44129300DBDCC3 /* timestamp.cpp */; };
 		4DB0B0191C4412A400DBDCC3 /* timestamp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB0B0181C4412A400DBDCC3 /* timestamp.h */; };
 		4DB3072F1AC9ED2500EE0982 /* space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB3072E1AC9ED2500EE0982 /* space.cpp */; };
+		4DB351131C8040B1002DD057 /* anchoredtext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB351101C8040B1002DD057 /* anchoredtext.cpp */; };
+		4DB351141C8040B1002DD057 /* dir.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB351111C8040B1002DD057 /* dir.cpp */; };
+		4DB351151C8040B1002DD057 /* tempo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB351121C8040B1002DD057 /* tempo.cpp */; };
 		4DB726C01B8B9F480040231B /* rpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726BF1B8B9F480040231B /* rpt.cpp */; };
 		4DB726C11B8B9F480040231B /* rpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726BF1B8B9F480040231B /* rpt.cpp */; };
 		4DB726C31B8B9F540040231B /* rpt.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB726C21B8B9F540040231B /* rpt.h */; };
@@ -100,6 +100,12 @@
 		4DCA95D81A515D0E008AD7E9 /* editorial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA95D71A515D0E008AD7E9 /* editorial.cpp */; };
 		4DCA95D91A515D0E008AD7E9 /* editorial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA95D71A515D0E008AD7E9 /* editorial.cpp */; };
 		4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DCA95DA1A515D33008AD7E9 /* editorial.h */; };
+		4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDBBB551C7AE43E00054AFF /* hairpin.h */; };
+		4DDBBB581C7AE43E00054AFF /* dynam.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DDBBB561C7AE43E00054AFF /* dynam.h */; };
+		4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBB591C7AE45900054AFF /* dynam.cpp */; };
+		4DDBBB5C1C7AE45900054AFF /* dynam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBB591C7AE45900054AFF /* dynam.cpp */; };
+		4DDBBB5D1C7AE45900054AFF /* hairpin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */; };
+		4DDBBB5E1C7AE45900054AFF /* hairpin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */; };
 		4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */; };
 		4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */; };
 		4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
@@ -297,9 +303,7 @@
 		4D9C5F3A1ADBBBEB005D3031 /* git_commit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = git_commit.h; path = include/vrv/git_commit.h; sourceTree = SOURCE_ROOT; };
 		4DA144891C2AB28700CB7CEE /* textelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = textelement.cpp; path = src/textelement.cpp; sourceTree = "<group>"; };
 		4DA1448C1C2AB29400CB7CEE /* textelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textelement.h; path = include/vrv/textelement.h; sourceTree = "<group>"; };
-		4DA60EDE1B6307A8006E2DFC /* textdirective.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textdirective.h; path = include/vrv/textdirective.h; sourceTree = "<group>"; };
 		4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textdirinterface.h; path = include/vrv/textdirinterface.h; sourceTree = "<group>"; };
-		4DA60EE21B6307B9006E2DFC /* textdirective.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = textdirective.cpp; path = src/textdirective.cpp; sourceTree = "<group>"; };
 		4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = textdirinterface.cpp; path = src/textdirinterface.cpp; sourceTree = "<group>"; };
 		4DA80D941A6940120089802D /* style.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = style.h; path = include/vrv/style.h; sourceTree = "<group>"; };
 		4DA80D951A6ACF5D0089802D /* style.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = style.cpp; path = src/style.cpp; sourceTree = "<group>"; };
@@ -307,6 +311,12 @@
 		4DB0B0181C4412A400DBDCC3 /* timestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = timestamp.h; path = include/vrv/timestamp.h; sourceTree = "<group>"; };
 		4DB3072D1AC9ED1800EE0982 /* space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space.h; path = include/vrv/space.h; sourceTree = "<group>"; };
 		4DB3072E1AC9ED2500EE0982 /* space.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space.cpp; path = src/space.cpp; sourceTree = "<group>"; };
+		4DB3510D1C80409E002DD057 /* anchoredtext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = anchoredtext.h; path = include/vrv/anchoredtext.h; sourceTree = "<group>"; };
+		4DB3510E1C80409E002DD057 /* dir.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dir.h; path = include/vrv/dir.h; sourceTree = "<group>"; };
+		4DB3510F1C80409E002DD057 /* tempo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tempo.h; path = include/vrv/tempo.h; sourceTree = "<group>"; };
+		4DB351101C8040B1002DD057 /* anchoredtext.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = anchoredtext.cpp; path = src/anchoredtext.cpp; sourceTree = "<group>"; };
+		4DB351111C8040B1002DD057 /* dir.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dir.cpp; path = src/dir.cpp; sourceTree = "<group>"; };
+		4DB351121C8040B1002DD057 /* tempo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tempo.cpp; path = src/tempo.cpp; sourceTree = "<group>"; };
 		4DB726BF1B8B9F480040231B /* rpt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rpt.cpp; path = src/rpt.cpp; sourceTree = "<group>"; };
 		4DB726C21B8B9F540040231B /* rpt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rpt.h; path = include/vrv/rpt.h; sourceTree = "<group>"; };
 		4DB726C41B8BB0E80040231B /* text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = text.cpp; path = src/text.cpp; sourceTree = "<group>"; };
@@ -319,6 +329,10 @@
 		4DC34BA719BC4A83006175CD /* dot.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dot.cpp; path = src/dot.cpp; sourceTree = "<group>"; };
 		4DCA95D71A515D0E008AD7E9 /* editorial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = editorial.cpp; path = src/editorial.cpp; sourceTree = "<group>"; };
 		4DCA95DA1A515D33008AD7E9 /* editorial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = editorial.h; path = include/vrv/editorial.h; sourceTree = "<group>"; };
+		4DDBBB551C7AE43E00054AFF /* hairpin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hairpin.h; path = include/vrv/hairpin.h; sourceTree = "<group>"; };
+		4DDBBB561C7AE43E00054AFF /* dynam.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dynam.h; path = include/vrv/dynam.h; sourceTree = "<group>"; };
+		4DDBBB591C7AE45900054AFF /* dynam.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dynam.cpp; path = src/dynam.cpp; sourceTree = "<group>"; };
+		4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = hairpin.cpp; path = src/hairpin.cpp; sourceTree = "<group>"; };
 		4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_text.cpp; path = src/view_text.cpp; sourceTree = "<group>"; };
 		4DEE28ED1940BCC100C76319 /* atts_analysis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_analysis.cpp; path = libmei/atts_analysis.cpp; sourceTree = "<group>"; };
 		4DEE28EE1940BCC100C76319 /* atts_analysis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_analysis.h; path = libmei/atts_analysis.h; sourceTree = "<group>"; };
@@ -594,12 +608,20 @@
 		4DF28A011A754DAA00BA9F7D /* floatingelements */ = {
 			isa = PBXGroup;
 			children = (
+				4DB351101C8040B1002DD057 /* anchoredtext.cpp */,
+				4DB3510D1C80409E002DD057 /* anchoredtext.h */,
+				4DB351111C8040B1002DD057 /* dir.cpp */,
+				4DB3510E1C80409E002DD057 /* dir.h */,
+				4DDBBB591C7AE45900054AFF /* dynam.cpp */,
+				4DDBBB561C7AE43E00054AFF /* dynam.h */,
 				4DF28A041A754DF000BA9F7D /* floatingelement.cpp */,
 				4DF28A021A754DE400BA9F7D /* floatingelement.h */,
+				4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */,
+				4DDBBB551C7AE43E00054AFF /* hairpin.h */,
 				8F086ED3188539540037FD8E /* slur.cpp */,
 				8F59292A18854BF800FE51AD /* slur.h */,
-				4DA60EE21B6307B9006E2DFC /* textdirective.cpp */,
-				4DA60EDE1B6307A8006E2DFC /* textdirective.h */,
+				4DB351121C8040B1002DD057 /* tempo.cpp */,
+				4DB3510F1C80409E002DD057 /* tempo.h */,
 				8F086ED8188539540037FD8E /* tie.cpp */,
 				8F59292F18854BF800FE51AD /* tie.h */,
 			);
@@ -809,12 +831,12 @@
 				4DB726C81B8BB0F30040231B /* text.h in Headers */,
 				8F59293E18854BF800FE51AD /* io.h in Headers */,
 				8F59293F18854BF800FE51AD /* iodarms.h in Headers */,
+				4DDBBB571C7AE43E00054AFF /* hairpin.h in Headers */,
 				8F59294018854BF800FE51AD /* iomei.h in Headers */,
 				4DCA95DB1A515D33008AD7E9 /* editorial.h in Headers */,
 				8F59294118854BF800FE51AD /* iomusxml.h in Headers */,
 				8F59294218854BF800FE51AD /* iopae.h in Headers */,
 				8F59294318854BF800FE51AD /* keysig.h in Headers */,
-				4DA60EE01B6307A8006E2DFC /* textdirective.h in Headers */,
 				8F59294418854BF800FE51AD /* layer.h in Headers */,
 				8F59294518854BF800FE51AD /* layerelement.h in Headers */,
 				8F59294718854BF800FE51AD /* measure.h in Headers */,
@@ -835,6 +857,7 @@
 				8F59294F18854BF800FE51AD /* rest.h in Headers */,
 				4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */,
 				8F59295018854BF800FE51AD /* scoredef.h in Headers */,
+				4DDBBB581C7AE43E00054AFF /* dynam.h in Headers */,
 				4DB726C31B8B9F540040231B /* rpt.h in Headers */,
 				8F59295118854BF800FE51AD /* slur.h in Headers */,
 				8F59295218854BF800FE51AD /* staff.h in Headers */,
@@ -952,7 +975,6 @@
 				8F086EE2188539540037FD8E /* aligner.cpp in Sources */,
 				8F086EE4188539540037FD8E /* barline.cpp in Sources */,
 				8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */,
-				4DA60EE41B6307B9006E2DFC /* textdirective.cpp in Sources */,
 				8F086EE6188539540037FD8E /* beam.cpp in Sources */,
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
@@ -969,16 +991,19 @@
 				8F086EF0188539540037FD8E /* iopae.cpp in Sources */,
 				4D8CD8A61B4E922A00F0756F /* atts_critapp.cpp in Sources */,
 				8F086EF1188539540037FD8E /* keysig.cpp in Sources */,
+				4DDBBB5D1C7AE45900054AFF /* hairpin.cpp in Sources */,
 				4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */,
 				8F086EF2188539540037FD8E /* layer.cpp in Sources */,
 				1579B3431B15033100B16F5C /* proport.cpp in Sources */,
 				8F086EF3188539540037FD8E /* layerelement.cpp in Sources */,
 				8F086EF5188539540037FD8E /* measure.cpp in Sources */,
+				4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */,
 				8F086EF6188539540037FD8E /* mensur.cpp in Sources */,
 				4DB726C51B8BB0E80040231B /* text.cpp in Sources */,
 				4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
+				4DB351141C8040B1002DD057 /* dir.cpp in Sources */,
 				8F086EF8188539540037FD8E /* note.cpp in Sources */,
 				8F086EF9188539540037FD8E /* object.cpp in Sources */,
 				8F086EFA188539540037FD8E /* page.cpp in Sources */,
@@ -997,6 +1022,7 @@
 				4D20B5EC1B873A1300EA9EC3 /* scoredefinterface.cpp in Sources */,
 				4D1BE7731C688F5A0086DC0E /* MidiMessage.cpp in Sources */,
 				4DCA95D81A515D0E008AD7E9 /* editorial.cpp in Sources */,
+				4DB351151C8040B1002DD057 /* tempo.cpp in Sources */,
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
 				4D1BE7711C688F5A0086DC0E /* MidiFile.cpp in Sources */,
 				8F086F05188539540037FD8E /* tuplet.cpp in Sources */,
@@ -1027,6 +1053,7 @@
 				4DF28A051A754DF000BA9F7D /* floatingelement.cpp in Sources */,
 				4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */,
 				4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */,
+				4DB351131C8040B1002DD057 /* anchoredtext.cpp in Sources */,
 				4DC34BA819BC4A83006175CD /* accid.cpp in Sources */,
 				4DC34BAA19BC4A83006175CD /* custos.cpp in Sources */,
 				4DC34BAC19BC4A83006175CD /* dot.cpp in Sources */,
@@ -1043,6 +1070,7 @@
 				8F3DD36C18854B410051330C /* object.cpp in Sources */,
 				8F3DD36E18854B410051330C /* vrv.cpp in Sources */,
 				8F3DD35E18854B390051330C /* view.cpp in Sources */,
+				4DDBBB5E1C7AE45900054AFF /* hairpin.cpp in Sources */,
 				8F3DD36018854B390051330C /* view_beam.cpp in Sources */,
 				8F3DD36218854B390051330C /* view_element.cpp in Sources */,
 				8F3DD36318854B390051330C /* view_graph.cpp in Sources */,
@@ -1055,6 +1083,7 @@
 				8F3DD33E18854B2E0051330C /* beam.cpp in Sources */,
 				8F3DD34018854B2E0051330C /* clef.cpp in Sources */,
 				8F3DD34218854B2E0051330C /* durationinterface.cpp in Sources */,
+				4DDBBB5C1C7AE45900054AFF /* dynam.cpp in Sources */,
 				8F3DD34418854B2E0051330C /* keysig.cpp in Sources */,
 				4D1BE7741C688F5A0086DC0E /* MidiMessage.cpp in Sources */,
 				4DF28A001A7545E500BA9F7D /* timeinterface.cpp in Sources */,
@@ -1085,7 +1114,6 @@
 				8F3DD32418854B090051330C /* io.cpp in Sources */,
 				4DB726C11B8B9F480040231B /* rpt.cpp in Sources */,
 				8F3DD32618854B090051330C /* iodarms.cpp in Sources */,
-				4DA60EE51B6307B9006E2DFC /* textdirective.cpp in Sources */,
 				8F3DD32818854B090051330C /* iomei.cpp in Sources */,
 				8F3DD32A18854B090051330C /* iomusxml.cpp in Sources */,
 				8F3DD32C18854B090051330C /* iopae.cpp in Sources */,

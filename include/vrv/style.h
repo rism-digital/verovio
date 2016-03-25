@@ -66,13 +66,17 @@ namespace vrv {
 #define MIN_SCALE 1
 #define MAX_SCALE 1000
 
-#define DEFAULT_SPACING_STAFF 8
+#define DEFAULT_SPACING_STAFF 10
 #define MIN_SPACING_STAFF 0
-#define MAX_SPACING_STAFF 12
+#define MAX_SPACING_STAFF 24
 
-#define DEFAULT_SPACING_SYSTEM 0
+#define DEFAULT_SPACING_SYSTEM 6
 #define MIN_SPACING_SYSTEM 0
 #define MAX_SPACING_SYSTEM 12
+
+#define DEFAULT_HAIRPIN_SIZE 3.0
+#define MIN_HAIRPIN_SIZE 2.0
+#define MAX_HAIRPIN_SIZE 8.0
 
 #define DEFAULT_LYRIC_SIZE 4.5
 #define MIN_LYRIC_SIZE 2.0
@@ -135,6 +139,18 @@ namespace vrv {
 #define DEFAULT_RIGHT_MARGIN_NOTE 0.0
 #define DEFAULT_RIGHT_MARGIN_REST 0.0
 
+/** Bottom margins */
+
+#define DEFAULT_BOTTOM_MARGIN_DEFAULT 0.5
+#define MIN_BOTTOM_MARGIN_DEFAULT 0.0
+#define MAX_BOTTOM_MARGIN_DEFAULT 5.0
+
+/** Top margins */
+
+#define DEFAULT_TOP_MARGIN_DEFAULT 0.5
+#define MIN_TOP_MARGIN_DEFAULT 0.0
+#define MAX_TOP_MARGIN_DEFAULT 5.0
+
 //----------------------------------------------------------------------------
 // Style
 //----------------------------------------------------------------------------
@@ -143,7 +159,7 @@ namespace vrv {
 #define TEMP_STYLE_ACCID_EDIT_SPACE 3.5 * PARAM_DENOMINATOR
 
 // the space between each lyric line in units
-#define TEMP_STYLE_LYIRC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
+#define TEMP_STYLE_LYIRC_LINE_SPACE 4.0 * PARAM_DENOMINATOR
 
 // the key signature spacing factor
 #define TEMP_STYLE_KEYSIG_STEP 1.3
@@ -216,6 +232,8 @@ public:
     short m_minMeasureWidth;
     /** The lyrics size (in units / PARAM_DENOMINATOR) */
     int m_lyricSize;
+    /** haripin size (in units / PARAM_DENOMINATOR) */
+    int m_hairpinSize;
 
     /** ties and slurs */
     char m_tieThickness;
@@ -264,6 +282,12 @@ public:
 
     /** The default right margin */
     char m_rightMarginDefault;
+
+    /** The default right margin */
+    char m_bottomMarginDefault;
+
+    /** The default right margin */
+    char m_topMarginDefault;
 };
 
 } // namespace vrv

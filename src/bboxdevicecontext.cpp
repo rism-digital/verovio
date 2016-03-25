@@ -32,7 +32,7 @@ static inline double DegToRad(double deg)
 // BBoxDeviceContext
 //----------------------------------------------------------------------------
 
-BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height) : DeviceContext()
+BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height, unsigned char update) : DeviceContext()
 {
     m_view = view;
     m_width = width;
@@ -42,37 +42,40 @@ BBoxDeviceContext::BBoxDeviceContext(View *view, int width, int height) : Device
     m_userScaleY = 1.0;
 
     m_drawingText = false;
+    m_textAlignment = LEFT;
 
     SetBrush(AxBLACK, AxSOLID);
     SetPen(AxBLACK, 1, AxSOLID);
+
+    m_update = update;
 }
 
 BBoxDeviceContext::~BBoxDeviceContext()
 {
 }
 
-void BBoxDeviceContext::StartGraphic(DocObject *object, std::string gClass, std::string gId)
+void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId)
 {
-    // add object
-    object->ResetBB();
+    // add the object object
+    object->BoundingBox::ResetBoundingBox();
     m_objects.push_back(object);
 }
 
-void BBoxDeviceContext::ResumeGraphic(DocObject *object, std::string gId)
+void BBoxDeviceContext::ResumeGraphic(Object *object, std::string gId)
 {
-    // add object
-    object->ResetBB();
+    // I am not sure we actually have to reset the bounding box here...
+    object->BoundingBox::ResetBoundingBox();
     m_objects.push_back(object);
 }
 
-void BBoxDeviceContext::EndGraphic(DocObject *object, View *view)
+void BBoxDeviceContext::EndGraphic(Object *object, View *view)
 {
     // detach the object
     assert(m_objects.back() == object);
     m_objects.pop_back();
 }
 
-void BBoxDeviceContext::EndResumedGraphic(DocObject *object, View *view)
+void BBoxDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
     // detach the object
     assert(m_objects.back() == object);
@@ -122,14 +125,18 @@ Point BBoxDeviceContext::GetLogicalOrigin()
     return Point(0, 0);
 }
 
-// claculated better
-void BBoxDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
+// calculated better
+void BBoxDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
-    int vals[4];
-    FindPointsForBounds(Point(x, y), Point(bezier1_coord[0], bezier1_coord[1]),
-        Point(bezier1_coord[2], bezier1_coord[3]), Point(bezier1_coord[4], bezier1_coord[5]), vals);
+    Point pos;
+    int width, height;
 
-    UpdateBB(vals[0], vals[1], vals[2], vals[3]);
+    ApproximateBezierBoundingBox(bezier1, &pos, &width, &height);
+    LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
+    ApproximateBezierBoundingBox(bezier2, &pos, &width, &height);
+    LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
 
 void BBoxDeviceContext::DrawCircle(int x, int y, int radius)
@@ -223,7 +230,7 @@ void BBoxDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     int p1 = penWidth / 2;
     int p2 = p1;
     // how odd line width is handled might depend on the implementation of the device context.
-    // however, we expect the actualy with to be shifted on the left/top
+    // however, we expect the actualy width to be shifted on the left/top
     // e.g. with 7, 4 on the left and 3 on the right
     if (penWidth % 2) {
         p1++;
@@ -281,7 +288,7 @@ void BBoxDeviceContext::DrawPlaceholder(int x, int y)
     UpdateBB(x, y, x, y);
 }
 
-void BBoxDeviceContext::StartText(int x, int y, char alignement)
+void BBoxDeviceContext::StartText(int x, int y, char alignment)
 {
     assert(!m_drawingText);
     m_drawingText = true;
@@ -289,6 +296,9 @@ void BBoxDeviceContext::StartText(int x, int y, char alignement)
     m_textY = y;
     m_textWidth = 0;
     m_textHeight = 0;
+    m_textAscent = 0;
+    m_textDescent = 0;
+    m_textAlignment = alignment;
 }
 
 void BBoxDeviceContext::EndText()
@@ -307,16 +317,20 @@ void BBoxDeviceContext::DrawText(const std::string &text, const std::wstring wte
 {
     assert(m_fontStack.top());
 
-    // unsigned long length = wtext.length();
-    int w, h;
-    GetTextExtent(wtext, &w, &h);
-    m_textWidth += w;
-    m_textHeight = std::max(m_textHeight, h);
-    // very approximative, we should use GetTextExtend once implemented
-    // m_textWidth += length * m_fontStack.top()->GetPointSize() / 7;
-    // ignore y bounding boxes for text
-    // m_textHeight = m_fontStack.top()->GetPointSize();
-    UpdateBB(m_textX, m_textY, m_textX + m_textWidth, m_textY - m_textHeight);
+    TextExtend extend;
+    GetTextExtent(wtext, &extend);
+    m_textWidth += extend.m_width;
+    // keep that maximum values for ascent and descent
+    m_textAscent = std::max(m_textAscent, extend.m_ascent);
+    m_textDescent = std::max(m_textDescent, extend.m_descent);
+    m_textHeight = m_textAscent + m_textDescent;
+    if (m_textAlignment == RIGHT) {
+        m_textX -= extend.m_width;
+    }
+    else if (m_textAlignment == CENTER) {
+        m_textX -= (extend.m_width / 2);
+    }
+    UpdateBB(m_textX, m_textY + m_textDescent, m_textX + m_textWidth, m_textY - m_textAscent);
 }
 
 void BBoxDeviceContext::DrawRotatedText(const std::string &text, int x, int y, double angle)
@@ -340,11 +354,11 @@ void BBoxDeviceContext::DrawMusicText(const std::wstring &text, int x, int y)
         glyph->GetBoundingBox(&g_x, &g_y, &g_w, &g_h);
 
         int x_off = x + g_x * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
-        // because we are in the drawing context, y position are already flipped
+        // because we are in the drawing context, y position is already flipped
         int y_off = y - g_y * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
 
         UpdateBB(x_off, y_off, x_off + g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm(),
-            // idem, y position are flipped
+            // idem, y position is flipped
             y_off - g_h * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm());
 
         lastCharWidth = g_w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
@@ -358,61 +372,83 @@ void BBoxDeviceContext::DrawSpline(int n, Point points[])
 
 void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
 {
-    if (m_isDeactivated) {
+    if (m_isDeactivatedX && m_isDeactivatedY) {
         return;
     }
 
-    // the array should not be empty
+    // the array may not be empty
     assert(!m_objects.empty());
 
     // we need to store logical coordinates in the objects, we need to convert them back (this is why we need a View
     // object)
-    (m_objects.back())
-        ->UpdateSelfBB(m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2));
+    if (!m_isDeactivatedX) (m_objects.back())->UpdateSelfBBoxX(m_view->ToLogicalX(x1), m_view->ToLogicalX(x2));
+    if (!m_isDeactivatedY) (m_objects.back())->UpdateSelfBBoxY(m_view->ToLogicalY(y1), m_view->ToLogicalY(y2));
 
     int i;
     // Stretch the content BB of the other objects
     for (i = 0; i < (int)m_objects.size(); i++) {
-        (m_objects.at(i))
-            ->UpdateContentBB(
-                m_view->ToLogicalX(x1), m_view->ToLogicalY(y1), m_view->ToLogicalX(x2), m_view->ToLogicalY(y2));
+        if (!m_isDeactivatedX) (m_objects.at(i))->UpdateContentBBoxX(m_view->ToLogicalX(x1), m_view->ToLogicalX(x2));
+        if (!m_isDeactivatedY) (m_objects.at(i))->UpdateContentBBoxY(m_view->ToLogicalY(y1), m_view->ToLogicalY(y2));
     }
 }
 
-// Ok, shame on me, found off the internet and modified, but for now it works
-void BBoxDeviceContext::FindPointsForBounds(Point P0, Point P1, Point P2, Point P3, int *ret)
+void BBoxDeviceContext::ApproximateBezierBoundingBox(Point bezier[], Point *pos, int *width, int *height)
 {
+    int ax = bezier[0].x;
+    int ay = bezier[0].y;
+    int bx = bezier[1].x;
+    int by = bezier[1].y;
+    int cx = bezier[2].x;
+    int cy = bezier[2].y;
+    int dx = bezier[3].x;
+    int dy = bezier[3].y;
 
-    int A = P3.x - 3 * P2.x + 3 * P1.x - P0.x;
-    int B = 3 * P2.x - 6 * P1.x + 3 * P0.x;
-    int C = 3 * P1.x - 3 * P0.x;
-    int D = P0.x;
+    double px, py, qx, qy, rx, ry, sx, sy, tx, ty, tobx, toby, tocx, tocy, todx, tody, toqx, toqy, torx, tory, totx,
+        toty;
+    int x, y, minx, miny, maxx, maxy;
 
-    int E = P3.y - 3 * P2.y + 3 * P1.y - P0.y;
-    int F = 3 * P2.y - 6 * P1.y + 3 * P0.y;
-    int G = 3 * P1.y - 3 * P0.y;
-    int H = P0.y;
+    minx = miny = -VRV_UNSET;
+    maxx = maxy = VRV_UNSET;
 
-    float x, y;
-    float xMin = 0xFFFF;
-    float yMin = 0xFFFF;
-    float xMax = 0;
-    float yMax = 0;
+    tobx = bx - ax;
+    toby = by - ay; // directions
+    tocx = cx - bx;
+    tocy = cy - by;
+    todx = dx - cx;
+    tody = dy - cy;
+    double step = 1.0 / 40.0; // precision
+    int i;
+    for (i = 0; i < 41; i++) {
+        double d = i * step;
+        px = ax + d * tobx;
+        py = ay + d * toby;
+        qx = bx + d * tocx;
+        qy = by + d * tocy;
+        rx = cx + d * todx;
+        ry = cy + d * tody;
+        toqx = qx - px;
+        toqy = qy - py;
+        torx = rx - qx;
+        tory = ry - qy;
 
-    for (float t = 0.0f; t <= 1.0f; t += 0.01f) {
-        x = A * t * t * t + B * t * t + C * t + D;
-        if (x < xMin) xMin = x;
-        if (x > xMax) xMax = x;
-        y = E * t * t * t + F * t * t + G * t + H;
-        if (y < yMin) yMin = y;
-        if (y > yMax) yMax = y;
+        sx = px + d * toqx;
+        sy = py + d * toqy;
+        tx = qx + d * torx;
+        ty = qy + d * tory;
+        totx = tx - sx;
+        toty = ty - sy;
+
+        x = sx + d * totx;
+        y = sy + d * toty;
+        minx = std::min(minx, x);
+        miny = std::min(miny, y);
+        maxx = std::max(maxx, x);
+        maxy = std::max(maxy, y);
     }
-
-    ret[0] = (int)xMin;
-    ret[1] = (int)yMin;
-
-    ret[2] = (int)xMax;
-    ret[3] = (int)yMax;
+    pos->x = minx;
+    pos->y = miny;
+    (*width) = maxx - minx;
+    (*height) = maxy - miny;
 }
 
 } // namespace vrv

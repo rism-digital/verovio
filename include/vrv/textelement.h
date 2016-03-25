@@ -16,7 +16,7 @@ namespace vrv {
 // TextElement
 //----------------------------------------------------------------------------
 
-class TextElement : public DocObject {
+class TextElement : public Object {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -27,8 +27,8 @@ public:
     TextElement(std::string classid);
     virtual ~TextElement();
     virtual void Reset();
-    virtual std::string GetClassName() { return "TextElement"; };
-    virtual ClassId Is() { return TEXT_ELEMENT; };
+    virtual std::string GetClassName() const { return "TextElement"; };
+    virtual ClassId Is() const { return TEXT_ELEMENT; };
     ///@}
 
 private:

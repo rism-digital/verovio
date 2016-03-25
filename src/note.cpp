@@ -97,8 +97,9 @@ void Note::Reset()
 
 void Note::AddLayerElement(vrv::LayerElement *element)
 {
-    assert(
-        dynamic_cast<Accid *>(element) || dynamic_cast<Verse *>(element) || dynamic_cast<EditorialElement *>(element));
+    // assert(
+    //    dynamic_cast<Accid *>(element) || dynamic_cast<Verse *>(element) || dynamic_cast<EditorialElement
+    //    *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();
@@ -160,7 +161,7 @@ int Note::GetDrawingDur()
     }
 }
 
-bool Note::IsClusterExtreme()
+bool Note::IsClusterExtreme() const
 {
     ChordCluster *cluster = this->m_cluster;
     if (this == cluster->at(0)) return true;

@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "floatingelement.h"
 #include "glyph.h"
 #include "layerelement.h"
 #include "view.h"
@@ -95,7 +96,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     m_svgNode.prepend_attribute("height") = StringFormat("%dpx", (int)((double)m_height * m_userScaleY)).c_str();
     m_svgNode.prepend_attribute("width") = StringFormat("%dpx", (int)((double)m_width * m_userScaleX)).c_str();
 
-    // add the woff VerovioText font in needed
+    // add the woff VerovioText font if needed
     if (m_vrvTextFont) {
         std::string woff = Resources::GetPath() + "/woff.xml";
         pugi::xml_document woffDoc;
@@ -139,7 +140,7 @@ void SvgDeviceContext::Commit(bool xml_declaration)
     m_committed = true;
 }
 
-void SvgDeviceContext::StartGraphic(DocObject *object, std::string gClass, std::string gId)
+void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::string gId)
 {
     std::string baseClass = object->GetClassName();
     std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
@@ -157,7 +158,7 @@ void SvgDeviceContext::StartGraphic(DocObject *object, std::string gClass, std::
     // currentBrush.GetOpacity()).c_str();
 }
 
-void SvgDeviceContext::StartTextGraphic(DocObject *object, std::string gClass, std::string gId)
+void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std::string gId)
 {
     std::string baseClass = object->GetClassName();
     std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
@@ -171,7 +172,7 @@ void SvgDeviceContext::StartTextGraphic(DocObject *object, std::string gClass, s
     m_currentNode.append_attribute("id") = gId.c_str();
 }
 
-void SvgDeviceContext::ResumeGraphic(DocObject *object, std::string gId)
+void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 {
     std::string xpath = "//g[@id=\"" + gId + "\"]";
     pugi::xpath_node selection = m_currentNode.select_single_node(xpath.c_str());
@@ -181,21 +182,21 @@ void SvgDeviceContext::ResumeGraphic(DocObject *object, std::string gId)
     m_svgNodeStack.push_back(m_currentNode);
 }
 
-void SvgDeviceContext::EndGraphic(DocObject *object, View *view)
+void SvgDeviceContext::EndGraphic(Object *object, View *view)
 {
     DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
 
-void SvgDeviceContext::EndResumedGraphic(DocObject *object, View *view)
+void SvgDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
     DrawSvgBoundingBox(object, view);
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
 
-void SvgDeviceContext::EndTextGraphic(DocObject *object, View *view)
+void SvgDeviceContext::EndTextGraphic(Object *object, View *view)
 {
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
@@ -275,16 +276,15 @@ Point SvgDeviceContext::GetLogicalOrigin()
 }
 
 // Drawing mething
-void SvgDeviceContext::DrawComplexBezierPath(int x, int y, int bezier1_coord[6], int bezier2_coord[6])
+void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
     pugi::xml_node pathChild = m_currentNode.append_child("path");
-    pathChild.append_attribute("d") = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", x, y, // M command
-                                          bezier1_coord[0], bezier1_coord[1], bezier1_coord[2], bezier1_coord[3],
-                                          bezier1_coord[4], bezier1_coord[5], // First bezier
-                                          bezier2_coord[0], bezier2_coord[1], bezier2_coord[2], bezier2_coord[3],
-                                          bezier2_coord[4], bezier2_coord[5] // Second Bezier
-                                          )
-                                          .c_str();
+    pathChild.append_attribute("d")
+        = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
+              bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
+              bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
+              )
+              .c_str();
     // pathChild.append_attribute("style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000;
     // stroke-linecap:round; stroke-linejoin:round;
     // stroke-opacity:1.0; stroke-width: %d", m_penStack.top().GetWidth()).c_str();
@@ -456,15 +456,15 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     // rectChild.append_attribute("fill-opacity") = "0.0"; // for empty rectangles with bounding boxes
 }
 
-void SvgDeviceContext::StartText(int x, int y, char alignement)
+void SvgDeviceContext::StartText(int x, int y, char alignment)
 {
     std::string s;
     std::string anchor;
 
-    if (alignement == RIGHT) {
+    if (alignment == RIGHT) {
         anchor = "end";
     }
-    if (alignement == CENTER) {
+    if (alignment == CENTER) {
         anchor = "middle";
     }
 
@@ -480,6 +480,26 @@ void SvgDeviceContext::StartText(int x, int y, char alignement)
     // font-size seems to be required in <text> in FireFox and also we set it to 0px so space
     // is not added between tspan elements
     m_currentNode.append_attribute("font-size") = "0px";
+    //
+    if (!m_fontStack.top()->GetFaceName().empty()) {
+        m_currentNode.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
+    }
+    if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
+        if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
+            m_currentNode.append_attribute("font-style") = "italic";
+        }
+        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
+            m_currentNode.append_attribute("font-style") = "normal";
+        }
+        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_oblique) {
+            m_currentNode.append_attribute("font-style") = "oblique";
+        }
+    }
+    if (m_fontStack.top()->GetWeight() != FONTWEIGHT_NONE) {
+        if (m_fontStack.top()->GetWeight() == FONTWEIGHT_bold) {
+            m_currentNode.append_attribute("font-weight") = "bold";
+        }
+    }
 }
 
 void SvgDeviceContext::MoveTextTo(int x, int y)
@@ -577,8 +597,12 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y)
         useChild.append_attribute("width") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
 
         // Get the bounds of the char
-        glyph->GetBoundingBox(&gx, &gy, &w, &h);
-        x += w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        if (glyph->GetHorizAdvX() > 0)
+            x += glyph->GetHorizAdvX() * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        else {
+            glyph->GetBoundingBox(&gx, &gy, &w, &h);
+            x += w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
+        }
     }
 }
 
@@ -620,20 +644,31 @@ std::string SvgDeviceContext::GetStringSVG(bool xml_declaration)
     return m_outdata.str();
 }
 
-void SvgDeviceContext::DrawSvgBoundingBox(DocObject *object, View *view)
+void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
 {
     bool drawBoundingBox = false;
     if (drawBoundingBox && view) {
+        BoundingBox *box = object;
+        // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
+        if (object->IsFloatingElement()) {
+            FloatingElement *floatingElement = dynamic_cast<FloatingElement *>(object);
+            assert(floatingElement);
+            box = floatingElement->GetCurrentFloatingPositioner();
+            // No bounding box found, ignore the object - this happens when the @staff is missing because the element is
+            // never drawn but there is still a EndGraphic call.
+            if (!box) return;
+        }
+
         SetPen(AxRED, 10, AxDOT_DASH);
         SetBrush(AxWHITE, AxTRANSPARENT);
         StartGraphic(object, "self-bounding-box", "0");
         if (object->HasSelfBB()) {
-            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + object->m_selfBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + object->m_selfBB_y1),
-                view->ToDeviceContextX(object->GetDrawingX() + object->m_selfBB_x2)
-                    - view->ToDeviceContextX(object->GetDrawingX() + object->m_selfBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + object->m_selfBB_y2)
-                    - view->ToDeviceContextY(object->GetDrawingY() + object->m_selfBB_y1));
+            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->m_selfBB_x1),
+                view->ToDeviceContextY(object->GetDrawingY() + box->m_selfBB_y1),
+                view->ToDeviceContextX(object->GetDrawingX() + box->m_selfBB_x2)
+                    - view->ToDeviceContextX(object->GetDrawingX() + box->m_selfBB_x1),
+                view->ToDeviceContextY(object->GetDrawingY() + box->m_selfBB_y2)
+                    - view->ToDeviceContextY(object->GetDrawingY() + box->m_selfBB_y1));
         }
 
         EndGraphic(object, NULL);
@@ -641,14 +676,12 @@ void SvgDeviceContext::DrawSvgBoundingBox(DocObject *object, View *view)
         SetPen(AxBLUE, 10, AxDOT_DASH);
         StartGraphic(object, "content-bounding-box", "0");
         if (object->HasContentBB()) {
-            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + object->m_contentBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + object->m_contentBB_y1),
-                view->ToDeviceContextX(object->GetDrawingX() + object->m_contentBB_x2)
-                    - view->ToDeviceContextX(object->GetDrawingX() + object->m_contentBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + object->m_contentBB_y2)
-                    - view->ToDeviceContextY(object->GetDrawingY() + object->m_contentBB_y1));
-            this->DrawRectangle(
-                view->ToDeviceContextX(object->GetDrawingX()), view->ToDeviceContextY(object->GetDrawingY()), 5, 300);
+            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->m_contentBB_x1),
+                view->ToDeviceContextY(object->GetDrawingY() + box->m_contentBB_y1),
+                view->ToDeviceContextX(object->GetDrawingX() + box->m_contentBB_x2)
+                    - view->ToDeviceContextX(object->GetDrawingX() + box->m_contentBB_x1),
+                view->ToDeviceContextY(object->GetDrawingY() + box->m_contentBB_y2)
+                    - view->ToDeviceContextY(object->GetDrawingY() + box->m_contentBB_y1));
         }
         EndGraphic(object, NULL);
 

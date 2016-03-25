@@ -40,7 +40,7 @@ void BeatRpt::Reset()
     ResetBeatRptVis();
 }
 
-double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit)
+double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit) const
 {
     return DUR_MAX / meterUnit;
 }
@@ -95,8 +95,8 @@ void FTrem::Reset()
 
 void FTrem::AddLayerElement(LayerElement *element)
 {
-    assert(
-        dynamic_cast<Note *>(element) || dynamic_cast<Chord *>(element) || dynamic_cast<EditorialElement *>(element));
+    // assert(
+    //    dynamic_cast<Note *>(element) || dynamic_cast<Chord *>(element) || dynamic_cast<EditorialElement *>(element));
     element->SetParent(this);
     m_children.push_back(element);
     Modify();

@@ -26,32 +26,32 @@ class Clef : public LayerElement, public AttClefshape, public AttLineloc, public
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
+     * Reset method resets all attribute classes.
      */
     ///@{
     Clef();
-    Clef(ScoreDefInterface *clefAttr);
+    Clef(const ScoreDefInterface *clefAttr);
     void Init();
     virtual ~Clef();
     virtual void Reset();
-    virtual Object *Clone() { return new Clef(*this); };
-    virtual std::string GetClassName() { return "Clef"; };
-    virtual ClassId Is() { return CLEF; };
+    virtual Object *Clone() const { return new Clef(*this); };
+    virtual std::string GetClassName() const { return "Clef"; };
+    virtual ClassId Is() const { return CLEF; };
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
     /**
      * Return the offset of the clef
      */
-    int GetClefOffset();
+    int GetClefOffset() const;
 
     /**
      * This is used for false clef offset calculation.
      * Returns 4 bytes with, from right to left, line, shape, dis and displace
      */
-    int GetClefId();
+    int GetClefId() const;
 
 private:
     //

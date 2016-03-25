@@ -27,18 +27,18 @@ class ScoreDef;
  * A System is contained in a Page.
  * It contains Staff objects.
 */
-class System : public DocObject, public DrawingListInterface {
+class System : public Object, public DrawingListInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     System();
     virtual ~System();
     virtual void Reset();
-    virtual std::string GetClassName() { return "System"; };
-    virtual ClassId Is() { return SYSTEM; };
+    virtual std::string GetClassName() const { return "System"; };
+    virtual ClassId Is() const { return SYSTEM; };
     ///@}
 
     /**
@@ -62,17 +62,19 @@ public:
     /**
      * Return the height of the system
      */
-    int GetHeight();
+    int GetHeight() const;
 
     /**
      * Return the default horizontal spacing of system.
      */
-    int GetVerticalSpacing();
+    int GetVerticalSpacing() const;
 
     /**
      * Return the index position of the system in its page parent
      */
     int GetSystemIdx() const { return Object::GetIdx(); };
+
+    void SetCurrentFloatingPositioner(int staffN, FloatingElement *element, int x, int y);
 
     //----------//
     // Functors //
@@ -98,7 +100,7 @@ public:
     virtual int SetAligmentYPos(ArrayPtrVoid *params);
 
     /**
-     * Correct the Y alignment once the the content of a system has been aligned and laid out.
+     * Correct the Y alignment once the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the SystemAligner.
      */
     virtual int IntegrateBoundingBoxYShift(ArrayPtrVoid *params);
@@ -126,13 +128,17 @@ public:
     virtual int JustifyX(ArrayPtrVoid *params);
 
     /**
-     * Lay out the Y positions of the staff looking that the bounding boxes of each staff
-     * This is the Functor called at the end of the system or a measure.
+     * See Object::CalcStaffOverlap
      */
-    virtual int SetBoundingBoxYShiftEnd(ArrayPtrVoid *params);
+    virtual int CalcStaffOverlap(ArrayPtrVoid *params);
 
     /**
      *
+     */
+    virtual int AdjustFloatingPostioners(ArrayPtrVoid *params);
+
+    /**
+     * See Object::CastOffPages
      */
     virtual int CastOffPages(ArrayPtrVoid *params);
 
@@ -147,7 +153,7 @@ public:
      */
     virtual int SetDrawingXY(ArrayPtrVoid *params);
 
-private:
+public:
     SystemAligner m_systemAligner;
 
 public:
@@ -172,12 +178,12 @@ public:
     int m_xAbs;
     /**
      * The X relative position of the system.
-     * It is used internally when calculating the layout andd it is not stored in the file.
+     * It is used internally when calculating the layout and it is not stored in the file.
      */
     int m_drawingXRel;
     /**
      * The width used by the labels at the left of the system.
-     * It is used internally when calculating the layout andd it is not stored in the file.
+     * It is used internally when calculating the layout and it is not stored in the file.
      */
     int m_drawingLabelsWidth;
     /** The width used by the abbreviated labels */

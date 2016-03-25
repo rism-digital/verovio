@@ -24,16 +24,17 @@ class Space : public LayerElement, public DurationInterface {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Space();
     virtual ~Space();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Space"; };
-    ;
-    virtual ClassId Is() { return SPACE; };
+    virtual std::string GetClassName() const { return "Space"; };
+    virtual ClassId Is() const { return SPACE; };
     ///@}
+
+    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
 
 private:
     //
