@@ -121,14 +121,14 @@ public:
     virtual ClassId Is() const { return STAFF_ALIGNMENT; }
     ///@}
 
+    /**
+     * @name Setter and getter for y
+     */
     void SetYRel(int yRel) { m_yRel = yRel; };
     int GetYRel() const { return m_yRel; };
 
     void SetYShift(int yShift);
     int GetYShift() const { return m_yShift; };
-
-    void SetMaxHeight(int max_height);
-    int GetMaxHeight() const { return m_maxHeight; };
 
     /**
      * @name Set and get verse count.
@@ -158,10 +158,13 @@ public:
     bool GetHairpinBelow() const { return m_hairpinBelow; };
     ///@}
 
+    /**
+     * Retrieves or creates the FloatingPositioner for the FloatingElement on this staff.
+     */
     void SetCurrentFloatingPositioner(FloatingElement *element, int x, int y);
 
     /**
-     * Setter and getter of the staff from which the alignment is created alignment.
+     * @name Setter and getter of the staff from which the alignment is created alignment.
      * Used for accessing the staff @n, the size, etc.
      */
     ///@{
@@ -169,13 +172,44 @@ public:
     void SetStaff(Staff *staff, Doc *doc);
     ///@}
 
-    int GetStaffHeight() const;
-
-    int CalcOverflowAbove(BoundingBox *box);
-    int CalcOverflowBelow(BoundingBox *box);
+    /**
+     * Returns the staff size (100 if no staff object is refered to)
+     */
+    int GetStaffSize() const;
 
     /**
-     *
+     * @name Calculates the overlow (above or below for the bounding box.
+     * Looks if the bounding box is a FloatingPositioner or not, in which case it we take into account its m_drawingYRel
+     * value.
+     */
+    ///@{
+    int CalcOverflowAbove(BoundingBox *box);
+    int CalcOverflowBelow(BoundingBox *box);
+    ///@}
+
+    /**
+     * @name Setter and getter for overflow and overlap values
+     */
+    ///@{
+    void SetOverflowAbove(int overflowAbove);
+    int GetOverflowAbove() const { return m_overflowAbove; };
+    void SetOverflowBelow(int overflowBottom);
+    int GetOverflowBelow() const { return m_overflowBelow; };
+    void SetOverlap(int overlap);
+    int GetOverlap() const { return m_overlap; };
+    int GetStaffHeight() const { return m_staffHeight; };
+    ///@}
+
+    /**
+     * @name Adds a bounding box to the array of overflowing objects above or below
+     */
+    ///@{
+    void AddBBoxAbove(BoundingBox *box) { m_overflowAboveBBoxes.push_back(box); };
+    void AddBBoxBelow(BoundingBox *box) { m_overflowBelowBBoxes.push_back(box); };
+    ///@}
+
+    /**
+     * Deletes all the FloatingPositioner objects.
      */
     void ClearPositioners();
 
@@ -201,9 +235,10 @@ public:
     virtual int IntegrateBoundingBoxYShift(ArrayPtrVoid *params);
 
     /**
-     *
+     * Adjust the position of the positoners looking at previously overlowing bounding boxes.
+     * Also add them to the list of overflowing elements.
      */
-    virtual int AdjustFloatingBoundingBoxes(ArrayPtrVoid *params);
+    virtual int AdjustFloatingPostioners(ArrayPtrVoid *params);
 
 private:
     //
@@ -211,7 +246,7 @@ public:
     //
 private:
     /**
-     *
+     * The list of FloatingPositioner for the staff.
      */
     ArrayOfFloatingPositioners m_floatingPositioners;
     /**
@@ -224,11 +259,6 @@ private:
      */
     int m_yRel;
     int m_yShift;
-    /**
-     * Stores temporally the maximum height of the staff pointing to it.
-     * It is set and integrated as m_yShift.
-     */
-    int m_maxHeight;
     /**
      * Stores the number of verse of the staves attached to the aligner
      */
@@ -245,18 +275,18 @@ private:
     bool m_hairpinBelow;
     ///@}
 
-public:
+    /**
+     * @name values for storing the overlow and overlap
+     */
+    ///@{
     int m_overflowAbove;
     int m_overflowBelow;
     int m_overlap;
     int m_staffHeight;
-
-    void SetOverflowAbove(int overflowAbove);
-    void SetOverflowBelow(int overflowBottom);
-    void SetOverlap(int overlap);
+    ///@}
 
     /**
-     *
+     * The list of overflowing bounding boxes (e.g, LayerElement or FloatingPositioner)
      */
     std::vector<BoundingBox *> m_overflowAboveBBoxes;
     std::vector<BoundingBox *> m_overflowBelowBBoxes;

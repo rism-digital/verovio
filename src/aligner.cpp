@@ -96,7 +96,6 @@ StaffAlignment::StaffAlignment() : Object()
 {
     m_yRel = 0;
     m_yShift = 0;
-    m_maxHeight = 0;
     m_verseCount = 0;
     m_staff = NULL;
     m_dirAbove = false;
@@ -134,7 +133,7 @@ void StaffAlignment::SetStaff(Staff *staff, Doc *doc)
     }
 }
 
-int StaffAlignment::GetStaffHeight() const
+int StaffAlignment::GetStaffSize() const
 {
     return m_staff ? m_staff->m_drawingStaffSize : 100;
 }
@@ -143,13 +142,6 @@ void StaffAlignment::SetYShift(int yShift)
 {
     if (yShift < m_yShift) {
         m_yShift = yShift;
-    }
-}
-
-void StaffAlignment::SetMaxHeight(int max_height)
-{
-    if (max_height < m_maxHeight) {
-        m_maxHeight = max_height;
     }
 }
 
@@ -496,7 +488,7 @@ int StaffAlignment::CalcStaffOverlap(ArrayPtrVoid *params)
     return FUNCTOR_SIBLINGS;
 }
 
-int StaffAlignment::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
+int StaffAlignment::AdjustFloatingPostioners(ArrayPtrVoid *params)
 {
     // param 0: the classId
     // param X: the doc
@@ -505,7 +497,7 @@ int StaffAlignment::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
     Doc *doc = static_cast<Doc *>((*params).at(1));
 
     // for slur we do not need to adjust them, only add them to the overflow boxes if required
-    int staffSize = this->GetStaffHeight();
+    int staffSize = this->GetStaffSize();
 
     if ((*classId) == SYL) {
         if (this->GetVerseCount() > 0) {
@@ -607,7 +599,7 @@ int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
     int shift = std::max(maxOverlfowAbove, doc->GetSpacingStaff() * doc->GetDrawingUnit(100));
 
     // Add a margin
-    shift += doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(this->GetStaffHeight()) / PARAM_DENOMINATOR;
+    shift += doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(this->GetStaffSize()) / PARAM_DENOMINATOR;
 
     // Shift, including the previous staff height
     SetYShift(-shift - (*previousStaffHeight));

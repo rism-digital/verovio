@@ -135,7 +135,7 @@ public:
     /**
      *
      */
-    virtual int AdjustFloatingBoundingBoxes(ArrayPtrVoid *params);
+    virtual int AdjustFloatingPostioners(ArrayPtrVoid *params);
 
     /**
      * See Object::CastOffPages

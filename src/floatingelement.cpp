@@ -168,7 +168,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     assert(doc);
     assert(staffAlignment);
 
-    int staffSize = staffAlignment->GetStaffHeight();
+    int staffSize = staffAlignment->GetStaffSize();
 
     if (horizOverlapingBBox == NULL) {
         if (this->m_place == STAFFREL_above) {
@@ -177,7 +177,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             this->SetDrawingYRel(yRel);
         }
         else {
-            int yRel = staffAlignment->m_staffHeight + m_contentBB_y2;
+            int yRel = staffAlignment->GetStaffHeight() + m_contentBB_y2;
             yRel += doc->GetTopMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
@@ -189,7 +189,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             this->SetDrawingYRel(yRel);
         }
         else {
-            int yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->m_staffHeight
+            int yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
                 + m_contentBB_y2;
             yRel += doc->GetTopMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);

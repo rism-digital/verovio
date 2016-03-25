@@ -251,17 +251,15 @@ void Page::LayOutVertically()
     Functor setOverflowBBoxes(&Object::SetOverflowBBoxes);
     this->Process(&setOverflowBBoxes, &params);
 
-    // Adjust / add bounding boxes for slurs
-    // Adjust / add bounding boxes for hairpin
-    // Adjust / add bounding boxes for dynam
+    // Adjust the positioners of floationg elements (slurs, hairpin, dynam, etc)
     params.clear();
     ClassId classId = OBJECT;
     params.push_back(&classId);
     params.push_back(doc);
-    Functor adjustFloatingBoundingBoxes(&Object::AdjustFloatingBoundingBoxes);
+    Functor adjustFloatingPostioners(&Object::AdjustFloatingPostioners);
     // Special case: because we redirect the functor, pass it as parameter to itself (!)
-    params.push_back(&adjustFloatingBoundingBoxes);
-    this->Process(&adjustFloatingBoundingBoxes, &params);
+    params.push_back(&adjustFloatingPostioners);
+    this->Process(&adjustFloatingPostioners, &params);
 
     // Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes params.clear();
     params.clear();

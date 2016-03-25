@@ -1253,20 +1253,20 @@ int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
         return FUNCTOR_CONTINUE;
     }
 
-    int staffSize = (*staffAlignment)->GetStaffHeight();
+    int staffSize = (*staffAlignment)->GetStaffSize();
 
     int overflowAbove = (*staffAlignment)->CalcOverflowAbove(current);
     if (overflowAbove > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
         // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
         (*staffAlignment)->SetOverflowAbove(overflowAbove);
-        (*staffAlignment)->m_overflowAboveBBoxes.push_back(current);
+        (*staffAlignment)->AddBBoxAbove(current);
     }
 
     int overflowBelow = (*staffAlignment)->CalcOverflowBelow(current);
     if (overflowBelow > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
         // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
         (*staffAlignment)->SetOverflowBelow(overflowBelow);
-        (*staffAlignment)->m_overflowBelowBBoxes.push_back(current);
+        (*staffAlignment)->AddBBoxBelow(current);
     }
 
     // do not go further down the tree in this case since the bounding box of the first element is already taken into

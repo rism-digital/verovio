@@ -265,7 +265,7 @@ int System::CalcStaffOverlap(ArrayPtrVoid *params)
     return FUNCTOR_SIBLINGS;
 }
 
-int System::AdjustFloatingBoundingBoxes(ArrayPtrVoid *params)
+int System::AdjustFloatingPostioners(ArrayPtrVoid *params)
 {
     // param 0: the classId
     // param X: the doc (unused)

@@ -445,7 +445,7 @@ public:
     /**
      *
      */
-    virtual int AdjustFloatingBoundingBoxes(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustFloatingPostioners(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
      * Align horizontally the content of a page.
