@@ -632,7 +632,7 @@ int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin) const
 
 int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin) const
 {
-    int size = m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITON_FACTOR;
+    int size = m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITION_FACTOR;
     // This should be styled
     if (withMargin) size += GetDrawingUnit(staffSize);
     return size;

@@ -98,13 +98,13 @@ Style::Style()
     m_rightMarginNote = DEFAULT_RIGHT_MARGIN_NOTE * DEFINITION_FACTOR;
     m_rightMarginRest = DEFAULT_RIGHT_MARGIN_REST * DEFINITION_FACTOR;
     /** The default right margin */
-    m_rightMarginDefault = DEFAULT_RIGHT_MARGIN_DEFAULT * DEFINITON_FACTOR;
+    m_rightMarginDefault = DEFAULT_RIGHT_MARGIN_DEFAULT * DEFINITION_FACTOR;
 
     /** The default right margin */
-    m_bottomMarginDefault = DEFAULT_BOTTOM_MARGIN_DEFAULT * DEFINITON_FACTOR;
+    m_bottomMarginDefault = DEFAULT_BOTTOM_MARGIN_DEFAULT * DEFINITION_FACTOR;
 
     /** The default right margin */
-    m_topMarginDefault = DEFAULT_TOP_MARGIN_DEFAULT * DEFINITON_FACTOR;
+    m_topMarginDefault = DEFAULT_TOP_MARGIN_DEFAULT * DEFINITION_FACTOR;
 }
 
 Style::~Style()

@@ -526,7 +526,7 @@ void Object::FillFlatList(ListOfObjects *flatList)
     this->Process(&addToFlatList, &params);
 }
 
-Object *Object::GetFirstParent(const ClassId classId, int maxSteps)
+Object *Object::GetFirstParent(const ClassId classId, int maxDepth)
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
