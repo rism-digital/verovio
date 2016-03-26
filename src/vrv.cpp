@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <cmath>
 #include <dirent.h>
+#include <sstream>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <vector>
@@ -20,11 +21,14 @@
 
 #include "git_commit.h"
 #include "glyph.h"
-#include "pugixml.hpp"
 #include "smufl.h"
 #include "vrvdef.h"
 
 //----------------------------------------------------------------------------
+
+#include "checked.h"
+#include "pugixml.hpp"
+#include "unchecked.h"
 
 #define STRING_FORMAT_MAX_LEN 2048
 
@@ -82,7 +86,7 @@ Glyph *Resources::GetTextGlyph(wchar_t code)
 
 bool Resources::LoadFont(std::string fontName)
 {
-    DIR *dir;
+    ::DIR *dir;
     dirent *pdir;
     std::string dirname = Resources::GetPath() + "/" + fontName;
     dir = opendir(dirname.c_str());
@@ -148,6 +152,7 @@ bool Resources::LoadFont(std::string fontName)
             if (current.attribute("w")) width = atof(current.attribute("w").value());
             if (current.attribute("h")) height = atof(current.attribute("h").value());
             glyph->SetBoundingBox(x, y, width, height);
+            if (current.attribute("h-a-x")) glyph->SetHorizAdvX(atof(current.attribute("h-a-x").value()));
         }
     }
 
@@ -158,9 +163,9 @@ bool Resources::InitTextFont()
 {
     // For the text font, we load the bounding boxes only
     pugi::xml_document doc;
-    // For now, we have only Georgia.xml bounding boxes for ASCII chars
+    // For now, we have only Times bounding boxes for ASCII chars
     // For any other char, we currently use 'o' bounding box
-    std::string filename = Resources::GetPath() + "/text/Georgia.xml";
+    std::string filename = Resources::GetPath() + "/text/Times.xml";
     pugi::xml_parse_result result = doc.load_file(filename.c_str());
     if (!result) {
         // File not found, default bounding boxes will be used
@@ -364,76 +369,22 @@ bool AreEqual(double dFirstVal, double dSecondVal)
     return std::fabs(dFirstVal - dSecondVal) < 1E-3;
 }
 
-std::string UTF16to8(const wchar_t *in)
+std::string UTF16to8(const std::wstring in)
 {
     std::string out;
-    unsigned int codepoint = 0;
-    for (; *in != 0; ++in) {
-        if (*in >= 0xd800 && *in <= 0xdbff)
-            codepoint = ((*in - 0xd800) << 10) + 0x10000;
-        else {
-            if (*in >= 0xdc00 && *in <= 0xdfff)
-                codepoint |= *in - 0xdc00;
-            else
-                codepoint = *in;
 
-            if (codepoint <= 0x7f)
-                out.append(1, static_cast<char>(codepoint));
-            else if (codepoint <= 0x7ff) {
-                out.append(1, static_cast<char>(0xc0 | ((codepoint >> 6) & 0x1f)));
-                out.append(1, static_cast<char>(0x80 | (codepoint & 0x3f)));
-            }
-            else if (codepoint <= 0xffff) {
-                out.append(1, static_cast<char>(0xe0 | ((codepoint >> 12) & 0x0f)));
-                out.append(1, static_cast<char>(0x80 | ((codepoint >> 6) & 0x3f)));
-                out.append(1, static_cast<char>(0x80 | (codepoint & 0x3f)));
-            }
-            else {
-                out.append(1, static_cast<char>(0xf0 | ((codepoint >> 18) & 0x07)));
-                out.append(1, static_cast<char>(0x80 | ((codepoint >> 12) & 0x3f)));
-                out.append(1, static_cast<char>(0x80 | ((codepoint >> 6) & 0x3f)));
-                out.append(1, static_cast<char>(0x80 | (codepoint & 0x3f)));
-            }
-            codepoint = 0;
-        }
-    }
+    utf8::utf16to8(in.begin(), in.end(), std::back_inserter(out));
+
     return out;
 }
 
-std::wstring UTF8to16(const char *in)
+std::wstring UTF8to16(const std::string in)
 {
     std::wstring out;
-    if (in == NULL) return out;
+    std::stringstream sin(in.c_str());
 
-    unsigned int codepoint;
-    while (*in != 0) {
-        unsigned char ch = static_cast<unsigned char>(*in);
-        if (ch <= 0x7f) {
-            codepoint = ch;
-        }
-        else if (ch <= 0xbf) {
-            codepoint = (codepoint << 6) | (ch & 0x3f);
-        }
-        else if (ch <= 0xdf) {
-            codepoint = ch & 0x1f;
-        }
-        else if (ch <= 0xef) {
-            codepoint = ch & 0x0f;
-        }
-        else {
-            codepoint = ch & 0x07;
-        }
-        ++in;
-        if (((*in & 0xc0) != 0x80) && (codepoint <= 0x10ffff)) {
-            if (codepoint > 0xffff) {
-                out.append(1, static_cast<wchar_t>(0xd800 + (codepoint >> 10)));
-                out.append(1, static_cast<wchar_t>(0xdc00 + (codepoint & 0x03ff)));
-            }
-            else if (codepoint < 0xd800 || codepoint >= 0xe000) {
-                out.append(1, static_cast<wchar_t>(codepoint));
-            }
-        }
-    }
+    utf8::utf8to16(std::istreambuf_iterator<char>(sin), std::istreambuf_iterator<char>(), std::back_inserter(out));
+
     return out;
 }
 

@@ -21,15 +21,18 @@ class Slur : public FloatingElement, public TimeSpanningInterface, public AttCur
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Slur();
     virtual ~Slur();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Slur"; };
-    virtual ClassId Is() { return SLUR; };
+    virtual std::string GetClassName() const { return "Slur"; };
+    virtual ClassId Is() const { return SLUR; };
     ///@}
+
+    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
+    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
 
 private:
     //

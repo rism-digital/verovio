@@ -23,19 +23,20 @@ class MRest : public LayerElement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     MRest();
     virtual ~MRest();
     virtual void Reset();
-    virtual std::string GetClassName() { return "MRest"; };
-    ;
-    virtual ClassId Is() { return MREST; };
+    virtual std::string GetClassName() const { return "MRest"; };
+    virtual ClassId Is() const { return MREST; };
     ///@}
 
 private:
+    //
 public:
+    //
 private:
 };
 

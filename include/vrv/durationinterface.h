@@ -22,7 +22,7 @@ class Object;
 
 /**
  * This class is an interface for elements with duration, such as notes and rests.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
 class DurationInterface : public Interface,
                           public AttAugmentdots,
@@ -35,7 +35,7 @@ class DurationInterface : public Interface,
 public:
     /**
      * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     DurationInterface();
@@ -50,14 +50,14 @@ public:
      * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
      * LayerElement and DurationInterface have no inheritance link.
      */
-    virtual double GetAlignmentDuration(int num, int numbase);
+    double GetInterfaceAlignmentDuration(int num, int numbase);
 
     /**
      * Returns the duration (in double) for the element for mensural notation
      * Currently this assume brevis equality (through DUR_MENSURAL_REF) and would
-     * need to be modifiy for shorter equality in later repertoire.
+     * need to be modified for shorter equality in later repertoire.
      */
-    virtual double GetAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur);
+    double GetInterfaceAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur);
 
     /**
      * Return true if the note or rest is the first of a beam.
@@ -75,7 +75,13 @@ public:
      * For CMN, it is the same (DURATION_1 == DUR_1)
      * For mensural, we need to apply the DUR_MENSURAL_MASK
      */
-    int GetActualDur();
+    int GetActualDur() const;
+
+    /**
+     * If the element is part of a chord, return the chord actual duration, otherwise the note actual duration.
+     * Since we need to check what the element is, we need to pass it as parameter.
+     */
+    int GetNoteOrChordDur(LayerElement *element);
 
     /**
      * Return true if the value is a mensural (DURATION_longa, brevis, etc.)
@@ -83,13 +89,15 @@ public:
     bool IsMensural();
 
     /**
-     * Inteface comparison operator.
+     * Interface comparison operator.
      * Check if the LayerElement has a DurationInterface and compare attributes
      */
     bool HasIdenticalDurationInterface(DurationInterface *otherDurationInterface);
 
 private:
+    //
 public:
+    //
 private:
 };
 

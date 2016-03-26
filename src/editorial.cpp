@@ -28,24 +28,27 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() : DocObject("ee-"), AttCommon()
+EditorialElement::EditorialElement() :  Object("ee-"), AttCommon(), AttCommonPart()
 {
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_COMMONPART);
 
     Reset();
 }
 
-EditorialElement::EditorialElement(std::string classid) : DocObject(classid), AttCommon()
+EditorialElement::EditorialElement(std::string classid) :  Object(classid), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_COMMONPART);
 
     Reset();
 }
 
 void EditorialElement::Reset()
 {
-    DocObject::Reset();
+    Object::Reset();
     ResetCommon();
+    ResetCommonPart();
 
     m_visibility = Visible;
 }

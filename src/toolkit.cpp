@@ -26,6 +26,10 @@
 #include "svgdevicecontext.h"
 #include "vrv.h"
 
+//----------------------------------------------------------------------------
+
+#include "MidiFile.h"
+
 namespace vrv {
 
 const char *UTF_16_BE_BOM = "\xFE\xFF";
@@ -338,7 +342,7 @@ bool Toolkit::LoadString(const std::string &data)
         // LogElapsedTimeEnd("layout");
     }
 
-    // disable justification if no layout or no justification
+    // disable justification if there's no layout or no justification
     if (m_noLayout || m_noJustification) {
         m_doc.SetJustificationX(false);
     }
@@ -351,7 +355,7 @@ bool Toolkit::LoadString(const std::string &data)
 
 std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
 {
-    // Page number is one-based - correct to 0-based first
+    // Page number is one-based - correct it to 0-based first
     pageNo--;
 
     MeiOutput meioutput(&m_doc, "");
@@ -406,7 +410,7 @@ bool Toolkit::ParseOptions(const std::string &json_options)
 
     // Parse the various flags
     // Note: it seems that there is a bug with jsonxx and emscripten
-    // Boolean value false do not parse properly. We have to use Number instead
+    // Boolean value false won't be parsed properly. We have to use Number instead
 
     if (json.has<jsonxx::Number>("noLayout")) SetNoLayout(json.get<jsonxx::Number>("noLayout"));
 
@@ -422,7 +426,7 @@ bool Toolkit::ParseOptions(const std::string &json_options)
     return true;
 
 #else
-    // The non js version of the app should not use this function.
+    // The non-js version of the app should not use this function.
     return false;
 #endif
 }
@@ -439,7 +443,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
         return o.json();
     }
 
-    // Fill the attribute array (pair of string) by looking by attributes for all available MEI modules
+    // Fill the attribute array (pair of string) by looking at attributes for all available MEI modules
     ArrayOfStrAttr attributes;
     element->GetAttributes(&attributes);
 
@@ -452,7 +456,7 @@ std::string Toolkit::GetElementAttr(const std::string &xmlId)
     return o.json();
 
 #else
-    // The non js version of the app should not use this function.
+    // The non-js version of the app should not use this function.
     return "";
 #endif
 }
@@ -498,7 +502,7 @@ bool Toolkit::Edit(const std::string &json_editorAction)
     return false;
 
 #else
-    // The non js version of the app should not use this function.
+    // The non-js version of the app should not use this function.
     return false;
 #endif
 }
@@ -513,7 +517,7 @@ std::string Toolkit::GetLogString()
     }
     return str;
 #else
-    // The non js version of the app should not use this function.
+    // The non-js version of the app should not use this function.
     return "";
 #endif
 }
@@ -532,7 +536,7 @@ void Toolkit::ResetLogBuffer()
 
 std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
 {
-    // Page number is one-based - correction to 0-based first
+    // Page number is one-based - correct it to 0-based first
     pageNo--;
 
     // Get the current system for the SVG clipping size
@@ -594,6 +598,16 @@ bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
 
     outfile << output;
     outfile.close();
+    return true;
+}
+
+bool Toolkit::RenderToMidiFile(const std::string &filename)
+{
+    MidiFile outputfile;
+    outputfile.absoluteTicks();
+    m_doc.ExportMIDI(&outputfile);
+    outputfile.sortTracks();
+    outputfile.write(filename);
     return true;
 }
 
@@ -666,12 +680,12 @@ bool Toolkit::Insert(std::string elementType, std::string startid, std::string e
     if (!m_doc.GetDrawingPage()) return false;
     Object *start = m_doc.GetDrawingPage()->FindChildByUuid(startid);
     Object *end = m_doc.GetDrawingPage()->FindChildByUuid(endid);
-    // Check that start and end element exists
+    // Check if both start and end elements exist
     if (!start || !end) {
         LogMessage("Elements start and end ids '%s' and '%s' could not be found", startid.c_str(), endid.c_str());
         return false;
     }
-    // Check that it is a LayerElement
+    // Check if it is a LayerElement
     if (!dynamic_cast<LayerElement *>(start)) {
         LogMessage("Element '%s' is not supported as start element", start->GetClassName().c_str());
         return false;

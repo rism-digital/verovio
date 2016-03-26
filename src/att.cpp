@@ -31,37 +31,37 @@ Att::~Att()
 {
 }
 
-std::string Att::StrToStr(std::string str)
+std::string Att::StrToStr(std::string str) const
 {
     return str;
 }
 
 // Basic converters for writing
 
-std::string Att::DblToStr(double data)
+std::string Att::DblToStr(double data) const
 {
     return StringFormat("%f", data);
 }
 
-std::string Att::IntToStr(int data)
+std::string Att::IntToStr(int data) const
 {
     return StringFormat("%d", data);
 }
 
 // Basic converters for reading
 
-double Att::StrToDbl(std::string value)
+double Att::StrToDbl(std::string value) const
 {
     return atof(value.c_str());
 }
-int Att::StrToInt(std::string value)
+int Att::StrToInt(std::string value) const
 {
     return atoi(value.c_str());
 }
 
 // Converters for writing and reading
 
-std::string Att::BeatrptRendToStr(data_BEATRPT_REND data)
+std::string Att::BeatrptRendToStr(data_BEATRPT_REND data) const
 {
     std::string value;
     switch (data) {
@@ -80,7 +80,7 @@ std::string Att::BeatrptRendToStr(data_BEATRPT_REND data)
     return value;
 }
 
-data_BEATRPT_REND Att::StrToBeatrptRend(std::string value)
+data_BEATRPT_REND Att::StrToBeatrptRend(std::string value) const
 {
     if (value == "4") return BEATRPT_REND_4;
     if (value == "8") return BEATRPT_REND_8;
@@ -93,7 +93,7 @@ data_BEATRPT_REND Att::StrToBeatrptRend(std::string value)
     return BEATRPT_REND_NONE;
 }
 
-std::string Att::DurationToStr(data_DURATION data)
+std::string Att::DurationToStr(data_DURATION data) const
 {
     std::string value;
     switch (data) {
@@ -124,7 +124,7 @@ std::string Att::DurationToStr(data_DURATION data)
     return value;
 }
 
-data_DURATION Att::StrToDuration(std::string value)
+data_DURATION Att::StrToDuration(std::string value) const
 {
     if (value == "maxima") return DURATION_maxima;
     if (value == "longa") return DURATION_longa;
@@ -154,7 +154,7 @@ data_DURATION Att::StrToDuration(std::string value)
     return DURATION_NONE;
 }
 
-std::string Att::KeysignatureToStr(data_KEYSIGNATURE data)
+std::string Att::KeysignatureToStr(data_KEYSIGNATURE data) const
 {
     std::string value;
     switch (data) {
@@ -182,7 +182,7 @@ std::string Att::KeysignatureToStr(data_KEYSIGNATURE data)
     return value;
 }
 
-data_KEYSIGNATURE Att::StrToKeysignature(std::string value)
+data_KEYSIGNATURE Att::StrToKeysignature(std::string value) const
 {
     if (value == "7f") return KEYSIGNATURE_7f;
     if (value == "6f") return KEYSIGNATURE_6f;
@@ -204,17 +204,34 @@ data_KEYSIGNATURE Att::StrToKeysignature(std::string value)
     return KEYSIGNATURE_NONE;
 }
 
-std::string Att::MeasurebeatToStr(data_MEASUREBEAT data)
+std::string Att::MeasurebeatToStr(data_MEASUREBEAT data) const
 {
-    return "0m0.0";
+    return StringFormat("%dm+%.1f", data.first, data.second);
 }
 
-data_MEASUREBEAT Att::StrToMeasurebeat(std::string value)
+data_MEASUREBEAT Att::StrToMeasurebeat(std::string value) const
 {
-    return std::make_pair(0, 1.0);
+    for (size_t i = 0; i < value.length(); i++) {
+        if (iswspace(value[i])) {
+            value.erase(i, 1);
+            i--;
+        }
+    }
+    int measure = 0;
+    double timePoint = 0.0;
+    size_t m = value.find_first_of('m');
+    size_t plus = value.find_last_of('+');
+    if (m != -1) measure = atoi(value.substr(0, m).c_str());
+    if (plus != -1) {
+        timePoint = atof(value.substr(plus).c_str());
+    }
+    else {
+        timePoint = atof(value.c_str());
+    }
+    return std::make_pair(measure, timePoint);
 }
 
-std::string Att::ModusmaiorToStr(data_MODUSMAIOR data)
+std::string Att::ModusmaiorToStr(data_MODUSMAIOR data) const
 {
     std::string value;
     switch (data) {
@@ -228,7 +245,7 @@ std::string Att::ModusmaiorToStr(data_MODUSMAIOR data)
     return value;
 }
 
-data_MODUSMAIOR Att::StrToModusmaior(std::string value)
+data_MODUSMAIOR Att::StrToModusmaior(std::string value) const
 {
     if (value == "2") return MODUSMAIOR_2;
     if (value == "3") return MODUSMAIOR_3;
@@ -236,7 +253,7 @@ data_MODUSMAIOR Att::StrToModusmaior(std::string value)
     return MODUSMAIOR_NONE;
 }
 
-std::string Att::ModusminorToStr(data_MODUSMINOR data)
+std::string Att::ModusminorToStr(data_MODUSMINOR data) const
 {
     std::string value;
     switch (data) {
@@ -250,7 +267,7 @@ std::string Att::ModusminorToStr(data_MODUSMINOR data)
     return value;
 }
 
-data_MODUSMINOR Att::StrToModusminor(std::string value)
+data_MODUSMINOR Att::StrToModusminor(std::string value) const
 {
     if (value == "2") return MODUSMINOR_2;
     if (value == "3") return MODUSMINOR_3;
@@ -258,7 +275,7 @@ data_MODUSMINOR Att::StrToModusminor(std::string value)
     return MODUSMINOR_NONE;
 }
 
-std::string Att::PitchnameToStr(data_PITCHNAME data)
+std::string Att::PitchnameToStr(data_PITCHNAME data) const
 {
     std::string value;
     switch (data) {
@@ -277,7 +294,7 @@ std::string Att::PitchnameToStr(data_PITCHNAME data)
     return value;
 }
 
-data_PITCHNAME Att::StrToPitchname(std::string value)
+data_PITCHNAME Att::StrToPitchname(std::string value) const
 {
     if (value == "c") return PITCHNAME_c;
     if (value == "d") return PITCHNAME_d;
@@ -290,7 +307,7 @@ data_PITCHNAME Att::StrToPitchname(std::string value)
     return PITCHNAME_NONE;
 }
 
-std::string Att::OctaveDisToStr(data_OCTAVE_DIS data)
+std::string Att::OctaveDisToStr(data_OCTAVE_DIS data) const
 {
     std::string value;
     switch (data) {
@@ -305,7 +322,7 @@ std::string Att::OctaveDisToStr(data_OCTAVE_DIS data)
     return value;
 }
 
-data_OCTAVE_DIS Att::StrToOctaveDis(std::string value)
+data_OCTAVE_DIS Att::StrToOctaveDis(std::string value) const
 {
     if (value == "8") return OCTAVE_DIS_8;
     if (value == "15") return OCTAVE_DIS_15;
@@ -314,7 +331,7 @@ data_OCTAVE_DIS Att::StrToOctaveDis(std::string value)
     return OCTAVE_DIS_NONE;
 }
 
-std::string Att::OrientationToStr(data_ORIENTATION data)
+std::string Att::OrientationToStr(data_ORIENTATION data) const
 {
     std::string value;
     switch (data) {
@@ -329,7 +346,7 @@ std::string Att::OrientationToStr(data_ORIENTATION data)
     return value;
 }
 
-data_ORIENTATION Att::StrToOrientation(std::string value)
+data_ORIENTATION Att::StrToOrientation(std::string value) const
 {
     if (value == "reversed") return ORIENTATION_reversed;
     if (value == "90CW") return ORIENTATION_90CW;
@@ -338,7 +355,7 @@ data_ORIENTATION Att::StrToOrientation(std::string value)
     return ORIENTATION_NONE;
 }
 
-std::string Att::ProlatioToStr(data_PROLATIO data)
+std::string Att::ProlatioToStr(data_PROLATIO data) const
 {
     std::string value;
     switch (data) {
@@ -352,7 +369,7 @@ std::string Att::ProlatioToStr(data_PROLATIO data)
     return value;
 }
 
-data_PROLATIO Att::StrToProlatio(std::string value)
+data_PROLATIO Att::StrToProlatio(std::string value) const
 {
     if (value == "2") return PROLATIO_2;
     if (value == "3") return PROLATIO_3;
@@ -360,7 +377,7 @@ data_PROLATIO Att::StrToProlatio(std::string value)
     return PROLATIO_NONE;
 }
 
-std::string Att::StemdirectionToStr(data_STEMDIRECTION data)
+std::string Att::StemdirectionToStr(data_STEMDIRECTION data) const
 {
     std::string value;
     switch (data) {
@@ -374,7 +391,7 @@ std::string Att::StemdirectionToStr(data_STEMDIRECTION data)
     return value;
 }
 
-data_STEMDIRECTION Att::StrToStemdirection(std::string value)
+data_STEMDIRECTION Att::StrToStemdirection(std::string value) const
 {
     if (value == "up") return STEMDIRECTION_up;
     if (value == "down") return STEMDIRECTION_down;
@@ -382,7 +399,7 @@ data_STEMDIRECTION Att::StrToStemdirection(std::string value)
     return STEMDIRECTION_NONE;
 }
 
-std::string Att::TempusToStr(data_TEMPUS data)
+std::string Att::TempusToStr(data_TEMPUS data) const
 {
     std::string value;
     switch (data) {
@@ -396,7 +413,7 @@ std::string Att::TempusToStr(data_TEMPUS data)
     return value;
 }
 
-data_TEMPUS Att::StrToTempus(std::string value)
+data_TEMPUS Att::StrToTempus(std::string value) const
 {
     if (value == "2") return TEMPUS_2;
     if (value == "3") return TEMPUS_3;
@@ -404,7 +421,7 @@ data_TEMPUS Att::StrToTempus(std::string value)
     return TEMPUS_NONE;
 }
 
-std::string Att::TieToStr(data_TIE data)
+std::string Att::TieToStr(data_TIE data) const
 {
     std::string value;
     switch (data) {
@@ -419,7 +436,7 @@ std::string Att::TieToStr(data_TIE data)
     return value;
 }
 
-data_TIE Att::StrToTie(std::string value)
+data_TIE Att::StrToTie(std::string value) const
 {
     if (value == "i") return TIE_i;
     if (value == "m") return TIE_m;
@@ -428,9 +445,9 @@ data_TIE Att::StrToTie(std::string value)
     return TIE_NONE;
 }
 
-std::string Att::XsdPosintlistToStr(xsd_posIntList data)
+std::string Att::XsdPosintlistToStr(xsd_posIntList data) const
 {
-    std::stringstream ss;
+    std::ostringstream ss;
     for (size_t i = 0; i < data.size(); ++i) {
         if (i != 0) ss << " ";
         ss << data[i];
@@ -438,10 +455,10 @@ std::string Att::XsdPosintlistToStr(xsd_posIntList data)
     return ss.str();
 }
 
-xsd_posIntList Att::StrToXsdPosintlist(std::string value)
+xsd_posIntList Att::StrToXsdPosintlist(std::string value) const
 {
     xsd_posIntList list;
-    std::stringstream iss(value);
+    std::istringstream iss(value);
     std::string token;
     while (std::getline(iss, token, ' ')) {
         list.push_back(atoi(token.c_str()));

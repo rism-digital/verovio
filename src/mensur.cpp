@@ -23,7 +23,7 @@ Mensur::Mensur()
     Init();
 }
 
-Mensur::Mensur(ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
+Mensur::Mensur(const ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
 {
     Init();
 

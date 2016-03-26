@@ -21,18 +21,20 @@ class Custos : public LayerElement, public PositionInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Custos();
     virtual ~Custos();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Custos"; };
-    virtual ClassId Is() { return CUSTOS; };
+    virtual std::string GetClassName() const { return "Custos"; };
+    virtual ClassId Is() const { return CUSTOS; };
     ///@}
 
+    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
+
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
 private:
     //

@@ -51,7 +51,7 @@ public:
     ///@{
     void SetCause(std::string cause_) { m_cause = cause_; };
     std::string GetCause() const { return m_cause; };
-    bool HasCause();
+    bool HasCause() const;
     ///@}
 
 private:
@@ -90,7 +90,7 @@ public:
     ///@{
     void SetSource(std::string source_) { m_source = source_; };
     std::string GetSource() const { return m_source; };
-    bool HasSource();
+    bool HasSource() const;
     ///@}
 
 private:

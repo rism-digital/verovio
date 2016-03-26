@@ -23,6 +23,13 @@ namespace vrv {
 // DeviceContext
 //----------------------------------------------------------------------------
 
+ClassId DeviceContext::Is() const
+{
+    // we should always have the method overridden
+    assert(false);
+    return DEVICE_CONTEXT;
+};
+
 void DeviceContext::SetPen(int colour, int width, int opacity)
 {
     float opacityValue;
@@ -30,7 +37,8 @@ void DeviceContext::SetPen(int colour, int width, int opacity)
     switch (opacity) {
         case AxSOLID: opacityValue = 1.0; break;
         case AxTRANSPARENT: opacityValue = 0.0; break;
-        default: opacityValue = 1.0; // solid brush as default
+        default:
+            opacityValue = 1.0; // solid brush by default
     }
 
     m_penStack.push(Pen(colour, width, opacityValue));
@@ -43,7 +51,8 @@ void DeviceContext::SetBrush(int colour, int opacity)
     switch (opacity) {
         case AxSOLID: opacityValue = 1.0; break;
         case AxTRANSPARENT: opacityValue = 0.0; break;
-        default: opacityValue = 1.0; // solid brush as default
+        default:
+            opacityValue = 1.0; // solid brush by default
     }
 
     m_brushStack.push(Brush(colour, opacityValue));
@@ -76,29 +85,43 @@ void DeviceContext::ResetFont()
 
 void DeviceContext::DeactivateGraphic()
 {
-    assert(!m_isDeactivated);
-    m_isDeactivated = true;
+    assert(!m_isDeactivatedX && !m_isDeactivatedY);
+    m_isDeactivatedX = true;
+    m_isDeactivatedY = true;
+}
+
+void DeviceContext::DeactivateGraphicX()
+{
+    assert(!m_isDeactivatedX && !m_isDeactivatedY);
+    m_isDeactivatedX = true;
+}
+
+void DeviceContext::DeactivateGraphicY()
+{
+    assert(!m_isDeactivatedX && !m_isDeactivatedY);
+    m_isDeactivatedY = true;
 }
 
 void DeviceContext::ReactivateGraphic()
 {
-    assert(m_isDeactivated);
-    m_isDeactivated = false;
+    assert(m_isDeactivatedX || m_isDeactivatedY);
+    m_isDeactivatedY = false;
+    m_isDeactivatedX = false;
 }
 
-void DeviceContext::GetTextExtent(const std::string &string, int *w, int *h)
+void DeviceContext::GetTextExtent(const std::string &string, TextExtend *extend)
 {
     std::wstring wtext(string.begin(), string.end());
-    GetTextExtent(wtext, w, h);
+    GetTextExtent(wtext, extend);
 }
 
-void DeviceContext::GetTextExtent(const std::wstring &string, int *w, int *h)
+void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend)
 {
     assert(m_fontStack.top());
 
     int x, y, partial_w, partial_h;
-    (*w) = 0;
-    (*h) = 0;
+    extend->m_width = 0;
+    extend->m_height = 0;
 
     Glyph *unkown = Resources::GetTextGlyph(L'o');
 
@@ -117,9 +140,13 @@ void DeviceContext::GetTextExtent(const std::wstring &string, int *w, int *h)
         partial_w /= glyph->GetUnitsPerEm();
         partial_h *= m_fontStack.top()->GetPointSize();
         partial_h /= glyph->GetUnitsPerEm();
+        y *= m_fontStack.top()->GetPointSize();
+        y /= glyph->GetUnitsPerEm();
 
-        (*w) += partial_w;
-        (*h) = std::max(partial_h, (*h));
+        extend->m_width += partial_w;
+        extend->m_height = std::max(partial_h, extend->m_height);
+        extend->m_ascent = std::max(partial_h + y, extend->m_ascent);
+        extend->m_descent = std::max(-y, extend->m_descent);
     }
 }
 

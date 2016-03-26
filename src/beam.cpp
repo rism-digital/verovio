@@ -47,7 +47,7 @@ void Beam::AddLayerElement(LayerElement *element)
 void Beam::FilterList(ListOfObjects *childList)
 {
     bool firstNoteGrace = false;
-    // We want to keep only notes and rest
+    // We want to keep only notes and rests
     // Eventually, we also need to filter out grace notes properly (e.g., with sub-beams)
     ListOfObjects::iterator iter = childList->begin();
 
@@ -57,17 +57,22 @@ void Beam::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        LayerElement *currentElement = dynamic_cast<LayerElement *>(*iter);
-        assert(currentElement);
-        if (!currentElement->HasInterface(INTERFACE_DURATION)) {
+        if (!(*iter)->HasInterface(INTERFACE_DURATION)) {
             // remove anything that has not a DurationInterface
             iter = childList->erase(iter);
+            continue;
+        }
+        if ((*iter)->Is() == REST) {
+            // remove anything that has not a DurationInterface
+            iter = childList->erase(iter);
+            continue;
         }
         else {
             // Drop notes that are signaled as grace notes
-            Note *n = dynamic_cast<Note *>(currentElement);
 
-            if (n) {
+            if ((*iter)->Is() == NOTE) {
+                Note *n = dynamic_cast<Note *>(*iter);
+                assert(n);
                 // if we are at the beginning of the beam
                 // and the note is cueSize
                 // assume all the beam is of grace notes
@@ -99,7 +104,7 @@ bool Beam::IsFirstInBeam(LayerElement *element)
     int position = this->GetListIndex(element);
     // This method should be called only if the note is part of a beam
     assert(position != -1);
-    // this is this first one
+    // this is the first one
     if (position == 0) return true;
     return false;
 }

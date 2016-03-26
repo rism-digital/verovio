@@ -18,18 +18,22 @@
 #include "attcomparison.h"
 #include "bboxdevicecontext.h"
 #include "devicecontext.h"
+#include "dir.h"
 #include "doc.h"
+#include "dynam.h"
 #include "floatingelement.h"
+#include "hairpin.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "measure.h"
 #include "note.h"
 #include "slur.h"
+#include "smufl.h"
 #include "staff.h"
 #include "style.h"
 #include "syl.h"
 #include "system.h"
-#include "textdirective.h"
+#include "tempo.h"
 #include "tie.h"
 #include "timeinterface.h"
 #include "vrv.h"
@@ -47,11 +51,22 @@ void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Meas
     assert(measure);
     assert(element);
 
-    if (element->HasInterface(INTERFACE_TIME_SPANNING)) {
-        // creating placeholder
+    // For dir and dynam, we do not consider the @tstamp2 for rendering
+    if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DIR) && (element->Is() != DYNAM)) {
+        // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
         system->AddToDrawingList(element);
+    }
+    else if (element->Is() == DIR) {
+        Dir *dir = dynamic_cast<Dir *>(element);
+        assert(dir);
+        DrawDir(dc, dir, measure, system);
+    }
+    else if (element->Is() == DYNAM) {
+        Dynam *dynam = dynamic_cast<Dynam *>(element);
+        assert(dynam);
+        DrawDynam(dc, dynam, measure, system);
     }
     else if (element->Is() == TEMPO) {
         Tempo *tempo = dynamic_cast<Tempo *>(element);
@@ -60,13 +75,21 @@ void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Meas
     }
 }
 
-void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System *system)
+void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *system)
 {
     assert(dc);
     assert(element);
     assert(system);
 
-    TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(element);
+    if (dc->Is() == BBOX_DEVICE_CONTEXT) {
+        BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
+        assert(bBoxDC);
+        if (!bBoxDC->UpdateVerticalValues()) {
+            if ((element->Is() == SLUR) || (element->Is() == HAIRPIN) || (element->Is() == TIE)) return;
+        }
+    }
+
+    TimeSpanningInterface *interface = element->GetTimeSpanningInterface();
     assert(interface);
 
     if (!interface->HasStartAndEnd()) return;
@@ -76,102 +99,256 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, DocObject *element, System
     System *parentSystem2 = dynamic_cast<System *>(interface->GetEnd()->GetFirstParent(SYSTEM));
 
     int x1, x2;
-    Staff *staff = NULL;
-    DocObject *graphic = NULL;
+    // Staff *staff = NULL;
+    Measure *measure = NULL;
+    Object *graphic = NULL;
     char spanningType = SPANNING_START_END;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
-        // Get the parent staff for calculating the y position
-        staff = dynamic_cast<Staff *>(interface->GetStart()->GetFirstParent(STAFF));
-        if (!Check(staff)) return;
-
+        // we use the start measure
+        measure = interface->GetStartMeasure();
+        if (!Check(measure)) return;
         x1 = interface->GetStart()->GetDrawingX();
         x2 = interface->GetEnd()->GetDrawingX();
         graphic = element;
     }
     // Only the first parent is the same, this means that the element is "open" at the end of the system
     else if (system == parentSystem1) {
-        // We need the last measure of the system for x2
-        Measure *last = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
-        if (!Check(last)) return;
-        staff = dynamic_cast<Staff *>(interface->GetStart()->GetFirstParent(STAFF));
-        if (!Check(staff)) return;
-
+        // We need the last measure of the system for x2 - we also use it for getting the staves later
+        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
+        if (!Check(measure)) return;
         x1 = interface->GetStart()->GetDrawingX();
-        x2 = last->GetDrawingX() + last->GetRightBarLineX();
+        x2 = measure->GetDrawingX() + measure->GetRightBarLineX();
         graphic = element;
         spanningType = SPANNING_START;
     }
     // We are in the system of the last note - draw the element from the beginning of the system
     else if (system == parentSystem2) {
-        // We need the first measure of the system for x1
-        Measure *first = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
-        if (!Check(first)) return;
-        // Get the staff of the first note - however, not the staff we need
-        Staff *lastStaff = dynamic_cast<Staff *>(interface->GetEnd()->GetFirstParent(STAFF));
-        if (!Check(lastStaff)) return;
-        // We need the first staff from the current system, i.e., the first measure.
-        AttCommonNComparison comparison(STAFF, lastStaff->GetN());
-        staff = dynamic_cast<Staff *>(system->FindChildByAttComparison(&comparison, 2));
-        if (!staff) {
-            LogDebug("Could not get staff (%d) while drawing staffGrp - View::DrawSylConnector", lastStaff->GetN());
-            return;
-        }
-        // Also try to get a first note - we should change this once we have a x position in measure that
-        // takes into account the scoreDef
-        Note *firstNote = dynamic_cast<Note *>(staff->FindChildByType(NOTE));
-
-        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
-                       : first->GetDrawingX();
+        // We need the first measure of the system for x1 - we also use it for getting the staves later
+        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        if (!Check(measure)) return;
+        // We need the position of the first default in the first measure for x1
+        AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
+        Alignment *pos
+            = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+        x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
+                 : measure->GetDrawingX();
         x2 = interface->GetEnd()->GetDrawingX();
         spanningType = SPANNING_END;
     }
-    // Rare case where neither the first note and the last note are in the current system - draw the connector
+    // Rare case where neither the first note nor the last note are in the current system - draw the connector
     // throughout the system
     else {
-        // We need the first measure of the system for x1
-        Measure *first = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
-        if (!Check(first)) return;
-        // Also try to get a first note - we should change this once we have a x position in measure that
-        // takes into account the scoreDef
-        Note *firstNote = dynamic_cast<Note *>(first->FindChildByType(NOTE));
+        // We need the first measure of the system for x1 - we also use it for getting the staves later
+        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        if (!Check(measure)) return;
+        // We need the position of the first default in the first measure for x1
+        AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
+        Alignment *pos
+            = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+        x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
+                 : measure->GetDrawingX();
         // We need the last measure of the system for x2
         Measure *last = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(last)) return;
-        // Get the staff of the first note - however, not the staff we need
-        Staff *firstStaff = dynamic_cast<Staff *>(interface->GetStart()->GetFirstParent(STAFF));
-        if (!Check(firstStaff)) return;
-
-        // We need the staff from the current system, i.e., the first measure.
-        AttCommonNComparison comparison(STAFF, firstStaff->GetN());
-        staff = dynamic_cast<Staff *>(first->FindChildByAttComparison(&comparison, 1));
-        if (!staff) {
-            LogDebug("Could not get staff (%d) while drawing staffGrp - View::DrawSylConnector", firstStaff->GetN());
-            return;
-        }
-
-        x1 = firstNote ? firstNote->GetDrawingX() - 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
-                       : first->GetDrawingX();
         x2 = last->GetDrawingX() + last->GetRightBarLineX();
         spanningType = SPANNING_MIDDLE;
     }
 
-    if (element->Is() == SLUR) {
-        // cast to Slur check in DrawTieOrSlur
-        DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, staff, spanningType, graphic);
-    }
-    else if (element->Is() == SYL) {
-        // cast to Syl check in DrawSylConnector
-        DrawSylConnector(dc, dynamic_cast<Syl *>(element), x1, x2, staff, spanningType, graphic);
-    }
-    else if (element->Is() == TIE) {
-        // cast to Slur check in DrawTieOrSlur
-        DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, staff, spanningType, graphic);
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = interface->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+
+        // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
+        if (element->IsFloatingElement())
+            system->SetCurrentFloatingPositioner(
+                (*staffIter)->GetN(), dynamic_cast<FloatingElement *>(element), x1, (*staffIter)->GetDrawingY());
+
+        if (element->Is() == HAIRPIN) {
+            // cast to Slur check in DrawTieOrSlur
+            DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is() == SLUR) {
+            // cast to Slur check in DrawTieOrSlur
+            DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is() == SYL) {
+            // cast to Syl check in DrawSylConnector
+            DrawSylConnector(dc, dynamic_cast<Syl *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
+        else if (element->Is() == TIE) {
+            // cast to Slur check in DrawTieOrSlur
+            DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
     }
 }
 
-void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic)
+void View::DrawHairpin(
+    DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(dc);
+    assert(hairpin);
+    assert(staff);
+
+    if (!hairpin->HasForm()) {
+        // we cannot draw a hairpin that has no form
+        return;
+    }
+
+    LayerElement *start = NULL;
+    LayerElement *end = NULL;
+
+    data_STAFFREL place = hairpin->GetPlace();
+    hairpinLog_FORM form = hairpin->GetForm();
+
+    int startY = 0;
+    int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
+
+    // We calculate points for cresc by default. Start/End have to be swapped
+    if (form == hairpinLog_FORM_dim) View::SwapY(&startY, &endY);
+
+    // int y1 = GetHairpinY(hairpin->GetPlace(), staff);
+    int y1 = hairpin->GetDrawingY();
+    int y2 = y1;
+
+    /************** parent layers **************/
+
+    start = dynamic_cast<LayerElement *>(hairpin->GetStart());
+    end = dynamic_cast<LayerElement *>(hairpin->GetEnd());
+
+    if (!start || !end) {
+        // no start and end, obviously nothing to do...
+        return;
+    }
+
+    Layer *layer1 = NULL;
+    Layer *layer2 = NULL;
+
+    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
+    if (start->Is() == TIMESTAMP_ATTR)
+        layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    else
+        layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+
+    // idem
+    if (end->Is() == TIMESTAMP_ATTR)
+        layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    else
+        layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+
+    assert(layer1 && layer2);
+
+    /************** start / end opening **************/
+
+    if (form == hairpinLog_FORM_cres) {
+        // the normal case
+        if (spanningType == SPANNING_START_END) {
+            // nothing to adjust
+        }
+        // In this case, we are drawing the first half a a cresc. Reduce the openning end
+        else if (spanningType == SPANNING_START) {
+            endY = endY / 2;
+        }
+        // Now this is the case we are drawing the end of a cresc. Increase the openning start
+        else if (spanningType == SPANNING_END) {
+            startY = endY / 2;
+        }
+        // Finally, cres accross the system, increase the start and reduce the end
+        else {
+            startY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false) / 3;
+            endY = 2 * startY;
+        }
+    }
+    else {
+        // the normal case
+        if (spanningType == SPANNING_START_END) {
+            // nothing to adjust
+        }
+        // In this case, we are drawing the first half a a dim. Increase the openning end
+        else if (spanningType == SPANNING_START) {
+            endY = startY / 2;
+        }
+        // Now this is the case we are drawing the end of a dim. Reduce the openning start
+        else if (spanningType == SPANNING_END) {
+            startY = startY / 2;
+        }
+        // Finally, dim accross the system, reduce the start and increase the end
+        else {
+            endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false) / 3;
+            startY = 2 * endY;
+        }
+    }
+
+    /************** direction **************/
+
+    /*
+    // first should be the tie @curvedir
+    if (slur->HasCurvedir()) {
+        up = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? true : false;
+    }
+    // then layer direction trumps note direction
+    else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+        up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
+    }
+    // look if in a chord
+    else if (startParentChord) {
+        if (startParentChord->PositionInChord(startNote) < 0) {
+            up = false;
+        }
+        else if (startParentChord->PositionInChord(startNote) > 0) {
+            up = true;
+        }
+        // away from the stem if odd number (center note)
+        else {
+            up = (stemDir != STEMDIRECTION_up);
+        }
+    }
+    else if (stemDir == STEMDIRECTION_up) {
+        up = false;
+    }
+    else if (stemDir == STEMDIRECTION_NONE) {
+        // no information from the note stem directions, look at the position in the notes
+        int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
+        up = (start->GetDrawingY() > center) ? true : false;
+    }
+    */
+
+    /************** adjusting y position **************/
+
+    if (place == STAFFREL_above) {
+        // y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        // y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+    else {
+        // y1 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        // y2 -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+
+    /************** draw it **************/
+
+    y1 -= m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+    y2 -= m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
+
+    if (graphic)
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else
+        dc->StartGraphic(hairpin, "spanning-hairpin", "");
+    // dc->DeactivateGraphic();
+
+    DrawObliquePolygon(
+        dc, x1, y1 - startY / 2, x2, y2 - endY / 2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+    DrawObliquePolygon(
+        dc, x1, y1 + startY / 2, x2, y2 + endY / 2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+
+    // dc->ReactivateGraphic();
+    if (graphic)
+        dc->EndResumedGraphic(graphic, this);
+    else
+        dc->EndGraphic(hairpin, this);
+}
+
+void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(dc);
     assert(slur);
@@ -187,10 +364,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     Chord *startChord = NULL;
     Chord *endChord = NULL;
 
-    bool up = true;
+    curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     data_STEMDIRECTION startStemDir = STEMDIRECTION_NONE;
     data_STEMDIRECTION endStemDir = STEMDIRECTION_NONE;
-    data_STEMDIRECTION stemDir;
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     int y1 = staff->GetDrawingY();
     int y2 = staff->GetDrawingY();
 
@@ -200,7 +377,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     end = dynamic_cast<LayerElement *>(slur->GetEnd());
 
     if (!start || !end) {
-        // no note, obviously nothing to do...
+        // no start and end, obviously nothing to do...
         return;
     }
 
@@ -227,8 +404,21 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         endStemDir = endChord->GetDrawingStemDir();
     }
 
-    Layer *layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
-    Layer *layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+    Layer *layer1 = NULL;
+    Layer *layer2 = NULL;
+
+    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
+    if (start->Is() == TIMESTAMP_ATTR)
+        layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    else
+        layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+
+    // idem
+    if (end->Is() == TIMESTAMP_ATTR)
+        layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    else
+        layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+
     assert(layer1 && layer2);
 
     if (layer1->GetN() != layer2->GetN()) {
@@ -259,32 +449,34 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     // first should be the tie @curvedir
     if (slur->HasCurvedir()) {
-        up = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? true : false;
+        drawingCurveDir
+            = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
+        drawingCurveDir
+            = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
-    //  the look if in a chord
+    // look if in a chord
     else if (startParentChord) {
         if (startParentChord->PositionInChord(startNote) < 0) {
-            up = false;
+            drawingCurveDir = curvature_CURVEDIR_below;
         }
         else if (startParentChord->PositionInChord(startNote) > 0) {
-            up = true;
+            drawingCurveDir = curvature_CURVEDIR_above;
         }
         // away from the stem if odd number (center note)
         else {
-            up = (stemDir != STEMDIRECTION_up);
+            drawingCurveDir = (stemDir != STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
         }
     }
     else if (stemDir == STEMDIRECTION_up) {
-        up = false;
+        drawingCurveDir = curvature_CURVEDIR_below;
     }
     else if (stemDir == STEMDIRECTION_NONE) {
         // no information from the note stem directions, look at the position in the notes
         int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-        up = (start->GetDrawingY() > center) ? true : false;
+        drawingCurveDir = (start->GetDrawingY() > center) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
 
     /************** adjusting y position **************/
@@ -302,7 +494,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             startChord->GetYExtremes(&yChordMax, &yChordMin);
         }
         // slur is up
-        if (up) {
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
             // P(^)
             if (startStemDir == STEMDIRECTION_down) y1 = start->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             //  d(^)d
@@ -311,8 +503,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             }
             // d(^)
             else {
-                // put it on the side, move it left
-                x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 2;
+                // put it on the side, move it left, but not if we have a @stamp
+                if (start->Is() != TIMESTAMP_ATTR) x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 2;
                 if (startChord || startParentChord)
                     y1 = yChordMin + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
                 else
@@ -348,7 +540,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         }
         // get the stem direction of the end
         // slur is up
-        if (up) {
+        if (drawingCurveDir == curvature_CURVEDIR_above) {
             // (^)P
             if (endStemDir == STEMDIRECTION_down) y2 = end->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
             // d(^)d
@@ -373,8 +565,8 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             }
             // (_)P
             else {
-                // put it on the side, move it right
-                x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                // put it on the side, move it right, but not if we have a @stamp2
+                if (end->Is() != TIMESTAMP_ATTR) x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 if (endChord || endParentChord)
                     y2 = yChordMin - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
                 else
@@ -385,21 +577,33 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     // Positions not attached to a note
     if (spanningType == SPANNING_START) {
-        if (up)
+        if (drawingCurveDir == curvature_CURVEDIR_above)
             y2 = std::max(staff->GetDrawingY(), y1);
         else
             y2 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
     }
-    else if (spanningType == SPANNING_END) {
-        if (up)
+    if (end->Is() == TIMESTAMP_ATTR) {
+        if (drawingCurveDir == curvature_CURVEDIR_above)
+            y2 = std::max(staff->GetDrawingY(), y1);
+        else
+            y2 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
+    }
+    if (spanningType == SPANNING_END) {
+        if (drawingCurveDir == curvature_CURVEDIR_above)
+            y1 = std::max(staff->GetDrawingY(), y2);
+        else
+            y1 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
+    }
+    if (start->Is() == TIMESTAMP_ATTR) {
+        if (drawingCurveDir == curvature_CURVEDIR_above)
             y1 = std::max(staff->GetDrawingY(), y2);
         else
             y1 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
     }
     // slur accross an entire system; use the staff position
-    else if (spanningType != SPANNING_START_END) {
+    else if (spanningType == SPANNING_MIDDLE) {
         // To be adjusted
-        if (up)
+        if (drawingCurveDir == curvature_CURVEDIR_above)
             y1 = staff->GetDrawingY();
         else
             y1 = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
@@ -408,7 +612,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     /************** y position **************/
 
-    if (up) {
+    if (drawingCurveDir == curvature_CURVEDIR_above) {
         y1 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         y2 += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
@@ -421,26 +625,27 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     points[0] = Point(x1, y1);
     points[1] = Point(x2, y2);
 
-    float angle = 0.0;
-    // We do not want to ajdust the position when calculating bounding boxes (at least for now)
-    if (dynamic_cast<BBoxDeviceContext *>(dc) == NULL) angle = AdjustSlur(slur, staff, layer1->GetN(), up, points);
+    float angle = AdjustSlur(slur, staff, layer1->GetN(), drawingCurveDir, points);
 
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITION_FACTOR;
+
+    assert(slur->GetCurrentFloatingPositioner());
+    slur->GetCurrentFloatingPositioner()->UpdateSlurPosition(points, angle, thickness, drawingCurveDir);
 
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(slur, "spanning-slur", "");
-    dc->DeactivateGraphic();
+    // dc->DeactivateGraphic();
     DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize, angle);
-    dc->ReactivateGraphic();
+    // dc->ReactivateGraphic();
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
         dc->EndGraphic(slur, this);
 }
 
-float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point points[])
+float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[])
 {
     // For readability makes them p1 and p2
     Point *p1 = &points[0];
@@ -448,7 +653,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
 
     /************** angle **************/
 
-    float slurAngle = GetAdjustedSlurAngle(p1, p2, up);
+    float slurAngle = GetAdjustedSlurAngle(p1, p2, curveDir);
 
     Point rotatedP2 = View::CalcPositionAfterRotation(*p2, -slurAngle, *p1);
     // LogDebug("P1 %d %d, P2 %d %d, Angle %f, Pres %d %d", x1, y1, x2, y2, slurAnge, rotadedP2.x, rotatedP2.y);
@@ -475,7 +680,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
     /************** control points **************/
 
     Point rotatedC1, rotatedC2;
-    GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, height, staff->m_drawingStaffSize);
+    GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, height, staff->m_drawingStaffSize);
 
     /************** content **************/
 
@@ -510,7 +715,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
         spanningContentPoints.push_back(std::make_pair((*it), p));
     }
 
-    GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, up, staff->m_drawingStaffSize);
+    GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
 
     // We need to keep the original control points
     Point adjustedRotatedC1 = rotatedC1;
@@ -518,26 +723,26 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
 
     if (!spanningContentPoints.empty()) {
         AdjustSlurCurve(
-            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, slurAngle);
-        // Use the adjusted control points for ajusting the position (p1, p2 and angle will be updated)
-        AdjustSlurPosition(
-            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, up, &slurAngle, true);
+            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, curveDir, slurAngle);
+        // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
+        AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2,
+            curveDir, &slurAngle, true);
         // Now readjust the curvature with the new p1 and p2 with the original control points
-        GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, height, staff->m_drawingStaffSize);
+        GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, height, staff->m_drawingStaffSize);
 
-        GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, up, staff->m_drawingStaffSize);
+        GetSpanningPointPositions(&spanningContentPoints, *p1, slurAngle, curveDir, staff->m_drawingStaffSize);
         int maxHeight = AdjustSlurCurve(
-            slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, slurAngle, false);
+            slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, slurAngle, false);
 
         if (maxHeight) {
             // Something went wrong since now all spanning points should be gone...
             // LogDebug("### %d notes for %s will need position adjustment", spanningContentPoints.size(),
             // slur->GetUuid().c_str());
-            // Use the normal control points for ajusting the position (p1, p2 and angle will be updated)
-            // Move it and forcing both side to move
+            // Use the normal control points for adjusting the position (p1, p2 and angle will be updated)
+            // Move it and force both sides to move
             AdjustSlurPosition(
-                slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, up, &slurAngle, true);
-            GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, up, maxHeight, staff->m_drawingStaffSize);
+                slur, &spanningContentPoints, p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, &slurAngle, true);
+            GetControlPoints(p1, &rotatedP2, &rotatedC1, &rotatedC2, curveDir, maxHeight, staff->m_drawingStaffSize);
         }
     }
     else {
@@ -552,7 +757,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point poin
     return slurAngle;
 }
 
-float View::GetAdjustedSlurAngle(Point *p1, Point *p2, bool up)
+float View::GetAdjustedSlurAngle(Point *p1, Point *p2, curvature_CURVEDIR curveDir)
 {
     float slurAngle = atan2(p2->y - p1->y, p2->x - p1->x);
 
@@ -560,14 +765,14 @@ float View::GetAdjustedSlurAngle(Point *p1, Point *p2, bool up)
     if (fabs(slurAngle) > TEMP_SLUR_MAX_SLOPE) {
         int side = (p2->x - p1->x) * sin(TEMP_SLUR_MAX_SLOPE) / sin(M_PI / 2 - TEMP_SLUR_MAX_SLOPE);
         if (p2->y > p1->y) {
-            if (up)
+            if (curveDir == curvature_CURVEDIR_above)
                 p1->y = p2->y - side;
             else
                 p2->y = p1->y + side;
             slurAngle = TEMP_SLUR_MAX_SLOPE;
         }
         else {
-            if (up)
+            if (curveDir == curvature_CURVEDIR_above)
                 p2->y = p1->y - side;
             else
                 p1->y = p2->y + side;
@@ -578,14 +783,15 @@ float View::GetAdjustedSlurAngle(Point *p1, Point *p2, bool up)
     return slurAngle;
 }
 
-void View::GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up, int height, int staffSize)
+void View::GetControlPoints(
+    Point *p1, Point *p2, Point *c1, Point *c2, curvature_CURVEDIR curveDir, int height, int staffSize)
 {
     // Set the x position of the control points
     int cPos = std::min((p2->x - p1->x) / TEMP_SLUR_CONTROL_POINT_FACTOR, m_doc->GetDrawingStaffSize(staffSize));
     c1->x = p1->x + cPos;
     c2->x = p2->x - cPos;
 
-    if (up) {
+    if (curveDir == curvature_CURVEDIR_above) {
         c1->y = p1->y + height;
         c2->y = p2->y + height;
     }
@@ -596,12 +802,12 @@ void View::GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up,
 }
 
 void View::GetSpanningPointPositions(
-    ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize)
+    ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, curvature_CURVEDIR curveDir, int staffSize)
 {
     ArrayOfLayerElementPointPairs::iterator itPoint;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); itPoint++) {
         Point p;
-        if (up) {
+        if (curveDir == curvature_CURVEDIR_above) {
             p.y = itPoint->first->GetDrawingTop(m_doc, staffSize);
         }
         else {
@@ -613,7 +819,7 @@ void View::GetSpanningPointPositions(
         // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
         itPoint->second = View::CalcPositionAfterRotation(p, -angle, p1);
         // This would add it after
-        if (up) {
+        if (curveDir == curvature_CURVEDIR_above) {
             itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 2;
         }
         else {
@@ -623,7 +829,7 @@ void View::GetSpanningPointPositions(
 }
 
 int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
-    Point *c2, bool up, float angle, bool posRatio)
+    Point *c2, curvature_CURVEDIR curveDir, float angle, bool posRatio)
 {
     Point bezier[4];
     bezier[0] = *p1;
@@ -665,7 +871,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
             }
 
             // Keep the maximum desired ratio
-            if (up) {
+            if (curveDir == curvature_CURVEDIR_above) {
                 if (y < itPoint->second.y) {
                     float ratio = (float)(p1->y - itPoint->second.y) / (float)(p1->y - y) * posXRatio;
                     maxRatio = ratio > maxRatio ? ratio : maxRatio;
@@ -697,7 +903,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
         }
 
         if (maxRatio > 1.0) {
-            if (up) {
+            if (curveDir == curvature_CURVEDIR_above) {
                 c1->y = p1->y + currentHeight * maxRatio;
                 c2->y = c1->y;
             }
@@ -708,7 +914,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
         }
     }
 
-    // Check if we need further adjustment the points with the adjusted curve
+    // Check if we need further adjustment of the points with the adjusted curve
     /*
     bezier[1] = *c1;
     bezier[2] = *c2;
@@ -736,7 +942,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 }
 
 void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2,
-    Point *c1, Point *c2, bool up, float *angle, bool forceBothSides)
+    Point *c1, Point *c2, curvature_CURVEDIR curveDir, float *angle, bool forceBothSides)
 {
     Point bezier[4];
     bezier[0] = *p1;
@@ -770,7 +976,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
 
         shift = 0;
         // Keep the maximum shift on the left and right
-        if (up) {
+        if (curveDir == curvature_CURVEDIR_above) {
             if (y < itPoint->second.y) {
                 shift = (itPoint->second.y - p1->y) - (y - p1->y);
             }
@@ -799,7 +1005,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
     // Unrotated the slur
     *p2 = View::CalcPositionAfterRotation(*p2, (*angle), *p1);
 
-    if (up) {
+    if (curveDir == curvature_CURVEDIR_above) {
         p1->y += maxShiftLeft;
         p2->y += maxShiftRight;
     }
@@ -808,11 +1014,11 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
         p2->y -= maxShiftRight;
     }
 
-    *angle = GetAdjustedSlurAngle(p1, p2, up);
+    *angle = GetAdjustedSlurAngle(p1, p2, curveDir);
     *p2 = View::CalcPositionAfterRotation(*p2, -(*angle), *p1);
 }
 
-void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic)
+void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(dc);
     assert(tie);
@@ -822,7 +1028,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     Note *note2 = NULL;
     Chord *parentChord1 = NULL;
 
-    bool up = true;
+    curvature_CURVEDIR drawingCurveDir = curvature_CURVEDIR_above;
     data_STEMDIRECTION noteStemDir = STEMDIRECTION_NONE;
     int y1, y2;
 
@@ -833,6 +1039,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 
     if (!note1 || !note2) {
         // no note, obviously nothing to do...
+        // this also means that notes with tstamp events are not supported
         return;
     }
 
@@ -897,37 +1104,39 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 
     // first should be the tie @curvedir
     if (tie->HasCurvedir()) {
-        up = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? true : false;
+        drawingCurveDir
+            = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        up = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? true : false;
+        drawingCurveDir
+            = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
-    //  the look if in a chord
+    // look if in a chord
     else if (parentChord1) {
         if (parentChord1->PositionInChord(note1) < 0) {
-            up = false;
+            drawingCurveDir = curvature_CURVEDIR_below;
         }
         else if (parentChord1->PositionInChord(note1) > 0) {
-            up = true;
+            drawingCurveDir = curvature_CURVEDIR_above;
         }
         // away from the stem if odd number (center note)
         else {
-            up = (noteStemDir != STEMDIRECTION_up);
+            drawingCurveDir = (noteStemDir != STEMDIRECTION_up) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
         }
     }
     else if (noteStemDir == STEMDIRECTION_up) {
-        up = false;
+        drawingCurveDir = curvature_CURVEDIR_below;
     }
     else if (noteStemDir == STEMDIRECTION_NONE) {
         // no information from the note stem directions, look at the position in the notes
         int center = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-        up = (y1 > center) ? true : false;
+        drawingCurveDir = (y1 > center) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
 
     /************** y position **************/
 
-    if (up) {
+    if (drawingCurveDir == curvature_CURVEDIR_above) {
         y1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         y2 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
         if (isShortTie) {
@@ -969,7 +1178,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     c1.x = x1 + (x2 - x1) / 4; // point at 1/4
     c2.x = x1 + (x2 - x1) / 4 * 3; // point at 3/4
 
-    if (up) {
+    if (drawingCurveDir == curvature_CURVEDIR_above) {
         c1.y = y1 + height;
         c2.y = y2 + height;
     }
@@ -992,36 +1201,36 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 }
 
 void View::DrawSylConnector(
-    DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic)
+    DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
 {
     assert(syl);
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
     int y = GetSylY(syl, staff);
-    int w, h;
+    TextExtend extend;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if (spanningType == SPANNING_START_END) {
         dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
-        dc->GetTextExtent(syl->GetText(syl), &w, &h);
+        dc->GetTextExtent(syl->GetText(syl), &extend);
         dc->ResetFont();
         // x position of the syl is two units back
-        x1 += w - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
     }
     // Only the first parent is the same, this means that the syl is "open" at the end of the system
     else if (spanningType == SPANNING_START) {
         dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
-        dc->GetTextExtent(syl->GetText(syl), &w, &h);
+        dc->GetTextExtent(syl->GetText(syl), &extend);
         dc->ResetFont();
         // idem
-        x1 += w - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+        x1 += extend.m_width - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
     }
     // We are in the system of the last note - draw the connector from the beginning of the system
     else if (spanningType == SPANNING_END) {
         // nothing to adjust
     }
-    // Rare case where neither the first note and the last note are in the current system - draw the connector
+    // Rare case where neither the first note nor the last note are in the current system - draw the connector
     // throughout the system
     else {
         // nothing to adjust
@@ -1084,6 +1293,115 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
     }
 }
 
+void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(dir);
+
+    // We cannot draw a dir that has no start position
+    if (!dir->GetStart()) return;
+
+    dc->StartGraphic(dir, "", dir->GetUuid());
+
+    // Use Romam bold for tempo
+    FontInfo dirTxt;
+    dirTxt.SetFaceName("Times");
+    dirTxt.SetStyle(FONTSTYLE_italic);
+
+    // If we have not timestamp
+    int x = dir->GetStart()->GetDrawingX();
+
+    bool setX = false;
+    bool setY = false;
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, x, (*staffIter)->GetDrawingY());
+
+        // Basic method that use bounding box
+        int y = dir->GetDrawingY();
+        // int y = GetDirY(dir->GetPlace(), *staffIter);
+
+        dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&dirTxt);
+
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        DrawTextChildren(dc, dir, x, y, setX, setY);
+        dc->EndText();
+
+        dc->ResetFont();
+        dc->ResetBrush();
+    }
+
+    dc->EndGraphic(dir, this);
+}
+
+void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(dynam);
+
+    // We cannot draw a return that has no start position
+    if (!dynam->GetStart()) return;
+
+    dc->StartGraphic(dynam, "", dynam->GetUuid());
+
+    bool isSymbolOnly = dynam->IsSymbolOnly();
+    std::wstring dynamSymbol;
+    if (isSymbolOnly) {
+        dynamSymbol = dynam->GetSymbolStr();
+    }
+
+    // Use Romam bold for tempo
+    FontInfo dynamTxt;
+    dynamTxt.SetFaceName("Times");
+    dynamTxt.SetStyle(FONTSTYLE_italic);
+
+    // If we have not timestamp
+    int x = dynam->GetStart()->GetDrawingX();
+
+    bool setX = false;
+    bool setY = false;
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, x, (*staffIter)->GetDrawingY());
+
+        int y = dynam->GetDrawingY();
+
+        dynamTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+
+        // If the dynamic is a symbol (pp, mf, etc.) draw it as one smufl string. This will not take into account
+        // editorial element within the dynam as it would with text
+        if (isSymbolOnly) {
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, dynamSymbol, true, (*staffIter)->m_drawingStaffSize);
+            dc->ResetFont();
+        }
+        else {
+            dc->SetBrush(m_currentColour, AxSOLID);
+            dc->SetFont(&dynamTxt);
+
+            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+            DrawTextChildren(dc, dynam, x, y, setX, setY);
+            dc->EndText();
+
+            dc->ResetFont();
+            dc->ResetBrush();
+        }
+    }
+
+    dc->EndGraphic(dynam, this);
+}
+
 void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system)
 {
     assert(dc);
@@ -1097,7 +1415,6 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     FontInfo tempoTxt;
     tempoTxt.SetFaceName("Times");
     tempoTxt.SetWeight(FONTWEIGHT_bold);
-    tempoTxt.SetPointSize(m_doc->GetDrawingLyricFont(100)->GetPointSize());
 
     // If we have not timestamp
     int x = measure->GetDrawingX();
@@ -1118,18 +1435,15 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     bool setX = false;
     bool setY = false;
 
-    std::vector<int>::iterator iter;
-    std::vector<int> staffList = tempo->GetStaff();
-    for (iter = staffList.begin(); iter != staffList.end(); iter++) {
-        AttCommonNComparison comparison(STAFF, *iter);
-        Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
-        if (!staff) {
-            LogWarning("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
-            continue;
-        }
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, x, (*staffIter)->GetDrawingY());
+
+        tempoTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
         // Basic method that use bounding box
-        int y = GetTempoY(staff);
+        int y = tempo->GetDrawingY();
 
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);
@@ -1144,5 +1458,65 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     dc->EndGraphic(tempo, this);
 }
+
+/*
+int View::GetDynamY(data_STAFFREL place, Staff *staff, bool baseline)
+{
+    assert(staff);
+
+    if (!staff->GetAlignment()) return staff->GetDrawingY();
+
+    int baselineShift = 0;
+    if (baseline) {
+        int descender = m_doc->GetGlyphDescender(SMUFL_E522_dynamicForte, staff->m_drawingStaffSize, false);
+        int height = m_doc->GetGlyphHeight(SMUFL_E522_dynamicForte, staff->m_drawingStaffSize, false);
+        baselineShift = height / 2 + descender;
+    }
+
+    // Temporary basic method for positionning dynam
+    int y;
+    if (place == STAFFREL_above) {
+        // For now is is position according to the staff and not the staff aligner. To be changed once we introduce
+        // the dynamic aligner within the staff aligner
+        y = staff->GetDrawingY() + staff->m_contentBB_y2;
+        if (baseline)
+            return y + m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2 - baselineShift;
+        else
+            return y + m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2;
+    }
+    else {
+        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight();
+        if (baseline)
+            return y - m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2 - baselineShift;
+        else
+            return y - m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2;
+    }
+    return y;
+}
+*/
+
+/*
+int View::GetHairpinY(data_STAFFREL place, Staff *staff)
+{
+    assert(staff);
+
+    if (!staff->GetAlignment()) return staff->GetDrawingY();
+
+    int y;
+    if (place == STAFFREL_above) {
+        if (staff->GetAlignment()->GetDynamAbove()) return this->GetDynamY(place, staff, false);
+        // For now is is position according to the staff and not the staff aligner. To be changed once we introduce
+        // the dynamic aligner within the staff aligner
+        y = staff->GetDrawingY() + staff->m_contentBB_y2
+            + m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, true) / 2;
+    }
+    else {
+        if (staff->GetAlignment()->GetDynamBelow()) return this->GetDynamY(place, staff, false);
+        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight()
+            - m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, true) / 2;
+    }
+    return y;
+}
+*/
 
 } // namespace vrv

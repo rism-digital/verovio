@@ -173,7 +173,7 @@ void View::DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int 
     std::wistringstream iss(s);
     std::wstring token;
     while (std::getline(iss, token, L'_')) {
-        dc->DrawText(UTF16to8(token.c_str()), token);
+        dc->DrawText(UTF16to8(token), token);
         // no _
         if (iss.eof()) break;
 
@@ -182,7 +182,7 @@ void View::DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int 
         dc->SetFont(&vrvTxt);
         std::wstring str;
         str.push_back(VRV_TEXT_E551);
-        dc->DrawText(UTF16to8(str.c_str()), str);
+        dc->DrawText(UTF16to8(str), str);
         dc->ResetFont();
     }
 }
@@ -192,7 +192,7 @@ void View::DrawThickBezierCurve(
 {
     assert(dc);
 
-    int bez1[6], bez2[6]; // filled array with control points and end point
+    Point bez1[4], bez2[4]; // filled array with control points and end point
     Point c1Rotated = c1;
     Point c2Rotated = c2;
     c1Rotated.y += thickness / 2;
@@ -202,13 +202,13 @@ void View::DrawThickBezierCurve(
         c2Rotated = CalcPositionAfterRotation(c2Rotated, angle, c2);
     }
 
+    bez1[0] = ToDeviceContext(p1);
+    bez2[0] = bez1[0];
+
     // Points for first bez, they go from xy to x1y1
-    bez1[0] = ToDeviceContextX(c1Rotated.x);
-    bez1[1] = ToDeviceContextY(c1Rotated.y);
-    bez1[2] = ToDeviceContextX(c2Rotated.x);
-    bez1[3] = ToDeviceContextY(c2Rotated.y);
-    bez1[4] = ToDeviceContextX(p2.x);
-    bez1[5] = ToDeviceContextY(p2.y);
+    bez1[1] = ToDeviceContext(c1Rotated);
+    bez1[2] = ToDeviceContext(c2Rotated);
+    bez1[3] = ToDeviceContext(p2);
 
     c1Rotated = c1;
     c2Rotated = c2;
@@ -220,16 +220,13 @@ void View::DrawThickBezierCurve(
     }
 
     // second bez. goes back
-    bez2[0] = ToDeviceContextX(c2Rotated.x);
-    bez2[1] = ToDeviceContextY(c2Rotated.y);
-    bez2[2] = ToDeviceContextX(c1Rotated.x);
-    bez2[3] = ToDeviceContextY(c1Rotated.y);
-    bez2[4] = ToDeviceContextX(p1.x);
-    bez2[5] = ToDeviceContextY(p1.y);
+    bez2[1] = ToDeviceContext(c1Rotated);
+    bez2[2] = ToDeviceContext(c2Rotated);
+    bez2[3] = ToDeviceContext(p2);
 
     // Actually draw it
     dc->SetPen(m_currentColour, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), AxSOLID);
-    dc->DrawComplexBezierPath(ToDeviceContextX(p1.x), ToDeviceContextY(p1.y), bez1, bez2);
+    dc->DrawComplexBezierPath(bez1, bez2);
     dc->ResetPen();
 }
 

@@ -137,6 +137,16 @@ int View::ToLogicalY(int i)
     return m_doc->m_drawingPageHeight - i; // flipped
 }
 
+Point View::ToDeviceContext(Point p)
+{
+    return Point(ToDeviceContextX(p.x), ToDeviceContextY(p.y));
+}
+
+Point View::ToLogical(Point p)
+{
+    return Point(ToLogicalX(p.x), ToLogicalY(p.y));
+}
+
 void View::SwapPoints(Point *x1, Point *x2)
 {
     Point a;
@@ -160,7 +170,7 @@ std::wstring View::IntToSmuflFigures(unsigned short number, int offset)
     // We do not convert more that FF values
     if (number > 0xFFFF) number = 0xFFFF;
 
-    std::wstringstream stream;
+    std::wostringstream stream;
     stream << number;
     std::wstring str = stream.str();
 

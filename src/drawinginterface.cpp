@@ -35,7 +35,7 @@ void DrawingListInterface::Reset()
     m_drawingList.clear();
 }
 
-void DrawingListInterface::AddToDrawingList(DocObject *object)
+void DrawingListInterface::AddToDrawingList( Object *object)
 {
     m_drawingList.push_back(object);
     m_drawingList.sort();

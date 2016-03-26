@@ -51,7 +51,7 @@ public:
     ///@{
     void SetOrder(arpegLog_ORDER order_) { m_order = order_; };
     arpegLog_ORDER GetOrder() const { return m_order; };
-    bool HasOrder();
+    bool HasOrder() const;
     ///@}
 
 private:
@@ -87,7 +87,7 @@ public:
     ///@{
     void SetArrow(data_BOOLEAN arrow_) { m_arrow = arrow_; };
     data_BOOLEAN GetArrow() const { return m_arrow; };
-    bool HasArrow();
+    bool HasArrow() const;
     ///@}
 
 private:
@@ -123,7 +123,7 @@ public:
     ///@{
     void SetForm(bTremLog_FORM form_) { m_form = form_; };
     bTremLog_FORM GetForm() const { return m_form; };
-    bool HasForm();
+    bool HasForm() const;
     ///@}
 
 private:
@@ -159,7 +159,7 @@ public:
     ///@{
     void SetBeam(std::string beam_) { m_beam = beam_; };
     std::string GetBeam() const { return m_beam; };
-    bool HasBeam();
+    bool HasBeam() const;
     ///@}
 
 private:
@@ -195,7 +195,7 @@ public:
     ///@{
     void SetBeamWith(data_OTHERSTAFF beamWith_) { m_beamWith = beamWith_; };
     data_OTHERSTAFF GetBeamWith() const { return m_beamWith; };
-    bool HasBeamWith();
+    bool HasBeamWith() const;
     ///@}
 
 private:
@@ -235,11 +235,11 @@ public:
     ///@{
     void SetBeamGroup(std::string beamGroup_) { m_beamGroup = beamGroup_; };
     std::string GetBeamGroup() const { return m_beamGroup; };
-    bool HasBeamGroup();
+    bool HasBeamGroup() const;
     //
     void SetBeamRests(data_BOOLEAN beamRests_) { m_beamRests = beamRests_; };
     data_BOOLEAN GetBeamRests() const { return m_beamRests; };
-    bool HasBeamRests();
+    bool HasBeamRests() const;
     ///@}
 
 private:
@@ -283,11 +283,11 @@ public:
     ///@{
     void SetForm(beamrend_FORM form_) { m_form = form_; };
     beamrend_FORM GetForm() const { return m_form; };
-    bool HasForm();
+    bool HasForm() const;
     //
     void SetSlope(double slope_) { m_slope = slope_; };
     double GetSlope() const { return m_slope; };
-    bool HasSlope();
+    bool HasSlope() const;
     ///@}
 
 private:
@@ -325,7 +325,7 @@ public:
     ///@{
     void SetBreaksec(int breaksec_) { m_breaksec = breaksec_; };
     int GetBreaksec() const { return m_breaksec; };
-    bool HasBreaksec();
+    bool HasBreaksec() const;
     ///@}
 
 private:
@@ -366,7 +366,7 @@ public:
     ///@{
     void SetBeatDef(data_DURATION beatDef_) { m_beatDef = beatDef_; };
     data_DURATION GetBeatDef() const { return m_beatDef; };
-    bool HasBeatDef();
+    bool HasBeatDef() const;
     ///@}
 
 private:
@@ -402,7 +402,7 @@ public:
     ///@{
     void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
     data_BEATRPT_REND GetForm() const { return m_form; };
-    bool HasForm();
+    bool HasForm() const;
     ///@}
 
 private:
@@ -438,7 +438,7 @@ public:
     ///@{
     void SetAmount(std::string amount_) { m_amount = amount_; };
     std::string GetAmount() const { return m_amount; };
-    bool HasAmount();
+    bool HasAmount() const;
     ///@}
 
 private:
@@ -478,7 +478,7 @@ public:
     ///@{
     void SetCutout(cutout_CUTOUT cutout_) { m_cutout = cutout_; };
     cutout_CUTOUT GetCutout() const { return m_cutout; };
-    bool HasCutout();
+    bool HasCutout() const;
     ///@}
 
 private:
@@ -514,7 +514,7 @@ public:
     ///@{
     void SetExpand(data_BOOLEAN expand_) { m_expand = expand_; };
     data_BOOLEAN GetExpand() const { return m_expand; };
-    bool HasExpand();
+    bool HasExpand() const;
     ///@}
 
 private:
@@ -555,7 +555,7 @@ public:
     ///@{
     void SetForm(fTremLog_FORM form_) { m_form = form_; };
     fTremLog_FORM GetForm() const { return m_form; };
-    bool HasForm();
+    bool HasForm() const;
     ///@}
 
 private:
@@ -591,11 +591,11 @@ public:
     ///@{
     void SetForm(fermataVis_FORM form_) { m_form = form_; };
     fermataVis_FORM GetForm() const { return m_form; };
-    bool HasForm();
+    bool HasForm() const;
     //
     void SetShape(fermataVis_SHAPE shape_) { m_shape = shape_; };
     fermataVis_SHAPE GetShape() const { return m_shape; };
-    bool HasShape();
+    bool HasShape() const;
     ///@}
 
 private:
@@ -633,11 +633,11 @@ public:
     ///@{
     void SetGrace(data_GRACE grace_) { m_grace = grace_; };
     data_GRACE GetGrace() const { return m_grace; };
-    bool HasGrace();
+    bool HasGrace() const;
     //
     void SetGraceTime(int graceTime_) { m_graceTime = graceTime_; };
     int GetGraceTime() const { return m_graceTime; };
-    bool HasGraceTime();
+    bool HasGraceTime() const;
     ///@}
 
 private:
@@ -678,11 +678,11 @@ public:
     ///@{
     void SetForm(hairpinLog_FORM form_) { m_form = form_; };
     hairpinLog_FORM GetForm() const { return m_form; };
-    bool HasForm();
+    bool HasForm() const;
     //
     void SetNiente(data_BOOLEAN niente_) { m_niente = niente_; };
     data_BOOLEAN GetNiente() const { return m_niente; };
-    bool HasNiente();
+    bool HasNiente() const;
     ///@}
 
 private:
@@ -724,7 +724,7 @@ public:
     ///@{
     void SetOpening(std::string opening_) { m_opening = opening_; };
     std::string GetOpening() const { return m_opening; };
-    bool HasOpening();
+    bool HasOpening() const;
     ///@}
 
 private:
@@ -763,31 +763,31 @@ public:
     ///@{
     void SetC(harpPedalLog_C c_) { m_c = c_; };
     harpPedalLog_C GetC() const { return m_c; };
-    bool HasC();
+    bool HasC() const;
     //
     void SetD(harpPedalLog_D d_) { m_d = d_; };
     harpPedalLog_D GetD() const { return m_d; };
-    bool HasD();
+    bool HasD() const;
     //
     void SetE(harpPedalLog_E e_) { m_e = e_; };
     harpPedalLog_E GetE() const { return m_e; };
-    bool HasE();
+    bool HasE() const;
     //
     void SetF(harpPedalLog_F f_) { m_f = f_; };
     harpPedalLog_F GetF() const { return m_f; };
-    bool HasF();
+    bool HasF() const;
     //
     void SetG(harpPedalLog_G g_) { m_g = g_; };
     harpPedalLog_G GetG() const { return m_g; };
-    bool HasG();
+    bool HasG() const;
     //
     void SetA(harpPedalLog_A a_) { m_a = a_; };
     harpPedalLog_A GetA() const { return m_a; };
-    bool HasA();
+    bool HasA() const;
     //
     void SetB(harpPedalLog_B b_) { m_b = b_; };
     harpPedalLog_B GetB() const { return m_b; };
-    bool HasB();
+    bool HasB() const;
     ///@}
 
 private:
@@ -835,7 +835,7 @@ public:
     ///@{
     void SetLv(data_BOOLEAN lv_) { m_lv = lv_; };
     data_BOOLEAN GetLv() const { return m_lv; };
-    bool HasLv();
+    bool HasLv() const;
     ///@}
 
 private:
@@ -874,7 +874,7 @@ public:
     ///@{
     void SetBlock(data_BOOLEAN block_) { m_block = block_; };
     data_BOOLEAN GetBlock() const { return m_block; };
-    bool HasBlock();
+    bool HasBlock() const;
     ///@}
 
 private:
@@ -914,7 +914,7 @@ public:
     ///@{
     void SetGliss(data_GLISSANDO gliss_) { m_gliss = gliss_; };
     data_GLISSANDO GetGliss() const { return m_gliss; };
-    bool HasGliss();
+    bool HasGliss() const;
     ///@}
 
 private:
@@ -950,7 +950,7 @@ public:
     ///@{
     void SetNum(int num_) { m_num = num_; };
     int GetNum() const { return m_num; };
-    bool HasNum();
+    bool HasNum() const;
     ///@}
 
 private:
@@ -989,11 +989,11 @@ public:
     ///@{
     void SetNumPlace(data_PLACE numPlace_) { m_numPlace = numPlace_; };
     data_PLACE GetNumPlace() const { return m_numPlace; };
-    bool HasNumPlace();
+    bool HasNumPlace() const;
     //
     void SetNumVisible(data_BOOLEAN numVisible_) { m_numVisible = numVisible_; };
     data_BOOLEAN GetNumVisible() const { return m_numVisible; };
-    bool HasNumVisible();
+    bool HasNumVisible() const;
     ///@}
 
 private:
@@ -1031,7 +1031,7 @@ public:
     ///@{
     void SetColl(octaveLog_COLL coll_) { m_coll = coll_; };
     octaveLog_COLL GetColl() const { return m_coll; };
-    bool HasColl();
+    bool HasColl() const;
     ///@}
 
 private:
@@ -1073,7 +1073,7 @@ public:
     ///@{
     void SetDir(pedalLog_DIR dir_) { m_dir = dir_; };
     pedalLog_DIR GetDir() const { return m_dir; };
-    bool HasDir();
+    bool HasDir() const;
     ///@}
 
 private:
@@ -1109,7 +1109,7 @@ public:
     ///@{
     void SetForm(pedalVis_FORM form_) { m_form = form_; };
     pedalVis_FORM GetForm() const { return m_form; };
-    bool HasForm();
+    bool HasForm() const;
     ///@}
 
 private:
@@ -1145,7 +1145,7 @@ public:
     ///@{
     void SetPedalStyle(pianopedals_PEDALSTYLE pedalStyle_) { m_pedalStyle = pedalStyle_; };
     pianopedals_PEDALSTYLE GetPedalStyle() const { return m_pedalStyle; };
-    bool HasPedalStyle();
+    bool HasPedalStyle() const;
     ///@}
 
 private:
@@ -1181,7 +1181,7 @@ public:
     ///@{
     void SetRehEnclose(rehearsal_REHENCLOSE rehEnclose_) { m_rehEnclose = rehEnclose_; };
     rehearsal_REHENCLOSE GetRehEnclose() const { return m_rehEnclose; };
-    bool HasRehEnclose();
+    bool HasRehEnclose() const;
     ///@}
 
 private:
@@ -1217,7 +1217,7 @@ public:
     ///@{
     void SetGridShow(data_BOOLEAN gridShow_) { m_gridShow = gridShow_; };
     data_BOOLEAN GetGridShow() const { return m_gridShow; };
-    bool HasGridShow();
+    bool HasGridShow() const;
     ///@}
 
 private:
@@ -1253,7 +1253,7 @@ public:
     ///@{
     void SetSlurRend(data_CURVERENDITION slurRend_) { m_slurRend = slurRend_; };
     data_CURVERENDITION GetSlurRend() const { return m_slurRend; };
-    bool HasSlurRend();
+    bool HasSlurRend() const;
     ///@}
 
 private:
@@ -1289,7 +1289,7 @@ public:
     ///@{
     void SetStemWith(data_OTHERSTAFF stemWith_) { m_stemWith = stemWith_; };
     data_OTHERSTAFF GetStemWith() const { return m_stemWith; };
-    bool HasStemWith();
+    bool HasStemWith() const;
     ///@}
 
 private:
@@ -1329,7 +1329,7 @@ public:
     ///@{
     void SetTieRend(data_CURVERENDITION tieRend_) { m_tieRend = tieRend_; };
     data_CURVERENDITION GetTieRend() const { return m_tieRend; };
-    bool HasTieRend();
+    bool HasTieRend() const;
     ///@}
 
 private:
@@ -1365,7 +1365,7 @@ public:
     ///@{
     void SetMeasperf(data_DURATION measperf_) { m_measperf = measperf_; };
     data_DURATION GetMeasperf() const { return m_measperf; };
-    bool HasMeasperf();
+    bool HasMeasperf() const;
     ///@}
 
 private:
@@ -1401,19 +1401,19 @@ public:
     ///@{
     void SetBracketPlace(data_PLACE bracketPlace_) { m_bracketPlace = bracketPlace_; };
     data_PLACE GetBracketPlace() const { return m_bracketPlace; };
-    bool HasBracketPlace();
+    bool HasBracketPlace() const;
     //
     void SetBracketVisible(data_BOOLEAN bracketVisible_) { m_bracketVisible = bracketVisible_; };
     data_BOOLEAN GetBracketVisible() const { return m_bracketVisible; };
-    bool HasBracketVisible();
+    bool HasBracketVisible() const;
     //
     void SetDurVisible(data_BOOLEAN durVisible_) { m_durVisible = durVisible_; };
     data_BOOLEAN GetDurVisible() const { return m_durVisible; };
-    bool HasDurVisible();
+    bool HasDurVisible() const;
     //
     void SetNumFormat(tupletVis_NUMFORMAT numFormat_) { m_numFormat = numFormat_; };
     tupletVis_NUMFORMAT GetNumFormat() const { return m_numFormat; };
-    bool HasNumFormat();
+    bool HasNumFormat() const;
     ///@}
 
 private:

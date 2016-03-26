@@ -44,45 +44,46 @@ public:
     ScoreDefElement(std::string classid);
     virtual ~ScoreDefElement();
     virtual void Reset();
-    virtual ClassId Is() { return SCOREDEF_ELEMENT; };
+    virtual ClassId Is() const { return SCOREDEF_ELEMENT; };
     ///@}
+
+    virtual ScoreDefInterface *GetScoreDefInterface() { return dynamic_cast<ScoreDefInterface *>(this); }
 
     /**
      * @name Methods for checking the presence of clef, key signature, etc. information.
      * Look both at the attributes (e.g., @key.sig) and at child elements (not implemented)
      */
     ///@{
-    bool HasClefInfo();
-    bool HasKeySigInfo();
-    bool HasMensurInfo();
-    bool HasMeterSigInfo();
+    bool HasClefInfo() const;
+    bool HasKeySigInfo() const;
+    bool HasMensurInfo() const;
+    bool HasMeterSigInfo() const;
     ///@}
 
     /**
      * @name Get a copy of the clef, keysig, mensur and meterSig.
      * These methods create new objects (heap) that will need to be deleted.
-     * The also convert attribute value object to an object. For example,
+     * They also convert attribute value objects to an object. For example,
      * if a staffDef has a @key.sig, the copy will be a KeySig object.
      * The conversion from attribute to element is performed in the appropriate
      * constructor of each corresponding class (Clef, KeySig, etc.)
      */
     ///@{
-    Clef *GetClefCopy();
-    KeySig *GetKeySigCopy();
-    Mensur *GetMensurCopy();
-    MeterSig *GetMeterSigCopy();
+    Clef *GetClefCopy() const;
+    KeySig *GetKeySigCopy() const;
+    Mensur *GetMensurCopy() const;
+    MeterSig *GetMeterSigCopy() const;
     ///@}
 
-protected:
 private:
     /**
      * @name Methods for checking if clef info is available at the attribute level.
      */
     ///@{
-    bool HasClefAttrInfo();
-    bool HasKeySigAttrInfo();
-    bool HasMensurAttrInfo();
-    bool HasMeterSigAttrInfo();
+    bool HasClefAttrInfo() const;
+    bool HasKeySigAttrInfo() const;
+    bool HasMensurAttrInfo() const;
+    bool HasMeterSigAttrInfo() const;
     ///@}
 
     /**
@@ -90,10 +91,10 @@ private:
      * To be implemented.
      */
     ///@{
-    bool HasClefElementInfo();
-    bool HasKeySigElementInfo();
-    bool HasMensurElementInfo();
-    bool HasMeterSigElementInfo();
+    bool HasClefElementInfo() const;
+    bool HasKeySigElementInfo() const;
+    bool HasMensurElementInfo() const;
+    bool HasMeterSigElementInfo() const;
     ///@}
 };
 
@@ -109,14 +110,14 @@ class ScoreDef : public ScoreDefElement, public ObjectListInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     ScoreDef();
     virtual ~ScoreDef();
     virtual void Reset();
-    virtual std::string GetClassName() { return "ScoreDef"; };
-    virtual ClassId Is() { return SCOREDEF; };
+    virtual std::string GetClassName() const { return "ScoreDef"; };
+    virtual ClassId Is() const { return SCOREDEF; };
     ///@}
 
     void AddStaffGrp(StaffGrp *staffGrp);
@@ -128,7 +129,7 @@ public:
 
     /**
      * Replace the corresponding staffDef with the content of the newStaffDef.
-     * Looks for the staffDef with the same m_n (@n) and replace the attribute set.
+     * Looks for the staffDef with the same m_n (@n) and replaces the attribute set.
      * Attribute set is provided by the ScoreOrStaffDefInterface.
      */
     void ReplaceDrawingValues(StaffDef *newStaffDef);
@@ -165,7 +166,7 @@ public:
     //----------//
 
     /**
-     * Fill a page by adding systems with the appropriate length
+     * Fill a page by adding systems with the appropriate length.
      * For ScoreDef, this means only moving them since their width is not taken into
      * account
      */
@@ -179,9 +180,11 @@ protected:
     virtual void FilterList(ListOfObjects *childList);
 
 private:
+    //
 public:
+    //
 private:
-    /** Flags for indicating whether lables needs to be drawn or not */
+    /** Flags for indicating whether labels need to be drawn or not */
     bool m_drawLabels;
     /** Store the drawing width (clef and key sig) of the scoreDef */
     int m_drawingWidth;
@@ -205,15 +208,15 @@ class StaffGrp : public Object,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     StaffGrp();
     virtual ~StaffGrp();
-    virtual Object *Clone() { return new StaffGrp(*this); };
+    virtual Object *Clone() const { return new StaffGrp(*this); };
     virtual void Reset();
-    virtual std::string GetClassName() { return "StaffGrp"; };
-    virtual ClassId Is() { return STAFFGRP; };
+    virtual std::string GetClassName() const { return "StaffGrp"; };
+    virtual ClassId Is() const { return STAFFGRP; };
     ///@}
 
     /**
@@ -260,15 +263,15 @@ class StaffDef : public ScoreDefElement,
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     StaffDef();
     virtual ~StaffDef();
-    virtual Object *Clone() { return new StaffDef(*this); };
+    virtual Object *Clone() const { return new StaffDef(*this); };
     virtual void Reset();
-    virtual std::string GetClassName() { return "StaffDef"; };
-    virtual ClassId Is() { return STAFFDEF; };
+    virtual std::string GetClassName() const { return "StaffDef"; };
+    virtual ClassId Is() const { return STAFFDEF; };
     ///@}
 
     //----------//
@@ -283,7 +286,7 @@ public:
     virtual int ReplaceDrawingValuesInStaffDef(ArrayPtrVoid *params);
 
     /**
-     * Set drawing flags for the StaffDef for indicating whether clefs, keysig, etc. needs
+     * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
      * to be redrawn.
      * This typically occurs when a new System or a new  ScoreDef is encountered.
      * See implementation and Object::SetStaffDefRedrawFlags for the parameters.

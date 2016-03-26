@@ -30,7 +30,7 @@ void BarLine::Reset()
     ResetBarLineLog();
 }
 
-bool BarLine::HasRepetitionDots()
+bool BarLine::HasRepetitionDots() const
 {
     if (GetForm() == BARRENDITION_rptstart || GetForm() == BARRENDITION_rptend || GetForm() == BARRENDITION_rptboth) {
         return true;

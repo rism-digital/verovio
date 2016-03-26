@@ -62,7 +62,7 @@ void Chord::Reset()
     ClearClusters();
 }
 
-void Chord::ClearClusters()
+void Chord::ClearClusters() const
 {
     std::list<ChordCluster *>::iterator iter;
     for (iter = m_clusters.begin(); iter != m_clusters.end(); ++iter) {
@@ -102,15 +102,13 @@ void Chord::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        LayerElement *currentElement = dynamic_cast<LayerElement *>(*iter);
-        assert(currentElement);
-        if (!currentElement->HasInterface(INTERFACE_DURATION)) {
+        if (!(*iter)->HasInterface(INTERFACE_DURATION)) {
+            // remove anything that has not a DurationInterface
             iter = childList->erase(iter);
+            continue;
         }
         else {
-            Note *n = dynamic_cast<Note *>(currentElement);
-
-            if (n) {
+            if ((*iter)->Is() == NOTE) {
                 iter++;
             }
             else {
@@ -210,7 +208,7 @@ void Chord::ResetAccidSpace(int fullUnit)
 
     /*
      * Each accidental's Y position will be its vertical center; set the grid extremes to account for that
-     * Resize m_accidSpace to be as tall as is possibly necessary; must accomodate every accidental stacked vertically.
+     * Resize m_accidSpace to be as tall as possibly necessary; must accomodate every accidental stacked vertically.
      */
     int accidHeight = ACCID_HEIGHT * halfUnit;
     int yMax, yMin;
@@ -259,8 +257,9 @@ void Chord::SetDrawingStemDir(data_STEMDIRECTION stemDir)
     m_drawingStemDir = stemDir;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+        if ((*it)->Is() != NOTE) continue;
         Note *note = dynamic_cast<Note *>(*it);
-        if (!note) continue;
+        assert(note);
         note->SetDrawingStemDir(stemDir);
     }
 }
@@ -270,8 +269,9 @@ void Chord::SetDrawingStemStart(Point stemStart)
     m_drawingStemStart = stemStart;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+        if ((*it)->Is() != NOTE) continue;
         Note *note = dynamic_cast<Note *>(*it);
-        if (!note) continue;
+        assert(note);
         note->SetDrawingStemStart(stemStart);
     }
 }
@@ -281,8 +281,9 @@ void Chord::SetDrawingStemEnd(Point stemEnd)
     m_drawingStemEnd = stemEnd;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
+        if ((*it)->Is() != NOTE) continue;
         Note *note = dynamic_cast<Note *>(*it);
-        if (!note) continue;
+        assert(note);
         note->SetDrawingStemEnd(stemEnd);
     }
 }

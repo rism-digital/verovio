@@ -65,7 +65,7 @@ bool AttAltsym::WriteAltsym(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttAltsym::HasAltsym()
+bool AttAltsym::HasAltsym() const
 {
     return (m_altsym != "");
 }
@@ -86,10 +86,10 @@ bool Att::SetUsersymbols(Object *element, std::string attrType, std::string attr
     return false;
 }
 
-void Att::GetUsersymbols(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ALTSYM)) {
-        AttAltsym *att = dynamic_cast<AttAltsym *>(element);
+        const AttAltsym *att = dynamic_cast<const AttAltsym *>(element);
         assert(att);
         if (att->HasAltsym()) {
             attributes->push_back(std::make_pair("altsym", att->StrToStr(att->GetAltsym())));

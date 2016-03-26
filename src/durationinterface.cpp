@@ -16,7 +16,9 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "chord.h"
 #include "mensur.h"
+#include "note.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -61,7 +63,7 @@ void DurationInterface::Reset()
     ResetStaffident();
 }
 
-double DurationInterface::GetAlignmentDuration(int num, int numbase)
+double DurationInterface::GetInterfaceAlignmentDuration(int num, int numbase)
 {
     int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
 
@@ -76,7 +78,7 @@ double DurationInterface::GetAlignmentDuration(int num, int numbase)
     return duration;
 }
 
-double DurationInterface::GetAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur)
+double DurationInterface::GetInterfaceAlignmentMensuralDuration(int num, int numbase, Mensur *currentMensur)
 {
     int note_dur = this->GetDurGes() != DURATION_NONE ? this->GetDurGes() : this->GetActualDur();
 
@@ -137,11 +139,28 @@ bool DurationInterface::IsLastInBeam(LayerElement *noteOrRest)
     return false;
 }
 
-int DurationInterface::GetActualDur()
+int DurationInterface::GetActualDur() const
 {
     // maxima (-1) is a mensural only value
     if (this->GetDur() == DURATION_maxima) return DUR_MX;
     return (this->GetDur() & DUR_MENSURAL_MASK);
+}
+
+int DurationInterface::GetNoteOrChordDur(LayerElement *element)
+{
+    if (element->Is() == CHORD) {
+        return this->GetActualDur();
+    }
+    else if (element->Is() == NOTE) {
+        Note *note = dynamic_cast<Note *>(element);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord)
+            return chord->GetActualDur();
+        else
+            return this->GetActualDur();
+    }
+    return this->GetActualDur();
 }
 
 bool DurationInterface::IsMensural()

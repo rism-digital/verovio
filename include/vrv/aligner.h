@@ -17,6 +17,7 @@ class MeasureAligner;
 class Note;
 class StaffAlignment;
 class SystemAligner;
+class TimestampAttr;
 
 /**
  * Alignment types for aligning types together.
@@ -25,7 +26,7 @@ class SystemAligner;
  * this to avoid notes aligning to it
  */
 enum AlignmentType {
-    // Non-justiable
+    // Non-justifiable
     ALIGNMENT_MEASURE_START = 0,
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF_ATTR,
@@ -60,7 +61,7 @@ public:
     // constructors and destructors
     SystemAligner();
     virtual ~SystemAligner();
-    virtual ClassId Is() { return SYSTEM_ALIGNER; }
+    virtual ClassId Is() const { return SYSTEM_ALIGNER; }
 
     int GetStaffAlignmentCount() const { return (int)m_children.size(); };
 
@@ -73,14 +74,22 @@ public:
      * Get bottom StaffAlignment for the system.
      * For each SystemAligner, we keep a StaffAlignment for the bottom position.
      */
-    StaffAlignment *GetBottomAlignment() { return m_bottomAlignment; };
+    StaffAlignment *GetBottomAlignment() const { return m_bottomAlignment; };
 
     /**
      * Get the StaffAlignment at index idx.
      * Creates the StaffAlignment if not there yet.
      * Checks the they are created incrementally (without gap).
+     * If a staff is passed, it will be used for initializing m_staffN and m_staffSize of the aligner.
+     * (no const since the bottom alignment is temporarily removed)
      */
-    StaffAlignment *GetStaffAlignment(int idx);
+    StaffAlignment *GetStaffAlignment(int idx, Staff *staff, Doc *doc);
+
+    /**
+     * Get the StaffAlignment for the staffN.
+     * Return NULL if not found.
+     */
+    StaffAlignment *GetStaffAlignmentForStaffN(int staffN) const;
 
 private:
     //
@@ -102,19 +111,24 @@ private:
  */
 class StaffAlignment : public Object {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     StaffAlignment();
     virtual ~StaffAlignment();
-    virtual ClassId Is() { return STAFF_ALIGNMENT; }
+    virtual ClassId Is() const { return STAFF_ALIGNMENT; }
+    ///@}
 
+    /**
+     * @name Setter and getter for y
+     */
     void SetYRel(int yRel) { m_yRel = yRel; };
-    int GetYRel() { return m_yRel; };
+    int GetYRel() const { return m_yRel; };
 
     void SetYShift(int yShift);
-    int GetYShift() { return m_yShift; };
-
-    void SetMaxHeight(int max_height);
-    int GetMaxHeight() { return m_maxHeight; };
+    int GetYShift() const { return m_yShift; };
 
     /**
      * @name Set and get verse count.
@@ -123,7 +137,85 @@ public:
      */
     ///@{
     void SetVerseCount(int verse_count);
-    int GetVerseCount() { return m_verseCount; };
+    int GetVerseCount() const { return m_verseCount; };
+
+    /**
+     * @name Setter and getter for above or below dir/dynam/hairpin
+     * Currently unused
+     */
+    ///@{
+    void SetDirAbove() { m_dirAbove = true; };
+    bool GetDirAbove() const { return m_dirAbove; };
+    void SetDirBelow() { m_dirBelow = true; };
+    bool GetDirBelow() const { return m_dirBelow; };
+    void SetDynamAbove() { m_dynamAbove = true; };
+    bool GetDynamAbove() const { return m_dynamAbove; };
+    void SetDynamBelow() { m_dynamBelow = true; };
+    bool GetDynamBelow() const { return m_dynamBelow; };
+    void SetHairpinAbove() { m_hairpinAbove = true; };
+    bool GetHairpinAbove() const { return m_hairpinAbove; };
+    void SetHairpinBelow() { m_hairpinBelow = true; };
+    bool GetHairpinBelow() const { return m_hairpinBelow; };
+    ///@}
+
+    /**
+     * Retrieves or creates the FloatingPositioner for the FloatingElement on this staff.
+     */
+    void SetCurrentFloatingPositioner(FloatingElement *element, int x, int y);
+
+    /**
+     * @name Setter and getter of the staff from which the alignment is created alignment.
+     * Used for accessing the staff @n, the size, etc.
+     */
+    ///@{
+    Staff *GetStaff() const { return m_staff; };
+    void SetStaff(Staff *staff, Doc *doc);
+    ///@}
+
+    /**
+     * Returns the staff size (100 if no staff object is refered to)
+     */
+    int GetStaffSize() const;
+
+    /**
+     * @name Calculates the overlow (above or below for the bounding box.
+     * Looks if the bounding box is a FloatingPositioner or not, in which case it we take into account its m_drawingYRel
+     * value.
+     */
+    ///@{
+    int CalcOverflowAbove(BoundingBox *box);
+    int CalcOverflowBelow(BoundingBox *box);
+    ///@}
+
+    /**
+     * @name Setter and getter for overflow and overlap values
+     */
+    ///@{
+    void SetOverflowAbove(int overflowAbove);
+    int GetOverflowAbove() const { return m_overflowAbove; };
+    void SetOverflowBelow(int overflowBottom);
+    int GetOverflowBelow() const { return m_overflowBelow; };
+    void SetOverlap(int overlap);
+    int GetOverlap() const { return m_overlap; };
+    int GetStaffHeight() const { return m_staffHeight; };
+    ///@}
+
+    /**
+     * @name Adds a bounding box to the array of overflowing objects above or below
+     */
+    ///@{
+    void AddBBoxAbove(BoundingBox *box) { m_overflowAboveBBoxes.push_back(box); };
+    void AddBBoxBelow(BoundingBox *box) { m_overflowBelowBBoxes.push_back(box); };
+    ///@}
+
+    /**
+     * Deletes all the FloatingPositioner objects.
+     */
+    void ClearPositioners();
+
+    //----------//
+    // Functors //
+    //----------//
 
     /**
      * Set the position of the StaffAlignment.
@@ -132,10 +224,21 @@ public:
     virtual int SetAligmentYPos(ArrayPtrVoid *params);
 
     /**
+     * See Object::CalcStaffOverlap
+     */
+    virtual int CalcStaffOverlap(ArrayPtrVoid *params);
+
+    /**
      * Correct the Y alignment once the the content of a system has been aligned and laid out.
      * Special case of functor redirected from System.
      */
     virtual int IntegrateBoundingBoxYShift(ArrayPtrVoid *params);
+
+    /**
+     * Adjust the position of the positoners looking at previously overlowing bounding boxes.
+     * Also add them to the list of overflowing elements.
+     */
+    virtual int AdjustFloatingPostioners(ArrayPtrVoid *params);
 
 private:
     //
@@ -143,19 +246,50 @@ public:
     //
 private:
     /**
+     * The list of FloatingPositioner for the staff.
+     */
+    ArrayOfFloatingPositioners m_floatingPositioners;
+    /**
+     * Stores a pointer to the staff from which the aligner was created.
+     * This is necessary since we don't always have all the staves.
+     */
+    Staff *m_staff;
+    /**
      * Stores the position relative to the system.
      */
     int m_yRel;
     int m_yShift;
     /**
-     * Stores temporally the maximum height of the of the staff pointing to it.
-     * It is set and integrated as m_yShift.
-     */
-    int m_maxHeight;
-    /**
      * Stores the number of verse of the staves attached to the aligner
      */
     int m_verseCount;
+    /**
+     * @name indicator for the presence of above and below dynam/hairpin
+     */
+    ///@{
+    bool m_dirAbove;
+    bool m_dirBelow;
+    bool m_dynamAbove;
+    bool m_dynamBelow;
+    bool m_hairpinAbove;
+    bool m_hairpinBelow;
+    ///@}
+
+    /**
+     * @name values for storing the overlow and overlap
+     */
+    ///@{
+    int m_overflowAbove;
+    int m_overflowBelow;
+    int m_overlap;
+    int m_staffHeight;
+    ///@}
+
+    /**
+     * The list of overflowing bounding boxes (e.g, LayerElement or FloatingPositioner)
+     */
+    std::vector<BoundingBox *> m_overflowAboveBBoxes;
+    std::vector<BoundingBox *> m_overflowBelowBBoxes;
 };
 
 //----------------------------------------------------------------------------
@@ -171,23 +305,23 @@ public:
     Alignment();
     Alignment(double time, AlignmentType type = ALIGNMENT_DEFAULT);
     virtual ~Alignment();
-    virtual ClassId Is() { return ALIGNMENT; }
+    virtual ClassId Is() const { return ALIGNMENT; }
 
     void SetXRel(int x_rel);
-    int GetXRel() { return m_xRel; };
+    int GetXRel() const { return m_xRel; };
 
     void SetXShift(int xShift);
-    int GetXShift() { return m_xShift; };
+    int GetXShift() const { return m_xShift; };
 
     void SetMaxWidth(int maxWidth);
-    int GetMaxWidth() { return m_maxWidth; };
+    int GetMaxWidth() const { return m_maxWidth; };
 
     /**
      * @name Set and get the time value of the alignment
      */
     ///@{
     void SetTime(double time) { m_time = time; };
-    double GetTime() { return m_time; };
+    double GetTime() const { return m_time; };
     ///@}
 
     /**
@@ -195,28 +329,28 @@ public:
      */
     ///@{
     void SetType(AlignmentType type) { m_type = type; };
-    AlignmentType GetType() { return m_type; };
+    AlignmentType GetType() const { return m_type; };
     ///@}
 
     /**
      * Returns the GraceAligner for the Alignment.
-     * Creates it if necessary.
+     * Create it if necessary.
      */
     GraceAligner *GetGraceAligner();
 
     /**
      * Returns true if the aligner has a GraceAligner
      */
-    bool HasGraceAligner() { return (m_graceAligner != NULL); };
+    bool HasGraceAligner() const { return (m_graceAligner != NULL); };
 
     /**
-     * Correct the X alignment of grace notes once the the content of a system has been aligned and laid out.
+     * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the GraceAligner.
      */
     virtual int IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params);
 
     /**
-     * Correct the X alignment once the the content of a system has been aligned and laid out.
+     * Correct the X alignment once the content of a system has been aligned and laid out.
      * Special case of functor redirected from Measure.
      */
     virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params);
@@ -293,7 +427,7 @@ public:
     // constructors and destructors
     MeasureAligner();
     virtual ~MeasureAligner();
-    virtual ClassId Is() { return MEASURE_ALIGNER; }
+    virtual ClassId Is() const { return MEASURE_ALIGNER; }
 
     int GetAlignmentCount() const { return (int)m_children.size(); };
 
@@ -306,32 +440,32 @@ public:
 
     /**
      * Keep the maximum time of the measure.
-     * This correspond to the whole duration of the measure and
+     * This corresponds to the whole duration of the measure and
      * should be the same for all staves/layers.
      */
     void SetMaxTime(double time);
 
     /**
-     * @name Set and get the non justifiable margin
+     * @name Set and get the non-justifiable margin
      */
     ///@{
     void SetNonJustifiableMargin(int margin) { m_nonJustifiableLeftMargin = margin; };
-    int GetNonJustifiableMargin() { return m_nonJustifiableLeftMargin; };
+    int GetNonJustifiableMargin() const { return m_nonJustifiableLeftMargin; };
     ///@}
 
     /**
      * Get left Alignment for the measure.
      * For each MeasureAligner, we keep and Alignment for the left position.
-     * The Alignment time will be always stay 0.0 and be the first in the list.
+     * The Alignment time will be always 0.0 and will appear first in the list.
      */
-    Alignment *GetLeftAlignment() { return m_leftAlignment; };
+    Alignment *GetLeftAlignment() const { return m_leftAlignment; };
 
     /**
      * Get right Alignment for the measure.
      * For each MeasureAligner, we keep and Alignment for the right position.
      * The Alignment time will be increased whenever necessary when values are added.
      */
-    Alignment *GetRightAlignment() { return m_rightAlignment; };
+    Alignment *GetRightAlignment() const { return m_rightAlignment; };
 
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.
@@ -369,7 +503,7 @@ private:
     Alignment *m_rightAlignment;
 
     /**
-     * Store the measure non justifiable margin used by the scoreDef attributes.
+     * Store measure's non-justifiable margin used by the scoreDef attributes.
      */
     int m_nonJustifiableLeftMargin;
 };
@@ -387,7 +521,7 @@ public:
     // constructors and destructors
     GraceAligner();
     virtual ~GraceAligner();
-    virtual ClassId Is() { return GRACE_ALIGNER; }
+    virtual ClassId Is() const { return GRACE_ALIGNER; }
 
     /**
      * Because the grace notes appear from left to right but need to be aligned
@@ -403,11 +537,11 @@ public:
     void AlignStack();
 
     /**
-     * @name Setter and getter for the width ofthe group of grace notes
+     * @name Setter and getter for the width of the group of grace notes
      */
     ///@{
     void SetWidth(int totalWidth) { m_totalWidth = totalWidth; };
-    int GetWidth() { return m_totalWidth; };
+    int GetWidth() const { return m_totalWidth; };
     ///@}
 
 private:
@@ -416,7 +550,7 @@ public:
     //
 private:
     /**
-     * The stack of notes where the are piled up before getting aligned
+     * The stack of notes where they are piled up before getting aligned
      */
     ArrayOfObjects m_noteStack;
     /**
@@ -424,6 +558,42 @@ private:
      * boxes X are integrated in Alignment::IntegrateBoundingBoxGraceXShift
      */
     int m_totalWidth;
+};
+
+//----------------------------------------------------------------------------
+// TimestampAligner
+//----------------------------------------------------------------------------
+
+/**
+ * This class stores the timestamps (TimestampsAttr) in a measure.
+ * It does not itself perform any alignment but only stores them and avoids duplicates
+ * (i.e., having two objects at the same position.
+ * It contains a vector of TimestampsAttr.
+ */
+class TimestampAligner : public Object {
+public:
+    // constructors and destructors
+    TimestampAligner();
+    virtual ~TimestampAligner();
+    virtual ClassId Is() const { return TIMESTAMP_ALIGNER; }
+
+    /**
+     * Reset the aligner (clear the content)
+     */
+    virtual void Reset();
+
+    /**
+     * Look for an existing TimestampAttr at a certain time.
+     * Creates it if not found
+     */
+    TimestampAttr *GetTimestampAtTime(double time);
+
+private:
+    //
+public:
+    //
+private:
+    //
 };
 
 } // namespace vrv

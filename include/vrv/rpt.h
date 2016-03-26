@@ -25,26 +25,24 @@ class BeatRpt : public LayerElement, public AttBeatRptVis {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     BeatRpt();
     virtual ~BeatRpt();
     virtual void Reset();
-    virtual std::string GetClassName() { return "BeatRpt"; };
-    ;
-    virtual ClassId Is() { return BEATRPT; };
+    virtual std::string GetClassName() const { return "BeatRpt"; };
+    virtual ClassId Is() const { return BEATRPT; };
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
     /**
-     * Returns the duration (in double) for the element.
-     * Careful: this method is not overriding LayerElement::GetAlignmentDuration since
-     * LayerElement and DurationInterface have no inheritance link.
+     * Returns the duration (in double) for the BeatRpt.
      */
-    virtual double GetAlignmentDuration(int meterUnit);
+
+    double GetBeatRptAlignmentDuration(int meterUnit) const;
 
 private:
     //
@@ -64,15 +62,14 @@ class BTrem : public LayerElement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     BTrem();
     virtual ~BTrem();
     virtual void Reset();
-    virtual std::string GetClassName() { return "BTrem"; };
-    ;
-    virtual ClassId Is() { return BTREM; };
+    virtual std::string GetClassName() const { return "BTrem"; };
+    virtual ClassId Is() const { return BTREM; }
     ///@}
 
     /**
@@ -99,15 +96,14 @@ class FTrem : public LayerElement, public ObjectListInterface, public AttSlashco
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     FTrem();
     virtual ~FTrem();
     virtual void Reset();
-    virtual std::string GetClassName() { return "FTrem"; };
-    ;
-    virtual ClassId Is() { return FTREM; };
+    virtual std::string GetClassName() const { return "FTrem"; };
+    virtual ClassId Is() const { return FTREM; };
     ///@}
 
     /**
@@ -140,15 +136,14 @@ class MRpt : public LayerElement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     MRpt();
     virtual ~MRpt();
     virtual void Reset();
-    virtual std::string GetClassName() { return "MRpt"; };
-    ;
-    virtual ClassId Is() { return MRPT; };
+    virtual std::string GetClassName() const { return "MRpt"; };
+    virtual ClassId Is() const { return MRPT; };
     ///@}
 
     //----------//
@@ -162,6 +157,7 @@ public:
     virtual int PrepareRpt(ArrayPtrVoid *params);
 
 private:
+    //
 public:
     /** measure count */
     int m_drawingMeasureCount;
@@ -180,15 +176,14 @@ class MRpt2 : public LayerElement {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     MRpt2();
     virtual ~MRpt2();
     virtual void Reset();
-    virtual std::string GetClassName() { return "MRpt2"; };
-    ;
-    virtual ClassId Is() { return MRPT2; };
+    virtual std::string GetClassName() const { return "MRpt2"; };
+    virtual ClassId Is() const { return MRPT2; };
     ///@}
 
 private:
@@ -209,15 +204,14 @@ class MultiRpt : public LayerElement, public AttNumbered {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     MultiRpt();
     virtual ~MultiRpt();
     virtual void Reset();
-    virtual std::string GetClassName() { return "MultiRpt"; };
-    ;
-    virtual ClassId Is() { return MULTIRPT; };
+    virtual std::string GetClassName() const { return "MultiRpt"; };
+    virtual ClassId Is() const { return MULTIRPT; };
     ///@}
 
 private:

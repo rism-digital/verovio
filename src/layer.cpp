@@ -32,7 +32,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Layer::Layer()
-    : DocObject("layer-"), DrawingListInterface(), ObjectListInterface(), StaffDefDrawingInterface(), AttCommon()
+    : Object("layer-"), DrawingListInterface(), ObjectListInterface(), StaffDefDrawingInterface(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
@@ -45,7 +45,7 @@ Layer::~Layer()
 
 void Layer::Reset()
 {
-    DocObject::Reset();
+    Object::Reset();
     DrawingListInterface::Reset();
     StaffDefDrawingInterface::Reset();
     ResetCommon();
@@ -75,13 +75,20 @@ LayerElement *Layer::GetPrevious(LayerElement *element)
 
 LayerElement *Layer::GetAtPos(int x)
 {
-    LayerElement *element = dynamic_cast<LayerElement *>(this->GetFirst());
-    if (!element || element->GetDrawingX() > x) return NULL;
+    Object *first = this->GetFirst();
+    if (!first || !first->IsLayerElement()) return NULL;
 
-    LayerElement *next = NULL;
-    while ((next = dynamic_cast<LayerElement *>(this->GetNext()))) {
-        if (next->GetDrawingX() > x) return element;
-        element = next;
+    LayerElement *element = dynamic_cast<LayerElement *>(first);
+    assert(element);
+    if (element->GetDrawingX() > x) return NULL;
+
+    Object *next;
+    while ((next = this->GetNext())) {
+        if (!next->IsLayerElement()) continue;
+        LayerElement *nextLayerElement = dynamic_cast<LayerElement *>(next);
+        assert(nextLayerElement);
+        if (nextLayerElement->GetDrawingX() > x) return element;
+        element = nextLayerElement;
     }
     return element;
 }
@@ -171,18 +178,19 @@ int Layer::AlignHorizontally(ArrayPtrVoid *params)
     // param 1: the time
     // param 2: the current Mensur
     // param 3: the current MeterSig
+    // param 4: the functor for passing it to the TimeStampAligner (unused)
     double *time = static_cast<double *>((*params).at(1));
     Mensur **currentMensur = static_cast<Mensur **>((*params).at(2));
     MeterSig **currentMeterSig = static_cast<MeterSig **>((*params).at(3));
 
-    // we need to call it because we are overriding Object::AlignHorizontally
-    this->ResetHorizontalAlignment();
-
-    // we are starting a new layer, reset the time;
-    (*time) = 0.0;
-
     (*currentMensur) = GetCurrentMensur();
     (*currentMeterSig) = GetCurrentMeterSig();
+
+    // We are starting a new layer, reset the time;
+    int meterUnit = 4;
+    if (*currentMeterSig && (*currentMeterSig)->HasUnit()) meterUnit = (*currentMeterSig)->GetUnit();
+    // We set it to -1.5 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
+    (*time) = DUR_MAX / meterUnit * -1.5;
 
     if (DrawClef() && GetCurrentClef()) {
         GetCurrentClef()->AlignHorizontally(params);
@@ -197,6 +205,9 @@ int Layer::AlignHorizontally(ArrayPtrVoid *params)
         GetCurrentMeterSig()->AlignHorizontally(params);
     }
 
+    // Now we have to set it to 0.0 since we will start aligning muscial content
+    (*time) = 0.0;
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -209,9 +220,10 @@ int Layer::AlignHorizontallyEnd(ArrayPtrVoid *params)
     MeasureAligner **measureAligner = static_cast<MeasureAligner **>((*params).at(0));
 
     int i;
-    for (i = 0; i < (int)(*measureAligner)->m_children.size(); i++) {
-        Alignment *alignment = dynamic_cast<Alignment *>((*measureAligner)->m_children.at(i));
-        if (alignment && alignment->HasGraceAligner()) {
+    for (i = 0; i < (*measureAligner)->GetChildCount(); i++) {
+        Alignment *alignment = dynamic_cast<Alignment *>((*measureAligner)->GetChild(i));
+        assert(alignment);
+        if (alignment->HasGraceAligner()) {
             alignment->GetGraceAligner()->AlignStack();
         }
     }
@@ -243,6 +255,7 @@ int Layer::SetDrawingXY(ArrayPtrVoid *params)
     // param 4: a pointer to the current layer
     // param 5: a pointer to the view (unused)
     // param 6: a bool indicating if we are processing layer elements or not
+    // param 7: a pointer to the functor for passing it to the timestamps (unused)
     Measure **currentMeasure = static_cast<Measure **>((*params).at(2));
     Layer **currentLayer = static_cast<Layer **>((*params).at(4));
     bool *processLayerElements = static_cast<bool *>((*params).at(6));
@@ -283,6 +296,18 @@ int Layer::PrepareRpt(ArrayPtrVoid *params)
     if ((*currentMRpt) && !this->FindChildByType(MRPT)) {
         (*currentMRpt) = NULL;
     }
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::CalcMaxMeasureDuration(ArrayPtrVoid *params)
+{
+    // param 0: std::vector<double>: a stack of maximum duration filled by the functor (unused)
+    // param 1: double: the duration of the current measure
+    double *currentValue = static_cast<double *>((*params).at(1));
+
+    // reset it
+    (*currentValue) = 0.0;
+
     return FUNCTOR_CONTINUE;
 }
 
