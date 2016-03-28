@@ -129,6 +129,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/keysig.cpp \
 	$VEROVIO_ROOT/src/layer.cpp \
 	$VEROVIO_ROOT/src/layerelement.cpp \
+	$VEROVIO_ROOT/src/ligature.cpp \
 	$VEROVIO_ROOT/src/measure.cpp \
 	$VEROVIO_ROOT/src/mensur.cpp \
 	$VEROVIO_ROOT/src/metersig.cpp \

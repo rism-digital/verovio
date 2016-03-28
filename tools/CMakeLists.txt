@@ -48,9 +48,10 @@ add_executable (verovio
 	../src/keysig.cpp
 	../src/layer.cpp
 	../src/layerelement.cpp
+	../src/ligature.cpp
+	../src/measure.cpp
 	../src/mensur.cpp
 	../src/metersig.cpp
-	../src/measure.cpp
 	../src/mrest.cpp
 	../src/multirest.cpp
 	../src/note.cpp
