@@ -19,6 +19,7 @@
 #include "io.h"
 #include "keysig.h"
 #include "layer.h"
+#include "ligature.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -990,7 +991,7 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     // param 1: the Doc
     int *min_pos = static_cast<int *>((*params).at(0));
     Doc *doc = static_cast<Doc *>((*params).at(1));
-
+    
     // starting an new layer
     if (this->Is() == LAYER) {
         (*min_pos) = 0;
@@ -1052,6 +1053,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     int *min_pos = static_cast<int *>((*params).at(0));
     int *measure_width = static_cast<int *>((*params).at(1));
     Doc *doc = static_cast<Doc *>((*params).at(2));
+    Ligature *ligParent;
 
     // starting a new measure
     if (this->Is() == MEASURE) {
@@ -1121,8 +1123,14 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     // |____x_____|
     //  ---- = negative offset
     int negative_offset = -(current->m_contentBB_x1);
-    if (!current->IsGraceNote())
-        negative_offset += (doc->GetLeftMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    
+    // Increase negative_offset by the symbol type's left margin, unless it's a note
+    // that's part of a ligature.
+    if (current->Is() == NOTE && !current->IsGraceNote()) {
+        ligParent = dynamic_cast<Ligature *>(current->GetFirstParent(LIGATURE, 1));
+        if (!ligParent)
+            negative_offset += (doc->GetLeftMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    }
 
     // This should never happen but can with glyphs not exactly registered at x=0 in the SMuFL font used
     if (negative_offset < 0) negative_offset = 0;
@@ -1156,8 +1164,15 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
 
     // the next minimal position is given by the right side of the bounding box + the spacing of the element
     int width = current->m_contentBB_x2;
-    if (!current->HasEmptyBB())
-        width += doc->GetRightMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+
+    // Move to right by the symbol type's right margin, unless it's a note that's
+	// part of a ligature.
+    if (!current->HasEmptyBB() && current->Is() == NOTE && !current->IsGraceNote()) {
+        ligParent = dynamic_cast<Ligature *>(current->GetFirstParent(LIGATURE, 1));
+        if (!ligParent)
+        	width += doc->GetRightMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    }
+    
     (*min_pos) = current->GetAlignment()->GetXRel() + width;
     current->GetAlignment()->SetMaxWidth(width);
 
