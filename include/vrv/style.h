@@ -132,7 +132,7 @@ namespace vrv {
 #define DEFAULT_RIGHT_MARGIN_MRPT2 DEFAULT_RIGHT_MARGIN_DEFAULT
 #define DEFAULT_RIGHT_MARGIN_MULTIREST DEFAULT_RIGHT_MARGIN_DEFAULT
 #define DEFAULT_RIGHT_MARGIN_MULTIRPT DEFAULT_RIGHT_MARGIN_DEFAULT
-#define DEFAULT_RIGHT_MARGIN_NOTE 0.0
+#define DEFAULT_RIGHT_MARGIN_NOTE 0.2
 #define DEFAULT_RIGHT_MARGIN_REST 0.0
 
 //----------------------------------------------------------------------------
@@ -156,7 +156,7 @@ namespace vrv {
 
 /* Style parameters for mensural notation */
 // Ratio of mensural notehead and accidental size to CMN size for the same staff size
-#define TEMP_MNOTEHEAD_SIZE_FACTOR 0.55
+#define TEMP_MNOTEHEAD_SIZE_FACTOR 0.60
 #define TEMP_MACCID_SIZE_FACTOR 0.65
 #define TEMP_MAUGDOT_SIZE_FACTOR 0.60
 // Size of mensuration sign circle relative to space between staff lines
