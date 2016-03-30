@@ -189,6 +189,7 @@ python $EMCC $CHATTY \
 	-s EXPORTED_FUNCTIONS="[\
 		'_vrvToolkit_constructor',\
 		'_vrvToolkit_destructor',\
+		'_vrvToolkit_getElementsAtTime',\
 		'_vrvToolkit_getLog',\
 		'_vrvToolkit_getVersion',\
 		'_vrvToolkit_getMEI',\

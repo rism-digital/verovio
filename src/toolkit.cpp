@@ -616,6 +616,12 @@ std::string Toolkit::RenderToMidi()
     return outputstr;
 }
 
+std::vector<std::string> Toolkit::GetElementsAtTime()
+{
+    std::vector<string> outputVector = {"testing", "GetElementsAtTime"};
+    return outputVector;
+}
+
 bool Toolkit::RenderToMidiFile(const std::string &filename)
 {
     MidiFile outputfile;
