@@ -11,7 +11,7 @@ add_definitions(-std=c++11)
 
 EXEC_PROGRAM(../tools/get_git_commit.sh ARGS OUTPUT_VARIABLE GIT_COMMIT)
 
-include_directories(/usr/local/include ../include ../include/midi ../include/pugi ../include/utf8 ../include/vrv ../libmei)
+include_directories(../include ../include/midi ../include/pugi ../include/utf8 ../include/vrv ../libmei)
 
 if(NO_PAE_SUPPORT)
   add_definitions(-DNO_PAE_SUPPORT)
