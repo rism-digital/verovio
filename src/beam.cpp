@@ -62,11 +62,6 @@ void Beam::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        if ((*iter)->Is() == REST) {
-            // remove anything that has not a DurationInterface
-            iter = childList->erase(iter);
-            continue;
-        }
         else {
             // Drop notes that are signaled as grace notes
 
@@ -84,6 +79,9 @@ void Beam::FilterList(ListOfObjects *childList)
                 // we have grace notes embedded in a beam
                 // drop them
                 if (!firstNoteGrace && n->HasGrace() == true)
+                    iter = childList->erase(iter);
+                // also remove notes within chords
+                else if (n->IsChordTone())
                     iter = childList->erase(iter);
                 else
                     iter++;
