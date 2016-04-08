@@ -114,7 +114,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             // Look at beam breaks
             (*beamElementCoords).at(elementCount)->m_breaksec = 0;
             AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary *>(current);
-            if (elementCount && beamsecondary && beamsecondary->HasBreaksec()) {
+            if (beamsecondary && beamsecondary->HasBreaksec()) {
                 if (!params.m_changingDur) params.m_changingDur = ON;
                 (*beamElementCoords).at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
             }
