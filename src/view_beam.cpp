@@ -132,12 +132,13 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                     }
                     params.m_stemDir = currentStemDir;
                 }
-                // keep the shortest dur in the beam
-                params.m_shortestDur = std::max(currentDur, params.m_shortestDur);
-                // check if we have more than duration in the beam
-                if (!params.m_changingDur && currentDur != lastDur) params.m_changingDur = ON;
-                lastDur = currentDur;
             }
+            // keep the shortest dur in the beam
+            params.m_shortestDur = std::max(currentDur, params.m_shortestDur);
+            // check if we have more than duration in the beam
+            if (!params.m_changingDur && currentDur != lastDur) params.m_changingDur = ON;
+            lastDur = currentDur;
+            
             elementCount++;
         }
 
