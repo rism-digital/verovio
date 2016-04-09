@@ -53,7 +53,7 @@ while getopts "lwv:h:c" opt; do
 		l)
 			echo "light version (-l)"
 			ASM="\
-				-O3 --memory-init-file 0 \
+				-O3 --memory-init-file 0 -std=c++11 \
 				-s ASM_JS=1 "
 			ASM_NAME="-light"
 			;;
