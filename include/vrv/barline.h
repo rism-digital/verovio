@@ -24,19 +24,19 @@ class BarLine : public LayerElement, public AttBarLineLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
+     * Reset method resets all attribute classes.
      */
     ///@{
     BarLine();
     virtual ~BarLine();
     virtual void Reset();
-    virtual Object *Clone() { return new BarLine(*this); };
-    virtual std::string GetClassName() { return "BarLine"; };
-    virtual ClassId Is() { return BARLINE; };
+    virtual Object *Clone() const { return new BarLine(*this); };
+    virtual std::string GetClassName() const { return "BarLine"; };
+    virtual ClassId Is() const { return BARLINE; };
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
     /**
      * Use to set the alignment for the Measure BarLine members.
@@ -47,7 +47,7 @@ public:
     /*
      * Return true if the barLine type requires repetition dots to be drawn.
      */
-    bool HasRepetitionDots();
+    bool HasRepetitionDots() const;
 
 private:
     //
@@ -67,15 +67,14 @@ class BarLineAttr : public BarLine {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
-     * No Reset() method required.
+     * No Reset() method is required.
      */
     ///@{
     BarLineAttr();
     virtual ~BarLineAttr();
-    virtual Object *Clone() { return new BarLineAttr(*this); };
-    virtual std::string GetClassName() { return "BarLineAttr"; };
-    virtual ClassId Is() { return BARLINE_ATTR; };
+    virtual Object *Clone() const { return new BarLineAttr(*this); };
+    virtual std::string GetClassName() const { return "BarLineAttr"; };
+    virtual ClassId Is() const { return BARLINE_ATTR; };
     ///@}
 };
 

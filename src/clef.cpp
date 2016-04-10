@@ -19,7 +19,7 @@ Clef::Clef() : LayerElement("clef-"), AttClefshape(), AttLineloc(), AttOctavedis
     Init();
 }
 
-Clef::Clef(ScoreDefInterface *clefAttr) : LayerElement("clef-")
+Clef::Clef(const ScoreDefInterface *clefAttr) : LayerElement("clef-")
 {
     Init();
 
@@ -50,12 +50,12 @@ void Clef::Reset()
     ResetOctavedisplacement();
 }
 
-int Clef::GetClefId()
+int Clef::GetClefId() const
 {
     return GetDisPlace() << 24 | GetDis() << 16 | GetShape() << 8 | GetLine();
 }
 
-int Clef::GetClefOffset()
+int Clef::GetClefOffset() const
 {
     int clefCode = GetClefId();
     int offset = 0; // case 5: UT 1e ligne par default, valable pour PERC

@@ -10,15 +10,19 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#include <vector>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "hairpin.h"
 #include "layer.h"
+#include "measure.h"
 #include "note.h"
 #include "syl.h"
 #include "system.h"
 #include "timeinterface.h"
+#include "verse.h"
 
 namespace vrv {
 
@@ -26,7 +30,7 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n) : DocObject("staff-"), AttCommon()
+Staff::Staff(int n) : Object("staff-"), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
@@ -40,7 +44,7 @@ Staff::~Staff()
 
 void Staff::Reset()
 {
-    DocObject::Reset();
+    Object::Reset();
     ResetCommon();
 
     m_drawingStaffSize = 100;
@@ -93,7 +97,7 @@ bool Staff::GetPosOnPage(ArrayPtrVoid *params)
     return false;
 }
 
-int Staff::GetYRel()
+int Staff::GetYRel() const
 {
     if (m_staffAlignment) {
         return m_staffAlignment->GetYRel();
@@ -108,23 +112,44 @@ int Staff::GetYRel()
 int Staff::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
-    // param 1: the staffNb
+    // param 1: the staffIdx
+    // param 2: the staffN
+    // param 3: the doc
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
-    int *staffNb = static_cast<int *>((*params).at(1));
+    int *staffIdx = static_cast<int *>((*params).at(1));
+    int *staffN = static_cast<int *>((*params).at(2));
+    Doc *doc = static_cast<Doc *>((*params).at(3));
 
     // we need to call it because we are overriding Object::AlignVertically
     this->ResetVerticalAlignment();
 
+    *staffN = this->GetN();
+
     // this gets (or creates) the measureAligner for the measure
-    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffNb);
+    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffIdx, this, doc);
 
     assert(alignment);
 
     // Set the pointer of the m_alignment
     m_staffAlignment = alignment;
 
+    std::vector<Object *>::iterator it;
+    it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(VERSE));
+    if (it != m_timeSpanningElements.end()) {
+        Verse *v = dynamic_cast<Verse *>(*it);
+        assert(v);
+        alignment->SetVerseCount(v->GetN());
+    }
+    it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(HAIRPIN));
+    if (it != m_timeSpanningElements.end()) {
+        Hairpin *h = dynamic_cast<Hairpin *>(*it);
+        assert(h);
+        if (h->GetPlace() == STAFFREL_above) alignment->SetHairpinAbove();
+        if (h->GetPlace() == STAFFREL_below) alignment->SetHairpinBelow();
+    }
+
     // for next staff
-    (*staffNb)++;
+    (*staffIdx)++;
 
     return FUNCTOR_CONTINUE;
 }
@@ -132,28 +157,20 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
 int Staff::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
 {
     // param 0: the current Syl
-    std::vector<DocObject *> *elements = static_cast<std::vector<DocObject *> *>((*params).at(0));
+    std::vector<Object *> *elements = static_cast<std::vector<Object *> *>((*params).at(0));
 
-    std::vector<DocObject *>::iterator iter = elements->begin();
+    std::vector<Object *>::iterator iter = elements->begin();
     while (iter != elements->end()) {
-        TimeSpanningInterface *interface = dynamic_cast<TimeSpanningInterface *>(*iter);
+        TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
         assert(interface);
-        Staff *endParent = dynamic_cast<Staff *>(interface->GetEnd()->GetFirstParent(STAFF));
-        assert(endParent);
-        // Because we are not processing following staff @n, we need to check it here.
-        // this might cause problem with cross-staves slurs if the end is on a lower staff than the start:
-        // this will be true for the staff below the start in the same measure - a fix would be to check if
-        // we are still in the same measure (compare this->m_parent and start->m_parent)
-        if (endParent->GetN() == this->GetN()) {
+        Measure *currentMeasure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+        assert(currentMeasure);
+        // We need to make sure we are in the next measure (and not just a staff below because of some cross staff
+        // notation
+        if ((interface->GetStartMeasure() != currentMeasure) && (interface->IsOnStaff(this->GetN()))) {
             m_timeSpanningElements.push_back(*iter);
         }
-        // We have reached the end of the spanning - remove it from the list of running elements
-        if (endParent == this) {
-            iter = elements->erase(iter);
-        }
-        else {
-            iter++;
-        }
+        iter++;
     }
     return FUNCTOR_CONTINUE;
 }
@@ -180,7 +197,6 @@ int Staff::FillStaffCurrentLyrics(ArrayPtrVoid *params)
 
 int Staff::ResetDrawing(ArrayPtrVoid *params)
 {
-    // Pass it to the pseudo functor of the interface
     this->m_timeSpanningElements.clear();
     return FUNCTOR_CONTINUE;
 };
@@ -194,6 +210,7 @@ int Staff::SetDrawingXY(ArrayPtrVoid *params)
     // param 4: a pointer to the current layer (unused)
     // param 5: a pointer to the view (unused)
     // param 6: a bool indicating if we are processing layer elements or not
+    // param 7: a pointer to the functor for passing it to the timestamps (unused)
     Doc *doc = static_cast<Doc *>((*params).at(0));
     System **currentSystem = static_cast<System **>((*params).at(1));
     Staff **currentStaff = static_cast<Staff **>((*params).at(3));
@@ -231,7 +248,7 @@ int Staff::PrepareRpt(ArrayPtrVoid *params)
     ScoreDef *scoreDef = static_cast<ScoreDef *>((*params).at(2));
 
     // If multiNumber is set, we already know that nothing needs to be done
-    // Futhermore, if @multi.number is false, the functor should have stop (see below)
+    // Futhermore, if @multi.number is false, the functor should have stopped (see below)
     if ((*multiNumber) != BOOLEAN_NONE) {
         return FUNCTOR_CONTINUE;
     }

@@ -11,6 +11,7 @@ swig -c++ -java -package org.rismch.verovio -outdir src/main/java/org/rismch/ver
 
 FILES="../src/accid.cpp \
              ../src/aligner.cpp \
+             ../src/anchoredtext.cpp \
              ../src/att.cpp \
              ../src/barline.cpp \
              ../src/bboxdevicecontext.cpp \
@@ -19,13 +20,16 @@ FILES="../src/accid.cpp \
              ../src/clef.cpp \
              ../src/custos.cpp \
              ../src/devicecontext.cpp \
+             ../src/dir.cpp \
              ../src/doc.cpp \
              ../src/dot.cpp \
              ../src/drawinginterface.cpp \
              ../src/durationinterface.cpp \
+             ../src/dynam.cpp \
              ../src/editorial.cpp \
              ../src/floatingelement.cpp \
              ../src/glyph.cpp \
+             ../src/hairpin.cpp \
              ../src/io.cpp \
              ../src/iodarms.cpp \
              ../src/iomei.cpp \
@@ -34,9 +38,10 @@ FILES="../src/accid.cpp \
              ../src/keysig.cpp \
              ../src/layer.cpp \
              ../src/layerelement.cpp \
+             ../src/ligature.cpp \
+             ../src/measure.cpp \
              ../src/mensur.cpp \
              ../src/metersig.cpp \
-             ../src/measure.cpp \
              ../src/mrest.cpp \
              ../src/multirest.cpp \
              ../src/note.cpp \
@@ -56,12 +61,13 @@ FILES="../src/accid.cpp \
              ../src/svgdevicecontext.cpp \
              ../src/syl.cpp \
              ../src/system.cpp \
+             ../src/tempo.cpp \
              ../src/text.cpp \
-             ../src/textdirective.cpp \
              ../src/textdirinterface.cpp \
              ../src/textelement.cpp \
              ../src/tie.cpp \
              ../src/timeinterface.cpp \
+             ../src/timestamp.cpp \
              ../src/toolkit.cpp \
              ../src/tuplet.cpp \
              ../src/verse.cpp \
@@ -75,7 +81,12 @@ FILES="../src/accid.cpp \
              ../src/view_text.cpp \
              ../src/view_tuplet.cpp \
              ../src/vrv.cpp \
-             ../src/pugixml.cpp \
+             ../src/pugi/pugixml.cpp \
+             ../src/midi/Binasc.cpp \
+             ../src/midi/MidiEvent.cpp \
+             ../src/midi/MidiEventList.cpp \
+             ../src/midi/MidiFile.cpp \
+             ../src/midi/MidiMessage.cpp \
              ../libmei/attconverter.cpp \
              ../libmei/atts_cmn.cpp \
              ../libmei/atts_critapp.cpp \
@@ -84,7 +95,7 @@ FILES="../src/accid.cpp \
              ../libmei/atts_pagebased.cpp \
              ../libmei/atts_shared.cpp"
 
-CXXOPTS="-g -fpic -I../include -I../include/vrv -I../libmei -I/opt/local/include/ -I/System/Library/Frameworks/JavaVM.framework/Headers/"
+CXXOPTS="-g -fpic -std=c++11 -I../include -I../include/vrv -I../include/midi -I../include/pugi -I../include/utf8 -I../libmei -I/opt/local/include/ -I/System/Library/Frameworks/JavaVM.framework/Headers/"
 g++ -shared -o target/libverovio.jnilib $CXXOPTS $FILES verovio_wrap.cxx
 cp target/libverovio.jnilib target/classes/META-INF/lib
 

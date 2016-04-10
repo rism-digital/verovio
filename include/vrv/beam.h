@@ -8,12 +8,12 @@
 #ifndef __VRV_BEAM_H__
 #define __VRV_BEAM_H__
 
-#include "layerelement.h"
 #include "drawinginterface.h"
+#include "layerelement.h"
 
 namespace vrv {
 
-// maximum number of partials allow
+// the maximum allowed number of partials
 #define MAX_DURATION_PARTIALS 16
 
 enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
@@ -26,17 +26,17 @@ class Beam : public LayerElement, public ObjectListInterface, public DrawingList
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
+     * Reset method resets all attribute classes.
      */
     ///@{
     Beam();
     virtual ~Beam();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Beam"; };
-    virtual ClassId Is() { return BEAM; };
+    virtual std::string GetClassName() const { return "Beam"; };
+    virtual ClassId Is() const { return BEAM; };
     ///@}
 
-    int GetNoteCount() const { return (int)m_children.size(); };
+    int GetNoteCount() const { return this->GetChildCount(NOTE); };
 
     /**
      * Add an element (a note or a rest) to a beam.
@@ -45,7 +45,8 @@ public:
     void AddLayerElement(LayerElement *element);
 
     /**
-     * Return information about the position in the beam
+     * Return information about the position in the beam.
+     * (no const since the cached list is updated)
      */
     ///@{
     bool IsFirstInBeam(LayerElement *element);
@@ -55,7 +56,7 @@ public:
     /**
      *
      */
-    const ArrayOfBeamElementCoords *GetElementCoords() { return &m_beamElementCoords; };
+    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; };
 
 protected:
     /**
@@ -81,9 +82,9 @@ public:
     //
 private:
     /**
-     * An array of the coordinates for each element
+     * An array of coordinates for each element
      **/
-    ArrayOfBeamElementCoords m_beamElementCoords;
+    mutable ArrayOfBeamElementCoords m_beamElementCoords;
 };
 
 //----------------------------------------------------------------------------

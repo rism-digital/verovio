@@ -26,18 +26,18 @@ class System;
  * A Page is contained in a Doc.
  * It contains System objects.
 */
-class Page : public DocObject {
+class Page : public Object {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Page();
     virtual ~Page();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Page"; };
-    virtual ClassId Is() { return PAGE; };
+    virtual std::string GetClassName() const { return "Page"; };
+    virtual ClassId Is() const { return PAGE; };
     ///@}
 
     /**
@@ -57,10 +57,10 @@ public:
     /**
      * Return the position of the staff on the page, from top to bottom
      */
-    int GetStaffPosOnPage(Staff *staff);
+    int GetStaffPosOnPage(Staff *staff) const;
 
     /**
-     * Do the layout of the page, whichi means aligning is content horizontally
+     * Do the layout of the page, which means aligning its content horizontally
      * and vertically, and justify horizontally and vertically if wanted.
      * This will be done only if m_layoutDone is false or force is true.
      */
@@ -91,21 +91,22 @@ public:
      * This is used for adjusting the page height when this is the expected behaviour,
      * typically with the --adjust-page-height option in the commandline tool
      */
-    int GetContentHeight();
+    int GetContentHeight() const;
 
     /**
      * Return the width of the content by looking at the first system of the page.
-     * This is used for adjusting the page with when this is the expected behaviour,
+     * This is used for adjusting the page width when this is the expected behaviour,
      * typically with the --no_layout option in the commandline tool
      *
      */
-    int GetContentWidth();
+    int GetContentWidth() const;
 
     //----------//
     // Functors //
     //----------//
 
 private:
+    //
 public:
     /** Page width (MEI scoredef@page.width). Saved if != -1 */
     int m_pageWidth;
@@ -127,13 +128,13 @@ public:
      * Hold the top scoreDef of the page.
      * The value must be initialized by going through the whole score for finding
      * all the clef or key changes that might occur within the text.
-     * The value is initialized with by the Object::SetCurrentScoreDef functor.
+     * The value is initialized by the Object::SetCurrentScoreDef functor.
      */
     ScoreDef m_drawingScoreDef;
 
 private:
     /**
-     * A flag for indicating whether the layout has been done or not
+     * A flag for indicating whether the layout has been done or not.
      * If yes, Layout will not layout the page (again) unless
      * the force parameter is set.
      */

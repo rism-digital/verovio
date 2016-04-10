@@ -18,14 +18,14 @@ namespace vrv {
 
 /**
  * This class is an interface for elements with a position on the staff, such as rests.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  * For now, the position is handled in a similar way that for PitchInterface, that is with a pitch and octave.
  */
 class PositionInterface : public Interface, public AttStafflocPitched {
 public:
     /**
      * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     PositionInterface();
@@ -36,12 +36,14 @@ public:
 
     /**
      * Inteface comparison operator.
-     * Check if the LayerElement has a PositionInterface and compare attributes
+     * Checks if the LayerElement has a PositionInterface and compares attributes
      */
     bool HasIdenticalPositionInterface(PositionInterface *otherPitchInterface);
 
 private:
+    //
 public:
+    //
 private:
 };
 

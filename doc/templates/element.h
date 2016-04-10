@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_ELEMENT_H__
 #define __VRV_ELEMENT_H__
 
@@ -13,16 +12,14 @@
 #include "layerelement.h"
 
 namespace vrv {
-    
+
 class ChildElement;
 
 //----------------------------------------------------------------------------
 // Element
 //----------------------------------------------------------------------------
 
-class Element: public LayerElement,
-    public AttCommon
-{
+class Element : public LayerElement, public AttCommon {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -32,24 +29,25 @@ public:
     Element();
     virtual ~Element();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Element"; };
+    virtual std::string GetClassName() { return "Element"; };
+    virtual ClassId Is() { return ELEMENT; };
     ///@}
-    
+
     /**
      * Add childElement to a element.
      */
     void AddChildElement(Object *childElement);
-    
+
 protected:
-
+    //
 private:
-    
+    //
 public:
-    
+    //
 private:
-
+    //
 };
 
-} // namespace vrv    
-    
+} // namespace vrv
+
 #endif

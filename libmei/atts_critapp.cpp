@@ -65,7 +65,7 @@ bool AttCrit::WriteCrit(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttCrit::HasCause()
+bool AttCrit::HasCause() const
 {
     return (m_cause != "");
 }
@@ -111,7 +111,7 @@ bool AttSource::WriteSource(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttSource::HasSource()
+bool AttSource::HasSource() const
 {
     return (m_source != "");
 }
@@ -140,17 +140,17 @@ bool Att::SetCritapp(Object *element, std::string attrType, std::string attrValu
     return false;
 }
 
-void Att::GetCritapp(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetCritapp(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_CRIT)) {
-        AttCrit *att = dynamic_cast<AttCrit *>(element);
+        const AttCrit *att = dynamic_cast<const AttCrit *>(element);
         assert(att);
         if (att->HasCause()) {
             attributes->push_back(std::make_pair("cause", att->StrToStr(att->GetCause())));
         }
     }
     if (element->HasAttClass(ATT_SOURCE)) {
-        AttSource *att = dynamic_cast<AttSource *>(element);
+        const AttSource *att = dynamic_cast<const AttSource *>(element);
         assert(att);
         if (att->HasSource()) {
             attributes->push_back(std::make_pair("source", att->StrToStr(att->GetSource())));

@@ -51,7 +51,7 @@ public:
     ///@{
     void SetFret(data_FRET fret_) { m_fret = fret_; };
     data_FRET GetFret() const { return m_fret; };
-    bool HasFret();
+    bool HasFret() const;
     ///@}
 
 private:
@@ -87,7 +87,7 @@ public:
     ///@{
     void SetChordref(std::string chordref_) { m_chordref = chordref_; };
     std::string GetChordref() const { return m_chordref; };
-    bool HasChordref();
+    bool HasChordref() const;
     ///@}
 
 private:
@@ -123,7 +123,7 @@ public:
     ///@{
     void SetRendgrid(harmVis_RENDGRID rendgrid_) { m_rendgrid = rendgrid_; };
     harmVis_RENDGRID GetRendgrid() const { return m_rendgrid; };
-    bool HasRendgrid();
+    bool HasRendgrid() const;
     ///@}
 
 private:

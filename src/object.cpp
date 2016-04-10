@@ -8,13 +8,15 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
 #include "chord.h"
+#include "dir.h"
 #include "doc.h"
+#include "dynam.h"
 #include "editorial.h"
 #include "io.h"
 #include "keysig.h"
@@ -27,37 +29,188 @@
 #include "page.h"
 #include "staff.h"
 #include "system.h"
+#include "tempo.h"
 #include "text.h"
-#include "textdirective.h"
 #include "textelement.h"
 #include "vrv.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
+// BoundingBox
+//----------------------------------------------------------------------------
+
+BoundingBox::BoundingBox()
+{
+    ResetBoundingBox();
+}
+
+ClassId BoundingBox::Is() const
+{
+    // we should always have the method overridden
+    assert(false);
+    return BOUNDING_BOX;
+};
+
+void BoundingBox::UpdateContentBBoxX(int x1, int x2)
+{
+    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
+
+    int min_x = std::min(x1, x2);
+    int max_x = std::max(x1, x2);
+
+    min_x -= m_drawingX;
+    max_x -= m_drawingX;
+
+    if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
+    if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
+
+    m_updatedBBoxX = true;
+    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
+    // GetClassName().c_str());
+}
+
+void BoundingBox::UpdateContentBBoxY(int y1, int y2)
+{
+    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
+
+    int min_y = std::min(y1, y2);
+    int max_y = std::max(y1, y2);
+
+    min_y -= m_drawingY;
+    max_y -= m_drawingY;
+
+    if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
+    if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
+
+    m_updatedBBoxY = true;
+    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
+    // GetClassName().c_str());
+}
+
+void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
+{
+    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+
+    int min_x = std::min(x1, x2);
+    int max_x = std::max(x1, x2);
+
+    min_x -= m_drawingX;
+    max_x -= m_drawingX;
+
+    if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
+    if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
+
+    m_updatedBBoxX = true;
+
+    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+}
+
+void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
+{
+    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+
+    int min_y = std::min(y1, y2);
+    int max_y = std::max(y1, y2);
+
+    min_y -= m_drawingY;
+    max_y -= m_drawingY;
+
+    if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
+    if (m_selfBB_y2 < max_y) m_selfBB_y2 = max_y;
+
+    m_updatedBBoxY = true;
+
+    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
+}
+
+void BoundingBox::ResetBoundingBox()
+{
+    m_contentBB_x1 = 0xFFFFFFF;
+    m_contentBB_y1 = 0xFFFFFFF;
+    m_contentBB_x2 = -0xFFFFFFF;
+    m_contentBB_y2 = -0xFFFFFFF;
+    m_selfBB_x1 = 0xFFFFFFF;
+    m_selfBB_y1 = 0xFFFFFFF;
+    m_selfBB_x2 = -0xFFFFFFF;
+    m_selfBB_y2 = -0xFFFFFFF;
+
+    m_updatedBBoxX = false;
+    m_updatedBBoxY = false;
+}
+
+void BoundingBox::SetEmptyBB()
+{
+    m_contentBB_x1 = 0;
+    m_contentBB_y1 = 0;
+    m_contentBB_x2 = 0;
+    m_contentBB_y2 = 0;
+    m_selfBB_x1 = 0;
+    m_selfBB_y1 = 0;
+    m_selfBB_x2 = 0;
+    m_selfBB_y2 = 0;
+
+    m_updatedBBoxX = true;
+    m_updatedBBoxY = true;
+}
+
+bool BoundingBox::HasEmptyBB()
+{
+    return (HasUpdatedBB() && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
+        && (m_contentBB_y2 == 0));
+}
+
+bool BoundingBox::HasContentBB()
+{
+    return ((m_contentBB_x1 != 0xFFFF) && (m_contentBB_y1 != 0xFFFF) && (m_contentBB_x2 != -0xFFFF)
+        && (m_contentBB_y2 != -0xFFFF));
+}
+
+bool BoundingBox::HasSelfBB()
+{
+    return ((m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF));
+}
+
+bool BoundingBox::HorizontalOverlap(const BoundingBox *other) const
+{
+    assert(other);
+
+    if (m_drawingX + m_contentBB_x2 < other->GetDrawingX() + other->m_contentBB_x1) return false;
+    if (m_drawingX + m_contentBB_x1 > other->GetDrawingX() + other->m_contentBB_x2) return false;
+    return true;
+}
+
+int BoundingBox::CalcVerticalOverlap(const BoundingBox *other) const
+{
+    assert(other);
+    return 0;
+}
+
+//----------------------------------------------------------------------------
 // Object
 //----------------------------------------------------------------------------
 
-Object::Object()
+Object::Object() : BoundingBox()
 {
     Init("m-");
 }
 
-Object::Object(std::string classid)
+Object::Object(std::string classid) : BoundingBox()
 {
     Init(classid);
 }
 
-Object *Object::Clone()
+Object *Object::Clone() const
 {
-    // This should never happen because the method should be overwritten
+    // This should never happen because the method should be overridden
     assert(false);
     return NULL;
 }
 
-Object::Object(const Object &object)
+Object::Object(const Object &object) : BoundingBox(object)
 {
     ClearChildren();
+    ResetBoundingBox(); // It does not make sense to keep the values of the BBox
     m_parent = NULL;
     m_classid = object.m_classid;
     m_uuid = object.m_uuid; // for now copy the uuid - to be decided
@@ -78,6 +231,7 @@ Object &Object::operator=(const Object &object)
     // not self assignement
     if (this != &object) {
         ClearChildren();
+        ResetBoundingBox(); // It does not make sense to keep the values of the BBox
         m_parent = NULL;
         m_classid = object.m_classid;
         m_uuid = object.m_uuid; // for now copy the uuid - to be decided
@@ -106,13 +260,21 @@ void Object::Init(std::string classid)
     m_isModified = true;
     m_classid = classid;
     this->GenerateUuid();
+
+    Reset();
 }
 
-ClassId Object::Is()
+ClassId Object::Is() const
 {
-    // we should always have the method overwritten
+    // we should always have the method overridden
     assert(false);
     return OBJECT;
+};
+
+void Object::Reset()
+{
+    ClearChildren();
+    ResetBoundingBox();
 };
 
 void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId interfaceId)
@@ -146,7 +308,7 @@ void Object::ClearChildren()
 {
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
-        // we need to check if the this is the parent
+        // we need to check if this is the parent
         // ownership might have been given up with Relinquish
         if ((*iter)->m_parent == this) {
             delete *iter;
@@ -155,12 +317,12 @@ void Object::ClearChildren()
     m_children.clear();
 }
 
-int Object::GetChildCount(const ClassId classId)
+int Object::GetChildCount(const ClassId classId) const
 {
     return (int)count_if(m_children.begin(), m_children.end(), ObjectComparison(classId));
 }
 
-int Object::GetAttributes(ArrayOfStrAttr *attributes)
+int Object::GetAttributes(ArrayOfStrAttr *attributes) const
 {
     assert(attributes);
     attributes->clear();
@@ -173,7 +335,7 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes)
     return (int)attributes->size();
 }
 
-bool Object::HasAttribute(std::string attribute, std::string value)
+bool Object::HasAttribute(std::string attribute, std::string value) const
 {
     ArrayOfStrAttr attributes;
     this->GetAttributes(&attributes);
@@ -197,6 +359,12 @@ Object *Object::GetNext()
     m_iteratorCurrent++;
     m_iteratorCurrent = std::find_if(m_iteratorCurrent, m_iteratorEnd, ObjectComparison(m_iteratorElementType));
     return (m_iteratorCurrent == m_iteratorEnd) ? NULL : *m_iteratorCurrent;
+}
+
+Object *Object::GetLast() const
+{
+    if (m_children.empty()) return NULL;
+    return m_children.back();
 }
 
 int Object::GetIdx() const
@@ -280,7 +448,7 @@ Object *Object::FindChildExtremeByAttComparison(AttComparison *attComparison, in
     return element;
 }
 
-Object *Object::GetChild(int idx)
+Object *Object::GetChild(int idx) const
 {
     if ((idx < 0) || (idx >= (int)m_children.size())) {
         return NULL;
@@ -302,7 +470,7 @@ void Object::GenerateUuid()
 {
     int nr = std::rand();
     char str[17];
-    // I do not want to use a stream to do this!
+    // I do not want to use a stream for doing this!
     snprintf(str, 16, "%016d", nr);
 
     m_uuid = m_classid + std::string(str);
@@ -321,10 +489,10 @@ void Object::SetParent(Object *parent)
 
 void Object::AddEditorialElement(EditorialElement *child)
 {
-    assert(dynamic_cast<Layer *>(this) || dynamic_cast<LayerElement *>(this) || dynamic_cast<Lem *>(this)
-        || dynamic_cast<Measure *>(this) || dynamic_cast<Note *>(this) || dynamic_cast<Staff *>(this)
-        || dynamic_cast<System *>(this) || dynamic_cast<Tempo *>(this) || dynamic_cast<EditorialElement *>(this)
-        || dynamic_cast<TextElement *>(this));
+    assert(dynamic_cast<Dir *>(this) || dynamic_cast<Dynam *>(this) || dynamic_cast<Layer *>(this)
+        || dynamic_cast<LayerElement *>(this) || dynamic_cast<Lem *>(this) || dynamic_cast<Measure *>(this)
+        || dynamic_cast<Note *>(this) || dynamic_cast<Staff *>(this) || dynamic_cast<System *>(this)
+        || dynamic_cast<Tempo *>(this) || dynamic_cast<EditorialElement *>(this) || dynamic_cast<TextElement *>(this));
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
@@ -359,20 +527,6 @@ void Object::FillFlatList(ListOfObjects *flatList)
     this->Process(&addToFlatList, &params);
 }
 
-void Object::AddSameAs(std::string id, std::string filename)
-{
-    std::string sameAs = filename;
-    if (!filename.empty()) {
-        sameAs += "#";
-    }
-    sameAs += id;
-
-    if (!m_sameAs.empty()) {
-        m_sameAs += " ";
-    }
-    m_sameAs += sameAs;
-}
-
 Object *Object::GetFirstParent(const ClassId classId, int maxDepth)
 {
     if ((maxDepth == 0) || !m_parent) {
@@ -401,30 +555,6 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
     }
 }
 
-bool Object::GetSameAs(std::string *id, std::string *filename, int idx)
-{
-    int i = 0;
-
-    std::istringstream iss(m_sameAs);
-    std::string token;
-    while (getline(iss, token, ' ')) {
-        if (i == idx) {
-            size_t pos = token.find("#");
-            if (pos != std::string::npos) {
-                (*filename) = token.substr(0, pos);
-                (*id) = token.substr(pos + 1, std::string::npos);
-            }
-            else {
-                (*filename) = "";
-                (*id) = token;
-            }
-            return true;
-        }
-        i++;
-    }
-    return false;
-}
-
 void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor, ArrayOfAttComparisons *filters,
     int deepness, bool direction)
 {
@@ -448,7 +578,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor
         return;
     }
     else if (this->IsEditorialElement()) {
-        // since editorial object do not count, we re-increase the deepness limit
+        // since editorial object doesn't count, we increase the deepness limit
         deepness++;
     }
     if (deepness == 0) {
@@ -461,7 +591,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor
     // We need a pointer to the array for the option to work on a reversed copy
     ArrayOfObjects *children = &this->m_children;
     ArrayOfObjects reversed;
-    // For processing backward, we operated on a copied reversed version
+    // For processing backwards, we operated on a copied reversed version
     // Since we hold pointers, only addresses are copied
     if (direction == BACKWARD) {
         reversed = (*children);
@@ -517,121 +647,6 @@ int Object::Save(FileOutputStream *output)
     this->Process(&save, &params, &saveEnd);
 
     return true;
-}
-
-//----------------------------------------------------------------------------
-// DocObject
-//----------------------------------------------------------------------------
-
-// Note: since it is one line of code
-// I am not making a new function for the two
-// constructors.
-DocObject::DocObject() : Object("md-")
-{
-    ResetBB();
-}
-
-DocObject::DocObject(std::string classid) : Object(classid)
-{
-    // m_doc = NULL;
-    ResetBB();
-}
-
-DocObject::~DocObject()
-{
-}
-
-void DocObject::UpdateContentBB(int x1, int y1, int x2, int y2)
-{
-    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
-
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
-    int min_y = std::min(y1, y2);
-    int max_y = std::max(y1, y2);
-
-    min_x -= m_drawingX;
-    max_x -= m_drawingX;
-    min_y -= m_drawingY;
-    max_y -= m_drawingY;
-
-    if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
-    if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
-    if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
-    if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
-
-    m_updatedBB = true;
-    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // GetClassName().c_str());
-}
-
-void DocObject::UpdateSelfBB(int x1, int y1, int x2, int y2)
-{
-    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
-    int min_y = std::min(y1, y2);
-    int max_y = std::max(y1, y2);
-
-    min_x -= m_drawingX;
-    max_x -= m_drawingX;
-    min_y -= m_drawingY;
-    max_y -= m_drawingY;
-
-    if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
-    if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
-    if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
-    if (m_selfBB_y2 < max_y) m_selfBB_y2 = max_y;
-
-    m_updatedBB = true;
-
-    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-}
-
-void DocObject::ResetBB()
-{
-    m_contentBB_x1 = 0xFFFFFFF;
-    m_contentBB_y1 = 0xFFFFFFF;
-    m_contentBB_x2 = -0xFFFFFFF;
-    m_contentBB_y2 = -0xFFFFFFF;
-    m_selfBB_x1 = 0xFFFFFFF;
-    m_selfBB_y1 = 0xFFFFFFF;
-    m_selfBB_x2 = -0xFFFFFFF;
-    m_selfBB_y2 = -0xFFFFFFF;
-
-    m_updatedBB = false;
-}
-
-void DocObject::SetEmptyBB()
-{
-    m_contentBB_x1 = 0;
-    m_contentBB_y1 = 0;
-    m_contentBB_x2 = 0;
-    m_contentBB_y2 = 0;
-    m_selfBB_x1 = 0;
-    m_selfBB_y1 = 0;
-    m_selfBB_x2 = 0;
-    m_selfBB_y2 = 0;
-
-    m_updatedBB = true;
-}
-
-bool DocObject::HasEmptyBB()
-{
-    return (m_updatedBB && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
-        && (m_contentBB_y2 == 0));
-}
-
-bool DocObject::HasContentBB()
-{
-    return ((m_contentBB_x1 != 0xFFFF) && (m_contentBB_y1 != 0xFFFF) && (m_contentBB_x2 != -0xFFFF)
-        && (m_contentBB_y2 != -0xFFFF));
-}
-
-bool DocObject::HasSelfBB()
-{
-    return ((m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF));
 }
 
 //----------------------------------------------------------------------------
@@ -701,7 +716,7 @@ Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const Class
     return (rit == m_list.rend()) ? NULL : *rit;
 }
 
-Object *ObjectListInterface::GetListPrevious(const Object *listElement)
+Object *ObjectListInterface::GetListPrevious(Object *listElement)
 {
     ListOfObjects::iterator iter;
     int i;
@@ -718,7 +733,7 @@ Object *ObjectListInterface::GetListPrevious(const Object *listElement)
     return NULL;
 }
 
-Object *ObjectListInterface::GetListNext(const Object *listElement)
+Object *ObjectListInterface::GetListNext(Object *listElement)
 {
     ListOfObjects::reverse_iterator iter;
     int i;
@@ -959,40 +974,14 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::AlignHorizontally(ArrayPtrVoid *params)
-{
-    // param 0: the measureAligner (unused)
-    // param 1: the time (unused)
-    // param 2: the current Mensur (unused)
-    // param 3: the current MeterSig (unused)
-
-    // reset all the drawing values - this also need to be called
-    // from any functor overriding this one!
-    this->ResetHorizontalAlignment();
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::AlignVertically(ArrayPtrVoid *params)
-{
-    // param 0: the systemAligner (unused)
-    // param 1: the staffNb (unused
-
-    // reset all the drawing values - this also need to be called
-    // from any functor overriding this one!
-    this->ResetVerticalAlignment();
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
 {
     // param 0: the minimum position (i.e., the width of the previous element)
     // param 1: the Doc
     int *min_pos = static_cast<int *>((*params).at(0));
     Doc *doc = static_cast<Doc *>((*params).at(1));
-    
-    // starting an new layer
+
+    // starting new layer
     if (this->Is() == LAYER) {
         (*min_pos) = 0;
         return FUNCTOR_CONTINUE;
@@ -1013,17 +1002,17 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     // we should have processed aligned before
     assert(note->GetGraceAlignment());
 
-    // the negative offset it the part of the bounding box that overflows on the left
+    // the negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    int negative_offset = -(note->m_contentBB_x1)
-        + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    int negative_offset
+        = -(note->m_contentBB_x1) + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
     if ((*min_pos) > 0) {
         //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }
 
-    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used
+    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used)
     if (negative_offset < 0) negative_offset = 0;
 
     // check if the element overlaps with the preceeding one given by (*min_pos)
@@ -1068,7 +1057,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
         return FUNCTOR_CONTINUE;
     }
 
-    // starting an new layer
+    // starting new layer
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer *>(this);
         assert(current_layer);
@@ -1107,7 +1096,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     if (!current->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
         assert(false); // quite drastic but this should never happen. If nothing has to be drawn
-        // then the BB should be set to empty with DocObject::SetEmptyBB()
+        // then the BB should be set to empty with  Object::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
 
@@ -1201,7 +1190,7 @@ int Object::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
     // ending a layer
     if (this->Is() == LAYER) {
         // mininimum position is the with the layer
-        // we keep it if is higher than what we had so far
+        // we keep it if it's higher than what we had so far
         // this will be used for shifting the right barLine
         (*measure_width) = std::max((*measure_width), (*min_pos));
         return FUNCTOR_CONTINUE;
@@ -1210,81 +1199,93 @@ int Object::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetBoundingBoxYShift(ArrayPtrVoid *params)
+int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
 {
-    // param 0: the position of the previous staff
-    // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int *>((*params).at(0));
-    int *system_height = static_cast<int *>((*params).at(1));
-
-    // starting a new system
-    if (this->Is() == SYSTEM) {
-        // we reset the system height
-        (*system_height) = 0;
-        (*min_pos) = 0;
-        return FUNCTOR_CONTINUE;
-    }
-
-    // starting a new measure
-    if (this->Is() == MEASURE) {
-        (*min_pos) = 0;
-        return FUNCTOR_CONTINUE;
-    }
+    // param 0: the maximum height in the current system
+    StaffAlignment **staffAlignment = static_cast<StaffAlignment **>((*params).at(0));
+    Doc *doc = static_cast<Doc *>((*params).at(1));
 
     // starting a new staff
-    if (this->Is() != STAFF) {
+    if (this->Is() == STAFF) {
+        Staff *currentStaff = dynamic_cast<Staff *>(this);
+        assert(currentStaff);
+        assert(currentStaff->GetAlignment());
+
+        (*staffAlignment) = currentStaff->GetAlignment();
+
+        // currentStaff->GetAlignment()->SetMaxHeight(currentStaff->m_contentBB_y1);
+
         return FUNCTOR_CONTINUE;
     }
 
-    Staff *current = dynamic_cast<Staff *>(this);
+    // starting new layer
+    if (this->Is() == LAYER) {
+        Layer *currentLayer = dynamic_cast<Layer *>(this);
+        assert(currentLayer);
+        // set scoreDef attr
+        if (currentLayer->GetDrawingClef()) {
+            currentLayer->GetDrawingClef()->SetOverflowBBoxes(params);
+        }
+        if (currentLayer->GetDrawingKeySig()) {
+            currentLayer->GetDrawingKeySig()->SetOverflowBBoxes(params);
+        }
+        if (currentLayer->GetDrawingMensur()) {
+            currentLayer->GetDrawingMensur()->SetOverflowBBoxes(params);
+        }
+        if (currentLayer->GetDrawingMeterSig()) {
+            currentLayer->GetDrawingMeterSig()->SetOverflowBBoxes(params);
+        }
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (this->IsFloatingElement()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (!this->IsLayerElement()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (this->Is() == SYL) {
+        // We don't want to add the syl to the overflow since lyrics require a full line anyway
+        return FUNCTOR_CONTINUE;
+    }
+
+    LayerElement *current = dynamic_cast<LayerElement *>(this);
     assert(current);
 
-    // at this stage we assume we have instantiated the alignment pointer
-    assert(current->GetAlignment());
-
-    // This is the value that needs to be removed to fit everything
-    int negative_offset = -current->m_contentBB_y2;
-
-    // this will probably never happen
-    if (negative_offset > 0) {
-        negative_offset = 0;
+    if (!current->HasToBeAligned()) {
+        // if nothing to do with this type of element
+        // return FUNCTOR_CONTINUE;
     }
 
-    // check if the staff overlaps with the preceding one given by (*min_pos)
-    int overlap = 0;
-    if ((current->GetAlignment()->GetYRel() - negative_offset) > (*min_pos)) {
-        overlap = (*min_pos) - current->GetAlignment()->GetYRel() + negative_offset;
-        current->GetAlignment()->SetYShift(overlap);
-    }
-
-    // LogDebug("%s min_pos %d; negative offset %d;  drawXRel %d; overlap %d", current->GetClassName().c_str(),
-    // (*min_pos), negative_offset,
-    // current->GetAlignment()->GetXRel(), overlap);
-
-    // the next minimal position if given by the bottom side of the bounding box + the spacing of the element
-    (*min_pos) = current->m_contentBB_y1;
-    current->GetAlignment()->SetMaxHeight(current->m_contentBB_y1);
-
-    // do not go further down the tree in this case
-    return FUNCTOR_SIBLINGS;
-}
-
-int Object::SetBoundingBoxYShiftEnd(ArrayPtrVoid *params)
-{
-    // param 0: the position of the previous staff
-    // param 1: the maximum height in the current system
-    int *min_pos = static_cast<int *>((*params).at(0));
-    int *system_height = static_cast<int *>((*params).at(1));
-
-    // ending a measure
-    if (this->Is() == MEASURE) {
-        // mininimum position is the height for the last (previous) staff
-        // we keep it if it is higher than what we had so far
-        (*system_height) = std::min((*system_height), (*min_pos));
+    if (!current->HasUpdatedBB()) {
+        // if nothing was drawn, do not take it into account
+        // assert(false); // quite drastic but this should never happen. If nothing has to be drawn
+        // LogDebug("Un-updated bounding box for '%s' '%s'", current->GetClassName().c_str(),
+        // current->GetUuid().c_str());
+        // then the BB should be set to empty with  Object::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
 
-    // ending a system: see System::SetBoundingBoxYShiftEnd
+    int staffSize = (*staffAlignment)->GetStaffSize();
+
+    int overflowAbove = (*staffAlignment)->CalcOverflowAbove(current);
+    if (overflowAbove > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+        // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+        (*staffAlignment)->SetOverflowAbove(overflowAbove);
+        (*staffAlignment)->AddBBoxAbove(current);
+    }
+
+    int overflowBelow = (*staffAlignment)->CalcOverflowBelow(current);
+    if (overflowBelow > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+        // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
+        (*staffAlignment)->SetOverflowBelow(overflowBelow);
+        (*staffAlignment)->AddBBoxBelow(current);
+    }
+
+    // do not go further down the tree in this case since the bounding box of the first element is already taken into
+    // account?
     return FUNCTOR_CONTINUE;
 }
 

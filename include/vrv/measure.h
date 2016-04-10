@@ -16,6 +16,7 @@
 namespace vrv {
 
 class FloatingElement;
+class TimestampAttr;
 
 //----------------------------------------------------------------------------
 // Measure
@@ -25,27 +26,27 @@ class FloatingElement;
  * This class represents a measure in a page-based score (Doc).
  * A Measure is contained in a Staff.
  * It contains Layer objects.
- * For internally simplication of processing, unmeasure music is contained in one single measure object
+ * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
-class Measure : public DocObject, public AttCommon, public AttMeasureLog, public AttPointing {
+class Measure : public Object, public AttCommon, public AttMeasureLog, public AttPointing {
 
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Measure(bool measuredMusic = true, int logMeasureNb = -1);
     virtual ~Measure();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Measure"; };
-    virtual ClassId Is() { return MEASURE; };
+    virtual std::string GetClassName() const { return "Measure"; };
+    virtual ClassId Is() const { return MEASURE; };
     ///@}
 
     /**
-     * Return true if measured music (otherwise we have fakes measures)
+     * Return true if measured music (otherwise we have fake measures)
      */
-    bool IsMeasuredMusic() { return m_measuredMusic; };
+    bool IsMeasuredMusic() const { return m_measuredMusic; };
 
     /**
      * @name Methods for adding allowed content
@@ -56,14 +57,20 @@ public:
     ///@}
 
     /**
+     * Add a TimestampAttr to the measure.
+     * The TimestampAttr it not added as child of the measure but to the Measure::m_timestamps array.
+     */
+    void AddTimestamp(TimestampAttr *timestampAttr);
+
+    /**
      * Return the index position of the measure in its system parent
      */
     int GetMeasureIdx() const { return Object::GetIdx(); };
 
     /**
-     * @name Set and get the left and right barLine types
-     * This somehow conflicts with AttMeasureLog, which are transfered from and to the
-     * BarLine object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
+     * @name Set and get the left and right barline types
+     * This somehow conflicts with AttMeasureLog, which is transfered from and to the
+     * Barline object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
      * MeiOutput::ReadMeiMeasure
      * Alternatively, we could keep them in sync here:
      * data_BARRENDITION GetLeftBarLineType() { m_leftBarLine.SetRend(GetRight()); return m_leftBarLine.GetRend(); };
@@ -78,41 +85,45 @@ public:
 
     /**
      * @name Set and get the barlines.
-     * Careful - the barlines are owned by the measure and will be destroy by it.
+     * Careful - the barlines are owned by the measure and will be destroyed by it.
      * This method should be used only for acessing them (e.g., when drawing) and
      * not for creating other measure objects.
      */
     ///@{
-    BarLine *GetLeftBarLine() { return &m_leftBarLine; };
-    BarLine *GetRightBarLine() { return &m_rightBarLine; };
+    BarLine *const GetLeftBarLine() { return &m_leftBarLine; };
+    BarLine *const GetRightBarLine() { return &m_rightBarLine; };
     ///@}
 
-    int GetXRel();
+    int GetXRel() const;
 
     /**
-     * Return the non justifiable with for the measure
+     * Return the non-justifiable left margin for the measure
      */
-    int GetNonJustifiableLeftMargin() { return m_measureAligner.GetNonJustifiableMargin(); }
+    int GetNonJustifiableLeftMargin() const { return m_measureAligner.GetNonJustifiableMargin(); }
 
     /**
-     * Return the X rel position of the right barLine (without its width)
+     * @name Return the X rel position of the right and left barLine (without their width)
      */
-    int GetRightBarLineX();
+    ///@{
+    int GetLeftBarLineX() const;
+    int GetRightBarLineX() const;
+    ///@}
 
     /**
      * Return the width of the measure, including the barLine width
      */
-    int GetWidth();
+    int GetWidth() const;
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * Reset the alignment values (m_drawingX, m_drawingXRel, etc.)
-     * Called by AlignHorizontally
+     * @name Reset the horizontal alignment
      */
-    virtual void ResetHorizontalAlignment();
+    ///@{
+    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params);
+    ///@}
 
     /**
      * AlignHorizontally the content of a measure.
@@ -120,18 +131,23 @@ public:
     virtual int AlignHorizontally(ArrayPtrVoid *params);
 
     /**
+     * Align horizontally the content of a layer.
+     */
+    virtual int AlignHorizontallyEnd(ArrayPtrVoid *params);
+
+    /**
      * AlignVertically the content of a measure.
      */
     virtual int AlignVertically(ArrayPtrVoid *params);
 
     /**
-     * Correct the X alignment of grace notes once the the content of a system has been aligned and laid out.
+     * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the GraceAligner.
      */
     virtual int IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params);
 
     /**
-     * Correct the X alignment once the the content of a system has been aligned and laid out.
+     * Correct the X alignment once the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the MeasureAligner.
      */
     virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params);
@@ -165,6 +181,41 @@ public:
      */
     virtual int SetDrawingXY(ArrayPtrVoid *params);
 
+    /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDrawing(ArrayPtrVoid *params);
+
+    /**
+     * See Object::FillStaffCurrentTimeSpanningEnd
+     */
+    virtual int FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params);
+
+    /**
+     * See Object::PrepareTimeSpanning.
+     */
+    virtual int PrepareTimeSpanningEnd(ArrayPtrVoid *params);
+
+    /**
+     * See Object:ExportMIDI
+     */
+    virtual int ExportMIDI(ArrayPtrVoid *params);
+
+    /**
+     * See Object:ExportMIDI
+     */
+    virtual int ExportMIDIEnd(ArrayPtrVoid *params);
+
+    /**
+     * See Object::CalcMaxMeasureDuration
+     */
+    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
+
+    /**
+     * See Object::PrepareTimestamps.
+     */
+    virtual int PrepareTimestampsEnd(ArrayPtrVoid *params);
+
 public:
     /**
      * The X absolute position of the measure for facsimile (transcription) encodings.
@@ -181,6 +232,8 @@ public:
      * The measure aligner that holds the x positions of the content of the measure
      */
     MeasureAligner m_measureAligner;
+
+    TimestampAligner m_timestampAligner;
 
 private:
     bool m_measuredMusic;

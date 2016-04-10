@@ -27,14 +27,13 @@ Style::Style()
     m_stemWidth = (unsigned short)(DEFAULT_STEM_WITDH * DEFINITION_FACTOR);
 
     /**
-     * Wolfgang legacy code used for initialiazing Doc::m_drawingBeamMin/MaxSlope
-     * and used in View::DrawBeamPostponed
+     * Used for initializing Doc::m_drawingBeamMin/MaxSlope and used in View::DrawBeamPostponed
      */
     m_beamMaxSlope = 10;
     m_beamMinSlope = 0;
 
     /**
-     * graceNum and Den for cue sized notes.
+     * graceNum and Den for cue-sized notes.
      */
     m_graceNum = 5;
     m_graceDen = 7;
@@ -49,6 +48,7 @@ Style::Style()
     m_spacingSystem = DEFAULT_SPACING_SYSTEM;
 
     m_lyricSize = DEFAULT_LYRIC_SIZE * PARAM_DENOMINATOR;
+    m_hairpinSize = DEFAULT_HAIRPIN_SIZE * PARAM_DENOMINATOR;
 
     m_minMeasureWidth = (short)(DEFAULT_MEASURE_WIDTH * PARAM_DENOMINATOR);
 
@@ -99,6 +99,12 @@ Style::Style()
     m_rightMarginRest = DEFAULT_RIGHT_MARGIN_REST * DEFINITION_FACTOR;
     /** The default right margin */
     m_rightMarginDefault = DEFAULT_RIGHT_MARGIN_DEFAULT * DEFINITION_FACTOR;
+
+    /** The default right margin */
+    m_bottomMarginDefault = DEFAULT_BOTTOM_MARGIN_DEFAULT * DEFINITION_FACTOR;
+
+    /** The default right margin */
+    m_topMarginDefault = DEFAULT_TOP_MARGIN_DEFAULT * DEFINITION_FACTOR;
 }
 
 Style::~Style()

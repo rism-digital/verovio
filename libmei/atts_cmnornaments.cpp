@@ -75,12 +75,12 @@ bool AttMordentLog::WriteMordentLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttMordentLog::HasForm()
+bool AttMordentLog::HasForm() const
 {
     return (m_form != mordentLog_FORM_NONE);
 }
 
-bool AttMordentLog::HasLong()
+bool AttMordentLog::HasLong() const
 {
     return (m_long != BOOLEAN_NONE);
 }
@@ -126,7 +126,7 @@ bool AttOrnam::WriteOrnam(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttOrnam::HasOrnam()
+bool AttOrnam::HasOrnam() const
 {
     return (m_ornam != ORNAM_cmn_NONE);
 }
@@ -182,12 +182,12 @@ bool AttOrnamentaccid::WriteOrnamentaccid(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttOrnamentaccid::HasAccidupper()
+bool AttOrnamentaccid::HasAccidupper() const
 {
     return (m_accidupper != ACCIDENTAL_EXPLICIT_NONE);
 }
 
-bool AttOrnamentaccid::HasAccidlower()
+bool AttOrnamentaccid::HasAccidlower() const
 {
     return (m_accidlower != ACCIDENTAL_EXPLICIT_NONE);
 }
@@ -243,12 +243,12 @@ bool AttTurnLog::WriteTurnLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttTurnLog::HasDelayed()
+bool AttTurnLog::HasDelayed() const
 {
     return (m_delayed != BOOLEAN_NONE);
 }
 
-bool AttTurnLog::HasForm()
+bool AttTurnLog::HasForm() const
 {
     return (m_form != turnLog_FORM_NONE);
 }
@@ -305,10 +305,10 @@ bool Att::SetCmnornaments(Object *element, std::string attrType, std::string att
     return false;
 }
 
-void Att::GetCmnornaments(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_MORDENTLOG)) {
-        AttMordentLog *att = dynamic_cast<AttMordentLog *>(element);
+        const AttMordentLog *att = dynamic_cast<const AttMordentLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->MordentLogFormToStr(att->GetForm())));
@@ -318,14 +318,14 @@ void Att::GetCmnornaments(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_ORNAM)) {
-        AttOrnam *att = dynamic_cast<AttOrnam *>(element);
+        const AttOrnam *att = dynamic_cast<const AttOrnam *>(element);
         assert(att);
         if (att->HasOrnam()) {
             attributes->push_back(std::make_pair("ornam", att->OrnamCmnToStr(att->GetOrnam())));
         }
     }
     if (element->HasAttClass(ATT_ORNAMENTACCID)) {
-        AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid *>(element);
+        const AttOrnamentaccid *att = dynamic_cast<const AttOrnamentaccid *>(element);
         assert(att);
         if (att->HasAccidupper()) {
             attributes->push_back(std::make_pair("accidupper", att->AccidentalExplicitToStr(att->GetAccidupper())));
@@ -335,7 +335,7 @@ void Att::GetCmnornaments(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_TURNLOG)) {
-        AttTurnLog *att = dynamic_cast<AttTurnLog *>(element);
+        const AttTurnLog *att = dynamic_cast<const AttTurnLog *>(element);
         assert(att);
         if (att->HasDelayed()) {
             attributes->push_back(std::make_pair("delayed", att->BooleanToStr(att->GetDelayed())));

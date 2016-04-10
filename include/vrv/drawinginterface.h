@@ -14,7 +14,7 @@
 namespace vrv {
 
 class Clef;
-class DocObject;
+class  Object;
 class KeySig;
 class Mensur;
 class MeterSig;
@@ -45,7 +45,7 @@ public:
      * that need to be drawn in a particular order.
      * For example, we need to draw beams before tuplets
      */
-    void AddToDrawingList(DocObject *element);
+    void AddToDrawingList( Object *element);
 
     /**
      * Return the drawing list.
@@ -60,7 +60,9 @@ public:
     void ResetDrawingList();
 
 private:
+    //
 public:
+    //
 private:
     /** The list of object for which drawing is postponed */
     ListOfObjects m_drawingList;
@@ -199,7 +201,7 @@ public:
 
     /**
      * @name Set and get the stem direction and stem positions
-     * The methods are virtual because they need to be overriden for Chords.
+     * The methods are virtual because they need to be overridden for Chords.
      */
     ///@{
     virtual void SetDrawingStemDir(data_STEMDIRECTION stemDir);

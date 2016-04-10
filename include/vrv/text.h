@@ -30,9 +30,8 @@ public:
     Rend();
     virtual ~Rend();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Rend"; };
-    ;
-    virtual ClassId Is() { return REND; };
+    virtual std::string GetClassName() const { return "Rend"; };
+    virtual ClassId Is() const { return REND; };
     ///@}
 
     /**
@@ -65,9 +64,8 @@ public:
     Text();
     virtual ~Text();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Text"; };
-    ;
-    virtual ClassId Is() { return TEXT; };
+    virtual std::string GetClassName() const { return "Text"; };
+    virtual ClassId Is() const { return TEXT; };
     ///@}
 
     /**

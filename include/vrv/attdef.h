@@ -112,7 +112,7 @@ enum data_DURATION {
 /**
  * MEI data.KEYSIGNATURE
  * The maximum is 255 (unsigned char)
- * Order from 7f to 7s should not be changes. This is a special case since we use abs()
+ * Order from 7f to 7s should not be changed. This is a special case since we use abs()
  * to get the number of flats or sharps
  */
 enum data_KEYSIGNATURE {

@@ -46,12 +46,18 @@ public:
     Chord();
     virtual ~Chord();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Chord"; };
-    virtual ClassId Is() { return CHORD; };
+    virtual std::string GetClassName() const { return "Chord"; };
+    virtual ClassId Is() const { return CHORD; };
     ///@}
 
+    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
+    {
+        return dynamic_cast<StemmedDrawingInterface *>(this);
+    }
+
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
     /**
      * Add an element (only note supported) to a chord.
@@ -82,7 +88,7 @@ public:
     void ResetAccidSpace(int fullUnit);
 
     /**
-     * @name Set and get the stem direction and stem positions
+     * @name Set and get stem direction and stem positions
      * The methods are overriding the interface because we want to apply it to child notes
      */
     ///@{
@@ -109,10 +115,10 @@ protected:
     /**
      * Clear the m_clusters vector and delete all the objects.
      */
-    void ClearClusters();
+    void ClearClusters() const;
 
 public:
-    std::list<ChordCluster *> m_clusters;
+    mutable std::list<ChordCluster *> m_clusters;
 
     /**
      * Number of ledger lines for the chord where:

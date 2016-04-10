@@ -65,7 +65,7 @@ bool AttArpegLog::WriteArpegLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttArpegLog::HasOrder()
+bool AttArpegLog::HasOrder() const
 {
     return (m_order != arpegLog_ORDER_NONE);
 }
@@ -111,7 +111,7 @@ bool AttArpegVis::WriteArpegVis(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttArpegVis::HasArrow()
+bool AttArpegVis::HasArrow() const
 {
     return (m_arrow != BOOLEAN_NONE);
 }
@@ -157,7 +157,7 @@ bool AttBTremLog::WriteBTremLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttBTremLog::HasForm()
+bool AttBTremLog::HasForm() const
 {
     return (m_form != bTremLog_FORM_NONE);
 }
@@ -203,7 +203,7 @@ bool AttBeamed::WriteBeamed(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttBeamed::HasBeam()
+bool AttBeamed::HasBeam() const
 {
     return (m_beam != "");
 }
@@ -249,7 +249,7 @@ bool AttBeamedwith::WriteBeamedwith(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttBeamedwith::HasBeamWith()
+bool AttBeamedwith::HasBeamWith() const
 {
     return (m_beamWith != OTHERSTAFF_NONE);
 }
@@ -305,12 +305,12 @@ bool AttBeamingLog::WriteBeamingLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttBeamingLog::HasBeamGroup()
+bool AttBeamingLog::HasBeamGroup() const
 {
     return (m_beamGroup != "");
 }
 
-bool AttBeamingLog::HasBeamRests()
+bool AttBeamingLog::HasBeamRests() const
 {
     return (m_beamRests != BOOLEAN_NONE);
 }
@@ -366,12 +366,12 @@ bool AttBeamrend::WriteBeamrend(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttBeamrend::HasForm()
+bool AttBeamrend::HasForm() const
 {
     return (m_form != beamrend_FORM_NONE);
 }
 
-bool AttBeamrend::HasSlope()
+bool AttBeamrend::HasSlope() const
 {
     return (m_slope != 0.0);
 }
@@ -417,7 +417,7 @@ bool AttBeamsecondary::WriteBeamsecondary(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttBeamsecondary::HasBreaksec()
+bool AttBeamsecondary::HasBreaksec() const
 {
     return (m_breaksec != 0);
 }
@@ -463,7 +463,7 @@ bool AttBeatRptLog::WriteBeatRptLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttBeatRptLog::HasBeatDef()
+bool AttBeatRptLog::HasBeatDef() const
 {
     return (m_beatDef != DURATION_NONE);
 }
@@ -509,7 +509,7 @@ bool AttBeatRptVis::WriteBeatRptVis(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttBeatRptVis::HasForm()
+bool AttBeatRptVis::HasForm() const
 {
     return (m_form != BEATRPT_REND_NONE);
 }
@@ -555,7 +555,7 @@ bool AttBendGes::WriteBendGes(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttBendGes::HasAmount()
+bool AttBendGes::HasAmount() const
 {
     return (m_amount != "");
 }
@@ -601,7 +601,7 @@ bool AttCutout::WriteCutout(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttCutout::HasCutout()
+bool AttCutout::HasCutout() const
 {
     return (m_cutout != cutout_CUTOUT_NONE);
 }
@@ -647,7 +647,7 @@ bool AttExpandable::WriteExpandable(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttExpandable::HasExpand()
+bool AttExpandable::HasExpand() const
 {
     return (m_expand != BOOLEAN_NONE);
 }
@@ -693,7 +693,7 @@ bool AttFTremLog::WriteFTremLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttFTremLog::HasForm()
+bool AttFTremLog::HasForm() const
 {
     return (m_form != fTremLog_FORM_NONE);
 }
@@ -749,12 +749,12 @@ bool AttFermataVis::WriteFermataVis(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttFermataVis::HasForm()
+bool AttFermataVis::HasForm() const
 {
     return (m_form != fermataVis_FORM_NONE);
 }
 
-bool AttFermataVis::HasShape()
+bool AttFermataVis::HasShape() const
 {
     return (m_shape != fermataVis_SHAPE_NONE);
 }
@@ -810,12 +810,12 @@ bool AttGraced::WriteGraced(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttGraced::HasGrace()
+bool AttGraced::HasGrace() const
 {
     return (m_grace != GRACE_NONE);
 }
 
-bool AttGraced::HasGraceTime()
+bool AttGraced::HasGraceTime() const
 {
     return (m_graceTime != 0);
 }
@@ -871,12 +871,12 @@ bool AttHairpinLog::WriteHairpinLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttHairpinLog::HasForm()
+bool AttHairpinLog::HasForm() const
 {
     return (m_form != hairpinLog_FORM_NONE);
 }
 
-bool AttHairpinLog::HasNiente()
+bool AttHairpinLog::HasNiente() const
 {
     return (m_niente != BOOLEAN_NONE);
 }
@@ -922,7 +922,7 @@ bool AttHairpinVis::WriteHairpinVis(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttHairpinVis::HasOpening()
+bool AttHairpinVis::HasOpening() const
 {
     return (m_opening != "");
 }
@@ -1028,37 +1028,37 @@ bool AttHarpPedalLog::WriteHarpPedalLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttHarpPedalLog::HasC()
+bool AttHarpPedalLog::HasC() const
 {
     return (m_c != harpPedalLog_C_NONE);
 }
 
-bool AttHarpPedalLog::HasD()
+bool AttHarpPedalLog::HasD() const
 {
     return (m_d != harpPedalLog_D_NONE);
 }
 
-bool AttHarpPedalLog::HasE()
+bool AttHarpPedalLog::HasE() const
 {
     return (m_e != harpPedalLog_E_NONE);
 }
 
-bool AttHarpPedalLog::HasF()
+bool AttHarpPedalLog::HasF() const
 {
     return (m_f != harpPedalLog_F_NONE);
 }
 
-bool AttHarpPedalLog::HasG()
+bool AttHarpPedalLog::HasG() const
 {
     return (m_g != harpPedalLog_G_NONE);
 }
 
-bool AttHarpPedalLog::HasA()
+bool AttHarpPedalLog::HasA() const
 {
     return (m_a != harpPedalLog_A_NONE);
 }
 
-bool AttHarpPedalLog::HasB()
+bool AttHarpPedalLog::HasB() const
 {
     return (m_b != harpPedalLog_B_NONE);
 }
@@ -1104,7 +1104,7 @@ bool AttLvpresent::WriteLvpresent(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttLvpresent::HasLv()
+bool AttLvpresent::HasLv() const
 {
     return (m_lv != BOOLEAN_NONE);
 }
@@ -1150,7 +1150,7 @@ bool AttMultiRestVis::WriteMultiRestVis(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttMultiRestVis::HasBlock()
+bool AttMultiRestVis::HasBlock() const
 {
     return (m_block != BOOLEAN_NONE);
 }
@@ -1196,7 +1196,7 @@ bool AttNoteGesCmn::WriteNoteGesCmn(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttNoteGesCmn::HasGliss()
+bool AttNoteGesCmn::HasGliss() const
 {
     return (m_gliss != GLISSANDO_NONE);
 }
@@ -1242,7 +1242,7 @@ bool AttNumbered::WriteNumbered(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttNumbered::HasNum()
+bool AttNumbered::HasNum() const
 {
     return (m_num != 0);
 }
@@ -1298,12 +1298,12 @@ bool AttNumberplacement::WriteNumberplacement(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttNumberplacement::HasNumPlace()
+bool AttNumberplacement::HasNumPlace() const
 {
     return (m_numPlace != PLACE_NONE);
 }
 
-bool AttNumberplacement::HasNumVisible()
+bool AttNumberplacement::HasNumVisible() const
 {
     return (m_numVisible != BOOLEAN_NONE);
 }
@@ -1349,7 +1349,7 @@ bool AttOctaveLog::WriteOctaveLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttOctaveLog::HasColl()
+bool AttOctaveLog::HasColl() const
 {
     return (m_coll != octaveLog_COLL_NONE);
 }
@@ -1395,7 +1395,7 @@ bool AttPedalLog::WritePedalLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttPedalLog::HasDir()
+bool AttPedalLog::HasDir() const
 {
     return (m_dir != pedalLog_DIR_NONE);
 }
@@ -1441,7 +1441,7 @@ bool AttPedalVis::WritePedalVis(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttPedalVis::HasForm()
+bool AttPedalVis::HasForm() const
 {
     return (m_form != pedalVis_FORM_NONE);
 }
@@ -1487,7 +1487,7 @@ bool AttPianopedals::WritePianopedals(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttPianopedals::HasPedalStyle()
+bool AttPianopedals::HasPedalStyle() const
 {
     return (m_pedalStyle != pianopedals_PEDALSTYLE_NONE);
 }
@@ -1533,7 +1533,7 @@ bool AttRehearsal::WriteRehearsal(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttRehearsal::HasRehEnclose()
+bool AttRehearsal::HasRehEnclose() const
 {
     return (m_rehEnclose != rehearsal_REHENCLOSE_NONE);
 }
@@ -1579,7 +1579,7 @@ bool AttScoreDefVisCmn::WriteScoreDefVisCmn(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttScoreDefVisCmn::HasGridShow()
+bool AttScoreDefVisCmn::HasGridShow() const
 {
     return (m_gridShow != BOOLEAN_NONE);
 }
@@ -1625,7 +1625,7 @@ bool AttSlurrend::WriteSlurrend(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttSlurrend::HasSlurRend()
+bool AttSlurrend::HasSlurRend() const
 {
     return (m_slurRend != CURVERENDITION_NONE);
 }
@@ -1671,7 +1671,7 @@ bool AttStemsCmn::WriteStemsCmn(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttStemsCmn::HasStemWith()
+bool AttStemsCmn::HasStemWith() const
 {
     return (m_stemWith != OTHERSTAFF_NONE);
 }
@@ -1717,7 +1717,7 @@ bool AttTierend::WriteTierend(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttTierend::HasTieRend()
+bool AttTierend::HasTieRend() const
 {
     return (m_tieRend != CURVERENDITION_NONE);
 }
@@ -1763,7 +1763,7 @@ bool AttTremmeasured::WriteTremmeasured(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttTremmeasured::HasMeasperf()
+bool AttTremmeasured::HasMeasperf() const
 {
     return (m_measperf != DURATION_NONE);
 }
@@ -1839,22 +1839,22 @@ bool AttTupletVis::WriteTupletVis(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttTupletVis::HasBracketPlace()
+bool AttTupletVis::HasBracketPlace() const
 {
     return (m_bracketPlace != PLACE_NONE);
 }
 
-bool AttTupletVis::HasBracketVisible()
+bool AttTupletVis::HasBracketVisible() const
 {
     return (m_bracketVisible != BOOLEAN_NONE);
 }
 
-bool AttTupletVis::HasDurVisible()
+bool AttTupletVis::HasDurVisible() const
 {
     return (m_durVisible != BOOLEAN_NONE);
 }
 
-bool AttTupletVis::HasNumFormat()
+bool AttTupletVis::HasNumFormat() const
 {
     return (m_numFormat != tupletVis_NUMFORMAT_NONE);
 }
@@ -2207,45 +2207,45 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
     return false;
 }
 
-void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_ARPEGLOG)) {
-        AttArpegLog *att = dynamic_cast<AttArpegLog *>(element);
+        const AttArpegLog *att = dynamic_cast<const AttArpegLog *>(element);
         assert(att);
         if (att->HasOrder()) {
             attributes->push_back(std::make_pair("order", att->ArpegLogOrderToStr(att->GetOrder())));
         }
     }
     if (element->HasAttClass(ATT_ARPEGVIS)) {
-        AttArpegVis *att = dynamic_cast<AttArpegVis *>(element);
+        const AttArpegVis *att = dynamic_cast<const AttArpegVis *>(element);
         assert(att);
         if (att->HasArrow()) {
             attributes->push_back(std::make_pair("arrow", att->BooleanToStr(att->GetArrow())));
         }
     }
     if (element->HasAttClass(ATT_BTREMLOG)) {
-        AttBTremLog *att = dynamic_cast<AttBTremLog *>(element);
+        const AttBTremLog *att = dynamic_cast<const AttBTremLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->BTremLogFormToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_BEAMED)) {
-        AttBeamed *att = dynamic_cast<AttBeamed *>(element);
+        const AttBeamed *att = dynamic_cast<const AttBeamed *>(element);
         assert(att);
         if (att->HasBeam()) {
             attributes->push_back(std::make_pair("beam", att->StrToStr(att->GetBeam())));
         }
     }
     if (element->HasAttClass(ATT_BEAMEDWITH)) {
-        AttBeamedwith *att = dynamic_cast<AttBeamedwith *>(element);
+        const AttBeamedwith *att = dynamic_cast<const AttBeamedwith *>(element);
         assert(att);
         if (att->HasBeamWith()) {
             attributes->push_back(std::make_pair("beam.with", att->OtherstaffToStr(att->GetBeamWith())));
         }
     }
     if (element->HasAttClass(ATT_BEAMINGLOG)) {
-        AttBeamingLog *att = dynamic_cast<AttBeamingLog *>(element);
+        const AttBeamingLog *att = dynamic_cast<const AttBeamingLog *>(element);
         assert(att);
         if (att->HasBeamGroup()) {
             attributes->push_back(std::make_pair("beam.group", att->StrToStr(att->GetBeamGroup())));
@@ -2255,7 +2255,7 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_BEAMREND)) {
-        AttBeamrend *att = dynamic_cast<AttBeamrend *>(element);
+        const AttBeamrend *att = dynamic_cast<const AttBeamrend *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->BeamrendFormToStr(att->GetForm())));
@@ -2265,56 +2265,56 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_BEAMSECONDARY)) {
-        AttBeamsecondary *att = dynamic_cast<AttBeamsecondary *>(element);
+        const AttBeamsecondary *att = dynamic_cast<const AttBeamsecondary *>(element);
         assert(att);
         if (att->HasBreaksec()) {
             attributes->push_back(std::make_pair("breaksec", att->IntToStr(att->GetBreaksec())));
         }
     }
     if (element->HasAttClass(ATT_BEATRPTLOG)) {
-        AttBeatRptLog *att = dynamic_cast<AttBeatRptLog *>(element);
+        const AttBeatRptLog *att = dynamic_cast<const AttBeatRptLog *>(element);
         assert(att);
         if (att->HasBeatDef()) {
             attributes->push_back(std::make_pair("beatDef", att->DurationToStr(att->GetBeatDef())));
         }
     }
     if (element->HasAttClass(ATT_BEATRPTVIS)) {
-        AttBeatRptVis *att = dynamic_cast<AttBeatRptVis *>(element);
+        const AttBeatRptVis *att = dynamic_cast<const AttBeatRptVis *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->BeatrptRendToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_BENDGES)) {
-        AttBendGes *att = dynamic_cast<AttBendGes *>(element);
+        const AttBendGes *att = dynamic_cast<const AttBendGes *>(element);
         assert(att);
         if (att->HasAmount()) {
             attributes->push_back(std::make_pair("amount", att->StrToStr(att->GetAmount())));
         }
     }
     if (element->HasAttClass(ATT_CUTOUT)) {
-        AttCutout *att = dynamic_cast<AttCutout *>(element);
+        const AttCutout *att = dynamic_cast<const AttCutout *>(element);
         assert(att);
         if (att->HasCutout()) {
             attributes->push_back(std::make_pair("cutout", att->CutoutCutoutToStr(att->GetCutout())));
         }
     }
     if (element->HasAttClass(ATT_EXPANDABLE)) {
-        AttExpandable *att = dynamic_cast<AttExpandable *>(element);
+        const AttExpandable *att = dynamic_cast<const AttExpandable *>(element);
         assert(att);
         if (att->HasExpand()) {
             attributes->push_back(std::make_pair("expand", att->BooleanToStr(att->GetExpand())));
         }
     }
     if (element->HasAttClass(ATT_FTREMLOG)) {
-        AttFTremLog *att = dynamic_cast<AttFTremLog *>(element);
+        const AttFTremLog *att = dynamic_cast<const AttFTremLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->FTremLogFormToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_FERMATAVIS)) {
-        AttFermataVis *att = dynamic_cast<AttFermataVis *>(element);
+        const AttFermataVis *att = dynamic_cast<const AttFermataVis *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->FermataVisFormToStr(att->GetForm())));
@@ -2324,7 +2324,7 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_GRACED)) {
-        AttGraced *att = dynamic_cast<AttGraced *>(element);
+        const AttGraced *att = dynamic_cast<const AttGraced *>(element);
         assert(att);
         if (att->HasGrace()) {
             attributes->push_back(std::make_pair("grace", att->GraceToStr(att->GetGrace())));
@@ -2334,7 +2334,7 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_HAIRPINLOG)) {
-        AttHairpinLog *att = dynamic_cast<AttHairpinLog *>(element);
+        const AttHairpinLog *att = dynamic_cast<const AttHairpinLog *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->HairpinLogFormToStr(att->GetForm())));
@@ -2344,14 +2344,14 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_HAIRPINVIS)) {
-        AttHairpinVis *att = dynamic_cast<AttHairpinVis *>(element);
+        const AttHairpinVis *att = dynamic_cast<const AttHairpinVis *>(element);
         assert(att);
         if (att->HasOpening()) {
             attributes->push_back(std::make_pair("opening", att->StrToStr(att->GetOpening())));
         }
     }
     if (element->HasAttClass(ATT_HARPPEDALLOG)) {
-        AttHarpPedalLog *att = dynamic_cast<AttHarpPedalLog *>(element);
+        const AttHarpPedalLog *att = dynamic_cast<const AttHarpPedalLog *>(element);
         assert(att);
         if (att->HasC()) {
             attributes->push_back(std::make_pair("c", att->HarpPedalLogCToStr(att->GetC())));
@@ -2376,35 +2376,35 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_LVPRESENT)) {
-        AttLvpresent *att = dynamic_cast<AttLvpresent *>(element);
+        const AttLvpresent *att = dynamic_cast<const AttLvpresent *>(element);
         assert(att);
         if (att->HasLv()) {
             attributes->push_back(std::make_pair("lv", att->BooleanToStr(att->GetLv())));
         }
     }
     if (element->HasAttClass(ATT_MULTIRESTVIS)) {
-        AttMultiRestVis *att = dynamic_cast<AttMultiRestVis *>(element);
+        const AttMultiRestVis *att = dynamic_cast<const AttMultiRestVis *>(element);
         assert(att);
         if (att->HasBlock()) {
             attributes->push_back(std::make_pair("block", att->BooleanToStr(att->GetBlock())));
         }
     }
     if (element->HasAttClass(ATT_NOTEGESCMN)) {
-        AttNoteGesCmn *att = dynamic_cast<AttNoteGesCmn *>(element);
+        const AttNoteGesCmn *att = dynamic_cast<const AttNoteGesCmn *>(element);
         assert(att);
         if (att->HasGliss()) {
             attributes->push_back(std::make_pair("gliss", att->GlissandoToStr(att->GetGliss())));
         }
     }
     if (element->HasAttClass(ATT_NUMBERED)) {
-        AttNumbered *att = dynamic_cast<AttNumbered *>(element);
+        const AttNumbered *att = dynamic_cast<const AttNumbered *>(element);
         assert(att);
         if (att->HasNum()) {
             attributes->push_back(std::make_pair("num", att->IntToStr(att->GetNum())));
         }
     }
     if (element->HasAttClass(ATT_NUMBERPLACEMENT)) {
-        AttNumberplacement *att = dynamic_cast<AttNumberplacement *>(element);
+        const AttNumberplacement *att = dynamic_cast<const AttNumberplacement *>(element);
         assert(att);
         if (att->HasNumPlace()) {
             attributes->push_back(std::make_pair("num.place", att->PlaceToStr(att->GetNumPlace())));
@@ -2414,77 +2414,77 @@ void Att::GetCmn(Object *element, ArrayOfStrAttr *attributes)
         }
     }
     if (element->HasAttClass(ATT_OCTAVELOG)) {
-        AttOctaveLog *att = dynamic_cast<AttOctaveLog *>(element);
+        const AttOctaveLog *att = dynamic_cast<const AttOctaveLog *>(element);
         assert(att);
         if (att->HasColl()) {
             attributes->push_back(std::make_pair("coll", att->OctaveLogCollToStr(att->GetColl())));
         }
     }
     if (element->HasAttClass(ATT_PEDALLOG)) {
-        AttPedalLog *att = dynamic_cast<AttPedalLog *>(element);
+        const AttPedalLog *att = dynamic_cast<const AttPedalLog *>(element);
         assert(att);
         if (att->HasDir()) {
             attributes->push_back(std::make_pair("dir", att->PedalLogDirToStr(att->GetDir())));
         }
     }
     if (element->HasAttClass(ATT_PEDALVIS)) {
-        AttPedalVis *att = dynamic_cast<AttPedalVis *>(element);
+        const AttPedalVis *att = dynamic_cast<const AttPedalVis *>(element);
         assert(att);
         if (att->HasForm()) {
             attributes->push_back(std::make_pair("form", att->PedalVisFormToStr(att->GetForm())));
         }
     }
     if (element->HasAttClass(ATT_PIANOPEDALS)) {
-        AttPianopedals *att = dynamic_cast<AttPianopedals *>(element);
+        const AttPianopedals *att = dynamic_cast<const AttPianopedals *>(element);
         assert(att);
         if (att->HasPedalStyle()) {
             attributes->push_back(std::make_pair("pedal.style", att->PianopedalsPedalstyleToStr(att->GetPedalStyle())));
         }
     }
     if (element->HasAttClass(ATT_REHEARSAL)) {
-        AttRehearsal *att = dynamic_cast<AttRehearsal *>(element);
+        const AttRehearsal *att = dynamic_cast<const AttRehearsal *>(element);
         assert(att);
         if (att->HasRehEnclose()) {
             attributes->push_back(std::make_pair("reh.enclose", att->RehearsalRehencloseToStr(att->GetRehEnclose())));
         }
     }
     if (element->HasAttClass(ATT_SCOREDEFVISCMN)) {
-        AttScoreDefVisCmn *att = dynamic_cast<AttScoreDefVisCmn *>(element);
+        const AttScoreDefVisCmn *att = dynamic_cast<const AttScoreDefVisCmn *>(element);
         assert(att);
         if (att->HasGridShow()) {
             attributes->push_back(std::make_pair("grid.show", att->BooleanToStr(att->GetGridShow())));
         }
     }
     if (element->HasAttClass(ATT_SLURREND)) {
-        AttSlurrend *att = dynamic_cast<AttSlurrend *>(element);
+        const AttSlurrend *att = dynamic_cast<const AttSlurrend *>(element);
         assert(att);
         if (att->HasSlurRend()) {
             attributes->push_back(std::make_pair("slur.rend", att->CurverenditionToStr(att->GetSlurRend())));
         }
     }
     if (element->HasAttClass(ATT_STEMSCMN)) {
-        AttStemsCmn *att = dynamic_cast<AttStemsCmn *>(element);
+        const AttStemsCmn *att = dynamic_cast<const AttStemsCmn *>(element);
         assert(att);
         if (att->HasStemWith()) {
             attributes->push_back(std::make_pair("stem.with", att->OtherstaffToStr(att->GetStemWith())));
         }
     }
     if (element->HasAttClass(ATT_TIEREND)) {
-        AttTierend *att = dynamic_cast<AttTierend *>(element);
+        const AttTierend *att = dynamic_cast<const AttTierend *>(element);
         assert(att);
         if (att->HasTieRend()) {
             attributes->push_back(std::make_pair("tie.rend", att->CurverenditionToStr(att->GetTieRend())));
         }
     }
     if (element->HasAttClass(ATT_TREMMEASURED)) {
-        AttTremmeasured *att = dynamic_cast<AttTremmeasured *>(element);
+        const AttTremmeasured *att = dynamic_cast<const AttTremmeasured *>(element);
         assert(att);
         if (att->HasMeasperf()) {
             attributes->push_back(std::make_pair("measperf", att->DurationToStr(att->GetMeasperf())));
         }
     }
     if (element->HasAttClass(ATT_TUPLETVIS)) {
-        AttTupletVis *att = dynamic_cast<AttTupletVis *>(element);
+        const AttTupletVis *att = dynamic_cast<const AttTupletVis *>(element);
         assert(att);
         if (att->HasBracketPlace()) {
             attributes->push_back(std::make_pair("bracket.place", att->PlaceToStr(att->GetBracketPlace())));

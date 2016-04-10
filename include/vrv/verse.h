@@ -23,14 +23,14 @@ class Verse : public LayerElement, public AttCommon {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Verse();
     virtual ~Verse();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Verse"; };
-    virtual ClassId Is() { return VERSE; };
+    virtual std::string GetClassName() const { return "Verse"; };
+    virtual ClassId Is() const { return VERSE; };
     ///@}
 
     /**
@@ -50,7 +50,7 @@ public:
     virtual int AlignVertically(ArrayPtrVoid *params);
 
     /**
-     * Builds a tree of int (IntTree) with the staff/layer/verse numbers
+     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
      * and for staff/layer to be then processed.
      */
     virtual int PrepareProcessingLists(ArrayPtrVoid *params);

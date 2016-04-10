@@ -15,8 +15,11 @@
 
 #include "attdef.h"
 #include "io.h"
-#include "pugixml.hpp"
 #include "vrvdef.h"
+
+//----------------------------------------------------------------------------
+
+#include "pugixml.hpp"
 
 namespace vrv {
 
@@ -114,7 +117,7 @@ private:
 
     /**
      * Add a Measure to the system.
-     * If the measure i already exists if will move all the its content.
+     * If the measure already exists it will move all its content.
      * The measure can contain only staves. Other elements must be stacked on m_floatingElements.
      */
     void AddMeasure(System *system, Measure *measure, int i);
@@ -136,7 +139,7 @@ private:
 
     /**
      * Returns the layer with @n=layerNb on the staff.
-     * Creates lhe layer if not found.
+     * Creates the layer if not found.
      */
     Layer *SelectLayer(int layerNb, Staff *staff);
 
@@ -167,10 +170,10 @@ private:
     ///@}
 
     /**
-     * @name Methods for openning and closing tie and slurs.
-     * Openned ties and slurs are stacks together with a musicxml::OpenTie
+     * @name Methods for opening and closing ties and slurs.
+     * Opened ties and slurs are stacked together with musicxml::OpenTie
      * and musicxml::OpenSlur objects.
-     * For now: only slur starting and ending on the same staff/voice are
+     * For now: only slurs starting and ending on the same staff/voice are
      * supported
      */
     ///@{

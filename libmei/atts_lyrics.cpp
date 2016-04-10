@@ -75,12 +75,12 @@ bool AttVerseLog::WriteVerseLog(pugi::xml_node element)
     return wroteAttribute;
 }
 
-bool AttVerseLog::HasRefrain()
+bool AttVerseLog::HasRefrain() const
 {
     return (m_refrain != BOOLEAN_NONE);
 }
 
-bool AttVerseLog::HasRhythm()
+bool AttVerseLog::HasRhythm() const
 {
     return (m_rhythm != "");
 }
@@ -105,10 +105,10 @@ bool Att::SetLyrics(Object *element, std::string attrType, std::string attrValue
     return false;
 }
 
-void Att::GetLyrics(Object *element, ArrayOfStrAttr *attributes)
+void Att::GetLyrics(const Object *element, ArrayOfStrAttr *attributes)
 {
     if (element->HasAttClass(ATT_VERSELOG)) {
-        AttVerseLog *att = dynamic_cast<AttVerseLog *>(element);
+        const AttVerseLog *att = dynamic_cast<const AttVerseLog *>(element);
         assert(att);
         if (att->HasRefrain()) {
             attributes->push_back(std::make_pair("refrain", att->BooleanToStr(att->GetRefrain())));

@@ -30,51 +30,25 @@ namespace vrv {
 #define VERSION_DEV true
 
 //----------------------------------------------------------------------------
-// Typedefs
-//----------------------------------------------------------------------------
-
-class AttComparison;
-class BeamElementCoord;
-class LayerElement;
-class Note;
-class Object;
-class Point;
-class Staff;
-
-typedef std::vector<Object *> ArrayOfObjects;
-
-typedef std::list<Object *> ListOfObjects;
-
-typedef std::vector<void *> ArrayPtrVoid;
-
-typedef std::vector<AttComparison *> ArrayOfAttComparisons;
-
-typedef std::vector<Note *> ChordCluster;
-
-typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
-
-typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
-
-typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
-
-//----------------------------------------------------------------------------
 // Object defines
 //----------------------------------------------------------------------------
 
 /**
  * The ClassIds are used to identify Object child classes through the Object::Is virtual method.
- * Each Object child class has to have its own id and has to overwrite the Is() method.
+ * Each Object child class has to have its own id and has to override the Is() method.
  * Base classes (e.g., LayerElement) that are never instanciated have boundary ids
  * used for checking if an Object is child of a base class. See for example
  * Object::IsLayerElement.
  */
 enum ClassId {
-    OBJECT = 0,
+    BOUNDING_BOX = 0, // Should not be instanciated as is
+    OBJECT, // Should not be instanciated as is
+    DEVICE_CONTEXT, // Should not be instanciated as is
     //
     ALIGNMENT,
     CLEF_ATTR,
     DOC,
-    DOC_OBJECT,
+    FLOATING_POSITIONER,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
     LAYER,
@@ -89,6 +63,7 @@ enum ClassId {
     SYSTEM,
     SYSTEM_ALIGNER,
     SYSTEM_ALIGNMENT,
+    TIMESTAMP_ALIGNER,
     // Ids for EditorialElement child classes
     EDITORIAL_ELEMENT,
     ABBR,
@@ -135,12 +110,16 @@ enum ClassId {
     REST,
     SPACE,
     SYL,
+    TIMESTAMP_ATTR,
     TUPLET,
     VERSE,
     LAYER_ELEMENT_max,
     // Ids for FloatingElement child classes
     FLOATING_ELEMENT,
     ANCHORED_TEXT,
+    DIR,
+    DYNAM,
+    HAIRPIN,
     SLUR,
     TEMPO,
     TIE,
@@ -156,12 +135,15 @@ enum ClassId {
     TEXT,
     TEXT_ELEMENT_max,
     //
+    BBOX_DEVICE_CONTEXT,
+    SVG_DEVICE_CONTEXT,
+    //
     UNSPECIFIED
 };
 
 /**
  * The InterfaceIds are used to identify Interface child classes through the Interface::IsInterface virtual method.
- * Each Interface child class has to have its own id and has to overwrite the IsInterface() method.
+ * Each Interface child class has to have its own id and has to override the IsInterface() method.
  */
 enum InterfaceId {
     INTERFACE,
@@ -170,8 +152,49 @@ enum InterfaceId {
     INTERFACE_POSITION,
     INTERFACE_SCOREDEF,
     INTERFACE_TEXT_DIR,
+    INTERFACE_TIME_POINT,
     INTERFACE_TIME_SPANNING
 };
+
+//----------------------------------------------------------------------------
+// Typedefs
+//----------------------------------------------------------------------------
+
+class AttComparison;
+class BeamElementCoord;
+class BoundingBox;
+class FloatingPositioner;
+class FloatingElement;
+class LayerElement;
+class Note;
+class Object;
+class Point;
+class Staff;
+class TimeSpanningInterface;
+
+typedef std::vector<Object *> ArrayOfObjects;
+
+typedef std::list<Object *> ListOfObjects;
+
+typedef std::vector<void *> ArrayPtrVoid;
+
+typedef std::vector<AttComparison *> ArrayOfAttComparisons;
+
+typedef std::vector<Note *> ChordCluster;
+
+typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
+
+typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
+
+typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
+
+typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;
+
+typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfInterfaceClassIdPairs;
+
+typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
+
+typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 
 //----------------------------------------------------------------------------
 // Global defines
@@ -185,7 +208,7 @@ enum InterfaceId {
 /**
  * Codes returned by Functors.
  * Default is FUNCTOR_CONTINUE.
- * FUNCTOR_SIBLINGS will no go any deeper in the tree.
+ * FUNCTOR_SIBLINGS won't go any deeper in the tree.
  * FUNCTOR_STOP wil stop the tree processing.
  */
 enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
@@ -218,7 +241,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 #define MAX_NOTE_DEPTH -1
 
 //----------------------------------------------------------------------------
-// VerovioText codpoints
+// VerovioText codepoints
 //----------------------------------------------------------------------------
 
 /**

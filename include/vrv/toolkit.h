@@ -10,16 +10,19 @@
 
 #include <string>
 
-#ifdef USE_EMSCRIPTEN
-#include "jsonxx.h"
-#endif
-
-#include "utf8.h"
-
 //----------------------------------------------------------------------------
 
 #include "doc.h"
 #include "view.h"
+
+//----------------------------------------------------------------------------
+
+#ifdef USE_EMSCRIPTEN
+#include "jsonxx.h"
+#endif
+
+#include "checked.h"
+#include "unchecked.h"
 
 namespace vrv {
 
@@ -52,7 +55,7 @@ public:
     bool LoadFile(const std::string &filename);
 
     /**
-     * Load a string data witht he specified type.
+     * Load a string data with the specified type.
      */
     bool LoadString(const std::string &data);
 
@@ -62,38 +65,38 @@ public:
     bool SaveFile(const std::string &filename);
 
     /**
-     * Parse the options passed as JSON string
-     * only available for Emscripten based compiles
+     * Parse the options passed as JSON string.
+     * Only available for Emscripten-based compiles
      **/
     bool ParseOptions(const std::string &json_options);
 
     /**
-     * Parse the editor actions passed as JSON string
-     * only available for Emscripten based compiles
+     * Parse the editor actions passed as JSON string.
+     * Only available for Emscripten-based compiles
      **/
     bool Edit(const std::string &json_editorAction);
 
     /**
      * Concatenates the vrv::logBuffer into a string an returns it.
-     * This is used only for Emscripten based compilation.
+     * This is used only for Emscripten-based compilation.
      * The vrv::logBuffer is filled by the vrv::LogXXX functions.
      */
     std::string GetLogString();
 
     /**
      * Returns the version number as a string.
-     * This is used only for Emscripten based compilation.
+     * This is used only for Emscripten-based compilation.
      */
     std::string GetVersion();
 
     /**
      * Resets the vrv::logBuffer.
-     * This is used only for Emscripten based compilation.
+     * This is used only for Emscripten-based compilation.
      */
     void ResetLogBuffer();
 
     /**
-     * Render the page in SVG and returns it as a string
+     * Render the page in SVG and returns it as a string.
      * Page number is 1-based
      */
     std::string RenderToSvg(int pageNo = 1, bool xml_declaration = false);
@@ -103,6 +106,12 @@ public:
      * Page number is 1-based.
      */
     bool RenderToSvgFile(const std::string &filename, int pageNo = 1);
+
+    /**
+     * Creates a midi file, opens it, and writes to it.
+     * currently generates a dummy midi file.
+     */
+    bool RenderToMidiFile(const std::string &filename);
 
     /**
      * Get the MEI as a string.
@@ -116,16 +125,16 @@ public:
     std::string GetElementAttr(const std::string &xmlId);
 
     /**
-     * Redo the layout of the loaded data
+     * Redo the layout of the loaded data.
      * This can be called once the rendering option were changed,
      * For example with a new page (sceen) height or a new zoom level.
      */
     void RedoLayout();
 
     /**
-     * Return the page on which the element is the ID (xml:id) is rendered
+     * Return the page on which the element is the ID (xml:id) is rendered.
      * This takes into account the current layout options.
-     * Retruns 0 if the element is not found.
+     * Returns 0 if no element is found.
      */
     int GetPageWithElement(const std::string &xmlId);
 
@@ -289,7 +298,7 @@ public:
     ///@}
 
     /**
-     * Experimental editor method
+     * Experimental editor methods
      */
     ///@{
     bool Drag(std::string elementId, int x, int y);
@@ -304,7 +313,7 @@ private:
 protected:
 #ifdef USE_EMSCRIPTEN
     /**
-     * Experimental editor method
+     * Experimental editor methods
      */
     ///@{
     bool ParseDragAction(jsonxx::Object param, std::string *elementId, int *x, int *y);

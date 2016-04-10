@@ -51,11 +51,11 @@ public:
     ///@{
     void SetRefrain(data_BOOLEAN refrain_) { m_refrain = refrain_; };
     data_BOOLEAN GetRefrain() const { return m_refrain; };
-    bool HasRefrain();
+    bool HasRefrain() const;
     //
     void SetRhythm(std::string rhythm_) { m_rhythm = rhythm_; };
     std::string GetRhythm() const { return m_rhythm; };
-    bool HasRhythm();
+    bool HasRhythm() const;
     ///@}
 
 private:

@@ -24,22 +24,24 @@ class Proport : public LayerElement, public AttDurationRatio {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
+     * Reset method resets all attribute classes.
      */
     ///@{
     Proport();
     virtual ~Proport();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Proport"; };
-    virtual ClassId Is() { return PROPORT; };
-    virtual Object *Clone() { return new Proport(*this); };
+    virtual std::string GetClassName() const { return "Proport"; };
+    virtual ClassId Is() const { return PROPORT; };
+    virtual Object *Clone() const { return new Proport(*this); };
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
 private:
+    //
 public:
+    //
 private:
 };
 

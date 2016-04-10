@@ -20,9 +20,12 @@ class Beam;
 class BeamParams;
 class Chord;
 class DeviceContext;
+class Dir;
 class Doc;
+class Dynam;
 class EditorialElement;
 class FloatingElement;
+class Hairpin;
 class Layer;
 class LayerElement;
 class Measure;
@@ -57,8 +60,8 @@ public:
     ///@}
 
     /**
-     * @name Virtual methods that are triggered when necessary but the do nothing in
-     * the View class. The can be overriden when necessary in the child classses.
+     * @name Virtual methods that are triggered when necessary but they do nothing in
+     * the View class. They can be overridden when necessary in the child classses.
      */
     ///@{
     virtual void OnBeginEdition() {}
@@ -87,7 +90,7 @@ public:
 
     /**
      * Set the document the view is pointing to (mandatory).
-     * Several view can point to the same document.
+     * Several views can point to the same document.
      */
     void SetDoc(Doc *doc);
 
@@ -102,6 +105,8 @@ public:
     int ToLogicalX(int i);
     int ToDeviceContextY(int i);
     int ToLogicalY(int i);
+    Point ToDeviceContext(Point p);
+    Point ToLogical(Point p);
     ///@}
 
     /**
@@ -200,7 +205,7 @@ protected:
      * @name Methods for drawing LayerElement child classes.
      * They are base drawing methods that are called directly from DrawLayerElement
      * Because some elements draw their children recursively (e.g., Note) they must all
-     * have the same parameters
+     * have the same parameters.
      * Defined in view_element.cpp
      */
     ///@{
@@ -233,7 +238,7 @@ protected:
     /**
      * @name Methods for drawing parts of LayerElement child classes.
      * They are sub-drawing methods that are called from the base drawing methods above.
-     * The parameter set can be different from a base drawing method since no recursive call is expected
+     * The parameter set can be different from a base drawing method since no recursive call is expected.
      * Defined in view_element.cpp
      */
     ///@{
@@ -287,29 +292,32 @@ protected:
 
     /**
      * @name Methods for drawing Floating child classes.
-     * They are base drawing methods that are called directly from DrawFloatingElement
+     * They are base drawing methods that are called directly from DrawFloatingElement.
      * Call appropriate method of child classes (Slur, Tempo, Tie, etc).
      * Defined in view_floating.cpp
      */
     ///@{
     void DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Measure *measure, System *system);
     void DrawSylConnector(
-        DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
+        DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff);
-    void DrawTimeSpanningElement(DeviceContext *dc, DocObject *object, System *system);
+    void DrawTimeSpanningElement(DeviceContext *dc, Object *object, System *system);
+    void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
+    void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
+    void DrawHairpin(
+        DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawSlur(
-        DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
+        DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
-    void DrawTie(
-        DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, DocObject *graphic = NULL);
+    void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
 
     ///@}
 
     /**
      * @name Methods for drawing mensural LayerElement child classes.
-     * They are base drawing methods that are called directly from DrawLayerElement
+     * They are base drawing methods that are called directly from DrawLayerElement.
      * Because some elements draw their children recursively (e.g., Note) they must all
-     * have the same parameters
+     * have the same parameters.
      * Defined in view_mensural.cpp
      */
     ///@{
@@ -359,9 +367,9 @@ protected:
     ///@}
 
     /**
-     * Calculate the ScoreDef width by taking into account its widest key signature
+     * Calculate the ScoreDef width by taking into account its widest key signature.
      * This is used in justifiation for anticipating the width of initial scoreDefs that are not drawn in the un-casted
-     * system
+     * system.
      */
     void SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef);
 
@@ -376,21 +384,21 @@ private:
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet *tuplet);
     int GetSylY(Syl *syl, Staff *staff);
-    int GetTempoY(Staff *staff);
     ///@}
 
     /**
      * @name Internal methods used for calculating slurs
      */
-    float AdjustSlur(Slur *slur, Staff *staff, int layerN, bool up, Point points[]);
+    float AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[]);
     int AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
-        Point *c2, bool up, float angle, bool posRatio = true);
+        Point *c2, curvature_CURVEDIR curveDir, float angle, bool posRatio = true);
     void AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
-        Point *c2, bool up, float *angle, bool forceBothSides);
-    float GetAdjustedSlurAngle(Point *p1, Point *p2, bool up);
-    void GetControlPoints(Point *p1, Point *p2, Point *c1, Point *c2, bool up, int height, int staffSize);
-    void GetSpanningPointPositions(
-        ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle, bool up, int staffSize);
+        Point *c2, curvature_CURVEDIR curveDir, float *angle, bool forceBothSides);
+    float GetAdjustedSlurAngle(Point *p1, Point *p2, curvature_CURVEDIR curveDir);
+    void GetControlPoints(
+        Point *p1, Point *p2, Point *c1, Point *c2, curvature_CURVEDIR curveDir, int height, int staffSize);
+    void GetSpanningPointPositions(ArrayOfLayerElementPointPairs *spanningPoints, Point p1, float angle,
+        curvature_CURVEDIR curveDir, int staffSize);
     ///@}
 
     /**
@@ -409,7 +417,7 @@ private:
     bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjustHorizontally);
 
     /**
-     * Swap the to points passed as reference.
+     * Swap the points passed as reference.
      * This is useful for example when calculating bezier positions.
      */
     static void SwapPoints(Point *x1, Point *x2);

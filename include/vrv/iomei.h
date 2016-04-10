@@ -14,6 +14,9 @@
 
 #include "doc.h"
 #include "io.h"
+
+//----------------------------------------------------------------------------
+
 #include "pugixml.hpp"
 
 namespace vrv {
@@ -35,10 +38,13 @@ class Custos;
 class Damage;
 class Del;
 class Dot;
+class Dir;
 class DurationInterface;
+class Dynam;
 class Expan;
 class FloatingElement;
 class FTrem;
+class Hairpin;
 class Layer;
 class LayerElement;
 class Lem;
@@ -74,6 +80,7 @@ class Text;
 class TextDirInterface;
 class TextElement;
 class Tie;
+class TimePointInterface;
 class TimeSpanningInterface;
 class Tuplet;
 class Unclear;
@@ -107,7 +114,7 @@ public:
     virtual bool WriteObject(Object *object);
 
     /**
-     * Writing object method that must be overriden in child class.
+     * Writing object method that must be overridden in the child class.
      */
     virtual bool WriteObjectEnd(Object *object);
 
@@ -117,7 +124,7 @@ public:
     std::string GetOutput(int page = -1);
 
     /**
-     * Setter for score-based MEI output (non implemented)
+     * Setter for score-based MEI output (not implemented)
      */
     void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; };
 
@@ -125,17 +132,22 @@ private:
     bool WriteMeiDoc(Doc *doc);
 
     /**
+     * Write the @xml:id to the currentNode
+     */
+    void WriteXmlId(pugi::xml_node currentNode, Object *object);
+
+    /**
      * @name Methods for writing MEI containers (measures, staff, etc) scoreDef and related.
      */
     ///@{
-    bool WriteMeiPage(pugi::xml_node currentNode, Page *page);
-    bool WriteMeiSystem(pugi::xml_node currentNode, System *system);
-    bool WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
-    bool WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
-    bool WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
-    bool WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure);
-    bool WriteMeiStaff(pugi::xml_node currentNode, Staff *staff);
-    bool WriteMeiLayer(pugi::xml_node currentNode, Layer *layer);
+    void WriteMeiPage(pugi::xml_node currentNode, Page *page);
+    void WriteMeiSystem(pugi::xml_node currentNode, System *system);
+    void WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
+    void WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
+    void WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
+    void WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure);
+    void WriteMeiStaff(pugi::xml_node currentNode, Staff *staff);
+    void WriteMeiLayer(pugi::xml_node currentNode, Layer *layer);
     ///@}
 
     /**
@@ -173,6 +185,9 @@ private:
      */
     ///@{
     void WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
+    void WriteMeiDir(pugi::xml_node currentNode, Dir *dir);
+    void WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam);
+    void WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteMeiSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteMeiTie(pugi::xml_node currentNode, Tie *tie);
@@ -190,26 +205,26 @@ private:
      * @name Methods for writing editorial markup
      */
     ///@{
-    bool WriteMeiAbbr(pugi::xml_node currentNode, Abbr *abbr);
-    bool WriteMeiAdd(pugi::xml_node currentNode, Add *add);
-    bool WriteMeiAnnot(pugi::xml_node currentNode, Annot *annot);
-    bool WriteMeiApp(pugi::xml_node currentNode, App *app);
-    bool WriteMeiCorr(pugi::xml_node currentNode, Corr *corr);
-    bool WriteMeiDamage(pugi::xml_node currentNode, Damage *damage);
-    bool WriteMeiDel(pugi::xml_node currentNode, Del *del);
-    bool WriteMeiExpan(pugi::xml_node currentNode, Expan *expan);
-    bool WriteMeiLem(pugi::xml_node currentNode, Lem *lem);
-    bool WriteMeiOrig(pugi::xml_node currentNode, Orig *orig);
-    bool WriteMeiRdg(pugi::xml_node currentNode, Rdg *rdg);
-    bool WriteMeiReg(pugi::xml_node currentNode, Reg *Reg);
-    bool WriteMeiRestore(pugi::xml_node currentNode, Restore *restore);
-    bool WriteMeiSic(pugi::xml_node currentNode, Sic *sic);
-    bool WriteMeiSupplied(pugi::xml_node currentNode, Supplied *supplied);
-    bool WriteMeiUnclear(pugi::xml_node currentNode, Unclear *unclear);
+    void WriteMeiAbbr(pugi::xml_node currentNode, Abbr *abbr);
+    void WriteMeiAdd(pugi::xml_node currentNode, Add *add);
+    void WriteMeiAnnot(pugi::xml_node currentNode, Annot *annot);
+    void WriteMeiApp(pugi::xml_node currentNode, App *app);
+    void WriteMeiCorr(pugi::xml_node currentNode, Corr *corr);
+    void WriteMeiDamage(pugi::xml_node currentNode, Damage *damage);
+    void WriteMeiDel(pugi::xml_node currentNode, Del *del);
+    void WriteMeiExpan(pugi::xml_node currentNode, Expan *expan);
+    void WriteMeiLem(pugi::xml_node currentNode, Lem *lem);
+    void WriteMeiOrig(pugi::xml_node currentNode, Orig *orig);
+    void WriteMeiRdg(pugi::xml_node currentNode, Rdg *rdg);
+    void WriteMeiReg(pugi::xml_node currentNode, Reg *Reg);
+    void WriteMeiRestore(pugi::xml_node currentNode, Restore *restore);
+    void WriteMeiSic(pugi::xml_node currentNode, Sic *sic);
+    void WriteMeiSupplied(pugi::xml_node currentNode, Supplied *supplied);
+    void WriteMeiUnclear(pugi::xml_node currentNode, Unclear *unclear);
     ///@}
 
     /**
-     * @name Methods for wrinting other mei elements
+     * @name Methods for writing other mei elements
      */
     ///@{
     void WriteMeiVerse(pugi::xml_node currentNode, Verse *verse);
@@ -217,19 +232,12 @@ private:
     ///@}
 
     /**
-     * @name Methods for wrinting a sameAs attribute
-     * The method has to be called by classed that support it (e.g., LayerElement)
-     * To be changed to Att
-     */
-    void WriteSameAsAttr(pugi::xml_node currentNode, Object *object);
-
-    /**
      * Write unsupported attributes stored in Object::m_unsupported (not tested)
      */
     void WriteUnsupportedAttr(pugi::xml_node currentNode, Object *object);
 
     /**
-     * @name Methods for wrinting LayerElement, EditorialElement and interfaces.
+     * @name Methods for writing LayerElement, EditorialElement and interfaces.
      * Call WriteDurationInferface from WriteNote, for example.
      */
     ///@{
@@ -240,13 +248,14 @@ private:
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
     void WriteScoreDefInterface(pugi::xml_node currentNode, ScoreDefInterface *interface);
     void WriteTextDirInterface(pugi::xml_node currentNode, TextDirInterface *interface);
+    void WriteTimePointInterface(pugi::xml_node currentNode, TimePointInterface *interface);
     void WriteTimeSpanningInterface(pugi::xml_node currentNode, TimeSpanningInterface *interface);
     ///@}
 
     /**
      * Escapes SMuFL characters to entities (e.g., &#xe1e7;).
-     * Must me used in conjunction with (pugi::format_default | pugi::format_no_escapes).
-     * Unused for now (see WriteMeiText) because it of un-escaped entities in the header.
+     * Must be used in conjunction with (pugi::format_default | pugi::format_no_escapes).
+     * Unused for now (see WriteMeiText) because of un-escaped entities in the header.
      */
     std::wstring EscapeSMuFL(std::wstring data);
 
@@ -257,9 +266,10 @@ private:
     ///@}
 
 public:
+    //
 private:
     std::string m_filename;
-    std::stringstream m_streamStringOutput;
+    std::ostringstream m_streamStringOutput;
     bool m_writeToStreamString;
     int m_page;
     bool m_scoreBasedMEI;
@@ -290,7 +300,7 @@ public:
     /**
      * Set an xPath query for selecting specific <rdg>.
      * By default, the first <lem> or <rdg> is loaded.
-     * If a query is provided, the element retieved by the specified xPath
+     * If a query is provided, the element retrieved by the specified xPath
      * query will be selected (if any, otherwise the first one will be used).
      */
     virtual void SetAppXPathQuery(std::string appXPathQuery) { m_appXPathQuery = appXPathQuery; };
@@ -302,9 +312,9 @@ private:
     /**
      * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related.
      * For each container (page, system, measure, staff and layer) there is one method for
-     * reading the element and one method for reading it children. The method for reading
+     * reading the element and one method for reading its children. The method for reading
      * the children can also be called when reading EditorialElement objects (<lem> or <rdg>
-     * for example. The filter object is optionnal and can be set for filtering the allowed
+     * for example. The filter object is optional and can be set for filtering the allowed
      * children (see MeiInput::IsAllowed)
      */
     ///@{
@@ -363,6 +373,9 @@ private:
      */
     ///@{
     bool ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText);
+    bool ReadMeiDir(Object *parent, pugi::xml_node dir);
+    bool ReadMeiDynam(Object *parent, pugi::xml_node dynam);
+    bool ReadMeiHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadMeiSlur(Object *parent, pugi::xml_node slur);
     bool ReadMeiTempo(Object *parent, pugi::xml_node tempo);
     bool ReadMeiTie(Object *parent, pugi::xml_node tie);
@@ -414,6 +427,7 @@ private:
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);
     bool ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *interface);
     bool ReadTextDirInterface(pugi::xml_node element, TextDirInterface *interface);
+    bool ReadTimePointInterface(pugi::xml_node element, TimePointInterface *interface);
     bool ReadTimeSpanningInterface(pugi::xml_node element, TimeSpanningInterface *interface);
     ///@}
 
@@ -421,15 +435,8 @@ private:
      * @name Methods for reading other MEI elements.
      */
     ///@{
-    bool ReadAccidAsAttr(Note *note, pugi::xml_node verse);
     bool ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpan);
     ///@}
-
-    /**
-     * Read a sameAs attribute
-     * The method has to be called by classed that support it (e.g., LayerElement)
-     */
-    void ReadSameAsAttr(pugi::xml_node element, Object *object);
 
     /**
      * Write unsupported attributes and store them in Object::m_unsupported (not tested)
