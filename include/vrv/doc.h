@@ -189,13 +189,6 @@ public:
     void ExportMIDI(MidiFile *midifile);
 
     /**
-     * Get all the elements (notes and rests) being played at time millisec.
-     * Return the page number being currently played, -1 if nothing if found.
-     * The elements are added to the ArrayOfObjects.
-     */
-    int GetElementsAtTime(int millisec, ArrayOfObjects *elements);
-
-    /**
      * Set the initial scoreDef of each page.
      * This is necessary for integrating changes that occur within a page.
      * It uses the MusObject::SetPageScoreDef functor method for parsing the file.
