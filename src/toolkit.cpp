@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "attcomparison.h"
 #include "iodarms.h"
 #include "iomei.h"
 #include "iomusxml.h"
@@ -620,26 +621,28 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 {
 #ifdef USE_EMSCRIPTEN
     jsonxx::Object o;
-    
-    /*
-    if (!m_doc.GetDrawingPage()) return o.json();
-    Object *element = m_doc.GetDrawingPage()->FindChildByUuid(xmlId);
-    if (!element) {
-        LogMessage("Element with id '%s' could not be found", xmlId.c_str());
-        return o.json();
+    jsonxx::Array a;
+
+    double time = (double)(millisec * 120 / 1000);
+    AttNoteOnsetOffsetComparison matchTime(time);
+    ArrayOfObjects notes;
+    // Here we would need to check that the midi export is done
+    m_doc.FindAllChildByAttComparison(&notes, &matchTime);
+
+    // Get the pageNo from the first note (if any)
+    int pageNo = -1;
+    if (notes.size() > 0) {
+        Page *page = dynamic_cast<Page *>(notes.at(0)->GetFirstParent(PAGE));
+        if (page) pageNo = page->GetIdx() + 1;
     }
-    */
-    
-    // Fill the attribute array (pair of string) by looking at attributes for all available MEI modules
-    ArrayOfStrAttr attributes;
-    //element->GetAttributes(&attributes);
-    
+
     // Fill the JSON object
-    ArrayOfStrAttr::iterator iter;
-    for (iter = attributes.begin(); iter != attributes.end(); iter++) {
-        o << (*iter).first << (*iter).second;
-        // LogMessage("Element %s - %s", (*iter).first.c_str(), (*iter).second.c_str());
+    ArrayOfObjects::iterator iter;
+    for (iter = notes.begin(); iter != notes.end(); iter++) {
+        a << (*iter)->GetUuid();
     }
+    o << "notes" << a;
+    o << "page" << pageNo;
     return o.json();
 #else
     // The non-js version of the app should not use this function.
@@ -654,6 +657,7 @@ bool Toolkit::RenderToMidiFile(const std::string &filename)
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
     outputfile.write(filename);
+
     return true;
 }
 

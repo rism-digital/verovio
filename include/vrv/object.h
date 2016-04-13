@@ -333,6 +333,13 @@ public:
         AttComparison *attComparison, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     /**
+     * Return all the object matching the AttComparison functor
+     * Deepness allow to limit the depth search (EditorialElements are not count)
+     */
+    void FindAllChildByAttComparison(ArrayOfObjects *objects, AttComparison *attComparison,
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+
+    /**
      * Give up ownership of the child at the idx position (NULL if not found)
      * This is a method to be used only in the very particular case where the child
      * object cannot be detached straight away. It is typically the case
@@ -424,6 +431,13 @@ public:
      * param 1: the pointer to pointer to the Object retrieved (if found).
      */
     virtual int FindExtremeByAttComparison(ArrayPtrVoid *params);
+
+    /**
+     * Find a all Object with a AttComparison functor.
+     * param 0: the pointer to the AttComparsion we are evaluating.
+     * param 1: the pointer to the ArrayOfObjects (matching) elements.
+     */
+    virtual int FindAllByAttComparison(ArrayPtrVoid *params);
 
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method

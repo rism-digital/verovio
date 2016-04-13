@@ -117,7 +117,7 @@ public:
      * Creates a midi file, opens it, and returns it (base64 encoded).
      */
     std::string RenderToMidi();
-    
+
     /**
      * Returns array of IDs of elements being currently played.
      */

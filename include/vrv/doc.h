@@ -187,7 +187,7 @@ public:
      * Run trough all the layer and fill the midi file content.
      */
     void ExportMIDI(MidiFile *midifile);
-    
+
     /**
      * Get all the elements (notes and rests) being played at time millisec.
      * Return the page number being currently played, -1 if nothing if found.
@@ -377,6 +377,12 @@ private:
      * drawing preparation will be reset before being done again.
      */
     bool m_drawingPreparationDone;
+
+    /**
+     * A flag to indicate if the MIDI export has been done.
+     * This is necessary for retrieving notes being played at a certain time.
+     */
+    bool m_midiExportDone;
 
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;
