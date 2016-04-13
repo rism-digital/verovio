@@ -769,11 +769,6 @@ public:
      */
     virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
-    /**
-     * See Object::CalcMaxMeasureDuration
-     */
-    virtual int CalcMaxMeasureDurationEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
-
 protected:
     /**
      * Clear the children vector and delete all the objects.

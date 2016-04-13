@@ -95,13 +95,11 @@ const char *vrvToolkit_renderToMidi(Toolkit *tk, const char *c_options)
     return tk->GetCString();
 }
 
-/* Unsure what this function should be
-const char *vrvToolkit_getElementsAtTime(Toolkit *tk, const char *c_options)
+const char *vrvToolkit_getElementsAtTime(Toolkit *tk, int millisec)
 {
-    tk->ResetLogBuffer();
-    tk->SetCString(tk->GetElementsAtTime());
+    tk->SetCString(tk->GetElementsAtTime(millisec));
     return tk->GetCString();
-}*/
+}
 
 void vrvToolkit_setOptions(Toolkit *tk, const char *options)
 {

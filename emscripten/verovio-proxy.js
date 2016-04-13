@@ -40,7 +40,7 @@ verovio.vrvToolkit.renderPage = Module.cwrap('vrvToolkit_renderPage', 'string', 
 verovio.vrvToolkit.renderToMidi = Module.cwrap('vrvToolkit_renderToMidi', 'string', ['number', 'string']);
 
 // char *getElementsAtTime(Toolkit *ic, const char *rendering_options )
-verovio.vrvToolkit.getElementsAtTime = Module.cwrap('vrvToolkit_getElementsAtTime', 'string', ['number', 'string']);
+verovio.vrvToolkit.getElementsAtTime = Module.cwrap('vrvToolkit_getElementsAtTime', 'string', ['number', 'number']);
 
 // char *getMEI(Toolkit *ic, int pageNo )
 verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number', 'number', 'number']);
@@ -112,8 +112,8 @@ verovio.toolkit.prototype.renderToMidi = function (options) {
   	return verovio.vrvToolkit.renderToMidi(this.ptr, options);
 };
 
-verovio.toolkit.prototype.getElementsAtTime = function (options) {
-  	return verovio.vrvToolkit.getElementsAtTime(this.ptr, options);
+verovio.toolkit.prototype.getElementsAtTime = function (millisec) {
+  	return verovio.vrvToolkit.getElementsAtTime(this.ptr, millisec);
 };
 
 verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {

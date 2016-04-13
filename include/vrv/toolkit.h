@@ -121,7 +121,7 @@ public:
     /**
      * Returns array of IDs of elements being currently played.
      */
-    std::vector<std::string> GetElementsAtTime();
+    std::string GetElementsAtTime(int millisec);
 
     /**
      * Get the MEI as a string.
