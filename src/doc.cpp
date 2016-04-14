@@ -510,6 +510,11 @@ int Doc::GetPageCount() const
     return GetChildCount();
 }
 
+bool Doc::GetMidiExportDone() const
+{
+    return m_midiExportDone;
+}
+
 int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;
