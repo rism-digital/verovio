@@ -69,6 +69,11 @@ int vrvToolkit_getPageWithElement(Toolkit *tk, const char *xmlId)
     return tk->GetPageWithElement(xmlId);
 }
 
+double vrvToolkit_getTimeForElement(Toolkit *tk, const char *xmlId)
+{
+    return tk->GetTimeForElement(xmlId);
+}
+
 bool vrvToolkit_loadData(Toolkit *tk, const char *data)
 {
     tk->ResetLogBuffer();

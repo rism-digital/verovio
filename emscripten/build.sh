@@ -195,6 +195,7 @@ python $EMCC $CHATTY \
 		'_vrvToolkit_getMEI',\
 		'_vrvToolkit_getPageCount',\
 		'_vrvToolkit_getPageWithElement',\
+		'_vrvToolkit_getTimeForElement',\
 		'_vrvToolkit_loadData',\
 		'_vrvToolkit_redoLayout',\
 		'_vrvToolkit_renderData',\

@@ -628,22 +628,22 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     ArrayOfObjects notes;
     // Here we would need to check that the midi export is done
     if (m_doc.GetMidiExportDone()) {
-      m_doc.FindAllChildByAttComparison(&notes, &matchTime);
+        m_doc.FindAllChildByAttComparison(&notes, &matchTime);
 
-      // Get the pageNo from the first note (if any)
-      int pageNo = -1;
-      if (notes.size() > 0) {
-          Page *page = dynamic_cast<Page *>(notes.at(0)->GetFirstParent(PAGE));
-          if (page) pageNo = page->GetIdx() + 1;
-      }
+        // Get the pageNo from the first note (if any)
+        int pageNo = -1;
+        if (notes.size() > 0) {
+            Page *page = dynamic_cast<Page *>(notes.at(0)->GetFirstParent(PAGE));
+            if (page) pageNo = page->GetIdx() + 1;
+        }
 
-      // Fill the JSON object
-      ArrayOfObjects::iterator iter;
-      for (iter = notes.begin(); iter != notes.end(); iter++) {
-          a << (*iter)->GetUuid();
-      }
-      o << "notes" << a;
-      o << "page" << pageNo;
+        // Fill the JSON object
+        ArrayOfObjects::iterator iter;
+        for (iter = notes.begin(); iter != notes.end(); iter++) {
+            a << (*iter)->GetUuid();
+        }
+        o << "notes" << a;
+        o << "page" << pageNo;
     }
     return o.json();
 #else
@@ -679,6 +679,18 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
         return 0;
     }
     return page->GetIdx() + 1;
+}
+
+double Toolkit::GetTimeForElement(const std::string &xmlId)
+{
+    Object *element = m_doc.FindChildByUuid(xmlId);
+    double timeofElement = 0.0;
+    if (element->Is() == NOTE) {
+        Note *note = dynamic_cast<Note *>(element);
+        assert(note);
+        timeofElement = note->m_playingOnset;
+    }
+    return timeofElement;
 }
 
 void Toolkit::SetCString(const std::string &data)

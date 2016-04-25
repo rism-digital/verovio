@@ -149,6 +149,12 @@ public:
     int GetPageWithElement(const std::string &xmlId);
 
     /**
+     * Return the time at which the element is the ID (xml:id) is played.
+     * Returns 0 if no element is found.
+     */
+    double GetTimeForElement(const std::string &xmlId);
+
+    /**
     * @name Set and get a std::string into a char * buffer.
     * This is used for returning a string buffer to emscripten.
     * The buffer is freed when reset or in MusController destructor.
