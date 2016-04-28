@@ -24,7 +24,7 @@ verovio.vrvToolkit.getPageCount = Module.cwrap('vrvToolkit_getPageCount', 'numbe
 // int getPageWithElement(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getPageWithElement = Module.cwrap('vrvToolkit_getPageWithElement', 'number', ['number', 'string']);
 
-// float getTimeForElement(Toolkit *ic, const char *xmlId)
+// double getTimeForElement(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getTimeForElement = Module.cwrap('vrvToolkit_getTimeForElement', 'number', ['number', 'string']);
 
 // bool loadData(Toolkit *ic, const char *data )

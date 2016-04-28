@@ -150,6 +150,7 @@ public:
 
     /**
      * Return the time at which the element is the ID (xml:id) is played.
+     * RenderToMidi() must be called prior to using this method.
      * Returns 0 if no element is found.
      */
     double GetTimeForElement(const std::string &xmlId);
