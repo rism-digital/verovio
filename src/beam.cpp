@@ -96,10 +96,24 @@ void Beam::FilterList(ListOfObjects *childList)
     InitCoords(childList);
 }
 
-bool Beam::IsFirstInBeam(LayerElement *element)
+int Beam::GetPosition(LayerElement *element)
 {
     this->GetList(this);
     int position = this->GetListIndex(element);
+    // Check if this is a note in the chord
+    if ((position == -1) && (element->Is() == NOTE)) {
+        Note *note = dynamic_cast<Note *>(element);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord) position = this->GetListIndex(chord);
+    }
+    return position;
+}
+
+bool Beam::IsFirstInBeam(LayerElement *element)
+{
+    this->GetList(this);
+    int position = this->GetPosition(element);
     // This method should be called only if the note is part of a beam
     assert(position != -1);
     // this is the first one
@@ -110,7 +124,7 @@ bool Beam::IsFirstInBeam(LayerElement *element)
 bool Beam::IsLastInBeam(LayerElement *element)
 {
     int size = (int)this->GetList(this)->size();
-    int position = this->GetListIndex(element);
+    int position = this->GetPosition(element);
     // This method should be called only if the note is part of a beam
     assert(position != -1);
     // this is the last one

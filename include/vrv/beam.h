@@ -70,6 +70,12 @@ protected:
      * This is called by Beam::FilterList
      */
     void InitCoords(ListOfObjects *childList);
+    
+    /**
+     * Return the position of the element in the beam.
+     * For notes, lookup the position of the parent chord.
+     */
+    int GetPosition(LayerElement *element);
 
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.
