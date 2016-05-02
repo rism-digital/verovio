@@ -11,6 +11,7 @@
 #include "aligner.h"
 #include "atts_shared.h"
 #include "durationinterface.h"
+#include "note.h"
 #include "object.h"
 
 namespace vrv {
@@ -112,6 +113,34 @@ public:
 
 private:
     AlignmentType m_type;
+};
+
+//----------------------------------------------------------------------------
+// AttNoteOnsetOffsetComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is of a certain ClassId and has a @n of value n.
+ */
+class AttNoteOnsetOffsetComparison : public AttComparison {
+
+public:
+    AttNoteOnsetOffsetComparison(const double time) : AttComparison(NOTE) { m_time = time; };
+
+    void SetTime(int time) { m_time = time; }
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        // This should not happen, but just in case
+        if (object->Is() != NOTE) return false;
+        Note *note = dynamic_cast<Note *>(object);
+        assert(note);
+        return ((note->m_playingOnset < m_time) && (note->m_playingOffset > m_time));
+    }
+
+private:
+    double m_time;
 };
 
 } // namespace vrv

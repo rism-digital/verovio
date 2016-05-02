@@ -78,6 +78,7 @@ void Doc::Reset(DocType type)
     m_drawingEvenSpacing = false;
     m_currentScoreDefDone = false;
     m_drawingPreparationDone = false;
+    m_midiExportDone = false;
 
     m_scoreDef.Reset();
 
@@ -164,6 +165,8 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             midiTrack++;
         }
     }
+
+    m_midiExportDone = true;
 }
 
 void Doc::PrepareDrawing()
@@ -505,6 +508,11 @@ bool Doc::HasPage(int pageIdx) const
 int Doc::GetPageCount() const
 {
     return GetChildCount();
+}
+
+bool Doc::GetMidiExportDone() const
+{
+    return m_midiExportDone;
 }
 
 int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const

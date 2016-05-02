@@ -148,6 +148,12 @@ private:
     static std::map<wchar_t, Glyph> m_textFont;
 };
 
+//----------------------------------------------------------------------------
+// Base64 code borrowed
+//----------------------------------------------------------------------------
+
+std::string Base64Encode(unsigned char const *, unsigned int len);
+
 } // namespace vrv
 
 #endif

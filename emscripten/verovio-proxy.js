@@ -24,6 +24,9 @@ verovio.vrvToolkit.getPageCount = Module.cwrap('vrvToolkit_getPageCount', 'numbe
 // int getPageWithElement(Toolkit *ic, const char *xmlId)
 verovio.vrvToolkit.getPageWithElement = Module.cwrap('vrvToolkit_getPageWithElement', 'number', ['number', 'string']);
 
+// double getTimeForElement(Toolkit *ic, const char *xmlId)
+verovio.vrvToolkit.getTimeForElement = Module.cwrap('vrvToolkit_getTimeForElement', 'number', ['number', 'string']);
+
 // bool loadData(Toolkit *ic, const char *data )
 verovio.vrvToolkit.loadData = Module.cwrap('vrvToolkit_loadData', 'number', ['number', 'string']);
 
@@ -36,6 +39,11 @@ verovio.vrvToolkit.renderData = Module.cwrap('vrvToolkit_renderData', 'string', 
 // char *renderPage(Toolkit *ic, int pageNo, const char *rendering_options )
 verovio.vrvToolkit.renderPage = Module.cwrap('vrvToolkit_renderPage', 'string', ['number', 'number', 'string']);
 
+// char *renderToMidi(Toolkit *ic, const char *rendering_options )
+verovio.vrvToolkit.renderToMidi = Module.cwrap('vrvToolkit_renderToMidi', 'string', ['number', 'string']);
+
+// char *getElementsAtTime(Toolkit *ic, int time )
+verovio.vrvToolkit.getElementsAtTime = Module.cwrap('vrvToolkit_getElementsAtTime', 'string', ['number', 'number']);
 
 // char *getMEI(Toolkit *ic, int pageNo )
 verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number', 'number', 'number']);
@@ -101,6 +109,18 @@ verovio.toolkit.prototype.renderData = function (data, options) {
 
 verovio.toolkit.prototype.renderPage = function (pageNo, options) {
   	return verovio.vrvToolkit.renderPage(this.ptr, pageNo, options);
+};
+
+verovio.toolkit.prototype.renderToMidi = function (options) {
+  	return verovio.vrvToolkit.renderToMidi(this.ptr, options);
+};
+
+verovio.toolkit.prototype.getElementsAtTime = function (millisec) {
+  	return verovio.vrvToolkit.getElementsAtTime(this.ptr, millisec);
+};
+
+verovio.toolkit.prototype.getTimeForElement = function (xmlId) {
+  	return verovio.vrvToolkit.getTimeForElement(this.ptr, xmlId);
 };
 
 verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {

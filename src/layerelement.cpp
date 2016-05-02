@@ -614,6 +614,9 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
         midiFile->addNoteOn(*midiTrack, *totalTime + *currentMeasureTime, channel, pitch, velocity);
         midiFile->addNoteOff(*midiTrack, *totalTime + *currentMeasureTime + dur, channel, pitch);
 
+        note->m_playingOnset = *totalTime + *currentMeasureTime;
+        note->m_playingOffset = *totalTime + *currentMeasureTime + dur;
+
         // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
         if (!(note->IsChordTone())) {
             (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
