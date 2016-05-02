@@ -152,6 +152,24 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
         DrawDots(dc, xDot, noteY, note->GetDots(), staff);
     }
+    
+    /************** accid **************/
+    
+    if (note->m_drawingAccid) {
+        int xAccid = xNote;
+        if (note->m_drawingAccid->GetFunc() != accidLog_FUNC_edit) {
+            xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, false);
+        }
+        
+        note->m_drawingAccid->SetDrawingX(xAccid);
+        note->m_drawingAccid->SetDrawingY(noteY);
+        
+        // postpone drawing the accidental until later if it's in a chord or if it is not an attribute
+        if (note->m_isDrawingAccidAttr) DrawAccid(dc, note->m_drawingAccid, layer, staff, measure);
+    }
+    
+    DrawLayerChildren(dc, note, layer, staff, measure);
+
 }
 
 void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
