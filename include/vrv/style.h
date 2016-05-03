@@ -172,17 +172,17 @@ namespace vrv {
 
 /* Style parameters for mensural notation */
 // Ratio of mensural notehead size to CMN notehead size for the same staff size
-#define MNOTEHEAD_SIZE_FACTOR 0.90
+#define MNOTEHEAD_SIZE_FACTOR 1.0
 // Size of mensuration sign circle relative to space between staff lines
-#define MSIGN_CIRCLE_DIAM 1.7
+#define MSIGN_CIRCLE_DIAM 2.0
 // Vertical position of center of mensuration sign as distance below top of the staff
-#define MSIGN_STAFFLINES_BELOW_TOP 2.0
+#define MSIGN_STAFFLINES_BELOW_TOP 1.0
 // Size of dot inside mensuration signs relative to space between staff lines
 #define MSIGN_DOT_DIAM 0.5
 // Relative size of figures in proportions
-#define PROPRT_SIZE_FACTOR 0.50
+#define PROPRT_SIZE_FACTOR 1.0
 // Linewidth for staff lines in mensural notation, rel. to "normal" width of staff lines */
-#define MENSURAL_LINEWIDTH_FACTOR 0.5
+#define MENSURAL_LINEWIDTH_FACTOR 1.0
 
 /**
  * This class contains the document default environment variables.
