@@ -121,7 +121,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
         DrawSmuflCode(dc, xNote, noteY, charCode, pseudoStaffSize, false);
 
-        DrawStem(dc, note, staff, true, note->GetDrawingStemDir(), radius, xStem, noteY);
+        DrawMensuralStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
     }
 
     /************** Ledger lines: **************/
@@ -155,6 +155,23 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
         DrawDots(dc, xDot, noteY, note->GetDots(), staff);
     }
+
+    /************** accid **************/
+
+    if (note->m_drawingAccid) {
+        int xAccid = xNote;
+        if (note->m_drawingAccid->GetFunc() != accidLog_FUNC_edit) {
+            xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, false);
+        }
+
+        note->m_drawingAccid->SetDrawingX(xAccid);
+        note->m_drawingAccid->SetDrawingY(noteY);
+
+        // postpone drawing the accidental until later if it's in a chord or if it is not an attribute
+        if (note->m_isDrawingAccidAttr) DrawAccid(dc, note->m_drawingAccid, layer, staff, measure);
+    }
+
+    DrawLayerChildren(dc, note, layer, staff, measure);
 }
 
 void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -202,6 +219,103 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     }
 
     dc->EndGraphic(element, this);
+}
+
+void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius,
+    int xn, int originY, int heightY)
+{
+    assert(object->GetDurationInterface());
+
+    int staffSize = staff->m_drawingStaffSize;
+    int staffY = staff->GetDrawingY();
+    int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
+    int drawingDur = (object->GetDurationInterface())->GetActualDur();
+    bool drawingCueSize = object->IsCueSize();
+    int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+
+    baseStem = m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
+    flagStemHeight = m_doc->GetDrawingDoubleUnit(staffSize);
+    if (drawingCueSize) {
+        baseStem = m_doc->GetGraceSize(baseStem);
+        flagStemHeight = m_doc->GetGraceSize(flagStemHeight);
+    }
+
+    nbFlags = drawingDur - DUR_8;
+    totalFlagStemHeight = flagStemHeight * (nbFlags * 2 - 1) / 2;
+
+    if (dir == STEMDIRECTION_down) {
+        // flip all lengths. Exception: in mensural notation, the stem will never be at left,
+        //   so leave radius as is.
+        baseStem = -baseStem;
+        totalFlagStemHeight = -totalFlagStemHeight;
+        heightY = -heightY;
+    }
+
+    // If we have flags, add them to the height. If duration is longa or maxima and (probably
+    // a redundant test) note is mensural, move stem to the right side of the notehead.
+    int y1 = originY;
+    int y2 = ((drawingDur > DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
+    int x2;
+    if (drawingDur < DUR_BR)
+        x2 = xn + radius;
+    else
+        x2 = xn;
+
+    if ((dir == STEMDIRECTION_up) && (y2 < verticalCenter)) {
+        y2 = verticalCenter;
+    }
+    else if ((dir == STEMDIRECTION_down) && (y2 > verticalCenter)) {
+        y2 = verticalCenter;
+    }
+
+    // shorten the stem at its connection with the note head
+    // this will not work if the pseudo size is changed
+    int shortening = 0.9 * m_doc->GetDrawingUnit(staffSize);
+
+    int stemY1 = (dir == STEMDIRECTION_up) ? y1 + shortening : y1 - shortening;
+    int stemY2 = y2;
+    if (drawingDur > DUR_4) {
+        // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
+        int shortener = (drawingCueSize) ? m_doc->GetGraceSize(m_doc->GetDrawingUnit(staffSize))
+                                         : m_doc->GetDrawingUnit(staffSize);
+        stemY2 = (dir == STEMDIRECTION_up) ? y2 - shortener : y2 + shortener;
+    }
+
+    int halfStemWidth = m_doc->GetDrawingStemWidth(staffSize) / 2;
+    // draw the stems and the flags
+    if (dir == STEMDIRECTION_up) {
+        DrawFullRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+
+        if (drawingDur > DUR_4) {
+            DrawSmuflCode(dc, x2 - halfStemWidth, y2, SMUFL_E240_flag8thUp, staff->m_drawingStaffSize, drawingCueSize);
+            for (int i = 0; i < nbFlags; i++)
+                DrawSmuflCode(dc, x2 - halfStemWidth, y2 - (i + 1) * flagStemHeight, SMUFL_E240_flag8thUp,
+                    staff->m_drawingStaffSize, drawingCueSize);
+        }
+    }
+    else {
+        DrawFullRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+
+        if (drawingDur > DUR_4) {
+            DrawSmuflCode(
+                dc, x2 - halfStemWidth, y2, SMUFL_E241_flag8thDown, staff->m_drawingStaffSize, drawingCueSize);
+            for (int i = 0; i < nbFlags; i++)
+                DrawSmuflCode(dc, x2 - halfStemWidth, y2 + (i + 1) * flagStemHeight, SMUFL_E241_flag8thDown,
+                    staff->m_drawingStaffSize, drawingCueSize);
+        }
+    }
+
+    // Store the start and end values
+    StemmedDrawingInterface *interface = object->GetStemmedDrawingInterface();
+    assert(interface);
+    interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
+    interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
+    interface->SetDrawingStemDir(dir);
+
+    // cast to note is check when setting drawingCueSize value
+    if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_acc)) {
+        DrawAcciaccaturaSlash(dc, object);
+    }
 }
 
 void View::DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff)

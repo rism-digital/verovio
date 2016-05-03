@@ -53,7 +53,7 @@ while getopts "lwv:h:c" opt; do
 		l)
 			echo "light version (-l)"
 			ASM="\
-				-O3 --memory-init-file 0 \
+				-O3 --memory-init-file 0 -std=c++11 \
 				-s ASM_JS=1 "
 			ASM_NAME="-light"
 			;;
@@ -190,15 +190,18 @@ python $EMCC $CHATTY \
 	-s EXPORTED_FUNCTIONS="[\
 		'_vrvToolkit_constructor',\
 		'_vrvToolkit_destructor',\
+		'_vrvToolkit_getElementsAtTime',\
 		'_vrvToolkit_getLog',\
 		'_vrvToolkit_getVersion',\
 		'_vrvToolkit_getMEI',\
 		'_vrvToolkit_getPageCount',\
 		'_vrvToolkit_getPageWithElement',\
+		'_vrvToolkit_getTimeForElement',\
 		'_vrvToolkit_loadData',\
 		'_vrvToolkit_redoLayout',\
 		'_vrvToolkit_renderData',\
 		'_vrvToolkit_renderPage',\
+		'_vrvToolkit_renderToMidi',\
 		'_vrvToolkit_setOptions',\
 		'_vrvToolkit_edit',\
 		'_vrvToolkit_getElementAttr']" \

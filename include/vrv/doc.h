@@ -63,7 +63,8 @@ public:
     * Get the total page count
     */
     int GetPageCount() const;
-
+    
+    bool GetMidiExportDone() const;
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
      */
@@ -370,6 +371,12 @@ private:
      * drawing preparation will be reset before being done again.
      */
     bool m_drawingPreparationDone;
+
+    /**
+     * A flag to indicate if the MIDI export has been done.
+     * This is necessary for retrieving notes being played at a certain time.
+     */
+    bool m_midiExportDone;
 
     /** Page width (MEI scoredef@page.width) - currently not saved */
     int m_pageWidth;

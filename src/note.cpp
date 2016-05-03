@@ -93,6 +93,9 @@ void Note::Reset()
     m_clusterPosition = 0;
     m_cluster = NULL;
     m_graceAlignment = NULL;
+
+    m_playingOnset = 0.0;
+    m_playingOffset = 0.0;
 }
 
 void Note::AddLayerElement(vrv::LayerElement *element)

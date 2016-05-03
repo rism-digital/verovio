@@ -66,9 +66,12 @@ public:
     virtual ClassId Is() const { return NOTE; };
     ///@}
 
-    virtual DurationInterface * GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
     virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
-    virtual StemmedDrawingInterface *GetStemmedDrawingInterface() { return dynamic_cast<StemmedDrawingInterface *>(this); }
+    virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
+    {
+        return dynamic_cast<StemmedDrawingInterface *>(this);
+    }
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; };
@@ -164,6 +167,9 @@ public:
      * If yes, then it is owned by the Note and will be deleted
      */
     bool m_isDrawingAccidAttr;
+
+    double m_playingOnset;
+    double m_playingOffset;
 
 private:
     /**

@@ -739,11 +739,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             if (!stepStr.empty()) note->SetPname(ConvertStepToPitchName(stepStr));
             std::string octaveStr = GetContentOfChild(pitch.node(), "octave");
             if (!octaveStr.empty()) note->SetOct(atoi(octaveStr.c_str()));
-            std::string alterStr = GetContentOfChild(node, "atler");
+            std::string alterStr = GetContentOfChild(pitch.node(), "alter");
             //
             if (accidentalStr.empty() && !alterStr.empty()) {
                 // add accid.ges once supported
-                // note->SetAccidGes(ConvertAlterToAccid(alterStr));
+                note->SetAccidGes((data_ACCIDENTAL_IMPLICIT)ConvertAlterToAccid(alterStr));
             }
         }
 

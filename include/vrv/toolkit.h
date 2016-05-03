@@ -114,6 +114,16 @@ public:
     bool RenderToMidiFile(const std::string &filename);
 
     /**
+     * Creates a midi file, opens it, and returns it (base64 encoded).
+     */
+    std::string RenderToMidi();
+
+    /**
+     * Returns array of IDs of elements being currently played.
+     */
+    std::string GetElementsAtTime(int millisec);
+
+    /**
      * Get the MEI as a string.
      * Get all the pages unless a page number (1-based) is specified
      */
@@ -137,6 +147,13 @@ public:
      * Returns 0 if no element is found.
      */
     int GetPageWithElement(const std::string &xmlId);
+
+    /**
+     * Return the time at which the element is the ID (xml:id) is played.
+     * RenderToMidi() must be called prior to using this method.
+     * Returns 0 if no element is found.
+     */
+    double GetTimeForElement(const std::string &xmlId);
 
     /**
     * @name Set and get a std::string into a char * buffer.

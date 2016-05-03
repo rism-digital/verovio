@@ -62,11 +62,6 @@ void Beam::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
-        if ((*iter)->Is() == REST) {
-            // remove anything that has not a DurationInterface
-            iter = childList->erase(iter);
-            continue;
-        }
         else {
             // Drop notes that are signaled as grace notes
 
@@ -85,6 +80,9 @@ void Beam::FilterList(ListOfObjects *childList)
                 // drop them
                 if (!firstNoteGrace && n->HasGrace() == true)
                     iter = childList->erase(iter);
+                // also remove notes within chords
+                else if (n->IsChordTone())
+                    iter = childList->erase(iter);
                 else
                     iter++;
             }
@@ -98,10 +96,24 @@ void Beam::FilterList(ListOfObjects *childList)
     InitCoords(childList);
 }
 
-bool Beam::IsFirstInBeam(LayerElement *element)
+int Beam::GetPosition(LayerElement *element)
 {
     this->GetList(this);
     int position = this->GetListIndex(element);
+    // Check if this is a note in the chord
+    if ((position == -1) && (element->Is() == NOTE)) {
+        Note *note = dynamic_cast<Note *>(element);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord) position = this->GetListIndex(chord);
+    }
+    return position;
+}
+
+bool Beam::IsFirstInBeam(LayerElement *element)
+{
+    this->GetList(this);
+    int position = this->GetPosition(element);
     // This method should be called only if the note is part of a beam
     assert(position != -1);
     // this is the first one
@@ -112,7 +124,7 @@ bool Beam::IsFirstInBeam(LayerElement *element)
 bool Beam::IsLastInBeam(LayerElement *element)
 {
     int size = (int)this->GetList(this)->size();
-    int position = this->GetListIndex(element);
+    int position = this->GetPosition(element);
     // This method should be called only if the note is part of a beam
     assert(position != -1);
     // this is the last one

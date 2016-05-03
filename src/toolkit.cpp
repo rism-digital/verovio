@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "attcomparison.h"
 #include "iodarms.h"
 #include "iomei.h"
 #include "iomusxml.h"
@@ -534,6 +535,20 @@ void Toolkit::ResetLogBuffer()
 #endif
 }
 
+void Toolkit::RedoLayout()
+{
+    m_doc.SetPageHeight(this->GetPageHeight());
+    m_doc.SetPageWidth(this->GetPageWidth());
+    m_doc.SetPageRightMar(this->GetBorder());
+    m_doc.SetPageLeftMar(this->GetBorder());
+    m_doc.SetPageTopMar(this->GetBorder());
+    m_doc.SetSpacingStaff(this->GetSpacingStaff());
+    m_doc.SetSpacingSystem(this->GetSpacingSystem());
+
+    m_doc.UnCastOff();
+    m_doc.CastOff();
+}
+
 std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
 {
     // Page number is one-based - correct it to 0-based first
@@ -570,20 +585,6 @@ std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
     return out_str;
 }
 
-void Toolkit::RedoLayout()
-{
-    m_doc.SetPageHeight(this->GetPageHeight());
-    m_doc.SetPageWidth(this->GetPageWidth());
-    m_doc.SetPageRightMar(this->GetBorder());
-    m_doc.SetPageLeftMar(this->GetBorder());
-    m_doc.SetPageTopMar(this->GetBorder());
-    m_doc.SetSpacingStaff(this->GetSpacingStaff());
-    m_doc.SetSpacingSystem(this->GetSpacingSystem());
-
-    m_doc.UnCastOff();
-    m_doc.CastOff();
-}
-
 bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
 {
     std::string output = RenderToSvg(pageNo, true);
@@ -601,6 +602,56 @@ bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
     return true;
 }
 
+std::string Toolkit::RenderToMidi()
+{
+    MidiFile outputfile;
+    outputfile.absoluteTicks();
+    m_doc.ExportMIDI(&outputfile);
+    outputfile.sortTracks();
+
+    stringstream strstrem;
+    outputfile.write(strstrem);
+    std::string outputstr = Base64Encode(
+        reinterpret_cast<const unsigned char *>(strstrem.str().c_str()), (unsigned int)strstrem.str().length());
+
+    return outputstr;
+}
+
+std::string Toolkit::GetElementsAtTime(int millisec)
+{
+#ifdef USE_EMSCRIPTEN
+    jsonxx::Object o;
+    jsonxx::Array a;
+
+    double time = (double)(millisec * 120 / 1000);
+    AttNoteOnsetOffsetComparison matchTime(time);
+    ArrayOfObjects notes;
+    // Here we would need to check that the midi export is done
+    if (m_doc.GetMidiExportDone()) {
+        m_doc.FindAllChildByAttComparison(&notes, &matchTime);
+
+        // Get the pageNo from the first note (if any)
+        int pageNo = -1;
+        if (notes.size() > 0) {
+            Page *page = dynamic_cast<Page *>(notes.at(0)->GetFirstParent(PAGE));
+            if (page) pageNo = page->GetIdx() + 1;
+        }
+
+        // Fill the JSON object
+        ArrayOfObjects::iterator iter;
+        for (iter = notes.begin(); iter != notes.end(); iter++) {
+            a << (*iter)->GetUuid();
+        }
+        o << "notes" << a;
+        o << "page" << pageNo;
+    }
+    return o.json();
+#else
+    // The non-js version of the app should not use this function.
+    return "";
+#endif
+}
+
 bool Toolkit::RenderToMidiFile(const std::string &filename)
 {
     MidiFile outputfile;
@@ -608,6 +659,7 @@ bool Toolkit::RenderToMidiFile(const std::string &filename)
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
     outputfile.write(filename);
+
     return true;
 }
 
@@ -627,6 +679,18 @@ int Toolkit::GetPageWithElement(const std::string &xmlId)
         return 0;
     }
     return page->GetIdx() + 1;
+}
+
+double Toolkit::GetTimeForElement(const std::string &xmlId)
+{
+    Object *element = m_doc.FindChildByUuid(xmlId);
+    double timeofElement = 0.0;
+    if (element->Is() == NOTE) {
+        Note *note = dynamic_cast<Note *>(element);
+        assert(note);
+        timeofElement = note->m_playingOnset;
+    }
+    return timeofElement;
 }
 
 void Toolkit::SetCString(const std::string &data)
