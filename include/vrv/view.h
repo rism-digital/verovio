@@ -252,7 +252,7 @@ protected:
     void DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff);
     void DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
     void DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
-    void DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, bool isMensural, data_STEMDIRECTION dir,
+    void DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir,
         int radius, int xn, int originY, int heightY = 0);
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff);
     ///@}
@@ -328,6 +328,8 @@ protected:
      * Defined in view_mensural.cpp
      */
     ///@{
+    void DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir,
+                  int radius, int xn, int originY, int heightY = 0);
     void DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMensurDot(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMensurHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff);

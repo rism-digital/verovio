@@ -442,7 +442,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             int beamX = chord->GetDrawingX();
             int originY = (chord->GetDrawingStemDir() == STEMDIRECTION_down ? yMax : yMin);
             int heightY = yMax - yMin;
-            DrawStem(dc, chord, staff, false, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
+            DrawStem(dc, chord, staff, chord->GetDrawingStemDir(), radius, beamX, originY, heightY);
         }
     }
 
@@ -1170,7 +1170,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         DrawSmuflCode(dc, xNote, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
 
         if (!(inBeam && drawingDur > DUR_4) && !inFTrem && !inChord) {
-            DrawStem(dc, note, staff, false, note->GetDrawingStemDir(), radius, xStem, noteY);
+            DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
         }
     }
 
@@ -1728,7 +1728,7 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned c
     }
 }
 
-void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, bool isMensural, data_STEMDIRECTION dir,
+void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir,
     int radius, int xn, int originY, int heightY)
 {
     assert(object->GetDurationInterface());
@@ -1755,7 +1755,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, bool 
         //   so leave radius as is.
         baseStem = -baseStem;
         totalFlagStemHeight = -totalFlagStemHeight;
-        if (!isMensural) radius = -radius;
+        radius = -radius;
         heightY = -heightY;
     }
 
@@ -1763,15 +1763,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, bool 
     // a redundant test) note is mensural, move stem to the right side of the notehead.
     int y1 = originY;
     int y2 = ((drawingDur > DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
-    int x2;
-    if (isMensural) {
-        if (drawingDur < DUR_BR)
-            x2 = xn + radius;
-        else
-            x2 = xn;
-    }
-    else
-        x2 = xn + radius;
+    int x2 = xn + radius;
 
     if ((dir == STEMDIRECTION_up) && (y2 < verticalCenter)) {
         y2 = verticalCenter;
@@ -1781,11 +1773,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, bool 
     }
 
     // shorten the stem at its connection with the note head
-    int shortening;
-    if (isMensural)
-        shortening = 0.6 * m_doc->GetDrawingUnit(staffSize);
-    else
-        shortening = 0.25 * m_doc->GetDrawingUnit(staffSize);
+    int shortening = 0.25 * m_doc->GetDrawingUnit(staffSize);
     int stemY1 = (dir == STEMDIRECTION_up) ? y1 + shortening : y1 - shortening;
     int stemY2 = y2;
     if (drawingDur > DUR_4) {
