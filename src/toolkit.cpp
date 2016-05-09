@@ -302,7 +302,7 @@ bool Toolkit::LoadString(const std::string &data)
         input->IgnoreLayoutInformation();
     }
 
-    // rdg xpath query?
+    // app xpath query?
     if (m_appXPathQuery.length() > 0) {
         input->SetAppXPathQuery(m_appXPathQuery);
     }

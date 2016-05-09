@@ -116,7 +116,7 @@ void display_usage()
 
     cerr << " --page=PAGE                Select the page to engrave (default is 1)" << endl;
 
-    cerr << " --rdg-xpath-query=QUERY    Set the xPath query for selecting <rdg> elements," << endl;
+    cerr << " --app-xpath-query=QUERY    Set the xPath query for selecting <app> child elements," << endl;
     cerr << "                            for example: \"./rdg[contains(@source, 'source-id')]\"" << endl;
 
     cerr << " --spacing-linear=SP        Specify the linear spacing factor (default is " << DEFAULT_SPACING_LINEAR
@@ -186,7 +186,7 @@ int main(int argc, char **argv)
         { "no-mei-hdr", no_argument, &no_mei_hdr, 1 }, { "no-justification", no_argument, &no_justification, 1 },
         { "outfile", required_argument, 0, 'o' }, { "page", required_argument, 0, 0 },
         { "page-height", required_argument, 0, 'h' }, { "page-width", required_argument, 0, 'w' },
-        { "rdg-xpath-query", required_argument, 0, 0 }, { "resources", required_argument, 0, 'r' },
+        { "app-xpath-query", required_argument, 0, 0 }, { "resources", required_argument, 0, 'r' },
         { "scale", required_argument, 0, 's' }, { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 },
         { "spacing-linear", required_argument, 0, 0 }, { "spacing-non-linear", required_argument, 0, 0 },
         { "spacing-staff", required_argument, 0, 0 }, { "spacing-system", required_argument, 0, 0 },
@@ -203,7 +203,7 @@ int main(int argc, char **argv)
                 else if (strcmp(long_options[option_index].name, "page") == 0) {
                     page = atoi(optarg);
                 }
-                else if (strcmp(long_options[option_index].name, "rdg-xpath-query") == 0) {
+                else if (strcmp(long_options[option_index].name, "app-xpath-query") == 0) {
                     cout << string(optarg) << endl;
                     toolkit.SetAppXPathQuery(string(optarg));
                 }

@@ -284,7 +284,7 @@ public:
     ///@}
 
     /**
-     * @name Set and get the xPath query for selecting <rdg> (if any)
+     * @name Set and get the xPath query for selecting <app> (if any)
      */
     ///@{
     void SetAppXPathQuery(std::string const &appXPathQuery) { m_appXPathQuery = appXPathQuery; };
@@ -292,7 +292,7 @@ public:
     ///@}
 
     /**
-     * @name Set and get the xPath query for selecting <rdg> (if any)
+     * @name Set and get the xPath query for selecting <app> (if any)
      */
     ///@{
     void SetScoreBasedMei(bool scoreBasedMei) { m_scoreBasedMei = scoreBasedMei; };

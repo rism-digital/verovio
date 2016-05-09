@@ -91,7 +91,7 @@ public:
     bool HasMeasureWithinEditoMarkup() { return m_hasMeasureWithinEditMarkup; };
 
     /**
-     * Set XPath query for <rdg> (MEI only)
+     * Set XPath query for <app> (MEI only)
      */
     virtual void SetAppXPathQuery(std::string xPathQuery){};
 
