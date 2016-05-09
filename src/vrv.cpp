@@ -30,6 +30,10 @@
 #include "pugixml.hpp"
 #include "unchecked.h"
 
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
 #define STRING_FORMAT_MAX_LEN 2048
 
 namespace vrv {
@@ -326,12 +330,9 @@ bool LogBufferContains(std::string s)
 
 void AppendLogBuffer(bool checkDuplicate, std::string message)
 {
-    if (checkDuplicate) {
-        if (!LogBufferContains(message)) logBuffer.push_back(message);
-    }
-    else {
-        logBuffer.push_back(message);
-    }
+    if (checkDuplicate && LogBufferContains(message)) return;
+    logBuffer.push_back(message);
+    EM_ASM_ARGS({ console.log(Pointer_stringify($0)); }, message.c_str());
 }
 #endif
 
