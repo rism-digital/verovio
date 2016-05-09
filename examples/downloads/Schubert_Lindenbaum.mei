@@ -184,7 +184,7 @@
                 <score>
                     <scoreDef ppq="24" meter.count="3" meter.unit="4" key.sig="1f">
                         <staffGrp>
-                            <staffDef n="1" xml:id="P1" lines="5" clef.line="2" clef.shape="G" key.sig="1f"  label="Singstimme"/>
+                            <staffDef n="1" xml:id="P1" lines="5" clef.line="2" clef.shape="G" key.sig="1f"  label="Singstimme" scale="85%"/>
                             <staffGrp xml:id="P2" symbol="brace" label="Pianoforte">
                                 <staffDef n="2" lines="5" clef.line="2" clef.shape="G" key.sig="1f"/>
                                 <staffDef n="3" lines="5" clef.line="4" clef.shape="F" key.sig="1f"/>
@@ -227,7 +227,7 @@
                             </staff>
                             <dynam label="direction" tstamp="1" tstamp.ges="0" place="below" staff="2">p</dynam>
                             <tempo staff="1" place="above" tstamp="1">Mässig.</tempo>
-                            <dir staff="1" place="above" tstamp="0">205.</dir>
+                            <!--dir staff="1" place="above" tstamp="0">205.</dir-->
                         </measure>
                         <measure n="2" xml:id="d1e192">
                             <staff n="1">
@@ -1662,8 +1662,8 @@
                             <tie startid="#d1e7162" curvedir="below" endid="#d1e7229"/>
                             <tie startid="#d1e7182" curvedir="below" endid="#d1e7254"/>
                             <slur startid="#d1e7022" curvedir="above" endid="#d1e7114"/>
-                            <hairpin form="cres" tstamp="2.33" tstamp2="2.6667"/>
-                            <hairpin form="dim" tstamp="3" tstamp2="3.6667"/>
+                            <hairpin staff="2" form="cres" tstamp="2.33" tstamp2="2.6667"/>
+                            <hairpin staff="2" form="dim" tstamp="3" tstamp2="3.6667"/>
                         </measure>
                         <measure n="18" xml:id="d1e7405">
                             <staff n="1">

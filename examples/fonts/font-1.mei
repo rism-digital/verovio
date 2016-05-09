@@ -87,6 +87,10 @@
                                 </layer>
                             </staff>
                             <tie tstamp="4.5" staff="2" curvedir="below" startid="#d1e569" endid="#d1e913"/>
+
+                            <dynam tstamp="1" staff="3">p</dynam>
+                            <dynam tstamp="2.5" staff="3">mf</dynam>
+                            <dynam tstamp="4.5" staff="3">f</dynam>
                         </measure>
                         <measure n="2" xml:id="d1e731" width="246.97">
                             <staff n="1">
@@ -143,6 +147,7 @@
                             </staff>
                             <tie tstamp="4.5" staff="1" curvedir="above" startid="#d1e891" endid="#d1e1173"/>
                             <trill staff="1" place="above" tstamp="1" startid="#d1e733"/>
+                            <dynam tstamp="3" staff="3">mp</dynam>
                         </measure>
                     </section>
                 </score>

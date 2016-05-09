@@ -90,8 +90,18 @@ active: home
                 <div id="carousel" class="carousel slide" data-ride="carousel">
                     <!-- Wrapper for slides -->
                     <div class="carousel-inner" role="listbox">
+                        <div class="item video-item">
+                            <video autoplay="true" loop="true" class="img-responsive window-shadow">
+                                <source src="/movies/editor.webm" type="video/webm"/>
+                            </video>
+                        </div>
                         <div class="item">
                             {% include svg/hummel-p6.svg %}
+                        </div>
+                        <div class="item video-item">
+                            <video autoplay="true" loop="true" class="img-responsive window-shadow">
+                                <source src="/movies/player.webm" type="video/webm"/>
+                            </video>
                         </div>
                         <div class="item">
                             {% include svg/schubert.svg %}
@@ -103,7 +113,13 @@ active: home
                 </div>
                 <div id="carousel-descriptions">
                     <p class="carousel-description text-center">
+                        Example use in a web-based editor
+                    </p>
+                    <p class="carousel-description text-center">
                         Johann Nepomuk Hummel, <em>Concerto for Trumpet in E major</em>
+                    </p>
+                    <p class="carousel-description text-center">
+                        Example of notes highlighting together with a MIDI player
                     </p>
                     <p class="carousel-description text-center">
                         Franz Schubert, <em>Der Lindenbaum</em>
@@ -148,7 +164,10 @@ active: home
         $(".carousel-inner .item").each(function(){
             $( "svg", this).attr("height", pageHeight * zoom / 100 + "px" );
             $( "svg", this).attr("width", pageWidth * zoom / 100 + "px" );
-        });    
+        });
+        $(".carousel-inner .video-item").each(function(){
+            $(this).css("min-height", pageHeight * zoom / 100 + "px" );
+        });      
     }
     
     function load_description( image ) {
@@ -164,7 +183,7 @@ active: home
         rand = Math.floor( Math.random() * $( "#carousel .item" ).length );
         load_description( rand );
         $( "#carousel .item").eq(rand).addClass("active");
-        $( "#carousel" ).carousel( { interval: 7000 } );
+        $( "#carousel" ).carousel( { interval: 5000 } );
         $( "#carousel" ).on('slid.bs.carousel', function (e) {
             idx = $(".active", e.target).index();
             load_description(idx);

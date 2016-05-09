@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Tempo example</title>
+            </titleStmt>
+            <pubStmt></pubStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp> 
+                            <staffDef clef.line="2" clef.shape="G" lines="5" n="1" xml:id="sd1" meter.sym="cut"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="4" oct="4" pname="a" xml:id="ed4n0v1b1s1"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="2">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note label="feature-example" dur="4" oct="6" pname="d" xml:id="cd4n0v1b2s1"/>
+                                    <note label="feature-example" dur="4" oct="3" pname="a" xml:id="bd3n128v1b2s1"/>
+                                    <note label="feature-example" dur="4" oct="3" pname="f" accid="s" xml:id="cd4n256v1b2s1"/>
+                                    <rest label="feature-example" dur="8" xml:id="bd3r384v1b2s1"/>
+                                    <note label="feature-example" dur="8" oct="4" pname="e" xml:id="bd3n384v1b2s1"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="3">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="4" oct="4" pname="a" xml:id="ed4n0v1b3s1"/>
+                                    <note dur="4" oct="4" pname="d" xml:id="dd4n128v1b3s1"/>
+                                    <note dur="4" oct="3" pname="g" xml:id="ed4n256v1b3s1"/>
+                                    <note dur="4" oct="4" pname="d" xml:id="dd4n384v1b3s1"/>
+                                </layer>
+                            </staff>
+                            <slur startid="ed4n256v1b3s1" endid="dd4n384v1b3s1"/>
+                        </measure>
+                        <measure n="4" right="invis">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="4" oct="3" pname="b" xml:id="bd3n512v1b4s1" tie="t"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

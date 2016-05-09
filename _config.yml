@@ -1,6 +1,4 @@
 name: Verovio music engraving library
-markdown: redcarpet
-pygments: true
+markdown: kramdown
 baseurl: "http://www.verovio.org"
-
 exclude: []
