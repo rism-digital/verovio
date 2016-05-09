@@ -636,9 +636,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(slur, "spanning-slur", "");
-    // dc->DeactivateGraphic();
     DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize, angle);
-    // dc->ReactivateGraphic();
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
@@ -1191,9 +1189,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(tie, "spanning-tie", "");
-    dc->DeactivateGraphic();
     DrawThickBezierCurve(dc, Point(x1, y1), Point(x2, y2), c1, c2, thickness, staff->m_drawingStaffSize);
-    dc->ReactivateGraphic();
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
@@ -1458,65 +1454,5 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     dc->EndGraphic(tempo, this);
 }
-
-/*
-int View::GetDynamY(data_STAFFREL place, Staff *staff, bool baseline)
-{
-    assert(staff);
-
-    if (!staff->GetAlignment()) return staff->GetDrawingY();
-
-    int baselineShift = 0;
-    if (baseline) {
-        int descender = m_doc->GetGlyphDescender(SMUFL_E522_dynamicForte, staff->m_drawingStaffSize, false);
-        int height = m_doc->GetGlyphHeight(SMUFL_E522_dynamicForte, staff->m_drawingStaffSize, false);
-        baselineShift = height / 2 + descender;
-    }
-
-    // Temporary basic method for positionning dynam
-    int y;
-    if (place == STAFFREL_above) {
-        // For now is is position according to the staff and not the staff aligner. To be changed once we introduce
-        // the dynamic aligner within the staff aligner
-        y = staff->GetDrawingY() + staff->m_contentBB_y2;
-        if (baseline)
-            return y + m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2 - baselineShift;
-        else
-            return y + m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2;
-    }
-    else {
-        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight();
-        if (baseline)
-            return y - m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2 - baselineShift;
-        else
-            return y - m_doc->GetDrawingDynamHeight(staff->m_drawingStaffSize, true) / 2;
-    }
-    return y;
-}
-*/
-
-/*
-int View::GetHairpinY(data_STAFFREL place, Staff *staff)
-{
-    assert(staff);
-
-    if (!staff->GetAlignment()) return staff->GetDrawingY();
-
-    int y;
-    if (place == STAFFREL_above) {
-        if (staff->GetAlignment()->GetDynamAbove()) return this->GetDynamY(place, staff, false);
-        // For now is is position according to the staff and not the staff aligner. To be changed once we introduce
-        // the dynamic aligner within the staff aligner
-        y = staff->GetDrawingY() + staff->m_contentBB_y2
-            + m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, true) / 2;
-    }
-    else {
-        if (staff->GetAlignment()->GetDynamBelow()) return this->GetDynamY(place, staff, false);
-        y = staff->GetDrawingY() + staff->GetAlignment()->GetMaxHeight()
-            - m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, true) / 2;
-    }
-    return y;
-}
-*/
 
 } // namespace vrv

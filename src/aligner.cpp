@@ -517,7 +517,7 @@ int StaffAlignment::AdjustFloatingPostioners(ArrayPtrVoid *params)
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
         if ((*iter)->GetElement()->Is() != (*classId)) continue;
 
-        if ((*classId) == SLUR) {
+        if (((*classId) == SLUR) || ((*classId) == TIE)) {
 
             int overflowAbove = this->CalcOverflowAbove((*iter));
             if (overflowAbove > doc->GetDrawingStaffLineWidth(staffSize) / 2) {

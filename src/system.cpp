@@ -273,6 +273,8 @@ int System::AdjustFloatingPostioners(ArrayPtrVoid *params)
     ClassId *classId = static_cast<ClassId *>((*params).at(0));
     Functor *adjustFloatingBoundingBoxes = static_cast<Functor *>((*params).at(2));
 
+    (*classId) = TIE;
+    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     (*classId) = SLUR;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     (*classId) = HAIRPIN;
