@@ -1380,10 +1380,10 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         dynamTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
         // If the dynamic is a symbol (pp, mf, etc.) draw it as one smufl string. This will not take into account
-        // editorial element within the dynam as it would with text
+        // editorial element within the dynam as it would with text. Also, it is center only if it is a symbol.
         if (isSymbolOnly) {
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            DrawSmuflString(dc, x, y, dynamSymbol, true, (*staffIter)->m_drawingStaffSize);
+            DrawSmuflString(dc, x, y, dynamSymbol, false, (*staffIter)->m_drawingStaffSize);
             dc->ResetFont();
         }
         else {
