@@ -1144,36 +1144,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         xNote = xStem - radius;
     }
 
-    /************** Noteheads: **************/
-
-    if (drawingDur < DUR_1) {
-        DrawMaximaToBrevis(dc, noteY, element, layer, staff);
-    }
-    // Whole notes
-    else if (drawingDur == DUR_1) {
-        if (note->GetColored() == BOOLEAN_true)
-            fontNo = SMUFL_E0FA_noteheadWholeFilled;
-        else
-            fontNo = SMUFL_E0A2_noteheadWhole;
-
-        DrawSmuflCode(dc, xNote, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
-    }
-    // Other values
-    else {
-        if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2) {
-            fontNo = SMUFL_E0A3_noteheadHalf;
-        }
-        else {
-            fontNo = SMUFL_E0A4_noteheadBlack;
-        }
-
-        DrawSmuflCode(dc, xNote, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
-
-        if (!(inBeam && drawingDur > DUR_4) && !inFTrem && !inChord) {
-            DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
-        }
-    }
-
     /************** Ledger lines: **************/
 
     int staffTop = staffY + m_doc->GetDrawingUnit(staffSize);
@@ -1205,6 +1175,36 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         // we do want to go ahead and draw if it's not in a chord
         else {
             DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
+        }
+    }
+
+    /************** Noteheads: **************/
+
+    if (drawingDur < DUR_1) {
+        DrawMaximaToBrevis(dc, noteY, element, layer, staff);
+    }
+    // Whole notes
+    else if (drawingDur == DUR_1) {
+        if (note->GetColored() == BOOLEAN_true)
+            fontNo = SMUFL_E0FA_noteheadWholeFilled;
+        else
+            fontNo = SMUFL_E0A2_noteheadWhole;
+
+        DrawSmuflCode(dc, xNote, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
+    }
+    // Other values
+    else {
+        if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2) {
+            fontNo = SMUFL_E0A3_noteheadHalf;
+        }
+        else {
+            fontNo = SMUFL_E0A4_noteheadBlack;
+        }
+
+        DrawSmuflCode(dc, xNote, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
+
+        if (!(inBeam && drawingDur > DUR_4) && !inFTrem && !inChord) {
+            DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
         }
     }
 
@@ -1728,8 +1728,8 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned c
     }
 }
 
-void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir,
-    int radius, int xn, int originY, int heightY)
+void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn,
+    int originY, int heightY)
 {
     assert(object->GetDurationInterface());
 

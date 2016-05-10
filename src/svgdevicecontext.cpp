@@ -166,7 +166,7 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         baseClass.append(" " + gClass);
     }
 
-    m_currentNode = m_currentNode.append_child("tspan");
+    m_currentNode = AppendChild("tspan");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = baseClass.c_str();
     m_currentNode.append_attribute("id") = gId.c_str();
@@ -275,10 +275,19 @@ Point SvgDeviceContext::GetLogicalOrigin()
     return Point(m_originX, m_originY);
 }
 
+pugi::xml_node SvgDeviceContext::AppendChild(std::string name)
+{
+    pugi::xml_node g = m_currentNode.child("g");
+    if (g)
+        return m_currentNode.insert_child_before(name.c_str(), g);
+    else
+        return m_currentNode.append_child(name.c_str());
+}
+
 // Drawing mething
 void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
 {
-    pugi::xml_node pathChild = m_currentNode.append_child("path");
+    pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d")
         = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
               bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
@@ -312,7 +321,7 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     int rh = height / 2;
     int rw = width / 2;
 
-    pugi::xml_node ellipseChild = m_currentNode.append_child("ellipse");
+    pugi::xml_node ellipseChild = AppendChild("ellipse");
     ellipseChild.append_attribute("cx") = x + rw;
     ellipseChild.append_attribute("cy") = y + rh;
     ellipseChild.append_attribute("rx") = rw;
@@ -387,7 +396,7 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     else
         fSweep = 0;
 
-    pugi::xml_node pathChild = m_currentNode.append_child("path");
+    pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)),
                                           abs(int(ry)), fArc, fSweep, int(xe), int(ye))
                                           .c_str();
@@ -404,7 +413,7 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
 
 void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
-    pugi::xml_node pathChild = m_currentNode.append_child("path");
+    pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
     pathChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
 }
@@ -413,7 +422,7 @@ void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffs
 {
     assert(m_penStack.size());
 
-    pugi::xml_node polygonChild = m_currentNode.append_child("polygon");
+    pugi::xml_node polygonChild = AppendChild("polygon");
     // if (fillStyle == wxODDEVEN_RULE)
     //    polygonChild.append_attribute("style") = "fill-rule:evenodd;";
     // else
@@ -446,7 +455,7 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
         x -= width;
     }
 
-    pugi::xml_node rectChild = m_currentNode.append_child("rect");
+    pugi::xml_node rectChild = AppendChild("rect");
     rectChild.append_attribute("x") = x;
     rectChild.append_attribute("y") = y;
     rectChild.append_attribute("width") = width;
@@ -468,7 +477,7 @@ void SvgDeviceContext::StartText(int x, int y, char alignment)
         anchor = "middle";
     }
 
-    m_currentNode = m_currentNode.append_child("text");
+    m_currentNode = AppendChild("text");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("x") = x;
     m_currentNode.append_attribute("y") = y;
@@ -525,7 +534,7 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         svgText.replace(0, 1, "\xC2\xA0");
     }
 
-    pugi::xml_node textChild = m_currentNode.append_child("tspan");
+    pugi::xml_node textChild = AppendChild("tspan");
     if (!m_fontStack.top()->GetFaceName().empty()) {
         textChild.append_attribute("font-family") = m_fontStack.top()->GetFaceName().c_str();
         // Special case where we want to specifiy if the VerovioText font (woff) needs to be included in the output
@@ -589,7 +598,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y)
         }
 
         // Write the char in the SVG
-        pugi::xml_node useChild = m_currentNode.append_child("use");
+        pugi::xml_node useChild = AppendChild("use");
         useChild.append_attribute("xlink:href") = StringFormat("#%s", glyph->GetCodeStr().c_str()).c_str();
         useChild.append_attribute("x") = x;
         useChild.append_attribute("y") = y;

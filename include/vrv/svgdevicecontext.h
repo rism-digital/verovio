@@ -161,6 +161,8 @@ private:
 
     std::string GetColour(int colour);
 
+    pugi::xml_node AppendChild(std::string name);
+
 public:
     //
 private:
