@@ -1,0 +1,191 @@
+---
+layout: verovio
+verovio-light: true
+title: MIDI Output
+active: other-formats
+other-active: midi
+version-footer: true
+midiplayer: true
+---
+
+<script type="text/javascript">
+//<![CDATA[
+
+    var zoom = 100;
+    var pageHeight = 9000;
+    var pageWidth = 1800;
+    var spacingStaff = 10;
+    var spacingSystem = 2;
+    var border = 20;
+    var adjustPageHeight = 1;
+    var vrvToolkit = new verovio.toolkit();
+    var ids = []
+
+    function load_data(data) {
+        options = JSON.stringify({
+                    pageHeight: pageHeight,
+                    pageWidth: pageWidth,
+                    adjustPageHeight: adjustPageHeight,
+                    spacingStaff: spacingStaff,
+                    spacingSystem: spacingSystem,
+                    border: border,
+                    scale: zoom
+                });
+
+        var svg = vrvToolkit.renderData( data + "\n", options );
+        console.log( svg );
+        $("#svg_output").html(svg);
+    }
+    
+    function play_midi() {
+        var base64midi = vrvToolkit.renderToMidi();
+        var song = 'data:audio/midi;base64,' + base64midi;
+        $("#play-button").hide();
+        $("#player").show();
+        $("#player").midiPlayer.play(song);
+    }
+    
+    var midiUpdate = function(time) {
+        var vrvTime = Math.max(0, 2 * time - 800);
+        var elementsattime = JSON.parse(vrvToolkit.getElementsAtTime(vrvTime))
+        if (elementsattime.page > 0) {
+            if ((elementsattime.notes.length > 0) && (ids != elementsattime.notes)) {
+                ids.forEach(function(noteid) {
+                    if ($.inArray(noteid, elementsattime.notes) == -1) {
+                        $("#" + noteid ).attr("fill", "#000");
+                        $("#" + noteid ).attr("stroke", "#000"); 
+                        //$("#" + noteid ).removeClassSVG("highlighted"); 
+                    }
+                });
+                ids = elementsattime.notes;
+                ids.forEach(function(noteid) {
+                    if ($.inArray(noteid, elementsattime.notes) != -1) {
+                    //console.log(noteid);
+                        $("#" + noteid ).attr("fill", "#c00");
+                        $("#" + noteid ).attr("stroke", "#c00");; 
+                        //$("#" + noteid ).addClassSVG("highlighted"); 
+                    }
+                }); 
+            }
+        }
+    }
+    
+    var midiStop = function() {
+        ids.forEach(function(noteid) {
+            $("#" + noteid ).attr("fill", "#000");
+            $("#" + noteid ).attr("stroke", "#000"); 
+            //$("#" + noteid ).removeClassSVG("highlighted"); 
+        });
+        $("#player").hide();
+        $("#play-button").show();
+    }
+    
+    $.fn.addClassSVG = function(className){
+        $(this).attr('class', function(index, existingClassNames) {
+            return existingClassNames + ' ' + className;
+        });
+        return this;
+    };
+
+    $.fn.removeClassSVG = function(className){
+        $(this).attr('class', function(index, existingClassNames) {
+            //var re = new RegExp(className, 'g');
+            //return existingClassNames.replace(re, '');
+        });
+        return this;
+    };
+
+//]]>
+</script>
+
+<div class="row">
+    
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include other-sidebar.html %}
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <h3>MIDI Output</h3>
+                
+                <p>
+                    Verovio provides a basic MIDI output feature that can be used from the command-line tool or from the JavaScript toolkit. The MIDI output can be written to a file for further processing or for building application with MIDI playback.
+                </p>
+                
+                <h4>Usage</h4>
+                <p>
+                    With the command-line tool, for generating a MIDI file with the default options, you need to do:
+                </p>
+                
+{% highlight bash %}$ verovio -f midi -o output.midi Ahle_Jesu_meines_Herzens_Freud.mei{% endhighlight %}
+                
+                <p>
+                    With the JavaScript toolkit, the MIDI output is available throught the <code>renderToMidi()</code> method. This returns a base64-coded MIDI file as string. 
+                </p>
+                
+{% highlight html %}
+<script type="text/javascript">
+  var vrvToolkit = new verovio.toolkit();
+  /* ... load the MEI file */
+  var midi = vrvToolkit.renderToMidi();
+</script>
+{% endhighlight %}
+                
+                <p>  
+                    The file can be made available for download or use for MIDI playback. However, since MIDI is not supported in web-browsers in a standard way, an additional player will be required.
+                </p>
+                
+                <p>
+                    Verovio uses the <a href="https://github.com/craigsapp/midifile" target="_blank">Midifile library</a> for generating the MIDI output.
+                </p>
+                
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                
+                <h4>Example use</h4>
+                
+                <div style="height: 30px;">
+                    <button id="play-button" onclick="play_midi();" class="btn btn-sm btn-default" type="button">
+                        <span class="glyphicon glyphicon-volume-up"/>
+                    </button>
+                    <div id="player" style="z-index: 20; position: absolute; display: none;"></div>
+                </div>
+                
+                <div id="svg_output"></div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+    $( document ).ready(function() {
+        
+        // adjust the zoom for small screens
+        width = $('#svg_output').width();
+        if ( width < zoom * pageWidth / 100 ) {
+            zoom = width * 100 / pageWidth;
+        }
+        
+        $.get( "{{ site.baseurl }}/examples/downloads/Bach_Chorale_bwv.363.mei" , function( data ) {
+            load_data(data);
+        });
+        
+        $("#player").midiPlayer({
+            color: "#c00",
+            onUnpdate: midiUpdate,
+            onStop: midiStop,
+            width: 250
+        });
+    
+    });
+//]]>
+</script>

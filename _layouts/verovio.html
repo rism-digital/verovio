@@ -12,6 +12,7 @@
 
         <!-- Custom CSS -->
         <link rel="stylesheet" href="{{ site.baseurl }}/css/verovio.css" />
+        <link rel="stylesheet" href="{{ site.baseurl }}/css/midiplayer.css" />
         
     </head>
     <body>
@@ -27,11 +28,20 @@
         {% else %}
         <script src="{{ site.baseurl }}/javascript/develop/verovio-toolkit.js" type="text/javascript" ></script>
         {% endif %}
+        <!-- midi-player -->
+        {% if page.midiplayer %}
+        <script src="{{ site.baseurl }}/javascript/midi-player/wildwebmidi.js" type="text/javascript"></script>
+        <script src="{{ site.baseurl }}/javascript/midi-player/midiplayer.js" type="text/javascript"></script>
+        {% endif %}
         <!--script src="{{ site.baseurl }}/javascript/canvg/rgbcolor.js" type="text/javascript" ></script-->
         <!--script src="{{ site.baseurl }}/javascript/canvg/StackBlur.js" type="text/javascript" ></script-->
         <!--script src="{{ site.baseurl }}/javascript/canvg/canvg.js" type="text/javascript" ></script-->
         
         {% include header.html %}
+        
+        {% if page.active != "hfome" %}
+        {% include top-header.html %}
+        {% endif %}
         
         <div class="container with-footer">
             

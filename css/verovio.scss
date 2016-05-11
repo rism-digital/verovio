@@ -2,11 +2,18 @@
 
 ---
 
+//$primary-color: #272727;
+//$primary-color-light: lighten($primary-color, 15%);
+
+$primary-color: #660000;
+$primary-color-light: lighten($primary-color, 10%);
+
 body {
-    margin-top: 65px;
+    margin-top: 52px;
 }
 
 .with-footer {
+    padding-top: 30px;
     margin-bottom: 35px;
 }
 
@@ -19,11 +26,25 @@ svg:not(:root){
     padding-left: 8px;
 }
 
+.navbar {
+    border-bottom: solid #464646 2px;
+}
+
+
 .navbar hr {
     margin: 0px;
     color: #464646;
     background-color: #464646;
     height: 2px;
+}
+
+
+.top-header {
+    background: $primary-color; /* For browsers that do not support gradients */
+    background: -webkit-linear-gradient($primary-color, $primary-color-light); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient($primary-color, $primary-color-light); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient($primary-color, $primary-color-light); /* For Firefox 3.6 to 15 */
+    background: linear-gradient($primary-color, $primary-color-light); /* Standard syntax */
 }
 
 /* This is a fix for bootstrap 3.1 to override width: auto; */
