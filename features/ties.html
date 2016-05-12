@@ -1,6 +1,6 @@
 ---
 ---
-<h3>Ties</h3>
+<h4>Ties</h4>
 
 <p>
     Verovio supports both ties encoded with <code>@tie</code> attributes or with <code>&lt;tie&gt;</code> elements. Ties overlapping two measures and interrupted by a system break or a page break are displayed appropriately.
@@ -14,7 +14,7 @@
 {% include features/tie.txt %}
 {% endhighlight %}
 </div>
-<br/>
+<hr/>
 
 <p>
     Verovio determines the tie direction looking at the context (layer, stem direction, chord, etc.). Collision with stem is normally avoided except with short ties and when the context does allow do to so.
@@ -28,7 +28,7 @@
 {% include features/tie-chords1.txt %}
 {% endhighlight %}
 </div>
-<br/>
+<hr/>
 
 <p>
     With chords, the <code>@tie</code> attribute can be set in the chord or in the notes. It can also be overwritten in the note if necessary.
@@ -42,7 +42,7 @@
 {% include features/tie-chords2.txt %}
 {% endhighlight %}
 </div>
-<br/>
+<hr/>
 
 <p>
     With <code>&lt;tie&gt;</code> elements, it is possible to specify the direction of the tie and its shape with the <code>@curvedir</code> and <code>@bulge</code> attributes.

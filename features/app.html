@@ -1,7 +1,6 @@
 ---
 ---
-<h3>Critical apparatus</h3>
-
+<h4>Critical apparatus</h4>
 
 <p>
     Verovio supports basic <code>&lt;app&gt;</code> and <code>&lt;rdg&gt;</code>/<code>&lt;lem&gt;</code> elements. During rendering, the lemma or the first reading is selected by default. A specific reading can easily be selected using the <code>--app-xpath-query=QUERY</code> option (<code>appXPathQuery</code> with the JavaScript toolkit).
@@ -54,10 +53,7 @@
 {% include features/app.txt %}
 {% endhighlight %}
 </div>
-<br/>
-
-<!-- ***************************** -->
-<h4>SVG structure</h4>
+<hr/>
 
 <p>
     The MEI structure is preserved as much as possible in the SVG output. For example, for the first note of the excerpt above, the MEI and SVG structure can be outlined as displayed below. The <code>&lt;app&gt;</code> and <code>&lt;lem&gt;</code> becomes a <code>&lt;g&gt;</code> element in the SVG with the corresponding <code>@id</code> attribute.

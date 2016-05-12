@@ -2,11 +2,8 @@
 
 ---
 
-//$primary-color: #272727;
-//$primary-color-light: lighten($primary-color, 15%);
-
-$primary-color: #660000;
-$primary-color-light: lighten($primary-color, 10%);
+$primary-color: #272727;
+$primary-color-light: lighten($primary-color, 15%);
 
 body {
     margin-top: 52px;
@@ -28,8 +25,8 @@ svg:not(:root){
 
 .navbar {
     border-bottom: solid #464646 2px;
+    border-radius: 0px !important;
 }
-
 
 .navbar hr {
     margin: 0px;
@@ -38,6 +35,20 @@ svg:not(:root){
     height: 2px;
 }
 
+.home-row {
+    display: flex;
+    align-items: center;
+}
+
+.home-row:not(:first-child) {
+    border-top: solid #464646 2px;
+    padding-top: 25px;
+    margin-top: 25px;
+}
+
+.home-panel {
+    background: #eee;
+}
 
 .top-header {
     background: $primary-color; /* For browsers that do not support gradients */
@@ -60,6 +71,12 @@ hr.panel {
     margin: 10px 0px;
 }
 
+hr.home {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    
+}
+
 .btn-heading {
     padding: 0px 4px;
     margin-left: 4px;
@@ -69,8 +86,38 @@ p a {
     text-decoration: underline;
 }
 
+.list-group a {
+    background-image: none !important;
+}
+
+.input-group {
+    width: 100%;
+}
+
 .sublist-group a {
     padding: 4px 15px;
+}
+
+.panel-body h3 {
+    margin-top: 0px;
+    margin-bottom: 20px;
+}
+
+.smufl-vertical-align {
+    display: flex;
+    align-items: center;
+}
+
+.panel-body h4 {
+    border-top: 1px #ddd solid;
+    padding-top: 20px;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+.panel-video {
+    border: 2px solid #ddd;
+    padding: 0px !important;
 }
 
 .panel-option {

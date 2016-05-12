@@ -15,7 +15,7 @@ midiplayer: true
     var pageHeight = 9000;
     var pageWidth = 1800;
     var spacingStaff = 10;
-    var spacingSystem = 2;
+    var spacingSystem = 0;
     var border = 20;
     var adjustPageHeight = 1;
     var vrvToolkit = new verovio.toolkit();
@@ -35,6 +35,13 @@ midiplayer: true
         var svg = vrvToolkit.renderData( data + "\n", options );
         console.log( svg );
         $("#svg_output").html(svg);
+        $( ".note" ).click(function() {
+            var id = $(this).attr("id");
+            var time = vrvToolkit.getTimeForElement(id);
+            // bug! time needs to be divided by 2
+            $("#midi-player").midiPlayer.seek(time / 2);
+        });
+        
     }
     
     function play_midi() {
@@ -46,7 +53,8 @@ midiplayer: true
     }
     
     var midiUpdate = function(time) {
-        var vrvTime = Math.max(0, 2 * time - 800);
+        // bug! time needs to be * 2 (- 400 for adjustment)
+        var vrvTime = Math.max(0, 2 * time - 400);
         var elementsattime = JSON.parse(vrvToolkit.getElementsAtTime(vrvTime))
         if (elementsattime.page > 0) {
             if ((elementsattime.notes.length > 0) && (ids != elementsattime.notes)) {
@@ -107,58 +115,57 @@ midiplayer: true
     </div>
     
     <div class="col-md-9">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <h3>MIDI Output</h3>
-                
+        <div class="panel-body">
+            <h3>MIDI Output</h3>
+            
+            <p>
+                Verovio provides a basic MIDI output feature that can be used from the command-line tool or from the JavaScript toolkit. The MIDI output can be written to a file for further processing or for building application with MIDI playbac. However, since MIDI is not supported in web-browsers in a standard way, an additional player will be required.
+            </p>
+            <p>
+                Verovio uses the <a href="https://github.com/craigsapp/midifile" target="_blank">Midifile library</a> for generating the MIDI output.
+            </p>
+            
+            <h4>Example use</h4>
+            
+            <p>
+                The example below uses a <a href="https://github.com/rism-ch/midi-player/" target="_blank">JavaScript MIDI player</a> that provides callback functions that allow note highlighting. Oppositely, it is also possible to click on a note for jumping in the piece.
+            </p>
+            
+            <div style="height: 30px;">
                 <p>
-                    Verovio provides a basic MIDI output feature that can be used from the command-line tool or from the JavaScript toolkit. The MIDI output can be written to a file for further processing or for building application with MIDI playback.
+                    <a id="play-button" onclick="play_midi()">Play it!</a>
                 </p>
-                
-                <h4>Usage</h4>
-                <p>
-                    With the command-line tool, for generating a MIDI file with the default options, you need to do:
-                </p>
-                
+                <div id="player" style="z-index: 20; position: absolute; display: none;"></div>
+            </div>
+            
+            <div id="svg_output"></div>
+
+            <h4>Usage</h4>
+            <p>
+                With the command-line tool, for generating a MIDI file with the default options, you need to do:
+            </p>
+            
 {% highlight bash %}$ verovio -f midi -o output.midi Ahle_Jesu_meines_Herzens_Freud.mei{% endhighlight %}
-                
-                <p>
-                    With the JavaScript toolkit, the MIDI output is available throught the <code>renderToMidi()</code> method. This returns a base64-coded MIDI file as string. 
-                </p>
-                
+            
+            <p>
+                With the JavaScript toolkit, the MIDI output is available throught the <code>renderToMidi()</code> method. This returns a base64-coded MIDI file as string. 
+            </p>
+            
 {% highlight html %}
 <script type="text/javascript">
-  var vrvToolkit = new verovio.toolkit();
-  /* ... load the MEI file */
-  var midi = vrvToolkit.renderToMidi();
+var vrvToolkit = new verovio.toolkit();
+/* ... load the MEI file */
+var midi = vrvToolkit.renderToMidi();
 </script>
 {% endhighlight %}
-                
-                <p>  
-                    The file can be made available for download or use for MIDI playback. However, since MIDI is not supported in web-browsers in a standard way, an additional player will be required.
-                </p>
-                
-                <p>
-                    Verovio uses the <a href="https://github.com/craigsapp/midifile" target="_blank">Midifile library</a> for generating the MIDI output.
-                </p>
-                
-            </div>
-        </div>
 
-        <div class="panel panel-default">
-            <div class="panel-body">
-                
-                <h4>Example use</h4>
-                
-                <div style="height: 30px;">
-                    <button id="play-button" onclick="play_midi();" class="btn btn-sm btn-default" type="button">
-                        <span class="glyphicon glyphicon-volume-up"/>
-                    </button>
-                    <div id="player" style="z-index: 20; position: absolute; display: none;"></div>
-                </div>
-                
-                <div id="svg_output"></div>
-            </div>
+            <h4>Future work</h4>
+            <ul class="list-style">
+                <li>Tempo control options</li>
+                <li>Transposing instrument support</li>
+                <li>Instrument type support</li>
+            </ul>
+            
         </div>
     </div>
     

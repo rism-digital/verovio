@@ -9,7 +9,7 @@ mei-doc-root: http://music-encoding.org/documentation/guidelines2013/
     This page documents the elements and attributes that are currently supported by Vevorio. It is also important to note that the hierarchy of elements supported by Verovio is limited and that it will also determine wherether an MEI document can be rendered or not.
 </p>
                     
-<h3>MEI elements</h3>
+<h4>MEI elements</h4>
 <p>
     Verovio supports a subset of MEI elements and attributes that are documented here. Additional elements and attributes will be added in the future.
 </p>                
@@ -18,7 +18,7 @@ mei-doc-root: http://music-encoding.org/documentation/guidelines2013/
         {% include mei-class.html %}
     {% endfor %}
 
-<h3>Page-based customization elements</h3>
+<h4>Page-based customization elements</h4>
 <p>
     A few elements supported by Verovio are defined in the page-based customization describe on the <a href="{{ site.baseurl}}/structure.xhtml">structure</a> page.
 </p>                    
@@ -26,7 +26,7 @@ mei-doc-root: http://music-encoding.org/documentation/guidelines2013/
         {% include mei-class.html %}
     {% endfor %}
     
-<h3>Load-only MEI elements</h3>
+<h4>Load-only MEI elements</h4>
 <p>
     Verovio can load both page-based customized and uncustomized MEI documents. When loading uncustomized MEI documents, some MEI elements are loaded by Verovio and converted to a page-based representation. Typically, <code>&lt;pb&gt;</code> milestone elements are converted to <code>&lt;page&gt;</code> container elements. Oppositely, <code>&lt;section&gt;</code> container elements are converted to <code>&lt;secb&gt;</code> milestone elements.
 </p>

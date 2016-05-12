@@ -14,24 +14,24 @@ how-active: how-mei
     </div>
     
     <div class="col-md-9">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <div class="alert alert-warning" role="alert">This page is out-dated</div>
-                    
-                    {% comment %}
-                        The trick is that GitHub pages does not allow plugins. We have to compile the supported mei locally.
-                        It is defined in the supported-mei.yml file, which is compiled by the mei_supported_to_liquid tag.
-                        The tag is defined in the MeiSupported plugin.
-                        
-                        For this to work properly:
-                        1) uncomment {_% mei_supported_to_liquid supported-mei.yml %_} in doc.html
-                        2) compile the page
-                        3) copy _site/doc.html to _include/doc.html
-                        4) recomment  {_% mei_supported_to_liquid supported-mei.yml %_} in doc.html before commiting
-                    {% endcomment %}
-                    {% include doc.html %}
+        <div class="panel-body">
+            <div class="alert alert-warning" role="alert">This page is out-dated</div>
+            
+            <h3>Supported MEI elements</h3>
                 
-            </div>
+                {% comment %}
+                    The trick is that GitHub pages does not allow plugins. We have to compile the supported mei locally.
+                    It is defined in the supported-mei.yml file, which is compiled by the mei_supported_to_liquid tag.
+                    The tag is defined in the MeiSupported plugin.
+                    
+                    For this to work properly:
+                    1) uncomment {_% mei_supported_to_liquid supported-mei.yml %_} in doc.html
+                    2) compile the page
+                    3) copy _site/doc.html to _include/doc.html
+                    4) recomment  {_% mei_supported_to_liquid supported-mei.yml %_} in doc.html before commiting
+                {% endcomment %}
+                {% include doc.html %}
+            
         </div>
     </div>
 </div>

@@ -39,56 +39,55 @@ additional-options:
     </div>
     
     <div class="col-md-9">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <p>
-                    Verovio can be build as a light and fast standalone command-line tool for converting files (in DARMS, PAE or MEI) into SVG. It is written in pure standard C++ with no dependencies on third-party frameworks and libraries. This ensures maximum portability of the codebase. Verovio implements its own rendering engine, which can render SVG with all the musical symbols embedded in it and without dependency on external fonts. Since the rendering engine is defined as an abstract class, it is possible easily to implement a rendering output different from SVG if needed (e.g., PDF, or HTML Canvas).
-                </p>
-                <p>
-                    Building and installing instructions are available on the <a href="{{ site.baseurl}}/download.xhtml">download</a> page.
-                </p>
-                
-                <h3>Basic usage</h3>
-                <p>
-                    For typesetting an MEI file with the default options, you need to do:
-                </p>
-                {% highlight bash %}$ verovio -f mei -o output.svg Hummel_Concerto_for_trumpet.mei{% endhighlight %}
-                <p>
-                    Width the <a href="{{ site.baseurl }}/examples/downloads/Hummel_Concerto_for_trumpet.mei">Hummel concerto for trumpet</a> example, this is what you should obtain:
-                </p>
-                <div id="hummel-p1" style="display: none;">
-                    {% include svg/hummel-p1.svg %}
-                </div>
-                
-                <h3>Typesetting options</h3>
-                {% for option in page.options %}
-                <div class="panel panel-default">
-                  <div class="panel-heading panel-option"><code>{{ option[0] }}</code></div>
-                  <div class="panel-body panel-option">
-                    {{ option[1] }}
-                  </div>
-                </div>
-                {% endfor %}
+        <div class="panel-body">
+            <h3>Command-line tool</h3>
+            
+            <p>
+                Verovio can be build as a light and fast standalone command-line tool for converting files (in DARMS, PAE or MEI) into SVG. It is written in pure standard C++ with no dependencies on third-party frameworks and libraries. This ensures maximum portability of the codebase. Verovio implements its own rendering engine, which can render SVG with all the musical symbols embedded in it and without dependency on external fonts. Since the rendering engine is defined as an abstract class, it is possible easily to implement a rendering output different from SVG if needed (e.g., PDF, or HTML Canvas).
+            </p>
+            <p>
+                Building and installing instructions are available on the <a href="{{ site.baseurl}}/download.xhtml">download</a> page.
+            </p>
+            
+            <h4>Basic usage</h4>
+            <p>
+                For typesetting an MEI file with the default options, you need to do:
+            </p>
+            {% highlight bash %}$ verovio -f mei -o output.svg Hummel_Concerto_for_trumpet.mei{% endhighlight %}
+            <p>
+                Width the <a href="{{ site.baseurl }}/examples/downloads/Hummel_Concerto_for_trumpet.mei">Hummel concerto for trumpet</a> example, this is what you should obtain:
+            </p>
+            <div id="hummel-p1" style="display: none;">
+                {% include svg/hummel-p1.svg %}
+            </div>
+            
+            <h4>Typesetting options</h4>
+            {% for option in page.options %}
+            <div class="panel panel-default">
+              <div class="panel-heading panel-option"><code>{{ option[0] }}</code></div>
+              <div class="panel-body panel-option">
+                {{ option[1] }}
+              </div>
+            </div>
+            {% endfor %}
 
-                <h3>Additional typesetting options</h3>
-                {% for option in page.additional-options %}
-                <div class="panel panel-default">
-                  <div class="panel-heading panel-option"><code>{{ option[0] }}</code></div>
-                  <div class="panel-body panel-option">
-                    {{ option[1] }}
-                  </div>
-                </div>
-                {% endfor %}
-                
-                <h3>Usage with options</h3>
-                <p>
-                    The following example shows how to ignore the layout information contained in the MEI file and to let it recalculated by Vevorio, here with a specific page width and page height. The second page of the <a href="{{ site.baseurl }}/examples/downloads/Guami_Canzona_24.mei">Guami canzona</a> example can be typeset with the following command:
-                </p>
-                {% highlight bash %}$ verovio -f mei --ignore-layout -h 2100 -w 4200 -b 100 --page=2 -o output.svg Guami_Canzona_24.mei{% endhighlight %}
-                <div id="guami-p2" style="display: none;">
-                    {% include svg/guami-p2.svg %}
-                </div>
-                
+            <h4>Additional typesetting options</h4>
+            {% for option in page.additional-options %}
+            <div class="panel panel-default">
+              <div class="panel-heading panel-option"><code>{{ option[0] }}</code></div>
+              <div class="panel-body panel-option">
+                {{ option[1] }}
+              </div>
+            </div>
+            {% endfor %}
+            
+            <h4>Usage with options</h4>
+            <p>
+                The following example shows how to ignore the layout information contained in the MEI file and to let it recalculated by Vevorio, here with a specific page width and page height. The second page of the <a href="{{ site.baseurl }}/examples/downloads/Guami_Canzona_24.mei">Guami canzona</a> example can be typeset with the following command:
+            </p>
+            {% highlight bash %}$ verovio -f mei --ignore-layout -h 2100 -w 4200 -b 100 --page=2 -o output.svg Guami_Canzona_24.mei{% endhighlight %}
+            <div id="guami-p2" style="display: none;">
+                {% include svg/guami-p2.svg %}
             </div>
         </div>
     </div>

@@ -46,80 +46,68 @@ examples:
     </div>
     
     <div class="col-md-9">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <h3>MusicXML Converter</h3>
-                
-                <p>
-                    Verovio supports basic conversion from MusicXML to MEI. When converting from this web interface, the resulting MEI data will be displayed directly in the MEI-Viewer. The MEI file can be saved through the 
-                    <button type="button" class="btn btn-default btn-xs">
-                      <span class="glyphicon glyphicon-download" aria-hidden="true"></span> MEI
-                    </button>
-                    button that will be displayed on the top right.
-                </p>
-                <p>
-                    This feature is highly experimental at this stage, and only the features supported by Verovio will be converted. Everything else will be lost. For a more complete conversion from MusicXML to MEI we strongly recommend to use the <a href="https://github.com/music-encoding/encoding-tools" target="_blank">MEI XSL stylesheets</a>.
-                </p>
-            </div>
-        </div>
-
-        <div class="panel panel-default">
-            <div class="panel-body">
-                
-                <h4>Try it!</h4>
-                <p>
-                    The files below are converted to MEI in your browser and directly displayed with Verovio.
-                </p>
-                
-                <div class="conainer"> 
-                    {% for d in page.examples %}
-                     <div class="row">
-                        <div class="col-xs-7">
-                            <p>
-                            <a href="{{ site.baseurl }}/examples/musicxml/{{ d.link }}">{{ d.name }}</a> ({{ d.size }})
-                            </p>
-                        </div>
-                        <div class="col-xs-5">
-                            <a href="{{ site.baseurl }}/mei-viewer.xhtml?file=examples/musicxml/{{ d.link }}&amp;musicxml=true">
-                                <button type="button" class="btn btn-default btn-xs">
-                                    <span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></span> Convert to MEI
-                                </button>
-                            </a>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        
-        <div class="panel panel-default">
-            <div class="panel-body">
-
-                <h4>Try it with your file</h4>
-                <p>
-                    You can also try to convert your own MusicXML file. If it works, the file will be displayed with Verovio and you will then be able to save the resulting MEI file.
-                </p>
-                <form id="upload_form" onsubmit="convert_file( $('#upload_form') ); return false" class="form-inline" role="form">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <input type="file" id="mei_files" name="file"></input>
-                        </div>
-                    </div>
-                </form>
-                <p>
-                    Terms of use: the conversion to MEI is performed locally in your browser. This means that the MusicXML data is not uploaded to our server.
-                </p>
-                <p>
-                    Important known limitations:
-                </p>
-                <ul>
-                     <li>The MusicXML &lt;backup&gt; element will always go back to the beginning of the measure.</li>
-                     <li>The MusicXML &lt;forward&gt; element is currently ignored.</li>
-                     <li>The file size with this web interface is limited to the size of the local storage of your browser, which is typically 5Mb.</li>
-                </ul>
-            </div>
+        <div class="panel-body">
+            <h3>MusicXML Converter</h3>
             
+            <p>
+                Verovio supports basic conversion from MusicXML to MEI. When converting from this web interface, the resulting MEI data will be displayed directly in the MEI-Viewer. The MEI file can be saved through the 
+                <button type="button" class="btn btn-default btn-xs">
+                  <span class="glyphicon glyphicon-download" aria-hidden="true"></span> MEI
+                </button>
+                button that will be displayed on the top right.
+            </p>
+            <p>
+                This feature is highly experimental at this stage, and only the features supported by Verovio will be converted. Everything else will be lost. For a more complete conversion from MusicXML to MEI we strongly recommend to use the <a href="https://github.com/music-encoding/encoding-tools" target="_blank">MEI XSL stylesheets</a>.
+            </p>
+            
+            <h4>Try it!</h4>
+            <p>
+                The files below are converted to MEI in your browser and directly displayed with Verovio.
+            </p>
+            
+            <div class="conainer"> 
+                {% for d in page.examples %}
+                 <div class="row">
+                    <div class="col-xs-7">
+                        <p>
+                        <a href="{{ site.baseurl }}/examples/musicxml/{{ d.link }}">{{ d.name }}</a> ({{ d.size }})
+                        </p>
+                    </div>
+                    <div class="col-xs-5">
+                        <a href="{{ site.baseurl }}/mei-viewer.xhtml?file=examples/musicxml/{{ d.link }}&amp;musicxml=true">
+                            <button type="button" class="btn btn-default btn-xs">
+                                <span class="glyphicon glyphicon-circle-arrow-right" aria-hidden="true"></span> Convert to MEI
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <h4>Try it with your file</h4>
+            <p>
+                You can also try to convert your own MusicXML file. If it works, the file will be displayed with Verovio and you will then be able to save the resulting MEI file.
+            </p>
+            <form id="upload_form" onsubmit="convert_file( $('#upload_form') ); return false" class="form-inline" role="form">
+                <div class="row">
+                    <div class="col-md-12">
+                        <input type="file" id="mei_files" name="file"></input>
+                    </div>
+                </div>
+            </form>
+            <p>
+                Terms of use: the conversion to MEI is performed locally in your browser. This means that the MusicXML data is not uploaded to our server.
+            </p>
+            <p>
+                Important known limitations:
+            </p>
+            <ul>
+                 <li>The MusicXML &lt;backup&gt; element will always go back to the beginning of the measure.</li>
+                 <li>The MusicXML &lt;forward&gt; element is currently ignored.</li>
+                 <li>The file size with this web interface is limited to the size of the local storage of your browser, which is typically 5Mb.</li>
+            </ul>
         </div>
+            
     </div>
 </div>
 
