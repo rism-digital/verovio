@@ -153,10 +153,18 @@ downloads:
     function apply_zoom() {
         $.cookie('zoom', zoom, { expires: 30 });
         set_options();
+        var measure = 0;
+        if (page != 1) {
+            measure = $("#svg_output .measure").attr("id");
+        }
+        
         vrvToolkit.redoLayout();
 
         $("#total_text").html(vrvToolkit.getPageCount());
         page = 1;
+        if (measure != 0) {
+            page = vrvToolkit.getPageWithElement(measure);
+        }
         load_page();
     }
 
