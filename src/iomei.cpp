@@ -1681,7 +1681,7 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "tupletSpan") {
             if (!ReadTupletSpanAsTuplet(dynamic_cast<Measure *>(parent), current)) {
-                LogWarning("<tupletSpan> not readable as <tuplet> and ignored");
+                LogWarning("<tupletSpan> is not readable as <tuplet> and will be ignored");
             }
         }
         else {
@@ -1864,7 +1864,7 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
         elementName = std::string(xmlElement.name());
         LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
         if (!IsAllowed(elementName, filter)) {
-            LogDebug("Element <%s> within %s ignored", xmlElement.name(), filter->GetClassName().c_str());
+            LogWarning("Element <%s> within %s is illegal and will be ignored", xmlElement.name(), filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -1952,7 +1952,7 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
         }
         // unknown
         else {
-            LogDebug("Element '%s' ignored", xmlElement.name());
+            LogWarning("Element '%s' is unknown and will be ignored", xmlElement.name());
         }
     }
     return success;
@@ -2309,7 +2309,7 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
         }
         elementName = std::string(xmlElement.name());
         if (!IsAllowed(elementName, filter)) {
-            LogDebug("Element <%s> within %s ignored", xmlElement.name(), filter->GetClassName().c_str());
+            LogWarning("Element <%s> within %s is illegal and will be ignored", xmlElement.name(), filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -2327,7 +2327,7 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
         }
         // unknown
         else {
-            LogDebug("Element %s ignored", xmlElement.name());
+            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
         }
         i++;
     }

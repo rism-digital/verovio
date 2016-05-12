@@ -47,7 +47,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     int staffSize = staff->m_drawingStaffSize;
     // Mensural noteheads are quite a bit smaller than CMN noteheads; use _pseudoStaffSize_
-    // to allow forcing this for fonts that don't consider this.
+    // to allow forcing this for fonts that don't consider that fact.
     int pseudoStaffSize = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
     int noteY = element->GetDrawingY();
     int xLedger, xNote, xStem;
@@ -89,13 +89,14 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     /************** Noteheads: **************/
 
-    // Ligature, maxima,longa, brevis, and semibrevis
+    // Ligature, maxima,longa, and brevis
     if ((note->GetLig() != noteLogMensural_LIG_NONE) && (drawingDur <= DUR_1)) {
         DrawLigatureNote(dc, element, layer, staff);
     }
     else if (drawingDur < DUR_1) {
         DrawMaximaToBrevis(dc, noteY, element, layer, staff);
     }
+    // Semibrevis
     else if (drawingDur == DUR_1) {
         if (note->GetColored())
             charCode = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
@@ -143,7 +144,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
     }
 
-    /************** dots **************/
+    /************** Augmentation dots **************/
 
     if (note->GetDots()) {
         int mensDrawingUnit = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * m_doc->GetDrawingUnit(staffSize));
@@ -156,7 +157,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         DrawDots(dc, xDot, noteY, note->GetDots(), staff);
     }
 
-    /************** accid **************/
+    /************** accidental **************/
 
     if (note->m_drawingAccid) {
         int xAccid = xNote;

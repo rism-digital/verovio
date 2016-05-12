@@ -1327,7 +1327,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     assert(syl);
 
     if (!syl->GetStart()) {
-        LogDebug("Syl parent note was not found");
+        LogWarning("Parent note for <syl> was not found");
         return;
     }
 
