@@ -29,9 +29,9 @@ downloads:
     - name: "Brahms Op 51/1"
       description: "String quartet, 7 pages - 640Kb"
       link: "Brahms_StringQuartet_Op51_No1.mei"
-#    - name: "Chopin op.18/8"
-#      description: "Edude, 3 pages - 400Kb"
-#      link: "Chopin_Etude_op.10_no.9.mei"
+    - name: "Chopin op.10/9"
+      description: "Edude, 3 pages - 400Kb"
+      link: "Chopin_Etude_op.10_no.9.mei"
 #    - name: "Chopin op.6/1"
 #      description: "Mazurka in F-sharp Minor, 3 pages - 270Kb"
 #      link: "Chopin_Mazurka_op.6.1.mei"
@@ -44,6 +44,7 @@ downloads:
     var zoom = 40;
     var pageHeight = 2970;
     var pageWidth = 2100;
+    var spacingSystem = 2;
     var swipe_pages = false;
     var log = false;
     var format = 'mei';
@@ -64,6 +65,7 @@ downloads:
                     pageWidth: pageWidth,
                     border: border,
                     scale: zoom,
+                    spacingSystem: spacingSystem,
                     adjustPageHeight: 1,
                     ignoreLayout: 1
                 });
