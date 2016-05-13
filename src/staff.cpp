@@ -221,6 +221,15 @@ int Staff::SetDrawingXY(ArrayPtrVoid *params)
     // Second pass where we do just process layer elements
     if ((*processLayerElements)) return FUNCTOR_CONTINUE;
 
+    // Setting the drawing values for the staff (lines, scale)
+    if (StaffDef *staffDef = doc->m_scoreDef.GetStaffDef(this->GetN())) {
+        this->m_drawingLines = staffDef->GetLines();
+        this->m_drawingNotationType = staffDef->GetNotationtype();
+        if (staffDef->HasScale()) {
+            this->m_drawingStaffSize = staffDef->GetScale();
+        }
+    }
+
     // Here we set the appropriate y value to be used for drawing
     // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_yAbs

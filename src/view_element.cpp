@@ -2108,7 +2108,7 @@ int View::GetSylY(Syl *syl, Staff *staff)
 
 bool View::IsOnStaffLine(int y, Staff *staff)
 {
-    return ((y - staff->GetDrawingY()) % m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) == 0);
+    return ((y - staff->GetDrawingY()) % (2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) == 0);
 }
 
 void View::PrepareChordDots(DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff)
