@@ -751,7 +751,7 @@ int View::CalculatePitchPosY(Staff *staff, data_PITCHNAME pname, int dec_clef, i
     return 0;
 }
 
-int View::CalculateRestPosY(Staff *staff, char duration)
+int View::CalculateRestPosY(Staff *staff, char duration, bool hasMultipleLayer, bool isFirstLayer)
 {
     assert(staff); // Pointer to staff cannot be NULL
 
@@ -775,6 +775,13 @@ int View::CalculateRestPosY(Staff *staff, char duration)
             offset = 12;
             break; // Signal an error, put the clef up high
     }
+    if (hasMultipleLayer) {
+        if (isFirstLayer)
+            offset += 2;
+        else
+            offset -= 2;
+    }
+
     return base + staff_space * offset;
 }
 

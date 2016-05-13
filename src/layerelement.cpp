@@ -498,7 +498,15 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
         assert(rest);
         // Automatically calculate rest position, if so requested
         if (rest->GetPloc() == PITCHNAME_NONE) {
-            this->SetDrawingY(this->GetDrawingY() + view->CalculateRestPosY(staffY, rest->GetActualDur()));
+            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            bool isFirstLayer = false;
+            if (hasMultipleLayer) {
+                Layer *firstLayer = dynamic_cast<Layer*>(staffY->FindChildByType(LAYER));
+                assert(firstLayer);
+                if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
+            }
+            this->SetDrawingY(this->GetDrawingY()
+                + view->CalculateRestPosY(staffY, rest->GetActualDur(), hasMultipleLayer, isFirstLayer));
         }
         else {
             this->SetDrawingY(this->GetDrawingY()
