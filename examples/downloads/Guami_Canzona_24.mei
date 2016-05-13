@@ -41,6 +41,12 @@
             </changeDesc>
             <date>2015-09-14</date>
         </change>
+        <change n="2" resp="#LP">
+            <changeDesc>
+                <p>Adding accid.ges</p>
+            </changeDesc>
+            <date>2016-05-14</date>
+        </change>
     </revisionDesc>
 </meiHead>
 <music>

@@ -247,9 +247,18 @@
                     <persName resp="Laurent Pugin"/>
                 </respStmt>
                 <changeDesc>
-                    <p> Removing @staff, @timestamp and @timestamp2 and @dur in slurs and ties when duplicating @startid / @endid.</p>
+                    <p>Removing @staff, @timestamp and @timestamp2 and @dur in slurs and ties when duplicating @startid / @endid.</p>
                 </changeDesc>
                 <date isodate="2016-02-02"/>
+            </change>
+            <change n="11">
+                <respStmt>
+                    <persName resp="Laurent Pugin"/>
+                </respStmt>
+                <changeDesc>
+                    <p>Fixing hairpin, dynam and dir staff positions</p>
+                </changeDesc>
+                <date isodate="2016-05-12"/>
             </change>
         </revisionDesc>
     </meiHead>
@@ -317,13 +326,13 @@
                                 </layer>
                             </staff>
                             <tempo staff="1" place="above" tstamp="0">Poco Adagio</tempo>
-                            <dynam tstamp="3.5" place="below" startto="-2" staff="1">ff</dynam>
+                            <dynam tstamp="3.5" place="below" startto="-2" staff="1">p</dynam>
                             <slur curvedir="below" startid="#d648110e110" endid="d648110e518" />
-                            <dynam tstamp="1" place="below" staff="4">p</dynam>
+                            <dynam tstamp="1" place="below" staff="2">p</dynam>
                             <slur curvedir="below" startid="#d648110e152" endid="d648110e173" />
                             <slur curvedir="below" startid="#d648110e195" endid="d648110e216" />
                             <tie curvedir="below" startid="#d648110e236" endid="d648110e624"/>
-                            <dynam tstamp="1" place="below" staff="4">p</dynam>
+                            <dynam tstamp="1" place="below" staff="3">p</dynam>
                             <slur curvedir="below" startid="#d648110e277" endid="d648110e298" />
                             <slur curvedir="below" startid="#d648110e318" endid="d648110e337" />
                             <dynam tstamp="1" place="below" staff="4">p</dynam>
@@ -385,7 +394,7 @@
                             </staff>
                             <slur curvedir="below" startid="#d648110e540" endid="d648110e561" />
                             <slur curvedir="below" startid="#d648110e601" endid="d648110e911" />
-                            <dir tstamp="1" place="above" staff="4">
+                            <dir tstamp="1" place="above" staff="1">
                                 espress.
                             </dir>
                             <slur curvedir="below" startid="#d648110e641" endid="d648110e660" />
@@ -518,14 +527,14 @@
                             </staff>
                             <hairpin tstamp="2.583" tstamp2="0m+3.833" form="dim" place="below" staff="1" opening="0" startto="-10" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e1402" endid="d648110e1422" />
-                            <hairpin tstamp="1" tstamp2="0m+2.042" form="cres" place="above" staff="4" opening="1.5" endto="-47"/>
+                            <hairpin tstamp="1" tstamp2="0m+2.042" form="cres" place="below" staff="1" opening="1.5" endto="-47"/>
                             <slur curvedir="below" startid="#d648110e1449" endid="d648110e1470" />
-                            <hairpin tstamp="1" tstamp2="0m+1.917" form="cres" place="below" staff="3" opening="1.5"/>
-                            <hairpin tstamp="1.083" tstamp2="0m+1.917" form="cres" place="above" staff="3" opening="1.5" startto="-34" endto="-14"/>
-                            <hairpin tstamp="2.5" tstamp2="0m+3.667" form="dim" place="above" staff="3" opening="0" endto="-8"/>
+                            <hairpin tstamp="1" tstamp2="0m+1.917" form="cres" place="below" staff="2" opening="1.5"/>
+                            <hairpin tstamp="1.083" tstamp2="0m+1.917" form="cres" place="below" staff="3" opening="1.5" startto="-34" endto="-14"/>
+                            <hairpin tstamp="2.5" tstamp2="0m+3.667" form="dim" place="below" staff="2" opening="0" endto="-8"/>
                             <slur curvedir="below" startid="#d648110e1554" endid="d648110e1597" />
                             <hairpin tstamp="1" tstamp2="0m+1.833" form="cres" place="below" staff="4" opening="1.5" endto="-16"/>
-                            <hairpin tstamp="2.5" tstamp2="0m+3.583" form="dim" place="above" staff="4" opening="0" endto="-10"/>
+                            <hairpin tstamp="2.5" tstamp2="0m+3.583" form="dim" place="below" staff="3" opening="0" endto="-10"/>
                             <hairpin tstamp="2.5" tstamp2="0m+3.583" form="dim" place="below" staff="4" opening="0" endto="-10"/>
                             <slur curvedir="above" startid="#d648110e1675" endid="d648110e1695" />
                         </measure>
@@ -676,10 +685,10 @@
                             </staff>
                             <dynam tstamp="1" place="below" staff="1">p</dynam>
                             <slur curvedir="below" startid="#d648110e2329" endid="d648110e2348" />
-                            <dynam tstamp="1" place="below" staff="4">p</dynam>
+                            <dynam tstamp="1" place="below" staff="2">p</dynam>
                             <slur curvedir="below" startid="#d648110e2392" endid="d648110e2411" />
                             <slur curvedir="below" startid="#d648110e2433" endid="d648110e2454" />
-                            <dynam tstamp="1" place="below" staff="1">p</dynam>
+                            <dynam tstamp="1" place="below" staff="3">p</dynam>
                             <slur curvedir="above" startid="#d648110e2498" endid="d648110e2519" />
                             <slur curvedir="above" startid="#d648110e2541" endid="d648110e2562" />
                             <slur curvedir="above" startid="#d648110e2627" endid="d648110e2961" />
@@ -863,8 +872,8 @@
                             <hairpin tstamp="1.125" tstamp2="0m+2.583" form="cres" place="below" staff="1" opening="1.5" startto="-33" endto="-22"/>
                             <hairpin tstamp="2.792" tstamp2="0m+3.917" form="dim" place="below" staff="1" opening="0" startto="-17" endto="-2"/>
                             <slur curvedir="above" startid="#d648110e3606" endid="d648110e3632" />
-                            <hairpin tstamp="1.042" tstamp2="0m+2.5" form="cres" place="below" staff="4" opening="1.5" startto="-17" endto="-36"/>
-                            <hairpin tstamp="2.792" tstamp2="0m+3.833" form="dim" place="below" staff="4" opening="0" startto="-29" endto="-4"/>
+                            <hairpin tstamp="1.042" tstamp2="0m+2.5" form="cres" place="below" staff="2" opening="1.5" startto="-17" endto="-36"/>
+                            <hairpin tstamp="2.792" tstamp2="0m+3.833" form="dim" place="below" staff="2" opening="0" startto="-29" endto="-4"/>
                             <slur curvedir="above" startid="#d648110e3688" endid="d648110e3734" />
                             <hairpin tstamp="1.042" tstamp2="0m+2.333" form="cres" place="below" staff="3" opening="1.5" startto="-35" endto="-4"/>
                             <hairpin tstamp="2.583" tstamp2="0m+3.708" form="dim" place="below" staff="3" opening="0" startto="-22" endto="-7"/>
@@ -911,9 +920,9 @@
                             <slur curvedir="below" startid="#d648110e3848" endid="d648110e3893" />
                             <hairpin tstamp="2.583" tstamp2="0m+3.75" form="dim" place="below" staff="1" opening="0" startto="-22" endto="-6"/>
                             <slur curvedir="above" startid="#d648110e3917" endid="d648110e3943" />
-                            <hairpin tstamp="1.042" tstamp2="0m+2.333" form="cres" place="below" staff="4" opening="1.5" startto="-17" endto="-28"/>
+                            <hairpin tstamp="1.042" tstamp2="0m+2.333" form="cres" place="below" staff="2" opening="1.5" startto="-17" endto="-28"/>
                             <slur curvedir="above" startid="#d648110e3967" endid="d648110e3996" />
-                            <hairpin tstamp="2.667" tstamp2="0m+3.875" form="dim" place="below" staff="4" opening="0" startto="-20" endto="-3"/>
+                            <hairpin tstamp="2.667" tstamp2="0m+3.875" form="dim" place="below" staff="2" opening="0" startto="-20" endto="-3"/>
                             <tie curvedir="above" startid="#d648110e3996" endid="d648110e4231"/>
                             <hairpin tstamp="1" tstamp2="0m+2.458" form="cres" place="below" staff="3" opening="1.5" endto="-1"/>
                             <slur curvedir="above" startid="#d648110e4025" endid="d648110e4068" />
@@ -962,8 +971,8 @@
                                 </layer>
                             </staff>
                             <slur curvedir="below" startid="#d648110e4181" endid="d648110e4211" />
-                            <hairpin tstamp="1" tstamp2="0m+3.542" form="dim" place="above" staff="4" opening="0" endto="-11"/>
-                            <hairpin tstamp="1.125" tstamp2="0m+3.542" form="dim" place="below" staff="4" opening="0" startto="-21" endto="-11"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.542" form="dim" place="below" staff="1" opening="0" endto="-11"/>
+                            <hairpin tstamp="1.125" tstamp2="0m+3.542" form="dim" place="below" staff="2" opening="0" startto="-21" endto="-11"/>
                             <slur curvedir="below" startid="#d648110e4255" endid="d648110e4309" />
                             <slur curvedir="below" startid="#d648110e4340" endid="d648110e4365" />
                             <hairpin tstamp="1.125" tstamp2="0m+3.333" form="dim" place="below" staff="3" opening="0" startto="-9" endto="-16"/>
@@ -1013,17 +1022,17 @@
                             </staff>
                             <slur curvedir="below" startid="#d648110e4497" endid="d648110e4534" />
                             <tie curvedir="below" startid="#d648110e4497" endid="d648110e4515"/>
-                            <dir tstamp="1" place="above" staff="4">
+                            <dir tstamp="1" place="above" staff="1">
                                 <rend fontstyle="italic">dolce</rend>
                             </dir>
                             <slur curvedir="below" startid="#d648110e4557" endid="d648110e4576" />
                             <slur curvedir="below" startid="#d648110e4598" endid="d648110e4617" />
-                            <dir tstamp="1" place="above" staff="3">
+                            <dir tstamp="1" place="above" staff="2">
                                 <rend fontstyle="italic">dolce</rend>
                             </dir>
                             <slur curvedir="below" startid="#d648110e4658" endid="d648110e4679" />
                             <slur curvedir="below" startid="#d648110e4699" endid="d648110e4718" />
-                            <dir tstamp="1" place="above" staff="4">
+                            <dir tstamp="1" place="above" staff="3">
                                 <rend fontstyle="italic">dolce</rend>
                             </dir>
                         </measure>
@@ -1117,7 +1126,7 @@
                             </staff>
                             <dynam tstamp="1" place="below" staff="1">pp</dynam>
                             <slur curvedir="above" startid="#d648110e5026" endid="d648110e5061" />
-                            <dynam tstamp="1" place="below" staff="4">pp</dynam>
+                            <dynam tstamp="1" place="below" staff="2">pp</dynam>
                             <slur curvedir="below" startid="#d648110e5085" endid="d648110e5108" />
                             <slur curvedir="below" startid="#d648110e5128" endid="d648110e5147" />
                             <dynam tstamp="1" place="below" staff="3">pp</dynam>
@@ -1214,8 +1223,8 @@
                             <slur curvedir="below" startid="#d648110e5649" endid="d648110e5667" />
                             <slur curvedir="below" startid="#d648110e5686" endid="d648110e5736" />
                             <slur curvedir="above" startid="#d648110e5757" endid="d648110e5814" />
-                            <hairpin tstamp="2.292" tstamp2="1m+2.042" form="cres" place="above" staff="3" opening="1.5" startto="-17" endto="-11"/>
-                            <hairpin tstamp="2" tstamp2="1m+1.542" form="cres" place="above" staff="4" opening="1.5" endto="-11"/>
+                            <hairpin tstamp="2.292" tstamp2="1m+2.042" form="cres" place="below" staff="2" opening="1.5" startto="-17" endto="-11"/>
+                            <hairpin tstamp="2" tstamp2="1m+1.542" form="cres" place="below" staff="3" opening="1.5" endto="-11"/>
                             <hairpin tstamp="2.083" tstamp2="1m+1.542" form="cres" place="below" staff="4" opening="1.5" startto="-22" endto="-11"/>
                         </measure>
                         <measure n="18" xml:id="d648110e5889">
@@ -1337,15 +1346,15 @@
                             <slur curvedir="below" startid="#d648110e6360" endid="d648110e6380" />
                             <slur curvedir="below" startid="#d648110e6401" endid="d648110e6422" />
                             <slur curvedir="below" startid="#d648110e6444" endid="d648110e6468" />
-                            <hairpin tstamp="2.208" tstamp2="1m+3.583" form="cres" place="above" staff="4" opening="1.5" startto="-13" endto="-10"/>
+                            <hairpin tstamp="2.208" tstamp2="1m+3.583" form="cres" place="below" staff="1" opening="1.5" startto="-13" endto="-10"/>
                             <slur curvedir="below" startid="#d648110e6507" endid="d648110e6528" />
                             <slur curvedir="below" startid="#d648110e6550" endid="d648110e6578" />
                             <tie curvedir="below" startid="#d648110e6550" endid="d648110e6600"/>
-                            <hairpin tstamp="2.208" tstamp2="1m+3.583" form="cres" place="above" staff="3" opening="1.5" startto="-13" endto="-10"/>
+                            <hairpin tstamp="2.208" tstamp2="1m+3.583" form="cres" place="below" staff="2" opening="1.5" startto="-13" endto="-10"/>
                             <slur curvedir="below" startid="#d648110e6654" endid="d648110e6675" />
                             <slur curvedir="below" startid="#d648110e6699" endid="d648110e6730" />
-                            <hairpin tstamp="2.083" tstamp2="1m+3.083" form="cres" place="below" staff="4" opening="1.5" startto="-16" endto="-10"/>
-                            <hairpin tstamp="2.208" tstamp2="1m+3.083" form="cres" place="above" staff="4" opening="1.5" startto="-13" endto="-10"/>
+                            <hairpin tstamp="2.083" tstamp2="1m+3.083" form="cres" place="below" staff="3" opening="1.5" startto="-16" endto="-10"/>
+                            <hairpin tstamp="2.208" tstamp2="1m+3.083" form="cres" place="below" staff="4" opening="1.5" startto="-13" endto="-10"/>
                         </measure>
                         <measure n="20" xml:id="d648110e6764">
                             <staff n="1">
@@ -1446,11 +1455,11 @@
                             </staff>
                             <slur curvedir="below" startid="#d648110e7223" endid="d648110e7273" />
                             <slur curvedir="below" startid="#d648110e7292" endid="d648110e7329" />
-                            <hairpin tstamp="1.042" tstamp2="0m+3.667" form="dim" place="above" staff="4" opening="0" startto="-23" endto="-8"/>
-                            <hairpin tstamp="1" tstamp2="0m+3.333" form="dim" place="above" staff="3" opening="0" endto="-16"/>
+                            <hairpin tstamp="1.042" tstamp2="0m+3.667" form="dim" place="below" staff="1" opening="0" startto="-23" endto="-8"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.333" form="dim" place="below" staff="2" opening="0" endto="-16"/>
                             <slur curvedir="below" startid="#d648110e7356" endid="d648110e7388" />
                             <slur curvedir="below" startid="#d648110e7410" endid="d648110e7454" />
-                            <hairpin tstamp="1.042" tstamp2="0m+3.125" form="dim" place="above" staff="4" opening="0" startto="-23" endto="-21"/>
+                            <hairpin tstamp="1.042" tstamp2="0m+3.125" form="dim" place="below" staff="3" opening="0" startto="-23" endto="-21"/>
                             <hairpin tstamp="1.042" tstamp2="0m+3.125" form="dim" place="below" staff="4" opening="0" startto="-23" endto="-21"/>
                         </measure>
                         <measure n="22" xml:id="d648110e7482">
@@ -1518,7 +1527,7 @@
                             </dir>
                             <slur curvedir="below" startid="#d648110e7539" endid="d648110e7559" />
                             <slur curvedir="below" startid="#d648110e7588" endid="d648110e7615" />
-                            <dir tstamp="2.75" place="below" staff="4">
+                            <dir tstamp="2.75" place="below" staff="2">
                                 <rend fontstyle="italic">cresc.</rend>
                             </dir>
                             <slur curvedir="below" startid="#d648110e7637" endid="d648110e7658" />
@@ -1619,7 +1628,7 @@
                             <slur curvedir="below" startid="#d648110e8079" endid="d648110e8118" />
                             <slur curvedir="below" startid="#d648110e8155" endid="d648110e8192" />
                             <slur curvedir="below" startid="#d648110e8265" endid="d648110e8296" />
-                            <hairpin tstamp="1.083" tstamp2="0m+3.417" form="cres" place="above" staff="3" opening="1.5" startto="-16" endto="-2"/>
+                            <hairpin tstamp="1.083" tstamp2="0m+3.417" form="cres" place="below" staff="2" opening="1.5" startto="-16" endto="-2"/>
                             <hairpin tstamp="1.083" tstamp2="0m+3.417" form="cres" place="below" staff="3" opening="1.5" startto="-16" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e8318" endid="d648110e8339" />
                             <slur curvedir="below" startid="#d648110e8359" endid="d648110e8385" />
@@ -1663,7 +1672,7 @@
                             </dir>
                             <slur curvedir="above" startid="#d648110e8538" endid="d648110e8593" />
                             <hairpin tstamp="1.708" tstamp2="0m+3.667" form="dim" place="below" staff="1" opening="0" startto="-19" endto="-8"/>
-                            <dir tstamp="1" place="below" staff="4">
+                            <dir tstamp="1" place="below" staff="2">
                                 <rend fontstyle="italic">dim.</rend>
                             </dir>
                             <slur curvedir="below" startid="#d648110e8621" endid="d648110e8653" />
@@ -1671,7 +1680,7 @@
                                 <rend fontstyle="italic">dim.</rend>
                             </dir>
                             <slur curvedir="below" startid="#d648110e8676" endid="d648110e8720" />
-                            <hairpin tstamp="1.75" tstamp2="0m+3.667" form="dim" place="above" staff="3" opening="0" startto="-6" endto="-8"/>
+                            <hairpin tstamp="1.75" tstamp2="0m+3.667" form="dim" place="below" staff="2" opening="0" startto="-6" endto="-8"/>
                             <hairpin tstamp="1.75" tstamp2="0m+3.667" form="dim" place="below" staff="3" opening="0" startto="-6" endto="-8"/>
                             <dir tstamp="1" place="below" staff="4">
                                 <rend fontstyle="italic">dim.</rend>
@@ -1773,7 +1782,7 @@
                                     </tuplet>
                                 </layer>
                             </staff>
-                            <dynam tstamp="1.875" place="below" startto="-3" staff="4">pp</dynam>
+                            <dynam tstamp="2.2" place="below" startto="-3" staff="2">pp</dynam>
                             <slur curvedir="below" startid="#d648110e8856" endid="d648110e8883" />
                             <slur curvedir="below" startid="#d648110e8911" endid="d648110e8965" />
                             <dynam tstamp="1.333" place="below" staff="3">pp</dynam>
@@ -1891,9 +1900,9 @@
                             </staff>
                             <dynam tstamp="1.25" place="below" startto="-6" staff="1">pp</dynam>
                             <hairpin tstamp="1.75" tstamp2="0m+3.792" form="dim" place="below" staff="1" opening="0" startto="-18" endto="-5"/>
-                            <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="above" staff="3" opening="0" endto="-5"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="below" staff="2" opening="0" endto="-5"/>
                             <slur curvedir="below" startid="#d648110e9618" endid="d648110e9673" />
-                            <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="above" staff="4" opening="0" endto="-5"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="below" staff="3" opening="0" endto="-5"/>
                             <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="below" staff="4" opening="0" endto="-5"/>
                             <slur curvedir="above" startid="#d648110e9856" endid="d648110e9913" />
                         </measure>
@@ -2062,12 +2071,14 @@
                             <hairpin tstamp="2.083" tstamp2="0m+2.667" form="dim" place="below" staff="1" opening="0" startto="-6"/>
                             <hairpin tstamp="3.333" tstamp2="0m+3.833" form="dim" place="below" staff="1" opening="0" endto="-4"/>
                             <slur curvedir="above" startid="#d648110e10309" endid="d648110e10336" />
-                            <dir tstamp="1.333" place="below" staff="4">
+                            <dir tstamp="1.333" place="below" staff="2">
                                 <rend fontstyle="italic">dolce</rend>
                             </dir>
                             <slur curvedir="below" startid="#d648110e10390" endid="d648110e10513" />
-                            <hairpin tstamp="1.583" tstamp2="0m+2" form="cres" place="below" staff="4" opening="1.5" startto="-2"/>
+                            <hairpin tstamp="1.583" tstamp2="0m+2" form="cres" place="below" staff="2" opening="1.5" startto="-2"/>
                             <slur curvedir="below" startid="#d648110e10559" endid="d648110e10589" />
+                            <hairpin tstamp="2.083" tstamp2="0m+2.667" form="dim" place="below" staff="2" opening="0" startto="-6"/>
+                            <hairpin tstamp="3.333" tstamp2="0m+3.833" form="dim" place="below" staff="2" opening="0" endto="-4"/>
                             <dir tstamp="1.333" place="below" staff="3">
                                 <rend fontstyle="italic">dolce</rend>
                             </dir>
@@ -2240,8 +2251,11 @@
                             <slur curvedir="below" startid="#d648110e11225" endid="d648110e11254" />
                             <hairpin tstamp="3.333" tstamp2="0m+3.917" form="dim" place="below" staff="1" opening="0" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e11307" endid="d648110e11334" />
+                            <hairpin tstamp="1.25" tstamp2="0m+1.833" form="dim" place="below" staff="2" opening="0" startto="-2" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e11384" endid="d648110e11413" />
+                            <hairpin tstamp="2.333" tstamp2="0m+2.792" form="dim" place="below" staff="2" opening="0" endto="-5"/>
                             <slur curvedir="below" startid="#d648110e11459" endid="d648110e11488" />
+                            <hairpin tstamp="3.333" tstamp2="0m+3.917" form="dim" place="below" staff="2" opening="0" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e11532" endid="d648110e11561" />
                             <hairpin tstamp="1.333" tstamp2="0m+1.833" form="dim" place="below" staff="3" opening="0" endto="-4"/>
                             <slur curvedir="above" startid="#d648110e11609" endid="d648110e11638" />
@@ -2413,25 +2427,26 @@
                                     </tuplet>
                                 </layer>
                             </staff>
-                            <hairpin tstamp="1.25" tstamp2="0m+1.792" form="cres" place="below" staff="1" opening="1.5" startto="-2" endto="-5"/>
+
                             <slur curvedir="above" startid="#d648110e12080" endid="d648110e12205" />
-                            <hairpin tstamp="2" tstamp2="0m+2.792" form="dim" place="below" staff="1" opening="0" endto="-5"/>
                             <slur curvedir="above" startid="#d648110e12257" endid="d648110e12291" />
-                            <hairpin tstamp="3.375" tstamp2="0m+3.833" form="dim" place="below" staff="1" opening="0" startto="-7" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e12341" endid="d648110e12454" />
                             <slur curvedir="below" startid="#d648110e12496" endid="d648110e12532" />
-                            <hairpin tstamp="3.375" tstamp2="0m+3.875" form="dim" place="below" staff="4" opening="0" startto="-7" endto="-3"/>
-                            <hairpin tstamp="1.333" tstamp2="0m+1.792" form="cres" place="above" staff="3" opening="1.5" endto="-5"/>
                             <slur curvedir="below" startid="#d648110e12583" endid="d648110e12706" />
-                            <hairpin tstamp="2.042" tstamp2="0m+2.833" form="dim" place="above" staff="3" opening="0" startto="-7" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e12758" endid="d648110e12785" />
-                            <hairpin tstamp="1.333" tstamp2="0m+1.917" form="cres" place="above" staff="4" opening="1.5" endto="-2"/>
-                            <hairpin tstamp="1.333" tstamp2="0m+1.917" form="cres" place="below" staff="4" opening="1.5" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e12836" endid="d648110e12964" />
-                            <hairpin tstamp="2.042" tstamp2="0m+2.75" form="dim" place="below" staff="4" opening="0" startto="-7" endto="-6"/>
-                            <hairpin tstamp="2.042" tstamp2="0m+2.75" form="dim" place="above" staff="4" opening="0" startto="-7" endto="-6"/>
                             <slur curvedir="below" startid="#d648110e13016" endid="d648110e13053" />
-                            <hairpin tstamp="3.375" tstamp2="0m+3.833" form="dim" place="above" staff="4" opening="0" startto="-7" endto="-4"/>
+                            <hairpin tstamp="1.25" tstamp2="0m+1.792" form="cres" place="below" staff="1" opening="1.5" startto="-2" endto="-5"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.917" form="cres" place="below" staff="2" opening="1.5" endto="-2"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.917" form="cres" place="below" staff="3" opening="1.5" endto="-2"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.792" form="cres" place="below" staff="4" opening="1.5" endto="-5"/>
+                            <hairpin tstamp="2.042" tstamp2="0m+2.833" form="dim" place="below" staff="1" opening="0" startto="-7" endto="-4"/>                            
+                            <hairpin tstamp="2" tstamp2="0m+2.792" form="dim" place="below" staff="2" opening="0" endto="-5"/>   
+                            <hairpin tstamp="2.042" tstamp2="0m+2.75" form="dim" place="below" staff="3" opening="0" startto="-7" endto="-6"/>
+                            <hairpin tstamp="2.042" tstamp2="0m+2.75" form="dim" place="below" staff="4" opening="0" startto="-7" endto="-6"/>
+                            <hairpin tstamp="3.375" tstamp2="0m+3.875" form="dim" place="below" staff="1" opening="0" startto="-7" endto="-3"/>
+                            <hairpin tstamp="3.375" tstamp2="0m+3.833" form="dim" place="below" staff="2" opening="0" startto="-7" endto="-4"/>
+                            <hairpin tstamp="3.375" tstamp2="0m+3.833" form="dim" place="below" staff="3" opening="0" startto="-7" endto="-4"/>
                             <hairpin tstamp="3.375" tstamp2="0m+3.833" form="dim" place="below" staff="4" opening="0" startto="-7" endto="-4"/>
                         </measure>
                         <measure n="30" xml:id="d648110e13090">
@@ -2586,19 +2601,19 @@
                             <slur curvedir="below" startid="#d648110e13107" endid="d648110e13136" />
                             <slur curvedir="below" startid="#d648110e13182" endid="d648110e13211" />
                             <slur curvedir="below" startid="#d648110e13255" endid="d648110e13286" />
-                            <hairpin tstamp="1.333" tstamp2="0m+1.833" form="dim" place="above" staff="4" opening="0" endto="-4"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.833" form="dim" place="below" staff="1" opening="0" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e13334" endid="d648110e13365" />
-                            <hairpin tstamp="2.375" tstamp2="0m+2.833" form="dim" place="above" staff="4" opening="0" startto="1" endto="-4"/>
+                            <hairpin tstamp="2.375" tstamp2="0m+2.833" form="dim" place="below" staff="1" opening="0" startto="1" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e13421" endid="d648110e13452" />
-                            <hairpin tstamp="3.333" tstamp2="0m+3.833" form="dim" place="above" staff="4" opening="0" endto="-4"/>
+                            <hairpin tstamp="3.333" tstamp2="0m+3.833" form="dim" place="below" staff="1" opening="0" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e13505" endid="d648110e13534" />
-                            <hairpin tstamp="1.333" tstamp2="0m+1.667" form="dim" place="above" staff="3" opening="0"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.667" form="dim" place="below" staff="2" opening="0"/>
                             <hairpin tstamp="1.333" tstamp2="0m+1.667" form="dim" place="below" staff="3" opening="0"/>
                             <slur curvedir="above" startid="#d648110e13590" endid="d648110e13624" />
-                            <hairpin tstamp="2.333" tstamp2="0m+2.75" form="dim" place="above" staff="3" opening="0" endto="-6"/>
+                            <hairpin tstamp="2.333" tstamp2="0m+2.75" form="dim" place="below" staff="2" opening="0" endto="-6"/>
                             <hairpin tstamp="2.333" tstamp2="0m+2.75" form="dim" place="below" staff="3" opening="0" endto="-6"/>
                             <slur curvedir="below" startid="#d648110e13679" endid="d648110e13711" />
-                            <hairpin tstamp="3.333" tstamp2="0m+3.833" form="dim" place="above" staff="3" opening="0" endto="-4"/>
+                            <hairpin tstamp="3.333" tstamp2="0m+3.833" form="dim" place="below" staff="2" opening="0" endto="-4"/>
                             <hairpin tstamp="3.333" tstamp2="0m+3.833" form="dim" place="below" staff="3" opening="0" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e13771" endid="d648110e13798" />
                             <hairpin tstamp="1.333" tstamp2="0m+1.833" form="dim" place="below" staff="4" opening="0" endto="-4"/>
@@ -2753,9 +2768,9 @@
                             <tie curvedir="above" startid="#d648110e14092" endid="d648110e14120"/>
                             <tie curvedir="above" startid="#d648110e14145" endid="d648110e14172"/>
                             <slur curvedir="below" startid="#d648110e14243" endid="d648110e14442" />
-                            <hairpin tstamp="1.333" tstamp2="0m+3.458" form="cres" place="below" staff="3" opening="1.5" endto="-5"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+3.458" form="cres" place="below" staff="2" opening="1.5" endto="-5"/>
                             <slur curvedir="above" startid="#d648110e14490" endid="d648110e14704" />
-                            <hairpin tstamp="1.417" tstamp2="0m+3.458" form="cres" place="above" staff="3" opening="1.5" startto="-6" endto="-5"/>
+                            <hairpin tstamp="1.417" tstamp2="0m+3.458" form="cres" place="below" staff="3" opening="1.5" startto="-6" endto="-5"/>
                             <hairpin tstamp="1.333" tstamp2="0m+3.75" form="cres" place="below" staff="4" opening="1.5" endto="-6"/>
                             <slur curvedir="above" startid="#d648110e14755" endid="d648110e14938" />
                         </measure>
@@ -2853,8 +2868,8 @@
                             </staff>
                             <dynam tstamp="1" place="below" staff="1">f</dynam>
                             <hairpin tstamp="1.25" tstamp2="0m+3.5" form="dim" place="below" staff="1" opening="0" startto="-6"/>
-                            <dynam tstamp="1" place="below" staff="4">f</dynam>
-                            <hairpin tstamp="1.25" tstamp2="0m+3.917" form="dim" place="below" staff="4" opening="0" startto="-2" endto="-2"/>
+                            <dynam tstamp="1" place="below" staff="2">f</dynam>
+                            <hairpin tstamp="1.25" tstamp2="0m+3.917" form="dim" place="below" staff="2" opening="0" startto="-2" endto="-2"/>
                             <dynam tstamp="1" place="below" staff="3">f</dynam>
                             <hairpin tstamp="1.208" tstamp2="0m+3.708" form="dim" place="below" staff="3" opening="0" startto="-3" endto="-7"/>
                             <dynam tstamp="1" place="below" staff="4">f</dynam>
@@ -2958,8 +2973,8 @@
                             </dir>
                             <tie curvedir="above" startid="#d648110e15788" endid="d648110e15811"/>
                             <tie curvedir="above" startid="#d648110e15834" endid="d648110e15861"/>
-                            <dynam tstamp="1" place="below" staff="4">p</dynam>
-                            <dir tstamp="1.333" place="below" staff="4">
+                            <dynam tstamp="1" place="below" staff="2">p</dynam>
+                            <dir tstamp="1.333" place="below" staff="2">
                                 <rend fontstyle="italic">dim.</rend>
                             </dir>
                             <dynam tstamp="1" place="below" staff="3">p</dynam>
@@ -3063,7 +3078,7 @@
                             </staff>
                             <slur curvedir="below" startid="#d648110e16622" endid="d648110e16701" />
                             <hairpin tstamp="1.583" tstamp2="0m+3.667" form="dim" place="below" staff="1" opening="0" startto="-10" endto="-8"/>
-                            <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="below" staff="4" opening="0" endto="-5"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="below" staff="2" opening="0" endto="-5"/>
                             <hairpin tstamp="1" tstamp2="0m+3.75" form="dim" place="below" staff="3" opening="0" endto="-6"/>
                             <hairpin tstamp="1" tstamp2="0m+3.75" form="dim" place="below" staff="4" opening="0" endto="-6"/>
                         </measure>
@@ -3225,25 +3240,26 @@
                                 </layer>
                             </staff>
                             <slur curvedir="above" startid="#d648110e17431" endid="d648110e17549" />
-                            <hairpin tstamp="2" tstamp2="0m+3" form="dim" place="below" staff="1" opening="0"/>
-                            <hairpin tstamp="3.333" tstamp2="0m+3.833" form="dim" place="below" staff="1" opening="0" endto="-4"/>
+
                             <slur curvedir="above" startid="#d648110e17599" endid="d648110e17629" />
-                            <hairpin tstamp="1.333" tstamp2="0m+1.958" form="cres" place="above" staff="4" opening="1.5" endto="-1"/>
                             <slur curvedir="below" startid="#d648110e17682" endid="d648110e17802" />
                             <slur curvedir="below" startid="#d648110e17846" endid="d648110e17881" />
-                            <hairpin tstamp="3.375" tstamp2="0m+3.958" form="dim" place="below" staff="4" opening="0" startto="-7" endto="-1"/>
                             <slur curvedir="below" startid="#d648110e17931" endid="d648110e18053" />
-                            <hairpin tstamp="1.458" tstamp2="0m+2" form="cres" place="above" staff="3" opening="1.5" startto="-5"/>
-                            <hairpin tstamp="2.083" tstamp2="0m+3" form="dim" place="above" staff="3" opening="0" startto="-6"/>
                             <slur curvedir="below" startid="#d648110e18103" endid="d648110e18132" />
-                            <hairpin tstamp="1.333" tstamp2="0m+2" form="cres" place="above" staff="4" opening="1.5"/>
-                            <hairpin tstamp="1.333" tstamp2="0m+2" form="cres" place="below" staff="4" opening="1.5"/>
                             <slur curvedir="below" startid="#d648110e18183" endid="d648110e18313" />
-                            <hairpin tstamp="2.083" tstamp2="0m+2.833" form="dim" place="above" staff="4" opening="0" startto="-6" endto="-4"/>
-                            <hairpin tstamp="2.083" tstamp2="0m+2.833" form="dim" place="below" staff="4" opening="0" startto="-6" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e18367" endid="d648110e18406" />
-                            <hairpin tstamp="3.375" tstamp2="0m+3.833" form="dim" place="below" staff="4" opening="0" startto="-7" endto="-4"/>
-                            <hairpin tstamp="3.417" tstamp2="0m+3.833" form="dim" place="above" staff="4" opening="0" startto="-6" endto="-4"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.958" form="cres" place="below" staff="1" opening="1.5" endto="-1"/>
+                            <hairpin tstamp="2.083" tstamp2="0m+3" form="dim" place="below" staff="1" opening="0" startto="-6"/>
+                            <hairpin tstamp="3.333" tstamp2="0m+3.833" form="dim" place="below" staff="1" opening="0" endto="-4"/>
+                            <hairpin tstamp="1.458" tstamp2="0m+2" form="cres" place="below" staff="2" opening="1.5" startto="-5"/>    
+                            <hairpin tstamp="2.083" tstamp2="0m+2.833" form="dim" place="below" staff="2" opening="0" startto="-6" endto="-4"/>
+                            <hairpin tstamp="3.375" tstamp2="0m+3.958" form="dim" place="below" staff="2" opening="0" startto="-7" endto="-1"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+2" form="cres" place="below" staff="3" opening="1.5"/>
+                            <hairpin tstamp="2.083" tstamp2="0m+2.833" form="dim" place="below" staff="3" opening="0" startto="-6" endto="-4"/>
+                            <hairpin tstamp="3.375" tstamp2="0m+3.833" form="dim" place="below" staff="3" opening="0" startto="-7" endto="-4"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+2" form="cres" place="below" staff="4" opening="1.5"/>
+                            <hairpin tstamp="2.1" tstamp2="0m+3" form="dim" place="below" staff="4" opening="0"/>
+                            <hairpin tstamp="3.417" tstamp2="0m+3.833" form="dim" place="below" staff="4" opening="0" startto="-6" endto="-4"/>
                         </measure>
                         <measure n="36" xml:id="d648110e18445">
                             <staff n="1">
@@ -3401,22 +3417,22 @@
                             <slur curvedir="below" startid="#d648110e18633" endid="d648110e18662" />
                             <slur curvedir="below" startid="#d648110e18707" endid="d648110e18736" />
                             <slur curvedir="below" startid="#d648110e18780" endid="d648110e18811" />
-                            <hairpin tstamp="3.333" tstamp2="0m+3.917" form="dim" place="above" staff="4" opening="0" endto="-2"/>
+                            <hairpin tstamp="3.333" tstamp2="0m+3.917" form="dim" place="below" staff="1" opening="0" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e18858" endid="d648110e18889" />
-                            <hairpin tstamp="1.375" tstamp2="0m+2" form="dim" place="above" staff="3" opening="0" startto="1"/>
+                            <hairpin tstamp="1.375" tstamp2="0m+2" form="dim" place="below" staff="2" opening="0" startto="1"/>
                             <slur curvedir="below" startid="#d648110e18944" endid="d648110e18973" />
                             <slur curvedir="below" startid="#d648110e19022" endid="d648110e19054" />
-                            <hairpin tstamp="2.375" tstamp2="0m+2.917" form="dim" place="above" staff="3" opening="0" startto="-7" endto="-2"/>
+                            <hairpin tstamp="2.375" tstamp2="0m+2.917" form="dim" place="below" staff="2" opening="0" startto="-7" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e19102" endid="d648110e19136" />
-                            <hairpin tstamp="3.375" tstamp2="0m+3.833" form="dim" place="above" staff="3" opening="0" startto="-7" endto="-4"/>
-                            <hairpin tstamp="1.333" tstamp2="0m+1.833" form="dim" place="above" staff="4" opening="0" endto="-4"/>
+                            <hairpin tstamp="3.375" tstamp2="0m+3.833" form="dim" place="below" staff="2" opening="0" startto="-7" endto="-4"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.833" form="dim" place="below" staff="3" opening="0" endto="-4"/>
                             <hairpin tstamp="1.375" tstamp2="0m+1.833" form="dim" place="below" staff="4" opening="0" startto="1" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e19194" endid="d648110e19223" />
                             <slur curvedir="below" startid="#d648110e19277" endid="d648110e19317" />
-                            <hairpin tstamp="2.375" tstamp2="0m+2.917" form="dim" place="above" staff="4" opening="0" startto="-7" endto="-2"/>
+                            <hairpin tstamp="2.375" tstamp2="0m+2.917" form="dim" place="below" staff="3" opening="0" startto="-7" endto="-2"/>
                             <hairpin tstamp="2.375" tstamp2="0m+2.917" form="dim" place="below" staff="4" opening="0" startto="-7" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e19369" endid="d648110e19408" />
-                            <hairpin tstamp="3.375" tstamp2="0m+3.917" form="dim" place="above" staff="4" opening="0" startto="-7" endto="-2"/>
+                            <hairpin tstamp="3.375" tstamp2="0m+3.917" form="dim" place="below" staff="3" opening="0" startto="-7" endto="-2"/>
                             <hairpin tstamp="3.375" tstamp2="0m+3.917" form="dim" place="below" staff="4" opening="0" startto="-7" endto="-2"/>
                         </measure>
                         <measure n="37" xml:id="d648110e19447">
@@ -3581,10 +3597,10 @@
                             <hairpin tstamp="2.083" tstamp2="0m+2.875" form="dim" place="below" staff="1" opening="0" startto="-6" endto="-3"/>
                             <hairpin tstamp="3.333" tstamp2="0m+4" form="dim" place="below" staff="1" opening="0"/>
                             <slur curvedir="above" startid="#d648110e19649" endid="d648110e19678" />
-                            <hairpin tstamp="1.333" tstamp2="0m+1.875" form="cres" place="below" staff="4" opening="1.5" endto="-3"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.875" form="cres" place="below" staff="2" opening="1.5" endto="-3"/>
                             <slur curvedir="below" startid="#d648110e19729" endid="d648110e19854" />
-                            <hairpin tstamp="2.083" tstamp2="0m+2.958" form="dim" place="below" staff="4" opening="0" startto="-6" endto="-1"/>
-                            <hairpin tstamp="3.333" tstamp2="0m+4" form="dim" place="below" staff="4" opening="0"/>
+                            <hairpin tstamp="2.083" tstamp2="0m+2.958" form="dim" place="below" staff="2" opening="0" startto="-6" endto="-1"/>
+                            <hairpin tstamp="3.333" tstamp2="0m+4" form="dim" place="below" staff="2" opening="0"/>
                             <slur curvedir="above" startid="#d648110e19907" endid="d648110e19934" />
                             <hairpin tstamp="1.333" tstamp2="0m+1.875" form="cres" place="below" staff="3" opening="1.5" endto="-3"/>
                             <slur curvedir="below" startid="#d648110e19983" endid="d648110e20097" />
@@ -3592,7 +3608,7 @@
                             <slur curvedir="above" startid="#d648110e20148" endid="d648110e20176" />
                             <hairpin tstamp="1.292" tstamp2="0m+1.667" form="cres" place="below" staff="4" opening="1.5" startto="-1"/>
                             <slur curvedir="below" startid="#d648110e20231" endid="d648110e20349" />
-                            <hairpin tstamp="2" tstamp2="0m+2.875" form="dim" place="above" staff="4" opening="0" endto="-3"/>
+                            <hairpin tstamp="2" tstamp2="0m+2.875" form="dim" place="below" staff="3" opening="0" endto="-3"/>
                             <hairpin tstamp="2.042" tstamp2="0m+2.875" form="dim" place="below" staff="4" opening="0" startto="-7" endto="-3"/>
                             <hairpin tstamp="3.333" tstamp2="0m+4" form="dim" place="below" staff="4" opening="0"/>
                             <slur curvedir="below" startid="#d648110e20405" endid="d648110e20432" />
@@ -3754,17 +3770,17 @@
                             <hairpin tstamp="3.25" tstamp2="0m+3.833" form="dim" place="below" staff="1" opening="0" startto="-2" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e20645" endid="d648110e20676" />
                             <slur curvedir="below" startid="#d648110e20724" endid="d648110e20755" />
-                            <hairpin tstamp="2.333" tstamp2="0m+2.833" form="dim" place="below" staff="4" opening="0" endto="-4"/>
+                            <hairpin tstamp="2.333" tstamp2="0m+2.833" form="dim" place="below" staff="2" opening="0" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e20802" endid="d648110e20833" />
-                            <hairpin tstamp="3.333" tstamp2="0m+3.75" form="dim" place="below" staff="4" opening="0" endto="-6"/>
+                            <hairpin tstamp="3.333" tstamp2="0m+3.75" form="dim" place="below" staff="2" opening="0" endto="-6"/>
                             <slur curvedir="below" startid="#d648110e20885" endid="d648110e20915" />
-                            <hairpin tstamp="1.333" tstamp2="0m+1.833" form="dim" place="above" staff="3" opening="0" endto="-4"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.833" form="dim" place="below" staff="3" opening="0" endto="-4"/>
                             <slur curvedir="above" startid="#d648110e20968" endid="d648110e20997" />
                             <hairpin tstamp="2.333" tstamp2="0m+2.875" form="dim" place="below" staff="3" opening="0" endto="-3"/>
                             <slur curvedir="above" startid="#d648110e21049" endid="d648110e21080" />
                             <hairpin tstamp="3.333" tstamp2="0m+3.792" form="dim" place="below" staff="3" opening="0" endto="-5"/>
                             <slur curvedir="above" startid="#d648110e21133" endid="d648110e21162" />
-                            <hairpin tstamp="1.333" tstamp2="0m+1.792" form="dim" place="above" staff="4" opening="0" endto="-5"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.792" form="dim" place="below" staff="2" opening="0" endto="-5"/>
                             <hairpin tstamp="1.333" tstamp2="0m+1.792" form="dim" place="below" staff="4" opening="0" endto="-5"/>
                             <slur curvedir="below" startid="#d648110e21216" endid="d648110e21245" />
                             <hairpin tstamp="2.333" tstamp2="0m+2.792" form="dim" place="below" staff="4" opening="0" endto="-5"/>
@@ -3915,7 +3931,7 @@
                             <hairpin tstamp="1.333" tstamp2="0m+3.75" form="cres" place="below" staff="1" opening="1.5" endto="-6"/>
                             <slur curvedir="above" startid="#d648110e21463" endid="d648110e21652" />
                             <slur curvedir="below" startid="#d648110e21702" endid="d648110e21910" />
-                            <hairpin tstamp="1.417" tstamp2="0m+3.75" form="cres" place="below" staff="4" opening="1.5" startto="-6" endto="-6"/>
+                            <hairpin tstamp="1.417" tstamp2="0m+3.75" form="cres" place="below" staff="2" opening="1.5" startto="-6" endto="-6"/>
                             <hairpin tstamp="1.333" tstamp2="0m+3.667" form="cres" place="below" staff="3" opening="1.5"/>
                             <slur curvedir="above" startid="#d648110e21963" endid="d648110e22157" />
                             <hairpin tstamp="1.333" tstamp2="0m+3.708" form="cres" place="below" staff="4" opening="1.5" endto="-7"/>
@@ -4018,8 +4034,8 @@
                             </staff>
                             <dynam tstamp="1" place="below" staff="1">f</dynam>
                             <hairpin tstamp="1.208" tstamp2="0m+3.708" form="dim" place="below" staff="1" opening="0" startto="-3" endto="-7"/>
-                            <dynam tstamp="1" place="below" staff="4">f</dynam>
-                            <hairpin tstamp="1.292" tstamp2="0m+3.75" form="dim" place="below" staff="4" opening="0" startto="-1" endto="-6"/>
+                            <dynam tstamp="1" place="below" staff="2">f</dynam>
+                            <hairpin tstamp="1.292" tstamp2="0m+3.75" form="dim" place="below" staff="2" opening="0" startto="-1" endto="-6"/>
                             <dynam tstamp="1" place="below" staff="3">f</dynam>
                             <hairpin tstamp="1.333" tstamp2="0m+3.667" form="dim" place="below" staff="3" opening="0"/>
                             <dynam tstamp="1" place="below" staff="4">f</dynam>
@@ -4125,12 +4141,12 @@
                                 <rend fontstyle="italic">dim.</rend>
                             </dir>
                             <tie curvedir="above" startid="#d648110e23217" endid="d648110e23242"/>
-                            <dir tstamp="1.667" place="below" staff="4">
+                            <dir tstamp="1.667" place="below" staff="2">
                                 <rend fontstyle="italic">dim.</rend>
                             </dir>
-                            <dynam tstamp="1.042" place="above" startto="-7" staff="3">p</dynam>
-                            <dynam tstamp="1" place="above" staff="4">p</dynam>
-                            <dir tstamp="1.333" place="above" staff="4">
+                            <dynam tstamp="1.042" place="below" startto="-7" staff="2">p</dynam>
+                            <dynam tstamp="1" place="below" staff="3">p</dynam>
+                            <dir tstamp="1.667" place="below" staff="3">
                                 <rend fontstyle="italic">dim.</rend>
                             </dir>
                             <dynam tstamp="1.333" place="below" staff="4">p</dynam>
@@ -4229,7 +4245,7 @@
                                 </layer>
                             </staff>
                             <slur curvedir="below" startid="#d648110e23987" endid="d648110e24063" />
-                            <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="above" staff="3" opening="0" endto="-5"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="below" staff="2" opening="0" endto="-5"/>
                             <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="below" staff="3" opening="0" endto="-5"/>
                             <hairpin tstamp="1.083" tstamp2="0m+2.833" form="dim" place="below" staff="4" opening="0" startto="-6" endto="-4"/>
                             <hairpin tstamp="3.333" tstamp2="0m+3.792" form="dim" place="below" staff="4" opening="0" endto="-5"/>
@@ -4479,7 +4495,7 @@
                             <slur curvedir="above" startid="#d648110e25915" endid="d648110e25934" />
                             <slur curvedir="above" startid="#d648110e25958" endid="d648110e25979" />
                             <slur curvedir="below" startid="#d648110e26005" endid="d648110e26029" />
-                            <hairpin tstamp="1.125" tstamp2="0m+3.667" form="cres" place="below" staff="4" opening="1.5" startto="-15" endto="-2"/>
+                            <hairpin tstamp="1.125" tstamp2="0m+3.667" form="cres" place="below" staff="2" opening="1.5" startto="-15" endto="-2"/>
                             <slur curvedir="above" startid="#d648110e26051" endid="d648110e26070" />
                             <slur curvedir="above" startid="#d648110e26090" endid="d648110e26114" />
                             <slur curvedir="above" startid="#d648110e26139" endid="d648110e26165" />
@@ -4546,12 +4562,12 @@
                             </dir>
                             <tie curvedir="above" startid="#d648110e26360" endid="d648110e26759"/>
                             <hairpin tstamp="2.208" tstamp2="1m+2.625" form="dim" place="below" staff="1" opening="0" startto="-43" endto="-33"/>
-                            <dynam tstamp="1" place="below" staff="4">f</dynam>
+                            <dynam tstamp="1" place="below" staff="2">f</dynam>
                             <slur curvedir="above" startid="#d648110e26391" endid="d648110e26882" />
-                            <dir tstamp="2" place="below" staff="4">
+                            <dir tstamp="2" place="below" staff="2">
                                 <rend fontstyle="italic">dim.</rend>
                             </dir>
-                            <hairpin tstamp="2.917" tstamp2="1m+1.625" form="dim" place="below" staff="4" opening="0" startto="-2" endto="-33"/>
+                            <hairpin tstamp="2.917" tstamp2="1m+1.625" form="dim" place="below" staff="2" opening="0" startto="-2" endto="-33"/>
                             <dynam tstamp="1" place="below" staff="3">f</dynam>
                             <slur curvedir="above" startid="#d648110e26498" endid="d648110e26989" />
                             <dir tstamp="2" place="below" staff="3">
@@ -4677,7 +4693,7 @@
                             <tie curvedir="above" startid="#d648110e27134" endid="d648110e27161"/>
                             <tie curvedir="above" startid="#d648110e27209" endid="d648110e27237"/>
                             <slur curvedir="above" startid="#d648110e27264" endid="d648110e27289" />
-                            <dynam tstamp="1" place="below" staff="4">p</dynam>
+                            <dynam tstamp="1" place="below" staff="2">p</dynam>
                             <slur curvedir="below" startid="#d648110e27319" endid="d648110e27340" />
                             <slur curvedir="below" startid="#d648110e27362" endid="d648110e27383" />
                             <slur curvedir="below" startid="#d648110e27418" endid="d648110e27446" />
@@ -4977,6 +4993,7 @@
                             <hairpin tstamp="1.125" tstamp2="1m+3.708" form="cres" place="below" staff="1" opening="1.5" startto="-5" endto="-7"/>
                             <slur curvedir="below" startid="#d648110e28960" endid="d648110e29009" />
                             <slur curvedir="below" startid="#d648110e29071" endid="d648110e29124" />
+                            <hairpin tstamp="1.083" tstamp2="1m+3.375" form="cres" place="below" staff="2" opening="1.5" startto="-6" endto="-7"/>
                             <slur curvedir="below" startid="#d648110e29192" endid="d648110e29222" />
                             <slur curvedir="below" startid="#d648110e29267" endid="d648110e29299" />
                             <hairpin tstamp="1.083" tstamp2="1m+3.375" form="cres" place="below" staff="3" opening="1.5" startto="-6" endto="-7"/>
@@ -5237,13 +5254,13 @@
                             <tie curvedir="above" startid="#d648110e30443" endid="d648110e30469"/>
                             <tie curvedir="below" startid="#d648110e30518" endid="d648110e30544"/>
                             <slur curvedir="below" startid="#d648110e30630" endid="d648110e30662" />
-                            <hairpin tstamp="1.125" tstamp2="0m+3.583" form="dim" place="below" staff="4" opening="0" startto="-5" endto="-2"/>
+                            <hairpin tstamp="1.125" tstamp2="0m+3.583" form="dim" place="below" staff="2" opening="0" startto="-5" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e30702" endid="d648110e30731" />
                             <slur curvedir="below" startid="#d648110e30773" endid="d648110e30800" />
                             <slur curvedir="above" startid="#d648110e30852" endid="d648110e30901" />
                             <slur curvedir="below" startid="#d648110e30963" endid="d648110e30992" />
                             <slur curvedir="above" startid="#d648110e31036" endid="d648110e31065" />
-                            <hairpin tstamp="1" tstamp2="0m+3.542" form="dim" place="above" staff="4" opening="0" endto="-11"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.542" form="dim" place="below" staff="3" opening="0" endto="-11"/>
                             <hairpin tstamp="1" tstamp2="0m+3.542" form="dim" place="below" staff="4" opening="0" endto="-11"/>
                         </measure>
                         <measure n="55" xml:id="d648110e31172">
@@ -5398,7 +5415,7 @@
                             <slur curvedir="above" startid="#d648110e31875" endid="d648110e32452" />
                             <slur curvedir="below" startid="#d648110e31957" endid="d648110e32033" />
                             <slur curvedir="below" startid="#d648110e32055" endid="d648110e32082" />
-                            <dir tstamp="3.75" place="below" staff="4">
+                            <dir tstamp="3.75" place="below" staff="2">
                                 <rend fontstyle="italic">cresc.</rend>
                             </dir>
                             <slur curvedir="above" startid="#d648110e32105" endid="d648110e32163" />
@@ -5706,7 +5723,7 @@
                             <tie curvedir="above" startid="#d648110e34301" endid="d648110e34327"/>
                             <slur curvedir="above" startid="#d648110e34404" endid="d648110e34723" />
                             <dynam tstamp="3.083" place="below" startto="-4" staff="1">p</dynam>
-                            <hairpin tstamp="1" tstamp2="0m+2.875" form="dim" place="below" staff="4" opening="0" endto="-3"/>
+                            <hairpin tstamp="1" tstamp2="0m+2.875" form="dim" place="below" staff="2" opening="0" endto="-3"/>
                             <slur curvedir="below" startid="#d648110e34496" endid="d648110e34551" />
                             <hairpin tstamp="1" tstamp2="0m+2.75" form="dim" place="below" staff="3" opening="0" endto="-6"/>
                             <slur curvedir="below" startid="#d648110e34571" endid="d648110e34628" />
@@ -5762,11 +5779,11 @@
                                 </layer>
                             </staff>
                             <slur curvedir="below" startid="#d648110e34739" endid="d648110e35088" />
-                            <dynam tstamp="2" place="below" staff="4">p</dynam>
+                            <dynam tstamp="2" place="below" staff="2">p</dynam>
                             <slur curvedir="below" startid="#d648110e34833" endid="d648110e34911" />
-                            <dir tstamp="2" place="below" staff="3">pizz.</dir>
+                            <dir tstamp="2" place="above" staff="4">pizz.</dir>
                             <slur curvedir="above" startid="#d648110e34950" endid="d648110e35379" />
-                            <dynam tstamp="3.083" place="above" startto="-22" staff="4">p</dynam>
+                            <dynam tstamp="3.083" place="below" startto="-22" staff="3">p</dynam>
                         </measure>
                         <measure n="62" xml:id="d648110e35086">
                             <staff n="1">
@@ -5823,7 +5840,7 @@
                             <slur curvedir="below" startid="#d648110e35104" endid="d648110e35182" />
                             <slur curvedir="above" startid="#d648110e35199" endid="d648110e35277" />
                             <slur curvedir="below" startid="#d648110e35293" endid="d648110e35643" />
-                            <hairpin tstamp="3.042" tstamp2="1m+2.583" form="cres" place="below" staff="4" opening="1.5" startto="-5" endto="-10"/>
+                            <hairpin tstamp="3.042" tstamp2="1m+2.583" form="cres" place="below" staff="2" opening="1.5" startto="-5" endto="-10"/>
                             <slur curvedir="above" startid="#d648110e35395" endid="d648110e35683" />
                         </measure>
                         <measure n="63" xml:id="d648110e35518">
@@ -5927,7 +5944,7 @@
                             <hairpin tstamp="1" tstamp2="0m+3.75" form="dim" place="below" staff="1" opening="0" endto="-6"/>
                             <slur curvedir="above" startid="#d648110e35909" endid="d648110e36068" />
                             <slur curvedir="below" startid="#d648110e36097" endid="d648110e36475" />
-                            <hairpin tstamp="1.458" tstamp2="0m+3.708" form="dim" place="below" staff="4" opening="0" startto="-13" endto="-7"/>
+                            <hairpin tstamp="1.458" tstamp2="0m+3.708" form="dim" place="below" staff="2" opening="0" startto="-13" endto="-7"/>
                             <slur curvedir="above" startid="#d648110e36155" endid="d648110e36177" />
                             <slur curvedir="below" startid="#d648110e36211" endid="d648110e36851" />
                         </measure>
@@ -5981,7 +5998,7 @@
                             <slur curvedir="above" startid="#d648110e36239" endid="d648110e36292" />
                             <dynam tstamp="1.083" place="below" startto="-6" staff="1">p</dynam>
                             <slur curvedir="above" startid="#d648110e36317" endid="d648110e36430" />
-                            <dynam tstamp="1" place="below" staff="4">p</dynam>
+                            <dynam tstamp="1" place="below" staff="2">p</dynam>
                             <dir tstamp="3" place="above" staff="4">arco</dir>
                             <slur curvedir="below" startid="#d648110e36569" endid="d648110e36900" />
                         </measure>
@@ -6106,14 +6123,14 @@
                             <slur curvedir="below" startid="#d648110e36961" endid="d648110e36982" />
                             <slur curvedir="below" startid="#d648110e37004" endid="d648110e37024" />
                             <slur curvedir="below" startid="#d648110e37045" endid="d648110e37066" />
-                            <hairpin tstamp="2" tstamp2="1m+3.708" form="cres" place="above" staff="4" opening="1.5" endto="-7"/>
+                            <hairpin tstamp="2" tstamp2="1m+3.708" form="cres" place="below" staff="1" opening="1.5" endto="-7"/>
                             <slur curvedir="below" startid="#d648110e37089" endid="d648110e37108" />
                             <slur curvedir="below" startid="#d648110e37147" endid="d648110e37168" />
-                            <hairpin tstamp="2" tstamp2="1m+3.708" form="cres" place="above" staff="3" opening="1.5" endto="-7"/>
+                            <hairpin tstamp="2" tstamp2="1m+3.708" form="cres" place="below" staff="2" opening="1.5" endto="-7"/>
                             <slur curvedir="below" startid="#d648110e37193" endid="d648110e37214" />
                             <slur curvedir="below" startid="#d648110e37236" endid="d648110e37283" />
                             <slur curvedir="below" startid="#d648110e37310" endid="d648110e37357" />
-                            <hairpin tstamp="1.75" tstamp2="1m+3.708" form="cres" place="above" staff="4" opening="1.5" startto="-6" endto="-7"/>
+                            <hairpin tstamp="1.75" tstamp2="1m+3.708" form="cres" place="below" staff="3" opening="1.5" startto="-6" endto="-7"/>
                             <slur curvedir="below" startid="#d648110e37388" endid="d648110e37443" />
                             <hairpin tstamp="2.083" tstamp2="1m+3.708" form="cres" place="below" staff="4" opening="1.5" startto="-6" endto="-7"/>
                         </measure>
@@ -6235,12 +6252,12 @@
                                 </layer>
                             </staff>
                             <slur curvedir="below" startid="#d648110e38084" endid="d648110e38134" />
-                            <hairpin tstamp="1" tstamp2="0m+3.5" form="dim" place="above" staff="4" opening="0" endto="-12"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.5" form="dim" place="below" staff="1" opening="0" endto="-12"/>
                             <slur curvedir="below" startid="#d648110e38156" endid="d648110e38188" />
-                            <hairpin tstamp="1" tstamp2="0m+3.125" form="dim" place="above" staff="3" opening="0" endto="-21"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.125" form="dim" place="below" staff="2" opening="0" endto="-21"/>
                             <slur curvedir="below" startid="#d648110e38215" endid="d648110e38247" />
-                            <hairpin tstamp="1" tstamp2="0m+2.917" form="dim" place="below" staff="4" opening="0" endto="-2"/>
-                            <hairpin tstamp="1.042" tstamp2="0m+2.917" form="dim" place="above" staff="4" opening="0" startto="-23" endto="-2"/>
+                            <hairpin tstamp="1" tstamp2="0m+2.917" form="dim" place="below" staff="3" opening="0" endto="-2"/>
+                            <hairpin tstamp="1.042" tstamp2="0m+2.917" form="dim" place="below" staff="4" opening="0" startto="-23" endto="-2"/>
                         </measure>
                         <measure n="70" xml:id="d648110e38333">
                             <staff n="1">
@@ -6331,7 +6348,7 @@
                                 <rend fontstyle="italic">cresc.</rend>
                             </dir>
                             <slur curvedir="below" startid="#d648110e38748" endid="d648110e38775" />
-                            <dir tstamp="2.75" place="above" staff="3">
+                            <dir tstamp="2.75" place="below" staff="2">
                                 <rend fontstyle="italic">cresc.</rend>
                             </dir>
                             <slur curvedir="above" startid="#d648110e38838" endid="d648110e38863" />
@@ -6436,7 +6453,7 @@
                             <slur curvedir="below" startid="#d648110e39186" endid="d648110e39225" />
                             <slur curvedir="below" startid="#d648110e39262" endid="d648110e39299" />
                             <slur curvedir="below" startid="#d648110e39321" endid="d648110e39346" />
-                            <hairpin tstamp="1" tstamp2="0m+3.625" form="cres" place="above" staff="3" opening="1.5" endto="-9"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.625" form="cres" place="below" staff="2" opening="1.5" endto="-9"/>
                             <hairpin tstamp="1" tstamp2="0m+3.625" form="cres" place="below" staff="3" opening="1.5" endto="-9"/>
                             <slur curvedir="below" startid="#d648110e39419" endid="d648110e39440" />
                             <slur curvedir="below" startid="#d648110e39462" endid="d648110e39483" />
@@ -6485,7 +6502,7 @@
                             </staff>
                             <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="below" staff="1" opening="0" endto="-5"/>
                             <slur curvedir="above" startid="#d648110e39685" endid="d648110e39735" />
-                            <hairpin tstamp="1" tstamp2="0m+3.375" form="dim" place="above" staff="3" opening="0" endto="-15"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.375" form="dim" place="below" staff="2" opening="0" endto="-15"/>
                             <slur curvedir="below" startid="#d648110e39839" endid="d648110e39878" />
                             <hairpin tstamp="1.083" tstamp2="0m+3.375" form="dim" place="below" staff="3" opening="0" startto="-22" endto="-15"/>
                             <hairpin tstamp="1" tstamp2="0m+3.417" form="dim" place="below" staff="4" opening="0" endto="-14"/>
@@ -6528,7 +6545,7 @@
                                 </layer>
                             </staff>
                             <hairpin tstamp="2.083" tstamp2="1m+2.25" form="dim" place="below" staff="1" opening="0" startto="-22" endto="-18"/>
-                            <hairpin tstamp="2.083" tstamp2="1m+2.25" form="dim" place="below" staff="4" opening="0" startto="-22" endto="-18"/>
+                            <hairpin tstamp="2.083" tstamp2="1m+2.25" form="dim" place="below" staff="2" opening="0" startto="-22" endto="-18"/>
                             <slur curvedir="above" startid="#d648110e40099" endid="d648110e40138" />
                             <hairpin tstamp="2.583" tstamp2="1m+2.75" form="dim" place="below" staff="3" opening="0" startto="-22" endto="-18"/>
                             <tie curvedir="below" startid="#d648110e40138" endid="d648110e40315"/>
@@ -6730,19 +6747,19 @@
                             </staff>
                             <slur curvedir="below" startid="#d648110e40471" endid="d648110e40586" />
                             <slur curvedir="below" startid="#d648110e40630" endid="d648110e41497" />
-                            <hairpin tstamp="1.333" tstamp2="0m+1.958" form="cres" place="above" staff="4" opening="1.5" endto="-1"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.958" form="cres" place="below" staff="1" opening="1.5" endto="-1"/>
                             <slur curvedir="below" startid="#d648110e40706" endid="d648110e40823" />
-                            <hairpin tstamp="2.083" tstamp2="0m+2.917" form="dim" place="above" staff="4" opening="0" startto="-6" endto="-2"/>
+                            <hairpin tstamp="2.083" tstamp2="0m+2.917" form="dim" place="below" staff="1" opening="0" startto="-6" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e40873" endid="d648110e41737" />
-                            <hairpin tstamp="1.333" tstamp2="0m+1.833" form="cres" place="above" staff="3" opening="1.5" endto="-4"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.833" form="cres" place="below" staff="2" opening="1.5" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e40949" endid="d648110e41072" />
-                            <hairpin tstamp="2.083" tstamp2="0m+2.875" form="dim" place="above" staff="3" opening="0" startto="-6" endto="-3"/>
+                            <hairpin tstamp="2.083" tstamp2="0m+2.875" form="dim" place="below" staff="2" opening="0" startto="-6" endto="-3"/>
                             <slur curvedir="above" startid="#d648110e41122" endid="d648110e41987" />
-                            <hairpin tstamp="1.333" tstamp2="0m+1.875" form="cres" place="above" staff="4" opening="1.5" endto="-3"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.875" form="cres" place="below" staff="3" opening="1.5" endto="-3"/>
                             <hairpin tstamp="1.333" tstamp2="0m+1.875" form="cres" place="below" staff="4" opening="1.5" endto="-3"/>
                             <slur curvedir="below" startid="#d648110e41197" endid="d648110e41327" />
+                            <hairpin tstamp="2" tstamp2="0m+2.792" form="dim" place="below" staff="3" opening="0" endto="-5"/>
                             <hairpin tstamp="2" tstamp2="0m+2.792" form="dim" place="below" staff="4" opening="0" endto="-5"/>
-                            <hairpin tstamp="2" tstamp2="0m+2.792" form="dim" place="above" staff="4" opening="0" endto="-5"/>
                             <slur curvedir="below" startid="#d648110e41381" endid="d648110e42251" />
                         </measure>
                         <measure n="76" xml:id="d648110e41439">
@@ -6874,15 +6891,15 @@
                             <slur curvedir="above" startid="#d648110e41546" endid="d648110e41573" />
                             <hairpin tstamp="3.333" tstamp2="0m+3.917" form="dim" place="below" staff="1" opening="0" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e41621" endid="d648110e41647" />
-                            <hairpin tstamp="1" tstamp2="0m+1.833" form="cres" place="above" staff="4" opening="1.5" endto="-4"/>
-                            <hairpin tstamp="2.333" tstamp2="0m+2.917" form="dim" place="below" staff="4" opening="0" endto="-2"/>
+                            <hairpin tstamp="1" tstamp2="0m+1.833" form="cres" place="below" staff="1" opening="1.5" endto="-4"/>
+                            <hairpin tstamp="2.333" tstamp2="0m+2.917" form="dim" place="below" staff="2" opening="0" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e41791" endid="d648110e41820" />
                             <slur curvedir="below" startid="#d648110e41868" endid="d648110e41897" />
-                            <hairpin tstamp="1" tstamp2="0m+1.75" form="cres" place="above" staff="3" opening="1.5" endto="-6"/>
+                            <hairpin tstamp="1" tstamp2="0m+1.75" form="cres" place="below" staff="2" opening="1.5" endto="-6"/>
                             <hairpin tstamp="1" tstamp2="0m+1.75" form="cres" place="below" staff="3" opening="1.5" endto="-6"/>
                             <hairpin tstamp="2.333" tstamp2="0m+2.875" form="dim" place="below" staff="3" opening="0" endto="-3"/>
                             <slur curvedir="below" startid="#d648110e42044" endid="d648110e42073" />
-                            <hairpin tstamp="3.333" tstamp2="0m+3.875" form="dim" place="above" staff="3" opening="0" endto="-3"/>
+                            <hairpin tstamp="3.333" tstamp2="0m+3.875" form="dim" place="below" staff="2" opening="0" endto="-3"/>
                             <slur curvedir="below" startid="#d648110e42124" endid="d648110e42154" />
                             <hairpin tstamp="3.375" tstamp2="0m+3.875" form="dim" place="below" staff="3" opening="0" startto="-7" endto="-3"/>
                             <hairpin tstamp="1" tstamp2="0m+1.792" form="cres" place="below" staff="4" opening="1.5" endto="-5"/>
@@ -6980,8 +6997,8 @@
                                 </layer>
                             </staff>
                             <slur curvedir="below" startid="#d648110e42452" endid="d648110e42510" />
-                            <hairpin tstamp="1.417" tstamp2="0m+3.708" form="cres" place="below" staff="4" opening="1.5" startto="-6" endto="-7"/>
-                            <hairpin tstamp="1.458" tstamp2="0m+3.708" form="cres" place="above" staff="4" opening="1.5" startto="-5" endto="-7"/>
+                            <hairpin tstamp="1.417" tstamp2="0m+3.708" form="cres" place="below" staff="1" opening="1.5" startto="-6" endto="-7"/>
+                            <hairpin tstamp="1.458" tstamp2="0m+3.708" form="cres" place="below" staff="2" opening="1.5" startto="-5" endto="-7"/>
                             <hairpin tstamp="1.417" tstamp2="0m+3.75" form="cres" place="below" staff="3" opening="1.5" startto="-6" endto="-6"/>
                             <hairpin tstamp="1.417" tstamp2="0m+3.792" form="cres" place="below" staff="4" opening="1.5" startto="-6" endto="-5"/>
                         </measure>
@@ -7074,8 +7091,8 @@
                                 </layer>
                             </staff>
                             <slur curvedir="above" startid="#d648110e43233" endid="d648110e43331" />
-                            <hairpin tstamp="1" tstamp2="0m+3.667" form="dim" place="above" staff="4" opening="0"/>
-                            <hairpin tstamp="1" tstamp2="0m+3.667" form="dim" place="below" staff="4" opening="0"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.667" form="dim" place="below" staff="1" opening="0"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.667" form="dim" place="below" staff="2" opening="0"/>
                             <hairpin tstamp="1" tstamp2="0m+3.792" form="dim" place="below" staff="3" opening="0" endto="-5"/>
                             <hairpin tstamp="1" tstamp2="0m+3.75" form="dim" place="below" staff="4" opening="0" endto="-6"/>
                         </measure>
@@ -7245,13 +7262,13 @@
                             <slur curvedir="above" startid="#d648110e44071" endid="d648110e44180" />
                             <slur curvedir="above" startid="#d648110e44220" endid="d648110e45098" />
                             <slur curvedir="below" startid="#d648110e44274" endid="d648110e44336" />
-                            <hairpin tstamp="1.333" tstamp2="0m+1.917" form="cres" place="above" staff="4" opening="1.5" endto="-2"/>
+                            <hairpin tstamp="1.333" tstamp2="0m+1.917" form="cres" place="below" staff="1" opening="1.5" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e44368" endid="d648110e44428" />
-                            <hairpin tstamp="2.083" tstamp2="0m+2.875" form="dim" place="above" staff="4" opening="0" startto="-6" endto="-3"/>
+                            <hairpin tstamp="2.083" tstamp2="0m+2.875" form="dim" place="below" staff="1" opening="0" startto="-6" endto="-3"/>
                             <slur curvedir="below" startid="#d648110e44478" endid="d648110e45338" />
-                            <hairpin tstamp="1" tstamp2="0m+1.833" form="cres" place="below" staff="3" opening="1.5" endto="-4"/>
-                            <hairpin tstamp="1.042" tstamp2="0m+1.833" form="cres" place="above" staff="3" opening="1.5" startto="-7" endto="-4"/>
-                            <hairpin tstamp="2" tstamp2="0m+2.875" form="dim" place="above" staff="3" opening="0" endto="-3"/>
+                            <hairpin tstamp="1" tstamp2="0m+1.833" form="cres" place="below" staff="2" opening="1.5" endto="-4"/>
+                            <hairpin tstamp="1.042" tstamp2="0m+1.833" form="cres" place="below" staff="3" opening="1.5" startto="-7" endto="-4"/>
+                            <hairpin tstamp="2" tstamp2="0m+2.875" form="dim" place="below" staff="2" opening="0" endto="-3"/>
                             <hairpin tstamp="2" tstamp2="0m+2.875" form="dim" place="below" staff="3" opening="0" endto="-3"/>
                             <slur curvedir="below" startid="#d648110e44750" endid="d648110e45591" />
                             <hairpin tstamp="1" tstamp2="0m+1.792" form="cres" place="below" staff="4" opening="1.5" endto="-5"/>
@@ -7388,12 +7405,12 @@
                             <hairpin tstamp="2.333" tstamp2="0m+2.833" form="dim" place="below" staff="1" opening="0" endto="-4"/>
                             <slur curvedir="above" startid="#d648110e45150" endid="d648110e45179" />
                             <slur curvedir="above" startid="#d648110e45227" endid="d648110e45254" />
-                            <hairpin tstamp="2.333" tstamp2="0m+2.917" form="dim" place="below" staff="4" opening="0" endto="-2"/>
+                            <hairpin tstamp="2.333" tstamp2="0m+2.917" form="dim" place="below" staff="2" opening="0" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e45383" endid="d648110e45412" />
-                            <hairpin tstamp="3.333" tstamp2="0m+3.875" form="dim" place="above" staff="4" opening="0" endto="-3"/>
+                            <hairpin tstamp="3.333" tstamp2="0m+3.875" form="dim" place="below" staff="1" opening="0" endto="-3"/>
                             <slur curvedir="below" startid="#d648110e45462" endid="d648110e45493" />
-                            <hairpin tstamp="3.417" tstamp2="0m+3.875" form="dim" place="below" staff="4" opening="0" startto="-6" endto="-3"/>
-                            <hairpin tstamp="1" tstamp2="0m+1.833" form="cres" place="above" staff="3" opening="1.5" endto="-4"/>
+                            <hairpin tstamp="3.417" tstamp2="0m+3.875" form="dim" place="below" staff="2" opening="0" startto="-6" endto="-3"/>
+                            <hairpin tstamp="1" tstamp2="0m+1.833" form="cres" place="below" staff="2" opening="1.5" endto="-4"/>
                             <hairpin tstamp="1" tstamp2="0m+1.833" form="cres" place="below" staff="3" opening="1.5" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e45645" endid="d648110e45677" />
                             <hairpin tstamp="2.417" tstamp2="0m+2.958" form="dim" place="below" staff="3" opening="0" startto="-6" endto="-1"/>
@@ -7496,7 +7513,7 @@
                             <slur curvedir="above" startid="#d648110e46050" endid="d648110e46113" />
                             <hairpin tstamp="1.583" tstamp2="1m+2.958" form="cres" place="below" staff="1" opening="1.5" startto="-10" endto="-1"/>
                             <slur curvedir="above" startid="#d648110e46133" endid="d648110e46848" />
-                            <hairpin tstamp="2.083" tstamp2="1m+3.625" form="cres" place="below" staff="4" opening="1.5" startto="-6" endto="-1"/>
+                            <hairpin tstamp="2.083" tstamp2="1m+3.625" form="cres" place="below" staff="2" opening="1.5" startto="-6" endto="-1"/>
                             <hairpin tstamp="2.083" tstamp2="1m+3.625" form="cres" place="below" staff="3" opening="1.5" startto="-6" endto="-1"/>
                             <hairpin tstamp="2" tstamp2="1m+3.625" form="cres" place="below" staff="4" opening="1.5" endto="-1"/>
                         </measure>
@@ -7678,10 +7695,10 @@
                             </staff>
                             <slur curvedir="above" startid="#d648110e47615" endid="d648110e47635" />
                             <slur curvedir="below" startid="#d648110e47654" endid="d648110e48777" />
-                            <dynam tstamp="1.125" place="below" startto="-5" staff="4">f</dynam>
-                            <dynam tstamp="1.5" place="above" startto="-4" staff="4">f</dynam>
-                            <dynam tstamp="1.083" place="below" startto="-6" staff="3">f</dynam>
-                            <dynam tstamp="1.042" place="below" startto="-7" staff="4">f</dynam>
+                            <dynam tstamp="1.125" place="below" startto="-5" staff="2">rf</dynam>
+                            <dynam tstamp="1.5" place="below" startto="-4" staff="1">rf</dynam>
+                            <dynam tstamp="1.083" place="below" startto="-6" staff="3">rf</dynam>
+                            <dynam tstamp="1.042" place="below" startto="-7" staff="4">rf</dynam>
                         </measure>
                         <measure n="84" xml:id="d648110e48362">
                             <staff n="1">
@@ -7758,11 +7775,11 @@
                                 <rend fontstyle="italic">dim.</rend>
                             </dir>
                             <slur curvedir="below" startid="#d648110e48439" endid="d648110e48517" />
-                            <dir tstamp="1" place="above" staff="3">
+                            <dir tstamp="1" place="below" staff="2">
                                 <rend fontstyle="italic">dim.</rend>
                             </dir>
                             <slur curvedir="below" startid="#d648110e48542" endid="d648110e48620" />
-                            <dir tstamp="1" place="above" staff="4">
+                            <dir tstamp="1" place="below" staff="3">
                                 <rend fontstyle="italic">dim.</rend>
                             </dir>
                             <dir tstamp="1" place="below" staff="4">
@@ -7832,7 +7849,7 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin tstamp="1.125" tstamp2="0m+3.5" form="dim" place="above" staff="4" opening="0" startto="-9"/>
+                            <hairpin tstamp="1.125" tstamp2="0m+3.5" form="dim" place="below" staff="1" opening="0" startto="-9"/>
                             <slur curvedir="below" startid="#d648110e48811" endid="d648110e48871" />
                             <slur curvedir="below" startid="#d648110e48902" endid="d648110e48966" />
                             <hairpin tstamp="1.625" tstamp2="0m+3.708" form="dim" place="above" staff="3" opening="0" startto="-9" endto="-7"/>
@@ -7893,12 +7910,12 @@
                             <slur curvedir="below" startid="#d648110e49201" endid="d648110e49556" />
                             <tie curvedir="below" startid="#d648110e49201" endid="d648110e49467"/>
                             <slur curvedir="below" startid="#d648110e49222" endid="d648110e49248" />
-                            <dynam tstamp="1.083" place="above" startto="-16" staff="4">p</dynam>
+                            <dynam tstamp="1" place="below" startto="-16" staff="1">p</dynam>
                             <slur curvedir="below" startid="#d648110e49270" endid="d648110e49291" />
                             <tie curvedir="below" startid="#d648110e49313" endid="d648110e49580"/>
-                            <hairpin tstamp="3.125" tstamp2="0m+3.708" form="cres" place="above" staff="4" opening="1.5" startto="-21" endto="-7"/>
-                            <hairpin tstamp="3.208" tstamp2="0m+3.708" form="cres" place="below" staff="4" opening="1.5" startto="-19" endto="-7"/>
-                            <dynam tstamp="1" place="above" staff="3">p</dynam>
+                            <hairpin tstamp="3.125" tstamp2="0m+3.708" form="cres" place="below" staff="1" opening="1.5" startto="-21" endto="-7"/>
+                            <hairpin tstamp="3.208" tstamp2="0m+3.708" form="cres" place="below" staff="2" opening="1.5" startto="-19" endto="-7"/>
+                            <dynam tstamp="1" place="below" staff="2">p</dynam>
                             <dynam tstamp="1" place="below" staff="3">p</dynam>
                             <slur curvedir="below" startid="#d648110e49363" endid="d648110e49384" />
                             <slur curvedir="below" startid="#d648110e49404" endid="d648110e49423" />
@@ -7973,10 +7990,10 @@
                                     </chord>
                                 </layer>
                             </staff>
-                            <hairpin tstamp="1" tstamp2="0m+1.875" form="dim" place="above" staff="4" opening="0" endto="-3"/>
+                            <hairpin tstamp="1" tstamp2="0m+1.875" form="dim" place="below" staff="1" opening="0" endto="-3"/>
                             <slur curvedir="below" startid="#d648110e49580" endid="d648110e49675" />
                             <slur curvedir="below" startid="#d648110e49698" endid="d648110e49740" />
-                            <hairpin tstamp="1.083" tstamp2="0m+1.833" form="dim" place="above" staff="3" opening="0" startto="-16" endto="-4"/>
+                            <hairpin tstamp="1.083" tstamp2="0m+1.833" form="dim" place="below" staff="2" opening="0" startto="-16" endto="-4"/>
                             <slur curvedir="below" startid="#d648110e49767" endid="d648110e49806" />
                             <dir tstamp="1" place="above" staff="4">pizz.</dir>
                             <arpeg tstamp="1" plist="d648110e49862 d648110e49878 d648110e49897" staff="4" layer="1"/>
@@ -8036,8 +8053,8 @@
                             <slur curvedir="above" startid="#d648110e50126" endid="d648110e50922" />
                             <slur curvedir="below" startid="#d648110e50145" endid="d648110e50164" />
                             <slur curvedir="above" startid="#d648110e50186" endid="d648110e50217" />
-                            <hairpin tstamp="2.125" tstamp2="0m+3.792" form="cres" place="below" staff="4" opening="1.5" startto="-15" endto="-5"/>
-                            <hairpin tstamp="2.167" tstamp2="0m+3.792" form="cres" place="above" staff="4" opening="1.5" startto="-14" endto="-5"/>
+                            <hairpin tstamp="2.125" tstamp2="0m+3.792" form="cres" place="below" staff="1" opening="1.5" startto="-15" endto="-5"/>
+                            <hairpin tstamp="2.167" tstamp2="0m+3.792" form="cres" place="below" staff="2" opening="1.5" startto="-14" endto="-5"/>
                             <slur curvedir="above" startid="#d648110e50266" endid="d648110e50287" />
                             <slur curvedir="below" startid="#d648110e50307" endid="d648110e50326" />
                         </measure>
@@ -8116,9 +8133,9 @@
                                 </layer>
                             </staff>
                             <tie curvedir="above" startid="#d648110e50461" endid="d648110e50922"/>
-                            <hairpin tstamp="1" tstamp2="0m+2.5" form="dim" place="above" staff="4" opening="0"/>
+                            <hairpin tstamp="1" tstamp2="0m+2.5" form="dim" place="below" staff="1" opening="0"/>
                             <slur curvedir="below" startid="#d648110e50486" endid="d648110e50577" />
-                            <hairpin tstamp="1" tstamp2="0m+2.417" form="dim" place="above" staff="3" opening="0" endto="-8"/>
+                            <hairpin tstamp="1" tstamp2="0m+2.417" form="dim" place="below" staff="2" opening="0" endto="-8"/>
                             <slur curvedir="below" startid="#d648110e50603" endid="d648110e50640" />
                             <slur curvedir="below" startid="#d648110e50662" endid="d648110e50706" />
                             <arpeg tstamp="1" plist="d648110e50758 d648110e50774 d648110e50793" staff="4" layer="1"/>
@@ -8262,11 +8279,11 @@
                             <slur curvedir="above" startid="#d648110e51335" endid="d648110e51356" />
                             <slur curvedir="above" startid="#d648110e51380" endid="d648110e51401" />
                             <slur curvedir="above" startid="#d648110e51442" endid="d648110e51479" />
-                            <hairpin tstamp="1" tstamp2="0m+3.542" form="cres" place="above" staff="4" opening="1.5" endto="-11"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.542" form="cres" place="below" staff="1" opening="1.5" endto="-11"/>
                             <slur curvedir="below" startid="#d648110e51503" endid="d648110e51531" />
-                            <hairpin tstamp="1.083" tstamp2="0m+3.542" form="cres" place="below" staff="4" opening="1.5" startto="-16" endto="-11"/>
+                            <hairpin tstamp="1.083" tstamp2="0m+3.542" form="cres" place="below" staff="2" opening="1.5" startto="-16" endto="-11"/>
                             <slur curvedir="below" startid="#d648110e51572" endid="d648110e51611" />
-                            <hairpin tstamp="1" tstamp2="0m+1.583" form="dim" place="above" staff="4" opening="1.5" endto="-4"/>
+                            <hairpin tstamp="1" tstamp2="0m+1.583" form="dim" place="below" staff="3" opening="1.5" endto="-4"/>
                             <hairpin tstamp="1" tstamp2="0m+1.583" form="dim" place="below" staff="4" opening="1.5" endto="-4"/>
                         </measure>
                         <measure n="92" xml:id="d648110e51814">
@@ -8344,9 +8361,9 @@
                             <dynam tstamp="1" place="below" staff="1">f</dynam>
                             <slur curvedir="above" startid="#d648110e51821" endid="d648110e52006" />
                             <slur curvedir="below" startid="#d648110e52063" endid="d648110e52133" />
-                            <dynam tstamp="1" place="above" staff="3">f</dynam>
+                            <dynam tstamp="1" place="below" staff="2">f</dynam>
                             <slur curvedir="below" startid="#d648110e52159" endid="d648110e52200" />
-                            <dynam tstamp="1" place="above" staff="4">f</dynam>
+                            <dynam tstamp="1" place="below" staff="3">f</dynam>
                             <dynam tstamp="1" place="below" staff="4">f</dynam>
                             <dir tstamp="2" place="above" staff="4">pizz.</dir>
                         </measure>
@@ -8420,10 +8437,10 @@
                                 </layer>
                             </staff>
                             <slur curvedir="above" startid="#d648110e52394" endid="d648110e52572" />
-                            <hairpin tstamp="1" tstamp2="0m+3.667" form="dim" place="above" staff="4" opening="1.5" endto="-8"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.667" form="dim" place="below" staff="1" opening="1.5" endto="-8"/>
                             <slur curvedir="below" startid="#d648110e52601" endid="d648110e52691" />
                             <dynam tstamp="1" place="below" staff="3">mf</dynam>
-                            <hairpin tstamp="1" tstamp2="0m+3.542" form="dim" place="above" staff="3" opening="1.5" endto="-11"/>
+                            <hairpin tstamp="1" tstamp2="0m+3.542" form="dim" place="below" staff="2" opening="1.5" endto="-11"/>
                             <slur curvedir="below" startid="#d648110e52723" endid="d648110e52762" />
                             <dynam tstamp="1" place="below" staff="4">mf</dynam>
                         </measure>
@@ -8477,17 +8494,17 @@
                                 </layer>
                             </staff>
                             <slur curvedir="below" startid="#d648110e52942" endid="d648110e52960" />
-                            <dynam tstamp="1" place="above" staff="4">p</dynam>
+                            <dynam tstamp="1" place="below" staff="1">p</dynam>
                             <slur curvedir="below" startid="#d648110e52982" endid="d648110e53029" />
                             <slur curvedir="below" startid="#d648110e52982" endid="d648110e53029" />
-                            <hairpin tstamp="1.458" tstamp2="0m+3" form="dim" place="above" staff="4" opening="1.5" startto="-37"/>
-                            <hairpin tstamp="1.792" tstamp2="0m+3" form="dim" place="below" staff="4" opening="1.5" startto="-29"/>
-                            <dynam tstamp="1" place="above" staff="3">p</dynam>
+                            <hairpin tstamp="1.458" tstamp2="0m+3" form="dim" place="below" staff="1" opening="1.5" startto="-37"/>
+                            <hairpin tstamp="1.792" tstamp2="0m+3" form="dim" place="below" staff="2" opening="1.5" startto="-29"/>
+                            <dynam tstamp="1" place="below" staff="2">p</dynam>
                             <dynam tstamp="2" place="below" staff="3">p</dynam>
                             <slur curvedir="below" startid="#d648110e53089" endid="d648110e53128" />
                             <arpeg tstamp="2" plist="d648110e53188 d648110e53206 d648110e53225" staff="4" layer="1"/>
                             <dynam tstamp="2.042" place="below" startto="-23" staff="4">p</dynam>
-                            <dir tstamp="3" place="above" staff="4">
+                            <dir tstamp="3" place="below" staff="3">
                                 <rend fontstyle="italic">dim.</rend>
                             </dir>
                             <dir tstamp="3" place="below" staff="4">
@@ -8545,8 +8562,8 @@
                             <slur curvedir="below" startid="#d648110e53296" endid="d648110e53314" />
                             <slur curvedir="below" startid="#d648110e53331" endid="d648110e53385" />
                             <slur curvedir="below" startid="#d648110e53331" endid="d648110e53385" />
-                            <hairpin tstamp="1.125" tstamp2="0m+2.875" form="dim" place="above" staff="4" opening="1.5" startto="-45" endto="-3"/>
-                            <hairpin tstamp="1.25" tstamp2="0m+2.875" form="dim" place="below" staff="4" opening="1.5" startto="-42" endto="-3"/>
+                            <hairpin tstamp="1.125" tstamp2="0m+2.875" form="dim" place="below" staff="1" opening="1.5" startto="-45" endto="-3"/>
+                            <hairpin tstamp="1.25" tstamp2="0m+2.875" form="dim" place="below" staff="2" opening="1.5" startto="-42" endto="-3"/>
                             <slur curvedir="below" startid="#d648110e53430" endid="d648110e53467" />
                         </measure>
                         <measure n="96" xml:id="d648110e53593" right="end">
@@ -8587,7 +8604,7 @@
                             </staff>
                             <dir tstamp="2" place="above" staff="1">pizz.</dir>
                             <fermata place="above" staff="1" startid="#d648110e53623" form="norm"/>
-                            <dir tstamp="2" place="above" staff="4">pizz.</dir>
+                            <dir tstamp="2" place="above" staff="2">pizz.</dir>
                             <fermata place="above" staff="4" startid="#d648110e53684" form="norm"/>
                             <dynam tstamp="1.75" place="below" startto="-6" staff="3">pp</dynam>
                             <fermata place="above" staff="3" startid="#d648110e53713" form="norm"/>
