@@ -312,6 +312,18 @@
                 </changeDesc>
                 <date isodate="2016-02-02"/>
             </change>
+            <change n="10">
+                <respStmt>
+                    <persName resp="Laurent Pugin"/>
+                </respStmt>
+                <changeDesc>
+                    <p>Fixing hairpins, dynam and dir possitions</p>
+                    <p>Fixing tuplets</p>
+                    <p>Adding slurs</p>
+                    <p>Adding oct.ges</p>
+                </changeDesc>
+                <date isodate="2016-05-12"/>
+            </change>
         </revisionDesc>
     </meiHead>
     <music>
@@ -422,7 +434,7 @@
                                 </layer>
                             </staff>
                             <dir staff="1" place="below" tstamp="1">cresc.</dir>
-                            <hairpin form="cres" staff="1" tstamp="3" place="below" tstamp2="4"/>
+                            <hairpin form="cres" staff="1" tstamp="3" place="below" tstamp2="6.5"/>
                             <slur startid="#d414233e381" endid="#d414233e1055" curvedir="above"/>
                         </measure>
                         <measure n="3" xml:id="d414233e709">
@@ -549,6 +561,8 @@
                             <dir staff="2" place="below" tstamp="4">
                                 <rend fontstyle="italic">segue</rend>
                             </dir>
+                            <slur startid="#d414233e1302" endid="#d414233e1321"/>
+                            <slur startid="#d414233e1348" endid="#d414233e1369"/>
                             <dynam staff="1" place="below" tstamp="1">p</dynam>
                         </measure>
                         <measure n="6" xml:id="d414233e1614">
@@ -596,7 +610,7 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin form="cres" staff="1" place="below" tstamp="2" tstamp2="4"/>
+                            <hairpin form="cres" staff="1" place="below" tstamp="2" tstamp2="6.5"/>
                             <slur curvedir="above" startid="#d414233e1624" endid="#d414233e2333"/>
                         </measure>
                         <measure n="7" xml:id="d414233e1950">
@@ -647,6 +661,7 @@
                                 </layer>
                             </staff>
                             <dynam staff="1" place="below" tstamp="1">f</dynam>
+                            <hairpin form="cres" staff="1" place="above" tstamp="5" tstamp2="1m+1.5"/>
                         </measure>
                         <measure n="8" xml:id="d414233e2295">
                             <staff n="1">
@@ -681,10 +696,9 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin form="cres" staff="1" place="above" tstamp="0.5" tstamp2="3"/>
-                            <hairpin form="cres" staff="1" place="below" tstamp="2" tstamp2="5"/>
-                            <dir tstamp="5" staff="2" place="above">cresc.</dir>
-                            <dir staff="1" place="above" tstamp="2">ritard.</dir>
+                            <hairpin form="cres" staff="1" place="below" tstamp="2.5" tstamp2="5"/>
+                            <dir tstamp="5.1" staff="1" place="below">cresc.</dir>
+                            <dir staff="1" place="above" tstamp="3.1">ritard.</dir>
                         </measure>
                         <measure n="9" xml:id="d414233e2588">
                             <staff n="1">
@@ -729,6 +743,8 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d414233e2598" endid="#d414233e2617"/>
+                            <slur startid="#d414233e2644" endid="#d414233e2665"/>
                             <dir staff="1" place="above" tstamp="1">a tempo</dir>
                             <dir staff="1" place="below" tstamp="1">sotto voce</dir>
                             <dir staff="2" place="below" tstamp="1">sempre legatissimo</dir>
@@ -778,7 +794,7 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin form="cres" staff="1" place="below" tstamp="2" tstamp2="5"/>
+                            <hairpin form="cres" staff="1" place="below" tstamp="2" tstamp2="6.5"/>
                             <slur startid="#d414233e2922" endid="#d414233e3597" curvedir="above"/>
                         </measure>
                         <measure n="11" xml:id="d414233e3251">
@@ -902,6 +918,8 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d414233e3844" endid="#d414233e3863"/>
+                            <slur startid="#d414233e3890" endid="#d414233e3911"/>
                         </measure>
                         <measure n="14" xml:id="d414233e4156">
                             <staff n="1">
@@ -948,7 +966,7 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin form="cres" staff="1" place="below" tstamp="2" tstamp2="5"/>
+                            <hairpin form="cres" staff="1" place="below" tstamp="2" tstamp2="6.5"/>
                             <slur startid="#d414233e4166" endid="#d414233e4834" curvedir="above"/>
                         </measure>
                         <measure n="15" xml:id="d414233e4492">
@@ -1060,7 +1078,7 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin form="cres" staff="1" place="below" tstamp="1.5" tstamp2="4"/>
+                            <hairpin form="cres" staff="1" place="below" tstamp="1.5" tstamp2="6.5"/>
                             <dynam staff="1" place="below" tstamp="1">p</dynam>
                             <slur startid="#d414233e5073" curvedir="above" endid="#d414233e6048"/>
                         </measure>
@@ -1173,7 +1191,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <dynam staff="1" place="above" tstamp="1">fz</dynam>
+                            <slur startid="#d414233e6083" endid="#d414233e6344" curvedir="above"/>
+                            <dynam staff="1" place="below" tstamp="1">fz</dynam>
                         </measure>
                         <measure n="21" xml:id="d414233e6342">
                             <staff n="1">
@@ -1210,7 +1229,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin form="cres" staff="1" place="below" tstamp="1" tstamp2="5"/>
+                            <slur startid="#d414233e6397" endid="#d414233e6700"/>
+                            <hairpin form="cres" staff="1" place="below" tstamp="3" tstamp2="1m+1.0"/>
                             <dynam staff="1" place="below" tstamp="1">p</dynam>
                         </measure>
                         <measure n="22" xml:id="d414233e6698">
@@ -1349,31 +1369,35 @@
                                     <note xml:id="d414233e7726" pname="d" oct="4" dur="8" stem.dir="up" accid.ges="f">
                                         <artic artic="stacc" place="above"/>
                                     </note>
-                                    <chord xml:id="d414548e1" dur="8" stem.dir="up">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e7750" pname="d" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e7769" pname="d" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414552e1" dur="8" stem.dir="up">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e7789" pname="e" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e7808" pname="e" oct="5" accid.ges="f"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d414548e1" dur="8" stem.dir="up">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e7750" pname="d" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e7769" pname="d" oct="5" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d414552e1" dur="8" stem.dir="up">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e7789" pname="e" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e7808" pname="e" oct="5" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
                                     <rest xml:id="d414233e7828" dur="8"/>
-                                    <chord xml:id="d414556e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e7836" pname="f" accid="f" oct="4"/>
-                                        <note xml:id="d414233e7857" pname="f" accid="f" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d414560e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e7879" pname="g" accid="f" oct="4"/>
-                                        <note xml:id="d414233e7900" pname="g" accid="f" oct="5"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d414556e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e7836" pname="f" accid="f" oct="4"/>
+                                            <note xml:id="d414233e7857" pname="f" accid="f" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d414560e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e7879" pname="g" accid="f" oct="4"/>
+                                            <note xml:id="d414233e7900" pname="g" accid="f" oct="5"/>
+                                        </chord>
+                                    </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -1396,37 +1420,43 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d414548e1" endid="#d414552e1" curvedir="above"/>
+                            <slur startid="#d414556e1" endid="#d414560e1" curvedir="above"/>
                             <dynam staff="1" place="below" tstamp="1">f</dynam>
                         </measure>
                         <measure n="26" xml:id="d414233e8158">
                             <staff n="1">
                                 <layer n="1">
                                     <rest xml:id="d414233e8160" dur="8"/>
-                                    <chord xml:id="d414577e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e8168" pname="g" accid="n" oct="4"/>
-                                        <note xml:id="d414233e8187" pname="g" accid="n" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d414581e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e8207" pname="a" accid="n" oct="4"/>
-                                        <note xml:id="d414233e8226" pname="a" accid="n" oct="5"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d414577e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e8168" pname="g" accid="n" oct="4"/>
+                                            <note xml:id="d414233e8187" pname="g" accid="n" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d414581e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e8207" pname="a" accid="n" oct="4"/>
+                                            <note xml:id="d414233e8226" pname="a" accid="n" oct="5"/>
+                                        </chord>
+                                    </beam>
                                     <rest xml:id="d414233e8246" dur="8"/>
-                                    <chord xml:id="d414585e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e8254" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e8273" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414589e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e8293" pname="c" oct="5"/>
-                                        <note xml:id="d414233e8310" pname="c" oct="6"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d414585e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e8254" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e8273" pname="b" oct="5" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d414589e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e8293" pname="c" oct="5"/>
+                                            <note xml:id="d414233e8310" pname="c" oct="6"/>
+                                        </chord>
+                                    </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -1449,35 +1479,41 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d414577e1" endid="#d414581e1"/>
+                            <slur startid="#d414585e1" endid="#d414589e1"/>
                             <dir staff="2" place="above" tstamp="3">accelerando e</dir>
                         </measure>
                         <measure n="27" xml:id="d414233e8554">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d414606e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e8556" pname="d" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e8577" pname="d" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414610e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e8594" pname="e" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e8610" pname="e" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414614e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e8627" pname="f" accid="f" oct="4"/>
-                                        <note xml:id="d414233e8645" pname="f" accid="f" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d414618e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e8664" pname="g" accid="f" oct="4"/>
-                                        <note xml:id="d414233e8682" pname="g" accid="f" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d414622e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e8701" pname="g" accid="n" oct="4"/>
-                                        <note xml:id="d414233e8717" pname="g" accid="n" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d414626e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e8734" pname="a" accid="n" oct="4"/>
-                                        <note xml:id="d414233e8751" pname="a" accid="n" oct="5"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d414606e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e8556" pname="d" oct="4" oct.ges="5" accid.ges="f"/>
+                                            <note xml:id="d414233e8577" pname="d" oct="5" oct.ges="6" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d414610e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e8594" pname="e" oct="4" oct.ges="4" accid.ges="f"/>
+                                            <note xml:id="d414233e8610" pname="e" oct="5" oct.ges="6" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d414614e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e8627" pname="f" accid="f" oct="4" oct.ges="5"/>
+                                            <note xml:id="d414233e8645" pname="f" accid="f" oct="5" oct.ges="6"/>
+                                        </chord>
+                                    </beam>
+                                    <beam>
+                                        <chord xml:id="d414618e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e8664" pname="g" accid="f" oct="4" oct.ges="5"/>
+                                            <note xml:id="d414233e8682" pname="g" accid="f" oct="5" oct.ges="6"/>
+                                        </chord>
+                                        <chord xml:id="d414622e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e8701" pname="g" accid="n" oct="4" oct.ges="5"/>
+                                            <note xml:id="d414233e8717" pname="g" accid="n" oct="5" oct.ges="6"/>
+                                        </chord>
+                                        <chord xml:id="d414626e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e8734" pname="a" accid="n" oct="4" oct.ges="5"/>
+                                            <note xml:id="d414233e8751" pname="a" accid="n" oct="5" oct.ges="6"/>
+                                        </chord>
+                                    </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -1500,23 +1536,28 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d414606e1" endid="#d414610e1"/>
+                            <slur startid="#d414614e1" endid="#d414618e1"/>
+                            <slur startid="#d414622e1" endid="#d414626e1"/>
                             <octave staff="1" dis="8" tstamp="1" dis.place="above" startid="#d414606e1" endid="#d414651e1"/>
                             <dir staff="1" place="below" tstamp="1">piu cresc.</dir>
                         </measure>
                         <measure n="28" xml:id="d414233e9012">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d414643e1" dur="16" stem.dir="down">
-                                        <note xml:id="d414233e9014" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e9035" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414647e1" dur="16" stem.dir="down">
-                                        <note xml:id="d414233e9052" pname="c" oct="5"/>
-                                        <note xml:id="d414233e9066" pname="c" oct="6"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d414643e1" dur="16" stem.dir="down">
+                                            <note xml:id="d414233e9014" pname="b" oct="4" accid.ges="f" oct.ges="5"/>
+                                            <note xml:id="d414233e9035" pname="b" oct="5" accid.ges="f" oct.ges="6"/>
+                                        </chord>
+                                        <chord xml:id="d414647e1" dur="16" stem.dir="down">
+                                            <note xml:id="d414233e9052" pname="c" oct="5" oct.ges="6"/>
+                                            <note xml:id="d414233e9066" pname="c" oct="6" oct.ges="7"/>
+                                        </chord>
+                                    </beam>
                                     <chord xml:id="d414651e1" dur="4" stem.dir="down">
-                                        <note xml:id="d414233e9081" pname="d" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e9097" pname="d" oct="6" accid.ges="f"/>
+                                        <note xml:id="d414233e9081" pname="d" oct="5" accid.ges="f" oct.ges="6"/>
+                                        <note xml:id="d414233e9097" pname="d" oct="6" accid.ges="f" oct.ges="7"/>
                                     </chord>
                                     <rest xml:id="d414233e9114" dur="4"/>
                                     <rest xml:id="d414233e9122" dur="8"/>
@@ -1544,6 +1585,7 @@
                                     <clef shape="F" line="4"/>
                                 </layer>
                             </staff>
+                            <slur startid="#d414643e1" endid="#d414651e1"/>
                             <dynam staff="2" place="above" tstamp="1">ff</dynam>
                         </measure>
                         <measure n="29" xml:id="d414233e9384">
@@ -1601,8 +1643,8 @@
                             </staff>
                             <dynam staff="1" place="below" tstamp="1">f</dynam>
                             <dir staff="2" place="below" tstamp="1">sempre legato</dir>
-                            <slur curvedir="above" startid="#d414668e1" endid="#d414676e1" />
-                            <slur curvedir="above" startid="#d414680e1" endid="#d414684e1" />
+                            <slur curvedir="above" startid="#d414668e1" endid="#d414676e1"/>
+                            <slur curvedir="above" startid="#d414680e1" endid="#d414684e1"/>
                         </measure>
                         <measure n="30" xml:id="d414233e9803">
                             <staff n="1">
@@ -1651,24 +1693,26 @@
                         <measure n="31" xml:id="d414233e10134">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d414714e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e10136" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e10160" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414718e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e10180" pname="a" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e10199" pname="a" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414722e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e10219" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e10238" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d414714e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e10136" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e10160" pname="b" oct="5" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d414718e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e10180" pname="a" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e10199" pname="a" oct="5" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d414722e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e10219" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e10238" pname="b" oct="5" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
                                     <chord xml:id="d414726e1" dur="4" dots="1" stem.dir="down">
                                         <note xml:id="d414233e10258" pname="c" oct="5"/>
                                         <note xml:id="d414233e10273" pname="c" oct="6"/>
@@ -1736,36 +1780,40 @@
                         <measure n="33" xml:id="d414233e10810">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d414756e1" dur="32" dots="1" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e10812" pname="d" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e10837" pname="d" oct="6" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414760e1" dur="32" dots="1" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e10858" pname="d" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e10878" pname="d" oct="6" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414764e1" dur="32" dots="1" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e10899" pname="d" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e10919" pname="d" oct="6" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414768e1" dur="32" dots="1" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e10940" pname="d" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e10960" pname="d" oct="6" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414772e1" dur="32" dots="1" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e10981" pname="d" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e11001" pname="d" oct="6" accid.ges="f"/>
-                                    </chord>
+                                    <beam>
+                                        <tuplet num="5" numbase="3" bracket.visible="false">
+                                            <chord xml:id="d414756e1" dur="8" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                                <artic artic="stacc" place="above"/>
+                                                <note xml:id="d414233e10812" pname="d" oct="5" oct.ges="6" accid.ges="f"/>
+                                                <note xml:id="d414233e10837" pname="d" oct="6" oct.ges="7" accid.ges="f"/>
+                                            </chord>
+                                            <chord xml:id="d414760e1" dur="8" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                                <artic artic="stacc" place="above"/>
+                                                <note xml:id="d414233e10858" pname="d" oct="5" oct.ges="6" accid.ges="f"/>
+                                                <note xml:id="d414233e10878" pname="d" oct="6" oct.ges="7" accid.ges="f"/>
+                                            </chord>
+                                            <chord xml:id="d414764e1" dur="8" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                                <artic artic="stacc" place="above"/>
+                                                <note xml:id="d414233e10899" pname="d" oct="5" oct.ges="6" accid.ges="f"/>
+                                                <note xml:id="d414233e10919" pname="d" oct="6" oct.ges="7" accid.ges="f"/>
+                                            </chord>
+                                            <chord xml:id="d414768e1" dur="8" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                                <artic artic="stacc" place="above"/>
+                                                <note xml:id="d414233e10940" pname="d" oct="5" oct.ges="6" accid.ges="f"/>
+                                                <note xml:id="d414233e10960" pname="d" oct="6" oct.ges="7" accid.ges="f"/>
+                                            </chord>
+                                            <chord xml:id="d414772e1" dur="8" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                                <artic artic="stacc" place="above"/>
+                                                <note xml:id="d414233e10981" pname="d" oct="5" accid.ges="f"/>
+                                                <note xml:id="d414233e11001" pname="d" oct="6" accid.ges="f"/>
+                                            </chord>
+                                        </tuplet>
+                                    </beam>
                                     <chord xml:id="d414776e1" dur="4" stem.dir="down">
                                         <artic artic="acc" place="above"/>
                                         <artic artic="acc" place="above"/>
@@ -1798,31 +1846,33 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d414756e1" endid="#d414772e1"/>
                             <octave staff="1" dis="8" startid="#d414756e1" endid="#d414768e1" dis.place="above"/>
-                            <dir staff="2" place="above" tstamp="1">appassionato</dir>
-                            <dynam staff="2" place="above" tstamp="1">f</dynam>
-                            <tupletSpan staff="1" startid="#d414756e1" endid="#d414772e1" bracket.visible="false" num="5" num.place="above" num.visible="true"/>
+                            <dir staff="2" place="above" tstamp="1.2">appassionato</dir>
+                            <dynam staff="1" place="below" tstamp="1">f</dynam>
                             <slur startid="#d414776e1" endid="#d414780e1" curvedir="above"/>
                         </measure>
                         <measure n="34" xml:id="d414233e11319">
                             <staff n="1">
                                 <layer n="1">
                                     <beam>
-                                        <note xml:id="d414233e11321" pname="d" oct="6" dur="32" dots="1" stem.dir="down" accid.ges="f">
-                                            <artic artic="stacc" place="above"/>
-                                        </note>
-                                        <note xml:id="d414233e11348" pname="d" oct="6" dur="32" dots="1" stem.dir="down" accid.ges="f">
-                                            <artic artic="stacc" place="above"/>
-                                        </note>
-                                        <note xml:id="d414233e11370" pname="d" oct="6" dur="32" dots="1" stem.dir="down" accid.ges="f">
-                                            <artic artic="stacc" place="above"/>
-                                        </note>
-                                        <note xml:id="d414233e11392" pname="d" oct="6" dur="32" dots="1" stem.dir="down" accid.ges="f">
-                                            <artic artic="stacc" place="above"/>
-                                        </note>
-                                        <note xml:id="d414233e11414" pname="d" oct="5" dur="32" dots="1" stem.dir="down" accid.ges="f">
-                                            <artic artic="stacc" place="above"/>
-                                        </note>
+                                        <tuplet num="5" numbase="3" bracket.visible="false">
+                                            <note xml:id="d414233e11321" pname="d" oct="6" dur="8" stem.dir="down" accid.ges="f">
+                                                <artic artic="stacc" place="above"/>
+                                            </note>
+                                            <note xml:id="d414233e11348" pname="d" oct="6" dur="8" stem.dir="down" accid.ges="f">
+                                                <artic artic="stacc" place="above"/>
+                                            </note>
+                                            <note xml:id="d414233e11370" pname="d" oct="6" dur="8" stem.dir="down" accid.ges="f">
+                                                <artic artic="stacc" place="above"/>
+                                            </note>
+                                            <note xml:id="d414233e11392" pname="d" oct="6" dur="8" stem.dir="down" accid.ges="f">
+                                                <artic artic="stacc" place="above"/>
+                                            </note>
+                                            <note xml:id="d414233e11414" pname="d" oct="5" dur="8" stem.dir="down" accid.ges="f">
+                                                <artic artic="stacc" place="above"/>
+                                            </note>
+                                        </tuplet>
                                     </beam>
                                     <note xml:id="d414233e11436" pname="d" oct="5" dur="4" stem.dir="down" accid.ges="f">
                                         <artic artic="acc" place="above"/>
@@ -1850,34 +1900,38 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <dynam staff="2" place="above" tstamp="1">pp</dynam>
-                            <tupletSpan staff="1" num="5" startid="#d414233e11321" endid="#d414233e11392" num.visible="true"/>
+                            <slur startid="#d414233e11321" endid="#d414233e11414"/>
+                            <dynam staff="1" place="below" tstamp="1">pp</dynam>
                             <slur curvedir="above" startid="#d414233e11436" endid="#d414233e11455"/>
                         </measure>
                         <measure n="35" xml:id="d414233e11697">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d414810e1" dur="32" dots="1" stem.dir="down">
-                                        <note xml:id="d414233e11699" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e11721" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414814e1" dur="32" dots="1" stem.dir="down">
-                                        <note xml:id="d414233e11739" pname="c" oct="5"/>
-                                        <note xml:id="d414233e11754" pname="c" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d414818e1" dur="32" dots="1" stem.dir="down">
-                                        <note xml:id="d414233e11770" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e11787" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414822e1" dur="32" dots="1" stem.dir="down">
-                                        <note xml:id="d414233e11805" pname="a" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e11822" pname="a" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414826e1" dur="32" dots="1" stem.dir="down">
-                                        <note xml:id="d414233e11840" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e11857" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414830e1" dur="4" dots="1" stem.dir="down">
+                                    <beam>
+                                        <tuplet num="5" numbase="3" bracket.visible="false">
+                                            <chord xml:id="d414810e1" dur="8" stem.dir="down">
+                                                <note xml:id="d414233e11699" pname="b" oct="4" accid.ges="f"/>
+                                                <note xml:id="d414233e11721" pname="b" oct="5" accid.ges="f"/>
+                                            </chord>
+                                            <chord xml:id="d414814e1" dur="8" stem.dir="down">
+                                                <note xml:id="d414233e11739" pname="c" oct="5"/>
+                                                <note xml:id="d414233e11754" pname="c" oct="6"/>
+                                            </chord>
+                                            <chord xml:id="d414818e1" dur="8" stem.dir="down">
+                                                <note xml:id="d414233e11770" pname="b" oct="4" accid.ges="f"/>
+                                                <note xml:id="d414233e11787" pname="b" oct="5" accid.ges="f"/>
+                                            </chord>
+                                            <chord xml:id="d414822e1" dur="8" stem.dir="down">
+                                                <note xml:id="d414233e11805" pname="a" oct="4" accid.ges="f"/>
+                                                <note xml:id="d414233e11822" pname="a" oct="5" accid.ges="f"/>
+                                            </chord>
+                                            <chord xml:id="d414826e1" dur="8" stem.dir="down">
+                                                <note xml:id="d414233e11840" pname="b" oct="4" accid.ges="f"/>
+                                                <note xml:id="d414233e11857" pname="b" oct="5" accid.ges="f"/>
+                                            </chord>
+                                        </tuplet>
+                                    </beam>
+                                    <chord xml:id="d414830e1-2" dur="4" dots="1" stem.dir="down">
                                         <note xml:id="d414233e11875" pname="c" oct="5"/>
                                         <note xml:id="d414233e11891" pname="c" oct="6"/>
                                     </chord>
@@ -1903,18 +1957,20 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <dynam staff="1" place="above" tstamp="1">f</dynam>
-                            <tupletSpan staff="1" num.visible="true" num="5" startid="#d414810e1" endid="#d414830e1" bracket.visible="false"/>
+                            <slur startid="#d414810e1" endid="#d414830e1-2"/>
+                            <dynam staff="1" place="below" tstamp="1">f</dynam>
                         </measure>
                         <measure n="36" xml:id="d414233e12129">
                             <staff n="1">
                                 <layer n="1">
                                     <beam>
-                                        <note xml:id="d414233e12131" pname="b" oct="4" dur="32" dots="1" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e12155" pname="c" oct="5" dur="32" dots="1" stem.dir="down"/>
-                                        <note xml:id="d414233e12172" pname="b" oct="4" dur="32" dots="1" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e12191" pname="a" oct="4" dur="32" dots="1" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e12210" pname="b" oct="4" dur="32" dots="1" stem.dir="down" accid.ges="f"/>
+                                        <tuplet num="5" numbase="3" bracket.visible="false">
+                                            <note xml:id="d414233e12131" pname="b" oct="4" dur="8" stem.dir="down" accid.ges="f"/>
+                                            <note xml:id="d414233e12155" pname="c" oct="5" dur="8" stem.dir="down"/>
+                                            <note xml:id="d414233e12172" pname="b" oct="4" dur="8" stem.dir="down" accid.ges="f"/>
+                                            <note xml:id="d414233e12191" pname="a" oct="4" dur="8" stem.dir="down" accid.ges="f"/>
+                                            <note xml:id="d414233e12210" pname="b" oct="4" dur="8" stem.dir="down" accid.ges="f"/>
+                                        </tuplet>
                                     </beam>
                                     <note xml:id="d414233e12229" pname="c" oct="5" dur="4" dots="1" stem.dir="down"/>
                                 </layer>
@@ -1942,7 +1998,6 @@
                             <dir staff="1" place="above" tstamp="1.5">poco rallent.</dir>
                             <dynam staff="1" place="below" tstamp="1">pp</dynam>
                             <slur curvedir="above" startid="#d414233e12131" endid="#d414233e12229"/>
-                            <tupletSpan staff="1" startid="#d414233e12131" endid="#d414233e12210" tstamp="1" num="5" num.visible="true" num.place="above"/>
                         </measure>
                         <measure n="37" xml:id="d414233e12466">
                             <staff n="1">
@@ -1987,6 +2042,8 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d414233e12476" endid="#d414233e12500"/>
+                            <slur startid="#d414233e12527" endid="#d414233e12548"/>
                             <dir staff="1" place="above" tstamp="1">a tempo, sempre agitato</dir>
                             <dynam staff="1" place="below" tstamp="1">p</dynam>
                         </measure>
@@ -2033,7 +2090,7 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin form="cres" place="above" staff="2" tstamp="2" tstamp2="5"/>
+                            <hairpin form="cres" place="below" staff="1" tstamp="2" tstamp2="6.5"/>
                             <slur curvedir="above" startid="#d414233e12803" endid="#d414233e13471"/>
                         </measure>
                         <measure n="39" xml:id="d414233e13128">
@@ -2154,6 +2211,8 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d414233e13718" endid="#d414233e13737"/>
+                            <slur startid="#d414233e13764" endid="#d414233e13785"/>
                         </measure>
                         <measure n="42" xml:id="d414233e14030">
                             <staff n="1">
@@ -2200,8 +2259,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin form="cres" place="below" staff="1" tstamp="2" tstamp2="5"/>
-                            <slur startid="#d414233e14040" endid="#d414233e14427" curvedir="above" />
+                            <hairpin form="cres" place="below" staff="1" tstamp="2" tstamp2="6.5"/>
+                            <slur startid="#d414233e14040" endid="#d414233e14427" curvedir="above"/>
                         </measure>
                         <measure n="43" xml:id="d414233e14366">
                             <staff n="1">
@@ -2217,10 +2276,10 @@
                                             <artic artic="stacc" place="above"/>
                                         </note>
                                     </beam>
+                                    <note xml:id="d414233e14427" pname="c" oct="5" dur="8" stem.dir="up">
+                                        <artic artic="stacc" place="above"/>
+                                    </note>
                                     <beam>
-                                        <note xml:id="d414233e14427" pname="c" oct="5" dur="8" stem.dir="up">
-                                            <artic artic="stacc" place="above"/>
-                                        </note>
                                         <note xml:id="d414233e14446" pname="g" oct="4" dur="8" stem.dir="up">
                                             <artic artic="stacc" place="above"/>
                                         </note>
@@ -2250,7 +2309,8 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin form="cres" staff="1" place="above" tstamp="5" tstamp2="2"/>
+                            <slur startid="#d414233e14446" endid="#d414233e14750" curvedir="above"/>
+                            <hairpin form="cres" staff="1" place="above" tstamp="5" tstamp2="1m+1.5"/>
                         </measure>
                         <measure n="44" xml:id="d414233e14707">
                             <staff n="1">
@@ -2285,38 +2345,42 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin form="cres" staff="2" place="above" tstamp="4" tstamp2="3"/>
+                            <hairpin form="cres" staff="2" place="above" tstamp="1" tstamp2="6.5"/>
                             <dir place="above" staff="2" tstamp="4">cresc.</dir>
                         </measure>
                         <measure n="45" xml:id="d414233e15002">
                             <staff n="1">
                                 <layer n="1">
                                     <rest xml:id="d414233e15004" dur="8"/>
-                                    <chord xml:id="d414964e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15012" pname="f" oct="4"/>
-                                        <note xml:id="d414233e15034" pname="f" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d414968e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15052" pname="g" oct="4"/>
-                                        <note xml:id="d414233e15069" pname="g" oct="5"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d414964e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15012" pname="f" oct="4"/>
+                                            <note xml:id="d414233e15034" pname="f" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d414968e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15052" pname="g" oct="4"/>
+                                            <note xml:id="d414233e15069" pname="g" oct="5"/>
+                                        </chord>
+                                    </beam>
                                     <rest xml:id="d414233e15087" dur="8"/>
-                                    <chord xml:id="d414972e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15095" pname="a" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e15114" pname="a" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d414976e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15134" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e15153" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d414972e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15095" pname="a" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e15114" pname="a" oct="5" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d414976e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15134" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e15153" pname="b" oct="5" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -2339,42 +2403,48 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d414964e1" endid="#d414968e1"/>
+                            <slur startid="#d414972e1" endid="#d414976e1"/>
                             <dir staff="1" place="above" tstamp="1">con forza</dir>
                         </measure>
                         <measure n="46" xml:id="d414233e15399">
                             <staff n="1">
                                 <layer n="1">
                                     <rest xml:id="d414233e15401" dur="8"/>
-                                    <chord xml:id="d414993e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15409" pname="c" oct="5"/>
-                                        <note xml:id="d414233e15431" pname="c" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d414997e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15449" pname="d" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e15468" pname="d" oct="6" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d415001e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15488" pname="c" oct="5"/>
-                                        <note xml:id="d414233e15505" pname="c" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415005e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15523" pname="a" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e15542" pname="a" oct="6" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d415009e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15562" pname="g" oct="5"/>
-                                        <note xml:id="d414233e15579" pname="g" oct="6"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d414993e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15409" pname="c" oct="5"/>
+                                            <note xml:id="d414233e15431" pname="c" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d414997e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15449" pname="d" oct="5" accid.ges="f"/>
+                                            <note xml:id="d414233e15468" pname="d" oct="6" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
+                                    <beam>
+                                        <chord xml:id="d415001e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15488" pname="c" oct="5"/>
+                                            <note xml:id="d414233e15505" pname="c" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d415005e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15523" pname="a" oct="5" accid.ges="f"/>
+                                            <note xml:id="d414233e15542" pname="a" oct="6" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d415009e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15562" pname="g" oct="5"/>
+                                            <note xml:id="d414233e15579" pname="g" oct="6"/>
+                                        </chord>
+                                    </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -2403,42 +2473,46 @@
                         <measure n="47" xml:id="d414233e15821">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d415026e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15823" pname="f" oct="5"/>
-                                        <note xml:id="d414233e15840" pname="f" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415030e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15858" pname="c" oct="5"/>
-                                        <note xml:id="d414233e15880" pname="c" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415034e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15898" pname="d" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e15917" pname="d" oct="6" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d415038e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15937" pname="c" oct="5"/>
-                                        <note xml:id="d414233e15954" pname="c" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415042e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e15972" pname="a" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e15991" pname="a" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d415046e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e16011" pname="f" oct="4"/>
-                                        <note xml:id="d414233e16029" pname="f" oct="5"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415026e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15823" pname="f" oct="5"/>
+                                            <note xml:id="d414233e15840" pname="f" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d415030e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15858" pname="c" oct="5"/>
+                                            <note xml:id="d414233e15880" pname="c" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d415034e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15898" pname="d" oct="5" accid.ges="f"/>
+                                            <note xml:id="d414233e15917" pname="d" oct="6" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
+                                    <beam>
+                                        <chord xml:id="d415038e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15937" pname="c" oct="5"/>
+                                            <note xml:id="d414233e15954" pname="c" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d415042e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e15972" pname="a" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e15991" pname="a" oct="5" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d415046e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e16011" pname="f" oct="4"/>
+                                            <note xml:id="d414233e16029" pname="f" oct="5"/>
+                                        </chord>
+                                    </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -2492,37 +2566,41 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <dynam place="above" staff="1" tstamp="1">fz</dynam>
+                            <dynam place="below" staff="1" tstamp="1">fz</dynam>
                         </measure>
                         <measure n="49" xml:id="d414233e16526">
                             <staff n="1">
                                 <layer n="1">
                                     <rest xml:id="d414233e16528" dur="8"/>
-                                    <chord xml:id="d415080e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e16536" pname="f" oct="4"/>
-                                        <note xml:id="d414233e16558" pname="f" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415084e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e16576" pname="g" oct="4"/>
-                                        <note xml:id="d414233e16593" pname="g" oct="5"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415080e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e16536" pname="f" oct="4"/>
+                                            <note xml:id="d414233e16558" pname="f" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415084e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e16576" pname="g" oct="4"/>
+                                            <note xml:id="d414233e16593" pname="g" oct="5"/>
+                                        </chord>
+                                    </beam>
                                     <rest xml:id="d414233e16611" dur="8"/>
-                                    <chord xml:id="d415088e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e16619" pname="a" accid="n" oct="4"/>
-                                        <note xml:id="d414233e16638" pname="a" accid="n" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415092e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e16658" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e16677" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415088e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e16619" pname="a" accid="n" oct="4"/>
+                                            <note xml:id="d414233e16638" pname="a" accid="n" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415092e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e16658" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e16677" pname="b" oct="5" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -2545,20 +2623,24 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d415080e1" endid="#d415084e1"/>
+                            <slur startid="#d415088e1" endid="#d415092e1"/>
                             <hairpin form="cres" staff="1" place="below" startid="#d415080e1" endid="#d415117e1"/>
                         </measure>
                         <measure n="50" xml:id="d414233e16921">
                             <staff n="1">
                                 <layer n="1">
                                     <rest xml:id="d414233e16923" dur="8"/>
-                                    <chord xml:id="d415109e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e16931" pname="c" oct="5"/>
-                                        <note xml:id="d414233e16950" pname="c" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415113e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e16965" pname="d" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e16981" pname="d" oct="6" accid.ges="f"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415109e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e16931" pname="c" oct="5"/>
+                                            <note xml:id="d414233e16950" pname="c" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d415113e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e16965" pname="d" oct="5" accid.ges="f"/>
+                                            <note xml:id="d414233e16981" pname="d" oct="6" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
                                     <chord xml:id="d415117e1" dur="4" dots="1" stem.dir="down">
                                         <note xml:id="d414233e16998" pname="e" oct="5" accid.ges="f"/>
                                         <note xml:id="d414233e17015" pname="e" oct="6" accid.ges="f"/>
@@ -2585,36 +2667,41 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d415109e1" endid="#d415117e1"/>
                         </measure>
                         <measure n="51" xml:id="d414233e17271">
                             <staff n="1">
                                 <layer n="1">
                                     <rest xml:id="d414233e17273" dur="8"/>
-                                    <chord xml:id="d415134e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e17281" pname="b" accid="n" oct="4"/>
-                                        <note xml:id="d414233e17305" pname="b" accid="n" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415138e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e17325" pname="c" oct="5"/>
-                                        <note xml:id="d414233e17342" pname="c" oct="6"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415134e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e17281" pname="b" accid="n" oct="4"/>
+                                            <note xml:id="d414233e17305" pname="b" accid="n" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415138e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e17325" pname="c" oct="5"/>
+                                            <note xml:id="d414233e17342" pname="c" oct="6"/>
+                                        </chord>
+                                    </beam>
                                     <rest xml:id="d414233e17360" dur="8"/>
-                                    <chord xml:id="d415142e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e17368" pname="d" accid="n" oct="5"/>
-                                        <note xml:id="d414233e17387" pname="d" accid="n" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415146e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e17407" pname="e" accid="n" oct="5"/>
-                                        <note xml:id="d414233e17426" pname="e" accid="n" oct="6"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415142e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e17368" pname="d" accid="n" oct="5"/>
+                                            <note xml:id="d414233e17387" pname="d" accid="n" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d415146e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e17407" pname="e" accid="n" oct="5"/>
+                                            <note xml:id="d414233e17426" pname="e" accid="n" oct="6"/>
+                                        </chord>
+                                    </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -2637,20 +2724,24 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d415134e1" endid="#d415138e1"/>
+                            <slur startid="#d415142e1" endid="#d415146e1"/>
                             <dir staff="1" place="below" tstamp="2">cre-scen-do</dir>
                         </measure>
                         <measure n="52" xml:id="d414233e17678">
                             <staff n="1">
                                 <layer n="1">
                                     <rest xml:id="d414233e17680" dur="8"/>
-                                    <chord xml:id="d415163e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e17688" pname="f" oct="5"/>
-                                        <note xml:id="d414233e17702" pname="f" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415167e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e17717" pname="g" oct="5"/>
-                                        <note xml:id="d414233e17731" pname="g" oct="6"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415163e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e17688" pname="f" oct="5"/>
+                                            <note xml:id="d414233e17702" pname="f" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d415167e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e17717" pname="g" oct="5"/>
+                                            <note xml:id="d414233e17731" pname="g" oct="6"/>
+                                        </chord>
+                                    </beam>
                                     <chord xml:id="d415171e1" dur="4" dots="1" stem.dir="down">
                                         <note xml:id="d414233e17746" pname="a" oct="5" accid.ges="f"/>
                                         <note xml:id="d414233e17763" pname="a" oct="6" accid.ges="f"/>
@@ -2677,32 +2768,37 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d415163e1" endid="#d415171e1"/>
                             <dir staff="1" place="below" tstamp="1"> e stretto</dir>
                         </measure>
                         <measure n="53" xml:id="d414233e18005">
                             <staff n="1">
                                 <layer n="1">
                                     <rest xml:id="d414233e18007" dur="8"/>
-                                    <chord xml:id="d415188e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18015" pname="e" accid="n" oct="4"/>
-                                        <note xml:id="d414233e18036" pname="e" accid="n" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415192e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18053" pname="f" oct="4"/>
-                                        <note xml:id="d414233e18067" pname="f" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415196e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18082" pname="a" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e18098" pname="a" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d415200e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18115" pname="g" oct="4"/>
-                                        <note xml:id="d414233e18129" pname="g" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415204e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18144" pname="a" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e18160" pname="a" oct="5" accid.ges="f"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415188e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18015" pname="e" accid="n" oct="4"/>
+                                            <note xml:id="d414233e18036" pname="e" accid="n" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415192e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18053" pname="f" oct="4"/>
+                                            <note xml:id="d414233e18067" pname="f" oct="5"/>
+                                        </chord>
+                                    </beam>
+                                    <beam>
+                                        <chord xml:id="d415196e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18082" pname="a" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e18098" pname="a" oct="5" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d415200e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18115" pname="g" oct="4"/>
+                                            <note xml:id="d414233e18129" pname="g" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415204e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18144" pname="a" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e18160" pname="a" oct="5" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -2725,35 +2821,40 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d415188e1" endid="#d415303e1"/>
                             <dir staff="2" place="above" tstamp="2.5">sempre piu cresc.</dir>
                         </measure>
                         <measure n="54" xml:id="d414233e18417">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d415221e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18419" pname="c" oct="5"/>
-                                        <note xml:id="d414233e18433" pname="c" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415225e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18448" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e18464" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d415229e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18481" pname="c" oct="5"/>
-                                        <note xml:id="d414233e18495" pname="c" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415233e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18510" pname="e" accid="f" oct="5"/>
-                                        <note xml:id="d414233e18528" pname="e" accid="f" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415237e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18547" pname="d" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e18563" pname="d" oct="6" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d415241e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18580" pname="e" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e18597" pname="e" oct="6" accid.ges="f"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415221e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18419" pname="c" oct="5"/>
+                                            <note xml:id="d414233e18433" pname="c" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d415225e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18448" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e18464" pname="b" oct="5" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d415229e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18481" pname="c" oct="5"/>
+                                            <note xml:id="d414233e18495" pname="c" oct="6"/>
+                                        </chord>
+                                    </beam>
+                                    <beam>
+                                        <chord xml:id="d415233e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18510" pname="e" accid="f" oct="5"/>
+                                            <note xml:id="d414233e18528" pname="e" accid="f" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d415237e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18547" pname="d" oct="5" accid.ges="f"/>
+                                            <note xml:id="d414233e18563" pname="d" oct="6" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d415241e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18580" pname="e" oct="5" accid.ges="f"/>
+                                            <note xml:id="d414233e18597" pname="e" oct="6" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -2781,30 +2882,34 @@
                         <measure n="55" xml:id="d414233e18853">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d415258e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18855" pname="f" oct="5"/>
-                                        <note xml:id="d414233e18869" pname="f" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415262e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18884" pname="e" accid="n" oct="5"/>
-                                        <note xml:id="d414233e18900" pname="e" accid="n" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415266e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18917" pname="f" oct="5"/>
-                                        <note xml:id="d414233e18931" pname="f" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415270e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18946" pname="a" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e18967" pname="a" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d415274e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e18984" pname="g" oct="4"/>
-                                        <note xml:id="d414233e18998" pname="g" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415278e1" dur="8" stem.dir="down">
-                                        <note xml:id="d414233e19013" pname="a" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e19030" pname="a" oct="5" accid.ges="f"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415258e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18855" pname="f" oct="5"/>
+                                            <note xml:id="d414233e18869" pname="f" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d415262e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18884" pname="e" accid="n" oct="5"/>
+                                            <note xml:id="d414233e18900" pname="e" accid="n" oct="6"/>
+                                        </chord>
+                                        <chord xml:id="d415266e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18917" pname="f" oct="5"/>
+                                            <note xml:id="d414233e18931" pname="f" oct="6"/>
+                                        </chord>
+                                    </beam>
+                                    <beam>
+                                        <chord xml:id="d415270e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18946" pname="a" oct="4" oct.ges="5" accid.ges="f"/>
+                                            <note xml:id="d414233e18967" pname="a" oct="5" oct.ges="6" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d415274e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e18984" pname="g" oct="4" oct.ges="5"/>
+                                            <note xml:id="d414233e18998" pname="g" oct="5" oct.ges="6"/>
+                                        </chord>
+                                        <chord xml:id="d415278e1" dur="8" stem.dir="down">
+                                            <note xml:id="d414233e19013" pname="a" oct="4" oct.ges="5" accid.ges="f"/>
+                                            <note xml:id="d414233e19030" pname="a" oct="5" oct.ges="6" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -2828,24 +2933,26 @@
                                 </layer>
                             </staff>
                             <octave staff="1" dis="8" dis.place="above" startid="#d415270e1" endid="#d415303e1"/>
-                            <hairpin form="cres" staff="2" place="above" tstamp="1" tstamp2="4"/>
+                            <hairpin form="cres" staff="2" place="above" tstamp="1" tstamp2="1m+1.5"/>
                         </measure>
                         <measure n="56" xml:id="d414233e19285">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d415295e1" dur="16" stem.dir="down">
-                                        <note xml:id="d414233e19287" pname="a" accid="n" oct="4"/>
-                                        <note xml:id="d414233e19303" pname="a" accid="n" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415299e1" dur="16" stem.dir="down">
-                                        <note xml:id="d414233e19320" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e19336" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415295e1" dur="16" stem.dir="down">
+                                            <note xml:id="d414233e19287" pname="a" accid="n" oct="4" oct.ges="5"/>
+                                            <note xml:id="d414233e19303" pname="a" accid="n" oct="5" oct.ges="6"/>
+                                        </chord>
+                                        <chord xml:id="d415299e1" dur="16" stem.dir="down">
+                                            <note xml:id="d414233e19320" pname="b" oct="4" oct.ges="5" accid.ges="f"/>
+                                            <note xml:id="d414233e19336" pname="b" oct="5" oct.ges="6" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
                                     <chord xml:id="d415303e1" dur="2" stem.dir="down">
                                         <artic artic="acc" place="above"/>
                                         <artic artic="acc" place="above"/>
-                                        <note xml:id="d414233e19353" pname="d" oct="5" accid.ges="f"/>
-                                        <note xml:id="d414233e19372" pname="d" oct="6" accid.ges="f"/>
+                                        <note xml:id="d414233e19353" pname="d" oct="5" oct.ges="6" accid.ges="f"/>
+                                        <note xml:id="d414233e19372" pname="d" oct="6" oct.ges="7" accid.ges="f"/>
                                     </chord>
                                     <chord xml:id="d415307e1" dur="8" stem.dir="down">
                                         <note xml:id="d414233e19392" pname="e" accid="n" oct="4"/>
@@ -2873,28 +2980,33 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d415307e1" endid="#d415340e1"/>
+                            <dynam staff="2" place="above" tstamp="2">fz</dynam>
+                            <dynam staff="2" place="above" tstamp="4.5">p</dynam>
                         </measure>
                         <measure n="57" xml:id="d414233e19668">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d415324e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e19670" pname="g" oct="4"/>
-                                        <note xml:id="d414233e19687" pname="g" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415328e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e19705" pname="g" oct="4"/>
-                                        <note xml:id="d414233e19722" pname="g" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415332e1" dur="8" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e19740" pname="g" oct="4"/>
-                                        <note xml:id="d414233e19757" pname="g" oct="5"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415324e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e19670" pname="g" oct="4"/>
+                                            <note xml:id="d414233e19687" pname="g" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415328e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e19705" pname="g" oct="4"/>
+                                            <note xml:id="d414233e19722" pname="g" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415332e1" dur="8" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e19740" pname="g" oct="4"/>
+                                            <note xml:id="d414233e19757" pname="g" oct="5"/>
+                                        </chord>
+                                    </beam>
                                     <chord xml:id="d415336e1" dur="4" stem.dir="down">
                                         <artic artic="acc" place="above"/>
                                         <artic artic="acc" place="above"/>
@@ -2927,8 +3039,7 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <dynam staff="2" place="above" tstamp="1.5">fz</dynam>
-                            <dynam staff="2" place="above" tstamp="4.5">p</dynam>
+                            <dir tstamp="1" staff="1" place="below">sotto voce</dir>
                         </measure>
                         <measure n="58" xml:id="d414233e20069">
                             <staff n="1">
@@ -2970,29 +3081,33 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <dir tstamp="1" staff="1" place="below">sotto voce</dir>
+                            <slur startid="#d414233e20071" endid="#d414233e20114"/>
+                            <slur startid="#d414233e20133" endid="#d414233e20150"/>
+                            <dynam staff="1" place="below" tstamp="1">pp</dynam>
                         </measure>
                         <measure n="59" xml:id="d414233e20394">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d415370e1" dur="8" stem.dir="up">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e20396" pname="e" accid="n" oct="4"/>
-                                        <note xml:id="d414233e20420" pname="e" accid="n" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415374e1" dur="8" stem.dir="up">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e20440" pname="d" accid="s" oct="4"/>
-                                        <note xml:id="d414233e20466" pname="d" accid="s" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415378e1" dur="8" stem.dir="up">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e20488" pname="e" oct="4"/>
-                                        <note xml:id="d414233e20505" pname="e" oct="5"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415370e1" dur="8" stem.dir="up">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e20396" pname="e" accid="n" oct="4"/>
+                                            <note xml:id="d414233e20420" pname="e" accid="n" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415374e1" dur="8" stem.dir="up">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e20440" pname="d" accid="s" oct="4"/>
+                                            <note xml:id="d414233e20466" pname="d" accid="s" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415378e1" dur="8" stem.dir="up">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e20488" pname="e" oct="4"/>
+                                            <note xml:id="d414233e20505" pname="e" oct="5"/>
+                                        </chord>
+                                    </beam>
                                     <chord xml:id="d415382e1" dur="4" dots="1" stem.dir="down">
                                         <note xml:id="d414233e20523" pname="f" oct="4"/>
                                         <note xml:id="d414233e20538" pname="f" oct="5"/>
@@ -3019,7 +3134,10 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <dynam staff="1" place="below" tstamp="1">pp</dynam>
+                            <slur startid="#d415370e1" endid="#d415382e1" curvedir="above"/>
+                            <dir tstamp="4" staff="1" place="above">ten.</dir>
+                            <dynam staff="1" place="below" tstamp="1">p</dynam>
+                            <hairpin form="cres" staff="1" place="below" tstamp="2" tstamp2="4"/>
                         </measure>
                         <measure n="60" xml:id="d414233e20784">
                             <staff n="1">
@@ -3052,59 +3170,69 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <hairpin form="cres" staff="1" place="below" tstamp="2" tstamp2="6"/>
+                            <slur startid="#d414233e20786" endid="#d414233e20845"/>
+                            <dir staff="1" place="below" tstamp="1">smorz.</dir>
                         </measure>
                         <measure n="61" xml:id="d414233e21090">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d415412e1" dur="32" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e21092" pname="g" oct="5"/>
-                                        <note xml:id="d414233e21114" pname="f" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415416e1" dur="32" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e21132" pname="g" oct="5"/>
-                                        <note xml:id="d414233e21149" pname="f" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415420e1" dur="32" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e21167" pname="g" oct="5"/>
-                                        <note xml:id="d414233e21184" pname="f" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415424e1" dur="32" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e21202" pname="g" oct="5"/>
-                                        <note xml:id="d414233e21219" pname="f" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415428e1" dur="32" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e21237" pname="g" oct="5"/>
-                                        <note xml:id="d414233e21254" pname="f" oct="6"/>
-                                    </chord>
-                                    <chord xml:id="d415432e1" dur="16" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e21272" pname="g" oct="5"/>
-                                        <note xml:id="d414233e21290" pname="g" oct="6"/>
-                                    </chord>
-                                    <rest xml:id="d414233e21308" dur="32"/>
-                                    <chord xml:id="d415436e1" dur="32" stem.dir="down">
-                                        <note xml:id="d414233e21316" pname="f" oct="4"/>
-                                        <note xml:id="d414233e21330" pname="g" oct="5"/>
-                                    </chord>
+                                    <beam>
+                                        <tuplet num="5" numbase="4" bracket.visible="false">
+                                            <chord xml:id="d415412e1" dur="16" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                                <artic artic="stacc" place="above"/>
+                                                <note xml:id="d414233e21092" pname="g" oct="5"/>
+                                                <note xml:id="d414233e21114" pname="g" oct="6"/>
+                                            </chord>
+                                            <chord xml:id="d415416e1" dur="16" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                                <artic artic="stacc" place="above"/>
+                                                <note xml:id="d414233e21132" pname="g" oct="5"/>
+                                                <note xml:id="d414233e21149" pname="g" oct="6"/>
+                                            </chord>
+                                            <chord xml:id="d415420e1" dur="16" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                                <artic artic="stacc" place="above"/>
+                                                <note xml:id="d414233e21167" pname="g" oct="5"/>
+                                                <note xml:id="d414233e21184" pname="g" oct="6"/>
+                                            </chord>
+                                            <chord xml:id="d415424e1" dur="16" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                                <artic artic="stacc" place="above"/>
+                                                <note xml:id="d414233e21202" pname="g" oct="5"/>
+                                                <note xml:id="d414233e21219" pname="g" oct="6"/>
+                                            </chord>
+                                            <chord xml:id="d415428e1" dur="16" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                                <artic artic="stacc" place="above"/>
+                                                <note xml:id="d414233e21237" pname="g" oct="5"/>
+                                                <note xml:id="d414233e21254" pname="g" oct="6"/>
+                                            </chord>
+                                        </tuplet>
+                                    </beam>
+                                    <beam>
+                                        <chord xml:id="d415432e1" dur="16" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e21272" pname="g" oct="5"/>
+                                            <note xml:id="d414233e21290" pname="g" oct="6"/>
+                                        </chord>
+                                        <rest xml:id="d414233e21308" dur="32"/>
+                                        <chord xml:id="d415436e1" dur="32" stem.dir="down">
+                                            <note xml:id="d414233e21316" pname="g" oct="4"/>
+                                            <note xml:id="d414233e21330" pname="g" oct="5"/>
+                                        </chord>
+                                    </beam>
                                     <chord xml:id="d415440e1" dur="4" stem.dir="down">
                                         <artic artic="acc" place="above"/>
                                         <artic artic="acc" place="above"/>
                                         <note xml:id="d414233e21345" pname="g" oct="4"/>
                                         <note xml:id="d414233e21362" pname="g" oct="5"/>
                                     </chord>
-                                    <note xml:id="d414233e21380" pname="f" oct="5" dur="8" stem.dir="down"/>
+                                    <chord xml:id="d414233e21380-1" dur="8" stem.dir="down">
+                                        <note xml:id="d414233e21380" pname="f" oct="5"/>
+                                        <note xml:id="d414233e21380-2" pname="f" oct="4"/>
+                                    </chord>
                                 </layer>
                             </staff>
                             <staff n="2">
@@ -3127,28 +3255,31 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <dir staff="1" place="below" tstamp="1.5">smorz</dir>
-                            <slur curvedir="below" startid="#" endid="#"/>
+                            <slur startid="#d415412e1" endid="#d415432e1"/>
+                            <slur startid="#d415440e1" endid="#d414233e21380-1"/>
+                            <dynam staff="1" place="below" tstamp="1">f</dynam>
                         </measure>
                         <measure n="62" xml:id="d414233e21624">
                             <staff n="1">
                                 <layer n="1">
                                     <beam>
-                                        <note xml:id="d414233e21626" pname="g" oct="5" dur="32" stem.dir="down">
-                                            <artic artic="stacc" place="above"/>
-                                        </note>
-                                        <note xml:id="d414233e21652" pname="g" oct="5" dur="32" stem.dir="down">
-                                            <artic artic="stacc" place="above"/>
-                                        </note>
-                                        <note xml:id="d414233e21673" pname="g" oct="5" dur="32" stem.dir="down">
-                                            <artic artic="stacc" place="above"/>
-                                        </note>
-                                        <note xml:id="d414233e21694" pname="g" oct="5" dur="32" stem.dir="down">
-                                            <artic artic="stacc" place="above"/>
-                                        </note>
-                                        <note xml:id="d414233e21715" pname="g" oct="5" dur="32" stem.dir="down">
-                                            <artic artic="stacc" place="above"/>
-                                        </note>
+                                        <tuplet num="5" numbase="4" bracket.visible="false">
+                                            <note xml:id="d414233e21626" pname="g" oct="5" dur="16" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                            </note>
+                                            <note xml:id="d414233e21652" pname="g" oct="5" dur="16" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                            </note>
+                                            <note xml:id="d414233e21673" pname="g" oct="5" dur="16" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                            </note>
+                                            <note xml:id="d414233e21694" pname="g" oct="5" dur="16" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                            </note>
+                                            <note xml:id="d414233e21715" pname="g" oct="5" dur="16" stem.dir="down">
+                                                <artic artic="stacc" place="above"/>
+                                            </note>
+                                        </tuplet>
                                     </beam>
                                     <beam>
                                         <note xml:id="d414233e21736" pname="g" oct="5" dur="16" stem.dir="down">
@@ -3183,46 +3314,51 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <dynam staff="1" place="below" tstamp="1">pp</dynam>
+                            <slur startid="#d414233e21626" endid="#d414233e21736"/>
+                            <slur startid="#d414233e21789" endid="#d414233e21806"/>
                         </measure>
                         <measure n="63" xml:id="d414233e22050">
                             <staff n="1">
                                 <layer n="1">
-                                    <chord xml:id="d415470e1" dur="16" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e22052" pname="e" accid="n" oct="4"/>
-                                        <note xml:id="d414233e22076" pname="e" accid="n" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415474e1" dur="16" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e22096" pname="f" oct="4"/>
-                                        <note xml:id="d414233e22113" pname="f" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415478e1" dur="16" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e22131" pname="g" oct="4"/>
-                                        <note xml:id="d414233e22148" pname="g" oct="5"/>
-                                    </chord>
-                                    <chord xml:id="d415482e1" dur="16" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e22166" pname="a" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e22185" pname="a" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d415486e1" dur="16" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e22205" pname="b" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e22224" pname="b" oct="5" accid.ges="f"/>
-                                    </chord>
-                                    <chord xml:id="d415490e1" dur="16" stem.dir="down">
-                                        <artic artic="stacc" place="above"/>
-                                        <artic artic="stacc" place="above"/>
-                                        <note xml:id="d414233e22244" pname="a" oct="4" accid.ges="f"/>
-                                        <note xml:id="d414233e22264" pname="a" oct="5" accid.ges="f"/>
-                                    </chord>
+                                    <beam>
+                                        <chord xml:id="d415470e1" dur="16" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e22052" pname="e" accid="n" oct="4"/>
+                                            <note xml:id="d414233e22076" pname="e" accid="n" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415474e1" dur="16" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e22096" pname="f" oct="4"/>
+                                            <note xml:id="d414233e22113" pname="f" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415478e1" dur="16" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e22131" pname="g" oct="4"/>
+                                            <note xml:id="d414233e22148" pname="g" oct="5"/>
+                                        </chord>
+                                        <chord xml:id="d415482e1" dur="16" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e22166" pname="a" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e22185" pname="a" oct="5" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d415486e1" dur="16" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e22205" pname="b" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e22224" pname="b" oct="5" accid.ges="f"/>
+                                        </chord>
+                                        <chord xml:id="d415490e1" dur="16" stem.dir="down">
+                                            <artic artic="stacc" place="above"/>
+                                            <artic artic="stacc" place="above"/>
+                                            <note xml:id="d414233e22244" pname="a" oct="4" accid.ges="f"/>
+                                            <note xml:id="d414233e22264" pname="a" oct="5" accid.ges="f"/>
+                                        </chord>
+                                    </beam>
                                     <chord xml:id="d415494e1" dur="4" dots="1" stem.dir="down">
                                         <note xml:id="d414233e22284" pname="f" oct="4"/>
                                         <note xml:id="d414233e22299" pname="f" oct="5"/>
@@ -3249,6 +3385,8 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <dynam staff="1" place="below" tstamp="1">ff</dynam>
+                            <slur startid="#d415470e1" endid="#d415494e1"/>
                         </measure>
                         <measure n="64" xml:id="d414233e22545">
                             <staff n="1">
@@ -3296,25 +3434,27 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <dynam staff="1" place="below" tstamp="1">pp</dynam>
+                            <slur startid="#d414233e22547" endid="#d414233e22686"/>
                         </measure>
                         <measure n="65" xml:id="d414233e22931">
                             <staff n="1">
                                 <layer n="1">
                                     <beam>
-                                        <note xml:id="d414233e22933" pname="b" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e22953" pname="c" oct="5" dur="16" stem.dir="down"/>
-                                        <note xml:id="d414233e22976" pname="a" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e22996" pname="c" oct="5" dur="16" stem.dir="down"/>
-                                        <note xml:id="d414233e23014" pname="b" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e23034" pname="c" oct="5" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e22933" pname="b" oct="5" oct.ges="6" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e22953" pname="c" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e22976" pname="a" oct="5" oct.ges="6" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e22996" pname="c" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e23014" pname="b" oct="5" oct.ges="6" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e23034" pname="c" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
                                     </beam>
                                     <beam>
-                                        <note xml:id="d414233e23052" pname="a" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e23072" pname="c" oct="5" dur="16" stem.dir="down"/>
-                                        <note xml:id="d414233e23090" pname="b" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e23110" pname="c" oct="5" dur="16" stem.dir="down"/>
-                                        <note xml:id="d414233e23128" pname="a" oct="5" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e23149" pname="c" oct="5" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e23052" pname="a" oct="5" oct.ges="6" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e23072" pname="c" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e23090" pname="b" oct="5" oct.ges="6" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e23110" pname="c" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e23128" pname="a" oct="5" oct.ges="6" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e23149" pname="c" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
                                     </beam>
                                 </layer>
                             </staff>
@@ -3338,27 +3478,29 @@
                                 </layer>
                             </staff>
                             <octave staff="1" dis="8" dis.place="above" startid="#d414233e22933" endid="#d414233e23812"/>
-                            <dir startid="#1" place="below" tstamp="1">legerissimo</dir>
-                            <dynam staff="2" place="above" tstamp="1">ppp</dynam>
+                            <dir place="above" staff="2" tstamp="1">legerissimo</dir>
+                            <dynam staff="1" place="below" tstamp="1">ppp</dynam>
+                            <slur startid="#d414233e22933" endid="#d414233e23149"/>
+                            <slur startid="#d414233e23196" endid="#d414233e23330"/>
                         </measure>
                         <measure n="66" xml:id="d414233e23349">
                             <staff n="1">
                                 <layer n="1">
                                     <beam>
-                                        <note xml:id="d414233e23351" pname="g" oct="5" dur="16" stem.dir="down"/>
-                                        <note xml:id="d414233e23369" pname="a" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e23389" pname="f" oct="5" dur="16" stem.dir="down"/>
-                                        <note xml:id="d414233e23407" pname="a" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e23427" pname="g" oct="5" dur="16" stem.dir="down"/>
-                                        <note xml:id="d414233e23445" pname="a" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e23351" pname="g" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e23369" pname="a" oct="4" oct.ges="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e23389" pname="f" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e23407" pname="a" oct="4" oct.ges="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e23427" pname="g" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e23445" pname="a" oct="4" oct.ges="5" dur="16" stem.dir="down" accid.ges="f"/>
                                     </beam>
                                     <beam>
-                                        <note xml:id="d414233e23465" pname="f" oct="5" dur="16" stem.dir="down"/>
-                                        <note xml:id="d414233e23483" pname="a" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e23503" pname="g" oct="5" dur="16" stem.dir="down"/>
-                                        <note xml:id="d414233e23521" pname="a" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
-                                        <note xml:id="d414233e23541" pname="f" oct="5" dur="16" stem.dir="down"/>
-                                        <note xml:id="d414233e23560" pname="a" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e23465" pname="f" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e23483" pname="a" oct="4" oct.ges="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e23503" pname="g" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e23521" pname="a" oct="4" oct.ges="5" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e23541" pname="f" oct="5" oct.ges="6" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e23560" pname="a" oct="4" oct.ges="5" dur="16" stem.dir="down" accid.ges="f"/>
                                     </beam>
                                 </layer>
                             </staff>
@@ -3382,11 +3524,14 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <slur startid="#d414233e23351" endid="#d414233e23560"/>
+                            <slur startid="#d414233e23581" endid="#d414233e23792"/>
+                            <dir place="above" staff="2" tstamp="1">smorz.</dir>
                         </measure>
                         <measure n="67" xml:id="d414233e23810" right="end">
                             <staff n="1">
                                 <layer n="1">
-                                    <note xml:id="d414233e23812" pname="f" oct="6" dur="8" stem.dir="down">
+                                    <note xml:id="d414233e23812" pname="f" oct="6" oct.ges="7" dur="8" stem.dir="down">
                                         <artic artic="stacc" place="above"/>
                                     </note>
                                     <rest xml:id="d414233e23829" dur="8"/>
