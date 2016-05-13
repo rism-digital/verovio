@@ -119,7 +119,7 @@ midiplayer: true
             <h3>MIDI Output</h3>
             
             <p>
-                Verovio provides a basic MIDI output feature that can be used from the command-line tool or from the JavaScript toolkit. The MIDI output can be written to a file for further processing or for building application with MIDI playbac. However, since MIDI is not supported in web-browsers in a standard way, an additional player will be required.
+                Verovio provides a basic MIDI output feature that can be used from the command-line tool or from the JavaScript toolkit. The MIDI output can be written to a file for further processing or for building application with MIDI playback, including in online environments. However, since MIDI is not supported in web-browsers in a standard way, an additional player will be required in such cases.
             </p>
             
             <h4>The MIDI output takes into account:</h4>
@@ -156,14 +156,14 @@ midiplayer: true
 {% highlight bash %}$ verovio -f midi -o output.midi Ahle_Jesu_meines_Herzens_Freud.mei{% endhighlight %}
             
             <p>
-                With the JavaScript toolkit, the MIDI output is available throught the <code>renderToMidi()</code> method. This returns a base64-coded MIDI file as string. 
+                With the JavaScript toolkit, the MIDI output is available throught the <code>renderToMidi()</code> method. This returns a base64-coded MIDI file as string, which can be passed to a player or made available for download.
             </p>
             
 {% highlight html %}
 <script type="text/javascript">
 var vrvToolkit = new verovio.toolkit();
 /* ... load the MEI file */
-var midi = vrvToolkit.renderToMidi();
+var midiFileIn64Base = vrvToolkit.renderToMidi();
 </script>
 {% endhighlight %}
 
