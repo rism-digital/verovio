@@ -919,6 +919,7 @@ void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *inte
     assert(interface);
 
     interface->WriteAccidental(element);
+    interface->WriteNoteGes(element);
     interface->WriteOctave(element);
     interface->WritePitch(element);
 }
@@ -2346,6 +2347,7 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
 bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interface)
 {
     interface->ReadAccidental(element);
+    interface->ReadNoteGes(element);
     interface->ReadOctave(element);
     interface->ReadPitch(element);
     return true;

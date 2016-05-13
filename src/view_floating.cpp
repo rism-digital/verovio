@@ -1326,7 +1326,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dirTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
         DrawTextChildren(dc, dir, x, y, setX, setY);
         dc->EndText();
 
@@ -1379,14 +1379,14 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         // editorial element within the dynam as it would with text. Also, it is center only if it is a symbol.
         if (isSymbolOnly) {
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
-            DrawSmuflString(dc, x, y, dynamSymbol, false, (*staffIter)->m_drawingStaffSize);
+            DrawSmuflString(dc, x, y, dynamSymbol, true, (*staffIter)->m_drawingStaffSize);
             dc->ResetFont();
         }
         else {
             dc->SetBrush(m_currentColour, AxSOLID);
             dc->SetFont(&dynamTxt);
 
-            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
             DrawTextChildren(dc, dynam, x, y, setX, setY);
             dc->EndText();
 

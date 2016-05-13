@@ -501,7 +501,7 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
             bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
             bool isFirstLayer = false;
             if (hasMultipleLayer) {
-                Layer *firstLayer = dynamic_cast<Layer*>(staffY->FindChildByType(LAYER));
+                Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
                 if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
             }
@@ -624,7 +624,10 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
         // Adjustment for transposition intruments
         midiBase += (*transSemi);
 
-        int pitch = midiBase + (note->GetOct() + 1) * 12;
+        int oct = note->GetOct();
+        if (note->HasOctGes()) oct = note->GetOctGes();
+
+        int pitch = midiBase + (oct + 1) * 12;
         int channel = 0;
         int velocity = 64;
         midiFile->addNoteOn(*midiTrack, *totalTime + *currentMeasureTime, channel, pitch, velocity);
