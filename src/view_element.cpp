@@ -163,6 +163,12 @@ void View::DrawAccid(
     Accid *accid = dynamic_cast<Accid *>(element);
     assert(accid);
 
+    // This can happen with accid within note with only accid.ges
+    if (!accid->HasAccid()) {
+        accid->SetEmptyBB();
+        return;
+    }
+
     dc->StartGraphic(element, "", element->GetUuid());
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
