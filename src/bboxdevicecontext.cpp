@@ -132,10 +132,10 @@ void BBoxDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]
     int width, height;
 
     ApproximateBezierBoundingBox(bezier1, &pos, &width, &height);
-    LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
     UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
     ApproximateBezierBoundingBox(bezier2, &pos, &width, &height);
-    LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
+    // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
     UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
 

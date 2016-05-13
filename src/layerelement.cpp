@@ -538,10 +538,14 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
     // param 1: int*: the midi track number
     // param 2: int*: the current time in the measure (incremented by each element)
     // param 3: int*: the current total measure time (incremented by each measure
+    // param 4: std::vector<double>: a stack of maximum duration filled by the functor (unused)
+    // param 5: int* the semi tone transposition for the current track
+
     MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
     int *midiTrack = static_cast<int *>((*params).at(1));
     double *currentMeasureTime = static_cast<double *>((*params).at(2));
     double *totalTime = static_cast<double *>((*params).at(3));
+    int *transSemi = static_cast<int *>((*params).at(5));
 
     // Here we need to check if the LayerElement as a duration, otherwise we can continue
     if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
@@ -550,7 +554,7 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
     if (this->Is() == REST) {
         Rest *rest = dynamic_cast<Rest *>(this);
         assert(rest);
-        LogMessage("Rest %f", GetAlignmentDuration());
+        // LogMessage("Rest %f", GetAlignmentDuration());
         // increase the currentTime accordingly
         (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
     }
@@ -570,9 +574,9 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
             dur = note->GetAlignmentDuration();
         dur = dur * 120 / (DUR_MAX / DURATION_4);
 
-        LogMessage("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
-            note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
-        LogMessage("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
+        // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
+        // note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
+        // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
 
         // Create midi note
         int midiBase = 0;
@@ -608,6 +612,10 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
                 default: break;
             }
         }
+
+        // Adjustment for transposition intruments
+        midiBase += (*transSemi);
+
         int pitch = midiBase + (note->GetOct() + 1) * 12;
         int channel = 0;
         int velocity = 64;
@@ -625,7 +633,7 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
     else if (this->Is() == SPACE) {
         Space *space = dynamic_cast<Space *>(this);
         assert(space);
-        LogMessage("Space %f", GetAlignmentDuration());
+        // LogMessage("Space %f", GetAlignmentDuration());
         // increase the currentTime accordingly
         (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
     }
@@ -639,12 +647,13 @@ int LayerElement::ExportMIDIEnd(ArrayPtrVoid *params)
     // param 2: int*: the current time in the measure (incremented by each element)
     // param 3: int*: the current total measure time (incremented by each measure (unused)
     // param 4: std::vector<double>: a stack of maximum duration filled by the functor (unused)
+    // param 5: int* the semi tone transposition for the current track (unused)
     double *currentMeasureTime = static_cast<double *>((*params).at(2));
 
     if (this->Is() == CHORD) {
         Chord *chord = dynamic_cast<Chord *>(this);
         assert(chord);
-        LogMessage("Chord %f", GetAlignmentDuration());
+        // LogMessage("Chord %f", GetAlignmentDuration());
         // increase the currentTime accordingly.
         (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
     }

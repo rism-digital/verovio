@@ -688,7 +688,7 @@ double Toolkit::GetTimeForElement(const std::string &xmlId)
     if (element->Is() == NOTE) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
-        timeofElement = note->m_playingOnset;
+        timeofElement = note->m_playingOnset * 1000 / 120;
     }
     return timeofElement;
 }

@@ -137,6 +137,13 @@ void Doc::ExportMIDI(MidiFile *midiFile)
     int midiTrack = 1;
     std::vector<AttComparison *> filters;
     for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+
+        int transSemi = 0;
+        // Get the transposition (semi-tone) value for the staff
+        if (StaffDef *staffDef = this->m_scoreDef.GetStaffDef(staves->first)) {
+            if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
+        }
+
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             midiFile->addTrack(1);
             filters.clear();
@@ -156,10 +163,11 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             params.push_back(&currentMeasureTime);
             params.push_back(&totalTime);
             params.push_back(&maxValuesLayer);
+            params.push_back(&transSemi);
             Functor exportMIDI(&Object::ExportMIDI);
             Functor exportMIDIEnd(&Object::ExportMIDIEnd);
 
-            LogMessage("Exporting track %d ----------------", midiTrack);
+            // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(&exportMIDI, &params, &exportMIDIEnd, &filters);
 
             midiTrack++;

@@ -259,7 +259,8 @@ class StaffDef : public ScoreDefElement,
                  public AttLabelsAddl,
                  public AttNotationtype,
                  public AttScalable,
-                 public AttStaffDefVis {
+                 public AttStaffDefVis,
+                 public AttTransposition {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

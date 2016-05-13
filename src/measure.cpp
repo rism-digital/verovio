@@ -29,8 +29,7 @@ namespace vrv {
 // Measure
 //----------------------------------------------------------------------------
 
-Measure::Measure(bool measureMusic, int logMeasureNb)
-    :  Object("measure-"), AttCommon(), AttMeasureLog(), AttPointing()
+Measure::Measure(bool measureMusic, int logMeasureNb) : Object("measure-"), AttCommon(), AttMeasureLog(), AttPointing()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_MEASURELOG);
@@ -379,9 +378,9 @@ int Measure::SetDrawingXY(ArrayPtrVoid *params)
 int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
 {
     // param 0: the current Syl
-    std::vector< Object *> *elements = static_cast<std::vector< Object *> *>((*params).at(0));
+    std::vector<Object *> *elements = static_cast<std::vector<Object *> *>((*params).at(0));
 
-    std::vector< Object *>::iterator iter = elements->begin();
+    std::vector<Object *>::iterator iter = elements->begin();
     while (iter != elements->end()) {
         TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
         assert(interface);
@@ -424,10 +423,10 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
 {
     // param 0: std::vector< Object*>* that holds the current elements to match
     // param 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
-    std::vector< Object *> *elements = static_cast<std::vector< Object *> *>((*params).at(0));
-     ArrayOfObjectBeatPairs *tstamps = static_cast< ArrayOfObjectBeatPairs *>((*params).at(1));
+    std::vector<Object *> *elements = static_cast<std::vector<Object *> *>((*params).at(0));
+    ArrayOfObjectBeatPairs *tstamps = static_cast<ArrayOfObjectBeatPairs *>((*params).at(1));
 
-     ArrayOfObjectBeatPairs::iterator iter = tstamps->begin();
+    ArrayOfObjectBeatPairs::iterator iter = tstamps->begin();
     // Loop throught the object/beat pairs and create the TimestampAttr when necessary
     while (iter != tstamps->end()) {
         // -1 means that we have a @tstamp (start) to add to the current measure
@@ -477,6 +476,7 @@ int Measure::ExportMIDI(ArrayPtrVoid *params)
     // param 2: int*: the current time in the measure (incremented by each element)
     // param 3: int*: the current total measure time (incremented by each measure (unused)
     // param 4: std::vector<double>: a stack of maximum duration filled by the functor (unused)
+    // param 5: int* the semi tone transposition for the current track (unused)
     double *currentMeasureTime = static_cast<double *>((*params).at(2));
 
     // Here we need to reset the currentMeasureTime because we are starting a new measure
@@ -492,6 +492,7 @@ int Measure::ExportMIDIEnd(ArrayPtrVoid *params)
     // param 2: int*: the current time in the measure (incremented by each element) (unused)
     // param 3: int*: the current total measure time (incremented by each measure
     // param 4: std::vector<double>: a stack of maximum duration filled by the functor
+    // param 5: int* the semi tone transposition for the current track (unused)
     double *totalTime = static_cast<double *>((*params).at(3));
     std::vector<double> *maxValues = static_cast<std::vector<double> *>((*params).at(4));
 

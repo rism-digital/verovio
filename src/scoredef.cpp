@@ -415,6 +415,7 @@ StaffDef::StaffDef()
     , AttNotationtype()
     , AttScalable()
     , AttStaffDefVis()
+    , AttTransposition()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
@@ -422,6 +423,7 @@ StaffDef::StaffDef()
     RegisterAttClass(ATT_NOTATIONTYPE);
     RegisterAttClass(ATT_SCALABLE);
     RegisterAttClass(ATT_STAFFDEFVIS);
+    RegisterAttClass(ATT_TRANSPOSITION);
 
     Reset();
 }
@@ -439,6 +441,7 @@ void StaffDef::Reset()
     ResetNotationtype();
     ResetScalable();
     ResetStaffDefVis();
+    ResetTransposition();
 }
 
 //----------------------------------------------------------------------------
