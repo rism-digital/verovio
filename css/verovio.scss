@@ -160,6 +160,11 @@ code.panel-header {
     display: none;
 }
 
+// Fixing image within tables
+.img-responsive {
+   width:100%;
+}
+
 // Does not work with Firefox and not very well with Safari
 @media print 
 {

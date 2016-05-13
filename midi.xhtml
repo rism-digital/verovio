@@ -121,6 +121,14 @@ midiplayer: true
             <p>
                 Verovio provides a basic MIDI output feature that can be used from the command-line tool or from the JavaScript toolkit. The MIDI output can be written to a file for further processing or for building application with MIDI playbac. However, since MIDI is not supported in web-browsers in a standard way, an additional player will be required.
             </p>
+            
+            <h4>The MIDI output takes into account:</h4>
+            <ul class="list-style">
+                <li>The sounding accidental values provided by <code>@accid.ges</code> on <code>notes</code> and <code>accid</code>.</li>
+                <li>The sounding octave values provided by <code>@oct.ges</code> on <code>note</code>.</li>
+                <li>Transposing instrument information provided by <code>@trans.semi</code> on <code>staffDef</code>.</li>
+            </ul>
+            
             <p>
                 Verovio uses the <a href="https://github.com/craigsapp/midifile" target="_blank">Midifile library</a> for generating the MIDI output.
             </p>
@@ -162,7 +170,6 @@ var midi = vrvToolkit.renderToMidi();
             <h4>Future work</h4>
             <ul class="list-style">
                 <li>Tempo control options</li>
-                <li>Transposing instrument support</li>
                 <li>Instrument type support</li>
                 <li>Tie support</li>
                 <li>Dynamic support</li>

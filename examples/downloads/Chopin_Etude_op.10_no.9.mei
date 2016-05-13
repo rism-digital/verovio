@@ -2982,7 +2982,7 @@
                             </staff>
                             <slur startid="#d415307e1" endid="#d415340e1"/>
                             <dynam staff="2" place="above" tstamp="2">fz</dynam>
-                            <dynam staff="2" place="above" tstamp="4.5">p</dynam>
+                            <dynam staff="2" place="above" tstamp="6">p</dynam>
                         </measure>
                         <measure n="57" xml:id="d414233e19668">
                             <staff n="1">
