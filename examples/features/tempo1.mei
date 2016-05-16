@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Hairpin example on multiple lines</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef meter.sym="cut">
+                        <staffGrp>
+                            <staffDef n="1" label="Violino" lines="5" clef.line="2" clef.shape="G"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="0" type="upbeat" label="feature-example">
+                            <staff n="1">
+                                <layer n="1">
+                                    <beam>
+                                        <note xml:id="m0_s2_e1" pname="e" oct="5" dur="8" />
+                                        <note xml:id="m0_s2_e2" pname="f" oct="5" dur="8" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <tempo tstamp="1" staff="1">Andante con moto <rend fontname="VerovioText">&#xE1D3;</rend> = 70 </tempo>
+                            <slur startid="#m0_s2_e1" endid="m0_s2_e2"/>
+                        </measure>
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="m1_s2_e1" pname="g" oct="5" dur="4" dots="1" />
+                                    <note xml:id="m1_s2_e2" pname="g" oct="5" dur="8" />
+                                    <note xml:id="m1_s2_e3" pname="g" oct="5" dur="4" />
+                                    <beam>
+                                        <note xml:id="m1_s2_e4" pname="g" oct="5" dur="8" />
+                                        <note xml:id="m1_s2_e5" pname="c" oct="6" dur="8" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur startid="#m1_s2_e4" endid="m1_s2_e5"/>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

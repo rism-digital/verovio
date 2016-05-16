@@ -1,0 +1,3 @@
+<dir staff="1" place="above" tstamp="1">a tempo</dir>
+<dir staff="1" tstamp="1">sotto voce</dir>
+<dir staff="2" tstamp="1">sempre legatissimo</dir>

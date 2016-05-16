@@ -1,0 +1,9 @@
+<measure n="1">
+  <staff n="1">
+    <layer n="1">
+      <note dur="2" pname="c" oct="4"/>
+      <note dur="2" pname="g" oct="4"/>
+    </layer>
+  </staff>
+  <hairpin form="cres" tstamp="1.0" tstamp2="5m+3.0" staff="1"/>
+</measure>

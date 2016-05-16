@@ -1,0 +1,12 @@
+<measure n="0" type="upbeat">
+  <staff n="1">
+    <layer n="1">
+      <beam>
+        <note xml:id="m0_s2_e1" pname="e" oct="5" dur="8"/>
+        <note xml:id="m0_s2_e2" pname="f" oct="5" dur="8"/>
+      </beam>
+    </layer>
+  </staff>
+  <tempo tstamp="1" staff="1">Andante con moto <rend fontname="VerovioText"></rend> = 70 </tempo>
+  <slur startid="#m0_s2_e1" endid="m0_s2_e2"/>
+</measure>

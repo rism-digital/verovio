@@ -1,0 +1,40 @@
+<measure n="0" type="upbeat">
+  <staff n="1">
+    <layer n="1">
+      <beam>
+        <note pname="e" oct="4" dur="8" stem.dir="up">
+          <verse>
+            <syl>Die</syl>
+          </verse>
+        </note>
+        <note pname="f" oct="4" dur="8" stem.dir="up" accid.ges="s">
+          <verse>
+            <syl>zwei</syl>
+          </verse>
+        </note>
+      </beam>
+    </layer>
+  </staff>
+  <staff n="2">
+    <layer n="1">
+      <beam>
+        <chord xml:id="d14e1" dur="8" stem.dir="up">
+          <note xml:id="d1e284" pname="g" oct="3"/>
+          <note xml:id="d1e306" pname="e" oct="4"/>
+        </chord>
+        <chord xml:id="d18e1" dur="8" stem.dir="up">
+          <note xml:id="d1e323" pname="b" oct="3"/>
+          <note xml:id="d1e345" pname="f" oct="4" accid.ges="s"/>
+        </chord>
+      </beam>
+    </layer>
+  </staff>
+  <staff n="3">
+    <layer n="1">
+      <rest xml:id="d1e367" dur="4"/>
+    </layer>
+  </staff>
+  <dynam tstamp="1" place="above" staff="1">pp</dynam>
+  <dynam tstamp="1" place="below" staff="2">pp</dynam>
+  <slur curvedir="below" startid="#d1e284" endid="#d1e323"/>
+</measure>

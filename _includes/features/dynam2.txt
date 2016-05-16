@@ -1,0 +1,24 @@
+<measure n="1">
+  <staff n="1">
+    <layer n="1">
+      <note pname="c" oct="4" dur="4"/>
+      <note pname="c" oct="4" dur="4"/>
+      <note pname="c" oct="4" dur="4"/>
+      <note pname="c" oct="4" dur="4"/>
+    </layer>
+  </staff>
+  <dynam tstamp="1.0" staff="1">pp</dynam>
+  <dynam tstamp="1.5" staff="1">cresc. molto</dynam>
+</measure>
+<measure n="2">
+  <staff n="1">
+    <layer n="1">
+      <note pname="c" oct="4" dur="4"/>
+      <note pname="c" oct="4" dur="4"/>
+      <note pname="c" oct="4" dur="4"/>
+      <note pname="c" oct="4" dur="4"/>
+    </layer>
+  </staff>
+  <dynam tstamp="1.0" staff="1">ff</dynam>
+  <dynam tstamp="1.5" staff="1">dim. molto</dynam>
+</measure>

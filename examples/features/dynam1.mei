@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Dynamic example</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef n="1" clef.line="2" clef.shape="G" lines="5" meter.count="4" meter.unit="4"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1" label="feature-example">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="c" oct="4" dur="4"/>
+                                    <note pname="d" oct="4" dur="4"/>
+                                    <note pname="e" oct="4" dur="4"/>
+                                    <note pname="f" oct="4" dur="4"/>
+                                </layer>
+                            </staff>
+                            <dynam tstamp="1.0" staff="1">p</dynam>
+                            <dynam tstamp="2.0" staff="1">f</dynam>
+                            <dynam tstamp="3.0" staff="1">pf</dynam>
+                            <dynam tstamp="4.0" staff="1">rfz</dynam>
+                        </measure>
+                        <measure n="2" label="feature-example">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="g" oct="4" dur="4"/>
+                                    <note pname="a" oct="4" dur="4"/>
+                                    <note pname="b" oct="4" dur="4"/>
+                                    <note pname="c" oct="5" dur="4"/>
+                                </layer>
+                            </staff>
+                            <dynam tstamp="1.0" staff="1">mf</dynam>
+                            <dynam tstamp="2.0" staff="1">mp</dynam>
+                            <dynam tstamp="3.0" staff="1">sfp</dynam>
+                            <dynam tstamp="4.0" staff="1">sfz</dynam>
+                        </measure>
+                        <measure n="3" label="feature-example">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note pname="g" oct="4" dur="2"/>
+                                    <note pname="c" oct="4" dur="2"/>
+                                </layer>
+                            </staff>
+                            <dynam tstamp="1.0" staff="1">ppppp</dynam>
+                            <dynam tstamp="3.0" staff="1">fffff</dynam>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

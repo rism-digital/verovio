@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Example with hairpin on several staves</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef meter.count="4" meter.unit="4" key.sig="1s" key.mode="major">
+                        <staffGrp symbol="bracket">
+                            <staffDef n="1" xml:id="s1" clef.line="2" clef.shape="G" key.sig="1f" label="Violino I" lines="5"/>
+                            <staffDef n="2" xml:id="s2" clef.line="2" clef.shape="G" key.sig="1f" label="Violino II" lines="5"/>
+                            <staffDef n="3" xml:id="s3" clef.line="3" clef.shape="C" key.sig="1f" label="Viola" lines="5"/>
+                            <staffDef n="4" xml:id="s4" clef.line="4" clef.shape="F" key.sig="1f" label="Violoncello" lines="5"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="5" label="feature-example">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d690095e1338" pname="f" oct="5" dur="4" tie="i"/>
+                                    <beam>
+                                        <note xml:id="d690095e1355" pname="f" oct="5" dur="8" tie="t"/>
+                                        <note xml:id="d690095e1375" pname="g" oct="5" dur="16"/>
+                                        <note xml:id="d690095e1393" pname="f" oct="5" dur="16"/>
+                                    </beam>
+                                    <beam>
+                                        <note xml:id="d690095e1411" pname="e" oct="5" dur="8"/>
+                                        <note xml:id="d690095e1434" pname="f" oct="5" dur="8"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note xml:id="d690095e1454" pname="b" oct="4" dur="2" dots="1" tie="i"/>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d690095e1485" pname="d" oct="4" dur="2" dots="1"/>
+                                </layer>
+                            </staff>
+                            <staff n="4">
+                                <layer n="1">
+                                    <note xml:id="d690095e1513" pname="d" oct="3" dur="2" dots="1"/>
+                                </layer>
+                            </staff>
+                            <dynam tstamp="1" place="below" staff="1 2 3 4">p</dynam>
+                            <hairpin tstamp="1.5" tstamp2="1m+1.5" form="cres" place="below" staff="1 2 3 4"/>
+                            <slur curvedir="above" startid="#d690095e1355" endid="#d690095e1411"/>
+                            <slur curvedir="above" startid="#d690095e1485" endid="#d690095e1620"/>
+                            <slur curvedir="above" startid="#d690095e1513" endid="#d690095e1651"/>
+                        </measure>
+                        <measure n="6" xml:id="d690095e1540">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d690095e1542" pname="g" oct="5" dur="2"/>
+                                    <note xml:id="d690095e1558" pname="b" oct="4" dur="4"/>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note xml:id="d690095e1580" pname="b" oct="4" dur="2" tie="t"/>
+                                    <note xml:id="d690095e1603" pname="g" oct="4" dur="4"/>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d690095e1620" pname="c" oct="4" dur="2" dots="1"/>
+                                </layer>
+                            </staff>
+                            <staff n="4">
+                                <layer n="1">
+                                    <note xml:id="d690095e1651" pname="e" oct="3" dur="2" dots="1"/>
+                                </layer>
+                            </staff>
+                            <hairpin tstamp="2.0" tstamp2="4.0" form="dim" place="below" staff="1 2 3 4"/>
+                            <slur curvedir="above" startid="#d690095e1542" endid="#d690095e1558"/>
+                            <slur curvedir="above" startid="#d690095e1580" endid="#d690095e1603"/>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

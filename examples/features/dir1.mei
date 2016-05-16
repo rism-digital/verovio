@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/2.1.1/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="2013">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Directive example</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp symbol="brace" barthru="true">
+                            <staffDef n="1" clef.shape="G" lines="5" clef.line="2"/>
+                            <staffDef n="2" clef.line="4" clef.shape="F" lines="5"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="9" xml:id="d414233e2588">
+                            <staff n="1">
+                                <layer n="1">
+                                    <rest xml:id="d414233e2590" dur="8"/>
+                                    <beam>
+                                        <note xml:id="d414233e2598" pname="f" oct="4" dur="8" stem.dir="up"/>
+                                        <note xml:id="d414233e2617" pname="g" oct="4" dur="8" stem.dir="up"/>
+                                    </beam>
+                                    <rest xml:id="d414233e2636" dur="8"/>
+                                    <beam>
+                                        <note xml:id="d414233e2644" pname="a" oct="4" dur="8" stem.dir="up" accid.ges="f"/>
+                                        <note xml:id="d414233e2665" pname="b" oct="4" dur="8" stem.dir="up" accid.ges="f"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <beam>
+                                        <note xml:id="d414233e2687" pname="f" oct="2" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e2705" pname="c" oct="3" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e2723" pname="a" oct="3" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e2743" pname="c" oct="3" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e2761" pname="b" accid="f" oct="3" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e2783" pname="c" oct="3" dur="16" stem.dir="down"/>
+                                    </beam>
+                                    <beam>
+                                        <note xml:id="d414233e2801" pname="f" oct="2" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e2819" pname="c" oct="3" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e2837" pname="c" oct="4" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e2855" pname="c" oct="3" dur="16" stem.dir="down"/>
+                                        <note xml:id="d414233e2873" pname="d" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
+                                        <note xml:id="d414233e2894" pname="c" oct="3" dur="16" stem.dir="down"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <slur startid="#d414233e2598" endid="#d414233e2617"/>
+                            <slur startid="#d414233e2644" endid="#d414233e2665"/>
+                            <dir staff="1" place="above" tstamp="1" label="feature-example">a tempo</dir>
+                            <dir staff="1" tstamp="1" label="feature-example">sotto voce</dir>
+                            <dir staff="2" tstamp="1" label="feature-example">sempre legatissimo</dir>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

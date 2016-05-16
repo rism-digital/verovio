@@ -1,0 +1,116 @@
+---
+---
+<h4>Dynamics</h4>
+
+<p>
+    Verovio supports <code>&lt;dynam&gt;</code> elements. Horizontal positioning can be specified using either the <code>@startid</code> or <code>@tstamp</code> attribute. 
+</p>
+<p>
+    When the text of the dynamic has corresponding code in SMUFL, the music font will be used. For example, for  <code>&lt;dynam&gt;p&lt;/dynam&gt;</code>, the SMuFL character U+E520 (dynamicPiano) will be used. Dynamics with corresponding SMuFL code are centered under the horizontal alignment points.
+</p>
+
+<div id="svg_output-1" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code1" file="dynam1.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/dynam1.txt %}
+{% endhighlight %}
+</div>
+
+<!-- ***************************** -->
+<hr/>
+<p>
+    Dynamics for which the text does not correspond to a SMuFL code are rendered in italic. The text is then left-aligned.
+</p>
+
+<div id="svg_output-2" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code2" file="dynam2.mei" %}
+<div id="code2-xml" style="display: none">
+{% highlight xml %}
+{% include features/dynam2.txt %}
+{% endhighlight %}
+</div>
+
+<!-- ***************************** -->
+<h5>Placement and scale</h5>
+<p>
+   By default, dynamics are placed below the staff. They can be placed above using the <code>@place</code> attribute. Dynamics are also scaled according to the <code>@scale</code> given in <code>staffDef</code>.
+</p>
+
+<div id="svg_output-3" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code3" file="dynam3.mei" %}
+<div id="code3-xml" style="display: none">
+{% highlight xml %}
+{% include features/dynam3.txt %}
+{% endhighlight %}
+</div>
+
+
+<!-- ***************************** -->
+<h4>Hairpins</h4>
+<p>
+   Verovio supports  <code>&lt;hairpin&gt;</code> elements. As for dynamics the placement can be specified with the <code>@place</code> attribute. Hairpins overlapping two measures or more and interrupted by a system break or a page break are displayed appropriately.
+</p>
+
+<div id="svg_output-4" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code4" file="hairpin1.mei" %}
+<div id="code4-xml" style="display: none">
+{% highlight xml %}
+{% include features/hairpin1.txt %}
+{% endhighlight %}
+</div>
+
+<h5>Multiple staves</h5>
+<p>
+   Verovio takes into account multiple values in <code>@staff</code> attribute when a hairpin applies to several staves.
+</p>
+
+<div id="svg_output-5" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code5" file="hairpin2.mei" %}
+<div id="code5-xml" style="display: none">
+{% highlight xml %}
+{% include features/hairpin2.txt %}
+{% endhighlight %}
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+    zoom = 40;
+    pageWidth = 1450;
+    
+    
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
+    
+    $.get( "{{ site.baseurl }}/examples/features/dynam1.mei" , function( data ) {
+        load_data( data, $('#svg_output-1') );
+    });
+
+    $.get( "{{ site.baseurl }}/examples/features/dynam2.mei" , function( data ) {
+        load_data( data, $('#svg_output-2') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/dynam3.mei" , function( data ) {
+        load_data( data, $('#svg_output-3') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/hairpin1.mei" , function( data ) {
+        pageWidth = 1000;
+        load_data( data, $('#svg_output-4') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/hairpin2.mei" , function( data ) {
+        spacingStaff = 8;
+        pageWidth = 1450;
+        load_data( data, $('#svg_output-5') );
+    });
+//]]>
+</script>

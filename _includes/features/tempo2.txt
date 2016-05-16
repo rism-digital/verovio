@@ -1,0 +1,3 @@
+<tempo staff="1">
+  <rend fontweight="normal">Modérément animé</rend>
+</tempo>

@@ -1,0 +1,75 @@
+---
+---
+<h4>Tempi</h4>
+
+<p>
+    Verovio supports <code>&lt;tempo&gt;</code> elements. Horizontal positioning can be specified using either the <code>@startid</code> or <code>@tstamp</code> attribute. By default, tempi indications are placed above the staff.
+</p>
+<p>
+    The <code>&lt;rend&gt;</code> element can used within the text for included SMuFL codes, for example for specifying metronome values. The <code>@fontname</code> attribute needs to have the value <code>VerovioText</code>.
+</p>
+
+<div id="svg_output-1" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code1" file="tempo1.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/tempo1.txt %}
+{% endhighlight %}
+</div>
+
+<!-- ***************************** -->
+<h5>Typographical attributes</h5>
+<p>
+    By default, tempi indications are rendered in bold. This can be modified by including a <code>&lt;rend&gt;</code> element in the text. It is also possible to have nested <code>&lt;rend&gt;</code> elements.
+</p>
+
+<div id="svg_output-2" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code2" file="tempo2.mei" %}
+<div id="code2-xml" style="display: none">
+{% highlight xml %}
+{% include features/tempo2.txt %}
+{% endhighlight %}
+</div>
+
+<!-- ***************************** -->
+<h4>Directives</h4>
+<p>
+    Verovio supports <code>&lt;dir&gt;</code> elements. Horizontal positioning can be specified using either the <code>@startid</code> or <code>@tstamp</code> attribute. By default, directive indications are placed below the staff and are rendered in italic.
+</p>
+
+<div id="svg_output-3" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code3" file="dir1.mei" %}
+<div id="code3-xml" style="display: none">
+{% highlight xml %}
+{% include features/dir1.txt %}
+{% endhighlight %}
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+    zoom = 40;
+    pageWidth = 1450;
+    
+    
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
+    
+    $.get( "{{ site.baseurl }}/examples/features/tempo1.mei" , function( data ) {
+        load_data( data, $('#svg_output-1') );
+    });
+
+    $.get( "{{ site.baseurl }}/examples/features/tempo2.mei" , function( data ) {
+        load_data( data, $('#svg_output-2') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/dir1.mei" , function( data ) {
+        load_data( data, $('#svg_output-3') );
+    });
+//]]>
+</script>

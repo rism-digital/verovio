@@ -181,7 +181,7 @@
                                 </staff>
                                 <dynam staff="1" place="below" tstamp="1">p</dynam>
                                 <dir staff="2" place="below" tstamp="1">legatissimo</dir>
-                                <dir staff="1" place="above" tstamp="1">Allegro molto agitato.</dir>
+                                <tempo staff="1" place="above" tstamp="1">Allegro molto agitato</tempo>
                                 <slur staff="1" curvedir="below" tstamp="2" tstamp2="0m+3"/>
                                 <slur staff="1" curvedir="below" tstamp="5" tstamp2="0m+6"/>
                                 <slur staff="2" curvedir="above" tstamp="0.5" tstamp2="0m+3.5"/>
@@ -382,7 +382,7 @@
                             </staff>
                             <dynam staff="1" place="below" tstamp="1">p</dynam>
                             <dir staff="2" place="below" tstamp="1">legatissimo</dir>
-                            <dir staff="1" place="above" tstamp="1">Allegro molto agitato.</dir>
+                            <tempo staff="1" place="above" tstamp="1">Allegro molto agitato</tempo>
                             <slur curvedir="below" startid="#d414233e38" endid="#d414233e62"/>
                             <slur curvedir="below" startid="#d414233e89" endid="#d414233e110"/>
                             <slur curvedir="above" startid="#d414233e148" endid="#d414233e242"/>

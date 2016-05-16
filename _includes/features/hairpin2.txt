@@ -1,0 +1,36 @@
+<measure n="5">
+  <staff n="1">
+    <layer n="1">
+      <note xml:id="d690095e1338" pname="f" oct="5" dur="4" tie="i"/>
+      <beam>
+        <note xml:id="d690095e1355" pname="f" oct="5" dur="8" tie="t"/>
+        <note xml:id="d690095e1375" pname="g" oct="5" dur="16"/>
+        <note xml:id="d690095e1393" pname="f" oct="5" dur="16"/>
+      </beam>
+      <beam>
+        <note xml:id="d690095e1411" pname="e" oct="5" dur="8"/>
+        <note xml:id="d690095e1434" pname="f" oct="5" dur="8"/>
+      </beam>
+    </layer>
+  </staff>
+  <staff n="2">
+    <layer n="1">
+      <note xml:id="d690095e1454" pname="b" oct="4" dur="2" dots="1" tie="i"/>
+    </layer>
+  </staff>
+  <staff n="3">
+    <layer n="1">
+      <note xml:id="d690095e1485" pname="d" oct="4" dur="2" dots="1"/>
+    </layer>
+  </staff>
+  <staff n="4">
+    <layer n="1">
+      <note xml:id="d690095e1513" pname="d" oct="3" dur="2" dots="1"/>
+    </layer>
+  </staff>
+  <dynam tstamp="1" place="below" staff="1 2 3 4">p</dynam>
+  <hairpin tstamp="1.5" tstamp2="1m+1.5" form="cres" place="below" staff="1 2 3 4"/>
+  <slur curvedir="above" startid="#d690095e1355" endid="#d690095e1411"/>
+  <slur curvedir="above" startid="#d690095e1485" endid="#d690095e1620"/>
+  <slur curvedir="above" startid="#d690095e1513" endid="#d690095e1651"/>
+</measure>
