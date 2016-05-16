@@ -558,6 +558,9 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
         if (m_fontStack.top()->GetWeight() == FONTWEIGHT_bold) {
             textChild.append_attribute("font-weight") = "bold";
         }
+        else if (m_fontStack.top()->GetWeight() == FONTWEIGHT_normal) {
+            textChild.append_attribute("font-weight") = "normal";
+        }
     }
     textChild.append_attribute("class") = "text";
     textChild.append_attribute("xml:space") = "preserve";
