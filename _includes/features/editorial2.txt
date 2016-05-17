@@ -1,0 +1,1 @@
+<tempo staff="1" tstamp="1.0">Allegro <add>molto <unclear>vivace</unclear></add></tempo>
