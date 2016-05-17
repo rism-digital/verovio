@@ -14,7 +14,7 @@
         <body>
             <mdiv>
                 <score>
-                    <scoreDef meter.count="4" meter.unit="4" key.sig="1s" key.mode="major">
+                    <scoreDef meter.count="3" meter.unit="4" key.sig="1s" key.mode="major">
                         <staffGrp symbol="bracket">
                             <staffDef n="1" xml:id="s1" clef.line="2" clef.shape="G" key.sig="1f" label="Violino I" lines="5"/>
                             <staffDef n="2" xml:id="s2" clef.line="2" clef.shape="G" key.sig="1f" label="Violino II" lines="5"/>
