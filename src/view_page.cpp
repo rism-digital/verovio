@@ -670,10 +670,8 @@ void View::DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, 
     assert(barLine);
 
     int x = barLine->GetDrawingX();
-    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
-        - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
-    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
-        + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(100, false) - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(100, false) + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
 
     int y_bottom = staff->GetDrawingY() - staffDef->GetLines() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y_top = y_bottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
