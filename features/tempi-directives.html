@@ -6,7 +6,7 @@
     Verovio supports <code>&lt;tempo&gt;</code> elements. Horizontal positioning can be specified using either the <code>@startid</code> or <code>@tstamp</code> attribute. By default, tempi indications are placed above the staff.
 </p>
 <p>
-    The <code>&lt;rend&gt;</code> element can used within the text for included SMuFL codes, for example for specifying metronome values. The <code>@fontname</code> attribute needs to have the value <code>VerovioText</code>.
+    The <code>&lt;rend&gt;</code> element can used within the text in order to include SMuFL codes, for example for specifying metronome values. The <code>@fontname</code> attribute needs to have the value <code>VerovioText</code>. (Only note SMuFL codes are included in the VerovioText font for now.)
 </p>
 
 <div id="svg_output-1" style="overflow:auto;"/>
@@ -19,7 +19,7 @@
 </div>
 
 <!-- ***************************** -->
-<h5>Typographical attributes</h5>
+<h5>Typographic formatting</h5>
 <p>
     By default, tempi indications are rendered in bold. This can be modified by including a <code>&lt;rend&gt;</code> element in the text. It is also possible to have nested <code>&lt;rend&gt;</code> elements.
 </p>
@@ -47,6 +47,11 @@
 {% include features/dir1.txt %}
 {% endhighlight %}
 </div>
+
+<hr/>
+<p>
+    As for tempi (see above), typographic formatting within <code>&lt;dir&gt;</code> elements is supported. As for <a href="?id=dynams-hairpins">hairpin</a>, a single directive element can be applied to multiple staves. <a href="?id=editorial">Editorial markup</a> is also supported within directives.
+</p>
 
 <script type="text/javascript">
 //<![CDATA[
