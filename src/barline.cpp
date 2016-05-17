@@ -5,51 +5,48 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "barline.h"
 
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Barline
+// BarLine
 //----------------------------------------------------------------------------
 
-Barline::Barline():
-	LayerElement("bline-"),
-    AttBarLineLog()
+BarLine::BarLine() : LayerElement("bline-"), AttBarLineLog()
 {
     RegisterAttClass(ATT_BARLINELOG);
+
     Reset();
 }
 
-Barline::~Barline()
+BarLine::~BarLine()
 {
 }
-    
-void Barline::Reset()
+
+void BarLine::Reset()
 {
     LayerElement::Reset();
     ResetBarLineLog();
 }
 
-bool Barline::HasRepetitionDots()
+bool BarLine::HasRepetitionDots() const
 {
-    if (GetRend() == BARRENDITION_rptstart || GetRend() == BARRENDITION_rptend || GetRend() == BARRENDITION_rptboth) {
+    if (GetForm() == BARRENDITION_rptstart || GetForm() == BARRENDITION_rptend || GetForm() == BARRENDITION_rptboth) {
         return true;
     }
     return false;
 }
-    
+
 //----------------------------------------------------------------------------
-// BarlineAttr
+// BarLineAttr
 //----------------------------------------------------------------------------
 
-BarlineAttr::BarlineAttr():
-    Barline()
+BarLineAttr::BarLineAttr() : BarLine()
 {
 }
 
-BarlineAttr::~BarlineAttr()
+BarLineAttr::~BarLineAttr()
 {
 }
 

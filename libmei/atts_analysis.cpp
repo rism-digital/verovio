@@ -3,12 +3,12 @@
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 //
-// Code generated using a modified version of libmei 
+// Code generated using a modified version of libmei
 // by Andrew Hankinson, Alastair Porter, and Others
 /////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////// 
-// NOTE: this file was generated with the Verovio libmei version and 
+/////////////////////////////////////////////////////////////////////////////
+// NOTE: this file was generated with the Verovio libmei version and
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -25,20 +25,22 @@
 /* #include_block */
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // AttCommonAnl
 //----------------------------------------------------------------------------
 
-AttCommonAnl::AttCommonAnl(): Att() {
+AttCommonAnl::AttCommonAnl() : Att()
+{
     ResetCommonAnl();
 }
 
-AttCommonAnl::~AttCommonAnl() {
-
+AttCommonAnl::~AttCommonAnl()
+{
 }
 
-void AttCommonAnl::ResetCommonAnl() {
+void AttCommonAnl::ResetCommonAnl()
+{
     m_copyof = "";
     m_corresp = "";
     m_next = "";
@@ -47,7 +49,8 @@ void AttCommonAnl::ResetCommonAnl() {
     m_synch = "";
 }
 
-bool AttCommonAnl::ReadCommonAnl(  pugi::xml_node element ) {
+bool AttCommonAnl::ReadCommonAnl(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("copyof")) {
         this->SetCopyof(StrToStr(element.attribute("copyof").value()));
@@ -82,7 +85,8 @@ bool AttCommonAnl::ReadCommonAnl(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttCommonAnl::WriteCommonAnl(  pugi::xml_node element ) {
+bool AttCommonAnl::WriteCommonAnl(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasCopyof()) {
         element.append_attribute("copyof") = StrToStr(this->GetCopyof()).c_str();
@@ -111,36 +115,35 @@ bool AttCommonAnl::WriteCommonAnl(  pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttCommonAnl::HasCopyof( )
+bool AttCommonAnl::HasCopyof() const
 {
     return (m_copyof != "");
 }
 
-bool AttCommonAnl::HasCorresp( )
+bool AttCommonAnl::HasCorresp() const
 {
     return (m_corresp != "");
 }
 
-bool AttCommonAnl::HasNext( )
+bool AttCommonAnl::HasNext() const
 {
     return (m_next != "");
 }
 
-bool AttCommonAnl::HasPrev( )
+bool AttCommonAnl::HasPrev() const
 {
     return (m_prev != "");
 }
 
-bool AttCommonAnl::HasSameas( )
+bool AttCommonAnl::HasSameas() const
 {
     return (m_sameas != "");
 }
 
-bool AttCommonAnl::HasSynch( )
+bool AttCommonAnl::HasSynch() const
 {
     return (m_synch != "");
 }
-
 
 /* include <attsynch> */
 
@@ -148,42 +151,45 @@ bool AttCommonAnl::HasSynch( )
 // AttHarmonicfunction
 //----------------------------------------------------------------------------
 
-AttHarmonicfunction::AttHarmonicfunction(): Att() {
+AttHarmonicfunction::AttHarmonicfunction() : Att()
+{
     ResetHarmonicfunction();
 }
 
-AttHarmonicfunction::~AttHarmonicfunction() {
-
+AttHarmonicfunction::~AttHarmonicfunction()
+{
 }
 
-void AttHarmonicfunction::ResetHarmonicfunction() {
-    m_deg = "";
+void AttHarmonicfunction::ResetHarmonicfunction()
+{
+    m_deg = SCALEDEGREE_NONE;
 }
 
-bool AttHarmonicfunction::ReadHarmonicfunction(  pugi::xml_node element ) {
+bool AttHarmonicfunction::ReadHarmonicfunction(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("deg")) {
-        this->SetDeg(StrToStr(element.attribute("deg").value()));
+        this->SetDeg(StrToScaledegree(element.attribute("deg").value()));
         element.remove_attribute("deg");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttHarmonicfunction::WriteHarmonicfunction(  pugi::xml_node element ) {
+bool AttHarmonicfunction::WriteHarmonicfunction(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDeg()) {
-        element.append_attribute("deg") = StrToStr(this->GetDeg()).c_str();
+        element.append_attribute("deg") = ScaledegreeToStr(this->GetDeg()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttHarmonicfunction::HasDeg( )
+bool AttHarmonicfunction::HasDeg() const
 {
-    return (m_deg != "");
+    return (m_deg != SCALEDEGREE_NONE);
 }
-
 
 /* include <attdeg> */
 
@@ -191,19 +197,22 @@ bool AttHarmonicfunction::HasDeg( )
 // AttIntervalharmonic
 //----------------------------------------------------------------------------
 
-AttIntervalharmonic::AttIntervalharmonic(): Att() {
+AttIntervalharmonic::AttIntervalharmonic() : Att()
+{
     ResetIntervalharmonic();
 }
 
-AttIntervalharmonic::~AttIntervalharmonic() {
-
+AttIntervalharmonic::~AttIntervalharmonic()
+{
 }
 
-void AttIntervalharmonic::ResetIntervalharmonic() {
+void AttIntervalharmonic::ResetIntervalharmonic()
+{
     m_inth = "";
 }
 
-bool AttIntervalharmonic::ReadIntervalharmonic(  pugi::xml_node element ) {
+bool AttIntervalharmonic::ReadIntervalharmonic(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("inth")) {
         this->SetInth(StrToStr(element.attribute("inth").value()));
@@ -213,7 +222,8 @@ bool AttIntervalharmonic::ReadIntervalharmonic(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttIntervalharmonic::WriteIntervalharmonic(  pugi::xml_node element ) {
+bool AttIntervalharmonic::WriteIntervalharmonic(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasInth()) {
         element.append_attribute("inth") = StrToStr(this->GetInth()).c_str();
@@ -222,11 +232,10 @@ bool AttIntervalharmonic::WriteIntervalharmonic(  pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttIntervalharmonic::HasInth( )
+bool AttIntervalharmonic::HasInth() const
 {
     return (m_inth != "");
 }
-
 
 /* include <attinth> */
 
@@ -234,42 +243,45 @@ bool AttIntervalharmonic::HasInth( )
 // AttIntervallicdesc
 //----------------------------------------------------------------------------
 
-AttIntervallicdesc::AttIntervallicdesc(): Att() {
+AttIntervallicdesc::AttIntervallicdesc() : Att()
+{
     ResetIntervallicdesc();
 }
 
-AttIntervallicdesc::~AttIntervallicdesc() {
-
+AttIntervallicdesc::~AttIntervallicdesc()
+{
 }
 
-void AttIntervallicdesc::ResetIntervallicdesc() {
-    m_intm = "";
+void AttIntervallicdesc::ResetIntervallicdesc()
+{
+    m_intm = INTERVAL_AMOUNT_NONE;
 }
 
-bool AttIntervallicdesc::ReadIntervallicdesc(  pugi::xml_node element ) {
+bool AttIntervallicdesc::ReadIntervallicdesc(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("intm")) {
-        this->SetIntm(StrToStr(element.attribute("intm").value()));
+        this->SetIntm(StrToIntervalAmount(element.attribute("intm").value()));
         element.remove_attribute("intm");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttIntervallicdesc::WriteIntervallicdesc(  pugi::xml_node element ) {
+bool AttIntervallicdesc::WriteIntervallicdesc(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasIntm()) {
-        element.append_attribute("intm") = StrToStr(this->GetIntm()).c_str();
+        element.append_attribute("intm") = IntervalAmountToStr(this->GetIntm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttIntervallicdesc::HasIntm( )
+bool AttIntervallicdesc::HasIntm() const
 {
-    return (m_intm != "");
+    return (m_intm != INTERVAL_AMOUNT_NONE);
 }
-
 
 /* include <attintm> */
 
@@ -277,42 +289,45 @@ bool AttIntervallicdesc::HasIntm( )
 // AttMelodicfunction
 //----------------------------------------------------------------------------
 
-AttMelodicfunction::AttMelodicfunction(): Att() {
+AttMelodicfunction::AttMelodicfunction() : Att()
+{
     ResetMelodicfunction();
 }
 
-AttMelodicfunction::~AttMelodicfunction() {
-
+AttMelodicfunction::~AttMelodicfunction()
+{
 }
 
-void AttMelodicfunction::ResetMelodicfunction() {
-    m_mfunc = "";
+void AttMelodicfunction::ResetMelodicfunction()
+{
+    m_mfunc = MELODICFUNCTION_NONE;
 }
 
-bool AttMelodicfunction::ReadMelodicfunction(  pugi::xml_node element ) {
+bool AttMelodicfunction::ReadMelodicfunction(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("mfunc")) {
-        this->SetMfunc(StrToStr(element.attribute("mfunc").value()));
+        this->SetMfunc(StrToMelodicfunction(element.attribute("mfunc").value()));
         element.remove_attribute("mfunc");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttMelodicfunction::WriteMelodicfunction(  pugi::xml_node element ) {
+bool AttMelodicfunction::WriteMelodicfunction(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasMfunc()) {
-        element.append_attribute("mfunc") = StrToStr(this->GetMfunc()).c_str();
+        element.append_attribute("mfunc") = MelodicfunctionToStr(this->GetMfunc()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttMelodicfunction::HasMfunc( )
+bool AttMelodicfunction::HasMfunc() const
 {
-    return (m_mfunc != "");
+    return (m_mfunc != MELODICFUNCTION_NONE);
 }
-
 
 /* include <attmfunc> */
 
@@ -320,42 +335,45 @@ bool AttMelodicfunction::HasMfunc( )
 // AttPitchclass
 //----------------------------------------------------------------------------
 
-AttPitchclass::AttPitchclass(): Att() {
+AttPitchclass::AttPitchclass() : Att()
+{
     ResetPitchclass();
 }
 
-AttPitchclass::~AttPitchclass() {
-
+AttPitchclass::~AttPitchclass()
+{
 }
 
-void AttPitchclass::ResetPitchclass() {
-    m_pclass = "";
+void AttPitchclass::ResetPitchclass()
+{
+    m_pclass = PITCHCLASS_NONE;
 }
 
-bool AttPitchclass::ReadPitchclass(  pugi::xml_node element ) {
+bool AttPitchclass::ReadPitchclass(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("pclass")) {
-        this->SetPclass(StrToStr(element.attribute("pclass").value()));
+        this->SetPclass(StrToPitchclass(element.attribute("pclass").value()));
         element.remove_attribute("pclass");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttPitchclass::WritePitchclass(  pugi::xml_node element ) {
+bool AttPitchclass::WritePitchclass(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasPclass()) {
-        element.append_attribute("pclass") = StrToStr(this->GetPclass()).c_str();
+        element.append_attribute("pclass") = PitchclassToStr(this->GetPclass()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttPitchclass::HasPclass( )
+bool AttPitchclass::HasPclass() const
 {
-    return (m_pclass != "");
+    return (m_pclass != PITCHCLASS_NONE);
 }
-
 
 /* include <attpclass> */
 
@@ -363,19 +381,22 @@ bool AttPitchclass::HasPclass( )
 // AttSolfa
 //----------------------------------------------------------------------------
 
-AttSolfa::AttSolfa(): Att() {
+AttSolfa::AttSolfa() : Att()
+{
     ResetSolfa();
 }
 
-AttSolfa::~AttSolfa() {
-
+AttSolfa::~AttSolfa()
+{
 }
 
-void AttSolfa::ResetSolfa() {
+void AttSolfa::ResetSolfa()
+{
     m_psolfa = "";
 }
 
-bool AttSolfa::ReadSolfa(  pugi::xml_node element ) {
+bool AttSolfa::ReadSolfa(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("psolfa")) {
         this->SetPsolfa(StrToStr(element.attribute("psolfa").value()));
@@ -385,7 +406,8 @@ bool AttSolfa::ReadSolfa(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttSolfa::WriteSolfa(  pugi::xml_node element ) {
+bool AttSolfa::WriteSolfa(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasPsolfa()) {
         element.append_attribute("psolfa") = StrToStr(this->GetPsolfa()).c_str();
@@ -394,18 +416,18 @@ bool AttSolfa::WriteSolfa(  pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttSolfa::HasPsolfa( )
+bool AttSolfa::HasPsolfa() const
 {
     return (m_psolfa != "");
 }
 
-
 /* include <attpsolfa> */
 
-bool Att::SetAnalysis( Object *element, std::string attrType, std::string attrValue ) {
-    if (element->HasAttClass( ATT_COMMONANL ) ) {
-        AttCommonAnl *att = dynamic_cast<AttCommonAnl*>(element);
-        assert( att );
+bool Att::SetAnalysis(Object *element, std::string attrType, std::string attrValue)
+{
+    if (element->HasAttClass(ATT_COMMONANL)) {
+        AttCommonAnl *att = dynamic_cast<AttCommonAnl *>(element);
+        assert(att);
         if (attrType == "copyof") {
             att->SetCopyof(att->StrToStr(attrValue));
             return true;
@@ -431,49 +453,49 @@ bool Att::SetAnalysis( Object *element, std::string attrType, std::string attrVa
             return true;
         }
     }
-    if (element->HasAttClass( ATT_HARMONICFUNCTION ) ) {
-        AttHarmonicfunction *att = dynamic_cast<AttHarmonicfunction*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_HARMONICFUNCTION)) {
+        AttHarmonicfunction *att = dynamic_cast<AttHarmonicfunction *>(element);
+        assert(att);
         if (attrType == "deg") {
-            att->SetDeg(att->StrToStr(attrValue));
+            att->SetDeg(att->StrToScaledegree(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass( ATT_INTERVALHARMONIC ) ) {
-        AttIntervalharmonic *att = dynamic_cast<AttIntervalharmonic*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_INTERVALHARMONIC)) {
+        AttIntervalharmonic *att = dynamic_cast<AttIntervalharmonic *>(element);
+        assert(att);
         if (attrType == "inth") {
             att->SetInth(att->StrToStr(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass( ATT_INTERVALLICDESC ) ) {
-        AttIntervallicdesc *att = dynamic_cast<AttIntervallicdesc*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_INTERVALLICDESC)) {
+        AttIntervallicdesc *att = dynamic_cast<AttIntervallicdesc *>(element);
+        assert(att);
         if (attrType == "intm") {
-            att->SetIntm(att->StrToStr(attrValue));
+            att->SetIntm(att->StrToIntervalAmount(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass( ATT_MELODICFUNCTION ) ) {
-        AttMelodicfunction *att = dynamic_cast<AttMelodicfunction*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_MELODICFUNCTION)) {
+        AttMelodicfunction *att = dynamic_cast<AttMelodicfunction *>(element);
+        assert(att);
         if (attrType == "mfunc") {
-            att->SetMfunc(att->StrToStr(attrValue));
+            att->SetMfunc(att->StrToMelodicfunction(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass( ATT_PITCHCLASS ) ) {
-        AttPitchclass *att = dynamic_cast<AttPitchclass*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_PITCHCLASS)) {
+        AttPitchclass *att = dynamic_cast<AttPitchclass *>(element);
+        assert(att);
         if (attrType == "pclass") {
-            att->SetPclass(att->StrToStr(attrValue));
+            att->SetPclass(att->StrToPitchclass(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass( ATT_SOLFA ) ) {
-        AttSolfa *att = dynamic_cast<AttSolfa*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_SOLFA)) {
+        AttSolfa *att = dynamic_cast<AttSolfa *>(element);
+        assert(att);
         if (attrType == "psolfa") {
             att->SetPsolfa(att->StrToStr(attrValue));
             return true;
@@ -483,10 +505,11 @@ bool Att::SetAnalysis( Object *element, std::string attrType, std::string attrVa
     return false;
 }
 
-void Att::GetAnalysis( Object *element, ArrayOfStrAttr *attributes ) {
-    if (element->HasAttClass( ATT_COMMONANL ) ) {
-        AttCommonAnl *att = dynamic_cast<AttCommonAnl*>(element);
-        assert( att );
+void Att::GetAnalysis(const Object *element, ArrayOfStrAttr *attributes)
+{
+    if (element->HasAttClass(ATT_COMMONANL)) {
+        const AttCommonAnl *att = dynamic_cast<const AttCommonAnl *>(element);
+        assert(att);
         if (att->HasCopyof()) {
             attributes->push_back(std::make_pair("copyof", att->StrToStr(att->GetCopyof())));
         }
@@ -506,50 +529,48 @@ void Att::GetAnalysis( Object *element, ArrayOfStrAttr *attributes ) {
             attributes->push_back(std::make_pair("synch", att->StrToStr(att->GetSynch())));
         }
     }
-    if (element->HasAttClass( ATT_HARMONICFUNCTION ) ) {
-        AttHarmonicfunction *att = dynamic_cast<AttHarmonicfunction*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_HARMONICFUNCTION)) {
+        const AttHarmonicfunction *att = dynamic_cast<const AttHarmonicfunction *>(element);
+        assert(att);
         if (att->HasDeg()) {
-            attributes->push_back(std::make_pair("deg", att->StrToStr(att->GetDeg())));
+            attributes->push_back(std::make_pair("deg", att->ScaledegreeToStr(att->GetDeg())));
         }
     }
-    if (element->HasAttClass( ATT_INTERVALHARMONIC ) ) {
-        AttIntervalharmonic *att = dynamic_cast<AttIntervalharmonic*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_INTERVALHARMONIC)) {
+        const AttIntervalharmonic *att = dynamic_cast<const AttIntervalharmonic *>(element);
+        assert(att);
         if (att->HasInth()) {
             attributes->push_back(std::make_pair("inth", att->StrToStr(att->GetInth())));
         }
     }
-    if (element->HasAttClass( ATT_INTERVALLICDESC ) ) {
-        AttIntervallicdesc *att = dynamic_cast<AttIntervallicdesc*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_INTERVALLICDESC)) {
+        const AttIntervallicdesc *att = dynamic_cast<const AttIntervallicdesc *>(element);
+        assert(att);
         if (att->HasIntm()) {
-            attributes->push_back(std::make_pair("intm", att->StrToStr(att->GetIntm())));
+            attributes->push_back(std::make_pair("intm", att->IntervalAmountToStr(att->GetIntm())));
         }
     }
-    if (element->HasAttClass( ATT_MELODICFUNCTION ) ) {
-        AttMelodicfunction *att = dynamic_cast<AttMelodicfunction*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_MELODICFUNCTION)) {
+        const AttMelodicfunction *att = dynamic_cast<const AttMelodicfunction *>(element);
+        assert(att);
         if (att->HasMfunc()) {
-            attributes->push_back(std::make_pair("mfunc", att->StrToStr(att->GetMfunc())));
+            attributes->push_back(std::make_pair("mfunc", att->MelodicfunctionToStr(att->GetMfunc())));
         }
     }
-    if (element->HasAttClass( ATT_PITCHCLASS ) ) {
-        AttPitchclass *att = dynamic_cast<AttPitchclass*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_PITCHCLASS)) {
+        const AttPitchclass *att = dynamic_cast<const AttPitchclass *>(element);
+        assert(att);
         if (att->HasPclass()) {
-            attributes->push_back(std::make_pair("pclass", att->StrToStr(att->GetPclass())));
+            attributes->push_back(std::make_pair("pclass", att->PitchclassToStr(att->GetPclass())));
         }
     }
-    if (element->HasAttClass( ATT_SOLFA ) ) {
-        AttSolfa *att = dynamic_cast<AttSolfa*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_SOLFA)) {
+        const AttSolfa *att = dynamic_cast<const AttSolfa *>(element);
+        assert(att);
         if (att->HasPsolfa()) {
             attributes->push_back(std::make_pair("psolfa", att->StrToStr(att->GetPsolfa())));
         }
     }
-
 }
-    
+
 } // vrv namespace
-    

@@ -1,7 +1,4 @@
-<symbol id="E4A9"
-        viewBox="0 0 2048 2048"
-        overflow="inherit"
-        horiz-adv-x="182">
+<symbol id="E4A9" viewBox="0 0 2048 2048" overflow="inherit">
    <g transform="scale(1,-1)">
       <path d="M94 -586q-62 0 -82 -8h-6q-4 0 -4 6q28 64 50 246t26 336q0 6 14 6t14 -6q4 -152 27 -334t49 -248q0 -6 -4 -6h-6q-16 8 -78 8z"/>
    </g>

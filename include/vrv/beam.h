@@ -4,103 +4,100 @@
 // Created:     26/06/2012
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
-//
 
 #ifndef __VRV_BEAM_H__
 #define __VRV_BEAM_H__
 
-#include "layerelement.h"
 #include "drawinginterface.h"
+#include "layerelement.h"
 
 namespace vrv {
-    
-// maximum number of partials allow
+
+// the maximum allowed number of partials
 #define MAX_DURATION_PARTIALS 16
-    
-enum  {
-    PARTIAL_NONE = 0,
-    PARTIAL_THROUGH,
-    PARTIAL_RIGHT,
-    PARTIAL_LEFT
-};
+
+enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
 
 //----------------------------------------------------------------------------
 // Beam
 //----------------------------------------------------------------------------
 
-class Beam: public LayerElement, public ObjectListInterface, public DrawingListInterface
-{
+class Beam : public LayerElement, public ObjectListInterface, public DrawingListInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
+     * Reset method resets all attribute classes.
      */
     ///@{
     Beam();
     virtual ~Beam();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Beam"; };
-    virtual ClassId Is() { return BEAM; };
+    virtual std::string GetClassName() const { return "Beam"; };
+    virtual ClassId Is() const { return BEAM; };
     ///@}
-    
-    int GetNoteCount() const { return (int)m_children.size(); };
-    
+
+    int GetNoteCount() const { return this->GetChildCount(NOTE); };
+
     /**
      * Add an element (a note or a rest) to a beam.
      * Only Note or Rest elements will be actually added to the beam.
      */
     void AddLayerElement(LayerElement *element);
-    
+
     /**
-     * Return information about the position in the beam
+     * Return information about the position in the beam.
+     * (no const since the cached list is updated)
      */
     ///@{
     bool IsFirstInBeam(LayerElement *element);
     bool IsLastInBeam(LayerElement *element);
     ///@}
-    
+
     /**
      *
      */
-    const ArrayOfBeamElementCoords *GetElementCoords() { return &m_beamElementCoords; };
-    
+    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; };
+
 protected:
     /**
      * Filter the list for a specific class.
      * For example, keep only notes in Beam
      * This also initializes the m_beamElementCoords vector
      */
-    virtual void FilterList( ListOfObjects *childList );
+    virtual void FilterList(ListOfObjects *childList);
     /**
      * Initializes the m_beamElementCoords vector objects.
      * This is called by Beam::FilterList
      */
-    void InitCoords( ListOfObjects *childList );
+    void InitCoords(ListOfObjects *childList);
     
+    /**
+     * Return the position of the element in the beam.
+     * For notes, lookup the position of the parent chord.
+     */
+    int GetPosition(LayerElement *element);
+
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
     void ClearCoords();
-    
-    
-private:
 
+private:
+    //
 public:
-    
+    //
 private:
     /**
-     * An array of the coordinates for each element
+     * An array of coordinates for each element
      **/
-    ArrayOfBeamElementCoords m_beamElementCoords;
-    
+    mutable ArrayOfBeamElementCoords m_beamElementCoords;
 };
-    
+
 //----------------------------------------------------------------------------
 // BeamElementCoord
 //----------------------------------------------------------------------------
 
-class BeamElementCoord
-{
+class BeamElementCoord {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -108,7 +105,7 @@ public:
     ///@{
     BeamElementCoord() { m_element = NULL; };
     virtual ~BeamElementCoord();
-    
+
     int m_x;
     int m_y; // represents the point farthest from the beam
     int m_yTop; // y value of topmost note
@@ -120,7 +117,6 @@ public:
     LayerElement *m_element;
 };
 
-    
 //----------------------------------------------------------------------------
 // BeamParams
 //----------------------------------------------------------------------------
@@ -129,17 +125,16 @@ public:
  * Class for storing drawing parameters when calculating beams.
  * See View::DrawBeam and View::CalcBeam
  */
-    
-class BeamParams
-{
+
+class BeamParams {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    BeamParams() {};
-    virtual ~BeamParams() {};
-    
+    BeamParams(){};
+    virtual ~BeamParams(){};
+
     // values to be set before calling CalcBeam
     bool m_changingDur;
     bool m_beamHasChord;
@@ -147,14 +142,14 @@ public:
     bool m_cueSize;
     int m_shortestDur;
     data_STEMDIRECTION m_stemDir;
-    
+
     // values set by CalcBeam
     int m_beamWidth;
     int m_beamWidthBlack;
     int m_beamWidthWhite;
     double m_startingY; // the initial position of the beam
     double m_beamSlope; // the slope of the beam
-    double m_verticalBoost; //extra height to ensure the beam clears all the noteheads
+    double m_verticalBoost; // extra height to ensure the beam clears all the noteheads
 };
 
 } // namespace vrv

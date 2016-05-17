@@ -34,14 +34,17 @@ function serialize() {
     var i;
     for (i = 0; i < items.length; i++) {
         item = items[i];
-        impl += "   <glyph glyph-code=\"" + item.getAttribute("id").toUpperCase() + "\" "; 
+        impl += "   <g c=\"" + item.getAttribute("id").toUpperCase() + "\" "; 
         r = item.getBBox();
         
         // add the bb value to the implementation
         impl += "x=\"" + r.x.toFixed(1) + "\" ";
         impl += "y=\"" + r.y.toFixed(1) + "\" ";
-        impl += "width=\"" + r.width.toFixed(1) + "\" ";
-        impl += "height=\"" + r.height.toFixed(1) + "\" ";
+        impl += "w=\"" + r.width.toFixed(1) + "\" ";
+        impl += "h=\"" + r.height.toFixed(1) + "\" ";
+        if (item.getAttribute("horiz-adv-x")) {
+            impl += "h-a-x=\"" + item.getAttribute("horiz-adv-x") + "\" ";
+        }
         
         impl += "/>\n";
     }

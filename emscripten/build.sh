@@ -8,9 +8,12 @@ function print_help {
 -c		Turns on \"Chatty\" compiling; Will print the compiler progress" >&2 ; 
 } 
 
-VEROVIO_ROOT=../
+VEROVIO_ROOT=..
 VEROVIO_INCLUDE=../include
 VEROVIO_INCLUDE_VRV=../include/vrv
+VEROVIO_INCLUDE_MIDI=../include/midi
+VEROVIO_INCLUDE_PUGI=../include/pugi
+VEROVIO_INCLUDE_UTF8=../include/utf8
 VEROVIO_LIBMEI=../libmei
 if command -v emcc >/dev/null 2>&1 ; then
 	EMCC=`command -v emcc`
@@ -28,7 +31,7 @@ if [ ! -d data ]; then mkdir data; fi
 # Empirically, the memory amount required is approx. 5 times the file size (as an indication).
 # We can disable this for a light version that uses the default memory settings 	
 ASM="\
-	-O3 --memory-init-file 0 \
+	-O3 --memory-init-file 0 -std=c++11 \
 	-s ASM_JS=1 \
 	-s OUTLINING_LIMIT=10000 \
 	-s TOTAL_MEMORY=128*1024*1024 \
@@ -50,7 +53,7 @@ while getopts "lwv:h:c" opt; do
 		l)
 			echo "light version (-l)"
 			ASM="\
-				-O3 --memory-init-file 0 \
+				-O3 --memory-init-file 0 -std=c++11 \
 				-s ASM_JS=1 "
 			ASM_NAME="-light"
 			;;
@@ -90,12 +93,16 @@ python $EMCC $CHATTY \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
 	-I$VEROVIO_INCLUDE_VRV \
+	-I$VEROVIO_INCLUDE_MIDI \
+	-I$VEROVIO_INCLUDE_PUGI \
+	-I$VEROVIO_INCLUDE_UTF8 \
 	-I$VEROVIO_LIBMEI \
 	-DUSE_EMSCRIPTEN \
 	$ASM \
 	./emscripten_main.cpp \
 	$VEROVIO_ROOT/src/accid.cpp \
 	$VEROVIO_ROOT/src/aligner.cpp \
+	$VEROVIO_ROOT/src/anchoredtext.cpp \
 	$VEROVIO_ROOT/src/att.cpp \
 	$VEROVIO_ROOT/src/barline.cpp \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
@@ -104,13 +111,16 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/clef.cpp \
 	$VEROVIO_ROOT/src/custos.cpp \
 	$VEROVIO_ROOT/src/devicecontext.cpp \
+	$VEROVIO_ROOT/src/dir.cpp \
 	$VEROVIO_ROOT/src/doc.cpp \
 	$VEROVIO_ROOT/src/dot.cpp \
 	$VEROVIO_ROOT/src/drawinginterface.cpp \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
+	$VEROVIO_ROOT/src/dynam.cpp \
 	$VEROVIO_ROOT/src/editorial.cpp \
 	$VEROVIO_ROOT/src/floatingelement.cpp \
 	$VEROVIO_ROOT/src/glyph.cpp \
+	$VEROVIO_ROOT/src/hairpin.cpp \
 	$VEROVIO_ROOT/src/io.cpp \
 	$VEROVIO_ROOT/src/iodarms.cpp \
 	$VEROVIO_ROOT/src/iomei.cpp \
@@ -141,11 +151,13 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/svgdevicecontext.cpp \
 	$VEROVIO_ROOT/src/syl.cpp \
 	$VEROVIO_ROOT/src/system.cpp \
-	$VEROVIO_ROOT/src/textdirective.cpp \
+	$VEROVIO_ROOT/src/tempo.cpp \
+	$VEROVIO_ROOT/src/text.cpp \
 	$VEROVIO_ROOT/src/textdirinterface.cpp \
+	$VEROVIO_ROOT/src/textelement.cpp \
 	$VEROVIO_ROOT/src/tie.cpp \
 	$VEROVIO_ROOT/src/timeinterface.cpp \
-	$VEROVIO_ROOT/src/trem.cpp \
+	$VEROVIO_ROOT/src/timestamp.cpp \
 	$VEROVIO_ROOT/src/toolkit.cpp \
 	$VEROVIO_ROOT/src/tuplet.cpp \
 	$VEROVIO_ROOT/src/verse.cpp \
@@ -156,28 +168,39 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/view_graph.cpp \
 	$VEROVIO_ROOT/src/view_mensural.cpp \
 	$VEROVIO_ROOT/src/view_page.cpp \
+	$VEROVIO_ROOT/src/view_text.cpp \
 	$VEROVIO_ROOT/src/view_tuplet.cpp \
 	$VEROVIO_ROOT/src/vrv.cpp \
-	$VEROVIO_ROOT/src/pugixml.cpp \
+	$VEROVIO_ROOT/src/pugi/pugixml.cpp \
+	$VEROVIO_ROOT/src/midi/Binasc.cpp \
+	$VEROVIO_ROOT/src/midi/MidiEvent.cpp \
+	$VEROVIO_ROOT/src/midi/MidiEventList.cpp \
+	$VEROVIO_ROOT/src/midi/MidiFile.cpp \
+	$VEROVIO_ROOT/src/midi/MidiMessage.cpp \
+	$VEROVIO_ROOT/libmei/attconverter.cpp \
 	$VEROVIO_ROOT/libmei/atts_cmn.cpp \
 	$VEROVIO_ROOT/libmei/atts_critapp.cpp \
+	$VEROVIO_ROOT/libmei/atts_mei.cpp \
 	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
-	$VEROVIO_ROOT/libmei/atts_shared.cpp \
 	$VEROVIO_ROOT/libmei/atts_pagebased.cpp \
+	$VEROVIO_ROOT/libmei/atts_shared.cpp \
 	lib/jsonxx/jsonxx.cc \
 	--embed-file data/ \
 	-s EXPORTED_FUNCTIONS="[\
 		'_vrvToolkit_constructor',\
 		'_vrvToolkit_destructor',\
+		'_vrvToolkit_getElementsAtTime',\
 		'_vrvToolkit_getLog',\
 		'_vrvToolkit_getVersion',\
 		'_vrvToolkit_getMEI',\
 		'_vrvToolkit_getPageCount',\
 		'_vrvToolkit_getPageWithElement',\
+		'_vrvToolkit_getTimeForElement',\
 		'_vrvToolkit_loadData',\
 		'_vrvToolkit_redoLayout',\
 		'_vrvToolkit_renderData',\
 		'_vrvToolkit_renderPage',\
+		'_vrvToolkit_renderToMidi',\
 		'_vrvToolkit_setOptions',\
 		'_vrvToolkit_edit',\
 		'_vrvToolkit_getElementAttr']" \
@@ -191,6 +214,8 @@ if [ $? -eq 0 ]; then
 	else
 		cat build/verovio.js verovio-proxy.js verovio-unload-listener.js > "build/$FILENAME"
 	fi
+	# create a gz version
+	gzip -c build/$FILENAME > build/$FILENAME.gz
 	# all good
 	echo "build/$FILENAME written"
 	# create also a zip file if version name is given

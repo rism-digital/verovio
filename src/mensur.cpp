@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "mensur.h"
 #include "scoredefinterface.h"
 
@@ -18,22 +17,16 @@ int Mensur::s_numBase = 2;
 // Mensur
 //----------------------------------------------------------------------------
 
-Mensur::Mensur():
-	LayerElement("mensur-"),
-    AttDurationRatio(),
-    AttMensuralShared(),
-    AttMensurLog(),
-    AttMensurVis(),
-    AttSlashcount()
+Mensur::Mensur()
+    : LayerElement("mensur-"), AttDurationRatio(), AttMensuralShared(), AttMensurLog(), AttMensurVis(), AttSlashcount()
 {
     Init();
 }
-    
-Mensur::Mensur( ScoreDefInterface *mensurAttr ):
-    LayerElement("mensur-")
+
+Mensur::Mensur(const ScoreDefInterface *mensurAttr) : LayerElement("mensur-")
 {
     Init();
-    
+
     this->SetDot(mensurAttr->GetMensurDot());
     this->SetSign(mensurAttr->GetMensurSign());
     this->SetSlash(mensurAttr->GetMensurSlash());
@@ -48,7 +41,7 @@ Mensur::Mensur( ScoreDefInterface *mensurAttr ):
     // It is unclear why we don't have mensur.num and mensur.numbase attributes
     // in att.mensura.default.log - ask Perry...
 }
-    
+
 void Mensur::Init()
 {
     RegisterAttClass(ATT_DURATIONRATIO);
@@ -56,13 +49,14 @@ void Mensur::Init()
     RegisterAttClass(ATT_MENSURLOG);
     RegisterAttClass(ATT_METERSIGVIS);
     RegisterAttClass(ATT_SLASHCOUNT);
+
     Reset();
 }
 
 Mensur::~Mensur()
 {
 }
-    
+
 void Mensur::Reset()
 {
     LayerElement::Reset();
@@ -72,5 +66,5 @@ void Mensur::Reset()
     ResetMensurVis();
     ResetSlashcount();
 }
-    
+
 } // namespace vrv

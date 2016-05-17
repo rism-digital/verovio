@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_CHORD_H__
 #define __VRV_CHORD_H__
 
@@ -16,72 +15,80 @@
 
 namespace vrv {
 
-#define ledgermin(a,b) (((a)<(b))?(a):(b))
-#define ledgermax(a,b) (((a)>(b))?(a):(b))
-    
+#define ledgermin(a, b) (((a) < (b)) ? (a) : (b))
+#define ledgermax(a, b) (((a) > (b)) ? (a) : (b))
+
 //----------------------------------------------------------------------------
 // Chord
 //----------------------------------------------------------------------------
 
 /**
  * This class represents a collection of notes in the same layer with the
- *    same onset time.
+ * same onset time.
  * A chord is contained in a layer.
  * It contains notes.
  */
-    
-class Chord: public LayerElement, public ObjectListInterface, public StemmedDrawingInterface, public DurationInterface,
-    public AttCommon,
-    public AttStemmed,
-    public AttStemmedCmn,
-    public AttTiepresent
-{
+
+class Chord : public LayerElement,
+              public ObjectListInterface,
+              public StemmedDrawingInterface,
+              public DurationInterface,
+              public AttCommon,
+              public AttStems,
+              public AttStemsCmn,
+              public AttTiepresent {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
-    Chord( );
+    Chord();
     virtual ~Chord();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Chord"; };
-    virtual ClassId Is() { return CHORD; };
+    virtual std::string GetClassName() const { return "Chord"; };
+    virtual ClassId Is() const { return CHORD; };
     ///@}
-    
+
+    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
+    {
+        return dynamic_cast<StemmedDrawingInterface *>(this);
+    }
+
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
-    
+    virtual bool HasToBeAligned() const { return true; };
+
     /**
      * Add an element (only note supported) to a chord.
      */
     void AddLayerElement(LayerElement *element);
 
-    virtual void FilterList( ListOfObjects *childlist );
-    
+    virtual void FilterList(ListOfObjects *childlist);
+
     void GetYExtremes(int *yMax, int *yMin);
-    
+
     /**
      * Returns list of notes that have accidentals
      */
     void ResetAccidList();
-    
+
     /**
      * Return information about the position in the chord
      */
     ///@{
-    /** Return 0 if the note id the middle note, -1 if below it and 1 if above */
+    /** Return 0 if the note id is the middle note, -1 if below it and 1 if above */
     int PositionInChord(Note *note);
     ///@}
-    
+
     /**
      * Prepares a 2D grid of booleans to track where accidentals are placed.
-     * Further documentation in chord.cpp comments.
+     * For further documentation, see comments in chord.cpp
      */
     void ResetAccidSpace(int fullUnit);
-    
+
     /**
-     * @name Set and get the stem direction and stem positions
+     * @name Set and get stem direction and stem positions
      * The methods are overriding the interface because we want to apply it to child notes
      */
     ///@{
@@ -89,31 +96,31 @@ public:
     virtual void SetDrawingStemStart(Point stemStart);
     virtual void SetDrawingStemEnd(Point stemEnd);
     ///@}
-    
+
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr( ArrayPtrVoid *params );
-    
+    virtual int PrepareTieAttr(ArrayPtrVoid *params);
+
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttrEnd( ArrayPtrVoid *params );
-    
+    virtual int PrepareTieAttrEnd(ArrayPtrVoid *params);
+
 protected:
     /**
      * Clear the m_clusters vector and delete all the objects.
      */
-    void ClearClusters();
-    
+    void ClearClusters() const;
+
 public:
-    std::list<ChordCluster*> m_clusters;
-    
-    /** 
+    mutable std::list<ChordCluster *> m_clusters;
+
+    /**
      * Number of ledger lines for the chord where:
      * Staff * is each staff for which the chord has notes and maps to:
      * a four char vector acting as a 2D array (2x2) where:
@@ -121,17 +128,17 @@ public:
      * [x][0] is below staff, [x][1] is above staff
      */
     MapOfLedgerLineFlags m_drawingLedgerLines;
-    
+
     /**
      * Positions of dots in the chord to avoid overlapping
      */
     std::list<int> m_dots;
-    
+
     /**
      * Variables related to preventing overlapping in the X dimension for accidentals
      */
-    std::vector<Note*> m_accidList;
-    std::vector< std::vector<bool> > m_accidSpace;
+    std::vector<Note *> m_accidList;
+    std::vector<std::vector<bool> > m_accidSpace;
     int m_accidSpaceTop, m_accidSpaceBot, m_accidSpaceLeft;
 };
 

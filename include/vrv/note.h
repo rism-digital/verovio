@@ -25,14 +25,14 @@ class Slur;
 class Tie;
 class Verse;
 class Note;
-typedef std::vector<Note*> ChordCluster;
-    
+typedef std::vector<Note *> ChordCluster;
+
 //----------------------------------------------------------------------------
 // Note
 //----------------------------------------------------------------------------
 
-/** 
- * This class models the MEI <note> element. 
+/**
+ * This class models the MEI <note> element.
  */
 
 // embellishments
@@ -42,126 +42,140 @@ typedef std::vector<Note*> ChordCluster;
 #define EMB_TRILL 1
 #define EMB_MORDENT 2
 
-class Note: public LayerElement, public StemmedDrawingInterface, public DurationInterface, public PitchInterface,
-    public AttColoration,
-    public AttGraced,
-    public AttNoteLogMensural,
-    public AttStemmed,
-    public AttStemmedCmn,
-    public AttTiepresent
-{
+class Note : public LayerElement,
+             public StemmedDrawingInterface,
+             public DurationInterface,
+             public PitchInterface,
+             public AttAccidentalPerformed,
+             public AttColoration,
+             public AttGraced,
+             public AttNoteLogMensural,
+             public AttStems,
+             public AttStemsCmn,
+             public AttTiepresent {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Note();
     virtual ~Note();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Note"; };
-    virtual ClassId Is() { return NOTE; };
+    virtual std::string GetClassName() const { return "Note"; };
+    virtual ClassId Is() const { return NOTE; };
     ///@}
-    
+
+    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+    virtual PitchInterface *GetPitchInterface() { return dynamic_cast<PitchInterface *>(this); }
+    virtual StemmedDrawingInterface *GetStemmedDrawingInterface()
+    {
+        return dynamic_cast<StemmedDrawingInterface *>(this);
+    }
+
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
-    
+    virtual bool HasToBeAligned() const { return true; };
+
     /**
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.
      */
     void AddLayerElement(LayerElement *element);
-    
+
     /**
      * @name Setter and getter for tie attribute and other pointers
      */
     ///@{
-    void ResetDrawingAccid( );
-    void ResetDrawingTieAttr( );
-    void SetDrawingTieAttr( );
-    Tie *GetDrawingTieAttr( ) { return m_drawingTieAttr; };
+    void ResetDrawingAccid();
+    void ResetDrawingTieAttr();
+    void SetDrawingTieAttr();
+    Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; };
     ///@}
-    
+
     /**
      * @name Setter and getter for the Algnment the grace note is pointing to (NULL by default)
      */
     ///@{
     Alignment *GetGraceAlignment();
-    void SetGraceAlignment( Alignment *graceAlignment );
-    bool HasGraceAlignment( ) { return (m_graceAlignment != NULL); };
-    void ResetGraceAlignment( ) { m_graceAlignment = NULL; };
+    void SetGraceAlignment(Alignment *graceAlignment);
+    bool HasGraceAlignment() const { return (m_graceAlignment != NULL); };
+    void ResetGraceAlignment() { m_graceAlignment = NULL; };
     ///@}
-    
+
     /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
-    Chord* IsChordTone( );
-    int GetDrawingDur( );
-    bool IsClusterExtreme( ); //used to find if is the highest or lowest note in a cluster
+    Chord *IsChordTone();
+    int GetDrawingDur();
+    bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
 
     /**
      * Returns a single integer representing pitch and octave.
      */
-    int GetDiatonicPitch( ) { return this->GetPname() + (int)this->GetOct() * 7; };
-    
+    int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; };
+
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr( ArrayPtrVoid *params );
-    
+    virtual int PrepareTieAttr(ArrayPtrVoid *params);
+
     /**
      * Functor for setting wordpos and connector ends
-     * The functor is process by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
-    virtual int PrepareLyrics( ArrayPtrVoid *params );
- 
+    virtual int PrepareLyrics(ArrayPtrVoid *params);
+
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer( ArrayPtrVoid *params );
-    
+    virtual int PreparePointersByLayer(ArrayPtrVoid *params);
+
     /**
+     * Processes The FloatingElement owned by the note (e.g, @tie).
      */
-    virtual int FillStaffCurrentTimeSpanning( ArrayPtrVoid *params );
-    
+    virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);
+
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing( ArrayPtrVoid *params );
-    
+    virtual int ResetDrawing(ArrayPtrVoid *params);
+
 private:
-    
+    //
 public:
     /** embellishment on this note **/
     unsigned int m_embellishment; // To be changed to Att
-    
+
     /** drawing stem length */
     int d_stemLen;
-    
+
     /** flags for determining clusters in chord **/
-    ChordCluster* m_cluster; //cluster this belongs to
-    int m_clusterPosition; //1-indexed position in said cluster; 0 if does not have position
-    
+    ChordCluster *m_cluster; // cluster this belongs to
+    int m_clusterPosition; // 1-indexed position in said cluster; 0 if does not have position
+
     /** other information necessary for notes in chords **/
     Accid *m_drawingAccid;
-    
-    /** 
+
+    /**
      * Flag indicating if the drawing accid is an attribute.
      * If yes, then it is owned by the Note and will be deleted
      */
     bool m_isDrawingAccidAttr;
-    
+
+    double m_playingOnset;
+    double m_playingOffset;
+
 private:
     /**
      * Tie attributes are represented a pointers to Tie objects.
      * There is one pointer for the initial attribute (TIE_i or TIE_m).
-     * The note with the initial attribute owns the Tie object and take care of deleting it
+     * The note with the initial attribute owns the Tie object and takes care of deleting it
      */
     Tie *m_drawingTieAttr;
     /**
@@ -171,5 +185,5 @@ private:
 };
 
 } // namespace vrv
-    
+
 #endif

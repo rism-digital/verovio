@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "drawinginterface.h"
 
 //----------------------------------------------------------------------------
@@ -27,36 +26,32 @@ DrawingListInterface::DrawingListInterface()
     Reset();
 }
 
-
 DrawingListInterface::~DrawingListInterface()
 {
 }
-    
-    
+
 void DrawingListInterface::Reset()
 {
     m_drawingList.clear();
 }
-    
-    
-    
-void DrawingListInterface::AddToDrawingList( DocObject *object )
+
+void DrawingListInterface::AddToDrawingList( Object *object)
 {
-    m_drawingList.push_back( object );
+    m_drawingList.push_back(object);
     m_drawingList.sort();
     m_drawingList.unique();
 }
 
-ListOfObjects *DrawingListInterface::GetDrawingList( )
+ListOfObjects *DrawingListInterface::GetDrawingList()
 {
     return &m_drawingList;
 }
 
-void DrawingListInterface::ResetDrawingList( )
+void DrawingListInterface::ResetDrawingList()
 {
     m_drawingList.clear();
 }
-    
+
 //----------------------------------------------------------------------------
 // StaffDefDrawingInterface
 //----------------------------------------------------------------------------
@@ -100,8 +95,8 @@ void StaffDefDrawingInterface::Reset()
     m_drawMensur = false;
     m_drawMeterSig = false;
 }
-        
-void StaffDefDrawingInterface::SetCurrentClef( Clef *clef )
+
+void StaffDefDrawingInterface::SetCurrentClef(Clef *clef)
 {
     if (clef) {
         if (m_currentClef) delete m_currentClef;
@@ -110,7 +105,7 @@ void StaffDefDrawingInterface::SetCurrentClef( Clef *clef )
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentKeySig( KeySig *keySig )
+void StaffDefDrawingInterface::SetCurrentKeySig(KeySig *keySig)
 {
     if (keySig) {
         if (m_currentKeySig) {
@@ -123,7 +118,7 @@ void StaffDefDrawingInterface::SetCurrentKeySig( KeySig *keySig )
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentMensur( Mensur *mensur )
+void StaffDefDrawingInterface::SetCurrentMensur(Mensur *mensur)
 {
     if (mensur) {
         if (m_currentMensur) delete m_currentMensur;
@@ -132,7 +127,7 @@ void StaffDefDrawingInterface::SetCurrentMensur( Mensur *mensur )
     }
 }
 
-void StaffDefDrawingInterface::SetCurrentMeterSig( MeterSig *meterSig )
+void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig *meterSig)
 {
     if (meterSig) {
         if (m_currentMeterSig) delete m_currentMeterSig;
@@ -141,7 +136,7 @@ void StaffDefDrawingInterface::SetCurrentMeterSig( MeterSig *meterSig )
     }
 }
 
-StaffDefDrawingInterface::StaffDefDrawingInterface( const StaffDefDrawingInterface& interface )
+StaffDefDrawingInterface::StaffDefDrawingInterface(const StaffDefDrawingInterface &interface)
 {
     m_currentClef = NULL;
     m_currentKeySig = NULL;
@@ -150,10 +145,10 @@ StaffDefDrawingInterface::StaffDefDrawingInterface( const StaffDefDrawingInterfa
     Reset();
 }
 
-StaffDefDrawingInterface& StaffDefDrawingInterface::operator=( const StaffDefDrawingInterface& interface )
+StaffDefDrawingInterface &StaffDefDrawingInterface::operator=(const StaffDefDrawingInterface &interface)
 {
-    if ( this != &interface ) // not self assignement
-    {
+    // not self assignement
+    if (this != &interface) {
         if (m_currentClef) {
             delete m_currentClef;
             m_currentClef = NULL;
@@ -175,7 +170,6 @@ StaffDefDrawingInterface& StaffDefDrawingInterface::operator=( const StaffDefDra
     return *this;
 }
 
-    
 //----------------------------------------------------------------------------
 // StemmedDrawingInterface
 //----------------------------------------------------------------------------
@@ -195,7 +189,7 @@ void StemmedDrawingInterface::Reset()
     m_drawingStemStart = Point(0, 0);
     m_drawingStemEnd = Point(0, 0);
 }
-    
+
 void StemmedDrawingInterface::SetDrawingStemDir(data_STEMDIRECTION stemDir)
 {
     m_drawingStemDir = stemDir;
@@ -226,5 +220,4 @@ Point StemmedDrawingInterface::GetDrawingStemEnd()
     return m_drawingStemEnd;
 }
 
-    
 } // namespace vrv

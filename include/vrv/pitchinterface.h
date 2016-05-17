@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_PITCH_INTERFACE_H__
 #define __VRV_PITCH_INTERFACE_H__
 
@@ -17,19 +16,15 @@ namespace vrv {
 // PitchInterface
 //----------------------------------------------------------------------------
 
-/** 
+/**
  * This class is an interface for elements with pitch, such as notes and neumes.
- * It is not an abstract class but should not be instanciate directly.
+ * It is not an abstract class but should not be instanciated directly.
  */
-class PitchInterface: public Interface,
-    public AttAccidental,
-    public AttOctave,
-    public AttPitch
-{
+class PitchInterface : public Interface, public AttAccidental, public AttNoteGes, public AttOctave, public AttPitch {
 public:
     /**
      * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     PitchInterface();
@@ -37,21 +32,20 @@ public:
     virtual void Reset();
     virtual InterfaceId IsInterface() { return INTERFACE_PITCH; };
     ///@}
-    
+
     /**
-     * Interface comparison operator. 
-     * Check if the LayerElement has a PitchInterface and compare attributes
+     * Interface comparison operator.
+     * Checks if the LayerElement has a PitchInterface and compares attributes
      */
-    bool HasIdenticalPitchInterface(PitchInterface  *otherPitchInterface);
-    
-private:
-    
-public:
+    bool HasIdenticalPitchInterface(PitchInterface *otherPitchInterface);
 
 private:
-    
+    //
+public:
+    //
+private:
 };
 
-} // namespace vrv    
+} // namespace vrv
 
 #endif

@@ -3,12 +3,12 @@
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 //
-// Code generated using a modified version of libmei 
+// Code generated using a modified version of libmei
 // by Andrew Hankinson, Alastair Porter, and Others
 /////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////// 
-// NOTE: this file was generated with the Verovio libmei version and 
+/////////////////////////////////////////////////////////////////////////////
+// NOTE: this file was generated with the Verovio libmei version and
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -16,7 +16,7 @@
 #define __VRV_ATTS_CMNORNAMENTS_H__
 
 #include "att.h"
-#include "att_classes.h"
+#include "attdef.h"
 #include "pugixml.hpp"
 
 //----------------------------------------------------------------------------
@@ -24,84 +24,79 @@
 #include <string>
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // AttMordentLog
 //----------------------------------------------------------------------------
 
-class AttMordentLog: public Att
-{
+class AttMordentLog : public Att {
 public:
     AttMordentLog();
     virtual ~AttMordentLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetMordentLog();
-    
+
     /** Read the values for the attribute class **/
-    bool ReadMordentLog( pugi::xml_node element );
-    
+    bool ReadMordentLog(pugi::xml_node element);
+
     /** Write the values for the attribute class **/
-    bool WriteMordentLog( pugi::xml_node element );
-    
+    bool WriteMordentLog(pugi::xml_node element);
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
-    bool HasForm( );
-    
+    void SetForm(mordentLog_FORM form_) { m_form = form_; };
+    mordentLog_FORM GetForm() const { return m_form; };
+    bool HasForm() const;
     //
-    void SetLong(std::string long_) { m_long = long_; };
-    std::string GetLong() const { return m_long; };    
-    bool HasLong( );
-    
+    void SetLong(data_BOOLEAN long_) { m_long = long_; };
+    data_BOOLEAN GetLong() const { return m_long; };
+    bool HasLong() const;
     ///@}
 
 private:
-    /** Records the function of the dot. **/
-    std::string m_form;
+    /** Records the appearance and usually the function of the bar line. **/
+    mordentLog_FORM m_form;
     /**
      * When the long attribute is set to 'yes', a double or long mordent, consisting of
      * 5 notes, is indicated.
      **/
-    std::string m_long;
+    data_BOOLEAN m_long;
 
-/* include <attlong> */
+    /* include <attlong> */
 };
 
 //----------------------------------------------------------------------------
 // AttOrnam
 //----------------------------------------------------------------------------
 
-class AttOrnam: public Att
-{
+class AttOrnam : public Att {
 public:
     AttOrnam();
     virtual ~AttOrnam();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetOrnam();
-    
+
     /** Read the values for the attribute class **/
-    bool ReadOrnam( pugi::xml_node element );
-    
+    bool ReadOrnam(pugi::xml_node element);
+
     /** Write the values for the attribute class **/
-    bool WriteOrnam( pugi::xml_node element );
-    
+    bool WriteOrnam(pugi::xml_node element);
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
-    void SetOrnam(std::string ornam_) { m_ornam = ornam_; };
-    std::string GetOrnam() const { return m_ornam; };    
-    bool HasOrnam( );
-    
+    void SetOrnam(data_ORNAM_cmn ornam_) { m_ornam = ornam_; };
+    data_ORNAM_cmn GetOrnam() const { return m_ornam; };
+    bool HasOrnam() const;
     ///@}
 
 private:
@@ -110,90 +105,84 @@ private:
      * If visual information about the ornament is needed, then one of the elements
      * that represents an ornament (mordent, trill, or turn) should be employed.
      **/
-    std::string m_ornam;
+    data_ORNAM_cmn m_ornam;
 
-/* include <attornam> */
+    /* include <attornam> */
 };
 
 //----------------------------------------------------------------------------
 // AttOrnamentaccid
 //----------------------------------------------------------------------------
 
-class AttOrnamentaccid: public Att
-{
+class AttOrnamentaccid : public Att {
 public:
     AttOrnamentaccid();
     virtual ~AttOrnamentaccid();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetOrnamentaccid();
-    
+
     /** Read the values for the attribute class **/
-    bool ReadOrnamentaccid( pugi::xml_node element );
-    
+    bool ReadOrnamentaccid(pugi::xml_node element);
+
     /** Write the values for the attribute class **/
-    bool WriteOrnamentaccid( pugi::xml_node element );
-    
+    bool WriteOrnamentaccid(pugi::xml_node element);
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
-    void SetAccidupper(std::string accidupper_) { m_accidupper = accidupper_; };
-    std::string GetAccidupper() const { return m_accidupper; };    
-    bool HasAccidupper( );
-    
+    void SetAccidupper(data_ACCIDENTAL_EXPLICIT accidupper_) { m_accidupper = accidupper_; };
+    data_ACCIDENTAL_EXPLICIT GetAccidupper() const { return m_accidupper; };
+    bool HasAccidupper() const;
     //
-    void SetAccidlower(std::string accidlower_) { m_accidlower = accidlower_; };
-    std::string GetAccidlower() const { return m_accidlower; };    
-    bool HasAccidlower( );
-    
+    void SetAccidlower(data_ACCIDENTAL_EXPLICIT accidlower_) { m_accidlower = accidlower_; };
+    data_ACCIDENTAL_EXPLICIT GetAccidlower() const { return m_accidlower; };
+    bool HasAccidlower() const;
     ///@}
 
 private:
     /** Records the written accidental associated with an upper neighboring note. **/
-    std::string m_accidupper;
+    data_ACCIDENTAL_EXPLICIT m_accidupper;
     /** Records the written accidental associated with a lower neighboring note. **/
-    std::string m_accidlower;
+    data_ACCIDENTAL_EXPLICIT m_accidlower;
 
-/* include <attaccidlower> */
+    /* include <attaccidlower> */
 };
 
 //----------------------------------------------------------------------------
 // AttTurnLog
 //----------------------------------------------------------------------------
 
-class AttTurnLog: public Att
-{
+class AttTurnLog : public Att {
 public:
     AttTurnLog();
     virtual ~AttTurnLog();
-    
+
     /** Reset the default values for the attribute class **/
     void ResetTurnLog();
-    
+
     /** Read the values for the attribute class **/
-    bool ReadTurnLog( pugi::xml_node element );
-    
+    bool ReadTurnLog(pugi::xml_node element);
+
     /** Write the values for the attribute class **/
-    bool WriteTurnLog( pugi::xml_node element );
-    
+    bool WriteTurnLog(pugi::xml_node element);
+
     /**
      * @name Setters, getters and presence checker for class members.
-     * The checker returns true if the attribute class is set (e.g., not equal 
+     * The checker returns true if the attribute class is set (e.g., not equal
      * to the default value)
      **/
     ///@{
-    void SetDelayed(std::string delayed_) { m_delayed = delayed_; };
-    std::string GetDelayed() const { return m_delayed; };    
-    bool HasDelayed( );
-    
+    void SetDelayed(data_BOOLEAN delayed_) { m_delayed = delayed_; };
+    data_BOOLEAN GetDelayed() const { return m_delayed; };
+    bool HasDelayed() const;
     //
-    void SetForm(std::string form_) { m_form = form_; };
-    std::string GetForm() const { return m_form; };    
-    bool HasForm( );
-    
+    void SetForm(turnLog_FORM form_) { m_form = form_; };
+    turnLog_FORM GetForm() const { return m_form; };
+    bool HasForm() const;
     ///@}
 
 private:
@@ -202,14 +191,13 @@ private:
      * of the beat.
      * See Read, p. 246.
      **/
-    std::string m_delayed;
-    /** Records the function of the dot. **/
-    std::string m_form;
+    data_BOOLEAN m_delayed;
+    /** Records the appearance and usually the function of the bar line. **/
+    turnLog_FORM m_form;
 
-/* include <attform> */
+    /* include <attform> */
 };
 
 } // vrv namespace
 
-#endif  // __VRV_ATTS_CMNORNAMENTS_H__
-
+#endif // __VRV_ATTS_CMNORNAMENTS_H__

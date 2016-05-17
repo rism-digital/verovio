@@ -15,22 +15,21 @@ namespace vrv {
 // Custos
 //----------------------------------------------------------------------------
 
-Custos::Custos():
-    LayerElement("custos-"), PositionInterface()
+Custos::Custos() : LayerElement("custos-"), PositionInterface()
 {
-    RegisterInterface( PositionInterface::GetAttClasses(), PositionInterface::IsInterface() );
-    
+    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+
     Reset();
 }
 
 Custos::~Custos()
 {
 }
-    
+
 void Custos::Reset()
 {
     LayerElement::Reset();
     PositionInterface::Reset();
-}    
+}
 
 } // namespace vrv

@@ -34,7 +34,7 @@
 
             <!-- redirect to a file for each glyph -->
             <xsl:result-document href="../data/{$fontName}/{$glyphCode}-{$smuflName}.xml">
-                <symbol id="{$glyphCode}" viewBox="0 0 {$unitsPerEm} {$unitsPerEm}" overflow="inherit" horiz-adv-x="{$horiz-adv-x}">
+                <symbol id="{$glyphCode}" viewBox="0 0 {$unitsPerEm} {$unitsPerEm}" overflow="inherit">
                     <g transform="scale(1,-1)">
                         <path>
                             <xsl:copy-of select="@d"/>
@@ -44,7 +44,7 @@
             </xsl:result-document>
 
             <!-- write the glyph to the bounding box svg file -->
-            <path xmlns="http://www.w3.org/2000/svg" transform="scale(1.0,-1.0)" id="{$glyphCode}">
+            <path xmlns="http://www.w3.org/2000/svg" transform="scale(1.0,-1.0)" id="{$glyphCode}" horiz-adv-x="{$horiz-adv-x}">
                 <xsl:copy-of select="@d"/>
             </path>
         </xsl:if>

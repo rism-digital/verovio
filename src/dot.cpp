@@ -21,40 +21,39 @@ namespace vrv {
 // Dot
 //----------------------------------------------------------------------------
 
-Dot::Dot():
-    LayerElement("dot-"), PositionInterface()
+Dot::Dot() : LayerElement("dot-"), PositionInterface()
 {
-    RegisterInterface( PositionInterface::GetAttClasses(), PositionInterface::IsInterface() );
-    
+    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+
     Reset();
 }
 
 Dot::~Dot()
 {
 }
-    
+
 void Dot::Reset()
 {
     LayerElement::Reset();
     PositionInterface::Reset();
     m_drawingNote = NULL;
 }
-    
+
 //----------------------------------------------------------------------------
-// Functors methods
+// Functor methods
 //----------------------------------------------------------------------------
-    
-int Dot::PreparePointersByLayer( ArrayPtrVoid *params )
+
+int Dot::PreparePointersByLayer(ArrayPtrVoid *params)
 {
     // param 0: the current Note
-    Note **currentNote = static_cast<Note**>((*params).at(0));
-    
+    Note **currentNote = static_cast<Note **>((*params).at(0));
+
     m_drawingNote = (*currentNote);
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
-int Dot::ResetDrawing( ArrayPtrVoid *params )
+
+int Dot::ResetDrawing(ArrayPtrVoid *params)
 {
     this->m_drawingNote = NULL;
     return FUNCTOR_CONTINUE;

@@ -3,12 +3,12 @@
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 //
-// Code generated using a modified version of libmei 
+// Code generated using a modified version of libmei
 // by Andrew Hankinson, Alastair Porter, and Others
 /////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////// 
-// NOTE: this file was generated with the Verovio libmei version and 
+/////////////////////////////////////////////////////////////////////////////
+// NOTE: this file was generated with the Verovio libmei version and
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -25,25 +25,28 @@
 /* #include_block */
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // AttTabular
 //----------------------------------------------------------------------------
 
-AttTabular::AttTabular(): Att() {
+AttTabular::AttTabular() : Att()
+{
     ResetTabular();
 }
 
-AttTabular::~AttTabular() {
-
+AttTabular::~AttTabular()
+{
 }
 
-void AttTabular::ResetTabular() {
-    m_colspanInt = 0;
-    m_rowspanInt = 0;
+void AttTabular::ResetTabular()
+{
+    m_colspan = 0;
+    m_rowspan = 0;
 }
 
-bool AttTabular::ReadTabular(  pugi::xml_node element ) {
+bool AttTabular::ReadTabular(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("colspan")) {
         this->SetColspan(StrToInt(element.attribute("colspan").value()));
@@ -58,7 +61,8 @@ bool AttTabular::ReadTabular(  pugi::xml_node element ) {
     return hasAttribute;
 }
 
-bool AttTabular::WriteTabular(  pugi::xml_node element ) {
+bool AttTabular::WriteTabular(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasColspan()) {
         element.append_attribute("colspan") = IntToStr(this->GetColspan()).c_str();
@@ -71,28 +75,28 @@ bool AttTabular::WriteTabular(  pugi::xml_node element ) {
     return wroteAttribute;
 }
 
-bool AttTabular::HasColspan( )
+bool AttTabular::HasColspan() const
 {
-    return (m_colspanInt != 0);
+    return (m_colspan != 0);
 }
 
-bool AttTabular::HasRowspan( )
+bool AttTabular::HasRowspan() const
 {
-    return (m_rowspanInt != 0);
+    return (m_rowspan != 0);
 }
-
 
 /* include <attrowspan> */
 
-bool Att::SetFigtable( Object *element, std::string attrType, std::string attrValue ) {
-    if (element->HasAttClass( ATT_TABULAR ) ) {
-        AttTabular *att = dynamic_cast<AttTabular*>(element);
-        assert( att );
-        if (attrType == "colspanInt") {
+bool Att::SetFigtable(Object *element, std::string attrType, std::string attrValue)
+{
+    if (element->HasAttClass(ATT_TABULAR)) {
+        AttTabular *att = dynamic_cast<AttTabular *>(element);
+        assert(att);
+        if (attrType == "colspan") {
             att->SetColspan(att->StrToInt(attrValue));
             return true;
         }
-        if (attrType == "rowspanInt") {
+        if (attrType == "rowspan") {
             att->SetRowspan(att->StrToInt(attrValue));
             return true;
         }
@@ -101,19 +105,18 @@ bool Att::SetFigtable( Object *element, std::string attrType, std::string attrVa
     return false;
 }
 
-void Att::GetFigtable( Object *element, ArrayOfStrAttr *attributes ) {
-    if (element->HasAttClass( ATT_TABULAR ) ) {
-        AttTabular *att = dynamic_cast<AttTabular*>(element);
-        assert( att );
+void Att::GetFigtable(const Object *element, ArrayOfStrAttr *attributes)
+{
+    if (element->HasAttClass(ATT_TABULAR)) {
+        const AttTabular *att = dynamic_cast<const AttTabular *>(element);
+        assert(att);
         if (att->HasColspan()) {
-            attributes->push_back(std::make_pair("colspanInt", att->IntToStr(att->GetColspan())));
+            attributes->push_back(std::make_pair("colspan", att->IntToStr(att->GetColspan())));
         }
         if (att->HasRowspan()) {
-            attributes->push_back(std::make_pair("rowspanInt", att->IntToStr(att->GetRowspan())));
+            attributes->push_back(std::make_pair("rowspan", att->IntToStr(att->GetRowspan())));
         }
     }
-
 }
-    
+
 } // vrv namespace
-    

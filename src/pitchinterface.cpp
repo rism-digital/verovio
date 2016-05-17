@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "pitchinterface.h"
 
 //----------------------------------------------------------------------------
@@ -22,41 +21,39 @@ namespace vrv {
 // PitchInterface
 //----------------------------------------------------------------------------
 
-PitchInterface::PitchInterface(): Interface(),
-    AttAccidental(),
-    AttOctave(),
-    AttPitch()
-    
+PitchInterface::PitchInterface() : Interface(), AttAccidental(), AttNoteGes(), AttOctave(), AttPitch()
 {
     RegisterInterfaceAttClass(ATT_ACCIDENTAL);
+    RegisterInterfaceAttClass(ATT_NOTEGES);
     RegisterInterfaceAttClass(ATT_OCTAVE);
     RegisterInterfaceAttClass(ATT_PITCH);
+
     Reset();
 }
-
 
 PitchInterface::~PitchInterface()
 {
 }
-    
+
 void PitchInterface::Reset()
 {
     ResetAccidental();
+    ResetNoteGes();
     ResetOctave();
     ResetPitch();
 }
 
-bool PitchInterface::HasIdenticalPitchInterface( PitchInterface *otherPitchInterface )
+bool PitchInterface::HasIdenticalPitchInterface(PitchInterface *otherPitchInterface)
 {
     // This should never happen because it is fully implemented
-    LogError( "PitchInterface::HasIdenticalPitchInterface missing" );
-    assert( false );
+    LogError("PitchInterface::HasIdenticalPitchInterface missing");
+    assert(false);
     return false;
     /*
-    if ( !otherPitchInterface ) {
+    if (!otherPitchInterface) {
         return false;
     }
     */
 }
-    
+
 } // namespace vrv

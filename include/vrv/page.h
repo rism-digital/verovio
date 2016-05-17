@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_PAGE_H__
 #define __VRV_PAGE_H__
 
@@ -18,7 +17,6 @@ class DeviceContext;
 class Staff;
 class System;
 
-    
 //----------------------------------------------------------------------------
 // Page
 //----------------------------------------------------------------------------
@@ -28,88 +26,87 @@ class System;
  * A Page is contained in a Doc.
  * It contains System objects.
 */
-class Page: public DocObject
-{
+class Page : public Object {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     Page();
     virtual ~Page();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Page"; };
-    virtual ClassId Is() { return PAGE; };
+    virtual std::string GetClassName() const { return "Page"; };
+    virtual ClassId Is() const { return PAGE; };
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-	void AddSystem( System *system );
+    void AddSystem(System *system);
     ///@}
-	
-	int GetSystemCount() const { return (int)m_children.size(); };
-    
+
+    int GetSystemCount() const { return (int)m_children.size(); };
+
     /**
      * Return the index position of the page in its document parent
      */
     int GetPageIdx() const { return Object::GetIdx(); };
-    
+
     /**
      * Return the position of the staff on the page, from top to bottom
      */
-    int GetStaffPosOnPage( Staff *staff );
-    
+    int GetStaffPosOnPage(Staff *staff) const;
+
     /**
-     * Do the layout of the page, whichi means aligning is content horizontally
+     * Do the layout of the page, which means aligning its content horizontally
      * and vertically, and justify horizontally and vertically if wanted.
      * This will be done only if m_layoutDone is false or force is true.
      */
-    void LayOut( bool force = false );
-    
+    void LayOut(bool force = false);
+
     /**
      * Lay out the content of the page (measures and their content) horizontally
      */
-    void LayOutHorizontally( );
-    
+    void LayOutHorizontally();
+
     /**
      * Justifiy the content of the page (measures and their content) horizontally
      */
-    void JustifyHorizontally( );
+    void JustifyHorizontally();
 
     /**
      * Lay out the content of the page (system/staves) vertically.
      */
-    void LayOutVertically(  );
-    
+    void LayOutVertically();
+
     /**
      * Justifiy the content of the page (system/staves) vertically
      */
-    void JustifyVertically( );
-    
+    void JustifyVertically();
+
     /**
      * Return the height of the content by looking at the last system of the page.
      * This is used for adjusting the page height when this is the expected behaviour,
      * typically with the --adjust-page-height option in the commandline tool
      */
-    int GetContentHeight( );
+    int GetContentHeight() const;
 
     /**
      * Return the width of the content by looking at the first system of the page.
-     * This is used for adjusting the page with when this is the expected behaviour,
+     * This is used for adjusting the page width when this is the expected behaviour,
      * typically with the --no_layout option in the commandline tool
-     * 
+     *
      */
-    int GetContentWidth( );
+    int GetContentWidth() const;
 
     //----------//
     // Functors //
     //----------//
-    
+
 private:
-    
+    //
 public:
     /** Page width (MEI scoredef@page.width). Saved if != -1 */
     int m_pageWidth;
@@ -121,28 +118,27 @@ public:
     short m_pageRightMar;
     /** Page top margin (MEI scoredef@page.topmar). Saved if != 0 */
     short m_pageTopMar;
-    /** 
+    /**
      * Surface (MEI @surface). Saved as facsimile for transciption layout.
      * For now, the target of the <graphic> element within surface is loaded here.
      */
     std::string m_surface;
-    
+
     /**
      * Hold the top scoreDef of the page.
      * The value must be initialized by going through the whole score for finding
      * all the clef or key changes that might occur within the text.
-     * The value is initialized with by the Object::SetCurrentScoreDef functor.
+     * The value is initialized by the Object::SetCurrentScoreDef functor.
      */
     ScoreDef m_drawingScoreDef;
 
 private:
     /**
-     * A flag for indicating whether the layout has been done or not
+     * A flag for indicating whether the layout has been done or not.
      * If yes, Layout will not layout the page (again) unless
      * the force parameter is set.
      */
     bool m_layoutDone;
-    
 };
 
 } // namespace vrv

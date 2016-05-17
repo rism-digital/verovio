@@ -309,7 +309,7 @@ namespace internal
             ((it != end) && (utf8::internal::mask8(*it++)) == bom[0]) &&
             ((it != end) && (utf8::internal::mask8(*it++)) == bom[1]) &&
             ((it != end) && (utf8::internal::mask8(*it))   == bom[2])
-           );
+          );
     }
 	
     //Deprecated in release 2.3 
@@ -320,7 +320,7 @@ namespace internal
             (utf8::internal::mask8(*it++)) == bom[0] &&
             (utf8::internal::mask8(*it++)) == bom[1] &&
             (utf8::internal::mask8(*it))   == bom[2]
-           );
+          );
     }
 } // namespace utf8
 

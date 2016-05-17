@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "rest.h"
 
 namespace vrv {
@@ -14,19 +13,18 @@ namespace vrv {
 // Rest
 //----------------------------------------------------------------------------
 
-Rest::Rest():
-	LayerElement("rest-"), DurationInterface(), PositionInterface()
+Rest::Rest() : LayerElement("rest-"), DurationInterface(), PositionInterface()
 {
-    RegisterInterface( DurationInterface::GetAttClasses(), DurationInterface::IsInterface() );
-    RegisterInterface( PositionInterface::GetAttClasses(), PositionInterface::IsInterface() );
-    
+    RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
+
     Reset();
 }
 
 Rest::~Rest()
 {
 }
-    
+
 void Rest::Reset()
 {
     LayerElement::Reset();

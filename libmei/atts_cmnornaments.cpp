@@ -3,12 +3,12 @@
 // Created:     2014
 // Copyright (c) Authors and others. All rights reserved.
 //
-// Code generated using a modified version of libmei 
+// Code generated using a modified version of libmei
 // by Andrew Hankinson, Alastair Porter, and Others
 /////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////// 
-// NOTE: this file was generated with the Verovio libmei version and 
+/////////////////////////////////////////////////////////////////////////////
+// NOTE: this file was generated with the Verovio libmei version and
 // should not be edited because changes will be lost.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -25,62 +25,65 @@
 /* #include_block */
 
 namespace vrv {
-    
+
 //----------------------------------------------------------------------------
 // AttMordentLog
 //----------------------------------------------------------------------------
 
-AttMordentLog::AttMordentLog(): Att() {
+AttMordentLog::AttMordentLog() : Att()
+{
     ResetMordentLog();
 }
 
-AttMordentLog::~AttMordentLog() {
-
+AttMordentLog::~AttMordentLog()
+{
 }
 
-void AttMordentLog::ResetMordentLog() {
-    m_form = "";
-    m_long = "";
+void AttMordentLog::ResetMordentLog()
+{
+    m_form = mordentLog_FORM_NONE;
+    m_long = BOOLEAN_NONE;
 }
 
-bool AttMordentLog::ReadMordentLog(  pugi::xml_node element ) {
+bool AttMordentLog::ReadMordentLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("form")) {
-        this->SetForm(StrToStr(element.attribute("form").value()));
+        this->SetForm(StrToMordentLogForm(element.attribute("form").value()));
         element.remove_attribute("form");
         hasAttribute = true;
     }
     if (element.attribute("long")) {
-        this->SetLong(StrToStr(element.attribute("long").value()));
+        this->SetLong(StrToBoolean(element.attribute("long").value()));
         element.remove_attribute("long");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttMordentLog::WriteMordentLog(  pugi::xml_node element ) {
+bool AttMordentLog::WriteMordentLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasForm()) {
-        element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
+        element.append_attribute("form") = MordentLogFormToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     if (this->HasLong()) {
-        element.append_attribute("long") = StrToStr(this->GetLong()).c_str();
+        element.append_attribute("long") = BooleanToStr(this->GetLong()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttMordentLog::HasForm( )
+bool AttMordentLog::HasForm() const
 {
-    return (m_form != "");
+    return (m_form != mordentLog_FORM_NONE);
 }
 
-bool AttMordentLog::HasLong( )
+bool AttMordentLog::HasLong() const
 {
-    return (m_long != "");
+    return (m_long != BOOLEAN_NONE);
 }
-
 
 /* include <attlong> */
 
@@ -88,42 +91,45 @@ bool AttMordentLog::HasLong( )
 // AttOrnam
 //----------------------------------------------------------------------------
 
-AttOrnam::AttOrnam(): Att() {
+AttOrnam::AttOrnam() : Att()
+{
     ResetOrnam();
 }
 
-AttOrnam::~AttOrnam() {
-
+AttOrnam::~AttOrnam()
+{
 }
 
-void AttOrnam::ResetOrnam() {
-    m_ornam = "";
+void AttOrnam::ResetOrnam()
+{
+    m_ornam = ORNAM_cmn_NONE;
 }
 
-bool AttOrnam::ReadOrnam(  pugi::xml_node element ) {
+bool AttOrnam::ReadOrnam(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("ornam")) {
-        this->SetOrnam(StrToStr(element.attribute("ornam").value()));
+        this->SetOrnam(StrToOrnamCmn(element.attribute("ornam").value()));
         element.remove_attribute("ornam");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttOrnam::WriteOrnam(  pugi::xml_node element ) {
+bool AttOrnam::WriteOrnam(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasOrnam()) {
-        element.append_attribute("ornam") = StrToStr(this->GetOrnam()).c_str();
+        element.append_attribute("ornam") = OrnamCmnToStr(this->GetOrnam()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttOrnam::HasOrnam( )
+bool AttOrnam::HasOrnam() const
 {
-    return (m_ornam != "");
+    return (m_ornam != ORNAM_cmn_NONE);
 }
-
 
 /* include <attornam> */
 
@@ -131,57 +137,60 @@ bool AttOrnam::HasOrnam( )
 // AttOrnamentaccid
 //----------------------------------------------------------------------------
 
-AttOrnamentaccid::AttOrnamentaccid(): Att() {
+AttOrnamentaccid::AttOrnamentaccid() : Att()
+{
     ResetOrnamentaccid();
 }
 
-AttOrnamentaccid::~AttOrnamentaccid() {
-
+AttOrnamentaccid::~AttOrnamentaccid()
+{
 }
 
-void AttOrnamentaccid::ResetOrnamentaccid() {
-    m_accidupper = "";
-    m_accidlower = "";
+void AttOrnamentaccid::ResetOrnamentaccid()
+{
+    m_accidupper = ACCIDENTAL_EXPLICIT_NONE;
+    m_accidlower = ACCIDENTAL_EXPLICIT_NONE;
 }
 
-bool AttOrnamentaccid::ReadOrnamentaccid(  pugi::xml_node element ) {
+bool AttOrnamentaccid::ReadOrnamentaccid(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("accidupper")) {
-        this->SetAccidupper(StrToStr(element.attribute("accidupper").value()));
+        this->SetAccidupper(StrToAccidentalExplicit(element.attribute("accidupper").value()));
         element.remove_attribute("accidupper");
         hasAttribute = true;
     }
     if (element.attribute("accidlower")) {
-        this->SetAccidlower(StrToStr(element.attribute("accidlower").value()));
+        this->SetAccidlower(StrToAccidentalExplicit(element.attribute("accidlower").value()));
         element.remove_attribute("accidlower");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttOrnamentaccid::WriteOrnamentaccid(  pugi::xml_node element ) {
+bool AttOrnamentaccid::WriteOrnamentaccid(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasAccidupper()) {
-        element.append_attribute("accidupper") = StrToStr(this->GetAccidupper()).c_str();
+        element.append_attribute("accidupper") = AccidentalExplicitToStr(this->GetAccidupper()).c_str();
         wroteAttribute = true;
     }
     if (this->HasAccidlower()) {
-        element.append_attribute("accidlower") = StrToStr(this->GetAccidlower()).c_str();
+        element.append_attribute("accidlower") = AccidentalExplicitToStr(this->GetAccidlower()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttOrnamentaccid::HasAccidupper( )
+bool AttOrnamentaccid::HasAccidupper() const
 {
-    return (m_accidupper != "");
+    return (m_accidupper != ACCIDENTAL_EXPLICIT_NONE);
 }
 
-bool AttOrnamentaccid::HasAccidlower( )
+bool AttOrnamentaccid::HasAccidlower() const
 {
-    return (m_accidlower != "");
+    return (m_accidlower != ACCIDENTAL_EXPLICIT_NONE);
 }
-
 
 /* include <attaccidlower> */
 
@@ -189,102 +198,106 @@ bool AttOrnamentaccid::HasAccidlower( )
 // AttTurnLog
 //----------------------------------------------------------------------------
 
-AttTurnLog::AttTurnLog(): Att() {
+AttTurnLog::AttTurnLog() : Att()
+{
     ResetTurnLog();
 }
 
-AttTurnLog::~AttTurnLog() {
-
+AttTurnLog::~AttTurnLog()
+{
 }
 
-void AttTurnLog::ResetTurnLog() {
-    m_delayed = "";
-    m_form = "";
+void AttTurnLog::ResetTurnLog()
+{
+    m_delayed = BOOLEAN_NONE;
+    m_form = turnLog_FORM_NONE;
 }
 
-bool AttTurnLog::ReadTurnLog(  pugi::xml_node element ) {
+bool AttTurnLog::ReadTurnLog(pugi::xml_node element)
+{
     bool hasAttribute = false;
     if (element.attribute("delayed")) {
-        this->SetDelayed(StrToStr(element.attribute("delayed").value()));
+        this->SetDelayed(StrToBoolean(element.attribute("delayed").value()));
         element.remove_attribute("delayed");
         hasAttribute = true;
     }
     if (element.attribute("form")) {
-        this->SetForm(StrToStr(element.attribute("form").value()));
+        this->SetForm(StrToTurnLogForm(element.attribute("form").value()));
         element.remove_attribute("form");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttTurnLog::WriteTurnLog(  pugi::xml_node element ) {
+bool AttTurnLog::WriteTurnLog(pugi::xml_node element)
+{
     bool wroteAttribute = false;
     if (this->HasDelayed()) {
-        element.append_attribute("delayed") = StrToStr(this->GetDelayed()).c_str();
+        element.append_attribute("delayed") = BooleanToStr(this->GetDelayed()).c_str();
         wroteAttribute = true;
     }
     if (this->HasForm()) {
-        element.append_attribute("form") = StrToStr(this->GetForm()).c_str();
+        element.append_attribute("form") = TurnLogFormToStr(this->GetForm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttTurnLog::HasDelayed( )
+bool AttTurnLog::HasDelayed() const
 {
-    return (m_delayed != "");
+    return (m_delayed != BOOLEAN_NONE);
 }
 
-bool AttTurnLog::HasForm( )
+bool AttTurnLog::HasForm() const
 {
-    return (m_form != "");
+    return (m_form != turnLog_FORM_NONE);
 }
-
 
 /* include <attform> */
 
-bool Att::SetCmnornaments( Object *element, std::string attrType, std::string attrValue ) {
-    if (element->HasAttClass( ATT_MORDENTLOG ) ) {
-        AttMordentLog *att = dynamic_cast<AttMordentLog*>(element);
-        assert( att );
+bool Att::SetCmnornaments(Object *element, std::string attrType, std::string attrValue)
+{
+    if (element->HasAttClass(ATT_MORDENTLOG)) {
+        AttMordentLog *att = dynamic_cast<AttMordentLog *>(element);
+        assert(att);
         if (attrType == "form") {
-            att->SetForm(att->StrToStr(attrValue));
+            att->SetForm(att->StrToMordentLogForm(attrValue));
             return true;
         }
         if (attrType == "long") {
-            att->SetLong(att->StrToStr(attrValue));
+            att->SetLong(att->StrToBoolean(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass( ATT_ORNAM ) ) {
-        AttOrnam *att = dynamic_cast<AttOrnam*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_ORNAM)) {
+        AttOrnam *att = dynamic_cast<AttOrnam *>(element);
+        assert(att);
         if (attrType == "ornam") {
-            att->SetOrnam(att->StrToStr(attrValue));
+            att->SetOrnam(att->StrToOrnamCmn(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass( ATT_ORNAMENTACCID ) ) {
-        AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_ORNAMENTACCID)) {
+        AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid *>(element);
+        assert(att);
         if (attrType == "accidupper") {
-            att->SetAccidupper(att->StrToStr(attrValue));
+            att->SetAccidupper(att->StrToAccidentalExplicit(attrValue));
             return true;
         }
         if (attrType == "accidlower") {
-            att->SetAccidlower(att->StrToStr(attrValue));
+            att->SetAccidlower(att->StrToAccidentalExplicit(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass( ATT_TURNLOG ) ) {
-        AttTurnLog *att = dynamic_cast<AttTurnLog*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_TURNLOG)) {
+        AttTurnLog *att = dynamic_cast<AttTurnLog *>(element);
+        assert(att);
         if (attrType == "delayed") {
-            att->SetDelayed(att->StrToStr(attrValue));
+            att->SetDelayed(att->StrToBoolean(attrValue));
             return true;
         }
         if (attrType == "form") {
-            att->SetForm(att->StrToStr(attrValue));
+            att->SetForm(att->StrToTurnLogForm(attrValue));
             return true;
         }
     }
@@ -292,46 +305,45 @@ bool Att::SetCmnornaments( Object *element, std::string attrType, std::string at
     return false;
 }
 
-void Att::GetCmnornaments( Object *element, ArrayOfStrAttr *attributes ) {
-    if (element->HasAttClass( ATT_MORDENTLOG ) ) {
-        AttMordentLog *att = dynamic_cast<AttMordentLog*>(element);
-        assert( att );
+void Att::GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes)
+{
+    if (element->HasAttClass(ATT_MORDENTLOG)) {
+        const AttMordentLog *att = dynamic_cast<const AttMordentLog *>(element);
+        assert(att);
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->StrToStr(att->GetForm())));
+            attributes->push_back(std::make_pair("form", att->MordentLogFormToStr(att->GetForm())));
         }
         if (att->HasLong()) {
-            attributes->push_back(std::make_pair("long", att->StrToStr(att->GetLong())));
+            attributes->push_back(std::make_pair("long", att->BooleanToStr(att->GetLong())));
         }
     }
-    if (element->HasAttClass( ATT_ORNAM ) ) {
-        AttOrnam *att = dynamic_cast<AttOrnam*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_ORNAM)) {
+        const AttOrnam *att = dynamic_cast<const AttOrnam *>(element);
+        assert(att);
         if (att->HasOrnam()) {
-            attributes->push_back(std::make_pair("ornam", att->StrToStr(att->GetOrnam())));
+            attributes->push_back(std::make_pair("ornam", att->OrnamCmnToStr(att->GetOrnam())));
         }
     }
-    if (element->HasAttClass( ATT_ORNAMENTACCID ) ) {
-        AttOrnamentaccid *att = dynamic_cast<AttOrnamentaccid*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_ORNAMENTACCID)) {
+        const AttOrnamentaccid *att = dynamic_cast<const AttOrnamentaccid *>(element);
+        assert(att);
         if (att->HasAccidupper()) {
-            attributes->push_back(std::make_pair("accidupper", att->StrToStr(att->GetAccidupper())));
+            attributes->push_back(std::make_pair("accidupper", att->AccidentalExplicitToStr(att->GetAccidupper())));
         }
         if (att->HasAccidlower()) {
-            attributes->push_back(std::make_pair("accidlower", att->StrToStr(att->GetAccidlower())));
+            attributes->push_back(std::make_pair("accidlower", att->AccidentalExplicitToStr(att->GetAccidlower())));
         }
     }
-    if (element->HasAttClass( ATT_TURNLOG ) ) {
-        AttTurnLog *att = dynamic_cast<AttTurnLog*>(element);
-        assert( att );
+    if (element->HasAttClass(ATT_TURNLOG)) {
+        const AttTurnLog *att = dynamic_cast<const AttTurnLog *>(element);
+        assert(att);
         if (att->HasDelayed()) {
-            attributes->push_back(std::make_pair("delayed", att->StrToStr(att->GetDelayed())));
+            attributes->push_back(std::make_pair("delayed", att->BooleanToStr(att->GetDelayed())));
         }
         if (att->HasForm()) {
-            attributes->push_back(std::make_pair("form", att->StrToStr(att->GetForm())));
+            attributes->push_back(std::make_pair("form", att->TurnLogFormToStr(att->GetForm())));
         }
     }
-
 }
-    
+
 } // vrv namespace
-    

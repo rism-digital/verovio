@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #include "slur.h"
 
 //----------------------------------------------------------------------------
@@ -14,34 +13,31 @@
 
 //----------------------------------------------------------------------------
 
+#include "vrv.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
 // Slur
 //----------------------------------------------------------------------------
 
-Slur::Slur():
-    FloatingElement("slur-"), TimeSpanningInterface(),
-    AttCurvature()
+Slur::Slur() : FloatingElement("slur-"), TimeSpanningInterface(), AttCurvature()
 {
+    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_CURVATURE);
-    
-    RegisterInterface( TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface() );
-    
+
     Reset();
 }
-
 
 Slur::~Slur()
 {
 }
-        
+
 void Slur::Reset()
 {
     FloatingElement::Reset();
     TimeSpanningInterface::Reset();
-    
     ResetCurvature();
 }
-    
+
 } // namespace vrv

@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_METERSIG_H__
 #define __VRV_METERSIG_H__
 
@@ -20,37 +19,34 @@ class ScoreDefInterface;
 // MeterSig
 //----------------------------------------------------------------------------
 
-/** 
- * This class models the MEI <meterSig> element. 
+/**
+ * This class models the MEI <meterSig> element.
  */
-class MeterSig: public LayerElement,
-    public AttMeterSigLog
-{
+class MeterSig : public LayerElement, public AttMeterSigLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes.
+     * Reset method resets all attribute classes.
      */
     ///@{
     MeterSig();
-    MeterSig( ScoreDefInterface *meterSigAttr );
+    MeterSig(const ScoreDefInterface *meterSigAttr);
     void Init();
     virtual ~MeterSig();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "MeterSig"; };
-    virtual ClassId Is() { return METERSIG; };
-    virtual Object* Clone() { return new MeterSig(*this); };
+    virtual std::string GetClassName() const { return "MeterSig"; };
+    virtual ClassId Is() const { return METERSIG; };
+    virtual Object *Clone() const { return new MeterSig(*this); };
     ///@}
-    
+
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; };
 
 private:
-    
+    //
 public:
-
+    //
 private:
-    
 };
 
 } // namespace vrv

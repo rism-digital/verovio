@@ -5,7 +5,6 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef __VRV_EDITORIAL_H__
 #define __VRV_EDITORIAL_H__
 
@@ -18,220 +17,132 @@ namespace vrv {
 class FloatingElement;
 class Layer;
 class LayerElement;
-class Lem;
 class Measure;
-class Rdg;
 class ScoreDef;
 class Staff;
 class StaffDef;
 class StaffGrp;
-    
-enum VisibilityType {
-    Hidden = 0,
-    Visible
-};
-    
+class TextElement;
+
+enum VisibilityType { Hidden = 0, Visible };
+
 //----------------------------------------------------------------------------
 // EditorialElement
 //----------------------------------------------------------------------------
 
 /**
  * This class is a base class for the editorial element containing musical
- * content. For example <rgd> or <add>.
+ * content, for example <rgd> or <add>.
  * It is not an abstract class but should not be instantiated directly.
  */
-class EditorialElement: public DocObject,
-    public AttCommon
-{
+class EditorialElement : public Object, public AttCommon, public AttCommonPart {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
     EditorialElement();
     EditorialElement(std::string classid);
     virtual ~EditorialElement();
     virtual void Reset();
-    virtual ClassId Is() { return EDITORIAL_ELEMENT; };
+    virtual ClassId Is() const { return EDITORIAL_ELEMENT; };
     ///@}
 
     /**
      * @name Add children to an editorial element.
      */
     ///@{
-    void AddFloatingElement( FloatingElement *child );
-    void AddLayerElement( LayerElement *child );
-    void AddLayer( Layer *child );
-    void AddMeasure( Measure *child );
-    void AddScoreDef( ScoreDef *child );
-    void AddStaff( Staff *child );
-    void AddStaffDef( StaffDef *child );
-    void AddStaffGrp( StaffGrp *child );
+    void AddFloatingElement(FloatingElement *child);
+    void AddLayerElement(LayerElement *child);
+    void AddTextElement(TextElement *child);
+    void AddLayer(Layer *child);
+    void AddMeasure(Measure *child);
+    void AddScoreDef(ScoreDef *child);
+    void AddStaff(Staff *child);
+    void AddStaffDef(StaffDef *child);
+    void AddStaffGrp(StaffGrp *child);
     ///@}
-    
-    
+
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * Fill a page by adding systems with the appropriate length
      * For EditorialElement, this means only moving them since their width is not
      * taken into account. Only system children EditorialElement are processed.
      */
-    virtual int CastOffSystems( ArrayPtrVoid *params );
-    
-protected:
-    
+    virtual int CastOffSystems(ArrayPtrVoid *params);
+
 private:
-    
+    //
 public:
+    /**
+     * Holds the visibility (hidden or visible) for an editorial element.
+     * By defautl, all editorial elements are visible. However, in an <app>, only one <rdg> is visible at the time. When
+     * loading the file, the first <rdg> (or the <lem>) is made visible.
+     */
     VisibilityType m_visibility;
-    
+
 private:
-    
 };
 
 //----------------------------------------------------------------------------
-// App
+// Abbr
 //----------------------------------------------------------------------------
 
-class App: public EditorialElement
-{
+class Abbr : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method reset all attribute classes
      */
     ///@{
-    App();
-    App( EditorialLevel level );
-    virtual ~App();
+    Abbr();
+    virtual ~Abbr();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "App"; };
-    virtual ClassId Is() { return APP; };
+    virtual std::string GetClassName() const { return "Abbr"; };
+    virtual ClassId Is() const { return ABBR; };
     ///@}
-    
-    /** Getter for level **/
-    EditorialLevel GetLevel() { return m_level; };
-    
-    /**
-     * Add children to a apparatus.
-     * Tests if lemOrRdg is Lem or Rdg.
-     */
-    void AddLemOrRdg(EditorialElement *lemOrRdg);
-    
-protected:
-    /** We store the level of the <app> for integrity check */
-    EditorialLevel m_level;
 
 private:
-    
+    //
 public:
-    
+    //
 private:
-
 };
-    
+
 //----------------------------------------------------------------------------
-// Lem
+// Add
 //----------------------------------------------------------------------------
 
-class Lem: public EditorialElement,
-    public AttSource
-{
+class Add : public EditorialElement, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method reset all attribute classes
      */
     ///@{
-    Lem();
-    virtual ~Lem();
+    Add();
+    virtual ~Add();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Lem"; };
-    virtual ClassId Is() { return LEM; };
+    virtual std::string GetClassName() const { return "Add"; };
+    virtual ClassId Is() const { return ADD; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
-    
+    //
 private:
-    
 };
 
-//----------------------------------------------------------------------------
-// Rdg
-//----------------------------------------------------------------------------
-
-class Rdg: public EditorialElement,
-    public AttSource
-{
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    Rdg();
-    virtual ~Rdg();
-    virtual void Reset();
-    virtual std::string GetClassName( ) { return "Rdg"; };
-    virtual ClassId Is() { return RDG; };
-    ///@}
-    
-protected:
-    
-private:
-    
-public:
-    
-private:
-    
-};    
-
-//----------------------------------------------------------------------------
-// Supplied
-//----------------------------------------------------------------------------
-
-class Supplied: public EditorialElement,
-    public AttSource
-{
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
-     */
-    ///@{
-    Supplied();
-    virtual ~Supplied();
-    virtual void Reset();
-    virtual std::string GetClassName( ) { return "Supplied"; };
-    virtual ClassId Is() { return SUPPLIED; };
-    ///@}
-    
-protected:
-    
-private:
-    
-public:
-    
-private:
-    
-};
-    
 //----------------------------------------------------------------------------
 // Annot
 //----------------------------------------------------------------------------
 
-class Annot: public EditorialElement,
-    public AttPlist,
-    public AttSource
-{
+class Annot : public EditorialElement, public AttPlist, public AttSource {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -241,24 +152,360 @@ public:
     Annot();
     virtual ~Annot();
     virtual void Reset();
-    virtual std::string GetClassName( ) { return "Annot"; };
-    virtual ClassId Is() { return ANNOT; };
+    virtual std::string GetClassName() const { return "Annot"; };
+    virtual ClassId Is() const { return ANNOT; };
     ///@}
-    
-protected:
-    
+
 private:
-    
+    //
 public:
     /**
      * A copy of the annot content tree stored as pugi::xml_document
      */
     pugi::xml_document m_content;
-    
+
 private:
-    
 };
 
-} // namespace vrv    
-    
+//----------------------------------------------------------------------------
+// App
+//----------------------------------------------------------------------------
+
+class App : public EditorialElement {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    App();
+    App(EditorialLevel level);
+    virtual ~App();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "App"; };
+    virtual ClassId Is() const { return APP; };
+    ///@}
+
+    /** Getter for level **/
+    EditorialLevel GetLevel() { return m_level; };
+
+    /**
+     * Add children to a apparatus.
+     * Tests if lemOrRdg is Lem or Rdg.
+     */
+    void AddLemOrRdg(EditorialElement *lemOrRdg);
+
+protected:
+    /** We store the level of the <app> for integrity check */
+    EditorialLevel m_level;
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Corr
+//----------------------------------------------------------------------------
+
+class Corr : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Corr();
+    virtual ~Corr();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Corr"; };
+    virtual ClassId Is() const { return CORR; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Damage
+//----------------------------------------------------------------------------
+
+class Damage : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Damage();
+    virtual ~Damage();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Damage"; };
+    virtual ClassId Is() const { return DAMAGE; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Del
+//----------------------------------------------------------------------------
+
+class Del : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Del();
+    virtual ~Del();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Del"; };
+    virtual ClassId Is() const { return DEL; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Expan
+//----------------------------------------------------------------------------
+
+class Expan : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Expan();
+    virtual ~Expan();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Expan"; };
+    virtual ClassId Is() const { return EXPAN; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Lem
+//----------------------------------------------------------------------------
+
+class Lem : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    Lem();
+    virtual ~Lem();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Lem"; };
+    virtual ClassId Is() const { return LEM; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Orig
+//----------------------------------------------------------------------------
+
+class Orig : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Orig();
+    virtual ~Orig();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Orig"; };
+    virtual ClassId Is() const { return ORIG; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Rdg
+//----------------------------------------------------------------------------
+
+class Rdg : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    Rdg();
+    virtual ~Rdg();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Rdg"; };
+    virtual ClassId Is() const { return RDG; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Reg
+//----------------------------------------------------------------------------
+
+class Reg : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Reg();
+    virtual ~Reg();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Reg"; };
+    virtual ClassId Is() const { return REG; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Restore
+//----------------------------------------------------------------------------
+
+class Restore : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Restore();
+    virtual ~Restore();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Restore"; };
+    virtual ClassId Is() const { return RESTORE; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Sic
+//----------------------------------------------------------------------------
+
+class Sic : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    Sic();
+    virtual ~Sic();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Sic"; };
+    virtual ClassId Is() const { return SIC; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Supplied
+//----------------------------------------------------------------------------
+
+class Supplied : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    Supplied();
+    virtual ~Supplied();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Supplied"; };
+    virtual ClassId Is() const { return SUPPLIED; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Unclear
+//----------------------------------------------------------------------------
+
+class Unclear : public EditorialElement, public AttSource {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    Unclear();
+    virtual ~Unclear();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Unclear"; };
+    virtual ClassId Is() const { return UNCLEAR; };
+    ///@}
+
+private:
+    //
+public:
+    //
+private:
+};
+
+} // namespace vrv
+
 #endif
