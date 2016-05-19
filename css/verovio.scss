@@ -187,6 +187,24 @@ table .img-responsive {
     }
 }
 
+#overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding-top: 100px;
+    background-color: $primary-color-light;
+    z-index: 10000;
+    vertical-align: middle;
+    text-align: center;
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: wait;   
+}
+
 span.keyboard-00 { background-image: url(icons/00.png) !important; }
 span.keyboard-01 { background-image: url(icons/01.png) !important; }
 span.keyboard-02 { background-image: url(icons/02.png) !important; }

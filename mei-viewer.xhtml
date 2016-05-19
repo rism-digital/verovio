@@ -117,6 +117,7 @@ downloads:
     }
 
     function load_page() {
+        $("#overlay").hide().css("cursor", "auto");
         $("#jump_text").val(page);
 
         svg = vrvToolkit.renderPage(page, "");
@@ -590,6 +591,7 @@ downloads:
             if (!file || (file.length == 0)) {
                 file = "examples/downloads/Schubert_Lindenbaum.mei";
             }
+            $("#overlay").show();
             $.ajax({
                 url: file
                 , dataType: "text"
