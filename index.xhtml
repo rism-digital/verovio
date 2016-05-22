@@ -3,6 +3,11 @@ layout: verovio
 verovio-light: true
 title: Verovio
 active: home
+projects:
+    - [["http://www.marenzio.org", "mode"], ["http://beethovens-werkstatt.de/prototyp-2-0/", "bw"],["http://dme.mozarteum.at", "dme"]]
+    - [["http://mith.us/ema/omas", "omas"],["http://freischuetz-digital.de", "freischuetz"],["http://simssa.ca/", "simssa"]]
+    - [["http://oerc.ox.ac.uk/", "oerc"],["http://www.kb.dk/en/nb/dcm/projekter/mermeid.html", "mermeid"],["http://scorelib.huma-num.fr/", "neuma"]]
+    - [["http://ncodamusic.org/", "ncoda"], ["http://www.rism.info", "rism"], []]
 ---
 <div class="row home-row"> 
     <div class="col-md-5 col-sm-12 home-panel">
@@ -97,44 +102,26 @@ active: home
 <div class="row home-row"> 
     <div class="col-xs-12">
         <p>
-            Verovio is designed to be used in a wide range of applications and has been adopted by several projects. It is currently used by:
+            Verovio is designed to be used in a wide range of applications and has been adopted by several projects or institutions. It is currently used by:
         </p>
         <table align="center">
+            {% for line in page.projects %}
             <tr>
-                <td align="center">
-                    <a href="http://www.marenzio.org" target="_blank">
-                        <img src="{{ site.baseurl }}/images/projects/mode.png" style="padding: 10px" class="img-responsive"/>
-                    </a>
-                </td>
-                <td align="center">
-                    <a href="http://beethovens-werkstatt.de/prototyp-2-0/" target="_blank">
-                        <img src="{{ site.baseurl }}/images/projects/beethovens-werkstatt.png" style="padding: 10px" class="img-responsive"/>
-                    </a>
-                </td>
-                <td align="center">
-                    <a href="http://dme.mozarteum.at" target="_blank">
-                        <img src="{{ site.baseurl }}/images/projects/dme.png" style="padding: 10px" class="img-responsive"/>
-                    </a>
-                </td>
+                {% for p in line %}
+                    {% if p != empty %}
+                       <td align="center">
+                           <a href="{{ p[0] }}" target="_blank">
+                               <img src="{{ site.baseurl }}/images/projects/{{ p[1] }}.png" style="padding: 10px" class="img-responsive"/>
+                           </a>
+                       </td>
+                    {% endif %}
+                {% endfor %}
             </tr>
-            <tr>
-                <td align="center">
-                    <a href="https://mith.us/ema/omas" target="_blank">
-                        <img src="{{ site.baseurl }}/images/projects/header_ema.png" style="padding: 10px" class="img-responsive"/>
-                    </a>
-                </td>
-                <td align="center">
-                    <a href="http://freischuetz-digital.de" target="_blank">
-                        <img src="{{ site.baseurl }}/images/projects/freischuetz.png" style="padding: 10px" class="img-responsive"/>
-                    </a>
-                </td>
-                <td align="center">
-                    <a href="http://www.rism.info" target="_blank">
-                        <img src="{{ site.baseurl }}/images/projects/rism.png" style="padding: 10px" class="img-responsive"/>
-                    </a>
-                </td>
-            </tr>
+            {% endfor %}
         </table>
+        <p style="margin-top: 10px;">
+            You are using Verovio? <a href="mailto:info@rism-ch.org">Just let us know</a>!
+        </p>
     </div>
 </div>
 
