@@ -188,7 +188,7 @@ void Page::LayOutHorizontally()
     params.clear();
     int shift = 0;
     int justifiable_shift = 0;
-    int minMeasureWidth = doc->m_drawingMinMeasureWidth;
+    int minMeasureWidth = 0;
     params.push_back(&shift);
     params.push_back(&justifiable_shift);
     params.push_back(&minMeasureWidth);

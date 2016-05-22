@@ -636,10 +636,12 @@ int MeasureAligner::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
     // param 4: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int *>((*params).at(0));
     int *justifiable_shift = static_cast<int *>((*params).at(1));
+    int *minMeasureWidth = static_cast<int *>((*params).at(2));
     Doc *doc = static_cast<Doc *>((*params).at(3));
 
     // We start a new MeasureAligner
     // Reset the accumulated shift to 0;
+    (*minMeasureWidth) = 0;
     (*shift) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
 
     (*justifiable_shift) = -1;
@@ -678,10 +680,11 @@ int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
     // param 2: the minimum measure width
-    // param 3: the functor to be redirected to the MeasureAligner (unused)
+    // param 4: the doc
     int *shift = static_cast<int *>((*params).at(0));
     int *justifiable_shift = static_cast<int *>((*params).at(1));
     int *minMeasureWidth = static_cast<int *>((*params).at(2));
+    Doc *doc = static_cast<Doc *>((*params).at(3));
 
     // integrates the m_xShift into the m_xRel
     m_xRel += m_xShift + (*shift);
@@ -692,6 +695,7 @@ int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
         MeasureAligner *aligner = dynamic_cast<MeasureAligner *>(m_parent);
         assert(aligner);
         aligner->SetNonJustifiableMargin(this->m_xRel + this->m_maxWidth);
+        LogDebug("Aligner margin %d", aligner->GetNonJustifiableMargin());
     }
     else if ((GetType() > ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
         MeasureAligner *aligner = dynamic_cast<MeasureAligner *>(m_parent);
@@ -699,8 +703,11 @@ int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
         (*justifiable_shift) = aligner->GetNonJustifiableMargin();
     }
 
-    if (GetType() == ALIGNMENT_FULLMEASURE2) {
-        (*minMeasureWidth) *= 2;
+    if (GetType() == ALIGNMENT_FULLMEASURE) {
+        (*minMeasureWidth) = doc->m_drawingMinMeasureWidth;
+    }
+    else if (GetType() == ALIGNMENT_FULLMEASURE2) {
+        (*minMeasureWidth) = 2 * doc->m_drawingMinMeasureWidth;
     }
     else if (GetType() == ALIGNMENT_MEASURE_END) {
         m_xRel = std::max(m_xRel, (*minMeasureWidth) + (*justifiable_shift));
@@ -765,6 +772,8 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
     int *maxActualDur = static_cast<int *>((*params).at(2));
     Doc *doc = static_cast<Doc *>((*params).at(3));
 
+    if (this->m_type <= ALIGNMENT_METERSIG_ATTR) return FUNCTOR_CONTINUE;
+
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
     if (intervalTime > 0.0) {
@@ -772,7 +781,7 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
             intervalTime, *maxActualDur, doc->GetSpacingLinear(), doc->GetSpacingNonLinear());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
-    m_xRel = (*previousXRel) + (intervalXRel)*DEFINITON_FACTOR;
+    m_xRel = (*previousXRel) + intervalXRel * DEFINITON_FACTOR;
     (*previousTime) = m_time;
     (*previousXRel) = m_xRel;
 
