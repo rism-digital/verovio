@@ -30,6 +30,7 @@ enum data_ACCIDENTAL_EXPLICIT {
     ACCIDENTAL_EXPLICIT_x,
     ACCIDENTAL_EXPLICIT_ff,
     ACCIDENTAL_EXPLICIT_xs,
+    ACCIDENTAL_EXPLICIT_sx,
     ACCIDENTAL_EXPLICIT_ts,
     ACCIDENTAL_EXPLICIT_tf,
     ACCIDENTAL_EXPLICIT_n,
@@ -220,24 +221,41 @@ enum data_COLORNAMES {
 };
 
 /**
- * MEI data.CURVERENDITION
- */
-enum data_CURVERENDITION {
-    CURVERENDITION_NONE = 0,
-    CURVERENDITION_narrow,
-    CURVERENDITION_medium,
-    CURVERENDITION_wide,
-    CURVERENDITION_dashed,
-    CURVERENDITION_dotted,
-};
-
-/**
  * MEI data.ENCLOSURE
  */
 enum data_ENCLOSURE {
     ENCLOSURE_NONE = 0,
     ENCLOSURE_paren,
     ENCLOSURE_brack,
+};
+
+/**
+ * MEI data.FILL
+ */
+enum data_FILL {
+    FILL_NONE = 0,
+    FILL_void,
+    FILL_solid,
+    FILL_top,
+    FILL_bottom,
+    FILL_left,
+    FILL_right,
+};
+
+/**
+ * MEI data.FONTSIZETERM
+ */
+enum data_FONTSIZETERM {
+    FONTSIZETERM_NONE = 0,
+    FONTSIZETERM_xx_small,
+    FONTSIZETERM_x_small,
+    FONTSIZETERM_small,
+    FONTSIZETERM_medium,
+    FONTSIZETERM_large,
+    FONTSIZETERM_x_large,
+    FONTSIZETERM_xx_large,
+    FONTSIZETERM_smaller,
+    FONTSIZETERM_larger,
 };
 
 /**
@@ -748,15 +766,6 @@ enum data_TEMPERAMENT {
  */
 enum data_TEXTRENDITIONLIST {
     TEXTRENDITIONLIST_NONE = 0,
-    TEXTRENDITIONLIST_xx_small,
-    TEXTRENDITIONLIST_x_small,
-    TEXTRENDITIONLIST_small,
-    TEXTRENDITIONLIST_medium,
-    TEXTRENDITIONLIST_large,
-    TEXTRENDITIONLIST_x_large,
-    TEXTRENDITIONLIST_xx_large,
-    TEXTRENDITIONLIST_smaller,
-    TEXTRENDITIONLIST_larger,
     TEXTRENDITIONLIST_italic,
     TEXTRENDITIONLIST_oblique,
     TEXTRENDITIONLIST_smcaps,
@@ -1069,6 +1078,16 @@ enum meterSigDefaultVis_METERREND {
 };
 
 /**
+ * MEI att.meterSigGrp.log@func
+ */
+enum meterSigGrpLog_FUNC {
+    meterSigGrpLog_FUNC_NONE = 0,
+    meterSigGrpLog_FUNC_alternating,
+    meterSigGrpLog_FUNC_interchanging,
+    meterSigGrpLog_FUNC_mixed,
+};
+
+/**
  * MEI att.meterconformance@metcon
  */
 enum meterconformance_METCON {
@@ -1142,16 +1161,6 @@ enum pianopedals_PEDALSTYLE {
     pianopedals_PEDALSTYLE_line,
     pianopedals_PEDALSTYLE_pedstar,
     pianopedals_PEDALSTYLE_altpedstar,
-};
-
-/**
- * MEI att.plist@evaluate
- */
-enum plist_EVALUATE {
-    plist_EVALUATE_NONE = 0,
-    plist_EVALUATE_all,
-    plist_EVALUATE_one,
-    plist_EVALUATE_none,
 };
 
 /**
@@ -1239,6 +1248,27 @@ enum sylLog_WORDPOS {
     sylLog_WORDPOS_i,
     sylLog_WORDPOS_m,
     sylLog_WORDPOS_t,
+};
+
+/**
+ * MEI att.targeteval@evaluate
+ */
+enum targeteval_EVALUATE {
+    targeteval_EVALUATE_NONE = 0,
+    targeteval_EVALUATE_all,
+    targeteval_EVALUATE_one,
+    targeteval_EVALUATE_none,
+};
+
+/**
+ * MEI att.tempo.log@func
+ */
+enum tempoLog_FUNC {
+    tempoLog_FUNC_NONE = 0,
+    tempoLog_FUNC_continuous,
+    tempoLog_FUNC_instantaneous,
+    tempoLog_FUNC_metricmod,
+    tempoLog_FUNC_precedente,
 };
 
 /**

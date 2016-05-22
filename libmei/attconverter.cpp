@@ -38,6 +38,7 @@ std::string AttConverter::AccidentalExplicitToStr(data_ACCIDENTAL_EXPLICIT data)
         case ACCIDENTAL_EXPLICIT_x: value = "x"; break;
         case ACCIDENTAL_EXPLICIT_ff: value = "ff"; break;
         case ACCIDENTAL_EXPLICIT_xs: value = "xs"; break;
+        case ACCIDENTAL_EXPLICIT_sx: value = "sx"; break;
         case ACCIDENTAL_EXPLICIT_ts: value = "ts"; break;
         case ACCIDENTAL_EXPLICIT_tf: value = "tf"; break;
         case ACCIDENTAL_EXPLICIT_n: value = "n"; break;
@@ -69,6 +70,7 @@ data_ACCIDENTAL_EXPLICIT AttConverter::StrToAccidentalExplicit(std::string value
     if (value == "x") return ACCIDENTAL_EXPLICIT_x;
     if (value == "ff") return ACCIDENTAL_EXPLICIT_ff;
     if (value == "xs") return ACCIDENTAL_EXPLICIT_xs;
+    if (value == "sx") return ACCIDENTAL_EXPLICIT_sx;
     if (value == "ts") return ACCIDENTAL_EXPLICIT_ts;
     if (value == "tf") return ACCIDENTAL_EXPLICIT_tf;
     if (value == "n") return ACCIDENTAL_EXPLICIT_n;
@@ -472,34 +474,6 @@ data_COLORNAMES AttConverter::StrToColornames(std::string value) const
     return COLORNAMES_NONE;
 }
 
-std::string AttConverter::CurverenditionToStr(data_CURVERENDITION data) const
-{
-    std::string value;
-    switch (data) {
-        case CURVERENDITION_narrow: value = "narrow"; break;
-        case CURVERENDITION_medium: value = "medium"; break;
-        case CURVERENDITION_wide: value = "wide"; break;
-        case CURVERENDITION_dashed: value = "dashed"; break;
-        case CURVERENDITION_dotted: value = "dotted"; break;
-        default:
-            LogWarning("Unknown value '%d' for data.CURVERENDITION", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-data_CURVERENDITION AttConverter::StrToCurverendition(std::string value) const
-{
-    if (value == "narrow") return CURVERENDITION_narrow;
-    if (value == "medium") return CURVERENDITION_medium;
-    if (value == "wide") return CURVERENDITION_wide;
-    if (value == "dashed") return CURVERENDITION_dashed;
-    if (value == "dotted") return CURVERENDITION_dotted;
-    LogWarning("Unsupported value '%s' for data.CURVERENDITION", value.c_str());
-    return CURVERENDITION_NONE;
-}
-
 std::string AttConverter::EnclosureToStr(data_ENCLOSURE data) const
 {
     std::string value;
@@ -520,6 +494,72 @@ data_ENCLOSURE AttConverter::StrToEnclosure(std::string value) const
     if (value == "brack") return ENCLOSURE_brack;
     LogWarning("Unsupported value '%s' for data.ENCLOSURE", value.c_str());
     return ENCLOSURE_NONE;
+}
+
+std::string AttConverter::FillToStr(data_FILL data) const
+{
+    std::string value;
+    switch (data) {
+        case FILL_void: value = "void"; break;
+        case FILL_solid: value = "solid"; break;
+        case FILL_top: value = "top"; break;
+        case FILL_bottom: value = "bottom"; break;
+        case FILL_left: value = "left"; break;
+        case FILL_right: value = "right"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.FILL", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_FILL AttConverter::StrToFill(std::string value) const
+{
+    if (value == "void") return FILL_void;
+    if (value == "solid") return FILL_solid;
+    if (value == "top") return FILL_top;
+    if (value == "bottom") return FILL_bottom;
+    if (value == "left") return FILL_left;
+    if (value == "right") return FILL_right;
+    LogWarning("Unsupported value '%s' for data.FILL", value.c_str());
+    return FILL_NONE;
+}
+
+std::string AttConverter::FontsizetermToStr(data_FONTSIZETERM data) const
+{
+    std::string value;
+    switch (data) {
+        case FONTSIZETERM_xx_small: value = "xx-small"; break;
+        case FONTSIZETERM_x_small: value = "x-small"; break;
+        case FONTSIZETERM_small: value = "small"; break;
+        case FONTSIZETERM_medium: value = "medium"; break;
+        case FONTSIZETERM_large: value = "large"; break;
+        case FONTSIZETERM_x_large: value = "x-large"; break;
+        case FONTSIZETERM_xx_large: value = "xx-large"; break;
+        case FONTSIZETERM_smaller: value = "smaller"; break;
+        case FONTSIZETERM_larger: value = "larger"; break;
+        default:
+            LogWarning("Unknown value '%d' for data.FONTSIZETERM", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+data_FONTSIZETERM AttConverter::StrToFontsizeterm(std::string value) const
+{
+    if (value == "xx-small") return FONTSIZETERM_xx_small;
+    if (value == "x-small") return FONTSIZETERM_x_small;
+    if (value == "small") return FONTSIZETERM_small;
+    if (value == "medium") return FONTSIZETERM_medium;
+    if (value == "large") return FONTSIZETERM_large;
+    if (value == "x-large") return FONTSIZETERM_x_large;
+    if (value == "xx-large") return FONTSIZETERM_xx_large;
+    if (value == "smaller") return FONTSIZETERM_smaller;
+    if (value == "larger") return FONTSIZETERM_larger;
+    LogWarning("Unsupported value '%s' for data.FONTSIZETERM", value.c_str());
+    return FONTSIZETERM_NONE;
 }
 
 std::string AttConverter::FontstyleToStr(data_FONTSTYLE data) const
@@ -1640,15 +1680,6 @@ std::string AttConverter::TextrenditionlistToStr(data_TEXTRENDITIONLIST data) co
 {
     std::string value;
     switch (data) {
-        case TEXTRENDITIONLIST_xx_small: value = "xx-small"; break;
-        case TEXTRENDITIONLIST_x_small: value = "x-small"; break;
-        case TEXTRENDITIONLIST_small: value = "small"; break;
-        case TEXTRENDITIONLIST_medium: value = "medium"; break;
-        case TEXTRENDITIONLIST_large: value = "large"; break;
-        case TEXTRENDITIONLIST_x_large: value = "x-large"; break;
-        case TEXTRENDITIONLIST_xx_large: value = "xx-large"; break;
-        case TEXTRENDITIONLIST_smaller: value = "smaller"; break;
-        case TEXTRENDITIONLIST_larger: value = "larger"; break;
         case TEXTRENDITIONLIST_italic: value = "italic"; break;
         case TEXTRENDITIONLIST_oblique: value = "oblique"; break;
         case TEXTRENDITIONLIST_smcaps: value = "smcaps"; break;
@@ -1683,15 +1714,6 @@ std::string AttConverter::TextrenditionlistToStr(data_TEXTRENDITIONLIST data) co
 
 data_TEXTRENDITIONLIST AttConverter::StrToTextrenditionlist(std::string value) const
 {
-    if (value == "xx-small") return TEXTRENDITIONLIST_xx_small;
-    if (value == "x-small") return TEXTRENDITIONLIST_x_small;
-    if (value == "small") return TEXTRENDITIONLIST_small;
-    if (value == "medium") return TEXTRENDITIONLIST_medium;
-    if (value == "large") return TEXTRENDITIONLIST_large;
-    if (value == "x-large") return TEXTRENDITIONLIST_x_large;
-    if (value == "xx-large") return TEXTRENDITIONLIST_xx_large;
-    if (value == "smaller") return TEXTRENDITIONLIST_smaller;
-    if (value == "larger") return TEXTRENDITIONLIST_larger;
     if (value == "italic") return TEXTRENDITIONLIST_italic;
     if (value == "oblique") return TEXTRENDITIONLIST_oblique;
     if (value == "smcaps") return TEXTRENDITIONLIST_smcaps;
@@ -2402,6 +2424,30 @@ meterSigDefaultVis_METERREND AttConverter::StrToMeterSigDefaultVisMeterrend(std:
     return meterSigDefaultVis_METERREND_NONE;
 }
 
+std::string AttConverter::MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case meterSigGrpLog_FUNC_alternating: value = "alternating"; break;
+        case meterSigGrpLog_FUNC_interchanging: value = "interchanging"; break;
+        case meterSigGrpLog_FUNC_mixed: value = "mixed"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.meterSigGrp.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+meterSigGrpLog_FUNC AttConverter::StrToMeterSigGrpLogFunc(std::string value) const
+{
+    if (value == "alternating") return meterSigGrpLog_FUNC_alternating;
+    if (value == "interchanging") return meterSigGrpLog_FUNC_interchanging;
+    if (value == "mixed") return meterSigGrpLog_FUNC_mixed;
+    LogWarning("Unsupported value '%s' for att.meterSigGrp.log@func", value.c_str());
+    return meterSigGrpLog_FUNC_NONE;
+}
+
 std::string AttConverter::MeterconformanceMetconToStr(meterconformance_METCON data) const
 {
     std::string value;
@@ -2584,30 +2630,6 @@ pianopedals_PEDALSTYLE AttConverter::StrToPianopedalsPedalstyle(std::string valu
     if (value == "altpedstar") return pianopedals_PEDALSTYLE_altpedstar;
     LogWarning("Unsupported value '%s' for att.pianopedals@pedal.style", value.c_str());
     return pianopedals_PEDALSTYLE_NONE;
-}
-
-std::string AttConverter::PlistEvaluateToStr(plist_EVALUATE data) const
-{
-    std::string value;
-    switch (data) {
-        case plist_EVALUATE_all: value = "all"; break;
-        case plist_EVALUATE_one: value = "one"; break;
-        case plist_EVALUATE_none: value = "none"; break;
-        default:
-            LogWarning("Unknown value '%d' for att.plist@evaluate", data);
-            value = "";
-            break;
-    }
-    return value;
-}
-
-plist_EVALUATE AttConverter::StrToPlistEvaluate(std::string value) const
-{
-    if (value == "all") return plist_EVALUATE_all;
-    if (value == "one") return plist_EVALUATE_one;
-    if (value == "none") return plist_EVALUATE_none;
-    LogWarning("Unsupported value '%s' for att.plist@evaluate", value.c_str());
-    return plist_EVALUATE_NONE;
 }
 
 std::string AttConverter::PointingXlinkactuateToStr(pointing_XLINKACTUATE data) const
@@ -2814,6 +2836,56 @@ sylLog_WORDPOS AttConverter::StrToSylLogWordpos(std::string value) const
     if (value == "t") return sylLog_WORDPOS_t;
     LogWarning("Unsupported value '%s' for att.syl.log@wordpos", value.c_str());
     return sylLog_WORDPOS_NONE;
+}
+
+std::string AttConverter::TargetevalEvaluateToStr(targeteval_EVALUATE data) const
+{
+    std::string value;
+    switch (data) {
+        case targeteval_EVALUATE_all: value = "all"; break;
+        case targeteval_EVALUATE_one: value = "one"; break;
+        case targeteval_EVALUATE_none: value = "none"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.targeteval@evaluate", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+targeteval_EVALUATE AttConverter::StrToTargetevalEvaluate(std::string value) const
+{
+    if (value == "all") return targeteval_EVALUATE_all;
+    if (value == "one") return targeteval_EVALUATE_one;
+    if (value == "none") return targeteval_EVALUATE_none;
+    LogWarning("Unsupported value '%s' for att.targeteval@evaluate", value.c_str());
+    return targeteval_EVALUATE_NONE;
+}
+
+std::string AttConverter::TempoLogFuncToStr(tempoLog_FUNC data) const
+{
+    std::string value;
+    switch (data) {
+        case tempoLog_FUNC_continuous: value = "continuous"; break;
+        case tempoLog_FUNC_instantaneous: value = "instantaneous"; break;
+        case tempoLog_FUNC_metricmod: value = "metricmod"; break;
+        case tempoLog_FUNC_precedente: value = "precedente"; break;
+        default:
+            LogWarning("Unknown value '%d' for att.tempo.log@func", data);
+            value = "";
+            break;
+    }
+    return value;
+}
+
+tempoLog_FUNC AttConverter::StrToTempoLogFunc(std::string value) const
+{
+    if (value == "continuous") return tempoLog_FUNC_continuous;
+    if (value == "instantaneous") return tempoLog_FUNC_instantaneous;
+    if (value == "metricmod") return tempoLog_FUNC_metricmod;
+    if (value == "precedente") return tempoLog_FUNC_precedente;
+    LogWarning("Unsupported value '%s' for att.tempo.log@func", value.c_str());
+    return tempoLog_FUNC_NONE;
 }
 
 std::string AttConverter::TupletVisNumformatToStr(tupletVis_NUMFORMAT data) const

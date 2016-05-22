@@ -199,19 +199,31 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMidiTempo(data_MIDITEMPO midiTempo_) { m_midiTempo = midiTempo_; };
-    data_MIDITEMPO GetMidiTempo() const { return m_midiTempo; };
-    bool HasMidiTempo() const;
+    void SetMidiBpm(data_MIDIBPM midiBpm_) { m_midiBpm = midiBpm_; };
+    data_MIDIBPM GetMidiBpm() const { return m_midiBpm; };
+    bool HasMidiBpm() const;
+    //
+    void SetMidiMspb(data_MIDIMSPB midiMspb_) { m_midiMspb = midiMspb_; };
+    data_MIDIMSPB GetMidiMspb() const { return m_midiMspb; };
+    bool HasMidiMspb() const;
     ///@}
 
 private:
     /**
-     * Contains a MIDI value, that is, the number of quarter notes per minute in the
-     * range from 10 to 1000.
+     * Captures the number of *quarter notes* per minute.
+     * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
+     * time signature or the metronomic indication*.
      **/
-    data_MIDITEMPO m_midiTempo;
+    data_MIDIBPM m_midiBpm;
+    /**
+     * Records the number of microseconds per *quarter note*.
+     * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
+     * time signature or the metronomic indication*. At 120 quarter notes per minute,
+     * each quarter note will last 500,000 microseconds.
+     **/
+    data_MIDIMSPB m_midiMspb;
 
-    /* include <attmidi.tempo> */
+    /* include <attmidi.mspb> */
 };
 
 //----------------------------------------------------------------------------
