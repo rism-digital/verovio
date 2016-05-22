@@ -82,7 +82,12 @@ while getopts "lwv:h:c" opt; do
 	esac
 done
 
-FILENAME="verovio-toolkit$ASM_NAME$WEBWORKER_NAME$VERSION_NAME.js"
+FILENAME="verovio-toolkit$ASM_NAME$WEBWORKER_NAME.js"
+
+if [ -n "$VERSION" ]; then
+    if [ ! -d build/$VERSION ]; then mkdir build/$VERSION; fi
+    FILENAME=$VERSION/$FILENAME
+fi
 
 echo "Sync svg resources"
 cp -r ../data/* data/

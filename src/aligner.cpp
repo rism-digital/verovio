@@ -221,7 +221,6 @@ MeasureAligner::MeasureAligner() : Object()
 {
     m_leftAlignment = NULL;
     m_rightAlignment = NULL;
-    m_nonJustifiableLeftMargin = 0;
 }
 
 MeasureAligner::~MeasureAligner()
@@ -231,6 +230,7 @@ MeasureAligner::~MeasureAligner()
 void MeasureAligner::Reset()
 {
     Object::Reset();
+    m_nonJustifiableLeftMargin = 0;
     m_leftAlignment = new Alignment(-1.0, ALIGNMENT_MEASURE_START);
     AddAlignment(m_leftAlignment);
     m_rightAlignment = new Alignment(0.0, ALIGNMENT_MEASURE_END);
