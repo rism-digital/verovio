@@ -509,7 +509,7 @@ downloads:
     </div>
     
     <div class="sidebar-panel">
-        <p>This viewer uses the latest development version and might be unstable.</p>
+        <p>This viewer uses the latest development version <a href="" id="version">[version]</a> and might be unstable.</p>
         <p>Do you need the old MEI viewer? It is available <a href="{{ site.baseurl }}/mei-viewer-old.xhtml">here</a>.</p>
     </div>
     
@@ -519,6 +519,12 @@ downloads:
 <script type="text/javascript">
 //<![CDATA[
     $( document ).ready(function() {
+        
+        var version = vrvToolkit.getVersion();
+        var n = version.lastIndexOf('-');
+        var commit = version.substring(n + 1);
+        $('#version').text( version );
+        $("#version").attr( "href", "http://github.com/rism-ch/verovio/commit/" + commit ) ; 
         
         $(window).keyup(function(event){
             // We need to make sure not to capture event on text fields
