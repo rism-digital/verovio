@@ -1,3 +1,3 @@
-./verovio --adjust-page-height --ignore-layout -s 33 --spacing-system=0 --spacing-staff=0 -r ../data/ -o ../example-lg.svg -h 1300 -w 2030 ~/Documents/verovio/gh-pages/examples/downloads/Schubert_Lindenbaum.mei
-./verovio --adjust-page-height --ignore-layout -s 40 --spacing-system=0 --spacing-staff=0 -r ../data/ -o ../example-md.svg -h 1200 -w 1410 ~/Documents/verovio/gh-pages/examples/downloads/Schubert_Lindenbaum.mei
-./verovio --page 3 --adjust-page-height --ignore-layout -s 40 --spacing-system=0 --spacing-staff=0 -r ../data/ -o ../example-sm.svg -h 800 -w 920 ~/Documents/verovio/gh-pages/examples/downloads/Schubert_Lindenbaum.mei
+./verovio --adjust-page-height --ignore-layout -s 35 --spacing-system=0 --spacing-staff=0 -r ../data/ -o ../example-lg.svg -h 1300 -w 1900 ~/Documents/verovio/gh-pages/examples/downloads/Schubert_Lindenbaum.mei
+./verovio  --no-justification  --adjust-page-height --ignore-layout -s 40 --spacing-system=0 --spacing-staff=0 -r ../data/ -o ../example-md.svg -h 1200 -w 1410 ~/Documents/verovio/gh-pages/examples/downloads/Schubert_Lindenbaum.mei
+./verovio  --no-justification  --page 3 --adjust-page-height --ignore-layout -s 40 --spacing-system=0 --spacing-staff=0 -r ../data/ -o ../example-sm.svg -h 800 -w 920 ~/Documents/verovio/gh-pages/examples/downloads/Schubert_Lindenbaum.mei
