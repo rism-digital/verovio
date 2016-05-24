@@ -277,6 +277,8 @@ int System::AdjustFloatingPostioners(ArrayPtrVoid *params)
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     (*classId) = SLUR;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
+    (*classId) = OCTAVE;
+    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     (*classId) = HAIRPIN;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     (*classId) = DYNAM;

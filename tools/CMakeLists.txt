@@ -55,6 +55,7 @@ add_executable (verovio
 	../src/multirest.cpp
 	../src/note.cpp
 	../src/object.cpp
+	../src/octave.cpp
 	../src/page.cpp
 	../src/pitchinterface.cpp
 	../src/positioninterface.cpp

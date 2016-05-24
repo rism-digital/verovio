@@ -32,6 +32,7 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "octave.h"
 #include "page.h"
 #include "proport.h"
 #include "rest.h"
@@ -213,6 +214,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == HAIRPIN) {
         m_currentNode = m_currentNode.append_child("hairpin");
         WriteMeiHairpin(m_currentNode, dynamic_cast<Hairpin *>(object));
+    }
+    else if (object->Is() == OCTAVE) {
+        m_currentNode = m_currentNode.append_child("octave");
+        WriteMeiOctave(m_currentNode, dynamic_cast<Octave *>(object));
     }
     else if (object->Is() == SLUR) {
         m_currentNode = m_currentNode.append_child("slur");
@@ -606,6 +611,15 @@ void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     WriteTimeSpanningInterface(currentNode, hairpin);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
+};
+
+void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
+{
+    assert(octave);
+
+    WriteXmlId(currentNode, octave);
+    WriteTimeSpanningInterface(currentNode, octave);
+    octave->WriteOctavedisplacement(currentNode);
 };
 
 void MeiOutput::WriteMeiSlur(pugi::xml_node currentNode, Slur *slur)
@@ -1664,6 +1678,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "hairpin") {
             success = ReadMeiHairpin(parent, current);
         }
+        else if (std::string(current.name()) == "octave") {
+            success = ReadMeiOctave(parent, current);
+        }
         else if (std::string(current.name()) == "slur") {
             success = ReadMeiSlur(parent, current);
         }
@@ -1733,6 +1750,18 @@ bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
     vrvHairpin->ReadPlacement(hairpin);
 
     AddFloatingElement(parent, vrvHairpin);
+    return true;
+}
+
+bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node octave)
+{
+    Octave *vrvOctave = new Octave();
+    SetMeiUuid(octave, vrvOctave);
+
+    ReadTimeSpanningInterface(octave, vrvOctave);
+    vrvOctave->ReadOctavedisplacement(octave);
+
+    AddFloatingElement(parent, vrvOctave);
     return true;
 }
 

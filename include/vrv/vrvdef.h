@@ -119,6 +119,7 @@ enum ClassId {
     DIR,
     DYNAM,
     HAIRPIN,
+    OCTAVE,
     SLUR,
     TEMPO,
     TIE,

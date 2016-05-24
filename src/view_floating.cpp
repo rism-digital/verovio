@@ -27,6 +27,7 @@
 #include "layerelement.h"
 #include "measure.h"
 #include "note.h"
+#include "octave.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -85,7 +86,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if ((element->Is() == SLUR) || (element->Is() == HAIRPIN) || (element->Is() == TIE)) return;
+            if ((element->Is() == SLUR) || (element->Is() == HAIRPIN) || (element->Is() == OCTAVE)
+                || (element->Is() == TIE))
+                return;
         }
     }
 
@@ -166,11 +169,15 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
                 (*staffIter)->GetN(), dynamic_cast<FloatingElement *>(element), x1, (*staffIter)->GetDrawingY());
 
         if (element->Is() == HAIRPIN) {
-            // cast to Slur check in DrawTieOrSlur
+            // cast to Harprin check in DrawHairpin
             DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
+        else if (element->Is() == OCTAVE) {
+            // cast to Slur check in DrawOctave
+            DrawOctave(dc, dynamic_cast<Octave *>(element), x1, x2, *staffIter, spanningType, graphic);
+        }
         else if (element->Is() == SLUR) {
-            // cast to Slur check in DrawTieOrSlur
+            // cast to Slur check in DrawSlur
             DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is() == SYL) {
@@ -178,7 +185,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             DrawSylConnector(dc, dynamic_cast<Syl *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is() == TIE) {
-            // cast to Slur check in DrawTieOrSlur
+            // cast to Slur check in DrawTie
             DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
     }
@@ -346,6 +353,108 @@ void View::DrawHairpin(
         dc->EndResumedGraphic(graphic, this);
     else
         dc->EndGraphic(hairpin, this);
+}
+
+void View::DrawOctave(
+    DeviceContext *dc, Octave *octave, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
+{
+    assert(dc);
+    assert(octave);
+    assert(staff);
+
+    if (!octave->HasDis() || !octave->HasDisPlace()) {
+        // we cannot draw an octave that has no @dis nor a @dis.place
+        return;
+    }
+
+    LayerElement *start = NULL;
+    LayerElement *end = NULL;
+
+    data_OCTAVE_DIS dis = octave->GetDis();
+    data_PLACE disPlace = octave->GetDisPlace();
+
+    int y1 = octave->GetDrawingY();
+    int y2 = y1;
+
+    /************** parent layers **************/
+
+    start = dynamic_cast<LayerElement *>(octave->GetStart());
+    end = dynamic_cast<LayerElement *>(octave->GetEnd());
+
+    if (!start || !end) {
+        // no start and end, obviously nothing to do...
+        return;
+    }
+
+    Layer *layer1 = NULL;
+    Layer *layer2 = NULL;
+
+    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
+    if (start->Is() == TIMESTAMP_ATTR)
+        layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    else {
+        layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
+        // if attached to and id and not a beginning of a system, then adjust it
+        if (spanningType != SPANNING_END)
+            x1 -= m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2;
+    }
+
+    // idem
+    if (end->Is() == TIMESTAMP_ATTR)
+        layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    else {
+        layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
+        // if attached to and id and not a end of a system, then adjust it
+        if (spanningType != SPANNING_START)
+            x2 += m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2;
+    }
+
+    assert(layer1 && layer2);
+
+    /************** draw it **************/
+
+    if (graphic)
+        dc->ResumeGraphic(graphic, graphic->GetUuid());
+    else
+        dc->StartGraphic(octave, "spanning-octave", "");
+
+    int code = SMUFL_E511_ottavaAlta;
+    if (disPlace == PLACE_above) {
+        switch (dis) {
+            // here we could use other glyphs depending on the style
+            case OCTAVE_DIS_8: code = SMUFL_E510_ottava; break;
+            case OCTAVE_DIS_15: code = SMUFL_E514_quindicesima; break;
+            case OCTAVE_DIS_22: code = SMUFL_E517_ventiduesima; break;
+            default: break;
+        }
+    }
+    else {
+        switch (dis) {
+            // ditto
+            case OCTAVE_DIS_8: code = SMUFL_E510_ottava; break;
+            case OCTAVE_DIS_15: code = SMUFL_E514_quindicesima; break;
+            case OCTAVE_DIS_22: code = SMUFL_E517_ventiduesima; break;
+            default: break;
+        }
+    }
+    int w, h;
+    std::wstring str;
+    str.push_back(code);
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
+    dc->GetSmuflTextExtent(str, &w, &h);
+    int yCode = (disPlace == PLACE_above) ? y1 - h : y1;
+    DrawSmuflCode(dc, x1 - w, yCode, code, staff->m_drawingStaffSize, false);
+    dc->ResetFont();
+
+    y2 += (disPlace == PLACE_above) ? -h : h;
+    x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    DrawHorizontalLine(dc, x1, x2, y1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+    DrawVerticalLine(dc, y1, y2, x2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+
+    if (graphic)
+        dc->EndResumedGraphic(graphic, this);
+    else
+        dc->EndGraphic(octave, this);
 }
 
 void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
