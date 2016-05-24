@@ -951,9 +951,9 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 {
     Point bezier[4];
     bezier[0] = *p1;
-    bezier[1] = *c1;
-    bezier[2] = *c2;
-    bezier[3] = *p2;
+    bezier[1] = *p2;
+    bezier[2] = *c1;
+    bezier[3] = *c2;
 
     ArrayOfLayerElementPointPairs::iterator itPoint;
     int y;
@@ -1034,8 +1034,8 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 
     // Check if we need further adjustment of the points with the adjusted curve
     /*
-    bezier[1] = *c1;
-    bezier[2] = *c2;
+    bezier[2] = *c1;
+    bezier[3] = *c2;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
         y = View::CalcBezierAtPosition(bezier, itPoint->second.x);
         if (up) {
@@ -1064,9 +1064,9 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
 {
     Point bezier[4];
     bezier[0] = *p1;
-    bezier[1] = *c1;
-    bezier[2] = *c2;
-    bezier[3] = *p2;
+    bezier[1] = *p2;
+    bezier[2] = *c1;
+    bezier[3] = *c2;
 
     int maxShiftLeft = 0;
     int maxShiftRight = 0;

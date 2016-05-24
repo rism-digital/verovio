@@ -434,7 +434,7 @@ private:
     /**
      * Calculate the position of a point after a rotation of rot_alpha around the center
      */
-    static int CalcBezierAtPosition(Point bezier[], int x);
+    static int CalcBezierAtPosition(const Point bezier[4], int x);
 
     /**
      * Swap values passed as reference.
