@@ -110,6 +110,7 @@ downloads:
             $("#play-button").show();
         }
         catch(err) {
+            $("#overlay").hide().css("cursor", "auto");
             $('#err').html(err);
             $('#errorDialog').modal();
         }
