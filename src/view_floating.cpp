@@ -447,9 +447,20 @@ void View::DrawOctave(
     dc->ResetFont();
 
     y2 += (disPlace == PLACE_above) ? -h : h;
+    // adjust is to avoid the figure to touch the line
     x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-    DrawHorizontalLine(dc, x1, x2, y1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
-    DrawVerticalLine(dc, y1, y2, x2, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+
+    dc->SetPen(m_currentColour, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID,
+        m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+    dc->SetBrush(m_currentColour, AxSOLID);
+
+    dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
+    // draw the ending vertical line if not the end of the system
+    if (spanningType != SPANNING_START)
+        dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+
+    dc->ResetPen();
+    dc->ResetBrush();
 
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
