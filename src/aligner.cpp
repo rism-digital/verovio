@@ -695,7 +695,7 @@ int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
         MeasureAligner *aligner = dynamic_cast<MeasureAligner *>(m_parent);
         assert(aligner);
         aligner->SetNonJustifiableMargin(this->m_xRel + this->m_maxWidth);
-        LogDebug("Aligner margin %d", aligner->GetNonJustifiableMargin());
+        // LogDebug("Aligner margin %d", aligner->GetNonJustifiableMargin());
     }
     else if ((GetType() > ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
         MeasureAligner *aligner = dynamic_cast<MeasureAligner *>(m_parent);
