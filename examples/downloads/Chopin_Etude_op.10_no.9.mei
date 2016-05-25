@@ -181,7 +181,7 @@
                                 </staff>
                                 <dynam staff="1" place="below" tstamp="1">p</dynam>
                                 <dir staff="2" place="below" tstamp="1">legatissimo</dir>
-                                <tempo staff="1" place="above" tstamp="1">Allegro molto agitato</tempo>
+                                <dir staff="1" place="above" tstamp="1">Allegro molto agitato</dir>
                                 <slur staff="1" curvedir="below" tstamp="2" tstamp2="0m+3"/>
                                 <slur staff="1" curvedir="below" tstamp="5" tstamp2="0m+6"/>
                                 <slur staff="2" curvedir="above" tstamp="0.5" tstamp2="0m+3.5"/>
@@ -324,6 +324,16 @@
                 </changeDesc>
                 <date isodate="2016-05-12"/>
             </change>
+            <change n="11">
+                <respStmt>
+                    <persName resp="Laurent Pugin"/>
+                </respStmt>
+                <changeDesc>
+                    <p>Fixing tempo in header (changing back to dir)</p>
+                    <p>Adding pedal marking</p>
+                </changeDesc>
+                <date isodate="2016-05-25"/>
+            </change>
         </revisionDesc>
     </meiHead>
     <music>
@@ -387,6 +397,10 @@
                             <slur curvedir="below" startid="#d414233e89" endid="#d414233e110"/>
                             <slur curvedir="above" startid="#d414233e148" endid="#d414233e242"/>
                             <slur curvedir="above" startid="#d414233e260" endid="#d414233e353"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="2" xml:id="d414233e371">
                             <staff n="1">
@@ -436,6 +450,10 @@
                             <dir staff="1" place="below" tstamp="1">cresc.</dir>
                             <hairpin form="cres" staff="1" tstamp="3" place="below" tstamp2="6.5"/>
                             <slur startid="#d414233e381" endid="#d414233e1055" curvedir="above"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="3" xml:id="d414233e709">
                             <staff n="1">
@@ -485,6 +503,10 @@
                                 </layer>
                             </staff>
                             <dir staff="1" place="below" tstamp="1">con forza</dir>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="4" xml:id="d414233e1053">
                             <staff n="1">
@@ -514,6 +536,10 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="5" xml:id="d414233e1292">
                             <staff n="1">
@@ -558,12 +584,14 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <dir staff="2" place="below" tstamp="4">
-                                <rend fontstyle="italic">segue</rend>
-                            </dir>
                             <slur startid="#d414233e1302" endid="#d414233e1321"/>
                             <slur startid="#d414233e1348" endid="#d414233e1369"/>
                             <dynam staff="1" place="below" tstamp="1">p</dynam>
+                            <pedal dir="down" staff="2" tstamp="1"  />
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <dir staff="2" place="below" tstamp="4">
+                                <rend fontstyle="italic">segue</rend>
+                            </dir>
                         </measure>
                         <measure n="6" xml:id="d414233e1614">
                             <staff n="1">
@@ -1045,6 +1073,8 @@
                                     </beam>
                                 </layer>
                             </staff>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="17" xml:id="d414233e5071">
                             <staff n="1">
@@ -1081,6 +1111,10 @@
                             <hairpin form="cres" staff="1" place="below" tstamp="1.5" tstamp2="6.5"/>
                             <dynam staff="1" place="below" tstamp="1">p</dynam>
                             <slur startid="#d414233e5073" curvedir="above" endid="#d414233e6048"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="18" xml:id="d414233e5399">
                             <staff n="1">
@@ -1110,6 +1144,10 @@
                                 </layer>
                             </staff>
                             <dir staff="1" place="below" tstamp="1">piu cresc.</dir>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="19" xml:id="d414233e5677">
                             <staff n="1">
@@ -1159,6 +1197,8 @@
                                 </layer>
                             </staff>
                             <dynam staff="1" place="below" tstamp="1">f</dynam>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="20" xml:id="d414233e6046">
                             <staff n="1">
@@ -1193,6 +1233,8 @@
                             </staff>
                             <slur startid="#d414233e6083" endid="#d414233e6344" curvedir="above"/>
                             <dynam staff="1" place="below" tstamp="1">fz</dynam>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="21" xml:id="d414233e6342">
                             <staff n="1">
@@ -1232,6 +1274,8 @@
                             <slur startid="#d414233e6397" endid="#d414233e6700"/>
                             <hairpin form="cres" staff="1" place="below" tstamp="3" tstamp2="1m+1.0"/>
                             <dynam staff="1" place="below" tstamp="1">p</dynam>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="22" xml:id="d414233e6698">
                             <staff n="1">
@@ -1264,6 +1308,10 @@
                             </staff>
                             <dir staff="2" place="above" tstamp="4">cresc.</dir>
                             <tie curvedir="above" startid="#d414233e6715" endid="#d414233e6988"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="23" xml:id="d414233e6986">
                             <staff n="1">
@@ -1312,6 +1360,8 @@
                             </staff>
                             <dir tstamp="4" staff="2" place="above">sempre</dir>
                             <slur startid="#d414233e7011" endid="#d414233e7362" curvedir="above"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="24" xml:id="d414233e7360">
                             <staff n="1">
@@ -1362,6 +1412,10 @@
                             </staff>
                             <dir staff="2" place="above" tstamp="1">stretto e piu</dir>
                             <slur startid="#d414233e7381" endid="#d414233e7726" curvedir="above"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="25" xml:id="d414233e7724">
                             <staff n="1">
@@ -1423,6 +1477,7 @@
                             <slur startid="#d414548e1" endid="#d414552e1" curvedir="above"/>
                             <slur startid="#d414556e1" endid="#d414560e1" curvedir="above"/>
                             <dynam staff="1" place="below" tstamp="1">f</dynam>
+                            <pedal dir="down" staff="2" tstamp="1"/>
                         </measure>
                         <measure n="26" xml:id="d414233e8158">
                             <staff n="1">
@@ -1482,6 +1537,9 @@
                             <slur startid="#d414577e1" endid="#d414581e1"/>
                             <slur startid="#d414585e1" endid="#d414589e1"/>
                             <dir staff="2" place="above" tstamp="3">accelerando e</dir>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="27" xml:id="d414233e8554">
                             <staff n="1">
@@ -1539,7 +1597,7 @@
                             <slur startid="#d414606e1" endid="#d414610e1"/>
                             <slur startid="#d414614e1" endid="#d414618e1"/>
                             <slur startid="#d414622e1" endid="#d414626e1"/>
-                            <octave staff="1" dis="8" tstamp="1" dis.place="above" startid="#d414606e1" endid="#d414651e1"/>
+                            <octave staff="1" dis="8" dis.place="above" startid="#d414606e1" endid="#d414651e1"/>
                             <dir staff="1" place="below" tstamp="1">piu cresc.</dir>
                         </measure>
                         <measure n="28" xml:id="d414233e9012">
@@ -1645,6 +1703,10 @@
                             <dir staff="2" place="below" tstamp="1">sempre legato</dir>
                             <slur curvedir="above" startid="#d414668e1" endid="#d414676e1"/>
                             <slur curvedir="above" startid="#d414680e1" endid="#d414684e1"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="30" xml:id="d414233e9803">
                             <staff n="1">
@@ -1689,6 +1751,10 @@
                             <dynam staff="1" place="below" tstamp="1">pp</dynam>
                             <slur startid="#d414233e9805" endid="#d414233e9852" curvedir="above"/>
                             <slur startid="#d414233e9873" endid="#d414233e9892" curvedir="above"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="31" xml:id="d414233e10134">
                             <staff n="1">
@@ -1742,6 +1808,10 @@
                             <dynam staff="1" place="below" tstamp="1">f</dynam>
                             <dir staff="2" place="above" tstamp="2">stretto</dir>
                             <slur curvedir="above" startid="#d414714e1" endid="#d414726e1"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="32" xml:id="d414233e10511">
                             <staff n="1">
@@ -1776,6 +1846,10 @@
                             </staff>
                             <dynam staff="1" place="below" tstamp="1">pp</dynam>
                             <slur startid="#d414233e10513" endid="#d414233e10554" curvedir="above"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="33" xml:id="d414233e10810">
                             <staff n="1">
@@ -1851,6 +1925,10 @@
                             <dir staff="2" place="above" tstamp="1.2">appassionato</dir>
                             <dynam staff="1" place="below" tstamp="1">f</dynam>
                             <slur startid="#d414776e1" endid="#d414780e1" curvedir="above"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="34" xml:id="d414233e11319">
                             <staff n="1">
@@ -1903,6 +1981,10 @@
                             <slur startid="#d414233e11321" endid="#d414233e11414"/>
                             <dynam staff="1" place="below" tstamp="1">pp</dynam>
                             <slur curvedir="above" startid="#d414233e11436" endid="#d414233e11455"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="35" xml:id="d414233e11697">
                             <staff n="1">
@@ -1959,6 +2041,10 @@
                             </staff>
                             <slur startid="#d414810e1" endid="#d414830e1-2"/>
                             <dynam staff="1" place="below" tstamp="1">f</dynam>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="36" xml:id="d414233e12129">
                             <staff n="1">
@@ -1998,6 +2084,10 @@
                             <dir staff="1" place="above" tstamp="1.5">poco rallent.</dir>
                             <dynam staff="1" place="below" tstamp="1">pp</dynam>
                             <slur curvedir="above" startid="#d414233e12131" endid="#d414233e12229"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="37" xml:id="d414233e12466">
                             <staff n="1">
@@ -2626,6 +2716,10 @@
                             <slur startid="#d415080e1" endid="#d415084e1"/>
                             <slur startid="#d415088e1" endid="#d415092e1"/>
                             <hairpin form="cres" staff="1" place="below" startid="#d415080e1" endid="#d415117e1"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="50" xml:id="d414233e16921">
                             <staff n="1">
@@ -2668,6 +2762,10 @@
                                 </layer>
                             </staff>
                             <slur startid="#d415109e1" endid="#d415117e1"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="51" xml:id="d414233e17271">
                             <staff n="1">
@@ -2727,6 +2825,10 @@
                             <slur startid="#d415134e1" endid="#d415138e1"/>
                             <slur startid="#d415142e1" endid="#d415146e1"/>
                             <dir staff="1" place="below" tstamp="2">cre-scen-do</dir>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="52" xml:id="d414233e17678">
                             <staff n="1">
@@ -2770,6 +2872,10 @@
                             </staff>
                             <slur startid="#d415163e1" endid="#d415171e1"/>
                             <dir staff="1" place="below" tstamp="1"> e stretto</dir>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="53" xml:id="d414233e18005">
                             <staff n="1">
@@ -3040,6 +3146,10 @@
                                 </layer>
                             </staff>
                             <dir tstamp="1" staff="1" place="below">sotto voce</dir>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="58" xml:id="d414233e20069">
                             <staff n="1">
@@ -3084,6 +3194,10 @@
                             <slur startid="#d414233e20071" endid="#d414233e20114"/>
                             <slur startid="#d414233e20133" endid="#d414233e20150"/>
                             <dynam staff="1" place="below" tstamp="1">pp</dynam>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="59" xml:id="d414233e20394">
                             <staff n="1">
@@ -3138,6 +3252,10 @@
                             <dir tstamp="4" staff="1" place="above">ten.</dir>
                             <dynam staff="1" place="below" tstamp="1">p</dynam>
                             <hairpin form="cres" staff="1" place="below" tstamp="2" tstamp2="4"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="60" xml:id="d414233e20784">
                             <staff n="1">
@@ -3172,6 +3290,10 @@
                             </staff>
                             <slur startid="#d414233e20786" endid="#d414233e20845"/>
                             <dir staff="1" place="below" tstamp="1">smorz.</dir>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="61" xml:id="d414233e21090">
                             <staff n="1">
@@ -3258,6 +3380,10 @@
                             <slur startid="#d415412e1" endid="#d415432e1"/>
                             <slur startid="#d415440e1" endid="#d414233e21380-1"/>
                             <dynam staff="1" place="below" tstamp="1">f</dynam>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="62" xml:id="d414233e21624">
                             <staff n="1">
@@ -3317,6 +3443,10 @@
                             <dynam staff="1" place="below" tstamp="1">pp</dynam>
                             <slur startid="#d414233e21626" endid="#d414233e21736"/>
                             <slur startid="#d414233e21789" endid="#d414233e21806"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="63" xml:id="d414233e22050">
                             <staff n="1">
@@ -3387,6 +3517,10 @@
                             </staff>
                             <dynam staff="1" place="below" tstamp="1">ff</dynam>
                             <slur startid="#d415470e1" endid="#d415494e1"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="64" xml:id="d414233e22545">
                             <staff n="1">
@@ -3436,6 +3570,10 @@
                             </staff>
                             <dynam staff="1" place="below" tstamp="1">pp</dynam>
                             <slur startid="#d414233e22547" endid="#d414233e22686"/>
+                            <pedal dir="down" staff="2" tstamp="1"/>
+                            <pedal dir="up" staff="2" tstamp="3.5"/>
+                            <pedal dir="down" staff="2" tstamp="4"/>
+                            <pedal dir="up" staff="2" tstamp="6.5"/>
                         </measure>
                         <measure n="65" xml:id="d414233e22931">
                             <staff n="1">
