@@ -140,25 +140,6 @@ public:
     int GetVerseCount() const { return m_verseCount; };
 
     /**
-     * @name Setter and getter for above or below dir/dynam/hairpin
-     * Currently unused
-     */
-    ///@{
-    void SetDirAbove() { m_dirAbove = true; };
-    bool GetDirAbove() const { return m_dirAbove; };
-    void SetDirBelow() { m_dirBelow = true; };
-    bool GetDirBelow() const { return m_dirBelow; };
-    void SetDynamAbove() { m_dynamAbove = true; };
-    bool GetDynamAbove() const { return m_dynamAbove; };
-    void SetDynamBelow() { m_dynamBelow = true; };
-    bool GetDynamBelow() const { return m_dynamBelow; };
-    void SetHairpinAbove() { m_hairpinAbove = true; };
-    bool GetHairpinAbove() const { return m_hairpinAbove; };
-    void SetHairpinBelow() { m_hairpinBelow = true; };
-    bool GetHairpinBelow() const { return m_hairpinBelow; };
-    ///@}
-
-    /**
      * Retrieves or creates the FloatingPositioner for the FloatingElement on this staff.
      */
     void SetCurrentFloatingPositioner(FloatingElement *element, int x, int y);

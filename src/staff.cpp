@@ -140,13 +140,6 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
         assert(v);
         alignment->SetVerseCount(v->GetN());
     }
-    it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(HAIRPIN));
-    if (it != m_timeSpanningElements.end()) {
-        Hairpin *h = dynamic_cast<Hairpin *>(*it);
-        assert(h);
-        if (h->GetPlace() == STAFFREL_above) alignment->SetHairpinAbove();
-        if (h->GetPlace() == STAFFREL_below) alignment->SetHairpinBelow();
-    }
 
     // for next staff
     (*staffIdx)++;
