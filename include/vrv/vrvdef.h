@@ -120,6 +120,7 @@ enum ClassId {
     DYNAM,
     HAIRPIN,
     OCTAVE,
+    PEDAL,
     SLUR,
     TEMPO,
     TIE,

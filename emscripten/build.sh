@@ -143,6 +143,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/object.cpp \
 	$VEROVIO_ROOT/src/octave.cpp \
 	$VEROVIO_ROOT/src/page.cpp \
+	$VEROVIO_ROOT/src/pedal.cpp \
 	$VEROVIO_ROOT/src/pitchinterface.cpp \
 	$VEROVIO_ROOT/src/positioninterface.cpp \
 	$VEROVIO_ROOT/src/proport.cpp \

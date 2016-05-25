@@ -34,6 +34,7 @@
 #include "note.h"
 #include "octave.h"
 #include "page.h"
+#include "pedal.h"
 #include "proport.h"
 #include "rest.h"
 #include "rpt.h"
@@ -218,6 +219,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == OCTAVE) {
         m_currentNode = m_currentNode.append_child("octave");
         WriteMeiOctave(m_currentNode, dynamic_cast<Octave *>(object));
+    }
+    else if (object->Is() == PEDAL) {
+        m_currentNode = m_currentNode.append_child("pedal");
+        WriteMeiPedal(m_currentNode, dynamic_cast<Pedal *>(object));
     }
     else if (object->Is() == SLUR) {
         m_currentNode = m_currentNode.append_child("slur");
@@ -620,6 +625,15 @@ void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
     WriteXmlId(currentNode, octave);
     WriteTimeSpanningInterface(currentNode, octave);
     octave->WriteOctavedisplacement(currentNode);
+};
+
+void MeiOutput::WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal)
+{
+    assert(pedal);
+
+    WriteXmlId(currentNode, pedal);
+    WriteTimeSpanningInterface(currentNode, pedal);
+    pedal->WritePlacement(currentNode);
 };
 
 void MeiOutput::WriteMeiSlur(pugi::xml_node currentNode, Slur *slur)
@@ -1681,6 +1695,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "octave") {
             success = ReadMeiOctave(parent, current);
         }
+        else if (std::string(current.name()) == "pedal") {
+            success = ReadMeiPedal(parent, current);
+        }
         else if (std::string(current.name()) == "slur") {
             success = ReadMeiSlur(parent, current);
         }
@@ -1753,7 +1770,19 @@ bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
     return true;
 }
 
-bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node octave)
+bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node pedal)
+{
+    Pedal *vrvPedal = new Pedal();
+    SetMeiUuid(pedal, vrvPedal);
+
+    ReadTimeSpanningInterface(pedal, vrvPedal);
+    vrvPedal->ReadPlacement(pedal);
+
+    AddFloatingElement(parent, vrvPedal);
+    return true;
+}
+
+bool MeiInput::ReadMeiPedal(Object *parent, pugi::xml_node octave)
 {
     Octave *vrvOctave = new Octave();
     SetMeiUuid(octave, vrvOctave);

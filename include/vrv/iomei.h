@@ -59,6 +59,7 @@ class MultiRpt;
 class Note;
 class Octave;
 class Orig;
+class Pedal;
 class PitchInterface;
 class PositionInterface;
 class Proport;
@@ -190,6 +191,7 @@ private:
     void WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteMeiOctave(pugi::xml_node currentNode, Octave *octave);
+    void WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal);
     void WriteMeiSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteMeiTie(pugi::xml_node currentNode, Tie *tie);
@@ -378,6 +380,7 @@ private:
     bool ReadMeiDynam(Object *parent, pugi::xml_node dynam);
     bool ReadMeiHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadMeiOctave(Object *parent, pugi::xml_node octave);
+    bool ReadMeiPedal(Object *parent, pugi::xml_node pedal);
     bool ReadMeiSlur(Object *parent, pugi::xml_node slur);
     bool ReadMeiTempo(Object *parent, pugi::xml_node tempo);
     bool ReadMeiTie(Object *parent, pugi::xml_node tie);
