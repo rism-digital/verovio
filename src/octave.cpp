@@ -24,6 +24,7 @@ namespace vrv {
 Octave::Octave() : FloatingElement("octave-"), TimeSpanningInterface(), AttOctavedisplacement()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_OCTAVEDISPLACEMENT);
 
     Reset();
 }

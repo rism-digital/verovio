@@ -31,6 +31,7 @@ class LayerElement;
 class Measure;
 class Octave;
 class Page;
+class Pedal;
 class Rend;
 class Slur;
 class Staff;
@@ -307,6 +308,7 @@ protected:
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawOctave(
         DeviceContext *dc, Octave *octave, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
     void DrawSlur(
         DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);

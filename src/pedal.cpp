@@ -21,9 +21,11 @@ namespace vrv {
 // Pedal
 //----------------------------------------------------------------------------
 
-Pedal::Pedal() : FloatingElement("pedal-"), TimeSpanningInterface(), AttPlacement()
+Pedal::Pedal() : FloatingElement("pedal-"), TimePointInterface(), AttPedalLog(), AttPlacement()
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    RegisterAttClass(ATT_PEDALLOG);
+    RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
 }
@@ -35,7 +37,8 @@ Pedal::~Pedal()
 void Pedal::Reset()
 {
     FloatingElement::Reset();
-    TimeSpanningInterface::Reset();
+    TimePointInterface::Reset();
+    ResetPedalLog();
     ResetPlacement();
 }
 

@@ -18,7 +18,7 @@ namespace vrv {
 // Pedal
 //----------------------------------------------------------------------------
 
-class Pedal : public FloatingElement, public TimeSpanningInterface, public AttPlacement {
+class Pedal : public FloatingElement, public TimePointInterface, public AttPedalLog, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -33,7 +33,6 @@ public:
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
-    virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
 
     //----------//
     // Functors //

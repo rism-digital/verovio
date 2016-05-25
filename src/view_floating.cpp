@@ -28,6 +28,7 @@
 #include "measure.h"
 #include "note.h"
 #include "octave.h"
+#include "pedal.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -68,6 +69,11 @@ void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Meas
         Dynam *dynam = dynamic_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
+    }
+    else if (element->Is() == PEDAL) {
+        Pedal *pedal = dynamic_cast<Pedal *>(element);
+        assert(pedal);
+        DrawPedal(dc, pedal, measure, system);
     }
     else if (element->Is() == TEMPO) {
         Tempo *tempo = dynamic_cast<Tempo *>(element);
@@ -1516,6 +1522,46 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     }
 
     dc->EndGraphic(dynam, this);
+}
+
+void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(pedal);
+
+    if (!pedal->GetStart()) return;
+
+    dc->StartGraphic(pedal, "", pedal->GetUuid());
+
+    int x = pedal->GetStart()->GetDrawingX();
+
+    int code = SMUFL_E650_keyboardPedalPed;
+    if (pedal->GetDir() == pedalLog_DIR_up) code = SMUFL_E655_keyboardPedalUp;
+    std::wstring str;
+    str.push_back(code);
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, x, (*staffIter)->GetDrawingY());
+        // Basic method that use bounding box
+        int y = pedal->GetDrawingY();
+
+        // Adjust the x position differently for up and down
+        int drawingX = x;
+        if (pedal->GetDir() == pedalLog_DIR_up)
+            drawingX -= m_doc->GetGlyphWidth(SMUFL_E655_keyboardPedalUp, (*staffIter)->m_drawingStaffSize, false) / 2;
+        else
+            drawingX -= m_doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, (*staffIter)->m_drawingStaffSize, false) / 2;
+
+        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        dc->ResetFont();
+    }
+
+    dc->EndGraphic(pedal, this);
 }
 
 void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system)

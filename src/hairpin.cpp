@@ -24,6 +24,8 @@ namespace vrv {
 Hairpin::Hairpin() : FloatingElement("hairpin-"), TimeSpanningInterface(), AttHairpinLog(), AttPlacement()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_HAIRPINLOG);
+    RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
 }

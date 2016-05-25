@@ -19,6 +19,7 @@
 #include "dynam.h"
 #include "hairpin.h"
 #include "octave.h"
+#include "pedal.h"
 #include "slur.h"
 #include "tempo.h"
 #include "timeinterface.h"
@@ -122,6 +123,12 @@ FloatingPositioner::FloatingPositioner(FloatingElement *element) : BoundingBox()
         assert(octave);
         // octave below by default (won't draw without @dis.place anyway);
         m_place = (octave->GetDisPlace() == PLACE_above) ? STAFFREL_above : STAFFREL_below;
+    }
+    else if (element->Is() == PEDAL) {
+        Pedal *pedal = dynamic_cast<Pedal *>(element);
+        assert(pedal);
+        // pedal below by default
+        m_place = pedal->HasPlace() ? pedal->GetPlace() : STAFFREL_below;
     }
     else if (element->Is() == TEMPO) {
         Tempo *tempo = dynamic_cast<Tempo *>(element);

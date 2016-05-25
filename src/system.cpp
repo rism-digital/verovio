@@ -287,6 +287,8 @@ int System::AdjustFloatingPostioners(ArrayPtrVoid *params)
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     (*classId) = DIR;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
+    (*classId) = PEDAL;
+    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     // SYL check if they are some lyrics and make space for them if any
     (*classId) = SYL;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);

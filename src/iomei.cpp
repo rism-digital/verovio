@@ -632,7 +632,8 @@ void MeiOutput::WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal)
     assert(pedal);
 
     WriteXmlId(currentNode, pedal);
-    WriteTimeSpanningInterface(currentNode, pedal);
+    WriteTimePointInterface(currentNode, pedal);
+    pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
 };
 
@@ -1770,19 +1771,7 @@ bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
     return true;
 }
 
-bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node pedal)
-{
-    Pedal *vrvPedal = new Pedal();
-    SetMeiUuid(pedal, vrvPedal);
-
-    ReadTimeSpanningInterface(pedal, vrvPedal);
-    vrvPedal->ReadPlacement(pedal);
-
-    AddFloatingElement(parent, vrvPedal);
-    return true;
-}
-
-bool MeiInput::ReadMeiPedal(Object *parent, pugi::xml_node octave)
+bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node octave)
 {
     Octave *vrvOctave = new Octave();
     SetMeiUuid(octave, vrvOctave);
@@ -1791,6 +1780,19 @@ bool MeiInput::ReadMeiPedal(Object *parent, pugi::xml_node octave)
     vrvOctave->ReadOctavedisplacement(octave);
 
     AddFloatingElement(parent, vrvOctave);
+    return true;
+}
+
+bool MeiInput::ReadMeiPedal(Object *parent, pugi::xml_node pedal)
+{
+    Pedal *vrvPedal = new Pedal();
+    SetMeiUuid(pedal, vrvPedal);
+
+    ReadTimePointInterface(pedal, vrvPedal);
+    vrvPedal->ReadPedalLog(pedal);
+    vrvPedal->ReadPlacement(pedal);
+
+    AddFloatingElement(parent, vrvPedal);
     return true;
 }
 
