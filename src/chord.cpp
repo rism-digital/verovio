@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "note.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -216,6 +217,7 @@ void Chord::ResetAccidSpace(int fullUnit)
     m_accidSpaceTop = yMax + (accidHeight / 2);
     m_accidSpaceBot = yMin - (accidHeight / 2);
     int height = (m_accidSpaceTop - m_accidSpaceBot) / halfUnit;
+    assert(height >= 0);
     m_accidSpace.resize(height);
 
     // Resize each row in m_accidSpace to be the proper length; set all the bools to false
@@ -232,6 +234,7 @@ void Chord::GetYExtremes(int *yMax, int *yMin)
     bool passed = false;
     int y1;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
         Note *note = dynamic_cast<Note *>(*it);
         if (!note) continue;
@@ -250,6 +253,7 @@ void Chord::GetYExtremes(int *yMax, int *yMin)
             }
         }
     }
+    assert(passed);
 }
 
 void Chord::SetDrawingStemDir(data_STEMDIRECTION stemDir)

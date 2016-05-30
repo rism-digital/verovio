@@ -23,6 +23,7 @@
 #include "system.h"
 #include "timeinterface.h"
 #include "verse.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -71,11 +72,6 @@ int Staff::GetVerticalSpacing()
     return 160; // arbitrary generic value
 }
 
-void Staff::ResetVerticalAlignment()
-{
-    m_drawingY = 0;
-}
-
 bool Staff::GetPosOnPage(ArrayPtrVoid *params)
 {
     // param 0: the Staff we are looking for
@@ -109,6 +105,14 @@ int Staff::GetYRel() const
 // Staff functor methods
 //----------------------------------------------------------------------------
 
+int Staff::ResetVerticalAlignment(ArrayPtrVoid *params)
+{
+    m_drawingY = 0;
+    m_staffAlignment = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Staff::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
@@ -119,9 +123,6 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
     int *staffIdx = static_cast<int *>((*params).at(1));
     int *staffN = static_cast<int *>((*params).at(2));
     Doc *doc = static_cast<Doc *>((*params).at(3));
-
-    // we need to call it because we are overriding Object::AlignVertically
-    this->ResetVerticalAlignment();
 
     *staffN = this->GetN();
 

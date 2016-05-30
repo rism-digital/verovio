@@ -257,6 +257,13 @@ int LayerElement::ResetHorizontalAlignment(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::ResetVerticalAlignment(ArrayPtrVoid *params)
+{
+    m_drawingY = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
 {
     // param 0: the measureAligner
@@ -489,7 +496,6 @@ int LayerElement::SetDrawingXY(ArrayPtrVoid *params)
     // Finally, adjust Y for notes and rests
     if (this->Is() == NOTE) {
         Note *note = dynamic_cast<Note *>(this);
-        assert(note);
         this->SetDrawingY(this->GetDrawingY()
             + view->CalculatePitchPosY(staffY, note->GetPname(), layerY->GetClefOffset(layerElementY), note->GetOct()));
     }

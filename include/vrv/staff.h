@@ -63,12 +63,6 @@ public:
      */
     int GetVerticalSpacing();
 
-    /**
-     * Reset the alignment values (m_drawingY, m_drawingYRel, etc.)
-     * Called by  AlignVertically
-     */
-    virtual void ResetVerticalAlignment();
-
     StaffAlignment *GetAlignment() const { return m_staffAlignment; };
 
     int GetYRel() const;
@@ -76,6 +70,13 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * @name Reset the vertical alignment
+     */
+    ///@{
+    virtual int ResetVerticalAlignment(ArrayPtrVoid *params);
+    ///@}
 
     /**
      * Currently unused - kept for "documentation"

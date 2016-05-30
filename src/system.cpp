@@ -125,6 +125,8 @@ int System::ResetVerticalAlignment(ArrayPtrVoid *params)
     m_drawingYRel = 0;
     m_drawingY = 0;
 
+    m_systemAligner.Reset();
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -136,9 +138,6 @@ int System::AlignVertically(ArrayPtrVoid *params)
     // param 3: the doc (unused)
     SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
 
-    // When calculating the alignment, the position has to be 0
-    m_drawingYRel = 0;
-    m_systemAligner.Reset();
     (*systemAligner) = &m_systemAligner;
 
     return FUNCTOR_CONTINUE;

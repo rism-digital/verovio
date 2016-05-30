@@ -218,6 +218,20 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 // FloatingElement functor methods
 //----------------------------------------------------------------------------
 
+int FloatingElement::ResetHorizontalAlignment(ArrayPtrVoid *params)
+{
+    m_currentPositioner = NULL;
+    
+    return FUNCTOR_CONTINUE;
+}
+
+int FloatingElement::ResetVerticalAlignment(ArrayPtrVoid *params)
+{
+    m_currentPositioner = NULL;
+    
+    return FUNCTOR_CONTINUE;
+}
+
 int FloatingElement::PrepareTimeSpanning(ArrayPtrVoid *params)
 {
     // Pass it to the pseudo functor of the interface
