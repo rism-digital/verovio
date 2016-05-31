@@ -26,8 +26,8 @@
 #include "page.h"
 #include "rest.h"
 #include "scoredef.h"
-#include "system.h"
 #include "staff.h"
+#include "system.h"
 #include "tuplet.h"
 #include "vrv.h"
 
@@ -456,11 +456,11 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
         (*dot)++;
         i++;
     }
-    if ((*dot == 1) && (*duration == 7)) {
+    if ((*dot == 1) && (incipit[i] == 7)) {
         // neumatic notation
         *duration = DURATION_breve;
         *dot = 0;
-        LogWarning("Found a note in neumatic notation (7.), using quarter note instead");
+        LogWarning("Found a note in neumatic notation (7.), using breve instead");
     }
 
     return i - index;
