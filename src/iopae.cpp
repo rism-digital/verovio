@@ -1098,9 +1098,7 @@ void PaeInput::convertMeasure(pae::Measure *measure)
     }
 
     // Set barLine
-    // FIXME use flags for proper barLine identification
-    BarLine *const bline = m_measure->GetRightBarLine();
-    bline->SetForm(measure->barLine);
+    m_measure->SetRight(measure->barLine);
 }
 
 void PaeInput::parseNote(pae::Note *note)
