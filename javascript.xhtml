@@ -107,7 +107,7 @@ options = JSON.stringify({
             <div class="panel panel-default">
                 <div class="panel-heading panel-option"><code>void loadData( string data )</code></div>
                   <div class="panel-body panel-option">
-                    Loads the data passed as a parameter. The data is a string of the music encoding (e.g., the MEI encoding). The method also perfroms the layout if necessary or if requested. It does not render the data, this can be accomplished subsequently by calling <code>renderPage</code>. The data stays in memory until new data is loaded or until the toolkit instance is deleted.
+                    Loads the data passed as a parameter. The data is a string of the music encoding (e.g., the MEI encoding). The method also performs the layout if necessary or if requested. It does not render the data, this can be accomplished subsequently by calling <code>renderPage</code>. The data stays in memory until new data is loaded or until the toolkit instance is deleted.
                   </div>
             </div>
             <div class="panel panel-default">
@@ -119,7 +119,7 @@ options = JSON.stringify({
             <div class="panel panel-default">
                 <div class="panel-heading panel-option"><code>string renderPage( int pageNumber, string options )</code></div>
                   <div class="panel-body panel-option">
-                    Renders a page for the data loaded in the toolkit and returns it in SVG. The page numbering is 1-based. Options for rendering can be passed as JSON string. The options affecting the layout (e.g., <code>pageHeight</code>, or <code>ignoreLayout</code>) cannot be modified when rendering a page and reloading the data it necessary for this.
+                    Renders a page for the data loaded in the toolkit and returns it in SVG. The page numbering is 1-based. Options for rendering can be passed as JSON string. The options affecting the layout (e.g., <code>pageHeight</code>, or <code>ignoreLayout</code>) cannot be modified when rendering a page and reloading the data if necessary for this.
                   </div>
             </div>
             <div class="panel panel-default">
@@ -143,7 +143,7 @@ options = JSON.stringify({
             
             <h4>Compatibility</h4>
             <p>
-                The Verovio JavaScript tookit has been tested with recent versions of the most widely used web-browsers. Internet Explorer requires at least version 10.
+                The Verovio JavaScript toolkit has been tested with recent versions of the most widely used web-browsers. Internet Explorer requires at least version 10.
             </p>
             <div class="row text-center">
                 <div class="col-sm-12" style="padding-bottom: 10px;">
