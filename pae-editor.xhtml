@@ -433,6 +433,23 @@ version-footer: true
         render_music(pae, 'pae');
     
     }
+    
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+    
+    $( document ).ready(function() {
+    
+        // Load the default file or the file passed in the URL
+        var pae = getParameterByName("pae");
+        console.log(pae);
+        
+        if (pae != "") {
+            $("#incipit_01").val(pae); 
+            update_incipit();
+        }
+    });
 
 
 //]]>
