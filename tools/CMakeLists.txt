@@ -6,15 +6,21 @@ SET(CMAKE_BUILD_TYPE Release)
 
 option(NO_PAE_SUPPORT "Disable Plain and Easy support" OFF)
 
+option(NO_HUMDRUM_SUPPORT "Disable Humdrum support" OFF)
+
 add_definitions(-g)
 add_definitions(-std=c++11)
 
 EXEC_PROGRAM(../tools/get_git_commit.sh ARGS OUTPUT_VARIABLE GIT_COMMIT)
 
-include_directories(/usr/local/include ../include ../include/midi ../include/pugi ../include/utf8 ../include/vrv ../libmei)
+include_directories(/usr/local/include ../include ../include/midi ../include/hum ../include/pugi ../include/utf8 ../include/vrv ../libmei)
 
 if(NO_PAE_SUPPORT)
   add_definitions(-DNO_PAE_SUPPORT)
+endif()
+
+if(NO_HUMDRUM_SUPPORT)
+  add_definitions(-DNO_HUMDRUM_SUPPORT)
 endif()
 
 add_executable (verovio 
@@ -44,6 +50,7 @@ add_executable (verovio
 	../src/iodarms.cpp
 	../src/iomei.cpp
 	../src/iopae.cpp
+	../src/iohumdrum.cpp
 	../src/iomusxml.cpp
 	../src/keysig.cpp
 	../src/layer.cpp
@@ -96,6 +103,7 @@ add_executable (verovio
 	../src/midi/MidiEventList.cpp
 	../src/midi/MidiFile.cpp
 	../src/midi/MidiMessage.cpp
+	../src/hum/humlib.cpp
 	../libmei/attconverter.cpp
 	../libmei/atts_cmn.cpp
 	../libmei/atts_critapp.cpp
