@@ -15,6 +15,7 @@
 
 #include "attcomparison.h"
 #include "iodarms.h"
+#include "iohumdrum.h"
 #include "iomei.h"
 #include "iomusxml.h"
 #include "iopae.h"
@@ -180,6 +181,9 @@ bool Toolkit::SetFormat(std::string const &informat)
     else if (informat == "darms") {
         m_format = DARMS;
     }
+    else if (informat == "humdrum") {
+        m_format = HUMDRUM;
+    }
     else if (informat == "mei") {
         m_format = MEI;
     }
@@ -187,7 +191,7 @@ bool Toolkit::SetFormat(std::string const &informat)
         m_format = MUSICXML;
     }
     else {
-        LogError("Input format can only be: mei, pae, musicxml or darms");
+        LogError("Input format can only be: mei, humdrum, pae, musicxml or darms");
         return false;
     }
     return true;
