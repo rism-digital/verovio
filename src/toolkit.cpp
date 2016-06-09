@@ -284,6 +284,9 @@ bool Toolkit::LoadString(const std::string &data)
     else if (m_format == DARMS) {
         input = new DarmsInput(&m_doc, "");
     }
+    else if (m_format == HUMDRUM) {
+        input = new HumdrumInput(&m_doc, "");
+    }
     else if (m_format == MEI) {
         input = new MeiInput(&m_doc, "");
     }
