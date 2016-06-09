@@ -18,6 +18,7 @@
 #include "accid.h"
 #include "beam.h"
 #include "chord.h"
+#include "clef.h"
 #include "custos.h"
 #include "devicecontext.h"
 #include "doc.h"

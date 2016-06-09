@@ -406,6 +406,11 @@ void Doc::SetCurrentScoreDef(bool force)
         return;
     }
 
+    if (m_currentScoreDefDone) {
+        Functor unsetCurrentScoreDef(&Object::UnsetCurrentScoreDef);
+        this->Process(&unsetCurrentScoreDef, NULL);
+    }
+
     ScoreDef currentScoreDef;
     currentScoreDef = m_scoreDef;
     StaffDef *staffDef = NULL;

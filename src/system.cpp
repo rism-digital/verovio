@@ -29,17 +29,27 @@ System::System() : Object("system-"), DrawingListInterface()
     // We set parent to it because we want to access the parent doc from the aligners
     m_systemAligner.SetParent(this);
 
+    // owned pointers need to be set to NULL;
+    m_drawingScoreDef = NULL;
+
     Reset();
 }
 
 System::~System()
 {
+    // We need to delete own objects
+    Reset();
 }
 
 void System::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
+
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
 
     m_systemLeftMar = 0;
     m_systemRightMar = 0;
@@ -106,9 +116,27 @@ void System::SetCurrentFloatingPositioner(int staffN, FloatingElement *element, 
     alignment->SetCurrentFloatingPositioner(element, x, y);
 }
 
+void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
+{
+    assert(!m_drawingScoreDef); // We should always call UnsetCurrentScoreDef before
+
+    m_drawingScoreDef = new ScoreDef();
+    *m_drawingScoreDef = *drawingScoreDef;
+}
+
 //----------------------------------------------------------------------------
 // System functor methods
 //----------------------------------------------------------------------------
+
+int System::UnsetCurrentScoreDef(ArrayPtrVoid *params)
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+};
 
 int System::ResetHorizontalAlignment(ArrayPtrVoid *params)
 {

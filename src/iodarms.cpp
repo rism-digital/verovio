@@ -11,6 +11,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "clef.h"
 #include "doc.h"
 #include "keysig.h"
 #include "layer.h"

@@ -9,16 +9,15 @@
 #define __VRV_LAYER_H__
 
 #include "atts_shared.h"
-#include "clef.h"
 #include "drawinginterface.h"
 #include "object.h"
 
 namespace vrv {
 
+class Clef;
 class DeviceContext;
 class LayerElement;
 class Note;
-class ScoreDef;
 class StaffDef;
 
 //----------------------------------------------------------------------------
@@ -30,11 +29,7 @@ class StaffDef;
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
 */
-class Layer : public Object,
-              public DrawingListInterface,
-              public ObjectListInterface,
-              public StaffDefDrawingInterface,
-              public AttCommon {
+class Layer : public Object, public DrawingListInterface, public ObjectListInterface, public AttCommon {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -80,12 +75,6 @@ public:
     int GetClefOffset(LayerElement *test);
 
     /**
-     * Set drawing clef, keysig and mensur if necessary and if available.
-     * Also set the current clef.
-     */
-    void SetDrawingAndCurrentValues(StaffDef *currentStaffDef);
-
-    /**
      * @name Set and get the stem direction of the layer.
      * This stays STEMDIRECTION_NONE with on single layer in the staff.
      */
@@ -94,9 +83,33 @@ public:
     data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; };
     ///@}
 
+    Clef *GetCurrentClef() const;
+    KeySig *GetCurrentKeySig() const;
+    Mensur *GetCurrentMensur() const;
+    MeterSig *GetCurrentMeterSig() const;
+
+    void ResetStaffDefOjects();
+
+    /**
+     * Set drawing clef, keysig and mensur if necessary and if available.
+     */
+    void SetDrawingAndCurrentValues(StaffDef *currentStaffDef);
+
+    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; };
+    void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; };
+    Clef *GetStaffDefClef() { return m_staffDefClef; };
+    KeySig *GetStaffDefKeySig() { return m_staffDefKeySig; };
+    Mensur *GetStaffDefMensur() { return m_staffDefMensur; };
+    MeterSig *GetStaffDefMeterSig() { return m_staffDefMeterSig; };
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Unset the initial scoreDef of each system and measure
+     */
+    virtual int UnsetCurrentScoreDef(ArrayPtrVoid *params);
 
     /**
      * Align horizontally the content of a layer.
@@ -139,6 +152,13 @@ private:
      *
      */
     data_STEMDIRECTION m_drawingStemDir;
+
+    /** */
+    Clef *m_staffDefClef;
+    KeySig *m_staffDefKeySig;
+    Mensur *m_staffDefMensur;
+    MeterSig *m_staffDefMeterSig;
+    bool m_drawKeySigCancellation;
 };
 
 } // namespace vrv

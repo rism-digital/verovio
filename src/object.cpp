@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "chord.h"
+#include "clef.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -269,6 +270,14 @@ ClassId Object::Is() const
     assert(false);
     return OBJECT;
 };
+
+void Object::Resert(Object *object)
+{
+    if (object) {
+        delete object;
+        object = NULL;
+    }
+}
 
 void Object::Reset()
 {
@@ -539,7 +548,7 @@ void Object::FillFlatList(ListOfObjects *flatList)
     this->Process(&addToFlatList, &params);
 }
 
-Object *Object::GetFirstParent(const ClassId classId, int maxSteps)
+Object *Object::GetFirstParent(const ClassId classId, int maxSteps) const
 {
     if ((maxSteps == 0) || !m_parent) {
         return NULL;
@@ -934,6 +943,20 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     // starting a new system
     if (this->Is() == SYSTEM) {
         currentScoreDef->SetRedrawFlags(true, true, false, false, false);
+        System *system = dynamic_cast<System *>(this);
+        assert(system);
+        system->SetDrawingScoreDef(currentScoreDef);
+        return FUNCTOR_CONTINUE;
+    }
+
+    // starting a new system
+    if (this->Is() == MEASURE) {
+        if (currentScoreDef->m_setAsDrawing) {
+            Measure *measure = dynamic_cast<Measure *>(this);
+            assert(measure);
+            measure->SetDrawingScoreDef(currentScoreDef);
+            currentScoreDef->m_setAsDrawing = false;
+        }
         return FUNCTOR_CONTINUE;
     }
 
@@ -958,6 +981,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         Staff *staff = dynamic_cast<Staff *>(this);
         assert(staff);
         (*currentStaffDef) = currentScoreDef->GetStaffDef(staff->GetN());
+        staff->m_drawingStaffDef = (*currentStaffDef);
         return FUNCTOR_CONTINUE;
     }
 
@@ -976,7 +1000,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
                 layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        layer->SetDrawingAndCurrentValues((*currentStaffDef));
+        // layer->SetDrawingAndCurrentValues((*currentStaffDef));
         return FUNCTOR_CONTINUE;
     }
 
@@ -1089,17 +1113,17 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
         assert(current_layer);
         (*min_pos) = 0;
         // set scoreDef attr
-        if (current_layer->GetDrawingClef()) {
-            current_layer->GetDrawingClef()->SetBoundingBoxXShift(params);
+        if (current_layer->GetStaffDefClef()) {
+            current_layer->GetStaffDefClef()->SetBoundingBoxXShift(params);
         }
-        if (current_layer->GetDrawingKeySig()) {
-            current_layer->GetDrawingKeySig()->SetBoundingBoxXShift(params);
+        if (current_layer->GetStaffDefKeySig()) {
+            current_layer->GetStaffDefKeySig()->SetBoundingBoxXShift(params);
         }
-        if (current_layer->GetDrawingMensur()) {
-            current_layer->GetDrawingMensur()->SetBoundingBoxXShift(params);
+        if (current_layer->GetStaffDefMensur()) {
+            current_layer->GetStaffDefMensur()->SetBoundingBoxXShift(params);
         }
-        if (current_layer->GetDrawingMeterSig()) {
-            current_layer->GetDrawingMeterSig()->SetBoundingBoxXShift(params);
+        if (current_layer->GetStaffDefMeterSig()) {
+            current_layer->GetStaffDefMeterSig()->SetBoundingBoxXShift(params);
         }
         return FUNCTOR_CONTINUE;
     }
@@ -1236,17 +1260,17 @@ int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
         Layer *currentLayer = dynamic_cast<Layer *>(this);
         assert(currentLayer);
         // set scoreDef attr
-        if (currentLayer->GetDrawingClef()) {
-            currentLayer->GetDrawingClef()->SetOverflowBBoxes(params);
+        if (currentLayer->GetStaffDefClef()) {
+            currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
         }
-        if (currentLayer->GetDrawingKeySig()) {
-            currentLayer->GetDrawingKeySig()->SetOverflowBBoxes(params);
+        if (currentLayer->GetStaffDefKeySig()) {
+            currentLayer->GetStaffDefKeySig()->SetOverflowBBoxes(params);
         }
-        if (currentLayer->GetDrawingMensur()) {
-            currentLayer->GetDrawingMensur()->SetOverflowBBoxes(params);
+        if (currentLayer->GetStaffDefMensur()) {
+            currentLayer->GetStaffDefMensur()->SetOverflowBBoxes(params);
         }
-        if (currentLayer->GetDrawingMeterSig()) {
-            currentLayer->GetDrawingMeterSig()->SetOverflowBBoxes(params);
+        if (currentLayer->GetStaffDefMeterSig()) {
+            currentLayer->GetStaffDefMeterSig()->SetOverflowBBoxes(params);
         }
         return FUNCTOR_CONTINUE;
     }

@@ -359,7 +359,7 @@ public:
      * Return the first parent of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
-    Object *GetFirstParent(const ClassId classId, int maxSteps = -1);
+    Object *GetFirstParent(const ClassId classId, int maxSteps = -1) const;
 
     /**
      * Return the last parent that is NOT of the specified type.
@@ -401,6 +401,8 @@ public:
      */
     virtual void Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor = NULL,
         ArrayOfAttComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+
+    void Resert(Object *object);
 
     //----------//
     // Functors //
@@ -597,6 +599,11 @@ public:
      * This is necessary for integrating changes that occur within a page.
      */
     virtual int SetCurrentScoreDef(ArrayPtrVoid *params);
+
+    /**
+     * Unset the initial scoreDef of each system and measure
+     */
+    virtual int UnsetCurrentScoreDef(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
      * Set the initial scoreDef of each page.

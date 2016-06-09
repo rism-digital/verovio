@@ -194,6 +194,7 @@ void ScoreDef::Reset()
 
     m_drawLabels = false;
     m_drawingWidth = 0;
+    m_setAsDrawing = false;
 }
 
 void ScoreDef::AddStaffGrp(StaffGrp *staffGrp)
@@ -207,6 +208,8 @@ void ScoreDef::AddStaffGrp(StaffGrp *staffGrp)
 void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
 {
     assert(newScoreDef);
+
+    m_setAsDrawing = true;
 
     bool drawClef = false;
     bool drawKeySig = false;
@@ -323,6 +326,8 @@ StaffDef *ScoreDef::GetStaffDef(int n)
 
 void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation)
 {
+    m_setAsDrawing = true;
+
     ArrayPtrVoid params;
     params.push_back(&clef);
     params.push_back(&keySig);
@@ -435,6 +440,7 @@ StaffDef::~StaffDef()
 void StaffDef::Reset()
 {
     ScoreDefElement::Reset();
+    StaffDefDrawingInterface::Reset();
     ResetCommon();
     ResetCommonPart();
     ResetLabelsAddl();

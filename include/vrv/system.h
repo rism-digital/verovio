@@ -76,9 +76,22 @@ public:
 
     void SetCurrentFloatingPositioner(int staffN, FloatingElement *element, int x, int y);
 
+    /**
+     * @name Setter and getter of the drawing scoreDef
+     */
+    ///@{
+    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; };
+    void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Unset the initial scoreDef of each system and measure
+     */
+    virtual int UnsetCurrentScoreDef(ArrayPtrVoid *params);
 
     /**
      * @name Reset the horizontal and vertical alignment
@@ -197,6 +210,7 @@ public:
     ///@}
 
 private:
+    ScoreDef *m_drawingScoreDef;
 };
 
 } // namespace vrv

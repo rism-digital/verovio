@@ -15,6 +15,7 @@
 
 #include "attcomparison.h"
 #include "beam.h"
+#include "clef.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "editorial.h"
@@ -915,17 +916,17 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     layer->ResetDrawingList();
 
     // draw the scoreDef if required
-    if (layer->GetDrawingClef()) {
-        DrawLayerElement(dc, layer->GetDrawingClef(), layer, staff, measure);
+    if (layer->GetStaffDefClef()) {
+        DrawLayerElement(dc, layer->GetStaffDefClef(), layer, staff, measure);
     }
-    if (layer->GetDrawingKeySig()) {
-        DrawLayerElement(dc, layer->GetDrawingKeySig(), layer, staff, measure);
+    if (layer->GetStaffDefKeySig()) {
+        DrawLayerElement(dc, layer->GetStaffDefKeySig(), layer, staff, measure);
     }
-    if (layer->GetDrawingMensur()) {
-        DrawLayerElement(dc, layer->GetDrawingMensur(), layer, staff, measure);
+    if (layer->GetStaffDefMensur()) {
+        DrawLayerElement(dc, layer->GetStaffDefMensur(), layer, staff, measure);
     }
-    if (layer->GetDrawingMeterSig()) {
-        DrawLayerElement(dc, layer->GetDrawingMeterSig(), layer, staff, measure);
+    if (layer->GetStaffDefMeterSig()) {
+        DrawLayerElement(dc, layer->GetStaffDefMeterSig(), layer, staff, measure);
     }
 
     DrawLayerChildren(dc, layer, layer, staff, measure);

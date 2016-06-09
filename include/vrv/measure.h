@@ -16,6 +16,7 @@
 namespace vrv {
 
 class FloatingElement;
+class ScoreDef;
 class TimestampAttr;
 
 //----------------------------------------------------------------------------
@@ -114,9 +115,22 @@ public:
      */
     int GetWidth() const;
 
+    /**
+     * @name Setter and getter of the drawing scoreDef
+     */
+    ///@{
+    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; };
+    void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Unset the initial scoreDef of each system and measure
+     */
+    virtual int UnsetCurrentScoreDef(ArrayPtrVoid *params);
 
     /**
      * @name Reset the horizontal alignment
@@ -245,6 +259,8 @@ private:
     BarLineAttr m_leftBarLine;
     BarLineAttr m_rightBarLine;
     ///@}
+
+    ScoreDef *m_drawingScoreDef;
 };
 
 } // namespace vrv

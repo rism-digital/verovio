@@ -122,32 +122,6 @@ public:
     ///@}
 
     /**
-     * @name Get the clef, keySig, mensur and meterSig to be drawn.
-     */
-    ///@{
-    Clef *GetDrawingClef()
-    {
-        if (m_drawClef) return m_currentClef;
-        return NULL;
-    };
-    KeySig *GetDrawingKeySig()
-    {
-        if (m_drawKeySig) return m_currentKeySig;
-        return NULL;
-    };
-    Mensur *GetDrawingMensur()
-    {
-        if (m_drawMensur) return m_currentMensur;
-        return NULL;
-    };
-    MeterSig *GetDrawingMeterSig()
-    {
-        if (m_drawMeterSig) return m_currentMeterSig;
-        return NULL;
-    };
-    ///@}
-
-    /**
      * @name Get the clef, keysig, mensur and meterSig object.
      * They will return a reference to the hold object (element or attribute).
      */

@@ -41,11 +41,16 @@ Measure::Measure(bool measureMusic, int logMeasureNb) : Object("measure-"), AttC
     // Idem for timestamps
     m_timestampAligner.SetParent(this);
 
+    // owned pointers need to be set to NULL;
+    m_drawingScoreDef = NULL;
+
     Reset();
 }
 
 Measure::~Measure()
 {
+    // We need to delete own objects
+    Reset();
 }
 
 void Measure::Reset()
@@ -54,6 +59,11 @@ void Measure::Reset()
     ResetCommon();
     ResetMeasureLog();
     ResetPointing();
+
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
 
     m_timestampAligner.Reset();
     m_measuredMusic = true;
@@ -130,9 +140,27 @@ int Measure::GetWidth() const
     return 0;
 }
 
+void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
+{
+    assert(!m_drawingScoreDef); // We should always call UnsetCurrentScoreDef before
+
+    m_drawingScoreDef = new ScoreDef();
+    *m_drawingScoreDef = *drawingScoreDef;
+}
+
 //----------------------------------------------------------------------------
 // Measure functor methods
 //----------------------------------------------------------------------------
+
+int Measure::UnsetCurrentScoreDef(ArrayPtrVoid *params)
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+};
 
 int Measure::ResetHorizontalAlignment(ArrayPtrVoid *params)
 {
