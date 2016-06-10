@@ -19,28 +19,28 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
+#include "rest.h"
+#include "vrv.h"
+#include "iomei.h"
+
 //#include "attcomparison.h"
 //#include "beam.h"
 //#include "chord.h"
-#include "doc.h"
-//#include "layer.h"
-//#include "measure.h"
 //#include "mrest.h"
 //#include "note.h"
-//#include "rest.h"
 //#include "slur.h"
-//#include "staff.h"
 //#include "syl.h"
 //#include "text.h"
 //#include "tie.h"
 //#include "tuplet.h"
 //#include "verse.h"
-#include "vrv.h"
 //#include "pugixml.hpp"
-#include "iomei.h"
 
 
 using namespace hum;   // humlib namespace
+using namespace std;
+
 
 namespace vrv {
 
@@ -55,6 +55,9 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename)
 	m_filename = filename;
 	m_page     = NULL;
 	m_system   = NULL;
+	m_measure  = NULL;
+	m_staff    = NULL;
+	m_layer    = NULL;
 	m_debug    = 1;
 }
 
@@ -155,7 +158,7 @@ bool HumdrumInput::convertHumdrum(HumdrumFile& infile) {
 
 	// calculateLayout();
 
-   if (m_debug) {
+	if (m_debug) {
 		MeiOutput meioutput(m_doc, "");
 		meioutput.SetScoreBasedMEI(true);
 		string mei = meioutput.GetOutput();
@@ -190,7 +193,134 @@ bool HumdrumInput::convertSystemMeasure(HumdrumFile& infile,
 
 	setupSystemMeasure(infile, kernstarts, startline, endline);
 
- 	return true;
+	return convertMeasureStaves(infile, kernstarts, startline, endline);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::convertMeasureStaves -- fill in a measure with the
+//    individual staff elements for each part.
+//
+
+bool HumdrumInput::convertMeasureStaves(HumdrumFile& infile,
+		const vector<HTp>& kernstarts, int startline, int endline) {
+
+	vector<int> layers = getStaffLayerCounts(infile, kernstarts, startline,
+			endline);
+
+	bool status = true;
+	for (int i=0; i<(int)kernstarts.size(); i++) {
+		status &= convertMeasureStaff(infile, kernstarts[i]->getTrack(),
+				startline, endline, i+1, layers[i]);
+		if (!status) {
+			break;
+		}
+	}
+
+	return status;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::convertMeasureStaff -- print a particular staff in a
+//     particular measure.
+//
+
+bool HumdrumInput::convertMeasureStaff(HumdrumFile& infile, int track,
+		int startline, int endline, int n, int layercount) {
+
+	m_staff = new Staff();
+	m_measure->AddStaff(m_staff);
+	m_staff->SetN(n);
+
+	bool status = true;
+	for (int i=0; i<layercount; i++) {
+		status &= convertStaffLayer(infile, track, startline, endline, i);
+		if (!status) {
+			break;
+		}
+	}
+
+	return status;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::convertStaffLayer -- Prepare a layer element in the current
+//   staff and then fill it with data.
+//
+
+bool HumdrumInput::convertStaffLayer(HumdrumFile& infile, int track,
+		int startline, int endline, int layerindex) {
+	m_layer = new Layer();
+	m_layer->SetN(layerindex + 1);
+	m_staff->AddLayer(m_layer);
+
+	return fillContentsOfLayer(infile, track, startline, endline, layerindex);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::convertStaffLayer -- Fill the layer with musical data.
+//
+
+bool HumdrumInput::fillContentsOfLayer(HumdrumFile& infile, int track,
+		int startline, int endline, int layerindex) {
+
+	Rest* rest = new Rest();
+	rest->SetDur(DURATION_8);
+	m_layer->AddLayerElement(rest);
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::getStaffLayerCounts -- Return the maximum layer count for each
+//    part within the measure.
+//
+
+vector<int> HumdrumInput::getStaffLayerCounts(HumdrumFile& infile,
+		const vector<HTp>& kernstarts, int startline, int endline) {
+	vector<int> maxvals(kernstarts.size(), 0);
+	vector<int> curvals(kernstarts.size(), 0);
+	vector<int> rkern(infile.getSpineCount() + 1, -1);
+	int i, j, track;
+
+	for (i=0; i<(int)kernstarts.size(); i++) {
+		rkern[kernstarts[i]->getTrack()] = i;
+	}
+
+	for (i=startline; i<=endline; i++) {
+		if (!infile[i].isData()) {
+			continue;
+		}
+		std::fill(curvals.begin(), curvals.end(), 0);
+		for (j=0; j<infile[i].getFieldCount(); j++) {
+			track = infile[i].token(j)->getTrack();
+			if (rkern[track] < 0) {
+				continue;
+			}
+			curvals[rkern[track]]++;
+		}
+		for (j=0; j<(int)curvals.size(); j++) {
+			if (curvals[j] > maxvals[j]) {
+				maxvals[j] = curvals[j];
+			}
+		}
+	}
+
+	return maxvals;
 }
 
 
@@ -280,74 +410,7 @@ void HumdrumInput::setSystemMeasureStyle(HumdrumFile& infile,
 	} else if (startbar.find("-") != string::npos) {
 		m_measure->SetLeft(BARRENDITION_invis);
 	}
-
-	
 }
-
-
-
-/*
-
-//////////////////////////////
-//
-// HumdrumInput::ReadHumdrumPart -- Process a single part.  There may be cases
-//    where two spines form a single "part" such as a piano grand staff, but
-//    this sort of case will be ignored for now.
-//
-
-bool HumdrumInput::readHumdrumPart(HumdrumFile& infile, HTp spinestart) {
-
-	Measure *measure     = NULL;
-	Staff *staff         = NULL;
-	Layer *layer         = NULL;
-	Note *note           = NULL;
-	Beam *beam           = NULL;
-	Tuplet *tuplet       = NULL;
-	Rest *rest           = NULL;
-	Tie *tie             = NULL;
-	Chord *chord         = NULL;
-	Slur *slur           = NULL;
-	ScoreDef *scoreDef   = NULL;
-
-	// staffGrp and staffDef
-	StaffGrp *staffGrp = new StaffGrp();
-	StaffDef *staffDef = new StaffDef();
-	staffDef->SetN(1);
-	staffDef->SetLines(5);
-
-	// clef
-	staffDef->SetClefLine(2);
-	staffDef->SetClefShape(CLEFSHAPE_G);
-
-	m_doc->m_scoreDef.SetKeySig(KEYSIGNATURE_2s);
-	m_doc->m_scoreDef.SetMeterSym(METERSIGN_common);
-
-	staffGrp->AddStaffDef(staffDef);
-	m_doc->m_scoreDef.AddStaffGrp(staffGrp);
-
-
-	// create the measure and its content
-	measure = new Measure();
-	measure->SetN(0);
-	staff = new Staff();
-	staff->SetN(1);
-	layer = new Layer();
-	layer->SetN(1);
-	rest = new Rest();
-	rest->SetDur(DURATION_8);
-
-	// add them up
-	layer->AddLayerElement(rest);
-	staff->AddLayer(layer);
-	measure->AddStaff(staff);
-	system->AddMeasure(measure);
-
-	return true;
-
-}
-
-
-*/
 
 
 
@@ -455,6 +518,40 @@ void HumdrumInput::calculateLayout(void) {
 
 
 } // namespace vrv
+
+
+/*
+
+	Layer *layer         = NULL;
+	Note *note           = NULL;
+	Beam *beam           = NULL;
+	Tuplet *tuplet       = NULL;
+	Tie *tie             = NULL;
+	Chord *chord         = NULL;
+	Slur *slur           = NULL;
+	ScoreDef *scoreDef   = NULL;
+
+	// staffGrp and staffDef
+	StaffGrp *staffGrp = new StaffGrp();
+	StaffDef *staffDef = new StaffDef();
+	staffDef->SetN(1);
+	staffDef->SetLines(5);
+
+	// clef
+	staffDef->SetClefLine(2);
+	staffDef->SetClefShape(CLEFSHAPE_G);
+
+	m_doc->m_scoreDef.SetKeySig(KEYSIGNATURE_2s);
+	m_doc->m_scoreDef.SetMeterSym(METERSIGN_common);
+
+	staffGrp->AddStaffDef(staffDef);
+	m_doc->m_scoreDef.AddStaffGrp(staffGrp);
+
+
+}
+
+
+*/
 
 
 

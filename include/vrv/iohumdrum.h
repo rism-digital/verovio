@@ -21,6 +21,8 @@
 #include "page.h"
 #include "system.h"
 #include "measure.h"
+#include "staff.h"
+#include "layer.h"
 
 #include "humlib.h"
 
@@ -49,13 +51,26 @@ class HumdrumInput : public FileInputStream {
 		bool   convertSystemMeasure (hum::HumdrumFile& infile,
 		                             const vector<hum::HTp>& kernstarts,
 		                             int& line);
+		bool   convertMeasureStaves (hum::HumdrumFile& infile,
+		                             const vector<hum::HTp>& kernstarts,
+		                             int startline, int endline);
+		bool   convertMeasureStaff  (hum::HumdrumFile& infile, int track,
+		                             int startline, int endline,
+		                             int n, int layercount);
 		void   setupSystemMeasure   (hum::HumdrumFile& infile,
 		                             const vector<hum::HTp>& kernstarts,
 		                             int startline, int endline);
+		bool   convertStaffLayer    (hum::HumdrumFile& infile, int track,
+		                             int startline, int endline, int layerindex);
 		int    getMeasureNumber     (hum::HumdrumFile& infile, int startline,
 		                             int endline);
-      void   calculateLayout      (void);
+		bool   fillContentsOfLayer  (hum::HumdrumFile& infile, int track,
+		                             int startline, int endline, int layerindex);
+		void   calculateLayout      (void);
 		void   setSystemMeasureStyle(hum::HumdrumFile& infile,
+		                             const vector<hum::HTp>& kernstarts,
+		                             int startline, int endline);
+		vector<int> getStaffLayerCounts(hum::HumdrumFile& infile,
 		                             const vector<hum::HTp>& kernstarts,
 		                             int startline, int endline);
 
@@ -65,6 +80,8 @@ class HumdrumInput : public FileInputStream {
 		Page*       m_page;      // The current page, or NULL.
 		System*     m_system;    // The current system, or NULL.
 		Measure*    m_measure;   // The current measure, or NULL.
+		Staff*      m_staff;     // The current staff, or NULL.
+		Layer*      m_layer;     // The current layer, or NULL.
 		int         m_debug;     // For printing MEI data to standard input.
 
 };
