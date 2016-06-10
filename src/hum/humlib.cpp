@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun  8 14:53:07 PDT 2016
+// Last Modified: Thu Jun  9 14:03:19 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2879,6 +2879,17 @@ void HumdrumFileBase::getSpineStartList(vector<HTp>& spinestarts,
 			}
 		}
 	}
+}
+
+
+void HumdrumFileBase::getKernSpineStartList(vector<HTp>& spinestarts) {
+   getSpineStartList(spinestarts, "**kern");
+}
+
+vector<HTp> HumdrumFileBase::getKernSpineStartList(void) {
+   vector<HTp> starts;
+   HumdrumFileBase::getKernSpineStartList(starts);
+   return starts;
 }
 
 

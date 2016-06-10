@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun  8 14:53:07 PDT 2016
+// Last Modified: Thu Jun  9 14:03:19 PDT 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -848,19 +848,21 @@ class HumdrumFileBase {
 		HTp           getSpineStart            (int spine) const { 
 		                                         return getTrackStart(spine+1); }
 
-		void          getSpineStartList        (vector<HTp>& spinelist);
-		void          getSpineStartList        (vector<HTp>& spinelist,
+		void          getSpineStartList        (vector<HTp>& spinestarts);
+		void          getSpineStartList        (vector<HTp>& spinestarts,
 		                                        const string& exinterp);
-		void          getSpineStartList        (vector<HTp>& spinelist,
+      void          getKernSpineStartList    (vector<HTp>& spinestarts);
+      vector<HTp>   getKernSpineStartList    ();
+		void          getSpineStartList        (vector<HTp>& spinestarts,
 		                                        const vector<string>& exinterps);
-		void          getTrackStartList        (vector<HTp>& spinelist) {
-								return getSpineStartList(spinelist); }
-		void          getTrackStartList        (vector<HTp>& spinelist,
+		void          getTrackStartList        (vector<HTp>& spinestarts) {
+								return getSpineStartList(spinestarts); }
+		void          getTrackStartList        (vector<HTp>& spinestarts,
 		                                        const string& exinterp) {
-								return getSpineStartList(spinelist, exinterp); }
-		void          getTrackStartList        (vector<HTp>& spinelist,
+								return getSpineStartList(spinestarts, exinterp); }
+		void          getTrackStartList        (vector<HTp>& spinestarts,
 		                                        const vector<string>& exinterps) {
-								return getSpineStartList(spinelist, exinterps); }
+								return getSpineStartList(spinestarts, exinterps); }
 
 		int           getTrackEndCount         (int track) const;
 		HTp           getTrackEnd              (int track, int subtrack) const;
