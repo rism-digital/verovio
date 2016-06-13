@@ -1127,7 +1127,7 @@ AttCommon::~AttCommon()
 
 void AttCommon::ResetCommon()
 {
-    m_n = 0;
+    m_n = -1;
 }
 
 bool AttCommon::ReadCommon(pugi::xml_node element)
@@ -1153,7 +1153,7 @@ bool AttCommon::WriteCommon(pugi::xml_node element)
 
 bool AttCommon::HasN() const
 {
-    return (m_n != 0);
+    return (m_n != -1);
 }
 
 /* include <attn> */
