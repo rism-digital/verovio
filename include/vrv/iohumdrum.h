@@ -18,28 +18,29 @@
 #include "io.h"
 #include "vrvdef.h"
 
-#include "layer.h"
-#include "measure.h"
-#include "page.h"
-#include "staff.h"
-#include "system.h"
-
-#include "rest.h"
-
 #include "humlib.h"
 
 //----------------------------------------------------------------------------
-
-namespace vrv {
 
 //----------------------------------------------------------------------------
 // HumdrumInput
 //----------------------------------------------------------------------------
 
-class HumdrumInput : public FileInputStream {
+namespace vrv {
+
+class Layer;
+class Measure;
+class Page;
+class Staff;
+class StaffDef;
+class StaffGrp;
+class System;
+class Rest;
+
+class HumdrumInput : public vrv::FileInputStream {
 public:
     // constructors and destructors
-    HumdrumInput(Doc *doc, std::string filename);
+    HumdrumInput(vrv::Doc *doc, std::string filename);
     virtual ~HumdrumInput();
 
     virtual bool ImportFile();
@@ -85,14 +86,14 @@ private:
     // these variables as parameters:
     //
 
-    StaffGrp *m_staffgroup; // information about parts
-    vector<StaffDef *> m_staffdef; // information about a staff
+    vrv::StaffGrp *m_staffgroup; // information about parts
+    vector<vrv::StaffDef *> m_staffdef; // information about a staff
 
-    Page *m_page; // current page, or NULL
-    System *m_system; // current system, or NULL
-    Measure *m_measure; // current measure, or NULL
-    Staff *m_staff; // current staff, or NULL
-    Layer *m_layer; // current layer, or NULL
+    vrv::Page *m_page; // current page, or NULL
+    vrv::System *m_system; // current system, or NULL
+    vrv::Measure *m_measure; // current measure, or NULL
+    vrv::Staff *m_staff; // current staff, or NULL
+    vrv::Layer *m_layer; // current layer, or NULL
 
     // m_layertokens == Humdrum **kern tokens for each staff/layer to be
     // converted.

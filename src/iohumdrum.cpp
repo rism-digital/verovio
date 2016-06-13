@@ -18,6 +18,7 @@
 
 #ifndef NO_HUMDRUM_SUPPORT
 
+#include "humlib.h"
 #include "iohumdrum.h"
 #include <math.h>
 
@@ -32,8 +33,13 @@
 
 #include "doc.h"
 #include "iomei.h"
+#include "layer.h"
+#include "measure.h"
 #include "mrest.h"
+#include "page.h"
 #include "rest.h"
+#include "staff.h"
+#include "system.h"
 #include "vrv.h"
 
 //#include "attcomparison.h"
@@ -50,6 +56,7 @@
 //#include "pugixml.hpp"
 
 using namespace hum; // humlib namespace
+using namespace vrv; // verovio namespace
 using namespace std;
 
 namespace vrv {
