@@ -5,10 +5,21 @@
 // vim:         ts=3
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
+//
+// References:
+//    http://humlib.humdrum.org
+//    http://music-encoding.org/support/tutorials/mei-1st
+//    http://music-encoding.org/support/guidelines
+//    http://music-encoding.org/documentation/2.1.1/elements
+//    http://music-encoding.org/documentation/3.0.0/elements
+//    http://music-encoding.org/documentation/2.1.1/atts
+//    http://music-encoding.org/documentation/3.0.0/atts
+//
 
 #ifndef NO_HUMDRUM_SUPPORT
 
 #include "iohumdrum.h"
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
@@ -20,6 +31,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "mrest.h"
 #include "rest.h"
 #include "vrv.h"
 #include "iomei.h"
@@ -53,12 +65,17 @@ namespace vrv {
 HumdrumInput::HumdrumInput(Doc *doc, std::string filename)
 		: FileInputStream(doc) {
 	m_filename = filename;
-	m_page     = NULL;
-	m_system   = NULL;
-	m_measure  = NULL;
-	m_staff    = NULL;
-	m_layer    = NULL;
-	m_debug    = 1;
+
+ 	m_staffgroup = NULL;
+	// m_staffdef is a vector
+
+	m_page       = NULL;
+	m_system     = NULL;
+	m_measure    = NULL;
+	m_staff      = NULL;
+	m_layer      = NULL;
+
+	m_debug      = 1;
 }
 
 
@@ -82,12 +99,12 @@ HumdrumInput::~HumdrumInput() {
 bool HumdrumInput::ImportFile() {
 	try {
 		m_doc->Reset(Raw);
-		HumdrumFile infile;
+		HumdrumFile& infile = m_infile;
 		bool result = infile.read(m_filename);
 		if (!result) {
 			return false;
 		}
-		return convertHumdrum(infile);
+		return convertHumdrum();
 	}
 	catch (char *str) {
 		LogError("%s", str);
@@ -105,12 +122,12 @@ bool HumdrumInput::ImportFile() {
 bool HumdrumInput::ImportString(const std::string content) {
 	try {
 		m_doc->Reset(Raw);
-		HumdrumFile infile;
+		HumdrumFile& infile = m_infile;
 		bool result = infile.readString(content);
 		if (!result) {
 			return false;
 		}
-		return convertHumdrum(infile);
+		return convertHumdrum();
 	}
 	catch (char *str) {
 		LogError("%s", str);
@@ -135,13 +152,18 @@ bool HumdrumInput::ImportString(const std::string content) {
 //     http://music-encoding.org/documentation/2.1.1/cmn
 //
 
-bool HumdrumInput::convertHumdrum(HumdrumFile& infile) {
+bool HumdrumInput::convertHumdrum(void) {
+	HumdrumFile& infile = m_infile;
+
 	bool status = true;  // for keeping track of problems in conversion process.
+
+	prepareTimeSigDur();
 
 	setupMeiDocument();
 
 	// Create a list of the parts and which spine represents them.
-	vector<HTp> kernstarts = infile.getKernSpineStartList();
+	vector<HTp>& kernstarts = m_kernstarts;
+	kernstarts = infile.getKernSpineStartList();
 
 	if (kernstarts.size() == 0) {
 		// no parts in file, give up.  Perhaps return an error.
@@ -150,10 +172,13 @@ bool HumdrumInput::convertHumdrum(HumdrumFile& infile) {
 
 	// Reverse the order, since top part is last spine.
 	reverse(kernstarts.begin(), kernstarts.end());
+	calculateReverseKernIndex();
+
+	prepareStaffGroup();
 
 	int line = kernstarts[0]->getLineIndex();
 	while (line < infile.getLineCount() - 1 && (line >= 0)) {
-		status &= convertSystemMeasure(infile, kernstarts, line);
+		status &= convertSystemMeasure(line);
 	}
 
 	// calculateLayout();
@@ -172,15 +197,288 @@ bool HumdrumInput::convertHumdrum(HumdrumFile& infile) {
 
 //////////////////////////////
 //
-// HumdrumInput::convertSystemMeasure -- Convert a measure of Humdrum data into
-//    a measure of MEI data.
+// HumdrumInput::prepareTimeSigDur -- create a list of the duration of time
+//      signatures in the file, indexed by HumdrumFile line number.  Only the
+//      first spine in the file is considered.
 //
 
-bool HumdrumInput::convertSystemMeasure(HumdrumFile& infile,
-		const vector<HTp>& kernstarts, int& line) {
+void HumdrumInput::prepareTimeSigDur(void) {
+	vector<HumNum>& sigdurs = m_timesigdurs;
+	HumdrumFile& infile = m_infile;
+	sigdurs.resize(infile.getLineCount());
+	std::fill(sigdurs.begin(), sigdurs.end(), -1);
+	HumNum curdur = -1;
+	int top;
+	int bot;
+	int bot2;
+	int i;
+	for (i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isInterpretation()) {
+			sigdurs[i] = curdur;
+		}
+		if (sscanf(infile[i].token(0)->c_str(), "*M%d/%d%%%d", &top, &bot,
+				&bot2) == 3) {
+			// deal with triplet-whole note beats later
+		} else if (sscanf(infile[i].token(0)->c_str(), "*M%d/%d", &top,
+				&bot) == 2) {
+			curdur = top;
+			if (bot == 0) {  // breve
+				curdur *= 2;
+			} else {
+				curdur /= bot;
+			}
+			curdur *= 4;  // convert to quarter note units;
+		}
+		sigdurs[i] = curdur;
+	}
 
+	for (i=sigdurs.size()-2; i>=0; i--) {
+		if (infile[i].getDuration() == 0) {
+			sigdurs[i] = sigdurs[i+1];
+		}
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::calculateReverseKernIndex --
+//
+
+void HumdrumInput::calculateReverseKernIndex(void) {
+	vector<int>& rkern = m_rkern;
+	HumdrumFile& infile = m_infile;
+	const vector<HTp>& kernstarts = m_kernstarts;
+
+	rkern.resize(infile.getSpineCount() + 1);
+	std::fill(rkern.begin(), rkern.end(), -1);
+	for (int i=0; i<(int)kernstarts.size(); i++) {
+		rkern[kernstarts[i]->getTrack()] = i;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::prepareStaffGroup --  Add information about each part.
+//
+
+void HumdrumInput::prepareStaffGroup(void) {
+	HumdrumFile& infile = m_infile;
+	const vector<HTp>& kernstarts = m_kernstarts;
+
+	m_staffgroup = new StaffGrp();
+	m_doc->m_scoreDef.AddStaffGrp(m_staffgroup);
+	for (int i=0; i<(int)kernstarts.size(); i++) {
+		m_staffdef.push_back(new StaffDef());
+		m_staffgroup->AddStaffDef(m_staffdef.back());
+		fillPartInfo(kernstarts[i], i+1);
+	}
+	if (kernstarts.size() == 2) {
+		m_staffgroup->SetSymbol(staffgroupingsym_SYMBOL_brace);
+	} else if (kernstarts.size() > 2) {
+		m_staffgroup->SetSymbol(staffgroupingsym_SYMBOL_bracket);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::fillPartInfo -- Should use regular expressions
+//    in the future.
+//
+
+void HumdrumInput::fillPartInfo(HTp partstart, int partnumber) {
+
+	string label;
+	string abbreviation;
+	string oclef;
+	string clef;
+	string keysig;
+	string key;
+	string timesig;
+	string metersig;
+	int top = 0;
+	int bot = 0;
+
+	HTp part = partstart;
+	while(part && !part->getLine()->isData()) {
+		if (part->compare(0, 5, "*clef") == 0) {
+			clef = *part;
+		} else if (part->compare(0, 6, "*oclef") == 0) {
+			oclef = *part;
+		} else if (part->compare(0, 3, "*k[") == 0) {
+			keysig = *part;
+		} else if (part->compare(0, 3, "*I'") == 0) {
+			abbreviation = part->substr(3);
+		} else if (part->compare(0, 3, "*I\"") == 0) {
+			label = part->substr(3);
+		} else if (sscanf(part->c_str(), "*M%d/%d", &top, &bot) == 2) {
+			timesig = *part;
+		}
+		part = part->getNextToken();
+	}
+
+	m_staffdef.back()->SetN(partnumber);
+	m_staffdef.back()->SetLines(5);
+
+	if (clef.size() > 0) {
+		setClef(m_staffdef.back(), clef);
+	}
+
+	if (label.size() > 0) {
+		m_staffdef.back()->SetLabel(label);
+	}
+
+	if (abbreviation.size() > 0) {
+		m_staffdef.back()->SetLabelAbbr(abbreviation);
+	}
+
+	if (keysig.size() > 0) {
+		setKeySig(m_staffdef.back(), keysig);
+	}
+
+	if (timesig.size() > 0) {
+		setTimeSig(m_staffdef.back(), timesig);
+	}
+
+	// m_staffdef.back()->SetMeterSym(METERSIGN_common);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::setTimeSig -- Convert a Humdrum timesig to an MEI timesig.
+//
+
+void HumdrumInput::setTimeSig(StaffDef* part, const string& timesig) {
+	int top  = -1000;
+	int bot  = -1000;
+	int bot2 = -1000;
+	if (sscanf(timesig.c_str(), "*M%d/%d%%%d", &top, &bot, &bot2) == 3) {
+		// Such as three-triplet whole notes in a 2/1 measure
+		// deal with this later
+	} else if (sscanf(timesig.c_str(), "*M%d/%d", &top, &bot) == 2) {
+		part->SetMeterCount(top);
+		part->SetMeterUnit(bot);
+	} else {
+		// some strange time signature which should never occur.
+	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::setKeySig -- Convert a Humdrum keysig to an MEI keysig.
+//
+
+void HumdrumInput::setKeySig(StaffDef* part, const string& keysig) {
+	bool fs = keysig.find("f#") != string::npos;
+	bool cs = keysig.find("c#") != string::npos;
+	bool gs = keysig.find("g#") != string::npos;
+	bool ds = keysig.find("d#") != string::npos;
+	bool as = keysig.find("a#") != string::npos;
+	bool es = keysig.find("e#") != string::npos;
+	bool bs = keysig.find("b#") != string::npos;
+
+	bool bb = keysig.find("b-") != string::npos;
+	bool eb = keysig.find("e-") != string::npos;
+	bool ab = keysig.find("a-") != string::npos;
+	bool db = keysig.find("d-") != string::npos;
+	bool gb = keysig.find("g-") != string::npos;
+	bool cb = keysig.find("c-") != string::npos;
+	bool fb = keysig.find("f-") != string::npos;
+
+	if (fs && !cs && !gs && !ds && !as && !es && !bs) {
+		part->SetKeySig(KEYSIGNATURE_1s);
+	} else if (fs && cs && !gs && !ds && !as && !es && !bs) {
+		part->SetKeySig(KEYSIGNATURE_2s);
+	} else if (fs && cs && gs && !ds && !as && !es && !bs) {
+		part->SetKeySig(KEYSIGNATURE_3s);
+	} else if (fs && cs && gs && ds && !as && !es && !bs) {
+		part->SetKeySig(KEYSIGNATURE_4s);
+	} else if (fs && cs && gs && ds && as && !es && !bs) {
+		part->SetKeySig(KEYSIGNATURE_5s);
+	} else if (fs && cs && gs && ds && as && es && !bs) {
+		part->SetKeySig(KEYSIGNATURE_6s);
+	} else if (fs && cs && gs && ds && as && es && bs) {
+		part->SetKeySig(KEYSIGNATURE_7s);
+	} else if (bb && !eb && !ab && !db && !gb && !cb && !fb) {
+		part->SetKeySig(KEYSIGNATURE_1f);
+	} else if (bb && eb && !ab && !db && !gb && !cb && !fb) {
+		part->SetKeySig(KEYSIGNATURE_2f);
+	} else if (bb && eb && ab && !db && !gb && !cb && !fb) {
+		part->SetKeySig(KEYSIGNATURE_3f);
+	} else if (bb && eb && ab && db && !gb && !cb && !fb) {
+		part->SetKeySig(KEYSIGNATURE_4f);
+	} else if (bb && eb && ab && db && gb && !cb && !fb) {
+		part->SetKeySig(KEYSIGNATURE_5f);
+	} else if (bb && eb && ab && db && gb && cb && !fb) {
+		part->SetKeySig(KEYSIGNATURE_6f);
+	} else if (bb && eb && ab && db && gb && cb && fb) {
+		part->SetKeySig(KEYSIGNATURE_7f);
+	} else if (!bb && !eb && !ab && !db && !gb && !cb && !fb &&
+	           !fs && !cs && !gs && !ds && !as && !es && !bs) {
+		part->SetKeySig(KEYSIGNATURE_0);
+	} else {
+		// nonstandard keysignature, so give a NONE style.
+		part->SetKeySig(KEYSIGNATURE_NONE);
+	}
+
+}
+
+
+//////////////////////////////
+//
+// HumdrumInput::setClef -- Convert a Humdrum clef to an MEI clef.
+//
+
+void HumdrumInput::setClef(StaffDef* part, const string& clef) {
+	if (clef.find("clefG") != string::npos) {
+		part->SetClefShape(CLEFSHAPE_G);
+	} else if (clef.find("clefF") != string::npos) {
+		part->SetClefShape(CLEFSHAPE_F);
+	} else if (clef.find("clefC") != string::npos) {
+		part->SetClefShape(CLEFSHAPE_C);
+	}
+
+	if (clef.find("2") != string::npos) {
+		part->SetClefLine(2);
+	} else if (clef.find("4") != string::npos) {
+		part->SetClefLine(4);
+	} else if (clef.find("3") != string::npos) {
+		part->SetClefLine(3);
+	} else if (clef.find("5") != string::npos) {
+		part->SetClefLine(5);
+	} else if (clef.find("1") != string::npos) {
+		part->SetClefLine(1);
+	}
+
+	if (clef.find("v") != string::npos) {
+		part->SetClefDis(OCTAVE_DIS_8);
+		part->SetClefDisPlace(PLACE_below);
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::convertSystemMeasure --
+//
+
+bool HumdrumInput::convertSystemMeasure(int& line) {
+	HumdrumFile& infile = m_infile;
+	const vector<HTp>& kernstarts = m_kernstarts;
 	int startline = line;
-	int endline   = getMeasureEndLine(infile, startline);
+	int endline   = getMeasureEndLine(startline);
 	if (endline < 0) {
 		// empty measure, skip it.  This can happen at the start of
 		// a score if there is an invisible measure before the start of the
@@ -191,9 +489,67 @@ bool HumdrumInput::convertSystemMeasure(HumdrumFile& infile,
 		line = endline;
 	}
 
-	setupSystemMeasure(infile, kernstarts, startline, endline);
+	setupSystemMeasure(startline, endline);
 
-	return convertMeasureStaves(infile, kernstarts, startline, endline);
+	storeStaffLayerTokensForMeasure(startline, endline);
+
+	return convertMeasureStaves(startline, endline);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::storeStaffLayerTokensForMeasure -- Store lists of notation
+//   data by staff and layer.
+//
+
+void HumdrumInput::storeStaffLayerTokensForMeasure(int startline,
+		int endline) {
+	HumdrumFile& infile = m_infile;
+	const vector<HTp>& kernstarts = m_kernstarts;
+	const vector<int>& rkern = m_rkern;
+	vector<vector<vector<HTp> > >& lt = m_layertokens;
+
+	lt.clear();
+	lt.resize(kernstarts.size());
+
+	int i, j, k;
+	for (i=0; i<(int)kernstarts.size(); i++) {
+		lt[i].clear();
+	}
+
+	int lasttrack  = -1;
+	int track      = -1;
+	int staffindex = -1;
+	int layerindex = 0;
+	for (i=startline; i<=endline; i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		for (j=0; j<infile[i].getFieldCount(); j++) {
+			track = infile[i].token(j)->getTrack();
+			staffindex = rkern[track];
+			if (staffindex < 0) {
+				continue;
+			}
+			if (track != lasttrack) {
+				layerindex = 0;
+			} else {
+				layerindex++;
+			}
+			lasttrack = track;
+			if (infile[i].token(j)->isNull()) {
+				continue;
+			}
+			if (lt[staffindex].size() < layerindex + 1) {
+				lt[staffindex].resize(lt[staffindex].size()+1);
+				lt[staffindex].back().clear();  // probably not necessary
+			}
+			lt[staffindex][layerindex].push_back(infile[i].token(j));
+		}
+	}
+
 }
 
 
@@ -204,15 +560,15 @@ bool HumdrumInput::convertSystemMeasure(HumdrumFile& infile,
 //    individual staff elements for each part.
 //
 
-bool HumdrumInput::convertMeasureStaves(HumdrumFile& infile,
-		const vector<HTp>& kernstarts, int startline, int endline) {
+bool HumdrumInput::convertMeasureStaves(int startline, int endline) {
+	HumdrumFile& infile = m_infile;
+	const vector<HTp>& kernstarts = m_kernstarts;
 
-	vector<int> layers = getStaffLayerCounts(infile, kernstarts, startline,
-			endline);
+	vector<int> layers = getStaffLayerCounts();
 
 	bool status = true;
 	for (int i=0; i<(int)kernstarts.size(); i++) {
-		status &= convertMeasureStaff(infile, kernstarts[i]->getTrack(),
+		status &= convertMeasureStaff(kernstarts[i]->getTrack(),
 				startline, endline, i+1, layers[i]);
 		if (!status) {
 			break;
@@ -230,8 +586,8 @@ bool HumdrumInput::convertMeasureStaves(HumdrumFile& infile,
 //     particular measure.
 //
 
-bool HumdrumInput::convertMeasureStaff(HumdrumFile& infile, int track,
-		int startline, int endline, int n, int layercount) {
+bool HumdrumInput::convertMeasureStaff(int track, int startline, int endline,
+		int n, int layercount) {
 
 	m_staff = new Staff();
 	m_measure->AddStaff(m_staff);
@@ -239,7 +595,7 @@ bool HumdrumInput::convertMeasureStaff(HumdrumFile& infile, int track,
 
 	bool status = true;
 	for (int i=0; i<layercount; i++) {
-		status &= convertStaffLayer(infile, track, startline, endline, i);
+		status &= convertStaffLayer(track, startline, endline, i);
 		if (!status) {
 			break;
 		}
@@ -256,30 +612,69 @@ bool HumdrumInput::convertMeasureStaff(HumdrumFile& infile, int track,
 //   staff and then fill it with data.
 //
 
-bool HumdrumInput::convertStaffLayer(HumdrumFile& infile, int track,
-		int startline, int endline, int layerindex) {
+bool HumdrumInput::convertStaffLayer(int track, int startline, int endline,
+		int layerindex) {
+	HumdrumFile& infile = m_infile;
 	m_layer = new Layer();
 	m_layer->SetN(layerindex + 1);
 	m_staff->AddLayer(m_layer);
 
-	return fillContentsOfLayer(infile, track, startline, endline, layerindex);
+	return fillContentsOfLayer(track, startline, endline, layerindex);
 }
 
 
 
 //////////////////////////////
 //
-// HumdrumInput::convertStaffLayer -- Fill the layer with musical data.
+// HumdrumInput::fillContentsOfLayer -- Fill the layer with musical data.
 //
 
-bool HumdrumInput::fillContentsOfLayer(HumdrumFile& infile, int track,
-		int startline, int endline, int layerindex) {
+bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline,
+		int layerindex) {
+	HumdrumFile& infile = m_infile;
+	vector<HumNum>& timesigdurs = m_timesigdurs;
 
-	Rest* rest = new Rest();
-	rest->SetDur(DURATION_8);
-	m_layer->AddLayerElement(rest);
+	HumNum starttime = infile[startline].getDurationFromStart();
+	HumNum endtime = infile[endline].getDurationFromStart() +
+	                 infile[endline].getDuration();
+	HumNum duration = endtime - starttime;
+
+	/* Why not allowed?
+	if (timesigdurs[startline] != duration) {
+		m_measure->SetMetcon(BOOLEAN_false);
+	}
+	*/
+
+	if (timesigdurs[startline] == duration) {
+		MRest* mrest = new MRest();
+		m_layer->AddLayerElement(mrest);
+	} else {
+		Rest* rest = new Rest();
+		m_layer->AddLayerElement(rest);
+		setDuration(rest, duration);
+	}
 
 	return true;
+}
+
+
+
+/////////////////////////////
+//
+// HumdrumInput::setDuration --  Incoming duration is in quarter notes.
+//
+
+void HumdrumInput::setDuration(Rest* rest, HumNum duration) {
+	if (duration == 3) {
+		rest->SetDur(DURATION_2);
+		rest->SetDots(1);
+	} else if (duration == 2) {
+		rest->SetDur(DURATION_2);
+	} else if (duration == 1) {
+		rest->SetDur(DURATION_4);
+	} else if (duration == 4) {
+		rest->SetDur(DURATION_1);
+	}
 }
 
 
@@ -290,37 +685,16 @@ bool HumdrumInput::fillContentsOfLayer(HumdrumFile& infile, int track,
 //    part within the measure.
 //
 
-vector<int> HumdrumInput::getStaffLayerCounts(HumdrumFile& infile,
-		const vector<HTp>& kernstarts, int startline, int endline) {
-	vector<int> maxvals(kernstarts.size(), 0);
-	vector<int> curvals(kernstarts.size(), 0);
-	vector<int> rkern(infile.getSpineCount() + 1, -1);
-	int i, j, track;
+vector<int> HumdrumInput::getStaffLayerCounts(void) {
+	vector<vector<vector<hum::HTp> > >& lt = m_layertokens;
+	vector<int> output(lt.size(), 0);
 
-	for (i=0; i<(int)kernstarts.size(); i++) {
-		rkern[kernstarts[i]->getTrack()] = i;
+	int i, j;
+	for (i=0; i<(int)lt.size(); i++) {
+		output[i] = lt[i].size();
 	}
 
-	for (i=startline; i<=endline; i++) {
-		if (!infile[i].isData()) {
-			continue;
-		}
-		std::fill(curvals.begin(), curvals.end(), 0);
-		for (j=0; j<infile[i].getFieldCount(); j++) {
-			track = infile[i].token(j)->getTrack();
-			if (rkern[track] < 0) {
-				continue;
-			}
-			curvals[rkern[track]]++;
-		}
-		for (j=0; j<(int)curvals.size(); j++) {
-			if (curvals[j] > maxvals[j]) {
-				maxvals[j] = curvals[j];
-			}
-		}
-	}
-
-	return maxvals;
+	return output;
 }
 
 
@@ -330,17 +704,18 @@ vector<int> HumdrumInput::getStaffLayerCounts(HumdrumFile& infile,
 // HumdrumInput::setupSystemMeasure -- prepare a new system measure.
 //
 
-void HumdrumInput::setupSystemMeasure(HumdrumFile& infile,
-		const vector<HTp>& kernstarts, int startline, int endline) {
+void HumdrumInput::setupSystemMeasure(int startline, int endline) {
+	HumdrumFile& infile = m_infile;
+
 	m_measure = new Measure();
 	m_system->AddMeasure(m_measure);
 
-	int measurenumber = getMeasureNumber(infile, startline, endline);
+	int measurenumber = getMeasureNumber(startline, endline);
 	if (measurenumber >= 0) {
 		m_measure->SetN(measurenumber);
 	}
 
-	setSystemMeasureStyle(infile, kernstarts, startline, endline);
+	setSystemMeasureStyle(startline, endline);
 }
 
 
@@ -368,8 +743,9 @@ void HumdrumInput::setupSystemMeasure(HumdrumFile& infile,
 //      http://music-encoding.org/guidelines/3.0.0/Images/ExampleImages/barline-20100510.png
 //
 
-void HumdrumInput::setSystemMeasureStyle(HumdrumFile& infile,
-		const vector<HTp>& kernstarts, int startline, int endline) {
+void HumdrumInput::setSystemMeasureStyle(int startline, int endline) {
+	HumdrumFile& infile = m_infile;
+	const vector<HTp>& kernstarts = m_kernstarts;
 
 	string endbar   = infile[endline].getTokenString(0);
 	string startbar = infile[startline].getTokenString(0);
@@ -423,7 +799,8 @@ void HumdrumInput::setSystemMeasureStyle(HumdrumFile& infile,
 //   measure.
 //
 
-int HumdrumInput::getMeasureEndLine(HumdrumFile& infile, int startline) {
+int HumdrumInput::getMeasureEndLine(int startline) {
+	HumdrumFile& infile = m_infile;
 	int endline = infile.getLineCount() - 1;
 	bool foundDataQ = false;
 	int i = startline+1;
@@ -483,8 +860,9 @@ void HumdrumInput::clear(void) {
 //     pickup measure.
 //
 
-int HumdrumInput::getMeasureNumber(HumdrumFile& infile, int startline,
-		int endline) {
+int HumdrumInput::getMeasureNumber(int startline, int endline) {
+	HumdrumFile& infile = m_infile;
+
 	if (infile[startline].getTokenString(0).compare(0, 2, "**") == 0) {
 		// create HumdrumFile.hasPickup() function and uncomment out below:
 		// if (infile.hasPickup()) {
@@ -518,40 +896,6 @@ void HumdrumInput::calculateLayout(void) {
 
 
 } // namespace vrv
-
-
-/*
-
-	Layer *layer         = NULL;
-	Note *note           = NULL;
-	Beam *beam           = NULL;
-	Tuplet *tuplet       = NULL;
-	Tie *tie             = NULL;
-	Chord *chord         = NULL;
-	Slur *slur           = NULL;
-	ScoreDef *scoreDef   = NULL;
-
-	// staffGrp and staffDef
-	StaffGrp *staffGrp = new StaffGrp();
-	StaffDef *staffDef = new StaffDef();
-	staffDef->SetN(1);
-	staffDef->SetLines(5);
-
-	// clef
-	staffDef->SetClefLine(2);
-	staffDef->SetClefShape(CLEFSHAPE_G);
-
-	m_doc->m_scoreDef.SetKeySig(KEYSIGNATURE_2s);
-	m_doc->m_scoreDef.SetMeterSym(METERSIGN_common);
-
-	staffGrp->AddStaffDef(staffDef);
-	m_doc->m_scoreDef.AddStaffGrp(staffGrp);
-
-
-}
-
-
-*/
 
 
 

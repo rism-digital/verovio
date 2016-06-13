@@ -24,6 +24,8 @@
 #include "staff.h"
 #include "layer.h"
 
+#include "rest.h"
+
 #include "humlib.h"
 
 //----------------------------------------------------------------------------
@@ -44,45 +46,74 @@ class HumdrumInput : public FileInputStream {
 		virtual bool ImportString(std::string humdrum);
 
 	protected:
-		void   clear                (void);
-		bool   convertHumdrum       (hum::HumdrumFile& infile);
-		void   setupMeiDocument     (void);
-		int    getMeasureEndLine    (hum::HumdrumFile& infile, int startline);
-		bool   convertSystemMeasure (hum::HumdrumFile& infile,
-		                             const vector<hum::HTp>& kernstarts,
-		                             int& line);
-		bool   convertMeasureStaves (hum::HumdrumFile& infile,
-		                             const vector<hum::HTp>& kernstarts,
-		                             int startline, int endline);
-		bool   convertMeasureStaff  (hum::HumdrumFile& infile, int track,
-		                             int startline, int endline,
-		                             int n, int layercount);
-		void   setupSystemMeasure   (hum::HumdrumFile& infile,
-		                             const vector<hum::HTp>& kernstarts,
-		                             int startline, int endline);
-		bool   convertStaffLayer    (hum::HumdrumFile& infile, int track,
-		                             int startline, int endline, int layerindex);
-		int    getMeasureNumber     (hum::HumdrumFile& infile, int startline,
-		                             int endline);
-		bool   fillContentsOfLayer  (hum::HumdrumFile& infile, int track,
-		                             int startline, int endline, int layerindex);
-		void   calculateLayout      (void);
-		void   setSystemMeasureStyle(hum::HumdrumFile& infile,
-		                             const vector<hum::HTp>& kernstarts,
-		                             int startline, int endline);
-		vector<int> getStaffLayerCounts(hum::HumdrumFile& infile,
-		                             const vector<hum::HTp>& kernstarts,
-		                             int startline, int endline);
+		void        clear                (void);
+		bool        convertHumdrum       (void);
+		void        setupMeiDocument     (void);
+		int         getMeasureEndLine    (int startline);
+		bool        convertSystemMeasure (int& line);
+		bool        convertMeasureStaves (int startline, int endline);
+		bool        convertMeasureStaff  (int track, int startline, int endline,
+		                                  int n, int layercount);
+		void        setupSystemMeasure   (int startline, int endline);
+		bool        convertStaffLayer    (int track, int startline, int endline,
+		                                  int layerindex);
+		int         getMeasureNumber     (int startline, int endline);
+		bool        fillContentsOfLayer  (int track, int startline, int endline,
+		                                  int layerindex);
+		void        calculateLayout      (void);
+		void        setSystemMeasureStyle(int startline, int endline);
+		vector<int> getStaffLayerCounts(void);
+		void        prepareStaffGroup    (void);
+		void        setClef              (StaffDef* part, const string& clef);
+		void        setKeySig            (StaffDef* part, const string& keysig);
+		void        setTimeSig           (StaffDef* part, const string& timesig);
+		void        fillPartInfo         (hum::HTp partstart, int partnumber);
+		void        storeStaffLayerTokensForMeasure(int startline, int endline);
+		void        calculateReverseKernIndex(void);
+		void        prepareTimeSigDur    (void);
+		void        setDuration          (Rest* rest, hum::HumNum duration);
+
 
 	private:
 		std::string m_filename;  // Filename to read/was read.
+
+		// m_debug == temporary variable to print MEI convertsion to standard
+		// output.
+		int               m_debug;      // printing MEI data to standard input
+
 		// m_doc is inherited root document object.
-		Page*       m_page;      // The current page, or NULL.
-		System*     m_system;    // The current system, or NULL.
-		Measure*    m_measure;   // The current measure, or NULL.
-		Staff*      m_staff;     // The current staff, or NULL.
-		Layer*      m_layer;     // The current layer, or NULL.
-		int         m_debug;     // For printing MEI data to standard input.
+
+		//////////////////////////////
+		//
+		// State variables for doing the conversion without having to pass
+		// these variables as parameters:
+		//
+
+		StaffGrp*         m_staffgroup; // information about parts
+		vector<StaffDef*> m_staffdef;   // information about a staff
+
+		Page*             m_page;       // current page, or NULL
+		System*           m_system;     // current system, or NULL
+		Measure*          m_measure;    // current measure, or NULL
+		Staff*            m_staff;      // current staff, or NULL
+		Layer*            m_layer;      // current layer, or NULL
+
+		// m_layertokens == Humdrum **kern tokens for each staff/layer to be
+		// converted.
+		vector<vector<vector<hum::HTp> > > m_layertokens;
+
+		// m_kernspines == list of tracks in Humdrum file being parsed which
+		// contain **kern data.
+		vector<hum::HTp> m_kernstarts;
+
+		// m_rkern == reverse listing of staff to Humdrum file track.
+		vector<int> m_rkern;
+
+		// m_infile == Humdrum file used for conversion.
+		hum::HumdrumFile m_infile;
+
+		// m_timesigdurs == Prevailing time signature duration of measure
+		vector<hum::HumNum> m_timesigdurs;
 
 };
 
