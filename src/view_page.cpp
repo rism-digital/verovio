@@ -175,6 +175,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     // first draw the beams
     DrawSystemList(dc, system, SYL);
     DrawSystemList(dc, system, HAIRPIN);
+    DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
 
@@ -191,6 +192,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
         if (((*iter)->Is() == classId) && (classId == HAIRPIN)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if (((*iter)->Is() == classId) && (classId == OCTAVE)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
         if (((*iter)->Is() == classId) && (classId == SYL)) {

@@ -163,38 +163,35 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetInth(std::string inth_) { m_inth = inth_; };
-    std::string GetInth() const { return m_inth; };
+    void SetInth(data_INTERVAL_HARMONIC inth_) { m_inth = inth_; };
+    data_INTERVAL_HARMONIC GetInth() const { return m_inth; };
     bool HasInth() const;
     ///@}
 
 private:
-    /**
-     * Encodes the harmonic interval between this note and other pitches occurring at
-     * the same time.
-     **/
-    std::string m_inth;
+    /** Encodes the harmonic interval between pitches occurring at the same time. **/
+    data_INTERVAL_HARMONIC m_inth;
 
     /* include <attinth> */
 };
 
 //----------------------------------------------------------------------------
-// AttIntervallicdesc
+// AttIntervalmelodic
 //----------------------------------------------------------------------------
 
-class AttIntervallicdesc : public Att {
+class AttIntervalmelodic : public Att {
 public:
-    AttIntervallicdesc();
-    virtual ~AttIntervallicdesc();
+    AttIntervalmelodic();
+    virtual ~AttIntervalmelodic();
 
     /** Reset the default values for the attribute class **/
-    void ResetIntervallicdesc();
+    void ResetIntervalmelodic();
 
     /** Read the values for the attribute class **/
-    bool ReadIntervallicdesc(pugi::xml_node element);
+    bool ReadIntervalmelodic(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteIntervallicdesc(pugi::xml_node element);
+    bool WriteIntervalmelodic(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -202,8 +199,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetIntm(data_INTERVAL_AMOUNT intm_) { m_intm = intm_; };
-    data_INTERVAL_AMOUNT GetIntm() const { return m_intm; };
+    void SetIntm(data_INTERVAL_MELODIC intm_) { m_intm = intm_; };
+    data_INTERVAL_MELODIC GetIntm() const { return m_intm; };
     bool HasIntm() const;
     ///@}
 
@@ -214,7 +211,7 @@ private:
      * diatonic interval direction, quality, and size, or a precise numeric value in
      * half steps.
      **/
-    data_INTERVAL_AMOUNT m_intm;
+    data_INTERVAL_MELODIC m_intm;
 
     /* include <attintm> */
 };

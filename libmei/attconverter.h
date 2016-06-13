@@ -62,11 +62,14 @@ public:
     std::string ColornamesToStr(data_COLORNAMES data) const;
     data_COLORNAMES StrToColornames(std::string value) const;
 
-    std::string CurverenditionToStr(data_CURVERENDITION data) const;
-    data_CURVERENDITION StrToCurverendition(std::string value) const;
-
     std::string EnclosureToStr(data_ENCLOSURE data) const;
     data_ENCLOSURE StrToEnclosure(std::string value) const;
+
+    std::string FillToStr(data_FILL data) const;
+    data_FILL StrToFill(std::string value) const;
+
+    std::string FontsizetermToStr(data_FONTSIZETERM data) const;
+    data_FONTSIZETERM StrToFontsizeterm(std::string value) const;
 
     std::string FontstyleToStr(data_FONTSTYLE data) const;
     data_FONTSTYLE StrToFontstyle(std::string value) const;
@@ -236,6 +239,9 @@ public:
     std::string MeterSigDefaultVisMeterrendToStr(meterSigDefaultVis_METERREND data) const;
     meterSigDefaultVis_METERREND StrToMeterSigDefaultVisMeterrend(std::string value) const;
 
+    std::string MeterSigGrpLogFuncToStr(meterSigGrpLog_FUNC data) const;
+    meterSigGrpLog_FUNC StrToMeterSigGrpLogFunc(std::string value) const;
+
     std::string MeterconformanceMetconToStr(meterconformance_METCON data) const;
     meterconformance_METCON StrToMeterconformanceMetcon(std::string value) const;
 
@@ -260,9 +266,6 @@ public:
     std::string PianopedalsPedalstyleToStr(pianopedals_PEDALSTYLE data) const;
     pianopedals_PEDALSTYLE StrToPianopedalsPedalstyle(std::string value) const;
 
-    std::string PlistEvaluateToStr(plist_EVALUATE data) const;
-    plist_EVALUATE StrToPlistEvaluate(std::string value) const;
-
     std::string PointingXlinkactuateToStr(pointing_XLINKACTUATE data) const;
     pointing_XLINKACTUATE StrToPointingXlinkactuate(std::string value) const;
 
@@ -286,6 +289,12 @@ public:
 
     std::string SylLogWordposToStr(sylLog_WORDPOS data) const;
     sylLog_WORDPOS StrToSylLogWordpos(std::string value) const;
+
+    std::string TargetevalEvaluateToStr(targeteval_EVALUATE data) const;
+    targeteval_EVALUATE StrToTargetevalEvaluate(std::string value) const;
+
+    std::string TempoLogFuncToStr(tempoLog_FUNC data) const;
+    tempoLog_FUNC StrToTempoLogFunc(std::string value) const;
 
     std::string TupletVisNumformatToStr(tupletVis_NUMFORMAT data) const;
     tupletVis_NUMFORMAT StrToTupletVisNumformat(std::string value) const;

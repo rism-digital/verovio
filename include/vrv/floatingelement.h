@@ -59,6 +59,20 @@ public:
     //----------//
 
     /**
+     * @name Reset the horizontal alignment
+     */
+    ///@{
+    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params);
+    ///@}
+
+    /**
+     * @name Reset the vertical alignment
+     */
+    ///@{
+    virtual int ResetVerticalAlignment(ArrayPtrVoid *params);
+    ///@}
+
+    /**
      * See Object::FillStaffCurrentTimeSpanning
      */
     virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);

@@ -370,7 +370,7 @@ public:
     ///@}
 
 private:
-    /** --- **/
+    /** Indicates the performed duration represented by the beatRpt symbol. **/
     data_DURATION m_beatDef;
 
     /* include <attbeatDef> */
@@ -436,18 +436,17 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetAmount(std::string amount_) { m_amount = amount_; };
-    std::string GetAmount() const { return m_amount; };
+    void SetAmount(double amount_) { m_amount = amount_; };
+    double GetAmount() const { return m_amount; };
     bool HasAmount() const;
     ///@}
 
 private:
     /**
-     * Records the amount of detuning.
-     * The decimal values should be rendered as a fraction (or an integer plus a
-     * fraction) along with the bend symbol.
+     * Numeric value capturing a cost.
+     * Can only be interpreted in combination with the currency attribute.
      **/
-    std::string m_amount;
+    double m_amount;
 
     /* include <attamount> */
 };
@@ -729,7 +728,7 @@ public:
 
 private:
     /**
-     * Specifies the distance between the points of the open end of a hairpin dynamic
+     * Specifies the distance between the lines at the open end of a hairpin dynamic
      * mark.
      **/
     std::string m_opening;
@@ -846,6 +845,42 @@ private:
     data_BOOLEAN m_lv;
 
     /* include <attlv> */
+};
+
+//----------------------------------------------------------------------------
+// AttMeterSigGrpLog
+//----------------------------------------------------------------------------
+
+class AttMeterSigGrpLog : public Att {
+public:
+    AttMeterSigGrpLog();
+    virtual ~AttMeterSigGrpLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetMeterSigGrpLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadMeterSigGrpLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteMeterSigGrpLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(meterSigGrpLog_FUNC func_) { m_func = func_; };
+    meterSigGrpLog_FUNC GetFunc() const { return m_func; };
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Records the function of an accidental. **/
+    meterSigGrpLog_FUNC m_func;
+
+    /* include <attfunc> */
 };
 
 //----------------------------------------------------------------------------
@@ -1251,16 +1286,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSlurRend(data_CURVERENDITION slurRend_) { m_slurRend = slurRend_; };
-    data_CURVERENDITION GetSlurRend() const { return m_slurRend; };
-    bool HasSlurRend() const;
+    void SetSlurLform(data_LINEFORM slurLform_) { m_slurLform = slurLform_; };
+    data_LINEFORM GetSlurLform() const { return m_slurLform; };
+    bool HasSlurLform() const;
+    //
+    void SetSlurLwidth(std::string slurLwidth_) { m_slurLwidth = slurLwidth_; };
+    std::string GetSlurLwidth() const { return m_slurLwidth; };
+    bool HasSlurLwidth() const;
     ///@}
 
 private:
-    /** Describes the line style of the slur. **/
-    data_CURVERENDITION m_slurRend;
+    /** --- **/
+    data_LINEFORM m_slurLform;
+    /** --- **/
+    std::string m_slurLwidth;
 
-    /* include <attslur.rend> */
+    /* include <attslur.lwidth> */
 };
 
 //----------------------------------------------------------------------------
@@ -1327,16 +1368,22 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTieRend(data_CURVERENDITION tieRend_) { m_tieRend = tieRend_; };
-    data_CURVERENDITION GetTieRend() const { return m_tieRend; };
-    bool HasTieRend() const;
+    void SetTieLform(data_LINEFORM tieLform_) { m_tieLform = tieLform_; };
+    data_LINEFORM GetTieLform() const { return m_tieLform; };
+    bool HasTieLform() const;
+    //
+    void SetTieLwidth(std::string tieLwidth_) { m_tieLwidth = tieLwidth_; };
+    std::string GetTieLwidth() const { return m_tieLwidth; };
+    bool HasTieLwidth() const;
     ///@}
 
 private:
-    /** Describes the line style of the tie. **/
-    data_CURVERENDITION m_tieRend;
+    /** --- **/
+    data_LINEFORM m_tieLform;
+    /** --- **/
+    std::string m_tieLwidth;
 
-    /* include <atttie.rend> */
+    /* include <atttie.lwidth> */
 };
 
 //----------------------------------------------------------------------------

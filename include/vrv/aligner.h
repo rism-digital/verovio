@@ -27,13 +27,13 @@ class TimestampAttr;
  */
 enum AlignmentType {
     // Non-justifiable
-    ALIGNMENT_MEASURE_START = 0,
-    ALIGNMENT_BARLINE,
-    ALIGNMENT_CLEF_ATTR,
+    ALIGNMENT_CLEF_ATTR = 0,
     ALIGNMENT_KEYSIG_ATTR,
     ALIGNMENT_MENSUR_ATTR,
     ALIGNMENT_METERSIG_ATTR,
+    ALIGNMENT_MEASURE_START,
     // Justifiable
+    ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF,
     ALIGNMENT_KEYSIG,
     ALIGNMENT_MENSUR,
@@ -138,25 +138,6 @@ public:
     ///@{
     void SetVerseCount(int verse_count);
     int GetVerseCount() const { return m_verseCount; };
-
-    /**
-     * @name Setter and getter for above or below dir/dynam/hairpin
-     * Currently unused
-     */
-    ///@{
-    void SetDirAbove() { m_dirAbove = true; };
-    bool GetDirAbove() const { return m_dirAbove; };
-    void SetDirBelow() { m_dirBelow = true; };
-    bool GetDirBelow() const { return m_dirBelow; };
-    void SetDynamAbove() { m_dynamAbove = true; };
-    bool GetDynamAbove() const { return m_dynamAbove; };
-    void SetDynamBelow() { m_dynamBelow = true; };
-    bool GetDynamBelow() const { return m_dynamBelow; };
-    void SetHairpinAbove() { m_hairpinAbove = true; };
-    bool GetHairpinAbove() const { return m_hairpinAbove; };
-    void SetHairpinBelow() { m_hairpinBelow = true; };
-    bool GetHairpinBelow() const { return m_hairpinBelow; };
-    ///@}
 
     /**
      * Retrieves or creates the FloatingPositioner for the FloatingElement on this staff.

@@ -200,16 +200,24 @@ Point View::CalcPositionAfterRotation(Point point, float rot_alpha, Point center
     return point;
 }
 
-int View::CalcBezierAtPosition(Point bezier[], int x)
+int View::CalcBezierAtPosition(const Point bezier[4], int x)
 {
+    // berzier parameter is point1, point2, control1, control2; change it to p1-c1-c2-p2
+    Point bezierPCCP[4];
+    bezierPCCP[0] = bezier[0];
+    bezierPCCP[1] = bezier[2];
+    bezierPCCP[2] = bezier[3];
+    bezierPCCP[3] = bezier[1];
+
     int i, j;
     double t = 0.0;
     // avoid division by 0
-    if (bezier[3].x != bezier[0].x) t = (double)(x - bezier[0].x) / (double)(bezier[3].x - bezier[0].x);
+    if (bezierPCCP[3].x != bezierPCCP[0].x)
+        t = (double)(x - bezierPCCP[0].x) / (double)(bezierPCCP[3].x - bezierPCCP[0].x);
     t = std::min(1.0, std::max(0.0, t));
     int n = 4;
 
-    for (i = 0; i < n; i++) View::s_deCasteljau[0][i] = bezier[i].y;
+    for (i = 0; i < n; i++) View::s_deCasteljau[0][i] = bezierPCCP[i].y;
     for (j = 1; j < n; j++) {
         for (int i = 0; i < 4 - j; i++) {
             View::s_deCasteljau[j][i] = View::s_deCasteljau[j - 1][i] * (1 - t) + View::s_deCasteljau[j - 1][i + 1] * t;

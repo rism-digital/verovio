@@ -30,7 +30,7 @@ ClassId DeviceContext::Is() const
     return DEVICE_CONTEXT;
 };
 
-void DeviceContext::SetPen(int colour, int width, int opacity)
+void DeviceContext::SetPen(int colour, int width, int opacity, int dashLength)
 {
     float opacityValue;
 
@@ -41,7 +41,7 @@ void DeviceContext::SetPen(int colour, int width, int opacity)
             opacityValue = 1.0; // solid brush by default
     }
 
-    m_penStack.push(Pen(colour, width, opacityValue));
+    m_penStack.push(Pen(colour, width, opacityValue, dashLength));
 }
 
 void DeviceContext::SetBrush(int colour, int opacity)

@@ -18,6 +18,9 @@
 #include "doc.h"
 #include "dynam.h"
 #include "hairpin.h"
+#include "octave.h"
+#include "pedal.h"
+#include "slur.h"
 #include "tempo.h"
 #include "timeinterface.h"
 
@@ -113,13 +116,25 @@ FloatingPositioner::FloatingPositioner(FloatingElement *element) : BoundingBox()
         Hairpin *hairpin = dynamic_cast<Hairpin *>(element);
         assert(hairpin);
         // haripin below by default;
-        m_place = hairpin->GetPlace() ? hairpin->GetPlace() : STAFFREL_below;
+        m_place = hairpin->HasPlace() ? hairpin->GetPlace() : STAFFREL_below;
+    }
+    else if (element->Is() == OCTAVE) {
+        Octave *octave = dynamic_cast<Octave *>(element);
+        assert(octave);
+        // octave below by default (won't draw without @dis.place anyway);
+        m_place = (octave->GetDisPlace() == PLACE_above) ? STAFFREL_above : STAFFREL_below;
+    }
+    else if (element->Is() == PEDAL) {
+        Pedal *pedal = dynamic_cast<Pedal *>(element);
+        assert(pedal);
+        // pedal below by default
+        m_place = pedal->HasPlace() ? pedal->GetPlace() : STAFFREL_below;
     }
     else if (element->Is() == TEMPO) {
         Tempo *tempo = dynamic_cast<Tempo *>(element);
         assert(tempo);
         // tempo above by default;
-        m_place = tempo->GetPlace() ? tempo->GetPlace() : STAFFREL_above;
+        m_place = tempo->HasPlace() ? tempo->GetPlace() : STAFFREL_above;
     }
     else {
         m_place = STAFFREL_NONE;
@@ -169,27 +184,28 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     assert(staffAlignment);
 
     int staffSize = staffAlignment->GetStaffSize();
+    int yRel;
 
     if (horizOverlapingBBox == NULL) {
         if (this->m_place == STAFFREL_above) {
-            int yRel = m_contentBB_y1;
+            yRel = m_contentBB_y1;
             yRel -= doc->GetBottomMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
         else {
-            int yRel = staffAlignment->GetStaffHeight() + m_contentBB_y2;
+            yRel = staffAlignment->GetStaffHeight() + m_contentBB_y2;
             yRel += doc->GetTopMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
     }
     else {
         if (this->m_place == STAFFREL_above) {
-            int yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + m_contentBB_y1;
+            yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + m_contentBB_y1;
             yRel -= doc->GetBottomMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
         else {
-            int yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
+            yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
                 + m_contentBB_y2;
             yRel += doc->GetTopMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
@@ -201,6 +217,20 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 //----------------------------------------------------------------------------
 // FloatingElement functor methods
 //----------------------------------------------------------------------------
+
+int FloatingElement::ResetHorizontalAlignment(ArrayPtrVoid *params)
+{
+    m_currentPositioner = NULL;
+    
+    return FUNCTOR_CONTINUE;
+}
+
+int FloatingElement::ResetVerticalAlignment(ArrayPtrVoid *params)
+{
+    m_currentPositioner = NULL;
+    
+    return FUNCTOR_CONTINUE;
+}
 
 int FloatingElement::PrepareTimeSpanning(ArrayPtrVoid *params)
 {
