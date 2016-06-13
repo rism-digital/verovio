@@ -18,11 +18,11 @@
 #include "io.h"
 #include "vrvdef.h"
 
-#include "page.h"
-#include "system.h"
-#include "measure.h"
-#include "staff.h"
 #include "layer.h"
+#include "measure.h"
+#include "page.h"
+#include "staff.h"
+#include "system.h"
 
 #include "rest.h"
 
@@ -37,91 +37,81 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 class HumdrumInput : public FileInputStream {
-	public:
-		// constructors and destructors
-		HumdrumInput(Doc *doc, std::string filename);
-		virtual ~HumdrumInput();
+public:
+    // constructors and destructors
+    HumdrumInput(Doc *doc, std::string filename);
+    virtual ~HumdrumInput();
 
-		virtual bool ImportFile();
-		virtual bool ImportString(std::string humdrum);
+    virtual bool ImportFile();
+    virtual bool ImportString(std::string humdrum);
 
-	protected:
-		void        clear                (void);
-		bool        convertHumdrum       (void);
-		void        setupMeiDocument     (void);
-		int         getMeasureEndLine    (int startline);
-		bool        convertSystemMeasure (int& line);
-		bool        convertMeasureStaves (int startline, int endline);
-		bool        convertMeasureStaff  (int track, int startline, int endline,
-		                                  int n, int layercount);
-		void        setupSystemMeasure   (int startline, int endline);
-		bool        convertStaffLayer    (int track, int startline, int endline,
-		                                  int layerindex);
-		int         getMeasureNumber     (int startline, int endline);
-		bool        fillContentsOfLayer  (int track, int startline, int endline,
-		                                  int layerindex);
-		void        calculateLayout      (void);
-		void        setSystemMeasureStyle(int startline, int endline);
-		vector<int> getStaffLayerCounts(void);
-		void        prepareStaffGroup    (void);
-		void        setClef              (StaffDef* part, const string& clef);
-		void        setKeySig            (StaffDef* part, const string& keysig);
-		void        setTimeSig           (StaffDef* part, const string& timesig);
-		void        fillPartInfo         (hum::HTp partstart, int partnumber);
-		void        storeStaffLayerTokensForMeasure(int startline, int endline);
-		void        calculateReverseKernIndex(void);
-		void        prepareTimeSigDur    (void);
-		void        setDuration          (Rest* rest, hum::HumNum duration);
+protected:
+    void clear(void);
+    bool convertHumdrum(void);
+    void setupMeiDocument(void);
+    int getMeasureEndLine(int startline);
+    bool convertSystemMeasure(int &line);
+    bool convertMeasureStaves(int startline, int endline);
+    bool convertMeasureStaff(int track, int startline, int endline, int n, int layercount);
+    void setupSystemMeasure(int startline, int endline);
+    bool convertStaffLayer(int track, int startline, int endline, int layerindex);
+    int getMeasureNumber(int startline, int endline);
+    bool fillContentsOfLayer(int track, int startline, int endline, int layerindex);
+    void calculateLayout(void);
+    void setSystemMeasureStyle(int startline, int endline);
+    vector<int> getStaffLayerCounts(void);
+    void prepareStaffGroup(void);
+    void setClef(StaffDef *part, const string &clef);
+    void setKeySig(StaffDef *part, const string &keysig);
+    void setTimeSig(StaffDef *part, const string &timesig);
+    void fillPartInfo(hum::HTp partstart, int partnumber);
+    void storeStaffLayerTokensForMeasure(int startline, int endline);
+    void calculateReverseKernIndex(void);
+    void prepareTimeSigDur(void);
+    void setDuration(Rest *rest, hum::HumNum duration);
 
+private:
+    std::string m_filename; // Filename to read/was read.
 
-	private:
-		std::string m_filename;  // Filename to read/was read.
+    // m_debug == temporary variable to print MEI convertsion to standard
+    // output.
+    int m_debug; // printing MEI data to standard input
 
-		// m_debug == temporary variable to print MEI convertsion to standard
-		// output.
-		int               m_debug;      // printing MEI data to standard input
+    // m_doc is inherited root document object.
 
-		// m_doc is inherited root document object.
+    //////////////////////////////
+    //
+    // State variables for doing the conversion without having to pass
+    // these variables as parameters:
+    //
 
-		//////////////////////////////
-		//
-		// State variables for doing the conversion without having to pass
-		// these variables as parameters:
-		//
+    StaffGrp *m_staffgroup; // information about parts
+    vector<StaffDef *> m_staffdef; // information about a staff
 
-		StaffGrp*         m_staffgroup; // information about parts
-		vector<StaffDef*> m_staffdef;   // information about a staff
+    Page *m_page; // current page, or NULL
+    System *m_system; // current system, or NULL
+    Measure *m_measure; // current measure, or NULL
+    Staff *m_staff; // current staff, or NULL
+    Layer *m_layer; // current layer, or NULL
 
-		Page*             m_page;       // current page, or NULL
-		System*           m_system;     // current system, or NULL
-		Measure*          m_measure;    // current measure, or NULL
-		Staff*            m_staff;      // current staff, or NULL
-		Layer*            m_layer;      // current layer, or NULL
+    // m_layertokens == Humdrum **kern tokens for each staff/layer to be
+    // converted.
+    vector<vector<vector<hum::HTp> > > m_layertokens;
 
-		// m_layertokens == Humdrum **kern tokens for each staff/layer to be
-		// converted.
-		vector<vector<vector<hum::HTp> > > m_layertokens;
+    // m_kernspines == list of tracks in Humdrum file being parsed which
+    // contain **kern data.
+    vector<hum::HTp> m_kernstarts;
 
-		// m_kernspines == list of tracks in Humdrum file being parsed which
-		// contain **kern data.
-		vector<hum::HTp> m_kernstarts;
+    // m_rkern == reverse listing of staff to Humdrum file track.
+    vector<int> m_rkern;
 
-		// m_rkern == reverse listing of staff to Humdrum file track.
-		vector<int> m_rkern;
+    // m_infile == Humdrum file used for conversion.
+    hum::HumdrumFile m_infile;
 
-		// m_infile == Humdrum file used for conversion.
-		hum::HumdrumFile m_infile;
-
-		// m_timesigdurs == Prevailing time signature duration of measure
-		vector<hum::HumNum> m_timesigdurs;
-
+    // m_timesigdurs == Prevailing time signature duration of measure
+    vector<hum::HumNum> m_timesigdurs;
 };
-
 
 } // namespace vrv
 
-
 #endif // __VRV_IOHUMDRUM_H__
-
-
-
