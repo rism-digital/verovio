@@ -490,10 +490,11 @@ bool MeiOutput::WriteMeiDoc(Doc *doc)
 
     if (m_scoreBasedMEI) {
         m_currentNode = mdiv.append_child("score");
-        m_currentNode = m_currentNode.append_child("section");
         m_nodeStack.push_back(m_currentNode);
         // First save the main scoreDef
         m_doc->m_scoreDef.Save(this);
+        m_currentNode = m_currentNode.append_child("section");
+        m_nodeStack.push_back(m_currentNode);
     }
     else {
         // element to place the pages
