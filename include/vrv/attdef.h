@@ -163,6 +163,11 @@ enum data_OCTAVE_DIS { OCTAVE_DIS_NONE = 0, OCTAVE_DIS_8 = 8, OCTAVE_DIS_15 = 15
 enum data_ORIENTATION { ORIENTATION_NONE = 0, ORIENTATION_reversed, ORIENTATION_90CW, ORIENTATION_90CCW };
 
 /**
+ * MEI data.PERCENT
+ */
+typedef int data_PERCENT;
+
+/**
  * MEI data.PITCHNAME
  */
 enum data_PITCHNAME {

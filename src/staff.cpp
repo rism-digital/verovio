@@ -23,6 +23,7 @@
 #include "system.h"
 #include "timeinterface.h"
 #include "verse.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -71,11 +72,6 @@ int Staff::GetVerticalSpacing()
     return 160; // arbitrary generic value
 }
 
-void Staff::ResetVerticalAlignment()
-{
-    m_drawingY = 0;
-}
-
 bool Staff::GetPosOnPage(ArrayPtrVoid *params)
 {
     // param 0: the Staff we are looking for
@@ -109,6 +105,14 @@ int Staff::GetYRel() const
 // Staff functor methods
 //----------------------------------------------------------------------------
 
+int Staff::ResetVerticalAlignment(ArrayPtrVoid *params)
+{
+    m_drawingY = 0;
+    m_staffAlignment = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Staff::AlignVertically(ArrayPtrVoid *params)
 {
     // param 0: the systemAligner
@@ -119,9 +123,6 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
     int *staffIdx = static_cast<int *>((*params).at(1));
     int *staffN = static_cast<int *>((*params).at(2));
     Doc *doc = static_cast<Doc *>((*params).at(3));
-
-    // we need to call it because we are overriding Object::AlignVertically
-    this->ResetVerticalAlignment();
 
     *staffN = this->GetN();
 
@@ -139,13 +140,6 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
         Verse *v = dynamic_cast<Verse *>(*it);
         assert(v);
         alignment->SetVerseCount(v->GetN());
-    }
-    it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(HAIRPIN));
-    if (it != m_timeSpanningElements.end()) {
-        Hairpin *h = dynamic_cast<Hairpin *>(*it);
-        assert(h);
-        if (h->GetPlace() == STAFFREL_above) alignment->SetHairpinAbove();
-        if (h->GetPlace() == STAFFREL_below) alignment->SetHairpinBelow();
     }
 
     // for next staff

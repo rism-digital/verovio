@@ -29,7 +29,9 @@ class Hairpin;
 class Layer;
 class LayerElement;
 class Measure;
+class Octave;
 class Page;
+class Pedal;
 class Rend;
 class Slur;
 class Staff;
@@ -304,6 +306,9 @@ protected:
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
     void DrawHairpin(
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawOctave(
+        DeviceContext *dc, Octave *octave, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
     void DrawSlur(
         DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
@@ -431,7 +436,7 @@ private:
     /**
      * Calculate the position of a point after a rotation of rot_alpha around the center
      */
-    static int CalcBezierAtPosition(Point bezier[], int x);
+    static int CalcBezierAtPosition(const Point bezier[4], int x);
 
     /**
      * Swap values passed as reference.

@@ -24,6 +24,8 @@ namespace vrv {
 Hairpin::Hairpin() : FloatingElement("hairpin-"), TimeSpanningInterface(), AttHairpinLog(), AttPlacement()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_HAIRPINLOG);
+    RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
 }
@@ -43,28 +45,5 @@ void Hairpin::Reset()
 //----------------------------------------------------------------------------
 // Hairpin functor methods
 //----------------------------------------------------------------------------
-
-int Hairpin::AlignVertically(ArrayPtrVoid *params)
-{
-    // param 0: the systemAligner
-    // param 1: the staffIdx (unused)
-    // param 2: the staffN (unused)
-    // param 3: the doc (unused)
-    SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
-
-    std::vector<int> staffList = this->GetStaff();
-    std::vector<int>::iterator iter;
-    for (iter = staffList.begin(); iter != staffList.end(); iter++) {
-        // this gets (or creates) the measureAligner for the measure
-        StaffAlignment *alignment = (*systemAligner)->GetStaffAlignmentForStaffN(*iter);
-
-        if (!alignment) continue;
-
-        if (this->GetPlace() == STAFFREL_above) alignment->SetHairpinAbove();
-        if (this->GetPlace() == STAFFREL_below) alignment->SetHairpinBelow();
-    }
-
-    return FUNCTOR_CONTINUE;
-}
 
 } // namespace vrv

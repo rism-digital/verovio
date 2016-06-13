@@ -115,6 +115,13 @@ public:
     ///@}
 
     /**
+     * @name Reset the vertical alignment
+     */
+    ///@{
+    virtual int ResetVerticalAlignment(ArrayPtrVoid *params);
+    ///@}
+
+    /**
      * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(ArrayPtrVoid *params);
