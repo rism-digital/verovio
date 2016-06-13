@@ -217,14 +217,14 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         BeatRpt *beatRpt = dynamic_cast<BeatRpt *>(this);
         assert(beatRpt);
         int meterUnit = 4;
-        if (meterSig) meterSig->GetUnit();
+        if (meterSig && meterSig->HasUnit()) meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else if (this->Is() == TIMESTAMP_ATTR) {
         TimestampAttr *timestampAttr = dynamic_cast<TimestampAttr *>(this);
         assert(timestampAttr);
         int meterUnit = 4;
-        if (meterSig) meterUnit = meterSig->GetUnit();
+        if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     else {

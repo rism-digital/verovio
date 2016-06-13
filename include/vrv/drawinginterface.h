@@ -8,16 +8,16 @@
 #ifndef __VRV_DRAWING_INTERFACE_H__
 #define __VRV_DRAWING_INTERFACE_H__
 
+#include "clef.h"
 #include "devicecontextbase.h"
+#include "keysig.h"
+#include "mensur.h"
+#include "metersig.h"
 #include "vrvdef.h"
 
 namespace vrv {
 
-class Clef;
 class Object;
-class KeySig;
-class Mensur;
-class MeterSig;
 
 //----------------------------------------------------------------------------
 // DrawingListInterface
@@ -89,8 +89,6 @@ public:
     StaffDefDrawingInterface();
     virtual ~StaffDefDrawingInterface();
     virtual void Reset();
-    StaffDefDrawingInterface(const StaffDefDrawingInterface &interface); // copy contructor
-    StaffDefDrawingInterface &operator=(const StaffDefDrawingInterface &interface); // copy assignement;
     ///@}
 
     /**
@@ -99,15 +97,15 @@ public:
      * This will be true only for the first layer in the staff.
      */
     ///@{
-    bool DrawClef() const { return m_drawClef; };
+    bool DrawClef() const { return (m_drawClef && m_currentClef.HasShape()); };
     void SetDrawClef(bool drawClef) { m_drawClef = drawClef; };
-    bool DrawKeySig() const { return m_drawKeySig; };
+    bool DrawKeySig() const { return (m_drawKeySig && (m_currentKeySig.GetAlterationType() != ACCIDENTAL_EXPLICIT_NONE)); };
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; };
     bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; };
     void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; };
-    bool DrawMensur() const { return m_drawMensur; };
+    bool DrawMensur() const {return (m_drawMensur && m_currentMensur.HasSign()); };
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; };
-    bool DrawMeterSig() const { return m_drawMeterSig; };
+    bool DrawMeterSig() const { return (m_drawMeterSig && m_currentMeterSig.HasUnit()); };
     void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; };
     ///@}
 
@@ -126,21 +124,21 @@ public:
      * They will return a reference to the hold object (element or attribute).
      */
     ///@{
-    Clef *GetCurrentClef() const { return m_currentClef; };
-    KeySig *GetCurrentKeySig() const { return m_currentKeySig; };
-    Mensur *GetCurrentMensur() const { return m_currentMensur; };
-    MeterSig *GetCurrentMeterSig() const { return m_currentMeterSig; };
+    Clef *GetCurrentClef() { return &m_currentClef; };
+    KeySig *GetCurrentKeySig() { return &m_currentKeySig; };
+    Mensur *GetCurrentMensur() { return &m_currentMensur; };
+    MeterSig *GetCurrentMeterSig() { return &m_currentMeterSig; };
     ///@}
 
 private:
     /** The clef or clef attributes */
-    Clef *m_currentClef;
+    Clef m_currentClef;
     /** The key signature */
-    KeySig *m_currentKeySig;
+    KeySig m_currentKeySig;
     /** The mensur */
-    Mensur *m_currentMensur;
+    Mensur m_currentMensur;
     /** The meter signature (time signature) */
-    MeterSig *m_currentMeterSig;
+    MeterSig m_currentMeterSig;
 
     /**
      *  @name Flags for indicating whether the clef, keysig and mensur needs to be drawn or not

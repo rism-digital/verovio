@@ -158,6 +158,12 @@ Clef *Layer::GetCurrentClef() const
 {
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff && staff->m_drawingStaffDef && staff->m_drawingStaffDef->GetCurrentClef());
+    LogMessage("Clef :%d - %d", staff->m_drawingStaffDef->GetCurrentClef()->GetShape(),
+        staff->m_drawingStaffDef->GetCurrentClef()->GetLine());
+    Clef *clef = staff->m_drawingStaffDef->GetCurrentClef();
+    if (clef->GetLine() > 4) {
+        Clef clef2;
+    }
     return staff->m_drawingStaffDef->GetCurrentClef();
 }
 
@@ -201,11 +207,12 @@ void Layer::SetDrawingAndCurrentValues(StaffDef *currentStaffDef)
         }
     }
 
-    if (currentStaffDef->DrawClef()) this->m_staffDefClef = currentStaffDef->GetClefCopy();
+    if (currentStaffDef->DrawClef()) this->m_staffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
     // special case - see above
-    if (drawKeySig) this->m_staffDefKeySig = currentStaffDef->GetKeySigCopy();
-    if (currentStaffDef->DrawMensur()) this->m_staffDefMensur = currentStaffDef->GetMensurCopy();
-    if (currentStaffDef->DrawMeterSig()) this->m_staffDefMeterSig = currentStaffDef->GetMeterSigCopy();
+    if (drawKeySig) this->m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+    if (currentStaffDef->DrawMensur()) this->m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
+    if (currentStaffDef->DrawMeterSig())
+        this->m_staffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
     this->SetDrawKeySigCancellation(currentStaffDef->DrawKeySigCancellation());
 
     // Don't draw on the next one

@@ -265,20 +265,28 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
     if (staffDef) {
         if (newStaffDef->HasClefInfo()) {
             staffDef->SetDrawClef(true);
-            staffDef->SetCurrentClef(newStaffDef->GetClefCopy());
+            Clef *clef = newStaffDef->GetClefCopy();
+            staffDef->SetCurrentClef(clef);
+            delete clef;
         }
         if (newStaffDef->HasKeySigInfo()) {
             staffDef->SetDrawKeySig(true);
             staffDef->SetDrawKeySigCancellation(true);
-            staffDef->SetCurrentKeySig(newStaffDef->GetKeySigCopy());
+            KeySig *keySig = newStaffDef->GetKeySigCopy();
+            staffDef->SetCurrentKeySig(keySig);
+            delete keySig;
         }
         if (newStaffDef->HasMensurInfo()) {
             staffDef->SetDrawMensur(true);
-            staffDef->SetCurrentMensur(newStaffDef->GetMensurCopy());
+            Mensur *mensur = newStaffDef->GetMensurCopy();
+            staffDef->SetCurrentMensur(mensur);
+            delete mensur;
         }
         if (newStaffDef->HasMeterSigInfo()) {
             staffDef->SetDrawMeterSig(true);
-            staffDef->SetCurrentMeterSig(newStaffDef->GetMeterSigCopy());
+            MeterSig *meterSig = newStaffDef->GetMeterSigCopy();
+            staffDef->SetCurrentMeterSig(meterSig);
+            delete meterSig;
         }
         // copy other attributes if present
         if (newStaffDef->HasLabel()) staffDef->SetLabel(newStaffDef->GetLabel());
@@ -501,16 +509,16 @@ int StaffDef::ReplaceDrawingValuesInStaffDef(ArrayPtrVoid *params)
     MeterSig *meterSig = static_cast<MeterSig *>((*params).at(3));
 
     if (clef) {
-        this->SetCurrentClef(new Clef(*clef));
+        this->SetCurrentClef(clef);
     }
     if (keySig) {
-        this->SetCurrentKeySig(new KeySig(*keySig));
+        this->SetCurrentKeySig(keySig);
     }
     if (mensur) {
-        this->SetCurrentMensur(new Mensur(*mensur));
+        this->SetCurrentMensur(mensur);
     }
     if (meterSig) {
-        this->SetCurrentMeterSig(new MeterSig(*meterSig));
+        this->SetCurrentMeterSig(meterSig);
     }
 
     return FUNCTOR_CONTINUE;

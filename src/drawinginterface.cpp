@@ -9,11 +9,7 @@
 
 //----------------------------------------------------------------------------
 
-#include "clef.h"
-#include "keysig.h"
 #include "layerelement.h"
-#include "mensur.h"
-#include "metersig.h"
 
 namespace vrv {
 
@@ -35,7 +31,7 @@ void DrawingListInterface::Reset()
     m_drawingList.clear();
 }
 
-void DrawingListInterface::AddToDrawingList( Object *object)
+void DrawingListInterface::AddToDrawingList(Object *object)
 {
     m_drawingList.push_back(object);
     m_drawingList.sort();
@@ -58,37 +54,24 @@ void DrawingListInterface::ResetDrawingList()
 
 StaffDefDrawingInterface::StaffDefDrawingInterface()
 {
-    // owned pointers need to be set to NULL;
-    m_currentClef = NULL;
-    m_currentKeySig = NULL;
-    m_currentMensur = NULL;
-    m_currentMeterSig = NULL;
     Reset();
 }
 
 StaffDefDrawingInterface::~StaffDefDrawingInterface()
 {
-    Reset();
 }
 
 void StaffDefDrawingInterface::Reset()
 {
-    if (m_currentClef) {
-        delete m_currentClef;
-        m_currentClef = NULL;
+    m_currentClef.Reset();
+    m_currentKeySig.Reset();
+    m_currentMensur.Reset();
+    m_currentMeterSig.Reset();
+
+    if (m_currentClef.GetLine() > 4) {
+        Clef clef2;
     }
-    if (m_currentKeySig) {
-        delete m_currentKeySig;
-        m_currentKeySig = NULL;
-    }
-    if (m_currentMensur) {
-        delete m_currentMensur;
-        m_currentMensur = NULL;
-    }
-    if (m_currentMeterSig) {
-        delete m_currentMeterSig;
-        m_currentMeterSig = NULL;
-    }
+
     m_drawClef = false;
     m_drawKeySig = false;
     m_drawKeySigCancellation = false;

@@ -981,7 +981,9 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         Staff *staff = dynamic_cast<Staff *>(this);
         assert(staff);
         (*currentStaffDef) = currentScoreDef->GetStaffDef(staff->GetN());
+        assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = (*currentStaffDef);
+
         return FUNCTOR_CONTINUE;
     }
 
@@ -1000,7 +1002,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
                 layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        // layer->SetDrawingAndCurrentValues((*currentStaffDef));
+        layer->SetDrawingAndCurrentValues((*currentStaffDef));
         return FUNCTOR_CONTINUE;
     }
 
