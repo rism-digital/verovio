@@ -42,7 +42,7 @@ AttChannelized::~AttChannelized()
 void AttChannelized::ResetChannelized()
 {
     m_midiChannel = MIDICHANNEL_NONE;
-    m_midiDuty = 0;
+    m_midiDuty = 100;
     m_midiPort = MIDIVALUE_NONE;
     m_midiTrack = 0;
 }
@@ -56,7 +56,7 @@ bool AttChannelized::ReadChannelized(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("midi.duty")) {
-        this->SetMidiDuty(StrToInt(element.attribute("midi.duty").value()));
+        this->SetMidiDuty(StrToPercent(element.attribute("midi.duty").value()));
         element.remove_attribute("midi.duty");
         hasAttribute = true;
     }
@@ -81,7 +81,7 @@ bool AttChannelized::WriteChannelized(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasMidiDuty()) {
-        element.append_attribute("midi.duty") = IntToStr(this->GetMidiDuty()).c_str();
+        element.append_attribute("midi.duty") = PercentToStr(this->GetMidiDuty()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMidiPort()) {
@@ -102,7 +102,7 @@ bool AttChannelized::HasMidiChannel() const
 
 bool AttChannelized::HasMidiDuty() const
 {
-    return (m_midiDuty != 0);
+    return (m_midiDuty != 100);
 }
 
 bool AttChannelized::HasMidiPort() const
@@ -509,7 +509,7 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
         if (attrType == "midi.duty") {
-            att->SetMidiDuty(att->StrToInt(attrValue));
+            att->SetMidiDuty(att->StrToPercent(attrValue));
             return true;
         }
         if (attrType == "midi.port") {
@@ -606,7 +606,7 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("midi.channel", att->MidichannelToStr(att->GetMidiChannel())));
         }
         if (att->HasMidiDuty()) {
-            attributes->push_back(std::make_pair("midi.duty", att->IntToStr(att->GetMidiDuty())));
+            attributes->push_back(std::make_pair("midi.duty", att->PercentToStr(att->GetMidiDuty())));
         }
         if (att->HasMidiPort()) {
             attributes->push_back(std::make_pair("midi.port", att->MidivalueToStr(att->GetMidiPort())));

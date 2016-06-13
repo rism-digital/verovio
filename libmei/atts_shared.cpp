@@ -5917,14 +5917,14 @@ AttScalable::~AttScalable()
 
 void AttScalable::ResetScalable()
 {
-    m_scale = 0;
+    m_scale = 100;
 }
 
 bool AttScalable::ReadScalable(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("scale")) {
-        this->SetScale(StrToInt(element.attribute("scale").value()));
+        this->SetScale(StrToPercent(element.attribute("scale").value()));
         element.remove_attribute("scale");
         hasAttribute = true;
     }
@@ -5935,7 +5935,7 @@ bool AttScalable::WriteScalable(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasScale()) {
-        element.append_attribute("scale") = IntToStr(this->GetScale()).c_str();
+        element.append_attribute("scale") = PercentToStr(this->GetScale()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -5943,7 +5943,7 @@ bool AttScalable::WriteScalable(pugi::xml_node element)
 
 bool AttScalable::HasScale() const
 {
-    return (m_scale != 0);
+    return (m_scale != 100);
 }
 
 /* include <attscale> */
@@ -9608,7 +9608,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttScalable *att = dynamic_cast<AttScalable *>(element);
         assert(att);
         if (attrType == "scale") {
-            att->SetScale(att->StrToInt(attrValue));
+            att->SetScale(att->StrToPercent(attrValue));
             return true;
         }
     }
@@ -11063,7 +11063,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttScalable *att = dynamic_cast<const AttScalable *>(element);
         assert(att);
         if (att->HasScale()) {
-            attributes->push_back(std::make_pair("scale", att->IntToStr(att->GetScale())));
+            attributes->push_back(std::make_pair("scale", att->PercentToStr(att->GetScale())));
         }
     }
     if (element->HasAttClass(ATT_SCOREDEFGES)) {

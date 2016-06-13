@@ -4483,14 +4483,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetScale(int scale_) { m_scale = scale_; };
-    int GetScale() const { return m_scale; };
+    void SetScale(data_PERCENT scale_) { m_scale = scale_; };
+    data_PERCENT GetScale() const { return m_scale; };
     bool HasScale() const;
     ///@}
 
 private:
     /** Scale factor to be applied to the feature to make it the desired display size. **/
-    int m_scale;
+    data_PERCENT m_scale;
 
     /* include <attscale> */
 };
