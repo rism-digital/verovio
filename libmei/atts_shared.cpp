@@ -5917,7 +5917,7 @@ AttScalable::~AttScalable()
 
 void AttScalable::ResetScalable()
 {
-    m_scale = 100;
+    m_scale = 0;
 }
 
 bool AttScalable::ReadScalable(pugi::xml_node element)
@@ -5943,7 +5943,7 @@ bool AttScalable::WriteScalable(pugi::xml_node element)
 
 bool AttScalable::HasScale() const
 {
-    return (m_scale != 100);
+    return (m_scale != 0);
 }
 
 /* include <attscale> */

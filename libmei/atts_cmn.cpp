@@ -777,7 +777,7 @@ AttGraced::~AttGraced()
 void AttGraced::ResetGraced()
 {
     m_grace = GRACE_NONE;
-    m_graceTime = 100;
+    m_graceTime = 0;
 }
 
 bool AttGraced::ReadGraced(pugi::xml_node element)
@@ -817,7 +817,7 @@ bool AttGraced::HasGrace() const
 
 bool AttGraced::HasGraceTime() const
 {
-    return (m_graceTime != 100);
+    return (m_graceTime != 0);
 }
 
 /* include <attgrace.time> */
