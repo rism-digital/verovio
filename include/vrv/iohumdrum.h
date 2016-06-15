@@ -36,6 +36,8 @@ class StaffDef;
 class StaffGrp;
 class System;
 class Rest;
+class Note;
+class Beam;
 
 class HumdrumInput : public vrv::FileInputStream {
 public:
@@ -72,7 +74,13 @@ protected:
     void setDuration(Rest *rest, hum::HumNum duration);
     void printMeasureTokens(void);
     int characterCount(const string &text, char symbol);
+    int characterCount(hum::HTp token, char symbol);
     bool emptyMeasures(void);
+    // void insertChord(vrv::Layer *element, hum::HTp token);
+    void insertNoteInLayer(vrv::Layer *element, hum::HTp token);
+    void insertNoteInBeam(vrv::Beam *element, hum::HTp token);
+    void insertRestInLayer(vrv::Layer *element, hum::HTp token);
+    void insertRestInBeam(vrv::Beam *element, hum::HTp token);
 
 private:
     std::string m_filename; // Filename to read/was read.

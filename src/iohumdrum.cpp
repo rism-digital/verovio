@@ -38,6 +38,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "mrest.h"
+#include "note.h"
 #include "page.h"
 #include "rest.h"
 #include "staff.h"
@@ -47,7 +48,6 @@
 //#include "attcomparison.h"
 //#include "chord.h"
 //#include "mrest.h"
-//#include "note.h"
 //#include "slur.h"
 //#include "syl.h"
 //#include "text.h"
@@ -657,7 +657,6 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 //////////////////////////////
 //
 // HumdrumInput::fillContentsOfLayer -- Fill the layer with musical data.
-// ggg
 //
 
 bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, int layerindex)
@@ -731,7 +730,15 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     Layer *&layer = m_layer;
     Beam *beam = NULL;
+    int spacecount = 0;
+    bool turnoffbeam = false;
     for (i = 0; i < (int)layerdata.size(); i++) {
+        if (layerdata[i]->isNull()) {
+            continue;
+        }
+        if (!layerdata[i]->getLine()->isData()) {
+            continue;
+        }
         if ((i == 0) && (beamstate[i] > 0)) {
             beam = new Beam;
             layer->AddLayerElement(beam);
@@ -741,11 +748,82 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             layer->AddLayerElement(beam);
         }
         else if (beamstate[i] == 0) {
+            turnoffbeam = true;
+        }
+        spacecount = characterCount(layerdata[i], ' ');
+        if (spacecount) {
+            // if (beam != NULL) {
+            // 	insertChord(beam, layerdata[i]);
+            // } else {
+            // 		insertChord(layer, layerdata[i]);
+            //	}
+        }
+        else {
+            if (beam != NULL) {
+                if (layerdata[i]->isRest()) {
+                    insertRestInBeam(beam, layerdata[i]);
+                }
+                else {
+                    insertNoteInBeam(beam, layerdata[i]);
+                }
+            }
+            else {
+                if (layerdata[i]->isRest()) {
+                    insertRestInLayer(layer, layerdata[i]);
+                }
+                else {
+                    insertNoteInLayer(layer, layerdata[i]);
+                }
+            }
+        }
+        if (turnoffbeam) {
+            turnoffbeam = false;
             beam = NULL;
         }
     }
 
     return true;
+}
+
+/*
+//////////////////////////////
+//
+// HumdrumInput::insertChord --
+//
+
+void HumdrumInput::insertChord(Layer *element, HTp token) {
+    // do nothing for now until testing an import of a file
+        // containing chords.
+}
+*/
+
+//////////////////////////////
+//
+// HumdrumInput::insertNoteOrRest --
+//
+
+void HumdrumInput::insertNoteInLayer(Layer *element, HTp token)
+{
+    Note *note = new Note;
+    element->AddLayerElement(note);
+}
+
+void HumdrumInput::insertNoteInBeam(Beam *element, HTp token)
+{
+    Note *note = new Note;
+    element->AddLayerElement(note);
+}
+
+void HumdrumInput::insertRestInLayer(Layer *element, HTp token)
+{
+    Rest *rest = new Rest;
+    element->AddLayerElement(rest);
+}
+
+void HumdrumInput::insertRestInBeam(Beam *element, HTp token)
+{
+    Rest *rest = new Rest;
+    element->AddLayerElement(rest);
 }
 
 /////////////////////////////
@@ -756,6 +834,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 int HumdrumInput::characterCount(const string &text, char symbol)
 {
     return std::count(text.begin(), text.end(), symbol);
+}
+
+int HumdrumInput::characterCount(HTp token, char symbol)
+{
+    return std::count(token->begin(), token->end(), symbol);
 }
 
 /////////////////////////////
