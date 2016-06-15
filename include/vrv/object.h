@@ -230,6 +230,10 @@ public:
     void SetUuid(std::string uuid);
     void ResetUuid();
 
+    std::string GetComment() const { return m_comment; }
+    void SetComment(std::string comment) { m_comment = comment; }
+    bool HasComment(void) { return m_comment.size(); }
+
     /**
      * @name Children count, with or without a ClassId.
      * Used for classes with several types of children.
@@ -834,6 +838,12 @@ private:
      * A vector for storing the list of InterfaceId (group of MEI att classes) implemented.
      */
     std::vector<InterfaceId> m_interfaces;
+
+    /**
+     * A string for storing a comment to be printed immediately before
+     * the object when printing an MEI element.
+     */
+    std::string m_comment;
 };
 
 //----------------------------------------------------------------------------

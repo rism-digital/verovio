@@ -153,6 +153,10 @@ std::string MeiOutput::GetOutput(int page)
 
 bool MeiOutput::WriteObject(Object *object)
 {
+    if (object->HasComment()) {
+        m_currentNode.append_child(pugi::node_comment).set_value(object->GetComment().c_str());
+    }
+
     // Containers and scoreDef related
     if (object->Is() == DOC) {
         WriteMeiDoc(dynamic_cast<Doc *>(object));

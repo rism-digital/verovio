@@ -2,7 +2,7 @@
 // Name:        iohumdrum.cpp
 // Author:      Craig Stuart Sapp
 // Created:     06/06/2015
-// vim:         ts=3
+// vim:         ts=4
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -14,12 +14,13 @@
 //    http://music-encoding.org/documentation/3.0.0/elements
 //    http://music-encoding.org/documentation/2.1.1/atts
 //    http://music-encoding.org/documentation/3.0.0/atts
+//    http://pugixml.org/docs/manual.html
 //
 
 #ifndef NO_HUMDRUM_SUPPORT
 
-#include "humlib.h"
 #include "iohumdrum.h"
+#include "humlib.h"
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -31,6 +32,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "beam.h"
 #include "doc.h"
 #include "iomei.h"
 #include "layer.h"
@@ -43,7 +45,6 @@
 #include "vrv.h"
 
 //#include "attcomparison.h"
-//#include "beam.h"
 //#include "chord.h"
 //#include "mrest.h"
 //#include "note.h"
@@ -55,8 +56,9 @@
 //#include "verse.h"
 //#include "pugixml.hpp"
 
-using namespace hum; // humlib namespace
+using namespace hum; // humlib  namespace
 using namespace vrv; // verovio namespace
+using namespace pugi; // pugixml namespace
 using namespace std;
 
 namespace vrv {
@@ -568,6 +570,8 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
             lt[staffindex][layerindex].push_back(infile[i].token(j));
         }
     }
+
+    // printMeasureTokens();
 }
 
 //////////////////////////////
@@ -631,18 +635,43 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
     m_layer->SetN(layerindex + 1);
     m_staff->AddLayer(m_layer);
 
+    if (m_debug) {
+        vector<int> &rkern = m_rkern;
+        int staffindex = rkern[track];
+        vector<HTp> &layerdata = m_layertokens[staffindex][layerindex];
+        string comment;
+        comment += " ";
+        for (int i = 0; i < (int)layerdata.size(); i++) {
+            comment += *layerdata[i];
+            if (i < (int)layerdata.size() - 1) {
+                comment += " ";
+            }
+        }
+        comment += " ";
+        m_layer->SetComment(comment);
+    }
+
     return fillContentsOfLayer(track, startline, endline, layerindex);
 }
 
 //////////////////////////////
 //
 // HumdrumInput::fillContentsOfLayer -- Fill the layer with musical data.
+// ggg
 //
 
 bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, int layerindex)
 {
+    int i;
     HumdrumFile &infile = m_infile;
     vector<HumNum> &timesigdurs = m_timesigdurs;
+    vector<int> &rkern = m_rkern;
+    int staffindex = rkern[track];
+    if (staffindex < 0) {
+        // some strange unexpected problem
+        return false;
+    }
+    vector<HTp> &layerdata = m_layertokens[staffindex][layerindex];
 
     HumNum starttime = infile[startline].getDurationFromStart();
     HumNum endtime = infile[endline].getDurationFromStart() + infile[endline].getDuration();
@@ -654,17 +683,101 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
     */
 
-    if (timesigdurs[startline] == duration) {
-        MRest *mrest = new MRest();
-        m_layer->AddLayerElement(mrest);
+    if (emptyMeasures()) {
+        if (timesigdurs[startline] == duration) {
+            MRest *mrest = new MRest();
+            m_layer->AddLayerElement(mrest);
+        }
+        else {
+            Rest *rest = new Rest();
+            m_layer->AddLayerElement(rest);
+            setDuration(rest, duration);
+        }
+        return true;
     }
-    else {
-        Rest *rest = new Rest();
-        m_layer->AddLayerElement(rest);
-        setDuration(rest, duration);
+
+    // setup beam states
+    vector<int> beamstate(layerdata.size(), 0);
+    int negativeQ = 0;
+    for (i = 0; i < (int)beamstate.size(); i++) {
+        if (!layerdata[i]->getLine()->isData()) {
+            beamstate[i] = 0;
+        }
+        else {
+            beamstate[i] = characterCount(*layerdata[i], 'L');
+            beamstate[i] -= characterCount(*layerdata[i], 'J');
+        }
+        if (i > 0) {
+            beamstate[i] += beamstate[i - 1];
+        }
+        if (beamstate[i] < 0) {
+            negativeQ = 1;
+        }
+    }
+    if (negativeQ || (beamstate.back() != 0)) {
+        // something wrong with the beaming, either incorrect or
+        // the beaming crosses a barline or layer.  Don't try to
+        // beam anything.
+        std::fill(beamstate.begin(), beamstate.end(), 0);
+    }
+
+    if (m_debug) {
+        cout << "BEAMSTATE: ";
+        for (i = 0; i < (int)beamstate.size(); i++) {
+            cout << beamstate[i] << " ";
+        }
+        cout << endl;
+    }
+
+    Layer *&layer = m_layer;
+    Beam *beam = NULL;
+    for (i = 0; i < (int)layerdata.size(); i++) {
+        if ((i == 0) && (beamstate[i] > 0)) {
+            beam = new Beam;
+            layer->AddLayerElement(beam);
+        }
+        else if ((beamstate[i - 1] == 0) && (beamstate[i] > 0)) {
+            beam = new Beam;
+            layer->AddLayerElement(beam);
+        }
+        else if (beamstate[i] == 0) {
+            beam = NULL;
+        }
     }
 
     return true;
+}
+
+/////////////////////////////
+//
+// HumdrumInput::characterCount --
+//
+
+int HumdrumInput::characterCount(const string &text, char symbol)
+{
+    return std::count(text.begin(), text.end(), symbol);
+}
+
+/////////////////////////////
+//
+// HumdrumInput::printMeasureTokens -- For debugging.
+//
+
+void HumdrumInput::printMeasureTokens(void)
+{
+    vector<vector<vector<hum::HTp> > > &lt = m_layertokens;
+    int i, j, k;
+    cerr << endl;
+    for (i = 0; i < lt.size(); i++) {
+        cerr << "STAFF " << i + 1 << "\t";
+        for (j = 0; j < lt[i].size(); j++) {
+            cerr << "LAYER " << j + 1 << ":\t";
+            for (k = 0; k < lt[i][j].size(); k++) {
+                cout << " " << *lt[i][j][k];
+            }
+            cerr << endl;
+        }
+    }
 }
 
 /////////////////////////////
@@ -913,6 +1026,17 @@ int HumdrumInput::getMeasureNumber(int startline, int endline)
 void HumdrumInput::calculateLayout(void)
 {
     m_doc->CastOff();
+}
+
+//////////////////////////////
+//
+// HumdrumInput::emptyMeasures -- For initial development, maybe convert to
+//     an option.
+//
+
+bool HumdrumInput::emptyMeasures(void)
+{
+    return false;
 }
 
 } // namespace vrv

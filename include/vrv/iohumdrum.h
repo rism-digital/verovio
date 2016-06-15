@@ -70,6 +70,9 @@ protected:
     void calculateReverseKernIndex(void);
     void prepareTimeSigDur(void);
     void setDuration(Rest *rest, hum::HumNum duration);
+    void printMeasureTokens(void);
+    int characterCount(const string &text, char symbol);
+    bool emptyMeasures(void);
 
 private:
     std::string m_filename; // Filename to read/was read.
