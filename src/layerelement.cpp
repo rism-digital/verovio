@@ -288,7 +288,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     }
     else if (this->Is() == CLEF) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_CLEF_ATTR;
+            type = ALIGNMENT_SCOREDEF_CLEF;
         }
         else {
             type = ALIGNMENT_CLEF;
@@ -296,18 +296,18 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     }
     else if (this->Is() == KEYSIG) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_KEYSIG_ATTR;
+            type = ALIGNMENT_SCOREDEF_KEYSIG;
         }
         else {
             // type = ALIGNMENT_KEYSIG;
             // We force this because they should appear only at the beginning of a measure and should be non-justifiable
             // We also need it because the PAE importer creates keySig (and not staffDef @key.sig)
-            type = ALIGNMENT_KEYSIG_ATTR;
+            type = ALIGNMENT_SCOREDEF_KEYSIG;
         }
     }
     else if (this->Is() == MENSUR) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_MENSUR_ATTR;
+            type = ALIGNMENT_SCOREDEF_MENSUR;
         }
         else {
             // replace the current mensur
@@ -318,7 +318,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     }
     else if (this->Is() == METERSIG) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_METERSIG_ATTR;
+            type = ALIGNMENT_SCOREDEF_METERSIG;
         }
         else {
             // replace the current meter signature
@@ -327,7 +327,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
             // type = ALIGNMENT_METERSIG
             // We force this because they should appear only at the beginning of a measure and should be non-justifiable
             // We also need it because the PAE importer creates meterSig (and not staffDef @meter)
-            type = ALIGNMENT_METERSIG_ATTR;
+            type = ALIGNMENT_SCOREDEF_METERSIG;
         }
     }
     else if ((this->Is() == MULTIREST) || (this->Is() == MREST) || (this->Is() == MRPT)) {

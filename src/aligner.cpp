@@ -231,7 +231,7 @@ void MeasureAligner::Reset()
 {
     Object::Reset();
     m_nonJustifiableLeftMargin = 0;
-    m_leftAlignment = new Alignment(-1.0, ALIGNMENT_MEASURE_START);
+    m_leftAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_START);
     AddAlignment(m_leftAlignment);
     m_rightAlignment = new Alignment(0.0, ALIGNMENT_MEASURE_END);
     AddAlignment(m_rightAlignment);
@@ -691,13 +691,13 @@ int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
     // cumulate the shift value and the width
     (*shift) += m_xShift;
 
-    if ((GetType() <= ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
+    if ((GetType() <= ALIGNMENT_SCOREDEF_METERSIG) && ((*justifiable_shift) < 0)) {
         MeasureAligner *aligner = dynamic_cast<MeasureAligner *>(m_parent);
         assert(aligner);
         aligner->SetNonJustifiableMargin(this->m_xRel + this->m_maxWidth);
         // LogDebug("Aligner margin %d", aligner->GetNonJustifiableMargin());
     }
-    else if ((GetType() > ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
+    else if ((GetType() > ALIGNMENT_SCOREDEF_METERSIG) && ((*justifiable_shift) < 0)) {
         MeasureAligner *aligner = dynamic_cast<MeasureAligner *>(m_parent);
         assert(aligner);
         (*justifiable_shift) = aligner->GetNonJustifiableMargin();
@@ -772,7 +772,7 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
     int *maxActualDur = static_cast<int *>((*params).at(2));
     Doc *doc = static_cast<Doc *>((*params).at(3));
 
-    if (this->m_type <= ALIGNMENT_METERSIG_ATTR) return FUNCTOR_CONTINUE;
+    if (this->m_type <= ALIGNMENT_MEASURE_START) return FUNCTOR_CONTINUE;
 
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
@@ -838,7 +838,7 @@ int Alignment::JustifyX(ArrayPtrVoid *params)
     // (m_xRel - margin) * measureRatio + margin, where measureRatio is given by:
     // (ratio - 1) * (margin / justifiable) + ratio
 
-    if ((GetType() < ALIGNMENT_CLEF_ATTR) || (GetType() > ALIGNMENT_METERSIG_ATTR)) {
+    if ((GetType() < ALIGNMENT_SCOREDEF_CLEF) || (GetType() > ALIGNMENT_SCOREDEF_METERSIG)) {
         this->m_xRel = ceil(((double)this->m_xRel - (double)(*margin)) * (*measureRatio)) + (*margin);
     }
 
