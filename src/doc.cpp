@@ -411,8 +411,7 @@ void Doc::SetCurrentScoreDef(bool force)
         this->Process(&unsetCurrentScoreDef, NULL);
     }
 
-    ScoreDef currentScoreDef;
-    currentScoreDef = m_scoreDef;
+    ScoreDef *currentScoreDef = &m_scoreDef;
     StaffDef *staffDef = NULL;
     ArrayPtrVoid params;
     params.push_back(&currentScoreDef);
@@ -421,7 +420,7 @@ void Doc::SetCurrentScoreDef(bool force)
 
     // First process the current scoreDef in order to fill the staffDef with
     // the appropriate drawing values
-    currentScoreDef.Process(&setCurrentScoreDef, &params);
+    currentScoreDef->Process(&setCurrentScoreDef, &params);
 
     // LogElapsedTimeStart();
     this->Process(&setCurrentScoreDef, &params);

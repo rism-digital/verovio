@@ -82,75 +82,37 @@ void StaffDefDrawingInterface::Reset()
 void StaffDefDrawingInterface::SetCurrentClef(Clef *clef)
 {
     if (clef) {
-        if (m_currentClef) delete m_currentClef;
-        m_currentClef = clef;
-        m_currentClef->SetScoreOrStaffDefAttr(true);
+        m_currentClef = *clef;
+        m_currentClef.SetScoreOrStaffDefAttr(true);
     }
 }
 
 void StaffDefDrawingInterface::SetCurrentKeySig(KeySig *keySig)
 {
     if (keySig) {
-        if (m_currentKeySig) {
-            keySig->m_drawingCancelAccidCount = m_currentKeySig->GetAlterationNumber();
-            keySig->m_drawingCancelAccidType = m_currentKeySig->GetAlterationType();
-            delete m_currentKeySig;
-        }
-        m_currentKeySig = keySig;
-        m_currentKeySig->SetScoreOrStaffDefAttr(true);
+        char drawingCancelAccidCount = m_currentKeySig.GetAlterationNumber();
+        data_ACCIDENTAL_EXPLICIT drawingCancelAccidType = m_currentKeySig.GetAlterationType();
+        m_currentKeySig = *keySig;
+        m_currentKeySig.m_drawingCancelAccidCount = drawingCancelAccidCount;
+        m_currentKeySig.m_drawingCancelAccidType = drawingCancelAccidType;
+        m_currentKeySig.SetScoreOrStaffDefAttr(true);
     }
 }
 
 void StaffDefDrawingInterface::SetCurrentMensur(Mensur *mensur)
 {
     if (mensur) {
-        if (m_currentMensur) delete m_currentMensur;
-        m_currentMensur = mensur;
-        m_currentMensur->SetScoreOrStaffDefAttr(true);
+        m_currentMensur = *mensur;
+        m_currentMensur.SetScoreOrStaffDefAttr(true);
     }
 }
 
 void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig *meterSig)
 {
     if (meterSig) {
-        if (m_currentMeterSig) delete m_currentMeterSig;
-        m_currentMeterSig = meterSig;
-        m_currentMeterSig->SetScoreOrStaffDefAttr(true);
+        m_currentMeterSig = *meterSig;
+        m_currentMeterSig.SetScoreOrStaffDefAttr(true);
     }
-}
-
-StaffDefDrawingInterface::StaffDefDrawingInterface(const StaffDefDrawingInterface &interface)
-{
-    m_currentClef = NULL;
-    m_currentKeySig = NULL;
-    m_currentMensur = NULL;
-    m_currentMeterSig = NULL;
-    Reset();
-}
-
-StaffDefDrawingInterface &StaffDefDrawingInterface::operator=(const StaffDefDrawingInterface &interface)
-{
-    // not self assignement
-    if (this != &interface) {
-        if (m_currentClef) {
-            delete m_currentClef;
-            m_currentClef = NULL;
-        }
-        if (m_currentKeySig) {
-            delete m_currentKeySig;
-            m_currentKeySig = NULL;
-        }
-        if (m_currentMensur) {
-            delete m_currentMensur;
-            m_currentMensur = NULL;
-        }
-        if (m_currentMeterSig) {
-            delete m_currentMeterSig;
-            m_currentMeterSig = NULL;
-        }
-        Reset();
-    }
-    return *this;
 }
 
 //----------------------------------------------------------------------------

@@ -158,12 +158,6 @@ Clef *Layer::GetCurrentClef() const
 {
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff && staff->m_drawingStaffDef && staff->m_drawingStaffDef->GetCurrentClef());
-    LogMessage("Clef :%d - %d", staff->m_drawingStaffDef->GetCurrentClef()->GetShape(),
-        staff->m_drawingStaffDef->GetCurrentClef()->GetLine());
-    Clef *clef = staff->m_drawingStaffDef->GetCurrentClef();
-    if (clef->GetLine() > 4) {
-        Clef clef2;
-    }
     return staff->m_drawingStaffDef->GetCurrentClef();
 }
 

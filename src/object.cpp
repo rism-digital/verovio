@@ -917,7 +917,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
 {
 
     // param 0: the current scoreDef
-    ScoreDef *currentScoreDef = static_cast<ScoreDef *>((*params).at(0));
+    ScoreDef **currentScoreDef = static_cast<ScoreDef **>((*params).at(0));
     StaffDef **currentStaffDef = static_cast<StaffDef **>((*params).at(1));
 
     assert(currentScoreDef);
@@ -929,33 +929,37 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         Page *page = dynamic_cast<Page *>(this);
         assert(page);
         if (page->m_parent->GetChildIndex(page) == 0) {
-            currentScoreDef->SetRedrawFlags(true, true, true, true, false);
-            currentScoreDef->SetDrawLabels(true);
+            (*currentScoreDef)->SetRedrawFlags(true, true, true, true, false);
+            (*currentScoreDef)->SetDrawLabels(true);
         }
         else {
-            currentScoreDef->SetRedrawFlags(true, true, false, false, false);
-            currentScoreDef->SetDrawLabels(false);
+            (*currentScoreDef)->SetRedrawFlags(true, true, false, false, false);
+            (*currentScoreDef)->SetDrawLabels(false);
         }
-        page->m_drawingScoreDef = *currentScoreDef;
+        page->m_drawingScoreDef = *(*currentScoreDef);
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new system
     if (this->Is() == SYSTEM) {
-        currentScoreDef->SetRedrawFlags(true, true, false, false, false);
+        // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
+        (*currentScoreDef)->SetRedrawFlags(true, true, false, false, false);
         System *system = dynamic_cast<System *>(this);
         assert(system);
-        system->SetDrawingScoreDef(currentScoreDef);
+        // For now we don't use it - eventually we want to set it. The problem will be to take into account succeeding
+        // scoreDefs appearing before the first measure of the system
+        // system->SetDrawingScoreDef(*currentScoreDef);
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new system
     if (this->Is() == MEASURE) {
-        if (currentScoreDef->m_setAsDrawing) {
+        if ((*currentScoreDef)->m_setAsDrawing) {
             Measure *measure = dynamic_cast<Measure *>(this);
             assert(measure);
-            measure->SetDrawingScoreDef(currentScoreDef);
-            currentScoreDef->m_setAsDrawing = false;
+            measure->SetDrawingScoreDef(*currentScoreDef);
+            (*currentScoreDef) = measure->GetDrawingScoreDef();
+            (*currentScoreDef)->m_setAsDrawing = false;
         }
         return FUNCTOR_CONTINUE;
     }
@@ -964,8 +968,9 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     if (this->Is() == SCOREDEF) {
         ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(this);
         assert(scoreDef);
-        // Replace the current scoreDef with the new one, including its content (staffDef)
-        currentScoreDef->ReplaceDrawingValues(scoreDef);
+        // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
+        // m_setAsDrawing to true so it will then be taken into account at the next measure
+        (*currentScoreDef)->ReplaceDrawingValues(scoreDef);
         return FUNCTOR_CONTINUE;
     }
 
@@ -973,17 +978,16 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     if (this->Is() == STAFFDEF) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(this);
         assert(staffDef);
-        currentScoreDef->ReplaceDrawingValues(staffDef);
+        (*currentScoreDef)->ReplaceDrawingValues(staffDef);
     }
 
     // starting a new staff
     if (this->Is() == STAFF) {
         Staff *staff = dynamic_cast<Staff *>(this);
         assert(staff);
-        (*currentStaffDef) = currentScoreDef->GetStaffDef(staff->GetN());
+        (*currentStaffDef) = (*currentScoreDef)->GetStaffDef(staff->GetN());
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = (*currentStaffDef);
-
         return FUNCTOR_CONTINUE;
     }
 
