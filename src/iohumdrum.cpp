@@ -721,7 +721,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         std::fill(beamstate.begin(), beamstate.end(), 0);
     }
 
-    if (m_debug) {
+    if (1 == 0) {
         cout << "BEAMSTATE: ";
         for (i = 0; i < (int)beamstate.size(); i++) {
             cout << beamstate[i] << " ";
