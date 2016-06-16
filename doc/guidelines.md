@@ -32,7 +32,7 @@ An easy way to install clang-format on OS X computers is to use [Hombrew](http:/
 brew install clang-format
 ```
 
-### Running clang-formag
+### Running clang-format
 
 To use clang-format to adjust a single file:
 
