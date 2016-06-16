@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jun  9 14:03:19 PDT 2016
+// Last Modified: Wed Jun 15 20:04:14 PDT 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -615,7 +615,7 @@ class HumdrumToken : public string, public HumHash {
 		string   getTrackString            (void) const;
 		int      getSubtokenCount          (const string& separator = " ") const;
 		string   getSubtoken               (int index,
-		                                    const string& separator) const;
+		                                    const string& separator = " ") const;
 		void     setParameters             (HumdrumToken* ptok);
 		void     setParameters             (const string& pdata,
 		                                    HumdrumToken* ptok = NULL);
@@ -1156,6 +1156,9 @@ class Convert {
 
 		// Rhythm processing, defined in Convert-rhythm.cpp
 		static HumNum  recipToDuration    (const string& recip, HumNum scale = 4,
+		                                   string separator = " ");
+		static HumNum  recipToDurationNoDots(const string& recip,
+		                                   HumNum scale = 4,
 		                                   string separator = " ");
 
 		// Pitch processing, defined in Convert-pitch.cpp

@@ -81,6 +81,7 @@ protected:
     void insertNoteInBeam(vrv::Beam *element, hum::HTp token);
     void insertRestInLayer(vrv::Layer *element, hum::HTp token);
     void insertRestInBeam(vrv::Beam *element, hum::HTp token);
+    void convertNote(vrv::Note *note, hum::HTp token, int subtoken = -1);
 
 private:
     std::string m_filename; // Filename to read/was read.

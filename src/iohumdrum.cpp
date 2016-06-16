@@ -806,12 +806,14 @@ void HumdrumInput::insertNoteInLayer(Layer *element, HTp token)
 {
     Note *note = new Note;
     element->AddLayerElement(note);
+    convertNote(note, token);
 }
 
 void HumdrumInput::insertNoteInBeam(Beam *element, HTp token)
 {
     Note *note = new Note;
     element->AddLayerElement(note);
+    convertNote(note, token);
 }
 
 void HumdrumInput::insertRestInLayer(Layer *element, HTp token)
@@ -824,6 +826,103 @@ void HumdrumInput::insertRestInBeam(Beam *element, HTp token)
 {
     Rest *rest = new Rest;
     element->AddLayerElement(rest);
+}
+
+/////////////////////////////
+//
+// HumdrumInput::convertNote --
+//    default value:
+//       subtoken = -1 (use the first subtoken);
+//
+
+void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
+{
+    string tstring;
+    if (subtoken < 0) {
+        tstring = *token;
+    }
+    else {
+        tstring = token->getSubtoken(subtoken);
+    }
+    int diatonic = Convert::kernToBase7(tstring);
+    int octave = diatonic / 7;
+    note->SetOct(octave);
+    switch (diatonic % 7) {
+        case 0: note->SetPname(PITCHNAME_c); break;
+        case 1: note->SetPname(PITCHNAME_d); break;
+        case 2: note->SetPname(PITCHNAME_e); break;
+        case 3: note->SetPname(PITCHNAME_f); break;
+        case 4: note->SetPname(PITCHNAME_g); break;
+        case 5: note->SetPname(PITCHNAME_a); break;
+        case 6: note->SetPname(PITCHNAME_b); break;
+    }
+    int dotcount = characterCount(tstring, '.');
+    if (dotcount > 0) {
+        note->SetDots(dotcount);
+    }
+
+    if (tstring.find("/") != string::npos) {
+        note->SetStemDir(STEMDIRECTION_up);
+    }
+    else if (tstring.find("\\") != string::npos) {
+        note->SetStemDir(STEMDIRECTION_down);
+    }
+
+    int accidCount = Convert::kernToAccidentalCount(tstring);
+    if (tstring.find("##X") != string::npos) {
+        note->SetAccid(ACCIDENTAL_EXPLICIT_x);
+    }
+    else if (tstring.find("#X") != string::npos) {
+        note->SetAccid(ACCIDENTAL_EXPLICIT_s);
+    }
+    else if (tstring.find("--X") != string::npos) {
+        note->SetAccid(ACCIDENTAL_EXPLICIT_ff);
+    }
+    else if (tstring.find("-X") != string::npos) {
+        note->SetAccid(ACCIDENTAL_EXPLICIT_ff);
+    }
+    else if (tstring.find("n") != string::npos) {
+        note->SetAccid(ACCIDENTAL_EXPLICIT_n);
+    }
+    /*
+            else if (accidCount == 2) {
+                    note->SetAccid(ACCIDENTAL_IMPLICIT_x);
+            } else if (accidCount == 1) {
+                    note->SetAccid(ACCIDENTAL_IMPLICIT_s);
+            } else if (accidCount == -1) {
+                    note->SetAccid(ACCIDENTAL_IMPLICIT_f);
+            } else if (accidCount == -2) {
+                    note->SetAccid(ACCIDENTAL_IMPLICIT_ff);
+            }
+    */
+
+    // Tuplet durations are not handled below yet.
+    // dur is in units of quarter notes.
+    HumNum dur = Convert::recipToDurationNoDots(tstring);
+    dur /= 4; // duration is now in whole note units;
+    if (dur.isInteger()) {
+        switch (dur.getNumerator()) {
+            case 1: note->SetDur(DURATION_1); break;
+            case 2: note->SetDur(DURATION_breve); break;
+            case 4: note->SetDur(DURATION_long); break;
+            case 8: note->SetDur(DURATION_maxima); break;
+        }
+    }
+    else if (dur.getNumerator() == 1) {
+        switch (dur.getDenominator()) {
+            case 2: note->SetDur(DURATION_2); break;
+            case 4: note->SetDur(DURATION_4); break;
+            case 8: note->SetDur(DURATION_8); break;
+            case 16: note->SetDur(DURATION_16); break;
+            case 32: note->SetDur(DURATION_32); break;
+            case 64: note->SetDur(DURATION_64); break;
+            case 128: note->SetDur(DURATION_128); break;
+            case 256: note->SetDur(DURATION_256); break;
+            case 512: note->SetDur(DURATION_512); break;
+            case 1024: note->SetDur(DURATION_1024); break;
+            case 2048: note->SetDur(DURATION_2048); break;
+        }
+    }
 }
 
 /////////////////////////////
