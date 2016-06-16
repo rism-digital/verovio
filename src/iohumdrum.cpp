@@ -871,30 +871,36 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
     int accidCount = Convert::kernToAccidentalCount(tstring);
     if (tstring.find("##X") != string::npos) {
         note->SetAccid(ACCIDENTAL_EXPLICIT_x);
+        note->SetAccidGes(ACCIDENTAL_IMPLICIT_ss);
     }
     else if (tstring.find("#X") != string::npos) {
         note->SetAccid(ACCIDENTAL_EXPLICIT_s);
+        note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
     }
     else if (tstring.find("--X") != string::npos) {
         note->SetAccid(ACCIDENTAL_EXPLICIT_ff);
+        note->SetAccidGes(ACCIDENTAL_IMPLICIT_ff);
     }
     else if (tstring.find("-X") != string::npos) {
-        note->SetAccid(ACCIDENTAL_EXPLICIT_ff);
+        note->SetAccid(ACCIDENTAL_EXPLICIT_f);
+        note->SetAccidGes(ACCIDENTAL_IMPLICIT_f);
     }
     else if (tstring.find("n") != string::npos) {
         note->SetAccid(ACCIDENTAL_EXPLICIT_n);
     }
-    /*
-            else if (accidCount == 2) {
-                    note->SetAccid(ACCIDENTAL_IMPLICIT_x);
-            } else if (accidCount == 1) {
-                    note->SetAccid(ACCIDENTAL_IMPLICIT_s);
-            } else if (accidCount == -1) {
-                    note->SetAccid(ACCIDENTAL_IMPLICIT_f);
-            } else if (accidCount == -2) {
-                    note->SetAccid(ACCIDENTAL_IMPLICIT_ff);
-            }
-    */
+    else if (accidCount == 2) {
+        // change later to ACCIDENTAL_IMPLICIT_x?
+        note->SetAccidGes(ACCIDENTAL_IMPLICIT_ss);
+    }
+    else if (accidCount == 1) {
+        note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
+    }
+    else if (accidCount == -1) {
+        note->SetAccidGes(ACCIDENTAL_IMPLICIT_f);
+    }
+    else if (accidCount == -2) {
+        note->SetAccidGes(ACCIDENTAL_IMPLICIT_ff);
+    }
 
     // Tuplet durations are not handled below yet.
     // dur is in units of quarter notes.
