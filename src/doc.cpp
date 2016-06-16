@@ -648,7 +648,7 @@ int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin) const
 
 int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin) const
 {
-    int size = m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITON_FACTOR;
+    int size = m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITION_FACTOR;
     // This should be styled
     if (withMargin) size += GetDrawingUnit(staffSize);
     return size;
@@ -751,27 +751,27 @@ char Doc::GetLeftPosition() const
 
 void Doc::SetPageHeight(int pageHeight)
 {
-    m_pageHeight = pageHeight * DEFINITON_FACTOR;
+    m_pageHeight = pageHeight * DEFINITION_FACTOR;
 };
 
 void Doc::SetPageWidth(int pageWidth)
 {
-    m_pageWidth = pageWidth * DEFINITON_FACTOR;
+    m_pageWidth = pageWidth * DEFINITION_FACTOR;
 };
 
 void Doc::SetPageLeftMar(short pageLeftMar)
 {
-    m_pageLeftMar = pageLeftMar * DEFINITON_FACTOR;
+    m_pageLeftMar = pageLeftMar * DEFINITION_FACTOR;
 };
 
 void Doc::SetPageRightMar(short pageRightMar)
 {
-    m_pageRightMar = pageRightMar * DEFINITON_FACTOR;
+    m_pageRightMar = pageRightMar * DEFINITION_FACTOR;
 };
 
 void Doc::SetPageTopMar(short pageTopMar)
 {
-    m_pageTopMar = pageTopMar * DEFINITON_FACTOR;
+    m_pageTopMar = pageTopMar * DEFINITION_FACTOR;
 };
 
 void Doc::SetSpacingStaff(short spacingStaff)
@@ -878,14 +878,14 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
     int contentHeight = m_drawingPage->GetContentHeight();
-    return (contentHeight + m_drawingPageTopMar * 2) / DEFINITON_FACTOR;
+    return (contentHeight + m_drawingPageTopMar * 2) / DEFINITION_FACTOR;
 }
 
 int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
     int contentWidth = m_drawingPage->GetContentWidth();
-    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITON_FACTOR;
+    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITION_FACTOR;
     ;
 }
 

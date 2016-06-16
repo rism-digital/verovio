@@ -212,7 +212,7 @@ void SvgDeviceContext::StartPage()
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("id") = "definition-scale";
     m_currentNode.append_attribute("viewBox")
-        = StringFormat("0 0 %d %d", m_width * DEFINITON_FACTOR, m_height * DEFINITON_FACTOR).c_str();
+        = StringFormat("0 0 %d %d", m_width * DEFINITION_FACTOR, m_height * DEFINITION_FACTOR).c_str();
 
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");

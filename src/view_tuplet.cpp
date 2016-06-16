@@ -24,7 +24,7 @@
 
 namespace vrv {
 
-#define TUPLET_OFFSET (25 * DEFINITON_FACTOR)
+#define TUPLET_OFFSET (25 * DEFINITION_FACTOR)
 
 /**
  * Analyze a tuplet object and figure out if all the notes are in the same beam

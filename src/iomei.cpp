@@ -1457,7 +1457,7 @@ bool MeiInput::ReadMeiSystem(Object *parent, pugi::xml_node system)
         vrvSystem->m_systemRightMar = atoi(system.attribute("system.rightmar").value());
     }
     if (system.attribute("uly")) {
-        vrvSystem->m_yAbs = atoi(system.attribute("uly").value()) * DEFINITON_FACTOR;
+        vrvSystem->m_yAbs = atoi(system.attribute("uly").value()) * DEFINITION_FACTOR;
     }
 
     // This could be moved to an AddSystem method for consistency with AddLayerElement
@@ -1841,7 +1841,7 @@ bool MeiInput::ReadMeiStaff(Object *parent, pugi::xml_node staff)
     vrvStaff->ReadCommon(staff);
 
     if (staff.attribute("uly")) {
-        vrvStaff->m_yAbs = atoi(staff.attribute("uly").value()) * DEFINITON_FACTOR;
+        vrvStaff->m_yAbs = atoi(staff.attribute("uly").value()) * DEFINITION_FACTOR;
     }
 
     if (!vrvStaff->HasN()) {
@@ -2015,7 +2015,7 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
 bool MeiInput::ReadLayerElement(pugi::xml_node element, LayerElement *object)
 {
     if (element.attribute("ulx")) {
-        object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITON_FACTOR;
+        object->m_xAbs = atoi(element.attribute("ulx").value()) * DEFINITION_FACTOR;
     }
 
     SetMeiUuid(element, object);
