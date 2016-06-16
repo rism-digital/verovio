@@ -24,6 +24,25 @@ Verovio uses a [Clang-Format](http://clang.llvm.org/docs/ClangFormat.html) codin
 The simplest way to fullfil the Verovio coding style is to use a clang-format tool and to apply the style defined in the 
 [.clang-format](../.clang-format) file available in the project root directory.
 
+### Downloading clang-format for OS X
+
+An easy way to install clang-format on OS X computers is to use [Hombrew](http://brew.sh).  Type this command in the terminal to install:
+
+```
+brew install clang-format
+```
+
+### Running clang-formag
+
+To use clang-format to adjust a single file:
+
+```
+clang-format -style=file -i   some-directory/some-file.cpp
+```
+
+The `-style=file` option instructs clang-format to search for the .clang-format configuration file (recursively in some parent directory).  The `-i` option is used to alter the file "in-place".  If you don't give the `-i` option, a fomatted copy of the file will be sent to standard output.
+
+
 ## Includes and forward declarations
 
 Includes in the header files must list first the system includes followed by the Verovio includes, if any, and then the includes for the libraries included in Verovio. All includes have to be ordered alphabetically:
