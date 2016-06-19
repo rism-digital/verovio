@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jun 18 21:01:45 PDT 2016
+// Last Modified: Sat Jun 18 22:22:17 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3888,7 +3888,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					continue;
 				}
 				int accid = Convert::kernToAccidentalCount(subtok);
-				if ((subtok.find("_") != string::npos) || 
+				if ((subtok.find("_") != string::npos) ||
 						(subtok.find("]") != string::npos)) {
 					// tied notes do not have slurs, so skip them
 					if ((accid != keysigs[rindex][diatonic % 7]) &&
@@ -3917,6 +3917,8 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 				} else if ((accid == 0) && (subtok.find("n") != string::npos)) {
 					infile[i].token(j)->setValue("auto", to_string(k),
 							"cautionaryAccidental", "true");
+					infile[i].token(j)->setValue("auto", to_string(k),
+							"visualAccidental", "true");
 				} else if (subtok.find("XX") == string::npos) {
 					// The accidental is not necessary. See if there is a single "X"
 					// immediately after the accidental which means to force it to
@@ -3926,18 +3928,18 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 						if (subtok[loc-1] == '#') {
 							infile[i].token(j)->setValue("auto", to_string(k),
 									"cautionaryAccidental", "true");
-									infile[i].token(j)->setValue("auto", to_string(k), 
+									infile[i].token(j)->setValue("auto", to_string(k),
 											"visualAccidental", "true");
 						} else if (subtok[loc-1] == '-') {
 							infile[i].token(j)->setValue("auto", to_string(k),
 									"cautionaryAccidental", "true");
-									infile[i].token(j)->setValue("auto", to_string(k), 
+									infile[i].token(j)->setValue("auto", to_string(k),
 											"visualAccidental", "true");
 						} else if (subtok[loc-1] == 'n') {
 							infile[i].token(j)->setValue("auto", to_string(k),
 									"cautionaryAccidental", "true");
-									infile[i].token(j)->setValue("auto", to_string(k), 
-											"visualAccidental", "true");
+							infile[i].token(j)->setValue("auto", to_string(k),
+									"visualAccidental", "true");
 						}
 					}
 				}
