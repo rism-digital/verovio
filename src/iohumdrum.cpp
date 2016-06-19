@@ -547,6 +547,7 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
         if (!infile[i].hasSpines()) {
             continue;
         }
+        lasttrack = -1;
         for (j = 0; j < infile[i].getFieldCount(); j++) {
             track = infile[i].token(j)->getTrack();
             staffindex = rkern[track];
@@ -640,11 +641,11 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
         int staffindex = rkern[track];
         vector<HTp> &layerdata = m_layertokens[staffindex][layerindex];
         string comment;
-        comment += " ";
+        comment += " kern: ";
         for (int i = 0; i < (int)layerdata.size(); i++) {
             comment += *layerdata[i];
             if (i < (int)layerdata.size() - 1) {
-                comment += " ";
+                comment += "  ";
             }
         }
         comment += " ";
@@ -838,11 +839,13 @@ void HumdrumInput::insertRestInBeam(Beam *element, HTp token)
 void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
 {
     string tstring;
+    int stindex = 0;
     if (subtoken < 0) {
         tstring = *token;
     }
     else {
         tstring = token->getSubtoken(subtoken);
+        stindex = subtoken;
     }
     int diatonic = Convert::kernToBase7(tstring);
     int octave = diatonic / 7;
@@ -868,38 +871,31 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
         note->SetStemDir(STEMDIRECTION_down);
     }
 
+    bool showInAccid = token->hasVisibleAccidental(stindex);
+    bool showInAccidGes = !showInAccid;
+    if (token->hasCautionaryAccidental(stindex)) {
+        showInAccidGes = true;
+    }
+
     int accidCount = Convert::kernToAccidentalCount(tstring);
-    if (tstring.find("##X") != string::npos) {
-        note->SetAccid(ACCIDENTAL_EXPLICIT_x);
-        note->SetAccidGes(ACCIDENTAL_IMPLICIT_ss);
+
+    if (showInAccid) {
+        switch (accidCount) {
+            case +2: note->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
+            case +1: note->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
+            case 0: note->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
+            case -1: note->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
+            case -2: note->SetAccid(ACCIDENTAL_EXPLICIT_ff); break;
+        }
     }
-    else if (tstring.find("#X") != string::npos) {
-        note->SetAccid(ACCIDENTAL_EXPLICIT_s);
-        note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
-    }
-    else if (tstring.find("--X") != string::npos) {
-        note->SetAccid(ACCIDENTAL_EXPLICIT_ff);
-        note->SetAccidGes(ACCIDENTAL_IMPLICIT_ff);
-    }
-    else if (tstring.find("-X") != string::npos) {
-        note->SetAccid(ACCIDENTAL_EXPLICIT_f);
-        note->SetAccidGes(ACCIDENTAL_IMPLICIT_f);
-    }
-    else if (tstring.find("n") != string::npos) {
-        note->SetAccid(ACCIDENTAL_EXPLICIT_n);
-    }
-    else if (accidCount == 2) {
-        // change later to ACCIDENTAL_IMPLICIT_x?
-        note->SetAccidGes(ACCIDENTAL_IMPLICIT_ss);
-    }
-    else if (accidCount == 1) {
-        note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
-    }
-    else if (accidCount == -1) {
-        note->SetAccidGes(ACCIDENTAL_IMPLICIT_f);
-    }
-    else if (accidCount == -2) {
-        note->SetAccidGes(ACCIDENTAL_IMPLICIT_ff);
+    if (showInAccidGes) {
+        switch (accidCount) {
+            case +2: note->SetAccidGes(ACCIDENTAL_IMPLICIT_ss); break;
+            case +1: note->SetAccidGes(ACCIDENTAL_IMPLICIT_s); break;
+            case 0: note->SetAccidGes(ACCIDENTAL_IMPLICIT_n); break;
+            case -1: note->SetAccidGes(ACCIDENTAL_IMPLICIT_f); break;
+            case -2: note->SetAccidGes(ACCIDENTAL_IMPLICIT_ff); break;
+        }
     }
 
     // Tuplet durations are not handled below yet.
@@ -1020,6 +1016,14 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 
     m_measure = new Measure();
     m_system->AddMeasure(m_measure);
+
+    if (1 == 0) {
+        string comment = "startline: ";
+        comment += to_string(startline);
+        comment += ", endline: ";
+        comment += to_string(endline);
+        m_measure->SetComment(comment);
+    }
 
     int measurenumber = getMeasureNumber(startline, endline);
     if (measurenumber >= 0) {

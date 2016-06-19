@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun 15 19:46:36 PDT 2016
+// Last Modified: Sat Jun 18 21:01:45 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2342,6 +2342,8 @@ ostream& HumdrumFile::printXml(ostream& out, int level,
 	level--;
 	out << Convert::repeatString(indent, level) << "<trackInfo>\n";
 
+	printXmlParameterInfo(out, level, "\t");
+
 	level--;
 	out << Convert::repeatString(indent, level) << "</sequenceInfo>\n";
 
@@ -2361,26 +2363,42 @@ ostream& HumdrumFile::printXml(ostream& out, int level,
 
 
 
+//////////////////////////////
+//
+// HumdrumFile::printXmlParameterInfo -- Print contents of HumHash for HumdrumFile.
+// default value: out = cout
+// default value: level = 0
+// default value: indent = "\t"
+//
+
+ostream& HumdrumFile::printXmlParameterInfo(ostream& out, int level,
+		const string& indent) {
+	((HumHash*)this)->printXml(out, level, indent);
+	return out;
+}
+
+
+
 
 //////////////////////////////
 //
 // HumdrumFileBase::HumdrumFileBase -- HumdrumFileBase constructor.
 //
 
-HumdrumFileBase::HumdrumFileBase(void) {
+HumdrumFileBase::HumdrumFileBase(void) : HumHash() {
 	addToTrackStarts(NULL);
 	ticksperquarternote = -1;
 	quietParse = false;
 }
 
-HumdrumFileBase::HumdrumFileBase(const string& filename) {
+HumdrumFileBase::HumdrumFileBase(const string& filename) : HumHash() {
 	addToTrackStarts(NULL);
 	ticksperquarternote = -1;
 	quietParse = false;
 	read(filename);
 }
 
-HumdrumFileBase::HumdrumFileBase(istream& contents) {
+HumdrumFileBase::HumdrumFileBase(istream& contents) : HumHash() {
 	addToTrackStarts(NULL);
 	ticksperquarternote = -1;
 	quietParse = false;
@@ -2394,7 +2412,9 @@ HumdrumFileBase::HumdrumFileBase(istream& contents) {
 // HumdrumFileBase::~HumdrumFileBase -- HumdrumFileBase deconstructor.
 //
 
-HumdrumFileBase::~HumdrumFileBase() { }
+HumdrumFileBase::~HumdrumFileBase() { 
+	// do nothing
+}
 
 
 
@@ -3228,24 +3248,44 @@ bool HumdrumFileBase::stitchLinesTogether(HumdrumLine& previous,
 			return setParseError(err);
 		}
 		for (i=0; i<previous.getTokenCount(); i++) {
-			previous.token(i)->makeForwardLink(*next.token(i));
+			if (next.token(i)) {
+				previous.token(i)->makeForwardLink(*next.token(i));
+			} else {
+				cerr << "Strange error 1" << endl;
+			}
 		}
 		return true;
 	}
 	int ii = 0;
 	for (i=0; i<previous.getTokenCount(); i++) {
 		if (!previous.token(i)->isManipulator()) {
-			previous.token(i)->makeForwardLink(*next.token(ii++));
+			if (next.token(ii) != NULL) {
+				previous.token(i)->makeForwardLink(*next.token(ii++));
+			} else {
+				cerr << "Strange error 2" << endl;
+			}
 		} else if (previous.token(i)->isSplitInterpretation()) {
 			// connect the previous token to the next two tokens.
-			previous.token(i)->makeForwardLink(*next.token(ii++));
-			previous.token(i)->makeForwardLink(*next.token(ii++));
+			if (next.token(ii) != NULL) {
+				previous.token(i)->makeForwardLink(*next.token(ii++));
+			} else {
+				cerr << "Strange error 3" << endl;
+			}
+			if (next.token(ii) != NULL) {
+				previous.token(i)->makeForwardLink(*next.token(ii++));
+			} else {
+				cerr << "Strange error 4" << endl;
+			}
 		} else if (previous.token(i)->isMergeInterpretation()) {
 			// connect multiple previous tokens which are adjacent *v
 			// spine manipulators to the current next token.
 			while ((i<previous.getTokenCount()) &&
 					previous.token(i)->isMergeInterpretation()) {
-				previous.token(i)->makeForwardLink(*next.token(ii));
+				if (next.token(ii) != NULL) {
+					previous.token(i)->makeForwardLink(*next.token(ii));
+				} else {
+					cerr << "Strange error 5" << endl;
+				}
 				i++;
 			}
 			i--;
@@ -3254,8 +3294,16 @@ bool HumdrumFileBase::stitchLinesTogether(HumdrumLine& previous,
 			// swapping the order of two spines.
 			if ((i<previous.getTokenCount()) &&
 					previous.token(i+1)->isExchangeInterpretation()) {
-				previous.token(i+1)->makeForwardLink(*next.token(ii++));
-				previous.token(i)->makeForwardLink(*next.token(ii++));
+				if (next.token(ii) != NULL) {
+					previous.token(i+1)->makeForwardLink(*next.token(ii++));
+				} else {
+					cerr << "Strange error 6" << endl;
+				}
+				if (next.token(ii) != NULL) {
+					previous.token(i)->makeForwardLink(*next.token(ii++));
+				} else {
+					cerr << "Strange error 7" << endl;
+				}
 			}
 			i++;
 		} else if (previous.token(i)->isTerminateInterpretation()) {
@@ -3272,10 +3320,22 @@ bool HumdrumFileBase::stitchLinesTogether(HumdrumLine& previous,
 				    << next.token(i);
 				return setParseError(err);
 			}
-			previous.token(i)->makeForwardLink(*next.token(ii++));
+			if (next.token(ii) != NULL) {
+				previous.token(i)->makeForwardLink(*next.token(ii++));
+			} else {
+				cerr << "Strange error 8" << endl;
+			}
 			ii++;
 		} else if (previous.token(i)->isExclusiveInterpretation()) {
-			previous.token(i)->makeForwardLink(*next.token(ii++));
+			if (next.token(ii) != NULL) {
+				if (previous.token(i) != NULL) {
+					previous.token(i)->makeForwardLink(*next.token(ii++));
+				} else {
+					cerr << "Strange error 10" << endl;
+				}
+			} else {
+				cerr << "Strange error 9" << endl;
+			}
 		} else {
 			return setParseError("Error: should not get here");
 		}
@@ -3700,6 +3760,239 @@ bool sortTokenPairsByLineIndex(const TokenPair& a, const TokenPair& b) {
 		}
 	}
 	return false;
+}
+
+
+
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::analyzeKernAccidentals -- Identify accidentals that
+//    should be printed (only in **kern spines) as well as cautionary
+//    accidentals (accidentals which are forced to be displayed but otherwise
+//    would not be printed.  Algorithm assumes that all secondary tied notes
+//    will not display their accidental across a system break.  Consideration
+//    about grace-note accidental display still needs to be done.
+//
+
+bool HumdrumFileContent::analyzeKernAccidentals(void) {
+	HumdrumFileContent& infile = *this;
+	int i, j, k;
+	int kindex;
+	int track;
+
+	// ktracks == List of **kern spines in data.
+	// rtracks == Reverse mapping from track to ktrack index (part/staff index).
+	vector<HTp> ktracks = getKernSpineStartList();
+	vector<int> rtracks(getMaxTrack()+1, -1);
+	for (i=0; i<ktracks.size(); i++) {
+		track = ktracks[i]->getTrack();
+		rtracks[track] = i;
+	}
+	int kcount = ktracks.size();
+
+	// keysigs == key signature spellings of diatonic pitch classes.  This array
+	// is duplicated into dstates after each barline.
+	vector<vector<int> > keysigs;
+	keysigs.resize(kcount);
+	for (i=0; i<kcount; i++) {
+		keysigs[i].resize(7);
+		std::fill(keysigs[i].begin(), keysigs[i].end(), 0);
+	}
+
+	// dstates == diatonic states for every pitch in a spine
+	// sub-spines are considered as a single unit, although there are
+	// score conventions which would keep a separate voices on a staff
+	// with different accidental states (i.e., two parts superimposed
+	// on the same staff, but treated as if on separate staves).
+	// Eventually this algorithm should be adjusted for dealing with
+	// cross-staff notes, where the cross-staff notes should be following
+	// the accidentals of a different spine...
+	vector<vector<int> > dstates; // diatonic states
+	dstates.resize(kcount);
+	for (i=0; i<kcount; i++) {
+		dstates[i].resize(70);     // 10 octave limit for analysis
+			                        // may cause problems; fix later.
+		std::fill(dstates[i].begin(), dstates[i].end(), 0);
+	}
+
+
+	// rhythmstart == keep track of first non-grace note in measure.
+	vector<int> foundrhythm(kcount, 0);
+	
+	int loc;
+	for (i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].hasSpines()) {
+			continue;
+		}
+		if (infile[i].isInterpretation()) {
+			for (j=0; j<infile[i].getFieldCount(); j++) {
+				if (!infile[i].token(j)->isKern()) {
+					continue;
+				}
+				if (infile[i].token(j)->compare(0, 3, "*k[") == 0) {
+					track = infile[i].token(j)->getTrack();
+					kindex = rtracks[track];
+					fillKeySignature(keysigs[kindex], *infile[i].token(j));
+					// resetting key states of current measure.  What to do if this
+					// key signature is in the middle of a measure?
+					resetDiatonicStatesWithKeySignature(dstates[kindex],
+							keysigs[kindex]);
+				}
+			}
+		} else if (infile[i].isBarline()) {
+			for (j=0; j<infile[i].getFieldCount(); j++) {
+				if (!infile[i].token(j)->isKern()) {
+					continue;
+				}
+				if (infile[i].token(j)->isInvisible()) {
+					continue;
+				}
+				std::fill(foundrhythm.begin(), foundrhythm.end(), 0);
+				track = infile[i].token(j)->getTrack();
+				kindex = rtracks[track];
+				// reset the accidental states in dstates to match keysigs.
+				resetDiatonicStatesWithKeySignature(dstates[kindex],
+						keysigs[kindex]);
+			}
+		}
+
+		if (!infile[i].isData()) {
+			continue;
+		}
+
+		for (j=0; j<infile[i].getFieldCount(); j++) {
+			if (!infile[i].token(j)->isKern()) {
+				continue;
+			}
+			if (infile[i].token(j)->isNull()) {
+				continue;
+			}
+			if (infile[i].token(j)->isRest()) {
+				continue;
+			}
+			if (infile[i].token(j)->find("q") != string::npos) {
+				// deal with grace notes later...
+				continue;
+			}
+			int subcount = infile[i].token(j)->getSubtokenCount();
+			track = infile[i].token(j)->getTrack();
+			int rindex = rtracks[track];
+			for (k=0; k<subcount; k++) {
+				string subtok = infile[i].token(j)->getSubtoken(k);
+				int diatonic = Convert::kernToBase7(subtok);
+				if (diatonic < 0) {
+					// Deal with extra-low notes later.
+					continue;
+				}
+				int accid = Convert::kernToAccidentalCount(subtok);
+				if ((subtok.find("_") != string::npos) || 
+						(subtok.find("]") != string::npos)) {
+					// tied notes do not have slurs, so skip them
+					if ((accid != keysigs[rindex][diatonic % 7]) &&
+							(foundrhythm[rindex] == 0)) {
+						// But first, prepare to force an accidental to be shown on
+						// the note immediately following the end of a tied group
+						// if the tied group crosses a barline.
+						dstates[rindex][diatonic] = -1000 + accid;
+					}
+					continue;
+				}
+				if (accid != dstates[rindex][diatonic]) {
+					// accidental is different from the previous state so should be
+					// printed
+					infile[i].token(j)->setValue("auto", to_string(k),
+							"visualAccidental", "true");
+					if (dstates[rindex][diatonic] < -900) {
+						// this is an obligatory cautionary accidental
+						// or at least half the time it is (figure that out later)
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"obligatoryAccidental", "true");
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"cautionaryAccidental", "true");
+					}
+					dstates[rindex][diatonic] = accid;
+				} else if ((accid == 0) && (subtok.find("n") != string::npos)) {
+					infile[i].token(j)->setValue("auto", to_string(k),
+							"cautionaryAccidental", "true");
+				} else if (subtok.find("XX") == string::npos) {
+					// The accidental is not necessary. See if there is a single "X"
+					// immediately after the accidental which means to force it to
+					// display.
+					loc = subtok.find("X");
+					if ((loc != string::npos) && (loc > 0)) {
+						if (subtok[loc-1] == '#') {
+							infile[i].token(j)->setValue("auto", to_string(k),
+									"cautionaryAccidental", "true");
+									infile[i].token(j)->setValue("auto", to_string(k), 
+											"visualAccidental", "true");
+						} else if (subtok[loc-1] == '-') {
+							infile[i].token(j)->setValue("auto", to_string(k),
+									"cautionaryAccidental", "true");
+									infile[i].token(j)->setValue("auto", to_string(k), 
+											"visualAccidental", "true");
+						} else if (subtok[loc-1] == 'n') {
+							infile[i].token(j)->setValue("auto", to_string(k),
+									"cautionaryAccidental", "true");
+									infile[i].token(j)->setValue("auto", to_string(k), 
+											"visualAccidental", "true");
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Indicate that the accidental analysis has been done:
+	infile.setValue("auto", "accidentalAnalysis", "true");
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::fillKeySignature -- Read key signature notes and
+//    assign +1 to sharps, -1 to flats in the diatonic input array.  Used
+//    only by HumdrumFileContent::analyzeKernAccidentals().
+//
+
+void HumdrumFileContent::fillKeySignature(vector<int>& states,
+		const string& keysig) {
+	std::fill(states.begin(), states.end(), 0);
+	if (keysig.find("f#") != string::npos) { states[3] = 1; }
+	if (keysig.find("c#") != string::npos) { states[0] = 1; }
+	if (keysig.find("g#") != string::npos) { states[4] = 1; }
+	if (keysig.find("d#") != string::npos) { states[1] = 1; }
+	if (keysig.find("a#") != string::npos) { states[5] = 1; }
+	if (keysig.find("e#") != string::npos) { states[2] = 1; }
+	if (keysig.find("b#") != string::npos) { states[6] = 1; }
+	if (keysig.find("b-") != string::npos) { states[6] = 1; }
+	if (keysig.find("e-") != string::npos) { states[2] = 1; }
+	if (keysig.find("a-") != string::npos) { states[5] = 1; }
+	if (keysig.find("d-") != string::npos) { states[1] = 1; }
+	if (keysig.find("g-") != string::npos) { states[4] = 1; }
+	if (keysig.find("c-") != string::npos) { states[0] = 1; }
+	if (keysig.find("f-") != string::npos) { states[3] = 1; }
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::resetDiatonicStatesWithKeySignature -- Only used in
+//     HumdrumFileContent::analyzeKernAccidentals().  Resets the accidental
+//     states for notes
+//
+
+void HumdrumFileContent::resetDiatonicStatesWithKeySignature(vector<int>&
+		states, vector<int>& signature) {
+	for (int i=0; i<(int)states.size(); i++) {
+		states[i] = signature[i % 7];
+	}
 }
 
 
@@ -6456,6 +6749,18 @@ void HumdrumLine::setOwner(void* hfile) {
 
 //////////////////////////////
 //
+// HumdrumLine::getOwner -- Return the HumdrumFile which manages
+//   (owns) this line.
+//
+
+HumdrumFile* HumdrumLine::getOwner(void) {
+	return (HumdrumFile*)owner;
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumLine::setParameters -- Takes a global comment with
 //     the structure:
 //        !!NS1:NS2:key1=value1:key2=value2:key3=value3
@@ -6702,7 +7007,7 @@ const string& HumdrumToken::getDataType(void) const {
 //
 // HumdrumToken::isDataType -- Returns true if the data type of the token
 //   matches the test data type.
-// @SEEALSO: getDataType
+// @SEEALSO: getDataType getKern
 //
 
 bool HumdrumToken::isDataType(string dtype) const {
@@ -6711,6 +7016,19 @@ bool HumdrumToken::isDataType(string dtype) const {
 	} else {
 		return getDataType().compare(2, string::npos, dtype) == 0;
 	}
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isKern -- Returns true if the data type of the token
+//    is **kern.
+// @SEEALSO: isDataType
+//
+
+bool HumdrumToken::isKern(void) const {
+	return isDataType("**kern");
 }
 
 
@@ -7152,6 +7470,33 @@ bool HumdrumToken::isNote(void) const {
 
 //////////////////////////////
 //
+// HumdrumToken::isInvisible -- True if a barline and is invisible (contains
+//     a "-" styling), or a note/rest contains the string "yy" which is
+//     interpreted as meaning make it invisible.
+// 
+// 
+
+bool HumdrumToken::isInvisible(void) const {
+	if (!isDataType("**kern")) {
+			return false;
+	}
+	if (isBarline()) {
+		if (find("-") != string::npos) {
+			return true;
+		}
+	} else if (isData()) {
+		if (find("yy") != string::npos) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
 // HumdrumToken::hasSlurStart -- Returns true if the **kern token has 
 //     a '(' character.
 //
@@ -7182,6 +7527,65 @@ bool HumdrumToken::hasSlurEnd(void) const {
 	return false;
 }
 
+
+
+//////////////////////////////
+//
+// HumdrumToken::hasVisibleAccidental -- Returns true if the accidental
+//    of a **kern note is viewable if rendered to graphical notation.
+// 	return values:
+//      0  = false;
+//      1  = true;
+//      -1 = undefined;
+//
+
+int HumdrumToken::hasVisibleAccidental(int subtokenIndex) const {
+	HumdrumLine* humrec = getOwner();
+	if (humrec == NULL) {
+		return -1;
+	}
+	HumdrumFile* humfile = humrec->getOwner();
+	if (humfile == NULL) {
+		return -1;
+	}
+	if (!humfile->getValueBool("auto", "accidentalAnalysis")) {
+		int status = humfile->analyzeKernAccidentals();
+		if (!status) {
+			return -1;
+		}
+	}
+	return getValueBool("auto", to_string(subtokenIndex), "visualAccidental");
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::hasVisibleAccidental -- Returns true if the accidental
+//    of a **kern note is viewable if rendered to graphical notation.
+// 	return values:
+//      0  = false;
+//      1  = true;
+//      -1 = undefined;
+//
+
+int HumdrumToken::hasCautionaryAccidental(int subtokenIndex) const {
+	HumdrumLine* humrec = getOwner();
+	if (humrec == NULL) {
+		return -1;
+	}
+	HumdrumFile* humfile = humrec->getOwner();
+	if (humfile == NULL) {
+		return -1;
+	}
+	if (!humfile->getValueBool("auto", "accidentalAnalysis")) {
+		int status = humfile->analyzeKernAccidentals();
+		if (!status) {
+			return -1;
+		}
+	}
+	return getValueBool("auto", to_string(subtokenIndex), "cautionaryAccidental");
+}
 
 
 
@@ -7440,7 +7844,7 @@ int HumdrumToken::getSubtokenCount(const string& separator) const {
 		count++;
 		start += separator.size();
 	}
-	return count;
+	return count+1;
 }
 
 
@@ -7874,7 +8278,7 @@ ostream& HumdrumToken::printXmlContentInfo(ostream& out, int level,
 
 ostream& HumdrumToken::printXmlParameterInfo(ostream& out, int level,
 		const string& indent) {
-	((HumHash)(*this)).printXml(out, level, indent);
+	((HumHash*)this)->printXml(out, level, indent);
 	return out;
 }
 

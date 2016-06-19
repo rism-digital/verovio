@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun 15 20:04:14 PDT 2016
+// Last Modified: Sat Jun 18 21:01:45 PDT 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -439,6 +439,7 @@ class HumdrumLine : public string, public HumHash {
 		void     createLineFromTokens   (void);
 		int      getLineIndex           (void) const;
 		int      getLineNumber          (void) const;
+		HumdrumFile* getOwner           (void);
 
 		HumNum   getDuration            (void) const;
 		HumNum   getDurationFromStart   (void) const;
@@ -583,9 +584,12 @@ class HumdrumToken : public string, public HumHash {
 		bool     isRest                    (void) const;
 		bool     isNote                    (void) const;
 		bool     isSecondaryTiedNote       (void) const;
+		bool     isInvisible               (void) const;
 
 		bool     hasSlurStart              (void) const;
 		bool     hasSlurEnd                (void) const;
+		int      hasVisibleAccidental      (int subtokenIndex) const;
+		int      hasCautionaryAccidental   (int subtokenIndex) const;
 
 		HumNum   getDuration               (void) const;
 		HumNum   getDuration               (HumNum scale) const;
@@ -609,6 +613,7 @@ class HumdrumToken : public string, public HumHash {
 		int      getTokenIndex (void) const { return getFieldIndex(); }
 		const string& getDataType          (void) const;
 		bool     isDataType                (string dtype) const;
+		bool     isKern                    (void) const;
 		string   getSpineInfo              (void) const;
 		int      getTrack                  (void) const;
 		int      getSubtrack               (void) const;
@@ -791,7 +796,7 @@ class TokenPair {
 bool sortTokenPairsByLineIndex(const TokenPair& a, const TokenPair& b);
 
 
-class HumdrumFileBase {
+class HumdrumFileBase : public HumHash {
 	public:
 		              HumdrumFileBase              (void);
                     HumdrumFileBase              (const string& contents);
@@ -1126,10 +1131,15 @@ class HumdrumFileContent : public HumdrumFileStructure {
 
 		bool   analyzeKernSlurs           (void);
 		bool   analyzeKernTies            (void);
+		bool   analyzeKernAccidentals     (void);
 
 	protected:
 		bool   analyzeKernSlurs           (HumdrumToken* spinestart);
 		bool   analyzeKernTies            (HumdrumToken* spinestart);
+		void   fillKeySignature           (vector<int>& states,
+		                                   const string& keysig);
+		void   resetDiatonicStatesWithKeySignature(vector<int>& states,
+				                             vector<int>& signature);
 };
 
 
@@ -1147,6 +1157,8 @@ class HumdrumFile : public HUMDRUMFILE_PARENT {
 
 		ostream&      printXml            (ostream& out = cout, int level = 0,
 		                                   const string& indent = "\t");
+		ostream&      printXmlParameterInfo(ostream& out, int level,
+		                                  const string& indent);
 };
 
 
