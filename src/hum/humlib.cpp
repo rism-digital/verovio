@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jun 18 22:22:17 PDT 2016
+// Last Modified: Mon Jun 20 07:33:45 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -887,7 +887,7 @@ vector<string> HumHash::getKeys(const string& ns) const {
 	if (parameters == NULL) {
 		return output;
 	}
-	int loc = ns.find(":");
+	int loc = (int)ns.find(":");
 	if (loc != string::npos) {
 		string ns1 = ns.substr(0, loc);
 		string ns2 = ns.substr(loc+1);
@@ -954,7 +954,7 @@ bool HumHash::hasParameters(const string& ns) const {
 	if (parameters == NULL) {
 		return false;
 	}
-	int loc = ns.find(":");
+	int loc = (int)ns.find(":");
 	if (loc != string::npos) {
 		string ns1 = ns.substr(0, loc);
 		string ns2 = ns.substr(loc+1);
@@ -1017,7 +1017,7 @@ int HumHash::getParameterCount(const string& ns1, const string& ns2) const {
 	if (it2 == it1->second.end()) {
 		return 0;
 	}
-	return it2->second.size();
+	return (int)it2->second.size();
 }
 
 
@@ -1025,7 +1025,7 @@ int HumHash::getParameterCount(const string& ns) const {
 	if (parameters == NULL) {
 		return false;
 	}
-	int loc = ns.find(":");
+	int loc = (int)ns.find(":");
 	if (loc != string::npos) {
 		string ns1 = ns.substr(0, loc);
 		string ns2 = ns.substr(loc+1);
@@ -2450,11 +2450,11 @@ string HumdrumFileBase::getXmlIdPrefix(void) {
 
 HumdrumLine& HumdrumFileBase::operator[](int index) {
 	if (index < 0) {
-		index = lines.size() - index;
+		index = (int)lines.size() - index;
 	}
 	if ((index < 0) || (index >= lines.size())) {
 		cerr << "Error: invalid index: " << index << endl;
-		index = lines.size()-1;
+		index = (int)lines.size()-1;
 	}
 	return *lines[index];
 }
@@ -2778,7 +2778,7 @@ void HumdrumFileBase::append(const string& line) {
 //
 
 int HumdrumFileBase::getLineCount(void) const {
-	return lines.size();
+	return (int)lines.size();
 }
 
 
@@ -2804,7 +2804,7 @@ HTp HumdrumFileBase::token(int lineindex, int fieldindex) {
 //
 
 int HumdrumFileBase::getMaxTrack(void) const {
-	return trackstarts.size() - 1;
+	return (int)trackstarts.size() - 1;
 }
 
 
@@ -3120,15 +3120,15 @@ HTp HumdrumFileBase::getTrackStart(int track) const {
 
 int HumdrumFileBase::getTrackEndCount(int track) const {
 	if (track < 0) {
-		track += trackends.size();
+		track += (int)trackends.size();
 	}
 	if (track < 0) {
 		return 0;
 	}
-	if (track >= trackends.size()) {
+	if (track >= (int)trackends.size()) {
 		return 0;
 	}
-	return trackends[track].size();
+	return (int)trackends[track].size();
 }
 
 
@@ -3142,21 +3142,21 @@ int HumdrumFileBase::getTrackEndCount(int track) const {
 
 HTp HumdrumFileBase::getTrackEnd(int track, int subtrack) const {
 	if (track < 0) {
-		track += trackends.size();
+		track += (int)trackends.size();
 	}
 	if (track < 0) {
 		return NULL;
 	}
-	if (track >= trackends.size()) {
+	if (track >= (int)trackends.size()) {
 		return NULL;
 	}
 	if (subtrack < 0) {
-		subtrack += trackends[track].size();
+		subtrack += (int)trackends[track].size();
 	}
 	if (subtrack < 0) {
 		return NULL;
 	}
-	if (subtrack >= trackends[track].size()) {
+	if (subtrack >= (int)trackends[track].size()) {
 		return NULL;
 	}
 	return trackends[track][subtrack];
@@ -3567,8 +3567,8 @@ string HumdrumFileBase::getMergedSpineInfo(vector<string>& info, int starti,
 	int len1;
 	int len2;
 	if (extra == 1) {
-		len1 = info[starti].size();
-		len2 = info[starti+1].size();
+		len1 = (int)info[starti].size();
+		len2 = (int)info[starti+1].size();
 		if (len1 == len2) {
 			if (info[starti].substr(0, len1-1) ==
 					info[starti+1].substr(0,len2-1)) {
@@ -3791,7 +3791,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 		track = ktracks[i]->getTrack();
 		rtracks[track] = i;
 	}
-	int kcount = ktracks.size();
+	int kcount = (int)ktracks.size();
 
 	// keysigs == key signature spellings of diatonic pitch classes.  This array
 	// is duplicated into dstates after each barline.
@@ -3923,7 +3923,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					// The accidental is not necessary. See if there is a single "X"
 					// immediately after the accidental which means to force it to
 					// display.
-					loc = subtok.find("X");
+					loc = (int)subtok.find("X");
 					if ((loc != string::npos) && (loc > 0)) {
 						if (subtok[loc-1] == '#') {
 							infile[i].token(j)->setValue("auto", to_string(k),
@@ -3965,20 +3965,20 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 void HumdrumFileContent::fillKeySignature(vector<int>& states,
 		const string& keysig) {
 	std::fill(states.begin(), states.end(), 0);
-	if (keysig.find("f#") != string::npos) { states[3] = 1; }
-	if (keysig.find("c#") != string::npos) { states[0] = 1; }
-	if (keysig.find("g#") != string::npos) { states[4] = 1; }
-	if (keysig.find("d#") != string::npos) { states[1] = 1; }
-	if (keysig.find("a#") != string::npos) { states[5] = 1; }
-	if (keysig.find("e#") != string::npos) { states[2] = 1; }
-	if (keysig.find("b#") != string::npos) { states[6] = 1; }
-	if (keysig.find("b-") != string::npos) { states[6] = 1; }
-	if (keysig.find("e-") != string::npos) { states[2] = 1; }
-	if (keysig.find("a-") != string::npos) { states[5] = 1; }
-	if (keysig.find("d-") != string::npos) { states[1] = 1; }
-	if (keysig.find("g-") != string::npos) { states[4] = 1; }
-	if (keysig.find("c-") != string::npos) { states[0] = 1; }
-	if (keysig.find("f-") != string::npos) { states[3] = 1; }
+	if (keysig.find("f#") != string::npos) { states[3] = +1; }
+	if (keysig.find("c#") != string::npos) { states[0] = +1; }
+	if (keysig.find("g#") != string::npos) { states[4] = +1; }
+	if (keysig.find("d#") != string::npos) { states[1] = +1; }
+	if (keysig.find("a#") != string::npos) { states[5] = +1; }
+	if (keysig.find("e#") != string::npos) { states[2] = +1; }
+	if (keysig.find("b#") != string::npos) { states[6] = +1; }
+	if (keysig.find("b-") != string::npos) { states[6] = -1; }
+	if (keysig.find("e-") != string::npos) { states[2] = -1; }
+	if (keysig.find("a-") != string::npos) { states[5] = -1; }
+	if (keysig.find("d-") != string::npos) { states[1] = -1; }
+	if (keysig.find("g-") != string::npos) { states[4] = -1; }
+	if (keysig.find("c-") != string::npos) { states[0] = -1; }
+	if (keysig.find("f-") != string::npos) { states[3] = -1; }
 }
 
 
@@ -4526,7 +4526,7 @@ HumdrumLine* HumdrumFileStructure::getBarline(int index) const {
 //
 
 int HumdrumFileStructure::getBarlineCount(void) const {
-	return barlines.size();
+	return (int)barlines.size();
 }
 
 
@@ -5158,7 +5158,7 @@ bool HumdrumFileStructure::analyzeNullLineRhythms(void) {
 		startdur = previous->getDurationFromStart();
 		enddur   = next ->getDurationFromStart();
 		HumNum gapdur = enddur - startdur;
-		HumNum nulldur = gapdur / (nulllines.size() + 1);
+		HumNum nulldur = gapdur / ((int)nulllines.size() + 1);
 		for (j=0; j<(int)nulllines.size(); j++) {
 			nulllines[j]->setDurationFromStart(startdur + (nulldur * (j+1)));
 		}
@@ -5182,7 +5182,7 @@ void HumdrumFileStructure::fillInNegativeStartTimes(void) {
 	int i;
 	HumNum lastdur = -1;
 	HumNum dur;
-	for (i=lines.size()-1; i>=0; i--) {
+	for (i=(int)lines.size()-1; i>=0; i--) {
 		dur = lines[i]->getDurationFromStart();
 		if (dur.isNegative() && lastdur.isNonNegative()) {
 			lines[i]->setDurationFromStart(lastdur);
@@ -5317,23 +5317,23 @@ void HumdrumFileStructure::checkForLocalParameters(HumdrumToken *token,
 	if (token->size() < 1) {
 		return;
 	}
-	int loc1 = token->find(":");
-	if (loc1 == string::npos) {
+	int loc1 = (int)token->find(":");
+	if (loc1 == (int)string::npos) {
 		return;
 	}
-	int loc2 = token->substr(loc1).find(":");
-	if (loc2 == string::npos) {
+	int loc2 = (int)token->substr(loc1).find(":");
+	if (loc2 == (int)string::npos) {
 		return;
 	}
 	loc2 += loc1 + 1;
-	int sloc = token->find(" ");
-	if (sloc != string::npos) {
+	int sloc = (int)token->find(" ");
+	if (sloc != (int)string::npos) {
 		if ((sloc < loc1) || (sloc < loc2)) {
 			return;
 		}
 	}
-	sloc = token->find("\t");
-	if (sloc != string::npos) {
+	sloc = (int)token->find("\t");
+	if (sloc != (int)string::npos) {
 		if ((sloc < loc1) || (sloc < loc2)) {
 			return;
 		}
@@ -5405,7 +5405,7 @@ void HumdrumFileStructure::analyzeSpineStrands(vector<TokenPair>& ends,
 		HumdrumToken* starttok) {
 
 	ends.resize(ends.size()+1);
-	int index = ends.size()-1;
+	int index = (int)ends.size()-1;
 	ends[index].first = starttok;
 	HumdrumToken* tok = starttok;
 	while (tok != NULL) {
@@ -5692,16 +5692,16 @@ bool HumdrumLine::isReference(void) const {
 	if ((*this)[3] == '!') {
 		return false;
 	}
-	int spaceloc = this->find(" ");
-	int tabloc = this->find("\t");
-	int colloc = this->find(":");
-	if (colloc == string::npos) {
+	int spaceloc = (int)this->find(" ");
+	int tabloc = (int)this->find("\t");
+	int colloc = (int)this->find(":");
+	if (colloc == (int)string::npos) {
 		return false;
 	}
-	if ((spaceloc != string::npos) && (spaceloc < colloc)) {
+	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
 		return false;
 	}
-	if ((tabloc != string::npos) && (tabloc < colloc)) {
+	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
 		return false;
 	}
 	return true;
@@ -5725,16 +5725,16 @@ string HumdrumLine::getReferenceKey(void) const {
 	if ((*this)[3] == '!') {
 		return "";
 	}
-	int spaceloc = this->find(" ");
-	int tabloc = this->find("\t");
-	int colloc = this->find(":");
-	if (colloc == string::npos) {
+	int spaceloc = (int)this->find(" ");
+	int tabloc = (int)this->find("\t");
+	int colloc = (int)this->find(":");
+	if (colloc == (int)string::npos) {
 		return "";
 	}
-	if ((spaceloc != string::npos) && (spaceloc < colloc)) {
+	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
 		return "";
 	}
-	if ((tabloc != string::npos) && (tabloc < colloc)) {
+	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
 		return "";
 	}
 	return this->substr(3, colloc - 3);
@@ -5758,16 +5758,16 @@ string HumdrumLine::getReferenceValue(void) const {
 	if ((*this)[3] == '!') {
 		return "";
 	}
-	int spaceloc = this->find(" ");
-	int tabloc = this->find("\t");
-	int colloc = this->find(":");
-	if (colloc == string::npos) {
+	int spaceloc = (int)this->find(" ");
+	int tabloc = (int)this->find("\t");
+	int colloc = (int)this->find(":");
+	if (colloc == (int)string::npos) {
 		return "";
 	}
-	if ((spaceloc != string::npos) && (spaceloc < colloc)) {
+	if ((spaceloc != (int)string::npos) && (spaceloc < colloc)) {
 		return "";
 	}
-	if ((tabloc != string::npos) && (tabloc < colloc)) {
+	if ((tabloc != (int)string::npos) && (tabloc < colloc)) {
 		return "";
 	}
 	return Convert::trimWhiteSpace(this->substr(colloc+1));
@@ -6157,11 +6157,7 @@ void HumdrumLine::setDuration(HumNum aDur) {
 //
 
 bool HumdrumLine::hasSpines(void) const {
-	if (isEmpty() || isCommentGlobal()) {
-		return false;
-	} else {
-		return true;
-	}
+	return (isEmpty() || isCommentGlobal()) ? false : true;
 }
 
 
@@ -6207,11 +6203,7 @@ bool HumdrumLine::isManipulator(void) const {
 //
 
 bool HumdrumLine::isEmpty(void) const {
-	if (size() == 0) {
-		return true;
-	} else {
-		return false;
-	}
+	return (size() == 0) ? true : false;
 }
 
 
@@ -6223,7 +6215,7 @@ bool HumdrumLine::isEmpty(void) const {
 //
 
 int HumdrumLine::getTokenCount(void) const {
-	return tokens.size();
+	return (int)tokens.size();
 }
 
 
@@ -6277,7 +6269,7 @@ int HumdrumLine::createTokensFromLine(void) {
 		}
 	}
 	tokens.push_back(token);
-	return tokens.size();
+	return (int)tokens.size();
 }
 
 
@@ -6791,8 +6783,8 @@ void HumdrumLine::setParameters(const string& pdata) {
 	int loc;
 	for (int i=2; i<pieces.size(); i++) {
 		Convert::replaceOccurrences(pieces[i], "&colon;", ":");
-		loc = pieces[i].find("=");
-		if (loc != string::npos) {
+		loc = (int)pieces[i].find("=");
+		if (loc != (int)string::npos) {
 			key   = pieces[i].substr(0, loc);
 			value = pieces[i].substr(loc+1, pieces[i].size());
 		} else {
@@ -6901,7 +6893,7 @@ bool HumdrumToken::equalChar(int index, char ch) const {
 //
 
 int HumdrumToken::getPreviousNonNullDataTokenCount(void) {
-	return previousNonNullTokens.size();
+	return (int)previousNonNullTokens.size();
 }
 
 
@@ -6916,12 +6908,12 @@ int HumdrumToken::getPreviousNonNullDataTokenCount(void) {
 
 HumdrumToken* HumdrumToken::getPreviousNonNullDataToken(int index) {
 	if (index < 0) {
-		index += previousNonNullTokens.size();
+		index += (int)previousNonNullTokens.size();
 	}
 	if (index < 0) {
 		return NULL;
 	}
-	if (index >= previousNonNullTokens.size()) {
+	if (index >= (int)previousNonNullTokens.size()) {
 		return NULL;
 	}
 	return previousNonNullTokens[index];
@@ -6936,7 +6928,7 @@ HumdrumToken* HumdrumToken::getPreviousNonNullDataToken(int index) {
 //
 
 int HumdrumToken::getNextNonNullDataTokenCount(void) {
-	return nextNonNullTokens.size();
+	return (int)nextNonNullTokens.size();
 }
 
 
@@ -7868,7 +7860,7 @@ string HumdrumToken::getSubtoken(int index, const string& separator) const {
 	int count = 0;
 	int start = 0;
 	int end   = 0;
-	while ((end = string::find(separator, start)) != string::npos) {
+	while ((end = (int)string::find(separator, start)) != (int)string::npos) {
 		count++;
 		if (count == index) {
 			return string::substr(start, end-start);
@@ -7915,8 +7907,8 @@ void HumdrumToken::setParameters(const string& pdata, HumdrumToken* ptok) {
 	int loc;
 	for (int i=2; i<pieces.size(); i++) {
 		Convert::replaceOccurrences(pieces[i], "&colon;", ":");
-		loc = pieces[i].find("=");
-		if (loc != string::npos) {
+		loc = (int)pieces[i].find("=");
+		if (loc != (int)string::npos) {
 			key   = pieces[i].substr(0, loc);
 			value = pieces[i].substr(loc+1, pieces[i].size());
 		} else {
@@ -8073,7 +8065,7 @@ void HumdrumToken::incrementState(void) {
 //
 
 int HumdrumToken::getNextTokenCount(void) const {
-	return nextTokens.size();
+	return (int)nextTokens.size();
 }
 
 
@@ -8088,7 +8080,7 @@ int HumdrumToken::getNextTokenCount(void) const {
 //
 
 int HumdrumToken::getPreviousTokenCount(void) const {
-	return previousTokens.size();
+	return (int)previousTokens.size();
 }
 
 
@@ -8101,8 +8093,8 @@ int HumdrumToken::getPreviousTokenCount(void) const {
 
 ostream& HumdrumToken::printCsv(ostream& out) {
 	string& value = *this;
-	int loc = this->find(",");
-	if (loc == string::npos) {
+	int loc = (int)this->find(",");
+	if (loc == (int)string::npos) {
 		out << value;
 	} else {
 		out << '"';
@@ -8503,7 +8495,7 @@ bool Convert::hasKernSlurEnd(const string& kerndata) {
 int Convert::getKernSlurStartElisionLevel(const string& kerndata) { 
 	bool foundSlurStart = false;
 	int output = 0;
-	for (int i=kerndata.size()-1; i >=0; i--) {
+	for (int i=(int)kerndata.size()-1; i >=0; i--) {
 		char ch = kerndata[i];
 		if (ch == '(') {
 			foundSlurStart = true;
@@ -8537,7 +8529,7 @@ int Convert::getKernSlurStartElisionLevel(const string& kerndata) {
 int Convert::getKernSlurEndElisionLevel(const string& kerndata) { 
 	bool foundSlurEnd = false;
 	int output = 0;
-	for (int i=kerndata.size()-1; i >=0; i--) {
+	for (int i=(int)kerndata.size()-1; i >=0; i--) {
 		char ch = kerndata[i];
 		if (ch == ')') {
 			foundSlurEnd = true;
@@ -9042,7 +9034,7 @@ HumNum Convert::recipToDuration(const string& recip, HumNum scale,
 			denominator = denominator * 10 + (subtok[numi++] - '0');
 		}
 		if ((loc + 1 < subtok.size()) && isdigit(subtok[loc+1])) {
-			int xi = loc + 1;
+			int xi = (int)loc + 1;
 			numerator = subtok[xi++] - '0';
 			while ((xi < subtok.size()) && isdigit(subtok[xi])) {
 				numerator = numerator * 10 + (subtok[xi++] - '0');
@@ -9110,9 +9102,9 @@ HumNum Convert::recipToDurationNoDots(const string& recip, HumNum scale,
 
 void Convert::replaceOccurrences(string& source, const string& search,
 		const string& replace) {
-	for (int loc=0; ; loc += replace.size()) {
-		loc = source.find(search, loc);
-		if (loc == string::npos) {
+	for (int loc=0; ; loc += (int)replace.size()) {
+		loc = (int)source.find(search, loc);
+		if (loc == (int)string::npos) {
 			break;
 		}
 		source.erase(loc, search.length());

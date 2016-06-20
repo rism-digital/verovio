@@ -388,7 +388,7 @@ void HumdrumInput::prepareTimeSigDur(void)
         sigdurs[i] = curdur;
     }
 
-    for (i = sigdurs.size() - 2; i >= 0; i--) {
+    for (i = (int)sigdurs.size() - 2; i >= 0; i--) {
         if (infile[i].getDuration() == 0) {
             sigdurs[i] = sigdurs[i + 1];
         }
@@ -420,7 +420,6 @@ void HumdrumInput::calculateReverseKernIndex(void)
 
 void HumdrumInput::prepareStaffGroup(void)
 {
-    HumdrumFile &infile = m_infile;
     const vector<HTp> &kernstarts = m_kernstarts;
 
     m_staffgroup = new StaffGrp();
@@ -650,8 +649,6 @@ void HumdrumInput::setClef(StaffDef *part, const string &clef)
 
 bool HumdrumInput::convertSystemMeasure(int &line)
 {
-    HumdrumFile &infile = m_infile;
-    const vector<HTp> &kernstarts = m_kernstarts;
     int startline = line;
     int endline = getMeasureEndLine(startline);
     if (endline < 0) {
@@ -688,7 +685,7 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
     lt.clear();
     lt.resize(kernstarts.size());
 
-    int i, j, k;
+    int i, j;
     for (i = 0; i < (int)kernstarts.size(); i++) {
         lt[i].clear();
     }
@@ -737,7 +734,6 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
 
 bool HumdrumInput::convertMeasureStaves(int startline, int endline)
 {
-    HumdrumFile &infile = m_infile;
     const vector<HTp> &kernstarts = m_kernstarts;
 
     vector<int> layers = getStaffLayerCounts();
@@ -785,7 +781,6 @@ bool HumdrumInput::convertMeasureStaff(int track, int startline, int endline, in
 
 bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int layerindex)
 {
-    HumdrumFile &infile = m_infile;
     m_layer = new Layer();
     m_currentlayer = layerindex + 1;
     m_layer->SetN(layerindex + 1);
@@ -876,6 +871,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         std::fill(beamstate.begin(), beamstate.end(), 0);
     }
 
+	/*
     if (1 == 0) {
         cout << "BEAMSTATE: ";
         for (i = 0; i < (int)beamstate.size(); i++) {
@@ -883,6 +879,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         cout << endl;
     }
+	*/
 
     Layer *&layer = m_layer;
     Beam *beam = NULL;
@@ -1200,11 +1197,11 @@ void HumdrumInput::printMeasureTokens(void)
     vector<vector<vector<hum::HTp> > > &lt = m_layertokens;
     int i, j, k;
     cerr << endl;
-    for (i = 0; i < lt.size(); i++) {
+    for (i = 0; i < (int)lt.size(); i++) {
         cerr << "STAFF " << i + 1 << "\t";
-        for (j = 0; j < lt[i].size(); j++) {
+        for (j = 0; j < (int)lt[i].size(); j++) {
             cerr << "LAYER " << j + 1 << ":\t";
-            for (k = 0; k < lt[i][j].size(); k++) {
+            for (k = 0; k < (int)lt[i][j].size(); k++) {
                 cout << " " << *lt[i][j][k];
             }
             cerr << endl;
@@ -1245,9 +1242,9 @@ vector<int> HumdrumInput::getStaffLayerCounts(void)
     vector<vector<vector<hum::HTp> > > &lt = m_layertokens;
     vector<int> output(lt.size(), 0);
 
-    int i, j;
+    int i;
     for (i = 0; i < (int)lt.size(); i++) {
-        output[i] = lt[i].size();
+        output[i] = (int)lt[i].size();
     }
 
     return output;
@@ -1260,11 +1257,10 @@ vector<int> HumdrumInput::getStaffLayerCounts(void)
 
 void HumdrumInput::setupSystemMeasure(int startline, int endline)
 {
-    HumdrumFile &infile = m_infile;
-
     m_measure = new Measure();
     m_system->AddMeasure(m_measure);
 
+	/*
     if (1 == 0) {
         string comment = "startline: ";
         comment += to_string(startline);
@@ -1272,6 +1268,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         comment += to_string(endline);
         m_measure->SetComment(comment);
     }
+	*/
 
     int measurenumber = getMeasureNumber(startline, endline);
     if (measurenumber >= 0) {
@@ -1307,7 +1304,6 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
 {
     HumdrumFile &infile = m_infile;
-    const vector<HTp> &kernstarts = m_kernstarts;
 
     string endbar = infile[endline].getTokenString(0);
     string startbar = infile[startline].getTokenString(0);
