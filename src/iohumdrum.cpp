@@ -191,6 +191,8 @@ namespace humaux {
         insertTieIntoDom();
     }
 
+    bool HumdrumTie::isInserted(void) { return m_inserted; }
+
     int HumdrumTie::getPitch(void) { return m_pitch; }
 
     int HumdrumTie::getLayer(void) { return m_layer; }
@@ -327,9 +329,6 @@ bool HumdrumInput::convertHumdrum(void)
     calculateReverseKernIndex();
 
     m_ties.resize(kernstarts.size());
-    for (int i = 0; i < m_ties.size(); i++) {
-        m_ties[i].reserve(32);
-    }
 
     prepareStaffGroup();
 
@@ -871,15 +870,15 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         std::fill(beamstate.begin(), beamstate.end(), 0);
     }
 
-	/*
-    if (1 == 0) {
-        cout << "BEAMSTATE: ";
-        for (i = 0; i < (int)beamstate.size(); i++) {
-            cout << beamstate[i] << " ";
-        }
-        cout << endl;
+    /*
+if (1 == 0) {
+    cout << "BEAMSTATE: ";
+    for (i = 0; i < (int)beamstate.size(); i++) {
+        cout << beamstate[i] << " ";
     }
-	*/
+    cout << endl;
+}
+    */
 
     Layer *&layer = m_layer;
     Beam *beam = NULL;
@@ -1102,14 +1101,10 @@ void HumdrumInput::processTieStart(Note *note, HTp token, const string &tstring)
     int rtrack = m_rkern[track];
     string noteuuid = note->GetUuid();
     int cl = m_currentlayer;
-    humaux::HumdrumTie ht;
     int pitch = Convert::kernToMidiNoteNumber(tstring);
 
-    m_ties[rtrack].resize(m_ties[rtrack].size() + 1);
-
+    m_ties[rtrack].emplace_back();
     m_ties[rtrack].back().setStart(noteuuid, m_measure, cl, tstring, pitch, timestamp, endtime);
-    void setStart(const string &id, Measure *starting, const string &token, int pitch, hum::HumNum starttime,
-        hum::HumNum endtime);
 }
 
 //////////////////////////////
@@ -1121,55 +1116,54 @@ void HumdrumInput::processTieEnd(Note *note, HTp token, const string &tstring)
 {
     HumNum timestamp = token->getDurationFromStart();
     int track = token->getTrack();
-    int rtrack = m_rkern[track];
+    int staffnum = m_rkern[track];
     string noteuuid = note->GetUuid();
 
     int pitch = Convert::kernToMidiNoteNumber(tstring);
-    int cl = m_currentlayer;
-    int layer;
-    int tpitch;
-    int i;
-    int found = -1;
+    int layer = m_currentlayer;
+    auto found = m_ties[staffnum].end();
     HumNum tstamp;
 
     // search for open tie in current layer
-    for (i = 0; i < (int)m_ties[rtrack].size(); i++) {
-        layer = m_ties[rtrack][i].getLayer();
-        if (cl != layer) {
+    for (auto it = m_ties[staffnum].begin(); it != m_ties[staffnum].end(); it++) {
+        if (it->getLayer() != layer) {
             continue;
         }
-        tpitch = m_ties[rtrack][i].getPitch();
-        if (pitch != tpitch) {
+        if (it->getPitch() != pitch) {
             continue;
         }
-        tstamp = m_ties[rtrack][i].getEndTime();
-        if (tstamp == timestamp) {
-            found = i;
+        if (it->getEndTime() == timestamp) {
+            found = it;
             break;
         }
     }
 
     // search for open tie in current staff outside of current layer.
-    if (found < 0) {
-        for (i = 0; i < (int)m_ties[rtrack].size(); i++) {
-            tpitch = m_ties[rtrack][i].getPitch();
-            if (pitch != tpitch) {
+    if (found == m_ties[staffnum].end()) {
+        for (auto it = m_ties[staffnum].begin(); it != m_ties[staffnum].end(); it++) {
+            if (it->getPitch() != pitch) {
                 continue;
             }
-            tstamp = m_ties[rtrack][i].getEndTime();
-            if (tstamp == timestamp) {
-                found = i;
+            if (it->getEndTime() == timestamp) {
+                found = it;
                 break;
             }
         }
     }
 
-    if (found < 0) {
+    if (found == m_ties[staffnum].end()) {
         // can't find start of slur so give up.
         return;
     }
 
-    m_ties[rtrack][found].setEndAndInsert(noteuuid, m_measure, tstring);
+    found->setEndAndInsert(noteuuid, m_measure, tstring);
+    if (found->isInserted()) {
+        // Only deleting the finished tie if it was successful.  Undeleted
+        // ones can be checked later.  They are either encoding errors, or
+        // hanging ties, or arpeggiation ties (the latter should be encoded
+        // with [[, ]] rather than [, ]).
+        m_ties[staffnum].erase(found);
+    }
 }
 
 /////////////////////////////
@@ -1260,15 +1254,15 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     m_measure = new Measure();
     m_system->AddMeasure(m_measure);
 
-	/*
-    if (1 == 0) {
-        string comment = "startline: ";
-        comment += to_string(startline);
-        comment += ", endline: ";
-        comment += to_string(endline);
-        m_measure->SetComment(comment);
-    }
-	*/
+    /*
+if (1 == 0) {
+    string comment = "startline: ";
+    comment += to_string(startline);
+    comment += ", endline: ";
+    comment += to_string(endline);
+    m_measure->SetComment(comment);
+}
+    */
 
     int measurenumber = getMeasureNumber(startline, endline);
     if (measurenumber >= 0) {

@@ -62,6 +62,7 @@ namespace humaux {
         string getEndToken(void);
         int getPitch(void);
         int getLayer(void);
+        bool isInserted(void);
         void clear();
 
     private:
@@ -177,7 +178,7 @@ private:
     // dimensions:
     // 1: staff
     // 2: all open ties for the staff
-    vector<vector<humaux::HumdrumTie> > m_ties;
+    vector<std::list<humaux::HumdrumTie> > m_ties;
 };
 
 } // namespace vrv
