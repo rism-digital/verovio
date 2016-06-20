@@ -43,6 +43,7 @@
 #include "rest.h"
 #include "staff.h"
 #include "system.h"
+#include "tie.h"
 #include "vrv.h"
 
 //#include "attcomparison.h"
@@ -63,6 +64,153 @@ using namespace std;
 
 namespace vrv {
 
+//----------------------------------------------------------------------------
+// namespace for local IoHumdrum classes
+//----------------------------------------------------------------------------
+
+namespace humaux {
+
+    /////////////////////////////////////////////////////////////////////
+
+    HumdrumTie::HumdrumTie(void)
+    {
+        m_endmeasure = m_startmeasure = NULL;
+        m_inserted = false;
+        m_pitch = 0;
+        m_layer = -1;
+    }
+
+    HumdrumTie::HumdrumTie(const HumdrumTie &anothertie)
+    {
+        m_starttoken = anothertie.m_starttoken;
+        m_endtoken = anothertie.m_endtoken;
+        m_starttime = anothertie.m_starttime;
+        m_endtime = anothertie.m_endtime;
+        m_inserted = anothertie.m_inserted;
+        m_startid = anothertie.m_startid;
+        m_endid = anothertie.m_endid;
+        m_startmeasure = anothertie.m_startmeasure;
+        m_endmeasure = anothertie.m_endmeasure;
+        m_pitch = anothertie.m_pitch;
+        m_layer = anothertie.m_layer;
+    }
+
+    HumdrumTie::~HumdrumTie(void) { clear(); }
+
+    HumdrumTie &HumdrumTie::operator=(const HumdrumTie &anothertie)
+    {
+        if (this == &anothertie) {
+            return *this;
+        }
+        m_starttoken = anothertie.m_starttoken;
+        m_endtoken = anothertie.m_endtoken;
+        m_starttime = anothertie.m_starttime;
+        m_endtime = anothertie.m_endtime;
+        m_inserted = anothertie.m_inserted;
+        m_startid = anothertie.m_startid;
+        m_endid = anothertie.m_endid;
+        m_startmeasure = anothertie.m_startmeasure;
+        m_endmeasure = anothertie.m_endmeasure;
+        m_pitch = anothertie.m_pitch;
+        m_layer = anothertie.m_layer;
+        return *this;
+    }
+
+    void HumdrumTie::clear(void)
+    {
+        m_endmeasure = m_startmeasure = NULL;
+        m_inserted = false;
+        m_startid.clear();
+        m_endid.clear();
+    }
+
+    void HumdrumTie::insertTieIntoDom(void)
+    {
+        if (m_inserted) {
+            // don't insert again
+            return;
+        }
+        if ((m_startmeasure == NULL) && (m_endmeasure == NULL)) {
+            // What are you trying to do?
+            return;
+        }
+        if (m_startmeasure == NULL) {
+            // This is a tie with no start.  Don't know what to do with this
+            // for now (but is possible due to repeated music).
+            return;
+        }
+        if (m_endmeasure == NULL) {
+            // This is a tie with no end.  Don't know what to do with this for now
+            // (but is possible due to repeated music).
+            return;
+        }
+
+        vrv::Tie *tie = new vrv::Tie;
+        tie->SetStartid(m_startid);
+        tie->SetEndid(m_endid);
+
+        bool samemeasure = false;
+        if (m_startmeasure == m_endmeasure) {
+            samemeasure = true;
+        }
+
+        if (samemeasure) {
+            m_startmeasure->AddFloatingElement(tie);
+            m_inserted = true;
+        }
+        else {
+            // The tie starts in one measure and goes to another.
+            // Probably handled the same as when in the same measure.
+            m_startmeasure->AddFloatingElement(tie);
+            m_inserted = true;
+        }
+    }
+
+    void HumdrumTie::setStart(const string &id, Measure *starting, int layer, const string &token, int pitch,
+        HumNum starttime, HumNum endtime)
+    {
+        m_starttoken = token;
+        m_starttime = starttime;
+        m_endtime = endtime;
+        m_pitch = pitch;
+        m_layer = layer;
+        m_startmeasure = starting;
+        m_startid = id;
+    }
+
+    void HumdrumTie::setEnd(const string &id, Measure *ending, const string &token)
+    {
+        m_endtoken = token;
+        m_endmeasure = ending;
+        m_endid = id;
+    }
+
+    void HumdrumTie::setEndAndInsert(const string &id, Measure *ending, const string &token)
+    {
+        setEnd(id, ending, token);
+        insertTieIntoDom();
+    }
+
+    int HumdrumTie::getPitch(void) { return m_pitch; }
+
+    int HumdrumTie::getLayer(void) { return m_layer; }
+
+    HumNum HumdrumTie::getStartTime(void) { return m_starttime; }
+
+    HumNum HumdrumTie::getEndTime(void) { return m_endtime; }
+
+    HumNum HumdrumTie::getDuration(void) { return m_endtime - m_starttime; }
+
+    string HumdrumTie::getStartToken(void) { return m_starttoken; }
+
+    string HumdrumTie::getEndToken(void) { return m_endtoken; }
+
+} // end namespace humaux
+
+//----------------------------------------------------------------------------
+// HumdrumInput
+//----------------------------------------------------------------------------
+
 //////////////////////////////
 //
 // HumdrumInput::HumdrumInput -- Constructor.
@@ -80,6 +228,7 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
     m_measure = NULL;
     m_staff = NULL;
     m_layer = NULL;
+    m_currentlayer = -1;
 
     m_debug = 1;
 }
@@ -176,6 +325,11 @@ bool HumdrumInput::convertHumdrum(void)
     // Reverse the order, since top part is last spine.
     reverse(kernstarts.begin(), kernstarts.end());
     calculateReverseKernIndex();
+
+    m_ties.resize(kernstarts.size());
+    for (int i = 0; i < m_ties.size(); i++) {
+        m_ties[i].reserve(32);
+    }
 
     prepareStaffGroup();
 
@@ -633,6 +787,7 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 {
     HumdrumFile &infile = m_infile;
     m_layer = new Layer();
+    m_currentlayer = layerindex + 1;
     m_layer->SetN(layerindex + 1);
     m_staff->AddLayer(m_layer);
 
@@ -859,6 +1014,7 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
         case 5: note->SetPname(PITCHNAME_a); break;
         case 6: note->SetPname(PITCHNAME_b); break;
     }
+
     int dotcount = characterCount(tstring, '.');
     if (dotcount > 0) {
         note->SetDots(dotcount);
@@ -925,6 +1081,98 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
             case 2048: note->SetDur(DURATION_2048); break;
         }
     }
+
+    // handle ties
+    if ((tstring.find("[") != string::npos) || (tstring.find("_") != string::npos)) {
+        processTieStart(note, token, tstring);
+    }
+
+    if ((tstring.find("_") != string::npos) || (tstring.find("]") != string::npos)) {
+        processTieEnd(note, token, tstring);
+    }
+}
+
+//////////////////////////////
+//
+// processTieStart --
+//
+
+void HumdrumInput::processTieStart(Note *note, HTp token, const string &tstring)
+{
+    HumNum timestamp = token->getDurationFromStart();
+    HumNum endtime = timestamp + token->getDuration();
+    int track = token->getTrack();
+    int rtrack = m_rkern[track];
+    string noteuuid = note->GetUuid();
+    int cl = m_currentlayer;
+    humaux::HumdrumTie ht;
+    int pitch = Convert::kernToMidiNoteNumber(tstring);
+
+    m_ties[rtrack].resize(m_ties[rtrack].size() + 1);
+
+    m_ties[rtrack].back().setStart(noteuuid, m_measure, cl, tstring, pitch, timestamp, endtime);
+    void setStart(const string &id, Measure *starting, const string &token, int pitch, hum::HumNum starttime,
+        hum::HumNum endtime);
+}
+
+//////////////////////////////
+//
+// processTieEnd --
+//
+
+void HumdrumInput::processTieEnd(Note *note, HTp token, const string &tstring)
+{
+    HumNum timestamp = token->getDurationFromStart();
+    int track = token->getTrack();
+    int rtrack = m_rkern[track];
+    string noteuuid = note->GetUuid();
+
+    int pitch = Convert::kernToMidiNoteNumber(tstring);
+    int cl = m_currentlayer;
+    int layer;
+    int tpitch;
+    int i;
+    int found = -1;
+    HumNum tstamp;
+
+    // search for open tie in current layer
+    for (i = 0; i < (int)m_ties[rtrack].size(); i++) {
+        layer = m_ties[rtrack][i].getLayer();
+        if (cl != layer) {
+            continue;
+        }
+        tpitch = m_ties[rtrack][i].getPitch();
+        if (pitch != tpitch) {
+            continue;
+        }
+        tstamp = m_ties[rtrack][i].getEndTime();
+        if (tstamp == timestamp) {
+            found = i;
+            break;
+        }
+    }
+
+    // search for open tie in current staff outside of current layer.
+    if (found < 0) {
+        for (i = 0; i < (int)m_ties[rtrack].size(); i++) {
+            tpitch = m_ties[rtrack][i].getPitch();
+            if (pitch != tpitch) {
+                continue;
+            }
+            tstamp = m_ties[rtrack][i].getEndTime();
+            if (tstamp == timestamp) {
+                found = i;
+                break;
+            }
+        }
+    }
+
+    if (found < 0) {
+        // can't find start of slur so give up.
+        return;
+    }
+
+    m_ties[rtrack][found].setEndAndInsert(noteuuid, m_measure, tstring);
 }
 
 /////////////////////////////

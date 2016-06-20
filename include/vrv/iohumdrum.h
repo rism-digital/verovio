@@ -15,15 +15,10 @@
 //----------------------------------------------------------------------------
 
 #include "attdef.h"
+#include "humlib.h"
 #include "io.h"
 #include "vrvdef.h"
 
-//----------------------------------------------------------------------------
-
-#include "humlib.h"
-
-//----------------------------------------------------------------------------
-// HumdrumInput
 //----------------------------------------------------------------------------
 
 namespace vrv {
@@ -38,6 +33,52 @@ class System;
 class Rest;
 class Note;
 class Beam;
+class Tie;
+
+//----------------------------------------------------------------------------
+// namespace for local IoHumdrum classes
+//----------------------------------------------------------------------------
+
+namespace humaux {
+
+    class HumdrumTie {
+    public:
+        HumdrumTie(void);
+        HumdrumTie(const HumdrumTie &anothertie);
+        ~HumdrumTie();
+        HumdrumTie &operator=(const HumdrumTie &anothertie);
+        void insertTieIntoDom(void);
+        void setStart(const string &id, Measure *starting, int layer, const string &token, int pitch,
+            hum::HumNum starttime, hum::HumNum endtime);
+        void setEnd(const string &id, Measure *ending, const string &token);
+        void setEndAndInsert(const string &id, Measure *ending, const string &token);
+        hum::HumNum getEndTime(void);
+        hum::HumNum getStartTime(void);
+        hum::HumNum getDuration(void);
+        string getStartToken(void);
+        string getEndToken(void);
+        int getPitch(void);
+        int getLayer(void);
+        void clear();
+
+    private:
+        string m_starttoken;
+        string m_endtoken;
+        hum::HumNum m_starttime;
+        hum::HumNum m_endtime;
+        int m_pitch;
+        int m_layer;
+        bool m_inserted;
+        string m_startid;
+        string m_endid;
+        Measure *m_startmeasure;
+        Measure *m_endmeasure;
+    };
+}
+
+//----------------------------------------------------------------------------
+// HumdrumInput
+//----------------------------------------------------------------------------
 
 class HumdrumInput : public vrv::FileInputStream {
 public:
@@ -82,6 +123,8 @@ protected:
     void insertRestInLayer(vrv::Layer *element, hum::HTp token);
     void insertRestInBeam(vrv::Beam *element, hum::HTp token);
     void convertNote(vrv::Note *note, hum::HTp token, int subtoken = -1);
+    void processTieStart(Note *note, hum::HTp token, const string &tstring);
+    void processTieEnd(Note *note, hum::HTp token, const string &tstring);
 
 private:
     std::string m_filename; // Filename to read/was read.
@@ -106,6 +149,7 @@ private:
     vrv::Measure *m_measure; // current measure, or NULL
     vrv::Staff *m_staff; // current staff, or NULL
     vrv::Layer *m_layer; // current layer, or NULL
+    int m_currentlayer;
 
     // m_layertokens == Humdrum **kern tokens for each staff/layer to be
     // converted.
@@ -123,6 +167,14 @@ private:
 
     // m_timesigdurs == Prevailing time signature duration of measure
     vector<hum::HumNum> m_timesigdurs;
+
+    // m_tiestates == keep track of ties for each staff/layer/pitch
+    // and allow for cross-layer ties (no cross staff ties, but that
+    // could be easy to implement.
+    // dimensions:
+    // 1: staff
+    // 2: all open ties for the staff
+    vector<vector<humaux::HumdrumTie> > m_ties;
 };
 
 } // namespace vrv
