@@ -201,7 +201,7 @@ typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 // Global defines
 //----------------------------------------------------------------------------
 
-#define DEFINITON_FACTOR 10
+#define DEFINITION_FACTOR 10
 #define PARAM_DENOMINATOR 10
 
 #define is_in(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
