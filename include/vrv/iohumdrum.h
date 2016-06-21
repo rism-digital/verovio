@@ -123,6 +123,7 @@ protected:
     int characterCountInSubtoken(hum::HTp token, char symbol);
     int characterCountInSubtoken(const string &text, char symbol);
     bool emptyMeasures(void);
+    bool hasFullMeasureRest(vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur);
 
     void convertNote(vrv::Note *note, hum::HTp token, int subtoken = -1);
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);

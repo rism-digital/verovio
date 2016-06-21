@@ -821,6 +821,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         return false;
     }
     vector<HTp> &layerdata = m_layertokens[staffindex][layerindex];
+    Layer *&layer = m_layer;
 
     HumNum starttime = infile[startline].getDurationFromStart();
     HumNum endtime = infile[endline].getDurationFromStart() + infile[endline].getDuration();
@@ -842,6 +843,17 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             m_layer->AddLayerElement(rest);
             setDuration(rest, duration);
         }
+        return true;
+    }
+
+    // If the layer contains only a single rest and the rest
+    // is the same duration as the time signature, then
+    // create a full measure rest (mrest).
+    // Deal with time/clef/key changes in measures with
+    // whole-measure rests later.
+    if (hasFullMeasureRest(layerdata, timesigdurs[startline], duration)) {
+        MRest *mrest = new MRest();
+        appendElement(layer, mrest);
         return true;
     }
 
@@ -870,7 +882,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         std::fill(beamstate.begin(), beamstate.end(), 0);
     }
 
-    Layer *&layer = m_layer;
     Beam *beam = NULL;
     int spacecount = 0;
     bool turnoffbeam = false;
@@ -883,11 +894,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         if ((i == 0) && (beamstate[i] > 0)) {
             beam = new Beam;
-            layer->AddLayerElement(beam);
+            appendElement(layer, beam);
         }
         else if ((beamstate[i - 1] == 0) && (beamstate[i] > 0)) {
             beam = new Beam;
-            layer->AddLayerElement(beam);
+            appendElement(layer, beam);
         }
         else if (beamstate[i] == 0) {
             turnoffbeam = true;
@@ -940,6 +951,38 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
 //////////////////////////////
 //
+// HumdrumInput::hasFullMeasureRest -- Returns true if a single
+//     rest in the measure which has the same duration as the
+//     time signature.
+//
+
+bool HumdrumInput::hasFullMeasureRest(vector<HTp> &layerdata, HumNum timesigdur, HumNum measuredur)
+{
+    if (timesigdur != measuredur) {
+        return false;
+    }
+    int datacount = 0;
+    int restcount = 0;
+    for (int i = 0; i < (int)layerdata.size(); i++) {
+        if (!layerdata[i]->isData()) {
+            continue;
+        }
+        if (layerdata[i]->isNull()) {
+            continue;
+        }
+        datacount++;
+        if (datacount > 1) {
+            return false;
+        }
+        if (!layerdata[i]->isRest()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+//////////////////////////////
+//
 // HumdrumInput::appendElement --
 //
 
@@ -955,6 +998,10 @@ template <class PARENT, class CHILD> void HumdrumInput::appendElement(PARENT par
 
 void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
 {
+
+    // Shouldn't be in a chord, so add rest duration here.
+    // Also full-measure rests are handled elsewhere.
+    convertRhythm(rest, token, subtoken);
 }
 
 /////////////////////////////
