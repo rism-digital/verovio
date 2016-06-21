@@ -58,7 +58,7 @@ class Pen {
 public:
     Pen() : m_penColour(0), m_penWidth(0), m_dashLength(0), m_penOpacity(0.0) {}
     Pen(int colour, int width, float opacity, int dashLength)
-        : m_penColour(colour), m_penWidth(width), m_penOpacity(opacity), m_dashLength(dashLength)
+        : m_penColour(colour), m_penWidth(width), m_dashLength(dashLength), m_penOpacity(opacity)
     {
     }
 

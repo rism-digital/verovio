@@ -127,6 +127,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     pae::Measure current_measure;
     pae::Note current_note;
     Clef *staffDefClef = NULL;
+    MeterSig *scoreDefMeterSig = NULL;
+    KeySig *scoreDefKeySig = NULL;
 
     std::vector<pae::Measure> staff;
 
@@ -173,13 +175,28 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     if (strlen(c_keysig)) {
         KeySig *k = new KeySig();
         getKeyInfo(c_keysig, k);
-        current_measure.key = k;
+        if (!scoreDefKeySig) {
+            scoreDefKeySig = k;
+        }
+        else {
+            if (current_measure.key) {
+                delete current_measure.key;
+            }
+            current_measure.key = k;
+        }
     }
     if (strlen(c_timesig)) {
         MeterSig *meter = new MeterSig;
         getTimeInfo(c_timesig, meter);
-        // What about previous values? Potential memory leak? LP
-        current_measure.meter = meter;
+        if (!scoreDefMeterSig) {
+            scoreDefMeterSig = meter;
+        }
+        else {
+            if (current_measure.meter) {
+                delete current_measure.meter;
+            }
+            current_measure.meter = meter;
+        }
     }
 
     // read the incipit string
@@ -351,7 +368,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         current_measure.notes.clear();
     }
 
-    m_doc->Reset(Raw);
+    m_doc->SetType(Raw);
     Page *page = new Page();
     System *system = new System();
 
@@ -385,6 +402,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         staffDef->SetClefDis(staffDefClef->GetDis());
         staffDef->SetClefDisPlace(staffDefClef->GetDisPlace());
         delete staffDefClef;
+    }
+    if (scoreDefKeySig) {
+        m_doc->m_scoreDef.SetKeySig(scoreDefKeySig->ConvertToKeySigLog());
+        delete scoreDefKeySig;
     }
     staffGrp->AddStaffDef(staffDef);
     m_doc->m_scoreDef.AddStaffGrp(staffGrp);

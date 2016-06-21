@@ -139,14 +139,14 @@ public:
     virtual int TimeSpanningLayerElements(ArrayPtrVoid *params);
 
     /**
-     * See Object:ExportMIDI
+     * See Object::GenerateMIDI
      */
-    virtual int ExportMIDI(ArrayPtrVoid *params);
+    virtual int GenerateMIDI(ArrayPtrVoid *params);
 
     /**
-     *  See Object:ExportMIDI
+     *  See Object::GenerateMIDI
      */
-    virtual int ExportMIDIEnd(ArrayPtrVoid *params);
+    virtual int GenerateMIDIEnd(ArrayPtrVoid *params);
 
     /**
      * See Object::CalcMaxMeasureDuration

@@ -339,7 +339,7 @@ bool Toolkit::LoadString(const std::string &data)
     // Regardless, we won't do layout if the --no-layout option was set.
     if (!input->HasLayoutInformation() && !m_noLayout) {
         // LogElapsedTimeStart();
-        m_doc.CastOff();
+        m_doc.CastOffDoc();
         // LogElapsedTimeEnd("layout");
     }
 
@@ -545,8 +545,8 @@ void Toolkit::RedoLayout()
     m_doc.SetSpacingStaff(this->GetSpacingStaff());
     m_doc.SetSpacingSystem(this->GetSpacingSystem());
 
-    m_doc.UnCastOff();
-    m_doc.CastOff();
+    m_doc.UnCastOffDoc();
+    m_doc.CastOffDoc();
 }
 
 std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)

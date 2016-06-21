@@ -173,6 +173,13 @@ void KeySig::ConvertToMei()
         return;
 }
 
+data_KEYSIGNATURE KeySig::ConvertToKeySigLog()
+{
+    char key = m_alterationNumber + KEYSIGNATURE_0;
+    if (m_alterationType == ACCIDENTAL_EXPLICIT_f) key = -key;
+    return (data_KEYSIGNATURE)key;
+}
+
 //----------------------------------------------------------------------------
 // Static methods
 //----------------------------------------------------------------------------

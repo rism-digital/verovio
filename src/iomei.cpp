@@ -1221,7 +1221,7 @@ MeiInput::~MeiInput()
 bool MeiInput::ImportFile()
 {
     try {
-        m_doc->Reset(Raw);
+        m_doc->SetType(Raw);
         pugi::xml_document doc;
         pugi::xml_parse_result result = doc.load_file(m_filename.c_str(), pugi::parse_default & ~pugi::parse_eol);
         if (!result) {
@@ -1239,7 +1239,7 @@ bool MeiInput::ImportFile()
 bool MeiInput::ImportString(const std::string mei)
 {
     try {
-        m_doc->Reset(Raw);
+        m_doc->SetType(Raw);
         pugi::xml_document doc;
         doc.load(mei.c_str(), pugi::parse_default & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
@@ -1346,7 +1346,7 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         DocType type;
         if (pages.attribute("type")) {
             type = StrToDocType(pages.attribute("type").value());
-            m_doc->Reset(type);
+            m_doc->SetType(type);
         }
 
         // this is a page-based MEI file, we just loop trough the pages

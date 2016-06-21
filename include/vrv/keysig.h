@@ -63,6 +63,9 @@ public:
     void ConvertToMei();
     void ConvertToInternal();
 
+    /* Convert to KeySigLog */
+    data_KEYSIGNATURE ConvertToKeySigLog();
+
     /**
      * Static methods for calculating position;
      */
