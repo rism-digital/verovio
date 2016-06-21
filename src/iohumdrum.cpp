@@ -962,7 +962,6 @@ bool HumdrumInput::hasFullMeasureRest(vector<HTp> &layerdata, HumNum timesigdur,
         return false;
     }
     int datacount = 0;
-    int restcount = 0;
     for (int i = 0; i < (int)layerdata.size(); i++) {
         if (!layerdata[i]->isData()) {
             continue;
@@ -970,6 +969,7 @@ bool HumdrumInput::hasFullMeasureRest(vector<HTp> &layerdata, HumNum timesigdur,
         if (layerdata[i]->isNull()) {
             continue;
         }
+        // deal with grace notes in same measure as mrest?
         datacount++;
         if (datacount > 1) {
             return false;
