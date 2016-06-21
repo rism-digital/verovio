@@ -33,6 +33,7 @@
 //----------------------------------------------------------------------------
 
 #include "beam.h"
+#include "chord.h"
 #include "doc.h"
 #include "iomei.h"
 #include "layer.h"
@@ -41,18 +42,16 @@
 #include "note.h"
 #include "page.h"
 #include "rest.h"
+#include "space.h"
 #include "staff.h"
 #include "system.h"
 #include "tie.h"
 #include "vrv.h"
 
 //#include "attcomparison.h"
-//#include "chord.h"
-//#include "mrest.h"
 //#include "slur.h"
 //#include "syl.h"
 //#include "text.h"
-//#include "tie.h"
 //#include "tuplet.h"
 //#include "verse.h"
 //#include "pugixml.hpp"
@@ -913,11 +912,29 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             int scount = layerdata[i]->getSubtokenCount();
             for (j = 0; j < scount; j++) {
-                Note *note = new Note;
-                appendElement(chord, note);
-                convertNote(note, layerdata[i], j);
+                if (layerdata[i]->find("yy") != string::npos) {
+                    Space *irest = new Space;
+                    appendElement(chord, irest);
+                    convertRhythm(irest, layerdata[i], j);
+                }
+                else {
+                    Note *note = new Note;
+                    appendElement(chord, note);
+                    convertNote(note, layerdata[i], j);
+                }
             }
             convertRhythm(chord, layerdata[i]);
+        }
+        else if (layerdata[i]->find("yy") != string::npos) {
+            // Invisible rest (or note which should be invisible.
+            Space *irest = new Space;
+            if (beam != NULL) {
+                appendElement(beam, irest);
+            }
+            else {
+                appendElement(layer, irest);
+            }
+            convertRhythm(irest, layerdata[i]);
         }
         else if (layerdata[i]->isRest()) {
             Rest *rest = new Rest;
@@ -929,7 +946,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             convertRest(rest, layerdata[i]);
         }
-        else { // should be a note
+        else {
+            // should be a note
             Note *note = new Note;
             if (beam != NULL) {
                 appendElement(beam, note);
