@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jun 18 21:01:45 PDT 2016
+// Last Modified: Mon Jun 20 20:25:28 PDT 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -578,6 +578,7 @@ class HumdrumToken : public string, public HumHash {
 		bool     isData                    (void) const;
 		bool     isNonNullData             (void) const;
 		bool     isNullData                (void) const;
+		bool     isChord                   (const string& separator = " ");
 		bool     hasRhythm                 (void) const;
 
 		// kern-specific functions:

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jun 20 07:33:45 PDT 2016
+// Last Modified: Mon Jun 20 20:25:28 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -7703,6 +7703,20 @@ bool HumdrumToken::isNonNullData(void) const {
 
 bool HumdrumToken::isNullData(void) const {
 	return isData() && isNull();
+}
+
+
+
+/////////////////////////////
+//
+// HumdrumToken::isChord -- True if is a chord.  Presuming you know what
+//     data type you are accessing.
+//     Default value:
+//          separate = " "   (**kern note separator)
+//
+
+bool HumdrumToken::isChord(const string& separator) {
+	return (this->find(separator) != string::npos) ? true : false;
 }
 
 

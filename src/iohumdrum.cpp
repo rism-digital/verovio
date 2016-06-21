@@ -1078,6 +1078,9 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
         }
     }
 
+    // handle note articulations
+    printNoteArticulations(note, token, tstring);
+
     // handle ties
     if ((tstring.find("[") != string::npos) || (tstring.find("_") != string::npos)) {
         processTieStart(note, token, tstring);
@@ -1090,7 +1093,34 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
 
 //////////////////////////////
 //
-// processTieStart --
+// HumdrumInput::printNoteArticulations -- Print articulations for notes.
+//
+
+void HumdrumInput::printNoteArticulations(Note *note, HTp token, const string &tstring)
+{
+    bool chordQ = token->isChord();
+    int layer = m_currentlayer;
+    if (tstring.find(";") != string::npos) {
+        if ((tstring.find("yy") == string::npos) && (tstring.find(";y") == string::npos)) {
+            if (layer == 1) {
+                note->SetFermata(PLACE_above);
+            }
+            else if (layer == 2) {
+                note->SetFermata(PLACE_below);
+            }
+            else {
+                // who knows, maybe check the stem direction or see
+                // if another note in a different layer already
+                // has a fermata (so you would not want to overwrite them).
+                note->SetFermata(PLACE_above);
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processTieStart --
 //
 
 void HumdrumInput::processTieStart(Note *note, HTp token, const string &tstring)

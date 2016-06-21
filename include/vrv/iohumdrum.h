@@ -129,6 +129,7 @@ protected:
     void convertNote(vrv::Note *note, hum::HTp token, int subtoken = -1);
     void processTieStart(Note *note, hum::HTp token, const string &tstring);
     void processTieEnd(Note *note, hum::HTp token, const string &tstring);
+    void printNoteArticulations(Note *note, hum::HTp token, const string &tstring);
 
 private:
     std::string m_filename; // Filename to read/was read.
