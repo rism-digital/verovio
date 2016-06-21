@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jun 20 20:25:28 PDT 2016
+// Last Modified: Tue Jun 21 07:12:11 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -4737,7 +4737,7 @@ bool HumdrumFileStructure::analyzeTokenDurations (void) {
 
 bool HumdrumFileStructure::analyzeGlobalParameters(void) {
 	HumdrumLine* spineline = NULL;
-	for (int i=lines.size()-1; i>=0; i--) {
+	for (int i=(int)lines.size()-1; i>=0; i--) {
 		if (lines[i]->hasSpines()) {
 			if (lines[i]->isAllNull())  {
 				continue;
@@ -7871,20 +7871,27 @@ string HumdrumToken::getSubtoken(int index, const string& separator) const {
 	if (index < 0) {
 		return "";
 	}
+
+	string output;
+	const string& token = *this;
+	if (separator.size() == 0) {
+		output = token[index];
+		return output;
+	}
+
 	int count = 0;
-	int start = 0;
-	int end   = 0;
-	while ((end = (int)string::find(separator, start)) != (int)string::npos) {
-		count++;
-		if (count == index) {
-			return string::substr(start, end-start);
+	for (int i=0; i<(int)size(); i++) {
+		if (string::compare(i, separator.size(), separator) == 0) {
+			count++;
+			if (count > index) {
+				break;
+			}
+			i += (int)separator.size() - 1;
+		} else if (count == index) {
+			output += token[i];
 		}
-		start += separator.size();
 	}
-	if (count == index) {
-		return string::substr(start, string::size()-start);
-	}
-	return "";
+	return output;
 }
 
 

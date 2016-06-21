@@ -811,7 +811,7 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 
 bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, int layerindex)
 {
-    int i;
+    int i, j;
     HumdrumFile &infile = m_infile;
     vector<HumNum> &timesigdurs = m_timesigdurs;
     vector<int> &rkern = m_rkern;
@@ -870,16 +870,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         std::fill(beamstate.begin(), beamstate.end(), 0);
     }
 
-    /*
-if (1 == 0) {
-    cout << "BEAMSTATE: ";
-    for (i = 0; i < (int)beamstate.size(); i++) {
-        cout << beamstate[i] << " ";
-    }
-    cout << endl;
-}
-    */
-
     Layer *&layer = m_layer;
     Beam *beam = NULL;
     int spacecount = 0;
@@ -902,32 +892,43 @@ if (1 == 0) {
         else if (beamstate[i] == 0) {
             turnoffbeam = true;
         }
-        spacecount = characterCount(layerdata[i], ' ');
-        if (spacecount) {
-            // if (beam != NULL) {
-            // 	insertChord(beam, layerdata[i]);
-            // } else {
-            // 		insertChord(layer, layerdata[i]);
-            //	}
-        }
-        else {
+        if (layerdata[i]->isChord()) {
+            Chord *chord = new Chord;
             if (beam != NULL) {
-                if (layerdata[i]->isRest()) {
-                    insertRestInBeam(beam, layerdata[i]);
-                }
-                else {
-                    insertNoteInBeam(beam, layerdata[i]);
-                }
+                appendElement(beam, chord);
             }
             else {
-                if (layerdata[i]->isRest()) {
-                    insertRestInLayer(layer, layerdata[i]);
-                }
-                else {
-                    insertNoteInLayer(layer, layerdata[i]);
-                }
+                appendElement(layer, chord);
             }
+            int scount = layerdata[i]->getSubtokenCount();
+            for (j = 0; j < scount; j++) {
+                Note *note = new Note;
+                appendElement(chord, note);
+                convertNote(note, layerdata[i], j);
+            }
+            convertRhythm(chord, layerdata[i]);
         }
+        else if (layerdata[i]->isRest()) {
+            Rest *rest = new Rest;
+            if (beam != NULL) {
+                appendElement(beam, rest);
+            }
+            else {
+                appendElement(layer, rest);
+            }
+            convertRest(rest, layerdata[i]);
+        }
+        else { // should be a note
+            Note *note = new Note;
+            if (beam != NULL) {
+                appendElement(beam, note);
+            }
+            else {
+                appendElement(layer, note);
+            }
+            convertNote(note, layerdata[i]);
+        }
+
         if (turnoffbeam) {
             turnoffbeam = false;
             beam = NULL;
@@ -937,47 +938,23 @@ if (1 == 0) {
     return true;
 }
 
-/*
 //////////////////////////////
 //
-// HumdrumInput::insertChord --
+// HumdrumInput::appendElement --
 //
 
-void HumdrumInput::insertChord(Layer *element, HTp token) {
-    // do nothing for now until testing an import of a file
-        // containing chords.
+template <class PARENT, class CHILD> void HumdrumInput::appendElement(PARENT parent, CHILD child)
+{
+    parent->AddLayerElement(child);
 }
-*/
 
-//////////////////////////////
+/////////////////////////////
 //
-// HumdrumInput::insertNoteOrRest --
+// HumdrumInput::convertRest --
 //
 
-void HumdrumInput::insertNoteInLayer(Layer *element, HTp token)
+void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
 {
-    Note *note = new Note;
-    element->AddLayerElement(note);
-    convertNote(note, token);
-}
-
-void HumdrumInput::insertNoteInBeam(Beam *element, HTp token)
-{
-    Note *note = new Note;
-    element->AddLayerElement(note);
-    convertNote(note, token);
-}
-
-void HumdrumInput::insertRestInLayer(Layer *element, HTp token)
-{
-    Rest *rest = new Rest;
-    element->AddLayerElement(rest);
-}
-
-void HumdrumInput::insertRestInBeam(Beam *element, HTp token)
-{
-    Rest *rest = new Rest;
-    element->AddLayerElement(rest);
 }
 
 /////////////////////////////
@@ -998,9 +975,14 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
         tstring = token->getSubtoken(subtoken);
         stindex = subtoken;
     }
+
+    bool chordQ = token->isChord();
+
+    // Add the pitch information
     int diatonic = Convert::kernToBase7(tstring);
     int octave = diatonic / 7;
     note->SetOct(octave);
+
     switch (diatonic % 7) {
         case 0: note->SetPname(PITCHNAME_c); break;
         case 1: note->SetPname(PITCHNAME_d); break;
@@ -1011,18 +993,6 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
         case 6: note->SetPname(PITCHNAME_b); break;
     }
 
-    int dotcount = characterCount(tstring, '.');
-    if (dotcount > 0) {
-        note->SetDots(dotcount);
-    }
-
-    if (tstring.find("/") != string::npos) {
-        note->SetStemDir(STEMDIRECTION_up);
-    }
-    else if (tstring.find("\\") != string::npos) {
-        note->SetStemDir(STEMDIRECTION_down);
-    }
-
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
     if (token->hasCautionaryAccidental(stindex)) {
@@ -1030,7 +1000,6 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
     }
 
     int accidCount = Convert::kernToAccidentalCount(tstring);
-
     if (showInAccid) {
         switch (accidCount) {
             case +2: note->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
@@ -1050,32 +1019,15 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
         }
     }
 
-    // Tuplet durations are not handled below yet.
-    // dur is in units of quarter notes.
-    HumNum dur = Convert::recipToDurationNoDots(tstring);
-    dur /= 4; // duration is now in whole note units;
-    if (dur.isInteger()) {
-        switch (dur.getNumerator()) {
-            case 1: note->SetDur(DURATION_1); break;
-            case 2: note->SetDur(DURATION_breve); break;
-            case 4: note->SetDur(DURATION_long); break;
-            case 8: note->SetDur(DURATION_maxima); break;
-        }
+    if (!chordQ) {
+        convertRhythm(note, token, subtoken);
     }
-    else if (dur.getNumerator() == 1) {
-        switch (dur.getDenominator()) {
-            case 2: note->SetDur(DURATION_2); break;
-            case 4: note->SetDur(DURATION_4); break;
-            case 8: note->SetDur(DURATION_8); break;
-            case 16: note->SetDur(DURATION_16); break;
-            case 32: note->SetDur(DURATION_32); break;
-            case 64: note->SetDur(DURATION_64); break;
-            case 128: note->SetDur(DURATION_128); break;
-            case 256: note->SetDur(DURATION_256); break;
-            case 512: note->SetDur(DURATION_512); break;
-            case 1024: note->SetDur(DURATION_1024); break;
-            case 2048: note->SetDur(DURATION_2048); break;
-        }
+
+    if (tstring.find("/") != string::npos) {
+        note->SetStemDir(STEMDIRECTION_up);
+    }
+    else if (tstring.find("\\") != string::npos) {
+        note->SetStemDir(STEMDIRECTION_down);
     }
 
     // handle note articulations
@@ -1088,6 +1040,59 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
 
     if ((tstring.find("_") != string::npos) || (tstring.find("]") != string::npos)) {
         processTieEnd(note, token, tstring);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::convertRhythm --
+//     default value:
+//         subtoken = -1;
+//
+
+template <class ELEMENT> void HumdrumInput::convertRhythm(ELEMENT element, HTp token, int subtoken)
+{
+    string tstring;
+    int stindex = 0;
+    if (subtoken < 0) {
+        tstring = *token;
+    }
+    else {
+        tstring = token->getSubtoken(subtoken);
+        stindex = subtoken;
+    }
+
+    int dotcount = characterCountInSubtoken(tstring, '.');
+    if (dotcount > 0) {
+        element->SetDots(dotcount);
+    }
+
+    // Tuplet durations are not handled below yet.
+    // dur is in units of quarter notes.
+    HumNum dur = Convert::recipToDurationNoDots(tstring);
+    dur /= 4; // duration is now in whole note units;
+    if (dur.isInteger()) {
+        switch (dur.getNumerator()) {
+            case 1: element->SetDur(DURATION_1); break;
+            case 2: element->SetDur(DURATION_breve); break;
+            case 4: element->SetDur(DURATION_long); break;
+            case 8: element->SetDur(DURATION_maxima); break;
+        }
+    }
+    else if (dur.getNumerator() == 1) {
+        switch (dur.getDenominator()) {
+            case 2: element->SetDur(DURATION_2); break;
+            case 4: element->SetDur(DURATION_4); break;
+            case 8: element->SetDur(DURATION_8); break;
+            case 16: element->SetDur(DURATION_16); break;
+            case 32: element->SetDur(DURATION_32); break;
+            case 64: element->SetDur(DURATION_64); break;
+            case 128: element->SetDur(DURATION_128); break;
+            case 256: element->SetDur(DURATION_256); break;
+            case 512: element->SetDur(DURATION_512); break;
+            case 1024: element->SetDur(DURATION_1024); break;
+            case 2048: element->SetDur(DURATION_2048); break;
+        }
     }
 }
 
@@ -1203,12 +1208,36 @@ void HumdrumInput::processTieEnd(Note *note, HTp token, const string &tstring)
 
 int HumdrumInput::characterCount(const string &text, char symbol)
 {
-    return std::count(text.begin(), text.end(), symbol);
+    return (int)std::count(text.begin(), text.end(), symbol);
 }
 
 int HumdrumInput::characterCount(HTp token, char symbol)
 {
-    return std::count(token->begin(), token->end(), symbol);
+    return (int)std::count(token->begin(), token->end(), symbol);
+}
+
+/////////////////////////////
+//
+// HumdrumInput::characterCountInSubtoken --
+//
+
+int HumdrumInput::characterCountInSubtoken(const string &text, char symbol)
+{
+    int sum = 0;
+    for (int i = 0; i < (int)text.size(); i++) {
+        if (text[i] == symbol) {
+            sum++;
+        }
+        if (text[i] == ' ') {
+            break;
+        }
+    }
+    return sum;
+}
+
+int HumdrumInput::characterCountInSubtoken(HTp token, char symbol)
+{
+    return characterCountInSubtoken(*token, symbol);
 }
 
 /////////////////////////////

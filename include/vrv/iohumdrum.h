@@ -120,16 +120,20 @@ protected:
     void printMeasureTokens(void);
     int characterCount(const string &text, char symbol);
     int characterCount(hum::HTp token, char symbol);
+    int characterCountInSubtoken(hum::HTp token, char symbol);
+    int characterCountInSubtoken(const string &text, char symbol);
     bool emptyMeasures(void);
-    // void insertChord(vrv::Layer *element, hum::HTp token);
-    void insertNoteInLayer(vrv::Layer *element, hum::HTp token);
-    void insertNoteInBeam(vrv::Beam *element, hum::HTp token);
-    void insertRestInLayer(vrv::Layer *element, hum::HTp token);
-    void insertRestInBeam(vrv::Beam *element, hum::HTp token);
+
     void convertNote(vrv::Note *note, hum::HTp token, int subtoken = -1);
+    void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
     void processTieStart(Note *note, hum::HTp token, const string &tstring);
     void processTieEnd(Note *note, hum::HTp token, const string &tstring);
     void printNoteArticulations(Note *note, hum::HTp token, const string &tstring);
+
+    /// Templates ///////////////////////////////////////////////////////////
+    template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
+
+    template <class ELEMENT> void convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
 
 private:
     std::string m_filename; // Filename to read/was read.
