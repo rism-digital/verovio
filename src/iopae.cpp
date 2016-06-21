@@ -384,9 +384,29 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 
         m_staff->AddLayer(m_layer);
         m_measure->AddStaff(m_staff);
-        system->AddMeasure(m_measure);
 
         pae::Measure obj = *it;
+
+        // Add a score def if we have a new key sig or meter sig
+        if (obj.key || obj.meter) {
+            ScoreDef *scoreDef = new ScoreDef();
+            if (obj.key) {
+                scoreDef->SetKeySig(obj.key->ConvertToKeySigLog());
+                delete obj.key;
+                obj.key = NULL;
+            }
+            if (scoreDefMeterSig) {
+                scoreDef->SetMeterCount(obj.meter->GetCount());
+                scoreDef->SetMeterUnit(obj.meter->GetUnit());
+                scoreDef->SetMeterSym(obj.meter->GetSym());
+                delete obj.meter;
+                obj.meter = NULL;
+            }
+            system->AddScoreDef(scoreDef);
+        }
+
+        system->AddMeasure(m_measure);
+
         convertMeasure(&obj);
         measure_count++;
     }
@@ -406,6 +426,12 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     if (scoreDefKeySig) {
         m_doc->m_scoreDef.SetKeySig(scoreDefKeySig->ConvertToKeySigLog());
         delete scoreDefKeySig;
+    }
+    if (scoreDefMeterSig) {
+        m_doc->m_scoreDef.SetMeterCount(scoreDefMeterSig->GetCount());
+        m_doc->m_scoreDef.SetMeterUnit(scoreDefMeterSig->GetUnit());
+        m_doc->m_scoreDef.SetMeterSym(scoreDefMeterSig->GetSym());
+        delete scoreDefMeterSig;
     }
     staffGrp->AddStaffDef(staffDef);
     m_doc->m_scoreDef.AddStaffGrp(staffGrp);
@@ -1095,14 +1121,6 @@ void PaeInput::convertMeasure(pae::Measure *measure)
 {
     if (measure->clef != NULL) {
         m_layer->AddLayerElement(measure->clef);
-    }
-
-    if (measure->key != NULL) {
-        m_layer->AddLayerElement(measure->key);
-    }
-
-    if (measure->meter != NULL) {
-        m_layer->AddLayerElement(measure->meter);
     }
 
     if (measure->wholerest > 0) {
