@@ -833,6 +833,12 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
     */
 
+	HumNum layerstarttime = infile[startline].getDurationFromStart();
+	HumNum layerendtime = infile[endline].getDurationFromStart();
+
+	vector<HumNum> prespace;
+	getTimingInformation(prespace, layerdata, layerstarttime, layerendtime);
+
     if (emptyMeasures()) {
         if (timesigdurs[startline] == duration) {
             MRest *mrest = new MRest();
@@ -948,6 +954,44 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     return true;
 }
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::getTimingInformation -- Calculate the start time and duration
+//     of each event so that partial layers can be filled in with <space>
+//     elements if necessary.
+
+void HumdrumInput::getTimingInformation(vector<HumNum>& prespace, 
+		vector<HTp>& layerdata, HumNum layerstarttime, HumNum layerendtime) {
+   prespace.resize(layerdata.size());
+	if (prespace.size() > 0) {
+		prespace[0] = 0;
+	}
+	vector<HumNum> startdur(layerdata.size());
+	vector<HumNum> duration(layerdata.size());
+	for (int i=0; i<(int)layerdata.size(); i++) {
+		startdur[i] = layerdata[i]->getDurationFromStart();
+		if (!layerdata[i]->isData()) {
+			duration[i] = 0;
+		} else {
+			duration[i] = layerdata[i]->getDuration();
+		}
+	}
+
+	if (layerdata.size() > 0) {
+		prespace[0] = startdur[0] - layerstarttime;
+	}
+	for (int i=1; i<(int)layerdata.size(); i++) {
+		prespace[i] = startdur[i] - startdur[i-1] - duration[i-1];
+	}
+	if (layerdata.size() > 0) {
+		prespace.resize(prespace.size()+1);
+		prespace.back() = layerendtime - startdur.back() - duration.back();
+	}
+}
+
 
 //////////////////////////////
 //

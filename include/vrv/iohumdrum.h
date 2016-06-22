@@ -124,12 +124,13 @@ protected:
     int characterCountInSubtoken(const string &text, char symbol);
     bool emptyMeasures(void);
     bool hasFullMeasureRest(vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur);
-
     void convertNote(vrv::Note *note, hum::HTp token, int subtoken = -1);
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
     void processTieStart(Note *note, hum::HTp token, const string &tstring);
     void processTieEnd(Note *note, hum::HTp token, const string &tstring);
     void printNoteArticulations(Note *note, hum::HTp token, const string &tstring);
+	void getTimingInformation(vector<hum::HumNum>& prespace, vector<hum::HTp>& layerdata,
+			hum::HumNum layerstarttime, hum::HumNum layerendtime);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
