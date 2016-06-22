@@ -152,6 +152,15 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = baseClass.c_str();
     m_currentNode.append_attribute("id") = gId.c_str();
+
+    if (object->HasAttClass(ATT_VISIBILITY)) {
+        AttVisibility *att = dynamic_cast<AttVisibility *>(object);
+        assert(att);
+        if (att->GetVisible() == BOOLEAN_false) {
+            m_currentNode.append_attribute("visibility") = "hidden";
+        }
+    }
+
     // m_currentNode.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity:
     // %f;",
     // GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(),
