@@ -175,9 +175,9 @@ void KeySig::ConvertToMei()
 
 data_KEYSIGNATURE KeySig::ConvertToKeySigLog()
 {
-    char key = m_alterationNumber + KEYSIGNATURE_0;
+    char key = m_alterationNumber;
     if (m_alterationType == ACCIDENTAL_EXPLICIT_f) key = -key;
-    return (data_KEYSIGNATURE)key;
+    return (data_KEYSIGNATURE)(key + KEYSIGNATURE_0);
 }
 
 //----------------------------------------------------------------------------
