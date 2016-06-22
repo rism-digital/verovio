@@ -113,7 +113,7 @@ version-footer: true
                             <area shape="rect" coords="467,3,482,52" href="javascript:onpitch('G', 3, 1, 92)" />
                             <area shape="rect" coords="492,3,507,52" href="javascript:onpitch('A', 3, 1, 94)" />
 
-                            <area shape="rect" coords="367,53,382,102" href="javascript:onpitch('D', 3, -1, 85)" />                
+                            <area shape="rect" coords="367,53,382,102" href="javascript:onpitch('D', 3, -1, 85)" />
                             <area shape="rect" coords="392,53,407,102" href="javascript:onpitch('E', 3, -1, 87)" />
                             <area shape="rect" coords="442,53,457,102" href="javascript:onpitch('G', 3, -1, 90)" />
                             <area shape="rect" coords="467,53,482,102" href="javascript:onpitch('A', 3, -1, 92)" />
@@ -128,15 +128,52 @@ version-footer: true
                             <area shape="rect" coords="501,3,525,152" href="javascript:onpitch('B', 3, 0, 95)" />
                         </map>
                         <img id="piano_img" src="{{ site.baseurl }}/images/piano.png" usemap="#piano_map"/>
-
-                        <input type="hidden" id="clef_01" name="clef_01" value="G-2" />
-                        <input type="hidden" id="key_01" name="key_01" value="" />
-                        <input type="hidden" id="timesig_01" name="timesig_01" value="4/4" />
                     </td>
                 </tr>
                 <tr>
                     <td class="keyboard">
-                        <input type="input" id="incipit_01" name="incipit_01" class="form-control" />
+                        <select id="clef_01" name="clef_01" class="form-control">
+                            <option value="G-1">G-1</option>
+                            <option value="G-2" selected="true">G-2 (treble)</option>
+                            <option value="C-1">C-1</option>
+                            <option value="C-2">C-2</option>
+                            <option value="C-3">C-3</option>
+                            <option value="C-4">C-4</option>
+                            <option value="C-5">C-5</option>
+                            <option value="F-4">F-4 (bass)</option>
+                            <option value="F-5">F-5</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="keyboard">
+                        <select id="key_01" name="key_01" class="form-control">
+                            <option value="">Key signature ...</option>
+                            <option value="xF">1 ♯</option>
+                            <option value="xFC">2 ♯</option>
+                            <option value="xFCG">3 ♯</option>
+                            <option value="xFCGD">4 ♯</option>
+                            <option value="xFCGDA">5 ♯</option>
+                            <option value="xFCGDAE">6 ♯</option>
+                            <option value="xFCGDAEB">7 ♯</option>
+                            <option value="bB">1 ♭</option>
+                            <option value="bBE">2 ♭</option>
+                            <option value="bBEA">3 ♭</option>
+                            <option value="bBEAD">4 ♭</option>
+                            <option value="bBEADG">5 ♭</option>
+                            <option value="bBEADGC">6 ♭</option>
+                            <option value="bBEADGCF">7 ♭</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="keyboard">
+                        <input type="input" id="timesig_01" name="timesig_01" class="form-control" placeholder="Time signature (e.g. c c/ 3/4) ..."/>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="keyboard">
+                        <input type="input" id="incipit_01" name="incipit_01" class="form-control" placeholder="Plain and Easy code ..." />
                     </td>
                 </tr>
                 <tr>
@@ -254,19 +291,6 @@ version-footer: true
         undos = []
     }
     
-    function set_timesig( )
-    {
-        num = $('#timesig_num_01').val();
-        den = $('#timesig_den_01').val();
-        num = parseInt( num );
-        den = parseInt( den );
-        timesig = "";
-        if ( num && den ) {
-            timesig = num + '/' + den;
-        } 
-        $('#timesig_01').val( timesig );
-    }
-    
     function activate_buttons( ) {
         // this is a hack: we set the focus on the kb-focus link (arbitrarily) so we can process
         // keystroke events for changing the duration with the keyboard
@@ -317,8 +341,6 @@ version-footer: true
     function update_incipit()
     {
         //$('#incipit_01').val('4'+ $('#incipit_01').val());
-        
-        set_timesig( );
         if ($('#incipit_01').val() == '') {
             // reset the octave if nothing in the incipit
             current_oct = -1
@@ -359,6 +381,18 @@ version-footer: true
     
     // keyup event for updating when the text input is modified
     $('#incipit_01').keyup(function(event){
+        update_incipit();
+    });
+    
+    $('#clef_01').change(function(event){
+        update_incipit();
+    });
+    
+    $('#key_01').change(function(event){
+        update_incipit();
+    });
+    
+    $('#timesig_01').keyup(function(event){
         update_incipit();
     });
     
