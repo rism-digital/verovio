@@ -26,16 +26,17 @@
 
 namespace vrv {
 
+class Beam;
+class Chord;
 class Layer;
 class Measure;
+class Note;
 class Page;
+class Rest;
 class Staff;
 class StaffDef;
 class StaffGrp;
 class System;
-class Rest;
-class Note;
-class Beam;
 class Tie;
 
 //----------------------------------------------------------------------------
@@ -130,6 +131,7 @@ protected:
     void printNoteArticulations(Note *note, hum::HTp token, const string &tstring);
     void getTimingInformation(vector<hum::HumNum> &prespace, vector<hum::HTp> &layerdata, hum::HumNum layerstarttime,
         hum::HumNum layerendtime);
+    void convertChord(Chord *chord, hum::HTp token);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);

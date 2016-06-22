@@ -926,20 +926,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             else {
                 appendElement(layer, chord);
             }
-            int scount = layerdata[i]->getSubtokenCount();
-            for (j = 0; j < scount; j++) {
-                if (layerdata[i]->find("yy") != string::npos) {
-                    Space *irest = new Space;
-                    appendElement(chord, irest);
-                    convertRhythm(irest, layerdata[i], j);
-                }
-                else {
-                    Note *note = new Note;
-                    appendElement(chord, note);
-                    convertNote(note, layerdata[i], j);
-                }
-            }
-            convertRhythm(chord, layerdata[i]);
+            convertChord(chord, layerdata[i]);
         }
         else if (layerdata[i]->find("yy") != string::npos) {
             // Invisible rest (or note which should be invisible.
@@ -994,6 +981,38 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::convertChord --
+//
+
+void HumdrumInput::convertChord(Chord *chord, HTp token)
+{
+    int scount = token->getSubtokenCount();
+    for (int j = 0; j < scount; j++) {
+        if (token->find("yy") != string::npos) {
+            Space *irest = new Space;
+            appendElement(chord, irest);
+            convertRhythm(irest, token, j);
+        }
+        else {
+            Note *note = new Note;
+            appendElement(chord, note);
+            convertNote(note, token, j);
+        }
+    }
+
+    convertRhythm(chord, token);
+
+    // Stem direction of the chord.  If both up and down, then show up.
+    if (token->find("/") != string::npos) {
+        chord->SetStemDir(STEMDIRECTION_up);
+    }
+    else if (token->find("\\") != string::npos) {
+        chord->SetStemDir(STEMDIRECTION_down);
+    }
 }
 
 //////////////////////////////
@@ -1154,11 +1173,13 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
         convertRhythm(note, token, subtoken);
     }
 
-    if (tstring.find("/") != string::npos) {
-        note->SetStemDir(STEMDIRECTION_up);
-    }
-    else if (tstring.find("\\") != string::npos) {
-        note->SetStemDir(STEMDIRECTION_down);
+    if (!chordQ) {
+        if (tstring.find("/") != string::npos) {
+            note->SetStemDir(STEMDIRECTION_up);
+        }
+        else if (tstring.find("\\") != string::npos) {
+            note->SetStemDir(STEMDIRECTION_down);
+        }
     }
 
     // handle note articulations
