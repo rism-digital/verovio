@@ -395,7 +395,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
                 delete obj.key;
                 obj.key = NULL;
             }
-            if (scoreDefMeterSig) {
+            if (obj.meter) {
                 scoreDef->SetMeterCount(obj.meter->GetCount());
                 scoreDef->SetMeterUnit(obj.meter->GetUnit());
                 scoreDef->SetMeterSym(obj.meter->GetSym());
