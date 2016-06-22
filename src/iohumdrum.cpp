@@ -252,7 +252,7 @@ HumdrumInput::~HumdrumInput()
 bool HumdrumInput::ImportFile()
 {
     try {
-        m_doc->Reset(Raw);
+        m_doc->Reset();
         HumdrumFile &infile = m_infile;
         bool result = infile.read(m_filename);
         if (!result) {
@@ -274,7 +274,7 @@ bool HumdrumInput::ImportFile()
 bool HumdrumInput::ImportString(const std::string content)
 {
     try {
-        m_doc->Reset(Raw);
+        m_doc->Reset();
         HumdrumFile &infile = m_infile;
         bool result = infile.readString(content);
         if (!result) {
@@ -810,7 +810,7 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 
 bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, int layerindex)
 {
-    int i, j;
+    int i;
     HumdrumFile &infile = m_infile;
     vector<HumNum> &timesigdurs = m_timesigdurs;
     vector<int> &rkern = m_rkern;
@@ -888,7 +888,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     Beam *beam = NULL;
-    int spacecount = 0;
     bool turnoffbeam = false;
     for (i = 0; i < (int)layerdata.size(); i++) {
         if (prespace[i] > 0) {
@@ -928,26 +927,28 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             convertChord(chord, layerdata[i]);
         }
-        else if (layerdata[i]->find("yy") != string::npos) {
-            // Invisible rest (or note which should be invisible.
-            Space *irest = new Space;
-            if (beam != NULL) {
-                appendElement(beam, irest);
-            }
-            else {
-                appendElement(layer, irest);
-            }
-            convertRhythm(irest, layerdata[i]);
-        }
         else if (layerdata[i]->isRest()) {
-            Rest *rest = new Rest;
-            if (beam != NULL) {
-                appendElement(beam, rest);
+            if (layerdata[i]->find("yy") != string::npos) {
+                // Invisible rest (or note which should be invisible.
+                Space *irest = new Space;
+                if (beam != NULL) {
+                    appendElement(beam, irest);
+                }
+                else {
+                    appendElement(layer, irest);
+                }
+                convertRhythm(irest, layerdata[i]);
             }
             else {
-                appendElement(layer, rest);
+                Rest *rest = new Rest;
+                if (beam != NULL) {
+                    appendElement(beam, rest);
+                }
+                else {
+                    appendElement(layer, rest);
+                }
+                convertRest(rest, layerdata[i]);
             }
-            convertRest(rest, layerdata[i]);
         }
         else {
             // should be a note
@@ -992,16 +993,9 @@ void HumdrumInput::convertChord(Chord *chord, HTp token)
 {
     int scount = token->getSubtokenCount();
     for (int j = 0; j < scount; j++) {
-        if (token->find("yy") != string::npos) {
-            Space *irest = new Space;
-            appendElement(chord, irest);
-            convertRhythm(irest, token, j);
-        }
-        else {
-            Note *note = new Note;
-            appendElement(chord, note);
-            convertNote(note, token, j);
-        }
+        Note *note = new Note;
+        appendElement(chord, note);
+        convertNote(note, token, j);
     }
 
     convertRhythm(chord, token);
@@ -1182,6 +1176,10 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
         }
     }
 
+    if (tstring.find("yy") != string::npos) {
+        note->SetVisible(BOOLEAN_false);
+    }
+
     // handle note articulations
     printNoteArticulations(note, token, tstring);
 
@@ -1255,7 +1253,7 @@ template <class ELEMENT> void HumdrumInput::convertRhythm(ELEMENT element, HTp t
 
 void HumdrumInput::printNoteArticulations(Note *note, HTp token, const string &tstring)
 {
-    bool chordQ = token->isChord();
+    // bool chordQ = token->isChord();
     int layer = m_currentlayer;
     if (tstring.find(";") != string::npos) {
         if ((tstring.find("yy") == string::npos) && (tstring.find(";y") == string::npos)) {
@@ -1694,7 +1692,7 @@ int HumdrumInput::getMeasureNumber(int startline, int endline)
 
 void HumdrumInput::calculateLayout(void)
 {
-    m_doc->CastOff();
+    // m_doc->CastOff();
 }
 
 //////////////////////////////
