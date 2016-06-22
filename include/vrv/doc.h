@@ -41,7 +41,7 @@ public:
     /*
      * Clear the content of the document.
      */
-    void Reset(DocType type);
+    virtual void Reset();
 
     /**
      * Refreshes the views from Doc.
@@ -49,10 +49,11 @@ public:
     virtual void Refresh();
 
     /**
-     * Getter for the DocType.
-     * The setter is Doc::Reset.
+     * Getter and setter for the DocType.
+     * The setter resets the document.
      */
     DocType GetType() const { return m_type; };
+    void SetType(DocType type);
 
     /**
      * Check if the document has a page with the specified value
@@ -63,7 +64,7 @@ public:
     * Get the total page count
     */
     int GetPageCount() const;
-    
+
     bool GetMidiExportDone() const;
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
@@ -195,7 +196,7 @@ public:
      * It uses the MusObject::SetPageScoreDef functor method for parsing the file.
      * This will be done only if m_currentScoreDefDone is false or force is true.
      */
-    void SetCurrentScoreDef(bool force = false);
+    void CollectScoreDefs(bool force = false);
 
     /**
      * Prepare the document for drawing.
@@ -208,13 +209,13 @@ public:
      * Casts off the entire document.
      * Starting from a single system, create and fill pages and systems.
      */
-    void CastOff();
+    void CastOffDoc();
 
     /**
      * Undo the cast off of the entire document.
      * The document will then contain one single page with one single system.
      */
-    void UnCastOff();
+    void UnCastOffDoc();
 
     /**
      * To be implemented.

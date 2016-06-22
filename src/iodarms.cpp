@@ -16,11 +16,11 @@
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
-#include "page.h"
 #include "note.h"
+#include "page.h"
 #include "rest.h"
-#include "system.h"
 #include "staff.h"
+#include "system.h"
 #include "tie.h"
 #include "vrv.h"
 
@@ -425,7 +425,7 @@ bool DarmsInput::ImportString(std::string data_str)
     const char *data = data_str.c_str();
     len = data_str.length();
 
-    m_doc->Reset(Raw);
+    m_doc->SetType(Raw);
     System *system = new System();
     Page *page = new Page();
     m_staff = new Staff(1);

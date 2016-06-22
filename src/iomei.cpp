@@ -748,6 +748,7 @@ void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
     chord->WriteStems(currentNode);
     chord->WriteStemsCmn(currentNode);
     chord->WriteTiepresent(currentNode);
+    chord->WriteVisibility(currentNode);
 }
 
 void MeiOutput::WriteMeiClef(pugi::xml_node currentNode, Clef *clef)
@@ -818,6 +819,7 @@ void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
     assert(mRest);
 
     WriteLayerElement(currentNode, mRest);
+    mRest->WriteVisibility(currentNode);
 }
 
 void MeiOutput::WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt)
@@ -864,6 +866,7 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
     note->WriteTiepresent(currentNode);
+    note->WriteVisibility(currentNode);
 }
 
 void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
@@ -1225,7 +1228,7 @@ MeiInput::~MeiInput()
 bool MeiInput::ImportFile()
 {
     try {
-        m_doc->Reset(Raw);
+        m_doc->SetType(Raw);
         pugi::xml_document doc;
         pugi::xml_parse_result result = doc.load_file(m_filename.c_str(), pugi::parse_default & ~pugi::parse_eol);
         if (!result) {
@@ -1243,7 +1246,7 @@ bool MeiInput::ImportFile()
 bool MeiInput::ImportString(const std::string mei)
 {
     try {
-        m_doc->Reset(Raw);
+        m_doc->SetType(Raw);
         pugi::xml_document doc;
         doc.load(mei.c_str(), pugi::parse_default & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
@@ -1350,7 +1353,7 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         DocType type;
         if (pages.attribute("type")) {
             type = StrToDocType(pages.attribute("type").value());
-            m_doc->Reset(type);
+            m_doc->SetType(type);
         }
 
         // this is a page-based MEI file, we just loop trough the pages
@@ -2096,6 +2099,7 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
     vrvChord->ReadStems(chord);
     vrvChord->ReadStemsCmn(chord);
     vrvChord->ReadTiepresent(chord);
+    vrvChord->ReadVisibility(chord);
 
     AddLayerElement(parent, vrvChord);
     return ReadMeiLayerChildren(vrvChord, chord);
@@ -2193,6 +2197,8 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
     MRest *vrvMRest = new MRest();
     ReadLayerElement(mRest, vrvMRest);
 
+    vrvMRest->ReadVisibility(mRest);
+
     AddLayerElement(parent, vrvMRest);
     return true;
 }
@@ -2251,6 +2257,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadStems(note);
     vrvNote->ReadStemsCmn(note);
     vrvNote->ReadTiepresent(note);
+    vrvNote->ReadVisibility(note);
 
     AddLayerElement(parent, vrvNote);
     return ReadMeiLayerChildren(vrvNote, note, vrvNote);

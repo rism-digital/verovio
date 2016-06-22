@@ -32,12 +32,14 @@ Chord::Chord()
     , AttStems()
     , AttStemsCmn()
     , AttTiepresent()
+    , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
+    RegisterAttClass(ATT_VISIBILITY);
 
     Reset();
 
@@ -59,6 +61,7 @@ void Chord::Reset()
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();
+    ResetVisibility();
 
     ClearClusters();
 }

@@ -9,6 +9,7 @@ option(NO_PAE_SUPPORT "Disable Plain and Easy support" OFF)
 option(NO_HUMDRUM_SUPPORT "Disable Humdrum support" OFF)
 
 add_definitions(-g)
+add_definitions(-Wall)
 add_definitions(-std=c++11)
 
 EXEC_PROGRAM(../tools/get_git_commit.sh ARGS OUTPUT_VARIABLE GIT_COMMIT)

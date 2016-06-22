@@ -37,6 +37,7 @@ Note::Note()
     , AttStems()
     , AttStemsCmn()
     , AttTiepresent()
+    , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
@@ -47,6 +48,7 @@ Note::Note()
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
+    RegisterAttClass(ATT_VISIBILITY);
 
     m_drawingTieAttr = NULL;
     m_drawingAccid = NULL;
@@ -80,6 +82,7 @@ void Note::Reset()
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();
+    ResetVisibility();
 
     // TO BE REMOVED
     m_embellishment = EMB_NONE;

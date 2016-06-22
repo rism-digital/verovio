@@ -469,7 +469,7 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 };
 
-int Measure::ExportMIDI(ArrayPtrVoid *params)
+int Measure::GenerateMIDI(ArrayPtrVoid *params)
 {
     // param 0: MidiFile*: the MidiFile we are writing to (unused)
     // param 1: int*: the midi track number (unused)
@@ -485,7 +485,7 @@ int Measure::ExportMIDI(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::ExportMIDIEnd(ArrayPtrVoid *params)
+int Measure::GenerateMIDIEnd(ArrayPtrVoid *params)
 {
     // param 0: MidiFile*: the MidiFile we are writing to (unused)
     // param 1: int*: the midi track number (unused)

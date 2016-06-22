@@ -127,6 +127,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     pae::Measure current_measure;
     pae::Note current_note;
     Clef *staffDefClef = NULL;
+    MeterSig *scoreDefMeterSig = NULL;
+    KeySig *scoreDefKeySig = NULL;
 
     std::vector<pae::Measure> staff;
 
@@ -173,13 +175,28 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     if (strlen(c_keysig)) {
         KeySig *k = new KeySig();
         getKeyInfo(c_keysig, k);
-        current_measure.key = k;
+        if (!scoreDefKeySig) {
+            scoreDefKeySig = k;
+        }
+        else {
+            if (current_measure.key) {
+                delete current_measure.key;
+            }
+            current_measure.key = k;
+        }
     }
     if (strlen(c_timesig)) {
         MeterSig *meter = new MeterSig;
         getTimeInfo(c_timesig, meter);
-        // What about previous values? Potential memory leak? LP
-        current_measure.meter = meter;
+        if (!scoreDefMeterSig) {
+            scoreDefMeterSig = meter;
+        }
+        else {
+            if (current_measure.meter) {
+                delete current_measure.meter;
+            }
+            current_measure.meter = meter;
+        }
     }
 
     // read the incipit string
@@ -351,7 +368,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         current_measure.notes.clear();
     }
 
-    m_doc->Reset(Raw);
+    m_doc->SetType(Raw);
     Page *page = new Page();
     System *system = new System();
 
@@ -367,9 +384,29 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 
         m_staff->AddLayer(m_layer);
         m_measure->AddStaff(m_staff);
-        system->AddMeasure(m_measure);
 
         pae::Measure obj = *it;
+
+        // Add a score def if we have a new key sig or meter sig
+        if (obj.key || obj.meter) {
+            ScoreDef *scoreDef = new ScoreDef();
+            if (obj.key) {
+                scoreDef->SetKeySig(obj.key->ConvertToKeySigLog());
+                delete obj.key;
+                obj.key = NULL;
+            }
+            if (obj.meter) {
+                scoreDef->SetMeterCount(obj.meter->GetCount());
+                scoreDef->SetMeterUnit(obj.meter->GetUnit());
+                scoreDef->SetMeterSym(obj.meter->GetSym());
+                delete obj.meter;
+                obj.meter = NULL;
+            }
+            system->AddScoreDef(scoreDef);
+        }
+
+        system->AddMeasure(m_measure);
+
         convertMeasure(&obj);
         measure_count++;
     }
@@ -385,6 +422,16 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         staffDef->SetClefDis(staffDefClef->GetDis());
         staffDef->SetClefDisPlace(staffDefClef->GetDisPlace());
         delete staffDefClef;
+    }
+    if (scoreDefKeySig) {
+        m_doc->m_scoreDef.SetKeySig(scoreDefKeySig->ConvertToKeySigLog());
+        delete scoreDefKeySig;
+    }
+    if (scoreDefMeterSig) {
+        m_doc->m_scoreDef.SetMeterCount(scoreDefMeterSig->GetCount());
+        m_doc->m_scoreDef.SetMeterUnit(scoreDefMeterSig->GetUnit());
+        m_doc->m_scoreDef.SetMeterSym(scoreDefMeterSig->GetSym());
+        delete scoreDefMeterSig;
     }
     staffGrp->AddStaffDef(staffDef);
     m_doc->m_scoreDef.AddStaffGrp(staffGrp);
@@ -1074,14 +1121,6 @@ void PaeInput::convertMeasure(pae::Measure *measure)
 {
     if (measure->clef != NULL) {
         m_layer->AddLayerElement(measure->clef);
-    }
-
-    if (measure->key != NULL) {
-        m_layer->AddLayerElement(measure->key);
-    }
-
-    if (measure->meter != NULL) {
-        m_layer->AddLayerElement(measure->meter);
     }
 
     if (measure->wholerest > 0) {

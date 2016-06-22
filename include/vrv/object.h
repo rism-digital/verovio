@@ -773,12 +773,12 @@ public:
      * param 3: int*: the current total measure time (incremented by each measure
      * param 4: std::vector<double>: a stack of maximum duration of each measure (emptied by the functor)
      */
-    virtual int ExportMIDI(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int GenerateMIDI(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
      * Export the object to a MidiFile (end method)
      */
-    virtual int ExportMIDIEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int GenerateMIDIEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
      * Calculate the maximum duration of each measure.
