@@ -46,6 +46,7 @@
 #include "staff.h"
 #include "syl.h"
 #include "system.h"
+#include "tempo.h"
 #include "text.h"
 #include "tie.h"
 #include "verse.h"
@@ -699,7 +700,48 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 
     storeStaffLayerTokensForMeasure(startline, endline);
 
+    checkForOmd(startline, endline);
+
     return convertMeasureStaves(startline, endline);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForOmd --
+//
+
+void HumdrumInput::checkForOmd(int startline, int endline)
+{
+    const vector<HTp> &kernstarts = m_kernstarts;
+    if (kernstarts.size() == 0) {
+        return;
+    }
+    if (startline != kernstarts[0]->getLineIndex()) {
+        // not at the start of the file.
+        return;
+    }
+    HumdrumFile &infile = m_infile;
+    string key;
+    string value;
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (infile[i].isData()) {
+            break;
+        }
+        if (!infile[i].isReference()) {
+            continue;
+        }
+        key = infile[i].getReferenceKey();
+        if (key == "OMD") {
+            value = infile[i].getReferenceValue();
+            Tempo *tempo = new Tempo;
+            m_measure->AddFloatingElement(tempo);
+            Text *text = new Text;
+            tempo->AddTextElement(text);
+            text->SetText(UTF8to16(unescapeHtmlEntities(value)));
+            // tempo->ResetStaffident();  // clear out previous staff owner(s).
+            tempo->AddStaff(1);
+        }
+    }
 }
 
 //////////////////////////////
@@ -1245,7 +1287,7 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
     HumdrumLine &line = *token->getLine();
     int track = token->getTrack();
     int ttrack;
-    int versenum = 1;
+    int versenum = 0;
     int startfield = token->getFieldIndex() + 1;
     for (int i = startfield; i < line.getFieldCount(); i++) {
         if (line.token(i)->isKern()) {
@@ -1255,12 +1297,13 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
             }
         }
         else if (line.token(i)->isDataType("**text")) {
+            versenum++;
             if (line.token(i)->isNull()) {
                 continue;
             }
             Verse *verse = new Verse;
             appendElement(note, verse);
-            verse->SetN(versenum++);
+            verse->SetN(versenum);
             Syl *syl = new Syl;
             appendElement(verse, syl);
             Text *text = new Text;
@@ -1268,6 +1311,7 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
             string content = *line.token(i);
             bool dashbegin = false;
             bool dashend = false;
+            bool extender = false;
             if (content.back() == '-') {
                 dashend = true;
                 content.pop_back();
@@ -1275,6 +1319,10 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
             if ((content.size() > 0) && (content[0] == '-')) {
                 dashbegin = true;
                 content.erase(0, 1);
+            }
+            if (content.back() == '_') {
+                extender = true;
+                content.pop_back();
             }
             if (dashbegin && dashend) {
                 syl->SetWordpos(sylLog_WORDPOS_m);
@@ -1286,6 +1334,10 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
             else if (dashend) {
                 syl->SetWordpos(sylLog_WORDPOS_i);
                 syl->SetCon(sylLog_CON_d);
+            }
+            else if (extender) {
+                syl->SetWordpos(sylLog_WORDPOS_t);
+                syl->SetCon(sylLog_CON_u);
             }
 
             text->SetText(UTF8to16(unescapeHtmlEntities(content)));
@@ -1514,7 +1566,9 @@ void HumdrumInput::printMeasureTokens(void)
 
 /////////////////////////////
 //
-// HumdrumInput::setDuration --  Incoming duration is in quarter notes units
+// HumdrumInput::setDuration --  Incoming duration is in quarter notes units.
+//    This function needs to be generalized (and how to deal with tuplets)?
+//    Mostly for <space> elements.
 //
 
 template <class ELEMENT> void HumdrumInput::setDuration(ELEMENT element, HumNum duration)
@@ -1538,6 +1592,16 @@ template <class ELEMENT> void HumdrumInput::setDuration(ELEMENT element, HumNum 
     }
     else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 2)) {
         element->SetDur(DURATION_8);
+        return;
+    }
+    else if ((duration.getNumerator() == 3) && (duration.getDenominator() == 2)) {
+        element->SetDur(DURATION_4);
+        element->SetDots(1);
+        return;
+    }
+    else if ((duration.getNumerator() == 3) && (duration.getDenominator() == 4)) {
+        element->SetDur(DURATION_8);
+        element->SetDots(1);
         return;
     }
     else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 4)) {

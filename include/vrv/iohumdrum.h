@@ -134,6 +134,7 @@ protected:
     void convertChord(Chord *chord, hum::HTp token);
     void prepareVerses(void);
     void convertVerses(Note *note, hum::HTp token, int subtoken);
+    void checkForOmd(int startline, int endline);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
