@@ -3,7 +3,7 @@
 // Author:      Craig Stuart Sapp
 // Created:     06/06/2015
 // Copyright (c) Authors and others. All rights reserved.
-// vim:         ts=3
+// vim:         ts=4
 /////////////////////////////////////////////////////////////////////////////
 
 #ifndef __VRV_IOHUMDRUM_H__
@@ -132,6 +132,8 @@ protected:
     void getTimingInformation(vector<hum::HumNum> &prespace, vector<hum::HTp> &layerdata, hum::HumNum layerstarttime,
         hum::HumNum layerendtime);
     void convertChord(Chord *chord, hum::HTp token);
+    void prepareVerses(void);
+    void convertVerses(Note *note, hum::HTp token, int subtoken);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
@@ -139,6 +141,11 @@ protected:
     template <class ELEMENT> void convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
 
     template <class ELEMENT> void setDuration(ELEMENT rest, hum::HumNum duration);
+
+    /// Static functions ////////////////////////////////////////////////////
+    static string unescapeHtmlEntities(const string &input);
+    static void WriteUTF8(std::ostream &Out, unsigned int Ch);
+    static void UnquoteHTML(std::istream &In, std::ostream &Out);
 
 private:
     std::string m_filename; // Filename to read/was read.
@@ -189,6 +196,10 @@ private:
     // 1: staff
     // 2: all open ties for the staff
     vector<std::list<humaux::HumdrumTie> > m_ties;
+
+    // m_verses == keeps track of whether or not each staff contains associated
+    // **text spines which will be converted into lyrics.
+    vector<bool> m_verses;
 };
 
 } // namespace vrv
