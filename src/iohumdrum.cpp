@@ -1588,7 +1588,8 @@ void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
         m_measure->SetLeft(BARRENDITION_rptend);
     }
     else if (startbar.find("-") != string::npos) {
-        m_measure->SetLeft(BARRENDITION_invis);
+        // This is the default state of @left, so don't specify.
+        // m_measure->SetLeft(BARRENDITION_invis);
     }
 }
 
