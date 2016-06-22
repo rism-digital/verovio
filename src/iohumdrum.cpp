@@ -832,11 +832,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
     */
 
-	HumNum layerstarttime = infile[startline].getDurationFromStart();
-	HumNum layerendtime = infile[endline].getDurationFromStart();
+    HumNum layerstarttime = infile[startline].getDurationFromStart();
+    HumNum layerendtime = infile[endline].getDurationFromStart();
 
-	vector<HumNum> prespace;
-	getTimingInformation(prespace, layerdata, layerstarttime, layerendtime);
+    vector<HumNum> prespace;
+    getTimingInformation(prespace, layerdata, layerstarttime, layerendtime);
 
     if (emptyMeasures()) {
         if (timesigdurs[startline] == duration) {
@@ -891,6 +891,16 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     int spacecount = 0;
     bool turnoffbeam = false;
     for (i = 0; i < (int)layerdata.size(); i++) {
+        if (prespace[i] > 0) {
+            Space *space = new Space;
+            if (beam != NULL) {
+                appendElement(beam, space);
+            }
+            else {
+                appendElement(layer, space);
+            }
+            setDuration(space, prespace[i]);
+        }
         if (layerdata[i]->isNull()) {
             continue;
         }
@@ -970,10 +980,21 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
     }
 
+    if (prespace.size() > layerdata.size()) {
+        if (prespace.back() > 0) {
+            Space *space = new Space;
+            if (beam != NULL) {
+                appendElement(beam, space);
+            }
+            else {
+                appendElement(layer, space);
+            }
+            setDuration(space, prespace.back());
+        }
+    }
+
     return true;
 }
-
-
 
 //////////////////////////////
 //
@@ -981,35 +1002,36 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 //     of each event so that partial layers can be filled in with <space>
 //     elements if necessary.
 
-void HumdrumInput::getTimingInformation(vector<HumNum>& prespace, 
-		vector<HTp>& layerdata, HumNum layerstarttime, HumNum layerendtime) {
-   prespace.resize(layerdata.size());
-	if (prespace.size() > 0) {
-		prespace[0] = 0;
-	}
-	vector<HumNum> startdur(layerdata.size());
-	vector<HumNum> duration(layerdata.size());
-	for (int i=0; i<(int)layerdata.size(); i++) {
-		startdur[i] = layerdata[i]->getDurationFromStart();
-		if (!layerdata[i]->isData()) {
-			duration[i] = 0;
-		} else {
-			duration[i] = layerdata[i]->getDuration();
-		}
-	}
+void HumdrumInput::getTimingInformation(
+    vector<HumNum> &prespace, vector<HTp> &layerdata, HumNum layerstarttime, HumNum layerendtime)
+{
+    prespace.resize(layerdata.size());
+    if (prespace.size() > 0) {
+        prespace[0] = 0;
+    }
+    vector<HumNum> startdur(layerdata.size());
+    vector<HumNum> duration(layerdata.size());
+    for (int i = 0; i < (int)layerdata.size(); i++) {
+        startdur[i] = layerdata[i]->getDurationFromStart();
+        if (!layerdata[i]->isData()) {
+            duration[i] = 0;
+        }
+        else {
+            duration[i] = layerdata[i]->getDuration();
+        }
+    }
 
-	if (layerdata.size() > 0) {
-		prespace[0] = startdur[0] - layerstarttime;
-	}
-	for (int i=1; i<(int)layerdata.size(); i++) {
-		prespace[i] = startdur[i] - startdur[i-1] - duration[i-1];
-	}
-	if (layerdata.size() > 0) {
-		prespace.resize(prespace.size()+1);
-		prespace.back() = layerendtime - startdur.back() - duration.back();
-	}
+    if (layerdata.size() > 0) {
+        prespace[0] = startdur[0] - layerstarttime;
+    }
+    for (int i = 1; i < (int)layerdata.size(); i++) {
+        prespace[i] = startdur[i] - startdur[i - 1] - duration[i - 1];
+    }
+    if (layerdata.size() > 0) {
+        prespace.resize(prespace.size() + 1);
+        prespace.back() = layerendtime - startdur.back() - duration.back();
+    }
 }
-
 
 //////////////////////////////
 //
@@ -1373,23 +1395,51 @@ void HumdrumInput::printMeasureTokens(void)
 
 /////////////////////////////
 //
-// HumdrumInput::setDuration --  Incoming duration is in quarter notes.
+// HumdrumInput::setDuration --  Incoming duration is in quarter notes units
 //
 
-void HumdrumInput::setDuration(Rest *rest, HumNum duration)
+template <class ELEMENT> void HumdrumInput::setDuration(ELEMENT element, HumNum duration)
 {
     if (duration == 3) {
-        rest->SetDur(DURATION_2);
-        rest->SetDots(1);
+        element->SetDur(DURATION_2);
+        element->SetDots(1);
+        return;
     }
     else if (duration == 2) {
-        rest->SetDur(DURATION_2);
+        element->SetDur(DURATION_2);
+        return;
     }
     else if (duration == 1) {
-        rest->SetDur(DURATION_4);
+        element->SetDur(DURATION_4);
+        return;
     }
     else if (duration == 4) {
-        rest->SetDur(DURATION_1);
+        element->SetDur(DURATION_1);
+        return;
+    }
+    else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 2)) {
+        element->SetDur(DURATION_8);
+        return;
+    }
+    else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 4)) {
+        element->SetDur(DURATION_16);
+        return;
+    }
+    else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 8)) {
+        element->SetDur(DURATION_32);
+        return;
+    }
+    else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 16)) {
+        element->SetDur(DURATION_64);
+        return;
+    }
+    else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 32)) {
+        element->SetDur(DURATION_128);
+        return;
+    }
+    else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 64)) {
+        element->SetDur(DURATION_256);
+        return;
     }
 }
 

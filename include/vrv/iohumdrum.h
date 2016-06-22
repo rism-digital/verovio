@@ -116,7 +116,6 @@ protected:
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex(void);
     void prepareTimeSigDur(void);
-    void setDuration(Rest *rest, hum::HumNum duration);
     void printMeasureTokens(void);
     int characterCount(const string &text, char symbol);
     int characterCount(hum::HTp token, char symbol);
@@ -129,13 +128,15 @@ protected:
     void processTieStart(Note *note, hum::HTp token, const string &tstring);
     void processTieEnd(Note *note, hum::HTp token, const string &tstring);
     void printNoteArticulations(Note *note, hum::HTp token, const string &tstring);
-	void getTimingInformation(vector<hum::HumNum>& prespace, vector<hum::HTp>& layerdata,
-			hum::HumNum layerstarttime, hum::HumNum layerendtime);
+    void getTimingInformation(vector<hum::HumNum> &prespace, vector<hum::HTp> &layerdata, hum::HumNum layerstarttime,
+        hum::HumNum layerendtime);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
 
     template <class ELEMENT> void convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
+
+    template <class ELEMENT> void setDuration(ELEMENT rest, hum::HumNum duration);
 
 private:
     std::string m_filename; // Filename to read/was read.
