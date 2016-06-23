@@ -1336,9 +1336,13 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
     int diatonic = Convert::kernToBase7(tstring);
     int octave = diatonic / 7;
     if (octaveupQ) {
-        octave--;
+        // @oct required even if @oct.ges given.
+        note->SetOctGes(octave);
+        note->SetOct(octave - 1);
     }
-    note->SetOct(octave);
+    else {
+        note->SetOct(octave);
+    }
 
     switch (diatonic % 7) {
         case 0: note->SetPname(PITCHNAME_c); break;
