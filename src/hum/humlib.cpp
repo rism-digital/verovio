@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jun 22 19:32:58 PDT 2016
+// Last Modified: Thu Jun 23 11:29:56 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -7699,6 +7699,24 @@ bool HumdrumToken::isData(void) const {
 		return false;
 	}
 	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isInterpretation -- Returns true if an interpretation.
+//
+
+bool HumdrumToken::isInterpretation(void) const {
+	if (size() == 0) {
+		return false;
+	}
+	int firstchar = (*this)[0];
+	if (firstchar == '*') {
+		return true;
+	}
+	return false;
 }
 
 

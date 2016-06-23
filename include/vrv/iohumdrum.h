@@ -135,6 +135,7 @@ protected:
     void prepareVerses(void);
     void convertVerses(Note *note, hum::HTp token, int subtoken);
     void checkForOmd(int startline, int endline);
+    void handleOttavaMark(hum::HumdrumToken &token, Note *note);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
@@ -204,6 +205,12 @@ private:
     // m_verses == keeps track of whether or not each staff contains associated
     // **text spines which will be converted into lyrics.
     vector<bool> m_verses;
+
+    // m_ottavanote == keep track of ottava marks: stores the starting note of
+    // an ottava line which will be turned off later.  m_ottavameasure == the
+    // starting measure of the ottava mark.
+    vector<Note *> m_ottavanote;
+    vector<Measure *> m_ottavameasure;
 };
 
 } // namespace vrv

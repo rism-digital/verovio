@@ -40,6 +40,7 @@
 #include "measure.h"
 #include "mrest.h"
 #include "note.h"
+#include "octave.h"
 #include "page.h"
 #include "rest.h"
 #include "space.h"
@@ -329,6 +330,11 @@ bool HumdrumInput::convertHumdrum(void)
     calculateReverseKernIndex();
 
     m_ties.resize(kernstarts.size());
+
+    m_ottavanote.resize(kernstarts.size());
+    m_ottavameasure.resize(kernstarts.size());
+    std::fill(m_ottavanote.begin(), m_ottavanote.end(), (Note *)NULL);
+    std::fill(m_ottavameasure.begin(), m_ottavameasure.end(), (Measure *)NULL);
 
     prepareVerses();
     prepareStaffGroup();
@@ -999,6 +1005,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         std::fill(gbeamstate.begin(), beamstate.end(), 0);
     }
 
+    Note *note = NULL;
     Beam *beam = NULL;
     Beam *gbeam = NULL;
     Chord *chord = NULL;
@@ -1018,6 +1025,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         if (layerdata[i]->isNull()) {
             continue;
+        }
+        if (layerdata[i]->isInterpretation()) {
+            handleOttavaMark(*layerdata[i], note);
         }
         if (!layerdata[i]->getLine()->isData()) {
             continue;
@@ -1094,7 +1104,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         else {
             // should be a note
-            Note *note = new Note;
+            note = new Note;
+            if ((m_ottavameasure[staffindex] != NULL) && (m_ottavanote[staffindex] == NULL)) {
+                m_ottavanote[staffindex] = note;
+            }
             if (isgrace && (gbeam != NULL)) {
                 appendElement(gbeam, note);
             }
@@ -1132,6 +1145,47 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::handleOttavaMark --  *8va turns on and *X8va tuns off.
+//    Generalized latter to 15ma, 8va basso, 15ma basso.  IF the *X8va is
+//    (incorrectly) placed at the start of the next measure before a note,
+//    then this algorithm may not work (need to keep track of the last note
+//    in the previous measure among all layers).
+//
+
+void HumdrumInput::handleOttavaMark(HumdrumToken &token, Note *note)
+{
+    int staffindex = m_currentstaff - 1;
+
+    if (token == "*8va") {
+        // turn on ottava
+        m_ottavameasure[staffindex] = m_measure;
+        m_ottavanote[staffindex] = NULL;
+        // When a new note is read, check if m_ottavameasure
+        // is non-null, and if so, store the new note in m_ottavanote.
+    }
+    else if (token == "*X8va") {
+        // turn off ottava
+        if ((m_ottavameasure[staffindex] != NULL) && (m_ottavanote[staffindex] != NULL)) {
+            Octave *octave = new Octave;
+            m_ottavameasure[staffindex]->AddFloatingElement(octave);
+            setStaff(octave, staffindex + 1);
+            octave->SetDis(OCTAVE_DIS_8);
+            octave->SetStartid(m_ottavanote[staffindex]->GetUuid());
+            if (note != NULL) {
+                octave->SetEndid(note->GetUuid());
+            }
+            else {
+                octave->SetEndid(m_measure->GetUuid());
+            }
+            octave->SetDisPlace(PLACE_above);
+        }
+        m_ottavanote[staffindex] = NULL;
+        m_ottavameasure[staffindex] = NULL;
+    }
 }
 
 //////////////////////////////
@@ -1272,6 +1326,8 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
 
     bool chordQ = token->isChord();
 
+    bool octaveupQ = m_ottavameasure[m_currentstaff - 1] ? true : false;
+
     if (tstring.find("q") != string::npos) {
         note->SetGrace(GRACE_acc);
     }
@@ -1279,6 +1335,9 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
     // Add the pitch information
     int diatonic = Convert::kernToBase7(tstring);
     int octave = diatonic / 7;
+    if (octaveupQ) {
+        octave--;
+    }
     note->SetOct(octave);
 
     switch (diatonic % 7) {
