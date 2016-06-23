@@ -546,7 +546,7 @@ int LayerElement::TimeSpanningLayerElements(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::ExportMIDI(ArrayPtrVoid *params)
+int LayerElement::GenerateMIDI(ArrayPtrVoid *params)
 {
     // param 0: MidiFile*: the MidiFile we are writing to
     // param 1: int*: the midi track number
@@ -566,8 +566,8 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
 
     // Now deal with the different elements
     if (this->Is() == REST) {
-        Rest *rest = dynamic_cast<Rest *>(this);
-        assert(rest);
+        // Rest *rest = dynamic_cast<Rest *>(this);
+        // assert(rest);
         // LogMessage("Rest %f", GetAlignmentDuration());
         // increase the currentTime accordingly
         (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
@@ -648,8 +648,8 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
         }
     }
     else if (this->Is() == SPACE) {
-        Space *space = dynamic_cast<Space *>(this);
-        assert(space);
+        // Space *space = dynamic_cast<Space *>(this);
+        // assert(space);
         // LogMessage("Space %f", GetAlignmentDuration());
         // increase the currentTime accordingly
         (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
@@ -657,7 +657,7 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::ExportMIDIEnd(ArrayPtrVoid *params)
+int LayerElement::GenerateMIDIEnd(ArrayPtrVoid *params)
 {
     // param 0: MidiFile*: the MidiFile we are writing to (unused)
     // param 1: int*: the midi track number (unused)
@@ -668,8 +668,8 @@ int LayerElement::ExportMIDIEnd(ArrayPtrVoid *params)
     double *currentMeasureTime = static_cast<double *>((*params).at(2));
 
     if (this->Is() == CHORD) {
-        Chord *chord = dynamic_cast<Chord *>(this);
-        assert(chord);
+        // Chord *chord = dynamic_cast<Chord *>(this);
+        // assert(chord);
         // LogMessage("Chord %f", GetAlignmentDuration());
         // increase the currentTime accordingly.
         (*currentMeasureTime) += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);

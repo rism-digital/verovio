@@ -634,8 +634,8 @@ public:
     data_GRACE GetGrace() const { return m_grace; };
     bool HasGrace() const;
     //
-    void SetGraceTime(int graceTime_) { m_graceTime = graceTime_; };
-    int GetGraceTime() const { return m_graceTime; };
+    void SetGraceTime(data_PERCENT graceTime_) { m_graceTime = graceTime_; };
+    data_PERCENT GetGraceTime() const { return m_graceTime; };
     bool HasGraceTime() const;
     ///@}
 
@@ -646,7 +646,7 @@ private:
      **/
     data_GRACE m_grace;
     /** Records the amount of time to be "stolen" from a non-grace note/chord. **/
-    int m_graceTime;
+    data_PERCENT m_graceTime;
 
     /* include <attgrace.time> */
 };

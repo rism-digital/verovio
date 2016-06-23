@@ -52,7 +52,8 @@ class Note : public LayerElement,
              public AttNoteLogMensural,
              public AttStems,
              public AttStemsCmn,
-             public AttTiepresent {
+             public AttTiepresent,
+             public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

@@ -54,6 +54,15 @@ void TimePointInterface::SetStart(LayerElement *start)
     m_start = start;
 }
 
+void TimePointInterface::AddStaff(int n)
+{
+    xsd_posIntList staves = this->GetStaff();
+    if (std::find(staves.begin(), staves.end(), n) == staves.end()) {
+        staves.push_back(n);
+        this->SetStaff(staves);
+    }
+}
+
 void TimePointInterface::SetUuidStr()
 {
     if (this->HasStartid()) {
@@ -114,8 +123,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
         }
         staves.push_back(staff);
     }
-    if (staves.empty())
-        LogDebug("Empty @staff array");
+    if (staves.empty()) LogDebug("Empty @staff array");
     return staves;
 }
 
@@ -187,11 +195,11 @@ bool TimeSpanningInterface::IsSpanningMeasures()
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int TimePointInterface::InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object)
+int TimePointInterface::InterfacePrepareTimestamps(ArrayPtrVoid *params, Object *object)
 {
     // param 0: std::vector< Object*>* that holds the current elements to match (unused)
     // param 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
-     ArrayOfObjectBeatPairs *tstamps = static_cast< ArrayOfObjectBeatPairs *>((*params).at(1));
+    ArrayOfObjectBeatPairs *tstamps = static_cast<ArrayOfObjectBeatPairs *>((*params).at(1));
 
     // First we check if the object has already a mapped @startid (it should not)
     if (this->HasStart()) {
@@ -210,14 +218,14 @@ int TimePointInterface::InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object
     return FUNCTOR_CONTINUE;
 }
 
-int TimePointInterface::InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object)
+int TimePointInterface::InterfaceResetDrawing(ArrayPtrVoid *params, Object *object)
 {
     m_start = NULL;
     m_startUuid = "";
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfacePrepareTimeSpanning(ArrayPtrVoid *params,  Object *object)
+int TimeSpanningInterface::InterfacePrepareTimeSpanning(ArrayPtrVoid *params, Object *object)
 {
     // param 0: std::vector< Object*>* that holds the current elements to match
     // param 1: bool* fillList for indicating whether the elements have to be stacked or not
@@ -234,11 +242,11 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(ArrayPtrVoid *params,  O
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object)
+int TimeSpanningInterface::InterfacePrepareTimestamps(ArrayPtrVoid *params, Object *object)
 {
     // param 0: std::vector< Object*>* that holds the current elements to match (unused)
     // param 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
-     ArrayOfObjectBeatPairs *tstamps = static_cast< ArrayOfObjectBeatPairs *>((*params).at(1));
+    ArrayOfObjectBeatPairs *tstamps = static_cast<ArrayOfObjectBeatPairs *>((*params).at(1));
 
     // First we check if the object has already a mapped @endid (it should not)
     if (this->HasEndid()) {
@@ -258,10 +266,10 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(ArrayPtrVoid *params,  Obj
     return TimePointInterface::InterfacePrepareTimestamps(params, object);
 }
 
-int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params,  Object *object)
+int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params, Object *object)
 {
     // param 0: std::vector< Object * >* of the current running TimeSpanningInterface elements
-    std::vector< Object *> *elements = static_cast<std::vector< Object *> *>((*params).at(0));
+    std::vector<Object *> *elements = static_cast<std::vector<Object *> *>((*params).at(0));
 
     if (this->IsSpanningMeasures()) {
         elements->push_back(object);
@@ -269,7 +277,7 @@ int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *p
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object)
+int TimeSpanningInterface::InterfaceResetDrawing(ArrayPtrVoid *params, Object *object)
 {
     m_end = NULL;
     m_endUuid = "";

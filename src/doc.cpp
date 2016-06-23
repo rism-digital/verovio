@@ -48,7 +48,7 @@ namespace vrv {
 Doc::Doc() : Object("doc-")
 {
     m_style = new Style();
-    Reset(Raw);
+    Reset();
 }
 
 Doc::~Doc()
@@ -56,11 +56,11 @@ Doc::~Doc()
     delete m_style;
 }
 
-void Doc::Reset(DocType type)
+void Doc::Reset()
 {
     Object::Reset();
 
-    m_type = type;
+    m_type = Raw;
     m_pageWidth = -1;
     m_pageHeight = -1;
     m_pageRightMar = 0;
@@ -85,6 +85,12 @@ void Doc::Reset(DocType type)
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
     m_drawingLyricFont.SetFaceName("Times");
+}
+
+void Doc::SetType(DocType type)
+{
+    Reset();
+    m_type = type;
 }
 
 void Doc::AddPage(Page *page)
@@ -164,11 +170,11 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             params.push_back(&totalTime);
             params.push_back(&maxValuesLayer);
             params.push_back(&transSemi);
-            Functor exportMIDI(&Object::ExportMIDI);
-            Functor exportMIDIEnd(&Object::ExportMIDIEnd);
+            Functor generateMIDI(&Object::GenerateMIDI);
+            Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
-            this->Process(&exportMIDI, &params, &exportMIDIEnd, &filters);
+            this->Process(&generateMIDI, &params, &generateMIDIEnd, &filters);
 
             midiTrack++;
         }
@@ -400,7 +406,7 @@ void Doc::PrepareDrawing()
     m_drawingPreparationDone = true;
 }
 
-void Doc::SetCurrentScoreDef(bool force)
+void Doc::CollectScoreDefs(bool force)
 {
     if (m_currentScoreDefDone && !force) {
         return;
@@ -429,9 +435,9 @@ void Doc::SetCurrentScoreDef(bool force)
     m_currentScoreDefDone = true;
 }
 
-void Doc::CastOff()
+void Doc::CastOffDoc()
 {
-    this->SetCurrentScoreDef();
+    this->CollectScoreDefs();
 
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
@@ -459,7 +465,7 @@ void Doc::CastOff()
     delete contentSystem;
 
     // Reset the scoreDef at the beginning of each system
-    this->SetCurrentScoreDef(true);
+    this->CollectScoreDefs(true);
     contentPage->LayOutVertically();
 
     // Detach the contentPage
@@ -485,10 +491,10 @@ void Doc::CastOff()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->SetCurrentScoreDef(true);
+    this->CollectScoreDefs(true);
 }
 
-void Doc::UnCastOff()
+void Doc::UnCastOffDoc()
 {
     Page *contentPage = new Page();
     System *contentSystem = new System();
@@ -509,7 +515,7 @@ void Doc::UnCastOff()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->SetCurrentScoreDef(true);
+    this->CollectScoreDefs(true);
 }
 
 bool Doc::HasPage(int pageIdx) const
@@ -652,7 +658,7 @@ int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin) const
 
 int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin) const
 {
-    int size = m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITON_FACTOR;
+    int size = m_style->m_hairpinSize * GetDrawingUnit(staffSize) / DEFINITION_FACTOR;
     // This should be styled
     if (withMargin) size += GetDrawingUnit(staffSize);
     return size;
@@ -755,27 +761,27 @@ char Doc::GetLeftPosition() const
 
 void Doc::SetPageHeight(int pageHeight)
 {
-    m_pageHeight = pageHeight * DEFINITON_FACTOR;
+    m_pageHeight = pageHeight * DEFINITION_FACTOR;
 };
 
 void Doc::SetPageWidth(int pageWidth)
 {
-    m_pageWidth = pageWidth * DEFINITON_FACTOR;
+    m_pageWidth = pageWidth * DEFINITION_FACTOR;
 };
 
 void Doc::SetPageLeftMar(short pageLeftMar)
 {
-    m_pageLeftMar = pageLeftMar * DEFINITON_FACTOR;
+    m_pageLeftMar = pageLeftMar * DEFINITION_FACTOR;
 };
 
 void Doc::SetPageRightMar(short pageRightMar)
 {
-    m_pageRightMar = pageRightMar * DEFINITON_FACTOR;
+    m_pageRightMar = pageRightMar * DEFINITION_FACTOR;
 };
 
 void Doc::SetPageTopMar(short pageTopMar)
 {
-    m_pageTopMar = pageTopMar * DEFINITON_FACTOR;
+    m_pageTopMar = pageTopMar * DEFINITION_FACTOR;
 };
 
 void Doc::SetSpacingStaff(short spacingStaff)
@@ -882,14 +888,14 @@ int Doc::GetAdjustedDrawingPageHeight() const
 {
     assert(m_drawingPage);
     int contentHeight = m_drawingPage->GetContentHeight();
-    return (contentHeight + m_drawingPageTopMar * 2) / DEFINITON_FACTOR;
+    return (contentHeight + m_drawingPageTopMar * 2) / DEFINITION_FACTOR;
 }
 
 int Doc::GetAdjustedDrawingPageWidth() const
 {
     assert(m_drawingPage);
     int contentWidth = m_drawingPage->GetContentWidth();
-    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITON_FACTOR;
+    return (contentWidth + m_drawingPageLeftMar + m_drawingPageRightMar) / DEFINITION_FACTOR;
     ;
 }
 

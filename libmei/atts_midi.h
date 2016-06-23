@@ -53,8 +53,8 @@ public:
     data_MIDICHANNEL GetMidiChannel() const { return m_midiChannel; };
     bool HasMidiChannel() const;
     //
-    void SetMidiDuty(int midiDuty_) { m_midiDuty = midiDuty_; };
-    int GetMidiDuty() const { return m_midiDuty; };
+    void SetMidiDuty(data_PERCENT midiDuty_) { m_midiDuty = midiDuty_; };
+    data_PERCENT GetMidiDuty() const { return m_midiDuty; };
     bool HasMidiDuty() const;
     //
     void SetMidiPort(data_MIDIVALUE midiPort_) { m_midiPort = midiPort_; };
@@ -70,7 +70,7 @@ private:
     /** Records a MIDI channel value. **/
     data_MIDICHANNEL m_midiChannel;
     /** Specifies the 'on' part of the duty cycle as a percentage of a note's duration. **/
-    int m_midiDuty;
+    data_PERCENT m_midiDuty;
     /** Sets the MIDI port value. **/
     data_MIDIVALUE m_midiPort;
     /** Sets the MIDI track. **/

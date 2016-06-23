@@ -789,7 +789,7 @@ bool AttGraced::ReadGraced(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("grace.time")) {
-        this->SetGraceTime(StrToInt(element.attribute("grace.time").value()));
+        this->SetGraceTime(StrToPercent(element.attribute("grace.time").value()));
         element.remove_attribute("grace.time");
         hasAttribute = true;
     }
@@ -804,7 +804,7 @@ bool AttGraced::WriteGraced(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasGraceTime()) {
-        element.append_attribute("grace.time") = IntToStr(this->GetGraceTime()).c_str();
+        element.append_attribute("grace.time") = PercentToStr(this->GetGraceTime()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -2079,7 +2079,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
         if (attrType == "grace.time") {
-            att->SetGraceTime(att->StrToInt(attrValue));
+            att->SetGraceTime(att->StrToPercent(attrValue));
             return true;
         }
     }
@@ -2422,7 +2422,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("grace", att->GraceToStr(att->GetGrace())));
         }
         if (att->HasGraceTime()) {
-            attributes->push_back(std::make_pair("grace.time", att->IntToStr(att->GetGraceTime())));
+            attributes->push_back(std::make_pair("grace.time", att->PercentToStr(att->GetGraceTime())));
         }
     }
     if (element->HasAttClass(ATT_HAIRPINLOG)) {

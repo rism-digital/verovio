@@ -71,7 +71,7 @@ void View::SetPage(int pageIdx, bool doLayout)
     m_currentPage = m_doc->SetDrawingPage(pageIdx);
 
     if (doLayout) {
-        m_doc->SetCurrentScoreDef();
+        m_doc->CollectScoreDefs();
         // if we once deal with multiple views, it would be better
         // to redo the layout only when necessary?
         m_currentPage->LayOut();

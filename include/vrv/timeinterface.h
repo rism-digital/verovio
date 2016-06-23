@@ -13,7 +13,7 @@
 
 namespace vrv {
 
-class  Object;
+class Object;
 class LayerElement;
 class Measure;
 
@@ -46,6 +46,11 @@ public:
     void SetStart(LayerElement *start);
     LayerElement *GetStart() { return m_start; };
     ///@}
+
+    /**
+     * Add a staff n to the AttStaffident vector (if not already there)
+     */
+    void AddStaff(int n);
 
     /**
      * Return true if a start is given (@startid or @tstamp)
@@ -82,12 +87,12 @@ public:
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params, Object *object);
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfaceResetDrawing(ArrayPtrVoid *params, Object *object);
 
 protected:
     /**
@@ -182,22 +187,22 @@ public:
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params, Object *object);
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int InterfacePrepareTimeSpanning(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfacePrepareTimeSpanning(ArrayPtrVoid *params, Object *object);
 
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params, Object *object);
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfaceResetDrawing(ArrayPtrVoid *params, Object *object);
 
 private:
     //

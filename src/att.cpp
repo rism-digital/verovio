@@ -275,6 +275,16 @@ data_MODUSMINOR Att::StrToModusminor(std::string value) const
     return MODUSMINOR_NONE;
 }
 
+std::string Att::PercentToStr(data_PERCENT data) const
+{
+    return StringFormat("%d%%", data);
+}
+
+data_PERCENT Att::StrToPercent(std::string value) const
+{
+    return atoi(value.substr(0, value.find("%")).c_str());
+}
+
 std::string Att::PitchnameToStr(data_PITCHNAME data) const
 {
     std::string value;
