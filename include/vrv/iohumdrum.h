@@ -141,7 +141,9 @@ protected:
 
     template <class ELEMENT> void convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
 
-    template <class ELEMENT> void setDuration(ELEMENT rest, hum::HumNum duration);
+    template <class ELEMENT> void setDuration(ELEMENT element, hum::HumNum duration);
+
+    template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
 
     /// Static functions ////////////////////////////////////////////////////
     static string unescapeHtmlEntities(const string &input);
@@ -170,6 +172,7 @@ private:
     vrv::System *m_system; // current system, or NULL
     vrv::Measure *m_measure; // current measure, or NULL
     vrv::Staff *m_staff; // current staff, or NULL
+    int m_currentstaff;
     vrv::Layer *m_layer; // current layer, or NULL
     int m_currentlayer;
 

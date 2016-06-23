@@ -231,6 +231,7 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
     m_staff = NULL;
     m_layer = NULL;
     m_currentlayer = -1;
+    m_currentstaff = -1;
 
     m_debug = 1;
 }
@@ -738,10 +739,21 @@ void HumdrumInput::checkForOmd(int startline, int endline)
             Text *text = new Text;
             tempo->AddTextElement(text);
             text->SetText(UTF8to16(unescapeHtmlEntities(value)));
-            // tempo->ResetStaffident();  // clear out previous staff owner(s).
-            tempo->AddStaff(1);
+            setStaff(tempo, 1);
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setStaff -- Set the staff attribute to given integer.
+//
+
+template <class ELEMENT> void HumdrumInput::setStaff(ELEMENT element, int staffnum)
+{
+    xsd_posIntList stafflist;
+    stafflist.push_back(staffnum);
+    element->SetStaff(stafflist);
 }
 
 //////////////////////////////
@@ -815,6 +827,7 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
 
     bool status = true;
     for (int i = 0; i < (int)kernstarts.size(); i++) {
+        m_currentstaff = i + 1;
         status &= convertMeasureStaff(kernstarts[i]->getTrack(), startline, endline, i + 1, layers[i]);
         if (!status) {
             break;
@@ -1331,6 +1344,10 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
 
     if ((tstring.find("_") != string::npos) || (tstring.find("]") != string::npos)) {
         processTieEnd(note, token, tstring);
+    }
+
+    if (tstring.find("j") != string::npos) {
+        setStaff(note, m_currentstaff + 1);
     }
 
     convertVerses(note, token, subtoken);
