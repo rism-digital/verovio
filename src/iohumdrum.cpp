@@ -941,22 +941,37 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     // setup beam states
     vector<int> beamstate(layerdata.size(), 0);
+    vector<int> gbeamstate(layerdata.size(), 0); // for grace notes
     int negativeQ = 0;
+    int gnegativeQ = 0;
+
     for (i = 0; i < (int)beamstate.size(); i++) {
         if (!layerdata[i]->getLine()->isData()) {
             beamstate[i] = 0;
+            gbeamstate[i] = 0;
         }
-        else {
+        else if (layerdata[i]->isGrace()) {
+            gbeamstate[i] = characterCount(*layerdata[i], 'L');
+            gbeamstate[i] -= characterCount(*layerdata[i], 'J');
+            beamstate[i] = 0;
+        }
+        else if (!layerdata[i]->isGrace()) {
             beamstate[i] = characterCount(*layerdata[i], 'L');
             beamstate[i] -= characterCount(*layerdata[i], 'J');
+            gbeamstate[i] = 0;
         }
         if (i > 0) {
             beamstate[i] += beamstate[i - 1];
+            gbeamstate[i] += gbeamstate[i - 1];
         }
         if (beamstate[i] < 0) {
             negativeQ = 1;
         }
+        if (gbeamstate[i] < 0) {
+            negativeQ = 1;
+        }
     }
+
     if (negativeQ || (beamstate.back() != 0)) {
         // something wrong with the beaming, either incorrect or
         // the beaming crosses a barline or layer.  Don't try to
@@ -964,8 +979,19 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         std::fill(beamstate.begin(), beamstate.end(), 0);
     }
 
+    if (gnegativeQ || (gbeamstate.back() != 0)) {
+        // something wrong with the graceote beaming, either incorrect or
+        // the beaming crosses a barline or layer.  Don't try to
+        // beam anything.
+        std::fill(gbeamstate.begin(), beamstate.end(), 0);
+    }
+
     Beam *beam = NULL;
+    Beam *gbeam = NULL;
+    Chord *chord = NULL;
+    bool isgrace = false;
     bool turnoffbeam = false;
+    bool turnoffgbeam = false;
     for (i = 0; i < (int)layerdata.size(); i++) {
         if (prespace[i] > 0) {
             Space *space = new Space;
@@ -983,7 +1009,12 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         if (!layerdata[i]->getLine()->isData()) {
             continue;
         }
+        isgrace = layerdata[i]->isGrace();
         if ((i == 0) && (beamstate[i] > 0)) {
+            beam = new Beam;
+            appendElement(layer, beam);
+        }
+        else if ((i == 0) && (gbeamstate[i] > 0)) {
             beam = new Beam;
             appendElement(layer, beam);
         }
@@ -991,12 +1022,27 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             beam = new Beam;
             appendElement(layer, beam);
         }
+        else if ((gbeamstate[i - 1] == 0) && (gbeamstate[i] > 0)) {
+            gbeam = new Beam;
+            if (beam != NULL) {
+                appendElement(beam, gbeam);
+            }
+            else {
+                appendElement(layer, gbeam);
+            }
+        }
         else if (beamstate[i] == 0) {
             turnoffbeam = true;
         }
+        else if (gbeamstate[i] == 0) {
+            turnoffgbeam = true;
+        }
         if (layerdata[i]->isChord()) {
-            Chord *chord = new Chord;
-            if (beam != NULL) {
+            chord = new Chord;
+            if (isgrace && (gbeam != NULL)) {
+                appendElement(gbeam, chord);
+            }
+            else if ((beam != NULL) && !isgrace) {
                 appendElement(beam, chord);
             }
             else {
@@ -1008,7 +1054,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (layerdata[i]->find("yy") != string::npos) {
                 // Invisible rest (or note which should be invisible.
                 Space *irest = new Space;
-                if (beam != NULL) {
+                if (isgrace && (gbeam != NULL)) {
+                    appendElement(gbeam, irest);
+                }
+                else if ((beam != NULL) && !isgrace) {
                     appendElement(beam, irest);
                 }
                 else {
@@ -1018,7 +1067,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             else {
                 Rest *rest = new Rest;
-                if (beam != NULL) {
+                if (isgrace && (gbeam != NULL)) {
+                    appendElement(gbeam, rest);
+                }
+                else if ((beam != NULL) && !isgrace) {
                     appendElement(beam, rest);
                 }
                 else {
@@ -1030,7 +1082,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         else {
             // should be a note
             Note *note = new Note;
-            if (beam != NULL) {
+            if (isgrace && (gbeam != NULL)) {
+                appendElement(gbeam, note);
+            }
+            else if (beam != NULL) {
                 appendElement(beam, note);
             }
             else {
@@ -1043,11 +1098,16 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             turnoffbeam = false;
             beam = NULL;
         }
+        if (turnoffgbeam) {
+            turnoffgbeam = false;
+            gbeam = NULL;
+        }
     }
 
     if (prespace.size() > layerdata.size()) {
         if (prespace.back() > 0) {
             Space *space = new Space;
+            // Shouldn't ever occur in a gbeam.
             if (beam != NULL) {
                 appendElement(beam, space);
             }
@@ -1198,6 +1258,10 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
     }
 
     bool chordQ = token->isChord();
+
+    if (tstring.find("q") != string::npos) {
+        note->SetGrace(GRACE_acc);
+    }
 
     // Add the pitch information
     int diatonic = Convert::kernToBase7(tstring);
@@ -1363,6 +1427,9 @@ template <class ELEMENT> void HumdrumInput::convertRhythm(ELEMENT element, HTp t
         tstring = token->getSubtoken(subtoken);
         stindex = subtoken;
     }
+
+    // Remove grace note information (for generating printed duration)
+    tstring.erase(std::remove(tstring.begin(), tstring.end(), 'q'), tstring.end());
 
     int dotcount = characterCountInSubtoken(tstring, '.');
     if (dotcount > 0) {

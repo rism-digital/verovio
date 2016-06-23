@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jun 21 07:12:11 PDT 2016
+// Last Modified: Wed Jun 22 19:32:58 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -7482,6 +7482,26 @@ bool HumdrumToken::isInvisible(void) const {
 		if (find("yy") != string::npos) {
 			return true;
 		}
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isGrace -- True if a **kern note has no duration.
+// 
+
+bool HumdrumToken::isGrace(void) const {
+	if (!isDataType("**kern")) {
+			return false;
+	}
+	if (!isData()) {
+		return false;
+	} else if (this->find("q") != string::npos) {
+		return true;
 	}
 
 	return false;
