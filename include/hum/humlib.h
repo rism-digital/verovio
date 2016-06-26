@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jun 23 15:08:59 PDT 2016
+// Last Modified: Sat Jun 25 20:55:48 PDT 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -589,6 +589,7 @@ class HumdrumToken : public string, public HumHash {
 		bool     isSecondaryTiedNote       (void) const;
 		bool     isInvisible               (void) const;
 		bool     isGrace                   (void) const;
+		bool     isClef                    (void) const;
 
 		bool     hasSlurStart              (void) const;
 		bool     hasSlurEnd                (void) const;

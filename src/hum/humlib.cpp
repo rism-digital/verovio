@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Jun 23 15:08:59 PDT 2016
+// Last Modified: Sat Jun 25 20:55:48 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -7521,6 +7521,26 @@ bool HumdrumToken::isGrace(void) const {
 	if (!isData()) {
 		return false;
 	} else if (this->find("q") != string::npos) {
+		return true;
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::isClef -- True if a **kern clef.
+// 
+
+bool HumdrumToken::isClef(void) const {
+	if (!isDataType("**kern")) {
+			return false;
+	}
+	if (!isInterpretation()) {
+		return false;
+	} else if (this->compare(0, 5, "*clef") != string::npos) {
 		return true;
 	}
 

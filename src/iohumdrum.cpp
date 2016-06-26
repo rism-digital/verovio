@@ -1089,6 +1089,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         if (layerdata[i]->isInterpretation()) {
             handleOttavaMark(*layerdata[i], note);
+			if (layerdata[i]->getDurationFromStart() != 0) {
+				if (layerdata[i]->isClef()) {
+					insertClefElement(elements, pointers, layerdata[i]);
+				}
+			}
         }
         if (!layerdata[i]->isData()) {
             continue;
@@ -1144,6 +1149,51 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     return true;
 }
+
+
+
+/////////////////////////////
+//
+// HumdrumInput::insertClefElement -- A clef which starts after the beginning of the movement.
+//
+
+void HumdrumInput::insertClefElement(vector<string>& elements, vector<void*> pointers, HTp token) {
+	Clef *clef = new Clef;
+	appendElement(elements, pointers, clef);
+
+    if (token->find("clefG") != string::npos) {
+        clef->SetShape(CLEFSHAPE_G);
+    }
+    else if (token->find("clefF") != string::npos) {
+        clef->SetShape(CLEFSHAPE_F);
+    }
+    else if (token->find("clefC") != string::npos) {
+        clef->SetShape(CLEFSHAPE_C);
+    }
+
+    if (token->find("2") != string::npos) {
+        clef->SetLine(2);
+    }
+    else if (token->find("4") != string::npos) {
+        clef->SetLine(4);
+    }
+    else if (token->find("3") != string::npos) {
+        clef->SetLine(3);
+    }
+    else if (token->find("5") != string::npos) {
+        clef->SetLine(5);
+    }
+    else if (token->find("1") != string::npos) {
+        clef->SetLine(1);
+    }
+
+    if (token->find("v") != string::npos) {
+        clef->SetDis(OCTAVE_DIS_8);
+        clef->SetDisPlace(PLACE_below);
+    }
+}
+
+
 
 //////////////////////////////
 //

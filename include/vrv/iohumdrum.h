@@ -177,6 +177,7 @@ protected:
     void removeTuplet(vector<string> &elements, vector<void *> &pointers);
     void removeGBeam(vector<string> &elements, vector<void *> &pointers);
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
+	void insertClefElement(vector<string>& elements, vector<void*> pointers, hum::HTp clef);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
