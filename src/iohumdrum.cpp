@@ -50,12 +50,12 @@
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
+#include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
 
 //#include "attcomparison.h"
 //#include "slur.h"
-//#include "tuplet.h"
 //#include "pugixml.hpp"
 
 using namespace hum; // humlib  namespace
@@ -233,8 +233,10 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
     m_layer = NULL;
     m_currentlayer = -1;
     m_currentstaff = -1;
+    m_tupletscaling = 1;
 
     m_debug = 1;
+    m_omd = false;
 }
 
 //////////////////////////////
@@ -719,12 +721,13 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 
 void HumdrumInput::checkForOmd(int startline, int endline)
 {
-    const vector<HTp> &kernstarts = m_kernstarts;
-    if (kernstarts.size() == 0) {
+    if (m_omd) {
         return;
     }
-    if (startline != kernstarts[0]->getLineIndex()) {
-        // not at the start of the file.
+    m_omd = true;
+
+    const vector<HTp> &kernstarts = m_kernstarts;
+    if (kernstarts.size() == 0) {
         return;
     }
     HumdrumFile &infile = m_infile;
@@ -901,6 +904,101 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 
 //////////////////////////////
 //
+// HumdrumInput::printGroupInfo --
+//
+
+void HumdrumInput::printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, vector<HTp> &layerdata)
+{
+    if (layerdata.size() != tg.size()) {
+        cerr << "LAYER SIZE = " << layerdata.size() << "\tTGSIZE" << tg.size() << endl;
+        return;
+    }
+    cerr << "TOK\tGRP\tBRAK\tNUM\tNBASE\tNSCAL\tBSTART\tBEND\tGBST\tGBEND\tTSTART\tTEND\tPRIORITY\n";
+    for (int i = 0; i < tg.size(); i++) {
+        cerr << *layerdata[i] << "\t";
+        cerr << tg[i].group << "\t";
+        cerr << tg[i].bracket << "\t";
+        cerr << tg[i].num << "\t";
+        cerr << tg[i].numbase << "\t";
+        cerr << tg[i].numscale << "\t";
+        cerr << tg[i].beamstart << "\t";
+        cerr << tg[i].beamend << "\t";
+        cerr << tg[i].gbeamstart << "\t";
+        cerr << tg[i].gbeamend << "\t";
+        cerr << tg[i].tupletstart << "\t";
+        cerr << tg[i].tupletend << "\t";
+        cerr << tg[i].priority;
+        cerr << endl;
+    }
+    cerr << "============================================" << endl;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::handleGroupStarts --
+//
+
+void HumdrumInput::handleGroupStarts(
+    const humaux::HumdrumBeamAndTuplet &tg, vector<string> &elements, vector<void *> &pointers, HTp token)
+{
+    if (tg.beamstart && tg.tupletstart) {
+        if (tg.priority == 'T') {
+            insertTuplet(elements, pointers, tg, token);
+            insertBeam(elements, pointers, tg);
+        }
+        else {
+            insertBeam(elements, pointers, tg);
+            insertTuplet(elements, pointers, tg, token);
+        }
+    }
+    else if (tg.beamstart) {
+        insertBeam(elements, pointers, tg);
+    }
+    else if (tg.tupletstart) {
+        insertTuplet(elements, pointers, tg, token);
+    }
+
+    if (tg.gbeamstart) {
+        // Grace note beams should not interact with
+        // regular beams or tuplets.
+        insertGBeam(elements, pointers, tg);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::handleGroupEnds --
+//
+
+void HumdrumInput::handleGroupEnds(
+    const humaux::HumdrumBeamAndTuplet &tg, vector<string> &elements, vector<void *> &pointers)
+{
+    if (tg.beamend && tg.tupletend) {
+        if (tg.priority == 'T') {
+            removeTuplet(elements, pointers);
+            removeBeam(elements, pointers);
+        }
+        else {
+            removeBeam(elements, pointers);
+            removeTuplet(elements, pointers);
+        }
+    }
+    else if (tg.beamend) {
+        removeBeam(elements, pointers);
+    }
+    else if (tg.tupletend) {
+        removeTuplet(elements, pointers);
+    }
+
+    if (tg.gbeamend) {
+        // Grace note beams should not interact with
+        // regular beams or tuplets.
+        removeGBeam(elements, pointers);
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::fillContentsOfLayer -- Fill the layer with musical data.
 //
 
@@ -917,6 +1015,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
     vector<HTp> &layerdata = m_layertokens[staffindex][layerindex];
     Layer *&layer = m_layer;
+
+    if (layerdata.size() == 0) {
+        // nothing to do.
+        return true;
+    }
 
     HumNum starttime = infile[startline].getDurationFromStart();
     HumNum endtime = infile[endline].getDurationFromStart() + infile[endline].getDuration();
@@ -958,26 +1061,122 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         return true;
     }
 
-    // setup beam states
+    vector<humaux::HumdrumBeamAndTuplet> tg;
+    prepareBeamAndTupletGroups(layerdata, tg);
+
+    if (m_debug) {
+        // printGroupInfo(tg, layerdata);
+    }
+
+    vector<string> elements;
+    vector<void *> pointers;
+
+    elements.push_back("layer");
+    pointers.push_back((void *)layer);
+
+    m_tupletscaling = 1;
+
+    Note *note = NULL;
+
+    for (i = 0; i < (int)layerdata.size(); i++) {
+        if (prespace[i] > 0) {
+            Space *space = new Space;
+            appendElement(elements, pointers, space);
+            setDuration(space, prespace[i]);
+        }
+        if (layerdata[i]->isNull()) {
+            continue;
+        }
+        if (layerdata[i]->isInterpretation()) {
+            handleOttavaMark(*layerdata[i], note);
+        }
+        if (!layerdata[i]->isData()) {
+            continue;
+        }
+
+        handleGroupStarts(tg[i], elements, pointers, layerdata[i]);
+
+        if (layerdata[i]->isChord()) {
+            Chord *chord = new Chord;
+            appendElement(elements, pointers, chord);
+            elements.push_back("chord");
+            pointers.push_back((void *)chord);
+            convertChord(chord, layerdata[i]);
+            elements.pop_back();
+            pointers.pop_back();
+        }
+        else if (layerdata[i]->isRest()) {
+            if (layerdata[i]->find("yy") != string::npos) {
+                // Invisible rest (or note which should be invisible.
+                Space *irest = new Space;
+                appendElement(elements, pointers, irest);
+                convertRhythm(irest, layerdata[i]);
+            }
+            else {
+                Rest *rest = new Rest;
+                appendElement(elements, pointers, rest);
+                convertRest(rest, layerdata[i]);
+            }
+        }
+        else {
+            // should be a note
+            note = new Note;
+            if ((m_ottavameasure[staffindex] != NULL) && (m_ottavanote[staffindex] == NULL)) {
+                m_ottavanote[staffindex] = note;
+            }
+            appendElement(elements, pointers, note);
+            convertNote(note, layerdata[i]);
+        }
+
+        handleGroupEnds(tg[i], elements, pointers);
+    }
+
+    if (prespace.size() > layerdata.size()) {
+        if (prespace.back() > 0) {
+            // if there is empty space at the end of the layer.  The layer is
+            // rhythmically too short, so add a space element to match the
+            // amount of underfilling.
+            Space *space = new Space;
+            appendElement(elements, pointers, space);
+            setDuration(space, prespace.back());
+        }
+    }
+
+    return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeLayerBeams --
+//
+
+void HumdrumInput::analyzeLayerBeams(vector<int> &beamnum, vector<int> &gbeamnum, const vector<HTp> &layerdata)
+{
+
     vector<int> beamstate(layerdata.size(), 0);
     vector<int> gbeamstate(layerdata.size(), 0); // for grace notes
     int negativeQ = 0;
     int gnegativeQ = 0;
 
+    int i;
     for (i = 0; i < (int)beamstate.size(); i++) {
-        if (!layerdata[i]->getLine()->isData()) {
+        if (!layerdata[i]->isData()) {
             beamstate[i] = 0;
             gbeamstate[i] = 0;
         }
-        else if (layerdata[i]->isGrace()) {
+        if (layerdata[i]->isNull()) {
+            // shouldn't get to this state
+            beamstate[i] = 0;
+            gbeamstate[i] = 0;
+        }
+        if (layerdata[i]->isGrace()) {
             gbeamstate[i] = characterCount(*layerdata[i], 'L');
             gbeamstate[i] -= characterCount(*layerdata[i], 'J');
-            beamstate[i] = 0;
+            // beamstate[i] = 0;
         }
-        else if (!layerdata[i]->isGrace()) {
+        else {
             beamstate[i] = characterCount(*layerdata[i], 'L');
             beamstate[i] -= characterCount(*layerdata[i], 'J');
-            gbeamstate[i] = 0;
         }
         if (i > 0) {
             beamstate[i] += beamstate[i - 1];
@@ -991,160 +1190,650 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
     }
 
+    // Convert to beam enumerations.  Beamstates are nonzero for the
+    // notes in a beam, but the last one is zero.
+    int bcounter = 1;
+    beamnum.resize(beamstate.size());
+    std::fill(beamnum.begin(), beamnum.end(), 0);
+    if (beamstate[0]) {
+        beamnum[0] = bcounter;
+    }
+    else {
+        beamnum[0] = 0;
+    }
+    for (i = 1; i < (int)beamstate.size(); i++) {
+        if (beamstate[i]) {
+            beamnum[i] = bcounter;
+        }
+        if ((!beamstate[i]) && beamstate[i - 1]) {
+            beamnum[i] = bcounter++;
+        }
+    }
+
+    bcounter = 1;
+    gbeamnum.resize(beamstate.size());
+    std::fill(gbeamnum.begin(), gbeamnum.end(), 0);
+    if (gbeamstate[0]) {
+        gbeamnum[0] = bcounter;
+    }
+    else {
+        gbeamnum[0] = 0;
+    }
+    for (i = 1; i < (int)gbeamstate.size(); i++) {
+        if (gbeamstate[i]) {
+            gbeamnum[i] = bcounter;
+        }
+        if ((!gbeamstate[i]) && gbeamstate[i - 1]) {
+            gbeamnum[i] = bcounter++;
+        }
+    }
+
     if (negativeQ || (beamstate.back() != 0)) {
         // something wrong with the beaming, either incorrect or
         // the beaming crosses a barline or layer.  Don't try to
         // beam anything.
         std::fill(beamstate.begin(), beamstate.end(), 0);
+        std::fill(beamnum.begin(), beamnum.end(), 0);
     }
 
     if (gnegativeQ || (gbeamstate.back() != 0)) {
         // something wrong with the graceote beaming, either incorrect or
         // the beaming crosses a barline or layer.  Don't try to
         // beam anything.
-        std::fill(gbeamstate.begin(), beamstate.end(), 0);
+        std::fill(gbeamstate.begin(), gbeamstate.end(), 0);
+        std::fill(gbeamnum.begin(), gbeamnum.end(), 0);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertTuplet --
+//
+
+void HumdrumInput::insertTuplet(
+    vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg, HTp token)
+{
+    Tuplet *tuplet = new Tuplet;
+    appendElement(elements, pointers, tuplet);
+    elements.push_back("tuplet");
+    pointers.push_back((void *)tuplet);
+
+    int staff = m_rkern[token->getTrack()];
+    if (m_verses[staff]) {
+        // If the music contains lyrics, force the tuplet above the staff.
+        tuplet->SetBracketPlace(PLACE_above);
     }
 
-    Note *note = NULL;
-    Beam *beam = NULL;
-    Beam *gbeam = NULL;
-    Chord *chord = NULL;
-    bool isgrace = false;
-    bool turnoffbeam = false;
-    bool turnoffgbeam = false;
+    tuplet->SetNum(tg.num * tg.numscale);
+    tuplet->SetNumbase(tg.numbase * tg.numscale);
+    if (tg.bracket) {
+        tuplet->SetBracketVisible(BOOLEAN_true);
+    }
+    else {
+        tuplet->SetBracketVisible(BOOLEAN_false);
+    }
+    HumNum base = tg.numbase;
+    if (!base.isPowerOfTwo()) {
+        tuplet->SetNumFormat(tupletVis_NUMFORMAT_ratio);
+    }
+    else {
+        tuplet->SetNumFormat(tupletVis_NUMFORMAT_count);
+    }
+    m_tupletscaling = tg.num;
+    m_tupletscaling /= tg.numbase;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertBeam --
+//
+
+void HumdrumInput::insertBeam(
+    vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg)
+{
+    Beam *beam = new Beam;
+    appendElement(elements, pointers, beam);
+    elements.push_back("beam");
+    pointers.push_back((void *)beam);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertGBeam --
+//
+
+void HumdrumInput::insertGBeam(
+    vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg)
+{
+    Beam *gbeam = new Beam;
+    appendElement(elements, pointers, gbeam);
+    elements.push_back("gbeam");
+    pointers.push_back((void *)gbeam);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::removeBeam --
+//
+
+void HumdrumInput::removeBeam(vector<string> &elements, vector<void *> &pointers)
+{
+    if (elements.back() != "beam") {
+        cerr << "ERROR REMOVING BEAM" << endl;
+        cerr << "ELEMENT STACK:" << endl;
+        for (int i = (int)elements.size() - 1; i >= 0; i--) {
+            cerr << i << ":\t" << elements[i] << endl;
+        }
+        return;
+    }
+    elements.pop_back();
+    pointers.pop_back();
+}
+
+//////////////////////////////
+//
+// HumdrumInput::removeGBeam --
+//
+
+void HumdrumInput::removeGBeam(vector<string> &elements, vector<void *> &pointers)
+{
+    if (elements.back() != "gbeam") {
+        cerr << "ERROR REMOVING GBEAM" << endl;
+        cerr << "ELEMENT STACK:" << endl;
+        for (int i = (int)elements.size() - 1; i >= 0; i--) {
+            cerr << i << ":\t" << elements[i] << endl;
+        }
+        return;
+    }
+    elements.pop_back();
+    pointers.pop_back();
+}
+
+//////////////////////////////
+//
+// HumdrumInput::removeTuplet --
+//
+
+void HumdrumInput::removeTuplet(vector<string> &elements, vector<void *> &pointers)
+{
+    if (elements.back() != "tuplet") {
+        cerr << "ERROR REMOVING Tuplet" << endl;
+        cerr << "ELEMENT BACK IS " << elements.back() << endl;
+        cerr << "ELEMENT STACK:" << endl;
+        for (int i = (int)elements.size() - 1; i >= 0; i--) {
+            cerr << i << ":\t" << elements[i] << endl;
+        }
+        return;
+    }
+    elements.pop_back();
+    pointers.pop_back();
+
+    // Need to fix this when nested tuplets are allowed:
+    m_tupletscaling = 1;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::prepareBeamAndTupletGroups -- Calculate beam and tuplet
+//     groupings for a layer.
+//
+
+void HumdrumInput::prepareBeamAndTupletGroups(
+    const vector<hum::HTp> &layerdata, vector<humaux::HumdrumBeamAndTuplet> &tg)
+{
+
+    vector<int> beamnum;
+    vector<int> gbeamnum;
+    analyzeLayerBeams(beamnum, gbeamnum, layerdata);
+
+    int i;
+    tg.clear();
+
+    // duritems == a list of items in the layer which have duration.
+    // Grace notes, barlines, interpretations, local comments, global comments,
+    // etc. are filtered out for the analysis.
+    vector<HTp> duritems;
+
+    // indexmapping == maping from a duritem index to a layerdata index.
+    vector<int> indexmapping;
+
+    // indexmapping2 == mapping from a layerdata index to a duritem index,
+    // with -1 meaning no mapping.
+    vector<int> indexmapping2;
+
+    // durbeamnum == beam numbers for durational items only.
+    vector<int> durbeamnum;
+
+    // Extract a list of the layer items which have duration:
     for (i = 0; i < (int)layerdata.size(); i++) {
-        if (prespace[i] > 0) {
-            Space *space = new Space;
-            if (beam != NULL) {
-                appendElement(beam, space);
-            }
-            else {
-                appendElement(layer, space);
-            }
-            setDuration(space, prespace[i]);
+        if (!layerdata[i]->isData()) {
+            indexmapping2.push_back(-1);
+            continue;
         }
         if (layerdata[i]->isNull()) {
+            indexmapping2.push_back(-1);
             continue;
         }
-        if (layerdata[i]->isInterpretation()) {
-            handleOttavaMark(*layerdata[i], note);
-        }
-        if (!layerdata[i]->getLine()->isData()) {
+        if (layerdata[i]->isGrace()) {
+            indexmapping2.push_back(-1);
             continue;
         }
-        isgrace = layerdata[i]->isGrace();
-        if ((i == 0) && (beamstate[i] > 0)) {
-            beam = new Beam;
-            appendElement(layer, beam);
+        indexmapping.push_back(i);
+        indexmapping2.push_back(indexmapping.size() - 1);
+        duritems.push_back(layerdata[i]);
+        durbeamnum.push_back(beamnum[i]);
+    }
+
+    // poweroftwo == keeps track whether durations are a based on a power
+    // (non-tuplet) or not (tuplet).  Notes/rests with false poweroftwo
+    // will be grouped into tuplets.
+    vector<bool> poweroftwo(duritems.size());
+    bool hastupletQ = false;
+    vector<HumNum> dotlessdur(duritems.size());
+    for (i = 0; i < (int)duritems.size(); i++) {
+        HumNum duration = Convert::recipToDurationNoDots(*duritems[i]);
+        dotlessdur[i] = duration;
+        poweroftwo[i] = duration.isPowerOfTwo();
+        hastupletQ |= !poweroftwo[i];
+    }
+
+    // Count the number of beams.  The durbeamnum vector contains a list
+    // of beam numbers starting from 1 (or 0 if a note/rest has no beam).
+    int beamcount = 0;
+    for (i = 0; i < (int)durbeamnum.size(); i++) {
+        if (durbeamnum[i] > beamcount) {
+            beamcount = durbeamnum[i];
         }
-        else if ((i == 0) && (gbeamstate[i] > 0)) {
-            beam = new Beam;
-            appendElement(layer, beam);
+    }
+
+    // beamstarts and beamends are lists of the starting and ending
+    // index for beams of duration items in the layer.  The index is
+    // into the durlist vector (list of items which posses duration).
+    vector<int> beamstarts(beamcount, -1);
+    vector<int> beamends(beamcount, 0);
+    for (i = 0; i < (int)durbeamnum.size(); i++) {
+        if (durbeamnum[i]) {
+            if (beamstarts[durbeamnum[i] - 1] < 0) {
+                beamstarts[durbeamnum[i] - 1] = i;
+            }
+            beamends[durbeamnum[i] - 1] = i;
         }
-        else if ((beamstate[i - 1] == 0) && (beamstate[i] > 0)) {
-            beam = new Beam;
-            appendElement(layer, beam);
+    }
+
+    // beamstartboolean == starting of a beam on a particular note
+    // beamendboolean == ending of a beam on a particular note
+    vector<int> beamstartboolean(durbeamnum.size(), 0);
+    vector<int> beamendboolean(durbeamnum.size(), 0);
+    for (i = 0; i < (int)beamstarts.size(); i++) {
+        beamstartboolean[beamstarts[i]] = i + 1;
+        beamendboolean[beamends[i]] = i + 1;
+    }
+
+    // Calculate grace note beam starts and ends.
+    // Presuming no clef changess, etc. found between notes in
+    // a gracenote beam.  Generalize further if so.
+    // gbeamstart == boolean for starting of a grace note beam
+    // gbeamend == boolean ending of a grace note beam
+    vector<int> gbeamstart(layerdata.size(), 0);
+    vector<int> gbeamend(layerdata.size(), 0);
+    vector<int> gstate(layerdata.size(), 0);
+    for (i = 0; i < (int)gbeamnum.size(); i++) {
+        if (!gbeamnum[i]) {
+            continue;
         }
-        else if ((gbeamstate[i - 1] == 0) && (gbeamstate[i] > 0)) {
-            gbeam = new Beam;
-            if (beam != NULL) {
-                appendElement(beam, gbeam);
-            }
-            else {
-                appendElement(layer, gbeam);
-            }
-        }
-        else if (beamstate[i] == 0) {
-            turnoffbeam = true;
-        }
-        else if (gbeamstate[i] == 0) {
-            turnoffgbeam = true;
-        }
-        if (layerdata[i]->isChord()) {
-            chord = new Chord;
-            if (isgrace && (gbeam != NULL)) {
-                appendElement(gbeam, chord);
-            }
-            else if ((beam != NULL) && !isgrace) {
-                appendElement(beam, chord);
-            }
-            else {
-                appendElement(layer, chord);
-            }
-            convertChord(chord, layerdata[i]);
-        }
-        else if (layerdata[i]->isRest()) {
-            if (layerdata[i]->find("yy") != string::npos) {
-                // Invisible rest (or note which should be invisible.
-                Space *irest = new Space;
-                if (isgrace && (gbeam != NULL)) {
-                    appendElement(gbeam, irest);
-                }
-                else if ((beam != NULL) && !isgrace) {
-                    appendElement(beam, irest);
-                }
-                else {
-                    appendElement(layer, irest);
-                }
-                convertRhythm(irest, layerdata[i]);
-            }
-            else {
-                Rest *rest = new Rest;
-                if (isgrace && (gbeam != NULL)) {
-                    appendElement(gbeam, rest);
-                }
-                else if ((beam != NULL) && !isgrace) {
-                    appendElement(beam, rest);
-                }
-                else {
-                    appendElement(layer, rest);
-                }
-                convertRest(rest, layerdata[i]);
-            }
+        else if (gstate[gbeamnum[i]]) {
+            continue;
         }
         else {
-            // should be a note
-            note = new Note;
-            if ((m_ottavameasure[staffindex] != NULL) && (m_ottavanote[staffindex] == NULL)) {
-                m_ottavanote[staffindex] = note;
-            }
-            if (isgrace && (gbeam != NULL)) {
-                appendElement(gbeam, note);
-            }
-            else if (beam != NULL) {
-                appendElement(beam, note);
-            }
-            else {
-                appendElement(layer, note);
-            }
-            convertNote(note, layerdata[i]);
-        }
-
-        if (turnoffbeam) {
-            turnoffbeam = false;
-            beam = NULL;
-        }
-        if (turnoffgbeam) {
-            turnoffgbeam = false;
-            gbeam = NULL;
+            gstate[gbeamnum[i]] = 1;
+            gbeamstart[i] = gbeamnum[i];
         }
     }
 
-    if (prespace.size() > layerdata.size()) {
-        if (prespace.back() > 0) {
-            Space *space = new Space;
-            // Shouldn't ever occur in a gbeam.
-            if (beam != NULL) {
-                appendElement(beam, space);
-            }
-            else {
-                appendElement(layer, space);
-            }
-            setDuration(space, prespace.back());
+    std::fill(gstate.begin(), gstate.end(), 0);
+    for (i = (int)gbeamnum.size() - 1; i >= 0; i--) {
+        if (!gbeamnum[i]) {
+            continue;
+        }
+        else if (gstate[gbeamnum[i]]) {
+            continue;
+        }
+        else {
+            gstate[gbeamnum[i]] = 1;
+            gbeamend[i] = gbeamnum[i];
         }
     }
 
-    return true;
+    if (!hastupletQ) {
+        tg.resize(layerdata.size());
+        for (i = 0; i < (int)layerdata.size(); i++) {
+            tg[i].gbeamstart = gbeamstart[i];
+            tg[i].gbeamend = gbeamend[i];
+            if (indexmapping2[i] < 0) {
+                continue;
+            }
+            tg[i].beamstart = beamstartboolean[indexmapping2[i]];
+            tg[i].beamend = beamendboolean[indexmapping2[i]];
+        }
+        return;
+    }
+
+    // fulldur == the full duration of the note/rest including augmentation dots.
+    vector<HumNum> fulldur(duritems.size());
+
+    // dursm = a cumulative sum of the full durs, starting at 0 for the first index.
+    vector<HumNum> dursum(duritems.size());
+
+    HumNum sum = 0;
+    vector<int> twocounttop(dotlessdur.size(), 0);
+    vector<int> twocountbot(dotlessdur.size(), 0);
+    for (i = 0; i < (int)dotlessdur.size(); i++) {
+        dotlessdur[i] = removeFactorsOfTwo(dotlessdur[i], twocounttop[i], twocountbot[i]);
+        fulldur[i] = Convert::recipToDuration(*duritems[i]);
+        dursum[i] = sum;
+        sum += fulldur[i];
+    }
+
+    // beamdur = a list of the durations for each beam.
+    vector<HumNum> beamdur(beamstarts.size());
+    for (i = 0; i < (int)beamdur.size(); i++) {
+        beamdur[i] = dursum[beamends[i]] - dursum[beamstarts[i]] + fulldur[beamends[i]];
+    }
+
+    // beampowdot == the number of augmentation dots on a power of two for
+    // the duration of the beam.  -1 means could not be made power of two with
+    // dots.
+    vector<int> beampowdot(beamstarts.size(), -1);
+    for (i = 0; i < (int)beampowdot.size(); i++) {
+        beampowdot[i] = getDotPowerOfTwo(beamdur[i]);
+    }
+
+    vector<bool> binarybeams(beamstarts.size(), false);
+    for (i = 0; i < (int)binarybeams.size(); i++) {
+        if (poweroftwo[beamstarts[i]]) {
+            binarybeams[i] = true;
+        }
+    }
+
+    // Assume that tuplet beams which can fit into a power of two will form
+    // a tuplet group.  Perhaps bias towards beampowdot being 0, and try to
+    // beam groups to include non-beamed tuplets into lower powdots.
+    // Should check that the factors of notes in the beam group all match...
+    vector<int> tupletgroups(poweroftwo.size(), 0);
+
+    // tupletbracket == boolean for if the tuplet group requires a bracket.
+    // It will require a bracket if they are not all enclosed in a beam.
+    vector<int> tupletbracket(poweroftwo.size(), -1);
+    int tupletnum = 1;
+    int j;
+    for (int i = 0; i < beampowdot.size(); i++) {
+        if (binarybeams[i]) {
+            continue;
+        }
+        if (beampowdot[i] >= 0) {
+            for (j = beamstarts[i]; j <= beamends[i]; j++) {
+                tupletgroups[j] = tupletnum;
+                tupletbracket[j] = 0;
+            }
+            tupletnum++;
+        }
+    }
+
+    // Go back and link all partial beamed tuplets and non-beamed tuplets.
+    HumNum groupdur;
+    for (int i = 0; i < (int)poweroftwo.size(); i++) {
+        if (poweroftwo[i]) {
+            // not a tuplet
+            continue;
+        }
+        if (tupletgroups[i]) {
+            // already in a tuplet group
+            continue;
+        }
+        // At a tuplet which is not already in a tuplet group
+        // search for how long the group should occur.
+        j = i + 1;
+        int ending = poweroftwo.size() - 1;
+        ;
+        groupdur = 0;
+        while (j < (int)poweroftwo.size()) {
+            if (poweroftwo[j]) {
+                ending = j - 1;
+                break;
+            }
+            if (tupletgroups[i]) {
+                ending = j - 1;
+                break;
+            }
+            if (dotlessdur[j] != dotlessdur[i]) {
+                ending = j - 1;
+                break;
+            }
+            groupdur = dursum[j] - dursum[i] + fulldur[j];
+            if (groupdur.isPowerOfTwo()) {
+                ending = j;
+                break;
+            }
+            j++;
+        }
+        if (ending >= 0) {
+            // create a new tuplet group (which will require a bracket).
+            for (j = i; j <= ending; j++) {
+                tupletgroups[j] = tupletnum;
+                tupletbracket[j] = 1;
+            }
+            tupletnum++;
+            i = ending;
+        }
+    }
+
+    // tupletstartboolean == starting of a tuplet group
+    // tupletendboolean == ending of a tuplet group
+    vector<int> tupletstartboolean(tupletgroups.size(), 0);
+    vector<int> tupletendboolean(tupletgroups.size(), 0);
+    vector<bool> tstart(tupletgroups.size(), false);
+    vector<bool> tend(tupletgroups.size(), false);
+    for (i = 0; i < (int)tupletgroups.size(); i++) {
+        if (!tupletgroups[i]) {
+            continue;
+        }
+        if (!tstart[tupletgroups[i] - 1]) {
+            tupletstartboolean[i] = tupletgroups[i];
+            tstart[tupletgroups[i] - 1] = true;
+        }
+    }
+    for (i = (int)tupletgroups.size() - 1; i >= 0; i--) {
+        if (!tupletgroups[i]) {
+            continue;
+        }
+        if (!tend[tupletgroups[i] - 1]) {
+            tupletendboolean[i] = tupletgroups[i];
+            tend[tupletgroups[i] - 1] = true;
+        }
+    }
+
+    vector<int> tuptop(tupletgroups.size(), -1);
+    vector<int> tupbot(tupletgroups.size(), -1);
+    for (i = 0; i < (int)tupletgroups.size(); i++) {
+        if (!tupletgroups[i]) {
+            continue;
+        }
+        if (dotlessdur[i].getNumerator() == 1) {
+            tuptop[i] = dotlessdur[i].getDenominator();
+            tupbot[i] = nextLowerPowerOfTwo(tuptop[i]);
+        }
+        else {
+            // this still needs to be fixed: dotted tuplets.
+            tuptop[i] = dotlessdur[i].getDenominator();
+            tupbot[i] = dotlessdur[i].getNumerator();
+        }
+    }
+
+    // tupletscale == 3 for three triplets, 6 for six sextuplets.
+    int xmin = 0;
+    int state = 0;
+    int value = 0;
+    int starti = -1;
+    HumNum vdur;
+    HumNum val2;
+    vector<int> tupletscale;
+    for (i = 0; i < (int)tupletstartboolean.size(); i++) {
+        if (tupletstartboolean[i]) {
+            state = 1;
+            xmin = twocountbot[i];
+            starti = i;
+            continue;
+        }
+        if (!state) {
+            continue;
+        }
+        if (twocountbot[i] < xmin) {
+            xmin = twocountbot[i];
+        }
+        if (tupletendboolean[i]) {
+            state = 0;
+            value = 1 << xmin;
+            vdur = dursum[i] - dursum[starti] + fulldur[i];
+            if (vdur < 1) {
+                val2 = vdur * value;
+                if (val2.isInteger()) {
+                    tupletscale.push_back(val2.getNumerator());
+                }
+                else {
+                    tupletscale.push_back(value);
+                }
+            }
+            else {
+                tupletscale.push_back(value);
+            }
+        }
+    }
+
+    tg.resize(layerdata.size());
+    for (i = 0; i < (int)layerdata.size(); i++) {
+        if (indexmapping2[i] < 0) {
+            tg[i].group = -1;
+            tg[i].bracket = -1;
+            tg[i].num = -1;
+            tg[i].numbase = -1;
+            tg[i].beamstart = 0;
+            tg[i].beamend = 0;
+            tg[i].gbeamstart = gbeamstart[i];
+            tg[i].gbeamend = gbeamend[i];
+            tg[i].tupletstart = 0;
+            tg[i].tupletend = 0;
+            tg[i].priority = ' ';
+        }
+        else {
+            tg[i].group = tupletgroups[indexmapping2[i]];
+            tg[i].bracket = tupletbracket[indexmapping2[i]];
+            tg[i].num = tuptop[indexmapping2[i]];
+            tg[i].numbase = tupbot[indexmapping2[i]];
+            tg[i].beamstart = beamstartboolean[indexmapping2[i]];
+            tg[i].beamend = beamendboolean[indexmapping2[i]];
+            tg[i].gbeamstart = gbeamstart[i];
+            tg[i].gbeamend = gbeamend[i];
+            tg[i].tupletstart = tupletstartboolean[indexmapping2[i]];
+            tg[i].tupletend = tupletendboolean[indexmapping2[i]];
+            if (tg[i].group > 0) {
+                tg[i].numscale = tupletscale[tg[i].group - 1];
+            }
+            else {
+                tg[i].numscale = 1;
+            }
+            if (tg[i].beamstart && tg[i].tupletstart) {
+                if (tg[i].bracket) {
+                    tg[i].priority = 'T'; // open tuplet first
+                }
+                else {
+                    tg[i].priority = 'B'; // open beam first
+                }
+            }
+            else if (tg[i].beamend && tg[i].tupletend) {
+                if (tg[i].bracket) {
+                    tg[i].priority = 'B'; // close beam first
+                }
+                else {
+                    tg[i].priority = 'T'; // close tuplet first
+                }
+            }
+            else {
+                tg[i].priority = ' ';
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::nextLowerPowerOfTwo --
+//
+
+int HumdrumInput::nextLowerPowerOfTwo(int x)
+{
+    if (x < 1) {
+        return 1;
+    }
+    x = x | (x >> 1);
+    x = x | (x >> 2);
+    x = x | (x >> 4);
+    x = x | (x >> 8);
+    x = x | (x >> 16);
+    return x - (x >> 1);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getDotPowerOfTwo -- Checks up to 3 augmentation dots.
+//
+
+int HumdrumInput::getDotPowerOfTwo(HumNum value)
+{
+    if (value.isPowerOfTwo()) {
+        return 0;
+    }
+    // check for one dot
+    HumNum tval = value * 2 / 3;
+    if (tval.isPowerOfTwo()) {
+        return 1;
+    }
+    tval = value * 4 / 7;
+    if (tval.isPowerOfTwo()) {
+        return 2;
+    }
+    tval = value * 8 / 15;
+    if (tval.isPowerOfTwo()) {
+        return 3;
+    }
+
+    return -1;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::removeFactorsOfTwo --
+//
+
+HumNum HumdrumInput::removeFactorsOfTwo(HumNum value, int &tcount, int &bcount)
+{
+    int top = value.getNumerator();
+    int bot = value.getDenominator();
+    tcount = 0;
+    bcount = 0;
+    if (top > 0) {
+        while (top % 2 == 0) {
+            top = top >> 1;
+            tcount++;
+        }
+    }
+    if (bot > 0) {
+        while (bot % 2 == 0) {
+            bot = bot >> 1;
+            bcount++;
+        }
+    }
+    HumNum output(top, bot);
+    return output;
 }
 
 //////////////////////////////
@@ -1294,6 +1983,31 @@ template <class PARENT, class CHILD> void HumdrumInput::appendElement(PARENT par
 
 /////////////////////////////
 //
+// HumdrumInput::appendElement --
+//
+
+template <class CHILD>
+void HumdrumInput::appendElement(const vector<string> &name, const vector<void *> &pointers, CHILD child)
+{
+    if (name.back() == "beam") {
+        appendElement((Beam *)pointers.back(), child);
+    }
+    else if (name.back() == "gbeam") {
+        appendElement((Beam *)pointers.back(), child);
+    }
+    else if (name.back() == "layer") {
+        appendElement((Layer *)pointers.back(), child);
+    }
+    else if (name.back() == "tuplet") {
+        appendElement((Tuplet *)pointers.back(), child);
+    }
+    else if (name.back() == "chord") {
+        appendElement((Chord *)pointers.back(), child);
+    }
+}
+
+/////////////////////////////
+//
 // HumdrumInput::convertRest --
 //
 
@@ -1303,6 +2017,35 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
     // Shouldn't be in a chord, so add rest duration here.
     // Also full-measure rests are handled elsewhere.
     convertRhythm(rest, token, subtoken);
+
+    string tstring;
+    int stindex = 0;
+    if (subtoken < 0) {
+        tstring = *token;
+    }
+    else {
+        tstring = token->getSubtoken(subtoken);
+        stindex = subtoken;
+    }
+
+    int layer = m_currentlayer;
+
+    if (tstring.find(";") != string::npos) {
+        if ((tstring.find("yy") == string::npos) && (tstring.find(";y") == string::npos)) {
+            if (layer == 1) {
+                rest->SetFermata(PLACE_above);
+            }
+            else if (layer == 2) {
+                rest->SetFermata(PLACE_below);
+            }
+            else {
+                // who knows, maybe check the stem direction or see
+                // if another note/rest in a different layer already
+                // has a fermata (so you would not want to overwrite them).
+                rest->SetFermata(PLACE_above);
+            }
+        }
+    }
 }
 
 /////////////////////////////
@@ -1520,6 +2263,9 @@ template <class ELEMENT> void HumdrumInput::convertRhythm(ELEMENT element, HTp t
     // dur is in units of quarter notes.
     HumNum dur = Convert::recipToDurationNoDots(tstring);
     dur /= 4; // duration is now in whole note units;
+
+    dur *= m_tupletscaling;
+
     if (dur.isInteger()) {
         switch (dur.getNumerator()) {
             case 1: element->SetDur(DURATION_1); break;
@@ -1554,6 +2300,7 @@ void HumdrumInput::printNoteArticulations(Note *note, HTp token, const string &t
 {
     // bool chordQ = token->isChord();
     int layer = m_currentlayer;
+
     if (tstring.find(";") != string::npos) {
         if ((tstring.find("yy") == string::npos) && (tstring.find(";y") == string::npos)) {
             if (layer == 1) {
@@ -1931,7 +2678,7 @@ int HumdrumInput::getMeasureEndLine(int startline)
 
 //////////////////////////////
 //
-// HumdumInput::setupMeiDocument -- Add a page and a system on the page to
+// HumdrumInput::setupMeiDocument -- Add a page and a system on the page to
 //     get things started.
 //
 
@@ -1954,6 +2701,7 @@ void HumdrumInput::clear(void)
     m_filename = "";
     m_page = NULL;
     m_system = NULL;
+    m_tupletscaling = 1;
 }
 
 //////////////////////////////

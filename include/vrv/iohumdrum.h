@@ -79,6 +79,34 @@ namespace humaux {
         Measure *m_startmeasure;
         Measure *m_endmeasure;
     };
+
+    class HumdrumBeamAndTuplet {
+    public:
+        int group; // tuplet group for layer
+        int bracket; // -1=undefined, 0=none, 1=show
+        int num; // @num
+        int numbase; // @numbase
+        int numscale; // for converting triplets into sextuplets for example
+        int tupletstart;
+        int tupletend;
+        int beamstart;
+        int beamend;
+        int gbeamstart;
+        int gbeamend;
+        char priority;
+        HumdrumBeamAndTuplet(void) { clear(); }
+        ~HumdrumBeamAndTuplet(void) { clear(); }
+        void clear(void)
+        {
+            group = bracket = 0;
+            numbase = num = 1;
+            numscale = 1;
+            tupletstart = tupletend = 0;
+            beamstart = beamend = 0;
+            gbeamstart = gbeamend = 0;
+            priority = ' ';
+        }
+    };
 }
 
 //----------------------------------------------------------------------------
@@ -136,6 +164,19 @@ protected:
     void convertVerses(Note *note, hum::HTp token, int subtoken);
     void checkForOmd(int startline, int endline);
     void handleOttavaMark(hum::HumdrumToken &token, Note *note);
+    void prepareBeamAndTupletGroups(const vector<hum::HTp> &layerdata, vector<humaux::HumdrumBeamAndTuplet> &hg);
+    void printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, vector<hum::HTp> &layerdata);
+    void insertTuplet(
+        vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg, hum::HTp token);
+    void insertBeam(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
+    void insertGBeam(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
+    void analyzeLayerBeams(vector<int> &beamnum, vector<int> &gbeamnum, const vector<hum::HTp> &layerdata);
+    void handleGroupStarts(
+        const humaux::HumdrumBeamAndTuplet &tg, vector<string> &elements, vector<void *> &pointers, hum::HTp token);
+    void handleGroupEnds(const humaux::HumdrumBeamAndTuplet &tg, vector<string> &elements, vector<void *> &pointers);
+    void removeTuplet(vector<string> &elements, vector<void *> &pointers);
+    void removeGBeam(vector<string> &elements, vector<void *> &pointers);
+    void removeBeam(vector<string> &elements, vector<void *> &pointers);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
@@ -146,10 +187,15 @@ protected:
 
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
 
+    template <class CHILD> void appendElement(const vector<string> &name, const vector<void *> &pointers, CHILD child);
+
     /// Static functions ////////////////////////////////////////////////////
     static string unescapeHtmlEntities(const string &input);
     static void WriteUTF8(std::ostream &Out, unsigned int Ch);
     static void UnquoteHTML(std::istream &In, std::ostream &Out);
+    static hum::HumNum removeFactorsOfTwo(hum::HumNum value, int &tcount, int &bcount);
+    static int getDotPowerOfTwo(hum::HumNum value);
+    static int nextLowerPowerOfTwo(int x);
 
 private:
     std::string m_filename; // Filename to read/was read.
@@ -211,6 +257,12 @@ private:
     // starting measure of the ottava mark.
     vector<Note *> m_ottavanote;
     vector<Measure *> m_ottavameasure;
+
+    // m_tupletscaling == tuplet-scaling factor for the current note.
+    hum::HumNum m_tupletscaling;
+
+    // m_omd == temporary variable for printing tempo designation.
+    bool m_omd;
 };
 
 } // namespace vrv
