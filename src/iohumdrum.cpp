@@ -235,7 +235,12 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
     m_currentstaff = -1;
     m_tupletscaling = 1;
 
+#ifdef USE_EMSCRIPTEN
+    m_debug = 0;
+#else
     m_debug = 1;
+#endif
+    m_comment = 1;
     m_omd = false;
 }
 
@@ -883,7 +888,7 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
     m_layer->SetN(layerindex + 1);
     m_staff->AddLayer(m_layer);
 
-    if (m_debug) {
+    if (m_comment) {
         vector<int> &rkern = m_rkern;
         int staffindex = rkern[track];
         vector<HTp> &layerdata = m_layertokens[staffindex][layerindex];
@@ -1089,11 +1094,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         if (layerdata[i]->isInterpretation()) {
             handleOttavaMark(*layerdata[i], note);
-			if (layerdata[i]->getDurationFromStart() != 0) {
-				if (layerdata[i]->isClef()) {
-					insertClefElement(elements, pointers, layerdata[i]);
-				}
-			}
+            if (layerdata[i]->getDurationFromStart() != 0) {
+                if (layerdata[i]->isClef()) {
+                    insertClefElement(elements, pointers, layerdata[i]);
+                }
+            }
         }
         if (!layerdata[i]->isData()) {
             continue;
@@ -1150,16 +1155,15 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     return true;
 }
 
-
-
 /////////////////////////////
 //
 // HumdrumInput::insertClefElement -- A clef which starts after the beginning of the movement.
 //
 
-void HumdrumInput::insertClefElement(vector<string>& elements, vector<void*> pointers, HTp token) {
-	Clef *clef = new Clef;
-	appendElement(elements, pointers, clef);
+void HumdrumInput::insertClefElement(vector<string> &elements, vector<void *> pointers, HTp token)
+{
+    Clef *clef = new Clef;
+    appendElement(elements, pointers, clef);
 
     if (token->find("clefG") != string::npos) {
         clef->SetShape(CLEFSHAPE_G);
@@ -1192,8 +1196,6 @@ void HumdrumInput::insertClefElement(vector<string>& elements, vector<void*> poi
         clef->SetDisPlace(PLACE_below);
     }
 }
-
-
 
 //////////////////////////////
 //
@@ -2775,7 +2777,7 @@ int HumdrumInput::getMeasureNumber(int startline, int endline)
     }
 
     int number;
-    if (sscanf(infile[startline].getTokenString(0).c_str(), "=%d", &number)) {
+    if (sscanf(infile[startline].getTokenString(0).c_str(), "=%d", &number) == 1) {
         return number;
     }
     else {

@@ -177,7 +177,7 @@ protected:
     void removeTuplet(vector<string> &elements, vector<void *> &pointers);
     void removeGBeam(vector<string> &elements, vector<void *> &pointers);
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
-	void insertClefElement(vector<string>& elements, vector<void*> pointers, hum::HTp clef);
+    void insertClefElement(vector<string> &elements, vector<void *> pointers, hum::HTp clef);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
@@ -201,9 +201,12 @@ protected:
 private:
     std::string m_filename; // Filename to read/was read.
 
-    // m_debug == temporary variable to print MEI convertsion to standard
-    // output.
-    int m_debug; // printing MEI data to standard input
+    // m_debug == mostly for printing MEI data to standard input.
+    int m_debug;
+
+    // m_comment == Display **kern data embedded in comments for each
+    // staff layer.
+    int m_comment;
 
     // m_doc is inherited root document object.
 
