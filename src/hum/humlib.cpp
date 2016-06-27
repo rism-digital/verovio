@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jun 25 20:55:48 PDT 2016
+// Last Modified: Sun Jun 26 18:19:00 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -7540,7 +7540,7 @@ bool HumdrumToken::isClef(void) const {
 	}
 	if (!isInterpretation()) {
 		return false;
-	} else if (this->compare(0, 5, "*clef") != string::npos) {
+	} else if (this->compare(0, 5, "*clef") == 0) {
 		return true;
 	}
 
