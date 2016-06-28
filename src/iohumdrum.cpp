@@ -407,7 +407,6 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLi
     bool lang;
     bool plang;
     string language;
-    vector<string> languages;
 
     for (int i = 0; i < (int)references.size(); i++) {
         plang = false;
@@ -430,9 +429,6 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLi
                     plang = false;
                     lang = false;
                 }
-                else {
-                    languages.push_back(language);
-                }
             }
             else {
                 language = key.substr(loc + 1);
@@ -440,18 +436,21 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLi
                     plang = false;
                     lang = false;
                 }
-                else {
-                    languages.push_back(language);
-                }
             }
         }
 
         for (int j = 0; j < (int)language.size(); j++) {
+            if (language[j] == '-') {
+                // don't force to lower case after first dash
+                // as BCP 47 country codes are in upper case, and
+                // variant codes usually start capitalized.
+                break;
+            }
             language[j] = std::tolower(language[j]);
         }
 
         pugi::xml_node title = titleStmt.append_child("title");
-        title.text().set(value.c_str());
+        title.text().set(unescapeHtmlEntities(value).c_str());
         if (lang) {
             title.append_attribute("xml:lang") = language.c_str();
             if (plang) {
