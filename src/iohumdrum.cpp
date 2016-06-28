@@ -53,10 +53,8 @@
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
-
 //#include "attcomparison.h"
 //#include "slur.h"
-//#include "pugixml.hpp"
 
 using namespace hum; // humlib  namespace
 using namespace vrv; // verovio namespace
@@ -351,6 +349,8 @@ bool HumdrumInput::convertHumdrum(void)
         status &= convertSystemMeasure(line);
     }
 
+    createHeader();
+
     // calculateLayout();
 
     if (m_debug) {
@@ -361,6 +361,107 @@ bool HumdrumInput::convertHumdrum(void)
     }
 
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::createHeader --
+//
+
+void HumdrumInput::createHeader(void)
+{
+
+    pugi::xml_node fileDesc = m_doc->m_header.append_child("fileDesc");
+    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
+
+    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
+
+    pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
+    pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
+    pugi::xml_node p1 = projectDesc.append_child("p");
+    p1.append_child(pugi::node_pcdata)
+        .set_value(StringFormat("Transcoded from Humdrum with Verovio version %s", GetVersion().c_str()).c_str());
+
+    pugi::xml_node date = pubStmt.append_child("date");
+    time_t t = time(0); // get time now
+    struct tm *now = localtime(&t);
+    std::string dateStr = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
+        now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
+    date.append_child(pugi::node_pcdata).set_value(dateStr.c_str());
+
+    HumdrumFile &infile = m_infile;
+
+    vector<HumdrumLine *> references = infile.getReferenceRecords();
+    insertTitle(titleStmt, references);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertTitle --
+//
+
+void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLine *> &references)
+{
+    string key;
+    string value;
+    bool lang;
+    bool plang;
+    string language;
+    vector<string> languages;
+
+    for (int i = 0; i < (int)references.size(); i++) {
+        plang = false;
+        lang = false;
+        key = references[i]->getReferenceKey();
+        if (key.compare(0, 3, "OTL") != 0) {
+            continue;
+        }
+        value = references[i]->getReferenceValue();
+        if (value.empty()) {
+            continue;
+        }
+        auto loc = key.find("@");
+        if (loc != string::npos) {
+            lang = true;
+            if (key.find("@@") != string::npos) {
+                plang = true;
+                language = key.substr(loc + 2);
+                if (language.empty()) {
+                    plang = false;
+                    lang = false;
+                }
+                else {
+                    languages.push_back(language);
+                }
+            }
+            else {
+                language = key.substr(loc + 1);
+                if (language.empty()) {
+                    plang = false;
+                    lang = false;
+                }
+                else {
+                    languages.push_back(language);
+                }
+            }
+        }
+
+        for (int j = 0; j < (int)language.size(); j++) {
+            language[j] = std::tolower(language[j]);
+        }
+
+        pugi::xml_node title = titleStmt.append_child("title");
+        title.text().set(value.c_str());
+        if (lang) {
+            title.append_attribute("xml:lang") = language.c_str();
+            if (plang) {
+                title.append_attribute("type") = "main";
+            }
+            else {
+                title.append_attribute("type") = "translated";
+            }
+        }
+    }
 }
 
 //////////////////////////////

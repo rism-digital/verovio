@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jun 26 18:19:00 PDT 2016
+// Last Modified: Mon Jun 27 16:25:37 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -2788,6 +2788,27 @@ void HumdrumFileBase::append(const char* line) {
 void HumdrumFileBase::append(const string& line) {
 	HumdrumLine* s = new HumdrumLine(line);
 	lines.push_back(s);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::getReferenceRecords --
+//
+
+vector<HumdrumLine*> HumdrumFileBase::getReferenceRecords(void) {
+	vector<HumdrumLine*> hlps;
+	hlps.reserve(32);
+	HumdrumLine* hlp;
+	auto& infile = *this;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isReference()) {
+			hlp = &infile[i];
+			hlps.push_back(hlp);
+		}
+	}
+	return hlps;
 }
 
 
