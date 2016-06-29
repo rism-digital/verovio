@@ -180,9 +180,10 @@ protected:
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
     void insertClefElement(vector<string> &elements, vector<void *> pointers, hum::HTp clef);
 
-    // header related functions:
+    // header related functions: ///////////////////////////////////////////
     void createHeader(void);
     void insertTitle(pugi::xml_node &titleStmt, const vector<hum::HumdrumLine *> &references);
+    void insertExtMeta(vector<hum::HumdrumLine *> &references);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);

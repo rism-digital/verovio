@@ -393,6 +393,38 @@ void HumdrumInput::createHeader(void)
 
     vector<HumdrumLine *> references = infile.getReferenceRecords();
     insertTitle(titleStmt, references);
+
+    if (references.size() > 0) {
+        insertExtMeta(references);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertExtMeta -- Print Humdrum reference records as XML into
+//     <extMeta> element.
+//
+
+void HumdrumInput::insertExtMeta(vector<HumdrumLine *> &references)
+{
+    stringstream xmldata;
+    xmldata << "<extMeta>\n";
+    for (int i = 0; i < references.size(); i++) {
+        references[i]->printXml(xmldata, 3);
+    }
+    xmldata << "</extMeta>\n";
+
+    pugi::xml_document tmpdoc;
+    pugi::xml_parse_result result = tmpdoc.load(xmldata.str().c_str());
+    if (!result) {
+        // some sort of error, so give up;
+        cerr << "ExtMeta parse error: " << result.description() << endl;
+        cerr << xmldata.str();
+        return;
+    }
+
+    pugi::xml_node extMeta = m_doc->m_header.append_copy(tmpdoc.document_element());
+    extMeta.append_attribute("xmlns") = "http://www.humdrum.org/ns/humxml";
 }
 
 //////////////////////////////
