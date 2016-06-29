@@ -184,6 +184,10 @@ protected:
     void createHeader(void);
     void insertTitle(pugi::xml_node &titleStmt, const vector<hum::HumdrumLine *> &references);
     void insertExtMeta(vector<hum::HumdrumLine *> &references);
+    void addPerson(vector<vector<string> > &respPeople, vector<hum::HumdrumLine *> &references, const string &key,
+        const string &role);
+    void getRespPeople(vector<vector<string> > &respPeople, vector<hum::HumdrumLine *> &references);
+    void insertRespStmt(pugi::xml_node &titleStmt, vector<vector<string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);

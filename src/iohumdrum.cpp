@@ -393,9 +393,76 @@ void HumdrumInput::createHeader(void)
 
     vector<HumdrumLine *> references = infile.getReferenceRecords();
     insertTitle(titleStmt, references);
+    vector<vector<string> > respPeople;
+    getRespPeople(respPeople, references);
+    if (respPeople.size() > 0) {
+        insertRespStmt(titleStmt, respPeople);
+    }
 
     if (references.size() > 0) {
         insertExtMeta(references);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::insertRespStmt -- Print a list of composer and/or lyricist.
+//
+
+void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, vector<vector<string> > &respPeople)
+{
+    if (respPeople.size() == 0) {
+        return;
+    }
+    pugi::xml_node respStmt = titleStmt.append_child("respStmt");
+    for (int i = 0; i < (int)respPeople.size(); i++) {
+        pugi::xml_node person = respStmt.append_child("persName");
+        person.append_attribute("role") = unescapeHtmlEntities(respPeople[i][1]).c_str();
+        person.text().set(unescapeHtmlEntities(respPeople[i][0]).c_str());
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getRespPeople -- Get the respStmnt people, such as the composer and/or lyricist.
+//
+
+void HumdrumInput::getRespPeople(vector<vector<string> > &respPeople, vector<HumdrumLine *> &references)
+{
+
+    // precalculate a reference map here to make more O(N) rather than O(N^2)
+    addPerson(respPeople, references, "COM", "composer");
+    addPerson(respPeople, references, "COA", "attributed composer");
+    addPerson(respPeople, references, "COS", "suspected composer");
+    addPerson(respPeople, references, "LYR", "lyricist");
+    addPerson(respPeople, references, "LIB", "librettist");
+    addPerson(respPeople, references, "LAR", "arranger");
+    addPerson(respPeople, references, "LOR", "orchestrator");
+    addPerson(respPeople, references, "RPN", "producer");
+    addPerson(respPeople, references, "MPN", "performer");
+    addPerson(respPeople, references, "MCN", "conductor");
+    addPerson(respPeople, references, "ODE", "dedicatee");
+    addPerson(respPeople, references, "OCO", "comissioner");
+    addPerson(respPeople, references, "OCL", "collector");
+    addPerson(respPeople, references, "ENC", "encoder");
+    addPerson(respPeople, references, "EED", "digital editor");
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addPerson --
+//
+
+void HumdrumInput::addPerson(
+    vector<vector<string> > &respPeople, vector<HumdrumLine *> &references, const string &key, const string &role)
+{
+    for (int i = 0; i < (int)references.size(); i++) {
+        if (references[i]->getReferenceKey() == key) {
+            respPeople.resize(respPeople.size() + 1);
+            respPeople.back().resize(2);
+            respPeople.back()[0] = references[i]->getReferenceValue();
+            respPeople.back()[1] = role;
+        }
     }
 }
 
