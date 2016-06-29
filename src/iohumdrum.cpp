@@ -440,6 +440,8 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLi
     bool plang;
     string language;
 
+    int titlecount = 0;
+
     for (int i = 0; i < (int)references.size(); i++) {
         plang = false;
         lang = false;
@@ -482,6 +484,7 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLi
         }
 
         pugi::xml_node title = titleStmt.append_child("title");
+        titlecount++;
         title.text().set(unescapeHtmlEntities(value).c_str());
         if (lang) {
             title.append_attribute("xml:lang") = language.c_str();
@@ -492,6 +495,11 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLi
                 title.append_attribute("type") = "translated";
             }
         }
+    }
+
+    if (!titlecount) {
+        // Put in a required empty <title/> tag:
+        titleStmt.append_child("title");
     }
 }
 
