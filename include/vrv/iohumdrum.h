@@ -207,6 +207,8 @@ protected:
     static hum::HumNum removeFactorsOfTwo(hum::HumNum value, int &tcount, int &bcount);
     static int getDotPowerOfTwo(hum::HumNum value);
     static int nextLowerPowerOfTwo(int x);
+    static string getDateString(void);
+    static string getReferenceValue(const string &key, vector<hum::HumdrumLine *> &references);
 
 private:
     std::string m_filename; // Filename to read/was read.

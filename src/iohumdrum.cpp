@@ -367,41 +367,109 @@ bool HumdrumInput::convertHumdrum(void)
 //
 // HumdrumInput::createHeader --
 //
+// References:
+//      http://music-encoding.org/wp-content/uploads/2015/03/CheatSheetHeader.pdf
+//      http://music-encoding.org/support/tutorials/mei-1st/exploring-the-mei-header
+//
+// <meiHead>
+//     <altId>  . . . . . . . . . . Alternate bibliographic identifier.
+//     <fileDesc> . . . . . . . . . Full bibliographic description of file.
+//        <titleStmt> (required) == Title and responsibility container.
+//           <title>  (required) == Title of bibliographic entry.
+//           <respStmt>          == Names of those repsonsible for intellectual/artistic content.
+//        <pubStmt>   (required) == Pub. name, address, date and related info.
+//
+//        <sourceDesc>           == Sources used to create electronic file.
+//           <source n="1">
+//              <identifier> <titleStmt> <editionStmt> <putStmt> <physDesc>
+//              <seriesStmt> <noteStmt> <history> <langUsage> <key> <tempo>
+//              <meter> <perfMedium> <classification> <contents> <relatedItem>
+//
+//      <encodingDesc>  . . . . . . Relation of file to sources and how it was created.
+//         <appInfo>? <editorialDecl>?
+//
+//     <workDesc>  . . . . . . . . Groupling for non-bibliograhpic aspects of text.
+//        <identifier> <titleStmt> <history> <langUsage> <key> <tempo> <meter>
+//        <perfMedium> <notesStmt> <classification> <castList> <incipit>
+//        <contents> <relatedItem>
+//
+//     <revisionDesc>  . . . . . . Alterations to the file.
+//        <change>
+//
 
 void HumdrumInput::createHeader(void)
 {
+    HumdrumFile &infile = m_infile;
+    vector<HumdrumLine *> references = infile.getReferenceRecords();
+    vector<vector<string> > respPeople;
+    getRespPeople(respPeople, references);
 
+    // <fileDesc> /////////////
     pugi::xml_node fileDesc = m_doc->m_header.append_child("fileDesc");
     pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
 
-    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-
-    pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
-    pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-    pugi::xml_node p1 = projectDesc.append_child("p");
-    p1.append_child(pugi::node_pcdata)
-        .set_value(StringFormat("Transcoded from Humdrum with Verovio version %s", GetVersion().c_str()).c_str());
-
-    pugi::xml_node date = pubStmt.append_child("date");
-    time_t t = time(0); // get time now
-    struct tm *now = localtime(&t);
-    std::string dateStr = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
-        now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
-    date.append_child(pugi::node_pcdata).set_value(dateStr.c_str());
-
-    HumdrumFile &infile = m_infile;
-
-    vector<HumdrumLine *> references = infile.getReferenceRecords();
     insertTitle(titleStmt, references);
-    vector<vector<string> > respPeople;
-    getRespPeople(respPeople, references);
     if (respPeople.size() > 0) {
         insertRespStmt(titleStmt, respPeople);
     }
 
+    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
+    pugi::xml_node date = pubStmt.append_child("date");
+
+    // <encodingDesc> /////////
+
+    // <workDesc> /////////////
+
+    // <encodingDesc> /////////
+    pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
+    pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
+
+    pugi::xml_node p1 = projectDesc.append_child("p");
+    p1.append_child(pugi::node_pcdata)
+        .set_value(StringFormat("Transcoded from Humdrum with Verovio version %s", GetVersion().c_str()).c_str());
+    string ENC = getReferenceValue("ENC", references);
+    if (ENC.size()) {
+        ENC = "Originally encoded by: " + ENC;
+        pugi::xml_node p2 = projectDesc.append_child("p");
+        p2.append_child(pugi::node_pcdata).set_value(ENC.c_str());
+    }
+
+    string datestr = getDateString();
+    date.append_child(pugi::node_pcdata).set_value(datestr.c_str());
+
     if (references.size() > 0) {
         insertExtMeta(references);
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getReferenceValue --
+//
+
+string HumdrumInput::getReferenceValue(const string &key, vector<HumdrumLine *> &references)
+{
+    for (int i = 0; i < (int)references.size(); i++) {
+        if (key == references[i]->getReferenceKey()) {
+            return references[i]->getReferenceValue();
+        }
+    }
+    string empty;
+    return empty;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getDateSting -- Return the current time and date as a string.
+//
+
+string HumdrumInput::getDateString(void)
+{
+    time_t t = time(0); // get time now
+    struct tm *now = localtime(&t);
+    string dateStr = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1, now->tm_mday,
+        now->tm_hour, now->tm_min, now->tm_sec);
+    return dateStr;
 }
 
 //////////////////////////////
@@ -426,26 +494,34 @@ void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, vector<vector<strin
 //
 // HumdrumInput::getRespPeople -- Get the respStmnt people, such as the composer and/or lyricist.
 //
+// Roles (4th parameter in addPerson(), is free-form, but should use the roles
+// are listed in these two webpages:
+//    http://www.loc.gov/marc/relators/relacode.html
+//       list of three-letter relator codes
+//    http://www.loc.gov/marc/relators/relaterm.html
+//       short descriptions of relator codes
+//
 
 void HumdrumInput::getRespPeople(vector<vector<string> > &respPeople, vector<HumdrumLine *> &references)
 {
 
     // precalculate a reference map here to make more O(N) rather than O(N^2)
-    addPerson(respPeople, references, "COM", "composer");
+    addPerson(respPeople, references, "COM", "Composer"); // cmp
     addPerson(respPeople, references, "COA", "attributed composer");
     addPerson(respPeople, references, "COS", "suspected composer");
-    addPerson(respPeople, references, "LYR", "lyricist");
-    addPerson(respPeople, references, "LIB", "librettist");
-    addPerson(respPeople, references, "LAR", "arranger");
-    addPerson(respPeople, references, "LOR", "orchestrator");
-    addPerson(respPeople, references, "RPN", "producer");
-    addPerson(respPeople, references, "MPN", "performer");
-    addPerson(respPeople, references, "MCN", "conductor");
-    addPerson(respPeople, references, "ODE", "dedicatee");
-    addPerson(respPeople, references, "OCO", "comissioner");
-    addPerson(respPeople, references, "OCL", "collector");
-    addPerson(respPeople, references, "ENC", "encoder");
+    addPerson(respPeople, references, "LYR", "Lyricist"); // lyr
+    addPerson(respPeople, references, "LIB", "Librettist"); // lbt
+    addPerson(respPeople, references, "LAR", "Arranger"); // arr
+    addPerson(respPeople, references, "LOR", "Adapter"); // orchestrator, adp
+    addPerson(respPeople, references, "RPN", "Producer"); // pro
+    addPerson(respPeople, references, "MPN", "Performer"); // prf, also: Singer/Instrumentalist
+    addPerson(respPeople, references, "MCN", "Conductor"); // cnd
+    addPerson(respPeople, references, "ODE", "Dedicatee"); // dte
+    addPerson(respPeople, references, "OCO", "Patron"); // commissioner, pat
+    addPerson(respPeople, references, "OCL", "Collector"); // col
     addPerson(respPeople, references, "EED", "digital editor");
+    // ENC added to encodingDesc
+    // addPerson(respPeople, references, "ENC", "encoder");           // mrk, Markup editor
 }
 
 //////////////////////////////
