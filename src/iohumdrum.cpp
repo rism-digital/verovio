@@ -35,6 +35,7 @@
 #include "beam.h"
 #include "chord.h"
 #include "doc.h"
+#include "dynam.h"
 #include "iomei.h"
 #include "layer.h"
 #include "measure.h"
@@ -336,6 +337,9 @@ bool HumdrumInput::convertHumdrum(void)
     calculateReverseKernIndex();
 
     m_ties.resize(kernstarts.size());
+
+    m_meter_bottoms.resize(kernstarts.size());
+    std::fill(m_meter_bottoms.begin(), m_meter_bottoms.end(), 4);
 
     m_ottavanote.resize(kernstarts.size());
     m_ottavameasure.resize(kernstarts.size());
@@ -684,7 +688,7 @@ void HumdrumInput::prepareVerses(void)
 
 //////////////////////////////
 //
-// HumdrumInput::prepareTimeSigDur -- create a list of the duration of time
+// HumdrumInput::prepareTimeSigDur -- create a list of the durations of time
 //      signatures in the file, indexed by HumdrumFile line number.  Only the
 //      first spine in the file is considered.
 //
@@ -785,7 +789,7 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
     string keysig;
     string key;
     string timesig;
-    string metersig;
+    // string metersig;
     int top = 0;
     int bot = 0;
 
@@ -808,6 +812,7 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
         }
         else if (sscanf(part->c_str(), "*M%d/%d", &top, &bot) == 2) {
             timesig = *part;
+            m_meter_bottoms[partnumber - 1] = bot;
         }
         part = part->getNextToken();
     }
@@ -1034,9 +1039,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
             value = infile[i].getReferenceValue();
             Tempo *tempo = new Tempo;
             m_measure->AddFloatingElement(tempo);
-            Text *text = new Text;
-            tempo->AddTextElement(text);
-            text->SetText(UTF8to16(unescapeHtmlEntities(value)));
+            addTextElement(tempo, value);
             setStaff(tempo, 1);
         }
     }
@@ -1399,6 +1402,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             elements.pop_back();
             pointers.pop_back();
             processSlur(layerdata[i]);
+            processDynamics(layerdata[i], staffindex);
         }
         else if (layerdata[i]->isRest()) {
             if (layerdata[i]->find("yy") != string::npos) {
@@ -1422,6 +1426,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             appendElement(elements, pointers, note);
             convertNote(note, layerdata[i]);
             processSlur(layerdata[i]);
+            processDynamics(layerdata[i], staffindex);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -1439,6 +1444,95 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+/////////////////////////////
+//
+// HumdrumInput::processDynamics --
+//
+
+void HumdrumInput::processDynamics(HTp token, int staffindex)
+{
+    string tok;
+    string dynamic;
+    HumdrumLine *line = token->getLine();
+    if (line == NULL) {
+        return;
+    }
+    int track = token->getTrack();
+    int ttrack;
+    int startfield = token->getFieldIndex() + 1;
+    for (int i = startfield; i < line->getFieldCount(); i++) {
+        if (line->token(i)->isKern()) {
+            ttrack = line->token(i)->getTrack();
+            if (ttrack != track) {
+                break;
+            }
+        }
+        if (!(line->token(i)->isDataType("**dynam") || line->token(i)->isDataType("**dyn"))) {
+            continue;
+        }
+        if (line->token(i)->isNull()) {
+            continue;
+        }
+
+        string tok = *line->token(i);
+        if (tok == "p") {
+            dynamic = "p";
+        }
+        else if (tok == "pp") {
+            dynamic = "pp";
+        }
+        else if (tok == "ppp") {
+            dynamic = "ppp";
+        }
+        else if (tok == "pppp") {
+            dynamic = "pppp";
+        }
+        else if (tok == "f") {
+            dynamic = "f";
+        }
+        else if (tok == "ff") {
+            dynamic = "ff";
+        }
+        else if (tok == "fff") {
+            dynamic = "fff";
+        }
+        else if (tok == "ffff") {
+            dynamic = "ffff";
+        }
+        else if (tok == "mp") {
+            dynamic = "mp";
+        }
+        else if (tok == "mf") {
+            dynamic = "mf";
+        }
+
+        if (dynamic.empty()) {
+            continue;
+        }
+
+        Dynam *dynam = new Dynam;
+        m_measure->AddFloatingElement(dynam);
+        setStaff(dynam, m_currentstaff);
+        addTextElement(dynam, dynamic);
+        HumNum qbeat = line->getDurationFromBarline();
+        HumNum mfactor = m_meter_bottoms[staffindex] / 4;
+        HumNum mbeat = qbeat * mfactor + 1;
+        dynam->SetTstamp(mbeat.getFloat());
+    }
+}
+
+/////////////////////////////
+//
+// HumdumInput::addTextElement -- Append text to a regular element.
+//
+
+template <class ELEMENT> void HumdrumInput::addTextElement(ELEMENT *element, const string &content)
+{
+    Text *text = new Text;
+    element->AddTextElement(text);
+    text->SetText(UTF8to16(unescapeHtmlEntities(content)));
 }
 
 /////////////////////////////
@@ -2578,8 +2672,6 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
             verse->SetN(versenum);
             Syl *syl = new Syl;
             appendElement(verse, syl);
-            Text *text = new Text;
-            syl->AddTextElement(text);
             string content = *line.token(i);
             bool dashbegin = false;
             bool dashend = false;
@@ -2611,8 +2703,7 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
                 syl->SetWordpos(sylLog_WORDPOS_t);
                 syl->SetCon(sylLog_CON_u);
             }
-
-            text->SetText(UTF8to16(unescapeHtmlEntities(content)));
+            addTextElement(syl, content);
         }
     }
 }
@@ -2738,7 +2829,6 @@ void HumdrumInput::processTieEnd(Note *note, HTp token, const string &tstring)
     int pitch = Convert::kernToMidiNoteNumber(tstring);
     int layer = m_currentlayer;
     auto found = m_ties[staffnum].end();
-    HumNum tstamp;
 
     // search for open tie in current layer
     for (auto it = m_ties[staffnum].begin(); it != m_ties[staffnum].end(); it++) {

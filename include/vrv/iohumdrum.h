@@ -180,6 +180,7 @@ protected:
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
     void insertClefElement(vector<string> &elements, vector<void *> pointers, hum::HTp clef);
     void processSlur(hum::HTp token);
+    void processDynamics(hum::HTp token, int staffindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -200,6 +201,8 @@ protected:
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
 
     template <class CHILD> void appendElement(const vector<string> &name, const vector<void *> &pointers, CHILD child);
+
+    template <class ELEMENT> void addTextElement(ELEMENT *element, const string &content);
 
     /// Static functions ////////////////////////////////////////////////////
     static string unescapeHtmlEntities(const string &input);
@@ -240,6 +243,10 @@ private:
     int m_currentstaff;
     vrv::Layer *m_layer; // current layer, or NULL
     int m_currentlayer;
+
+    // m_meter_bottoms == Used to keep track of bottom value of time signature.
+    // This is needed to calculate tstamps.
+    vector<hum::HumNum> m_meter_bottoms;
 
     // m_layertokens == Humdrum **kern tokens for each staff/layer to be
     // converted.
