@@ -2270,6 +2270,10 @@ void HumdrumInput::convertChord(Chord *chord, HTp token)
     else if (token->find("\\") != string::npos) {
         chord->SetStemDir(STEMDIRECTION_down);
     }
+
+    token->setValue("MEI", "xml:id", chord->GetUuid());
+    int index = m_measures.size() - 1;
+    token->setValue("MEI", "measureIndex", index);
 }
 
 //////////////////////////////
@@ -2532,10 +2536,12 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
 
     convertVerses(note, token, subtoken);
 
-    // maybe organize by sub-token index:
-    token->setValue("MEI", "xml:id", note->GetUuid());
-    int index = m_measures.size() - 1;
-    token->setValue("MEI", "measureIndex", index);
+    // maybe organize by sub-token index, but consider as chord for now
+    if (!chordQ) {
+        token->setValue("MEI", "xml:id", note->GetUuid());
+        int index = m_measures.size() - 1;
+        token->setValue("MEI", "measureIndex", index);
+    }
 }
 
 //////////////////////////////
