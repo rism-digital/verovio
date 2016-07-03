@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jun 27 16:25:37 PDT 2016
+// Last Modified: Sat Jul  2 17:12:56 PDT 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -605,6 +605,12 @@ class HumdrumToken : public string, public HumHash {
 		HumNum   getDurationToEnd          (void) const;
 		HumNum   getDurationToEnd          (HumNum scale) const;
 
+		HumNum   getDurationFromBarline    (void) const;
+		HumNum   getDurationFromBarline    (HumNum scale) const;
+
+		HumNum   getDurationToBarline      (void) const;
+		HumNum   getDurationToBarline      (HumNum scale) const;
+
 		HumNum   getBarlineDuration        (void) const;
 		HumNum   getBarlineDuration        (HumNum scale) const;
 
@@ -632,6 +638,8 @@ class HumdrumToken : public string, public HumHash {
 		int      getStrandIndex            (void) const;
 		int      getSlurStartElisionLevel  (void) const;
 		int      getSlurEndElisionLevel    (void) const;
+		HTp      getSlurStartToken         (void);
+		HTp      getSlurEndToken           (void);
 		ostream& printCsv                  (ostream& out = cout);
 		ostream& printXml                  (ostream& out = cout, int level = 0,
 		                                    const string& indent = "\t");

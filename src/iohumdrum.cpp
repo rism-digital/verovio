@@ -43,6 +43,7 @@
 #include "octave.h"
 #include "page.h"
 #include "rest.h"
+#include "slur.h"
 #include "space.h"
 #include "staff.h"
 #include "syl.h"
@@ -54,7 +55,6 @@
 #include "verse.h"
 #include "vrv.h"
 //#include "attcomparison.h"
-//#include "slur.h"
 
 using namespace hum; // humlib  namespace
 using namespace vrv; // verovio namespace
@@ -315,6 +315,7 @@ bool HumdrumInput::ImportString(const std::string content)
 bool HumdrumInput::convertHumdrum(void)
 {
     HumdrumFile &infile = m_infile;
+    infile.analyzeKernSlurs();
 
     bool status = true; // for keeping track of problems in conversion process.
 
@@ -429,7 +430,7 @@ void HumdrumInput::createHeader(void)
         .set_value(StringFormat("Transcoded from Humdrum with Verovio version %s", GetVersion().c_str()).c_str());
     string ENC = getReferenceValue("ENC", references);
     if (ENC.size()) {
-        ENC = "Originally encoded by: " + ENC;
+        ENC = "Encoded by: " + ENC;
         pugi::xml_node p2 = projectDesc.append_child("p");
         p2.append_child(pugi::node_pcdata).set_value(ENC.c_str());
     }
@@ -1195,7 +1196,7 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 // HumdrumInput::printGroupInfo --
 //
 
-void HumdrumInput::printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, vector<HTp> &layerdata)
+void HumdrumInput::printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, const vector<HTp> &layerdata)
 {
     if (layerdata.size() != tg.size()) {
         cerr << "LAYER SIZE = " << layerdata.size() << "\tTGSIZE" << tg.size() << endl;
@@ -1397,6 +1398,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             convertChord(chord, layerdata[i]);
             elements.pop_back();
             pointers.pop_back();
+            processSlur(layerdata[i]);
         }
         else if (layerdata[i]->isRest()) {
             if (layerdata[i]->find("yy") != string::npos) {
@@ -1419,6 +1421,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             appendElement(elements, pointers, note);
             convertNote(note, layerdata[i]);
+            processSlur(layerdata[i]);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -1436,6 +1439,36 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+/////////////////////////////
+//
+// HumdrumInput::processSlur --
+//
+
+void HumdrumInput::processSlur(HTp token)
+{
+    HTp slurstart = token->getSlurStartToken();
+    if (!slurstart) {
+        return;
+    }
+
+    int mindex = slurstart->getValueInt("MEI", "measureIndex");
+    Measure *startmeasure = m_measures[mindex];
+
+    Slur *slur = new Slur;
+    slur->SetEndid("#" + token->getValue("MEI", "xml:id"));
+    slur->SetStartid("#" + slurstart->getValue("MEI", "xml:id"));
+
+    startmeasure->AddFloatingElement(slur);
+    setStaff(slur, m_currentstaff);
+
+    if (slurstart->getValueBool("LO", "S", "a")) {
+        slur->SetCurvedir(curvature_CURVEDIR_above);
+    }
+    else if (slurstart->getValueBool("LO", "S", "b")) {
+        slur->SetCurvedir(curvature_CURVEDIR_below);
+    }
 }
 
 /////////////////////////////
@@ -1498,11 +1531,13 @@ void HumdrumInput::analyzeLayerBeams(vector<int> &beamnum, vector<int> &gbeamnum
         if (!layerdata[i]->isData()) {
             beamstate[i] = 0;
             gbeamstate[i] = 0;
+            continue;
         }
         if (layerdata[i]->isNull()) {
             // shouldn't get to this state
             beamstate[i] = 0;
             gbeamstate[i] = 0;
+            continue;
         }
         if (layerdata[i]->isGrace()) {
             gbeamstate[i] = characterCount(*layerdata[i], 'L');
@@ -1759,7 +1794,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         durbeamnum.push_back(beamnum[i]);
     }
 
-    // poweroftwo == keeps track whether durations are a based on a power
+    // poweroftwo == keeps track whether durations are based on a power
     // (non-tuplet) or not (tuplet).  Notes/rests with false poweroftwo
     // will be grouped into tuplets.
     vector<bool> poweroftwo(duritems.size());
@@ -2381,6 +2416,10 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
             }
         }
     }
+
+    token->setValue("MEI", "xml:id", rest->GetUuid());
+    int index = m_measures.size() - 1;
+    token->setValue("MEI", "measureIndex", index);
 }
 
 /////////////////////////////
@@ -2492,6 +2531,11 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
     }
 
     convertVerses(note, token, subtoken);
+
+    // maybe organize by sub-token index:
+    token->setValue("MEI", "xml:id", note->GetUuid());
+    int index = m_measures.size() - 1;
+    token->setValue("MEI", "measureIndex", index);
 }
 
 //////////////////////////////
@@ -2883,6 +2927,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
 {
     m_measure = new Measure();
     m_system->AddMeasure(m_measure);
+    m_measures.push_back(m_measure);
 
     int measurenumber = getMeasureNumber(startline, endline);
     if (measurenumber >= 0) {

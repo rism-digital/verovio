@@ -166,7 +166,7 @@ protected:
     void checkForOmd(int startline, int endline);
     void handleOttavaMark(hum::HumdrumToken &token, Note *note);
     void prepareBeamAndTupletGroups(const vector<hum::HTp> &layerdata, vector<humaux::HumdrumBeamAndTuplet> &hg);
-    void printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, vector<hum::HTp> &layerdata);
+    void printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, const vector<hum::HTp> &layerdata);
     void insertTuplet(
         vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg, hum::HTp token);
     void insertBeam(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
@@ -179,6 +179,7 @@ protected:
     void removeGBeam(vector<string> &elements, vector<void *> &pointers);
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
     void insertClefElement(vector<string> &elements, vector<void *> pointers, hum::HTp clef);
+    void processSlur(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -233,6 +234,7 @@ private:
 
     vrv::Page *m_page; // current page, or NULL
     vrv::System *m_system; // current system, or NULL
+    vector<vrv::Measure *> m_measures;
     vrv::Measure *m_measure; // current measure, or NULL
     vrv::Staff *m_staff; // current staff, or NULL
     int m_currentstaff;
