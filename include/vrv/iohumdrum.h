@@ -181,6 +181,8 @@ protected:
     void insertClefElement(vector<string> &elements, vector<void *> pointers, hum::HTp clef);
     void processSlur(hum::HTp token);
     void processDynamics(hum::HTp token, int staffindex);
+    void processDirection(hum::HTp token, int staffindex);
+    hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);

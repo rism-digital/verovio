@@ -34,6 +34,7 @@
 
 #include "beam.h"
 #include "chord.h"
+#include "dir.h"
 #include "doc.h"
 #include "dynam.h"
 #include "iomei.h"
@@ -1403,6 +1404,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             pointers.pop_back();
             processSlur(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
+            processDirection(layerdata[i], staffindex);
         }
         else if (layerdata[i]->isRest()) {
             if (layerdata[i]->find("yy") != string::npos) {
@@ -1427,6 +1429,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             convertNote(note, layerdata[i]);
             processSlur(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
+            processDirection(layerdata[i], staffindex);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -1444,6 +1447,58 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::processDirection --
+//
+
+void HumdrumInput::processDirection(HTp token, int staffindex)
+{
+    string text = token->getValue("LO", "TX", "t");
+    if (text.size() == 0) {
+        return;
+    }
+
+    int zparam = token->isDefined("LO", "TX", "Z");
+    int yparam = token->isDefined("LO", "TX", "Y");
+
+    double Y = 0.0;
+    double Z = 0.0;
+    string placement;
+    if (zparam) {
+        Z = token->getValueInt("LO", "TX", "Z");
+        if (Z > 0) {
+            placement = "above";
+        }
+        else {
+            placement = "below";
+        }
+    }
+    if (yparam) {
+        Y = token->getValueInt("LO", "TX", "Y");
+        if (Y > 0) {
+            placement = "below";
+        }
+        else {
+            placement = "above";
+        }
+    }
+
+    Dir *dir = new Dir;
+    m_measure->AddFloatingElement(dir);
+    setStaff(dir, m_currentstaff);
+    addTextElement(dir, text);
+    HumNum tstamp = getMeasureTstamp(token, staffindex);
+    dir->SetTstamp(tstamp.getFloat());
+
+    if (placement == "above") {
+        dir->SetPlace(STAFFREL_above);
+    }
+    else if (placement == "below") {
+        dir->SetPlace(STAFFREL_below);
+    }
 }
 
 /////////////////////////////
@@ -1516,11 +1571,22 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
         m_measure->AddFloatingElement(dynam);
         setStaff(dynam, m_currentstaff);
         addTextElement(dynam, dynamic);
-        HumNum qbeat = line->getDurationFromBarline();
-        HumNum mfactor = m_meter_bottoms[staffindex] / 4;
-        HumNum mbeat = qbeat * mfactor + 1;
-        dynam->SetTstamp(mbeat.getFloat());
+        HumNum barstamp = getMeasureTstamp(token, staffindex);
+        dynam->SetTstamp(barstamp.getFloat());
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getMeasureTstamp --
+//
+
+HumNum HumdrumInput::getMeasureTstamp(HTp token, int staffindex)
+{
+    HumNum qbeat = token->getDurationFromBarline();
+    HumNum mfactor = m_meter_bottoms[staffindex] / 4;
+    HumNum mbeat = qbeat * mfactor + 1;
+    return mbeat;
 }
 
 /////////////////////////////
