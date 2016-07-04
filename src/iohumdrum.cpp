@@ -2611,6 +2611,10 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
 
     if (tstring.find("q") != string::npos) {
         note->SetGrace(GRACE_acc);
+        // set the visual duration to an eighth note if there
+        // is no rhythm specified (will be overwritten later
+        // if there is a rhythm).
+        note->SetDur(DURATION_8);
     }
 
     // Add the pitch information
