@@ -1517,6 +1517,21 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
     int track = token->getTrack();
     int ttrack;
     int startfield = token->getFieldIndex() + 1;
+
+    // Handle "z" for sforzando (sf). Could also be rendered as (sfz), but deal
+    // with that later, such as maybe make "zz" mean (sfz).
+
+    if (token->find("z") != string::npos) {
+        if (token->find("zy") == string::npos) { // don't show invisible sfz.
+            Dynam *dynam = new Dynam;
+            m_measure->AddFloatingElement(dynam);
+            setStaff(dynam, m_currentstaff);
+            addTextElement(dynam, "sf");
+            HumNum barstamp = getMeasureTstamp(token, staffindex);
+            dynam->SetTstamp(barstamp.getFloat());
+        }
+    }
+
     for (int i = startfield; i < line->getFieldCount(); i++) {
         if (line->token(i)->isKern()) {
             ttrack = line->token(i)->getTrack();
