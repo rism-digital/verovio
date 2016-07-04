@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul  3 19:30:42 PDT 2016
+// Last Modified: Mon Jul  4 07:07:12 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3844,7 +3844,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 		std::fill(keysigs[i].begin(), keysigs[i].end(), 0);
 	}
 
-	// dstates == diatonic states for every pitch in a spine
+	// dstates == diatonic states for every pitch in a spine.
 	// sub-spines are considered as a single unit, although there are
 	// score conventions which would keep a separate voices on a staff
 	// with different accidental states (i.e., two parts superimposed
@@ -3858,6 +3858,14 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 		dstates[i].resize(70);     // 10 octave limit for analysis
 			                        // may cause problems; fix later.
 		std::fill(dstates[i].begin(), dstates[i].end(), 0);
+	}
+
+	// gdstates == grace note diatonic states for every pitch in a spine.
+	vector<vector<int> > gdstates; // grace-note diatonic states
+	gdstates.resize(kcount);
+	for (i=0; i<kcount; i++) {
+		gdstates[i].resize(70);
+		std::fill(gdstates[i].begin(), gdstates[i].end(), 0);
 	}
 
 
@@ -3882,6 +3890,8 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					// key signature is in the middle of a measure?
 					resetDiatonicStatesWithKeySignature(dstates[kindex],
 							keysigs[kindex]);
+					resetDiatonicStatesWithKeySignature(gdstates[kindex],
+							keysigs[kindex]);
 				}
 			}
 		} else if (infile[i].isBarline()) {
@@ -3897,6 +3907,8 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 				kindex = rtracks[track];
 				// reset the accidental states in dstates to match keysigs.
 				resetDiatonicStatesWithKeySignature(dstates[kindex],
+						keysigs[kindex]);
+				resetDiatonicStatesWithKeySignature(gdstates[kindex],
 						keysigs[kindex]);
 			}
 		}
@@ -3915,10 +3927,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 			if (infile[i].token(j)->isRest()) {
 				continue;
 			}
-			if (infile[i].token(j)->find("q") != string::npos) {
-				// deal with grace notes later...
-				continue;
-			}
+
 			int subcount = infile[i].token(j)->getSubtokenCount();
 			track = infile[i].token(j)->getTrack();
 			int rindex = rtracks[track];
@@ -3929,7 +3938,9 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					// Deal with extra-low notes later.
 					continue;
 				}
+				int graceQ = infile[i].token(j)->isGrace();
 				int accid = Convert::kernToAccidentalCount(subtok);
+
 				if ((subtok.find("_") != string::npos) ||
 						(subtok.find("]") != string::npos)) {
 					// tied notes do not have slurs, so skip them
@@ -3939,10 +3950,33 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 						// the note immediately following the end of a tied group
 						// if the tied group crosses a barline.
 						dstates[rindex][diatonic] = -1000 + accid;
+						gdstates[rindex][diatonic] = -1000 + accid;
 					}
 					continue;
 				}
-				if (accid != dstates[rindex][diatonic]) {
+
+				if (graceQ && (accid != gdstates[rindex][diatonic])) {
+
+					// accidental is different from the previous state so should be
+					// printed
+					infile[i].token(j)->setValue("auto", to_string(k),
+							"visualAccidental", "true");
+					if (gdstates[rindex][diatonic] < -900) {
+						// this is an obligatory cautionary accidental
+						// or at least half the time it is (figure that out later)
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"obligatoryAccidental", "true");
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"cautionaryAccidental", "true");
+					}
+					gdstates[rindex][diatonic] = accid;
+					// regular notes are not affected by grace notes accidental
+					// changes, but should have an obligatory cautionary accidental,
+					// displayed for clarification.
+					dstates[rindex][diatonic] = -1000 + accid;
+
+				} else if (!graceQ && (accid != dstates[rindex][diatonic])) {
+
 					// accidental is different from the previous state so should be
 					// printed
 					infile[i].token(j)->setValue("auto", to_string(k),
@@ -3956,6 +3990,8 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 								"cautionaryAccidental", "true");
 					}
 					dstates[rindex][diatonic] = accid;
+					gdstates[rindex][diatonic] = accid;
+
 				} else if ((accid == 0) && (subtok.find("n") != string::npos)) {
 					infile[i].token(j)->setValue("auto", to_string(k),
 							"cautionaryAccidental", "true");
@@ -3985,6 +4021,9 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 						}
 					}
 				}
+
+
+
 			}
 		}
 	}
