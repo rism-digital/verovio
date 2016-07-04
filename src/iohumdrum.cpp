@@ -1412,11 +1412,17 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 Space *irest = new Space;
                 appendElement(elements, pointers, irest);
                 convertRhythm(irest, layerdata[i]);
+                processSlur(layerdata[i]);
+                processDynamics(layerdata[i], staffindex);
+                processDirection(layerdata[i], staffindex);
             }
             else {
                 Rest *rest = new Rest;
                 appendElement(elements, pointers, rest);
                 convertRest(rest, layerdata[i]);
+                processSlur(layerdata[i]);
+                processDynamics(layerdata[i], staffindex);
+                processDirection(layerdata[i], staffindex);
             }
         }
         else {
@@ -1460,14 +1466,24 @@ void HumdrumInput::processDirection(HTp token, int staffindex)
     if (text.size() == 0) {
         return;
     }
+    cerr << "TEXT IS " << text << endl;
 
     int zparam = token->isDefined("LO", "TX", "Z");
     int yparam = token->isDefined("LO", "TX", "Y");
 
+    bool aparam = token->getValueBool("LO", "TX", "a");
+    bool bparam = token->getValueBool("LO", "TX", "b");
+
     double Y = 0.0;
     double Z = 0.0;
     string placement;
-    if (zparam) {
+    if (aparam) {
+        placement = "above";
+    }
+    else if (bparam) {
+        placement = "below";
+    }
+    else if (zparam) {
         Z = token->getValueInt("LO", "TX", "Z");
         if (Z > 0) {
             placement = "above";
@@ -1476,7 +1492,7 @@ void HumdrumInput::processDirection(HTp token, int staffindex)
             placement = "below";
         }
     }
-    if (yparam) {
+    else if (yparam) {
         Y = token->getValueInt("LO", "TX", "Y");
         if (Y > 0) {
             placement = "below";
