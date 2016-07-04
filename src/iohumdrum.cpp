@@ -1466,7 +1466,6 @@ void HumdrumInput::processDirection(HTp token, int staffindex)
     if (text.size() == 0) {
         return;
     }
-    cerr << "TEXT IS " << text << endl;
 
     int zparam = token->isDefined("LO", "TX", "Z");
     int yparam = token->isDefined("LO", "TX", "Y");
