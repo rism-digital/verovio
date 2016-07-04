@@ -1538,12 +1538,28 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
 
     if (token->find("z") != string::npos) {
         if (token->find("zy") == string::npos) { // don't show invisible sfz.
+
+            bool aboveQ = token->getValueBool("LO", "DY", "a");
+            bool belowQ = token->getValueBool("LO", "DY", "b");
+            if (token->isDefined("LO", "DY", "Z")) {
+                aboveQ = true;
+            }
+            else if (token->isDefined("LO", "DY", "Y")) {
+                belowQ = true;
+            }
+
             Dynam *dynam = new Dynam;
             m_measure->AddFloatingElement(dynam);
             setStaff(dynam, m_currentstaff);
             addTextElement(dynam, "sf");
             HumNum barstamp = getMeasureTstamp(token, staffindex);
             dynam->SetTstamp(barstamp.getFloat());
+            if (aboveQ) {
+                dynam->SetPlace(STAFFREL_above);
+            }
+            else if (belowQ) {
+                dynam->SetPlace(STAFFREL_below);
+            }
         }
     }
 
@@ -1553,48 +1569,95 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
             if (ttrack != track) {
                 break;
             }
+            // Break if this is not the last layer for the current spine
+            if (!line->token(i)->isNull()) {
+                break;
+            }
         }
         if (!(line->token(i)->isDataType("**dynam") || line->token(i)->isDataType("**dyn"))) {
             continue;
         }
-        if (line->token(i)->isNull()) {
-            continue;
-        }
+        // Don't skipp NULL tokens, because this algorithm only prints dynamics
+        // after the last layer, and there could be notes in earlier layer
+        // that need the dynamic.
+        // if (line->token(i)->isNull()) {
+        //     continue;
+        // }
 
         string tok = *line->token(i);
-        if (tok == "p") {
+
+        string hairpins;
+        string letters;
+        for (int i = 0; i < (int)tok.size(); i++) {
+            if (isalpha(tok[i])) {
+                letters.push_back(tok[i]);
+            }
+            else {
+                hairpins.push_back(tok[i]);
+            }
+        }
+
+        if (letters == "p") {
             dynamic = "p";
         }
-        else if (tok == "pp") {
+        else if (letters == "pp") {
             dynamic = "pp";
         }
-        else if (tok == "ppp") {
+        else if (letters == "ppp") {
             dynamic = "ppp";
         }
-        else if (tok == "pppp") {
+        else if (letters == "pppp") {
             dynamic = "pppp";
         }
-        else if (tok == "f") {
+        else if (letters == "f") {
             dynamic = "f";
         }
-        else if (tok == "ff") {
+        else if (letters == "ff") {
             dynamic = "ff";
         }
-        else if (tok == "fff") {
+        else if (letters == "fff") {
             dynamic = "fff";
         }
-        else if (tok == "ffff") {
+        else if (letters == "ffff") {
             dynamic = "ffff";
         }
-        else if (tok == "mp") {
+        else if (letters == "mp") {
             dynamic = "mp";
         }
-        else if (tok == "mf") {
+        else if (letters == "mf") {
             dynamic = "mf";
+        }
+        else if (letters == "fp") {
+            dynamic = "fp";
+        }
+        else if (letters == "sf") {
+            // for a sf which is shared betwee staves in piano music;
+            // otherwise "z" on **kern notes is probably better.
+            dynamic = "sf";
+        }
+        else if (letters == "sfz") {
+            // for a sf which is shared betwee staves in piano music;
+            // otherwise "zz" on **kern notes is probably better.
+            dynamic = "sfz";
+        }
+        else if (letters == "rf") {
+            dynamic = "rf";
+        }
+        else if (letters == "rfz") {
+            dynamic = "rfz";
         }
 
         if (dynamic.empty()) {
             continue;
+        }
+
+        bool aboveQ = line->token(i)->getValueBool("LO", "DY", "a");
+        bool belowQ = line->token(i)->getValueBool("LO", "DY", "b");
+        if (line->token(i)->isDefined("LO", "DY", "Z")) {
+            aboveQ = true;
+        }
+        else if (line->token(i)->isDefined("LO", "DY", "Y")) {
+            belowQ = true;
         }
 
         Dynam *dynam = new Dynam;
@@ -1603,6 +1666,13 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
         addTextElement(dynam, dynamic);
         HumNum barstamp = getMeasureTstamp(token, staffindex);
         dynam->SetTstamp(barstamp.getFloat());
+
+        if (aboveQ) {
+            dynam->SetPlace(STAFFREL_above);
+        }
+        else if (belowQ) {
+            dynam->SetPlace(STAFFREL_below);
+        }
     }
 }
 
@@ -1719,8 +1789,14 @@ void HumdrumInput::analyzeLayerBeams(vector<int> &beamnum, vector<int> &gbeamnum
     int i;
     for (i = 0; i < (int)beamstate.size(); i++) {
         if (!layerdata[i]->isData()) {
-            beamstate[i] = 0;
-            gbeamstate[i] = 0;
+            if (i > 0) {
+                beamstate[i] = beamstate[i - 1];
+                gbeamstate[i] = gbeamstate[i - 1];
+            }
+            else {
+                beamstate[i] = 0;
+                gbeamstate[i] = 0;
+            }
             continue;
         }
         if (layerdata[i]->isNull()) {
