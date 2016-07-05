@@ -2328,7 +2328,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
         if (tupletendboolean[i]) {
             state = 0;
-            value = 1 << xmin;
+            value = (1 << xmin);
             vdur = dursum[i] - dursum[starti] + fulldur[i];
             if (vdur < 1) {
                 val2 = vdur * value;
@@ -2338,6 +2338,9 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 else {
                     tupletscale.push_back(value);
                 }
+            }
+            else if (vdur / 3 * 2 == 1) {
+                tupletscale.push_back(1);
             }
             else {
                 tupletscale.push_back(value);
