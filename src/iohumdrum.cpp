@@ -2557,6 +2557,7 @@ void HumdrumInput::getTimingInformation(
     }
     vector<HumNum> startdur(layerdata.size());
     vector<HumNum> duration(layerdata.size());
+    HumNum correction = 0;
     for (int i = 0; i < (int)layerdata.size(); i++) {
         startdur[i] = layerdata[i]->getDurationFromStart();
         if (!layerdata[i]->isData()) {
@@ -2572,6 +2573,14 @@ void HumdrumInput::getTimingInformation(
     }
     for (int i = 1; i < (int)layerdata.size(); i++) {
         prespace[i] = startdur[i] - startdur[i - 1] - duration[i - 1];
+        if (prespace[i] < 0) {
+            correction += prespace[i];
+            prespace[i] = 0;
+        }
+        else if (prespace[i] > 0) {
+            prespace[i] += correction;
+            correction = 0;
+        }
     }
     if (layerdata.size() > 0) {
         prespace.resize(prespace.size() + 1);
