@@ -220,7 +220,9 @@ void StaffAlignment::SetCurrentFloatingPositioner(FloatingElement *element, int 
 MeasureAligner::MeasureAligner() : Object()
 {
     m_leftAlignment = NULL;
+    m_leftBarLineAlignment = NULL;
     m_rightAlignment = NULL;
+    m_rightBarLineAlignment = NULL;
 }
 
 MeasureAligner::~MeasureAligner()
@@ -233,7 +235,11 @@ void MeasureAligner::Reset()
     m_nonJustifiableLeftMargin = 0;
     m_leftAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_START);
     AddAlignment(m_leftAlignment);
-    m_rightAlignment = new Alignment(0.0, ALIGNMENT_MEASURE_END);
+    m_leftBarLineAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_LEFT_BARLINE);
+    AddAlignment(m_leftBarLineAlignment);
+    m_rightBarLineAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_RIGHT_BARLINE);
+    AddAlignment(m_rightBarLineAlignment);
+    m_rightAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_END);
     AddAlignment(m_rightAlignment);
 }
 
@@ -248,7 +254,7 @@ void MeasureAligner::AddAlignment(Alignment *alignment, int idx)
     }
 }
 
-Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type, bool hasEndAlignment)
+Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
 {
     int i;
     int idx = -1; // the index if we reach the end.
@@ -276,14 +282,10 @@ Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type, b
     }
     // nothing found
     if (idx == -1) {
-        // this is tricky! Because we want m_rightAlignment to always stay at the end (with hasEndAlignment),
-        // we always to insert _before_ the last one - m_rightAlignment is added in Reset()
-        if (hasEndAlignment) {
-            idx = GetAlignmentCount() - 1;
+        if ((type != ALIGNMENT_MEASURE_END) && (this->Is() != GRACE_ALIGNER)) {
+            assert(false);
         }
-        else {
-            idx = GetAlignmentCount();
-        }
+        idx = GetAlignmentCount();
     }
     Alignment *newAlignment = new Alignment(time, type);
     AddAlignment(newAlignment, idx);
@@ -292,8 +294,20 @@ Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type, b
 
 void MeasureAligner::SetMaxTime(double time)
 {
-    if (m_rightAlignment->GetTime() < time) {
-        m_rightAlignment->SetTime(time);
+    // we have to have a m_rightBarLineAlignment
+    assert(m_rightBarLineAlignment);
+
+    // it must be found in the aligner
+    int idx = m_rightBarLineAlignment->GetIdx();
+    assert(idx != -1);
+
+    int i;
+    Alignment *alignment = NULL;
+    // First try to see if we already have something at the time position
+    for (i = idx; i < GetAlignmentCount(); i++) {
+        alignment = dynamic_cast<Alignment *>(m_children.at(i));
+        assert(alignment);
+        alignment->SetTime(time);
     }
 }
 
@@ -326,8 +340,7 @@ void GraceAligner::AlignStack()
         double duration = note->LayerElement::GetAlignmentDuration(NULL, NULL, false);
         // Time goes backward with grace notes
         time -= duration;
-        // Set the hasEndAlignment to false with grace notes because we don't have an end-measure alignment
-        note->SetGraceAlignment(this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT, false));
+        note->SetGraceAlignment(this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT));
     }
     m_noteStack.clear();
 }

@@ -26,12 +26,13 @@ class TimestampAttr;
  * this to avoid notes aligning to it
  */
 enum AlignmentType {
+    ALIGNMENT_MEASURE_START = 0,
     // Non-justifiable
-    ALIGNMENT_SCOREDEF_CLEF = 0,
+    ALIGNMENT_SCOREDEF_CLEF,
     ALIGNMENT_SCOREDEF_KEYSIG,
     ALIGNMENT_SCOREDEF_MENSUR,
     ALIGNMENT_SCOREDEF_METERSIG,
-    ALIGNMENT_MEASURE_START,
+    ALIGNMENT_MEASURE_LEFT_BARLINE,
     // Justifiable
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF,
@@ -45,6 +46,8 @@ enum AlignmentType {
     ALIGNMENT_FULLMEASURE2,
     ALIGNMENT_ACCID,
     ALIGNMENT_DEFAULT,
+    // Non-justifiable
+    ALIGNMENT_MEASURE_RIGHT_BARLINE,
     ALIGNMENT_MEASURE_END
 };
 
@@ -417,7 +420,7 @@ public:
      */
     virtual void Reset();
 
-    Alignment *GetAlignmentAtTime(double time, AlignmentType type, bool hasEndAlignment = true);
+    Alignment *GetAlignmentAtTime(double time, AlignmentType type);
 
     /**
      * Keep the maximum time of the measure.
@@ -474,14 +477,16 @@ public:
     //
 private:
     /**
-     * A pointer to the left Alignment object kept for the measure start position
+     * A pointer to the left and right Alignment object kept for the measure start and end position
      */
     Alignment *m_leftAlignment;
+    Alignment *m_rightAlignment;
 
     /**
-     * A pointer to the left Alignment object kept for the measure end position
+     * A pointer to the left and right Alignment object kept for the left and right barline position
      */
-    Alignment *m_rightAlignment;
+    Alignment *m_leftBarLineAlignment;
+    Alignment *m_rightBarLineAlignment;
 
     /**
      * Store measure's non-justifiable margin used by the scoreDef attributes.

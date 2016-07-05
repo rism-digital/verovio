@@ -245,8 +245,8 @@ int Layer::AlignHorizontally(ArrayPtrVoid *params)
     // We are starting a new layer, reset the time;
     int meterUnit = 4;
     if (*currentMeterSig && (*currentMeterSig)->HasUnit()) meterUnit = (*currentMeterSig)->GetUnit();
-    // We set it to -1.5 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
-    (*time) = DUR_MAX * -1.5;
+    // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
+    (*time) = DUR_MAX * -1.0;
 
     if (this->GetStaffDefClef()) {
         GetStaffDefClef()->AlignHorizontally(params);

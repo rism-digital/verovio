@@ -95,7 +95,7 @@ public:
     BarLine *const GetRightBarLine() { return &m_rightBarLine; };
     ///@}
 
-    int GetXRel() const;
+    // int GetXRel() const;
 
     /**
      * Return the non-justifiable left margin for the measure
@@ -103,11 +103,15 @@ public:
     int GetNonJustifiableLeftMargin() const { return m_measureAligner.GetNonJustifiableMargin(); }
 
     /**
-     * @name Return the X rel position of the right and left barLine (without their width)
+     * @name Return the X1 and X2 rel position of the right and left barLine
      */
     ///@{
     int GetLeftBarLineX() const;
+    int GetLeftBarLineX1() const;
+    int GetLeftBarLineX2() const;
     int GetRightBarLineX() const;
+    int GetLeftBarLineXRel1() const;
+    int GetLeftBarLineXRel2() const;
     ///@}
 
     /**

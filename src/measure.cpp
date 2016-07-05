@@ -108,15 +108,18 @@ void Measure::AddStaff(Staff *staff)
     }
 }
 
+/*
 int Measure::GetXRel() const
 {
     if (m_measureAligner.GetLeftAlignment()) {
+        LogDebug("LEFT %d", m_measureAligner.GetLeftAlignment()->GetXRel() );
         return m_measureAligner.GetLeftAlignment()->GetXRel();
     }
     return 0;
 }
+*/
 
-int Measure::GetLeftBarLineX() const
+int Measure::GetLeftBarLineX1() const
 {
     if (m_measureAligner.GetLeftAlignment()) {
         return m_measureAligner.GetLeftAlignment()->GetXRel();
@@ -318,6 +321,8 @@ int Measure::AlignMeasures(ArrayPtrVoid *params)
 
 int Measure::ResetDrawing(ArrayPtrVoid *params)
 {
+    this->m_leftBarLine.Reset();
+    this->m_rightBarLine.Reset();
     this->m_timestampAligner.Reset();
     return FUNCTOR_CONTINUE;
 };

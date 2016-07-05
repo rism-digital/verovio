@@ -1110,6 +1110,9 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
         if (current_measure->GetLeftBarLineType() != BARRENDITION_NONE) {
             current_measure->GetLeftBarLine()->SetBoundingBoxXShift(params);
         }
+        if (current_measure->GetRightBarLineType() != BARRENDITION_NONE) {
+            current_measure->GetRightBarLine()->SetBoundingBoxXShift(params);
+        }
         return FUNCTOR_CONTINUE;
     }
 
