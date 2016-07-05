@@ -1006,8 +1006,6 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 
     storeStaffLayerTokensForMeasure(startline, endline);
 
-    checkForOmd(startline, endline);
-
     return convertMeasureStaves(startline, endline);
 }
 
@@ -1129,9 +1127,22 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
 
     vector<int> layers = getStaffLayerCounts();
 
+    int i;
+
+    // pre-allocate
+    vector<Staff *> stafflist(kernstarts.size());
+    for (i = 0; i < (int)kernstarts.size(); i++) {
+        stafflist[i] = new Staff();
+        m_measure->AddStaff(stafflist[i]);
+    }
+
+    checkForOmd(startline, endline);
+
     bool status = true;
-    for (int i = 0; i < (int)kernstarts.size(); i++) {
+    for (i = 0; i < (int)kernstarts.size(); i++) {
         m_currentstaff = i + 1;
+        m_staff = stafflist[i];
+        m_staff->SetN(m_currentstaff);
         status &= convertMeasureStaff(kernstarts[i]->getTrack(), startline, endline, i + 1, layers[i]);
         if (!status) {
             break;
@@ -1149,11 +1160,6 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
 
 bool HumdrumInput::convertMeasureStaff(int track, int startline, int endline, int n, int layercount)
 {
-
-    m_staff = new Staff();
-    m_measure->AddStaff(m_staff);
-    m_staff->SetN(n);
-
     bool status = true;
     for (int i = 0; i < layercount; i++) {
         status &= convertStaffLayer(track, startline, endline, i);
