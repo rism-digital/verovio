@@ -44,6 +44,7 @@
 #include "note.h"
 #include "octave.h"
 #include "page.h"
+#include "pedal.h"
 #include "rest.h"
 #include "slur.h"
 #include "space.h"
@@ -1389,7 +1390,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             continue;
         }
         if (layerdata[i]->isInterpretation()) {
-            handleOttavaMark(*layerdata[i], note);
+            handleOttavaMark(layerdata[i], note);
+            handlePedalMark(layerdata[i], note);
             if (layerdata[i]->getDurationFromStart() != 0) {
                 if (layerdata[i]->isClef()) {
                     insertClefElement(elements, pointers, layerdata[i]);
@@ -2489,11 +2491,11 @@ HumNum HumdrumInput::removeFactorsOfTwo(HumNum value, int &tcount, int &bcount)
 //    in the previous measure among all layers).
 //
 
-void HumdrumInput::handleOttavaMark(HumdrumToken &token, Note *note)
+void HumdrumInput::handleOttavaMark(HTp token, Note *note)
 {
     int staffindex = m_currentstaff - 1;
 
-    if (token == "*8va") {
+    if (*token == "*8va") {
         // turn on ottava
         m_ottavameasure[staffindex] = m_measure;
         m_ottavanotestart[staffindex] = NULL;
@@ -2501,7 +2503,7 @@ void HumdrumInput::handleOttavaMark(HumdrumToken &token, Note *note)
         // When a new note is read, check if m_ottavameasure
         // is non-null, and if so, store the new note in m_ottavanotestart.
     }
-    else if (token == "*X8va") {
+    else if (*token == "*X8va") {
         // turn off ottava
         if ((m_ottavameasure[staffindex] != NULL) && (m_ottavanotestart[staffindex] != NULL)
             && (m_ottavanoteend[staffindex] != NULL)) {
@@ -2517,6 +2519,64 @@ void HumdrumInput::handleOttavaMark(HumdrumToken &token, Note *note)
         m_ottavanoteend[staffindex] = NULL;
         m_ottavameasure[staffindex] = NULL;
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::handlePedalMark --  *ped turns on and *Xped tuns off.
+//    IF the *X8va is (incorrectly) placed at the start of the next measure
+//    before a note, then this algorithm may not work (need to keep track
+//    of the last note in the previous measure among all layers).
+//
+
+void HumdrumInput::handlePedalMark(HTp token, Note *note)
+{
+    int staffindex = m_currentstaff - 1;
+
+    if (*token == "*ped") {
+        // turn on pedal
+        Pedal *pedal = new Pedal;
+        m_measure->AddFloatingElement(pedal);
+        HumNum tstamp = getMeasureTstamp(token, staffindex);
+        pedal->SetTstamp(tstamp.getFloat());
+        pedal->SetDir(pedalLog_DIR_down);
+        setStaff(pedal, m_currentstaff);
+    }
+    else if (*token == "*Xped") {
+        // turn off pedal
+        HTp pdata = getPreviousDataToken(token);
+        if (pdata != NULL) {
+            Pedal *pedal = new Pedal;
+            m_measure->AddFloatingElement(pedal);
+            HumNum tstamp = getMeasureTstamp(pdata, staffindex);
+            pedal->SetTstamp(tstamp.getFloat());
+            pedal->SetDir(pedalLog_DIR_up);
+            setStaff(pedal, m_currentstaff);
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getPreviousDataToken --
+//
+
+HTp HumdrumInput::getPreviousDataToken(HTp token)
+{
+    if (token == NULL) {
+        return NULL;
+    }
+    HTp current = token;
+    current = current->getPreviousToken();
+    while (current) {
+        if (current == NULL) {
+            break;
+        }
+        if (current->isData()) {
+            break;
+        }
+    }
+    return current;
 }
 
 //////////////////////////////

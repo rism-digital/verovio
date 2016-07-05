@@ -164,7 +164,8 @@ protected:
     void prepareVerses(void);
     void convertVerses(Note *note, hum::HTp token, int subtoken);
     void checkForOmd(int startline, int endline);
-    void handleOttavaMark(hum::HumdrumToken &token, Note *note);
+    void handleOttavaMark(hum::HTp token, Note *note);
+    void handlePedalMark(hum::HTp token, Note *note);
     void prepareBeamAndTupletGroups(const vector<hum::HTp> &layerdata, vector<humaux::HumdrumBeamAndTuplet> &hg);
     void printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, const vector<hum::HTp> &layerdata);
     void insertTuplet(
@@ -183,6 +184,7 @@ protected:
     void processDynamics(hum::HTp token, int staffindex);
     void processDirection(hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex);
+    hum::HTp getPreviousDataToken(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -285,6 +287,13 @@ private:
     vector<Note *> m_ottavanotestart;
     vector<Note *> m_ottavanoteend;
     vector<Measure *> m_ottavameasure;
+
+    // m_pedal == keep track of pedal marks: stores the starting note of
+    // a pedalling which will be turned off later.  m_pedalmeasure == the
+    // starting measure of the pedalling.
+    vector<Note *> m_pedalnotestart;
+    vector<Note *> m_pedalnoteend;
+    vector<Measure *> m_pedalmeasure;
 
     // m_tupletscaling == tuplet-scaling factor for the current note.
     hum::HumNum m_tupletscaling;
