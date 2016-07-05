@@ -153,14 +153,14 @@ protected:
     int characterCountInSubtoken(const string &text, char symbol);
     bool emptyMeasures(void);
     bool hasFullMeasureRest(vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur);
-    void convertNote(vrv::Note *note, hum::HTp token, int subtoken = -1);
+    void convertNote(vrv::Note *note, hum::HTp token, int staffindex, int subtoken = -1);
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
     void processTieStart(Note *note, hum::HTp token, const string &tstring);
     void processTieEnd(Note *note, hum::HTp token, const string &tstring);
     void printNoteArticulations(Note *note, hum::HTp token, const string &tstring);
     void getTimingInformation(vector<hum::HumNum> &prespace, vector<hum::HTp> &layerdata, hum::HumNum layerstarttime,
         hum::HumNum layerendtime);
-    void convertChord(Chord *chord, hum::HTp token);
+    void convertChord(Chord *chord, hum::HTp token, int staffindex);
     void prepareVerses(void);
     void convertVerses(Note *note, hum::HTp token, int subtoken);
     void checkForOmd(int startline, int endline);
@@ -282,7 +282,8 @@ private:
     // m_ottavanote == keep track of ottava marks: stores the starting note of
     // an ottava line which will be turned off later.  m_ottavameasure == the
     // starting measure of the ottava mark.
-    vector<Note *> m_ottavanote;
+    vector<Note *> m_ottavanotestart;
+    vector<Note *> m_ottavanoteend;
     vector<Measure *> m_ottavameasure;
 
     // m_tupletscaling == tuplet-scaling factor for the current note.

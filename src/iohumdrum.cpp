@@ -342,9 +342,11 @@ bool HumdrumInput::convertHumdrum(void)
     m_meter_bottoms.resize(kernstarts.size());
     std::fill(m_meter_bottoms.begin(), m_meter_bottoms.end(), 4);
 
-    m_ottavanote.resize(kernstarts.size());
+    m_ottavanotestart.resize(kernstarts.size());
+    m_ottavanoteend.resize(kernstarts.size());
     m_ottavameasure.resize(kernstarts.size());
-    std::fill(m_ottavanote.begin(), m_ottavanote.end(), (Note *)NULL);
+    std::fill(m_ottavanotestart.begin(), m_ottavanotestart.end(), (Note *)NULL);
+    std::fill(m_ottavanoteend.begin(), m_ottavanoteend.end(), (Note *)NULL);
     std::fill(m_ottavameasure.begin(), m_ottavameasure.end(), (Measure *)NULL);
 
     prepareVerses();
@@ -1399,7 +1401,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             appendElement(elements, pointers, chord);
             elements.push_back("chord");
             pointers.push_back((void *)chord);
-            convertChord(chord, layerdata[i]);
+            convertChord(chord, layerdata[i], staffindex);
             elements.pop_back();
             pointers.pop_back();
             processSlur(layerdata[i]);
@@ -1428,11 +1430,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         else {
             // should be a note
             note = new Note;
-            if ((m_ottavameasure[staffindex] != NULL) && (m_ottavanote[staffindex] == NULL)) {
-                m_ottavanote[staffindex] = note;
-            }
             appendElement(elements, pointers, note);
-            convertNote(note, layerdata[i]);
+            convertNote(note, layerdata[i], staffindex);
             processSlur(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
             processDirection(layerdata[i], staffindex);
@@ -2491,27 +2490,25 @@ void HumdrumInput::handleOttavaMark(HumdrumToken &token, Note *note)
     if (token == "*8va") {
         // turn on ottava
         m_ottavameasure[staffindex] = m_measure;
-        m_ottavanote[staffindex] = NULL;
+        m_ottavanotestart[staffindex] = NULL;
+        m_ottavanoteend[staffindex] = NULL;
         // When a new note is read, check if m_ottavameasure
-        // is non-null, and if so, store the new note in m_ottavanote.
+        // is non-null, and if so, store the new note in m_ottavanotestart.
     }
     else if (token == "*X8va") {
         // turn off ottava
-        if ((m_ottavameasure[staffindex] != NULL) && (m_ottavanote[staffindex] != NULL)) {
+        if ((m_ottavameasure[staffindex] != NULL) && (m_ottavanotestart[staffindex] != NULL)
+            && (m_ottavanoteend[staffindex] != NULL)) {
             Octave *octave = new Octave;
             m_ottavameasure[staffindex]->AddFloatingElement(octave);
             setStaff(octave, staffindex + 1);
             octave->SetDis(OCTAVE_DIS_8);
-            octave->SetStartid(m_ottavanote[staffindex]->GetUuid());
-            if (note != NULL) {
-                octave->SetEndid(note->GetUuid());
-            }
-            else {
-                octave->SetEndid(m_measure->GetUuid());
-            }
+            octave->SetStartid("#" + m_ottavanotestart[staffindex]->GetUuid());
+            octave->SetEndid("#" + m_ottavanoteend[staffindex]->GetUuid());
             octave->SetDisPlace(PLACE_above);
         }
-        m_ottavanote[staffindex] = NULL;
+        m_ottavanotestart[staffindex] = NULL;
+        m_ottavanoteend[staffindex] = NULL;
         m_ottavameasure[staffindex] = NULL;
     }
 }
@@ -2521,13 +2518,13 @@ void HumdrumInput::handleOttavaMark(HumdrumToken &token, Note *note)
 // HumdrumInput::convertChord --
 //
 
-void HumdrumInput::convertChord(Chord *chord, HTp token)
+void HumdrumInput::convertChord(Chord *chord, HTp token, int staffindex)
 {
     int scount = token->getSubtokenCount();
     for (int j = 0; j < scount; j++) {
         Note *note = new Note;
         appendElement(chord, note);
-        convertNote(note, token, j);
+        convertNote(note, token, staffindex, j);
     }
 
     convertRhythm(chord, token);
@@ -2711,7 +2708,7 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
 //       subtoken = -1 (use the first subtoken);
 //
 
-void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
+void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtoken)
 {
     string tstring;
     int stindex = 0;
@@ -2726,6 +2723,11 @@ void HumdrumInput::convertNote(Note *note, HTp token, int subtoken)
     bool chordQ = token->isChord();
 
     bool octaveupQ = m_ottavameasure[m_currentstaff - 1] ? true : false;
+
+    if ((m_ottavameasure[staffindex] != NULL) && (m_ottavanotestart[staffindex] == NULL)) {
+        m_ottavanotestart[staffindex] = note;
+    }
+    m_ottavanoteend[staffindex] = note;
 
     if (tstring.find("q") != string::npos) {
         note->SetGrace(GRACE_acc);
