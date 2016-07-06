@@ -37,6 +37,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "hairpin.h"
 #include "iomei.h"
 #include "layer.h"
 #include "measure.h"
@@ -1525,11 +1526,16 @@ void HumdrumInput::processDirection(HTp token, int staffindex)
 
 /////////////////////////////
 //
-// HumdrumInput::processDynamics --
+// HumdrumInput::processDynamics -- Eventually deal with dynamics which start
+//    on a null **kern line.  Currently this function will ignore dyanmics
+//    which occur or start on such lines.  The best thing would probably be to
+//    add null **kern lines to the layer data (but skip other types of nulls
+//    when there are notes or rests on the line otherwise).
 //
 
 void HumdrumInput::processDynamics(HTp token, int staffindex)
 {
+
     string tok;
     string dynamic;
     HumdrumLine *line = token->getLine();
@@ -1654,33 +1660,158 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
             dynamic = "rfz";
         }
 
-        if (dynamic.empty()) {
-            continue;
-        }
+        if (!dynamic.empty()) {
+            bool aboveQ = line->token(i)->getValueBool("LO", "DY", "a");
+            bool belowQ = line->token(i)->getValueBool("LO", "DY", "b");
+            if (line->token(i)->isDefined("LO", "DY", "Z")) {
+                aboveQ = true;
+            }
+            else if (line->token(i)->isDefined("LO", "DY", "Y")) {
+                belowQ = true;
+            }
 
-        bool aboveQ = line->token(i)->getValueBool("LO", "DY", "a");
-        bool belowQ = line->token(i)->getValueBool("LO", "DY", "b");
-        if (line->token(i)->isDefined("LO", "DY", "Z")) {
-            aboveQ = true;
-        }
-        else if (line->token(i)->isDefined("LO", "DY", "Y")) {
-            belowQ = true;
-        }
+            Dynam *dynam = new Dynam;
+            m_measure->AddFloatingElement(dynam);
+            setStaff(dynam, m_currentstaff);
+            addTextElement(dynam, dynamic);
+            HumNum barstamp = getMeasureTstamp(token, staffindex);
+            dynam->SetTstamp(barstamp.getFloat());
 
-        Dynam *dynam = new Dynam;
-        m_measure->AddFloatingElement(dynam);
-        setStaff(dynam, m_currentstaff);
-        addTextElement(dynam, dynamic);
-        HumNum barstamp = getMeasureTstamp(token, staffindex);
-        dynam->SetTstamp(barstamp.getFloat());
-
-        if (aboveQ) {
-            dynam->SetPlace(STAFFREL_above);
+            if (aboveQ) {
+                dynam->SetPlace(STAFFREL_above);
+            }
+            else if (belowQ) {
+                dynam->SetPlace(STAFFREL_below);
+            }
         }
-        else if (belowQ) {
-            dynam->SetPlace(STAFFREL_below);
+        if (hairpins.find("<") != string::npos) {
+            HTp endtok = NULL;
+            if (hairpins.find("<[") != string::npos) {
+                endtok = token;
+            }
+            else {
+                endtok = getCrescendoEnd(line->token(i));
+            }
+            if (endtok != NULL) {
+                Hairpin *hairpin = new Hairpin;
+                setStaff(hairpin, m_currentstaff);
+                HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
+                int measures = getMeasureDifference(line->token(i), endtok);
+                hairpin->SetTstamp(tstamp.getFloat());
+                pair<int, double> ts2(measures, tstamp2.getFloat());
+                hairpin->SetTstamp2(ts2);
+                hairpin->SetForm(hairpinLog_FORM_cres);
+                m_measure->AddFloatingElement(hairpin);
+            }
+        }
+        else if (hairpins.find(">") != string::npos) {
+            HTp endtok = NULL;
+            if (hairpins.find(">]") != string::npos) {
+                endtok = token;
+            }
+            else {
+                endtok = getDecrescendoEnd(line->token(i));
+            }
+            if (endtok != NULL) {
+                Hairpin *hairpin = new Hairpin;
+                setStaff(hairpin, m_currentstaff);
+                HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
+                HumNum tstamp2 = getMeasureTstamp(endtok, staffindex);
+                int measures = getMeasureDifference(line->token(i), endtok);
+                hairpin->SetTstamp(tstamp.getFloat());
+                pair<int, double> ts2(measures, tstamp2.getFloat());
+                hairpin->SetTstamp2(ts2);
+                hairpin->SetForm(hairpinLog_FORM_dim);
+                m_measure->AddFloatingElement(hairpin);
+            }
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getMeasureDifference --
+//
+
+int HumdrumInput::getMeasureDifference(HTp starttok, HTp endtok)
+{
+    HumdrumLine *line = starttok->getOwner();
+    if (line == NULL) {
+        return 0;
+    }
+    HumdrumFile *file = line->getOwner();
+    if (file == NULL) {
+        return 0;
+    }
+    HumdrumFile &infile = *file;
+    int startline = starttok->getLineIndex();
+    int endline = endtok->getLineIndex();
+    int counter = 0;
+    for (int i = startline; i <= endline; i++) {
+        if (infile[i].isBarline()) {
+            counter++;
+        }
+    }
+    return counter;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getCrescendoEnd --
+//
+
+HTp HumdrumInput::getCrescendoEnd(HTp token)
+{
+    return getHairpinEnd(token, "[");
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getDecrescendoEnd --
+//
+
+HTp HumdrumInput::getDecrescendoEnd(HTp token)
+{
+    return getHairpinEnd(token, "]");
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getHairpinEnd --
+//
+
+HTp HumdrumInput::getHairpinEnd(HTp token, const string &endchar)
+{
+    if (token == NULL) {
+        return NULL;
+    }
+    token = token->getNextNonNullDataToken();
+    int badtoken = 0;
+    while (token != NULL) {
+        if (token->find(endchar) != string::npos) {
+            return token;
+        }
+        badtoken = 0;
+        for (int i = 0; i < (int)token->size(); i++) {
+            if (isalpha((*token)[i])) {
+                badtoken = 1;
+            }
+            else if ((*token)[i] == '<') {
+                badtoken = 1;
+            }
+            else if ((*token)[i] == '>') {
+                badtoken = 1;
+            }
+            if (badtoken) {
+                // maybe return the bad token for a weak ending
+                // to a hairpin...
+                return NULL;
+            }
+        }
+        token = token->getNextNonNullDataToken();
+    }
+    return NULL;
 }
 
 //////////////////////////////

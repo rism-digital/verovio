@@ -32,6 +32,7 @@ class Chord;
 class Layer;
 class Measure;
 class Note;
+class Hairpin;
 class Page;
 class Rest;
 class Staff;
@@ -185,6 +186,10 @@ protected:
     void processDirection(hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex);
     hum::HTp getPreviousDataToken(hum::HTp token);
+    hum::HTp getHairpinEnd(hum::HTp token, const string &endchar);
+    hum::HTp getDecrescendoEnd(hum::HTp token);
+    hum::HTp getCrescendoEnd(hum::HTp token);
+    int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
