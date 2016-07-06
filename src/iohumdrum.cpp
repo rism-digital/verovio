@@ -1535,7 +1535,6 @@ void HumdrumInput::processDirection(HTp token, int staffindex)
 
 void HumdrumInput::processDynamics(HTp token, int staffindex)
 {
-
     string tok;
     string dynamic;
     HumdrumLine *line = token->getLine();
@@ -1640,6 +1639,9 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
         else if (letters == "mf") {
             dynamic = "mf";
         }
+        else if (letters == "fz") {
+            dynamic = "fz";
+        }
         else if (letters == "fp") {
             dynamic = "fp";
         }
@@ -1693,6 +1695,14 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
                 endtok = getCrescendoEnd(line->token(i));
             }
             if (endtok != NULL) {
+                bool aboveQ = line->token(i)->getValueBool("LO", "DY", "a");
+                bool belowQ = line->token(i)->getValueBool("LO", "DY", "b");
+                if (line->token(i)->isDefined("LO", "DY", "Z")) {
+                    aboveQ = true;
+                }
+                else if (line->token(i)->isDefined("LO", "DY", "Y")) {
+                    belowQ = true;
+                }
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff);
                 HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
@@ -1703,6 +1713,12 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
                 m_measure->AddFloatingElement(hairpin);
+                if (aboveQ) {
+                    hairpin->SetPlace(STAFFREL_above);
+                }
+                else if (belowQ) {
+                    hairpin->SetPlace(STAFFREL_below);
+                }
             }
         }
         else if (hairpins.find(">") != string::npos) {
@@ -1714,6 +1730,14 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
                 endtok = getDecrescendoEnd(line->token(i));
             }
             if (endtok != NULL) {
+                bool aboveQ = line->token(i)->getValueBool("LO", "DY", "a");
+                bool belowQ = line->token(i)->getValueBool("LO", "DY", "b");
+                if (line->token(i)->isDefined("LO", "DY", "Z")) {
+                    aboveQ = true;
+                }
+                else if (line->token(i)->isDefined("LO", "DY", "Y")) {
+                    belowQ = true;
+                }
                 Hairpin *hairpin = new Hairpin;
                 setStaff(hairpin, m_currentstaff);
                 HumNum tstamp = getMeasureTstamp(line->token(i), staffindex);
@@ -1724,9 +1748,34 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_dim);
                 m_measure->AddFloatingElement(hairpin);
+                if (aboveQ) {
+                    hairpin->SetPlace(STAFFREL_above);
+                }
+                else if (belowQ) {
+                    hairpin->SetPlace(STAFFREL_below);
+                }
             }
         }
     }
+
+    token = token->getNextToken();
+    if (token == NULL) {
+        return;
+    }
+    while (token && !token->isData()) {
+        token = token->getNextToken();
+    }
+    if (token == NULL) {
+        return;
+    }
+    if (!token->isNull()) {
+        return;
+    }
+    // re-run this function on null tokens after the main note since
+    // there may be dynamics unattached to a note (for various often
+    // legitimate reasons).  Maybe make this more efficient later, such as
+    // do a separate parse of dynamics data in a different loop.
+    processDynamics(token, staffindex);
 }
 
 //////////////////////////////
