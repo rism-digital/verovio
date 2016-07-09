@@ -106,12 +106,12 @@ public:
      * @name Return the X1 and X2 rel position of the right and left barLine
      */
     ///@{
-    int GetLeftBarLineX() const;
-    int GetLeftBarLineX1() const;
-    int GetLeftBarLineX2() const;
-    int GetRightBarLineX() const;
-    int GetLeftBarLineXRel1() const;
-    int GetLeftBarLineXRel2() const;
+    int GetLeftBarLineXRel() const;
+    int GetLeftBarLineX1Rel() const;
+    int GetLeftBarLineX2Rel() const;
+    int GetRightBarLineXRel() const;
+    int GetRightBarLineX1Rel() const;
+    int GetRightBarLineX2Rel() const;
     ///@}
 
     /**

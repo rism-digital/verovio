@@ -128,7 +128,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
         x1 = interface->GetStart()->GetDrawingX();
-        x2 = measure->GetDrawingX() + measure->GetRightBarLineX();
+        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         graphic = element;
         spanningType = SPANNING_START;
     }
@@ -161,7 +161,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // We need the last measure of the system for x2
         Measure *last = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(last)) return;
-        x2 = last->GetDrawingX() + last->GetRightBarLineX();
+        x2 = last->GetDrawingX() + last->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
     }
 

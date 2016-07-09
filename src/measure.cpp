@@ -108,37 +108,63 @@ void Measure::AddStaff(Staff *staff)
     }
 }
 
-/*
-int Measure::GetXRel() const
+int Measure::GetLeftBarLineXRel() const
 {
-    if (m_measureAligner.GetLeftAlignment()) {
-        LogDebug("LEFT %d", m_measureAligner.GetLeftAlignment()->GetXRel() );
-        return m_measureAligner.GetLeftAlignment()->GetXRel();
-    }
-    return 0;
-}
-*/
-
-int Measure::GetLeftBarLineX1() const
-{
-    if (m_measureAligner.GetLeftAlignment()) {
-        return m_measureAligner.GetLeftAlignment()->GetXRel();
+    if (m_measureAligner.GetLeftBarLineAlignment()) {
+        return m_measureAligner.GetLeftBarLineAlignment()->GetXRel();
     }
     return 0;
 }
 
-int Measure::GetRightBarLineX() const
+int Measure::GetLeftBarLineX1Rel() const
 {
-    if (m_measureAligner.GetRightAlignment()) {
-        return m_measureAligner.GetRightAlignment()->GetXRel();
+    int x = GetLeftBarLineXRel();
+    if (m_leftBarLine.HasUpdatedBB()) {
+        x += m_leftBarLine.m_contentBB_x1;
+    }
+    return x;
+}
+
+int Measure::GetLeftBarLineX2Rel() const
+{
+    int x = GetLeftBarLineXRel();
+    if (m_leftBarLine.HasUpdatedBB()) {
+        x += m_leftBarLine.m_contentBB_x2;
+    }
+    return x;
+}
+
+int Measure::GetRightBarLineXRel() const
+{
+    if (m_measureAligner.GetRightBarLineAlignment()) {
+        return m_measureAligner.GetRightBarLineAlignment()->GetXRel();
     }
     return 0;
+}
+
+int Measure::GetRightBarLineX1Rel() const
+{
+    int x = GetRightBarLineXRel();
+    if (m_rightBarLine.HasUpdatedBB()) {
+        x += m_rightBarLine.m_contentBB_x1;
+    }
+    return x;
+}
+
+int Measure::GetRightBarLineX2Rel() const
+{
+    int x = GetRightBarLineXRel();
+    if (m_rightBarLine.HasUpdatedBB()) {
+        x += m_rightBarLine.m_contentBB_x2;
+    }
+    return x;
 }
 
 int Measure::GetWidth() const
 {
+    assert(m_measureAligner.GetRightAlignment());
     if (m_measureAligner.GetRightAlignment()) {
-        return GetRightBarLineX() + m_measureAligner.GetRightAlignment()->GetMaxWidth();
+        return m_measureAligner.GetRightAlignment()->GetXRel();
     }
     return 0;
 }

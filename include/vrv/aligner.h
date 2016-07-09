@@ -438,11 +438,12 @@ public:
     ///@}
 
     /**
-     * Get left Alignment for the measure.
+     * Get left Alignment for the measure and for the left BarLine.
      * For each MeasureAligner, we keep and Alignment for the left position.
-     * The Alignment time will be always 0.0 and will appear first in the list.
+     * The Alignment time will be always -1.0 * DUR_MAX and will appear first in the list.
      */
     Alignment *GetLeftAlignment() const { return m_leftAlignment; };
+    Alignment *GetLeftBarLineAlignment() const { return m_leftBarLineAlignment; };
 
     /**
      * Get right Alignment for the measure.
@@ -450,6 +451,7 @@ public:
      * The Alignment time will be increased whenever necessary when values are added.
      */
     Alignment *GetRightAlignment() const { return m_rightAlignment; };
+    Alignment *GetRightBarLineAlignment() const { return m_rightBarLineAlignment; };
 
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.

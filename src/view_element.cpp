@@ -891,7 +891,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
+    int width = measure->GetRightBarLineXRel() - measure->GetNonJustifiableLeftMargin();
     int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
     int y = element->GetDrawingY();
 
@@ -958,7 +958,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
+    int width = measure->GetRightBarLineXRel() - measure->GetNonJustifiableLeftMargin();
     int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
 
     // We do not support more than three chars
@@ -1620,7 +1620,7 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
 
 void View::DrawMRptPart(DeviceContext *dc, int x, wchar_t smuflCode, int num, bool line, Staff *staff, Measure *measure)
 {
-    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
+    int width = measure->GetRightBarLineXRel() - measure->GetNonJustifiableLeftMargin();
     int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
 
     int xSymbol = xCentered - m_doc->GetGlyphWidth(smuflCode, staff->m_drawingStaffSize, false) / 2;
