@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Jul  2 17:12:56 PDT 2016
+// Last Modified: Sun Jul 10 23:13:47 PDT 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -198,12 +198,12 @@ class HumHash {
 		void           setOrigin           (const string& ns1, const string& ns2,
 		                                    const string& parameter,
 		                                    HumdrumToken* tok);
-		void           setOrigin           (const string& ns1, const string& ns2, 
+		void           setOrigin           (const string& ns1, const string& ns2,
 		                                    const string& parameter,
 		                                    HumdrumToken& tok);
 
 		HumdrumToken*  getOrigin           (const string& key) const;
-		HumdrumToken*  getOrigin           (const string& ns2, 
+		HumdrumToken*  getOrigin           (const string& ns2,
 		                                    const string& key) const;
 		HumdrumToken*  getOrigin           (const string& ns1,
 		                                    const string& ns2,
@@ -247,7 +247,7 @@ class HumNum {
 		double   getFloat           (void) const;
 		double   toFloat  (void) const { return getFloat(); }
 		int      getInteger         (double round = 0.0) const;
-		int      toInteger (double round = 0.0) const { 
+		int      toInteger (double round = 0.0) const {
 		                                            return getInteger(round); }
 		int      getNumerator       (void) const;
 		int      getDenominator     (void) const;
@@ -863,7 +863,7 @@ class HumdrumFileBase : public HumHash {
 		                                        const string& separator = ",");
 
 		HTp           getTrackStart            (int track) const;
-		HTp           getSpineStart            (int spine) const { 
+		HTp           getSpineStart            (int spine) const {
 		                                         return getTrackStart(spine+1); }
 
 		void          getSpineStartList        (vector<HTp>& spinestarts);

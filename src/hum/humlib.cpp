@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jul  4 07:07:12 PDT 2016
+// Last Modified: Sun Jul 10 23:13:47 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -743,7 +743,7 @@ void HumHash::setValue(const string& key, const char* value) {
 }
 
 
-void HumHash::setValue(const string& ns2, const string& key, 
+void HumHash::setValue(const string& ns2, const string& key,
 		const char* value) {
 	setValue(ns2, key, (string)value);
 }
@@ -798,8 +798,8 @@ void HumHash::setValue(const string& ns2, const string& key, HTp value) {
 }
 
 
-void HumHash::setValue(const string& ns1, const string& ns2, 
-		const string& key, HTp value) { 
+void HumHash::setValue(const string& ns1, const string& ns2,
+		const string& key, HTp value) {
 	initializeParameters();
 	stringstream ss;
 	ss << "HT_" << ((long long)value);
@@ -1253,7 +1253,7 @@ void HumHash::setOrigin(const string& ns2, const string& key,
 
 
 void HumHash::setOrigin(const string& ns1, const string& ns2,
-		const string& key, HumdrumToken* tok) { 
+		const string& key, HumdrumToken* tok) {
 	if (parameters == NULL) {
 		return;
 	}
@@ -1274,7 +1274,7 @@ void HumHash::setOrigin(const string& ns1, const string& ns2,
 }
 
 
-void HumHash::setOrigin(const string& ns1, const string& ns2, 
+void HumHash::setOrigin(const string& ns1, const string& ns2,
 		const string& key, HumdrumToken& tok) {
 	setOrigin(ns1, ns2, key, &tok);
 }
@@ -1312,8 +1312,8 @@ HumdrumToken* HumHash::getOrigin(const string& ns2, const string& key) const {
 }
 
 
-HumdrumToken* HumHash::getOrigin(const string& ns1, const string& ns2, 
-		const string& key) const { 
+HumdrumToken* HumHash::getOrigin(const string& ns1, const string& ns2,
+		const string& key) const {
 	if (parameters == NULL) {
 		return NULL;
 	}
@@ -2433,7 +2433,7 @@ HumdrumFileBase::HumdrumFileBase(istream& contents) : HumHash() {
 // HumdrumFileBase::~HumdrumFileBase -- HumdrumFileBase deconstructor.
 //
 
-HumdrumFileBase::~HumdrumFileBase() { 
+HumdrumFileBase::~HumdrumFileBase() {
 	// do nothing
 }
 
@@ -2619,7 +2619,8 @@ bool HumdrumFileBase::readCsv(istream& contents, const string& separator) {
 bool HumdrumFileBase::readString(const string& contents) {
 	stringstream infile;
 	infile << contents;
-	return read(infile);
+	int status = read(infile);
+	return status;
 }
 
 
@@ -2675,7 +2676,7 @@ bool HumdrumFileBase::isValid(void) {
 		cerr << parseError << endl;
 		displayError = false;
 	}
-   return !parseError.size();
+   return parseError.empty();
 }
 
 
@@ -2984,8 +2985,8 @@ void HumdrumFileBase::getSpineSequence(vector<vector<HTp> >& sequence,
 }
 
 
-void HumdrumFileBase::getSpineSequence(vector<vector<HTp> >& sequence, int spine,
-		int options) {
+void HumdrumFileBase::getSpineSequence(vector<vector<HTp> >& sequence,
+		int spine, int options) {
 	getTrackSequence(sequence, spine+1, options);
 }
 
@@ -3651,6 +3652,8 @@ bool HumdrumFileBase::analyzeNonNullDataTokens(void) {
 		}
 	}
 
+	ptokens.resize(0);
+
 	// analyze backward tokens:
 	for (int i=1; i<=getMaxTrack(); i++) {
 		for (int j=0; j<getTrackEndCount(i); j++) {
@@ -3678,6 +3681,7 @@ bool HumdrumFileBase::processNonNullDataTokensForTrackBackward(
 
 	HTp token = endtoken;
 	int tcount = token->getPreviousTokenCount();
+
 	while (tcount > 0) {
 		for (int i=1; i<tcount; i++) {
 			if (!processNonNullDataTokensForTrackBackward(
@@ -3685,15 +3689,22 @@ bool HumdrumFileBase::processNonNullDataTokensForTrackBackward(
 				return false;
 			}
 		}
-		if (token->isData()) {
+		HTp prevtoken = token->getPreviousToken();
+		if (prevtoken->isSplitInterpretation()) {
+			addUniqueTokens(prevtoken->nextNonNullTokens, ptokens);
+			if (token != prevtoken->nextTokens[0]) {
+				// terminate if not most primary subspine
+				return true;
+			}
+		} else if (token->isData()) {
 			addUniqueTokens(token->nextNonNullTokens, ptokens);
 			if (!token->isNull()) {
 				ptokens.resize(0);
 				ptokens.push_back(token);
 			}
 		}
-		// Data tokens can only be followed by up to one previous token,
-		// so no need to check for more than one next token.
+
+		// Follow previous data token 0 since 1 and higher are handled above.
 		token = token->getPreviousToken(0);
 		tcount = token->getPreviousTokenCount();
 	}
@@ -3707,27 +3718,36 @@ bool HumdrumFileBase::processNonNullDataTokensForTrackBackward(
 //
 // HumdurmFile::processNonNullDataTokensForTrackForward -- Helper function
 //    for analyzeNonNullDataTokens.  Given any token, this function tells
-//    you what is the previous non-null data token(s) in the spine after
+//    you what are the previous non-null data token(s) in the spine before
 //    the given token.
 //
 
-bool HumdrumFileBase::processNonNullDataTokensForTrackForward(
-		HTp starttoken, vector<HTp> ptokens) {
+bool HumdrumFileBase::processNonNullDataTokensForTrackForward(HTp starttoken,
+		vector<HTp> ptokens) {
+
 	HTp token = starttoken;
 	int tcount = token->getNextTokenCount();
 	while (tcount > 0) {
-		if (!token->isData()) {
+		if (token->isSplitInterpretation()) {
 			for (int i=1; i<tcount; i++) {
 				if (!processNonNullDataTokensForTrackForward(
 						token->getNextToken(i), ptokens)) {
 					return false;
 				}
 			}
+		} else if (token->isMergeInterpretation()) {
+			HTp nexttoken = token->getNextToken();
+			addUniqueTokens(nexttoken->previousNonNullTokens, ptokens);
+			if (token != nexttoken->previousTokens[0]) {
+				// terminate if not most primary subspine
+				return true;
+			}
 		} else {
 			addUniqueTokens(token->previousNonNullTokens, ptokens);
-			if (!token->isNull()) {
+			if (token->isData() && !token->isNull()) {
 				ptokens.resize(0);
 				ptokens.push_back(token);
+
 			}
 		}
 		// Data tokens can only be followed by up to one next token,
@@ -5092,7 +5112,6 @@ bool HumdrumFileStructure::prepareDurations(HumdrumToken* token, int state,
 		return isValid();
 	}
 
-	HumdrumToken* initial = token;
 	HumNum dursum = startdur;
 	token->incrementState();
 
@@ -5102,11 +5121,18 @@ bool HumdrumFileStructure::prepareDurations(HumdrumToken* token, int state,
 	}
 	int tcount = token->getNextTokenCount();
 
+	vector<HTp> reservoir;
+	vector<HumNum> startdurs;
+
 	// Assign line durationFromStarts for primary track first.
 	while (tcount > 0) {
+		for (int t=1; t<tcount; t++) {
+			reservoir.push_back(token->getNextToken(t));
+			startdurs.push_back(dursum);
+		}
 		token = token->getNextToken(0);
 		if (state != token->getState()) {
-			return isValid();
+			break;
 		}
 		token->incrementState();
 		if (!setLineDurationFromStart(token, dursum)) { return isValid(); }
@@ -5121,30 +5147,10 @@ bool HumdrumFileStructure::prepareDurations(HumdrumToken* token, int state,
 	}
 
 	// Process secondary tracks next:
-	int newstate = state + 1;
+	int newstate = state;
 
-	token = initial;
-	dursum = startdur;
-	if (token->getDuration().isPositive()) {
-		dursum += token->getDuration();
-	}
-	tcount = token->getNextTokenCount();
-	while (tcount > 0) {
-		if (tcount > 1) {
-			for (int i=1; i<tcount; i++) {
-				if (!prepareDurations(token->getNextToken(i), state, dursum)) {
-					return isValid();
-				}
-			}
-		}
-		token = token->getNextToken(0);
-		if (newstate != token->getState()) {
-			return isValid();
-		}
-		if (token->getDuration().isPositive()) {
-			dursum += token->getDuration();
-		}
-		tcount = token->getNextTokenCount();
+	for (int i=reservoir.size()-1; i>=0; i--) {
+		prepareDurations(reservoir[i], newstate, startdurs[i]);
 	}
 
 	return isValid();
@@ -5391,9 +5397,9 @@ bool HumdrumFileStructure::assignDurationsToNonRhythmicTrack(
 
 //////////////////////////////
 //
-// HumdrumFileStructure::processLocalParametersForTrack --  Search for local
-//   parameters in each spine and fill in the HumHash for the token to which the
-//   parameter is to be applied.
+// HumdrumFileStructure::processLocalParametersForTrack --  Search for
+//   local parameters backwards in each spine and fill in the HumHash 
+//   for the token to which the parameter is to be applied.
 //
 
 bool HumdrumFileStructure::processLocalParametersForTrack(
@@ -5401,6 +5407,7 @@ bool HumdrumFileStructure::processLocalParametersForTrack(
 
 	HumdrumToken* token = starttok;
 	int tcount = token->getPreviousTokenCount();
+
 	while (tcount > 0) {
 		for (int i=1; i<tcount; i++) {
 			if (!processLocalParametersForTrack(
@@ -5408,7 +5415,13 @@ bool HumdrumFileStructure::processLocalParametersForTrack(
 				return isValid();
 			}
 		}
-		if (!(token->isNull() && token->isManipulator())) {
+		HTp prevtoken = token->getPreviousToken();
+		if (prevtoken->isSplitInterpretation()) {
+			if (token != prevtoken->nextTokens[0]) {
+				// terminate if not most primary subspine
+				return true;
+			}
+		} else if (!(token->isNull() & token->isManipulator())) {
 			if (token->isCommentLocal()) {
 				checkForLocalParameters(token, current);
 			} else {
@@ -5416,8 +5429,7 @@ bool HumdrumFileStructure::processLocalParametersForTrack(
 			}
 		}
 
-		// Data tokens can only be followed by up to one previous token,
-		// so no need to check for more than one next token.
+		// Follow previous data token 0 since 1 and higher are handled above.
 		token = token->getPreviousToken(0);
 		tcount = token->getPreviousTokenCount();
 	}
@@ -8730,7 +8742,7 @@ bool Convert::isKernSecondaryTiedNote(const string& kerndata) {
 //////////////////////////////
 //
 // Convert::isKernNoteAttack -- Returns true if the input string
-//   represents a **kern note (not null or rest) and is not a 
+//   represents a **kern note (not null or rest) and is not a
 //   secondary tied note.
 //
 
@@ -8793,7 +8805,7 @@ bool Convert::hasKernSlurEnd(const string& kerndata) {
 //   Returns -1 if no '(' character in string.
 //
 
-int Convert::getKernSlurStartElisionLevel(const string& kerndata) { 
+int Convert::getKernSlurStartElisionLevel(const string& kerndata) {
 	bool foundSlurStart = false;
 	int output = 0;
 	for (int i=(int)kerndata.size()-1; i >=0; i--) {
@@ -8822,12 +8834,12 @@ int Convert::getKernSlurStartElisionLevel(const string& kerndata) {
 
 //////////////////////////////
 //
-// Convert::getKernSlurEndElisionLevel -- Returns the number of 
+// Convert::getKernSlurEndElisionLevel -- Returns the number of
 //   '&' characters before the last ')' character in a kern token.
 //   Returns -1 if no ')' character in string.
 //
 
-int Convert::getKernSlurEndElisionLevel(const string& kerndata) { 
+int Convert::getKernSlurEndElisionLevel(const string& kerndata) {
 	bool foundSlurEnd = false;
 	int output = 0;
 	for (int i=(int)kerndata.size()-1; i >=0; i--) {
