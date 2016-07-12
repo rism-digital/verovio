@@ -285,11 +285,17 @@ private:
  */
 class Alignment : public Object {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Alignment();
     Alignment(double time, AlignmentType type = ALIGNMENT_DEFAULT);
     virtual ~Alignment();
+    virtual void Reset();
     virtual ClassId Is() const { return ALIGNMENT; }
+    ///@}
 
     void SetXRel(int x_rel);
     int GetXRel() const { return m_xRel; };
@@ -307,6 +313,11 @@ public:
     void SetTime(double time) { m_time = time; };
     double GetTime() const { return m_time; };
     ///@}
+
+    /**
+     *
+     */
+    void AddLayerElementRef(LayerElement *element);
 
     /**
      * @name Set and get the type of the alignment
@@ -327,6 +338,13 @@ public:
      */
     bool HasGraceAligner() const { return (m_graceAligner != NULL); };
 
+    virtual int HorizontalSpaceForDuration(
+        double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
+
+    //----------//
+    // Functors //
+    //----------//
+
     /**
      * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the GraceAligner.
@@ -339,9 +357,6 @@ public:
      */
     virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params);
 
-    virtual int HorizontalSpaceForDuration(
-        double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
-
     /**
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
@@ -353,6 +368,18 @@ public:
      * Special case of functor redirected from Measure.
      */
     virtual int JustifyX(ArrayPtrVoid *params);
+
+    /**
+     * Lay out the X positions of the staff content looking that the bounding boxes.
+     * The m_xShift is updated appropriately
+     */
+    virtual int SetBoundingBoxXShift(ArrayPtrVoid *params);
+
+    /**
+     * Lay out the X positions of the staff content looking that the bounding boxes.
+     * The m_xShift is updated appropriately
+     */
+    virtual int SetBoundingBoxXShiftEnd(ArrayPtrVoid *params);
 
 private:
     //
@@ -396,6 +423,10 @@ private:
      * The Alignment owns it.
      */
     GraceAligner *m_graceAligner;
+    /**
+     * An array of all the LayerElement objects pointing to the alignment
+     */
+    ArrayOfObjects m_layerElementsRef;
 };
 
 //----------------------------------------------------------------------------
@@ -452,6 +483,10 @@ public:
      */
     Alignment *GetRightAlignment() const { return m_rightAlignment; };
     Alignment *GetRightBarLineAlignment() const { return m_rightBarLineAlignment; };
+
+    //----------//
+    // Functors //
+    //----------//
 
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.

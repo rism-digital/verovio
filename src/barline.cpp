@@ -7,6 +7,14 @@
 
 #include "barline.h"
 
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
+#include "aligner.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -28,6 +36,12 @@ void BarLine::Reset()
 {
     LayerElement::Reset();
     ResetBarLineLog();
+}
+
+void BarLine::SetAlignment(vrv::Alignment *alignment)
+{
+    m_alignment = alignment;
+    m_alignment->AddLayerElementRef(this);
 }
 
 bool BarLine::HasRepetitionDots() const

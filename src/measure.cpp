@@ -225,11 +225,11 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
     (*measureAligner) = &m_measureAligner;
 
     if (m_leftBarLine.GetForm() != BARRENDITION_NONE) {
-        m_leftBarLine.SetAlignment(m_measureAligner.GetLeftAlignment());
+        m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment());
     }
 
     if (m_rightBarLine.GetForm() != BARRENDITION_NONE) {
-        m_rightBarLine.SetAlignment(m_measureAligner.GetRightAlignment());
+        m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment());
     }
 
     // LogDebug("\n ***** Align measure %d", this->GetN());
@@ -270,6 +270,45 @@ int Measure::AlignVertically(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::SetBoundingBoxXShift(ArrayPtrVoid *params)
+{
+    // param 0: the minimum position (i.e., the width of the previous element)
+    // param 1: the maximum width in the current measure
+    // param 2: the Doc (unused)
+    // param 3: the functor to be redirected to Aligner
+    // param 4: the functor to be redirected to Aligner at the end (unused)
+    int *min_pos = static_cast<int *>((*params).at(0));
+    int *measure_width = static_cast<int *>((*params).at(1));
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+
+    // we reset the measure width and the minimum position
+    (*measure_width) = 0;
+    (*min_pos) = 0;
+
+    m_measureAligner.Process(setBoundingBoxXShift, params);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
+{
+    // param 0: the minimum position (i.e., the width of the previous element)
+    // param 1: the maximum width in the current measure
+    // param 2: the Doc (unused)
+    // param 3: the functor to be redirected to Aligner (unused)
+    // param 4: the functor to be redirected to Aligner at the end
+    int *min_pos = static_cast<int *>((*params).at(0));
+    int *measure_width = static_cast<int *>((*params).at(1));
+    Functor *setBoundingBoxXShiftEnd = static_cast<Functor *>((*params).at(4));
+
+    // use the measure width as minimum position of the barLine
+    (*min_pos) = (*measure_width);
+
+    m_measureAligner.Process(setBoundingBoxXShiftEnd, params);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
 {
     // param 0: the functor to be redirected to Aligner
@@ -284,10 +323,9 @@ int Measure::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift (unused)
     // param 1: the cumulated justifiable shift (unused)
-    // param 2: the minimum measure width (unused)
     // param 3: the doc for accessing drawing parameters (unused)
     // param 4: the functor to be redirected to Aligner
-    Functor *integrateBoundingBoxShift = static_cast<Functor *>((*params).at(4));
+    Functor *integrateBoundingBoxShift = static_cast<Functor *>((*params).at(3));
 
     m_measureAligner.Process(integrateBoundingBoxShift, params);
 
@@ -332,15 +370,7 @@ int Measure::AlignMeasures(ArrayPtrVoid *params)
 
     this->m_drawingXRel = (*shift);
 
-    assert(m_measureAligner.GetRightAlignment());
-
-    (*shift) += m_measureAligner.GetRightAlignment()->GetXRel();
-
-    // We also need to take into account the measure end (right) barLine with here
-    if (GetRightBarLineType() != BARRENDITION_NONE) {
-        // shift the next measure of the total with
-        (*shift) += GetRightBarLine()->GetAlignment()->GetMaxWidth();
-    }
+    (*shift) += this->GetWidth();
 
     return FUNCTOR_SIBLINGS;
 }

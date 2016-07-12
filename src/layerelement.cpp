@@ -361,6 +361,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
         (*measureAligner)->SetMaxTime((*time) + duration);
 
     m_alignment = (*measureAligner)->GetAlignmentAtTime(*time, type);
+    m_alignment->AddLayerElementRef(this);
 
     if (this->IsGraceNote()) {
         GraceAligner *graceAligner = m_alignment->GetGraceAligner();

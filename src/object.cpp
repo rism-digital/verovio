@@ -1096,44 +1096,17 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     // param 0: the minimum position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
     // param 2: the Doc
+    // param 3: the functor to be redirected to Aligner (unused)
+    // param 4: the functor to be redirected to Aligner at the end (unused)
     int *min_pos = static_cast<int *>((*params).at(0));
-    int *measure_width = static_cast<int *>((*params).at(1));
+    // int *measure_width = static_cast<int *>((*params).at(1));
     Doc *doc = static_cast<Doc *>((*params).at(2));
-
-    // starting a new measure
-    if (this->Is() == MEASURE) {
-        Measure *current_measure = dynamic_cast<Measure *>(this);
-        assert(current_measure);
-        // we reset the measure width and the minimum position
-        (*measure_width) = 0;
-        (*min_pos) = 0;
-        if (current_measure->GetLeftBarLineType() != BARRENDITION_NONE) {
-            current_measure->GetLeftBarLine()->SetBoundingBoxXShift(params);
-        }
-        if (current_measure->GetRightBarLineType() != BARRENDITION_NONE) {
-            current_measure->GetRightBarLine()->SetBoundingBoxXShift(params);
-        }
-        return FUNCTOR_CONTINUE;
-    }
 
     // starting new layer
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer *>(this);
         assert(current_layer);
         (*min_pos) = 0;
-        // set scoreDef attr
-        if (current_layer->GetStaffDefClef()) {
-            current_layer->GetStaffDefClef()->SetBoundingBoxXShift(params);
-        }
-        if (current_layer->GetStaffDefKeySig()) {
-            current_layer->GetStaffDefKeySig()->SetBoundingBoxXShift(params);
-        }
-        if (current_layer->GetStaffDefMensur()) {
-            current_layer->GetStaffDefMensur()->SetBoundingBoxXShift(params);
-        }
-        if (current_layer->GetStaffDefMeterSig()) {
-            current_layer->GetStaffDefMeterSig()->SetBoundingBoxXShift(params);
-        }
         return FUNCTOR_CONTINUE;
     }
 
@@ -1220,18 +1193,6 @@ int Object::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
     // param 1: the maximum width in the current measure
     int *min_pos = static_cast<int *>((*params).at(0));
     int *measure_width = static_cast<int *>((*params).at(1));
-
-    // ending a measure
-    if (this->Is() == MEASURE) {
-        Measure *current_measure = dynamic_cast<Measure *>(this);
-        assert(current_measure);
-        // use the measure width as minimum position of the barLine
-        (*min_pos) = (*measure_width);
-        if (current_measure->GetRightBarLineType() != BARRENDITION_NONE) {
-            current_measure->GetRightBarLine()->SetBoundingBoxXShift(params);
-        }
-        return FUNCTOR_CONTINUE;
-    }
 
     // ending a layer
     if (this->Is() == LAYER) {

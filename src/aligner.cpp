@@ -351,6 +351,21 @@ void GraceAligner::AlignStack()
 
 Alignment::Alignment() : Object()
 {
+    Reset();
+}
+
+Alignment::Alignment(double time, AlignmentType type) : Object()
+{
+    Reset();
+    m_time = time;
+    m_type = type;
+}
+
+void Alignment::Reset()
+{
+    Object::Reset();
+
+    m_layerElementsRef.clear();
     m_xRel = 0;
     m_xShift = 0;
     m_maxWidth = 0;
@@ -359,21 +374,17 @@ Alignment::Alignment() : Object()
     m_graceAligner = NULL;
 }
 
-Alignment::Alignment(double time, AlignmentType type) : Object()
-{
-    m_xRel = 0;
-    m_xShift = 0;
-    m_maxWidth = 0;
-    m_time = time;
-    m_type = type;
-    m_graceAligner = NULL;
-}
-
 Alignment::~Alignment()
 {
     if (m_graceAligner) {
         delete m_graceAligner;
     }
+}
+
+void Alignment::AddLayerElementRef(LayerElement *element)
+{
+    assert(element->IsLayerElement());
+    m_layerElementsRef.push_back(element);
 }
 
 void Alignment::SetXRel(int x_rel)
@@ -644,20 +655,15 @@ int MeasureAligner::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
-    // param 2: the minimum measure width (unused)
-    // param 3: the doc for accessing drawing parameters
-    // param 4: the functor to be redirected to the MeasureAligner (unused)
+    // param 2: the doc for accessing drawing parameters
+    // param 3: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int *>((*params).at(0));
     int *justifiable_shift = static_cast<int *>((*params).at(1));
-    int *minMeasureWidth = static_cast<int *>((*params).at(2));
-    Doc *doc = static_cast<Doc *>((*params).at(3));
+    Doc *doc = static_cast<Doc *>((*params).at(2));
 
-    // We start a new MeasureAligner
-    // Reset the accumulated shift to 0;
-    (*minMeasureWidth) = 0;
     (*shift) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
 
-    (*justifiable_shift) = -1;
+    (*justifiable_shift) = 0;
 
     return FUNCTOR_CONTINUE;
 }
@@ -691,43 +697,97 @@ int Alignment::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
 int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
-    // param 1: the accumulated justifiable shift
-    // param 2: the minimum measure width
-    // param 4: the doc
+    // param 1: the accumulated justifiable shift (unused)
+    // param 2: the doc (unused)
     int *shift = static_cast<int *>((*params).at(0));
-    int *justifiable_shift = static_cast<int *>((*params).at(1));
-    int *minMeasureWidth = static_cast<int *>((*params).at(2));
-    Doc *doc = static_cast<Doc *>((*params).at(3));
 
     // integrates the m_xShift into the m_xRel
     m_xRel += m_xShift + (*shift);
     // cumulate the shift value and the width
     (*shift) += m_xShift;
 
-    if ((GetType() <= ALIGNMENT_SCOREDEF_METERSIG) && ((*justifiable_shift) < 0)) {
-        MeasureAligner *aligner = dynamic_cast<MeasureAligner *>(m_parent);
-        assert(aligner);
-        aligner->SetNonJustifiableMargin(this->m_xRel + this->m_maxWidth);
-        // LogDebug("Aligner margin %d", aligner->GetNonJustifiableMargin());
-    }
-    else if ((GetType() > ALIGNMENT_SCOREDEF_METERSIG) && ((*justifiable_shift) < 0)) {
-        MeasureAligner *aligner = dynamic_cast<MeasureAligner *>(m_parent);
-        assert(aligner);
-        (*justifiable_shift) = aligner->GetNonJustifiableMargin();
-    }
-
-    if (GetType() == ALIGNMENT_FULLMEASURE) {
-        (*minMeasureWidth) = doc->m_drawingMinMeasureWidth;
-    }
-    else if (GetType() == ALIGNMENT_FULLMEASURE2) {
-        (*minMeasureWidth) = 2 * doc->m_drawingMinMeasureWidth;
-    }
-    else if (GetType() == ALIGNMENT_MEASURE_END) {
-        m_xRel = std::max(m_xRel, (*minMeasureWidth) + (*justifiable_shift));
-    }
-
     // reset member to 0
     m_xShift = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Alignment::SetBoundingBoxXShift(ArrayPtrVoid *params)
+{
+    // param 0: the minimum position (i.e., the width of the previous element)
+    // param 1: the maximum width in the current measure
+    // param 2: the Doc
+    // param 3: the functor to be redirected to Aligner (unused)
+    // param 4: the functor to be redirected to Aligner at the end (unused)
+    int *min_pos = static_cast<int *>((*params).at(0));
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+
+    // Here we want to process only the left scoreDef up to the left barline
+    if (this->m_type > ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
+
+    ArrayOfObjects::iterator iter;
+
+    // Because we are processing the elements vertically we need to reset min_pos for each element
+    int previousMinPos = (*min_pos);
+    for (iter = m_layerElementsRef.begin(); iter != m_layerElementsRef.end(); iter++) {
+        (*min_pos) = previousMinPos;
+        (*iter)->Process(setBoundingBoxXShift, params);
+    }
+
+    // If we have elements for this alignment, then adjust the min_pos
+    if (!m_layerElementsRef.empty()) {
+        (*min_pos) = this->GetXRel() + this->GetMaxWidth();
+    }
+    // Otherwise, just set its xShift because this was not done by the functor
+    else {
+        this->SetXShift((*min_pos) - this->GetXRel());
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Alignment::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
+{
+    // param 0: the minimum position (i.e., the width of the previous element)
+    // param 1: the maximum width in the current measure
+    // param 2: the Doc
+    // param 3: the functor to be redirected to Aligner
+    // param 4: the functor to be redirected to Aligner at the end (unused)
+    int *min_pos = static_cast<int *>((*params).at(0));
+    Doc *doc = static_cast<Doc *>((*params).at(2));
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+
+    // Because these do not get shifted with their bounding box because their bounding box is calculated according to
+    // the width of the measure, their xShift has to be set 'by hand'
+    if (GetType() == ALIGNMENT_FULLMEASURE) {
+        this->SetXShift(doc->m_drawingMinMeasureWidth - this->GetXRel());
+    }
+    else if (GetType() == ALIGNMENT_FULLMEASURE2) {
+        this->SetXShift(2 * doc->m_drawingMinMeasureWidth - this->GetXRel());
+    }
+
+    // Here we want to process only the alignments from the right barline to the end - this includes the right scoreDef
+    // if any
+    if (this->m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) return FUNCTOR_CONTINUE;
+
+    ArrayOfObjects::iterator iter;
+
+    // Because we are processing the elements vertically we need to reset min_pos for each element
+    int previousMinPos = (*min_pos);
+    for (iter = m_layerElementsRef.begin(); iter != m_layerElementsRef.end(); iter++) {
+        (*min_pos) = previousMinPos;
+        (*iter)->Process(setBoundingBoxXShift, params);
+    }
+
+    // If we have elements for this alignment, then adjust the min_pos
+    if (!m_layerElementsRef.empty()) {
+        (*min_pos) = this->GetXRel() + this->GetMaxWidth();
+    }
+    // Otherwise, just set its xShift because this was not done by the functor
+    // This includes ALIGNMENT_MEASURE_END alignments
+    else {
+        this->SetXShift((*min_pos) - this->GetXRel());
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -785,10 +845,14 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
     int *maxActualDur = static_cast<int *>((*params).at(2));
     Doc *doc = static_cast<Doc *>((*params).at(3));
 
-    if (this->m_type <= ALIGNMENT_MEASURE_START) return FUNCTOR_CONTINUE;
+    if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
+    if (this->m_type >= ALIGNMENT_MEASURE_RIGHT_BARLINE) return FUNCTOR_CONTINUE;
 
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
+
+    if (this->m_type == ALIGNMENT_CLEF) intervalTime = 0.0;
+
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(
             intervalTime, *maxActualDur, doc->GetSpacingLinear(), doc->GetSpacingNonLinear());
