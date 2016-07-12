@@ -3502,54 +3502,32 @@ void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
         m_measure->SetRight(BARRENDITION_end);
     }
     else if (endbar.find(":|!|:") != string::npos) {
-        m_measure->SetRight(BARRENDITION_rptend);
+        m_measure->SetRight(BARRENDITION_rptboth);
     }
     else if (endbar.find(":!!:") != string::npos) {
-        m_measure->SetRight(BARRENDITION_rptend);
+        m_measure->SetRight(BARRENDITION_rptboth);
     }
     else if (endbar.find(":||:") != string::npos) {
-        m_measure->SetRight(BARRENDITION_rptend);
+        m_measure->SetRight(BARRENDITION_rptboth);
     }
     else if (endbar.find(":!:") != string::npos) {
-        m_measure->SetRight(BARRENDITION_rptend);
+        m_measure->SetRight(BARRENDITION_rptboth);
     }
     else if (endbar.find(":|:") != string::npos) {
-        m_measure->SetRight(BARRENDITION_rptend);
+        m_measure->SetRight(BARRENDITION_rptboth);
     }
     else if (endbar.find(":|") != string::npos) {
         m_measure->SetRight(BARRENDITION_rptend);
     }
     else if (endbar.find(":!") != string::npos) {
         m_measure->SetRight(BARRENDITION_rptend);
+    } else if (endbar.find("!:") != string::npos) {
+        m_measure->SetRight(BARRENDITION_rptstart);
+    } else if (endbar.find("|:") != string::npos) {
+        m_measure->SetRight(BARRENDITION_rptstart);
     }
     else if (endbar.find("-") != string::npos) {
         m_measure->SetRight(BARRENDITION_invis);
-    }
-
-    if (startbar.find(":|!|:") != string::npos) {
-        m_measure->SetLeft(BARRENDITION_rptstart);
-    }
-    else if (startbar.find(":!!:") != string::npos) {
-        m_measure->SetLeft(BARRENDITION_rptstart);
-    }
-    else if (startbar.find(":||:") != string::npos) {
-        m_measure->SetLeft(BARRENDITION_rptstart);
-    }
-    else if (startbar.find(":!:") != string::npos) {
-        m_measure->SetLeft(BARRENDITION_rptstart);
-    }
-    else if (startbar.find(":|:") != string::npos) {
-        m_measure->SetLeft(BARRENDITION_rptstart);
-    }
-    else if (startbar.find("|:") != string::npos) {
-        m_measure->SetLeft(BARRENDITION_rptend);
-    }
-    else if (startbar.find("!:") != string::npos) {
-        m_measure->SetLeft(BARRENDITION_rptend);
-    }
-    else if (startbar.find("-") != string::npos) {
-        // This is the default state of @left, so don't specify.
-        // m_measure->SetLeft(BARRENDITION_invis);
     }
 }
 

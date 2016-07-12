@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 10 23:13:47 PDT 2016
+// Last Modified: Sun Jul 10 23:42:14 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -545,7 +545,12 @@ int HumHash::getValueInt(const string& ns1, const string& ns2,
 	} else {
 		int intvalue;
 		try {
-			intvalue = stoi(value);
+			// problem with emscripten with stoi:
+			// intvalue = stoi(value);
+			stringstream converter(value);
+			if (!(converter >> intvalue)) {
+				intvalue = 0;
+			}
 		} catch (invalid_argument& e) {
 			intvalue = 0;
 		}
