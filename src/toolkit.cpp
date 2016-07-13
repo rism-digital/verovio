@@ -290,6 +290,7 @@ bool Toolkit::LoadString(const std::string &data)
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(data)) {
             LogError("Error importing Humdrum data");
+            delete tempinput;
             return false;
         }
 
