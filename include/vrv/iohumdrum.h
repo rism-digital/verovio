@@ -124,6 +124,8 @@ public:
     virtual bool ImportFile();
     virtual bool ImportString(std::string humdrum);
 
+    string GetMeiString(void);
+
 protected:
     void clear(void);
     bool convertHumdrum(void);
@@ -190,6 +192,7 @@ protected:
     hum::HTp getDecrescendoEnd(hum::HTp token);
     hum::HTp getCrescendoEnd(hum::HTp token);
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
+    void storeOriginalClefApp(void);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -305,6 +308,9 @@ private:
 
     // m_omd == temporary variable for printing tempo designation.
     bool m_omd;
+
+    // m_oclef == temporary variable for printing "original-clef" <app>
+    vector<std::pair<int, hum::HTp> > m_oclef;
 };
 
 } // namespace vrv

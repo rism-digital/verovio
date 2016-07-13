@@ -277,6 +277,7 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
 
 bool Toolkit::LoadString(const std::string &data)
 {
+    string newData;
     FileInputStream *input = NULL;
     if (m_format == PAE) {
         input = new PaeInput(&m_doc, "");
@@ -285,7 +286,19 @@ bool Toolkit::LoadString(const std::string &data)
         input = new DarmsInput(&m_doc, "");
     }
     else if (m_format == HUMDRUM) {
-        input = new HumdrumInput(&m_doc, "");
+        Doc tempdoc;
+        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        if (!tempinput->ImportString(data)) {
+            LogError("Error importing Humdrum data");
+            return false;
+        }
+
+        MeiOutput meioutput(&tempdoc, "");
+        meioutput.SetScoreBasedMEI(true);
+        newData = meioutput.GetOutput();
+        delete tempinput;
+
+        input = new MeiInput(&m_doc, "");
     }
     else if (m_format == MEI) {
         input = new MeiInput(&m_doc, "");
@@ -315,7 +328,7 @@ bool Toolkit::LoadString(const std::string &data)
     }
 
     // load the file
-    if (!input->ImportString(data)) {
+    if (!input->ImportString(newData.size() ? newData : data)) {
         LogError("Error importing data");
         delete input;
         return false;

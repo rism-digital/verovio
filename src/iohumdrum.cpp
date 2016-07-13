@@ -37,6 +37,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "editorial.h"
 #include "hairpin.h"
 #include "iomei.h"
 #include "layer.h"
@@ -364,10 +365,7 @@ bool HumdrumInput::convertHumdrum(void)
     // calculateLayout();
 
     if (m_debug) {
-        MeiOutput meioutput(m_doc, "");
-        meioutput.SetScoreBasedMEI(true);
-        string mei = meioutput.GetOutput();
-        cout << mei;
+        cout << GetMeiString();
     }
 
     return status;
@@ -789,7 +787,6 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
 
     string label;
     string abbreviation;
-    string oclef;
     string clef;
     string keysig;
     string key;
@@ -797,6 +794,7 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
     // string metersig;
     int top = 0;
     int bot = 0;
+    pair<int, HTp> oclef;
 
     HTp part = partstart;
     while (part && !part->getLine()->isData()) {
@@ -804,7 +802,7 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
             clef = *part;
         }
         else if (part->compare(0, 6, "*oclef") == 0) {
-            oclef = *part;
+            m_oclef.emplace_back(partnumber, part);
         }
         else if (part->compare(0, 3, "*k[") == 0) {
             keysig = *part;
@@ -3457,6 +3455,10 @@ vector<int> HumdrumInput::getStaffLayerCounts(void)
 
 void HumdrumInput::setupSystemMeasure(int startline, int endline)
 {
+    if (m_oclef.size()) {
+        storeOriginalClefApp();
+    }
+
     m_measure = new Measure();
     m_system->AddMeasure(m_measure);
     m_measures.push_back(m_measure);
@@ -3467,6 +3469,55 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     setSystemMeasureStyle(startline, endline);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::storeOriginalClefApp -- If there are any original clefs, create
+//   an app for them.
+//
+// <app>
+//    <lem></lem>
+//    <rdg label="original">
+//       <scoreDef>
+//          <staffGrp>
+//             <staffDef clef.shape="C" clef.line="4" n="1"/>
+//          </staffGrp>
+//       </scoreDef>
+//    </rdg>
+// </app>
+//
+
+void HumdrumInput::storeOriginalClefApp(void)
+{
+    if (m_oclef.empty()) {
+        return;
+    }
+
+    App *app = new App;
+    m_system->AddEditorialElement(app);
+
+    Lem *lem = new Lem;
+    app->AddLemOrRdg(lem);
+
+    Rdg *rdg = new Rdg;
+    app->AddLemOrRdg(rdg);
+    rdg->SetLabel("original-clef");
+
+    ScoreDef *scoredef = new ScoreDef;
+    rdg->AddScoreDef(scoredef);
+
+    StaffGrp *staffgrp = new StaffGrp;
+    scoredef->AddStaffGrp(staffgrp);
+
+    for (int i = 0; i < m_oclef.size(); i++) {
+        StaffDef *staffdef = new StaffDef;
+        staffgrp->AddStaffDef(staffdef);
+        setClef(staffdef, *m_oclef[i].second);
+        staffdef->SetN(m_oclef[i].first);
+    }
+
+    m_oclef.clear();
 }
 
 //////////////////////////////
@@ -3521,9 +3572,11 @@ void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
     }
     else if (endbar.find(":!") != string::npos) {
         m_measure->SetRight(BARRENDITION_rptend);
-    } else if (endbar.find("!:") != string::npos) {
+    }
+    else if (endbar.find("!:") != string::npos) {
         m_measure->SetRight(BARRENDITION_rptstart);
-    } else if (endbar.find("|:") != string::npos) {
+    }
+    else if (endbar.find("|:") != string::npos) {
         m_measure->SetRight(BARRENDITION_rptstart);
     }
     else if (endbar.find("-") != string::npos) {
@@ -3894,6 +3947,18 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
             }
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::GetMeiString -- Return the converted MEI content.
+//
+
+std::string HumdrumInput::GetMeiString(void)
+{
+    MeiOutput meioutput(m_doc, "");
+    meioutput.SetScoreBasedMEI(true);
+    return meioutput.GetOutput();
 }
 
 } // namespace vrv
