@@ -655,13 +655,12 @@ int MeasureAligner::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift
-    // param 2: the doc for accessing drawing parameters
+    // param 2: the doc for accessing drawing parameters (unused)
     // param 3: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int *>((*params).at(0));
     int *justifiable_shift = static_cast<int *>((*params).at(1));
-    Doc *doc = static_cast<Doc *>((*params).at(2));
 
-    (*shift) = 0; // doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    (*shift) = 0;
 
     (*justifiable_shift) = 0;
 
@@ -699,9 +698,12 @@ int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift (unused)
     // param 2: the doc
+    // param 3: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int *>((*params).at(0));
     Doc *doc = static_cast<Doc *>((*params).at(2));
 
+    // We move the first left position according to style but not for aligners that are empty and not
+    // for the left barline because we want it to be at the 0 pos if nothing before it.
     if (((*shift) == 0) && (m_type != ALIGNMENT_MEASURE_LEFT_BARLINE) && !m_layerElementsRef.empty()) {
         (*shift) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     }
@@ -850,12 +852,17 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
     int *maxActualDur = static_cast<int *>((*params).at(2));
     Doc *doc = static_cast<Doc *>((*params).at(3));
 
+    // Do not set an x pos for anything before the barline (including it)
     if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
+    // Do not set an x pos for anything after the barline (but still for it)
     if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) return FUNCTOR_CONTINUE;
 
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
 
+    // For clef changes, do not take into account the interval so we keep them left aligned
+    // This is not perfect because the previous time is the one of the previous aligner and
+    // there is maybe space between the last note and the clef on their layer
     if (this->m_type == ALIGNMENT_CLEF) intervalTime = 0.0;
 
     if (intervalTime > 0.0) {

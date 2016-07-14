@@ -285,6 +285,7 @@ int Measure::SetBoundingBoxXShift(ArrayPtrVoid *params)
     (*measure_width) = 0;
     (*min_pos) = 0;
 
+    // Process the left scoreDef elements and the left barLine
     m_measureAligner.Process(setBoundingBoxXShift, params);
 
     return FUNCTOR_CONTINUE;
@@ -304,6 +305,7 @@ int Measure::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
     // use the measure width as minimum position of the barLine
     (*min_pos) = (*measure_width);
 
+    // Process the right barLine and the right scoreDef elements
     m_measureAligner.Process(setBoundingBoxXShiftEnd, params);
 
     return FUNCTOR_CONTINUE;
