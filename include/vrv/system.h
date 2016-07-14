@@ -207,6 +207,7 @@ public:
      */
     ///@{
     int m_drawingTotalWidth;
+    int m_drawingJustifiableWidth;
     ///@}
 
 private:

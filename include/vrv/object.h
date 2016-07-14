@@ -478,6 +478,7 @@ public:
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * param 0: the cumulated shift
+     * param 1: the cumulated justifiable width
      */
     virtual int AlignMeasures(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 

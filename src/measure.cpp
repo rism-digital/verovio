@@ -327,10 +327,9 @@ int Measure::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
 int Measure::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift (unused)
-    // param 1: the cumulated justifiable shift (unused)
-    // param 3: the doc for accessing drawing parameters (unused)
-    // param 4: the functor to be redirected to Aligner
-    Functor *integrateBoundingBoxShift = static_cast<Functor *>((*params).at(3));
+    // param 1: the doc for accessing drawing parameters (unused)
+    // param 2: the functor to be redirected to Aligner
+    Functor *integrateBoundingBoxShift = static_cast<Functor *>((*params).at(2));
 
     m_measureAligner.Process(integrateBoundingBoxShift, params);
 
@@ -353,15 +352,21 @@ int Measure::SetAlignmentXPos(ArrayPtrVoid *params)
 
 int Measure::JustifyX(ArrayPtrVoid *params)
 {
-    // param 0: the justification ratio
-    // param 1: the justification ratio for the measure (depends on the margin) (unused)
-    // param 2: the non-justifiable margin (unused)
-    // param 3: the system full width (without system margins) (unused)
-    // param 4: the functor to be redirected to the MeasureAligner
-    double *ratio = static_cast<double *>((*params).at(0));
-    Functor *justifyX = static_cast<Functor *>((*params).at(4));
+    // param 0: the measureXRel of the next measure
+    // param 1: the justification ratio (unused)
+    // param 2: the xRel position of the left barline (unused)
+    // param 3: the xRel position of the right barline (unused)
+    // param 4: the system full width (without system margins) (unused)
+    // param 5: the functor to be redirected to the MeasureAligner
+    int *measureXRel = static_cast<int *>((*params).at(0));
+    Functor *justifyX = static_cast<Functor *>((*params).at(5));
 
-    this->m_drawingXRel = ceil((*ratio) * (double)this->m_drawingXRel);
+    if ((*measureXRel > 0)) {
+        this->m_drawingXRel = (*measureXRel);
+    }
+    else {
+        (*measureXRel) = this->m_drawingXRel;
+    }
 
     m_measureAligner.Process(justifyX, params);
 
@@ -371,11 +376,14 @@ int Measure::JustifyX(ArrayPtrVoid *params)
 int Measure::AlignMeasures(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift
+    // param 1: the cumulated justifiable width
     int *shift = static_cast<int *>((*params).at(0));
+    int *justifiableWidth = static_cast<int *>((*params).at(1));
 
     this->m_drawingXRel = (*shift);
 
     (*shift) += this->GetWidth();
+    (*justifiableWidth) += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();
 
     return FUNCTOR_SIBLINGS;
 }

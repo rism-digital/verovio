@@ -461,10 +461,9 @@ public:
     void SetMaxTime(double time);
 
     /**
-     * @name Set and get the non-justifiable margin
+     * @name Set and Get the non-justifiable margin (right and left scoreDefs)
      */
     ///@{
-    void SetNonJustifiableMargin(int margin) { m_nonJustifiableLeftMargin = margin; };
     int GetNonJustifiableMargin() const { return m_nonJustifiableLeftMargin; };
     ///@}
 

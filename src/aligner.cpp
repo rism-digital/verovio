@@ -654,15 +654,11 @@ int StaffAlignment::IntegrateBoundingBoxYShift(ArrayPtrVoid *params)
 int MeasureAligner::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
-    // param 1: the accumulated justifiable shift
-    // param 2: the doc for accessing drawing parameters (unused)
-    // param 3: the functor to be redirected to the MeasureAligner (unused)
+    // param 1: the doc for accessing drawing parameters (unused)
+    // param 2: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int *>((*params).at(0));
-    int *justifiable_shift = static_cast<int *>((*params).at(1));
 
     (*shift) = 0;
-
-    (*justifiable_shift) = 0;
 
     return FUNCTOR_CONTINUE;
 }
@@ -696,11 +692,10 @@ int Alignment::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
 int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
-    // param 1: the accumulated justifiable shift (unused)
-    // param 2: the doc
-    // param 3: the functor to be redirected to the MeasureAligner (unused)
+    // param 1: the doc
+    // param 2: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int *>((*params).at(0));
-    Doc *doc = static_cast<Doc *>((*params).at(2));
+    Doc *doc = static_cast<Doc *>((*params).at(1));
 
     // We move the first left position according to style but not for aligners that are empty and not
     // for the left barline because we want it to be at the 0 pos if nothing before it.
@@ -879,56 +874,53 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
 
 int MeasureAligner::JustifyX(ArrayPtrVoid *params)
 {
-    // param 0: the justification ratio
-    // param 1: the justification ratio for the measure (depends on the margin)
-    // param 2: the non justifiable margin
-    // param 3: the system full width (without system margins) (unused)
-    // param 4: the functor to be redirected to the MeasureAligner (unused)
-    double *ratio = static_cast<double *>((*params).at(0));
-    double *measureRatio = static_cast<double *>((*params).at(1));
-    int *margin = static_cast<int *>((*params).at(2));
+    // param 0: the measureXRel of the next measure
+    // param 1: the justification ratio (unused)
+    // param 2: the xRel position of the left barline
+    // param 3: the xRel position of the right barline
+    // param 4: the system full width (without system margins) (unused)
+    // param 5: the functor to be redirected to the MeasureAligner (unused)
+    int *leftBarLineX = static_cast<int *>((*params).at(2));
+    int *rightBarLineX = static_cast<int *>((*params).at(3));
 
-    int width = GetRightAlignment()->GetXRel() + GetRightAlignment()->GetMaxWidth();
+    (*leftBarLineX) = GetLeftBarLineAlignment()->GetXRel();
+    (*rightBarLineX) = GetRightBarLineAlignment()->GetXRel();
 
-    // the ratio in the measure has to take into account the non-justifiable width
-    // for elements within the margin, we do not move them
-    // for after the margin (right) we have a position that is given by:
-    // (m_xRel - margin) * measureRatio + margin, where measureRatio is given by:
-    // (ratio - 1) * (margin / justifiable) + ratio
-
-    (*measureRatio) = ((*ratio) - 1) * ((double)m_nonJustifiableLeftMargin / (double)width) + (*ratio);
-    (*margin) = m_nonJustifiableLeftMargin;
+    // LogDebug("Justification measure ratio: %f - leftBarLineX %d", (*justifiableRatio), (*leftBarLineX));
 
     return FUNCTOR_CONTINUE;
 }
 
 int Alignment::JustifyX(ArrayPtrVoid *params)
 {
-    // param 0: the justification ratio
+    // param 0: the measureXRel of the next measure
     // param 1: the justification ratio for the measure (depends on the margin)
-    // param 2: the non-justifiable margin
-    // param 3: the system full width (without system margins) (unused)
-    // param 4: the functor to be redirected to the MeasureAligner (unused)
-    double *ratio = static_cast<double *>((*params).at(0));
-    double *measureRatio = static_cast<double *>((*params).at(1));
-    int *margin = static_cast<int *>((*params).at(2));
+    // param 2: the xRel position of the left barline
+    // param 3: the xRel position of the right barline
+    // param 4: the system full width (without system margins) (unused)
+    // param 5: the functor to be redirected to the MeasureAligner (unused)
+    int *measureXRel = static_cast<int *>((*params).at(0));
+    double *justifiableRatio = static_cast<double *>((*params).at(1));
+    int *leftBarLineX = static_cast<int *>((*params).at(2));
+    int *rightBarLineX = static_cast<int *>((*params).at(3));
 
-    if (GetType() == ALIGNMENT_MEASURE_START) {
-        return FUNCTOR_CONTINUE;
+    if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) {
+        // Nothing to do for all left scoreDef elements and the left barline
     }
-    else if (GetType() == ALIGNMENT_MEASURE_END) {
-        this->m_xRel = ceil((*ratio) * (double)this->m_xRel);
-        return FUNCTOR_CONTINUE;
+    else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
+        // All elements up to the next barline, move them but also take into account the leftBarlineX
+        this->m_xRel = ceil(((double)this->m_xRel - (double)(*leftBarLineX)) * (*justifiableRatio)) + (*leftBarLineX);
+    }
+    else {
+        //  Now more the right barline and all right scoreDef elements
+        int shift = this->m_xRel - (*rightBarLineX);
+        this->m_xRel = ceil(((double)(*rightBarLineX) - (double)(*leftBarLineX)) * (*justifiableRatio))
+            + (*leftBarLineX) + shift;
     }
 
-    // the ratio in the measure has to take into account the non-justifiable width
-    // for elements within the margin, we do not move them
-    // for after the margin (right) we have a position that is given by:
-    // (m_xRel - margin) * measureRatio + margin, where measureRatio is given by:
-    // (ratio - 1) * (margin / justifiable) + ratio
-
-    if ((GetType() < ALIGNMENT_SCOREDEF_CLEF) || (GetType() > ALIGNMENT_SCOREDEF_METERSIG)) {
-        this->m_xRel = ceil(((double)this->m_xRel - (double)(*margin)) * (*measureRatio)) + (*margin);
+    // Finally, when reaching the end of the measure, update the measureXRel for the next measure
+    if (m_type == ALIGNMENT_MEASURE_END) {
+        (*measureXRel) += this->m_xRel;
     }
 
     return FUNCTOR_CONTINUE;
