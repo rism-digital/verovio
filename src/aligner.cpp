@@ -283,9 +283,15 @@ Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
     // nothing found
     if (idx == -1) {
         if ((type != ALIGNMENT_MEASURE_END) && (this->Is() != GRACE_ALIGNER)) {
-            assert(false);
+            // This typically occurs when a tstamp event occurs after the last note of a measure
+            int rightBarlineIdx = m_rightBarLineAlignment->GetIdx();
+            assert(rightBarlineIdx != -1);
+            idx = rightBarlineIdx - 1;
+            this->SetMaxTime(time);
         }
-        idx = GetAlignmentCount();
+        else {
+            idx = GetAlignmentCount();
+        }
     }
     Alignment *newAlignment = new Alignment(time, type);
     AddAlignment(newAlignment, idx);
@@ -762,10 +768,10 @@ int Alignment::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
     // Because these do not get shifted with their bounding box because their bounding box is calculated according to
     // the width of the measure, their xShift has to be set 'by hand'
     if (GetType() == ALIGNMENT_FULLMEASURE) {
-        this->SetXShift(doc->m_drawingMinMeasureWidth - this->GetXRel());
+        (*min_pos) = std::max(this->GetXRel() + doc->m_drawingMinMeasureWidth, (*min_pos));
     }
     else if (GetType() == ALIGNMENT_FULLMEASURE2) {
-        this->SetXShift(2 * doc->m_drawingMinMeasureWidth - this->GetXRel());
+        (*min_pos) = std::max(this->GetXRel() + 2 * doc->m_drawingMinMeasureWidth, (*min_pos));
     }
 
     // Here we want to process only the alignments from the right barline to the end - this includes the right scoreDef
