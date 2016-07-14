@@ -16,6 +16,7 @@
 namespace vrv {
 
 class FloatingElement;
+class ScoreDef;
 class TimestampAttr;
 
 //----------------------------------------------------------------------------
@@ -94,7 +95,7 @@ public:
     BarLine *const GetRightBarLine() { return &m_rightBarLine; };
     ///@}
 
-    int GetXRel() const;
+    // int GetXRel() const;
 
     /**
      * Return the non-justifiable left margin for the measure
@@ -102,11 +103,15 @@ public:
     int GetNonJustifiableLeftMargin() const { return m_measureAligner.GetNonJustifiableMargin(); }
 
     /**
-     * @name Return the X rel position of the right and left barLine (without their width)
+     * @name Return the X1 and X2 rel position of the right and left barLine
      */
     ///@{
-    int GetLeftBarLineX() const;
-    int GetRightBarLineX() const;
+    int GetLeftBarLineXRel() const;
+    int GetLeftBarLineX1Rel() const;
+    int GetLeftBarLineX2Rel() const;
+    int GetRightBarLineXRel() const;
+    int GetRightBarLineX1Rel() const;
+    int GetRightBarLineX2Rel() const;
     ///@}
 
     /**
@@ -114,9 +119,22 @@ public:
      */
     int GetWidth() const;
 
+    /**
+     * @name Setter and getter of the drawing scoreDef
+     */
+    ///@{
+    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; };
+    void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Unset the initial scoreDef of each system and measure
+     */
+    virtual int UnsetCurrentScoreDef(ArrayPtrVoid *params);
 
     /**
      * @name Reset the horizontal alignment
@@ -157,6 +175,18 @@ public:
      * Special case that redirects the functor to the MeasureAligner.
      */
     virtual int SetAlignmentXPos(ArrayPtrVoid *params);
+
+    /**
+     * Lay out the X positions of the staff content looking that the bounding boxes.
+     * The m_xShift is updated appropriately
+     */
+    virtual int SetBoundingBoxXShift(ArrayPtrVoid *params);
+
+    /**
+     * Lay out the X positions of the staff content looking at the bounding boxes.
+     * This is the Functor called at the end of the measure or a layer.
+     */
+    virtual int SetBoundingBoxXShiftEnd(ArrayPtrVoid *params);
 
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
@@ -245,6 +275,8 @@ private:
     BarLineAttr m_leftBarLine;
     BarLineAttr m_rightBarLine;
     ///@}
+
+    ScoreDef *m_drawingScoreDef;
 };
 
 } // namespace vrv

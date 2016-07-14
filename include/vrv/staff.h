@@ -16,6 +16,7 @@ namespace vrv {
 class DeviceContext;
 class Layer;
 class StaffAlignment;
+class StaffDef;
 class Syl;
 class TimeSpanningInterface;
 
@@ -70,6 +71,11 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * Unset the initial scoreDef of each system and measure
+     */
+    virtual int UnsetCurrentScoreDef(ArrayPtrVoid *params);
 
     /**
      * @name Reset the vertical alignment
@@ -144,6 +150,8 @@ public:
  * This is the top left corner of the staff (the X position is the position of the system).
  */
     int m_yAbs;
+
+    StaffDef *m_drawingStaffDef;
 
 private:
     /**

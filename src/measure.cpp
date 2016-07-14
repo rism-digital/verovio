@@ -41,11 +41,19 @@ Measure::Measure(bool measureMusic, int logMeasureNb) : Object("measure-"), AttC
     // Idem for timestamps
     m_timestampAligner.SetParent(this);
 
+    // owned pointers need to be set to NULL;
+    m_drawingScoreDef = NULL;
+
+    // Make the left barLine a left one...
+    m_leftBarLine.SetLeft();
+
     Reset();
 }
 
 Measure::~Measure()
 {
+    // We need to delete own objects
+    Reset();
 }
 
 void Measure::Reset()
@@ -54,6 +62,11 @@ void Measure::Reset()
     ResetCommon();
     ResetMeasureLog();
     ResetPointing();
+
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
 
     m_timestampAligner.Reset();
     m_measuredMusic = true;
@@ -98,41 +111,88 @@ void Measure::AddStaff(Staff *staff)
     }
 }
 
-int Measure::GetXRel() const
+int Measure::GetLeftBarLineXRel() const
 {
-    if (m_measureAligner.GetLeftAlignment()) {
-        return m_measureAligner.GetLeftAlignment()->GetXRel();
+    if (m_measureAligner.GetLeftBarLineAlignment()) {
+        return m_measureAligner.GetLeftBarLineAlignment()->GetXRel();
     }
     return 0;
 }
 
-int Measure::GetLeftBarLineX() const
+int Measure::GetLeftBarLineX1Rel() const
 {
-    if (m_measureAligner.GetLeftAlignment()) {
-        return m_measureAligner.GetLeftAlignment()->GetXRel();
+    int x = GetLeftBarLineXRel();
+    if (m_leftBarLine.HasUpdatedBB()) {
+        x += m_leftBarLine.m_contentBB_x1;
+    }
+    return x;
+}
+
+int Measure::GetLeftBarLineX2Rel() const
+{
+    int x = GetLeftBarLineXRel();
+    if (m_leftBarLine.HasUpdatedBB()) {
+        x += m_leftBarLine.m_contentBB_x2;
+    }
+    return x;
+}
+
+int Measure::GetRightBarLineXRel() const
+{
+    if (m_measureAligner.GetRightBarLineAlignment()) {
+        return m_measureAligner.GetRightBarLineAlignment()->GetXRel();
     }
     return 0;
 }
 
-int Measure::GetRightBarLineX() const
+int Measure::GetRightBarLineX1Rel() const
 {
+    int x = GetRightBarLineXRel();
+    if (m_rightBarLine.HasUpdatedBB()) {
+        x += m_rightBarLine.m_contentBB_x1;
+    }
+    return x;
+}
+
+int Measure::GetRightBarLineX2Rel() const
+{
+    int x = GetRightBarLineXRel();
+    if (m_rightBarLine.HasUpdatedBB()) {
+        x += m_rightBarLine.m_contentBB_x2;
+    }
+    return x;
+}
+
+int Measure::GetWidth() const
+{
+    assert(m_measureAligner.GetRightAlignment());
     if (m_measureAligner.GetRightAlignment()) {
         return m_measureAligner.GetRightAlignment()->GetXRel();
     }
     return 0;
 }
 
-int Measure::GetWidth() const
+void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    if (m_measureAligner.GetRightAlignment()) {
-        return GetRightBarLineX() + m_measureAligner.GetRightAlignment()->GetMaxWidth();
-    }
-    return 0;
+    assert(!m_drawingScoreDef); // We should always call UnsetCurrentScoreDef before
+
+    m_drawingScoreDef = new ScoreDef();
+    *m_drawingScoreDef = *drawingScoreDef;
 }
 
 //----------------------------------------------------------------------------
 // Measure functor methods
 //----------------------------------------------------------------------------
+
+int Measure::UnsetCurrentScoreDef(ArrayPtrVoid *params)
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+};
 
 int Measure::ResetHorizontalAlignment(ArrayPtrVoid *params)
 {
@@ -168,11 +228,11 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
     (*measureAligner) = &m_measureAligner;
 
     if (m_leftBarLine.GetForm() != BARRENDITION_NONE) {
-        m_leftBarLine.SetAlignment(m_measureAligner.GetLeftAlignment());
+        m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment());
     }
 
     if (m_rightBarLine.GetForm() != BARRENDITION_NONE) {
-        m_rightBarLine.SetAlignment(m_measureAligner.GetRightAlignment());
+        m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment());
     }
 
     // LogDebug("\n ***** Align measure %d", this->GetN());
@@ -213,6 +273,47 @@ int Measure::AlignVertically(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::SetBoundingBoxXShift(ArrayPtrVoid *params)
+{
+    // param 0: the minimum position (i.e., the width of the previous element)
+    // param 1: the maximum width in the current measure
+    // param 2: the Doc (unused)
+    // param 3: the functor to be redirected to Aligner
+    // param 4: the functor to be redirected to Aligner at the end (unused)
+    int *min_pos = static_cast<int *>((*params).at(0));
+    int *measure_width = static_cast<int *>((*params).at(1));
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+
+    // we reset the measure width and the minimum position
+    (*measure_width) = 0;
+    (*min_pos) = 0;
+
+    // Process the left scoreDef elements and the left barLine
+    m_measureAligner.Process(setBoundingBoxXShift, params);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
+{
+    // param 0: the minimum position (i.e., the width of the previous element)
+    // param 1: the maximum width in the current measure
+    // param 2: the Doc (unused)
+    // param 3: the functor to be redirected to Aligner (unused)
+    // param 4: the functor to be redirected to Aligner at the end
+    int *min_pos = static_cast<int *>((*params).at(0));
+    int *measure_width = static_cast<int *>((*params).at(1));
+    Functor *setBoundingBoxXShiftEnd = static_cast<Functor *>((*params).at(4));
+
+    // use the measure width as minimum position of the barLine
+    (*min_pos) = (*measure_width);
+
+    // Process the right barLine and the right scoreDef elements
+    m_measureAligner.Process(setBoundingBoxXShiftEnd, params);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
 {
     // param 0: the functor to be redirected to Aligner
@@ -226,11 +327,9 @@ int Measure::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
 int Measure::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift (unused)
-    // param 1: the cumulated justifiable shift (unused)
-    // param 2: the minimum measure width (unused)
-    // param 3: the doc for accessing drawing parameters (unused)
-    // param 4: the functor to be redirected to Aligner
-    Functor *integrateBoundingBoxShift = static_cast<Functor *>((*params).at(4));
+    // param 1: the doc for accessing drawing parameters (unused)
+    // param 2: the functor to be redirected to Aligner
+    Functor *integrateBoundingBoxShift = static_cast<Functor *>((*params).at(2));
 
     m_measureAligner.Process(integrateBoundingBoxShift, params);
 
@@ -253,15 +352,21 @@ int Measure::SetAlignmentXPos(ArrayPtrVoid *params)
 
 int Measure::JustifyX(ArrayPtrVoid *params)
 {
-    // param 0: the justification ratio
-    // param 1: the justification ratio for the measure (depends on the margin) (unused)
-    // param 2: the non-justifiable margin (unused)
-    // param 3: the system full width (without system margins) (unused)
-    // param 4: the functor to be redirected to the MeasureAligner
-    double *ratio = static_cast<double *>((*params).at(0));
-    Functor *justifyX = static_cast<Functor *>((*params).at(4));
+    // param 0: the measureXRel of the next measure
+    // param 1: the justification ratio (unused)
+    // param 2: the xRel position of the left barline (unused)
+    // param 3: the xRel position of the right barline (unused)
+    // param 4: the system full width (without system margins) (unused)
+    // param 5: the functor to be redirected to the MeasureAligner
+    int *measureXRel = static_cast<int *>((*params).at(0));
+    Functor *justifyX = static_cast<Functor *>((*params).at(5));
 
-    this->m_drawingXRel = ceil((*ratio) * (double)this->m_drawingXRel);
+    if ((*measureXRel > 0)) {
+        this->m_drawingXRel = (*measureXRel);
+    }
+    else {
+        (*measureXRel) = this->m_drawingXRel;
+    }
 
     m_measureAligner.Process(justifyX, params);
 
@@ -271,25 +376,22 @@ int Measure::JustifyX(ArrayPtrVoid *params)
 int Measure::AlignMeasures(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift
+    // param 1: the cumulated justifiable width
     int *shift = static_cast<int *>((*params).at(0));
+    int *justifiableWidth = static_cast<int *>((*params).at(1));
 
     this->m_drawingXRel = (*shift);
 
-    assert(m_measureAligner.GetRightAlignment());
-
-    (*shift) += m_measureAligner.GetRightAlignment()->GetXRel();
-
-    // We also need to take into account the measure end (right) barLine with here
-    if (GetRightBarLineType() != BARRENDITION_NONE) {
-        // shift the next measure of the total with
-        (*shift) += GetRightBarLine()->GetAlignment()->GetMaxWidth();
-    }
+    (*shift) += this->GetWidth();
+    (*justifiableWidth) += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();
 
     return FUNCTOR_SIBLINGS;
 }
 
 int Measure::ResetDrawing(ArrayPtrVoid *params)
 {
+    this->m_leftBarLine.Reset();
+    this->m_rightBarLine.Reset();
     this->m_timestampAligner.Reset();
     return FUNCTOR_CONTINUE;
 };
@@ -314,7 +416,6 @@ int Measure::CastOffSystems(ArrayPtrVoid *params)
         (*currentSystem) = new System();
         page->AddSystem(*currentSystem);
         (*shift) = this->m_drawingXRel;
-        ;
     }
 
     // Special case where we use the Relinquish method.

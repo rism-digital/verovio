@@ -26,12 +26,13 @@ class TimestampAttr;
  * this to avoid notes aligning to it
  */
 enum AlignmentType {
+    ALIGNMENT_MEASURE_START = 0,
     // Non-justifiable
-    ALIGNMENT_CLEF_ATTR = 0,
-    ALIGNMENT_KEYSIG_ATTR,
-    ALIGNMENT_MENSUR_ATTR,
-    ALIGNMENT_METERSIG_ATTR,
-    ALIGNMENT_MEASURE_START,
+    ALIGNMENT_SCOREDEF_CLEF,
+    ALIGNMENT_SCOREDEF_KEYSIG,
+    ALIGNMENT_SCOREDEF_MENSUR,
+    ALIGNMENT_SCOREDEF_METERSIG,
+    ALIGNMENT_MEASURE_LEFT_BARLINE,
     // Justifiable
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF,
@@ -45,6 +46,8 @@ enum AlignmentType {
     ALIGNMENT_FULLMEASURE2,
     ALIGNMENT_ACCID,
     ALIGNMENT_DEFAULT,
+    // Non-justifiable
+    ALIGNMENT_MEASURE_RIGHT_BARLINE,
     ALIGNMENT_MEASURE_END
 };
 
@@ -282,11 +285,17 @@ private:
  */
 class Alignment : public Object {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
     Alignment();
     Alignment(double time, AlignmentType type = ALIGNMENT_DEFAULT);
     virtual ~Alignment();
+    virtual void Reset();
     virtual ClassId Is() const { return ALIGNMENT; }
+    ///@}
 
     void SetXRel(int x_rel);
     int GetXRel() const { return m_xRel; };
@@ -304,6 +313,11 @@ public:
     void SetTime(double time) { m_time = time; };
     double GetTime() const { return m_time; };
     ///@}
+
+    /**
+     *
+     */
+    void AddLayerElementRef(LayerElement *element);
 
     /**
      * @name Set and get the type of the alignment
@@ -324,6 +338,13 @@ public:
      */
     bool HasGraceAligner() const { return (m_graceAligner != NULL); };
 
+    virtual int HorizontalSpaceForDuration(
+        double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
+
+    //----------//
+    // Functors //
+    //----------//
+
     /**
      * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the GraceAligner.
@@ -336,9 +357,6 @@ public:
      */
     virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params);
 
-    virtual int HorizontalSpaceForDuration(
-        double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
-
     /**
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
@@ -350,6 +368,18 @@ public:
      * Special case of functor redirected from Measure.
      */
     virtual int JustifyX(ArrayPtrVoid *params);
+
+    /**
+     * Lay out the X positions of the staff content looking that the bounding boxes.
+     * The m_xShift is updated appropriately
+     */
+    virtual int SetBoundingBoxXShift(ArrayPtrVoid *params);
+
+    /**
+     * Lay out the X positions of the staff content looking that the bounding boxes.
+     * The m_xShift is updated appropriately
+     */
+    virtual int SetBoundingBoxXShiftEnd(ArrayPtrVoid *params);
 
 private:
     //
@@ -393,6 +423,10 @@ private:
      * The Alignment owns it.
      */
     GraceAligner *m_graceAligner;
+    /**
+     * An array of all the LayerElement objects pointing to the alignment
+     */
+    ArrayOfObjects m_layerElementsRef;
 };
 
 //----------------------------------------------------------------------------
@@ -417,7 +451,7 @@ public:
      */
     virtual void Reset();
 
-    Alignment *GetAlignmentAtTime(double time, AlignmentType type, bool hasEndAlignment = true);
+    Alignment *GetAlignmentAtTime(double time, AlignmentType type);
 
     /**
      * Keep the maximum time of the measure.
@@ -427,19 +461,19 @@ public:
     void SetMaxTime(double time);
 
     /**
-     * @name Set and get the non-justifiable margin
+     * @name Set and Get the non-justifiable margin (right and left scoreDefs)
      */
     ///@{
-    void SetNonJustifiableMargin(int margin) { m_nonJustifiableLeftMargin = margin; };
     int GetNonJustifiableMargin() const { return m_nonJustifiableLeftMargin; };
     ///@}
 
     /**
-     * Get left Alignment for the measure.
+     * Get left Alignment for the measure and for the left BarLine.
      * For each MeasureAligner, we keep and Alignment for the left position.
-     * The Alignment time will be always 0.0 and will appear first in the list.
+     * The Alignment time will be always -1.0 * DUR_MAX and will appear first in the list.
      */
     Alignment *GetLeftAlignment() const { return m_leftAlignment; };
+    Alignment *GetLeftBarLineAlignment() const { return m_leftBarLineAlignment; };
 
     /**
      * Get right Alignment for the measure.
@@ -447,6 +481,11 @@ public:
      * The Alignment time will be increased whenever necessary when values are added.
      */
     Alignment *GetRightAlignment() const { return m_rightAlignment; };
+    Alignment *GetRightBarLineAlignment() const { return m_rightBarLineAlignment; };
+
+    //----------//
+    // Functors //
+    //----------//
 
     /**
      * Correct the X alignment once the the content of a system has been aligned and laid out.
@@ -474,14 +513,16 @@ public:
     //
 private:
     /**
-     * A pointer to the left Alignment object kept for the measure start position
+     * A pointer to the left and right Alignment object kept for the measure start and end position
      */
     Alignment *m_leftAlignment;
+    Alignment *m_rightAlignment;
 
     /**
-     * A pointer to the left Alignment object kept for the measure end position
+     * A pointer to the left and right Alignment object kept for the left and right barline position
      */
-    Alignment *m_rightAlignment;
+    Alignment *m_leftBarLineAlignment;
+    Alignment *m_rightBarLineAlignment;
 
     /**
      * Store measure's non-justifiable margin used by the scoreDef attributes.

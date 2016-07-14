@@ -220,7 +220,9 @@ void StaffAlignment::SetCurrentFloatingPositioner(FloatingElement *element, int 
 MeasureAligner::MeasureAligner() : Object()
 {
     m_leftAlignment = NULL;
+    m_leftBarLineAlignment = NULL;
     m_rightAlignment = NULL;
+    m_rightBarLineAlignment = NULL;
 }
 
 MeasureAligner::~MeasureAligner()
@@ -231,9 +233,13 @@ void MeasureAligner::Reset()
 {
     Object::Reset();
     m_nonJustifiableLeftMargin = 0;
-    m_leftAlignment = new Alignment(-1.0, ALIGNMENT_MEASURE_START);
+    m_leftAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_START);
     AddAlignment(m_leftAlignment);
-    m_rightAlignment = new Alignment(0.0, ALIGNMENT_MEASURE_END);
+    m_leftBarLineAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_LEFT_BARLINE);
+    AddAlignment(m_leftBarLineAlignment);
+    m_rightBarLineAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_RIGHT_BARLINE);
+    AddAlignment(m_rightBarLineAlignment);
+    m_rightAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_END);
     AddAlignment(m_rightAlignment);
 }
 
@@ -248,7 +254,7 @@ void MeasureAligner::AddAlignment(Alignment *alignment, int idx)
     }
 }
 
-Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type, bool hasEndAlignment)
+Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
 {
     int i;
     int idx = -1; // the index if we reach the end.
@@ -276,10 +282,12 @@ Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type, b
     }
     // nothing found
     if (idx == -1) {
-        // this is tricky! Because we want m_rightAlignment to always stay at the end (with hasEndAlignment),
-        // we always to insert _before_ the last one - m_rightAlignment is added in Reset()
-        if (hasEndAlignment) {
-            idx = GetAlignmentCount() - 1;
+        if ((type != ALIGNMENT_MEASURE_END) && (this->Is() != GRACE_ALIGNER)) {
+            // This typically occurs when a tstamp event occurs after the last note of a measure
+            int rightBarlineIdx = m_rightBarLineAlignment->GetIdx();
+            assert(rightBarlineIdx != -1);
+            idx = rightBarlineIdx - 1;
+            this->SetMaxTime(time);
         }
         else {
             idx = GetAlignmentCount();
@@ -292,8 +300,20 @@ Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type, b
 
 void MeasureAligner::SetMaxTime(double time)
 {
-    if (m_rightAlignment->GetTime() < time) {
-        m_rightAlignment->SetTime(time);
+    // we have to have a m_rightBarLineAlignment
+    assert(m_rightBarLineAlignment);
+
+    // it must be found in the aligner
+    int idx = m_rightBarLineAlignment->GetIdx();
+    assert(idx != -1);
+
+    int i;
+    Alignment *alignment = NULL;
+    // First try to see if we already have something at the time position
+    for (i = idx; i < GetAlignmentCount(); i++) {
+        alignment = dynamic_cast<Alignment *>(m_children.at(i));
+        assert(alignment);
+        alignment->SetTime(time);
     }
 }
 
@@ -326,8 +346,7 @@ void GraceAligner::AlignStack()
         double duration = note->LayerElement::GetAlignmentDuration(NULL, NULL, false);
         // Time goes backward with grace notes
         time -= duration;
-        // Set the hasEndAlignment to false with grace notes because we don't have an end-measure alignment
-        note->SetGraceAlignment(this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT, false));
+        note->SetGraceAlignment(this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT));
     }
     m_noteStack.clear();
 }
@@ -338,6 +357,21 @@ void GraceAligner::AlignStack()
 
 Alignment::Alignment() : Object()
 {
+    Reset();
+}
+
+Alignment::Alignment(double time, AlignmentType type) : Object()
+{
+    Reset();
+    m_time = time;
+    m_type = type;
+}
+
+void Alignment::Reset()
+{
+    Object::Reset();
+
+    m_layerElementsRef.clear();
     m_xRel = 0;
     m_xShift = 0;
     m_maxWidth = 0;
@@ -346,21 +380,17 @@ Alignment::Alignment() : Object()
     m_graceAligner = NULL;
 }
 
-Alignment::Alignment(double time, AlignmentType type) : Object()
-{
-    m_xRel = 0;
-    m_xShift = 0;
-    m_maxWidth = 0;
-    m_time = time;
-    m_type = type;
-    m_graceAligner = NULL;
-}
-
 Alignment::~Alignment()
 {
     if (m_graceAligner) {
         delete m_graceAligner;
     }
+}
+
+void Alignment::AddLayerElementRef(LayerElement *element)
+{
+    assert(element->IsLayerElement());
+    m_layerElementsRef.push_back(element);
 }
 
 void Alignment::SetXRel(int x_rel)
@@ -630,21 +660,11 @@ int StaffAlignment::IntegrateBoundingBoxYShift(ArrayPtrVoid *params)
 int MeasureAligner::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
-    // param 1: the accumulated justifiable shift
-    // param 2: the minimum measure width (unused)
-    // param 3: the doc for accessing drawing parameters
-    // param 4: the functor to be redirected to the MeasureAligner (unused)
+    // param 1: the doc for accessing drawing parameters (unused)
+    // param 2: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int *>((*params).at(0));
-    int *justifiable_shift = static_cast<int *>((*params).at(1));
-    int *minMeasureWidth = static_cast<int *>((*params).at(2));
-    Doc *doc = static_cast<Doc *>((*params).at(3));
 
-    // We start a new MeasureAligner
-    // Reset the accumulated shift to 0;
-    (*minMeasureWidth) = 0;
-    (*shift) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-
-    (*justifiable_shift) = -1;
+    (*shift) = 0;
 
     return FUNCTOR_CONTINUE;
 }
@@ -678,43 +698,104 @@ int Alignment::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
 int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
-    // param 1: the accumulated justifiable shift
-    // param 2: the minimum measure width
-    // param 4: the doc
+    // param 1: the doc
+    // param 2: the functor to be redirected to the MeasureAligner (unused)
     int *shift = static_cast<int *>((*params).at(0));
-    int *justifiable_shift = static_cast<int *>((*params).at(1));
-    int *minMeasureWidth = static_cast<int *>((*params).at(2));
-    Doc *doc = static_cast<Doc *>((*params).at(3));
+    Doc *doc = static_cast<Doc *>((*params).at(1));
+
+    // We move the first left position according to style but not for aligners that are empty and not
+    // for the left barline because we want it to be at the 0 pos if nothing before it.
+    if (((*shift) == 0) && (m_type != ALIGNMENT_MEASURE_LEFT_BARLINE) && !m_layerElementsRef.empty()) {
+        (*shift) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    }
 
     // integrates the m_xShift into the m_xRel
     m_xRel += m_xShift + (*shift);
     // cumulate the shift value and the width
     (*shift) += m_xShift;
 
-    if ((GetType() <= ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
-        MeasureAligner *aligner = dynamic_cast<MeasureAligner *>(m_parent);
-        assert(aligner);
-        aligner->SetNonJustifiableMargin(this->m_xRel + this->m_maxWidth);
-        // LogDebug("Aligner margin %d", aligner->GetNonJustifiableMargin());
-    }
-    else if ((GetType() > ALIGNMENT_METERSIG_ATTR) && ((*justifiable_shift) < 0)) {
-        MeasureAligner *aligner = dynamic_cast<MeasureAligner *>(m_parent);
-        assert(aligner);
-        (*justifiable_shift) = aligner->GetNonJustifiableMargin();
-    }
-
-    if (GetType() == ALIGNMENT_FULLMEASURE) {
-        (*minMeasureWidth) = doc->m_drawingMinMeasureWidth;
-    }
-    else if (GetType() == ALIGNMENT_FULLMEASURE2) {
-        (*minMeasureWidth) = 2 * doc->m_drawingMinMeasureWidth;
-    }
-    else if (GetType() == ALIGNMENT_MEASURE_END) {
-        m_xRel = std::max(m_xRel, (*minMeasureWidth) + (*justifiable_shift));
-    }
-
     // reset member to 0
     m_xShift = 0;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Alignment::SetBoundingBoxXShift(ArrayPtrVoid *params)
+{
+    // param 0: the minimum position (i.e., the width of the previous element)
+    // param 1: the maximum width in the current measure
+    // param 2: the Doc
+    // param 3: the functor to be redirected to Aligner (unused)
+    // param 4: the functor to be redirected to Aligner at the end (unused)
+    int *min_pos = static_cast<int *>((*params).at(0));
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+
+    // Here we want to process only the left scoreDef up to the left barline
+    if (this->m_type > ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
+
+    ArrayOfObjects::iterator iter;
+
+    // Because we are processing the elements vertically we need to reset min_pos for each element
+    int previousMinPos = (*min_pos);
+    for (iter = m_layerElementsRef.begin(); iter != m_layerElementsRef.end(); iter++) {
+        (*min_pos) = previousMinPos;
+        (*iter)->Process(setBoundingBoxXShift, params);
+    }
+
+    // If we have elements for this alignment, then adjust the min_pos
+    if (!m_layerElementsRef.empty()) {
+        (*min_pos) = this->GetXRel() + this->GetMaxWidth();
+    }
+    // Otherwise, just set its xShift because this was not done by the functor
+    else {
+        this->SetXShift((*min_pos) - this->GetXRel());
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Alignment::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
+{
+    // param 0: the minimum position (i.e., the width of the previous element)
+    // param 1: the maximum width in the current measure
+    // param 2: the Doc
+    // param 3: the functor to be redirected to Aligner
+    // param 4: the functor to be redirected to Aligner at the end (unused)
+    int *min_pos = static_cast<int *>((*params).at(0));
+    Doc *doc = static_cast<Doc *>((*params).at(2));
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+
+    // Because these do not get shifted with their bounding box because their bounding box is calculated according to
+    // the width of the measure, their xShift has to be set 'by hand'
+    if (GetType() == ALIGNMENT_FULLMEASURE) {
+        (*min_pos) = std::max(this->GetXRel() + doc->m_drawingMinMeasureWidth, (*min_pos));
+    }
+    else if (GetType() == ALIGNMENT_FULLMEASURE2) {
+        (*min_pos) = std::max(this->GetXRel() + 2 * doc->m_drawingMinMeasureWidth, (*min_pos));
+    }
+
+    // Here we want to process only the alignments from the right barline to the end - this includes the right scoreDef
+    // if any
+    if (this->m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) return FUNCTOR_CONTINUE;
+
+    ArrayOfObjects::iterator iter;
+
+    // Because we are processing the elements vertically we need to reset min_pos for each element
+    int previousMinPos = (*min_pos);
+    for (iter = m_layerElementsRef.begin(); iter != m_layerElementsRef.end(); iter++) {
+        (*min_pos) = previousMinPos;
+        (*iter)->Process(setBoundingBoxXShift, params);
+    }
+
+    // If we have elements for this alignment, then adjust the min_pos
+    if (!m_layerElementsRef.empty()) {
+        (*min_pos) = this->GetXRel() + this->GetMaxWidth();
+    }
+    // Otherwise, just set its xShift because this was not done by the functor
+    // This includes ALIGNMENT_MEASURE_END alignments
+    else {
+        this->SetXShift((*min_pos) - this->GetXRel());
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -772,10 +853,19 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
     int *maxActualDur = static_cast<int *>((*params).at(2));
     Doc *doc = static_cast<Doc *>((*params).at(3));
 
-    if (this->m_type <= ALIGNMENT_METERSIG_ATTR) return FUNCTOR_CONTINUE;
+    // Do not set an x pos for anything before the barline (including it)
+    if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
+    // Do not set an x pos for anything after the barline (but still for it)
+    if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) return FUNCTOR_CONTINUE;
 
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));
+
+    // For clef changes, do not take into account the interval so we keep them left aligned
+    // This is not perfect because the previous time is the one of the previous aligner and
+    // there is maybe space between the last note and the clef on their layer
+    if (this->m_type == ALIGNMENT_CLEF) intervalTime = 0.0;
+
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(
             intervalTime, *maxActualDur, doc->GetSpacingLinear(), doc->GetSpacingNonLinear());
@@ -790,56 +880,53 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
 
 int MeasureAligner::JustifyX(ArrayPtrVoid *params)
 {
-    // param 0: the justification ratio
-    // param 1: the justification ratio for the measure (depends on the margin)
-    // param 2: the non justifiable margin
-    // param 3: the system full width (without system margins) (unused)
-    // param 4: the functor to be redirected to the MeasureAligner (unused)
-    double *ratio = static_cast<double *>((*params).at(0));
-    double *measureRatio = static_cast<double *>((*params).at(1));
-    int *margin = static_cast<int *>((*params).at(2));
+    // param 0: the measureXRel of the next measure
+    // param 1: the justification ratio (unused)
+    // param 2: the xRel position of the left barline
+    // param 3: the xRel position of the right barline
+    // param 4: the system full width (without system margins) (unused)
+    // param 5: the functor to be redirected to the MeasureAligner (unused)
+    int *leftBarLineX = static_cast<int *>((*params).at(2));
+    int *rightBarLineX = static_cast<int *>((*params).at(3));
 
-    int width = GetRightAlignment()->GetXRel() + GetRightAlignment()->GetMaxWidth();
+    (*leftBarLineX) = GetLeftBarLineAlignment()->GetXRel();
+    (*rightBarLineX) = GetRightBarLineAlignment()->GetXRel();
 
-    // the ratio in the measure has to take into account the non-justifiable width
-    // for elements within the margin, we do not move them
-    // for after the margin (right) we have a position that is given by:
-    // (m_xRel - margin) * measureRatio + margin, where measureRatio is given by:
-    // (ratio - 1) * (margin / justifiable) + ratio
-
-    (*measureRatio) = ((*ratio) - 1) * ((double)m_nonJustifiableLeftMargin / (double)width) + (*ratio);
-    (*margin) = m_nonJustifiableLeftMargin;
+    // LogDebug("Justification measure ratio: %f - leftBarLineX %d", (*justifiableRatio), (*leftBarLineX));
 
     return FUNCTOR_CONTINUE;
 }
 
 int Alignment::JustifyX(ArrayPtrVoid *params)
 {
-    // param 0: the justification ratio
+    // param 0: the measureXRel of the next measure
     // param 1: the justification ratio for the measure (depends on the margin)
-    // param 2: the non-justifiable margin
-    // param 3: the system full width (without system margins) (unused)
-    // param 4: the functor to be redirected to the MeasureAligner (unused)
-    double *ratio = static_cast<double *>((*params).at(0));
-    double *measureRatio = static_cast<double *>((*params).at(1));
-    int *margin = static_cast<int *>((*params).at(2));
+    // param 2: the xRel position of the left barline
+    // param 3: the xRel position of the right barline
+    // param 4: the system full width (without system margins) (unused)
+    // param 5: the functor to be redirected to the MeasureAligner (unused)
+    int *measureXRel = static_cast<int *>((*params).at(0));
+    double *justifiableRatio = static_cast<double *>((*params).at(1));
+    int *leftBarLineX = static_cast<int *>((*params).at(2));
+    int *rightBarLineX = static_cast<int *>((*params).at(3));
 
-    if (GetType() == ALIGNMENT_MEASURE_START) {
-        return FUNCTOR_CONTINUE;
+    if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) {
+        // Nothing to do for all left scoreDef elements and the left barline
     }
-    else if (GetType() == ALIGNMENT_MEASURE_END) {
-        this->m_xRel = ceil((*ratio) * (double)this->m_xRel);
-        return FUNCTOR_CONTINUE;
+    else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
+        // All elements up to the next barline, move them but also take into account the leftBarlineX
+        this->m_xRel = ceil(((double)this->m_xRel - (double)(*leftBarLineX)) * (*justifiableRatio)) + (*leftBarLineX);
+    }
+    else {
+        //  Now more the right barline and all right scoreDef elements
+        int shift = this->m_xRel - (*rightBarLineX);
+        this->m_xRel = ceil(((double)(*rightBarLineX) - (double)(*leftBarLineX)) * (*justifiableRatio))
+            + (*leftBarLineX) + shift;
     }
 
-    // the ratio in the measure has to take into account the non-justifiable width
-    // for elements within the margin, we do not move them
-    // for after the margin (right) we have a position that is given by:
-    // (m_xRel - margin) * measureRatio + margin, where measureRatio is given by:
-    // (ratio - 1) * (margin / justifiable) + ratio
-
-    if ((GetType() < ALIGNMENT_CLEF_ATTR) || (GetType() > ALIGNMENT_METERSIG_ATTR)) {
-        this->m_xRel = ceil(((double)this->m_xRel - (double)(*margin)) * (*measureRatio)) + (*margin);
+    // Finally, when reaching the end of the measure, update the measureXRel for the next measure
+    if (m_type == ALIGNMENT_MEASURE_END) {
+        (*measureXRel) += this->m_xRel;
     }
 
     return FUNCTOR_CONTINUE;

@@ -16,6 +16,7 @@
 
 #include "beam.h"
 #include "chord.h"
+#include "clef.h"
 #include "doc.h"
 #include "keysig.h"
 #include "layer.h"

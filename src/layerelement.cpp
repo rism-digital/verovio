@@ -217,14 +217,14 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         BeatRpt *beatRpt = dynamic_cast<BeatRpt *>(this);
         assert(beatRpt);
         int meterUnit = 4;
-        if (meterSig) meterSig->GetUnit();
+        if (meterSig && meterSig->HasUnit()) meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
     else if (this->Is() == TIMESTAMP_ATTR) {
         TimestampAttr *timestampAttr = dynamic_cast<TimestampAttr *>(this);
         assert(timestampAttr);
         int meterUnit = 4;
-        if (meterSig) meterUnit = meterSig->GetUnit();
+        if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     else {
@@ -288,7 +288,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     }
     else if (this->Is() == CLEF) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_CLEF_ATTR;
+            type = ALIGNMENT_SCOREDEF_CLEF;
         }
         else {
             type = ALIGNMENT_CLEF;
@@ -296,18 +296,18 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     }
     else if (this->Is() == KEYSIG) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_KEYSIG_ATTR;
+            type = ALIGNMENT_SCOREDEF_KEYSIG;
         }
         else {
             // type = ALIGNMENT_KEYSIG;
             // We force this because they should appear only at the beginning of a measure and should be non-justifiable
             // We also need it because the PAE importer creates keySig (and not staffDef @key.sig)
-            type = ALIGNMENT_KEYSIG_ATTR;
+            type = ALIGNMENT_SCOREDEF_KEYSIG;
         }
     }
     else if (this->Is() == MENSUR) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_MENSUR_ATTR;
+            type = ALIGNMENT_SCOREDEF_MENSUR;
         }
         else {
             // replace the current mensur
@@ -318,7 +318,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
     }
     else if (this->Is() == METERSIG) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_METERSIG_ATTR;
+            type = ALIGNMENT_SCOREDEF_METERSIG;
         }
         else {
             // replace the current meter signature
@@ -327,7 +327,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
             // type = ALIGNMENT_METERSIG
             // We force this because they should appear only at the beginning of a measure and should be non-justifiable
             // We also need it because the PAE importer creates meterSig (and not staffDef @meter)
-            type = ALIGNMENT_METERSIG_ATTR;
+            type = ALIGNMENT_SCOREDEF_METERSIG;
         }
     }
     else if ((this->Is() == MULTIREST) || (this->Is() == MREST) || (this->Is() == MRPT)) {
@@ -361,6 +361,7 @@ int LayerElement::AlignHorizontally(ArrayPtrVoid *params)
         (*measureAligner)->SetMaxTime((*time) + duration);
 
     m_alignment = (*measureAligner)->GetAlignmentAtTime(*time, type);
+    m_alignment->AddLayerElementRef(this);
 
     if (this->IsGraceNote()) {
         GraceAligner *graceAligner = m_alignment->GetGraceAligner();
