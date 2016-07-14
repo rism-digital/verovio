@@ -165,7 +165,7 @@ void Page::LayOutHorizontally()
     params.push_back(&grace_min_pos);
     params.push_back(doc);
     Functor setBoundingBoxGraceXShift(&Object::SetBoundingBoxGraceXShift);
-    // this->Process(&setBoundingBoxGraceXShift, &params);
+    this->Process(&setBoundingBoxGraceXShift, &params);
 
     // Integrate the X bounding box shift of the elements
     // Once the m_xShift have been calculated, move all positions accordingly
@@ -173,7 +173,7 @@ void Page::LayOutHorizontally()
     Functor integrateBoundingBoxGraceXShift(&Object::IntegrateBoundingBoxGraceXShift);
     // Special case: because we redirect the functor, pass it as parameter to itself (!)
     params.push_back(&integrateBoundingBoxGraceXShift);
-    // this->Process(&integrateBoundingBoxGraceXShift, &params);
+    this->Process(&integrateBoundingBoxGraceXShift, &params);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping

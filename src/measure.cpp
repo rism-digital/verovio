@@ -403,7 +403,6 @@ int Measure::CastOffSystems(ArrayPtrVoid *params)
         (*currentSystem) = new System();
         page->AddSystem(*currentSystem);
         (*shift) = this->m_drawingXRel;
-        ;
     }
 
     // Special case where we use the Relinquish method.

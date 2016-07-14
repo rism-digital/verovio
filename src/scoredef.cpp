@@ -251,7 +251,7 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     if (meterSig) delete meterSig;
 
     // The keySig cancellation flag is the same as keySig because we draw cancellation with new key sig
-    this->SetRedrawFlags(drawClef, drawKeySig, drawMensur, drawMeterSig, drawKeySig);
+    this->SetRedrawFlags(drawClef, drawKeySig, drawMensur, drawMeterSig, drawKeySig, false);
 }
 
 void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
@@ -332,7 +332,8 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     return staffDef;
 }
 
-void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation)
+void ScoreDef::SetRedrawFlags(
+    bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation, bool applyToAll)
 {
     m_setAsDrawing = true;
 
@@ -342,6 +343,7 @@ void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig
     params.push_back(&mensur);
     params.push_back(&meterSig);
     params.push_back(&keySigCancellation);
+    params.push_back(&applyToAll);
     Functor setStaffDefDraw(&Object::SetStaffDefRedrawFlags);
     this->Process(&setStaffDefDraw, &params);
 }
@@ -531,26 +533,28 @@ int StaffDef::SetStaffDefRedrawFlags(ArrayPtrVoid *params)
     // param 2: bool mensur flag
     // param 3: bool meterSig flag
     // param 4: bool keySig cancellation flag
+    // param 5: bool the flag for indicating if apply to all or not
     bool *clef = static_cast<bool *>((*params).at(0));
     bool *keysig = static_cast<bool *>((*params).at(1));
     bool *mensur = static_cast<bool *>((*params).at(2));
     bool *meterSig = static_cast<bool *>((*params).at(3));
     bool *keySigCancellation = static_cast<bool *>((*params).at(4));
+    bool *applyToAll = static_cast<bool *>((*params).at(5));
 
-    if ((*clef)) {
-        this->SetDrawClef(true);
+    if ((*clef) || (*applyToAll)) {
+        this->SetDrawClef((*clef));
     }
-    if ((*keysig)) {
-        this->SetDrawKeySig(true);
+    if ((*keysig) || (*applyToAll)) {
+        this->SetDrawKeySig((*keysig));
     }
-    if ((*mensur)) {
-        this->SetDrawMensur(true);
+    if ((*mensur) || (*applyToAll)) {
+        this->SetDrawMensur((*mensur));
     }
-    if ((*meterSig)) {
-        this->SetDrawMeterSig(true);
+    if ((*meterSig) || (*applyToAll)) {
+        this->SetDrawMeterSig((*meterSig));
     }
-    if ((*keySigCancellation)) {
-        this->SetDrawKeySigCancellation(true);
+    if ((*keySigCancellation) || (*applyToAll)) {
+        this->SetDrawKeySigCancellation((*keySigCancellation));
     }
 
     return FUNCTOR_CONTINUE;

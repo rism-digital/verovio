@@ -142,8 +142,9 @@ public:
     /**
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
+     * Only true flags are applied, unless applyToAll is set to true.
      */
-    void SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation);
+    void SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation, bool applyToAll);
 
     /**
      * @name Set and get the scoreDef drawing flags for clef, keysig and mensur.

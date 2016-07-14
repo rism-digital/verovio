@@ -915,12 +915,14 @@ int Object::FindAllByAttComparison(ArrayPtrVoid *params)
 
 int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
 {
-
     // param 0: the current scoreDef
+    // param 1: the current staffDef
     ScoreDef **currentScoreDef = static_cast<ScoreDef **>((*params).at(0));
     StaffDef **currentStaffDef = static_cast<StaffDef **>((*params).at(1));
+    ScoreDef *upcomingScoreDef = static_cast<ScoreDef *>((*params).at(2));
 
-    assert(currentScoreDef);
+    // assert(*currentScoreDef);
+    assert(upcomingScoreDef);
 
     // starting a new page
     if (this->Is() == PAGE) {
@@ -929,21 +931,21 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         Page *page = dynamic_cast<Page *>(this);
         assert(page);
         if (page->m_parent->GetChildIndex(page) == 0) {
-            (*currentScoreDef)->SetRedrawFlags(true, true, true, true, false);
-            (*currentScoreDef)->SetDrawLabels(true);
+            upcomingScoreDef->SetRedrawFlags(true, true, true, true, false, false);
+            upcomingScoreDef->SetDrawLabels(true);
         }
         else {
-            (*currentScoreDef)->SetRedrawFlags(true, true, false, false, false);
-            (*currentScoreDef)->SetDrawLabels(false);
+            upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
+            upcomingScoreDef->SetDrawLabels(false);
         }
-        page->m_drawingScoreDef = *(*currentScoreDef);
+        page->m_drawingScoreDef = *upcomingScoreDef;
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new system
     if (this->Is() == SYSTEM) {
         // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
-        (*currentScoreDef)->SetRedrawFlags(true, true, false, false, false);
+        upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
         System *system = dynamic_cast<System *>(this);
         assert(system);
         // For now we don't use it - eventually we want to set it. The problem will be to take into account succeeding
@@ -954,12 +956,13 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
 
     // starting a new system
     if (this->Is() == MEASURE) {
-        if ((*currentScoreDef)->m_setAsDrawing) {
+        if (upcomingScoreDef->m_setAsDrawing) {
             Measure *measure = dynamic_cast<Measure *>(this);
             assert(measure);
-            measure->SetDrawingScoreDef(*currentScoreDef);
+            measure->SetDrawingScoreDef(upcomingScoreDef);
             (*currentScoreDef) = measure->GetDrawingScoreDef();
-            (*currentScoreDef)->m_setAsDrawing = false;
+            upcomingScoreDef->SetRedrawFlags(false, false, false, false, false, true);
+            upcomingScoreDef->m_setAsDrawing = false;
         }
         return FUNCTOR_CONTINUE;
     }
@@ -970,7 +973,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         assert(scoreDef);
         // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
         // m_setAsDrawing to true so it will then be taken into account at the next measure
-        (*currentScoreDef)->ReplaceDrawingValues(scoreDef);
+        upcomingScoreDef->ReplaceDrawingValues(scoreDef);
         return FUNCTOR_CONTINUE;
     }
 
@@ -978,7 +981,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     if (this->Is() == STAFFDEF) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(this);
         assert(staffDef);
-        (*currentScoreDef)->ReplaceDrawingValues(staffDef);
+        upcomingScoreDef->ReplaceDrawingValues(staffDef);
     }
 
     // starting a new staff
@@ -1015,7 +1018,10 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         Clef *clef = dynamic_cast<Clef *>(this);
         assert(clef);
         assert(*currentStaffDef);
-        (*currentStaffDef)->SetCurrentClef(new Clef(*clef));
+        StaffDef *upcomingStaffDef = upcomingScoreDef->GetStaffDef((*currentStaffDef)->GetN());
+        assert(upcomingStaffDef);
+        upcomingStaffDef->SetCurrentClef(clef);
+        upcomingScoreDef->m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1024,7 +1030,10 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         KeySig *keysig = dynamic_cast<KeySig *>(this);
         assert(keysig);
         assert(*currentStaffDef);
-        (*currentStaffDef)->SetCurrentKeySig(new KeySig(*keysig));
+        StaffDef *upcomingStaffDef = upcomingScoreDef->GetStaffDef((*currentStaffDef)->GetN());
+        assert(upcomingStaffDef);
+        upcomingStaffDef->SetCurrentKeySig(keysig);
+        upcomingScoreDef->m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1152,7 +1161,8 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
 
     // with a grace note, also take into account the full width of the group given by the GraceAligner
     if (current->GetAlignment()->HasGraceAligner()) {
-        negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth();
+        negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth()
+            + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }
 
     int currentX = current->GetAlignment()->GetXRel();

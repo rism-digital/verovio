@@ -661,7 +661,7 @@ int MeasureAligner::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
     int *justifiable_shift = static_cast<int *>((*params).at(1));
     Doc *doc = static_cast<Doc *>((*params).at(2));
 
-    (*shift) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    (*shift) = 0; // doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
 
     (*justifiable_shift) = 0;
 
@@ -698,8 +698,13 @@ int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the accumulated shift
     // param 1: the accumulated justifiable shift (unused)
-    // param 2: the doc (unused)
+    // param 2: the doc
     int *shift = static_cast<int *>((*params).at(0));
+    Doc *doc = static_cast<Doc *>((*params).at(2));
+
+    if (((*shift) == 0) && (m_type != ALIGNMENT_MEASURE_LEFT_BARLINE) && !m_layerElementsRef.empty()) {
+        (*shift) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    }
 
     // integrates the m_xShift into the m_xRel
     m_xRel += m_xShift + (*shift);
@@ -846,7 +851,7 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
     Doc *doc = static_cast<Doc *>((*params).at(3));
 
     if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
-    if (this->m_type >= ALIGNMENT_MEASURE_RIGHT_BARLINE) return FUNCTOR_CONTINUE;
+    if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) return FUNCTOR_CONTINUE;
 
     int intervalXRel = 0;
     double intervalTime = (m_time - (*previousTime));

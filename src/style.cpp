@@ -41,7 +41,7 @@ Style::Style()
     m_pageHeight = DEFAULT_PAGE_HEIGHT * DEFINITION_FACTOR;
     m_pageWidth = DEFAULT_PAGE_WIDTH * DEFINITION_FACTOR;
     m_pageRightMar = DEFAULT_PAGE_RIGHT_MAR * DEFINITION_FACTOR;
-    ;
+
     m_pageLeftMar = DEFAULT_PAGE_LEFT_MAR * DEFINITION_FACTOR;
     m_pageTopMar = DEFAULT_PAGE_TOP_MAR * DEFINITION_FACTOR;
     m_spacingStaff = DEFAULT_SPACING_STAFF;
@@ -56,7 +56,7 @@ Style::Style()
     m_tieThickness = DEFAULT_TIE_THICKNESS * PARAM_DENOMINATOR;
     m_minSlurHeight = DEFAULT_MIN_SLUR_HEIGHT * PARAM_DENOMINATOR;
     m_maxSlurHeight = DEFAULT_MAX_SLUR_HEIGHT * PARAM_DENOMINATOR;
-    ;
+
     m_slurThickness = DEFAULT_SLUR_THICKNESS * PARAM_DENOMINATOR;
 
     /** The left spacing */
