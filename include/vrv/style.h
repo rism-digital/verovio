@@ -103,7 +103,8 @@ namespace vrv {
 
 #define DEFAULT_LEFT_MARGIN_ACCID 1.0
 #define DEFAULT_LEFT_MARGIN_BARLINE DEFAULT_LEFT_MARGIN_DEFAULT
-#define DEFAULT_LEFT_MARGIN_BARLINE_ATTR 0.0
+#define DEFAULT_LEFT_MARGIN_BARLINE_ATTR_LEFT 0.0
+#define DEFAULT_LEFT_MARGIN_BARLINE_ATTR_RIGHT 1.0
 #define DEFAULT_LEFT_MARGIN_BEATRPT 2.0
 #define DEFAULT_LEFT_MARGIN_CHORD 1.0
 #define DEFAULT_LEFT_MARGIN_CLEF DEFAULT_LEFT_MARGIN_DEFAULT
@@ -125,7 +126,8 @@ namespace vrv {
 
 #define DEFAULT_RIGHT_MARGIN_ACCID 0.0
 #define DEFAULT_RIGHT_MARGIN_BARLINE 2.0
-#define DEFAULT_RIGHT_MARGIN_BARLINE_ATTR 0.0
+#define DEFAULT_RIGHT_MARGIN_BARLINE_ATTR_LEFT 0.0
+#define DEFAULT_RIGHT_MARGIN_BARLINE_ATTR_RIGHT 0.0
 #define DEFAULT_RIGHT_MARGIN_BEATRPT DEFAULT_RIGHT_MARGIN_DEFAULT
 #define DEFAULT_RIGHT_MARGIN_CHORD 0.0
 #define DEFAULT_RIGHT_MARGIN_CLEF 2.0
@@ -247,7 +249,8 @@ public:
     /** The layout left margin by element */
     char m_leftMarginAccid;
     char m_leftMarginBarLine;
-    char m_leftMarginBarLineAttr;
+    char m_leftMarginBarLineAttrLeft;
+    char m_leftMarginBarLineAttrRight;
     char m_leftMarginBeatRpt;
     char m_leftMarginChord;
     char m_leftMarginClef;
@@ -266,7 +269,8 @@ public:
     /** The layout right margin by element */
     char m_rightMarginAccid;
     char m_rightMarginBarLine;
-    char m_rightMarginBarLineAttr;
+    char m_rightMarginBarLineAttrLeft;
+    char m_rightMarginBarLineAttrRight;
     char m_rightMarginBeatRpt;
     char m_rightMarginChord;
     char m_rightMarginClef;

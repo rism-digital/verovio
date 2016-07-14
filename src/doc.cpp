@@ -710,7 +710,8 @@ char Doc::GetLeftMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_style->m_leftMarginAccid;
     if (classId == BARLINE) return m_style->m_leftMarginBarLine;
-    if (classId == BARLINE_ATTR) return m_style->m_leftMarginBarLineAttr;
+    if (classId == BARLINE_ATTR_LEFT) return m_style->m_leftMarginBarLineAttrLeft;
+    if (classId == BARLINE_ATTR_RIGHT) return m_style->m_leftMarginBarLineAttrRight;
     if (classId == BEATRPT) return m_style->m_leftMarginBeatRpt;
     if (classId == CHORD) return m_style->m_leftMarginChord;
     if (classId == CLEF) return m_style->m_leftMarginClef;
@@ -730,7 +731,8 @@ char Doc::GetRightMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_style->m_rightMarginAccid;
     if (classId == BARLINE) return m_style->m_rightMarginBarLine;
-    if (classId == BARLINE_ATTR) return m_style->m_rightMarginBarLineAttr;
+    if (classId == BARLINE_ATTR_LEFT) return m_style->m_rightMarginBarLineAttrLeft;
+    if (classId == BARLINE_ATTR_RIGHT) return m_style->m_rightMarginBarLineAttrRight;
     if (classId == BEATRPT) return m_style->m_rightMarginBeatRpt;
     if (classId == CHORD) return m_style->m_rightMarginChord;
     if (classId == CLEF) return m_style->m_rightMarginClef;

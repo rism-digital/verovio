@@ -44,6 +44,9 @@ Measure::Measure(bool measureMusic, int logMeasureNb) : Object("measure-"), AttC
     // owned pointers need to be set to NULL;
     m_drawingScoreDef = NULL;
 
+    // Make the left barLine a left one...
+    m_leftBarLine.SetLeft();
+
     Reset();
 }
 
