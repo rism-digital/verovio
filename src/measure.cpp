@@ -276,20 +276,25 @@ int Measure::AlignVertically(ArrayPtrVoid *params)
 int Measure::SetBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the maximum width in the current measure
-    // param 2: the Doc (unused)
-    // param 3: the functor to be redirected to Aligner
-    // param 4: the functor to be redirected to Aligner at the end (unused)
-    int *min_pos = static_cast<int *>((*params).at(0));
-    int *measure_width = static_cast<int *>((*params).at(1));
-    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+    // param 1: the minimum for the beginning of a layer (i.e., after the left barline)
+    // param 2: the maximum width in the current measure
+    // param 3: the Doc (unused)
+    // param 4: the functor to be redirected to Aligner
+    // param 5: the functor to be redirected to Aligner at the end (unused)
+    int *minPos = static_cast<int *>((*params).at(0));
+    int *layerMinPos = static_cast<int *>((*params).at(1));
+    int *measureWidth = static_cast<int *>((*params).at(2));
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(4));
 
     // we reset the measure width and the minimum position
-    (*measure_width) = 0;
-    (*min_pos) = 0;
+    (*measureWidth) = 0;
+    (*layerMinPos) = 0;
+    (*minPos) = 0;
 
     // Process the left scoreDef elements and the left barLine
     m_measureAligner.Process(setBoundingBoxXShift, params);
+
+    (*layerMinPos) = (*minPos);
 
     return FUNCTOR_CONTINUE;
 }
@@ -297,16 +302,17 @@ int Measure::SetBoundingBoxXShift(ArrayPtrVoid *params)
 int Measure::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
 {
     // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the maximum width in the current measure
-    // param 2: the Doc (unused)
-    // param 3: the functor to be redirected to Aligner (unused)
-    // param 4: the functor to be redirected to Aligner at the end
-    int *min_pos = static_cast<int *>((*params).at(0));
-    int *measure_width = static_cast<int *>((*params).at(1));
-    Functor *setBoundingBoxXShiftEnd = static_cast<Functor *>((*params).at(4));
+    // param 1: the minimum for the beginning of a layer (i.e., after the left barline) (unused)
+    // param 2: the maximum width in the current measure
+    // param 3: the Doc (unused)
+    // param 4: the functor to be redirected to Aligner (unused)
+    // param 5: the functor to be redirected to Aligner at the end
+    int *minPos = static_cast<int *>((*params).at(0));
+    int *measureWidth = static_cast<int *>((*params).at(2));
+    Functor *setBoundingBoxXShiftEnd = static_cast<Functor *>((*params).at(5));
 
     // use the measure width as minimum position of the barLine
-    (*min_pos) = (*measure_width);
+    (*minPos) = (*measureWidth);
 
     // Process the right barLine and the right scoreDef elements
     m_measureAligner.Process(setBoundingBoxXShiftEnd, params);
