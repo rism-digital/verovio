@@ -21,4 +21,4 @@ Example output
 
 This page was generated with version 0.9.12-dev-d8be655
 
-![Example page](/images/page-0.9.12-dev-d8be655)
+![Example page](/images/page-0.9.12-dev-d8be655.png)
