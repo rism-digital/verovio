@@ -1379,11 +1379,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         // x position of the syl is two units back
         x2 -= 2 * (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        // if (x1 > x2) {
-        //    DrawFullRectangle(dc, x1, y + 2 * m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), x2, y + 3 *
-        //    m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
-        //    LogDebug("x1 > x2 (%d %d)", x1, x2);
-        //}
+        // DrawFullRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
 
         // the length of the dash and the space between them - can be made a parameter
         int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
@@ -1394,17 +1390,22 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         int nbDashes = dist / dashSpace;
 
         int margin = dist / 2;
+        // no dash if the distance is smaller than a dash length
+        if (dist < dashLength) {
+            nbDashes = 0;
+        }
         // at least one dash
-        if (nbDashes < 2) {
+        else if (nbDashes < 2) {
             nbDashes = 1;
         }
         else {
             margin = (dist - ((nbDashes - 1) * dashSpace)) / 2;
         }
-        margin -= dashLength / 2;
+
         int i, x;
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i * dashSpace);
+            x = std::max(x, x1);
             DrawFullRectangle(dc, x - halfDashLength, y, x + halfDashLength,
                 y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
         }
