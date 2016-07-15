@@ -7,6 +7,14 @@
 
 #include "barline.h"
 
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
+#include "aligner.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -30,6 +38,12 @@ void BarLine::Reset()
     ResetBarLineLog();
 }
 
+void BarLine::SetAlignment(vrv::Alignment *alignment)
+{
+    m_alignment = alignment;
+    m_alignment->AddLayerElementRef(this);
+}
+
 bool BarLine::HasRepetitionDots() const
 {
     if (GetForm() == BARRENDITION_rptstart || GetForm() == BARRENDITION_rptend || GetForm() == BARRENDITION_rptboth) {
@@ -44,6 +58,7 @@ bool BarLine::HasRepetitionDots() const
 
 BarLineAttr::BarLineAttr() : BarLine()
 {
+    m_isLeft = false;
 }
 
 BarLineAttr::~BarLineAttr()

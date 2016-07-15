@@ -18,6 +18,7 @@
 #include "anchoredtext.h"
 #include "beam.h"
 #include "chord.h"
+#include "clef.h"
 #include "custos.h"
 #include "dir.h"
 #include "dot.h"

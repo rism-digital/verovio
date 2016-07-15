@@ -15,6 +15,7 @@
 
 #include "attcomparison.h"
 #include "beam.h"
+#include "clef.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "editorial.h"
@@ -653,9 +654,9 @@ void View::DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barL
     }
     else if (barLine->GetForm() == BARRENDITION_dbl) {
         // Narrow the bars a little bit - should be centered?
-        x1 += barLineWidth;
+        x2 -= barLineWidth;
         DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
-        DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x2, barLineWidth);
     }
     else if (barLine->GetForm() == BARRENDITION_end) {
         DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
@@ -710,11 +711,11 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     DrawMeasureChildren(dc, measure, measure, system);
 
     if (measure->GetLeftBarLineType() != BARRENDITION_NONE) {
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetLeftBarLineX(),
+        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetLeftBarLineXRel(),
             measure->GetLeftBarLine());
     }
     if (measure->GetRightBarLineType() != BARRENDITION_NONE) {
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarLineX(),
+        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarLineXRel(),
             measure->GetRightBarLine());
     }
 
@@ -915,17 +916,17 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     layer->ResetDrawingList();
 
     // draw the scoreDef if required
-    if (layer->GetDrawingClef()) {
-        DrawLayerElement(dc, layer->GetDrawingClef(), layer, staff, measure);
+    if (layer->GetStaffDefClef()) {
+        DrawLayerElement(dc, layer->GetStaffDefClef(), layer, staff, measure);
     }
-    if (layer->GetDrawingKeySig()) {
-        DrawLayerElement(dc, layer->GetDrawingKeySig(), layer, staff, measure);
+    if (layer->GetStaffDefKeySig()) {
+        DrawLayerElement(dc, layer->GetStaffDefKeySig(), layer, staff, measure);
     }
-    if (layer->GetDrawingMensur()) {
-        DrawLayerElement(dc, layer->GetDrawingMensur(), layer, staff, measure);
+    if (layer->GetStaffDefMensur()) {
+        DrawLayerElement(dc, layer->GetStaffDefMensur(), layer, staff, measure);
     }
-    if (layer->GetDrawingMeterSig()) {
-        DrawLayerElement(dc, layer->GetDrawingMeterSig(), layer, staff, measure);
+    if (layer->GetStaffDefMeterSig()) {
+        DrawLayerElement(dc, layer->GetStaffDefMeterSig(), layer, staff, measure);
     }
 
     DrawLayerChildren(dc, layer, layer, staff, measure);

@@ -18,6 +18,7 @@
 #include "accid.h"
 #include "beam.h"
 #include "chord.h"
+#include "clef.h"
 #include "custos.h"
 #include "devicecontext.h"
 #include "doc.h"
@@ -890,8 +891,8 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
-    int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
+    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
+    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
     int y = element->GetDrawingY();
 
     // move it down according to the number of line in the staff
@@ -957,8 +958,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
-    int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
+    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
+    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
 
     // We do not support more than three chars
     int num = std::min(multiRest->GetNum(), 999);
@@ -1619,8 +1620,8 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
 
 void View::DrawMRptPart(DeviceContext *dc, int x, wchar_t smuflCode, int num, bool line, Staff *staff, Measure *measure)
 {
-    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
-    int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
+    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
+    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
 
     int xSymbol = xCentered - m_doc->GetGlyphWidth(smuflCode, staff->m_drawingStaffSize, false) / 2;
     int y = staff->GetDrawingY();

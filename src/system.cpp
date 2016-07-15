@@ -29,17 +29,27 @@ System::System() : Object("system-"), DrawingListInterface()
     // We set parent to it because we want to access the parent doc from the aligners
     m_systemAligner.SetParent(this);
 
+    // owned pointers need to be set to NULL;
+    m_drawingScoreDef = NULL;
+
     Reset();
 }
 
 System::~System()
 {
+    // We need to delete own objects
+    Reset();
 }
 
 void System::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
+
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
 
     m_systemLeftMar = 0;
     m_systemRightMar = 0;
@@ -50,6 +60,7 @@ void System::Reset()
     m_drawingYRel = 0;
     m_drawingY = 0;
     m_drawingTotalWidth = 0;
+    m_drawingJustifiableWidth = 0;
     m_drawingLabelsWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
 }
@@ -106,9 +117,27 @@ void System::SetCurrentFloatingPositioner(int staffN, FloatingElement *element, 
     alignment->SetCurrentFloatingPositioner(element, x, y);
 }
 
+void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
+{
+    assert(!m_drawingScoreDef); // We should always call UnsetCurrentScoreDef before
+
+    m_drawingScoreDef = new ScoreDef();
+    *m_drawingScoreDef = *drawingScoreDef;
+}
+
 //----------------------------------------------------------------------------
 // System functor methods
 //----------------------------------------------------------------------------
+
+int System::UnsetCurrentScoreDef(ArrayPtrVoid *params)
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+};
 
 int System::ResetHorizontalAlignment(ArrayPtrVoid *params)
 {
@@ -181,10 +210,13 @@ int System::IntegrateBoundingBoxYShift(ArrayPtrVoid *params)
 int System::AlignMeasures(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift
+    // param 1: the cumulated justifiable width
     int *shift = static_cast<int *>((*params).at(0));
+    int *justifiableWidth = static_cast<int *>((*params).at(1));
 
     m_drawingXRel = this->m_systemLeftMar + this->GetDrawingLabelsWidth();
     (*shift) = 0;
+    (*justifiableWidth) = 0;
 
     return FUNCTOR_CONTINUE;
 }
@@ -192,9 +224,12 @@ int System::AlignMeasures(ArrayPtrVoid *params)
 int System::AlignMeasuresEnd(ArrayPtrVoid *params)
 {
     // param 0: the cumulated shift
+    // param 1: the cumulated justifiable width
     int *shift = static_cast<int *>((*params).at(0));
+    int *justifiableWidth = static_cast<int *>((*params).at(1));
 
     m_drawingTotalWidth = (*shift) + this->GetDrawingLabelsWidth();
+    m_drawingJustifiableWidth = (*justifiableWidth);
 
     return FUNCTOR_CONTINUE;
 }
@@ -217,33 +252,36 @@ int System::AlignSystems(ArrayPtrVoid *params)
 
 int System::JustifyX(ArrayPtrVoid *params)
 {
-    // param 0: the justification ratio
-    // param 1: the justification ratio for the measure (depends on the margin) (unused)
-    // param 2: the non-justifiable margin (unused)
-    // param 3: the system full width (without system margins)
-    // param 4: the functor to be redirected to the MeasureAligner
-    double *ratio = static_cast<double *>((*params).at(0));
-    int *systemFullWidth = static_cast<int *>((*params).at(3));
+    // param 0: the measureXRel of the next measure
+    // param 1: the justification ratio
+    // param 2: the xRel position of the left barline (unused)
+    // param 3: the xRel position of the right barline (unused)
+    // param 4: the system full width (without system margins)
+    // param 5: the functor to be redirected to the MeasureAligner (unused)
+    int *measureXRel = static_cast<int *>((*params).at(0));
+    double *justifiableRatio = static_cast<double *>((*params).at(1));
+    int *systemFullWidth = static_cast<int *>((*params).at(4));
 
     assert(m_parent);
     assert(m_parent->m_parent);
 
-    (*ratio)
-        = (double)((*systemFullWidth) - this->GetDrawingLabelsWidth() - this->m_systemLeftMar - this->m_systemRightMar)
-        / ((double)m_drawingTotalWidth - this->GetDrawingLabelsWidth());
+    (*measureXRel) = 0;
+    int margins = this->m_systemLeftMar + this->m_systemRightMar;
+    int nonJustifiableWidth
+        = margins + (m_drawingTotalWidth - m_drawingJustifiableWidth); // m_drawingTotalWidth includes the labels
+    (*justifiableRatio) = (double)((*systemFullWidth) - nonJustifiableWidth) / ((double)m_drawingJustifiableWidth);
 
-    // LogDebug("System::JustifyX: *ratio=%lf", (*ratio));
-
-    if ((*ratio) < 0.8) {
+    if ((*justifiableRatio) < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
         LogWarning("Justification stop because of a ratio smaller than 0.8");
-        // return FUNCTOR_SIBLINGS;
     }
 
-    // Check if we are on the last page and on the last system - do no justify it if ratio > 1.0
+    // Check if we are on the last page and on the last system - do no justify it if ratio > 1.25
+    // Eventually we should make this a parameter
     if ((m_parent->GetIdx() == m_parent->m_parent->GetChildCount() - 1)
         && (this->GetIdx() == m_parent->GetChildCount() - 1)) {
-        if ((*ratio) > 1.0) {
+        // HARDCODED
+        if ((*justifiableRatio) > 1.25) {
             return FUNCTOR_STOP;
         }
     }

@@ -23,7 +23,7 @@ class Measure;
 
 /**
  * This class is an interface for elements having a single time point, such as tempo, reh, etc..
- * It is not an abstract class but should not be instanciated directly.
+ * It is not an abstract class but should not be instantiated directly.
  */
 class TimePointInterface : public Interface, public AttStaffident, public AttStartid, public AttTimestampMusical {
 public:
@@ -122,7 +122,7 @@ private:
 
 /**
  * This class is an interface for spanning elements, such as slur, hairpin, etc..
- * It is not an abstract class but should not be instanciated directly.
+ * It is not an abstract class but should not be instantiated directly.
  */
 class TimeSpanningInterface : public TimePointInterface, public AttStartendid, public AttTimestamp2Musical {
 public:

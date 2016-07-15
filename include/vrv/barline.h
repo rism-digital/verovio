@@ -42,7 +42,7 @@ public:
      * Use to set the alignment for the Measure BarLine members.
      * This is as special case where we need to add to the measure aligner.
      */
-    void SetAlignment(Alignment *alignment) { m_alignment = alignment; };
+    void SetAlignment(Alignment *alignment);
 
     /*
      * Return true if the barLine type requires repetition dots to be drawn.
@@ -74,8 +74,18 @@ public:
     virtual ~BarLineAttr();
     virtual Object *Clone() const { return new BarLineAttr(*this); };
     virtual std::string GetClassName() const { return "BarLineAttr"; };
-    virtual ClassId Is() const { return BARLINE_ATTR; };
+    virtual ClassId Is() const { return (m_isLeft ? BARLINE_ATTR_LEFT : BARLINE_ATTR_RIGHT); };
     ///@}
+
+    void SetLeft() { m_isLeft = true; }
+
+private:
+    //
+public:
+    //
+private:
+    /** A flag for left barlines (right if false) */
+    bool m_isLeft;
 };
 
 } // namespace vrv

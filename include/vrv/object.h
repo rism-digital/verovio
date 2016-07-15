@@ -363,7 +363,7 @@ public:
      * Return the first parent of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
-    Object *GetFirstParent(const ClassId classId, int maxSteps = -1);
+    Object *GetFirstParent(const ClassId classId, int maxSteps = -1) const;
 
     /**
      * Return the last parent that is NOT of the specified type.
@@ -405,6 +405,8 @@ public:
      */
     virtual void Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor = NULL,
         ArrayOfAttComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+
+    void Resert(Object *object);
 
     //----------//
     // Functors //
@@ -480,6 +482,7 @@ public:
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * param 0: the cumulated shift
+     * param 1: the cumulated justifiable width
      */
     virtual int AlignMeasures(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
@@ -603,6 +606,11 @@ public:
     virtual int SetCurrentScoreDef(ArrayPtrVoid *params);
 
     /**
+     * Unset the initial scoreDef of each system and measure
+     */
+    virtual int UnsetCurrentScoreDef(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
      * Set the initial scoreDef of each page.
      * This is necessary for integrating changes that occur within a page.
      * param 0: bool clef flag.
@@ -610,6 +618,7 @@ public:
      * param 2: bool the mensur flag.
      * param 3: bool the metersig flag.
      * param 4: bool the keysig cancellation flag;
+     * param 5: bool the flag for indicating if apply to all or not
      */
     virtual int SetStaffDefRedrawFlags(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 

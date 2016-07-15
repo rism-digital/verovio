@@ -16,6 +16,7 @@
 
 #include "doc.h"
 #include "hairpin.h"
+#include "keysig.h"
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
@@ -55,6 +56,7 @@ void Staff::Reset()
     m_drawingY = 0;
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
+    m_drawingStaffDef = NULL;
 }
 
 void Staff::AddLayer(Layer *layer)
@@ -104,6 +106,13 @@ int Staff::GetYRel() const
 //----------------------------------------------------------------------------
 // Staff functor methods
 //----------------------------------------------------------------------------
+
+int Staff::UnsetCurrentScoreDef(ArrayPtrVoid *params)
+{
+    m_drawingStaffDef = NULL;
+
+    return FUNCTOR_CONTINUE;
+};
 
 int Staff::ResetVerticalAlignment(ArrayPtrVoid *params)
 {

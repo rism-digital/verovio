@@ -17,6 +17,7 @@
 #include "attcomparison.h"
 #include "beam.h"
 #include "chord.h"
+#include "clef.h"
 #include "doc.h"
 #include "layer.h"
 #include "measure.h"

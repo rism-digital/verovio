@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "chord.h"
+#include "clef.h"
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
@@ -269,6 +270,14 @@ ClassId Object::Is() const
     assert(false);
     return OBJECT;
 };
+
+void Object::Resert(Object *object)
+{
+    if (object) {
+        delete object;
+        object = NULL;
+    }
+}
 
 void Object::Reset()
 {
@@ -539,7 +548,7 @@ void Object::FillFlatList(ListOfObjects *flatList)
     this->Process(&addToFlatList, &params);
 }
 
-Object *Object::GetFirstParent(const ClassId classId, int maxSteps)
+Object *Object::GetFirstParent(const ClassId classId, int maxSteps) const
 {
     if ((maxSteps == 0) || !m_parent) {
         return NULL;
@@ -906,12 +915,14 @@ int Object::FindAllByAttComparison(ArrayPtrVoid *params)
 
 int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
 {
-
     // param 0: the current scoreDef
-    ScoreDef *currentScoreDef = static_cast<ScoreDef *>((*params).at(0));
+    // param 1: the current staffDef
+    ScoreDef **currentScoreDef = static_cast<ScoreDef **>((*params).at(0));
     StaffDef **currentStaffDef = static_cast<StaffDef **>((*params).at(1));
+    ScoreDef *upcomingScoreDef = static_cast<ScoreDef *>((*params).at(2));
 
-    assert(currentScoreDef);
+    // assert(*currentScoreDef);
+    assert(upcomingScoreDef);
 
     // starting a new page
     if (this->Is() == PAGE) {
@@ -920,20 +931,39 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         Page *page = dynamic_cast<Page *>(this);
         assert(page);
         if (page->m_parent->GetChildIndex(page) == 0) {
-            currentScoreDef->SetRedrawFlags(true, true, true, true, false);
-            currentScoreDef->SetDrawLabels(true);
+            upcomingScoreDef->SetRedrawFlags(true, true, true, true, false, false);
+            upcomingScoreDef->SetDrawLabels(true);
         }
         else {
-            currentScoreDef->SetRedrawFlags(true, true, false, false, false);
-            currentScoreDef->SetDrawLabels(false);
+            upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
+            upcomingScoreDef->SetDrawLabels(false);
         }
-        page->m_drawingScoreDef = *currentScoreDef;
+        page->m_drawingScoreDef = *upcomingScoreDef;
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new system
     if (this->Is() == SYSTEM) {
-        currentScoreDef->SetRedrawFlags(true, true, false, false, false);
+        // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
+        upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
+        System *system = dynamic_cast<System *>(this);
+        assert(system);
+        // For now we don't use it - eventually we want to set it. The problem will be to take into account succeeding
+        // scoreDefs appearing before the first measure of the system
+        // system->SetDrawingScoreDef(*currentScoreDef);
+        return FUNCTOR_CONTINUE;
+    }
+
+    // starting a new system
+    if (this->Is() == MEASURE) {
+        if (upcomingScoreDef->m_setAsDrawing) {
+            Measure *measure = dynamic_cast<Measure *>(this);
+            assert(measure);
+            measure->SetDrawingScoreDef(upcomingScoreDef);
+            (*currentScoreDef) = measure->GetDrawingScoreDef();
+            upcomingScoreDef->SetRedrawFlags(false, false, false, false, false, true);
+            upcomingScoreDef->m_setAsDrawing = false;
+        }
         return FUNCTOR_CONTINUE;
     }
 
@@ -941,8 +971,9 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     if (this->Is() == SCOREDEF) {
         ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(this);
         assert(scoreDef);
-        // Replace the current scoreDef with the new one, including its content (staffDef)
-        currentScoreDef->ReplaceDrawingValues(scoreDef);
+        // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
+        // m_setAsDrawing to true so it will then be taken into account at the next measure
+        upcomingScoreDef->ReplaceDrawingValues(scoreDef);
         return FUNCTOR_CONTINUE;
     }
 
@@ -950,14 +981,16 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     if (this->Is() == STAFFDEF) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(this);
         assert(staffDef);
-        currentScoreDef->ReplaceDrawingValues(staffDef);
+        upcomingScoreDef->ReplaceDrawingValues(staffDef);
     }
 
     // starting a new staff
     if (this->Is() == STAFF) {
         Staff *staff = dynamic_cast<Staff *>(this);
         assert(staff);
-        (*currentStaffDef) = currentScoreDef->GetStaffDef(staff->GetN());
+        (*currentStaffDef) = (*currentScoreDef)->GetStaffDef(staff->GetN());
+        assert(staff->m_drawingStaffDef == NULL);
+        staff->m_drawingStaffDef = (*currentStaffDef);
         return FUNCTOR_CONTINUE;
     }
 
@@ -985,7 +1018,10 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         Clef *clef = dynamic_cast<Clef *>(this);
         assert(clef);
         assert(*currentStaffDef);
-        (*currentStaffDef)->SetCurrentClef(new Clef(*clef));
+        StaffDef *upcomingStaffDef = upcomingScoreDef->GetStaffDef((*currentStaffDef)->GetN());
+        assert(upcomingStaffDef);
+        upcomingStaffDef->SetCurrentClef(clef);
+        upcomingScoreDef->m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
 
@@ -994,7 +1030,10 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         KeySig *keysig = dynamic_cast<KeySig *>(this);
         assert(keysig);
         assert(*currentStaffDef);
-        (*currentStaffDef)->SetCurrentKeySig(new KeySig(*keysig));
+        StaffDef *upcomingStaffDef = upcomingScoreDef->GetStaffDef((*currentStaffDef)->GetN());
+        assert(upcomingStaffDef);
+        upcomingStaffDef->SetCurrentKeySig(keysig);
+        upcomingScoreDef->m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1066,41 +1105,17 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     // param 0: the minimum position (i.e., the width of the previous element)
     // param 1: the maximum width in the current measure
     // param 2: the Doc
+    // param 3: the functor to be redirected to Aligner (unused)
+    // param 4: the functor to be redirected to Aligner at the end (unused)
     int *min_pos = static_cast<int *>((*params).at(0));
-    int *measure_width = static_cast<int *>((*params).at(1));
+    // int *measure_width = static_cast<int *>((*params).at(1));
     Doc *doc = static_cast<Doc *>((*params).at(2));
-
-    // starting a new measure
-    if (this->Is() == MEASURE) {
-        Measure *current_measure = dynamic_cast<Measure *>(this);
-        assert(current_measure);
-        // we reset the measure width and the minimum position
-        (*measure_width) = 0;
-        (*min_pos) = 0;
-        if (current_measure->GetLeftBarLineType() != BARRENDITION_NONE) {
-            current_measure->GetLeftBarLine()->SetBoundingBoxXShift(params);
-        }
-        return FUNCTOR_CONTINUE;
-    }
 
     // starting new layer
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer *>(this);
         assert(current_layer);
         (*min_pos) = 0;
-        // set scoreDef attr
-        if (current_layer->GetDrawingClef()) {
-            current_layer->GetDrawingClef()->SetBoundingBoxXShift(params);
-        }
-        if (current_layer->GetDrawingKeySig()) {
-            current_layer->GetDrawingKeySig()->SetBoundingBoxXShift(params);
-        }
-        if (current_layer->GetDrawingMensur()) {
-            current_layer->GetDrawingMensur()->SetBoundingBoxXShift(params);
-        }
-        if (current_layer->GetDrawingMeterSig()) {
-            current_layer->GetDrawingMeterSig()->SetBoundingBoxXShift(params);
-        }
         return FUNCTOR_CONTINUE;
     }
 
@@ -1146,7 +1161,8 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
 
     // with a grace note, also take into account the full width of the group given by the GraceAligner
     if (current->GetAlignment()->HasGraceAligner()) {
-        negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth();
+        negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth()
+            + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }
 
     int currentX = current->GetAlignment()->GetXRel();
@@ -1188,18 +1204,6 @@ int Object::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
     int *min_pos = static_cast<int *>((*params).at(0));
     int *measure_width = static_cast<int *>((*params).at(1));
 
-    // ending a measure
-    if (this->Is() == MEASURE) {
-        Measure *current_measure = dynamic_cast<Measure *>(this);
-        assert(current_measure);
-        // use the measure width as minimum position of the barLine
-        (*min_pos) = (*measure_width);
-        if (current_measure->GetRightBarLineType() != BARRENDITION_NONE) {
-            current_measure->GetRightBarLine()->SetBoundingBoxXShift(params);
-        }
-        return FUNCTOR_CONTINUE;
-    }
-
     // ending a layer
     if (this->Is() == LAYER) {
         // mininimum position is the with the layer
@@ -1236,17 +1240,17 @@ int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
         Layer *currentLayer = dynamic_cast<Layer *>(this);
         assert(currentLayer);
         // set scoreDef attr
-        if (currentLayer->GetDrawingClef()) {
-            currentLayer->GetDrawingClef()->SetOverflowBBoxes(params);
+        if (currentLayer->GetStaffDefClef()) {
+            currentLayer->GetStaffDefClef()->SetOverflowBBoxes(params);
         }
-        if (currentLayer->GetDrawingKeySig()) {
-            currentLayer->GetDrawingKeySig()->SetOverflowBBoxes(params);
+        if (currentLayer->GetStaffDefKeySig()) {
+            currentLayer->GetStaffDefKeySig()->SetOverflowBBoxes(params);
         }
-        if (currentLayer->GetDrawingMensur()) {
-            currentLayer->GetDrawingMensur()->SetOverflowBBoxes(params);
+        if (currentLayer->GetStaffDefMensur()) {
+            currentLayer->GetStaffDefMensur()->SetOverflowBBoxes(params);
         }
-        if (currentLayer->GetDrawingMeterSig()) {
-            currentLayer->GetDrawingMeterSig()->SetOverflowBBoxes(params);
+        if (currentLayer->GetStaffDefMeterSig()) {
+            currentLayer->GetStaffDefMeterSig()->SetOverflowBBoxes(params);
         }
         return FUNCTOR_CONTINUE;
     }
