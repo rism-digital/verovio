@@ -196,6 +196,7 @@ bool Resources::InitTextFont()
             if (current.attribute("w")) width = atof(current.attribute("w").value());
             if (current.attribute("h")) height = atof(current.attribute("h").value());
             glyph.SetBoundingBox(x, y, width, height);
+            if (current.attribute("h-a-x")) glyph.SetHorizAdvX(atof(current.attribute("h-a-x").value()));
             m_textFont[code] = glyph;
         }
     }

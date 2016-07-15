@@ -19,6 +19,6 @@ The Verovio coding style is available [here](doc/guidelines.md).
 Example output
 --------------
 
-This page was generated with version 0.9.11
+This page was generated with version 0.9.12-dev-d8be655
 
-![Example page](/images/page-0.9.11.png)
+![Example page](/images/page-0.9.12-dev-d8be655.png)
