@@ -1524,11 +1524,7 @@ void HumdrumInput::processDirection(HTp token, int staffindex)
 
 /////////////////////////////
 //
-// HumdrumInput::processDynamics -- Eventually deal with dynamics which start
-//    on a null **kern line.  Currently this function will ignore dyanmics
-//    which occur or start on such lines.  The best thing would probably be to
-//    add null **kern lines to the layer data (but skip other types of nulls
-//    when there are notes or rests on the line otherwise).
+// HumdrumInput::processDynamics --
 //
 
 void HumdrumInput::processDynamics(HTp token, int staffindex)
@@ -1542,6 +1538,11 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
     int track = token->getTrack();
     int ttrack;
     int startfield = token->getFieldIndex() + 1;
+
+    bool forceAboveQ = false;
+    if (m_verses[staffindex]) {
+        forceAboveQ = true;
+    }
 
     // Handle "z" for sforzando (sf). Could also be rendered as (sfz), but deal
     // with that later, such as maybe make "zz" mean (sfz).
@@ -1569,6 +1570,9 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
             }
             else if (belowQ) {
                 dynam->SetPlace(STAFFREL_below);
+            }
+            else if (forceAboveQ) {
+                dynam->SetPlace(STAFFREL_above);
             }
         }
     }
@@ -1683,6 +1687,9 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
             else if (belowQ) {
                 dynam->SetPlace(STAFFREL_below);
             }
+            else if (forceAboveQ) {
+                dynam->SetPlace(STAFFREL_above);
+            }
         }
         if (hairpins.find("<") != string::npos) {
             HTp endtok = NULL;
@@ -1716,6 +1723,9 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
                 }
                 else if (belowQ) {
                     hairpin->SetPlace(STAFFREL_below);
+                }
+                else if (forceAboveQ) {
+                    hairpin->SetPlace(STAFFREL_above);
                 }
             }
         }
@@ -1751,6 +1761,9 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
                 }
                 else if (belowQ) {
                     hairpin->SetPlace(STAFFREL_below);
+                }
+                else if (forceAboveQ) {
+                    hairpin->SetPlace(STAFFREL_above);
                 }
             }
         }
