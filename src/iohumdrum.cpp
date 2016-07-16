@@ -213,15 +213,17 @@ namespace humaux {
 
     /////////////////////////////////////////////////////////////////////
 
-	StaffStateVariables::StaffStateVariables(void) { clear(); }
-	StaffStateVariables::~StaffStateVariables() { clear(); }
-	void StaffStateVariables::clear(void) {
-		verse = false;
-    	ottavanotestart = ottavanoteend = NULL;
-    	ottavameasure = NULL;
-		ties.clear();
-		meter_bottom = 4;
-	}
+    StaffStateVariables::StaffStateVariables(void) { clear(); }
+    StaffStateVariables::~StaffStateVariables() { clear(); }
+    void StaffStateVariables::clear(void)
+    {
+        verse = false;
+        suppress_beam_tuplet = false;
+        ottavanotestart = ottavanoteend = NULL;
+        ottavameasure = NULL;
+        ties.clear();
+        meter_bottom = 4;
+    }
 
 } // end namespace humaux
 
@@ -352,7 +354,7 @@ bool HumdrumInput::convertHumdrum(void)
     reverse(kernstarts.begin(), kernstarts.end());
     calculateReverseKernIndex();
 
-	m_staffstates.resize(kernstarts.size());
+    m_staffstates.resize(kernstarts.size());
 
     prepareVerses();
     prepareStaffGroup();
@@ -665,8 +667,8 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLi
 void HumdrumInput::prepareVerses(void)
 {
     int i, j;
-	vector<humaux::StaffStateVariables>& ss = m_staffstates;
-	// ss[*].verse should already be set to false.
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    // ss[*].verse should already be set to false.
 
     vector<HTp> &kern = m_kernstarts;
 
@@ -785,7 +787,7 @@ void HumdrumInput::prepareStaffGroup(void)
 
 void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
 {
-	vector<humaux::StaffStateVariables>& ss = m_staffstates;
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     string label;
     string abbreviation;
@@ -1244,21 +1246,24 @@ void HumdrumInput::printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, cons
 void HumdrumInput::handleGroupStarts(
     const humaux::HumdrumBeamAndTuplet &tg, vector<string> &elements, vector<void *> &pointers, HTp token)
 {
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    int staffindex = m_currentstaff - 1;
+
     if (tg.beamstart && tg.tupletstart) {
         if (tg.priority == 'T') {
-            insertTuplet(elements, pointers, tg, token);
+            insertTuplet(elements, pointers, tg, token, ss[staffindex].suppress_beam_tuplet);
             insertBeam(elements, pointers, tg);
         }
         else {
             insertBeam(elements, pointers, tg);
-            insertTuplet(elements, pointers, tg, token);
+            insertTuplet(elements, pointers, tg, token, ss[staffindex].suppress_beam_tuplet);
         }
     }
     else if (tg.beamstart) {
         insertBeam(elements, pointers, tg);
     }
     else if (tg.tupletstart) {
-        insertTuplet(elements, pointers, tg, token);
+        insertTuplet(elements, pointers, tg, token, false);
     }
 
     if (tg.gbeamstart) {
@@ -1393,6 +1398,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         if (layerdata[i]->isInterpretation()) {
             handleOttavaMark(layerdata[i], note);
             handlePedalMark(layerdata[i], note);
+            handleStaffStateVariables(layerdata[i]);
             if (layerdata[i]->getDurationFromStart() != 0) {
                 if (layerdata[i]->isClef()) {
                     insertClefElement(elements, pointers, layerdata[i]);
@@ -1534,7 +1540,7 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
     string tok;
     string dynamic;
     HumdrumLine *line = token->getLine();
-	vector<humaux::StaffStateVariables>& ss = m_staffstates;
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
     if (line == NULL) {
         return;
     }
@@ -1884,7 +1890,7 @@ HTp HumdrumInput::getHairpinEnd(HTp token, const string &endchar)
 
 HumNum HumdrumInput::getMeasureTstamp(HTp token, int staffindex)
 {
-	vector<humaux::StaffStateVariables>& ss = m_staffstates;
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
     HumNum qbeat = token->getDurationFromBarline();
     HumNum mfactor = ss[staffindex].meter_bottom / 4;
     HumNum mbeat = qbeat * mfactor + 1;
@@ -2088,9 +2094,10 @@ void HumdrumInput::analyzeLayerBeams(vector<int> &beamnum, vector<int> &gbeamnum
 // HumdrumInput::insertTuplet --
 //
 
-void HumdrumInput::insertTuplet(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg, HTp token)
+void HumdrumInput::insertTuplet(vector<string> &elements, vector<void *> &pointers,
+    const humaux::HumdrumBeamAndTuplet &tg, HTp token, bool suppress)
 {
-	vector<humaux::StaffStateVariables>& ss = m_staffstates;
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     Tuplet *tuplet = new Tuplet;
     appendElement(elements, pointers, tuplet);
@@ -2105,11 +2112,25 @@ void HumdrumInput::insertTuplet(vector<string> &elements, vector<void *> &pointe
 
     tuplet->SetNum(tg.num * tg.numscale);
     tuplet->SetNumbase(tg.numbase * tg.numscale);
-    if (tg.bracket) {
-        tuplet->SetBracketVisible(BOOLEAN_true);
+    if (suppress) {
+        // This shouldn't be needed, but just in case.
+        // The visibility of the bracket is determined
+        // earlier when there is a beam to attach
+        // the tuplet to.
+        tuplet->SetBracketVisible(BOOLEAN_false);
     }
     else {
-        tuplet->SetBracketVisible(BOOLEAN_false);
+        if (tg.bracket) {
+            tuplet->SetBracketVisible(BOOLEAN_true);
+        }
+        else {
+            tuplet->SetBracketVisible(BOOLEAN_false);
+        }
+    }
+    if (suppress) {
+        // Number is visible by default, so only hide
+        // it if necessary.
+        tuplet->SetNumVisible(BOOLEAN_false);
     }
     HumNum base = tg.numbase;
     if (!base.isPowerOfTwo()) {
@@ -2680,6 +2701,29 @@ HumNum HumdrumInput::removeFactorsOfTwo(HumNum value, int &tcount, int &bcount)
 
 //////////////////////////////
 //
+// HumdrumInput::handleStaffStateVariables -- Deal with simple boolean switches
+//     that are turned on/off by interpretation tokes.
+//
+// Controls that this function deals with:
+// *Xbeamtup = suppress beam tuplet numbers
+// *beamtup  = display beam tuplet numbers
+//
+
+void HumdrumInput::handleStaffStateVariables(HTp token)
+{
+    int staffindex = m_currentstaff - 1;
+    string value = *token;
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    if (value == "*Xbeamtup") {
+        ss[staffindex].suppress_beam_tuplet = true;
+    }
+    else if (value == "*beamtup") {
+        ss[staffindex].suppress_beam_tuplet = false;
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::handleOttavaMark --  *8va turns on and *X8va tuns off.
 //    Generalized latter to 15ma, 8va basso, 15ma basso.  IF the *X8va is
 //    (incorrectly) placed at the start of the next measure before a note,
@@ -2689,7 +2733,7 @@ HumNum HumdrumInput::removeFactorsOfTwo(HumNum value, int &tcount, int &bcount)
 
 void HumdrumInput::handleOttavaMark(HTp token, Note *note)
 {
-	vector<humaux::StaffStateVariables>& ss = m_staffstates;
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
     int staffindex = m_currentstaff - 1;
 
     if (*token == "*8va") {
@@ -2973,7 +3017,7 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
 
 void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtoken)
 {
-	vector<humaux::StaffStateVariables>& ss = m_staffstates;
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     string tstring;
     int stindex = 0;
@@ -3101,7 +3145,7 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
 void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
 {
     int staff = m_rkern[token->getTrack()];
-	vector<humaux::StaffStateVariables>& ss = m_staffstates;
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
     if (!ss[staff].verse) {
         return;
     }
@@ -3258,7 +3302,7 @@ void HumdrumInput::printNoteArticulations(Note *note, HTp token, const string &t
 
 void HumdrumInput::processTieStart(Note *note, HTp token, const string &tstring)
 {
-	vector<humaux::StaffStateVariables>& ss = m_staffstates;
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
     HumNum timestamp = token->getDurationFromStart();
     HumNum endtime = timestamp + token->getDuration();
     int track = token->getTrack();
@@ -3278,7 +3322,7 @@ void HumdrumInput::processTieStart(Note *note, HTp token, const string &tstring)
 
 void HumdrumInput::processTieEnd(Note *note, HTp token, const string &tstring)
 {
-	vector<humaux::StaffStateVariables>& ss = m_staffstates;
+    vector<humaux::StaffStateVariables> &ss = m_staffstates;
     HumNum timestamp = token->getDurationFromStart();
     int track = token->getTrack();
     int staffnum = m_rkern[track];

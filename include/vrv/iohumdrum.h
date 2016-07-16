@@ -110,42 +110,42 @@ namespace humaux {
         }
     };
 
+    // StaffStateVariables is a data structure used in the HumdrumInput
+    // class to store state variables for processing staves.  This structure
+    // is used to store all variables which are vectors
+    class StaffStateVariables {
+    public:
+        StaffStateVariables(void);
+        ~StaffStateVariables(void);
+        void clear(void);
 
-	// StaffStateVariables is a data structure used in the HumdrumInput
-	// class to store state variables for processing staves.  This structure
-	// is used to store all variables which are vectors
-	class StaffStateVariables {
-	public:
-		StaffStateVariables(void);
-		~StaffStateVariables(void);
-		void clear(void);
+        // verse == keeps track of whether or not staff contains associated
+        // **text spines which will be converted into lyrics.
+        bool verse;
 
-    	// verse == keeps track of whether or not staff contains associated
-    	// **text spines which will be converted into lyrics.
-    	bool verse;
+        // suppress_beam_tuplet == keeps track of whether or not beams should
+        // display beam tuplet numbers.
+        bool suppress_beam_tuplet;
 
-    	// ottavanote == keep track of ottava marks: stores the starting note of
-    	// an ottava line which will be turned off later.  ottavameasure == the
-    	// starting measure of the ottava mark.
-    	Note *ottavanotestart;
-    	Note *ottavanoteend;
-    	Measure *ottavameasure;
+        // ottavanote == keep track of ottava marks: stores the starting note of
+        // an ottava line which will be turned off later.  ottavameasure == the
+        // starting measure of the ottava mark.
+        Note *ottavanotestart;
+        Note *ottavanoteend;
+        Measure *ottavameasure;
 
-    	// meter_bottom == Used to keep track of bottom value of time signature.
-    	// This is needed to calculate tstamps.
-    	hum::HumNum meter_bottom;
+        // meter_bottom == Used to keep track of bottom value of time signature.
+        // This is needed to calculate tstamps.
+        hum::HumNum meter_bottom;
 
-    	// ties == keep track of ties for each staff/layer/pitch
-    	// and allow for cross-layer ties (no cross staff ties, but that
-    	// could be easy to implement.
-    	// dimensions:
-    	// 1: staff
-    	// 2: all open ties for the staff
-    	std::list<humaux::HumdrumTie> ties;
-
-	};
-
-
+        // ties == keep track of ties for each staff/layer/pitch
+        // and allow for cross-layer ties (no cross staff ties, but that
+        // could be easy to implement.
+        // dimensions:
+        // 1: staff
+        // 2: all open ties for the staff
+        std::list<humaux::HumdrumTie> ties;
+    };
 }
 
 //----------------------------------------------------------------------------
@@ -208,14 +208,15 @@ protected:
     void handlePedalMark(hum::HTp token, Note *note);
     void prepareBeamAndTupletGroups(const vector<hum::HTp> &layerdata, vector<humaux::HumdrumBeamAndTuplet> &hg);
     void printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, const vector<hum::HTp> &layerdata);
-    void insertTuplet(
-        vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg, hum::HTp token);
+    void insertTuplet(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg,
+        hum::HTp token, bool suppress);
     void insertBeam(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
     void insertGBeam(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
     void analyzeLayerBeams(vector<int> &beamnum, vector<int> &gbeamnum, const vector<hum::HTp> &layerdata);
     void handleGroupStarts(
         const humaux::HumdrumBeamAndTuplet &tg, vector<string> &elements, vector<void *> &pointers, hum::HTp token);
     void handleGroupEnds(const humaux::HumdrumBeamAndTuplet &tg, vector<string> &elements, vector<void *> &pointers);
+    void handleStaffStateVariables(hum::HTp token);
     void removeTuplet(vector<string> &elements, vector<void *> &pointers);
     void removeGBeam(vector<string> &elements, vector<void *> &pointers);
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
@@ -319,9 +320,8 @@ private:
     // m_oclef == temporary variable for printing "original-clef" <app>
     vector<std::pair<int, hum::HTp> > m_oclef;
 
-	// m_staffstates == state variables for each staff.
-	vector<humaux::StaffStateVariables> m_staffstates;
-
+    // m_staffstates == state variables for each staff.
+    vector<humaux::StaffStateVariables> m_staffstates;
 };
 
 } // namespace vrv
