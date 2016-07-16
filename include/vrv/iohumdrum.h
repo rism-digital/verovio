@@ -109,6 +109,43 @@ namespace humaux {
             priority = ' ';
         }
     };
+
+
+	// StaffStateVariables is a data structure used in the HumdrumInput
+	// class to store state variables for processing staves.  This structure
+	// is used to store all variables which are vectors
+	class StaffStateVariables {
+	public:
+		StaffStateVariables(void);
+		~StaffStateVariables(void);
+		void clear(void);
+
+    	// verse == keeps track of whether or not staff contains associated
+    	// **text spines which will be converted into lyrics.
+    	bool verse;
+
+    	// ottavanote == keep track of ottava marks: stores the starting note of
+    	// an ottava line which will be turned off later.  ottavameasure == the
+    	// starting measure of the ottava mark.
+    	Note *ottavanotestart;
+    	Note *ottavanoteend;
+    	Measure *ottavameasure;
+
+    	// meter_bottom == Used to keep track of bottom value of time signature.
+    	// This is needed to calculate tstamps.
+    	hum::HumNum meter_bottom;
+
+    	// ties == keep track of ties for each staff/layer/pitch
+    	// and allow for cross-layer ties (no cross staff ties, but that
+    	// could be easy to implement.
+    	// dimensions:
+    	// 1: staff
+    	// 2: all open ties for the staff
+    	std::list<humaux::HumdrumTie> ties;
+
+	};
+
+
 }
 
 //----------------------------------------------------------------------------
@@ -256,10 +293,6 @@ private:
     vrv::Layer *m_layer; // current layer, or NULL
     int m_currentlayer;
 
-    // m_meter_bottoms == Used to keep track of bottom value of time signature.
-    // This is needed to calculate tstamps.
-    vector<hum::HumNum> m_meter_bottoms;
-
     // m_layertokens == Humdrum **kern tokens for each staff/layer to be
     // converted.
     vector<vector<vector<hum::HTp> > > m_layertokens;
@@ -277,32 +310,6 @@ private:
     // m_timesigdurs == Prevailing time signature duration of measure
     vector<hum::HumNum> m_timesigdurs;
 
-    // m_tiestates == keep track of ties for each staff/layer/pitch
-    // and allow for cross-layer ties (no cross staff ties, but that
-    // could be easy to implement.
-    // dimensions:
-    // 1: staff
-    // 2: all open ties for the staff
-    vector<std::list<humaux::HumdrumTie> > m_ties;
-
-    // m_verses == keeps track of whether or not each staff contains associated
-    // **text spines which will be converted into lyrics.
-    vector<bool> m_verses;
-
-    // m_ottavanote == keep track of ottava marks: stores the starting note of
-    // an ottava line which will be turned off later.  m_ottavameasure == the
-    // starting measure of the ottava mark.
-    vector<Note *> m_ottavanotestart;
-    vector<Note *> m_ottavanoteend;
-    vector<Measure *> m_ottavameasure;
-
-    // m_pedal == keep track of pedal marks: stores the starting note of
-    // a pedalling which will be turned off later.  m_pedalmeasure == the
-    // starting measure of the pedalling.
-    vector<Note *> m_pedalnotestart;
-    vector<Note *> m_pedalnoteend;
-    vector<Measure *> m_pedalmeasure;
-
     // m_tupletscaling == tuplet-scaling factor for the current note.
     hum::HumNum m_tupletscaling;
 
@@ -311,6 +318,10 @@ private:
 
     // m_oclef == temporary variable for printing "original-clef" <app>
     vector<std::pair<int, hum::HTp> > m_oclef;
+
+	// m_staffstates == state variables for each staff.
+	vector<humaux::StaffStateVariables> m_staffstates;
+
 };
 
 } // namespace vrv
