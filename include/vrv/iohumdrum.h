@@ -127,6 +127,10 @@ namespace humaux {
         // display beam tuplet numbers.
         bool suppress_beam_tuplet;
 
+        // suppress_bracket_tuplet == keeps track of whether or not tuplet
+        // brackets should be displayed.
+        bool suppress_bracket_tuplet;
+
         // ottavanote == keep track of ottava marks: stores the starting note of
         // an ottava line which will be turned off later.  ottavameasure == the
         // starting measure of the ottava mark.

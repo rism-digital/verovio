@@ -219,6 +219,7 @@ namespace humaux {
     {
         verse = false;
         suppress_beam_tuplet = false;
+        suppress_bracket_tuplet = false;
         ottavanotestart = ottavanoteend = NULL;
         ottavameasure = NULL;
         ties.clear();
@@ -1263,7 +1264,7 @@ void HumdrumInput::handleGroupStarts(
         insertBeam(elements, pointers, tg);
     }
     else if (tg.tupletstart) {
-        insertTuplet(elements, pointers, tg, token, false);
+        insertTuplet(elements, pointers, tg, token, ss[staffindex].suppress_bracket_tuplet);
     }
 
     if (tg.gbeamstart) {
@@ -1608,6 +1609,12 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
         // }
 
         string tok = *line->token(i);
+
+        // ggg
+        if (line->token(i)->getValueBool("auto", "DY", "processed")) {
+            return;
+        }
+        line->token(i)->setValue("auto", "DY", "processed", "true");
 
         string hairpins;
         string letters;
@@ -2705,8 +2712,12 @@ HumNum HumdrumInput::removeFactorsOfTwo(HumNum value, int &tcount, int &bcount)
 //     that are turned on/off by interpretation tokes.
 //
 // Controls that this function deals with:
+// *Xtuplet = suppress beam and bracket tuplet numbers
+// *tuplet = display beam and bracket tuplet numbers
 // *Xbeamtup = suppress beam tuplet numbers
 // *beamtup  = display beam tuplet numbers
+// *Xbrackettup = suppress tuplet brackets
+// *brackettup  = display tuplet brackets
 //
 
 void HumdrumInput::handleStaffStateVariables(HTp token)
@@ -2719,6 +2730,20 @@ void HumdrumInput::handleStaffStateVariables(HTp token)
     }
     else if (value == "*beamtup") {
         ss[staffindex].suppress_beam_tuplet = false;
+    }
+    if (value == "*Xbrackettup") {
+        ss[staffindex].suppress_bracket_tuplet = true;
+    }
+    else if (value == "*brackettup") {
+        ss[staffindex].suppress_bracket_tuplet = false;
+    }
+    if (value == "*Xtuplet") {
+        ss[staffindex].suppress_beam_tuplet = true;
+        ss[staffindex].suppress_bracket_tuplet = true;
+    }
+    if (value == "*tuplet") {
+        ss[staffindex].suppress_beam_tuplet = false;
+        ss[staffindex].suppress_bracket_tuplet = false;
     }
 }
 
@@ -2921,6 +2946,10 @@ bool HumdrumInput::hasFullMeasureRest(vector<HTp> &layerdata, HumNum timesigdur,
             return false;
         }
         if (!layerdata[i]->isRest()) {
+            return false;
+        }
+        if (layerdata[i]->find("yy") != string::npos) {
+            // treat invisible full measure rest as a space later.
             return false;
         }
     }
