@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 10 23:42:14 PDT 2016
+// Last Modified: Mon Jul 18 08:48:07 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3965,6 +3965,14 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 				}
 				int graceQ = infile[i].token(j)->isGrace();
 				int accid = Convert::kernToAccidentalCount(subtok);
+				int hiddenQ = 0;
+				if (subtok.find("yy") == string::npos) {
+					if ((subtok.find("ny") != string::npos) ||
+					    (subtok.find("#y") != string::npos) ||
+					    (subtok.find("-y") != string::npos)) {
+						hiddenQ = 1;
+					}
+				}
 
 				if ((subtok.find("_") != string::npos) ||
 						(subtok.find("]") != string::npos)) {
@@ -3981,18 +3989,19 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 				}
 
 				if (graceQ && (accid != gdstates[rindex][diatonic])) {
-
 					// accidental is different from the previous state so should be
 					// printed
-					infile[i].token(j)->setValue("auto", to_string(k),
-							"visualAccidental", "true");
-					if (gdstates[rindex][diatonic] < -900) {
-						// this is an obligatory cautionary accidental
-						// or at least half the time it is (figure that out later)
+					if (!hiddenQ) {
 						infile[i].token(j)->setValue("auto", to_string(k),
-								"obligatoryAccidental", "true");
-						infile[i].token(j)->setValue("auto", to_string(k),
-								"cautionaryAccidental", "true");
+								"visualAccidental", "true");
+						if (gdstates[rindex][diatonic] < -900) {
+							// this is an obligatory cautionary accidental
+							// or at least half the time it is (figure that out later)
+							infile[i].token(j)->setValue("auto", to_string(k),
+									"obligatoryAccidental", "true");
+							infile[i].token(j)->setValue("auto", to_string(k),
+									"cautionaryAccidental", "true");
+						}
 					}
 					gdstates[rindex][diatonic] = accid;
 					// regular notes are not affected by grace notes accidental
@@ -4001,23 +4010,25 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					dstates[rindex][diatonic] = -1000 + accid;
 
 				} else if (!graceQ && (accid != dstates[rindex][diatonic])) {
-
 					// accidental is different from the previous state so should be
-					// printed
-					infile[i].token(j)->setValue("auto", to_string(k),
-							"visualAccidental", "true");
-					if (dstates[rindex][diatonic] < -900) {
-						// this is an obligatory cautionary accidental
-						// or at least half the time it is (figure that out later)
+					// printed, but only print if not supposed to be hidden.
+					if (!hiddenQ) {
 						infile[i].token(j)->setValue("auto", to_string(k),
-								"obligatoryAccidental", "true");
-						infile[i].token(j)->setValue("auto", to_string(k),
-								"cautionaryAccidental", "true");
+								"visualAccidental", "true");
+						if (dstates[rindex][diatonic] < -900) {
+							// this is an obligatory cautionary accidental
+							// or at least half the time it is (figure that out later)
+							infile[i].token(j)->setValue("auto", to_string(k),
+									"obligatoryAccidental", "true");
+							infile[i].token(j)->setValue("auto", to_string(k),
+									"cautionaryAccidental", "true");
+						}
 					}
 					dstates[rindex][diatonic] = accid;
 					gdstates[rindex][diatonic] = accid;
 
-				} else if ((accid == 0) && (subtok.find("n") != string::npos)) {
+				} else if ((accid == 0) && (subtok.find("n") != string::npos) &&
+							!hiddenQ) {
 					infile[i].token(j)->setValue("auto", to_string(k),
 							"cautionaryAccidental", "true");
 					infile[i].token(j)->setValue("auto", to_string(k),
