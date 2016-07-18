@@ -186,6 +186,7 @@ protected:
     void setClef(StaffDef *part, const string &clef);
     void setKeySig(StaffDef *part, const string &keysig);
     void setTimeSig(StaffDef *part, const string &timesig);
+    void setMeterSymbol(StaffDef *part, const string &metersig);
     void fillPartInfo(hum::HTp partstart, int partnumber);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex(void);

@@ -796,7 +796,7 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
     string keysig;
     string key;
     string timesig;
-    // string metersig;
+    string metersig;
     int top = 0;
     int bot = 0;
     pair<int, HTp> oclef;
@@ -817,6 +817,12 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
         }
         else if (part->compare(0, 3, "*I\"") == 0) {
             label = part->substr(3);
+        }
+        else if (part->compare(0, 5, "*met(") == 0) {
+            auto ploc = part->rfind(")");
+            if (ploc != string::npos) {
+                metersig = part->substr(5, ploc - 5);
+            }
         }
         else if (sscanf(part->c_str(), "*M%d/%d", &top, &bot) == 2) {
             timesig = *part;
@@ -848,7 +854,33 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
         setTimeSig(m_staffdef.back(), timesig);
     }
 
-    // m_staffdef.back()->SetMeterSym(METERSIGN_common);
+    if (metersig.size() > 0) {
+        setMeterSymbol(m_staffdef.back(), metersig);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setMeterSymbol -- common time or cut time.
+//    (no other mensurations for now).
+//
+
+void HumdrumInput::setMeterSymbol(StaffDef *part, const string &metersig)
+{
+    if (metersig == "C") {
+        // This is used more strictly for C mensuration.
+        part->SetMeterSym(METERSIGN_common);
+    }
+    else if (metersig == "c") {
+        part->SetMeterSym(METERSIGN_common);
+    }
+    else if (metersig == "c|") {
+        part->SetMeterSym(METERSIGN_cut);
+    }
+    else if (metersig == "C|") {
+        // This is used more strictly for Cut-C mensuration.
+        part->SetMeterSym(METERSIGN_cut);
+    }
 }
 
 //////////////////////////////
