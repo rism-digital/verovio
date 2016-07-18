@@ -3192,8 +3192,17 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
         processTieEnd(note, token, tstring);
     }
 
-    if (tstring.find("j") != string::npos) {
-        setStaff(note, m_currentstaff + 1);
+    if (tstring.find("jj") != string::npos) {
+        int newstaff = m_currentstaff - 1;
+        if ((newstaff > 0) && (newstaff <= m_kernstarts.size())) {
+            setStaff(note, newstaff);
+        }
+    }
+    else if (tstring.find("j") != string::npos) {
+        int newstaff = m_currentstaff + 1;
+        if ((newstaff > 0) && (newstaff <= m_kernstarts.size())) {
+            setStaff(note, newstaff);
+        }
     }
 
     convertVerses(note, token, subtoken);
