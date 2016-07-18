@@ -24,6 +24,7 @@
 #include "dot.h"
 #include "dynam.h"
 #include "editorial.h"
+#include "ending.h"
 #include "hairpin.h"
 #include "keysig.h"
 #include "layer.h"
@@ -2971,6 +2972,22 @@ bool MeiInput::ReadScoreBasedMei(pugi::xml_node element)
     }
     else if ((std::string(element.name()) == "supplied")) {
         success = ReadMeiSupplied(m_system, element, EDITORIAL_SYSTEM);
+    }
+    // endings
+    else if (std::string(element.name()) == "ending") {
+        // We will need to move this into a ReadMeiSystemChildren (?) when we want to support app around or within
+        // endings
+        pugi::xml_node current;
+        EndingBoundary *endingStart = new EndingBoundary();
+        SetMeiUuid(element, endingStart);
+        endingStart->ReadCommon(element);
+        m_system->AddEnding(endingStart);
+        for (current = element.first_child(); current; current = current.next_sibling()) {
+            LogDebug("Reading %s", current.name());
+            success = ReadScoreBasedMei(current);
+        }
+        EndingBoundary *endingEnd = new EndingBoundary(endingStart);
+        m_system->AddEnding(endingEnd);
     }
     // content
     else if (std::string(element.name()) == "measure") {

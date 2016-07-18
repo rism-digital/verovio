@@ -27,6 +27,7 @@ FILES="../src/accid.cpp \
              ../src/durationinterface.cpp \
              ../src/dynam.cpp \
              ../src/editorial.cpp \
+             ../src/ending.cpp \
              ../src/floatingelement.cpp \
              ../src/glyph.cpp \
              ../src/hairpin.cpp \

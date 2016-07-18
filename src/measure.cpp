@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "ending.h"
 #include "floatingelement.h"
 #include "page.h"
 #include "staff.h"
@@ -81,6 +82,8 @@ void Measure::Reset()
     if (!m_measuredMusic) {
         m_xAbs = 0;
     }
+
+    m_drawingEnding = NULL;
 }
 
 void Measure::AddFloatingElement(FloatingElement *element)
@@ -399,6 +402,7 @@ int Measure::ResetDrawing(ArrayPtrVoid *params)
     this->m_leftBarLine.Reset();
     this->m_rightBarLine.Reset();
     this->m_timestampAligner.Reset();
+    m_drawingEnding = NULL;
     return FUNCTOR_CONTINUE;
 };
 
@@ -504,6 +508,27 @@ int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::PrepareEndings(ArrayPtrVoid *params)
+{
+    // param 0: Measure **lastMeasure
+    // param 1: EndingBoundary **currentEnding
+    Measure **lastMeasure = static_cast<Measure **>((*params).at(0));
+    EndingBoundary **currentEnding = static_cast<EndingBoundary **>((*params).at(1));
+
+    if ((*currentEnding)) {
+        // This is the first measure we are encountering since the beginning of the ending
+        if ((*currentEnding)->GetMeasure() == NULL) {
+            (*currentEnding)->SetMeasure(this);
+        }
+        // Set the ending to each measure in between
+        this->m_drawingEnding = (*currentEnding);
+    }
+    // Keep a pointer to the measure for when we are reaching the end (see EndingBoundary::PrepareEndings)
+    (*lastMeasure) = this;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::PrepareTimeSpanningEnd(ArrayPtrVoid *params)
 {
     // param 0: std::vector< Object*>* that holds the current elements to match
@@ -512,8 +537,10 @@ int Measure::PrepareTimeSpanningEnd(ArrayPtrVoid *params)
 
     ArrayOfInterfaceClassIdPairs::iterator iter = elements->begin();
     while (iter != elements->end()) {
-        // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
-        // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
+        // At the end of the measure (going backward) we remove element for which we do not need to match the end
+        // (for
+        // now). Eventually, we could consider them, for example if we want to display their spanning or for
+        // improved
         // midi output
         if ((iter->second == DIR) || (iter->second == DYNAM)) {
             iter = elements->erase(iter);
@@ -603,7 +630,8 @@ int Measure::GenerateMIDIEnd(ArrayPtrVoid *params)
     double *totalTime = static_cast<double *>((*params).at(3));
     std::vector<double> *maxValues = static_cast<std::vector<double> *>((*params).at(4));
 
-    // We a to the total time the maximum duration of the measure so if there is no layer, if the layer is not full or
+    // We a to the total time the maximum duration of the measure so if there is no layer, if the layer is not full
+    // or
     // if there is an encoding error in the measure, the next one will be properly aligned
     assert(!maxValues->empty());
     (*totalTime) += maxValues->front();

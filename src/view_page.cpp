@@ -19,6 +19,7 @@
 #include "devicecontext.h"
 #include "doc.h"
 #include "editorial.h"
+#include "ending.h"
 #include "floatingelement.h"
 #include "keysig.h"
 #include "layer.h"
@@ -179,6 +180,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
+    DrawSystemList(dc, system, ENDING_BOUNDARY);
 
     dc->EndGraphic(system, this);
 }
@@ -206,6 +208,10 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         }
         if (((*iter)->Is() == classId) && (classId == SLUR)) {
             DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if (((*iter)->Is() == classId) && (classId == ENDING_BOUNDARY)) {
+            // cast to EndingBoundary check in DrawEnding
+            DrawEnding(dc, dynamic_cast<EndingBoundary *>(*iter), system);
         }
     }
 }
@@ -722,6 +728,10 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     if (measure->IsMeasuredMusic()) {
         dc->EndGraphic(measure, this);
     }
+
+    if (measure->GetDrawingEnding()) {
+        system->AddToDrawingList(measure->GetDrawingEnding());
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -974,7 +984,17 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
 
     Object *current;
     for (current = parent->GetFirst(); current; current = parent->GetNext()) {
-        if (current->Is() == MEASURE) {
+        if (current->Is() == ENDING_BOUNDARY) {
+            EndingBoundary *ending = dynamic_cast<EndingBoundary *>(current);
+            assert(ending);
+            if (ending->IsStartBoundary()) {
+                // Create placeholder, but only for the start boundary. A graphic for the end boundary will be created
+                // only if it is on a different system - See View::DrawEnding
+                dc->StartGraphic(current, "", current->GetUuid());
+                dc->EndGraphic(current, this);
+            }
+        }
+        else if (current->Is() == MEASURE) {
             // cast to Measure check in DrawMeasure
             DrawMeasure(dc, dynamic_cast<Measure *>(current), system);
         }

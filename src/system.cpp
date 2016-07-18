@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "ending.h"
 #include "measure.h"
 #include "page.h"
 #include "vrv.h"
@@ -63,6 +64,13 @@ void System::Reset()
     m_drawingJustifiableWidth = 0;
     m_drawingLabelsWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
+}
+
+void System::AddEnding(EndingBoundary *ending)
+{
+    ending->SetParent(this);
+    m_children.push_back(ending);
+    Modify();
 }
 
 void System::AddMeasure(Measure *measure)
@@ -325,6 +333,8 @@ int System::AdjustFloatingPostioners(ArrayPtrVoid *params)
     (*classId) = DIR;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     (*classId) = PEDAL;
+    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
+    (*classId) = ENDING_BOUNDARY;
     m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
     // SYL check if they are some lyrics and make space for them if any
     (*classId) = SYL;

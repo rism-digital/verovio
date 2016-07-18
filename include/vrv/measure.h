@@ -15,6 +15,7 @@
 
 namespace vrv {
 
+class EndingBoundary;
 class FloatingElement;
 class ScoreDef;
 class TimestampAttr;
@@ -127,6 +128,14 @@ public:
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
     ///@}
 
+    /**
+     * @name Setter and getter of the drawing ending
+     */
+    ///@{
+    EndingBoundary *GetDrawingEnding() const { return m_drawingEnding; }
+    void SetDrawingEnding(EndingBoundary *ending) { m_drawingEnding = ending; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -227,6 +236,11 @@ public:
     virtual int PrepareTimeSpanningEnd(ArrayPtrVoid *params);
 
     /**
+     * See Object::PrepareEndings.
+     */
+    virtual int PrepareEndings(ArrayPtrVoid *params);
+
+    /**
      * See Object::GenerateMIDI
      */
     virtual int GenerateMIDI(ArrayPtrVoid *params);
@@ -276,7 +290,18 @@ private:
     BarLineAttr m_rightBarLine;
     ///@}
 
+    /**
+     * A pointer to the drawing ScoreDef instance. It is owned by the measure and added to a measure when a scoreDef
+     * change before it required it. This include scoreDef elements before it but also clef changes within the previous
+     * measure.
+     */
     ScoreDef *m_drawingScoreDef;
+
+    /**
+     * A pointer to the ending to which the measure belongs. Set by PrepareEndings and passed to the System drawing list
+     * in DrawMeasure
+     */
+    EndingBoundary *m_drawingEnding;
 };
 
 } // namespace vrv
