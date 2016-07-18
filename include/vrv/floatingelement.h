@@ -54,6 +54,14 @@ public:
     void SetCurrentFloatingPositioner(FloatingPositioner *boundingBox);
     FloatingPositioner *GetCurrentFloatingPositioner() { return m_currentPositioner; };
 
+    /**
+     * @name Get and set the drawing group id for linking floating element horizontally
+     */
+    ///@{
+    int GetDrawingGrpId() const { return m_drawingGrpId; }
+    void SetDrawingGrpId(int drawingGrpId) { m_drawingGrpId = drawingGrpId; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -104,6 +112,9 @@ public:
     //
 private:
     FloatingPositioner *m_currentPositioner;
+
+    /* Drawing Id to group floating elements horizontally */
+    int m_drawingGrpId;
 };
 
 //----------------------------------------------------------------------------

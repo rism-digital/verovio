@@ -709,6 +709,14 @@ public:
     virtual int PrepareEndings(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
+     * Functor for grouping FloatingElement by drawingGrpId
+     * param 0: int value of the current grp
+     * param 1: EndingBoundary **currentEnding
+     * param 2: bool has ending ended
+     */
+    virtual int PrepareFloatingGrps(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
      * Goes through all the TimeSpanningInterface elements and set them a current to each staff
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
      * param 0: std::vector< Object*>* of the current running TimeSpanningInterface elements
