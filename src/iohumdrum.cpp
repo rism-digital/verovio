@@ -1359,6 +1359,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         return true;
     }
 
+    vector<string> elements;
+    vector<void *> pointers;
+    elements.push_back("layer");
+    pointers.push_back((void *)layer);
+
     // If the layer contains only a single rest and the rest
     // is the same duration as the time signature, then
     // create a full measure rest (mrest).
@@ -1367,6 +1372,16 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     if (hasFullMeasureRest(layerdata, timesigdurs[startline], duration)) {
         MRest *mrest = new MRest();
         appendElement(layer, mrest);
+        // Basic compensation for clef change (can be improved later):
+        for (i = 0; i < layerdata.size(); i++) {
+            if (!layerdata[i]->isClef()) {
+                continue;
+            }
+            insertClefElement(elements, pointers, layerdata[i]);
+        }
+        // probably better to mark the rest in Humdrum data
+        // as a full-measure rest here, and then process the
+        // measure as normal below.
         return true;
     }
 
@@ -1376,12 +1391,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     if (m_debug) {
         // printGroupInfo(tg, layerdata);
     }
-
-    vector<string> elements;
-    vector<void *> pointers;
-
-    elements.push_back("layer");
-    pointers.push_back((void *)layer);
 
     m_tupletscaling = 1;
 
@@ -1610,7 +1619,6 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
 
         string tok = *line->token(i);
 
-        // ggg
         if (line->token(i)->getValueBool("auto", "DY", "processed")) {
             return;
         }
