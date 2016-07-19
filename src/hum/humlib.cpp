@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jul 18 08:48:07 PDT 2016
+// Last Modified: Tue Jul 19 10:56:51 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3894,8 +3894,8 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 	}
 
 
-	// rhythmstart == keep track of first non-grace note in measure.
-	vector<int> foundrhythm(kcount, 0);
+	// rhythmstart == keep track of first beat in measure.
+	vector<int> firstinbar(kcount, 0);
 	
 	int loc;
 	for (i=0; i<infile.getLineCount(); i++) {
@@ -3927,7 +3927,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 				if (infile[i].token(j)->isInvisible()) {
 					continue;
 				}
-				std::fill(foundrhythm.begin(), foundrhythm.end(), 0);
+				std::fill(firstinbar.begin(), firstinbar.end(), 1);
 				track = infile[i].token(j)->getTrack();
 				kindex = rtracks[track];
 				// reset the accidental states in dstates to match keysigs.
@@ -3974,11 +3974,11 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					}
 				}
 
-				if ((subtok.find("_") != string::npos) ||
-						(subtok.find("]") != string::npos)) {
+				if (((subtok.find("_") != string::npos) ||
+						(subtok.find("]") != string::npos))) {
 					// tied notes do not have slurs, so skip them
 					if ((accid != keysigs[rindex][diatonic % 7]) &&
-							(foundrhythm[rindex] == 0)) {
+							firstinbar[rindex]) {
 						// But first, prepare to force an accidental to be shown on
 						// the note immediately following the end of a tied group
 						// if the tied group crosses a barline.
@@ -4057,11 +4057,9 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 						}
 					}
 				}
-
-
-
 			}
 		}
+		std::fill(firstinbar.begin(), firstinbar.end(), 0);
 	}
 
 	// Indicate that the accidental analysis has been done:
