@@ -414,41 +414,30 @@ public:
 
     /**
      * Find a Object with a specified uuid.
-     * param 0: the uuid we are looking for.
-     * param 1: the pointer to pointer to the Object retrieved (if found).
      */
     virtual int FindByUuid(FunctorParams *functorParams);
 
     /**
-     * Find a Object with a AttComparison functor .
-     * param 0: the pointer to the AttComparsion we are evaluating.
-     * param 1: the pointer to pointer to the Object retrieved (if found).
-     */
+     * Find a Object with a AttComparison functor .     */
     virtual int FindByAttComparison(FunctorParams *functorParams);
 
     /**
      * Find a Object with the extreme value with a AttComparison functor .
-     * param 0: the pointer to the AttComparsion we are evaluating.
-     * param 1: the pointer to pointer to the Object retrieved (if found).
      */
     virtual int FindExtremeByAttComparison(FunctorParams *functorParams);
 
     /**
      * Find a all Object with a AttComparison functor.
-     * param 0: the pointer to the AttComparsion we are evaluating.
-     * param 1: the pointer to the ArrayOfObjects (matching) elements.
      */
     virtual int FindAllByAttComparison(FunctorParams *functorParams);
 
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method
-     * param 0: a pointer to the FileOutputStream.
      */
     virtual int Save(FunctorParams *functorParams);
 
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method
-     * param 0: a pointer to the FileOutputStream.
      */
     virtual int SaveEnd(FunctorParams *functorParams);
 
@@ -458,7 +447,7 @@ public:
     ///@{
 
     /**
-     *
+     * Adjust the position of all floating positionner, staff by staff.
      */
     virtual int AdjustFloatingPostioners(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -476,8 +465,6 @@ public:
 
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
-     * param 0: the cumulated shift
-     * param 1: the cumulated justifiable width
      */
     virtual int AlignMeasures(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -581,10 +568,6 @@ public:
 
     /**
      * Replace the drawing values a staffDef.
-     * param 0: Clef pointer (NULL if none)
-     * param 1: KeySig pointer (NULL if none)
-     * param 2: Mensur pointer (NULL if none)
-     * param 3: MeterSig pointer (NULL if none)
      */
     virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -602,22 +585,13 @@ public:
     /**
      * Set the initial scoreDef of each page.
      * This is necessary for integrating changes that occur within a page.
-     * param 0: bool clef flag.
-     * param 1: bool keysig flag.
-     * param 2: bool the mensur flag.
-     * param 3: bool the metersig flag.
-     * param 4: bool the keysig cancellation flag;
-     * param 5: bool the flag for indicating if apply to all or not
      */
     virtual int SetStaffDefRedrawFlags(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     ///@}
 
     /**
-     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
-     * and for staff/layer to be then processed.
-     * param 0: IntTree*
-     * param 1: IntTree*
+     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
      */
     virtual int PrepareProcessingLists(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -625,8 +599,6 @@ public:
      * Matches start and end for TimeSpanningInterface elements (such as tie or slur).
      * If fillList is set to false, only the remaining elements will be matched.
      * This is used when processing a second time in the other direction
-     * param 0: std::vector< Object*>* that holds the current elements to match
-     * param 1: bool* fillList for indicating whether the elements have to be stacked or not
      */
     virtual int PrepareTimeSpanning(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -639,8 +611,6 @@ public:
      * Matches start and end for TimeSpanningInterface elements with tstamp(2) attributes.
      * It is performed only on TimeSpanningInterface elements withouth @startid (or @endid).
      * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.
-     * param 0: std::vector< Object*>* that holds the current elements to match
-     * param 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
      */
     virtual int PrepareTimestamps(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -652,16 +622,12 @@ public:
     /**
      * Processes Chord and Note for matching @tie by processing by Layer and by looking
      * at the Pname and Oct
-     * param 0: std::vector<Note*>* that holds the current notes with open ties
-     * param 1: Chord** currentChord for the current chord if in a chord
      */
     virtual int PrepareTieAttr(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Processes Chord and Note for matching @tie by processing by Layer; resets the
      * Chord pointer to NULL at the end of a chord
-     * param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
-     * param 1: Chord** currentChord for the current chord if in a chord
      */
     virtual int PrepareTieAttrEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -669,7 +635,6 @@ public:
      * Processes by Layer and set drawing pointers.
      * Set Dot::m_drawingNote for Dot elements in mensural mode
      * Set Note::m_drawingAccid for Note elements having an Accid child
-     * param 0: Note** currentNote for the current not to w
      */
     virtual int PreparePointersByLayer(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -688,29 +653,22 @@ public:
     /**
      * Functor for setting mRpt drawing numbers (if required)
      * The functor is processed by staff/layer using an ArrayOfAttComparisons filter.
-     * param 0: MRpt **currentMRpt
-     * param 1: data_BOOLEAN for indicating if the MRpt::m_drawingNumber has to be set or not
-     * param 2: ScoreDef * doc scoreDef
      */
     virtual int PrepareRpt(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Functor for setting Measure of EndingBoundary
-     * param 0: Measure **lastMeasure
-     * param 1: EndingBoundary **currentEnding
      */
     virtual int PrepareEndings(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Goes through all the TimeSpanningInterface elements and set them a current to each staff
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
-     * param 0: std::vector< Object*>* of the current running TimeSpanningInterface elements
      */
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Remove the TimeSpanningInterface element from the list when the last measure is reached.
-     * param 0: std::vector< Object*>* of the current running TimeSpanningInterface elements
      */
     virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -772,11 +730,6 @@ public:
 
     /**
      * Export the object to a MidiFile
-     * param 0: MidiFile*: the MidiFile we are writing to
-     * param 1: int*: the midi track number
-     * param 2: int*: the current time in the measure (incremented by each element)
-     * param 3: int*: the current total measure time (incremented by each measure
-     * param 4: std::vector<double>: a stack of maximum duration of each measure (emptied by the functor)
      */
     virtual int GenerateMIDI(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -787,8 +740,6 @@ public:
 
     /**
      * Calculate the maximum duration of each measure.
-     * param 0: std::vector<double>: a stack of maximum duration filled by the functor
-     * param 1: double: the maximum duration of the current measure
      */
     virtual int CalcMaxMeasureDuration(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
