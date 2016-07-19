@@ -15,6 +15,7 @@
 
 #include "doc.h"
 #include "ending.h"
+#include "functorparams.h"
 #include "measure.h"
 #include "page.h"
 #include "vrv.h"
@@ -137,7 +138,7 @@ void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 // System functor methods
 //----------------------------------------------------------------------------
 
-int System::UnsetCurrentScoreDef(ArrayPtrVoid *params)
+int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
@@ -147,7 +148,7 @@ int System::UnsetCurrentScoreDef(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 };
 
-int System::ResetHorizontalAlignment(ArrayPtrVoid *params)
+int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_drawingXRel = 0;
     m_drawingX = 0;
@@ -157,7 +158,7 @@ int System::ResetHorizontalAlignment(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int System::ResetVerticalAlignment(ArrayPtrVoid *params)
+int System::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_drawingYRel = 0;
     m_drawingY = 0;
@@ -167,119 +168,94 @@ int System::ResetVerticalAlignment(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int System::AlignVertically(ArrayPtrVoid *params)
+int System::AlignVertically(FunctorParams *functorParams)
 {
-    // param 0: the systemAligner
-    // param 1: the staffIdx (unused)
-    // param 2: the staffN (unused)
-    // param 3: the doc (unused)
-    SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    assert(params);
 
-    (*systemAligner) = &m_systemAligner;
+    params->m_systemAligner = &m_systemAligner;
 
     return FUNCTOR_CONTINUE;
 }
 
-int System::SetAligmentYPos(ArrayPtrVoid *params)
+int System::SetAligmentYPos(FunctorParams *functorParams)
 {
-    // param 0: the previous staff height
-    // param 1: the extra staff height
-    // param 2  the previous verse count
-    // param 3: the doc
-    // param 4: the functor to be redirected to SystemAligner
-    int *previousStaffHeight = static_cast<int *>((*params).at(0));
-    int *previousOverflowBelow = static_cast<int *>((*params).at(1));
-    int *previousVerseCount = static_cast<int *>((*params).at(2));
-    Doc *doc = static_cast<Doc *>((*params).at(3));
-    Functor *setAligmnentPosY = static_cast<Functor *>((*params).at(4));
+    SetAligmentYPosParams *params = dynamic_cast<SetAligmentYPosParams *>(functorParams);
+    assert(params);
 
-    (*previousStaffHeight) = 0;
-    (*previousVerseCount) = 0;
-    (*previousOverflowBelow) = doc->GetSpacingStaff() * doc->GetDrawingUnit(100);
+    params->m_previousStaffHeight = 0;
+    params->m_previousVerseCount = 0;
+    params->m_previousOverflowBelow = params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100);
 
-    m_systemAligner.Process(setAligmnentPosY, params);
+    m_systemAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int System::IntegrateBoundingBoxYShift(ArrayPtrVoid *params)
+int System::IntegrateBoundingBoxYShift(FunctorParams *functorParams)
 {
-    // param 0: the cumulated shift
-    // param 1: the functor to be redirected to SystemAligner
-    int *shift = static_cast<int *>((*params).at(0));
-    Functor *integrateBoundingBoxYShift = static_cast<Functor *>((*params).at(1));
+    IntegrateBoundingBoxYShiftParams *params = dynamic_cast<IntegrateBoundingBoxYShiftParams *>(functorParams);
+    assert(params);
 
-    (*shift) = 0;
-    m_systemAligner.Process(integrateBoundingBoxYShift, params);
+    params->m_shift = 0;
+    m_systemAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int System::AlignMeasures(ArrayPtrVoid *params)
+int System::AlignMeasures(FunctorParams *functorParams)
 {
-    // param 0: the cumulated shift
-    // param 1: the cumulated justifiable width
-    int *shift = static_cast<int *>((*params).at(0));
-    int *justifiableWidth = static_cast<int *>((*params).at(1));
+    AlignMeasuresParams *params = dynamic_cast<AlignMeasuresParams *>(functorParams);
+    assert(params);
 
     m_drawingXRel = this->m_systemLeftMar + this->GetDrawingLabelsWidth();
-    (*shift) = 0;
-    (*justifiableWidth) = 0;
+    params->m_shift = 0;
+    params->m_justifiableWidth = 0;
 
     return FUNCTOR_CONTINUE;
 }
 
-int System::AlignMeasuresEnd(ArrayPtrVoid *params)
+int System::AlignMeasuresEnd(FunctorParams *functorParams)
 {
-    // param 0: the cumulated shift
-    // param 1: the cumulated justifiable width
-    int *shift = static_cast<int *>((*params).at(0));
-    int *justifiableWidth = static_cast<int *>((*params).at(1));
+    AlignMeasuresParams *params = dynamic_cast<AlignMeasuresParams *>(functorParams);
+    assert(params);
 
-    m_drawingTotalWidth = (*shift) + this->GetDrawingLabelsWidth();
-    m_drawingJustifiableWidth = (*justifiableWidth);
+    m_drawingTotalWidth = params->m_shift + this->GetDrawingLabelsWidth();
+    m_drawingJustifiableWidth = params->m_justifiableWidth;
 
     return FUNCTOR_CONTINUE;
 }
 
-int System::AlignSystems(ArrayPtrVoid *params)
+int System::AlignSystems(FunctorParams *functorParams)
 {
-    // param 0: the cumulated shift
-    // param 1: the system margin
-    int *shift = static_cast<int *>((*params).at(0));
-    int *systemMargin = static_cast<int *>((*params).at(1));
+    AlignSystemsParams *params = dynamic_cast<AlignSystemsParams *>(functorParams);
+    assert(params);
 
-    this->m_drawingYRel = (*shift);
+    this->m_drawingYRel = params->m_shift;
 
     assert(m_systemAligner.GetBottomAlignment());
 
-    (*shift) += m_systemAligner.GetBottomAlignment()->GetYRel() - (*systemMargin);
+    params->m_shift += m_systemAligner.GetBottomAlignment()->GetYRel() - params->m_systemMargin;
 
     return FUNCTOR_SIBLINGS;
 }
 
-int System::JustifyX(ArrayPtrVoid *params)
+int System::JustifyX(FunctorParams *functorParams)
 {
-    // param 0: the measureXRel of the next measure
-    // param 1: the justification ratio
-    // param 2: the xRel position of the left barline (unused)
-    // param 3: the xRel position of the right barline (unused)
-    // param 4: the system full width (without system margins)
-    // param 5: the functor to be redirected to the MeasureAligner (unused)
-    int *measureXRel = static_cast<int *>((*params).at(0));
-    double *justifiableRatio = static_cast<double *>((*params).at(1));
-    int *systemFullWidth = static_cast<int *>((*params).at(4));
+    JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
+    assert(params);
 
     assert(m_parent);
     assert(m_parent->m_parent);
 
-    (*measureXRel) = 0;
+    params->m_measureXRel = 0;
     int margins = this->m_systemLeftMar + this->m_systemRightMar;
     int nonJustifiableWidth
         = margins + (m_drawingTotalWidth - m_drawingJustifiableWidth); // m_drawingTotalWidth includes the labels
-    (*justifiableRatio) = (double)((*systemFullWidth) - nonJustifiableWidth) / ((double)m_drawingJustifiableWidth);
+    params->m_justifiableRatio
+        = (double)(params->m_systemFullWidth - nonJustifiableWidth) / ((double)m_drawingJustifiableWidth);
 
-    if ((*justifiableRatio) < 0.8) {
+    if (params->m_justifiableRatio < 0.8) {
         // Arbitrary value for avoiding over-compressed justification
         LogWarning("Justification stop because of a ratio smaller than 0.8");
     }
@@ -289,7 +265,7 @@ int System::JustifyX(ArrayPtrVoid *params)
     if ((m_parent->GetIdx() == m_parent->m_parent->GetChildCount() - 1)
         && (this->GetIdx() == m_parent->GetChildCount() - 1)) {
         // HARDCODED
-        if ((*justifiableRatio) > 1.25) {
+        if (params->m_justifiableRatio > 1.25) {
             return FUNCTOR_STOP;
         }
     }
@@ -297,131 +273,106 @@ int System::JustifyX(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int System::CalcStaffOverlap(ArrayPtrVoid *params)
+int System::CalcStaffOverlap(FunctorParams *functorParams)
 {
-    // param 0: a pointer to the previous staff alignment
-    // param 1: a pointer to the functor for passing it to the system aligner
-    StaffAlignment **previous = static_cast<StaffAlignment **>((*params).at(0));
-    Functor *calcStaffOverlap = static_cast<Functor *>((*params).at(1));
+    CalcStaffOverlapParams *params = dynamic_cast<CalcStaffOverlapParams *>(functorParams);
+    assert(params);
 
-    (*previous) = NULL;
-    m_systemAligner.Process(calcStaffOverlap, params);
+    params->m_previous = NULL;
+    m_systemAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int System::AdjustFloatingPostioners(ArrayPtrVoid *params)
+int System::AdjustFloatingPostioners(FunctorParams *functorParams)
 {
-    // param 0: the classId
-    // param X: the doc (unused)
-    // param X: a pointer to the functor for passing it to the system aligner
-    ClassId *classId = static_cast<ClassId *>((*params).at(0));
-    Functor *adjustFloatingBoundingBoxes = static_cast<Functor *>((*params).at(2));
+    AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
+    assert(params);
 
-    (*classId) = TIE;
-    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
-    (*classId) = SLUR;
-    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
-    (*classId) = OCTAVE;
-    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
-    (*classId) = HAIRPIN;
-    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
-    (*classId) = DYNAM;
-    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
-    (*classId) = TEMPO;
-    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
-    (*classId) = DIR;
-    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
-    (*classId) = PEDAL;
-    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
-    (*classId) = ENDING_BOUNDARY;
-    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
+    params->m_classId = TIE;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = SLUR;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = OCTAVE;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = HAIRPIN;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = DYNAM;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = TEMPO;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = DIR;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = PEDAL;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = ENDING_BOUNDARY;
+    m_systemAligner.Process(params->m_functor, params);
     // SYL check if they are some lyrics and make space for them if any
-    (*classId) = SYL;
-    m_systemAligner.Process(adjustFloatingBoundingBoxes, params);
+    params->m_classId = SYL;
+    m_systemAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int System::CastOffPages(ArrayPtrVoid *params)
+int System::CastOffPages(FunctorParams *functorParams)
 {
-    // param 0: a pointer to the page we are taking the content from
-    // param 1: a pointer the document we are adding pages to
-    // param 2: a pointer to the current page
-    // param 3: the cummulated shift (m_drawingYRel of the first system of the current page)
-    // param 4: the page height
-    Page *contentPage = static_cast<Page *>((*params).at(0));
-    Doc *doc = static_cast<Doc *>((*params).at(1));
-    Page **currentPage = static_cast<Page **>((*params).at(2));
-    int *shift = static_cast<int *>((*params).at(3));
-    int *pageHeight = static_cast<int *>((*params).at(4));
+    CastOffPagesParams *params = dynamic_cast<CastOffPagesParams *>(functorParams);
+    assert(params);
 
-    if (((*currentPage)->GetChildCount() > 0)
-        && (this->m_drawingYRel - this->GetHeight() - (*shift) < 0)) { //(*pageHeight))) {
-        (*currentPage) = new Page();
-        doc->AddPage(*currentPage);
-        (*shift) = this->m_drawingYRel - (*pageHeight);
+    if ((params->m_currentPage->GetChildCount() > 0)
+        && (this->m_drawingYRel - this->GetHeight() - params->m_shift < 0)) {
+        params->m_currentPage = new Page();
+        params->m_doc->AddPage(params->m_currentPage);
+        params->m_shift = this->m_drawingYRel - params->m_pageHeight;
     }
 
     // Special case where we use the Relinquish method.
     // We want to move the system to the currentPage. However, we cannot use DetachChild
     // from the contentPage because this screws up the iterator. Relinquish gives up
     // the ownership of the system - the contentPage itself will be deleted afterwards.
-    System *system = dynamic_cast<System *>(contentPage->Relinquish(this->GetIdx()));
+    System *system = dynamic_cast<System *>(params->m_contentPage->Relinquish(this->GetIdx()));
     assert(system);
-    (*currentPage)->AddSystem(system);
+    params->m_currentPage->AddSystem(system);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int System::UnCastOff(ArrayPtrVoid *params)
+int System::UnCastOff(FunctorParams *functorParams)
 {
-    // param 0: a pointer to the system we are adding system to
-    System *currentSystem = static_cast<System *>((*params).at(0));
+    UnCastOffParams *params = dynamic_cast<UnCastOffParams *>(functorParams);
+    assert(params);
 
     // Just move all the content of the system to the continous one (parameter)
     // Use the MoveChildren method that moves and relinquishes them
     // See Object::Relinquish
-    currentSystem->MoveChildren(this);
+    params->m_currentSystem->MoveChildren(this);
 
     return FUNCTOR_CONTINUE;
 }
 
-int System::SetDrawingXY(ArrayPtrVoid *params)
+int System::SetDrawingXY(FunctorParams *functorParams)
 {
-    // param 0: a pointer doc
-    // param 1: a pointer to the current system
-    // param 2: a pointer to the current measure (unused)
-    // param 3: a pointer to the current staff (unused)
-    // param 4: a pointer to the current layer
-    // param 5: a pointer to the view (unused)
-    // param 6: a bool indicating if we are processing layer elements or not
-    // param 7: a pointer to the functor for passing it to the timestamps (unused)
-    Doc *doc = static_cast<Doc *>((*params).at(0));
-    System **currentSystem = static_cast<System **>((*params).at(1));
-    bool *processLayerElements = static_cast<bool *>((*params).at(6));
+    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
+    assert(params);
 
-    (*currentSystem) = this;
+    params->m_currentSystem = this;
 
     // Second pass where we do just process layer elements
-    if ((*processLayerElements)) return FUNCTOR_CONTINUE;
+    if (params->m_processLayerElements) return FUNCTOR_CONTINUE;
 
     // Here we set the appropriate y value to be used for drawing
     // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_yAbs
     if (this->m_yAbs == VRV_UNSET) {
-        assert(doc->GetType() == Raw);
+        assert(params->m_doc->GetType() == Raw);
         this->SetDrawingX(this->m_drawingXRel);
         this->SetDrawingY(this->m_drawingYRel);
     }
     else {
-        assert(doc->GetType() == Transcription);
+        assert(params->m_doc->GetType() == Transcription);
         this->SetDrawingX(this->m_xAbs);
         this->SetDrawingY(this->m_yAbs);
     }
-
-    // For avoiding unused variable warning in non debug mode
-    doc = NULL;
 
     return FUNCTOR_CONTINUE;
 }

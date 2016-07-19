@@ -19,6 +19,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "editorial.h"
+#include "functorparams.h"
 #include "io.h"
 #include "keysig.h"
 #include "layer.h"
@@ -271,14 +272,6 @@ ClassId Object::Is() const
     return OBJECT;
 };
 
-void Object::Resert(Object *object)
-{
-    if (object) {
-        delete object;
-        object = NULL;
-    }
-}
-
 void Object::Reset()
 {
     ClearChildren();
@@ -420,12 +413,10 @@ Object *Object::Relinquish(int idx)
 Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
 {
     Functor findByUuid(&Object::FindByUuid);
-    Object *element = NULL;
-    ArrayPtrVoid params;
-    params.push_back(&uuid);
-    params.push_back(&element);
-    this->Process(&findByUuid, &params, NULL, NULL, deepness, direction);
-    return element;
+    FindByUuidParams findbyUuidParams;
+    findbyUuidParams.m_uuid = uuid;
+    this->Process(&findByUuid, &findbyUuidParams, NULL, NULL, deepness, direction);
+    return findbyUuidParams.m_element;
 }
 
 Object *Object::FindChildByType(ClassId classId, int deepness, bool direction)
@@ -437,23 +428,19 @@ Object *Object::FindChildByType(ClassId classId, int deepness, bool direction)
 Object *Object::FindChildByAttComparison(AttComparison *attComparison, int deepness, bool direction)
 {
     Functor findByAttComparison(&Object::FindByAttComparison);
-    Object *element = NULL;
-    ArrayPtrVoid params;
-    params.push_back(attComparison);
-    params.push_back(&element);
-    this->Process(&findByAttComparison, &params, NULL, NULL, deepness, direction);
-    return element;
+    FindByAttComparisonParams findByAttComparisonParams;
+    findByAttComparisonParams.m_attComparison = attComparison;
+    this->Process(&findByAttComparison, &findByAttComparisonParams, NULL, NULL, deepness, direction);
+    return findByAttComparisonParams.m_element;
 }
 
 Object *Object::FindChildExtremeByAttComparison(AttComparison *attComparison, int deepness, bool direction)
 {
     Functor findExtremeByAttComparison(&Object::FindExtremeByAttComparison);
-    Object *element = NULL;
-    ArrayPtrVoid params;
-    params.push_back(attComparison);
-    params.push_back(&element);
-    this->Process(&findExtremeByAttComparison, &params, NULL, NULL, deepness, direction);
-    return element;
+    FindExtremeByAttComparisonParams findExtremeByAttComparisonParams;
+    findExtremeByAttComparisonParams.m_attComparison = attComparison;
+    this->Process(&findExtremeByAttComparison, &findExtremeByAttComparisonParams, NULL, NULL, deepness, direction);
+    return findExtremeByAttComparisonParams.m_element;
 }
 
 void Object::FindAllChildByAttComparison(
@@ -463,10 +450,10 @@ void Object::FindAllChildByAttComparison(
     objects->clear();
 
     Functor findAllByAttComparison(&Object::FindAllByAttComparison);
-    ArrayPtrVoid params;
-    params.push_back(attComparison);
-    params.push_back(objects);
-    this->Process(&findAllByAttComparison, &params, NULL, NULL, deepness, direction);
+    FindAllByAttComparisonParams findAllByAttComparisonParams;
+    findAllByAttComparisonParams.m_attComparison = attComparison;
+    findAllByAttComparisonParams.m_elements = objects;
+    this->Process(&findAllByAttComparison, &findAllByAttComparisonParams, NULL, NULL, deepness, direction);
 }
 
 Object *Object::GetChild(int idx) const
@@ -543,9 +530,9 @@ void Object::Modify(bool modified)
 void Object::FillFlatList(ListOfObjects *flatList)
 {
     Functor addToFlatList(&Object::AddLayerElementToFlatList);
-    ArrayPtrVoid params;
-    params.push_back(&flatList);
-    this->Process(&addToFlatList, &params);
+    AddLayerElementToFlatListParams addLayerElementToFlatListParams;
+    addLayerElementToFlatListParams.m_flatList = flatList;
+    this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
 
 Object *Object::GetFirstParent(const ClassId classId, int maxSteps) const
@@ -576,8 +563,8 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxSteps)
     }
 }
 
-void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor, ArrayOfAttComparisons *filters,
-    int deepness, bool direction)
+void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor,
+    ArrayOfAttComparisons *filters, int deepness, bool direction)
 {
     if (functor->m_returnCode == FUNCTOR_STOP) {
         return;
@@ -591,7 +578,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor
         }
     }
 
-    functor->Call(this, params);
+    functor->Call(this, functorParams);
 
     // do not go any deeper in this case
     if (functor->m_returnCode == FUNCTOR_SIBLINGS) {
@@ -638,7 +625,7 @@ void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor
                 if ((**attComparisonIter)(*iter)) {
                     // the attribute value matches, process the object
                     // LogDebug("%s ", (*iter)->GetClassName().c_str());
-                    (*iter)->Process(functor, params, endFunctor, filters, deepness, direction);
+                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
                     break;
                 }
                 else {
@@ -648,24 +635,24 @@ void Object::Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor
             }
         }
         // we will end here if there is no filter at all or for the current child type
-        (*iter)->Process(functor, params, endFunctor, filters, deepness, direction);
+        (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
     }
 
     if (endFunctor) {
-        endFunctor->Call(this, params);
+        endFunctor->Call(this, functorParams);
     }
 }
 
 int Object::Save(FileOutputStream *output)
 {
-    ArrayPtrVoid params;
-    params.push_back(output);
+    SaveParams saveParams;
+    saveParams.m_output = output;
 
     Functor save(&Object::Save);
     // Special case where we want to process all objects
     save.m_visibleOnly = false;
     Functor saveEnd(&Object::SaveEnd);
-    this->Process(&save, &params, &saveEnd);
+    this->Process(&save, &saveParams, &saveEnd);
 
     return true;
 }
@@ -813,47 +800,45 @@ Functor::Functor()
     obj_fpt = NULL;
 }
 
-Functor::Functor(int (Object::*_obj_fpt)(ArrayPtrVoid *))
+Functor::Functor(int (Object::*_obj_fpt)(FunctorParams *))
 {
     m_returnCode = FUNCTOR_CONTINUE;
     m_visibleOnly = true;
     obj_fpt = _obj_fpt;
 }
 
-void Functor::Call(Object *ptr, ArrayPtrVoid *params)
+void Functor::Call(Object *ptr, FunctorParams *functorParams)
 {
     // we should have return codes (not just bool) for avoiding to go further down the tree in some cases
-    m_returnCode = (*ptr.*obj_fpt)(params);
+    m_returnCode = (*ptr.*obj_fpt)(functorParams);
 }
 
 //----------------------------------------------------------------------------
 // Object functor methods
 //----------------------------------------------------------------------------
 
-int Object::AddLayerElementToFlatList(ArrayPtrVoid *params)
+int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
 {
-    // param 0: the ListOfObjects
-    ListOfObjects **list = static_cast<ListOfObjects **>((*params).at(0));
-    // if (dynamic_cast<LayerElement*>(this)) {
-    (*list)->push_back(this);
-    //}
+    AddLayerElementToFlatListParams *params = dynamic_cast<AddLayerElementToFlatListParams *>(functorParams);
+    assert(params);
+
+    params->m_flatList->push_back(this);
+
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByUuid(ArrayPtrVoid *params)
+int Object::FindByUuid(FunctorParams *functorParams)
 {
-    // param 0: the uuid we are looking for
-    // param 1: the pointer to pointer to the Object
-    std::string *uuid = static_cast<std::string *>((*params).at(0));
-    Object **element = static_cast<Object **>((*params).at(1));
+    FindByUuidParams *params = dynamic_cast<FindByUuidParams *>(functorParams);
+    assert(params);
 
-    if ((*element)) {
+    if (params->m_element) {
         // this should not happen, but just in case
         return FUNCTOR_STOP;
     }
 
-    if ((*uuid) == this->GetUuid()) {
-        (*element) = this;
+    if (params->m_uuid == this->GetUuid()) {
+        params->m_element = this;
         // LogDebug("Found it!");
         return FUNCTOR_STOP;
     }
@@ -861,21 +846,19 @@ int Object::FindByUuid(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindByAttComparison(ArrayPtrVoid *params)
+int Object::FindByAttComparison(FunctorParams *functorParams)
 {
-    // param 0: the type we are looking for
-    // param 1: the pointer to pointer to the Object
-    AttComparison *test = static_cast<AttComparison *>((*params).at(0));
-    Object **element = static_cast<Object **>((*params).at(1));
+    FindByAttComparisonParams *params = dynamic_cast<FindByAttComparisonParams *>(functorParams);
+    assert(params);
 
-    if ((*element)) {
+    if (params->m_element) {
         // this should not happen, but just in case
         return FUNCTOR_STOP;
     }
 
     // evaluate by applying the AttComparison operator()
-    if ((*test)(this)) {
-        (*element) = this;
+    if ((*params->m_attComparison)(this)) {
+        params->m_element = this;
         // LogDebug("Found it!");
         return FUNCTOR_STOP;
     }
@@ -883,46 +866,38 @@ int Object::FindByAttComparison(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindExtremeByAttComparison(ArrayPtrVoid *params)
+int Object::FindExtremeByAttComparison(FunctorParams *functorParams)
 {
-    // param 0: the type we are looking for
-    // param 1: the pointer to pointer to the Object
-    AttComparison *test = static_cast<AttComparison *>((*params).at(0));
-    Object **element = static_cast<Object **>((*params).at(1));
+    FindExtremeByAttComparisonParams *params = dynamic_cast<FindExtremeByAttComparisonParams *>(functorParams);
+    assert(params);
 
     // evaluate by applying the AttComparison operator()
-    if ((*test)(this)) {
-        (*element) = this;
+    if ((*params->m_attComparison)(this)) {
+        params->m_element = this;
     }
     // continue until the end
     return FUNCTOR_CONTINUE;
 }
 
-int Object::FindAllByAttComparison(ArrayPtrVoid *params)
+int Object::FindAllByAttComparison(FunctorParams *functorParams)
 {
-    // param 0: the type we are looking for
-    // param 1: the pointer to pointer to the Object
-    AttComparison *test = static_cast<AttComparison *>((*params).at(0));
-    ArrayOfObjects *objects = static_cast<ArrayOfObjects *>((*params).at(1));
+    FindAllByAttComparisonParams *params = dynamic_cast<FindAllByAttComparisonParams *>(functorParams);
+    assert(params);
 
     // evaluate by applying the AttComparison operator()
-    if ((*test)(this)) {
-        objects->push_back(this);
+    if ((*params->m_attComparison)(this)) {
+        params->m_elements->push_back(this);
     }
     // continue until the end
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
+int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 {
-    // param 0: the current scoreDef
-    // param 1: the current staffDef
-    ScoreDef **currentScoreDef = static_cast<ScoreDef **>((*params).at(0));
-    StaffDef **currentStaffDef = static_cast<StaffDef **>((*params).at(1));
-    ScoreDef *upcomingScoreDef = static_cast<ScoreDef *>((*params).at(2));
+    SetCurrentScoreDefParams *params = dynamic_cast<SetCurrentScoreDefParams *>(functorParams);
+    assert(params);
 
-    // assert(*currentScoreDef);
-    assert(upcomingScoreDef);
+    assert(params->m_upcomingScoreDef);
 
     // starting a new page
     if (this->Is() == PAGE) {
@@ -931,21 +906,21 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         Page *page = dynamic_cast<Page *>(this);
         assert(page);
         if (page->m_parent->GetChildIndex(page) == 0) {
-            upcomingScoreDef->SetRedrawFlags(true, true, true, true, false, false);
-            upcomingScoreDef->SetDrawLabels(true);
+            params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false, false);
+            params->m_upcomingScoreDef->SetDrawLabels(true);
         }
         else {
-            upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
-            upcomingScoreDef->SetDrawLabels(false);
+            params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
+            params->m_upcomingScoreDef->SetDrawLabels(false);
         }
-        page->m_drawingScoreDef = *upcomingScoreDef;
+        page->m_drawingScoreDef = *params->m_upcomingScoreDef;
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new system
     if (this->Is() == SYSTEM) {
         // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
-        upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
+        params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
         System *system = dynamic_cast<System *>(this);
         assert(system);
         // For now we don't use it - eventually we want to set it. The problem will be to take into account succeeding
@@ -956,13 +931,13 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
 
     // starting a new system
     if (this->Is() == MEASURE) {
-        if (upcomingScoreDef->m_setAsDrawing) {
+        if (params->m_upcomingScoreDef->m_setAsDrawing) {
             Measure *measure = dynamic_cast<Measure *>(this);
             assert(measure);
-            measure->SetDrawingScoreDef(upcomingScoreDef);
-            (*currentScoreDef) = measure->GetDrawingScoreDef();
-            upcomingScoreDef->SetRedrawFlags(false, false, false, false, false, true);
-            upcomingScoreDef->m_setAsDrawing = false;
+            measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
+            params->m_currentScoreDef = measure->GetDrawingScoreDef();
+            params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, false, true);
+            params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
         return FUNCTOR_CONTINUE;
     }
@@ -973,7 +948,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
         assert(scoreDef);
         // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
         // m_setAsDrawing to true so it will then be taken into account at the next measure
-        upcomingScoreDef->ReplaceDrawingValues(scoreDef);
+        params->m_upcomingScoreDef->ReplaceDrawingValues(scoreDef);
         return FUNCTOR_CONTINUE;
     }
 
@@ -981,16 +956,16 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     if (this->Is() == STAFFDEF) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(this);
         assert(staffDef);
-        upcomingScoreDef->ReplaceDrawingValues(staffDef);
+        params->m_upcomingScoreDef->ReplaceDrawingValues(staffDef);
     }
 
     // starting a new staff
     if (this->Is() == STAFF) {
         Staff *staff = dynamic_cast<Staff *>(this);
         assert(staff);
-        (*currentStaffDef) = (*currentScoreDef)->GetStaffDef(staff->GetN());
+        params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
         assert(staff->m_drawingStaffDef == NULL);
-        staff->m_drawingStaffDef = (*currentStaffDef);
+        staff->m_drawingStaffDef = params->m_currentStaffDef;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1009,7 +984,7 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
                 layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        layer->SetDrawingAndCurrentValues((*currentStaffDef));
+        layer->SetDrawingAndCurrentValues(params->m_currentStaffDef);
         return FUNCTOR_CONTINUE;
     }
 
@@ -1017,11 +992,11 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     if (this->Is() == CLEF) {
         Clef *clef = dynamic_cast<Clef *>(this);
         assert(clef);
-        assert(*currentStaffDef);
-        StaffDef *upcomingStaffDef = upcomingScoreDef->GetStaffDef((*currentStaffDef)->GetN());
+        assert(params->m_currentStaffDef);
+        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
         upcomingStaffDef->SetCurrentClef(clef);
-        upcomingScoreDef->m_setAsDrawing = true;
+        params->m_upcomingScoreDef->m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1029,27 +1004,25 @@ int Object::SetCurrentScoreDef(ArrayPtrVoid *params)
     if (this->Is() == KEYSIG) {
         KeySig *keysig = dynamic_cast<KeySig *>(this);
         assert(keysig);
-        assert(*currentStaffDef);
-        StaffDef *upcomingStaffDef = upcomingScoreDef->GetStaffDef((*currentStaffDef)->GetN());
+        assert(params->m_currentStaffDef);
+        StaffDef *upcomingStaffDef = params->m_upcomingScoreDef->GetStaffDef(params->m_currentStaffDef->GetN());
         assert(upcomingStaffDef);
         upcomingStaffDef->SetCurrentKeySig(keysig);
-        upcomingScoreDef->m_setAsDrawing = true;
+        params->m_upcomingScoreDef->m_setAsDrawing = true;
         return FUNCTOR_CONTINUE;
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
+int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
 {
-    // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the Doc
-    int *minPos = static_cast<int *>((*params).at(0));
-    Doc *doc = static_cast<Doc *>((*params).at(1));
+    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    assert(params);
 
     // starting new layer
     if (this->Is() == LAYER) {
-        (*minPos) = 0;
+        params->m_graceMinPos = 0;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1061,7 +1034,7 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     assert(note);
 
     if (!note->IsGraceNote()) {
-        (*minPos) = 0;
+        params->m_graceMinPos = 0;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1071,10 +1044,10 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     // the negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    int negative_offset
-        = -(note->m_contentBB_x1) + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    int negative_offset = -(note->m_contentBB_x1)
+        + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
-    if ((*minPos) > 0) {
+    if (params->m_graceMinPos > 0) {
         //(*minPos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }
 
@@ -1082,15 +1055,15 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     if (negative_offset < 0) negative_offset = 0;
 
     // check if the element overlaps with the preceeding one given by (*minPos)
-    int overlap = (*minPos) - note->GetGraceAlignment()->GetXRel() + negative_offset;
+    int overlap = params->m_graceMinPos - note->GetGraceAlignment()->GetXRel() + negative_offset;
 
-    if ((note->GetGraceAlignment()->GetXRel() - negative_offset) < (*minPos)) {
+    if ((note->GetGraceAlignment()->GetXRel() - negative_offset) < params->m_graceMinPos) {
         note->GetGraceAlignment()->SetXShift(overlap);
     }
 
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*minPos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2
-        + doc->GetRightMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    params->m_graceMinPos = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2
+        + params->m_doc->GetRightMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     //(*minPos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
     // note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) *
     // doc->GetDrawingUnit(100) /
@@ -1100,23 +1073,16 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
+int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
-    // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the minimum for the beginning of a layer (i.e., after the left barline)
-    // param 2: the maximum width in the current measure
-    // param 3: the Doc
-    // param 4: the functor to be redirected to Aligner (unused)
-    // param 5: the functor to be redirected to Aligner at the end (unused)
-    int *minPos = static_cast<int *>((*params).at(0));
-    int *layerMinPos = static_cast<int *>((*params).at(1));
-    Doc *doc = static_cast<Doc *>((*params).at(3));
+    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    assert(params);
 
     // starting new layer
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer *>(this);
         assert(current_layer);
-        (*minPos) = (*layerMinPos);
+        params->m_minPos = params->m_layerMinPos;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1155,7 +1121,8 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     //  ---- = negative offset
     int negative_offset = -(current->m_contentBB_x1);
     if (!current->IsGraceNote())
-        negative_offset += (doc->GetLeftMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+        negative_offset
+            += (params->m_doc->GetLeftMargin(current->Is()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used)
     if (negative_offset < 0) negative_offset = 0;
@@ -1163,7 +1130,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     // with a grace note, also take into account the full width of the group given by the GraceAligner
     if (current->GetAlignment()->HasGraceAligner()) {
         negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth()
-            + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+            + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }
 
     int currentX = current->GetAlignment()->GetXRel();
@@ -1174,16 +1141,16 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     }
 
     // check if the element overlaps with the preceeding one given by (*minPos)
-    int overlap = (*minPos) - currentX + negative_offset;
+    int overlap = params->m_minPos - currentX + negative_offset;
 
-    if ((currentX - negative_offset) < (*minPos)) {
+    if ((currentX - negative_offset) < params->m_minPos) {
         current->GetAlignment()->SetXShift(overlap);
     }
 
     // do not adjust the min pos and the max width since this is already handled by
     // the GraceAligner
     if (current->IsGraceNote()) {
-        (*minPos) = current->GetAlignment()->GetXRel();
+        params->m_minPos = current->GetAlignment()->GetXRel();
         current->GetAlignment()->SetMaxWidth(0);
         return FUNCTOR_CONTINUE;
     }
@@ -1191,38 +1158,34 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     // the next minimal position is given by the right side of the bounding box + the spacing of the element
     int width = current->m_contentBB_x2;
     if (!current->HasEmptyBB())
-        width += doc->GetRightMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    (*minPos) = current->GetAlignment()->GetXRel() + width;
+        width += params->m_doc->GetRightMargin(current->Is()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    params->m_minPos = current->GetAlignment()->GetXRel() + width;
     current->GetAlignment()->SetMaxWidth(width);
 
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
+int Object::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
 {
-    // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the minimum for the beginning of a layer (i.e., after the left barline) (unused)
-    // param 2: the maximum width in the current measure
-    int *minPos = static_cast<int *>((*params).at(0));
-    int *measureWidth = static_cast<int *>((*params).at(2));
+    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    assert(params);
 
     // ending a layer
     if (this->Is() == LAYER) {
         // mininimum position is the with the layer
         // we keep it if it's higher than what we had so far
         // this will be used for shifting the right barLine
-        (*measureWidth) = std::max((*measureWidth), (*minPos));
+        params->m_measureWidth = std::max(params->m_measureWidth, params->m_minPos);
         return FUNCTOR_CONTINUE;
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
+int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 {
-    // param 0: the maximum height in the current system
-    StaffAlignment **staffAlignment = static_cast<StaffAlignment **>((*params).at(0));
-    Doc *doc = static_cast<Doc *>((*params).at(1));
+    SetOverflowBBoxesParams *params = dynamic_cast<SetOverflowBBoxesParams *>(functorParams);
+    assert(params);
 
     // starting a new staff
     if (this->Is() == STAFF) {
@@ -1230,7 +1193,7 @@ int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
         assert(currentStaff);
         assert(currentStaff->GetAlignment());
 
-        (*staffAlignment) = currentStaff->GetAlignment();
+        params->m_staffAlignment = currentStaff->GetAlignment();
 
         // currentStaff->GetAlignment()->SetMaxHeight(currentStaff->m_contentBB_y1);
 
@@ -1287,20 +1250,20 @@ int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
         return FUNCTOR_CONTINUE;
     }
 
-    int staffSize = (*staffAlignment)->GetStaffSize();
+    int staffSize = params->m_staffAlignment->GetStaffSize();
 
-    int overflowAbove = (*staffAlignment)->CalcOverflowAbove(current);
-    if (overflowAbove > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+    int overflowAbove = params->m_staffAlignment->CalcOverflowAbove(current);
+    if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
         // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
-        (*staffAlignment)->SetOverflowAbove(overflowAbove);
-        (*staffAlignment)->AddBBoxAbove(current);
+        params->m_staffAlignment->SetOverflowAbove(overflowAbove);
+        params->m_staffAlignment->AddBBoxAbove(current);
     }
 
-    int overflowBelow = (*staffAlignment)->CalcOverflowBelow(current);
-    if (overflowBelow > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+    int overflowBelow = params->m_staffAlignment->CalcOverflowBelow(current);
+    if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
         // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
-        (*staffAlignment)->SetOverflowBelow(overflowBelow);
-        (*staffAlignment)->AddBBoxBelow(current);
+        params->m_staffAlignment->SetOverflowBelow(overflowBelow);
+        params->m_staffAlignment->AddBBoxBelow(current);
     }
 
     // do not go further down the tree in this case since the bounding box of the first element is already taken into
@@ -1308,21 +1271,23 @@ int Object::SetOverflowBBoxes(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::Save(ArrayPtrVoid *params)
+int Object::Save(FunctorParams *functorParams)
 {
-    // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream *>((*params).at(0));
-    if (!output->WriteObject(this)) {
+    SaveParams *params = dynamic_cast<SaveParams *>(functorParams);
+    assert(params);
+
+    if (!params->m_output->WriteObject(this)) {
         return FUNCTOR_STOP;
     }
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SaveEnd(ArrayPtrVoid *params)
+int Object::SaveEnd(FunctorParams *functorParams)
 {
-    // param 0: output stream
-    FileOutputStream *output = static_cast<FileOutputStream *>((*params).at(0));
-    if (!output->WriteObjectEnd(this)) {
+    SaveParams *params = dynamic_cast<SaveParams *>(functorParams);
+    assert(params);
+
+    if (!params->m_output->WriteObjectEnd(this)) {
         return FUNCTOR_STOP;
     }
     return FUNCTOR_CONTINUE;

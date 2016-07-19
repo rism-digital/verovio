@@ -14,6 +14,7 @@
 namespace vrv {
 
 class Object;
+class FunctorParams;
 class LayerElement;
 class Measure;
 
@@ -87,12 +88,12 @@ public:
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params, Object *object);
+    virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params, Object *object);
+    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
 
 protected:
     /**
@@ -187,22 +188,22 @@ public:
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params, Object *object);
+    virtual int InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int InterfacePrepareTimeSpanning(ArrayPtrVoid *params, Object *object);
+    virtual int InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params, Object *object);
+    virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params, Object *object);
+    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
 
 private:
     //

@@ -105,12 +105,12 @@ public:
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr(ArrayPtrVoid *params);
+    virtual int PrepareTieAttr(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttrEnd(ArrayPtrVoid *params);
+    virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
 
 protected:
     /**

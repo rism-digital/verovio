@@ -16,6 +16,7 @@
 #include "attcomparison.h"
 #include "bboxdevicecontext.h"
 #include "doc.h"
+#include "functorparams.h"
 #include "system.h"
 #include "view.h"
 #include "vrv.h"
@@ -58,22 +59,6 @@ void Page::AddSystem(System *system)
     Modify();
 }
 
-int Page::GetStaffPosOnPage(Staff *staff) const
-{
-    /*
-    int position = -1;
-    bool success = false;
-    ArrayPtrVoid params;
-    params.Add(staff);
-    params.Add(&position);
-    params.Add(&success);
-    MusStaffFunctor getStaffPosOnPage(&Staff::GetPosOnPage);
-    Process(&getStaffPosOnPage, params);    
-    return position;
-    */ // ax2.3
-    return 0;
-}
-
 void Page::LayOut(bool force)
 {
     if (m_layoutDone && !force) {
@@ -96,37 +81,28 @@ void Page::LayOutHorizontally()
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    ArrayPtrVoid params;
-
     // Reset the horizontal alignment
     Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
-    this->Process(&resetHorizontalAlignment, &params);
+    this->Process(&resetHorizontalAlignment, NULL);
 
     // Reset the vertical alignment
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
-    this->Process(&resetVerticalAlignment, &params);
+    this->Process(&resetVerticalAlignment, NULL);
 
     // Align the content of the page using measure aligners
     // After this:
     // - each LayerElement object will have its Alignment pointer initialized
-    MeasureAligner *measureAlignerPtr = NULL;
-    double time = 0.0;
-    Mensur *currentMensur = NULL;
-    MeterSig *currentMeterSig = NULL;
-    params.push_back(&measureAlignerPtr);
-    params.push_back(&time);
-    params.push_back(&currentMensur);
-    params.push_back(&currentMeterSig);
+    AlignHorizontallyParams alignHorizontallyParams;
     Functor alignHorizontally(&Object::AlignHorizontally);
     Functor alignHorizontallyEnd(&Object::AlignHorizontallyEnd);
-    // Pass the functor for processing the timestamps
-    params.push_back(&alignHorizontally);
-    this->Process(&alignHorizontally, &params, &alignHorizontallyEnd);
+    // Pass it for redirection
+    alignHorizontallyParams.m_functor = &alignHorizontally;
+    this->Process(&alignHorizontally, &alignHorizontallyParams, &alignHorizontallyEnd);
 
     // Unless duration-based spacing is disabled, set the X position of each Alignment.
     // Does non-linear spacing based on the duration space between two Alignment objects.
     if (!doc->GetEvenSpacing()) {
-        int longestActualDur;
+        int longestActualDur = DUR_4;
         // Get the longest duration in the piece
         AttDurExtreme durExtremeComparison(LONGEST);
         Object *longestDur = this->FindChildExtremeByAttComparison(&durExtremeComparison);
@@ -137,17 +113,13 @@ void Page::LayOutHorizontally()
             // LogDebug("Longest duration is DUR_* code %d", longestActualDur);
         }
 
-        params.clear();
-        double previousTime = 0.0;
-        int previousXRel = 0;
-        params.push_back(&previousTime);
-        params.push_back(&previousXRel);
-        params.push_back(&longestActualDur);
-        params.push_back(doc);
+        SetAlignmentXPosParams setAlignmentXPosParams;
+        setAlignmentXPosParams.m_longestActualDur = longestActualDur;
+        setAlignmentXPosParams.m_doc = doc;
         Functor setAlignmentX(&Object::SetAlignmentXPos);
-        // Special case: because we redirect the functor, pass it as parameter to itself (!)
-        params.push_back(&setAlignmentX);
-        this->Process(&setAlignmentX, &params);
+        // Pass it for redirection
+        setAlignmentXPosParams.m_functor = &setAlignmentX;
+        this->Process(&setAlignmentX, &setAlignmentXPosParams);
     }
 
     // Render it for filling the bounding box
@@ -160,59 +132,44 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    params.clear();
-    int grace_min_pos = 0;
-    params.push_back(&grace_min_pos);
-    params.push_back(doc);
+    SetBoundingBoxGraceXShiftParams setBoundingBoxGraceXShiftParams;
+    setBoundingBoxGraceXShiftParams.m_doc = doc;
     Functor setBoundingBoxGraceXShift(&Object::SetBoundingBoxGraceXShift);
-    this->Process(&setBoundingBoxGraceXShift, &params);
+    this->Process(&setBoundingBoxGraceXShift, &setBoundingBoxGraceXShiftParams);
 
     // Integrate the X bounding box shift of the elements
     // Once the m_xShift have been calculated, move all positions accordingly
-    params.clear();
+    IntegrateBoundingBoxGraceXShiftParams integrateBoundingBoxGraceXShiftParams;
     Functor integrateBoundingBoxGraceXShift(&Object::IntegrateBoundingBoxGraceXShift);
-    // Special case: because we redirect the functor, pass it as parameter to itself (!)
-    params.push_back(&integrateBoundingBoxGraceXShift);
-    this->Process(&integrateBoundingBoxGraceXShift, &params);
+    // Pass it for redirection
+    integrateBoundingBoxGraceXShiftParams.m_functor = &integrateBoundingBoxGraceXShift;
+    this->Process(&integrateBoundingBoxGraceXShift, &integrateBoundingBoxGraceXShiftParams);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    params.clear();
-    int minPos = 0;
-    int layerMinPos = 0;
-    int measureWidth = 0;
-    params.push_back(&minPos);
-    params.push_back(&layerMinPos);
-    
-    params.push_back(&measureWidth);
-    params.push_back(doc);
+    SetBoundingBoxXShiftParams setBoundingBoxXShiftParams;
+    setBoundingBoxXShiftParams.m_doc = doc;
     Functor setBoundingBoxXShift(&Object::SetBoundingBoxXShift);
     Functor setBoundingBoxXShiftEnd(&Object::SetBoundingBoxXShiftEnd);
-    // Special case: because we redirect the functor, pass it a parameter to itself (!)
-    params.push_back(&setBoundingBoxXShift);
-    params.push_back(&setBoundingBoxXShiftEnd);
-    this->Process(&setBoundingBoxXShift, &params, &setBoundingBoxXShiftEnd);
+    // Pass them for redirection
+    setBoundingBoxXShiftParams.m_functor = &setBoundingBoxXShift;
+    setBoundingBoxXShiftParams.m_functorEnd = &setBoundingBoxXShiftEnd;
+    this->Process(&setBoundingBoxXShift, &setBoundingBoxXShiftParams, &setBoundingBoxXShiftEnd);
 
     // Integrate the X bounding box shift of the elements
     // Once the m_xShift have been calculated, move all positions accordingly
-    params.clear();
-    int shift = 0;
-    params.push_back(&shift);
-    params.push_back(doc);
+    IntegrateBoundingBoxXShiftParams integrateBoundingBoxXShiftParams;
+    integrateBoundingBoxXShiftParams.m_doc = doc;
     Functor integrateBoundingBoxXShift(&Object::IntegrateBoundingBoxXShift);
-    // Special case: because we redirect the functor, pass it as parameter to itself (!)
-    params.push_back(&integrateBoundingBoxXShift);
-    this->Process(&integrateBoundingBoxXShift, &params);
+    // Pass it for redirection
+    integrateBoundingBoxXShiftParams.m_functor = &integrateBoundingBoxXShift;
+    this->Process(&integrateBoundingBoxXShift, &integrateBoundingBoxXShiftParams);
 
     // Adjust measure X position
-    params.clear();
-    shift = 0;
-    int justifiableWidth = 0;
-    params.push_back(&shift);
-    params.push_back(&justifiableWidth);
+    AlignMeasuresParams alignMeasuresParams;
     Functor alignMeasures(&Object::AlignMeasures);
     Functor alignMeasuresEnd(&Object::AlignMeasuresEnd);
-    this->Process(&alignMeasures, &params, &alignMeasuresEnd);
+    this->Process(&alignMeasures, &alignMeasuresParams, &alignMeasuresEnd);
 }
 
 void Page::LayOutVertically()
@@ -224,24 +181,17 @@ void Page::LayOutVertically()
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    ArrayPtrVoid params;
-
     // Reset the vertical alignment
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
-    this->Process(&resetVerticalAlignment, &params);
+    this->Process(&resetVerticalAlignment, NULL);
 
     // Align the content of the page using system aligners
     // After this:
     // - each Staff object will then have its StaffAlignment pointer initialized
-    SystemAligner *systemAlignerPtr = NULL;
-    int staffIdx = 0;
-    int staffN = 0;
-    params.push_back(&systemAlignerPtr);
-    params.push_back(&staffIdx);
-    params.push_back(&staffN);
-    params.push_back(doc);
+    AlignVerticallyParams alignVerticallyParams;
+    alignVerticallyParams.m_doc = doc;
     Functor alignVertically(&Object::AlignVertically);
-    this->Process(&alignVertically, &params);
+    this->Process(&alignVertically, &alignVerticallyParams);
 
     // Render it for filling the bounding box
     View view;
@@ -252,66 +202,49 @@ void Page::LayOutVertically()
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
-    params.clear();
-    StaffAlignment *staffAlignment = NULL;
-    params.push_back(&staffAlignment);
-    params.push_back(doc);
+    SetOverflowBBoxesParams setOverflowBBoxesParams;
+    setOverflowBBoxesParams.m_doc = doc;
     Functor setOverflowBBoxes(&Object::SetOverflowBBoxes);
-    this->Process(&setOverflowBBoxes, &params);
+    this->Process(&setOverflowBBoxes, &setOverflowBBoxesParams);
 
     // Adjust the positioners of floationg elements (slurs, hairpin, dynam, etc)
-    params.clear();
-    ClassId classId = OBJECT;
-    params.push_back(&classId);
-    params.push_back(doc);
+    AdjustFloatingPostionersParams adjustFloatingPostionersParams;
+    adjustFloatingPostionersParams.m_doc = doc;
     Functor adjustFloatingPostioners(&Object::AdjustFloatingPostioners);
-    // Special case: because we redirect the functor, pass it as parameter to itself (!)
-    params.push_back(&adjustFloatingPostioners);
-    this->Process(&adjustFloatingPostioners, &params);
+    // Pass it for redirection
+    adjustFloatingPostionersParams.m_functor = &adjustFloatingPostioners;
+    this->Process(&adjustFloatingPostioners, &adjustFloatingPostionersParams);
 
     // Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes params.clear();
-    params.clear();
-    StaffAlignment *previous = NULL;
-    params.push_back(&previous);
+    CalcStaffOverlapParams calcStaffOverlapParams;
     Functor calcStaffOverlap(&Object::CalcStaffOverlap);
-    // Special case: because we redirect the functor, pass it as parameter to itself (!)
-    params.push_back(&calcStaffOverlap);
-    this->Process(&calcStaffOverlap, &params);
+    // Pass it for redirection
+    calcStaffOverlapParams.m_functor = &calcStaffOverlap;
+    this->Process(&calcStaffOverlap, &calcStaffOverlapParams);
 
     // Set the Y position of each StaffAlignment
     // Adjust the Y shift to make sure there is a minimal space (staffMargin) between each staff
-    params.clear();
-    int previousStaffHeight = 0;
-    int previousOverflowBelow = 0;
-    int previousVerseCount = 0;
-    params.push_back(&previousStaffHeight);
-    params.push_back(&previousOverflowBelow);
-    params.push_back(&previousVerseCount);
-    params.push_back(doc);
+    SetAligmentYPosParams setAligmentYPosParams;
+    setAligmentYPosParams.m_doc = doc;
     Functor setAlignmentY(&Object::SetAligmentYPos);
-    // Special case: because we redirect the functor, pass it as parameter to itself (!)
-    params.push_back(&setAlignmentY);
-    this->Process(&setAlignmentY, &params);
+    // Pass it for redirection
+    setAligmentYPosParams.m_functor = &setAlignmentY;
+    this->Process(&setAlignmentY, &setAligmentYPosParams);
 
     // Integrate the Y shift of the staves
     // Once the m_yShift have been calculated, move all positions accordingly
-    params.clear();
-    int shift = 0;
-    params.push_back(&shift);
+    IntegrateBoundingBoxYShiftParams integrateBoundingBoxYShiftParams;
     Functor integrateBoundingBoxYShift(&Object::IntegrateBoundingBoxYShift);
-    // Special case: because we redirect the functor, pass it as parameter to itself (!)
-    params.push_back(&integrateBoundingBoxYShift);
-    this->Process(&integrateBoundingBoxYShift, &params);
+    // Pass it for redirection
+    integrateBoundingBoxYShiftParams.m_functor = &integrateBoundingBoxYShift;
+    this->Process(&integrateBoundingBoxYShift, &integrateBoundingBoxYShiftParams);
 
     // Adjust system Y position
-    params.clear();
-    shift = doc->m_drawingPageHeight - doc->m_drawingPageTopMar;
-    int systemMargin = (doc->GetSpacingSystem()) * doc->GetDrawingUnit(100);
-    params.push_back(&shift);
-    params.push_back(&systemMargin);
+    AlignSystemsParams alignSystemsParams;
+    alignSystemsParams.m_shift = doc->m_drawingPageHeight - doc->m_drawingPageTopMar;
+    alignSystemsParams.m_systemMargin = (doc->GetSpacingSystem()) * doc->GetDrawingUnit(100);
     Functor alignSystems(&Object::AlignSystems);
-    Functor alignSystemsEnd(&Object::AlignSystemsEnd);
-    this->Process(&alignSystems, &params, &alignSystemsEnd);
+    this->Process(&alignSystems, &alignSystemsParams);
 }
 
 void Page::JustifyHorizontally()
@@ -327,24 +260,13 @@ void Page::JustifyHorizontally()
     // Make sure we have the correct page
     assert(this == doc->GetDrawingPage());
 
-    ArrayPtrVoid params;
-
     // Justify X position
-    params.clear();
-    int measureXRel;
-    double justifiableRatio = 1.0;
-    int leftBarLineX = 0;
-    int rightBarLineX = 0;
-    int systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar;
-    params.push_back(&measureXRel);
-    params.push_back(&justifiableRatio);
-    params.push_back(&leftBarLineX);
-    params.push_back(&rightBarLineX);
-    params.push_back(&systemFullWidth);
+    JustifyXParams justifyXParams;
+    justifyXParams.m_systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar;
     Functor justifyX(&Object::JustifyX);
-    // Special case: because we redirect the functor, pass it as parameter to itself (!)
-    params.push_back(&justifyX);
-    this->Process(&justifyX, &params);
+    // Pass it for redirection
+    justifyXParams.m_functor = &justifyX;
+    this->Process(&justifyX, &justifyXParams);
 }
 
 int Page::GetContentHeight() const

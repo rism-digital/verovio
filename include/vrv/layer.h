@@ -109,39 +109,39 @@ public:
     /**
      * Unset the initial scoreDef of each system and measure
      */
-    virtual int UnsetCurrentScoreDef(ArrayPtrVoid *params);
+    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
      * Align horizontally the content of a layer.
      */
-    virtual int AlignHorizontally(ArrayPtrVoid *params);
+    virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
      * Align horizontally the content of a layer.
      */
-    virtual int AlignHorizontallyEnd(ArrayPtrVoid *params);
+    virtual int AlignHorizontallyEnd(FunctorParams *functorParams);
 
     /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
      * and for staff/layer to be then processed.
      */
-    virtual int PrepareProcessingLists(ArrayPtrVoid *params);
+    virtual int PrepareProcessingLists(FunctorParams *functorParams);
 
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY(ArrayPtrVoid *params);
+    virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
      * See implementation and Object::PrepareRpt
      */
-    virtual int PrepareRpt(ArrayPtrVoid *params);
+    virtual int PrepareRpt(FunctorParams *functorParams);
 
     /**
      * See Object::CalcMaxMeasureDuration
      */
-    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
+    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
 
 private:
     //

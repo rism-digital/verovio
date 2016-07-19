@@ -16,6 +16,7 @@
 
 #include "doc.h"
 #include "floatingelement.h"
+#include "functorparams.h"
 #include "note.h"
 #include "staff.h"
 #include "style.h"
@@ -477,23 +478,23 @@ TimestampAttr *TimestampAligner::GetTimestampAtTime(double time)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int StaffAlignment::CalcStaffOverlap(ArrayPtrVoid *params)
+int StaffAlignment::CalcStaffOverlap(FunctorParams *functorParams)
 {
-    // param 0: a pointer to the previous staff alignment
-    // param 1: a pointer to the functor for passing it to the system aligner (unused)
-    StaffAlignment **previous = static_cast<StaffAlignment **>((*params).at(0));
-
+    CalcStaffOverlapParams *params = dynamic_cast<CalcStaffOverlapParams *>(functorParams);
+    assert(params);
+    
     // This is the bottom alignment (or something is wrong)
     if (!this->m_staff) return FUNCTOR_STOP;
 
-    if ((*previous) == NULL) {
-        (*previous) = this;
+    if (params->m_previous == NULL) {
+        params->m_previous = this;
         return FUNCTOR_SIBLINGS;
     }
 
     ArrayOfBoundingBoxes::iterator iter;
     // go through all the elements of the top staff that have an overflow below
-    for (iter = (*previous)->m_overflowBelowBBoxes.begin(); iter != (*previous)->m_overflowBelowBBoxes.end(); iter++) {
+    for (iter = params->m_previous->m_overflowBelowBBoxes.begin();
+         iter != params->m_previous->m_overflowBelowBBoxes.end(); iter++) {
         auto i = m_overflowAboveBBoxes.begin();
         auto end = m_overflowAboveBBoxes.end();
         while (i != end) {
@@ -501,9 +502,9 @@ int StaffAlignment::CalcStaffOverlap(ArrayPtrVoid *params)
             i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalOverlap(elem); });
             if (i != end) {
                 // calculate the vertical overlap and see if this is more than the expected space
-                int overflowBelow = (*previous)->CalcOverflowBelow(*iter);
+                int overflowBelow = params->m_previous->CalcOverflowBelow(*iter);
                 int overflowAbove = this->CalcOverflowAbove(*i);
-                int spacing = std::max((*previous)->m_overflowBelow, this->m_overflowAbove);
+                int spacing = std::max(params->m_previous->m_overflowBelow, this->m_overflowAbove);
                 if (spacing < (overflowBelow + overflowAbove)) {
                     // LogDebug("Overlap %d", (overflowBelow + overflowAbove) - spacing);
                     this->SetOverlap((overflowBelow + overflowAbove) - spacing);
@@ -513,28 +514,26 @@ int StaffAlignment::CalcStaffOverlap(ArrayPtrVoid *params)
         }
     }
 
-    (*previous) = this;
+    params->m_previous = this;
 
     return FUNCTOR_SIBLINGS;
 }
 
-int StaffAlignment::AdjustFloatingPostioners(ArrayPtrVoid *params)
+int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
 {
-    // param 0: the classId
-    // param X: the doc
-    // param X: a pointer to the functor for passing it to the system aligner (unused)
-    ClassId *classId = static_cast<ClassId *>((*params).at(0));
-    Doc *doc = static_cast<Doc *>((*params).at(1));
-
+    AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
+    assert(params);
+    
     // for slur we do not need to adjust them, only add them to the overflow boxes if required
     int staffSize = this->GetStaffSize();
 
-    if ((*classId) == SYL) {
+    if (params->m_classId == SYL) {
         if (this->GetVerseCount() > 0) {
-            FontInfo *lyricFont = doc->GetDrawingLyricFont(m_staff->m_drawingStaffSize);
-            int descender = doc->GetTextGlyphDescender(L'q', lyricFont, false);
-            int height = doc->GetTextGlyphHeight(L'I', lyricFont, false);
-            int margin = doc->GetBottomMargin(SYL) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            FontInfo *lyricFont = params->m_doc->GetDrawingLyricFont(m_staff->m_drawingStaffSize);
+            int descender = params->m_doc->GetTextGlyphDescender(L'q', lyricFont, false);
+            int height = params->m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
+            int margin
+                = params->m_doc->GetBottomMargin(SYL) * params->m_doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetOverflowBelow(this->m_overflowBelow + this->GetVerseCount() * (height - descender + margin));
             // For now just clear the overflowBelow, which avoids the overlap to be calculated. We could also keep them
             // and check if they are some lyrics in order to know if the overlap needs to be calculated or not.
@@ -545,19 +544,19 @@ int StaffAlignment::AdjustFloatingPostioners(ArrayPtrVoid *params)
 
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
-        if ((*iter)->GetElement()->Is() != (*classId)) continue;
+        if ((*iter)->GetElement()->Is() != params->m_classId) continue;
 
-        if (((*classId) == SLUR) || ((*classId) == TIE)) {
+        if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
             int overflowAbove = this->CalcOverflowAbove((*iter));
-            if (overflowAbove > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
-                // LogMessage("%s top overflow: %d", current->GetUuid().c_str(), overflowAbove);
+            if (overflowAbove > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+                // LogMessage("%sparams->m_doctop overflow: %d", current->GetUuid().c_str(), overflowAbove);
                 this->SetOverflowAbove(overflowAbove);
                 this->m_overflowAboveBBoxes.push_back((*iter));
             }
 
             int overflowBelow = this->CalcOverflowBelow((*iter));
-            if (overflowBelow > doc->GetDrawingStaffLineWidth(staffSize) / 2) {
+            if (overflowBelow > params->m_doc->GetDrawingStaffLineWidth(staffSize) / 2) {
                 // LogMessage("%s bottom overflow: %d", current->GetUuid().c_str(), overflowBelow);
                 this->SetOverflowBelow(overflowBelow);
                 this->m_overflowBelowBBoxes.push_back((*iter));
@@ -566,7 +565,7 @@ int StaffAlignment::AdjustFloatingPostioners(ArrayPtrVoid *params)
         }
 
         // This sets the default position (without considering any overflowing box)
-        (*iter)->CalcDrawingYRel(doc, this, NULL);
+        (*iter)->CalcDrawingYRel(params->m_doc, this, NULL);
 
         ArrayOfBoundingBoxes *overflowBoxes = &m_overflowBelowBBoxes;
         // above?
@@ -580,7 +579,7 @@ int StaffAlignment::AdjustFloatingPostioners(ArrayPtrVoid *params)
             i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalOverlap(elem); });
             if (i != end) {
                 // update the yRel accordingly
-                (*iter)->CalcDrawingYRel(doc, this, *i);
+                (*iter)->CalcDrawingYRel(params->m_doc, this, *i);
                 i++;
             }
         }
@@ -601,75 +600,66 @@ int StaffAlignment::AdjustFloatingPostioners(ArrayPtrVoid *params)
     return FUNCTOR_SIBLINGS;
 }
 
-int StaffAlignment::SetAligmentYPos(ArrayPtrVoid *params)
+int StaffAlignment::SetAligmentYPos(FunctorParams *functorParams)
 {
-    // param 0: the previous staff height
-    // param 1: the extra staff height
-    // param 2  the previous verse count
-    // param 3: the doc
-    // param 4: the functor to be redirected to SystemAligner (unused)
-    int *previousStaffHeight = static_cast<int *>((*params).at(0));
-    int *previousOverflowBelow = static_cast<int *>((*params).at(1));
-    int *previousVerseCount = static_cast<int *>((*params).at(2));
-    Doc *doc = static_cast<Doc *>((*params).at(3));
-
+    SetAligmentYPosParams *params = dynamic_cast<SetAligmentYPosParams *>(functorParams);
+    assert(params);
+    
     int maxOverlfowAbove;
-    if ((*previousVerseCount) > 0) {
-        maxOverlfowAbove = (*previousOverflowBelow) + m_overflowAbove;
+    if (params->m_previousVerseCount > 0) {
+        maxOverlfowAbove = params->m_previousOverflowBelow + m_overflowAbove;
     }
     else {
         // The maximum between the overflow below of the previous staff and the overflow above of the current
-        maxOverlfowAbove = std::max((*previousOverflowBelow), m_overflowAbove);
+        maxOverlfowAbove = std::max(params->m_previousOverflowBelow, m_overflowAbove);
 
         // If we have some overlap, add it
         if (m_overlap) maxOverlfowAbove += m_overlap;
     }
 
     // Is the maximum the overflow (+ overlap) shift, or the default ?
-    int shift = std::max(maxOverlfowAbove, doc->GetSpacingStaff() * doc->GetDrawingUnit(100));
+    int shift = std::max(maxOverlfowAbove, params->m_doc->GetSpacingStaff() * params->m_doc->GetDrawingUnit(100));
 
     // Add a margin
-    shift += doc->GetBottomMargin(STAFF) * doc->GetDrawingUnit(this->GetStaffSize()) / PARAM_DENOMINATOR;
+    shift += params->m_doc->GetBottomMargin(STAFF) * params->m_doc->GetDrawingUnit(this->GetStaffSize())
+        / PARAM_DENOMINATOR;
 
     // Shift, including the previous staff height
-    SetYShift(-shift - (*previousStaffHeight));
+    SetYShift(-shift - params->m_previousStaffHeight);
 
-    (*previousStaffHeight) = m_staffHeight;
-    (*previousOverflowBelow) = m_overflowBelow;
-    (*previousVerseCount) = this->GetVerseCount();
+    params->m_previousStaffHeight = m_staffHeight;
+    params->m_previousOverflowBelow = m_overflowBelow;
+    params->m_previousVerseCount = this->GetVerseCount();
 
     return FUNCTOR_CONTINUE;
 }
 
-int StaffAlignment::IntegrateBoundingBoxYShift(ArrayPtrVoid *params)
+int StaffAlignment::IntegrateBoundingBoxYShift(FunctorParams *functorParams)
 {
-    // param 0: the accumulated shift
-    // param 1: the functor to be redirected to the SystemAligner (unused)
-    int *shift = static_cast<int *>((*params).at(0));
-
+    IntegrateBoundingBoxYShiftParams *params = dynamic_cast<IntegrateBoundingBoxYShiftParams *>(functorParams);
+    assert(params);
+    
     // integrates the m_yShift into the m_yRel
-    m_yRel += m_yShift + (*shift);
+    m_yRel += m_yShift + params->m_shift;
 
     // cumulate the shift value
-    (*shift) += m_yShift;
+    params->m_shift += m_yShift;
     m_yShift = 0;
 
     return FUNCTOR_CONTINUE;
 }
 
-int MeasureAligner::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
+int MeasureAligner::IntegrateBoundingBoxXShift(FunctorParams *functorParams)
 {
-    // param 0: the accumulated shift
-    // param 1: the doc for accessing drawing parameters (unused)
-    // param 2: the functor to be redirected to the MeasureAligner (unused)
-    int *shift = static_cast<int *>((*params).at(0));
-
-    (*shift) = 0;
+    IntegrateBoundingBoxXShiftParams *params = dynamic_cast<IntegrateBoundingBoxXShiftParams *>(functorParams);
+    assert(params);
+    
+    params->m_shift = 0;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
+int Alignment::IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams)
 {
     if (!m_graceAligner) {
         return FUNCTOR_CONTINUE;
@@ -695,24 +685,21 @@ int Alignment::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
+int Alignment::IntegrateBoundingBoxXShift(FunctorParams *functorParams)
 {
-    // param 0: the accumulated shift
-    // param 1: the doc
-    // param 2: the functor to be redirected to the MeasureAligner (unused)
-    int *shift = static_cast<int *>((*params).at(0));
-    Doc *doc = static_cast<Doc *>((*params).at(1));
-
+    IntegrateBoundingBoxXShiftParams *params = dynamic_cast<IntegrateBoundingBoxXShiftParams *>(functorParams);
+    assert(params);
+    
     // We move the first left position according to style but not for aligners that are empty and not
     // for the left barline because we want it to be at the 0 pos if nothing before it.
-    if (((*shift) == 0) && (m_type != ALIGNMENT_MEASURE_LEFT_BARLINE) && !m_layerElementsRef.empty()) {
-        (*shift) = doc->GetLeftPosition() * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    if ((params->m_shift == 0) && (m_type != ALIGNMENT_MEASURE_LEFT_BARLINE) && !m_layerElementsRef.empty()) {
+        params->m_shift = params->m_doc->GetLeftPosition() * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     }
 
     // integrates the m_xShift into the m_xRel
-    m_xRel += m_xShift + (*shift);
+    m_xRel += m_xShift + params->m_shift;
     // cumulate the shift value and the width
-    (*shift) += m_xShift;
+    params->m_shift += m_xShift;
 
     // reset member to 0
     m_xShift = 0;
@@ -720,62 +707,48 @@ int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::SetBoundingBoxXShift(ArrayPtrVoid *params)
+int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
-    // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the minimum for the beginning of a layer (i.e., after the left barline) (unused)
-    // param 2: the maximum width in the current measure
-    // param 3: the Doc
-    // param 4: the functor to be redirected to Aligner (unused)
-    // param 5: the functor to be redirected to Aligner at the end (unused)
-    int *minPos = static_cast<int *>((*params).at(0));
-
-    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(4));
-
+    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    assert(params);
+    
     // Here we want to process only the left scoreDef up to the left barline
     if (this->m_type > ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
 
     ArrayOfObjects::iterator iter;
 
     // Because we are processing the elements vertically we need to reset minPos for each element
-    int previousMinPos = (*minPos);
+    int previousMinPos = params->m_minPos;
     for (iter = m_layerElementsRef.begin(); iter != m_layerElementsRef.end(); iter++) {
-        (*minPos) = previousMinPos;
-        (*iter)->Process(setBoundingBoxXShift, params);
+        params->m_minPos = previousMinPos;
+        (*iter)->Process(params->m_functor, params);
     }
 
     // If we have elements for this alignment, then adjust the minPos
     if (!m_layerElementsRef.empty()) {
-        (*minPos) = this->GetXRel() + this->GetMaxWidth();
+        params->m_minPos = this->GetXRel() + this->GetMaxWidth();
     }
     // Otherwise, just set its xShift because this was not done by the functor
     else {
-        this->SetXShift((*minPos) - this->GetXRel());
-        (*minPos) = this->GetXRel();
+        this->SetXShift(params->m_minPos - this->GetXRel());
+        params->m_minPos = this->GetXRel();
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
+int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
 {
-    // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the minimum for the beginning of a layer (i.e., after the left barline) (unused)
-    // param 2: the maximum width in the current measure
-    // param 3: the Doc
-    // param 4: the functor to be redirected to Aligner
-    // param 5: the functor to be redirected to Aligner at the end (unused)
-    int *minPos = static_cast<int *>((*params).at(0));
-    Doc *doc = static_cast<Doc *>((*params).at(3));
-    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(4));
-
+    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    assert(params);
+    
     // Because these do not get shifted with their bounding box because their bounding box is calculated according to
     // the width of the measure, their xShift has to be set 'by hand'
     if (GetType() == ALIGNMENT_FULLMEASURE) {
-        (*minPos) = std::max(this->GetXRel() + doc->m_drawingMinMeasureWidth, (*minPos));
+        params->m_minPos = std::max(this->GetXRel() + params->m_doc->m_drawingMinMeasureWidth, params->m_minPos);
     }
     else if (GetType() == ALIGNMENT_FULLMEASURE2) {
-        (*minPos) = std::max(this->GetXRel() + 2 * doc->m_drawingMinMeasureWidth, (*minPos));
+        params->m_minPos = std::max(this->GetXRel() + 2 * params->m_doc->m_drawingMinMeasureWidth, params->m_minPos);
     }
 
     // Here we want to process only the alignments from the right barline to the end - this includes the right scoreDef
@@ -785,38 +758,34 @@ int Alignment::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
     ArrayOfObjects::iterator iter;
 
     // Because we are processing the elements vertically we need to reset minPos for each element
-    int previousMinPos = (*minPos);
+    int previousMinPos = params->m_minPos;
     for (iter = m_layerElementsRef.begin(); iter != m_layerElementsRef.end(); iter++) {
-        (*minPos) = previousMinPos;
-        (*iter)->Process(setBoundingBoxXShift, params);
+        params->m_minPos = previousMinPos;
+        (*iter)->Process(params->m_functor, params);
     }
 
     // If we have elements for this alignment, then adjust the minPos
     if (!m_layerElementsRef.empty()) {
-        (*minPos) = this->GetXRel() + this->GetMaxWidth();
+        params->m_minPos = this->GetXRel() + this->GetMaxWidth();
     }
     // Otherwise, just set its xShift because this was not done by the functor
     // This includes ALIGNMENT_MEASURE_END alignments
     else {
-        this->SetXShift((*minPos) - this->GetXRel());
+        this->SetXShift(params->m_minPos - this->GetXRel());
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-int MeasureAligner::SetAlignmentXPos(ArrayPtrVoid *params)
+int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
 {
-    // param 0: the previous time position
-    // param 1: the previous x rel position
-    // param 2: duration of the longest note (unused)
-    // param 3: the functor to be redirected to the MeasureAligner (unused)
-    double *previousTime = static_cast<double *>((*params).at(0));
-    int *previousXRel = static_cast<int *>((*params).at(1));
-
+    SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
+    assert(params);
+    
     // We start a new MeasureAligner
     // Reset the previous time position and x_rel to 0;
-    (*previousTime) = 0.0;
-    (*previousXRel) = 0;
+    params->m_previousTime = 0.0;
+    params->m_previousXRel = 0;
 
     return FUNCTOR_CONTINUE;
 }
@@ -846,24 +815,18 @@ int Alignment::HorizontalSpaceForDuration(
     return intervalXRel;
 }
 
-int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
+int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 {
-    // param 0: the previous time position
-    // param 1: the previous x rel position
-    // param 2: duration of the longest note
-    // param 3: the functor to be redirected to the MeasureAligner (unused)
-    double *previousTime = static_cast<double *>((*params).at(0));
-    int *previousXRel = static_cast<int *>((*params).at(1));
-    int *maxActualDur = static_cast<int *>((*params).at(2));
-    Doc *doc = static_cast<Doc *>((*params).at(3));
-
+    SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
+    assert(params);
+    
     // Do not set an x pos for anything before the barline (including it)
     if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
     // Do not set an x pos for anything after the barline (but still for it)
     if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) return FUNCTOR_CONTINUE;
 
     int intervalXRel = 0;
-    double intervalTime = (m_time - (*previousTime));
+    double intervalTime = (m_time - params->m_previousTime);
 
     // For clef changes, do not take into account the interval so we keep them left aligned
     // This is not perfect because the previous time is the one of the previous aligner and
@@ -871,66 +834,52 @@ int Alignment::SetAlignmentXPos(ArrayPtrVoid *params)
     if (this->m_type == ALIGNMENT_CLEF) intervalTime = 0.0;
 
     if (intervalTime > 0.0) {
-        intervalXRel = HorizontalSpaceForDuration(
-            intervalTime, *maxActualDur, doc->GetSpacingLinear(), doc->GetSpacingNonLinear());
+        intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
+            params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
-    m_xRel = (*previousXRel) + intervalXRel * DEFINITION_FACTOR;
-    (*previousTime) = m_time;
-    (*previousXRel) = m_xRel;
+    m_xRel = params->m_previousXRel + intervalXRel * DEFINITION_FACTOR;
+    params->m_previousTime = m_time;
+    params->m_previousXRel = m_xRel;
 
     return FUNCTOR_CONTINUE;
 }
 
-int MeasureAligner::JustifyX(ArrayPtrVoid *params)
+int MeasureAligner::JustifyX(FunctorParams *functorParams)
 {
-    // param 0: the measureXRel of the next measure
-    // param 1: the justification ratio (unused)
-    // param 2: the xRel position of the left barline
-    // param 3: the xRel position of the right barline
-    // param 4: the system full width (without system margins) (unused)
-    // param 5: the functor to be redirected to the MeasureAligner (unused)
-    int *leftBarLineX = static_cast<int *>((*params).at(2));
-    int *rightBarLineX = static_cast<int *>((*params).at(3));
-
-    (*leftBarLineX) = GetLeftBarLineAlignment()->GetXRel();
-    (*rightBarLineX) = GetRightBarLineAlignment()->GetXRel();
-
-    // LogDebug("Justification measure ratio: %f - leftBarLineX %d", (*justifiableRatio), (*leftBarLineX));
+    JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
+    assert(params);
+    
+    params->m_leftBarLineX = GetLeftBarLineAlignment()->GetXRel();
+    params->m_rightBarLineX = GetRightBarLineAlignment()->GetXRel();
 
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::JustifyX(ArrayPtrVoid *params)
+int Alignment::JustifyX(FunctorParams *functorParams)
 {
-    // param 0: the measureXRel of the next measure
-    // param 1: the justification ratio for the measure (depends on the margin)
-    // param 2: the xRel position of the left barline
-    // param 3: the xRel position of the right barline
-    // param 4: the system full width (without system margins) (unused)
-    // param 5: the functor to be redirected to the MeasureAligner (unused)
-    int *measureXRel = static_cast<int *>((*params).at(0));
-    double *justifiableRatio = static_cast<double *>((*params).at(1));
-    int *leftBarLineX = static_cast<int *>((*params).at(2));
-    int *rightBarLineX = static_cast<int *>((*params).at(3));
-
+    JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
+    assert(params);
+    
     if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) {
         // Nothing to do for all left scoreDef elements and the left barline
     }
     else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         // All elements up to the next barline, move them but also take into account the leftBarlineX
-        this->m_xRel = ceil(((double)this->m_xRel - (double)(*leftBarLineX)) * (*justifiableRatio)) + (*leftBarLineX);
+        this->m_xRel = ceil(((double)this->m_xRel - (double)params->m_leftBarLineX * params->m_justifiableRatio)
+            + params->m_leftBarLineX);
     }
     else {
         //  Now more the right barline and all right scoreDef elements
-        int shift = this->m_xRel - (*rightBarLineX);
-        this->m_xRel = ceil(((double)(*rightBarLineX) - (double)(*leftBarLineX)) * (*justifiableRatio))
-            + (*leftBarLineX) + shift;
+        int shift = this->m_xRel - params->m_rightBarLineX;
+        this->m_xRel
+            = ceil(((double)params->m_rightBarLineX - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
+            + params->m_leftBarLineX + shift;
     }
 
     // Finally, when reaching the end of the measure, update the measureXRel for the next measure
     if (m_type == ALIGNMENT_MEASURE_END) {
-        (*measureXRel) += this->m_xRel;
+        params->m_measureXRel += this->m_xRel;
     }
 
     return FUNCTOR_CONTINUE;

@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "attcomparison.h"
+#include "functorparams.h"
 #include "layerelement.h"
 #include "measure.h"
 #include "staff.h"
@@ -195,11 +196,10 @@ bool TimeSpanningInterface::IsSpanningMeasures()
 // Interface pseudo functor (redirected)
 //----------------------------------------------------------------------------
 
-int TimePointInterface::InterfacePrepareTimestamps(ArrayPtrVoid *params, Object *object)
+int TimePointInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
 {
-    // param 0: std::vector< Object*>* that holds the current elements to match (unused)
-    // param 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
-    ArrayOfObjectBeatPairs *tstamps = static_cast<ArrayOfObjectBeatPairs *>((*params).at(1));
+    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
+    assert(params);
 
     // First we check if the object has already a mapped @startid (it should not)
     if (this->HasStart()) {
@@ -213,76 +213,73 @@ int TimePointInterface::InterfacePrepareTimestamps(ArrayPtrVoid *params, Object 
     }
 
     // We set -1 to the data_MEASUREBEAT for @tstamp
-    tstamps->push_back(std::make_pair(object, data_MEASUREBEAT(-1, this->GetTstamp())));
+    params->m_tstamps.push_back(std::make_pair(object, data_MEASUREBEAT(-1, this->GetTstamp())));
 
     return FUNCTOR_CONTINUE;
 }
 
-int TimePointInterface::InterfaceResetDrawing(ArrayPtrVoid *params, Object *object)
+int TimePointInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
 {
     m_start = NULL;
     m_startUuid = "";
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfacePrepareTimeSpanning(ArrayPtrVoid *params, Object *object)
+int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object)
 {
-    // param 0: std::vector< Object*>* that holds the current elements to match
-    // param 1: bool* fillList for indicating whether the elements have to be stacked or not
-    ArrayOfInterfaceClassIdPairs *elements = static_cast<ArrayOfInterfaceClassIdPairs *>((*params).at(0));
-    bool *fillList = static_cast<bool *>((*params).at(1));
+    PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
+    assert(params);
 
-    if ((*fillList) == false) {
+    if (params->m_fillList == false) {
         return FUNCTOR_CONTINUE;
     }
 
     this->SetUuidStr();
-    elements->push_back(std::make_pair(this, object->Is()));
+    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->Is()));
 
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfacePrepareTimestamps(ArrayPtrVoid *params, Object *object)
+int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object)
 {
-    // param 0: std::vector< Object*>* that holds the current elements to match (unused)
-    // param 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
-    ArrayOfObjectBeatPairs *tstamps = static_cast<ArrayOfObjectBeatPairs *>((*params).at(1));
+    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
+    assert(params);
 
     // First we check if the object has already a mapped @endid (it should not)
     if (this->HasEndid()) {
         if (this->HasTstamp2())
             LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
                 object->GetClassName().c_str(), object->GetUuid().c_str());
-        return TimePointInterface::InterfacePrepareTimestamps(params, object);
+        return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
     }
     else if (!HasTstamp2()) {
         // We won't be able to do anything, just try to prepare the tstamp (start)
-        return TimePointInterface::InterfacePrepareTimestamps(params, object);
+        return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
     }
 
     // We can now add the pair to our stack
-    tstamps->push_back(std::make_pair(object, data_MEASUREBEAT(this->GetTstamp2())));
+    params->m_tstamps.push_back(std::make_pair(object, data_MEASUREBEAT(this->GetTstamp2())));
 
     return TimePointInterface::InterfacePrepareTimestamps(params, object);
 }
 
-int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params, Object *object)
+int TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object)
 {
-    // param 0: std::vector< Object * >* of the current running TimeSpanningInterface elements
-    std::vector<Object *> *elements = static_cast<std::vector<Object *> *>((*params).at(0));
+    FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    assert(params);
 
     if (this->IsSpanningMeasures()) {
-        elements->push_back(object);
+        params->m_timeSpanningElements.push_back(object);
     }
     return FUNCTOR_CONTINUE;
 }
 
-int TimeSpanningInterface::InterfaceResetDrawing(ArrayPtrVoid *params, Object *object)
+int TimeSpanningInterface::InterfaceResetDrawing(FunctorParams *functorParams, Object *object)
 {
     m_end = NULL;
     m_endUuid = "";
     // Special case where we have interface inheritance
-    return TimePointInterface::InterfaceResetDrawing(params, object);
+    return TimePointInterface::InterfaceResetDrawing(functorParams, object);
 }
 
 } // namespace vrv

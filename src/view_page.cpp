@@ -21,6 +21,7 @@
 #include "editorial.h"
 #include "ending.h"
 #include "floatingelement.h"
+#include "functorparams.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -51,27 +52,18 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
 
     int i;
-    System *system = NULL;
-    Measure *measure = NULL;
-    Staff *staff = NULL;
-    Layer *layer = NULL;
-    bool processLayerElement = false;
-    ArrayPtrVoid params;
-    params.push_back(m_doc);
-    params.push_back(&system);
-    params.push_back(&measure);
-    params.push_back(&staff);
-    params.push_back(&layer);
-    params.push_back(this);
-    params.push_back(&processLayerElement);
+    SetDrawingXYParams setDrawingXYParams;
+    setDrawingXYParams.m_doc = m_doc;
+    setDrawingXYParams.m_view = this;
     Functor setDrawingXY(&Object::SetDrawingXY);
-    params.push_back(&setDrawingXY);
+    // Pass it for redirection
+    setDrawingXYParams.m_functor = &setDrawingXY;
     // First pass without processing the LayerElements - we need this for cross-staff going down because
     // the elements will need the position of the staff below to have been set before
-    m_currentPage->Process(&setDrawingXY, &params);
+    m_currentPage->Process(&setDrawingXY, &setDrawingXYParams);
     // Second pass that process the LayerElements (only)
-    processLayerElement = true;
-    m_currentPage->Process(&setDrawingXY, &params);
+    setDrawingXYParams.m_processLayerElements = true;
+    m_currentPage->Process(&setDrawingXY, &setDrawingXYParams);
 
     // Keep the width of the initial scoreDef
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
@@ -91,7 +83,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 
     for (i = 0; i < m_currentPage->GetSystemCount(); i++) {
         // cast to System check in DrawSystem
-        system = dynamic_cast<System *>(m_currentPage->GetChild(i));
+        System *system = dynamic_cast<System *>(m_currentPage->GetChild(i));
         DrawSystem(dc, system);
     }
 

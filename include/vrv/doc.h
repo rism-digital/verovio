@@ -188,7 +188,7 @@ public:
      * Export the document to a MIDI file.
      * Run trough all the layer and fill the midi file content.
      */
-    void ExportMIDI(MidiFile *midifile);
+    void ExportMIDI(MidiFile *midiFile);
 
     /**
      * Set the initial scoreDef of each page.
@@ -264,7 +264,7 @@ public:
      * Functor for setting wordpos and connector ends
      * The functor is process by doc at the end of a document of closing opened syl.
      */
-    virtual int PrepareLyricsEnd(ArrayPtrVoid *params);
+    virtual int PrepareLyricsEnd(FunctorParams *functorParams);
 
 private:
     /**

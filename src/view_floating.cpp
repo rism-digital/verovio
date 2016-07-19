@@ -24,6 +24,7 @@
 #include "dynam.h"
 #include "ending.h"
 #include "floatingelement.h"
+#include "functorparams.h"
 #include "hairpin.h"
 #include "layer.h"
 #include "layerelement.h"
@@ -813,11 +814,9 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
 
     System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
     assert(system);
-    std::vector<LayerElement *> spanningContent;
-    ArrayPtrVoid params;
-    params.push_back(&spanningContent);
-    params.push_back(&p1->x);
-    params.push_back(&p2->x);
+    TimeSpanningLayerElementsParams timeSpanningLayerElementsParams;
+    timeSpanningLayerElementsParams.m_minPos = p1->x;
+    timeSpanningLayerElementsParams.m_maxPos = p2->x;
     std::vector<AttComparison *> filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
@@ -827,12 +826,13 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     filters.push_back(&matchLayer);
 
     Functor timeSpanningLayerElements(&Object::TimeSpanningLayerElements);
-    system->Process(&timeSpanningLayerElements, &params, NULL, &filters);
+    system->Process(&timeSpanningLayerElements, &timeSpanningLayerElementsParams, NULL, &filters);
     // if (spanningContent.size() > 12) LogDebug("### %d %s", spanningContent.size(), slur->GetUuid().c_str());
 
     ArrayOfLayerElementPointPairs spanningContentPoints;
     std::vector<LayerElement *>::iterator it;
-    for (it = spanningContent.begin(); it != spanningContent.end(); it++) {
+    for (it = timeSpanningLayerElementsParams.m_spanningContent.begin();
+         it != timeSpanningLayerElementsParams.m_spanningContent.end(); it++) {
         Note *note = NULL;
         // We keep only notes and chords for now
         if (((*it)->Is() != NOTE) && ((*it)->Is() != CHORD)) continue;
