@@ -20,12 +20,16 @@
 
 //----------------------------------------------------------------------------
 
+#ifndef NO_HUMDRUM_SUPPORT
 #include "humlib.h"
 #include "pugixml.hpp"
+#endif /* NO_HUMDRUM_SUPPORT */
 
 //----------------------------------------------------------------------------
 
 namespace vrv {
+
+#ifndef NO_HUMDRUM_SUPPORT
 
 class Beam;
 class Chord;
@@ -152,6 +156,8 @@ namespace humaux {
     };
 }
 
+#endif /* NO_HUMDRUM_SUPPORT */
+
 //----------------------------------------------------------------------------
 // HumdrumInput
 //----------------------------------------------------------------------------
@@ -164,6 +170,8 @@ public:
 
     virtual bool ImportFile();
     virtual bool ImportString(std::string humdrum);
+
+#ifndef NO_HUMDRUM_SUPPORT
 
     string GetMeiString(void);
 
@@ -327,6 +335,8 @@ private:
 
     // m_staffstates == state variables for each staff.
     vector<humaux::StaffStateVariables> m_staffstates;
+
+#endif /* NO_HUMDRUM_SUPPORT */
 };
 
 } // namespace vrv

@@ -17,25 +17,35 @@
 //    http://pugixml.org/docs/manual.html
 //
 
+#include "iohumdrum.h"
+
 #ifndef NO_HUMDRUM_SUPPORT
 
-#include "iohumdrum.h"
 #include "humlib.h"
 #include <math.h>
 
+#endif /* NO_HUMDRUM_SUPPORT */
+
 //----------------------------------------------------------------------------
+
+#ifndef NO_HUMDRUM_SUPPORT
 
 #include <algorithm>
 #include <assert.h>
 #include <sstream>
 #include <vector>
 
+#endif /* NO_HUMDRUM_SUPPORT */
+
 //----------------------------------------------------------------------------
+
+#include "doc.h"
+
+#ifndef NO_HUMDRUM_SUPPORT
 
 #include "beam.h"
 #include "chord.h"
 #include "dir.h"
-#include "doc.h"
 #include "dynam.h"
 #include "editorial.h"
 #include "hairpin.h"
@@ -66,7 +76,11 @@ using namespace vrv; // verovio namespace
 using namespace pugi; // pugixml namespace
 using namespace std;
 
+#endif /* NO_HUMDRUM_SUPPORT */
+
 namespace vrv {
+
+#ifndef NO_HUMDRUM_SUPPORT
 
 //----------------------------------------------------------------------------
 // namespace for local IoHumdrum classes
@@ -228,6 +242,8 @@ namespace humaux {
 
 } // end namespace humaux
 
+#endif /* NO_HUMDRUM_SUPPORT */
+
 //----------------------------------------------------------------------------
 // HumdrumInput
 //----------------------------------------------------------------------------
@@ -239,6 +255,9 @@ namespace humaux {
 
 HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc)
 {
+
+#ifndef NO_HUMDRUM_SUPPORT
+
     m_filename = filename;
 
     m_staffgroup = NULL;
@@ -260,6 +279,8 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
 #endif
     m_comment = 1;
     m_omd = false;
+
+#endif /* NO_HUMDRUM_SUPPORT */
 }
 
 //////////////////////////////
@@ -269,7 +290,12 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
 
 HumdrumInput::~HumdrumInput()
 {
+
+#ifndef NO_HUMDRUM_SUPPORT
+
     clear();
+
+#endif /* NO_HUMDRUM_SUPPORT */
 }
 
 //////////////////////////////
@@ -279,6 +305,9 @@ HumdrumInput::~HumdrumInput()
 
 bool HumdrumInput::ImportFile()
 {
+
+#ifndef NO_HUMDRUM_SUPPORT
+
     try {
         m_doc->Reset();
         HumdrumFile &infile = m_infile;
@@ -292,6 +321,10 @@ bool HumdrumInput::ImportFile()
         LogError("%s", str);
         return false;
     }
+
+#else
+    return true;
+#endif /* NO_HUMDRUM_SUPPORT */
 }
 
 //////////////////////////////
@@ -301,6 +334,9 @@ bool HumdrumInput::ImportFile()
 
 bool HumdrumInput::ImportString(const std::string content)
 {
+
+#ifndef NO_HUMDRUM_SUPPORT
+
     try {
         m_doc->Reset();
         HumdrumFile &infile = m_infile;
@@ -314,12 +350,18 @@ bool HumdrumInput::ImportString(const std::string content)
         LogError("%s", str);
         return false;
     }
+
+#else
+    return true;
+#endif /* NO_HUMDRUM_SUPPORT */
 }
 
 ///////////////////////////////////////////////////////////////////////////
 //
 // Protected functions.
 //
+
+#ifndef NO_HUMDRUM_SUPPORT
 
 //////////////////////////////
 //
@@ -4125,6 +4167,6 @@ std::string HumdrumInput::GetMeiString(void)
     return meioutput.GetOutput();
 }
 
-} // namespace vrv
-
 #endif /* NO_HUMDRUM_SUPPORT */
+
+} // namespace vrv
