@@ -1704,6 +1704,9 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
         else if (letters == "fp") {
             dynamic = "fp";
         }
+        else if (letters == "sfp") {
+            dynamic = "sfp";
+        }
         else if (letters == "sf") {
             // for a sf which is shared betwee staves in piano music;
             // otherwise "z" on **kern notes is probably better.
@@ -3056,6 +3059,19 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
     }
 
     int layer = m_currentlayer;
+
+    if (tstring.find("jj") != string::npos) {
+        int newstaff = m_currentstaff - 1;
+        if ((newstaff > 0) && (newstaff <= m_kernstarts.size())) {
+            setStaff(rest, newstaff);
+        }
+    }
+    else if (tstring.find("j") != string::npos) {
+        int newstaff = m_currentstaff + 1;
+        if ((newstaff > 0) && (newstaff <= m_kernstarts.size())) {
+            setStaff(rest, newstaff);
+        }
+    }
 
     if (tstring.find(";") != string::npos) {
         if ((tstring.find("yy") == string::npos) && (tstring.find(";y") == string::npos)) {
