@@ -1400,7 +1400,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     // is the same duration as the time signature, then
     // create a full measure rest (mrest).
     // Deal with time/clef/key changes in measures with
-    // whole-measure rests later.
+    // whole-measure rests later.  Also have to deal with
+    // pedal mark in mrest meaures.
     if (hasFullMeasureRest(layerdata, timesigdurs[startline], duration)) {
         MRest *mrest = new MRest();
         appendElement(layer, mrest);
@@ -2881,6 +2882,7 @@ HTp HumdrumInput::getPreviousDataToken(HTp token)
         if (current->isData()) {
             break;
         }
+        current = current->getPreviousToken();
     }
     return current;
 }
