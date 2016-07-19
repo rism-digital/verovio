@@ -527,19 +527,6 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    // param 0: MidiFile*: the MidiFile we are writing to
-    // param 1: int*: the midi track number
-    // param 2: int*: the current time in the measure (incremented by each element)
-    // param 3: int*: the current total measure time (incremented by each measure
-    // param 4: std::vector<double>: a stack of maximum duration filled by the functor (unused)
-    // param 5: int* the semi tone transposition for the current track
-
-    // MidiFile *midiFile = static_cast<MidiFile *>((*params).at(0));
-    // int *midiTrack = static_cast<int *>((*params).at(1));
-    // double *currentMeasureTime = static_cast<double *>((*params).at(2));
-    // double *totalTime = static_cast<double *>((*params).at(3));
-    // int *transSemi = static_cast<int *>((*params).at(5));
-
     // Here we need to check if the LayerElement as a duration, otherwise we can continue
     if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
 
@@ -617,7 +604,8 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
         int velocity = 64;
         params->m_midiFile->addNoteOn(
             params->m_midiTrack, params->m_totalTime + params->m_currentMeasureTime, channel, pitch, velocity);
-        params->m_midiFile->addNoteOff(params->m_midiTrack, params->m_totalTime + params->m_currentMeasureTime + dur, channel, pitch);
+        params->m_midiFile->addNoteOff(
+            params->m_midiTrack, params->m_totalTime + params->m_currentMeasureTime + dur, channel, pitch);
 
         note->m_playingOnset = params->m_totalTime + params->m_currentMeasureTime;
         note->m_playingOffset = params->m_totalTime + params->m_currentMeasureTime + dur;

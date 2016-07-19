@@ -154,6 +154,8 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             filters.push_back(&matchLayer);
 
             GenerateMIDIParams generateMIDIParams;
+            generateMIDIParams.m_midiFile = midiFile;
+            generateMIDIParams.m_maxValues = calcMaxMeasureDurationParams.m_maxValues;
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
 
