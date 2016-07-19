@@ -482,7 +482,7 @@ int StaffAlignment::CalcStaffOverlap(FunctorParams *functorParams)
 {
     CalcStaffOverlapParams *params = dynamic_cast<CalcStaffOverlapParams *>(functorParams);
     assert(params);
-    
+
     // This is the bottom alignment (or something is wrong)
     if (!this->m_staff) return FUNCTOR_STOP;
 
@@ -523,7 +523,7 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
 {
     AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
     assert(params);
-    
+
     // for slur we do not need to adjust them, only add them to the overflow boxes if required
     int staffSize = this->GetStaffSize();
 
@@ -604,7 +604,7 @@ int StaffAlignment::SetAligmentYPos(FunctorParams *functorParams)
 {
     SetAligmentYPosParams *params = dynamic_cast<SetAligmentYPosParams *>(functorParams);
     assert(params);
-    
+
     int maxOverlfowAbove;
     if (params->m_previousVerseCount > 0) {
         maxOverlfowAbove = params->m_previousOverflowBelow + m_overflowAbove;
@@ -638,7 +638,7 @@ int StaffAlignment::IntegrateBoundingBoxYShift(FunctorParams *functorParams)
 {
     IntegrateBoundingBoxYShiftParams *params = dynamic_cast<IntegrateBoundingBoxYShiftParams *>(functorParams);
     assert(params);
-    
+
     // integrates the m_yShift into the m_yRel
     m_yRel += m_yShift + params->m_shift;
 
@@ -653,7 +653,7 @@ int MeasureAligner::IntegrateBoundingBoxXShift(FunctorParams *functorParams)
 {
     IntegrateBoundingBoxXShiftParams *params = dynamic_cast<IntegrateBoundingBoxXShiftParams *>(functorParams);
     assert(params);
-    
+
     params->m_shift = 0;
 
     return FUNCTOR_CONTINUE;
@@ -689,7 +689,7 @@ int Alignment::IntegrateBoundingBoxXShift(FunctorParams *functorParams)
 {
     IntegrateBoundingBoxXShiftParams *params = dynamic_cast<IntegrateBoundingBoxXShiftParams *>(functorParams);
     assert(params);
-    
+
     // We move the first left position according to style but not for aligners that are empty and not
     // for the left barline because we want it to be at the 0 pos if nothing before it.
     if ((params->m_shift == 0) && (m_type != ALIGNMENT_MEASURE_LEFT_BARLINE) && !m_layerElementsRef.empty()) {
@@ -711,7 +711,7 @@ int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
-    
+
     // Here we want to process only the left scoreDef up to the left barline
     if (this->m_type > ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
 
@@ -741,7 +741,7 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
-    
+
     // Because these do not get shifted with their bounding box because their bounding box is calculated according to
     // the width of the measure, their xShift has to be set 'by hand'
     if (GetType() == ALIGNMENT_FULLMEASURE) {
@@ -781,7 +781,7 @@ int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
 {
     SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
     assert(params);
-    
+
     // We start a new MeasureAligner
     // Reset the previous time position and x_rel to 0;
     params->m_previousTime = 0.0;
@@ -819,7 +819,7 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 {
     SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
     assert(params);
-    
+
     // Do not set an x pos for anything before the barline (including it)
     if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
     // Do not set an x pos for anything after the barline (but still for it)
@@ -849,7 +849,7 @@ int MeasureAligner::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
     assert(params);
-    
+
     params->m_leftBarLineX = GetLeftBarLineAlignment()->GetXRel();
     params->m_rightBarLineX = GetRightBarLineAlignment()->GetXRel();
 
@@ -860,13 +860,13 @@ int Alignment::JustifyX(FunctorParams *functorParams)
 {
     JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
     assert(params);
-    
+
     if (m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) {
         // Nothing to do for all left scoreDef elements and the left barline
     }
     else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         // All elements up to the next barline, move them but also take into account the leftBarlineX
-        this->m_xRel = ceil(((double)this->m_xRel - (double)params->m_leftBarLineX * params->m_justifiableRatio)
+        this->m_xRel = ceil((((double)this->m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
             + params->m_leftBarLineX);
     }
     else {
