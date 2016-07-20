@@ -43,6 +43,7 @@
 
 #ifndef NO_HUMDRUM_SUPPORT
 
+#include "accid.h"
 #include "beam.h"
 #include "chord.h"
 #include "dir.h"
@@ -3208,29 +3209,39 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
         case 6: note->SetPname(PITCHNAME_b); break;
     }
 
+    int accidCount = Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
     if (token->hasCautionaryAccidental(stindex)) {
+        addCautionaryAccidental(note, token, accidCount);
         showInAccidGes = true;
+        showInAccid = false;
     }
 
-    int accidCount = Convert::kernToAccidentalCount(tstring);
     if (showInAccid) {
         switch (accidCount) {
+            // case +3: note->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
             case +2: note->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
             case +1: note->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
             case 0: note->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
             case -1: note->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
-            case -2: note->SetAccid(ACCIDENTAL_EXPLICIT_ff); break;
+            case -2:
+                note->SetAccid(ACCIDENTAL_EXPLICIT_ff);
+                break;
+                // case -3: note->SetAccid(ACCIDENTAL_EXPLICIT_tf); break;
         }
     }
     if (showInAccidGes) {
         switch (accidCount) {
+            // case +3: note->SetAccidGes(ACCIDENTAL_IMPLICIT_ts); break;
             case +2: note->SetAccidGes(ACCIDENTAL_IMPLICIT_ss); break;
             case +1: note->SetAccidGes(ACCIDENTAL_IMPLICIT_s); break;
             case 0: note->SetAccidGes(ACCIDENTAL_IMPLICIT_n); break;
             case -1: note->SetAccidGes(ACCIDENTAL_IMPLICIT_f); break;
-            case -2: note->SetAccidGes(ACCIDENTAL_IMPLICIT_ff); break;
+            case -2:
+                note->SetAccidGes(ACCIDENTAL_IMPLICIT_ff);
+                break;
+                // case -3: note->SetAccidGes(ACCIDENTAL_IMPLICIT_tf); break;
         }
     }
 
@@ -3283,6 +3294,27 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
         token->setValue("MEI", "xml:id", note->GetUuid());
         int index = m_measures.size() - 1;
         token->setValue("MEI", "measureIndex", index);
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addCautionaryAccidental --
+//
+
+void HumdrumInput::addCautionaryAccidental(Note *note, HTp token, int acount)
+{
+    Accid *accid = new Accid;
+    note->AddLayerElement(accid);
+    accid->SetFunc(accidLog_FUNC_caution);
+    switch (acount) {
+        case +3: accid->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
+        case +2: accid->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
+        case +1: accid->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
+        case 0: accid->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
+        case -1: accid->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
+        case -2: accid->SetAccid(ACCIDENTAL_EXPLICIT_ff); break;
+        case -3: accid->SetAccid(ACCIDENTAL_EXPLICIT_tf); break;
     }
 }
 
