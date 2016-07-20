@@ -508,9 +508,15 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
                 TimeSpanningInterface *tsInterface = ((*iter).first)->GetTimeSpanningInterface();
                 assert(tsInterface);
                 if (tsInterface->HasStartAndEnd()) {
-                    //params->m_timeSpanningInterfaces.erase(std::remove(params->m_timeSpanningInterfaces.begin(),
-                    //                                           params->m_timeSpanningInterfaces.end(), (*iter).first),
-                    //    params->m_timeSpanningInterfaces.end());
+                    auto item
+                        = std::find_if(params->m_timeSpanningInterfaces.begin(), params->m_timeSpanningInterfaces.end(),
+                            [tsInterface](std::pair<TimeSpanningInterface *, ClassId> pair) {
+                                return (pair.first == tsInterface);
+                            });
+                    if (item != params->m_timeSpanningInterfaces.end()) {
+                        LogDebug("Found it!");
+                        params->m_timeSpanningInterfaces.erase(item);
+                    }
                 }
             }
             // remove it
@@ -525,9 +531,15 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
             // We can check if the interface is now fully mapped (start / end) and purge the list of unmatched
             // elements
             if (interface->HasStartAndEnd()) {
-                //params->m_timeSpanningInterfaces.erase(std::remove(params->m_timeSpanningInterfaces.begin(),
-                //                                           params->m_timeSpanningInterfaces.end(), (*iter).first),
-                //    params->m_timeSpanningInterfaces.end());
+                auto item
+                    = std::find_if(params->m_timeSpanningInterfaces.begin(), params->m_timeSpanningInterfaces.end(),
+                        [interface](std::pair<TimeSpanningInterface *, ClassId> pair) {
+                            return (pair.first == interface);
+                        });
+                if (item != params->m_timeSpanningInterfaces.end()) {
+                    LogDebug("Found it!");
+                    params->m_timeSpanningInterfaces.erase(item);
+                }
             }
             iter = params->m_tstamps.erase(iter);
         }

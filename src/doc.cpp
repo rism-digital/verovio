@@ -197,15 +197,15 @@ void Doc::PrepareDrawing()
 
     // Now try to match the @tstamp and @tstamp2 attributes.
     PrepareTimestampsParams prepareTimestampsParams;
-    prepareTimeSpanningParams.m_timeSpanningInterfaces = prepareTimeSpanningParams.m_timeSpanningInterfaces;
+    prepareTimestampsParams.m_timeSpanningInterfaces = prepareTimeSpanningParams.m_timeSpanningInterfaces;
     Functor prepareTimestamps(&Object::PrepareTimestamps);
     Functor prepareTimestampsEnd(&Object::PrepareTimestampsEnd);
     this->Process(&prepareTimestamps, &prepareTimestampsParams, &prepareTimestampsEnd);
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!prepareTimeSpanningParams.m_timeSpanningInterfaces.empty()) {
-        LogWarning("%d time spanning elements could not be matched",
-            prepareTimeSpanningParams.m_timeSpanningInterfaces.size());
+    if (!prepareTimestampsParams.m_timeSpanningInterfaces.empty()) {
+        LogWarning(
+            "%d time spanning elements could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and

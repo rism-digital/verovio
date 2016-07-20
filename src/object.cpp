@@ -921,8 +921,8 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     if (this->Is() == SYSTEM) {
         // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
         params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
-        System *system = dynamic_cast<System *>(this);
-        assert(system);
+        // System *system = dynamic_cast<System *>(this);
+        // assert(system);
         // For now we don't use it - eventually we want to set it. The problem will be to take into account succeeding
         // scoreDefs appearing before the first measure of the system
         // system->SetDrawingScoreDef(*currentScoreDef);
@@ -1080,8 +1080,6 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
 
     // starting new layer
     if (this->Is() == LAYER) {
-        Layer *current_layer = dynamic_cast<Layer *>(this);
-        assert(current_layer);
         params->m_minPos = params->m_layerMinPos;
         return FUNCTOR_CONTINUE;
     }
