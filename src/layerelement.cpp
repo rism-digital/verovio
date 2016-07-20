@@ -601,10 +601,16 @@ int LayerElement::ExportMIDI(ArrayPtrVoid *params)
         else if (note->m_drawingAccid) {
             data_ACCIDENTAL_EXPLICIT acc_exp = note->m_drawingAccid->GetAccid();
             switch (acc_exp) {
-                case ACCIDENTAL_IMPLICIT_s: midiBase += 1; break;
-                case ACCIDENTAL_IMPLICIT_f: midiBase -= 1; break;
-                case ACCIDENTAL_IMPLICIT_ss: midiBase += 2; break;
-                case ACCIDENTAL_IMPLICIT_ff: midiBase -= 2; break;
+                case ACCIDENTAL_EXPLICIT_s: midiBase += 1; break;
+                case ACCIDENTAL_EXPLICIT_f: midiBase -= 1; break;
+                case ACCIDENTAL_EXPLICIT_ss: midiBase += 2; break;
+                case ACCIDENTAL_EXPLICIT_x: midiBase += 2; break;
+                case ACCIDENTAL_EXPLICIT_ff: midiBase -= 2; break;
+                case ACCIDENTAL_EXPLICIT_xs: midiBase += 3; break;
+                case ACCIDENTAL_EXPLICIT_ts: midiBase += 3; break;
+                case ACCIDENTAL_EXPLICIT_tf: midiBase -= 3; break;
+                case ACCIDENTAL_EXPLICIT_nf: midiBase -= 1; break;
+                case ACCIDENTAL_EXPLICIT_ns: midiBase += 1; break;
                 default: break;
             }
         }
