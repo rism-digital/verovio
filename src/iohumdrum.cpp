@@ -1473,9 +1473,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     for (i = 0; i < (int)layerdata.size(); i++) {
         if (prespace[i] > 0) {
-            Space *space = new Space;
-            appendElement(elements, pointers, space);
-            setDuration(space, prespace[i]);
+            addSpace(elements, pointers, prespace[i]);
         }
         if (layerdata[i]->isNull()) {
             continue;
@@ -1545,13 +1543,26 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             // if there is empty space at the end of the layer.  The layer is
             // rhythmically too short, so add a space element to match the
             // amount of underfilling.
-            Space *space = new Space;
-            appendElement(elements, pointers, space);
-            setDuration(space, prespace.back());
+            addSpace(elements, pointers, prespace.back());
         }
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addSpace -- Add one or more space elements
+//    to match the required duration.
+//
+
+void HumdrumInput::addSpace(vector<string> &elements, vector<void *> &pointers, HumNum duration)
+{
+    while (duration > 0) {
+        Space *space = new Space;
+        appendElement(elements, pointers, space);
+        duration -= setDuration(space, duration);
+    }
 }
 
 //////////////////////////////
@@ -3580,59 +3591,75 @@ void HumdrumInput::printMeasureTokens(void)
 //    Mostly for <space> elements.
 //
 
-template <class ELEMENT> void HumdrumInput::setDuration(ELEMENT element, HumNum duration)
+template <class ELEMENT> HumNum HumdrumInput::setDuration(ELEMENT element, HumNum duration)
 {
     if (duration == 3) {
         element->SetDur(DURATION_2);
         element->SetDots(1);
-        return;
+        return duration;
     }
     else if (duration == 2) {
         element->SetDur(DURATION_2);
-        return;
+        return duration;
     }
     else if (duration == 1) {
         element->SetDur(DURATION_4);
-        return;
+        return duration;
     }
     else if (duration == 4) {
         element->SetDur(DURATION_1);
-        return;
+        return duration;
     }
     else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 2)) {
         element->SetDur(DURATION_8);
-        return;
+        return duration;
     }
     else if ((duration.getNumerator() == 3) && (duration.getDenominator() == 2)) {
         element->SetDur(DURATION_4);
         element->SetDots(1);
-        return;
+        return duration;
     }
     else if ((duration.getNumerator() == 3) && (duration.getDenominator() == 4)) {
         element->SetDur(DURATION_8);
         element->SetDots(1);
-        return;
+        return duration;
     }
     else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 4)) {
         element->SetDur(DURATION_16);
-        return;
+        return duration;
     }
     else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 8)) {
         element->SetDur(DURATION_32);
-        return;
+        return duration;
     }
     else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 16)) {
         element->SetDur(DURATION_64);
-        return;
+        return duration;
     }
     else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 32)) {
         element->SetDur(DURATION_128);
-        return;
+        return duration;
     }
     else if ((duration.getNumerator() == 1) && (duration.getDenominator() == 64)) {
         element->SetDur(DURATION_256);
-        return;
+        return duration;
     }
+    if (duration > 4) {
+        element->SetDur(DURATION_1);
+        return 4;
+    }
+    if (duration > 2) {
+        element->SetDur(DURATION_2);
+        return 2;
+    }
+    if (duration > 1) {
+        element->SetDur(DURATION_4);
+        return 1;
+    }
+    // Don't know what to do, so return duration
+    // There will be an error in the data.
+    cerr << "Unprintable rhythm: " << duration << endl;
+    return duration;
 }
 
 //////////////////////////////

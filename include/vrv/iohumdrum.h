@@ -244,6 +244,7 @@ protected:
     hum::HTp getCrescendoEnd(hum::HTp token);
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
     void storeOriginalClefApp(void);
+    void addSpace(vector<string> &elements, vector<void *> &pointers, hum::HumNum duration);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -259,7 +260,7 @@ protected:
 
     template <class ELEMENT> void convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
 
-    template <class ELEMENT> void setDuration(ELEMENT element, hum::HumNum duration);
+    template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
 
     template <class ELEMENT> void setStaff(ELEMENT element, int staffnum);
 
