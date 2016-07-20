@@ -723,32 +723,35 @@ int Alignment::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
 int Alignment::SetBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the maximum width in the current measure
-    // param 2: the Doc
-    // param 3: the functor to be redirected to Aligner (unused)
-    // param 4: the functor to be redirected to Aligner at the end (unused)
-    int *min_pos = static_cast<int *>((*params).at(0));
-    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+    // param 1: the minimum for the beginning of a layer (i.e., after the left barline) (unused)
+    // param 2: the maximum width in the current measure
+    // param 3: the Doc
+    // param 4: the functor to be redirected to Aligner (unused)
+    // param 5: the functor to be redirected to Aligner at the end (unused)
+    int *minPos = static_cast<int *>((*params).at(0));
+
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(4));
 
     // Here we want to process only the left scoreDef up to the left barline
     if (this->m_type > ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
 
     ArrayOfObjects::iterator iter;
 
-    // Because we are processing the elements vertically we need to reset min_pos for each element
-    int previousMinPos = (*min_pos);
+    // Because we are processing the elements vertically we need to reset minPos for each element
+    int previousMinPos = (*minPos);
     for (iter = m_layerElementsRef.begin(); iter != m_layerElementsRef.end(); iter++) {
-        (*min_pos) = previousMinPos;
+        (*minPos) = previousMinPos;
         (*iter)->Process(setBoundingBoxXShift, params);
     }
 
-    // If we have elements for this alignment, then adjust the min_pos
+    // If we have elements for this alignment, then adjust the minPos
     if (!m_layerElementsRef.empty()) {
-        (*min_pos) = this->GetXRel() + this->GetMaxWidth();
+        (*minPos) = this->GetXRel() + this->GetMaxWidth();
     }
     // Otherwise, just set its xShift because this was not done by the functor
     else {
-        this->SetXShift((*min_pos) - this->GetXRel());
+        this->SetXShift((*minPos) - this->GetXRel());
+        (*minPos) = this->GetXRel();
     }
 
     return FUNCTOR_CONTINUE;
@@ -757,21 +760,22 @@ int Alignment::SetBoundingBoxXShift(ArrayPtrVoid *params)
 int Alignment::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
 {
     // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the maximum width in the current measure
-    // param 2: the Doc
-    // param 3: the functor to be redirected to Aligner
-    // param 4: the functor to be redirected to Aligner at the end (unused)
-    int *min_pos = static_cast<int *>((*params).at(0));
-    Doc *doc = static_cast<Doc *>((*params).at(2));
-    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+    // param 1: the minimum for the beginning of a layer (i.e., after the left barline) (unused)
+    // param 2: the maximum width in the current measure
+    // param 3: the Doc
+    // param 4: the functor to be redirected to Aligner
+    // param 5: the functor to be redirected to Aligner at the end (unused)
+    int *minPos = static_cast<int *>((*params).at(0));
+    Doc *doc = static_cast<Doc *>((*params).at(3));
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(4));
 
     // Because these do not get shifted with their bounding box because their bounding box is calculated according to
     // the width of the measure, their xShift has to be set 'by hand'
     if (GetType() == ALIGNMENT_FULLMEASURE) {
-        (*min_pos) = std::max(this->GetXRel() + doc->m_drawingMinMeasureWidth, (*min_pos));
+        (*minPos) = std::max(this->GetXRel() + doc->m_drawingMinMeasureWidth, (*minPos));
     }
     else if (GetType() == ALIGNMENT_FULLMEASURE2) {
-        (*min_pos) = std::max(this->GetXRel() + 2 * doc->m_drawingMinMeasureWidth, (*min_pos));
+        (*minPos) = std::max(this->GetXRel() + 2 * doc->m_drawingMinMeasureWidth, (*minPos));
     }
 
     // Here we want to process only the alignments from the right barline to the end - this includes the right scoreDef
@@ -780,21 +784,21 @@ int Alignment::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
 
     ArrayOfObjects::iterator iter;
 
-    // Because we are processing the elements vertically we need to reset min_pos for each element
-    int previousMinPos = (*min_pos);
+    // Because we are processing the elements vertically we need to reset minPos for each element
+    int previousMinPos = (*minPos);
     for (iter = m_layerElementsRef.begin(); iter != m_layerElementsRef.end(); iter++) {
-        (*min_pos) = previousMinPos;
+        (*minPos) = previousMinPos;
         (*iter)->Process(setBoundingBoxXShift, params);
     }
 
-    // If we have elements for this alignment, then adjust the min_pos
+    // If we have elements for this alignment, then adjust the minPos
     if (!m_layerElementsRef.empty()) {
-        (*min_pos) = this->GetXRel() + this->GetMaxWidth();
+        (*minPos) = this->GetXRel() + this->GetMaxWidth();
     }
     // Otherwise, just set its xShift because this was not done by the functor
     // This includes ALIGNMENT_MEASURE_END alignments
     else {
-        this->SetXShift((*min_pos) - this->GetXRel());
+        this->SetXShift((*minPos) - this->GetXRel());
     }
 
     return FUNCTOR_CONTINUE;

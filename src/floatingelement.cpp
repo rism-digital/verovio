@@ -112,6 +112,10 @@ FloatingPositioner::FloatingPositioner(FloatingElement *element) : BoundingBox()
         // dynam below by default
         m_place = dynam->HasPlace() ? dynam->GetPlace() : STAFFREL_below;
     }
+    else if (element->Is() == ENDING_BOUNDARY) {
+        // endings always above;
+        m_place = STAFFREL_above;
+    }
     else if (element->Is() == HAIRPIN) {
         Hairpin *hairpin = dynamic_cast<Hairpin *>(element);
         assert(hairpin);
@@ -221,14 +225,14 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 int FloatingElement::ResetHorizontalAlignment(ArrayPtrVoid *params)
 {
     m_currentPositioner = NULL;
-    
+
     return FUNCTOR_CONTINUE;
 }
 
 int FloatingElement::ResetVerticalAlignment(ArrayPtrVoid *params)
 {
     m_currentPositioner = NULL;
-    
+
     return FUNCTOR_CONTINUE;
 }
 

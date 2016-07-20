@@ -375,6 +375,15 @@ void Doc::PrepareDrawing()
         }
     }
 
+    // Prepare the endings (pointers to the measure after and before the boundaries
+    params.clear();
+    Measure *lastMeasure = NULL;
+    EndingBoundary *currentEnding = NULL;
+    params.push_back(&lastMeasure);
+    params.push_back(&currentEnding);
+    Functor prepareEndings(&Object::PrepareEndings);
+    this->Process(&prepareEndings, &params);
+
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
     StaffN_LayerN_VerseN_t::iterator staves;

@@ -178,10 +178,13 @@ void Page::LayOutHorizontally()
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     params.clear();
-    int min_pos = 0;
-    int measure_width = 0;
-    params.push_back(&min_pos);
-    params.push_back(&measure_width);
+    int minPos = 0;
+    int layerMinPos = 0;
+    int measureWidth = 0;
+    params.push_back(&minPos);
+    params.push_back(&layerMinPos);
+    
+    params.push_back(&measureWidth);
     params.push_back(doc);
     Functor setBoundingBoxXShift(&Object::SetBoundingBoxXShift);
     Functor setBoundingBoxXShiftEnd(&Object::SetBoundingBoxXShiftEnd);

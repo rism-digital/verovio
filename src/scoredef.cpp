@@ -490,7 +490,6 @@ int ScoreDef::CastOffSystems(ArrayPtrVoid *params)
     // scoreDef and one for the current that will be the initial one at the next system
     // Also, the abbr label (width) changes would not be taken into account
     (*currentScoreDefWidth) = this->GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
-    ;
 
     return FUNCTOR_SIBLINGS;
 }

@@ -706,6 +706,13 @@ public:
     virtual int PrepareRpt(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
 
     /**
+     * Functor for setting Measure of EndingBoundary
+     * param 0: Measure **lastMeasure
+     * param 1: EndingBoundary **currentEnding
+     */
+    virtual int PrepareEndings(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+
+    /**
      * Goes through all the TimeSpanningInterface elements and set them a current to each staff
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
      * param 0: std::vector< Object*>* of the current running TimeSpanningInterface elements

@@ -125,6 +125,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
 	$VEROVIO_ROOT/src/dynam.cpp \
 	$VEROVIO_ROOT/src/editorial.cpp \
+	$VEROVIO_ROOT/src/ending.cpp \
 	$VEROVIO_ROOT/src/floatingelement.cpp \
 	$VEROVIO_ROOT/src/glyph.cpp \
 	$VEROVIO_ROOT/src/hairpin.cpp \

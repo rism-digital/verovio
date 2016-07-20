@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <iostream>
 #include <math.h>
+#include <sstream>
 
 //----------------------------------------------------------------------------
 
@@ -21,6 +22,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "ending.h"
 #include "floatingelement.h"
 #include "hairpin.h"
 #include "layer.h"
@@ -36,6 +38,7 @@
 #include "syl.h"
 #include "system.h"
 #include "tempo.h"
+#include "text.h"
 #include "tie.h"
 #include "timeinterface.h"
 #include "vrv.h"
@@ -1620,6 +1623,146 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     }
 
     dc->EndGraphic(tempo, this);
+}
+
+void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
+{
+    assert(dc);
+    assert(ending);
+    assert(system);
+
+    if (dc->Is() == BBOX_DEVICE_CONTEXT) {
+        BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
+        assert(bBoxDC);
+        if (!bBoxDC->UpdateVerticalValues()) {
+            return;
+        }
+    }
+
+    // Only start boundaries are added to the system drawing list from each measure
+    assert(ending->IsStartBoundary());
+    // in non debug mode
+    if (!ending->IsStartBoundary()) return;
+
+    EndingBoundary *start = ending;
+    EndingBoundary *end = ending->GetEndBoundary();
+
+    // We need to make sure we have the end boudary and a measure (first and last) in each of them
+    assert(end);
+    assert(start->GetMeasure() && end->GetMeasure());
+    // in non debug mode
+    if (!end) return;
+    if (!start->GetMeasure() || !end->GetMeasure()) return;
+
+    // Get the parent system of the first and last note
+    System *parentSystem1 = dynamic_cast<System *>(start->GetFirstParent(SYSTEM));
+    System *parentSystem2 = dynamic_cast<System *>(end->GetFirstParent(SYSTEM));
+
+    assert(parentSystem1 && parentSystem2);
+    // in non debug mode
+    if (!parentSystem1 || !parentSystem2) return;
+
+    int x1, x2;
+    Measure *measure = NULL;
+    char spanningType = SPANNING_START_END;
+
+    // The both correspond to the current system, which means no system break in-between (simple case)
+    if ((system == parentSystem1) && (system == parentSystem2)) {
+        x1 = start->GetMeasure()->GetDrawingX();
+        x2 = end->GetMeasure()->GetDrawingX() + end->GetMeasure()->GetRightBarLineXRel();
+    }
+    // Only the first parent is the same, this means that the ending is "open" at the end of the system
+    else if (system == parentSystem1) {
+        // We need the last measure of the system for x2 - we also use it for getting the staves later
+        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
+        if (!Check(measure)) return;
+        x1 = start->GetMeasure()->GetDrawingX();
+        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
+        spanningType = SPANNING_START;
+    }
+    // We are in the system where the ending ends - draw it from the beginning of the system
+    else if (system == parentSystem2) {
+        // We need the last measure of the system for x2
+        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        if (!Check(measure)) return;
+        x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
+        x2 = end->GetMeasure()->GetDrawingX() + end->GetMeasure()->GetRightBarLineXRel();
+        spanningType = SPANNING_END;
+    }
+    // Rare case where neither the first note nor the last note are in the current system - draw the connector
+    // throughout the system
+    else {
+        // We need the first measure of the system for x1 - we also use it for getting the staves later
+        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
+        if (!Check(measure)) return;
+        x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
+        // We need the last measure of the system for x2
+        measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
+        if (!Check(measure)) return;
+        x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
+        spanningType = SPANNING_MIDDLE;
+    }
+
+    // For now just get the first staff - eventually we should look at the scoreDef
+    // Maybe we should also draw it on top of each staffGrp? Or should ending have a staffIdent?
+    // We would need to call SetCurrentFloatingPositioner for each staff where it is drawn
+    Staff *staff = dynamic_cast<Staff *>(system->FindChildByType(STAFF, 2, FORWARD));
+    if (!Check(staff)) return;
+    system->SetCurrentFloatingPositioner(staff->GetN(), ending, x1, staff->GetDrawingY());
+
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START))
+        dc->ResumeGraphic(ending, ending->GetUuid());
+    else
+        dc->StartGraphic(ending, "spanning-ending", "");
+
+    int y1 = ending->GetDrawingY();
+
+    FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+    // currentFont.SetWeight(FONTWEIGHT_bold);
+    // currentFont.SetPointSize(currentFont.GetPointSize() * 2 / 3);
+    dc->SetFont(&currentFont);
+
+    TextExtend extend;
+    dc->GetTextExtent("M", &extend);
+
+    if (start->HasN()) {
+        std::wstringstream strStream;
+        // Maybe we want to add ( ) after system breaks?
+        // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
+        strStream << start->GetN() << L".";
+        // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
+
+        Text text;
+        text.SetText(strStream.str());
+
+        bool setX = false;
+        bool setY = false;
+
+        int textX = x1;
+        if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+            textX += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
+        }
+        dc->StartText(ToDeviceContextX(textX), ToDeviceContextY(y1), LEFT);
+        DrawTextElement(dc, &text, textX, y1, setX, setY);
+        dc->EndText();
+    }
+
+    dc->ResetFont();
+
+    int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
+
+    DrawFullRectangle(dc, x1, y2, x2, y2 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        DrawFullRectangle(dc, x1, y1, x1 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y2);
+    }
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        DrawFullRectangle(dc, x2 - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y1, x2, y2);
+    }
+
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START))
+        dc->EndResumedGraphic(ending, this);
+    else
+        dc->EndGraphic(ending, this);
 }
 
 } // namespace vrv

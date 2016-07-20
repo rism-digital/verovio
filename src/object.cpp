@@ -1044,12 +1044,12 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
 {
     // param 0: the minimum position (i.e., the width of the previous element)
     // param 1: the Doc
-    int *min_pos = static_cast<int *>((*params).at(0));
+    int *minPos = static_cast<int *>((*params).at(0));
     Doc *doc = static_cast<Doc *>((*params).at(1));
 
     // starting new layer
     if (this->Is() == LAYER) {
-        (*min_pos) = 0;
+        (*minPos) = 0;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1061,7 +1061,7 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     assert(note);
 
     if (!note->IsGraceNote()) {
-        (*min_pos) = 0;
+        (*minPos) = 0;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1074,24 +1074,24 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
     int negative_offset
         = -(note->m_contentBB_x1) + (doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
-    if ((*min_pos) > 0) {
-        //(*min_pos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    if ((*minPos) > 0) {
+        //(*minPos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }
 
     // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used)
     if (negative_offset < 0) negative_offset = 0;
 
-    // check if the element overlaps with the preceeding one given by (*min_pos)
-    int overlap = (*min_pos) - note->GetGraceAlignment()->GetXRel() + negative_offset;
+    // check if the element overlaps with the preceeding one given by (*minPos)
+    int overlap = (*minPos) - note->GetGraceAlignment()->GetXRel() + negative_offset;
 
-    if ((note->GetGraceAlignment()->GetXRel() - negative_offset) < (*min_pos)) {
+    if ((note->GetGraceAlignment()->GetXRel() - negative_offset) < (*minPos)) {
         note->GetGraceAlignment()->SetXShift(overlap);
     }
 
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    (*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2
+    (*minPos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2
         + doc->GetRightMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    //(*min_pos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
+    //(*minPos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
     // note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) *
     // doc->GetDrawingUnit(100) /
     // PARAM_DENOMINATOR);
@@ -1103,19 +1103,20 @@ int Object::SetBoundingBoxGraceXShift(ArrayPtrVoid *params)
 int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the maximum width in the current measure
-    // param 2: the Doc
-    // param 3: the functor to be redirected to Aligner (unused)
-    // param 4: the functor to be redirected to Aligner at the end (unused)
-    int *min_pos = static_cast<int *>((*params).at(0));
-    // int *measure_width = static_cast<int *>((*params).at(1));
-    Doc *doc = static_cast<Doc *>((*params).at(2));
+    // param 1: the minimum for the beginning of a layer (i.e., after the left barline)
+    // param 2: the maximum width in the current measure
+    // param 3: the Doc
+    // param 4: the functor to be redirected to Aligner (unused)
+    // param 5: the functor to be redirected to Aligner at the end (unused)
+    int *minPos = static_cast<int *>((*params).at(0));
+    int *layerMinPos = static_cast<int *>((*params).at(1));
+    Doc *doc = static_cast<Doc *>((*params).at(3));
 
     // starting new layer
     if (this->Is() == LAYER) {
         Layer *current_layer = dynamic_cast<Layer *>(this);
         assert(current_layer);
-        (*min_pos) = 0;
+        (*minPos) = (*layerMinPos);
         return FUNCTOR_CONTINUE;
     }
 
@@ -1172,17 +1173,17 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
         currentX += note->GetGraceAlignment()->GetXRel();
     }
 
-    // check if the element overlaps with the preceeding one given by (*min_pos)
-    int overlap = (*min_pos) - currentX + negative_offset;
+    // check if the element overlaps with the preceeding one given by (*minPos)
+    int overlap = (*minPos) - currentX + negative_offset;
 
-    if ((currentX - negative_offset) < (*min_pos)) {
+    if ((currentX - negative_offset) < (*minPos)) {
         current->GetAlignment()->SetXShift(overlap);
     }
 
     // do not adjust the min pos and the max width since this is already handled by
     // the GraceAligner
     if (current->IsGraceNote()) {
-        (*min_pos) = current->GetAlignment()->GetXRel();
+        (*minPos) = current->GetAlignment()->GetXRel();
         current->GetAlignment()->SetMaxWidth(0);
         return FUNCTOR_CONTINUE;
     }
@@ -1191,7 +1192,7 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
     int width = current->m_contentBB_x2;
     if (!current->HasEmptyBB())
         width += doc->GetRightMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    (*min_pos) = current->GetAlignment()->GetXRel() + width;
+    (*minPos) = current->GetAlignment()->GetXRel() + width;
     current->GetAlignment()->SetMaxWidth(width);
 
     return FUNCTOR_CONTINUE;
@@ -1200,16 +1201,17 @@ int Object::SetBoundingBoxXShift(ArrayPtrVoid *params)
 int Object::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
 {
     // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the maximum width in the current measure
-    int *min_pos = static_cast<int *>((*params).at(0));
-    int *measure_width = static_cast<int *>((*params).at(1));
+    // param 1: the minimum for the beginning of a layer (i.e., after the left barline) (unused)
+    // param 2: the maximum width in the current measure
+    int *minPos = static_cast<int *>((*params).at(0));
+    int *measureWidth = static_cast<int *>((*params).at(2));
 
     // ending a layer
     if (this->Is() == LAYER) {
         // mininimum position is the with the layer
         // we keep it if it's higher than what we had so far
         // this will be used for shifting the right barLine
-        (*measure_width) = std::max((*measure_width), (*min_pos));
+        (*measureWidth) = std::max((*measureWidth), (*minPos));
         return FUNCTOR_CONTINUE;
     }
 

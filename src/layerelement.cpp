@@ -534,10 +534,10 @@ int LayerElement::TimeSpanningLayerElements(ArrayPtrVoid *params)
     // param 1: the minimum position
     // param 2: the maximum position
     std::vector<LayerElement *> *spanningContent = static_cast<std::vector<LayerElement *> *>((*params).at(0));
-    int *min_pos = static_cast<int *>((*params).at(1));
+    int *minPos = static_cast<int *>((*params).at(1));
     int *max_pos = static_cast<int *>((*params).at(2));
 
-    if (this->GetDrawingX() > (*min_pos) && this->GetDrawingX() < (*max_pos)) {
+    if (this->GetDrawingX() > (*minPos) && this->GetDrawingX() < (*max_pos)) {
         spanningContent->push_back(this);
     }
     else if (this->GetDrawingX() > (*max_pos)) {

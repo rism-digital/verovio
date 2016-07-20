@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "ending.h"
 #include "floatingelement.h"
 #include "page.h"
 #include "staff.h"
@@ -81,6 +82,8 @@ void Measure::Reset()
     if (!m_measuredMusic) {
         m_xAbs = 0;
     }
+
+    m_drawingEnding = NULL;
 }
 
 void Measure::AddFloatingElement(FloatingElement *element)
@@ -276,20 +279,25 @@ int Measure::AlignVertically(ArrayPtrVoid *params)
 int Measure::SetBoundingBoxXShift(ArrayPtrVoid *params)
 {
     // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the maximum width in the current measure
-    // param 2: the Doc (unused)
-    // param 3: the functor to be redirected to Aligner
-    // param 4: the functor to be redirected to Aligner at the end (unused)
-    int *min_pos = static_cast<int *>((*params).at(0));
-    int *measure_width = static_cast<int *>((*params).at(1));
-    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(3));
+    // param 1: the minimum for the beginning of a layer (i.e., after the left barline)
+    // param 2: the maximum width in the current measure
+    // param 3: the Doc (unused)
+    // param 4: the functor to be redirected to Aligner
+    // param 5: the functor to be redirected to Aligner at the end (unused)
+    int *minPos = static_cast<int *>((*params).at(0));
+    int *layerMinPos = static_cast<int *>((*params).at(1));
+    int *measureWidth = static_cast<int *>((*params).at(2));
+    Functor *setBoundingBoxXShift = static_cast<Functor *>((*params).at(4));
 
     // we reset the measure width and the minimum position
-    (*measure_width) = 0;
-    (*min_pos) = 0;
+    (*measureWidth) = 0;
+    (*layerMinPos) = 0;
+    (*minPos) = 0;
 
     // Process the left scoreDef elements and the left barLine
     m_measureAligner.Process(setBoundingBoxXShift, params);
+
+    (*layerMinPos) = (*minPos);
 
     return FUNCTOR_CONTINUE;
 }
@@ -297,16 +305,17 @@ int Measure::SetBoundingBoxXShift(ArrayPtrVoid *params)
 int Measure::SetBoundingBoxXShiftEnd(ArrayPtrVoid *params)
 {
     // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the maximum width in the current measure
-    // param 2: the Doc (unused)
-    // param 3: the functor to be redirected to Aligner (unused)
-    // param 4: the functor to be redirected to Aligner at the end
-    int *min_pos = static_cast<int *>((*params).at(0));
-    int *measure_width = static_cast<int *>((*params).at(1));
-    Functor *setBoundingBoxXShiftEnd = static_cast<Functor *>((*params).at(4));
+    // param 1: the minimum for the beginning of a layer (i.e., after the left barline) (unused)
+    // param 2: the maximum width in the current measure
+    // param 3: the Doc (unused)
+    // param 4: the functor to be redirected to Aligner (unused)
+    // param 5: the functor to be redirected to Aligner at the end
+    int *minPos = static_cast<int *>((*params).at(0));
+    int *measureWidth = static_cast<int *>((*params).at(2));
+    Functor *setBoundingBoxXShiftEnd = static_cast<Functor *>((*params).at(5));
 
     // use the measure width as minimum position of the barLine
-    (*min_pos) = (*measure_width);
+    (*minPos) = (*measureWidth);
 
     // Process the right barLine and the right scoreDef elements
     m_measureAligner.Process(setBoundingBoxXShiftEnd, params);
@@ -393,6 +402,7 @@ int Measure::ResetDrawing(ArrayPtrVoid *params)
     this->m_leftBarLine.Reset();
     this->m_rightBarLine.Reset();
     this->m_timestampAligner.Reset();
+    m_drawingEnding = NULL;
     return FUNCTOR_CONTINUE;
 };
 
@@ -498,6 +508,27 @@ int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::PrepareEndings(ArrayPtrVoid *params)
+{
+    // param 0: Measure **lastMeasure
+    // param 1: EndingBoundary **currentEnding
+    Measure **lastMeasure = static_cast<Measure **>((*params).at(0));
+    EndingBoundary **currentEnding = static_cast<EndingBoundary **>((*params).at(1));
+
+    if ((*currentEnding)) {
+        // This is the first measure we are encountering since the beginning of the ending
+        if ((*currentEnding)->GetMeasure() == NULL) {
+            (*currentEnding)->SetMeasure(this);
+        }
+        // Set the ending to each measure in between
+        this->m_drawingEnding = (*currentEnding);
+    }
+    // Keep a pointer to the measure for when we are reaching the end (see EndingBoundary::PrepareEndings)
+    (*lastMeasure) = this;
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::PrepareTimeSpanningEnd(ArrayPtrVoid *params)
 {
     // param 0: std::vector< Object*>* that holds the current elements to match
@@ -506,8 +537,10 @@ int Measure::PrepareTimeSpanningEnd(ArrayPtrVoid *params)
 
     ArrayOfInterfaceClassIdPairs::iterator iter = elements->begin();
     while (iter != elements->end()) {
-        // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
-        // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
+        // At the end of the measure (going backward) we remove element for which we do not need to match the end
+        // (for
+        // now). Eventually, we could consider them, for example if we want to display their spanning or for
+        // improved
         // midi output
         if ((iter->second == DIR) || (iter->second == DYNAM)) {
             iter = elements->erase(iter);
@@ -597,7 +630,8 @@ int Measure::GenerateMIDIEnd(ArrayPtrVoid *params)
     double *totalTime = static_cast<double *>((*params).at(3));
     std::vector<double> *maxValues = static_cast<std::vector<double> *>((*params).at(4));
 
-    // We a to the total time the maximum duration of the measure so if there is no layer, if the layer is not full or
+    // We a to the total time the maximum duration of the measure so if there is no layer, if the layer is not full
+    // or
     // if there is an encoding error in the measure, the next one will be properly aligned
     assert(!maxValues->empty());
     (*totalTime) += maxValues->front();
