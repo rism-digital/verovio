@@ -132,13 +132,13 @@ Inheritance diagram for vrv::DurationInterface:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:acd64baba469c9b9f7092075acbbfcf77"><td class="memItemLeft" align="right" valign="top">virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_duration_interface.html#acd64baba469c9b9f7092075acbbfcf77">GetAlignmentDuration</a> (int num, int numbase)</td></tr>
-<tr class="memdesc:acd64baba469c9b9f7092075acbbfcf77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the duration (in double) for the element.  <a href="#acd64baba469c9b9f7092075acbbfcf77">More...</a><br /></td></tr>
-<tr class="separator:acd64baba469c9b9f7092075acbbfcf77"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5551784279b6cbeeca3a57c71117fc16"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5551784279b6cbeeca3a57c71117fc16"></a>
-virtual double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_duration_interface.html#a5551784279b6cbeeca3a57c71117fc16">GetAlignmentMensuralDuration</a> (int num, int numbase, <a class="el" href="classvrv_1_1_mensur.html">Mensur</a> *currentMensur)</td></tr>
-<tr class="memdesc:a5551784279b6cbeeca3a57c71117fc16"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the duration (in double) for the element for mensural notation Currently this assume brevis equality (through DUR_MENSURAL_REF) and would need to be modifiy for shorter equality in later repertoire. <br /></td></tr>
-<tr class="separator:a5551784279b6cbeeca3a57c71117fc16"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad72f9c1aa9ae69505d47d7da4698f6c6"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_duration_interface.html#ad72f9c1aa9ae69505d47d7da4698f6c6">GetInterfaceAlignmentDuration</a> (int num, int numbase)</td></tr>
+<tr class="memdesc:ad72f9c1aa9ae69505d47d7da4698f6c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the duration (in double) for the element.  <a href="#ad72f9c1aa9ae69505d47d7da4698f6c6">More...</a><br /></td></tr>
+<tr class="separator:ad72f9c1aa9ae69505d47d7da4698f6c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a131e7317854f0bb184405e59f906ef82"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a131e7317854f0bb184405e59f906ef82"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_duration_interface.html#a131e7317854f0bb184405e59f906ef82">GetInterfaceAlignmentMensuralDuration</a> (int num, int numbase, <a class="el" href="classvrv_1_1_mensur.html">Mensur</a> *currentMensur)</td></tr>
+<tr class="memdesc:a131e7317854f0bb184405e59f906ef82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the duration (in double) for the element for mensural notation Currently this assume brevis equality (through DUR_MENSURAL_REF) and would need to be modified for shorter equality in later repertoire. <br /></td></tr>
+<tr class="separator:a131e7317854f0bb184405e59f906ef82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7abd60beb364ff44323e4e60e11d59f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac7abd60beb364ff44323e4e60e11d59f"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_duration_interface.html#ac7abd60beb364ff44323e4e60e11d59f">IsFirstInBeam</a> (<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *noteOrRest)</td></tr>
 <tr class="memdesc:ac7abd60beb364ff44323e4e60e11d59f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the note or rest is the first of a beam. <br /></td></tr>
@@ -147,19 +147,22 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_duration_interface.html#ae07578a3e138bddc967229f1ee93cb94">IsLastInBeam</a> (<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *noteOrRest)</td></tr>
 <tr class="memdesc:ae07578a3e138bddc967229f1ee93cb94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the note or rest is the last of a beam. <br /></td></tr>
 <tr class="separator:ae07578a3e138bddc967229f1ee93cb94"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46544653a7fefb4de3bac6d451f6555a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a46544653a7fefb4de3bac6d451f6555a"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_duration_interface.html#a46544653a7fefb4de3bac6d451f6555a">GetActualDur</a> ()</td></tr>
-<tr class="memdesc:a46544653a7fefb4de3bac6d451f6555a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the actual duration of the note, for both CMN and mensural durations See data_DURATION For CMN, it is the same (DURATION_1 == DUR_1) For mensural, we need to apply the DUR_MENSURAL_MASK. <br /></td></tr>
-<tr class="separator:a46544653a7fefb4de3bac6d451f6555a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2663805f1c369c86238729773f138047"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2663805f1c369c86238729773f138047"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_duration_interface.html#a2663805f1c369c86238729773f138047">GetActualDur</a> () const </td></tr>
+<tr class="memdesc:a2663805f1c369c86238729773f138047"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the actual duration of the note, for both CMN and mensural durations See data_DURATION For CMN, it is the same (DURATION_1 == DUR_1) For mensural, we need to apply the DUR_MENSURAL_MASK. <br /></td></tr>
+<tr class="separator:a2663805f1c369c86238729773f138047"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec84ae43f7d2b25df6e3b9f05aa4bea7"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_duration_interface.html#aec84ae43f7d2b25df6e3b9f05aa4bea7">GetNoteOrChordDur</a> (<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element)</td></tr>
+<tr class="memdesc:aec84ae43f7d2b25df6e3b9f05aa4bea7"><td class="mdescLeft">&#160;</td><td class="mdescRight">If the element is part of a chord, return the chord actual duration, otherwise the note actual duration.  <a href="#aec84ae43f7d2b25df6e3b9f05aa4bea7">More...</a><br /></td></tr>
+<tr class="separator:aec84ae43f7d2b25df6e3b9f05aa4bea7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a574a195254393ecd052f8fd67062cddf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a574a195254393ecd052f8fd67062cddf"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_duration_interface.html#a574a195254393ecd052f8fd67062cddf">IsMensural</a> ()</td></tr>
 <tr class="memdesc:a574a195254393ecd052f8fd67062cddf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the value is a mensural (DURATION_longa, brevis, etc.) <br /></td></tr>
 <tr class="separator:a574a195254393ecd052f8fd67062cddf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4069af8ecad13f6b29e960cec642b6f5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_duration_interface.html#a4069af8ecad13f6b29e960cec642b6f5">HasIdenticalDurationInterface</a> (<a class="el" href="classvrv_1_1_duration_interface.html">DurationInterface</a> *otherDurationInterface)</td></tr>
-<tr class="memdesc:a4069af8ecad13f6b29e960cec642b6f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inteface comparison operator.  <a href="#a4069af8ecad13f6b29e960cec642b6f5">More...</a><br /></td></tr>
+<tr class="memdesc:a4069af8ecad13f6b29e960cec642b6f5"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. ">Interface</a> comparison operator.  <a href="#a4069af8ecad13f6b29e960cec642b6f5">More...</a><br /></td></tr>
 <tr class="separator:a4069af8ecad13f6b29e960cec642b6f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Constructors, destructors, reset methods</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>Reset method reset all attribute classes </p>
+<tr><td colspan="2"><div class="groupText"><p>Reset method resets all attribute classes </p>
 </div></td></tr>
 <tr class="memitem:abcb2f792eeb999beb3a5f247c812d274"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abcb2f792eeb999beb3a5f247c812d274"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>DurationInterface</b> ()</td></tr>
@@ -191,17 +194,14 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class is an interface for elements with duration, such as notes and rests. </p>
-<p>It is not an abstract class but should not be instanciate directly. </p>
+<p>It is not an abstract class but should not be instanciated directly. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="acd64baba469c9b9f7092075acbbfcf77"></a>
+<a class="anchor" id="ad72f9c1aa9ae69505d47d7da4698f6c6"></a>
 <div class="memitem">
 <div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual double vrv::DurationInterface::GetAlignmentDuration </td>
+          <td class="memname">double vrv::DurationInterface::GetInterfaceAlignmentDuration </td>
           <td>(</td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>num</em>, </td>
@@ -218,15 +218,29 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
           <td></td><td></td>
         </tr>
       </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
 </div><div class="memdoc">
 
 <p>Returns the duration (in double) for the element. </p>
-<p>It returns 0.0 for grace notes. Careful: this method is not overriding <a class="el" href="classvrv_1_1_layer_element.html#a179daa9135efe8f5276f19b5f8f02f0b" title="Returns the duration if the child element has a DurationInterface. ">LayerElement::GetAlignmentDuration</a> since <a class="el" href="classvrv_1_1_layer_element.html" title="This class is a base class for the Layer (<layer>) content. ">LayerElement</a> and <a class="el" href="classvrv_1_1_duration_interface.html" title="This class is an interface for elements with duration, such as notes and rests. ">DurationInterface</a> have no inheritance link. </p>
+<p>It returns 0.0 for grace notes. Careful: this method is not overriding <a class="el" href="classvrv_1_1_layer_element.html#abaca82bc513ba6bbbc1bcd3d59fa7172" title="Returns the duration if the child element has a DurationInterface. ">LayerElement::GetAlignmentDuration</a> since <a class="el" href="classvrv_1_1_layer_element.html" title="This class is a base class for the Layer (<layer>) content. ">LayerElement</a> and <a class="el" href="classvrv_1_1_duration_interface.html" title="This class is an interface for elements with duration, such as notes and rests. ">DurationInterface</a> have no inheritance link. </p>
+
+</div>
+</div>
+<a class="anchor" id="aec84ae43f7d2b25df6e3b9f05aa4bea7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int vrv::DurationInterface::GetNoteOrChordDur </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *&#160;</td>
+          <td class="paramname"><em>element</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>If the element is part of a chord, return the chord actual duration, otherwise the note actual duration. </p>
+<p>Since we need to check what the element is, we need to pass it as parameter. </p>
 
 </div>
 </div>
@@ -244,7 +258,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
       </table>
 </div><div class="memdoc">
 
-<p>Inteface comparison operator. </p>
+<p><a class="el" href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. ">Interface</a> comparison operator. </p>
 <p>Check if the <a class="el" href="classvrv_1_1_layer_element.html" title="This class is a base class for the Layer (<layer>) content. ">LayerElement</a> has a <a class="el" href="classvrv_1_1_duration_interface.html" title="This class is an interface for elements with duration, such as notes and rests. ">DurationInterface</a> and compare attributes </p>
 
 </div>
@@ -271,7 +285,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 </div><div class="memdoc">
 
 <p>Virtual method returning the InterfaceId of the interface. </p>
-<p>Needs to be overwritten in child classes. </p>
+<p>Needs to be overridden in child classes. </p>
 
 <p>Reimplemented from <a class="el" href="classvrv_1_1_interface.html#a5a6818097ffc4a990e6e6e004cf1aaa3">vrv::Interface</a>.</p>
 
@@ -286,7 +300,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_duration_interface.html">DurationInterface</a></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:49 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:05 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

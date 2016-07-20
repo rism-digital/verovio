@@ -113,56 +113,128 @@ $(document).ready(function(){initNavTree('floatingelement_8h_source.html','');})
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160;<span class="preprocessor">#ifndef __VRV_FLOATING_ELEMENT_H__</span></div>
 <div class="line"><a name="l00009"></a><span class="lineno">    9</span>&#160;<span class="preprocessor">#define __VRV_FLOATING_ELEMENT_H__</span></div>
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
-<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;object.h&quot;</span></div>
-<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrv.html">vrv</a> {</div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment">// FloatingElement</span></div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;devicecontextbase.h&quot;</span></div>
+<div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;object.h&quot;</span></div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrv.html">vrv</a> {</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">class </span>FloatingPositioner;</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">class </span>StaffAlignment;</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;</div>
-<div class="line"><a name="l00023"></a><span class="lineno"><a class="line" href="classvrv_1_1_floating_element.html">   23</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_floating_element.html">FloatingElement</a> : <span class="keyword">public</span> <a class="code" href="classvrv_1_1_doc_object.html">DocObject</a> {</div>
-<div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <a class="code" href="classvrv_1_1_floating_element.html">FloatingElement</a>();</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="classvrv_1_1_floating_element.html">FloatingElement</a>(std::string classid);</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_floating_element.html">FloatingElement</a>();</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_floating_element.html#a9b41047a14a0c5e7e501e00d09bff485">Reset</a>();</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">virtual</span> ClassId Is() { <span class="keywordflow">return</span> FLOATING_ELEMENT; };</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="comment">//----------//</span></div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="comment">// Functors //</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="comment">//----------//</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment">// FloatingElement</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00022"></a><span class="lineno">   22</span>&#160;</div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classvrv_1_1_floating_element.html">   27</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_floating_element.html">FloatingElement</a> : <span class="keyword">public</span> <a class="code" href="classvrv_1_1_object.html">Object</a> {</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <a class="code" href="classvrv_1_1_floating_element.html">FloatingElement</a>();</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <a class="code" href="classvrv_1_1_floating_element.html">FloatingElement</a>(std::string classid);</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_floating_element.html">FloatingElement</a>();</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_floating_element.html#a9b41047a14a0c5e7e501e00d09bff485">Reset</a>();</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> FLOATING_ELEMENT; };</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_floating_element.html#a94f0edd34ef5d1da2213f9045705a298">FillStaffCurrentTimeSpanning</a>(ArrayPtrVoid *params);</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> UpdateContentBBoxX(<span class="keywordtype">int</span> x1, <span class="keywordtype">int</span> x2);</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> UpdateContentBBoxY(<span class="keywordtype">int</span> y1, <span class="keywordtype">int</span> y2);</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> UpdateSelfBBoxX(<span class="keywordtype">int</span> x1, <span class="keywordtype">int</span> x2);</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> UpdateSelfBBoxY(<span class="keywordtype">int</span> y1, <span class="keywordtype">int</span> y2);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_floating_element.html#af17771b3cb78501ab1841abbf13aa988">PrepareTimeSpanning</a>(ArrayPtrVoid *params);</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_floating_element.html#abec95f736866252a999eb70298c4f39e">ResetDrawing</a>(ArrayPtrVoid *params);</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> GetDrawingX() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> GetDrawingY() <span class="keyword">const</span>;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keywordtype">void</span> SetCurrentFloatingPositioner(<a class="code" href="classvrv_1_1_floating_positioner.html">FloatingPositioner</a> *boundingBox);</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <a class="code" href="classvrv_1_1_floating_positioner.html">FloatingPositioner</a> *GetCurrentFloatingPositioner() { <span class="keywordflow">return</span> m_currentPositioner; };</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;};</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;} <span class="comment">// namespace vrv</span></div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="classvrv_1_1_floating_element_html_a94f0edd34ef5d1da2213f9045705a298"><div class="ttname"><a href="classvrv_1_1_floating_element.html#a94f0edd34ef5d1da2213f9045705a298">vrv::FloatingElement::FillStaffCurrentTimeSpanning</a></div><div class="ttdeci">virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)</div><div class="ttdoc">See Object::FillStaffCurrentTimeSpanning. </div></div>
-<div class="ttc" id="classvrv_1_1_floating_element_html"><div class="ttname"><a href="classvrv_1_1_floating_element.html">vrv::FloatingElement</a></div><div class="ttdoc">This class is an interface for elements appearing within measure. </div><div class="ttdef"><b>Definition:</b> floatingelement.h:23</div></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="comment">//----------//</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">// Functors //</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="comment">//----------//</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_floating_element.html#a94ea1524c305a034c38745026505f1b3">ResetHorizontalAlignment</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_floating_element.html#a5de9cc54eadb9bce1f359cea40913d2b">ResetVerticalAlignment</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_floating_element.html#a0294e91849c7bfdd27330d1c6e981ac3">FillStaffCurrentTimeSpanning</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_floating_element.html#aa58f2bdd701d0f2dad7dc56fbc53476a">PrepareTimeSpanning</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_floating_element.html#adead9863e4f94ca512eeffc7fbb728ef">PrepareTimestamps</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_floating_element.html#a921e47f63565f57f9523b6d0b8795e51">ResetDrawing</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_floating_element.html#a9f13998284442ef5ea2bd1d74ee9a602">UnCastOff</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <a class="code" href="classvrv_1_1_floating_positioner.html">FloatingPositioner</a> *m_currentPositioner;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;};</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="comment">// FloatingPositioner</span></div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;</div>
+<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="classvrv_1_1_floating_positioner.html">  116</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_floating_positioner.html">FloatingPositioner</a> : <span class="keyword">public</span> <a class="code" href="classvrv_1_1_bounding_box.html">BoundingBox</a> {</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="comment">// constructors and destructors</span></div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <a class="code" href="classvrv_1_1_floating_positioner.html">FloatingPositioner</a>(<a class="code" href="classvrv_1_1_floating_element.html">FloatingElement</a> *element);</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_floating_positioner.html">FloatingPositioner</a>(){};</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> FLOATING_POSITIONER; };</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> ResetPositioner();</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <a class="code" href="classvrv_1_1_floating_element.html">FloatingElement</a> *GetElement()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_element; };</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordtype">bool</span> CalcDrawingYRel(<a class="code" href="classvrv_1_1_doc.html">Doc</a> *doc, <a class="code" href="classvrv_1_1_staff_alignment.html">StaffAlignment</a> *staffAlignment, <a class="code" href="classvrv_1_1_bounding_box.html">BoundingBox</a> *horizOverlapingBBox);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    data_STAFFREL GetDrawingPlace()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> m_place; };</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keywordtype">void</span> UpdateSlurPosition(<span class="keyword">const</span> <a class="code" href="classvrv_1_1_point.html">Point</a> points[4], <span class="keywordtype">float</span> angle, <span class="keywordtype">int</span> thickness, curvature_CURVEDIR curveDir);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordtype">int</span> GetDrawingYRel()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="classvrv_1_1_floating_positioner.html#a52d529c02864d41c1b31cad82be18881">m_drawingYRel</a>; };</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordtype">void</span> SetDrawingYRel(<span class="keywordtype">int</span> drawingYRel);</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00146"></a><span class="lineno"><a class="line" href="classvrv_1_1_floating_positioner.html#a52d529c02864d41c1b31cad82be18881">  146</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_floating_positioner.html#a52d529c02864d41c1b31cad82be18881">m_drawingYRel</a>;</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <a class="code" href="classvrv_1_1_floating_element.html">FloatingElement</a> *m_element;</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    data_STAFFREL m_place;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <a class="code" href="classvrv_1_1_point.html">Point</a> m_slurPoints[4];</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordtype">float</span> m_slurAngle;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keywordtype">int</span> m_slurThickness;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    curvature_CURVEDIR m_slurDir;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;};</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;} <span class="comment">// namespace vrv</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="classvrv_1_1_floating_element_html_a94ea1524c305a034c38745026505f1b3"><div class="ttname"><a href="classvrv_1_1_floating_element.html#a94ea1524c305a034c38745026505f1b3">vrv::FloatingElement::ResetHorizontalAlignment</a></div><div class="ttdeci">virtual int ResetHorizontalAlignment(FunctorParams *functorParams)</div><div class="ttdoc">Reset the horizontal alignment environment for various types for object. </div></div>
+<div class="ttc" id="classvrv_1_1_floating_element_html_a5de9cc54eadb9bce1f359cea40913d2b"><div class="ttname"><a href="classvrv_1_1_floating_element.html#a5de9cc54eadb9bce1f359cea40913d2b">vrv::FloatingElement::ResetVerticalAlignment</a></div><div class="ttdeci">virtual int ResetVerticalAlignment(FunctorParams *functorParams)</div><div class="ttdoc">Reset the verticall alignment environment for various types for object. </div></div>
+<div class="ttc" id="classvrv_1_1_floating_positioner_html_a52d529c02864d41c1b31cad82be18881"><div class="ttname"><a href="classvrv_1_1_floating_positioner.html#a52d529c02864d41c1b31cad82be18881">vrv::FloatingPositioner::m_drawingYRel</a></div><div class="ttdeci">int m_drawingYRel</div><div class="ttdoc">The Y drawing relative position of the object. </div><div class="ttdef"><b>Definition:</b> floatingelement.h:146</div></div>
+<div class="ttc" id="classvrv_1_1_floating_element_html"><div class="ttname"><a href="classvrv_1_1_floating_element.html">vrv::FloatingElement</a></div><div class="ttdoc">This class is an interface for elements appearing within measure. </div><div class="ttdef"><b>Definition:</b> floatingelement.h:27</div></div>
+<div class="ttc" id="classvrv_1_1_point_html"><div class="ttname"><a href="classvrv_1_1_point.html">vrv::Point</a></div><div class="ttdoc">Simple class for representing points. </div><div class="ttdef"><b>Definition:</b> devicecontextbase.h:150</div></div>
+<div class="ttc" id="classvrv_1_1_floating_element_html_a9f13998284442ef5ea2bd1d74ee9a602"><div class="ttname"><a href="classvrv_1_1_floating_element.html#a9f13998284442ef5ea2bd1d74ee9a602">vrv::FloatingElement::UnCastOff</a></div><div class="ttdeci">virtual int UnCastOff(FunctorParams *functorParams)</div><div class="ttdoc">Undo the cast of the system. </div></div>
+<div class="ttc" id="classvrv_1_1_floating_element_html_aa58f2bdd701d0f2dad7dc56fbc53476a"><div class="ttname"><a href="classvrv_1_1_floating_element.html#aa58f2bdd701d0f2dad7dc56fbc53476a">vrv::FloatingElement::PrepareTimeSpanning</a></div><div class="ttdeci">virtual int PrepareTimeSpanning(FunctorParams *functorParams)</div><div class="ttdoc">See Object::PrepareTimeSpanning. </div></div>
+<div class="ttc" id="classvrv_1_1_bounding_box_html"><div class="ttname"><a href="classvrv_1_1_bounding_box.html">vrv::BoundingBox</a></div><div class="ttdoc">This class represents a basic object in the layout domain. </div><div class="ttdef"><b>Definition:</b> object.h:72</div></div>
+<div class="ttc" id="classvrv_1_1_staff_alignment_html"><div class="ttname"><a href="classvrv_1_1_staff_alignment.html">vrv::StaffAlignment</a></div><div class="ttdoc">This class stores an alignement position staves will point to. </div><div class="ttdef"><b>Definition:</b> aligner.h:115</div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
+<div class="ttc" id="classvrv_1_1_floating_element_html_a921e47f63565f57f9523b6d0b8795e51"><div class="ttname"><a href="classvrv_1_1_floating_element.html#a921e47f63565f57f9523b6d0b8795e51">vrv::FloatingElement::ResetDrawing</a></div><div class="ttdeci">virtual int ResetDrawing(FunctorParams *functorParams)</div><div class="ttdoc">Reset the drawing values before calling PrepareDrawing after changes. </div></div>
+<div class="ttc" id="classvrv_1_1_object_html"><div class="ttname"><a href="classvrv_1_1_object.html">vrv::Object</a></div><div class="ttdoc">This class represents a basic object. </div><div class="ttdef"><b>Definition:</b> object.h:144</div></div>
+<div class="ttc" id="classvrv_1_1_floating_element_html_a0294e91849c7bfdd27330d1c6e981ac3"><div class="ttname"><a href="classvrv_1_1_floating_element.html#a0294e91849c7bfdd27330d1c6e981ac3">vrv::FloatingElement::FillStaffCurrentTimeSpanning</a></div><div class="ttdeci">virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams)</div><div class="ttdoc">See Object::FillStaffCurrentTimeSpanning. </div></div>
+<div class="ttc" id="classvrv_1_1_floating_element_html_adead9863e4f94ca512eeffc7fbb728ef"><div class="ttname"><a href="classvrv_1_1_floating_element.html#adead9863e4f94ca512eeffc7fbb728ef">vrv::FloatingElement::PrepareTimestamps</a></div><div class="ttdeci">virtual int PrepareTimestamps(FunctorParams *functorParams)</div><div class="ttdoc">See Object::PrepareTimestamps. </div></div>
+<div class="ttc" id="classvrv_1_1_functor_params_html"><div class="ttname"><a href="classvrv_1_1_functor_params.html">vrv::FunctorParams</a></div><div class="ttdoc">This is the base class for all MEI att classes. </div><div class="ttdef"><b>Definition:</b> functorparams.h:53</div></div>
 <div class="ttc" id="classvrv_1_1_floating_element_html_a9b41047a14a0c5e7e501e00d09bff485"><div class="ttname"><a href="classvrv_1_1_floating_element.html#a9b41047a14a0c5e7e501e00d09bff485">vrv::FloatingElement::Reset</a></div><div class="ttdeci">virtual void Reset()</div><div class="ttdoc">Reset the object, that is 1) removing all childs and 2) resetting all attributes. ...</div></div>
-<div class="ttc" id="classvrv_1_1_floating_element_html_af17771b3cb78501ab1841abbf13aa988"><div class="ttname"><a href="classvrv_1_1_floating_element.html#af17771b3cb78501ab1841abbf13aa988">vrv::FloatingElement::PrepareTimeSpanning</a></div><div class="ttdeci">virtual int PrepareTimeSpanning(ArrayPtrVoid *params)</div><div class="ttdoc">See Object::PrepareTimeSpanning. </div></div>
-<div class="ttc" id="classvrv_1_1_doc_object_html"><div class="ttname"><a href="classvrv_1_1_doc_object.html">vrv::DocObject</a></div><div class="ttdoc">This class represents a basic object in the layout domain. </div><div class="ttdef"><b>Definition:</b> object.h:692</div></div>
-<div class="ttc" id="classvrv_1_1_floating_element_html_abec95f736866252a999eb70298c4f39e"><div class="ttname"><a href="classvrv_1_1_floating_element.html#abec95f736866252a999eb70298c4f39e">vrv::FloatingElement::ResetDrawing</a></div><div class="ttdeci">virtual int ResetDrawing(ArrayPtrVoid *params)</div><div class="ttdoc">Reset the drawing values before calling PrepareDrawing after changes. </div></div>
+<div class="ttc" id="classvrv_1_1_doc_html"><div class="ttname"><a href="classvrv_1_1_doc.html">vrv::Doc</a></div><div class="ttdoc">This class is a hold the data and corresponds to the model of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> doc.h:31</div></div>
+<div class="ttc" id="classvrv_1_1_floating_positioner_html"><div class="ttname"><a href="classvrv_1_1_floating_positioner.html">vrv::FloatingPositioner</a></div><div class="ttdoc">This class represents a basic object in the layout domain. </div><div class="ttdef"><b>Definition:</b> floatingelement.h:116</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>floatingelement.h</b></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:48 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

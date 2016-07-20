@@ -1,14 +1,10 @@
 var searchData=
 [
-  ['tempo',['Tempo',['../classvrv_1_1_tempo.html',1,'vrv']]],
-  ['text',['Text',['../classvrv_1_1_text.html',1,'vrv']]],
-  ['textdirinterface',['TextDirInterface',['../classvrv_1_1_text_dir_interface.html',1,'vrv']]],
-  ['textelement',['TextElement',['../classvrv_1_1_text_element.html',1,'vrv']]],
-  ['textlistinterface',['TextListInterface',['../classvrv_1_1_text_list_interface.html',1,'vrv']]],
-  ['tie',['Tie',['../classvrv_1_1_tie.html',1,'vrv']]],
-  ['timepointinterface',['TimePointInterface',['../classvrv_1_1_time_point_interface.html',1,'vrv']]],
-  ['timespanninginterface',['TimeSpanningInterface',['../classvrv_1_1_time_spanning_interface.html',1,'vrv']]],
-  ['timestampattr',['TimestampAttr',['../classvrv_1_1_timestamp_attr.html',1,'vrv']]],
-  ['toolkit',['Toolkit',['../classvrv_1_1_toolkit.html',1,'vrv']]],
-  ['tuplet',['Tuplet',['../classvrv_1_1_tuplet.html',1,'vrv']]]
+  ['rdg',['Rdg',['../classvrv_1_1_rdg.html',1,'vrv']]],
+  ['reg',['Reg',['../classvrv_1_1_reg.html',1,'vrv']]],
+  ['rend',['Rend',['../classvrv_1_1_rend.html',1,'vrv']]],
+  ['replacedrawingvaluesinstaffdefparams',['ReplaceDrawingValuesInStaffDefParams',['../classvrv_1_1_replace_drawing_values_in_staff_def_params.html',1,'vrv']]],
+  ['resources',['Resources',['../classvrv_1_1_resources.html',1,'vrv']]],
+  ['rest',['Rest',['../classvrv_1_1_rest.html',1,'vrv']]],
+  ['restore',['Restore',['../classvrv_1_1_restore.html',1,'vrv']]]
 ];

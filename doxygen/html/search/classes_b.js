@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['note',['Note',['../classvrv_1_1_note.html',1,'vrv']]]
+  ['layer',['Layer',['../classvrv_1_1_layer.html',1,'vrv']]],
+  ['layerelement',['LayerElement',['../classvrv_1_1_layer_element.html',1,'vrv']]],
+  ['lem',['Lem',['../classvrv_1_1_lem.html',1,'vrv']]]
 ];

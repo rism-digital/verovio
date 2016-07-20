@@ -139,9 +139,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_view.html#a721ff64f1ce15ac64a4e0b78308e84bd">View</a> ()</td></tr>
 <tr class="memdesc:a721ff64f1ce15ac64a4e0b78308e84bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructors and destructors. <br /></td></tr>
 <tr class="separator:a721ff64f1ce15ac64a4e0b78308e84bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Virtual methods that are triggered when necessary but the do nothing in</div></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Virtual methods that are triggered when necessary but they do nothing in</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>the <a class="el" href="classvrv_1_1_view.html" title="This class is a drawing context and corresponds to the view of a MVC design pattern. ">View</a> class.</p>
-<p>The can be overriden when necessary in the child classses. </p>
+<p>They can be overridden when necessary in the child classses. </p>
 </div></td></tr>
 <tr class="memitem:ad1535ec16df1684ceac1d9daf05fe2be"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1535ec16df1684ceac1d9daf05fe2be"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>OnBeginEdition</b> ()</td></tr>
@@ -192,15 +192,21 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>ToDeviceContextY</b> (
 <tr class="memitem:a37a5369135a5c8dcd803c0b0e2248909"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37a5369135a5c8dcd803c0b0e2248909"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>ToLogicalY</b> (int i)</td></tr>
 <tr class="separator:a37a5369135a5c8dcd803c0b0e2248909"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3847668818a6ab7867786708b43f34d8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3847668818a6ab7867786708b43f34d8"></a>
+<a class="el" href="classvrv_1_1_point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ToDeviceContext</b> (<a class="el" href="classvrv_1_1_point.html">Point</a> p)</td></tr>
+<tr class="separator:a3847668818a6ab7867786708b43f34d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a424a26bcf7b2d53fed9446f4d3231581"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a424a26bcf7b2d53fed9446f4d3231581"></a>
+<a class="el" href="classvrv_1_1_point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><b>ToLogical</b> (<a class="el" href="classvrv_1_1_point.html">Point</a> p)</td></tr>
+<tr class="separator:a424a26bcf7b2d53fed9446f4d3231581"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Methods for calculating drawing positions</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Defined in view_element.cpp </p>
 </div></td></tr>
 <tr class="memitem:a75ec05720f8f5796f20d75a315b41c2d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a75ec05720f8f5796f20d75a315b41c2d"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>CalculatePitchPosY</b> (<a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, data_PITCHNAME pname, int dec_clef, int oct)</td></tr>
 <tr class="separator:a75ec05720f8f5796f20d75a315b41c2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5067093e5fe3bd53a267c243e4756a61"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5067093e5fe3bd53a267c243e4756a61"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateRestPosY</b> (<a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, char duration)</td></tr>
-<tr class="separator:a5067093e5fe3bd53a267c243e4756a61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac89df3b62a8ea41fd01e8e5eb17ed31a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac89df3b62a8ea41fd01e8e5eb17ed31a"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>CalculateRestPosY</b> (<a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, char duration, bool hasMultipleLayer, bool isFirstLayer)</td></tr>
+<tr class="separator:ac89df3b62a8ea41fd01e8e5eb17ed31a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2112e69dbe8de940f486983ebfcdd21c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2112e69dbe8de940f486983ebfcdd21c"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>CalculatePitchCode</b> (<a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, int y_n, int x_pos, int *octave)</td></tr>
 <tr class="separator:a2112e69dbe8de940f486983ebfcdd21c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -231,9 +237,8 @@ Public Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a303f43f2ba8d9098e6391efc79711fbf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a303f43f2ba8d9098e6391efc79711fbf"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_view.html#a303f43f2ba8d9098e6391efc79711fbf">SetScoreDefDrawingWidth</a> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_score_def.html">ScoreDef</a> *scoreDef)</td></tr>
-<tr class="memdesc:a303f43f2ba8d9098e6391efc79711fbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the <a class="el" href="classvrv_1_1_score_def.html" title="This class represents a MEI scoreDef. ">ScoreDef</a> width by taking into account its widest key signature This is used in justifiation for anticipating the width of initial scoreDefs that are not drawn in the un-casted system. <br /></td></tr>
+<tr class="memitem:a303f43f2ba8d9098e6391efc79711fbf"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_view.html#a303f43f2ba8d9098e6391efc79711fbf">SetScoreDefDrawingWidth</a> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_score_def.html">ScoreDef</a> *scoreDef)</td></tr>
+<tr class="memdesc:a303f43f2ba8d9098e6391efc79711fbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the <a class="el" href="classvrv_1_1_score_def.html" title="This class represents a MEI scoreDef. ">ScoreDef</a> width by taking into account its widest key signature.  <a href="#a303f43f2ba8d9098e6391efc79711fbf">More...</a><br /></td></tr>
 <tr class="separator:a303f43f2ba8d9098e6391efc79711fbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Methods for drawing System, ScoreDef, StaffDef, Staff, and Layer.</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Additional methods for drawing braces, barlines, slurs, etc.</p>
@@ -405,7 +410,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawText</b> (<a clas
 <tr class="separator:ae1b8bff6d74e55c200cfa14bbf02969f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Methods for drawing parts of LayerElement child classes.</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>They are sub-drawing methods that are called from the base drawing methods above.</p>
-<p>The parameter set can be different from a base drawing method since no recursive call is expected Defined in view_element.cpp </p>
+<p>The parameter set can be different from a base drawing method since no recursive call is expected. Defined in view_element.cpp </p>
 </div></td></tr>
 <tr class="memitem:ad1a94949350f4b7cc5b6ec55898fab23"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad1a94949350f4b7cc5b6ec55898fab23"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawAcciaccaturaSlash</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element)</td></tr>
@@ -437,9 +442,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRestQuarter</b> (
 <tr class="memitem:ab1f060244afcaeae6bfb85584da3e344"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab1f060244afcaeae6bfb85584da3e344"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawRestWhole</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
 <tr class="separator:ab1f060244afcaeae6bfb85584da3e344"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a737cffd1b0f56a5cba5f17c1b0808843"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a737cffd1b0f56a5cba5f17c1b0808843"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawStem</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *object, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, bool isMensural, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY=0)</td></tr>
-<tr class="separator:a737cffd1b0f56a5cba5f17c1b0808843"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acdae645762ae00d844a855dd05207ad6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acdae645762ae00d844a855dd05207ad6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawStem</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *object, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY=0)</td></tr>
+<tr class="separator:acdae645762ae00d844a855dd05207ad6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acdc24e97804aa703a490b4880798956d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acdc24e97804aa703a490b4880798956d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawTrill</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
 <tr class="separator:acdc24e97804aa703a490b4880798956d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -463,32 +468,51 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawFTrem</b> (<a cla
 void&#160;</td><td class="memItemRight" valign="bottom"><b>CalcBeam</b> (<a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount, <a class="el" href="classvrv_1_1_beam_params.html">BeamParams</a> *params)</td></tr>
 <tr class="separator:a20709b3ffafac1b1532db8240f72cbcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Methods for drawing Floating child classes.</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>They are base drawing methods that are called directly from DrawFloatingElement Call appropriate method of child classes (<a class="el" href="classvrv_1_1_slur.html">Slur</a>, <a class="el" href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. ">Tempo</a>, <a class="el" href="classvrv_1_1_tie.html">Tie</a>, etc).</p>
-<p>Defined in view_floating.cpp </p>
+<tr><td colspan="2"><div class="groupText"><p>They are base drawing methods that are called directly from DrawFloatingElement.</p>
+<p>Call appropriate method of child classes (<a class="el" href="classvrv_1_1_slur.html">Slur</a>, <a class="el" href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. ">Tempo</a>, <a class="el" href="classvrv_1_1_tie.html">Tie</a>, etc). Defined in view_floating.cpp </p>
 </div></td></tr>
 <tr class="memitem:a5ff7d64027440838029614a357f2dfe4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ff7d64027440838029614a357f2dfe4"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawFloatingElement</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_floating_element.html">FloatingElement</a> *element, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure, <a class="el" href="classvrv_1_1_system.html">System</a> *system)</td></tr>
 <tr class="separator:a5ff7d64027440838029614a357f2dfe4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a592f47f7f71e8fad4ecaf8243dbf54be"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a592f47f7f71e8fad4ecaf8243dbf54be"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawSylConnector</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_syl.html">Syl</a> *syl, int x1, int x2, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, char spanningType, <a class="el" href="classvrv_1_1_doc_object.html">DocObject</a> *graphic=NULL)</td></tr>
-<tr class="separator:a592f47f7f71e8fad4ecaf8243dbf54be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3415becdea672c00a2f206f4e1be194"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3415becdea672c00a2f206f4e1be194"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawSylConnector</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_syl.html">Syl</a> *syl, int x1, int x2, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, char spanningType, <a class="el" href="classvrv_1_1_object.html">Object</a> *graphic=NULL)</td></tr>
+<tr class="separator:ad3415becdea672c00a2f206f4e1be194"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6d4480a7df10b397ddc8f62aeefeb19"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae6d4480a7df10b397ddc8f62aeefeb19"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawSylConnectorLines</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x1, int x2, int y, <a class="el" href="classvrv_1_1_syl.html">Syl</a> *syl, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
 <tr class="separator:ae6d4480a7df10b397ddc8f62aeefeb19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afcaaabb15be813f3a85fc04be571394f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afcaaabb15be813f3a85fc04be571394f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawTimeSpanningElement</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_doc_object.html">DocObject</a> *object, <a class="el" href="classvrv_1_1_system.html">System</a> *system)</td></tr>
-<tr class="separator:afcaaabb15be813f3a85fc04be571394f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a287b2cdf4b093c9ca74a1036535174b1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a287b2cdf4b093c9ca74a1036535174b1"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawSlur</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_slur.html">Slur</a> *slur, int x1, int x2, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, char spanningType, <a class="el" href="classvrv_1_1_doc_object.html">DocObject</a> *graphic=NULL)</td></tr>
-<tr class="separator:a287b2cdf4b093c9ca74a1036535174b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a229730b700b9e34cf020921827eab201"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a229730b700b9e34cf020921827eab201"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawTimeSpanningElement</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_object.html">Object</a> *object, <a class="el" href="classvrv_1_1_system.html">System</a> *system)</td></tr>
+<tr class="separator:a229730b700b9e34cf020921827eab201"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5ca8f2c3fd55027afe6ae9bf00a1825"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae5ca8f2c3fd55027afe6ae9bf00a1825"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawDir</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_dir.html">Dir</a> *dir, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure, <a class="el" href="classvrv_1_1_system.html">System</a> *system)</td></tr>
+<tr class="separator:ae5ca8f2c3fd55027afe6ae9bf00a1825"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af3d784a5dec18db724d2f6bd62e81f79"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af3d784a5dec18db724d2f6bd62e81f79"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawDynam</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_dynam.html">Dynam</a> *dynam, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure, <a class="el" href="classvrv_1_1_system.html">System</a> *system)</td></tr>
+<tr class="separator:af3d784a5dec18db724d2f6bd62e81f79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02eef612cc25b5dd55898cb8487a34a5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a02eef612cc25b5dd55898cb8487a34a5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawEnding</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_ending_boundary.html">EndingBoundary</a> *ending, <a class="el" href="classvrv_1_1_system.html">System</a> *system)</td></tr>
+<tr class="separator:a02eef612cc25b5dd55898cb8487a34a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6d706ccd9a5a99171e7606d97cf3f207"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6d706ccd9a5a99171e7606d97cf3f207"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawHairpin</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_hairpin.html">Hairpin</a> *hairpin, int x1, int x2, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, char spanningType, <a class="el" href="classvrv_1_1_object.html">Object</a> *graphic=NULL)</td></tr>
+<tr class="separator:a6d706ccd9a5a99171e7606d97cf3f207"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0c76bea5f32e2f8074693c14c2e6195"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac0c76bea5f32e2f8074693c14c2e6195"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawOctave</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_octave.html">Octave</a> *octave, int x1, int x2, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, char spanningType, <a class="el" href="classvrv_1_1_object.html">Object</a> *graphic=NULL)</td></tr>
+<tr class="separator:ac0c76bea5f32e2f8074693c14c2e6195"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d9f88428c22c67573f7fb56ed086ab3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5d9f88428c22c67573f7fb56ed086ab3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawPedal</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_pedal.html">Pedal</a> *pedal, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure, <a class="el" href="classvrv_1_1_system.html">System</a> *system)</td></tr>
+<tr class="separator:a5d9f88428c22c67573f7fb56ed086ab3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68d86b67e466c9d49ca6e3c12a473d33"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a68d86b67e466c9d49ca6e3c12a473d33"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawSlur</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_slur.html">Slur</a> *slur, int x1, int x2, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, char spanningType, <a class="el" href="classvrv_1_1_object.html">Object</a> *graphic=NULL)</td></tr>
+<tr class="separator:a68d86b67e466c9d49ca6e3c12a473d33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a56da13bc73f007bf819c4d11a99af67d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a56da13bc73f007bf819c4d11a99af67d"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawTempo</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_tempo.html">Tempo</a> *tempo, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure, <a class="el" href="classvrv_1_1_system.html">System</a> *system)</td></tr>
 <tr class="separator:a56da13bc73f007bf819c4d11a99af67d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65a6bb38a8acb4d3db110b7df6acb99d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65a6bb38a8acb4d3db110b7df6acb99d"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawTie</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_tie.html">Tie</a> *tie, int x1, int x2, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, char spanningType, <a class="el" href="classvrv_1_1_doc_object.html">DocObject</a> *graphic=NULL)</td></tr>
-<tr class="separator:a65a6bb38a8acb4d3db110b7df6acb99d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac132015c7b5900dcf0faba08d6d7546a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac132015c7b5900dcf0faba08d6d7546a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawTie</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_tie.html">Tie</a> *tie, int x1, int x2, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, char spanningType, <a class="el" href="classvrv_1_1_object.html">Object</a> *graphic=NULL)</td></tr>
+<tr class="separator:ac132015c7b5900dcf0faba08d6d7546a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Methods for drawing mensural LayerElement child classes.</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>They are base drawing methods that are called directly from DrawLayerElement Because some elements draw their children recursively (e.g., <a class="el" href="classvrv_1_1_note.html">Note</a>) they must all have the same parameters Defined in view_mensural.cpp </p>
+<tr><td colspan="2"><div class="groupText"><p>They are base drawing methods that are called directly from DrawLayerElement.</p>
+<p>Because some elements draw their children recursively (e.g., <a class="el" href="classvrv_1_1_note.html">Note</a>) they must all have the same parameters. Defined in view_mensural.cpp </p>
 </div></td></tr>
 <tr class="memitem:a996684014a80ece24f0cd4a9e707d049"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a996684014a80ece24f0cd4a9e707d049"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawMensur</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="el" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure)</td></tr>
@@ -502,6 +526,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawProport</b> (<a c
 <tr><td colspan="2"><div class="groupHeader">Methods for drawing parts of mensural LayerElement child classes.</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Defined in view_mensural.cpp </p>
 </div></td></tr>
+<tr class="memitem:a94e7bcbebc30354ddb282c785a7ff255"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94e7bcbebc30354ddb282c785a7ff255"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawMensuralStem</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *object, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff, data_STEMDIRECTION dir, int radius, int xn, int originY, int heightY=0)</td></tr>
+<tr class="separator:a94e7bcbebc30354ddb282c785a7ff255"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40ce839c9c1146b3caeebc7fcf0b9f9b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40ce839c9c1146b3caeebc7fcf0b9f9b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>DrawMensurCircle</b> (<a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *dc, int x, int yy, <a class="el" href="classvrv_1_1_staff.html">Staff</a> *staff)</td></tr>
 <tr class="separator:a40ce839c9c1146b3caeebc7fcf0b9f9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -637,7 +664,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 </div><div class="memdoc">
 
 <p>Set the document the view is pointing to (mandatory). </p>
-<p>Several view can point to the same document. </p>
+<p>Several views can point to the same document. </p>
 
 </div>
 </div>
@@ -667,6 +694,43 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 
 <p>Set the current page to pageIdx. </p>
 <p>If doLayout is true, the layout of the page will be calculated. This is the default behavior, however, in some cases, we do not want it. For example, when drawing the pages for getting the bounding boxes. </p>
+
+</div>
+</div>
+<a class="anchor" id="a303f43f2ba8d9098e6391efc79711fbf"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrv::View::SetScoreDefDrawingWidth </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_device_context.html">DeviceContext</a> *&#160;</td>
+          <td class="paramname"><em>dc</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_score_def.html">ScoreDef</a> *&#160;</td>
+          <td class="paramname"><em>scoreDef</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculate the <a class="el" href="classvrv_1_1_score_def.html" title="This class represents a MEI scoreDef. ">ScoreDef</a> width by taking into account its widest key signature. </p>
+<p>This is used in justifiation for anticipating the width of initial scoreDefs that are not drawn in the un-casted system. </p>
 
 </div>
 </div>
@@ -726,7 +790,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_view.html">View</a></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:51 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:08 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

@@ -127,20 +127,21 @@ $(document).ready(function(){initNavTree('space_8h_source.html','');});
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <a class="code" href="classvrv_1_1_space.html">Space</a>();</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_space.html">Space</a>();</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> Reset();</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">virtual</span> std::string GetClassName() { <span class="keywordflow">return</span> <span class="stringliteral">&quot;Space&quot;</span>; };</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    ;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">virtual</span> ClassId Is() { <span class="keywordflow">return</span> SPACE; };</div>
-<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;};</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;} <span class="comment">// namespace vrv</span></div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">virtual</span> std::string GetClassName()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;Space&quot;</span>; };</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> SPACE; };</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classvrv_1_1_duration_interface.html">DurationInterface</a> *GetDurationInterface() { <span class="keywordflow">return</span> <span class="keyword">dynamic_cast&lt;</span><a class="code" href="classvrv_1_1_duration_interface.html">DurationInterface</a> *<span class="keyword">&gt;</span>(<span class="keyword">this</span>); }</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;};</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;} <span class="comment">// namespace vrv</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classvrv_1_1_duration_interface_html"><div class="ttname"><a href="classvrv_1_1_duration_interface.html">vrv::DurationInterface</a></div><div class="ttdoc">This class is an interface for elements with duration, such as notes and rests. </div><div class="ttdef"><b>Definition:</b> durationinterface.h:27</div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
 <div class="ttc" id="classvrv_1_1_space_html"><div class="ttname"><a href="classvrv_1_1_space.html">vrv::Space</a></div><div class="ttdoc">This class models the MEI <space> </div><div class="ttdef"><b>Definition:</b> space.h:23</div></div>
@@ -151,7 +152,7 @@ $(document).ready(function(){initNavTree('space_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>space.h</b></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:49 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

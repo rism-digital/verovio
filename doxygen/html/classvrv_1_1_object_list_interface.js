@@ -8,8 +8,8 @@ var classvrv_1_1_object_list_interface =
     [ "GetListFirst", "classvrv_1_1_object_list_interface.html#a1dd620b5a71dbbc985d19972d404b04c", null ],
     [ "GetListFirstBackward", "classvrv_1_1_object_list_interface.html#aa7011af7543f539acd4cf68ca9ab7f8b", null ],
     [ "GetListIndex", "classvrv_1_1_object_list_interface.html#a3bdaaa1533dc4c5c662562db54a23146", null ],
-    [ "GetListNext", "classvrv_1_1_object_list_interface.html#aa390767e556fa0acfbf39dfd97476200", null ],
-    [ "GetListPrevious", "classvrv_1_1_object_list_interface.html#a5262feebeeb70f9a2583c6750daa6e54", null ],
+    [ "GetListNext", "classvrv_1_1_object_list_interface.html#ae111de575ca76e7718a6a9298629d505", null ],
+    [ "GetListPrevious", "classvrv_1_1_object_list_interface.html#a7be9e4e97f020eb673aae4407ded65fc", null ],
     [ "operator=", "classvrv_1_1_object_list_interface.html#ab2a5da9d41d3dca383ff9d3785a9b021", null ],
     [ "ResetList", "classvrv_1_1_object_list_interface.html#ab5637423219e7de94ef81b7169a8ace1", null ]
 ];

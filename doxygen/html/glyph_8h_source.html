@@ -135,23 +135,27 @@ $(document).ready(function(){initNavTree('glyph_8h_source.html','');});
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
 <div class="line"><a name="l00055"></a><span class="lineno"><a class="line" href="classvrv_1_1_glyph.html#a9b2879e91a774ec78623387d6192b555">   55</a></span>&#160;    std::string <a class="code" href="classvrv_1_1_glyph.html#a9b2879e91a774ec78623387d6192b555">GetCodeStr</a>() { <span class="keywordflow">return</span> m_codeStr; };</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keywordtype">int</span> m_x;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keywordtype">int</span> m_y;</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordtype">int</span> m_width;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keywordtype">int</span> m_height;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keywordtype">int</span> m_unitsPerEm;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    std::string m_path;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    std::string m_codeStr;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;};</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;} <span class="comment">// namespace vrv</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">int</span> GetHorizAdvX() { <span class="keywordflow">return</span> m_horizAdvX; };</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keywordtype">void</span> SetHorizAdvX(<span class="keywordtype">double</span> horizAdvX) { m_horizAdvX = (int)(horizAdvX * 10.0); };</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordtype">int</span> m_x;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordtype">int</span> m_y;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordtype">int</span> m_width;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordtype">int</span> m_height;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordtype">int</span> m_horizAdvX;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordtype">int</span> m_unitsPerEm;</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    std::string m_path;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    std::string m_codeStr;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;};</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;} <span class="comment">// namespace vrv</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classvrv_1_1_glyph_html_a707057dbabada77f71f75e1b4cf1cfd1"><div class="ttname"><a href="classvrv_1_1_glyph.html#a707057dbabada77f71f75e1b4cf1cfd1">vrv::Glyph::GetBoundingBox</a></div><div class="ttdeci">void GetBoundingBox(int *x, int *y, int *w, int *h)</div><div class="ttdoc">Get the bounds of the glyph. </div></div>
 <div class="ttc" id="classvrv_1_1_glyph_html_ae763477cb691fa2887d54a67a38a75b9"><div class="ttname"><a href="classvrv_1_1_glyph.html#ae763477cb691fa2887d54a67a38a75b9">vrv::Glyph::GetUnitsPerEm</a></div><div class="ttdeci">int GetUnitsPerEm()</div><div class="ttdoc">Get the units per EM. </div><div class="ttdef"><b>Definition:</b> glyph.h:49</div></div>
 <div class="ttc" id="classvrv_1_1_glyph_html_a9b2879e91a774ec78623387d6192b555"><div class="ttname"><a href="classvrv_1_1_glyph.html#a9b2879e91a774ec78623387d6192b555">vrv::Glyph::GetCodeStr</a></div><div class="ttdeci">std::string GetCodeStr()</div><div class="ttdoc">Get the code string. </div><div class="ttdef"><b>Definition:</b> glyph.h:55</div></div>
@@ -165,7 +169,7 @@ $(document).ready(function(){initNavTree('glyph_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>glyph.h</b></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:48 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

@@ -140,9 +140,9 @@ $(document).ready(function(){initNavTree('vrv_8h_source.html','');});
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keywordtype">bool</span> AreEqual(<span class="keywordtype">double</span> dFirstVal, <span class="keywordtype">double</span> dSecondVal);</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;std::string UTF16to8(<span class="keyword">const</span> <span class="keywordtype">wchar_t</span> *in);</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;std::string UTF16to8(<span class="keyword">const</span> std::wstring in);</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;std::wstring UTF8to16(<span class="keyword">const</span> <span class="keywordtype">char</span> *in);</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;std::wstring UTF8to16(<span class="keyword">const</span> std::string in);</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;std::string StringFormat(<span class="keyword">const</span> <span class="keywordtype">char</span> *fmt, ...);</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="comment">// This is the implementation callable with variable arguments</span></div>
@@ -186,9 +186,15 @@ $(document).ready(function(){initNavTree('vrv_8h_source.html','');});
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keyword">static</span> std::map&lt;wchar_t, Glyph&gt; m_textFont;</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;};</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;} <span class="comment">// namespace vrv</span></div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;<span class="comment">// Base64 code borrowed</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;std::string Base64Encode(<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> <span class="keyword">const</span> *, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> len);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;} <span class="comment">// namespace vrv</span></div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classvrv_1_1_resources_html"><div class="ttname"><a href="classvrv_1_1_resources.html">vrv::Resources</a></div><div class="ttdoc">This class provides static resource values. </div><div class="ttdef"><b>Definition:</b> vrv.h:118</div></div>
 <div class="ttc" id="classvrv_1_1_resources_html_adf153b2fb62a2d1e2e45d566d13eaae7"><div class="ttname"><a href="classvrv_1_1_resources.html#adf153b2fb62a2d1e2e45d566d13eaae7">vrv::Resources::InitFonts</a></div><div class="ttdeci">static bool InitFonts()</div><div class="ttdoc">Init the SMufL music and text fonts. </div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
@@ -203,7 +209,7 @@ $(document).ready(function(){initNavTree('vrv_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>vrv.h</b></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:49 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

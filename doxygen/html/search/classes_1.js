@@ -7,6 +7,7 @@ var searchData=
   ['beamelementcoord',['BeamElementCoord',['../classvrv_1_1_beam_element_coord.html',1,'vrv']]],
   ['beamparams',['BeamParams',['../classvrv_1_1_beam_params.html',1,'vrv']]],
   ['beatrpt',['BeatRpt',['../classvrv_1_1_beat_rpt.html',1,'vrv']]],
+  ['boundingbox',['BoundingBox',['../classvrv_1_1_bounding_box.html',1,'vrv']]],
   ['brush',['Brush',['../classvrv_1_1_brush.html',1,'vrv']]],
   ['btrem',['BTrem',['../classvrv_1_1_b_trem.html',1,'vrv']]]
 ];

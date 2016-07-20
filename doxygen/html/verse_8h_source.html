@@ -129,8 +129,8 @@ $(document).ready(function(){initNavTree('verse_8h_source.html','');});
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <a class="code" href="classvrv_1_1_verse.html">Verse</a>();</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_verse.html">Verse</a>();</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_verse.html#a274a32008d98d318d126e70dd812948b">Reset</a>();</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">virtual</span> std::string GetClassName() { <span class="keywordflow">return</span> <span class="stringliteral">&quot;Verse&quot;</span>; };</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">virtual</span> ClassId Is() { <span class="keywordflow">return</span> VERSE; };</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <span class="keyword">virtual</span> std::string GetClassName()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;Verse&quot;</span>; };</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> VERSE; };</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_verse.html#aaf7194dbd33263969db36db2103dabf3">AddLayerElement</a>(<a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element);</div>
 <div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
@@ -138,9 +138,9 @@ $(document).ready(function(){initNavTree('verse_8h_source.html','');});
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="comment">// Functors //</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="comment">//----------//</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_verse.html#a01bc5b4e2c68917ab9f5470019aac4b6">AlignVertically</a>(ArrayPtrVoid *params);</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_verse.html#ab0782d026d9a53cd1c20d31a356c7dca">AlignVertically</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_verse.html#a61969da9a752aae740e4ed5de4baa40f">PrepareProcessingLists</a>(ArrayPtrVoid *params);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_verse.html#affe8ae62b3b29ee06d9ce10a30ddfd82">PrepareProcessingLists</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="comment">//</span></div>
@@ -152,12 +152,13 @@ $(document).ready(function(){initNavTree('verse_8h_source.html','');});
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;} <span class="comment">// namespace vrv</span></div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="classvrv_1_1_verse_html_a61969da9a752aae740e4ed5de4baa40f"><div class="ttname"><a href="classvrv_1_1_verse.html#a61969da9a752aae740e4ed5de4baa40f">vrv::Verse::PrepareProcessingLists</a></div><div class="ttdeci">virtual int PrepareProcessingLists(ArrayPtrVoid *params)</div><div class="ttdoc">Builds a tree of int (IntTree) with the staff/layer/verse numbers and for staff/layer to be then proc...</div></div>
 <div class="ttc" id="classvrv_1_1_verse_html_aaf7194dbd33263969db36db2103dabf3"><div class="ttname"><a href="classvrv_1_1_verse.html#aaf7194dbd33263969db36db2103dabf3">vrv::Verse::AddLayerElement</a></div><div class="ttdeci">void AddLayerElement(LayerElement *element)</div><div class="ttdoc">Add an element (a syl) to a verse. </div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
 <div class="ttc" id="classvrv_1_1_verse_html"><div class="ttname"><a href="classvrv_1_1_verse.html">vrv::Verse</a></div><div class="ttdef"><b>Definition:</b> verse.h:22</div></div>
 <div class="ttc" id="classvrv_1_1_verse_html_a274a32008d98d318d126e70dd812948b"><div class="ttname"><a href="classvrv_1_1_verse.html#a274a32008d98d318d126e70dd812948b">vrv::Verse::Reset</a></div><div class="ttdeci">virtual void Reset()</div><div class="ttdoc">Reset the object, that is 1) removing all childs and 2) resetting all attributes. ...</div></div>
-<div class="ttc" id="classvrv_1_1_verse_html_a01bc5b4e2c68917ab9f5470019aac4b6"><div class="ttname"><a href="classvrv_1_1_verse.html#a01bc5b4e2c68917ab9f5470019aac4b6">vrv::Verse::AlignVertically</a></div><div class="ttdeci">virtual int AlignVertically(ArrayPtrVoid *params)</div><div class="ttdoc">Align the content of a staff vertically. </div></div>
+<div class="ttc" id="classvrv_1_1_functor_params_html"><div class="ttname"><a href="classvrv_1_1_functor_params.html">vrv::FunctorParams</a></div><div class="ttdoc">This is the base class for all MEI att classes. </div><div class="ttdef"><b>Definition:</b> functorparams.h:53</div></div>
+<div class="ttc" id="classvrv_1_1_verse_html_ab0782d026d9a53cd1c20d31a356c7dca"><div class="ttname"><a href="classvrv_1_1_verse.html#ab0782d026d9a53cd1c20d31a356c7dca">vrv::Verse::AlignVertically</a></div><div class="ttdeci">virtual int AlignVertically(FunctorParams *functorParams)</div><div class="ttdoc">Align the content of a staff vertically. </div></div>
+<div class="ttc" id="classvrv_1_1_verse_html_affe8ae62b3b29ee06d9ce10a30ddfd82"><div class="ttname"><a href="classvrv_1_1_verse.html#affe8ae62b3b29ee06d9ce10a30ddfd82">vrv::Verse::PrepareProcessingLists</a></div><div class="ttdeci">virtual int PrepareProcessingLists(FunctorParams *functorParams)</div><div class="ttdoc">Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then pro...</div></div>
 <div class="ttc" id="classvrv_1_1_layer_element_html"><div class="ttname"><a href="classvrv_1_1_layer_element.html">vrv::LayerElement</a></div><div class="ttdoc">This class is a base class for the Layer (<layer>) content. </div><div class="ttdef"><b>Definition:</b> layerelement.h:31</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
@@ -165,7 +166,7 @@ $(document).ready(function(){initNavTree('verse_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>verse.h</b></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:49 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

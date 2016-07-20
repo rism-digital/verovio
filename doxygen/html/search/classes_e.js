@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['rdg',['Rdg',['../classvrv_1_1_rdg.html',1,'vrv']]],
-  ['reg',['Reg',['../classvrv_1_1_reg.html',1,'vrv']]],
-  ['rend',['Rend',['../classvrv_1_1_rend.html',1,'vrv']]],
-  ['resources',['Resources',['../classvrv_1_1_resources.html',1,'vrv']]],
-  ['rest',['Rest',['../classvrv_1_1_rest.html',1,'vrv']]],
-  ['restore',['Restore',['../classvrv_1_1_restore.html',1,'vrv']]]
+  ['object',['Object',['../classvrv_1_1_object.html',1,'vrv']]],
+  ['objectcomparison',['ObjectComparison',['../classvrv_1_1_object_comparison.html',1,'vrv']]],
+  ['objectlistinterface',['ObjectListInterface',['../classvrv_1_1_object_list_interface.html',1,'vrv']]],
+  ['octave',['Octave',['../classvrv_1_1_octave.html',1,'vrv']]],
+  ['orig',['Orig',['../classvrv_1_1_orig.html',1,'vrv']]]
 ];

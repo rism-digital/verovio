@@ -152,10 +152,17 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:a614386b61204b49e28a369d51c6431d3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a614386b61204b49e28a369d51c6431d3"></a>
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Glyph</b> ()</td></tr>
 <tr class="separator:a614386b61204b49e28a369d51c6431d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Setter and getter for the horizAdvX</div></td></tr>
+<tr class="memitem:ad7a4bed8780d5a024574853975040084"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad7a4bed8780d5a024574853975040084"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>GetHorizAdvX</b> ()</td></tr>
+<tr class="separator:ad7a4bed8780d5a024574853975040084"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab4462f3d4439c83d47ff3d6799a49c35"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab4462f3d4439c83d47ff3d6799a49c35"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetHorizAdvX</b> (double horizAdvX)</td></tr>
+<tr class="separator:ab4462f3d4439c83d47ff3d6799a49c35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class is used for storing a music font glyph. </p>
-<p>All glyph values are integers. However, for keeping precision as high as possible, they are 10 times the original values. Since the unit per em value is also 10 times the original, there is no incident on calculations elsewhere. However, it does increase the precision because units are always multiplied by a point size before being devided by the unit per em. See Ex: 10.2 become 102, with a unit per em of 20480 (instead of 2048) </p>
+<p>All glyph values are integers. However, for keeping precision as high as possible, they are 10 times the original values. Since the unit per em value is also 10 times the original, there is no incident on calculations elsewhere. However, it does increase the precision because units are always multiplied by a point size before being divided by the unit per em. See Ex: 10.2 become 102, with a unit per em of 20480 (instead of 2048) </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="glyph_8h_source.html">glyph.h</a></li>
 </ul>
@@ -165,7 +172,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Glyph</b> ()</td>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_glyph.html">Glyph</a></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:49 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:06 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

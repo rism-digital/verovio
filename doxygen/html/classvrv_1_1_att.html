@@ -112,7 +112,7 @@ $(document).ready(function(){initNavTree('classvrv_1_1_att.html','');});
 </div><!--header-->
 <div class="contents">
 
-<p>This base class for all MEI att classes.  
+<p>This is the base class for all MEI att classes.  
  <a href="classvrv_1_1_att.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="att_8h_source.html">att.h</a>&gt;</code></p>
@@ -127,10 +127,10 @@ Inheritance diagram for vrv::Att:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0c9b1fa3116e197f847713e7507ff62b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c9b1fa3116e197f847713e7507ff62b"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_att.html#a0c9b1fa3116e197f847713e7507ff62b">StrToStr</a> (std::string str)</td></tr>
-<tr class="memdesc:a0c9b1fa3116e197f847713e7507ff62b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dummy string converter. <br /></td></tr>
-<tr class="separator:a0c9b1fa3116e197f847713e7507ff62b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a89abf0ef2104b4ef015fcdbf66f03d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a89abf0ef2104b4ef015fcdbf66f03d"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_att.html#a0a89abf0ef2104b4ef015fcdbf66f03d">StrToStr</a> (std::string str) const </td></tr>
+<tr class="memdesc:a0a89abf0ef2104b4ef015fcdbf66f03d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Dummy string converter. <br /></td></tr>
+<tr class="separator:a0a89abf0ef2104b4ef015fcdbf66f03d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Constructors and destructor</div></td></tr>
 <tr class="memitem:ab2fe2a045e5d42cc66eb3777b401184a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab2fe2a045e5d42cc66eb3777b401184a"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Att</b> ()</td></tr>
@@ -139,104 +139,110 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Att</b> ()</td></tr>
 <tr class="separator:ace6d34f667598b67ab1ddd304df63765"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Basic converters for writing</div></td></tr>
-<tr class="memitem:a6aa50a1bad127b5cee3e37ce21382b35"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6aa50a1bad127b5cee3e37ce21382b35"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>DblToStr</b> (double data)</td></tr>
-<tr class="separator:a6aa50a1bad127b5cee3e37ce21382b35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acfaf847f17a6c2374abb7ee0c4cd7967"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acfaf847f17a6c2374abb7ee0c4cd7967"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>IntToStr</b> (int data)</td></tr>
-<tr class="separator:acfaf847f17a6c2374abb7ee0c4cd7967"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f73478df5e0a31768f8dd2dfad07ba1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f73478df5e0a31768f8dd2dfad07ba1"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>DblToStr</b> (double data) const </td></tr>
+<tr class="separator:a0f73478df5e0a31768f8dd2dfad07ba1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afcb7dfcb288e34d5b27f714253445797"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afcb7dfcb288e34d5b27f714253445797"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>IntToStr</b> (int data) const </td></tr>
+<tr class="separator:afcb7dfcb288e34d5b27f714253445797"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Basic converters for reading</div></td></tr>
-<tr class="memitem:a76ceb1dc4d5d51fa0244ad3d9233237f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a76ceb1dc4d5d51fa0244ad3d9233237f"></a>
-double&#160;</td><td class="memItemRight" valign="bottom"><b>StrToDbl</b> (std::string value)</td></tr>
-<tr class="separator:a76ceb1dc4d5d51fa0244ad3d9233237f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ef6ea0da5eb5d431f75eb4698c6e625"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ef6ea0da5eb5d431f75eb4698c6e625"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>StrToInt</b> (std::string value)</td></tr>
-<tr class="separator:a1ef6ea0da5eb5d431f75eb4698c6e625"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08e338f8c01167e1e1b63775deeac622"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a08e338f8c01167e1e1b63775deeac622"></a>
+double&#160;</td><td class="memItemRight" valign="bottom"><b>StrToDbl</b> (std::string value) const </td></tr>
+<tr class="separator:a08e338f8c01167e1e1b63775deeac622"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a667e3c390957f72f70bb5ea9e4851d41"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a667e3c390957f72f70bb5ea9e4851d41"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>StrToInt</b> (std::string value) const </td></tr>
+<tr class="separator:a667e3c390957f72f70bb5ea9e4851d41"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Converters for writing and reading</div></td></tr>
-<tr class="memitem:aab4f2b8a32a9b86df9c28d99286c979b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab4f2b8a32a9b86df9c28d99286c979b"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>BeatrptRendToStr</b> (data_BEATRPT_REND data)</td></tr>
-<tr class="separator:aab4f2b8a32a9b86df9c28d99286c979b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89e2ae58297d744e17952de137035d83"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a89e2ae58297d744e17952de137035d83"></a>
-data_BEATRPT_REND&#160;</td><td class="memItemRight" valign="bottom"><b>StrToBeatrptRend</b> (std::string value)</td></tr>
-<tr class="separator:a89e2ae58297d744e17952de137035d83"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8d5a70c1abde87e3bdde84d9eaa8a3e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8d5a70c1abde87e3bdde84d9eaa8a3e"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>DurationToStr</b> (data_DURATION data)</td></tr>
-<tr class="separator:ae8d5a70c1abde87e3bdde84d9eaa8a3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad746785acd2fa8babbacc367fb05538f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad746785acd2fa8babbacc367fb05538f"></a>
-data_DURATION&#160;</td><td class="memItemRight" valign="bottom"><b>StrToDuration</b> (std::string value)</td></tr>
-<tr class="separator:ad746785acd2fa8babbacc367fb05538f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c373079e51a8ad1213eb7fdda5a5374"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c373079e51a8ad1213eb7fdda5a5374"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>KeysignatureToStr</b> (data_KEYSIGNATURE data)</td></tr>
-<tr class="separator:a0c373079e51a8ad1213eb7fdda5a5374"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e1306c4b6313887061c496e9a362805"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e1306c4b6313887061c496e9a362805"></a>
-data_KEYSIGNATURE&#160;</td><td class="memItemRight" valign="bottom"><b>StrToKeysignature</b> (std::string value)</td></tr>
-<tr class="separator:a4e1306c4b6313887061c496e9a362805"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7ac37aeab6799dd82d2da63c06e19db"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa7ac37aeab6799dd82d2da63c06e19db"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>MeasurebeatToStr</b> (data_MEASUREBEAT data)</td></tr>
-<tr class="separator:aa7ac37aeab6799dd82d2da63c06e19db"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae50014944e2836be37ec5d4179b4bf6b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae50014944e2836be37ec5d4179b4bf6b"></a>
-data_MEASUREBEAT&#160;</td><td class="memItemRight" valign="bottom"><b>StrToMeasurebeat</b> (std::string value)</td></tr>
-<tr class="separator:ae50014944e2836be37ec5d4179b4bf6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63b8ddf671294cf42f4a31987834072a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a63b8ddf671294cf42f4a31987834072a"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>ModusmaiorToStr</b> (data_MODUSMAIOR data)</td></tr>
-<tr class="separator:a63b8ddf671294cf42f4a31987834072a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac8d7fd2e39574fe21a4748fd1487d99"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aac8d7fd2e39574fe21a4748fd1487d99"></a>
-data_MODUSMAIOR&#160;</td><td class="memItemRight" valign="bottom"><b>StrToModusmaior</b> (std::string value)</td></tr>
-<tr class="separator:aac8d7fd2e39574fe21a4748fd1487d99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb87cad62a15c75bab372c9e42e47935"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abb87cad62a15c75bab372c9e42e47935"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>ModusminorToStr</b> (data_MODUSMINOR data)</td></tr>
-<tr class="separator:abb87cad62a15c75bab372c9e42e47935"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2e35327a828e5607bcdc75e5041700ea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2e35327a828e5607bcdc75e5041700ea"></a>
-data_MODUSMINOR&#160;</td><td class="memItemRight" valign="bottom"><b>StrToModusminor</b> (std::string value)</td></tr>
-<tr class="separator:a2e35327a828e5607bcdc75e5041700ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bc9f044d3f46b38112b472f46d044d5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5bc9f044d3f46b38112b472f46d044d5"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>OctaveDisToStr</b> (data_OCTAVE_DIS data)</td></tr>
-<tr class="separator:a5bc9f044d3f46b38112b472f46d044d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ba9d2b95c7eae812778af6012cefd96"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ba9d2b95c7eae812778af6012cefd96"></a>
-data_OCTAVE_DIS&#160;</td><td class="memItemRight" valign="bottom"><b>StrToOctaveDis</b> (std::string value)</td></tr>
-<tr class="separator:a1ba9d2b95c7eae812778af6012cefd96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af14a022ed0f605c70fa157d62a26ce0f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af14a022ed0f605c70fa157d62a26ce0f"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>OrientationToStr</b> (data_ORIENTATION data)</td></tr>
-<tr class="separator:af14a022ed0f605c70fa157d62a26ce0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa9d80e76a115c78245da5625e7289994"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa9d80e76a115c78245da5625e7289994"></a>
-data_ORIENTATION&#160;</td><td class="memItemRight" valign="bottom"><b>StrToOrientation</b> (std::string value)</td></tr>
-<tr class="separator:aa9d80e76a115c78245da5625e7289994"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a69a198b9c9efd6bf9a0d03cc7326a073"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a69a198b9c9efd6bf9a0d03cc7326a073"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>PitchnameToStr</b> (data_PITCHNAME data)</td></tr>
-<tr class="separator:a69a198b9c9efd6bf9a0d03cc7326a073"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ade7c47d191149dfc39c7eb6d2cd7412d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade7c47d191149dfc39c7eb6d2cd7412d"></a>
-data_PITCHNAME&#160;</td><td class="memItemRight" valign="bottom"><b>StrToPitchname</b> (std::string value)</td></tr>
-<tr class="separator:ade7c47d191149dfc39c7eb6d2cd7412d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c612a6f32fe6dd25e27ab783b084675"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c612a6f32fe6dd25e27ab783b084675"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>ProlatioToStr</b> (data_PROLATIO data)</td></tr>
-<tr class="separator:a0c612a6f32fe6dd25e27ab783b084675"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab0a03c958017bcede9433e6f06f97380"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab0a03c958017bcede9433e6f06f97380"></a>
-data_PROLATIO&#160;</td><td class="memItemRight" valign="bottom"><b>StrToProlatio</b> (std::string value)</td></tr>
-<tr class="separator:ab0a03c958017bcede9433e6f06f97380"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbb26495abac1cd7cbdf7a2880f076d1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acbb26495abac1cd7cbdf7a2880f076d1"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>StemdirectionToStr</b> (data_STEMDIRECTION data)</td></tr>
-<tr class="separator:acbb26495abac1cd7cbdf7a2880f076d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1cfb029369c83bfe34caf9f7a4a97571"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1cfb029369c83bfe34caf9f7a4a97571"></a>
-data_STEMDIRECTION&#160;</td><td class="memItemRight" valign="bottom"><b>StrToStemdirection</b> (std::string value)</td></tr>
-<tr class="separator:a1cfb029369c83bfe34caf9f7a4a97571"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a85901951bc8463510fdae870167d45ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a85901951bc8463510fdae870167d45ce"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>TempusToStr</b> (data_TEMPUS data)</td></tr>
-<tr class="separator:a85901951bc8463510fdae870167d45ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada8616988abe6b6f14799714b230b78e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada8616988abe6b6f14799714b230b78e"></a>
-data_TEMPUS&#160;</td><td class="memItemRight" valign="bottom"><b>StrToTempus</b> (std::string value)</td></tr>
-<tr class="separator:ada8616988abe6b6f14799714b230b78e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0bcfe2a268b36ae62ddc7dcfddf2a4c2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0bcfe2a268b36ae62ddc7dcfddf2a4c2"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>TieToStr</b> (data_TIE data)</td></tr>
-<tr class="separator:a0bcfe2a268b36ae62ddc7dcfddf2a4c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d5956a3746a9389bd1f8c2a74169585"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3d5956a3746a9389bd1f8c2a74169585"></a>
-data_TIE&#160;</td><td class="memItemRight" valign="bottom"><b>StrToTie</b> (std::string value)</td></tr>
-<tr class="separator:a3d5956a3746a9389bd1f8c2a74169585"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af8a16387c1fb860406854866ba06be2b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af8a16387c1fb860406854866ba06be2b"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><b>XsdPosintlistToStr</b> (xsd_posIntList data)</td></tr>
-<tr class="separator:af8a16387c1fb860406854866ba06be2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad7e66e6e8fcb3688b489714b52fee346"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad7e66e6e8fcb3688b489714b52fee346"></a>
-xsd_posIntList&#160;</td><td class="memItemRight" valign="bottom"><b>StrToXsdPosintlist</b> (std::string value)</td></tr>
-<tr class="separator:ad7e66e6e8fcb3688b489714b52fee346"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa379d81915fdd759846b0198d89a9e82"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa379d81915fdd759846b0198d89a9e82"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>BeatrptRendToStr</b> (data_BEATRPT_REND data) const </td></tr>
+<tr class="separator:aa379d81915fdd759846b0198d89a9e82"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13803bb78b919e447f91891031f91b45"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a13803bb78b919e447f91891031f91b45"></a>
+data_BEATRPT_REND&#160;</td><td class="memItemRight" valign="bottom"><b>StrToBeatrptRend</b> (std::string value) const </td></tr>
+<tr class="separator:a13803bb78b919e447f91891031f91b45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7687335e15f812e400b85ab0fbead1a9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7687335e15f812e400b85ab0fbead1a9"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>DurationToStr</b> (data_DURATION data) const </td></tr>
+<tr class="separator:a7687335e15f812e400b85ab0fbead1a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a916f3bbc21999b717d03987502b9a11b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a916f3bbc21999b717d03987502b9a11b"></a>
+data_DURATION&#160;</td><td class="memItemRight" valign="bottom"><b>StrToDuration</b> (std::string value) const </td></tr>
+<tr class="separator:a916f3bbc21999b717d03987502b9a11b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15c15f91bfd28fe7adfc9af3dacae968"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a15c15f91bfd28fe7adfc9af3dacae968"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>KeysignatureToStr</b> (data_KEYSIGNATURE data) const </td></tr>
+<tr class="separator:a15c15f91bfd28fe7adfc9af3dacae968"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad39382e7b34c13efda39e30eba52826f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad39382e7b34c13efda39e30eba52826f"></a>
+data_KEYSIGNATURE&#160;</td><td class="memItemRight" valign="bottom"><b>StrToKeysignature</b> (std::string value) const </td></tr>
+<tr class="separator:ad39382e7b34c13efda39e30eba52826f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94d10c85647f9dc74357c1dbd221a3cf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a94d10c85647f9dc74357c1dbd221a3cf"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>MeasurebeatToStr</b> (data_MEASUREBEAT data) const </td></tr>
+<tr class="separator:a94d10c85647f9dc74357c1dbd221a3cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a86fa5ce82bbcb789b07a5f174366f08e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a86fa5ce82bbcb789b07a5f174366f08e"></a>
+data_MEASUREBEAT&#160;</td><td class="memItemRight" valign="bottom"><b>StrToMeasurebeat</b> (std::string value) const </td></tr>
+<tr class="separator:a86fa5ce82bbcb789b07a5f174366f08e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abd4b9234b1dcb4237ce9c4f12470da47"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abd4b9234b1dcb4237ce9c4f12470da47"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>ModusmaiorToStr</b> (data_MODUSMAIOR data) const </td></tr>
+<tr class="separator:abd4b9234b1dcb4237ce9c4f12470da47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9fc546fb4da5153a21439560f54538f6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9fc546fb4da5153a21439560f54538f6"></a>
+data_MODUSMAIOR&#160;</td><td class="memItemRight" valign="bottom"><b>StrToModusmaior</b> (std::string value) const </td></tr>
+<tr class="separator:a9fc546fb4da5153a21439560f54538f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad26aee8d0a7587315d8d7160331c2a2f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad26aee8d0a7587315d8d7160331c2a2f"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>ModusminorToStr</b> (data_MODUSMINOR data) const </td></tr>
+<tr class="separator:ad26aee8d0a7587315d8d7160331c2a2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2dfcd2f5366adf6b77f1c61aeddbbd47"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2dfcd2f5366adf6b77f1c61aeddbbd47"></a>
+data_MODUSMINOR&#160;</td><td class="memItemRight" valign="bottom"><b>StrToModusminor</b> (std::string value) const </td></tr>
+<tr class="separator:a2dfcd2f5366adf6b77f1c61aeddbbd47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a573bff0e76f19d9ba2647530ab3d5dc8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a573bff0e76f19d9ba2647530ab3d5dc8"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>OctaveDisToStr</b> (data_OCTAVE_DIS data) const </td></tr>
+<tr class="separator:a573bff0e76f19d9ba2647530ab3d5dc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8981f21ba921017e9aed13f720f0de63"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8981f21ba921017e9aed13f720f0de63"></a>
+data_OCTAVE_DIS&#160;</td><td class="memItemRight" valign="bottom"><b>StrToOctaveDis</b> (std::string value) const </td></tr>
+<tr class="separator:a8981f21ba921017e9aed13f720f0de63"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87a652a58e24e2fd76669f5d2bc9fdbd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a87a652a58e24e2fd76669f5d2bc9fdbd"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>OrientationToStr</b> (data_ORIENTATION data) const </td></tr>
+<tr class="separator:a87a652a58e24e2fd76669f5d2bc9fdbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0e899c645448d57b0feca06744196f14"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0e899c645448d57b0feca06744196f14"></a>
+data_ORIENTATION&#160;</td><td class="memItemRight" valign="bottom"><b>StrToOrientation</b> (std::string value) const </td></tr>
+<tr class="separator:a0e899c645448d57b0feca06744196f14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56ebe7a18ee00bcad7df2c994d842c46"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a56ebe7a18ee00bcad7df2c994d842c46"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>PercentToStr</b> (data_PERCENT data) const </td></tr>
+<tr class="separator:a56ebe7a18ee00bcad7df2c994d842c46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a243085b2f8151f23467d8f6bb6f0ab49"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a243085b2f8151f23467d8f6bb6f0ab49"></a>
+data_PERCENT&#160;</td><td class="memItemRight" valign="bottom"><b>StrToPercent</b> (std::string value) const </td></tr>
+<tr class="separator:a243085b2f8151f23467d8f6bb6f0ab49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af20e1c1220e776d5a601de28b6b3e3d2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af20e1c1220e776d5a601de28b6b3e3d2"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>PitchnameToStr</b> (data_PITCHNAME data) const </td></tr>
+<tr class="separator:af20e1c1220e776d5a601de28b6b3e3d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade9c041037c1c6e4f69b8c5704f4b4d8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade9c041037c1c6e4f69b8c5704f4b4d8"></a>
+data_PITCHNAME&#160;</td><td class="memItemRight" valign="bottom"><b>StrToPitchname</b> (std::string value) const </td></tr>
+<tr class="separator:ade9c041037c1c6e4f69b8c5704f4b4d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77f8b084397812dc7b8feb1239e34eab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a77f8b084397812dc7b8feb1239e34eab"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>ProlatioToStr</b> (data_PROLATIO data) const </td></tr>
+<tr class="separator:a77f8b084397812dc7b8feb1239e34eab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcb9b49c1af473c1e3c054ceb822bae6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adcb9b49c1af473c1e3c054ceb822bae6"></a>
+data_PROLATIO&#160;</td><td class="memItemRight" valign="bottom"><b>StrToProlatio</b> (std::string value) const </td></tr>
+<tr class="separator:adcb9b49c1af473c1e3c054ceb822bae6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29a0fa4c27b3f60d87a1daf798477810"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29a0fa4c27b3f60d87a1daf798477810"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>StemdirectionToStr</b> (data_STEMDIRECTION data) const </td></tr>
+<tr class="separator:a29a0fa4c27b3f60d87a1daf798477810"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5d063f1c10a5024ac3c129e83088e02"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad5d063f1c10a5024ac3c129e83088e02"></a>
+data_STEMDIRECTION&#160;</td><td class="memItemRight" valign="bottom"><b>StrToStemdirection</b> (std::string value) const </td></tr>
+<tr class="separator:ad5d063f1c10a5024ac3c129e83088e02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49b7ec0058aea1b16ca943d1a3cc9db5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a49b7ec0058aea1b16ca943d1a3cc9db5"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>TempusToStr</b> (data_TEMPUS data) const </td></tr>
+<tr class="separator:a49b7ec0058aea1b16ca943d1a3cc9db5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b1d7bf9754bf2e38ac776a70e4217ec"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9b1d7bf9754bf2e38ac776a70e4217ec"></a>
+data_TEMPUS&#160;</td><td class="memItemRight" valign="bottom"><b>StrToTempus</b> (std::string value) const </td></tr>
+<tr class="separator:a9b1d7bf9754bf2e38ac776a70e4217ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f10ab7d20be6d0ffb67b07122fe6860"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8f10ab7d20be6d0ffb67b07122fe6860"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>TieToStr</b> (data_TIE data) const </td></tr>
+<tr class="separator:a8f10ab7d20be6d0ffb67b07122fe6860"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa95bf3b2ccab23f2f54458772fd89318"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa95bf3b2ccab23f2f54458772fd89318"></a>
+data_TIE&#160;</td><td class="memItemRight" valign="bottom"><b>StrToTie</b> (std::string value) const </td></tr>
+<tr class="separator:aa95bf3b2ccab23f2f54458772fd89318"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c88347a45ca672bb537d20fcdd842f6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2c88347a45ca672bb537d20fcdd842f6"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>XsdPosintlistToStr</b> (xsd_posIntList data) const </td></tr>
+<tr class="separator:a2c88347a45ca672bb537d20fcdd842f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a18cfc4eeb3961c051dc22f5e85bd90b5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a18cfc4eeb3961c051dc22f5e85bd90b5"></a>
+xsd_posIntList&#160;</td><td class="memItemRight" valign="bottom"><b>StrToXsdPosintlist</b> (std::string value) const </td></tr>
+<tr class="separator:a18cfc4eeb3961c051dc22f5e85bd90b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -261,28 +267,28 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><b>SetPagebased</
 <tr class="memitem:aa9d1e149df277f43d46a650fdbd9c693"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa9d1e149df277f43d46a650fdbd9c693"></a>
 static bool&#160;</td><td class="memItemRight" valign="bottom"><b>SetShared</b> (<a class="el" href="classvrv_1_1_object.html">Object</a> *element, std::string attrType, std::string attrValue)</td></tr>
 <tr class="separator:aa9d1e149df277f43d46a650fdbd9c693"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe8a2d89959edfe2eddae565b2f15115"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abe8a2d89959edfe2eddae565b2f15115"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_att.html#abe8a2d89959edfe2eddae565b2f15115">GetCmn</a> (<a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
-<tr class="memdesc:abe8a2d89959edfe2eddae565b2f15115"><td class="mdescLeft">&#160;</td><td class="mdescRight">Idem for getting attributes as strings. <br /></td></tr>
-<tr class="separator:abe8a2d89959edfe2eddae565b2f15115"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ef4931ad735251330e424cf7a412588"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ef4931ad735251330e424cf7a412588"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetCritapp</b> (<a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
-<tr class="separator:a0ef4931ad735251330e424cf7a412588"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7630666ef65457f53bba048cfa237d05"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7630666ef65457f53bba048cfa237d05"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetMei</b> (<a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
-<tr class="separator:a7630666ef65457f53bba048cfa237d05"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3ce22c0c87eebeb828a35db3f2c7e17"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3ce22c0c87eebeb828a35db3f2c7e17"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetMensural</b> (<a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
-<tr class="separator:ad3ce22c0c87eebeb828a35db3f2c7e17"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afb60d51e1ec9a6c4e3664e9e206cdb3f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afb60d51e1ec9a6c4e3664e9e206cdb3f"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetPagebased</b> (<a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
-<tr class="separator:afb60d51e1ec9a6c4e3664e9e206cdb3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3c47c53b154e3e1aae0b594cbc120267"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3c47c53b154e3e1aae0b594cbc120267"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetShared</b> (<a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
-<tr class="separator:a3c47c53b154e3e1aae0b594cbc120267"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a81e40feed99e1dc86cac6626d76fb494"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a81e40feed99e1dc86cac6626d76fb494"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_att.html#a81e40feed99e1dc86cac6626d76fb494">GetCmn</a> (const <a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
+<tr class="memdesc:a81e40feed99e1dc86cac6626d76fb494"><td class="mdescLeft">&#160;</td><td class="mdescRight">Idem for getting attributes as strings. <br /></td></tr>
+<tr class="separator:a81e40feed99e1dc86cac6626d76fb494"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74e5fe03eba140d024ad926dc656dd31"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a74e5fe03eba140d024ad926dc656dd31"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetCritapp</b> (const <a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
+<tr class="separator:a74e5fe03eba140d024ad926dc656dd31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f5d5e5d651192892f87902e528d827f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3f5d5e5d651192892f87902e528d827f"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetMei</b> (const <a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
+<tr class="separator:a3f5d5e5d651192892f87902e528d827f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b85d9a043c7c8b809b53b6cb0d91fbf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1b85d9a043c7c8b809b53b6cb0d91fbf"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetMensural</b> (const <a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
+<tr class="separator:a1b85d9a043c7c8b809b53b6cb0d91fbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a198a84953f8c61d027056f70c75621a4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a198a84953f8c61d027056f70c75621a4"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetPagebased</b> (const <a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
+<tr class="separator:a198a84953f8c61d027056f70c75621a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71e84249caf6d127af9ad88ef96ac66a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a71e84249caf6d127af9ad88ef96ac66a"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetShared</b> (const <a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
+<tr class="separator:a71e84249caf6d127af9ad88ef96ac66a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>This base class for all MEI att classes. </p>
+<div class="textblock"><p>This is the base class for all MEI att classes. </p>
 <p>It is not an abstract class but it should not be instanciated directly. The att classes are generated with the libmei parser for Verovio. </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li><a class="el" href="att_8h_source.html">att.h</a></li>
@@ -293,7 +299,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetShared</b> 
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_att.html">Att</a></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:49 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:05 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

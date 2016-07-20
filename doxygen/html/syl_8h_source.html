@@ -135,43 +135,48 @@ $(document).ready(function(){initNavTree('syl_8h_source.html','');});
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="classvrv_1_1_syl.html">Syl</a>();</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_syl.html">Syl</a>();</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_syl.html#ad8421ee7c48a1a2810a40cd268613400">Reset</a>();</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">virtual</span> std::string GetClassName() { <span class="keywordflow">return</span> <span class="stringliteral">&quot;Syl&quot;</span>; };</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">virtual</span> ClassId Is() { <span class="keywordflow">return</span> SYL; };</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">virtual</span> std::string GetClassName()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;Syl&quot;</span>; };</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> SYL; };</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_syl.html#af1c3e81208c28823c2419f3eae933978">AddTextElement</a>(<a class="code" href="classvrv_1_1_text_element.html">TextElement</a> *element);</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="comment">//----------//</span></div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="comment">// Functors //</span></div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    <span class="comment">//----------//</span></div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_syl.html#adf6c43c02a25babe3b1400a95756a2ed">PrepareLyrics</a>(ArrayPtrVoid *params);</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_syl.html#a1d6e5bc1b1259023a87bbfad27e9755a">FillStaffCurrentTimeSpanning</a>(ArrayPtrVoid *params);</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_syl.html#a1f46c122c8097ca234399ba102cc00f2">ResetDrawing</a>(ArrayPtrVoid *params);</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="classvrv_1_1_syl.html#a404f20b3057e7ff75388ef20e417b21a">   82</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_syl.html#a404f20b3057e7ff75388ef20e417b21a">m_drawingVerse</a>;</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;};</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classvrv_1_1_time_point_interface.html">TimePointInterface</a> *GetTimePointInterface() { <span class="keywordflow">return</span> <span class="keyword">dynamic_cast&lt;</span><a class="code" href="classvrv_1_1_time_point_interface.html">TimePointInterface</a> *<span class="keyword">&gt;</span>(<span class="keyword">this</span>); }</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classvrv_1_1_time_spanning_interface.html">TimeSpanningInterface</a> *GetTimeSpanningInterface() { <span class="keywordflow">return</span> <span class="keyword">dynamic_cast&lt;</span><a class="code" href="classvrv_1_1_time_spanning_interface.html">TimeSpanningInterface</a> *<span class="keyword">&gt;</span>(<span class="keyword">this</span>); }</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_syl.html#af1c3e81208c28823c2419f3eae933978">AddTextElement</a>(<a class="code" href="classvrv_1_1_text_element.html">TextElement</a> *element);</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    <span class="comment">//----------//</span></div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">// Functors //</span></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="comment">//----------//</span></div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_syl.html#a1a6e9b3882e72eb56dfc0335dbf3f63d">PrepareLyrics</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_syl.html#a97f982b99f0becd3d207dcb7c621636a">FillStaffCurrentTimeSpanning</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_syl.html#a23fd0bc19c3581f210bc071aa7dbbc39">ResetDrawing</a>(<a class="code" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="classvrv_1_1_syl.html#a404f20b3057e7ff75388ef20e417b21a">   85</a></span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_syl.html#a404f20b3057e7ff75388ef20e417b21a">m_drawingVerse</a>;</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;} <span class="comment">// namespace vrv</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="classvrv_1_1_time_spanning_interface_html"><div class="ttname"><a href="classvrv_1_1_time_spanning_interface.html">vrv::TimeSpanningInterface</a></div><div class="ttdoc">This class is an interface for spanning elements, such as slur, hairpin, etc. </div><div class="ttdef"><b>Definition:</b> timeinterface.h:100</div></div>
-<div class="ttc" id="classvrv_1_1_syl_html_a1d6e5bc1b1259023a87bbfad27e9755a"><div class="ttname"><a href="classvrv_1_1_syl.html#a1d6e5bc1b1259023a87bbfad27e9755a">vrv::Syl::FillStaffCurrentTimeSpanning</a></div><div class="ttdeci">virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)</div><div class="ttdoc">See Object::FillStaffCurrentTimeSpanning. </div></div>
-<div class="ttc" id="classvrv_1_1_syl_html_adf6c43c02a25babe3b1400a95756a2ed"><div class="ttname"><a href="classvrv_1_1_syl.html#adf6c43c02a25babe3b1400a95756a2ed">vrv::Syl::PrepareLyrics</a></div><div class="ttdeci">virtual int PrepareLyrics(ArrayPtrVoid *params)</div><div class="ttdoc">Functor for setting wordpos and connector ends The functor is process by staff/layer/verse using an A...</div></div>
-<div class="ttc" id="classvrv_1_1_text_list_interface_html"><div class="ttname"><a href="classvrv_1_1_text_list_interface.html">vrv::TextListInterface</a></div><div class="ttdoc">This class is an pseudo interface for elements maintaining a flat list of children LayerElement for p...</div><div class="ttdef"><b>Definition:</b> object.h:820</div></div>
-<div class="ttc" id="classvrv_1_1_syl_html_a1f46c122c8097ca234399ba102cc00f2"><div class="ttname"><a href="classvrv_1_1_syl.html#a1f46c122c8097ca234399ba102cc00f2">vrv::Syl::ResetDrawing</a></div><div class="ttdeci">virtual int ResetDrawing(ArrayPtrVoid *params)</div><div class="ttdoc">Reset the drawing values before calling PrepareDrawing after changes. </div></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;};</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;} <span class="comment">// namespace vrv</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="classvrv_1_1_time_spanning_interface_html"><div class="ttname"><a href="classvrv_1_1_time_spanning_interface.html">vrv::TimeSpanningInterface</a></div><div class="ttdoc">This class is an interface for spanning elements, such as slur, hairpin, etc. </div><div class="ttdef"><b>Definition:</b> timeinterface.h:128</div></div>
+<div class="ttc" id="classvrv_1_1_text_list_interface_html"><div class="ttname"><a href="classvrv_1_1_text_list_interface.html">vrv::TextListInterface</a></div><div class="ttdoc">This class is an pseudo interface for elements maintaining a flat list of children LayerElement for p...</div><div class="ttdef"><b>Definition:</b> object.h:875</div></div>
+<div class="ttc" id="classvrv_1_1_syl_html_a97f982b99f0becd3d207dcb7c621636a"><div class="ttname"><a href="classvrv_1_1_syl.html#a97f982b99f0becd3d207dcb7c621636a">vrv::Syl::FillStaffCurrentTimeSpanning</a></div><div class="ttdeci">virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams)</div><div class="ttdoc">See Object::FillStaffCurrentTimeSpanning. </div></div>
+<div class="ttc" id="classvrv_1_1_syl_html_a23fd0bc19c3581f210bc071aa7dbbc39"><div class="ttname"><a href="classvrv_1_1_syl.html#a23fd0bc19c3581f210bc071aa7dbbc39">vrv::Syl::ResetDrawing</a></div><div class="ttdeci">virtual int ResetDrawing(FunctorParams *functorParams)</div><div class="ttdoc">Reset the drawing values before calling PrepareDrawing after changes. </div></div>
+<div class="ttc" id="classvrv_1_1_syl_html_a1a6e9b3882e72eb56dfc0335dbf3f63d"><div class="ttname"><a href="classvrv_1_1_syl.html#a1a6e9b3882e72eb56dfc0335dbf3f63d">vrv::Syl::PrepareLyrics</a></div><div class="ttdeci">virtual int PrepareLyrics(FunctorParams *functorParams)</div><div class="ttdoc">Functor for setting wordpos and connector ends The functor is processed by staff/layer/verse using an...</div></div>
 <div class="ttc" id="classvrv_1_1_syl_html"><div class="ttname"><a href="classvrv_1_1_syl.html">vrv::Syl</a></div><div class="ttdoc">Syl is a TimeSpanningInterface for managing syllable connectors. </div><div class="ttdef"><b>Definition:</b> syl.h:30</div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
 <div class="ttc" id="classvrv_1_1_syl_html_af1c3e81208c28823c2419f3eae933978"><div class="ttname"><a href="classvrv_1_1_syl.html#af1c3e81208c28823c2419f3eae933978">vrv::Syl::AddTextElement</a></div><div class="ttdeci">void AddTextElement(TextElement *element)</div><div class="ttdoc">Add an element (text, rend. </div></div>
 <div class="ttc" id="classvrv_1_1_syl_html_ad8421ee7c48a1a2810a40cd268613400"><div class="ttname"><a href="classvrv_1_1_syl.html#ad8421ee7c48a1a2810a40cd268613400">vrv::Syl::Reset</a></div><div class="ttdeci">virtual void Reset()</div><div class="ttdoc">Reset the object, that is 1) removing all childs and 2) resetting all attributes. ...</div></div>
+<div class="ttc" id="classvrv_1_1_functor_params_html"><div class="ttname"><a href="classvrv_1_1_functor_params.html">vrv::FunctorParams</a></div><div class="ttdoc">This is the base class for all MEI att classes. </div><div class="ttdef"><b>Definition:</b> functorparams.h:53</div></div>
 <div class="ttc" id="classvrv_1_1_text_element_html"><div class="ttname"><a href="classvrv_1_1_text_element.html">vrv::TextElement</a></div><div class="ttdef"><b>Definition:</b> textelement.h:19</div></div>
-<div class="ttc" id="classvrv_1_1_syl_html_a404f20b3057e7ff75388ef20e417b21a"><div class="ttname"><a href="classvrv_1_1_syl.html#a404f20b3057e7ff75388ef20e417b21a">vrv::Syl::m_drawingVerse</a></div><div class="ttdeci">int m_drawingVerse</div><div class="ttdoc">The verse number with multiple verses Value is 1 by default, set in PrepareLyrics. </div><div class="ttdef"><b>Definition:</b> syl.h:82</div></div>
+<div class="ttc" id="classvrv_1_1_syl_html_a404f20b3057e7ff75388ef20e417b21a"><div class="ttname"><a href="classvrv_1_1_syl.html#a404f20b3057e7ff75388ef20e417b21a">vrv::Syl::m_drawingVerse</a></div><div class="ttdeci">int m_drawingVerse</div><div class="ttdoc">The verse number with multiple verses Value is 1 by default, set in PrepareLyrics. </div><div class="ttdef"><b>Definition:</b> syl.h:85</div></div>
+<div class="ttc" id="classvrv_1_1_time_point_interface_html"><div class="ttname"><a href="classvrv_1_1_time_point_interface.html">vrv::TimePointInterface</a></div><div class="ttdoc">This class is an interface for elements having a single time point, such as tempo, reh, etc. </div><div class="ttdef"><b>Definition:</b> timeinterface.h:29</div></div>
 <div class="ttc" id="classvrv_1_1_layer_element_html"><div class="ttname"><a href="classvrv_1_1_layer_element.html">vrv::LayerElement</a></div><div class="ttdoc">This class is a base class for the Layer (<layer>) content. </div><div class="ttdef"><b>Definition:</b> layerelement.h:31</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
@@ -179,7 +184,7 @@ $(document).ready(function(){initNavTree('syl_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>syl.h</b></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:49 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

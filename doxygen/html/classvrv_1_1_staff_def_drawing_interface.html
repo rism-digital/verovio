@@ -121,8 +121,7 @@ Inheritance diagram for vrv::StaffDefDrawingInterface:</div>
  <div class="center">
   <img src="classvrv_1_1_staff_def_drawing_interface.png" usemap="#vrv::StaffDefDrawingInterface_map" alt=""/>
   <map id="vrv::StaffDefDrawingInterface_map" name="vrv::StaffDefDrawingInterface_map">
-<area href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). " alt="vrv::Layer" shape="rect" coords="0,56,180,80"/>
-<area href="classvrv_1_1_staff_def.html" title="This class represents a MEI staffDef. " alt="vrv::StaffDef" shape="rect" coords="190,56,370,80"/>
+<area href="classvrv_1_1_staff_def.html" title="This class represents a MEI staffDef. " alt="vrv::StaffDef" shape="rect" coords="0,56,180,80"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -138,12 +137,6 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~StaffDefDrawingIn
 <tr class="memitem:a9aaf5432c024a82344ee3afdad491fdd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9aaf5432c024a82344ee3afdad491fdd"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>Reset</b> ()</td></tr>
 <tr class="separator:a9aaf5432c024a82344ee3afdad491fdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26d8f7bba277eab55b9194b20303cc67"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a26d8f7bba277eab55b9194b20303cc67"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>StaffDefDrawingInterface</b> (const <a class="el" href="classvrv_1_1_staff_def_drawing_interface.html">StaffDefDrawingInterface</a> &amp;interface)</td></tr>
-<tr class="separator:a26d8f7bba277eab55b9194b20303cc67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a061f3fb4193671282d4c15c09de85501"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a061f3fb4193671282d4c15c09de85501"></a>
-<a class="el" href="classvrv_1_1_staff_def_drawing_interface.html">StaffDefDrawingInterface</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classvrv_1_1_staff_def_drawing_interface.html">StaffDefDrawingInterface</a> &amp;interface)</td></tr>
-<tr class="separator:a061f3fb4193671282d4c15c09de85501"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Set and get the layer drawing flags for clef, keysig and mensur.</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>This will be true when starting a new system or when a scoreDef or staffDef changes occurs This will be true only for the first layer in the staff. </p>
 </div></td></tr>
@@ -190,34 +183,21 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetCurrentMensur</b> 
 <tr class="memitem:a8a99d3827afa8601363b63b887b64f19"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8a99d3827afa8601363b63b887b64f19"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetCurrentMeterSig</b> (<a class="el" href="classvrv_1_1_meter_sig.html">MeterSig</a> *meterSig)</td></tr>
 <tr class="separator:a8a99d3827afa8601363b63b887b64f19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr><td colspan="2"><div class="groupHeader">Get the clef, keySig, mensur and meterSig to be drawn.</div></td></tr>
-<tr class="memitem:ac549ec4952826d33d19f8f8ba32d178f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac549ec4952826d33d19f8f8ba32d178f"></a>
-<a class="el" href="classvrv_1_1_clef.html">Clef</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingClef</b> ()</td></tr>
-<tr class="separator:ac549ec4952826d33d19f8f8ba32d178f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d521026fc31d4e9e1379939ca15c3d9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d521026fc31d4e9e1379939ca15c3d9"></a>
-<a class="el" href="classvrv_1_1_key_sig.html">KeySig</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingKeySig</b> ()</td></tr>
-<tr class="separator:a9d521026fc31d4e9e1379939ca15c3d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4759d395529e4106edef9ef3a3a32b08"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4759d395529e4106edef9ef3a3a32b08"></a>
-<a class="el" href="classvrv_1_1_mensur.html">Mensur</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingMensur</b> ()</td></tr>
-<tr class="separator:a4759d395529e4106edef9ef3a3a32b08"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aec5690993a5b69cf4000fd2b5a907f1c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aec5690993a5b69cf4000fd2b5a907f1c"></a>
-<a class="el" href="classvrv_1_1_meter_sig.html">MeterSig</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingMeterSig</b> ()</td></tr>
-<tr class="separator:aec5690993a5b69cf4000fd2b5a907f1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Get the clef, keysig, mensur and meterSig object.</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>They will return a reference to the hold object (element or attribute). </p>
 </div></td></tr>
-<tr class="memitem:a44fd34f21dbbe97153b3a55862fda2b5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a44fd34f21dbbe97153b3a55862fda2b5"></a>
-<a class="el" href="classvrv_1_1_clef.html">Clef</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetCurrentClef</b> () const </td></tr>
-<tr class="separator:a44fd34f21dbbe97153b3a55862fda2b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ead44519ae79206952c098640b52e74"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0ead44519ae79206952c098640b52e74"></a>
-<a class="el" href="classvrv_1_1_key_sig.html">KeySig</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetCurrentKeySig</b> () const </td></tr>
-<tr class="separator:a0ead44519ae79206952c098640b52e74"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf50c116e65cf5909914e28c6a88f340"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abf50c116e65cf5909914e28c6a88f340"></a>
-<a class="el" href="classvrv_1_1_mensur.html">Mensur</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetCurrentMensur</b> () const </td></tr>
-<tr class="separator:abf50c116e65cf5909914e28c6a88f340"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25989548664e8538f295e25661c8cdc3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a25989548664e8538f295e25661c8cdc3"></a>
-<a class="el" href="classvrv_1_1_meter_sig.html">MeterSig</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetCurrentMeterSig</b> () const </td></tr>
-<tr class="separator:a25989548664e8538f295e25661c8cdc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8a0d101e91cb23c858883624de2c4237"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8a0d101e91cb23c858883624de2c4237"></a>
+<a class="el" href="classvrv_1_1_clef.html">Clef</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetCurrentClef</b> ()</td></tr>
+<tr class="separator:a8a0d101e91cb23c858883624de2c4237"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a189c279fda5b3e2ef3941b49d103cd71"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a189c279fda5b3e2ef3941b49d103cd71"></a>
+<a class="el" href="classvrv_1_1_key_sig.html">KeySig</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetCurrentKeySig</b> ()</td></tr>
+<tr class="separator:a189c279fda5b3e2ef3941b49d103cd71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4eab54ab49ffc228a17a529a106dbef8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4eab54ab49ffc228a17a529a106dbef8"></a>
+<a class="el" href="classvrv_1_1_mensur.html">Mensur</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetCurrentMensur</b> ()</td></tr>
+<tr class="separator:a4eab54ab49ffc228a17a529a106dbef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed58ecb2cd66f66cf0b83df6492fe3ac"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aed58ecb2cd66f66cf0b83df6492fe3ac"></a>
+<a class="el" href="classvrv_1_1_meter_sig.html">MeterSig</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetCurrentMeterSig</b> ()</td></tr>
+<tr class="separator:aed58ecb2cd66f66cf0b83df6492fe3ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class is an interface for MEI scoreDef or staffDef attributes clef, keysig and mensur. </p>
@@ -231,7 +211,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetCurrentMeterSig</b
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_staff_def_drawing_interface.html">StaffDefDrawingInterface</a></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:50 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:07 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

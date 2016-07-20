@@ -111,7 +111,7 @@ $(document).ready(function(){initNavTree('classvrv_1_1_text_dir_interface.html',
 </div><!--header-->
 <div class="contents">
 
-<p>This class is an interface for elements implementing a text directive, such as &lt;dir&gt;, &lt;tempo&gt;, or &lt;dynam&gt; It is not an abstract class but should not be instanciate directly.  
+<p>This class is an interface for elements implementing a text directive, such as &lt;dir&gt;, &lt;tempo&gt;, or &lt;dynam&gt; It is not an abstract class but should not be instanciated directly.  
  <a href="classvrv_1_1_text_dir_interface.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="textdirinterface_8h_source.html">textdirinterface.h</a>&gt;</code></p>
@@ -121,16 +121,18 @@ Inheritance diagram for vrv::TextDirInterface:</div>
  <div class="center">
   <img src="classvrv_1_1_text_dir_interface.png" usemap="#vrv::TextDirInterface_map" alt=""/>
   <map id="vrv::TextDirInterface_map" name="vrv::TextDirInterface_map">
-<area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="0,0,127,24"/>
-<area href="classvrv_1_1_anchored_text.html" title="This class is an interface for <anchoredText> elements at the measure level. " alt="vrv::AnchoredText" shape="rect" coords="68,112,195,136"/>
-<area href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. " alt="vrv::Tempo" shape="rect" coords="205,112,332,136"/>
+<area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="68,0,195,24"/>
+<area href="classvrv_1_1_anchored_text.html" title="This class is an interface for <anchoredText> elements at the measure level. " alt="vrv::AnchoredText" shape="rect" coords="0,112,127,136"/>
+<area href="classvrv_1_1_dir.html" alt="vrv::Dir" shape="rect" coords="137,112,264,136"/>
+<area href="classvrv_1_1_dynam.html" alt="vrv::Dynam" shape="rect" coords="274,112,401,136"/>
+<area href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. " alt="vrv::Tempo" shape="rect" coords="411,112,538,136"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr><td colspan="2"><div class="groupHeader">Constructors, destructors, reset methods</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>Reset method reset all attribute classes </p>
+<tr><td colspan="2"><div class="groupText"><p>Reset method resets all attribute classes </p>
 </div></td></tr>
 <tr class="memitem:abd4fa1ef55a49c790e0b5db7c7d48d8d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abd4fa1ef55a49c790e0b5db7c7d48d8d"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>TextDirInterface</b> ()</td></tr>
@@ -161,7 +163,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 <tr class="separator:a1fbabd3b506190dc2f1b4584a49a85ea inherit pub_methods_classvrv_1_1_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>This class is an interface for elements implementing a text directive, such as &lt;dir&gt;, &lt;tempo&gt;, or &lt;dynam&gt; It is not an abstract class but should not be instanciate directly. </p>
+<div class="textblock"><p>This class is an interface for elements implementing a text directive, such as &lt;dir&gt;, &lt;tempo&gt;, or &lt;dynam&gt; It is not an abstract class but should not be instanciated directly. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a class="anchor" id="a02ed2e54e7752890c28f7b58fc74baad"></a>
 <div class="memitem">
@@ -185,7 +187,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 </div><div class="memdoc">
 
 <p>Virtual method returning the InterfaceId of the interface. </p>
-<p>Needs to be overwritten in child classes. </p>
+<p>Needs to be overridden in child classes. </p>
 
 <p>Reimplemented from <a class="el" href="classvrv_1_1_interface.html#a5a6818097ffc4a990e6e6e004cf1aaa3">vrv::Interface</a>.</p>
 
@@ -200,7 +202,7 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_text_dir_interface.html">TextDirInterface</a></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:51 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:08 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

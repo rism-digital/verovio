@@ -155,6 +155,12 @@ $(document).ready(function(){initNavTree('functions_func_r.html','');});
 <li>RemoveChildAt()
 : <a class="el" href="classvrv_1_1_object.html#a7dbbee49cb70efaafbd7a80fa245176f">vrv::Object</a>
 </li>
+<li>RenderToMidi()
+: <a class="el" href="classvrv_1_1_toolkit.html#a6ae456f82e585835f461c792dc5c4f2a">vrv::Toolkit</a>
+</li>
+<li>RenderToMidiFile()
+: <a class="el" href="classvrv_1_1_toolkit.html#a47607d8329d2a8cca35b6c549f466094">vrv::Toolkit</a>
+</li>
 <li>RenderToSvg()
 : <a class="el" href="classvrv_1_1_toolkit.html#af7f2364ddf6649f9272d80a770c5a570">vrv::Toolkit</a>
 </li>
@@ -165,13 +171,14 @@ $(document).ready(function(){initNavTree('functions_func_r.html','');});
 : <a class="el" href="classvrv_1_1_score_def.html#a1225a27011925b11b208356a11bebdd3">vrv::ScoreDef</a>
 </li>
 <li>ReplaceDrawingValuesInStaffDef()
-: <a class="el" href="classvrv_1_1_object.html#a3cfb58a7ab906c09d1209e0f476d9d62">vrv::Object</a>
-, <a class="el" href="classvrv_1_1_staff_def.html#a465e0bce9774ef1c440f04766c3e812f">vrv::StaffDef</a>
+: <a class="el" href="classvrv_1_1_object.html#a4433a99f4aa214a4cc351ba903d6baf4">vrv::Object</a>
+, <a class="el" href="classvrv_1_1_staff_def.html#a3437c34ecc3b1de05c6ee1e9e1e3ede8">vrv::StaffDef</a>
 </li>
 <li>Reset()
 : <a class="el" href="classvrv_1_1_abbr.html#ac7d315b6903e06a22126c42a7141e82d">vrv::Abbr</a>
 , <a class="el" href="classvrv_1_1_accid.html#a77f0229943afc71686a9a5ad48866ab6">vrv::Accid</a>
 , <a class="el" href="classvrv_1_1_add.html#aa50868e956e276fe32abbdc44c86f7ab">vrv::Add</a>
+, <a class="el" href="classvrv_1_1_alignment.html#a0287d653bbc3253df179dfcaaab2f343">vrv::Alignment</a>
 , <a class="el" href="classvrv_1_1_anchored_text.html#a994b8d19db67c14b85ef4543ec9add53">vrv::AnchoredText</a>
 , <a class="el" href="classvrv_1_1_annot.html#accca6c7f265148eeac13e8dabc061a84">vrv::Annot</a>
 , <a class="el" href="classvrv_1_1_app.html#ab257604e5582c2d2961a202ec83e09ba">vrv::App</a>
@@ -183,11 +190,16 @@ $(document).ready(function(){initNavTree('functions_func_r.html','');});
 , <a class="el" href="classvrv_1_1_custos.html#a32c4ea04b40a718aabdd6199f8ed4423">vrv::Custos</a>
 , <a class="el" href="classvrv_1_1_damage.html#a1e069800a85fe9d3a32f9e49fc5d307c">vrv::Damage</a>
 , <a class="el" href="classvrv_1_1_del.html#a26bbb25b17b1332e0a4d7a9d37e4900b">vrv::Del</a>
+, <a class="el" href="classvrv_1_1_dir.html#ae432921bad571110afc4dc541f657984">vrv::Dir</a>
+, <a class="el" href="classvrv_1_1_doc.html#a351c9c94a26f5cf02356d873287f469c">vrv::Doc</a>
 , <a class="el" href="classvrv_1_1_dot.html#a573879ea0cb5a2aa550fb99faf7f0a52">vrv::Dot</a>
+, <a class="el" href="classvrv_1_1_dynam.html#a796634a0f186838ef311761060835d05">vrv::Dynam</a>
 , <a class="el" href="classvrv_1_1_editorial_element.html#abd7e8631e1dd27b74faf50fa278d0a11">vrv::EditorialElement</a>
+, <a class="el" href="classvrv_1_1_ending_boundary.html#abce139fd5c460e0f432ff266db6f949b">vrv::EndingBoundary</a>
 , <a class="el" href="classvrv_1_1_expan.html#ab3244a775bf1372733f7a27f72c1549c">vrv::Expan</a>
 , <a class="el" href="classvrv_1_1_floating_element.html#a9b41047a14a0c5e7e501e00d09bff485">vrv::FloatingElement</a>
 , <a class="el" href="classvrv_1_1_f_trem.html#abfe7d983b09535ba5c074878c70eeed9">vrv::FTrem</a>
+, <a class="el" href="classvrv_1_1_hairpin.html#acf6ebba6694c86e28faee5c18844bb4d">vrv::Hairpin</a>
 , <a class="el" href="classvrv_1_1_key_sig.html#a5d508aa999353ab19a1bb00e5aa4a356">vrv::KeySig</a>
 , <a class="el" href="classvrv_1_1_layer_element.html#afda62d2037293f7448dc26ca2e445b68">vrv::LayerElement</a>
 , <a class="el" href="classvrv_1_1_lem.html#a07ff80c4cacf4d2a707eb68f94d70ba1">vrv::Lem</a>
@@ -201,8 +213,10 @@ $(document).ready(function(){initNavTree('functions_func_r.html','');});
 , <a class="el" href="classvrv_1_1_multi_rest.html#ab51f1dff1cdb12d373ed4d42e9b3ab89">vrv::MultiRest</a>
 , <a class="el" href="classvrv_1_1_multi_rpt.html#a6c228ab031ba4a04bdf3352f926ad3f1">vrv::MultiRpt</a>
 , <a class="el" href="classvrv_1_1_object.html#acdbfa3602b2a05ed4c7ba41c77f92b7e">vrv::Object</a>
+, <a class="el" href="classvrv_1_1_octave.html#a229ec2da837f68c480ab55161beb1cb8">vrv::Octave</a>
 , <a class="el" href="classvrv_1_1_orig.html#ad98c66ed00ddf29ab9e6daf78bf112ce">vrv::Orig</a>
 , <a class="el" href="classvrv_1_1_page.html#ac858909c078a4a4c7c3879aad83e45d7">vrv::Page</a>
+, <a class="el" href="classvrv_1_1_pedal.html#a578f94f90ceb7176bb547357536e9bf9">vrv::Pedal</a>
 , <a class="el" href="classvrv_1_1_proport.html#abe080e5bc139c410e93ffb36e244a01c">vrv::Proport</a>
 , <a class="el" href="classvrv_1_1_rdg.html#ac3cad7c428be4125ce816a64bc0b082b">vrv::Rdg</a>
 , <a class="el" href="classvrv_1_1_reg.html#a6e95e8401a483fab8101da795bc79136">vrv::Reg</a>
@@ -221,6 +235,7 @@ $(document).ready(function(){initNavTree('functions_func_r.html','');});
 , <a class="el" href="classvrv_1_1_text.html#a0f10976c135be6c5b73c2f6eecd8a4c3">vrv::Text</a>
 , <a class="el" href="classvrv_1_1_text_element.html#a8ac1eec61d858d477357d64e0b6f1338">vrv::TextElement</a>
 , <a class="el" href="classvrv_1_1_tie.html#aa2dcc8217fbcb23238941592457f994d">vrv::Tie</a>
+, <a class="el" href="classvrv_1_1_timestamp_aligner.html#a985b1e565b90e6bcbab6e88b09fd50c0">vrv::TimestampAligner</a>
 , <a class="el" href="classvrv_1_1_timestamp_attr.html#a18518bfeb14edf87293657d25cb5ef30">vrv::TimestampAttr</a>
 , <a class="el" href="classvrv_1_1_tuplet.html#a464671f725eb5ac5f54affe1c94470de">vrv::Tuplet</a>
 , <a class="el" href="classvrv_1_1_unclear.html#aa5046e312c4ed0ffea9b8e7c28396a85">vrv::Unclear</a>
@@ -232,13 +247,18 @@ $(document).ready(function(){initNavTree('functions_func_r.html','');});
 <li>ResetAccidSpace()
 : <a class="el" href="classvrv_1_1_chord.html#a6430ae1f4ab55182ce554938454c111b">vrv::Chord</a>
 </li>
+<li>ResetBoundingBox()
+: <a class="el" href="classvrv_1_1_bounding_box.html#ae79b9324168608f36cb71c8ca4174220">vrv::BoundingBox</a>
+</li>
 <li>ResetDrawing()
-: <a class="el" href="classvrv_1_1_dot.html#a8f4d9514a1e92c05b8e26806725f4dd9">vrv::Dot</a>
-, <a class="el" href="classvrv_1_1_floating_element.html#abec95f736866252a999eb70298c4f39e">vrv::FloatingElement</a>
-, <a class="el" href="classvrv_1_1_note.html#affb340d959e651c5989fc590126378e5">vrv::Note</a>
-, <a class="el" href="classvrv_1_1_object.html#a9598e16dc9e257a164e15592587379af">vrv::Object</a>
-, <a class="el" href="classvrv_1_1_staff.html#ab95b86447a0dd034966a3950883ddb9e">vrv::Staff</a>
-, <a class="el" href="classvrv_1_1_syl.html#a1f46c122c8097ca234399ba102cc00f2">vrv::Syl</a>
+: <a class="el" href="classvrv_1_1_dot.html#a8284f4468b749572fd757975ccaa5acd">vrv::Dot</a>
+, <a class="el" href="classvrv_1_1_ending_boundary.html#a427926bba5a9e8749e709a6b418aadec">vrv::EndingBoundary</a>
+, <a class="el" href="classvrv_1_1_floating_element.html#a921e47f63565f57f9523b6d0b8795e51">vrv::FloatingElement</a>
+, <a class="el" href="classvrv_1_1_measure.html#a9592e7c53aac45b95a5a797e37550fe7">vrv::Measure</a>
+, <a class="el" href="classvrv_1_1_note.html#aa8ed8330eedbe43ecde48e5f83ff8df0">vrv::Note</a>
+, <a class="el" href="classvrv_1_1_object.html#ae18e09b2661ed1fd1fd65b7330185d78">vrv::Object</a>
+, <a class="el" href="classvrv_1_1_staff.html#af445c1b571a451f7d83ecc8c28d45fde">vrv::Staff</a>
+, <a class="el" href="classvrv_1_1_syl.html#a23fd0bc19c3581f210bc071aa7dbbc39">vrv::Syl</a>
 </li>
 <li>ResetDrawingList()
 : <a class="el" href="classvrv_1_1_drawing_list_interface.html#a4b20a831da972d0a05fa42be7c6eb5e9">vrv::DrawingListInterface</a>
@@ -247,8 +267,11 @@ $(document).ready(function(){initNavTree('functions_func_r.html','');});
 : <a class="el" href="classvrv_1_1_doc.html#a6ab38682780ec861437404767df45732">vrv::Doc</a>
 </li>
 <li>ResetHorizontalAlignment()
-: <a class="el" href="classvrv_1_1_layer_element.html#ad02d8fb2a35d1439bf7ec21b8d0d2ea0">vrv::LayerElement</a>
-, <a class="el" href="classvrv_1_1_measure.html#ae21623440487300ec571b353c04789e3">vrv::Measure</a>
+: <a class="el" href="classvrv_1_1_floating_element.html#a94ea1524c305a034c38745026505f1b3">vrv::FloatingElement</a>
+, <a class="el" href="classvrv_1_1_layer_element.html#ad80313afbd3e9a3d22a320cfbc6b5685">vrv::LayerElement</a>
+, <a class="el" href="classvrv_1_1_measure.html#a13da1440d609e772eb651bf169802999">vrv::Measure</a>
+, <a class="el" href="classvrv_1_1_object.html#a29a1b94e5a5909f1808fbf5b6082f395">vrv::Object</a>
+, <a class="el" href="classvrv_1_1_system.html#a1ce3b747859b8527f6678952e51c2d8c">vrv::System</a>
 </li>
 <li>ResetList()
 : <a class="el" href="classvrv_1_1_object_list_interface.html#ab5637423219e7de94ef81b7169a8ace1">vrv::ObjectListInterface</a>
@@ -257,7 +280,11 @@ $(document).ready(function(){initNavTree('functions_func_r.html','');});
 : <a class="el" href="classvrv_1_1_toolkit.html#a9621011e0b28c573d62c5412a8c886ec">vrv::Toolkit</a>
 </li>
 <li>ResetVerticalAlignment()
-: <a class="el" href="classvrv_1_1_staff.html#a54edffc7a89000658162195cf988089e">vrv::Staff</a>
+: <a class="el" href="classvrv_1_1_floating_element.html#a5de9cc54eadb9bce1f359cea40913d2b">vrv::FloatingElement</a>
+, <a class="el" href="classvrv_1_1_layer_element.html#a1911c3248161c492f5d1fdad9e429ae0">vrv::LayerElement</a>
+, <a class="el" href="classvrv_1_1_object.html#a211cbb0f72bdd8392d6e31f6b8af51dd">vrv::Object</a>
+, <a class="el" href="classvrv_1_1_staff.html#adbd0ace09326958de6ddde0b709ab727">vrv::Staff</a>
+, <a class="el" href="classvrv_1_1_system.html#a42ce9e0d7c04ddd4c0f3318c4a899485">vrv::System</a>
 </li>
 <li>RGB2Int()
 : <a class="el" href="classvrv_1_1_device_context.html#a73f8ff83665f5699325367b3a3743bae">vrv::DeviceContext</a>
@@ -268,7 +295,7 @@ $(document).ready(function(){initNavTree('functions_func_r.html','');});
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:51 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:08 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

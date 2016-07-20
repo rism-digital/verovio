@@ -12,8 +12,8 @@ var classvrv_1_1_editorial_element =
     [ "AddStaffDef", "classvrv_1_1_editorial_element.html#a5e97cb9fb8d1659e810f956394682626", null ],
     [ "AddStaffGrp", "classvrv_1_1_editorial_element.html#a09a828c3e78792dfcd3521d244d79508", null ],
     [ "AddTextElement", "classvrv_1_1_editorial_element.html#a7c388caa8e819eb2f07758454a23d3a5", null ],
-    [ "CastOffSystems", "classvrv_1_1_editorial_element.html#ad62deb2feb2e3bc9cd0ff9a4127ad850", null ],
-    [ "Is", "classvrv_1_1_editorial_element.html#a758e7e3ca45323de060bace0bb036da8", null ],
+    [ "CastOffSystems", "classvrv_1_1_editorial_element.html#a55eb6f409988796198cbcd14a8abafe9", null ],
+    [ "Is", "classvrv_1_1_editorial_element.html#a6063740236a13fc1fa11cacf305786f7", null ],
     [ "Reset", "classvrv_1_1_editorial_element.html#abd7e8631e1dd27b74faf50fa278d0a11", null ],
     [ "m_visibility", "classvrv_1_1_editorial_element.html#aeac215256d1fb1a8bb10a813be1c0eea", null ]
 ];

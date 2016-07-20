@@ -122,38 +122,57 @@ Inheritance diagram for vrv::TimeSpanningInterface:</div>
  <div class="center">
   <img src="classvrv_1_1_time_spanning_interface.png" usemap="#vrv::TimeSpanningInterface_map" alt=""/>
   <map id="vrv::TimeSpanningInterface_map" name="vrv::TimeSpanningInterface_map">
-<area href="classvrv_1_1_time_point_interface.html" title="This class is an interface for elements having a single time point, such as tempo, reh, etc. " alt="vrv::TimePointInterface" shape="rect" coords="264,56,430,80"/>
-<area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="0,0,166,24"/>
-<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="264,168,430,192"/>
-<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="440,168,606,192"/>
-<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="616,168,782,192"/>
+<area href="classvrv_1_1_time_point_interface.html" title="This class is an interface for elements having a single time point, such as tempo, reh, etc. " alt="vrv::TimePointInterface" shape="rect" coords="352,56,518,80"/>
+<area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="88,0,254,24"/>
+<area href="classvrv_1_1_dir.html" alt="vrv::Dir" shape="rect" coords="0,168,166,192"/>
+<area href="classvrv_1_1_dynam.html" alt="vrv::Dynam" shape="rect" coords="176,168,342,192"/>
+<area href="classvrv_1_1_hairpin.html" alt="vrv::Hairpin" shape="rect" coords="352,168,518,192"/>
+<area href="classvrv_1_1_octave.html" alt="vrv::Octave" shape="rect" coords="528,168,694,192"/>
+<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="704,168,870,192"/>
+<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="880,168,1046,192"/>
+<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="1056,168,1222,192"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a3cefd66ce3b1542568132a2ef87646c8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3cefd66ce3b1542568132a2ef87646c8"></a>
+virtual <a class="el" href="classvrv_1_1_time_point_interface.html">TimePointInterface</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetTimePointInterface</b> ()</td></tr>
+<tr class="separator:a3cefd66ce3b1542568132a2ef87646c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a26f9c358bc5081656fde4774506a0293"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a26f9c358bc5081656fde4774506a0293"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>SetStartAndEnd</b> (<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *element)</td></tr>
 <tr class="separator:a26f9c358bc5081656fde4774506a0293"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a02cb3fd1d5c429acbef273cb99966a9b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a02cb3fd1d5c429acbef273cb99966a9b"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>HasStartAndEnd</b> ()</td></tr>
 <tr class="separator:a02cb3fd1d5c429acbef273cb99966a9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1286ca2a24e646753e7ffcc6ff3394d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab1286ca2a24e646753e7ffcc6ff3394d"></a>
+<a class="el" href="classvrv_1_1_measure.html">Measure</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#ab1286ca2a24e646753e7ffcc6ff3394d">GetEndMeasure</a> ()</td></tr>
+<tr class="memdesc:ab1286ca2a24e646753e7ffcc6ff3394d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the end measure of the <a class="el" href="classvrv_1_1_time_point_interface.html" title="This class is an interface for elements having a single time point, such as tempo, reh, etc. ">TimePointInterface</a>. <br /></td></tr>
+<tr class="separator:ab1286ca2a24e646753e7ffcc6ff3394d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8889df0c70dd8ad214c556b776aa0511"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8889df0c70dd8ad214c556b776aa0511"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#a8889df0c70dd8ad214c556b776aa0511">IsSpanningMeasures</a> ()</td></tr>
+<tr class="memdesc:a8889df0c70dd8ad214c556b776aa0511"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the element is spanning over two or more measures. <br /></td></tr>
+<tr class="separator:a8889df0c70dd8ad214c556b776aa0511"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a494562ad8f3d38e0b358a9cdcfd5c93f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a494562ad8f3d38e0b358a9cdcfd5c93f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetUuidStr</b> ()</td></tr>
 <tr class="separator:a494562ad8f3d38e0b358a9cdcfd5c93f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af64a8308d50994b28c5e79250ce598b0"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#af64a8308d50994b28c5e79250ce598b0">InterfaceFillStaffCurrentTimeSpanning</a> (ArrayPtrVoid *params, <a class="el" href="classvrv_1_1_doc_object.html">DocObject</a> *object)</td></tr>
-<tr class="memdesc:af64a8308d50994b28c5e79250ce598b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">We have functor in the interface for avoiding code duplication in each implementation class.  <a href="#af64a8308d50994b28c5e79250ce598b0">More...</a><br /></td></tr>
-<tr class="separator:af64a8308d50994b28c5e79250ce598b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a292cbcf723029230e8ac4179a0ab18c7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a292cbcf723029230e8ac4179a0ab18c7"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#a292cbcf723029230e8ac4179a0ab18c7">InterfacePrepareTimeSpanning</a> (ArrayPtrVoid *params, <a class="el" href="classvrv_1_1_doc_object.html">DocObject</a> *object)</td></tr>
-<tr class="memdesc:a292cbcf723029230e8ac4179a0ab18c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#a10305d2638544afafdaf7af0ad34f534" title="Matches start and end for TimeSpanningInterface elements (such as tie or slur) If fillList is set to ...">Object::PrepareTimeSpanning</a>. <br /></td></tr>
-<tr class="separator:a292cbcf723029230e8ac4179a0ab18c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae23a2db40a4a670a99eee82b76985869"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae23a2db40a4a670a99eee82b76985869"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#ae23a2db40a4a670a99eee82b76985869">InterfaceResetDrawing</a> (ArrayPtrVoid *params, <a class="el" href="classvrv_1_1_doc_object.html">DocObject</a> *object)</td></tr>
-<tr class="memdesc:ae23a2db40a4a670a99eee82b76985869"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#a9598e16dc9e257a164e15592587379af" title="Reset the drawing values before calling PrepareDrawing after changes. ">Object::ResetDrawing</a>. <br /></td></tr>
-<tr class="separator:ae23a2db40a4a670a99eee82b76985869"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7eb9ec4141167667a95edb3e91b72c6a"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#a7eb9ec4141167667a95edb3e91b72c6a">InterfaceFillStaffCurrentTimeSpanning</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
+<tr class="memdesc:a7eb9ec4141167667a95edb3e91b72c6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">We have functors in the interface for avoiding code duplication in each implementation class.  <a href="#a7eb9ec4141167667a95edb3e91b72c6a">More...</a><br /></td></tr>
+<tr class="separator:a7eb9ec4141167667a95edb3e91b72c6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdd5ee6c76457751a32e0f26310331d0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afdd5ee6c76457751a32e0f26310331d0"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#afdd5ee6c76457751a32e0f26310331d0">InterfacePrepareTimeSpanning</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
+<tr class="memdesc:afdd5ee6c76457751a32e0f26310331d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#acf5548dc77c315039ea5b8ce9e323bc3" title="Matches start and end for TimeSpanningInterface elements (such as tie or slur). ">Object::PrepareTimeSpanning</a>. <br /></td></tr>
+<tr class="separator:afdd5ee6c76457751a32e0f26310331d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb8a7bb12dfeffb584dd52840fc11ac4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acb8a7bb12dfeffb584dd52840fc11ac4"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#acb8a7bb12dfeffb584dd52840fc11ac4">InterfacePrepareTimestamps</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
+<tr class="memdesc:acb8a7bb12dfeffb584dd52840fc11ac4"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#add7c9b75fc81f87f444f681e4988d91f" title="Matches start and end for TimeSpanningInterface elements with tstamp(2) attributes. ">Object::PrepareTimestamps</a>. <br /></td></tr>
+<tr class="separator:acb8a7bb12dfeffb584dd52840fc11ac4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a662b369eb4ed6068d8b9da4de73108ed"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a662b369eb4ed6068d8b9da4de73108ed"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#a662b369eb4ed6068d8b9da4de73108ed">InterfaceResetDrawing</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
+<tr class="memdesc:a662b369eb4ed6068d8b9da4de73108ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#ae18e09b2661ed1fd1fd65b7330185d78" title="Reset the drawing values before calling PrepareDrawing after changes. ">Object::ResetDrawing</a>. <br /></td></tr>
+<tr class="separator:a662b369eb4ed6068d8b9da4de73108ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Constructors, destructors, reset methods</div></td></tr>
-<tr><td colspan="2"><div class="groupText"><p>Reset method reset all attribute classes </p>
+<tr><td colspan="2"><div class="groupText"><p>Reset method resets all attribute classes </p>
 </div></td></tr>
 <tr class="memitem:ac94e8747e0ea08969523467586f59717"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac94e8747e0ea08969523467586f59717"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>TimeSpanningInterface</b> ()</td></tr>
@@ -177,12 +196,27 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetEnd</b> (<a class=
 <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetEnd</b> ()</td></tr>
 <tr class="separator:ae3bf35a85b17a514c8559bf5e8385fc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrv_1_1_time_point_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrv_1_1_time_point_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrv_1_1_time_point_interface.html">vrv::TimePointInterface</a></td></tr>
+<tr class="memitem:a67678cf06ae06579a830344df5c5598a inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67678cf06ae06579a830344df5c5598a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#a67678cf06ae06579a830344df5c5598a">AddStaff</a> (int n)</td></tr>
+<tr class="memdesc:a67678cf06ae06579a830344df5c5598a inherit pub_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_add.html">Add</a> a staff n to the AttStaffident vector (if not already there) <br /></td></tr>
+<tr class="separator:a67678cf06ae06579a830344df5c5598a inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a645c1d24917af2fe9687bd41589a53b8 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a645c1d24917af2fe9687bd41589a53b8"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>HasStart</b> ()</td></tr>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#a645c1d24917af2fe9687bd41589a53b8">HasStart</a> ()</td></tr>
+<tr class="memdesc:a645c1d24917af2fe9687bd41589a53b8 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if a start is given ( or ) <br /></td></tr>
 <tr class="separator:a645c1d24917af2fe9687bd41589a53b8 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf47474d192a6a9c14732c4055605a6d inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf47474d192a6a9c14732c4055605a6d"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>SetUuidStr</b> ()</td></tr>
-<tr class="separator:acf47474d192a6a9c14732c4055605a6d inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54007f47ab2054a75b29618b8b47dd4f inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a54007f47ab2054a75b29618b8b47dd4f"></a>
+<a class="el" href="classvrv_1_1_measure.html">Measure</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#a54007f47ab2054a75b29618b8b47dd4f">GetStartMeasure</a> ()</td></tr>
+<tr class="memdesc:a54007f47ab2054a75b29618b8b47dd4f inherit pub_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the start measure of the <a class="el" href="classvrv_1_1_time_point_interface.html" title="This class is an interface for elements having a single time point, such as tempo, reh, etc. ">TimePointInterface</a>. <br /></td></tr>
+<tr class="separator:a54007f47ab2054a75b29618b8b47dd4f inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11824d7f91a23984c3655671971c3592 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a11824d7f91a23984c3655671971c3592"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#a11824d7f91a23984c3655671971c3592">IsOnStaff</a> (int n)</td></tr>
+<tr class="memdesc:a11824d7f91a23984c3655671971c3592 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if the <a class="el" href="classvrv_1_1_time_point_interface.html" title="This class is an interface for elements having a single time point, such as tempo, reh, etc. ">TimePointInterface</a> occurs on the staff <br />
+Looks that the parent staff if the using  or at the  values. <br /></td></tr>
+<tr class="separator:a11824d7f91a23984c3655671971c3592 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc143d64530139d69ea66c3c413581d0 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acc143d64530139d69ea66c3c413581d0"></a>
+std::vector&lt; <a class="el" href="classvrv_1_1_staff.html">Staff</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#acc143d64530139d69ea66c3c413581d0">GetTstampStaves</a> (<a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure)</td></tr>
+<tr class="memdesc:acc143d64530139d69ea66c3c413581d0 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a vector of staves looking at the  attribute or at the parent staff or the . <br /></td></tr>
+<tr class="separator:acc143d64530139d69ea66c3c413581d0 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a470841fa6a90f560e791882bd0d7ff3d inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a470841fa6a90f560e791882bd0d7ff3d"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>TimePointInterface</b> ()</td></tr>
 <tr class="separator:a470841fa6a90f560e791882bd0d7ff3d inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -214,6 +248,10 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~Interface</b> ()<
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_methods_classvrv_1_1_time_point_interface"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classvrv_1_1_time_point_interface')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classvrv_1_1_time_point_interface.html">vrv::TimePointInterface</a></td></tr>
+<tr class="memitem:acf47474d192a6a9c14732c4055605a6d inherit pro_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acf47474d192a6a9c14732c4055605a6d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#acf47474d192a6a9c14732c4055605a6d">SetUuidStr</a> ()</td></tr>
+<tr class="memdesc:acf47474d192a6a9c14732c4055605a6d inherit pro_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract the fragment of the start or end :id if given. <br /></td></tr>
+<tr class="separator:acf47474d192a6a9c14732c4055605a6d inherit pro_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84852fde24469edca530034c261ef1fa inherit pro_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a84852fde24469edca530034c261ef1fa"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#a84852fde24469edca530034c261ef1fa">ExtractUuidFragment</a> (std::string refUuid)</td></tr>
 <tr class="memdesc:a84852fde24469edca530034c261ef1fa inherit pro_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract the uuid from a string. <br /></td></tr>
@@ -228,9 +266,9 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class is an interface for spanning elements, such as slur, hairpin, etc. </p>
-<p>It is not an abstract class but should not be instanciate directly. </p>
+<p>It is not an abstract class but should not be instantiated directly. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="af64a8308d50994b28c5e79250ce598b0"></a>
+<a class="anchor" id="a7eb9ec4141167667a95edb3e91b72c6a"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -240,13 +278,13 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b
         <tr>
           <td class="memname">virtual int vrv::TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning </td>
           <td>(</td>
-          <td class="paramtype">ArrayPtrVoid *&#160;</td>
-          <td class="paramname"><em>params</em>, </td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *&#160;</td>
+          <td class="paramname"><em>functorParams</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classvrv_1_1_doc_object.html">DocObject</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_object.html">Object</a> *&#160;</td>
           <td class="paramname"><em>object</em>&#160;</td>
         </tr>
         <tr>
@@ -262,8 +300,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b
 </table>
 </div><div class="memdoc">
 
-<p>We have functor in the interface for avoiding code duplication in each implementation class. </p>
-<p>Since we are in an interface, we need to pass the <a class="el" href="classvrv_1_1_doc_object.html" title="This class represents a basic object in the layout domain. ">DocObject</a> (implementation) to the functor method. These not called by the Process/Call loop but by the implementaion classes explicitely. See <a class="el" href="classvrv_1_1_floating_element.html#a94f0edd34ef5d1da2213f9045705a298" title="See Object::FillStaffCurrentTimeSpanning. ">FloatingElement::FillStaffCurrentTimeSpanning</a> for an example. See <a class="el" href="classvrv_1_1_object.html#ab85653e6361c86e424d41e5ae93eafaa" title="Goes through all the TimeSpanningInterface element and set them a current to each staff where require...">Object::FillStaffCurrentTimeSpanning</a> </p>
+<p>We have functors in the interface for avoiding code duplication in each implementation class. </p>
+<p>Since we are in an interface, we need to pass the <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> (implementation) to the functor methods. These are not called by the Process/Call loop but by the implementation classes explicitely. See <a class="el" href="classvrv_1_1_floating_element.html#a0294e91849c7bfdd27330d1c6e981ac3" title="See Object::FillStaffCurrentTimeSpanning. ">FloatingElement::FillStaffCurrentTimeSpanning</a> for an example. See <a class="el" href="classvrv_1_1_object.html#af2fe95ae3e17efb2fb1b8a32633f6ae1" title="Goes through all the TimeSpanningInterface elements and set them a current to each staff where requir...">Object::FillStaffCurrentTimeSpanning</a> </p>
 
 </div>
 </div>
@@ -289,7 +327,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b
 </div><div class="memdoc">
 
 <p>Virtual method returning the InterfaceId of the interface. </p>
-<p>Needs to be overwritten in child classes. </p>
+<p>Needs to be overridden in child classes. </p>
 
 <p>Reimplemented from <a class="el" href="classvrv_1_1_time_point_interface.html#a37f500cfc23ea2606a9dd7bfd64f202a">vrv::TimePointInterface</a>.</p>
 
@@ -304,7 +342,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_time_spanning_interface.html">TimeSpanningInterface</a></li>
-    <li class="footer">Generated on Thu Jan 14 2016 16:03:51 by
+    <li class="footer">Generated on Wed Jul 20 2016 07:50:08 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>
