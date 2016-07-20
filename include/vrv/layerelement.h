@@ -111,47 +111,47 @@ public:
      * @name Reset the horizontal alignment
      */
     ///@{
-    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params);
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
     ///@}
 
     /**
      * @name Reset the vertical alignment
      */
     ///@{
-    virtual int ResetVerticalAlignment(ArrayPtrVoid *params);
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
     ///@}
 
     /**
      * See Object::AlignHorizontally
      */
-    virtual int AlignHorizontally(ArrayPtrVoid *params);
+    virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning(ArrayPtrVoid *params);
+    virtual int PrepareTimeSpanning(FunctorParams *functorParams);
 
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY(ArrayPtrVoid *params);
+    virtual int SetDrawingXY(FunctorParams *functorParams);
 
-    virtual int TimeSpanningLayerElements(ArrayPtrVoid *params);
+    virtual int TimeSpanningLayerElements(FunctorParams *functorParams);
 
     /**
      * See Object::GenerateMIDI
      */
-    virtual int GenerateMIDI(ArrayPtrVoid *params);
+    virtual int GenerateMIDI(FunctorParams *functorParams);
 
     /**
      *  See Object::GenerateMIDI
      */
-    virtual int GenerateMIDIEnd(ArrayPtrVoid *params);
+    virtual int GenerateMIDIEnd(FunctorParams *functorParams);
 
     /**
      * See Object::CalcMaxMeasureDuration
      */
-    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
+    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
 
 private:
     //

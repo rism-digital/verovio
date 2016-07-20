@@ -205,24 +205,24 @@ public:
      * Set the position of the StaffAlignment.
      * Functor redirected from System.
      */
-    virtual int SetAligmentYPos(ArrayPtrVoid *params);
+    virtual int SetAligmentYPos(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStaffOverlap
      */
-    virtual int CalcStaffOverlap(ArrayPtrVoid *params);
+    virtual int CalcStaffOverlap(FunctorParams *functorParams);
 
     /**
      * Correct the Y alignment once the the content of a system has been aligned and laid out.
      * Special case of functor redirected from System.
      */
-    virtual int IntegrateBoundingBoxYShift(ArrayPtrVoid *params);
+    virtual int IntegrateBoundingBoxYShift(FunctorParams *functorParams);
 
     /**
      * Adjust the position of the positoners looking at previously overlowing bounding boxes.
      * Also add them to the list of overflowing elements.
      */
-    virtual int AdjustFloatingPostioners(ArrayPtrVoid *params);
+    virtual int AdjustFloatingPostioners(FunctorParams *functorParams);
 
 private:
     //
@@ -349,37 +349,37 @@ public:
      * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the GraceAligner.
      */
-    virtual int IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params);
+    virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams);
 
     /**
      * Correct the X alignment once the content of a system has been aligned and laid out.
      * Special case of functor redirected from Measure.
      */
-    virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params);
+    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams);
 
     /**
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      */
-    virtual int SetAlignmentXPos(ArrayPtrVoid *params);
+    virtual int SetAlignmentXPos(FunctorParams *functorParams);
 
     /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
-    virtual int JustifyX(ArrayPtrVoid *params);
+    virtual int JustifyX(FunctorParams *functorParams);
 
     /**
      * Lay out the X positions of the staff content looking that the bounding boxes.
      * The m_xShift is updated appropriately
      */
-    virtual int SetBoundingBoxXShift(ArrayPtrVoid *params);
+    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
 
     /**
      * Lay out the X positions of the staff content looking that the bounding boxes.
      * The m_xShift is updated appropriately
      */
-    virtual int SetBoundingBoxXShiftEnd(ArrayPtrVoid *params);
+    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
 
 private:
     //
@@ -491,20 +491,20 @@ public:
      * Correct the X alignment once the the content of a system has been aligned and laid out.
      * Special case of functor redirected from Measure.
      */
-    virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params);
+    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams);
 
     /**
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      * For each MeasureAlignment, we need to reset the previous time position.
      */
-    virtual int SetAlignmentXPos(ArrayPtrVoid *params);
+    virtual int SetAlignmentXPos(FunctorParams *functorParams);
 
     /**
      * Justify the X positions
      * Special case of functor redirected from Measure.
      */
-    virtual int JustifyX(ArrayPtrVoid *params);
+    virtual int JustifyX(FunctorParams *functorParams);
 
 private:
     void AddAlignment(Alignment *alignment, int idx = -1);

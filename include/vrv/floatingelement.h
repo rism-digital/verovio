@@ -62,41 +62,41 @@ public:
      * @name Reset the horizontal alignment
      */
     ///@{
-    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params);
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
     ///@}
 
     /**
      * @name Reset the vertical alignment
      */
     ///@{
-    virtual int ResetVerticalAlignment(ArrayPtrVoid *params);
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
     ///@}
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);
+    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning(ArrayPtrVoid *params);
+    virtual int PrepareTimeSpanning(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int PrepareTimestamps(ArrayPtrVoid *params);
+    virtual int PrepareTimestamps(FunctorParams *functorParams);
 
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing(ArrayPtrVoid *params);
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
      * Undo the cast of the system.
      * This is used by Doc::ContinuousLayout
      */
-    virtual int UnCastOff(ArrayPtrVoid *params);
+    virtual int UnCastOff(FunctorParams *functorParams);
 
 private:
     //

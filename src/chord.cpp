@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functorparams.h"
 #include "note.h"
 #include "vrv.h"
 
@@ -299,26 +300,24 @@ void Chord::SetDrawingStemEnd(Point stemEnd)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Chord::PrepareTieAttr(ArrayPtrVoid *params)
+int Chord::PrepareTieAttr(FunctorParams *functorParams)
 {
-    // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
-    // param 1: Chord** currentChord for the current chord if in a chord
-    Chord **currentChord = static_cast<Chord **>((*params).at(1));
+    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
+    assert(params);
 
-    assert(!(*currentChord));
-    (*currentChord) = this;
+    assert(!params->m_currentChord);
+    params->m_currentChord = this;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::PrepareTieAttrEnd(ArrayPtrVoid *params)
+int Chord::PrepareTieAttrEnd(FunctorParams *functorParams)
 {
-    // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
-    // param 1: Chord** currentChord for the current chord if in a chord
-    Chord **currentChord = static_cast<Chord **>((*params).at(1));
+    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
+    assert(params);
 
-    assert((*currentChord));
-    (*currentChord) = NULL;
+    assert(params->m_currentChord);
+    params->m_currentChord = NULL;
 
     return FUNCTOR_CONTINUE;
 }

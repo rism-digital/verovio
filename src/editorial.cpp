@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "floatingelement.h"
+#include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
 #include "scoredef.h"
@@ -28,7 +29,7 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() :  Object("ee-"), AttCommon(), AttCommonPart()
+EditorialElement::EditorialElement() : Object("ee-"), AttCommon(), AttCommonPart()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
@@ -36,7 +37,7 @@ EditorialElement::EditorialElement() :  Object("ee-"), AttCommon(), AttCommonPar
     Reset();
 }
 
-EditorialElement::EditorialElement(std::string classid) :  Object(classid), AttCommon()
+EditorialElement::EditorialElement(std::string classid) : Object(classid), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
@@ -483,16 +484,10 @@ void Unclear::Reset()
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
 
-int EditorialElement::CastOffSystems(ArrayPtrVoid *params)
+int EditorialElement::CastOffSystems(FunctorParams *functorParams)
 {
-    // param 0: a pointer to the system we are taking the content from
-    // param 1: a pointer the page we are adding system to (unused)
-    // param 2: a pointer to the current system
-    // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
-    // param 4: the system width (unused)
-    // param 5: the current scoreDef width (unused)
-    System *contentSystem = static_cast<System *>((*params).at(0));
-    System **currentSystem = static_cast<System **>((*params).at(2));
+    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
     assert(dynamic_cast<System *>(this->m_parent));
@@ -501,9 +496,10 @@ int EditorialElement::CastOffSystems(ArrayPtrVoid *params)
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(contentSystem->Relinquish(this->GetIdx()));
+    EditorialElement *editorialElement
+        = dynamic_cast<EditorialElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     assert(editorialElement);
-    (*currentSystem)->AddEditorialElement(editorialElement);
+    params->m_currentSystem->AddEditorialElement(editorialElement);
 
     return FUNCTOR_SIBLINGS;
 }

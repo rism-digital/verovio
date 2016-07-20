@@ -56,19 +56,19 @@ public:
     /**
      * See Object::PrepareEndings.
      */
-    virtual int PrepareEndings(ArrayPtrVoid *params);
+    virtual int PrepareEndings(FunctorParams *functorParams);
 
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing(ArrayPtrVoid *params);
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
      * Fill a page by adding systems with the appropriate length.
      * For Endings, this means only moving them since their width is not taken into
      * account
      */
-    virtual int CastOffSystems(ArrayPtrVoid *params);
+    virtual int CastOffSystems(FunctorParams *functorParams);
 
 private:
     //

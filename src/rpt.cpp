@@ -16,6 +16,7 @@
 
 #include "chord.h"
 #include "editorial.h"
+#include "functorparams.h"
 #include "note.h"
 
 namespace vrv {
@@ -178,28 +179,25 @@ void MultiRpt::Reset()
 // MRpt functor methods
 //----------------------------------------------------------------------------
 
-int MRpt::PrepareRpt(ArrayPtrVoid *params)
+int MRpt::PrepareRpt(FunctorParams *functorParams)
 {
-    // param 0: a pointer to the current MRpt pointer
-    // param 1: a pointer to the data_BOOLEAN indicating if multiNumber
-    // param 2: a pointer to the doc scoreDef (unused)
-    MRpt **currentMRpt = static_cast<MRpt **>((*params).at(0));
-    data_BOOLEAN *multiNumber = static_cast<data_BOOLEAN *>((*params).at(1));
+    PrepareRptParams *params = dynamic_cast<PrepareRptParams *>(functorParams);
+    assert(params);
 
     // If multiNumber is not true, nothing needs to be done
-    if ((*multiNumber) != BOOLEAN_true) {
+    if (params->m_multiNumber != BOOLEAN_true) {
         return FUNCTOR_CONTINUE;
     }
 
     // If this is the first one, number has to be 2
-    if ((*currentMRpt) == NULL) {
+    if (params->m_currentMRpt == NULL) {
         this->m_drawingMeasureCount = 2;
     }
     // Otherwise increment it
     else {
-        this->m_drawingMeasureCount = (*currentMRpt)->m_drawingMeasureCount + 1;
+        this->m_drawingMeasureCount = params->m_currentMRpt->m_drawingMeasureCount + 1;
     }
-    (*currentMRpt) = this;
+    params->m_currentMRpt = this;
     return FUNCTOR_CONTINUE;
 }
 

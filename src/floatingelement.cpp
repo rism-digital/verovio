@@ -222,71 +222,71 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 // FloatingElement functor methods
 //----------------------------------------------------------------------------
 
-int FloatingElement::ResetHorizontalAlignment(ArrayPtrVoid *params)
+int FloatingElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
 
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingElement::ResetVerticalAlignment(ArrayPtrVoid *params)
+int FloatingElement::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
 
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingElement::PrepareTimeSpanning(ArrayPtrVoid *params)
+int FloatingElement::PrepareTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
-        return interface->InterfacePrepareTimeSpanning(params, this);
+        return interface->InterfacePrepareTimeSpanning(functorParams, this);
     }
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingElement::PrepareTimestamps(ArrayPtrVoid *params)
+int FloatingElement::PrepareTimestamps(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_POINT)) {
         TimePointInterface *interface = this->GetTimePointInterface();
         assert(interface);
-        return interface->InterfacePrepareTimestamps(params, this);
+        return interface->InterfacePrepareTimestamps(functorParams, this);
     }
     else if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
-        return interface->InterfacePrepareTimestamps(params, this);
+        return interface->InterfacePrepareTimestamps(functorParams, this);
     }
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingElement::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
+int FloatingElement::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
-        return interface->InterfaceFillStaffCurrentTimeSpanning(params, this);
+        return interface->InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
     }
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingElement::ResetDrawing(ArrayPtrVoid *params)
+int FloatingElement::ResetDrawing(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
         TimeSpanningInterface *interface = this->GetTimeSpanningInterface();
         assert(interface);
-        return interface->InterfaceResetDrawing(params, this);
+        return interface->InterfaceResetDrawing(functorParams, this);
     }
     return FUNCTOR_CONTINUE;
 };
 
-int FloatingElement::UnCastOff(ArrayPtrVoid *params)
+int FloatingElement::UnCastOff(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
 

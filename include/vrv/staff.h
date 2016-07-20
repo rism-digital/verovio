@@ -75,52 +75,40 @@ public:
     /**
      * Unset the initial scoreDef of each system and measure
      */
-    virtual int UnsetCurrentScoreDef(ArrayPtrVoid *params);
+    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
      * @name Reset the vertical alignment
      */
     ///@{
-    virtual int ResetVerticalAlignment(ArrayPtrVoid *params);
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
     ///@}
-
-    /**
-     * Currently unused - kept for "documentation"
-     */
-    virtual bool GetPosOnPage(ArrayPtrVoid *params);
 
     /**
      * Align the content of a staff vertically.
      */
-    virtual int AlignVertically(ArrayPtrVoid *params);
+    virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);
-
-    /**
-     * Functor for setting running lyrics in staves
-     * This is necessary for <syl> that starts in one measure and ends in another one
-     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
-     */
-    virtual int FillStaffCurrentLyrics(ArrayPtrVoid *params);
+    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing(ArrayPtrVoid *params);
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY(ArrayPtrVoid *params);
+    virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
      * See implementation and Object::PrepareRpt
      */
-    virtual int PrepareRpt(ArrayPtrVoid *params);
+    virtual int PrepareRpt(FunctorParams *functorParams);
 
 public:
     /**

@@ -154,7 +154,7 @@ public:
      * Functor for setting mRpt drawing numbers (if required)
      * See implementation and Object::PrepareRpt
      */
-    virtual int PrepareRpt(ArrayPtrVoid *params);
+    virtual int PrepareRpt(FunctorParams *functorParams);
 
 private:
     //

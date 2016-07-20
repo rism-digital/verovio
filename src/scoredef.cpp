@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
+#include "functorparams.h"
 #include "keysig.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -237,13 +238,13 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
         meterSig = newScoreDef->GetMeterSigCopy();
     }
 
-    ArrayPtrVoid params;
-    params.push_back(clef);
-    params.push_back(keySig);
-    params.push_back(mensur);
-    params.push_back(meterSig);
+    ReplaceDrawingValuesInStaffDefParams replaceDrawingValuesInStaffDefParams;
+    replaceDrawingValuesInStaffDefParams.m_clef = clef;
+    replaceDrawingValuesInStaffDefParams.m_keySig = keySig;
+    replaceDrawingValuesInStaffDefParams.m_mensur = mensur;
+    replaceDrawingValuesInStaffDefParams.m_meterSig = meterSig;
     Functor replaceDrawingValuesInScoreDef(&Object::ReplaceDrawingValuesInStaffDef);
-    this->Process(&replaceDrawingValuesInScoreDef, &params);
+    this->Process(&replaceDrawingValuesInScoreDef, &replaceDrawingValuesInStaffDefParams);
 
     if (clef) delete clef;
     if (keySig) delete keySig;
@@ -337,15 +338,15 @@ void ScoreDef::SetRedrawFlags(
 {
     m_setAsDrawing = true;
 
-    ArrayPtrVoid params;
-    params.push_back(&clef);
-    params.push_back(&keySig);
-    params.push_back(&mensur);
-    params.push_back(&meterSig);
-    params.push_back(&keySigCancellation);
-    params.push_back(&applyToAll);
+    SetStaffDefRedrawFlagsParams setStaffDefRedrawFlagsParams;
+    setStaffDefRedrawFlagsParams.m_clef = clef;
+    setStaffDefRedrawFlagsParams.m_keySig = keySig;
+    setStaffDefRedrawFlagsParams.m_mensur = mensur;
+    setStaffDefRedrawFlagsParams.m_meterSig = meterSig;
+    setStaffDefRedrawFlagsParams.m_keySigCancellation = keySigCancellation;
+    setStaffDefRedrawFlagsParams.m_applyToAll = applyToAll;
     Functor setStaffDefDraw(&Object::SetStaffDefRedrawFlags);
-    this->Process(&setStaffDefDraw, &params);
+    this->Process(&setStaffDefDraw, &setStaffDefRedrawFlagsParams);
 }
 
 void ScoreDef::SetDrawingWidth(int drawingWidth)
@@ -464,17 +465,10 @@ void StaffDef::Reset()
 // ScoreDef functor methods
 //----------------------------------------------------------------------------
 
-int ScoreDef::CastOffSystems(ArrayPtrVoid *params)
+int ScoreDef::CastOffSystems(FunctorParams *functorParams)
 {
-    // param 0: a pointer to the system we are taking the content from
-    // param 1: a pointer the page we are adding system to (unused)
-    // param 2: a pointer to the current system
-    // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
-    // param 4: the system width (unused)
-    // param 5: the current scoreDef width
-    System *contentSystem = static_cast<System *>((*params).at(0));
-    System **currentSystem = static_cast<System **>((*params).at(2));
-    int *currentScoreDefWidth = static_cast<int *>((*params).at(5));
+    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
     assert(dynamic_cast<System *>(this->m_parent));
@@ -483,13 +477,13 @@ int ScoreDef::CastOffSystems(ArrayPtrVoid *params)
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(contentSystem->Relinquish(this->GetIdx()));
-    (*currentSystem)->AddScoreDef(scoreDef);
+    ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    params->m_currentSystem->AddScoreDef(scoreDef);
     // This is not perfect since now the scoreDefWith is the one of the intermediate scoreDefs (and not
     // the initial one - for this to be corrected, we would need two parameters, one for the current initial
     // scoreDef and one for the current that will be the initial one at the next system
     // Also, the abbr label (width) changes would not be taken into account
-    (*currentScoreDefWidth) = this->GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
+    params->m_currentScoreDefWidth = this->GetDrawingWidth() + params->m_contentSystem->GetDrawingAbbrLabelsWidth();
 
     return FUNCTOR_SIBLINGS;
 }
@@ -498,62 +492,46 @@ int ScoreDef::CastOffSystems(ArrayPtrVoid *params)
 // StaffDef functor methods
 //----------------------------------------------------------------------------
 
-int StaffDef::ReplaceDrawingValuesInStaffDef(ArrayPtrVoid *params)
+int StaffDef::ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams)
 {
-    // param 0: Clef pointer (NULL if none)
-    // param 1: KeySig pointer (NULL if none)
-    // param 2: Mensur pointer (NULL if none)
-    // param 3: MeterSig pointer (NULL if none)
-    Clef *clef = static_cast<Clef *>((*params).at(0));
-    KeySig *keySig = static_cast<KeySig *>((*params).at(1));
-    Mensur *mensur = static_cast<Mensur *>((*params).at(2));
-    MeterSig *meterSig = static_cast<MeterSig *>((*params).at(3));
+    ReplaceDrawingValuesInStaffDefParams *params = dynamic_cast<ReplaceDrawingValuesInStaffDefParams *>(functorParams);
+    assert(params);
 
-    if (clef) {
-        this->SetCurrentClef(clef);
+    if (params->m_clef) {
+        this->SetCurrentClef(params->m_clef);
     }
-    if (keySig) {
-        this->SetCurrentKeySig(keySig);
+    if (params->m_keySig) {
+        this->SetCurrentKeySig(params->m_keySig);
     }
-    if (mensur) {
-        this->SetCurrentMensur(mensur);
+    if (params->m_mensur) {
+        this->SetCurrentMensur(params->m_mensur);
     }
-    if (meterSig) {
-        this->SetCurrentMeterSig(meterSig);
+    if (params->m_meterSig) {
+        this->SetCurrentMeterSig(params->m_meterSig);
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-int StaffDef::SetStaffDefRedrawFlags(ArrayPtrVoid *params)
+int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
 {
-    // param 0: bool clef flag
-    // param 1: bool keysig flag
-    // param 2: bool mensur flag
-    // param 3: bool meterSig flag
-    // param 4: bool keySig cancellation flag
-    // param 5: bool the flag for indicating if apply to all or not
-    bool *clef = static_cast<bool *>((*params).at(0));
-    bool *keysig = static_cast<bool *>((*params).at(1));
-    bool *mensur = static_cast<bool *>((*params).at(2));
-    bool *meterSig = static_cast<bool *>((*params).at(3));
-    bool *keySigCancellation = static_cast<bool *>((*params).at(4));
-    bool *applyToAll = static_cast<bool *>((*params).at(5));
+    SetStaffDefRedrawFlagsParams *params = dynamic_cast<SetStaffDefRedrawFlagsParams *>(functorParams);
+    assert(params);
 
-    if ((*clef) || (*applyToAll)) {
-        this->SetDrawClef((*clef));
+    if (params->m_clef || params->m_applyToAll) {
+        this->SetDrawClef(params->m_clef);
     }
-    if ((*keysig) || (*applyToAll)) {
-        this->SetDrawKeySig((*keysig));
+    if (params->m_keySig || params->m_applyToAll) {
+        this->SetDrawKeySig(params->m_keySig);
     }
-    if ((*mensur) || (*applyToAll)) {
-        this->SetDrawMensur((*mensur));
+    if (params->m_mensur || params->m_applyToAll) {
+        this->SetDrawMensur(params->m_mensur);
     }
-    if ((*meterSig) || (*applyToAll)) {
-        this->SetDrawMeterSig((*meterSig));
+    if (params->m_meterSig || params->m_applyToAll) {
+        this->SetDrawMeterSig(params->m_meterSig);
     }
-    if ((*keySigCancellation) || (*applyToAll)) {
-        this->SetDrawKeySigCancellation((*keySigCancellation));
+    if (params->m_keySigCancellation || params->m_applyToAll) {
+        this->SetDrawKeySigCancellation(params->m_keySigCancellation);
     }
 
     return FUNCTOR_CONTINUE;

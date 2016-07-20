@@ -171,7 +171,7 @@ public:
      * For ScoreDef, this means only moving them since their width is not taken into
      * account
      */
-    virtual int CastOffSystems(ArrayPtrVoid *params);
+    virtual int CastOffSystems(FunctorParams *functorParams);
 
 protected:
     /**
@@ -286,7 +286,7 @@ public:
      * Called form ScoreDef::ReplaceDrawingValues.
      * See implementation and Object::ReplaceDrawingValuesInStaffDef for the parameters.
      */
-    virtual int ReplaceDrawingValuesInStaffDef(ArrayPtrVoid *params);
+    virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams);
 
     /**
      * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
@@ -294,7 +294,7 @@ public:
      * This typically occurs when a new System or a new  ScoreDef is encountered.
      * See implementation and Object::SetStaffDefRedrawFlags for the parameters.
      */
-    virtual int SetStaffDefRedrawFlags(ArrayPtrVoid *params);
+    virtual int SetStaffDefRedrawFlags(FunctorParams *functorParams);
 
 private:
     //
