@@ -168,8 +168,8 @@ int main(int argc, char **argv)
     // The fonts will be loaded later with Resources::InitFonts()
     Toolkit toolkit(false);
 
-    // read pae by default
-    type = MEI;
+    // auto-detect the input format type by default
+    type = AUTO;
 
     if (argc < 2) {
         cerr << "Expected one input file but found none." << endl << endl;
