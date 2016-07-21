@@ -817,6 +817,7 @@ void HumdrumInput::prepareStaffGroup(void)
     }
     if (kernstarts.size() == 2) {
         m_staffgroup->SetSymbol(staffgroupingsym_SYMBOL_brace);
+        m_staffgroup->SetBarthru(BOOLEAN_true);
     }
     else if (kernstarts.size() > 2) {
         m_staffgroup->SetSymbol(staffgroupingsym_SYMBOL_bracket);
@@ -1458,7 +1459,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
 
         // Uncomment this when MRest::SetFermata() is implemented:
-        //for (int z = 0; z < (int)layerdata.size(); z++) {
+        // for (int z = 0; z < (int)layerdata.size(); z++) {
         //    if (!layerdata[z]->isData()) {
         //        continue;
         //    }
