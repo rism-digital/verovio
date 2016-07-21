@@ -156,6 +156,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             GenerateMIDIParams generateMIDIParams;
             generateMIDIParams.m_midiFile = midiFile;
             generateMIDIParams.m_maxValues = calcMaxMeasureDurationParams.m_maxValues;
+            generateMIDIParams.m_transSemi = transSemi;
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
 
