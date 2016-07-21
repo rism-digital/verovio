@@ -608,7 +608,7 @@ void HumdrumInput::insertExtMeta(vector<HumdrumLine *> &references)
 {
     stringstream xmldata;
     xmldata << "<extMeta>\n";
-    for (int i = 0; i < references.size(); i++) {
+    for (int i = 0; i < (int)references.size(); i++) {
         references[i]->printXml(xmldata, 3);
     }
     xmldata << "</extMeta>\n";
@@ -1184,7 +1184,7 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
             if (infile[i].token(j)->isNull()) {
                 continue;
             }
-            if (lt[staffindex].size() < layerindex + 1) {
+            if ((int)lt[staffindex].size() < layerindex + 1) {
                 lt[staffindex].resize(lt[staffindex].size() + 1);
                 lt[staffindex].back().clear(); // probably not necessary
             }
@@ -1295,7 +1295,7 @@ void HumdrumInput::printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, cons
         return;
     }
     cerr << "TOK\tGRP\tBRAK\tNUM\tNBASE\tNSCAL\tBSTART\tBEND\tGBST\tGBEND\tTSTART\tTEND\tPRIORITY\n";
-    for (int i = 0; i < tg.size(); i++) {
+    for (int i = 0; i < (int)tg.size(); i++) {
         cerr << *layerdata[i] << "\t";
         cerr << tg[i].group << "\t";
         cerr << tg[i].bracket << "\t";
@@ -1450,7 +1450,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         appendElement(layer, mrest);
 
         // Basic compensation for clef change (can be improved later):
-        for (i = 0; i < layerdata.size(); i++) {
+        for (i = 0; i < (int)layerdata.size(); i++) {
             if (!layerdata[i]->isClef()) {
                 continue;
             }
@@ -2546,7 +2546,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     vector<int> tupletbracket(poweroftwo.size(), -1);
     int tupletnum = 1;
     int j;
-    for (int i = 0; i < beampowdot.size(); i++) {
+    for (int i = 0; i < (int)beampowdot.size(); i++) {
         if (binarybeams[i]) {
             continue;
         }
@@ -3118,26 +3118,24 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
     convertRhythm(rest, token, subtoken);
 
     string tstring;
-    int stindex = 0;
     if (subtoken < 0) {
         tstring = *token;
     }
     else {
         tstring = token->getSubtoken(subtoken);
-        stindex = subtoken;
     }
 
     int layer = m_currentlayer;
 
     if (tstring.find("jj") != string::npos) {
         int newstaff = m_currentstaff - 1;
-        if ((newstaff > 0) && (newstaff <= m_kernstarts.size())) {
+        if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
             setStaff(rest, newstaff);
         }
     }
     else if (tstring.find("j") != string::npos) {
         int newstaff = m_currentstaff + 1;
-        if ((newstaff > 0) && (newstaff <= m_kernstarts.size())) {
+        if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
             setStaff(rest, newstaff);
         }
     }
@@ -3291,13 +3289,13 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
 
     if (tstring.find("jj") != string::npos) {
         int newstaff = m_currentstaff - 1;
-        if ((newstaff > 0) && (newstaff <= m_kernstarts.size())) {
+        if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
             setStaff(note, newstaff);
         }
     }
     else if (tstring.find("j") != string::npos) {
         int newstaff = m_currentstaff + 1;
-        if ((newstaff > 0) && (newstaff <= m_kernstarts.size())) {
+        if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
             setStaff(note, newstaff);
         }
     }
@@ -3414,13 +3412,11 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
 template <class ELEMENT> void HumdrumInput::convertRhythm(ELEMENT element, HTp token, int subtoken)
 {
     string tstring;
-    int stindex = 0;
     if (subtoken < 0) {
         tstring = *token;
     }
     else {
         tstring = token->getSubtoken(subtoken);
-        stindex = subtoken;
     }
 
     // Remove grace note information (for generating printed duration)
@@ -3790,7 +3786,7 @@ void HumdrumInput::storeOriginalClefApp(void)
     StaffGrp *staffgrp = new StaffGrp;
     scoredef->AddStaffGrp(staffgrp);
 
-    for (int i = 0; i < m_oclef.size(); i++) {
+    for (int i = 0; i < (int)m_oclef.size(); i++) {
         StaffDef *staffdef = new StaffDef;
         staffgrp->AddStaffDef(staffdef);
         setClef(staffdef, *m_oclef[i].second);
@@ -4107,7 +4103,7 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
         MatchHexNumber,
     } MatchState;
     std::string MatchingName;
-    unsigned int CharCode;
+    unsigned int CharCode = 0;
     bool ProcessedChar, GotCharCode;
     MatchState = NoMatch;
     for (;;) {
