@@ -984,7 +984,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // Draw the base rect
         // make it 8 pixels smaller than the interline space
         // these are the two 4 substracted and added
-        DrawFullRectangle(dc, x1, y2, x2, y1);
+        DrawFilledRectangle(dc, x1, y2, x2, y1);
 
         // Draw two lines at beginning and end
         // make it 8 pixels longer, and 4 pixels width
@@ -1000,7 +1000,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // Position centered in third line
         y1 = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * 4;
         y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        DrawFullRectangle(dc, x1, y2 - 4, x2, y1 + 4);
+        DrawFilledRectangle(dc, x1, y2 - 4, x2, y1 + 4);
     }
 
     // Draw the text above
@@ -1677,7 +1677,7 @@ void View::DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff)
         y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    DrawFullRectangle(dc, x1, y2, x2, y1);
+    DrawFilledRectangle(dc, x1, y2, x2, y1);
 
     // lines
     x1 = x - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -1700,7 +1700,7 @@ void View::DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff)
         y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-    DrawFullRectangle(dc, x1, y2, x2, y1);
+    DrawFilledRectangle(dc, x1, y2, x2, y1);
 }
 
 void View::DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff)
@@ -1737,7 +1737,7 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned c
     }
 
     y2 = y1 + vertic;
-    DrawFullRectangle(dc, x1, y1, x2, y2);
+    DrawFilledRectangle(dc, x1, y1, x2, y2);
 
     off /= 2;
     x1 -= off;
@@ -1810,7 +1810,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
 
     // draw the stems and the flags
     if (dir == STEMDIRECTION_up) {
-        DrawFullRectangle(dc, x2 - m_doc->GetDrawingStemWidth(staffSize), stemY1, x2, stemY2);
+        DrawFilledRectangle(dc, x2 - m_doc->GetDrawingStemWidth(staffSize), stemY1, x2, stemY2);
 
         if (drawingDur > DUR_4) {
             DrawSmuflCode(dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), y2, SMUFL_E240_flag8thUp,
@@ -1821,7 +1821,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
         }
     }
     else {
-        DrawFullRectangle(dc, x2, stemY1, x2 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), stemY2);
+        DrawFilledRectangle(dc, x2, stemY1, x2 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), stemY2);
 
         if (drawingDur > DUR_4) {
             DrawSmuflCode(dc, x2, y2, SMUFL_E241_flag8thDown, staff->m_drawingStaffSize, drawingCueSize);

@@ -1258,7 +1258,7 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         x2 -= 2 * (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
         // if (x1 > x2) {
-        //    DrawFullRectangle(dc, x1, y + 2 * m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), x2, y + 3 *
+        //    DrawFilledRectangle(dc, x1, y + 2 * m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), x2, y + 3 *
         //    m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
         //    LogDebug("x1 > x2 (%d %d)", x1, x2);
         //}
@@ -1283,13 +1283,13 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         int i, x;
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i * dashSpace);
-            DrawFullRectangle(dc, x - halfDashLength, y, x + halfDashLength,
+            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength,
                 y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
         }
     }
     else if (syl->GetCon() == sylLog_CON_u) {
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
-        DrawFullRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+        DrawFilledRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
     }
 }
 

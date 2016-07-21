@@ -360,11 +360,12 @@ protected:
     void DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin);
     void DrawThickBezierCurve(
         DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle = 0.0);
-    void DrawPartFullRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
+    void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100);
     void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
-    void DrawFullRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
+    void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
+    void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill);
     void DrawDot(DeviceContext *dc, int x, int y, int staffSize);
     ///@}
 

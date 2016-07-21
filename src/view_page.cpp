@@ -444,7 +444,7 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     // the glyphs and the line
     y1 += m_doc->GetDrawingStemWidth(100);
     y2 -= m_doc->GetDrawingStemWidth(100);
-    DrawFullRectangle(dc, x1, y1, x2, y2);
+    DrawFilledRectangle(dc, x1, y1, x2, y2);
 
     return;
 }

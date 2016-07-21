@@ -175,6 +175,7 @@ namespace vrv {
 #define TEMP_MNOTEHEAD_SIZE_FACTOR 0.60
 #define TEMP_MACCID_SIZE_FACTOR 0.65
 #define TEMP_MAUGDOT_SIZE_FACTOR 0.60
+#define TEMP_MINIMA_WIDTH_FACTOR 0.60
 // Size of mensuration sign circle relative to space between staff lines
 #define MSIGN_CIRCLE_DIAM 2.0
 // Vertical position of center of mensuration sign as distance below top of the staff
