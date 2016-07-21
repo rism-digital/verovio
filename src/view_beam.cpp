@@ -423,15 +423,10 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(dynamic_cast<AttDurationMusical *>(firstElement.m_element));
     int dur = (dynamic_cast<AttDurationMusical *>(firstElement.m_element))->GetDur();
 
-    Chord *childChord1 = NULL;
-    Chord *childChord2 = NULL;
-
     if (firstElement.m_element->Is() == CHORD) {
-        childChord1 = dynamic_cast<Chord *>(firstElement.m_element);
         params.m_beamHasChord = ON;
     }
     if (secondElement.m_element->Is() == CHORD) {
-        childChord2 = dynamic_cast<Chord *>(secondElement.m_element);
         params.m_beamHasChord = ON;
     }
 

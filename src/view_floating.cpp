@@ -239,6 +239,8 @@ void View::DrawHairpin(
         return;
     }
 
+    /* We actually do not need the layer for now
+
     Layer *layer1 = NULL;
     Layer *layer2 = NULL;
 
@@ -255,6 +257,8 @@ void View::DrawHairpin(
         layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
 
     assert(layer1 && layer2);
+
+     */
 
     /************** start / end opening **************/
 
@@ -396,6 +400,8 @@ void View::DrawOctave(
         return;
     }
 
+    /* We actually do not need the layer for now
+
     Layer *layer1 = NULL;
     Layer *layer2 = NULL;
 
@@ -420,6 +426,8 @@ void View::DrawOctave(
     }
 
     assert(layer1 && layer2);
+
+    */
 
     /************** draw it **************/
 

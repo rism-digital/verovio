@@ -62,21 +62,21 @@ DarmsInput::~DarmsInput()
 
 void DarmsInput::UnrollKeysig(int quantity, char alter)
 {
-    data_PITCHNAME flats[]
-        = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
-    data_PITCHNAME sharps[]
-        = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
-    data_PITCHNAME *alteration_set;
+    //data_PITCHNAME flats[]
+    //    = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
+    //data_PITCHNAME sharps[]
+    //    = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
+    // data_PITCHNAME *alteration_set;
     data_ACCIDENTAL_EXPLICIT accid = ACCIDENTAL_EXPLICIT_NONE;
 
     if (quantity == 0) quantity++;
 
     if (alter == '-') {
-        alteration_set = flats;
+        // alteration_set = flats;
         accid = ACCIDENTAL_EXPLICIT_f;
     }
     else {
-        alteration_set = sharps;
+        // alteration_set = sharps;
         accid = ACCIDENTAL_EXPLICIT_s;
     }
 
@@ -400,7 +400,6 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
 bool DarmsInput::ImportFile()
 {
     char data[10000];
-    size_t len;
 
     std::ifstream infile;
 
@@ -412,7 +411,6 @@ bool DarmsInput::ImportFile()
     }
 
     infile.getline(data, sizeof(data), '\n');
-    len = strlen(data);
     infile.close();
 
     return ImportString(data);
@@ -420,11 +418,11 @@ bool DarmsInput::ImportFile()
 
 bool DarmsInput::ImportString(std::string data_str)
 {
-    size_t len;
+    int len;
     int res;
     int pos = 0;
     const char *data = data_str.c_str();
-    len = data_str.length();
+    len = (int)data_str.length();
 
     m_doc->SetType(Raw);
     System *system = new System();

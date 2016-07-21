@@ -78,8 +78,7 @@ void Beam::FilterList(ListOfObjects *childList)
                 // if the first note in beam was NOT a grace
                 // we have grace notes embedded in a beam
                 // drop them
-                if (!firstNoteGrace && n->HasGrace() == true)
-                    iter = childList->erase(iter);
+                if (!firstNoteGrace && n->HasGrace() == true) iter = childList->erase(iter);
                 // also remove notes within chords
                 else if (n->IsChordTone())
                     iter = childList->erase(iter);
@@ -137,7 +136,7 @@ void Beam::InitCoords(ListOfObjects *childList)
     ClearCoords();
     m_beamElementCoords.reserve(childList->size());
     int i;
-    for (i = 0; i < childList->size(); i++) {
+    for (i = 0; i < (int)childList->size(); i++) {
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
 }

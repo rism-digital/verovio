@@ -870,7 +870,6 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
         = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a, PITCHNAME_b };
     int y_dec, yb, plafond;
     int degres, octaves, position, code;
-    char clefId = 0;
 
     int staffSize = parentStaff->m_drawingStaffSize;
     // calculer position du do central en fonction clef
@@ -886,7 +885,6 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
 
     Clef *clef = layer->GetClef(pelement);
     if (clef) {
-        clefId = clef->GetClefId();
         yb += (clef->GetClefOffset()) * m_doc->GetDrawingUnit(staffSize); // UT1 reel
     }
     yb -= 4 * m_doc->GetDrawingOctaveSize(staffSize); // UT, note la plus grave

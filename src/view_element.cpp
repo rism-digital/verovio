@@ -932,15 +932,14 @@ void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     MRpt2 *mRpt2 = dynamic_cast<MRpt2 *>(element);
     assert(mRpt2);
+    // in non debug
+    if (!mRpt2) return;
 
     dc->StartGraphic(element, "", element->GetUuid());
 
     DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, 2, true, staff, measure);
 
     dc->EndGraphic(element, this);
-
-    // For avoiding unused variable warning in non debug mode
-    mRpt2 = NULL;
 }
 
 void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1064,7 +1063,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int drawingDur;
     int staffY = staff->GetDrawingY();
     wchar_t fontNo;
-    int ledge;
     int verticalCenter = 0;
     bool flippedNotehead = false;
     bool doubleLengthLedger = false;
@@ -1077,11 +1075,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
 
-    if (drawingDur > DUR_1) {
-        ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
-    }
-    else {
-        ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
+    if (drawingDur <= DUR_1) {
         radius += radius / 3;
     }
 
@@ -1591,7 +1585,7 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
     assert(dc);
     assert(staff);
 
-    int ynum, yden;
+    int ynum = 0, yden = 0;
     std::wstring wtext;
 
     if (numBase) {
@@ -1887,11 +1881,16 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
 
     // another way of calculating accidBot
     assert(((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit) == accidTop + accidHeightDiff);
+    // in non debug
+    if (((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit) != accidTop + accidHeightDiff)
+        return 0;
 
     // store it for asserts
     accidSpaceSize = (int)accidSpace->size();
     assert(accidTop >= 0);
     assert(accidTop < accidSpaceSize);
+    // in non debug
+    if ((accidTop < 0) || (accidTop >= accidSpaceSize)) return 0;
 
     /*
      * Make sure all four corners of the accidental are not on an already-taken spot.

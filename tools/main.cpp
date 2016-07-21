@@ -150,7 +150,6 @@ int main(int argc, char **argv)
     // Init random number generator for uuids
     std::srand((unsigned int)std::time(0));
 
-    FileFormat type;
     int no_mei_hdr = 0;
     int adjust_page_height = 0;
     int all_pages = 0;
@@ -167,9 +166,6 @@ int main(int argc, char **argv)
     // the resource path might be specified in the parameters
     // The fonts will be loaded later with Resources::InitFonts()
     Toolkit toolkit(false);
-
-    // read pae by default
-    type = MEI;
 
     if (argc < 2) {
         cerr << "Expected one input file but found none." << endl << endl;
