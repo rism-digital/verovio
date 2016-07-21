@@ -165,8 +165,8 @@ namespace humaux {
         }
 
         vrv::Tie *tie = new vrv::Tie;
-        tie->SetStartid(m_startid);
-        tie->SetEndid(m_endid);
+        tie->SetStartid("#" + m_startid);
+        tie->SetEndid("#" + m_endid);
 
         bool samemeasure = false;
         if (m_startmeasure == m_endmeasure) {
@@ -608,9 +608,11 @@ void HumdrumInput::insertExtMeta(vector<HumdrumLine *> &references)
 {
     stringstream xmldata;
     xmldata << "<extMeta>\n";
+    xmldata << "\t<frames xmlns:humxml=\"http://www.humdrum.org/ns/humxml\">\n";
     for (int i = 0; i < (int)references.size(); i++) {
-        references[i]->printXml(xmldata, 3);
+        references[i]->printXml(xmldata, 4);
     }
+    xmldata << "\t</frames>\n";
     xmldata << "</extMeta>\n";
 
     pugi::xml_document tmpdoc;
@@ -622,8 +624,7 @@ void HumdrumInput::insertExtMeta(vector<HumdrumLine *> &references)
         return;
     }
 
-    pugi::xml_node extMeta = m_doc->m_header.append_copy(tmpdoc.document_element());
-    extMeta.append_attribute("xmlns") = "http://www.humdrum.org/ns/humxml";
+    m_doc->m_header.append_copy(tmpdoc.document_element());
 }
 
 //////////////////////////////
@@ -1122,6 +1123,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
             Tempo *tempo = new Tempo;
             m_measure->AddFloatingElement(tempo);
             addTextElement(tempo, value);
+            tempo->SetTstamp(1.0);
             setStaff(tempo, 1);
         }
     }
