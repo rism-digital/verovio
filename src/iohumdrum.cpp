@@ -1448,6 +1448,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     if (hasFullMeasureRest(layerdata, timesigdurs[startline], duration)) {
         MRest *mrest = new MRest();
         appendElement(layer, mrest);
+
         // Basic compensation for clef change (can be improved later):
         for (i = 0; i < layerdata.size(); i++) {
             if (!layerdata[i]->isClef()) {
@@ -1455,6 +1456,20 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             insertClefElement(elements, pointers, layerdata[i]);
         }
+
+        // Uncomment this when MRest::SetFermata() is implemented:
+        //for (int z = 0; z < (int)layerdata.size(); z++) {
+        //    if (!layerdata[z]->isData()) {
+        //        continue;
+        //    }
+        //    if (!layerdata[z]->isRest()) {
+        //        continue;
+        //    }
+        //    if (layerdata[z]->find(";") != string::npos) {
+        //        mrest->SetFermata(PLACE_above);
+        //    }
+        //}
+
         // probably better to mark the rest in Humdrum data
         // as a full-measure rest here, and then process the
         // measure as normal below.
