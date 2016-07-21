@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jul 19 10:56:51 PDT 2016
+// Last Modified: Wed Jul 20 21:22:34 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -893,7 +893,7 @@ vector<string> HumHash::getKeys(const string& ns) const {
 	if (parameters == NULL) {
 		return output;
 	}
-	int loc = (int)ns.find(":");
+	auto loc = ns.find(":");
 	if (loc != string::npos) {
 		string ns1 = ns.substr(0, loc);
 		string ns2 = ns.substr(loc+1);
@@ -960,7 +960,7 @@ bool HumHash::hasParameters(const string& ns) const {
 	if (parameters == NULL) {
 		return false;
 	}
-	int loc = (int)ns.find(":");
+	auto loc = ns.find(":");
 	if (loc != string::npos) {
 		string ns1 = ns.substr(0, loc);
 		string ns2 = ns.substr(loc+1);
@@ -1031,7 +1031,7 @@ int HumHash::getParameterCount(const string& ns) const {
 	if (parameters == NULL) {
 		return false;
 	}
-	int loc = (int)ns.find(":");
+	auto loc = ns.find(":");
 	if (loc != string::npos) {
 		string ns1 = ns.substr(0, loc);
 		string ns2 = ns.substr(loc+1);
@@ -1655,7 +1655,7 @@ void HumNum::setValue(const string& ratstring) {
 	buffer[0] = 0;
 	buffer[1] = 0;
 	int slash = 0;
-	for (int i=0; i<ratstring.size(); i++) {
+	for (int i=0; i<(int)ratstring.size(); i++) {
 		if (ratstring[i] == '/') {
 			slash = 1;
 			continue;
@@ -2478,7 +2478,7 @@ HumdrumLine& HumdrumFileBase::operator[](int index) {
 	if (index < 0) {
 		index = (int)lines.size() - index;
 	}
-	if ((index < 0) || (index >= lines.size())) {
+	if ((index < 0) || (index >= (int)lines.size())) {
 		cerr << "Error: invalid index: " << index << endl;
 		index = (int)lines.size()-1;
 	}
@@ -2758,7 +2758,7 @@ ostream& HumdrumFileBase::printCsv(ostream& out,
 
 bool HumdrumFileBase::analyzeTokens(void) {
 	int i;
-	for (i=0; i<lines.size(); i++) {
+	for (i=0; i<(int)lines.size(); i++) {
 		lines[i]->createTokensFromLine();
 	}
 	return isValid();
@@ -2773,7 +2773,7 @@ bool HumdrumFileBase::analyzeTokens(void) {
 //
 
 void HumdrumFileBase::createLinesFromTokens(void) {
-	for (int i=0; i<lines.size(); i++) {
+	for (int i=0; i<(int)lines.size(); i++) {
 		lines[i]->createLineFromTokens();
 	}
 }
@@ -2918,7 +2918,7 @@ ostream& HumdrumFileBase::printTrackInfo(ostream& out) {
 void HumdrumFileBase::getSpineStartList(vector<HTp>& spinestarts) {
 	spinestarts.reserve(trackstarts.size());
 	spinestarts.resize(0);
-	for (int i=1; i<trackstarts.size(); i++) {
+	for (int i=1; i<(int)trackstarts.size(); i++) {
 		spinestarts.push_back(trackstarts[i]);
 	}
 }
@@ -2928,7 +2928,7 @@ void HumdrumFileBase::getSpineStartList(vector<HTp>& spinestarts,
 		const string& exinterp) {
 	spinestarts.reserve(trackstarts.size());
 	spinestarts.resize(0);
-	for (int i=1; i<trackstarts.size(); i++) {
+	for (int i=1; i<(int)trackstarts.size(); i++) {
 		if (exinterp == *trackstarts[i]) {
 			spinestarts.push_back(trackstarts[i]);
 		}
@@ -2940,8 +2940,8 @@ void HumdrumFileBase::getSpineStartList(vector<HTp>& spinestarts,
 		const vector<string>& exinterps) {
 	spinestarts.reserve(trackstarts.size());
 	spinestarts.resize(0);
-	for (int i=1; i<trackstarts.size(); i++) {
-		for (int j=0; j<exinterps.size(); j++) {
+	for (int i=1; i<(int)trackstarts.size(); i++) {
+		for (int j=0; j<(int)exinterps.size(); j++) {
 			if (exinterps[j] == *trackstarts[i]) {
 				spinestarts.push_back(trackstarts[i]);
 			}
@@ -3009,7 +3009,7 @@ void HumdrumFileBase::getPrimaryTrackSequence(vector<HTp>& sequence, int track,
 	vector<vector<HTp> > tempseq;
 	getTrackSequence(tempseq, track, options | OPT_PRIMARY);
 	sequence.resize(tempseq.size());
-	for (int i=0; i<tempseq.size(); i++) {
+	for (int i=0; i<(int)tempseq.size(); i++) {
 		sequence[i] = tempseq[i][0];
 	}
 }
@@ -3147,7 +3147,7 @@ void HumdrumFileBase::getTrackSequence(vector<vector<HTp> >& sequence,
 //
 
 HTp HumdrumFileBase::getTrackStart(int track) const {
-	if ((track > 0) && (track < trackstarts.size())) {
+	if ((track > 0) && (track < (int)trackstarts.size())) {
 		return trackstarts[track];
 	} else {
 		return NULL;
@@ -3220,7 +3220,7 @@ HTp HumdrumFileBase::getTrackEnd(int track, int subtrack) const {
 //
 
 bool HumdrumFileBase::analyzeLines(void) {
-	for (int i=0; i<lines.size(); i++) {
+	for (int i=0; i<(int)lines.size(); i++) {
 		lines[i]->setLineIndex(i);
 	}
 	return isValid();
@@ -3235,7 +3235,7 @@ bool HumdrumFileBase::analyzeLines(void) {
 //
 
 bool HumdrumFileBase::analyzeTracks(void) {
-	for (int i=0; i<lines.size(); i++) {
+	for (int i=0; i<(int)lines.size(); i++) {
 		int status = lines[i]->analyzeTracks(parseError);
 		if (!status) {
 			return false;
@@ -3256,7 +3256,7 @@ bool HumdrumFileBase::analyzeLinks(void) {
 	HumdrumLine* next     = NULL;
 	HumdrumLine* previous = NULL;
 
-	for (int i=0; i<lines.size(); i++) {
+	for (int i=0; i<(int)lines.size(); i++) {
 		if (!lines[i]->hasSpines()) {
 			continue;
 		}
@@ -3450,7 +3450,7 @@ bool HumdrumFileBase::analyzeSpines(void) {
 			}
 			continue;
 		}
-		if (datatype.size() != lines[i]->getTokenCount()) {
+		if ((int)datatype.size() != lines[i]->getTokenCount()) {
 			stringstream err;
 			err << "Error on line " << (i+1) << ':' << endl;
 			err << "   Expected " << datatype.size() << " fields,"
@@ -3590,7 +3590,7 @@ bool HumdrumFileBase::adjustSpines(HumdrumLine& line, vector<string>& datatype,
 
 	datatype.resize(newtype.size());
 	sinfo.resize(newinfo.size());
-	for (i=0; i<newtype.size(); i++) {
+	for (i=0; i<(int)newtype.size(); i++) {
 		datatype[i] = newtype[i];
 		sinfo[i]    = newinfo[i];
 	}
@@ -3779,9 +3779,9 @@ void HumdrumFileBase::addUniqueTokens(vector<HTp>& target,
 		vector<HTp>& source) {
 	int i, j;
 	bool found;
-	for (i=0; i<source.size(); i++) {
+	for (i=0; i<(int)source.size(); i++) {
 		found = false;
-		for (j=0; j<target.size(); j++) {
+		for (j=0; j<(int)target.size(); j++) {
 			if (source[i] == target[i]) {
 				found = true;
 			}
@@ -3854,7 +3854,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 	// rtracks == Reverse mapping from track to ktrack index (part/staff index).
 	vector<HTp> ktracks = getKernSpineStartList();
 	vector<int> rtracks(getMaxTrack()+1, -1);
-	for (i=0; i<ktracks.size(); i++) {
+	for (i=0; i<(int)ktracks.size(); i++) {
 		track = ktracks[i]->getTrack();
 		rtracks[track] = i;
 	}
@@ -3897,7 +3897,6 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 	// rhythmstart == keep track of first beat in measure.
 	vector<int> firstinbar(kcount, 0);
 	
-	int loc;
 	for (i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].hasSpines()) {
 			continue;
@@ -4037,7 +4036,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					// The accidental is not necessary. See if there is a single "X"
 					// immediately after the accidental which means to force it to
 					// display.
-					loc = (int)subtok.find("X");
+					auto loc = subtok.find("X");
 					if ((loc != string::npos) && (loc > 0)) {
 						if (subtok[loc-1] == '#') {
 							infile[i].token(j)->setValue("auto", to_string(k),
@@ -4127,7 +4126,7 @@ bool HumdrumFileContent::analyzeKernSlurs(void) {
 	vector<HTp> kernspines;
 	getSpineStartList(kernspines, "**kern");
 	bool output = true;
-	for (int i=0; i<kernspines.size(); i++) {
+	for (int i=0; i<(int)kernspines.size(); i++) {
 		output = output && analyzeKernSlurs(kernspines[i]);
 	}
 	return output;
@@ -4144,8 +4143,8 @@ bool HumdrumFileContent::analyzeKernSlurs(HTp spinestart) {
 
 	int elisionlevel;
 	int i, j;
-	for (i=0; i<tracktokens.size(); i++) {
-		for (j=0; j<tracktokens[i].size(); j++) {
+	for (i=0; i<(int)tracktokens.size(); i++) {
+		for (j=0; j<(int)tracktokens[i].size(); j++) {
 			if (tracktokens[i][j]->hasSlurStart() &&
 					tracktokens[i][j]->hasSlurEnd()) {
 
@@ -4222,8 +4221,8 @@ bool HumdrumFileContent::analyzeKernSlurs(HTp spinestart) {
 		}
 	}
 	// Mark un-closed slur starts:
-	for (i=0; i<sluropens.size(); i++) {
-		for (j=0; j<sluropens[i].size(); j++) {
+	for (i=0; i<(int)sluropens.size(); i++) {
+		for (j=0; j<(int)sluropens[i].size(); j++) {
 			sluropens[i][j]->setValue("", "auto", "hangingSlur", "true");
 			sluropens[i][j]->setValue("", "auto", "slurDuration", 
 				sluropens[i][j]->getDurationFromStart());
@@ -4247,7 +4246,7 @@ bool HumdrumFileContent::analyzeKernTies(void) {
 	vector<HTp> kernspines;
 	getSpineStartList(kernspines, "**kern");
 	bool output = true;
-	for (int i=0; i<kernspines.size(); i++) {
+	for (int i=0; i<(int)kernspines.size(); i++) {
 		output = output && analyzeKernTies(kernspines[i]);
 	}
 	return output;
@@ -4665,7 +4664,7 @@ HumdrumLine* HumdrumFileStructure::getBarline(int index) const {
 	if (index < 0) {
 		return NULL;
 	}
-	if (index >= barlines.size()) {
+	if (index >= (int)barlines.size()) {
 		return NULL;
 	}
 	return barlines[index];
@@ -4703,12 +4702,12 @@ HumNum HumdrumFileStructure::getBarlineDuration(int index) const {
 	if (index < 0) {
 		return 0;
 	}
-	if (index >= barlines.size()) {
+	if (index >= (int)barlines.size()) {
 		return 0;
 	}
 	HumNum startdur = barlines[index]->getDurationFromStart();
 	HumNum enddur;
-	if (index + 1 < barlines.size() - 1) {
+	if (index + 1 < (int)barlines.size() - 1) {
 		enddur = barlines[index+1]->getDurationFromStart();
 	} else {
 		enddur = getScoreDuration();
@@ -4731,7 +4730,7 @@ HumNum HumdrumFileStructure::getBarlineDurationFromStart(int index) const {
 	if (index < 0) {
 		return 0;
 	}
-	if (index >= barlines.size()) {
+	if (index >= (int)barlines.size()) {
 		return getScoreDuration();
 	}
 	return barlines[index]->getDurationFromStart();
@@ -4752,7 +4751,7 @@ HumNum HumdrumFileStructure::getBarlineDurationToEnd(int index) const {
 	if (index < 0) {
 		return 0;
 	}
-	if (index >= barlines.size()) {
+	if (index >= (int)barlines.size()) {
 		return getScoreDuration();
 	}
 	return barlines[index]->getDurationToEnd();
@@ -5336,7 +5335,7 @@ void HumdrumFileStructure::fillInNegativeStartTimes(void) {
 	}
 
 	// fill in start times for ending comments
-	for (i=0; i<lines.size(); i++) {
+	for (i=0; i<(int)lines.size(); i++) {
 		dur = lines[i]->getDurationFromStart();
 		if (dur.isNonNegative()) {
 			lastdur = dur;
@@ -5358,7 +5357,7 @@ void HumdrumFileStructure::assignLineDurations(void) {
 	HumNum startdur;
 	HumNum enddur;
 	HumNum dur;
-	for (int i=0; i<lines.size()-1; i++) {
+	for (int i=0; i<(int)lines.size()-1; i++) {
 		startdur = lines[i]->getDurationFromStart();
 		enddur = lines[i+1]->getDurationFromStart();
 		dur = enddur - startdur;
@@ -5508,10 +5507,10 @@ bool HumdrumFileStructure::analyzeStrands(void) {
 		analyzeSpineStrands(strand2d.back(), tok);
 	}
 
-	for (i=0; i<strand2d.size(); i++) {
+	for (i=0; i<(int)strand2d.size(); i++) {
 		std::sort(strand2d[i].begin(), strand2d[i].end(), 
 				sortTokenPairsByLineIndex);
-		for (j=0; j<strand2d[i].size(); j++) {
+		for (j=0; j<(int)strand2d[i].size(); j++) {
 			strand1d.push_back(strand2d[i][j]);
 		}
 	}
@@ -5532,7 +5531,7 @@ bool HumdrumFileStructure::analyzeStrands(void) {
 
 void HumdrumFileStructure::assignStrandsToTokens(void) {
 	HTp tok;
-	for (int i=0; i<strand1d.size(); i++) {
+	for (int i=0; i<(int)strand1d.size(); i++) {
 		tok = strand1d[i].first;
 		while (tok != NULL) {
 			tok->setStrandIndex(i);
@@ -5667,12 +5666,12 @@ void HumdrumLine::setLineFromCsv(const string& csv, const string& separator) {
 	// construct tab-delimited string
 	string output;
 	bool inquote = false;
-	for (int i=0; i<csv.size(); i++) {
+	for (int i=0; i<(int)csv.size(); i++) {
 		if ((csv[i] == '"') && !inquote) {
 			inquote = true;
 			continue;
 		}
-		if (inquote && (csv[i] == '"') && (i < csv.length()-1)) {
+		if (inquote && (csv[i] == '"') && (i < (int)csv.length()-1)) {
 			output += '"';
 			i++;
 			continue;
@@ -5700,7 +5699,7 @@ void HumdrumLine::setLineFromCsv(const string& csv, const string& separator) {
 //
 
 void HumdrumLine::clear(void) {
-	for (int i=0; i<tokens.size(); i++) {
+	for (int i=0; i<(int)tokens.size(); i++) {
 		delete tokens[i];
 		tokens[i] = NULL;
 	}
@@ -5715,7 +5714,7 @@ void HumdrumLine::clear(void) {
 //
 
 bool HumdrumLine::equalChar(int index, char ch) const {
-	if (size() <= index) {
+	if ((int)size() <= index) {
 		return false;
 	}
 	if (index < 0) {
@@ -6331,7 +6330,7 @@ bool HumdrumLine::isGlobal(void) const {
 //
 
 bool HumdrumLine::isManipulator(void) const {
-	for (int i=0; i<tokens.size(); i++) {
+	for (int i=0; i<(int)tokens.size(); i++) {
 		if (tokens[i]->isManipulator()) {
 			return true;
 		}
@@ -6406,7 +6405,7 @@ int HumdrumLine::createTokensFromLine(void) {
 	HumdrumToken* token = new HumdrumToken();
 	token->setOwner(this);
 	char ch;
-	for (int i=0; i<size(); i++) {
+	for (int i=0; i<(int)size(); i++) {
 		ch = getChar(i);
 		if (ch == '\t') {
 			tokens.push_back(token);
@@ -6434,9 +6433,9 @@ int HumdrumLine::createTokensFromLine(void) {
 void HumdrumLine::createLineFromTokens(void) {
 	string& iline = *this;
 	iline.resize(0);
-	for (int i=0; i<tokens.size(); i++) {
+	for (int i=0; i<(int)tokens.size(); i++) {
 		iline += (string)(*tokens[i]);
-		if (i < tokens.size() - 1) {
+		if (i < (int)tokens.size() - 1) {
 			iline += '\t';
 		}
 	}
@@ -6473,7 +6472,7 @@ char HumdrumLine::getChar(int index) const {
 	if (index < 0) {
 		return '\0';
 	}
-	if (index >= size()) {
+	if (index >= (int)size()) {
 		return '\0';
 	}
 	return (((string)(*this))[index]);
@@ -6498,9 +6497,9 @@ ostream& HumdrumLine::printSpineInfo(ostream& out) {
 	if (isManipulator()) {
 		out << *this;
 	} else {
-		for (int i=0; i<tokens.size(); i++) {
+		for (int i=0; i<(int)tokens.size(); i++) {
 			out << tokens[i]->getSpineInfo();
-			if (i < tokens.size() - 1) {
+			if (i < (int)tokens.size() - 1) {
 				out << '\t';
 			}
 		}
@@ -6523,9 +6522,9 @@ ostream& HumdrumLine::printDataTypeInfo(ostream& out) {
 	if (isManipulator()) {
 		out << *this;
 	} else {
-		for (int i=0; i<tokens.size(); i++) {
+		for (int i=0; i<(int)tokens.size(); i++) {
 			out << tokens[i]->getDataType().substr(2, string::npos);
-			if (i < tokens.size() - 1) {
+			if (i < (int)tokens.size() - 1) {
 				out << '\t';
 			}
 		}
@@ -6545,7 +6544,7 @@ bool HumdrumLine::analyzeTokenDurations(string& err) {
 	if (!hasSpines()) {
 		return !err.size();
 	}
-	for (int i=0; i<tokens.size(); i++) {
+	for (int i=0; i<(int)tokens.size(); i++) {
 		if (!tokens[i]->analyzeDuration(err)) {
 			return !err.size();
 		}
@@ -6573,15 +6572,15 @@ bool HumdrumLine::analyzeTracks(string& err) {
 	int maxtrack = 0;
 	int i, j, k;
 
-	for (i=0; i<tokens.size(); i++) {
+	for (i=0; i<(int)tokens.size(); i++) {
 		info = tokens[i]->getSpineInfo();
 		track = 0;
-		for (j=0; j<info.size(); j++) {
+		for (j=0; j<(int)info.size(); j++) {
 			if (!isdigit(info[j])) {
 				continue;
 			}
 			track = info[j] - '0';
-			for (k=j+1; k<info.size(); k++) {
+			for (k=j+1; k<(int)info.size(); k++) {
 				if (isdigit(info[k])) {
 					track = track * 10 + (info[k] - '0');
 				} else {
@@ -6605,10 +6604,10 @@ bool HumdrumLine::analyzeTracks(string& err) {
 	fill(subtracks.begin(), subtracks.end(), 0);
 	fill(cursub.begin(), cursub.end(), 0);
 
-	for (i=0; i<tokens.size(); i++) {
+	for (i=0; i<(int)tokens.size(); i++) {
 		subtracks[tokens[i]->getTrack()]++;
 	}
-	for (i=0; i<tokens.size(); i++) {
+	for (i=0; i<(int)tokens.size(); i++) {
 		track = tokens[i]->getTrack();
 		subtrack = subtracks[track];
 		if (subtrack > 1) {
@@ -6637,9 +6636,9 @@ ostream& HumdrumLine::printDurationInfo(ostream& out) {
 	if (isManipulator()) {
 		out << *this;
 	} else {
-		for (int i=0; i<tokens.size(); i++) {
+		for (int i=0; i<(int)tokens.size(); i++) {
 			tokens[i]->getDuration().printMixedFraction(out);
-			if (i < tokens.size() - 1) {
+			if (i < (int)tokens.size() - 1) {
 				out << '\t';
 			}
 		}
@@ -6888,9 +6887,9 @@ ostream& HumdrumLine::printTrackInfo(ostream& out) {
 	if (isManipulator()) {
 		out << *this;
 	} else {
-		for (int i=0; i<tokens.size(); i++) {
+		for (int i=0; i<(int)tokens.size(); i++) {
 			out << tokens[i]->getTrackString();
-			if (i < tokens.size() - 1) {
+			if (i < (int)tokens.size() - 1) {
 				out << '\t';
 			}
 		}
@@ -6952,7 +6951,7 @@ void HumdrumLine::setParameters(const string& pdata) {
 	string key;
 	string value;
 	int loc;
-	for (int i=2; i<pieces.size(); i++) {
+	for (int i=2; i<(int)pieces.size(); i++) {
 		Convert::replaceOccurrences(pieces[i], "&colon;", ":");
 		loc = (int)pieces[i].find("=");
 		if (loc != (int)string::npos) {
@@ -7039,7 +7038,7 @@ HumdrumToken::~HumdrumToken() {
 //
 
 bool HumdrumToken::equalChar(int index, char ch) const {
-	if (size() <= index) {
+	if ((int)size() <= index) {
 		return false;
 	}
 	if (index < 0) {
@@ -7119,7 +7118,7 @@ HumdrumToken* HumdrumToken::getNextNonNullDataToken(int index) {
 	if (index < 0) {
 		return NULL;
 	}
-	if (index >= nextNonNullTokens.size()) {
+	if (index >= (int)nextNonNullTokens.size()) {
 		return NULL;
 	}
 	return nextNonNullTokens[index];
@@ -8205,7 +8204,7 @@ void HumdrumToken::setParameters(const string& pdata, HumdrumToken* ptok) {
 	string key;
 	string value;
 	int loc;
-	for (int i=2; i<pieces.size(); i++) {
+	for (int i=2; i<(int)pieces.size(); i++) {
 		Convert::replaceOccurrences(pieces[i], "&colon;", ":");
 		loc = (int)pieces[i].find("=");
 		if (loc != (int)string::npos) {
@@ -8398,7 +8397,7 @@ ostream& HumdrumToken::printCsv(ostream& out) {
 		out << value;
 	} else {
 		out << '"';
-		for (int i=0; i<value.size(); i++) {
+		for (int i=0; i<(int)value.size(); i++) {
 		   if (value[i] == '"') {
 				out << '"' << '"';
 			} else {
@@ -8644,10 +8643,10 @@ ostream& operator<<(ostream& out, HumdrumToken* token) {
 //
 
 ostream& printSequence(vector<vector<HTp> >& sequence, ostream& out) {
-	for (int i=0; i<sequence.size(); i++) {
-		for (int j=0; j<sequence[i].size(); j++) {
+	for (int i=0; i<(int)sequence.size(); i++) {
+		for (int j=0; j<(int)sequence[i].size(); j++) {
 			out << sequence[i][j];
-			if (j < sequence[i].size() - 1) {
+			if (j < (int)sequence[i].size() - 1) {
 				out << '\t';
 			}
 		}
@@ -8658,7 +8657,7 @@ ostream& printSequence(vector<vector<HTp> >& sequence, ostream& out) {
 
 
 ostream& printSequence(vector<HTp>& sequence, ostream& out) {
-	for (int i=0; i<sequence.size(); i++) {
+	for (int i=0; i<(int)sequence.size(); i++) {
 		out << sequence[i] << endl;
 	}
 	return out;
@@ -8697,6 +8696,254 @@ HTp HumdrumToken::getSlurEndToken(void) {
 
 //////////////////////////////
 //
+// Convert::recipToDuration -- Convert **recip rhythmic values into
+//     rational number durations in terms of quarter notes.  For example "4"
+//     will be converted to 1, "4." to 3/2 (1+1/2).  The second parameter
+//     is a scaling factor which can change the rhythmic value's base duration.
+//     Giving a scale of 1 will return the duration in whole note units, so
+//     "4" will return a value of 1/4 (one quarter of a whole note).  Using
+//     3/2 will give the duration in terms of dotted-quarter note units.
+//     The third parameter is the sub-token separate.  For example if the input
+//     string contains a space, anything after the first space will be ignored
+//     when extracting the string.  **kern data which also includes the pitch
+//     along with the rhythm can also be given and will be ignored.
+// default value: scale = 4 (duration in terms of quarter notes)
+// default value: separator = " " (sub-token separator)
+//
+
+HumNum Convert::recipToDuration(const string& recip, HumNum scale,
+		string separator) {
+	size_t loc;
+	loc = recip.find(separator);
+	string subtok;
+	if (loc != string::npos) {
+		subtok = recip.substr(0, loc);
+	} else {
+		subtok = recip;
+	}
+
+	loc = recip.find('q');
+	if (loc != string::npos) {
+		// grace note, ignore printed rhythm
+		HumNum zero(0);
+		return zero;
+	}
+
+	int dotcount = 0;
+	int i;
+	int numi = -1;
+	for (i=0; i<(int)subtok.size(); i++) {
+		if (subtok[i] == '.') {
+			dotcount++;
+		}
+		if ((numi < 0) && isdigit(subtok[i])) {
+			numi = i;
+		}
+	}
+	loc = subtok.find("%");
+	int numerator = 1;
+	int denominator = 1;
+	HumNum output;
+	if (loc != string::npos) {
+		// reciprocal rhythm
+		numerator = 1;
+		denominator = subtok[numi++] - '0';
+		while ((numi<(int)subtok.size()) && isdigit(subtok[numi])) {
+			denominator = denominator * 10 + (subtok[numi++] - '0');
+		}
+		if ((loc + 1 < subtok.size()) && isdigit(subtok[loc+1])) {
+			int xi = (int)loc + 1;
+			numerator = subtok[xi++] - '0';
+			while ((xi<(int)subtok.size()) && isdigit(subtok[xi])) {
+				numerator = numerator * 10 + (subtok[xi++] - '0');
+			}
+		}
+		output.setValue(numerator, denominator);
+	} else if (numi < 0) {
+		// no rhythm found
+		HumNum zero(0);
+		return zero;
+	} else if (subtok[numi] == '0') {
+		// 0-symbol
+		int zerocount = 1;
+		for (i=numi+1; i<(int)subtok.size(); i++) {
+			if (subtok[i] == '0') {
+				zerocount++;
+			} else {
+				break;
+			}
+		}
+		numerator = (int)pow(2, zerocount);
+		output.setValue(numerator, 1);
+	} else {
+		// plain rhythm
+		denominator = subtok[numi++] - '0';
+		while ((numi<(int)subtok.size()) && isdigit(subtok[numi])) {
+			denominator = denominator * 10 + (subtok[numi++] - '0');
+		}
+		output.setValue(1, denominator);
+	}
+
+	if (dotcount <= 0) {
+		return output * scale;
+	}
+
+	int bot = (int)pow(2.0, dotcount);
+	int top = (int)pow(2.0, dotcount + 1) - 1;
+	HumNum factor(top, bot);
+	return output * factor * scale;
+}
+
+
+//////////////////////////////
+//
+// Convert::recipToDurationNoDots -- Same as recipToDuration(), but ignore
+//   any augmentation dots.
+//
+
+HumNum Convert::recipToDurationNoDots(const string& recip, HumNum scale,
+		string separator) {
+	string temp = recip;
+	std::replace(temp.begin(), temp.end(), '.', 'Z');
+	return Convert::recipToDuration(temp, scale, separator);
+}
+
+
+
+
+//////////////////////////////
+//
+// Convert::replaceOccurrences -- Similar to s// regular expressions
+//    operator.  This function replaces the search string in the source
+//    string with the replace string.
+//
+
+void Convert::replaceOccurrences(string& source, const string& search,
+		const string& replace) {
+	for (int loc=0; ; loc += (int)replace.size()) {
+		loc = (int)source.find(search, loc);
+		if (loc == (int)string::npos) {
+			break;
+		}
+		source.erase(loc, search.length());
+		source.insert(loc, replace);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Convert::splitString -- Splits a string into a list of strings
+//   separated by the given character.  Empty strings will be generated
+//   if the separator occurs at the start/end of the input string, and
+//   if two or more separates are adjacent to each other.
+// default value: separator = ' ';
+//
+
+vector<string> Convert::splitString(const string& data, char separator) {
+	stringstream ss(data);
+	string key;
+	vector<string> output;
+	while (getline(ss, key, separator)) {
+		output.push_back(key);
+	}
+	if (output.size() == 0) {
+		output.push_back(data);
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::repeatString -- Returns a string which repeats the given
+//   pattern by the given count.
+//
+
+string Convert::repeatString(const string& pattern, int count) {
+	string output;
+	for (int i=0; i<count; i++) {
+		output += pattern;
+	}
+	return output;
+}
+
+
+//////////////////////////////
+//
+// Convert::encodeXml -- Encode a string for XML printing.  Ampersands
+//    get converted to &amp;, < to &lt; > to &gt;, " to &quot; and
+//    ' to &apos;.
+//
+
+string Convert::encodeXml(const string& input) {
+	string output;
+	output.reserve(input.size()*2);
+	for (int i=0; i<(int)input.size(); i++) {
+		switch (input[i]) {
+			case '&':  output += "&amp;";   break;
+			case '<':  output += "&lt;";    break;
+			case '>':  output += "&gt;";    break;
+			case '"':  output += "&quot;";  break;
+			case '\'': output += "&apos;";  break;
+			default:   output += input[i];
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::getHumNumAttributes -- Returns XML attributes for a HumNum
+//   number.  First @float which gives the floating-point representation.
+//   If the number has a fractional part, then also add @ratfrac with the
+//   fractional representation of the non-integer portion number.
+//
+
+string Convert::getHumNumAttributes(const HumNum& num) {
+	string output;
+	if (num.isInteger()) {
+		output += " float=\"" + to_string(num.getNumerator()) + "\"";
+	} else {
+		stringstream sstr;
+		sstr << num.toFloat();
+		output += " float=\"" + sstr.str() + "\"";
+	}
+	if (!num.isInteger()) {
+		HumNum rem = num.getRemainder();
+		output += " ratfrac=\"" + to_string(rem.getNumerator()) +
+				+ "/" + to_string(rem.getDenominator()) + "\"";
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::trimWhiteSpace -- remove spaces, tabs and/or newlines
+//     from the beginning and end of input string.
+//
+
+string Convert::trimWhiteSpace(const string& input) {
+	string s = input;
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+			std::not1(std::ptr_fun<int, int>(std::isspace))));
+	s.erase(std::find_if(s.rbegin(), s.rend(),
+			std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+	return s;
+}
+
+
+
+
+
+//////////////////////////////
+//
 // Convert::isKernRest -- Returns true if the input string represents
 //   a **kern rest.
 //
@@ -8719,7 +8966,7 @@ bool Convert::isKernRest(const string& kerndata) {
 
 bool Convert::isKernNote(const string& kerndata) {
 	char ch;
-	for (int i=0; i < kerndata.size(); i++) {
+	for (int i=0; i < (int)kerndata.size(); i++) {
 		ch = std::tolower(kerndata[i]);
 		if ((ch >= 'a') && (ch <= 'g')) {
 			return true;
@@ -8742,7 +8989,7 @@ bool Convert::isKernSecondaryTiedNote(const string& kerndata) {
 	if (!Convert::isKernNote(kerndata)) {
 		return false;
 	}
-	for (int i=0; i < kerndata.size(); i++) {
+	for (int i=0; i < (int)kerndata.size(); i++) {
 		ch = std::tolower(kerndata[i]);
 		if ((ch == '_') || (ch == ']')) {
 			return true;
@@ -8765,7 +9012,7 @@ bool Convert::isKernNoteAttack(const string& kerndata) {
 	if (!Convert::isKernNote(kerndata)) {
 		return false;
 	}
-	for (int i=0; i < kerndata.size(); i++) {
+	for (int i=0; i < (int)kerndata.size(); i++) {
 		ch = std::tolower(kerndata[i]);
 		if ((ch == '_') || (ch == ']')) {
 			return false;
@@ -8783,7 +9030,7 @@ bool Convert::isKernNoteAttack(const string& kerndata) {
 //
 
 bool Convert::hasKernSlurStart(const string& kerndata) {
-	for (int i=0; i < kerndata.size(); i++) {
+	for (int i=0; i < (int)kerndata.size(); i++) {
 		char ch = kerndata[i];
 		if (ch == '(') {
 			return true;
@@ -8801,7 +9048,7 @@ bool Convert::hasKernSlurStart(const string& kerndata) {
 //
 
 bool Convert::hasKernSlurEnd(const string& kerndata) {
-	for (int i=0; i < kerndata.size(); i++) {
+	for (int i=0; i < (int)kerndata.size(); i++) {
 		char ch = kerndata[i];
 		if (ch == ')') {
 			return true;
@@ -8934,7 +9181,7 @@ int Convert::getLcm(const vector<int>& numbers) {
 		return 1;
 	}
 	int output = numbers[0];
-	for (int i=1; i<numbers.size(); i++) {
+	for (int i=1; i<(int)numbers.size(); i++) {
 		output = (output * numbers[i]) / getGcd(output, numbers[i]);
 	}
 	return output;
@@ -8982,11 +9229,11 @@ string Convert::kernToScientificPitch(const string& kerndata,
 	int    accidental;
 	int    octave;
 
-	for (int i=0; i<subtokens.size(); i++) {
+	for (int i=0; i<(int)subtokens.size(); i++) {
 		diatonic   = Convert::kernToDiatonicUC(subtokens[i]);
 		accidental = Convert::kernToAccidentalCount(subtokens[i]);
 		octave     = Convert::kernToOctaveNumber(subtokens[i]);
-		if ((i > 0) && (i < subtokens.size()-1)) {
+		if ((i > 0) && (i < (int)subtokens.size()-1)) {
 			output += " ";
 		}
 		output += diatonic;
@@ -9011,7 +9258,7 @@ string Convert::kernToScientificPitch(const string& kerndata,
 //
 
 int Convert::kernToDiatonicPC(const string& kerndata) {
-	for (int i=0; i<kerndata.size(); i++) {
+	for (int i=0; i<(int)kerndata.size(); i++) {
 		if (kerndata[i] == ' ') {
 			break;
 		}
@@ -9042,7 +9289,7 @@ int Convert::kernToDiatonicPC(const string& kerndata) {
 //
 
 char Convert::kernToDiatonicUC(const string& kerndata) {
-	for (int i=0; i<kerndata.size(); i++) {
+	for (int i=0; i<(int)kerndata.size(); i++) {
 		if (kerndata[i] == ' ') {
 			break;
 		}
@@ -9085,7 +9332,7 @@ char Convert::kernToDiatonicLC(const string& kerndata) {
 
 int Convert::kernToAccidentalCount(const string& kerndata) {
 	int output = 0;
-	for (int i=0; i<kerndata.size(); i++) {
+	for (int i=0; i<(int)kerndata.size(); i++) {
 		if (kerndata[i] == ' ') {
 			break;
 		}
@@ -9115,7 +9362,7 @@ int Convert::kernToOctaveNumber(const string& kerndata) {
 	if (kerndata == ".") {
 		return -1000;
 	}
-	for (int i=0; i<kerndata.size(); i++) {
+	for (int i=0; i<(int)kerndata.size(); i++) {
 		if (kerndata[i] == ' ') {
 			break;
 		}
@@ -9297,254 +9544,6 @@ int Convert::pitchToWbh(int dpc, int acc, int octave, int maxacc) {
 		return output;
 	}
 	return (output + acc) * octave + maxacc;
-}
-
-
-
-
-
-//////////////////////////////
-//
-// Convert::recipToDuration -- Convert **recip rhythmic values into
-//     rational number durations in terms of quarter notes.  For example "4"
-//     will be converted to 1, "4." to 3/2 (1+1/2).  The second parameter
-//     is a scaling factor which can change the rhythmic value's base duration.
-//     Giving a scale of 1 will return the duration in whole note units, so
-//     "4" will return a value of 1/4 (one quarter of a whole note).  Using
-//     3/2 will give the duration in terms of dotted-quarter note units.
-//     The third parameter is the sub-token separate.  For example if the input
-//     string contains a space, anything after the first space will be ignored
-//     when extracting the string.  **kern data which also includes the pitch
-//     along with the rhythm can also be given and will be ignored.
-// default value: scale = 4 (duration in terms of quarter notes)
-// default value: separator = " " (sub-token separator)
-//
-
-HumNum Convert::recipToDuration(const string& recip, HumNum scale,
-		string separator) {
-	size_t loc;
-	loc = recip.find(separator);
-	string subtok;
-	if (loc != string::npos) {
-		subtok = recip.substr(0, loc);
-	} else {
-		subtok = recip;
-	}
-
-	loc = recip.find('q');
-	if (loc != string::npos) {
-		// grace note, ignore printed rhythm
-		HumNum zero(0);
-		return zero;
-	}
-
-	int dotcount = 0;
-	int i;
-	int numi = -1;
-	for (i=0; i<subtok.size(); i++) {
-		if (subtok[i] == '.') {
-			dotcount++;
-		}
-		if ((numi < 0) && isdigit(subtok[i])) {
-			numi = i;
-		}
-	}
-	loc = subtok.find("%");
-	int numerator = 1;
-	int denominator = 1;
-	HumNum output;
-	if (loc != string::npos) {
-		// reciprocal rhythm
-		numerator = 1;
-		denominator = subtok[numi++] - '0';
-		while ((numi < subtok.size()) && isdigit(subtok[numi])) {
-			denominator = denominator * 10 + (subtok[numi++] - '0');
-		}
-		if ((loc + 1 < subtok.size()) && isdigit(subtok[loc+1])) {
-			int xi = (int)loc + 1;
-			numerator = subtok[xi++] - '0';
-			while ((xi < subtok.size()) && isdigit(subtok[xi])) {
-				numerator = numerator * 10 + (subtok[xi++] - '0');
-			}
-		}
-		output.setValue(numerator, denominator);
-	} else if (numi < 0) {
-		// no rhythm found
-		HumNum zero(0);
-		return zero;
-	} else if (subtok[numi] == '0') {
-		// 0-symbol
-		int zerocount = 1;
-		for (i=numi+1; i<subtok.size(); i++) {
-			if (subtok[i] == '0') {
-				zerocount++;
-			} else {
-				break;
-			}
-		}
-		numerator = (int)pow(2, zerocount);
-		output.setValue(numerator, 1);
-	} else {
-		// plain rhythm
-		denominator = subtok[numi++] - '0';
-		while ((numi < subtok.size()) && isdigit(subtok[numi])) {
-			denominator = denominator * 10 + (subtok[numi++] - '0');
-		}
-		output.setValue(1, denominator);
-	}
-
-	if (dotcount <= 0) {
-		return output * scale;
-	}
-
-	int bot = (int)pow(2.0, dotcount);
-	int top = (int)pow(2.0, dotcount + 1) - 1;
-	HumNum factor(top, bot);
-	return output * factor * scale;
-}
-
-
-//////////////////////////////
-//
-// Convert::recipToDurationNoDots -- Same as recipToDuration(), but ignore
-//   any augmentation dots.
-//
-
-HumNum Convert::recipToDurationNoDots(const string& recip, HumNum scale,
-		string separator) {
-	string temp = recip;
-	std::replace(temp.begin(), temp.end(), '.', 'Z');
-	return Convert::recipToDuration(temp, scale, separator);
-}
-
-
-
-
-//////////////////////////////
-//
-// Convert::replaceOccurrences -- Similar to s// regular expressions
-//    operator.  This function replaces the search string in the source
-//    string with the replace string.
-//
-
-void Convert::replaceOccurrences(string& source, const string& search,
-		const string& replace) {
-	for (int loc=0; ; loc += (int)replace.size()) {
-		loc = (int)source.find(search, loc);
-		if (loc == (int)string::npos) {
-			break;
-		}
-		source.erase(loc, search.length());
-		source.insert(loc, replace);
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Convert::splitString -- Splits a string into a list of strings
-//   separated by the given character.  Empty strings will be generated
-//   if the separator occurs at the start/end of the input string, and
-//   if two or more separates are adjacent to each other.
-// default value: separator = ' ';
-//
-
-vector<string> Convert::splitString(const string& data, char separator) {
-	stringstream ss(data);
-	string key;
-	vector<string> output;
-	while (getline(ss, key, separator)) {
-		output.push_back(key);
-	}
-	if (output.size() == 0) {
-		output.push_back(data);
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// Convert::repeatString -- Returns a string which repeats the given
-//   pattern by the given count.
-//
-
-string Convert::repeatString(const string& pattern, int count) {
-	string output;
-	for (int i=0; i<count; i++) {
-		output += pattern;
-	}
-	return output;
-}
-
-
-//////////////////////////////
-//
-// Convert::encodeXml -- Encode a string for XML printing.  Ampersands
-//    get converted to &amp;, < to &lt; > to &gt;, " to &quot; and
-//    ' to &apos;.
-//
-
-string Convert::encodeXml(const string& input) {
-	string output;
-	output.reserve(input.size()*2);
-	for (int i=0; i<input.size(); i++) {
-		switch (input[i]) {
-			case '&':  output += "&amp;";   break;
-			case '<':  output += "&lt;";    break;
-			case '>':  output += "&gt;";    break;
-			case '"':  output += "&quot;";  break;
-			case '\'': output += "&apos;";  break;
-			default:   output += input[i];
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// Convert::getHumNumAttributes -- Returns XML attributes for a HumNum
-//   number.  First @float which gives the floating-point representation.
-//   If the number has a fractional part, then also add @ratfrac with the
-//   fractional representation of the non-integer portion number.
-//
-
-string Convert::getHumNumAttributes(const HumNum& num) {
-	string output;
-	if (num.isInteger()) {
-		output += " float=\"" + to_string(num.getNumerator()) + "\"";
-	} else {
-		stringstream sstr;
-		sstr << num.toFloat();
-		output += " float=\"" + sstr.str() + "\"";
-	}
-	if (!num.isInteger()) {
-		HumNum rem = num.getRemainder();
-		output += " ratfrac=\"" + to_string(rem.getNumerator()) +
-				+ "/" + to_string(rem.getDenominator()) + "\"";
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// Convert::trimWhiteSpace -- remove spaces, tabs and/or newlines
-//     from the beginning and end of input string.
-//
-
-string Convert::trimWhiteSpace(const string& input) {
-	string s = input;
-	s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-			std::not1(std::ptr_fun<int, int>(std::isspace))));
-	s.erase(std::find_if(s.rbegin(), s.rend(),
-			std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-	return s;
 }
 
 

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jul 10 23:42:14 PDT 2016
+// Last Modified: Wed Jul 20 21:22:34 PDT 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _MINHUMDRUM_H
 
 #include <math.h>
+#include <string.h>
+#include <stdarg.h>
 
 #include <string>
 #include <vector>
@@ -47,6 +49,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <sstream>
 #include <map>
 #include <set>
+#include <algorithm>
 
 using std::string;
 using std::vector;
