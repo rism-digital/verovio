@@ -46,6 +46,7 @@ enum ClassId {
     DEVICE_CONTEXT, // Should not be instanciated as is
     //
     ALIGNMENT,
+    BOUNDARY_END,
     CLEF_ATTR,
     DOC,
     ENDING_BOUNDARY,
@@ -150,6 +151,7 @@ enum ClassId {
  */
 enum InterfaceId {
     INTERFACE,
+    INTERFACE_BOUNDARY,
     INTERFACE_DURATION,
     INTERFACE_PITCH,
     INTERFACE_POSITION,

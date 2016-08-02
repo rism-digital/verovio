@@ -16,6 +16,7 @@ FILES="../src/accid.cpp \
              ../src/barline.cpp \
              ../src/bboxdevicecontext.cpp \
              ../src/beam.cpp \
+             ../src/boundary.cpp \
              ../src/chord.cpp \
              ../src/clef.cpp \
              ../src/custos.cpp \

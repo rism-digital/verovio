@@ -112,6 +112,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/barline.cpp \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
 	$VEROVIO_ROOT/src/beam.cpp \
+	$VEROVIO_ROOT/src/boundary.cpp \
 	$VEROVIO_ROOT/src/chord.cpp \
 	$VEROVIO_ROOT/src/clef.cpp \
 	$VEROVIO_ROOT/src/custos.cpp \
