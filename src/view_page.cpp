@@ -52,12 +52,8 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
 
     int i;
-    SetDrawingXYParams setDrawingXYParams;
-    setDrawingXYParams.m_doc = m_doc;
-    setDrawingXYParams.m_view = this;
     Functor setDrawingXY(&Object::SetDrawingXY);
-    // Pass it for redirection
-    setDrawingXYParams.m_functor = &setDrawingXY;
+    SetDrawingXYParams setDrawingXYParams(m_doc, this, &setDrawingXY);
     // First pass without processing the LayerElements - we need this for cross-staff going down because
     // the elements will need the position of the staff below to have been set before
     m_currentPage->Process(&setDrawingXY, &setDrawingXYParams);

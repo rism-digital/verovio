@@ -428,8 +428,7 @@ Object *Object::FindChildByType(ClassId classId, int deepness, bool direction)
 Object *Object::FindChildByAttComparison(AttComparison *attComparison, int deepness, bool direction)
 {
     Functor findByAttComparison(&Object::FindByAttComparison);
-    FindByAttComparisonParams findByAttComparisonParams;
-    findByAttComparisonParams.m_attComparison = attComparison;
+    FindByAttComparisonParams findByAttComparisonParams(attComparison);
     this->Process(&findByAttComparison, &findByAttComparisonParams, NULL, NULL, deepness, direction);
     return findByAttComparisonParams.m_element;
 }
@@ -437,8 +436,7 @@ Object *Object::FindChildByAttComparison(AttComparison *attComparison, int deepn
 Object *Object::FindChildExtremeByAttComparison(AttComparison *attComparison, int deepness, bool direction)
 {
     Functor findExtremeByAttComparison(&Object::FindExtremeByAttComparison);
-    FindExtremeByAttComparisonParams findExtremeByAttComparisonParams;
-    findExtremeByAttComparisonParams.m_attComparison = attComparison;
+    FindExtremeByAttComparisonParams findExtremeByAttComparisonParams(attComparison);
     this->Process(&findExtremeByAttComparison, &findExtremeByAttComparisonParams, NULL, NULL, deepness, direction);
     return findExtremeByAttComparisonParams.m_element;
 }
@@ -450,9 +448,7 @@ void Object::FindAllChildByAttComparison(
     objects->clear();
 
     Functor findAllByAttComparison(&Object::FindAllByAttComparison);
-    FindAllByAttComparisonParams findAllByAttComparisonParams;
-    findAllByAttComparisonParams.m_attComparison = attComparison;
-    findAllByAttComparisonParams.m_elements = objects;
+    FindAllByAttComparisonParams findAllByAttComparisonParams(attComparison, objects);
     this->Process(&findAllByAttComparison, &findAllByAttComparisonParams, NULL, NULL, deepness, direction);
 }
 
@@ -530,8 +526,7 @@ void Object::Modify(bool modified)
 void Object::FillFlatList(ListOfObjects *flatList)
 {
     Functor addToFlatList(&Object::AddLayerElementToFlatList);
-    AddLayerElementToFlatListParams addLayerElementToFlatListParams;
-    addLayerElementToFlatListParams.m_flatList = flatList;
+    AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
 
@@ -645,8 +640,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
 
 int Object::Save(FileOutputStream *output)
 {
-    SaveParams saveParams;
-    saveParams.m_output = output;
+    SaveParams saveParams(output);
 
     Functor save(&Object::Save);
     // Special case where we want to process all objects

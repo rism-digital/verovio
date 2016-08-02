@@ -153,8 +153,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
-            GenerateMIDIParams generateMIDIParams;
-            generateMIDIParams.m_midiFile = midiFile;
+            GenerateMIDIParams generateMIDIParams(midiFile);
             generateMIDIParams.m_maxValues = calcMaxMeasureDurationParams.m_maxValues;
             generateMIDIParams.m_transSemi = transSemi;
             Functor generateMIDI(&Object::GenerateMIDI);
@@ -327,8 +326,7 @@ void Doc::PrepareDrawing()
             filters.push_back(&matchLayer);
 
             // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
-            PrepareRptParams prepareRptParams;
-            prepareRptParams.m_currentScoreDef = &m_scoreDef;
+            PrepareRptParams prepareRptParams(&m_scoreDef);
             Functor prepareRpt(&Object::PrepareRpt);
             this->Process(&prepareRpt, &prepareRptParams, NULL, &filters);
         }
@@ -382,8 +380,7 @@ void Doc::CollectScoreDefs(bool force)
     }
 
     ScoreDef upcomingScoreDef = m_scoreDef;
-    SetCurrentScoreDefParams setCurrentScoreDefParams;
-    setCurrentScoreDefParams.m_upcomingScoreDef = &upcomingScoreDef;
+    SetCurrentScoreDefParams setCurrentScoreDefParams(&upcomingScoreDef);
     Functor setCurrentScoreDef(&Object::SetCurrentScoreDef);
 
     // First process the current scoreDef in order to fill the staffDef with
@@ -410,10 +407,7 @@ void Doc::CastOffDoc()
 
     System *currentSystem = new System();
     contentPage->AddSystem(currentSystem);
-    CastOffSystemsParams castOffSystemsParams;
-    castOffSystemsParams.m_contentSystem = contentSystem;
-    castOffSystemsParams.m_page = contentPage;
-    castOffSystemsParams.m_currentSystem = currentSystem;
+    CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem);
     castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar
         - this->m_drawingPageRightMar - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
     castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
@@ -434,10 +428,7 @@ void Doc::CastOffDoc()
 
     Page *currentPage = new Page();
     this->AddPage(currentPage);
-    CastOffPagesParams castOffPagesParams;
-    castOffPagesParams.m_contentPage = contentPage;
-    castOffPagesParams.m_doc = this;
-    castOffPagesParams.m_currentPage = currentPage;
+    CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
     castOffPagesParams.m_pageHeight
         = this->m_drawingPageHeight - this->m_drawingPageTopMar; // obviously we need a bottom margin
     Functor castOffPages(&Object::CastOffPages);
@@ -458,8 +449,7 @@ void Doc::UnCastOffDoc()
     System *contentSystem = new System();
     contentPage->AddSystem(contentSystem);
 
-    UnCastOffParams unCastOffParams;
-    unCastOffParams.m_currentSystem = contentSystem;
+    UnCastOffParams unCastOffParams(contentSystem);
 
     Functor unCastOff(&Object::UnCastOff);
     this->Process(&unCastOff, &unCastOffParams);
