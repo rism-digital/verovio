@@ -44,6 +44,8 @@
 #include "timeinterface.h"
 #include "vrv.h"
 
+#define NOMINMAX
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
