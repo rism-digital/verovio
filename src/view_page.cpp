@@ -168,7 +168,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
-    DrawSystemList(dc, system, ENDING_BOUNDARY);
+    DrawSystemList(dc, system, ENDING);
 
     dc->EndGraphic(system, this);
 }
@@ -197,9 +197,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         if (((*iter)->Is() == classId) && (classId == SLUR)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
-        if (((*iter)->Is() == classId) && (classId == ENDING_BOUNDARY)) {
-            // cast to EndingBoundary check in DrawEnding
-            DrawEnding(dc, dynamic_cast<EndingBoundary *>(*iter), system);
+        if (((*iter)->Is() == classId) && (classId == ENDING)) {
+            // cast to Ending check in DrawEnding
+            DrawEnding(dc, dynamic_cast<Ending *>(*iter), system);
         }
     }
 }
@@ -970,15 +970,15 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
 
     Object *current;
     for (current = parent->GetFirst(); current; current = parent->GetNext()) {
-        if (current->Is() == ENDING_BOUNDARY) {
-            EndingBoundary *ending = dynamic_cast<EndingBoundary *>(current);
-            assert(ending);
-            if (ending->IsStartBoundary()) {
-                // Create placeholder, but only for the start boundary. A graphic for the end boundary will be created
-                // only if it is on a different system - See View::DrawEnding
-                dc->StartGraphic(current, "", current->GetUuid());
-                dc->EndGraphic(current, this);
-            }
+        // Boundary ends are not drawn directly (for now) - maybe we want to draw an empty SVG element?
+        if (current->Is() == BOUNDARY_END) {
+            // nothing to do, then
+        }
+        else if (current->Is() == ENDING) {
+            // Create placeholder - A graphic for the end boundary will be created
+            // but only if it is on a different system - See View::DrawEnding
+            dc->StartGraphic(current, "", current->GetUuid());
+            dc->EndGraphic(current, this);
         }
         else if (current->Is() == MEASURE) {
             // cast to Measure check in DrawMeasure

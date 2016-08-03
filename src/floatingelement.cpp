@@ -112,7 +112,7 @@ FloatingPositioner::FloatingPositioner(FloatingElement *element) : BoundingBox()
         // dynam below by default
         m_place = dynam->HasPlace() ? dynam->GetPlace() : STAFFREL_below;
     }
-    else if (element->Is() == ENDING_BOUNDARY) {
+    else if (element->Is() == ENDING) {
         // endings always above;
         m_place = STAFFREL_above;
     }

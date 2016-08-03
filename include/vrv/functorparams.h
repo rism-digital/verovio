@@ -17,9 +17,10 @@ class MidiFile;
 namespace vrv {
 
 class AttComparison;
+class BoundaryStartInterface;
 class Chord;
 class Clef;
-class EndingBoundary;
+class Ending;
 class FileOutputStream;
 class KeySig;
 class Layer;
@@ -500,23 +501,24 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareEndingsParams
+// PrepareBoundariesParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: the last measure
- * member 1: the current ending boundary
+ * member 1: the current boundary
 **/
 
-class PrepareEndingsParams : public FunctorParams {
+class PrepareBoundariesParams : public FunctorParams {
 public:
-    PrepareEndingsParams()
+    PrepareBoundariesParams()
     {
         m_lastMeasure = NULL;
         m_currentEnding = NULL;
     }
     Measure *m_lastMeasure;
-    EndingBoundary *m_currentEnding;
+    Ending *m_currentEnding;
+    std::vector<BoundaryStartInterface *> m_startBoundaries;
 };
 
 //----------------------------------------------------------------------------

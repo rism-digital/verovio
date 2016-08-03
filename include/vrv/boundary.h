@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class Measure;
 class Object;
 
 //----------------------------------------------------------------------------
@@ -34,8 +35,11 @@ public:
     virtual ~BoundaryEnd();
     virtual void Reset();
     virtual std::string GetClassName() const;
-    virtual ClassId Is() const { return MEASURE; };
+    virtual ClassId Is() const { return BOUNDARY_END; };
     ///@}
+
+    void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
+    Measure *GetMeasure() { return m_drawingMeasure; }
 
     /**
      * @name Get the corresponding boundary start
@@ -44,9 +48,26 @@ public:
     Object *GetStart() { return m_start; };
     ///@}
 
-    //-----------------//
-    // Pseudo functors //
-    //-----------------//
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::PrepareBoundaries.
+     */
+    virtual int PrepareBoundaries(FunctorParams *functorParams);
+
+    /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
+     * Fill a page by adding systems with the appropriate length.
+     * For Endings, this means only moving them since their width is not taken into
+     * account
+     */
+    virtual int CastOffSystems(FunctorParams *functorParams);
 
 protected:
     //
@@ -58,7 +79,10 @@ protected:
     Object *m_start;
 
 private:
+    /** The class name of the corresponding start */
     std::string m_startClassName;
+    /** The last measure child of the element */
+    Measure *m_drawingMeasure;
 };
 
 //----------------------------------------------------------------------------
@@ -81,6 +105,9 @@ public:
     virtual void Reset();
     ///@}
 
+    void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
+    Measure *GetMeasure() { return m_drawingMeasure; }
+
     /**
      * @name Set and get the first LayerElement
      * The setter asserts that no LayerElement was previously set.
@@ -95,6 +122,18 @@ public:
     // Pseudo functors //
     //-----------------//
 
+    /**
+     * See Object::PrepareBoundaries
+     * Called from Ending::PrepareBoundaries and EditorialElement::PrepareBoundaries
+     */
+    virtual int InterfacePrepareBoundaries(FunctorParams *functorParams);
+
+    /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     * Called from Ending::ResetDrawing and EditorialElement::ResetDrawing
+     */
+    virtual int InterfaceResetDrawing(FunctorParams *functorParams);
+
 protected:
     //
 private:
@@ -105,6 +144,8 @@ protected:
     BoundaryEnd *m_end;
 
 private:
+    /** The first measure child of the element */
+    Measure *m_drawingMeasure;
 };
 
 } // namespace vrv

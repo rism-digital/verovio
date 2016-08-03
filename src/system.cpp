@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "boundary.h"
 #include "doc.h"
 #include "ending.h"
 #include "functorparams.h"
@@ -67,7 +68,14 @@ void System::Reset()
     m_drawingAbbrLabelsWidth = 0;
 }
 
-void System::AddEnding(EndingBoundary *ending)
+void System::AddBoundaryEnd(BoundaryEnd *boundaryEnd)
+{
+    boundaryEnd->SetParent(this);
+    m_children.push_back(boundaryEnd);
+    Modify();
+}
+
+void System::AddEnding(Ending *ending)
 {
     ending->SetParent(this);
     m_children.push_back(ending);
@@ -305,7 +313,7 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
-    params->m_classId = ENDING_BOUNDARY;
+    params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;

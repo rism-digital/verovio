@@ -447,20 +447,23 @@ int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareEndings(FunctorParams *functorParams)
+int Measure::PrepareBoundaries(FunctorParams *functorParams)
 {
-    PrepareEndingsParams *params = dynamic_cast<PrepareEndingsParams *>(functorParams);
+    PrepareBoundariesParams *params = dynamic_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
+    std::vector<BoundaryStartInterface *>::iterator iter;
+    for (iter = params->m_startBoundaries.begin(); iter != params->m_startBoundaries.end(); iter++) {
+        (*iter)->SetMeasure(this);
+    }
+    params->m_startBoundaries.clear();
+
     if (params->m_currentEnding) {
-        // This is the first measure we are encountering since the beginning of the ending
-        if (params->m_currentEnding->GetMeasure() == NULL) {
-            params->m_currentEnding->SetMeasure(this);
-        }
         // Set the ending to each measure in between
         this->m_drawingEnding = params->m_currentEnding;
     }
-    // Keep a pointer to the measure for when we are reaching the end (see EndingBoundary::PrepareEndings)
+
+    // Keep a pointer to the measure for when we are reaching the end (see BoundaryEnd::PrepareBoundaries)
     params->m_lastMeasure = this;
 
     return FUNCTOR_CONTINUE;

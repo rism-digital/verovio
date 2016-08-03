@@ -1633,7 +1633,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     dc->EndGraphic(tempo, this);
 }
 
-void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
+void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 {
     assert(dc);
     assert(ending);
@@ -1647,24 +1647,18 @@ void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
         }
     }
 
-    // Only start boundaries are added to the system drawing list from each measure
-    assert(ending->IsStartBoundary());
-    // in non debug mode
-    if (!ending->IsStartBoundary()) return;
-
-    EndingBoundary *start = ending;
-    EndingBoundary *end = ending->GetEndBoundary();
+    BoundaryEnd *endingEndBoundary = ending->GetEnd();
 
     // We need to make sure we have the end boudary and a measure (first and last) in each of them
-    assert(end);
-    assert(start->GetMeasure() && end->GetMeasure());
+    assert(endingEndBoundary);
+    assert(ending->GetMeasure() && endingEndBoundary->GetMeasure());
     // in non debug mode
-    if (!end) return;
-    if (!start->GetMeasure() || !end->GetMeasure()) return;
+    if (!endingEndBoundary) return;
+    if (!ending->GetMeasure() || !endingEndBoundary->GetMeasure()) return;
 
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System *>(start->GetFirstParent(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(end->GetFirstParent(SYSTEM));
+    System *parentSystem1 = dynamic_cast<System *>(ending->GetFirstParent(SYSTEM));
+    System *parentSystem2 = dynamic_cast<System *>(endingEndBoundary->GetFirstParent(SYSTEM));
 
     assert(parentSystem1 && parentSystem2);
     // in non debug mode
@@ -1676,15 +1670,15 @@ void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
-        x1 = start->GetMeasure()->GetDrawingX();
-        x2 = end->GetMeasure()->GetDrawingX() + end->GetMeasure()->GetRightBarLineXRel();
+        x1 = ending->GetMeasure()->GetDrawingX();
+        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
     }
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
     else if (system == parentSystem1) {
         // We need the last measure of the system for x2 - we also use it for getting the staves later
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
-        x1 = start->GetMeasure()->GetDrawingX();
+        x1 = ending->GetMeasure()->GetDrawingX();
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         spanningType = SPANNING_START;
     }
@@ -1694,7 +1688,7 @@ void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
-        x2 = end->GetMeasure()->GetDrawingX() + end->GetMeasure()->GetRightBarLineXRel();
+        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
@@ -1733,11 +1727,11 @@ void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
     TextExtend extend;
     dc->GetTextExtent("M", &extend);
 
-    if (start->HasN()) {
+    if (ending->HasN()) {
         std::wstringstream strStream;
         // Maybe we want to add ( ) after system breaks?
         // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
-        strStream << start->GetN() << L".";
+        strStream << ending->GetN() << L".";
         // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
 
         Text text;

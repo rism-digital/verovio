@@ -657,9 +657,9 @@ public:
     virtual int PrepareRpt(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Functor for setting Measure of EndingBoundary
+     * Functor for setting Measure of Ending
      */
-    virtual int PrepareEndings(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareBoundaries(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Goes through all the TimeSpanningInterface elements and set them a current to each staff

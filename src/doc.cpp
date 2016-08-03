@@ -333,8 +333,8 @@ void Doc::PrepareDrawing()
     }
 
     // Prepare the endings (pointers to the measure after and before the boundaries
-    PrepareEndingsParams prepareEndingsParams;
-    Functor prepareEndings(&Object::PrepareEndings);
+    PrepareBoundariesParams prepareEndingsParams;
+    Functor prepareEndings(&Object::PrepareBoundaries);
     this->Process(&prepareEndings, &prepareEndingsParams);
 
     /*

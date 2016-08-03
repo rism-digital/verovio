@@ -9,6 +9,7 @@
 #define __VRV_ENDING_H__
 
 #include "atts_shared.h"
+#include "boundary.h"
 #include "floatingelement.h"
 
 namespace vrv {
@@ -16,37 +17,34 @@ namespace vrv {
 class Measure;
 
 //----------------------------------------------------------------------------
-// EndingBoundary
+// Ending
 //----------------------------------------------------------------------------
 
-class EndingBoundary : public FloatingElement, public AttCommon {
+class Ending : public FloatingElement, public BoundaryStartInterface, public AttCommon {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method resets all attribute classes
      */
     ///@{
-    EndingBoundary(EndingBoundary *startBoundary = NULL);
-    virtual ~EndingBoundary();
+    Ending();
+    virtual ~Ending();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "EndingBoundary"; };
-    virtual ClassId Is() const { return ENDING_BOUNDARY; };
+    virtual std::string GetClassName() const { return "Ending"; };
+    virtual ClassId Is() const { return ENDING; };
     ///@}
 
-    void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
-    Measure *GetMeasure() { return m_drawingMeasure; }
-
-    void SetEndBoundary(EndingBoundary *endBoundary) { m_endBoundary = endBoundary; }
-    EndingBoundary *GetEndBoundary() { return m_endBoundary; }
-    EndingBoundary *GetStartBoundary() { return m_startBoundary; }
+    // void SetEndBoundary(Ending *endBoundary) { m_endBoundary = endBoundary; }
+    // Ending *GetEndBoundary() { return m_endBoundary; }
+    // Ending *GetStartBoundary() { return m_startBoundary; }
 
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method resets all attribute classes
      */
     ///@{
-    bool IsStartBoundary() { return (m_startBoundary == NULL); }
-    bool IsEndBoundary() { return (m_startBoundary != NULL); }
+    // bool IsStartBoundary() { return (m_startBoundary == NULL); }
+    // bool IsEndBoundary() { return (m_startBoundary != NULL); }
     ///@}
 
     //----------//
@@ -54,9 +52,9 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareEndings.
+     * See Object::PrepareBoundaries.
      */
-    virtual int PrepareEndings(FunctorParams *functorParams);
+    virtual int PrepareBoundaries(FunctorParams *functorParams);
 
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
@@ -75,13 +73,11 @@ private:
 public:
     //
 private:
-    /** The measure (first or last) child of the ending */
-    Measure *m_drawingMeasure;
     /**
      * Pointer for starting and ending boundary.
      */
-    EndingBoundary *m_startBoundary;
-    EndingBoundary *m_endBoundary;
+    // Ending *m_startBoundary;
+    // Ending *m_endBoundary;
 };
 
 } // namespace vrv

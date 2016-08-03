@@ -17,6 +17,7 @@
 #include "accid.h"
 #include "anchoredtext.h"
 #include "beam.h"
+#include "boundary.h"
 #include "chord.h"
 #include "clef.h"
 #include "custos.h"
@@ -2978,16 +2979,17 @@ bool MeiInput::ReadScoreBasedMei(pugi::xml_node element)
         // We will need to move this into a ReadMeiSystemChildren (?) when we want to support app around or within
         // endings
         pugi::xml_node current;
-        EndingBoundary *endingStart = new EndingBoundary();
-        SetMeiUuid(element, endingStart);
-        endingStart->ReadCommon(element);
-        m_system->AddEnding(endingStart);
+        Ending *ending = new Ending();
+        SetMeiUuid(element, ending);
+        ending->ReadCommon(element);
+        m_system->AddEnding(ending);
         for (current = element.first_child(); current; current = current.next_sibling()) {
             LogDebug("Reading %s", current.name());
             success = ReadScoreBasedMei(current);
         }
-        EndingBoundary *endingEnd = new EndingBoundary(endingStart);
-        m_system->AddEnding(endingEnd);
+        BoundaryEnd *endingEnd = new BoundaryEnd(ending);
+        ending->SetEnd(endingEnd);
+        m_system->AddBoundaryEnd(endingEnd);
     }
     // content
     else if (std::string(element.name()) == "measure") {
