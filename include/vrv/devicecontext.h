@@ -58,7 +58,7 @@ public:
      */
     ///@{
     void SetBrush(int colour, int opacity);
-    void SetPen(int colour, int width, int opacity);
+    void SetPen(int colour, int width, int opacity, int dashLength = 0);
     void SetFont(FontInfo *font);
     void ResetBrush();
     void ResetPen();

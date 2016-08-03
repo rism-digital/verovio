@@ -25,7 +25,7 @@ namespace vrv {
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 11
+#define VERSION_REVISION 12
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
 
@@ -46,8 +46,10 @@ enum ClassId {
     DEVICE_CONTEXT, // Should not be instanciated as is
     //
     ALIGNMENT,
+    BOUNDARY_END,
     CLEF_ATTR,
     DOC,
+    ENDING,
     FLOATING_POSITIONER,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
@@ -87,7 +89,8 @@ enum ClassId {
     LAYER_ELEMENT,
     ACCID,
     BARLINE,
-    BARLINE_ATTR,
+    BARLINE_ATTR_LEFT,
+    BARLINE_ATTR_RIGHT,
     BEAM,
     BEATRPT,
     BTREM,
@@ -120,6 +123,8 @@ enum ClassId {
     DIR,
     DYNAM,
     HAIRPIN,
+    OCTAVE,
+    PEDAL,
     SLUR,
     TEMPO,
     TIE,
@@ -147,6 +152,7 @@ enum ClassId {
  */
 enum InterfaceId {
     INTERFACE,
+    INTERFACE_BOUNDARY,
     INTERFACE_DURATION,
     INTERFACE_PITCH,
     INTERFACE_POSITION,
@@ -175,8 +181,6 @@ class TimeSpanningInterface;
 typedef std::vector<Object *> ArrayOfObjects;
 
 typedef std::list<Object *> ListOfObjects;
-
-typedef std::vector<void *> ArrayPtrVoid;
 
 typedef std::vector<AttComparison *> ArrayOfAttComparisons;
 

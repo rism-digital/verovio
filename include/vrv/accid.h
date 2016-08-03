@@ -43,7 +43,7 @@ public:
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer(ArrayPtrVoid *params);
+    virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
 private:
     //

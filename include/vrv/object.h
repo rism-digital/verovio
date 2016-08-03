@@ -24,6 +24,7 @@ class DurationInterface;
 class EditorialElement;
 class FileOutputStream;
 class Functor;
+class FunctorParams;
 class PitchInterface;
 class PositionInterface;
 class ScoreDefInterface;
@@ -359,7 +360,7 @@ public:
      * Return the first parent of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
-    Object *GetFirstParent(const ClassId classId, int maxSteps = -1);
+    Object *GetFirstParent(const ClassId classId, int maxSteps = -1) const;
 
     /**
      * Return the last parent that is NOT of the specified type.
@@ -399,7 +400,7 @@ public:
      * Deepness specifies how many child levels should be processed. UNLIMITED_DEPTH means no
      * limit (EditorialElement objects do not count).
      */
-    virtual void Process(Functor *functor, ArrayPtrVoid *params, Functor *endFunctor = NULL,
+    virtual void Process(Functor *functor, FunctorParams *functorParams, Functor *endFunctor = NULL,
         ArrayOfAttComparisons *filters = NULL, int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
 
     //----------//
@@ -409,47 +410,36 @@ public:
     /**
      * Add each LayerElements and its children to a flat list
      */
-    virtual int AddLayerElementToFlatList(ArrayPtrVoid *params);
+    virtual int AddLayerElementToFlatList(FunctorParams *functorParams);
 
     /**
      * Find a Object with a specified uuid.
-     * param 0: the uuid we are looking for.
-     * param 1: the pointer to pointer to the Object retrieved (if found).
      */
-    virtual int FindByUuid(ArrayPtrVoid *params);
+    virtual int FindByUuid(FunctorParams *functorParams);
 
     /**
-     * Find a Object with a AttComparison functor .
-     * param 0: the pointer to the AttComparsion we are evaluating.
-     * param 1: the pointer to pointer to the Object retrieved (if found).
-     */
-    virtual int FindByAttComparison(ArrayPtrVoid *params);
+     * Find a Object with a AttComparison functor .     */
+    virtual int FindByAttComparison(FunctorParams *functorParams);
 
     /**
      * Find a Object with the extreme value with a AttComparison functor .
-     * param 0: the pointer to the AttComparsion we are evaluating.
-     * param 1: the pointer to pointer to the Object retrieved (if found).
      */
-    virtual int FindExtremeByAttComparison(ArrayPtrVoid *params);
+    virtual int FindExtremeByAttComparison(FunctorParams *functorParams);
 
     /**
      * Find a all Object with a AttComparison functor.
-     * param 0: the pointer to the AttComparsion we are evaluating.
-     * param 1: the pointer to the ArrayOfObjects (matching) elements.
      */
-    virtual int FindAllByAttComparison(ArrayPtrVoid *params);
+    virtual int FindAllByAttComparison(FunctorParams *functorParams);
 
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method
-     * param 0: a pointer to the FileOutputStream.
      */
-    virtual int Save(ArrayPtrVoid *params);
+    virtual int Save(FunctorParams *functorParams);
 
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method
-     * param 0: a pointer to the FileOutputStream.
      */
-    virtual int SaveEnd(ArrayPtrVoid *params);
+    virtual int SaveEnd(FunctorParams *functorParams);
 
     /**
      * @name Functors for aligning the content horizontally
@@ -457,74 +447,73 @@ public:
     ///@{
 
     /**
-     *
+     * Adjust the position of all floating positionner, staff by staff.
      */
-    virtual int AdjustFloatingPostioners(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustFloatingPostioners(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Align horizontally the content of a page.
      * For each LayerElement, instanciate its Alignment.
      * It creates it if no other note or event occurs at its position.
      */
-    virtual int AlignHorizontally(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int AlignHorizontally(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * For each Layer, align the grace note stacked in GraceAlignment
      */
-    virtual int AlignHorizontallyEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int AlignHorizontallyEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
-     * param 0: the cumulated shift
      */
-    virtual int AlignMeasures(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int AlignMeasures(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Store the width of the system in the MeasureAligner for justification
      * This method is called at the end of a system.
      */
-    virtual int AlignMeasuresEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int AlignMeasuresEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Correct the X alignment once the content of a system has been aligned and laid out
      * See Measure::IntegrateBoundingBoxXShift for actual implementation
      */
-    virtual int IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Correct the X alignment once the content of a system has been aligned and laid out
      * See Measure::IntegrateBoundingBoxXShift for actual implementation
      */
-    virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Reset the horizontal alignment environment for various types for object.
      */
-    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Set the position of the Alignment.
      * Looks at the time difference from the previous Alignment.
      */
-    virtual int SetAlignmentXPos(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int SetAlignmentXPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
      * The m_xShift is updated appropriately
      */
-    virtual int SetBoundingBoxGraceXShift(ArrayPtrVoid *params);
+    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.
      * The m_xShift is updated appropriately
      */
-    virtual int SetBoundingBoxXShift(ArrayPtrVoid *params);
+    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.
      * This is the Functor called at the end of the measure or a layer.
      */
-    virtual int SetBoundingBoxXShiftEnd(ArrayPtrVoid *params);
+    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
 
     ///@}
 
@@ -537,44 +526,38 @@ public:
      * Align vertically the content of a page.
      * For each Staff, instanciate its StaffAlignment.
      */
-    virtual int AlignVertically(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int AlignVertically(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
      */
-    virtual int AlignSystems(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * Store the height of the system in the SystemAligner for justification
-     * This method is called at the end of a system.
-     */
-    virtual int AlignSystemsEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int AlignSystems(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
      */
-    virtual int CalcStaffOverlap(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int CalcStaffOverlap(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Correct the Y alignment once the content of a system has been aligned and laid out
      * See System::IntegrateBoundingBoxYShift for actual implementation
      */
-    virtual int IntegrateBoundingBoxYShift(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int IntegrateBoundingBoxYShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Reset the verticall alignment environment for various types for object.
      */
-    virtual int ResetVerticalAlignment(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Set the position of the StaffAlignment.
      */
-    virtual int SetAligmentYPos(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int SetAligmentYPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
      */
-    virtual int SetOverflowBBoxes(ArrayPtrVoid *params);
+    virtual int SetOverflowBBoxes(FunctorParams *functorParams);
 
     ///@}
 
@@ -585,135 +568,119 @@ public:
 
     /**
      * Replace the drawing values a staffDef.
-     * param 0: Clef pointer (NULL if none)
-     * param 1: KeySig pointer (NULL if none)
-     * param 2: Mensur pointer (NULL if none)
-     * param 3: MeterSig pointer (NULL if none)
      */
-    virtual int ReplaceDrawingValuesInStaffDef(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Set the initial scoreDef of each page.
      * This is necessary for integrating changes that occur within a page.
      */
-    virtual int SetCurrentScoreDef(ArrayPtrVoid *params);
+    virtual int SetCurrentScoreDef(FunctorParams *functorParams);
+
+    /**
+     * Unset the initial scoreDef of each system and measure
+     */
+    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Set the initial scoreDef of each page.
      * This is necessary for integrating changes that occur within a page.
-     * param 0: bool clef flag.
-     * param 1: bool keysig flag.
-     * param 2: bool the mensur flag.
-     * param 3: bool the metersig flag.
-     * param 4: bool the keysig cancellation flag;
      */
-    virtual int SetStaffDefRedrawFlags(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int SetStaffDefRedrawFlags(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     ///@}
 
     /**
-     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
-     * and for staff/layer to be then processed.
-     * param 0: IntTree*
-     * param 1: IntTree*
+     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
      */
-    virtual int PrepareProcessingLists(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareProcessingLists(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Matches start and end for TimeSpanningInterface elements (such as tie or slur).
      * If fillList is set to false, only the remaining elements will be matched.
      * This is used when processing a second time in the other direction
-     * param 0: std::vector< Object*>* that holds the current elements to match
-     * param 1: bool* fillList for indicating whether the elements have to be stacked or not
      */
-    virtual int PrepareTimeSpanning(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareTimeSpanning(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * See Object::PrepareTimeSpanning.
      */
-    virtual int PrepareTimeSpanningEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareTimeSpanningEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Matches start and end for TimeSpanningInterface elements with tstamp(2) attributes.
      * It is performed only on TimeSpanningInterface elements withouth @startid (or @endid).
      * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.
-     * param 0: std::vector< Object*>* that holds the current elements to match
-     * param 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
      */
-    virtual int PrepareTimestamps(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareTimestamps(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * See Object::PrepareTimestamps.
      */
-    virtual int PrepareTimestampsEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareTimestampsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Processes Chord and Note for matching @tie by processing by Layer and by looking
      * at the Pname and Oct
-     * param 0: std::vector<Note*>* that holds the current notes with open ties
-     * param 1: Chord** currentChord for the current chord if in a chord
      */
-    virtual int PrepareTieAttr(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareTieAttr(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Processes Chord and Note for matching @tie by processing by Layer; resets the
      * Chord pointer to NULL at the end of a chord
-     * param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
-     * param 1: Chord** currentChord for the current chord if in a chord
      */
-    virtual int PrepareTieAttrEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareTieAttrEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Processes by Layer and set drawing pointers.
      * Set Dot::m_drawingNote for Dot elements in mensural mode
      * Set Note::m_drawingAccid for Note elements having an Accid child
-     * param 0: Note** currentNote for the current not to w
      */
-    virtual int PreparePointersByLayer(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int PreparePointersByLayer(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Functor for setting wordpos and connector ends
      * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
      */
-    virtual int PrepareLyrics(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareLyrics(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Functor for setting wordpos and connector ends
      * The functor is processed by doc at the end of a document of closing opened syl.
      */
-    virtual int PrepareLyricsEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareLyricsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
      * The functor is processed by staff/layer using an ArrayOfAttComparisons filter.
-     * param 0: MRpt **currentMRpt
-     * param 1: data_BOOLEAN for indicating if the MRpt::m_drawingNumber has to be set or not
-     * param 2: ScoreDef * doc scoreDef
      */
-    virtual int PrepareRpt(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int PrepareRpt(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * Functor for setting Measure of Ending
+     */
+    virtual int PrepareBoundaries(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Goes through all the TimeSpanningInterface elements and set them a current to each staff
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
-     * param 0: std::vector< Object*>* of the current running TimeSpanningInterface elements
      */
-    virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Remove the TimeSpanningInterface element from the list when the last measure is reached.
-     * param 0: std::vector< Object*>* of the current running TimeSpanningInterface elements
      */
-    virtual int FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int ResetDrawing(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int SetDrawingXY(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * @name Functors for justification
@@ -723,12 +690,12 @@ public:
     /**
      * Justify the X positions
      */
-    virtual int JustifyX(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int JustifyX(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Justify the Y positions
      */
-    virtual int JustifyY(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int JustifyY(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     ///@}
 
@@ -741,47 +708,40 @@ public:
      * Fill a page by adding systems with the appropriate length.
      *
      */
-    virtual int CastOffSystems(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int CastOffSystems(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      *
      */
-    virtual int CastOffPages(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int CastOffPages(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Undo the cast of both pages and system.
      * This is used by Doc::ContinuousLayout for putting all pages / systems continously.
      */
-    virtual int UnCastOff(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int UnCastOff(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     ///@}
 
     /**
      *
      */
-    virtual int TimeSpanningLayerElements(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int TimeSpanningLayerElements(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Export the object to a MidiFile
-     * param 0: MidiFile*: the MidiFile we are writing to
-     * param 1: int*: the midi track number
-     * param 2: int*: the current time in the measure (incremented by each element)
-     * param 3: int*: the current total measure time (incremented by each measure
-     * param 4: std::vector<double>: a stack of maximum duration of each measure (emptied by the functor)
      */
-    virtual int ExportMIDI(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int GenerateMIDI(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Export the object to a MidiFile (end method)
      */
-    virtual int ExportMIDIEnd(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int GenerateMIDIEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Calculate the maximum duration of each measure.
-     * param 0: std::vector<double>: a stack of maximum duration filled by the functor
-     * param 1: double: the maximum duration of the current measure
      */
-    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params) { return FUNCTOR_CONTINUE; };
+    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
 protected:
     /**
@@ -947,17 +907,17 @@ private:
  */
 class Functor {
 private:
-    int (Object::*obj_fpt)(ArrayPtrVoid *params); // pointer to member function
+    int (Object::*obj_fpt)(FunctorParams *functorParams); // pointer to member function
 
 public:
     // constructor - takes pointer to an object and pointer to a member and stores
     // them in two private variables
     Functor();
-    Functor(int (Object::*_obj_fpt)(ArrayPtrVoid *));
+    Functor(int (Object::*_obj_fpt)(FunctorParams *));
     virtual ~Functor(){};
 
     // override function "Call"
-    virtual void Call(Object *ptr, ArrayPtrVoid *params);
+    virtual void Call(Object *ptr, FunctorParams *functorParams);
 
 private:
     //

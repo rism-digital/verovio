@@ -59,10 +59,7 @@ public:
     ///@}
 
 private:
-    /**
-     * Used to indicate a common, usually centered, refrain (Mup User's Guide, p.
-     * 44).
-     **/
+    /** Used to indicate a common, usually centered, refrain. **/
     data_BOOLEAN m_refrain;
     /**
      * Used to specify a rhythm for the lyric syllables that differs from that of the

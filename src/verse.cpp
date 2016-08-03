@@ -15,6 +15,7 @@
 
 #include "aligner.h"
 #include "editorial.h"
+#include "functorparams.h"
 #include "layer.h"
 #include "staff.h"
 #include "syl.h"
@@ -54,17 +55,13 @@ void Verse::AddLayerElement(vrv::LayerElement *element)
 // Verse functor methods
 //----------------------------------------------------------------------------
 
-int Verse::AlignVertically(ArrayPtrVoid *params)
+int Verse::AlignVertically(FunctorParams *functorParams)
 {
-    // param 0: the systemAligner
-    // param 1: the staffIdx (unused)
-    // param 2: the staffN
-    // param 3: the doc (unused)
-    SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
-    int *staffN = static_cast<int *>((*params).at(2));
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    assert(params);
 
     // this gets (or creates) the measureAligner for the measure
-    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignmentForStaffN(*staffN);
+    StaffAlignment *alignment = params->m_systemAligner->GetStaffAlignmentForStaffN(params->m_staffN);
 
     if (!alignment) return FUNCTOR_CONTINUE;
 
@@ -74,19 +71,17 @@ int Verse::AlignVertically(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Verse::PrepareProcessingLists(ArrayPtrVoid *params)
+int Verse::PrepareProcessingLists(FunctorParams *functorParams)
 {
-    // param 0: the IntTree* for staff/layer/verse
-    // param 1: the IntTree* for staff/layer (unused)
-    IntTree *tree = static_cast<IntTree *>((*params).at(0));
-    // Alternate solution with StaffN_LayerN_VerseN_t
+    PrepareProcessingListsParams *params = dynamic_cast<PrepareProcessingListsParams *>(functorParams);
+    assert(params);
     // StaffN_LayerN_VerseN_t *tree = static_cast<StaffN_LayerN_VerseN_t*>((*params).at(0));
 
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
     assert(staff && layer);
 
-    tree->child[staff->GetN()].child[layer->GetN()].child[this->GetN()];
+    params->m_verseTree.child[staff->GetN()].child[layer->GetN()].child[this->GetN()];
     // Alternate solution with StaffN_LayerN_VerseN_t
     //(*tree)[ staff->GetN() ][ layer->GetN() ][ this->GetN() ] = true;
 

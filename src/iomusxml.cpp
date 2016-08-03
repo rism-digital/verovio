@@ -17,6 +17,7 @@
 #include "attcomparison.h"
 #include "beam.h"
 #include "chord.h"
+#include "clef.h"
 #include "doc.h"
 #include "layer.h"
 #include "measure.h"
@@ -52,7 +53,7 @@ MusicXmlInput::~MusicXmlInput()
 bool MusicXmlInput::ImportFile()
 {
     try {
-        m_doc->Reset(Raw);
+        m_doc->SetType(Raw);
         pugi::xml_document xmlDoc;
         pugi::xml_parse_result result = xmlDoc.load_file(m_filename.c_str());
         if (!result) {
@@ -70,7 +71,7 @@ bool MusicXmlInput::ImportFile()
 bool MusicXmlInput::ImportString(const std::string musicxml)
 {
     try {
-        m_doc->Reset(Raw);
+        m_doc->SetType(Raw);
         pugi::xml_document xmlDoc;
         xmlDoc.load(musicxml.c_str());
         pugi::xml_node root = xmlDoc.first_child();

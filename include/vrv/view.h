@@ -24,12 +24,15 @@ class Dir;
 class Doc;
 class Dynam;
 class EditorialElement;
+class Ending;
 class FloatingElement;
 class Hairpin;
 class Layer;
 class LayerElement;
 class Measure;
+class Octave;
 class Page;
+class Pedal;
 class Rend;
 class Slur;
 class Staff;
@@ -133,7 +136,7 @@ public:
      */
     ///@{
     int CalculatePitchPosY(Staff *staff, data_PITCHNAME pname, int dec_clef, int oct);
-    int CalculateRestPosY(Staff *staff, char duration);
+    int CalculateRestPosY(Staff *staff, char duration, bool hasMultipleLayer, bool isFirstLayer);
     int CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave);
     ///@}
 
@@ -254,8 +257,8 @@ protected:
     void DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff);
     void DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
     void DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
-    void DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir,
-        int radius, int xn, int originY, int heightY = 0);
+    void DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn,
+        int originY, int heightY = 0);
     void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff);
     ///@}
 
@@ -304,8 +307,12 @@ protected:
     void DrawTimeSpanningElement(DeviceContext *dc, Object *object, System *system);
     void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
+    void DrawEnding(DeviceContext *dc, Ending *ending, System *system);
     void DrawHairpin(
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawOctave(
+        DeviceContext *dc, Octave *octave, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
     void DrawSlur(
         DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
@@ -330,8 +337,8 @@ protected:
      * Defined in view_mensural.cpp
      */
     ///@{
-    void DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir,
-                  int radius, int xn, int originY, int heightY = 0);
+    void DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius,
+        int xn, int originY, int heightY = 0);
     void DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMensurDot(DeviceContext *dc, int x, int yy, Staff *staff);
     void DrawMensurHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff);
@@ -433,7 +440,7 @@ private:
     /**
      * Calculate the position of a point after a rotation of rot_alpha around the center
      */
-    static int CalcBezierAtPosition(Point bezier[], int x);
+    static int CalcBezierAtPosition(const Point bezier[4], int x);
 
     /**
      * Swap values passed as reference.

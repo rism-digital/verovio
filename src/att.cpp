@@ -219,8 +219,8 @@ data_MEASUREBEAT Att::StrToMeasurebeat(std::string value) const
     }
     int measure = 0;
     double timePoint = 0.0;
-    size_t m = value.find_first_of('m');
-    size_t plus = value.find_last_of('+');
+    int m = (int)value.find_first_of('m');
+    int plus = (int)value.find_last_of('+');
     if (m != -1) measure = atoi(value.substr(0, m).c_str());
     if (plus != -1) {
         timePoint = atof(value.substr(plus).c_str());
@@ -273,6 +273,16 @@ data_MODUSMINOR Att::StrToModusminor(std::string value) const
     if (value == "3") return MODUSMINOR_3;
     LogWarning("Unsupported modusmaior '%s'", value.c_str());
     return MODUSMINOR_NONE;
+}
+
+std::string Att::PercentToStr(data_PERCENT data) const
+{
+    return StringFormat("%d%%", data);
+}
+
+data_PERCENT Att::StrToPercent(std::string value) const
+{
+    return atoi(value.substr(0, value.find("%")).c_str());
 }
 
 std::string Att::PitchnameToStr(data_PITCHNAME data) const

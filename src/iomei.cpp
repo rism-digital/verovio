@@ -17,12 +17,15 @@
 #include "accid.h"
 #include "anchoredtext.h"
 #include "beam.h"
+#include "boundary.h"
 #include "chord.h"
+#include "clef.h"
 #include "custos.h"
 #include "dir.h"
 #include "dot.h"
 #include "dynam.h"
 #include "editorial.h"
+#include "ending.h"
 #include "hairpin.h"
 #include "keysig.h"
 #include "layer.h"
@@ -33,7 +36,9 @@
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
+#include "octave.h"
 #include "page.h"
+#include "pedal.h"
 #include "proport.h"
 #include "rest.h"
 #include "rpt.h"
@@ -84,20 +89,20 @@ bool MeiOutput::ExportFile()
             // schema processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "http://music-encoding.org/schema/2.1.1/mei-all.rng";
+            decl.append_attribute("href") = "http://music-encoding.org/schema/3.0.0/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://relaxng.org/ns/structure/1.0";
 
             // schematron processing instruction
             decl = meiDoc.append_child(pugi::node_declaration);
             decl.set_name("xml-model");
-            decl.append_attribute("href") = "http://music-encoding.org/schema/2.1.1/mei-all.rng";
+            decl.append_attribute("href") = "http://music-encoding.org/schema/3.0.0/mei-all.rng";
             decl.append_attribute("type") = "application/xml";
             decl.append_attribute("schematypens") = "http://purl.oclc.org/dsdl/schematron";
 
             m_mei = meiDoc.append_child("mei");
             m_mei.append_attribute("xmlns") = "http://www.music-encoding.org/ns/mei";
-            m_mei.append_attribute("meiversion") = "2013";
+            m_mei.append_attribute("meiversion") = "3.0.0";
 
             // this starts the call of all the functors
             m_doc->Save(this);
@@ -214,6 +219,14 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == HAIRPIN) {
         m_currentNode = m_currentNode.append_child("hairpin");
         WriteMeiHairpin(m_currentNode, dynamic_cast<Hairpin *>(object));
+    }
+    else if (object->Is() == OCTAVE) {
+        m_currentNode = m_currentNode.append_child("octave");
+        WriteMeiOctave(m_currentNode, dynamic_cast<Octave *>(object));
+    }
+    else if (object->Is() == PEDAL) {
+        m_currentNode = m_currentNode.append_child("pedal");
+        WriteMeiPedal(m_currentNode, dynamic_cast<Pedal *>(object));
     }
     else if (object->Is() == SLUR) {
         m_currentNode = m_currentNode.append_child("slur");
@@ -486,10 +499,11 @@ bool MeiOutput::WriteMeiDoc(Doc *doc)
 
     if (m_scoreBasedMEI) {
         m_currentNode = mdiv.append_child("score");
-        m_currentNode = m_currentNode.append_child("section");
         m_nodeStack.push_back(m_currentNode);
         // First save the main scoreDef
         m_doc->m_scoreDef.Save(this);
+        m_currentNode = m_currentNode.append_child("section");
+        m_nodeStack.push_back(m_currentNode);
     }
     else {
         // element to place the pages
@@ -565,6 +579,7 @@ void MeiOutput::WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     staffDef->WriteNotationtype(currentNode);
     staffDef->WriteScalable(currentNode);
     staffDef->WriteStaffDefVis(currentNode);
+    staffDef->WriteTransposition(currentNode);
 }
 
 void MeiOutput::WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure)
@@ -611,6 +626,25 @@ void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     WriteTimeSpanningInterface(currentNode, hairpin);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
+};
+
+void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
+{
+    assert(octave);
+
+    WriteXmlId(currentNode, octave);
+    WriteTimeSpanningInterface(currentNode, octave);
+    octave->WriteOctavedisplacement(currentNode);
+};
+
+void MeiOutput::WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal)
+{
+    assert(pedal);
+
+    WriteXmlId(currentNode, pedal);
+    WriteTimePointInterface(currentNode, pedal);
+    pedal->WritePedalLog(currentNode);
+    pedal->WritePlacement(currentNode);
 };
 
 void MeiOutput::WriteMeiSlur(pugi::xml_node currentNode, Slur *slur)
@@ -719,6 +753,7 @@ void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
     chord->WriteStems(currentNode);
     chord->WriteStemsCmn(currentNode);
     chord->WriteTiepresent(currentNode);
+    chord->WriteVisibility(currentNode);
 }
 
 void MeiOutput::WriteMeiClef(pugi::xml_node currentNode, Clef *clef)
@@ -789,6 +824,7 @@ void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
     assert(mRest);
 
     WriteLayerElement(currentNode, mRest);
+    mRest->WriteVisibility(currentNode);
 }
 
 void MeiOutput::WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt)
@@ -835,6 +871,7 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
     note->WriteTiepresent(currentNode);
+    note->WriteVisibility(currentNode);
 }
 
 void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
@@ -924,6 +961,7 @@ void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *inte
     assert(interface);
 
     interface->WriteAccidental(element);
+    interface->WriteNoteGes(element);
     interface->WriteOctave(element);
     interface->WritePitch(element);
 }
@@ -1195,7 +1233,7 @@ MeiInput::~MeiInput()
 bool MeiInput::ImportFile()
 {
     try {
-        m_doc->Reset(Raw);
+        m_doc->SetType(Raw);
         pugi::xml_document doc;
         pugi::xml_parse_result result = doc.load_file(m_filename.c_str(), pugi::parse_default & ~pugi::parse_eol);
         if (!result) {
@@ -1213,7 +1251,7 @@ bool MeiInput::ImportFile()
 bool MeiInput::ImportString(const std::string mei)
 {
     try {
-        m_doc->Reset(Raw);
+        m_doc->SetType(Raw);
         pugi::xml_document doc;
         doc.load(mei.c_str(), pugi::parse_default & ~pugi::parse_eol);
         pugi::xml_node root = doc.first_child();
@@ -1320,7 +1358,7 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         DocType type;
         if (pages.attribute("type")) {
             type = StrToDocType(pages.attribute("type").value());
-            m_doc->Reset(type);
+            m_doc->SetType(type);
         }
 
         // this is a page-based MEI file, we just loop trough the pages
@@ -1598,6 +1636,7 @@ bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
     vrvStaffDef->ReadNotationtype(staffDef);
     vrvStaffDef->ReadScalable(staffDef);
     vrvStaffDef->ReadStaffDefVis(staffDef);
+    vrvStaffDef->ReadTransposition(staffDef);
 
     if (!vrvStaffDef->HasN()) {
         LogWarning("No @n on <staffDef> might yield unpredictable results");
@@ -1666,6 +1705,12 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "hairpin") {
             success = ReadMeiHairpin(parent, current);
+        }
+        else if (std::string(current.name()) == "octave") {
+            success = ReadMeiOctave(parent, current);
+        }
+        else if (std::string(current.name()) == "pedal") {
+            success = ReadMeiPedal(parent, current);
         }
         else if (std::string(current.name()) == "slur") {
             success = ReadMeiSlur(parent, current);
@@ -1736,6 +1781,31 @@ bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
     vrvHairpin->ReadPlacement(hairpin);
 
     AddFloatingElement(parent, vrvHairpin);
+    return true;
+}
+
+bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node octave)
+{
+    Octave *vrvOctave = new Octave();
+    SetMeiUuid(octave, vrvOctave);
+
+    ReadTimeSpanningInterface(octave, vrvOctave);
+    vrvOctave->ReadOctavedisplacement(octave);
+
+    AddFloatingElement(parent, vrvOctave);
+    return true;
+}
+
+bool MeiInput::ReadMeiPedal(Object *parent, pugi::xml_node pedal)
+{
+    Pedal *vrvPedal = new Pedal();
+    SetMeiUuid(pedal, vrvPedal);
+
+    ReadTimePointInterface(pedal, vrvPedal);
+    vrvPedal->ReadPedalLog(pedal);
+    vrvPedal->ReadPlacement(pedal);
+
+    AddFloatingElement(parent, vrvPedal);
     return true;
 }
 
@@ -2038,6 +2108,7 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
     vrvChord->ReadStems(chord);
     vrvChord->ReadStemsCmn(chord);
     vrvChord->ReadTiepresent(chord);
+    vrvChord->ReadVisibility(chord);
 
     AddLayerElement(parent, vrvChord);
     return ReadMeiLayerChildren(vrvChord, chord);
@@ -2156,6 +2227,8 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
     MRest *vrvMRest = new MRest();
     ReadLayerElement(mRest, vrvMRest);
 
+    vrvMRest->ReadVisibility(mRest);
+
     AddLayerElement(parent, vrvMRest);
     return true;
 }
@@ -2214,6 +2287,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadStems(note);
     vrvNote->ReadStemsCmn(note);
     vrvNote->ReadTiepresent(note);
+    vrvNote->ReadVisibility(note);
 
     AddLayerElement(parent, vrvNote);
     return ReadMeiLayerChildren(vrvNote, note, vrvNote);
@@ -2375,6 +2449,7 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
 bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interface)
 {
     interface->ReadAccidental(element);
+    interface->ReadNoteGes(element);
     interface->ReadOctave(element);
     interface->ReadPitch(element);
     return true;
@@ -2934,6 +3009,23 @@ bool MeiInput::ReadScoreBasedMei(pugi::xml_node element)
     }
     else if ((std::string(element.name()) == "supplied")) {
         success = ReadMeiSupplied(m_system, element, EDITORIAL_SYSTEM);
+    }
+    // endings
+    else if (std::string(element.name()) == "ending") {
+        // We will need to move this into a ReadMeiSystemChildren (?) when we want to support app around or within
+        // endings
+        pugi::xml_node current;
+        Ending *ending = new Ending();
+        SetMeiUuid(element, ending);
+        ending->ReadCommon(element);
+        m_system->AddEnding(ending);
+        for (current = element.first_child(); current; current = current.next_sibling()) {
+            LogDebug("Reading %s", current.name());
+            success = ReadScoreBasedMei(current);
+        }
+        BoundaryEnd *endingEnd = new BoundaryEnd(ending);
+        ending->SetEnd(endingEnd);
+        m_system->AddBoundaryEnd(endingEnd);
     }
     // content
     else if (std::string(element.name()) == "measure") {

@@ -10,6 +10,7 @@
 
 #include "atts_critapp.h"
 #include "atts_shared.h"
+#include "boundary.h"
 #include "object.h"
 
 namespace vrv {
@@ -35,7 +36,7 @@ enum VisibilityType { Hidden = 0, Visible };
  * content, for example <rgd> or <add>.
  * It is not an abstract class but should not be instantiated directly.
  */
-class EditorialElement : public Object, public AttCommon, public AttCommonPart {
+class EditorialElement : public Object, public BoundaryStartInterface, public AttCommon, public AttCommonPart {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -69,11 +70,21 @@ public:
     //----------//
 
     /**
+     * See Object::PrepareBoundaries.
+     */
+    virtual int PrepareBoundaries(FunctorParams *functorParams);
+
+    /**
+     * Reset the drawing values before calling PrepareDrawing after changes.
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
+    /**
      * Fill a page by adding systems with the appropriate length
      * For EditorialElement, this means only moving them since their width is not
      * taken into account. Only system children EditorialElement are processed.
      */
-    virtual int CastOffSystems(ArrayPtrVoid *params);
+    virtual int CastOffSystems(FunctorParams *functorParams);
 
 private:
     //

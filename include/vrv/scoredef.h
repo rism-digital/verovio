@@ -142,8 +142,9 @@ public:
     /**
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
+     * Only true flags are applied, unless applyToAll is set to true.
      */
-    void SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation);
+    void SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation, bool applyToAll);
 
     /**
      * @name Set and get the scoreDef drawing flags for clef, keysig and mensur.
@@ -170,7 +171,7 @@ public:
      * For ScoreDef, this means only moving them since their width is not taken into
      * account
      */
-    virtual int CastOffSystems(ArrayPtrVoid *params);
+    virtual int CastOffSystems(FunctorParams *functorParams);
 
 protected:
     /**
@@ -182,6 +183,7 @@ protected:
 private:
     //
 public:
+    bool m_setAsDrawing;
     //
 private:
     /** Flags for indicating whether labels need to be drawn or not */
@@ -259,7 +261,8 @@ class StaffDef : public ScoreDefElement,
                  public AttLabelsAddl,
                  public AttNotationtype,
                  public AttScalable,
-                 public AttStaffDefVis {
+                 public AttStaffDefVis,
+                 public AttTransposition {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -283,7 +286,7 @@ public:
      * Called form ScoreDef::ReplaceDrawingValues.
      * See implementation and Object::ReplaceDrawingValuesInStaffDef for the parameters.
      */
-    virtual int ReplaceDrawingValuesInStaffDef(ArrayPtrVoid *params);
+    virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams);
 
     /**
      * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
@@ -291,7 +294,7 @@ public:
      * This typically occurs when a new System or a new  ScoreDef is encountered.
      * See implementation and Object::SetStaffDefRedrawFlags for the parameters.
      */
-    virtual int SetStaffDefRedrawFlags(ArrayPtrVoid *params);
+    virtual int SetStaffDefRedrawFlags(FunctorParams *functorParams);
 
 private:
     //

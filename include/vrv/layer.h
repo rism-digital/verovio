@@ -9,16 +9,15 @@
 #define __VRV_LAYER_H__
 
 #include "atts_shared.h"
-#include "clef.h"
 #include "drawinginterface.h"
 #include "object.h"
 
 namespace vrv {
 
+class Clef;
 class DeviceContext;
 class LayerElement;
 class Note;
-class ScoreDef;
 class StaffDef;
 
 //----------------------------------------------------------------------------
@@ -30,11 +29,7 @@ class StaffDef;
  * A Layer is contained in a Staff.
  * It contains LayerElement objects.
 */
-class Layer : public Object,
-              public DrawingListInterface,
-              public ObjectListInterface,
-              public StaffDefDrawingInterface,
-              public AttCommon {
+class Layer : public Object, public DrawingListInterface, public ObjectListInterface, public AttCommon {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -80,12 +75,6 @@ public:
     int GetClefOffset(LayerElement *test);
 
     /**
-     * Set drawing clef, keysig and mensur if necessary and if available.
-     * Also set the current clef.
-     */
-    void SetDrawingAndCurrentValues(StaffDef *currentStaffDef);
-
-    /**
      * @name Set and get the stem direction of the layer.
      * This stays STEMDIRECTION_NONE with on single layer in the staff.
      */
@@ -94,41 +83,65 @@ public:
     data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; };
     ///@}
 
+    Clef *GetCurrentClef() const;
+    KeySig *GetCurrentKeySig() const;
+    Mensur *GetCurrentMensur() const;
+    MeterSig *GetCurrentMeterSig() const;
+
+    void ResetStaffDefOjects();
+
+    /**
+     * Set drawing clef, keysig and mensur if necessary and if available.
+     */
+    void SetDrawingAndCurrentValues(StaffDef *currentStaffDef);
+
+    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; };
+    void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; };
+    Clef *GetStaffDefClef() { return m_staffDefClef; };
+    KeySig *GetStaffDefKeySig() { return m_staffDefKeySig; };
+    Mensur *GetStaffDefMensur() { return m_staffDefMensur; };
+    MeterSig *GetStaffDefMeterSig() { return m_staffDefMeterSig; };
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * Align horizontally the content of a layer.
+     * Unset the initial scoreDef of each system and measure
      */
-    virtual int AlignHorizontally(ArrayPtrVoid *params);
+    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
      * Align horizontally the content of a layer.
      */
-    virtual int AlignHorizontallyEnd(ArrayPtrVoid *params);
+    virtual int AlignHorizontally(FunctorParams *functorParams);
+
+    /**
+     * Align horizontally the content of a layer.
+     */
+    virtual int AlignHorizontallyEnd(FunctorParams *functorParams);
 
     /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
      * and for staff/layer to be then processed.
      */
-    virtual int PrepareProcessingLists(ArrayPtrVoid *params);
+    virtual int PrepareProcessingLists(FunctorParams *functorParams);
 
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY(ArrayPtrVoid *params);
+    virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
      * See implementation and Object::PrepareRpt
      */
-    virtual int PrepareRpt(ArrayPtrVoid *params);
+    virtual int PrepareRpt(FunctorParams *functorParams);
 
     /**
      * See Object::CalcMaxMeasureDuration
      */
-    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
+    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
 
 private:
     //
@@ -139,6 +152,13 @@ private:
      *
      */
     data_STEMDIRECTION m_drawingStemDir;
+
+    /** */
+    Clef *m_staffDefClef;
+    KeySig *m_staffDefKeySig;
+    Mensur *m_staffDefMensur;
+    MeterSig *m_staffDefMeterSig;
+    bool m_drawKeySigCancellation;
 };
 
 } // namespace vrv

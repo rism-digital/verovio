@@ -13,7 +13,8 @@
 
 namespace vrv {
 
-class  Object;
+class Object;
+class FunctorParams;
 class LayerElement;
 class Measure;
 
@@ -23,7 +24,7 @@ class Measure;
 
 /**
  * This class is an interface for elements having a single time point, such as tempo, reh, etc..
- * It is not an abstract class but should not be instanciated directly.
+ * It is not an abstract class but should not be instantiated directly.
  */
 class TimePointInterface : public Interface, public AttStaffident, public AttStartid, public AttTimestampMusical {
 public:
@@ -46,6 +47,11 @@ public:
     void SetStart(LayerElement *start);
     LayerElement *GetStart() { return m_start; };
     ///@}
+
+    /**
+     * Add a staff n to the AttStaffident vector (if not already there)
+     */
+    void AddStaff(int n);
 
     /**
      * Return true if a start is given (@startid or @tstamp)
@@ -82,12 +88,12 @@ public:
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
 
 protected:
     /**
@@ -117,7 +123,7 @@ private:
 
 /**
  * This class is an interface for spanning elements, such as slur, hairpin, etc..
- * It is not an abstract class but should not be instanciated directly.
+ * It is not an abstract class but should not be instantiated directly.
  */
 class TimeSpanningInterface : public TimePointInterface, public AttStartendid, public AttTimestamp2Musical {
 public:
@@ -182,22 +188,22 @@ public:
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int InterfacePrepareTimeSpanning(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
 
 private:
     //

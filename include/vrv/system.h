@@ -14,7 +14,9 @@
 
 namespace vrv {
 
+class BoundaryEnd;
 class DeviceContext;
+class Ending;
 class Measure;
 class ScoreDef;
 
@@ -45,6 +47,8 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
+    void AddBoundaryEnd(BoundaryEnd *boundaryEnd);
+    void AddEnding(Ending *ending);
     void AddMeasure(Measure *measure);
     void AddScoreDef(ScoreDef *scoreDef);
     ///@}
@@ -76,82 +80,95 @@ public:
 
     void SetCurrentFloatingPositioner(int staffN, FloatingElement *element, int x, int y);
 
+    /**
+     * @name Setter and getter of the drawing scoreDef
+     */
+    ///@{
+    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; };
+    void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
 
     /**
+     * Unset the initial scoreDef of each system and measure
+     */
+    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
+
+    /**
      * @name Reset the horizontal and vertical alignment
      */
     ///@{
-    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params);
-    virtual int ResetVerticalAlignment(ArrayPtrVoid *params);
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
     ///@}
 
     /**
      * Align the content of a system vertically.
      */
-    virtual int AlignVertically(ArrayPtrVoid *params);
+    virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
      * Set the position of the StaffAlignment.
      * Redirect the functor to the SytemAligner
      */
-    virtual int SetAligmentYPos(ArrayPtrVoid *params);
+    virtual int SetAligmentYPos(FunctorParams *functorParams);
 
     /**
      * Correct the Y alignment once the content of a system has been aligned and laid out.
      * Special case that redirects the functor to the SystemAligner.
      */
-    virtual int IntegrateBoundingBoxYShift(ArrayPtrVoid *params);
+    virtual int IntegrateBoundingBoxYShift(FunctorParams *functorParams);
 
     /**
      * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
      */
-    virtual int AlignSystems(ArrayPtrVoid *params);
+    virtual int AlignSystems(FunctorParams *functorParams);
 
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * In System object resets the shift to 0;
      */
-    virtual int AlignMeasures(ArrayPtrVoid *params);
+    virtual int AlignMeasures(FunctorParams *functorParams);
 
     /**
      * Store the width of the system in the MeasureAligner for justification
      */
-    virtual int AlignMeasuresEnd(ArrayPtrVoid *params);
+    virtual int AlignMeasuresEnd(FunctorParams *functorParams);
 
     /**
      * Justify the X positions
      * Special case that redirects the functor to the MeasureAligner.
      */
-    virtual int JustifyX(ArrayPtrVoid *params);
+    virtual int JustifyX(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStaffOverlap
      */
-    virtual int CalcStaffOverlap(ArrayPtrVoid *params);
+    virtual int CalcStaffOverlap(FunctorParams *functorParams);
 
     /**
      *
      */
-    virtual int AdjustFloatingPostioners(ArrayPtrVoid *params);
+    virtual int AdjustFloatingPostioners(FunctorParams *functorParams);
 
     /**
      * See Object::CastOffPages
      */
-    virtual int CastOffPages(ArrayPtrVoid *params);
+    virtual int CastOffPages(FunctorParams *functorParams);
 
     /**
      * Undo the cast of the system.
      * This is used by Doc::ContinuousLayout
      */
-    virtual int UnCastOff(ArrayPtrVoid *params);
+    virtual int UnCastOff(FunctorParams *functorParams);
 
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY(ArrayPtrVoid *params);
+    virtual int SetDrawingXY(FunctorParams *functorParams);
 
 public:
     SystemAligner m_systemAligner;
@@ -194,9 +211,11 @@ public:
      */
     ///@{
     int m_drawingTotalWidth;
+    int m_drawingJustifiableWidth;
     ///@}
 
 private:
+    ScoreDef *m_drawingScoreDef;
 };
 
 } // namespace vrv

@@ -17,6 +17,7 @@
 #include "attcomparison.h"
 #include "barline.h"
 #include "chord.h"
+#include "functorparams.h"
 #include "glyph.h"
 #include "keysig.h"
 #include "layer.h"
@@ -48,7 +49,7 @@ namespace vrv {
 Doc::Doc() : Object("doc-")
 {
     m_style = new Style();
-    Reset(Raw);
+    Reset();
 }
 
 Doc::~Doc()
@@ -56,11 +57,11 @@ Doc::~Doc()
     delete m_style;
 }
 
-void Doc::Reset(DocType type)
+void Doc::Reset()
 {
     Object::Reset();
 
-    m_type = type;
+    m_type = Raw;
     m_pageWidth = -1;
     m_pageHeight = -1;
     m_pageRightMar = 0;
@@ -87,6 +88,12 @@ void Doc::Reset(DocType type)
     m_drawingLyricFont.SetFaceName("Times");
 }
 
+void Doc::SetType(DocType type)
+{
+    Reset();
+    m_type = type;
+}
+
 void Doc::AddPage(Page *page)
 {
     page->SetParent(this);
@@ -101,29 +108,21 @@ void Doc::Refresh()
 
 void Doc::ExportMIDI(MidiFile *midiFile)
 {
-    ArrayPtrVoid params;
+    CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
 
     // We first calculate the maximum duration of each measure
-    std::vector<double> maxValues;
-    double currentValue;
-    params.push_back(&maxValues);
-    params.push_back(&currentValue);
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
-    this->Process(&calcMaxMeasureDuration, &params);
+    this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams);
 
     // We need to populate processing lists for processing the document by Layer (by Verse will not be used)
-    params.clear();
-    IntTree verseTree;
-    IntTree layerTree;
-    params.push_back(&verseTree);
-    params.push_back(&layerTree);
+    PrepareProcessingListsParams prepareProcessingListsParams;
     // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
     // StaffN_LayerN_VerseN_t staffLayerVerseTree;
     // params.push_back(&staffLayerVerseTree);
 
     // We first fill a tree of int with [staff/layer] and [staff/layer/verse] numbers (@n) to be process
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &params);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
 
     // The tree is used to process each staff/layer/verse separatly
     // For this, we use a array of AttCommmonNComparison that looks for each object if it is of the type
@@ -136,7 +135,15 @@ void Doc::ExportMIDI(MidiFile *midiFile)
     // track 0 (included by default) is reserved for meta messages common to all tracks
     int midiTrack = 1;
     std::vector<AttComparison *> filters;
-    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
+         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+
+        int transSemi = 0;
+        // Get the transposition (semi-tone) value for the staff
+        if (StaffDef *staffDef = this->m_scoreDef.GetStaffDef(staves->first)) {
+            if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
+        }
+
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             midiFile->addTrack(1);
             filters.clear();
@@ -146,21 +153,14 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
-            double currentMeasureTime = 0.0;
-            double totalTime = 0.0;
-            std::vector<double> maxValuesLayer = maxValues;
+            GenerateMIDIParams generateMIDIParams(midiFile);
+            generateMIDIParams.m_maxValues = calcMaxMeasureDurationParams.m_maxValues;
+            generateMIDIParams.m_transSemi = transSemi;
+            Functor generateMIDI(&Object::GenerateMIDI);
+            Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
 
-            params.clear();
-            params.push_back(midiFile);
-            params.push_back(&midiTrack);
-            params.push_back(&currentMeasureTime);
-            params.push_back(&totalTime);
-            params.push_back(&maxValuesLayer);
-            Functor exportMIDI(&Object::ExportMIDI);
-            Functor exportMIDIEnd(&Object::ExportMIDIEnd);
-
-            LogMessage("Exporting track %d ----------------", midiTrack);
-            this->Process(&exportMIDI, &params, &exportMIDIEnd, &filters);
+            // LogDebug("Exporting track %d ----------------", midiTrack);
+            this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);
 
             midiTrack++;
         }
@@ -171,7 +171,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
 void Doc::PrepareDrawing()
 {
-    ArrayPtrVoid params;
+    FunctorParams params;
 
     if (m_drawingPreparationDone) {
         Functor resetDrawing(&Object::ResetDrawing);
@@ -179,45 +179,38 @@ void Doc::PrepareDrawing()
     }
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
-    ArrayOfInterfaceClassIdPairs timeSpanningInterfaces;
-    bool fillList = true;
-    params.push_back(&timeSpanningInterfaces);
-    params.push_back(&fillList);
+    PrepareTimeSpanningParams prepareTimeSpanningParams;
     Functor prepareTimeSpanning(&Object::PrepareTimeSpanning);
     Functor prepareTimeSpanningEnd(&Object::PrepareTimeSpanningEnd);
-    this->Process(&prepareTimeSpanning, &params, &prepareTimeSpanningEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
+    this->Process(
+        &prepareTimeSpanning, &prepareTimeSpanningParams, &prepareTimeSpanningEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
 
     // First we try backwards because normally the spanning elements are at the end of
     // the measure. However, in some case, one (or both) end points will appear afterwards
     // in the encoding. For these, the previous iteration will not have resolved the link and
     // the spanning elements will remain in the timeSpanningElements array. We try again forwards
     // but this time without filling the list (that is only will the remaining elements)
-    if (!timeSpanningInterfaces.empty()) {
-        fillList = false;
-        this->Process(&prepareTimeSpanning, &params);
+    if (!prepareTimeSpanningParams.m_timeSpanningInterfaces.empty()) {
+        prepareTimeSpanningParams.m_fillList = false;
+        this->Process(&prepareTimeSpanning, &prepareTimeSpanningParams);
     }
 
     // Now try to match the @tstamp and @tstamp2 attributes.
-    params.clear();
-    ArrayOfObjectBeatPairs tstamps;
-    params.push_back(&timeSpanningInterfaces);
-    params.push_back(&tstamps);
+    PrepareTimestampsParams prepareTimestampsParams;
+    prepareTimestampsParams.m_timeSpanningInterfaces = prepareTimeSpanningParams.m_timeSpanningInterfaces;
     Functor prepareTimestamps(&Object::PrepareTimestamps);
     Functor prepareTimestampsEnd(&Object::PrepareTimestampsEnd);
-    this->Process(&prepareTimestamps, &params, &prepareTimestampsEnd);
+    this->Process(&prepareTimestamps, &prepareTimestampsParams, &prepareTimestampsEnd);
 
     // If some are still there, then it is probably an issue in the encoding
-    if (!timeSpanningInterfaces.empty()) {
-        LogWarning("%d time spanning elements could not be matched", timeSpanningInterfaces.size());
+    if (!prepareTimestampsParams.m_timeSpanningInterfaces.empty()) {
+        LogWarning(
+            "%d time spanning elements could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
-    params.clear();
-    IntTree verseTree;
-    IntTree layerTree;
-    params.push_back(&verseTree);
-    params.push_back(&layerTree);
+    PrepareProcessingListsParams prepareProcessingListsParams;
     // Alternate solution with StaffN_LayerN_VerseN_t (see also Verse::PrepareDrawing)
     // StaffN_LayerN_VerseN_t staffLayerVerseTree;
     // params.push_back(&staffLayerVerseTree);
@@ -225,7 +218,7 @@ void Doc::PrepareDrawing()
     // We first fill a tree of ints with [staff/layer] and [staff/layer/verse] numbers (@n) to be processed
     // LogElapsedTimeStart();
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
-    this->Process(&prepareProcessingLists, &params);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
 
     // The tree is used to process each staff/layer/verse separately
     // For this, we use an array of AttCommmonNComparison that looks for each object if it is of the type
@@ -237,10 +230,9 @@ void Doc::PrepareDrawing()
 
     // Process by layer for matching @tie attribute - we process notes and chords, looking at
     // GetTie values and pitch and oct for matching notes
-    Chord *currentChord;
-    std::vector<Note *> currentNotes;
     std::vector<AttComparison *> filters;
-    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
+         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
@@ -249,20 +241,17 @@ void Doc::PrepareDrawing()
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
-            currentChord = NULL;
-            currentNotes.clear();
-            ArrayPtrVoid paramsTieAttr;
-            paramsTieAttr.push_back(&currentNotes);
-            paramsTieAttr.push_back(&currentChord);
+            PrepareTieAttrParams prepareTieAttrParams;
             Functor prepareTieAttr(&Object::PrepareTieAttr);
             Functor prepareTieAttrEnd(&Object::PrepareTieAttrEnd);
-            this->Process(&prepareTieAttr, &paramsTieAttr, &prepareTieAttrEnd, &filters);
+            this->Process(&prepareTieAttr, &prepareTieAttrParams, &prepareTieAttrEnd, &filters);
 
             // After having processed one layer, we check if we have open ties - if yes, we
             // must reset them and they will be ignored.
-            if (!currentNotes.empty()) {
+            if (!prepareTieAttrParams.m_currentNotes.empty()) {
                 std::vector<Note *>::iterator iter;
-                for (iter = currentNotes.begin(); iter != currentNotes.end(); iter++) {
+                for (iter = prepareTieAttrParams.m_currentNotes.begin();
+                     iter != prepareTieAttrParams.m_currentNotes.end(); iter++) {
                     LogWarning("Unable to match @tie of note '%s', skipping it", (*iter)->GetUuid().c_str());
                     (*iter)->ResetDrawingTieAttr();
                 }
@@ -270,8 +259,8 @@ void Doc::PrepareDrawing()
         }
     }
 
-    Note *currentNote = NULL;
-    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
+         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
@@ -280,18 +269,15 @@ void Doc::PrepareDrawing()
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
-            ArrayPtrVoid paramsPointers;
-            paramsPointers.push_back(&currentNote);
+            PreparePointersByLayerParams preparePointersByLayerParams;
             Functor preparePointersByLayer(&Object::PreparePointersByLayer);
-            this->Process(&preparePointersByLayer, &paramsPointers, NULL, &filters);
+            this->Process(&preparePointersByLayer, &preparePointersByLayerParams, NULL, &filters);
         }
     }
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
-    Syl *currentSyl;
-    Note *lastNote;
-    Note *lastButOneNote;
-    for (staves = verseTree.child.begin(); staves != verseTree.child.end(); ++staves) {
+    for (staves = prepareProcessingListsParams.m_verseTree.child.begin();
+         staves != prepareProcessingListsParams.m_verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';
@@ -306,16 +292,10 @@ void Doc::PrepareDrawing()
 
                 // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
                 // m_drawingLastNote is set only if the syl has a forward connector
-                currentSyl = NULL;
-                lastNote = NULL;
-                lastButOneNote = NULL;
-                ArrayPtrVoid paramsLyrics;
-                paramsLyrics.push_back(&currentSyl);
-                paramsLyrics.push_back(&lastNote);
-                paramsLyrics.push_back(&lastButOneNote);
+                PrepareLyricsParams prepareLyricsParams;
                 Functor prepareLyrics(&Object::PrepareLyrics);
                 Functor prepareLyricsEnd(&Object::PrepareLyricsEnd);
-                this->Process(&prepareLyrics, &paramsLyrics, &prepareLyricsEnd, &filters);
+                this->Process(&prepareLyrics, &prepareLyricsParams, &prepareLyricsEnd, &filters);
             }
         }
     }
@@ -323,22 +303,20 @@ void Doc::PrepareDrawing()
     // Once <slur>, <ties> and @ties are matched but also syl connectors, we need to set them as running
     // TimeSpanningInterface to each staff they are extended. This does not need to be done staff by staff because we
     // can just check the staff->GetN to see where we are (see Staff::FillStaffCurrentTimeSpanning)
-    params.clear();
-    std::vector<TimeSpanningInterface *> timeSpanningElements;
-    params.push_back(&timeSpanningElements);
+    FillStaffCurrentTimeSpanningParams fillStaffCurrentTimeSpanningParams;
     Functor fillStaffCurrentTimeSpanning(&Object::FillStaffCurrentTimeSpanning);
     Functor fillStaffCurrentTimeSpanningEnd(&Object::FillStaffCurrentTimeSpanningEnd);
-    this->Process(&fillStaffCurrentTimeSpanning, &params, &fillStaffCurrentTimeSpanningEnd);
+    this->Process(&fillStaffCurrentTimeSpanning, &fillStaffCurrentTimeSpanningParams, &fillStaffCurrentTimeSpanningEnd);
 
     // Something must be wrong in the encoding because a TimeSpanningInterface was left open
-    if (!timeSpanningElements.empty()) {
-        LogDebug("%d time spanning elements could not be set as running", timeSpanningElements.size());
+    if (!fillStaffCurrentTimeSpanningParams.m_timeSpanningElements.empty()) {
+        LogDebug("%d time spanning elements could not be set as running",
+            fillStaffCurrentTimeSpanningParams.m_timeSpanningElements.size());
     }
 
     // Process by staff for matching mRpt elements and setting the drawing number
-    MRpt *currentMRpt;
-    data_BOOLEAN multiNumber;
-    for (staves = layerTree.child.begin(); staves != layerTree.child.end(); ++staves) {
+    for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
+         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
@@ -347,19 +325,17 @@ void Doc::PrepareDrawing()
             filters.push_back(&matchStaff);
             filters.push_back(&matchLayer);
 
-            // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
-            // m_drawingLastNote is set only if the syl has a forward connector
-            currentMRpt = NULL;
             // We set multiNumber to NONE for indicated we need to look at the staffDef when reaching the first staff
-            multiNumber = BOOLEAN_NONE;
-            ArrayPtrVoid paramsRptAttr;
-            paramsRptAttr.push_back(&currentMRpt);
-            paramsRptAttr.push_back(&multiNumber);
-            paramsRptAttr.push_back(&m_scoreDef);
+            PrepareRptParams prepareRptParams(&m_scoreDef);
             Functor prepareRpt(&Object::PrepareRpt);
-            this->Process(&prepareRpt, &paramsRptAttr, NULL, &filters);
+            this->Process(&prepareRpt, &prepareRptParams, NULL, &filters);
         }
     }
+
+    // Prepare the endings (pointers to the measure after and before the boundaries
+    PrepareBoundariesParams prepareEndingsParams;
+    Functor prepareEndings(&Object::PrepareBoundaries);
+    this->Process(&prepareEndings, &prepareEndingsParams);
 
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
@@ -379,7 +355,7 @@ void Doc::PrepareDrawing()
                 filters.push_back(&matchLayer);
                 filters.push_back(&matchVerse);
 
-                ArrayPtrVoid paramsLyrics;
+                FunctorParams paramsLyrics;
                 Functor prepareLyrics(&Object::PrepareLyrics);
                 this->Process(&prepareLyrics, paramsLyrics, NULL, &filters);
             }
@@ -392,34 +368,35 @@ void Doc::PrepareDrawing()
     m_drawingPreparationDone = true;
 }
 
-void Doc::SetCurrentScoreDef(bool force)
+void Doc::CollectScoreDefs(bool force)
 {
     if (m_currentScoreDefDone && !force) {
         return;
     }
 
-    ScoreDef currentScoreDef;
-    currentScoreDef = m_scoreDef;
-    StaffDef *staffDef = NULL;
-    ArrayPtrVoid params;
-    params.push_back(&currentScoreDef);
-    params.push_back(&staffDef);
+    if (m_currentScoreDefDone) {
+        Functor unsetCurrentScoreDef(&Object::UnsetCurrentScoreDef);
+        this->Process(&unsetCurrentScoreDef, NULL);
+    }
+
+    ScoreDef upcomingScoreDef = m_scoreDef;
+    SetCurrentScoreDefParams setCurrentScoreDefParams(&upcomingScoreDef);
     Functor setCurrentScoreDef(&Object::SetCurrentScoreDef);
 
     // First process the current scoreDef in order to fill the staffDef with
     // the appropriate drawing values
-    currentScoreDef.Process(&setCurrentScoreDef, &params);
+    upcomingScoreDef.Process(&setCurrentScoreDef, &setCurrentScoreDefParams);
 
     // LogElapsedTimeStart();
-    this->Process(&setCurrentScoreDef, &params);
+    this->Process(&setCurrentScoreDef, &setCurrentScoreDefParams);
     // LogElapsedTimeEnd ("Setting scoreDefs");
 
     m_currentScoreDefDone = true;
 }
 
-void Doc::CastOff()
+void Doc::CastOffDoc()
 {
-    this->SetCurrentScoreDef();
+    this->CollectScoreDefs();
 
     Page *contentPage = this->SetDrawingPage(0);
     assert(contentPage);
@@ -430,24 +407,19 @@ void Doc::CastOff()
 
     System *currentSystem = new System();
     contentPage->AddSystem(currentSystem);
-    int shift = -contentSystem->GetDrawingLabelsWidth();
-    int systemFullWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar - this->m_drawingPageRightMar
-        - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
-    // The width of the initial scoreDef is stored in the page scoreDef
-    int scoreDefWidth = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
-    ArrayPtrVoid params;
-    params.push_back(contentSystem);
-    params.push_back(contentPage);
-    params.push_back(&currentSystem);
-    params.push_back(&shift);
-    params.push_back(&systemFullWidth);
-    params.push_back(&scoreDefWidth);
+    CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem);
+    castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar
+        - this->m_drawingPageRightMar - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
+    castOffSystemsParams.m_shift = -contentSystem->GetDrawingLabelsWidth();
+    castOffSystemsParams.m_currentScoreDefWidth
+        = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
+
     Functor castOffSystems(&Object::CastOffSystems);
-    contentSystem->Process(&castOffSystems, &params);
+    contentSystem->Process(&castOffSystems, &castOffSystemsParams);
     delete contentSystem;
 
     // Reset the scoreDef at the beginning of each system
-    this->SetCurrentScoreDef(true);
+    this->CollectScoreDefs(true);
     contentPage->LayOutVertically();
 
     // Detach the contentPage
@@ -456,16 +428,11 @@ void Doc::CastOff()
 
     Page *currentPage = new Page();
     this->AddPage(currentPage);
-    shift = 0;
-    int pageFullHeight = this->m_drawingPageHeight - this->m_drawingPageTopMar; // obviously we need a bottom margin
-    params.clear();
-    params.push_back(contentPage);
-    params.push_back(this);
-    params.push_back(&currentPage);
-    params.push_back(&shift);
-    params.push_back(&pageFullHeight);
+    CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
+    castOffPagesParams.m_pageHeight
+        = this->m_drawingPageHeight - this->m_drawingPageTopMar; // obviously we need a bottom margin
     Functor castOffPages(&Object::CastOffPages);
-    contentPage->Process(&castOffPages, &params);
+    contentPage->Process(&castOffPages, &castOffPagesParams);
     delete contentPage;
 
     // LogDebug("Layout: %d pages", this->GetChildCount());
@@ -473,20 +440,19 @@ void Doc::CastOff()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->SetCurrentScoreDef(true);
+    this->CollectScoreDefs(true);
 }
 
-void Doc::UnCastOff()
+void Doc::UnCastOffDoc()
 {
     Page *contentPage = new Page();
     System *contentSystem = new System();
     contentPage->AddSystem(contentSystem);
 
-    ArrayPtrVoid params;
-    params.push_back(contentSystem);
+    UnCastOffParams unCastOffParams(contentSystem);
 
     Functor unCastOff(&Object::UnCastOff);
-    this->Process(&unCastOff, &params);
+    this->Process(&unCastOff, &unCastOffParams);
 
     this->ClearChildren();
 
@@ -497,7 +463,7 @@ void Doc::UnCastOff()
     // We need to reset the drawing page to NULL
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
-    this->SetCurrentScoreDef(true);
+    this->CollectScoreDefs(true);
 }
 
 bool Doc::HasPage(int pageIdx) const
@@ -690,7 +656,8 @@ char Doc::GetLeftMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_style->m_leftMarginAccid;
     if (classId == BARLINE) return m_style->m_leftMarginBarLine;
-    if (classId == BARLINE_ATTR) return m_style->m_leftMarginBarLineAttr;
+    if (classId == BARLINE_ATTR_LEFT) return m_style->m_leftMarginBarLineAttrLeft;
+    if (classId == BARLINE_ATTR_RIGHT) return m_style->m_leftMarginBarLineAttrRight;
     if (classId == BEATRPT) return m_style->m_leftMarginBeatRpt;
     if (classId == CHORD) return m_style->m_leftMarginChord;
     if (classId == CLEF) return m_style->m_leftMarginClef;
@@ -710,7 +677,8 @@ char Doc::GetRightMargin(const ClassId classId) const
 {
     if (classId == ACCID) return m_style->m_rightMarginAccid;
     if (classId == BARLINE) return m_style->m_rightMarginBarLine;
-    if (classId == BARLINE_ATTR) return m_style->m_rightMarginBarLineAttr;
+    if (classId == BARLINE_ATTR_LEFT) return m_style->m_rightMarginBarLineAttrLeft;
+    if (classId == BARLINE_ATTR_RIGHT) return m_style->m_rightMarginBarLineAttrRight;
     if (classId == BEATRPT) return m_style->m_rightMarginBeatRpt;
     if (classId == CHORD) return m_style->m_rightMarginChord;
     if (classId == CLEF) return m_style->m_rightMarginClef;
@@ -885,15 +853,13 @@ int Doc::GetAdjustedDrawingPageWidth() const
 // Doc functors methods
 //----------------------------------------------------------------------------
 
-int Doc::PrepareLyricsEnd(ArrayPtrVoid *params)
+int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
 {
-    // param 0: the current Syl
-    // param 1: the last Note
-    Syl **currentSyl = static_cast<Syl **>((*params).at(0));
-    Note **lastNote = static_cast<Note **>((*params).at(1));
+    PrepareLyricsParams *params = dynamic_cast<PrepareLyricsParams *>(functorParams);
+    assert(params);
 
-    if ((*currentSyl) && (*lastNote)) {
-        (*currentSyl)->SetEnd(*lastNote);
+    if (params->m_currentSyl && params->m_lastNote) {
+        params->m_currentSyl->SetEnd(params->m_lastNote);
     }
 
     return FUNCTOR_STOP;

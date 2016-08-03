@@ -1067,10 +1067,10 @@ private:
     /**
      * Describes a curve as one or more pairs of values with respect to an imaginary
      * line connecting the starting and ending points of the curve.
-     * The first value of each pair represents a point along the line, expressed as a
-     * percentage of the line's length. The second value captures a distance to the
-     * left (positive value) or right (negative value) of the line, expressed in
-     * virtual units. N.B. An MEI virtual unit (VU) is half the distance between
+     * The first value captures a distance to the left (positive value) or right
+     * (negative value) of the line, expressed in virtual units. The second value of
+     * each pair represents a point along the line, expressed as a percentage of the
+     * line's length. N.B. An MEI virtual unit (VU) is half the distance between
      * adjacent staff lines.
      **/
     double m_bulge;
@@ -2099,16 +2099,74 @@ public:
      * to the default value)
      **/
     ///@{
+    void SetSig(data_KEYSIGNATURE sig_) { m_sig = sig_; };
+    data_KEYSIGNATURE GetSig() const { return m_sig; };
+    bool HasSig() const;
+    //
+    void SetSigMixed(std::string sigMixed_) { m_sigMixed = sigMixed_; };
+    std::string GetSigMixed() const { return m_sigMixed; };
+    bool HasSigMixed() const;
+    //
     void SetMode(data_MODE mode_) { m_mode = mode_; };
     data_MODE GetMode() const { return m_mode; };
     bool HasMode() const;
     ///@}
 
 private:
+    /** Indicates where the key lies in the circle of fifths. **/
+    data_KEYSIGNATURE m_sig;
+    /**
+     * Mixed key signatures, e.g.
+     * those consisting of a mixture of flats and sharps (Read, p. 143, ex. 9-39), and
+     * key signatures with unorthodox placement of the accidentals (Read, p. 141) must
+     * be indicated by setting the key.sig attribute to 'mixed' and providing explicit
+     * key signature information in the key.sig.mixed attribute or in the <keySig>
+     * element. It is intended that key.sig.mixed contain a series of tokens with each
+     * token containing pitch name, accidental, and octave, such as 'a4 c5s e5f' that
+     * indicate what key accidentals should be rendered and where they should be
+     * placed.
+     **/
+    std::string m_sigMixed;
     /** Indicates major, minor, or other tonality. **/
     data_MODE m_mode;
 
     /* include <attmode> */
+};
+
+//----------------------------------------------------------------------------
+// AttKeySigVis
+//----------------------------------------------------------------------------
+
+class AttKeySigVis : public Att {
+public:
+    AttKeySigVis();
+    virtual ~AttKeySigVis();
+
+    /** Reset the default values for the attribute class **/
+    void ResetKeySigVis();
+
+    /** Read the values for the attribute class **/
+    bool ReadKeySigVis(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteKeySigVis(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetSigShowchange(data_BOOLEAN sigShowchange_) { m_sigShowchange = sigShowchange_; };
+    data_BOOLEAN GetSigShowchange() const { return m_sigShowchange; };
+    bool HasSigShowchange() const;
+    ///@}
+
+private:
+    /** Determines whether cautionary accidentals should be displayed at a key change. **/
+    data_BOOLEAN m_sigShowchange;
+
+    /* include <attsig.showchange> */
 };
 
 //----------------------------------------------------------------------------
@@ -2620,8 +2678,8 @@ public:
     std::string GetLyricName() const { return m_lyricName; };
     bool HasLyricName() const;
     //
-    void SetLyricSize(std::string lyricSize_) { m_lyricSize = lyricSize_; };
-    std::string GetLyricSize() const { return m_lyricSize; };
+    void SetLyricSize(int lyricSize_) { m_lyricSize = lyricSize_; };
+    int GetLyricSize() const { return m_lyricSize; };
     bool HasLyricSize() const;
     //
     void SetLyricStyle(data_FONTSTYLE lyricStyle_) { m_lyricStyle = lyricStyle_; };
@@ -2641,7 +2699,7 @@ private:
     /** Sets the font name default value for lyrics. **/
     std::string m_lyricName;
     /** Sets the default font size value for lyrics. **/
-    std::string m_lyricSize;
+    int m_lyricSize;
     /** Sets the default font style value for lyrics. **/
     data_FONTSTYLE m_lyricStyle;
     /** Sets the default font weight value for lyrics. **/
@@ -3270,7 +3328,9 @@ private:
     /**
      * Used to describe tempo in terms of beats (often the meter signature denominator)
      * per minute, ala M.M.
-     * (Maezel's Metronome).
+     * (Maezel's Metronome). Do not confuse this attribute with midi.bpm or midi.mspb.
+     * In MIDI, a beat is always defined as a quarter note, *not the numerator of the
+     * time signature or the metronomic indication*.
      **/
     std::string m_mm;
     /** Captures the metronomic unit. **/
@@ -3397,8 +3457,8 @@ public:
     std::string GetMusicName() const { return m_musicName; };
     bool HasMusicName() const;
     //
-    void SetMusicSize(std::string musicSize_) { m_musicSize = musicSize_; };
-    std::string GetMusicSize() const { return m_musicSize; };
+    void SetMusicSize(int musicSize_) { m_musicSize = musicSize_; };
+    int GetMusicSize() const { return m_musicSize; };
     bool HasMusicSize() const;
     ///@}
 
@@ -3406,7 +3466,7 @@ private:
     /** Sets the default music font name. **/
     std::string m_musicName;
     /** Sets the default music font size. **/
-    std::string m_musicSize;
+    int m_musicSize;
 
     /* include <attmusic.size> */
 };
@@ -3487,8 +3547,8 @@ public:
     std::string GetHeadColor() const { return m_headColor; };
     bool HasHeadColor() const;
     //
-    void SetHeadFill(std::string headFill_) { m_headFill = headFill_; };
-    std::string GetHeadFill() const { return m_headFill; };
+    void SetHeadFill(data_FILL headFill_) { m_headFill = headFill_; };
+    data_FILL GetHeadFill() const { return m_headFill; };
     bool HasHeadFill() const;
     //
     void SetHeadFillcolor(std::string headFillcolor_) { m_headFillcolor = headFillcolor_; };
@@ -3516,7 +3576,7 @@ private:
     /** Captures the overall color of a notehead. **/
     std::string m_headColor;
     /** Describes how/if the notehead is filled. **/
-    std::string m_headFill;
+    data_FILL m_headFill;
     /** Captures the fill color of a notehead if different from the overall note color. **/
     std::string m_headFillcolor;
     /** Records any additional symbols applied to the notehead. **/
@@ -3733,6 +3793,172 @@ private:
     data_BOOLEAN m_optimize;
 
     /* include <attoptimize> */
+};
+
+//----------------------------------------------------------------------------
+// AttOriginLayerident
+//----------------------------------------------------------------------------
+
+class AttOriginLayerident : public Att {
+public:
+    AttOriginLayerident();
+    virtual ~AttOriginLayerident();
+
+    /** Reset the default values for the attribute class **/
+    void ResetOriginLayerident();
+
+    /** Read the values for the attribute class **/
+    bool ReadOriginLayerident(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteOriginLayerident(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetOriginLayer(std::string originLayer_) { m_originLayer = originLayer_; };
+    std::string GetOriginLayer() const { return m_originLayer; };
+    bool HasOriginLayer() const;
+    ///@}
+
+private:
+    /** Identifies the layer on which referenced notation occurs. **/
+    std::string m_originLayer;
+
+    /* include <attorigin.layer> */
+};
+
+//----------------------------------------------------------------------------
+// AttOriginStaffident
+//----------------------------------------------------------------------------
+
+class AttOriginStaffident : public Att {
+public:
+    AttOriginStaffident();
+    virtual ~AttOriginStaffident();
+
+    /** Reset the default values for the attribute class **/
+    void ResetOriginStaffident();
+
+    /** Read the values for the attribute class **/
+    bool ReadOriginStaffident(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteOriginStaffident(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetOriginStaff(std::string originStaff_) { m_originStaff = originStaff_; };
+    std::string GetOriginStaff() const { return m_originStaff; };
+    bool HasOriginStaff() const;
+    ///@}
+
+private:
+    /**
+     * Signifies the staff on which referenced notation occurs.
+     * Defaults to the same value as the local staff. Mandatory when applicable.
+     **/
+    std::string m_originStaff;
+
+    /* include <attorigin.staff> */
+};
+
+//----------------------------------------------------------------------------
+// AttOriginStartendid
+//----------------------------------------------------------------------------
+
+class AttOriginStartendid : public Att {
+public:
+    AttOriginStartendid();
+    virtual ~AttOriginStartendid();
+
+    /** Reset the default values for the attribute class **/
+    void ResetOriginStartendid();
+
+    /** Read the values for the attribute class **/
+    bool ReadOriginStartendid(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteOriginStartendid(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetOriginStartid(std::string originStartid_) { m_originStartid = originStartid_; };
+    std::string GetOriginStartid() const { return m_originStartid; };
+    bool HasOriginStartid() const;
+    //
+    void SetOriginEndid(std::string originEndid_) { m_originEndid = originEndid_; };
+    std::string GetOriginEndid() const { return m_originEndid; };
+    bool HasOriginEndid() const;
+    ///@}
+
+private:
+    /** Indicates the first element in a sequence of events. **/
+    std::string m_originStartid;
+    /** Indicates the final element in a sequence of events. **/
+    std::string m_originEndid;
+
+    /* include <attorigin.endid> */
+};
+
+//----------------------------------------------------------------------------
+// AttOriginTimestampMusical
+//----------------------------------------------------------------------------
+
+class AttOriginTimestampMusical : public Att {
+public:
+    AttOriginTimestampMusical();
+    virtual ~AttOriginTimestampMusical();
+
+    /** Reset the default values for the attribute class **/
+    void ResetOriginTimestampMusical();
+
+    /** Read the values for the attribute class **/
+    bool ReadOriginTimestampMusical(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteOriginTimestampMusical(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetOriginTstamp(data_MEASUREBEAT originTstamp_) { m_originTstamp = originTstamp_; };
+    data_MEASUREBEAT GetOriginTstamp() const { return m_originTstamp; };
+    bool HasOriginTstamp() const;
+    //
+    void SetOriginTstamp2(data_MEASUREBEAT originTstamp2_) { m_originTstamp2 = originTstamp2_; };
+    data_MEASUREBEAT GetOriginTstamp2() const { return m_originTstamp2; };
+    bool HasOriginTstamp2() const;
+    ///@}
+
+private:
+    /**
+     * Encodes the starting point of musical material in terms of musical time, i.e., a
+     * (potentially negative) count of measures plus a beat location.
+     **/
+    data_MEASUREBEAT m_originTstamp;
+    /**
+     * Encodes the ending point of musical material in terms of musical time, i.e., a
+     * count of measures plus a beat location.
+     * The values are relative to the measure identified by @origin.tstamp.
+     **/
+    data_MEASUREBEAT m_originTstamp2;
+
+    /* include <attorigin.tstamp2> */
 };
 
 //----------------------------------------------------------------------------
@@ -3999,22 +4225,17 @@ public:
     void SetPlist(std::string plist_) { m_plist = plist_; };
     std::string GetPlist() const { return m_plist; };
     bool HasPlist() const;
-    //
-    void SetEvaluate(plist_EVALUATE evaluate_) { m_evaluate = evaluate_; };
-    plist_EVALUATE GetEvaluate() const { return m_evaluate; };
-    bool HasEvaluate() const;
     ///@}
 
 private:
     /**
-     * Contains a space separated list of references that identify logical events that
-     * participate in a collection, such as notes under a phrase mark.
+     * Contains a space separated list of references that identify active participants
+     * in a collection/relationship, such as notes under a phrase mark; that is, the
+     * entities pointed "from".
      **/
     std::string m_plist;
-    /** Specifies the intended meaning when the target of a pointer is itself a pointer. **/
-    plist_EVALUATE m_evaluate;
 
-    /* include <attevaluate> */
+    /* include <attplist> */
 };
 
 //----------------------------------------------------------------------------
@@ -4060,10 +4281,6 @@ public:
     void SetTargettype(std::string targettype_) { m_targettype = targettype_; };
     std::string GetTargettype() const { return m_targettype; };
     bool HasTargettype() const;
-    //
-    void SetTitle(std::string title_) { m_title = title_; };
-    std::string GetTitle() const { return m_title; };
-    bool HasTitle() const;
     ///@}
 
 private:
@@ -4083,14 +4300,12 @@ private:
      **/
     std::string m_target;
     /**
-     * In contrast with the role attribute, allows the target resource to be
-     * characterized using any convenient classification scheme or typology.
+     * Characterization of target resource(s) using any convenient classification
+     * scheme or typology.
      **/
     std::string m_targettype;
-    /** --- **/
-    std::string m_title;
 
-    /* include <atttitle> */
+    /* include <atttargettype> */
 };
 
 //----------------------------------------------------------------------------
@@ -4199,8 +4414,8 @@ public:
 
 private:
     /**
-     * Captures information regarding responsibility for some aspect of the text's
-     * creation, transcription, editing, or encoding.
+     * Indicates the agent(s) responsible for some aspect of the text's creation,
+     * transcription, editing, or encoding.
      * Its value must point to one or more identifiers declared in the document header.
      **/
     std::string m_resp;
@@ -4268,14 +4483,14 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetScale(int scale_) { m_scale = scale_; };
-    int GetScale() const { return m_scale; };
+    void SetScale(data_PERCENT scale_) { m_scale = scale_; };
+    data_PERCENT GetScale() const { return m_scale; };
     bool HasScale() const;
     ///@}
 
 private:
     /** Scale factor to be applied to the feature to make it the desired display size. **/
-    int m_scale;
+    data_PERCENT m_scale;
 
     /* include <attscale> */
 };
@@ -5224,6 +5439,81 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// AttTargeteval
+//----------------------------------------------------------------------------
+
+class AttTargeteval : public Att {
+public:
+    AttTargeteval();
+    virtual ~AttTargeteval();
+
+    /** Reset the default values for the attribute class **/
+    void ResetTargeteval();
+
+    /** Read the values for the attribute class **/
+    bool ReadTargeteval(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteTargeteval(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetEvaluate(targeteval_EVALUATE evaluate_) { m_evaluate = evaluate_; };
+    targeteval_EVALUATE GetEvaluate() const { return m_evaluate; };
+    bool HasEvaluate() const;
+    ///@}
+
+private:
+    /**
+     * Specifies the intended meaning when a participant in a relationship is itself a
+     * pointer.
+     **/
+    targeteval_EVALUATE m_evaluate;
+
+    /* include <attevaluate> */
+};
+
+//----------------------------------------------------------------------------
+// AttTempoLog
+//----------------------------------------------------------------------------
+
+class AttTempoLog : public Att {
+public:
+    AttTempoLog();
+    virtual ~AttTempoLog();
+
+    /** Reset the default values for the attribute class **/
+    void ResetTempoLog();
+
+    /** Read the values for the attribute class **/
+    bool ReadTempoLog(pugi::xml_node element);
+
+    /** Write the values for the attribute class **/
+    bool WriteTempoLog(pugi::xml_node element);
+
+    /**
+     * @name Setters, getters and presence checker for class members.
+     * The checker returns true if the attribute class is set (e.g., not equal
+     * to the default value)
+     **/
+    ///@{
+    void SetFunc(tempoLog_FUNC func_) { m_func = func_; };
+    tempoLog_FUNC GetFunc() const { return m_func; };
+    bool HasFunc() const;
+    ///@}
+
+private:
+    /** Records the function of an accidental. **/
+    tempoLog_FUNC m_func;
+
+    /* include <attfunc> */
+};
+
+//----------------------------------------------------------------------------
 // AttTextstyle
 //----------------------------------------------------------------------------
 
@@ -5255,8 +5545,8 @@ public:
     std::string GetTextName() const { return m_textName; };
     bool HasTextName() const;
     //
-    void SetTextSize(std::string textSize_) { m_textSize = textSize_; };
-    std::string GetTextSize() const { return m_textSize; };
+    void SetTextSize(int textSize_) { m_textSize = textSize_; };
+    int GetTextSize() const { return m_textSize; };
     bool HasTextSize() const;
     //
     void SetTextStyle(data_FONTSTYLE textStyle_) { m_textStyle = textStyle_; };
@@ -5283,7 +5573,7 @@ private:
      * Provides a default value for the font size of text (other than lyrics) when this
      * information is not provided on the individual elements.
      **/
-    std::string m_textSize;
+    int m_textSize;
     /**
      * Provides a default value for the font style of text (other than lyrics) when
      * this information is not provided on the individual elements.
@@ -5630,8 +5920,8 @@ public:
     std::string GetFontname() const { return m_fontname; };
     bool HasFontname() const;
     //
-    void SetFontsize(double fontsize_) { m_fontsize = fontsize_; };
-    double GetFontsize() const { return m_fontsize; };
+    void SetFontsize(int fontsize_) { m_fontsize = fontsize_; };
+    int GetFontsize() const { return m_fontsize; };
     bool HasFontsize() const;
     //
     void SetFontstyle(data_FONTSTYLE fontstyle_) { m_fontstyle = fontstyle_; };
@@ -5648,8 +5938,12 @@ private:
     std::string m_fontfam;
     /** Holds the name of a font. **/
     std::string m_fontname;
-    /** Indicates the size of a font in printers' points, i.e., 1/72nd of an inch. **/
-    double m_fontsize;
+    /**
+     * Indicates the size of a font expressed in printers' points, i.e., 1/72nd of an
+     * inch, relative terms, e.g., "small", "larger", etc., or percentage values
+     * relative to "normal" size, e.g., "125%".
+     **/
+    int m_fontsize;
     /** Records the style of a font, i.e, italic, oblique, or normal. **/
     data_FONTSTYLE m_fontstyle;
     /** Used to indicate bold type. **/

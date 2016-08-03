@@ -41,7 +41,7 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
     if (tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH) && (tuplet->GetNoteCount() != 0)) return true;
 
     // No we contain a beam? Go on and search for it in the children
-    for (unsigned int i = 0; i < tuplet->GetChildCount(); i++) {
+    for (int i = 0; i < tuplet->GetChildCount(); i++) {
         currentBeam = dynamic_cast<Beam *>(tuplet->GetChild(i));
 
         // first child is not a beam, or it is a beam but we have more than one child

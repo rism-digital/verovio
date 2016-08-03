@@ -284,7 +284,7 @@ public:
     ///@}
 
     /**
-     * @name Set and get the xPath query for selecting <rdg> (if any)
+     * @name Set and get the xPath query for selecting <app> (if any)
      */
     ///@{
     void SetAppXPathQuery(std::string const &appXPathQuery) { m_appXPathQuery = appXPathQuery; };
@@ -292,7 +292,7 @@ public:
     ///@}
 
     /**
-     * @name Set and get the xPath query for selecting <rdg> (if any)
+     * @name Set and get the xPath query for selecting <app> (if any)
      */
     ///@{
     void SetScoreBasedMei(bool scoreBasedMei) { m_scoreBasedMei = scoreBasedMei; };
@@ -350,7 +350,6 @@ private:
     int m_pageHeight;
     int m_pageWidth;
     int m_border; // to be replace by pageRightMar, pageLeftMar, pageTopMar
-    int m_unit;
     /** given in units **/
     int m_spacingStaff;
     int m_spacingSystem;

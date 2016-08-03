@@ -12,8 +12,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "vrvdef.h"
 #include "attconverter.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -129,6 +129,9 @@ public:
 
     std::string OrientationToStr(data_ORIENTATION data) const;
     data_ORIENTATION StrToOrientation(std::string value) const;
+
+    std::string PercentToStr(data_PERCENT data) const;
+    data_PERCENT StrToPercent(std::string value) const;
 
     std::string PitchnameToStr(data_PITCHNAME data) const;
     data_PITCHNAME StrToPitchname(std::string value) const;

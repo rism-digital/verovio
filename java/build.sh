@@ -16,6 +16,7 @@ FILES="../src/accid.cpp \
              ../src/barline.cpp \
              ../src/bboxdevicecontext.cpp \
              ../src/beam.cpp \
+             ../src/boundary.cpp \
              ../src/chord.cpp \
              ../src/clef.cpp \
              ../src/custos.cpp \
@@ -27,6 +28,7 @@ FILES="../src/accid.cpp \
              ../src/durationinterface.cpp \
              ../src/dynam.cpp \
              ../src/editorial.cpp \
+             ../src/ending.cpp \
              ../src/floatingelement.cpp \
              ../src/glyph.cpp \
              ../src/hairpin.cpp \
@@ -46,7 +48,9 @@ FILES="../src/accid.cpp \
              ../src/multirest.cpp \
              ../src/note.cpp \
              ../src/object.cpp \
+             ../src/octave.cpp \
              ../src/page.cpp \
+             ../src/pedal.cpp \
              ../src/pitchinterface.cpp \
              ../src/positioninterface.cpp \
              ../src/proport.cpp \

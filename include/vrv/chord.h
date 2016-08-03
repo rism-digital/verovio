@@ -36,7 +36,8 @@ class Chord : public LayerElement,
               public AttCommon,
               public AttStems,
               public AttStemsCmn,
-              public AttTiepresent {
+              public AttTiepresent,
+              public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -104,12 +105,12 @@ public:
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr(ArrayPtrVoid *params);
+    virtual int PrepareTieAttr(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttrEnd(ArrayPtrVoid *params);
+    virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
 
 protected:
     /**

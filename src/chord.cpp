@@ -14,7 +14,9 @@
 
 //----------------------------------------------------------------------------
 
+#include "functorparams.h"
 #include "note.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -31,12 +33,14 @@ Chord::Chord()
     , AttStems()
     , AttStemsCmn()
     , AttTiepresent()
+    , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
+    RegisterAttClass(ATT_VISIBILITY);
 
     Reset();
 
@@ -58,6 +62,7 @@ void Chord::Reset()
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();
+    ResetVisibility();
 
     ClearClusters();
 }
@@ -211,16 +216,17 @@ void Chord::ResetAccidSpace(int fullUnit)
      * Resize m_accidSpace to be as tall as possibly necessary; must accomodate every accidental stacked vertically.
      */
     int accidHeight = ACCID_HEIGHT * halfUnit;
-    int yMax, yMin;
+    int yMax = 0, yMin = 0;
     this->GetYExtremes(&yMax, &yMin);
     m_accidSpaceTop = yMax + (accidHeight / 2);
     m_accidSpaceBot = yMin - (accidHeight / 2);
     int height = (m_accidSpaceTop - m_accidSpaceBot) / halfUnit;
+    assert(height >= 0);
     m_accidSpace.resize(height);
 
     // Resize each row in m_accidSpace to be the proper length; set all the bools to false
     std::vector<bool> *accidLine;
-    for (idx = 0; idx < m_accidSpace.size(); idx++) {
+    for (idx = 0; idx < (int)m_accidSpace.size(); idx++) {
         accidLine = &m_accidSpace.at(idx);
         accidLine->resize(accidLineLength);
         for (setIdx = 0; setIdx < accidLineLength; setIdx++) accidLine->at(setIdx) = false;
@@ -232,6 +238,7 @@ void Chord::GetYExtremes(int *yMax, int *yMin)
     bool passed = false;
     int y1;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
         Note *note = dynamic_cast<Note *>(*it);
         if (!note) continue;
@@ -250,6 +257,7 @@ void Chord::GetYExtremes(int *yMax, int *yMin)
             }
         }
     }
+    assert(passed);
 }
 
 void Chord::SetDrawingStemDir(data_STEMDIRECTION stemDir)
@@ -292,26 +300,24 @@ void Chord::SetDrawingStemEnd(Point stemEnd)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Chord::PrepareTieAttr(ArrayPtrVoid *params)
+int Chord::PrepareTieAttr(FunctorParams *functorParams)
 {
-    // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
-    // param 1: Chord** currentChord for the current chord if in a chord
-    Chord **currentChord = static_cast<Chord **>((*params).at(1));
+    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
+    assert(params);
 
-    assert(!(*currentChord));
-    (*currentChord) = this;
+    assert(!params->m_currentChord);
+    params->m_currentChord = this;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Chord::PrepareTieAttrEnd(ArrayPtrVoid *params)
+int Chord::PrepareTieAttrEnd(FunctorParams *functorParams)
 {
-    // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
-    // param 1: Chord** currentChord for the current chord if in a chord
-    Chord **currentChord = static_cast<Chord **>((*params).at(1));
+    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
+    assert(params);
 
-    assert((*currentChord));
-    (*currentChord) = NULL;
+    assert(params->m_currentChord);
+    params->m_currentChord = NULL;
 
     return FUNCTOR_CONTINUE;
 }

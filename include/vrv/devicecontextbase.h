@@ -56,18 +56,23 @@ enum {
 
 class Pen {
 public:
-    Pen() : m_penColour(0), m_penWidth(0), m_penOpacity(0.0) {}
-    Pen(int colour, int width, float opacity) : m_penColour(colour), m_penWidth(width), m_penOpacity(opacity) {}
+    Pen() : m_penColour(0), m_penWidth(0), m_dashLength(0), m_penOpacity(0.0) {}
+    Pen(int colour, int width, float opacity, int dashLength)
+        : m_penColour(colour), m_penWidth(width), m_dashLength(dashLength), m_penOpacity(opacity)
+    {
+    }
 
     int GetColour() const { return m_penColour; }
     void SetColour(int colour) { m_penColour = colour; }
     int GetWidth() const { return m_penWidth; }
     void SetWidth(int width) { m_penWidth = width; }
+    int GetDashLenght() const { return m_dashLength; }
+    void SetDashLength(int dashLength) { m_dashLength = dashLength; }
     float GetOpacity() const { return m_penOpacity; }
     void SetOpacity(float opacity) { m_penOpacity = opacity; }
 
 public:
-    int m_penColour, m_penWidth;
+    int m_penColour, m_penWidth, m_dashLength;
     float m_penOpacity;
 };
 

@@ -15,7 +15,9 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "ending.h"
 #include "floatingelement.h"
+#include "functorparams.h"
 #include "page.h"
 #include "staff.h"
 #include "system.h"
@@ -29,8 +31,7 @@ namespace vrv {
 // Measure
 //----------------------------------------------------------------------------
 
-Measure::Measure(bool measureMusic, int logMeasureNb)
-    :  Object("measure-"), AttCommon(), AttMeasureLog(), AttPointing()
+Measure::Measure(bool measureMusic, int logMeasureNb) : Object("measure-"), AttCommon(), AttMeasureLog(), AttPointing()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_MEASURELOG);
@@ -42,11 +43,19 @@ Measure::Measure(bool measureMusic, int logMeasureNb)
     // Idem for timestamps
     m_timestampAligner.SetParent(this);
 
+    // owned pointers need to be set to NULL;
+    m_drawingScoreDef = NULL;
+
+    // Make the left barLine a left one...
+    m_leftBarLine.SetLeft();
+
     Reset();
 }
 
 Measure::~Measure()
 {
+    // We need to delete own objects
+    Reset();
 }
 
 void Measure::Reset()
@@ -55,6 +64,11 @@ void Measure::Reset()
     ResetCommon();
     ResetMeasureLog();
     ResetPointing();
+
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
 
     m_timestampAligner.Reset();
     m_measuredMusic = true;
@@ -69,6 +83,8 @@ void Measure::Reset()
     if (!m_measuredMusic) {
         m_xAbs = 0;
     }
+
+    m_drawingEnding = NULL;
 }
 
 void Measure::AddFloatingElement(FloatingElement *element)
@@ -99,43 +115,90 @@ void Measure::AddStaff(Staff *staff)
     }
 }
 
-int Measure::GetXRel() const
+int Measure::GetLeftBarLineXRel() const
 {
-    if (m_measureAligner.GetLeftAlignment()) {
-        return m_measureAligner.GetLeftAlignment()->GetXRel();
+    if (m_measureAligner.GetLeftBarLineAlignment()) {
+        return m_measureAligner.GetLeftBarLineAlignment()->GetXRel();
     }
     return 0;
 }
 
-int Measure::GetLeftBarLineX() const
+int Measure::GetLeftBarLineX1Rel() const
 {
-    if (m_measureAligner.GetLeftAlignment()) {
-        return m_measureAligner.GetLeftAlignment()->GetXRel();
+    int x = GetLeftBarLineXRel();
+    if (m_leftBarLine.HasUpdatedBB()) {
+        x += m_leftBarLine.m_contentBB_x1;
+    }
+    return x;
+}
+
+int Measure::GetLeftBarLineX2Rel() const
+{
+    int x = GetLeftBarLineXRel();
+    if (m_leftBarLine.HasUpdatedBB()) {
+        x += m_leftBarLine.m_contentBB_x2;
+    }
+    return x;
+}
+
+int Measure::GetRightBarLineXRel() const
+{
+    if (m_measureAligner.GetRightBarLineAlignment()) {
+        return m_measureAligner.GetRightBarLineAlignment()->GetXRel();
     }
     return 0;
 }
 
-int Measure::GetRightBarLineX() const
+int Measure::GetRightBarLineX1Rel() const
 {
+    int x = GetRightBarLineXRel();
+    if (m_rightBarLine.HasUpdatedBB()) {
+        x += m_rightBarLine.m_contentBB_x1;
+    }
+    return x;
+}
+
+int Measure::GetRightBarLineX2Rel() const
+{
+    int x = GetRightBarLineXRel();
+    if (m_rightBarLine.HasUpdatedBB()) {
+        x += m_rightBarLine.m_contentBB_x2;
+    }
+    return x;
+}
+
+int Measure::GetWidth() const
+{
+    assert(m_measureAligner.GetRightAlignment());
     if (m_measureAligner.GetRightAlignment()) {
         return m_measureAligner.GetRightAlignment()->GetXRel();
     }
     return 0;
 }
 
-int Measure::GetWidth() const
+void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 {
-    if (m_measureAligner.GetRightAlignment()) {
-        return GetRightBarLineX() + m_measureAligner.GetRightAlignment()->GetMaxWidth();
-    }
-    return 0;
+    assert(!m_drawingScoreDef); // We should always call UnsetCurrentScoreDef before
+
+    m_drawingScoreDef = new ScoreDef();
+    *m_drawingScoreDef = *drawingScoreDef;
 }
 
 //----------------------------------------------------------------------------
 // Measure functor methods
 //----------------------------------------------------------------------------
 
-int Measure::ResetHorizontalAlignment(ArrayPtrVoid *params)
+int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
+{
+    if (m_drawingScoreDef) {
+        delete m_drawingScoreDef;
+        m_drawingScoreDef = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+};
+
+int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_drawingXRel = 0;
     m_drawingX = 0;
@@ -149,14 +212,10 @@ int Measure::ResetHorizontalAlignment(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::AlignHorizontally(ArrayPtrVoid *params)
+int Measure::AlignHorizontally(FunctorParams *functorParams)
 {
-    // param 0: the measureAligner
-    // param 1: the time (unused)
-    // param 2: the current Mensur (unused)
-    // param 3: the current MeterSig (unused)
-    // param 4: the functor for passing it to the TimeStampAligner (unused)
-    MeasureAligner **measureAligner = static_cast<MeasureAligner **>((*params).at(0));
+    AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
+    assert(params);
 
     // clear the content of the measureAligner
     m_measureAligner.Reset();
@@ -166,191 +225,184 @@ int Measure::AlignHorizontally(ArrayPtrVoid *params)
     this->SetRightBarLineType(this->GetRight());
 
     // point to it
-    (*measureAligner) = &m_measureAligner;
+    params->m_measureAligner = &m_measureAligner;
 
     if (m_leftBarLine.GetForm() != BARRENDITION_NONE) {
-        m_leftBarLine.SetAlignment(m_measureAligner.GetLeftAlignment());
+        m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment());
     }
 
     if (m_rightBarLine.GetForm() != BARRENDITION_NONE) {
-        m_rightBarLine.SetAlignment(m_measureAligner.GetRightAlignment());
+        m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment());
     }
 
     // LogDebug("\n ***** Align measure %d", this->GetN());
 
-    assert(*measureAligner);
+    assert(params->m_measureAligner);
 
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::AlignHorizontallyEnd(ArrayPtrVoid *params)
+int Measure::AlignHorizontallyEnd(FunctorParams *functorParams)
 {
-    // param 0: the measureAligner (unused)
-    // param 1: the time (unused)
-    // param 2: the current Mensur (unused)
-    // param 3: the current MeterSig (unused)
-    // param 4: the functor for passing it to the TimeStampAligner
-    Functor *alignHorizontally = static_cast<Functor *>((*params).at(4));
+    AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
+    assert(params);
 
     // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a
     // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work in
     // MEI anyway.
-    m_timestampAligner.Process(alignHorizontally, params);
+    m_timestampAligner.Process(params->m_functor, params);
 
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::AlignVertically(ArrayPtrVoid *params)
+int Measure::AlignVertically(FunctorParams *functorParams)
 {
-    // param 0: the systemAligner (unused)
-    // param 1: the staffIdx
-    // param 2: the staffN (unused)
-    // param 3: the doc (unused)
-    int *staffIdx = static_cast<int *>((*params).at(1));
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    assert(params);
 
     // we also need to reset the staffNb
-    (*staffIdx) = 0;
+    params->m_staffIdx = 0;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params)
+int Measure::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
-    // param 0: the functor to be redirected to Aligner
-    Functor *integrateBoundingBoxGraceXShift = static_cast<Functor *>((*params).at(0));
+    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    assert(params);
 
-    m_measureAligner.Process(integrateBoundingBoxGraceXShift, params);
+    // we reset the measure width and the minimum position
+    params->m_measureWidth = 0;
+    params->m_layerMinPos = 0;
+    params->m_minPos = 0;
+
+    // Process the left scoreDef elements and the left barLine
+    m_measureAligner.Process(params->m_functor, params);
+
+    params->m_layerMinPos = params->m_minPos;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
+{
+    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    assert(params);
+
+    // use the measure width as minimum position of the barLine
+    params->m_minPos = params->m_measureWidth;
+
+    // Process the right barLine and the right scoreDef elements
+    m_measureAligner.Process(params->m_functorEnd, params);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams)
+{
+    IntegrateBoundingBoxGraceXShiftParams *params
+        = dynamic_cast<IntegrateBoundingBoxGraceXShiftParams *>(functorParams);
+    assert(params);
+
+    m_measureAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::IntegrateBoundingBoxXShift(ArrayPtrVoid *params)
+int Measure::IntegrateBoundingBoxXShift(FunctorParams *functorParams)
 {
-    // param 0: the cumulated shift (unused)
-    // param 1: the cumulated justifiable shift (unused)
-    // param 2: the minimum measure width (unused)
-    // param 3: the doc for accessing drawing parameters (unused)
-    // param 4: the functor to be redirected to Aligner
-    Functor *integrateBoundingBoxShift = static_cast<Functor *>((*params).at(4));
+    IntegrateBoundingBoxXShiftParams *params = dynamic_cast<IntegrateBoundingBoxXShiftParams *>(functorParams);
+    assert(params);
 
-    m_measureAligner.Process(integrateBoundingBoxShift, params);
+    m_measureAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::SetAlignmentXPos(ArrayPtrVoid *params)
+int Measure::SetAlignmentXPos(FunctorParams *functorParams)
 {
-    // param 0: the previous time position (unused)
-    // param 1: the previous x rel position (unused)
-    // param 2: duration of the longest note (unused)
-    // param 3: the doc (unused)
-    // param 4: the functor to be redirected to Aligner
-    Functor *setAligmnentPosX = static_cast<Functor *>((*params).at(4));
+    SetAlignmentXPosParams *params = dynamic_cast<SetAlignmentXPosParams *>(functorParams);
+    assert(params);
 
-    m_measureAligner.Process(setAligmnentPosX, params);
+    m_measureAligner.Process(params->m_functor, params);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::JustifyX(ArrayPtrVoid *params)
+int Measure::JustifyX(FunctorParams *functorParams)
 {
-    // param 0: the justification ratio
-    // param 1: the justification ratio for the measure (depends on the margin) (unused)
-    // param 2: the non-justifiable margin (unused)
-    // param 3: the system full width (without system margins) (unused)
-    // param 4: the functor to be redirected to the MeasureAligner
-    double *ratio = static_cast<double *>((*params).at(0));
-    Functor *justifyX = static_cast<Functor *>((*params).at(4));
+    JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
+    assert(params);
 
-    this->m_drawingXRel = ceil((*ratio) * (double)this->m_drawingXRel);
-
-    m_measureAligner.Process(justifyX, params);
-
-    return FUNCTOR_SIBLINGS;
-}
-
-int Measure::AlignMeasures(ArrayPtrVoid *params)
-{
-    // param 0: the cumulated shift
-    int *shift = static_cast<int *>((*params).at(0));
-
-    this->m_drawingXRel = (*shift);
-
-    assert(m_measureAligner.GetRightAlignment());
-
-    (*shift) += m_measureAligner.GetRightAlignment()->GetXRel();
-
-    // We also need to take into account the measure end (right) barLine with here
-    if (GetRightBarLineType() != BARRENDITION_NONE) {
-        // shift the next measure of the total with
-        (*shift) += GetRightBarLine()->GetAlignment()->GetMaxWidth();
+    if (params->m_measureXRel > 0) {
+        this->m_drawingXRel = params->m_measureXRel;
+    }
+    else {
+        params->m_measureXRel = this->m_drawingXRel;
     }
 
+    m_measureAligner.Process(params->m_functor, params);
+
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::ResetDrawing(ArrayPtrVoid *params)
+int Measure::AlignMeasures(FunctorParams *functorParams)
 {
+    AlignMeasuresParams *params = dynamic_cast<AlignMeasuresParams *>(functorParams);
+    assert(params);
+
+    this->m_drawingXRel = params->m_shift;
+
+    params->m_shift += this->GetWidth();
+    params->m_justifiableWidth += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Measure::ResetDrawing(FunctorParams *functorParams)
+{
+    this->m_leftBarLine.Reset();
+    this->m_rightBarLine.Reset();
     this->m_timestampAligner.Reset();
+    m_drawingEnding = NULL;
     return FUNCTOR_CONTINUE;
 };
 
-int Measure::CastOffSystems(ArrayPtrVoid *params)
+int Measure::CastOffSystems(FunctorParams *functorParams)
 {
-    // param 0: a pointer to the system we are taking the content from
-    // param 1: a pointer the page we are adding system to
-    // param 2: a pointer to the current system
-    // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system)
-    // param 4: the system width
-    // param 5: the current scoreDef width
-    System *contentSystem = static_cast<System *>((*params).at(0));
-    Page *page = static_cast<Page *>((*params).at(1));
-    System **currentSystem = static_cast<System **>((*params).at(2));
-    int *shift = static_cast<int *>((*params).at(3));
-    int *systemWidth = static_cast<int *>((*params).at(4));
-    int *currentScoreDefWidth = static_cast<int *>((*params).at(5));
+    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
 
-    if (((*currentSystem)->GetChildCount() > 0)
-        && (this->m_drawingXRel + this->GetWidth() + (*currentScoreDefWidth) - (*shift) > (*systemWidth))) {
-        (*currentSystem) = new System();
-        page->AddSystem(*currentSystem);
-        (*shift) = this->m_drawingXRel;
-        ;
+    if ((params->m_currentSystem->GetChildCount() > 0)
+        && (this->m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift
+               > params->m_systemWidth)) {
+        params->m_currentSystem = new System();
+        params->m_page->AddSystem(params->m_currentSystem);
+        params->m_shift = this->m_drawingXRel;
     }
 
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    Measure *measure = dynamic_cast<Measure *>(contentSystem->Relinquish(this->GetIdx()));
+    Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     assert(measure);
-    (*currentSystem)->AddMeasure(measure);
+    params->m_currentSystem->AddMeasure(measure);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::SetDrawingXY(ArrayPtrVoid *params)
+int Measure::SetDrawingXY(FunctorParams *functorParams)
 {
-    // param 0: a pointer doc
-    // param 1: a pointer to the current system
-    // param 2: a pointer to the current measure
-    // param 3: a pointer to the current staff (unused)
-    // param 4: a pointer to the current layer (unused)
-    // param 5: a pointer to the view (unused)
-    // param 6: a bool indicating if we are processing layer elements or not
-    // param 7: a pointer to the functor for passing it to the timestamps
-    Doc *doc = static_cast<Doc *>((*params).at(0));
-    System **currentSystem = static_cast<System **>((*params).at(1));
-    Measure **currentMeasure = static_cast<Measure **>((*params).at(2));
-    bool *processLayerElements = static_cast<bool *>((*params).at(6));
-    Functor *setDrawingXY = static_cast<Functor *>((*params).at(7));
+    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
+    assert(params);
 
-    (*currentMeasure) = this;
+    params->m_currentMeasure = this;
 
     // Second pass where we do just process layer elements
-    if ((*processLayerElements)) {
+    if (params->m_processLayerElements) {
         // However, we need to process the timestamps
-        m_timestampAligner.Process(setDrawingXY, params);
+        m_timestampAligner.Process(params->m_functor, params);
         return FUNCTOR_CONTINUE;
     }
 
@@ -358,38 +410,35 @@ int Measure::SetDrawingXY(ArrayPtrVoid *params)
     // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_xAbs
     if (this->m_xAbs == VRV_UNSET) {
-        assert(doc->GetType() == Raw);
-        this->SetDrawingX(this->m_drawingXRel + (*currentSystem)->GetDrawingX());
+        assert(params->m_doc->GetType() == Raw);
+        this->SetDrawingX(this->m_drawingXRel + params->m_currentSystem->GetDrawingX());
     }
     else {
-        assert(doc->GetType() == Transcription);
+        assert(params->m_doc->GetType() == Transcription);
         this->SetDrawingX(this->m_xAbs);
     }
 
     // Process the timestamps - we can do it already since the first pass in only taking care of X position for the
     // LayerElements
-    m_timestampAligner.Process(setDrawingXY, params);
-
-    // For avoiding unused variable warning in non debug mode
-    doc = NULL;
+    m_timestampAligner.Process(params->m_functor, params);
 
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
+int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
 {
-    // param 0: the current Syl
-    std::vector< Object *> *elements = static_cast<std::vector< Object *> *>((*params).at(0));
+    FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    assert(params);
 
-    std::vector< Object *>::iterator iter = elements->begin();
-    while (iter != elements->end()) {
+    std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
+    while (iter != params->m_timeSpanningElements.end()) {
         TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
         assert(interface);
         Measure *endParent = dynamic_cast<Measure *>(interface->GetEnd()->GetFirstParent(MEASURE));
         assert(endParent);
         // We have reached the end of the spanning - remove it from the list of running elements
         if (endParent == this) {
-            iter = elements->erase(iter);
+            iter = params->m_timeSpanningElements.erase(iter);
         }
         else {
             iter++;
@@ -398,19 +447,42 @@ int Measure::FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareTimeSpanningEnd(ArrayPtrVoid *params)
+int Measure::PrepareBoundaries(FunctorParams *functorParams)
 {
-    // param 0: std::vector< Object*>* that holds the current elements to match
-    // param 1: bool* fillList for indicating whether the elements have to be stacked or not (unused)
-    ArrayOfInterfaceClassIdPairs *elements = static_cast<ArrayOfInterfaceClassIdPairs *>((*params).at(0));
+    PrepareBoundariesParams *params = dynamic_cast<PrepareBoundariesParams *>(functorParams);
+    assert(params);
 
-    ArrayOfInterfaceClassIdPairs::iterator iter = elements->begin();
-    while (iter != elements->end()) {
-        // At the end of the measure (going backward) we remove element for which we do not need to match the end (for
-        // now). Eventually, we could consider them, for example if we want to display their spanning or for improved
+    std::vector<BoundaryStartInterface *>::iterator iter;
+    for (iter = params->m_startBoundaries.begin(); iter != params->m_startBoundaries.end(); iter++) {
+        (*iter)->SetMeasure(this);
+    }
+    params->m_startBoundaries.clear();
+
+    if (params->m_currentEnding) {
+        // Set the ending to each measure in between
+        this->m_drawingEnding = params->m_currentEnding;
+    }
+
+    // Keep a pointer to the measure for when we are reaching the end (see BoundaryEnd::PrepareBoundaries)
+    params->m_lastMeasure = this;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
+{
+    PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
+    assert(params);
+
+    ArrayOfInterfaceClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    while (iter != params->m_timeSpanningInterfaces.end()) {
+        // At the end of the measure (going backward) we remove element for which we do not need to match the end
+        // (for
+        // now). Eventually, we could consider them, for example if we want to display their spanning or for
+        // improved
         // midi output
         if ((iter->second == DIR) || (iter->second == DYNAM)) {
-            iter = elements->erase(iter);
+            iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {
             iter++;
@@ -420,16 +492,14 @@ int Measure::PrepareTimeSpanningEnd(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
+int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
 {
-    // param 0: std::vector< Object*>* that holds the current elements to match
-    // param 1:  ArrayOfObjectBeatPairs* that holds the tstamp2 elements for attach to the end measure
-    std::vector< Object *> *elements = static_cast<std::vector< Object *> *>((*params).at(0));
-     ArrayOfObjectBeatPairs *tstamps = static_cast< ArrayOfObjectBeatPairs *>((*params).at(1));
+    PrepareTimestampsParams *params = dynamic_cast<PrepareTimestampsParams *>(functorParams);
+    assert(params);
 
-     ArrayOfObjectBeatPairs::iterator iter = tstamps->begin();
+    ArrayOfObjectBeatPairs::iterator iter = params->m_tstamps.begin();
     // Loop throught the object/beat pairs and create the TimestampAttr when necessary
-    while (iter != tstamps->end()) {
+    while (iter != params->m_tstamps.end()) {
         // -1 means that we have a @tstamp (start) to add to the current measure
         if ((*iter).second.first == -1) {
             TimePointInterface *interface = ((*iter).first)->GetTimePointInterface();
@@ -441,11 +511,19 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
                 TimeSpanningInterface *tsInterface = ((*iter).first)->GetTimeSpanningInterface();
                 assert(tsInterface);
                 if (tsInterface->HasStartAndEnd()) {
-                    elements->erase(std::remove(elements->begin(), elements->end(), (*iter).first), elements->end());
+                    auto item
+                        = std::find_if(params->m_timeSpanningInterfaces.begin(), params->m_timeSpanningInterfaces.end(),
+                            [tsInterface](std::pair<TimeSpanningInterface *, ClassId> pair) {
+                                return (pair.first == tsInterface);
+                            });
+                    if (item != params->m_timeSpanningInterfaces.end()) {
+                        LogDebug("Found it!");
+                        params->m_timeSpanningInterfaces.erase(item);
+                    }
                 }
             }
             // remove it
-            iter = tstamps->erase(iter);
+            iter = params->m_tstamps.erase(iter);
         }
         // 0 means that we have a @tstamp2 (end) to add to the current measure
         else if ((*iter).second.first == 0) {
@@ -456,9 +534,17 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
             // We can check if the interface is now fully mapped (start / end) and purge the list of unmatched
             // elements
             if (interface->HasStartAndEnd()) {
-                elements->erase(std::remove(elements->begin(), elements->end(), (*iter).first), elements->end());
+                auto item
+                    = std::find_if(params->m_timeSpanningInterfaces.begin(), params->m_timeSpanningInterfaces.end(),
+                        [interface](std::pair<TimeSpanningInterface *, ClassId> pair) {
+                            return (pair.first == interface);
+                        });
+                if (item != params->m_timeSpanningInterfaces.end()) {
+                    LogDebug("Found it!");
+                    params->m_timeSpanningInterfaces.erase(item);
+                }
             }
-            iter = tstamps->erase(iter);
+            iter = params->m_tstamps.erase(iter);
         }
         // we have not reached the correct end measure yet
         else {
@@ -470,48 +556,39 @@ int Measure::PrepareTimestampsEnd(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 };
 
-int Measure::ExportMIDI(ArrayPtrVoid *params)
+int Measure::GenerateMIDI(FunctorParams *functorParams)
 {
-    // param 0: MidiFile*: the MidiFile we are writing to (unused)
-    // param 1: int*: the midi track number (unused)
-    // param 2: int*: the current time in the measure (incremented by each element)
-    // param 3: int*: the current total measure time (incremented by each measure (unused)
-    // param 4: std::vector<double>: a stack of maximum duration filled by the functor (unused)
-    double *currentMeasureTime = static_cast<double *>((*params).at(2));
+    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
 
     // Here we need to reset the currentMeasureTime because we are starting a new measure
-    (*currentMeasureTime) = 0;
+    params->m_currentMeasureTime = 0;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::ExportMIDIEnd(ArrayPtrVoid *params)
+int Measure::GenerateMIDIEnd(FunctorParams *functorParams)
 {
-    // param 0: MidiFile*: the MidiFile we are writing to (unused)
-    // param 1: int*: the midi track number (unused)
-    // param 2: int*: the current time in the measure (incremented by each element) (unused)
-    // param 3: int*: the current total measure time (incremented by each measure
-    // param 4: std::vector<double>: a stack of maximum duration filled by the functor
-    double *totalTime = static_cast<double *>((*params).at(3));
-    std::vector<double> *maxValues = static_cast<std::vector<double> *>((*params).at(4));
+    GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
+    assert(params);
 
-    // We a to the total time the maximum duration of the measure so if there is no layer, if the layer is not full or
+    // We a to the total time the maximum duration of the measure so if there is no layer, if the layer is not full
+    // or
     // if there is an encoding error in the measure, the next one will be properly aligned
-    assert(!maxValues->empty());
-    (*totalTime) += maxValues->front();
-    maxValues->erase(maxValues->begin());
+    assert(!params->m_maxValues.empty());
+    params->m_totalTime += params->m_maxValues.front();
+    params->m_maxValues.erase(params->m_maxValues.begin());
 
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::CalcMaxMeasureDuration(ArrayPtrVoid *params)
+int Measure::CalcMaxMeasureDuration(FunctorParams *functorParams)
 {
-    // param 0: std::vector<double>: a stack of maximum duration filled by the functor
-    // param 1: double: the duration of the current measure (unused)
-    std::vector<double> *maxValues = static_cast<std::vector<double> *>((*params).at(0));
+    CalcMaxMeasureDurationParams *params = dynamic_cast<CalcMaxMeasureDurationParams *>(functorParams);
+    assert(params);
 
     // We just need to add a value to the stack
-    maxValues->push_back(0.0);
+    params->m_maxValues.push_back(0.0);
 
     return FUNCTOR_CONTINUE;
 }

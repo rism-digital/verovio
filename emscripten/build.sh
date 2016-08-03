@@ -82,7 +82,12 @@ while getopts "lwv:h:c" opt; do
 	esac
 done
 
-FILENAME="verovio-toolkit$ASM_NAME$WEBWORKER_NAME$VERSION_NAME.js"
+FILENAME="verovio-toolkit$ASM_NAME$WEBWORKER_NAME.js"
+
+if [ -n "$VERSION" ]; then
+    if [ ! -d build/$VERSION ]; then mkdir build/$VERSION; fi
+    FILENAME=$VERSION/$FILENAME
+fi
 
 echo "Sync svg resources"
 cp -r ../data/* data/
@@ -107,6 +112,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/barline.cpp \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
 	$VEROVIO_ROOT/src/beam.cpp \
+	$VEROVIO_ROOT/src/boundary.cpp \
 	$VEROVIO_ROOT/src/chord.cpp \
 	$VEROVIO_ROOT/src/clef.cpp \
 	$VEROVIO_ROOT/src/custos.cpp \
@@ -118,6 +124,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
 	$VEROVIO_ROOT/src/dynam.cpp \
 	$VEROVIO_ROOT/src/editorial.cpp \
+	$VEROVIO_ROOT/src/ending.cpp \
 	$VEROVIO_ROOT/src/floatingelement.cpp \
 	$VEROVIO_ROOT/src/glyph.cpp \
 	$VEROVIO_ROOT/src/hairpin.cpp \
@@ -137,7 +144,9 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/multirest.cpp \
 	$VEROVIO_ROOT/src/note.cpp \
 	$VEROVIO_ROOT/src/object.cpp \
+	$VEROVIO_ROOT/src/octave.cpp \
 	$VEROVIO_ROOT/src/page.cpp \
+	$VEROVIO_ROOT/src/pedal.cpp \
 	$VEROVIO_ROOT/src/pitchinterface.cpp \
 	$VEROVIO_ROOT/src/positioninterface.cpp \
 	$VEROVIO_ROOT/src/proport.cpp \

@@ -45,12 +45,12 @@ public:
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer(ArrayPtrVoid *params);
+    virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
-    virtual int ResetDrawing(ArrayPtrVoid *params);
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
     //
