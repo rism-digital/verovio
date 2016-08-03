@@ -805,7 +805,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
         int dist = abs(p2->x - p1->x);
         height
             = std::max(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITION_FACTOR,
-                dist / TEMP_STYLE_SLUR_HEIGHT_FACTOR);
+                dist / TEMP_SLUR_HEIGHT_FACTOR);
         height = std::min(
             m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITION_FACTOR, height);
     }
@@ -1420,9 +1420,8 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         int i, x;
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i * dashSpace);
-            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength,
             x = std::max(x, x1);
-            DrawFullRectangle(dc, x - halfDashLength, y, x + halfDashLength,
+            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength,
                 y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
         }
     }
@@ -1758,12 +1757,12 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
     int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
 
-    DrawFullRectangle(dc, x1, y2, x2, y2 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+    DrawFilledRectangle(dc, x1, y2, x2, y2 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        DrawFullRectangle(dc, x1, y1, x1 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y2);
+        DrawFilledRectangle(dc, x1, y1, x1 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y2);
     }
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        DrawFullRectangle(dc, x2 - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y1, x2, y2);
+        DrawFilledRectangle(dc, x2 - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y1, x2, y2);
     }
 
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START))

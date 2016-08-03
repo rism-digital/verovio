@@ -27,13 +27,13 @@ namespace vrv {
  */
 
 class Ligature : public LayerElement,
-              public ObjectListInterface,
-              public StemmedDrawingInterface,
-              public DurationInterface,
-              public AttCommon,
-              public AttStems,
-              public AttStemsCmn,
-              public AttTiepresent {
+                 public ObjectListInterface,
+                 public StemmedDrawingInterface,
+                 public DurationInterface,
+                 public AttCommon,
+                 public AttStems,
+                 public AttStemsCmn,
+                 public AttTiepresent {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -89,16 +89,6 @@ public:
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * See Object::PrepareTieAttr
-     */
-    virtual int PrepareTieAttr(ArrayPtrVoid *params);
-
-    /**
-     * See Object::PrepareTieAttr
-     */
-    virtual int PrepareTieAttrEnd(ArrayPtrVoid *params);
 
 protected:
     /**

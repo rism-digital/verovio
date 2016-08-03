@@ -197,29 +197,4 @@ void Ligature::SetDrawingStemEnd(Point stemEnd)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Ligature::PrepareTieAttr(ArrayPtrVoid *params)
-{
-    // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
-    //???NO SUCH
-    // param 1: Ligature** currentLigature for the current ligature if in a ligature
-    Ligature **currentLigature = static_cast<Ligature **>((*params).at(1));
-
-    assert(!(*currentLigature));
-    (*currentLigature) = this;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Ligature::PrepareTieAttrEnd(ArrayPtrVoid *params)
-{
-    // param 0: std::vector<Note*>* that holds the current notes with open ties (unused)
-    //???NO SUCH
-    // param 1: Ligature** currentLigature for the current ligature if in a ligature
-    Ligature **currentLigature = static_cast<Ligature **>((*params).at(1));
-
-    assert((*currentLigature));
-    (*currentLigature) = NULL;
-
-    return FUNCTOR_CONTINUE;
-}
 }

@@ -288,8 +288,8 @@ bool MeiOutput::WriteObject(Object *object)
     }
     else if (object->Is() == LIGATURE) {
         LogError("WriteMeiLigature not implemented. (MeiOutput::WriteObject)");
-        //m_currentNode = m_currentNode.append_child("ligature");
-        //WriteMeiLigature(m_currentNode, dynamic_cast<KeySig *>(object));
+        // m_currentNode = m_currentNode.append_child("ligature");
+        // WriteMeiLigature(m_currentNode, dynamic_cast<KeySig *>(object));
     }
     else if (object->Is() == MENSUR) {
         m_currentNode = m_currentNode.append_child("mensur");
@@ -1932,9 +1932,10 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
             break;
         }
         elementName = std::string(xmlElement.name());
-        LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
+        // LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
         if (!IsAllowed(elementName, filter)) {
-            LogWarning("Element <%s> within %s is illegal and will be ignored", xmlElement.name(), filter->GetClassName().c_str());
+            LogWarning("Element <%s> within %s is illegal and will be ignored", xmlElement.name(),
+                filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -2175,26 +2176,24 @@ bool MeiInput::ReadMeiKeySig(Object *parent, pugi::xml_node keySig)
     return true;
 }
 
-
 bool MeiInput::ReadMeiLigature(Object *parent, pugi::xml_node ligature)
 {
     Ligature *vrvLigature = new Ligature();
 #if 1
     SetMeiUuid(ligature, vrvLigature);
-    
+
     ReadDurationInterface(ligature, vrvLigature);
     vrvLigature->ReadCommon(ligature);
     vrvLigature->ReadStems(ligature);
     vrvLigature->ReadStemsCmn(ligature);
     vrvLigature->ReadTiepresent(ligature);
-    
+
     AddLayerElement(parent, vrvLigature);
     return ReadMeiLayerChildren(vrvLigature, ligature);
 #else
     return true;
 #endif
 }
-    
 
 bool MeiInput::ReadMeiMensur(Object *parent, pugi::xml_node mensur)
 {
@@ -2383,7 +2382,8 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
         }
         elementName = std::string(xmlElement.name());
         if (!IsAllowed(elementName, filter)) {
-            LogWarning("Element <%s> within %s is illegal and will be ignored", xmlElement.name(), filter->GetClassName().c_str());
+            LogWarning("Element <%s> within %s is illegal and will be ignored", xmlElement.name(),
+                filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -2853,7 +2853,8 @@ void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
         system->AddScoreDef(scoreDef);
     }
     else {
-        LogWarning("'%s' not supported within '%s' (1)", scoreDef->GetClassName().c_str(), parent->GetClassName().c_str());
+        LogWarning(
+            "'%s' not supported within '%s' (1)", scoreDef->GetClassName().c_str(), parent->GetClassName().c_str());
         delete scoreDef;
     }
 }
@@ -2872,7 +2873,8 @@ void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp)
         (dynamic_cast<StaffGrp *>(parent))->AddStaffGrp(staffGrp);
     }
     else {
-        LogWarning("'%s' not supported within '%s' (2)", staffGrp->GetClassName().c_str(), parent->GetClassName().c_str());
+        LogWarning(
+            "'%s' not supported within '%s' (2)", staffGrp->GetClassName().c_str(), parent->GetClassName().c_str());
         delete staffGrp;
     }
 }
@@ -2931,7 +2933,8 @@ void MeiInput::AddLayerElement(Object *parent, LayerElement *element)
         ligature->AddLayerElement(element);
     }
     else {
-        LogWarning("'%s' not supported within '%s' (3)", element->GetClassName().c_str(), parent->GetClassName().c_str());
+        LogWarning(
+            "'%s' not supported within '%s' (3)", element->GetClassName().c_str(), parent->GetClassName().c_str());
         delete element;
     }
 }
@@ -2949,7 +2952,8 @@ void MeiInput::AddFloatingElement(Object *parent, FloatingElement *element)
         measure->AddFloatingElement(element);
     }
     else {
-        LogWarning("'%s' not supported within '%s' (4)", element->GetClassName().c_str(), parent->GetClassName().c_str());
+        LogWarning(
+            "'%s' not supported within '%s' (4)", element->GetClassName().c_str(), parent->GetClassName().c_str());
         delete element;
     }
 }
@@ -2992,7 +2996,8 @@ void MeiInput::AddTextElement(Object *parent, TextElement *element)
         tempo->AddTextElement(element);
     }
     else {
-        LogWarning("'%s' not supported within '%s' (5)", element->GetClassName().c_str(), parent->GetClassName().c_str());
+        LogWarning(
+            "'%s' not supported within '%s' (5)", element->GetClassName().c_str(), parent->GetClassName().c_str());
         delete element;
     }
 }

@@ -531,7 +531,7 @@ void Object::FillFlatList(ListOfObjects *flatList)
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
 
-Object *Object::GetFirstParent(const ClassId classId, int maxDepth)
+Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
@@ -1070,13 +1070,6 @@ int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
 
 int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
-    // param 0: the minimum position (i.e., the width of the previous element)
-    // param 1: the maximum width in the current measure
-    // param 2: the Doc
-    int *min_pos = static_cast<int *>((*params).at(0));
-    int *measure_width = static_cast<int *>((*params).at(1));
-    Doc *doc = static_cast<Doc *>((*params).at(2));
-    Ligature *ligParent;
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
 
@@ -1120,15 +1113,10 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
     // |____x_____|
     //  ---- = negative offset
     int negative_offset = -(current->m_contentBB_x1);
-    
+
     // Increase negative_offset by the symbol type's left margin, unless it's a note
     // that's part of a ligature.
-    if (current->Is() == NOTE && !current->IsGraceNote()) {
-        ligParent = dynamic_cast<Ligature *>(current->GetFirstParent(LIGATURE, 1));
-        if (!ligParent)
-            negative_offset += (doc->GetLeftMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-    }
-    if (!current->IsGraceNote())
+    if (!current->IsGraceNote() && !current->IsInLigature())
         negative_offset
             += (params->m_doc->GetLeftMargin(current->Is()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
@@ -1167,15 +1155,8 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
     int width = current->m_contentBB_x2;
 
     // Move to right by the symbol type's right margin, unless it's a note that's
-	// part of a ligature.
-    if (!current->HasEmptyBB() && current->Is() == NOTE && !current->IsGraceNote()) {
-        ligParent = dynamic_cast<Ligature *>(current->GetFirstParent(LIGATURE, 1));
-        if (!ligParent)
-        	width += doc->GetRightMargin(current->Is()) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    }
-    
-    (*min_pos) = current->GetAlignment()->GetXRel() + width;
-    if (!current->HasEmptyBB())
+    // part of a ligature.
+    if (!current->HasEmptyBB() && !current->IsInLigature())
         width += params->m_doc->GetRightMargin(current->Is()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     params->m_minPos = current->GetAlignment()->GetXRel() + width;
     current->GetAlignment()->SetMaxWidth(width);
@@ -1284,7 +1265,8 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         params->m_staffAlignment->AddBBoxBelow(current);
     }
 
-    // do not go further down the tree in this case since the bounding box of the first element is already taken into
+    // do not go further down the tree in this case since the bounding box of the first element is already taken
+    // into
     // account?
     return FUNCTOR_CONTINUE;
 }
