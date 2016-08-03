@@ -2179,7 +2179,6 @@ bool MeiInput::ReadMeiKeySig(Object *parent, pugi::xml_node keySig)
 bool MeiInput::ReadMeiLigature(Object *parent, pugi::xml_node ligature)
 {
     Ligature *vrvLigature = new Ligature();
-#if 1
     SetMeiUuid(ligature, vrvLigature);
 
     ReadDurationInterface(ligature, vrvLigature);
@@ -2190,9 +2189,6 @@ bool MeiInput::ReadMeiLigature(Object *parent, pugi::xml_node ligature)
 
     AddLayerElement(parent, vrvLigature);
     return ReadMeiLayerChildren(vrvLigature, ligature);
-#else
-    return true;
-#endif
 }
 
 bool MeiInput::ReadMeiMensur(Object *parent, pugi::xml_node mensur)
