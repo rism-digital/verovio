@@ -49,6 +49,8 @@ FloatingElement::~FloatingElement()
 void FloatingElement::Reset()
 {
     Object::Reset();
+
+    m_drawingGrpId = 0;
 }
 
 void FloatingElement::UpdateContentBBoxX(int x1, int x2)
@@ -283,6 +285,7 @@ int FloatingElement::ResetDrawing(FunctorParams *functorParams)
         assert(interface);
         return interface->InterfaceResetDrawing(functorParams, this);
     }
+    m_drawingGrpId = 0;
     return FUNCTOR_CONTINUE;
 };
 

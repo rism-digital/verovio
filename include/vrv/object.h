@@ -662,6 +662,11 @@ public:
     virtual int PrepareBoundaries(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
+     * Functor for grouping FloatingElement by drawingGrpId
+     */
+    virtual int PrepareFloatingGrps(FunctorParams *functoParams) { return FUNCTOR_CONTINUE; };
+
+    /**
      * Goes through all the TimeSpanningInterface elements and set them a current to each staff
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
      */

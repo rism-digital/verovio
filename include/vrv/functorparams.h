@@ -522,6 +522,28 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// PrepareFloatingGrpsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: int value of the current grp
+ * member 1: EndingBoundary **currentEnding
+ * member 2: bool has ending ended
+ **/
+
+class PrepareFloatingGrpsParams : public FunctorParams {
+public:
+    PrepareFloatingGrpsParams()
+    {
+        // m_lastMeasure = NULL;
+        // m_currentEnding = NULL;
+    }
+    // Measure *m_lastMeasure;
+    // Ending *m_currentEnding;
+    // std::vector<BoundaryStartInterface *> m_startBoundaries;
+};
+
+//----------------------------------------------------------------------------
 // PrepareLyricsParams
 //----------------------------------------------------------------------------
 
