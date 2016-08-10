@@ -161,37 +161,38 @@ namespace vrv {
 #define TEMP_ACCID_EDIT_SPACE 3.5 * PARAM_DENOMINATOR
 
 // the space between each lyric line in units
-#define TEMP_LYIRC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
+#define TEMP_LYRIC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
 
 // the key signature spacing factor
 #define TEMP_KEYSIG_STEP 1.3
 
 // the maximum angle of a slur
 #define TEMP_SLUR_MAX_SLOPE (45 * M_PI / 180)
-#define TEMP_SLUR_CURVE_FACTOR 5 // a factor for allow more (0) or less (100) curved slurs
+#define TEMP_SLUR_CURVE_FACTOR 5 // a factor to allow more (0) or less (100) curved slurs
 #define TEMP_SLUR_HEIGHT_FACTOR 8 // high value means flatter slurs
 #define TEMP_SLUR_CONTROL_POINT_FACTOR 5 // higher value means more curved at the end
 
 /* Style parameters for mensural notation */
-// Ratio of mensural notehead and accidental size to CMN size for the same staff size
-#define TEMP_MNOTEHEAD_SIZE_FACTOR 1.00
-#define TEMP_MACCID_SIZE_FACTOR 1.00
-#define TEMP_MAUGDOT_SIZE_FACTOR 1.00
-#define TEMP_MINIMA_WIDTH_FACTOR 1.00
+// Ratios of mensural notehead, accidental, aug. dot size to CMN for the same staff size
+#define TEMP_MNOTEHEAD_SIZE_FACTOR 0.55
+#define TEMP_MACCID_SIZE_FACTOR 0.65
+#define TEMP_MAUGDOT_SIZE_FACTOR 0.60
+// Width of the minima diamond relative to its height
+#define TEMP_MINIMA_WIDTH_FACTOR 0.60
 // Size of mensuration sign circle relative to space between staff lines
-#define MSIGN_CIRCLE_DIAM 2.0
+#define MSIGN_CIRCLE_DIAM 1.7
 // Vertical position of center of mensuration sign as distance below top of the staff
-#define MSIGN_STAFFLINES_BELOW_TOP 1.0
+#define MSIGN_STAFFLINES_BELOW_TOP 2.0
 // Size of dot inside mensuration signs relative to space between staff lines
 #define MSIGN_DOT_DIAM 0.5
 // Relative size of figures in proportions
-#define PROPRT_SIZE_FACTOR 1.0
+#define PROPRT_SIZE_FACTOR 0.5
 // Linewidth for staff lines in mensural notation, rel. to "normal" width of staff lines */
-#define MENSURAL_LINEWIDTH_FACTOR 1.0
+#define MENSURAL_LINEWIDTH_FACTOR 0.5
 
 /**
  * This class contains the document default environment variables.
- * Some of them are not available as is in MEI - to be solved
+ * FIXME: Some of them are not available as is in MEI - to be solved
  */
 class Style {
 public:

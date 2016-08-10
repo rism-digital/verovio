@@ -124,7 +124,7 @@ void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width,
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(AxWHITE, AxTRANSPARENT);
     
-#define TEMPORARY_KLUDGE_NO
+#define TEMPORARY_KLUDGE
 #ifdef TEMPORARY_KLUDGE
     if (fill) {
         int dHeight = ToDeviceContextX(height);
