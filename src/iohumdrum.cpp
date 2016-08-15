@@ -2501,10 +2501,11 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         return;
     }
 
-    // fulldur == the full duration of the note/rest including augmentation dots.
+    // fulldur == full duration of the note/rest including augmentation dots.
     vector<HumNum> fulldur(duritems.size());
 
-    // dursm = a cumulative sum of the full durs, starting at 0 for the first index.
+    // dursm = a cumulative sum of the full durs, starting at 0 for
+    // the first index.
     vector<HumNum> dursum(duritems.size());
 
     HumNum sum = 0;
@@ -2562,9 +2563,18 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
     }
 
+    // beamstate == boolean for keeping track of whether or not a beam
+    // is currently active.
+    bool beamstate = false;
+
     // Go back and link all partial beamed tuplets and non-beamed tuplets.
     HumNum groupdur;
     for (int i = 0; i < (int)poweroftwo.size(); i++) {
+
+        if (beamstarts[i]) {
+            beamstate = true;
+        }
+
         if (poweroftwo[i]) {
             // not a tuplet
             continue;
@@ -2603,10 +2613,22 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             // create a new tuplet group (which will require a bracket).
             for (j = i; j <= ending; j++) {
                 tupletgroups[j] = tupletnum;
-                tupletbracket[j] = 1;
+                // Only turn on a tuplet bracket if the tuplet is not inside
+                // of a beam (may have to change if a tuplet bracked is
+                // desired within a beam).
+                if (beamstate) {
+                    tupletbracket[j] = 0;
+                }
+                else {
+                    tupletbracket[j] = 1;
+                }
             }
             tupletnum++;
             i = ending;
+        }
+
+        if (beamends[i]) {
+            beamstate = false;
         }
     }
 
@@ -2728,7 +2750,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 tg[i].numscale = 1;
             }
             if (tg[i].beamstart && tg[i].tupletstart) {
-                if (tg[i].bracket) {
+                if (tg[i].bracket > 0) {
                     tg[i].priority = 'T'; // open tuplet first
                 }
                 else {
@@ -2736,7 +2758,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 }
             }
             else if (tg[i].beamend && tg[i].tupletend) {
-                if (tg[i].bracket) {
+                if (tg[i].bracket > 0) {
                     tg[i].priority = 'B'; // close beam first
                 }
                 else {
