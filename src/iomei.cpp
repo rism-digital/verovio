@@ -2073,9 +2073,6 @@ bool MeiInput::ReadMeiBeam(Object *parent, pugi::xml_node beam)
 
     ReadMeiLayerChildren(vrvBeam, beam);
 
-    if (vrvBeam->GetNoteCount() == 1) {
-        LogWarning("<beam> with only one note");
-    }
     return true;
 }
 
