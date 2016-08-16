@@ -116,69 +116,35 @@ void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2,
 }
 
 /* Draw an empty ("void") diamond with its top lefthand point at (x1, y1). */
-    
+
 void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill)
 {
     Point p[4];
-    
-    dc->SetPen(m_currentColour, 0, AxSOLID);
-    dc->SetBrush(AxWHITE, AxTRANSPARENT);
-    
-#define TEMPORARY_KLUDGE
-#ifdef TEMPORARY_KLUDGE
-    if (fill) {
-        int dHeight = ToDeviceContextX(height);
-        int dWidth = ToDeviceContextX(width);
-        p[0].x = ToDeviceContextX(x1);
-        p[0].y = ToDeviceContextY(y1);
-        p[1].x = ToDeviceContextX(x1+dWidth/2);
-        p[1].y = ToDeviceContextY(y1+dHeight/2);
-        p[2].x = p[0].x+dWidth;
-        p[2].y = p[0].y;
-        p[3].x = ToDeviceContextX(x1+dWidth/2);
-        p[3].y = ToDeviceContextY(y1-dHeight/2);
-        
-        dc->DrawPolygon(4, p);
-    }
-    else {
-        // This block of code is just because DrawPolygon() _always_ fills. Until that's fixed...
-        int linewidth = 40;
-        p[0].x = x1+width/2;
-        //y1 += linewidth/2;
-        p[0].y = y1-(height/2);
-        p[0].y = y1-(height/2)-linewidth;
-        p[0].y = y1-(height/2)-(linewidth/2);
-        p[1].x = p[0].x+width/2;
-        p[1].y = p[0].y+height/2;
-        p[2].x = p[0].x;
-        p[2].y = p[1].y+height/2;
-        p[3].x = p[0].x-width/2;
-        p[3].y = p[1].y;
-        DrawObliquePolygon(dc, p[0].x, p[0].y, p[1].x, p[1].y, linewidth);
-        DrawObliquePolygon(dc, p[1].x, p[1].y, p[2].x, p[2].y, linewidth);
-        DrawObliquePolygon(dc, p[2].x, p[2].y, p[3].x, p[3].y, linewidth);
-        DrawObliquePolygon(dc, p[3].x, p[3].y, p[0].x, p[0].y, linewidth);
-    }
-#else
+
+    int linewidth = 40; // This should be made a parameter for DrawDiammond
+    dc->SetPen(m_currentColour, linewidth, AxSOLID);
+    if (fill)
+        dc->SetBrush(m_currentColour, AxSOLID);
+    else
+        dc->SetBrush(m_currentColour, AxTRANSPARENT);
+
     int dHeight = ToDeviceContextX(height);
     int dWidth = ToDeviceContextX(width);
     p[0].x = ToDeviceContextX(x1);
     p[0].y = ToDeviceContextY(y1);
-    p[1].x = ToDeviceContextX(x1+dWidth/2);
-    p[1].y = ToDeviceContextY(y1+dHeight/2);
-    p[2].x = p[0].x+dWidth;
+    p[1].x = ToDeviceContextX(x1 + dWidth / 2);
+    p[1].y = ToDeviceContextY(y1 + dHeight / 2);
+    p[2].x = p[0].x + dWidth;
     p[2].y = p[0].y;
-    p[3].x = ToDeviceContextX(x1+dWidth/2);
-    p[3].y = ToDeviceContextY(y1-dHeight/2);
-    
+    p[3].x = ToDeviceContextX(x1 + dWidth / 2);
+    p[3].y = ToDeviceContextY(y1 - dHeight / 2);
+
     dc->DrawPolygon(4, p);
-#endif
+
     dc->ResetPen();
     dc->ResetBrush();
-    
 }
 
-    
 void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
 {
     int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
