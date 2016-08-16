@@ -776,7 +776,7 @@ protected:
 private:
     std::string m_uuid;
     std::string m_classid;
-    static unsigned long m_objectCounter;
+    static unsigned long s_objectCounter;
 
     /**
      * Indicates whether the object content is up-to-date or not.

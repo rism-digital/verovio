@@ -191,12 +191,12 @@ int BoundingBox::CalcVerticalOverlap(const BoundingBox *other) const
 // Object
 //----------------------------------------------------------------------------
 
-unsigned long Object::m_objectCounter = 0;
+unsigned long Object::s_objectCounter = 0;
 
 Object::Object() : BoundingBox()
 {
     Init("m-");
-    if (m_objectCounter++ == 0) {
+    if (s_objectCounter++ == 0) {
         SeedUuid();
     }
 }
@@ -204,7 +204,7 @@ Object::Object() : BoundingBox()
 Object::Object(std::string classid) : BoundingBox()
 {
     Init(classid);
-    if (m_objectCounter++ == 0) {
+    if (s_objectCounter++ == 0) {
         SeedUuid();
     }
 }
