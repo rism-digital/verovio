@@ -6,8 +6,6 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <assert.h>
-#include <cstdlib>
-#include <ctime>
 #include <getopt.h>
 #include <iostream>
 #include <sstream>
@@ -129,6 +127,8 @@ void display_usage()
 
     cerr << " --spacing-system=SP        Specify the spacing above each system (in MEI vu)" << endl;
 
+    cerr << " --xml-id-seed=INT          Seed the random number generator for XML IDs" << endl;
+
     // Debugging options
     cerr << endl << "Debugging options" << endl;
 
@@ -146,9 +146,6 @@ int main(int argc, char **argv)
     string outformat = "svg";
     string font = "";
     bool std_output = false;
-
-    // Init random number generator for uuids
-    std::srand((unsigned int)std::time(0));
 
     int no_mei_hdr = 0;
     int adjust_page_height = 0;
@@ -186,7 +183,8 @@ int main(int argc, char **argv)
         { "scale", required_argument, 0, 's' }, { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 },
         { "spacing-linear", required_argument, 0, 0 }, { "spacing-non-linear", required_argument, 0, 0 },
         { "spacing-staff", required_argument, 0, 0 }, { "spacing-system", required_argument, 0, 0 },
-        { "type", required_argument, 0, 't' }, { "version", no_argument, &show_version, 1 }, { 0, 0, 0, 0 } };
+        { "type", required_argument, 0, 't' }, { "version", no_argument, &show_version, 1 },
+        { "xml-id-seed", required_argument, 0, 0 }, { 0, 0, 0, 0 } };
 
     int option_index = 0;
     while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:v", long_options, &option_index)) != -1) {
@@ -222,6 +220,9 @@ int main(int argc, char **argv)
                     if (!toolkit.SetSpacingSystem(atoi(optarg))) {
                         exit(1);
                     }
+                }
+                else if (strcmp(long_options[option_index].name, "xml-id-seed") == 0) {
+                    Object::SeedUuid(atoi(optarg));
                 }
                 break;
 

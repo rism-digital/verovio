@@ -8,6 +8,8 @@
 #ifndef __VRV_OBJECT_H__
 #define __VRV_OBJECT_H__
 
+#include <cstdlib>
+#include <ctime>
 #include <iterator>
 #include <map>
 #include <string>
@@ -230,6 +232,7 @@ public:
     std::string GetUuid() const { return m_uuid; };
     void SetUuid(std::string uuid);
     void ResetUuid();
+    static void SeedUuid(unsigned int seed = 0);
 
     /**
      * @name Children count, with or without a ClassId.
@@ -773,6 +776,7 @@ protected:
 private:
     std::string m_uuid;
     std::string m_classid;
+    static unsigned long m_objectCounter;
 
     /**
      * Indicates whether the object content is up-to-date or not.

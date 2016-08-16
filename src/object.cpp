@@ -191,14 +191,22 @@ int BoundingBox::CalcVerticalOverlap(const BoundingBox *other) const
 // Object
 //----------------------------------------------------------------------------
 
+unsigned long Object::m_objectCounter = 0;
+
 Object::Object() : BoundingBox()
 {
     Init("m-");
+    if (m_objectCounter++ == 0) {
+        SeedUuid();
+    }
 }
 
 Object::Object(std::string classid) : BoundingBox()
 {
     Init(classid);
+    if (m_objectCounter++ == 0) {
+        SeedUuid();
+    }
 }
 
 Object *Object::Clone() const
@@ -483,6 +491,15 @@ void Object::GenerateUuid()
 void Object::ResetUuid()
 {
     GenerateUuid();
+}
+
+void Object::SeedUuid(unsigned int seed) {
+    // Init random number generator for uuids
+    if (seed == 0) {
+       std::srand((unsigned int)std::time(0));
+    } else {
+       std::srand(seed);
+    }
 }
 
 void Object::SetParent(Object *parent)
