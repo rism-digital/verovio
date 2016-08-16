@@ -135,8 +135,17 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
     if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
         DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
-        if (durationInterface->GetNoteOrChordDur(this) < DUR_2)
-            return this->GetDrawingY() + doc->GetDrawingUnit(staffSize);
+        if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
+            if (this->Is() == CHORD) {
+                int yChordMax = 0, yChordMin = 0;
+                Chord *chord = dynamic_cast<Chord *>(this);
+                assert(chord);
+                chord->GetYExtremes(&yChordMax, &yChordMin);
+                return yChordMax + doc->GetDrawingUnit(staffSize);
+            }
+            else
+                return this->GetDrawingY() + doc->GetDrawingUnit(staffSize);
+        }
         // We should also take into accound the stem shift to the right
         StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
@@ -155,8 +164,17 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize)
     if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
         DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
-        if (durationInterface->GetNoteOrChordDur(this) < DUR_2)
-            return this->GetDrawingY() - doc->GetDrawingUnit(staffSize);
+        if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
+            if (this->Is() == CHORD) {
+                int yChordMax = 0, yChordMin = 0;
+                Chord *chord = dynamic_cast<Chord *>(this);
+                assert(chord);
+                chord->GetYExtremes(&yChordMax, &yChordMin);
+                return yChordMin - doc->GetDrawingUnit(staffSize);
+            }
+            else
+                return this->GetDrawingY() - doc->GetDrawingUnit(staffSize);
+        }
         // We should also take into accound the stem shift to the right
         StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
