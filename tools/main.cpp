@@ -150,6 +150,7 @@ int main(int argc, char **argv)
     // Init random number generator for uuids
     std::srand((unsigned int)std::time(0));
 
+    FileFormat type;
     int no_mei_hdr = 0;
     int adjust_page_height = 0;
     int all_pages = 0;
@@ -167,12 +168,9 @@ int main(int argc, char **argv)
     // The fonts will be loaded later with Resources::InitFonts()
     Toolkit toolkit(false);
 
-<<<<<<< HEAD
     // auto-detect the input format type by default
     type = AUTO;
 
-=======
->>>>>>> develop
     if (argc < 2) {
         cerr << "Expected one input file but found none." << endl << endl;
         display_usage();
