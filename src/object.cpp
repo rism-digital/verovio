@@ -1027,7 +1027,7 @@ int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
     Note *note = dynamic_cast<Note *>(this);
     assert(note);
 
-    if (!note->IsGraceNote()) {
+    if (!note->IsGraceNote() || note->IsChordTone()) {
         params->m_graceMinPos = 0;
         return FUNCTOR_CONTINUE;
     }
