@@ -189,7 +189,7 @@ protected:
      * If this is a note, store here the stem coordinates (useful for ex. tuplets)
      */
     Point m_drawingStemStart; // beginning point, the one near the note
-    Point m_drawingStemEnd; // end point (!), near beam or stem
+    Point m_drawingStemEnd; // end point (!), near beam or flag 
     /**
      * Stem direction as drawn
      */

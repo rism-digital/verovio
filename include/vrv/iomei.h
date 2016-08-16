@@ -355,6 +355,7 @@ private:
     bool ReadMeiDot(Object *parent, pugi::xml_node dot);
     bool ReadMeiFTrem(Object *parent, pugi::xml_node fTrem);
     bool ReadMeiKeySig(Object *parent, pugi::xml_node keySig);
+    bool ReadMeiLigature(Object *parent, pugi::xml_node ligature);
     bool ReadMeiMensur(Object *parent, pugi::xml_node mensur);
     bool ReadMeiMeterSig(Object *parent, pugi::xml_node meterSig);
     bool ReadMeiMRest(Object *parent, pugi::xml_node mRest);

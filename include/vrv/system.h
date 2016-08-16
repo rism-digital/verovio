@@ -14,8 +14,9 @@
 
 namespace vrv {
 
+class BoundaryEnd;
 class DeviceContext;
-class EndingBoundary;
+class Ending;
 class Measure;
 class ScoreDef;
 
@@ -46,7 +47,8 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddEnding(EndingBoundary *endingBoundary);
+    void AddBoundaryEnd(BoundaryEnd *boundaryEnd);
+    void AddEnding(Ending *ending);
     void AddMeasure(Measure *measure);
     void AddScoreDef(ScoreDef *scoreDef);
     ///@}

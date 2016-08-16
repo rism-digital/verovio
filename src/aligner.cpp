@@ -257,6 +257,7 @@ void MeasureAligner::AddAlignment(Alignment *alignment, int idx)
 
 Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
 {
+    time = round(time*(pow(10,10))/pow(10,10));
     int i;
     int idx = -1; // the index if we reach the end.
     Alignment *alignment = NULL;

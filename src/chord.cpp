@@ -216,7 +216,7 @@ void Chord::ResetAccidSpace(int fullUnit)
      * Resize m_accidSpace to be as tall as possibly necessary; must accomodate every accidental stacked vertically.
      */
     int accidHeight = ACCID_HEIGHT * halfUnit;
-    int yMax, yMin;
+    int yMax = 0, yMin = 0;
     this->GetYExtremes(&yMax, &yMin);
     m_accidSpaceTop = yMax + (accidHeight / 2);
     m_accidSpaceBot = yMin - (accidHeight / 2);
@@ -226,7 +226,7 @@ void Chord::ResetAccidSpace(int fullUnit)
 
     // Resize each row in m_accidSpace to be the proper length; set all the bools to false
     std::vector<bool> *accidLine;
-    for (idx = 0; idx < m_accidSpace.size(); idx++) {
+    for (idx = 0; idx < (int)m_accidSpace.size(); idx++) {
         accidLine = &m_accidSpace.at(idx);
         accidLine->resize(accidLineLength);
         for (setIdx = 0; setIdx < accidLineLength; setIdx++) accidLine->at(setIdx) = false;

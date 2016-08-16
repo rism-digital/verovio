@@ -36,9 +36,9 @@ typedef std::vector<std::pair<std::string, std::string> > ArrayOfStrAttr;
 #define DUR_MX -1 // maxima
 #define DUR_LG 0 // longa
 #define DUR_BR 1 // brevis
-#define DUR_1 2 // whole note
-#define DUR_2 3 // ...
-#define DUR_4 4
+#define DUR_1 2 // whole note (semibrevis)
+#define DUR_2 3 // half note (minima)
+#define DUR_4 4 // ...
 #define DUR_8 5
 #define DUR_16 6
 #define DUR_32 7

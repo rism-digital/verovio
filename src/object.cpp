@@ -428,8 +428,7 @@ Object *Object::FindChildByType(ClassId classId, int deepness, bool direction)
 Object *Object::FindChildByAttComparison(AttComparison *attComparison, int deepness, bool direction)
 {
     Functor findByAttComparison(&Object::FindByAttComparison);
-    FindByAttComparisonParams findByAttComparisonParams;
-    findByAttComparisonParams.m_attComparison = attComparison;
+    FindByAttComparisonParams findByAttComparisonParams(attComparison);
     this->Process(&findByAttComparison, &findByAttComparisonParams, NULL, NULL, deepness, direction);
     return findByAttComparisonParams.m_element;
 }
@@ -437,8 +436,7 @@ Object *Object::FindChildByAttComparison(AttComparison *attComparison, int deepn
 Object *Object::FindChildExtremeByAttComparison(AttComparison *attComparison, int deepness, bool direction)
 {
     Functor findExtremeByAttComparison(&Object::FindExtremeByAttComparison);
-    FindExtremeByAttComparisonParams findExtremeByAttComparisonParams;
-    findExtremeByAttComparisonParams.m_attComparison = attComparison;
+    FindExtremeByAttComparisonParams findExtremeByAttComparisonParams(attComparison);
     this->Process(&findExtremeByAttComparison, &findExtremeByAttComparisonParams, NULL, NULL, deepness, direction);
     return findExtremeByAttComparisonParams.m_element;
 }
@@ -450,9 +448,7 @@ void Object::FindAllChildByAttComparison(
     objects->clear();
 
     Functor findAllByAttComparison(&Object::FindAllByAttComparison);
-    FindAllByAttComparisonParams findAllByAttComparisonParams;
-    findAllByAttComparisonParams.m_attComparison = attComparison;
-    findAllByAttComparisonParams.m_elements = objects;
+    FindAllByAttComparisonParams findAllByAttComparisonParams(attComparison, objects);
     this->Process(&findAllByAttComparison, &findAllByAttComparisonParams, NULL, NULL, deepness, direction);
 }
 
@@ -530,14 +526,13 @@ void Object::Modify(bool modified)
 void Object::FillFlatList(ListOfObjects *flatList)
 {
     Functor addToFlatList(&Object::AddLayerElementToFlatList);
-    AddLayerElementToFlatListParams addLayerElementToFlatListParams;
-    addLayerElementToFlatListParams.m_flatList = flatList;
+    AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
 
-Object *Object::GetFirstParent(const ClassId classId, int maxSteps) const
+Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
 {
-    if ((maxSteps == 0) || !m_parent) {
+    if ((maxDepth == 0) || !m_parent) {
         return NULL;
     }
 
@@ -545,13 +540,13 @@ Object *Object::GetFirstParent(const ClassId classId, int maxSteps) const
         return m_parent;
     }
     else {
-        return (m_parent->GetFirstParent(classId, maxSteps - 1));
+        return (m_parent->GetFirstParent(classId, maxDepth - 1));
     }
 }
 
-Object *Object::GetLastParentNot(const ClassId classId, int maxSteps)
+Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
 {
-    if ((maxSteps == 0) || !m_parent) {
+    if ((maxDepth == 0) || !m_parent) {
         return NULL;
     }
 
@@ -559,7 +554,7 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxSteps)
         return this;
     }
     else {
-        return (m_parent->GetLastParentNot(classId, maxSteps - 1));
+        return (m_parent->GetLastParentNot(classId, maxDepth - 1));
     }
 }
 
@@ -645,8 +640,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
 
 int Object::Save(FileOutputStream *output)
 {
-    SaveParams saveParams;
-    saveParams.m_output = output;
+    SaveParams saveParams(output);
 
     Functor save(&Object::Save);
     // Special case where we want to process all objects
@@ -1033,7 +1027,7 @@ int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
     Note *note = dynamic_cast<Note *>(this);
     assert(note);
 
-    if (!note->IsGraceNote()) {
+    if (!note->IsGraceNote() || note->IsChordTone()) {
         params->m_graceMinPos = 0;
         return FUNCTOR_CONTINUE;
     }
@@ -1114,15 +1108,18 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    // the negative offset is the part of the bounding box that overflows on the left
+    // The negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     int negative_offset = -(current->m_contentBB_x1);
-    if (!current->IsGraceNote())
+
+    // Increase negative_offset by the symbol type's left margin, unless it's a note
+    // that's part of a ligature.
+    if (!current->IsGraceNote() && !current->IsInLigature())
         negative_offset
             += (params->m_doc->GetLeftMargin(current->Is()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
-    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used)
+    // This should never happen but can with glyphs not exactly registered at x=0 in the SMuFL font used
     if (negative_offset < 0) negative_offset = 0;
 
     // with a grace note, also take into account the full width of the group given by the GraceAligner
@@ -1155,7 +1152,10 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
 
     // the next minimal position is given by the right side of the bounding box + the spacing of the element
     int width = current->m_contentBB_x2;
-    if (!current->HasEmptyBB())
+
+    // Move to right by the symbol type's right margin, unless it's a note that's
+    // part of a ligature.
+    if (!current->HasEmptyBB() && !current->IsInLigature())
         width += params->m_doc->GetRightMargin(current->Is()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     params->m_minPos = current->GetAlignment()->GetXRel() + width;
     current->GetAlignment()->SetMaxWidth(width);
@@ -1264,7 +1264,8 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         params->m_staffAlignment->AddBBoxBelow(current);
     }
 
-    // do not go further down the tree in this case since the bounding box of the first element is already taken into
+    // do not go further down the tree in this case since the bounding box of the first element is already taken
+    // into
     // account?
     return FUNCTOR_CONTINUE;
 }

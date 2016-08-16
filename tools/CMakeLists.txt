@@ -14,7 +14,11 @@ add_definitions(-std=c++11)
 
 EXEC_PROGRAM(../tools/get_git_commit.sh ARGS OUTPUT_VARIABLE GIT_COMMIT)
 
+<<<<<<< HEAD
 include_directories(/usr/local/include ../include ../include/midi ../include/hum ../include/pugi ../include/utf8 ../include/vrv ../libmei)
+=======
+include_directories(../include ../include/midi ../include/pugi ../include/utf8 ../include/vrv ../libmei)
+>>>>>>> develop
 
 if(NO_PAE_SUPPORT)
   add_definitions(-DNO_PAE_SUPPORT)
@@ -33,6 +37,7 @@ add_executable (verovio
 	../src/barline.cpp
 	../src/bboxdevicecontext.cpp
 	../src/beam.cpp
+	../src/boundary.cpp
 	../src/chord.cpp
 	../src/clef.cpp
 	../src/custos.cpp
@@ -57,9 +62,10 @@ add_executable (verovio
 	../src/keysig.cpp
 	../src/layer.cpp
 	../src/layerelement.cpp
+	../src/ligature.cpp
+	../src/measure.cpp
 	../src/mensur.cpp
 	../src/metersig.cpp
-	../src/measure.cpp
 	../src/mrest.cpp
 	../src/multirest.cpp
 	../src/note.cpp

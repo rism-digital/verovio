@@ -201,7 +201,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     }
 
     // read the incipit string
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     int i = 0;
     while (i < length) {
         // eat the input...
@@ -449,7 +449,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 int PaeInput::getOctave(const char *incipit, char *octave, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     if (incipit[i] == '\'') {
         *octave = BASE_OCT;
         while ((i + 1 < length) && (incipit[i + 1] == '\'')) {
@@ -478,7 +478,7 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
 {
 
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     switch (incipit[i]) {
         case '0': *duration = DURATION_long; break;
@@ -522,7 +522,7 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
 int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     measure->durations_offset = 0;
     measure->durations.clear();
@@ -556,7 +556,7 @@ int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index
 int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accident, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     if (incipit[i] == 'n') {
         *accident = ACCIDENTAL_EXPLICIT_n;
@@ -586,7 +586,7 @@ int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accid
 int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     // detect if it is a fermata or a tuplet
     regex_t re;
@@ -687,7 +687,7 @@ int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int inde
 int PaeInput::getGraceNote(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     // acciaccatura
     if (incipit[i] == 'g') {
@@ -742,7 +742,7 @@ data_PITCHNAME PaeInput::getPitch(char c_note)
 int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     if (!isdigit(incipit[i]) && (incipit[i] != 'c') && (incipit[i] != 'o')) {
         return 0;
@@ -823,7 +823,7 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
     // go through the 3 character and retrieve the letter (clef) and the line
     // mensural clef (with + in between) currently ignored
     // clef with octava correct?
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     int i = 0;
     char clef = 'G';
     char line = '2';
@@ -873,7 +873,7 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
 
 int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
 {
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     int i = index;
 
     *wholerest = 1;
@@ -951,7 +951,7 @@ int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int ind
 
 int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int index)
 {
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     int i = index;
     int j;
 
@@ -982,7 +982,7 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
     int alt_nr = 0;
 
     // at the key information line, extract data
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     int i = index;
     bool end_of_keysig = false;
     while ((i < length) && (!end_of_keysig)) {
@@ -1022,7 +1022,6 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     regex_t re;
     int oct;
     int i = index;
-    bool acc;
     int app;
     int tuplet_num;
 
@@ -1077,7 +1076,6 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     oct = note->octave;
     measure->notes.push_back(*note);
 
-    acc = note->acciaccatura;
     app = note->appoggiatura;
     tuplet_num = note->tuplet_note;
 
@@ -1102,7 +1100,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     // durations
     if (measure->durations.size() > 0) {
         measure->durations_offset++;
-        if (measure->durations_offset >= measure->durations.size()) {
+        if (measure->durations_offset >= (int)measure->durations.size()) {
             measure->durations_offset = 0;
         }
     }
@@ -1340,7 +1338,7 @@ void PaeInput::getAtRecordKeyValue(char *key, char *value, const char *input)
     char SEPARATOR = ':';
     char EMPTY = '\0';
 
-    size_t length = strlen(input);
+    int length = (int)strlen(input);
     int count = 0;
 
     // zero out strings

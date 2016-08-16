@@ -17,6 +17,7 @@
 #include "accid.h"
 #include "anchoredtext.h"
 #include "beam.h"
+#include "boundary.h"
 #include "chord.h"
 #include "clef.h"
 #include "custos.h"
@@ -28,6 +29,7 @@
 #include "hairpin.h"
 #include "keysig.h"
 #include "layer.h"
+#include "ligature.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -287,6 +289,11 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == KEYSIG) {
         m_currentNode = m_currentNode.append_child("keySig");
         WriteMeiKeySig(m_currentNode, dynamic_cast<KeySig *>(object));
+    }
+    else if (object->Is() == LIGATURE) {
+        LogError("WriteMeiLigature not implemented. (MeiOutput::WriteObject)");
+        // m_currentNode = m_currentNode.append_child("ligature");
+        // WriteMeiLigature(m_currentNode, dynamic_cast<KeySig *>(object));
     }
     else if (object->Is() == MENSUR) {
         m_currentNode = m_currentNode.append_child("mensur");
@@ -1723,7 +1730,7 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "tupletSpan") {
             if (!ReadTupletSpanAsTuplet(dynamic_cast<Measure *>(parent), current)) {
-                LogWarning("<tupletSpan> not readable as <tuplet> and ignored");
+                LogWarning("<tupletSpan> is not readable as <tuplet> and will be ignored");
             }
         }
         else {
@@ -1929,8 +1936,10 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
             break;
         }
         elementName = std::string(xmlElement.name());
+        // LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
         if (!IsAllowed(elementName, filter)) {
-            LogDebug("Element <%s> within %s ignored", xmlElement.name(), filter->GetClassName().c_str());
+            LogWarning("Element <%s> within %s is illegal and will be ignored", xmlElement.name(),
+                filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -1970,6 +1979,9 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
         }
         else if (elementName == "keySig") {
             success = ReadMeiKeySig(parent, xmlElement);
+        }
+        else if (elementName == "ligature") {
+            success = ReadMeiLigature(parent, xmlElement);
         }
         else if (elementName == "mensur") {
             success = ReadMeiMensur(parent, xmlElement);
@@ -2015,7 +2027,7 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
         }
         // unknown
         else {
-            LogDebug("Element %s ignored", xmlElement.name());
+            LogWarning("Element '%s' is unknown and will be ignored", xmlElement.name());
         }
     }
     return success;
@@ -2065,9 +2077,6 @@ bool MeiInput::ReadMeiBeam(Object *parent, pugi::xml_node beam)
 
     ReadMeiLayerChildren(vrvBeam, beam);
 
-    if (vrvBeam->GetNoteCount() == 1) {
-        LogWarning("<beam> with only one note");
-    }
     return true;
 }
 
@@ -2166,6 +2175,21 @@ bool MeiInput::ReadMeiKeySig(Object *parent, pugi::xml_node keySig)
 
     AddLayerElement(parent, vrvKeySig);
     return true;
+}
+
+bool MeiInput::ReadMeiLigature(Object *parent, pugi::xml_node ligature)
+{
+    Ligature *vrvLigature = new Ligature();
+    SetMeiUuid(ligature, vrvLigature);
+
+    ReadDurationInterface(ligature, vrvLigature);
+    vrvLigature->ReadCommon(ligature);
+    vrvLigature->ReadStems(ligature);
+    vrvLigature->ReadStemsCmn(ligature);
+    vrvLigature->ReadTiepresent(ligature);
+
+    AddLayerElement(parent, vrvLigature);
+    return ReadMeiLayerChildren(vrvLigature, ligature);
 }
 
 bool MeiInput::ReadMeiMensur(Object *parent, pugi::xml_node mensur)
@@ -2355,7 +2379,8 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
         }
         elementName = std::string(xmlElement.name());
         if (!IsAllowed(elementName, filter)) {
-            LogDebug("Element <%s> within %s ignored", xmlElement.name(), filter->GetClassName().c_str());
+            LogWarning("Element <%s> within %s is illegal and will be ignored", xmlElement.name(),
+                filter->GetClassName().c_str());
             continue;
         }
         // editorial
@@ -2373,7 +2398,7 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
         }
         // unknown
         else {
-            LogDebug("Element %s ignored", xmlElement.name());
+            LogWarning("Element %s is unknown and will be ignored", xmlElement.name());
         }
         i++;
     }
@@ -2825,7 +2850,8 @@ void MeiInput::AddScoreDef(Object *parent, ScoreDef *scoreDef)
         system->AddScoreDef(scoreDef);
     }
     else {
-        LogWarning("'%s' not supported within '%s'", scoreDef->GetClassName().c_str(), parent->GetClassName().c_str());
+        LogWarning(
+            "'%s' not supported within '%s' (1)", scoreDef->GetClassName().c_str(), parent->GetClassName().c_str());
         delete scoreDef;
     }
 }
@@ -2844,7 +2870,8 @@ void MeiInput::AddStaffGrp(Object *parent, StaffGrp *staffGrp)
         (dynamic_cast<StaffGrp *>(parent))->AddStaffGrp(staffGrp);
     }
     else {
-        LogWarning("'%s' not supported within '%s'", staffGrp->GetClassName().c_str(), parent->GetClassName().c_str());
+        LogWarning(
+            "'%s' not supported within '%s' (2)", staffGrp->GetClassName().c_str(), parent->GetClassName().c_str());
         delete staffGrp;
     }
 }
@@ -2897,8 +2924,14 @@ void MeiInput::AddLayerElement(Object *parent, LayerElement *element)
         assert(verse);
         verse->AddLayerElement(element);
     }
+    else if (parent->Is() == LIGATURE) {
+        Ligature *ligature = dynamic_cast<Ligature *>(parent);
+        assert(ligature);
+        ligature->AddLayerElement(element);
+    }
     else {
-        LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str());
+        LogWarning(
+            "'%s' not supported within '%s' (3)", element->GetClassName().c_str(), parent->GetClassName().c_str());
         delete element;
     }
 }
@@ -2916,7 +2949,8 @@ void MeiInput::AddFloatingElement(Object *parent, FloatingElement *element)
         measure->AddFloatingElement(element);
     }
     else {
-        LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str());
+        LogWarning(
+            "'%s' not supported within '%s' (4)", element->GetClassName().c_str(), parent->GetClassName().c_str());
         delete element;
     }
 }
@@ -2959,7 +2993,8 @@ void MeiInput::AddTextElement(Object *parent, TextElement *element)
         tempo->AddTextElement(element);
     }
     else {
-        LogWarning("'%s' not supported within '%s'", element->GetClassName().c_str(), parent->GetClassName().c_str());
+        LogWarning(
+            "'%s' not supported within '%s' (5)", element->GetClassName().c_str(), parent->GetClassName().c_str());
         delete element;
     }
 }
@@ -2982,16 +3017,17 @@ bool MeiInput::ReadScoreBasedMei(pugi::xml_node element)
         // We will need to move this into a ReadMeiSystemChildren (?) when we want to support app around or within
         // endings
         pugi::xml_node current;
-        EndingBoundary *endingStart = new EndingBoundary();
-        SetMeiUuid(element, endingStart);
-        endingStart->ReadCommon(element);
-        m_system->AddEnding(endingStart);
+        Ending *ending = new Ending();
+        SetMeiUuid(element, ending);
+        ending->ReadCommon(element);
+        m_system->AddEnding(ending);
         for (current = element.first_child(); current; current = current.next_sibling()) {
             LogDebug("Reading %s", current.name());
             success = ReadScoreBasedMei(current);
         }
-        EndingBoundary *endingEnd = new EndingBoundary(endingStart);
-        m_system->AddEnding(endingEnd);
+        BoundaryEnd *endingEnd = new BoundaryEnd(ending);
+        ending->SetEnd(endingEnd);
+        m_system->AddBoundaryEnd(endingEnd);
     }
     // content
     else if (std::string(element.name()) == "measure") {

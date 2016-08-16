@@ -186,8 +186,10 @@ void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, dou
 
     /// now same as circle arc...
 
+    /*
     double theta1 = atan2(ys - yc, xs - xc);
     double theta2 = atan2(ye - yc, xe - xc);
+
 
     int fArc; // flag for large or small arc 0 means less than 180 degrees
     if ((theta2 - theta1) > 0)
@@ -201,9 +203,9 @@ void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, dou
     else
         fSweep = 0;
 
-    // WriteLine(StringFormat("<path d=\"M%d %d A%d %d 0.0 %d %d  %d %d \" />",
-    //    int(xs), int(ys), int(rx), int(ry),
-    //    fArc, fSweep, int(xe), int(ye)));
+    WriteLine(StringFormat("<path d=\"M%d %d A%d %d 0.0 %d %d  %d %d \" />", int(xs), int(ys), int(rx), int(ry), fArc,
+        fSweep, int(xe), int(ye)));
+    */
 
     int penWidth = m_penStack.top().GetWidth();
     if (penWidth % 2) {
@@ -275,7 +277,7 @@ void BBoxDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height
         x -= width;
     }
     int penWidth = m_penStack.top().GetWidth();
-    ;
+
     if (penWidth % 2) {
         penWidth += 1;
     }

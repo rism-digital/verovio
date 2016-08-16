@@ -20,70 +20,54 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// EndingBoundary
+// Ending
 //----------------------------------------------------------------------------
 
-EndingBoundary::EndingBoundary(EndingBoundary *startBoundary) : FloatingElement("ending-"), AttCommon()
+Ending::Ending() : FloatingElement("ending-"), BoundaryStartInterface(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
-
-    m_startBoundary = startBoundary;
-    if (m_startBoundary) {
-        m_startBoundary->SetEndBoundary(this);
-    }
-    else {
-        m_endBoundary = NULL;
-    }
 
     Reset();
 }
 
-EndingBoundary::~EndingBoundary()
+Ending::~Ending()
 {
 }
 
-void EndingBoundary::Reset()
+void Ending::Reset()
 {
     FloatingElement::Reset();
+    BoundaryStartInterface::Reset();
     ResetCommon();
-
-    m_drawingMeasure = NULL;
 }
 
 //----------------------------------------------------------------------------
-// EndingBoundary functor methods
+// Ending functor methods
 //----------------------------------------------------------------------------
 
-int EndingBoundary::PrepareEndings(FunctorParams *functorParams)
+int Ending::PrepareBoundaries(FunctorParams *functorParams)
 {
-    PrepareEndingsParams *params = dynamic_cast<PrepareEndingsParams *>(functorParams);
+    PrepareBoundariesParams *params = dynamic_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
-    // This is an end boundary - we need to its pointer to the last measure we have encountered
-    if (this->IsEndBoundary()) {
-        if (params->m_lastMeasure == NULL) {
-            LogWarning("A measure cannot be set to the end ending boundary");
-        }
-        this->SetMeasure(params->m_lastMeasure);
-        // We are done
-        params->m_lastMeasure = NULL;
-        params->m_currentEnding = NULL;
-    }
-    else if (this->IsStartBoundary()) {
-        params->m_currentEnding = this;
-    }
+    // Endings should always have an BoundaryEnd
+    assert(this->IsBoundary());
+
+    this->BoundaryStartInterface::InterfacePrepareBoundaries(functorParams);
+
+    params->m_currentEnding = this;
 
     return FUNCTOR_CONTINUE;
 }
 
-int EndingBoundary::ResetDrawing(FunctorParams *functorParams)
+int Ending::ResetDrawing(FunctorParams *functorParams)
 {
-    m_drawingMeasure = NULL;
+    this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
 
     return FUNCTOR_CONTINUE;
 };
 
-int EndingBoundary::CastOffSystems(FunctorParams *functorParams)
+int Ending::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
     assert(params);
@@ -95,7 +79,7 @@ int EndingBoundary::CastOffSystems(FunctorParams *functorParams)
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    EndingBoundary *ending = dynamic_cast<EndingBoundary *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    Ending *ending = dynamic_cast<Ending *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     params->m_currentSystem->AddEnding(ending);
 
     return FUNCTOR_SIBLINGS;

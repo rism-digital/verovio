@@ -17,9 +17,10 @@ class MidiFile;
 namespace vrv {
 
 class AttComparison;
+class BoundaryStartInterface;
 class Chord;
 class Clef;
-class EndingBoundary;
+class Ending;
 class FileOutputStream;
 class KeySig;
 class Layer;
@@ -70,7 +71,7 @@ public:
 
 class AddLayerElementToFlatListParams : public FunctorParams {
 public:
-    AddLayerElementToFlatListParams() { m_flatList = NULL; }
+    AddLayerElementToFlatListParams(ListOfObjects *flatList) { m_flatList = flatList; }
     ListOfObjects *m_flatList;
 };
 
@@ -86,11 +87,11 @@ public:
 
 class AdjustFloatingPostionersParams : public FunctorParams {
 public:
-    AdjustFloatingPostionersParams()
+    AdjustFloatingPostionersParams(Doc *doc, Functor *functor)
     {
         m_classId = OBJECT;
-        m_doc = NULL;
-        m_functor = NULL;
+        m_doc = doc;
+        m_functor = functor;
     }
     ClassId m_classId;
     Doc *m_doc;
@@ -111,13 +112,13 @@ public:
 
 class AlignHorizontallyParams : public FunctorParams {
 public:
-    AlignHorizontallyParams()
+    AlignHorizontallyParams(Functor *functor)
     {
         m_measureAligner = NULL;
         m_time = 0.0;
         m_currentMensur = NULL;
         m_currentMeterSig = NULL;
-        m_functor = NULL;
+        m_functor = functor;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
@@ -180,12 +181,12 @@ public:
 
 class AlignVerticallyParams : public FunctorParams {
 public:
-    AlignVerticallyParams()
+    AlignVerticallyParams(Doc *doc)
     {
         m_systemAligner = NULL;
         m_staffIdx = 0;
         m_staffN = 0;
-        m_doc = NULL;
+        m_doc = doc;
     }
     SystemAligner *m_systemAligner;
     int m_staffIdx;
@@ -220,10 +221,10 @@ public:
 
 class CalcStaffOverlapParams : public FunctorParams {
 public:
-    CalcStaffOverlapParams()
+    CalcStaffOverlapParams(Functor *functor)
     {
         m_previous = NULL;
-        m_functor = NULL;
+        m_functor = functor;
     }
     StaffAlignment *m_previous;
     Functor *m_functor;
@@ -243,11 +244,11 @@ public:
 
 class CastOffPagesParams : public FunctorParams {
 public:
-    CastOffPagesParams()
+    CastOffPagesParams(Page *contentPage, Doc *doc, Page *currentPage)
     {
-        m_contentPage = NULL;
-        m_doc = NULL;
-        m_currentPage = NULL;
+        m_contentPage = contentPage;
+        m_doc = doc;
+        m_currentPage = currentPage;
         m_shift = 0;
         m_pageHeight = 0;
     }
@@ -273,11 +274,11 @@ public:
 
 class CastOffSystemsParams : public FunctorParams {
 public:
-    CastOffSystemsParams()
+    CastOffSystemsParams(System *contentSystem, Page *page, System *currentSystem)
     {
-        m_contentSystem = NULL;
-        m_page = NULL;
-        m_currentSystem = NULL;
+        m_contentSystem = contentSystem;
+        m_page = page;
+        m_currentSystem = currentSystem;
         m_shift = 0;
         m_systemWidth = 0;
         m_currentScoreDefWidth = 0;
@@ -315,10 +316,10 @@ public:
 
 class FindAllByAttComparisonParams : public FunctorParams {
 public:
-    FindAllByAttComparisonParams()
+    FindAllByAttComparisonParams(AttComparison *attComparison, ArrayOfObjects *elements)
     {
-        m_attComparison = NULL;
-        m_elements = NULL;
+        m_attComparison = attComparison;
+        m_elements = elements;
     }
     AttComparison *m_attComparison;
     ArrayOfObjects *m_elements;
@@ -335,9 +336,9 @@ public:
 
 class FindByAttComparisonParams : public FunctorParams {
 public:
-    FindByAttComparisonParams()
+    FindByAttComparisonParams(AttComparison *attComparison)
     {
-        m_attComparison = NULL;
+        m_attComparison = attComparison;
         m_element = NULL;
     }
     AttComparison *m_attComparison;
@@ -371,9 +372,9 @@ public:
 
 class FindExtremeByAttComparisonParams : public FunctorParams {
 public:
-    FindExtremeByAttComparisonParams()
+    FindExtremeByAttComparisonParams(AttComparison *attComparison)
     {
-        m_attComparison = NULL;
+        m_attComparison = attComparison;
         m_element = NULL;
     }
     AttComparison *m_attComparison;
@@ -395,9 +396,9 @@ public:
 
 class GenerateMIDIParams : public FunctorParams {
 public:
-    GenerateMIDIParams()
+    GenerateMIDIParams(MidiFile *midiFile)
     {
-        m_midiFile = NULL;
+        m_midiFile = midiFile;
         m_midiTrack = 0;
         m_currentMeasureTime = 0.0;
         m_totalTime = 0.0;
@@ -421,7 +422,7 @@ public:
 
 class IntegrateBoundingBoxGraceXShiftParams : public FunctorParams {
 public:
-    IntegrateBoundingBoxGraceXShiftParams() { m_functor = NULL; }
+    IntegrateBoundingBoxGraceXShiftParams(Functor *functor) { m_functor = functor; }
     Functor *m_functor;
 };
 
@@ -437,11 +438,11 @@ public:
 
 class IntegrateBoundingBoxXShiftParams : public FunctorParams {
 public:
-    IntegrateBoundingBoxXShiftParams()
+    IntegrateBoundingBoxXShiftParams(Doc *doc, Functor *functor)
     {
         m_shift = 0;
-        m_doc = NULL;
-        m_functor = NULL;
+        m_doc = doc;
+        m_functor = functor;
     }
     int m_shift;
     Doc *m_doc;
@@ -459,10 +460,10 @@ public:
 
 class IntegrateBoundingBoxYShiftParams : public FunctorParams {
 public:
-    IntegrateBoundingBoxYShiftParams()
+    IntegrateBoundingBoxYShiftParams(Functor *functor)
     {
         m_shift = 0;
-        m_functor = NULL;
+        m_functor = functor;
     }
     int m_shift;
     Functor *m_functor;
@@ -482,14 +483,14 @@ public:
 
 class JustifyXParams : public FunctorParams {
 public:
-    JustifyXParams()
+    JustifyXParams(Functor *functor)
     {
         m_measureXRel = 0;
         m_justifiableRatio = 1.0;
         m_leftBarLineX = 0;
         m_rightBarLineX = 0;
         m_systemFullWidth = 0;
-        m_functor = NULL;
+        m_functor = functor;
     }
     int m_measureXRel;
     double m_justifiableRatio;
@@ -500,23 +501,46 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareEndingsParams
+// PrepareBoundariesParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: the last measure
- * member 1: the current ending boundary
+ * member 1: the current boundary
 **/
 
-class PrepareEndingsParams : public FunctorParams {
+class PrepareBoundariesParams : public FunctorParams {
 public:
-    PrepareEndingsParams()
+    PrepareBoundariesParams()
     {
         m_lastMeasure = NULL;
         m_currentEnding = NULL;
     }
     Measure *m_lastMeasure;
-    EndingBoundary *m_currentEnding;
+    Ending *m_currentEnding;
+    std::vector<BoundaryStartInterface *> m_startBoundaries;
+};
+
+//----------------------------------------------------------------------------
+// PrepareFloatingGrpsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: int value of the current grp
+ * member 1: EndingBoundary **currentEnding
+ * member 2: bool has ending ended
+ **/
+
+class PrepareFloatingGrpsParams : public FunctorParams {
+public:
+    PrepareFloatingGrpsParams()
+    {
+        // m_lastMeasure = NULL;
+        // m_currentEnding = NULL;
+    }
+    // Measure *m_lastMeasure;
+    // Ending *m_currentEnding;
+    // std::vector<BoundaryStartInterface *> m_startBoundaries;
 };
 
 //----------------------------------------------------------------------------
@@ -553,11 +577,11 @@ public:
 
 class PrepareRptParams : public FunctorParams {
 public:
-    PrepareRptParams()
+    PrepareRptParams(ScoreDef *currentScoreDef)
     {
         m_currentMRpt = NULL;
         m_multiNumber = BOOLEAN_NONE;
-        m_currentScoreDef = NULL;
+        m_currentScoreDef = currentScoreDef;
     }
     MRpt *m_currentMRpt;
     data_BOOLEAN m_multiNumber;
@@ -656,12 +680,12 @@ public:
 
 class ReplaceDrawingValuesInStaffDefParams : public FunctorParams {
 public:
-    ReplaceDrawingValuesInStaffDefParams()
+    ReplaceDrawingValuesInStaffDefParams(Clef *clef, KeySig *keySig, Mensur *mensur, MeterSig *meterSig)
     {
-        m_clef = NULL;
-        m_keySig = NULL;
-        m_mensur = NULL;
-        m_meterSig = NULL;
+        m_clef = clef;
+        m_keySig = keySig;
+        m_mensur = mensur;
+        m_meterSig = meterSig;
     }
     Clef *m_clef;
     KeySig *m_keySig;
@@ -679,7 +703,7 @@ public:
 
 class SaveParams : public FunctorParams {
 public:
-    SaveParams() { m_output = NULL; }
+    SaveParams(FileOutputStream *output) { m_output = output; }
     FileOutputStream *m_output;
 };
 
@@ -697,13 +721,13 @@ public:
 
 class SetAlignmentXPosParams : public FunctorParams {
 public:
-    SetAlignmentXPosParams()
+    SetAlignmentXPosParams(Doc *doc, Functor *functor)
     {
         m_previousTime = 0.0;
         m_previousXRel = 0;
         m_longestActualDur = 0;
-        m_doc = NULL;
-        m_functor = NULL;
+        m_doc = doc;
+        m_functor = functor;
     }
     double m_previousTime;
     int m_previousXRel;
@@ -726,13 +750,13 @@ public:
 
 class SetAligmentYPosParams : public FunctorParams {
 public:
-    SetAligmentYPosParams()
+    SetAligmentYPosParams(Doc *doc, Functor *functor)
     {
         m_previousStaffHeight = 0;
         m_previousOverflowBelow = 0;
         m_previousVerseCount = 0;
-        m_doc = NULL;
-        m_functor = NULL;
+        m_doc = doc;
+        m_functor = functor;
     }
     int m_previousStaffHeight;
     int m_previousOverflowBelow;
@@ -752,10 +776,10 @@ public:
 
 class SetBoundingBoxGraceXShiftParams : public FunctorParams {
 public:
-    SetBoundingBoxGraceXShiftParams()
+    SetBoundingBoxGraceXShiftParams(Doc *doc)
     {
         m_graceMinPos = 0;
-        m_doc = NULL;
+        m_doc = doc;
     }
 
     int m_graceMinPos;
@@ -774,14 +798,14 @@ public:
 
 class SetBoundingBoxXShiftParams : public FunctorParams {
 public:
-    SetBoundingBoxXShiftParams()
+    SetBoundingBoxXShiftParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_minPos = 0;
         m_layerMinPos = 0;
         m_measureWidth = 0;
-        m_doc = NULL;
-        m_functor = NULL;
-        m_functorEnd = NULL;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
     }
     int m_minPos;
     int m_layerMinPos;
@@ -803,11 +827,11 @@ public:
 
 class SetCurrentScoreDefParams : public FunctorParams {
 public:
-    SetCurrentScoreDefParams()
+    SetCurrentScoreDefParams(ScoreDef *upcomingScoreDef)
     {
         m_currentScoreDef = NULL;
         m_currentStaffDef = NULL;
-        m_upcomingScoreDef = NULL;
+        m_upcomingScoreDef = upcomingScoreDef;
     }
     ScoreDef *m_currentScoreDef;
     StaffDef *m_currentStaffDef;
@@ -831,16 +855,16 @@ public:
 
 class SetDrawingXYParams : public FunctorParams {
 public:
-    SetDrawingXYParams()
+    SetDrawingXYParams(Doc *doc, View *view, Functor *functor)
     {
-        m_doc = NULL;
+        m_doc = doc;
         m_currentSystem = NULL;
         m_currentMeasure = NULL;
         m_currentStaff = NULL;
         m_currentLayer = NULL;
-        m_view = NULL;
+        m_view = view;
         m_processLayerElements = false;
-        m_functor = NULL;
+        m_functor = functor;
     }
     Doc *m_doc;
     System *m_currentSystem;
@@ -863,10 +887,10 @@ public:
 
 class SetOverflowBBoxesParams : public FunctorParams {
 public:
-    SetOverflowBBoxesParams()
+    SetOverflowBBoxesParams(Doc *doc)
     {
         m_staffAlignment = NULL;
-        m_doc = NULL;
+        m_doc = doc;
     }
     StaffAlignment *m_staffAlignment;
     Doc *m_doc;
@@ -936,7 +960,7 @@ public:
 
 class UnCastOffParams : public FunctorParams {
 public:
-    UnCastOffParams() { m_currentSystem = NULL; }
+    UnCastOffParams(System *currentSystem) { m_currentSystem = currentSystem; }
     System *m_currentSystem;
 };
 

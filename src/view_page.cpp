@@ -52,12 +52,8 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
 
     int i;
-    SetDrawingXYParams setDrawingXYParams;
-    setDrawingXYParams.m_doc = m_doc;
-    setDrawingXYParams.m_view = this;
     Functor setDrawingXY(&Object::SetDrawingXY);
-    // Pass it for redirection
-    setDrawingXYParams.m_functor = &setDrawingXY;
+    SetDrawingXYParams setDrawingXYParams(m_doc, this, &setDrawingXY);
     // First pass without processing the LayerElements - we need this for cross-staff going down because
     // the elements will need the position of the staff below to have been set before
     m_currentPage->Process(&setDrawingXY, &setDrawingXYParams);
@@ -123,7 +119,7 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
         + m_doc->GetRightMargin(CLEF);
     if (numAlteration > 0) {
         width += m_doc->GetLeftMargin(KEYSIG)
-            + m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_STYLE_KEYSIG_STEP
+            + m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_KEYSIG_STEP
             + m_doc->GetRightMargin(KEYSIG);
     }
 
@@ -172,7 +168,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
-    DrawSystemList(dc, system, ENDING_BOUNDARY);
+    DrawSystemList(dc, system, ENDING);
 
     dc->EndGraphic(system, this);
 }
@@ -201,9 +197,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         if (((*iter)->Is() == classId) && (classId == SLUR)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
-        if (((*iter)->Is() == classId) && (classId == ENDING_BOUNDARY)) {
-            // cast to EndingBoundary check in DrawEnding
-            DrawEnding(dc, dynamic_cast<EndingBoundary *>(*iter), system);
+        if (((*iter)->Is() == classId) && (classId == ENDING)) {
+            // cast to Ending check in DrawEnding
+            DrawEnding(dc, dynamic_cast<Ending *>(*iter), system);
         }
     }
 }
@@ -447,7 +443,7 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     // the glyphs and the line
     y1 += m_doc->GetDrawingStemWidth(100);
     y2 -= m_doc->GetDrawingStemWidth(100);
-    DrawFullRectangle(dc, x1, y1, x2, y2);
+    DrawFilledRectangle(dc, x1, y1, x2, y2);
 
     return;
 }
@@ -870,7 +866,6 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
         = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a, PITCHNAME_b };
     int y_dec, yb, plafond;
     int degres, octaves, position, code;
-    char clefId = 0;
 
     int staffSize = parentStaff->m_drawingStaffSize;
     // calculer position du do central en fonction clef
@@ -886,7 +881,6 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
 
     Clef *clef = layer->GetClef(pelement);
     if (clef) {
-        clefId = clef->GetClefId();
         yb += (clef->GetClefOffset()) * m_doc->GetDrawingUnit(staffSize); // UT1 reel
     }
     yb -= 4 * m_doc->GetDrawingOctaveSize(staffSize); // UT, note la plus grave
@@ -976,15 +970,15 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
 
     Object *current;
     for (current = parent->GetFirst(); current; current = parent->GetNext()) {
-        if (current->Is() == ENDING_BOUNDARY) {
-            EndingBoundary *ending = dynamic_cast<EndingBoundary *>(current);
-            assert(ending);
-            if (ending->IsStartBoundary()) {
-                // Create placeholder, but only for the start boundary. A graphic for the end boundary will be created
-                // only if it is on a different system - See View::DrawEnding
-                dc->StartGraphic(current, "", current->GetUuid());
-                dc->EndGraphic(current, this);
-            }
+        // Boundary ends are not drawn directly (for now) - maybe we want to draw an empty SVG element?
+        if (current->Is() == BOUNDARY_END) {
+            // nothing to do, then
+        }
+        else if (current->Is() == ENDING) {
+            // Create placeholder - A graphic for the end boundary will be created
+            // but only if it is on a different system - See View::DrawEnding
+            dc->StartGraphic(current, "", current->GetUuid());
+            dc->EndGraphic(current, this);
         }
         else if (current->Is() == MEASURE) {
             // cast to Measure check in DrawMeasure

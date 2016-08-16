@@ -99,6 +99,12 @@ bool LayerElement::IsGraceNote() const
     return (note && note->HasGrace());
 }
 
+bool LayerElement::IsInLigature()
+{
+    if (this->Is() != NOTE) return false;
+    return (this->GetFirstParent(LIGATURE, MAX_LIGATURE_DEPTH));
+}
+
 bool LayerElement::IsInFTrem()
 {
     if ((this->Is() != NOTE) || (this->Is() == CHORD)) return false;

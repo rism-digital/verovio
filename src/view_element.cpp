@@ -98,6 +98,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is() == KEYSIG) {
         DrawKeySig(dc, element, layer, staff, measure);
     }
+    else if (element->Is() == LIGATURE) {
+        DrawLigature(dc, element, layer, staff, measure);
+    }
     else if (element->Is() == MENSUR) {
         DrawMensur(dc, element, layer, staff, measure);
     }
@@ -151,7 +154,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
 //----------------------------------------------------------------------------
 // View - LayerElement
 //----------------------------------------------------------------------------
-
+    
 void View::DrawAccid(
     DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid)
 {
@@ -171,6 +174,15 @@ void View::DrawAccid(
     }
 
     dc->StartGraphic(element, "", element->GetUuid());
+
+    bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
+                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
+                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+
+    // Mensural accidentals may be quite a bit smaller than CMN accidentals; use _pseudoStaffSize_ to force this.
+    int pseudoStaffSize;
+    if (isMensural) pseudoStaffSize = (int)(TEMP_MACCID_SIZE_FACTOR * staff->m_drawingStaffSize);
+    else pseudoStaffSize = staff->m_drawingStaffSize;
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if (accid->m_parent) {
@@ -201,7 +213,7 @@ void View::DrawAccid(
             accid->SetDrawingX(accid->GetDrawingX() + radius / 2);
         }
         accid->SetDrawingY(
-            y + TEMP_STYLE_ACCID_EDIT_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR);
+            y + TEMP_ACCID_EDIT_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR);
     }
 
     int x = accid->GetDrawingX();
@@ -223,7 +235,7 @@ void View::DrawAccid(
         default: break;
     }
 
-    DrawSmuflCode(dc, x, y, symc, staff->m_drawingStaffSize, accid->m_drawingCueSize);
+    DrawSmuflCode(dc, x, y, symc, pseudoStaffSize, accid->m_drawingCueSize);
 
     dc->EndGraphic(element, this);
 }
@@ -797,7 +809,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     x = element->GetDrawingX();
     // HARDCODED
     int step
-        = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_STYLE_KEYSIG_STEP;
+        = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_KEYSIG_STEP;
 
     // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by
     // default)
@@ -932,15 +944,14 @@ void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     MRpt2 *mRpt2 = dynamic_cast<MRpt2 *>(element);
     assert(mRpt2);
+    // in non debug
+    if (!mRpt2) return;
 
     dc->StartGraphic(element, "", element->GetUuid());
 
     DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, 2, true, staff, measure);
 
     dc->EndGraphic(element, this);
-
-    // For avoiding unused variable warning in non debug mode
-    mRpt2 = NULL;
 }
 
 void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -979,7 +990,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // Draw the base rect
         // make it 8 pixels smaller than the interline space
         // these are the two 4 substracted and added
-        DrawFullRectangle(dc, x1, y2, x2, y1);
+        DrawFilledRectangle(dc, x1, y2, x2, y1);
 
         // Draw two lines at beginning and end
         // make it 8 pixels longer, and 4 pixels width
@@ -995,7 +1006,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // Position centered in third line
         y1 = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * 4;
         y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        DrawFullRectangle(dc, x1, y2 - 4, x2, y1 + 4);
+        DrawFilledRectangle(dc, x1, y2 - 4, x2, y1 + 4);
     }
 
     // Draw the text above
@@ -1064,7 +1075,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int drawingDur;
     int staffY = staff->GetDrawingY();
     wchar_t fontNo;
-    int ledge;
     int verticalCenter = 0;
     bool flippedNotehead = false;
     bool doubleLengthLedger = false;
@@ -1077,11 +1087,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
 
-    if (drawingDur > DUR_1) {
-        ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
-    }
-    else {
-        ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
+    if (drawingDur <= DUR_1) {
         radius += radius / 3;
     }
 
@@ -1322,7 +1328,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     assert(syl);
 
     if (!syl->GetStart()) {
-        LogDebug("Syl parent note was not found");
+        LogWarning("Parent note for <syl> was not found");
         return;
     }
 
@@ -1447,16 +1453,29 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     dc->ResetPen();
     dc->ResetBrush();
 }
-
+    
+bool IsMensuralStaff(Staff *staff);
+bool IsMensuralStaff(Staff *staff)
+{
+    bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
+                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
+                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    return isMensural;
+}
+    
 void View::DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
 {
     int i;
+    int useStaffSize = staff->m_drawingStaffSize;
+    if (IsMensuralStaff(staff))
+        useStaffSize *= TEMP_MAUGDOT_SIZE_FACTOR;
+    
     if (IsOnStaffLine(y, staff)) {
-        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y += m_doc->GetDrawingUnit(useStaffSize);
     }
     for (i = 0; i < dots; i++) {
-        DrawDot(dc, x, y, staff->m_drawingStaffSize);
-        x += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        DrawDot(dc, x, y, useStaffSize);
+        x += m_doc->GetDrawingDoubleUnit(useStaffSize);
     }
 }
 
@@ -1591,7 +1610,7 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
     assert(dc);
     assert(staff);
 
-    int ynum, yden;
+    int ynum = 0, yden = 0;
     std::wstring wtext;
 
     if (numBase) {
@@ -1659,7 +1678,7 @@ void View::DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff)
         y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    DrawFullRectangle(dc, x1, y2, x2, y1);
+    DrawFilledRectangle(dc, x1, y2, x2, y1);
 
     // lines
     x1 = x - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -1682,7 +1701,7 @@ void View::DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff)
         y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-    DrawFullRectangle(dc, x1, y2, x2, y1);
+    DrawFilledRectangle(dc, x1, y2, x2, y1);
 }
 
 void View::DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff)
@@ -1719,7 +1738,7 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned c
     }
 
     y2 = y1 + vertic;
-    DrawFullRectangle(dc, x1, y1, x2, y2);
+    DrawFilledRectangle(dc, x1, y1, x2, y2);
 
     off /= 2;
     x1 -= off;
@@ -1792,7 +1811,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
 
     // draw the stems and the flags
     if (dir == STEMDIRECTION_up) {
-        DrawFullRectangle(dc, x2 - m_doc->GetDrawingStemWidth(staffSize), stemY1, x2, stemY2);
+        DrawFilledRectangle(dc, x2 - m_doc->GetDrawingStemWidth(staffSize), stemY1, x2, stemY2);
 
         if (drawingDur > DUR_4) {
             DrawSmuflCode(dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), y2, SMUFL_E240_flag8thUp,
@@ -1803,7 +1822,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
         }
     }
     else {
-        DrawFullRectangle(dc, x2, stemY1, x2 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), stemY2);
+        DrawFilledRectangle(dc, x2, stemY1, x2 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), stemY2);
 
         if (drawingDur > DUR_4) {
             DrawSmuflCode(dc, x2, y2, SMUFL_E241_flag8thDown, staff->m_drawingStaffSize, drawingCueSize);
@@ -1887,11 +1906,16 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
 
     // another way of calculating accidBot
     assert(((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit) == accidTop + accidHeightDiff);
+    // in non debug
+    if (((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit) != accidTop + accidHeightDiff)
+        return 0;
 
     // store it for asserts
     accidSpaceSize = (int)accidSpace->size();
     assert(accidTop >= 0);
     assert(accidTop < accidSpaceSize);
+    // in non debug
+    if ((accidTop < 0) || (accidTop >= accidSpaceSize)) return 0;
 
     /*
      * Make sure all four corners of the accidental are not on an already-taken spot.

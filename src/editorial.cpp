@@ -29,7 +29,7 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() : Object("ee-"), AttCommon(), AttCommonPart()
+EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), AttCommon(), AttCommonPart()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
@@ -48,6 +48,7 @@ EditorialElement::EditorialElement(std::string classid) : Object(classid), AttCo
 void EditorialElement::Reset()
 {
     Object::Reset();
+    BoundaryStartInterface::Reset();
     ResetCommon();
     ResetCommonPart();
 
@@ -483,6 +484,25 @@ void Unclear::Reset()
 //----------------------------------------------------------------------------
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
+
+int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
+{
+    if (this->IsBoundary()) {
+        this->BoundaryStartInterface::InterfacePrepareBoundaries(functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int EditorialElement::ResetDrawing(FunctorParams *functorParams)
+{
+
+    if (this->IsBoundary()) {
+        this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+};
 
 int EditorialElement::CastOffSystems(FunctorParams *functorParams)
 {

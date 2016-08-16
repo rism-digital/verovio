@@ -49,6 +49,8 @@ FloatingElement::~FloatingElement()
 void FloatingElement::Reset()
 {
     Object::Reset();
+
+    m_drawingGrpId = 0;
 }
 
 void FloatingElement::UpdateContentBBoxX(int x1, int x2)
@@ -112,7 +114,7 @@ FloatingPositioner::FloatingPositioner(FloatingElement *element) : BoundingBox()
         // dynam below by default
         m_place = dynam->HasPlace() ? dynam->GetPlace() : STAFFREL_below;
     }
-    else if (element->Is() == ENDING_BOUNDARY) {
+    else if (element->Is() == ENDING) {
         // endings always above;
         m_place = STAFFREL_above;
     }
@@ -283,6 +285,7 @@ int FloatingElement::ResetDrawing(FunctorParams *functorParams)
         assert(interface);
         return interface->InterfaceResetDrawing(functorParams, this);
     }
+    m_drawingGrpId = 0;
     return FUNCTOR_CONTINUE;
 };
 

@@ -46,9 +46,10 @@ enum ClassId {
     DEVICE_CONTEXT, // Should not be instanciated as is
     //
     ALIGNMENT,
+    BOUNDARY_END,
     CLEF_ATTR,
     DOC,
-    ENDING_BOUNDARY,
+    ENDING,
     FLOATING_POSITIONER,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
@@ -99,6 +100,7 @@ enum ClassId {
     DOT,
     FTREM,
     KEYSIG,
+    LIGATURE,
     MENSUR,
     METERSIG,
     MREST,
@@ -150,6 +152,7 @@ enum ClassId {
  */
 enum InterfaceId {
     INTERFACE,
+    INTERFACE_BOUNDARY,
     INTERFACE_DURATION,
     INTERFACE_PITCH,
     INTERFACE_POSITION,
@@ -231,6 +234,9 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 
 /** Define the maximum levels between a fTrem and its notes **/
 #define MAX_FTREM_DEPTH -1
+
+/** Define the maximum levels between a ligature and its notes **/
+#define MAX_LIGATURE_DEPTH -1
 
 /** Define the maximum levels between a tuplet and its notes **/
 #define MAX_TUPLET_DEPTH -1

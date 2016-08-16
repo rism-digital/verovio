@@ -114,6 +114,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/barline.cpp \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
 	$VEROVIO_ROOT/src/beam.cpp \
+	$VEROVIO_ROOT/src/boundary.cpp \
 	$VEROVIO_ROOT/src/chord.cpp \
 	$VEROVIO_ROOT/src/clef.cpp \
 	$VEROVIO_ROOT/src/custos.cpp \
@@ -138,6 +139,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/keysig.cpp \
 	$VEROVIO_ROOT/src/layer.cpp \
 	$VEROVIO_ROOT/src/layerelement.cpp \
+	$VEROVIO_ROOT/src/ligature.cpp \
 	$VEROVIO_ROOT/src/measure.cpp \
 	$VEROVIO_ROOT/src/mensur.cpp \
 	$VEROVIO_ROOT/src/metersig.cpp \

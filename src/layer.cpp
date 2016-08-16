@@ -238,9 +238,6 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
     params->m_currentMeterSig = GetCurrentMeterSig();
 
     // We are starting a new layer, reset the time;
-    int meterUnit = 4;
-    if (params->m_currentMeterSig && params->m_currentMeterSig->HasUnit())
-        meterUnit = params->m_currentMeterSig->GetUnit();
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
     params->m_time = DUR_MAX * -1.0;
 
@@ -309,13 +306,16 @@ int Layer::SetDrawingXY(FunctorParams *functorParams)
 
     // set the values for the scoreDef elements when required
     if (this->GetStaffDefClef()) {
-        this->GetStaffDefClef()->SetDrawingX(this->GetStaffDefClef()->GetXRel() + params->m_currentMeasure->GetDrawingX());
+        this->GetStaffDefClef()->SetDrawingX(
+            this->GetStaffDefClef()->GetXRel() + params->m_currentMeasure->GetDrawingX());
     }
     if (this->GetStaffDefKeySig()) {
-        this->GetStaffDefKeySig()->SetDrawingX(this->GetStaffDefKeySig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
+        this->GetStaffDefKeySig()->SetDrawingX(
+            this->GetStaffDefKeySig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
     }
     if (this->GetStaffDefMensur()) {
-        this->GetStaffDefMensur()->SetDrawingX(this->GetStaffDefMensur()->GetXRel() + params->m_currentMeasure->GetDrawingX());
+        this->GetStaffDefMensur()->SetDrawingX(
+            this->GetStaffDefMensur()->GetXRel() + params->m_currentMeasure->GetDrawingX());
     }
     if (this->GetStaffDefMeterSig()) {
         this->GetStaffDefMeterSig()->SetDrawingX(

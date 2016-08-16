@@ -239,6 +239,8 @@ void View::DrawHairpin(
         return;
     }
 
+    /* We actually do not need the layer for now
+
     Layer *layer1 = NULL;
     Layer *layer2 = NULL;
 
@@ -255,6 +257,8 @@ void View::DrawHairpin(
         layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
 
     assert(layer1 && layer2);
+
+     */
 
     /************** start / end opening **************/
 
@@ -396,6 +400,8 @@ void View::DrawOctave(
         return;
     }
 
+    /* We actually do not need the layer for now
+
     Layer *layer1 = NULL;
     Layer *layer2 = NULL;
 
@@ -420,6 +426,8 @@ void View::DrawOctave(
     }
 
     assert(layer1 && layer2);
+
+    */
 
     /************** draw it **************/
 
@@ -797,7 +805,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
         int dist = abs(p2->x - p1->x);
         height
             = std::max(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITION_FACTOR,
-                dist / TEMP_STYLE_SLUR_HEIGHT_FACTOR);
+                dist / TEMP_SLUR_HEIGHT_FACTOR);
         height = std::min(
             m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITION_FACTOR, height);
     }
@@ -889,21 +897,21 @@ float View::GetAdjustedSlurAngle(Point *p1, Point *p2, curvature_CURVEDIR curveD
     float slurAngle = atan2(p2->y - p1->y, p2->x - p1->x);
 
     // the slope of the slur is high and needs to be corrected
-    if (fabs(slurAngle) > TEMP_STYLE_SLUR_MAX_SLOPE) {
-        int side = (p2->x - p1->x) * sin(TEMP_STYLE_SLUR_MAX_SLOPE) / sin(M_PI / 2 - TEMP_STYLE_SLUR_MAX_SLOPE);
+    if (fabs(slurAngle) > TEMP_SLUR_MAX_SLOPE) {
+        int side = (p2->x - p1->x) * sin(TEMP_SLUR_MAX_SLOPE) / sin(M_PI / 2 - TEMP_SLUR_MAX_SLOPE);
         if (p2->y > p1->y) {
             if (curveDir == curvature_CURVEDIR_above)
                 p1->y = p2->y - side;
             else
                 p2->y = p1->y + side;
-            slurAngle = TEMP_STYLE_SLUR_MAX_SLOPE;
+            slurAngle = TEMP_SLUR_MAX_SLOPE;
         }
         else {
             if (curveDir == curvature_CURVEDIR_above)
                 p2->y = p1->y - side;
             else
                 p1->y = p2->y + side;
-            slurAngle = -TEMP_STYLE_SLUR_MAX_SLOPE;
+            slurAngle = -TEMP_SLUR_MAX_SLOPE;
         }
     }
 
@@ -914,7 +922,7 @@ void View::GetControlPoints(
     Point *p1, Point *p2, Point *c1, Point *c2, curvature_CURVEDIR curveDir, int height, int staffSize)
 {
     // Set the x position of the control points
-    int cPos = std::min((p2->x - p1->x) / TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR, m_doc->GetDrawingStaffSize(staffSize));
+    int cPos = std::min((p2->x - p1->x) / TEMP_SLUR_CONTROL_POINT_FACTOR, m_doc->GetDrawingStaffSize(staffSize));
     c1->x = p1->x + cPos;
     c2->x = p2->x - cPos;
 
@@ -973,7 +981,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 
     // 0.2 for avoiding / by 0 (below)
     float maxHeightFactor = std::max(0.2, fabs(angle));
-    maxHeight = dist / (maxHeightFactor * (TEMP_STYLE_SLUR_CURVE_FACTOR
+    maxHeight = dist / (maxHeightFactor * (TEMP_SLUR_CURVE_FACTOR
                                               + 5)); // 5 is the minimum - can be increased for limiting curvature
     if (posRatio) {
         // Do we want to set a max height?
@@ -1382,7 +1390,11 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         // x position of the syl is two units back
         x2 -= 2 * (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
-        // DrawFullRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+        // if (x1 > x2) {
+        //    DrawFilledRectangle(dc, x1, y + 2 * m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), x2, y + 3 *
+        //    m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+        //    LogDebug("x1 > x2 (%d %d)", x1, x2);
+        //}
 
         // the length of the dash and the space between them - can be made a parameter
         int dashLength = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 3;
@@ -1409,13 +1421,13 @@ void View::DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *
         for (i = 0; i < nbDashes; i++) {
             x = x1 + margin + (i * dashSpace);
             x = std::max(x, x1);
-            DrawFullRectangle(dc, x - halfDashLength, y, x + halfDashLength,
+            DrawFilledRectangle(dc, x - halfDashLength, y, x + halfDashLength,
                 y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
         }
     }
     else if (syl->GetCon() == sylLog_CON_u) {
         x1 += (int)m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 2;
-        DrawFullRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+        DrawFilledRectangle(dc, x1, y, x2, y + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
     }
 }
 
@@ -1625,7 +1637,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     dc->EndGraphic(tempo, this);
 }
 
-void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
+void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 {
     assert(dc);
     assert(ending);
@@ -1639,24 +1651,18 @@ void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
         }
     }
 
-    // Only start boundaries are added to the system drawing list from each measure
-    assert(ending->IsStartBoundary());
-    // in non debug mode
-    if (!ending->IsStartBoundary()) return;
-
-    EndingBoundary *start = ending;
-    EndingBoundary *end = ending->GetEndBoundary();
+    BoundaryEnd *endingEndBoundary = ending->GetEnd();
 
     // We need to make sure we have the end boudary and a measure (first and last) in each of them
-    assert(end);
-    assert(start->GetMeasure() && end->GetMeasure());
+    assert(endingEndBoundary);
+    assert(ending->GetMeasure() && endingEndBoundary->GetMeasure());
     // in non debug mode
-    if (!end) return;
-    if (!start->GetMeasure() || !end->GetMeasure()) return;
+    if (!endingEndBoundary) return;
+    if (!ending->GetMeasure() || !endingEndBoundary->GetMeasure()) return;
 
     // Get the parent system of the first and last note
-    System *parentSystem1 = dynamic_cast<System *>(start->GetFirstParent(SYSTEM));
-    System *parentSystem2 = dynamic_cast<System *>(end->GetFirstParent(SYSTEM));
+    System *parentSystem1 = dynamic_cast<System *>(ending->GetFirstParent(SYSTEM));
+    System *parentSystem2 = dynamic_cast<System *>(endingEndBoundary->GetFirstParent(SYSTEM));
 
     assert(parentSystem1 && parentSystem2);
     // in non debug mode
@@ -1668,15 +1674,15 @@ void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
-        x1 = start->GetMeasure()->GetDrawingX();
-        x2 = end->GetMeasure()->GetDrawingX() + end->GetMeasure()->GetRightBarLineXRel();
+        x1 = ending->GetMeasure()->GetDrawingX();
+        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
     }
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
     else if (system == parentSystem1) {
         // We need the last measure of the system for x2 - we also use it for getting the staves later
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
-        x1 = start->GetMeasure()->GetDrawingX();
+        x1 = ending->GetMeasure()->GetDrawingX();
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         spanningType = SPANNING_START;
     }
@@ -1686,7 +1692,7 @@ void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
-        x2 = end->GetMeasure()->GetDrawingX() + end->GetMeasure()->GetRightBarLineXRel();
+        x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
         spanningType = SPANNING_END;
     }
     // Rare case where neither the first note nor the last note are in the current system - draw the connector
@@ -1725,11 +1731,11 @@ void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
     TextExtend extend;
     dc->GetTextExtent("M", &extend);
 
-    if (start->HasN()) {
+    if (ending->HasN()) {
         std::wstringstream strStream;
         // Maybe we want to add ( ) after system breaks?
         // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
-        strStream << start->GetN() << L".";
+        strStream << ending->GetN() << L".";
         // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
 
         Text text;
@@ -1751,12 +1757,12 @@ void View::DrawEnding(DeviceContext *dc, EndingBoundary *ending, System *system)
 
     int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
 
-    DrawFullRectangle(dc, x1, y2, x2, y2 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
+    DrawFilledRectangle(dc, x1, y2, x2, y2 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        DrawFullRectangle(dc, x1, y1, x1 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y2);
+        DrawFilledRectangle(dc, x1, y1, x1 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y2);
     }
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        DrawFullRectangle(dc, x2 - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y1, x2, y2);
+        DrawFilledRectangle(dc, x2 - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y1, x2, y2);
     }
 
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START))
