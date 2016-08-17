@@ -452,6 +452,11 @@ public:
     virtual int AdjustFloatingPostioners(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
+     * Adjust the position of all floating positionner that are grouped, staff by staff.
+     */
+    virtual int AdjustFloatingPostionerGrps(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+
+    /**
      * Align horizontally the content of a page.
      * For each LayerElement, instanciate its Alignment.
      * It creates it if no other note or event occurs at its position.

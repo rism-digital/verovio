@@ -297,6 +297,9 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
     assert(params);
 
+    AdjustFloatingPostionerGrpsParams adjustFloatingPostionerGrpsParams(params->m_doc);
+    Functor adjustFloatingPostionerGrps(&Object::AdjustFloatingPostionerGrps);
+
     params->m_classId = TIE;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = SLUR;
@@ -315,6 +318,11 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(ENDING);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;
     m_systemAligner.Process(params->m_functor, params);

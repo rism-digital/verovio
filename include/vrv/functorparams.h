@@ -99,6 +99,22 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustFloatingPostionerGrpsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a vector of the classId to group
+ * member 1: the doc
+ **/
+
+class AdjustFloatingPostionerGrpsParams : public FunctorParams {
+public:
+    AdjustFloatingPostionerGrpsParams(Doc *doc) { m_doc = doc; }
+    std::vector<ClassId> m_classIds;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AlignHorizontallyParams
 //----------------------------------------------------------------------------
 
