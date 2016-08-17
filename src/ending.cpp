@@ -85,4 +85,21 @@ int Ending::CastOffSystems(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Ending::PrepareFloatingGrps(FunctorParams *functorParams)
+{
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
+
+    if (params->m_previousEnding) {
+        // We need to group the previous and this ending
+        params->m_previousEnding->SetDrawingGrpId(params->m_drawingGrpId);
+        this->SetDrawingGrpId(params->m_drawingGrpId);
+        // Also set the previous ending to NULL to the grpId is _not_ incremented at the next measure
+        // We need this because three or more endings might have to be grouped together
+        params->m_previousEnding = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

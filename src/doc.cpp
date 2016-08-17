@@ -337,6 +337,11 @@ void Doc::PrepareDrawing()
     Functor prepareEndings(&Object::PrepareBoundaries);
     this->Process(&prepareEndings, &prepareEndingsParams);
 
+    // Prepare the floating drawing groups
+    PrepareFloatingGrpsParams prepareFloatingGrpsParams;
+    Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
+    this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams);
+
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
     StaffN_LayerN_VerseN_t::iterator staves;

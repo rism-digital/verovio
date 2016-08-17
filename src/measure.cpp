@@ -469,6 +469,20 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::PrepareFloatingGrps(FunctorParams *functorParams)
+{
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
+
+    if (params->m_previousEnding) {
+        // We have a measure in between endings and the previous one was group, so we need to increase the grpId
+        if (params->m_previousEnding->GetDrawingGrpId() > 0) params->m_drawingGrpId++;
+        params->m_previousEnding = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
 {
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);

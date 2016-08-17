@@ -535,12 +535,11 @@ class PrepareFloatingGrpsParams : public FunctorParams {
 public:
     PrepareFloatingGrpsParams()
     {
-        // m_lastMeasure = NULL;
-        // m_currentEnding = NULL;
+        m_previousEnding = NULL;
+        m_drawingGrpId = 1;
     }
-    // Measure *m_lastMeasure;
-    // Ending *m_currentEnding;
-    // std::vector<BoundaryStartInterface *> m_startBoundaries;
+    Ending *m_previousEnding;
+    int m_drawingGrpId;
 };
 
 //----------------------------------------------------------------------------
