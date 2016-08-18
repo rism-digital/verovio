@@ -136,6 +136,11 @@ public:
     void SetDrawingEnding(Ending *ending) { m_drawingEnding = ending; }
     ///@}
 
+    /*
+     * Return the first staff of each staffGrp for according to the scoreDef
+     */
+    std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
+
     //----------//
     // Functors //
     //----------//

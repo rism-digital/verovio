@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "attcomparison.h"
 #include "doc.h"
 #include "ending.h"
 #include "floatingelement.h"
@@ -182,6 +183,40 @@ void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
 
     m_drawingScoreDef = new ScoreDef();
     *m_drawingScoreDef = *drawingScoreDef;
+}
+
+std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
+{
+    assert(scoreDef);
+
+    std::vector<Staff *> staves;
+    std::vector<int>::iterator iter;
+    std::vector<int> staffList;
+
+    // First get all the staffGrps
+    AttComparison matchType(STAFFGRP);
+    ArrayOfObjects staffGrps;
+    ArrayOfObjects::iterator staffGrpIter;
+    scoreDef->FindAllChildByAttComparison(&staffGrps, &matchType);
+
+    // Then the @n of each first staffDef
+    for (staffGrpIter = staffGrps.begin(); staffGrpIter != staffGrps.end(); staffGrpIter++) {
+        StaffDef *staffDef = dynamic_cast<StaffDef *>((*staffGrpIter)->GetFirst(STAFFDEF));
+        if (staffDef) staffList.push_back(staffDef->GetN());
+    }
+
+    // Get the corresponding staves in the measure
+    for (iter = staffList.begin(); iter != staffList.end(); iter++) {
+        AttCommonNComparison matchN(STAFF, *iter);
+        Staff *staff = dynamic_cast<Staff *>(this->FindChildByAttComparison(&matchN, 1));
+        if (!staff) {
+            // LogDebug("Staff with @n '%d' not found in measure '%s'", *iter, measure->GetUuid().c_str());
+            continue;
+        }
+        staves.push_back(staff);
+    }
+    if (staves.empty()) LogDebug("Empty @staff array");
+    return staves;
 }
 
 //----------------------------------------------------------------------------
@@ -531,7 +566,7 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
                                 return (pair.first == tsInterface);
                             });
                     if (item != params->m_timeSpanningInterfaces.end()) {
-                        LogDebug("Found it!");
+                        // LogDebug("Found it!");
                         params->m_timeSpanningInterfaces.erase(item);
                     }
                 }
@@ -554,7 +589,7 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
                             return (pair.first == interface);
                         });
                 if (item != params->m_timeSpanningInterfaces.end()) {
-                    LogDebug("Found it!");
+                    // LogDebug("Found it!");
                     params->m_timeSpanningInterfaces.erase(item);
                 }
             }

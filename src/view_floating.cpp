@@ -1709,60 +1709,70 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         spanningType = SPANNING_MIDDLE;
     }
 
-    // For now just get the first staff - eventually we should look at the scoreDef
-    // Maybe we should also draw it on top of each staffGrp? Or should ending have a staffIdent?
-    // We would need to call SetCurrentFloatingPositioner for each staff where it is drawn
-    Staff *staff = dynamic_cast<Staff *>(system->FindChildByType(STAFF, 2, FORWARD));
-    if (!Check(staff)) return;
-    system->SetCurrentFloatingPositioner(staff->GetN(), ending, x1, staff->GetDrawingY());
-
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START))
         dc->ResumeGraphic(ending, ending->GetUuid());
     else
         dc->StartGraphic(ending, "spanning-ending", "");
 
-    int y1 = ending->GetDrawingY();
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList;
+    assert(ending->GetMeasure()->GetDrawingScoreDef());
+    // By default, endings are drawn on top of each group (@ending.rend="gouped") unless "top" is specified)
+    if (ending->GetMeasure()->GetDrawingScoreDef()->GetEndingRend() == endings_ENDINGREND_top) {
+        Staff *staff = dynamic_cast<Staff *>(system->FindChildByType(STAFF, 2, FORWARD));
+        if (!Check(staff)) return;
+        staffList.push_back(staff);
+    }
+    else {
+        staffList = ending->GetMeasure()->GetFirstStaffGrpStaves(ending->GetMeasure()->GetDrawingScoreDef());
+    }
 
-    FontInfo currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-    // currentFont.SetWeight(FONTWEIGHT_bold);
-    // currentFont.SetPointSize(currentFont.GetPointSize() * 2 / 3);
-    dc->SetFont(&currentFont);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), ending, x1, (*staffIter)->GetDrawingY());
 
-    TextExtend extend;
-    dc->GetTextExtent("M", &extend);
+        int y1 = ending->GetDrawingY();
 
-    if (ending->HasN()) {
-        std::wstringstream strStream;
-        // Maybe we want to add ( ) after system breaks?
-        // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
-        strStream << ending->GetN() << L".";
-        // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
+        FontInfo currentFont = *m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize);
+        // currentFont.SetWeight(FONTWEIGHT_bold);
+        // currentFont.SetPointSize(currentFont.GetPointSize() * 2 / 3);
+        dc->SetFont(&currentFont);
 
-        Text text;
-        text.SetText(strStream.str());
+        TextExtend extend;
+        dc->GetTextExtent("M", &extend);
 
-        bool setX = false;
-        bool setY = false;
+        if (ending->HasN()) {
+            std::wstringstream strStream;
+            // Maybe we want to add ( ) after system breaks?
+            // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
+            strStream << ending->GetN() << L".";
+            // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
 
-        int textX = x1;
-        if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-            textX += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
+            Text text;
+            text.SetText(strStream.str());
+
+            bool setX = false;
+            bool setY = false;
+
+            int textX = x1;
+            if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+                textX += m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
+            }
+            dc->StartText(ToDeviceContextX(textX), ToDeviceContextY(y1), LEFT);
+            DrawTextElement(dc, &text, textX, y1, setX, setY);
+            dc->EndText();
         }
-        dc->StartText(ToDeviceContextX(textX), ToDeviceContextY(y1), LEFT);
-        DrawTextElement(dc, &text, textX, y1, setX, setY);
-        dc->EndText();
-    }
 
-    dc->ResetFont();
+        dc->ResetFont();
 
-    int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
+        int y2 = y1 + extend.m_height + m_doc->GetDrawingUnit((*staffIter)->m_drawingStaffSize) * 2 / 3;
 
-    DrawFilledRectangle(dc, x1, y2, x2, y2 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize));
-    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
-        DrawFilledRectangle(dc, x1, y1, x1 + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y2);
-    }
-    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        DrawFilledRectangle(dc, x2 - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize), y1, x2, y2);
+        DrawFilledRectangle(dc, x1, y2, x2, y2 + m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize));
+        if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+            DrawFilledRectangle(dc, x1, y1, x1 + m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize), y2);
+        }
+        if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+            DrawFilledRectangle(dc, x2 - m_doc->GetDrawingBarLineWidth((*staffIter)->m_drawingStaffSize), y1, x2, y2);
+        }
     }
 
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START))
