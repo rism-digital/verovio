@@ -420,7 +420,8 @@ void Doc::CastOffDoc()
         = contentPage->m_drawingScoreDef.GetDrawingWidth() + contentSystem->GetDrawingAbbrLabelsWidth();
 
     Functor castOffSystems(&Object::CastOffSystems);
-    contentSystem->Process(&castOffSystems, &castOffSystemsParams);
+    Functor castOffSystemsEnd(&Object::CastOffSystemsEnd);
+    contentSystem->Process(&castOffSystems, &castOffSystemsParams, &castOffSystemsEnd);
     delete contentSystem;
 
     // Reset the scoreDef at the beginning of each system

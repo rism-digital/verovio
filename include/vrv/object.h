@@ -716,9 +716,13 @@ public:
 
     /**
      * Fill a page by adding systems with the appropriate length.
-     *
      */
     virtual int CastOffSystems(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * Add all the pending objects where reaching the end
+     */
+    virtual int CastOffSystemsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      *

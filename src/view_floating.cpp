@@ -1675,6 +1675,9 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     // The both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
         x1 = ending->GetMeasure()->GetDrawingX();
+        // if it is the first measure of the system use the left barline position
+        if (system->GetFirst(MEASURE) == ending->GetMeasure())
+            x1 += ending->GetMeasure()->GetLeftBarLineXRel();
         x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
     }
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
@@ -1683,6 +1686,9 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
         x1 = ending->GetMeasure()->GetDrawingX();
+        // if it is the first measure of the system use the left barline position
+        if (system->GetFirst(MEASURE) == ending->GetMeasure())
+            x1 += ending->GetMeasure()->GetLeftBarLineXRel();
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         spanningType = SPANNING_START;
     }

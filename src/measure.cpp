@@ -16,6 +16,7 @@
 
 #include "attcomparison.h"
 #include "doc.h"
+#include "editorial.h"
 #include "ending.h"
 #include "floatingelement.h"
 #include "functorparams.h"
@@ -415,6 +416,21 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
         params->m_page->AddSystem(params->m_currentSystem);
         params->m_shift = this->m_drawingXRel;
     }
+
+    // First add all pendings objects
+    ArrayOfObjects::iterator iter;
+    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); iter++) {
+        if ((*iter)->Is() == EDITORIAL_ELEMENT)
+            params->m_currentSystem->AddEditorialElement(dynamic_cast<EditorialElement *>(*iter));
+        else if ((*iter)->Is() == ENDING)
+            params->m_currentSystem->AddEnding(dynamic_cast<Ending *>(*iter));
+        else if ((*iter)->Is() == SCOREDEF)
+            params->m_currentSystem->AddScoreDef(dynamic_cast<ScoreDef *>(*iter));
+        else {
+            assert(false);
+        }
+    }
+    params->m_pendingObjects.clear();
 
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild

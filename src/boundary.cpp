@@ -115,6 +115,8 @@ int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     BoundaryEnd *endBoundary = dynamic_cast<BoundaryEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
+    // the next system
     params->m_currentSystem->AddBoundaryEnd(endBoundary);
 
     return FUNCTOR_SIBLINGS;

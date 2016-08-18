@@ -15,6 +15,7 @@
 
 #include "boundary.h"
 #include "doc.h"
+#include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
 #include "measure.h"
@@ -391,6 +392,30 @@ int System::SetDrawingXY(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+int System::CastOffSystemsEnd(FunctorParams *functorParams)
+{
+    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
+
+    if (params->m_pendingObjects.empty()) return FUNCTOR_STOP;
+
+    // Otherwise add all pendings objects
+    ArrayOfObjects::iterator iter;
+    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); iter++) {
+        if ((*iter)->Is() == EDITORIAL_ELEMENT)
+            params->m_currentSystem->AddEditorialElement(dynamic_cast<EditorialElement *>(*iter));
+        else if ((*iter)->Is() == ENDING)
+            params->m_currentSystem->AddEnding(dynamic_cast<Ending *>(*iter));
+        else if ((*iter)->Is() == SCOREDEF)
+            params->m_currentSystem->AddScoreDef(dynamic_cast<ScoreDef *>(*iter));
+        else {
+            assert(false);
+        }
+    }
+
+    return FUNCTOR_STOP;
 }
 
 } // namespace vrv

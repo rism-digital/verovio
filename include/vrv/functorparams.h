@@ -286,6 +286,7 @@ public:
  * member 3: the cummulated shift (m_drawingXRel of the first measure of the current system)
  * member 4: the system width
  * member 5: the current scoreDef width
+ * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
 **/
 
 class CastOffSystemsParams : public FunctorParams {
@@ -305,6 +306,7 @@ public:
     int m_shift;
     int m_systemWidth;
     int m_currentScoreDefWidth;
+    ArrayOfObjects m_pendingObjects;
 };
 
 //----------------------------------------------------------------------------
@@ -542,9 +544,8 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: int value of the current grp
- * member 1: EndingBoundary **currentEnding
- * member 2: bool has ending ended
+ * member 0: the previous ending
+ * member 1: the current grpId
  **/
 
 class PrepareFloatingGrpsParams : public FunctorParams {

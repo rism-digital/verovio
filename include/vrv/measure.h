@@ -137,7 +137,7 @@ public:
     ///@}
 
     /*
-     * Return the first staff of each staffGrp for according to the scoreDef
+     * Return the first staff of each staffGrp according to the scoreDef
      */
     std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
 
