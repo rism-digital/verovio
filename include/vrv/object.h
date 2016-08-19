@@ -234,6 +234,11 @@ public:
     void ResetUuid();
     static void SeedUuid(unsigned int seed = 0);
 
+    void SetSVGClass(const std::string &classcontent);
+    void AddSVGClass(const std::string &classname);
+    std::string GetSVGClass(void);
+    bool HasSVGClass(void);
+
     /**
      * @name Children count, with or without a ClassId.
      * Used for classes with several types of children.
@@ -785,6 +790,7 @@ protected:
 private:
     std::string m_uuid;
     std::string m_classid;
+    std::string m_svgclass;
     static unsigned long s_objectCounter;
 
     /**

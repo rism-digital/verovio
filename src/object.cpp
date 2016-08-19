@@ -313,6 +313,29 @@ void Object::SetUuid(std::string uuid)
     m_uuid = uuid;
 };
 
+std::string Object::GetSVGClass(void)
+{
+    return m_svgclass;
+}
+
+void Object::SetSVGClass(const std::string &classcontent)
+{
+    m_svgclass = classcontent;
+}
+
+void Object::AddSVGClass(const std::string &classname)
+{
+    if (HasSVGClass()) {
+        m_svgclass += " ";
+    }
+    m_svgclass += classname;
+}
+
+bool Object::HasSVGClass(void)
+{
+    return !m_svgclass.empty();
+}
+
 void Object::ClearChildren()
 {
     ArrayOfObjects::iterator iter;
@@ -493,12 +516,14 @@ void Object::ResetUuid()
     GenerateUuid();
 }
 
-void Object::SeedUuid(unsigned int seed) {
+void Object::SeedUuid(unsigned int seed)
+{
     // Init random number generator for uuids
     if (seed == 0) {
-       std::srand((unsigned int)std::time(0));
-    } else {
-       std::srand(seed);
+        std::srand((unsigned int)std::time(0));
+    }
+    else {
+        std::srand(seed);
     }
 }
 
