@@ -1547,6 +1547,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         else {
             // should be a note
             note = new Note;
+            note->SetSVGClass("highlight");
+std::cerr << "CLASS SET TO " << note->GetSVGClass() << endl;
             appendElement(elements, pointers, note);
             convertNote(note, layerdata[i], staffindex);
             processSlur(layerdata[i]);

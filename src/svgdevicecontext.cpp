@@ -148,8 +148,11 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         baseClass.append(" " + gClass);
     }
     if (object->HasSVGClass()) {
+std::cerr << "got ehre" << std::endl;
         baseClass.append(" " + object->GetSVGClass());
     }
+std::cerr << "baseClass is " << baseClass << std::endl;
+std::cerr << " EXTRA CLASS IS " << object->GetSVGClass() << std::endl;
 
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
