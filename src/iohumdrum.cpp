@@ -1548,6 +1548,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             // should be a note
             note = new Note;
             note->SetSVGClass("highlight");
+            setLocationId(note, layerdata[i], 0);
             appendElement(elements, pointers, note);
             convertNote(note, layerdata[i], staffindex);
             processSlur(layerdata[i]);
@@ -2995,6 +2996,7 @@ void HumdrumInput::convertChord(Chord *chord, HTp token, int staffindex)
     int scount = token->getSubtokenCount();
     for (int j = 0; j < scount; j++) {
         Note *note = new Note;
+        setLocationId(note, token, j);
         appendElement(chord, note);
         convertNote(note, token, staffindex, j);
     }
@@ -4262,6 +4264,27 @@ std::string HumdrumInput::GetMeiString(void)
     meioutput.SetScoreBasedMEI(true);
     return meioutput.GetOutput();
 }
+
+
+//////////////////////////////
+//
+// HumdrumInput::setLocationId -- use the file location of the item
+//    for the ID.
+//
+
+void HumdrumInput::setLocationId(Object* object, HTp token, int subtoken) {
+	int line = token->getLineIndex();
+	int field = token->getFieldIndex();
+	string id = object->GetClassName();
+    id += "-L" + to_string(line);
+    id += "F" + to_string(field);
+	id += "S" + to_string(subtoken);
+std::cerr << "ID = " << id << std::endl;
+	object->SetUuid(id);
+std::cerr << "NID = " << object->GetUuid() << std::endl;
+}
+
+
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
