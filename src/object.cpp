@@ -191,14 +191,22 @@ int BoundingBox::CalcVerticalOverlap(const BoundingBox *other) const
 // Object
 //----------------------------------------------------------------------------
 
+unsigned long Object::s_objectCounter = 0;
+
 Object::Object() : BoundingBox()
 {
     Init("m-");
+    if (s_objectCounter++ == 0) {
+        SeedUuid();
+    }
 }
 
 Object::Object(std::string classid) : BoundingBox()
 {
     Init(classid);
+    if (s_objectCounter++ == 0) {
+        SeedUuid();
+    }
 }
 
 Object *Object::Clone() const
@@ -304,6 +312,29 @@ void Object::SetUuid(std::string uuid)
 {
     m_uuid = uuid;
 };
+
+std::string Object::GetSVGClass(void)
+{
+    return m_svgclass;
+}
+
+void Object::SetSVGClass(const std::string &classcontent)
+{
+    m_svgclass = classcontent;
+}
+
+void Object::AddSVGClass(const std::string &classname)
+{
+    if (HasSVGClass()) {
+        m_svgclass += " ";
+    }
+    m_svgclass += classname;
+}
+
+bool Object::HasSVGClass(void)
+{
+    return !m_svgclass.empty();
+}
 
 void Object::ClearChildren()
 {
@@ -483,6 +514,17 @@ void Object::GenerateUuid()
 void Object::ResetUuid()
 {
     GenerateUuid();
+}
+
+void Object::SeedUuid(unsigned int seed)
+{
+    // Init random number generator for uuids
+    if (seed == 0) {
+        std::srand((unsigned int)std::time(0));
+    }
+    else {
+        std::srand(seed);
+    }
 }
 
 void Object::SetParent(Object *parent)

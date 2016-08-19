@@ -67,6 +67,11 @@ public:
      * account
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
+    
+    /**
+     * Functor for grouping FloatingElement by drawingGrpId
+     */
+    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
 private:
     //

@@ -519,7 +519,8 @@ int EditorialElement::CastOffSystems(FunctorParams *functorParams)
     EditorialElement *editorialElement
         = dynamic_cast<EditorialElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     assert(editorialElement);
-    params->m_currentSystem->AddEditorialElement(editorialElement);
+    // move as pending since we want it at the beginning of the system in case of system break coming
+    params->m_pendingObjects.push_back(editorialElement);
 
     return FUNCTOR_SIBLINGS;
 }

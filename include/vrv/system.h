@@ -169,6 +169,11 @@ public:
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
     virtual int SetDrawingXY(FunctorParams *functorParams);
+    
+    /**
+     * Add all the pending objects where reaching the end
+     */
+    virtual int CastOffSystemsEnd(FunctorParams *functorParams);
 
 public:
     SystemAligner m_systemAligner;

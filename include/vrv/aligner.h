@@ -224,6 +224,11 @@ public:
      */
     virtual int AdjustFloatingPostioners(FunctorParams *functorParams);
 
+    /**
+     * Adjust the position of all floating positionner that are grouped, staff by staff.
+     */
+    virtual int AdjustFloatingPostionerGrps(FunctorParams *functorParams);
+
 private:
     //
 public:

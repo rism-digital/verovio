@@ -8,6 +8,8 @@
 #ifndef __VRV_OBJECT_H__
 #define __VRV_OBJECT_H__
 
+#include <cstdlib>
+#include <ctime>
 #include <iterator>
 #include <map>
 #include <string>
@@ -230,6 +232,12 @@ public:
     std::string GetUuid() const { return m_uuid; };
     void SetUuid(std::string uuid);
     void ResetUuid();
+    static void SeedUuid(unsigned int seed = 0);
+
+    void SetSVGClass(const std::string &classcontent);
+    void AddSVGClass(const std::string &classname);
+    std::string GetSVGClass(void);
+    bool HasSVGClass(void);
 
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
@@ -454,6 +462,11 @@ public:
      * Adjust the position of all floating positionner, staff by staff.
      */
     virtual int AdjustFloatingPostioners(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * Adjust the position of all floating positionner that are grouped, staff by staff.
+     */
+    virtual int AdjustFloatingPostionerGrps(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Align horizontally the content of a page.
@@ -715,9 +728,13 @@ public:
 
     /**
      * Fill a page by adding systems with the appropriate length.
-     *
      */
     virtual int CastOffSystems(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * Add all the pending objects where reaching the end
+     */
+    virtual int CastOffSystemsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      *
@@ -777,6 +794,8 @@ protected:
 private:
     std::string m_uuid;
     std::string m_classid;
+    std::string m_svgclass;
+    static unsigned long s_objectCounter;
 
     /**
      * Indicates whether the object content is up-to-date or not.
