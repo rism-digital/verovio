@@ -450,7 +450,6 @@ bool MeiOutput::WriteObjectEnd(Object *object)
 std::string MeiOutput::UuidToMeiStr(Object *element)
 {
     std::string out = element->GetUuid();
-    std::transform(out.begin(), out.end(), out.begin(), ::tolower);
     // LogDebug("uuid: %s", out.c_str());
     return out;
 }
