@@ -15,6 +15,7 @@
 
 #include "boundary.h"
 #include "doc.h"
+#include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
 #include "measure.h"
@@ -297,6 +298,9 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
     assert(params);
 
+    AdjustFloatingPostionerGrpsParams adjustFloatingPostionerGrpsParams(params->m_doc);
+    Functor adjustFloatingPostionerGrps(&Object::AdjustFloatingPostionerGrps);
+
     params->m_classId = TIE;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = SLUR;
@@ -315,6 +319,11 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
+
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(ENDING);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     // SYL check if they are some lyrics and make space for them if any
     params->m_classId = SYL;
     m_systemAligner.Process(params->m_functor, params);
@@ -383,6 +392,30 @@ int System::SetDrawingXY(FunctorParams *functorParams)
     }
 
     return FUNCTOR_CONTINUE;
+}
+
+int System::CastOffSystemsEnd(FunctorParams *functorParams)
+{
+    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
+
+    if (params->m_pendingObjects.empty()) return FUNCTOR_STOP;
+
+    // Otherwise add all pendings objects
+    ArrayOfObjects::iterator iter;
+    for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); iter++) {
+        if ((*iter)->Is() == EDITORIAL_ELEMENT)
+            params->m_currentSystem->AddEditorialElement(dynamic_cast<EditorialElement *>(*iter));
+        else if ((*iter)->Is() == ENDING)
+            params->m_currentSystem->AddEnding(dynamic_cast<Ending *>(*iter));
+        else if ((*iter)->Is() == SCOREDEF)
+            params->m_currentSystem->AddScoreDef(dynamic_cast<ScoreDef *>(*iter));
+        else {
+            assert(false);
+        }
+    }
+
+    return FUNCTOR_STOP;
 }
 
 } // namespace vrv

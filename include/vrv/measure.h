@@ -136,6 +136,11 @@ public:
     void SetDrawingEnding(Ending *ending) { m_drawingEnding = ending; }
     ///@}
 
+    /*
+     * Return the first staff of each staffGrp according to the scoreDef
+     */
+    std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
+
     //----------//
     // Functors //
     //----------//
@@ -231,6 +236,11 @@ public:
     virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams);
 
     /**
+     * Functor for grouping FloatingElement by drawingGrpId
+     */
+    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
+
+    /**
      * See Object::PrepareTimeSpanning.
      */
     virtual int PrepareTimeSpanningEnd(FunctorParams *functorParams);
@@ -298,7 +308,8 @@ private:
     ScoreDef *m_drawingScoreDef;
 
     /**
-     * A pointer to the ending to which the measure belongs. Set by PrepareBoundaries and passed to the System drawing list
+     * A pointer to the ending to which the measure belongs. Set by PrepareBoundaries and passed to the System drawing
+     * list
      * in DrawMeasure
      */
     Ending *m_drawingEnding;

@@ -553,6 +553,7 @@ void MeiOutput::WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
 
     WriteXmlId(currentNode, scoreDef);
     WriteScoreDefInterface(currentNode, scoreDef);
+    scoreDef->WriteEndings(currentNode);
 }
 
 void MeiOutput::WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp)
@@ -1552,6 +1553,7 @@ bool MeiInput::ReadMeiScoreDef(Object *parent, pugi::xml_node scoreDef)
     SetMeiUuid(scoreDef, vrvScoreDef);
 
     ReadScoreDefInterface(scoreDef, vrvScoreDef);
+    vrvScoreDef->ReadEndings(scoreDef);
 
     AddScoreDef(parent, vrvScoreDef);
     return ReadMeiScoreDefChildren(vrvScoreDef, scoreDef);

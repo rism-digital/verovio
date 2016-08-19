@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "ending.h"
 #include "functorparams.h"
 #include "system.h"
 #include "vrv.h"
@@ -114,9 +115,28 @@ int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     BoundaryEnd *endBoundary = dynamic_cast<BoundaryEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
+    // the next system
     params->m_currentSystem->AddBoundaryEnd(endBoundary);
 
     return FUNCTOR_SIBLINGS;
+}
+
+int BoundaryEnd::PrepareFloatingGrps(FunctorParams *functorParams)
+{
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
+
+    assert(this->GetStart());
+
+    // We are reaching the end of an ending - put it to the param and it will be grouped with the next one if there is
+    // not measure in between
+    if (this->GetStart()->Is() == ENDING) {
+        params->m_previousEnding = dynamic_cast<Ending *>(this->GetStart());
+        assert(params->m_previousEnding);
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 //----------------------------------------------------------------------------

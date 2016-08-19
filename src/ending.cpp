@@ -80,9 +80,27 @@ int Ending::CastOffSystems(FunctorParams *functorParams)
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     Ending *ending = dynamic_cast<Ending *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    params->m_currentSystem->AddEnding(ending);
+    // move as pending since we want it at the beginning of the system in case of system break coming
+    params->m_pendingObjects.push_back(ending);
 
     return FUNCTOR_SIBLINGS;
+}
+
+int Ending::PrepareFloatingGrps(FunctorParams *functorParams)
+{
+    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    assert(params);
+
+    if (params->m_previousEnding) {
+        // We need to group the previous and this ending
+        params->m_previousEnding->SetDrawingGrpId(params->m_drawingGrpId);
+        this->SetDrawingGrpId(params->m_drawingGrpId);
+        // Also set the previous ending to NULL to the grpId is _not_ incremented at the next measure
+        // We need this because three or more endings might have to be grouped together
+        params->m_previousEnding = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv
