@@ -1515,6 +1515,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
         if (layerdata[i]->isChord()) {
             Chord *chord = new Chord;
+            setLocationId(chord, layerdata[i], -1);
             appendElement(elements, pointers, chord);
             elements.push_back("chord");
             pointers.push_back((void *)chord);
@@ -1529,6 +1530,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (layerdata[i]->find("yy") != string::npos) {
                 // Invisible rest (or note which should be invisible.
                 Space *irest = new Space;
+                setLocationId(irest, layerdata[i], -1);
                 appendElement(elements, pointers, irest);
                 convertRhythm(irest, layerdata[i]);
                 processSlur(layerdata[i]);
@@ -1537,6 +1539,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             else {
                 Rest *rest = new Rest;
+                setLocationId(rest, layerdata[i], -1);
                 appendElement(elements, pointers, rest);
                 convertRest(rest, layerdata[i]);
                 processSlur(layerdata[i]);
@@ -1548,7 +1551,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             // should be a note
             note = new Note;
             note->SetSVGClass("highlight");
-            setLocationId(note, layerdata[i], 0);
+            setLocationId(note, layerdata[i], -1);
             appendElement(elements, pointers, note);
             convertNote(note, layerdata[i], staffindex);
             processSlur(layerdata[i]);
@@ -3390,9 +3393,11 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
                 continue;
             }
             Verse *verse = new Verse;
+            setLocationId(verse, line.token(i), -1);
             appendElement(note, verse);
             verse->SetN(versenum);
             Syl *syl = new Syl;
+            setLocationId(syl, line.token(i), -1);
             appendElement(verse, syl);
             string content = *line.token(i);
             bool dashbegin = false;
@@ -4273,17 +4278,17 @@ std::string HumdrumInput::GetMeiString(void)
 //
 
 void HumdrumInput::setLocationId(Object* object, HTp token, int subtoken) {
-	int line = token->getLineIndex();
-	int field = token->getFieldIndex();
+	int line = token->getLineIndex() + 1;
+	int field = token->getFieldIndex() + 1;
 	string id = object->GetClassName();
+    std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     id += "-L" + to_string(line);
     id += "F" + to_string(field);
-	id += "S" + to_string(subtoken);
-std::cerr << "ID = " << id << std::endl;
+	if (subtoken >= 0) {
+	    id += "S" + to_string(subtoken+1);
+    }
 	object->SetUuid(id);
-std::cerr << "NID = " << object->GetUuid() << std::endl;
 }
-
 
 
 #endif /* NO_HUMDRUM_SUPPORT */
