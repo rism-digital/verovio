@@ -54,15 +54,7 @@ public:
      * @name Add children to an editorial element.
      */
     ///@{
-    void AddFloatingElement(FloatingElement *child);
-    void AddLayerElement(LayerElement *child);
-    void AddTextElement(TextElement *child);
-    void AddLayer(Layer *child);
-    void AddMeasure(Measure *child);
-    void AddScoreDef(ScoreDef *child);
-    void AddStaff(Staff *child);
-    void AddStaffDef(StaffDef *child);
-    void AddStaffGrp(StaffGrp *child);
+    virtual void AddChild(Object *object);
     ///@}
 
     //----------//
@@ -202,9 +194,8 @@ public:
 
     /**
      * Add children to a apparatus.
-     * Tests if lemOrRdg is Lem or Rdg.
      */
-    void AddLemOrRdg(EditorialElement *lemOrRdg);
+    virtual void AddChild(Object *object);
 
 protected:
     /** We store the level of the <app> for integrity check */

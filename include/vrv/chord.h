@@ -63,7 +63,7 @@ public:
     /**
      * Add an element (only note supported) to a chord.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
     virtual void FilterList(ListOfObjects *childlist);
 

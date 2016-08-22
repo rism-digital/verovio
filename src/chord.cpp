@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "editorial.h"
 #include "functorparams.h"
 #include "note.h"
 #include "vrv.h"
@@ -80,11 +81,21 @@ void Chord::ClearClusters() const
     m_clusters.clear();
 }
 
-void Chord::AddLayerElement(LayerElement *element)
+void Chord::AddChild(Object *child)
 {
-    assert(dynamic_cast<Note *>(element));
-    element->SetParent(this);
-    m_children.push_back(element);
+    if (child->Is() == NOTE) {
+        assert(dynamic_cast<Note *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 

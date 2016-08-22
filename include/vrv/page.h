@@ -44,7 +44,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddSystem(System *system);
+    virtual void AddChild(Object *object);
     ///@}
 
     int GetSystemCount() const { return (int)m_children.size(); };

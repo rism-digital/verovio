@@ -44,7 +44,7 @@ public:
      * Add an element (a note or a rest) to a tuplet.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
 protected:
     /**

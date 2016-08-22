@@ -118,7 +118,7 @@ int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
     // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
     // the next system but only if the pending object array it empty (otherwise it will mess up the MEI tree)
     if (params->m_pendingObjects.empty())
-        params->m_currentSystem->AddBoundaryEnd(endBoundary);
+        params->m_currentSystem->AddChild(endBoundary);
     else
         params->m_pendingObjects.push_back(endBoundary);
 

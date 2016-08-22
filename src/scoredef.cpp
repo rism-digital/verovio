@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
+#include "editorial.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "mensur.h"
@@ -201,11 +202,21 @@ void ScoreDef::Reset()
     m_setAsDrawing = false;
 }
 
-void ScoreDef::AddStaffGrp(StaffGrp *staffGrp)
+void ScoreDef::AddChild(Object *child)
 {
-    assert(m_children.empty());
-    staffGrp->SetParent(this);
-    m_children.push_back(staffGrp);
+    if (child->Is() == STAFFGRP) {
+        assert(dynamic_cast<StaffGrp *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
@@ -389,17 +400,24 @@ void StaffGrp::Reset()
     ResetStaffGrpVis();
 }
 
-void StaffGrp::AddStaffDef(StaffDef *staffDef)
+void StaffGrp::AddChild(Object *child)
 {
-    staffDef->SetParent(this);
-    m_children.push_back(staffDef);
-    Modify();
-}
+    if (child->Is() == STAFFDEF) {
+        assert(dynamic_cast<StaffDef *>(child));
+    }
+    else if (child->Is() == STAFFGRP) {
+        assert(dynamic_cast<StaffGrp *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
 
-void StaffGrp::AddStaffGrp(StaffGrp *staffGrp)
-{
-    staffGrp->SetParent(this);
-    m_children.push_back(staffGrp);
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 

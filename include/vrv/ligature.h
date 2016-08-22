@@ -53,7 +53,7 @@ public:
     /**
      * Add an element (only notes are supported) to a ligature.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
     virtual void FilterList(ListOfObjects *childlist);
 

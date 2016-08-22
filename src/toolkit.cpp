@@ -765,7 +765,7 @@ bool Toolkit::Insert(std::string elementType, std::string startid, std::string e
         Slur *slur = new Slur();
         slur->SetStartid(startid);
         slur->SetEndid(endid);
-        measure->AddFloatingElement(slur);
+        measure->AddChild(slur);
         m_doc.PrepareDrawing();
         return true;
     }

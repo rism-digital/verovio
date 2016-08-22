@@ -450,20 +450,6 @@ private:
     void ReadUnsupportedAttr(pugi::xml_node element, Object *object);
 
     /**
-     * Method for adding the element to the appropriate parent (e.g., Layer, Beam).
-     * This used for any element that supports different types of child.
-     * For example, the StaffGrp can contain StaffGrp or StaffDef.
-     * These methods dynamically case the parent to the appropriate class.
-     */
-    ///@{
-    void AddLayerElement(Object *parent, LayerElement *element);
-    void AddFloatingElement(Object *parent, FloatingElement *element);
-    void AddTextElement(Object *parent, TextElement *element);
-    void AddScoreDef(Object *parent, ScoreDef *element);
-    void AddStaffGrp(Object *parent, StaffGrp *element);
-    ///@}
-
-    /**
      * Returns true if the element is name is an editorial element (e.g., "app", "supplied", etc.)
      */
     bool IsEditorialElementName(std::string elementName);

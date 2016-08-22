@@ -59,71 +59,40 @@ EditorialElement::~EditorialElement()
 {
 }
 
-void EditorialElement::AddFloatingElement(FloatingElement *child)
+void EditorialElement::AddChild(Object *child)
 {
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddTextElement(TextElement *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddLayer(Layer *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-    if (child->GetN() < 1) {
-        LogError("Layer without @n is not supported within editorial markup element");
+    if (child->IsFloatingElement()) {
+        assert(dynamic_cast<FloatingElement *>(child));
     }
-}
-
-void EditorialElement::AddLayerElement(LayerElement *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddMeasure(Measure *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddScoreDef(ScoreDef *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddStaff(Staff *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-    if (child->GetN() < 1) {
-        LogError("Staff without @n is not supported within editorial markup element");
+    else if (child->IsLayerElement()) {
+        assert(dynamic_cast<LayerElement *>(child));
     }
-}
+    else if (child->IsTextElement()) {
+        assert(dynamic_cast<TextElement *>(child));
+    }
+    else if (child->Is() == LAYER) {
+        assert(dynamic_cast<Layer *>(child));
+    }
+    else if (child->Is() == MEASURE) {
+        assert(dynamic_cast<Measure *>(child));
+    }
+    else if (child->Is() == SCOREDEF) {
+        assert(dynamic_cast<ScoreDef *>(child));
+    }
+    else if (child->Is() == STAFF) {
+        assert(dynamic_cast<Staff *>(child));
+    }
+    else if (child->Is() == STAFFDEF) {
+        assert(dynamic_cast<Staff *>(child));
+    }
+    else if (child->Is() == STAFFGRP) {
+        assert(dynamic_cast<Staff *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
 
-void EditorialElement::AddStaffDef(StaffDef *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddStaffGrp(StaffGrp *child)
-{
-    // assert(m_children.empty());
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
@@ -221,9 +190,19 @@ App::~App()
 {
 }
 
-void App::AddLemOrRdg(EditorialElement *child)
+void App::AddChild(Object *child)
 {
-    assert(dynamic_cast<Lem *>(child) || dynamic_cast<Rdg *>(child));
+    if (child->Is() == LEM) {
+        assert(dynamic_cast<Lem *>(child));
+    }
+    else if (child->Is() == RDG) {
+        assert(dynamic_cast<Rdg *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
     child->SetParent(this);
     m_children.push_back(child);
     Modify();

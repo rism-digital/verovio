@@ -17,6 +17,7 @@
 #include "clef.h"
 #include "custos.h"
 #include "doc.h"
+#include "editorial.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "measure.h"
@@ -85,15 +86,21 @@ void Layer::ResetStaffDefOjects()
     }
 }
 
-void Layer::AddLayerElement(LayerElement *element, int idx)
+void Layer::AddChild(Object *child)
 {
-    element->SetParent(this);
-    if (idx == -1) {
-        m_children.push_back(element);
+    if (child->IsLayerElement()) {
+        assert(dynamic_cast<LayerElement *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        InsertChild(element, idx);
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
     }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 

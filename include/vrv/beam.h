@@ -42,7 +42,7 @@ public:
      * Add an element (a note or a rest) to a beam.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
     /**
      * Return information about the position in the beam.
@@ -70,7 +70,7 @@ protected:
      * This is called by Beam::FilterList
      */
     void InitCoords(ListOfObjects *childList);
-    
+
     /**
      * Return the position of the element in the beam.
      * For notes, lookup the position of the parent chord.

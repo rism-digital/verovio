@@ -69,31 +69,30 @@ void System::Reset()
     m_drawingAbbrLabelsWidth = 0;
 }
 
-void System::AddBoundaryEnd(BoundaryEnd *boundaryEnd)
+void System::AddChild(Object *child)
 {
-    boundaryEnd->SetParent(this);
-    m_children.push_back(boundaryEnd);
-    Modify();
-}
+    if (child->Is() == BOUNDARY_END) {
+        assert(dynamic_cast<BoundaryEnd *>(child));
+    }
+    else if (child->Is() == ENDING) {
+        assert(dynamic_cast<Ending *>(child));
+    }
+    else if (child->Is() == MEASURE) {
+        assert(dynamic_cast<Measure *>(child));
+    }
+    else if (child->Is() == SCOREDEF) {
+        assert(dynamic_cast<ScoreDef *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
 
-void System::AddEnding(Ending *ending)
-{
-    ending->SetParent(this);
-    m_children.push_back(ending);
-    Modify();
-}
-
-void System::AddMeasure(Measure *measure)
-{
-    measure->SetParent(this);
-    m_children.push_back(measure);
-    Modify();
-}
-
-void System::AddScoreDef(ScoreDef *scoreDef)
-{
-    scoreDef->SetParent(this);
-    m_children.push_back(scoreDef);
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
@@ -339,7 +338,7 @@ int System::CastOffPages(FunctorParams *functorParams)
     if ((params->m_currentPage->GetChildCount() > 0)
         && (this->m_drawingYRel - this->GetHeight() - params->m_shift < 0)) {
         params->m_currentPage = new Page();
-        params->m_doc->AddPage(params->m_currentPage);
+        params->m_doc->AddChild(params->m_currentPage);
         params->m_shift = this->m_drawingYRel - params->m_pageHeight;
     }
 
@@ -349,7 +348,7 @@ int System::CastOffPages(FunctorParams *functorParams)
     // the ownership of the system - the contentPage itself will be deleted afterwards.
     System *system = dynamic_cast<System *>(params->m_contentPage->Relinquish(this->GetIdx()));
     assert(system);
-    params->m_currentPage->AddSystem(system);
+    params->m_currentPage->AddChild(system);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -404,15 +403,7 @@ int System::CastOffSystemsEnd(FunctorParams *functorParams)
     // Otherwise add all pendings objects
     ArrayOfObjects::iterator iter;
     for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); iter++) {
-        if ((*iter)->Is() == EDITORIAL_ELEMENT)
-            params->m_currentSystem->AddEditorialElement(dynamic_cast<EditorialElement *>(*iter));
-        else if ((*iter)->Is() == ENDING)
-            params->m_currentSystem->AddEnding(dynamic_cast<Ending *>(*iter));
-        else if ((*iter)->Is() == SCOREDEF)
-            params->m_currentSystem->AddScoreDef(dynamic_cast<ScoreDef *>(*iter));
-        else {
-            assert(false);
-        }
+        params->m_currentSystem->AddChild(*iter);
     }
 
     return FUNCTOR_STOP;

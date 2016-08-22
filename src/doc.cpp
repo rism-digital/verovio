@@ -94,10 +94,18 @@ void Doc::SetType(DocType type)
     m_type = type;
 }
 
-void Doc::AddPage(Page *page)
+void Doc::AddChild(Object *child)
 {
-    page->SetParent(this);
-    m_children.push_back(page);
+    if (child->Is() == PAGE) {
+        assert(dynamic_cast<Page *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
@@ -411,7 +419,7 @@ void Doc::CastOffDoc()
     assert(contentSystem);
 
     System *currentSystem = new System();
-    contentPage->AddSystem(currentSystem);
+    contentPage->AddChild(currentSystem);
     CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem);
     castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar
         - this->m_drawingPageRightMar - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
@@ -433,7 +441,7 @@ void Doc::CastOffDoc()
     assert(contentPage && !contentPage->m_parent);
 
     Page *currentPage = new Page();
-    this->AddPage(currentPage);
+    this->AddChild(currentPage);
     CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
     castOffPagesParams.m_pageHeight
         = this->m_drawingPageHeight - this->m_drawingPageTopMar; // obviously we need a bottom margin
@@ -453,7 +461,7 @@ void Doc::UnCastOffDoc()
 {
     Page *contentPage = new Page();
     System *contentSystem = new System();
-    contentPage->AddSystem(contentSystem);
+    contentPage->AddChild(contentSystem);
 
     UnCastOffParams unCastOffParams(contentSystem);
 
@@ -462,7 +470,7 @@ void Doc::UnCastOffDoc()
 
     this->ClearChildren();
 
-    this->AddPage(contentPage);
+    this->AddChild(contentPage);
 
     // LogDebug("ContinousLayout: %d pages", this->GetChildCount());
 

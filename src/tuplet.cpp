@@ -7,6 +7,18 @@
 
 #include "tuplet.h"
 
+//----------------------------------------------------------------------------
+
+#include "assert.h"
+
+//----------------------------------------------------------------------------
+
+#include "beam.h"
+#include "chord.h"
+#include "editorial.h"
+#include "note.h"
+#include "vrv.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -35,14 +47,27 @@ void Tuplet::Reset()
     ResetTupletVis();
 }
 
-void Tuplet::AddLayerElement(LayerElement *element)
+void Tuplet::AddChild(Object *child)
 {
-    // if (!element->HasInterface(INTERFACE_DURATION)()) {
-    //    return;
-    //}
+    if (child->Is() == BEAM) {
+        assert(dynamic_cast<Beam *>(child));
+    }
+    else if (child->Is() == CHORD) {
+        assert(dynamic_cast<Chord *>(child));
+    }
+    else if (child->Is() == NOTE) {
+        assert(dynamic_cast<Note *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
 
-    element->SetParent(this);
-    m_children.push_back(element);
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 

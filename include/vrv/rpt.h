@@ -76,7 +76,7 @@ public:
      * Add an element (a note or a chord) to a fTrem.
      * Only Note or Chord elements will be actually added to the fTrem.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
 private:
     //
@@ -110,7 +110,7 @@ public:
      * Add an element (a note or a chord) to a fTrem.
      * Only Note or Chord elements will be actually added to the fTrem.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
 private:
     //

@@ -47,10 +47,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddBoundaryEnd(BoundaryEnd *boundaryEnd);
-    void AddEnding(Ending *ending);
-    void AddMeasure(Measure *measure);
-    void AddScoreDef(ScoreDef *scoreDef);
+    virtual void AddChild(Object *object);
     ///@}
 
     /**

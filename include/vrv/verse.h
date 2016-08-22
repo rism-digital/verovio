@@ -37,7 +37,7 @@ public:
      * Add an element (a syl) to a verse.
      * Only Syl elements will be actually added to the verse.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
     //----------//
     // Functors //

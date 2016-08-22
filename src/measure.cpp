@@ -90,32 +90,29 @@ void Measure::Reset()
     m_drawingEnding = NULL;
 }
 
-void Measure::AddFloatingElement(FloatingElement *element)
+void Measure::AddChild(Object *child)
 {
-    element->SetParent(this);
-    m_children.push_back(element);
+    if (child->IsFloatingElement()) {
+        assert(dynamic_cast<FloatingElement *>(child));
+    }
 
-    if (element->Is() == STAFF) {
-        Staff *staff = dynamic_cast<Staff *>(element);
+    else if (child->Is() == STAFF) {
+        Staff *staff = dynamic_cast<Staff *>(child);
         assert(staff);
-        if (staff->GetN() < 1) {
+        if (staff && (staff->GetN() < 1)) {
             // This is not 100% safe if we have a <app> and <rdg> with more than
             // one staff as a previous child.
             staff->SetN(this->GetChildCount());
         }
     }
-}
-
-void Measure::AddStaff(Staff *staff)
-{
-    staff->SetParent(this);
-    m_children.push_back(staff);
-
-    if (staff->GetN() < 1) {
-        // This is not 100% safe if we have a <app> and <rdg> with more than
-        // one staff as a previous child.
-        staff->SetN(this->GetChildCount());
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
     }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
 }
 
 int Measure::GetLeftBarLineXRel() const
@@ -414,24 +411,14 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
         && (this->m_drawingXRel + this->GetWidth() + params->m_currentScoreDefWidth - params->m_shift
                > params->m_systemWidth)) {
         params->m_currentSystem = new System();
-        params->m_page->AddSystem(params->m_currentSystem);
+        params->m_page->AddChild(params->m_currentSystem);
         params->m_shift = this->m_drawingXRel;
     }
 
     // First add all pendings objects
     ArrayOfObjects::iterator iter;
     for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); iter++) {
-        if ((*iter)->Is() == BOUNDARY_END)
-            params->m_currentSystem->AddBoundaryEnd(dynamic_cast<BoundaryEnd *>(*iter));
-        else if ((*iter)->IsEditorialElement())
-            params->m_currentSystem->AddEditorialElement(dynamic_cast<EditorialElement *>(*iter));
-        else if ((*iter)->Is() == ENDING)
-            params->m_currentSystem->AddEnding(dynamic_cast<Ending *>(*iter));
-        else if ((*iter)->Is() == SCOREDEF)
-            params->m_currentSystem->AddScoreDef(dynamic_cast<ScoreDef *>(*iter));
-        else {
-            assert(false);
-        }
+        params->m_currentSystem->AddChild(*iter);
     }
     params->m_pendingObjects.clear();
 
@@ -441,7 +428,7 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     Measure *measure = dynamic_cast<Measure *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     assert(measure);
-    params->m_currentSystem->AddMeasure(measure);
+    params->m_currentSystem->AddChild(measure);
 
     return FUNCTOR_SIBLINGS;
 }

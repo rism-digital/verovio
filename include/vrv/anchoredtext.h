@@ -42,7 +42,7 @@ public:
      * Add an element (text, rend. etc.) to a tempo.
      * Only supported elements will be actually added to the child list.
      */
-    void AddTextElement(TextElement *element);
+    virtual void AddChild(Object *object);
 
 private:
     //

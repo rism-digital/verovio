@@ -281,10 +281,10 @@ public:
     void SetParent(Object *parent);
 
     /**
-     * Add an EditorialElement as child.
-     * This can happen at many levels.
+     * Base method for adding children.
+     * The method has to be overridden.
      */
-    void AddEditorialElement(EditorialElement *child);
+    virtual void AddChild(Object *object);
 
     /**
      * Return the index position of the object in its parent (-1 if not found)

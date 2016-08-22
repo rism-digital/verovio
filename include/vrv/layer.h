@@ -47,7 +47,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddLayerElement(LayerElement *element, int idx = -1);
+    virtual void AddChild(Object *object);
     ///@}
 
     /**

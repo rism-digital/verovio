@@ -81,7 +81,7 @@ public:
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
     /**
      * @name Setter and getter for tie attribute and other pointers

@@ -18,6 +18,7 @@
 #include "editorial.h"
 #include "functorparams.h"
 #include "note.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -64,15 +65,26 @@ void BTrem::Reset()
     LayerElement::Reset();
 }
 
-void BTrem::AddLayerElement(LayerElement *element)
+void BTrem::AddChild(Object *child)
 {
-    assert(
-        dynamic_cast<Note *>(element) || dynamic_cast<Chord *>(element) || dynamic_cast<EditorialElement *>(element));
-    element->SetParent(this);
-    m_children.push_back(element);
+    if (child->Is() == CHORD) {
+        assert(dynamic_cast<Chord *>(child));
+    }
+    else if (child->Is() == NOTE) {
+        assert(dynamic_cast<Note *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
-
 //----------------------------------------------------------------------------
 // FTrem
 //----------------------------------------------------------------------------
@@ -94,12 +106,24 @@ void FTrem::Reset()
     ResetSlashcount();
 }
 
-void FTrem::AddLayerElement(LayerElement *element)
+void FTrem::AddChild(Object *child)
 {
-    // assert(
-    //    dynamic_cast<Note *>(element) || dynamic_cast<Chord *>(element) || dynamic_cast<EditorialElement *>(element));
-    element->SetParent(this);
-    m_children.push_back(element);
+    if (child->Is() == CHORD) {
+        assert(dynamic_cast<Chord *>(child));
+    }
+    else if (child->Is() == NOTE) {
+        assert(dynamic_cast<Note *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 

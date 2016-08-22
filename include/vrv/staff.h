@@ -49,7 +49,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddLayer(Layer *layer);
+    virtual void AddChild(Object *object);
     ///@}
 
     int GetLayerCount() const { return (int)m_children.size(); };

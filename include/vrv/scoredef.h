@@ -120,7 +120,7 @@ public:
     virtual ClassId Is() const { return SCOREDEF; };
     ///@}
 
-    void AddStaffGrp(StaffGrp *staffGrp);
+    virtual void AddChild(Object *object);
 
     /**
      * Replace the scoreDef with the content of the newScoreDef.
@@ -225,8 +225,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddStaffDef(StaffDef *staffDef);
-    void AddStaffGrp(StaffGrp *staffGrp);
+    virtual void AddChild(Object *object);
     ///@}
 
     //----------//

@@ -36,7 +36,7 @@ public:
     virtual ~Doc();
     virtual ClassId Is() const { return DOC; }
 
-    void AddPage(Page *page);
+    virtual void AddChild(Object *object);
 
     /*
      * Clear the content of the document.

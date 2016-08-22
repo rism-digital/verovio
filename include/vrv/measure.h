@@ -54,8 +54,7 @@ public:
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddStaff(Staff *staff);
-    void AddFloatingElement(FloatingElement *element);
+    virtual void AddChild(Object *object);
     ///@}
 
     /**
