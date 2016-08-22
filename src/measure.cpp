@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "attcomparison.h"
+#include "boundary.h"
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
@@ -420,7 +421,9 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     // First add all pendings objects
     ArrayOfObjects::iterator iter;
     for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); iter++) {
-        if ((*iter)->IsEditorialElement())
+        if ((*iter)->Is() == BOUNDARY_END)
+            params->m_currentSystem->AddBoundaryEnd(dynamic_cast<BoundaryEnd *>(*iter));
+        else if ((*iter)->IsEditorialElement())
             params->m_currentSystem->AddEditorialElement(dynamic_cast<EditorialElement *>(*iter));
         else if ((*iter)->Is() == ENDING)
             params->m_currentSystem->AddEnding(dynamic_cast<Ending *>(*iter));

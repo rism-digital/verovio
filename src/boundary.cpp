@@ -116,8 +116,11 @@ int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     BoundaryEnd *endBoundary = dynamic_cast<BoundaryEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
-    // the next system
-    params->m_currentSystem->AddBoundaryEnd(endBoundary);
+    // the next system but only if the pending object array it empty (otherwise it will mess up the MEI tree)
+    if (params->m_pendingObjects.empty())
+        params->m_currentSystem->AddBoundaryEnd(endBoundary);
+    else
+        params->m_pendingObjects.push_back(endBoundary);
 
     return FUNCTOR_SIBLINGS;
 }
