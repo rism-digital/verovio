@@ -910,11 +910,11 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     if (this->Is() == SYSTEM) {
         // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
         params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
-        // System *system = dynamic_cast<System *>(this);
-        // assert(system);
-        // For now we don't use it - eventually we want to set it. The problem will be to take into account succeeding
+        System *system = dynamic_cast<System *>(this);
+        assert(system);
+        // For now we don't use it - eventually we want to set it by taking into account succeeding
         // scoreDefs appearing before the first measure of the system
-        // system->SetDrawingScoreDef(*currentScoreDef);
+        system->SetDrawingScoreDef(params->m_upcomingScoreDef);
         return FUNCTOR_CONTINUE;
     }
 
@@ -1090,7 +1090,8 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
 
     if (!current->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
-        assert(false); // quite drastic but this should never happen. If nothing has to be drawn
+        // assert(!VERSION_DEV); // quite drastic but this should never happen. If nothing has to be drawn
+        LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
         // then the BB should be set to empty with  Object::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }

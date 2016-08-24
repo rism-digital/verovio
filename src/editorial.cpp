@@ -61,7 +61,10 @@ EditorialElement::~EditorialElement()
 
 void EditorialElement::AddChild(Object *child)
 {
-    if (child->IsFloatingElement()) {
+    if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else if (child->IsFloatingElement()) {
         assert(dynamic_cast<FloatingElement *>(child));
     }
     else if (child->IsLayerElement()) {

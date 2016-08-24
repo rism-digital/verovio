@@ -1676,8 +1676,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     if ((system == parentSystem1) && (system == parentSystem2)) {
         x1 = ending->GetMeasure()->GetDrawingX();
         // if it is the first measure of the system use the left barline position
-        if (system->GetFirst(MEASURE) == ending->GetMeasure())
-            x1 += ending->GetMeasure()->GetLeftBarLineXRel();
+        if (system->GetFirst(MEASURE) == ending->GetMeasure()) x1 += ending->GetMeasure()->GetLeftBarLineXRel();
         x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
     }
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
@@ -1687,8 +1686,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if (!Check(measure)) return;
         x1 = ending->GetMeasure()->GetDrawingX();
         // if it is the first measure of the system use the left barline position
-        if (system->GetFirst(MEASURE) == ending->GetMeasure())
-            x1 += ending->GetMeasure()->GetLeftBarLineXRel();
+        if (system->GetFirst(MEASURE) == ending->GetMeasure()) x1 += ending->GetMeasure()->GetLeftBarLineXRel();
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         spanningType = SPANNING_START;
     }
@@ -1722,15 +1720,15 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList;
-    assert(ending->GetMeasure()->GetDrawingScoreDef());
+    assert(system->GetDrawingScoreDef());
     // By default, endings are drawn on top of each group (@ending.rend="gouped") unless "top" is specified)
-    if (ending->GetMeasure()->GetDrawingScoreDef()->GetEndingRend() == endings_ENDINGREND_top) {
+    if (system->GetDrawingScoreDef()->GetEndingRend() == endings_ENDINGREND_top) {
         Staff *staff = dynamic_cast<Staff *>(system->FindChildByType(STAFF, 2, FORWARD));
         if (!Check(staff)) return;
         staffList.push_back(staff);
     }
     else {
-        staffList = ending->GetMeasure()->GetFirstStaffGrpStaves(ending->GetMeasure()->GetDrawingScoreDef());
+        staffList = ending->GetMeasure()->GetFirstStaffGrpStaves(system->GetDrawingScoreDef());
     }
 
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
