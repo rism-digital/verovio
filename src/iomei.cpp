@@ -178,6 +178,10 @@ bool MeiOutput::WriteObject(Object *object)
         }
         // Here we could add a <sb> element (but not for the first system of the page?)
     }
+    else if (object->Is() == ENDING) {
+        m_currentNode = m_currentNode.append_child("ending");
+        WriteMeiEnding(m_currentNode, dynamic_cast<Ending *>(object));
+    }
     else if (object->Is() == SCOREDEF) {
         m_currentNode = m_currentNode.append_child("scoreDef");
         WriteMeiScoreDef(m_currentNode, dynamic_cast<ScoreDef *>(object));
@@ -423,6 +427,16 @@ bool MeiOutput::WriteObject(Object *object)
         WriteMeiUnclear(m_currentNode, dynamic_cast<Unclear *>(object));
     }
 
+    // BoundaryEnd - nothing to add - only
+    else if (object->Is() == BOUNDARY_END) {
+        if (m_scoreBasedMEI)
+            return true;
+        else {
+            m_currentNode = m_currentNode.append_child("boundaryEnd");
+            WriteMeiBoundaryEnd(m_currentNode, dynamic_cast<BoundaryEnd *>(object));
+        }
+    }
+
     else {
         // Missing output method for the class
         LogError("Output method missing for '%s'", object->GetClassName().c_str());
@@ -437,6 +451,11 @@ bool MeiOutput::WriteObject(Object *object)
 
 bool MeiOutput::WriteObjectEnd(Object *object)
 {
+    if (m_scoreBasedMEI && (object->IsEditorialElement() || (object->Is() == ENDING))) {
+        BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(object);
+        assert(interface);
+        if (interface->IsBoundary()) return true;
+    }
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
 
@@ -545,6 +564,25 @@ void MeiOutput::WriteMeiSystem(pugi::xml_node currentNode, System *system)
     if (system->m_yAbs != VRV_UNSET) {
         currentNode.append_attribute("uly") = StringFormat("%d", system->m_yAbs).c_str();
     }
+}
+
+void MeiOutput::WriteMeiBoundaryEnd(pugi::xml_node currentNode, BoundaryEnd *boundaryEnd)
+{
+    assert(boundaryEnd && boundaryEnd->GetStart());
+
+    WriteXmlId(currentNode, boundaryEnd);
+    currentNode.append_attribute("startid") = UuidToMeiStr(boundaryEnd->GetStart()).c_str();
+    std::string meiElementName = boundaryEnd->GetStart()->GetClassName();
+    std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
+    currentNode.append_attribute("type") = meiElementName.c_str();
+}
+
+void MeiOutput::WriteMeiEnding(pugi::xml_node currentNode, Ending *ending)
+{
+    assert(ending);
+
+    WriteXmlId(currentNode, ending);
+    ending->WriteCommon(currentNode);
 }
 
 void MeiOutput::WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)

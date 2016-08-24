@@ -30,6 +30,7 @@ class App;
 class BarLine;
 class Beam;
 class BeatRpt;
+class BoundaryEnd;
 class BTrem;
 class Chord;
 class Clef;
@@ -41,6 +42,7 @@ class Dot;
 class Dir;
 class DurationInterface;
 class Dynam;
+class Ending;
 class Expan;
 class FloatingElement;
 class FTrem;
@@ -144,6 +146,8 @@ private:
     ///@{
     void WriteMeiPage(pugi::xml_node currentNode, Page *page);
     void WriteMeiSystem(pugi::xml_node currentNode, System *system);
+    void WriteMeiBoundaryEnd(pugi::xml_node currentNode, BoundaryEnd *boundaryEnd);
+    void WriteMeiEnding(pugi::xml_node currentNote, Ending *ending);
     void WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
     void WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
     void WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);

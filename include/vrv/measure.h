@@ -301,7 +301,7 @@ private:
 
     /**
      * A pointer to the drawing ScoreDef instance. It is owned by the measure and added to a measure when a scoreDef
-     * change before it required it. This include scoreDef elements before it but also clef changes within the previous
+     * change before or requires it. This include scoreDef elements before it but also clef changes within the previous
      * measure.
      */
     ScoreDef *m_drawingScoreDef;
