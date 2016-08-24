@@ -83,7 +83,7 @@ Style::Style()
     m_leftMarginDefault = DEFAULT_LEFT_MARGIN_DEFAULT * DEFINITION_FACTOR;
 
     /** The layout right margin by element */
-    m_rightMarginAccid = DEFAULT_LEFT_MARGIN_ACCID * DEFINITION_FACTOR;
+    m_rightMarginAccid = DEFAULT_RIGHT_MARGIN_ACCID * DEFINITION_FACTOR;
     m_rightMarginBarLine = DEFAULT_RIGHT_MARGIN_BARLINE * DEFINITION_FACTOR;
     m_rightMarginBarLineAttrLeft = DEFAULT_RIGHT_MARGIN_BARLINE_ATTR_LEFT * DEFINITION_FACTOR;
     m_rightMarginBarLineAttrRight = DEFAULT_RIGHT_MARGIN_BARLINE_ATTR_RIGHT * DEFINITION_FACTOR;
