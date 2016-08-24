@@ -128,10 +128,10 @@ my $VEROVIO_INCLUDE = "$VEROVIO_ROOT/include";
 my $VEROVIO_LIBMEI  = "$VEROVIO_ROOT/libmei";
 
 my $includes = "";
-$includes .= " -I./lib/jsonxx";
 $includes .= " -I$VEROVIO_INCLUDE";
 $includes .= " -I$VEROVIO_INCLUDE/vrv";
 $includes .= " -I$VEROVIO_INCLUDE/hum";
+$includes .= " -I$VEROVIO_INCLUDE/json";
 $includes .= " -I$VEROVIO_INCLUDE/midi";
 $includes .= " -I$VEROVIO_INCLUDE/pugi";
 $includes .= " -I$VEROVIO_INCLUDE/utf8";
@@ -215,6 +215,7 @@ sub getSources {
 	push @sources, "./emscripten_main.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*/*.cpp";
+	push @sources, glob "$VEROVIO_ROOT/src/*/*.cc";
 
 	# libmei: only a subset is included:
 	push @sources, "$VEROVIO_ROOT/libmei/attconverter.cpp";
@@ -224,9 +225,6 @@ sub getSources {
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mensural.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_pagebased.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_shared.cpp";
-
-	# jsonxx:
-	push @sources, "./lib/jsonxx/jsonxx.cc";
 
 	return join " ", @sources
 }
