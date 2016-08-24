@@ -58,6 +58,7 @@
 		4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
 		4D8CD8A61B4E922A00F0756F /* atts_critapp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F31940BCC100C76319 /* atts_critapp.cpp */; };
 		4D8CD8A71B4E927300F0756F /* atts_critapp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F31940BCC100C76319 /* atts_critapp.cpp */; };
+		4D95D4F21D6E042400B2B856 /* section.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F11D6E042400B2B856 /* section.cpp */; };
 		4D983005192E959E00320037 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
 		4D9A9C17199F560200028D93 /* verse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C16199F560200028D93 /* verse.h */; };
 		4D9A9C19199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
@@ -306,6 +307,8 @@
 		4D797B041A67C55F007637BD /* devicecontextbase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = devicecontextbase.h; path = include/vrv/devicecontextbase.h; sourceTree = "<group>"; };
 		4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = drawinginterface.cpp; path = src/drawinginterface.cpp; sourceTree = "<group>"; };
 		4D9234F11A586AE100763251 /* attcomparison.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = attcomparison.h; path = include/vrv/attcomparison.h; sourceTree = "<group>"; };
+		4D95D4F01D6E041E00B2B856 /* section.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = section.h; path = include/vrv/section.h; sourceTree = "<group>"; };
+		4D95D4F11D6E042400B2B856 /* section.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = section.cpp; path = src/section.cpp; sourceTree = "<group>"; };
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
 		4D9A9C16199F560200028D93 /* verse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verse.h; path = include/vrv/verse.h; sourceTree = "<group>"; };
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
@@ -755,6 +758,8 @@
 				8F59292518854BF800FE51AD /* page.h */,
 				8F086ED2188539540037FD8E /* scoredef.cpp */,
 				8F59292918854BF800FE51AD /* scoredef.h */,
+				4D95D4F11D6E042400B2B856 /* section.cpp */,
+				4D95D4F01D6E041E00B2B856 /* section.h */,
 				8F086ED4188539540037FD8E /* staff.cpp */,
 				8F59292B18854BF800FE51AD /* staff.h */,
 				8F086ED7188539540037FD8E /* system.cpp */,
@@ -1056,6 +1061,7 @@
 				4DA80D961A6ACF5D0089802D /* style.cpp in Sources */,
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
 				4D20B5EC1B873A1300EA9EC3 /* scoredefinterface.cpp in Sources */,
+				4D95D4F21D6E042400B2B856 /* section.cpp in Sources */,
 				4D1BE7731C688F5A0086DC0E /* MidiMessage.cpp in Sources */,
 				4DCA95D81A515D0E008AD7E9 /* editorial.cpp in Sources */,
 				4DB351151C8040B1002DD057 /* tempo.cpp in Sources */,

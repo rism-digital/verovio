@@ -1,37 +1,37 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        ending.h
+// Name:        section.h
 // Author:      Laurent Pugin
 // Created:     14/07/2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_ENDING_H__
-#define __VRV_ENDING_H__
+#ifndef __VRV_SECTION_H__
+#define __VRV_SECTION_H__
 
 #include "atts_shared.h"
 #include "boundary.h"
-#include "floatingelement.h"
+#include "object.h"
 
 namespace vrv {
 
-class Measure;
+class Section;
 
 //----------------------------------------------------------------------------
 // Ending
 //----------------------------------------------------------------------------
 
-class Ending : public FloatingElement, public BoundaryStartInterface, public AttCommon {
+class Section : public Object, public BoundaryStartInterface, public AttCommon, public AttCommonPart {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method resets all attribute classes
      */
     ///@{
-    Ending();
-    virtual ~Ending();
+    Section();
+    virtual ~Section();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Ending"; };
-    virtual ClassId Is() const { return ENDING; };
+    virtual std::string GetClassName() const { return "Section"; };
+    virtual ClassId Is() const { return SECTION; };
     ///@}
 
     //----------//
@@ -54,11 +54,6 @@ public:
      * account
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
-
-    /**
-     * Functor for grouping FloatingElement by drawingGrpId
-     */
-    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
 private:
     //

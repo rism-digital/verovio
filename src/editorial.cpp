@@ -478,7 +478,6 @@ int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
 
 int EditorialElement::ResetDrawing(FunctorParams *functorParams)
 {
-
     if (this->IsBoundary()) {
         this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
     }
