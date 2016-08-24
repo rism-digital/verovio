@@ -435,13 +435,27 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style)
 {
     assert(m_penStack.size());
+    assert(m_brushStack.size());
+
+    Pen currentPen = m_penStack.top();
+    Brush currentBrush = m_brushStack.top();
 
     pugi::xml_node polygonChild = AppendChild("polygon");
     // if (fillStyle == wxODDEVEN_RULE)
-    //    polygonChild.append_attribute("style") = "fill-rule:evenodd;";
+    //    polygonChild.append_attribute("fill-rule") = "evenodd;";
     // else
-    polygonChild.append_attribute("style") = "fill-rule:nonzero;";
-    polygonChild.append_attribute("stroke-width") = StringFormat("%d", m_penStack.top().GetWidth()).c_str();
+    polygonChild.append_attribute("fill-rule") = "nonzero";
+    if (currentPen.GetColour() != AxBLACK)
+        polygonChild.append_attribute("stroke")
+            = StringFormat("#%s", GetColour(currentPen.GetColour()).c_str()).c_str();
+    polygonChild.append_attribute("stroke-width") = StringFormat("%d", currentPen.GetWidth()).c_str();
+    if (currentPen.GetOpacity() != 1.0)
+        polygonChild.append_attribute("stroke-opacity") = StringFormat("%f", currentPen.GetOpacity()).c_str();
+    if (currentBrush.GetColour() != AxBLACK)
+        polygonChild.append_attribute("fill")
+            = StringFormat("#%s", GetColour(currentBrush.GetColour()).c_str()).c_str();
+    if (currentBrush.GetOpacity() != 1.0)
+        polygonChild.append_attribute("fill-opacity") = StringFormat("%f", currentBrush.GetOpacity()).c_str();
 
     std::string pointsString;
     for (int i = 0; i < n; i++) {
