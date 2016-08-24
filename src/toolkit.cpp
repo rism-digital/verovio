@@ -619,7 +619,7 @@ std::string Toolkit::RenderToMidi()
 
 std::string Toolkit::GetElementsAtTime(int millisec)
 {
-#ifdef USE_EMSCRIPTEN
+#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
     jsonxx::Object o;
     jsonxx::Array a;
 

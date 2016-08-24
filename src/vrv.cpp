@@ -11,11 +11,16 @@
 
 #include <assert.h>
 #include <cmath>
-#include <dirent.h>
 #include <sstream>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <vector>
+
+#ifndef _WIN32
+#include <dirent.h>
+#else
+#include "win32.h"
+#endif
 
 //----------------------------------------------------------------------------
 

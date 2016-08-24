@@ -13,8 +13,13 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string>
-#include <sys/time.h>
 #include <vector>
+
+#ifndef _WIN32
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
 
 namespace vrv {
 

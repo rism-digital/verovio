@@ -17,7 +17,7 @@
 
 //----------------------------------------------------------------------------
 
-#ifdef USE_EMSCRIPTEN
+#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
 #include "jsonxx.h"
 #endif
 
