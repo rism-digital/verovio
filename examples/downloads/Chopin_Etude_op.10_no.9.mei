@@ -341,7 +341,7 @@
             <mdiv>
                 <score>
                     <scoreDef meter.count="6" meter.unit="8" key.sig="4f" key.mode="minor">
-                        <staffGrp symbol="brace" barthru="true">
+                        <staffGrp symbol="brace" barthru="true" label="Piano">
                             <staffDef n="1" clef.shape="G" lines="5" clef.line="2"/>
                             <staffDef n="2" clef.line="4" clef.shape="F" lines="5"/>
                         </staffGrp>
