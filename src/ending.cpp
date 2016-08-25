@@ -13,7 +13,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "editorial.h"
 #include "functorparams.h"
+#include "measure.h"
+#include "scoredef.h"
 #include "system.h"
 #include "vrv.h"
 
@@ -39,6 +42,27 @@ void Ending::Reset()
     FloatingElement::Reset();
     BoundaryStartInterface::Reset();
     ResetCommon();
+}
+
+void Ending::AddChild(Object *child)
+{
+    if (child->Is() == MEASURE) {
+        assert(dynamic_cast<Measure *>(child));
+    }
+    else if (child->Is() == SCOREDEF) {
+        assert(dynamic_cast<ScoreDef *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
 }
 
 //----------------------------------------------------------------------------

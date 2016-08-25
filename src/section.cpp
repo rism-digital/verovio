@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        section.h
 // Author:      Laurent Pugin
-// Created:     14/07/2016
+// Created:     24/08/2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
@@ -13,7 +13,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "editorial.h"
+#include "ending.h"
 #include "functorparams.h"
+#include "measure.h"
+#include "scoredef.h"
 #include "system.h"
 #include "vrv.h"
 
@@ -39,6 +43,76 @@ void Section::Reset()
 {
     Object::Reset();
     BoundaryStartInterface::Reset();
+    ResetCommon();
+    ResetCommonPart();
+}
+
+void Section::AddChild(Object *child)
+{
+    if (child->Is() == ENDING) {
+        assert(dynamic_cast<Ending *>(child));
+    }
+    else if (child->Is() == MEASURE) {
+        assert(dynamic_cast<Measure *>(child));
+    }
+    else if (child->Is() == SCOREDEF) {
+        assert(dynamic_cast<ScoreDef *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
+}
+
+//----------------------------------------------------------------------------
+// Pb
+//----------------------------------------------------------------------------
+
+Pb::Pb() : Object("pb-"), AttCommon(), AttCommonPart()
+{
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_COMMONPART);
+
+    Reset();
+}
+
+Pb::~Pb()
+{
+}
+
+void Pb::Reset()
+{
+    Object::Reset();
+    ResetCommon();
+    ResetCommonPart();
+}
+
+//----------------------------------------------------------------------------
+// Sb
+//----------------------------------------------------------------------------
+
+Sb::Sb() : Object("pb-"), AttCommon(), AttCommonPart()
+{
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_COMMONPART);
+
+    Reset();
+}
+
+Sb::~Sb()
+{
+}
+
+void Sb::Reset()
+{
+    Object::Reset();
     ResetCommon();
     ResetCommonPart();
 }
@@ -74,12 +148,49 @@ int Section::CastOffSystems(FunctorParams *functorParams)
     assert(dynamic_cast<System *>(this->m_parent));
 
     // Special case where we use the Relinquish method.
-    // We want to move the measure to the currentSystem. However, we cannot use DetachChild
-    // from the content System because this screws up the iterator. Relinquish gives up
-    // the ownership of the Measure - the contentSystem will be deleted afterwards.
     Section *section = dynamic_cast<Section *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    // move as pSection since we want it at the beginning of the system in case of system break coming
+    // move as pending since we want it at the beginning of the system in case of system break coming
     params->m_pendingObjects.push_back(section);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
+// Pb functor methods
+//----------------------------------------------------------------------------
+
+int Pb::CastOffSystems(FunctorParams *functorParams)
+{
+    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
+
+    // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
+    assert(dynamic_cast<System *>(this->m_parent));
+
+    // Special case where we use the Relinquish method.
+    Pb *pb = dynamic_cast<Pb *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    // move as pending since we want it at the beginning of the system in case of system break coming
+    params->m_pendingObjects.push_back(pb);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+//----------------------------------------------------------------------------
+// Sb functor methods
+//----------------------------------------------------------------------------
+
+int Sb::CastOffSystems(FunctorParams *functorParams)
+{
+    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
+
+    // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
+    assert(dynamic_cast<System *>(this->m_parent));
+
+    // Special case where we use the Relinquish method.
+    Sb *sb = dynamic_cast<Sb *>(params->m_contentSystem->Relinquish(this->GetIdx()));
+    // move as pending since we want it at the beginning of the system in case of system break coming
+    params->m_pendingObjects.push_back(sb);
 
     return FUNCTOR_SIBLINGS;
 }

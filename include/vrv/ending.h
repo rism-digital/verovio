@@ -20,6 +20,10 @@ class Measure;
 // Ending
 //----------------------------------------------------------------------------
 
+/**
+ * This class represents a MEI ending.
+ * It can be both a container (in score-based MEI) and a boundary (in page-based MEI)
+ */
 class Ending : public FloatingElement, public BoundaryStartInterface, public AttCommon {
 public:
     /**
@@ -33,6 +37,11 @@ public:
     virtual std::string GetClassName() const { return "Ending"; };
     virtual ClassId Is() const { return ENDING; };
     ///@}
+
+    /**
+     * Method for adding allowed content
+     */
+    virtual void AddChild(Object *object);
 
     //----------//
     // Functors //
