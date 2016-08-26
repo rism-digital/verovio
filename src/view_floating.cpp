@@ -822,9 +822,9 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
 
     System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
     assert(system);
-    TimeSpanningLayerElementsParams timeSpanningLayerElementsParams;
-    timeSpanningLayerElementsParams.m_minPos = p1->x;
-    timeSpanningLayerElementsParams.m_maxPos = p2->x;
+    FindTimeSpanningLayerElementsParams findTimeSpanningLayerElementsParams;
+    findTimeSpanningLayerElementsParams.m_minPos = p1->x;
+    findTimeSpanningLayerElementsParams.m_maxPos = p2->x;
     std::vector<AttComparison *> filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
@@ -833,14 +833,14 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     filters.push_back(&matchStaff);
     filters.push_back(&matchLayer);
 
-    Functor timeSpanningLayerElements(&Object::TimeSpanningLayerElements);
-    system->Process(&timeSpanningLayerElements, &timeSpanningLayerElementsParams, NULL, &filters);
+    Functor timeSpanningLayerElements(&Object::FindTimeSpanningLayerElements);
+    system->Process(&timeSpanningLayerElements, &findTimeSpanningLayerElementsParams, NULL, &filters);
     // if (spanningContent.size() > 12) LogDebug("### %d %s", spanningContent.size(), slur->GetUuid().c_str());
 
     ArrayOfLayerElementPointPairs spanningContentPoints;
     std::vector<LayerElement *>::iterator it;
-    for (it = timeSpanningLayerElementsParams.m_spanningContent.begin();
-         it != timeSpanningLayerElementsParams.m_spanningContent.end(); it++) {
+    for (it = findTimeSpanningLayerElementsParams.m_spanningContent.begin();
+         it != findTimeSpanningLayerElementsParams.m_spanningContent.end(); it++) {
         Note *note = NULL;
         // We keep only notes and chords for now
         if (((*it)->Is() != NOTE) && ((*it)->Is() != CHORD)) continue;

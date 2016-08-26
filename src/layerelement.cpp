@@ -531,9 +531,9 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::TimeSpanningLayerElements(FunctorParams *functorParams)
+int LayerElement::FindTimeSpanningLayerElements(FunctorParams *functorParams)
 {
-    TimeSpanningLayerElementsParams *params = dynamic_cast<TimeSpanningLayerElementsParams *>(functorParams);
+    FindTimeSpanningLayerElementsParams *params = dynamic_cast<FindTimeSpanningLayerElementsParams *>(functorParams);
     assert(params);
 
     if ((this->GetDrawingX() > params->m_minPos) && (this->GetDrawingX() < params->m_maxPos)) {

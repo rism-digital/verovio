@@ -325,8 +325,6 @@ bool Toolkit::LoadString(const std::string &data)
     m_doc.SetSpacingSystem(this->GetSpacingSystem());
     m_doc.SetEvenSpacing(this->GetEvenNoteSpacing());
 
-    return true;
-
     m_doc.PrepareDrawing();
 
     if (input->HasMeasureWithinEditoMarkup() && !m_noLayout) {

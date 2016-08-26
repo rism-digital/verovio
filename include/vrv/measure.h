@@ -163,12 +163,10 @@ public:
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
     /**
-     * @name See Object::AlignHorizontally
+     * See Object::AlignHorizontally
      */
-    ///@{
     virtual int AlignHorizontally(FunctorParams *functorParams);
     virtual int AlignHorizontallyEnd(FunctorParams *functorParams);
-    ///@}
 
     /**
      * See Object::AlignVertically

@@ -103,12 +103,10 @@ public:
     //----------//
 
     /**
-     * @name See Object::PrepareTieAttr
+     * See Object::PrepareTieAttr
      */
-    ///@{
     virtual int PrepareTieAttr(FunctorParams *functorParams);
     virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
-    ///@}
 
 protected:
     /**

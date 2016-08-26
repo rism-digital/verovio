@@ -135,17 +135,15 @@ public:
     virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
-     * See Object::TimeSpanningLayerElements
+     * See Object::FindTimeSpanningLayerElements
      */
-    virtual int TimeSpanningLayerElements(FunctorParams *functorParams);
+    virtual int FindTimeSpanningLayerElements(FunctorParams *functorParams);
 
     /**
-     * @name See Object::GenerateMIDI
+     * See Object::GenerateMIDI
      */
-    ///@{
     virtual int GenerateMIDI(FunctorParams *functorParams);
     virtual int GenerateMIDIEnd(FunctorParams *functorParams);
-    ///@}
 
     /**
      * See Object::CalcMaxMeasureDuration

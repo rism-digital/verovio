@@ -98,7 +98,7 @@ public:
      * See Object::ResetHorizontalAlignment
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
-    
+
     /**
      * See Object::ResetVerticalAlignment
      */
@@ -125,12 +125,10 @@ public:
     virtual int AlignSystems(FunctorParams *functorParams);
 
     /**
-     * @name See Object::AlignMeasures
+     * See Object::AlignMeasures
      */
-    ///@{
     virtual int AlignMeasures(FunctorParams *functorParams);
     virtual int AlignMeasuresEnd(FunctorParams *functorParams);
-    ///@}
 
     /**
      * See Object::JustifyX

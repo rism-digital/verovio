@@ -400,6 +400,28 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// FindTimeSpanningLayerElementsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the vector of LayerElement pointer to fill
+ * member 1: the minimum position
+ * member 2: the maximum position
+ **/
+
+class FindTimeSpanningLayerElementsParams : public FunctorParams {
+public:
+    FindTimeSpanningLayerElementsParams()
+    {
+        m_minPos = 0;
+        m_maxPos = 0;
+    }
+    std::vector<LayerElement *> m_spanningContent;
+    int m_minPos;
+    int m_maxPos;
+};
+
+//----------------------------------------------------------------------------
 // GenerateMIDIParams
 //----------------------------------------------------------------------------
 
@@ -942,28 +964,6 @@ public:
     bool m_meterSig;
     bool m_keySigCancellation;
     bool m_applyToAll;
-};
-
-//----------------------------------------------------------------------------
-// TimeSpanningLayerElementsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the vector of LayerElement pointer to fill
- * member 1: the minimum position
- * member 2: the maximum position
-**/
-
-class TimeSpanningLayerElementsParams : public FunctorParams {
-public:
-    TimeSpanningLayerElementsParams()
-    {
-        m_minPos = 0;
-        m_maxPos = 0;
-    }
-    std::vector<LayerElement *> m_spanningContent;
-    int m_minPos;
-    int m_maxPos;
 };
 
 //----------------------------------------------------------------------------
