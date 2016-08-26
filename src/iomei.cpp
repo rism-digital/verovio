@@ -42,6 +42,7 @@
 #include "proport.h"
 #include "rest.h"
 #include "rpt.h"
+#include "section.h"
 #include "slur.h"
 #include "space.h"
 #include "staff.h"
@@ -177,6 +178,10 @@ bool MeiOutput::WriteObject(Object *object)
             WriteMeiSystem(m_currentNode, dynamic_cast<System *>(object));
         }
         // Here we could add a <sb> element (but not for the first system of the page?)
+    }
+    else if (object->Is() == SECTION) {
+        m_currentNode = m_currentNode.append_child("section");
+        WriteMeiSection(m_currentNode, dynamic_cast<Section *>(object));
     }
     else if (object->Is() == ENDING) {
         m_currentNode = m_currentNode.append_child("ending");
@@ -521,8 +526,6 @@ bool MeiOutput::WriteMeiDoc(Doc *doc)
         m_nodeStack.push_back(m_currentNode);
         // First save the main scoreDef
         m_doc->m_scoreDef.Save(this);
-        m_currentNode = m_currentNode.append_child("section");
-        m_nodeStack.push_back(m_currentNode);
     }
     else {
         // element to place the pages
@@ -575,6 +578,15 @@ void MeiOutput::WriteMeiBoundaryEnd(pugi::xml_node currentNode, BoundaryEnd *bou
     std::string meiElementName = boundaryEnd->GetStart()->GetClassName();
     std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
     currentNode.append_attribute("type") = meiElementName.c_str();
+}
+
+void MeiOutput::WriteMeiSection(pugi::xml_node currentNode, Section *section)
+{
+    assert(section);
+
+    WriteXmlId(currentNode, section);
+    section->WriteCommon(currentNode);
+    section->WriteCommonPart(currentNode);
 }
 
 void MeiOutput::WriteMeiEnding(pugi::xml_node currentNode, Ending *ending)
@@ -1263,6 +1275,7 @@ MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
     m_system = NULL;
     //
     m_hasScoreDef = false;
+    m_readingScoreBased = false;
 }
 
 MeiInput::~MeiInput()
@@ -1421,6 +1434,7 @@ bool MeiInput::ReadMei(pugi::xml_node root)
 {
     pugi::xml_node current;
     bool success = true;
+    m_readingScoreBased = false;
 
     if (!root.empty() && (current = root.child("meiHead"))) {
         ReadMeiHeader(current);
@@ -1462,6 +1476,7 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         }
     }
     else {
+        m_readingScoreBased = true;
         m_page = new Page();
         m_system = new System();
         m_page->AddChild(m_system);
@@ -1483,6 +1498,90 @@ bool MeiInput::ReadMeiHeader(pugi::xml_node meiHead)
         m_doc->m_header.append_copy(child);
     }
     return true;
+}
+
+bool MeiInput::ReadMeiSection(Object *parent, pugi::xml_node section)
+{
+    Section *vrvSection = new Section();
+    SetMeiUuid(section, vrvSection);
+
+    vrvSection->ReadCommon(section);
+    vrvSection->ReadCommonPart(section);
+
+    parent->AddChild(vrvSection);
+    if (m_readingScoreBased)
+        return ReadMeiSectionChildren(vrvSection, section);
+    else
+        return ReadMeiSystemChildren(vrvSection, section);
+}
+
+bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
+{
+    assert(
+        dynamic_cast<Section *>(parent) || dynamic_cast<Ending *>(parent) || dynamic_cast<EditorialElement *>(parent));
+
+    bool success = true;
+    pugi::xml_node current;
+    Measure *unmeasured = NULL;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        // editorial
+        else if (IsEditorialElementName(current.name())) {
+            success = ReadMeiEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
+        }
+        // content
+        else if (std::string(current.name()) == "ending") {
+            // we should not endings with unmeasured music ... (?)
+            assert(!unmeasured);
+            ReadMeiEnding(parent, current);
+        }
+        else if (std::string(current.name()) == "scoreDef") {
+            ReadMeiScoreDef(parent, current);
+        }
+        else if (std::string(current.name()) == "section") {
+            ReadMeiSection(parent, current);
+        }
+        // unmeasured music
+        else if (parentNode.child("staff")) {
+            if (!unmeasured) {
+                if (parent->Is() == SECTION) {
+                    unmeasured = new Measure(false);
+                    parent->AddChild(unmeasured);
+                }
+                else {
+                    LogError("Unmeasured music within editorial markup is currently not supported");
+                    return false;
+                }
+            }
+            success = ReadMeiStaff(unmeasured, current);
+        }
+        else if (parentNode.child("measure")) {
+            // we should not mix measured and unmeasured music within a system...
+            assert(!unmeasured);
+            // if (parent->IsEditorialElement()) {
+            //    m_hasMeasureWithinEditMarkup = true;
+            //}
+            success = ReadMeiMeasure(parent, current);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <section>", current.name());
+        }
+    }
+    return success;
+}
+
+bool MeiInput::ReadMeiEnding(Object *parent, pugi::xml_node ending)
+{
+    Ending *vrvEnding = new Ending();
+    SetMeiUuid(ending, vrvEnding);
+
+    vrvEnding->ReadCommon(ending);
+
+    parent->AddChild(vrvEnding);
+    if (m_readingScoreBased)
+        return ReadMeiSectionChildren(vrvEnding, ending);
+    else
+        return true;
 }
 
 bool MeiInput::ReadMeiPage(pugi::xml_node page)
@@ -1582,7 +1681,11 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
         if (!success) break;
         // editorial
         else if (IsEditorialElementName(current.name())) {
-            success = ReadMeiEditorialElement(parent, current, EDITORIAL_SYSTEM);
+            success = ReadMeiEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
+        }
+        // boundaryEnd
+        else if (std::string(current.name()) == "boundaryEnd") {
+            success = ReadMeiBoundaryEnd(parent, current);
         }
         // content
         else if (std::string(current.name()) == "scoreDef") {
@@ -1626,6 +1729,28 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
         }
     }
     return success;
+}
+
+bool MeiInput::ReadMeiBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
+{
+    assert(dynamic_cast<System *>(parent));
+
+    std::string startUuid;
+    Object *start = NULL;
+    if (boundaryEnd.attribute("startid")) {
+        std::string startUuid = boundaryEnd.attribute("startid").value();
+        start = m_doc->FindChildByUuid(startUuid);
+    }
+    if (!start) {
+        LogError("Could not find start element '%s' for boundaryEnd", startUuid.c_str());
+        return false;
+    }
+
+    BoundaryEnd *vrvBoundaryEnd = new BoundaryEnd(start);
+    SetMeiUuid(boundaryEnd, vrvBoundaryEnd);
+
+    parent->AddChild(vrvBoundaryEnd);
+    return true;
 }
 
 bool MeiInput::ReadMeiScoreDef(Object *parent, pugi::xml_node scoreDef)
@@ -2855,8 +2980,11 @@ bool MeiInput::ReadMeiEditorialChildren(Object *parent, pugi::xml_node parentNod
 {
     assert(dynamic_cast<EditorialElement *>(parent));
 
-    if (level == EDITORIAL_SYSTEM) {
-        return ReadMeiSystemChildren(parent, parentNode);
+    if (level == EDITORIAL_TOPLEVEL) {
+        if (m_readingScoreBased)
+            return ReadMeiSectionChildren(parent, parentNode);
+        else
+            return ReadMeiSystemChildren(parent, parentNode);
     }
     else if (level == EDITORIAL_SCOREDEF) {
         return ReadMeiScoreDefChildren(parent, parentNode);
@@ -2884,77 +3012,36 @@ bool MeiInput::ReadMeiEditorialChildren(Object *parent, pugi::xml_node parentNod
 bool MeiInput::ReadScoreBasedMei(pugi::xml_node element)
 {
     bool success = true;
-    // editorial
-    if ((std::string(element.name()) == "app")) {
-        success = ReadMeiApp(m_system, element, EDITORIAL_SYSTEM);
-    }
-    else if ((std::string(element.name()) == "annot")) {
-        success = ReadMeiAnnot(m_system, element);
-    }
-    else if ((std::string(element.name()) == "supplied")) {
-        success = ReadMeiSupplied(m_system, element, EDITORIAL_SYSTEM);
-    }
-    // endings
-    else if (std::string(element.name()) == "ending") {
-        // We will need to move this into a ReadMeiSystemChildren (?) when we want to support app around or within
-        // endings
-        pugi::xml_node current;
-        Ending *ending = new Ending();
-        SetMeiUuid(element, ending);
-        ending->ReadCommon(element);
-        m_system->AddChild(ending);
-        for (current = element.first_child(); current; current = current.next_sibling()) {
-            LogDebug("Reading %s", current.name());
-            success = ReadScoreBasedMei(current);
+    // nested mdiv
+    if (std::string(element.name()) == "mdiv") {
+        if (!element.first_child()) {
+            LogError("No <mdiv> child found");
+            return false;
         }
-        BoundaryEnd *endingEnd = new BoundaryEnd(ending);
-        ending->SetEnd(endingEnd);
-        m_system->AddChild(endingEnd);
-    }
-    // content
-    else if (std::string(element.name()) == "measure") {
-        // This is the call that will put us back on the page-based reading loop
-        success = ReadMeiMeasure(m_system, element);
-    }
-    else if (std::string(element.name()) == "pb") {
-        if ((m_system->GetChildCount() > 0) && !m_ignoreLayoutInformation) {
-            // LogDebug("pb");
-            this->m_hasLayoutInformation = true;
-            m_page = new Page();
-            m_system = new System();
-            m_page->AddChild(m_system);
-            m_doc->AddChild(m_page);
-        }
-    }
-    else if (std::string(element.name()) == "sb") {
-        if ((m_page->GetSystemCount() > 0) && !m_ignoreLayoutInformation) {
-            // LogDebug("pb");
-            this->m_hasLayoutInformation = true;
-            m_system = new System();
-            m_page->AddChild(m_system);
-        }
+        success = ReadScoreBasedMei(element.first_child());
     }
     else if (std::string(element.name()) == "score") {
-        pugi::xml_node current;
-        for (current = element.first_child(); current; current = current.next_sibling()) {
-            if (!success) break;
-            success = ReadScoreBasedMei(current);
+        pugi::xml_node scoreDef = element.first_child();
+        if (!scoreDef || (std::string(scoreDef.name()) != "scoreDef")) {
+            LogError("A <scoreDef> is required as first child of <score>");
+            return false;
         }
-    }
-    else if ((std::string(element.name()) == "scoreDef")) {
-        success = ReadMeiScoreDef(m_system, element);
-    }
-    else if (std::string(element.name()) == "section") {
+        // This actually sets the Doc::m_scoreDef
+        success = ReadMeiScoreDef(m_system, scoreDef);
+        if (!success) return false;
         pugi::xml_node current;
-        for (current = element.first_child(); current; current = current.next_sibling()) {
+        for (current = scoreDef.next_sibling(); current; current = current.next_sibling()) {
             if (!success) break;
-            // This will happen with unmeasured music - ReadMeiSystemChildren will read take over the loop
-            // This means that <pb> and <sb> (for example) will not be read
-            else if ((std::string(current.name()) == "staff")) {
-                success = ReadMeiSystemChildren(m_system, element);
-                break;
+            std::string elementName = std::string(current.name());
+
+            // editorial
+            if (IsEditorialElementName(current.name())) {
+                success = ReadMeiEditorialElement(m_system, current, EDITORIAL_TOPLEVEL);
             }
-            success = ReadScoreBasedMei(current);
+            // content
+            else if (elementName == "section") {
+                success = ReadMeiSection(m_system, current);
+            }
         }
     }
     else {

@@ -61,6 +61,7 @@ class MultiRpt;
 class Note;
 class Octave;
 class Orig;
+class Pb;
 class Pedal;
 class PitchInterface;
 class PositionInterface;
@@ -72,6 +73,8 @@ class Rest;
 class Restore;
 class ScoreDef;
 class ScoreDefInterface;
+class Sb;
+class Section;
 class Sic;
 class Slur;
 class Space;
@@ -141,13 +144,22 @@ private:
     void WriteXmlId(pugi::xml_node currentNode, Object *object);
 
     /**
+     * @name Methods for writing MEI score-based elements
+     */
+    ///@{
+    void WriteMeiSection(pugi::xml_node currentNode, Section *section);
+    void WriteMeiEnding(pugi::xml_node currentNote, Ending *ending);
+    void WriteMeiPb(pugi::xml_node currentNode, Pb *pb);
+    void WriteMeiSb(pugi::xml_node currentNode, Sb *sb);
+    ///@}
+
+    /**
      * @name Methods for writing MEI containers (measures, staff, etc) scoreDef and related.
      */
     ///@{
     void WriteMeiPage(pugi::xml_node currentNode, Page *page);
     void WriteMeiSystem(pugi::xml_node currentNode, System *system);
     void WriteMeiBoundaryEnd(pugi::xml_node currentNode, BoundaryEnd *boundaryEnd);
-    void WriteMeiEnding(pugi::xml_node currentNote, Ending *ending);
     void WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
     void WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
     void WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
@@ -318,6 +330,17 @@ private:
     bool ReadMeiHeader(pugi::xml_node meihead);
 
     /**
+     * @name Methods for reading MEI score-based elements
+     */
+    ///@{
+    bool ReadMeiSection(Object *parent, pugi::xml_node section);
+    bool ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiEnding(Object *parent, pugi::xml_node ending);
+    bool ReadMeiPb(Object *parent, pugi::xml_node pb);
+    bool ReadMeiSb(Object *parent, pugi::xml_node sb);
+    ///@}
+
+    /**
      * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related.
      * For each container (page, system, measure, staff and layer) there is one method for
      * reading the element and one method for reading its children. The method for reading
@@ -330,6 +353,7 @@ private:
     bool ReadMeiPageChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiSystem(Object *parent, pugi::xml_node system);
     bool ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd);
     bool ReadMeiScoreDef(Object *parent, pugi::xml_node scoreDef);
     bool ReadMeiScoreDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp);
@@ -489,6 +513,11 @@ private:
      *
      */
     std::string m_appXPathQuery;
+
+    /**
+     * A flag indicating wheather we are reading page-based or score-based MEI
+     */
+    bool m_readingScoreBased;
 
     /**
      * This is used when reading a standard MEI file to specify if a scoreDef has already been read or not.

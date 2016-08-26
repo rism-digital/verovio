@@ -74,7 +74,6 @@ void Measure::Reset()
     }
 
     m_timestampAligner.Reset();
-    m_measuredMusic = true;
     m_xAbs = VRV_UNSET;
     m_drawingXRel = 0;
     m_drawingX = 0;
@@ -221,6 +220,22 @@ std::vector<Staff *> Measure::GetFirstStaffGrpStaves(ScoreDef *scoreDef)
 //----------------------------------------------------------------------------
 // Measure functor methods
 //----------------------------------------------------------------------------
+
+int Measure::Save(FunctorParams *functorParams)
+{
+    if (this->IsMeasuredMusic())
+        return Object::Save(functorParams);
+    else
+        return FUNCTOR_CONTINUE;
+}
+
+int Measure::SaveEnd(FunctorParams *functorParams)
+{
+    if (this->IsMeasuredMusic())
+        return Object::SaveEnd(functorParams);
+    else
+        return FUNCTOR_CONTINUE;
+}
 
 int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {

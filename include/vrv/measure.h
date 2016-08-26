@@ -145,6 +145,16 @@ public:
     //----------//
 
     /**
+     * Save the content of any object by calling the appropriate FileOutputStream method
+     */
+    virtual int Save(FunctorParams *functorParams);
+
+    /**
+     * Save the content of any object by calling the appropriate FileOutputStream method
+     */
+    virtual int SaveEnd(FunctorParams *functorParams);
+
+    /**
      * Unset the initial scoreDef of each system and measure
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);

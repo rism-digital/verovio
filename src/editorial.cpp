@@ -18,6 +18,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "scoredef.h"
+#include "section.h"
 #include "staff.h"
 #include "system.h"
 #include "textelement.h"
@@ -78,6 +79,9 @@ void EditorialElement::AddChild(Object *child)
     }
     else if (child->Is() == MEASURE) {
         assert(dynamic_cast<Measure *>(child));
+    }
+    else if (child->Is() == SECTION) {
+        assert(dynamic_cast<Section *>(child));
     }
     else if (child->Is() == SCOREDEF) {
         assert(dynamic_cast<ScoreDef *>(child));

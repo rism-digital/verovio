@@ -1103,7 +1103,7 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
 {
     assert(element);
     if (element->Is() == APP) {
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_SYSTEM);
+        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
     }
 
     dc->StartGraphic(element, "", element->GetUuid());

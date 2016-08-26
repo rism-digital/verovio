@@ -20,6 +20,7 @@
 #include "functorparams.h"
 #include "measure.h"
 #include "page.h"
+#include "section.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -71,7 +72,10 @@ void System::Reset()
 
 void System::AddChild(Object *child)
 {
-    if (child->Is() == BOUNDARY_END) {
+    if (child->Is() == SECTION) {
+        assert(dynamic_cast<Section *>(child));
+    }
+    else if (child->Is() == BOUNDARY_END) {
         assert(dynamic_cast<BoundaryEnd *>(child));
     }
     else if (child->Is() == ENDING) {
