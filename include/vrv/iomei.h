@@ -529,7 +529,7 @@ private:
     /**
      * A static array for storing the implemented editorial elements
      */
-    static std::string s_editorialElementNames[];
+    static std::vector<std::string> s_editorialElementNames;
 };
 
 } // namespace vrv

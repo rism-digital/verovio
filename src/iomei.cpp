@@ -58,9 +58,8 @@
 
 namespace vrv {
 
-#define EDIT_NAMES 14
-std::string MeiInput::s_editorialElementNames[] = { "abbr", "add", "app", "annot", "corr", "damage", "del", "expan",
-    "orig", "reg", "restore", "sic", "supplied", "unclear" }; // update EDIT_NAMES (above) accordingly
+std::vector<std::string> MeiInput::s_editorialElementNames = { "abbr", "add", "app", "annot", "corr", "damage", "del",
+    "expan", "orig", "reg", "restore", "sic", "supplied", "unclear" };
 
 //----------------------------------------------------------------------------
 // MeiOutput
@@ -3225,10 +3224,8 @@ std::wstring MeiInput::RightTrim(std::wstring str)
 
 bool MeiInput::IsEditorialElementName(std::string elementName)
 {
-    int i;
-    for (i = 0; i < EDIT_NAMES; i++) {
-        if (std::string(MeiInput::s_editorialElementNames[i]) == elementName) return true;
-    }
+    auto i = std::find(MeiInput::s_editorialElementNames.begin(), MeiInput::s_editorialElementNames.end(), elementName);
+    if (i != MeiInput::s_editorialElementNames.end()) return true;
     return false;
 }
 
