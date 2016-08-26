@@ -1674,9 +1674,10 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
-        x1 = ending->GetMeasure()->GetDrawingX();
+        measure = ending->GetMeasure();
+        x1 = measure->GetDrawingX();
         // if it is the first measure of the system use the left barline position
-        if (system->GetFirst(MEASURE) == ending->GetMeasure()) x1 += ending->GetMeasure()->GetLeftBarLineXRel();
+        if (system->GetFirst(MEASURE) == measure) x1 += measure->GetLeftBarLineXRel();
         x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
     }
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
@@ -1721,6 +1722,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList;
     assert(system->GetDrawingScoreDef());
+    assert(measure);
     // By default, endings are drawn on top of each group (@ending.rend="gouped") unless "top" is specified)
     if (system->GetDrawingScoreDef()->GetEndingRend() == endings_ENDINGREND_top) {
         Staff *staff = dynamic_cast<Staff *>(system->FindChildByType(STAFF, 2, FORWARD));
@@ -1728,7 +1730,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         staffList.push_back(staff);
     }
     else {
-        staffList = ending->GetMeasure()->GetFirstStaffGrpStaves(system->GetDrawingScoreDef());
+        staffList = measure->GetFirstStaffGrpStaves(system->GetDrawingScoreDef());
     }
 
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {

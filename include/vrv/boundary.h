@@ -34,7 +34,7 @@ public:
     BoundaryEnd(Object *start);
     virtual ~BoundaryEnd();
     virtual void Reset();
-    virtual std::string GetClassName() const;
+    virtual std::string GetClassName() const { return "boundaryEnd"; }
     virtual ClassId Is() const { return BOUNDARY_END; }
     ///@}
 
@@ -46,6 +46,7 @@ public:
      */
     ///@{
     Object *GetStart() { return m_start; }
+    std::string GetStartClassName() const { return m_startClassName; }
     ///@}
 
     //----------//

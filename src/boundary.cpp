@@ -41,11 +41,6 @@ void BoundaryEnd::Reset()
     m_drawingMeasure = NULL;
 }
 
-std::string BoundaryEnd::GetClassName() const
-{
-    return m_startClassName + "BoundaryEnd";
-}
-
 //----------------------------------------------------------------------------
 // BoundaryStartInterface
 //----------------------------------------------------------------------------

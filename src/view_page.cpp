@@ -972,21 +972,29 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
     for (current = parent->GetFirst(); current; current = parent->GetNext()) {
         // Boundary ends are not drawn directly (for now) - maybe we want to draw an empty SVG element?
         if (current->Is() == BOUNDARY_END) {
-            // nothing to do, then
+            BoundaryEnd *boundaryEnd = dynamic_cast<BoundaryEnd *>(current);
+            assert(boundaryEnd);
+            assert(boundaryEnd->GetStart());
+            dc->StartGraphic(current, boundaryEnd->GetStart()->GetUuid(), current->GetUuid());
+            dc->EndGraphic(current, this);
         }
         else if (current->Is() == ENDING) {
             // Create placeholder - A graphic for the end boundary will be created
             // but only if it is on a different system - See View::DrawEnding
-            dc->StartGraphic(current, "", current->GetUuid());
+            dc->StartGraphic(current, "boundary-start", current->GetUuid());
             dc->EndGraphic(current, this);
         }
         else if (current->Is() == MEASURE) {
             // cast to Measure check in DrawMeasure
             DrawMeasure(dc, dynamic_cast<Measure *>(current), system);
         }
-        else if (current->IsEditorialElement()) {
-            // cast to EditorialElement check in DrawSystemEditorial element
-            DrawSystemEditorialElement(dc, dynamic_cast<EditorialElement *>(current), system);
+        else if (current->Is() == PB) {
+            dc->StartGraphic(current, "", current->GetUuid());
+            dc->EndGraphic(current, this);
+        }
+        else if (current->Is() == SB) {
+            dc->StartGraphic(current, "", current->GetUuid());
+            dc->EndGraphic(current, this);
         }
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (current->Is() == SCOREDEF) {
@@ -994,6 +1002,14 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(current);
             assert(scoreDef);
             SetScoreDefDrawingWidth(dc, scoreDef);
+        }
+        else if (current->Is() == SECTION) {
+            dc->StartGraphic(current, "boundaryStart", current->GetUuid());
+            dc->EndGraphic(current, this);
+        }
+        else if (current->IsEditorialElement()) {
+            // cast to EditorialElement check in DrawSystemEditorial element
+            DrawSystemEditorialElement(dc, dynamic_cast<EditorialElement *>(current), system);
         }
         else {
             assert(false);
@@ -1106,10 +1122,14 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
     }
 
-    dc->StartGraphic(element, "", element->GetUuid());
-    if (element->m_visibility == Visible) {
-        DrawSystemChildren(dc, element, system);
-    }
+    std::string boundaryStart;
+    if (element->IsBoundaryElement()) boundaryStart = "boundaryStart";
+
+    dc->StartGraphic(element, boundaryStart, element->GetUuid());
+    // EditorialElements at the system level that are visible have no children
+    // if (element->m_visibility == Visible) {
+    //    DrawSystemChildren(dc, element, system);
+    //}
     dc->EndGraphic(element, this);
 }
 
