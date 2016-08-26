@@ -151,8 +151,7 @@ public:
     //----------//
 
     /**
-     * Functor for setting mRpt drawing numbers (if required)
-     * See implementation and Object::PrepareRpt
+     * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
 

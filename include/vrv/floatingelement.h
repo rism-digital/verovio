@@ -67,18 +67,14 @@ public:
     //----------//
 
     /**
-     * @name Reset the horizontal alignment
+     * See Object::ResetHorizontalAlignment
      */
-    ///@{
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
-    ///@}
 
     /**
-     * @name Reset the vertical alignment
+     * See Object::ResetVerticalAlignment
      */
-    ///@{
     virtual int ResetVerticalAlignment(FunctorParams *functorParams);
-    ///@}
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
@@ -96,13 +92,12 @@ public:
     virtual int PrepareTimestamps(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
-     * Undo the cast of the system.
-     * This is used by Doc::ContinuousLayout
+     * See Object::UnCastOff
      */
     virtual int UnCastOff(FunctorParams *functorParams);
 

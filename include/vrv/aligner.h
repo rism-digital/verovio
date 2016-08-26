@@ -202,8 +202,7 @@ public:
     //----------//
 
     /**
-     * Set the position of the StaffAlignment.
-     * Functor redirected from System.
+     * See Object::SetAligmentYPos
      */
     virtual int SetAligmentYPos(FunctorParams *functorParams);
 
@@ -213,19 +212,17 @@ public:
     virtual int CalcStaffOverlap(FunctorParams *functorParams);
 
     /**
-     * Correct the Y alignment once the the content of a system has been aligned and laid out.
-     * Special case of functor redirected from System.
+     * See Object::IntegrateBoundingBoxYShift
      */
     virtual int IntegrateBoundingBoxYShift(FunctorParams *functorParams);
 
     /**
-     * Adjust the position of the positoners looking at previously overlowing bounding boxes.
-     * Also add them to the list of overflowing elements.
+     * See Object::AdjustFloatingPostioners
      */
     virtual int AdjustFloatingPostioners(FunctorParams *functorParams);
 
     /**
-     * Adjust the position of all floating positionner that are grouped, staff by staff.
+     * See Object::AdjustFloatingPostionerGrps
      */
     virtual int AdjustFloatingPostionerGrps(FunctorParams *functorParams);
 
@@ -378,13 +375,11 @@ public:
      * Lay out the X positions of the staff content looking that the bounding boxes.
      * The m_xShift is updated appropriately
      */
+    ///@{
     virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-
-    /**
-     * Lay out the X positions of the staff content looking that the bounding boxes.
-     * The m_xShift is updated appropriately
-     */
     virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
+    ///@}
+    
 
 private:
     //

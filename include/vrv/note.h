@@ -127,8 +127,7 @@ public:
     virtual int PrepareTieAttr(FunctorParams *functorParams);
 
     /**
-     * Functor for setting wordpos and connector ends
-     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * See Object::PrepareLyrics
      */
     virtual int PrepareLyrics(FunctorParams *functorParams);
 
@@ -138,12 +137,12 @@ public:
     virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
     /**
-     * Processes The FloatingElement owned by the note (e.g, @tie).
+     * See Object::FillStaffCurrentTimeSpanning
      */
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 

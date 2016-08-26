@@ -107,34 +107,32 @@ public:
     //----------//
 
     /**
-     * Unset the initial scoreDef of each system and measure
+     * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
-     * Align horizontally the content of a layer.
+     * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
-     * Align horizontally the content of a layer.
+     * See Object::AlignHorizontallyEnd
      */
     virtual int AlignHorizontallyEnd(FunctorParams *functorParams);
 
     /**
-     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
-     * and for staff/layer to be then processed.
+     * See Object::PrepareProcessingLists
      */
     virtual int PrepareProcessingLists(FunctorParams *functorParams);
 
     /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     * See Object::SetDrawingXY
      */
     virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
-     * Functor for setting mRpt drawing numbers (if required)
-     * See implementation and Object::PrepareRpt
+     * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
 

@@ -170,14 +170,12 @@ bool MeiOutput::WriteObject(Object *object)
             m_currentNode = m_currentNode.append_child("page");
             WriteMeiPage(m_currentNode, dynamic_cast<Page *>(object));
         }
-        // Here we could add a <pb> element
     }
     else if (object->Is() == SYSTEM) {
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("system");
             WriteMeiSystem(m_currentNode, dynamic_cast<System *>(object));
         }
-        // Here we could add a <sb> element (but not for the first system of the page?)
     }
     else if (object->Is() == SECTION) {
         m_currentNode = m_currentNode.append_child("section");

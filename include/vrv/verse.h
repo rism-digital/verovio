@@ -44,14 +44,12 @@ public:
     //----------//
 
     /**
-     * Align the content of a staff vertically.
      * See Object::AlignVertically
      */
     virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
-     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
-     * and for staff/layer to be then processed.
+     * See Object::PrepareProcessingLists
      */
     virtual int PrepareProcessingLists(FunctorParams *functorParams);
 

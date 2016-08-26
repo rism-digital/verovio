@@ -145,97 +145,81 @@ public:
     //----------//
 
     /**
-     * Save the content of any object by calling the appropriate FileOutputStream method
+     * See Object::Save
      */
+    ///@{
     virtual int Save(FunctorParams *functorParams);
-
-    /**
-     * Save the content of any object by calling the appropriate FileOutputStream method
-     */
     virtual int SaveEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
-     * Unset the initial scoreDef of each system and measure
+     * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
-     * @name Reset the horizontal alignment
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+
+    /**
+     * @name See Object::AlignHorizontally
      */
     ///@{
-    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+    virtual int AlignHorizontally(FunctorParams *functorParams);
+    virtual int AlignHorizontallyEnd(FunctorParams *functorParams);
     ///@}
 
     /**
-     * AlignHorizontally the content of a measure.
-     */
-    virtual int AlignHorizontally(FunctorParams *functorParams);
-
-    /**
-     * Align horizontally the content of a layer.
-     */
-    virtual int AlignHorizontallyEnd(FunctorParams *functorParams);
-
-    /**
-     * AlignVertically the content of a measure.
+     * See Object::AlignVertically
      */
     virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
-     * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
-     * Special case that redirects the functor to the GraceAligner.
+     * See Object::IntegrateBoundingBoxGraceXShift
      */
     virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams);
 
     /**
-     * Correct the X alignment once the content of a system has been aligned and laid out.
-     * Special case that redirects the functor to the MeasureAligner.
+     * See Object::IntegrateBoundingBoxXShift
      */
     virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams);
 
     /**
-     * Set the position of the Alignment.
-     * Special case that redirects the functor to the MeasureAligner.
+     * See Object::SetAlignmentXPos
      */
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
 
     /**
-     * Lay out the X positions of the staff content looking that the bounding boxes.
-     * The m_xShift is updated appropriately
+     * See Object::SetBoundingBoxXShift
      */
+    ///@{
     virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-
-    /**
-     * Lay out the X positions of the staff content looking at the bounding boxes.
-     * This is the Functor called at the end of the measure or a layer.
-     */
     virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
-     * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
-     * This method also moves the end position of the measure according to the barLine width.
+     * See Object::AlignMeasures
      */
     virtual int AlignMeasures(FunctorParams *functorParams);
 
     /**
-     * Justify the X positions
-     * Special case that redirects the functor to the MeasureAligner.
+     * See Object::JustifyX
      */
     virtual int JustifyX(FunctorParams *functorParams);
 
     /**
-     * Fill a page by adding systems with the appropriate length
-     *
+     * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
 
     /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     * See Object::SetDrawingXY
      */
     virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
@@ -245,29 +229,27 @@ public:
     virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams);
 
     /**
-     * Functor for grouping FloatingElement by drawingGrpId
+     * See Object::PrepareFloatingGrps
      */
     virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
     /**
-     * See Object::PrepareTimeSpanning.
+     * See Object::PrepareTimeSpanning
      */
     virtual int PrepareTimeSpanningEnd(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareBoundaries.
+     * See Object::PrepareBoundaries
      */
     virtual int PrepareBoundaries(FunctorParams *functorParams);
 
     /**
-     * See Object::GenerateMIDI
+     * @name See Object::GenerateMIDI
      */
+    ///@{
     virtual int GenerateMIDI(FunctorParams *functorParams);
-
-    /**
-     * See Object::GenerateMIDI
-     */
     virtual int GenerateMIDIEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::CalcMaxMeasureDuration
@@ -275,7 +257,7 @@ public:
     virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareTimestamps.
+     * See Object::PrepareTimestamps
      */
     virtual int PrepareTimestampsEnd(FunctorParams *functorParams);
 

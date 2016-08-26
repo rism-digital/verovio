@@ -59,9 +59,7 @@ public:
     //----------//
 
     /**
-     * Functor for setting wordpos and connector ends
-     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter
-     * See PrepareDarwing
+     * See Object::PrepareLyrics
      */
     virtual int PrepareLyrics(FunctorParams *functorParams);
 
@@ -71,7 +69,7 @@ public:
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 

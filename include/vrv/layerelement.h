@@ -110,18 +110,14 @@ public:
     //----------//
 
     /**
-     * @name Reset the horizontal alignment
+     * See Object::ResetHorizontalAlignment
      */
-    ///@{
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
-    ///@}
 
     /**
-     * @name Reset the vertical alignment
+     * See Object::ResetHorizontalAlignment
      */
-    ///@{
     virtual int ResetVerticalAlignment(FunctorParams *functorParams);
-    ///@}
 
     /**
      * See Object::AlignHorizontally
@@ -134,21 +130,22 @@ public:
     virtual int PrepareTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     * See Object::SetDrawingXY
      */
     virtual int SetDrawingXY(FunctorParams *functorParams);
 
+    /**
+     * See Object::TimeSpanningLayerElements
+     */
     virtual int TimeSpanningLayerElements(FunctorParams *functorParams);
 
     /**
-     * See Object::GenerateMIDI
+     * @name See Object::GenerateMIDI
      */
+    ///@{
     virtual int GenerateMIDI(FunctorParams *functorParams);
-
-    /**
-     *  See Object::GenerateMIDI
-     */
     virtual int GenerateMIDIEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::CalcMaxMeasureDuration

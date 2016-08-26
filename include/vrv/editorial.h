@@ -63,19 +63,17 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareBoundaries.
+     * See Object::PrepareBoundaries
      */
     virtual int PrepareBoundaries(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
-     * Fill a page by adding systems with the appropriate length
-     * For EditorialElement, this means only moving them since their width is not
-     * taken into account. Only system children EditorialElement are processed.
+     * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
 

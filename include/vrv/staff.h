@@ -73,19 +73,17 @@ public:
     //----------//
 
     /**
-     * Unset the initial scoreDef of each system and measure
+     * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
-     * @name Reset the vertical alignment
+     * See Object::ResetVerticalAlignment
      */
-    ///@{
     virtual int ResetVerticalAlignment(FunctorParams *functorParams);
-    ///@}
 
     /**
-     * Align the content of a staff vertically.
+     * See Object::AlignVertically
      */
     virtual int AlignVertically(FunctorParams *functorParams);
 
@@ -95,18 +93,17 @@ public:
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     * See Object::SetDrawingXY
      */
     virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
-     * Functor for setting mRpt drawing numbers (if required)
-     * See implementation and Object::PrepareRpt
+     * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
 

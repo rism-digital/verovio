@@ -261,8 +261,7 @@ public:
     //----------//
 
     /**
-     * Functor for setting wordpos and connector ends
-     * The functor is process by doc at the end of a document of closing opened syl.
+     * See Object::PrepareLyricsEnd
      */
     virtual int PrepareLyricsEnd(FunctorParams *functorParams);
 

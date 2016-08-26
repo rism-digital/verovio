@@ -432,14 +432,12 @@ public:
     virtual int FindAllByAttComparison(FunctorParams *functorParams);
 
     /**
-     * Save the content of any object by calling the appropriate FileOutputStream method
+     * @name Save the content of any object by calling the appropriate FileOutputStream method
      */
+    ///@{
     virtual int Save(FunctorParams *functorParams);
-
-    /**
-     * Save the content of any object by calling the appropriate FileOutputStream method
-     */
     virtual int SaveEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * @name Functors for aligning the content horizontally
@@ -457,27 +455,24 @@ public:
     virtual int AdjustFloatingPostionerGrps(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Align horizontally the content of a page.
+     * @name Align horizontally the content of a page.
      * For each LayerElement, instanciate its Alignment.
      * It creates it if no other note or event occurs at its position.
+     * At the end, for each Layer, align the grace note stacked in GraceAlignment.
      */
+    ///@{
     virtual int AlignHorizontally(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * For each Layer, align the grace note stacked in GraceAlignment
-     */
     virtual int AlignHorizontallyEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     /**
-     * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
+     * @name Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
+     * At the end, store the width of the system in the MeasureAligner for justification.
      */
+    ///@{
     virtual int AlignMeasures(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * Store the width of the system in the MeasureAligner for justification
-     * This method is called at the end of a system.
-     */
     virtual int AlignMeasuresEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     /**
      * Correct the X alignment once the content of a system has been aligned and laid out
@@ -509,16 +504,14 @@ public:
     virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
 
     /**
-     * Lay out the X positions of the staff content looking at the bounding boxes.
+     * @name Lay out the X positions of the staff content looking at the bounding boxes.
      * The m_xShift is updated appropriately
+     * At the end, lay out the X positions of the staff content looking at the bounding boxes.
      */
+    ///@{
     virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-
-    /**
-     * Lay out the X positions of the staff content looking at the bounding boxes.
-     * This is the Functor called at the end of the measure or a layer.
-     */
     virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
+    ///@}
 
     ///@}
 
@@ -573,6 +566,8 @@ public:
 
     /**
      * Replace the drawing values a staffDef.
+     * Set the current / drawing clef, key signature, etc. to the StaffDef
+     * Called form ScoreDef::ReplaceDrawingValues.
      */
     virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -588,8 +583,10 @@ public:
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Set the initial scoreDef of each page.
-     * This is necessary for integrating changes that occur within a page.
+     * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
+     * to be redrawn.
+     * This typically occurs when a new System or a new  ScoreDef is encountered.
+     * See implementation and Object::SetStaffDefRedrawFlags for the parameters.
      */
     virtual int SetStaffDefRedrawFlags(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
@@ -601,40 +598,35 @@ public:
     virtual int PrepareProcessingLists(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Matches start and end for TimeSpanningInterface elements (such as tie or slur).
+     * @name Matches start and end for TimeSpanningInterface elements (such as tie or slur).
      * If fillList is set to false, only the remaining elements will be matched.
      * This is used when processing a second time in the other direction
      */
+    ///@{
     virtual int PrepareTimeSpanning(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * See Object::PrepareTimeSpanning.
-     */
     virtual int PrepareTimeSpanningEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     /**
-     * Matches start and end for TimeSpanningInterface elements with tstamp(2) attributes.
+     * @name Matches start and end for TimeSpanningInterface elements with tstamp(2) attributes.
      * It is performed only on TimeSpanningInterface elements withouth @startid (or @endid).
      * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.
      */
+    ///@ {
     virtual int PrepareTimestamps(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * See Object::PrepareTimestamps.
-     */
     virtual int PrepareTimestampsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     /**
-     * Processes Chord and Note for matching @tie by processing by Layer and by looking
-     * at the Pname and Oct
+     * @name Processes Chord and Note for matching @tie by processing by Layer and by looking
+     * at the Pname and Oct.
+     * At the end, processes Chord and Note for matching @tie by processing by Layer; resets the
+     * Chord pointer to NULL at the end of a chord.
      */
+    ///@
     virtual int PrepareTieAttr(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * Processes Chord and Note for matching @tie by processing by Layer; resets the
-     * Chord pointer to NULL at the end of a chord
-     */
     virtual int PrepareTieAttrEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     /**
      * Processes by Layer and set drawing pointers.
@@ -644,16 +636,14 @@ public:
     virtual int PreparePointersByLayer(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Functor for setting wordpos and connector ends
+     * @name Functor for setting wordpos and connector ends
      * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * At the end, the functor is processed by doc at the end of a document of closing opened syl.
      */
+    ///@
     virtual int PrepareLyrics(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * Functor for setting wordpos and connector ends
-     * The functor is processed by doc at the end of a document of closing opened syl.
-     */
     virtual int PrepareLyricsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
@@ -672,15 +662,14 @@ public:
     virtual int PrepareFloatingGrps(FunctorParams *functoParams) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Goes through all the TimeSpanningInterface elements and set them a current to each staff
+     * @name Go through all the TimeSpanningInterface elements and set them a current to each staff
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
+     * At the end, remove the TimeSpanningInterface element from the list when the last measure is reached.
      */
+    ///@{
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * Remove the TimeSpanningInterface element from the list when the last measure is reached.
-     */
     virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
@@ -715,14 +704,13 @@ public:
     ///@{
 
     /**
-     * Fill a page by adding systems with the appropriate length.
+     * @name Fill a page by adding systems with the appropriate length.
+     * At the end, add all the pending objects where reaching the end
      */
+    ///@{
     virtual int CastOffSystems(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * Add all the pending objects where reaching the end
-     */
     virtual int CastOffSystemsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     /**
      *
@@ -743,14 +731,12 @@ public:
     virtual int TimeSpanningLayerElements(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
-     * Export the object to a MidiFile
+     * @name Export the object to a MidiFile
      */
+    ///@{
     virtual int GenerateMIDI(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
-
-    /**
-     * Export the object to a MidiFile (end method)
-     */
     virtual int GenerateMIDIEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     /**
      * Calculate the maximum duration of each measure.

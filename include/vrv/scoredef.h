@@ -167,9 +167,7 @@ public:
     //----------//
 
     /**
-     * Fill a page by adding systems with the appropriate length.
-     * For ScoreDef, this means only moving them since their width is not taken into
-     * account
+     * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
 
@@ -281,17 +279,12 @@ public:
     //----------//
 
     /**
-     * Set the current / drawing clef, key signature, etc. to the StaffDef
-     * Called form ScoreDef::ReplaceDrawingValues.
-     * See implementation and Object::ReplaceDrawingValuesInStaffDef for the parameters.
+     * See Object::ReplaceDrawingValuesInStaffDef
      */
     virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams);
 
     /**
-     * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
-     * to be redrawn.
-     * This typically occurs when a new System or a new  ScoreDef is encountered.
-     * See implementation and Object::SetStaffDefRedrawFlags for the parameters.
+     * See Object::SetStaffDefRedrawFlags
      */
     virtual int SetStaffDefRedrawFlags(FunctorParams *functorParams);
 
