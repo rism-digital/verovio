@@ -84,6 +84,12 @@ void System::AddChild(Object *child)
     else if (child->Is() == MEASURE) {
         assert(dynamic_cast<Measure *>(child));
     }
+    else if (child->Is() == PB) {
+        assert(dynamic_cast<Pb *>(child));
+    }
+    else if (child->Is() == SB) {
+        assert(dynamic_cast<Sb *>(child));
+    }
     else if (child->Is() == SCOREDEF) {
         assert(dynamic_cast<ScoreDef *>(child));
     }

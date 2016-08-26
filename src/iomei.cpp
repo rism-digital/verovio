@@ -186,6 +186,14 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("ending");
         WriteMeiEnding(m_currentNode, dynamic_cast<Ending *>(object));
     }
+    else if (object->Is() == PB) {
+        m_currentNode = m_currentNode.append_child("pb");
+        WriteMeiPb(m_currentNode, dynamic_cast<Pb *>(object));
+    }
+    else if (object->Is() == SB) {
+        m_currentNode = m_currentNode.append_child("sb");
+        WriteMeiSb(m_currentNode, dynamic_cast<Sb *>(object));
+    }
     else if (object->Is() == SCOREDEF) {
         m_currentNode = m_currentNode.append_child("scoreDef");
         WriteMeiScoreDef(m_currentNode, dynamic_cast<ScoreDef *>(object));
@@ -594,6 +602,24 @@ void MeiOutput::WriteMeiEnding(pugi::xml_node currentNode, Ending *ending)
 
     WriteXmlId(currentNode, ending);
     ending->WriteCommon(currentNode);
+}
+
+void MeiOutput::WriteMeiPb(pugi::xml_node currentNode, Pb *pb)
+{
+    assert(pb);
+
+    WriteXmlId(currentNode, pb);
+    pb->WriteCommon(currentNode);
+    pb->WriteCommonPart(currentNode);
+}
+
+void MeiOutput::WriteMeiSb(pugi::xml_node currentNode, Sb *sb)
+{
+    assert(sb);
+
+    WriteXmlId(currentNode, sb);
+    sb->WriteCommon(currentNode);
+    sb->WriteCommonPart(currentNode);
 }
 
 void MeiOutput::WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef)
@@ -1538,13 +1564,20 @@ bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "ending") {
             // we should not endings with unmeasured music ... (?)
             assert(!unmeasured);
-            ReadMeiEnding(parent, current);
+            success = ReadMeiEnding(parent, current);
         }
         else if (std::string(current.name()) == "scoreDef") {
-            ReadMeiScoreDef(parent, current);
+            success = ReadMeiScoreDef(parent, current);
         }
         else if (std::string(current.name()) == "section") {
-            ReadMeiSection(parent, current);
+            success = ReadMeiSection(parent, current);
+        }
+        // pb and sb
+        else if (std::string(current.name()) == "pb") {
+            success = ReadMeiPb(parent, current);
+        }
+        else if (std::string(current.name()) == "sb") {
+            success = ReadMeiSb(parent, current);
         }
         // unmeasured music
         else if (parentNode.child("staff")) {
@@ -1587,6 +1620,30 @@ bool MeiInput::ReadMeiEnding(Object *parent, pugi::xml_node ending)
         return ReadMeiSectionChildren(vrvEnding, ending);
     else
         return true;
+}
+
+bool MeiInput::ReadMeiPb(Object *parent, pugi::xml_node pb)
+{
+    Pb *vrvPb = new Pb();
+    SetMeiUuid(pb, vrvPb);
+
+    vrvPb->ReadCommon(pb);
+    vrvPb->ReadCommonPart(pb);
+
+    parent->AddChild(vrvPb);
+    return true;
+}
+
+bool MeiInput::ReadMeiSb(Object *parent, pugi::xml_node sb)
+{
+    Sb *vrvSb = new Sb();
+    SetMeiUuid(sb, vrvSb);
+
+    vrvSb->ReadCommon(sb);
+    vrvSb->ReadCommonPart(sb);
+
+    parent->AddChild(vrvSb);
+    return true;
 }
 
 bool MeiInput::ReadMeiPage(pugi::xml_node page)

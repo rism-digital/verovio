@@ -55,6 +55,12 @@ void Section::AddChild(Object *child)
     else if (child->Is() == MEASURE) {
         assert(dynamic_cast<Measure *>(child));
     }
+    else if (child->Is() == PB) {
+        assert(dynamic_cast<Pb *>(child));
+    }
+    else if (child->Is() == SB) {
+        assert(dynamic_cast<Sb *>(child));
+    }
     else if (child->Is() == SCOREDEF) {
         assert(dynamic_cast<ScoreDef *>(child));
     }
@@ -179,6 +185,16 @@ int Section::CastOffSystems(FunctorParams *functorParams)
 // Pb functor methods
 //----------------------------------------------------------------------------
 
+int Pb::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Pb::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
@@ -198,6 +214,16 @@ int Pb::CastOffSystems(FunctorParams *functorParams)
 //----------------------------------------------------------------------------
 // Sb functor methods
 //----------------------------------------------------------------------------
+
+int Sb::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Sb::CastOffSystems(FunctorParams *functorParams)
 {
