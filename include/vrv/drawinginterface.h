@@ -97,16 +97,16 @@ public:
      * This will be true only for the first layer in the staff.
      */
     ///@{
-    bool DrawClef() const { return (m_drawClef && m_currentClef.HasShape()); };
-    void SetDrawClef(bool drawClef) { m_drawClef = drawClef; };
-    bool DrawKeySig() const { return (m_drawKeySig && (m_currentKeySig.GetAlterationType() != ACCIDENTAL_EXPLICIT_NONE)); };
-    void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; };
-    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; };
-    void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; };
-    bool DrawMensur() const {return (m_drawMensur && m_currentMensur.HasSign()); };
-    void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; };
-    bool DrawMeterSig() const { return (m_drawMeterSig && m_currentMeterSig.HasUnit()); };
-    void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; };
+    bool DrawClef() const { return (m_drawClef && m_currentClef.HasShape()); }
+    void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
+    bool DrawKeySig() const { return (m_drawKeySig && (m_currentKeySig.GetAlterationType() != ACCIDENTAL_EXPLICIT_NONE)); }
+    void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
+    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; }
+    void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; }
+    bool DrawMensur() const {return (m_drawMensur && m_currentMensur.HasSign()); }
+    void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
+    bool DrawMeterSig() const { return (m_drawMeterSig && m_currentMeterSig.HasUnit()); }
+    void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; }
     ///@}
 
     /**
@@ -124,10 +124,10 @@ public:
      * They will return a reference to the hold object (element or attribute).
      */
     ///@{
-    Clef *GetCurrentClef() { return &m_currentClef; };
-    KeySig *GetCurrentKeySig() { return &m_currentKeySig; };
-    Mensur *GetCurrentMensur() { return &m_currentMensur; };
-    MeterSig *GetCurrentMeterSig() { return &m_currentMeterSig; };
+    Clef *GetCurrentClef() { return &m_currentClef; }
+    KeySig *GetCurrentKeySig() { return &m_currentKeySig; }
+    Mensur *GetCurrentMensur() { return &m_currentMensur; }
+    MeterSig *GetCurrentMeterSig() { return &m_currentMeterSig; }
     ///@}
 
 private:

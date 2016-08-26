@@ -39,8 +39,8 @@ public:
     System();
     virtual ~System();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "System"; };
-    virtual ClassId Is() const { return SYSTEM; };
+    virtual std::string GetClassName() const { return "System"; }
+    virtual ClassId Is() const { return SYSTEM; }
     ///@}
 
     /**
@@ -54,9 +54,9 @@ public:
      * @name Set and get the labels drawing width (normal and abbreviated)
      */
     ///@{
-    int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; };
+    int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
     void SetDrawingLabelsWidth(int width);
-    int GetDrawingAbbrLabelsWidth() const { return m_drawingAbbrLabelsWidth; };
+    int GetDrawingAbbrLabelsWidth() const { return m_drawingAbbrLabelsWidth; }
     void SetDrawingAbbrLabelsWidth(int width);
     ///@}
 
@@ -73,7 +73,7 @@ public:
     /**
      * Return the index position of the system in its page parent
      */
-    int GetSystemIdx() const { return Object::GetIdx(); };
+    int GetSystemIdx() const { return Object::GetIdx(); }
 
     void SetCurrentFloatingPositioner(int staffN, FloatingElement *element, int x, int y);
 
@@ -81,7 +81,7 @@ public:
      * @name Setter and getter of the drawing scoreDef
      */
     ///@{
-    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; };
+    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
     ///@}
 

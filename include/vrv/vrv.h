@@ -127,8 +127,8 @@ public:
      */
     ///@{
     /** Resource path */
-    static std::string GetPath() { return m_path; };
-    static void SetPath(std::string path) { m_path = path; };
+    static std::string GetPath() { return m_path; }
+    static void SetPath(std::string path) { m_path = path; }
     /** Init the SMufL music and text fonts */
     static bool InitFonts();
     /** Init the text font (bounding boxes and ASCII only) */

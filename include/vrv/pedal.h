@@ -28,8 +28,8 @@ public:
     Pedal();
     virtual ~Pedal();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Pedal"; };
-    virtual ClassId Is() const { return PEDAL; };
+    virtual std::string GetClassName() const { return "Pedal"; }
+    virtual ClassId Is() const { return PEDAL; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

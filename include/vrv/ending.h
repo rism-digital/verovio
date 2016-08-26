@@ -34,8 +34,8 @@ public:
     Ending();
     virtual ~Ending();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Ending"; };
-    virtual ClassId Is() const { return ENDING; };
+    virtual std::string GetClassName() const { return "Ending"; }
+    virtual ClassId Is() const { return ENDING; }
     ///@}
 
     /**

@@ -52,7 +52,7 @@ public:
      * Getter and setter for the DocType.
      * The setter resets the document.
      */
-    DocType GetType() const { return m_type; };
+    DocType GetType() const { return m_type; }
     void SetType(DocType type);
 
     /**
@@ -126,18 +126,18 @@ public:
      * @name Getters for tie and slur parameters
      */
     ///@{
-    char GetTieThickness() const { return m_style->m_tieThickness; };
-    char GetSlurMinHeight() const { return m_style->m_minSlurHeight; };
-    char GetSlurMaxHeight() const { return m_style->m_maxSlurHeight; };
-    char GetSlurThickness() const { return m_style->m_slurThickness; };
+    char GetTieThickness() const { return m_style->m_tieThickness; }
+    char GetSlurMinHeight() const { return m_style->m_minSlurHeight; }
+    char GetSlurMaxHeight() const { return m_style->m_maxSlurHeight; }
+    char GetSlurThickness() const { return m_style->m_slurThickness; }
     ///@}
 
     /**
      * @name Getters for the page dimensions and margins
      */
     ///@{
-    short GetSpacingStaff() const { return m_spacingStaff; };
-    short GetSpacingSystem() const { return m_spacingSystem; };
+    short GetSpacingStaff() const { return m_spacingStaff; }
+    short GetSpacingSystem() const { return m_spacingSystem; }
     ///@}
 
     /**
@@ -160,8 +160,8 @@ public:
      * for drawing the entire document on one single system.
      */
     ///@{
-    void SetJustificationX(bool drawingJustifyX) { m_drawingJustifyX = drawingJustifyX; };
-    bool GetJustificationX() const { return m_drawingJustifyX; };
+    void SetJustificationX(bool drawingJustifyX) { m_drawingJustifyX = drawingJustifyX; }
+    bool GetJustificationX() const { return m_drawingJustifyX; }
     ///@}
 
     /*
@@ -170,18 +170,18 @@ public:
      * It should be disabled (so we get "even" note spacing) for mensural notation.
      */
     ///@{
-    void SetEvenSpacing(bool drawingEvenSpacing) { m_drawingEvenSpacing = drawingEvenSpacing; };
-    bool GetEvenSpacing() const { return m_drawingEvenSpacing; };
+    void SetEvenSpacing(bool drawingEvenSpacing) { m_drawingEvenSpacing = drawingEvenSpacing; }
+    bool GetEvenSpacing() const { return m_drawingEvenSpacing; }
     ///@}
 
     /*
      * @name Setter and getter for linear and non-linear spacing parameters
      */
     ///@{
-    void SetSpacingLinear(double drawingSpacingLinear) { m_drawingSpacingLinear = drawingSpacingLinear; };
-    double GetSpacingLinear() const { return m_drawingSpacingLinear; };
-    void SetSpacingNonLinear(double drawingSpacingNonLinear) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; };
-    double GetSpacingNonLinear() const { return m_drawingSpacingNonLinear; };
+    void SetSpacingLinear(double drawingSpacingLinear) { m_drawingSpacingLinear = drawingSpacingLinear; }
+    double GetSpacingLinear() const { return m_drawingSpacingLinear; }
+    void SetSpacingNonLinear(double drawingSpacingNonLinear) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; }
+    double GetSpacingNonLinear() const { return m_drawingSpacingNonLinear; }
     ///@}
 
     /**
@@ -235,14 +235,14 @@ public:
      * We need to call this because otherwise looking at the page idx will fail.
      * See Doc::LayOut for an example.
      */
-    void ResetDrawingPage() { m_drawingPage = NULL; };
+    void ResetDrawingPage() { m_drawingPage = NULL; }
 
     /**
      * Getter to the drawPage. Normally, getting the page should
      * be done with Doc::SetDrawingPage. This is only a method for
      * asserting that currently have the right page.
      */
-    Page *GetDrawingPage() const { return m_drawingPage; };
+    Page *GetDrawingPage() const { return m_drawingPage; }
 
     /**
      * Return the width adjusted to the content of the current drawing page.

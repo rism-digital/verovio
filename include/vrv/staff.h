@@ -41,8 +41,8 @@ public:
     Staff(int n = -1);
     virtual ~Staff();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Staff"; };
-    virtual ClassId Is() const { return STAFF; };
+    virtual std::string GetClassName() const { return "Staff"; }
+    virtual ClassId Is() const { return STAFF; }
     ///@}
 
     /**
@@ -52,19 +52,19 @@ public:
     virtual void AddChild(Object *object);
     ///@}
 
-    int GetLayerCount() const { return (int)m_children.size(); };
+    int GetLayerCount() const { return (int)m_children.size(); }
 
     /**
      * Return the index position of the staff in its measure parent
      */
-    int GetStaffIdx() const { return Object::GetIdx(); };
+    int GetStaffIdx() const { return Object::GetIdx(); }
 
     /**
      * Return the default horizontal spacing of staves.
      */
     int GetVerticalSpacing();
 
-    StaffAlignment *GetAlignment() const { return m_staffAlignment; };
+    StaffAlignment *GetAlignment() const { return m_staffAlignment; }
 
     int GetYRel() const;
 

@@ -41,14 +41,14 @@ public:
     Measure(bool measuredMusic = true, int logMeasureNb = -1);
     virtual ~Measure();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Measure"; };
-    virtual ClassId Is() const { return MEASURE; };
+    virtual std::string GetClassName() const { return "Measure"; }
+    virtual ClassId Is() const { return MEASURE; }
     ///@}
 
     /**
      * Return true if measured music (otherwise we have fake measures)
      */
-    bool IsMeasuredMusic() const { return m_measuredMusic; };
+    bool IsMeasuredMusic() const { return m_measuredMusic; }
 
     /**
      * @name Methods for adding allowed content
@@ -66,7 +66,7 @@ public:
     /**
      * Return the index position of the measure in its system parent
      */
-    int GetMeasureIdx() const { return Object::GetIdx(); };
+    int GetMeasureIdx() const { return Object::GetIdx(); }
 
     /**
      * @name Set and get the left and right barline types
@@ -74,14 +74,14 @@ public:
      * Barline object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
      * MeiOutput::ReadMeiMeasure
      * Alternatively, we could keep them in sync here:
-     * data_BARRENDITION GetLeftBarLineType() { m_leftBarLine.SetRend(GetRight()); return m_leftBarLine.GetRend(); };
-     * void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetRend(type); SetLeft(type); };
+     * data_BARRENDITION GetLeftBarLineType() { m_leftBarLine.SetRend(GetRight()); return m_leftBarLine.GetRend(); }
+     * void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetRend(type); SetLeft(type); }
      */
     ///@{
-    data_BARRENDITION GetLeftBarLineType() const { return m_leftBarLine.GetForm(); };
-    void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetForm(type); };
-    data_BARRENDITION GetRightBarLineType() const { return m_rightBarLine.GetForm(); };
-    void SetRightBarLineType(data_BARRENDITION type) { m_rightBarLine.SetForm(type); };
+    data_BARRENDITION GetLeftBarLineType() const { return m_leftBarLine.GetForm(); }
+    void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetForm(type); }
+    data_BARRENDITION GetRightBarLineType() const { return m_rightBarLine.GetForm(); }
+    void SetRightBarLineType(data_BARRENDITION type) { m_rightBarLine.SetForm(type); }
     ///@}
 
     /**
@@ -91,8 +91,8 @@ public:
      * not for creating other measure objects.
      */
     ///@{
-    BarLine *const GetLeftBarLine() { return &m_leftBarLine; };
-    BarLine *const GetRightBarLine() { return &m_rightBarLine; };
+    BarLine *const GetLeftBarLine() { return &m_leftBarLine; }
+    BarLine *const GetRightBarLine() { return &m_rightBarLine; }
     ///@}
 
     // int GetXRel() const;
@@ -123,7 +123,7 @@ public:
      * @name Setter and getter of the drawing scoreDef
      */
     ///@{
-    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; };
+    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
     void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
     ///@}
 

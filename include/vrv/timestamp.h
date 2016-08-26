@@ -26,8 +26,8 @@ public:
     TimestampAttr();
     virtual ~TimestampAttr();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "TimestampAttr"; };
-    virtual ClassId Is() const { return TIMESTAMP_ATTR; };
+    virtual std::string GetClassName() const { return "TimestampAttr"; }
+    virtual ClassId Is() const { return TIMESTAMP_ATTR; }
     ///@}
 
     /**
@@ -35,8 +35,8 @@ public:
      * The actual duration position is the timestamp position - 1.0.
      */
     ///@{
-    double GetActualDurPos() const { return m_actualDurPos; };
-    void SetDrawingPos(double pos) { m_actualDurPos = pos; };
+    double GetActualDurPos() const { return m_actualDurPos; }
+    void SetDrawingPos(double pos) { m_actualDurPos = pos; }
     ///@}
 
     /**

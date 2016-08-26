@@ -32,11 +32,11 @@ public:
     Beam();
     virtual ~Beam();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Beam"; };
-    virtual ClassId Is() const { return BEAM; };
+    virtual std::string GetClassName() const { return "Beam"; }
+    virtual ClassId Is() const { return BEAM; }
     ///@}
 
-    int GetNoteCount() const { return this->GetChildCount(NOTE); };
+    int GetNoteCount() const { return this->GetChildCount(NOTE); }
 
     /**
      * Add an element (a note or a rest) to a beam.
@@ -56,7 +56,7 @@ public:
     /**
      *
      */
-    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; };
+    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; }
 
 protected:
     /**
@@ -103,7 +103,7 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    BeamElementCoord() { m_element = NULL; };
+    BeamElementCoord() { m_element = NULL; }
     virtual ~BeamElementCoord();
 
     int m_x;

@@ -44,7 +44,7 @@ public:
     ScoreDefElement(std::string classid);
     virtual ~ScoreDefElement();
     virtual void Reset();
-    virtual ClassId Is() const { return SCOREDEF_ELEMENT; };
+    virtual ClassId Is() const { return SCOREDEF_ELEMENT; }
     ///@}
 
     virtual ScoreDefInterface *GetScoreDefInterface() { return dynamic_cast<ScoreDefInterface *>(this); }
@@ -116,8 +116,8 @@ public:
     ScoreDef();
     virtual ~ScoreDef();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "ScoreDef"; };
-    virtual ClassId Is() const { return SCOREDEF; };
+    virtual std::string GetClassName() const { return "ScoreDef"; }
+    virtual ClassId Is() const { return SCOREDEF; }
     ///@}
 
     virtual void AddChild(Object *object);
@@ -150,15 +150,15 @@ public:
      * @name Set and get the scoreDef drawing flags for clef, keysig and mensur.
      */
     ///@{
-    bool DrawLabels() const { return m_drawLabels; };
-    void SetDrawLabels(bool drawLabels) { m_drawLabels = drawLabels; };
+    bool DrawLabels() const { return m_drawLabels; }
+    void SetDrawLabels(bool drawLabels) { m_drawLabels = drawLabels; }
     ///@}
 
     /**
      * @name Set and get the scoreDef drawing width.
      */
     ///@{
-    int GetDrawingWidth() const { return m_drawingWidth; };
+    int GetDrawingWidth() const { return m_drawingWidth; }
     void SetDrawingWidth(int drawingWidth);
     ///@}
 
@@ -213,10 +213,10 @@ public:
     ///@{
     StaffGrp();
     virtual ~StaffGrp();
-    virtual Object *Clone() const { return new StaffGrp(*this); };
+    virtual Object *Clone() const { return new StaffGrp(*this); }
     virtual void Reset();
-    virtual std::string GetClassName() const { return "StaffGrp"; };
-    virtual ClassId Is() const { return STAFFGRP; };
+    virtual std::string GetClassName() const { return "StaffGrp"; }
+    virtual ClassId Is() const { return STAFFGRP; }
     ///@}
 
     /**
@@ -268,10 +268,10 @@ public:
     ///@{
     StaffDef();
     virtual ~StaffDef();
-    virtual Object *Clone() const { return new StaffDef(*this); };
+    virtual Object *Clone() const { return new StaffDef(*this); }
     virtual void Reset();
-    virtual std::string GetClassName() const { return "StaffDef"; };
-    virtual ClassId Is() const { return STAFFDEF; };
+    virtual std::string GetClassName() const { return "StaffDef"; }
+    virtual ClassId Is() const { return STAFFDEF; }
     ///@}
 
     //----------//

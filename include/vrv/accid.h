@@ -27,14 +27,14 @@ public:
     Accid();
     virtual ~Accid();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Accid"; };
-    virtual ClassId Is() const { return ACCID; };
+    virtual std::string GetClassName() const { return "Accid"; }
+    virtual ClassId Is() const { return ACCID; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     //----------//
     // Functors //

@@ -34,13 +34,13 @@ public:
     void Init();
     virtual ~Clef();
     virtual void Reset();
-    virtual Object *Clone() const { return new Clef(*this); };
-    virtual std::string GetClassName() const { return "Clef"; };
-    virtual ClassId Is() const { return CLEF; };
+    virtual Object *Clone() const { return new Clef(*this); }
+    virtual std::string GetClassName() const { return "Clef"; }
+    virtual ClassId Is() const { return CLEF; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     /**
      * Return the offset of the clef

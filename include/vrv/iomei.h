@@ -133,7 +133,7 @@ public:
     /**
      * Setter for score-based MEI output (not implemented)
      */
-    void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; };
+    void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
 
 private:
     bool WriteMeiDoc(Doc *doc);
@@ -323,7 +323,7 @@ public:
      * If a query is provided, the element retrieved by the specified xPath
      * query will be selected (if any, otherwise the first one will be used).
      */
-    virtual void SetAppXPathQuery(std::string appXPathQuery) { m_appXPathQuery = appXPathQuery; };
+    virtual void SetAppXPathQuery(std::string appXPathQuery) { m_appXPathQuery = appXPathQuery; }
 
 private:
     bool ReadMei(pugi::xml_node root);

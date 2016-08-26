@@ -39,12 +39,12 @@ public:
     /**
      * Dummy object method that must be overridden in child class.
      */
-    virtual bool WriteObject(Object *object) { return true; };
+    virtual bool WriteObject(Object *object) { return true; }
 
     /**
      * Dummy object method that must be overridden in child class.
      */
-    virtual bool WriteObjectEnd(Object *object) { return true; };
+    virtual bool WriteObjectEnd(Object *object) { return true; }
 
 public:
     //
@@ -76,19 +76,19 @@ public:
     /**
      * Setter for the layoutInformation ignore flag
      */
-    void IgnoreLayoutInformation() { m_ignoreLayoutInformation = true; };
+    void IgnoreLayoutInformation() { m_ignoreLayoutInformation = true; }
 
     /**
      * Getter for layoutInformation flag that is set to true during import
      * if layout information is found (and not to be ignored).
      */
-    bool HasLayoutInformation() { return m_hasLayoutInformation; };
+    bool HasLayoutInformation() { return m_hasLayoutInformation; }
 
     /**
      * Getter for <app> level flag that is set to true during import
      * if <measure> within editorial markup has been found
      */
-    bool HasMeasureWithinEditoMarkup() { return m_hasMeasureWithinEditMarkup; };
+    bool HasMeasureWithinEditoMarkup() { return m_hasMeasureWithinEditMarkup; }
 
     /**
      * Set XPath query for <app> (MEI only)

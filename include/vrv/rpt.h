@@ -31,12 +31,12 @@ public:
     BeatRpt();
     virtual ~BeatRpt();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "BeatRpt"; };
-    virtual ClassId Is() const { return BEATRPT; };
+    virtual std::string GetClassName() const { return "BeatRpt"; }
+    virtual ClassId Is() const { return BEATRPT; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     /**
      * Returns the duration (in double) for the BeatRpt.
@@ -68,7 +68,7 @@ public:
     BTrem();
     virtual ~BTrem();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "BTrem"; };
+    virtual std::string GetClassName() const { return "BTrem"; }
     virtual ClassId Is() const { return BTREM; }
     ///@}
 
@@ -102,8 +102,8 @@ public:
     FTrem();
     virtual ~FTrem();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "FTrem"; };
-    virtual ClassId Is() const { return FTREM; };
+    virtual std::string GetClassName() const { return "FTrem"; }
+    virtual ClassId Is() const { return FTREM; }
     ///@}
 
     /**
@@ -142,8 +142,8 @@ public:
     MRpt();
     virtual ~MRpt();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "MRpt"; };
-    virtual ClassId Is() const { return MRPT; };
+    virtual std::string GetClassName() const { return "MRpt"; }
+    virtual ClassId Is() const { return MRPT; }
     ///@}
 
     //----------//
@@ -181,8 +181,8 @@ public:
     MRpt2();
     virtual ~MRpt2();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "MRpt2"; };
-    virtual ClassId Is() const { return MRPT2; };
+    virtual std::string GetClassName() const { return "MRpt2"; }
+    virtual ClassId Is() const { return MRPT2; }
     ///@}
 
 private:
@@ -209,8 +209,8 @@ public:
     MultiRpt();
     virtual ~MultiRpt();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "MultiRpt"; };
-    virtual ClassId Is() const { return MULTIRPT; };
+    virtual std::string GetClassName() const { return "MultiRpt"; }
+    virtual ClassId Is() const { return MULTIRPT; }
     ///@}
 
 private:

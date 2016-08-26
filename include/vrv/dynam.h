@@ -30,8 +30,8 @@ public:
     Dynam();
     virtual ~Dynam();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Dynam"; };
-    virtual ClassId Is() const { return DYNAM; };
+    virtual std::string GetClassName() const { return "Dynam"; }
+    virtual ClassId Is() const { return DYNAM; }
     ///@}
 
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }

@@ -35,7 +35,7 @@ public:
     virtual ~BoundaryEnd();
     virtual void Reset();
     virtual std::string GetClassName() const;
-    virtual ClassId Is() const { return BOUNDARY_END; };
+    virtual ClassId Is() const { return BOUNDARY_END; }
     ///@}
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
@@ -45,7 +45,7 @@ public:
      * @name Get the corresponding boundary start
      */
     ///@{
-    Object *GetStart() { return m_start; };
+    Object *GetStart() { return m_start; }
     ///@}
 
     //----------//

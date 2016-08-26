@@ -39,8 +39,8 @@ public:
     Layer();
     virtual ~Layer();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Layer"; };
-    virtual ClassId Is() const { return LAYER; };
+    virtual std::string GetClassName() const { return "Layer"; }
+    virtual ClassId Is() const { return LAYER; }
     ///@}
 
     /**
@@ -54,7 +54,7 @@ public:
      * Return the index position of the layer in its staff parent.
      * The index position is 0-based.
      */
-    int GetLayerIdx() const { return Object::GetIdx(); };
+    int GetLayerIdx() const { return Object::GetIdx(); }
 
     LayerElement *GetPrevious(LayerElement *element);
     LayerElement *GetAtPos(int x);
@@ -79,8 +79,8 @@ public:
      * This stays STEMDIRECTION_NONE with on single layer in the staff.
      */
     ///@{
-    void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; };
-    data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; };
+    void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; }
+    data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; }
     ///@}
 
     Clef *GetCurrentClef() const;
@@ -95,12 +95,12 @@ public:
      */
     void SetDrawingAndCurrentValues(StaffDef *currentStaffDef);
 
-    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; };
-    void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; };
-    Clef *GetStaffDefClef() { return m_staffDefClef; };
-    KeySig *GetStaffDefKeySig() { return m_staffDefKeySig; };
-    Mensur *GetStaffDefMensur() { return m_staffDefMensur; };
-    MeterSig *GetStaffDefMeterSig() { return m_staffDefMeterSig; };
+    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; }
+    void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; }
+    Clef *GetStaffDefClef() { return m_staffDefClef; }
+    KeySig *GetStaffDefKeySig() { return m_staffDefKeySig; }
+    Mensur *GetStaffDefMensur() { return m_staffDefMensur; }
+    MeterSig *GetStaffDefMeterSig() { return m_staffDefMeterSig; }
 
     //----------//
     // Functors //

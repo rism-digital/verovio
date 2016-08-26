@@ -35,7 +35,7 @@ public:
     FloatingElement(std::string classid);
     virtual ~FloatingElement();
     virtual void Reset();
-    virtual ClassId Is() const { return FLOATING_ELEMENT; };
+    virtual ClassId Is() const { return FLOATING_ELEMENT; }
     ///@}
 
     virtual void UpdateContentBBoxX(int x1, int x2);
@@ -52,7 +52,7 @@ public:
     ///@}
 
     void SetCurrentFloatingPositioner(FloatingPositioner *boundingBox);
-    FloatingPositioner *GetCurrentFloatingPositioner() { return m_currentPositioner; };
+    FloatingPositioner *GetCurrentFloatingPositioner() { return m_currentPositioner; }
 
     /**
      * @name Get and set the drawing group id for linking floating element horizontally
@@ -124,15 +124,15 @@ public:
     // constructors and destructors
     FloatingPositioner(FloatingElement *element);
     virtual ~FloatingPositioner(){};
-    virtual ClassId Is() const { return FLOATING_POSITIONER; };
+    virtual ClassId Is() const { return FLOATING_POSITIONER; }
 
     virtual void ResetPositioner();
 
-    FloatingElement *GetElement() const { return m_element; };
+    FloatingElement *GetElement() const { return m_element; }
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
 
-    data_STAFFREL GetDrawingPlace() const { return m_place; };
+    data_STAFFREL GetDrawingPlace() const { return m_place; }
 
     void UpdateSlurPosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
@@ -140,7 +140,7 @@ public:
      * @name Get and set the Y drawing relative position
      */
     ///@{
-    int GetDrawingYRel() const { return m_drawingYRel; };
+    int GetDrawingYRel() const { return m_drawingYRel; }
     void SetDrawingYRel(int drawingYRel);
     ///@}
 

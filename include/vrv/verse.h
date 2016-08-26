@@ -29,8 +29,8 @@ public:
     Verse();
     virtual ~Verse();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Verse"; };
-    virtual ClassId Is() const { return VERSE; };
+    virtual std::string GetClassName() const { return "Verse"; }
+    virtual ClassId Is() const { return VERSE; }
     ///@}
 
     /**

@@ -39,7 +39,7 @@ public:
     LayerElement(std::string classid);
     virtual ~LayerElement();
     virtual void Reset();
-    virtual ClassId Is() const { return LAYER_ELEMENT; };
+    virtual ClassId Is() const { return LAYER_ELEMENT; }
     ///@}
 
     /**
@@ -59,8 +59,8 @@ public:
      * NB In the scoreDef or staffDef itself, it can be either an attribute or an element.
      */
     ///@{
-    bool GetScoreOrStaffDefAttr() const { return m_isScoreOrStaffDefAttr; };
-    void SetScoreOrStaffDefAttr(bool isScoreOrStaffDefAttr) { m_isScoreOrStaffDefAttr = isScoreOrStaffDefAttr; };
+    bool GetScoreOrStaffDefAttr() const { return m_isScoreOrStaffDefAttr; }
+    void SetScoreOrStaffDefAttr(bool isScoreOrStaffDefAttr) { m_isScoreOrStaffDefAttr = isScoreOrStaffDefAttr; }
     ///@}
 
     /**
@@ -76,7 +76,7 @@ public:
     /** Return true if the element is a note or a chord within a fTrem */
     bool IsInFTrem();
     /** Return true if the element has to be aligned horizontally */
-    virtual bool HasToBeAligned() const { return false; };
+    virtual bool HasToBeAligned() const { return false; }
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
@@ -96,7 +96,7 @@ public:
     /**
      * Alignment getter
      */
-    Alignment *GetAlignment() const { return m_alignment; };
+    Alignment *GetAlignment() const { return m_alignment; }
 
     int GetXRel() const;
 

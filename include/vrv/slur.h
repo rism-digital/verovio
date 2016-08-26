@@ -27,8 +27,8 @@ public:
     Slur();
     virtual ~Slur();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Slur"; };
-    virtual ClassId Is() const { return SLUR; };
+    virtual std::string GetClassName() const { return "Slur"; }
+    virtual ClassId Is() const { return SLUR; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

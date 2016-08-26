@@ -170,7 +170,7 @@ public:
      */
     ///@{
     bool SetBorder(int border);
-    int GetBorder() { return m_border; };
+    int GetBorder() { return m_border; }
     ///@}
 
     /**
@@ -178,7 +178,7 @@ public:
      */
     ///@{
     bool SetScale(int scale);
-    int GetScale() { return m_scale; };
+    int GetScale() { return m_scale; }
     ///@}
 
     /**
@@ -186,7 +186,7 @@ public:
      */
     ///@{
     bool SetPageHeight(int h);
-    int GetPageHeight() { return m_pageHeight; };
+    int GetPageHeight() { return m_pageHeight; }
     ///@}
 
     /**
@@ -194,7 +194,7 @@ public:
      */
     ///@{
     bool SetPageWidth(int w);
-    int GetPageWidth() { return m_pageWidth; };
+    int GetPageWidth() { return m_pageWidth; }
     ///@}
 
     /**
@@ -203,8 +203,8 @@ public:
     ///@{
     bool SetSpacingStaff(int spacingStaff);
     bool SetSpacingSystem(int spacingSystem);
-    int GetSpacingStaff() { return m_spacingStaff; };
-    int GetSpacingSystem() { return m_spacingSystem; };
+    int GetSpacingStaff() { return m_spacingStaff; }
+    int GetSpacingSystem() { return m_spacingSystem; }
     ///@}
 
     /**
@@ -212,7 +212,7 @@ public:
      */
     ///@{
     bool SetSpacingLinear(float spacingLinear);
-    float GetSpacingLinear() { return m_spacingLinear; };
+    float GetSpacingLinear() { return m_spacingLinear; }
     ///@}
 
     /**
@@ -220,7 +220,7 @@ public:
      */
     ///@{
     bool SetSpacingNonLinear(float spacingNonLinear);
-    float GetSpacingNonLinear() { return m_spacingNonLinear; };
+    float GetSpacingNonLinear() { return m_spacingNonLinear; }
     ///@}
 
     /**
@@ -228,8 +228,8 @@ public:
      * and output one single page with one single system
      */
     ///@{
-    void SetNoLayout(bool l) { m_noLayout = l; };
-    int GetNoLayout() { return m_noLayout; };
+    void SetNoLayout(bool l) { m_noLayout = l; }
+    int GetNoLayout() { return m_noLayout; }
     ///@}
 
     /**
@@ -237,40 +237,40 @@ public:
      * and fully recalculate the layout
      */
     ///@{
-    void SetIgnoreLayout(bool l) { m_ignoreLayout = l; };
-    int GetIgnoreLayout() { return m_ignoreLayout; };
+    void SetIgnoreLayout(bool l) { m_ignoreLayout = l; }
+    int GetIgnoreLayout() { return m_ignoreLayout; }
     ///@}
 
     /**
      * @name Crop the page height to the height of the content
      */
     ///@{
-    void SetAdjustPageHeight(bool a) { m_adjustPageHeight = a; };
-    int GetAdjustPageHeight() { return m_adjustPageHeight; };
+    void SetAdjustPageHeight(bool a) { m_adjustPageHeight = a; }
+    int GetAdjustPageHeight() { return m_adjustPageHeight; }
     ///@}
 
     /**
      * @name Space notes equally and close together (normally for mensural notation)
      */
     ///@{
-    void SetEvenNoteSpacing(bool even) { m_evenNoteSpacing = even; };
-    int GetEvenNoteSpacing() { return m_evenNoteSpacing; };
+    void SetEvenNoteSpacing(bool even) { m_evenNoteSpacing = even; }
+    int GetEvenNoteSpacing() { return m_evenNoteSpacing; }
     ///@}
 
     /**
      * @name Do not justify the system (for debugging purposes)
      */
     ///@{
-    void SetNoJustification(bool j) { m_noJustification = j; };
-    int GetNoJustification() { return m_noJustification; };
+    void SetNoJustification(bool j) { m_noJustification = j; }
+    int GetNoJustification() { return m_noJustification; }
     ///@}
 
     /**
      * @name Do not justify the system (for debugging purposes)
      */
     ///@{
-    void SetShowBoundingBoxes(bool b) { m_showBoundingBoxes = b; };
-    int GetShowBoundingBoxes() { return m_showBoundingBoxes; };
+    void SetShowBoundingBoxes(bool b) { m_showBoundingBoxes = b; }
+    int GetShowBoundingBoxes() { return m_showBoundingBoxes; }
     ///@}
 
     /**
@@ -279,24 +279,24 @@ public:
      */
     ///@{
     bool SetFormat(std::string const &informat);
-    void SetFormat(FileFormat format) { m_format = format; };
-    int GetFormat() { return m_format; };
+    void SetFormat(FileFormat format) { m_format = format; }
+    int GetFormat() { return m_format; }
     ///@}
 
     /**
      * @name Set and get the xPath query for selecting <app> (if any)
      */
     ///@{
-    void SetAppXPathQuery(std::string const &appXPathQuery) { m_appXPathQuery = appXPathQuery; };
-    std::string GetAppXPathQuery() { return m_appXPathQuery; };
+    void SetAppXPathQuery(std::string const &appXPathQuery) { m_appXPathQuery = appXPathQuery; }
+    std::string GetAppXPathQuery() { return m_appXPathQuery; }
     ///@}
 
     /**
      * @name Set and get the xPath query for selecting <app> (if any)
      */
     ///@{
-    void SetScoreBasedMei(bool scoreBasedMei) { m_scoreBasedMei = scoreBasedMei; };
-    bool GetScoreBasedMei() { return m_scoreBasedMei; };
+    void SetScoreBasedMei(bool scoreBasedMei) { m_scoreBasedMei = scoreBasedMei; }
+    bool GetScoreBasedMei() { return m_scoreBasedMei; }
     ///@}
 
     /**
