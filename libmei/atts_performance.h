@@ -49,8 +49,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetWhen(std::string when_) { m_when = when_; };
-    std::string GetWhen() const { return m_when; };
+    void SetWhen(std::string when_) { m_when = when_; }
+    std::string GetWhen() const { return m_when; }
     bool HasWhen() const;
     ///@}
 
