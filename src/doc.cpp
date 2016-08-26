@@ -511,6 +511,32 @@ void Doc::CastOffEncodingDoc()
     this->CollectScoreDefs(true);
 }
 
+void Doc::ConvertToPageBasedDoc()
+{
+    Page *contentPage = dynamic_cast<Page *>(this->FindChildByType(PAGE));
+    assert(contentPage);
+
+    System *contentSystem = dynamic_cast<System *>(contentPage->FindChildByType(SYSTEM));
+    assert(contentSystem);
+
+    // Detach the contentPage
+    this->DetachChild(0);
+    assert(contentPage && !contentPage->m_parent);
+
+    Page *page = new Page();
+    this->AddChild(page);
+    System *system = new System();
+    page->AddChild(system);
+
+    ConvertToPageBasedParams convertToPageBasedParams(system);
+    Functor convertToPageBased(&Object::ConvertToPageBased);
+    Functor convertToPageBasedEnd(&Object::ConvertToPageBasedEnd);
+    contentSystem->Process(&convertToPageBased, &convertToPageBasedParams, &convertToPageBasedEnd);
+
+    delete contentPage;
+    this->ResetDrawingPage();
+}
+
 bool Doc::HasPage(int pageIdx) const
 {
     return ((pageIdx >= 0) && (pageIdx < GetChildCount()));

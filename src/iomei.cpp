@@ -1499,22 +1499,17 @@ bool MeiInput::ReadMei(pugi::xml_node root)
     }
     else {
         m_readingScoreBased = true;
-        System temporarySystem;
+        Page *page = new Page();
+        m_doc->AddChild(page);
+        System *system = new System();
+        page->AddChild(system);
         pugi::xml_node current;
         for (current = mdiv.first_child(); current; current = current.next_sibling()) {
             if (!success) break;
-            success = ReadScoreBasedMei(current, &temporarySystem);
+            success = ReadScoreBasedMei(current, system);
         }
         if (success) {
-            System *pageBasedSystem = new System();
-            ConvertToPageBasedParams convertToPageBasedParams(pageBasedSystem);
-            Functor convertToPageBased(&Object::ConvertToPageBased);
-            Functor convertToPageBasedEnd(&Object::ConvertToPageBasedEnd);
-            temporarySystem.Process(&convertToPageBased, &convertToPageBasedParams, &convertToPageBasedEnd);
-            Page *page = new Page();
-            page->AddChild(pageBasedSystem);
-            m_doc->AddChild(page);
-            pugi::xml_node current;
+            m_doc->ConvertToPageBasedDoc();
         }
     }
     return success;

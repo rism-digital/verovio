@@ -224,6 +224,13 @@ public:
     void CastOffEncodingDoc();
 
     /**
+     * Convert the doc from score-based to page-based MEI.
+     * Containers will be converted to boundaryStart / boundaryEnd.
+     * Does not perform any check if the data needs or can be converted.
+     */
+    void ConvertToPageBasedDoc();
+
+    /**
      * To be implemented.
      */
     void RefreshViews(){};
