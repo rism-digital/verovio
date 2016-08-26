@@ -89,16 +89,17 @@ int BoundaryEnd::PrepareBoundaries(FunctorParams *functorParams)
     PrepareBoundariesParams *params = dynamic_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
-    // We need to its pointer to the last measure we have encountered
-    if (params->m_lastMeasure == NULL) {
-        LogWarning("A measure cannot be set to the end boundary");
-    }
+    // We set its pointer to the last measure we have encountered - this can be NULL in case no measure exists before
+    // the end boundary
+    // This can happen with a editorial container around a scoreDef at the beginning
     this->SetMeasure(params->m_lastMeasure);
 
     // Endings are also set as Measure::m_drawingEnding for all meaasures in between - when we reach the end boundary of
     // an ending, we need to set the m_currentEnding to NULL
     if (params->m_currentEnding && this->GetStart()->Is() == ENDING) {
         params->m_currentEnding = NULL;
+        // With ending we need the drawing measure - this will crash with en empty ending at the beginning of a score...
+        assert(m_drawingMeasure);
     }
 
     return FUNCTOR_CONTINUE;
