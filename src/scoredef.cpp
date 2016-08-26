@@ -482,6 +482,17 @@ void StaffDef::Reset()
 // ScoreDef functor methods
 //----------------------------------------------------------------------------
 
+int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    // Move itself to the pageBasedSystem - do not process children
+    this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int ScoreDef::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);

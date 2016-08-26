@@ -121,6 +121,11 @@ public:
     bool IsBoundary() { return (m_end != NULL); }
     ///@}
 
+    /**
+     *
+     */
+    void ConvertToPageBasedBoundary(Object *object, Object *parent);
+
     //-----------------//
     // Pseudo functors //
     //-----------------//

@@ -471,6 +471,26 @@ void Unclear::Reset()
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
 
+int EditorialElement::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    if (this->m_visibility == Visible) ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
 {
     if (this->IsBoundary()) {

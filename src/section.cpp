@@ -121,6 +121,26 @@ void Sb::Reset()
 // Section functor methods
 //----------------------------------------------------------------------------
 
+int Section::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Section::ConvertToPageBasedEnd(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Section::PrepareBoundaries(FunctorParams *functorParams)
 {
     if (this->IsBoundary()) {

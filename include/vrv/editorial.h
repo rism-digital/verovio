@@ -63,6 +63,12 @@ public:
     //----------//
 
     /**
+     * See Object::ConvertToPageBased
+     */
+    virtual int ConvertToPageBased(FunctorParams *functorParams);
+    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+
+    /**
      * See Object::PrepareBoundaries
      */
     virtual int PrepareBoundaries(FunctorParams *functorParams);

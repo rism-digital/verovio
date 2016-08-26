@@ -377,7 +377,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 if (staffDef) {
                     staffDef->SetLabel(partName);
                 }
-                m_staffGrpStack.back()->MoveChildren(partStaffGrp);
+                m_staffGrpStack.back()->MoveChildrenFrom(partStaffGrp);
                 delete partStaffGrp;
             }
 

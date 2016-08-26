@@ -169,6 +169,11 @@ public:
     ///@}
 
     /**
+     * Wrapper for checking if an element is set as a boundary element
+     */
+    bool IsBoundaryElement();
+
+    /**
      * @name Methods for registering a MEI att class and for registering interfaces regrouping MEI att classes.
      */
     ///@{
@@ -218,8 +223,16 @@ public:
      * Move all the children of the object passed as parameter to this one.
      * Objects must be of the same type.
      * After this operation, the object passed as parameter has no child anymore.
+     * If idx is provided, move the children to the idx position in the object children.
+     * Only moving to the same type is allow unless allowTypeChange is true.
      */
-    void MoveChildren(Object *object);
+    void MoveChildrenFrom(Object *sourceParent, int idx = -1, bool allowTypeChange = false);
+
+    /**
+     * Move an object to another parent.
+     * The object is relinquished from its current parent - see Object::Relinquish
+     */
+    void MoveItselfTo(Object *targetParent);
 
     /**
      * Method call for copying child classes.
@@ -346,10 +359,16 @@ public:
      * object cannot be detached straight away. It is typically the case
      * when this has to be done within an iterator. The parent of the object
      * will be set to NULL but the object will not be removed. If the parent
-     * is not destroyed after that, you should expect problems...
+     * is not destroyed after that, you should expect problems unless Object::ClearRelinquishedChildren is called
      * In other words: do not use unless you are absolutely sure what you are doing
      */
     Object *Relinquish(int idx);
+
+    /**
+     * Removes all the children that were previously relinquished.
+     * This has to be used when children are moved but then the parent is not deleted.
+     */
+    void ClearRelinquishedChildren();
 
     /**
      * Remove and delete the child at the idx position.
@@ -452,6 +471,7 @@ public:
      * Convert top-level all container (section, endings) and editorial elements to boundary elements.
      */
     virtual int ConvertToPageBased(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method.

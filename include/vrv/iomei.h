@@ -483,9 +483,11 @@ private:
     bool IsEditorialElementName(std::string elementName);
 
     /**
-     * Read score-based MEI
+     * Read score-based MEI.
+     * The data is read into a Syste, which is then converted to page-based MEI.
+     * See MeiInput::ReadMei
      */
-    bool ReadScoreBasedMei(pugi::xml_node element);
+    bool ReadScoreBasedMei(pugi::xml_node element, System *parent);
 
     /**
      * @name Various methods for reading / converting values.
@@ -503,11 +505,6 @@ public:
     //
 private:
     std::string m_filename;
-
-    /** The current page when reading score-based MEI */
-    Page *m_page;
-    /** The current system when reading score-based MEI */
-    System *m_system;
 
     /**
      *

@@ -69,6 +69,26 @@ void Ending::AddChild(Object *child)
 // Ending functor methods
 //----------------------------------------------------------------------------
 
+int Ending::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Ending::PrepareBoundaries(FunctorParams *functorParams)
 {
     PrepareBoundariesParams *params = dynamic_cast<PrepareBoundariesParams *>(functorParams);

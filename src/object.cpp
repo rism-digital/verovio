@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "boundary.h"
 #include "chord.h"
 #include "clef.h"
 #include "dir.h"
@@ -284,20 +285,48 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
     m_interfaces.push_back(interfaceId);
 }
 
-void Object::MoveChildren(Object *object)
+bool Object::IsBoundaryElement()
 {
-    if (this == object) {
+    if (this->IsEditorialElement() || (this->Is() == ENDING) || (this->Is() == SECTION)) {
+        BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(this);
+        assert(interface);
+        return (interface->IsBoundary());
+    }
+    return false;
+}
+
+void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChange)
+{
+    if (this == sourceParent) {
         assert("Object cannot be copied to itself");
     }
-    if (this->Is() != object->Is()) {
+    if (!allowTypeChange && (this->Is() != sourceParent->Is())) {
         assert("Object must be of the same type");
     }
 
     int i;
-    for (i = 0; i < (int)object->m_children.size(); i++) {
-        this->m_children.push_back(object->Relinquish(i));
-        object->m_children.at(i)->m_parent = this;
+    for (i = 0; i < (int)sourceParent->m_children.size(); i++) {
+        Object *child = sourceParent->Relinquish(i);
+        child->SetParent(this);
+        if (idx != -1) {
+            this->InsertChild(child, idx);
+            idx++;
+        }
+        else {
+            this->m_children.push_back(child);
+        }
     }
+}
+
+void Object::MoveItselfTo(Object *targetParent)
+{
+    assert(targetParent);
+    assert(m_parent);
+    assert(m_parent != targetParent);
+
+    Object *relinquishedObject = this->m_parent->Relinquish(this->GetIdx());
+    assert(relinquishedObject && (relinquishedObject == this));
+    targetParent->AddChild(relinquishedObject);
 }
 
 void Object::SetUuid(std::string uuid)
@@ -408,6 +437,18 @@ Object *Object::Relinquish(int idx)
     Object *child = m_children.at(idx);
     child->m_parent = NULL;
     return child;
+}
+
+void Object::ClearRelinquishedChildren()
+{
+    ArrayOfObjects::iterator iter;
+    for (iter = m_children.begin(); iter != m_children.end();) {
+        if ((*iter)->m_parent != this) {
+            m_children.erase(iter);
+        }
+        else
+            iter++;
+    }
 }
 
 Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
@@ -560,11 +601,12 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         return;
     }
 
+    bool processChildren = true;
     if (functor->m_visibleOnly && this->IsEditorialElement()) {
         EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(this);
         assert(editorialElement);
         if (editorialElement->m_visibility == Hidden) {
-            return;
+            processChildren = false;
         }
     }
 
@@ -585,47 +627,49 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
     deepness--;
 
-    ArrayOfObjects::iterator iter;
-    // We need a pointer to the array for the option to work on a reversed copy
-    ArrayOfObjects *children = &this->m_children;
-    ArrayOfObjects reversed;
-    // For processing backwards, we operated on a copied reversed version
-    // Since we hold pointers, only addresses are copied
-    if (direction == BACKWARD) {
-        reversed = (*children);
-        std::reverse(reversed.begin(), reversed.end());
-        children = &reversed;
-    }
-    for (iter = children->begin(); iter != children->end(); ++iter) {
-        if (filters && !filters->empty()) {
-            bool hasAttComparison = false;
-            // first we look if there is a comparison object for the object type (e.g., a Staff)
-            ArrayOfAttComparisons::iterator attComparisonIter;
-            for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
-                // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
-                // the attribute (see below)
-                Object *o = *iter;
-                if (o->Is() == (*attComparisonIter)->GetType()) {
-                    hasAttComparison = true;
-                    break;
-                }
-            }
-            if (hasAttComparison) {
-                // use the operator of the AttComparison object to evaluate the attribute
-                if ((**attComparisonIter)(*iter)) {
-                    // the attribute value matches, process the object
-                    // LogDebug("%s ", (*iter)->GetClassName().c_str());
-                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
-                    break;
-                }
-                else {
-                    // the attribute value does not match, skip this child
-                    continue;
-                }
-            }
+    if (processChildren) {
+        ArrayOfObjects::iterator iter;
+        // We need a pointer to the array for the option to work on a reversed copy
+        ArrayOfObjects *children = &this->m_children;
+        ArrayOfObjects reversed;
+        // For processing backwards, we operated on a copied reversed version
+        // Since we hold pointers, only addresses are copied
+        if (direction == BACKWARD) {
+            reversed = (*children);
+            std::reverse(reversed.begin(), reversed.end());
+            children = &reversed;
         }
-        // we will end here if there is no filter at all or for the current child type
-        (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+        for (iter = children->begin(); iter != children->end(); ++iter) {
+            if (filters && !filters->empty()) {
+                bool hasAttComparison = false;
+                // first we look if there is a comparison object for the object type (e.g., a Staff)
+                ArrayOfAttComparisons::iterator attComparisonIter;
+                for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
+                    // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
+                    // the attribute (see below)
+                    Object *o = *iter;
+                    if (o->Is() == (*attComparisonIter)->GetType()) {
+                        hasAttComparison = true;
+                        break;
+                    }
+                }
+                if (hasAttComparison) {
+                    // use the operator of the AttComparison object to evaluate the attribute
+                    if ((**attComparisonIter)(*iter)) {
+                        // the attribute value matches, process the object
+                        // LogDebug("%s ", (*iter)->GetClassName().c_str());
+                        (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+                        break;
+                    }
+                    else {
+                        // the attribute value does not match, skip this child
+                        continue;
+                    }
+                }
+            }
+            // we will end here if there is no filter at all or for the current child type
+            (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+        }
     }
 
     if (endFunctor) {

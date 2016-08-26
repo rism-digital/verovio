@@ -26,6 +26,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
+#include "functorparams.h"
 #include "hairpin.h"
 #include "keysig.h"
 #include "layer.h"
@@ -454,7 +455,7 @@ bool MeiOutput::WriteObject(Object *object)
 
 bool MeiOutput::WriteObjectEnd(Object *object)
 {
-    if (m_scoreBasedMEI && (object->IsEditorialElement() || (object->Is() == ENDING))) {
+    if (m_scoreBasedMEI && object->IsBoundaryElement()) {
         BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(object);
         assert(interface);
         if (interface->IsBoundary()) return true;
@@ -1269,8 +1270,6 @@ std::string MeiOutput::DocTypeToStr(DocType type)
 MeiInput::MeiInput(Doc *doc, std::string filename) : FileInputStream(doc)
 {
     m_filename = filename;
-    m_page = NULL;
-    m_system = NULL;
     //
     m_hasScoreDef = false;
     m_readingScoreBased = false;
@@ -1475,14 +1474,22 @@ bool MeiInput::ReadMei(pugi::xml_node root)
     }
     else {
         m_readingScoreBased = true;
-        m_page = new Page();
-        m_system = new System();
-        m_page->AddChild(m_system);
-        m_doc->AddChild(m_page);
+        System temporarySystem;
         pugi::xml_node current;
         for (current = mdiv.first_child(); current; current = current.next_sibling()) {
             if (!success) break;
-            success = ReadScoreBasedMei(current);
+            success = ReadScoreBasedMei(current, &temporarySystem);
+        }
+        if (success) {
+            System *pageBasedSystem = new System();
+            ConvertToPageBasedParams convertToPageBasedParams(pageBasedSystem);
+            Functor convertToPageBased(&Object::ConvertToPageBased);
+            Functor convertToPageBasedEnd(&Object::ConvertToPageBasedEnd);
+            temporarySystem.Process(&convertToPageBased, &convertToPageBasedParams, &convertToPageBasedEnd);
+            Page *page = new Page();
+            page->AddChild(pageBasedSystem);
+            m_doc->AddChild(page);
+            pugi::xml_node current;
         }
     }
     return success;
@@ -3007,7 +3014,7 @@ bool MeiInput::ReadMeiEditorialChildren(Object *parent, pugi::xml_node parentNod
     }
 }
 
-bool MeiInput::ReadScoreBasedMei(pugi::xml_node element)
+bool MeiInput::ReadScoreBasedMei(pugi::xml_node element, System *parent)
 {
     bool success = true;
     // nested mdiv
@@ -3016,7 +3023,7 @@ bool MeiInput::ReadScoreBasedMei(pugi::xml_node element)
             LogError("No <mdiv> child found");
             return false;
         }
-        success = ReadScoreBasedMei(element.first_child());
+        success = ReadScoreBasedMei(element.first_child(), parent);
     }
     else if (std::string(element.name()) == "score") {
         pugi::xml_node scoreDef = element.first_child();
@@ -3025,7 +3032,7 @@ bool MeiInput::ReadScoreBasedMei(pugi::xml_node element)
             return false;
         }
         // This actually sets the Doc::m_scoreDef
-        success = ReadMeiScoreDef(m_system, scoreDef);
+        success = ReadMeiScoreDef(parent, scoreDef);
         if (!success) return false;
         pugi::xml_node current;
         for (current = scoreDef.next_sibling(); current; current = current.next_sibling()) {
@@ -3034,11 +3041,11 @@ bool MeiInput::ReadScoreBasedMei(pugi::xml_node element)
 
             // editorial
             if (IsEditorialElementName(current.name())) {
-                success = ReadMeiEditorialElement(m_system, current, EDITORIAL_TOPLEVEL);
+                success = ReadMeiEditorialElement(parent, current, EDITORIAL_TOPLEVEL);
             }
             // content
             else if (elementName == "section") {
-                success = ReadMeiSection(m_system, current);
+                success = ReadMeiSection(parent, current);
             }
         }
     }

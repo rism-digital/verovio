@@ -310,6 +310,20 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// ConvertToPageBasedParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the system we are moving the content to
+ **/
+
+class ConvertToPageBasedParams : public FunctorParams {
+public:
+    ConvertToPageBasedParams(System *pageBasedSystem) { m_pageBasedSystem = pageBasedSystem; }
+    System *m_pageBasedSystem;
+};
+
+//----------------------------------------------------------------------------
 // FillStaffCurrentTimeSpanningParams
 //----------------------------------------------------------------------------
 

@@ -22,7 +22,8 @@ class Measure;
 
 /**
  * This class represents a MEI ending.
- * It can be both a container (in score-based MEI) and a boundary (in page-based MEI)
+ * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
+ * It inherits from FloatingElement for spanning drawing features.
  */
 class Ending : public FloatingElement, public BoundaryStartInterface, public AttCommon {
 public:
@@ -46,6 +47,12 @@ public:
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::ConvertToPageBased
+     */
+    virtual int ConvertToPageBased(FunctorParams *functorParams);
+    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareBoundaries

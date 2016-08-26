@@ -363,9 +363,9 @@ int System::UnCastOff(FunctorParams *functorParams)
     assert(params);
 
     // Just move all the content of the system to the continous one (parameter)
-    // Use the MoveChildren method that moves and relinquishes them
+    // Use the MoveChildrenFrom method that moves and relinquishes them
     // See Object::Relinquish
-    params->m_currentSystem->MoveChildren(this);
+    params->m_currentSystem->MoveChildrenFrom(this);
 
     return FUNCTOR_CONTINUE;
 }

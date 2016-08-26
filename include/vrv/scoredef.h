@@ -167,6 +167,11 @@ public:
     //----------//
 
     /**
+     * See Object::ConvertToPageBased
+     */
+    virtual int ConvertToPageBased(FunctorParams *functorParams);
+
+    /**
      * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);

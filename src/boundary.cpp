@@ -71,6 +71,20 @@ void BoundaryStartInterface::SetEnd(BoundaryEnd *end)
     m_end = end;
 }
 
+void BoundaryStartInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
+{
+    assert(object);
+    assert(parent);
+
+    // Then add a BoundaryEnd
+    BoundaryEnd *boundaryEnd = new BoundaryEnd(object);
+    this->SetEnd(boundaryEnd);
+    parent->AddChild(boundaryEnd);
+
+    // Also clear the relinquished children
+    object->ClearRelinquishedChildren();
+}
+
 //----------------------------------------------------------------------------
 // BoundaryEnd functor methods
 //----------------------------------------------------------------------------
