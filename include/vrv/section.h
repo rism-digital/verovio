@@ -67,6 +67,11 @@ public:
      * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
+    
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
 
 private:
     //
@@ -101,7 +106,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::ConvertToPageBased
      */
@@ -111,6 +116,11 @@ public:
      * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
+
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
 
 private:
     //
@@ -145,7 +155,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::ConvertToPageBased
      */
@@ -155,6 +165,11 @@ public:
      * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
+
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
 
 private:
     //

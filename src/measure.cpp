@@ -459,6 +459,16 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Measure::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    MoveItselfTo(params->m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int Measure::SetDrawingXY(FunctorParams *functorParams)
 {
     SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);

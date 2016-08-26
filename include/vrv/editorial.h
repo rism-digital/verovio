@@ -83,6 +83,11 @@ public:
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
 
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
+
 private:
     //
 public:

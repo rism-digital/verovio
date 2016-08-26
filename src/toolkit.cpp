@@ -297,11 +297,6 @@ bool Toolkit::LoadString(const std::string &data)
         return false;
     }
 
-    // ignore layout?
-    if (m_ignoreLayout || m_noLayout) {
-        input->IgnoreLayoutInformation();
-    }
-
     // app xpath query?
     if (m_appXPathQuery.length() > 0) {
         input->SetAppXPathQuery(m_appXPathQuery);
@@ -327,20 +322,21 @@ bool Toolkit::LoadString(const std::string &data)
 
     m_doc.PrepareDrawing();
 
-    if (input->HasMeasureWithinEditoMarkup() && !m_noLayout) {
-        LogWarning(
-            "Only continous layout is possible with <measure> within editorial markup, switching to --no-layout");
-        this->SetNoLayout(true);
-    }
-
     // Do the layout? this depends on the options and the file. PAE and
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --ignore-layout option.
     // Regardless, we won't do layout if the --no-layout option was set.
-    if (!input->HasLayoutInformation() && !m_noLayout) {
-        // LogElapsedTimeStart();
-        m_doc.CastOffDoc();
-        // LogElapsedTimeEnd("layout");
+    if (!m_noLayout) {
+        if (input->HasLayoutInformation()) {
+            // LogElapsedTimeStart();
+            m_doc.CastOffEncodingDoc();
+            // LogElapsedTimeEnd("layout");
+        }
+        else {
+            // LogElapsedTimeStart();
+            m_doc.CastOffDoc();
+            // LogElapsedTimeEnd("layout");
+        }
     }
 
     // disable justification if there's no layout or no justification

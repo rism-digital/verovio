@@ -17,6 +17,7 @@
 #include "functorparams.h"
 #include "measure.h"
 #include "scoredef.h"
+#include "section.h"
 #include "system.h"
 #include "vrv.h"
 
@@ -48,6 +49,12 @@ void Ending::AddChild(Object *child)
 {
     if (child->Is() == MEASURE) {
         assert(dynamic_cast<Measure *>(child));
+    }
+    else if (child->Is() == PB) {
+        assert(dynamic_cast<Pb *>(child));
+    }
+    else if (child->Is() == SB) {
+        assert(dynamic_cast<Sb *>(child));
     }
     else if (child->Is() == SCOREDEF) {
         assert(dynamic_cast<ScoreDef *>(child));
@@ -126,6 +133,16 @@ int Ending::CastOffSystems(FunctorParams *functorParams)
     Ending *ending = dynamic_cast<Ending *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // move as pending since we want it at the beginning of the system in case of system break coming
     params->m_pendingObjects.push_back(ending);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Ending::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }

@@ -480,6 +480,37 @@ void Doc::UnCastOffDoc()
     this->CollectScoreDefs(true);
 }
 
+void Doc::CastOffEncodingDoc()
+{
+    this->CollectScoreDefs();
+
+    Page *contentPage = this->SetDrawingPage(0);
+    assert(contentPage);
+
+    System *contentSystem = dynamic_cast<System *>(contentPage->FindChildByType(SYSTEM));
+    assert(contentSystem);
+
+    // Detach the contentPage
+    this->DetachChild(0);
+    assert(contentPage && !contentPage->m_parent);
+
+    Page *page = new Page();
+    this->AddChild(page);
+    System *system = new System();
+    page->AddChild(system);
+
+    CastOffEncodingParams castOffEncodingParams(this, page, system, contentSystem);
+
+    Functor castOffEncoding(&Object::CastOffEncoding);
+    contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
+    delete contentPage;
+
+    // We need to reset the drawing page to NULL
+    // because idx will still be 0 but contentPage is dead!
+    this->ResetDrawingPage();
+    this->CollectScoreDefs(true);
+}
+
 bool Doc::HasPage(int pageIdx) const
 {
     return ((pageIdx >= 0) && (pageIdx < GetChildCount()));

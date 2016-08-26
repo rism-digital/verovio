@@ -13,10 +13,12 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
 #include "measure.h"
+#include "page.h"
 #include "scoredef.h"
 #include "system.h"
 #include "vrv.h"
@@ -181,6 +183,16 @@ int Section::CastOffSystems(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Section::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    MoveItselfTo(params->m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 //----------------------------------------------------------------------------
 // Pb functor methods
 //----------------------------------------------------------------------------
@@ -211,6 +223,27 @@ int Pb::CastOffSystems(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int Pb::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    if (!params->m_firstPbProcessed) {
+        params->m_firstPbProcessed = true;
+    }
+    else {
+
+        params->m_currentPage = new Page();
+        params->m_doc->AddChild(params->m_currentPage);
+        params->m_currentSystem = new System();
+        params->m_currentPage->AddChild(params->m_currentSystem);
+    }
+
+    MoveItselfTo(params->m_currentSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 //----------------------------------------------------------------------------
 // Sb functor methods
 //----------------------------------------------------------------------------
@@ -237,6 +270,19 @@ int Sb::CastOffSystems(FunctorParams *functorParams)
     Sb *sb = dynamic_cast<Sb *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // move as pending since we want it at the beginning of the system in case of system break coming
     params->m_pendingObjects.push_back(sb);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Sb::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    params->m_currentSystem = new System();
+    params->m_currentPage->AddChild(params->m_currentSystem);
+
+    MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }

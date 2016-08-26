@@ -176,6 +176,11 @@ public:
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
 
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
+
 protected:
     /**
      * Filter the list for a specific class.

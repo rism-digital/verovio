@@ -218,6 +218,12 @@ public:
     void UnCastOffDoc();
 
     /**
+     * Cast off of the entire document according to the encoded data (pb and sb).
+     * Does not perform any check on the presence and / or validity of such data.
+     */
+    void CastOffEncodingDoc();
+
+    /**
      * To be implemented.
      */
     void RefreshViews(){};

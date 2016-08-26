@@ -1623,6 +1623,8 @@ bool MeiInput::ReadMeiEnding(Object *parent, pugi::xml_node ending)
 
 bool MeiInput::ReadMeiPb(Object *parent, pugi::xml_node pb)
 {
+    this->m_hasLayoutInformation = true;
+
     Pb *vrvPb = new Pb();
     SetMeiUuid(pb, vrvPb);
 
@@ -1773,16 +1775,6 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
         else if (parentNode.child("measure")) {
             // we should not mix measured and unmeasured music within a system...
             assert(!unmeasured);
-            if (parent->IsEditorialElement()) {
-                if (!m_ignoreLayoutInformation) {
-                    LogError("Cannot have <measure> within editorial markup unless layout information \
-                             is ignored and continous layout is chosen (try with --no-layout)");
-                    return false;
-                }
-                else {
-                    m_hasMeasureWithinEditMarkup = true;
-                }
-            }
             success = ReadMeiMeasure(parent, current);
         }
         else {
