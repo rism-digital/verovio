@@ -25,11 +25,11 @@ class Doc;
 class Dynam;
 class EditorialElement;
 class Ending;
-class FloatingElement;
 class Hairpin;
 class Layer;
 class LayerElement;
 class Measure;
+class MeasureElement;
 class Octave;
 class Page;
 class Pedal;
@@ -38,6 +38,7 @@ class Slur;
 class Staff;
 class Syl;
 class System;
+class SystemElement;
 class Tempo;
 class Text;
 class TextElement;
@@ -300,7 +301,7 @@ protected:
      * Defined in view_floating.cpp
      */
     ///@{
-    void DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Measure *measure, System *system);
+    void DrawMeasureElement(DeviceContext *dc, MeasureElement *element, Measure *measure, System *system);
     void DrawSylConnector(
         DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff);

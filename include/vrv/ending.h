@@ -10,7 +10,7 @@
 
 #include "atts_shared.h"
 #include "boundary.h"
-#include "floatingelement.h"
+#include "systemelement.h"
 
 namespace vrv {
 
@@ -25,7 +25,7 @@ class Measure;
  * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
  * It inherits from FloatingElement for spanning drawing features.
  */
-class Ending : public FloatingElement, public BoundaryStartInterface, public AttCommon {
+class Ending : public SystemElement, public BoundaryStartInterface, public AttCommon {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

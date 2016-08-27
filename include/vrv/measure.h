@@ -16,7 +16,7 @@
 namespace vrv {
 
 class Ending;
-class FloatingElement;
+class MeasureElement;
 class ScoreDef;
 class TimestampAttr;
 

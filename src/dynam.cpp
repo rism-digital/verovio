@@ -29,7 +29,7 @@ std::wstring dynamSmufl[] = { L"\uE520", L"\uE521", L"\uE522", L"\uE523", L"\uE5
 // Dynam
 //----------------------------------------------------------------------------
 
-Dynam::Dynam() : FloatingElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
+Dynam::Dynam() : MeasureElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -43,7 +43,7 @@ Dynam::~Dynam()
 
 void Dynam::Reset()
 {
-    FloatingElement::Reset();
+    MeasureElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
 }

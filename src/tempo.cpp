@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "floatingelement.h"
+#include "measureelement.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -24,7 +24,7 @@ namespace vrv {
 // Tempo
 //----------------------------------------------------------------------------
 
-Tempo::Tempo() : FloatingElement("tempo-"), TextDirInterface(), TimePointInterface()
+Tempo::Tempo() : MeasureElement("tempo-"), TextDirInterface(), TimePointInterface()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
@@ -38,7 +38,7 @@ Tempo::~Tempo()
 
 void Tempo::Reset()
 {
-    FloatingElement::Reset();
+    MeasureElement::Reset();
     TextDirInterface::Reset();
     TimePointInterface::Reset();
 }

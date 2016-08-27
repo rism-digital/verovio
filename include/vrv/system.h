@@ -75,7 +75,7 @@ public:
      */
     int GetSystemIdx() const { return Object::GetIdx(); }
 
-    void SetCurrentFloatingPositioner(int staffN, FloatingElement *element, int x, int y);
+    void SetCurrentFloatingPositioner(int staffN, FloatingObject *object, int x, int y);
 
     /**
      * @name Setter and getter of the drawing scoreDef

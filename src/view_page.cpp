@@ -20,11 +20,11 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
-#include "floatingelement.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
+#include "measureelement.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
@@ -1030,9 +1030,9 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
             // cast to Staff check in DrawStaff
             DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
         }
-        else if (current->IsFloatingElement()) {
-            // cast to FloatingElement check in DrawFloatingElement
-            DrawFloatingElement(dc, dynamic_cast<FloatingElement *>(current), measure, system);
+        else if (current->IsMeasureElement()) {
+            // cast to MeasureElement check in DrawMeasureElement
+            DrawMeasureElement(dc, dynamic_cast<MeasureElement *>(current), measure, system);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawMeasureEditorialElement

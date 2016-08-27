@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        floatingelement.h
+// Name:        floatingobject.h
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_FLOATING_ELEMENT_H__
-#define __VRV_FLOATING_ELEMENT_H__
+#ifndef __VRV_FLOATING_OBJECT_H__
+#define __VRV_FLOATING_OBJECT_H__
 
 #include "devicecontextbase.h"
 #include "object.h"
@@ -17,25 +17,25 @@ class FloatingPositioner;
 class StaffAlignment;
 
 //----------------------------------------------------------------------------
-// FloatingElement
+// FloatingObject
 //----------------------------------------------------------------------------
 
 /**
- * This class is an interface for elements appearing within measure.
+ * This class represents elements appearing within a measure.
  * It is not an abstract class but should not be instanciated directly.
  */
-class FloatingElement : public Object {
+class FloatingObject : public Object {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method resets all attribute classes
      */
     ///@{
-    FloatingElement();
-    FloatingElement(std::string classid);
-    virtual ~FloatingElement();
+    FloatingObject();
+    FloatingObject(std::string classid);
+    virtual ~FloatingObject();
     virtual void Reset();
-    virtual ClassId Is() const { return FLOATING_ELEMENT; }
+    virtual ClassId Is() const { return FLOATING_OBJECT; }
     ///@}
 
     virtual void UpdateContentBBoxX(int x1, int x2);
@@ -122,13 +122,13 @@ private:
 class FloatingPositioner : public BoundingBox {
 public:
     // constructors and destructors
-    FloatingPositioner(FloatingElement *element);
+    FloatingPositioner(FloatingObject *object);
     virtual ~FloatingPositioner(){};
     virtual ClassId Is() const { return FLOATING_POSITIONER; }
 
     virtual void ResetPositioner();
 
-    FloatingElement *GetElement() const { return m_element; }
+    FloatingObject *GetObject() const { return m_object; }
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
 
@@ -151,7 +151,7 @@ protected:
      */
     int m_drawingYRel;
 
-    FloatingElement *m_element;
+    FloatingObject *m_object;
 
     data_STAFFREL m_place;
 

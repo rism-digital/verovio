@@ -19,8 +19,8 @@
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
-#include "floatingelement.h"
 #include "functorparams.h"
+#include "measureelement.h"
 #include "page.h"
 #include "staff.h"
 #include "system.h"
@@ -91,10 +91,9 @@ void Measure::Reset()
 
 void Measure::AddChild(Object *child)
 {
-    if (child->IsFloatingElement()) {
-        assert(dynamic_cast<FloatingElement *>(child));
+    if (child->IsMeasureElement()) {
+        assert(dynamic_cast<MeasureElement *>(child));
     }
-
     else if (child->Is() == STAFF) {
         Staff *staff = dynamic_cast<Staff *>(child);
         assert(staff);

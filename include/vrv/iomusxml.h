@@ -23,10 +23,10 @@
 
 namespace vrv {
 
-class FloatingElement;
 class Layer;
 class LayerElement;
 class Measure;
+class MeasureElement;
 class Slur;
 class StaffGrp;
 class System;
@@ -206,7 +206,7 @@ private:
      * The stack of floating elements (tie, slur, etc.) to be added at the
      * end of each measure
      */
-    std::vector<std::pair<int, FloatingElement *> > m_floatingElements;
+    std::vector<std::pair<int, MeasureElement *> > m_measureElements;
 };
 
 } // namespace vrv {

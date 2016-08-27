@@ -49,7 +49,7 @@ enum ClassId {
     BOUNDARY_END,
     CLEF_ATTR,
     DOC,
-    ENDING,
+    FLOATING_OBJECT,
     FLOATING_POSITIONER,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
@@ -88,6 +88,22 @@ enum ClassId {
     SUPPLIED,
     UNCLEAR,
     EDITORIAL_ELEMENT_max,
+    // Ids for SystemElement child classes
+    SYSTEM_ELEMENT,
+    ENDING,
+    SYSTEM_ELEMENT_max,
+    // Ids for MeasureElement child classes
+    MEASURE_ELEMENT,
+    ANCHORED_TEXT,
+    DIR,
+    DYNAM,
+    HAIRPIN,
+    OCTAVE,
+    PEDAL,
+    SLUR,
+    TEMPO,
+    TIE,
+    MEASURE_ELEMENT_max,
     // Ids for LayerElement child classes
     LAYER_ELEMENT,
     ACCID,
@@ -120,18 +136,6 @@ enum ClassId {
     TUPLET,
     VERSE,
     LAYER_ELEMENT_max,
-    // Ids for FloatingElement child classes
-    FLOATING_ELEMENT,
-    ANCHORED_TEXT,
-    DIR,
-    DYNAM,
-    HAIRPIN,
-    OCTAVE,
-    PEDAL,
-    SLUR,
-    TEMPO,
-    TIE,
-    FLOATING_ELEMENT_max,
     // Ids for ScoreDefElement child classes
     SCOREDEF_ELEMENT,
     SCOREDEF,
@@ -173,7 +177,6 @@ class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
 class FloatingPositioner;
-class FloatingElement;
 class LayerElement;
 class Note;
 class Object;

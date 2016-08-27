@@ -133,15 +133,15 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-void System::SetCurrentFloatingPositioner(int staffN, FloatingElement *element, int x, int y)
+void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, int x, int y)
 {
-    assert(element);
+    assert(object);
 
     // If we have only the bottom alignment, then nothing to do (yet)
     if (m_systemAligner.GetChildCount() == 1) return;
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
     assert(alignment);
-    alignment->SetCurrentFloatingPositioner(element, x, y);
+    alignment->SetCurrentFloatingPositioner(object, x, y);
 }
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)

@@ -8,7 +8,7 @@
 #ifndef __VRV_DIR_H__
 #define __VRV_DIR_H__
 
-#include "floatingelement.h"
+#include "measureelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
 
@@ -20,7 +20,7 @@ class TextElement;
 // Dir
 //----------------------------------------------------------------------------
 
-class Dir : public FloatingElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
+class Dir : public MeasureElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

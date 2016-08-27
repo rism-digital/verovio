@@ -8,7 +8,7 @@
 #ifndef __VRV_DYNAM_H__
 #define __VRV_DYNAM_H__
 
-#include "floatingelement.h"
+#include "measureelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
 
@@ -20,7 +20,7 @@ class TextElement;
 // Dynam
 //----------------------------------------------------------------------------
 
-class Dynam : public FloatingElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
+class Dynam : public MeasureElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

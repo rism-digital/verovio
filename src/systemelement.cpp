@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        slur.cpp
-// Author:      Rodolfo Zitellini
-// Created:     26/06/2012
+// Name:        systemelement.cpp
+// Author:      Laurent Pugin
+// Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "slur.h"
+#include "systemelement.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,31 +13,33 @@
 
 //----------------------------------------------------------------------------
 
-#include "vrv.h"
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Slur
+// SystemElement
 //----------------------------------------------------------------------------
 
-Slur::Slur() : MeasureElement("slur-"), TimeSpanningInterface(), AttCurvature()
+SystemElement::SystemElement() : FloatingObject("se")
 {
-    RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
-    RegisterAttClass(ATT_CURVATURE);
-
     Reset();
 }
 
-Slur::~Slur()
+SystemElement::SystemElement(std::string classid) : FloatingObject(classid)
+{
+    Reset();
+}
+
+SystemElement::~SystemElement()
 {
 }
 
-void Slur::Reset()
+void SystemElement::Reset()
 {
-    MeasureElement::Reset();
-    TimeSpanningInterface::Reset();
-    ResetCurvature();
+    FloatingObject::Reset();
 }
+
+//----------------------------------------------------------------------------
+// Functor methods
+//----------------------------------------------------------------------------
 
 } // namespace vrv

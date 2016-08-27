@@ -1258,7 +1258,11 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (this->IsFloatingElement()) {
+    if (this->IsSystemElement()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (this->IsMeasureElement()) {
         return FUNCTOR_CONTINUE;
     }
 

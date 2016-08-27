@@ -15,10 +15,10 @@
 
 namespace vrv {
 
-class FloatingElement;
 class Layer;
 class LayerElement;
 class Measure;
+class MeasureElement;
 class ScoreDef;
 class Staff;
 class StaffDef;

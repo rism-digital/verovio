@@ -396,8 +396,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     // here we could check that we have that there is only one staffGrp left in m_staffGrpStack
 
     Measure *measure = NULL;
-    std::vector<std::pair<int, FloatingElement *> >::iterator iter;
-    for (iter = m_floatingElements.begin(); iter != m_floatingElements.end(); iter++) {
+    std::vector<std::pair<int, MeasureElement *> >::iterator iter;
+    for (iter = m_measureElements.begin(); iter != m_measureElements.end(); iter++) {
         if (!measure || (measure->GetN() != iter->first)) {
             AttCommonNComparison comparisonMeasure(MEASURE, iter->first);
             measure = dynamic_cast<Measure *>(system->FindChildByAttComparison(&comparisonMeasure, 1));
@@ -813,7 +813,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         // Then open a new tie
         if ((tieStr1 == "start") || (tieStr2 == "start")) {
             Tie *tie = new Tie();
-            m_floatingElements.push_back(std::make_pair(measureNb, tie));
+            m_measureElements.push_back(std::make_pair(measureNb, tie));
             OpenTie(staff, layer, note, tie);
         }
 
@@ -847,7 +847,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 meiSlur->SetCurvedir(curvature_CURVEDIR_below);
             }
             // add it to the stack
-            m_floatingElements.push_back(std::make_pair(measureNb, meiSlur));
+            m_measureElements.push_back(std::make_pair(measureNb, meiSlur));
             OpenSlur(staff, layer, slurNumber, element, meiSlur);
         }
         else if (HasAttributeWithValue(slur, "type", "stop")) {

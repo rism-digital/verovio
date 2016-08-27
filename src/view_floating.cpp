@@ -23,7 +23,6 @@
 #include "doc.h"
 #include "dynam.h"
 #include "ending.h"
-#include "floatingelement.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "layer.h"
@@ -47,10 +46,10 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// View - FloatingElement
+// View - FloatingObject
 //----------------------------------------------------------------------------
 
-void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Measure *measure, System *system)
+void View::DrawMeasureElement(DeviceContext *dc, MeasureElement *element, Measure *measure, System *system)
 {
     assert(dc);
     assert(system);
@@ -174,9 +173,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
-        if (element->IsFloatingElement())
+        if (element->IsMeasureElement())
             system->SetCurrentFloatingPositioner(
-                (*staffIter)->GetN(), dynamic_cast<FloatingElement *>(element), x1, (*staffIter)->GetDrawingY());
+                (*staffIter)->GetN(), dynamic_cast<MeasureElement *>(element), x1, (*staffIter)->GetDrawingY());
 
         if (element->Is() == HAIRPIN) {
             // cast to Harprin check in DrawHairpin

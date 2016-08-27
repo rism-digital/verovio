@@ -13,10 +13,10 @@
 
 //----------------------------------------------------------------------------
 
-#include "floatingelement.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
+#include "measureelement.h"
 #include "scoredef.h"
 #include "section.h"
 #include "staff.h"
@@ -65,8 +65,8 @@ void EditorialElement::AddChild(Object *child)
     if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
-    else if (child->IsFloatingElement()) {
-        assert(dynamic_cast<FloatingElement *>(child));
+    else if (child->IsFloatingObject()) {
+        assert(dynamic_cast<FloatingObject *>(child));
     }
     else if (child->IsLayerElement()) {
         assert(dynamic_cast<LayerElement *>(child));

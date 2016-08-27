@@ -24,7 +24,7 @@ namespace vrv {
 // Dir
 //----------------------------------------------------------------------------
 
-Dir::Dir() : FloatingElement("dir-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
+Dir::Dir() : MeasureElement("dir-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -38,7 +38,7 @@ Dir::~Dir()
 
 void Dir::Reset()
 {
-    FloatingElement::Reset();
+    MeasureElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
 }

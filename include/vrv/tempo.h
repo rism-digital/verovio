@@ -8,7 +8,7 @@
 #ifndef __VRV_TEMPO_H__
 #define __VRV_TEMPO_H__
 
-#include "floatingelement.h"
+#include "measureelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
 
@@ -23,7 +23,7 @@ class TextElement;
 /**
  * This class is an interface for <tempo> elements at the measure level
  */
-class Tempo : public FloatingElement, public TextDirInterface, public TimePointInterface {
+class Tempo : public MeasureElement, public TextDirInterface, public TimePointInterface {
 public:
     /**
      * @name Constructors, destructors, reset methods

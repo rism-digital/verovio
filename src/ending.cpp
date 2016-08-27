@@ -27,7 +27,7 @@ namespace vrv {
 // Ending
 //----------------------------------------------------------------------------
 
-Ending::Ending() : FloatingElement("ending-"), BoundaryStartInterface(), AttCommon()
+Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
@@ -40,7 +40,7 @@ Ending::~Ending()
 
 void Ending::Reset()
 {
-    FloatingElement::Reset();
+    SystemElement::Reset();
     BoundaryStartInterface::Reset();
     ResetCommon();
 }

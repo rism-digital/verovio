@@ -12,6 +12,7 @@
 
 namespace vrv {
 
+class FloatingObject;
 class GraceAligner;
 class MeasureAligner;
 class Note;
@@ -143,9 +144,9 @@ public:
     int GetVerseCount() const { return m_verseCount; }
 
     /**
-     * Retrieves or creates the FloatingPositioner for the FloatingElement on this staff.
+     * Retrieves or creates the FloatingPositioner for the FloatingObject on this staff.
      */
-    void SetCurrentFloatingPositioner(FloatingElement *element, int x, int y);
+    void SetCurrentFloatingPositioner(FloatingObject *object, int x, int y);
 
     /**
      * @name Setter and getter of the staff from which the alignment is created alignment.
@@ -379,7 +380,6 @@ public:
     virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
     virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
     ///@}
-    
 
 private:
     //

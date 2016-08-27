@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "floatingelement.h"
+#include "floatingobject.h"
 #include "functorparams.h"
 #include "note.h"
 #include "staff.h"
@@ -196,22 +196,22 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     return -(box->GetDrawingY() + box->m_contentBB_y1 + m_staffHeight);
 }
 
-void StaffAlignment::SetCurrentFloatingPositioner(FloatingElement *element, int x, int y)
+void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, int x, int y)
 {
     auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
-        [element](FloatingPositioner *positioner) { return positioner->GetElement() == element; });
+        [object](FloatingPositioner *positioner) { return positioner->GetObject() == object; });
     if (item != m_floatingPositioners.end()) {
         // LogDebug("Found it!");
     }
     else {
-        FloatingPositioner *box = new FloatingPositioner(element);
+        FloatingPositioner *box = new FloatingPositioner(object);
         m_floatingPositioners.push_back(box);
         item = m_floatingPositioners.end() - 1;
     }
     (*item)->SetDrawingX(x);
     (*item)->SetDrawingY(y);
     // LogDebug("BB %d", item->second.m_contentBB_x1);
-    element->SetCurrentFloatingPositioner((*item));
+    object->SetCurrentFloatingPositioner((*item));
 }
 
 //----------------------------------------------------------------------------
@@ -545,8 +545,8 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
 
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
-        assert((*iter)->GetElement());
-        if ((*iter)->GetElement()->Is() != params->m_classId) continue;
+        assert((*iter)->GetObject());
+        if ((*iter)->GetObject()->Is() != params->m_classId) continue;
 
         if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
@@ -611,11 +611,11 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
     // make a temporary copy of positionners with a classId desired and that have a drawing grpId
     std::copy_if(m_floatingPositioners.begin(), m_floatingPositioners.end(), std::back_inserter(positioners),
         [params](FloatingPositioner *positioner) {
-            assert(positioner->GetElement());
+            assert(positioner->GetObject());
             // search in the desired classIds
-            return ((std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetElement()->Is())
+            return ((std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->Is())
                         != params->m_classIds.end())
-                && (positioner->GetElement()->GetDrawingGrpId() != 0));
+                && (positioner->GetObject()->GetDrawingGrpId() != 0));
         });
 
     // A vector for storing a pair with the grpId and the min or max YRel
@@ -623,7 +623,7 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
 
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
-        int currentGrpId = (*iter)->GetElement()->GetDrawingGrpId();
+        int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
         // Look if we already have a pair for this grpId
         auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
             [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
@@ -644,7 +644,7 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
 
     // Now go through all the positioners again and ajust the YRel with the value of the pair
     for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
-        int currentGrpId = (*iter)->GetElement()->GetDrawingGrpId();
+        int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
         auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
             [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
         // We must have find it
