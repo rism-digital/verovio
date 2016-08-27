@@ -912,6 +912,4 @@ static void dirent_set_errno(int error)
 }
 #endif
 
-} // namespace vrv
-
 #endif
