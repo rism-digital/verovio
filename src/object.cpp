@@ -1262,7 +1262,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (this->IsMeasureElement()) {
+    if (this->IsControlElement()) {
         return FUNCTOR_CONTINUE;
     }
 

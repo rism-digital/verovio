@@ -1030,7 +1030,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
             // cast to Staff check in DrawStaff
             DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
         }
-        else if (current->IsMeasureElement()) {
+        else if (current->IsControlElement()) {
             // cast to ControlElement check in DrawMeasureElement
             DrawMeasureElement(dc, dynamic_cast<ControlElement *>(current), measure, system);
         }

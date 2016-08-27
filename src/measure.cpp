@@ -91,7 +91,7 @@ void Measure::Reset()
 
 void Measure::AddChild(Object *child)
 {
-    if (child->IsMeasureElement()) {
+    if (child->IsControlElement()) {
         assert(dynamic_cast<ControlElement *>(child));
     }
     else if (child->Is() == STAFF) {

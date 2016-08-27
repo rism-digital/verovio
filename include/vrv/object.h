@@ -156,28 +156,28 @@ public:
     ///@}
 
     /**
-     * @name Methods for checking if an object is part of a group of classId's.
-     * For example, all LayerElement child class classId's are between LAYER_ELEMENT and LAYER_ELEMENT_max.
-     * See classId enum.
+     * Wrapper for checking if an element is a floating object (system elements and control elements)
      */
-    ///@{
-    bool IsEditorialElement() const { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); }
-    bool IsLayerElement() const { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); }
-    bool IsMeasureElement() const { return (this->Is() > CONTROL_ELEMENT && this->Is() < CONTROL_ELEMENT_max); }
-    bool IsSystemElement() const { return (this->Is() > SYSTEM_ELEMENT && this->Is() < SYSTEM_ELEMENT_max); }
-    bool IsScoreDefElement() const { return (this->Is() > SCOREDEF_ELEMENT && this->Is() < SCOREDEF_ELEMENT_max); }
-    bool IsTextElement() const { return (this->Is() > TEXT_ELEMENT && this->Is() < TEXT_ELEMENT_max); }
-    ///@}
-
-    /**
-     *
-     */
-    bool IsFloatingObject() const { return (this->IsSystemElement() || this->IsMeasureElement()); }
+    bool IsFloatingObject() const { return (this->IsSystemElement() || this->IsControlElement()); }
 
     /**
      * Wrapper for checking if an element is set as a boundary element
      */
     bool IsBoundaryElement();
+
+    /**
+     * @name Methods for checking if an object is part of a group of classId's.
+     * For example, all LayerElement child class classId's are between LAYER_ELEMENT and LAYER_ELEMENT_max.
+     * See classId enum.
+     */
+    ///@{
+    bool IsControlElement() const { return (this->Is() > CONTROL_ELEMENT && this->Is() < CONTROL_ELEMENT_max); }
+    bool IsEditorialElement() const { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); }
+    bool IsLayerElement() const { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); }
+    bool IsScoreDefElement() const { return (this->Is() > SCOREDEF_ELEMENT && this->Is() < SCOREDEF_ELEMENT_max); }
+    bool IsSystemElement() const { return (this->Is() > SYSTEM_ELEMENT && this->Is() < SYSTEM_ELEMENT_max); }
+    bool IsTextElement() const { return (this->Is() > TEXT_ELEMENT && this->Is() < TEXT_ELEMENT_max); }
+    ///@}
 
     /**
      * @name Methods for registering a MEI att class and for registering interfaces regrouping MEI att classes.

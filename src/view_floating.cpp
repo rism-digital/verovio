@@ -173,7 +173,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
-        if (element->IsMeasureElement())
+        if (element->IsControlElement())
             system->SetCurrentFloatingPositioner(
                 (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), x1, (*staffIter)->GetDrawingY());
 
