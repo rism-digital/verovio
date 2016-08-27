@@ -49,7 +49,7 @@ namespace vrv {
 // View - FloatingObject
 //----------------------------------------------------------------------------
 
-void View::DrawMeasureElement(DeviceContext *dc, MeasureElement *element, Measure *measure, System *system)
+void View::DrawMeasureElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system)
 {
     assert(dc);
     assert(system);
@@ -175,7 +175,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsMeasureElement())
             system->SetCurrentFloatingPositioner(
-                (*staffIter)->GetN(), dynamic_cast<MeasureElement *>(element), x1, (*staffIter)->GetDrawingY());
+                (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), x1, (*staffIter)->GetDrawingY());
 
         if (element->Is() == HAIRPIN) {
             // cast to Harprin check in DrawHairpin

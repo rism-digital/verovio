@@ -10,7 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
-#include "measureelement.h"
+#include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -19,7 +19,7 @@ namespace vrv {
 // Octave
 //----------------------------------------------------------------------------
 
-class Octave : public MeasureElement, public TimeSpanningInterface, public AttOctavedisplacement {
+class Octave : public ControlElement, public TimeSpanningInterface, public AttOctavedisplacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

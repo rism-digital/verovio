@@ -199,7 +199,7 @@ private:
     ///@}
 
     /**
-     * @name Methods for writing MeasureElement
+     * @name Methods for writing ControlElement
      */
     ///@{
     void WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);

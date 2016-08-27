@@ -8,7 +8,7 @@
 #ifndef __VRV_ANCHORED_TEXT_H__
 #define __VRV_ANCHORED_TEXT_H__
 
-#include "measureelement.h"
+#include "controlelement.h"
 #include "textdirinterface.h"
 
 namespace vrv {
@@ -22,7 +22,7 @@ class TextElement;
 /**
  * This class is an interface for <anchoredText> elements at the measure level
  */
-class AnchoredText : public MeasureElement, public TextDirInterface {
+class AnchoredText : public ControlElement, public TextDirInterface {
 public:
     /**
      * @name Constructors, destructors, reset methods

@@ -16,7 +16,7 @@
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
-#include "measureelement.h"
+#include "controlelement.h"
 #include "scoredef.h"
 #include "section.h"
 #include "staff.h"

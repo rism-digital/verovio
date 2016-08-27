@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        measureelement.cpp
+// Name:        controlelement.cpp
 // Author:      Laurent Pugin
 // Created:     2016
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "measureelement.h"
+#include "controlelement.h"
 
 //----------------------------------------------------------------------------
 
@@ -16,24 +16,24 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// MeasureElement
+// ControlElement
 //----------------------------------------------------------------------------
 
-MeasureElement::MeasureElement() : FloatingObject("me")
+ControlElement::ControlElement() : FloatingObject("me")
 {
     Reset();
 }
 
-MeasureElement::MeasureElement(std::string classid) : FloatingObject(classid)
+ControlElement::ControlElement(std::string classid) : FloatingObject(classid)
 {
     Reset();
 }
 
-MeasureElement::~MeasureElement()
+ControlElement::~ControlElement()
 {
 }
 
-void MeasureElement::Reset()
+void ControlElement::Reset()
 {
     FloatingObject::Reset();
 }

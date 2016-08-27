@@ -92,8 +92,8 @@ enum ClassId {
     SYSTEM_ELEMENT,
     ENDING,
     SYSTEM_ELEMENT_max,
-    // Ids for MeasureElement child classes
-    MEASURE_ELEMENT,
+    // Ids for ControlElement child classes
+    CONTROL_ELEMENT,
     ANCHORED_TEXT,
     DIR,
     DYNAM,
@@ -103,7 +103,7 @@ enum ClassId {
     SLUR,
     TEMPO,
     TIE,
-    MEASURE_ELEMENT_max,
+    CONTROL_ELEMENT_max,
     // Ids for LayerElement child classes
     LAYER_ELEMENT,
     ACCID,

@@ -8,7 +8,7 @@
 #ifndef __VRV_TIE_H__
 #define __VRV_TIE_H__
 
-#include "measureelement.h"
+#include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -17,7 +17,7 @@ namespace vrv {
 // Tie
 //----------------------------------------------------------------------------
 
-class Tie : public MeasureElement, public TimeSpanningInterface, public AttCurvature {
+class Tie : public ControlElement, public TimeSpanningInterface, public AttCurvature {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

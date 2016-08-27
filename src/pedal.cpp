@@ -21,7 +21,7 @@ namespace vrv {
 // Pedal
 //----------------------------------------------------------------------------
 
-Pedal::Pedal() : MeasureElement("pedal-"), TimePointInterface(), AttPedalLog(), AttPlacement()
+Pedal::Pedal() : ControlElement("pedal-"), TimePointInterface(), AttPedalLog(), AttPlacement()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_PEDALLOG);
@@ -36,7 +36,7 @@ Pedal::~Pedal()
 
 void Pedal::Reset()
 {
-    MeasureElement::Reset();
+    ControlElement::Reset();
     TimePointInterface::Reset();
     ResetPedalLog();
     ResetPlacement();

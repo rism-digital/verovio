@@ -8,7 +8,7 @@
 #ifndef __VRV_SLUR_H__
 #define __VRV_SLUR_H__
 
-#include "measureelement.h"
+#include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -17,7 +17,7 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-class Slur : public MeasureElement, public TimeSpanningInterface, public AttCurvature {
+class Slur : public ControlElement, public TimeSpanningInterface, public AttCurvature {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

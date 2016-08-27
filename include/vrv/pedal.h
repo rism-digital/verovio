@@ -9,7 +9,7 @@
 #define __VRV_PEDAL_H__
 
 #include "atts_cmn.h"
-#include "measureelement.h"
+#include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -18,7 +18,7 @@ namespace vrv {
 // Pedal
 //----------------------------------------------------------------------------
 
-class Pedal : public MeasureElement, public TimePointInterface, public AttPedalLog, public AttPlacement {
+class Pedal : public ControlElement, public TimePointInterface, public AttPedalLog, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

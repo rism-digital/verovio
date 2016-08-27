@@ -20,7 +20,7 @@
 #include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
-#include "measureelement.h"
+#include "controlelement.h"
 #include "page.h"
 #include "staff.h"
 #include "system.h"
@@ -92,7 +92,7 @@ void Measure::Reset()
 void Measure::AddChild(Object *child)
 {
     if (child->IsMeasureElement()) {
-        assert(dynamic_cast<MeasureElement *>(child));
+        assert(dynamic_cast<ControlElement *>(child));
     }
     else if (child->Is() == STAFF) {
         Staff *staff = dynamic_cast<Staff *>(child);

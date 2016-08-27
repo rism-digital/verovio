@@ -18,7 +18,7 @@ namespace vrv {
 class Layer;
 class LayerElement;
 class Measure;
-class MeasureElement;
+class ControlElement;
 class ScoreDef;
 class Staff;
 class StaffDef;

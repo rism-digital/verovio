@@ -14,7 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
-#include "measureelement.h"
+#include "controlelement.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -24,7 +24,7 @@ namespace vrv {
 // AnchoredText
 //----------------------------------------------------------------------------
 
-AnchoredText::AnchoredText() : MeasureElement("anchtxt-"), TextDirInterface()
+AnchoredText::AnchoredText() : ControlElement("anchtxt-"), TextDirInterface()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
 
@@ -37,7 +37,7 @@ AnchoredText::~AnchoredText()
 
 void AnchoredText::Reset()
 {
-    MeasureElement::Reset();
+    ControlElement::Reset();
     TextDirInterface::Reset();
 }
 

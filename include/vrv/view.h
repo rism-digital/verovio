@@ -29,7 +29,7 @@ class Hairpin;
 class Layer;
 class LayerElement;
 class Measure;
-class MeasureElement;
+class ControlElement;
 class Octave;
 class Page;
 class Pedal;
@@ -301,7 +301,7 @@ protected:
      * Defined in view_floating.cpp
      */
     ///@{
-    void DrawMeasureElement(DeviceContext *dc, MeasureElement *element, Measure *measure, System *system);
+    void DrawMeasureElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
     void DrawSylConnector(
         DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff);

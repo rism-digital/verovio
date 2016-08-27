@@ -24,7 +24,7 @@
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
-#include "measureelement.h"
+#include "controlelement.h"
 #include "mensur.h"
 #include "metersig.h"
 #include "note.h"
@@ -1031,8 +1031,8 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
             DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
         }
         else if (current->IsMeasureElement()) {
-            // cast to MeasureElement check in DrawMeasureElement
-            DrawMeasureElement(dc, dynamic_cast<MeasureElement *>(current), measure, system);
+            // cast to ControlElement check in DrawMeasureElement
+            DrawMeasureElement(dc, dynamic_cast<ControlElement *>(current), measure, system);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawMeasureEditorialElement
