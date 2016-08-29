@@ -301,14 +301,13 @@ protected:
      * Defined in view_floating.cpp
      */
     ///@{
-    void DrawMeasureElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
+    void DrawControlElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
     void DrawSylConnector(
         DeviceContext *dc, Syl *syl, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawSylConnectorLines(DeviceContext *dc, int x1, int x2, int y, Syl *syl, Staff *staff);
     void DrawTimeSpanningElement(DeviceContext *dc, Object *object, System *system);
     void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
-    void DrawEnding(DeviceContext *dc, Ending *ending, System *system);
     void DrawHairpin(
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawOctave(
@@ -318,7 +317,16 @@ protected:
         DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    ///@}
 
+    /**
+     * @name Methods for drawing SystemElement child classes.
+     * They are base drawing methods that are called directly from DrawSystemElement.
+     * Defined in view_floating.cpp
+     */
+    ///@{
+    void DrawSystemElement(DeviceContext *dc, SystemElement *element, System *system);
+    void DrawEnding(DeviceContext *dc, Ending *ending, System *system);
     ///@}
 
     /**

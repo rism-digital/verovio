@@ -8,7 +8,7 @@
 #ifndef __VRV_BOUNDARY_H__
 #define __VRV_BOUNDARY_H__
 
-#include "object.h"
+#include "systemelement.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -24,7 +24,7 @@ class Object;
  * This class is an interface for elements having a single time point, such as tempo, reh, etc..
  * It is not an abstract class but should not be instantiated directly.
  */
-class BoundaryEnd : public Object {
+class BoundaryEnd : public SystemElement {
 public:
     /**
      * @name Constructors, destructors, reset methods

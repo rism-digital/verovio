@@ -24,7 +24,7 @@ namespace vrv {
 // BoundaryEnd
 //----------------------------------------------------------------------------
 
-BoundaryEnd::BoundaryEnd(Object *start)
+BoundaryEnd::BoundaryEnd(Object *start) : SystemElement("bdend")
 {
     Reset();
     m_start = start;

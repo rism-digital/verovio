@@ -46,10 +46,10 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// View - FloatingObject
+// View - FloatingObject - ControlElement
 //----------------------------------------------------------------------------
 
-void View::DrawMeasureElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system)
+void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system)
 {
     assert(dc);
     assert(system);
@@ -1634,6 +1634,44 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     }
 
     dc->EndGraphic(tempo, this);
+}
+
+//----------------------------------------------------------------------------
+// View - FloatingObject - SystemElement
+//----------------------------------------------------------------------------
+
+void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *system)
+{
+    assert(dc);
+    assert(element);
+    assert(system);
+
+    if (element->Is() == BOUNDARY_END) {
+        BoundaryEnd *boundaryEnd = dynamic_cast<BoundaryEnd *>(element);
+        assert(boundaryEnd);
+        assert(boundaryEnd->GetStart());
+        dc->StartGraphic(element, boundaryEnd->GetStart()->GetUuid(), element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is() == ENDING) {
+        // Create placeholder - A graphic for the end boundary will be created
+        // but only if it is on a different system - See View::DrawEnding
+        // The Ending is added to the System drawing list by View::DrawMeasure
+        dc->StartGraphic(element, "boundaryStart", element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is() == PB) {
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is() == SB) {
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is() == SECTION) {
+        dc->StartGraphic(element, "boundaryStart", element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
 }
 
 void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)

@@ -43,14 +43,13 @@ namespace vrv {
 enum ClassId {
     BOUNDING_BOX = 0, // Should not be instanciated as is
     OBJECT, // Should not be instanciated as is
-    DEVICE_CONTEXT, // Should not be instanciated as is
-    //
-    ALIGNMENT,
-    BOUNDARY_END,
-    CLEF_ATTR,
-    DOC,
+    DEVICE_CONTEXT, // Should not be instanciated as is,
     FLOATING_OBJECT,
     FLOATING_POSITIONER,
+    //
+    ALIGNMENT,
+    CLEF_ATTR,
+    DOC,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
     LAYER,
@@ -58,10 +57,7 @@ enum ClassId {
     MEASURE_ALIGNER,
     MENSUR_ATTR,
     METERSIG_ATTR,
-    PB,
     PAGE,
-    SB,
-    SECTION,
     STAFF,
     STAFF_ALIGNMENT,
     STAFFGRP,
@@ -90,7 +86,11 @@ enum ClassId {
     EDITORIAL_ELEMENT_max,
     // Ids for SystemElement child classes
     SYSTEM_ELEMENT,
+    BOUNDARY_END,
     ENDING,
+    PB,
+    SB,
+    SECTION,
     SYSTEM_ELEMENT_max,
     // Ids for ControlElement child classes
     CONTROL_ELEMENT,
