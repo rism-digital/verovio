@@ -327,7 +327,7 @@ bool Toolkit::LoadString(const std::string &data)
     // might have been ignored because of the --ignore-layout option.
     // Regardless, we won't do layout if the --no-layout option was set.
     if (!m_noLayout) {
-        if (input->HasLayoutInformation()) {
+        if (input->HasLayoutInformation() && !m_ignoreLayout) {
             // LogElapsedTimeStart();
             m_doc.CastOffEncodingDoc();
             // LogElapsedTimeEnd("layout");

@@ -1,3 +1,4 @@
+
 /////////////////////////////////////////////////////////////////////////////
 // Name:        iomei.cpp
 // Author:      Laurent Pugin
@@ -43,6 +44,7 @@
 #include "proport.h"
 #include "rest.h"
 #include "rpt.h"
+#include "score.h"
 #include "section.h"
 #include "slur.h"
 #include "space.h"
@@ -1499,14 +1501,11 @@ bool MeiInput::ReadMei(pugi::xml_node root)
     }
     else {
         m_readingScoreBased = true;
-        Page *page = new Page();
-        m_doc->AddChild(page);
-        System *system = new System();
-        page->AddChild(system);
+        Score *score = m_doc->CreateScoreBuffer();
         pugi::xml_node current;
         for (current = mdiv.first_child(); current; current = current.next_sibling()) {
             if (!success) break;
-            success = ReadScoreBasedMei(current, system);
+            success = ReadScoreBasedMei(current, score);
         }
         if (success) {
             m_doc->ConvertToPageBasedDoc();
@@ -1803,7 +1802,7 @@ bool MeiInput::ReadMeiBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
 
 bool MeiInput::ReadMeiScoreDef(Object *parent, pugi::xml_node scoreDef)
 {
-    assert(dynamic_cast<System *>(parent) || dynamic_cast<EditorialElement *>(parent));
+    assert(dynamic_cast<Score *>(parent) || dynamic_cast<System *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     ScoreDef *vrvScoreDef;
     if (!m_hasScoreDef) {
@@ -3057,7 +3056,7 @@ bool MeiInput::ReadMeiEditorialChildren(Object *parent, pugi::xml_node parentNod
     }
 }
 
-bool MeiInput::ReadScoreBasedMei(pugi::xml_node element, System *parent)
+bool MeiInput::ReadScoreBasedMei(pugi::xml_node element, Score *parent)
 {
     bool success = true;
     // nested mdiv

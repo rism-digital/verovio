@@ -13,10 +13,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "controlelement.h"
 #include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
-#include "controlelement.h"
 #include "scoredef.h"
 #include "section.h"
 #include "staff.h"
@@ -65,8 +65,11 @@ void EditorialElement::AddChild(Object *child)
     if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
     }
-    else if (child->IsFloatingObject()) {
-        assert(dynamic_cast<FloatingObject *>(child));
+    else if (child->IsSystemElement()) {
+        assert(dynamic_cast<SystemElement *>(child));
+    }
+    else if (child->IsControlElement()) {
+        assert(dynamic_cast<ControlElement *>(child));
     }
     else if (child->IsLayerElement()) {
         assert(dynamic_cast<LayerElement *>(child));
@@ -79,15 +82,6 @@ void EditorialElement::AddChild(Object *child)
     }
     else if (child->Is() == MEASURE) {
         assert(dynamic_cast<Measure *>(child));
-    }
-    else if (child->Is() == PB) {
-        assert(dynamic_cast<Pb *>(child));
-    }
-    else if (child->Is() == SB) {
-        assert(dynamic_cast<Sb *>(child));
-    }
-    else if (child->Is() == SECTION) {
-        assert(dynamic_cast<Section *>(child));
     }
     else if (child->Is() == SCOREDEF) {
         assert(dynamic_cast<ScoreDef *>(child));

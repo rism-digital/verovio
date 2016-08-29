@@ -71,6 +71,7 @@ class Reg;
 class Rend;
 class Rest;
 class Restore;
+class Score;
 class ScoreDef;
 class ScoreDefInterface;
 class Sb;
@@ -484,10 +485,10 @@ private:
 
     /**
      * Read score-based MEI.
-     * The data is read into a Syste, which is then converted to page-based MEI.
-     * See MeiInput::ReadMei
+     * The data is read into an object, which is then converted to page-based MEI.
+     * See MeiInput::ReadMei, Doc::CreateScoreBuffer and Doc::ConvertToPageBasedDoc
      */
-    bool ReadScoreBasedMei(pugi::xml_node element, System *parent);
+    bool ReadScoreBasedMei(pugi::xml_node element, Score *parent);
 
     /**
      * @name Various methods for reading / converting values.

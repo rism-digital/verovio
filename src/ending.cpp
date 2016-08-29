@@ -50,14 +50,13 @@ void Ending::AddChild(Object *child)
     if (child->Is() == MEASURE) {
         assert(dynamic_cast<Measure *>(child));
     }
-    else if (child->Is() == PB) {
-        assert(dynamic_cast<Pb *>(child));
-    }
-    else if (child->Is() == SB) {
-        assert(dynamic_cast<Sb *>(child));
-    }
-    else if (child->Is() == SCOREDEF) {
-        assert(dynamic_cast<ScoreDef *>(child));
+    else if (child->IsSystemElement()) {
+        assert(dynamic_cast<SystemElement *>(child));
+        // here we are actually allowing ending withing ending, which is wrong
+        if (child->Is() == ENDING) {
+            LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+            assert(false);
+        }
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

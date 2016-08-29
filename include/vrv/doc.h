@@ -18,6 +18,7 @@ namespace vrv {
 
 class FontInfo;
 class Page;
+class Score;
 
 enum DocType { Raw = 0, Rendering, Transcription };
 
@@ -59,6 +60,14 @@ public:
      * Check if the document has a page with the specified value
      */
     bool HasPage(int pageIdx) const;
+
+    /**
+     * Create a mDiv buffer for loading or creating a scoreBased MEI document.
+     * Creating a mDiv buffer clear existing data (but not the header).
+     * The mDiv buffer is owned by the Doc.
+     * Once the document is created, Doc::ConvertToPagePagedDoc should be called to convert it before rendering.
+     */
+    Score *CreateScoreBuffer();
 
     /**
     * Get the total page count
@@ -405,6 +414,11 @@ private:
     short m_spacingStaff;
     /** System minimal spacing (MEI scoredef@spacing.system) - currently not saved */
     short m_spacingSystem;
+
+    /**
+     * A mDiv buffer for loading or creating a scoreBased MEI.
+     */
+    Score *m_scoreBuffer;
 };
 
 } // namespace vrv

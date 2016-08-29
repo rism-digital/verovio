@@ -51,20 +51,14 @@ void Section::Reset()
 
 void Section::AddChild(Object *child)
 {
-    if (child->Is() == ENDING) {
-        assert(dynamic_cast<Ending *>(child));
-    }
-    else if (child->Is() == MEASURE) {
+    if (child->Is() == MEASURE) {
         assert(dynamic_cast<Measure *>(child));
-    }
-    else if (child->Is() == PB) {
-        assert(dynamic_cast<Pb *>(child));
-    }
-    else if (child->Is() == SB) {
-        assert(dynamic_cast<Sb *>(child));
     }
     else if (child->Is() == SCOREDEF) {
         assert(dynamic_cast<ScoreDef *>(child));
+    }
+    else if (child->IsSystemElement()) {
+        assert(dynamic_cast<SystemElement *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

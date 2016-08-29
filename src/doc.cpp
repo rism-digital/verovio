@@ -28,6 +28,7 @@
 #include "note.h"
 #include "page.h"
 #include "rpt.h"
+#include "score.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -49,12 +50,18 @@ namespace vrv {
 Doc::Doc() : Object("doc-")
 {
     m_style = new Style();
+
+    // owned pointers need to be set to NULL;
+    m_scoreBuffer = NULL;
     Reset();
 }
 
 Doc::~Doc()
 {
     delete m_style;
+    if (m_scoreBuffer) {
+        delete m_scoreBuffer;
+    }
 }
 
 void Doc::Reset()
@@ -82,6 +89,10 @@ void Doc::Reset()
     m_midiExportDone = false;
 
     m_scoreDef.Reset();
+    if (m_scoreBuffer) {
+        delete m_scoreBuffer;
+        m_scoreBuffer = NULL;
+    }
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
@@ -96,6 +107,8 @@ void Doc::SetType(DocType type)
 
 void Doc::AddChild(Object *child)
 {
+    assert(!m_scoreBuffer); // Children cannot be added if a mDiv buffer was created;
+
     if (child->Is() == PAGE) {
         assert(dynamic_cast<Page *>(child));
     }
@@ -107,6 +120,17 @@ void Doc::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
+}
+
+Score *Doc::CreateScoreBuffer()
+{
+    assert(!m_scoreBuffer); // Should not be called twice - Call Doc::Reset() to Reset it if necessary
+
+    ClearChildren();
+    m_scoreDef.Reset();
+
+    m_scoreBuffer = new Score();
+    return m_scoreBuffer;
 }
 
 void Doc::Refresh()
@@ -513,27 +537,25 @@ void Doc::CastOffEncodingDoc()
 
 void Doc::ConvertToPageBasedDoc()
 {
-    Page *contentPage = dynamic_cast<Page *>(this->FindChildByType(PAGE));
-    assert(contentPage);
-
-    System *contentSystem = dynamic_cast<System *>(contentPage->FindChildByType(SYSTEM));
-    assert(contentSystem);
-
-    // Detach the contentPage
-    this->DetachChild(0);
-    assert(contentPage && !contentPage->m_parent);
+    assert(m_scoreBuffer); // Doc::CreateScoreBuffer needs to be called first;
 
     Page *page = new Page();
-    this->AddChild(page);
     System *system = new System();
     page->AddChild(system);
 
     ConvertToPageBasedParams convertToPageBasedParams(system);
     Functor convertToPageBased(&Object::ConvertToPageBased);
     Functor convertToPageBasedEnd(&Object::ConvertToPageBasedEnd);
-    contentSystem->Process(&convertToPageBased, &convertToPageBasedParams, &convertToPageBasedEnd);
+    m_scoreBuffer->Process(&convertToPageBased, &convertToPageBasedParams, &convertToPageBasedEnd);
 
-    delete contentPage;
+    m_scoreBuffer->ClearRelinquishedChildren();
+    assert(m_scoreBuffer->GetChildCount() == 0);
+
+    delete m_scoreBuffer;
+    m_scoreBuffer = NULL;
+
+    this->AddChild(page);
+
     this->ResetDrawingPage();
 }
 

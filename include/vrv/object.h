@@ -161,7 +161,7 @@ public:
     bool IsFloatingObject() const { return (this->IsSystemElement() || this->IsControlElement()); }
 
     /**
-     * Wrapper for checking if an element is set as a boundary element
+     * Wrapper for checking if an element has a boundary start interface and also if is set as a boundary element
      */
     bool IsBoundaryElement();
 

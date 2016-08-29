@@ -61,6 +61,7 @@
 		4D95D4F21D6E042400B2B856 /* section.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F11D6E042400B2B856 /* section.cpp */; };
 		4D95D4F61D71866200B2B856 /* controlelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F51D71866200B2B856 /* controlelement.cpp */; };
 		4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F81D718D4A00B2B856 /* systemelement.cpp */; };
+		4D95D4FC1D74551100B2B856 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
 		4D983005192E959E00320037 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
 		4D9A9C17199F560200028D93 /* verse.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D9A9C16199F560200028D93 /* verse.h */; };
 		4D9A9C19199F561200028D93 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
@@ -315,6 +316,8 @@
 		4D95D4F51D71866200B2B856 /* controlelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = controlelement.cpp; path = src/controlelement.cpp; sourceTree = "<group>"; };
 		4D95D4F71D718D0200B2B856 /* systemelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = systemelement.h; path = include/vrv/systemelement.h; sourceTree = "<group>"; };
 		4D95D4F81D718D4A00B2B856 /* systemelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = systemelement.cpp; path = src/systemelement.cpp; sourceTree = "<group>"; };
+		4D95D4FA1D74549700B2B856 /* score.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = score.h; path = include/vrv/score.h; sourceTree = "<group>"; };
+		4D95D4FB1D74551100B2B856 /* score.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = score.cpp; path = src/score.cpp; sourceTree = "<group>"; };
 		4D983004192E959E00320037 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = tools/main.cpp; sourceTree = SOURCE_ROOT; };
 		4D9A9C16199F560200028D93 /* verse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = verse.h; path = include/vrv/verse.h; sourceTree = "<group>"; };
 		4D9A9C18199F561200028D93 /* verse.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = verse.cpp; path = src/verse.cpp; sourceTree = "<group>"; };
@@ -782,6 +785,8 @@
 				8F59292B18854BF800FE51AD /* staff.h */,
 				8F086ED7188539540037FD8E /* system.cpp */,
 				8F59292E18854BF800FE51AD /* system.h */,
+				4D95D4FB1D74551100B2B856 /* score.cpp */,
+				4D95D4FA1D74549700B2B856 /* score.h */,
 			);
 			name = containers;
 			sourceTree = "<group>";
@@ -1034,6 +1039,7 @@
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
 				4D543E221B80AACF004B823C /* view_floating.cpp in Sources */,
+				4D95D4FC1D74551100B2B856 /* score.cpp in Sources */,
 				8F086EE9188539540037FD8E /* doc.cpp in Sources */,
 				8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */,
 				8F086EEB188539540037FD8E /* toolkit.cpp in Sources */,

@@ -58,6 +58,7 @@ enum ClassId {
     MENSUR_ATTR,
     METERSIG_ATTR,
     PAGE,
+    SCORE,
     STAFF,
     STAFF_ALIGNMENT,
     STAFFGRP,
