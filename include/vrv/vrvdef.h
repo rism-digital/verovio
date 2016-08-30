@@ -72,6 +72,7 @@ enum ClassId {
     ADD,
     ANNOT,
     APP,
+    CHOICE,
     CORR,
     DAMAGE,
     DEL,

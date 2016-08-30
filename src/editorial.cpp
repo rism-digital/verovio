@@ -216,6 +216,33 @@ void App::AddChild(Object *child)
 }
 
 //----------------------------------------------------------------------------
+// Choice
+//----------------------------------------------------------------------------
+
+Choice::Choice() : EditorialElement("choice-")
+{
+    m_level = EDITORIAL_UNDEFINED;
+
+    Reset();
+}
+
+Choice::Choice(EditorialLevel level) : EditorialElement("choice-")
+{
+    m_level = level;
+
+    Reset();
+}
+
+void Choice::Reset()
+{
+    EditorialElement::Reset();
+}
+
+Choice::~Choice()
+{
+}
+
+//----------------------------------------------------------------------------
 // Corr
 //----------------------------------------------------------------------------
 

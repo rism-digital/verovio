@@ -219,6 +219,39 @@ private:
 };
 
 //----------------------------------------------------------------------------
+// Choice
+//----------------------------------------------------------------------------
+
+class Choice : public EditorialElement {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    Choice();
+    Choice(EditorialLevel level);
+    virtual ~Choice();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Choice"; }
+    virtual ClassId Is() const { return CHOICE; }
+    ///@}
+
+    /** Getter for level **/
+    EditorialLevel GetLevel() { return m_level; }
+
+protected:
+    /** We store the level of the <choice> for integrity check */
+    EditorialLevel m_level;
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
 // Corr
 //----------------------------------------------------------------------------
 
