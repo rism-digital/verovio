@@ -83,12 +83,12 @@ public:
     /**
      * Set XPath query for <app> (MEI only)
      */
-    virtual void SetAppXPathQuery(std::string xPathQuery) {}
+    virtual void SetAppXPathQueries(std::vector<std::string> &xPathQueries) {}
 
     /**
      * Set XPath query for <app> (MEI only)
      */
-    virtual void SetChoiceXPathQueries(std::vector<std::string> &choiceXPathQueries) {}
+    virtual void SetChoiceXPathQueries(std::vector<std::string> &xPathQueries) {}
 
 private:
     /**

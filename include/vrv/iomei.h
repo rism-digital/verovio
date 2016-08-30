@@ -321,20 +321,18 @@ public:
     virtual bool ImportString(std::string mei);
 
     /**
-     * Set an xPath query for selecting specific <rdg>.
+     * Set the xPath queries for selecting specific <rdg>.
      * By default, the first <lem> or <rdg> is loaded.
-     * If a query is provided, the element retrieved by the specified xPath
+     * If one (or more) query is provided, the element matching the specified xPath
      * query will be selected (if any, otherwise the first one will be used).
      */
-    virtual void SetAppXPathQuery(std::string appXPathQuery) { m_appXPathQuery = appXPathQuery; }
+    virtual void SetAppXPathQueries(std::vector<std::string> &xPathQueries) { m_appXPathQueries = xPathQueries; }
 
     /**
-     * Set XPath query for <app> (MEI only)
+     * Set the xPath queries for selecting <choice> children.
+     * Works similarly as SetAppXPathQueries. By default, the first child is made visible
      */
-    virtual void SetChoiceXPathQueries(std::vector<std::string>& choiceXPathQueries)
-    {
-        m_choiceXPathQueries = choiceXPathQueries;
-    }
+    virtual void SetChoiceXPathQueries(std::vector<std::string> &xPathQueries) { m_choiceXPathQueries = xPathQueries; }
 
 private:
     bool ReadMei(pugi::xml_node root);
@@ -520,12 +518,12 @@ private:
     std::string m_filename;
 
     /**
-     *
+     * A vector for storing xpath queries for selecting <app> children
      */
-    std::string m_appXPathQuery;
+    std::vector<std::string> m_appXPathQueries;
 
     /**
-     *
+     * A vector the storing xpath queries for selecting <choice> children
      */
     std::vector<std::string> m_choiceXPathQueries;
 

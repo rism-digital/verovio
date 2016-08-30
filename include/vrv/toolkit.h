@@ -287,15 +287,15 @@ public:
      * @name Set and get the xPath query for selecting <app> (if any)
      */
     ///@{
-    void SetAppXPathQuery(std::string const &appXPathQuery) { m_appXPathQuery = appXPathQuery; }
-    std::string GetAppXPathQuery() { return m_appXPathQuery; }
+    void SetAppXPathQueries(std::vector<std::string> const &xPathQueries) { m_appXPathQueries = xPathQueries; }
+    std::vector<std::string> GetAppXPathQuery() { return m_appXPathQueries; }
     ///@}
 
     /**
      * @name Set and get the xPath queries for selecting <choice> (if any)
      */
     ///@{
-    void SetChoiceXPathQueries(std::vector<std::string> &xPathQueries) { m_choiceXPathQueries = xPathQueries; }
+    void SetChoiceXPathQueries(std::vector<std::string> const &xPathQueries) { m_choiceXPathQueries = xPathQueries; }
     std::vector<std::string> GetChoiceXPathQueries() { return m_choiceXPathQueries; }
     ///@}
 
@@ -365,7 +365,7 @@ private:
     bool m_noLayout;
     bool m_ignoreLayout;
     bool m_adjustPageHeight;
-    std::string m_appXPathQuery;
+    std::vector<std::string> m_appXPathQueries;
     std::vector<std::string> m_choiceXPathQueries;
     bool m_scoreBasedMei;
     bool m_evenNoteSpacing;

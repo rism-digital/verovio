@@ -298,8 +298,8 @@ bool Toolkit::LoadString(const std::string &data)
     }
 
     // app xpath query?
-    if (m_appXPathQuery.length() > 0) {
-        input->SetAppXPathQuery(m_appXPathQuery);
+    if (m_appXPathQueries.size() > 0) {
+        input->SetAppXPathQueries(m_appXPathQueries);
     }
     if (m_choiceXPathQueries.size() > 0) {
         input->SetChoiceXPathQueries(m_choiceXPathQueries);
@@ -406,7 +406,20 @@ bool Toolkit::ParseOptions(const std::string &json_options)
 
     if (json.has<jsonxx::Number>("spacingSystem")) SetSpacingSystem(json.get<jsonxx::Number>("spacingSystem"));
 
-    if (json.has<jsonxx::String>("appXPathQuery")) SetAppXPathQuery(json.get<jsonxx::String>("appXPathQuery"));
+    if (json.has<jsonxx::String>("appXPathQuery")) {
+        std::vector<std::string> queries = { json.get<jsonxx::String>("appXPathQuery") };
+        SetAppXPathQueries(queries);
+    }
+
+    if (json.has<jsonxx::Array>("appXPathQueries")) {
+        jsonxx::Array values = json.get<jsonxx::Array>("appXPathQueries");
+        std::vector<std::string> queries;
+        int i;
+        for (i = 0; i < values.size(); i++) {
+            if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
+        }
+        SetAppXPathQueries(queries);
+    }
 
     if (json.has<jsonxx::String>("choiceXPathQuery")) {
         std::vector<std::string> queries = { json.get<jsonxx::String>("choiceXPathQuery") };

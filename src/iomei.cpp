@@ -2853,9 +2853,10 @@ bool MeiInput::ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, Edi
 
     // Check if one child node matches the m_appXPathQuery
     pugi::xml_node selectedLemOrRdg;
-    if (m_appXPathQuery.length() > 0) {
-        pugi::xpath_node selection = parentNode.select_single_node(m_appXPathQuery.c_str());
-        if (selection) selectedLemOrRdg = selection.node();
+    if (m_appXPathQueries.size() > 0) {
+        auto i = std::find_if(m_appXPathQueries.begin(), m_appXPathQueries.end(),
+            [parentNode](std::string &query) { return (parentNode.select_single_node(query.c_str())); });
+        if (i != m_appXPathQueries.end()) selectedLemOrRdg = parentNode.select_single_node(i->c_str()).node();
     }
 
     bool success = true;

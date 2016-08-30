@@ -145,6 +145,7 @@ int main(int argc, char **argv)
     string outfile;
     string outformat = "svg";
     string font = "";
+    vector<string> appXPathQueries;
     vector<string> choiceXPathQueries;
     bool std_output = false;
 
@@ -200,7 +201,7 @@ int main(int argc, char **argv)
                 }
                 else if (strcmp(long_options[option_index].name, "app-xpath-query") == 0) {
                     cout << string(optarg) << endl;
-                    toolkit.SetAppXPathQuery(string(optarg));
+                    appXPathQueries.push_back(string(optarg));
                 }
                 else if (strcmp(long_options[option_index].name, "choice-xpath-query") == 0) {
                     cout << string(optarg) << endl;
@@ -278,6 +279,9 @@ int main(int argc, char **argv)
         }
     }
 
+    if (appXPathQueries.size() > 0) {
+        toolkit.SetAppXPathQueries(appXPathQueries);
+    }
     if (choiceXPathQueries.size() > 0) {
         toolkit.SetChoiceXPathQueries(choiceXPathQueries);
     }
