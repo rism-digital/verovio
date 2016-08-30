@@ -16,11 +16,9 @@
 // Avoid conflict between windows and std functions
 #define NOMINMAX
 
-// MSVC defines this in winsock2.h!?
-typedef struct timeval {
-    long tv_sec;
-    long tv_usec;
-} timeval;
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <stdint.h>
 
 int gettimeofday(struct timeval *tp, struct timezone *tzp)
 {
@@ -913,7 +911,5 @@ static void dirent_set_errno(int error)
 #ifdef __cplusplus
 }
 #endif
-
-} // namespace vrv
 
 #endif
