@@ -19,6 +19,10 @@
 #include <sys/time.h>
 #else
 #include <time.h>
+typedef struct timeval {
+  long tv_sec;
+  long tv_usec;
+} timeval;
 #endif
 
 namespace vrv {

@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <iostream>
+#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
 #include <math.h>
 #include <sstream>
 
@@ -979,7 +980,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
     int maxHeight = 0;
 
     // 0.2 for avoiding / by 0 (below)
-    float maxHeightFactor = std::max(0.2, fabs(angle));
+    float maxHeightFactor = std::max(0.2f, fabsf(angle));
     maxHeight = dist / (maxHeightFactor * (TEMP_SLUR_CURVE_FACTOR
                                               + 5)); // 5 is the minimum - can be increased for limiting curvature
     if (posRatio) {
