@@ -373,7 +373,7 @@ bool Toolkit::SaveFile(const std::string &filename)
 
 bool Toolkit::ParseOptions(const std::string &json_options)
 {
-#ifdef USE_EMSCRIPTEN
+#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
 
     jsonxx::Object json;
 
@@ -432,7 +432,7 @@ bool Toolkit::ParseOptions(const std::string &json_options)
 
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
-#ifdef USE_EMSCRIPTEN
+#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
     jsonxx::Object o;
 
     if (!m_doc.GetDrawingPage()) return o.json();

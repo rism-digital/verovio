@@ -14,9 +14,9 @@ import os
 os.system("../tools/get_git_commit.sh")
 
 
-EXTRA_COMPILE_ARGS = []
+EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
 if platform.system() != 'Windows':
-    EXTRA_COMPILE_ARGS = ['-std=c++11', '-Wno-write-strings', '-Wno-overloaded-virtual', '-Wno-unused-private-field']
+    EXTRA_COMPILE_ARGS += ['-std=c++11', '-Wno-write-strings', '-Wno-overloaded-virtual', '-Wno-unused-private-field']
     
 
 verovio_module = Extension('_verovio',
