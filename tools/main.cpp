@@ -145,6 +145,7 @@ int main(int argc, char **argv)
     string outfile;
     string outformat = "svg";
     string font = "";
+    vector<string> choiceXPathQueries;
     bool std_output = false;
 
     int no_mei_hdr = 0;
@@ -172,19 +173,19 @@ int main(int argc, char **argv)
     int c;
 
     static struct option long_options[] = { { "adjust-page-height", no_argument, &adjust_page_height, 1 },
-        { "all-pages", no_argument, &all_pages, 1 }, { "border", required_argument, 0, 'b' },
+        { "all-pages", no_argument, &all_pages, 1 }, { "app-xpath-query", required_argument, 0, 0 },
+        { "border", required_argument, 0, 'b' }, { "choice-xpath-query", required_argument, 0, 0 },
         { "even-note-spacing", no_argument, &even_note_spacing, 1 }, { "font", required_argument, 0, 0 },
         { "format", required_argument, 0, 'f' }, { "help", no_argument, &show_help, 1 },
         { "ignore-layout", no_argument, &ignore_layout, 1 }, { "no-layout", no_argument, &no_layout, 1 },
         { "no-mei-hdr", no_argument, &no_mei_hdr, 1 }, { "no-justification", no_argument, &no_justification, 1 },
         { "outfile", required_argument, 0, 'o' }, { "page", required_argument, 0, 0 },
         { "page-height", required_argument, 0, 'h' }, { "page-width", required_argument, 0, 'w' },
-        { "app-xpath-query", required_argument, 0, 0 }, { "resources", required_argument, 0, 'r' },
-        { "scale", required_argument, 0, 's' }, { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 },
-        { "spacing-linear", required_argument, 0, 0 }, { "spacing-non-linear", required_argument, 0, 0 },
-        { "spacing-staff", required_argument, 0, 0 }, { "spacing-system", required_argument, 0, 0 },
-        { "type", required_argument, 0, 't' }, { "version", no_argument, &show_version, 1 },
-        { "xml-id-seed", required_argument, 0, 0 }, { 0, 0, 0, 0 } };
+        { "resources", required_argument, 0, 'r' }, { "scale", required_argument, 0, 's' },
+        { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 }, { "spacing-linear", required_argument, 0, 0 },
+        { "spacing-non-linear", required_argument, 0, 0 }, { "spacing-staff", required_argument, 0, 0 },
+        { "spacing-system", required_argument, 0, 0 }, { "type", required_argument, 0, 't' },
+        { "version", no_argument, &show_version, 1 }, { "xml-id-seed", required_argument, 0, 0 }, { 0, 0, 0, 0 } };
 
     int option_index = 0;
     while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:v", long_options, &option_index)) != -1) {
@@ -200,6 +201,10 @@ int main(int argc, char **argv)
                 else if (strcmp(long_options[option_index].name, "app-xpath-query") == 0) {
                     cout << string(optarg) << endl;
                     toolkit.SetAppXPathQuery(string(optarg));
+                }
+                else if (strcmp(long_options[option_index].name, "choice-xpath-query") == 0) {
+                    cout << string(optarg) << endl;
+                    choiceXPathQueries.push_back(string(optarg));
                 }
                 else if (strcmp(long_options[option_index].name, "spacing-linear") == 0) {
                     if (!toolkit.SetSpacingLinear(atof(optarg))) {
@@ -271,6 +276,10 @@ int main(int argc, char **argv)
 
             default: break;
         }
+    }
+
+    if (choiceXPathQueries.size() > 0) {
+        toolkit.SetChoiceXPathQueries(choiceXPathQueries);
     }
 
     if (show_version) {
