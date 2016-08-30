@@ -31,16 +31,26 @@ Tie *tie = NULL;
 Chord *chord = NULL;
 Slur *slur = NULL;
 ScoreDef *scoreDef = NULL;
+Ending *ending = NULL;
 
 // start and end id
 std::string startid;
 std::string endid;
 
 ////////////////////////////////////
-// Score definition
+// The score as score-based MEI
 ////////////////////////////////////
 
 m_doc->Reset();
+Score *score = m_doc->CreateScoreBuffer();
+// the section
+Section *section = new Section();
+score->AddChild(section);
+
+////////////////////////////////////
+// ScoreDef definition
+////////////////////////////////////
+
 // staffGrp and staffDef
 StaffGrp *staffGrp = new StaffGrp();
 StaffDef *staffDef = new StaffDef();
@@ -55,15 +65,6 @@ m_doc->m_scoreDef.SetMeterSym(METERSIGN_common);
 // adding the staffDef to the staffGrp and the staffGrp to the doc scoreDef
 staffGrp->AddChild(staffDef);
 m_doc->m_scoreDef.AddChild(staffGrp);
-
-////////////////////////////////////
-// The score as score-based MEI
-////////////////////////////////////
-
-Score *score = m_doc->CreateScoreBuffer();
-// the section
-Section *section = new Section();
-score->AddChild(section);
 
 ////////////////////////////////////
 // Up-beat measure
@@ -127,6 +128,7 @@ beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_16);
 note->SetPname(PITCHNAME_c);
+note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
 beam->AddChild(note);
 note = new Note();
@@ -155,6 +157,7 @@ note = new Note();
 note->SetDur(DURATION_8);
 note->SetDots(1);
 note->SetPname(PITCHNAME_f);
+note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
 beam->AddChild(note);
 note = new Note();
@@ -178,6 +181,7 @@ note = new Note();
 note->SetDur(DURATION_4);
 note->SetDots(1);
 note->SetPname(PITCHNAME_g);
+note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
 // keep the id as end id for the tie
 endid = note->GetUuid();
@@ -198,6 +202,7 @@ startid = note->GetUuid();
 chord->AddChild(note);
 note = new Note();
 note->SetPname(PITCHNAME_c);
+note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
 chord->AddChild(note);
 beam->AddChild(chord);
