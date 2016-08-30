@@ -60,8 +60,8 @@
 
 namespace vrv {
 
-std::vector<std::string> MeiInput::s_editorialElementNames = { "abbr", "add", "app", "annot", "corr", "damage", "del",
-    "expan", "orig", "reg", "restore", "sic", "supplied", "unclear" };
+std::vector<std::string> MeiInput::s_editorialElementNames = { "abbr", "add", "app", "annot", "choice", "corr",
+    "damage", "del", "expan", "orig", "reg", "restore", "sic", "supplied", "unclear" };
 
 //----------------------------------------------------------------------------
 // MeiOutput
@@ -390,6 +390,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == APP) {
         m_currentNode = m_currentNode.append_child("app");
         WriteMeiApp(m_currentNode, dynamic_cast<App *>(object));
+    }
+    else if (object->Is() == CHOICE) {
+        m_currentNode = m_currentNode.append_child("choice");
+        WriteMeiChoice(m_currentNode, dynamic_cast<Choice *>(object));
     }
     else if (object->Is() == CORR) {
         m_currentNode = m_currentNode.append_child("corr");
@@ -1140,6 +1144,13 @@ void MeiOutput::WriteMeiApp(pugi::xml_node currentNode, App *app)
     assert(app);
 
     WriteEditorialElement(currentNode, app);
+};
+
+void MeiOutput::WriteMeiChoice(pugi::xml_node currentNode, Choice *choice)
+{
+    assert(choice);
+
+    WriteEditorialElement(currentNode, choice);
 };
 
 void MeiOutput::WriteMeiCorr(pugi::xml_node currentNode, Corr *corr)
@@ -2733,6 +2744,9 @@ bool MeiInput::ReadMeiEditorialElement(Object *parent, pugi::xml_node current, E
     else if (std::string(current.name()) == "annot") {
         return ReadMeiAnnot(parent, current);
     }
+    else if (std::string(current.name()) == "choice") {
+        return ReadMeiChoice(parent, current, level, filter);
+    }
     else if (std::string(current.name()) == "corr") {
         return ReadMeiCorr(parent, current, level, filter);
     }
@@ -2877,6 +2891,91 @@ bool MeiInput::ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, Edi
         }
         else {
             LogWarning("Could not make one <rdg> or <lem> visible");
+        }
+    }
+    return success;
+}
+
+bool MeiInput::ReadMeiChoice(Object *parent, pugi::xml_node choice, EditorialLevel level, Object *filter)
+{
+    if (!m_hasScoreDef) {
+        LogError("<choice> before any <scoreDef> is not supported");
+        return false;
+    }
+    Choice *vrvChoice = new Choice(level);
+    ReadEditorialElement(choice, vrvChoice);
+
+    parent->AddChild(vrvChoice);
+
+    return ReadMeiChoiceChildren(vrvChoice, choice, level, filter);
+}
+
+bool MeiInput::ReadMeiChoiceChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter)
+{
+    assert(dynamic_cast<Choice *>(parent));
+
+    // Check if one child node matches a value in m_choiceXPathQueries
+    pugi::xml_node selectedChild;
+    if (m_choiceXPathQueries.size() > 0) {
+        auto i = std::find_if(m_choiceXPathQueries.begin(), m_choiceXPathQueries.end(),
+            [parentNode](std::string &query) { return (parentNode.select_single_node(query.c_str())); });
+        if (i != m_choiceXPathQueries.end()) selectedChild = parentNode.select_single_node(i->c_str()).node();
+    }
+
+    bool success = true;
+    bool hasXPathSelected = false;
+    pugi::xml_node current;
+    for (current = parentNode.first_child(); current; current = current.next_sibling()) {
+        if (!success) break;
+        if (std::string(current.name()) == "abbr") {
+            success = ReadMeiAbbr(parent, current, level, filter);
+        }
+        else if (std::string(current.name()) == "choice") {
+            success = ReadMeiChoice(parent, current, level, filter);
+        }
+        else if (std::string(current.name()) == "corr") {
+            success = ReadMeiCorr(parent, current, level, filter);
+        }
+        else if (std::string(current.name()) == "expan") {
+            success = ReadMeiExpan(parent, current, level, filter);
+        }
+        else if (std::string(current.name()) == "orig") {
+            success = ReadMeiOrig(parent, current, level, filter);
+        }
+        else if (std::string(current.name()) == "reg") {
+            success = ReadMeiReg(parent, current, level, filter);
+        }
+        else if (std::string(current.name()) == "sic") {
+            success = ReadMeiSic(parent, current, level, filter);
+        }
+        else if (std::string(current.name()) == "unclear") {
+            success = ReadMeiUnclear(parent, current, level, filter);
+        }
+        else {
+            LogWarning("Unsupported '<%s>' within <choice>", current.name());
+        }
+        // Now we check if the xpath selection (if any) matches the current node.
+        // If yes, make it visible
+        EditorialElement *last = dynamic_cast<EditorialElement *>(parent->GetLast());
+        if (success && last) {
+            if (selectedChild == current) {
+                last->m_visibility = Visible;
+                hasXPathSelected = true;
+            }
+            else {
+                last->m_visibility = Hidden;
+            }
+        }
+    }
+
+    // If no child was made visible through the xpath selection, make the first one visible
+    if (!hasXPathSelected) {
+        EditorialElement *first = dynamic_cast<EditorialElement *>(parent->GetFirst());
+        if (first) {
+            first->m_visibility = Visible;
+        }
+        else {
+            LogWarning("Could not make one child of <choice> visible");
         }
     }
     return success;

@@ -240,6 +240,11 @@ public:
     /** Getter for level **/
     EditorialLevel GetLevel() { return m_level; }
 
+    /**
+     * Add children to a apparatus.
+     */
+    virtual void AddChild(Object *object);
+
 protected:
     /** We store the level of the <choice> for integrity check */
     EditorialLevel m_level;

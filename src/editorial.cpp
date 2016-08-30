@@ -242,6 +242,42 @@ Choice::~Choice()
 {
 }
 
+void Choice::AddChild(Object *child)
+{
+    if (child->Is() == ABBR) {
+        assert(dynamic_cast<Abbr *>(child));
+    }
+    else if (child->Is() == CHOICE) {
+        assert(dynamic_cast<Choice *>(child));
+    }
+    else if (child->Is() == CORR) {
+        assert(dynamic_cast<Corr *>(child));
+    }
+    else if (child->Is() == EXPAN) {
+        assert(dynamic_cast<Expan *>(child));
+    }
+    else if (child->Is() == ORIG) {
+        assert(dynamic_cast<Orig *>(child));
+    }
+    else if (child->Is() == REG) {
+        assert(dynamic_cast<Reg *>(child));
+    }
+    else if (child->Is() == SIC) {
+        assert(dynamic_cast<Sic *>(child));
+    }
+    else if (child->Is() == UNCLEAR) {
+        assert(dynamic_cast<Unclear *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
+}
+
 //----------------------------------------------------------------------------
 // Corr
 //----------------------------------------------------------------------------

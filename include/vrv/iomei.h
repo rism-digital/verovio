@@ -32,6 +32,7 @@ class Beam;
 class BeatRpt;
 class BoundaryEnd;
 class BTrem;
+class Choice;
 class Chord;
 class Clef;
 class Corr;
@@ -230,6 +231,7 @@ private:
     void WriteMeiAdd(pugi::xml_node currentNode, Add *add);
     void WriteMeiAnnot(pugi::xml_node currentNode, Annot *annot);
     void WriteMeiApp(pugi::xml_node currentNode, App *app);
+    void WriteMeiChoice(pugi::xml_node currentNode, Choice *choice);
     void WriteMeiCorr(pugi::xml_node currentNode, Corr *corr);
     void WriteMeiDamage(pugi::xml_node currentNode, Damage *damage);
     void WriteMeiDel(pugi::xml_node currentNode, Del *del);
@@ -435,6 +437,8 @@ private:
     bool ReadMeiAnnot(Object *parent, pugi::xml_node annot);
     bool ReadMeiApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL);
     bool ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiChoice(Object *parent, pugi::xml_node choice, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiChoiceChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL);
     bool ReadMeiCorr(Object *parent, pugi::xml_node corr, EditorialLevel level, Object *filter = NULL);
     bool ReadMeiDamage(Object *parent, pugi::xml_node damage, EditorialLevel level, Object *filter = NULL);
     bool ReadMeiDel(Object *parent, pugi::xml_node del, EditorialLevel level, Object *filter = NULL);
@@ -511,6 +515,11 @@ private:
      *
      */
     std::string m_appXPathQuery;
+
+    /**
+     *
+     */
+    std::vector<std::string> m_choiceXPathQueries;
 
     /**
      * A flag indicating wheather we are reading page-based or score-based MEI
