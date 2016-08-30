@@ -405,6 +405,8 @@ bool Toolkit::ParseOptions(const std::string &json_options)
 
     if (json.has<jsonxx::String>("appXPathQuery")) SetAppXPathQuery(json.get<jsonxx::String>("appXPathQuery"));
 
+    if (json.has<jsonxx::Number>("xmlIdSeed")) Object::SeedUuid(json.get<jsonxx::Number>("xmlIdSeed"));
+
     // Parse the various flags
     // Note: it seems that there is a bug with jsonxx and emscripten
     // Boolean value false won't be parsed properly. We have to use Number instead
