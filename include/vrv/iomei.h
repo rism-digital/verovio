@@ -328,6 +328,14 @@ public:
      */
     virtual void SetAppXPathQuery(std::string appXPathQuery) { m_appXPathQuery = appXPathQuery; }
 
+    /**
+     * Set XPath query for <app> (MEI only)
+     */
+    virtual void SetChoiceXPathQueries(std::vector<std::string>& choiceXPathQueries)
+    {
+        m_choiceXPathQueries = choiceXPathQueries;
+    }
+
 private:
     bool ReadMei(pugi::xml_node root);
     bool ReadMeiHeader(pugi::xml_node meihead);

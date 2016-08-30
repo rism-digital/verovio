@@ -9,6 +9,7 @@
 #define __VRV_IO_H__
 
 #include <fstream>
+#include <vector>
 
 namespace vrv {
 
@@ -82,7 +83,12 @@ public:
     /**
      * Set XPath query for <app> (MEI only)
      */
-    virtual void SetAppXPathQuery(std::string xPathQuery){};
+    virtual void SetAppXPathQuery(std::string xPathQuery) {}
+
+    /**
+     * Set XPath query for <app> (MEI only)
+     */
+    virtual void SetChoiceXPathQueries(std::vector<std::string> &choiceXPathQueries) {}
 
 private:
     /**
