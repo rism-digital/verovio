@@ -297,12 +297,15 @@ bool Toolkit::LoadString(const std::string &data)
         return false;
     }
 
-    // app xpath query?
+    // xpath queries?
     if (m_appXPathQueries.size() > 0) {
         input->SetAppXPathQueries(m_appXPathQueries);
     }
     if (m_choiceXPathQueries.size() > 0) {
         input->SetChoiceXPathQueries(m_choiceXPathQueries);
+    }
+    if (m_mdivXPathQuery.length() > 0) {
+        input->SetMdivXPathQuery(m_mdivXPathQuery);
     }
 
     // load the file
@@ -435,6 +438,8 @@ bool Toolkit::ParseOptions(const std::string &json_options)
         }
         SetChoiceXPathQueries(queries);
     }
+
+    if (json.has<jsonxx::String>("mdivXPathQuery")) SetMdivXPathQuery(json.get<jsonxx::String>("mdivXPathQuery"));
 
     if (json.has<jsonxx::Number>("xmlIdSeed")) Object::SeedUuid(json.get<jsonxx::Number>("xmlIdSeed"));
 

@@ -334,6 +334,13 @@ public:
      */
     virtual void SetChoiceXPathQueries(std::vector<std::string> &xPathQueries) { m_choiceXPathQueries = xPathQueries; }
 
+    /**
+     * Set the XPath query for selecting a specific <mdiv>
+     * Only one mdiv can be selected. This also works differently that <app> and <choice> selection because only the
+     * selected mdiv will be loaded.
+     */
+    virtual void SetMdivXPathQuery(std::string &xPathQuery) { m_mdivXPathQuery = xPathQuery; }
+
 private:
     bool ReadMei(pugi::xml_node root);
     bool ReadMeiHeader(pugi::xml_node meihead);
@@ -517,15 +524,12 @@ public:
 private:
     std::string m_filename;
 
-    /**
-     * A vector for storing xpath queries for selecting <app> children
-     */
+    /** A vector for storing xpath queries for selecting <app> children */
     std::vector<std::string> m_appXPathQueries;
-
-    /**
-     * A vector the storing xpath queries for selecting <choice> children
-     */
+    /** A vector the storing xpath queries for selecting <choice> children */
     std::vector<std::string> m_choiceXPathQueries;
+    /** A string for storing the xpath query for selecting a <mdiv> */
+    std::string m_mdivXPathQuery;
 
     /**
      * A flag indicating wheather we are reading page-based or score-based MEI

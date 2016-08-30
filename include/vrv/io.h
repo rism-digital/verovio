@@ -81,14 +81,19 @@ public:
     bool HasLayoutInformation() { return m_hasLayoutInformation; }
 
     /**
-     * Set XPath query for <app> (MEI only)
+     * Set XPath queries for <app> (MEI only)
      */
     virtual void SetAppXPathQueries(std::vector<std::string> &xPathQueries) {}
 
     /**
-     * Set XPath query for <app> (MEI only)
+     * Set XPath queries for <choice> (MEI only)
      */
     virtual void SetChoiceXPathQueries(std::vector<std::string> &xPathQueries) {}
+
+    /**
+     * Set XPath query for <mdiv> (MEI only)
+     */
+    virtual void SetMdivXPathQuery(std::string &xPathQuery) {}
 
 private:
     /**

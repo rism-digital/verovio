@@ -1485,8 +1485,19 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         body = music.child("body");
     }
     if (!body.empty()) {
-        mdiv = body.child("mdiv");
+        if (!m_mdivXPathQuery.empty()) {
+            pugi::xpath_node selection = body.select_single_node(m_mdivXPathQuery.c_str());
+            if (selection)
+                mdiv = selection.node();
+            else {
+                LogError("the <mdiv> requested with the xpath query '%s' could not be found", m_mdivXPathQuery.c_str());
+                return false;
+            }
+        }
+        else
+            mdiv = body.child("mdiv");
     }
+
     if (!mdiv.empty()) {
         pages = mdiv.child("pages");
     }

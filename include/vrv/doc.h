@@ -62,9 +62,9 @@ public:
     bool HasPage(int pageIdx) const;
 
     /**
-     * Create a mDiv buffer for loading or creating a scoreBased MEI document.
-     * Creating a mDiv buffer clear existing data (but not the header).
-     * The mDiv buffer is owned by the Doc.
+     * Create a score buffer for loading or creating a scoreBased MEI document.
+     * Creating a mdiv buffer clear existing data (but not the header).
+     * The score buffer is owned by the Doc.
      * Once the document is created, Doc::ConvertToPagePagedDoc should be called to convert it before rendering.
      */
     Score *CreateScoreBuffer();
@@ -416,7 +416,7 @@ private:
     short m_spacingSystem;
 
     /**
-     * A mDiv buffer for loading or creating a scoreBased MEI.
+     * A score buffer for loading or creating a scoreBased MEI.
      */
     Score *m_scoreBuffer;
 };

@@ -300,6 +300,14 @@ public:
     ///@}
 
     /**
+     * @name Set and get the xPath query for selecting a <mdiv>
+     */
+    ///@{
+    void SetMdivXPathQuery(std::string const &xPathQuery) { m_mdivXPathQuery = xPathQuery; };
+    std::string GetMdivXPathQuery() { return m_mdivXPathQuery; };
+    ///@}
+
+    /**
      * @name Set and get the xPath query for selecting <app> (if any)
      */
     ///@{
@@ -367,6 +375,7 @@ private:
     bool m_adjustPageHeight;
     std::vector<std::string> m_appXPathQueries;
     std::vector<std::string> m_choiceXPathQueries;
+    std::string m_mdivXPathQuery;
     bool m_scoreBasedMei;
     bool m_evenNoteSpacing;
     float m_spacingLinear;

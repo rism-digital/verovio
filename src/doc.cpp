@@ -107,7 +107,7 @@ void Doc::SetType(DocType type)
 
 void Doc::AddChild(Object *child)
 {
-    assert(!m_scoreBuffer); // Children cannot be added if a mDiv buffer was created;
+    assert(!m_scoreBuffer); // Children cannot be added if a score buffer was created;
 
     if (child->Is() == PAGE) {
         assert(dynamic_cast<Page *>(child));
