@@ -15,6 +15,7 @@
 
 #include "editorial.h"
 #include "note.h"
+#include "rest.h"
 #include "tuplet.h"
 #include "vrv.h"
 
@@ -52,6 +53,9 @@ void Beam::AddChild(Object *child)
     }
     else if (child->Is() == TUPLET) {
         assert(dynamic_cast<Tuplet *>(child));
+    }
+    else if (child->Is() == REST) {
+        assert(dynamic_cast<Rest *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

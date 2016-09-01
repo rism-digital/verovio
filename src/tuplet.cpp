@@ -17,6 +17,7 @@
 #include "chord.h"
 #include "editorial.h"
 #include "note.h"
+#include "rest.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -57,6 +58,9 @@ void Tuplet::AddChild(Object *child)
     }
     else if (child->Is() == NOTE) {
         assert(dynamic_cast<Note *>(child));
+    }
+    else if (child->Is() == REST) {
+        assert(dynamic_cast<Rest *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
