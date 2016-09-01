@@ -105,6 +105,11 @@ public:
     virtual int ResetVerticalAlignment(FunctorParams *functorParams);
 
     /**
+     * See Object::AlignHorizontally
+     */
+    virtual int AlignHorizontally(FunctorParams *functorParams);
+
+    /**
      * See Object::AlignVertically
      */
     virtual int AlignVertically(FunctorParams *functorParams);

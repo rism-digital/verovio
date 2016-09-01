@@ -303,6 +303,11 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
     params->m_time = DUR_MAX * -1.0;
 
+    if (params->m_isFirstMeasure)
+        params->m_scoreDefRole = SYSTEM_SCOREDEF;
+    else
+        params->m_scoreDefRole = INTERMEDIATE_SCOREDEF;
+
     if (this->GetStaffDefClef()) {
         GetStaffDefClef()->AlignHorizontally(params);
     }
@@ -316,6 +321,8 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
         GetStaffDefMeterSig()->AlignHorizontally(params);
     }
 
+    params->m_scoreDefRole = NONE;
+
     // Now we have to set it to 0.0 since we will start aligning muscial content
     params->m_time = 0.0;
 
@@ -327,7 +334,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
-    params->m_cautionScoreDef = true;
+    params->m_scoreDefRole = CAUTIONARY_SCOREDEF;
 
     if (this->GetCautionStaffDefClef()) {
         GetCautionStaffDefClef()->AlignHorizontally(params);
@@ -342,7 +349,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
         GetCautionStaffDefMeterSig()->AlignHorizontally(params);
     }
 
-    params->m_cautionScoreDef = false;
+    params->m_scoreDefRole = NONE;
 
     int i;
     for (i = 0; i < params->m_measureAligner->GetChildCount(); i++) {

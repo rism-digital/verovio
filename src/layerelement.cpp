@@ -71,7 +71,7 @@ void LayerElement::Reset()
     m_drawingX = 0;
     m_drawingY = 0;
 
-    m_isScoreOrStaffDefAttr = false;
+    m_scoreDefRole = NONE;
     m_alignment = NULL;
     m_beamElementCoord = NULL;
 }
@@ -294,6 +294,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
+    this->SetScoreDefRole(params->m_scoreDefRole);
+
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
@@ -305,17 +307,19 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_BARLINE;
     }
     else if (this->Is() == CLEF) {
-        if (this->GetScoreOrStaffDefAttr()) {
-            type = params->m_cautionScoreDef ? ALIGNMENT_SCOREDEF_CAUTION_CLEF : ALIGNMENT_SCOREDEF_CLEF;
-        }
+        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+            type = ALIGNMENT_SCOREDEF_CLEF;
+        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+            type = ALIGNMENT_SCOREDEF_CAUTION_CLEF;
         else {
             type = ALIGNMENT_CLEF;
         }
     }
     else if (this->Is() == KEYSIG) {
-        if (this->GetScoreOrStaffDefAttr()) {
-            type = params->m_cautionScoreDef ? ALIGNMENT_SCOREDEF_CAUTION_KEYSIG : ALIGNMENT_SCOREDEF_KEYSIG;
-        }
+        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+            type = ALIGNMENT_SCOREDEF_KEYSIG;
+        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+            type = ALIGNMENT_SCOREDEF_CAUTION_KEYSIG;
         else {
             // type = ALIGNMENT_KEYSIG;
             // We force this because they should appear only at the beginning of a measure and should be non-justifiable
@@ -324,9 +328,10 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
     }
     else if (this->Is() == MENSUR) {
-        if (this->GetScoreOrStaffDefAttr()) {
-            type = params->m_cautionScoreDef ? ALIGNMENT_SCOREDEF_CAUTION_MENSUR : ALIGNMENT_SCOREDEF_MENSUR;
-        }
+        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+            type = ALIGNMENT_SCOREDEF_MENSUR;
+        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+            type = ALIGNMENT_SCOREDEF_CAUTION_MENSUR;
         else {
             // replace the current mensur
             params->m_currentMensur = dynamic_cast<Mensur *>(this);
@@ -335,9 +340,10 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
     }
     else if (this->Is() == METERSIG) {
-        if (this->GetScoreOrStaffDefAttr()) {
-            type = params->m_cautionScoreDef ? ALIGNMENT_SCOREDEF_CAUTION_METERSIG : ALIGNMENT_SCOREDEF_METERSIG;
-        }
+        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
+            type = ALIGNMENT_SCOREDEF_METERSIG;
+        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+            type = ALIGNMENT_SCOREDEF_CAUTION_METERSIG;
         else {
             // replace the current meter signature
             params->m_currentMeterSig = dynamic_cast<MeterSig *>(this);

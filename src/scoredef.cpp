@@ -128,7 +128,6 @@ Clef *ScoreDefElement::GetClefCopy() const
     }
     // Always check if HasClefInfo() is true before asking for a copy
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
 
@@ -143,7 +142,6 @@ KeySig *ScoreDefElement::GetKeySigCopy() const
     }
     // Always check if HasKeySigInfo() is true before asking for a copy
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
 
@@ -158,7 +156,6 @@ Mensur *ScoreDefElement::GetMensurCopy() const
     }
     // Always check if HasMensurInfo() is true before asking for a copy
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
 
@@ -173,7 +170,6 @@ MeterSig *ScoreDefElement::GetMeterSigCopy() const
     }
     // Always check if HasMeterSigInfo() is true before asking for a copy
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
 

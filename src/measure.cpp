@@ -16,11 +16,11 @@
 
 #include "attcomparison.h"
 #include "boundary.h"
+#include "controlelement.h"
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
 #include "functorparams.h"
-#include "controlelement.h"
 #include "page.h"
 #include "staff.h"
 #include "system.h"
@@ -310,6 +310,9 @@ int Measure::AlignHorizontallyEnd(FunctorParams *functorParams)
     // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work in
     // MEI anyway.
     m_timestampAligner.Process(params->m_functor, params);
+
+    // Next scoreDef will be INTERMEDIATE_SCOREDEF (See Layer::AlignHorizontally)
+    params->m_isFirstMeasure = false;
 
     return FUNCTOR_CONTINUE;
 }

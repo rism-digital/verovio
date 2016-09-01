@@ -287,6 +287,17 @@ enum EditorialLevel {
 };
 
 //----------------------------------------------------------------------------
+// Types for layer element
+//----------------------------------------------------------------------------
+
+/**
+ * The types are used to distinguish LayerElement that are default layer elements,
+ * scoreDef layer elements and cautionary scoreDef layer elements
+ */
+
+enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAUTIONARY_SCOREDEF };
+
+//----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
 

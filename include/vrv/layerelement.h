@@ -59,8 +59,8 @@ public:
      * NB In the scoreDef or staffDef itself, it can be either an attribute or an element.
      */
     ///@{
-    bool GetScoreOrStaffDefAttr() const { return m_isScoreOrStaffDefAttr; }
-    void SetScoreOrStaffDefAttr(bool isScoreOrStaffDefAttr) { m_isScoreOrStaffDefAttr = isScoreOrStaffDefAttr; }
+    ElementScoreDefRole GetScoreDefRole() const { return m_scoreDefRole; }
+    void SetScoreDefRole(ElementScoreDefRole scoreDefRole) { m_scoreDefRole = scoreDefRole; }
     ///@}
 
     /**
@@ -171,7 +171,7 @@ protected:
 
 private:
     /** Indicates whether it is a ScoreDef or StaffDef attribute */
-    bool m_isScoreOrStaffDefAttr;
+    ElementScoreDefRole m_scoreDefRole;
 };
 
 } // namespace vrv

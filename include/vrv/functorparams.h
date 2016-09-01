@@ -125,6 +125,7 @@ public:
  * member 3: the current MeterSig
  * member 4: the functor for passing it to the TimeStampAligner
  * member 5: a flag indicating whereas we are processing the caution scoreDef
+ * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
 **/
 
 class AlignHorizontallyParams : public FunctorParams {
@@ -136,14 +137,16 @@ public:
         m_currentMensur = NULL;
         m_currentMeterSig = NULL;
         m_functor = functor;
-        m_cautionScoreDef = false;
+        m_scoreDefRole = NONE;
+        m_isFirstMeasure = false;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
     Mensur *m_currentMensur;
     MeterSig *m_currentMeterSig;
     Functor *m_functor;
-    bool m_cautionScoreDef;
+    ElementScoreDefRole m_scoreDefRole;
+    bool m_isFirstMeasure;
 };
 
 //----------------------------------------------------------------------------
