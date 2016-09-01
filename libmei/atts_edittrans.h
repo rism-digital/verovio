@@ -49,8 +49,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetAgent(std::string agent_) { m_agent = agent_; };
-    std::string GetAgent() const { return m_agent; };
+    void SetAgent(std::string agent_) { m_agent = agent_; }
+    std::string GetAgent() const { return m_agent; }
     bool HasAgent() const;
     ///@}
 
@@ -88,12 +88,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCert(data_CERTAINTY cert_) { m_cert = cert_; };
-    data_CERTAINTY GetCert() const { return m_cert; };
+    void SetCert(data_CERTAINTY cert_) { m_cert = cert_; }
+    data_CERTAINTY GetCert() const { return m_cert; }
     bool HasCert() const;
     //
-    void SetEvidence(std::string evidence_) { m_evidence = evidence_; };
-    std::string GetEvidence() const { return m_evidence; };
+    void SetEvidence(std::string evidence_) { m_evidence = evidence_; }
+    std::string GetEvidence() const { return m_evidence; }
     bool HasEvidence() const;
     ///@}
 
@@ -134,8 +134,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetExtent(std::string extent_) { m_extent = extent_; };
-    std::string GetExtent() const { return m_extent; };
+    void SetExtent(std::string extent_) { m_extent = extent_; }
+    std::string GetExtent() const { return m_extent; }
     bool HasExtent() const;
     ///@}
 
@@ -170,8 +170,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetReason(std::string reason_) { m_reason = reason_; };
-    std::string GetReason() const { return m_reason; };
+    void SetReason(std::string reason_) { m_reason = reason_; }
+    std::string GetReason() const { return m_reason; }
     bool HasReason() const;
     ///@}
 

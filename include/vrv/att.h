@@ -56,7 +56,7 @@ public:
     // static bool SetLyrics(Object *element, std::string attrType, std::string attrValue);
     static bool SetMei(Object *element, std::string attrType, std::string attrValue);
     static bool SetMensural(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetMidi(Object *element, std::string attrType, std::string attrValue);
+    static bool SetMidi(Object *element, std::string attrType, std::string attrValue);
     static bool SetPagebased(Object *element, std::string attrType, std::string attrValue);
     // static bool SetPerformance(Object *element, std::string attrType, std::string attrValue);
     // static bool SetNeumes(Object *element, std::string attrType, std::string attrValue);
@@ -104,8 +104,6 @@ public:
     int StrToInt(std::string value) const;
     ///@}
 
-    bool SetMidi(vrv::Object *element, std::string attrType, std::string attrValue);
-
     /** @name Converters for writing and reading */
     ///@{
     std::string BeatrptRendToStr(data_BEATRPT_REND data) const;
@@ -125,6 +123,18 @@ public:
 
     std::string ModusminorToStr(data_MODUSMINOR data) const;
     data_MODUSMINOR StrToModusminor(std::string value) const;
+
+    std::string MidibpmToStr(data_MIDIBPM data) const { return IntToStr(data); }
+    data_MIDIBPM StrToMidibpm(std::string value) const { return StrToInt(value); }
+
+    std::string MidichannelToStr(data_MIDICHANNEL data) const { return IntToStr(data); }
+    data_MIDICHANNEL StrToMidichannel(std::string value) const { return StrToInt(value); }
+
+    std::string MidimspbToStr(data_MIDIMSPB data) const { return IntToStr(data); }
+    data_MIDIMSPB StrToMidimspb(std::string value) const { return StrToInt(value); }
+
+    std::string MidivalueToStr(data_MIDIVALUE data) const { return IntToStr(data); }
+    data_MIDIVALUE StrToMidivalue(std::string value) const { return StrToInt(value); }
 
     std::string OctaveDisToStr(data_OCTAVE_DIS data) const;
     data_OCTAVE_DIS StrToOctaveDis(std::string value) const;

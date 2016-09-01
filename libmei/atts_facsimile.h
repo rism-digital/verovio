@@ -49,8 +49,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFacs(data_URIS facs_) { m_facs = facs_; };
-    data_URIS GetFacs() const { return m_facs; };
+    void SetFacs(data_URIS facs_) { m_facs = facs_; }
+    data_URIS GetFacs() const { return m_facs; }
     bool HasFacs() const;
     ///@}
 

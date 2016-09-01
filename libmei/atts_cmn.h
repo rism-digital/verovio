@@ -49,8 +49,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOrder(arpegLog_ORDER order_) { m_order = order_; };
-    arpegLog_ORDER GetOrder() const { return m_order; };
+    void SetOrder(arpegLog_ORDER order_) { m_order = order_; }
+    arpegLog_ORDER GetOrder() const { return m_order; }
     bool HasOrder() const;
     ///@}
 
@@ -85,8 +85,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetArrow(data_BOOLEAN arrow_) { m_arrow = arrow_; };
-    data_BOOLEAN GetArrow() const { return m_arrow; };
+    void SetArrow(data_BOOLEAN arrow_) { m_arrow = arrow_; }
+    data_BOOLEAN GetArrow() const { return m_arrow; }
     bool HasArrow() const;
     ///@}
 
@@ -121,8 +121,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(bTremLog_FORM form_) { m_form = form_; };
-    bTremLog_FORM GetForm() const { return m_form; };
+    void SetForm(bTremLog_FORM form_) { m_form = form_; }
+    bTremLog_FORM GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 
@@ -157,8 +157,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBeam(std::string beam_) { m_beam = beam_; };
-    std::string GetBeam() const { return m_beam; };
+    void SetBeam(std::string beam_) { m_beam = beam_; }
+    std::string GetBeam() const { return m_beam; }
     bool HasBeam() const;
     ///@}
 
@@ -193,8 +193,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBeamWith(data_OTHERSTAFF beamWith_) { m_beamWith = beamWith_; };
-    data_OTHERSTAFF GetBeamWith() const { return m_beamWith; };
+    void SetBeamWith(data_OTHERSTAFF beamWith_) { m_beamWith = beamWith_; }
+    data_OTHERSTAFF GetBeamWith() const { return m_beamWith; }
     bool HasBeamWith() const;
     ///@}
 
@@ -233,12 +233,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBeamGroup(std::string beamGroup_) { m_beamGroup = beamGroup_; };
-    std::string GetBeamGroup() const { return m_beamGroup; };
+    void SetBeamGroup(std::string beamGroup_) { m_beamGroup = beamGroup_; }
+    std::string GetBeamGroup() const { return m_beamGroup; }
     bool HasBeamGroup() const;
     //
-    void SetBeamRests(data_BOOLEAN beamRests_) { m_beamRests = beamRests_; };
-    data_BOOLEAN GetBeamRests() const { return m_beamRests; };
+    void SetBeamRests(data_BOOLEAN beamRests_) { m_beamRests = beamRests_; }
+    data_BOOLEAN GetBeamRests() const { return m_beamRests; }
     bool HasBeamRests() const;
     ///@}
 
@@ -281,12 +281,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(beamrend_FORM form_) { m_form = form_; };
-    beamrend_FORM GetForm() const { return m_form; };
+    void SetForm(beamrend_FORM form_) { m_form = form_; }
+    beamrend_FORM GetForm() const { return m_form; }
     bool HasForm() const;
     //
-    void SetSlope(double slope_) { m_slope = slope_; };
-    double GetSlope() const { return m_slope; };
+    void SetSlope(double slope_) { m_slope = slope_; }
+    double GetSlope() const { return m_slope; }
     bool HasSlope() const;
     ///@}
 
@@ -323,8 +323,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBreaksec(int breaksec_) { m_breaksec = breaksec_; };
-    int GetBreaksec() const { return m_breaksec; };
+    void SetBreaksec(int breaksec_) { m_breaksec = breaksec_; }
+    int GetBreaksec() const { return m_breaksec; }
     bool HasBreaksec() const;
     ///@}
 
@@ -364,8 +364,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBeatDef(data_DURATION beatDef_) { m_beatDef = beatDef_; };
-    data_DURATION GetBeatDef() const { return m_beatDef; };
+    void SetBeatDef(data_DURATION beatDef_) { m_beatDef = beatDef_; }
+    data_DURATION GetBeatDef() const { return m_beatDef; }
     bool HasBeatDef() const;
     ///@}
 
@@ -400,8 +400,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(data_BEATRPT_REND form_) { m_form = form_; };
-    data_BEATRPT_REND GetForm() const { return m_form; };
+    void SetForm(data_BEATRPT_REND form_) { m_form = form_; }
+    data_BEATRPT_REND GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 
@@ -436,8 +436,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetAmount(double amount_) { m_amount = amount_; };
-    double GetAmount() const { return m_amount; };
+    void SetAmount(double amount_) { m_amount = amount_; }
+    double GetAmount() const { return m_amount; }
     bool HasAmount() const;
     ///@}
 
@@ -475,8 +475,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCutout(cutout_CUTOUT cutout_) { m_cutout = cutout_; };
-    cutout_CUTOUT GetCutout() const { return m_cutout; };
+    void SetCutout(cutout_CUTOUT cutout_) { m_cutout = cutout_; }
+    cutout_CUTOUT GetCutout() const { return m_cutout; }
     bool HasCutout() const;
     ///@}
 
@@ -511,8 +511,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetExpand(data_BOOLEAN expand_) { m_expand = expand_; };
-    data_BOOLEAN GetExpand() const { return m_expand; };
+    void SetExpand(data_BOOLEAN expand_) { m_expand = expand_; }
+    data_BOOLEAN GetExpand() const { return m_expand; }
     bool HasExpand() const;
     ///@}
 
@@ -552,8 +552,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(fTremLog_FORM form_) { m_form = form_; };
-    fTremLog_FORM GetForm() const { return m_form; };
+    void SetForm(fTremLog_FORM form_) { m_form = form_; }
+    fTremLog_FORM GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 
@@ -588,12 +588,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(fermataVis_FORM form_) { m_form = form_; };
-    fermataVis_FORM GetForm() const { return m_form; };
+    void SetForm(fermataVis_FORM form_) { m_form = form_; }
+    fermataVis_FORM GetForm() const { return m_form; }
     bool HasForm() const;
     //
-    void SetShape(fermataVis_SHAPE shape_) { m_shape = shape_; };
-    fermataVis_SHAPE GetShape() const { return m_shape; };
+    void SetShape(fermataVis_SHAPE shape_) { m_shape = shape_; }
+    fermataVis_SHAPE GetShape() const { return m_shape; }
     bool HasShape() const;
     ///@}
 
@@ -630,12 +630,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetGrace(data_GRACE grace_) { m_grace = grace_; };
-    data_GRACE GetGrace() const { return m_grace; };
+    void SetGrace(data_GRACE grace_) { m_grace = grace_; }
+    data_GRACE GetGrace() const { return m_grace; }
     bool HasGrace() const;
     //
-    void SetGraceTime(data_PERCENT graceTime_) { m_graceTime = graceTime_; };
-    data_PERCENT GetGraceTime() const { return m_graceTime; };
+    void SetGraceTime(data_PERCENT graceTime_) { m_graceTime = graceTime_; }
+    data_PERCENT GetGraceTime() const { return m_graceTime; }
     bool HasGraceTime() const;
     ///@}
 
@@ -675,12 +675,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(hairpinLog_FORM form_) { m_form = form_; };
-    hairpinLog_FORM GetForm() const { return m_form; };
+    void SetForm(hairpinLog_FORM form_) { m_form = form_; }
+    hairpinLog_FORM GetForm() const { return m_form; }
     bool HasForm() const;
     //
-    void SetNiente(data_BOOLEAN niente_) { m_niente = niente_; };
-    data_BOOLEAN GetNiente() const { return m_niente; };
+    void SetNiente(data_BOOLEAN niente_) { m_niente = niente_; }
+    data_BOOLEAN GetNiente() const { return m_niente; }
     bool HasNiente() const;
     ///@}
 
@@ -721,8 +721,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOpening(std::string opening_) { m_opening = opening_; };
-    std::string GetOpening() const { return m_opening; };
+    void SetOpening(std::string opening_) { m_opening = opening_; }
+    std::string GetOpening() const { return m_opening; }
     bool HasOpening() const;
     ///@}
 
@@ -760,32 +760,32 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetC(harpPedalLog_C c_) { m_c = c_; };
-    harpPedalLog_C GetC() const { return m_c; };
+    void SetC(harpPedalLog_C c_) { m_c = c_; }
+    harpPedalLog_C GetC() const { return m_c; }
     bool HasC() const;
     //
-    void SetD(harpPedalLog_D d_) { m_d = d_; };
-    harpPedalLog_D GetD() const { return m_d; };
+    void SetD(harpPedalLog_D d_) { m_d = d_; }
+    harpPedalLog_D GetD() const { return m_d; }
     bool HasD() const;
     //
-    void SetE(harpPedalLog_E e_) { m_e = e_; };
-    harpPedalLog_E GetE() const { return m_e; };
+    void SetE(harpPedalLog_E e_) { m_e = e_; }
+    harpPedalLog_E GetE() const { return m_e; }
     bool HasE() const;
     //
-    void SetF(harpPedalLog_F f_) { m_f = f_; };
-    harpPedalLog_F GetF() const { return m_f; };
+    void SetF(harpPedalLog_F f_) { m_f = f_; }
+    harpPedalLog_F GetF() const { return m_f; }
     bool HasF() const;
     //
-    void SetG(harpPedalLog_G g_) { m_g = g_; };
-    harpPedalLog_G GetG() const { return m_g; };
+    void SetG(harpPedalLog_G g_) { m_g = g_; }
+    harpPedalLog_G GetG() const { return m_g; }
     bool HasG() const;
     //
-    void SetA(harpPedalLog_A a_) { m_a = a_; };
-    harpPedalLog_A GetA() const { return m_a; };
+    void SetA(harpPedalLog_A a_) { m_a = a_; }
+    harpPedalLog_A GetA() const { return m_a; }
     bool HasA() const;
     //
-    void SetB(harpPedalLog_B b_) { m_b = b_; };
-    harpPedalLog_B GetB() const { return m_b; };
+    void SetB(harpPedalLog_B b_) { m_b = b_; }
+    harpPedalLog_B GetB() const { return m_b; }
     bool HasB() const;
     ///@}
 
@@ -832,8 +832,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetLv(data_BOOLEAN lv_) { m_lv = lv_; };
-    data_BOOLEAN GetLv() const { return m_lv; };
+    void SetLv(data_BOOLEAN lv_) { m_lv = lv_; }
+    data_BOOLEAN GetLv() const { return m_lv; }
     bool HasLv() const;
     ///@}
 
@@ -871,8 +871,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFunc(meterSigGrpLog_FUNC func_) { m_func = func_; };
-    meterSigGrpLog_FUNC GetFunc() const { return m_func; };
+    void SetFunc(meterSigGrpLog_FUNC func_) { m_func = func_; }
+    meterSigGrpLog_FUNC GetFunc() const { return m_func; }
     bool HasFunc() const;
     ///@}
 
@@ -907,8 +907,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBlock(data_BOOLEAN block_) { m_block = block_; };
-    data_BOOLEAN GetBlock() const { return m_block; };
+    void SetBlock(data_BOOLEAN block_) { m_block = block_; }
+    data_BOOLEAN GetBlock() const { return m_block; }
     bool HasBlock() const;
     ///@}
 
@@ -947,8 +947,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetGliss(data_GLISSANDO gliss_) { m_gliss = gliss_; };
-    data_GLISSANDO GetGliss() const { return m_gliss; };
+    void SetGliss(data_GLISSANDO gliss_) { m_gliss = gliss_; }
+    data_GLISSANDO GetGliss() const { return m_gliss; }
     bool HasGliss() const;
     ///@}
 
@@ -983,8 +983,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNum(int num_) { m_num = num_; };
-    int GetNum() const { return m_num; };
+    void SetNum(int num_) { m_num = num_; }
+    int GetNum() const { return m_num; }
     bool HasNum() const;
     ///@}
 
@@ -1022,12 +1022,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetNumPlace(data_PLACE numPlace_) { m_numPlace = numPlace_; };
-    data_PLACE GetNumPlace() const { return m_numPlace; };
+    void SetNumPlace(data_PLACE numPlace_) { m_numPlace = numPlace_; }
+    data_PLACE GetNumPlace() const { return m_numPlace; }
     bool HasNumPlace() const;
     //
-    void SetNumVisible(data_BOOLEAN numVisible_) { m_numVisible = numVisible_; };
-    data_BOOLEAN GetNumVisible() const { return m_numVisible; };
+    void SetNumVisible(data_BOOLEAN numVisible_) { m_numVisible = numVisible_; }
+    data_BOOLEAN GetNumVisible() const { return m_numVisible; }
     bool HasNumVisible() const;
     ///@}
 
@@ -1064,8 +1064,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetColl(octaveLog_COLL coll_) { m_coll = coll_; };
-    octaveLog_COLL GetColl() const { return m_coll; };
+    void SetColl(octaveLog_COLL coll_) { m_coll = coll_; }
+    octaveLog_COLL GetColl() const { return m_coll; }
     bool HasColl() const;
     ///@}
 
@@ -1106,8 +1106,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDir(pedalLog_DIR dir_) { m_dir = dir_; };
-    pedalLog_DIR GetDir() const { return m_dir; };
+    void SetDir(pedalLog_DIR dir_) { m_dir = dir_; }
+    pedalLog_DIR GetDir() const { return m_dir; }
     bool HasDir() const;
     ///@}
 
@@ -1142,8 +1142,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(pedalVis_FORM form_) { m_form = form_; };
-    pedalVis_FORM GetForm() const { return m_form; };
+    void SetForm(pedalVis_FORM form_) { m_form = form_; }
+    pedalVis_FORM GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 
@@ -1178,8 +1178,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPedalStyle(pianopedals_PEDALSTYLE pedalStyle_) { m_pedalStyle = pedalStyle_; };
-    pianopedals_PEDALSTYLE GetPedalStyle() const { return m_pedalStyle; };
+    void SetPedalStyle(pianopedals_PEDALSTYLE pedalStyle_) { m_pedalStyle = pedalStyle_; }
+    pianopedals_PEDALSTYLE GetPedalStyle() const { return m_pedalStyle; }
     bool HasPedalStyle() const;
     ///@}
 
@@ -1214,8 +1214,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRehEnclose(rehearsal_REHENCLOSE rehEnclose_) { m_rehEnclose = rehEnclose_; };
-    rehearsal_REHENCLOSE GetRehEnclose() const { return m_rehEnclose; };
+    void SetRehEnclose(rehearsal_REHENCLOSE rehEnclose_) { m_rehEnclose = rehEnclose_; }
+    rehearsal_REHENCLOSE GetRehEnclose() const { return m_rehEnclose; }
     bool HasRehEnclose() const;
     ///@}
 
@@ -1250,8 +1250,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetGridShow(data_BOOLEAN gridShow_) { m_gridShow = gridShow_; };
-    data_BOOLEAN GetGridShow() const { return m_gridShow; };
+    void SetGridShow(data_BOOLEAN gridShow_) { m_gridShow = gridShow_; }
+    data_BOOLEAN GetGridShow() const { return m_gridShow; }
     bool HasGridShow() const;
     ///@}
 
@@ -1286,12 +1286,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSlurLform(data_LINEFORM slurLform_) { m_slurLform = slurLform_; };
-    data_LINEFORM GetSlurLform() const { return m_slurLform; };
+    void SetSlurLform(data_LINEFORM slurLform_) { m_slurLform = slurLform_; }
+    data_LINEFORM GetSlurLform() const { return m_slurLform; }
     bool HasSlurLform() const;
     //
-    void SetSlurLwidth(std::string slurLwidth_) { m_slurLwidth = slurLwidth_; };
-    std::string GetSlurLwidth() const { return m_slurLwidth; };
+    void SetSlurLwidth(std::string slurLwidth_) { m_slurLwidth = slurLwidth_; }
+    std::string GetSlurLwidth() const { return m_slurLwidth; }
     bool HasSlurLwidth() const;
     ///@}
 
@@ -1328,8 +1328,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStemWith(data_OTHERSTAFF stemWith_) { m_stemWith = stemWith_; };
-    data_OTHERSTAFF GetStemWith() const { return m_stemWith; };
+    void SetStemWith(data_OTHERSTAFF stemWith_) { m_stemWith = stemWith_; }
+    data_OTHERSTAFF GetStemWith() const { return m_stemWith; }
     bool HasStemWith() const;
     ///@}
 
@@ -1368,12 +1368,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTieLform(data_LINEFORM tieLform_) { m_tieLform = tieLform_; };
-    data_LINEFORM GetTieLform() const { return m_tieLform; };
+    void SetTieLform(data_LINEFORM tieLform_) { m_tieLform = tieLform_; }
+    data_LINEFORM GetTieLform() const { return m_tieLform; }
     bool HasTieLform() const;
     //
-    void SetTieLwidth(std::string tieLwidth_) { m_tieLwidth = tieLwidth_; };
-    std::string GetTieLwidth() const { return m_tieLwidth; };
+    void SetTieLwidth(std::string tieLwidth_) { m_tieLwidth = tieLwidth_; }
+    std::string GetTieLwidth() const { return m_tieLwidth; }
     bool HasTieLwidth() const;
     ///@}
 
@@ -1410,8 +1410,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMeasperf(data_DURATION measperf_) { m_measperf = measperf_; };
-    data_DURATION GetMeasperf() const { return m_measperf; };
+    void SetMeasperf(data_DURATION measperf_) { m_measperf = measperf_; }
+    data_DURATION GetMeasperf() const { return m_measperf; }
     bool HasMeasperf() const;
     ///@}
 
@@ -1446,20 +1446,20 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetBracketPlace(data_PLACE bracketPlace_) { m_bracketPlace = bracketPlace_; };
-    data_PLACE GetBracketPlace() const { return m_bracketPlace; };
+    void SetBracketPlace(data_PLACE bracketPlace_) { m_bracketPlace = bracketPlace_; }
+    data_PLACE GetBracketPlace() const { return m_bracketPlace; }
     bool HasBracketPlace() const;
     //
-    void SetBracketVisible(data_BOOLEAN bracketVisible_) { m_bracketVisible = bracketVisible_; };
-    data_BOOLEAN GetBracketVisible() const { return m_bracketVisible; };
+    void SetBracketVisible(data_BOOLEAN bracketVisible_) { m_bracketVisible = bracketVisible_; }
+    data_BOOLEAN GetBracketVisible() const { return m_bracketVisible; }
     bool HasBracketVisible() const;
     //
-    void SetDurVisible(data_BOOLEAN durVisible_) { m_durVisible = durVisible_; };
-    data_BOOLEAN GetDurVisible() const { return m_durVisible; };
+    void SetDurVisible(data_BOOLEAN durVisible_) { m_durVisible = durVisible_; }
+    data_BOOLEAN GetDurVisible() const { return m_durVisible; }
     bool HasDurVisible() const;
     //
-    void SetNumFormat(tupletVis_NUMFORMAT numFormat_) { m_numFormat = numFormat_; };
-    tupletVis_NUMFORMAT GetNumFormat() const { return m_numFormat; };
+    void SetNumFormat(tupletVis_NUMFORMAT numFormat_) { m_numFormat = numFormat_; }
+    tupletVis_NUMFORMAT GetNumFormat() const { return m_numFormat; }
     bool HasNumFormat() const;
     ///@}
 

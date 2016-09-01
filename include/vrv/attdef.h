@@ -136,19 +136,14 @@ enum data_KEYSIGNATURE {
 };
 
 /**
+ * MEI data.MEASUREBEAT
+ */
+typedef std::pair<int, double> data_MEASUREBEAT;
+
+/**
  * MEI data.MIDIBPM
  */
 typedef int data_MIDIBPM;
-
-/**
- * MEI data.MIDIVALUE
- */
-typedef int data_MIDIVALUE;
-
-/**
- * MEI data.MIDIMSPB
- */
-typedef int data_MIDIMSPB;
 
 /**
  * MEI data.MIDICHANNEL
@@ -156,9 +151,14 @@ typedef int data_MIDIMSPB;
 typedef int data_MIDICHANNEL;
 
 /**
- * MEI data.MEASUREBEAT
+ * MEI data.MIDIMSPB
  */
-typedef std::pair<int, double> data_MEASUREBEAT;
+typedef int data_MIDIMSPB;
+
+/**
+ * MEI data.MIDIVALUE
+ */
+typedef int data_MIDIVALUE;
 
 /**
  * MEI data.MODUSMAIOR

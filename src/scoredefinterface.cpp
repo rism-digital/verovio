@@ -32,6 +32,7 @@ ScoreDefInterface::ScoreDefInterface()
     , AttMensuralShared()
     , AttMeterSigDefaultLog()
     , AttMeterSigDefaultVis()
+    , AttMiditempo()
     , AttMultinummeasures()
 {
     RegisterInterfaceAttClass(ATT_CLEFFINGLOG);
@@ -41,6 +42,7 @@ ScoreDefInterface::ScoreDefInterface()
     RegisterInterfaceAttClass(ATT_MENSURALSHARED);
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTLOG);
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTVIS);
+    RegisterInterfaceAttClass(ATT_MIDITEMPO);
     RegisterInterfaceAttClass(ATT_MULTINUMMEASURES);
 
     Reset();
@@ -59,6 +61,7 @@ void ScoreDefInterface::Reset()
     ResetMensuralShared();
     ResetMeterSigDefaultLog();
     ResetMeterSigDefaultVis();
+    ResetMiditempo();
     ResetMultinummeasures();
 }
 
