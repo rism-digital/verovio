@@ -806,6 +806,12 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         return;
     }
 
+    // C major (0) key sig and system scoreDef - cancellation (if any) is done at the end of the previous system
+    else if ((keySig->GetScoreDefRole() == SYSTEM_SCOREDEF) && (keySig->GetAlterationNumber() == 0)) {
+        keySig->SetEmptyBB();
+        return;
+    }
+
     dc->StartGraphic(element, "", element->GetUuid());
 
     x = element->GetDrawingX();
