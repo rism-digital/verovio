@@ -1608,7 +1608,7 @@ bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadMeiSb(parent, current);
         }
         // unmeasured music
-        else if (parentNode.child("staff")) {
+        else if (std::string(current.name()) == "sb") {
             if (!unmeasured) {
                 if (parent->Is() == SECTION) {
                     unmeasured = new Measure(false);
@@ -1621,7 +1621,7 @@ bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
             }
             success = ReadMeiStaff(unmeasured, current);
         }
-        else if (parentNode.child("measure")) {
+        if (std::string(current.name()) == "measure") {
             // we should not mix measured and unmeasured music within a system...
             assert(!unmeasured);
             // if (parent->IsEditorialElement()) {
@@ -1786,7 +1786,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
             ReadMeiScoreDef(parent, current);
         }
         // unmeasured music
-        else if (parentNode.child("staff")) {
+        else if (std::string(current.name()) == "staff") {
             if (!unmeasured) {
                 if (parent->Is() == SYSTEM) {
                     System *system = dynamic_cast<System *>(parent);
@@ -1801,7 +1801,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
             }
             success = ReadMeiStaff(unmeasured, current);
         }
-        else if (parentNode.child("measure")) {
+        else if (std::string(current.name()) == "measure") {
             // we should not mix measured and unmeasured music within a system...
             assert(!unmeasured);
             success = ReadMeiMeasure(parent, current);

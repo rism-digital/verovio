@@ -51,11 +51,11 @@ void Beam::AddChild(Object *child)
     else if (child->Is() == NOTE) {
         assert(dynamic_cast<Note *>(child));
     }
-    else if (child->Is() == TUPLET) {
-        assert(dynamic_cast<Tuplet *>(child));
-    }
     else if (child->Is() == REST) {
         assert(dynamic_cast<Rest *>(child));
+    }
+    else if (child->Is() == TUPLET) {
+        assert(dynamic_cast<Tuplet *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));
