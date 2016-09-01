@@ -115,6 +115,7 @@ add_executable (verovio
 	../libmei/atts_critapp.cpp
 	../libmei/atts_mei.cpp
 	../libmei/atts_mensural.cpp
+	../libmei/atts_midi.cpp
 	../libmei/atts_pagebased.cpp
 	../libmei/atts_shared.cpp
 	)

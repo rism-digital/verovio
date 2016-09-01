@@ -24,6 +24,52 @@
 
 /* #include_block */
 
+int StrToInt(const std::string& number) {
+	return stoi(number);
+}
+
+int StrToMidivalue(const std::string& number) {
+	return StrToInt(number);
+}
+
+vrv::data_MIDICHANNEL StrToMidichannel(const std::string& number) {
+	return (vrv::data_MIDICHANNEL)StrToInt(number);
+}
+
+std::string MidichannelToStr(vrv::data_MIDICHANNEL number) {
+	return std::to_string((int)number);
+}
+
+
+
+vrv::data_MIDIBPM StrToMidibpm(const std::string& number) {
+	return (vrv::data_MIDIBPM)StrToInt(number);
+}
+
+std::string MidibpmToStr(vrv::data_MIDIBPM number) {
+	return std::to_string((int)number);
+}
+
+vrv::data_MIDIBPM StrToMidimspb(const std::string& number) {
+	return (vrv::data_MIDIBPM)StrToInt(number);
+}
+
+std::string MidimspbToStr(vrv::data_MIDIBPM number) {
+	return std::to_string((int)number);
+}
+
+
+
+vrv::data_MIDIMSPB StrToMidimsbp(const std::string& number) {
+	return (vrv::data_MIDIMSPB)StrToInt(number);
+}
+
+std::string MidivalueToStr(vrv::data_MIDIVALUE data) {
+	return std::to_string((int)data);
+
+}
+
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -273,17 +319,17 @@ void AttMiditempo::ResetMiditempo()
     m_midiMspb = MIDIMSPB_NONE;
 }
 
+
+
 bool AttMiditempo::ReadMiditempo(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("midi.bpm")) {
         this->SetMidiBpm(StrToMidibpm(element.attribute("midi.bpm").value()));
-        element.remove_attribute("midi.bpm");
         hasAttribute = true;
     }
     if (element.attribute("midi.mspb")) {
         this->SetMidiMspb(StrToMidimspb(element.attribute("midi.mspb").value()));
-        element.remove_attribute("midi.mspb");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -505,7 +551,7 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
         AttChannelized *att = dynamic_cast<AttChannelized *>(element);
         assert(att);
         if (attrType == "midi.channel") {
-            att->SetMidiChannel(att->StrToMidichannel(attrValue));
+            att->SetMidiChannel(StrToMidichannel(attrValue));
             return true;
         }
         if (attrType == "midi.duty") {
@@ -513,7 +559,7 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
         if (attrType == "midi.port") {
-            att->SetMidiPort(att->StrToMidivalue(attrValue));
+            att->SetMidiPort(StrToMidivalue(attrValue));
             return true;
         }
         if (attrType == "midi.track") {
@@ -525,19 +571,19 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
         AttMidiinstrument *att = dynamic_cast<AttMidiinstrument *>(element);
         assert(att);
         if (attrType == "midi.instrnum") {
-            att->SetMidiInstrnum(att->StrToMidivalue(attrValue));
+            att->SetMidiInstrnum(StrToMidivalue(attrValue));
             return true;
         }
         if (attrType == "midi.instrname") {
-            att->SetMidiInstrname(att->StrToMidinames(attrValue));
+            att->SetMidiInstrname(StrToMidinames(attrValue));
             return true;
         }
         if (attrType == "midi.pan") {
-            att->SetMidiPan(att->StrToMidivalue(attrValue));
+            att->SetMidiPan(StrToMidivalue(attrValue));
             return true;
         }
         if (attrType == "midi.volume") {
-            att->SetMidiVolume(att->StrToMidivalue(attrValue));
+            att->SetMidiVolume(StrToMidivalue(attrValue));
             return true;
         }
     }
@@ -553,11 +599,11 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
         AttMiditempo *att = dynamic_cast<AttMiditempo *>(element);
         assert(att);
         if (attrType == "midi.bpm") {
-            att->SetMidiBpm(att->StrToMidibpm(attrValue));
+            att->SetMidiBpm(StrToMidibpm(attrValue));
             return true;
         }
         if (attrType == "midi.mspb") {
-            att->SetMidiMspb(att->StrToMidimspb(attrValue));
+            att->SetMidiMspb(StrToMidimspb(attrValue));
             return true;
         }
     }
@@ -565,7 +611,7 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
         AttMidivalue *att = dynamic_cast<AttMidivalue *>(element);
         assert(att);
         if (attrType == "val") {
-            att->SetVal(att->StrToMidivalue(attrValue));
+            att->SetVal(StrToMidivalue(attrValue));
             return true;
         }
     }
@@ -573,7 +619,7 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
         AttMidivalue2 *att = dynamic_cast<AttMidivalue2 *>(element);
         assert(att);
         if (attrType == "val2") {
-            att->SetVal2(att->StrToMidivalue(attrValue));
+            att->SetVal2(StrToMidivalue(attrValue));
             return true;
         }
     }
@@ -581,7 +627,7 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
         AttMidivelocity *att = dynamic_cast<AttMidivelocity *>(element);
         assert(att);
         if (attrType == "vel") {
-            att->SetVel(att->StrToMidivalue(attrValue));
+            att->SetVel(StrToMidivalue(attrValue));
             return true;
         }
     }
@@ -603,13 +649,13 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
         const AttChannelized *att = dynamic_cast<const AttChannelized *>(element);
         assert(att);
         if (att->HasMidiChannel()) {
-            attributes->push_back(std::make_pair("midi.channel", att->MidichannelToStr(att->GetMidiChannel())));
+            attributes->push_back(std::make_pair("midi.channel", MidichannelToStr(att->GetMidiChannel())));
         }
         if (att->HasMidiDuty()) {
             attributes->push_back(std::make_pair("midi.duty", att->PercentToStr(att->GetMidiDuty())));
         }
         if (att->HasMidiPort()) {
-            attributes->push_back(std::make_pair("midi.port", att->MidivalueToStr(att->GetMidiPort())));
+            attributes->push_back(std::make_pair("midi.port", MidivalueToStr(att->GetMidiPort())));
         }
         if (att->HasMidiTrack()) {
             attributes->push_back(std::make_pair("midi.track", att->IntToStr(att->GetMidiTrack())));
@@ -619,16 +665,16 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
         const AttMidiinstrument *att = dynamic_cast<const AttMidiinstrument *>(element);
         assert(att);
         if (att->HasMidiInstrnum()) {
-            attributes->push_back(std::make_pair("midi.instrnum", att->MidivalueToStr(att->GetMidiInstrnum())));
+            attributes->push_back(std::make_pair("midi.instrnum", MidivalueToStr(att->GetMidiInstrnum())));
         }
         if (att->HasMidiInstrname()) {
             attributes->push_back(std::make_pair("midi.instrname", att->MidinamesToStr(att->GetMidiInstrname())));
         }
         if (att->HasMidiPan()) {
-            attributes->push_back(std::make_pair("midi.pan", att->MidivalueToStr(att->GetMidiPan())));
+            attributes->push_back(std::make_pair("midi.pan", MidivalueToStr(att->GetMidiPan())));
         }
         if (att->HasMidiVolume()) {
-            attributes->push_back(std::make_pair("midi.volume", att->MidivalueToStr(att->GetMidiVolume())));
+            attributes->push_back(std::make_pair("midi.volume", MidivalueToStr(att->GetMidiVolume())));
         }
     }
     if (element->HasAttClass(ATT_MIDINUMBER)) {
@@ -642,31 +688,31 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
         const AttMiditempo *att = dynamic_cast<const AttMiditempo *>(element);
         assert(att);
         if (att->HasMidiBpm()) {
-            attributes->push_back(std::make_pair("midi.bpm", att->MidibpmToStr(att->GetMidiBpm())));
+            attributes->push_back(std::make_pair("midi.bpm", MidibpmToStr(att->GetMidiBpm())));
         }
         if (att->HasMidiMspb()) {
-            attributes->push_back(std::make_pair("midi.mspb", att->MidimspbToStr(att->GetMidiMspb())));
+            attributes->push_back(std::make_pair("midi.mspb", MidimspbToStr(att->GetMidiMspb())));
         }
     }
     if (element->HasAttClass(ATT_MIDIVALUE)) {
         const AttMidivalue *att = dynamic_cast<const AttMidivalue *>(element);
         assert(att);
         if (att->HasVal()) {
-            attributes->push_back(std::make_pair("val", att->MidivalueToStr(att->GetVal())));
+            attributes->push_back(std::make_pair("val", MidivalueToStr(att->GetVal())));
         }
     }
     if (element->HasAttClass(ATT_MIDIVALUE2)) {
         const AttMidivalue2 *att = dynamic_cast<const AttMidivalue2 *>(element);
         assert(att);
         if (att->HasVal2()) {
-            attributes->push_back(std::make_pair("val2", att->MidivalueToStr(att->GetVal2())));
+            attributes->push_back(std::make_pair("val2", MidivalueToStr(att->GetVal2())));
         }
     }
     if (element->HasAttClass(ATT_MIDIVELOCITY)) {
         const AttMidivelocity *att = dynamic_cast<const AttMidivelocity *>(element);
         assert(att);
         if (att->HasVel()) {
-            attributes->push_back(std::make_pair("vel", att->MidivalueToStr(att->GetVel())));
+            attributes->push_back(std::make_pair("vel", MidivalueToStr(att->GetVel())));
         }
     }
     if (element->HasAttClass(ATT_TIMEBASE)) {

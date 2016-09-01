@@ -97,6 +97,13 @@ void System::AddScoreDef(ScoreDef *scoreDef)
     Modify();
 }
 
+void System::AddApp(App *app)
+{
+    app->SetParent(this);
+    m_children.push_back(app);
+    Modify();
+}
+
 int System::GetVerticalSpacing() const
 {
     return 0; // arbitrary generic value

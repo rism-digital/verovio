@@ -35,6 +35,7 @@ class Beam;
 class Chord;
 class Layer;
 class Measure;
+class ScoreDef;
 class Note;
 class Hairpin;
 class Page;
@@ -247,6 +248,7 @@ protected:
     void storeOriginalClefApp(void);
     void addSpace(vector<string> &elements, vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object* object, hum::HTp token, int subtoken);
+	void addMidiTempo(vrv::ScoreDef& m_scoreDef, hum::HTp kernpart);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);

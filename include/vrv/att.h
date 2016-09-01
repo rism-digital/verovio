@@ -79,7 +79,7 @@ public:
     // static void GetLyrics(Object *element, ArrayOfStrAttr *attributes);
     static void GetMei(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMensural(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetMidi(Object *element, ArrayOfStrAttr *attributes);
+    static void GetMidi(const Object *element, ArrayOfStrAttr *attributes);
     static void GetPagebased(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetPerformance(Object *element, ArrayOfStrAttr *attributes);
     // static void GetNeumes(Object *element, ArrayOfStrAttr *attributes);
@@ -103,6 +103,8 @@ public:
     double StrToDbl(std::string value) const;
     int StrToInt(std::string value) const;
     ///@}
+
+    bool SetMidi(vrv::Object *element, std::string attrType, std::string attrValue);
 
     /** @name Converters for writing and reading */
     ///@{

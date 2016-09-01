@@ -21,7 +21,23 @@
 
 //----------------------------------------------------------------------------
 
+#define MIDIVALUE_NONE -1
+#define MIDICHANNEL_NONE -1
+#define MIDIMSPB_NONE -1
+#define MIDIBPM_NONE -1
+
 #include <string>
+
+int StrToInt(const std::string& number);
+int StrToMidivalue(const std::string& number);
+vrv::data_MIDICHANNEL StrToMidichannel(const std::string& number);
+vrv::data_MIDIMSPB StrToMidimsbp(const std::string& number);
+std::string MidivalueToStr(vrv::data_MIDIVALUE data);
+vrv::data_MIDIMSPB StrToMidimsbp(const std::string& number);
+vrv::data_MIDIBPM StrToMidibpm(const std::string& number);
+std::string MidibpmToStr(vrv::data_MIDIBPM number);
+vrv::data_MIDIBPM StrToMidimspb(const std::string& number);
+std::string MidimspbToStr(vrv::data_MIDIBPM number);
 
 namespace vrv {
 

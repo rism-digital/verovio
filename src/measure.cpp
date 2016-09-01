@@ -9,6 +9,8 @@
 
 //----------------------------------------------------------------------------
 
+#include <iostream>
+
 #include <assert.h>
 #include <math.h>
 
@@ -426,7 +428,10 @@ int Measure::CastOffSystems(FunctorParams *functorParams)
             params->m_currentSystem->AddEnding(dynamic_cast<Ending *>(*iter));
         else if ((*iter)->Is() == SCOREDEF)
             params->m_currentSystem->AddScoreDef(dynamic_cast<ScoreDef *>(*iter));
+        else if ((*iter)->Is() == APP)
+            params->m_currentSystem->AddApp(dynamic_cast<App *>(*iter));
         else {
+            std::cerr << "Error: Unknown element: " << (*iter)->Is() << std::endl;
             assert(false);
         }
     }

@@ -10,6 +10,7 @@
 
 #include "aligner.h"
 #include "drawinginterface.h"
+#include "editorial.h"
 #include "object.h"
 
 namespace vrv {
@@ -51,6 +52,7 @@ public:
     void AddEnding(Ending *ending);
     void AddMeasure(Measure *measure);
     void AddScoreDef(ScoreDef *scoreDef);
+    void AddApp(App *app);
     ///@}
 
     /**

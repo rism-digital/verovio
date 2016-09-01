@@ -816,6 +816,9 @@ void HumdrumInput::prepareStaffGroup(void)
         m_staffgroup->AddStaffDef(m_staffdef.back());
         fillPartInfo(kernstarts[i], i + 1);
     }
+	if (kernstarts.size() > 0) {
+		addMidiTempo(m_doc->m_scoreDef, kernstarts[0]);
+	}
     if (kernstarts.size() == 2) {
         m_staffgroup->SetSymbol(staffgroupingsym_SYMBOL_brace);
         m_staffgroup->SetBarthru(BOOLEAN_true);
@@ -824,6 +827,37 @@ void HumdrumInput::prepareStaffGroup(void)
         m_staffgroup->SetSymbol(staffgroupingsym_SYMBOL_bracket);
     }
 }
+
+
+//////////////////////////////
+//
+// HumdrumInput::addMidiTempo --
+//
+
+void HumdrumInput::addMidiTempo(ScoreDef& m_scoreDef, HTp kernpart) {
+	while (kernpart != NULL) {
+		if (kernpart->isData()) {
+			break;;
+		}
+		if (!kernpart->isInterpretation()) {
+			kernpart = kernpart->getNextToken();
+			continue;
+		}
+		if (kernpart->compare(0, 3, "*MM") == 0) {
+			if (kernpart->size() > 3) {
+				if (::isdigit((*kernpart)[3])) {
+                	int tempo = stoi(kernpart->substr(3));
+					// string tempostr = to_string(tempo);
+					m_scoreDef.SetMidiBpm(tempo);
+				}
+			}
+			break;
+		}
+		kernpart = kernpart->getNextToken();
+	}
+}
+
+
 
 //////////////////////////////
 //
