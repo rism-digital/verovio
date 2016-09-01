@@ -814,7 +814,8 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by
     // default)
-    if ((keySig->GetAlterationNumber() == 0) || (layer->DrawCautionKeySigCancel() && keySig->m_drawingShowchange)) {
+    if ((keySig->GetScoreDefRole() != SYSTEM_SCOREDEF)
+        && ((keySig->GetAlterationNumber() == 0) || keySig->m_drawingShowchange)) {
         // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
         if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
             for (i = 0; i < keySig->m_drawingCancelAccidCount; i++) {
