@@ -221,29 +221,17 @@ void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
     // Remove any previous value in the Layer
     this->ResetStaffDefObjects();
 
-    // Special case with C-major / A-minor key signature (0) : if key cancellation is false, we are at the beginning
-    // of a new system, and hence we should not draw it. Maybe this can be improved?
-    bool drawKeySig = currentStaffDef->DrawKeySig();
-    if (currentStaffDef->GetCurrentKeySig() && (currentStaffDef->GetCurrentKeySig()->GetAlterationNumber() == 0)) {
-        if (currentStaffDef->DrawKeySigCancellation() == false) {
-            drawKeySig = false;
-        }
-    }
-
     if (currentStaffDef->DrawClef()) this->m_staffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
-    // special case - see above
-    if (drawKeySig) this->m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+    if (currentStaffDef->DrawKeySig()) this->m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
     if (currentStaffDef->DrawMensur()) this->m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
     if (currentStaffDef->DrawMeterSig())
         this->m_staffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
-    this->SetDrawKeySigCancellation(currentStaffDef->DrawKeySigCancellation());
 
     // Don't draw on the next one
     currentStaffDef->SetDrawClef(false);
     currentStaffDef->SetDrawKeySig(false);
     currentStaffDef->SetDrawMensur(false);
     currentStaffDef->SetDrawMeterSig(false);
-    currentStaffDef->SetDrawKeySigCancellation(false);
 }
 
 void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
@@ -253,31 +241,18 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
         return;
     }
 
-    // Special case with C-major / A-minor key signature (0) : if key cancellation is false, we are at the beginning
-    // of a new system, and hence we should not draw it. Maybe this can be improved?
-    /*
-    bool drawKeySig = currentStaffDef->DrawKeySig();
-    if (currentStaffDef->GetCurrentKeySig() && (currentStaffDef->GetCurrentKeySig()->GetAlterationNumber() == 0)) {
-        if (currentStaffDef->DrawKeySigCancellation() == false) {
-            drawKeySig = false;
-        }
-    }
-    */
-
     if (currentStaffDef->DrawClef()) this->m_cautionStaffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
     // special case - see above
     if (currentStaffDef->DrawKeySig()) this->m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
     if (currentStaffDef->DrawMensur()) this->m_cautionStaffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
     if (currentStaffDef->DrawMeterSig())
         this->m_cautionStaffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
-    this->SetDrawCautionKeySigCancel(currentStaffDef->DrawKeySigCancellation());
 
     // Don't draw on the next one
     currentStaffDef->SetDrawClef(false);
     currentStaffDef->SetDrawKeySig(false);
     currentStaffDef->SetDrawMensur(false);
     currentStaffDef->SetDrawMeterSig(false);
-    currentStaffDef->SetDrawKeySigCancellation(false);
 }
 
 //----------------------------------------------------------------------------

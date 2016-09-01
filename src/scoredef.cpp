@@ -257,8 +257,7 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     if (mensur) delete mensur;
     if (meterSig) delete meterSig;
 
-    // The keySig cancellation flag is the same as keySig because we draw cancellation with new key sig
-    this->SetRedrawFlags(drawClef, drawKeySig, drawMensur, drawMeterSig, drawKeySig, false);
+    this->SetRedrawFlags(drawClef, drawKeySig, drawMensur, drawMeterSig, false);
 }
 
 void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
@@ -278,7 +277,6 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
         }
         if (newStaffDef->HasKeySigInfo()) {
             staffDef->SetDrawKeySig(true);
-            staffDef->SetDrawKeySigCancellation(true);
             KeySig *keySig = newStaffDef->GetKeySigCopy();
             staffDef->SetCurrentKeySig(keySig);
             delete keySig;
@@ -340,7 +338,7 @@ StaffDef *ScoreDef::GetStaffDef(int n)
 }
 
 void ScoreDef::SetRedrawFlags(
-    bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation, bool applyToAll)
+    bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll)
 {
     m_setAsDrawing = true;
 
@@ -349,7 +347,6 @@ void ScoreDef::SetRedrawFlags(
     setStaffDefRedrawFlagsParams.m_keySig = keySig;
     setStaffDefRedrawFlagsParams.m_mensur = mensur;
     setStaffDefRedrawFlagsParams.m_meterSig = meterSig;
-    setStaffDefRedrawFlagsParams.m_keySigCancellation = keySigCancellation;
     setStaffDefRedrawFlagsParams.m_applyToAll = applyToAll;
     Functor setStaffDefDraw(&Object::SetStaffDefRedrawFlags);
     this->Process(&setStaffDefDraw, &setStaffDefRedrawFlagsParams);
@@ -564,9 +561,6 @@ int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
     }
     if (params->m_meterSig || params->m_applyToAll) {
         this->SetDrawMeterSig(params->m_meterSig);
-    }
-    if (params->m_keySigCancellation || params->m_applyToAll) {
-        this->SetDrawKeySigCancellation(params->m_keySigCancellation);
     }
 
     return FUNCTOR_CONTINUE;

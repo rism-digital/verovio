@@ -980,18 +980,12 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new page
     if (this->Is() == PAGE) {
-        // The keySig cancellation is set to false, which means that a scoreDef change has to occur
-        // after a page break if right at the begining. This is the same for systems below
         Page *page = dynamic_cast<Page *>(this);
         assert(page);
         if (page->m_parent->GetChildIndex(page) == 0) {
-            params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false, false);
+            params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false);
             params->m_upcomingScoreDef->SetDrawLabels(true);
         }
-        // else {
-        //    params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
-        //    params->m_upcomingScoreDef->SetDrawLabels(false);
-        //}
         page->m_drawingScoreDef = *params->m_upcomingScoreDef;
         return FUNCTOR_CONTINUE;
     }
@@ -1021,7 +1015,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
                 params->m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
             }
             // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
-            params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
+            params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false);
             // Set it to the current system (used e.g. for endings)
             params->m_currentSystem->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentSystem = NULL;
@@ -1029,7 +1023,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         if (params->m_upcomingScoreDef->m_setAsDrawing) {
             measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
-            params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, false, true);
+            params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, true);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
         params->m_previousMeasure = measure;

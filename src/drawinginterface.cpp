@@ -74,7 +74,6 @@ void StaffDefDrawingInterface::Reset()
 
     m_drawClef = false;
     m_drawKeySig = false;
-    m_drawKeySigCancellation = false;
     m_drawMensur = false;
     m_drawMeterSig = false;
 }

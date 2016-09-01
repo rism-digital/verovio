@@ -99,11 +99,12 @@ public:
     ///@{
     bool DrawClef() const { return (m_drawClef && m_currentClef.HasShape()); }
     void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
-    bool DrawKeySig() const { return (m_drawKeySig && (m_currentKeySig.GetAlterationType() != ACCIDENTAL_EXPLICIT_NONE)); }
+    bool DrawKeySig() const
+    {
+        return (m_drawKeySig && (m_currentKeySig.GetAlterationType() != ACCIDENTAL_EXPLICIT_NONE));
+    }
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
-    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; }
-    void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; }
-    bool DrawMensur() const {return (m_drawMensur && m_currentMensur.HasSign()); }
+    bool DrawMensur() const { return (m_drawMensur && m_currentMensur.HasSign()); }
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
     bool DrawMeterSig() const { return (m_drawMeterSig && m_currentMeterSig.HasUnit()); }
     void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; }
@@ -146,7 +147,6 @@ private:
     ///@{
     bool m_drawClef;
     bool m_drawKeySig;
-    bool m_drawKeySigCancellation;
     bool m_drawMensur;
     bool m_drawMeterSig;
     ///@}
@@ -189,7 +189,7 @@ protected:
      * If this is a note, store here the stem coordinates (useful for ex. tuplets)
      */
     Point m_drawingStemStart; // beginning point, the one near the note
-    Point m_drawingStemEnd; // end point (!), near beam or flag 
+    Point m_drawingStemEnd; // end point (!), near beam or flag
     /**
      * Stem direction as drawn
      */

@@ -1018,8 +1018,7 @@ public:
  * member 1: bool keysig flag
  * member 2: bool mensur flag
  * member 3: bool meterSig flag
- * member 4: bool keySig cancellation flag
- * member 5: bool the flag for indicating if apply to all or not
+ * member 4: bool the flag for indicating if apply to all or not
 **/
 
 class SetStaffDefRedrawFlagsParams : public FunctorParams {
@@ -1030,14 +1029,12 @@ public:
         m_keySig = false;
         m_mensur = false;
         m_meterSig = false;
-        m_keySigCancellation = false;
         m_applyToAll = false;
     }
     bool m_clef;
     bool m_keySig;
     bool m_mensur;
     bool m_meterSig;
-    bool m_keySigCancellation;
     bool m_applyToAll;
 };
 

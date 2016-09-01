@@ -144,7 +144,7 @@ public:
      * This is necessary at the beginning or when a scoreDef occurs.
      * Only true flags are applied, unless applyToAll is set to true.
      */
-    void SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation, bool applyToAll);
+    void SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll);
 
     /**
      * @name Set and get the scoreDef drawing flags for clef, keysig and mensur.
