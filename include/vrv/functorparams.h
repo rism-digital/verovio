@@ -124,6 +124,7 @@ public:
  * member 2: the current Mensur
  * member 3: the current MeterSig
  * member 4: the functor for passing it to the TimeStampAligner
+ * member 5: a flag indicating whereas we are processing the caution scoreDef
 **/
 
 class AlignHorizontallyParams : public FunctorParams {
@@ -135,12 +136,14 @@ public:
         m_currentMensur = NULL;
         m_currentMeterSig = NULL;
         m_functor = functor;
+        m_cautionScoreDef = false;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
     Mensur *m_currentMensur;
     MeterSig *m_currentMeterSig;
     Functor *m_functor;
+    bool m_cautionScoreDef;
 };
 
 //----------------------------------------------------------------------------
@@ -897,6 +900,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// SetCautionaryScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current scoreDef
+ * member 1: the current staffDef
+ **/
+
+class SetCautionaryScoreDefParams : public FunctorParams {
+public:
+    SetCautionaryScoreDefParams(ScoreDef *currentScoreDef)
+    {
+        m_currentScoreDef = currentScoreDef;
+        m_currentStaffDef = NULL;
+    }
+    ScoreDef *m_currentScoreDef;
+    StaffDef *m_currentStaffDef;
+};
+
+//----------------------------------------------------------------------------
 // SetCurrentScoreDefParams
 //----------------------------------------------------------------------------
 
@@ -904,6 +927,8 @@ public:
  * member 0: the current scoreDef
  * member 1: the current staffDef
  * member 2: the upcoming scoreDef
+ * member 3: the previous measure (for setting cautionary scoreDef)
+ * member 4: the current system (for setting the system scoreDef)
 **/
 
 class SetCurrentScoreDefParams : public FunctorParams {
@@ -913,10 +938,14 @@ public:
         m_currentScoreDef = NULL;
         m_currentStaffDef = NULL;
         m_upcomingScoreDef = upcomingScoreDef;
+        m_previousMeasure = NULL;
+        m_currentSystem = NULL;
     }
     ScoreDef *m_currentScoreDef;
     StaffDef *m_currentStaffDef;
     ScoreDef *m_upcomingScoreDef;
+    Measure *m_previousMeasure;
+    System *m_currentSystem;
 };
 
 //----------------------------------------------------------------------------

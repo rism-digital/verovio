@@ -131,9 +131,9 @@ public:
     std::vector<Object *> m_timeSpanningElements;
 
     /**
- * The Y absolute position of the staff for facsimile (transcription) encodings.
- * This is the top left corner of the staff (the X position is the position of the system).
- */
+     * The Y absolute position of the staff for facsimile (transcription) encodings.
+     * This is the top left corner of the staff (the X position is the position of the system).
+     */
     int m_yAbs;
 
     StaffDef *m_drawingStaffDef;

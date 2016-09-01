@@ -602,6 +602,11 @@ public:
      */
     virtual int SetOverflowBBoxes(FunctorParams *functorParams);
 
+    /**
+     * Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
+     */
+    virtual int SetOverflowBBoxesEnd(FunctorParams *functorParams);
+
     ///@}
 
     /**
@@ -617,10 +622,17 @@ public:
     virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Set the initial scoreDef of each page.
-     * This is necessary for integrating changes that occur within a page.
+     * Set the current scoreDef wherever need.
+     * This is include a scoreDef for each system.
+     * It also includes a scoreDef for each measure where a change occured before.
+     * A change can be either a scoreDef before or a clef, meterSig, etc. within the previous measure.
      */
     virtual int SetCurrentScoreDef(FunctorParams *functorParams);
+
+    /**
+     * Set the cautionnary scoreDef wherever need.
+     */
+    virtual int SetCautionaryScoreDef(FunctorParams *functorParams);
 
     /**
      * Unset the initial scoreDef of each system and measure

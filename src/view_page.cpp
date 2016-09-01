@@ -926,6 +926,20 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     }
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
+    
+    // draw the scoreDef if required
+    if (layer->GetCautionStaffDefClef()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefClef(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefKeySig()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefKeySig(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefMensur()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefMensur(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefMeterSig()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefMeterSig(), layer, staff, measure);
+    }
 
     // first draw the postponed tuplets
     DrawLayerList(dc, layer, staff, measure, TUPLET);

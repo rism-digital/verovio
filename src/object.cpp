@@ -535,12 +535,14 @@ void Object::ResetUuid()
     GenerateUuid();
 }
 
-void Object::SeedUuid(unsigned int seed) {
+void Object::SeedUuid(unsigned int seed)
+{
     // Init random number generator for uuids
     if (seed == 0) {
-       std::srand((unsigned int)std::time(0));
-    } else {
-       std::srand(seed);
+        std::srand((unsigned int)std::time(0));
+    }
+    else {
+        std::srand(seed);
     }
 }
 
@@ -943,6 +945,32 @@ int Object::FindAllByAttComparison(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
+{
+    SetCautionaryScoreDefParams *params = dynamic_cast<SetCautionaryScoreDefParams *>(functorParams);
+    assert(params);
+
+    assert(params->m_currentScoreDef);
+
+    // starting a new staff
+    if (this->Is() == STAFF) {
+        Staff *staff = dynamic_cast<Staff *>(this);
+        assert(staff);
+        params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
+        return FUNCTOR_CONTINUE;
+    }
+
+    // starting a new layer
+    if (this->Is() == LAYER) {
+        Layer *layer = dynamic_cast<Layer *>(this);
+        assert(layer);
+        layer->SetDrawingCautionValues(params->m_currentStaffDef);
+        return FUNCTOR_SIBLINGS;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 {
     SetCurrentScoreDefParams *params = dynamic_cast<SetCurrentScoreDefParams *>(functorParams);
@@ -960,36 +988,51 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
             params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false, false);
             params->m_upcomingScoreDef->SetDrawLabels(true);
         }
-        else {
-            params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
-            params->m_upcomingScoreDef->SetDrawLabels(false);
-        }
+        // else {
+        //    params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
+        //    params->m_upcomingScoreDef->SetDrawLabels(false);
+        //}
         page->m_drawingScoreDef = *params->m_upcomingScoreDef;
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new system
     if (this->Is() == SYSTEM) {
-        // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
-        params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
         System *system = dynamic_cast<System *>(this);
         assert(system);
-        // For now we don't use it - eventually we want to set it by taking into account succeeding
-        // scoreDefs appearing before the first measure of the system
-        system->SetDrawingScoreDef(params->m_upcomingScoreDef);
+        // This is the only thing we do for now - we need to wait until we reach the first measure
+        params->m_currentSystem = system;
         return FUNCTOR_CONTINUE;
     }
 
-    // starting a new system
+    // starting a new measure
     if (this->Is() == MEASURE) {
+        Measure *measure = dynamic_cast<Measure *>(this);
+        assert(measure);
+        // This is the first measure of the system - more to do...
+        if (params->m_currentSystem) {
+            // We had a scoreDef so we need to put cautionnary values
+            // This will also happend with clef in the last measure - however, the cautionnary functor will not do
+            // anything then
+            if (params->m_upcomingScoreDef->m_setAsDrawing && params->m_previousMeasure) {
+                ScoreDef cautionaryScoreDef = *params->m_upcomingScoreDef;
+                SetCautionaryScoreDefParams setCautionaryScoreDefParams(&cautionaryScoreDef);
+                Functor setCautionaryScoreDef(&Object::SetCautionaryScoreDef);
+                params->m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
+            }
+            // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
+            params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
+            // Set it to the current system (used e.g. for endings)
+            params->m_currentSystem->SetDrawingScoreDef(params->m_upcomingScoreDef);
+            params->m_currentSystem = NULL;
+        }
         if (params->m_upcomingScoreDef->m_setAsDrawing) {
-            Measure *measure = dynamic_cast<Measure *>(this);
-            assert(measure);
             measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
             params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, false, true);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
+        params->m_previousMeasure = measure;
         return FUNCTOR_CONTINUE;
     }
 
@@ -1035,7 +1078,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
                 layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        layer->SetDrawingAndCurrentValues(params->m_currentStaffDef);
+        layer->SetDrawingStaffDefValues(params->m_currentStaffDef);
         return FUNCTOR_CONTINUE;
     }
 
@@ -1329,6 +1372,32 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     // do not go further down the tree in this case since the bounding box of the first element is already taken
     // into
     // account?
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
+{
+    SetOverflowBBoxesParams *params = dynamic_cast<SetOverflowBBoxesParams *>(functorParams);
+    assert(params);
+
+    // starting new layer
+    if (this->Is() == LAYER) {
+        Layer *currentLayer = dynamic_cast<Layer *>(this);
+        assert(currentLayer);
+        // set scoreDef attr
+        if (currentLayer->GetCautionStaffDefClef()) {
+            currentLayer->GetCautionStaffDefClef()->SetOverflowBBoxes(params);
+        }
+        if (currentLayer->GetCautionStaffDefKeySig()) {
+            currentLayer->GetCautionStaffDefKeySig()->SetOverflowBBoxes(params);
+        }
+        if (currentLayer->GetCautionStaffDefMensur()) {
+            currentLayer->GetCautionStaffDefMensur()->SetOverflowBBoxes(params);
+        }
+        if (currentLayer->GetCautionStaffDefMeterSig()) {
+            currentLayer->GetCautionStaffDefMeterSig()->SetOverflowBBoxes(params);
+        }
+    }
     return FUNCTOR_CONTINUE;
 }
 

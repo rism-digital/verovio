@@ -88,12 +88,12 @@ public:
     Mensur *GetCurrentMensur() const;
     MeterSig *GetCurrentMeterSig() const;
 
-    void ResetStaffDefOjects();
+    void ResetStaffDefObjects();
 
     /**
      * Set drawing clef, keysig and mensur if necessary and if available.
      */
-    void SetDrawingAndCurrentValues(StaffDef *currentStaffDef);
+    void SetDrawingStaffDefValues(StaffDef *currentStaffDef);
 
     bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; }
     void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; }
@@ -101,6 +101,18 @@ public:
     KeySig *GetStaffDefKeySig() { return m_staffDefKeySig; }
     Mensur *GetStaffDefMensur() { return m_staffDefMensur; }
     MeterSig *GetStaffDefMeterSig() { return m_staffDefMeterSig; }
+
+    /**
+     * Set drawing clef, keysig and mensur if necessary and if available.
+     */
+    void SetDrawingCautionValues(StaffDef *currentStaffDef);
+
+    bool DrawCautionKeySigCancel() const { return m_drawCautionKeySigCancel; }
+    void SetDrawCautionKeySigCancel(bool drawCautionKeySig) { m_drawCautionKeySigCancel = drawCautionKeySig; }
+    Clef *GetCautionStaffDefClef() { return m_cautionStaffDefClef; }
+    KeySig *GetCautionStaffDefKeySig() { return m_cautionStaffDefKeySig; }
+    Mensur *GetCautionStaffDefMensur() { return m_cautionStaffDefMensur; }
+    MeterSig *GetCautionStaffDefMeterSig() { return m_cautionStaffDefMeterSig; }
 
     //----------//
     // Functors //
@@ -157,6 +169,13 @@ private:
     Mensur *m_staffDefMensur;
     MeterSig *m_staffDefMeterSig;
     bool m_drawKeySigCancellation;
+
+    /** */
+    Clef *m_cautionStaffDefClef;
+    KeySig *m_cautionStaffDefKeySig;
+    Mensur *m_cautionStaffDefMensur;
+    MeterSig *m_cautionStaffDefMeterSig;
+    bool m_drawCautionKeySigCancel;
 };
 
 } // namespace vrv

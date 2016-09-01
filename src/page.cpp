@@ -196,7 +196,8 @@ void Page::LayOutVertically()
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     SetOverflowBBoxesParams setOverflowBBoxesParams(doc);
     Functor setOverflowBBoxes(&Object::SetOverflowBBoxes);
-    this->Process(&setOverflowBBoxes, &setOverflowBBoxesParams);
+    Functor setOverflowBBoxesEnd(&Object::SetOverflowBBoxesEnd);
+    this->Process(&setOverflowBBoxes, &setOverflowBBoxesParams, &setOverflowBBoxesEnd);
 
     // Adjust the positioners of floationg elements (slurs, hairpin, dynam, etc)
     Functor adjustFloatingPostioners(&Object::AdjustFloatingPostioners);

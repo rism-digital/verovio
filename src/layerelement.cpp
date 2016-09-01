@@ -306,7 +306,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (this->Is() == CLEF) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_SCOREDEF_CLEF;
+            type = params->m_cautionScoreDef ? ALIGNMENT_SCOREDEF_CAUTION_CLEF : ALIGNMENT_SCOREDEF_CLEF;
         }
         else {
             type = ALIGNMENT_CLEF;
@@ -314,7 +314,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (this->Is() == KEYSIG) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_SCOREDEF_KEYSIG;
+            type = params->m_cautionScoreDef ? ALIGNMENT_SCOREDEF_CAUTION_KEYSIG : ALIGNMENT_SCOREDEF_KEYSIG;
         }
         else {
             // type = ALIGNMENT_KEYSIG;
@@ -325,7 +325,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (this->Is() == MENSUR) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_SCOREDEF_MENSUR;
+            type = params->m_cautionScoreDef ? ALIGNMENT_SCOREDEF_CAUTION_MENSUR : ALIGNMENT_SCOREDEF_MENSUR;
         }
         else {
             // replace the current mensur
@@ -336,7 +336,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (this->Is() == METERSIG) {
         if (this->GetScoreOrStaffDefAttr()) {
-            type = ALIGNMENT_SCOREDEF_METERSIG;
+            type = params->m_cautionScoreDef ? ALIGNMENT_SCOREDEF_CAUTION_METERSIG : ALIGNMENT_SCOREDEF_METERSIG;
         }
         else {
             // replace the current meter signature

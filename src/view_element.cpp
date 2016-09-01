@@ -154,7 +154,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
 //----------------------------------------------------------------------------
 // View - LayerElement
 //----------------------------------------------------------------------------
-    
+
 void View::DrawAccid(
     DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid)
 {
@@ -176,13 +176,15 @@ void View::DrawAccid(
     dc->StartGraphic(element, "", element->GetUuid());
 
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
-                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
-                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     // Mensural accidentals may be quite a bit smaller than CMN accidentals; use _pseudoStaffSize_ to force this.
     int pseudoStaffSize;
-    if (isMensural) pseudoStaffSize = (int)(TEMP_MACCID_SIZE_FACTOR * staff->m_drawingStaffSize);
-    else pseudoStaffSize = staff->m_drawingStaffSize;
+    if (isMensural)
+        pseudoStaffSize = (int)(TEMP_MACCID_SIZE_FACTOR * staff->m_drawingStaffSize);
+    else
+        pseudoStaffSize = staff->m_drawingStaffSize;
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if (accid->m_parent) {
@@ -808,12 +810,11 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     x = element->GetDrawingX();
     // HARDCODED
-    int step
-        = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_KEYSIG_STEP;
+    int step = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_KEYSIG_STEP;
 
     // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by
     // default)
-    if ((keySig->GetAlterationNumber() == 0) || (layer->DrawKeySigCancellation() && keySig->m_drawingShowchange)) {
+    if ((keySig->GetAlterationNumber() == 0) || (layer->DrawCautionKeySigCancel() && keySig->m_drawingShowchange)) {
         // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
         if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
             for (i = 0; i < keySig->m_drawingCancelAccidCount; i++) {
@@ -1453,23 +1454,22 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     dc->ResetPen();
     dc->ResetBrush();
 }
-    
+
 bool IsMensuralStaff(Staff *staff);
 bool IsMensuralStaff(Staff *staff)
 {
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
-                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
-                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     return isMensural;
 }
-    
+
 void View::DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
 {
     int i;
     int useStaffSize = staff->m_drawingStaffSize;
-    if (IsMensuralStaff(staff))
-        useStaffSize *= TEMP_MAUGDOT_SIZE_FACTOR;
-    
+    if (IsMensuralStaff(staff)) useStaffSize *= TEMP_MAUGDOT_SIZE_FACTOR;
+
     if (IsOnStaffLine(y, staff)) {
         y += m_doc->GetDrawingUnit(useStaffSize);
     }
