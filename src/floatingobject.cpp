@@ -18,6 +18,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "hairpin.h"
+#include "harm.h"
 #include "octave.h"
 #include "pedal.h"
 #include "slur.h"
@@ -123,6 +124,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         assert(hairpin);
         // haripin below by default;
         m_place = hairpin->HasPlace() ? hairpin->GetPlace() : STAFFREL_below;
+    }
+    else if (object->Is() == HARM) {
+        Harm *harm = dynamic_cast<Harm *>(object);
+        assert(harm);
+        // harm above by default
+        m_place = harm->HasPlace() ? harm->GetPlace() : STAFFREL_above;
     }
     else if (object->Is() == OCTAVE) {
         Octave *octave = dynamic_cast<Octave *>(object);

@@ -26,6 +26,7 @@ class Dynam;
 class EditorialElement;
 class Ending;
 class Hairpin;
+class Harm;
 class Layer;
 class LayerElement;
 class Measure;
@@ -310,6 +311,7 @@ protected:
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
     void DrawHairpin(
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system);
     void DrawOctave(
         DeviceContext *dc, Octave *octave, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);

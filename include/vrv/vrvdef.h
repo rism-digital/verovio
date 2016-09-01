@@ -100,6 +100,7 @@ enum ClassId {
     DIR,
     DYNAM,
     HAIRPIN,
+    HARM,
     OCTAVE,
     PEDAL,
     SLUR,

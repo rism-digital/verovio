@@ -574,7 +574,7 @@ int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
         // now). Eventually, we could consider them, for example if we want to display their spanning or for
         // improved
         // midi output
-        if ((iter->second == DIR) || (iter->second == DYNAM)) {
+        if ((iter->second == DIR) || (iter->second == DYNAM) || (iter->second == HARM)) {
             iter = params->m_timeSpanningInterfaces.erase(iter);
         }
         else {

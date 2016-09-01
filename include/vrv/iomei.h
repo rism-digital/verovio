@@ -48,6 +48,7 @@ class Expan;
 class FloatingElement;
 class FTrem;
 class Hairpin;
+class Harm;
 class Layer;
 class LayerElement;
 class Lem;
@@ -208,6 +209,7 @@ private:
     void WriteMeiDir(pugi::xml_node currentNode, Dir *dir);
     void WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
+    void WriteMeiHarm(pugi::xml_node currentNode, Harm *harm);
     void WriteMeiOctave(pugi::xml_node currentNode, Octave *octave);
     void WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal);
     void WriteMeiSlur(pugi::xml_node currentNode, Slur *slur);
@@ -424,6 +426,7 @@ private:
     bool ReadMeiDir(Object *parent, pugi::xml_node dir);
     bool ReadMeiDynam(Object *parent, pugi::xml_node dynam);
     bool ReadMeiHairpin(Object *parent, pugi::xml_node hairpin);
+    bool ReadMeiHarm(Object *parent, pugi::xml_node harm);
     bool ReadMeiOctave(Object *parent, pugi::xml_node octave);
     bool ReadMeiPedal(Object *parent, pugi::xml_node pedal);
     bool ReadMeiSlur(Object *parent, pugi::xml_node slur);

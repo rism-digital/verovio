@@ -29,6 +29,7 @@
 #include "ending.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "harm.h"
 #include "keysig.h"
 #include "layer.h"
 #include "ligature.h"
@@ -236,6 +237,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == HAIRPIN) {
         m_currentNode = m_currentNode.append_child("hairpin");
         WriteMeiHairpin(m_currentNode, dynamic_cast<Hairpin *>(object));
+    }
+    else if (object->Is() == HARM) {
+        m_currentNode = m_currentNode.append_child("harm");
+        WriteMeiHarm(m_currentNode, dynamic_cast<Harm *>(object));
     }
     else if (object->Is() == OCTAVE) {
         m_currentNode = m_currentNode.append_child("octave");
@@ -706,6 +711,15 @@ void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
     WriteTimeSpanningInterface(currentNode, hairpin);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
+};
+
+void MeiOutput::WriteMeiHarm(pugi::xml_node currentNode, Harm *harm)
+{
+    assert(harm);
+
+    WriteXmlId(currentNode, harm);
+    WriteTextDirInterface(currentNode, harm);
+    WriteTimeSpanningInterface(currentNode, harm);
 };
 
 void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
@@ -1977,6 +1991,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "hairpin") {
             success = ReadMeiHairpin(parent, current);
         }
+        else if (std::string(current.name()) == "harm") {
+            success = ReadMeiHarm(parent, current);
+        }
         else if (std::string(current.name()) == "octave") {
             success = ReadMeiOctave(parent, current);
         }
@@ -2053,6 +2070,18 @@ bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
 
     parent->AddChild(vrvHairpin);
     return true;
+}
+
+bool MeiInput::ReadMeiHarm(Object *parent, pugi::xml_node harm)
+{
+    Harm *vrvHarm = new Harm();
+    SetMeiUuid(harm, vrvHarm);
+
+    ReadTextDirInterface(harm, vrvHarm);
+    ReadTimeSpanningInterface(harm, vrvHarm);
+
+    parent->AddChild(vrvHarm);
+    return ReadMeiTextChildren(vrvHarm, harm);
 }
 
 bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node octave)

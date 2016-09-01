@@ -325,6 +325,8 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = HARM;
+    m_systemAligner.Process(params->m_functor, params);
     params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
 

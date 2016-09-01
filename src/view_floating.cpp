@@ -26,6 +26,7 @@
 #include "ending.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "harm.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "measure.h"
@@ -57,8 +58,9 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(measure);
     assert(element);
 
-    // For dir and dynam, we do not consider the @tstamp2 for rendering
-    if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DIR) && (element->Is() != DYNAM)) {
+    // For dir, dynam, and harm, we do not consider the @tstamp2 for rendering
+    if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DIR) && (element->Is() != DYNAM)
+        && (element->Is() != HARM)) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -73,6 +75,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Dynam *dynam = dynamic_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
+    }
+    else if (element->Is() == HARM) {
+        Harm *harm = dynamic_cast<Harm *>(element);
+        assert(harm);
+        DrawHarm(dc, harm, measure, system);
     }
     else if (element->Is() == PEDAL) {
         Pedal *pedal = dynamic_cast<Pedal *>(element);
@@ -1538,6 +1545,53 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     }
 
     dc->EndGraphic(dynam, this);
+}
+
+void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(harm);
+
+    // We cannot draw a dir that has no start position
+    if (!harm->GetStart()) return;
+
+    dc->StartGraphic(harm, "", harm->GetUuid());
+
+    // Use Romam bold for tempo
+    FontInfo dirTxt;
+    dirTxt.SetFaceName("Times");
+
+    // If we have not timestamp
+    int x = harm->GetStart()->GetDrawingX();
+
+    bool setX = false;
+    bool setY = false;
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = harm->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, x, (*staffIter)->GetDrawingY());
+
+        // Basic method that use bounding box
+        int y = harm->GetDrawingY();
+        // int y = GetDirY(dir->GetPlace(), *staffIter);
+
+        dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&dirTxt);
+
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        DrawTextChildren(dc, harm, x, y, setX, setY);
+        dc->EndText();
+
+        dc->ResetFont();
+        dc->ResetBrush();
+    }
+
+    dc->EndGraphic(harm, this);
 }
 
 void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system)
