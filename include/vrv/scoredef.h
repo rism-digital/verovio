@@ -173,6 +173,16 @@ public:
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
 
+    /**
+     * See Object::GenerateMIDI
+     */
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcMaxMeasureDuration
+     */
+    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
+
 protected:
     /**
      * Filter the list for a specific class.

@@ -217,13 +217,19 @@ public:
 /**
  * member 0: std::vector<double>: a stack of maximum duration filled by the functor
  * member 1: double: the duration of the current measure
+ * member 2: the current bpm
 **/
 
 class CalcMaxMeasureDurationParams : public FunctorParams {
 public:
-    CalcMaxMeasureDurationParams() { m_currentValue = 0.0; }
+    CalcMaxMeasureDurationParams()
+    {
+        m_currentValue = 0.0;
+        m_currentBpm = 120;
+    }
     std::vector<double> m_maxValues;
     double m_currentValue;
+    int m_currentBpm;
 };
 
 //----------------------------------------------------------------------------
@@ -410,6 +416,7 @@ public:
  * member 3: int*: the current total measure time (incremented by each measure
  * member 4: std::vector<double>: a stack of maximum duration filled by the functor
  * member 5: int* the semi tone transposition for the current track
+ * member 6: int with the current bpm
 **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -421,6 +428,7 @@ public:
         m_currentMeasureTime = 0.0;
         m_totalTime = 0.0;
         m_transSemi = 0;
+        m_currentBpm = 120;
     }
     MidiFile *m_midiFile;
     int m_midiTrack;
@@ -428,6 +436,7 @@ public:
     double m_totalTime;
     std::vector<double> m_maxValues;
     int m_transSemi;
+    int m_currentBpm;
 };
 
 //----------------------------------------------------------------------------
