@@ -159,8 +159,8 @@ namespace humaux {
             return;
         }
         if (m_endmeasure == NULL) {
-            // This is a tie with no end.  Don't know what to do with this for now
-            // (but is possible due to repeated music).
+            // This is a tie with no end.  Don't know what to do with this
+            // for now (but is possible due to repeated music).
             return;
         }
 
@@ -936,7 +936,71 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
     if (metersig.size() > 0) {
         setMeterSymbol(m_staffdef.back(), metersig);
     }
+
+	addInstrumentDefinition(m_staffdef.back(), partstart);
 }
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::addInstrumentDefinition --
+//
+// <staffDef>
+//    <instrDef @midi.channel @midi.instrnum @midi.instrname>
+//
+
+void HumdrumInput::addInstrumentDefinition(StaffDef* staffdef, HTp partstart) {
+
+	HTp instcode = NULL;
+	while (partstart != NULL) {
+		if (partstart->isData()) {
+			break;;
+		}
+		if (!partstart->isInterpretation()) {
+			partstart = partstart->getNextToken();
+			continue;
+		}
+		if (partstart->compare(0, 2, "*I") == 0) {
+			if (partstart->size() < 2) {
+				partstart = partstart->getNextToken();
+				continue;
+			}
+			if (!::islower((*partstart)[2])) {
+				// instrument class, name, abbrevation or similar
+				partstart = partstart->getNextToken();
+				continue;
+			}
+			instcode = partstart;
+			break;
+		}
+		partstart = partstart->getNextToken();
+	}
+
+
+	if (instcode == NULL) {
+		return;
+	}
+
+	// InstrDef* idef = new InstrDef;
+	// staffdef->AddInstrDef(idef);
+
+	// Allowing users to assign MIDI instrument numbers in data would be useful.
+//	static HumInstrument imap;
+//	int gmpc = imap.getGM(*instcode);
+
+//   m_staffdef.push_back(new StaffDef());
+//   m_staffgroup->AddStaffDef(m_staffdef.back());
+
+//   gmpc is -1 if no mapping (probably assign to 0 in those cases).
+//   if (instcode) {
+//   std::cerr << "GOT HERE " << *instcode << " " << gmpc << std::endl;
+//   }
+
+}
+
+
+
 
 //////////////////////////////
 //

@@ -249,6 +249,7 @@ protected:
     void addSpace(vector<string> &elements, vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object* object, hum::HTp token, int subtoken);
 	void addMidiTempo(vrv::ScoreDef& m_scoreDef, hum::HTp kernpart);
+	void addInstrumentDefinition(vrv::StaffDef* staffdef, hum::HTp partstart);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
