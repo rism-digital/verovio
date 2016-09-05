@@ -94,6 +94,9 @@ void Measure::AddChild(Object *child)
     if (child->IsControlElement()) {
         assert(dynamic_cast<ControlElement *>(child));
     }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
     else if (child->Is() == STAFF) {
         Staff *staff = dynamic_cast<Staff *>(child);
         assert(staff);

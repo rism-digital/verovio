@@ -48,6 +48,9 @@ void Beam::AddChild(Object *child)
     else if (child->Is() == CHORD) {
         assert(dynamic_cast<Chord *>(child));
     }
+    else if (child->Is() == CLEF) {
+        assert(dynamic_cast<Clef *>(child));
+    }
     else if (child->Is() == NOTE) {
         assert(dynamic_cast<Note *>(child));
     }

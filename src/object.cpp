@@ -986,6 +986,9 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
             params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false);
             params->m_upcomingScoreDef->SetDrawLabels(true);
         }
+        else {
+            params->m_upcomingScoreDef->SetDrawLabels(false);
+        }
         page->m_drawingScoreDef = *params->m_upcomingScoreDef;
         return FUNCTOR_CONTINUE;
     }

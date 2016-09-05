@@ -1381,7 +1381,13 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "chord") {
             return true;
         }
+        else if (element == "clef") {
+            return true;
+        }
         else if (element == "note") {
+            return true;
+        }
+        else if (element == "rest") {
             return true;
         }
         else if (element == "tuplet") {
@@ -1394,6 +1400,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for bTrem
     else if (filterParent->Is() == BTREM) {
         if (element == "chord") {
+            return true;
+        }
+        else if (element == "clef") {
             return true;
         }
         else if (element == "note") {
@@ -1415,6 +1424,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for fTrem
     else if (filterParent->Is() == FTREM) {
         if (element == "chord") {
+            return true;
+        }
+        else if (element == "clef") {
             return true;
         }
         else if (element == "note") {
@@ -1456,7 +1468,13 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         else if (element == "chord") {
             return true;
         }
+        else if (element == "clef") {
+            return true;
+        }
         else if (element == "note") {
+            return true;
+        }
+        if (element == "rest") {
             return true;
         }
         else {
@@ -1621,7 +1639,7 @@ bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
             }
             success = ReadMeiStaff(unmeasured, current);
         }
-        if (std::string(current.name()) == "measure") {
+        else if (std::string(current.name()) == "measure") {
             // we should not mix measured and unmeasured music within a system...
             assert(!unmeasured);
             // if (parent->IsEditorialElement()) {
