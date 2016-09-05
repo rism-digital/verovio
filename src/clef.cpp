@@ -50,11 +50,6 @@ void Clef::Reset()
     ResetOctavedisplacement();
 }
 
-int Clef::GetClefId() const
-{
-    return GetDisPlace() << 24 | GetDis() << 16 | GetShape() << 8 | GetLine();
-}
-
 int Clef::GetClefOffset() const
 {
     int offset = 0;

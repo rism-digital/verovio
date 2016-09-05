@@ -627,59 +627,6 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         ? true
         : false;
 
-    /*
-    switch (clef->GetClefId()) {
-        case C1:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-            break;
-        case G1:
-            sym = (isMensural ? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
-            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-            break;
-        case G2_8va:
-            sym = SMUFL_E053_gClef8va;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case G2_8vb:
-            sym = SMUFL_E052_gClef8vb;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case C2:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case G2:
-            sym = (isMensural ? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case F3:
-            sym = SMUFL_E062_fClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            break;
-        case C3:
-            sym = (isMensural ? SMUFL_E909_mensuralCclefPetrucciPosMiddle : SMUFL_E05C_cClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            break;
-        case F5: sym = SMUFL_E062_fClef; break;
-        case F4:
-            sym = (isMensural ? SMUFL_E904_mensuralFclefPetrucci : SMUFL_E062_fClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            break;
-        case C4:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            break;
-        case C5: sym = SMUFL_E05C_cClef; break;
-        case perc:
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            // FIXME
-            sym = SMUFL_E05C_cClef;
-            break;
-        default: break;
-    }
-    */
-
     int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
 
     if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, PLACE_below))

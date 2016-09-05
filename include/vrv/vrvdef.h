@@ -307,29 +307,6 @@ enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAU
 #define ON 1
 #define OFF 0
 
-/* This is used for fast clef offset calculation.
- * It uses 4 bytes with, from right to left
- * - line
- * - shape
- * - dis (0 or 1)
- * - dis.place (0 or 1)
- */
-enum ClefId {
-    G1 = CLEFSHAPE_G << 8 | 1,
-    G2 = CLEFSHAPE_G << 8 | 2,
-    G2_8va = PLACE_above << 24 | OCTAVE_DIS_8 << 16 | G2,
-    G2_8vb = PLACE_below << 24 | OCTAVE_DIS_8 << 16 | G2,
-    F3 = CLEFSHAPE_F << 8 | 3,
-    F4 = CLEFSHAPE_F << 8 | 4,
-    F5 = CLEFSHAPE_F << 8 | 5,
-    C1 = CLEFSHAPE_C << 8 | 1,
-    C2 = CLEFSHAPE_C << 8 | 2,
-    C3 = CLEFSHAPE_C << 8 | 3,
-    C4 = CLEFSHAPE_C << 8 | 4,
-    C5 = CLEFSHAPE_C << 8 | 5,
-    perc = CLEFSHAPE_perc << 8 | 1
-};
-
 // The next four macros were tuned using the Leipzig font.
 
 // Width (in half-drawing units) of an accidental; used to prevent overlap on complex chords
