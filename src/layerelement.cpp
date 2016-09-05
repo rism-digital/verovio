@@ -363,7 +363,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->IsGraceNote()) {
         type = ALIGNMENT_GRACENOTE;
     }
-    else if ((this->Is() == BEAM) || (this->Is() == TUPLET) || (this->Is() == VERSE) || (this->Is() == SYL)) {
+    else if ((this->Is() == BEAM) || (this->Is() == TUPLET)) {
         type = ALIGNMENT_CONTAINER;
     }
     else if (this->Is() == DOT) {
@@ -371,6 +371,20 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (this->Is() == ACCID) {
         type = ALIGNMENT_ACCID;
+    }
+    else if (this->Is() == SYL) {
+        // Refer to the note parent
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        assert(note);
+        m_alignment = note->GetAlignment();
+        return FUNCTOR_CONTINUE;
+    }
+    else if (this->Is() == VERSE) {
+        // Idem
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        assert(note);
+        m_alignment = note->GetAlignment();
+        return FUNCTOR_CONTINUE;
     }
 
     // get the duration of the event
