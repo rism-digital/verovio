@@ -14,7 +14,7 @@ Version 5.2.8 - adding perc clef
 -->
 <svg>
 <metadata>
-Created by FontForge 20120731 at Mon Sep  5 21:02:37 2016
+Created by FontForge 20120731 at Mon Sep  5 21:19:45 2016
  By laurent
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
@@ -30,11 +30,10 @@ Version 5.2.7
     panose-1="2 0 5 3 0 0 0 0 0 0"
     ascent="800"
     descent="-200"
-    x-height="250"
     bbox="-163 -893 1833 1317"
     underline-thickness="50"
     underline-position="-50"
-    unicode-range="U+0075-E93D"
+    unicode-range="U+0061-E93D"
   />
     <missing-glyph />
     <glyph glyph-name="uniE0A3" unicode="&#xe0a3;" horiz-adv-x="320" 
@@ -800,7 +799,7 @@ c7.33299 -22 28.667 -48.333 64 -79z" />
     <glyph glyph-name="uniE069" unicode="&#xe069;" horiz-adv-x="330" 
 d="M200 250h130v-500h-130v500zM0 250h130v-500h-130v500z" />
     <glyph glyph-name="z" unicode="z" horiz-adv-x="330" 
-d="M200 250h130v-500h-130v500zM0 250h130v-500h-130v500z" />
+ />
     <glyph glyph-name="uniE06A" unicode="&#xe06a;" horiz-adv-x="257" 
 d="M0 395h257v-791h-257v791zM41 311v-622h174v622h-174z" />
   </font>
