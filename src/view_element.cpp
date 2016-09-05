@@ -226,7 +226,7 @@ void View::DrawAccid(
         case ACCIDENTAL_EXPLICIT_n: symc = SMUFL_E261_accidentalNatural; break;
         case ACCIDENTAL_EXPLICIT_ss: symc = SMUFL_E263_accidentalDoubleSharp; break;
         case ACCIDENTAL_EXPLICIT_s: symc = SMUFL_E262_accidentalSharp; break;
-        case ACCIDENTAL_EXPLICIT_ff: symc = SMUFL_E264_accidentalDoubleFlat;
+        case ACCIDENTAL_EXPLICIT_ff: symc = SMUFL_E264_accidentalDoubleFlat; break;
         case ACCIDENTAL_EXPLICIT_f: symc = SMUFL_E260_accidentalFlat; break;
         case ACCIDENTAL_EXPLICIT_su:
             symc = SMUFL_E268_accidentalNaturalSharp;
