@@ -57,24 +57,28 @@ int Clef::GetClefId() const
 
 int Clef::GetClefOffset() const
 {
-    int clefCode = GetClefId();
-    int offset = 0; // case 5: UT 1e ligne par default, valable pour PERC
-    switch (clefCode) {
-        case G1: offset = -4; break;
-        case G2: offset = -2; break;
-        case G2_8va: offset = -9; break;
-        case G2_8vb: offset = 5; break;
-        case F3: offset = 8; break;
-        case F4: offset = 10; break;
-        case F5: offset = 12; break;
-        case C1: offset = 0; break;
-        case C2: offset = 2; break;
-        case C3: offset = 4; break;
-        case C4: offset = 6; break;
-        case C5: offset = 8;
-        default: break;
-    }
+    int offset = 0;
+    if (GetShape() == CLEFSHAPE_G)
+        offset = -4;
+    else if (GetShape() == CLEFSHAPE_F)
+        offset = 4;
+
+    offset += (GetLine() - 1) * 2;
+
+    int disPlace = 0;
+    if (GetDisPlace() == PLACE_above)
+        disPlace = -1;
+    else if (GetDisPlace() == PLACE_below)
+        disPlace = 1;
+
+    if ((disPlace != 0) && (GetDis() != OCTAVE_DIS_NONE)) offset += (disPlace * (GetDis() - 1));
+
     return offset;
+}
+
+int Clef::ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_PLACE place)
+{
+    return place << 24 | octaveDis << 16 | line << 8 | shape;
 }
 
 } // namespace vrv

@@ -14,6 +14,7 @@
 
 namespace vrv {
 
+class Clef;
 class ScoreDefInterface;
 
 //----------------------------------------------------------------------------
@@ -70,7 +71,7 @@ public:
      * Static methods for calculating position;
      */
     static data_PITCHNAME GetAlterationAt(data_ACCIDENTAL_EXPLICIT alterationType, int pos);
-    static int GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, int clefId);
+    static int GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, Clef *clef);
 
 private:
     //

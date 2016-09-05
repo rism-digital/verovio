@@ -6,12 +6,16 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "keysig.h"
-#include "scoredefinterface.h"
 
 //----------------------------------------------------------------------------
 
 #include <assert.h>
 #include <stdlib.h>
+
+//----------------------------------------------------------------------------
+
+#include "clef.h"
+#include "scoredefinterface.h"
 
 namespace vrv {
 
@@ -28,28 +32,28 @@ int KeySig::octave_map[2][9][7] = {
     {
         // flats
         // C,  D,  E,  F,  G,  A,  B
-        { 01, 01, 01, 00, 00, 00, 00 }, // treble
-        { 00, 00, 00, 00, 00, 00, 00 }, // soprano
-        { 00, 00, 00, 00, 00, -1, -1 }, // mezzo
-        { 00, 00, 00, -1, -1, -1, -1 }, // alto
-        { 00, 00, 00, -1, -1, -1, -1 }, // tenor
-        { -1, -1, -1, -1, -1, -2, -2 }, // ??
-        { -1, -1, -1, -2, -2, -2, -2 }, // bass
-        { -1, -1, -1, -1, -1, -1, -1 }, // bariton
-        { 01, 01, 01, 00, 00, 00, 00 }, // french g
+        { 01, 01, 01, 00, 00, 00, 00 }, // french g = G-1
+        { 01, 01, 01, 00, 00, 00, 00 }, // treble = G-2
+        { 00, 00, 00, 00, 00, 00, 00 }, // soprano = C-1 (G-3)
+        { 00, 00, 00, 00, 00, -1, -1 }, // mezzo = C-2
+        { 00, 00, 00, -1, -1, -1, -1 }, // alto = C-3
+        { 00, 00, 00, -1, -1, -1, -1 }, // tenor = C-4
+        { -1, -1, -1, -1, -1, -1, -1 }, // bariton = F-3 (C-5)
+        { -1, -1, -1, -2, -2, -2, -2 }, // bass = F-4
+        { -1, -1, -1, -1, -1, -2, -2 }, // sub-bass = F-5
     },
     {
         // sharps
         // C,  D,  E,  F,  G,  A,  B
+        { 01, 01, 01, 01, 01, 00, 00 }, // freench g
         { 01, 01, 01, 01, 01, 00, 00 }, // treble
         { 00, 00, 00, 00, 00, 00, 00 }, // soprano
         { 00, 00, 00, 00, 00, 00, 00 }, // mezzo
         { 00, 00, 00, 00, 00, -1, -1 }, // alto
         { 00, 00, 00, -1, -1, -1, -1 }, // tenor
-        { -1, -1, -1, -1, -1, -2, -2 }, // ??
-        { -1, -1, -1, -1, -1, -2, -2 }, // bass
         { -1, -1, -1, -1, -1, -1, -1 }, // bariton
-        { 01, 01, 01, 01, 01, 00, 00 }, // freench g
+        { -1, -1, -1, -1, -1, -2, -2 }, // bass
+        { -1, -1, -1, -1, -1, -2, -2 }, // sub-bass
     },
 };
 
@@ -198,31 +202,56 @@ data_PITCHNAME KeySig::GetAlterationAt(data_ACCIDENTAL_EXPLICIT alterationType, 
     return alteration_set[pos];
 }
 
-int KeySig::GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, int clefId)
+int KeySig::GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, Clef *clef)
 {
     int alter_set = 0; // flats
     int key_set = 0;
 
     if (alterationType == ACCIDENTAL_EXPLICIT_s) alter_set = 1;
 
-    switch (clefId) {
-        case G2: key_set = 0; break;
-        case G2_8va: key_set = 0; break;
-        case G2_8vb: key_set = 3; break;
-        case C1: key_set = 1; break;
-        case C2: key_set = 2; break;
-        case C3: key_set = 3; break;
-        case C4: key_set = 4; break;
-        case C5: key_set = 5; break;
-        case F5: key_set = 5; break;
-        case F4: key_set = 6; break;
-        case F3: key_set = 7; break;
-        case G1: key_set = 8; break;
+    int shapeLine = 0;
+    shapeLine = clef->GetShape() << 8 | clef->GetLine();
 
-        default: key_set = 0; break;
+    switch (shapeLine) {
+        case (CLEFSHAPE_G << 8 | 1): key_set = 0; break;
+        case (CLEFSHAPE_G << 8 | 2): key_set = 1; break;
+        case (CLEFSHAPE_G << 8 | 3): key_set = 2; break;
+        case (CLEFSHAPE_G << 8 | 4): key_set = 3; break;
+        case (CLEFSHAPE_G << 8 | 5): key_set = 4; break;
+
+        case (CLEFSHAPE_C << 8 | 1): key_set = 2; break;
+        case (CLEFSHAPE_C << 8 | 2): key_set = 3; break;
+        case (CLEFSHAPE_C << 8 | 3): key_set = 4; break;
+        case (CLEFSHAPE_C << 8 | 4): key_set = 5; break;
+        case (CLEFSHAPE_C << 8 | 5): key_set = 6; break;
+
+        case (CLEFSHAPE_F << 8 | 3): key_set = 6; break;
+        case (CLEFSHAPE_F << 8 | 4): key_set = 7; break;
+        case (CLEFSHAPE_F << 8 | 5):
+            key_set = 8;
+            break;
+
+        // does not really exist but just to make it somehow aligned with the clef
+        case (CLEFSHAPE_F << 8 | 1): key_set = 8; break;
+        case (CLEFSHAPE_F << 8 | 2): key_set = 8; break;
+
+        default: key_set = 4; break;
     }
 
-    return octave_map[alter_set][key_set][pitch - 1] + OCTAVE_OFFSET;
+    int octave = octave_map[alter_set][key_set][pitch - 1] + OCTAVE_OFFSET;
+
+    int disPlace = 0;
+    if (clef->GetDis() != OCTAVE_DIS_NONE) {
+        // DIS 22 not supported
+        if (clef->GetDisPlace() == PLACE_above)
+            disPlace = (clef->GetDis() == OCTAVE_DIS_8) ? -1 : -2;
+        else if (clef->GetDisPlace() == PLACE_below)
+            disPlace = (clef->GetDis() == OCTAVE_DIS_8) ? 1 : 2;
+    }
+
+    octave -= disPlace;
+
+    return octave;
 }
 
 } // namespace vrv

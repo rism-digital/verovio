@@ -53,6 +53,8 @@ public:
      */
     int GetClefId() const;
 
+    static int ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_PLACE place);
+
 private:
     //
 public:

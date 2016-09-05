@@ -739,9 +739,9 @@ int View::CalculatePitchPosY(Staff *staff, data_PITCHNAME pname, int dec_clef, i
     // Old Wolfgang code with octave stored in an unsigned char - this could be refactored
     oct -= OCTAVE_OFFSET;
     y_int = ((dec_clef + oct * 7) - 9) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (staff->m_drawingLines > 5) {
-        y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
+    // if (staff->m_drawingLines > 5) {
+    y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    //}
 
     /* exprime distance separant m_drawingY de
     position 1e Si, corrigee par dec_clef et oct. Elle est additionnee
@@ -926,7 +926,7 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     }
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
-    
+
     // draw the scoreDef if required
     if (layer->GetCautionStaffDefClef()) {
         DrawLayerElement(dc, layer->GetCautionStaffDefClef(), layer, staff, measure);
