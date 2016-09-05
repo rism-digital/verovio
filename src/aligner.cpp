@@ -525,7 +525,6 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
     AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
     assert(params);
 
-    // for slur we do not need to adjust them, only add them to the overflow boxes if required
     int staffSize = this->GetStaffSize();
 
     if (params->m_classId == SYL) {
@@ -548,6 +547,7 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         assert((*iter)->GetObject());
         if ((*iter)->GetObject()->Is() != params->m_classId) continue;
 
+        // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
         if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
             int overflowAbove = this->CalcOverflowAbove((*iter));

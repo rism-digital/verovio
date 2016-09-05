@@ -1466,9 +1466,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, x, (*staffIter)->GetDrawingY());
 
-        // Basic method that use bounding box
         int y = dir->GetDrawingY();
-        // int y = GetDirY(dir->GetPlace(), *staffIter);
 
         dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
@@ -1574,9 +1572,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, x, (*staffIter)->GetDrawingY());
 
-        // Basic method that use bounding box
         int y = harm->GetDrawingY();
-        // int y = GetDirY(dir->GetPlace(), *staffIter);
 
         dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
@@ -1674,7 +1670,6 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
         tempoTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
-        // Basic method that use bounding box
         int y = tempo->GetDrawingY();
 
         dc->SetBrush(m_currentColour, AxSOLID);
@@ -1841,9 +1836,9 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if (ending->HasN()) {
             std::wstringstream strStream;
             // Maybe we want to add ( ) after system breaks?
-            // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
+            if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
             strStream << ending->GetN() << L".";
-            // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
+            if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
 
             Text text;
             text.SetText(strStream.str());
