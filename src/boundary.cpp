@@ -24,7 +24,7 @@ namespace vrv {
 // BoundaryEnd
 //----------------------------------------------------------------------------
 
-BoundaryEnd::BoundaryEnd(Object *start)
+BoundaryEnd::BoundaryEnd(Object *start) : SystemElement("bdend")
 {
     Reset();
     m_start = start;
@@ -39,11 +39,6 @@ void BoundaryEnd::Reset()
 {
     m_start = NULL;
     m_drawingMeasure = NULL;
-}
-
-std::string BoundaryEnd::GetClassName() const
-{
-    return m_startClassName + "BoundaryEnd";
 }
 
 //----------------------------------------------------------------------------
@@ -71,6 +66,20 @@ void BoundaryStartInterface::SetEnd(BoundaryEnd *end)
     m_end = end;
 }
 
+void BoundaryStartInterface::ConvertToPageBasedBoundary(Object *object, Object *parent)
+{
+    assert(object);
+    assert(parent);
+
+    // Then add a BoundaryEnd
+    BoundaryEnd *boundaryEnd = new BoundaryEnd(object);
+    this->SetEnd(boundaryEnd);
+    parent->AddChild(boundaryEnd);
+
+    // Also clear the relinquished children
+    object->ClearRelinquishedChildren();
+}
+
 //----------------------------------------------------------------------------
 // BoundaryEnd functor methods
 //----------------------------------------------------------------------------
@@ -80,16 +89,17 @@ int BoundaryEnd::PrepareBoundaries(FunctorParams *functorParams)
     PrepareBoundariesParams *params = dynamic_cast<PrepareBoundariesParams *>(functorParams);
     assert(params);
 
-    // We need to its pointer to the last measure we have encountered
-    if (params->m_lastMeasure == NULL) {
-        LogWarning("A measure cannot be set to the end boundary");
-    }
+    // We set its pointer to the last measure we have encountered - this can be NULL in case no measure exists before
+    // the end boundary
+    // This can happen with a editorial container around a scoreDef at the beginning
     this->SetMeasure(params->m_lastMeasure);
 
     // Endings are also set as Measure::m_drawingEnding for all meaasures in between - when we reach the end boundary of
     // an ending, we need to set the m_currentEnding to NULL
     if (params->m_currentEnding && this->GetStart()->Is() == ENDING) {
         params->m_currentEnding = NULL;
+        // With ending we need the drawing measure - this will crash with en empty ending at the beginning of a score...
+        assert(m_drawingMeasure);
     }
 
     return FUNCTOR_CONTINUE;
@@ -97,6 +107,8 @@ int BoundaryEnd::PrepareBoundaries(FunctorParams *functorParams)
 
 int BoundaryEnd::ResetDrawing(FunctorParams *functorParams)
 {
+    FloatingObject::ResetDrawing(functorParams);
+
     this->SetMeasure(NULL);
 
     return FUNCTOR_CONTINUE;
@@ -116,8 +128,21 @@ int BoundaryEnd::CastOffSystems(FunctorParams *functorParams)
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     BoundaryEnd *endBoundary = dynamic_cast<BoundaryEnd *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // End boundaries are not added to the pending objects because we do not want them to be placed at the beginning of
-    // the next system
-    params->m_currentSystem->AddBoundaryEnd(endBoundary);
+    // the next system but only if the pending object array it empty (otherwise it will mess up the MEI tree)
+    if (params->m_pendingObjects.empty())
+        params->m_currentSystem->AddChild(endBoundary);
+    else
+        params->m_pendingObjects.push_back(endBoundary);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int BoundaryEnd::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }

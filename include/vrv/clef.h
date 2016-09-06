@@ -34,13 +34,13 @@ public:
     void Init();
     virtual ~Clef();
     virtual void Reset();
-    virtual Object *Clone() const { return new Clef(*this); };
-    virtual std::string GetClassName() const { return "Clef"; };
-    virtual ClassId Is() const { return CLEF; };
+    virtual Object *Clone() const { return new Clef(*this); }
+    virtual std::string GetClassName() const { return "Clef"; }
+    virtual ClassId Is() const { return CLEF; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     /**
      * Return the offset of the clef
@@ -48,10 +48,9 @@ public:
     int GetClefOffset() const;
 
     /**
-     * This is used for false clef offset calculation.
-     * Returns 4 bytes with, from right to left, line, shape, dis and displace
+     * Return a clef id based on the various parameters
      */
-    int GetClefId() const;
+    static int ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_PLACE place);
 
 private:
     //

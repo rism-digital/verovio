@@ -43,7 +43,7 @@ public:
     ScoreDefInterface();
     virtual ~ScoreDefInterface();
     virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_SCOREDEF; };
+    virtual InterfaceId IsInterface() { return INTERFACE_SCOREDEF; }
     ///@}
 
 private:

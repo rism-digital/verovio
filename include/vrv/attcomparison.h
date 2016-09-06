@@ -28,7 +28,7 @@ enum DurExtreme { LONGEST = 0, SHORTEST };
 class AttCommonNComparison : public AttComparison {
 
 public:
-    AttCommonNComparison(ClassId AttClassId, const int n) : AttComparison(AttClassId) { m_n = n; };
+    AttCommonNComparison(ClassId AttClassId, const int n) : AttComparison(AttClassId) { m_n = n; }
 
     void SetN(int n) { m_n = n; }
 
@@ -65,7 +65,7 @@ public:
             m_extremeDur = -VRV_UNSET;
         else
             m_extremeDur = VRV_UNSET;
-    };
+    }
 
     virtual bool operator()(Object *object)
     {
@@ -100,7 +100,7 @@ private:
 class AttMeasureAlignerType : public AttComparison {
 
 public:
-    AttMeasureAlignerType(const AlignmentType type) : AttComparison(OBJECT) { m_type = type; };
+    AttMeasureAlignerType(const AlignmentType type) : AttComparison(OBJECT) { m_type = type; }
 
     void SetType(AlignmentType type) { m_type = type; }
 
@@ -125,7 +125,7 @@ private:
 class AttNoteOnsetOffsetComparison : public AttComparison {
 
 public:
-    AttNoteOnsetOffsetComparison(const double time) : AttComparison(NOTE) { m_time = time; };
+    AttNoteOnsetOffsetComparison(const double time) : AttComparison(NOTE) { m_time = time; }
 
     void SetTime(int time) { m_time = time; }
 

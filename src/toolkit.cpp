@@ -391,14 +391,15 @@ bool Toolkit::LoadString(const std::string &data)
         return false;
     }
 
-    // ignore layout?
-    if (m_ignoreLayout || m_noLayout) {
-        input->IgnoreLayoutInformation();
+    // xpath queries?
+    if (m_appXPathQueries.size() > 0) {
+        input->SetAppXPathQueries(m_appXPathQueries);
     }
-
-    // app xpath query?
-    if (m_appXPathQuery.length() > 0) {
-        input->SetAppXPathQuery(m_appXPathQuery);
+    if (m_choiceXPathQueries.size() > 0) {
+        input->SetChoiceXPathQueries(m_choiceXPathQueries);
+    }
+    if (m_mdivXPathQuery.length() > 0) {
+        input->SetMdivXPathQuery(m_mdivXPathQuery);
     }
 
     // load the file
@@ -421,20 +422,21 @@ bool Toolkit::LoadString(const std::string &data)
 
     m_doc.PrepareDrawing();
 
-    if (input->HasMeasureWithinEditoMarkup() && !m_noLayout) {
-        LogWarning(
-            "Only continous layout is possible with <measure> within editorial markup, switching to --no-layout");
-        this->SetNoLayout(true);
-    }
-
     // Do the layout? this depends on the options and the file. PAE and
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --ignore-layout option.
     // Regardless, we won't do layout if the --no-layout option was set.
-    if (!input->HasLayoutInformation() && !m_noLayout) {
-        // LogElapsedTimeStart();
-        m_doc.CastOffDoc();
-        // LogElapsedTimeEnd("layout");
+    if (!m_noLayout) {
+        if (input->HasLayoutInformation() && !m_ignoreLayout) {
+            // LogElapsedTimeStart();
+            m_doc.CastOffEncodingDoc();
+            // LogElapsedTimeEnd("layout");
+        }
+        else {
+            // LogElapsedTimeStart();
+            m_doc.CastOffDoc();
+            // LogElapsedTimeEnd("layout");
+        }
     }
 
     // disable justification if there's no layout or no justification
@@ -471,7 +473,7 @@ bool Toolkit::SaveFile(const std::string &filename)
 
 bool Toolkit::ParseOptions(const std::string &json_options)
 {
-#ifdef USE_EMSCRIPTEN
+#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
 
     jsonxx::Object json;
 
@@ -501,7 +503,37 @@ bool Toolkit::ParseOptions(const std::string &json_options)
 
     if (json.has<jsonxx::Number>("spacingSystem")) SetSpacingSystem(json.get<jsonxx::Number>("spacingSystem"));
 
-    if (json.has<jsonxx::String>("appXPathQuery")) SetAppXPathQuery(json.get<jsonxx::String>("appXPathQuery"));
+    if (json.has<jsonxx::String>("appXPathQuery")) {
+        std::vector<std::string> queries = { json.get<jsonxx::String>("appXPathQuery") };
+        SetAppXPathQueries(queries);
+    }
+
+    if (json.has<jsonxx::Array>("appXPathQueries")) {
+        jsonxx::Array values = json.get<jsonxx::Array>("appXPathQueries");
+        std::vector<std::string> queries;
+        int i;
+        for (i = 0; i < values.size(); i++) {
+            if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
+        }
+        SetAppXPathQueries(queries);
+    }
+
+    if (json.has<jsonxx::String>("choiceXPathQuery")) {
+        std::vector<std::string> queries = { json.get<jsonxx::String>("choiceXPathQuery") };
+        SetChoiceXPathQueries(queries);
+    }
+
+    if (json.has<jsonxx::Array>("choiceXPathQueries")) {
+        jsonxx::Array values = json.get<jsonxx::Array>("choiceXPathQueries");
+        std::vector<std::string> queries;
+        int i;
+        for (i = 0; i < values.size(); i++) {
+            if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
+        }
+        SetChoiceXPathQueries(queries);
+    }
+
+    if (json.has<jsonxx::String>("mdivXPathQuery")) SetMdivXPathQuery(json.get<jsonxx::String>("mdivXPathQuery"));
 
     if (json.has<jsonxx::Number>("xmlIdSeed")) Object::SeedUuid(json.get<jsonxx::Number>("xmlIdSeed"));
 
@@ -521,7 +553,6 @@ bool Toolkit::ParseOptions(const std::string &json_options)
         SetShowBoundingBoxes(json.get<jsonxx::Number>("showBoundingBoxes"));
 
     return true;
-
 #else
     // The non-js version of the app should not use this function.
     return false;
@@ -530,7 +561,7 @@ bool Toolkit::ParseOptions(const std::string &json_options)
 
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
-#ifdef USE_EMSCRIPTEN
+#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
     jsonxx::Object o;
 
     if (!m_doc.GetDrawingPage()) return o.json();
@@ -715,7 +746,7 @@ std::string Toolkit::RenderToMidi()
 
 std::string Toolkit::GetElementsAtTime(int millisec)
 {
-#ifdef USE_EMSCRIPTEN
+#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
     jsonxx::Object o;
     jsonxx::Array a;
 
@@ -861,7 +892,7 @@ bool Toolkit::Insert(std::string elementType, std::string startid, std::string e
         Slur *slur = new Slur();
         slur->SetStartid(startid);
         slur->SetEndid(endid);
-        measure->AddFloatingElement(slur);
+        measure->AddChild(slur);
         m_doc.PrepareDrawing();
         return true;
     }

@@ -9,7 +9,7 @@
 #define __VRV_PEDAL_H__
 
 #include "atts_cmn.h"
-#include "floatingelement.h"
+#include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -18,7 +18,7 @@ namespace vrv {
 // Pedal
 //----------------------------------------------------------------------------
 
-class Pedal : public FloatingElement, public TimePointInterface, public AttPedalLog, public AttPlacement {
+class Pedal : public ControlElement, public TimePointInterface, public AttPedalLog, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -28,8 +28,8 @@ public:
     Pedal();
     virtual ~Pedal();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Pedal"; };
-    virtual ClassId Is() const { return PEDAL; };
+    virtual std::string GetClassName() const { return "Pedal"; }
+    virtual ClassId Is() const { return PEDAL; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

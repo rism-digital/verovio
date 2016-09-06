@@ -47,8 +47,8 @@ public:
     Chord();
     virtual ~Chord();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Chord"; };
-    virtual ClassId Is() const { return CHORD; };
+    virtual std::string GetClassName() const { return "Chord"; }
+    virtual ClassId Is() const { return CHORD; }
     ///@}
 
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
@@ -58,12 +58,12 @@ public:
     }
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     /**
      * Add an element (only note supported) to a chord.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
     virtual void FilterList(ListOfObjects *childlist);
 
@@ -106,10 +106,6 @@ public:
      * See Object::PrepareTieAttr
      */
     virtual int PrepareTieAttr(FunctorParams *functorParams);
-
-    /**
-     * See Object::PrepareTieAttr
-     */
     virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
 
 protected:

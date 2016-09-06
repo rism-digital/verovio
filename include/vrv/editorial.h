@@ -15,10 +15,10 @@
 
 namespace vrv {
 
-class FloatingElement;
 class Layer;
 class LayerElement;
 class Measure;
+class ControlElement;
 class ScoreDef;
 class Staff;
 class StaffDef;
@@ -35,6 +35,7 @@ enum VisibilityType { Hidden = 0, Visible };
  * This class is a base class for the editorial element containing musical
  * content, for example <rgd> or <add>.
  * It is not an abstract class but should not be instantiated directly.
+ * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
  */
 class EditorialElement : public Object, public BoundaryStartInterface, public AttCommon, public AttCommonPart {
 public:
@@ -47,22 +48,14 @@ public:
     EditorialElement(std::string classid);
     virtual ~EditorialElement();
     virtual void Reset();
-    virtual ClassId Is() const { return EDITORIAL_ELEMENT; };
+    virtual ClassId Is() const { return EDITORIAL_ELEMENT; }
     ///@}
 
     /**
      * @name Add children to an editorial element.
      */
     ///@{
-    void AddFloatingElement(FloatingElement *child);
-    void AddLayerElement(LayerElement *child);
-    void AddTextElement(TextElement *child);
-    void AddLayer(Layer *child);
-    void AddMeasure(Measure *child);
-    void AddScoreDef(ScoreDef *child);
-    void AddStaff(Staff *child);
-    void AddStaffDef(StaffDef *child);
-    void AddStaffGrp(StaffGrp *child);
+    virtual void AddChild(Object *object);
     ///@}
 
     //----------//
@@ -70,21 +63,30 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareBoundaries.
+     * See Object::ConvertToPageBased
+     */
+    virtual int ConvertToPageBased(FunctorParams *functorParams);
+    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareBoundaries
      */
     virtual int PrepareBoundaries(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
-     * Fill a page by adding systems with the appropriate length
-     * For EditorialElement, this means only moving them since their width is not
-     * taken into account. Only system children EditorialElement are processed.
+     * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
+
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
 
 private:
     //
@@ -113,8 +115,8 @@ public:
     Abbr();
     virtual ~Abbr();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Abbr"; };
-    virtual ClassId Is() const { return ABBR; };
+    virtual std::string GetClassName() const { return "Abbr"; }
+    virtual ClassId Is() const { return ABBR; }
     ///@}
 
 private:
@@ -138,8 +140,8 @@ public:
     Add();
     virtual ~Add();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Add"; };
-    virtual ClassId Is() const { return ADD; };
+    virtual std::string GetClassName() const { return "Add"; }
+    virtual ClassId Is() const { return ADD; }
     ///@}
 
 private:
@@ -163,8 +165,8 @@ public:
     Annot();
     virtual ~Annot();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Annot"; };
-    virtual ClassId Is() const { return ANNOT; };
+    virtual std::string GetClassName() const { return "Annot"; }
+    virtual ClassId Is() const { return ANNOT; }
     ///@}
 
 private:
@@ -193,21 +195,58 @@ public:
     App(EditorialLevel level);
     virtual ~App();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "App"; };
-    virtual ClassId Is() const { return APP; };
+    virtual std::string GetClassName() const { return "App"; }
+    virtual ClassId Is() const { return APP; }
     ///@}
 
     /** Getter for level **/
-    EditorialLevel GetLevel() { return m_level; };
+    EditorialLevel GetLevel() { return m_level; }
 
     /**
      * Add children to a apparatus.
-     * Tests if lemOrRdg is Lem or Rdg.
      */
-    void AddLemOrRdg(EditorialElement *lemOrRdg);
+    virtual void AddChild(Object *object);
 
 protected:
     /** We store the level of the <app> for integrity check */
+    EditorialLevel m_level;
+
+private:
+    //
+public:
+    //
+private:
+};
+
+//----------------------------------------------------------------------------
+// Choice
+//----------------------------------------------------------------------------
+
+class Choice : public EditorialElement {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     * Reset method resets all attribute classes
+     */
+    ///@{
+    Choice();
+    Choice(EditorialLevel level);
+    virtual ~Choice();
+    virtual void Reset();
+    virtual std::string GetClassName() const { return "Choice"; }
+    virtual ClassId Is() const { return CHOICE; }
+    ///@}
+
+    /** Getter for level **/
+    EditorialLevel GetLevel() { return m_level; }
+
+    /**
+     * Add children to a apparatus.
+     */
+    virtual void AddChild(Object *object);
+
+protected:
+    /** We store the level of the <choice> for integrity check */
     EditorialLevel m_level;
 
 private:
@@ -231,8 +270,8 @@ public:
     Corr();
     virtual ~Corr();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Corr"; };
-    virtual ClassId Is() const { return CORR; };
+    virtual std::string GetClassName() const { return "Corr"; }
+    virtual ClassId Is() const { return CORR; }
     ///@}
 
 private:
@@ -256,8 +295,8 @@ public:
     Damage();
     virtual ~Damage();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Damage"; };
-    virtual ClassId Is() const { return DAMAGE; };
+    virtual std::string GetClassName() const { return "Damage"; }
+    virtual ClassId Is() const { return DAMAGE; }
     ///@}
 
 private:
@@ -281,8 +320,8 @@ public:
     Del();
     virtual ~Del();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Del"; };
-    virtual ClassId Is() const { return DEL; };
+    virtual std::string GetClassName() const { return "Del"; }
+    virtual ClassId Is() const { return DEL; }
     ///@}
 
 private:
@@ -306,8 +345,8 @@ public:
     Expan();
     virtual ~Expan();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Expan"; };
-    virtual ClassId Is() const { return EXPAN; };
+    virtual std::string GetClassName() const { return "Expan"; }
+    virtual ClassId Is() const { return EXPAN; }
     ///@}
 
 private:
@@ -331,8 +370,8 @@ public:
     Lem();
     virtual ~Lem();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Lem"; };
-    virtual ClassId Is() const { return LEM; };
+    virtual std::string GetClassName() const { return "Lem"; }
+    virtual ClassId Is() const { return LEM; }
     ///@}
 
 private:
@@ -356,8 +395,8 @@ public:
     Orig();
     virtual ~Orig();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Orig"; };
-    virtual ClassId Is() const { return ORIG; };
+    virtual std::string GetClassName() const { return "Orig"; }
+    virtual ClassId Is() const { return ORIG; }
     ///@}
 
 private:
@@ -381,8 +420,8 @@ public:
     Rdg();
     virtual ~Rdg();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Rdg"; };
-    virtual ClassId Is() const { return RDG; };
+    virtual std::string GetClassName() const { return "Rdg"; }
+    virtual ClassId Is() const { return RDG; }
     ///@}
 
 private:
@@ -406,8 +445,8 @@ public:
     Reg();
     virtual ~Reg();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Reg"; };
-    virtual ClassId Is() const { return REG; };
+    virtual std::string GetClassName() const { return "Reg"; }
+    virtual ClassId Is() const { return REG; }
     ///@}
 
 private:
@@ -431,8 +470,8 @@ public:
     Restore();
     virtual ~Restore();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Restore"; };
-    virtual ClassId Is() const { return RESTORE; };
+    virtual std::string GetClassName() const { return "Restore"; }
+    virtual ClassId Is() const { return RESTORE; }
     ///@}
 
 private:
@@ -456,8 +495,8 @@ public:
     Sic();
     virtual ~Sic();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Sic"; };
-    virtual ClassId Is() const { return SIC; };
+    virtual std::string GetClassName() const { return "Sic"; }
+    virtual ClassId Is() const { return SIC; }
     ///@}
 
 private:
@@ -481,8 +520,8 @@ public:
     Supplied();
     virtual ~Supplied();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Supplied"; };
-    virtual ClassId Is() const { return SUPPLIED; };
+    virtual std::string GetClassName() const { return "Supplied"; }
+    virtual ClassId Is() const { return SUPPLIED; }
     ///@}
 
 private:
@@ -506,8 +545,8 @@ public:
     Unclear();
     virtual ~Unclear();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Unclear"; };
-    virtual ClassId Is() const { return UNCLEAR; };
+    virtual std::string GetClassName() const { return "Unclear"; }
+    virtual ClassId Is() const { return UNCLEAR; }
     ///@}
 
 private:

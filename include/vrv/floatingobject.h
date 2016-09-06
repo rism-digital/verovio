@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        floatingelement.h
+// Name:        floatingobject.h
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_FLOATING_ELEMENT_H__
-#define __VRV_FLOATING_ELEMENT_H__
+#ifndef __VRV_FLOATING_OBJECT_H__
+#define __VRV_FLOATING_OBJECT_H__
 
 #include "devicecontextbase.h"
 #include "object.h"
@@ -17,25 +17,25 @@ class FloatingPositioner;
 class StaffAlignment;
 
 //----------------------------------------------------------------------------
-// FloatingElement
+// FloatingObject
 //----------------------------------------------------------------------------
 
 /**
- * This class is an interface for elements appearing within measure.
+ * This class represents elements appearing within a measure.
  * It is not an abstract class but should not be instanciated directly.
  */
-class FloatingElement : public Object {
+class FloatingObject : public Object {
 public:
     /**
      * @name Constructors, destructors, reset methods
      * Reset method resets all attribute classes
      */
     ///@{
-    FloatingElement();
-    FloatingElement(std::string classid);
-    virtual ~FloatingElement();
+    FloatingObject();
+    FloatingObject(std::string classid);
+    virtual ~FloatingObject();
     virtual void Reset();
-    virtual ClassId Is() const { return FLOATING_ELEMENT; };
+    virtual ClassId Is() const { return FLOATING_OBJECT; }
     ///@}
 
     virtual void UpdateContentBBoxX(int x1, int x2);
@@ -52,7 +52,7 @@ public:
     ///@}
 
     void SetCurrentFloatingPositioner(FloatingPositioner *boundingBox);
-    FloatingPositioner *GetCurrentFloatingPositioner() { return m_currentPositioner; };
+    FloatingPositioner *GetCurrentFloatingPositioner() { return m_currentPositioner; }
 
     /**
      * @name Get and set the drawing group id for linking floating element horizontally
@@ -67,18 +67,14 @@ public:
     //----------//
 
     /**
-     * @name Reset the horizontal alignment
+     * See Object::ResetHorizontalAlignment
      */
-    ///@{
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
-    ///@}
 
     /**
-     * @name Reset the vertical alignment
+     * See Object::ResetVerticalAlignment
      */
-    ///@{
     virtual int ResetVerticalAlignment(FunctorParams *functorParams);
-    ///@}
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
@@ -96,13 +92,12 @@ public:
     virtual int PrepareTimestamps(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
-     * Undo the cast of the system.
-     * This is used by Doc::ContinuousLayout
+     * See Object::UnCastOff
      */
     virtual int UnCastOff(FunctorParams *functorParams);
 
@@ -127,17 +122,17 @@ private:
 class FloatingPositioner : public BoundingBox {
 public:
     // constructors and destructors
-    FloatingPositioner(FloatingElement *element);
+    FloatingPositioner(FloatingObject *object);
     virtual ~FloatingPositioner(){};
-    virtual ClassId Is() const { return FLOATING_POSITIONER; };
+    virtual ClassId Is() const { return FLOATING_POSITIONER; }
 
     virtual void ResetPositioner();
 
-    FloatingElement *GetElement() const { return m_element; };
+    FloatingObject *GetObject() const { return m_object; }
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
 
-    data_STAFFREL GetDrawingPlace() const { return m_place; };
+    data_STAFFREL GetDrawingPlace() const { return m_place; }
 
     void UpdateSlurPosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
@@ -145,7 +140,7 @@ public:
      * @name Get and set the Y drawing relative position
      */
     ///@{
-    int GetDrawingYRel() const { return m_drawingYRel; };
+    int GetDrawingYRel() const { return m_drawingYRel; }
     void SetDrawingYRel(int drawingYRel);
     ///@}
 
@@ -156,7 +151,7 @@ protected:
      */
     int m_drawingYRel;
 
-    FloatingElement *m_element;
+    FloatingObject *m_object;
 
     data_STAFFREL m_place;
 

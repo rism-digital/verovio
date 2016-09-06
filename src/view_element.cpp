@@ -154,7 +154,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
 //----------------------------------------------------------------------------
 // View - LayerElement
 //----------------------------------------------------------------------------
-    
+
 void View::DrawAccid(
     DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid)
 {
@@ -176,13 +176,15 @@ void View::DrawAccid(
     dc->StartGraphic(element, "", element->GetUuid());
 
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
-                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
-                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     // Mensural accidentals may be quite a bit smaller than CMN accidentals; use _pseudoStaffSize_ to force this.
     int pseudoStaffSize;
-    if (isMensural) pseudoStaffSize = (int)(TEMP_MACCID_SIZE_FACTOR * staff->m_drawingStaffSize);
-    else pseudoStaffSize = staff->m_drawingStaffSize;
+    if (isMensural)
+        pseudoStaffSize = (int)(TEMP_MACCID_SIZE_FACTOR * staff->m_drawingStaffSize);
+    else
+        pseudoStaffSize = staff->m_drawingStaffSize;
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if (accid->m_parent) {
@@ -224,7 +226,7 @@ void View::DrawAccid(
         case ACCIDENTAL_EXPLICIT_n: symc = SMUFL_E261_accidentalNatural; break;
         case ACCIDENTAL_EXPLICIT_ss: symc = SMUFL_E263_accidentalDoubleSharp; break;
         case ACCIDENTAL_EXPLICIT_s: symc = SMUFL_E262_accidentalSharp; break;
-        case ACCIDENTAL_EXPLICIT_ff: symc = SMUFL_E264_accidentalDoubleFlat;
+        case ACCIDENTAL_EXPLICIT_ff: symc = SMUFL_E264_accidentalDoubleFlat; break;
         case ACCIDENTAL_EXPLICIT_f: symc = SMUFL_E260_accidentalFlat; break;
         case ACCIDENTAL_EXPLICIT_su:
             symc = SMUFL_E268_accidentalNaturalSharp;
@@ -616,67 +618,69 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Clef *clef = dynamic_cast<Clef *>(element);
     assert(clef);
 
-    dc->StartGraphic(element, "", element->GetUuid());
-
     int y = staff->GetDrawingY();
     int x = element->GetDrawingX();
-    int sym = SMUFL_E050_gClef;
+    int sym = 0;
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
                           || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
                           || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black)
         ? true
         : false;
 
-    switch (clef->GetClefId()) {
-        case C1:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-            break;
-        case G1:
-            sym = (isMensural ? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
-            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-            break;
-        case G2_8va:
-            sym = SMUFL_E053_gClef8va;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case G2_8vb:
-            sym = SMUFL_E052_gClef8vb;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case C2:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case G2:
-            sym = (isMensural ? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case F3:
-            sym = SMUFL_E062_fClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            break;
-        case C3:
-            sym = (isMensural ? SMUFL_E909_mensuralCclefPetrucciPosMiddle : SMUFL_E05C_cClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            break;
-        case F5: sym = SMUFL_E062_fClef; break;
-        case F4:
-            sym = (isMensural ? SMUFL_E904_mensuralFclefPetrucci : SMUFL_E062_fClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            break;
-        case C4:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            break;
-        case C5: sym = SMUFL_E05C_cClef; break;
-        case perc:
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            // FIXME
-            sym = SMUFL_E05C_cClef;
-            break;
-        default: break;
+    int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
+
+    if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, PLACE_NONE))
+        sym = SMUFL_E050_gClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, PLACE_below))
+        sym = SMUFL_E052_gClef8vb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, PLACE_below))
+        sym = SMUFL_E051_gClef15mb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, PLACE_above))
+        sym = SMUFL_E053_gClef8va;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, PLACE_above))
+        sym = SMUFL_E054_gClef15ma;
+    // C-clef
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_NONE, PLACE_NONE))
+        sym = SMUFL_E05C_cClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, PLACE_below))
+        sym = SMUFL_E05D_cClef8vb;
+    else if (clef->GetShape() == CLEFSHAPE_C)
+        sym = SMUFL_E05C_cClef;
+
+    // F-clef
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_NONE, PLACE_NONE))
+        sym = SMUFL_E062_fClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, PLACE_below))
+        sym = SMUFL_E064_fClef8vb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, PLACE_below))
+        sym = SMUFL_E063_fClef15mb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, PLACE_above))
+        sym = SMUFL_E065_fClef8va;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, PLACE_above))
+        sym = SMUFL_E066_fClef15ma;
+    else if (clef->GetShape() == CLEFSHAPE_F)
+        sym = SMUFL_E062_fClef;
+
+    // Perc
+    else if (clef->GetShape() == CLEFSHAPE_perc)
+        sym = SMUFL_E069_unpitchedPercussionClef1;
+
+    // mensural clefs
+    if (isMensural) {
+        if (sym == SMUFL_E050_gClef)
+            sym = SMUFL_E901_mensuralGclefPetrucci;
+        else if (sym == SMUFL_E05C_cClef)
+            sym = SMUFL_E909_mensuralCclefPetrucciPosMiddle;
+        else if (sym == SMUFL_E062_fClef)
+            sym = SMUFL_E904_mensuralFclefPetrucci;
     }
+
+    if (sym == 0) {
+        clef->SetEmptyBB();
+        return;
+    }
+
+    y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
 
     bool cueSize = false;
     // force cue size for intermediate clefs
@@ -684,6 +688,8 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     // if (!cueSize)
     //    x -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+
+    dc->StartGraphic(element, "", element->GetUuid());
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, cueSize);
 
@@ -804,23 +810,28 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         return;
     }
 
+    // C major (0) key sig and system scoreDef - cancellation (if any) is done at the end of the previous system
+    else if ((keySig->GetScoreDefRole() == SYSTEM_SCOREDEF) && (keySig->GetAlterationNumber() == 0)) {
+        keySig->SetEmptyBB();
+        return;
+    }
+
     dc->StartGraphic(element, "", element->GetUuid());
 
     x = element->GetDrawingX();
     // HARDCODED
-    int step
-        = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_KEYSIG_STEP;
+    int step = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_KEYSIG_STEP;
 
     // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by
     // default)
-    if ((keySig->GetAlterationNumber() == 0) || (layer->DrawKeySigCancellation() && keySig->m_drawingShowchange)) {
+    if ((keySig->GetScoreDefRole() != SYSTEM_SCOREDEF)
+        && ((keySig->GetAlterationNumber() == 0) || keySig->m_drawingShowchange)) {
         // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
         if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
             for (i = 0; i < keySig->m_drawingCancelAccidCount; i++) {
                 data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
-                y = staff->GetDrawingY()
-                    + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
-                          KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c->GetClefId()));
+                y = staff->GetDrawingY() + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
+                                               KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c));
                 ;
 
                 DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
@@ -831,9 +842,8 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         else if (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount) {
             for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; i++) {
                 data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
-                y = staff->GetDrawingY()
-                    + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
-                          KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c->GetClefId()));
+                y = staff->GetDrawingY() + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
+                                               KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c));
                 ;
 
                 DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
@@ -845,7 +855,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     for (i = 0; i < keySig->GetAlterationNumber(); i++) {
         data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->GetAlterationType(), i);
         y = staff->GetDrawingY() + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
-                                       KeySig::GetOctave(keySig->GetAlterationType(), pitch, c->GetClefId()));
+                                       KeySig::GetOctave(keySig->GetAlterationType(), pitch, c));
         ;
 
         if (keySig->GetAlterationType() == ACCIDENTAL_EXPLICIT_f)
@@ -1453,23 +1463,22 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     dc->ResetPen();
     dc->ResetBrush();
 }
-    
+
 bool IsMensuralStaff(Staff *staff);
 bool IsMensuralStaff(Staff *staff)
 {
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
-                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
-                       || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
     return isMensural;
 }
-    
+
 void View::DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
 {
     int i;
     int useStaffSize = staff->m_drawingStaffSize;
-    if (IsMensuralStaff(staff))
-        useStaffSize *= TEMP_MAUGDOT_SIZE_FACTOR;
-    
+    if (IsMensuralStaff(staff)) useStaffSize *= TEMP_MAUGDOT_SIZE_FACTOR;
+
     if (IsOnStaffLine(y, staff)) {
         y += m_doc->GetDrawingUnit(useStaffSize);
     }
@@ -1613,12 +1622,15 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
     int ynum = 0, yden = 0;
     std::wstring wtext;
 
+    int yCenter = y - (staff->m_drawingLines) / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    yCenter += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+
     if (numBase) {
-        ynum = y - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
+        ynum = yCenter; // - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
         yden = ynum - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2);
     }
     else
-        ynum = y - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
+        ynum = yCenter - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
 
     if (numBase > 9 || num > 9) {
         x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;

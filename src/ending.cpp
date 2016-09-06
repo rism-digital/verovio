@@ -13,7 +13,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "editorial.h"
 #include "functorparams.h"
+#include "measure.h"
+#include "scoredef.h"
+#include "section.h"
 #include "system.h"
 #include "vrv.h"
 
@@ -23,7 +27,7 @@ namespace vrv {
 // Ending
 //----------------------------------------------------------------------------
 
-Ending::Ending() : FloatingElement("ending-"), BoundaryStartInterface(), AttCommon()
+Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
@@ -36,14 +40,60 @@ Ending::~Ending()
 
 void Ending::Reset()
 {
-    FloatingElement::Reset();
+    SystemElement::Reset();
     BoundaryStartInterface::Reset();
     ResetCommon();
+}
+
+void Ending::AddChild(Object *child)
+{
+    if (child->Is() == MEASURE) {
+        assert(dynamic_cast<Measure *>(child));
+    }
+    else if (child->IsSystemElement()) {
+        assert(dynamic_cast<SystemElement *>(child));
+        // here we are actually allowing ending withing ending, which is wrong
+        if (child->Is() == ENDING) {
+            LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+            assert(false);
+        }
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
 }
 
 //----------------------------------------------------------------------------
 // Ending functor methods
 //----------------------------------------------------------------------------
+
+int Ending::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Ending::ConvertToPageBasedEnd(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
 
 int Ending::PrepareBoundaries(FunctorParams *functorParams)
 {
@@ -62,6 +112,8 @@ int Ending::PrepareBoundaries(FunctorParams *functorParams)
 
 int Ending::ResetDrawing(FunctorParams *functorParams)
 {
+    FloatingObject::ResetDrawing(functorParams);
+
     this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
 
     return FUNCTOR_CONTINUE;
@@ -82,6 +134,16 @@ int Ending::CastOffSystems(FunctorParams *functorParams)
     Ending *ending = dynamic_cast<Ending *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     // move as pending since we want it at the beginning of the system in case of system break coming
     params->m_pendingObjects.push_back(ending);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Ending::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }

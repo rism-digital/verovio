@@ -42,7 +42,7 @@ public:
     ///@{
     SvgDeviceContext(int width, int height);
     virtual ~SvgDeviceContext();
-    virtual ClassId Is() const { return SVG_DEVICE_CONTEXT; };
+    virtual ClassId Is() const { return SVG_DEVICE_CONTEXT; }
     ///@}
 
     /**
@@ -149,7 +149,7 @@ private:
     /**
      * Change the flag for indicating the use of the VerovioText font
      */
-    void VrvTextFont() { m_vrvTextFont = true; };
+    void VrvTextFont() { m_vrvTextFont = true; }
 
     /**
      * Flush the data to the internal buffer.

@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <iostream>
+#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
 #include <math.h>
 #include <sstream>
 
@@ -23,9 +24,9 @@
 #include "doc.h"
 #include "dynam.h"
 #include "ending.h"
-#include "floatingelement.h"
 #include "functorparams.h"
 #include "hairpin.h"
+#include "harm.h"
 #include "layer.h"
 #include "layerelement.h"
 #include "measure.h"
@@ -47,18 +48,19 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// View - FloatingElement
+// View - FloatingObject - ControlElement
 //----------------------------------------------------------------------------
 
-void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Measure *measure, System *system)
+void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system)
 {
     assert(dc);
     assert(system);
     assert(measure);
     assert(element);
 
-    // For dir and dynam, we do not consider the @tstamp2 for rendering
-    if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DIR) && (element->Is() != DYNAM)) {
+    // For dir, dynam, and harm, we do not consider the @tstamp2 for rendering
+    if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DIR) && (element->Is() != DYNAM)
+        && (element->Is() != HARM)) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -73,6 +75,11 @@ void View::DrawFloatingElement(DeviceContext *dc, FloatingElement *element, Meas
         Dynam *dynam = dynamic_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
+    }
+    else if (element->Is() == HARM) {
+        Harm *harm = dynamic_cast<Harm *>(element);
+        assert(harm);
+        DrawHarm(dc, harm, measure, system);
     }
     else if (element->Is() == PEDAL) {
         Pedal *pedal = dynamic_cast<Pedal *>(element);
@@ -174,9 +181,9 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
 
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
-        if (element->IsFloatingElement())
+        if (element->IsControlElement())
             system->SetCurrentFloatingPositioner(
-                (*staffIter)->GetN(), dynamic_cast<FloatingElement *>(element), x1, (*staffIter)->GetDrawingY());
+                (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), x1, (*staffIter)->GetDrawingY());
 
         if (element->Is() == HAIRPIN) {
             // cast to Harprin check in DrawHairpin
@@ -822,9 +829,9 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
 
     System *system = dynamic_cast<System *>(staff->GetFirstParent(SYSTEM));
     assert(system);
-    TimeSpanningLayerElementsParams timeSpanningLayerElementsParams;
-    timeSpanningLayerElementsParams.m_minPos = p1->x;
-    timeSpanningLayerElementsParams.m_maxPos = p2->x;
+    FindTimeSpanningLayerElementsParams findTimeSpanningLayerElementsParams;
+    findTimeSpanningLayerElementsParams.m_minPos = p1->x;
+    findTimeSpanningLayerElementsParams.m_maxPos = p2->x;
     std::vector<AttComparison *> filters;
     // Create ad comparison object for each type / @n
     // For now we only look at one layer (assumed layer1 == layer2)
@@ -833,14 +840,14 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     filters.push_back(&matchStaff);
     filters.push_back(&matchLayer);
 
-    Functor timeSpanningLayerElements(&Object::TimeSpanningLayerElements);
-    system->Process(&timeSpanningLayerElements, &timeSpanningLayerElementsParams, NULL, &filters);
+    Functor timeSpanningLayerElements(&Object::FindTimeSpanningLayerElements);
+    system->Process(&timeSpanningLayerElements, &findTimeSpanningLayerElementsParams, NULL, &filters);
     // if (spanningContent.size() > 12) LogDebug("### %d %s", spanningContent.size(), slur->GetUuid().c_str());
 
     ArrayOfLayerElementPointPairs spanningContentPoints;
     std::vector<LayerElement *>::iterator it;
-    for (it = timeSpanningLayerElementsParams.m_spanningContent.begin();
-         it != timeSpanningLayerElementsParams.m_spanningContent.end(); it++) {
+    for (it = findTimeSpanningLayerElementsParams.m_spanningContent.begin();
+         it != findTimeSpanningLayerElementsParams.m_spanningContent.end(); it++) {
         Note *note = NULL;
         // We keep only notes and chords for now
         if (((*it)->Is() != NOTE) && ((*it)->Is() != CHORD)) continue;
@@ -980,7 +987,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
     int maxHeight = 0;
 
     // 0.2 for avoiding / by 0 (below)
-    float maxHeightFactor = std::max(0.2, fabs(angle));
+    float maxHeightFactor = std::max(0.2f, fabsf(angle));
     maxHeight = dist / (maxHeightFactor * (TEMP_SLUR_CURVE_FACTOR
                                               + 5)); // 5 is the minimum - can be increased for limiting curvature
     if (posRatio) {
@@ -1459,9 +1466,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, x, (*staffIter)->GetDrawingY());
 
-        // Basic method that use bounding box
         int y = dir->GetDrawingY();
-        // int y = GetDirY(dir->GetPlace(), *staffIter);
 
         dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
@@ -1538,6 +1543,51 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     }
 
     dc->EndGraphic(dynam, this);
+}
+
+void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(harm);
+
+    // We cannot draw a dir that has no start position
+    if (!harm->GetStart()) return;
+
+    dc->StartGraphic(harm, "", harm->GetUuid());
+
+    // Use Romam bold for tempo
+    FontInfo dirTxt;
+    dirTxt.SetFaceName("Times");
+
+    // If we have not timestamp
+    int x = harm->GetStart()->GetDrawingX();
+
+    bool setX = false;
+    bool setY = false;
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = harm->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, x, (*staffIter)->GetDrawingY());
+
+        int y = harm->GetDrawingY();
+
+        dirTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
+
+        dc->SetBrush(m_currentColour, AxSOLID);
+        dc->SetFont(&dirTxt);
+
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        DrawTextChildren(dc, harm, x, y, setX, setY);
+        dc->EndText();
+
+        dc->ResetFont();
+        dc->ResetBrush();
+    }
+
+    dc->EndGraphic(harm, this);
 }
 
 void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system)
@@ -1620,7 +1670,6 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
         tempoTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
-        // Basic method that use bounding box
         int y = tempo->GetDrawingY();
 
         dc->SetBrush(m_currentColour, AxSOLID);
@@ -1635,6 +1684,44 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     }
 
     dc->EndGraphic(tempo, this);
+}
+
+//----------------------------------------------------------------------------
+// View - FloatingObject - SystemElement
+//----------------------------------------------------------------------------
+
+void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *system)
+{
+    assert(dc);
+    assert(element);
+    assert(system);
+
+    if (element->Is() == BOUNDARY_END) {
+        BoundaryEnd *boundaryEnd = dynamic_cast<BoundaryEnd *>(element);
+        assert(boundaryEnd);
+        assert(boundaryEnd->GetStart());
+        dc->StartGraphic(element, boundaryEnd->GetStart()->GetUuid(), element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is() == ENDING) {
+        // Create placeholder - A graphic for the end boundary will be created
+        // but only if it is on a different system - See View::DrawEnding
+        // The Ending is added to the System drawing list by View::DrawMeasure
+        dc->StartGraphic(element, "boundaryStart", element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is() == PB) {
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is() == SB) {
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
+    else if (element->Is() == SECTION) {
+        dc->StartGraphic(element, "boundaryStart", element->GetUuid());
+        dc->EndGraphic(element, this);
+    }
 }
 
 void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
@@ -1674,10 +1761,10 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
     // The both correspond to the current system, which means no system break in-between (simple case)
     if ((system == parentSystem1) && (system == parentSystem2)) {
-        x1 = ending->GetMeasure()->GetDrawingX();
+        measure = ending->GetMeasure();
+        x1 = measure->GetDrawingX();
         // if it is the first measure of the system use the left barline position
-        if (system->GetFirst(MEASURE) == ending->GetMeasure())
-            x1 += ending->GetMeasure()->GetLeftBarLineXRel();
+        if (system->GetFirst(MEASURE) == measure) x1 += measure->GetLeftBarLineXRel();
         x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
     }
     // Only the first parent is the same, this means that the ending is "open" at the end of the system
@@ -1687,8 +1774,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if (!Check(measure)) return;
         x1 = ending->GetMeasure()->GetDrawingX();
         // if it is the first measure of the system use the left barline position
-        if (system->GetFirst(MEASURE) == ending->GetMeasure())
-            x1 += ending->GetMeasure()->GetLeftBarLineXRel();
+        if (system->GetFirst(MEASURE) == ending->GetMeasure()) x1 += ending->GetMeasure()->GetLeftBarLineXRel();
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         spanningType = SPANNING_START;
     }
@@ -1722,15 +1808,16 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList;
-    assert(ending->GetMeasure()->GetDrawingScoreDef());
+    assert(system->GetDrawingScoreDef());
+    assert(measure);
     // By default, endings are drawn on top of each group (@ending.rend="gouped") unless "top" is specified)
-    if (ending->GetMeasure()->GetDrawingScoreDef()->GetEndingRend() == endings_ENDINGREND_top) {
+    if (system->GetDrawingScoreDef()->GetEndingRend() == endings_ENDINGREND_top) {
         Staff *staff = dynamic_cast<Staff *>(system->FindChildByType(STAFF, 2, FORWARD));
         if (!Check(staff)) return;
         staffList.push_back(staff);
     }
     else {
-        staffList = ending->GetMeasure()->GetFirstStaffGrpStaves(ending->GetMeasure()->GetDrawingScoreDef());
+        staffList = measure->GetFirstStaffGrpStaves(system->GetDrawingScoreDef());
     }
 
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
@@ -1749,9 +1836,9 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         if (ending->HasN()) {
             std::wstringstream strStream;
             // Maybe we want to add ( ) after system breaks?
-            // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
+            if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L"(";
             strStream << ending->GetN() << L".";
-            // if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
+            if ((spanningType == SPANNING_END) || (spanningType == SPANNING_MIDDLE)) strStream << L")";
 
             Text text;
             text.SetText(strStream.str());

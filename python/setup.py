@@ -6,91 +6,24 @@ setup.py file for Verovio
 
 
 from distutils.core import setup, Extension
+from glob import glob
+import platform
 
 # generate the git commit include file
 import os
 os.system("../tools/get_git_commit.sh")
 
 
+EXTRA_COMPILE_ARGS = ['-DPYTHON_BINDING']
+if platform.system() != 'Windows':
+    EXTRA_COMPILE_ARGS += ['-std=c++11', '-Wno-write-strings', '-Wno-overloaded-virtual', '-Wno-unused-private-field']
+    
+
 verovio_module = Extension('_verovio',
-    sources=['../src/accid.cpp',
-             '../src/aligner.cpp',
-             '../src/anchoredtext.cpp',
-             '../src/att.cpp',
-             '../src/barline.cpp',
-             '../src/bboxdevicecontext.cpp',
-             '../src/beam.cpp',
-             '../src/boundary.cpp',
-             '../src/chord.cpp',
-             '../src/clef.cpp',
-             '../src/custos.cpp',
-             '../src/devicecontext.cpp',
-             '../src/dir.cpp',
-             '../src/doc.cpp', 
-             '../src/dot.cpp',
-             '../src/drawinginterface.cpp',
-             '../src/durationinterface.cpp',
-             '../src/dynam.cpp',
-             '../src/editorial.cpp',
-             '../src/ending.cpp',
-             '../src/floatingelement.cpp',
-             '../src/glyph.cpp',
-             '../src/hairpin.cpp',
-             '../src/io.cpp',
-             '../src/iodarms.cpp',
-             '../src/iohumdrum.cpp',
-             '../src/iomei.cpp',
-             '../src/iopae.cpp',
-             '../src/iomusxml.cpp',
-             '../src/keysig.cpp',
-             '../src/layer.cpp',
-             '../src/layerelement.cpp',
-             '../src/ligature.cpp',
-             '../src/measure.cpp',
-             '../src/mensur.cpp',
-             '../src/metersig.cpp',
-             '../src/mrest.cpp',
-             '../src/multirest.cpp',
-             '../src/note.cpp',
-             '../src/object.cpp',
-             '../src/octave.cpp',
-             '../src/page.cpp',
-             '../src/pedal.cpp',
-             '../src/pitchinterface.cpp',
-             '../src/positioninterface.cpp',
-             '../src/proport.cpp',
-             '../src/rest.cpp',
-             '../src/rpt.cpp',
-             '../src/scoredef.cpp',
-             '../src/scoredefinterface.cpp',
-             '../src/slur.cpp',
-             '../src/space.cpp',
-             '../src/staff.cpp',
-             '../src/style.cpp',
-             '../src/svgdevicecontext.cpp',
-             '../src/syl.cpp',
-             '../src/system.cpp',
-             '../src/tempo.cpp',
-             '../src/text.cpp',
-             '../src/textdirinterface.cpp',
-             '../src/textelement.cpp',
-             '../src/tie.cpp',
-             '../src/timeinterface.cpp',
-             '../src/timestamp.cpp',
-             '../src/toolkit.cpp',
-             '../src/tuplet.cpp',
-             '../src/verse.cpp',
-             '../src/view.cpp',
-             '../src/view_beam.cpp',
-             '../src/view_element.cpp',
-             '../src/view_floating.cpp',
-             '../src/view_graph.cpp',
-             '../src/view_mensural.cpp',
-             '../src/view_page.cpp',
-             '../src/view_text.cpp',
-             '../src/view_tuplet.cpp',
-             '../src/vrv.cpp',
-             '../src/hum/humlib.cpp',
+    sources=
+        glob('../src/*.cpp') +
+        [
+             '../src/json/jsonxx.cc',
              '../src/pugi/pugixml.cpp',
              '../src/midi/Binasc.cpp',
              '../src/midi/MidiEvent.cpp',
@@ -105,9 +38,10 @@ verovio_module = Extension('_verovio',
              '../libmei/atts_pagebased.cpp',
              '../libmei/atts_shared.cpp',
              'verovio.i'],
-                swig_opts=['-c++'],
-                include_dirs=['/usr/local/include', '../include', '../include/vrv', '../include/hum', '../include/midi', '../include/pugi', '../include/utf8', '../libmei'],
-                extra_compile_args=['-std=c++11', '-Wno-write-strings', '-Wno-overloaded-virtual', '-Wno-unused-private-field'])
+    swig_opts=['-c++'],
+    include_dirs=['/usr/local/include', '../include', '../include/vrv', '../include/json', '../include/midi', '../include/pugi', '../include/utf8', '../include/win32', '../libmei'],
+    extra_compile_args=EXTRA_COMPILE_ARGS
+)
 
 setup (name = 'verovio',
        version = '0.9.12',

@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        floatingelement.cpp
+// Name:        floatingobject.cpp
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "floatingelement.h"
+#include "floatingobject.h"
 
 //----------------------------------------------------------------------------
 
@@ -18,6 +18,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "hairpin.h"
+#include "harm.h"
 #include "octave.h"
 #include "pedal.h"
 #include "slur.h"
@@ -27,68 +28,68 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// FloatingElement
+// FloatingObject
 //----------------------------------------------------------------------------
 
-FloatingElement::FloatingElement() : Object("fe")
+FloatingObject::FloatingObject() : Object("fe")
 {
     Reset();
 }
 
-FloatingElement::FloatingElement(std::string classid) : Object(classid)
+FloatingObject::FloatingObject(std::string classid) : Object(classid)
 {
     Reset();
 
     m_currentPositioner = NULL;
 }
 
-FloatingElement::~FloatingElement()
+FloatingObject::~FloatingObject()
 {
 }
 
-void FloatingElement::Reset()
+void FloatingObject::Reset()
 {
     Object::Reset();
 
-    m_drawingGrpId = 0;
+    m_drawingGrpId = DRAWING_GRP_NONE;
 }
 
-void FloatingElement::UpdateContentBBoxX(int x1, int x2)
+void FloatingObject::UpdateContentBBoxX(int x1, int x2)
 {
     if (!m_currentPositioner) return;
     m_currentPositioner->BoundingBox::UpdateContentBBoxX(x1, x2);
 }
 
-void FloatingElement::UpdateContentBBoxY(int y1, int y2)
+void FloatingObject::UpdateContentBBoxY(int y1, int y2)
 {
     if (!m_currentPositioner) return;
     m_currentPositioner->BoundingBox::UpdateContentBBoxY(y1, y2);
 }
 
-void FloatingElement::UpdateSelfBBoxX(int x1, int x2)
+void FloatingObject::UpdateSelfBBoxX(int x1, int x2)
 {
     if (!m_currentPositioner) return;
     m_currentPositioner->BoundingBox::UpdateSelfBBoxX(x1, x2);
 }
 
-void FloatingElement::UpdateSelfBBoxY(int y1, int y2)
+void FloatingObject::UpdateSelfBBoxY(int y1, int y2)
 {
     if (!m_currentPositioner) return;
     m_currentPositioner->BoundingBox::UpdateSelfBBoxY(y1, y2);
 }
 
-int FloatingElement::GetDrawingX() const
+int FloatingObject::GetDrawingX() const
 {
     return m_drawingX;
 }
 
-int FloatingElement::GetDrawingY() const
+int FloatingObject::GetDrawingY() const
 {
     if (!m_currentPositioner) return 0;
     return m_currentPositioner->GetDrawingY() - m_currentPositioner->GetDrawingYRel();
 }
 
-void FloatingElement::SetCurrentFloatingPositioner(FloatingPositioner *boundingBox)
+void FloatingObject::SetCurrentFloatingPositioner(FloatingPositioner *boundingBox)
 {
     m_currentPositioner = boundingBox;
 }
@@ -97,47 +98,53 @@ void FloatingElement::SetCurrentFloatingPositioner(FloatingPositioner *boundingB
 // FloatingPositioner
 //----------------------------------------------------------------------------
 
-FloatingPositioner::FloatingPositioner(FloatingElement *element) : BoundingBox()
+FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
 {
-    assert(element);
+    assert(object);
 
-    m_element = element;
-    if (element->Is() == DIR) {
-        Dir *dir = dynamic_cast<Dir *>(element);
+    m_object = object;
+    if (object->Is() == DIR) {
+        Dir *dir = dynamic_cast<Dir *>(object);
         assert(dir);
         // dir below by default
         m_place = dir->HasPlace() ? dir->GetPlace() : STAFFREL_below;
     }
-    else if (element->Is() == DYNAM) {
-        Dynam *dynam = dynamic_cast<Dynam *>(element);
+    else if (object->Is() == DYNAM) {
+        Dynam *dynam = dynamic_cast<Dynam *>(object);
         assert(dynam);
         // dynam below by default
         m_place = dynam->HasPlace() ? dynam->GetPlace() : STAFFREL_below;
     }
-    else if (element->Is() == ENDING) {
+    else if (object->Is() == ENDING) {
         // endings always above;
         m_place = STAFFREL_above;
     }
-    else if (element->Is() == HAIRPIN) {
-        Hairpin *hairpin = dynamic_cast<Hairpin *>(element);
+    else if (object->Is() == HAIRPIN) {
+        Hairpin *hairpin = dynamic_cast<Hairpin *>(object);
         assert(hairpin);
         // haripin below by default;
         m_place = hairpin->HasPlace() ? hairpin->GetPlace() : STAFFREL_below;
     }
-    else if (element->Is() == OCTAVE) {
-        Octave *octave = dynamic_cast<Octave *>(element);
+    else if (object->Is() == HARM) {
+        Harm *harm = dynamic_cast<Harm *>(object);
+        assert(harm);
+        // harm above by default
+        m_place = harm->HasPlace() ? harm->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is() == OCTAVE) {
+        Octave *octave = dynamic_cast<Octave *>(object);
         assert(octave);
         // octave below by default (won't draw without @dis.place anyway);
         m_place = (octave->GetDisPlace() == PLACE_above) ? STAFFREL_above : STAFFREL_below;
     }
-    else if (element->Is() == PEDAL) {
-        Pedal *pedal = dynamic_cast<Pedal *>(element);
+    else if (object->Is() == PEDAL) {
+        Pedal *pedal = dynamic_cast<Pedal *>(object);
         assert(pedal);
         // pedal below by default
         m_place = pedal->HasPlace() ? pedal->GetPlace() : STAFFREL_below;
     }
-    else if (element->Is() == TEMPO) {
-        Tempo *tempo = dynamic_cast<Tempo *>(element);
+    else if (object->Is() == TEMPO) {
+        Tempo *tempo = dynamic_cast<Tempo *>(object);
         assert(tempo);
         // tempo above by default;
         m_place = tempo->HasPlace() ? tempo->GetPlace() : STAFFREL_above;
@@ -195,25 +202,25 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     if (horizOverlapingBBox == NULL) {
         if (this->m_place == STAFFREL_above) {
             yRel = m_contentBB_y1;
-            yRel -= doc->GetBottomMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel -= doc->GetBottomMargin(this->m_object->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + m_contentBB_y2;
-            yRel += doc->GetTopMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel += doc->GetTopMargin(this->m_object->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
     }
     else {
         if (this->m_place == STAFFREL_above) {
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + m_contentBB_y1;
-            yRel -= doc->GetBottomMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel -= doc->GetBottomMargin(this->m_object->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
         else {
             yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
                 + m_contentBB_y2;
-            yRel += doc->GetTopMargin(this->m_element->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel += doc->GetTopMargin(this->m_object->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
     }
@@ -221,24 +228,24 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 }
 
 //----------------------------------------------------------------------------
-// FloatingElement functor methods
+// FloatingObject functor methods
 //----------------------------------------------------------------------------
 
-int FloatingElement::ResetHorizontalAlignment(FunctorParams *functorParams)
+int FloatingObject::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
 
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingElement::ResetVerticalAlignment(FunctorParams *functorParams)
+int FloatingObject::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
 
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingElement::PrepareTimeSpanning(FunctorParams *functorParams)
+int FloatingObject::PrepareTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
@@ -249,7 +256,7 @@ int FloatingElement::PrepareTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingElement::PrepareTimestamps(FunctorParams *functorParams)
+int FloatingObject::PrepareTimestamps(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_POINT)) {
@@ -265,7 +272,7 @@ int FloatingElement::PrepareTimestamps(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingElement::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
+int FloatingObject::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
     if (this->HasInterface(INTERFACE_TIME_SPANNING)) {
@@ -276,7 +283,7 @@ int FloatingElement::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FloatingElement::ResetDrawing(FunctorParams *functorParams)
+int FloatingObject::ResetDrawing(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
     // Pass it to the pseudo functor of the interface
@@ -285,11 +292,11 @@ int FloatingElement::ResetDrawing(FunctorParams *functorParams)
         assert(interface);
         return interface->InterfaceResetDrawing(functorParams, this);
     }
-    m_drawingGrpId = 0;
+    m_drawingGrpId = DRAWING_GRP_NONE;
     return FUNCTOR_CONTINUE;
 };
 
-int FloatingElement::UnCastOff(FunctorParams *functorParams)
+int FloatingObject::UnCastOff(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
 

@@ -34,17 +34,17 @@ public:
     Tuplet();
     virtual ~Tuplet();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Tuplet"; };
-    virtual ClassId Is() const { return TUPLET; };
+    virtual std::string GetClassName() const { return "Tuplet"; }
+    virtual ClassId Is() const { return TUPLET; }
     ///@}
 
-    int GetNoteCount() const { return this->GetChildCount(NOTE); };
+    int GetNoteCount() const { return this->GetChildCount(NOTE); }
 
     /**
      * Add an element (a note or a rest) to a tuplet.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
 protected:
     /**
