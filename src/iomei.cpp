@@ -482,7 +482,6 @@ bool MeiOutput::WriteObjectEnd(Object *object)
         return true;
     }
     else if (m_scoreBasedMEI && (object->Is() == PAGE)) {
-        //int x = 0;
         return true;
     }
     m_nodeStack.pop_back();
