@@ -414,18 +414,19 @@ bool HumdrumInput::convertHumdrum(void)
 
     // calculateLayout();
 
+    m_doc->ConvertToPageBasedDoc();
+
     if (m_debug) {
         cout << GetMeiString();
     }
 
-	m_doc->ConvertToPageBasedDoc();
-	// If the document has <pb/> and <sb/> elements you can call:
-	//    m_doc->CastOffEncodingDoc();
-	// which will cast off the document according to these breaks.
-	// Adding <pb/> and <sb/> are done with
-	// Pb pb = new Pb();
-	// section->AddChild(pb);
-	
+    // If the document has <pb/> and <sb/> elements you can call:
+    //    m_doc->CastOffEncodingDoc();
+    // which will cast off the document according to these breaks.
+    // Adding <pb/> and <sb/> are done with
+    // Pb pb = new Pb();
+    // section->AddChild(pb);
+
     return status;
 }
 
@@ -828,9 +829,9 @@ void HumdrumInput::prepareStaffGroup(void)
         m_staffgroup->AddChild(m_staffdef.back());
         fillPartInfo(kernstarts[i], i + 1);
     }
-	if (kernstarts.size() > 0) {
-		addMidiTempo(m_doc->m_scoreDef, kernstarts[0]);
-	}
+    if (kernstarts.size() > 0) {
+        addMidiTempo(m_doc->m_scoreDef, kernstarts[0]);
+    }
     if (kernstarts.size() == 2) {
         m_staffgroup->SetSymbol(staffgroupingsym_SYMBOL_brace);
         m_staffgroup->SetBarthru(BOOLEAN_true);
@@ -840,36 +841,35 @@ void HumdrumInput::prepareStaffGroup(void)
     }
 }
 
-
 //////////////////////////////
 //
 // HumdrumInput::addMidiTempo --
 //
 
-void HumdrumInput::addMidiTempo(ScoreDef& m_scoreDef, HTp kernpart) {
-	while (kernpart != NULL) {
-		if (kernpart->isData()) {
-			break;;
-		}
-		if (!kernpart->isInterpretation()) {
-			kernpart = kernpart->getNextToken();
-			continue;
-		}
-		if (kernpart->compare(0, 3, "*MM") == 0) {
-			if (kernpart->size() > 3) {
-				if (::isdigit((*kernpart)[3])) {
-                	int tempo = stoi(kernpart->substr(3));
-					// string tempostr = to_string(tempo);
-					m_scoreDef.SetMidiBpm(tempo);
-				}
-			}
-			break;
-		}
-		kernpart = kernpart->getNextToken();
-	}
+void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, HTp kernpart)
+{
+    while (kernpart != NULL) {
+        if (kernpart->isData()) {
+            break;
+            ;
+        }
+        if (!kernpart->isInterpretation()) {
+            kernpart = kernpart->getNextToken();
+            continue;
+        }
+        if (kernpart->compare(0, 3, "*MM") == 0) {
+            if (kernpart->size() > 3) {
+                if (::isdigit((*kernpart)[3])) {
+                    int tempo = stoi(kernpart->substr(3));
+                    // string tempostr = to_string(tempo);
+                    m_scoreDef.SetMidiBpm(tempo);
+                }
+            }
+            break;
+        }
+        kernpart = kernpart->getNextToken();
+    }
 }
-
-
 
 //////////////////////////////
 //
@@ -949,10 +949,8 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
         setMeterSymbol(m_staffdef.back(), metersig);
     }
 
-	addInstrumentDefinition(m_staffdef.back(), partstart);
+    addInstrumentDefinition(m_staffdef.back(), partstart);
 }
-
-
 
 //////////////////////////////
 //
@@ -962,57 +960,54 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
 //    <instrDef @midi.channel @midi.instrnum @midi.instrname>
 //
 
-void HumdrumInput::addInstrumentDefinition(StaffDef* staffdef, HTp partstart) {
+void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, HTp partstart)
+{
 
-	HTp instcode = NULL;
-	while (partstart != NULL) {
-		if (partstart->isData()) {
-			break;;
-		}
-		if (!partstart->isInterpretation()) {
-			partstart = partstart->getNextToken();
-			continue;
-		}
-		if (partstart->compare(0, 2, "*I") == 0) {
-			if (partstart->size() < 2) {
-				partstart = partstart->getNextToken();
-				continue;
-			}
-			if (!::islower((*partstart)[2])) {
-				// instrument class, name, abbrevation or similar
-				partstart = partstart->getNextToken();
-				continue;
-			}
-			instcode = partstart;
-			break;
-		}
-		partstart = partstart->getNextToken();
-	}
+    HTp instcode = NULL;
+    while (partstart != NULL) {
+        if (partstart->isData()) {
+            break;
+            ;
+        }
+        if (!partstart->isInterpretation()) {
+            partstart = partstart->getNextToken();
+            continue;
+        }
+        if (partstart->compare(0, 2, "*I") == 0) {
+            if (partstart->size() < 2) {
+                partstart = partstart->getNextToken();
+                continue;
+            }
+            if (!::islower((*partstart)[2])) {
+                // instrument class, name, abbrevation or similar
+                partstart = partstart->getNextToken();
+                continue;
+            }
+            instcode = partstart;
+            break;
+        }
+        partstart = partstart->getNextToken();
+    }
 
+    if (instcode == NULL) {
+        return;
+    }
 
-	if (instcode == NULL) {
-		return;
-	}
+    // InstrDef* idef = new InstrDef;
+    // staffdef->AddInstrDef(idef);
 
-	// InstrDef* idef = new InstrDef;
-	// staffdef->AddInstrDef(idef);
+    // Allowing users to assign MIDI instrument numbers in data would be useful.
+    //	static HumInstrument imap;
+    //	int gmpc = imap.getGM(*instcode);
 
-	// Allowing users to assign MIDI instrument numbers in data would be useful.
-//	static HumInstrument imap;
-//	int gmpc = imap.getGM(*instcode);
+    //   m_staffdef.push_back(new StaffDef());
+    //   m_staffgroup->AddStaffDef(m_staffdef.back());
 
-//   m_staffdef.push_back(new StaffDef());
-//   m_staffgroup->AddStaffDef(m_staffdef.back());
-
-//   gmpc is -1 if no mapping (probably assign to 0 in those cases).
-//   if (instcode) {
-//   std::cerr << "GOT HERE " << *instcode << " " << gmpc << std::endl;
-//   }
-
+    //   gmpc is -1 if no mapping (probably assign to 0 in those cases).
+    //   if (instcode) {
+    //   std::cerr << "GOT HERE " << *instcode << " " << gmpc << std::endl;
+    //   }
 }
-
-
-
 
 //////////////////////////////
 //
@@ -1142,7 +1137,10 @@ void HumdrumInput::setKeySig(StaffDef *part, const string &keysig)
 
 void HumdrumInput::setClef(StaffDef *part, const string &clef)
 {
-    if (clef.find("clefG") != string::npos) {
+    if (clef.find("clefGG") != string::npos) {
+        part->SetClefShape(CLEFSHAPE_GG);
+    }
+    else if (clef.find("clefG") != string::npos) {
         part->SetClefShape(CLEFSHAPE_G);
     }
     else if (clef.find("clefF") != string::npos) {
@@ -1150,6 +1148,9 @@ void HumdrumInput::setClef(StaffDef *part, const string &clef)
     }
     else if (clef.find("clefC") != string::npos) {
         part->SetClefShape(CLEFSHAPE_C);
+    }
+    if (clef.find("clefX") != string::npos) {
+        part->SetClefShape(CLEFSHAPE_perc);
     }
 
     if (clef.find("2") != string::npos) {
@@ -1168,9 +1169,21 @@ void HumdrumInput::setClef(StaffDef *part, const string &clef)
         part->SetClefLine(1);
     }
 
-    if (clef.find("v") != string::npos) {
+    if (clef.find("vv") != string::npos) {
+        part->SetClefDis(OCTAVE_DIS_15);
+        part->SetClefDisPlace(PLACE_below);
+    }
+    else if (clef.find("v") != string::npos) {
         part->SetClefDis(OCTAVE_DIS_8);
         part->SetClefDisPlace(PLACE_below);
+    }
+    else if (clef.find("^^") != string::npos) {
+        part->SetClefDis(OCTAVE_DIS_15);
+        part->SetClefDisPlace(PLACE_above);
+    }
+    else if (clef.find("^") != string::npos) {
+        part->SetClefDis(OCTAVE_DIS_8);
+        part->SetClefDisPlace(PLACE_above);
     }
 }
 
@@ -3898,7 +3911,7 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     m_measure = new Measure();
     // m_system->AddMeasure(m_measure);
     // m_system->AddChild(m_measure);
-	m_sections.back()->AddChild(m_measure);
+    m_sections.back()->AddChild(m_measure);
     m_measures.push_back(m_measure);
 
     int measurenumber = getMeasureNumber(startline, endline);
@@ -4415,26 +4428,25 @@ std::string HumdrumInput::GetMeiString(void)
     return meioutput.GetOutput();
 }
 
-
 //////////////////////////////
 //
 // HumdrumInput::setLocationId -- use the file location of the item
 //    for the ID.
 //
 
-void HumdrumInput::setLocationId(Object* object, HTp token, int subtoken) {
-	int line = token->getLineIndex() + 1;
-	int field = token->getFieldIndex() + 1;
-	string id = object->GetClassName();
+void HumdrumInput::setLocationId(Object *object, HTp token, int subtoken)
+{
+    int line = token->getLineIndex() + 1;
+    int field = token->getFieldIndex() + 1;
+    string id = object->GetClassName();
     std::transform(id.begin(), id.end(), id.begin(), ::tolower);
     id += "-L" + to_string(line);
     id += "F" + to_string(field);
-	if (subtoken >= 0) {
-	    id += "S" + to_string(subtoken+1);
+    if (subtoken >= 0) {
+        id += "S" + to_string(subtoken + 1);
     }
-	object->SetUuid(id);
+    object->SetUuid(id);
 }
-
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
