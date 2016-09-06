@@ -106,7 +106,7 @@ public:
     void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
     bool DrawMensur() const { return (m_drawMensur && m_currentMensur.HasSign()); }
     void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
-    bool DrawMeterSig() const { return (m_drawMeterSig && m_currentMeterSig.HasUnit()); }
+    bool DrawMeterSig() const { return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym())); }
     void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; }
     ///@}
 

@@ -1620,7 +1620,7 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
     assert(staff);
 
     int ynum = 0, yden = 0;
-    std::wstring wtext;
+    std::wstring numText, numBaseText;
 
     int yCenter = y - (staff->m_drawingLines) / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     yCenter += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -1632,18 +1632,20 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
     else
         ynum = yCenter - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
 
-    if (numBase > 9 || num > 9) {
-        x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
-    }
-
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    wtext = IntToTimeSigFigures(num);
-    DrawSmuflString(dc, x, ynum, wtext, true, staff->m_drawingStaffSize); // true = center
+    numText = IntToTimeSigFigures(num);
+    if (numBase) numBaseText = IntToTimeSigFigures(numBase);
+
+    std::wstring widthText = (numText.length() > numBaseText.length()) ? numText : numBaseText;
+
+    int w = 0, h = 0;
+    dc->GetSmuflTextExtent(widthText, &w, &h);
+    x += (w / 2);
+    DrawSmuflString(dc, x, ynum, numText, true, staff->m_drawingStaffSize);
 
     if (numBase) {
-        wtext = IntToTimeSigFigures(numBase);
-        DrawSmuflString(dc, x, yden, wtext, true, staff->m_drawingStaffSize); // '1' = center
+        DrawSmuflString(dc, x, yden, numBaseText, true, staff->m_drawingStaffSize);
     }
 
     dc->ResetFont();
