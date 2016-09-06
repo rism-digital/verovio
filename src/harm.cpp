@@ -68,8 +68,8 @@ void Harm::AddChild(Object *child)
 
 int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
 {
-    PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
-    assert(params);
+    //PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    //assert(params);
 
     this->SetDrawingGrpId(DRAWING_GRP_HARM);
 
