@@ -176,14 +176,12 @@ namespace humaux {
         }
 
         if (samemeasure) {
-            // m_startmeasure->AddFloatingElement(tie);
             m_startmeasure->AddChild(tie);
             m_inserted = true;
         }
         else {
             // The tie starts in one measure and goes to another.
             // Probably handled the same as when in the same measure.
-            // m_startmeasure->AddFloatingElement(tie);
             m_startmeasure->AddChild(tie);
             m_inserted = true;
         }
@@ -266,10 +264,7 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
     m_filename = filename;
 
     m_staffgroup = NULL;
-    // m_staffdef is a vector
-
-    // m_page = NULL;
-    // m_system = NULL;
+    m_score = NULL;
     m_measure = NULL;
     m_staff = NULL;
     m_layer = NULL;
@@ -821,11 +816,9 @@ void HumdrumInput::prepareStaffGroup(void)
     const vector<HTp> &kernstarts = m_kernstarts;
 
     m_staffgroup = new StaffGrp();
-    // m_doc->m_scoreDef.AddStaffGrp(m_staffgroup);
     m_doc->m_scoreDef.AddChild(m_staffgroup);
     for (int i = 0; i < (int)kernstarts.size(); i++) {
         m_staffdef.push_back(new StaffDef());
-        // m_staffgroup->AddStaffDef(m_staffdef.back());
         m_staffgroup->AddChild(m_staffdef.back());
         fillPartInfo(kernstarts[i], i + 1);
     }
@@ -1151,6 +1144,8 @@ void HumdrumInput::setClef(StaffDef *part, const string &clef)
     }
     if (clef.find("clefX") != string::npos) {
         part->SetClefShape(CLEFSHAPE_perc);
+		// by default place on 3rd line (unless another numbe is given):
+        part->SetClefLine(3);
     }
 
     if (clef.find("2") != string::npos) {
@@ -1244,7 +1239,6 @@ void HumdrumInput::checkForOmd(int startline, int endline)
         if (key == "OMD") {
             value = infile[i].getReferenceValue();
             Tempo *tempo = new Tempo;
-            // m_measure->AddFloatingElement(tempo);
             m_measure->AddChild(tempo);
             addTextElement(tempo, value);
             tempo->SetTstamp(1.0);
@@ -1340,7 +1334,6 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
     vector<Staff *> stafflist(kernstarts.size());
     for (i = 0; i < (int)kernstarts.size(); i++) {
         stafflist[i] = new Staff();
-        // m_measure->AddStaff(stafflist[i]);
         m_measure->AddChild(stafflist[i]);
     }
 
@@ -1390,7 +1383,6 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
     m_layer = new Layer();
     m_currentlayer = layerindex + 1;
     m_layer->SetN(layerindex + 1);
-    // m_staff->AddLayer(m_layer);
     m_staff->AddChild(m_layer);
 
     if (m_comment) {
@@ -1553,12 +1545,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     if (emptyMeasures()) {
         if (timesigdurs[startline] == duration) {
             MRest *mrest = new MRest();
-            // m_layer->AddLayerElement(mrest);
             m_layer->AddChild(mrest);
         }
         else {
             Rest *rest = new Rest();
-            // m_layer->AddLayerElement(rest);
             m_layer->AddChild(rest);
             setDuration(rest, duration);
         }
@@ -1764,7 +1754,6 @@ void HumdrumInput::processDirection(HTp token, int staffindex)
     }
 
     Dir *dir = new Dir;
-    // m_measure->AddFloatingElement(dir);
     m_measure->AddChild(dir);
     setStaff(dir, m_currentstaff);
     addTextElement(dir, text);
@@ -1818,7 +1807,6 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
             }
 
             Dynam *dynam = new Dynam;
-            // m_measure->AddFloatingElement(dynam);
             m_measure->AddChild(dynam);
             setStaff(dynam, m_currentstaff);
             addTextElement(dynam, "sf");
@@ -1942,7 +1930,6 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
             }
 
             Dynam *dynam = new Dynam;
-            // m_measure->AddFloatingElement(dynam);
             m_measure->AddChild(dynam);
             setStaff(dynam, m_currentstaff);
             addTextElement(dynam, dynamic);
@@ -1985,7 +1972,6 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
                 pair<int, double> ts2(measures, tstamp2.getFloat());
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_cres);
-                // m_measure->AddFloatingElement(hairpin);
                 m_measure->AddChild(hairpin);
                 if (aboveQ) {
                     hairpin->SetPlace(STAFFREL_above);
@@ -2024,7 +2010,6 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
                 pair<int, double> ts2(measures, tstamp2.getFloat());
                 hairpin->SetTstamp2(ts2);
                 hairpin->SetForm(hairpinLog_FORM_dim);
-                // m_measure->AddFloatingElement(hairpin);
                 m_measure->AddChild(hairpin);
                 if (aboveQ) {
                     hairpin->SetPlace(STAFFREL_above);
@@ -2166,7 +2151,6 @@ HumNum HumdrumInput::getMeasureTstamp(HTp token, int staffindex)
 template <class ELEMENT> void HumdrumInput::addTextElement(ELEMENT *element, const string &content)
 {
     Text *text = new Text;
-    // element->AddTextElement(text);
     element->AddChild(text);
     text->SetText(UTF8to16(unescapeHtmlEntities(content)));
 }
@@ -2190,7 +2174,6 @@ void HumdrumInput::processSlur(HTp token)
     slur->SetEndid("#" + token->getValue("MEI", "xml:id"));
     slur->SetStartid("#" + slurstart->getValue("MEI", "xml:id"));
 
-    // startmeasure->AddFloatingElement(slur);
     startmeasure->AddChild(slur);
     setStaff(slur, m_currentstaff);
 
@@ -3052,7 +3035,6 @@ void HumdrumInput::handleOttavaMark(HTp token, Note *note)
         if ((ss[staffindex].ottavameasure != NULL) && (ss[staffindex].ottavanotestart != NULL)
             && (ss[staffindex].ottavanoteend != NULL)) {
             Octave *octave = new Octave;
-            // ss[staffindex].ottavameasure->AddFloatingElement(octave);
             ss[staffindex].ottavameasure->AddChild(octave);
             setStaff(octave, staffindex + 1);
             octave->SetDis(OCTAVE_DIS_8);
@@ -3081,7 +3063,6 @@ void HumdrumInput::handlePedalMark(HTp token, Note *note)
     if (*token == "*ped") {
         // turn on pedal
         Pedal *pedal = new Pedal;
-        // m_measure->AddFloatingElement(pedal);
         m_measure->AddChild(pedal);
         HumNum tstamp = getMeasureTstamp(token, staffindex);
         pedal->SetTstamp(tstamp.getFloat());
@@ -3093,7 +3074,6 @@ void HumdrumInput::handlePedalMark(HTp token, Note *note)
         HTp pdata = getPreviousDataToken(token);
         if (pdata != NULL) {
             Pedal *pedal = new Pedal;
-            // m_measure->AddFloatingElement(pedal);
             m_measure->AddChild(pedal);
             HumNum tstamp = getMeasureTstamp(pdata, staffindex);
             pedal->SetTstamp(tstamp.getFloat());
@@ -3246,7 +3226,6 @@ bool HumdrumInput::hasFullMeasureRest(vector<HTp> &layerdata, HumNum timesigdur,
 
 template <class PARENT, class CHILD> void HumdrumInput::appendElement(PARENT parent, CHILD child)
 {
-    // parent->AddLayerElement(child);
     parent->AddChild(child);
 }
 
@@ -3488,7 +3467,6 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
 void HumdrumInput::addCautionaryAccidental(Note *note, HTp token, int acount)
 {
     Accid *accid = new Accid;
-    // note->AddLayerElement(accid);
     note->AddChild(accid);
     accid->SetFunc(accidLog_FUNC_caution);
     switch (acount) {
@@ -3909,8 +3887,6 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     m_measure = new Measure();
-    // m_system->AddMeasure(m_measure);
-    // m_system->AddChild(m_measure);
     m_sections.back()->AddChild(m_measure);
     m_measures.push_back(m_measure);
 
@@ -3946,31 +3922,23 @@ void HumdrumInput::storeOriginalClefApp(void)
     }
 
     App *app = new App;
-    // m_system->AddEditorialElement(app);
-    // m_system->AddChild(app);
     m_sections.back()->AddChild(app);
 
     Lem *lem = new Lem;
-    // app->AddLemOrRdg(lem);
     app->AddChild(lem);
 
     Rdg *rdg = new Rdg;
-    // app->AddChild(rdg);
-    // app->AddLemOrRdg(rdg);
     app->AddChild(rdg);
     rdg->SetLabel("original-clef");
 
     ScoreDef *scoredef = new ScoreDef;
-    // rdg->AddScoreDef(scoredef);
     rdg->AddChild(scoredef);
 
     StaffGrp *staffgrp = new StaffGrp;
-    // scoredef->AddStaffGrp(staffgrp);
     scoredef->AddChild(staffgrp);
 
     for (int i = 0; i < (int)m_oclef.size(); i++) {
         StaffDef *staffdef = new StaffDef;
-        // staffgrp->AddStaffDef(staffdef);
         staffgrp->AddChild(staffdef);
         setClef(staffdef, *m_oclef[i].second);
         staffdef->SetN(m_oclef[i].first);
@@ -4086,13 +4054,6 @@ int HumdrumInput::getMeasureEndLine(int startline)
 
 void HumdrumInput::setupMeiDocument(void)
 {
-    // m_page = new Page();
-    // m_doc->AddPage(m_page);
-    // m_doc->AddChild(m_page);
-    // m_system = new System();
-    // m_page->AddSystem(m_system);
-    // m_page->AddChild(m_system);
-
     m_score = m_doc->CreateScoreBuffer();
 
     Section *section = new Section();
@@ -4109,8 +4070,6 @@ void HumdrumInput::setupMeiDocument(void)
 void HumdrumInput::clear(void)
 {
     m_filename = "";
-    // m_page = NULL;
-    // m_system = NULL;
     m_tupletscaling = 1;
 }
 
