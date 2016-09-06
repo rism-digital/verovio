@@ -1,13 +1,17 @@
 var searchData=
 [
   ['saveparams',['SaveParams',['../classvrv_1_1_save_params.html',1,'vrv']]],
+  ['sb',['Sb',['../classvrv_1_1_sb.html',1,'vrv']]],
+  ['score',['Score',['../classvrv_1_1_score.html',1,'vrv']]],
   ['scoredef',['ScoreDef',['../classvrv_1_1_score_def.html',1,'vrv']]],
   ['scoredefelement',['ScoreDefElement',['../classvrv_1_1_score_def_element.html',1,'vrv']]],
   ['scoredefinterface',['ScoreDefInterface',['../classvrv_1_1_score_def_interface.html',1,'vrv']]],
+  ['section',['Section',['../classvrv_1_1_section.html',1,'vrv']]],
   ['setaligmentyposparams',['SetAligmentYPosParams',['../classvrv_1_1_set_aligment_y_pos_params.html',1,'vrv']]],
   ['setalignmentxposparams',['SetAlignmentXPosParams',['../classvrv_1_1_set_alignment_x_pos_params.html',1,'vrv']]],
   ['setboundingboxgracexshiftparams',['SetBoundingBoxGraceXShiftParams',['../classvrv_1_1_set_bounding_box_grace_x_shift_params.html',1,'vrv']]],
   ['setboundingboxxshiftparams',['SetBoundingBoxXShiftParams',['../classvrv_1_1_set_bounding_box_x_shift_params.html',1,'vrv']]],
+  ['setcautionaryscoredefparams',['SetCautionaryScoreDefParams',['../classvrv_1_1_set_cautionary_score_def_params.html',1,'vrv']]],
   ['setcurrentscoredefparams',['SetCurrentScoreDefParams',['../classvrv_1_1_set_current_score_def_params.html',1,'vrv']]],
   ['setdrawingxyparams',['SetDrawingXYParams',['../classvrv_1_1_set_drawing_x_y_params.html',1,'vrv']]],
   ['setoverflowbboxesparams',['SetOverflowBBoxesParams',['../classvrv_1_1_set_overflow_b_boxes_params.html',1,'vrv']]],
@@ -26,5 +30,6 @@ var searchData=
   ['svgdevicecontext',['SvgDeviceContext',['../classvrv_1_1_svg_device_context.html',1,'vrv']]],
   ['syl',['Syl',['../classvrv_1_1_syl.html',1,'vrv']]],
   ['system',['System',['../classvrv_1_1_system.html',1,'vrv']]],
-  ['systemaligner',['SystemAligner',['../classvrv_1_1_system_aligner.html',1,'vrv']]]
+  ['systemaligner',['SystemAligner',['../classvrv_1_1_system_aligner.html',1,'vrv']]],
+  ['systemelement',['SystemElement',['../classvrv_1_1_system_element.html',1,'vrv']]]
 ];

@@ -2,9 +2,12 @@ var classvrv_1_1_doc =
 [
     [ "Doc", "classvrv_1_1_doc.html#a6ae80af9be1fb301753322a4d779bced", null ],
     [ "~Doc", "classvrv_1_1_doc.html#a516c030103274ed0eb17f283b6f55088", null ],
-    [ "AddPage", "classvrv_1_1_doc.html#ab4b078be683bd9c300b65158d47b521c", null ],
+    [ "AddChild", "classvrv_1_1_doc.html#afa5e63f78721a319b7c195c46a5789d4", null ],
     [ "CastOffDoc", "classvrv_1_1_doc.html#a931f9cb5bb89b797564b30d35f10e0cc", null ],
+    [ "CastOffEncodingDoc", "classvrv_1_1_doc.html#a1f4801d2f14675afd7a372f525cbed2d", null ],
     [ "CollectScoreDefs", "classvrv_1_1_doc.html#ab76ac764588cc8d114024102260c1a28", null ],
+    [ "ConvertToPageBasedDoc", "classvrv_1_1_doc.html#a1f5b58cd73b6f04ce22ebf231c69db32", null ],
+    [ "CreateScoreBuffer", "classvrv_1_1_doc.html#a015895be073387040f0429f474a589a9", null ],
     [ "ExportMIDI", "classvrv_1_1_doc.html#a8d5b755ccb86f875aeed6d03bec26218", null ],
     [ "GetAdjustedDrawingPageHeight", "classvrv_1_1_doc.html#ada58d2075eb68ec2c620408b320c2142", null ],
     [ "GetAdjustedDrawingPageWidth", "classvrv_1_1_doc.html#a87817811155170739796c024c4c117fb", null ],

@@ -127,12 +127,12 @@ $(document).ready(function(){initNavTree('accid_8h_source.html','');});
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;    <a class="code" href="classvrv_1_1_accid.html">Accid</a>();</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_accid.html">Accid</a>();</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_accid.html#a77f0229943afc71686a9a5ad48866ab6">Reset</a>();</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">virtual</span> std::string GetClassName()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;Accid&quot;</span>; };</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> ACCID; };</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;    <span class="keyword">virtual</span> std::string GetClassName()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;Accid&quot;</span>; }</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> ACCID; }</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">virtual</span> <a class="code" href="classvrv_1_1_position_interface.html">PositionInterface</a> *GetPositionInterface() { <span class="keywordflow">return</span> <span class="keyword">dynamic_cast&lt;</span><a class="code" href="classvrv_1_1_position_interface.html">PositionInterface</a> *<span class="keyword">&gt;</span>(<span class="keyword">this</span>); }</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
-<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classvrv_1_1_accid.html#a9ffe591d5c38140ec1131c0b5cf0ccef">   37</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_accid.html#a9ffe591d5c38140ec1131c0b5cf0ccef">HasToBeAligned</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="keyword">true</span>; };</div>
+<div class="line"><a name="l00037"></a><span class="lineno"><a class="line" href="classvrv_1_1_accid.html#a9ffe591d5c38140ec1131c0b5cf0ccef">   37</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_accid.html#a9ffe591d5c38140ec1131c0b5cf0ccef">HasToBeAligned</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="comment">//----------//</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <span class="comment">// Functors //</span></div>
@@ -156,7 +156,7 @@ $(document).ready(function(){initNavTree('accid_8h_source.html','');});
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
 <div class="ttc" id="classvrv_1_1_accid_html_a95531e64cc2f6058638709308276b254"><div class="ttname"><a href="classvrv_1_1_accid.html#a95531e64cc2f6058638709308276b254">vrv::Accid::m_drawingCueSize</a></div><div class="ttdeci">bool m_drawingCueSize</div><div class="ttdoc">Indicates if is cue size for accid object created for . </div><div class="ttdef"><b>Definition:</b> accid.h:55</div></div>
 <div class="ttc" id="classvrv_1_1_position_interface_html"><div class="ttname"><a href="classvrv_1_1_position_interface.html">vrv::PositionInterface</a></div><div class="ttdoc">This class is an interface for elements with a position on the staff, such as rests. </div><div class="ttdef"><b>Definition:</b> positioninterface.h:24</div></div>
-<div class="ttc" id="classvrv_1_1_functor_params_html"><div class="ttname"><a href="classvrv_1_1_functor_params.html">vrv::FunctorParams</a></div><div class="ttdoc">This is the base class for all MEI att classes. </div><div class="ttdef"><b>Definition:</b> functorparams.h:53</div></div>
+<div class="ttc" id="classvrv_1_1_functor_params_html"><div class="ttname"><a href="classvrv_1_1_functor_params.html">vrv::FunctorParams</a></div><div class="ttdoc">This is the base class for all MEI att classes. </div><div class="ttdef"><b>Definition:</b> functorparams.h:54</div></div>
 <div class="ttc" id="classvrv_1_1_accid_html_a9ffe591d5c38140ec1131c0b5cf0ccef"><div class="ttname"><a href="classvrv_1_1_accid.html#a9ffe591d5c38140ec1131c0b5cf0ccef">vrv::Accid::HasToBeAligned</a></div><div class="ttdeci">virtual bool HasToBeAligned() const </div><div class="ttdoc">Override the method since alignment is required. </div><div class="ttdef"><b>Definition:</b> accid.h:37</div></div>
 <div class="ttc" id="classvrv_1_1_accid_html"><div class="ttname"><a href="classvrv_1_1_accid.html">vrv::Accid</a></div><div class="ttdef"><b>Definition:</b> accid.h:20</div></div>
 <div class="ttc" id="classvrv_1_1_layer_element_html"><div class="ttname"><a href="classvrv_1_1_layer_element.html">vrv::LayerElement</a></div><div class="ttdoc">This class is a base class for the Layer (<layer>) content. </div><div class="ttdef"><b>Definition:</b> layerelement.h:31</div></div>
@@ -166,7 +166,7 @@ $(document).ready(function(){initNavTree('accid_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>accid.h</b></li>
-    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
+    <li class="footer">Generated on Tue Sep 6 2016 08:32:55 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

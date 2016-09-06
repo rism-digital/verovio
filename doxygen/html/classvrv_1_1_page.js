@@ -2,7 +2,7 @@ var classvrv_1_1_page =
 [
     [ "Page", "classvrv_1_1_page.html#aef17cc516b80dce4f3cc8c86a417e4b8", null ],
     [ "~Page", "classvrv_1_1_page.html#a49c908159583beb6bc58706fc34f9bb6", null ],
-    [ "AddSystem", "classvrv_1_1_page.html#a0017b67ad07d943f20792b82c7ba35ec", null ],
+    [ "AddChild", "classvrv_1_1_page.html#aaab394087268b7ac653d6d935bd306c6", null ],
     [ "GetClassName", "classvrv_1_1_page.html#a81516ef39736c8fc65f53f00ca2e5730", null ],
     [ "GetContentHeight", "classvrv_1_1_page.html#a12469df3a9d39b9561c885e3d4d3a336", null ],
     [ "GetContentWidth", "classvrv_1_1_page.html#a4e5f1aa02dfb1f9878e65bd694983f91", null ],

@@ -2,7 +2,7 @@ var classvrv_1_1_note =
 [
     [ "Note", "classvrv_1_1_note.html#aec35e5f742e883b3c8bbd7d4a7ecc5c2", null ],
     [ "~Note", "classvrv_1_1_note.html#a63d285601a42d945b7481cb40d2dfa6b", null ],
-    [ "AddLayerElement", "classvrv_1_1_note.html#ab96f1edcef71ecebd45ad41b85b680b2", null ],
+    [ "AddChild", "classvrv_1_1_note.html#a777cd96f58898204059f5f08dbf2a736", null ],
     [ "FillStaffCurrentTimeSpanning", "classvrv_1_1_note.html#a6886de271d42a7e1be452338d7153e99", null ],
     [ "GetClassName", "classvrv_1_1_note.html#a23b0143a497a940d5eb1325663140e1c", null ],
     [ "GetDiatonicPitch", "classvrv_1_1_note.html#a56fd3b046fcbc40994a4798f5aa64075", null ],

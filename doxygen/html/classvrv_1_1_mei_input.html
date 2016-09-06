@@ -137,9 +137,15 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>ImportFile</b
 <tr class="memitem:a0d51bbd081157e924e2005d7aa9f1d48"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0d51bbd081157e924e2005d7aa9f1d48"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>ImportString</b> (std::string mei)</td></tr>
 <tr class="separator:a0d51bbd081157e924e2005d7aa9f1d48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8dcb2d60611cfa71434a03c5a92db898"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_mei_input.html#a8dcb2d60611cfa71434a03c5a92db898">SetAppXPathQuery</a> (std::string appXPathQuery)</td></tr>
-<tr class="memdesc:a8dcb2d60611cfa71434a03c5a92db898"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set an xPath query for selecting specific &lt;rdg&gt;.  <a href="#a8dcb2d60611cfa71434a03c5a92db898">More...</a><br /></td></tr>
-<tr class="separator:a8dcb2d60611cfa71434a03c5a92db898"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf0fef7e1bda36a2d688b04409fad639"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_mei_input.html#abf0fef7e1bda36a2d688b04409fad639">SetAppXPathQueries</a> (std::vector&lt; std::string &gt; &amp;xPathQueries)</td></tr>
+<tr class="memdesc:abf0fef7e1bda36a2d688b04409fad639"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the xPath queries for selecting specific &lt;rdg&gt;.  <a href="#abf0fef7e1bda36a2d688b04409fad639">More...</a><br /></td></tr>
+<tr class="separator:abf0fef7e1bda36a2d688b04409fad639"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed6a892e76a6b41f4c792d29ee289b7c"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_mei_input.html#aed6a892e76a6b41f4c792d29ee289b7c">SetChoiceXPathQueries</a> (std::vector&lt; std::string &gt; &amp;xPathQueries)</td></tr>
+<tr class="memdesc:aed6a892e76a6b41f4c792d29ee289b7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the xPath queries for selecting &lt;choice&gt; children.  <a href="#aed6a892e76a6b41f4c792d29ee289b7c">More...</a><br /></td></tr>
+<tr class="separator:aed6a892e76a6b41f4c792d29ee289b7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa039e44d5ddd789af9f4a64c9a2ef667"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_mei_input.html#aa039e44d5ddd789af9f4a64c9a2ef667">SetMdivXPathQuery</a> (std::string &amp;xPathQuery)</td></tr>
+<tr class="memdesc:aa039e44d5ddd789af9f4a64c9a2ef667"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the XPath query for selecting a specific &lt;mdiv&gt; Only one mdiv can be selected.  <a href="#aa039e44d5ddd789af9f4a64c9a2ef667">More...</a><br /></td></tr>
+<tr class="separator:aa039e44d5ddd789af9f4a64c9a2ef667"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrv_1_1_file_input_stream"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrv_1_1_file_input_stream')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrv_1_1_file_input_stream.html">vrv::FileInputStream</a></td></tr>
 <tr class="memitem:a433365b4a664e8b56c163302ffa61c1d inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a433365b4a664e8b56c163302ffa61c1d"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>FileInputStream</b> (<a class="el" href="classvrv_1_1_doc.html">Doc</a> *doc, std::string filename)</td></tr>
@@ -147,18 +153,10 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>ImportString<
 <tr class="memitem:a3c5007e9133b8710a0cb4c8a9eac6281 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3c5007e9133b8710a0cb4c8a9eac6281"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>FileInputStream</b> (<a class="el" href="classvrv_1_1_doc.html">Doc</a> *doc)</td></tr>
 <tr class="separator:a3c5007e9133b8710a0cb4c8a9eac6281 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab6fbf93425336f5ed3dfa263b4223ef3 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab6fbf93425336f5ed3dfa263b4223ef3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_file_input_stream.html#ab6fbf93425336f5ed3dfa263b4223ef3">IgnoreLayoutInformation</a> ()</td></tr>
-<tr class="memdesc:ab6fbf93425336f5ed3dfa263b4223ef3 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="mdescLeft">&#160;</td><td class="mdescRight">Setter for the layoutInformation ignore flag. <br /></td></tr>
-<tr class="separator:ab6fbf93425336f5ed3dfa263b4223ef3 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaab137b06a33e650c5a4b85f29dbac4a inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaab137b06a33e650c5a4b85f29dbac4a"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_file_input_stream.html#aaab137b06a33e650c5a4b85f29dbac4a">HasLayoutInformation</a> ()</td></tr>
 <tr class="memdesc:aaab137b06a33e650c5a4b85f29dbac4a inherit pub_methods_classvrv_1_1_file_input_stream"><td class="mdescLeft">&#160;</td><td class="mdescRight">Getter for layoutInformation flag that is set to true during import if layout information is found (and not to be ignored). <br /></td></tr>
 <tr class="separator:aaab137b06a33e650c5a4b85f29dbac4a inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4bba43591517d8e4c9bf07333a2f0a86 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4bba43591517d8e4c9bf07333a2f0a86"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_file_input_stream.html#a4bba43591517d8e4c9bf07333a2f0a86">HasMeasureWithinEditoMarkup</a> ()</td></tr>
-<tr class="memdesc:a4bba43591517d8e4c9bf07333a2f0a86 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="mdescLeft">&#160;</td><td class="mdescRight">Getter for &lt;app&gt; level flag that is set to true during import if &lt;measure&gt; within editorial markup has been found. <br /></td></tr>
-<tr class="separator:a4bba43591517d8e4c9bf07333a2f0a86 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -169,18 +167,12 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a46152aad3fa73405859f3fab30020e10 inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_file_input_stream.html#a46152aad3fa73405859f3fab30020e10">m_hasLayoutInformation</a></td></tr>
 <tr class="memdesc:a46152aad3fa73405859f3fab30020e10 inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="mdescLeft">&#160;</td><td class="mdescRight">Becomes true if layout information is found during the import.  <a href="#a46152aad3fa73405859f3fab30020e10">More...</a><br /></td></tr>
 <tr class="separator:a46152aad3fa73405859f3fab30020e10 inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff8205b90884453aef787c9471b93d1e inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_file_input_stream.html#aff8205b90884453aef787c9471b93d1e">m_hasMeasureWithinEditMarkup</a></td></tr>
-<tr class="memdesc:aff8205b90884453aef787c9471b93d1e inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="mdescLeft">&#160;</td><td class="mdescRight">Becomes true if &lt;measure&gt; are included within editorial markup.  <a href="#aff8205b90884453aef787c9471b93d1e">More...</a><br /></td></tr>
-<tr class="separator:aff8205b90884453aef787c9471b93d1e inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f5a976b16320dd2c300ecaebecaca8c inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_file_input_stream.html#a0f5a976b16320dd2c300ecaebecaca8c">m_ignoreLayoutInformation</a></td></tr>
-<tr class="memdesc:a0f5a976b16320dd2c300ecaebecaca8c inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="mdescLeft">&#160;</td><td class="mdescRight">If set to true, the layout information found during the import will be ignored.  <a href="#a0f5a976b16320dd2c300ecaebecaca8c">More...</a><br /></td></tr>
-<tr class="separator:a0f5a976b16320dd2c300ecaebecaca8c inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class is a file input stream for reading MEI files. </p>
 <p>It uses the libmei C++ library. Under development. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="a8dcb2d60611cfa71434a03c5a92db898"></a>
+<a class="anchor" id="abf0fef7e1bda36a2d688b04409fad639"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -188,10 +180,10 @@ Additional Inherited Members</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual void vrv::MeiInput::SetAppXPathQuery </td>
+          <td class="memname">virtual void vrv::MeiInput::SetAppXPathQueries </td>
           <td>(</td>
-          <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>appXPathQuery</em></td><td>)</td>
+          <td class="paramtype">std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>xPathQueries</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -202,10 +194,68 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Set an xPath query for selecting specific &lt;rdg&gt;. </p>
-<p>By default, the first &lt;lem&gt; or &lt;rdg&gt; is loaded. If a query is provided, the element retrieved by the specified xPath query will be selected (if any, otherwise the first one will be used). </p>
+<p>Set the xPath queries for selecting specific &lt;rdg&gt;. </p>
+<p>By default, the first &lt;lem&gt; or &lt;rdg&gt; is loaded. If one (or more) query is provided, the element matching the specified xPath query will be selected (if any, otherwise the first one will be used). </p>
 
-<p>Reimplemented from <a class="el" href="classvrv_1_1_file_input_stream.html#a60883bea31299bfb4b926491152c9365">vrv::FileInputStream</a>.</p>
+<p>Reimplemented from <a class="el" href="classvrv_1_1_file_input_stream.html#afc335afede6007a0137b49e94645d6cb">vrv::FileInputStream</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aed6a892e76a6b41f4c792d29ee289b7c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void vrv::MeiInput::SetChoiceXPathQueries </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; std::string &gt; &amp;&#160;</td>
+          <td class="paramname"><em>xPathQueries</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the xPath queries for selecting &lt;choice&gt; children. </p>
+<p>Works similarly as SetAppXPathQueries. By default, the first child is made visible </p>
+
+<p>Reimplemented from <a class="el" href="classvrv_1_1_file_input_stream.html#a8424703873e2e41d7346834840760ae0">vrv::FileInputStream</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa039e44d5ddd789af9f4a64c9a2ef667"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void vrv::MeiInput::SetMdivXPathQuery </td>
+          <td>(</td>
+          <td class="paramtype">std::string &amp;&#160;</td>
+          <td class="paramname"><em>xPathQuery</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the XPath query for selecting a specific &lt;mdiv&gt; Only one mdiv can be selected. </p>
+<p>This also works differently that &lt;app&gt; and &lt;choice&gt; selection because only the selected mdiv will be loaded. </p>
+
+<p>Reimplemented from <a class="el" href="classvrv_1_1_file_input_stream.html#a54d4f2123a797f2c76d53bbd3afe92a9">vrv::FileInputStream</a>.</p>
 
 </div>
 </div>
@@ -218,7 +268,7 @@ Additional Inherited Members</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_mei_input.html">MeiInput</a></li>
-    <li class="footer">Generated on Wed Jul 20 2016 07:50:06 by
+    <li class="footer">Generated on Tue Sep 6 2016 08:32:59 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

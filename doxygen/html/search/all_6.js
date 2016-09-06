@@ -1,7 +1,6 @@
 var searchData=
 [
   ['generatemidi',['GenerateMIDI',['../classvrv_1_1_layer_element.html#a7454a0a6922a5682093047666c63102f',1,'vrv::LayerElement::GenerateMIDI()'],['../classvrv_1_1_measure.html#af0a102d6699c8d6949f3ee9a3390859b',1,'vrv::Measure::GenerateMIDI()'],['../classvrv_1_1_object.html#afd41452bb5fc9587faf7b3c667e72452',1,'vrv::Object::GenerateMIDI()']]],
-  ['generatemidiend',['GenerateMIDIEnd',['../classvrv_1_1_layer_element.html#a3103139823a2ca11724ab38cf23f7a52',1,'vrv::LayerElement::GenerateMIDIEnd()'],['../classvrv_1_1_measure.html#a1ff19112fbbbaf6fd34aa85b3b50fa52',1,'vrv::Measure::GenerateMIDIEnd()'],['../classvrv_1_1_object.html#a1edb6aefa8123655dd8324f79370c656',1,'vrv::Object::GenerateMIDIEnd()']]],
   ['generatemidiparams',['GenerateMIDIParams',['../classvrv_1_1_generate_m_i_d_i_params.html',1,'vrv']]],
   ['getactualdur',['GetActualDur',['../classvrv_1_1_duration_interface.html#a2663805f1c369c86238729773f138047',1,'vrv::DurationInterface']]],
   ['getadjusteddrawingpageheight',['GetAdjustedDrawingPageHeight',['../classvrv_1_1_doc.html#ada58d2075eb68ec2c620408b320c2142',1,'vrv::Doc']]],
@@ -17,7 +16,6 @@ var searchData=
   ['getchild',['GetChild',['../classvrv_1_1_object.html#a8c711c39522c5abb7ab5466a18cc77ab',1,'vrv::Object']]],
   ['getchildindex',['GetChildIndex',['../classvrv_1_1_object.html#aa187432e90c784c80ac11e25ba92161c',1,'vrv::Object']]],
   ['getclef',['GetClef',['../classvrv_1_1_layer.html#a07e4a02152c687549acfd2c5ae3eef62',1,'vrv::Layer']]],
-  ['getclefid',['GetClefId',['../classvrv_1_1_clef.html#aa75c36646c45dfdad47b90edbe16843c',1,'vrv::Clef']]],
   ['getclefoffset',['GetClefOffset',['../classvrv_1_1_clef.html#a55ea206e981a2254c8bee36226b154c6',1,'vrv::Clef::GetClefOffset()'],['../classvrv_1_1_layer.html#a47d5c3b5a681fbf020cfc88bac167385',1,'vrv::Layer::GetClefOffset()']]],
   ['getcmn',['GetCmn',['../classvrv_1_1_att.html#a81e40feed99e1dc86cac6626d76fb494',1,'vrv::Att']]],
   ['getcodestr',['GetCodeStr',['../classvrv_1_1_glyph.html#a9b2879e91a774ec78623387d6192b555',1,'vrv::Glyph']]],
@@ -41,7 +39,7 @@ var searchData=
   ['getlastparentnot',['GetLastParentNot',['../classvrv_1_1_object.html#a3c450a8ffd67df67c16986910b16ff91',1,'vrv::Object']]],
   ['getlayeridx',['GetLayerIdx',['../classvrv_1_1_layer.html#a6521929d39942c7ff1f6b4c383df1063',1,'vrv::Layer']]],
   ['getleftalignment',['GetLeftAlignment',['../classvrv_1_1_measure_aligner.html#aa26ca291ace55d68a82b24a520dc5249',1,'vrv::MeasureAligner']]],
-  ['getlevel',['GetLevel',['../classvrv_1_1_app.html#a07dd8b721f08e752c19884426a183633',1,'vrv::App']]],
+  ['getlevel',['GetLevel',['../classvrv_1_1_app.html#a07dd8b721f08e752c19884426a183633',1,'vrv::App::GetLevel()'],['../classvrv_1_1_choice.html#a66c2af71b0ee3d8406dd0dc0aae1dcd8',1,'vrv::Choice::GetLevel()']]],
   ['getlist',['GetList',['../classvrv_1_1_object_list_interface.html#a7d4780a033564fdfd2f37db8830f058e',1,'vrv::ObjectListInterface']]],
   ['getlistfirst',['GetListFirst',['../classvrv_1_1_object_list_interface.html#a1dd620b5a71dbbc985d19972d404b04c',1,'vrv::ObjectListInterface']]],
   ['getlistindex',['GetListIndex',['../classvrv_1_1_object_list_interface.html#a3bdaaa1533dc4c5c662562db54a23146',1,'vrv::ObjectListInterface']]],

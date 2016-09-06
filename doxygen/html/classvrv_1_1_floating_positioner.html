@@ -116,7 +116,7 @@ $(document).ready(function(){initNavTree('classvrv_1_1_floating_positioner.html'
 <p>This class represents a basic object in the layout domain.  
  <a href="classvrv_1_1_floating_positioner.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="floatingelement_8h_source.html">floatingelement.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="floatingobject_8h_source.html">floatingobject.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for vrv::FloatingPositioner:</div>
 <div class="dyncontent">
@@ -129,18 +129,18 @@ Inheritance diagram for vrv::FloatingPositioner:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ac4f45e00a43230178286b3619f1be917"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac4f45e00a43230178286b3619f1be917"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>FloatingPositioner</b> (<a class="el" href="classvrv_1_1_floating_element.html">FloatingElement</a> *element)</td></tr>
-<tr class="separator:ac4f45e00a43230178286b3619f1be917"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa48621171f0a36d7c2b53c4491616b02"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa48621171f0a36d7c2b53c4491616b02"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>FloatingPositioner</b> (<a class="el" href="classvrv_1_1_floating_object.html">FloatingObject</a> *object)</td></tr>
+<tr class="separator:aa48621171f0a36d7c2b53c4491616b02"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae4c99a3854c06522e27c5c0f7b4c7f56"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae4c99a3854c06522e27c5c0f7b4c7f56"></a>
 virtual ClassId&#160;</td><td class="memItemRight" valign="bottom"><b>Is</b> () const </td></tr>
 <tr class="separator:ae4c99a3854c06522e27c5c0f7b4c7f56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99e8532f6ab38b81a39c5625b5955539"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a99e8532f6ab38b81a39c5625b5955539"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>ResetPositioner</b> ()</td></tr>
 <tr class="separator:a99e8532f6ab38b81a39c5625b5955539"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa81745a36d3123579e4d7b059ee78ed1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa81745a36d3123579e4d7b059ee78ed1"></a>
-<a class="el" href="classvrv_1_1_floating_element.html">FloatingElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetElement</b> () const </td></tr>
-<tr class="separator:aa81745a36d3123579e4d7b059ee78ed1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e6aa2f4bab127d429e3e48edd0b3865"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6e6aa2f4bab127d429e3e48edd0b3865"></a>
+<a class="el" href="classvrv_1_1_floating_object.html">FloatingObject</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetObject</b> () const </td></tr>
+<tr class="separator:a6e6aa2f4bab127d429e3e48edd0b3865"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a610bffb3224668e17473bd16ba7d6b2a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a610bffb3224668e17473bd16ba7d6b2a"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>CalcDrawingYRel</b> (<a class="el" href="classvrv_1_1_doc.html">Doc</a> *doc, <a class="el" href="classvrv_1_1_staff_alignment.html">StaffAlignment</a> *staffAlignment, <a class="el" href="classvrv_1_1_bounding_box.html">BoundingBox</a> *horizOverlapingBBox)</td></tr>
 <tr class="separator:a610bffb3224668e17473bd16ba7d6b2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -214,9 +214,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a52d529c02864d41c1b31cad82be18881"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_floating_positioner.html#a52d529c02864d41c1b31cad82be18881">m_drawingYRel</a></td></tr>
 <tr class="memdesc:a52d529c02864d41c1b31cad82be18881"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Y drawing relative position of the object.  <a href="#a52d529c02864d41c1b31cad82be18881">More...</a><br /></td></tr>
 <tr class="separator:a52d529c02864d41c1b31cad82be18881"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4fb419b87bfca61e873b6d14eddf862d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4fb419b87bfca61e873b6d14eddf862d"></a>
-<a class="el" href="classvrv_1_1_floating_element.html">FloatingElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_element</b></td></tr>
-<tr class="separator:a4fb419b87bfca61e873b6d14eddf862d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37c2446744eb4ae4149628468b066c5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37c2446744eb4ae4149628468b066c5e"></a>
+<a class="el" href="classvrv_1_1_floating_object.html">FloatingObject</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_object</b></td></tr>
+<tr class="separator:a37c2446744eb4ae4149628468b066c5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a230809600834d92bdbe3258fc931f172"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a230809600834d92bdbe3258fc931f172"></a>
 data_STAFFREL&#160;</td><td class="memItemRight" valign="bottom"><b>m_place</b></td></tr>
 <tr class="separator:a230809600834d92bdbe3258fc931f172"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -295,7 +295,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>m_selfBB_y2</b></td></
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li><a class="el" href="floatingelement_8h_source.html">floatingelement.h</a></li>
+<li><a class="el" href="floatingobject_8h_source.html">floatingobject.h</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
@@ -303,7 +303,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>m_selfBB_y2</b></td></
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_floating_positioner.html">FloatingPositioner</a></li>
-    <li class="footer">Generated on Wed Jul 20 2016 07:50:06 by
+    <li class="footer">Generated on Tue Sep 6 2016 08:32:58 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

@@ -2,7 +2,7 @@ var classvrv_1_1_syl =
 [
     [ "Syl", "classvrv_1_1_syl.html#a9cba9ac9d44ff3e7481616159f125a2a", null ],
     [ "~Syl", "classvrv_1_1_syl.html#a8be15ecb9214a389483e7a10ffc04b2b", null ],
-    [ "AddTextElement", "classvrv_1_1_syl.html#af1c3e81208c28823c2419f3eae933978", null ],
+    [ "AddChild", "classvrv_1_1_syl.html#a969ee1646f3ebc1ef176e05c27c64bf1", null ],
     [ "FillStaffCurrentTimeSpanning", "classvrv_1_1_syl.html#a97f982b99f0becd3d207dcb7c621636a", null ],
     [ "GetClassName", "classvrv_1_1_syl.html#a48c5e758331c01a7b28262b50842c0e6", null ],
     [ "GetTimePointInterface", "classvrv_1_1_syl.html#ace61c5236a8c0ad372dadca3f9d43630", null ],

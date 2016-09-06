@@ -135,7 +135,7 @@ $(document).ready(function(){initNavTree('bboxdevicecontext_8h_source.html','');
 <div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <a class="code" href="classvrv_1_1_b_box_device_context.html">BBoxDeviceContext</a>(<a class="code" href="classvrv_1_1_view.html">View</a> *view, <span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height, <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> update = BBOX_BOTH);</div>
 <div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_b_box_device_context.html">BBoxDeviceContext</a>();</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> BBOX_DEVICE_CONTEXT; };</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> BBOX_DEVICE_CONTEXT; }</div>
 <div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> SetBackground(<span class="keywordtype">int</span> colour, <span class="keywordtype">int</span> style = AxSOLID);</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> SetBackgroundImage(<span class="keywordtype">void</span> *image, <span class="keywordtype">double</span> opacity = 1.0){};</div>
@@ -205,10 +205,10 @@ $(document).ready(function(){initNavTree('bboxdevicecontext_8h_source.html','');
 <div class="ttc" id="classvrv_1_1_device_context_html"><div class="ttname"><a href="classvrv_1_1_device_context.html">vrv::DeviceContext</a></div><div class="ttdoc">This class is an abstract device context. </div><div class="ttdef"><b>Definition:</b> devicecontext.h:39</div></div>
 <div class="ttc" id="classvrv_1_1_point_html"><div class="ttname"><a href="classvrv_1_1_point.html">vrv::Point</a></div><div class="ttdoc">Simple class for representing points. </div><div class="ttdef"><b>Definition:</b> devicecontextbase.h:150</div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
-<div class="ttc" id="classvrv_1_1_object_html"><div class="ttname"><a href="classvrv_1_1_object.html">vrv::Object</a></div><div class="ttdoc">This class represents a basic object. </div><div class="ttdef"><b>Definition:</b> object.h:144</div></div>
+<div class="ttc" id="classvrv_1_1_object_html"><div class="ttname"><a href="classvrv_1_1_object.html">vrv::Object</a></div><div class="ttdoc">This class represents a basic object. </div><div class="ttdef"><b>Definition:</b> object.h:146</div></div>
 <div class="ttc" id="classvrv_1_1_b_box_device_context_html_a5b9c19400a36495c71b7f7bccf80457f"><div class="ttname"><a href="classvrv_1_1_b_box_device_context.html#a5b9c19400a36495c71b7f7bccf80457f">vrv::BBoxDeviceContext::MoveTextTo</a></div><div class="ttdeci">virtual void MoveTextTo(int x, int y)</div><div class="ttdoc">Move a text to the specified position, for example when starting a new line. </div></div>
 <div class="ttc" id="classvrv_1_1_b_box_device_context_html_ace984ec9c99483969dbd20c27c26ff1f"><div class="ttname"><a href="classvrv_1_1_b_box_device_context.html#ace984ec9c99483969dbd20c27c26ff1f">vrv::BBoxDeviceContext::DrawPlaceholder</a></div><div class="ttdeci">virtual void DrawPlaceholder(int x, int y)</div><div class="ttdoc">Special method for forcing bounding boxes to be updated Used for invisible elements (e...</div></div>
-<div class="ttc" id="classvrv_1_1_view_html"><div class="ttname"><a href="classvrv_1_1_view.html">vrv::View</a></div><div class="ttdoc">This class is a drawing context and corresponds to the view of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> view.h:57</div></div>
+<div class="ttc" id="classvrv_1_1_view_html"><div class="ttname"><a href="classvrv_1_1_view.html">vrv::View</a></div><div class="ttdoc">This class is a drawing context and corresponds to the view of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> view.h:59</div></div>
 <div class="ttc" id="classvrv_1_1_b_box_device_context_html"><div class="ttname"><a href="classvrv_1_1_b_box_device_context.html">vrv::BBoxDeviceContext</a></div><div class="ttdoc">This class calculates the bounding box of the object being drawn. </div><div class="ttdef"><b>Definition:</b> bboxdevicecontext.h:38</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
@@ -216,7 +216,7 @@ $(document).ready(function(){initNavTree('bboxdevicecontext_8h_source.html','');
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>bboxdevicecontext.h</b></li>
-    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
+    <li class="footer">Generated on Tue Sep 6 2016 08:32:55 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

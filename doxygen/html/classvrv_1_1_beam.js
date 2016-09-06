@@ -2,7 +2,7 @@ var classvrv_1_1_beam =
 [
     [ "Beam", "classvrv_1_1_beam.html#ad870ee58fa2f27ea30c1123b74e0f57f", null ],
     [ "~Beam", "classvrv_1_1_beam.html#a60d90b31b728d67d6c1143c264e5af3c", null ],
-    [ "AddLayerElement", "classvrv_1_1_beam.html#adb2f7a456c0ca22b3831cac69c31271d", null ],
+    [ "AddChild", "classvrv_1_1_beam.html#a2bf2871cb6ceb877ef0f87acb43e0393", null ],
     [ "ClearCoords", "classvrv_1_1_beam.html#a34fc75baaa7ed6db561e8b67044349b7", null ],
     [ "FilterList", "classvrv_1_1_beam.html#a444ea8b5240b49456d8a1f9a7902d5f4", null ],
     [ "GetClassName", "classvrv_1_1_beam.html#aa209dd21e94be8a818c8e7bc3fbe0733", null ],

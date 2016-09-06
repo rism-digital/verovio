@@ -2,7 +2,7 @@ var classvrv_1_1_dir =
 [
     [ "Dir", "classvrv_1_1_dir.html#a80bb28a453db077203b6f75307446464", null ],
     [ "~Dir", "classvrv_1_1_dir.html#a71210ff94d9fc48732efa32704f26dad", null ],
-    [ "AddTextElement", "classvrv_1_1_dir.html#a66594adb5f9218438010c5f2af73e23a", null ],
+    [ "AddChild", "classvrv_1_1_dir.html#a96d1ae22416dd7d6d4506072b299d161", null ],
     [ "GetClassName", "classvrv_1_1_dir.html#a1c370c3d2d4d0d6a8e5fb0aa414a3fc9", null ],
     [ "GetTextDirInterface", "classvrv_1_1_dir.html#af6190b09efcc865616870fefe1970ec1", null ],
     [ "GetTimePointInterface", "classvrv_1_1_dir.html#a2364b7032c3e368720db2fdf71a4c618", null ],

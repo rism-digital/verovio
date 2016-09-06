@@ -2,7 +2,7 @@ var classvrv_1_1_dynam =
 [
     [ "Dynam", "classvrv_1_1_dynam.html#a00505b726586f56cdbb2c9fd6f29beeb", null ],
     [ "~Dynam", "classvrv_1_1_dynam.html#aa3ba2f9cfb9ef3b639444d508d32239e", null ],
-    [ "AddTextElement", "classvrv_1_1_dynam.html#a42790afd97a5f55e150f1c450874a3b2", null ],
+    [ "AddChild", "classvrv_1_1_dynam.html#a7f5807e8ea2ab33ffa8bf5441b9536ce", null ],
     [ "GetClassName", "classvrv_1_1_dynam.html#a06f71217759f9a7de4994452ff682b64", null ],
     [ "GetSymbolStr", "classvrv_1_1_dynam.html#ab1ac545e80fe9cc517e712ea1e0c9816", null ],
     [ "GetTextDirInterface", "classvrv_1_1_dynam.html#a94ac71e8b1aa3864c6e6b53432b10a45", null ],

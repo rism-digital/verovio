@@ -106,6 +106,7 @@ $(document).ready(function(){initNavTree('classvrv_1_1_object.html','');});
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
@@ -129,25 +130,34 @@ Inheritance diagram for vrv::Object:</div>
 <area href="classvrv_1_1_alignment.html" title="This class stores an alignement position elements will point to. " alt="vrv::Alignment" shape="rect" coords="146,112,282,136"/>
 <area href="classvrv_1_1_doc.html" title="This class is a hold the data and corresponds to the model of a MVC design pattern. " alt="vrv::Doc" shape="rect" coords="146,168,282,192"/>
 <area href="classvrv_1_1_editorial_element.html" title="This class is a base class for the editorial element containing musical content, for example <rgd> or..." alt="vrv::EditorialElement" shape="rect" coords="146,224,282,248"/>
-<area href="classvrv_1_1_floating_element.html" title="This class is an interface for elements appearing within measure. " alt="vrv::FloatingElement" shape="rect" coords="146,280,282,304"/>
+<area href="classvrv_1_1_floating_object.html" title="This class represents elements appearing within a measure. " alt="vrv::FloatingObject" shape="rect" coords="146,280,282,304"/>
 <area href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). " alt="vrv::Layer" shape="rect" coords="146,336,282,360"/>
 <area href="classvrv_1_1_layer_element.html" title="This class is a base class for the Layer (<layer>) content. " alt="vrv::LayerElement" shape="rect" coords="146,392,282,416"/>
 <area href="classvrv_1_1_measure.html" title="This class represents a measure in a page-based score (Doc). " alt="vrv::Measure" shape="rect" coords="146,448,282,472"/>
 <area href="classvrv_1_1_measure_aligner.html" title="This class aligns the content of a measure It contains a vector of Alignment. " alt="vrv::MeasureAligner" shape="rect" coords="146,504,282,528"/>
 <area href="classvrv_1_1_page.html" title="This class represents a page in a laid-out score (Doc). " alt="vrv::Page" shape="rect" coords="146,560,282,584"/>
-<area href="classvrv_1_1_score_def_element.html" title="This class is a base class for MEI scoreDef or staffDef elements. " alt="vrv::ScoreDefElement" shape="rect" coords="146,616,282,640"/>
-<area href="classvrv_1_1_staff.html" title="This class represents a staff in a laid-out score (Doc). " alt="vrv::Staff" shape="rect" coords="146,672,282,696"/>
-<area href="classvrv_1_1_staff_alignment.html" title="This class stores an alignement position staves will point to. " alt="vrv::StaffAlignment" shape="rect" coords="146,728,282,752"/>
-<area href="classvrv_1_1_staff_grp.html" title="This class represents a MEI staffGrp. " alt="vrv::StaffGrp" shape="rect" coords="146,784,282,808"/>
-<area href="classvrv_1_1_system.html" title="This class represents a system in a laid-out score (Doc). " alt="vrv::System" shape="rect" coords="146,840,282,864"/>
-<area href="classvrv_1_1_system_aligner.html" title="This class aligns the content of a system It contains a vector of StaffAlignment. ..." alt="vrv::SystemAligner" shape="rect" coords="146,896,282,920"/>
-<area href="classvrv_1_1_text_element.html" alt="vrv::TextElement" shape="rect" coords="146,952,282,976"/>
-<area href="classvrv_1_1_timestamp_aligner.html" title="This class stores the timestamps (TimestampsAttr) in a measure. " alt="vrv::TimestampAligner" shape="rect" coords="146,1008,282,1032"/>
+<area href="classvrv_1_1_score.html" title="This class represent a <score> in MEI. " alt="vrv::Score" shape="rect" coords="146,616,282,640"/>
+<area href="classvrv_1_1_score_def_element.html" title="This class is a base class for MEI scoreDef or staffDef elements. " alt="vrv::ScoreDefElement" shape="rect" coords="146,672,282,696"/>
+<area href="classvrv_1_1_staff.html" title="This class represents a staff in a laid-out score (Doc). " alt="vrv::Staff" shape="rect" coords="146,728,282,752"/>
+<area href="classvrv_1_1_staff_alignment.html" title="This class stores an alignement position staves will point to. " alt="vrv::StaffAlignment" shape="rect" coords="146,784,282,808"/>
+<area href="classvrv_1_1_staff_grp.html" title="This class represents a MEI staffGrp. " alt="vrv::StaffGrp" shape="rect" coords="146,840,282,864"/>
+<area href="classvrv_1_1_system.html" title="This class represents a system in a laid-out score (Doc). " alt="vrv::System" shape="rect" coords="146,896,282,920"/>
+<area href="classvrv_1_1_system_aligner.html" title="This class aligns the content of a system It contains a vector of StaffAlignment. ..." alt="vrv::SystemAligner" shape="rect" coords="146,952,282,976"/>
+<area href="classvrv_1_1_text_element.html" alt="vrv::TextElement" shape="rect" coords="146,1008,282,1032"/>
+<area href="classvrv_1_1_timestamp_aligner.html" title="This class stores the timestamps (TimestampsAttr) in a measure. " alt="vrv::TimestampAligner" shape="rect" coords="146,1064,282,1088"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:aca21d5cf5a2ddb72771b57be55891856"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aca21d5cf5a2ddb72771b57be55891856"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#aca21d5cf5a2ddb72771b57be55891856">IsFloatingObject</a> () const </td></tr>
+<tr class="memdesc:aca21d5cf5a2ddb72771b57be55891856"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper for checking if an element is a floating object (system elements and control elements) <br /></td></tr>
+<tr class="separator:aca21d5cf5a2ddb72771b57be55891856"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b1d528341ef806d382cdd1c27911021"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5b1d528341ef806d382cdd1c27911021"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a5b1d528341ef806d382cdd1c27911021">IsBoundaryElement</a> ()</td></tr>
+<tr class="memdesc:a5b1d528341ef806d382cdd1c27911021"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper for checking if an element has a boundary start interface and also if is set as a boundary element. <br /></td></tr>
+<tr class="separator:a5b1d528341ef806d382cdd1c27911021"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60120fd33bf1f7227c4dc2f6a9b265c7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60120fd33bf1f7227c4dc2f6a9b265c7"></a>
 virtual <a class="el" href="classvrv_1_1_duration_interface.html">DurationInterface</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetDurationInterface</b> ()</td></tr>
 <tr class="separator:a60120fd33bf1f7227c4dc2f6a9b265c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -182,9 +192,12 @@ virtual <a class="el" href="classvrv_1_1_time_spanning_interface.html">TimeSpann
 <a class="el" href="classvrv_1_1_object.html">Object</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a6ad51ecc97faf69c8fa8432a780aed44">operator=</a> (const <a class="el" href="classvrv_1_1_object.html">Object</a> &amp;object)</td></tr>
 <tr class="memdesc:a6ad51ecc97faf69c8fa8432a780aed44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy assignement - see copy constructor. <br /></td></tr>
 <tr class="separator:a6ad51ecc97faf69c8fa8432a780aed44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad406fae576f302bb02d7f3442528fc3d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ad406fae576f302bb02d7f3442528fc3d">MoveChildren</a> (<a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
-<tr class="memdesc:ad406fae576f302bb02d7f3442528fc3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move all the children of the object passed as parameter to this one.  <a href="#ad406fae576f302bb02d7f3442528fc3d">More...</a><br /></td></tr>
-<tr class="separator:ad406fae576f302bb02d7f3442528fc3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa846e8099e10d6cf427e8255e4a62dd4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#aa846e8099e10d6cf427e8255e4a62dd4">MoveChildrenFrom</a> (<a class="el" href="classvrv_1_1_object.html">Object</a> *sourceParent, int idx=-1, bool allowTypeChange=false)</td></tr>
+<tr class="memdesc:aa846e8099e10d6cf427e8255e4a62dd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move all the children of the object passed as parameter to this one.  <a href="#aa846e8099e10d6cf427e8255e4a62dd4">More...</a><br /></td></tr>
+<tr class="separator:aa846e8099e10d6cf427e8255e4a62dd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7063ea155c08f4e39e5c59b735f1d9e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ac7063ea155c08f4e39e5c59b735f1d9e">MoveItselfTo</a> (<a class="el" href="classvrv_1_1_object.html">Object</a> *targetParent)</td></tr>
+<tr class="memdesc:ac7063ea155c08f4e39e5c59b735f1d9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Move an object to another parent.  <a href="#ac7063ea155c08f4e39e5c59b735f1d9e">More...</a><br /></td></tr>
+<tr class="separator:ac7063ea155c08f4e39e5c59b735f1d9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a20ea7ca3f0f7b75587af0561aa912c23"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrv_1_1_object.html">Object</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a20ea7ca3f0f7b75587af0561aa912c23">Clone</a> () const </td></tr>
 <tr class="memdesc:a20ea7ca3f0f7b75587af0561aa912c23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method call for copying child classes.  <a href="#a20ea7ca3f0f7b75587af0561aa912c23">More...</a><br /></td></tr>
 <tr class="separator:a20ea7ca3f0f7b75587af0561aa912c23"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -215,9 +228,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a9f30aa6a8185b260943003a08980d376"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a9f30aa6a8185b260943003a08980d376">SetParent</a> (<a class="el" href="classvrv_1_1_object.html">Object</a> *parent)</td></tr>
 <tr class="memdesc:a9f30aa6a8185b260943003a08980d376"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the parent of the <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a>.  <a href="#a9f30aa6a8185b260943003a08980d376">More...</a><br /></td></tr>
 <tr class="separator:a9f30aa6a8185b260943003a08980d376"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abdb868b124ba8b532e12f1a5069728fd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#abdb868b124ba8b532e12f1a5069728fd">AddEditorialElement</a> (<a class="el" href="classvrv_1_1_editorial_element.html">EditorialElement</a> *child)</td></tr>
-<tr class="memdesc:abdb868b124ba8b532e12f1a5069728fd"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_add.html">Add</a> an <a class="el" href="classvrv_1_1_editorial_element.html" title="This class is a base class for the editorial element containing musical content, for example <rgd> or...">EditorialElement</a> as child.  <a href="#abdb868b124ba8b532e12f1a5069728fd">More...</a><br /></td></tr>
-<tr class="separator:abdb868b124ba8b532e12f1a5069728fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ab113f1faf62ee0332687ff981c0948"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a2ab113f1faf62ee0332687ff981c0948">AddChild</a> (<a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
+<tr class="memdesc:a2ab113f1faf62ee0332687ff981c0948"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base method for adding children.  <a href="#a2ab113f1faf62ee0332687ff981c0948">More...</a><br /></td></tr>
+<tr class="separator:a2ab113f1faf62ee0332687ff981c0948"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2bc090f1b04e2c0202bc497ee9f0a6b4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2bc090f1b04e2c0202bc497ee9f0a6b4"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a2bc090f1b04e2c0202bc497ee9f0a6b4">GetIdx</a> () const </td></tr>
 <tr class="memdesc:a2bc090f1b04e2c0202bc497ee9f0a6b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the index position of the object in its parent (-1 if not found) <br /></td></tr>
@@ -257,6 +270,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a48ea7a78dfbdf0195235b56679924c76"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrv_1_1_object.html">Object</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a48ea7a78dfbdf0195235b56679924c76">Relinquish</a> (int idx)</td></tr>
 <tr class="memdesc:a48ea7a78dfbdf0195235b56679924c76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Give up ownership of the child at the idx position (NULL if not found) This is a method to be used only in the very particular case where the child object cannot be detached straight away.  <a href="#a48ea7a78dfbdf0195235b56679924c76">More...</a><br /></td></tr>
 <tr class="separator:a48ea7a78dfbdf0195235b56679924c76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a667b4432b8f9d9e92bfd34fe5c885099"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a667b4432b8f9d9e92bfd34fe5c885099">ClearRelinquishedChildren</a> ()</td></tr>
+<tr class="memdesc:a667b4432b8f9d9e92bfd34fe5c885099"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes all the children that were previously relinquished.  <a href="#a667b4432b8f9d9e92bfd34fe5c885099">More...</a><br /></td></tr>
+<tr class="separator:a667b4432b8f9d9e92bfd34fe5c885099"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7dbbee49cb70efaafbd7a80fa245176f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7dbbee49cb70efaafbd7a80fa245176f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a7dbbee49cb70efaafbd7a80fa245176f">RemoveChildAt</a> (int idx)</td></tr>
 <tr class="memdesc:a7dbbee49cb70efaafbd7a80fa245176f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove and delete the child at the idx position. <br /></td></tr>
@@ -288,104 +304,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a1af968d5140f79fd056aa5a46d7cad11">AddLayerElementToFlatList</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="memdesc:a1af968d5140f79fd056aa5a46d7cad11"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_add.html">Add</a> each LayerElements and its children to a flat list. <br /></td></tr>
 <tr class="separator:a1af968d5140f79fd056aa5a46d7cad11"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a8ac50b3a292c42c0b24d7c7a6cd3b1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3a8ac50b3a292c42c0b24d7c7a6cd3b1"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a3a8ac50b3a292c42c0b24d7c7a6cd3b1">FindByUuid</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a3a8ac50b3a292c42c0b24d7c7a6cd3b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> with a specified uuid. <br /></td></tr>
-<tr class="separator:a3a8ac50b3a292c42c0b24d7c7a6cd3b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b4eb628244a6197a1b75371b1b5bb37"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a9b4eb628244a6197a1b75371b1b5bb37">FindByAttComparison</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a9b4eb628244a6197a1b75371b1b5bb37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> with a <a class="el" href="classvrv_1_1_att_comparison.html">AttComparison</a> functor .  <a href="#a9b4eb628244a6197a1b75371b1b5bb37">More...</a><br /></td></tr>
-<tr class="separator:a9b4eb628244a6197a1b75371b1b5bb37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70fa2b25a27adbedda21848ab596a144"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a70fa2b25a27adbedda21848ab596a144"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a70fa2b25a27adbedda21848ab596a144">FindExtremeByAttComparison</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a70fa2b25a27adbedda21848ab596a144"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> with the extreme value with a <a class="el" href="classvrv_1_1_att_comparison.html">AttComparison</a> functor . <br /></td></tr>
-<tr class="separator:a70fa2b25a27adbedda21848ab596a144"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a179616a313a938ec562a31e47a9b025a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a179616a313a938ec562a31e47a9b025a"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a179616a313a938ec562a31e47a9b025a">FindAllByAttComparison</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a179616a313a938ec562a31e47a9b025a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a all <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> with a <a class="el" href="classvrv_1_1_att_comparison.html">AttComparison</a> functor. <br /></td></tr>
-<tr class="separator:a179616a313a938ec562a31e47a9b025a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ec6663670b4b6522cb4892babf36742"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ec6663670b4b6522cb4892babf36742"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a8ec6663670b4b6522cb4892babf36742">Save</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a8ec6663670b4b6522cb4892babf36742"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the content of any object by calling the appropriate <a class="el" href="classvrv_1_1_file_output_stream.html" title="This class is a base class for file output stream classes. ">FileOutputStream</a> method. <br /></td></tr>
-<tr class="separator:a8ec6663670b4b6522cb4892babf36742"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad628dce30da1167aa84313ea7a4f5612"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad628dce30da1167aa84313ea7a4f5612"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ad628dce30da1167aa84313ea7a4f5612">SaveEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:ad628dce30da1167aa84313ea7a4f5612"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the content of any object by calling the appropriate <a class="el" href="classvrv_1_1_file_output_stream.html" title="This class is a base class for file output stream classes. ">FileOutputStream</a> method. <br /></td></tr>
-<tr class="separator:ad628dce30da1167aa84313ea7a4f5612"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d7dc0044b762bfc525da9a3db9c9e47"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7d7dc0044b762bfc525da9a3db9c9e47"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a7d7dc0044b762bfc525da9a3db9c9e47">PrepareProcessingLists</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a7d7dc0044b762bfc525da9a3db9c9e47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a tree of ints (<a class="el" href="structvrv_1_1_int_tree.html" title="Generic int map recursive structure for storing hierachy of values For example, we want to process al...">IntTree</a>) with the staff/layer/verse numbers and for staff/layer to be then processed. <br /></td></tr>
-<tr class="separator:a7d7dc0044b762bfc525da9a3db9c9e47"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf5548dc77c315039ea5b8ce9e323bc3"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#acf5548dc77c315039ea5b8ce9e323bc3">PrepareTimeSpanning</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:acf5548dc77c315039ea5b8ce9e323bc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matches start and end for <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements (such as tie or slur).  <a href="#acf5548dc77c315039ea5b8ce9e323bc3">More...</a><br /></td></tr>
-<tr class="separator:acf5548dc77c315039ea5b8ce9e323bc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0a6487406988804ac698e5593309cd35"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a6487406988804ac698e5593309cd35"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a0a6487406988804ac698e5593309cd35">PrepareTimeSpanningEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a0a6487406988804ac698e5593309cd35"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#acf5548dc77c315039ea5b8ce9e323bc3" title="Matches start and end for TimeSpanningInterface elements (such as tie or slur). ">Object::PrepareTimeSpanning</a>. <br /></td></tr>
-<tr class="separator:a0a6487406988804ac698e5593309cd35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add7c9b75fc81f87f444f681e4988d91f"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#add7c9b75fc81f87f444f681e4988d91f">PrepareTimestamps</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:add7c9b75fc81f87f444f681e4988d91f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matches start and end for <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements with tstamp(2) attributes.  <a href="#add7c9b75fc81f87f444f681e4988d91f">More...</a><br /></td></tr>
-<tr class="separator:add7c9b75fc81f87f444f681e4988d91f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7d386369a8a88fb02f8a4b870c700351"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7d386369a8a88fb02f8a4b870c700351"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a7d386369a8a88fb02f8a4b870c700351">PrepareTimestampsEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a7d386369a8a88fb02f8a4b870c700351"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#add7c9b75fc81f87f444f681e4988d91f" title="Matches start and end for TimeSpanningInterface elements with tstamp(2) attributes. ">Object::PrepareTimestamps</a>. <br /></td></tr>
-<tr class="separator:a7d386369a8a88fb02f8a4b870c700351"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52e593fc7ddca6964ef2f04f1377bcd9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a52e593fc7ddca6964ef2f04f1377bcd9"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a52e593fc7ddca6964ef2f04f1377bcd9">PrepareTieAttr</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a52e593fc7ddca6964ef2f04f1377bcd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Processes <a class="el" href="classvrv_1_1_chord.html" title="This class represents a collection of notes in the same layer with the same onset time...">Chord</a> and <a class="el" href="classvrv_1_1_note.html">Note</a> for matching  by processing by <a class="el" href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). ">Layer</a> and by looking at the Pname and Oct. <br /></td></tr>
-<tr class="separator:a52e593fc7ddca6964ef2f04f1377bcd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a45139881ea68d440b95d92721d33fe1f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a45139881ea68d440b95d92721d33fe1f"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a45139881ea68d440b95d92721d33fe1f">PrepareTieAttrEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a45139881ea68d440b95d92721d33fe1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Processes <a class="el" href="classvrv_1_1_chord.html" title="This class represents a collection of notes in the same layer with the same onset time...">Chord</a> and <a class="el" href="classvrv_1_1_note.html">Note</a> for matching  by processing by <a class="el" href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). ">Layer</a>; resets the <a class="el" href="classvrv_1_1_chord.html" title="This class represents a collection of notes in the same layer with the same onset time...">Chord</a> pointer to NULL at the end of a chord. <br /></td></tr>
-<tr class="separator:a45139881ea68d440b95d92721d33fe1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a741aa9f015e58449cfcd0ef91cecccd0"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a741aa9f015e58449cfcd0ef91cecccd0">PreparePointersByLayer</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a741aa9f015e58449cfcd0ef91cecccd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Processes by <a class="el" href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). ">Layer</a> and set drawing pointers.  <a href="#a741aa9f015e58449cfcd0ef91cecccd0">More...</a><br /></td></tr>
-<tr class="separator:a741aa9f015e58449cfcd0ef91cecccd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a691a2477cf831c7662f2850e5d66afc7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a691a2477cf831c7662f2850e5d66afc7"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a691a2477cf831c7662f2850e5d66afc7">PrepareLyrics</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a691a2477cf831c7662f2850e5d66afc7"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_functor.html" title="This class is an abstact Functor for the object hierarchy. ">Functor</a> for setting wordpos and connector ends The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter. <br /></td></tr>
-<tr class="separator:a691a2477cf831c7662f2850e5d66afc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23b4eb282d555f93fba96ca3ed7e5d8e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a23b4eb282d555f93fba96ca3ed7e5d8e"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a23b4eb282d555f93fba96ca3ed7e5d8e">PrepareLyricsEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a23b4eb282d555f93fba96ca3ed7e5d8e"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_functor.html" title="This class is an abstact Functor for the object hierarchy. ">Functor</a> for setting wordpos and connector ends The functor is processed by doc at the end of a document of closing opened syl. <br /></td></tr>
-<tr class="separator:a23b4eb282d555f93fba96ca3ed7e5d8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4757c701d873b486addaac1e7c78a670"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4757c701d873b486addaac1e7c78a670"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a4757c701d873b486addaac1e7c78a670">PrepareRpt</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a4757c701d873b486addaac1e7c78a670"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_functor.html" title="This class is an abstact Functor for the object hierarchy. ">Functor</a> for setting mRpt drawing numbers (if required) The functor is processed by staff/layer using an ArrayOfAttComparisons filter. <br /></td></tr>
-<tr class="separator:a4757c701d873b486addaac1e7c78a670"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae471abf39322a7fb6ef3bcf7d8b29c49"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae471abf39322a7fb6ef3bcf7d8b29c49"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ae471abf39322a7fb6ef3bcf7d8b29c49">PrepareEndings</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:ae471abf39322a7fb6ef3bcf7d8b29c49"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_functor.html" title="This class is an abstact Functor for the object hierarchy. ">Functor</a> for setting <a class="el" href="classvrv_1_1_measure.html" title="This class represents a measure in a page-based score (Doc). ">Measure</a> of <a class="el" href="classvrv_1_1_ending_boundary.html">EndingBoundary</a>. <br /></td></tr>
-<tr class="separator:ae471abf39322a7fb6ef3bcf7d8b29c49"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2fe95ae3e17efb2fb1b8a32633f6ae1"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#af2fe95ae3e17efb2fb1b8a32633f6ae1">FillStaffCurrentTimeSpanning</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:af2fe95ae3e17efb2fb1b8a32633f6ae1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Goes through all the <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements and set them a current to each staff where required.  <a href="#af2fe95ae3e17efb2fb1b8a32633f6ae1">More...</a><br /></td></tr>
-<tr class="separator:af2fe95ae3e17efb2fb1b8a32633f6ae1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4615b5674ddd45610d2422fc5696aa7f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4615b5674ddd45610d2422fc5696aa7f"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a4615b5674ddd45610d2422fc5696aa7f">FillStaffCurrentTimeSpanningEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a4615b5674ddd45610d2422fc5696aa7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> element from the list when the last measure is reached. <br /></td></tr>
-<tr class="separator:a4615b5674ddd45610d2422fc5696aa7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae18e09b2661ed1fd1fd65b7330185d78"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae18e09b2661ed1fd1fd65b7330185d78"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ae18e09b2661ed1fd1fd65b7330185d78">ResetDrawing</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:ae18e09b2661ed1fd1fd65b7330185d78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the drawing values before calling PrepareDrawing after changes. <br /></td></tr>
-<tr class="separator:ae18e09b2661ed1fd1fd65b7330185d78"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af9ef702b57e1c01b048380105c664b68"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af9ef702b57e1c01b048380105c664b68"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#af9ef702b57e1c01b048380105c664b68">SetDrawingXY</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:af9ef702b57e1c01b048380105c664b68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the drawing position (m_drawingX and m_drawingY) values for objects. <br /></td></tr>
-<tr class="separator:af9ef702b57e1c01b048380105c664b68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3cdb7511fc040f4f9007a3c92ccd19dc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3cdb7511fc040f4f9007a3c92ccd19dc"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>TimeSpanningLayerElements</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="separator:a3cdb7511fc040f4f9007a3c92ccd19dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd41452bb5fc9587faf7b3c667e72452"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd41452bb5fc9587faf7b3c667e72452"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#afd41452bb5fc9587faf7b3c667e72452">GenerateMIDI</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:afd41452bb5fc9587faf7b3c667e72452"><td class="mdescLeft">&#160;</td><td class="mdescRight">Export the object to a MidiFile. <br /></td></tr>
-<tr class="separator:afd41452bb5fc9587faf7b3c667e72452"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1edb6aefa8123655dd8324f79370c656"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1edb6aefa8123655dd8324f79370c656"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a1edb6aefa8123655dd8324f79370c656">GenerateMIDIEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a1edb6aefa8123655dd8324f79370c656"><td class="mdescLeft">&#160;</td><td class="mdescRight">Export the object to a MidiFile (end method) <br /></td></tr>
-<tr class="separator:a1edb6aefa8123655dd8324f79370c656"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a737cdd7e6162a5ad980266859c3451e4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a737cdd7e6162a5ad980266859c3451e4"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a737cdd7e6162a5ad980266859c3451e4">CalcMaxMeasureDuration</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a737cdd7e6162a5ad980266859c3451e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the maximum duration of each measure. <br /></td></tr>
-<tr class="separator:a737cdd7e6162a5ad980266859c3451e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Constructors, destructors, and other standard methods</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>Reset method resets all attribute classes </p>
 </div></td></tr>
@@ -408,18 +326,21 @@ virtual std::string&#160;</td><td class="memItemRight" valign="bottom"><b>GetCla
 <tr><td colspan="2"><div class="groupText"><p>For example, all <a class="el" href="classvrv_1_1_layer_element.html" title="This class is a base class for the Layer (<layer>) content. ">LayerElement</a> child class classId's are between LAYER_ELEMENT and LAYER_ELEMENT_max.</p>
 <p>See classId enum. </p>
 </div></td></tr>
+<tr class="memitem:a5a9291fca74f4c6c0c42961747a62127"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5a9291fca74f4c6c0c42961747a62127"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsControlElement</b> () const </td></tr>
+<tr class="separator:a5a9291fca74f4c6c0c42961747a62127"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab00adc3bf1efd6418a0386126ad68189"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab00adc3bf1efd6418a0386126ad68189"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsEditorialElement</b> () const </td></tr>
 <tr class="separator:ab00adc3bf1efd6418a0386126ad68189"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa66ae9412703c68f917bb88cbccfc7bb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa66ae9412703c68f917bb88cbccfc7bb"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsLayerElement</b> () const </td></tr>
 <tr class="separator:aa66ae9412703c68f917bb88cbccfc7bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4716740064c0116af499cac98ec1e3a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa4716740064c0116af499cac98ec1e3a"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsFloatingElement</b> () const </td></tr>
-<tr class="separator:aa4716740064c0116af499cac98ec1e3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a452bfc1d5ca16a3d020e6b9323313cf0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a452bfc1d5ca16a3d020e6b9323313cf0"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsScoreDefElement</b> () const </td></tr>
 <tr class="separator:a452bfc1d5ca16a3d020e6b9323313cf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cf0f9e6ff2e21d0a65ab9113946dfdb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0cf0f9e6ff2e21d0a65ab9113946dfdb"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsSystemElement</b> () const </td></tr>
+<tr class="separator:a0cf0f9e6ff2e21d0a65ab9113946dfdb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2039220ee116bc7c5f0882b051035e65"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2039220ee116bc7c5f0882b051035e65"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>IsTextElement</b> () const </td></tr>
 <tr class="separator:a2039220ee116bc7c5f0882b051035e65"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -456,33 +377,69 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>GetChildCount</b> (con
 <tr class="memitem:ab2e351247e616a3f30eaf2e3d125f054"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab2e351247e616a3f30eaf2e3d125f054"></a>
 <a class="el" href="classvrv_1_1_object.html">Object</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetNext</b> ()</td></tr>
 <tr class="separator:ab2e351247e616a3f30eaf2e3d125f054"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Functors for finding objects</div></td></tr>
+<tr class="memitem:a3a8ac50b3a292c42c0b24d7c7a6cd3b1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3a8ac50b3a292c42c0b24d7c7a6cd3b1"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a3a8ac50b3a292c42c0b24d7c7a6cd3b1">FindByUuid</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a3a8ac50b3a292c42c0b24d7c7a6cd3b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> with a specified uuid. <br /></td></tr>
+<tr class="separator:a3a8ac50b3a292c42c0b24d7c7a6cd3b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b4eb628244a6197a1b75371b1b5bb37"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a9b4eb628244a6197a1b75371b1b5bb37">FindByAttComparison</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a9b4eb628244a6197a1b75371b1b5bb37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> with a <a class="el" href="classvrv_1_1_att_comparison.html">AttComparison</a> functor .  <a href="#a9b4eb628244a6197a1b75371b1b5bb37">More...</a><br /></td></tr>
+<tr class="separator:a9b4eb628244a6197a1b75371b1b5bb37"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70fa2b25a27adbedda21848ab596a144"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a70fa2b25a27adbedda21848ab596a144"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a70fa2b25a27adbedda21848ab596a144">FindExtremeByAttComparison</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a70fa2b25a27adbedda21848ab596a144"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> with the extreme value with a <a class="el" href="classvrv_1_1_att_comparison.html">AttComparison</a> functor . <br /></td></tr>
+<tr class="separator:a70fa2b25a27adbedda21848ab596a144"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a179616a313a938ec562a31e47a9b025a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a179616a313a938ec562a31e47a9b025a"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a179616a313a938ec562a31e47a9b025a">FindAllByAttComparison</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a179616a313a938ec562a31e47a9b025a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find a all <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> with a <a class="el" href="classvrv_1_1_att_comparison.html">AttComparison</a> functor. <br /></td></tr>
+<tr class="separator:a179616a313a938ec562a31e47a9b025a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a89fef0fdcaef2bc504163556a96305"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5a89fef0fdcaef2bc504163556a96305"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a5a89fef0fdcaef2bc504163556a96305">FindTimeSpanningLayerElements</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a5a89fef0fdcaef2bc504163556a96305"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the time spanning layer elements between two points. <br /></td></tr>
+<tr class="separator:a5a89fef0fdcaef2bc504163556a96305"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Functors for loading and saving the docuement</div></td></tr>
+<tr class="memitem:a184baa7590e2d6fb527ea93742c42447"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a184baa7590e2d6fb527ea93742c42447"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a184baa7590e2d6fb527ea93742c42447">ConvertToPageBased</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a184baa7590e2d6fb527ea93742c42447"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convert top-level all container (section, endings) and editorial elements to boundary elements. <br /></td></tr>
+<tr class="separator:a184baa7590e2d6fb527ea93742c42447"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada7635cbf8546995bd3e05d7c44a813f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada7635cbf8546995bd3e05d7c44a813f"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>ConvertToPageBasedEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="separator:ada7635cbf8546995bd3e05d7c44a813f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ec6663670b4b6522cb4892babf36742"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ec6663670b4b6522cb4892babf36742"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a8ec6663670b4b6522cb4892babf36742">Save</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a8ec6663670b4b6522cb4892babf36742"><td class="mdescLeft">&#160;</td><td class="mdescRight">Save the content of any object by calling the appropriate <a class="el" href="classvrv_1_1_file_output_stream.html" title="This class is a base class for file output stream classes. ">FileOutputStream</a> method. <br /></td></tr>
+<tr class="separator:a8ec6663670b4b6522cb4892babf36742"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad628dce30da1167aa84313ea7a4f5612"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad628dce30da1167aa84313ea7a4f5612"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>SaveEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="separator:ad628dce30da1167aa84313ea7a4f5612"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Functors for aligning the content horizontally</div></td></tr>
 <tr class="memitem:ae7f8d5a9f06c95c995b993b67cea04d6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae7f8d5a9f06c95c995b993b67cea04d6"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ae7f8d5a9f06c95c995b993b67cea04d6">AdjustFloatingPostioners</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="memdesc:ae7f8d5a9f06c95c995b993b67cea04d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adjust the position of all floating positionner, staff by staff. <br /></td></tr>
 <tr class="separator:ae7f8d5a9f06c95c995b993b67cea04d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad465f471ea8ef35bb04fc01ed0fd96ff"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad465f471ea8ef35bb04fc01ed0fd96ff"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ad465f471ea8ef35bb04fc01ed0fd96ff">AdjustFloatingPostionerGrps</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:ad465f471ea8ef35bb04fc01ed0fd96ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adjust the position of all floating positionner that are grouped, staff by staff. <br /></td></tr>
+<tr class="separator:ad465f471ea8ef35bb04fc01ed0fd96ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96d9c4551b064ee187a3545f0350df30"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a96d9c4551b064ee187a3545f0350df30">AlignHorizontally</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="memdesc:a96d9c4551b064ee187a3545f0350df30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Align horizontally the content of a page.  <a href="#a96d9c4551b064ee187a3545f0350df30">More...</a><br /></td></tr>
 <tr class="separator:a96d9c4551b064ee187a3545f0350df30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae9c6b181fd2b128a77fb3383e9969daf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9c6b181fd2b128a77fb3383e9969daf"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ae9c6b181fd2b128a77fb3383e9969daf">AlignHorizontallyEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:ae9c6b181fd2b128a77fb3383e9969daf"><td class="mdescLeft">&#160;</td><td class="mdescRight">For each <a class="el" href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). ">Layer</a>, align the grace note stacked in GraceAlignment. <br /></td></tr>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>AlignHorizontallyEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="separator:ae9c6b181fd2b128a77fb3383e9969daf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1612611f533263371c9c1b5a173b21fb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1612611f533263371c9c1b5a173b21fb"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a1612611f533263371c9c1b5a173b21fb">AlignMeasures</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a1612611f533263371c9c1b5a173b21fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Align the measures by adjusting the m_drawingXRel position looking at the <a class="el" href="classvrv_1_1_measure_aligner.html" title="This class aligns the content of a measure It contains a vector of Alignment. ">MeasureAligner</a>. <br /></td></tr>
+<tr class="memitem:a1612611f533263371c9c1b5a173b21fb"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a1612611f533263371c9c1b5a173b21fb">AlignMeasures</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a1612611f533263371c9c1b5a173b21fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Align the measures by adjusting the m_drawingXRel position looking at the <a class="el" href="classvrv_1_1_measure_aligner.html" title="This class aligns the content of a measure It contains a vector of Alignment. ">MeasureAligner</a>.  <a href="#a1612611f533263371c9c1b5a173b21fb">More...</a><br /></td></tr>
 <tr class="separator:a1612611f533263371c9c1b5a173b21fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa35155dec37a5bb97314ad96d2ebd234"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa35155dec37a5bb97314ad96d2ebd234"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#aa35155dec37a5bb97314ad96d2ebd234">AlignMeasuresEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:aa35155dec37a5bb97314ad96d2ebd234"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store the width of the system in the <a class="el" href="classvrv_1_1_measure_aligner.html" title="This class aligns the content of a measure It contains a vector of Alignment. ">MeasureAligner</a> for justification This method is called at the end of a system. <br /></td></tr>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>AlignMeasuresEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="separator:aa35155dec37a5bb97314ad96d2ebd234"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e4f7029bf79e8c0cfc399089e7a6688"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e4f7029bf79e8c0cfc399089e7a6688"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a4e4f7029bf79e8c0cfc399089e7a6688">IntegrateBoundingBoxGraceXShift</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a4e4f7029bf79e8c0cfc399089e7a6688"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correct the X alignment once the content of a system has been aligned and laid out See <a class="el" href="classvrv_1_1_measure.html#aca50095d88a8749e28a5af40e7d66f1f" title="Correct the X alignment once the content of a system has been aligned and laid out. ">Measure::IntegrateBoundingBoxXShift</a> for actual implementation. <br /></td></tr>
+<tr class="memdesc:a4e4f7029bf79e8c0cfc399089e7a6688"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correct the X alignment once the content of a system has been aligned and laid out See <a class="el" href="classvrv_1_1_measure.html#aca50095d88a8749e28a5af40e7d66f1f" title="See Object::IntegrateBoundingBoxXShift. ">Measure::IntegrateBoundingBoxXShift</a> for actual implementation. <br /></td></tr>
 <tr class="separator:a4e4f7029bf79e8c0cfc399089e7a6688"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad84648ce20b25f98fe3dce5498633a37"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad84648ce20b25f98fe3dce5498633a37"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ad84648ce20b25f98fe3dce5498633a37">IntegrateBoundingBoxXShift</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:ad84648ce20b25f98fe3dce5498633a37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correct the X alignment once the content of a system has been aligned and laid out See <a class="el" href="classvrv_1_1_measure.html#aca50095d88a8749e28a5af40e7d66f1f" title="Correct the X alignment once the content of a system has been aligned and laid out. ">Measure::IntegrateBoundingBoxXShift</a> for actual implementation. <br /></td></tr>
+<tr class="memdesc:ad84648ce20b25f98fe3dce5498633a37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correct the X alignment once the content of a system has been aligned and laid out See <a class="el" href="classvrv_1_1_measure.html#aca50095d88a8749e28a5af40e7d66f1f" title="See Object::IntegrateBoundingBoxXShift. ">Measure::IntegrateBoundingBoxXShift</a> for actual implementation. <br /></td></tr>
 <tr class="separator:ad84648ce20b25f98fe3dce5498633a37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a29a1b94e5a5909f1808fbf5b6082f395"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29a1b94e5a5909f1808fbf5b6082f395"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a29a1b94e5a5909f1808fbf5b6082f395">ResetHorizontalAlignment</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
@@ -497,8 +454,8 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:af64b03279f65db406b6ba0585e6b4cfb"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#af64b03279f65db406b6ba0585e6b4cfb">SetBoundingBoxXShift</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="memdesc:af64b03279f65db406b6ba0585e6b4cfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lay out the X positions of the staff content looking at the bounding boxes.  <a href="#af64b03279f65db406b6ba0585e6b4cfb">More...</a><br /></td></tr>
 <tr class="separator:af64b03279f65db406b6ba0585e6b4cfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f87eea46f01299e97014871b312ccdd"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a4f87eea46f01299e97014871b312ccdd">SetBoundingBoxXShiftEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a4f87eea46f01299e97014871b312ccdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lay out the X positions of the staff content looking at the bounding boxes.  <a href="#a4f87eea46f01299e97014871b312ccdd">More...</a><br /></td></tr>
+<tr class="memitem:a4f87eea46f01299e97014871b312ccdd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4f87eea46f01299e97014871b312ccdd"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>SetBoundingBoxXShiftEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="separator:a4f87eea46f01299e97014871b312ccdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Functors for aligning the content vertically.</div></td></tr>
 <tr class="memitem:ab0497dd399535cd5eb3e76ecb70adc9d"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ab0497dd399535cd5eb3e76ecb70adc9d">AlignVertically</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
@@ -514,7 +471,7 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="separator:ad5d7c59997c02ea1dfb852bfaa5d4ace"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16d124ef5aca404a77b4ee8c6c7e02a7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a16d124ef5aca404a77b4ee8c6c7e02a7"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a16d124ef5aca404a77b4ee8c6c7e02a7">IntegrateBoundingBoxYShift</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a16d124ef5aca404a77b4ee8c6c7e02a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correct the Y alignment once the content of a system has been aligned and laid out See <a class="el" href="classvrv_1_1_system.html#a64bc44d4eecab49c8756ccfe797fadc0" title="Correct the Y alignment once the content of a system has been aligned and laid out. ">System::IntegrateBoundingBoxYShift</a> for actual implementation. <br /></td></tr>
+<tr class="memdesc:a16d124ef5aca404a77b4ee8c6c7e02a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Correct the Y alignment once the content of a system has been aligned and laid out See <a class="el" href="classvrv_1_1_system.html#a64bc44d4eecab49c8756ccfe797fadc0" title="See Object::IntegrateBoundingBoxYShift. ">System::IntegrateBoundingBoxYShift</a> for actual implementation. <br /></td></tr>
 <tr class="separator:a16d124ef5aca404a77b4ee8c6c7e02a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a211cbb0f72bdd8392d6e31f6b8af51dd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a211cbb0f72bdd8392d6e31f6b8af51dd"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a211cbb0f72bdd8392d6e31f6b8af51dd">ResetVerticalAlignment</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
@@ -528,21 +485,86 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a45993175bb6a94cbbd0a5b69251e25eb">SetOverflowBBoxes</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="memdesc:a45993175bb6a94cbbd0a5b69251e25eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows. <br /></td></tr>
 <tr class="separator:a45993175bb6a94cbbd0a5b69251e25eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70161897776b5acbaf0dddaa1ddd9def"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a70161897776b5acbaf0dddaa1ddd9def"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a70161897776b5acbaf0dddaa1ddd9def">SetOverflowBBoxesEnd</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a70161897776b5acbaf0dddaa1ddd9def"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows. <br /></td></tr>
+<tr class="separator:a70161897776b5acbaf0dddaa1ddd9def"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Functors setting the current scoreDef.</div></td></tr>
-<tr class="memitem:a4433a99f4aa214a4cc351ba903d6baf4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4433a99f4aa214a4cc351ba903d6baf4"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a4433a99f4aa214a4cc351ba903d6baf4">ReplaceDrawingValuesInStaffDef</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:a4433a99f4aa214a4cc351ba903d6baf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace the drawing values a staffDef. <br /></td></tr>
+<tr class="memitem:a4433a99f4aa214a4cc351ba903d6baf4"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a4433a99f4aa214a4cc351ba903d6baf4">ReplaceDrawingValuesInStaffDef</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a4433a99f4aa214a4cc351ba903d6baf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Replace the drawing values a staffDef.  <a href="#a4433a99f4aa214a4cc351ba903d6baf4">More...</a><br /></td></tr>
 <tr class="separator:a4433a99f4aa214a4cc351ba903d6baf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:add47b63f56af38add94c019fa227e178"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#add47b63f56af38add94c019fa227e178">SetCurrentScoreDef</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:add47b63f56af38add94c019fa227e178"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the initial scoreDef of each page.  <a href="#add47b63f56af38add94c019fa227e178">More...</a><br /></td></tr>
+<tr class="memdesc:add47b63f56af38add94c019fa227e178"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the current scoreDef wherever need.  <a href="#add47b63f56af38add94c019fa227e178">More...</a><br /></td></tr>
 <tr class="separator:add47b63f56af38add94c019fa227e178"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a95154b135f78a323dafdfec2a76e2d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3a95154b135f78a323dafdfec2a76e2d"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a3a95154b135f78a323dafdfec2a76e2d">SetCautionaryScoreDef</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a3a95154b135f78a323dafdfec2a76e2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the cautionnary scoreDef wherever need. <br /></td></tr>
+<tr class="separator:a3a95154b135f78a323dafdfec2a76e2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad381f7000ca6ee023426510d8a3a936a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad381f7000ca6ee023426510d8a3a936a"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ad381f7000ca6ee023426510d8a3a936a">UnsetCurrentScoreDef</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="memdesc:ad381f7000ca6ee023426510d8a3a936a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unset the initial scoreDef of each system and measure. <br /></td></tr>
 <tr class="separator:ad381f7000ca6ee023426510d8a3a936a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af661ccbb821d7e2a22e313069c8b8cf6"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#af661ccbb821d7e2a22e313069c8b8cf6">SetStaffDefRedrawFlags</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:af661ccbb821d7e2a22e313069c8b8cf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the initial scoreDef of each page.  <a href="#af661ccbb821d7e2a22e313069c8b8cf6">More...</a><br /></td></tr>
+<tr class="memdesc:af661ccbb821d7e2a22e313069c8b8cf6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set drawing flags for the <a class="el" href="classvrv_1_1_staff_def.html" title="This class represents a MEI staffDef. ">StaffDef</a> for indicating whether clefs, keysigs, etc.  <a href="#af661ccbb821d7e2a22e313069c8b8cf6">More...</a><br /></td></tr>
 <tr class="separator:af661ccbb821d7e2a22e313069c8b8cf6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Functors for preparing drawing</div></td></tr>
+<tr class="memitem:a7d7dc0044b762bfc525da9a3db9c9e47"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7d7dc0044b762bfc525da9a3db9c9e47"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a7d7dc0044b762bfc525da9a3db9c9e47">PrepareProcessingLists</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a7d7dc0044b762bfc525da9a3db9c9e47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Builds a tree of ints (<a class="el" href="structvrv_1_1_int_tree.html" title="Generic int map recursive structure for storing hierachy of values For example, we want to process al...">IntTree</a>) with the staff/layer/verse numbers and for staff/layer to be then processed. <br /></td></tr>
+<tr class="separator:a7d7dc0044b762bfc525da9a3db9c9e47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf5548dc77c315039ea5b8ce9e323bc3"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#acf5548dc77c315039ea5b8ce9e323bc3">PrepareTimeSpanning</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:acf5548dc77c315039ea5b8ce9e323bc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Match start and end for <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements (such as tie or slur).  <a href="#acf5548dc77c315039ea5b8ce9e323bc3">More...</a><br /></td></tr>
+<tr class="separator:acf5548dc77c315039ea5b8ce9e323bc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a6487406988804ac698e5593309cd35"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0a6487406988804ac698e5593309cd35"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>PrepareTimeSpanningEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="separator:a0a6487406988804ac698e5593309cd35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add7c9b75fc81f87f444f681e4988d91f"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#add7c9b75fc81f87f444f681e4988d91f">PrepareTimestamps</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:add7c9b75fc81f87f444f681e4988d91f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Match start and end for <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements with tstamp(2) attributes.  <a href="#add7c9b75fc81f87f444f681e4988d91f">More...</a><br /></td></tr>
+<tr class="separator:add7c9b75fc81f87f444f681e4988d91f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7d386369a8a88fb02f8a4b870c700351"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7d386369a8a88fb02f8a4b870c700351"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>PrepareTimestampsEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="separator:a7d386369a8a88fb02f8a4b870c700351"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a52e593fc7ddca6964ef2f04f1377bcd9"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a52e593fc7ddca6964ef2f04f1377bcd9">PrepareTieAttr</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a52e593fc7ddca6964ef2f04f1377bcd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process <a class="el" href="classvrv_1_1_chord.html" title="This class represents a collection of notes in the same layer with the same onset time...">Chord</a> and <a class="el" href="classvrv_1_1_note.html">Note</a> for matching  by processing by <a class="el" href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). ">Layer</a> and by looking at the Pname and Oct.  <a href="#a52e593fc7ddca6964ef2f04f1377bcd9">More...</a><br /></td></tr>
+<tr class="separator:a52e593fc7ddca6964ef2f04f1377bcd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45139881ea68d440b95d92721d33fe1f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a45139881ea68d440b95d92721d33fe1f"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>PrepareTieAttrEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="separator:a45139881ea68d440b95d92721d33fe1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a741aa9f015e58449cfcd0ef91cecccd0"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a741aa9f015e58449cfcd0ef91cecccd0">PreparePointersByLayer</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a741aa9f015e58449cfcd0ef91cecccd0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Process by <a class="el" href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). ">Layer</a> and set drawing pointers.  <a href="#a741aa9f015e58449cfcd0ef91cecccd0">More...</a><br /></td></tr>
+<tr class="separator:a741aa9f015e58449cfcd0ef91cecccd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a691a2477cf831c7662f2850e5d66afc7"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a691a2477cf831c7662f2850e5d66afc7">PrepareLyrics</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a691a2477cf831c7662f2850e5d66afc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set wordpos and connector ends The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.  <a href="#a691a2477cf831c7662f2850e5d66afc7">More...</a><br /></td></tr>
+<tr class="separator:a691a2477cf831c7662f2850e5d66afc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23b4eb282d555f93fba96ca3ed7e5d8e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a23b4eb282d555f93fba96ca3ed7e5d8e"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>PrepareLyricsEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="separator:a23b4eb282d555f93fba96ca3ed7e5d8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4757c701d873b486addaac1e7c78a670"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4757c701d873b486addaac1e7c78a670"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a4757c701d873b486addaac1e7c78a670">PrepareRpt</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a4757c701d873b486addaac1e7c78a670"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_functor.html" title="This class is an abstact Functor for the object hierarchy. ">Functor</a> for setting mRpt drawing numbers (if required) The functor is processed by staff/layer using an ArrayOfAttComparisons filter. <br /></td></tr>
+<tr class="separator:a4757c701d873b486addaac1e7c78a670"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5acc10b3d917c8065eb86db13ae6112"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af5acc10b3d917c8065eb86db13ae6112"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#af5acc10b3d917c8065eb86db13ae6112">PrepareBoundaries</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:af5acc10b3d917c8065eb86db13ae6112"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_functor.html" title="This class is an abstact Functor for the object hierarchy. ">Functor</a> for setting <a class="el" href="classvrv_1_1_measure.html" title="This class represents a measure in a page-based score (Doc). ">Measure</a> of <a class="el" href="classvrv_1_1_ending.html" title="This class represents a MEI ending. ">Ending</a>. <br /></td></tr>
+<tr class="separator:af5acc10b3d917c8065eb86db13ae6112"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a254c145f84da07151d0e64b342f4ba8b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a254c145f84da07151d0e64b342f4ba8b"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a254c145f84da07151d0e64b342f4ba8b">PrepareFloatingGrps</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functoParams)</td></tr>
+<tr class="memdesc:a254c145f84da07151d0e64b342f4ba8b"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_functor.html" title="This class is an abstact Functor for the object hierarchy. ">Functor</a> for grouping <a class="el" href="classvrv_1_1_floating_object.html" title="This class represents elements appearing within a measure. ">FloatingObject</a> by drawingGrpId. <br /></td></tr>
+<tr class="separator:a254c145f84da07151d0e64b342f4ba8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2fe95ae3e17efb2fb1b8a32633f6ae1"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#af2fe95ae3e17efb2fb1b8a32633f6ae1">FillStaffCurrentTimeSpanning</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:af2fe95ae3e17efb2fb1b8a32633f6ae1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Go through all the <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements and set them a current to each staff where required.  <a href="#af2fe95ae3e17efb2fb1b8a32633f6ae1">More...</a><br /></td></tr>
+<tr class="separator:af2fe95ae3e17efb2fb1b8a32633f6ae1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4615b5674ddd45610d2422fc5696aa7f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4615b5674ddd45610d2422fc5696aa7f"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>FillStaffCurrentTimeSpanningEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="separator:a4615b5674ddd45610d2422fc5696aa7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae18e09b2661ed1fd1fd65b7330185d78"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae18e09b2661ed1fd1fd65b7330185d78"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ae18e09b2661ed1fd1fd65b7330185d78">ResetDrawing</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:ae18e09b2661ed1fd1fd65b7330185d78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the drawing values before calling PrepareDrawing after changes. <br /></td></tr>
+<tr class="separator:ae18e09b2661ed1fd1fd65b7330185d78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9ef702b57e1c01b048380105c664b68"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af9ef702b57e1c01b048380105c664b68"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#af9ef702b57e1c01b048380105c664b68">SetDrawingXY</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:af9ef702b57e1c01b048380105c664b68"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the drawing position (m_drawingX and m_drawingY) values for objects. <br /></td></tr>
+<tr class="separator:af9ef702b57e1c01b048380105c664b68"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Functors for justification</div></td></tr>
 <tr class="memitem:aee445a575f9cea3236f57000d1d8d48e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aee445a575f9cea3236f57000d1d8d48e"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#aee445a575f9cea3236f57000d1d8d48e">JustifyX</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
@@ -553,16 +575,34 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memdesc:a4f1694403b1a3fbbc45f032c595a5530"><td class="mdescLeft">&#160;</td><td class="mdescRight">Justify the Y positions. <br /></td></tr>
 <tr class="separator:a4f1694403b1a3fbbc45f032c595a5530"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Functors for calculating the layout of a document.</div></td></tr>
-<tr class="memitem:af523eabd9b8d6e6bd707039e33c5d499"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af523eabd9b8d6e6bd707039e33c5d499"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#af523eabd9b8d6e6bd707039e33c5d499">CastOffSystems</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
-<tr class="memdesc:af523eabd9b8d6e6bd707039e33c5d499"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a page by adding systems with the appropriate length. <br /></td></tr>
+<tr class="memitem:af523eabd9b8d6e6bd707039e33c5d499"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#af523eabd9b8d6e6bd707039e33c5d499">CastOffSystems</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:af523eabd9b8d6e6bd707039e33c5d499"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill a page by adding systems with the appropriate length.  <a href="#af523eabd9b8d6e6bd707039e33c5d499">More...</a><br /></td></tr>
 <tr class="separator:af523eabd9b8d6e6bd707039e33c5d499"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4139a7b4b8d9044e12bcc809ad03995"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad4139a7b4b8d9044e12bcc809ad03995"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>CastOffSystemsEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="separator:ad4139a7b4b8d9044e12bcc809ad03995"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a1c487e6041d8f7da9a3cdb47d714b2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3a1c487e6041d8f7da9a3cdb47d714b2"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>CastOffPages</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="separator:a3a1c487e6041d8f7da9a3cdb47d714b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab23ae22371778dc313264b8f6bd50e23"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab23ae22371778dc313264b8f6bd50e23"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ab23ae22371778dc313264b8f6bd50e23">CastOffEncoding</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:ab23ae22371778dc313264b8f6bd50e23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast off the document according to the encoding provided (pb and sb) <br /></td></tr>
+<tr class="separator:ab23ae22371778dc313264b8f6bd50e23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad53b4c22017677e68f8b99ceb503db40"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#ad53b4c22017677e68f8b99ceb503db40">UnCastOff</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
 <tr class="memdesc:ad53b4c22017677e68f8b99ceb503db40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Undo the cast of both pages and system.  <a href="#ad53b4c22017677e68f8b99ceb503db40">More...</a><br /></td></tr>
 <tr class="separator:ad53b4c22017677e68f8b99ceb503db40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Functors for generating MIDI output.</div></td></tr>
+<tr class="memitem:afd41452bb5fc9587faf7b3c667e72452"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afd41452bb5fc9587faf7b3c667e72452"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#afd41452bb5fc9587faf7b3c667e72452">GenerateMIDI</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:afd41452bb5fc9587faf7b3c667e72452"><td class="mdescLeft">&#160;</td><td class="mdescRight">Export the object to a MidiFile. <br /></td></tr>
+<tr class="separator:afd41452bb5fc9587faf7b3c667e72452"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1edb6aefa8123655dd8324f79370c656"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1edb6aefa8123655dd8324f79370c656"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>GenerateMIDIEnd</b> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="separator:a1edb6aefa8123655dd8324f79370c656"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a737cdd7e6162a5ad980266859c3451e4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a737cdd7e6162a5ad980266859c3451e4"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_object.html#a737cdd7e6162a5ad980266859c3451e4">CalcMaxMeasureDuration</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams)</td></tr>
+<tr class="memdesc:a737cdd7e6162a5ad980266859c3451e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the maximum duration of each measure. <br /></td></tr>
+<tr class="separator:a737cdd7e6162a5ad980266859c3451e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrv_1_1_bounding_box"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrv_1_1_bounding_box')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrv_1_1_bounding_box.html">vrv::BoundingBox</a></td></tr>
 <tr class="memitem:a8cc083afb0d6f3a68d60fae9569645b8 inherit pub_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8cc083afb0d6f3a68d60fae9569645b8"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateContentBBoxX</b> (int x1, int x2)</td></tr>
@@ -614,6 +654,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDrawingX</b> (int 
 <tr class="memitem:a2347d539fa303b2a0564a15322112496 inherit pub_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2347d539fa303b2a0564a15322112496"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDrawingY</b> (int drawingY)</td></tr>
 <tr class="separator:a2347d539fa303b2a0564a15322112496 inherit pub_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-methods"></a>
+Static Public Member Functions</h2></td></tr>
+<tr class="memitem:a8c269609416ebdb3b948df8aac3134e1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8c269609416ebdb3b948df8aac3134e1"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>SeedUuid</b> (unsigned int seed=0)</td></tr>
+<tr class="separator:a8c269609416ebdb3b948df8aac3134e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -692,22 +738,32 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="abdb868b124ba8b532e12f1a5069728fd"></a>
+<a class="anchor" id="a2ab113f1faf62ee0332687ff981c0948"></a>
 <div class="memitem">
 <div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void vrv::Object::AddEditorialElement </td>
+          <td class="memname">virtual void vrv::Object::AddChild </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classvrv_1_1_editorial_element.html">EditorialElement</a> *&#160;</td>
-          <td class="paramname"><em>child</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_object.html">Object</a> *&#160;</td>
+          <td class="paramname"><em>object</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
 </div><div class="memdoc">
 
-<p><a class="el" href="classvrv_1_1_add.html">Add</a> an <a class="el" href="classvrv_1_1_editorial_element.html" title="This class is a base class for the editorial element containing musical content, for example <rgd> or...">EditorialElement</a> as child. </p>
-<p>This can happen at many levels. </p>
+<p>Base method for adding children. </p>
+<p>The method has to be overridden. </p>
+
+<p>Reimplemented in <a class="el" href="classvrv_1_1_choice.html#a1d4ddd3267610ef0111fca7b8d1b4ff1">vrv::Choice</a>, <a class="el" href="classvrv_1_1_staff_grp.html#a956604868479af1d37015170b0a84dc8">vrv::StaffGrp</a>, <a class="el" href="classvrv_1_1_app.html#adf95cef5fe23595f282c5132632ad586">vrv::App</a>, <a class="el" href="classvrv_1_1_score_def.html#a84d613522f0f0ff1d87b2560fe03db2b">vrv::ScoreDef</a>, <a class="el" href="classvrv_1_1_f_trem.html#abb8be6995dab20cdff23f51815b59053">vrv::FTrem</a>, <a class="el" href="classvrv_1_1_note.html#a777cd96f58898204059f5f08dbf2a736">vrv::Note</a>, <a class="el" href="classvrv_1_1_b_trem.html#a47709ad018df5fa76be21a07510124a8">vrv::BTrem</a>, <a class="el" href="classvrv_1_1_chord.html#ae003b9ef10ebe3e78f523c72f436ca55">vrv::Chord</a>, <a class="el" href="classvrv_1_1_editorial_element.html#ab6f6bd0064ed0bb9c4c1ff2ac193bf57">vrv::EditorialElement</a>, <a class="el" href="classvrv_1_1_measure.html#a81e1e232db13e677d6114a4b21033157">vrv::Measure</a>, <a class="el" href="classvrv_1_1_ligature.html#ae8ed65b2aad258c484322516f251f0d5">vrv::Ligature</a>, <a class="el" href="classvrv_1_1_syl.html#a969ee1646f3ebc1ef176e05c27c64bf1">vrv::Syl</a>, <a class="el" href="classvrv_1_1_staff.html#a8756c96787854aca70ceefbd09067341">vrv::Staff</a>, <a class="el" href="classvrv_1_1_layer.html#aca24781dca1d322d561a2c5e2ee72815">vrv::Layer</a>, <a class="el" href="classvrv_1_1_system.html#a74085bf784ecdc0ef6525c9e43804844">vrv::System</a>, <a class="el" href="classvrv_1_1_page.html#aaab394087268b7ac653d6d935bd306c6">vrv::Page</a>, <a class="el" href="classvrv_1_1_tempo.html#afc8ed253953d9ef9c6f83b5fbcf39d62">vrv::Tempo</a>, <a class="el" href="classvrv_1_1_tuplet.html#a091eac9913c75a427dca15b7db03b84b">vrv::Tuplet</a>, <a class="el" href="classvrv_1_1_anchored_text.html#abbccf56ecc91175568fe68bf6129b077">vrv::AnchoredText</a>, <a class="el" href="classvrv_1_1_beam.html#a2bf2871cb6ceb877ef0f87acb43e0393">vrv::Beam</a>, <a class="el" href="classvrv_1_1_dir.html#a96d1ae22416dd7d6d4506072b299d161">vrv::Dir</a>, <a class="el" href="classvrv_1_1_dynam.html#a7f5807e8ea2ab33ffa8bf5441b9536ce">vrv::Dynam</a>, <a class="el" href="classvrv_1_1_ending.html#a2b12b38ccf841d0360311f23c90dd9a8">vrv::Ending</a>, <a class="el" href="classvrv_1_1_harm.html#a274cac4d91a80e41c748dcf69c393234">vrv::Harm</a>, <a class="el" href="classvrv_1_1_section.html#a6a993d4f2c7b9d095f5b38684a62a258">vrv::Section</a>, <a class="el" href="classvrv_1_1_rend.html#a0b34bc701ca351da1f57079e51eb8487">vrv::Rend</a>, <a class="el" href="classvrv_1_1_doc.html#afa5e63f78721a319b7c195c46a5789d4">vrv::Doc</a>, <a class="el" href="classvrv_1_1_verse.html#adc3501e4a9c4096cd920b415aa02bd33">vrv::Verse</a>, and <a class="el" href="classvrv_1_1_score.html#a160da7fac200e756591e2530bd5f1bfd">vrv::Score</a>.</p>
 
 </div>
 </div>
@@ -734,9 +790,38 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 </div><div class="memdoc">
 
 <p>Align horizontally the content of a page. </p>
-<p>For each <a class="el" href="classvrv_1_1_layer_element.html" title="This class is a base class for the Layer (<layer>) content. ">LayerElement</a>, instanciate its <a class="el" href="classvrv_1_1_alignment.html" title="This class stores an alignement position elements will point to. ">Alignment</a>. It creates it if no other note or event occurs at its position. </p>
+<p>For each <a class="el" href="classvrv_1_1_layer_element.html" title="This class is a base class for the Layer (<layer>) content. ">LayerElement</a>, instanciate its <a class="el" href="classvrv_1_1_alignment.html" title="This class stores an alignement position elements will point to. ">Alignment</a>. It creates it if no other note or event occurs at its position. At the end, for each <a class="el" href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). ">Layer</a>, align the grace note stacked in GraceAlignment. </p>
 
-<p>Reimplemented in <a class="el" href="classvrv_1_1_measure.html#aa3b562577b2c8ee3703bef304dc848d9">vrv::Measure</a>, <a class="el" href="classvrv_1_1_layer_element.html#aa9313165677a808adb9ac9084aa012d2">vrv::LayerElement</a>, and <a class="el" href="classvrv_1_1_layer.html#ab2e1b95d9f6b6be1a493a2c483094b04">vrv::Layer</a>.</p>
+<p>Reimplemented in <a class="el" href="classvrv_1_1_measure.html#aa3b562577b2c8ee3703bef304dc848d9">vrv::Measure</a>, <a class="el" href="classvrv_1_1_layer.html#ab2e1b95d9f6b6be1a493a2c483094b04">vrv::Layer</a>, <a class="el" href="classvrv_1_1_layer_element.html#aa9313165677a808adb9ac9084aa012d2">vrv::LayerElement</a>, and <a class="el" href="classvrv_1_1_system.html#ac5485e7573278cc935c49edbe75e580e">vrv::System</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1612611f533263371c9c1b5a173b21fb"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int vrv::Object::AlignMeasures </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *&#160;</td>
+          <td class="paramname"><em>functorParams</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Align the measures by adjusting the m_drawingXRel position looking at the <a class="el" href="classvrv_1_1_measure_aligner.html" title="This class aligns the content of a measure It contains a vector of Alignment. ">MeasureAligner</a>. </p>
+<p>At the end, store the width of the system in the <a class="el" href="classvrv_1_1_measure_aligner.html" title="This class aligns the content of a measure It contains a vector of Alignment. ">MeasureAligner</a> for justification. </p>
+
+<p>Reimplemented in <a class="el" href="classvrv_1_1_measure.html#a82457254eec82c88afa981df53a0c47c">vrv::Measure</a>, and <a class="el" href="classvrv_1_1_system.html#a6c2c305854d0f875af16f0a48c98425c">vrv::System</a>.</p>
 
 </div>
 </div>
@@ -766,6 +851,53 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 <p>For each <a class="el" href="classvrv_1_1_staff.html" title="This class represents a staff in a laid-out score (Doc). ">Staff</a>, instanciate its <a class="el" href="classvrv_1_1_staff_alignment.html" title="This class stores an alignement position staves will point to. ">StaffAlignment</a>. </p>
 
 <p>Reimplemented in <a class="el" href="classvrv_1_1_measure.html#ae07050f3560322d506406ee7784c67d2">vrv::Measure</a>, <a class="el" href="classvrv_1_1_system.html#a5ea92acba6b1e62923e9411ee702670c">vrv::System</a>, <a class="el" href="classvrv_1_1_staff.html#a117c874984f47c04a116e5a369f73b52">vrv::Staff</a>, and <a class="el" href="classvrv_1_1_verse.html#ab0782d026d9a53cd1c20d31a356c7dca">vrv::Verse</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af523eabd9b8d6e6bd707039e33c5d499"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int vrv::Object::CastOffSystems </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *&#160;</td>
+          <td class="paramname"><em>functorParams</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Fill a page by adding systems with the appropriate length. </p>
+<p>At the end, add all the pending objects where reaching the end </p>
+
+<p>Reimplemented in <a class="el" href="classvrv_1_1_measure.html#a079569c6758abafd6d1136bbdd1d3b90">vrv::Measure</a>, <a class="el" href="classvrv_1_1_score_def.html#a0201cf78e1a7efbf950650f6105fa0cd">vrv::ScoreDef</a>, <a class="el" href="classvrv_1_1_sb.html#ab25617535beabced2e5bb1bf874b9624">vrv::Sb</a>, <a class="el" href="classvrv_1_1_pb.html#ab7aaeb5d340ed824576e81e626ab562c">vrv::Pb</a>, <a class="el" href="classvrv_1_1_editorial_element.html#a55eb6f409988796198cbcd14a8abafe9">vrv::EditorialElement</a>, <a class="el" href="classvrv_1_1_ending.html#a90e151ed74273b4ae227d27b3b41c4d8">vrv::Ending</a>, <a class="el" href="classvrv_1_1_boundary_end.html#ae0b4120a6ca6470fca91d69b1c865932">vrv::BoundaryEnd</a>, and <a class="el" href="classvrv_1_1_section.html#abefa0c4b213281b8e46a4dce70a17426">vrv::Section</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a667b4432b8f9d9e92bfd34fe5c885099"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrv::Object::ClearRelinquishedChildren </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Removes all the children that were previously relinquished. </p>
+<p>This has to be used when children are moved but then the parent is not deleted. </p>
 
 </div>
 </div>
@@ -838,10 +970,10 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 </table>
 </div><div class="memdoc">
 
-<p>Goes through all the <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements and set them a current to each staff where required. </p>
-<p>For <a class="el" href="classvrv_1_1_note.html">Note</a> with DrawingTieAttr, the functor is redirected to the tie object. </p>
+<p>Go through all the <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements and set them a current to each staff where required. </p>
+<p>For <a class="el" href="classvrv_1_1_note.html">Note</a> with DrawingTieAttr, the functor is redirected to the tie object. At the end, remove the <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> element from the list when the last measure is reached. </p>
 
-<p>Reimplemented in <a class="el" href="classvrv_1_1_note.html#a6886de271d42a7e1be452338d7153e99">vrv::Note</a>, <a class="el" href="classvrv_1_1_staff.html#a0315f172bfa34a1b25afa4a62e77db09">vrv::Staff</a>, <a class="el" href="classvrv_1_1_floating_element.html#a0294e91849c7bfdd27330d1c6e981ac3">vrv::FloatingElement</a>, and <a class="el" href="classvrv_1_1_syl.html#a97f982b99f0becd3d207dcb7c621636a">vrv::Syl</a>.</p>
+<p>Reimplemented in <a class="el" href="classvrv_1_1_note.html#a6886de271d42a7e1be452338d7153e99">vrv::Note</a>, <a class="el" href="classvrv_1_1_staff.html#a0315f172bfa34a1b25afa4a62e77db09">vrv::Staff</a>, <a class="el" href="classvrv_1_1_floating_object.html#a26acefe41b29aa28c85eb244f624d2c1">vrv::FloatingObject</a>, and <a class="el" href="classvrv_1_1_syl.html#a97f982b99f0becd3d207dcb7c621636a">vrv::Syl</a>.</p>
 
 </div>
 </div>
@@ -948,22 +1080,86 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 
 </div>
 </div>
-<a class="anchor" id="ad406fae576f302bb02d7f3442528fc3d"></a>
+<a class="anchor" id="aa846e8099e10d6cf427e8255e4a62dd4"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void vrv::Object::MoveChildren </td>
+          <td class="memname">void vrv::Object::MoveChildrenFrom </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classvrv_1_1_object.html">Object</a> *&#160;</td>
-          <td class="paramname"><em>object</em></td><td>)</td>
+          <td class="paramname"><em>sourceParent</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>idx</em> = <code>-1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>allowTypeChange</em> = <code>false</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Move all the children of the object passed as parameter to this one. </p>
-<p>Objects must be of the same type. After this operation, the object passed as parameter has no child anymore. </p>
+<p>Objects must be of the same type. After this operation, the object passed as parameter has no child anymore. If idx is provided, move the children to the idx position in the object children. Only moving to the same type is allow unless allowTypeChange is true. </p>
+
+</div>
+</div>
+<a class="anchor" id="ac7063ea155c08f4e39e5c59b735f1d9e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrv::Object::MoveItselfTo </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_object.html">Object</a> *&#160;</td>
+          <td class="paramname"><em>targetParent</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Move an object to another parent. </p>
+<p>The object is relinquished from its current parent - see <a class="el" href="classvrv_1_1_object.html#a48ea7a78dfbdf0195235b56679924c76" title="Give up ownership of the child at the idx position (NULL if not found) This is a method to be used on...">Object::Relinquish</a> </p>
+
+</div>
+</div>
+<a class="anchor" id="a691a2477cf831c7662f2850e5d66afc7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int vrv::Object::PrepareLyrics </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *&#160;</td>
+          <td class="paramname"><em>functorParams</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set wordpos and connector ends The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter. </p>
+<p>At the end, the functor is processed by doc at the end of a document of closing opened syl. </p>
+
+<p>Reimplemented in <a class="el" href="classvrv_1_1_note.html#abe7983adf04930b56757c181df0d0b31">vrv::Note</a>, and <a class="el" href="classvrv_1_1_syl.html#a1a6e9b3882e72eb56dfc0335dbf3f63d">vrv::Syl</a>.</p>
 
 </div>
 </div>
@@ -989,10 +1185,39 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 </table>
 </div><div class="memdoc">
 
-<p>Processes by <a class="el" href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). ">Layer</a> and set drawing pointers. </p>
+<p>Process by <a class="el" href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). ">Layer</a> and set drawing pointers. </p>
 <p>Set <a class="el" href="classvrv_1_1_dot.html#a5fd307f78948cc3b6528877df704beea" title="A pointer to the note the point relates to. ">Dot::m_drawingNote</a> for <a class="el" href="classvrv_1_1_dot.html">Dot</a> elements in mensural mode Set <a class="el" href="classvrv_1_1_note.html#a35172cc870711cba26933d2b831cc812" title="other information necessary for notes in chords ">Note::m_drawingAccid</a> for <a class="el" href="classvrv_1_1_note.html">Note</a> elements having an <a class="el" href="classvrv_1_1_accid.html">Accid</a> child </p>
 
 <p>Reimplemented in <a class="el" href="classvrv_1_1_note.html#a701a19d11c0f03dfdb427e9246853f44">vrv::Note</a>, <a class="el" href="classvrv_1_1_dot.html#a0cd770f3f7b664c506b702be5ae114f3">vrv::Dot</a>, and <a class="el" href="classvrv_1_1_accid.html#add240525196abd49ca0eaa07ce637e0b">vrv::Accid</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a52e593fc7ddca6964ef2f04f1377bcd9"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int vrv::Object::PrepareTieAttr </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *&#160;</td>
+          <td class="paramname"><em>functorParams</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Process <a class="el" href="classvrv_1_1_chord.html" title="This class represents a collection of notes in the same layer with the same onset time...">Chord</a> and <a class="el" href="classvrv_1_1_note.html">Note</a> for matching  by processing by <a class="el" href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). ">Layer</a> and by looking at the Pname and Oct. </p>
+<p>At the end, processes <a class="el" href="classvrv_1_1_chord.html" title="This class represents a collection of notes in the same layer with the same onset time...">Chord</a> and <a class="el" href="classvrv_1_1_note.html">Note</a> for matching  by processing by <a class="el" href="classvrv_1_1_layer.html" title="This class represents a layer in a laid-out score (Doc). ">Layer</a>; resets the <a class="el" href="classvrv_1_1_chord.html" title="This class represents a collection of notes in the same layer with the same onset time...">Chord</a> pointer to NULL at the end of a chord. </p>
+
+<p>Reimplemented in <a class="el" href="classvrv_1_1_note.html#a0dd5b0277e7befb0ae0c28990fb5092c">vrv::Note</a>, and <a class="el" href="classvrv_1_1_chord.html#a8410f7b58c9ca691ca16c063b0f75df9">vrv::Chord</a>.</p>
 
 </div>
 </div>
@@ -1018,10 +1243,10 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 </table>
 </div><div class="memdoc">
 
-<p>Matches start and end for <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements (such as tie or slur). </p>
+<p>Match start and end for <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements (such as tie or slur). </p>
 <p>If fillList is set to false, only the remaining elements will be matched. This is used when processing a second time in the other direction </p>
 
-<p>Reimplemented in <a class="el" href="classvrv_1_1_layer_element.html#a72dc4f513f06956e474ca0bfca73aeb2">vrv::LayerElement</a>, and <a class="el" href="classvrv_1_1_floating_element.html#aa58f2bdd701d0f2dad7dc56fbc53476a">vrv::FloatingElement</a>.</p>
+<p>Reimplemented in <a class="el" href="classvrv_1_1_layer_element.html#a72dc4f513f06956e474ca0bfca73aeb2">vrv::LayerElement</a>, and <a class="el" href="classvrv_1_1_floating_object.html#ad0b4a076b299fc6e9ed32cc51aab1bf7">vrv::FloatingObject</a>.</p>
 
 </div>
 </div>
@@ -1047,10 +1272,10 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 </table>
 </div><div class="memdoc">
 
-<p>Matches start and end for <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements with tstamp(2) attributes. </p>
+<p>Match start and end for <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements with tstamp(2) attributes. </p>
 <p>It is performed only on <a class="el" href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. ">TimeSpanningInterface</a> elements withouth  (or ). It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps. </p>
 
-<p>Reimplemented in <a class="el" href="classvrv_1_1_floating_element.html#adead9863e4f94ca512eeffc7fbb728ef">vrv::FloatingElement</a>.</p>
+<p>Reimplemented in <a class="el" href="classvrv_1_1_floating_object.html#ada6846dddeb271c4eb74a753ed763ed7">vrv::FloatingObject</a>.</p>
 
 </div>
 </div>
@@ -1130,7 +1355,36 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 </div><div class="memdoc">
 
 <p>Give up ownership of the child at the idx position (NULL if not found) This is a method to be used only in the very particular case where the child object cannot be detached straight away. </p>
-<p>It is typically the case when this has to be done within an iterator. The parent of the object will be set to NULL but the object will not be removed. If the parent is not destroyed after that, you should expect problems... In other words: do not use unless you are absolutely sure what you are doing </p>
+<p>It is typically the case when this has to be done within an iterator. The parent of the object will be set to NULL but the object will not be removed. If the parent is not destroyed after that, you should expect problems unless <a class="el" href="classvrv_1_1_object.html#a667b4432b8f9d9e92bfd34fe5c885099" title="Removes all the children that were previously relinquished. ">Object::ClearRelinquishedChildren</a> is called In other words: do not use unless you are absolutely sure what you are doing </p>
+
+</div>
+</div>
+<a class="anchor" id="a4433a99f4aa214a4cc351ba903d6baf4"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int vrv::Object::ReplaceDrawingValuesInStaffDef </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *&#160;</td>
+          <td class="paramname"><em>functorParams</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Replace the drawing values a staffDef. </p>
+<p>Set the current / drawing clef, key signature, etc. to the <a class="el" href="classvrv_1_1_staff_def.html" title="This class represents a MEI staffDef. ">StaffDef</a> Called form <a class="el" href="classvrv_1_1_score_def.html#a1225a27011925b11b208356a11bebdd3" title="Replace the scoreDef with the content of the newScoreDef. ">ScoreDef::ReplaceDrawingValues</a>. </p>
+
+<p>Reimplemented in <a class="el" href="classvrv_1_1_staff_def.html#a3437c34ecc3b1de05c6ee1e9e1e3ede8">vrv::StaffDef</a>.</p>
 
 </div>
 </div>
@@ -1158,7 +1412,7 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 <p>Reset the object, that is 1) removing all childs and 2) resetting all attributes. </p>
 <p>The method is virtual, so <em>always</em> call the parent in the method overriding it. </p>
 
-<p>Reimplemented in <a class="el" href="classvrv_1_1_timestamp_aligner.html#a985b1e565b90e6bcbab6e88b09fd50c0">vrv::TimestampAligner</a>, <a class="el" href="classvrv_1_1_unclear.html#aa5046e312c4ed0ffea9b8e7c28396a85">vrv::Unclear</a>, <a class="el" href="classvrv_1_1_supplied.html#a4afaec93c95f56e6c4b857d20f120184">vrv::Supplied</a>, <a class="el" href="classvrv_1_1_measure_aligner.html#a5a533dcbe8644f3c92975643210a0341">vrv::MeasureAligner</a>, <a class="el" href="classvrv_1_1_sic.html#a6778a5a0c6542a13850d37da59c925da">vrv::Sic</a>, <a class="el" href="classvrv_1_1_restore.html#aa7f43e964e7e9b287e319b221e35ff53">vrv::Restore</a>, <a class="el" href="classvrv_1_1_reg.html#a6e95e8401a483fab8101da795bc79136">vrv::Reg</a>, <a class="el" href="classvrv_1_1_rdg.html#ac3cad7c428be4125ce816a64bc0b082b">vrv::Rdg</a>, <a class="el" href="classvrv_1_1_orig.html#ad98c66ed00ddf29ab9e6daf78bf112ce">vrv::Orig</a>, <a class="el" href="classvrv_1_1_lem.html#a07ff80c4cacf4d2a707eb68f94d70ba1">vrv::Lem</a>, <a class="el" href="classvrv_1_1_expan.html#ab3244a775bf1372733f7a27f72c1549c">vrv::Expan</a>, <a class="el" href="classvrv_1_1_alignment.html#a0287d653bbc3253df179dfcaaab2f343">vrv::Alignment</a>, <a class="el" href="classvrv_1_1_del.html#a26bbb25b17b1332e0a4d7a9d37e4900b">vrv::Del</a>, <a class="el" href="classvrv_1_1_damage.html#a1e069800a85fe9d3a32f9e49fc5d307c">vrv::Damage</a>, <a class="el" href="classvrv_1_1_corr.html#a135cb83134f4260398e0d06ec8d8b058">vrv::Corr</a>, <a class="el" href="classvrv_1_1_staff_grp.html#a347677b55f3e9749ac925d19b3e55b9b">vrv::StaffGrp</a>, <a class="el" href="classvrv_1_1_multi_rpt.html#a6c228ab031ba4a04bdf3352f926ad3f1">vrv::MultiRpt</a>, <a class="el" href="classvrv_1_1_app.html#ab257604e5582c2d2961a202ec83e09ba">vrv::App</a>, <a class="el" href="classvrv_1_1_m_rpt2.html#ad5bba7b0c95f8f1ca9354d4fc1933bb7">vrv::MRpt2</a>, <a class="el" href="classvrv_1_1_annot.html#accca6c7f265148eeac13e8dabc061a84">vrv::Annot</a>, <a class="el" href="classvrv_1_1_m_rpt.html#a12037c7e9b9c29330ea3c62dc7de7227">vrv::MRpt</a>, <a class="el" href="classvrv_1_1_add.html#aa50868e956e276fe32abbdc44c86f7ab">vrv::Add</a>, <a class="el" href="classvrv_1_1_score_def.html#ab7953cd561585a76c37a35410e7c2df8">vrv::ScoreDef</a>, <a class="el" href="classvrv_1_1_abbr.html#ac7d315b6903e06a22126c42a7141e82d">vrv::Abbr</a>, <a class="el" href="classvrv_1_1_f_trem.html#abfe7d983b09535ba5c074878c70eeed9">vrv::FTrem</a>, <a class="el" href="classvrv_1_1_system_aligner.html#a9adc9a3111069c7abdb3854eaa57533d">vrv::SystemAligner</a>, <a class="el" href="classvrv_1_1_b_trem.html#a8c7cd9ab4c8b07e187f72e4036e8c517">vrv::BTrem</a>, <a class="el" href="classvrv_1_1_text.html#a0f10976c135be6c5b73c2f6eecd8a4c3">vrv::Text</a>, <a class="el" href="classvrv_1_1_editorial_element.html#abd7e8631e1dd27b74faf50fa278d0a11">vrv::EditorialElement</a>, <a class="el" href="classvrv_1_1_key_sig.html#a5d508aa999353ab19a1bb00e5aa4a356">vrv::KeySig</a>, <a class="el" href="classvrv_1_1_score_def_element.html#a1e121d95814e70d0123bb7be2e69f634">vrv::ScoreDefElement</a>, <a class="el" href="classvrv_1_1_doc.html#a351c9c94a26f5cf02356d873287f469c">vrv::Doc</a>, <a class="el" href="classvrv_1_1_measure.html#a82fee57a4557d152cdecc5c97c9d1d6b">vrv::Measure</a>, <a class="el" href="classvrv_1_1_staff.html#aaf72035d9ae4ae883541f3c4e7eab9ad">vrv::Staff</a>, <a class="el" href="classvrv_1_1_syl.html#ad8421ee7c48a1a2810a40cd268613400">vrv::Syl</a>, <a class="el" href="classvrv_1_1_mensur.html#a2a4d0f5eb80e43876dfa8ab61edc8ad3">vrv::Mensur</a>, <a class="el" href="classvrv_1_1_layer_element.html#afda62d2037293f7448dc26ca2e445b68">vrv::LayerElement</a>, <a class="el" href="classvrv_1_1_page.html#ac858909c078a4a4c7c3879aad83e45d7">vrv::Page</a>, <a class="el" href="classvrv_1_1_floating_element.html#a9b41047a14a0c5e7e501e00d09bff485">vrv::FloatingElement</a>, <a class="el" href="classvrv_1_1_clef.html#a1ba48f8992f81f64e0bfd68116b893d0">vrv::Clef</a>, <a class="el" href="classvrv_1_1_meter_sig.html#ae6ca88828841d660bdc908132b230e6b">vrv::MeterSig</a>, <a class="el" href="classvrv_1_1_tuplet.html#a464671f725eb5ac5f54affe1c94470de">vrv::Tuplet</a>, <a class="el" href="classvrv_1_1_tempo.html#a3a16d51f3ccb7a68b4c8a6efe01c6718">vrv::Tempo</a>, <a class="el" href="classvrv_1_1_anchored_text.html#a994b8d19db67c14b85ef4543ec9add53">vrv::AnchoredText</a>, <a class="el" href="classvrv_1_1_multi_rest.html#ab51f1dff1cdb12d373ed4d42e9b3ab89">vrv::MultiRest</a>, <a class="el" href="classvrv_1_1_beat_rpt.html#a1b56d52250e9f0a38bd1a058bdad6cdd">vrv::BeatRpt</a>, <a class="el" href="classvrv_1_1_bar_line.html#af5652cfb6a6ceac082aff24efe345e82">vrv::BarLine</a>, <a class="el" href="classvrv_1_1_dir.html#ae432921bad571110afc4dc541f657984">vrv::Dir</a>, <a class="el" href="classvrv_1_1_dynam.html#a796634a0f186838ef311761060835d05">vrv::Dynam</a>, <a class="el" href="classvrv_1_1_m_rest.html#a22ac6f8f4a0c036f50a3468b331b9700">vrv::MRest</a>, <a class="el" href="classvrv_1_1_proport.html#abe080e5bc139c410e93ffb36e244a01c">vrv::Proport</a>, <a class="el" href="classvrv_1_1_rend.html#a1d459bbc6fbe07e56de1e35deb64d9df">vrv::Rend</a>, <a class="el" href="classvrv_1_1_dot.html#a573879ea0cb5a2aa550fb99faf7f0a52">vrv::Dot</a>, <a class="el" href="classvrv_1_1_ending_boundary.html#abce139fd5c460e0f432ff266db6f949b">vrv::EndingBoundary</a>, <a class="el" href="classvrv_1_1_octave.html#a229ec2da837f68c480ab55161beb1cb8">vrv::Octave</a>, <a class="el" href="classvrv_1_1_verse.html#a274a32008d98d318d126e70dd812948b">vrv::Verse</a>, <a class="el" href="classvrv_1_1_hairpin.html#acf6ebba6694c86e28faee5c18844bb4d">vrv::Hairpin</a>, <a class="el" href="classvrv_1_1_pedal.html#a578f94f90ceb7176bb547357536e9bf9">vrv::Pedal</a>, <a class="el" href="classvrv_1_1_accid.html#a77f0229943afc71686a9a5ad48866ab6">vrv::Accid</a>, <a class="el" href="classvrv_1_1_custos.html#a32c4ea04b40a718aabdd6199f8ed4423">vrv::Custos</a>, <a class="el" href="classvrv_1_1_slur.html#ad489e51d4fbd05c4a7b77171979c980d">vrv::Slur</a>, <a class="el" href="classvrv_1_1_text_element.html#a8ac1eec61d858d477357d64e0b6f1338">vrv::TextElement</a>, <a class="el" href="classvrv_1_1_tie.html#aa2dcc8217fbcb23238941592457f994d">vrv::Tie</a>, and <a class="el" href="classvrv_1_1_timestamp_attr.html#a18518bfeb14edf87293657d25cb5ef30">vrv::TimestampAttr</a>.</p>
+<p>Reimplemented in <a class="el" href="classvrv_1_1_timestamp_aligner.html#a985b1e565b90e6bcbab6e88b09fd50c0">vrv::TimestampAligner</a>, <a class="el" href="classvrv_1_1_measure_aligner.html#a5a533dcbe8644f3c92975643210a0341">vrv::MeasureAligner</a>, <a class="el" href="classvrv_1_1_alignment.html#a0287d653bbc3253df179dfcaaab2f343">vrv::Alignment</a>, <a class="el" href="classvrv_1_1_staff_grp.html#a347677b55f3e9749ac925d19b3e55b9b">vrv::StaffGrp</a>, <a class="el" href="classvrv_1_1_multi_rpt.html#a6c228ab031ba4a04bdf3352f926ad3f1">vrv::MultiRpt</a>, <a class="el" href="classvrv_1_1_m_rpt2.html#ad5bba7b0c95f8f1ca9354d4fc1933bb7">vrv::MRpt2</a>, <a class="el" href="classvrv_1_1_sb.html#a551be1cf0301942047b57576508f1134">vrv::Sb</a>, <a class="el" href="classvrv_1_1_m_rpt.html#a12037c7e9b9c29330ea3c62dc7de7227">vrv::MRpt</a>, <a class="el" href="classvrv_1_1_score_def.html#ab7953cd561585a76c37a35410e7c2df8">vrv::ScoreDef</a>, <a class="el" href="classvrv_1_1_f_trem.html#abfe7d983b09535ba5c074878c70eeed9">vrv::FTrem</a>, <a class="el" href="classvrv_1_1_pb.html#a7826c28da54c675a9e504fc6b223c5e8">vrv::Pb</a>, <a class="el" href="classvrv_1_1_system_aligner.html#a9adc9a3111069c7abdb3854eaa57533d">vrv::SystemAligner</a>, <a class="el" href="classvrv_1_1_b_trem.html#a8c7cd9ab4c8b07e187f72e4036e8c517">vrv::BTrem</a>, <a class="el" href="classvrv_1_1_text.html#a0f10976c135be6c5b73c2f6eecd8a4c3">vrv::Text</a>, <a class="el" href="classvrv_1_1_key_sig.html#a5d508aa999353ab19a1bb00e5aa4a356">vrv::KeySig</a>, <a class="el" href="classvrv_1_1_score_def_element.html#a1e121d95814e70d0123bb7be2e69f634">vrv::ScoreDefElement</a>, <a class="el" href="classvrv_1_1_doc.html#a351c9c94a26f5cf02356d873287f469c">vrv::Doc</a>, <a class="el" href="classvrv_1_1_measure.html#a82fee57a4557d152cdecc5c97c9d1d6b">vrv::Measure</a>, <a class="el" href="classvrv_1_1_staff.html#aaf72035d9ae4ae883541f3c4e7eab9ad">vrv::Staff</a>, <a class="el" href="classvrv_1_1_syl.html#ad8421ee7c48a1a2810a40cd268613400">vrv::Syl</a>, <a class="el" href="classvrv_1_1_mensur.html#a2a4d0f5eb80e43876dfa8ab61edc8ad3">vrv::Mensur</a>, <a class="el" href="classvrv_1_1_layer_element.html#afda62d2037293f7448dc26ca2e445b68">vrv::LayerElement</a>, <a class="el" href="classvrv_1_1_page.html#ac858909c078a4a4c7c3879aad83e45d7">vrv::Page</a>, <a class="el" href="classvrv_1_1_floating_object.html#a598b5443645caf3544285c9b99bfcdbb">vrv::FloatingObject</a>, <a class="el" href="classvrv_1_1_score.html#a21257b2604924e3a3b77019d81dc55f1">vrv::Score</a>, <a class="el" href="classvrv_1_1_boundary_end.html#a810d3a039a5ae97a502f032af3c72b4f">vrv::BoundaryEnd</a>, <a class="el" href="classvrv_1_1_clef.html#a1ba48f8992f81f64e0bfd68116b893d0">vrv::Clef</a>, <a class="el" href="classvrv_1_1_meter_sig.html#ae6ca88828841d660bdc908132b230e6b">vrv::MeterSig</a>, <a class="el" href="classvrv_1_1_tuplet.html#a464671f725eb5ac5f54affe1c94470de">vrv::Tuplet</a>, <a class="el" href="classvrv_1_1_tempo.html#a3a16d51f3ccb7a68b4c8a6efe01c6718">vrv::Tempo</a>, <a class="el" href="classvrv_1_1_anchored_text.html#a994b8d19db67c14b85ef4543ec9add53">vrv::AnchoredText</a>, <a class="el" href="classvrv_1_1_control_element.html#a4798e8da3af4e07b1b4d95d7df515416">vrv::ControlElement</a>, <a class="el" href="classvrv_1_1_system_element.html#ae1759cdc3693ad2f404cb0cf5cfe327a">vrv::SystemElement</a>, <a class="el" href="classvrv_1_1_multi_rest.html#ab51f1dff1cdb12d373ed4d42e9b3ab89">vrv::MultiRest</a>, <a class="el" href="classvrv_1_1_beat_rpt.html#a1b56d52250e9f0a38bd1a058bdad6cdd">vrv::BeatRpt</a>, <a class="el" href="classvrv_1_1_bar_line.html#af5652cfb6a6ceac082aff24efe345e82">vrv::BarLine</a>, <a class="el" href="classvrv_1_1_dir.html#ae432921bad571110afc4dc541f657984">vrv::Dir</a>, <a class="el" href="classvrv_1_1_dynam.html#a796634a0f186838ef311761060835d05">vrv::Dynam</a>, <a class="el" href="classvrv_1_1_harm.html#a2edec90bcf59cb039a4341cfd1060050">vrv::Harm</a>, <a class="el" href="classvrv_1_1_m_rest.html#a22ac6f8f4a0c036f50a3468b331b9700">vrv::MRest</a>, <a class="el" href="classvrv_1_1_proport.html#abe080e5bc139c410e93ffb36e244a01c">vrv::Proport</a>, <a class="el" href="classvrv_1_1_rend.html#a1d459bbc6fbe07e56de1e35deb64d9df">vrv::Rend</a>, <a class="el" href="classvrv_1_1_dot.html#a573879ea0cb5a2aa550fb99faf7f0a52">vrv::Dot</a>, <a class="el" href="classvrv_1_1_octave.html#a229ec2da837f68c480ab55161beb1cb8">vrv::Octave</a>, <a class="el" href="classvrv_1_1_verse.html#a274a32008d98d318d126e70dd812948b">vrv::Verse</a>, <a class="el" href="classvrv_1_1_hairpin.html#acf6ebba6694c86e28faee5c18844bb4d">vrv::Hairpin</a>, <a class="el" href="classvrv_1_1_pedal.html#a578f94f90ceb7176bb547357536e9bf9">vrv::Pedal</a>, <a class="el" href="classvrv_1_1_accid.html#a77f0229943afc71686a9a5ad48866ab6">vrv::Accid</a>, <a class="el" href="classvrv_1_1_custos.html#a32c4ea04b40a718aabdd6199f8ed4423">vrv::Custos</a>, <a class="el" href="classvrv_1_1_slur.html#ad489e51d4fbd05c4a7b77171979c980d">vrv::Slur</a>, <a class="el" href="classvrv_1_1_text_element.html#a8ac1eec61d858d477357d64e0b6f1338">vrv::TextElement</a>, <a class="el" href="classvrv_1_1_tie.html#aa2dcc8217fbcb23238941592457f994d">vrv::Tie</a>, and <a class="el" href="classvrv_1_1_timestamp_attr.html#a18518bfeb14edf87293657d25cb5ef30">vrv::TimestampAttr</a>.</p>
 
 </div>
 </div>
@@ -1268,38 +1522,9 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 </div><div class="memdoc">
 
 <p>Lay out the X positions of the staff content looking at the bounding boxes. </p>
-<p>The m_xShift is updated appropriately </p>
+<p>The m_xShift is updated appropriately At the end, lay out the X positions of the staff content looking at the bounding boxes. </p>
 
 <p>Reimplemented in <a class="el" href="classvrv_1_1_alignment.html#a116f20b1c9a666ab514fd2f644216a1b">vrv::Alignment</a>, and <a class="el" href="classvrv_1_1_measure.html#a5c9f0f53948bbcc1b090997f2cf0f9ba">vrv::Measure</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a4f87eea46f01299e97014871b312ccdd"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual int vrv::Object::SetBoundingBoxXShiftEnd </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *&#160;</td>
-          <td class="paramname"><em>functorParams</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Lay out the X positions of the staff content looking at the bounding boxes. </p>
-<p>This is the <a class="el" href="classvrv_1_1_functor.html" title="This class is an abstact Functor for the object hierarchy. ">Functor</a> called at the end of the measure or a layer. </p>
-
-<p>Reimplemented in <a class="el" href="classvrv_1_1_alignment.html#afe80e9a88f30435f6f7387a2cba1f15a">vrv::Alignment</a>, and <a class="el" href="classvrv_1_1_measure.html#abf7e77c27bd5d77be7b111b46b22ae47">vrv::Measure</a>.</p>
 
 </div>
 </div>
@@ -1325,8 +1550,8 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 </table>
 </div><div class="memdoc">
 
-<p>Set the initial scoreDef of each page. </p>
-<p>This is necessary for integrating changes that occur within a page. </p>
+<p>Set the current scoreDef wherever need. </p>
+<p>This is include a scoreDef for each system. It also includes a scoreDef for each measure where a change occured before. A change can be either a scoreDef before or a clef, meterSig, etc. within the previous measure. </p>
 
 </div>
 </div>
@@ -1371,8 +1596,8 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 </table>
 </div><div class="memdoc">
 
-<p>Set the initial scoreDef of each page. </p>
-<p>This is necessary for integrating changes that occur within a page. </p>
+<p>Set drawing flags for the <a class="el" href="classvrv_1_1_staff_def.html" title="This class represents a MEI staffDef. ">StaffDef</a> for indicating whether clefs, keysigs, etc. </p>
+<p>need to be redrawn. This typically occurs when a new <a class="el" href="classvrv_1_1_system.html" title="This class represents a system in a laid-out score (Doc). ">System</a> or a new <a class="el" href="classvrv_1_1_score_def.html" title="This class represents a MEI scoreDef. ">ScoreDef</a> is encountered. See implementation and <a class="el" href="classvrv_1_1_object.html#af661ccbb821d7e2a22e313069c8b8cf6" title="Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. ">Object::SetStaffDefRedrawFlags</a> for the parameters. </p>
 
 <p>Reimplemented in <a class="el" href="classvrv_1_1_staff_def.html#a56d69722b3495b9e5e91d38229753caa">vrv::StaffDef</a>.</p>
 
@@ -1403,7 +1628,7 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 <p>Undo the cast of both pages and system. </p>
 <p>This is used by Doc::ContinuousLayout for putting all pages / systems continously. </p>
 
-<p>Reimplemented in <a class="el" href="classvrv_1_1_system.html#a3229696f014d2302f8baea8bb4ef9cc0">vrv::System</a>, and <a class="el" href="classvrv_1_1_floating_element.html#a9f13998284442ef5ea2bd1d74ee9a602">vrv::FloatingElement</a>.</p>
+<p>Reimplemented in <a class="el" href="classvrv_1_1_system.html#a3229696f014d2302f8baea8bb4ef9cc0">vrv::System</a>, and <a class="el" href="classvrv_1_1_floating_object.html#a8bf4262ef0383452bb3666bd1b077a67">vrv::FloatingObject</a>.</p>
 
 </div>
 </div>
@@ -1432,7 +1657,7 @@ ArrayOfObjects&#160;</td><td class="memItemRight" valign="bottom"><b>m_children<
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_object.html">Object</a></li>
-    <li class="footer">Generated on Wed Jul 20 2016 07:50:07 by
+    <li class="footer">Generated on Tue Sep 6 2016 08:32:59 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

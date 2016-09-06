@@ -1,6 +1,6 @@
 var classvrv_1_1_set_drawing_x_y_params =
 [
-    [ "SetDrawingXYParams", "classvrv_1_1_set_drawing_x_y_params.html#aeecbb0acac995042aef01876bb255866", null ],
+    [ "SetDrawingXYParams", "classvrv_1_1_set_drawing_x_y_params.html#a60f7d07edfd1d7f8d2a06f9bd3757d5d", null ],
     [ "m_currentLayer", "classvrv_1_1_set_drawing_x_y_params.html#ac06cc322b75a89424ec11767a834814e", null ],
     [ "m_currentMeasure", "classvrv_1_1_set_drawing_x_y_params.html#a2273a8c129a006ebbfaec3458074b5d8", null ],
     [ "m_currentStaff", "classvrv_1_1_set_drawing_x_y_params.html#aa2c4efd1b8fefd099a62538d46fce240", null ],

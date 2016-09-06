@@ -138,7 +138,7 @@ $(document).ready(function(){initNavTree('svgdevicecontext_8h_source.html','');}
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">public</span>:</div>
 <div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <a class="code" href="classvrv_1_1_svg_device_context.html">SvgDeviceContext</a>(<span class="keywordtype">int</span> width, <span class="keywordtype">int</span> height);</div>
 <div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_svg_device_context.html">SvgDeviceContext</a>();</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> SVG_DEVICE_CONTEXT; };</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> SVG_DEVICE_CONTEXT; }</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> SetBackground(<span class="keywordtype">int</span> colour, <span class="keywordtype">int</span> style = AxSOLID);</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> SetBackgroundImage(<span class="keywordtype">void</span> *image, <span class="keywordtype">double</span> opacity = 1.0);</div>
@@ -188,7 +188,7 @@ $(document).ready(function(){initNavTree('svgdevicecontext_8h_source.html','');}
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="keywordtype">void</span> DrawSvgBoundingBox(<a class="code" href="classvrv_1_1_object.html">Object</a> *<span class="keywordtype">object</span>, <a class="code" href="classvrv_1_1_view.html">View</a> *view);</div>
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keywordtype">void</span> VrvTextFont() { m_vrvTextFont = <span class="keyword">true</span>; };</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    <span class="keywordtype">void</span> VrvTextFont() { m_vrvTextFont = <span class="keyword">true</span>; }</div>
 <div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
 <div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keywordtype">void</span> Commit(<span class="keywordtype">bool</span> xml_declaration);</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
@@ -233,16 +233,16 @@ $(document).ready(function(){initNavTree('svgdevicecontext_8h_source.html','');}
 <div class="ttc" id="classvrv_1_1_svg_device_context_html_ac7579ffcdf3f65f5b270a90988dc3079"><div class="ttname"><a href="classvrv_1_1_svg_device_context.html#ac7579ffcdf3f65f5b270a90988dc3079">vrv::SvgDeviceContext::MoveTextTo</a></div><div class="ttdeci">virtual void MoveTextTo(int x, int y)</div><div class="ttdoc">Move a text to the specified position, for example when starting a new line. </div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
 <div class="ttc" id="classvrv_1_1_svg_device_context_html"><div class="ttname"><a href="classvrv_1_1_svg_device_context.html">vrv::SvgDeviceContext</a></div><div class="ttdoc">This class implements a drawing context for generating SVG files. </div><div class="ttdef"><b>Definition:</b> svgdevicecontext.h:37</div></div>
-<div class="ttc" id="classvrv_1_1_object_html"><div class="ttname"><a href="classvrv_1_1_object.html">vrv::Object</a></div><div class="ttdoc">This class represents a basic object. </div><div class="ttdef"><b>Definition:</b> object.h:144</div></div>
+<div class="ttc" id="classvrv_1_1_object_html"><div class="ttname"><a href="classvrv_1_1_object.html">vrv::Object</a></div><div class="ttdoc">This class represents a basic object. </div><div class="ttdef"><b>Definition:</b> object.h:146</div></div>
 <div class="ttc" id="classvrv_1_1_svg_device_context_html_a49eb15ae209f1ab05b072c5fb9589d3a"><div class="ttname"><a href="classvrv_1_1_svg_device_context.html#a49eb15ae209f1ab05b072c5fb9589d3a">vrv::SvgDeviceContext::GetStringSVG</a></div><div class="ttdeci">std::string GetStringSVG(bool xml_declaration=false)</div><div class="ttdoc">} </div></div>
-<div class="ttc" id="classvrv_1_1_view_html"><div class="ttname"><a href="classvrv_1_1_view.html">vrv::View</a></div><div class="ttdoc">This class is a drawing context and corresponds to the view of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> view.h:57</div></div>
+<div class="ttc" id="classvrv_1_1_view_html"><div class="ttname"><a href="classvrv_1_1_view.html">vrv::View</a></div><div class="ttdoc">This class is a drawing context and corresponds to the view of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> view.h:59</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>svgdevicecontext.h</b></li>
-    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
+    <li class="footer">Generated on Tue Sep 6 2016 08:32:56 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

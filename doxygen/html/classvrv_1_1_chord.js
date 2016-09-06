@@ -2,7 +2,7 @@ var classvrv_1_1_chord =
 [
     [ "Chord", "classvrv_1_1_chord.html#ab6c5a3f6a8ec9843054579ea482a2b60", null ],
     [ "~Chord", "classvrv_1_1_chord.html#a9ae1e1fa231042a16cb94107e2572ee8", null ],
-    [ "AddLayerElement", "classvrv_1_1_chord.html#a3ab08500f6b11c2f3f4256a903307eab", null ],
+    [ "AddChild", "classvrv_1_1_chord.html#ae003b9ef10ebe3e78f523c72f436ca55", null ],
     [ "ClearClusters", "classvrv_1_1_chord.html#ac95d6a15ae3134f2178dd199531ecb42", null ],
     [ "FilterList", "classvrv_1_1_chord.html#a725f7e46b31a610503cac3f8a17c5fc7", null ],
     [ "GetClassName", "classvrv_1_1_chord.html#a01038426db25e51fe8a035c1f0a8d46a", null ],

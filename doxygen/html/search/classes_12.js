@@ -9,7 +9,6 @@ var searchData=
   ['tie',['Tie',['../classvrv_1_1_tie.html',1,'vrv']]],
   ['timepointinterface',['TimePointInterface',['../classvrv_1_1_time_point_interface.html',1,'vrv']]],
   ['timespanninginterface',['TimeSpanningInterface',['../classvrv_1_1_time_spanning_interface.html',1,'vrv']]],
-  ['timespanninglayerelementsparams',['TimeSpanningLayerElementsParams',['../classvrv_1_1_time_spanning_layer_elements_params.html',1,'vrv']]],
   ['timestampaligner',['TimestampAligner',['../classvrv_1_1_timestamp_aligner.html',1,'vrv']]],
   ['timestampattr',['TimestampAttr',['../classvrv_1_1_timestamp_attr.html',1,'vrv']]],
   ['toolkit',['Toolkit',['../classvrv_1_1_toolkit.html',1,'vrv']]],

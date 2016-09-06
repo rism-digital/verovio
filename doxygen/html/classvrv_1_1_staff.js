@@ -2,7 +2,7 @@ var classvrv_1_1_staff =
 [
     [ "Staff", "classvrv_1_1_staff.html#a86d88fff2ea1f7120109a849a9554ac7", null ],
     [ "~Staff", "classvrv_1_1_staff.html#a37cd8e05822ef95c7edf9ea7340d425f", null ],
-    [ "AddLayer", "classvrv_1_1_staff.html#a66887752a9c46c24a91237c68808003f", null ],
+    [ "AddChild", "classvrv_1_1_staff.html#a8756c96787854aca70ceefbd09067341", null ],
     [ "AlignVertically", "classvrv_1_1_staff.html#a117c874984f47c04a116e5a369f73b52", null ],
     [ "FillStaffCurrentTimeSpanning", "classvrv_1_1_staff.html#a0315f172bfa34a1b25afa4a62e77db09", null ],
     [ "GetAlignment", "classvrv_1_1_staff.html#a11473f759f99db3ab63047fd2769d4b6", null ],

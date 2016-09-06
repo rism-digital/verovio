@@ -127,14 +127,15 @@ Inheritance diagram for vrv::TimePointInterface:</div>
 <area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="0,0,166,24"/>
 <area href="classvrv_1_1_pedal.html" alt="vrv::Pedal" shape="rect" coords="88,112,254,136"/>
 <area href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. " alt="vrv::Tempo" shape="rect" coords="264,112,430,136"/>
-<area href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. " alt="vrv::TimeSpanningInterface" shape="rect" coords="616,112,782,136"/>
-<area href="classvrv_1_1_dir.html" alt="vrv::Dir" shape="rect" coords="88,168,254,192"/>
-<area href="classvrv_1_1_dynam.html" alt="vrv::Dynam" shape="rect" coords="264,168,430,192"/>
-<area href="classvrv_1_1_hairpin.html" alt="vrv::Hairpin" shape="rect" coords="440,168,606,192"/>
-<area href="classvrv_1_1_octave.html" alt="vrv::Octave" shape="rect" coords="616,168,782,192"/>
-<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="792,168,958,192"/>
-<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="968,168,1134,192"/>
-<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="1144,168,1310,192"/>
+<area href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. " alt="vrv::TimeSpanningInterface" shape="rect" coords="440,112,606,136"/>
+<area href="classvrv_1_1_dir.html" alt="vrv::Dir" shape="rect" coords="616,168,782,192"/>
+<area href="classvrv_1_1_dynam.html" alt="vrv::Dynam" shape="rect" coords="616,224,782,248"/>
+<area href="classvrv_1_1_hairpin.html" alt="vrv::Hairpin" shape="rect" coords="616,280,782,304"/>
+<area href="classvrv_1_1_harm.html" alt="vrv::Harm" shape="rect" coords="616,336,782,360"/>
+<area href="classvrv_1_1_octave.html" alt="vrv::Octave" shape="rect" coords="616,392,782,416"/>
+<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="616,448,782,472"/>
+<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="616,504,782,528"/>
+<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="616,560,782,584"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -265,7 +266,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b
 </div><div class="memdoc">
 
 <p>We have functor in the interface for avoiding code duplication in each implementation class. </p>
-<p>Since we are in an interface, we need to pass the <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> (implementation) to the functor method. These not called by the Process/Call loop but by the implementaion classes explicitely. See <a class="el" href="classvrv_1_1_floating_element.html#a0294e91849c7bfdd27330d1c6e981ac3" title="See Object::FillStaffCurrentTimeSpanning. ">FloatingElement::FillStaffCurrentTimeSpanning</a> for an example. See <a class="el" href="classvrv_1_1_object.html#add7c9b75fc81f87f444f681e4988d91f" title="Matches start and end for TimeSpanningInterface elements with tstamp(2) attributes. ">Object::PrepareTimestamps</a> </p>
+<p>Since we are in an interface, we need to pass the <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> (implementation) to the functor method. These not called by the Process/Call loop but by the implementaion classes explicitely. See <a class="el" href="classvrv_1_1_floating_object.html#a26acefe41b29aa28c85eb244f624d2c1" title="See Object::FillStaffCurrentTimeSpanning. ">FloatingObject::FillStaffCurrentTimeSpanning</a> for an example. See <a class="el" href="classvrv_1_1_object.html#add7c9b75fc81f87f444f681e4988d91f" title="Match start and end for TimeSpanningInterface elements with tstamp(2) attributes. ...">Object::PrepareTimestamps</a> </p>
 
 <p>Reimplemented in <a class="el" href="classvrv_1_1_time_spanning_interface.html#acb8a7bb12dfeffb584dd52840fc11ac4">vrv::TimeSpanningInterface</a>.</p>
 
@@ -310,7 +311,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_time_point_interface.html">TimePointInterface</a></li>
-    <li class="footer">Generated on Wed Jul 20 2016 07:50:08 by
+    <li class="footer">Generated on Tue Sep 6 2016 08:33:02 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

@@ -132,22 +132,22 @@ $(document).ready(function(){initNavTree('beam_8h_source.html','');});
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="classvrv_1_1_beam.html">Beam</a>();</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_beam.html">Beam</a>();</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> Reset();</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">virtual</span> std::string GetClassName()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;Beam&quot;</span>; };</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> BEAM; };</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keyword">virtual</span> std::string GetClassName()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <span class="stringliteral">&quot;Beam&quot;</span>; }</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;    <span class="keyword">virtual</span> ClassId Is()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> BEAM; }</div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">int</span> GetNoteCount()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> this-&gt;GetChildCount(NOTE); };</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;    <span class="keywordtype">int</span> GetNoteCount()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> this-&gt;GetChildCount(NOTE); }</div>
 <div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_beam.html#adb2f7a456c0ca22b3831cac69c31271d">AddLayerElement</a>(<a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element);</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_beam.html#a2bf2871cb6ceb877ef0f87acb43e0393">AddChild</a>(<a class="code" href="classvrv_1_1_object.html">Object</a> *<span class="keywordtype">object</span>);</div>
 <div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_beam.html#a6b77b30f89dcc0f8b266138baa8904eb">IsFirstInBeam</a>(<a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element);</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordtype">bool</span> IsLastInBeam(<a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element);</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keyword">const</span> ArrayOfBeamElementCoords *GetElementCoords()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> &amp;m_beamElementCoords; };</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    <span class="keyword">const</span> ArrayOfBeamElementCoords *GetElementCoords()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> &amp;m_beamElementCoords; }</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;<span class="keyword">protected</span>:</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_beam.html#a444ea8b5240b49456d8a1f9a7902d5f4">FilterList</a>(ListOfObjects *childList);</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_beam.html#a1c876445fbcda3be5e0ef46647a9a1b3">InitCoords</a>(ListOfObjects *childList);</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    </div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_beam.html#a1c878bf5ec80f7bd9a0f7c2c7aa8a8e0">GetPosition</a>(<a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element);</div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_beam.html#a34fc75baaa7ed6db561e8b67044349b7">ClearCoords</a>();</div>
@@ -166,7 +166,7 @@ $(document).ready(function(){initNavTree('beam_8h_source.html','');});
 <div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
 <div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="classvrv_1_1_beam_element_coord.html">  100</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_beam_element_coord.html">BeamElementCoord</a> {</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="classvrv_1_1_beam_element_coord.html">BeamElementCoord</a>() { m_element = NULL; };</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <a class="code" href="classvrv_1_1_beam_element_coord.html">BeamElementCoord</a>() { m_element = NULL; }</div>
 <div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_beam_element_coord.html">BeamElementCoord</a>();</div>
 <div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
 <div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordtype">int</span> m_x;</div>
@@ -212,11 +212,12 @@ $(document).ready(function(){initNavTree('beam_8h_source.html','');});
 <div class="ttc" id="classvrv_1_1_beam_html_a444ea8b5240b49456d8a1f9a7902d5f4"><div class="ttname"><a href="classvrv_1_1_beam.html#a444ea8b5240b49456d8a1f9a7902d5f4">vrv::Beam::FilterList</a></div><div class="ttdeci">virtual void FilterList(ListOfObjects *childList)</div><div class="ttdoc">Filter the list for a specific class. </div></div>
 <div class="ttc" id="classvrv_1_1_beam_html_a1c876445fbcda3be5e0ef46647a9a1b3"><div class="ttname"><a href="classvrv_1_1_beam.html#a1c876445fbcda3be5e0ef46647a9a1b3">vrv::Beam::InitCoords</a></div><div class="ttdeci">void InitCoords(ListOfObjects *childList)</div><div class="ttdoc">Initializes the m_beamElementCoords vector objects. </div></div>
 <div class="ttc" id="classvrv_1_1_drawing_list_interface_html"><div class="ttname"><a href="classvrv_1_1_drawing_list_interface.html">vrv::DrawingListInterface</a></div><div class="ttdoc">This class is an interface for elements with duration, such as notes and rests. </div><div class="ttdef"><b>Definition:</b> drawinginterface.h:30</div></div>
-<div class="ttc" id="classvrv_1_1_beam_html_adb2f7a456c0ca22b3831cac69c31271d"><div class="ttname"><a href="classvrv_1_1_beam.html#adb2f7a456c0ca22b3831cac69c31271d">vrv::Beam::AddLayerElement</a></div><div class="ttdeci">void AddLayerElement(LayerElement *element)</div><div class="ttdoc">Add an element (a note or a rest) to a beam. </div></div>
 <div class="ttc" id="classvrv_1_1_beam_html_a1c878bf5ec80f7bd9a0f7c2c7aa8a8e0"><div class="ttname"><a href="classvrv_1_1_beam.html#a1c878bf5ec80f7bd9a0f7c2c7aa8a8e0">vrv::Beam::GetPosition</a></div><div class="ttdeci">int GetPosition(LayerElement *element)</div><div class="ttdoc">Return the position of the element in the beam. </div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
+<div class="ttc" id="classvrv_1_1_beam_html_a2bf2871cb6ceb877ef0f87acb43e0393"><div class="ttname"><a href="classvrv_1_1_beam.html#a2bf2871cb6ceb877ef0f87acb43e0393">vrv::Beam::AddChild</a></div><div class="ttdeci">virtual void AddChild(Object *object)</div><div class="ttdoc">Add an element (a note or a rest) to a beam. </div></div>
+<div class="ttc" id="classvrv_1_1_object_html"><div class="ttname"><a href="classvrv_1_1_object.html">vrv::Object</a></div><div class="ttdoc">This class represents a basic object. </div><div class="ttdef"><b>Definition:</b> object.h:146</div></div>
 <div class="ttc" id="classvrv_1_1_beam_html"><div class="ttname"><a href="classvrv_1_1_beam.html">vrv::Beam</a></div><div class="ttdef"><b>Definition:</b> beam.h:25</div></div>
-<div class="ttc" id="classvrv_1_1_object_list_interface_html"><div class="ttname"><a href="classvrv_1_1_object_list_interface.html">vrv::ObjectListInterface</a></div><div class="ttdoc">This class is an pseudo interface for elements maintaining a flat list of children LayerElement for p...</div><div class="ttdef"><b>Definition:</b> object.h:809</div></div>
+<div class="ttc" id="classvrv_1_1_object_list_interface_html"><div class="ttname"><a href="classvrv_1_1_object_list_interface.html">vrv::ObjectListInterface</a></div><div class="ttdoc">This class is an pseudo interface for elements maintaining a flat list of children LayerElement for p...</div><div class="ttdef"><b>Definition:</b> object.h:867</div></div>
 <div class="ttc" id="classvrv_1_1_beam_html_a6b77b30f89dcc0f8b266138baa8904eb"><div class="ttname"><a href="classvrv_1_1_beam.html#a6b77b30f89dcc0f8b266138baa8904eb">vrv::Beam::IsFirstInBeam</a></div><div class="ttdeci">bool IsFirstInBeam(LayerElement *element)</div><div class="ttdoc">Return information about the position in the beam. </div></div>
 <div class="ttc" id="classvrv_1_1_beam_element_coord_html"><div class="ttname"><a href="classvrv_1_1_beam_element_coord.html">vrv::BeamElementCoord</a></div><div class="ttdef"><b>Definition:</b> beam.h:100</div></div>
 <div class="ttc" id="classvrv_1_1_beam_html_a34fc75baaa7ed6db561e8b67044349b7"><div class="ttname"><a href="classvrv_1_1_beam.html#a34fc75baaa7ed6db561e8b67044349b7">vrv::Beam::ClearCoords</a></div><div class="ttdeci">void ClearCoords()</div><div class="ttdoc">Clear the m_beamElementCoords vector and delete all the objects. </div></div>
@@ -228,7 +229,7 @@ $(document).ready(function(){initNavTree('beam_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>beam.h</b></li>
-    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
+    <li class="footer">Generated on Tue Sep 6 2016 08:32:55 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

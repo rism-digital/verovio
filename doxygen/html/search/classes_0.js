@@ -4,6 +4,7 @@ var searchData=
   ['accid',['Accid',['../classvrv_1_1_accid.html',1,'vrv']]],
   ['add',['Add',['../classvrv_1_1_add.html',1,'vrv']]],
   ['addlayerelementtoflatlistparams',['AddLayerElementToFlatListParams',['../classvrv_1_1_add_layer_element_to_flat_list_params.html',1,'vrv']]],
+  ['adjustfloatingpostionergrpsparams',['AdjustFloatingPostionerGrpsParams',['../classvrv_1_1_adjust_floating_postioner_grps_params.html',1,'vrv']]],
   ['adjustfloatingpostionersparams',['AdjustFloatingPostionersParams',['../classvrv_1_1_adjust_floating_postioners_params.html',1,'vrv']]],
   ['alignhorizontallyparams',['AlignHorizontallyParams',['../classvrv_1_1_align_horizontally_params.html',1,'vrv']]],
   ['alignmeasuresparams',['AlignMeasuresParams',['../classvrv_1_1_align_measures_params.html',1,'vrv']]],

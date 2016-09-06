@@ -122,15 +122,16 @@ Inheritance diagram for vrv::TimeSpanningInterface:</div>
  <div class="center">
   <img src="classvrv_1_1_time_spanning_interface.png" usemap="#vrv::TimeSpanningInterface_map" alt=""/>
   <map id="vrv::TimeSpanningInterface_map" name="vrv::TimeSpanningInterface_map">
-<area href="classvrv_1_1_time_point_interface.html" title="This class is an interface for elements having a single time point, such as tempo, reh, etc. " alt="vrv::TimePointInterface" shape="rect" coords="352,56,518,80"/>
-<area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="88,0,254,24"/>
-<area href="classvrv_1_1_dir.html" alt="vrv::Dir" shape="rect" coords="0,168,166,192"/>
-<area href="classvrv_1_1_dynam.html" alt="vrv::Dynam" shape="rect" coords="176,168,342,192"/>
-<area href="classvrv_1_1_hairpin.html" alt="vrv::Hairpin" shape="rect" coords="352,168,518,192"/>
-<area href="classvrv_1_1_octave.html" alt="vrv::Octave" shape="rect" coords="528,168,694,192"/>
-<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="704,168,870,192"/>
-<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="880,168,1046,192"/>
-<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="1056,168,1222,192"/>
+<area href="classvrv_1_1_time_point_interface.html" title="This class is an interface for elements having a single time point, such as tempo, reh, etc. " alt="vrv::TimePointInterface" shape="rect" coords="264,56,430,80"/>
+<area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="0,0,166,24"/>
+<area href="classvrv_1_1_dir.html" alt="vrv::Dir" shape="rect" coords="616,168,782,192"/>
+<area href="classvrv_1_1_dynam.html" alt="vrv::Dynam" shape="rect" coords="616,224,782,248"/>
+<area href="classvrv_1_1_hairpin.html" alt="vrv::Hairpin" shape="rect" coords="616,280,782,304"/>
+<area href="classvrv_1_1_harm.html" alt="vrv::Harm" shape="rect" coords="616,336,782,360"/>
+<area href="classvrv_1_1_octave.html" alt="vrv::Octave" shape="rect" coords="616,392,782,416"/>
+<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="616,448,782,472"/>
+<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="616,504,782,528"/>
+<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="616,560,782,584"/>
 </map>
  </div></div>
 <table class="memberdecls">
@@ -161,11 +162,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetUuidStr</b> ()</td
 <tr class="separator:a7eb9ec4141167667a95edb3e91b72c6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afdd5ee6c76457751a32e0f26310331d0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afdd5ee6c76457751a32e0f26310331d0"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#afdd5ee6c76457751a32e0f26310331d0">InterfacePrepareTimeSpanning</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
-<tr class="memdesc:afdd5ee6c76457751a32e0f26310331d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#acf5548dc77c315039ea5b8ce9e323bc3" title="Matches start and end for TimeSpanningInterface elements (such as tie or slur). ">Object::PrepareTimeSpanning</a>. <br /></td></tr>
+<tr class="memdesc:afdd5ee6c76457751a32e0f26310331d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#acf5548dc77c315039ea5b8ce9e323bc3" title="Match start and end for TimeSpanningInterface elements (such as tie or slur). ">Object::PrepareTimeSpanning</a>. <br /></td></tr>
 <tr class="separator:afdd5ee6c76457751a32e0f26310331d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb8a7bb12dfeffb584dd52840fc11ac4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acb8a7bb12dfeffb584dd52840fc11ac4"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#acb8a7bb12dfeffb584dd52840fc11ac4">InterfacePrepareTimestamps</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
-<tr class="memdesc:acb8a7bb12dfeffb584dd52840fc11ac4"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#add7c9b75fc81f87f444f681e4988d91f" title="Matches start and end for TimeSpanningInterface elements with tstamp(2) attributes. ">Object::PrepareTimestamps</a>. <br /></td></tr>
+<tr class="memdesc:acb8a7bb12dfeffb584dd52840fc11ac4"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#add7c9b75fc81f87f444f681e4988d91f" title="Match start and end for TimeSpanningInterface elements with tstamp(2) attributes. ...">Object::PrepareTimestamps</a>. <br /></td></tr>
 <tr class="separator:acb8a7bb12dfeffb584dd52840fc11ac4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a662b369eb4ed6068d8b9da4de73108ed"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a662b369eb4ed6068d8b9da4de73108ed"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_spanning_interface.html#a662b369eb4ed6068d8b9da4de73108ed">InterfaceResetDrawing</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
@@ -301,7 +302,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b
 </div><div class="memdoc">
 
 <p>We have functors in the interface for avoiding code duplication in each implementation class. </p>
-<p>Since we are in an interface, we need to pass the <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> (implementation) to the functor methods. These are not called by the Process/Call loop but by the implementation classes explicitely. See <a class="el" href="classvrv_1_1_floating_element.html#a0294e91849c7bfdd27330d1c6e981ac3" title="See Object::FillStaffCurrentTimeSpanning. ">FloatingElement::FillStaffCurrentTimeSpanning</a> for an example. See <a class="el" href="classvrv_1_1_object.html#af2fe95ae3e17efb2fb1b8a32633f6ae1" title="Goes through all the TimeSpanningInterface elements and set them a current to each staff where requir...">Object::FillStaffCurrentTimeSpanning</a> </p>
+<p>Since we are in an interface, we need to pass the <a class="el" href="classvrv_1_1_object.html" title="This class represents a basic object. ">Object</a> (implementation) to the functor methods. These are not called by the Process/Call loop but by the implementation classes explicitely. See <a class="el" href="classvrv_1_1_floating_object.html#a26acefe41b29aa28c85eb244f624d2c1" title="See Object::FillStaffCurrentTimeSpanning. ">FloatingObject::FillStaffCurrentTimeSpanning</a> for an example. See <a class="el" href="classvrv_1_1_object.html#af2fe95ae3e17efb2fb1b8a32633f6ae1" title="Go through all the TimeSpanningInterface elements and set them a current to each staff where required...">Object::FillStaffCurrentTimeSpanning</a> </p>
 
 </div>
 </div>
@@ -342,7 +343,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_time_spanning_interface.html">TimeSpanningInterface</a></li>
-    <li class="footer">Generated on Wed Jul 20 2016 07:50:08 by
+    <li class="footer">Generated on Tue Sep 6 2016 08:33:02 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

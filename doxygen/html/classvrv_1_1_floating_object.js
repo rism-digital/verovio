@@ -1,0 +1,25 @@
+var classvrv_1_1_floating_object =
+[
+    [ "FloatingObject", "classvrv_1_1_floating_object.html#a881e66e4ba71468555b7a8abae6a346e", null ],
+    [ "FloatingObject", "classvrv_1_1_floating_object.html#aa78bfd42521efc05ef62b5b71e7e7785", null ],
+    [ "~FloatingObject", "classvrv_1_1_floating_object.html#ac09ff8994cb1d0119fdd67d25d12f410", null ],
+    [ "FillStaffCurrentTimeSpanning", "classvrv_1_1_floating_object.html#a26acefe41b29aa28c85eb244f624d2c1", null ],
+    [ "GetCurrentFloatingPositioner", "classvrv_1_1_floating_object.html#a4d92135a6f8a1967fb53ac60e3cbb0c7", null ],
+    [ "GetDrawingGrpId", "classvrv_1_1_floating_object.html#a40dd74ac8b2347713466d963d43c1a90", null ],
+    [ "GetDrawingX", "classvrv_1_1_floating_object.html#a3ccbab79475f98bf8969131316ab6baa", null ],
+    [ "GetDrawingY", "classvrv_1_1_floating_object.html#aaf6095fa171444982c486c1acfab7a1b", null ],
+    [ "Is", "classvrv_1_1_floating_object.html#a4e3728d5694239818bf65d3d66c6a37b", null ],
+    [ "PrepareTimeSpanning", "classvrv_1_1_floating_object.html#ad0b4a076b299fc6e9ed32cc51aab1bf7", null ],
+    [ "PrepareTimestamps", "classvrv_1_1_floating_object.html#ada6846dddeb271c4eb74a753ed763ed7", null ],
+    [ "Reset", "classvrv_1_1_floating_object.html#a598b5443645caf3544285c9b99bfcdbb", null ],
+    [ "ResetDrawing", "classvrv_1_1_floating_object.html#a7ffe51b2123461f9bc70ae597a24fe0e", null ],
+    [ "ResetHorizontalAlignment", "classvrv_1_1_floating_object.html#a73c7828c73925d4b483c90ea3c45e0a6", null ],
+    [ "ResetVerticalAlignment", "classvrv_1_1_floating_object.html#a641ed5d645ade83bf5c970d3e5cc02c4", null ],
+    [ "SetCurrentFloatingPositioner", "classvrv_1_1_floating_object.html#a819ad528a043efce1c9a8f860896b603", null ],
+    [ "SetDrawingGrpId", "classvrv_1_1_floating_object.html#a2a54c03eab79c35ce2030916053bd1d4", null ],
+    [ "UnCastOff", "classvrv_1_1_floating_object.html#a8bf4262ef0383452bb3666bd1b077a67", null ],
+    [ "UpdateContentBBoxX", "classvrv_1_1_floating_object.html#abbd346830de7211ed94772948f0e9513", null ],
+    [ "UpdateContentBBoxY", "classvrv_1_1_floating_object.html#a0f19109398376ce67d8211faa133e7f5", null ],
+    [ "UpdateSelfBBoxX", "classvrv_1_1_floating_object.html#a78079e4ba538d3e212ba44a79fc32f61", null ],
+    [ "UpdateSelfBBoxY", "classvrv_1_1_floating_object.html#a1dec773ac9a13ce9abb0b750488061e7", null ]
+];

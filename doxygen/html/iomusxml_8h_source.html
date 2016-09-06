@@ -128,10 +128,10 @@ $(document).ready(function(){initNavTree('iomusxml_8h_source.html','');});
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrv.html">vrv</a> {</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">class </span>FloatingElement;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">class </span>Layer;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">class </span>LayerElement;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">class </span>Measure;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">class </span>Layer;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">class </span>LayerElement;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">class </span>Measure;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">class </span>ControlElement;</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">class </span>Slur;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">class </span>StaffGrp;</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">class </span>System;</div>
@@ -239,22 +239,22 @@ $(document).ready(function(){initNavTree('iomusxml_8h_source.html','');});
 <div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    std::vector&lt;std::pair&lt;Slur *, musicxml::OpenSlur&gt; &gt; m_slurStack;</div>
 <div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    std::vector&lt;std::pair&lt;Tie *, musicxml::OpenTie&gt; &gt; m_tieStack;</div>
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    std::vector&lt;std::pair&lt;int, FloatingElement *&gt; &gt; m_floatingElements;</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    std::vector&lt;std::pair&lt;int, ControlElement *&gt; &gt; m_controlElements;</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;};</div>
 <div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;</div>
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;} <span class="comment">// namespace vrv {</span></div>
 <div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;</div>
 <div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="preprocessor">#endif // __VRV_IOMUSXML_H__</span></div>
-<div class="ttc" id="classvrv_1_1_staff_grp_html"><div class="ttname"><a href="classvrv_1_1_staff_grp.html">vrv::StaffGrp</a></div><div class="ttdoc">This class represents a MEI staffGrp. </div><div class="ttdef"><b>Definition:</b> scoredef.h:203</div></div>
-<div class="ttc" id="classvrv_1_1_system_html"><div class="ttname"><a href="classvrv_1_1_system.html">vrv::System</a></div><div class="ttdoc">This class represents a system in a laid-out score (Doc). </div><div class="ttdef"><b>Definition:</b> system.h:31</div></div>
+<div class="ttc" id="classvrv_1_1_staff_grp_html"><div class="ttname"><a href="classvrv_1_1_staff_grp.html">vrv::StaffGrp</a></div><div class="ttdoc">This class represents a MEI staffGrp. </div><div class="ttdef"><b>Definition:</b> scoredef.h:211</div></div>
+<div class="ttc" id="classvrv_1_1_system_html"><div class="ttname"><a href="classvrv_1_1_system.html">vrv::System</a></div><div class="ttdoc">This class represents a system in a laid-out score (Doc). </div><div class="ttdef"><b>Definition:</b> system.h:32</div></div>
 <div class="ttc" id="classvrv_1_1_layer_html"><div class="ttname"><a href="classvrv_1_1_layer.html">vrv::Layer</a></div><div class="ttdoc">This class represents a layer in a laid-out score (Doc). </div><div class="ttdef"><b>Definition:</b> layer.h:32</div></div>
 <div class="ttc" id="classvrv_1_1_staff_html"><div class="ttname"><a href="classvrv_1_1_staff.html">vrv::Staff</a></div><div class="ttdoc">This class represents a staff in a laid-out score (Doc). </div><div class="ttdef"><b>Definition:</b> staff.h:33</div></div>
-<div class="ttc" id="classvrv_1_1_file_input_stream_html"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html">vrv::FileInputStream</a></div><div class="ttdoc">This class is a base class for file input stream classes. </div><div class="ttdef"><b>Definition:</b> io.h:65</div></div>
+<div class="ttc" id="classvrv_1_1_file_input_stream_html"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html">vrv::FileInputStream</a></div><div class="ttdoc">This class is a base class for file input stream classes. </div><div class="ttdef"><b>Definition:</b> io.h:66</div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
 <div class="ttc" id="classvrv_1_1_slur_html"><div class="ttname"><a href="classvrv_1_1_slur.html">vrv::Slur</a></div><div class="ttdef"><b>Definition:</b> slur.h:20</div></div>
 <div class="ttc" id="classvrv_1_1_note_html"><div class="ttname"><a href="classvrv_1_1_note.html">vrv::Note</a></div><div class="ttdef"><b>Definition:</b> note.h:45</div></div>
 <div class="ttc" id="classvrv_1_1_music_xml_input_html"><div class="ttname"><a href="classvrv_1_1_music_xml_input.html">vrv::MusicXmlInput</a></div><div class="ttdef"><b>Definition:</b> iomusxml.h:78</div></div>
-<div class="ttc" id="classvrv_1_1_doc_html"><div class="ttname"><a href="classvrv_1_1_doc.html">vrv::Doc</a></div><div class="ttdoc">This class is a hold the data and corresponds to the model of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> doc.h:31</div></div>
+<div class="ttc" id="classvrv_1_1_doc_html"><div class="ttname"><a href="classvrv_1_1_doc.html">vrv::Doc</a></div><div class="ttdoc">This class is a hold the data and corresponds to the model of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> doc.h:32</div></div>
 <div class="ttc" id="classvrv_1_1_measure_html"><div class="ttname"><a href="classvrv_1_1_measure.html">vrv::Measure</a></div><div class="ttdoc">This class represents a measure in a page-based score (Doc). </div><div class="ttdef"><b>Definition:</b> measure.h:33</div></div>
 <div class="ttc" id="classvrv_1_1_layer_element_html"><div class="ttname"><a href="classvrv_1_1_layer_element.html">vrv::LayerElement</a></div><div class="ttdoc">This class is a base class for the Layer (<layer>) content. </div><div class="ttdef"><b>Definition:</b> layerelement.h:31</div></div>
 <div class="ttc" id="classvrv_1_1_tie_html"><div class="ttname"><a href="classvrv_1_1_tie.html">vrv::Tie</a></div><div class="ttdef"><b>Definition:</b> tie.h:20</div></div>
@@ -264,7 +264,7 @@ $(document).ready(function(){initNavTree('iomusxml_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>iomusxml.h</b></li>
-    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
+    <li class="footer">Generated on Tue Sep 6 2016 08:32:56 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

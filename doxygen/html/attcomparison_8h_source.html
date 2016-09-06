@@ -130,7 +130,7 @@ $(document).ready(function(){initNavTree('attcomparison_8h_source.html','');});
 <div class="line"><a name="l00028"></a><span class="lineno"><a class="line" href="classvrv_1_1_att_common_n_comparison.html">   28</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_att_common_n_comparison.html">AttCommonNComparison</a> : <span class="keyword">public</span> <a class="code" href="classvrv_1_1_att_comparison.html">AttComparison</a> {</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="classvrv_1_1_att_common_n_comparison.html">AttCommonNComparison</a>(ClassId AttClassId, <span class="keyword">const</span> <span class="keywordtype">int</span> n) : <a class="code" href="classvrv_1_1_att_comparison.html">AttComparison</a>(AttClassId) { m_n = n; };</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <a class="code" href="classvrv_1_1_att_common_n_comparison.html">AttCommonNComparison</a>(ClassId AttClassId, <span class="keyword">const</span> <span class="keywordtype">int</span> n) : <a class="code" href="classvrv_1_1_att_comparison.html">AttComparison</a>(AttClassId) { m_n = n; }</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">void</span> SetN(<span class="keywordtype">int</span> n) { m_n = n; }</div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;</div>
@@ -162,7 +162,7 @@ $(document).ready(function(){initNavTree('attcomparison_8h_source.html','');});
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            m_extremeDur = -VRV_UNSET;</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        <span class="keywordflow">else</span></div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            m_extremeDur = VRV_UNSET;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    };</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    }</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> operator()(<a class="code" href="classvrv_1_1_object.html">Object</a> *<span class="keywordtype">object</span>)</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    {</div>
@@ -194,7 +194,7 @@ $(document).ready(function(){initNavTree('attcomparison_8h_source.html','');});
 <div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="classvrv_1_1_att_measure_aligner_type.html">  100</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_att_measure_aligner_type.html">AttMeasureAlignerType</a> : <span class="keyword">public</span> <a class="code" href="classvrv_1_1_att_comparison.html">AttComparison</a> {</div>
 <div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
 <div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <a class="code" href="classvrv_1_1_att_measure_aligner_type.html">AttMeasureAlignerType</a>(<span class="keyword">const</span> AlignmentType type) : <a class="code" href="classvrv_1_1_att_comparison.html">AttComparison</a>(OBJECT) { m_type = type; };</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <a class="code" href="classvrv_1_1_att_measure_aligner_type.html">AttMeasureAlignerType</a>(<span class="keyword">const</span> AlignmentType type) : <a class="code" href="classvrv_1_1_att_comparison.html">AttComparison</a>(OBJECT) { m_type = type; }</div>
 <div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordtype">void</span> SetType(AlignmentType type) { m_type = type; }</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
@@ -216,7 +216,7 @@ $(document).ready(function(){initNavTree('attcomparison_8h_source.html','');});
 <div class="line"><a name="l00125"></a><span class="lineno"><a class="line" href="classvrv_1_1_att_note_onset_offset_comparison.html">  125</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_att_note_onset_offset_comparison.html">AttNoteOnsetOffsetComparison</a> : <span class="keyword">public</span> <a class="code" href="classvrv_1_1_att_comparison.html">AttComparison</a> {</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
 <div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <a class="code" href="classvrv_1_1_att_note_onset_offset_comparison.html">AttNoteOnsetOffsetComparison</a>(<span class="keyword">const</span> <span class="keywordtype">double</span> time) : <a class="code" href="classvrv_1_1_att_comparison.html">AttComparison</a>(NOTE) { m_time = time; };</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <a class="code" href="classvrv_1_1_att_note_onset_offset_comparison.html">AttNoteOnsetOffsetComparison</a>(<span class="keyword">const</span> <span class="keywordtype">double</span> time) : <a class="code" href="classvrv_1_1_att_comparison.html">AttComparison</a>(NOTE) { m_time = time; }</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordtype">void</span> SetTime(<span class="keywordtype">int</span> time) { m_time = time; }</div>
 <div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
@@ -239,11 +239,11 @@ $(document).ready(function(){initNavTree('attcomparison_8h_source.html','');});
 <div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classvrv_1_1_att_common_n_comparison_html"><div class="ttname"><a href="classvrv_1_1_att_common_n_comparison.html">vrv::AttCommonNComparison</a></div><div class="ttdoc">This class evaluates if the object is of a certain ClassId and has a   of value n. </div><div class="ttdef"><b>Definition:</b> attcomparison.h:28</div></div>
 <div class="ttc" id="classvrv_1_1_duration_interface_html"><div class="ttname"><a href="classvrv_1_1_duration_interface.html">vrv::DurationInterface</a></div><div class="ttdoc">This class is an interface for elements with duration, such as notes and rests. </div><div class="ttdef"><b>Definition:</b> durationinterface.h:27</div></div>
-<div class="ttc" id="classvrv_1_1_alignment_html"><div class="ttname"><a href="classvrv_1_1_alignment.html">vrv::Alignment</a></div><div class="ttdoc">This class stores an alignement position elements will point to. </div><div class="ttdef"><b>Definition:</b> aligner.h:286</div></div>
+<div class="ttc" id="classvrv_1_1_alignment_html"><div class="ttname"><a href="classvrv_1_1_alignment.html">vrv::Alignment</a></div><div class="ttdoc">This class stores an alignement position elements will point to. </div><div class="ttdef"><b>Definition:</b> aligner.h:293</div></div>
 <div class="ttc" id="classvrv_1_1_att_comparison_html"><div class="ttname"><a href="classvrv_1_1_att_comparison.html">vrv::AttComparison</a></div><div class="ttdef"><b>Definition:</b> att.h:206</div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
 <div class="ttc" id="classvrv_1_1_att_dur_extreme_html"><div class="ttname"><a href="classvrv_1_1_att_dur_extreme.html">vrv::AttDurExtreme</a></div><div class="ttdoc">This class evaluates if the object the extreme duration so far The object has to have a DurationInter...</div><div class="ttdef"><b>Definition:</b> attcomparison.h:58</div></div>
-<div class="ttc" id="classvrv_1_1_object_html"><div class="ttname"><a href="classvrv_1_1_object.html">vrv::Object</a></div><div class="ttdoc">This class represents a basic object. </div><div class="ttdef"><b>Definition:</b> object.h:144</div></div>
+<div class="ttc" id="classvrv_1_1_object_html"><div class="ttname"><a href="classvrv_1_1_object.html">vrv::Object</a></div><div class="ttdoc">This class represents a basic object. </div><div class="ttdef"><b>Definition:</b> object.h:146</div></div>
 <div class="ttc" id="classvrv_1_1_att_measure_aligner_type_html"><div class="ttname"><a href="classvrv_1_1_att_measure_aligner_type.html">vrv::AttMeasureAlignerType</a></div><div class="ttdoc">This class evaluates if the object is an Alignment of a certain type. </div><div class="ttdef"><b>Definition:</b> attcomparison.h:100</div></div>
 <div class="ttc" id="classvrv_1_1_note_html"><div class="ttname"><a href="classvrv_1_1_note.html">vrv::Note</a></div><div class="ttdef"><b>Definition:</b> note.h:45</div></div>
 <div class="ttc" id="classvrv_1_1_att_note_onset_offset_comparison_html"><div class="ttname"><a href="classvrv_1_1_att_note_onset_offset_comparison.html">vrv::AttNoteOnsetOffsetComparison</a></div><div class="ttdoc">This class evaluates if the object is of a certain ClassId and has a   of value n. </div><div class="ttdef"><b>Definition:</b> attcomparison.h:125</div></div>
@@ -253,7 +253,7 @@ $(document).ready(function(){initNavTree('attcomparison_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>attcomparison.h</b></li>
-    <li class="footer">Generated on Wed Jul 20 2016 07:50:04 by
+    <li class="footer">Generated on Tue Sep 6 2016 08:32:55 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>
