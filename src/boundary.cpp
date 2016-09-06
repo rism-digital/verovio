@@ -107,6 +107,8 @@ int BoundaryEnd::PrepareBoundaries(FunctorParams *functorParams)
 
 int BoundaryEnd::ResetDrawing(FunctorParams *functorParams)
 {
+    FloatingObject::ResetDrawing(functorParams);
+
     this->SetMeasure(NULL);
 
     return FUNCTOR_CONTINUE;

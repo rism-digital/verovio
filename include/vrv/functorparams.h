@@ -624,7 +624,7 @@ public:
     PrepareFloatingGrpsParams()
     {
         m_previousEnding = NULL;
-        m_drawingGrpId = 1;
+        m_drawingGrpId = DRAWING_GRP_OTHER;
     }
     Ending *m_previousEnding;
     int m_drawingGrpId;

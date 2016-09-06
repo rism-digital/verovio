@@ -44,6 +44,10 @@ public:
      */
     virtual void AddChild(Object *object);
 
+    //----------//
+    // Functors //
+    //----------//
+
 private:
     //
 public:

@@ -299,13 +299,20 @@ enum EditorialLevel {
 enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAUTIONARY_SCOREDEF };
 
 //----------------------------------------------------------------------------
+// Drawing groups (reserved values)
+//----------------------------------------------------------------------------
+
+/**
+ * We need fix values for types that are all groupes together
+ */
+
+enum { DRAWING_GRP_NONE = 0, DRAWING_GRP_VERSE, DRAWING_GRP_HARM, DRAWING_GRP_OTHER };
+
+//----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
 
 #define OCTAVE_OFFSET 4
-
-#define ON 1
-#define OFF 0
 
 // The next four macros were tuned using the Leipzig font.
 
