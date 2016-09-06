@@ -15,7 +15,7 @@
 
 #include "editorial.h"
 #include "scoredef.h"
-#include "systemelement.h"
+#include "section.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -43,8 +43,8 @@ void Score::AddChild(Object *child)
     if (child->Is() == SCOREDEF) {
         assert(dynamic_cast<ScoreDef *>(child));
     }
-    else if (child->IsSystemElement()) {
-        assert(dynamic_cast<SystemElement *>(child));
+    else if (child->Is() == SECTION) {
+        assert(dynamic_cast<Section *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

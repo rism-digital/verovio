@@ -24,11 +24,11 @@
 #include "metersig.h"
 #include "multirest.h"
 #include "note.h"
-#include "page.h"
 #include "rest.h"
+#include "score.h"
 #include "scoredef.h"
+#include "section.h"
 #include "staff.h"
-#include "system.h"
 #include "tuplet.h"
 #include "vrv.h"
 
@@ -137,7 +137,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     while (!infile.eof()) {
         infile.getline(data_line, 10000);
         if (infile.eof()) {
-            LogDebug("Truncated file or ending tag missing");
+            // LogDebug("Truncated file or ending tag missing");
             // exit(1);
         }
         getAtRecordKeyValue(data_key, data_value, data_line);
@@ -370,8 +370,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     }
 
     m_doc->SetType(Raw);
-    Page *page = new Page();
-    System *system = new System();
+    Score *score = m_doc->CreateScoreBuffer();
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
 
     int measure_count = 1;
 
@@ -403,10 +405,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
                 delete obj.meter;
                 obj.meter = NULL;
             }
-            system->AddChild(scoreDef);
+            section->AddChild(scoreDef);
         }
 
-        system->AddChild(m_measure);
+        section->AddChild(m_measure);
 
         convertMeasure(&obj);
         measure_count++;
@@ -437,8 +439,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     staffGrp->AddChild(staffDef);
     m_doc->m_scoreDef.AddChild(staffGrp);
 
-    page->AddChild(system);
-    m_doc->AddChild(page);
+    m_doc->ConvertToPageBasedDoc();
 }
 
 //////////////////////////////

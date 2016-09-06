@@ -482,6 +482,12 @@ bool MeiOutput::WriteObjectEnd(Object *object)
         assert(interface);
         if (interface->IsBoundary()) return true;
     }
+    else if (m_scoreBasedMEI && (object->Is() == SYSTEM)) {
+        return true;
+    }
+    else if (m_scoreBasedMEI && (object->Is() == PAGE)) {
+        return true;
+    }
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
 
@@ -3252,6 +3258,9 @@ bool MeiInput::ReadScoreBasedMei(pugi::xml_node element, Score *parent)
             // content
             else if (elementName == "section") {
                 success = ReadMeiSection(parent, current);
+            }
+            else {
+                LogWarning("Element <%s> within <score> is not supported and will be ignored ", elementName.c_str());
             }
         }
     }
