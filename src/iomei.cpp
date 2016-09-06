@@ -478,6 +478,13 @@ bool MeiOutput::WriteObjectEnd(Object *object)
         assert(interface);
         if (interface->IsBoundary()) return true;
     }
+    else if (m_scoreBasedMEI && (object->Is() == SYSTEM)) {
+        return true;
+    }
+    else if (m_scoreBasedMEI && (object->Is() == PAGE)) {
+        //int x = 0;
+        return true;
+    }
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
 
