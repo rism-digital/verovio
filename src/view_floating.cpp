@@ -407,34 +407,11 @@ void View::DrawOctave(
         return;
     }
 
-    /* We actually do not need the layer for now
-
-    Layer *layer1 = NULL;
-    Layer *layer2 = NULL;
-
-    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
-    if (start->Is() == TIMESTAMP_ATTR)
-        layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    else {
-        layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
-        // if attached to and id and not a beginning of a system, then adjust it
-        if (spanningType != SPANNING_END)
-            x1 -= m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2;
+    /********** adjust the end position ***********/
+    
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        if (octave->HasEndid()) x2 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
     }
-
-    // idem
-    if (end->Is() == TIMESTAMP_ATTR)
-        layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    else {
-        layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
-        // if attached to and id and not a end of a system, then adjust it
-        if (spanningType != SPANNING_START)
-            x2 += m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2;
-    }
-
-    assert(layer1 && layer2);
-
-    */
 
     /************** draw it **************/
 
