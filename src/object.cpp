@@ -1217,7 +1217,7 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
 
     if (!current->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
-        // assert(!VERSION_DEV); // quite drastic but this should never happen. If nothing has to be drawn
+        assert(false); // quite drastic but this should never happen. If nothing has to be drawn
         LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
         // then the BB should be set to empty with  Object::SetEmptyBB()
         return FUNCTOR_CONTINUE;
