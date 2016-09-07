@@ -408,9 +408,10 @@ void View::DrawOctave(
     }
 
     /********** adjust the end position ***********/
-    
+
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
-        if (octave->HasEndid()) x2 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
+        if (octave->HasEndid())
+            x2 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
     }
 
     /************** draw it **************/
@@ -442,6 +443,7 @@ void View::DrawOctave(
     int w, h;
     std::wstring str;
     str.push_back(code);
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
     dc->GetSmuflTextExtent(str, &w, &h);
     int yCode = (disPlace == PLACE_above) ? y1 - h : y1;
@@ -452,14 +454,14 @@ void View::DrawOctave(
     // adjust is to avoid the figure to touch the line
     x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
-    dc->SetPen(m_currentColour, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID,
-        m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+    dc->SetPen(m_currentColour, lineWidth, AxSOLID, h / 3);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
     // draw the ending vertical line if not the end of the system
     if (spanningType != SPANNING_START)
-        dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+        dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
+            ToDeviceContextY(y2 + lineWidth / 2));
 
     dc->ResetPen();
     dc->ResetBrush();
