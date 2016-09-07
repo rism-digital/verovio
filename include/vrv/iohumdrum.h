@@ -38,12 +38,12 @@ class Measure;
 class ScoreDef;
 class Note;
 class Hairpin;
-class Page;
 class Rest;
+class Score;
+class Section;
 class Staff;
 class StaffDef;
 class StaffGrp;
-class System;
 class Tie;
 
 //----------------------------------------------------------------------------
@@ -295,6 +295,12 @@ private:
 
     // m_doc is inherited root document object.
 
+	// m_score stores the music
+	Score* m_score;
+
+	// m_sections stores segments of the music
+	vector<Section*> m_sections;
+
     //////////////////////////////
     //
     // State variables for doing the conversion without having to pass
@@ -303,9 +309,6 @@ private:
 
     vrv::StaffGrp *m_staffgroup; // information about parts
     vector<vrv::StaffDef *> m_staffdef; // information about a staff
-
-    vrv::Page *m_page; // current page, or NULL
-    vrv::System *m_system; // current system, or NULL
     vector<vrv::Measure *> m_measures;
     vrv::Measure *m_measure; // current measure, or NULL
     vrv::Staff *m_staff; // current staff, or NULL

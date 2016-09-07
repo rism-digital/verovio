@@ -191,18 +191,18 @@ public:
     /**
      * Method for registering an MEI att classes in the interface.
      */
-    void RegisterInterfaceAttClass(AttClassId attClassId) { m_interfaceAttClasses.push_back(attClassId); };
+    void RegisterInterfaceAttClass(AttClassId attClassId) { m_interfaceAttClasses.push_back(attClassId); }
 
     /**
      * Method for obtaining a pointer to the attribute class vector of the interface
      */
-    std::vector<AttClassId> *GetAttClasses() { return &m_interfaceAttClasses; };
+    std::vector<AttClassId> *GetAttClasses() { return &m_interfaceAttClasses; }
 
     /**
      * Virtual method returning the InterfaceId of the interface.
      * Needs to be overridden in child classes.
      */
-    virtual InterfaceId IsInterface() { return INTERFACE; };
+    virtual InterfaceId IsInterface() { return INTERFACE; }
 
 private:
     /**
@@ -218,11 +218,11 @@ private:
 class AttComparison {
 
 public:
-    AttComparison(ClassId classId) { m_classId = classId; };
+    AttComparison(ClassId classId) { m_classId = classId; }
 
     virtual bool operator()(Object *object);
 
-    ClassId GetType() { return m_classId; };
+    ClassId GetType() { return m_classId; }
 
     bool MatchesType(Object *object);
 

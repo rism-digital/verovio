@@ -23,12 +23,12 @@
 #include "measure.h"
 #include "mrest.h"
 #include "note.h"
-#include "page.h"
 #include "rest.h"
+#include "score.h"
+#include "section.h"
 #include "slur.h"
 #include "staff.h"
 #include "syl.h"
-#include "system.h"
 #include "text.h"
 #include "tie.h"
 #include "tuplet.h"
@@ -152,24 +152,24 @@ std::string MusicXmlInput::GetContentOfChild(pugi::xml_node node, std::string ch
     return "";
 }
 
-void MusicXmlInput::AddMeasure(System *system, Measure *measure, int i)
+void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
 {
-    assert(system);
+    assert(section);
     assert(i >= 0);
 
     // we just need to add a measure
-    if (i == system->GetChildCount()) {
-        system->AddMeasure(measure);
+    if (i == section->GetChildCount()) {
+        section->AddChild(measure);
     }
     // otherwise copy the content to the corresponding existing measure
-    else if (system->GetChildCount() > i) {
-        Measure *existingMeasure = dynamic_cast<Measure *>(system->GetChild(i));
+    else if (section->GetChildCount() > i) {
+        Measure *existingMeasure = dynamic_cast<Measure *>(section->GetChild(i));
         assert(existingMeasure);
         Object *current;
         for (current = measure->GetFirst(); current; current = measure->GetNext()) {
             Staff *staff = dynamic_cast<Staff *>(measure->Relinquish(current->GetIdx()));
             assert(staff);
-            existingMeasure->AddStaff(staff);
+            existingMeasure->AddChild(staff);
         }
     }
     // there is a gap, this should not happen
@@ -184,23 +184,10 @@ void MusicXmlInput::AddLayerElement(Layer *layer, LayerElement *element)
     assert(element);
 
     if (m_elementStack.empty()) {
-        layer->AddLayerElement(element);
+        layer->AddChild(element);
     }
-    else if (m_elementStack.back()->Is() == BEAM) {
-        Beam *beam = dynamic_cast<Beam *>(m_elementStack.back());
-        assert(beam);
-        beam->AddLayerElement(element);
-    }
-    else if (m_elementStack.back()->Is() == CHORD) {
-        Chord *chord = dynamic_cast<Chord *>(m_elementStack.back());
-        assert(chord);
-        chord->AddLayerElement(element);
-    }
-    else if (m_elementStack.back()->Is() == TUPLET) {
-        Tuplet *tuplet = dynamic_cast<Tuplet *>(m_elementStack.back());
-        assert(tuplet);
-        tuplet->AddLayerElement(element);
-    }
+    else
+        (m_elementStack.back()->AddChild(element));
 }
 
 Layer *MusicXmlInput::SelectLayer(pugi::xml_node node, vrv::Measure *measure)
@@ -259,7 +246,7 @@ Layer *MusicXmlInput::SelectLayer(int layerNb, Staff *staff)
     // add at least one layer
     layer = new Layer();
     layer->SetN(layerNb);
-    staff->AddLayer(layer);
+    staff->AddChild(layer);
     return layer;
 }
 
@@ -329,14 +316,17 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 {
     assert(root);
 
+    Score *score = m_doc->CreateScoreBuffer();
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
+
     std::vector<StaffGrp *> m_staffGrpStack;
     StaffGrp *staffGrp = new StaffGrp();
-    m_doc->m_scoreDef.AddStaffGrp(staffGrp);
+    m_doc->m_scoreDef.AddChild(staffGrp);
     m_staffGrpStack.push_back(staffGrp);
 
     int staffOffset = 0;
-    Page *page = new Page();
-    System *system = new System();
 
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
@@ -356,7 +346,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                     staffGrp->SetSymbol(staffgroupingsym_SYMBOL_line);
                 }
                 // now stack it
-                m_staffGrpStack.back()->AddStaffGrp(staffGrp);
+                m_staffGrpStack.back()->AddChild(staffGrp);
                 m_staffGrpStack.push_back(staffGrp);
             }
             // this is the end of a part-group - we assume each opened part-group to be closed
@@ -383,14 +373,14 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 partStaffGrp->SetLabel(partName);
                 partStaffGrp->SetSymbol(staffgroupingsym_SYMBOL_brace);
                 partStaffGrp->SetBarthru(BOOLEAN_true);
-                m_staffGrpStack.back()->AddStaffGrp(partStaffGrp);
+                m_staffGrpStack.back()->AddChild(partStaffGrp);
             }
             else {
                 StaffDef *staffDef = dynamic_cast<StaffDef *>(partStaffGrp->FindChildByType(STAFFDEF));
                 if (staffDef) {
                     staffDef->SetLabel(partName);
                 }
-                m_staffGrpStack.back()->MoveChildren(partStaffGrp);
+                m_staffGrpStack.back()->MoveChildrenFrom(partStaffGrp);
                 delete partStaffGrp;
             }
 
@@ -401,7 +391,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 LogWarning("Could not find the part '%s'", partId.c_str());
                 continue;
             }
-            ReadMusicXmlPart(part.node(), system, nbStaves, staffOffset);
+            ReadMusicXmlPart(part.node(), section, nbStaves, staffOffset);
             // increment the staffOffset for reading the next part
             staffOffset += nbStaves;
         }
@@ -409,24 +399,22 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     // here we could check that we have that there is only one staffGrp left in m_staffGrpStack
 
     Measure *measure = NULL;
-    std::vector<std::pair<int, FloatingElement *> >::iterator iter;
-    for (iter = m_floatingElements.begin(); iter != m_floatingElements.end(); iter++) {
+    std::vector<std::pair<int, ControlElement *> >::iterator iter;
+    for (iter = m_controlElements.begin(); iter != m_controlElements.end(); iter++) {
         if (!measure || (measure->GetN() != iter->first)) {
             AttCommonNComparison comparisonMeasure(MEASURE, iter->first);
-            measure = dynamic_cast<Measure *>(system->FindChildByAttComparison(&comparisonMeasure, 1));
+            measure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
             LogWarning(
                 "Element '%s' could not be added to measure '%d'", iter->second->GetClassName().c_str(), iter->first);
             continue;
         }
-        measure->AddFloatingElement(iter->second);
+        measure->AddChild(iter->second);
     }
 
     // assert(m_tieStack.empty());
-
-    page->AddSystem(system);
-    m_doc->AddPage(page);
+    m_doc->ConvertToPageBasedDoc();
 
     return true;
 }
@@ -469,7 +457,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 staffDef->SetN(i + 1 + staffOffset);
                 // by default five line staves
                 staffDef->SetLines(5);
-                staffGrp->AddStaffDef(staffDef);
+                staffGrp->AddChild(staffDef);
             }
 
             // clef sign - first look if we have a clef-sign with the corresponding staff @number
@@ -538,10 +526,10 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     return nbStaves;
 }
 
-bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, System *system, int nbStaves, int staffOffset)
+bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset)
 {
     assert(node);
-    assert(system);
+    assert(section);
 
     pugi::xpath_node_set measures = node.select_nodes("measure");
     if (measures.size() == 0) {
@@ -555,7 +543,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, System *system, int nb
         Measure *measure = new Measure();
         ReadMusicXmlMeasure(xmlMeasure.node(), measure, nbStaves, staffOffset);
         // Add the measure to the system - if already there from a previous part we'll just merge the content
-        AddMeasure(system, measure, i);
+        AddMeasure(section, measure, i);
         i++;
     }
     return false;
@@ -574,7 +562,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
         // the staff @n must take into account the staffOffset
         Staff *staff = new Staff();
         staff->SetN(i + 1 + staffOffset);
-        measure->AddStaff(staff);
+        measure->AddChild(staff);
         // layers will be added in SelectLayer
     }
 
@@ -701,7 +689,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         // we assume /note without /type to be mRest
         if (typeStr.empty()) {
             MRest *mRest = new MRest();
-            layer->AddLayerElement(mRest);
+            layer->AddChild(mRest);
         }
         else {
             Rest *rest = new Rest();
@@ -720,7 +708,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         if (!accidentalStr.empty()) {
             Accid *accid = new Accid();
             accid->SetAccid(ConvertAccidentalToAccid(accidentalStr));
-            note->AddLayerElement(accid);
+            note->AddChild(accid);
         }
 
         // Stem direction - taken into account below for the chord or the note
@@ -809,9 +797,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 
             Text *text = new Text();
             text->SetText(UTF8to16(textStr));
-            syl->AddTextElement(text);
-            verse->AddLayerElement(syl);
-            note->AddLayerElement(verse);
+            syl->AddChild(text);
+            verse->AddChild(syl);
+            note->AddChild(verse);
         }
 
         // Ties
@@ -826,7 +814,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         // Then open a new tie
         if ((tieStr1 == "start") || (tieStr2 == "start")) {
             Tie *tie = new Tie();
-            m_floatingElements.push_back(std::make_pair(measureNb, tie));
+            m_controlElements.push_back(std::make_pair(measureNb, tie));
             OpenTie(staff, layer, note, tie);
         }
 
@@ -860,7 +848,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 meiSlur->SetCurvedir(curvature_CURVEDIR_below);
             }
             // add it to the stack
-            m_floatingElements.push_back(std::make_pair(measureNb, meiSlur));
+            m_controlElements.push_back(std::make_pair(measureNb, meiSlur));
             OpenSlur(staff, layer, slurNumber, element, meiSlur);
         }
         else if (HasAttributeWithValue(slur, "type", "stop")) {

@@ -74,7 +74,6 @@ void StaffDefDrawingInterface::Reset()
 
     m_drawClef = false;
     m_drawKeySig = false;
-    m_drawKeySigCancellation = false;
     m_drawMensur = false;
     m_drawMeterSig = false;
 }
@@ -83,7 +82,6 @@ void StaffDefDrawingInterface::SetCurrentClef(Clef *clef)
 {
     if (clef) {
         m_currentClef = *clef;
-        m_currentClef.SetScoreOrStaffDefAttr(true);
     }
 }
 
@@ -95,7 +93,6 @@ void StaffDefDrawingInterface::SetCurrentKeySig(KeySig *keySig)
         m_currentKeySig = *keySig;
         m_currentKeySig.m_drawingCancelAccidCount = drawingCancelAccidCount;
         m_currentKeySig.m_drawingCancelAccidType = drawingCancelAccidType;
-        m_currentKeySig.SetScoreOrStaffDefAttr(true);
     }
 }
 
@@ -103,7 +100,6 @@ void StaffDefDrawingInterface::SetCurrentMensur(Mensur *mensur)
 {
     if (mensur) {
         m_currentMensur = *mensur;
-        m_currentMensur.SetScoreOrStaffDefAttr(true);
     }
 }
 
@@ -111,7 +107,6 @@ void StaffDefDrawingInterface::SetCurrentMeterSig(MeterSig *meterSig)
 {
     if (meterSig) {
         m_currentMeterSig = *meterSig;
-        m_currentMeterSig.SetScoreOrStaffDefAttr(true);
     }
 }
 

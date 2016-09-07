@@ -16,11 +16,11 @@
 #include "attcomparison.h"
 #include "beam.h"
 #include "clef.h"
+#include "controlelement.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "editorial.h"
 #include "ending.h"
-#include "floatingelement.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "layer.h"
@@ -739,9 +739,9 @@ int View::CalculatePitchPosY(Staff *staff, data_PITCHNAME pname, int dec_clef, i
     // Old Wolfgang code with octave stored in an unsigned char - this could be refactored
     oct -= OCTAVE_OFFSET;
     y_int = ((dec_clef + oct * 7) - 9) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (staff->m_drawingLines > 5) {
-        y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
+    // if (staff->m_drawingLines > 5) {
+    y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    //}
 
     /* exprime distance separant m_drawingY de
     position 1e Si, corrigee par dec_clef et oct. Elle est additionnee
@@ -927,6 +927,20 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
 
+    // draw the scoreDef if required
+    if (layer->GetCautionStaffDefClef()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefClef(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefKeySig()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefKeySig(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefMensur()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefMensur(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefMeterSig()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefMeterSig(), layer, staff, measure);
+    }
+
     // first draw the postponed tuplets
     DrawLayerList(dc, layer, staff, measure, TUPLET);
 
@@ -970,23 +984,9 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
 
     Object *current;
     for (current = parent->GetFirst(); current; current = parent->GetNext()) {
-        // Boundary ends are not drawn directly (for now) - maybe we want to draw an empty SVG element?
-        if (current->Is() == BOUNDARY_END) {
-            // nothing to do, then
-        }
-        else if (current->Is() == ENDING) {
-            // Create placeholder - A graphic for the end boundary will be created
-            // but only if it is on a different system - See View::DrawEnding
-            dc->StartGraphic(current, "", current->GetUuid());
-            dc->EndGraphic(current, this);
-        }
-        else if (current->Is() == MEASURE) {
+        if (current->Is() == MEASURE) {
             // cast to Measure check in DrawMeasure
             DrawMeasure(dc, dynamic_cast<Measure *>(current), system);
-        }
-        else if (current->IsEditorialElement()) {
-            // cast to EditorialElement check in DrawSystemEditorial element
-            DrawSystemEditorialElement(dc, dynamic_cast<EditorialElement *>(current), system);
         }
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (current->Is() == SCOREDEF) {
@@ -994,6 +994,14 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(current);
             assert(scoreDef);
             SetScoreDefDrawingWidth(dc, scoreDef);
+        }
+        else if (current->IsSystemElement()) {
+            // cast to EditorialElement check in DrawSystemEditorial element
+            DrawSystemElement(dc, dynamic_cast<SystemElement *>(current), system);
+        }
+        else if (current->IsEditorialElement()) {
+            // cast to EditorialElement check in DrawSystemEditorial element
+            DrawSystemEditorialElement(dc, dynamic_cast<EditorialElement *>(current), system);
         }
         else {
             assert(false);
@@ -1014,9 +1022,9 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
             // cast to Staff check in DrawStaff
             DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
         }
-        else if (current->IsFloatingElement()) {
-            // cast to FloatingElement check in DrawFloatingElement
-            DrawFloatingElement(dc, dynamic_cast<FloatingElement *>(current), measure, system);
+        else if (current->IsControlElement()) {
+            // cast to ControlElement check in DrawControlElement
+            DrawControlElement(dc, dynamic_cast<ControlElement *>(current), measure, system);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawMeasureEditorialElement
@@ -1102,23 +1110,29 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, boo
 void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *element, System *system)
 {
     assert(element);
-    if (element->Is() == APP) {
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_SYSTEM);
-    }
+    if (element->Is() == APP)
+        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
+    else if (element->Is() == CHOICE)
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
 
-    dc->StartGraphic(element, "", element->GetUuid());
-    if (element->m_visibility == Visible) {
-        DrawSystemChildren(dc, element, system);
-    }
+    std::string boundaryStart;
+    if (element->IsBoundaryElement()) boundaryStart = "boundaryStart";
+
+    dc->StartGraphic(element, boundaryStart, element->GetUuid());
+    // EditorialElements at the system level that are visible have no children
+    // if (element->m_visibility == Visible) {
+    //    DrawSystemChildren(dc, element, system);
+    //}
     dc->EndGraphic(element, this);
 }
 
 void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *element, Measure *measure, System *system)
 {
     assert(element);
-    if (element->Is() == APP) {
+    if (element->Is() == APP)
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_MEASURE);
-    }
+    else if (element->Is() == CHOICE)
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_MEASURE);
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1130,9 +1144,10 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
 void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *element, Staff *staff, Measure *measure)
 {
     assert(element);
-    if (element->Is() == APP) {
+    if (element->Is() == APP)
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_STAFF);
-    }
+    else if (element->Is() == CHOICE)
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_STAFF);
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1145,9 +1160,10 @@ void View::DrawLayerEditorialElement(
     DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(element);
-    if (element->Is() == APP) {
+    if (element->Is() == APP)
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_LAYER);
-    }
+    else if (element->Is() == CHOICE)
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_LAYER);
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1159,9 +1175,10 @@ void View::DrawLayerEditorialElement(
 void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY)
 {
     assert(element);
-    if (element->Is() == APP) {
+    if (element->Is() == APP)
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TEXT);
-    }
+    else if (element->Is() == CHOICE)
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_TEXT);
 
     dc->StartTextGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {

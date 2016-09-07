@@ -41,7 +41,7 @@ public:
     DurationInterface();
     virtual ~DurationInterface();
     virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_DURATION; };
+    virtual InterfaceId IsInterface() { return INTERFACE_DURATION; }
     ///@}SetDurationGes
 
     /**

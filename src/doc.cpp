@@ -28,6 +28,7 @@
 #include "note.h"
 #include "page.h"
 #include "rpt.h"
+#include "score.h"
 #include "slur.h"
 #include "smufl.h"
 #include "staff.h"
@@ -49,12 +50,18 @@ namespace vrv {
 Doc::Doc() : Object("doc-")
 {
     m_style = new Style();
+
+    // owned pointers need to be set to NULL;
+    m_scoreBuffer = NULL;
     Reset();
 }
 
 Doc::~Doc()
 {
     delete m_style;
+    if (m_scoreBuffer) {
+        delete m_scoreBuffer;
+    }
 }
 
 void Doc::Reset()
@@ -82,6 +89,10 @@ void Doc::Reset()
     m_midiExportDone = false;
 
     m_scoreDef.Reset();
+    if (m_scoreBuffer) {
+        delete m_scoreBuffer;
+        m_scoreBuffer = NULL;
+    }
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
@@ -94,11 +105,32 @@ void Doc::SetType(DocType type)
     m_type = type;
 }
 
-void Doc::AddPage(Page *page)
+void Doc::AddChild(Object *child)
 {
-    page->SetParent(this);
-    m_children.push_back(page);
+    assert(!m_scoreBuffer); // Children cannot be added if a score buffer was created;
+
+    if (child->Is() == PAGE) {
+        assert(dynamic_cast<Page *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
+}
+
+Score *Doc::CreateScoreBuffer()
+{
+    assert(!m_scoreBuffer); // Should not be called twice - Call Doc::Reset() to Reset it if necessary
+
+    ClearChildren();
+    m_scoreDef.Reset();
+
+    m_scoreBuffer = new Score();
+    return m_scoreBuffer;
 }
 
 void Doc::Refresh()
@@ -413,7 +445,7 @@ void Doc::CastOffDoc()
     assert(contentSystem);
 
     System *currentSystem = new System();
-    contentPage->AddSystem(currentSystem);
+    contentPage->AddChild(currentSystem);
     CastOffSystemsParams castOffSystemsParams(contentSystem, contentPage, currentSystem);
     castOffSystemsParams.m_systemWidth = this->m_drawingPageWidth - this->m_drawingPageLeftMar
         - this->m_drawingPageRightMar - currentSystem->m_systemLeftMar - currentSystem->m_systemRightMar;
@@ -435,7 +467,7 @@ void Doc::CastOffDoc()
     assert(contentPage && !contentPage->m_parent);
 
     Page *currentPage = new Page();
-    this->AddPage(currentPage);
+    this->AddChild(currentPage);
     CastOffPagesParams castOffPagesParams(contentPage, this, currentPage);
     castOffPagesParams.m_pageHeight
         = this->m_drawingPageHeight - this->m_drawingPageTopMar; // obviously we need a bottom margin
@@ -455,7 +487,7 @@ void Doc::UnCastOffDoc()
 {
     Page *contentPage = new Page();
     System *contentSystem = new System();
-    contentPage->AddSystem(contentSystem);
+    contentPage->AddChild(contentSystem);
 
     UnCastOffParams unCastOffParams(contentSystem);
 
@@ -464,7 +496,7 @@ void Doc::UnCastOffDoc()
 
     this->ClearChildren();
 
-    this->AddPage(contentPage);
+    this->AddChild(contentPage);
 
     // LogDebug("ContinousLayout: %d pages", this->GetChildCount());
 
@@ -472,6 +504,61 @@ void Doc::UnCastOffDoc()
     // because idx will still be 0 but contentPage is dead!
     this->ResetDrawingPage();
     this->CollectScoreDefs(true);
+}
+
+void Doc::CastOffEncodingDoc()
+{
+    this->CollectScoreDefs();
+
+    Page *contentPage = this->SetDrawingPage(0);
+    assert(contentPage);
+
+    System *contentSystem = dynamic_cast<System *>(contentPage->FindChildByType(SYSTEM));
+    assert(contentSystem);
+
+    // Detach the contentPage
+    this->DetachChild(0);
+    assert(contentPage && !contentPage->m_parent);
+
+    Page *page = new Page();
+    this->AddChild(page);
+    System *system = new System();
+    page->AddChild(system);
+
+    CastOffEncodingParams castOffEncodingParams(this, page, system, contentSystem);
+
+    Functor castOffEncoding(&Object::CastOffEncoding);
+    contentSystem->Process(&castOffEncoding, &castOffEncodingParams);
+    delete contentPage;
+
+    // We need to reset the drawing page to NULL
+    // because idx will still be 0 but contentPage is dead!
+    this->ResetDrawingPage();
+    this->CollectScoreDefs(true);
+}
+
+void Doc::ConvertToPageBasedDoc()
+{
+    assert(m_scoreBuffer); // Doc::CreateScoreBuffer needs to be called first;
+
+    Page *page = new Page();
+    System *system = new System();
+    page->AddChild(system);
+
+    ConvertToPageBasedParams convertToPageBasedParams(system);
+    Functor convertToPageBased(&Object::ConvertToPageBased);
+    Functor convertToPageBasedEnd(&Object::ConvertToPageBasedEnd);
+    m_scoreBuffer->Process(&convertToPageBased, &convertToPageBasedParams, &convertToPageBasedEnd);
+
+    m_scoreBuffer->ClearRelinquishedChildren();
+    assert(m_scoreBuffer->GetChildCount() == 0);
+
+    delete m_scoreBuffer;
+    m_scoreBuffer = NULL;
+
+    this->AddChild(page);
+
+    this->ResetDrawingPage();
 }
 
 bool Doc::HasPage(int pageIdx) const

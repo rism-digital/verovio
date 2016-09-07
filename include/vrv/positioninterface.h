@@ -31,7 +31,7 @@ public:
     PositionInterface();
     virtual ~PositionInterface();
     virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_POSITION; };
+    virtual InterfaceId IsInterface() { return INTERFACE_POSITION; }
     ///@}
 
     /**

@@ -35,6 +35,7 @@ my $VEROVIO_ROOT  = "..";
 # Empirically, the memory amount required is roughly 5 times the file size.
 # This can be disabled in the light version, which uses the default memory settings.
 my $ASM = "-O3";
+$ASM .= " -DNDEBUG";
 $ASM .= " --memory-init-file 0";
 $ASM .= " -std=c++11";
 $ASM .= " -s ASM_JS=1";
@@ -87,7 +88,7 @@ GetOptions (
 
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
-	$ASM = "-O3 --memory-init-file 0 -std=c++11 -s ASM_JS=1";
+	$ASM = "-O3 -DNDEBUG --memory-init-file 0 -std=c++11 -s ASM_JS=1";
 	$ASM_NAME = "-light";
 }
 
@@ -128,10 +129,10 @@ my $VEROVIO_INCLUDE = "$VEROVIO_ROOT/include";
 my $VEROVIO_LIBMEI  = "$VEROVIO_ROOT/libmei";
 
 my $includes = "";
-$includes .= " -I./lib/jsonxx";
 $includes .= " -I$VEROVIO_INCLUDE";
 $includes .= " -I$VEROVIO_INCLUDE/vrv";
 $includes .= " -I$VEROVIO_INCLUDE/hum";
+$includes .= " -I$VEROVIO_INCLUDE/json";
 $includes .= " -I$VEROVIO_INCLUDE/midi";
 $includes .= " -I$VEROVIO_INCLUDE/pugi";
 $includes .= " -I$VEROVIO_INCLUDE/utf8";
@@ -215,6 +216,7 @@ sub getSources {
 	push @sources, "./emscripten_main.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*/*.cpp";
+	push @sources, glob "$VEROVIO_ROOT/src/*/*.cc";
 
 	# libmei: only a subset is included:
 	push @sources, "$VEROVIO_ROOT/libmei/attconverter.cpp";
@@ -225,9 +227,6 @@ sub getSources {
 	push @sources, "$VEROVIO_ROOT/libmei/atts_pagebased.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_shared.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_midi.cpp";
-
-	# jsonxx:
-	push @sources, "./lib/jsonxx/jsonxx.cc";
 
 	return join " ", @sources
 }

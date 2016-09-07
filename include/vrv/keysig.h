@@ -14,6 +14,7 @@
 
 namespace vrv {
 
+class Clef;
 class ScoreDefInterface;
 
 //----------------------------------------------------------------------------
@@ -44,20 +45,20 @@ public:
     void Init();
     virtual ~KeySig();
     virtual void Reset();
-    virtual Object *Clone() const { return new KeySig(*this); };
-    virtual std::string GetClassName() const { return "KeySig"; };
-    virtual ClassId Is() const { return KEYSIG; };
+    virtual Object *Clone() const { return new KeySig(*this); }
+    virtual std::string GetClassName() const { return "KeySig"; }
+    virtual ClassId Is() const { return KEYSIG; }
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     /* Alteration number getter/setter */
-    int GetAlterationNumber() const { return m_alterationNumber; };
-    void SetAlterationNumber(int alterationNumber) { m_alterationNumber = alterationNumber; };
+    int GetAlterationNumber() const { return m_alterationNumber; }
+    void SetAlterationNumber(int alterationNumber) { m_alterationNumber = alterationNumber; }
 
     /* Alteration number getter/setter */
-    data_ACCIDENTAL_EXPLICIT GetAlterationType() const { return m_alterationType; };
-    void SetAlterationType(data_ACCIDENTAL_EXPLICIT alterationType) { m_alterationType = alterationType; };
+    data_ACCIDENTAL_EXPLICIT GetAlterationType() const { return m_alterationType; }
+    void SetAlterationType(data_ACCIDENTAL_EXPLICIT alterationType) { m_alterationType = alterationType; }
 
     /* Temporary methods for turning @accid and @pitch into num_alter and alter */
     void ConvertToMei();
@@ -70,7 +71,7 @@ public:
      * Static methods for calculating position;
      */
     static data_PITCHNAME GetAlterationAt(data_ACCIDENTAL_EXPLICIT alterationType, int pos);
-    static int GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, int clefId);
+    static int GetOctave(data_ACCIDENTAL_EXPLICIT alterationType, data_PITCHNAME pitch, Clef *clef);
 
 private:
     //

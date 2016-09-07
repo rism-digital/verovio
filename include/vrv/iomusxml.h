@@ -23,13 +23,13 @@
 
 namespace vrv {
 
-class FloatingElement;
+class ControlElement;
 class Layer;
 class LayerElement;
 class Measure;
+class Section;
 class Slur;
 class StaffGrp;
-class System;
 class Tie;
 /// class Tuplet;
 
@@ -94,7 +94,7 @@ private:
      * @name Top level methods for reading MusicXml part and measure elements.
      */
     ///@{
-    bool ReadMusicXmlPart(pugi::xml_node node, System *system, int nbStaves, int staffOffset);
+    bool ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset);
     bool ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, int nbStaves, int staffOffset);
     ///@}
 
@@ -116,11 +116,11 @@ private:
     ///@}
 
     /**
-     * Add a Measure to the system.
+     * Add a Measure to the section.
      * If the measure already exists it will move all its content.
      * The measure can contain only staves. Other elements must be stacked on m_floatingElements.
      */
-    void AddMeasure(System *system, Measure *measure, int i);
+    void AddMeasure(Section *section, Measure *measure, int i);
 
     /**
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
@@ -206,7 +206,7 @@ private:
      * The stack of floating elements (tie, slur, etc.) to be added at the
      * end of each measure
      */
-    std::vector<std::pair<int, FloatingElement *> > m_floatingElements;
+    std::vector<std::pair<int, ControlElement *> > m_controlElements;
 };
 
 } // namespace vrv {

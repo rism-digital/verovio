@@ -43,14 +43,13 @@ namespace vrv {
 enum ClassId {
     BOUNDING_BOX = 0, // Should not be instanciated as is
     OBJECT, // Should not be instanciated as is
-    DEVICE_CONTEXT, // Should not be instanciated as is
+    DEVICE_CONTEXT, // Should not be instanciated as is,
+    FLOATING_OBJECT,
+    FLOATING_POSITIONER,
     //
     ALIGNMENT,
-    BOUNDARY_END,
     CLEF_ATTR,
     DOC,
-    ENDING,
-    FLOATING_POSITIONER,
     GRACE_ALIGNER,
     KEYSIG_ATTR,
     LAYER,
@@ -59,6 +58,7 @@ enum ClassId {
     MENSUR_ATTR,
     METERSIG_ATTR,
     PAGE,
+    SCORE,
     STAFF,
     STAFF_ALIGNMENT,
     STAFFGRP,
@@ -72,6 +72,7 @@ enum ClassId {
     ADD,
     ANNOT,
     APP,
+    CHOICE,
     CORR,
     DAMAGE,
     DEL,
@@ -85,6 +86,27 @@ enum ClassId {
     SUPPLIED,
     UNCLEAR,
     EDITORIAL_ELEMENT_max,
+    // Ids for SystemElement child classes
+    SYSTEM_ELEMENT,
+    BOUNDARY_END,
+    ENDING,
+    PB,
+    SB,
+    SECTION,
+    SYSTEM_ELEMENT_max,
+    // Ids for ControlElement child classes
+    CONTROL_ELEMENT,
+    ANCHORED_TEXT,
+    DIR,
+    DYNAM,
+    HAIRPIN,
+    HARM,
+    OCTAVE,
+    PEDAL,
+    SLUR,
+    TEMPO,
+    TIE,
+    CONTROL_ELEMENT_max,
     // Ids for LayerElement child classes
     LAYER_ELEMENT,
     ACCID,
@@ -117,18 +139,6 @@ enum ClassId {
     TUPLET,
     VERSE,
     LAYER_ELEMENT_max,
-    // Ids for FloatingElement child classes
-    FLOATING_ELEMENT,
-    ANCHORED_TEXT,
-    DIR,
-    DYNAM,
-    HAIRPIN,
-    OCTAVE,
-    PEDAL,
-    SLUR,
-    TEMPO,
-    TIE,
-    FLOATING_ELEMENT_max,
     // Ids for ScoreDefElement child classes
     SCOREDEF_ELEMENT,
     SCOREDEF,
@@ -170,7 +180,6 @@ class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
 class FloatingPositioner;
-class FloatingElement;
 class LayerElement;
 class Note;
 class Object;
@@ -268,7 +277,7 @@ enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 // the maximum is 255 (unsigned char)
 enum EditorialLevel {
     EDITORIAL_UNDEFINED = 0,
-    EDITORIAL_SYSTEM,
+    EDITORIAL_TOPLEVEL,
     EDITORIAL_SCOREDEF,
     EDITORIAL_STAFFGRP,
     EDITORIAL_MEASURE,
@@ -279,36 +288,31 @@ enum EditorialLevel {
 };
 
 //----------------------------------------------------------------------------
+// Types for layer element
+//----------------------------------------------------------------------------
+
+/**
+ * The types are used to distinguish LayerElement that are default layer elements,
+ * scoreDef layer elements and cautionary scoreDef layer elements
+ */
+
+enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAUTIONARY_SCOREDEF };
+
+//----------------------------------------------------------------------------
+// Drawing groups (reserved values)
+//----------------------------------------------------------------------------
+
+/**
+ * We need fix values for types that are all groupes together
+ */
+
+enum { DRAWING_GRP_NONE = 0, DRAWING_GRP_VERSE, DRAWING_GRP_HARM, DRAWING_GRP_OTHER };
+
+//----------------------------------------------------------------------------
 // Legacy Wolfgang defines
 //----------------------------------------------------------------------------
 
 #define OCTAVE_OFFSET 4
-
-#define ON 1
-#define OFF 0
-
-/* This is used for fast clef offset calculation.
- * It uses 4 bytes with, from right to left
- * - line
- * - shape
- * - dis (0 or 1)
- * - dis.place (0 or 1)
- */
-enum ClefId {
-    G1 = CLEFSHAPE_G << 8 | 1,
-    G2 = CLEFSHAPE_G << 8 | 2,
-    G2_8va = PLACE_above << 24 | OCTAVE_DIS_8 << 16 | G2,
-    G2_8vb = PLACE_below << 24 | OCTAVE_DIS_8 << 16 | G2,
-    F3 = CLEFSHAPE_F << 8 | 3,
-    F4 = CLEFSHAPE_F << 8 | 4,
-    F5 = CLEFSHAPE_F << 8 | 5,
-    C1 = CLEFSHAPE_C << 8 | 1,
-    C2 = CLEFSHAPE_C << 8 | 2,
-    C3 = CLEFSHAPE_C << 8 | 3,
-    C4 = CLEFSHAPE_C << 8 | 4,
-    C5 = CLEFSHAPE_C << 8 | 5,
-    perc = CLEFSHAPE_perc << 8 | 1
-};
 
 // The next four macros were tuned using the Leipzig font.
 

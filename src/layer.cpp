@@ -17,6 +17,7 @@
 #include "clef.h"
 #include "custos.h"
 #include "doc.h"
+#include "editorial.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "measure.h"
@@ -42,6 +43,10 @@ Layer::Layer() : Object("layer-"), DrawingListInterface(), ObjectListInterface()
     m_staffDefKeySig = NULL;
     m_staffDefMensur = NULL;
     m_staffDefMeterSig = NULL;
+    m_cautionStaffDefClef = NULL;
+    m_cautionStaffDefKeySig = NULL;
+    m_cautionStaffDefMensur = NULL;
+    m_cautionStaffDefMeterSig = NULL;
 
     Reset();
 }
@@ -58,15 +63,14 @@ void Layer::Reset()
     DrawingListInterface::Reset();
     ResetCommon();
 
-    ResetStaffDefOjects();
+    ResetStaffDefObjects();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
 }
 
-void Layer::ResetStaffDefOjects()
+void Layer::ResetStaffDefObjects()
 {
     m_drawKeySigCancellation = false;
-    // Resert(m_staffDefClef);
     if (m_staffDefClef) {
         delete m_staffDefClef;
         m_staffDefClef = NULL;
@@ -83,17 +87,41 @@ void Layer::ResetStaffDefOjects()
         delete m_staffDefMeterSig;
         m_staffDefMeterSig = NULL;
     }
+    // cautionary values
+    m_drawCautionKeySigCancel = false;
+    if (m_cautionStaffDefClef) {
+        delete m_cautionStaffDefClef;
+        m_cautionStaffDefClef = NULL;
+    }
+    if (m_cautionStaffDefKeySig) {
+        delete m_cautionStaffDefKeySig;
+        m_cautionStaffDefKeySig = NULL;
+    }
+    if (m_cautionStaffDefMensur) {
+        delete m_cautionStaffDefMensur;
+        m_cautionStaffDefMensur = NULL;
+    }
+    if (m_cautionStaffDefMeterSig) {
+        delete m_cautionStaffDefMeterSig;
+        m_cautionStaffDefMeterSig = NULL;
+    }
 }
 
-void Layer::AddLayerElement(LayerElement *element, int idx)
+void Layer::AddChild(Object *child)
 {
-    element->SetParent(this);
-    if (idx == -1) {
-        m_children.push_back(element);
+    if (child->IsLayerElement()) {
+        assert(dynamic_cast<LayerElement *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
     }
     else {
-        InsertChild(element, idx);
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
     }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
@@ -183,7 +211,7 @@ MeterSig *Layer::GetCurrentMeterSig() const
     return staff->m_drawingStaffDef->GetCurrentMeterSig();
 }
 
-void Layer::SetDrawingAndCurrentValues(StaffDef *currentStaffDef)
+void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
 {
     if (!currentStaffDef) {
         LogDebug("staffDef not found");
@@ -191,31 +219,40 @@ void Layer::SetDrawingAndCurrentValues(StaffDef *currentStaffDef)
     }
 
     // Remove any previous value in the Layer
-    this->ResetStaffDefOjects();
-
-    // Special case with C-major / A-minor key signature (0) : if key cancellation is false, we are at the beginning
-    // of a new system, and hence we should not draw it. Maybe this can be improved?
-    bool drawKeySig = currentStaffDef->DrawKeySig();
-    if (currentStaffDef->GetCurrentKeySig() && (currentStaffDef->GetCurrentKeySig()->GetAlterationNumber() == 0)) {
-        if (currentStaffDef->DrawKeySigCancellation() == false) {
-            drawKeySig = false;
-        }
-    }
+    this->ResetStaffDefObjects();
 
     if (currentStaffDef->DrawClef()) this->m_staffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
-    // special case - see above
-    if (drawKeySig) this->m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+    if (currentStaffDef->DrawKeySig()) this->m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
     if (currentStaffDef->DrawMensur()) this->m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
     if (currentStaffDef->DrawMeterSig())
         this->m_staffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
-    this->SetDrawKeySigCancellation(currentStaffDef->DrawKeySigCancellation());
 
     // Don't draw on the next one
     currentStaffDef->SetDrawClef(false);
     currentStaffDef->SetDrawKeySig(false);
     currentStaffDef->SetDrawMensur(false);
     currentStaffDef->SetDrawMeterSig(false);
-    currentStaffDef->SetDrawKeySigCancellation(false);
+}
+
+void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
+{
+    if (!currentStaffDef) {
+        LogDebug("staffDef not found");
+        return;
+    }
+
+    if (currentStaffDef->DrawClef()) this->m_cautionStaffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
+    // special case - see above
+    if (currentStaffDef->DrawKeySig()) this->m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+    if (currentStaffDef->DrawMensur()) this->m_cautionStaffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
+    if (currentStaffDef->DrawMeterSig())
+        this->m_cautionStaffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
+
+    // Don't draw on the next one
+    currentStaffDef->SetDrawClef(false);
+    currentStaffDef->SetDrawKeySig(false);
+    currentStaffDef->SetDrawMensur(false);
+    currentStaffDef->SetDrawMeterSig(false);
 }
 
 //----------------------------------------------------------------------------
@@ -224,7 +261,7 @@ void Layer::SetDrawingAndCurrentValues(StaffDef *currentStaffDef)
 
 int Layer::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
-    ResetStaffDefOjects();
+    ResetStaffDefObjects();
 
     return FUNCTOR_CONTINUE;
 };
@@ -241,6 +278,11 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
     // We set it to -1.0 for the scoreDef attributes since they have to be aligned before any timestamp event (-1.0)
     params->m_time = DUR_MAX * -1.0;
 
+    if (params->m_isFirstMeasure)
+        params->m_scoreDefRole = SYSTEM_SCOREDEF;
+    else
+        params->m_scoreDefRole = INTERMEDIATE_SCOREDEF;
+
     if (this->GetStaffDefClef()) {
         GetStaffDefClef()->AlignHorizontally(params);
     }
@@ -250,9 +292,11 @@ int Layer::AlignHorizontally(FunctorParams *functorParams)
     if (this->GetStaffDefMensur()) {
         GetStaffDefMensur()->AlignHorizontally(params);
     }
-    if (GetStaffDefMeterSig()) {
+    if (this->GetStaffDefMeterSig()) {
         GetStaffDefMeterSig()->AlignHorizontally(params);
     }
+
+    params->m_scoreDefRole = NONE;
 
     // Now we have to set it to 0.0 since we will start aligning muscial content
     params->m_time = 0.0;
@@ -264,6 +308,23 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
 {
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
+
+    params->m_scoreDefRole = CAUTIONARY_SCOREDEF;
+
+    if (this->GetCautionStaffDefClef()) {
+        GetCautionStaffDefClef()->AlignHorizontally(params);
+    }
+    if (this->GetCautionStaffDefKeySig()) {
+        GetCautionStaffDefKeySig()->AlignHorizontally(params);
+    }
+    if (this->GetCautionStaffDefMensur()) {
+        GetCautionStaffDefMensur()->AlignHorizontally(params);
+    }
+    if (this->GetCautionStaffDefMeterSig()) {
+        GetCautionStaffDefMeterSig()->AlignHorizontally(params);
+    }
+
+    params->m_scoreDefRole = NONE;
 
     int i;
     for (i = 0; i < params->m_measureAligner->GetChildCount(); i++) {
@@ -320,6 +381,25 @@ int Layer::SetDrawingXY(FunctorParams *functorParams)
     if (this->GetStaffDefMeterSig()) {
         this->GetStaffDefMeterSig()->SetDrawingX(
             this->GetStaffDefMeterSig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
+    }
+
+    // Cautionary values
+    // set the values for the scoreDef elements when required
+    if (this->GetCautionStaffDefClef()) {
+        this->GetCautionStaffDefClef()->SetDrawingX(
+            this->GetCautionStaffDefClef()->GetXRel() + params->m_currentMeasure->GetDrawingX());
+    }
+    if (this->GetCautionStaffDefKeySig()) {
+        this->GetCautionStaffDefKeySig()->SetDrawingX(
+            this->GetCautionStaffDefKeySig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
+    }
+    if (this->GetCautionStaffDefMensur()) {
+        this->GetCautionStaffDefMensur()->SetDrawingX(
+            this->GetCautionStaffDefMensur()->GetXRel() + params->m_currentMeasure->GetDrawingX());
+    }
+    if (this->GetCautionStaffDefMeterSig()) {
+        this->GetCautionStaffDefMeterSig()->SetDrawingX(
+            this->GetCautionStaffDefMeterSig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
     }
 
     return FUNCTOR_CONTINUE;

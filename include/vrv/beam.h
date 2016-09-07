@@ -32,17 +32,17 @@ public:
     Beam();
     virtual ~Beam();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Beam"; };
-    virtual ClassId Is() const { return BEAM; };
+    virtual std::string GetClassName() const { return "Beam"; }
+    virtual ClassId Is() const { return BEAM; }
     ///@}
 
-    int GetNoteCount() const { return this->GetChildCount(NOTE); };
+    int GetNoteCount() const { return this->GetChildCount(NOTE); }
 
     /**
      * Add an element (a note or a rest) to a beam.
      * Only Note or Rest elements will be actually added to the beam.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
     /**
      * Return information about the position in the beam.
@@ -56,7 +56,7 @@ public:
     /**
      *
      */
-    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; };
+    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; }
 
 protected:
     /**
@@ -70,7 +70,7 @@ protected:
      * This is called by Beam::FilterList
      */
     void InitCoords(ListOfObjects *childList);
-    
+
     /**
      * Return the position of the element in the beam.
      * For notes, lookup the position of the parent chord.
@@ -103,7 +103,7 @@ public:
      * @name Constructors, destructors, and other standard methods
      */
     ///@{
-    BeamElementCoord() { m_element = NULL; };
+    BeamElementCoord() { m_element = NULL; }
     virtual ~BeamElementCoord();
 
     int m_x;

@@ -44,7 +44,7 @@ public:
     ScoreDefElement(std::string classid);
     virtual ~ScoreDefElement();
     virtual void Reset();
-    virtual ClassId Is() const { return SCOREDEF_ELEMENT; };
+    virtual ClassId Is() const { return SCOREDEF_ELEMENT; }
     ///@}
 
     virtual ScoreDefInterface *GetScoreDefInterface() { return dynamic_cast<ScoreDefInterface *>(this); }
@@ -116,11 +116,11 @@ public:
     ScoreDef();
     virtual ~ScoreDef();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "ScoreDef"; };
-    virtual ClassId Is() const { return SCOREDEF; };
+    virtual std::string GetClassName() const { return "ScoreDef"; }
+    virtual ClassId Is() const { return SCOREDEF; }
     ///@}
 
-    void AddStaffGrp(StaffGrp *staffGrp);
+    virtual void AddChild(Object *object);
 
     /**
      * Replace the scoreDef with the content of the newScoreDef.
@@ -144,21 +144,21 @@ public:
      * This is necessary at the beginning or when a scoreDef occurs.
      * Only true flags are applied, unless applyToAll is set to true.
      */
-    void SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation, bool applyToAll);
+    void SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll);
 
     /**
      * @name Set and get the scoreDef drawing flags for clef, keysig and mensur.
      */
     ///@{
-    bool DrawLabels() const { return m_drawLabels; };
-    void SetDrawLabels(bool drawLabels) { m_drawLabels = drawLabels; };
+    bool DrawLabels() const { return m_drawLabels; }
+    void SetDrawLabels(bool drawLabels) { m_drawLabels = drawLabels; }
     ///@}
 
     /**
      * @name Set and get the scoreDef drawing width.
      */
     ///@{
-    int GetDrawingWidth() const { return m_drawingWidth; };
+    int GetDrawingWidth() const { return m_drawingWidth; }
     void SetDrawingWidth(int drawingWidth);
     ///@}
 
@@ -167,21 +167,20 @@ public:
     //----------//
 
     /**
-     * Fill a page by adding systems with the appropriate length.
-     * For ScoreDef, this means only moving them since their width is not taken into
-     * account
+     * See Object::ConvertToPageBased
+     */
+    virtual int ConvertToPageBased(FunctorParams *functorParams);
+
+    /**
+     * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
 
     /**
-     * See Object::GenerateMIDI
-     */
-    virtual int GenerateMIDI(FunctorParams *functorParams);
 
-    /**
-     * See Object::CalcMaxMeasureDuration
+     * See Object::CastOffEncoding
      */
-    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
+    virtual int CastOffEncoding(FunctorParams *functorParams);
 
 protected:
     /**
@@ -225,18 +224,17 @@ public:
     ///@{
     StaffGrp();
     virtual ~StaffGrp();
-    virtual Object *Clone() const { return new StaffGrp(*this); };
+    virtual Object *Clone() const { return new StaffGrp(*this); }
     virtual void Reset();
-    virtual std::string GetClassName() const { return "StaffGrp"; };
-    virtual ClassId Is() const { return STAFFGRP; };
+    virtual std::string GetClassName() const { return "StaffGrp"; }
+    virtual ClassId Is() const { return STAFFGRP; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddStaffDef(StaffDef *staffDef);
-    void AddStaffGrp(StaffGrp *staffGrp);
+    virtual void AddChild(Object *object);
     ///@}
 
     //----------//
@@ -281,10 +279,10 @@ public:
     ///@{
     StaffDef();
     virtual ~StaffDef();
-    virtual Object *Clone() const { return new StaffDef(*this); };
+    virtual Object *Clone() const { return new StaffDef(*this); }
     virtual void Reset();
-    virtual std::string GetClassName() const { return "StaffDef"; };
-    virtual ClassId Is() const { return STAFFDEF; };
+    virtual std::string GetClassName() const { return "StaffDef"; }
+    virtual ClassId Is() const { return STAFFDEF; }
     ///@}
 
     //----------//
@@ -292,17 +290,12 @@ public:
     //----------//
 
     /**
-     * Set the current / drawing clef, key signature, etc. to the StaffDef
-     * Called form ScoreDef::ReplaceDrawingValues.
-     * See implementation and Object::ReplaceDrawingValuesInStaffDef for the parameters.
+     * See Object::ReplaceDrawingValuesInStaffDef
      */
     virtual int ReplaceDrawingValuesInStaffDef(FunctorParams *functorParams);
 
     /**
-     * Set drawing flags for the StaffDef for indicating whether clefs, keysigs, etc. need
-     * to be redrawn.
-     * This typically occurs when a new System or a new  ScoreDef is encountered.
-     * See implementation and Object::SetStaffDefRedrawFlags for the parameters.
+     * See Object::SetStaffDefRedrawFlags
      */
     virtual int SetStaffDefRedrawFlags(FunctorParams *functorParams);
 

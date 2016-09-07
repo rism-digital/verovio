@@ -20,6 +20,7 @@
 #include "functorparams.h"
 #include "measure.h"
 #include "page.h"
+#include "section.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -69,38 +70,27 @@ void System::Reset()
     m_drawingAbbrLabelsWidth = 0;
 }
 
-void System::AddBoundaryEnd(BoundaryEnd *boundaryEnd)
+void System::AddChild(Object *child)
 {
-    boundaryEnd->SetParent(this);
-    m_children.push_back(boundaryEnd);
-    Modify();
-}
+    if (child->Is() == MEASURE) {
+        assert(dynamic_cast<Measure *>(child));
+    }
+    else if (child->Is() == SCOREDEF) {
+        assert(dynamic_cast<ScoreDef *>(child));
+    }
+    else if (child->IsSystemElement()) {
+        assert(dynamic_cast<SystemElement *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
 
-void System::AddEnding(Ending *ending)
-{
-    ending->SetParent(this);
-    m_children.push_back(ending);
-    Modify();
-}
-
-void System::AddMeasure(Measure *measure)
-{
-    measure->SetParent(this);
-    m_children.push_back(measure);
-    Modify();
-}
-
-void System::AddScoreDef(ScoreDef *scoreDef)
-{
-    scoreDef->SetParent(this);
-    m_children.push_back(scoreDef);
-    Modify();
-}
-
-void System::AddApp(App *app)
-{
-    app->SetParent(this);
-    m_children.push_back(app);
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
@@ -131,15 +121,15 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-void System::SetCurrentFloatingPositioner(int staffN, FloatingElement *element, int x, int y)
+void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, int x, int y)
 {
-    assert(element);
+    assert(object);
 
     // If we have only the bottom alignment, then nothing to do (yet)
     if (m_systemAligner.GetChildCount() == 1) return;
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
     assert(alignment);
-    alignment->SetCurrentFloatingPositioner(element, x, y);
+    alignment->SetCurrentFloatingPositioner(object, x, y);
 }
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
@@ -180,6 +170,17 @@ int System::ResetVerticalAlignment(FunctorParams *functorParams)
     m_drawingY = 0;
 
     m_systemAligner.Reset();
+
+    return FUNCTOR_CONTINUE;
+}
+
+int System::AlignHorizontally(FunctorParams *functorParams)
+{
+    AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
+    assert(params);
+
+    // since we are starting a new system its first scoreDef will need to be a SYSTEM_SCOREDEF
+    params->m_isFirstMeasure = true;
 
     return FUNCTOR_CONTINUE;
 }
@@ -324,9 +325,15 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = PEDAL;
     m_systemAligner.Process(params->m_functor, params);
+
+    params->m_classId = HARM;
+    m_systemAligner.Process(params->m_functor, params);
+    adjustFloatingPostionerGrpsParams.m_classIds.clear();
+    adjustFloatingPostionerGrpsParams.m_classIds.push_back(HARM);
+    m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
+
     params->m_classId = ENDING;
     m_systemAligner.Process(params->m_functor, params);
-
     adjustFloatingPostionerGrpsParams.m_classIds.clear();
     adjustFloatingPostionerGrpsParams.m_classIds.push_back(ENDING);
     m_systemAligner.Process(&adjustFloatingPostionerGrps, &adjustFloatingPostionerGrpsParams);
@@ -346,7 +353,7 @@ int System::CastOffPages(FunctorParams *functorParams)
     if ((params->m_currentPage->GetChildCount() > 0)
         && (this->m_drawingYRel - this->GetHeight() - params->m_shift < 0)) {
         params->m_currentPage = new Page();
-        params->m_doc->AddPage(params->m_currentPage);
+        params->m_doc->AddChild(params->m_currentPage);
         params->m_shift = this->m_drawingYRel - params->m_pageHeight;
     }
 
@@ -356,7 +363,7 @@ int System::CastOffPages(FunctorParams *functorParams)
     // the ownership of the system - the contentPage itself will be deleted afterwards.
     System *system = dynamic_cast<System *>(params->m_contentPage->Relinquish(this->GetIdx()));
     assert(system);
-    params->m_currentPage->AddSystem(system);
+    params->m_currentPage->AddChild(system);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -367,9 +374,9 @@ int System::UnCastOff(FunctorParams *functorParams)
     assert(params);
 
     // Just move all the content of the system to the continous one (parameter)
-    // Use the MoveChildren method that moves and relinquishes them
+    // Use the MoveChildrenFrom method that moves and relinquishes them
     // See Object::Relinquish
-    params->m_currentSystem->MoveChildren(this);
+    params->m_currentSystem->MoveChildrenFrom(this);
 
     return FUNCTOR_CONTINUE;
 }
@@ -411,15 +418,7 @@ int System::CastOffSystemsEnd(FunctorParams *functorParams)
     // Otherwise add all pendings objects
     ArrayOfObjects::iterator iter;
     for (iter = params->m_pendingObjects.begin(); iter != params->m_pendingObjects.end(); iter++) {
-        if ((*iter)->Is() == EDITORIAL_ELEMENT)
-            params->m_currentSystem->AddEditorialElement(dynamic_cast<EditorialElement *>(*iter));
-        else if ((*iter)->Is() == ENDING)
-            params->m_currentSystem->AddEnding(dynamic_cast<Ending *>(*iter));
-        else if ((*iter)->Is() == SCOREDEF)
-            params->m_currentSystem->AddScoreDef(dynamic_cast<ScoreDef *>(*iter));
-        else {
-            assert(false);
-        }
+        params->m_currentSystem->AddChild(*iter);
     }
 
     return FUNCTOR_STOP;
