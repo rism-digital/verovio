@@ -47,7 +47,6 @@ downloads:
     var pageWidth = 2100;
     var spacingSystem = 2;
     var swipe_pages = false;
-    var log = false;
     var format = 'mei';
     var outputFilename = 'output.mei' 
     var ids = [];
@@ -99,15 +98,18 @@ downloads:
         try {
             vrvToolkit.loadData(data);
             
-            if (log) {
-                str = vrvToolkit.getLog();
-                $("#log_p").html( str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/\n/g, "<br/>") );
+            if (vrvToolkit.getPageCount() == 0) {
+                $("#overlay").hide().css("cursor", "auto");
+                log = vrvToolkit.getLog();
+                $('#err').text(log).html();
+                $('#errorDialog').modal();
             }
-
-            $("#total_text").html(vrvToolkit.getPageCount());
-            page = 1;
-            load_page();
-            $("#play-button").show();
+            else {
+                $("#total_text").html(vrvToolkit.getPageCount());
+                page = 1;
+                load_page();
+                $("#play-button").show();
+            }
         }
         catch(err) {
             $("#overlay").hide().css("cursor", "auto");
@@ -348,10 +350,7 @@ downloads:
             </div>
             <div class="modal-body">
                 <div class="alert alert-danger" role="alert">Sorry, Verovio failed to process the MEI data</div>
-                <p>
-                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#errDiv" aria-expanded="false" aria-controls="errDiv">Show the error log</button>
-                </p>
-                <div class="collapse" id="errDiv">
+                <div id="errDiv">
                     <pre id="err"></pre>
                 </div>
             </div>
