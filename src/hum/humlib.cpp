@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Sep  7 15:12:08 CEST 2016
+// Last Modified: Wed Sep  7 23:43:43 CEST 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -6085,6 +6085,7 @@ void HumdrumLine::setLineFromCsv(const char* csv, const string& separator) {
 }
 
 
+
 void HumdrumLine::setLineFromCsv(const string& csv, const string& separator) {
 	if (csv.size() < 1) {
 		return;
@@ -6096,12 +6097,21 @@ void HumdrumLine::setLineFromCsv(const string& csv, const string& separator) {
 	// construct tab-delimited string
 	string output;
 	bool inquote = false;
+
+	if ((newcsv.size() >= 2) && (newcsv[0] == '!') && (newcsv[1] == '!')) {
+		// Global commands and reference records which do not start with a
+		// quote are considered to be literal.
+		*this = newcsv;
+		return;
+	}
+
 	for (int i=0; i<(int)newcsv.size(); i++) {
 		if ((newcsv[i] == '"') && !inquote) {
 			inquote = true;
 			continue;
 		}
-		if (inquote && (newcsv[i] == '"') && (i < (int)newcsv.length()-1)) {
+		if (inquote && (newcsv[i] == '"') && (newcsv[i+1] == '"') 
+				&& (i < (int)newcsv.length()-1)) {
 			output += '"';
 			i++;
 			continue;
