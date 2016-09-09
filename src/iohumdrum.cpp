@@ -475,7 +475,8 @@ void HumdrumInput::createHeader(void)
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     string EED = getReferenceValue("EED", references);
     if (EED.size()) {
-        pugi::xml_node editor = pubStmt.append_child("persName");
+        pugi::xml_node pubRespStmt = titleStmt.append_child("respStmt");
+        pugi::xml_node editor = pubRespStmt.append_child("persName");
         editor.append_attribute("role") = "editor";
         editor.append_child(pugi::node_pcdata).set_value(EED.c_str());
     }
@@ -506,11 +507,6 @@ void HumdrumInput::createHeader(void)
 
     // <sourceDesc> /////////
     
-    // <extMeta> /////////////
-    if (references.size() > 0) {
-        insertExtMeta(references);
-    }
-    
     // <workDesc> /////////////
     pugi::xml_node workDesc = m_doc->m_header.append_child("workDesc");
     pugi::xml_node work = workDesc.append_child("work");
@@ -526,6 +522,11 @@ void HumdrumInput::createHeader(void)
         insertRespStmt(titleStmt, respPeople);
     }
     
+    // <extMeta> /////////////
+    if (references.size() > 0) {
+        insertExtMeta(references);
+    }
+
     // pugi::xml_node creation = work.append_child("creation");
 }
 
