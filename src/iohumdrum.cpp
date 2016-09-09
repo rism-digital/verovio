@@ -475,7 +475,7 @@ void HumdrumInput::createHeader(void)
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     string EED = getReferenceValue("EED", references);
     if (EED.size()) {
-        pugi::xml_node pubRespStmt = titleStmt.append_child("respStmt");
+        pugi::xml_node pubRespStmt = pubStmt.append_child("respStmt");
         pugi::xml_node editor = pubRespStmt.append_child("persName");
         editor.append_attribute("role") = "editor";
         editor.append_child(pugi::node_pcdata).set_value(EED.c_str());
