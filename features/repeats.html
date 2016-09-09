@@ -63,6 +63,22 @@
 {% endhighlight %}
 </div>
 
+<!-- ***************************** -->
+<h4>Endings</h4>
+
+<p>
+    Verovio supports <code>&lt;ending&gt;</code> elements. Consecutive endings are aligned horizontally. By default, Verovio renders endings on top of each staff group. This is the equivalent to the value <code>grouped</code> for the <code>@ending.rend</code> attribute in <code>&lt;scoreDef&gt;</code>. For rendering endings only at the top its value has to be set to <code>top</code>.
+</p>
+
+<div id="svg_output-endings" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code-endings" file="endings.mei" %}
+<div id="code-endings-xml" style="display: none">
+{% highlight xml %}
+{% include features/endings.txt %}
+{% endhighlight %}
+</div>
+
 
 <script type="text/javascript">
 //<![CDATA[
@@ -94,6 +110,10 @@
     
     $.get( "{{ site.baseurl }}/examples/features/beatrpt2.mei" , function( data ) {
         load_data( data, $('#svg_output-beatrpt2') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/endings.mei" , function( data ) {
+        load_data( data, $('#svg_output-endings') );
     });
 //]]>
 </script>

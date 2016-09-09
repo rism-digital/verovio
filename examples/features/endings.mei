@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Ending example</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef midi.bpm="92">
+                        <staffGrp>
+                            <staffDef clef.shape="G" clef.line="2" key.sig="0" meter.count="2" meter.unit="4" n="1" lines="5" />
+                            <staffGrp symbol="brace">
+                            <staffDef clef.shape="G" clef.line="2" key.sig="0" meter.count="2" meter.unit="4" n="2" lines="5" />
+                            <staffDef clef.shape="F" clef.line="4" key.sig="0" meter.count="2" meter.unit="4" n="3" lines="5" />
+                            </staffGrp>
+                        </staffGrp>
+                    </scoreDef>
+                    <section label="feature-example">
+                        <measure>
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="8" oct="4" pname="b" accid.ges="n">
+                                        <verse n="1">
+                                            <syl>er</syl>
+                                        </verse>
+                                    </note>
+                                    <note dur="8" oct="4" pname="g" accid.ges="n">
+                                        <verse n="1">
+                                            <syl>im</syl>
+                                        </verse>
+                                    </note>
+                                    <note dur="8" oct="4" pname="a" accid.ges="n">
+                                        <verse n="1">
+                                            <syl con="d" wordpos="i">gan</syl>
+                                        </verse>
+                                    </note>
+                                    <note dur="8" oct="4" pname="b" accid.ges="n">
+                                        <verse n="1">
+                                            <syl wordpos="t">ze</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <rest dur="8" />
+                                    <beam>
+                                        <chord dur="8">
+                                            <note oct="3" pname="b" accid.ges="n" />
+                                            <note oct="4" pname="d" accid.ges="n" />
+                                            <note oct="4" pname="g" accid.ges="n" />
+                                        </chord>
+                                        <rest dur="8" />
+                                        <chord dur="8">
+                                            <note oct="4" pname="d" accid.ges="n" />
+                                            <note oct="4" pname="f" accid.ges="n" />
+                                            <note oct="4" pname="g" accid.ges="n" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <beam>
+                                        <note dur="8" oct="3" pname="g" accid.ges="n" />
+                                        <rest dur="8" />
+                                        <note dur="8" oct="2" pname="g" accid.ges="n" />
+                                    </beam>
+                                    <rest dur="8" />
+                                </layer>
+                            </staff>
+                        </measure>
+                        <ending n="1">
+                        <measure n="13" right="rptend">
+                            <staff n="1">
+                                <layer n="1">
+                                    <beam>
+                                        <note dots="1" dur="8" oct="5" pname="c" accid.ges="n">
+                                            <verse n="1">
+                                                <syl>Haus;</syl>
+                                            </verse>
+                                        </note>
+                                        <note dur="16" oct="5" pname="d" accid.ges="n" />
+                                        <note dur="8" oct="5" pname="e" accid.ges="n" />
+                                    </beam>
+                                    <note dur="8" oct="4" pname="g" accid.ges="n">
+                                        <verse n="1">
+                                            <syl>do</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <rest dur="8" />
+                                    <beam>
+                                        <chord dur="8">
+                                            <note oct="4" pname="c" accid.ges="n" />
+                                            <note oct="4" pname="e" accid.ges="n" />
+                                        </chord>
+                                        <chord dur="8">
+                                            <note oct="4" pname="e" accid.ges="n" />
+                                            <note oct="4" pname="g" accid.ges="n" />
+                                        </chord>
+                                        <chord dur="8">
+                                            <note oct="4" pname="c" accid.ges="n" />
+                                            <note oct="4" pname="e" accid.ges="n" />
+                                        </chord>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <chord dots="1" dur="4">
+                                        <note oct="3" pname="c" accid.ges="n" />
+                                        <note oct="3" pname="g" accid.ges="n" />
+                                    </chord>
+                                    <rest dur="8" />
+                                </layer>
+                            </staff>
+                            <slur staff="1" startid="#note-L95F3" endid="#note-L98F3" />
+                        </measure>
+                        </ending>
+                        <ending n="2">
+                        <measure n="14" right="end">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="4" oct="5" pname="c" accid.ges="n">
+                                        <verse n="1">
+                                            <syl>Haus.</syl>
+                                        </verse>
+                                    </note>
+                                    <rest dur="8" />
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <chord dots="1" dur="4">
+                                        <note oct="4" pname="c" accid.ges="n" />
+                                        <note oct="4" pname="e" accid.ges="n" />
+                                        <note oct="4" pname="g" accid.ges="n" />
+                                    </chord>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <beam>
+                                        <note dur="8" oct="3" pname="c" accid.ges="n" />
+                                        <note dur="8" oct="2" pname="g" accid.ges="n" />
+                                        <note dur="8" oct="2" pname="c" accid.ges="n" />
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                        </ending>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

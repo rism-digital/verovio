@@ -1,0 +1,139 @@
+<section>
+  <measure>
+    <staff n="1">
+      <layer n="1">
+        <note dur="8" oct="4" pname="b" accid.ges="n">
+          <verse n="1">
+            <syl>er</syl>
+          </verse>
+        </note>
+        <note dur="8" oct="4" pname="g" accid.ges="n">
+          <verse n="1">
+            <syl>im</syl>
+          </verse>
+        </note>
+        <note dur="8" oct="4" pname="a" accid.ges="n">
+          <verse n="1">
+            <syl con="d" wordpos="i">gan</syl>
+          </verse>
+        </note>
+        <note dur="8" oct="4" pname="b" accid.ges="n">
+          <verse n="1">
+            <syl wordpos="t">ze</syl>
+          </verse>
+        </note>
+      </layer>
+    </staff>
+    <staff n="2">
+      <layer n="1">
+        <rest dur="8"/>
+        <beam>
+          <chord dur="8">
+            <note oct="3" pname="b" accid.ges="n"/>
+            <note oct="4" pname="d" accid.ges="n"/>
+            <note oct="4" pname="g" accid.ges="n"/>
+          </chord>
+          <rest dur="8"/>
+          <chord dur="8">
+            <note oct="4" pname="d" accid.ges="n"/>
+            <note oct="4" pname="f" accid.ges="n"/>
+            <note oct="4" pname="g" accid.ges="n"/>
+          </chord>
+        </beam>
+      </layer>
+    </staff>
+    <staff n="3">
+      <layer n="1">
+        <beam>
+          <note dur="8" oct="3" pname="g" accid.ges="n"/>
+          <rest dur="8"/>
+          <note dur="8" oct="2" pname="g" accid.ges="n"/>
+        </beam>
+        <rest dur="8"/>
+      </layer>
+    </staff>
+  </measure>
+  <ending n="1">
+    <measure n="13" right="rptend">
+      <staff n="1">
+        <layer n="1">
+          <beam>
+            <note dots="1" dur="8" oct="5" pname="c" accid.ges="n">
+              <verse n="1">
+                <syl>Haus;</syl>
+              </verse>
+            </note>
+            <note dur="16" oct="5" pname="d" accid.ges="n"/>
+            <note dur="8" oct="5" pname="e" accid.ges="n"/>
+          </beam>
+          <note dur="8" oct="4" pname="g" accid.ges="n">
+            <verse n="1">
+              <syl>do</syl>
+            </verse>
+          </note>
+        </layer>
+      </staff>
+      <staff n="2">
+        <layer n="1">
+          <rest dur="8"/>
+          <beam>
+            <chord dur="8">
+              <note oct="4" pname="c" accid.ges="n"/>
+              <note oct="4" pname="e" accid.ges="n"/>
+            </chord>
+            <chord dur="8">
+              <note oct="4" pname="e" accid.ges="n"/>
+              <note oct="4" pname="g" accid.ges="n"/>
+            </chord>
+            <chord dur="8">
+              <note oct="4" pname="c" accid.ges="n"/>
+              <note oct="4" pname="e" accid.ges="n"/>
+            </chord>
+          </beam>
+        </layer>
+      </staff>
+      <staff n="3">
+        <layer n="1">
+          <chord dots="1" dur="4">
+            <note oct="3" pname="c" accid.ges="n"/>
+            <note oct="3" pname="g" accid.ges="n"/>
+          </chord>
+          <rest dur="8"/>
+        </layer>
+      </staff>
+      <slur staff="1" startid="#note-L95F3" endid="#note-L98F3"/>
+    </measure>
+  </ending>
+  <ending n="2">
+    <measure n="14" right="end">
+      <staff n="1">
+        <layer n="1">
+          <note dur="4" oct="5" pname="c" accid.ges="n">
+            <verse n="1">
+              <syl>Haus.</syl>
+            </verse>
+          </note>
+          <rest dur="8"/>
+        </layer>
+      </staff>
+      <staff n="2">
+        <layer n="1">
+          <chord dots="1" dur="4">
+            <note oct="4" pname="c" accid.ges="n"/>
+            <note oct="4" pname="e" accid.ges="n"/>
+            <note oct="4" pname="g" accid.ges="n"/>
+          </chord>
+        </layer>
+      </staff>
+      <staff n="3">
+        <layer n="1">
+          <beam>
+            <note dur="8" oct="3" pname="c" accid.ges="n"/>
+            <note dur="8" oct="2" pname="g" accid.ges="n"/>
+            <note dur="8" oct="2" pname="c" accid.ges="n"/>
+          </beam>
+        </layer>
+      </staff>
+    </measure>
+  </ending>
+</section>
