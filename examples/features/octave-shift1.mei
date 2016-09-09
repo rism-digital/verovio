@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Octave shift example</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef clef.line="2" clef.shape="G" lines="5" n="1"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section label="feature-example">
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="2" oct="6" pname="e"/>
+                                    <beam>
+                                        <note dur="8" oct="6" pname="f"/>
+                                        <note dur="8" oct="6" pname="a"/>
+                                        <note dur="8" oct="6" pname="g"/>
+                                        <note dur="8" oct="6" pname="b"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="2" right="dbl">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="1" oct="7" pname="c"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="3">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="2" oct="5" oct.ges="6" pname="e" xml:id="n1"/>
+                                    <beam>
+                                        <note dur="8" oct="5" oct.ges="6"  pname="f"/>
+                                        <note dur="8" oct="5" oct.ges="6"  pname="a"/>
+                                        <note dur="8" oct="5" oct.ges="6"  pname="g"/>
+                                        <note dur="8" oct="5" oct.ges="6"  pname="b"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <octave startid="#n1" endid="#n2" dis="8" dis.place="above"></octave>
+                        </measure>
+                        <measure n="4" right="dbl">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="1" oct="6" oct.ges="7"  pname="c" xml:id="n2"/>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

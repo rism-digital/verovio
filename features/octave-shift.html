@@ -1,0 +1,54 @@
+---
+---
+<h4>Octave shift</h4>
+
+<p>
+    Verovio supports <code>&lt;oct&gt;</code> for octave shifts. For correct MIDI output, the <code>@oct.ges</code> attribute needs to be provided.
+</p>
+
+<div id="svg_output-1" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code1" file="octave-shift1.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/octave-shift1.txt %}
+{% endhighlight %}
+</div>
+
+<!-- ***************************** -->
+<hr/>
+<p>
+    For <em>ottava bassa</em> displacements the <code>@place</code> attribute has to have the value <code>below</code>. The <em>quindicesima</em> displacement is also supported. The scope of the octave shift can be specified either with <code>@startid</code> / <code>@endid</code> or with <code>@tstamp</code> / <code>@tstamps</code> attributes.
+</p>
+
+<div id="svg_output-2" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code1" file="octave-shift2.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/octave-shift2.txt %}
+{% endhighlight %}
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+    zoom = 40;
+    pageWidth = 1500;
+    border = 10;
+    
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
+    
+    $.get( "{{ site.baseurl }}/examples/features/octave-shift1.mei" , function( data ) {
+        load_data( data, $('#svg_output-1') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/octave-shift2.mei" , function( data ) {
+        load_data( data, $('#svg_output-2') );
+    });
+//]]>
+</script>
+

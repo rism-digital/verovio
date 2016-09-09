@@ -1,0 +1,43 @@
+<section>
+  <measure n="1">
+    <staff n="1">
+      <layer n="1">
+        <note dur="2" oct="6" pname="e"/>
+        <beam>
+          <note dur="8" oct="6" pname="f"/>
+          <note dur="8" oct="6" pname="a"/>
+          <note dur="8" oct="6" pname="g"/>
+          <note dur="8" oct="6" pname="b"/>
+        </beam>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="2" right="dbl">
+    <staff n="1">
+      <layer n="1">
+        <note dur="1" oct="7" pname="c"/>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="3">
+    <staff n="1">
+      <layer n="1">
+        <note dur="2" oct="5" oct.ges="6" pname="e" xml:id="n1"/>
+        <beam>
+          <note dur="8" oct="5" oct.ges="6" pname="f"/>
+          <note dur="8" oct="5" oct.ges="6" pname="a"/>
+          <note dur="8" oct="5" oct.ges="6" pname="g"/>
+          <note dur="8" oct="5" oct.ges="6" pname="b"/>
+        </beam>
+      </layer>
+    </staff>
+    <octave startid="#n1" endid="#n2" dis="8" dis.place="above"/>
+  </measure>
+  <measure n="4" right="dbl">
+    <staff n="1">
+      <layer n="1">
+        <note dur="1" oct="6" oct.ges="7" pname="c" xml:id="n2"/>
+      </layer>
+    </staff>
+  </measure>
+</section>
