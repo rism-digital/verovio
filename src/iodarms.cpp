@@ -25,6 +25,8 @@
 #include "tie.h"
 #include "vrv.h"
 
+#define MAX_DARMS_BUFFER 10000
+
 namespace vrv {
 
 // Ok, this is ugly, but since this is static data, why not?
@@ -416,7 +418,7 @@ bool DarmsInput::ImportFile()
     return ImportString(data);
 }
 
-bool DarmsInput::ImportString(std::string data_str)
+bool DarmsInput::ImportString(std::string const &data_str)
 {
     int len;
     int res;

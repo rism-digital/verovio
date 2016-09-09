@@ -82,7 +82,7 @@ public:
     virtual ~MusicXmlInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string musicxml);
+    virtual bool ImportString(std::string const &musicxml);
 
 private:
     /**

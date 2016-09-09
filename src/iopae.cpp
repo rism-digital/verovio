@@ -94,7 +94,7 @@ bool PaeInput::ImportFile()
 #endif
 }
 
-bool PaeInput::ImportString(std::string pae)
+bool PaeInput::ImportString(std::string const &pae)
 {
 #ifndef NO_PAE_SUPPORT
     std::istringstream in_stream(pae);
