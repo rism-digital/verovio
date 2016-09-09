@@ -1,0 +1,32 @@
+<measure n="1">
+  <staff n="1">
+    <layer n="1">
+      <rest dur="2"/>
+      <note dots="1" dur="2" oct="4" pname="c" accid.ges="n"/>
+      <note dur="4" oct="4" pname="d" accid.ges="n"/>
+      <note dur="4" oct="4" pname="e" accid.ges="n"/>
+      <note dur="4" oct="4" pname="f" accid.ges="n"/>
+    </layer>
+  </staff>
+  <staff n="2">
+    <layer n="1">
+      <note dur="1" oct="4" pname="g" accid.ges="n"/>
+      <note dots="1" dur="2" oct="4" pname="c" accid.ges="n"/>
+      <note dur="4" oct="4" pname="d" accid.ges="n"/>
+    </layer>
+  </staff>
+  <staff n="3">
+    <layer n="1">
+      <note dur="2" oct="3" pname="g" accid.ges="n"/>
+      <note dots="1" dur="2" oct="4" pname="g" accid.ges="n"/>
+      <note dur="4" oct="4" pname="f" accid.ges="n"/>
+      <note dur="4" oct="4" pname="e" accid.ges="n"/>
+      <note dur="4" oct="4" pname="d" accid.ges="n"/>
+    </layer>
+  </staff>
+  <harm place="below" staff="3" tstamp="1">G</harm>
+  <harm place="below" staff="3" tstamp="3">X</harm>
+  <harm place="below" staff="3" tstamp="6">D2</harm>
+  <harm place="below" staff="3" tstamp="7">C0</harm>
+  <harm place="below" staff="3" tstamp="8">D0</harm>
+</measure>

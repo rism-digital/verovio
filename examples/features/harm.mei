@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Piano pedal example</title>
+            </titleStmt>
+            <pubStmt/>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp symbol="bracket">
+                            <staffDef n="1" lines="5" clef.shape="G" clef.line="2" />
+                            <staffDef n="2" lines="5" clef.shape="G" clef.line="2" clef.dis="8" clef.dis.place="below" />
+                            <staffDef n="3" lines="5" clef.shape="G" clef.line="2" clef.dis="8" clef.dis.place="below" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1" label="feature-example">
+                            <staff n="1">
+                                <layer n="1">
+                                    <rest dur="2" />
+                                    <note dots="1" dur="2" oct="4" pname="c" accid.ges="n" />
+                                    <note dur="4" oct="4" pname="d" accid.ges="n" />
+                                    <note dur="4" oct="4" pname="e" accid.ges="n" />
+                                    <note dur="4" oct="4" pname="f" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note dur="1" oct="4" pname="g" accid.ges="n" />
+                                    <note dots="1" dur="2" oct="4" pname="c" accid.ges="n" />
+                                    <note dur="4" oct="4" pname="d" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note dur="2" oct="3" pname="g" accid.ges="n" />
+                                    <note dots="1" dur="2" oct="4" pname="g" accid.ges="n" />
+                                    <note dur="4" oct="4" pname="f" accid.ges="n" />
+                                    <note dur="4" oct="4" pname="e" accid.ges="n" />
+                                    <note dur="4" oct="4" pname="d" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <harm place="below" staff="3" tstamp="1">G</harm>
+                            <harm place="below" staff="3" tstamp="3">X</harm>
+                            <harm place="below" staff="3" tstamp="6">D2</harm>
+                            <harm place="below" staff="3" tstamp="7">C0</harm>
+                            <harm place="below" staff="3" tstamp="8">D0</harm>
+                        </measure>
+                        <measure n="2">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="2" oct="4" pname="g" accid.ges="n" />
+                                    <note dur="2" oct="4" pname="a" accid.ges="n" />
+                                    <note dur="2" oct="4" pname="b" accid.ges="n" />
+                                    <note dur="2" oct="5" pname="c" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note dur="2" oct="4" pname="e" accid.ges="n" />
+                                    <note dur="2" oct="4" pname="f" accid.ges="n" />
+                                    <note dur="1" oct="4" pname="g" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note dur="4" oct="4" pname="c" accid.ges="n" />
+                                    <note dur="4" oct="3" pname="b" accid.ges="n" />
+                                    <note dur="2" oct="3" pname="a" accid.ges="n" />
+                                    <note dur="2" oct="3" pname="g" accid.ges="n" />
+                                    <note dur="2" oct="3" pname="a" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <harm place="below" staff="3" tstamp="1">C0</harm>
+                            <harm place="below" staff="3" tstamp="2">E2</harm>
+                            <harm place="below" staff="3" tstamp="3">F1</harm>
+                            <harm place="below" staff="3" tstamp="5">G0</harm>
+                            <harm place="below" staff="3" tstamp="7">A0</harm>
+                        </measure>
+                        <measure n="3">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dur="2" oct="5" pname="d" accid.ges="n" />
+                                    <note dots="1" dur="2" oct="5" pname="e" accid.ges="n" />
+                                    <note dur="4" oct="5" pname="d" accid.ges="n" />
+                                    <note dur="4" oct="4" pname="e" accid.ges="n" />
+                                    <note dur="4" oct="4" pname="f" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note dur="2" oct="3" pname="g" accid.ges="n" />
+                                    <note dots="1" dur="2" oct="4" pname="c" accid.ges="n" />
+                                    <note dur="4" oct="3" pname="b" accid.ges="n" />
+                                    <note dur="4" oct="4" pname="c" accid.ges="n" />
+                                    <note dur="4" oct="4" pname="d" accid.ges="n" />
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note dur="2" oct="3" pname="b" accid.ges="n" />
+                                    <note dur="2" oct="4" pname="c" accid.ges="n" />
+                                    <rest dur="2" />
+                                    <note dur="2" oct="4" pname="c" accid.ges="n"/>
+                                </layer>
+                            </staff>
+                            <harm place="below" staff="3" tstamp="1">G0</harm>
+                            <harm place="below" staff="3" tstamp="3">C0</harm>
+                            <harm place="below" staff="3" tstamp="7">C0</harm>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
