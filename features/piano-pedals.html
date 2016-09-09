@@ -1,0 +1,34 @@
+---
+---
+<h4>Piano pedals</h4>
+
+<p>
+    Verovio supports <code>&lt;pedal&gt;</code> for piano pedals. Currently only <code>up</code> and <code>down</code> values are supported for the <code>@dir</code> attribute. The <code>@form="line"</code> is not supported at this stage.
+</p>
+
+<div id="svg_output-1" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code1" file="piano-pedal.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/piano-pedal.txt %}
+{% endhighlight %}
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+    zoom = 40;
+    pageWidth = 1500;
+    
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
+    
+    $.get( "{{ site.baseurl }}/examples/features/piano-pedal.mei" , function( data ) {
+        load_data( data, $('#svg_output-1') );
+    });
+//]]>
+</script>
+

@@ -1,0 +1,55 @@
+<measure n="1" xml:id="d414233e9">
+  <staff n="1">
+    <layer n="1">
+      <rest xml:id="d414233e30" dur="8"/>
+      <beam>
+        <note xml:id="d414233e38" pname="f" oct="4" dur="8" stem.dir="up">
+          <artic artic="stacc" place="below"/>
+        </note>
+        <note xml:id="d414233e62" pname="g" oct="4" dur="8" stem.dir="up">
+          <artic artic="stacc" place="below"/>
+        </note>
+      </beam>
+      <rest xml:id="d414233e81" dur="8"/>
+      <beam>
+        <note xml:id="d414233e89" pname="a" oct="4" dur="8" stem.dir="up" accid.ges="f">
+          <artic artic="stacc" place="below"/>
+        </note>
+        <note xml:id="d414233e110" pname="b" oct="4" dur="8" stem.dir="up" accid.ges="f">
+          <artic artic="stacc" place="below"/>
+        </note>
+      </beam>
+    </layer>
+  </staff>
+  <staff n="2">
+    <layer n="1">
+      <beam>
+        <note xml:id="d414233e148" pname="f" oct="2" dur="16" stem.dir="down"/>
+        <note xml:id="d414233e166" pname="c" oct="3" dur="16" stem.dir="down"/>
+        <note xml:id="d414233e184" pname="a" oct="3" dur="16" stem.dir="down" accid.ges="f"/>
+        <note xml:id="d414233e204" pname="c" oct="3" dur="16" stem.dir="down"/>
+        <note xml:id="d414233e222" pname="b" oct="3" dur="16" stem.dir="down" accid.ges="f"/>
+        <note xml:id="d414233e242" pname="c" oct="3" dur="16" stem.dir="down"/>
+      </beam>
+      <beam>
+        <note xml:id="d414233e260" pname="f" oct="2" dur="16" stem.dir="down"/>
+        <note xml:id="d414233e279" pname="c" oct="3" dur="16" stem.dir="down"/>
+        <note xml:id="d414233e297" pname="c" oct="4" dur="16" stem.dir="down"/>
+        <note xml:id="d414233e315" pname="c" oct="3" dur="16" stem.dir="down"/>
+        <note xml:id="d414233e333" pname="d" oct="4" dur="16" stem.dir="down" accid.ges="f"/>
+        <note xml:id="d414233e353" pname="c" oct="3" dur="16" stem.dir="down"/>
+      </beam>
+    </layer>
+  </staff>
+  <dynam staff="1" place="below" tstamp="1">p</dynam>
+  <dir staff="2" place="below" tstamp="1">legatissimo</dir>
+  <tempo staff="1" place="above" tstamp="1">Allegro molto agitato</tempo>
+  <slur curvedir="below" startid="#d414233e38" endid="#d414233e62"/>
+  <slur curvedir="below" startid="#d414233e89" endid="#d414233e110"/>
+  <slur curvedir="above" startid="#d414233e148" endid="#d414233e242"/>
+  <slur curvedir="above" startid="#d414233e260" endid="#d414233e353"/>
+  <pedal dir="down" staff="2" tstamp="1"/>
+  <pedal dir="up" staff="2" tstamp="3.5"/>
+  <pedal dir="down" staff="2" tstamp="4"/>
+  <pedal dir="up" staff="2" tstamp="6.5"/>
+</measure>
