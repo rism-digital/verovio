@@ -21,15 +21,15 @@
         <body>
             <mdiv>
                 <score>
+                    <scoreDef>
+                        <staffGrp symbol="bracket">
+                            <staffDef  clef.shape="G" clef.line="2" key.sig="1s" meter.count="4" meter.unit="4" n="1" label="Soprano" lines="5" />
+                            <staffDef  clef.shape="G" clef.line="2" key.sig="1s" meter.count="4" meter.unit="4" n="2" label="Alto" lines="5" />
+                            <staffDef  clef.shape="G" clef.line="2" clef.dis="8" clef.dis.place="below" key.sig="1s"  meter.count="4" meter.unit="4" n="3" label="Tenore" lines="5" />
+                            <staffDef  clef.shape="F" clef.line="4" key.sig="1s" meter.count="4" meter.unit="4" n="4" label="Basso" lines="5" />
+                        </staffGrp>
+                    </scoreDef>
                     <section>
-                        <scoreDef>
-                            <staffGrp symbol="bracket">
-                                <staffDef  clef.shape="G" clef.line="2" key.sig="1s" meter.count="4" meter.unit="4" n="1" label="Soprano" lines="5" />
-                                <staffDef  clef.shape="G" clef.line="2" key.sig="1s" meter.count="4" meter.unit="4" n="2" label="Alto" lines="5" />
-                                <staffDef  clef.shape="G" clef.line="2" clef.dis="8" clef.dis.place="below" key.sig="1s"  meter.count="4" meter.unit="4" n="3" label="Tenore" lines="5" />
-                                <staffDef  clef.shape="F" clef.line="4" key.sig="1s" meter.count="4" meter.unit="4" n="4" label="Basso" lines="5" />
-                            </staffGrp>
-                        </scoreDef>
                         <measure  n="1">
                             <staff  n="1">
                                 <layer  n="1">
