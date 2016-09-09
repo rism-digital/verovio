@@ -468,40 +468,65 @@ void HumdrumInput::createHeader(void)
 
     // <fileDesc> /////////////
     pugi::xml_node fileDesc = m_doc->m_header.append_child("fileDesc");
-    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
+    pugi::xml_node filetitle = fileDesc.append_child("titleStmt");
 
-    insertTitle(titleStmt, references);
-    if (respPeople.size() > 0) {
-        insertRespStmt(titleStmt, respPeople);
-    }
+    insertTitle(filetitle, references);
 
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
+    string EED = getReferenceValue("EED", references);
+    if (EED.size()) {
+        pugi::xml_node editor = pubStmt.append_child("persName");
+        editor.append_attribute("role") = "editor";
+        editor.append_child(pugi::node_pcdata).set_value(EED.c_str());
+    }
+    string YEM = getReferenceValue("YEM", references);
+    if (YEM.size()) {
+        pugi::xml_node availability = pubStmt.append_child("availability");
+        pugi::xml_node useRestrict = availability.append_child("useRestrict");
+        useRestrict.append_child(pugi::node_pcdata).set_value(YEM.c_str());
+    }
     pugi::xml_node date = pubStmt.append_child("date");
-
-    // <encodingDesc> /////////
-
-    // <workDesc> /////////////
 
     // <encodingDesc> /////////
     pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
     pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-
+    
     pugi::xml_node p1 = projectDesc.append_child("p");
     p1.append_child(pugi::node_pcdata)
-        .set_value(StringFormat("Transcoded from Humdrum with Verovio version %s", GetVersion().c_str()).c_str());
+    .set_value(StringFormat("Transcoded from Humdrum with Verovio version %s", GetVersion().c_str()).c_str());
     string ENC = getReferenceValue("ENC", references);
     if (ENC.size()) {
         ENC = "Encoded by: " + ENC;
         pugi::xml_node p2 = projectDesc.append_child("p");
         p2.append_child(pugi::node_pcdata).set_value(ENC.c_str());
     }
-
+    
     string datestr = getDateString();
     date.append_child(pugi::node_pcdata).set_value(datestr.c_str());
 
+    // <sourceDesc> /////////
+    
+    // <extMeta> /////////////
     if (references.size() > 0) {
         insertExtMeta(references);
     }
+    
+    // <workDesc> /////////////
+    pugi::xml_node workDesc = m_doc->m_header.append_child("workDesc");
+    pugi::xml_node work = workDesc.append_child("work");
+    pugi::xml_node identifier= work.append_child("identifier");
+    pugi::xml_node titleStmt = work.append_child("titleStmt");
+    
+    string SCT = getReferenceValue("SCT", references);
+    if (SCT.size()) {
+        identifier.append_child(pugi::node_pcdata).set_value(SCT.c_str());
+    }
+    insertTitle(titleStmt, references);
+    if (respPeople.size() > 0) {
+        insertRespStmt(titleStmt, respPeople);
+    }
+    
+    // pugi::xml_node creation = work.append_child("creation");
 }
 
 //////////////////////////////
@@ -568,21 +593,20 @@ void HumdrumInput::getRespPeople(vector<vector<string> > &respPeople, vector<Hum
 {
 
     // precalculate a reference map here to make more O(N) rather than O(N^2)
-    addPerson(respPeople, references, "COM", "Composer"); // cmp
+    addPerson(respPeople, references, "COM", "composer"); // cmp
     addPerson(respPeople, references, "COA", "attributed composer");
     addPerson(respPeople, references, "COS", "suspected composer");
-    addPerson(respPeople, references, "LYR", "Lyricist"); // lyr
-    addPerson(respPeople, references, "LIB", "Librettist"); // lbt
-    addPerson(respPeople, references, "LAR", "Arranger"); // arr
-    addPerson(respPeople, references, "LOR", "Adapter"); // orchestrator, adp
-    addPerson(respPeople, references, "RPN", "Producer"); // pro
-    addPerson(respPeople, references, "MPN", "Performer"); // prf, also: Singer/Instrumentalist
-    addPerson(respPeople, references, "MCN", "Conductor"); // cnd
-    addPerson(respPeople, references, "ODE", "Dedicatee"); // dte
-    addPerson(respPeople, references, "OCO", "Patron"); // commissioner, pat
-    addPerson(respPeople, references, "OCL", "Collector"); // col
-    addPerson(respPeople, references, "EED", "digital editor");
-    // ENC added to encodingDesc
+    addPerson(respPeople, references, "LYR", "lyricist"); // lyr
+    addPerson(respPeople, references, "LIB", "librettist"); // lbt
+    addPerson(respPeople, references, "LAR", "arranger"); // arr
+    addPerson(respPeople, references, "LOR", "adapter"); // orchestrator, adp
+    addPerson(respPeople, references, "RPN", "producer"); // pro
+    addPerson(respPeople, references, "MPN", "performer"); // prf, also: Singer/Instrumentalist
+    addPerson(respPeople, references, "MCN", "conductor"); // cnd
+    addPerson(respPeople, references, "ODE", "dedicatee"); // dte
+    addPerson(respPeople, references, "OCO", "patron"); // commissioner, pat
+    addPerson(respPeople, references, "OCL", "collector"); // col
+    // EED and ENC added to pubStmt and encodingDesc respectively
     // addPerson(respPeople, references, "ENC", "encoder");           // mrk, Markup editor
 }
 
