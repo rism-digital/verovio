@@ -1,0 +1,23 @@
+<section>
+  <measure n="1" left="rptstart" right="single">
+    <staff n="1">
+      <layer n="1">
+        <multiRest num="3"/>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="1" left="rptboth" right="rptend">
+    <staff n="1">
+      <layer n="1">
+        <multiRest num="7"/>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="1" right="rptstart">
+    <staff n="1">
+      <layer n="1">
+        <multiRest num="5"/>
+      </layer>
+    </staff>
+  </measure>
+</section>
