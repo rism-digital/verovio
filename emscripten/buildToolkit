@@ -226,6 +226,7 @@ sub getSources {
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mensural.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_pagebased.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_shared.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_midi.cpp";
 
 	return join " ", @sources
 }

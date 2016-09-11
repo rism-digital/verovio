@@ -141,7 +141,8 @@ void Doc::Refresh()
 void Doc::ExportMIDI(MidiFile *midiFile)
 {
     CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
-
+    if (m_scoreDef.HasMidiBpm()) calcMaxMeasureDurationParams.m_currentBpm = m_scoreDef.GetMidiBpm();
+    
     // We first calculate the maximum duration of each measure
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
     this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams);
@@ -191,6 +192,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
 
+            if (m_scoreDef.HasMidiBpm()) generateMIDIParams.m_currentBpm = m_scoreDef.GetMidiBpm();
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);
 

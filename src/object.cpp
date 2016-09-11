@@ -223,6 +223,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
     m_parent = NULL;
     m_classid = object.m_classid;
+    m_svgclass = object.m_svgclass;
     m_uuid = object.m_uuid; // for now copy the uuid - to be decided
     m_isModified = true;
 
@@ -244,6 +245,7 @@ Object &Object::operator=(const Object &object)
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
         m_parent = NULL;
         m_classid = object.m_classid;
+        m_svgclass = object.m_svgclass;
         m_uuid = object.m_uuid; // for now copy the uuid - to be decided
         m_isModified = true;
 
@@ -341,6 +343,29 @@ void Object::SetUuid(std::string uuid)
 {
     m_uuid = uuid;
 };
+
+std::string Object::GetSVGClass(void)
+{
+    return m_svgclass;
+}
+
+void Object::SetSVGClass(const std::string &classcontent)
+{
+    m_svgclass = classcontent;
+}
+
+void Object::AddSVGClass(const std::string &classname)
+{
+    if (HasSVGClass()) {
+        m_svgclass += " ";
+    }
+    m_svgclass += classname;
+}
+
+bool Object::HasSVGClass(void)
+{
+    return !m_svgclass.empty();
+}
 
 void Object::ClearChildren()
 {

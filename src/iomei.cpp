@@ -161,6 +161,10 @@ std::string MeiOutput::GetOutput(int page)
 
 bool MeiOutput::WriteObject(Object *object)
 {
+    if (object->HasComment()) {
+        m_currentNode.append_child(pugi::node_comment).set_value(object->GetComment().c_str());
+    }
+
     // Containers and scoreDef related
     if (object->Is() == DOC) {
         WriteMeiDoc(dynamic_cast<Doc *>(object));
@@ -1084,6 +1088,7 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteMensuralShared(element);
     interface->WriteMeterSigDefaultLog(element);
     interface->WriteMeterSigDefaultVis(element);
+    interface->WriteMiditempo(element);
     interface->WriteMultinummeasures(element);
 }
 
@@ -2761,6 +2766,7 @@ bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadMensuralShared(element);
     interface->ReadMeterSigDefaultLog(element);
     interface->ReadMeterSigDefaultVis(element);
+    interface->ReadMiditempo(element);
     interface->ReadMultinummeasures(element);
     return true;
 }
