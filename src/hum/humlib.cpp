@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Sep  2 13:07:18 CEST 2016
+// Last Modified: Wed Sep  7 23:43:43 CEST 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -6041,6 +6041,9 @@ HumdrumLine::HumdrumLine(void) : string() {
 
 HumdrumLine::HumdrumLine(const string& aString) : string(aString) {
 	owner = NULL;
+	if ((this->size() > 0) && (this->back() == 0x0d)) {
+		this->resize(this->size() - 1);
+	}
 	duration = -1;
 	durationFromStart = -1;
 	setPrefix("!!");
@@ -6048,6 +6051,9 @@ HumdrumLine::HumdrumLine(const string& aString) : string(aString) {
 
 HumdrumLine::HumdrumLine(const char* aString) : string(aString) {
 	owner = NULL;
+	if ((this->size() > 0) && (this->back() == 0x0d)) {
+		this->resize(this->size() - 1);
+	}
 	duration = -1;
 	durationFromStart = -1;
 	setPrefix("!!");
@@ -6079,33 +6085,47 @@ void HumdrumLine::setLineFromCsv(const char* csv, const string& separator) {
 }
 
 
+
 void HumdrumLine::setLineFromCsv(const string& csv, const string& separator) {
 	if (csv.size() < 1) {
 		return;
 	}
+	string newcsv = csv;
+	if ((newcsv.size() > 0) && (newcsv.back() == 0x0d)) {
+		newcsv.resize(newcsv.size() - 1);
+	}
 	// construct tab-delimited string
 	string output;
 	bool inquote = false;
-	for (int i=0; i<(int)csv.size(); i++) {
-		if ((csv[i] == '"') && !inquote) {
+
+	if ((newcsv.size() >= 2) && (newcsv[0] == '!') && (newcsv[1] == '!')) {
+		// Global commands and reference records which do not start with a
+		// quote are considered to be literal.
+		*this = newcsv;
+		return;
+	}
+
+	for (int i=0; i<(int)newcsv.size(); i++) {
+		if ((newcsv[i] == '"') && !inquote) {
 			inquote = true;
 			continue;
 		}
-		if (inquote && (csv[i] == '"') && (i < (int)csv.length()-1)) {
+		if (inquote && (newcsv[i] == '"') && (newcsv[i+1] == '"') 
+				&& (i < (int)newcsv.length()-1)) {
 			output += '"';
 			i++;
 			continue;
 		}
-		if (csv[i] == '"') {
+		if (newcsv[i] == '"') {
 			inquote = false;
 			continue;
 		}
-		if ((!inquote) && (csv.substr(i, separator.size()) == separator)) {
+		if ((!inquote) && (newcsv.substr(i, separator.size()) == separator)) {
 			output += '\t';
 			i += separator.size() - 1;
 			continue;
 		}
-		output += csv[i];
+		output += newcsv[i];
 	}
 	string& value = *this;
 	value = output;

@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Sep  2 11:04:59 CEST 2016
+// Last Modified: Wed Sep  7 23:43:43 CEST 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1103,7 +1103,7 @@ class HumdrumFileBase : public HumHash {
 		             ~HumdrumFileBase              ();
 
 		bool          read                         (istream& contents);
-		bool          read                         (const char*   filename);
+		bool          read                         (const char* filename);
 		bool          read                         (const string& filename);
 		bool          readCsv                      (istream& contents,
 		                                            const string& separator=",");
@@ -1112,9 +1112,9 @@ class HumdrumFileBase : public HumHash {
 		bool          readCsv                      (const string& contents,
 		                                            const string& separator=",");
 
-		bool          readString                   (const char*   contents);
+		bool          readString                   (const char* contents);
 		bool          readString                   (const string& contents);
-		bool          readStringCsv                (const char*   contents,
+		bool          readStringCsv                (const char* contents,
 		                                            const string& separator=",");
 		bool          readStringCsv                (const string& contents,
 		                                            const string& separator=",");
@@ -1124,7 +1124,7 @@ class HumdrumFileBase : public HumHash {
 		void          setQuietParsing              (void);
 		void          setNoisyParsing              (void);
 
-		bool    parse    (istream& contents)         { return read(contents); }
+		bool    parse    (istream& contents)      { return read(contents); }
 		bool    parse    (const char* contents)   { return readString(contents); }
 		bool    parse    (const string& contents) { return readString(contents); }
 		bool    parseCsv (istream& contents, const string& separator = ",") {

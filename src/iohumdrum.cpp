@@ -330,7 +330,7 @@ bool HumdrumInput::ImportFile()
 // HumdrumInput::ImportString -- Read a Humdrum file from a text string.
 //
 
-bool HumdrumInput::ImportString(const std::string content)
+bool HumdrumInput::ImportString(std::string content)
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
@@ -338,7 +338,42 @@ bool HumdrumInput::ImportString(const std::string content)
     try {
         m_doc->Reset();
         HumdrumFile &infile = m_infile;
-        bool result = infile.readString(content);
+
+        // Auto-detect CSV Humdrum file. Maybe later move to the humlib parser.
+        string exinterp;
+        bool found = false;
+        int comma = 0;
+        int tab = 0;
+        for (int i = 0; i < (int)content.size() - 3; i++) {
+            if (content[i] == '\n' && content[i + 1] == '*' && content[i + 2] == '*') {
+                found = true;
+                i += 2;
+                exinterp = "**";
+                continue;
+            }
+            if (!found) {
+                continue;
+            }
+            if (content[i] == 0x0a) {
+                break;
+            }
+            exinterp.push_back(content[i]);
+            if (content[i] == '\t') {
+                tab++;
+            }
+            if (content[i] == ',') {
+                comma++;
+            }
+        }
+
+        bool result;
+        if (comma < tab) {
+            result = infile.readString(content);
+        }
+        else {
+            result = infile.readStringCsv(content);
+        }
+
         if (!result) {
             return false;
         }
@@ -1169,7 +1204,7 @@ void HumdrumInput::setClef(StaffDef *part, const string &clef)
     }
     if (clef.find("clefX") != string::npos) {
         part->SetClefShape(CLEFSHAPE_perc);
-		// by default place on 3rd line (unless another numbe is given):
+        // by default place on 3rd line (unless another numbe is given):
         part->SetClefLine(3);
     }
 
@@ -2550,7 +2585,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             continue;
         }
         indexmapping.push_back(i);
-        indexmapping2.push_back(indexmapping.size() - 1);
+        indexmapping2.push_back((int)indexmapping.size() - 1);
         duritems.push_back(layerdata[i]);
         durbeamnum.push_back(beamnum[i]);
     }
@@ -2734,7 +2769,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         // At a tuplet which is not already in a tuplet group
         // search for how long the group should occur.
         j = i + 1;
-        int ending = poweroftwo.size() - 1;
+        int ending = (int)poweroftwo.size() - 1;
         ;
         groupdur = 0;
         while (j < (int)poweroftwo.size()) {
@@ -3158,7 +3193,7 @@ void HumdrumInput::convertChord(Chord *chord, HTp token, int staffindex)
     }
 
     token->setValue("MEI", "xml:id", chord->GetUuid());
-    int index = m_measures.size() - 1;
+    int index = (int)m_measures.size() - 1;
     token->setValue("MEI", "measureIndex", index);
 }
 
@@ -3332,7 +3367,7 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
     }
 
     token->setValue("MEI", "xml:id", rest->GetUuid());
-    int index = m_measures.size() - 1;
+    int index = (int)m_measures.size() - 1;
     token->setValue("MEI", "measureIndex", index);
 }
 
@@ -3479,7 +3514,7 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
     // maybe organize by sub-token index, but consider as chord for now
     if (!chordQ) {
         token->setValue("MEI", "xml:id", note->GetUuid());
-        int index = m_measures.size() - 1;
+        int index = (int)m_measures.size() - 1;
         token->setValue("MEI", "measureIndex", index);
     }
 }
