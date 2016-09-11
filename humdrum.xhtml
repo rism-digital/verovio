@@ -6,12 +6,21 @@ other-active: humdrum
 version-footer: true
 ---
 
+<style>
+
+[id$="-code"]
+{
+	tab-size: 18;
+}
+
+</style>
+
 <script type="text/javascript">
 //<![CDATA[
 
-    var zoom = 40;
-    var pageHeight = 2970;
-    var pageWidth = 1400;
+    var zoom = 33.5;
+    var pageHeight = 1000;
+    var pageWidth = 2000;
     var spacingStaff = 0;
     var border = 20;
     var adjustPageHeight = 1;
@@ -29,57 +38,8 @@ version-footer: true
                 });
 
         var svg = vrvToolkit.renderData( data, options );
-        console.log( svg );
-        output_div.html(kern);
+        output_div.html( svg );
     }
-    
-    var kern = 
-    
-"**kern	**dynam	**kern	**dynam\n\
-*staff2	*	*staff1	*staff1/2\n\
-*>[A,A,B,B]	*	*>[A,A,B,B]	*>[A,A,B,B]\n\
-*>norep[A,B]	*	*>norep[A,B]	*>norep[A,B]\n\
-*>A	*	*>A	*>A\n\
-*clefF4	*	*clefG2	*clefG2\n\
-*k[b-]	*	*k[b-]	*k[b-]\n\
-*F:	*	*F:	*F:\n\
-*M3/4	*	*M3/4	*M3/4\n\
-*MM152	*	*MM152	*MM152\n\
-=1-	=1-	=1-	=1-\n\
-4FF/ 4F/	.	4c:/ 4f:/ 4a:/ 4cc:/	f\n\
-4C/	.	4a/ 4cc/	.\n\
-4AA/	.	4a/ 4cc/	.\n\
-=2	=2	=2	=2\n\
-4FF/	.	4.a/ 4.cc/	.\n\
-4FFF/	.	.	.\n\
-.	.	(16dd\LL	.\n\
-.	.	16cc\JJ	.\n\
-4r	.	16b-/LL	.\n\
-.	.	16a/	.\n\
-.	.	16g/	.\n\
-.	.	16f/JJ	.\n\
-=3	=3	=3	=3\n\
-8F\ 8A\L	.	4ff\	.\n\
-8F\ 8A\	.	.	.\n\
-8F\ 8G\ 8B-\	.	4ee\	.\n\
-8F\ 8G\ 8B-\	.	.	.\n\
-8F\ 8A\ 8c\	.	4ee-\)	.\n\
-8F\ 8A\ 8c\J	.	.	.\n\
-=4	=4	=4	=4\n\
-8F\ 8B-\ 8d\L	.	4dd\	.\n\
-8F\ 8B-\ 8d\	.	.	.\n\
-8F\ 8B-\ 8d\	.	4r	.\n\
-8F\ 8B-\ 8d\	.	.	.\n\
-8F\ 8B-\ 8d\	.	4r	.\n\
-8F\ 8B-\ 8d\J	.	.	.\n\
-=5	=5	=5	=5\n\
-8F\ 8G\ 8e\L	.	(8cc\L	p\n\
-8F\ 8G\ 8e\	.	8b-\J)	.\n\
-8F\ 8G\ 8e\	.	4b-'\	.\n\
-8F\ 8G\ 8e\	.	.	.\n\
-8F\ 8G\ 8e\	.	4r	.\n\
-8F\ 8G\ 8e\J	.	.	.\n\
-*-	*-	*-	*-\n";
 
 //]]>
 </script>
@@ -94,18 +54,51 @@ version-footer: true
     
     <div class="col-md-9">
         <div class="panel-body">
-            
             <h3>Humdrum Input</h3>
-            
             <p>
-                Verovio can load Humdrum data.
+                Verovio can load Humdrum data.  The following example from Mozart's piano sonata in 
+                F major, K<sup>1</sup>&#160;280 (K<sup>6</sup>&#160;189e), mvmt.&#160;1, is generated dynamically inside this page from
+                the Humdum data that follows.
             </p>
             
-            <div id="humdrum" style="overflow:auto;"/>
-            <p>
-                <div class="highlight"><pre><code id="humdrum-code"></code></pre></div>
+            <div id="humdrum1-svg" style="overflow:auto;"/>
+
+            <p> 
+            The data consists of three data streams, called <i>spines</i>.  The first column represents music on the
+            bottom staff, the second column represents the top staff and the third column contains the
+            dynamics which in this case apply to both staves.
             </p>
-            
+
+            <p>
+                <div class="highlight"><pre><code id="humdrum1-code"></code></pre></div>
+            </p>
+
+
+            <p>
+            View the full score in the interactive
+            <a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn">Verovio Humdrum Viewer</a>,
+            which is a special-purpose web interface to Verovio for Humdrum data.
+            When on a VHV page, try pressing the key "p" to view the scan of the original print.  Also try pressing "m"
+            to view the internal conversion to MEI data.
+            </p>
+
+            <p>
+            The above data is in the standard tab-separated-value (TSV) format for Humdrum data.  For situations where
+            tabs may be munged, Verovio can also import Humdrum data in the comma-separated-value (CSV) format:
+
+            <p>
+                <div id="humdrum2-svg" style="overflow:auto;"/>
+                <div class="highlight"><pre><code id="humdrum2-code"></code></pre></div>
+            </p>
+
+            <p>
+            In the <a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn">Verovio Humdrum Viewer</a>, 
+            try pressing the comma key "," to toggle between TSV and CSV versions of the Humdrum data.
+            </p>
+
+
+            </p>
+
         </div>
     </div>
     
@@ -115,16 +108,145 @@ version-footer: true
 //<![CDATA[
 
     $( document ).ready(function() {
-        
-        // adjust the zoom for small screens
-        width = $('#svg_pae1').width();
-        if ( width < zoom * pageWidth / 100 ) {
-            zoom = width * 100 / pageWidth;
-        }
-        
-        $('#humdrum-code').html(kern);
-        load_data( kern, $("#humdrum") );
-    
+        renderAllExamples();
     });
+
+
+    $( window ).resize(function() {
+        renderAllExamples();
+    });
+
+
+    function renderAllExamples() {
+        var examples = getExampleNumbers();
+        for (var i=0; i<examples.length; i++) {
+            var selector = "#humdrum" + examples[i];
+            var kern = $(selector + "-data").text();
+            var targetWidth = $(selector + "-code").parent().width();
+            if ( (targetWidth > 0) ) {
+                zoom = (targetWidth + border * 2)/ pageWidth * 100;
+            }
+            $(selector + '-code').html(kern);
+            load_data( $(selector + "-data").text(), $(selector + "-svg") );
+        }
+    }
+
+    function getExampleNumbers() {
+       var nums = {};
+       var list = document.querySelectorAll("[id^='humdrum']");
+       var matches;
+       for (var i=0; i<list.length; i++) {
+          if (matches = list[i].id.match(/humdrum(\d+)/)) {
+             nums[matches[1]] = 1;
+          }
+       }
+       return Object.keys(nums);
+    }
+
 //]]>
 </script>
+
+
+<script id="humdrum1-data" type="text/x-humdrum">!!!COM: Mozart, Wolfgang Amadeus
+!!!OTL: Piano Sonata No. 2 in F major
+!!!OMV: 1
+!!!SCT1: K<sup>1</sup> 280
+!!!SCT2: K<sup>6</sup> 189e
+!!!OMD: Allegro assai
+**kern	**kern	**dynam
+*staff2	*staff1	*staff1/2
+*clefF4	*clefG2	*clefG2
+*k[b-]	*k[b-]	*k[b-]
+*F:	*F:	*F:
+*M3/4	*M3/4	*M3/4
+*MM152	*MM152	*MM152
+=1-	=1-	=1-
+4FF 4F	4c: 4f: 4a: 4cc:	f
+4C	4a/ 4cc/	.
+4AA	4a/ 4cc/	.
+=2	=2	=2
+4FF	4.a/ 4.cc/	.
+4FFF	.	.
+.	(16ddLL	.
+.	16ccJJ	.
+4r	16b-LL	.
+.	16a	.
+.	16g	.
+.	16fJJ	.
+=3	=3	=3
+8F 8AL	4ff	.
+8F 8A	.	.
+8F 8G 8B-	4ee	.
+8F 8G 8B-	.	.
+8F 8A 8c	4ee-)	.
+8F 8A 8cJ	.	.
+=4	=4	=4
+8F 8B- 8dL	4dd	.
+8F 8B- 8d	.	.
+8F 8B- 8d	4r	.
+8F 8B- 8d	.	.
+8F 8B- 8d	4r	.
+8F 8B- 8dJ	.	.
+=5	=5	=5
+8F 8G 8eL	(8ccL	p
+8F 8G 8e	8b-J)	.
+8F 8G 8e	4b-'	.
+8F 8G 8e	.	.
+8F 8G 8e	4r	.
+8F 8G 8eJ	.	.
+=6	=6	=6
+*-	*-	*-
+</script>
+
+<script id="humdrum2-data" type="text/x-humdrum">!!!COM: Mozart, Wolfgang Amadeus
+!!!OTL: Piano Sonata No. 2 in F major
+!!!OMV: 1
+!!!SCT1: K1 280
+!!!SCT2: K6 189e
+!!!OMD: Allegro assai
+**kern,**kern,**dynam
+*staff2,*staff1,*staff1/2
+*clefF4,*clefG2,*clefG2
+*k[b-],*k[b-],*k[b-]
+*F:,*F:,*F:
+*M3/4,*M3/4,*M3/4
+*MM152,*MM152,*MM152
+=1-,=1-,=1-
+4FF 4F,4c: 4f: 4a: 4cc:,f
+4C,4a/ 4cc/,.
+4AA,4a/ 4cc/,.
+=2,=2,=2
+4FF,4.a/ 4.cc/,.
+4FFF,.,.
+.,(16ddLL,.
+.,16ccJJ,.
+4r,16b-LL,.
+.,16a,.
+.,16g,.
+.,16fJJ,.
+=3,=3,=3
+8F 8AL,4ff,.
+8F 8A,.,.
+8F 8G 8B-,4ee,.
+8F 8G 8B-,.,.
+8F 8A 8c,4ee-),.
+8F 8A 8cJ,.,.
+=4,=4,=4
+8F 8B- 8dL,4dd,.
+8F 8B- 8d,.,.
+8F 8B- 8d,4r,.
+8F 8B- 8d,.,.
+8F 8B- 8d,4r,.
+8F 8B- 8dJ,.,.
+=5,=5,=5
+8F 8G 8eL,(8ccL,p
+8F 8G 8e,8b-J),.
+8F 8G 8e,4b-',.
+8F 8G 8e,.,.
+8F 8G 8e,4r,.
+8F 8G 8eJ,.,.
+=6,=6,=6
+*-,*-,*-
+</script>
+
+
