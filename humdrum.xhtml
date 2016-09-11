@@ -1,0 +1,130 @@
+---
+layout: verovio
+title: Humdrum Input
+active: other-formats
+other-active: humdrum
+version-footer: true
+---
+
+<script type="text/javascript">
+//<![CDATA[
+
+    var zoom = 40;
+    var pageHeight = 2970;
+    var pageWidth = 1400;
+    var spacingStaff = 0;
+    var border = 20;
+    var adjustPageHeight = 1;
+    var vrvToolkit = new verovio.toolkit();
+
+    function load_data(data, output_div) {
+        options = JSON.stringify({
+                    inputFormat: 'humdrum',
+                    pageHeight: pageHeight,
+                    pageWidth: pageWidth,
+                    adjustPageHeight: adjustPageHeight,
+                    spacingStaff: spacingStaff,
+                    border: border,
+                    scale: zoom
+                });
+
+        var svg = vrvToolkit.renderData( data, options );
+        console.log( svg );
+        output_div.html(kern);
+    }
+    
+    var kern = 
+    
+"**kern	**dynam	**kern	**dynam\n\
+*staff2	*	*staff1	*staff1/2\n\
+*>[A,A,B,B]	*	*>[A,A,B,B]	*>[A,A,B,B]\n\
+*>norep[A,B]	*	*>norep[A,B]	*>norep[A,B]\n\
+*>A	*	*>A	*>A\n\
+*clefF4	*	*clefG2	*clefG2\n\
+*k[b-]	*	*k[b-]	*k[b-]\n\
+*F:	*	*F:	*F:\n\
+*M3/4	*	*M3/4	*M3/4\n\
+*MM152	*	*MM152	*MM152\n\
+=1-	=1-	=1-	=1-\n\
+4FF/ 4F/	.	4c:/ 4f:/ 4a:/ 4cc:/	f\n\
+4C/	.	4a/ 4cc/	.\n\
+4AA/	.	4a/ 4cc/	.\n\
+=2	=2	=2	=2\n\
+4FF/	.	4.a/ 4.cc/	.\n\
+4FFF/	.	.	.\n\
+.	.	(16dd\LL	.\n\
+.	.	16cc\JJ	.\n\
+4r	.	16b-/LL	.\n\
+.	.	16a/	.\n\
+.	.	16g/	.\n\
+.	.	16f/JJ	.\n\
+=3	=3	=3	=3\n\
+8F\ 8A\L	.	4ff\	.\n\
+8F\ 8A\	.	.	.\n\
+8F\ 8G\ 8B-\	.	4ee\	.\n\
+8F\ 8G\ 8B-\	.	.	.\n\
+8F\ 8A\ 8c\	.	4ee-\)	.\n\
+8F\ 8A\ 8c\J	.	.	.\n\
+=4	=4	=4	=4\n\
+8F\ 8B-\ 8d\L	.	4dd\	.\n\
+8F\ 8B-\ 8d\	.	.	.\n\
+8F\ 8B-\ 8d\	.	4r	.\n\
+8F\ 8B-\ 8d\	.	.	.\n\
+8F\ 8B-\ 8d\	.	4r	.\n\
+8F\ 8B-\ 8d\J	.	.	.\n\
+=5	=5	=5	=5\n\
+8F\ 8G\ 8e\L	.	(8cc\L	p\n\
+8F\ 8G\ 8e\	.	8b-\J)	.\n\
+8F\ 8G\ 8e\	.	4b-'\	.\n\
+8F\ 8G\ 8e\	.	.	.\n\
+8F\ 8G\ 8e\	.	4r	.\n\
+8F\ 8G\ 8e\J	.	.	.\n\
+*-	*-	*-	*-\n";
+
+//]]>
+</script>
+
+<div class="row">
+    
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include other-sidebar.html %}
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="panel-body">
+            
+            <h3>Humdrum Input</h3>
+            
+            <p>
+                Verovio can load Humdrum data.
+            </p>
+            
+            <div id="humdrum" style="overflow:auto;"/>
+            <p>
+                <div class="highlight"><pre><code id="humdrum-code"></code></pre></div>
+            </p>
+            
+        </div>
+    </div>
+    
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+    $( document ).ready(function() {
+        
+        // adjust the zoom for small screens
+        width = $('#svg_pae1').width();
+        if ( width < zoom * pageWidth / 100 ) {
+            zoom = width * 100 / pageWidth;
+        }
+        
+        $('#humdrum-code').html(kern);
+        load_data( kern, $("#humdrum") );
+    
+    });
+//]]>
+</script>
