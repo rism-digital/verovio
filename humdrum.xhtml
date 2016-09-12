@@ -4,133 +4,229 @@ title: Humdrum Input
 active: other-formats
 other-active: humdrum
 version-footer: true
+vim: ts=3
 ---
 
 <style>
 
-[id$="-code"]
-{
+[id$="-code"] {
 	tab-size: 18;
+}
+
+#repdiv {
+	padding-top: 60px;
+}
+
+#repdiv ul {
+	margin: 0;
+	padding: 0;
 }
 
 </style>
 
-<script type="text/javascript">
-//<![CDATA[
-
-    var zoom = 33.5;
-    var pageHeight = 1000;
-    var pageWidth = 2000;
-    var spacingStaff = 0;
-    var border = 20;
-    var adjustPageHeight = 1;
-    var vrvToolkit = new verovio.toolkit();
-
-    function load_data(data, output_div) {
-        options = JSON.stringify({
-                    inputFormat: 'humdrum',
-                    pageHeight: pageHeight,
-                    pageWidth: pageWidth,
-                    adjustPageHeight: adjustPageHeight,
-                    spacingStaff: spacingStaff,
-                    border: border,
-                    scale: zoom
-                });
-
-        var svg = vrvToolkit.renderData( data, options );
-        output_div.html( svg );
-    }
-
-//]]>
-</script>
-
 <div class="row">
-    
-    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
-        <div class="panel panel-default">
-            {% include other-sidebar.html %}
-        </div>
-    </div>
-    
-    <div class="col-md-9">
-        <div class="panel-body">
-            <h3>Humdrum Input</h3>
-            <p>
-                Verovio can load <a href="http://www.humdrum.org/" targe="_blanck">Humdrum</a> data.  The following example from Mozart's piano sonata in F major, K<sup>1</sup>&#160;280 (K<sup>6</sup>&#160;189e), mvmt.&#160;1, is generated dynamically inside this page from the Humdum data that follows.
-            </p>
-            
-            <div id="humdrum1-svg" style="overflow:auto;"/>
+	<div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+		<div class="panel panel-default">
+			{% include other-sidebar.html %}
+		</div>
+	</div>
+	
+	<div class="col-md-9">
+		<div class="panel-body">
+			<h3>Humdrum Input</h3>
+			<p>
+				Humdrum data is an analytic music code for transcribing full
+				polyphonic textures.  Humdum syntax presents notes of the score
+				in strict time sequence.  Each row represents all notes sounding or
+				events occurring at a given time, and each column traces the
+				melodic line of the individual parts. More information about the
+				syntax is available on the
+				<a target="_blank" href="http://www.humdrum.org">Humdrum</a>
+				website.
+			</p>
 
-            <p>
-                The data consists of three data streams, called <i>spines</i>.  The first column represents music on the bottom staff, the second column represents the top staff and the third column contains the dynamics which in this case apply to both staves.
-            </p>
+			<p>
+				The following example from Mozart's
+				piano sonata in F major, K<sup>1</sup>&#160;280
+				(K<sup>6</sup>&#160;189e), mvmt.&#160;1, is generated dynamically
+				inside this page from the Humdrum data that follows.
 
-            <p>
-                <div class="highlight"><pre><code id="humdrum1-code"></code></pre></div>
-            </p>
+			</p>
+			
+			<div id="humdrum1-svg" style="overflow:auto;"/>
 
+			<p>
+			The data consists of three separate streams of information, called
+			<i>spines</i> that usually consist of one column, but sometime more.
+			The first column represents music on the bottom staff,
+			the second column represents the top staff, and the third column
+			contains the dynamics, which in this case apply to both staves.
+			</p>
 
-            <p>
-                View the full score in the interactive <a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn">Verovio Humdrum Viewer</a>, which is a special-purpose web interface to Verovio for Humdrum data. When on a VHV page, try pressing the key "p" to view the scan of the original print.  Also try pressing "m" to view the internal conversion to MEI data.
-            </p>
-
-            <p>
-                The above data is in the standard tab-separated-value (TSV) format for Humdrum data.  For situations where tabs may be munged, Verovio can also import Humdrum data in the comma-separated-value (CSV) format:
-            <p>
-                <div id="humdrum2-svg" style="overflow:auto;"/>
-                <div class="highlight"><pre><code id="humdrum2-code"></code></pre></div>
-            </p>
-
-            <p>
-            In the <a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn">Verovio Humdrum Viewer</a>, try pressing the comma key "," to toggle between TSV and CSV versions of the Humdrum data.
-            </p>
+			<p>
+				<div class="highlight"><pre><code id="humdrum1-code"></code></pre></div>
+			</p>
 
 
-            </p>
+			<p>
+			View the full score in the interactive
+			<a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn">Verovio Humdrum Viewer</a>,
+			which is a special-purpose web interface to Verovio for Humdrum data.
+			When on a VHV notation page, try pressing the key "p" to view the scan
+			of the original print from which the musical data was encoded.  Also
+			try pressing "m" to view the internal conversion to MEI data.  Vi users
+			can try pressing "v" to toggle between the basic and vim modes for the
+			text editor.
+			</p>
 
-        </div>
-    </div>
-    
+			<p>
+			The above data is in the standard tab-separated-value (TSV) format for
+			Humdrum data.  For situations where tabs may be munged, Verovio can
+			also import Humdrum data in the comma-separated-value (CSV) format:
+			</p>
+
+			<p>
+				<div id="humdrum2-svg" style="overflow:auto;"/>
+				<div class="highlight"><pre><code id="humdrum2-code"></code></pre></div>
+			</p>
+
+			<p>
+			In the <a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn">Verovio Humdrum Viewer</a>,
+			try pressing the comma key "," to toggle between TSV and CSV versions
+			of the Humdrum data.
+			</p>
+
+			<h4> Command-line usage </h4>
+
+			<p>
+			To typeset music in the Humdrum format on the command-line:
+			{% highlight bash %}
+			$ verovio -f humdrum input.krn -o output.svg
+			{% endhighlight %}
+			</p>
+
+			<p>
+			You can usually use the auto-detection feature of verovio by omitting
+			the <tt>-f</tt> option.
+			{% highlight bash %}
+			$ verovio input.krn -o output.svg
+			{% endhighlight %}
+			</p>
+
+			<p>
+			The output filename will have the same basename as the input if the
+			<tt>-o</tt> option is not given, so in this case the output will be
+			called <tt>file.svg</tt>.
+			{% highlight bash %}
+			$ verovio file.krn
+			{% endhighlight %}
+			</p>
+
+			<p>
+			Standard input/output can be used with the verovio command by giving a
+			dash for standard input and <tt>-o -</tt> to send the output to
+			standad output.
+			{% highlight bash %}
+			$ cat input.krn | verovio - -o - > output.svg
+			{% endhighlight %}
+			</p>
+
+			<p>
+			To convert to MEI data:
+			{% highlight bash %}
+			$ verovio file.krn --no-layout --all-pages -t mei
+			{% endhighlight %}
+			</p>
+
+			<h4> Javascript usage </h4>
+
+			<p>
+			See the
+			<a target="_blank" href="http://www.humdrum.org/vhv-demos">VHV demos</a>
+			website for demonstrations for how to use the JavaScript toolkit
+			version of Verovio specifically when using Humdrum data as input.
+			</p>
+
+			<div style="height:100px;"></div>
+		</div>
+	</div>
+	
 </div>
 
 <script type="text/javascript">
 //<![CDATA[
 
-    $( document ).ready(function() {
-        renderAllExamples();
-    });
+var zoom = 33.5;
+var pageHeight = 1000;
+var pageWidth = 2000;
+var spacingStaff = 0;
+var border = 20;
+var adjustPageHeight = 1;
+var vrvToolkit = new verovio.toolkit();
+
+function load_data(data, output_div) {
+	options = JSON.stringify({
+		inputFormat: 'humdrum',
+		pageHeight: pageHeight,
+		pageWidth: pageWidth,
+		adjustPageHeight: adjustPageHeight,
+		spacingStaff: spacingStaff,
+		border: border,
+		scale: zoom
+	});
+
+	var svg = vrvToolkit.renderData(data, options);
+	output_div.html(svg);
+}
 
 
-    $( window ).resize(function() {
-        renderAllExamples();
-    });
+$(document).ready(function() {
+	displayRepertory();
+	renderAllExamples();
+});
 
 
-    function renderAllExamples() {
-        var examples = getExampleNumbers();
-        for (var i=0; i<examples.length; i++) {
-            var selector = "#humdrum" + examples[i];
-            var kern = $(selector + "-data").text();
-            var targetWidth = $(selector + "-code").parent().width();
-            if ( (targetWidth > 0) ) {
-                zoom = (targetWidth + border * 2)/ pageWidth * 100;
-            }
-            $(selector + '-code').html(kern);
-            load_data( $(selector + "-data").text(), $(selector + "-svg") );
-        }
-    }
+$(window).resize(function() {
+	renderAllExamples();
+});
 
-    function getExampleNumbers() {
-       var nums = {};
-       var list = document.querySelectorAll("[id^='humdrum']");
-       var matches;
-       for (var i=0; i<list.length; i++) {
-          if (matches = list[i].id.match(/humdrum(\d+)/)) {
-             nums[matches[1]] = 1;
-          }
-       }
-       return Object.keys(nums);
-    }
+
+function renderAllExamples() {
+	var examples = getExampleNumbers();
+	for (var i=0; i<examples.length; i++) {
+		var selector = "#humdrum" + examples[i];
+		var kern = $(selector + "-data").text();
+		var targetWidth = $(selector + "-code").parent().width();
+		if ((targetWidth > 0)) {
+			zoom = (targetWidth + border)/ pageWidth * 100;
+		}
+		$(selector + '-code').html(kern);
+		load_data($(selector + "-data").text(), $(selector + "-svg"));
+	}
+}
+
+
+function getExampleNumbers() {
+   var nums = {};
+   var list = document.querySelectorAll("[id^='humdrum']");
+   var matches;
+   for (var i=0; i<list.length; i++) {
+	  if (matches = list[i].id.match(/humdrum(\d+)/)) {
+		 nums[matches[1]] = 1;
+	  }
+   }
+   return Object.keys(nums);
+}
+
+
+function displayRepertory() {
+	var sidebar = document.querySelector("#sidebar");
+	var newdiv = document.createElement("div");
+	newdiv.id = "repdiv";
+	var content = document.querySelector("#repertories").innerHTML;
+	newdiv.innerHTML = content;
+	sidebar.appendChild(newdiv);
+}
 
 //]]>
 </script>
@@ -236,6 +332,31 @@ version-footer: true
 8F 8G 8eJ,.,.
 =6,=6,=6
 *-,*-,*-
+</script>
+
+<script id="repertories" type="text/plain">
+<p>
+Sample repertories of Humdrum data displayed in the Verovio Humdrum Viewer:
+</p>
+
+<p>
+<ul>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=chorales">J.S. Bach chorales</a>
+	(When viewing a chorale, type the "o" letter key to toggle view of the original historic clefs.)
+</li>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas">Mozart piano sonatas</a></li>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=beethoven/sonatas">Beethoven piano sonatas</a></li>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=beethoven/quartets">Beethoven string quartets</a></li>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=cc/chopin/mazurka">Chopin mazurkas</a></li>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=joplin">Works of Scott Joplin</a></li>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=jrp/Jos">Works of Josquin des Prez</a></li>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=jrp/Ock">Works of Johannes Ockeghem</a></li>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=jrp/Rue">Works of Pierre de la Rue</a></li>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=jrp/Ort">Works of Mabrianus de Orto</a></li>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=liederschatz1">Deutscher Liederschatz, Band I</a></li>
+</ul>
+</p>
+
 </script>
 
 
