@@ -111,6 +111,75 @@
     </div>
 </div>
 
+<!-- ***************************** -->
+<h4>Choice markup</h4>
+
+<p>
+    Verovio supports <code>&lt;choice&gt;</code> elements. During rendering, the only one child is rendered. By default, the first child is selected. A specific child can easily be selected using the <code>--choice-xpath-query=QUERY</code> option (<code>choiceXPathQuery</code> with the JavaScript toolkit). The <code>--choice-xpath-query=QUERY</code> option is repeatable with the command-line tool. With the JavaScript toolkit, multiple values can be passed as an array to a <code>choiceXPathQueries</code> option.
+</p>
+
+<p>
+    The example below has three <code>&lt;choice&gt;</code> elements with an <code>&lt;orig&gt;</code> element as first child. It is shown be default (first rendering). In this second rendering the <code>choiceXPathQueries</code> is set to <code>["./corr"]</code> for showing the corrected version. In the third rendering, <code>choiceXPathQueries</code> is set to <code>["./reg", "./corr[@cert='high']"]</code>, which shows the regularized version and the correction but only the one with a high certainty.
+</p>
+
+<div class="row">
+    <div class="col-sm-4">
+        <table>
+            <tr>
+                <td>Original</td>
+            </tr>
+            <tr>
+                <td>
+                    <div id="svg_output-3-1" style="overflow:auto;"/>
+                </td>
+            </tr>
+            <tr>
+                <td><code>[ ]</code></td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-sm-4">
+        <table>
+            <tr>
+                <td>Corrected</td>
+            </tr>
+            <tr>
+                <td>
+                    <div id="svg_output-3-2" style="overflow:auto;"/>
+                </td>
+            </tr>
+            <tr>
+                <td><code>["./corr"]</code></td>
+            </tr>
+        </table>
+    </div>
+    <div class="col-sm-4">
+        <table>
+            <tr>
+                <td>Regularized and corrected (high certainty)</td>
+            </tr>
+            <tr>
+                <td>
+                    <div id="svg_output-3-3" style="overflow:auto;"/>
+                </td>
+            </tr>
+            <tr>
+                <td><code>["./reg", "corr[@cert='high']"]</code></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+
+<div id="svg_output-3" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code3" file="choice.mei" %}
+<div id="code3-xml" style="display: none">
+{% highlight xml %}
+{% include features/editorial2.txt %}
+{% endhighlight %}
+</div>
+
 <script type="text/javascript">
 //<![CDATA[
     zoom = 40;
@@ -124,11 +193,28 @@
     }
     
     $.get( "{{ site.baseurl }}/examples/features/editorial1.mei" , function( data ) {
+        choiceXPathQueries = []
         load_data( data, $('#svg_output-1') );
     });
     
     $.get( "{{ site.baseurl }}/examples/features/editorial2.mei" , function( data ) {
+        choiceXPathQueries = []
         load_data( data, $('#svg_output-2') );
+    });
+    
+    $.get( "{{ site.baseurl }}/examples/features/choice.mei" , function( data ) {
+        choiceXPathQueries = []
+        load_data( data, $('#svg_output-3-1') );
+    });
+
+    $.get( "{{ site.baseurl }}/examples/features/choice.mei" , function( data ) {
+        choiceXPathQueries = ["./corr"]
+        load_data( data, $('#svg_output-3-2') );
+    });
+
+    $.get( "{{ site.baseurl }}/examples/features/choice.mei" , function( data ) {
+        choiceXPathQueries = ["./reg", "corr[@cert='high']"]
+        load_data( data, $('#svg_output-3-3') );
     });
 
 //]]>

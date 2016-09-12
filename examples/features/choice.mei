@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Choice</title>
+            </titleStmt>
+            <pubStmt></pubStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef meter.count="2" meter.unit="4">
+                        <staffGrp>
+                            <staffDef n="1" clef.line="2" clef.shape="G"  lines="5" />
+                        </staffGrp>
+                    </scoreDef>
+                    <section label="feature-example">
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <beam>
+                                        <note pname="f" oct="4" dur="16"/>
+                                        <note pname="a" oct="4" dur="16"/>
+                                        <note pname="c" oct="5" dur="16"/>
+                                        <note pname="a" oct="4" dur="16"/>
+                                    </beam>
+                                    <choice>
+                                        <orig>
+                                            <beatRpt rend="16"/>    
+                                        </orig>
+                                        <reg>
+                                            <beam>
+                                                <note pname="f" oct="4" dur="16"/>
+                                                <note pname="a" oct="4" dur="16"/>
+                                                <note pname="c" oct="5" dur="16"/>
+                                                <note pname="a" oct="4" dur="16"/>
+                                            </beam>
+                                        </reg>
+                                    </choice>
+                                </layer>
+                            </staff>
+                            <tempo staff="1" tstamp="1">
+                                <choice>
+                                    <sic>
+                                        Alegro
+                                    </sic>
+                                    <corr cert="medium">
+                                        Allegro
+                                    </corr>
+                                </choice>
+                            </tempo>
+                        </measure>
+                        <measure n="2">
+                            <staff n="1">
+                                <layer n="1">
+                                    <chord dur="2">
+                                        <note pname="f" oct="4"/>
+                                        <note pname="a" oct="4"/>
+                                        <choice>
+                                            <sic>
+                                                <note pname="d" oct="5"/>
+                                            </sic>
+                                            <corr cert='high'>
+                                                <note pname="c" oct="5"/>
+                                            </corr>
+                                        </choice>
+                                    </chord>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
