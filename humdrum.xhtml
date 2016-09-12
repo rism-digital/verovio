@@ -13,14 +13,16 @@ vim: ts=3
 	tab-size: 18;
 }
 
-#repdiv {
-	padding-top: 60px;
-}
-
 #repdiv ul {
 	margin: 0;
 	padding: 0;
 }
+
+#xxx {
+	overflow: scroll;
+	max-height:400px;
+}
+
 
 </style>
 
@@ -37,19 +39,22 @@ vim: ts=3
 			<p>
 				Humdrum data is an analytic music code for transcribing full
 				polyphonic textures.  Humdum syntax presents notes of the score
-				in strict time sequence.  Each row represents all notes sounding or
-				events occurring at a given time, and each column traces the
-				melodic line of the individual parts. More information about the
-				syntax is available on the
+				in strict time sequence.  Each data row represents all notes
+				sounding or events occurring at the same time, and each column
+				traces the melodic line of the individual parts. More information
+				about the syntax is available on the
 				<a target="_blank" href="http://www.humdrum.org">Humdrum</a>
 				website.
 			</p>
+
+			<h4> Sample data and Verovio rendering </h4>
 
 			<p>
 				The following example from Mozart's
 				piano sonata in F major, K<sup>1</sup>&#160;280
 				(K<sup>6</sup>&#160;189e), mvmt.&#160;1, is generated dynamically
-				inside this page from the Humdrum data that follows.
+				within this page using the JavaScript form of Verovio, inputting
+				the Humdrum data that follows.
 
 			</p>
 			
@@ -57,7 +62,8 @@ vim: ts=3
 
 			<p>
 			The data consists of three separate streams of information, called
-			<i>spines</i> that usually consist of one column, but sometime more.
+			<i>spines</i> that usually consist of one column, but sometime more
+			due to spine splits into subspines.
 			The first column represents music on the bottom staff,
 			the second column represents the top staff, and the third column
 			contains the dynamics, which in this case apply to both staves.
@@ -68,33 +74,26 @@ vim: ts=3
 			</p>
 
 
+			<h4> Verovio Humdrum Viewer </h4>
+
 			<p>
-			View the full score in the interactive
-			<a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn">Verovio Humdrum Viewer</a>,
-			which is a special-purpose web interface to Verovio for Humdrum data.
-			When on a VHV notation page, try pressing the key "p" to view the scan
+			The <a target="_blank" href="http://verovio.humdrum.org">Verovio Humdurm Viewer</a> (VHV) is a special-purpose interactive website for
+			viewing and editing Humdrum files with the Verovio notation egraving
+			library.  You can view the full score for the above Mozart example in VHV from
+			this link: <a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn">verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn</a>.
+			</p>
+
+			<p>
+			When on a VHV notation page, try pressing the key "<b>p</b>" to view the scan
 			of the original print from which the musical data was encoded.  Also
-			try pressing "m" to view the internal conversion to MEI data.  Vi users
-			can try pressing "v" to toggle between the basic and vim modes for the
-			text editor.
+			try pressing "<b>m</b>" to view the internal conversion to MEI data.  Vi users
+			can try pressing "<b>v</b>" to toggle between the basic and vim modes for the
+			text editor.  Use the left/right arrow keys or PageUp/PageDown to navigate
+			to different pages.  Press shift-left/right arrows to go to the 
+			next/previous work/movement in the repertory.
 			</p>
 
-			<p>
-			The above data is in the standard tab-separated-value (TSV) format for
-			Humdrum data.  For situations where tabs may be munged, Verovio can
-			also import Humdrum data in the comma-separated-value (CSV) format:
-			</p>
-
-			<p>
-				<div id="humdrum2-svg" style="overflow:auto;"/>
-				<div class="highlight"><pre><code id="humdrum2-code"></code></pre></div>
-			</p>
-
-			<p>
-			In the <a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn">Verovio Humdrum Viewer</a>,
-			try pressing the comma key "," to toggle between TSV and CSV versions
-			of the Humdrum data.
-			</p>
+			<div id="repertory-container"></div>
 
 			<h4> Command-line usage </h4>
 
@@ -147,6 +146,37 @@ vim: ts=3
 			version of Verovio specifically when using Humdrum data as input.
 			</p>
 
+			<h4> A more complicated example </h4>
+
+			Below is a song for voice and piano accompaniment.  Each verse
+			is listed in a separate spine.
+
+			<p>
+				<div id="humdrum3-svg" style="overflow:auto;"/>
+				<div id="xxx" class="highlight"><pre><code id="humdrum3-code"></code></pre></div>
+			</p>
+
+			<h4> Humdrum data in CSV form </h4>
+
+			<p>
+			In the first example on this page, the Humdrum data is given in
+			the standard tab-separated-value (TSV) format for Humdrum
+			data.  For situations where tabs may be munged, Verovio can also
+			import Humdrum data in the comma-separated-value (CSV)
+			format:
+			</p>
+
+			<p>
+				<div id="humdrum2-svg" style="overflow:auto;"/>
+				<div class="highlight"><pre><code id="humdrum2-code"></code></pre></div>
+			</p>
+
+			<p>
+			In the <a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn">Verovio Humdrum Viewer</a>,
+			try pressing the comma key "," to toggle between TSV and CSV versions
+			of the Humdrum data.
+			</p>
+
 			<div style="height:100px;"></div>
 		</div>
 	</div>
@@ -157,7 +187,7 @@ vim: ts=3
 //<![CDATA[
 
 var zoom = 33.5;
-var pageHeight = 1000;
+var pageHeight = 2000;
 var pageWidth = 2000;
 var spacingStaff = 0;
 var border = 20;
@@ -194,6 +224,7 @@ $(window).resize(function() {
 function renderAllExamples() {
 	var examples = getExampleNumbers();
 	for (var i=0; i<examples.length; i++) {
+		console.log("Preparing example", examples[i]);
 		var selector = "#humdrum" + examples[i];
 		var kern = $(selector + "-data").text();
 		var targetWidth = $(selector + "-code").parent().width();
@@ -220,10 +251,15 @@ function getExampleNumbers() {
 
 
 function displayRepertory() {
-	var sidebar = document.querySelector("#sidebar");
+	var sidebar = document.querySelector("#repertory-container");
 	var newdiv = document.createElement("div");
 	newdiv.id = "repdiv";
-	var content = document.querySelector("#repertories").innerHTML;
+	var element = document.querySelector("#repertories");
+	var content = "";
+	if (element) {
+		content = element.innerHTML;
+	}
+
 	newdiv.innerHTML = content;
 	sidebar.appendChild(newdiv);
 }
@@ -240,11 +276,11 @@ function displayRepertory() {
 !!!OMD: Allegro assai
 **kern	**kern	**dynam
 *staff2	*staff1	*staff1/2
-*clefF4	*clefG2	*clefG2
-*k[b-]	*k[b-]	*k[b-]
-*F:	*F:	*F:
-*M3/4	*M3/4	*M3/4
-*MM152	*MM152	*MM152
+*clefF4	*clefG2	*
+*k[b-]	*k[b-]	*
+*F:	*F:	*
+*M3/4	*M3/4	*
+*MM152	*MM152	*
 =1-	=1-	=1-
 4FF 4F	4c: 4f: 4a: 4cc:	f
 4C	4a/ 4cc/	.
@@ -290,12 +326,12 @@ function displayRepertory() {
 !!!SCT2: K6 189e
 !!!OMD: Allegro assai
 **kern,**kern,**dynam
-*staff2,*staff1,*staff1/2
-*clefF4,*clefG2,*clefG2
-*k[b-],*k[b-],*k[b-]
-*F:,*F:,*F:
-*M3/4,*M3/4,*M3/4
-*MM152,*MM152,*MM152
+*staff2,*staff1,*
+*clefF4,*clefG2,*
+*k[b-],*k[b-],*k
+*F:,*F:,*
+*M3/4,*M3/4,*
+*MM152,*MM152,*
 =1-,=1-,=1-
 4FF 4F,4c: 4f: 4a: 4cc:,f
 4C,4a/ 4cc/,.
@@ -317,21 +353,97 @@ function displayRepertory() {
 8F 8A 8c,4ee-),.
 8F 8A 8cJ,.,.
 =4,=4,=4
-8F 8B- 8dL,4dd,.
-8F 8B- 8d,.,.
-8F 8B- 8d,4r,.
-8F 8B- 8d,.,.
-8F 8B- 8d,4r,.
-8F 8B- 8dJ,.,.
-=5,=5,=5
-8F 8G 8eL,(8ccL,p
-8F 8G 8e,8b-J),.
-8F 8G 8e,4b-',.
-8F 8G 8e,.,.
-8F 8G 8e,4r,.
-8F 8G 8eJ,.,.
-=6,=6,=6
 *-,*-,*-
+</script>
+
+
+<script id="humdrum3-data" type="text/x-humdrum">!!!OTL@@DE: Liebes-A-B-C
+!!!OTL@@DE: Liebes-A-B-C
+!!!COM: Pohlenz, August
+!!!CDT: 1790/07/03/-1843/03/09/
+!!!ODT: 1827
+!!!OMD: Allegretto
+!!!LYR: Gerhard, Wilhelm
+!!!LDT: 1826
+!!!OCL: Erk, Ludwig
+!!!GCO: Deutscher Liederschatz, Band 1
+**kern	**kern	**kern	**text	**text	**text	**text	**text	**text	**text
+*staff3	*staff2	*staff1	*staff1	*staff1	*staff1	*staff1	*staff1	*staff1	*staff1
+*Ipiano	*Ipiano	*Ivox	*	*	*	*	*	*	*
+*clefF4	*clefG2	*clefG2	*	*	*	*	*	*	*
+*k[b-]	*k[b-]	*k[b-]	*	*	*	*	*	*	*
+*F:	*F:	*F:	*	*	*	*	*	*	*
+*M3/8	*M3/8	*M3/8	*	*	*	*	*	*	*
+*MM100	*MM100	*MM100	*	*	*	*	*	*	*
+=1-	=1-	=1-	=1-	=1-	=1-	=1-	=1-	=1-	=1-
+*^	*^	*	*	*	*	*	*	*	*
+!	!	!	!	!	!	!	!	!	!	!	!
+*	*	*	*	*	*	*	*	*	*	*	*
+!	!	!	!	!	!	!	!	!	!	!	!
+8A/L	4F\	8f/L	4c\	8f/	A	E	I	M	Q	U	Yp-
+8G/	.	8e/	.	8e/	B	F	K	N	R	V	-si-
+8A/J	8F\	8f/J	8c\	8f/	C	G	und	O	S	W	-lon
+*v	*v	*	*	*	*	*	*	*	*	*	*
+*	*v	*v	*	*	*	*	*	*	*	*
+*	*	*	*	*	*	*	*	*	*
+*	*	*	*	*	*	*	*	*	*
+=2	=2	=2	=2	=2	=2	=2	=2	=2	=2
+4C\ 4c\	4e/ 4g/	4g/	D,	H,	L,	P,	T,	X,	Z,
+8r	8r	8r	.	.	.	.	.	.	.
+=3	=3	=3	=3	=3	=3	=3	=3	=3	=3
+4C\ 4c\	8e/ 8g/L	8g/	wenn	wärst	Aeug-	gleich	Schei-	mach'	nun
+.	8d/ 8f/	8f/	ich	du	-lein	ei-	-den	ei-	geh'
+8C\ 8c\	8e/ 8g/J	8g/	dich	doch	so	-ner	thut	-nen	zu
+=4	=4	=4	=4	=4	=4	=4	=4	=4	=4
+4F\ 4c\	4f/ 4a/	4a/	seh',	da!	hell	Fee	weh.	Knix,	Bett!
+8r	8r	8r	.	.	.	.	.	.	.
+=5	=5	=5	=5	=5	=5	=5	=5	=5	=5
+!	!	!	!	!	!	!	!	!	!
+4DD/ 4D/	8r	8a/	dich,	Drück-	glänz-	fes-	Hal-	drückt	Bricht
+.	8c/ 8d/ 8f#/L	8a/	mei-	-te	-ten	-selst	-te	dir	doch
+8r	8c/ 8d/ 8f#/J	8dd\	-ne	mein	in	du	mit	ein	die
+=6	=6	=6	=6	=6	=6	=6	=6	=6	=6
+!	!	!	!	!	!	!	!	!	!
+4GG/	8r	8.cc\	sü-	treu-	Lie-	Herz	Herz	jun-	Nacht
+.	8B-/ 8d/ 8g/L	.	.	.	.	.	.	.	.
+.	.	16b-\	-sse	-er	-bes-	und	und	-ger	schon
+8r	8B-/ 8d/ 8g/J	8b-\	Lust,	Arm,	-pracht	Sinn,	Mund	Fant	ein,
+=7	=7	=7	=7	=7	=7	=7	=7	=7	=7
+!	!	!	!	!	!	!	!	!	!
+4CC/ 4C/	8r	8g/	klopft	Hol-	mir	Grüb-	treu	zärt-	kann
+.	8B-/ 8c/ 8e/L	8g/	die	-de,	aus	-chen	an	-lich	ja
+8r	8B-/ 8c/ 8e/J	8cc\	em-	dich	der	in	dem	die	nicht
+=8	=8	=8	=8	=8	=8	=8	=8	=8	=8
+!	!	!	!	!	!	!	!	!	!
+4FF/	8r	8.b-\	-pör-	lie-	Wim-	Wang'	Lie-	Schwwa-	bei
+.	8A/ 8c/ 8f/L	.	.	.	.	.	.	.	.
+!	!	!	!	!	!	!	!	!	!
+.	.	16a/	-te	-be-	-pern	und	-bes-	-nen-	dir
+8r	8A/ 8c/ 8f/J	8a/	Brust,	warm!	Nacht,	Kinn,	-bund,	-hand,	sein,
+=9	=9	=9	=9	=9	=9	=9	=9	=9	=9
+8FF/L	8A/ 8f/L	8f/	wird	Schätz-	tra-	Ro-	sa-	a-	wenn
+8GG/	8B-/ 8e/	8e/	mir	-chen,	-fen	-sen-	-ge	-ber	ich
+8AA/J	8c/ 8f/J	8f/	so	ach	wie	-glut,	mir	nur	auch
+=10	=10	=10	=10	=10	=10	=10	=10	=10	=10
+4BB-/	8r	8.ee\	wohl	wärst	bli-	Li-	nie	ern-	Flü-
+.	8B-/ 8d/ 8g/L	.	.	.	.	.	.	.	.
+.	.	16dd\	und	du	-tzes-	-lien-	A-	-sten	-gel
+8r	8B-/ 8d/ 8g/J	8dd\	weh,	da!	-schnell,	schnee,	de!	Blicks	hätt'!
+=11	=11	=11	=11	=11	=11	=11	=11	=11	=11
+4C/	8r	8cc\	wenn	wärst	Aeug-	rei-	Schei-	mach'	Geh'
+.	8B-/ 8c/ 8e/L	8g/	ich	du	-lein	-zen-	-den	ihm	nur
+8r	8B-/ 8c/ 8e/J	8a/	dich	mir	so	-de	thut	den	zu
+=12	=12	=12	=12	=12	=12	=12	=12	=12	=12
+4FF/ 4F/	4A/ 4c/ 4f/	4f/	seh'!	nah'!	hell.	Fee!	weh.	Knix!	Bett!
+8r	8r	8r	.	.	.	.	.	.	.
+==	==	==	==	==	==	==	==	==	==
+*-	*-	*-	*-	*-	*-	*-	*-	*-	*-
+!!!SMS: Deutscher Liederschatz, Band 1, Ludwig Erk, ed.
+!!!ENC: Craig Stuart Sapp
+!!!END: 2004/05/16/
+!!!EED: 2011/02/05/
+!!!EFL: 001/651
+!!muse2ps: s^(.){(..)}^z21jv200,114,144
 </script>
 
 <script id="repertories" type="text/plain">
@@ -353,7 +465,7 @@ Sample repertories of Humdrum data displayed in the Verovio Humdrum Viewer:
 <li> <a target="_blank" href="http://verovio.humdrum.org/?file=jrp/Ock">Works of Johannes Ockeghem</a></li>
 <li> <a target="_blank" href="http://verovio.humdrum.org/?file=jrp/Rue">Works of Pierre de la Rue</a></li>
 <li> <a target="_blank" href="http://verovio.humdrum.org/?file=jrp/Ort">Works of Mabrianus de Orto</a></li>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=liederschatz1">Deutscher Liederschatz, Band I</a></li>
+<li> <a target="_blank" href="http://verovio.humdrum.org/?file=liederschatz1">Deutscher Liederschatz, Band I</a>, Edited by Ludwig Erk.</li>
 </ul>
 </p>
 
