@@ -294,7 +294,7 @@ public:
      * @name Set and get the xPath query for selecting <app> (if any)
      */
     ///@{
-    void SetAppXPathQueries(std::vector<std::string> const &xPathQueries) { m_appXPathQueries = xPathQueries; }
+    void SetAppXPathQueries(std::vector<std::string> const &xPathQueries);
     std::vector<std::string> GetAppXPathQuery() { return m_appXPathQueries; }
     ///@}
 
@@ -302,7 +302,7 @@ public:
      * @name Set and get the xPath queries for selecting <choice> (if any)
      */
     ///@{
-    void SetChoiceXPathQueries(std::vector<std::string> const &xPathQueries) { m_choiceXPathQueries = xPathQueries; }
+    void SetChoiceXPathQueries(std::vector<std::string> const &xPathQueries);
     std::vector<std::string> GetChoiceXPathQueries() { return m_choiceXPathQueries; }
     ///@}
 
