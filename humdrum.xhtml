@@ -48,6 +48,16 @@ repertoires:
 	max-height:400px;
 }
 
+#xxx pre {
+	overflow: scroll;
+	white-space: nowrap;
+}
+
+#xxx pre code {
+	overflow: scroll;
+	white-space: pre;
+	tab-size: 12 !important;
+}
 
 </style>
 
@@ -62,7 +72,7 @@ repertoires:
 		<div class="panel-body">
 			<h3>Humdrum Input</h3>
 			<p>
-				Humdrum data is an analytic music code for transcribing full
+				Humdrum data is an analytic music code for transcribing fully
 				polyphonic textures.  Humdum syntax presents notes of the score
 				in strict time sequence.  Each data row represents all notes
 				sounding or events occurring at the same time, and each column
@@ -158,7 +168,7 @@ repertoires:
 			<p>
 			Standard input/output can be used with the verovio command by giving a
 			dash for standard input and <tt>-o -</tt> to send the output to
-			standad output.
+			standard output.
 			{% highlight bash %}
 			$ cat input.krn | verovio - -o - > output.svg
 			{% endhighlight %}
@@ -183,12 +193,29 @@ repertoires:
 			<h4> A more complicated example </h4>
 
 			Below is a song for voice and piano accompaniment.  Each verse
-			is listed in a separate spine.
+			is listed in a separate spine of <tt>**text</tt> in addition to
+			the three staves of music in <tt>**kern</tt> spines and one
+			dynamics (<tt>**dynam</tt>) spine.
 
 			<p>
 				<div id="humdrum3-svg" style="overflow:auto;"/>
 				<div id="xxx" class="highlight"><pre><code id="humdrum3-code"></code></pre></div>
 			</p>
+
+<!--
+			In this example the first measure of the piano accompaniment contains
+			multiple layers (in MEI terminology) for two independent melodic
+			sequences on a single staff.  These are handled as <i>subspines</i> in
+			Humdrum data, with <tt>*^</tt> in a spine splitting the music into
+			two subspines, and <tt>*v</tt> in adjacent spines merging two or
+			more subspines.
+
+			The following example was prepared by the Humdrum Extras commands:
+
+			{% highlight bash %}
+			$ extractx -i **kern
+			{% endhighlight %}
+-->
 
 			<h4> Humdrum data in CSV form </h4>
 
@@ -376,7 +403,6 @@ function getExampleNumbers() {
 
 
 <script id="humdrum3-data" type="text/x-humdrum">!!!OTL@@DE: Liebes-A-B-C
-!!!OTL@@DE: Liebes-A-B-C
 !!!COM: Pohlenz, August
 !!!CDT: 1790/07/03/-1843/03/09/
 !!!ODT: 1827
@@ -395,64 +421,54 @@ function getExampleNumbers() {
 *MM100	*MM100	*MM100	*	*	*	*	*	*	*
 =1-	=1-	=1-	=1-	=1-	=1-	=1-	=1-	=1-	=1-
 *^	*^	*	*	*	*	*	*	*	*
-!	!	!	!	!	!	!	!	!	!	!	!
-*	*	*	*	*	*	*	*	*	*	*	*
-!	!	!	!	!	!	!	!	!	!	!	!
-8A/L	4F\	8f/L	4c\	8f/	A	E	I	M	Q	U	Yp-
-8G/	.	8e/	.	8e/	B	F	K	N	R	V	-si-
-8A/J	8F\	8f/J	8c\	8f/	C	G	und	O	S	W	-lon
+8AL	4F	8fL	4c	8f	A	E	I	M	Q	U	Yp-
+8G	.	8e	.	8e	B	F	K	N	R	V	-si-
+8AJ	8F	8fJ	8c	8f	C	G	und	O	S	W	-lon
 *v	*v	*	*	*	*	*	*	*	*	*	*
 *	*v	*v	*	*	*	*	*	*	*	*
-*	*	*	*	*	*	*	*	*	*
-*	*	*	*	*	*	*	*	*	*
 =2	=2	=2	=2	=2	=2	=2	=2	=2	=2
-4C\ 4c\	4e/ 4g/	4g/	D,	H,	L,	P,	T,	X,	Z,
+4C 4c	4e 4g	4g	D,	H,	L,	P,	T,	X,	Z,
 8r	8r	8r	.	.	.	.	.	.	.
 =3	=3	=3	=3	=3	=3	=3	=3	=3	=3
-4C\ 4c\	8e/ 8g/L	8g/	wenn	wärst	Aeug-	gleich	Schei-	mach'	nun
-.	8d/ 8f/	8f/	ich	du	-lein	ei-	-den	ei-	geh'
-8C\ 8c\	8e/ 8g/J	8g/	dich	doch	so	-ner	thut	-nen	zu
+4C 4c	8e 8gL	8g	wenn	wärst	Aeug-	gleich	Schei-	mach'	nun
+.	8d 8f	8f	ich	du	-lein	ei-	-den	ei-	geh'
+8C 8c	8e 8gJ	8g	dich	doch	so	-ner	thut	-nen	zu
 =4	=4	=4	=4	=4	=4	=4	=4	=4	=4
-4F\ 4c\	4f/ 4a/	4a/	seh',	da!	hell	Fee	weh.	Knix,	Bett!
+4F 4c	4f 4a	4a	seh',	da!	hell	Fee	weh.	Knix,	Bett!
 8r	8r	8r	.	.	.	.	.	.	.
 =5	=5	=5	=5	=5	=5	=5	=5	=5	=5
-!	!	!	!	!	!	!	!	!	!
-4DD/ 4D/	8r	8a/	dich,	Drück-	glänz-	fes-	Hal-	drückt	Bricht
-.	8c/ 8d/ 8f#/L	8a/	mei-	-te	-ten	-selst	-te	dir	doch
-8r	8c/ 8d/ 8f#/J	8dd\	-ne	mein	in	du	mit	ein	die
+4DD 4D	8r	8a	dich,	Drück-	glänz-	fes-	Hal-	drückt	Bricht
+.	8c 8d 8f#L	8a	mei-	-te	-ten	-selst	-te	dir	doch
+8r	8c 8d 8f#J	8dd	-ne	mein	in	du	mit	ein	die
 =6	=6	=6	=6	=6	=6	=6	=6	=6	=6
-!	!	!	!	!	!	!	!	!	!
-4GG/	8r	8.cc\	sü-	treu-	Lie-	Herz	Herz	jun-	Nacht
-.	8B-/ 8d/ 8g/L	.	.	.	.	.	.	.	.
-.	.	16b-\	-sse	-er	-bes-	und	und	-ger	schon
-8r	8B-/ 8d/ 8g/J	8b-\	Lust,	Arm,	-pracht	Sinn,	Mund	Fant	ein,
+4GG	8r	8.cc	sü-	treu-	Lie-	Herz	Herz	jun-	Nacht
+.	8B- 8d 8gL	.	.	.	.	.	.	.	.
+.	.	16b-	-sse	-er	-bes-	und	und	-ger	schon
+8r	8B- 8d 8gJ	8b-	Lust,	Arm,	-pracht	Sinn,	Mund	Fant	ein,
 =7	=7	=7	=7	=7	=7	=7	=7	=7	=7
-!	!	!	!	!	!	!	!	!	!
-4CC/ 4C/	8r	8g/	klopft	Hol-	mir	Grüb-	treu	zärt-	kann
-.	8B-/ 8c/ 8e/L	8g/	die	-de,	aus	-chen	an	-lich	ja
-8r	8B-/ 8c/ 8e/J	8cc\	em-	dich	der	in	dem	die	nicht
+4CC 4C	8r	8g	klopft	Hol-	mir	Grüb-	treu	zärt-	kann
+.	8B- 8c 8eL	8g	die	-de,	aus	-chen	an	-lich	ja
+8r	8B- 8c 8eJ	8cc	em-	dich	der	in	dem	die	nicht
 =8	=8	=8	=8	=8	=8	=8	=8	=8	=8
-!	!	!	!	!	!	!	!	!	!
-4FF/	8r	8.b-\	-pör-	lie-	Wim-	Wang'	Lie-	Schwwa-	bei
-.	8A/ 8c/ 8f/L	.	.	.	.	.	.	.	.
-!	!	!	!	!	!	!	!	!	!
-.	.	16a/	-te	-be-	-pern	und	-bes-	-nen-	dir
-8r	8A/ 8c/ 8f/J	8a/	Brust,	warm!	Nacht,	Kinn,	-bund,	-hand,	sein,
+4FF	8r	8.b-	-pör-	lie-	Wim-	Wang'	Lie-	Schwa-	bei
+.	8A 8c 8fL	.	.	.	.	.	.	.	.
+.	.	16a	-te	-be-	-pern	und	-bes-	-nen-	dir
+8r	8A 8c 8fJ	8a	Brust,	warm!	Nacht,	Kinn,	-bund,	-hand,	sein,
 =9	=9	=9	=9	=9	=9	=9	=9	=9	=9
-8FF/L	8A/ 8f/L	8f/	wird	Schätz-	tra-	Ro-	sa-	a-	wenn
-8GG/	8B-/ 8e/	8e/	mir	-chen,	-fen	-sen-	-ge	-ber	ich
-8AA/J	8c/ 8f/J	8f/	so	ach	wie	-glut,	mir	nur	auch
+8FFL	8A 8fL	8f	wird	Schätz-	tra-	Ro-	sa-	a-	wenn
+8GG	8B- 8e	8e	mir	-chen,	-fen	-sen-	-ge	-ber	ich
+8AAJ	8c 8fJ	8f	so	ach	wie	-glut,	mir	nur	auch
 =10	=10	=10	=10	=10	=10	=10	=10	=10	=10
-4BB-/	8r	8.ee\	wohl	wärst	bli-	Li-	nie	ern-	Flü-
-.	8B-/ 8d/ 8g/L	.	.	.	.	.	.	.	.
-.	.	16dd\	und	du	-tzes-	-lien-	A-	-sten	-gel
-8r	8B-/ 8d/ 8g/J	8dd\	weh,	da!	-schnell,	schnee,	de!	Blicks	hätt'!
+4BB-	8r	8.ee	wohl	wärst	bli-	Li-	nie	ern-	Flü-
+.	8B- 8d 8gL	.	.	.	.	.	.	.	.
+.	.	16dd	und	du	-tzes-	-lien-	A-	-sten	-gel
+8r	8B- 8d 8gJ	8dd	weh,	da!	-schnell,	schnee,	de!	Blicks	hätt'!
 =11	=11	=11	=11	=11	=11	=11	=11	=11	=11
-4C/	8r	8cc\	wenn	wärst	Aeug-	rei-	Schei-	mach'	Geh'
-.	8B-/ 8c/ 8e/L	8g/	ich	du	-lein	-zen-	-den	ihm	nur
-8r	8B-/ 8c/ 8e/J	8a/	dich	mir	so	-de	thut	den	zu
+4C	8r	8cc	wenn	wärst	Aeug-	rei-	Schei-	mach'	Geh'
+.	8B- 8c 8eL	8g	ich	du	-lein	-zen-	-den	ihm	nur
+8r	8B- 8c 8eJ	8a	dich	mir	so	-de	thut	den	zu
 =12	=12	=12	=12	=12	=12	=12	=12	=12	=12
-4FF/ 4F/	4A/ 4c/ 4f/	4f/	seh'!	nah'!	hell.	Fee!	weh.	Knix!	Bett!
+4FF 4F	4A 4c 4f	4f	seh'!	nah'!	hell.	Fee!	weh.	Knix!	Bett!
 8r	8r	8r	.	.	.	.	.	.	.
 ==	==	==	==	==	==	==	==	==	==
 *-	*-	*-	*-	*-	*-	*-	*-	*-	*-
@@ -462,4 +478,5 @@ function getExampleNumbers() {
 !!!EED: 2011/02/05/
 !!!EFL: 001/651
 !!muse2ps: s^(.){(..)}^z21jv200,114,144
+!!CharacterEncoding: UTF-8
 </script>
