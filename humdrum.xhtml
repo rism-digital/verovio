@@ -5,6 +5,31 @@ active: other-formats
 other-active: humdrum
 version-footer: true
 vim: ts=3
+repertoires:
+    - name: "J.S. Bach chorales"
+      description: "When viewing a chorale, type the \"o\" letter key to toggle view of the original historic clefs."
+      link: "http://verovio.humdrum.org/?file=chorales"
+    - name: "Mozart piano sonatas"
+      link: "http://verovio.humdrum.org/?file=mozart/sonatas"
+    - name: "Beethoven piano sontats"
+      link: "http://verovio.humdrum.org/?file=beethoven/sonatas"
+    - name: "Beethoven string quartets"
+      link: "http://verovio.humdrum.org/?file=beethoven/quartets"
+    - name: "Chopin mazurkas"
+      link: "http://verovio.humdrum.org/?file=cc/chopin/mazurka"
+    - name: "Works of Scott Joplin"
+      link: "http://verovio.humdrum.org/?file=joplin"
+    - name: "Works of Josquin des Prez"
+      link: "http://verovio.humdrum.org/?file=jrp/Jos"
+    - name: "Works of Johannes Ockeghem"
+      link: "http://verovio.humdrum.org/?file=jrp/Ock"
+    - name: "Works of Pierre de la Rue"
+      link: "http://verovio.humdrum.org/?file=jrp/Rue"
+    - name: "Works of Mabrianus de Orto"
+      link: "http://verovio.humdrum.org/?file=jrp/Ort"
+    - name: "Deutscher Liederschatz, Band I"
+      description: "Edited by Ludwig Erk."
+      link: "http://verovio.humdrum.org/?file=liederschatz1"
 ---
 
 <style>
@@ -93,7 +118,16 @@ vim: ts=3
 			next/previous work/movement in the repertory.
 			</p>
 
-			<div id="repertory-container"></div>
+			<p>
+			Sample repertories of Humdrum data displayed in the Verovio Humdrum Viewer:
+			</p>
+			
+            <ul>
+            {% for r in page.repertoires %}
+            <li> <a target="_blank" href="{{ r.link }}">{{ r.name }}</a> {% if r.description %}({{ r.description }}){% endif %}</li>
+            {% endfor %}
+            </ul>
+			
 
 			<h4> Command-line usage </h4>
 
@@ -211,7 +245,6 @@ function load_data(data, output_div) {
 
 
 $(document).ready(function() {
-	displayRepertory();
 	renderAllExamples();
 });
 
@@ -247,21 +280,6 @@ function getExampleNumbers() {
 	  }
    }
    return Object.keys(nums);
-}
-
-
-function displayRepertory() {
-	var sidebar = document.querySelector("#repertory-container");
-	var newdiv = document.createElement("div");
-	newdiv.id = "repdiv";
-	var element = document.querySelector("#repertories");
-	var content = "";
-	if (element) {
-		content = element.innerHTML;
-	}
-
-	newdiv.innerHTML = content;
-	sidebar.appendChild(newdiv);
 }
 
 //]]>
@@ -445,30 +463,3 @@ function displayRepertory() {
 !!!EFL: 001/651
 !!muse2ps: s^(.){(..)}^z21jv200,114,144
 </script>
-
-<script id="repertories" type="text/plain">
-<p>
-Sample repertories of Humdrum data displayed in the Verovio Humdrum Viewer:
-</p>
-
-<p>
-<ul>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=chorales">J.S. Bach chorales</a>
-	(When viewing a chorale, type the "o" letter key to toggle view of the original historic clefs.)
-</li>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas">Mozart piano sonatas</a></li>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=beethoven/sonatas">Beethoven piano sonatas</a></li>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=beethoven/quartets">Beethoven string quartets</a></li>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=cc/chopin/mazurka">Chopin mazurkas</a></li>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=joplin">Works of Scott Joplin</a></li>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=jrp/Jos">Works of Josquin des Prez</a></li>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=jrp/Ock">Works of Johannes Ockeghem</a></li>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=jrp/Rue">Works of Pierre de la Rue</a></li>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=jrp/Ort">Works of Mabrianus de Orto</a></li>
-<li> <a target="_blank" href="http://verovio.humdrum.org/?file=liederschatz1">Deutscher Liederschatz, Band I</a>, Edited by Ludwig Erk.</li>
-</ul>
-</p>
-
-</script>
-
-
