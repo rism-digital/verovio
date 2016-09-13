@@ -143,43 +143,34 @@ repertoires:
 
 			<p>
 			To typeset music in the Humdrum format on the command-line:
-			{% highlight bash %}
-			$ verovio -f humdrum input.krn -o output.svg
-			{% endhighlight %}
 			</p>
+			{% highlight bash %}$ verovio -f humdrum input.krn -o output.svg{% endhighlight %}
 
 			<p>
 			You can usually use the auto-detection feature of verovio by omitting
 			the <tt>-f</tt> option.
-			{% highlight bash %}
-			$ verovio input.krn -o output.svg
-			{% endhighlight %}
 			</p>
+			{% highlight bash %}$ verovio input.krn -o output.svg{% endhighlight %}
 
 			<p>
 			The output filename will have the same basename as the input if the
 			<tt>-o</tt> option is not given, so in this case the output will be
 			called <tt>file.svg</tt>.
-			{% highlight bash %}
-			$ verovio file.krn
-			{% endhighlight %}
 			</p>
+			{% highlight bash %}$ verovio file.krn{% endhighlight %}
 
 			<p>
 			Standard input/output can be used with the verovio command by giving a
 			dash for standard input and <tt>-o -</tt> to send the output to
 			standard output.
-			{% highlight bash %}
-			$ cat input.krn | verovio - -o - > output.svg
-			{% endhighlight %}
 			</p>
+			{% highlight bash %}$ cat input.krn | verovio - -o - > output.svg{% endhighlight %}
+
 
 			<p>
 			To convert to MEI data:
-			{% highlight bash %}
-			$ verovio file.krn --no-layout --all-pages -t mei
-			{% endhighlight %}
-			</p>
+			</p>{% highlight bash %}$ verovio file.krn --no-layout --all-pages -t mei{% endhighlight %}
+
 
 			<h4> Javascript usage </h4>
 
