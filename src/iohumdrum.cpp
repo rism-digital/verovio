@@ -330,7 +330,7 @@ bool HumdrumInput::ImportFile()
 // HumdrumInput::ImportString -- Read a Humdrum file from a text string.
 //
 
-bool HumdrumInput::ImportString(std::string content)
+bool HumdrumInput::ImportString(std::string const &content)
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
