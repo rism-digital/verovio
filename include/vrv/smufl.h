@@ -41,6 +41,8 @@ enum {
     SMUFL_E064_fClef8vb = 0xE064,
     SMUFL_E065_fClef8va = 0xE065,
     SMUFL_E066_fClef15ma = 0xE066,
+    SMUFL_E069_unpitchedPercussionClef1 = 0xE069,
+    SMUFL_E06A_unpitchedPercussionClef2 = 0xE06A,
     SMUFL_E080_timeSig0 = 0xE080,
     SMUFL_E081_timeSig1 = 0xE081,
     SMUFL_E082_timeSig2 = 0xE082,
@@ -94,6 +96,16 @@ enum {
     SMUFL_E500_repeat1Bar = 0xE500,
     SMUFL_E501_repeat2Bars = 0xE501,
     SMUFL_E502_repeat4Bars = 0xE502,
+    SMUFL_E510_ottava = 0xE510,
+    SMUFL_E511_ottavaAlta = 0xE511,
+    SMUFL_E512_ottavaBassa = 0xE512,
+    SMUFL_E513_ottavaBassaBa = 0xE513,
+    SMUFL_E514_quindicesima = 0xE514,
+    SMUFL_E515_quindicesimaAlta = 0xE515,
+    SMUFL_E516_quindicesimaBassa = 0xE516,
+    SMUFL_E517_ventiduesima = 0xE517,
+    SMUFL_E518_ventiduesimaAlta = 0xE518,
+    SMUFL_E519_ventiduesimaBassa = 0xE519,
     SMUFL_E520_dynamicPiano = 0xE520,
     SMUFL_E521_dynamicMezzo = 0xE521,
     SMUFL_E522_dynamicForte = 0xE522,
@@ -155,7 +167,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 130
+#define SMUFL_COUNT 142
 
 } // vrv namespace
 

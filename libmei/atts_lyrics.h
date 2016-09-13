@@ -49,20 +49,17 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRefrain(data_BOOLEAN refrain_) { m_refrain = refrain_; };
-    data_BOOLEAN GetRefrain() const { return m_refrain; };
+    void SetRefrain(data_BOOLEAN refrain_) { m_refrain = refrain_; }
+    data_BOOLEAN GetRefrain() const { return m_refrain; }
     bool HasRefrain() const;
     //
-    void SetRhythm(std::string rhythm_) { m_rhythm = rhythm_; };
-    std::string GetRhythm() const { return m_rhythm; };
+    void SetRhythm(std::string rhythm_) { m_rhythm = rhythm_; }
+    std::string GetRhythm() const { return m_rhythm; }
     bool HasRhythm() const;
     ///@}
 
 private:
-    /**
-     * Used to indicate a common, usually centered, refrain (Mup User's Guide, p.
-     * 44).
-     **/
+    /** Used to indicate a common, usually centered, refrain. **/
     data_BOOLEAN m_refrain;
     /**
      * Used to specify a rhythm for the lyric syllables that differs from that of the

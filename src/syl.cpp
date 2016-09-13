@@ -14,10 +14,12 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functorparams.h"
 #include "note.h"
 #include "staff.h"
 #include "textelement.h"
 #include "verse.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -48,11 +50,21 @@ void Syl::Reset()
     m_drawingVerse = 1;
 }
 
-void Syl::AddTextElement(TextElement *element)
+void Syl::AddChild(Object *child)
 {
-    assert(dynamic_cast<TextElement *>(element) || dynamic_cast<EditorialElement *>(element));
-    element->SetParent(this);
-    m_children.push_back(element);
+    if (child->IsTextElement()) {
+        assert(dynamic_cast<TextElement *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
@@ -60,14 +72,10 @@ void Syl::AddTextElement(TextElement *element)
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Syl::PrepareLyrics(ArrayPtrVoid *params)
+int Syl::PrepareLyrics(FunctorParams *functorParams)
 {
-    // param 0: the current Syl
-    // param 1: the last Note
-    // param 2: the last but one Note
-    Syl **currentSyl = static_cast<Syl **>((*params).at(0));
-    Note **lastNote = static_cast<Note **>((*params).at(1));
-    Note **lastButOneNote = static_cast<Note **>((*params).at(2));
+    PrepareLyricsParams *params = dynamic_cast<PrepareLyricsParams *>(functorParams);
+    assert(params);
 
     Verse *verse = dynamic_cast<Verse *>(this->GetFirstParent(VERSE, MAX_NOTE_DEPTH));
     if (verse) {
@@ -77,43 +85,44 @@ int Syl::PrepareLyrics(ArrayPtrVoid *params)
     this->SetStart(dynamic_cast<LayerElement *>(this->GetFirstParent(NOTE, MAX_NOTE_DEPTH)));
 
     // At this stage currentSyl is actually the previous one that is ending here
-    if ((*currentSyl)) {
+    if (params->m_currentSyl) {
         // The previous syl was an initial or median -> The note we just parsed is the end
-        if (((*currentSyl)->GetWordpos() == sylLog_WORDPOS_i) || ((*currentSyl)->GetWordpos() == sylLog_WORDPOS_m)) {
-            (*currentSyl)->SetEnd(*lastNote);
+        if ((params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_i)
+            || (params->m_currentSyl->GetWordpos() == sylLog_WORDPOS_m)) {
+            params->m_currentSyl->SetEnd(params->m_lastNote);
         }
         // The previous syl was a underscore -> the previous but one was the end
-        else if ((*currentSyl)->GetCon() == sylLog_CON_u) {
-            (*currentSyl)->SetEnd(*lastButOneNote);
+        else if (params->m_currentSyl->GetCon() == sylLog_CON_u) {
+            params->m_currentSyl->SetEnd(params->m_lastButOneNote);
         }
     }
 
     // Now decide what to do with the starting syl and check if it has a forward connector
     if ((this->GetWordpos() == sylLog_WORDPOS_i) || (this->GetWordpos() == sylLog_WORDPOS_m)) {
-        (*currentSyl) = this;
+        params->m_currentSyl = this;
         return FUNCTOR_CONTINUE;
     }
     else if (this->GetCon() == sylLog_CON_u) {
-        (*currentSyl) = this;
+        params->m_currentSyl = this;
         return FUNCTOR_CONTINUE;
     }
     else {
-        (*currentSyl) = NULL;
+        params->m_currentSyl = NULL;
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-int Syl::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
+int Syl::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(params, this);
+    return TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
 }
 
-int Syl::ResetDrawing(ArrayPtrVoid *params)
+int Syl::ResetDrawing(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
-    return TimeSpanningInterface::InterfaceResetDrawing(params, this);
+    return TimeSpanningInterface::InterfaceResetDrawing(functorParams, this);
 };
 
 } // namespace vrv

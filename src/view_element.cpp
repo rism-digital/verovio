@@ -18,6 +18,7 @@
 #include "accid.h"
 #include "beam.h"
 #include "chord.h"
+#include "clef.h"
 #include "custos.h"
 #include "devicecontext.h"
 #include "doc.h"
@@ -97,6 +98,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is() == KEYSIG) {
         DrawKeySig(dc, element, layer, staff, measure);
     }
+    else if (element->Is() == LIGATURE) {
+        DrawLigature(dc, element, layer, staff, measure);
+    }
     else if (element->Is() == MENSUR) {
         DrawMensur(dc, element, layer, staff, measure);
     }
@@ -171,6 +175,17 @@ void View::DrawAccid(
 
     dc->StartGraphic(element, "", element->GetUuid());
 
+    bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+
+    // Mensural accidentals may be quite a bit smaller than CMN accidentals; use _pseudoStaffSize_ to force this.
+    int pseudoStaffSize;
+    if (isMensural)
+        pseudoStaffSize = (int)(TEMP_MACCID_SIZE_FACTOR * staff->m_drawingStaffSize);
+    else
+        pseudoStaffSize = staff->m_drawingStaffSize;
+
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if (accid->m_parent) {
         accid->SetDrawingY(accid->GetDrawingY()
@@ -200,7 +215,7 @@ void View::DrawAccid(
             accid->SetDrawingX(accid->GetDrawingX() + radius / 2);
         }
         accid->SetDrawingY(
-            y + TEMP_STYLE_ACCID_EDIT_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR);
+            y + TEMP_ACCID_EDIT_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR);
     }
 
     int x = accid->GetDrawingX();
@@ -211,7 +226,7 @@ void View::DrawAccid(
         case ACCIDENTAL_EXPLICIT_n: symc = SMUFL_E261_accidentalNatural; break;
         case ACCIDENTAL_EXPLICIT_ss: symc = SMUFL_E263_accidentalDoubleSharp; break;
         case ACCIDENTAL_EXPLICIT_s: symc = SMUFL_E262_accidentalSharp; break;
-        case ACCIDENTAL_EXPLICIT_ff: symc = SMUFL_E264_accidentalDoubleFlat;
+        case ACCIDENTAL_EXPLICIT_ff: symc = SMUFL_E264_accidentalDoubleFlat; break;
         case ACCIDENTAL_EXPLICIT_f: symc = SMUFL_E260_accidentalFlat; break;
         case ACCIDENTAL_EXPLICIT_su:
             symc = SMUFL_E268_accidentalNaturalSharp;
@@ -222,7 +237,7 @@ void View::DrawAccid(
         default: break;
     }
 
-    DrawSmuflCode(dc, x, y, symc, staff->m_drawingStaffSize, accid->m_drawingCueSize);
+    DrawSmuflCode(dc, x, y, symc, pseudoStaffSize, accid->m_drawingCueSize);
 
     dc->EndGraphic(element, this);
 }
@@ -603,67 +618,69 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Clef *clef = dynamic_cast<Clef *>(element);
     assert(clef);
 
-    dc->StartGraphic(element, "", element->GetUuid());
-
     int y = staff->GetDrawingY();
     int x = element->GetDrawingX();
-    int sym = SMUFL_E050_gClef;
+    int sym = 0;
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
                           || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
                           || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black)
         ? true
         : false;
 
-    switch (clef->GetClefId()) {
-        case C1:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-            break;
-        case G1:
-            sym = (isMensural ? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
-            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-            break;
-        case G2_8va:
-            sym = SMUFL_E053_gClef8va;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case G2_8vb:
-            sym = SMUFL_E052_gClef8vb;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case C2:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case G2:
-            sym = (isMensural ? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case F3:
-            sym = SMUFL_E062_fClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            break;
-        case C3:
-            sym = (isMensural ? SMUFL_E909_mensuralCclefPetrucciPosMiddle : SMUFL_E05C_cClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            break;
-        case F5: sym = SMUFL_E062_fClef; break;
-        case F4:
-            sym = (isMensural ? SMUFL_E904_mensuralFclefPetrucci : SMUFL_E062_fClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            break;
-        case C4:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            break;
-        case C5: sym = SMUFL_E05C_cClef; break;
-        case perc:
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            // FIXME
-            sym = SMUFL_E05C_cClef;
-            break;
-        default: break;
+    int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
+
+    if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, PLACE_NONE))
+        sym = SMUFL_E050_gClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, PLACE_below))
+        sym = SMUFL_E052_gClef8vb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, PLACE_below))
+        sym = SMUFL_E051_gClef15mb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, PLACE_above))
+        sym = SMUFL_E053_gClef8va;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, PLACE_above))
+        sym = SMUFL_E054_gClef15ma;
+    // C-clef
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_NONE, PLACE_NONE))
+        sym = SMUFL_E05C_cClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_C, 0, OCTAVE_DIS_8, PLACE_below))
+        sym = SMUFL_E05D_cClef8vb;
+    else if (clef->GetShape() == CLEFSHAPE_C)
+        sym = SMUFL_E05C_cClef;
+
+    // F-clef
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_NONE, PLACE_NONE))
+        sym = SMUFL_E062_fClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, PLACE_below))
+        sym = SMUFL_E064_fClef8vb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, PLACE_below))
+        sym = SMUFL_E063_fClef15mb;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_8, PLACE_above))
+        sym = SMUFL_E065_fClef8va;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_F, 0, OCTAVE_DIS_15, PLACE_above))
+        sym = SMUFL_E066_fClef15ma;
+    else if (clef->GetShape() == CLEFSHAPE_F)
+        sym = SMUFL_E062_fClef;
+
+    // Perc
+    else if (clef->GetShape() == CLEFSHAPE_perc)
+        sym = SMUFL_E069_unpitchedPercussionClef1;
+
+    // mensural clefs
+    if (isMensural) {
+        if (sym == SMUFL_E050_gClef)
+            sym = SMUFL_E901_mensuralGclefPetrucci;
+        else if (sym == SMUFL_E05C_cClef)
+            sym = SMUFL_E909_mensuralCclefPetrucciPosMiddle;
+        else if (sym == SMUFL_E062_fClef)
+            sym = SMUFL_E904_mensuralFclefPetrucci;
     }
+
+    if (sym == 0) {
+        clef->SetEmptyBB();
+        return;
+    }
+
+    y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
 
     bool cueSize = false;
     // force cue size for intermediate clefs
@@ -671,6 +688,8 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     // if (!cueSize)
     //    x -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+
+    dc->StartGraphic(element, "", element->GetUuid());
 
     DrawSmuflCode(dc, x, y, sym, staff->m_drawingStaffSize, cueSize);
 
@@ -791,23 +810,28 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         return;
     }
 
+    // C major (0) key sig and system scoreDef - cancellation (if any) is done at the end of the previous system
+    else if ((keySig->GetScoreDefRole() == SYSTEM_SCOREDEF) && (keySig->GetAlterationNumber() == 0)) {
+        keySig->SetEmptyBB();
+        return;
+    }
+
     dc->StartGraphic(element, "", element->GetUuid());
 
     x = element->GetDrawingX();
     // HARDCODED
-    int step
-        = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_STYLE_KEYSIG_STEP;
+    int step = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_KEYSIG_STEP;
 
     // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by
     // default)
-    if ((keySig->GetAlterationNumber() == 0) || (layer->DrawKeySigCancellation() && keySig->m_drawingShowchange)) {
+    if ((keySig->GetScoreDefRole() != SYSTEM_SCOREDEF)
+        && ((keySig->GetAlterationNumber() == 0) || keySig->m_drawingShowchange)) {
         // The type of alteration is different (f/s or f/n or s/n) - cancel all accid in the normal order
         if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
             for (i = 0; i < keySig->m_drawingCancelAccidCount; i++) {
                 data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
-                y = staff->GetDrawingY()
-                    + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
-                          KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c->GetClefId()));
+                y = staff->GetDrawingY() + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
+                                               KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c));
                 ;
 
                 DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
@@ -818,9 +842,8 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         else if (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount) {
             for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; i++) {
                 data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
-                y = staff->GetDrawingY()
-                    + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
-                          KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c->GetClefId()));
+                y = staff->GetDrawingY() + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
+                                               KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c));
                 ;
 
                 DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
@@ -832,7 +855,7 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     for (i = 0; i < keySig->GetAlterationNumber(); i++) {
         data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->GetAlterationType(), i);
         y = staff->GetDrawingY() + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
-                                       KeySig::GetOctave(keySig->GetAlterationType(), pitch, c->GetClefId()));
+                                       KeySig::GetOctave(keySig->GetAlterationType(), pitch, c));
         ;
 
         if (keySig->GetAlterationType() == ACCIDENTAL_EXPLICIT_f)
@@ -890,8 +913,8 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
-    int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
+    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
+    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
     int y = element->GetDrawingY();
 
     // move it down according to the number of line in the staff
@@ -931,15 +954,14 @@ void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     MRpt2 *mRpt2 = dynamic_cast<MRpt2 *>(element);
     assert(mRpt2);
+    // in non debug
+    if (!mRpt2) return;
 
     dc->StartGraphic(element, "", element->GetUuid());
 
     DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, 2, true, staff, measure);
 
     dc->EndGraphic(element, this);
-
-    // For avoiding unused variable warning in non debug mode
-    mRpt2 = NULL;
 }
 
 void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -957,8 +979,8 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
-    int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
+    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
+    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
 
     // We do not support more than three chars
     int num = std::min(multiRest->GetNum(), 999);
@@ -978,7 +1000,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // Draw the base rect
         // make it 8 pixels smaller than the interline space
         // these are the two 4 substracted and added
-        DrawFullRectangle(dc, x1, y2, x2, y1);
+        DrawFilledRectangle(dc, x1, y2, x2, y1);
 
         // Draw two lines at beginning and end
         // make it 8 pixels longer, and 4 pixels width
@@ -994,7 +1016,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
         // Position centered in third line
         y1 = staff->GetDrawingY() - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) / 2) * 4;
         y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-        DrawFullRectangle(dc, x1, y2 - 4, x2, y1 + 4);
+        DrawFilledRectangle(dc, x1, y2 - 4, x2, y1 + 4);
     }
 
     // Draw the text above
@@ -1063,7 +1085,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int drawingDur;
     int staffY = staff->GetDrawingY();
     wchar_t fontNo;
-    int ledge;
     int verticalCenter = 0;
     bool flippedNotehead = false;
     bool doubleLengthLedger = false;
@@ -1076,11 +1097,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
 
-    if (drawingDur > DUR_1) {
-        ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
-    }
-    else {
-        ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
+    if (drawingDur <= DUR_1) {
         radius += radius / 3;
     }
 
@@ -1321,7 +1338,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     assert(syl);
 
     if (!syl->GetStart()) {
-        LogDebug("Syl parent note was not found");
+        LogWarning("Parent note for <syl> was not found");
         return;
     }
 
@@ -1447,15 +1464,27 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     dc->ResetBrush();
 }
 
+bool IsMensuralStaff(Staff *staff);
+bool IsMensuralStaff(Staff *staff)
+{
+    bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
+        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    return isMensural;
+}
+
 void View::DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
 {
     int i;
+    int useStaffSize = staff->m_drawingStaffSize;
+    if (IsMensuralStaff(staff)) useStaffSize *= TEMP_MAUGDOT_SIZE_FACTOR;
+
     if (IsOnStaffLine(y, staff)) {
-        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        y += m_doc->GetDrawingUnit(useStaffSize);
     }
     for (i = 0; i < dots; i++) {
-        DrawDot(dc, x, y, staff->m_drawingStaffSize);
-        x += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        DrawDot(dc, x, y, useStaffSize);
+        x += m_doc->GetDrawingDoubleUnit(useStaffSize);
     }
 }
 
@@ -1590,28 +1619,33 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
     assert(dc);
     assert(staff);
 
-    int ynum, yden;
-    std::wstring wtext;
+    int ynum = 0, yden = 0;
+    std::wstring numText, numBaseText;
+
+    int yCenter = y - (staff->m_drawingLines) / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+    yCenter += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     if (numBase) {
-        ynum = y - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
+        ynum = yCenter; // - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
         yden = ynum - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2);
     }
     else
-        ynum = y - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
-
-    if (numBase > 9 || num > 9) {
-        x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
-    }
+        ynum = yCenter - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    wtext = IntToTimeSigFigures(num);
-    DrawSmuflString(dc, x, ynum, wtext, true, staff->m_drawingStaffSize); // true = center
+    numText = IntToTimeSigFigures(num);
+    if (numBase) numBaseText = IntToTimeSigFigures(numBase);
+
+    std::wstring widthText = (numText.length() > numBaseText.length()) ? numText : numBaseText;
+
+    int w = 0, h = 0;
+    dc->GetSmuflTextExtent(widthText, &w, &h);
+    x += (w / 2);
+    DrawSmuflString(dc, x, ynum, numText, true, staff->m_drawingStaffSize);
 
     if (numBase) {
-        wtext = IntToTimeSigFigures(numBase);
-        DrawSmuflString(dc, x, yden, wtext, true, staff->m_drawingStaffSize); // '1' = center
+        DrawSmuflString(dc, x, yden, numBaseText, true, staff->m_drawingStaffSize);
     }
 
     dc->ResetFont();
@@ -1619,8 +1653,8 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
 
 void View::DrawMRptPart(DeviceContext *dc, int x, wchar_t smuflCode, int num, bool line, Staff *staff, Measure *measure)
 {
-    int width = measure->GetRightBarLineX() - measure->GetNonJustifiableLeftMargin();
-    int xCentered = measure->GetDrawingX() + measure->GetNonJustifiableLeftMargin() + (width / 2);
+    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
+    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
 
     int xSymbol = xCentered - m_doc->GetGlyphWidth(smuflCode, staff->m_drawingStaffSize, false) / 2;
     int y = staff->GetDrawingY();
@@ -1658,7 +1692,7 @@ void View::DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff)
         y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    DrawFullRectangle(dc, x1, y2, x2, y1);
+    DrawFilledRectangle(dc, x1, y2, x2, y1);
 
     // lines
     x1 = x - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
@@ -1681,7 +1715,7 @@ void View::DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff)
         y1 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
 
     y2 = y1 + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-    DrawFullRectangle(dc, x1, y2, x2, y1);
+    DrawFilledRectangle(dc, x1, y2, x2, y1);
 }
 
 void View::DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff)
@@ -1718,7 +1752,7 @@ void View::DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned c
     }
 
     y2 = y1 + vertic;
-    DrawFullRectangle(dc, x1, y1, x2, y2);
+    DrawFilledRectangle(dc, x1, y1, x2, y2);
 
     off /= 2;
     x1 -= off;
@@ -1791,7 +1825,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
 
     // draw the stems and the flags
     if (dir == STEMDIRECTION_up) {
-        DrawFullRectangle(dc, x2 - m_doc->GetDrawingStemWidth(staffSize), stemY1, x2, stemY2);
+        DrawFilledRectangle(dc, x2 - m_doc->GetDrawingStemWidth(staffSize), stemY1, x2, stemY2);
 
         if (drawingDur > DUR_4) {
             DrawSmuflCode(dc, x2 - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), y2, SMUFL_E240_flag8thUp,
@@ -1802,7 +1836,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
         }
     }
     else {
-        DrawFullRectangle(dc, x2, stemY1, x2 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), stemY2);
+        DrawFilledRectangle(dc, x2, stemY1, x2 + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), stemY2);
 
         if (drawingDur > DUR_4) {
             DrawSmuflCode(dc, x2, y2, SMUFL_E241_flag8thDown, staff->m_drawingStaffSize, drawingCueSize);
@@ -1886,11 +1920,16 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
 
     // another way of calculating accidBot
     assert(((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit) == accidTop + accidHeightDiff);
+    // in non debug
+    if (((int)accidSpace->size() - 1) - ((std::max(0, bottomY - listBot)) / halfUnit) != accidTop + accidHeightDiff)
+        return 0;
 
     // store it for asserts
     accidSpaceSize = (int)accidSpace->size();
     assert(accidTop >= 0);
     assert(accidTop < accidSpaceSize);
+    // in non debug
+    if ((accidTop < 0) || (accidTop >= accidSpaceSize)) return 0;
 
     /*
      * Make sure all four corners of the accidental are not on an already-taken spot.

@@ -45,7 +45,7 @@ verovio.vrvToolkit.renderToMidi = Module.cwrap('vrvToolkit_renderToMidi', 'strin
 // char *getElementsAtTime(Toolkit *ic, int time )
 verovio.vrvToolkit.getElementsAtTime = Module.cwrap('vrvToolkit_getElementsAtTime', 'string', ['number', 'number']);
 
-// char *getMEI(Toolkit *ic, int pageNo )
+// char *getMEI(Toolkit *ic, int pageNo, int scoreBased )
 verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number', 'number', 'number']);
 
 // void setOptions(Toolkit *ic, const char *options) 

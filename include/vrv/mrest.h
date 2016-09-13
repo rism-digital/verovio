@@ -8,6 +8,7 @@
 #ifndef __VRV_MREST_H__
 #define __VRV_MREST_H__
 
+#include "atts_shared.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -19,7 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <mRest>
  */
-class MRest : public LayerElement {
+class MRest : public LayerElement, public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -29,8 +30,8 @@ public:
     MRest();
     virtual ~MRest();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "MRest"; };
-    virtual ClassId Is() const { return MREST; };
+    virtual std::string GetClassName() const { return "MRest"; }
+    virtual ClassId Is() const { return MREST; }
     ///@}
 
 private:

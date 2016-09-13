@@ -13,7 +13,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "editorial.h"
 #include "note.h"
+#include "rest.h"
+#include "tuplet.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -36,11 +40,36 @@ void Beam::Reset()
     LayerElement::Reset();
 }
 
-void Beam::AddLayerElement(LayerElement *element)
+void Beam::AddChild(Object *child)
 {
+    if (child->Is() == BEAM) {
+        assert(dynamic_cast<Beam *>(child));
+    }
+    else if (child->Is() == CHORD) {
+        assert(dynamic_cast<Chord *>(child));
+    }
+    else if (child->Is() == CLEF) {
+        assert(dynamic_cast<Clef *>(child));
+    }
+    else if (child->Is() == NOTE) {
+        assert(dynamic_cast<Note *>(child));
+    }
+    else if (child->Is() == REST) {
+        assert(dynamic_cast<Rest *>(child));
+    }
+    else if (child->Is() == TUPLET) {
+        assert(dynamic_cast<Tuplet *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
 
-    element->SetParent(this);
-    m_children.push_back(element);
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
@@ -78,8 +107,7 @@ void Beam::FilterList(ListOfObjects *childList)
                 // if the first note in beam was NOT a grace
                 // we have grace notes embedded in a beam
                 // drop them
-                if (!firstNoteGrace && n->HasGrace() == true)
-                    iter = childList->erase(iter);
+                if (!firstNoteGrace && n->HasGrace() == true) iter = childList->erase(iter);
                 // also remove notes within chords
                 else if (n->IsChordTone())
                     iter = childList->erase(iter);
@@ -137,7 +165,7 @@ void Beam::InitCoords(ListOfObjects *childList)
     ClearCoords();
     m_beamElementCoords.reserve(childList->size());
     int i;
-    for (i = 0; i < childList->size(); i++) {
+    for (i = 0; i < (int)childList->size(); i++) {
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
 }

@@ -29,31 +29,29 @@ public:
     Verse();
     virtual ~Verse();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Verse"; };
-    virtual ClassId Is() const { return VERSE; };
+    virtual std::string GetClassName() const { return "Verse"; }
+    virtual ClassId Is() const { return VERSE; }
     ///@}
 
     /**
      * Add an element (a syl) to a verse.
      * Only Syl elements will be actually added to the verse.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * Align the content of a staff vertically.
      * See Object::AlignVertically
      */
-    virtual int AlignVertically(ArrayPtrVoid *params);
+    virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
-     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
-     * and for staff/layer to be then processed.
+     * See Object::PrepareProcessingLists
      */
-    virtual int PrepareProcessingLists(ArrayPtrVoid *params);
+    virtual int PrepareProcessingLists(FunctorParams *functorParams);
 
 private:
     //

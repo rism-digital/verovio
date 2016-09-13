@@ -12,8 +12,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "vrvdef.h"
 #include "attconverter.h"
+#include "vrvdef.h"
 
 namespace vrv {
 
@@ -56,7 +56,7 @@ public:
     // static bool SetLyrics(Object *element, std::string attrType, std::string attrValue);
     static bool SetMei(Object *element, std::string attrType, std::string attrValue);
     static bool SetMensural(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetMidi(Object *element, std::string attrType, std::string attrValue);
+    static bool SetMidi(Object *element, std::string attrType, std::string attrValue);
     static bool SetPagebased(Object *element, std::string attrType, std::string attrValue);
     // static bool SetPerformance(Object *element, std::string attrType, std::string attrValue);
     // static bool SetNeumes(Object *element, std::string attrType, std::string attrValue);
@@ -79,7 +79,7 @@ public:
     // static void GetLyrics(Object *element, ArrayOfStrAttr *attributes);
     static void GetMei(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMensural(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetMidi(Object *element, ArrayOfStrAttr *attributes);
+    static void GetMidi(const Object *element, ArrayOfStrAttr *attributes);
     static void GetPagebased(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetPerformance(Object *element, ArrayOfStrAttr *attributes);
     // static void GetNeumes(Object *element, ArrayOfStrAttr *attributes);
@@ -124,11 +124,26 @@ public:
     std::string ModusminorToStr(data_MODUSMINOR data) const;
     data_MODUSMINOR StrToModusminor(std::string value) const;
 
+    std::string MidibpmToStr(data_MIDIBPM data) const { return IntToStr(data); }
+    data_MIDIBPM StrToMidibpm(std::string value) const { return StrToInt(value); }
+
+    std::string MidichannelToStr(data_MIDICHANNEL data) const { return IntToStr(data); }
+    data_MIDICHANNEL StrToMidichannel(std::string value) const { return StrToInt(value); }
+
+    std::string MidimspbToStr(data_MIDIMSPB data) const { return IntToStr(data); }
+    data_MIDIMSPB StrToMidimspb(std::string value) const { return StrToInt(value); }
+
+    std::string MidivalueToStr(data_MIDIVALUE data) const { return IntToStr(data); }
+    data_MIDIVALUE StrToMidivalue(std::string value) const { return StrToInt(value); }
+
     std::string OctaveDisToStr(data_OCTAVE_DIS data) const;
     data_OCTAVE_DIS StrToOctaveDis(std::string value) const;
 
     std::string OrientationToStr(data_ORIENTATION data) const;
     data_ORIENTATION StrToOrientation(std::string value) const;
+
+    std::string PercentToStr(data_PERCENT data) const;
+    data_PERCENT StrToPercent(std::string value) const;
 
     std::string PitchnameToStr(data_PITCHNAME data) const;
     data_PITCHNAME StrToPitchname(std::string value) const;
@@ -176,18 +191,18 @@ public:
     /**
      * Method for registering an MEI att classes in the interface.
      */
-    void RegisterInterfaceAttClass(AttClassId attClassId) { m_interfaceAttClasses.push_back(attClassId); };
+    void RegisterInterfaceAttClass(AttClassId attClassId) { m_interfaceAttClasses.push_back(attClassId); }
 
     /**
      * Method for obtaining a pointer to the attribute class vector of the interface
      */
-    std::vector<AttClassId> *GetAttClasses() { return &m_interfaceAttClasses; };
+    std::vector<AttClassId> *GetAttClasses() { return &m_interfaceAttClasses; }
 
     /**
      * Virtual method returning the InterfaceId of the interface.
      * Needs to be overridden in child classes.
      */
-    virtual InterfaceId IsInterface() { return INTERFACE; };
+    virtual InterfaceId IsInterface() { return INTERFACE; }
 
 private:
     /**
@@ -203,11 +218,11 @@ private:
 class AttComparison {
 
 public:
-    AttComparison(ClassId classId) { m_classId = classId; };
+    AttComparison(ClassId classId) { m_classId = classId; }
 
     virtual bool operator()(Object *object);
 
-    ClassId GetType() { return m_classId; };
+    ClassId GetType() { return m_classId; }
 
     bool MatchesType(Object *object);
 

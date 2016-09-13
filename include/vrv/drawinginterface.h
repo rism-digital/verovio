@@ -8,16 +8,16 @@
 #ifndef __VRV_DRAWING_INTERFACE_H__
 #define __VRV_DRAWING_INTERFACE_H__
 
+#include "clef.h"
 #include "devicecontextbase.h"
+#include "keysig.h"
+#include "mensur.h"
+#include "metersig.h"
 #include "vrvdef.h"
 
 namespace vrv {
 
-class Clef;
 class Object;
-class KeySig;
-class Mensur;
-class MeterSig;
 
 //----------------------------------------------------------------------------
 // DrawingListInterface
@@ -89,8 +89,6 @@ public:
     StaffDefDrawingInterface();
     virtual ~StaffDefDrawingInterface();
     virtual void Reset();
-    StaffDefDrawingInterface(const StaffDefDrawingInterface &interface); // copy contructor
-    StaffDefDrawingInterface &operator=(const StaffDefDrawingInterface &interface); // copy assignement;
     ///@}
 
     /**
@@ -99,16 +97,17 @@ public:
      * This will be true only for the first layer in the staff.
      */
     ///@{
-    bool DrawClef() const { return m_drawClef; };
-    void SetDrawClef(bool drawClef) { m_drawClef = drawClef; };
-    bool DrawKeySig() const { return m_drawKeySig; };
-    void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; };
-    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; };
-    void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; };
-    bool DrawMensur() const { return m_drawMensur; };
-    void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; };
-    bool DrawMeterSig() const { return m_drawMeterSig; };
-    void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; };
+    bool DrawClef() const { return (m_drawClef && m_currentClef.HasShape()); }
+    void SetDrawClef(bool drawClef) { m_drawClef = drawClef; }
+    bool DrawKeySig() const
+    {
+        return (m_drawKeySig && (m_currentKeySig.GetAlterationType() != ACCIDENTAL_EXPLICIT_NONE));
+    }
+    void SetDrawKeySig(bool drawKeySig) { m_drawKeySig = drawKeySig; }
+    bool DrawMensur() const { return (m_drawMensur && m_currentMensur.HasSign()); }
+    void SetDrawMensur(bool drawMensur) { m_drawMensur = drawMensur; }
+    bool DrawMeterSig() const { return (m_drawMeterSig && (m_currentMeterSig.HasUnit() || m_currentMeterSig.HasSym())); }
+    void SetDrawMeterSig(bool drawMeterSig) { m_drawMeterSig = drawMeterSig; }
     ///@}
 
     /**
@@ -122,51 +121,25 @@ public:
     ///@}
 
     /**
-     * @name Get the clef, keySig, mensur and meterSig to be drawn.
-     */
-    ///@{
-    Clef *GetDrawingClef()
-    {
-        if (m_drawClef) return m_currentClef;
-        return NULL;
-    };
-    KeySig *GetDrawingKeySig()
-    {
-        if (m_drawKeySig) return m_currentKeySig;
-        return NULL;
-    };
-    Mensur *GetDrawingMensur()
-    {
-        if (m_drawMensur) return m_currentMensur;
-        return NULL;
-    };
-    MeterSig *GetDrawingMeterSig()
-    {
-        if (m_drawMeterSig) return m_currentMeterSig;
-        return NULL;
-    };
-    ///@}
-
-    /**
      * @name Get the clef, keysig, mensur and meterSig object.
      * They will return a reference to the hold object (element or attribute).
      */
     ///@{
-    Clef *GetCurrentClef() const { return m_currentClef; };
-    KeySig *GetCurrentKeySig() const { return m_currentKeySig; };
-    Mensur *GetCurrentMensur() const { return m_currentMensur; };
-    MeterSig *GetCurrentMeterSig() const { return m_currentMeterSig; };
+    Clef *GetCurrentClef() { return &m_currentClef; }
+    KeySig *GetCurrentKeySig() { return &m_currentKeySig; }
+    Mensur *GetCurrentMensur() { return &m_currentMensur; }
+    MeterSig *GetCurrentMeterSig() { return &m_currentMeterSig; }
     ///@}
 
 private:
     /** The clef or clef attributes */
-    Clef *m_currentClef;
+    Clef m_currentClef;
     /** The key signature */
-    KeySig *m_currentKeySig;
+    KeySig m_currentKeySig;
     /** The mensur */
-    Mensur *m_currentMensur;
+    Mensur m_currentMensur;
     /** The meter signature (time signature) */
-    MeterSig *m_currentMeterSig;
+    MeterSig m_currentMeterSig;
 
     /**
      *  @name Flags for indicating whether the clef, keysig and mensur needs to be drawn or not
@@ -174,7 +147,6 @@ private:
     ///@{
     bool m_drawClef;
     bool m_drawKeySig;
-    bool m_drawKeySigCancellation;
     bool m_drawMensur;
     bool m_drawMeterSig;
     ///@}
@@ -217,7 +189,7 @@ protected:
      * If this is a note, store here the stem coordinates (useful for ex. tuplets)
      */
     Point m_drawingStemStart; // beginning point, the one near the note
-    Point m_drawingStemEnd; // end point (!), near beam or stem
+    Point m_drawingStemEnd; // end point (!), near beam or flag
     /**
      * Stem direction as drawn
      */

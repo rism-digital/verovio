@@ -10,12 +10,13 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
 #include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "floatingelement.h"
+#include "floatingobject.h"
 #include "glyph.h"
 #include "layerelement.h"
 #include "view.h"
@@ -147,11 +148,25 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     if (gClass.length() > 0) {
         baseClass.append(" " + gClass);
     }
+    if (object->HasSVGClass()) {
+        baseClass.append(" " + object->GetSVGClass());
+    }
 
     m_currentNode = m_currentNode.append_child("g");
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = baseClass.c_str();
-    m_currentNode.append_attribute("id") = gId.c_str();
+    if (gId.length() > 0) {
+        m_currentNode.append_attribute("id") = gId.c_str();
+    }
+
+    if (object->HasAttClass(ATT_VISIBILITY)) {
+        AttVisibility *att = dynamic_cast<AttVisibility *>(object);
+        assert(att);
+        if (att->GetVisible() == BOOLEAN_false) {
+            m_currentNode.append_attribute("visibility") = "hidden";
+        }
+    }
+
     // m_currentNode.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity:
     // %f;",
     // GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(),
@@ -212,7 +227,7 @@ void SvgDeviceContext::StartPage()
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("id") = "definition-scale";
     m_currentNode.append_attribute("viewBox")
-        = StringFormat("0 0 %d %d", m_width * DEFINITON_FACTOR, m_height * DEFINITON_FACTOR).c_str();
+        = StringFormat("0 0 %d %d", m_width * DEFINITION_FACTOR, m_height * DEFINITION_FACTOR).c_str();
 
     // a graphic for the origin
     m_currentNode = m_currentNode.append_child("g");
@@ -416,6 +431,9 @@ void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
     pathChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
+    if (m_penStack.top().GetDashLenght() > 0)
+        pathChild.append_attribute("stroke-dasharray")
+            = StringFormat("%d, %d", m_penStack.top().GetDashLenght(), m_penStack.top().GetDashLenght()).c_str();
 }
 
 void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style)
@@ -662,10 +680,10 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
     if (drawBoundingBox && view) {
         BoundingBox *box = object;
         // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
-        if (object->IsFloatingElement()) {
-            FloatingElement *floatingElement = dynamic_cast<FloatingElement *>(object);
-            assert(floatingElement);
-            box = floatingElement->GetCurrentFloatingPositioner();
+        if (object->IsFloatingObject()) {
+            FloatingObject *floatingObject = dynamic_cast<FloatingObject *>(object);
+            assert(floatingObject);
+            box = floatingObject->GetCurrentFloatingPositioner();
             // No bounding box found, ignore the object - this happens when the @staff is missing because the element is
             // never drawn but there is still a EndGraphic call.
             if (!box) return;

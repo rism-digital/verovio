@@ -30,19 +30,19 @@ public:
     BarLine();
     virtual ~BarLine();
     virtual void Reset();
-    virtual Object *Clone() const { return new BarLine(*this); };
-    virtual std::string GetClassName() const { return "BarLine"; };
-    virtual ClassId Is() const { return BARLINE; };
+    virtual Object *Clone() const { return new BarLine(*this); }
+    virtual std::string GetClassName() const { return "BarLine"; }
+    virtual ClassId Is() const { return BARLINE; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     /**
      * Use to set the alignment for the Measure BarLine members.
      * This is as special case where we need to add to the measure aligner.
      */
-    void SetAlignment(Alignment *alignment) { m_alignment = alignment; };
+    void SetAlignment(Alignment *alignment);
 
     /*
      * Return true if the barLine type requires repetition dots to be drawn.
@@ -72,10 +72,20 @@ public:
     ///@{
     BarLineAttr();
     virtual ~BarLineAttr();
-    virtual Object *Clone() const { return new BarLineAttr(*this); };
-    virtual std::string GetClassName() const { return "BarLineAttr"; };
-    virtual ClassId Is() const { return BARLINE_ATTR; };
+    virtual Object *Clone() const { return new BarLineAttr(*this); }
+    virtual std::string GetClassName() const { return "BarLineAttr"; }
+    virtual ClassId Is() const { return (m_isLeft ? BARLINE_ATTR_LEFT : BARLINE_ATTR_RIGHT); }
     ///@}
+
+    void SetLeft() { m_isLeft = true; }
+
+private:
+    //
+public:
+    //
+private:
+    /** A flag for left barlines (right if false) */
+    bool m_isLeft;
 };
 
 } // namespace vrv

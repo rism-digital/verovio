@@ -36,7 +36,8 @@ class Chord : public LayerElement,
               public AttCommon,
               public AttStems,
               public AttStemsCmn,
-              public AttTiepresent {
+              public AttTiepresent,
+              public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -46,8 +47,8 @@ public:
     Chord();
     virtual ~Chord();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Chord"; };
-    virtual ClassId Is() const { return CHORD; };
+    virtual std::string GetClassName() const { return "Chord"; }
+    virtual ClassId Is() const { return CHORD; }
     ///@}
 
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
@@ -57,12 +58,12 @@ public:
     }
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     /**
      * Add an element (only note supported) to a chord.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
     virtual void FilterList(ListOfObjects *childlist);
 
@@ -74,16 +75,16 @@ public:
     void ResetAccidList();
 
     /**
-     * Return information about the position in the chord
+     * Return information about a note's position in the chord
      */
     ///@{
-    /** Return 0 if the note id is the middle note, -1 if below it and 1 if above */
+    /** Return 0 if the note is the middle note, -1 if below it and 1 if above */
     int PositionInChord(Note *note);
     ///@}
 
     /**
      * Prepares a 2D grid of booleans to track where accidentals are placed.
-     * For further documentation, see comments in chord.cpp
+     * Further documentation is in chord.cpp comments.
      */
     void ResetAccidSpace(int fullUnit);
 
@@ -104,12 +105,8 @@ public:
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr(ArrayPtrVoid *params);
-
-    /**
-     * See Object::PrepareTieAttr
-     */
-    virtual int PrepareTieAttrEnd(ArrayPtrVoid *params);
+    virtual int PrepareTieAttr(FunctorParams *functorParams);
+    virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
 
 protected:
     /**

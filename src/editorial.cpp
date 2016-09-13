@@ -13,10 +13,12 @@
 
 //----------------------------------------------------------------------------
 
-#include "floatingelement.h"
+#include "controlelement.h"
+#include "functorparams.h"
 #include "layer.h"
 #include "measure.h"
 #include "scoredef.h"
+#include "section.h"
 #include "staff.h"
 #include "system.h"
 #include "textelement.h"
@@ -28,7 +30,7 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() :  Object("ee-"), AttCommon(), AttCommonPart()
+EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), AttCommon(), AttCommonPart()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
@@ -36,7 +38,7 @@ EditorialElement::EditorialElement() :  Object("ee-"), AttCommon(), AttCommonPar
     Reset();
 }
 
-EditorialElement::EditorialElement(std::string classid) :  Object(classid), AttCommon()
+EditorialElement::EditorialElement(std::string classid) : Object(classid), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
@@ -47,6 +49,7 @@ EditorialElement::EditorialElement(std::string classid) :  Object(classid), AttC
 void EditorialElement::Reset()
 {
     Object::Reset();
+    BoundaryStartInterface::Reset();
     ResetCommon();
     ResetCommonPart();
 
@@ -57,71 +60,46 @@ EditorialElement::~EditorialElement()
 {
 }
 
-void EditorialElement::AddFloatingElement(FloatingElement *child)
+void EditorialElement::AddChild(Object *child)
 {
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddTextElement(TextElement *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddLayer(Layer *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-    if (child->GetN() < 1) {
-        LogError("Layer without @n is not supported within editorial markup element");
+    if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
     }
-}
-
-void EditorialElement::AddLayerElement(LayerElement *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddMeasure(Measure *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddScoreDef(ScoreDef *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddStaff(Staff *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-    if (child->GetN() < 1) {
-        LogError("Staff without @n is not supported within editorial markup element");
+    else if (child->IsSystemElement()) {
+        assert(dynamic_cast<SystemElement *>(child));
     }
-}
+    else if (child->IsControlElement()) {
+        assert(dynamic_cast<ControlElement *>(child));
+    }
+    else if (child->IsLayerElement()) {
+        assert(dynamic_cast<LayerElement *>(child));
+    }
+    else if (child->IsTextElement()) {
+        assert(dynamic_cast<TextElement *>(child));
+    }
+    else if (child->Is() == LAYER) {
+        assert(dynamic_cast<Layer *>(child));
+    }
+    else if (child->Is() == MEASURE) {
+        assert(dynamic_cast<Measure *>(child));
+    }
+    else if (child->Is() == SCOREDEF) {
+        assert(dynamic_cast<ScoreDef *>(child));
+    }
+    else if (child->Is() == STAFF) {
+        assert(dynamic_cast<Staff *>(child));
+    }
+    else if (child->Is() == STAFFDEF) {
+        assert(dynamic_cast<Staff *>(child));
+    }
+    else if (child->Is() == STAFFGRP) {
+        assert(dynamic_cast<Staff *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
 
-void EditorialElement::AddStaffDef(StaffDef *child)
-{
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
-}
-
-void EditorialElement::AddStaffGrp(StaffGrp *child)
-{
-    // assert(m_children.empty());
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
@@ -219,9 +197,82 @@ App::~App()
 {
 }
 
-void App::AddLemOrRdg(EditorialElement *child)
+void App::AddChild(Object *child)
 {
-    assert(dynamic_cast<Lem *>(child) || dynamic_cast<Rdg *>(child));
+    if (child->Is() == LEM) {
+        assert(dynamic_cast<Lem *>(child));
+    }
+    else if (child->Is() == RDG) {
+        assert(dynamic_cast<Rdg *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
+}
+
+//----------------------------------------------------------------------------
+// Choice
+//----------------------------------------------------------------------------
+
+Choice::Choice() : EditorialElement("choice-")
+{
+    m_level = EDITORIAL_UNDEFINED;
+
+    Reset();
+}
+
+Choice::Choice(EditorialLevel level) : EditorialElement("choice-")
+{
+    m_level = level;
+
+    Reset();
+}
+
+void Choice::Reset()
+{
+    EditorialElement::Reset();
+}
+
+Choice::~Choice()
+{
+}
+
+void Choice::AddChild(Object *child)
+{
+    if (child->Is() == ABBR) {
+        assert(dynamic_cast<Abbr *>(child));
+    }
+    else if (child->Is() == CHOICE) {
+        assert(dynamic_cast<Choice *>(child));
+    }
+    else if (child->Is() == CORR) {
+        assert(dynamic_cast<Corr *>(child));
+    }
+    else if (child->Is() == EXPAN) {
+        assert(dynamic_cast<Expan *>(child));
+    }
+    else if (child->Is() == ORIG) {
+        assert(dynamic_cast<Orig *>(child));
+    }
+    else if (child->Is() == REG) {
+        assert(dynamic_cast<Reg *>(child));
+    }
+    else if (child->Is() == SIC) {
+        assert(dynamic_cast<Sic *>(child));
+    }
+    else if (child->Is() == UNCLEAR) {
+        assert(dynamic_cast<Unclear *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
@@ -483,16 +534,48 @@ void Unclear::Reset()
 // EditorialElement functor methods
 //----------------------------------------------------------------------------
 
-int EditorialElement::CastOffSystems(ArrayPtrVoid *params)
+int EditorialElement::ConvertToPageBased(FunctorParams *functorParams)
 {
-    // param 0: a pointer to the system we are taking the content from
-    // param 1: a pointer the page we are adding system to (unused)
-    // param 2: a pointer to the current system
-    // param 3: the cummulated shift (m_drawingXRel of the first measure of the current system) (unused)
-    // param 4: the system width (unused)
-    // param 5: the current scoreDef width (unused)
-    System *contentSystem = static_cast<System *>((*params).at(0));
-    System **currentSystem = static_cast<System **>((*params).at(2));
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int EditorialElement::ConvertToPageBasedEnd(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    if (this->m_visibility == Visible) ConvertToPageBasedBoundary(this, params->m_pageBasedSystem);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int EditorialElement::PrepareBoundaries(FunctorParams *functorParams)
+{
+    if (this->IsBoundary()) {
+        this->BoundaryStartInterface::InterfacePrepareBoundaries(functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int EditorialElement::ResetDrawing(FunctorParams *functorParams)
+{
+    if (this->IsBoundary()) {
+        this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
+    }
+
+    return FUNCTOR_CONTINUE;
+};
+
+int EditorialElement::CastOffSystems(FunctorParams *functorParams)
+{
+    CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
+    assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
     assert(dynamic_cast<System *>(this->m_parent));
@@ -501,9 +584,21 @@ int EditorialElement::CastOffSystems(ArrayPtrVoid *params)
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
-    EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(contentSystem->Relinquish(this->GetIdx()));
+    EditorialElement *editorialElement
+        = dynamic_cast<EditorialElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));
     assert(editorialElement);
-    (*currentSystem)->AddEditorialElement(editorialElement);
+    // move as pending since we want it at the beginning of the system in case of system break coming
+    params->m_pendingObjects.push_back(editorialElement);
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int EditorialElement::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }

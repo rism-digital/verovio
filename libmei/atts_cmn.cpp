@@ -531,14 +531,14 @@ AttBendGes::~AttBendGes()
 
 void AttBendGes::ResetBendGes()
 {
-    m_amount = "";
+    m_amount = 0.0;
 }
 
 bool AttBendGes::ReadBendGes(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("amount")) {
-        this->SetAmount(StrToStr(element.attribute("amount").value()));
+        this->SetAmount(StrToDbl(element.attribute("amount").value()));
         element.remove_attribute("amount");
         hasAttribute = true;
     }
@@ -549,7 +549,7 @@ bool AttBendGes::WriteBendGes(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasAmount()) {
-        element.append_attribute("amount") = StrToStr(this->GetAmount()).c_str();
+        element.append_attribute("amount") = DblToStr(this->GetAmount()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -557,7 +557,7 @@ bool AttBendGes::WriteBendGes(pugi::xml_node element)
 
 bool AttBendGes::HasAmount() const
 {
-    return (m_amount != "");
+    return (m_amount != 0.0);
 }
 
 /* include <attamount> */
@@ -789,7 +789,7 @@ bool AttGraced::ReadGraced(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("grace.time")) {
-        this->SetGraceTime(StrToInt(element.attribute("grace.time").value()));
+        this->SetGraceTime(StrToPercent(element.attribute("grace.time").value()));
         element.remove_attribute("grace.time");
         hasAttribute = true;
     }
@@ -804,7 +804,7 @@ bool AttGraced::WriteGraced(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasGraceTime()) {
-        element.append_attribute("grace.time") = IntToStr(this->GetGraceTime()).c_str();
+        element.append_attribute("grace.time") = PercentToStr(this->GetGraceTime()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -1110,6 +1110,52 @@ bool AttLvpresent::HasLv() const
 }
 
 /* include <attlv> */
+
+//----------------------------------------------------------------------------
+// AttMeterSigGrpLog
+//----------------------------------------------------------------------------
+
+AttMeterSigGrpLog::AttMeterSigGrpLog() : Att()
+{
+    ResetMeterSigGrpLog();
+}
+
+AttMeterSigGrpLog::~AttMeterSigGrpLog()
+{
+}
+
+void AttMeterSigGrpLog::ResetMeterSigGrpLog()
+{
+    m_func = meterSigGrpLog_FUNC_NONE;
+}
+
+bool AttMeterSigGrpLog::ReadMeterSigGrpLog(pugi::xml_node element)
+{
+    bool hasAttribute = false;
+    if (element.attribute("func")) {
+        this->SetFunc(StrToMeterSigGrpLogFunc(element.attribute("func").value()));
+        element.remove_attribute("func");
+        hasAttribute = true;
+    }
+    return hasAttribute;
+}
+
+bool AttMeterSigGrpLog::WriteMeterSigGrpLog(pugi::xml_node element)
+{
+    bool wroteAttribute = false;
+    if (this->HasFunc()) {
+        element.append_attribute("func") = MeterSigGrpLogFuncToStr(this->GetFunc()).c_str();
+        wroteAttribute = true;
+    }
+    return wroteAttribute;
+}
+
+bool AttMeterSigGrpLog::HasFunc() const
+{
+    return (m_func != meterSigGrpLog_FUNC_NONE);
+}
+
+/* include <attfunc> */
 
 //----------------------------------------------------------------------------
 // AttMultiRestVis
@@ -1601,15 +1647,21 @@ AttSlurrend::~AttSlurrend()
 
 void AttSlurrend::ResetSlurrend()
 {
-    m_slurRend = CURVERENDITION_NONE;
+    m_slurLform = LINEFORM_NONE;
+    m_slurLwidth = "";
 }
 
 bool AttSlurrend::ReadSlurrend(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("slur.rend")) {
-        this->SetSlurRend(StrToCurverendition(element.attribute("slur.rend").value()));
-        element.remove_attribute("slur.rend");
+    if (element.attribute("slur.lform")) {
+        this->SetSlurLform(StrToLineform(element.attribute("slur.lform").value()));
+        element.remove_attribute("slur.lform");
+        hasAttribute = true;
+    }
+    if (element.attribute("slur.lwidth")) {
+        this->SetSlurLwidth(StrToStr(element.attribute("slur.lwidth").value()));
+        element.remove_attribute("slur.lwidth");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1618,19 +1670,28 @@ bool AttSlurrend::ReadSlurrend(pugi::xml_node element)
 bool AttSlurrend::WriteSlurrend(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasSlurRend()) {
-        element.append_attribute("slur.rend") = CurverenditionToStr(this->GetSlurRend()).c_str();
+    if (this->HasSlurLform()) {
+        element.append_attribute("slur.lform") = LineformToStr(this->GetSlurLform()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasSlurLwidth()) {
+        element.append_attribute("slur.lwidth") = StrToStr(this->GetSlurLwidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttSlurrend::HasSlurRend() const
+bool AttSlurrend::HasSlurLform() const
 {
-    return (m_slurRend != CURVERENDITION_NONE);
+    return (m_slurLform != LINEFORM_NONE);
 }
 
-/* include <attslur.rend> */
+bool AttSlurrend::HasSlurLwidth() const
+{
+    return (m_slurLwidth != "");
+}
+
+/* include <attslur.lwidth> */
 
 //----------------------------------------------------------------------------
 // AttStemsCmn
@@ -1693,15 +1754,21 @@ AttTierend::~AttTierend()
 
 void AttTierend::ResetTierend()
 {
-    m_tieRend = CURVERENDITION_NONE;
+    m_tieLform = LINEFORM_NONE;
+    m_tieLwidth = "";
 }
 
 bool AttTierend::ReadTierend(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("tie.rend")) {
-        this->SetTieRend(StrToCurverendition(element.attribute("tie.rend").value()));
-        element.remove_attribute("tie.rend");
+    if (element.attribute("tie.lform")) {
+        this->SetTieLform(StrToLineform(element.attribute("tie.lform").value()));
+        element.remove_attribute("tie.lform");
+        hasAttribute = true;
+    }
+    if (element.attribute("tie.lwidth")) {
+        this->SetTieLwidth(StrToStr(element.attribute("tie.lwidth").value()));
+        element.remove_attribute("tie.lwidth");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -1710,19 +1777,28 @@ bool AttTierend::ReadTierend(pugi::xml_node element)
 bool AttTierend::WriteTierend(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasTieRend()) {
-        element.append_attribute("tie.rend") = CurverenditionToStr(this->GetTieRend()).c_str();
+    if (this->HasTieLform()) {
+        element.append_attribute("tie.lform") = LineformToStr(this->GetTieLform()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasTieLwidth()) {
+        element.append_attribute("tie.lwidth") = StrToStr(this->GetTieLwidth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttTierend::HasTieRend() const
+bool AttTierend::HasTieLform() const
 {
-    return (m_tieRend != CURVERENDITION_NONE);
+    return (m_tieLform != LINEFORM_NONE);
 }
 
-/* include <atttie.rend> */
+bool AttTierend::HasTieLwidth() const
+{
+    return (m_tieLwidth != "");
+}
+
+/* include <atttie.lwidth> */
 
 //----------------------------------------------------------------------------
 // AttTremmeasured
@@ -1955,7 +2031,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         AttBendGes *att = dynamic_cast<AttBendGes *>(element);
         assert(att);
         if (attrType == "amount") {
-            att->SetAmount(att->StrToStr(attrValue));
+            att->SetAmount(att->StrToDbl(attrValue));
             return true;
         }
     }
@@ -2003,7 +2079,7 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
         if (attrType == "grace.time") {
-            att->SetGraceTime(att->StrToInt(attrValue));
+            att->SetGraceTime(att->StrToPercent(attrValue));
             return true;
         }
     }
@@ -2064,6 +2140,14 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
         assert(att);
         if (attrType == "lv") {
             att->SetLv(att->StrToBoolean(attrValue));
+            return true;
+        }
+    }
+    if (element->HasAttClass(ATT_METERSIGGRPLOG)) {
+        AttMeterSigGrpLog *att = dynamic_cast<AttMeterSigGrpLog *>(element);
+        assert(att);
+        if (attrType == "func") {
+            att->SetFunc(att->StrToMeterSigGrpLogFunc(attrValue));
             return true;
         }
     }
@@ -2154,8 +2238,12 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
     if (element->HasAttClass(ATT_SLURREND)) {
         AttSlurrend *att = dynamic_cast<AttSlurrend *>(element);
         assert(att);
-        if (attrType == "slur.rend") {
-            att->SetSlurRend(att->StrToCurverendition(attrValue));
+        if (attrType == "slur.lform") {
+            att->SetSlurLform(att->StrToLineform(attrValue));
+            return true;
+        }
+        if (attrType == "slur.lwidth") {
+            att->SetSlurLwidth(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -2170,8 +2258,12 @@ bool Att::SetCmn(Object *element, std::string attrType, std::string attrValue)
     if (element->HasAttClass(ATT_TIEREND)) {
         AttTierend *att = dynamic_cast<AttTierend *>(element);
         assert(att);
-        if (attrType == "tie.rend") {
-            att->SetTieRend(att->StrToCurverendition(attrValue));
+        if (attrType == "tie.lform") {
+            att->SetTieLform(att->StrToLineform(attrValue));
+            return true;
+        }
+        if (attrType == "tie.lwidth") {
+            att->SetTieLwidth(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -2289,7 +2381,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         const AttBendGes *att = dynamic_cast<const AttBendGes *>(element);
         assert(att);
         if (att->HasAmount()) {
-            attributes->push_back(std::make_pair("amount", att->StrToStr(att->GetAmount())));
+            attributes->push_back(std::make_pair("amount", att->DblToStr(att->GetAmount())));
         }
     }
     if (element->HasAttClass(ATT_CUTOUT)) {
@@ -2330,7 +2422,7 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("grace", att->GraceToStr(att->GetGrace())));
         }
         if (att->HasGraceTime()) {
-            attributes->push_back(std::make_pair("grace.time", att->IntToStr(att->GetGraceTime())));
+            attributes->push_back(std::make_pair("grace.time", att->PercentToStr(att->GetGraceTime())));
         }
     }
     if (element->HasAttClass(ATT_HAIRPINLOG)) {
@@ -2380,6 +2472,13 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
         assert(att);
         if (att->HasLv()) {
             attributes->push_back(std::make_pair("lv", att->BooleanToStr(att->GetLv())));
+        }
+    }
+    if (element->HasAttClass(ATT_METERSIGGRPLOG)) {
+        const AttMeterSigGrpLog *att = dynamic_cast<const AttMeterSigGrpLog *>(element);
+        assert(att);
+        if (att->HasFunc()) {
+            attributes->push_back(std::make_pair("func", att->MeterSigGrpLogFuncToStr(att->GetFunc())));
         }
     }
     if (element->HasAttClass(ATT_MULTIRESTVIS)) {
@@ -2458,8 +2557,11 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_SLURREND)) {
         const AttSlurrend *att = dynamic_cast<const AttSlurrend *>(element);
         assert(att);
-        if (att->HasSlurRend()) {
-            attributes->push_back(std::make_pair("slur.rend", att->CurverenditionToStr(att->GetSlurRend())));
+        if (att->HasSlurLform()) {
+            attributes->push_back(std::make_pair("slur.lform", att->LineformToStr(att->GetSlurLform())));
+        }
+        if (att->HasSlurLwidth()) {
+            attributes->push_back(std::make_pair("slur.lwidth", att->StrToStr(att->GetSlurLwidth())));
         }
     }
     if (element->HasAttClass(ATT_STEMSCMN)) {
@@ -2472,8 +2574,11 @@ void Att::GetCmn(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_TIEREND)) {
         const AttTierend *att = dynamic_cast<const AttTierend *>(element);
         assert(att);
-        if (att->HasTieRend()) {
-            attributes->push_back(std::make_pair("tie.rend", att->CurverenditionToStr(att->GetTieRend())));
+        if (att->HasTieLform()) {
+            attributes->push_back(std::make_pair("tie.lform", att->LineformToStr(att->GetTieLform())));
+        }
+        if (att->HasTieLwidth()) {
+            attributes->push_back(std::make_pair("tie.lwidth", att->StrToStr(att->GetTieLwidth())));
         }
     }
     if (element->HasAttClass(ATT_TREMMEASURED)) {

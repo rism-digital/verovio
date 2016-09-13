@@ -14,7 +14,9 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "functorparams.h"
 #include "slur.h"
+#include "syl.h"
 #include "tie.h"
 #include "verse.h"
 #include "vrv.h"
@@ -37,6 +39,7 @@ Note::Note()
     , AttStems()
     , AttStemsCmn()
     , AttTiepresent()
+    , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
@@ -47,6 +50,7 @@ Note::Note()
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
+    RegisterAttClass(ATT_VISIBILITY);
 
     m_drawingTieAttr = NULL;
     m_drawingAccid = NULL;
@@ -80,6 +84,7 @@ void Note::Reset()
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();
+    ResetVisibility();
 
     // TO BE REMOVED
     m_embellishment = EMB_NONE;
@@ -98,13 +103,27 @@ void Note::Reset()
     m_playingOffset = 0.0;
 }
 
-void Note::AddLayerElement(vrv::LayerElement *element)
+void Note::AddChild(Object *child)
 {
-    // assert(
-    //    dynamic_cast<Accid *>(element) || dynamic_cast<Verse *>(element) || dynamic_cast<EditorialElement
-    //    *>(element));
-    element->SetParent(this);
-    m_children.push_back(element);
+    if (child->Is() == ACCID) {
+        assert(dynamic_cast<Accid *>(child));
+    }
+    else if (child->Is() == SYL) {
+        assert(dynamic_cast<Syl *>(child));
+    }
+    else if (child->Is() == VERSE) {
+        assert(dynamic_cast<Verse *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
@@ -178,22 +197,20 @@ bool Note::IsClusterExtreme() const
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Note::PrepareTieAttr(ArrayPtrVoid *params)
+int Note::PrepareTieAttr(FunctorParams *functorParams)
 {
-    // param 0: std::vector<Note*>* that holds the current notes with open ties
-    // param 1: Chord** currentChord for the current chord if in a chord
-    std::vector<Note *> *currentNotes = static_cast<std::vector<Note *> *>((*params).at(0));
-    Chord **currentChord = static_cast<Chord **>((*params).at(1));
+    PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
+    assert(params);
 
     AttTiepresent *check = this;
     // Use the parent chord if there is no @tie on the note
-    if (!this->HasTie() && (*currentChord)) {
-        check = (*currentChord);
+    if (!this->HasTie() && params->m_currentChord) {
+        check = params->m_currentChord;
     }
     assert(check);
 
-    std::vector<Note *>::iterator iter = currentNotes->begin();
-    while (iter != currentNotes->end()) {
+    std::vector<Note *>::iterator iter = params->m_currentNotes.begin();
+    while (iter != params->m_currentNotes.end()) {
         // same octave and same pitch - this is the one!
         if ((this->GetOct() == (*iter)->GetOct()) && (this->GetPname() == (*iter)->GetPname())) {
             // right flag
@@ -205,7 +222,7 @@ int Note::PrepareTieAttr(ArrayPtrVoid *params)
                 LogWarning("Expected @tie median or terminal in note '%s', skipping it", this->GetUuid().c_str());
                 (*iter)->ResetDrawingTieAttr();
             }
-            iter = currentNotes->erase(iter);
+            iter = params->m_currentNotes.erase(iter);
             // we are done for this note
             break;
         }
@@ -214,39 +231,36 @@ int Note::PrepareTieAttr(ArrayPtrVoid *params)
 
     if ((check->GetTie() == TIE_m) || (check->GetTie() == TIE_i)) {
         this->SetDrawingTieAttr();
-        currentNotes->push_back(this);
+        params->m_currentNotes.push_back(this);
     }
 
     return FUNCTOR_CONTINUE;
 }
 
-int Note::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
+int Note::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
     // Pass it to the pseudo functor of the interface
     if (this->m_drawingTieAttr) {
-        return this->m_drawingTieAttr->FillStaffCurrentTimeSpanning(params);
+        return this->m_drawingTieAttr->FillStaffCurrentTimeSpanning(functorParams);
     }
     return FUNCTOR_CONTINUE;
 }
 
-int Note::PrepareLyrics(ArrayPtrVoid *params)
+int Note::PrepareLyrics(FunctorParams *functorParams)
 {
-    // param 0: the current Syl (unused)
-    // param 1: the last Note
-    // param 2: the last but one Note
-    Note **lastNote = static_cast<Note **>((*params).at(1));
-    Note **lastButOneNote = static_cast<Note **>((*params).at(2));
+    PrepareLyricsParams *params = dynamic_cast<PrepareLyricsParams *>(functorParams);
+    assert(params);
 
-    (*lastButOneNote) = (*lastNote);
-    (*lastNote) = this;
+    params->m_lastButOneNote = params->m_lastNote;
+    params->m_lastNote = this;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Note::PreparePointersByLayer(ArrayPtrVoid *params)
+int Note::PreparePointersByLayer(FunctorParams *functorParams)
 {
-    // param 0: the current Note
-    Note **currentNote = static_cast<Note **>((*params).at(0));
+    PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
+    assert(params);
 
     this->ResetDrawingAccid();
     // LogDebug("PreparePointersByLayer: accid=%d ACC_EXP_NONE=%d", this->GetAccid(), ACCIDENTAL_EXPLICIT_NONE);
@@ -260,12 +274,12 @@ int Note::PreparePointersByLayer(ArrayPtrVoid *params)
         this->m_drawingAccid->m_drawingCueSize = this->HasGrace();
     }
 
-    (*currentNote) = this;
+    params->m_currentNote = this;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Note::ResetDrawing(ArrayPtrVoid *params)
+int Note::ResetDrawing(FunctorParams *functorParams)
 {
     this->ResetDrawingTieAttr();
     return FUNCTOR_CONTINUE;

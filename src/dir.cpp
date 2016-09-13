@@ -16,6 +16,7 @@
 #include "aligner.h"
 #include "editorial.h"
 #include "text.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -23,7 +24,7 @@ namespace vrv {
 // Dir
 //----------------------------------------------------------------------------
 
-Dir::Dir() : FloatingElement("dir-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
+Dir::Dir() : ControlElement("dir-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -37,44 +38,31 @@ Dir::~Dir()
 
 void Dir::Reset()
 {
-    FloatingElement::Reset();
+    ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
 }
 
-void Dir::AddTextElement(TextElement *element)
+void Dir::AddChild(Object *child)
 {
-    assert(dynamic_cast<TextElement *>(element) || dynamic_cast<EditorialElement *>(element));
-    element->SetParent(this);
-    m_children.push_back(element);
+    if (child->IsTextElement()) {
+        assert(dynamic_cast<TextElement *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
 //----------------------------------------------------------------------------
 // Dir functor methods
 //----------------------------------------------------------------------------
-
-int Dir::AlignVertically(ArrayPtrVoid *params)
-{
-    // param 0: the systemAligner
-    // param 1: the staffIdx (unused)
-    // param 2: the staffN (unused)
-    // param 3: the doc (unused)
-    SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
-
-    std::vector<int> staffList = this->GetStaff();
-    std::vector<int>::iterator iter;
-    for (iter = staffList.begin(); iter != staffList.end(); iter++) {
-        // this gets (or creates) the measureAligner for the measure
-        StaffAlignment *alignment = (*systemAligner)->GetStaffAlignmentForStaffN(*iter);
-
-        if (!alignment) continue;
-
-        if (this->GetPlace() == STAFFREL_above) alignment->SetDirAbove();
-        if (this->GetPlace() == STAFFREL_below) alignment->SetDirBelow();
-    }
-
-    return FUNCTOR_CONTINUE;
-}
 
 } // namespace vrv

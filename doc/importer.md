@@ -5,7 +5,7 @@ Verovio supports import for Plain and Easy and for Darms codes (See the PaeInput
 
 ![Snippet](https://cloud.githubusercontent.com/assets/3487289/9319255/2f5187de-4501-11e5-808b-897ed35aa6dd.png)
 
-Some features (articulation, endings, etc.) are still missing but will be added eventually. The resulting MEI file is available [here](importer.mei) and the SVG output for version 0.9.9 [there](importer.svg).
+Some features (articulation, endings, etc.) are still missing but will be added eventually. The resulting MEI file is available [here](importer.mei) and the SVG output for version 0.9.12-dev-0727ade [there](importer.svg).
 
 ``` C++
 ////////////////////////////////////
@@ -31,38 +31,40 @@ Tie *tie = NULL;
 Chord *chord = NULL;
 Slur *slur = NULL;
 ScoreDef *scoreDef = NULL;
+Ending *ending = NULL;
 
 // start and end id
 std::string startid;
 std::string endid;
 
 ////////////////////////////////////
-// Score definition
+// The score as score-based MEI
+////////////////////////////////////
+
+m_doc->Reset();
+Score *score = m_doc->CreateScoreBuffer();
+// the section
+Section *section = new Section();
+score->AddChild(section);
+
+////////////////////////////////////
+// ScoreDef definition
 ////////////////////////////////////
 
 // staffGrp and staffDef
 StaffGrp *staffGrp = new StaffGrp();
 StaffDef *staffDef = new StaffDef();
-staffDef->SetN( 1 );
+staffDef->SetN(1);
 staffDef->SetLines(5);
-
 // clef
 staffDef->SetClefLine(2);
 staffDef->SetClefShape(CLEFSHAPE_G);
-
-// key and meter signatures can be put at in the doc scoreDef
+// key and meter signatures can be put at in the scoreDef
 m_doc->m_scoreDef.SetKeySig(KEYSIGNATURE_2s);
 m_doc->m_scoreDef.SetMeterSym(METERSIGN_common);
-
 // adding the staffDef to the staffGrp and the staffGrp to the doc scoreDef
-staffGrp->AddStaffDef(staffDef);
-m_doc->m_scoreDef.AddStaffGrp(staffGrp);
-
-// we need one page and one system
-Page *page = new Page();
-m_doc->AddPage(page);
-System *system = new System();
-page->AddSystem(system);
+staffGrp->AddChild(staffDef);
+m_doc->m_scoreDef.AddChild(staffGrp);
 
 ////////////////////////////////////
 // Up-beat measure
@@ -79,32 +81,29 @@ rest = new Rest();
 rest->SetDur(DURATION_8);
 
 // add them up
-layer->AddLayerElement(rest);
-staff->AddLayer(layer);
-measure->AddStaff(staff);
-system->AddMeasure(measure);
+layer->AddChild(rest);
+staff->AddChild(layer);
+measure->AddChild(staff);
+section->AddChild(measure);
 
 ////////////////////////////////////
 // Multi-rest measure
 ////////////////////////////////////
 
-// create another measure and content
 measure = new Measure();
 measure->SetN(1);
 staff = new Staff();
 staff->SetN(1);
 layer = new Layer();
 layer->SetN(1);
-
-// add a multi-rest
 multiRest = new MultiRest();
 multiRest->SetNum(3);
 
 // add them up
-layer->AddLayerElement(multiRest);
-staff->AddLayer(layer);
-measure->AddStaff(staff);
-system->AddMeasure(measure);
+layer->AddChild(multiRest);
+staff->AddChild(layer);
+measure->AddChild(staff);
+section->AddChild(measure);
 
 ////////////////////////////////////
 // Fourth measure
@@ -125,30 +124,30 @@ note = new Note();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_b);
 note->SetOct(4);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_16);
 note->SetPname(PITCHNAME_c);
 note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_16);
 note->SetPname(PITCHNAME_b);
 note->SetOct(4);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_16);
 note->SetPname(PITCHNAME_a);
 note->SetOct(4);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_e);
 note->SetOct(5);
-beam->AddLayerElement(note);
-tuplet->AddLayerElement(beam);
-layer->AddLayerElement(tuplet);
+beam->AddChild(note);
+tuplet->AddChild(beam);
+layer->AddChild(tuplet);
 
 tuplet = new Tuplet;
 tuplet->SetNum(3);
@@ -158,35 +157,35 @@ note = new Note();
 note->SetDur(DURATION_8);
 note->SetDots(1);
 note->SetPname(PITCHNAME_f);
+note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_16);
 note->SetPname(PITCHNAME_g);
 note->SetOct(5);
 note->SetAccid(ACCIDENTAL_EXPLICIT_n);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_g);
 note->SetOct(5);
 note->SetAccid(ACCIDENTAL_EXPLICIT_s);
-
 // keep the id as start id for the tie
 startid = note->GetUuid();
-beam->AddLayerElement(note);
-tuplet->AddLayerElement(beam);
-layer->AddLayerElement(tuplet);
+beam->AddChild(note);
+tuplet->AddChild(beam);
+layer->AddChild(tuplet);
 
 note = new Note();
 note->SetDur(DURATION_4);
 note->SetDots(1);
 note->SetPname(PITCHNAME_g);
+note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
-
 // keep the id as end id for the tie
 endid = note->GetUuid();
-layer->AddLayerElement(note);
+layer->AddChild(note);
 
 // create the tie with appropriate start and end ids
 tie = new Tie();
@@ -200,33 +199,41 @@ note = new Note();
 note->SetPname(PITCHNAME_a);
 note->SetOct(5);
 startid = note->GetUuid();
-chord->AddLayerElement(note);
+chord->AddChild(note);
 note = new Note();
 note->SetPname(PITCHNAME_c);
 note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
-chord->AddLayerElement(note);
-beam->AddLayerElement(chord);
+chord->AddChild(note);
+beam->AddChild(chord);
 chord = new Chord();
 chord->SetDur(DURATION_8);
 note = new Note();
 note->SetPname(PITCHNAME_g);
 note->SetOct(5);
-chord->AddLayerElement(note);
+chord->AddChild(note);
 note = new Note();
 note->SetPname(PITCHNAME_b);
 note->SetOct(4);
-chord->AddLayerElement(note);
-beam->AddLayerElement(chord);
-layer->AddLayerElement(beam);
+chord->AddChild(note);
+beam->AddChild(chord);
+layer->AddChild(beam);
+
+// add the hairpin
+Hairpin *hairpin = new Hairpin();
+hairpin->SetForm(hairpinLog_FORM_dim);
+hairpin->AddStaff(1);
+hairpin->SetTstamp(2.8);
+hairpin->SetTstamp2(std::make_pair(1, 0.9));
+// add the slur to the measure
+measure->AddChild(hairpin);
 
 // add them up
-staff->AddLayer(layer);
-measure->AddStaff(staff);
-
+staff->AddChild(layer);
+measure->AddChild(staff);
 // add the tie element to the measure
-measure->AddFloatingElement(tie);
-system->AddMeasure(measure);
+measure->AddChild(tie);
+section->AddChild(measure);
 
 ////////////////////////////////////
 // Fifth measure
@@ -246,7 +253,7 @@ note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_e);
 note->SetOct(5);
 note->SetStemDir(STEMDIRECTION_up);
-layer->AddLayerElement(note);
+layer->AddChild(note);
 
 chord = new Chord();
 chord->SetDur(DURATION_breve);
@@ -255,26 +262,34 @@ note->SetPname(PITCHNAME_g);
 note->SetOct(5);
 note->SetAccid(ACCIDENTAL_EXPLICIT_n);
 endid = note->GetUuid();
-chord->AddLayerElement(note);
+chord->AddChild(note);
 note = new Note();
 note->SetPname(PITCHNAME_d);
 note->SetOct(5);
 note->SetAccid(ACCIDENTAL_EXPLICIT_s);
-chord->AddLayerElement(note);
-layer->AddLayerElement(chord);
+chord->AddChild(note);
+layer->AddChild(chord);
 
-// create the slur
 slur = new Slur();
 slur->SetStartid(startid);
 slur->SetEndid(endid);
+// add the slur to the measure
+section->GetLast()->AddChild(slur);
 
-// add the slur to the previous measure
-dynamic_cast<Measure*>(system->m_children.back())->AddFloatingElement(slur);
+// add the hairpin
+Dynam *dynam = new Dynam();
+dynam->AddStaff(1);
+dynam->SetTstamp(1.0);
+Text *text = new Text();
+text->SetText(L"p");
+dynam->AddChild(text);
+// add the slur to the measure
+measure->AddChild(dynam);
 
-// add the content
-staff->AddLayer(layer);
-measure->AddStaff(staff);
-system->AddMeasure(measure);
+// add them up
+staff->AddChild(layer);
+measure->AddChild(staff);
+section->AddChild(measure);
 
 ////////////////////////////////////
 // Changing the scoreDef
@@ -285,7 +300,7 @@ scoreDef->SetMeterCount(6);
 scoreDef->SetMeterUnit(8);
 scoreDef->SetKeySig(KEYSIGNATURE_0);
 
-system->AddScoreDef(scoreDef);
+section->AddChild(scoreDef);
 
 ////////////////////////////////////
 // Sixth measure
@@ -305,26 +320,26 @@ note->SetDur(DURATION_4);
 note->SetDots(1);
 note->SetPname(PITCHNAME_e);
 note->SetOct(5);
-layer->AddLayerElement(note);
+layer->AddChild(note);
 
 beam = new Beam();
 note = new Note();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_d);
 note->SetOct(5);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_c);
 note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_b);
 note->SetOct(4);
-beam->AddLayerElement(note);
-layer->AddLayerElement(beam);
+beam->AddChild(note);
+layer->AddChild(beam);
 
 beam = new Beam();
 note = new Note();
@@ -332,18 +347,18 @@ note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_c);
 note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_a);
 note->SetOct(4);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_e);
 note->SetOct(4);
-beam->AddLayerElement(note);
-layer2->AddLayerElement(beam);
+beam->AddChild(note);
+layer2->AddChild(beam);
 
 note = new Note();
 note->SetDur(DURATION_4);
@@ -351,18 +366,20 @@ note->SetDots(1);
 note->SetPname(PITCHNAME_f);
 note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(4);
-layer2->AddLayerElement(note);
+layer2->AddChild(note);
 
 // add them up
-staff->AddLayer(layer);
-staff->AddLayer(layer2);
-measure->AddStaff(staff);
-system->AddMeasure(measure);
+staff->AddChild(layer);
+staff->AddChild(layer2);
+measure->AddChild(staff);
+section->AddChild(measure);
 
 ////////////////////////////////////
 // Seventh measure
 ////////////////////////////////////
 
+ending = new Ending();
+ending->SetN(1);
 measure = new Measure();
 measure->SetN(7);
 measure->SetRight(BARRENDITION_rptend);
@@ -379,32 +396,33 @@ note->SetDots(1);
 note->SetPname(PITCHNAME_c);
 note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
-layer->AddLayerElement(note);
+layer->AddChild(note);
 
 note = new Note();
 note->SetDur(DURATION_4);
 note->SetDots(1);
 note->SetPname(PITCHNAME_d);
 note->SetOct(5);
-layer->AddLayerElement(note);
+layer->AddChild(note);
 
 beam = new Beam();
 note = new Note();
+startid = note->GetUuid();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_e);
 note->SetOct(4);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_a);
 note->SetOct(4);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_g);
 note->SetOct(4);
-beam->AddLayerElement(note);
-layer2->AddLayerElement(beam);
+beam->AddChild(note);
+layer2->AddChild(beam);
 
 beam = new Beam();
 note = new Note();
@@ -412,30 +430,40 @@ note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_f);
 note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(4);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_b);
 note->SetOct(4);
-beam->AddLayerElement(note);
+beam->AddChild(note);
 note = new Note();
+endid = note->GetUuid();
 note->SetDur(DURATION_8);
 note->SetPname(PITCHNAME_a);
 note->SetAccid(ACCIDENTAL_EXPLICIT_s);
 note->SetOct(4);
-beam->AddLayerElement(note);
-layer2->AddLayerElement(beam);
+beam->AddChild(note);
+layer2->AddChild(beam);
+
+slur = new Slur();
+slur->SetStartid(startid);
+slur->SetEndid(endid);
+// add the slur to the measure
+section->GetLast()->AddChild(slur);
 
 // add them up
-staff->AddLayer(layer);
-staff->AddLayer(layer2);
-measure->AddStaff(staff);
-system->AddMeasure(measure);
+staff->AddChild(layer);
+staff->AddChild(layer2);
+measure->AddChild(staff);
+ending->AddChild(measure);
+section->AddChild(ending);
 
 ////////////////////////////////////
 // Eighth measure
 ////////////////////////////////////
 
+ending = new Ending();
+ending->SetN(2);
 measure = new Measure();
 measure->SetN(8);
 measure->SetRight(BARRENDITION_end);
@@ -450,18 +478,24 @@ note = new Note();
 note->SetPname(PITCHNAME_c);
 note->SetAccidGes(ACCIDENTAL_IMPLICIT_s);
 note->SetOct(5);
-chord->AddLayerElement(note);
+chord->AddChild(note);
 note = new Note();
 note->SetPname(PITCHNAME_e);
 note->SetOct(4);
 note->SetFermata(PLACE_below);
-chord->AddLayerElement(note);
-layer->AddLayerElement(chord);
+chord->AddChild(note);
+layer->AddChild(chord);
 
 // add them up
-staff->AddLayer(layer);
-measure->AddStaff(staff);
-system->AddMeasure(measure);
-```
+staff->AddChild(layer);
+measure->AddChild(staff);
+ending->AddChild(measure);
+section->AddChild(ending);
 
+////////////////////////////////////
+// Convert the Doc to page-based MEI
+////////////////////////////////////
+
+m_doc->ConvertToPageBasedDoc();
+```
 

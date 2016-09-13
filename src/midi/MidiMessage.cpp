@@ -16,6 +16,10 @@
 #include <vector>
 #include <iostream>
 
+#ifdef _WIN32
+#include <iterator>
+#endif
+
 using namespace std;
 
 

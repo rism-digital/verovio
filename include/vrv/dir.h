@@ -8,7 +8,7 @@
 #ifndef __VRV_DIR_H__
 #define __VRV_DIR_H__
 
-#include "floatingelement.h"
+#include "controlelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
 
@@ -20,7 +20,7 @@ class TextElement;
 // Dir
 //----------------------------------------------------------------------------
 
-class Dir : public FloatingElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
+class Dir : public ControlElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -30,8 +30,8 @@ public:
     Dir();
     virtual ~Dir();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Dir"; };
-    virtual ClassId Is() const { return DIR; };
+    virtual std::string GetClassName() const { return "Dir"; }
+    virtual ClassId Is() const { return DIR; }
     ///@}
 
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
@@ -42,17 +42,11 @@ public:
     * Add an element (text, rend. etc.) to a dynam.
     * Only supported elements will be actually added to the child list.
     */
-    void AddTextElement(TextElement *element);
+    virtual void AddChild(Object *object);
 
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * Align the content of a staff vertically.
-     * See Object::AlignVertically
-     */
-    virtual int AlignVertically(ArrayPtrVoid *params);
 
 protected:
     //

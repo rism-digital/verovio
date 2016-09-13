@@ -18,6 +18,7 @@ namespace vrv {
 
 class FontInfo;
 class Page;
+class Score;
 
 enum DocType { Raw = 0, Rendering, Transcription };
 
@@ -36,12 +37,12 @@ public:
     virtual ~Doc();
     virtual ClassId Is() const { return DOC; }
 
-    void AddPage(Page *page);
+    virtual void AddChild(Object *object);
 
     /*
      * Clear the content of the document.
      */
-    void Reset(DocType type);
+    virtual void Reset();
 
     /**
      * Refreshes the views from Doc.
@@ -49,10 +50,11 @@ public:
     virtual void Refresh();
 
     /**
-     * Getter for the DocType.
-     * The setter is Doc::Reset.
+     * Getter and setter for the DocType.
+     * The setter resets the document.
      */
-    DocType GetType() const { return m_type; };
+    DocType GetType() const { return m_type; }
+    void SetType(DocType type);
 
     /**
      * Check if the document has a page with the specified value
@@ -60,10 +62,18 @@ public:
     bool HasPage(int pageIdx) const;
 
     /**
+     * Create a score buffer for loading or creating a scoreBased MEI document.
+     * Creating a mdiv buffer clear existing data (but not the header).
+     * The score buffer is owned by the Doc.
+     * Once the document is created, Doc::ConvertToPagePagedDoc should be called to convert it before rendering.
+     */
+    Score *CreateScoreBuffer();
+
+    /**
     * Get the total page count
     */
     int GetPageCount() const;
-    
+
     bool GetMidiExportDone() const;
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
@@ -125,18 +135,18 @@ public:
      * @name Getters for tie and slur parameters
      */
     ///@{
-    char GetTieThickness() const { return m_style->m_tieThickness; };
-    char GetSlurMinHeight() const { return m_style->m_minSlurHeight; };
-    char GetSlurMaxHeight() const { return m_style->m_maxSlurHeight; };
-    char GetSlurThickness() const { return m_style->m_slurThickness; };
+    char GetTieThickness() const { return m_style->m_tieThickness; }
+    char GetSlurMinHeight() const { return m_style->m_minSlurHeight; }
+    char GetSlurMaxHeight() const { return m_style->m_maxSlurHeight; }
+    char GetSlurThickness() const { return m_style->m_slurThickness; }
     ///@}
 
     /**
      * @name Getters for the page dimensions and margins
      */
     ///@{
-    short GetSpacingStaff() const { return m_spacingStaff; };
-    short GetSpacingSystem() const { return m_spacingSystem; };
+    short GetSpacingStaff() const { return m_spacingStaff; }
+    short GetSpacingSystem() const { return m_spacingSystem; }
     ///@}
 
     /**
@@ -159,8 +169,8 @@ public:
      * for drawing the entire document on one single system.
      */
     ///@{
-    void SetJustificationX(bool drawingJustifyX) { m_drawingJustifyX = drawingJustifyX; };
-    bool GetJustificationX() const { return m_drawingJustifyX; };
+    void SetJustificationX(bool drawingJustifyX) { m_drawingJustifyX = drawingJustifyX; }
+    bool GetJustificationX() const { return m_drawingJustifyX; }
     ///@}
 
     /*
@@ -169,25 +179,25 @@ public:
      * It should be disabled (so we get "even" note spacing) for mensural notation.
      */
     ///@{
-    void SetEvenSpacing(bool drawingEvenSpacing) { m_drawingEvenSpacing = drawingEvenSpacing; };
-    bool GetEvenSpacing() const { return m_drawingEvenSpacing; };
+    void SetEvenSpacing(bool drawingEvenSpacing) { m_drawingEvenSpacing = drawingEvenSpacing; }
+    bool GetEvenSpacing() const { return m_drawingEvenSpacing; }
     ///@}
 
     /*
      * @name Setter and getter for linear and non-linear spacing parameters
      */
     ///@{
-    void SetSpacingLinear(double drawingSpacingLinear) { m_drawingSpacingLinear = drawingSpacingLinear; };
-    double GetSpacingLinear() const { return m_drawingSpacingLinear; };
-    void SetSpacingNonLinear(double drawingSpacingNonLinear) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; };
-    double GetSpacingNonLinear() const { return m_drawingSpacingNonLinear; };
+    void SetSpacingLinear(double drawingSpacingLinear) { m_drawingSpacingLinear = drawingSpacingLinear; }
+    double GetSpacingLinear() const { return m_drawingSpacingLinear; }
+    void SetSpacingNonLinear(double drawingSpacingNonLinear) { m_drawingSpacingNonLinear = drawingSpacingNonLinear; }
+    double GetSpacingNonLinear() const { return m_drawingSpacingNonLinear; }
     ///@}
 
     /**
      * Export the document to a MIDI file.
      * Run trough all the layer and fill the midi file content.
      */
-    void ExportMIDI(MidiFile *midifile);
+    void ExportMIDI(MidiFile *midiFile);
 
     /**
      * Set the initial scoreDef of each page.
@@ -195,7 +205,7 @@ public:
      * It uses the MusObject::SetPageScoreDef functor method for parsing the file.
      * This will be done only if m_currentScoreDefDone is false or force is true.
      */
-    void SetCurrentScoreDef(bool force = false);
+    void CollectScoreDefs(bool force = false);
 
     /**
      * Prepare the document for drawing.
@@ -208,13 +218,26 @@ public:
      * Casts off the entire document.
      * Starting from a single system, create and fill pages and systems.
      */
-    void CastOff();
+    void CastOffDoc();
 
     /**
      * Undo the cast off of the entire document.
      * The document will then contain one single page with one single system.
      */
-    void UnCastOff();
+    void UnCastOffDoc();
+
+    /**
+     * Cast off of the entire document according to the encoded data (pb and sb).
+     * Does not perform any check on the presence and / or validity of such data.
+     */
+    void CastOffEncodingDoc();
+
+    /**
+     * Convert the doc from score-based to page-based MEI.
+     * Containers will be converted to boundaryStart / boundaryEnd.
+     * Does not perform any check if the data needs or can be converted.
+     */
+    void ConvertToPageBasedDoc();
 
     /**
      * To be implemented.
@@ -234,14 +257,14 @@ public:
      * We need to call this because otherwise looking at the page idx will fail.
      * See Doc::LayOut for an example.
      */
-    void ResetDrawingPage() { m_drawingPage = NULL; };
+    void ResetDrawingPage() { m_drawingPage = NULL; }
 
     /**
      * Getter to the drawPage. Normally, getting the page should
      * be done with Doc::SetDrawingPage. This is only a method for
      * asserting that currently have the right page.
      */
-    Page *GetDrawingPage() const { return m_drawingPage; };
+    Page *GetDrawingPage() const { return m_drawingPage; }
 
     /**
      * Return the width adjusted to the content of the current drawing page.
@@ -260,10 +283,9 @@ public:
     //----------//
 
     /**
-     * Functor for setting wordpos and connector ends
-     * The functor is process by doc at the end of a document of closing opened syl.
+     * See Object::PrepareLyricsEnd
      */
-    virtual int PrepareLyricsEnd(ArrayPtrVoid *params);
+    virtual int PrepareLyricsEnd(FunctorParams *functorParams);
 
 private:
     /**
@@ -392,6 +414,11 @@ private:
     short m_spacingStaff;
     /** System minimal spacing (MEI scoredef@spacing.system) - currently not saved */
     short m_spacingSystem;
+
+    /**
+     * A score buffer for loading or creating a scoreBased MEI.
+     */
+    Score *m_scoreBuffer;
 };
 
 } // namespace vrv

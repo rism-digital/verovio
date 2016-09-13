@@ -107,8 +107,8 @@
             <glyph glyph-code="E066" smufl-name="fClef15ma"/>
             <!--<glyph glyph-code="E067" smufl-name="fClefArrowUp"/>-->
             <!--<glyph glyph-code="E068" smufl-name="fClefArrowDown"/>-->
-            <!--<glyph glyph-code="E069" smufl-name="unpitchedPercussionClef1"/>-->
-            <!--<glyph glyph-code="E06A" smufl-name="unpitchedPercussionClef2"/>-->
+            <glyph glyph-code="E069" smufl-name="unpitchedPercussionClef1"/>
+            <glyph glyph-code="E06A" smufl-name="unpitchedPercussionClef2"/>
             <!--<glyph glyph-code="E06B" smufl-name="semipitchedPercussionClef1"/>-->
             <!--<glyph glyph-code="E06C" smufl-name="semipitchedPercussionClef2"/>-->
             <!--<glyph glyph-code="E06F" smufl-name="cClefTriangular"/>-->
@@ -1204,16 +1204,16 @@
         </barRepeats>
         <octaves>
             <description>Octaves</description>
-            <!--<glyph glyph-code="E510" smufl-name="ottava"/>-->
-            <!--<glyph glyph-code="E511" smufl-name="ottavaAlta"/>-->
-            <!--<glyph glyph-code="E512" smufl-name="ottavaBassa"/>-->
-            <!--<glyph glyph-code="E513" smufl-name="ottavaBassaBa"/>-->
-            <!--<glyph glyph-code="E514" smufl-name="quindicesima"/>-->
-            <!--<glyph glyph-code="E515" smufl-name="quindicesimaAlta"/>-->
-            <!--<glyph glyph-code="E516" smufl-name="quindicesimaBassa"/>-->
-            <!--<glyph glyph-code="E517" smufl-name="ventiduesima"/>-->
-            <!--<glyph glyph-code="E518" smufl-name="ventiduesimaAlta"/>-->
-            <!--<glyph glyph-code="E519" smufl-name="ventiduesimaBassa"/>-->
+            <glyph glyph-code="E510" smufl-name="ottava"/>
+            <glyph glyph-code="E511" smufl-name="ottavaAlta"/>
+            <glyph glyph-code="E512" smufl-name="ottavaBassa"/>
+            <glyph glyph-code="E513" smufl-name="ottavaBassaBa"/>
+            <glyph glyph-code="E514" smufl-name="quindicesima"/>
+            <glyph glyph-code="E515" smufl-name="quindicesimaAlta"/>
+            <glyph glyph-code="E516" smufl-name="quindicesimaBassa"/>
+            <glyph glyph-code="E517" smufl-name="ventiduesima"/>
+            <glyph glyph-code="E518" smufl-name="ventiduesimaAlta"/>
+            <glyph glyph-code="E519" smufl-name="ventiduesimaBassa"/>
             <!--<glyph glyph-code="E51A" smufl-name="octaveParensLeft"/>-->
             <!--<glyph glyph-code="E51B" smufl-name="octaveParensRight"/>-->
             <range_end>U+E51F</range_end>

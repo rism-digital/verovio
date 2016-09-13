@@ -49,28 +49,28 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCopyof(std::string copyof_) { m_copyof = copyof_; };
-    std::string GetCopyof() const { return m_copyof; };
+    void SetCopyof(std::string copyof_) { m_copyof = copyof_; }
+    std::string GetCopyof() const { return m_copyof; }
     bool HasCopyof() const;
     //
-    void SetCorresp(std::string corresp_) { m_corresp = corresp_; };
-    std::string GetCorresp() const { return m_corresp; };
+    void SetCorresp(std::string corresp_) { m_corresp = corresp_; }
+    std::string GetCorresp() const { return m_corresp; }
     bool HasCorresp() const;
     //
-    void SetNext(std::string next_) { m_next = next_; };
-    std::string GetNext() const { return m_next; };
+    void SetNext(std::string next_) { m_next = next_; }
+    std::string GetNext() const { return m_next; }
     bool HasNext() const;
     //
-    void SetPrev(std::string prev_) { m_prev = prev_; };
-    std::string GetPrev() const { return m_prev; };
+    void SetPrev(std::string prev_) { m_prev = prev_; }
+    std::string GetPrev() const { return m_prev; }
     bool HasPrev() const;
     //
-    void SetSameas(std::string sameas_) { m_sameas = sameas_; };
-    std::string GetSameas() const { return m_sameas; };
+    void SetSameas(std::string sameas_) { m_sameas = sameas_; }
+    std::string GetSameas() const { return m_sameas; }
     bool HasSameas() const;
     //
-    void SetSynch(std::string synch_) { m_synch = synch_; };
-    std::string GetSynch() const { return m_synch; };
+    void SetSynch(std::string synch_) { m_synch = synch_; }
+    std::string GetSynch() const { return m_synch; }
     bool HasSynch() const;
     ///@}
 
@@ -121,8 +121,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDeg(data_SCALEDEGREE deg_) { m_deg = deg_; };
-    data_SCALEDEGREE GetDeg() const { return m_deg; };
+    void SetDeg(data_SCALEDEGREE deg_) { m_deg = deg_; }
+    data_SCALEDEGREE GetDeg() const { return m_deg; }
     bool HasDeg() const;
     ///@}
 
@@ -163,38 +163,35 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetInth(std::string inth_) { m_inth = inth_; };
-    std::string GetInth() const { return m_inth; };
+    void SetInth(data_INTERVAL_HARMONIC inth_) { m_inth = inth_; }
+    data_INTERVAL_HARMONIC GetInth() const { return m_inth; }
     bool HasInth() const;
     ///@}
 
 private:
-    /**
-     * Encodes the harmonic interval between this note and other pitches occurring at
-     * the same time.
-     **/
-    std::string m_inth;
+    /** Encodes the harmonic interval between pitches occurring at the same time. **/
+    data_INTERVAL_HARMONIC m_inth;
 
     /* include <attinth> */
 };
 
 //----------------------------------------------------------------------------
-// AttIntervallicdesc
+// AttIntervalmelodic
 //----------------------------------------------------------------------------
 
-class AttIntervallicdesc : public Att {
+class AttIntervalmelodic : public Att {
 public:
-    AttIntervallicdesc();
-    virtual ~AttIntervallicdesc();
+    AttIntervalmelodic();
+    virtual ~AttIntervalmelodic();
 
     /** Reset the default values for the attribute class **/
-    void ResetIntervallicdesc();
+    void ResetIntervalmelodic();
 
     /** Read the values for the attribute class **/
-    bool ReadIntervallicdesc(pugi::xml_node element);
+    bool ReadIntervalmelodic(pugi::xml_node element);
 
     /** Write the values for the attribute class **/
-    bool WriteIntervallicdesc(pugi::xml_node element);
+    bool WriteIntervalmelodic(pugi::xml_node element);
 
     /**
      * @name Setters, getters and presence checker for class members.
@@ -202,8 +199,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetIntm(data_INTERVAL_AMOUNT intm_) { m_intm = intm_; };
-    data_INTERVAL_AMOUNT GetIntm() const { return m_intm; };
+    void SetIntm(data_INTERVAL_MELODIC intm_) { m_intm = intm_; }
+    data_INTERVAL_MELODIC GetIntm() const { return m_intm; }
     bool HasIntm() const;
     ///@}
 
@@ -214,7 +211,7 @@ private:
      * diatonic interval direction, quality, and size, or a precise numeric value in
      * half steps.
      **/
-    data_INTERVAL_AMOUNT m_intm;
+    data_INTERVAL_MELODIC m_intm;
 
     /* include <attintm> */
 };
@@ -243,8 +240,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetMfunc(data_MELODICFUNCTION mfunc_) { m_mfunc = mfunc_; };
-    data_MELODICFUNCTION GetMfunc() const { return m_mfunc; };
+    void SetMfunc(data_MELODICFUNCTION mfunc_) { m_mfunc = mfunc_; }
+    data_MELODICFUNCTION GetMfunc() const { return m_mfunc; }
     bool HasMfunc() const;
     ///@}
 
@@ -279,8 +276,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPclass(data_PITCHCLASS pclass_) { m_pclass = pclass_; };
-    data_PITCHCLASS GetPclass() const { return m_pclass; };
+    void SetPclass(data_PITCHCLASS pclass_) { m_pclass = pclass_; }
+    data_PITCHCLASS GetPclass() const { return m_pclass; }
     bool HasPclass() const;
     ///@}
 
@@ -315,8 +312,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetPsolfa(std::string psolfa_) { m_psolfa = psolfa_; };
-    std::string GetPsolfa() const { return m_psolfa; };
+    void SetPsolfa(std::string psolfa_) { m_psolfa = psolfa_; }
+    std::string GetPsolfa() const { return m_psolfa; }
     bool HasPsolfa() const;
     ///@}
 

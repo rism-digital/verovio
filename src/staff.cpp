@@ -15,7 +15,10 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "editorial.h"
+#include "functorparams.h"
 #include "hairpin.h"
+#include "keysig.h"
 #include "layer.h"
 #include "measure.h"
 #include "note.h"
@@ -23,6 +26,7 @@
 #include "system.h"
 #include "timeinterface.h"
 #include "verse.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -54,47 +58,36 @@ void Staff::Reset()
     m_drawingY = 0;
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
+    m_drawingStaffDef = NULL;
 }
 
-void Staff::AddLayer(Layer *layer)
+void Staff::AddChild(Object *child)
 {
-    layer->SetParent(this);
-    m_children.push_back(layer);
-
-    if (layer->GetN() < 1) {
-        layer->SetN(this->GetLayerCount());
+    if (child->Is() == LAYER) {
+        Layer *layer = dynamic_cast<Layer *>(child);
+        assert(layer);
+        if (layer && (layer->GetN() < 1)) {
+            // This is not 100% safe if we have a <app> and <rdg> with more than
+            // one layer as a previous child.
+            layer->SetN(this->GetChildCount());
+        }
     }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
 }
 
 int Staff::GetVerticalSpacing()
 {
     return 160; // arbitrary generic value
-}
-
-void Staff::ResetVerticalAlignment()
-{
-    m_drawingY = 0;
-}
-
-bool Staff::GetPosOnPage(ArrayPtrVoid *params)
-{
-    // param 0: the Staff we are looking for
-    // param 1: the position on the page (int)
-    // param 2; the success flag (bool)
-    Staff *staff = static_cast<Staff *>((*params).at(0));
-    int *position = static_cast<int *>((*params).at(1));
-    bool *success = static_cast<bool *>((*params).at(2));
-
-    if ((*success)) {
-        return true;
-    }
-    (*position)++;
-    if (this == staff) {
-        (*success) = true;
-        return true;
-    }
-    // to be verified
-    return false;
 }
 
 int Staff::GetYRel() const
@@ -109,24 +102,30 @@ int Staff::GetYRel() const
 // Staff functor methods
 //----------------------------------------------------------------------------
 
-int Staff::AlignVertically(ArrayPtrVoid *params)
+int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
 {
-    // param 0: the systemAligner
-    // param 1: the staffIdx
-    // param 2: the staffN
-    // param 3: the doc
-    SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
-    int *staffIdx = static_cast<int *>((*params).at(1));
-    int *staffN = static_cast<int *>((*params).at(2));
-    Doc *doc = static_cast<Doc *>((*params).at(3));
+    m_drawingStaffDef = NULL;
 
-    // we need to call it because we are overriding Object::AlignVertically
-    this->ResetVerticalAlignment();
+    return FUNCTOR_CONTINUE;
+};
 
-    *staffN = this->GetN();
+int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
+{
+    m_drawingY = 0;
+    m_staffAlignment = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Staff::AlignVertically(FunctorParams *functorParams)
+{
+    AlignVerticallyParams *params = dynamic_cast<AlignVerticallyParams *>(functorParams);
+    assert(params);
+
+    params->m_staffN = this->GetN();
 
     // this gets (or creates) the measureAligner for the measure
-    StaffAlignment *alignment = (*systemAligner)->GetStaffAlignment(*staffIdx, this, doc);
+    StaffAlignment *alignment = params->m_systemAligner->GetStaffAlignment(params->m_staffIdx, this, params->m_doc);
 
     assert(alignment);
 
@@ -140,27 +139,20 @@ int Staff::AlignVertically(ArrayPtrVoid *params)
         assert(v);
         alignment->SetVerseCount(v->GetN());
     }
-    it = std::find_if(m_timeSpanningElements.begin(), m_timeSpanningElements.end(), ObjectComparison(HAIRPIN));
-    if (it != m_timeSpanningElements.end()) {
-        Hairpin *h = dynamic_cast<Hairpin *>(*it);
-        assert(h);
-        if (h->GetPlace() == STAFFREL_above) alignment->SetHairpinAbove();
-        if (h->GetPlace() == STAFFREL_below) alignment->SetHairpinBelow();
-    }
 
     // for next staff
-    (*staffIdx)++;
+    params->m_staffIdx++;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
+int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 {
-    // param 0: the current Syl
-    std::vector<Object *> *elements = static_cast<std::vector<Object *> *>((*params).at(0));
+    FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
+    assert(params);
 
-    std::vector<Object *>::iterator iter = elements->begin();
-    while (iter != elements->end()) {
+    std::vector<Object *>::iterator iter = params->m_timeSpanningElements.begin();
+    while (iter != params->m_timeSpanningElements.end()) {
         TimeSpanningInterface *interface = (*iter)->GetTimeSpanningInterface();
         assert(interface);
         Measure *currentMeasure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
@@ -175,54 +167,24 @@ int Staff::FillStaffCurrentTimeSpanning(ArrayPtrVoid *params)
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::FillStaffCurrentLyrics(ArrayPtrVoid *params)
-{
-    // param 0: the current Syl
-    // param 1: the last Note
-    Syl **currentSyl = static_cast<Syl **>((*params).at(0));
-
-    if ((*currentSyl)) {
-        // We have a running syl started in a previous measure
-        this->m_timeSpanningElements.push_back((*currentSyl));
-        if ((*currentSyl)->GetEnd()) {
-            // Look if the syl ends in this measure - if not, add it
-            if ((*currentSyl)->GetEnd()->GetFirstParent(STAFF) == this) {
-                (*currentSyl) = NULL;
-            }
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Staff::ResetDrawing(ArrayPtrVoid *params)
+int Staff::ResetDrawing(FunctorParams *functorParams)
 {
     this->m_timeSpanningElements.clear();
     return FUNCTOR_CONTINUE;
 };
 
-int Staff::SetDrawingXY(ArrayPtrVoid *params)
+int Staff::SetDrawingXY(FunctorParams *functorParams)
 {
-    // param 0: a pointer doc
-    // param 1: a pointer to the current system
-    // param 2: a pointer to the current measure (unused)
-    // param 3: a pointer to the current staff
-    // param 4: a pointer to the current layer (unused)
-    // param 5: a pointer to the view (unused)
-    // param 6: a bool indicating if we are processing layer elements or not
-    // param 7: a pointer to the functor for passing it to the timestamps (unused)
-    Doc *doc = static_cast<Doc *>((*params).at(0));
-    System **currentSystem = static_cast<System **>((*params).at(1));
-    Staff **currentStaff = static_cast<Staff **>((*params).at(3));
-    bool *processLayerElements = static_cast<bool *>((*params).at(6));
+    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
+    assert(params);
 
-    (*currentStaff) = this;
+    params->m_currentStaff = this;
 
     // Second pass where we do just process layer elements
-    if ((*processLayerElements)) return FUNCTOR_CONTINUE;
+    if (params->m_processLayerElements) return FUNCTOR_CONTINUE;
 
     // Setting the drawing values for the staff (lines, scale)
-    if (StaffDef *staffDef = doc->m_scoreDef.GetStaffDef(this->GetN())) {
+    if (StaffDef *staffDef = params->m_doc->m_scoreDef.GetStaffDef(this->GetN())) {
         this->m_drawingLines = staffDef->GetLines();
         this->m_drawingNotationType = staffDef->GetNotationtype();
         if (staffDef->HasScale()) {
@@ -234,43 +196,37 @@ int Staff::SetDrawingXY(ArrayPtrVoid *params)
     // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
     // With Transcription documents, we use the m_yAbs
     if (this->m_yAbs == VRV_UNSET) {
-        assert(doc->GetType() == Raw);
-        this->SetDrawingY(this->GetYRel() + (*currentSystem)->GetDrawingY());
+        assert(params->m_doc->GetType() == Raw);
+        this->SetDrawingY(this->GetYRel() + params->m_currentSystem->GetDrawingY());
     }
     else {
-        assert(doc->GetType() == Transcription);
+        assert(params->m_doc->GetType() == Transcription);
         this->SetDrawingY(this->m_yAbs);
     }
-
-    // For avoiding unused variable warning in non debug mode
-    doc = NULL;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Staff::PrepareRpt(ArrayPtrVoid *params)
+int Staff::PrepareRpt(FunctorParams *functorParams)
 {
-    // param 0: a pointer to the current MRpt pointer (unused)
-    // param 1: a pointer to the data_BOOLEAN indicating if multiNumber
-    // param 2: a pointer to the doc scoreDef
-    data_BOOLEAN *multiNumber = static_cast<data_BOOLEAN *>((*params).at(1));
-    ScoreDef *scoreDef = static_cast<ScoreDef *>((*params).at(2));
+    PrepareRptParams *params = dynamic_cast<PrepareRptParams *>(functorParams);
+    assert(params);
 
     // If multiNumber is set, we already know that nothing needs to be done
     // Futhermore, if @multi.number is false, the functor should have stopped (see below)
-    if ((*multiNumber) != BOOLEAN_NONE) {
+    if (params->m_multiNumber != BOOLEAN_NONE) {
         return FUNCTOR_CONTINUE;
     }
 
     // This is happening only for the first staff element of the staff @n
-    if (StaffDef *staffDef = scoreDef->GetStaffDef(this->GetN())) {
+    if (StaffDef *staffDef = params->m_currentScoreDef->GetStaffDef(this->GetN())) {
         if ((staffDef->HasMultiNumber()) && (staffDef->GetMultiNumber() == BOOLEAN_false)) {
             // Set it just in case, but stopping the functor should do it for this staff @n
-            (*multiNumber) = BOOLEAN_false;
+            params->m_multiNumber = BOOLEAN_false;
             return FUNCTOR_STOP;
         }
     }
-    (*multiNumber) = BOOLEAN_true;
+    params->m_multiNumber = BOOLEAN_true;
     return FUNCTOR_CONTINUE;
 }
 

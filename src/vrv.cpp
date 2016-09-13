@@ -11,15 +11,26 @@
 
 #include <assert.h>
 #include <cmath>
-#include <dirent.h>
 #include <sstream>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <vector>
 
+#ifndef _WIN32
+#include <dirent.h>
+#else
+#include "win32.h"
+#endif
+
 //----------------------------------------------------------------------------
 
+// Windows has no Bourne shell (sh), therefore no "git_commit.h" is created.
+#ifndef _WIN32
 #include "git_commit.h"
+#else
+#define GIT_COMMIT "[undefined]"
+#endif
+
 #include "glyph.h"
 #include "smufl.h"
 #include "vrvdef.h"
@@ -196,6 +207,7 @@ bool Resources::InitTextFont()
             if (current.attribute("w")) width = atof(current.attribute("w").value());
             if (current.attribute("h")) height = atof(current.attribute("h").value());
             glyph.SetBoundingBox(x, y, width, height);
+            if (current.attribute("h-a-x")) glyph.SetHorizAdvX(atof(current.attribute("h-a-x").value()));
             m_textFont[code] = glyph;
         }
     }

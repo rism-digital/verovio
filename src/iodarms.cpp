@@ -11,18 +11,21 @@
 
 //----------------------------------------------------------------------------
 
+#include "clef.h"
 #include "doc.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
 #include "mensur.h"
-#include "page.h"
 #include "note.h"
 #include "rest.h"
-#include "system.h"
+#include "score.h"
+#include "section.h"
 #include "staff.h"
 #include "tie.h"
 #include "vrv.h"
+
+#define MAX_DARMS_BUFFER 10000
 
 namespace vrv {
 
@@ -61,26 +64,26 @@ DarmsInput::~DarmsInput()
 
 void DarmsInput::UnrollKeysig(int quantity, char alter)
 {
-    data_PITCHNAME flats[]
-        = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
-    data_PITCHNAME sharps[]
-        = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
-    data_PITCHNAME *alteration_set;
+    // data_PITCHNAME flats[]
+    //    = { PITCHNAME_b, PITCHNAME_e, PITCHNAME_a, PITCHNAME_d, PITCHNAME_g, PITCHNAME_c, PITCHNAME_f };
+    // data_PITCHNAME sharps[]
+    //    = { PITCHNAME_f, PITCHNAME_c, PITCHNAME_g, PITCHNAME_d, PITCHNAME_a, PITCHNAME_e, PITCHNAME_b };
+    // data_PITCHNAME *alteration_set;
     data_ACCIDENTAL_EXPLICIT accid = ACCIDENTAL_EXPLICIT_NONE;
 
     if (quantity == 0) quantity++;
 
     if (alter == '-') {
-        alteration_set = flats;
+        // alteration_set = flats;
         accid = ACCIDENTAL_EXPLICIT_f;
     }
     else {
-        alteration_set = sharps;
+        // alteration_set = sharps;
         accid = ACCIDENTAL_EXPLICIT_s;
     }
 
     KeySig *k = new KeySig(quantity, accid);
-    m_layer->AddLayerElement(k);
+    m_layer->AddChild(k);
     return;
     //////
     /*
@@ -89,7 +92,7 @@ void DarmsInput::UnrollKeysig(int quantity, char alter)
         alter->SetOloc(4);
         alter->SetPloc(alteration_set[i]);
         alter->SetAccid(accid);
-        m_layer->AddLayerElement(alter);
+        m_layer->AddChild(alter);
     }
     */
 }
@@ -151,7 +154,7 @@ int DarmsInput::parseMeter(int pos, const char *data)
         LogDebug("DarmsInput: Meter is: %i %i", meter->GetNumbase(), meter->GetNumbase());
     }
 
-    m_layer->AddLayerElement(meter);
+    m_layer->AddChild(meter);
     return pos;
 }
 
@@ -263,7 +266,7 @@ int DarmsInput::do_Clef(int pos, const char *data)
         return 0; // fail
     }
 
-    m_layer->AddLayerElement(mclef);
+    m_layer->AddChild(mclef);
     return pos;
 }
 
@@ -353,7 +356,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         rest->SetDur(duration);
         rest->SetDurGes(DURATION_8);
         rest->SetDots(dot);
-        m_layer->AddLayerElement(rest);
+        m_layer->AddChild(rest);
     }
     else {
         if ((position + m_clef_offset) > sizeof(PitchMap)) position = 0;
@@ -365,7 +368,7 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
         note->SetOct(PitchMap[position + m_clef_offset].oct);
         note->SetPname(PitchMap[position + m_clef_offset].pitch);
         note->SetDots(dot);
-        m_layer->AddLayerElement(note);
+        m_layer->AddChild(note);
 
         // Ties are between two notes and have a reference to the two notes
         // if more than two notes are tied, the m_second note of the first
@@ -399,7 +402,6 @@ int DarmsInput::do_Note(int pos, const char *data, bool rest)
 bool DarmsInput::ImportFile()
 {
     char data[10000];
-    size_t len;
 
     std::ifstream infile;
 
@@ -411,32 +413,34 @@ bool DarmsInput::ImportFile()
     }
 
     infile.getline(data, sizeof(data), '\n');
-    len = strlen(data);
     infile.close();
 
     return ImportString(data);
 }
 
-bool DarmsInput::ImportString(std::string data_str)
+bool DarmsInput::ImportString(std::string const &data_str)
 {
-    size_t len;
+    int len;
     int res;
     int pos = 0;
     const char *data = data_str.c_str();
-    len = data_str.length();
+    len = (int)data_str.length();
 
-    m_doc->Reset(Raw);
-    System *system = new System();
-    Page *page = new Page();
+    m_doc->SetType(Raw);
+    Score *score = m_doc->CreateScoreBuffer();
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
+
     m_staff = new Staff(1);
     m_measure = new Measure(true, 1);
     m_layer = new Layer();
     m_layer->SetN(1);
 
     m_current_tie = NULL;
-    m_staff->AddLayer(m_layer);
-    m_measure->AddStaff(m_staff);
-    system->AddMeasure(m_measure);
+    m_staff->AddChild(m_layer);
+    m_measure->AddChild(m_staff);
+    section->AddChild(m_measure);
 
     // do this the C style, char by char
     while (pos < len) {
@@ -476,11 +480,10 @@ bool DarmsInput::ImportString(std::string data_str)
     StaffGrp *staffGrp = new StaffGrp();
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN(1);
-    staffGrp->AddStaffDef(staffDef);
-    m_doc->m_scoreDef.AddStaffGrp(staffGrp);
+    staffGrp->AddChild(staffDef);
+    m_doc->m_scoreDef.AddChild(staffGrp);
 
-    page->AddSystem(system);
-    m_doc->AddPage(page);
+    m_doc->ConvertToPageBasedDoc();
 
     return true;
 }

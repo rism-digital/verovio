@@ -11,6 +11,8 @@ function print_help {
 VEROVIO_ROOT=..
 VEROVIO_INCLUDE=../include
 VEROVIO_INCLUDE_VRV=../include/vrv
+VEROVIO_INCLUDE_HUM=../include/hum
+VEROVIO_INCLUDE_JSON=../include/json
 VEROVIO_INCLUDE_MIDI=../include/midi
 VEROVIO_INCLUDE_PUGI=../include/pugi
 VEROVIO_INCLUDE_UTF8=../include/utf8
@@ -82,7 +84,12 @@ while getopts "lwv:h:c" opt; do
 	esac
 done
 
-FILENAME="verovio-toolkit$ASM_NAME$WEBWORKER_NAME$VERSION_NAME.js"
+FILENAME="verovio-toolkit$ASM_NAME$WEBWORKER_NAME.js"
+
+if [ -n "$VERSION" ]; then
+    if [ ! -d build/$VERSION ]; then mkdir build/$VERSION; fi
+    FILENAME=$VERSION/$FILENAME
+fi
 
 echo "Sync svg resources"
 cp -r ../data/* data/
@@ -93,6 +100,8 @@ python $EMCC $CHATTY \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
 	-I$VEROVIO_INCLUDE_VRV \
+	-I$VEROVIO_INCLUDE_HUM \
+	-I$VEROVIO_INCLUDE_JSON \
 	-I$VEROVIO_INCLUDE_MIDI \
 	-I$VEROVIO_INCLUDE_PUGI \
 	-I$VEROVIO_INCLUDE_UTF8 \
@@ -107,6 +116,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/barline.cpp \
 	$VEROVIO_ROOT/src/bboxdevicecontext.cpp \
 	$VEROVIO_ROOT/src/beam.cpp \
+	$VEROVIO_ROOT/src/boundary.cpp \
 	$VEROVIO_ROOT/src/chord.cpp \
 	$VEROVIO_ROOT/src/clef.cpp \
 	$VEROVIO_ROOT/src/custos.cpp \
@@ -118,17 +128,20 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/durationinterface.cpp \
 	$VEROVIO_ROOT/src/dynam.cpp \
 	$VEROVIO_ROOT/src/editorial.cpp \
+	$VEROVIO_ROOT/src/ending.cpp \
 	$VEROVIO_ROOT/src/floatingelement.cpp \
 	$VEROVIO_ROOT/src/glyph.cpp \
 	$VEROVIO_ROOT/src/hairpin.cpp \
 	$VEROVIO_ROOT/src/io.cpp \
 	$VEROVIO_ROOT/src/iodarms.cpp \
+	$VEROVIO_ROOT/src/iohumdrum.cpp \
 	$VEROVIO_ROOT/src/iomei.cpp \
 	$VEROVIO_ROOT/src/iomusxml.cpp \
 	$VEROVIO_ROOT/src/iopae.cpp \
 	$VEROVIO_ROOT/src/keysig.cpp \
 	$VEROVIO_ROOT/src/layer.cpp \
 	$VEROVIO_ROOT/src/layerelement.cpp \
+	$VEROVIO_ROOT/src/ligature.cpp \
 	$VEROVIO_ROOT/src/measure.cpp \
 	$VEROVIO_ROOT/src/mensur.cpp \
 	$VEROVIO_ROOT/src/metersig.cpp \
@@ -136,7 +149,9 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/multirest.cpp \
 	$VEROVIO_ROOT/src/note.cpp \
 	$VEROVIO_ROOT/src/object.cpp \
+	$VEROVIO_ROOT/src/octave.cpp \
 	$VEROVIO_ROOT/src/page.cpp \
+	$VEROVIO_ROOT/src/pedal.cpp \
 	$VEROVIO_ROOT/src/pitchinterface.cpp \
 	$VEROVIO_ROOT/src/positioninterface.cpp \
 	$VEROVIO_ROOT/src/proport.cpp \
@@ -171,6 +186,8 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/view_text.cpp \
 	$VEROVIO_ROOT/src/view_tuplet.cpp \
 	$VEROVIO_ROOT/src/vrv.cpp \
+	$VEROVIO_ROOT/src/hum/humlib.cpp \
+	$VEROVIO_ROOT/src/json/jsonxx.cc \
 	$VEROVIO_ROOT/src/pugi/pugixml.cpp \
 	$VEROVIO_ROOT/src/midi/Binasc.cpp \
 	$VEROVIO_ROOT/src/midi/MidiEvent.cpp \
@@ -184,7 +201,6 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
 	$VEROVIO_ROOT/libmei/atts_pagebased.cpp \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \
-	lib/jsonxx/jsonxx.cc \
 	--embed-file data/ \
 	-s EXPORTED_FUNCTIONS="[\
 		'_vrvToolkit_constructor',\

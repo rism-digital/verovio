@@ -41,9 +41,9 @@ AttChannelized::~AttChannelized()
 
 void AttChannelized::ResetChannelized()
 {
-    m_midiChannel = MIDICHANNEL_NONE;
+    m_midiChannel = -1;
     m_midiDuty = 0;
-    m_midiPort = MIDIVALUE_NONE;
+    m_midiPort = -1;
     m_midiTrack = 0;
 }
 
@@ -56,7 +56,7 @@ bool AttChannelized::ReadChannelized(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("midi.duty")) {
-        this->SetMidiDuty(StrToInt(element.attribute("midi.duty").value()));
+        this->SetMidiDuty(StrToPercent(element.attribute("midi.duty").value()));
         element.remove_attribute("midi.duty");
         hasAttribute = true;
     }
@@ -81,7 +81,7 @@ bool AttChannelized::WriteChannelized(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasMidiDuty()) {
-        element.append_attribute("midi.duty") = IntToStr(this->GetMidiDuty()).c_str();
+        element.append_attribute("midi.duty") = PercentToStr(this->GetMidiDuty()).c_str();
         wroteAttribute = true;
     }
     if (this->HasMidiPort()) {
@@ -97,7 +97,7 @@ bool AttChannelized::WriteChannelized(pugi::xml_node element)
 
 bool AttChannelized::HasMidiChannel() const
 {
-    return (m_midiChannel != MIDICHANNEL_NONE);
+    return (m_midiChannel != -1);
 }
 
 bool AttChannelized::HasMidiDuty() const
@@ -107,7 +107,7 @@ bool AttChannelized::HasMidiDuty() const
 
 bool AttChannelized::HasMidiPort() const
 {
-    return (m_midiPort != MIDIVALUE_NONE);
+    return (m_midiPort != -1);
 }
 
 bool AttChannelized::HasMidiTrack() const
@@ -132,10 +132,10 @@ AttMidiinstrument::~AttMidiinstrument()
 
 void AttMidiinstrument::ResetMidiinstrument()
 {
-    m_midiInstrnum = MIDIVALUE_NONE;
+    m_midiInstrnum = -1;
     m_midiInstrname = MIDINAMES_NONE;
-    m_midiPan = MIDIVALUE_NONE;
-    m_midiVolume = MIDIVALUE_NONE;
+    m_midiPan = -1;
+    m_midiVolume = -1;
 }
 
 bool AttMidiinstrument::ReadMidiinstrument(pugi::xml_node element)
@@ -188,7 +188,7 @@ bool AttMidiinstrument::WriteMidiinstrument(pugi::xml_node element)
 
 bool AttMidiinstrument::HasMidiInstrnum() const
 {
-    return (m_midiInstrnum != MIDIVALUE_NONE);
+    return (m_midiInstrnum != -1);
 }
 
 bool AttMidiinstrument::HasMidiInstrname() const
@@ -198,12 +198,12 @@ bool AttMidiinstrument::HasMidiInstrname() const
 
 bool AttMidiinstrument::HasMidiPan() const
 {
-    return (m_midiPan != MIDIVALUE_NONE);
+    return (m_midiPan != -1);
 }
 
 bool AttMidiinstrument::HasMidiVolume() const
 {
-    return (m_midiVolume != MIDIVALUE_NONE);
+    return (m_midiVolume != -1);
 }
 
 /* include <attmidi.volume> */
@@ -269,15 +269,21 @@ AttMiditempo::~AttMiditempo()
 
 void AttMiditempo::ResetMiditempo()
 {
-    m_midiTempo = MIDITEMPO_NONE;
+    m_midiBpm = -1;
+    m_midiMspb = -1;
 }
 
 bool AttMiditempo::ReadMiditempo(pugi::xml_node element)
 {
     bool hasAttribute = false;
-    if (element.attribute("midi.tempo")) {
-        this->SetMidiTempo(StrToMiditempo(element.attribute("midi.tempo").value()));
-        element.remove_attribute("midi.tempo");
+    if (element.attribute("midi.bpm")) {
+        this->SetMidiBpm(StrToMidibpm(element.attribute("midi.bpm").value()));
+        element.remove_attribute("midi.bpm");
+        hasAttribute = true;
+    }
+    if (element.attribute("midi.mspb")) {
+        this->SetMidiMspb(StrToMidimspb(element.attribute("midi.mspb").value()));
+        element.remove_attribute("midi.mspb");
         hasAttribute = true;
     }
     return hasAttribute;
@@ -286,19 +292,28 @@ bool AttMiditempo::ReadMiditempo(pugi::xml_node element)
 bool AttMiditempo::WriteMiditempo(pugi::xml_node element)
 {
     bool wroteAttribute = false;
-    if (this->HasMidiTempo()) {
-        element.append_attribute("midi.tempo") = MiditempoToStr(this->GetMidiTempo()).c_str();
+    if (this->HasMidiBpm()) {
+        element.append_attribute("midi.bpm") = MidibpmToStr(this->GetMidiBpm()).c_str();
+        wroteAttribute = true;
+    }
+    if (this->HasMidiMspb()) {
+        element.append_attribute("midi.mspb") = MidimspbToStr(this->GetMidiMspb()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttMiditempo::HasMidiTempo() const
+bool AttMiditempo::HasMidiBpm() const
 {
-    return (m_midiTempo != MIDITEMPO_NONE);
+    return (m_midiBpm != -1);
 }
 
-/* include <attmidi.tempo> */
+bool AttMiditempo::HasMidiMspb() const
+{
+    return (m_midiMspb != -1);
+}
+
+/* include <attmidi.mspb> */
 
 //----------------------------------------------------------------------------
 // AttMidivalue
@@ -315,7 +330,7 @@ AttMidivalue::~AttMidivalue()
 
 void AttMidivalue::ResetMidivalue()
 {
-    m_val = MIDIVALUE_NONE;
+    m_val = -1;
 }
 
 bool AttMidivalue::ReadMidivalue(pugi::xml_node element)
@@ -341,7 +356,7 @@ bool AttMidivalue::WriteMidivalue(pugi::xml_node element)
 
 bool AttMidivalue::HasVal() const
 {
-    return (m_val != MIDIVALUE_NONE);
+    return (m_val != -1);
 }
 
 /* include <attval> */
@@ -361,7 +376,7 @@ AttMidivalue2::~AttMidivalue2()
 
 void AttMidivalue2::ResetMidivalue2()
 {
-    m_val2 = MIDIVALUE_NONE;
+    m_val2 = -1;
 }
 
 bool AttMidivalue2::ReadMidivalue2(pugi::xml_node element)
@@ -387,7 +402,7 @@ bool AttMidivalue2::WriteMidivalue2(pugi::xml_node element)
 
 bool AttMidivalue2::HasVal2() const
 {
-    return (m_val2 != MIDIVALUE_NONE);
+    return (m_val2 != -1);
 }
 
 /* include <attval2> */
@@ -407,7 +422,7 @@ AttMidivelocity::~AttMidivelocity()
 
 void AttMidivelocity::ResetMidivelocity()
 {
-    m_vel = MIDIVALUE_NONE;
+    m_vel = -1;
 }
 
 bool AttMidivelocity::ReadMidivelocity(pugi::xml_node element)
@@ -433,7 +448,7 @@ bool AttMidivelocity::WriteMidivelocity(pugi::xml_node element)
 
 bool AttMidivelocity::HasVel() const
 {
-    return (m_vel != MIDIVALUE_NONE);
+    return (m_vel != -1);
 }
 
 /* include <attvel> */
@@ -494,7 +509,7 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
             return true;
         }
         if (attrType == "midi.duty") {
-            att->SetMidiDuty(att->StrToInt(attrValue));
+            att->SetMidiDuty(att->StrToPercent(attrValue));
             return true;
         }
         if (attrType == "midi.port") {
@@ -537,8 +552,12 @@ bool Att::SetMidi(Object *element, std::string attrType, std::string attrValue)
     if (element->HasAttClass(ATT_MIDITEMPO)) {
         AttMiditempo *att = dynamic_cast<AttMiditempo *>(element);
         assert(att);
-        if (attrType == "midi.tempo") {
-            att->SetMidiTempo(att->StrToMiditempo(attrValue));
+        if (attrType == "midi.bpm") {
+            att->SetMidiBpm(att->StrToMidibpm(attrValue));
+            return true;
+        }
+        if (attrType == "midi.mspb") {
+            att->SetMidiMspb(att->StrToMidimspb(attrValue));
             return true;
         }
     }
@@ -587,7 +606,7 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("midi.channel", att->MidichannelToStr(att->GetMidiChannel())));
         }
         if (att->HasMidiDuty()) {
-            attributes->push_back(std::make_pair("midi.duty", att->IntToStr(att->GetMidiDuty())));
+            attributes->push_back(std::make_pair("midi.duty", att->PercentToStr(att->GetMidiDuty())));
         }
         if (att->HasMidiPort()) {
             attributes->push_back(std::make_pair("midi.port", att->MidivalueToStr(att->GetMidiPort())));
@@ -622,8 +641,11 @@ void Att::GetMidi(const Object *element, ArrayOfStrAttr *attributes)
     if (element->HasAttClass(ATT_MIDITEMPO)) {
         const AttMiditempo *att = dynamic_cast<const AttMiditempo *>(element);
         assert(att);
-        if (att->HasMidiTempo()) {
-            attributes->push_back(std::make_pair("midi.tempo", att->MiditempoToStr(att->GetMidiTempo())));
+        if (att->HasMidiBpm()) {
+            attributes->push_back(std::make_pair("midi.bpm", att->MidibpmToStr(att->GetMidiBpm())));
+        }
+        if (att->HasMidiMspb()) {
+            attributes->push_back(std::make_pair("midi.mspb", att->MidimspbToStr(att->GetMidiMspb())));
         }
     }
     if (element->HasAttClass(ATT_MIDIVALUE)) {
