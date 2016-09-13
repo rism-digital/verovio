@@ -1,0 +1,51 @@
+<section>
+  <measure n="1">
+    <staff n="1">
+      <layer n="1">
+        <beam>
+          <note pname="f" oct="4" dur="16"/>
+          <note pname="a" oct="4" dur="16"/>
+          <note pname="c" oct="5" dur="16"/>
+          <note pname="a" oct="4" dur="16"/>
+        </beam>
+        <choice>
+          <orig>
+            <beatRpt rend="16"/>
+          </orig>
+          <reg>
+            <beam>
+              <note pname="f" oct="4" dur="16"/>
+              <note pname="a" oct="4" dur="16"/>
+              <note pname="c" oct="5" dur="16"/>
+              <note pname="a" oct="4" dur="16"/>
+            </beam>
+          </reg>
+        </choice>
+      </layer>
+    </staff>
+    <tempo staff="1" tstamp="1">
+      <choice>
+        <sic>Alegro</sic>
+        <corr cert="medium">Allegro</corr>
+      </choice>
+    </tempo>
+  </measure>
+  <measure n="2">
+    <staff n="1">
+      <layer n="1">
+        <chord dur="2">
+          <note pname="f" oct="4"/>
+          <note pname="a" oct="4"/>
+          <choice>
+            <sic>
+              <note pname="d" oct="5"/>
+            </sic>
+            <corr cert="high">
+              <note pname="c" oct="5"/>
+            </corr>
+          </choice>
+        </chord>
+      </layer>
+    </staff>
+  </measure>
+</section>
