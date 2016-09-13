@@ -294,7 +294,10 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
             delete meterSig;
         }
         // copy other attributes if present
-        if (newStaffDef->HasLabel()) staffDef->SetLabel(newStaffDef->GetLabel());
+        if (newStaffDef->HasLabel()) {
+            LogMessage(newStaffDef->GetLabel().c_str());
+            staffDef->SetLabel(newStaffDef->GetLabel());
+        }
         if (newStaffDef->HasLabelAbbr()) staffDef->SetLabelAbbr(newStaffDef->GetLabelAbbr());
     }
     else {
@@ -337,8 +340,7 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     return staffDef;
 }
 
-void ScoreDef::SetRedrawFlags(
-    bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll)
+void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll)
 {
     m_setAsDrawing = true;
 

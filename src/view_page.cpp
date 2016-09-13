@@ -144,7 +144,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     Measure *measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
     if (measure) {
         // NULL for the BarLine parameters indicates that we are drawing the scoreDef
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, system->GetDrawingX(), NULL);
+        DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, system->GetDrawingX(), NULL);
         // Draw mesure number if > 1
         // This needs to be improved because we are now using (tuplet) oblique figures.
         // We should also have a better way to specify if the number has to be displayed or not
@@ -222,7 +222,7 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
 
         DrawStaffDefLabels(dc, measure, scoreDef, !scoreDef->DrawLabels());
         // if this was true (non-abbreviated labels), set it to false for next one
-        scoreDef->SetDrawLabels(false);
+        // scoreDef->SetDrawLabels(false);
     }
     else {
         barLine->SetDrawingX(x);
@@ -797,7 +797,11 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     DrawStaffLines(dc, staff, measure, system);
 
+    DrawStaffDef(dc, staff, measure);
+
     DrawStaffChildren(dc, staff, staff, measure);
+
+    DrawStaffDefCautionary(dc, staff, measure);
 
     std::vector<Object *>::iterator iter;
     for (iter = staff->m_timeSpanningElements.begin(); iter != staff->m_timeSpanningElements.end(); ++iter) {
@@ -845,6 +849,66 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     dc->ResetBrush();
 
     return;
+}
+
+void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(staff);
+    assert(measure);
+
+    // StaffDef information is always in the first layer
+    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    if (!layer || !layer->HasStaffDef()) return;
+
+    StaffDef staffDef;
+    dc->StartGraphic(&staffDef, "", staffDef.GetUuid());
+
+    // draw the scoreDef if required
+    if (layer->GetStaffDefClef()) {
+        DrawLayerElement(dc, layer->GetStaffDefClef(), layer, staff, measure);
+    }
+    if (layer->GetStaffDefKeySig()) {
+        DrawLayerElement(dc, layer->GetStaffDefKeySig(), layer, staff, measure);
+    }
+    if (layer->GetStaffDefMensur()) {
+        DrawLayerElement(dc, layer->GetStaffDefMensur(), layer, staff, measure);
+    }
+    if (layer->GetStaffDefMeterSig()) {
+        DrawLayerElement(dc, layer->GetStaffDefMeterSig(), layer, staff, measure);
+    }
+
+    dc->EndGraphic(&staffDef, this);
+}
+
+void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(staff);
+    assert(measure);
+
+    // StaffDef cautionary information is always in the first layer
+    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    if (!layer || !layer->HasCautionStaffDef()) return;
+
+    StaffDef staffDef;
+    dc->StartGraphic(&staffDef, "cautionary", staffDef.GetUuid());
+
+    // draw the scoreDef if required
+    if (layer->GetCautionStaffDefClef()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefClef(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefKeySig()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefKeySig(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefMensur()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefMensur(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefMeterSig()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefMeterSig(), layer, staff, measure);
+    }
+
+    dc->EndGraphic(&staffDef, this);
 }
 
 //----------------------------------------------------------------------------
@@ -906,45 +970,19 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     assert(staff);
     assert(measure);
 
-    dc->StartGraphic(layer, "", layer->GetUuid());
-
     // first we need to clear the drawing list of postponed elements
     layer->ResetDrawingList();
 
-    // draw the scoreDef if required
-    if (layer->GetStaffDefClef()) {
-        DrawLayerElement(dc, layer->GetStaffDefClef(), layer, staff, measure);
-    }
-    if (layer->GetStaffDefKeySig()) {
-        DrawLayerElement(dc, layer->GetStaffDefKeySig(), layer, staff, measure);
-    }
-    if (layer->GetStaffDefMensur()) {
-        DrawLayerElement(dc, layer->GetStaffDefMensur(), layer, staff, measure);
-    }
-    if (layer->GetStaffDefMeterSig()) {
-        DrawLayerElement(dc, layer->GetStaffDefMeterSig(), layer, staff, measure);
-    }
+    // Now start to draw the layer content
+
+    dc->StartGraphic(layer, "", layer->GetUuid());
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
 
-    // draw the scoreDef if required
-    if (layer->GetCautionStaffDefClef()) {
-        DrawLayerElement(dc, layer->GetCautionStaffDefClef(), layer, staff, measure);
-    }
-    if (layer->GetCautionStaffDefKeySig()) {
-        DrawLayerElement(dc, layer->GetCautionStaffDefKeySig(), layer, staff, measure);
-    }
-    if (layer->GetCautionStaffDefMensur()) {
-        DrawLayerElement(dc, layer->GetCautionStaffDefMensur(), layer, staff, measure);
-    }
-    if (layer->GetCautionStaffDefMeterSig()) {
-        DrawLayerElement(dc, layer->GetCautionStaffDefMeterSig(), layer, staff, measure);
-    }
+    dc->EndGraphic(layer, this);
 
     // first draw the postponed tuplets
     DrawLayerList(dc, layer, staff, measure, TUPLET);
-
-    dc->EndGraphic(layer, this);
 }
 
 void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId)
