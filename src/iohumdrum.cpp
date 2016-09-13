@@ -275,7 +275,7 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
 #ifdef USE_EMSCRIPTEN
     m_debug = 0;
 #else
-    m_debug = 1;
+    m_debug = 0;
 #endif
     m_comment = 1;
     m_omd = false;
