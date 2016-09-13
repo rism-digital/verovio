@@ -161,6 +161,10 @@ std::string MeiOutput::GetOutput(int page)
 
 bool MeiOutput::WriteObject(Object *object)
 {
+    if (object->HasComment()) {
+        m_currentNode.append_child(pugi::node_comment).set_value(object->GetComment().c_str());
+    }
+
     // Containers and scoreDef related
     if (object->Is() == DOC) {
         WriteMeiDoc(dynamic_cast<Doc *>(object));
@@ -477,6 +481,12 @@ bool MeiOutput::WriteObjectEnd(Object *object)
         BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(object);
         assert(interface);
         if (interface->IsBoundary()) return true;
+    }
+    else if (m_scoreBasedMEI && (object->Is() == SYSTEM)) {
+        return true;
+    }
+    else if (m_scoreBasedMEI && (object->Is() == PAGE)) {
+        return true;
     }
     m_nodeStack.pop_back();
     m_currentNode = m_nodeStack.back();
@@ -1078,6 +1088,7 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteMensuralShared(element);
     interface->WriteMeterSigDefaultLog(element);
     interface->WriteMeterSigDefaultVis(element);
+    interface->WriteMiditempo(element);
     interface->WriteMultinummeasures(element);
 }
 
@@ -1348,7 +1359,7 @@ bool MeiInput::ImportFile()
     }
 }
 
-bool MeiInput::ImportString(const std::string mei)
+bool MeiInput::ImportString(std::string const &mei)
 {
     try {
         m_doc->SetType(Raw);
@@ -2755,6 +2766,7 @@ bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadMensuralShared(element);
     interface->ReadMeterSigDefaultLog(element);
     interface->ReadMeterSigDefaultVis(element);
+    interface->ReadMiditempo(element);
     interface->ReadMultinummeasures(element);
     return true;
 }
@@ -3246,6 +3258,9 @@ bool MeiInput::ReadScoreBasedMei(pugi::xml_node element, Score *parent)
             // content
             else if (elementName == "section") {
                 success = ReadMeiSection(parent, current);
+            }
+            else {
+                LogWarning("Element <%s> within <score> is not supported and will be ignored ", elementName.c_str());
             }
         }
     }

@@ -627,62 +627,11 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         ? true
         : false;
 
-    /*
-    switch (clef->GetClefId()) {
-        case C1:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-            break;
-        case G1:
-            sym = (isMensural ? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
-            y -= m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-            break;
-        case G2_8va:
-            sym = SMUFL_E053_gClef8va;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case G2_8vb:
-            sym = SMUFL_E052_gClef8vb;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case C2:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case G2:
-            sym = (isMensural ? SMUFL_E901_mensuralGclefPetrucci : SMUFL_E050_gClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 3;
-            break;
-        case F3:
-            sym = SMUFL_E062_fClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            break;
-        case C3:
-            sym = (isMensural ? SMUFL_E909_mensuralCclefPetrucciPosMiddle : SMUFL_E05C_cClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            break;
-        case F5: sym = SMUFL_E062_fClef; break;
-        case F4:
-            sym = (isMensural ? SMUFL_E904_mensuralFclefPetrucci : SMUFL_E062_fClef);
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            break;
-        case C4:
-            sym = SMUFL_E05C_cClef;
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            break;
-        case C5: sym = SMUFL_E05C_cClef; break;
-        case perc:
-            y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
-            // FIXME
-            sym = SMUFL_E05C_cClef;
-            break;
-        default: break;
-    }
-    */
-
     int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
 
-    if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, PLACE_below))
+    if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_NONE, PLACE_NONE))
+        sym = SMUFL_E050_gClef;
+    else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_8, PLACE_below))
         sym = SMUFL_E052_gClef8vb;
     else if (shapeOctaveDis == Clef::ClefId(CLEFSHAPE_G, 0, OCTAVE_DIS_15, PLACE_below))
         sym = SMUFL_E051_gClef15mb;
@@ -1671,7 +1620,7 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
     assert(staff);
 
     int ynum = 0, yden = 0;
-    std::wstring wtext;
+    std::wstring numText, numBaseText;
 
     int yCenter = y - (staff->m_drawingLines) / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     yCenter += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -1683,18 +1632,20 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
     else
         ynum = yCenter - (m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4);
 
-    if (numBase > 9 || num > 9) {
-        x += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
-    }
-
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
 
-    wtext = IntToTimeSigFigures(num);
-    DrawSmuflString(dc, x, ynum, wtext, true, staff->m_drawingStaffSize); // true = center
+    numText = IntToTimeSigFigures(num);
+    if (numBase) numBaseText = IntToTimeSigFigures(numBase);
+
+    std::wstring widthText = (numText.length() > numBaseText.length()) ? numText : numBaseText;
+
+    int w = 0, h = 0;
+    dc->GetSmuflTextExtent(widthText, &w, &h);
+    x += (w / 2);
+    DrawSmuflString(dc, x, ynum, numText, true, staff->m_drawingStaffSize);
 
     if (numBase) {
-        wtext = IntToTimeSigFigures(numBase);
-        DrawSmuflString(dc, x, yden, wtext, true, staff->m_drawingStaffSize); // '1' = center
+        DrawSmuflString(dc, x, yden, numBaseText, true, staff->m_drawingStaffSize);
     }
 
     dc->ResetFont();

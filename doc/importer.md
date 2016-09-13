@@ -493,4 +493,3 @@ section->AddChild(ending);
 m_doc->ConvertToPageBasedDoc();
 ```
 
-

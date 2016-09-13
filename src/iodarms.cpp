@@ -18,12 +18,14 @@
 #include "measure.h"
 #include "mensur.h"
 #include "note.h"
-#include "page.h"
 #include "rest.h"
+#include "score.h"
+#include "section.h"
 #include "staff.h"
-#include "system.h"
 #include "tie.h"
 #include "vrv.h"
+
+#define MAX_DARMS_BUFFER 10000
 
 namespace vrv {
 
@@ -416,7 +418,7 @@ bool DarmsInput::ImportFile()
     return ImportString(data);
 }
 
-bool DarmsInput::ImportString(std::string data_str)
+bool DarmsInput::ImportString(std::string const &data_str)
 {
     int len;
     int res;
@@ -425,8 +427,11 @@ bool DarmsInput::ImportString(std::string data_str)
     len = (int)data_str.length();
 
     m_doc->SetType(Raw);
-    System *system = new System();
-    Page *page = new Page();
+    Score *score = m_doc->CreateScoreBuffer();
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
+
     m_staff = new Staff(1);
     m_measure = new Measure(true, 1);
     m_layer = new Layer();
@@ -435,7 +440,7 @@ bool DarmsInput::ImportString(std::string data_str)
     m_current_tie = NULL;
     m_staff->AddChild(m_layer);
     m_measure->AddChild(m_staff);
-    system->AddChild(m_measure);
+    section->AddChild(m_measure);
 
     // do this the C style, char by char
     while (pos < len) {
@@ -478,8 +483,7 @@ bool DarmsInput::ImportString(std::string data_str)
     staffGrp->AddChild(staffDef);
     m_doc->m_scoreDef.AddChild(staffGrp);
 
-    page->AddChild(system);
-    m_doc->AddChild(page);
+    m_doc->ConvertToPageBasedDoc();
 
     return true;
 }

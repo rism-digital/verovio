@@ -10,6 +10,7 @@
 		152886C51C9CA86100B515BB /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
+		4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
 		4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7661C688F5A0086DC0E /* Binasc.cpp */; };
 		4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7661C688F5A0086DC0E /* Binasc.cpp */; };
 		4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */; };
@@ -76,6 +77,8 @@
 		4DA1448A1C2AB28700CB7CEE /* textelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA144891C2AB28700CB7CEE /* textelement.cpp */; };
 		4DA1448B1C2AB28700CB7CEE /* textelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA144891C2AB28700CB7CEE /* textelement.cpp */; };
 		4DA1448D1C2AB29400CB7CEE /* textelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA1448C1C2AB29400CB7CEE /* textelement.h */; };
+		4DA20ED11D0F151900706C4A /* iohumdrum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA20ED01D0F151900706C4A /* iohumdrum.cpp */; };
+		4DA20ED51D0F156600706C4A /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA20ED41D0F156600706C4A /* humlib.cpp */; };
 		4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
 		4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
 		4DA60EE11B6307A8006E2DFC /* textdirinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */; };
@@ -332,6 +335,10 @@
 		4D9C5F3A1ADBBBEB005D3031 /* git_commit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = git_commit.h; path = include/vrv/git_commit.h; sourceTree = SOURCE_ROOT; };
 		4DA144891C2AB28700CB7CEE /* textelement.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = textelement.cpp; path = src/textelement.cpp; sourceTree = "<group>"; };
 		4DA1448C1C2AB29400CB7CEE /* textelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textelement.h; path = include/vrv/textelement.h; sourceTree = "<group>"; };
+		4DA20ECF1D0F150900706C4A /* iohumdrum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iohumdrum.h; path = include/vrv/iohumdrum.h; sourceTree = "<group>"; };
+		4DA20ED01D0F151900706C4A /* iohumdrum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iohumdrum.cpp; path = src/iohumdrum.cpp; sourceTree = "<group>"; };
+		4DA20ED31D0F155500706C4A /* humlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = humlib.h; path = include/hum/humlib.h; sourceTree = "<group>"; };
+		4DA20ED41D0F156600706C4A /* humlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = humlib.cpp; path = src/hum/humlib.cpp; sourceTree = "<group>"; };
 		4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textdirinterface.h; path = include/vrv/textdirinterface.h; sourceTree = "<group>"; };
 		4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = textdirinterface.cpp; path = src/textdirinterface.cpp; sourceTree = "<group>"; };
 		4DA80D941A6940120089802D /* style.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = style.h; path = include/vrv/style.h; sourceTree = "<group>"; };
@@ -574,6 +581,15 @@
 			name = textelements;
 			sourceTree = "<group>";
 		};
+		4DA20ED21D0F153100706C4A /* hum */ = {
+			isa = PBXGroup;
+			children = (
+				4DA20ED41D0F156600706C4A /* humlib.cpp */,
+				4DA20ED31D0F155500706C4A /* humlib.h */,
+			);
+			name = hum;
+			sourceTree = "<group>";
+		};
 		4DBC09271B51960100B1832C /* utf8 */ = {
 			isa = PBXGroup;
 			children = (
@@ -662,8 +678,8 @@
 				4DB351111C8040B1002DD057 /* dir.cpp */,
 				4DB3510E1C80409E002DD057 /* dir.h */,
 				4DDBBB591C7AE45900054AFF /* dynam.cpp */,
-				4D796B5D1D78641900A15238 /* harm.cpp */,
 				4DDBBB561C7AE43E00054AFF /* dynam.h */,
+				4D796B5D1D78641900A15238 /* harm.cpp */,
 				4D796B5C1D78641200A15238 /* harm.h */,
 				4D95D4F51D71866200B2B856 /* controlelement.cpp */,
 				4DF28A021A754DE400BA9F7D /* controlelement.h */,
@@ -689,6 +705,7 @@
 				4DEE28EC1940BCA100C76319 /* libmei */,
 				4D7D8A3C1886E36200D78B62 /* tools */,
 				8F086F351885397A0037FD8E /* source */,
+				4DA20ED21D0F153100706C4A /* hum */,
 				4D1BE7751C688F6F0086DC0E /* midi */,
 				4D22C42118891D7300D0831F /* pugixml */,
 				4DBC09271B51960100B1832C /* utf8 */,
@@ -763,6 +780,8 @@
 				8F59291718854BF800FE51AD /* io.h */,
 				8F086EC1188539540037FD8E /* iodarms.cpp */,
 				8F59291818854BF800FE51AD /* iodarms.h */,
+				4DA20ED01D0F151900706C4A /* iohumdrum.cpp */,
+				4DA20ECF1D0F150900706C4A /* iohumdrum.h */,
 				8F086EC2188539540037FD8E /* iomei.cpp */,
 				8F59291918854BF800FE51AD /* iomei.h */,
 				8F086EC3188539540037FD8E /* iomusxml.cpp */,
@@ -1058,6 +1077,7 @@
 				8F086EF0188539540037FD8E /* iopae.cpp in Sources */,
 				4D8CD8A61B4E922A00F0756F /* atts_critapp.cpp in Sources */,
 				8F086EF1188539540037FD8E /* keysig.cpp in Sources */,
+				4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */,
 				4DDBBB5D1C7AE45900054AFF /* hairpin.cpp in Sources */,
 				4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */,
 				8F086EF2188539540037FD8E /* layer.cpp in Sources */,
@@ -1082,6 +1102,7 @@
 				8F086EFC188539540037FD8E /* positioninterface.cpp in Sources */,
 				4DB0B0161C44129300DBDCC3 /* timestamp.cpp in Sources */,
 				4D1BE76F1C688F5A0086DC0E /* MidiEventList.cpp in Sources */,
+				4DA20ED11D0F151900706C4A /* iohumdrum.cpp in Sources */,
 				8F086EFD188539540037FD8E /* rest.cpp in Sources */,
 				8F086EFE188539540037FD8E /* scoredef.cpp in Sources */,
 				4D5572401CF3F32A008D06A0 /* octave.cpp in Sources */,
@@ -1125,6 +1146,7 @@
 				4D1D73401A1D08DC001E08F6 /* glyph.cpp in Sources */,
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
 				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
+				4DA20ED51D0F156600706C4A /* humlib.cpp in Sources */,
 				4DF28A051A754DF000BA9F7D /* floatingobject.cpp in Sources */,
 				4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */,
 				4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */,

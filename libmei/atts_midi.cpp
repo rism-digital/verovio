@@ -41,9 +41,9 @@ AttChannelized::~AttChannelized()
 
 void AttChannelized::ResetChannelized()
 {
-    m_midiChannel = MIDICHANNEL_NONE;
+    m_midiChannel = -1;
     m_midiDuty = 0;
-    m_midiPort = MIDIVALUE_NONE;
+    m_midiPort = -1;
     m_midiTrack = 0;
 }
 
@@ -97,7 +97,7 @@ bool AttChannelized::WriteChannelized(pugi::xml_node element)
 
 bool AttChannelized::HasMidiChannel() const
 {
-    return (m_midiChannel != MIDICHANNEL_NONE);
+    return (m_midiChannel != -1);
 }
 
 bool AttChannelized::HasMidiDuty() const
@@ -107,7 +107,7 @@ bool AttChannelized::HasMidiDuty() const
 
 bool AttChannelized::HasMidiPort() const
 {
-    return (m_midiPort != MIDIVALUE_NONE);
+    return (m_midiPort != -1);
 }
 
 bool AttChannelized::HasMidiTrack() const
@@ -132,10 +132,10 @@ AttMidiinstrument::~AttMidiinstrument()
 
 void AttMidiinstrument::ResetMidiinstrument()
 {
-    m_midiInstrnum = MIDIVALUE_NONE;
+    m_midiInstrnum = -1;
     m_midiInstrname = MIDINAMES_NONE;
-    m_midiPan = MIDIVALUE_NONE;
-    m_midiVolume = MIDIVALUE_NONE;
+    m_midiPan = -1;
+    m_midiVolume = -1;
 }
 
 bool AttMidiinstrument::ReadMidiinstrument(pugi::xml_node element)
@@ -188,7 +188,7 @@ bool AttMidiinstrument::WriteMidiinstrument(pugi::xml_node element)
 
 bool AttMidiinstrument::HasMidiInstrnum() const
 {
-    return (m_midiInstrnum != MIDIVALUE_NONE);
+    return (m_midiInstrnum != -1);
 }
 
 bool AttMidiinstrument::HasMidiInstrname() const
@@ -198,12 +198,12 @@ bool AttMidiinstrument::HasMidiInstrname() const
 
 bool AttMidiinstrument::HasMidiPan() const
 {
-    return (m_midiPan != MIDIVALUE_NONE);
+    return (m_midiPan != -1);
 }
 
 bool AttMidiinstrument::HasMidiVolume() const
 {
-    return (m_midiVolume != MIDIVALUE_NONE);
+    return (m_midiVolume != -1);
 }
 
 /* include <attmidi.volume> */
@@ -269,8 +269,8 @@ AttMiditempo::~AttMiditempo()
 
 void AttMiditempo::ResetMiditempo()
 {
-    m_midiBpm = MIDIBPM_NONE;
-    m_midiMspb = MIDIMSPB_NONE;
+    m_midiBpm = -1;
+    m_midiMspb = -1;
 }
 
 bool AttMiditempo::ReadMiditempo(pugi::xml_node element)
@@ -305,12 +305,12 @@ bool AttMiditempo::WriteMiditempo(pugi::xml_node element)
 
 bool AttMiditempo::HasMidiBpm() const
 {
-    return (m_midiBpm != MIDIBPM_NONE);
+    return (m_midiBpm != -1);
 }
 
 bool AttMiditempo::HasMidiMspb() const
 {
-    return (m_midiMspb != MIDIMSPB_NONE);
+    return (m_midiMspb != -1);
 }
 
 /* include <attmidi.mspb> */
@@ -330,7 +330,7 @@ AttMidivalue::~AttMidivalue()
 
 void AttMidivalue::ResetMidivalue()
 {
-    m_val = MIDIVALUE_NONE;
+    m_val = -1;
 }
 
 bool AttMidivalue::ReadMidivalue(pugi::xml_node element)
@@ -356,7 +356,7 @@ bool AttMidivalue::WriteMidivalue(pugi::xml_node element)
 
 bool AttMidivalue::HasVal() const
 {
-    return (m_val != MIDIVALUE_NONE);
+    return (m_val != -1);
 }
 
 /* include <attval> */
@@ -376,7 +376,7 @@ AttMidivalue2::~AttMidivalue2()
 
 void AttMidivalue2::ResetMidivalue2()
 {
-    m_val2 = MIDIVALUE_NONE;
+    m_val2 = -1;
 }
 
 bool AttMidivalue2::ReadMidivalue2(pugi::xml_node element)
@@ -402,7 +402,7 @@ bool AttMidivalue2::WriteMidivalue2(pugi::xml_node element)
 
 bool AttMidivalue2::HasVal2() const
 {
-    return (m_val2 != MIDIVALUE_NONE);
+    return (m_val2 != -1);
 }
 
 /* include <attval2> */
@@ -422,7 +422,7 @@ AttMidivelocity::~AttMidivelocity()
 
 void AttMidivelocity::ResetMidivelocity()
 {
-    m_vel = MIDIVALUE_NONE;
+    m_vel = -1;
 }
 
 bool AttMidivelocity::ReadMidivelocity(pugi::xml_node element)
@@ -448,7 +448,7 @@ bool AttMidivelocity::WriteMidivelocity(pugi::xml_node element)
 
 bool AttMidivelocity::HasVel() const
 {
-    return (m_vel != MIDIVALUE_NONE);
+    return (m_vel != -1);
 }
 
 /* include <attvel> */

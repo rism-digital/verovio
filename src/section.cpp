@@ -154,6 +154,8 @@ int Section::PrepareBoundaries(FunctorParams *functorParams)
 
 int Section::ResetDrawing(FunctorParams *functorParams)
 {
+    FloatingObject::ResetDrawing(functorParams);
+
     if (this->IsBoundary()) {
         this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
     }

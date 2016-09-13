@@ -15,6 +15,7 @@
 
 #include "aligner.h"
 #include "editorial.h"
+#include "functorparams.h"
 #include "text.h"
 #include "vrv.h"
 
@@ -64,5 +65,15 @@ void Harm::AddChild(Object *child)
 //----------------------------------------------------------------------------
 // Harm functor methods
 //----------------------------------------------------------------------------
+
+int Harm::PrepareFloatingGrps(FunctorParams *functorParams)
+{
+    //PrepareFloatingGrpsParams *params = dynamic_cast<PrepareFloatingGrpsParams *>(functorParams);
+    //assert(params);
+
+    this->SetDrawingGrpId(DRAWING_GRP_HARM);
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

@@ -9,6 +9,8 @@
 
 //----------------------------------------------------------------------------
 
+#include <iostream>
+
 #include <assert.h>
 #include <math.h>
 
@@ -558,7 +560,7 @@ int Measure::PrepareFloatingGrps(FunctorParams *functorParams)
 
     if (params->m_previousEnding) {
         // We have a measure in between endings and the previous one was group, so we need to increase the grpId
-        if (params->m_previousEnding->GetDrawingGrpId() > 0) params->m_drawingGrpId++;
+        if (params->m_previousEnding->GetDrawingGrpId() > DRAWING_GRP_NONE) params->m_drawingGrpId++;
         params->m_previousEnding = NULL;
     }
 

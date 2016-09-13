@@ -311,11 +311,12 @@ void MeasureAligner::SetMaxTime(double time)
 
     int i;
     Alignment *alignment = NULL;
-    // First try to see if we already have something at the time position
+    // Increase the time position for all alignment from the right barline
     for (i = idx; i < GetAlignmentCount(); i++) {
         alignment = dynamic_cast<Alignment *>(m_children.at(i));
         assert(alignment);
-        alignment->SetTime(time);
+        // Change it only if higher than before
+        if (time > alignment->GetTime()) alignment->SetTime(time);
     }
 }
 

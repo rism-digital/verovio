@@ -112,6 +112,8 @@ int Ending::PrepareBoundaries(FunctorParams *functorParams)
 
 int Ending::ResetDrawing(FunctorParams *functorParams)
 {
+    FloatingObject::ResetDrawing(functorParams);
+
     this->BoundaryStartInterface::InterfaceResetDrawing(functorParams);
 
     return FUNCTOR_CONTINUE;

@@ -15,6 +15,7 @@
 
 #include "attcomparison.h"
 #include "iodarms.h"
+#include "iohumdrum.h"
 #include "iomei.h"
 #include "iomusxml.h"
 #include "iopae.h"
@@ -44,7 +45,7 @@ Toolkit::Toolkit(bool initFont)
 {
 
     m_scale = DEFAULT_SCALE;
-    m_format = MEI;
+    m_format = AUTO;
 
     // default page size
     m_pageHeight = DEFAULT_PAGE_HEIGHT;
@@ -180,18 +181,88 @@ bool Toolkit::SetFormat(std::string const &informat)
     else if (informat == "darms") {
         m_format = DARMS;
     }
+    else if (informat == "humdrum") {
+        m_format = HUMDRUM;
+    }
     else if (informat == "mei") {
         m_format = MEI;
     }
     else if (informat == "musicxml") {
         m_format = MUSICXML;
     }
+    else if (informat == "auto") {
+        m_format = AUTO;
+    }
     else {
-        LogError("Input format can only be: mei, pae, xml or darms");
+        LogError("Input format can only be: mei, humdrum, pae, musicxml or darms");
         return false;
     }
     return true;
 };
+
+FileFormat Toolkit::IdentifyInputFormat(const string &data)
+{
+    size_t searchLimit = 600;
+    if (data.size() == 0) {
+        return UNKNOWN;
+    }
+    if (data[0] == '@') {
+        return PAE;
+    }
+    if (data[0] == '*' || data[0] == '!') {
+        return HUMDRUM;
+    }
+    if ((unsigned int)data[0] == 0xff || (unsigned int)data[0] == 0xfe) {
+        // Handle UTF-16 content here later.
+        cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << endl;
+        return UNKNOWN;
+    }
+    if (data[0] == '<') {
+        // <mei> == root node for standard organization of MEI data
+        // <pages> == root node for pages organization of MEI data
+        // <score-partwise> == root node for part-wise organization of MusicXML data
+        // <score-timewise> == root node for time-wise organization of MusicXML data
+        // <opus> == root node for multi-movement/work organization of MusicXML data
+        string initial = data.substr(0, searchLimit);
+
+        if (initial.find("<mei ") != string::npos) {
+            return MEI;
+        }
+        if (initial.find("<mei>") != string::npos) {
+            return MEI;
+        }
+        if (initial.find("<pages>") != string::npos) {
+            return MEI;
+        }
+        if (initial.find("<pages ") != string::npos) {
+            return MEI;
+        }
+        if (initial.find("<score-partwise>") != string::npos) {
+            return MUSICXML;
+        }
+        if (initial.find("<score-timewise>") != string::npos) {
+            return MUSICXML;
+        }
+        if (initial.find("<opus>") != string::npos) {
+            return MUSICXML;
+        }
+        if (initial.find("<score-partwise ") != string::npos) {
+            return MUSICXML;
+        }
+        if (initial.find("<score-timewise ") != string::npos) {
+            return MUSICXML;
+        }
+        if (initial.find("<opus ") != string::npos) {
+            return MUSICXML;
+        }
+
+        cerr << "Warning: Trying to load unknown XML data which cannot be identified." << endl;
+        return UNKNOWN;
+    }
+
+    // Assume that the input is DARMS if other input types were not detected.
+    return DARMS;
+}
 
 bool Toolkit::SetFont(std::string const &font)
 {
@@ -273,17 +344,40 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
 
 bool Toolkit::LoadString(const std::string &data)
 {
+    string newData;
     FileInputStream *input = NULL;
-    if (m_format == PAE) {
+
+    auto inputFormat = m_format;
+    if (inputFormat == AUTO) {
+        inputFormat = IdentifyInputFormat(data);
+    }
+
+    if (inputFormat == PAE) {
         input = new PaeInput(&m_doc, "");
     }
-    else if (m_format == DARMS) {
+    else if (inputFormat == DARMS) {
         input = new DarmsInput(&m_doc, "");
     }
-    else if (m_format == MEI) {
+    else if (inputFormat == HUMDRUM) {
+        Doc tempdoc;
+        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        if (!tempinput->ImportString(data)) {
+            LogError("Error importing Humdrum data");
+            delete tempinput;
+            return false;
+        }
+
+        MeiOutput meioutput(&tempdoc, "");
+        meioutput.SetScoreBasedMEI(true);
+        newData = meioutput.GetOutput();
+        delete tempinput;
+
         input = new MeiInput(&m_doc, "");
     }
-    else if (m_format == MUSICXML) {
+    else if (inputFormat == MEI) {
+        input = new MeiInput(&m_doc, "");
+    }
+    else if (inputFormat == MUSICXML) {
         input = new MusicXmlInput(&m_doc, "");
     }
     else {
@@ -309,7 +403,7 @@ bool Toolkit::LoadString(const std::string &data)
     }
 
     // load the file
-    if (!input->ImportString(data)) {
+    if (!input->ImportString(newData.size() ? newData : data)) {
         LogError("Error importing data");
         delete input;
         return false;

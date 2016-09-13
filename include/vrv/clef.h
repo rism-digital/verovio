@@ -48,11 +48,8 @@ public:
     int GetClefOffset() const;
 
     /**
-     * This is used for false clef offset calculation.
-     * Returns 4 bytes with, from right to left, line, shape, dis and displace
+     * Return a clef id based on the various parameters
      */
-    int GetClefId() const;
-
     static int ClefId(data_CLEFSHAPE shape, char line, data_OCTAVE_DIS octaveDis, data_PLACE place);
 
 private:

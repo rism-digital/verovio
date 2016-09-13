@@ -10,6 +10,7 @@
 
 #include "aligner.h"
 #include "drawinginterface.h"
+#include "editorial.h"
 #include "object.h"
 
 namespace vrv {

@@ -141,6 +141,26 @@ enum data_KEYSIGNATURE {
 typedef std::pair<int, double> data_MEASUREBEAT;
 
 /**
+ * MEI data.MIDIBPM
+ */
+typedef int data_MIDIBPM;
+
+/**
+ * MEI data.MIDICHANNEL
+ */
+typedef int data_MIDICHANNEL;
+
+/**
+ * MEI data.MIDIMSPB
+ */
+typedef int data_MIDIMSPB;
+
+/**
+ * MEI data.MIDIVALUE
+ */
+typedef int data_MIDIVALUE;
+
+/**
  * MEI data.MODUSMAIOR
  * NONE is -3 for perfect value (abs) by default
  */

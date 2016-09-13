@@ -23,12 +23,12 @@
 #include "measure.h"
 #include "mrest.h"
 #include "note.h"
-#include "page.h"
 #include "rest.h"
+#include "score.h"
+#include "section.h"
 #include "slur.h"
 #include "staff.h"
 #include "syl.h"
-#include "system.h"
 #include "text.h"
 #include "tie.h"
 #include "tuplet.h"
@@ -68,7 +68,7 @@ bool MusicXmlInput::ImportFile()
     }
 }
 
-bool MusicXmlInput::ImportString(const std::string musicxml)
+bool MusicXmlInput::ImportString(std::string const &musicxml)
 {
     try {
         m_doc->SetType(Raw);
@@ -152,18 +152,18 @@ std::string MusicXmlInput::GetContentOfChild(pugi::xml_node node, std::string ch
     return "";
 }
 
-void MusicXmlInput::AddMeasure(System *system, Measure *measure, int i)
+void MusicXmlInput::AddMeasure(Section *section, Measure *measure, int i)
 {
-    assert(system);
+    assert(section);
     assert(i >= 0);
 
     // we just need to add a measure
-    if (i == system->GetChildCount()) {
-        system->AddChild(measure);
+    if (i == section->GetChildCount()) {
+        section->AddChild(measure);
     }
     // otherwise copy the content to the corresponding existing measure
-    else if (system->GetChildCount() > i) {
-        Measure *existingMeasure = dynamic_cast<Measure *>(system->GetChild(i));
+    else if (section->GetChildCount() > i) {
+        Measure *existingMeasure = dynamic_cast<Measure *>(section->GetChild(i));
         assert(existingMeasure);
         Object *current;
         for (current = measure->GetFirst(); current; current = measure->GetNext()) {
@@ -316,14 +316,17 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 {
     assert(root);
 
+    Score *score = m_doc->CreateScoreBuffer();
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
+
     std::vector<StaffGrp *> m_staffGrpStack;
     StaffGrp *staffGrp = new StaffGrp();
     m_doc->m_scoreDef.AddChild(staffGrp);
     m_staffGrpStack.push_back(staffGrp);
 
     int staffOffset = 0;
-    Page *page = new Page();
-    System *system = new System();
 
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
@@ -388,7 +391,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 LogWarning("Could not find the part '%s'", partId.c_str());
                 continue;
             }
-            ReadMusicXmlPart(part.node(), system, nbStaves, staffOffset);
+            ReadMusicXmlPart(part.node(), section, nbStaves, staffOffset);
             // increment the staffOffset for reading the next part
             staffOffset += nbStaves;
         }
@@ -400,7 +403,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     for (iter = m_controlElements.begin(); iter != m_controlElements.end(); iter++) {
         if (!measure || (measure->GetN() != iter->first)) {
             AttCommonNComparison comparisonMeasure(MEASURE, iter->first);
-            measure = dynamic_cast<Measure *>(system->FindChildByAttComparison(&comparisonMeasure, 1));
+            measure = dynamic_cast<Measure *>(section->FindChildByAttComparison(&comparisonMeasure, 1));
         }
         if (!measure) {
             LogWarning(
@@ -411,9 +414,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     }
 
     // assert(m_tieStack.empty());
-
-    page->AddChild(system);
-    m_doc->AddChild(page);
+    m_doc->ConvertToPageBasedDoc();
 
     return true;
 }
@@ -525,10 +526,10 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     return nbStaves;
 }
 
-bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, System *system, int nbStaves, int staffOffset)
+bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int nbStaves, int staffOffset)
 {
     assert(node);
-    assert(system);
+    assert(section);
 
     pugi::xpath_node_set measures = node.select_nodes("measure");
     if (measures.size() == 0) {
@@ -542,7 +543,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, System *system, int nb
         Measure *measure = new Measure();
         ReadMusicXmlMeasure(xmlMeasure.node(), measure, nbStaves, staffOffset);
         // Add the measure to the system - if already there from a previous part we'll just merge the content
-        AddMeasure(system, measure, i);
+        AddMeasure(section, measure, i);
         i++;
     }
     return false;

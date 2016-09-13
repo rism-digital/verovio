@@ -407,34 +407,12 @@ void View::DrawOctave(
         return;
     }
 
-    /* We actually do not need the layer for now
+    /********** adjust the end position ***********/
 
-    Layer *layer1 = NULL;
-    Layer *layer2 = NULL;
-
-    // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
-    if (start->Is() == TIMESTAMP_ATTR)
-        layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    else {
-        layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
-        // if attached to and id and not a beginning of a system, then adjust it
-        if (spanningType != SPANNING_END)
-            x1 -= m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2;
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
+        if (octave->HasEndid())
+            x2 += (m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2);
     }
-
-    // idem
-    if (end->Is() == TIMESTAMP_ATTR)
-        layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
-    else {
-        layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
-        // if attached to and id and not a end of a system, then adjust it
-        if (spanningType != SPANNING_START)
-            x2 += m_doc->GetGlyphWidth(SMUFL_E0A2_noteheadWhole, staff->m_drawingStaffSize, false) / 2;
-    }
-
-    assert(layer1 && layer2);
-
-    */
 
     /************** draw it **************/
 
@@ -465,6 +443,7 @@ void View::DrawOctave(
     int w, h;
     std::wstring str;
     str.push_back(code);
+    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
     dc->GetSmuflTextExtent(str, &w, &h);
     int yCode = (disPlace == PLACE_above) ? y1 - h : y1;
@@ -475,14 +454,14 @@ void View::DrawOctave(
     // adjust is to avoid the figure to touch the line
     x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
-    dc->SetPen(m_currentColour, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID,
-        m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+    dc->SetPen(m_currentColour, lineWidth, AxSOLID, h / 3);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawLine(ToDeviceContextX(x1), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y1));
     // draw the ending vertical line if not the end of the system
     if (spanningType != SPANNING_START)
-        dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1), ToDeviceContextX(x2), ToDeviceContextY(y2));
+        dc->DrawLine(ToDeviceContextX(x2), ToDeviceContextY(y1 + lineWidth / 2), ToDeviceContextX(x2),
+            ToDeviceContextY(y2 + lineWidth / 2));
 
     dc->ResetPen();
     dc->ResetBrush();
@@ -772,7 +751,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     float angle = AdjustSlur(slur, staff, layer1->GetN(), drawingCurveDir, points);
 
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / DEFINITION_FACTOR;
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / PARAM_DENOMINATOR;
 
     assert(slur->GetCurrentFloatingPositioner());
     slur->GetCurrentFloatingPositioner()->UpdateSlurPosition(points, angle, thickness, drawingCurveDir);
@@ -811,10 +790,10 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     else {
         int dist = abs(p2->x - p1->x);
         height
-            = std::max(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITION_FACTOR,
+            = std::max(m_doc->GetSlurMinHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR,
                 dist / TEMP_SLUR_HEIGHT_FACTOR);
         height = std::min(
-            m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / DEFINITION_FACTOR, height);
+            m_doc->GetSlurMaxHeight() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR, height);
     }
 
     // the height of the control points
@@ -1309,7 +1288,7 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
             height += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
         }
     }
-    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetTieThickness() / DEFINITION_FACTOR;
+    int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetTieThickness() / PARAM_DENOMINATOR;
 
     // control points
     Point c1, c2;

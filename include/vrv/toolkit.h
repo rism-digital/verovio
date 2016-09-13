@@ -26,7 +26,7 @@
 
 namespace vrv {
 
-typedef enum { MEI = 0, PAE, DARMS, MUSICXML } FileFormat;
+typedef enum { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML } FileFormat;
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -281,6 +281,13 @@ public:
     bool SetFormat(std::string const &informat);
     void SetFormat(FileFormat format) { m_format = format; }
     int GetFormat() { return m_format; }
+    ///@}
+
+    /**
+     * @name Identify the input file type for auto loading of input data
+     */
+    ///@{
+    FileFormat IdentifyInputFormat(const std::string &data);
     ///@}
 
     /**
