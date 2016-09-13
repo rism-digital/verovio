@@ -179,11 +179,13 @@ void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, dou
     double xc = x + rx;
     double yc = y + ry;
 
+    /*
     double xs, ys, xe, ye;
     xs = xc + rx * cos(DegToRad(start));
     xe = xc + rx * cos(DegToRad(end));
     ys = yc - ry * sin(DegToRad(start));
     ye = yc - ry * sin(DegToRad(end));
+    */
 
     /// now same as circle arc...
 

@@ -532,7 +532,7 @@ int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index
     // int j = 0;
     do {
         int dot;
-        data_DURATION dur;
+        data_DURATION dur = DURATION_4;
         // measure->dots.setSize(j+1);
         i += getDuration(incipit, &dur, &dot, i);
         measure->durations.push_back(dur);
