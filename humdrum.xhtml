@@ -67,13 +67,13 @@ repertoires:
 			{% include other-sidebar.html %}
 		</div>
 	</div>
-	
+
 	<div class="col-md-9">
 		<div class="panel-body">
 			<h3>Humdrum Input</h3>
 			<p>
 				Humdrum data is an analytic music code for transcribing fully
-				polyphonic textures.  Humdum syntax presents notes of the score
+				polyphonic textures.  Humdrum syntax presents notes of the score
 				in strict time sequence.  Each data row represents all notes
 				sounding or events occurring at the same time, and each column
 				traces the melodic line of the individual parts. More information
@@ -92,7 +92,7 @@ repertoires:
 				the Humdrum data that follows.
 
 			</p>
-			
+
 			<div id="humdrum1-svg" style="overflow:auto;"/>
 
 			<p>
@@ -112,7 +112,7 @@ repertoires:
 			<h4> Verovio Humdrum Viewer </h4>
 
 			<p>
-			The <a target="_blank" href="http://verovio.humdrum.org">Verovio Humdurm Viewer</a> (VHV) is a special-purpose interactive website for
+			The <a target="_blank" href="http://verovio.humdrum.org">Verovio Humdrum Viewer</a> (VHV) is a special-purpose interactive website for
 			viewing and editing Humdrum files with the Verovio notation egraving
 			library.  You can view the full score for the above Mozart example in VHV from
 			this link: <a target="_blank" href="http://verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn">verovio.humdrum.org/?file=mozart/sonatas/sonata02-1.krn</a>.
@@ -124,20 +124,20 @@ repertoires:
 			try pressing "<b>m</b>" to view the internal conversion to MEI data.  Vi users
 			can try pressing "<b>v</b>" to toggle between the basic and vim modes for the
 			text editor.  Use the left/right arrow keys or PageUp/PageDown to navigate
-			to different pages.  Press shift-left/right arrows to go to the 
+			to different pages.  Press shift-left/right arrows to go to the
 			next/previous work/movement in the repertory.
 			</p>
 
 			<p>
 			Sample repertories of Humdrum data displayed in the Verovio Humdrum Viewer:
 			</p>
-			
+
             <ul>
             {% for r in page.repertoires %}
             <li> <a target="_blank" href="{{ r.link }}">{{ r.name }}</a> {% if r.description %}({{ r.description }}){% endif %}</li>
             {% endfor %}
             </ul>
-			
+
 
 			<h4> Command-line usage </h4>
 
@@ -232,7 +232,7 @@ repertoires:
 			<div style="height:100px;"></div>
 		</div>
 	</div>
-	
+
 </div>
 
 <script type="text/javascript">
