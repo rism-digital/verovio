@@ -19,7 +19,7 @@
                             <staffDef clef.line="4" clef.shape="F" lines="5" n="1"/>
                         </staffGrp>
                     </scoreDef>
-                    <section label="example">
+                    <section label="feature-example">
                         <measure n="1">
                             <staff n="1">
                                 <layer n="1">
