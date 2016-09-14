@@ -76,6 +76,7 @@ var annotated_dup =
       [ "GraceAligner", "classvrv_1_1_grace_aligner.html", "classvrv_1_1_grace_aligner" ],
       [ "Hairpin", "classvrv_1_1_hairpin.html", "classvrv_1_1_hairpin" ],
       [ "Harm", "classvrv_1_1_harm.html", "classvrv_1_1_harm" ],
+      [ "HumdrumInput", "classvrv_1_1_humdrum_input.html", "classvrv_1_1_humdrum_input" ],
       [ "IntegrateBoundingBoxGraceXShiftParams", "classvrv_1_1_integrate_bounding_box_grace_x_shift_params.html", "classvrv_1_1_integrate_bounding_box_grace_x_shift_params" ],
       [ "IntegrateBoundingBoxXShiftParams", "classvrv_1_1_integrate_bounding_box_x_shift_params.html", "classvrv_1_1_integrate_bounding_box_x_shift_params" ],
       [ "IntegrateBoundingBoxYShiftParams", "classvrv_1_1_integrate_bounding_box_y_shift_params.html", "classvrv_1_1_integrate_bounding_box_y_shift_params" ],

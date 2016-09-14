@@ -31,6 +31,7 @@ var files =
     [ "hairpin.h", "hairpin_8h_source.html", null ],
     [ "harm.h", "harm_8h_source.html", null ],
     [ "io.h", "io_8h_source.html", null ],
+    [ "iohumdrum.h", "iohumdrum_8h_source.html", null ],
     [ "iomei.h", "iomei_8h_source.html", null ],
     [ "iomusxml.h", "iomusxml_8h_source.html", null ],
     [ "keysig.h", "keysig_8h_source.html", null ],

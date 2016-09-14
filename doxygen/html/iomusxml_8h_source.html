@@ -128,13 +128,13 @@ $(document).ready(function(){initNavTree('iomusxml_8h_source.html','');});
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrv.html">vrv</a> {</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">class </span>Layer;</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">class </span>LayerElement;</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">class </span>Measure;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">class </span>ControlElement;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">class </span>Slur;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">class </span>StaffGrp;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">class </span>System;</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">class </span>ControlElement;</div>
+<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">class </span>Layer;</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">class </span>LayerElement;</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">class </span>Measure;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">class </span>Section;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">class </span>Slur;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">class </span>StaffGrp;</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">class </span>Tie;</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;</div>
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
@@ -186,12 +186,12 @@ $(document).ready(function(){initNavTree('iomusxml_8h_source.html','');});
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_music_xml_input.html">MusicXmlInput</a>();</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> ImportFile();</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> ImportString(std::string musicxml);</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> ImportString(std::string <span class="keyword">const</span> &amp;musicxml);</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="keywordtype">bool</span> ReadMusicXml(pugi::xml_node root);</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordtype">bool</span> ReadMusicXmlPart(pugi::xml_node node, <a class="code" href="classvrv_1_1_system.html">System</a> *system, <span class="keywordtype">int</span> nbStaves, <span class="keywordtype">int</span> staffOffset);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordtype">bool</span> ReadMusicXmlPart(pugi::xml_node node, <a class="code" href="classvrv_1_1_section.html">Section</a> *section, <span class="keywordtype">int</span> nbStaves, <span class="keywordtype">int</span> staffOffset);</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="keywordtype">bool</span> ReadMusicXmlMeasure(pugi::xml_node node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> nbStaves, <span class="keywordtype">int</span> staffOffset);</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="keywordtype">int</span> ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, <a class="code" href="classvrv_1_1_staff_grp.html">StaffGrp</a> *staffGrp, <span class="keywordtype">int</span> staffOffset);</div>
@@ -202,7 +202,7 @@ $(document).ready(function(){initNavTree('iomusxml_8h_source.html','');});
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlForward(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlNote(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordtype">void</span> AddMeasure(<a class="code" href="classvrv_1_1_system.html">System</a> *system, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> i);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordtype">void</span> AddMeasure(<a class="code" href="classvrv_1_1_section.html">Section</a> *section, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> i);</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
 <div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordtype">void</span> AddLayerElement(<a class="code" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element);</div>
 <div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
@@ -245,8 +245,8 @@ $(document).ready(function(){initNavTree('iomusxml_8h_source.html','');});
 <div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;} <span class="comment">// namespace vrv {</span></div>
 <div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;</div>
 <div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;<span class="preprocessor">#endif // __VRV_IOMUSXML_H__</span></div>
-<div class="ttc" id="classvrv_1_1_staff_grp_html"><div class="ttname"><a href="classvrv_1_1_staff_grp.html">vrv::StaffGrp</a></div><div class="ttdoc">This class represents a MEI staffGrp. </div><div class="ttdef"><b>Definition:</b> scoredef.h:211</div></div>
-<div class="ttc" id="classvrv_1_1_system_html"><div class="ttname"><a href="classvrv_1_1_system.html">vrv::System</a></div><div class="ttdoc">This class represents a system in a laid-out score (Doc). </div><div class="ttdef"><b>Definition:</b> system.h:32</div></div>
+<div class="ttc" id="classvrv_1_1_staff_grp_html"><div class="ttname"><a href="classvrv_1_1_staff_grp.html">vrv::StaffGrp</a></div><div class="ttdoc">This class represents a MEI staffGrp. </div><div class="ttdef"><b>Definition:</b> scoredef.h:212</div></div>
+<div class="ttc" id="classvrv_1_1_section_html"><div class="ttname"><a href="classvrv_1_1_section.html">vrv::Section</a></div><div class="ttdoc">This class represents a MEI section. </div><div class="ttdef"><b>Definition:</b> section.h:27</div></div>
 <div class="ttc" id="classvrv_1_1_layer_html"><div class="ttname"><a href="classvrv_1_1_layer.html">vrv::Layer</a></div><div class="ttdoc">This class represents a layer in a laid-out score (Doc). </div><div class="ttdef"><b>Definition:</b> layer.h:32</div></div>
 <div class="ttc" id="classvrv_1_1_staff_html"><div class="ttname"><a href="classvrv_1_1_staff.html">vrv::Staff</a></div><div class="ttdoc">This class represents a staff in a laid-out score (Doc). </div><div class="ttdef"><b>Definition:</b> staff.h:33</div></div>
 <div class="ttc" id="classvrv_1_1_file_input_stream_html"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html">vrv::FileInputStream</a></div><div class="ttdoc">This class is a base class for file input stream classes. </div><div class="ttdef"><b>Definition:</b> io.h:66</div></div>
@@ -264,7 +264,7 @@ $(document).ready(function(){initNavTree('iomusxml_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>iomusxml.h</b></li>
-    <li class="footer">Generated on Tue Sep 6 2016 08:32:56 by
+    <li class="footer">Generated on Wed Sep 14 2016 07:50:45 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

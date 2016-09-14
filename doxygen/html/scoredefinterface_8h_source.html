@@ -115,50 +115,52 @@ $(document).ready(function(){initNavTree('scoredefinterface_8h_source.html','');
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;</div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;<span class="preprocessor">#include &quot;atts_mensural.h&quot;</span></div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="preprocessor">#include &quot;atts_shared.h&quot;</span></div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;vrvdef.h&quot;</span></div>
-<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrv.html">vrv</a> {</div>
-<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;</div>
-<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">// ScoreDefInterface</span></div>
-<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
-<div class="line"><a name="l00026"></a><span class="lineno"><a class="line" href="classvrv_1_1_score_def_interface.html">   26</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_score_def_interface.html">ScoreDefInterface</a> : <span class="keyword">public</span> <a class="code" href="classvrv_1_1_interface.html">Interface</a>,</div>
-<div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;                          <span class="keyword">public</span> AttCleffingLog,</div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;                          <span class="keyword">public</span> AttKeySigDefaultLog,</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                          <span class="keyword">public</span> AttKeySigDefaultVis,</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                          <span class="keyword">public</span> AttMensuralLog,</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                          <span class="keyword">public</span> AttMensuralShared,</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                          <span class="keyword">public</span> AttMeterSigDefaultLog,</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                          <span class="keyword">public</span> AttMeterSigDefaultVis,</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                          <span class="keyword">public</span> AttMultinummeasures {</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;    <a class="code" href="classvrv_1_1_score_def_interface.html">ScoreDefInterface</a>();</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_score_def_interface.html">ScoreDefInterface</a>();</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> Reset();</div>
-<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="classvrv_1_1_score_def_interface.html#a8508fdc45f34b3126fa1afa7fcadf35a">   44</a></span>&#160;    <span class="keyword">virtual</span> InterfaceId <a class="code" href="classvrv_1_1_score_def_interface.html#a8508fdc45f34b3126fa1afa7fcadf35a">IsInterface</a>() { <span class="keywordflow">return</span> INTERFACE_SCOREDEF; }</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="preprocessor">#include &quot;atts_midi.h&quot;</span></div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="preprocessor">#include &quot;vrvdef.h&quot;</span></div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrv.html">vrv</a> {</div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;<span class="comment">// ScoreDefInterface</span></div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00021"></a><span class="lineno">   21</span>&#160;</div>
+<div class="line"><a name="l00027"></a><span class="lineno"><a class="line" href="classvrv_1_1_score_def_interface.html">   27</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_score_def_interface.html">ScoreDefInterface</a> : <span class="keyword">public</span> <a class="code" href="classvrv_1_1_interface.html">Interface</a>,</div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;                          <span class="keyword">public</span> AttCleffingLog,</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;                          <span class="keyword">public</span> AttKeySigDefaultLog,</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;                          <span class="keyword">public</span> AttKeySigDefaultVis,</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;                          <span class="keyword">public</span> AttMensuralLog,</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;                          <span class="keyword">public</span> AttMensuralShared,</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;                          <span class="keyword">public</span> AttMeterSigDefaultLog,</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                          <span class="keyword">public</span> AttMeterSigDefaultVis,</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;                          <span class="keyword">public</span> AttMiditempo,</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;                          <span class="keyword">public</span> AttMultinummeasures {</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;    <a class="code" href="classvrv_1_1_score_def_interface.html">ScoreDefInterface</a>();</div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_score_def_interface.html">ScoreDefInterface</a>();</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> Reset();</div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="classvrv_1_1_score_def_interface.html#a8508fdc45f34b3126fa1afa7fcadf35a">   46</a></span>&#160;    <span class="keyword">virtual</span> InterfaceId <a class="code" href="classvrv_1_1_score_def_interface.html#a8508fdc45f34b3126fa1afa7fcadf35a">IsInterface</a>() { <span class="keywordflow">return</span> INTERFACE_SCOREDEF; }</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">private</span>:</div>
 <div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;};</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;} <span class="comment">// namespace vrv</span></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;};</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="classvrv_1_1_score_def_interface_html"><div class="ttname"><a href="classvrv_1_1_score_def_interface.html">vrv::ScoreDefInterface</a></div><div class="ttdoc">This class is an interface for elements implementing score attributes, such as <scoreDef>, or <staffDef> It is not an abstract class but should not be instanciated directly. </div><div class="ttdef"><b>Definition:</b> scoredefinterface.h:26</div></div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;} <span class="comment">// namespace vrv</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="classvrv_1_1_score_def_interface_html"><div class="ttname"><a href="classvrv_1_1_score_def_interface.html">vrv::ScoreDefInterface</a></div><div class="ttdoc">This class is an interface for elements implementing score attributes, such as <scoreDef>, or <staffDef> It is not an abstract class but should not be instanciated directly. </div><div class="ttdef"><b>Definition:</b> scoredefinterface.h:27</div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
-<div class="ttc" id="classvrv_1_1_interface_html"><div class="ttname"><a href="classvrv_1_1_interface.html">vrv::Interface</a></div><div class="ttdoc">This is a base class for regrouping MEI att classes. </div><div class="ttdef"><b>Definition:</b> att.h:167</div></div>
-<div class="ttc" id="classvrv_1_1_score_def_interface_html_a8508fdc45f34b3126fa1afa7fcadf35a"><div class="ttname"><a href="classvrv_1_1_score_def_interface.html#a8508fdc45f34b3126fa1afa7fcadf35a">vrv::ScoreDefInterface::IsInterface</a></div><div class="ttdeci">virtual InterfaceId IsInterface()</div><div class="ttdoc">Virtual method returning the InterfaceId of the interface. </div><div class="ttdef"><b>Definition:</b> scoredefinterface.h:44</div></div>
+<div class="ttc" id="classvrv_1_1_interface_html"><div class="ttname"><a href="classvrv_1_1_interface.html">vrv::Interface</a></div><div class="ttdoc">This is a base class for regrouping MEI att classes. </div><div class="ttdef"><b>Definition:</b> att.h:179</div></div>
+<div class="ttc" id="classvrv_1_1_score_def_interface_html_a8508fdc45f34b3126fa1afa7fcadf35a"><div class="ttname"><a href="classvrv_1_1_score_def_interface.html#a8508fdc45f34b3126fa1afa7fcadf35a">vrv::ScoreDefInterface::IsInterface</a></div><div class="ttdeci">virtual InterfaceId IsInterface()</div><div class="ttdoc">Virtual method returning the InterfaceId of the interface. </div><div class="ttdef"><b>Definition:</b> scoredefinterface.h:46</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>scoredefinterface.h</b></li>
-    <li class="footer">Generated on Tue Sep 6 2016 08:32:56 by
+    <li class="footer">Generated on Wed Sep 14 2016 07:50:45 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

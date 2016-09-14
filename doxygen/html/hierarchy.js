@@ -171,6 +171,9 @@ var hierarchy =
     [ "AttMeterSigLog", null, [
       [ "vrv::MeterSig", "classvrv_1_1_meter_sig.html", null ]
     ] ],
+    [ "AttMiditempo", null, [
+      [ "vrv::ScoreDefInterface", "classvrv_1_1_score_def_interface.html", null ]
+    ] ],
     [ "AttMultinummeasures", null, [
       [ "vrv::ScoreDefInterface", "classvrv_1_1_score_def_interface.html", null ]
     ] ],
@@ -463,6 +466,7 @@ var hierarchy =
     [ "vrv::Glyph", "classvrv_1_1_glyph.html", null ],
     [ "ifstream", null, [
       [ "vrv::FileInputStream", "classvrv_1_1_file_input_stream.html", [
+        [ "vrv::HumdrumInput", "classvrv_1_1_humdrum_input.html", null ],
         [ "vrv::MeiInput", "classvrv_1_1_mei_input.html", null ],
         [ "vrv::MusicXmlInput", "classvrv_1_1_music_xml_input.html", null ]
       ] ]

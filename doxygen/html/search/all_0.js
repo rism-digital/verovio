@@ -28,6 +28,7 @@ var searchData=
   ['anchoredtext',['AnchoredText',['../classvrv_1_1_anchored_text.html',1,'vrv']]],
   ['annot',['Annot',['../classvrv_1_1_annot.html',1,'vrv']]],
   ['app',['App',['../classvrv_1_1_app.html',1,'vrv']]],
+  ['appendelement',['appendElement',['../classvrv_1_1_humdrum_input.html#aebdd0f0aabbcd60b1676a90f718490cd',1,'vrv::HumdrumInput']]],
   ['att',['Att',['../classvrv_1_1_att.html',1,'vrv']]],
   ['attcommonncomparison',['AttCommonNComparison',['../classvrv_1_1_att_common_n_comparison.html',1,'vrv']]],
   ['attcomparison',['AttComparison',['../classvrv_1_1_att_comparison.html',1,'vrv']]],

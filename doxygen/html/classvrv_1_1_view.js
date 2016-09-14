@@ -90,6 +90,8 @@ var classvrv_1_1_view =
     [ "DrawSpace", "classvrv_1_1_view.html#a761b0f017e09396ebb6e1166dd587209", null ],
     [ "DrawStaff", "classvrv_1_1_view.html#a1d43d6f24ff959692ac53f006f4ed3a4", null ],
     [ "DrawStaffChildren", "classvrv_1_1_view.html#a13da848d9092d64b3095458af90dacc0", null ],
+    [ "DrawStaffDef", "classvrv_1_1_view.html#a4c150fc51a54dfc1cb83a0ee4f590f87", null ],
+    [ "DrawStaffDefCautionary", "classvrv_1_1_view.html#a3fa1b793b97e6dc280493bfdbcdcb738", null ],
     [ "DrawStaffDefLabels", "classvrv_1_1_view.html#a968d68d1f42e9b6ab0d455980d578e82", null ],
     [ "DrawStaffEditorialElement", "classvrv_1_1_view.html#a4cad4e627eaa84b4567adefa6983045e", null ],
     [ "DrawStaffGrp", "classvrv_1_1_view.html#a558ddfe856c5aa32afe8bc9e61d9a9a9", null ],

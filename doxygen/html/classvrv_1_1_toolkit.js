@@ -32,6 +32,7 @@ var classvrv_1_1_toolkit =
     [ "GetSpacingSystem", "classvrv_1_1_toolkit.html#aa638b9275bd17eafd02d38c8d389f387", null ],
     [ "GetTimeForElement", "classvrv_1_1_toolkit.html#a5d2a4df7406fd1aae9d71bdd9f3a1042", null ],
     [ "GetVersion", "classvrv_1_1_toolkit.html#a293b23b38c10be4da8b38c4b3a769d1d", null ],
+    [ "IdentifyInputFormat", "classvrv_1_1_toolkit.html#a14e074a753dc128bd75e7ffaa93af6e6", null ],
     [ "Insert", "classvrv_1_1_toolkit.html#ad09f0d1af5dfd1f9595a4382c11a920e", null ],
     [ "LoadFile", "classvrv_1_1_toolkit.html#a3859f9341d415376b7d8f11a1aa8e352", null ],
     [ "LoadString", "classvrv_1_1_toolkit.html#ac93d1ccc3cdc4bdce58046432f5f4e7b", null ],

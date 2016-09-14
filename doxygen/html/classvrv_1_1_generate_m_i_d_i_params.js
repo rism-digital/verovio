@@ -1,6 +1,7 @@
 var classvrv_1_1_generate_m_i_d_i_params =
 [
     [ "GenerateMIDIParams", "classvrv_1_1_generate_m_i_d_i_params.html#ad7146971229b5224ace09f35c7877e48", null ],
+    [ "m_currentBpm", "classvrv_1_1_generate_m_i_d_i_params.html#a892673c4585f2698d46ceb9c9c583083", null ],
     [ "m_currentMeasureTime", "classvrv_1_1_generate_m_i_d_i_params.html#a68eb808c350706ab3a163324fe9ec58f", null ],
     [ "m_maxValues", "classvrv_1_1_generate_m_i_d_i_params.html#adf2f41b2f0840f31cb4f2cdc07397df8", null ],
     [ "m_midiFile", "classvrv_1_1_generate_m_i_d_i_params.html#ac58ba9383d3699b0c20e6fd5dc0d776b", null ],

@@ -4,5 +4,6 @@ var searchData=
   ['uncastoffdoc',['UnCastOffDoc',['../classvrv_1_1_doc.html#a60ec7810abc3f73ed1bb41e521289693',1,'vrv::Doc']]],
   ['uncastoffparams',['UnCastOffParams',['../classvrv_1_1_un_cast_off_params.html',1,'vrv']]],
   ['unclear',['Unclear',['../classvrv_1_1_unclear.html',1,'vrv']]],
+  ['unescapehtmlentities',['unescapeHtmlEntities',['../classvrv_1_1_humdrum_input.html#ad1c249101a3f89a9a64bdaa35cc2ab0a',1,'vrv::HumdrumInput']]],
   ['unsetcurrentscoredef',['UnsetCurrentScoreDef',['../classvrv_1_1_layer.html#aaef4bde4c30d8f9a213987d77fea267e',1,'vrv::Layer::UnsetCurrentScoreDef()'],['../classvrv_1_1_measure.html#a9922ed9a7db47188d95d6cf04df1a9be',1,'vrv::Measure::UnsetCurrentScoreDef()'],['../classvrv_1_1_object.html#ad381f7000ca6ee023426510d8a3a936a',1,'vrv::Object::UnsetCurrentScoreDef()'],['../classvrv_1_1_staff.html#acf6d012ff957195b4656fd1342a09154',1,'vrv::Staff::UnsetCurrentScoreDef()'],['../classvrv_1_1_system.html#aa3142c9f36aa22748f37f79162a89d2e',1,'vrv::System::UnsetCurrentScoreDef()']]]
 ];
