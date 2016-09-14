@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "boundary.h"
 #include "chord.h"
 #include "clef.h"
 #include "dir.h"
@@ -23,7 +24,6 @@
 #include "io.h"
 #include "keysig.h"
 #include "layer.h"
-#include "ligature.h"
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
@@ -192,14 +192,22 @@ int BoundingBox::CalcVerticalOverlap(const BoundingBox *other) const
 // Object
 //----------------------------------------------------------------------------
 
+unsigned long Object::s_objectCounter = 0;
+
 Object::Object() : BoundingBox()
 {
     Init("m-");
+    if (s_objectCounter++ == 0) {
+        SeedUuid();
+    }
 }
 
 Object::Object(std::string classid) : BoundingBox()
 {
     Init(classid);
+    if (s_objectCounter++ == 0) {
+        SeedUuid();
+    }
 }
 
 Object *Object::Clone() const
@@ -215,6 +223,7 @@ Object::Object(const Object &object) : BoundingBox(object)
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
     m_parent = NULL;
     m_classid = object.m_classid;
+    m_svgclass = object.m_svgclass;
     m_uuid = object.m_uuid; // for now copy the uuid - to be decided
     m_isModified = true;
 
@@ -236,6 +245,7 @@ Object &Object::operator=(const Object &object)
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
         m_parent = NULL;
         m_classid = object.m_classid;
+        m_svgclass = object.m_svgclass;
         m_uuid = object.m_uuid; // for now copy the uuid - to be decided
         m_isModified = true;
 
@@ -285,26 +295,77 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
     m_interfaces.push_back(interfaceId);
 }
 
-void Object::MoveChildren(Object *object)
+bool Object::IsBoundaryElement()
 {
-    if (this == object) {
+    if (this->IsEditorialElement() || (this->Is() == ENDING) || (this->Is() == SECTION)) {
+        BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(this);
+        assert(interface);
+        return (interface->IsBoundary());
+    }
+    return false;
+}
+
+void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChange)
+{
+    if (this == sourceParent) {
         assert("Object cannot be copied to itself");
     }
-    if (this->Is() != object->Is()) {
+    if (!allowTypeChange && (this->Is() != sourceParent->Is())) {
         assert("Object must be of the same type");
     }
 
     int i;
-    for (i = 0; i < (int)object->m_children.size(); i++) {
-        this->m_children.push_back(object->Relinquish(i));
-        object->m_children.at(i)->m_parent = this;
+    for (i = 0; i < (int)sourceParent->m_children.size(); i++) {
+        Object *child = sourceParent->Relinquish(i);
+        child->SetParent(this);
+        if (idx != -1) {
+            this->InsertChild(child, idx);
+            idx++;
+        }
+        else {
+            this->m_children.push_back(child);
+        }
     }
+}
+
+void Object::MoveItselfTo(Object *targetParent)
+{
+    assert(targetParent);
+    assert(m_parent);
+    assert(m_parent != targetParent);
+
+    Object *relinquishedObject = this->m_parent->Relinquish(this->GetIdx());
+    assert(relinquishedObject && (relinquishedObject == this));
+    targetParent->AddChild(relinquishedObject);
 }
 
 void Object::SetUuid(std::string uuid)
 {
     m_uuid = uuid;
 };
+
+std::string Object::GetSVGClass(void)
+{
+    return m_svgclass;
+}
+
+void Object::SetSVGClass(const std::string &classcontent)
+{
+    m_svgclass = classcontent;
+}
+
+void Object::AddSVGClass(const std::string &classname)
+{
+    if (HasSVGClass()) {
+        m_svgclass += " ";
+    }
+    m_svgclass += classname;
+}
+
+bool Object::HasSVGClass(void)
+{
+    return !m_svgclass.empty();
+}
 
 void Object::ClearChildren()
 {
@@ -411,6 +472,18 @@ Object *Object::Relinquish(int idx)
     return child;
 }
 
+void Object::ClearRelinquishedChildren()
+{
+    ArrayOfObjects::iterator iter;
+    for (iter = m_children.begin(); iter != m_children.end();) {
+        if ((*iter)->m_parent != this) {
+            m_children.erase(iter);
+        }
+        else
+            iter++;
+    }
+}
+
 Object *Object::FindChildByUuid(std::string uuid, int deepness, bool direction)
 {
     Functor findByUuid(&Object::FindByUuid);
@@ -479,11 +552,23 @@ void Object::GenerateUuid()
     snprintf(str, 16, "%016d", nr);
 
     m_uuid = m_classid + std::string(str);
+    std::transform(m_uuid.begin(), m_uuid.end(), m_uuid.begin(), ::tolower);
 }
 
 void Object::ResetUuid()
 {
     GenerateUuid();
+}
+
+void Object::SeedUuid(unsigned int seed)
+{
+    // Init random number generator for uuids
+    if (seed == 0) {
+        std::srand((unsigned int)std::time(0));
+    }
+    else {
+        std::srand(seed);
+    }
 }
 
 void Object::SetParent(Object *parent)
@@ -492,15 +577,10 @@ void Object::SetParent(Object *parent)
     m_parent = parent;
 }
 
-void Object::AddEditorialElement(EditorialElement *child)
+void Object::AddChild(Object *child)
 {
-    assert(dynamic_cast<Dir *>(this) || dynamic_cast<Dynam *>(this) || dynamic_cast<Layer *>(this)
-        || dynamic_cast<LayerElement *>(this) || dynamic_cast<Lem *>(this) || dynamic_cast<Measure *>(this)
-        || dynamic_cast<Note *>(this) || dynamic_cast<Staff *>(this) || dynamic_cast<System *>(this)
-        || dynamic_cast<Tempo *>(this) || dynamic_cast<EditorialElement *>(this) || dynamic_cast<TextElement *>(this));
-    child->SetParent(this);
-    m_children.push_back(child);
-    Modify();
+    // This should never happen because the method should be overridden
+    assert(false);
 }
 
 int Object::GetChildIndex(const Object *child)
@@ -566,11 +646,12 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
         return;
     }
 
+    bool processChildren = true;
     if (functor->m_visibleOnly && this->IsEditorialElement()) {
         EditorialElement *editorialElement = dynamic_cast<EditorialElement *>(this);
         assert(editorialElement);
         if (editorialElement->m_visibility == Hidden) {
-            return;
+            processChildren = false;
         }
     }
 
@@ -591,47 +672,49 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
     }
     deepness--;
 
-    ArrayOfObjects::iterator iter;
-    // We need a pointer to the array for the option to work on a reversed copy
-    ArrayOfObjects *children = &this->m_children;
-    ArrayOfObjects reversed;
-    // For processing backwards, we operated on a copied reversed version
-    // Since we hold pointers, only addresses are copied
-    if (direction == BACKWARD) {
-        reversed = (*children);
-        std::reverse(reversed.begin(), reversed.end());
-        children = &reversed;
-    }
-    for (iter = children->begin(); iter != children->end(); ++iter) {
-        if (filters && !filters->empty()) {
-            bool hasAttComparison = false;
-            // first we look if there is a comparison object for the object type (e.g., a Staff)
-            ArrayOfAttComparisons::iterator attComparisonIter;
-            for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
-                // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
-                // the attribute (see below)
-                Object *o = *iter;
-                if (o->Is() == (*attComparisonIter)->GetType()) {
-                    hasAttComparison = true;
-                    break;
-                }
-            }
-            if (hasAttComparison) {
-                // use the operator of the AttComparison object to evaluate the attribute
-                if ((**attComparisonIter)(*iter)) {
-                    // the attribute value matches, process the object
-                    // LogDebug("%s ", (*iter)->GetClassName().c_str());
-                    (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
-                    break;
-                }
-                else {
-                    // the attribute value does not match, skip this child
-                    continue;
-                }
-            }
+    if (processChildren) {
+        ArrayOfObjects::iterator iter;
+        // We need a pointer to the array for the option to work on a reversed copy
+        ArrayOfObjects *children = &this->m_children;
+        ArrayOfObjects reversed;
+        // For processing backwards, we operated on a copied reversed version
+        // Since we hold pointers, only addresses are copied
+        if (direction == BACKWARD) {
+            reversed = (*children);
+            std::reverse(reversed.begin(), reversed.end());
+            children = &reversed;
         }
-        // we will end here if there is no filter at all or for the current child type
-        (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+        for (iter = children->begin(); iter != children->end(); ++iter) {
+            if (filters && !filters->empty()) {
+                bool hasAttComparison = false;
+                // first we look if there is a comparison object for the object type (e.g., a Staff)
+                ArrayOfAttComparisons::iterator attComparisonIter;
+                for (attComparisonIter = filters->begin(); attComparisonIter != filters->end(); attComparisonIter++) {
+                    // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
+                    // the attribute (see below)
+                    Object *o = *iter;
+                    if (o->Is() == (*attComparisonIter)->GetType()) {
+                        hasAttComparison = true;
+                        break;
+                    }
+                }
+                if (hasAttComparison) {
+                    // use the operator of the AttComparison object to evaluate the attribute
+                    if ((**attComparisonIter)(*iter)) {
+                        // the attribute value matches, process the object
+                        // LogDebug("%s ", (*iter)->GetClassName().c_str());
+                        (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+                        break;
+                    }
+                    else {
+                        // the attribute value does not match, skip this child
+                        continue;
+                    }
+                }
+            }
+            // we will end here if there is no filter at all or for the current child type
+            (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
+        }
     }
 
     if (endFunctor) {
@@ -887,6 +970,32 @@ int Object::FindAllByAttComparison(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
+{
+    SetCautionaryScoreDefParams *params = dynamic_cast<SetCautionaryScoreDefParams *>(functorParams);
+    assert(params);
+
+    assert(params->m_currentScoreDef);
+
+    // starting a new staff
+    if (this->Is() == STAFF) {
+        Staff *staff = dynamic_cast<Staff *>(this);
+        assert(staff);
+        params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
+        return FUNCTOR_CONTINUE;
+    }
+
+    // starting a new layer
+    if (this->Is() == LAYER) {
+        Layer *layer = dynamic_cast<Layer *>(this);
+        assert(layer);
+        layer->SetDrawingCautionValues(params->m_currentStaffDef);
+        return FUNCTOR_SIBLINGS;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 {
     SetCurrentScoreDefParams *params = dynamic_cast<SetCurrentScoreDefParams *>(functorParams);
@@ -896,17 +1005,11 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new page
     if (this->Is() == PAGE) {
-        // The keySig cancellation is set to false, which means that a scoreDef change has to occur
-        // after a page break if right at the begining. This is the same for systems below
         Page *page = dynamic_cast<Page *>(this);
         assert(page);
         if (page->m_parent->GetChildIndex(page) == 0) {
-            params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false, false);
-            params->m_upcomingScoreDef->SetDrawLabels(true);
-        }
-        else {
-            params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
-            params->m_upcomingScoreDef->SetDrawLabels(false);
+            params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false);
+            params->m_drawLabels = true;
         }
         page->m_drawingScoreDef = *params->m_upcomingScoreDef;
         return FUNCTOR_CONTINUE;
@@ -914,26 +1017,43 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 
     // starting a new system
     if (this->Is() == SYSTEM) {
-        // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
-        params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false, false);
-        // System *system = dynamic_cast<System *>(this);
-        // assert(system);
-        // For now we don't use it - eventually we want to set it. The problem will be to take into account succeeding
-        // scoreDefs appearing before the first measure of the system
-        // system->SetDrawingScoreDef(*currentScoreDef);
+        System *system = dynamic_cast<System *>(this);
+        assert(system);
+        // This is the only thing we do for now - we need to wait until we reach the first measure
+        params->m_currentSystem = system;
         return FUNCTOR_CONTINUE;
     }
 
-    // starting a new system
+    // starting a new measure
     if (this->Is() == MEASURE) {
+        Measure *measure = dynamic_cast<Measure *>(this);
+        assert(measure);
+        // This is the first measure of the system - more to do...
+        if (params->m_currentSystem) {
+            // We had a scoreDef so we need to put cautionnary values
+            // This will also happend with clef in the last measure - however, the cautionnary functor will not do
+            // anything then
+            if (params->m_upcomingScoreDef->m_setAsDrawing && params->m_previousMeasure) {
+                ScoreDef cautionaryScoreDef = *params->m_upcomingScoreDef;
+                SetCautionaryScoreDefParams setCautionaryScoreDefParams(&cautionaryScoreDef);
+                Functor setCautionaryScoreDef(&Object::SetCautionaryScoreDef);
+                params->m_previousMeasure->Process(&setCautionaryScoreDef, &setCautionaryScoreDefParams);
+            }
+            // Set the flags we want to have. This also sets m_setAsDrawing to true so the next measure will keep it
+            params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false);
+            // Set it to the current system (used e.g. for endings)
+            params->m_currentSystem->SetDrawingScoreDef(params->m_upcomingScoreDef);
+            params->m_currentSystem->GetDrawingScoreDef()->SetDrawLabels(params->m_drawLabels);
+            params->m_currentSystem = NULL;
+            params->m_drawLabels = false;
+        }
         if (params->m_upcomingScoreDef->m_setAsDrawing) {
-            Measure *measure = dynamic_cast<Measure *>(this);
-            assert(measure);
             measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
-            params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, false, true);
+            params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, true);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
+        params->m_previousMeasure = measure;
         return FUNCTOR_CONTINUE;
     }
 
@@ -979,7 +1099,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
                 layer->SetDrawingStemDir(STEMDIRECTION_down);
             }
         }
-        layer->SetDrawingAndCurrentValues(params->m_currentStaffDef);
+        layer->SetDrawingStaffDefValues(params->m_currentStaffDef);
         return FUNCTOR_CONTINUE;
     }
 
@@ -1028,7 +1148,7 @@ int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
     Note *note = dynamic_cast<Note *>(this);
     assert(note);
 
-    if (!note->IsGraceNote()) {
+    if (!note->IsGraceNote() || note->IsChordTone()) {
         params->m_graceMinPos = 0;
         return FUNCTOR_CONTINUE;
     }
@@ -1097,6 +1217,7 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
     if (!current->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
         assert(false); // quite drastic but this should never happen. If nothing has to be drawn
+        LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
         // then the BB should be set to empty with  Object::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
@@ -1219,7 +1340,11 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (this->IsFloatingElement()) {
+    if (this->IsSystemElement()) {
+        return FUNCTOR_CONTINUE;
+    }
+
+    if (this->IsControlElement()) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -1268,6 +1393,32 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     // do not go further down the tree in this case since the bounding box of the first element is already taken
     // into
     // account?
+    return FUNCTOR_CONTINUE;
+}
+
+int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
+{
+    SetOverflowBBoxesParams *params = dynamic_cast<SetOverflowBBoxesParams *>(functorParams);
+    assert(params);
+
+    // starting new layer
+    if (this->Is() == LAYER) {
+        Layer *currentLayer = dynamic_cast<Layer *>(this);
+        assert(currentLayer);
+        // set scoreDef attr
+        if (currentLayer->GetCautionStaffDefClef()) {
+            currentLayer->GetCautionStaffDefClef()->SetOverflowBBoxes(params);
+        }
+        if (currentLayer->GetCautionStaffDefKeySig()) {
+            currentLayer->GetCautionStaffDefKeySig()->SetOverflowBBoxes(params);
+        }
+        if (currentLayer->GetCautionStaffDefMensur()) {
+            currentLayer->GetCautionStaffDefMensur()->SetOverflowBBoxes(params);
+        }
+        if (currentLayer->GetCautionStaffDefMeterSig()) {
+            currentLayer->GetCautionStaffDefMeterSig()->SetOverflowBBoxes(params);
+        }
+    }
     return FUNCTOR_CONTINUE;
 }
 

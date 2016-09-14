@@ -16,6 +16,7 @@
 #include "editorial.h"
 #include "functorparams.h"
 #include "slur.h"
+#include "syl.h"
 #include "tie.h"
 #include "verse.h"
 #include "vrv.h"
@@ -102,13 +103,27 @@ void Note::Reset()
     m_playingOffset = 0.0;
 }
 
-void Note::AddLayerElement(vrv::LayerElement *element)
+void Note::AddChild(Object *child)
 {
-    // assert(
-    //    dynamic_cast<Accid *>(element) || dynamic_cast<Verse *>(element) || dynamic_cast<EditorialElement
-    //    *>(element));
-    element->SetParent(this);
-    m_children.push_back(element);
+    if (child->Is() == ACCID) {
+        assert(dynamic_cast<Accid *>(child));
+    }
+    else if (child->Is() == SYL) {
+        assert(dynamic_cast<Syl *>(child));
+    }
+    else if (child->Is() == VERSE) {
+        assert(dynamic_cast<Verse *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 

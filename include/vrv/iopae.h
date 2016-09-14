@@ -66,7 +66,7 @@ namespace pae {
             tuplet_notes = old.tuplet_notes;
             tuplet_note = old.tuplet_note;
         }
-        Note(void) { clear(); };
+        Note(void) { clear(); }
         void clear(void)
         {
             appoggiatura = 0;
@@ -87,7 +87,7 @@ namespace pae {
             clef = NULL;
             meter = NULL;
             key = NULL;
-        };
+        }
 
         Note &operator=(const Note &d)
         { // for STL vector
@@ -163,7 +163,7 @@ namespace pae {
             abbreviation_offset = d.abbreviation_offset;
             wholerest = d.wholerest;
         }
-        Measure(void) { clear(); };
+        Measure(void) { clear(); }
 
         Measure &operator=(const Measure &d)
         { // for STL vector
@@ -189,7 +189,7 @@ namespace pae {
             notes.clear();
             durations_offset = DURATION_long;
             reset();
-        };
+        }
         void reset(void)
         {
             clef = NULL;
@@ -199,7 +199,7 @@ namespace pae {
             barLine = BARRENDITION_NONE;
             wholerest = 0;
             abbreviation_offset = -1;
-        };
+        }
         Clef *clef;
         MeterSig *meter;
         KeySig *key;
@@ -227,7 +227,7 @@ public:
     virtual ~PaeInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string pae);
+    virtual bool ImportString(std::string const &pae);
 
 #ifndef NO_PAE_SUPPORT
 

@@ -15,7 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "floatingelement.h"
+#include "floatingobject.h"
 #include "functorparams.h"
 #include "note.h"
 #include "staff.h"
@@ -196,22 +196,22 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     return -(box->GetDrawingY() + box->m_contentBB_y1 + m_staffHeight);
 }
 
-void StaffAlignment::SetCurrentFloatingPositioner(FloatingElement *element, int x, int y)
+void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, int x, int y)
 {
     auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
-        [element](FloatingPositioner *positioner) { return positioner->GetElement() == element; });
+        [object](FloatingPositioner *positioner) { return positioner->GetObject() == object; });
     if (item != m_floatingPositioners.end()) {
         // LogDebug("Found it!");
     }
     else {
-        FloatingPositioner *box = new FloatingPositioner(element);
+        FloatingPositioner *box = new FloatingPositioner(object);
         m_floatingPositioners.push_back(box);
         item = m_floatingPositioners.end() - 1;
     }
     (*item)->SetDrawingX(x);
     (*item)->SetDrawingY(y);
     // LogDebug("BB %d", item->second.m_contentBB_x1);
-    element->SetCurrentFloatingPositioner((*item));
+    object->SetCurrentFloatingPositioner((*item));
 }
 
 //----------------------------------------------------------------------------
@@ -257,7 +257,7 @@ void MeasureAligner::AddAlignment(Alignment *alignment, int idx)
 
 Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
 {
-    time = round(time*(pow(10,10))/pow(10,10));
+    time = round(time * (pow(10, 10)) / pow(10, 10));
     int i;
     int idx = -1; // the index if we reach the end.
     Alignment *alignment = NULL;
@@ -311,11 +311,12 @@ void MeasureAligner::SetMaxTime(double time)
 
     int i;
     Alignment *alignment = NULL;
-    // First try to see if we already have something at the time position
+    // Increase the time position for all alignment from the right barline
     for (i = idx; i < GetAlignmentCount(); i++) {
         alignment = dynamic_cast<Alignment *>(m_children.at(i));
         assert(alignment);
-        alignment->SetTime(time);
+        // Change it only if higher than before
+        if (time > alignment->GetTime()) alignment->SetTime(time);
     }
 }
 
@@ -525,7 +526,6 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
     AdjustFloatingPostionersParams *params = dynamic_cast<AdjustFloatingPostionersParams *>(functorParams);
     assert(params);
 
-    // for slur we do not need to adjust them, only add them to the overflow boxes if required
     int staffSize = this->GetStaffSize();
 
     if (params->m_classId == SYL) {
@@ -545,8 +545,10 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
 
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
-        if ((*iter)->GetElement()->Is() != params->m_classId) continue;
+        assert((*iter)->GetObject());
+        if ((*iter)->GetObject()->Is() != params->m_classId) continue;
 
+        // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
         if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
 
             int overflowAbove = this->CalcOverflowAbove((*iter));
@@ -596,6 +598,59 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
             overflowBoxes->push_back((*iter));
             this->SetOverflowBelow(overflowBelow);
         }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
+{
+    AdjustFloatingPostionerGrpsParams *params = dynamic_cast<AdjustFloatingPostionerGrpsParams *>(functorParams);
+    assert(params);
+
+    ArrayOfFloatingPositioners positioners;
+    // make a temporary copy of positionners with a classId desired and that have a drawing grpId
+    std::copy_if(m_floatingPositioners.begin(), m_floatingPositioners.end(), std::back_inserter(positioners),
+        [params](FloatingPositioner *positioner) {
+            assert(positioner->GetObject());
+            // search in the desired classIds
+            return ((std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->Is())
+                        != params->m_classIds.end())
+                && (positioner->GetObject()->GetDrawingGrpId() != 0));
+        });
+
+    // A vector for storing a pair with the grpId and the min or max YRel
+    std::vector<std::pair<int, int> > grpIdYRel;
+
+    ArrayOfFloatingPositioners::iterator iter;
+    for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
+        int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
+        // Look if we already have a pair for this grpId
+        auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
+            [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
+        // if not, then just add a new pair with the YRel of the current positioner
+        if (i == grpIdYRel.end()) {
+            grpIdYRel.push_back(std::make_pair(currentGrpId, (*iter)->GetDrawingYRel()));
+        }
+        // else, adjust the min or max YRel of the pair if necessary
+        else {
+            if ((*iter)->GetDrawingPlace() == STAFFREL_above) {
+                if ((*iter)->GetDrawingYRel() < (*i).second) (*i).second = (*iter)->GetDrawingYRel();
+            }
+            else {
+                if ((*iter)->GetDrawingYRel() > (*i).second) (*i).second = (*iter)->GetDrawingYRel();
+            }
+        }
+    }
+
+    // Now go through all the positioners again and ajust the YRel with the value of the pair
+    for (iter = positioners.begin(); iter != positioners.end(); ++iter) {
+        int currentGrpId = (*iter)->GetObject()->GetDrawingGrpId();
+        auto i = std::find_if(grpIdYRel.begin(), grpIdYRel.end(),
+            [currentGrpId](std::pair<int, int> &pair) { return (pair.first == currentGrpId); });
+        // We must have find it
+        assert(i != grpIdYRel.end());
+        (*iter)->SetDrawingYRel((*i).second);
     }
 
     return FUNCTOR_SIBLINGS;
@@ -743,7 +798,8 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
 
-    // Because these do not get shifted with their bounding box because their bounding box is calculated according to
+    // Because these do not get shifted with their bounding box because their bounding box is calculated
+    // according to
     // the width of the measure, their xShift has to be set 'by hand'
     if (GetType() == ALIGNMENT_FULLMEASURE) {
         params->m_minPos = std::max(this->GetXRel() + params->m_doc->m_drawingMinMeasureWidth, params->m_minPos);
@@ -752,7 +808,8 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
         params->m_minPos = std::max(this->GetXRel() + 2 * params->m_doc->m_drawingMinMeasureWidth, params->m_minPos);
     }
 
-    // Here we want to process only the alignments from the right barline to the end - this includes the right scoreDef
+    // Here we want to process only the alignments from the right barline to the end - this includes the right
+    // scoreDef
     // if any
     if (this->m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) return FUNCTOR_CONTINUE;
 

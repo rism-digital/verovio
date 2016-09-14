@@ -8,7 +8,7 @@
 #ifndef __VRV_TIE_H__
 #define __VRV_TIE_H__
 
-#include "floatingelement.h"
+#include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -17,7 +17,7 @@ namespace vrv {
 // Tie
 //----------------------------------------------------------------------------
 
-class Tie : public FloatingElement, public TimeSpanningInterface, public AttCurvature {
+class Tie : public ControlElement, public TimeSpanningInterface, public AttCurvature {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -27,12 +27,16 @@ public:
     Tie();
     virtual ~Tie();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Tie"; };
-    virtual ClassId Is() const { return TIE; };
+    virtual std::string GetClassName() const { return "Tie"; }
+    virtual ClassId Is() const { return TIE; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+
+    //----------//
+    // Functors //
+    //----------//
 
 private:
     //

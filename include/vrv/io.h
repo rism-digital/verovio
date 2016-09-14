@@ -9,6 +9,7 @@
 #define __VRV_IO_H__
 
 #include <fstream>
+#include <vector>
 
 namespace vrv {
 
@@ -39,12 +40,12 @@ public:
     /**
      * Dummy object method that must be overridden in child class.
      */
-    virtual bool WriteObject(Object *object) { return true; };
+    virtual bool WriteObject(Object *object) { return true; }
 
     /**
      * Dummy object method that must be overridden in child class.
      */
-    virtual bool WriteObjectEnd(Object *object) { return true; };
+    virtual bool WriteObjectEnd(Object *object) { return true; }
 
 public:
     //
@@ -71,29 +72,28 @@ public:
 
     // read
     virtual bool ImportFile() { return true; }
-    virtual bool ImportString(std::string data) { return true; }
-
-    /**
-     * Setter for the layoutInformation ignore flag
-     */
-    void IgnoreLayoutInformation() { m_ignoreLayoutInformation = true; };
+    virtual bool ImportString(std::string const & data) { return true; }
 
     /**
      * Getter for layoutInformation flag that is set to true during import
      * if layout information is found (and not to be ignored).
      */
-    bool HasLayoutInformation() { return m_hasLayoutInformation; };
+    bool HasLayoutInformation() { return m_hasLayoutInformation; }
 
     /**
-     * Getter for <app> level flag that is set to true during import
-     * if <measure> within editorial markup has been found
+     * Set XPath queries for <app> (MEI only)
      */
-    bool HasMeasureWithinEditoMarkup() { return m_hasMeasureWithinEditMarkup; };
+    virtual void SetAppXPathQueries(std::vector<std::string> &xPathQueries) {}
 
     /**
-     * Set XPath query for <app> (MEI only)
+     * Set XPath queries for <choice> (MEI only)
      */
-    virtual void SetAppXPathQuery(std::string xPathQuery){};
+    virtual void SetChoiceXPathQueries(std::vector<std::string> &xPathQueries) {}
+
+    /**
+     * Set XPath query for <mdiv> (MEI only)
+     */
+    virtual void SetMdivXPathQuery(std::string &xPathQuery) {}
 
 private:
     /**
@@ -112,19 +112,6 @@ protected:
      * file contains <pb> and <sb>. This will stay wrong with PAE import
      */
     bool m_hasLayoutInformation;
-
-    /**
-     * Becomes true if <measure> are included within editorial markup.
-     * If this is true, the only continuous layout will be available.
-     */
-    bool m_hasMeasureWithinEditMarkup;
-
-    /**
-     * If set to true, the layout information found during the import
-     * will be ignored. The file will be loaded in one single page with
-     * one single system.
-     */
-    bool m_ignoreLayoutInformation;
 };
 
 } // namespace vrv

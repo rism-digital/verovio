@@ -8,7 +8,7 @@
 #ifndef __VRV_BOUNDARY_H__
 #define __VRV_BOUNDARY_H__
 
-#include "object.h"
+#include "systemelement.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -24,7 +24,7 @@ class Object;
  * This class is an interface for elements having a single time point, such as tempo, reh, etc..
  * It is not an abstract class but should not be instantiated directly.
  */
-class BoundaryEnd : public Object {
+class BoundaryEnd : public SystemElement {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -34,8 +34,8 @@ public:
     BoundaryEnd(Object *start);
     virtual ~BoundaryEnd();
     virtual void Reset();
-    virtual std::string GetClassName() const;
-    virtual ClassId Is() const { return BOUNDARY_END; };
+    virtual std::string GetClassName() const { return "boundaryEnd"; }
+    virtual ClassId Is() const { return BOUNDARY_END; }
     ///@}
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }
@@ -45,7 +45,8 @@ public:
      * @name Get the corresponding boundary start
      */
     ///@{
-    Object *GetStart() { return m_start; };
+    Object *GetStart() { return m_start; }
+    std::string GetStartClassName() const { return m_startClassName; }
     ///@}
 
     //----------//
@@ -53,21 +54,29 @@ public:
     //----------//
 
     /**
-     * See Object::PrepareBoundaries.
+     * See Object::PrepareBoundaries
      */
     virtual int PrepareBoundaries(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
-     * Fill a page by adding systems with the appropriate length.
-     * For Endings, this means only moving them since their width is not taken into
-     * account
+     * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
+
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareFloatingGrps
+     */
+    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
 protected:
     //
@@ -117,6 +126,11 @@ public:
     BoundaryEnd *GetEnd() { return m_end; }
     bool IsBoundary() { return (m_end != NULL); }
     ///@}
+
+    /**
+     *
+     */
+    void ConvertToPageBasedBoundary(Object *object, Object *parent);
 
     //-----------------//
     // Pseudo functors //

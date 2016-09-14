@@ -19,6 +19,7 @@
 #include "layer.h"
 #include "staff.h"
 #include "syl.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -43,11 +44,21 @@ void Verse::Reset()
     ResetCommon();
 }
 
-void Verse::AddLayerElement(vrv::LayerElement *element)
+void Verse::AddChild(Object *child)
 {
-    assert(dynamic_cast<Syl *>(element) || dynamic_cast<EditorialElement *>(element));
-    element->SetParent(this);
-    m_children.push_back(element);
+    if (child->Is() == SYL) {
+        assert(dynamic_cast<Syl *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 

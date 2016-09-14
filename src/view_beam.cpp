@@ -43,10 +43,10 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     LayerElement *current;
 
     BeamParams params;
-    params.m_changingDur = OFF;
-    params.m_beamHasChord = OFF;
-    params.m_hasMultipleStemDir = OFF;
-    params.m_cueSize = OFF;
+    params.m_changingDur = false;
+    params.m_beamHasChord = false;
+    params.m_hasMultipleStemDir = false;
+    params.m_cueSize = false;
     params.m_shortestDur = 0;
     params.m_stemDir = STEMDIRECTION_NONE;
 
@@ -115,7 +115,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             (*beamElementCoords).at(elementCount)->m_breaksec = 0;
             AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary *>(current);
             if (beamsecondary && beamsecondary->HasBreaksec()) {
-                if (!params.m_changingDur) params.m_changingDur = ON;
+                if (!params.m_changingDur) params.m_changingDur = true;
                 (*beamElementCoords).at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
             }
 
@@ -127,7 +127,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                     currentStemDir = (dynamic_cast<AttStems *>(current))->GetStemDir();
                     if (currentStemDir != STEMDIRECTION_NONE) {
                         if ((params.m_stemDir != STEMDIRECTION_NONE) && (params.m_stemDir != currentStemDir)) {
-                            params.m_hasMultipleStemDir = ON;
+                            params.m_hasMultipleStemDir = true;
                         }
                     }
                     params.m_stemDir = currentStemDir;
@@ -136,7 +136,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             // keep the shortest dur in the beam
             params.m_shortestDur = std::max(currentDur, params.m_shortestDur);
             // check if we have more than duration in the beam
-            if (!params.m_changingDur && currentDur != lastDur) params.m_changingDur = ON;
+            if (!params.m_changingDur && currentDur != lastDur) params.m_changingDur = true;
             lastDur = currentDur;
             
             elementCount++;
@@ -411,10 +411,10 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     BeamParams params;
-    params.m_changingDur = OFF;
-    params.m_beamHasChord = OFF;
-    params.m_hasMultipleStemDir = OFF;
-    params.m_cueSize = OFF;
+    params.m_changingDur = false;
+    params.m_beamHasChord = false;
+    params.m_hasMultipleStemDir = false;
+    params.m_cueSize = false;
     // adjust params.m_shortestDur depending on the number of slashes
     params.m_shortestDur = std::max(DUR_8, DUR_1 + fTrem->GetSlash());
     params.m_stemDir = STEMDIRECTION_NONE;
@@ -424,10 +424,10 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int dur = (dynamic_cast<AttDurationMusical *>(firstElement.m_element))->GetDur();
 
     if (firstElement.m_element->Is() == CHORD) {
-        params.m_beamHasChord = ON;
+        params.m_beamHasChord = true;
     }
     if (secondElement.m_element->Is() == CHORD) {
-        params.m_beamHasChord = ON;
+        params.m_beamHasChord = true;
     }
 
     // For now look at the stemDir only on the first note
@@ -561,7 +561,7 @@ void View::CalcBeam(
     verticalCenter = staff->GetDrawingY()
         - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2); // center point of the staff
     yExtreme = verticalCenter; // value of farthest y point on the staff from verticalCenter minus verticalCenter; used
-    // if beamHasChord = ON
+    // if beamHasChord = true
 
     int last = elementCount - 1;
 

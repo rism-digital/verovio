@@ -10,6 +10,7 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -19,14 +20,6 @@
 #include "vrv.h"
 
 namespace vrv {
-
-extern "C" {
-static inline double DegToRad(double deg)
-{
-    return (deg * M_PI) / 180.0;
-}
-// static inline double RadToDeg(double deg) { return (deg * 180.0) / M_PI; }
-}
 
 //----------------------------------------------------------------------------
 // BBoxDeviceContext
@@ -151,62 +144,6 @@ void BBoxDeviceContext::DrawEllipse(int x, int y, int width, int height)
 
 void BBoxDeviceContext::DrawEllipticArc(int x, int y, int width, int height, double start, double end)
 {
-    /*
-    Draws an arc of an ellipse. The current pen is used for drawing the arc
-    and the current brush is used for drawing the pie. This function is
-    currently only available for X window and PostScript device contexts.
-
-    x and y specify the x and y coordinates of the upper-left corner of the
-    rectangle that contains the ellipse.
-
-    width and height specify the width and height of the rectangle that
-    contains the ellipse.
-
-    start and end specify the start and end of the arc relative to the
-    three-o'clock position from the center of the rectangle. Angles are
-    specified in degrees (360 is a complete circle). Positive values mean
-    counter-clockwise motion. If start is equal to end, a complete ellipse
-    will be drawn. */
-
-    // known bug: SVG draws with the current pen along the radii, but this does not happen in wxMSW
-
-    std::string s;
-    // radius
-    double rx = width / 2;
-    double ry = height / 2;
-    // center
-    double xc = x + rx;
-    double yc = y + ry;
-
-    double xs, ys, xe, ye;
-    xs = xc + rx * cos(DegToRad(start));
-    xe = xc + rx * cos(DegToRad(end));
-    ys = yc - ry * sin(DegToRad(start));
-    ye = yc - ry * sin(DegToRad(end));
-
-    /// now same as circle arc...
-
-    /*
-    double theta1 = atan2(ys - yc, xs - xc);
-    double theta2 = atan2(ye - yc, xe - xc);
-
-
-    int fArc; // flag for large or small arc 0 means less than 180 degrees
-    if ((theta2 - theta1) > 0)
-        fArc = 1;
-    else
-        fArc = 0;
-
-    int fSweep;
-    if (fabs(theta2 - theta1) > M_PI)
-        fSweep = 1;
-    else
-        fSweep = 0;
-
-    WriteLine(StringFormat("<path d=\"M%d %d A%d %d 0.0 %d %d  %d %d \" />", int(xs), int(ys), int(rx), int(ry), fArc,
-        fSweep, int(xe), int(ye)));
-    */
-
     int penWidth = m_penStack.top().GetWidth();
     if (penWidth % 2) {
         penWidth += 1;

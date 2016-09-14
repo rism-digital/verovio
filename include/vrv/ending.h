@@ -10,7 +10,7 @@
 
 #include "atts_shared.h"
 #include "boundary.h"
-#include "floatingelement.h"
+#include "systemelement.h"
 
 namespace vrv {
 
@@ -20,7 +20,12 @@ class Measure;
 // Ending
 //----------------------------------------------------------------------------
 
-class Ending : public FloatingElement, public BoundaryStartInterface, public AttCommon {
+/**
+ * This class represents a MEI ending.
+ * It can be both a container (in score-based MEI) and a boundary (in page-based MEI).
+ * It inherits from FloatingElement for spanning drawing features.
+ */
+class Ending : public SystemElement, public BoundaryStartInterface, public AttCommon {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -30,54 +35,56 @@ public:
     Ending();
     virtual ~Ending();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Ending"; };
-    virtual ClassId Is() const { return ENDING; };
+    virtual std::string GetClassName() const { return "Ending"; }
+    virtual ClassId Is() const { return ENDING; }
     ///@}
-
-    // void SetEndBoundary(Ending *endBoundary) { m_endBoundary = endBoundary; }
-    // Ending *GetEndBoundary() { return m_endBoundary; }
-    // Ending *GetStartBoundary() { return m_startBoundary; }
 
     /**
-     * @name Constructors, destructors, and other standard methods
-     * Reset method resets all attribute classes
+     * Method for adding allowed content
      */
-    ///@{
-    // bool IsStartBoundary() { return (m_startBoundary == NULL); }
-    // bool IsEndBoundary() { return (m_startBoundary != NULL); }
-    ///@}
+    virtual void AddChild(Object *object);
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * See Object::PrepareBoundaries.
+     * See Object::ConvertToPageBased
+     */
+    virtual int ConvertToPageBased(FunctorParams *functorParams);
+    virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareBoundaries
      */
     virtual int PrepareBoundaries(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
-     * Fill a page by adding systems with the appropriate length.
-     * For Endings, this means only moving them since their width is not taken into
-     * account
+     * See Object::CastOffSystems
      */
     virtual int CastOffSystems(FunctorParams *functorParams);
+
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareFloatingGrps
+     */
+    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
 private:
     //
 public:
     //
 private:
-    /**
-     * Pointer for starting and ending boundary.
-     */
-    // Ending *m_startBoundary;
-    // Ending *m_endBoundary;
+    //
 };
 
 } // namespace vrv

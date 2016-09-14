@@ -30,8 +30,8 @@ public:
     MRest();
     virtual ~MRest();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "MRest"; };
-    virtual ClassId Is() const { return MREST; };
+    virtual std::string GetClassName() const { return "MRest"; }
+    virtual ClassId Is() const { return MREST; }
     ///@}
 
 private:

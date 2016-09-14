@@ -8,7 +8,7 @@
 #ifndef __VRV_DYNAM_H__
 #define __VRV_DYNAM_H__
 
-#include "floatingelement.h"
+#include "controlelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
 
@@ -20,7 +20,7 @@ class TextElement;
 // Dynam
 //----------------------------------------------------------------------------
 
-class Dynam : public FloatingElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
+class Dynam : public ControlElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -30,8 +30,8 @@ public:
     Dynam();
     virtual ~Dynam();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Dynam"; };
-    virtual ClassId Is() const { return DYNAM; };
+    virtual std::string GetClassName() const { return "Dynam"; }
+    virtual ClassId Is() const { return DYNAM; }
     ///@}
 
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
@@ -42,7 +42,7 @@ public:
     * Add an element (text, rend. etc.) to a dynam.
     * Only supported elements will be actually added to the child list.
     */
-    void AddTextElement(TextElement *element);
+    virtual void AddChild(Object *object);
 
     /**
      * Return true if the dynam text is only composed of f, p, r, z, etc. letters (e.g. sfz)

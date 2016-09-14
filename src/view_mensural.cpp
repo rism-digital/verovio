@@ -50,27 +50,26 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     // staff; use _pseudoStaffSize_ to force this for fonts that don't consider that fact.
     int pseudoStaffSize = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
     int noteY = element->GetDrawingY();
-    int xLedger, xNote, xStem;
+    int xNote, xStem;
     int drawingDur;
     int staffY = staff->GetDrawingY();
     wchar_t charCode;
-    int ledge;
+    // int ledge;
     int verticalCenter = 0;
-    bool mensural_black = (staff->m_drawingNotationType==NOTATIONTYPE_mensural_black);
+    bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     xStem = element->GetDrawingX();
-    xLedger = xStem;
 
     drawingDur = note->GetDrawingDur();
 
     int radius = m_doc->GetGlyphWidth(SMUFL_E93C_mensuralNoteheadMinimaWhite, pseudoStaffSize, false) / 2;
 
     if (drawingDur > DUR_1) {
-        ledge = m_doc->GetDrawingLedgerLineLength(pseudoStaffSize, false);
+        // ledge = m_doc->GetDrawingLedgerLineLength(pseudoStaffSize, false);
         if (mensural_black) radius *= TEMP_MINIMA_WIDTH_FACTOR;
     }
     else {
-        ledge = m_doc->GetDrawingLedgerLineLength(pseudoStaffSize, false);
+        // ledge = m_doc->GetDrawingLedgerLineLength(pseudoStaffSize, false);
         radius += radius / 3;
     }
 
@@ -106,17 +105,18 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     // Semibrevis
     else if (drawingDur == DUR_1) {
         if (mensural_black) {
-            int sbStaffSize = 0.8*staff->m_drawingStaffSize;    // FIXME: should be pseudoStaffSize, but that's too small; why??
-            //LogDebug("<DrawDiamond SB: pseudoStaffSize=%d m_drawing=%d sb=%d 2*sb=%d (int)(1.2*sb)=%d",
+            int sbStaffSize
+                = 0.8 * staff->m_drawingStaffSize; // FIXME: should be pseudoStaffSize, but that's too small; why??
+            // LogDebug("<DrawDiamond SB: pseudoStaffSize=%d m_drawing=%d sb=%d 2*sb=%d (int)(1.2*sb)=%d",
             //  pseudoStaffSize, staff->m_drawingStaffSize, sbStaffSize, 2*sbStaffSize, (int)(1.2*sbStaffSize));
-            DrawDiamond(dc, xNote, noteY, 2*sbStaffSize, (int)(1.2*sbStaffSize), !note->GetColored());
+            DrawDiamond(dc, xNote, noteY, 2 * sbStaffSize, (int)(1.2 * sbStaffSize), !note->GetColored());
         }
         else {
             if (note->GetColored())
                 charCode = SMUFL_E938_mensuralNoteheadSemibrevisBlack;
             else
                 charCode = SMUFL_E939_mensuralNoteheadSemibrevisVoid;
-            
+
             DrawSmuflCode(dc, xNote, noteY, charCode, pseudoStaffSize, false);
         }
     }
@@ -125,9 +125,10 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         if (mensural_black) {
             // SMuFL 1.20 doesn't have a codepoint for the "colored" semibrevis and minima head in black
             // mensural notation. But an unfilled (void) narrow diamond is fine, so we draw one.
-            int sbStaffSize = 0.8*staff->m_drawingStaffSize;    // FIXME: should be pseudoStaffSize, but that's too small; why??
-            DrawDiamond(dc, xNote, noteY, 2*sbStaffSize, (int)(TEMP_MINIMA_WIDTH_FACTOR*2*sbStaffSize),
-                        !note->GetColored());
+            int sbStaffSize
+                = 0.8 * staff->m_drawingStaffSize; // FIXME: should be pseudoStaffSize, but that's too small; why??
+            DrawDiamond(dc, xNote, noteY, 2 * sbStaffSize, (int)(TEMP_MINIMA_WIDTH_FACTOR * 2 * sbStaffSize),
+                !note->GetColored());
         }
         else {
             if (note->GetColored()) {
@@ -484,9 +485,8 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     int xn, xLeft, xRight, yTop, yBottom, y3, y4;
     // int yy2, y5; // unused
     int verticalCenter, up, height;
-    bool mensural_black = (staff->m_drawingNotationType==NOTATIONTYPE_mensural_black);
-    bool fillNotehead = (mensural_black || note->GetColored()) &&
-                        !(mensural_black && note->GetColored());
+    bool mensural_black = (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
+    bool fillNotehead = (mensural_black || note->GetColored()) && !(mensural_black && note->GetColored());
     height = m_doc->GetDrawingBeamWidth(pseudoStaffSize, false) / 2;
     xn = element->GetDrawingX();
 
@@ -500,7 +500,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     }
     yTop = y + m_doc->GetDrawingUnit(pseudoStaffSize);
     yBottom = y - m_doc->GetDrawingUnit(pseudoStaffSize);
-    
+
     y3 = yTop;
     y4 = yBottom;
     if (!mensural_black) {
@@ -547,17 +547,16 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     return;
 }
 
-
 void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(element);
     assert(layer);
     assert(staff);
-    
+
     Ligature *ligature = dynamic_cast<Ligature *>(element);
     assert(ligature);
-    
+
     dc->StartGraphic(ligature, "", ligature->GetUuid());
 
     // Draw children (notes)
@@ -566,7 +565,6 @@ void View::DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, 
     dc->EndGraphic(ligature, this);
 }
 
-    
 void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff)
 {
     assert(dc);
@@ -625,9 +623,9 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
      {
      DrawVerticalLine (dc,y3,y4,x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
      View::s_drawingLigObliqua = true;
-     //oblique = OFF;
+     //oblique = false;
      //			if (val == DUR_1)	// left tail up if DUR_1
-     //				queue_lig = ON;
+     //				queue_lig = true;
      }
      else	// 2nd pass: oblique lines and final flagStemHeighte
      {
@@ -649,7 +647,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
      flagStemHeighte
 
      View::s_drawingLigObliqua = false;
-     //			queue_lig = OFF;	// ??defuses alg.queue DUR_BR??
+     //			queue_lig = false;	// ??defuses alg.queue DUR_BR??
 
      }
      }
@@ -694,14 +692,14 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     if (note->GetActualDur() == DUR_LG) {
         verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
         // ENZ
-        up = (y < verticalCenter) ? ON : OFF;
+        up = (y < verticalCenter) ? true : false;
         // ENZ
         if (note->GetDrawingStemDir() != STEMDIRECTION_NONE) {
             if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
-                up = ON;
+                up = true;
             }
             else {
-                up = OFF;
+                up = false;
             }
         }
 
@@ -724,7 +722,8 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
     assert(dc);
     assert(staff);
 
-    int ynum, yden;
+    int ynum = 0;
+    int yden = 0;
     int textSize = PROPRT_SIZE_FACTOR * staff->m_drawingStaffSize;
     std::wstring wtext;
 

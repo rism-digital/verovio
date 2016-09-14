@@ -99,6 +99,22 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustFloatingPostionerGrpsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a vector of the classId to group
+ * member 1: the doc
+ **/
+
+class AdjustFloatingPostionerGrpsParams : public FunctorParams {
+public:
+    AdjustFloatingPostionerGrpsParams(Doc *doc) { m_doc = doc; }
+    std::vector<ClassId> m_classIds;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AlignHorizontallyParams
 //----------------------------------------------------------------------------
 
@@ -108,6 +124,8 @@ public:
  * member 2: the current Mensur
  * member 3: the current MeterSig
  * member 4: the functor for passing it to the TimeStampAligner
+ * member 5: a flag indicating whereas we are processing the caution scoreDef
+ * member 6: a flag indicating is we are in the first measure (for the scoreDef role)
 **/
 
 class AlignHorizontallyParams : public FunctorParams {
@@ -119,12 +137,16 @@ public:
         m_currentMensur = NULL;
         m_currentMeterSig = NULL;
         m_functor = functor;
+        m_scoreDefRole = NONE;
+        m_isFirstMeasure = false;
     }
     MeasureAligner *m_measureAligner;
     double m_time;
     Mensur *m_currentMensur;
     MeterSig *m_currentMeterSig;
     Functor *m_functor;
+    ElementScoreDefRole m_scoreDefRole;
+    bool m_isFirstMeasure;
 };
 
 //----------------------------------------------------------------------------
@@ -201,13 +223,19 @@ public:
 /**
  * member 0: std::vector<double>: a stack of maximum duration filled by the functor
  * member 1: double: the duration of the current measure
+ * member 2: the current bpm
 **/
 
 class CalcMaxMeasureDurationParams : public FunctorParams {
 public:
-    CalcMaxMeasureDurationParams() { m_currentValue = 0.0; }
+    CalcMaxMeasureDurationParams()
+    {
+        m_currentValue = 0.0;
+        m_currentBpm = 120;
+    }
     std::vector<double> m_maxValues;
     double m_currentValue;
+    int m_currentBpm;
 };
 
 //----------------------------------------------------------------------------
@@ -228,6 +256,35 @@ public:
     }
     StaffAlignment *m_previous;
     Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// CastOffEncodingParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer the document we are adding pages to
+ * member 2: a pointer to the current page
+ * member 4: a pointer to the current system
+ * member 3: a pointer to the system we are taking the content from
+ * member 5: a flag indicating if we have processed the first pb
+ **/
+
+class CastOffEncodingParams : public FunctorParams {
+public:
+    CastOffEncodingParams(Doc *doc, Page *currentPage, System *currentSystem, System *contentSystem)
+    {
+        m_doc = doc;
+        m_currentPage = currentPage;
+        m_currentSystem = currentSystem;
+        m_contentSystem = contentSystem;
+        m_firstPbProcessed = false;
+    }
+    Doc *m_doc;
+    Page *m_currentPage;
+    System *m_contentSystem;
+    System *m_currentSystem;
+    bool m_firstPbProcessed;
 };
 
 //----------------------------------------------------------------------------
@@ -270,6 +327,7 @@ public:
  * member 3: the cummulated shift (m_drawingXRel of the first measure of the current system)
  * member 4: the system width
  * member 5: the current scoreDef width
+ * member 6: the current pending objects (ScoreDef, Endings, etc.) to be place at the beginning of a system
 **/
 
 class CastOffSystemsParams : public FunctorParams {
@@ -289,6 +347,21 @@ public:
     int m_shift;
     int m_systemWidth;
     int m_currentScoreDefWidth;
+    ArrayOfObjects m_pendingObjects;
+};
+
+//----------------------------------------------------------------------------
+// ConvertToPageBasedParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the system we are moving the content to
+ **/
+
+class ConvertToPageBasedParams : public FunctorParams {
+public:
+    ConvertToPageBasedParams(System *pageBasedSystem) { m_pageBasedSystem = pageBasedSystem; }
+    System *m_pageBasedSystem;
 };
 
 //----------------------------------------------------------------------------
@@ -382,6 +455,28 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// FindTimeSpanningLayerElementsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the vector of LayerElement pointer to fill
+ * member 1: the minimum position
+ * member 2: the maximum position
+ **/
+
+class FindTimeSpanningLayerElementsParams : public FunctorParams {
+public:
+    FindTimeSpanningLayerElementsParams()
+    {
+        m_minPos = 0;
+        m_maxPos = 0;
+    }
+    std::vector<LayerElement *> m_spanningContent;
+    int m_minPos;
+    int m_maxPos;
+};
+
+//----------------------------------------------------------------------------
 // GenerateMIDIParams
 //----------------------------------------------------------------------------
 
@@ -392,6 +487,7 @@ public:
  * member 3: int*: the current total measure time (incremented by each measure
  * member 4: std::vector<double>: a stack of maximum duration filled by the functor
  * member 5: int* the semi tone transposition for the current track
+ * member 6: int with the current bpm
 **/
 
 class GenerateMIDIParams : public FunctorParams {
@@ -403,6 +499,7 @@ public:
         m_currentMeasureTime = 0.0;
         m_totalTime = 0.0;
         m_transSemi = 0;
+        m_currentBpm = 120;
     }
     MidiFile *m_midiFile;
     int m_midiTrack;
@@ -410,6 +507,7 @@ public:
     double m_totalTime;
     std::vector<double> m_maxValues;
     int m_transSemi;
+    int m_currentBpm;
 };
 
 //----------------------------------------------------------------------------
@@ -519,6 +617,26 @@ public:
     Measure *m_lastMeasure;
     Ending *m_currentEnding;
     std::vector<BoundaryStartInterface *> m_startBoundaries;
+};
+
+//----------------------------------------------------------------------------
+// PrepareFloatingGrpsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the previous ending
+ * member 1: the current grpId
+ **/
+
+class PrepareFloatingGrpsParams : public FunctorParams {
+public:
+    PrepareFloatingGrpsParams()
+    {
+        m_previousEnding = NULL;
+        m_drawingGrpId = DRAWING_GRP_OTHER;
+    }
+    Ending *m_previousEnding;
+    int m_drawingGrpId;
 };
 
 //----------------------------------------------------------------------------
@@ -794,6 +912,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// SetCautionaryScoreDefParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current scoreDef
+ * member 1: the current staffDef
+ **/
+
+class SetCautionaryScoreDefParams : public FunctorParams {
+public:
+    SetCautionaryScoreDefParams(ScoreDef *currentScoreDef)
+    {
+        m_currentScoreDef = currentScoreDef;
+        m_currentStaffDef = NULL;
+    }
+    ScoreDef *m_currentScoreDef;
+    StaffDef *m_currentStaffDef;
+};
+
+//----------------------------------------------------------------------------
 // SetCurrentScoreDefParams
 //----------------------------------------------------------------------------
 
@@ -801,6 +939,9 @@ public:
  * member 0: the current scoreDef
  * member 1: the current staffDef
  * member 2: the upcoming scoreDef
+ * member 3: the previous measure (for setting cautionary scoreDef)
+ * member 4: the current system (for setting the system scoreDef)
+ * member 5: the flag indicating whereas full labels have to be drawn
 **/
 
 class SetCurrentScoreDefParams : public FunctorParams {
@@ -810,10 +951,16 @@ public:
         m_currentScoreDef = NULL;
         m_currentStaffDef = NULL;
         m_upcomingScoreDef = upcomingScoreDef;
+        m_previousMeasure = NULL;
+        m_currentSystem = NULL;
+        m_drawLabels = false;
     }
     ScoreDef *m_currentScoreDef;
     StaffDef *m_currentStaffDef;
     ScoreDef *m_upcomingScoreDef;
+    Measure *m_previousMeasure;
+    System *m_currentSystem;
+    bool m_drawLabels;
 };
 
 //----------------------------------------------------------------------------
@@ -883,8 +1030,7 @@ public:
  * member 1: bool keysig flag
  * member 2: bool mensur flag
  * member 3: bool meterSig flag
- * member 4: bool keySig cancellation flag
- * member 5: bool the flag for indicating if apply to all or not
+ * member 4: bool the flag for indicating if apply to all or not
 **/
 
 class SetStaffDefRedrawFlagsParams : public FunctorParams {
@@ -895,37 +1041,13 @@ public:
         m_keySig = false;
         m_mensur = false;
         m_meterSig = false;
-        m_keySigCancellation = false;
         m_applyToAll = false;
     }
     bool m_clef;
     bool m_keySig;
     bool m_mensur;
     bool m_meterSig;
-    bool m_keySigCancellation;
     bool m_applyToAll;
-};
-
-//----------------------------------------------------------------------------
-// TimeSpanningLayerElementsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer to the vector of LayerElement pointer to fill
- * member 1: the minimum position
- * member 2: the maximum position
-**/
-
-class TimeSpanningLayerElementsParams : public FunctorParams {
-public:
-    TimeSpanningLayerElementsParams()
-    {
-        m_minPos = 0;
-        m_maxPos = 0;
-    }
-    std::vector<LayerElement *> m_spanningContent;
-    int m_minPos;
-    int m_maxPos;
 };
 
 //----------------------------------------------------------------------------

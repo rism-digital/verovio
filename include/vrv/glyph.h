@@ -46,20 +46,20 @@ public:
     void SetBoundingBox(double x, double y, double w, double h);
 
     /** Get the units per EM */
-    int GetUnitsPerEm() { return m_unitsPerEm; };
+    int GetUnitsPerEm() { return m_unitsPerEm; }
 
     /** Get the path */
-    std::string GetPath() { return m_path; };
+    std::string GetPath() { return m_path; }
 
     /** Get the code string */
-    std::string GetCodeStr() { return m_codeStr; };
+    std::string GetCodeStr() { return m_codeStr; }
 
     /**
      * @name Setter and getter for the horizAdvX
      */
     ///@{
-    int GetHorizAdvX() { return m_horizAdvX; };
-    void SetHorizAdvX(double horizAdvX) { m_horizAdvX = (int)(horizAdvX * 10.0); };
+    int GetHorizAdvX() { return m_horizAdvX; }
+    void SetHorizAdvX(double horizAdvX) { m_horizAdvX = (int)(horizAdvX * 10.0); }
     ///@}
 
 private:

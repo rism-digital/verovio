@@ -41,30 +41,30 @@ public:
     Staff(int n = -1);
     virtual ~Staff();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Staff"; };
-    virtual ClassId Is() const { return STAFF; };
+    virtual std::string GetClassName() const { return "Staff"; }
+    virtual ClassId Is() const { return STAFF; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddLayer(Layer *layer);
+    virtual void AddChild(Object *object);
     ///@}
 
-    int GetLayerCount() const { return (int)m_children.size(); };
+    int GetLayerCount() const { return (int)m_children.size(); }
 
     /**
      * Return the index position of the staff in its measure parent
      */
-    int GetStaffIdx() const { return Object::GetIdx(); };
+    int GetStaffIdx() const { return Object::GetIdx(); }
 
     /**
      * Return the default horizontal spacing of staves.
      */
     int GetVerticalSpacing();
 
-    StaffAlignment *GetAlignment() const { return m_staffAlignment; };
+    StaffAlignment *GetAlignment() const { return m_staffAlignment; }
 
     int GetYRel() const;
 
@@ -73,19 +73,17 @@ public:
     //----------//
 
     /**
-     * Unset the initial scoreDef of each system and measure
+     * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
-     * @name Reset the vertical alignment
+     * See Object::ResetVerticalAlignment
      */
-    ///@{
     virtual int ResetVerticalAlignment(FunctorParams *functorParams);
-    ///@}
 
     /**
-     * Align the content of a staff vertically.
+     * See Object::AlignVertically
      */
     virtual int AlignVertically(FunctorParams *functorParams);
 
@@ -95,18 +93,17 @@ public:
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     * See Object::SetDrawingXY
      */
     virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
-     * Functor for setting mRpt drawing numbers (if required)
-     * See implementation and Object::PrepareRpt
+     * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
 
@@ -134,9 +131,9 @@ public:
     std::vector<Object *> m_timeSpanningElements;
 
     /**
- * The Y absolute position of the staff for facsimile (transcription) encodings.
- * This is the top left corner of the staff (the X position is the position of the system).
- */
+     * The Y absolute position of the staff for facsimile (transcription) encodings.
+     * This is the top left corner of the staff (the X position is the position of the system).
+     */
     int m_yAbs;
 
     StaffDef *m_drawingStaffDef;
