@@ -1359,7 +1359,7 @@ bool MeiInput::ImportFile()
     }
 }
 
-bool MeiInput::ImportString(const std::string mei)
+bool MeiInput::ImportString(std::string const &mei)
 {
     try {
         m_doc->SetType(Raw);

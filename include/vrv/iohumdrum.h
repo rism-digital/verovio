@@ -170,7 +170,7 @@ public:
     virtual ~HumdrumInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string humdrum);
+    virtual bool ImportString(std::string const &humdrum);
 
 #ifndef NO_HUMDRUM_SUPPORT
 
@@ -247,9 +247,9 @@ protected:
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
     void storeOriginalClefApp(void);
     void addSpace(vector<string> &elements, vector<void *> &pointers, hum::HumNum duration);
-    void setLocationId(vrv::Object* object, hum::HTp token, int subtoken);
-	void addMidiTempo(vrv::ScoreDef& m_scoreDef, hum::HTp kernpart);
-	void addInstrumentDefinition(vrv::StaffDef* staffdef, hum::HTp partstart);
+    void setLocationId(vrv::Object *object, hum::HTp token, int subtoken);
+    void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
+    void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -295,11 +295,11 @@ private:
 
     // m_doc is inherited root document object.
 
-	// m_score stores the music
-	Score* m_score;
+    // m_score stores the music
+    Score *m_score;
 
-	// m_sections stores segments of the music
-	vector<Section*> m_sections;
+    // m_sections stores segments of the music
+    vector<Section *> m_sections;
 
     //////////////////////////////
     //

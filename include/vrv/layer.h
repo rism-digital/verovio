@@ -101,6 +101,7 @@ public:
     KeySig *GetStaffDefKeySig() { return m_staffDefKeySig; }
     Mensur *GetStaffDefMensur() { return m_staffDefMensur; }
     MeterSig *GetStaffDefMeterSig() { return m_staffDefMeterSig; }
+    bool HasStaffDef() { return (m_staffDefClef || m_staffDefKeySig || m_staffDefMensur || m_staffDefMeterSig); }
 
     /**
      * Set drawing clef, keysig and mensur if necessary and if available.
@@ -113,6 +114,11 @@ public:
     KeySig *GetCautionStaffDefKeySig() { return m_cautionStaffDefKeySig; }
     Mensur *GetCautionStaffDefMensur() { return m_cautionStaffDefMensur; }
     MeterSig *GetCautionStaffDefMeterSig() { return m_cautionStaffDefMeterSig; }
+    bool HasCautionStaffDef()
+    {
+        return (
+            m_cautionStaffDefClef || m_cautionStaffDefKeySig || m_cautionStaffDefMensur || m_cautionStaffDefMeterSig);
+    }
 
     //----------//
     // Functors //

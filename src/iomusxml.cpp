@@ -68,7 +68,7 @@ bool MusicXmlInput::ImportFile()
     }
 }
 
-bool MusicXmlInput::ImportString(const std::string musicxml)
+bool MusicXmlInput::ImportString(std::string const &musicxml)
 {
     try {
         m_doc->SetType(Raw);

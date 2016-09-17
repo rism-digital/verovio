@@ -320,7 +320,7 @@ public:
     virtual ~MeiInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string mei);
+    virtual bool ImportString(std::string const &mei);
 
     /**
      * Set the xPath queries for selecting specific <rdg>.

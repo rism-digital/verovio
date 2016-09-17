@@ -59,8 +59,8 @@ void display_usage()
 {
 
     display_version();
-    cerr << endl << "Usage:" << endl << endl;
-    cerr << " verovio [-f format] [-s scale] [-t type] [-r resources] [-o outfile] infile" << endl << endl;
+    cerr << endl << "Example usage:" << endl << endl;
+    cerr << " verovio [-s scale] [-t type] [-r resources] [-o outfile] infile" << endl << endl;
 
     // These need to be kept in alphabetical order:
     // -options with both short and long forms first
@@ -68,7 +68,7 @@ void display_usage()
     // -then debugging options
 
     // Options with both short and long forms
-    cerr << "Options" << endl;
+    cerr << "Options (marked as * are repeatable)" << endl;
 
     cerr << " -                          Use \"-\" as input file for reading from the standard input" << endl;
 
@@ -98,24 +98,30 @@ void display_usage()
 
     cerr << " --all-pages                Output all pages with one output file per page" << endl;
 
+    cerr << " --app-xpath-query=QR*      Set the xPath query for selecting <app> child elements," << endl;
+    cerr << "                            for example: \"./rdg[contains(@source, 'source-id')]\";" << endl;
+    cerr << "                            by default the <lem> or the first <rdg> is selected" << endl;
+
+    cerr << " --choice-xpath-query=QR*   Set the xPath query for selecting <choice> child elements," << endl;
+    cerr << "                            for example: \"./orig\"; by default the first child is selected" << endl;
+
     cerr << " --even-note-spacing        Space notes evenly and close together regardless of their durations" << endl;
 
-    cerr << " --font=FONT                Select the music font to use (default is Leipzig; Bravura and Gootville are "
-            "also available)"
-         << endl;
+    cerr << " --font=FONT                Select the music font to use (default is Leipzig;" << endl;
+    cerr << "                            Bravura and Gootville are also available)" << endl;
 
     cerr << " --help                     Display this message" << endl;
 
     cerr << " --ignore-layout            Ignore all encoded layout information (if any)" << endl;
     cerr << "                            and fully recalculate the layout" << endl;
 
+    cerr << " --mdiv-xpath-query=QR      Set the xPath query for selecting the <mdiv> to be rendered;" << endl;
+    cerr << "                            only one <mdiv> can be rendered" << endl;
+
     cerr << " --no-layout                Ignore all encoded layout information (if any)" << endl;
     cerr << "                            and output one single page with one single system" << endl;
 
     cerr << " --page=PAGE                Select the page to engrave (default is 1)" << endl;
-
-    cerr << " --app-xpath-query=QUERY    Set the xPath query for selecting <app> child elements," << endl;
-    cerr << "                            for example: \"./rdg[contains(@source, 'source-id')]\"" << endl;
 
     cerr << " --spacing-linear=SP        Specify the linear spacing factor (default is " << DEFAULT_SPACING_LINEAR
          << ")" << endl;

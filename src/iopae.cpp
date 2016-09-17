@@ -94,7 +94,7 @@ bool PaeInput::ImportFile()
 #endif
 }
 
-bool PaeInput::ImportString(std::string pae)
+bool PaeInput::ImportString(std::string const &pae)
 {
 #ifndef NO_PAE_SUPPORT
     std::istringstream in_stream(pae);
@@ -532,7 +532,7 @@ int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index
     // int j = 0;
     do {
         int dot;
-        data_DURATION dur;
+        data_DURATION dur = DURATION_4;
         // measure->dots.setSize(j+1);
         i += getDuration(incipit, &dur, &dot, i);
         measure->durations.push_back(dur);

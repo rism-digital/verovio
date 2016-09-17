@@ -1009,10 +1009,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         assert(page);
         if (page->m_parent->GetChildIndex(page) == 0) {
             params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false);
-            params->m_upcomingScoreDef->SetDrawLabels(true);
-        }
-        else {
-            params->m_upcomingScoreDef->SetDrawLabels(false);
+            params->m_drawLabels = true;
         }
         page->m_drawingScoreDef = *params->m_upcomingScoreDef;
         return FUNCTOR_CONTINUE;
@@ -1046,7 +1043,9 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
             params->m_upcomingScoreDef->SetRedrawFlags(true, true, false, false, false);
             // Set it to the current system (used e.g. for endings)
             params->m_currentSystem->SetDrawingScoreDef(params->m_upcomingScoreDef);
+            params->m_currentSystem->GetDrawingScoreDef()->SetDrawLabels(params->m_drawLabels);
             params->m_currentSystem = NULL;
+            params->m_drawLabels = false;
         }
         if (params->m_upcomingScoreDef->m_setAsDrawing) {
             measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
