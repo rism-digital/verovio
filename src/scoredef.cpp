@@ -337,8 +337,7 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     return staffDef;
 }
 
-void ScoreDef::SetRedrawFlags(
-    bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll)
+void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll)
 {
     m_setAsDrawing = true;
 

@@ -1637,7 +1637,7 @@ bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadMeiSb(parent, current);
         }
         // unmeasured music
-        else if (std::string(current.name()) == "sb") {
+        else if (std::string(current.name()) == "staff") {
             if (!unmeasured) {
                 if (parent->Is() == SECTION) {
                     unmeasured = new Measure(false);
