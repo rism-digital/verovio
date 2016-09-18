@@ -30,6 +30,7 @@ verovio_module = Extension('_verovio',
              '../src/midi/MidiEventList.cpp',
              '../src/midi/MidiFile.cpp',
              '../src/midi/MidiMessage.cpp',
+             '../src/hum/humlib.cpp',
              '../libmei/attconverter.cpp',
              '../libmei/atts_cmn.cpp',
              '../libmei/atts_critapp.cpp',
@@ -39,7 +40,7 @@ verovio_module = Extension('_verovio',
              '../libmei/atts_shared.cpp',
              'verovio.i'],
     swig_opts=['-c++'],
-    include_dirs=['/usr/local/include', '../include', '../include/vrv', '../include/json', '../include/midi', '../include/pugi', '../include/utf8', '../include/win32', '../libmei'],
+    include_dirs=['/usr/local/include', '../include', '../include/vrv', '../include/json', '../include/midi', '../include/hum', '../include/pugi', '../include/utf8', '../include/win32', '../libmei'],
     extra_compile_args=EXTRA_COMPILE_ARGS
 )
 
