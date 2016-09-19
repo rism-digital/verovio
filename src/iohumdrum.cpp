@@ -275,7 +275,7 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
 #ifdef USE_EMSCRIPTEN
     m_debug = 0;
 #else
-    m_debug = 1;
+    m_debug = 0;
 #endif
     m_comment = 1;
     m_omd = false;
@@ -2560,7 +2560,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             continue;
         }
         indexmapping.push_back(i);
-        indexmapping2.push_back(indexmapping.size() - 1);
+        indexmapping2.push_back((int)indexmapping.size() - 1);
         duritems.push_back(layerdata[i]);
         durbeamnum.push_back(beamnum[i]);
     }
@@ -2744,7 +2744,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         // At a tuplet which is not already in a tuplet group
         // search for how long the group should occur.
         j = i + 1;
-        int ending = poweroftwo.size() - 1;
+        int ending = (int)poweroftwo.size() - 1;
         ;
         groupdur = 0;
         while (j < (int)poweroftwo.size()) {
@@ -3168,7 +3168,7 @@ void HumdrumInput::convertChord(Chord *chord, HTp token, int staffindex)
     }
 
     token->setValue("MEI", "xml:id", chord->GetUuid());
-    int index = m_measures.size() - 1;
+    int index = (int)m_measures.size() - 1;
     token->setValue("MEI", "measureIndex", index);
 }
 
@@ -3342,7 +3342,7 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
     }
 
     token->setValue("MEI", "xml:id", rest->GetUuid());
-    int index = m_measures.size() - 1;
+    int index = (int)m_measures.size() - 1;
     token->setValue("MEI", "measureIndex", index);
 }
 
@@ -3489,7 +3489,7 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
     // maybe organize by sub-token index, but consider as chord for now
     if (!chordQ) {
         token->setValue("MEI", "xml:id", note->GetUuid());
-        int index = m_measures.size() - 1;
+        int index = (int)m_measures.size() - 1;
         token->setValue("MEI", "measureIndex", index);
     }
 }

@@ -200,6 +200,22 @@ bool Toolkit::SetFormat(std::string const &informat)
     return true;
 };
 
+void Toolkit::SetAppXPathQueries(std::vector<std::string> const &xPathQueries)
+{
+    m_appXPathQueries = xPathQueries;
+    m_appXPathQueries.erase(std::remove_if(m_appXPathQueries.begin(), m_appXPathQueries.end(),
+                                [](const std::string &s) { return s.empty(); }),
+        m_appXPathQueries.end());
+}
+
+void Toolkit::SetChoiceXPathQueries(std::vector<std::string> const &xPathQueries)
+{
+    m_choiceXPathQueries = xPathQueries;
+    m_choiceXPathQueries.erase(std::remove_if(m_choiceXPathQueries.begin(), m_choiceXPathQueries.end(),
+                                   [](const std::string &s) { return s.empty(); }),
+        m_choiceXPathQueries.end());
+}
+
 FileFormat Toolkit::IdentifyInputFormat(const string &data)
 {
     size_t searchLimit = 600;

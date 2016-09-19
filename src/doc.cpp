@@ -953,7 +953,7 @@ int Doc::PrepareLyricsEnd(FunctorParams *functorParams)
     PrepareLyricsParams *params = dynamic_cast<PrepareLyricsParams *>(functorParams);
     assert(params);
 
-    if (params->m_currentSyl && params->m_lastNote) {
+    if ((params->m_currentSyl && params->m_lastNote) && (params->m_currentSyl->GetStart() != params->m_lastNote)) {
         params->m_currentSyl->SetEnd(params->m_lastNote);
     }
 

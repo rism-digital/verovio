@@ -476,7 +476,7 @@ bool DarmsInput::ImportString(std::string const &data_str)
         pos++;
     }
 
-    // add miniaml scoreDef
+    // add minimal scoreDef
     StaffGrp *staffGrp = new StaffGrp();
     StaffDef *staffDef = new StaffDef();
     staffDef->SetN(1);

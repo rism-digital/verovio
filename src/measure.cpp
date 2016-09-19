@@ -85,7 +85,7 @@ void Measure::Reset()
     m_leftBarLine.SetForm(this->GetLeft());
 
     if (!m_measuredMusic) {
-        m_xAbs = 0;
+        m_xAbs = VRV_UNSET;
     }
 
     m_drawingEnding = NULL;
