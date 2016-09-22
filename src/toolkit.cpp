@@ -305,7 +305,7 @@ bool Toolkit::LoadFile(const std::string &filename)
     std::string content(fileSize, 0);
     in.read(&content[0], fileSize);
 
-    return LoadString(content);
+    return LoadData(content);
 }
 
 bool Toolkit::IsUTF16(const std::string &filename)
@@ -355,10 +355,10 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     std::string utf8line;
     utf8::utf16to8(utf16line.begin(), utf16line.end(), back_inserter(utf8line));
 
-    return LoadString(utf8line);
+    return LoadData(utf8line);
 }
 
-bool Toolkit::LoadString(const std::string &data)
+bool Toolkit::LoadData(const std::string &data)
 {
     string newData;
     FileInputStream *input = NULL;
