@@ -16,13 +16,9 @@
 #include <vector>
 
 #ifndef _WIN32
-#include <sys/time.h>
+    #include <sys/time.h>
 #else
-#include <time.h>
-typedef struct timeval {
-  long tv_sec;
-  long tv_usec;
-} timeval;
+    #include <time.h>
 #endif
 
 namespace vrv {
