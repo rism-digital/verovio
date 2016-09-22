@@ -52,7 +52,7 @@ bool dir_exists(string dir)
 
 void display_version()
 {
-    cerr << "Verovio " << GetVersion() << endl;
+    cerr << "Verovio " << vrv::GetVersion() << endl;
 }
 
 void display_usage()
