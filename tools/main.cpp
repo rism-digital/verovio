@@ -6,11 +6,16 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <assert.h>
-#include <getopt.h>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
+
+#ifndef _WIN32
+#include <getopt.h>
+#else
+#include "win_getopt.h"
+#endif
 
 //----------------------------------------------------------------------------
 
