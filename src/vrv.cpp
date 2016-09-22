@@ -19,7 +19,8 @@
 #ifndef _WIN32
 #include <dirent.h>
 #else
-#include "win32.h"
+#include "win_dirent.h"
+#include "win_time.h"
 #endif
 
 //----------------------------------------------------------------------------
