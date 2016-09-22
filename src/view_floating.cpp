@@ -890,14 +890,14 @@ float View::GetAdjustedSlurAngle(Point *p1, Point *p2, curvature_CURVEDIR curveD
                 p1->y = p2->y - side;
             else
                 p2->y = p1->y + side;
-            slurAngle = TEMP_SLUR_MAX_SLOPE;
+            slurAngle = (float)TEMP_SLUR_MAX_SLOPE;
         }
         else {
             if (curveDir == curvature_CURVEDIR_above)
                 p2->y = p1->y - side;
             else
                 p1->y = p2->y + side;
-            slurAngle = -TEMP_SLUR_MAX_SLOPE;
+            slurAngle = (float)-TEMP_SLUR_MAX_SLOPE;
         }
     }
 
