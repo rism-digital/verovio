@@ -17,9 +17,10 @@
 #include <vector>
 
 #ifndef _WIN32
-#include <dirent.h>
+    #include <dirent.h>
 #else
-#include "win32.h"
+    #include "dirent.h"
+    #include "win32time.h"
 #endif
 
 //----------------------------------------------------------------------------
