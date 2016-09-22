@@ -370,7 +370,7 @@ int main(int argc, char **argv)
 
     // Load the std input or load the file
     if (infile == "-") {
-        stringstream data_stream;
+        ostringstream data_stream;
         for (string line; getline(cin, line);) {
             data_stream << line << endl;
         }
