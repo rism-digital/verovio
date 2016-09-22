@@ -57,7 +57,7 @@ public:
     /**
      * Load a string data with the specified type.
      */
-    bool LoadString(const std::string &data);
+    bool LoadData(const std::string &data);
 
     /**
      * Save an MEI file.

@@ -52,7 +52,7 @@ bool dir_exists(string dir)
 
 void display_version()
 {
-    cerr << "Verovio " << GetVersion() << endl;
+    cerr << "Verovio " << vrv::GetVersion() << endl;
 }
 
 void display_usage()
@@ -374,7 +374,7 @@ int main(int argc, char **argv)
         for (string line; getline(cin, line);) {
             data_stream << line << endl;
         }
-        if (!toolkit.LoadString(data_stream.str())) {
+        if (!toolkit.LoadData(data_stream.str())) {
             cerr << "The input could not be loaded." << endl;
             exit(1);
         }

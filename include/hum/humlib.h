@@ -51,6 +51,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <set>
 #include <algorithm>
 
+#ifdef _WIN32
+    #include <cctype>
+    #include <functional>
+    #include <locale>
+#endif
+
 using std::string;
 using std::vector;
 using std::istream;
@@ -1668,4 +1674,3 @@ class Options {
 } // end of namespace hum
 
 #endif /* _MINHUMDRUM_H */
-
