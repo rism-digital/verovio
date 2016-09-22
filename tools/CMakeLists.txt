@@ -7,10 +7,21 @@ set(CMAKE_BUILD_TYPE Release)
 option(NO_PAE_SUPPORT     "Disable Plain and Easy support" OFF)
 option(NO_HUMDRUM_SUPPORT "Disable Humdrum support"        OFF)
 
+include_directories(
+    ../include
+    ../include/midi
+    ../include/hum
+    ../include/pugi
+    ../include/utf8
+    ../include/vrv
+    ../libmei
+)
+
 if(MSVC)
     add_definitions(/W2)
     add_definitions(/wd4244)          # suppress warning of possible loss of precision
     add_definitions(-DNO_PAE_SUPPORT) # regex is working differently under Windows so PAE is not supported (yet)
+    include_directories(../include/win32)
 else()
     add_definitions(-Wall)
     add_definitions(-g)
@@ -20,17 +31,6 @@ endif()
 execute_process(
     COMMAND ../tools/get_git_commit.sh
     OUTPUT_VARIABLE GIT_COMMIT
-)
-
-include_directories(
-    ../include
-    ../include/midi
-    ../include/hum
-    ../include/pugi
-    ../include/utf8
-    ../include/vrv
-    ../include/win32
-    ../libmei
 )
 
 if(NO_PAE_SUPPORT)

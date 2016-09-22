@@ -50,12 +50,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <set>
 #include <algorithm>
-
-#ifdef _WIN32
-    #include <cctype>
-    #include <functional>
-    #include <locale>
-#endif
+#include <cctype>
+#include <functional>
+#include <locale>
 
 using std::string;
 using std::vector;
