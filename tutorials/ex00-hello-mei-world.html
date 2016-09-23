@@ -1,0 +1,33 @@
+---
+---
+<html>
+    <head>
+        <title>Verovio Hello MEI World!</title>
+        <script src="{{ site.baseurl }}/javascript/develop/verovio-toolkit.js" type="text/javascript" ></script>
+        <!-- We also use jQuery for this example -->
+        <script src="{{ site.baseurl }}/javascript/jquery.min.js" type="text/javascript" ></script>    
+    </head>
+    <body>
+        <!-- The div where we are going to insert the SVG -->
+        <div id="output"/>
+        <script type="text/javascript">
+        
+            ///////////////////////////
+            /* Create the vrvToolkit */
+            ///////////////////////////
+            var vrvToolkit = new verovio.toolkit();
+            
+            ////////////////////////////////////
+            /* Load the file using a HTTP GET */
+            ////////////////////////////////////
+            $.ajax({
+                url: "{{ site.baseurl }}/examples/downloads/Beethoven_StringQuartet_Op18_No2.mei"
+                , dataType: "text"
+                , success: function(data) {
+                    var svg = vrvToolkit.renderData( data );
+                    $("#output").html(svg);
+                }
+            });
+        </script>
+    </body>
+</html>

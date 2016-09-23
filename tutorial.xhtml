@@ -1,0 +1,96 @@
+---
+layout: verovio
+verovio-light: true
+title: Verovio – Features
+active: tutorial
+how-active: how-features
+version-footer: true
+tutorials:
+    - id: "ex00"
+      name: "Score and barlines"
+    - id: "score-changes"
+      name: "Score changes"
+    - id: "chords"
+      name: "Chords"  
+---
+
+<div class="row">
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include tutorial-sidebar.html %}
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="panel-body">
+            <h3>Tutorial</h3>
+            <p>
+                This section shows some of the features of Verovio. All the examples are rendered dynamically in the web-browser with its <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript toolkit</a> version.
+            </p>
+            
+            <div id="tutorial">
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+    var zoom = 40;
+    var pageHeight = 2970;
+    var pageWidth = 2100;
+    var adjustPageHeight = 1;
+    var border = 25;
+    var spacingStaff = 4;
+    var appXPathQuery = "";
+    var choiceXPathQueries = ""
+    var noLayout = 0;
+    var vrvToolkit = new verovio.toolkit();
+
+    function load_data(data, output_div) {
+        options = JSON.stringify({
+                    inputFormat: 'mei',
+                    pageHeight: pageHeight,
+                    pageWidth: pageWidth,
+                    adjustPageHeight: adjustPageHeight,
+                    border: border,
+                    spacingStaff: spacingStaff,
+                    appXPathQuery: appXPathQuery,
+                    choiceXPathQueries: choiceXPathQueries,
+                    noLayout: noLayout,
+                    scale: zoom
+                });
+        
+                console.log(options);
+        var svg = vrvToolkit.renderData( data + "\n", options );
+        output_div.html(svg);
+    }
+    
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+
+    $( document ).ready(function() {
+        
+        var id = getParameterByName("id");
+        if (!id) {
+            id = "{{ page.tutorials[0].id }}";
+        }
+        var file = "tutorials/" + id + ".html";
+        // load the file    
+        $( "#tutorial" ).load( file, function() {
+              $(".toggle_code").click(function(){
+                  $( "#" + $(this).attr("id") + "-xml" ).toggle();
+                    $("span", this).toggleClass("glyphicon-eye-open glyphicon-eye-close");
+              });
+          
+        });
+        // activate the link menu
+        $( "#link-" + id ).addClass( "active" );
+        
+    });
+//]]>
+</script>
