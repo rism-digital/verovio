@@ -1,0 +1,3 @@
+[submodule "verovio-tutorial"]
+	path = verovio-tutorial
+	url = https://github.com/rism-ch/verovio-tutorial
