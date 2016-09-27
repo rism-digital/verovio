@@ -6,12 +6,28 @@ active: tutorial
 how-active: how-features
 version-footer: true
 tutorials:
-    - id: "ex00"
-      name: "Score and barlines"
-    - id: "score-changes"
-      name: "Score changes"
-    - id: "chords"
-      name: "Chords"  
+    - id: "intro"
+      name: "Introduction"
+    - id: "topic00"
+      name: "Getting started"
+    - id: "topic01"
+      name: "Managing options"
+    - id: "topic02"
+      name: "Handling events"
+    - id: "topic03"
+      name: "Highlighting content"
+    - id: "topic04"
+      name: "Accessing MEI elements"
+    - id: "topic05"
+      name: "Selecting readings"
+    - id: "topic06"
+      name: "Accessing MEI attributes"
+    - id: "topic07"
+      name: "Applying an XSLT"
+    - id: "topic08"
+      name: "Playing the MIDI output"
+    - id: "topic09"
+      name: "Interacting with editorial choices"
 ---
 
 <div class="row">
@@ -79,7 +95,7 @@ tutorials:
         if (!id) {
             id = "{{ page.tutorials[0].id }}";
         }
-        var file = "tutorials/" + id + ".html";
+        var file = "tutorial/" + id + ".html";
         // load the file    
         $( "#tutorial" ).load( file, function() {
               $(".toggle_code").click(function(){
