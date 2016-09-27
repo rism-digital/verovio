@@ -1,0 +1,52 @@
+---
+---
+<h3>Accessing MEI elements</h3>
+
+<p>
+   [Description is missing]
+</p>
+
+{% highlight javascript %}
+/////////////////////////////
+/* An id in the file below */
+/////////////////////////////
+id = "chord-L1186F7";
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% highlight javascript %}
+//////////////////////////////////////////////////////////////////////
+/* A function that loads the page where the id is and highlights it */
+//////////////////////////////////////////////////////////////////////
+function loadPage() {
+    var elementPage = vrvToolkit.getPageWithElement(id);
+    if (elementPage == 0) {
+        console.log("ID not found");
+    }
+    else {
+        page = elementPage;
+    }
+
+    svg = vrvToolkit.renderPage(page, "");
+    $("#svg_output").html(svg);
+    
+    ///////////////////////////
+    /* Highlight the element */
+    ///////////////////////////
+    $("#" + id).attr("fill", "#f00").attr("stroke", "#f00");
+};
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% include html-tutorial.html id="code1" file="topic04-access.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic04-access.html %}
+{% endhighlight %}
+</div>

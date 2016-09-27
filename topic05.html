@@ -1,0 +1,66 @@
+---
+---
+<h3>Selecting readings</h3>
+
+<p>
+   [Description is missing]
+</p>
+
+
+{% highlight javascript %}
+///////////////////////////////////////////////////
+/* A variable for selecting the <rdg> in a <app> */
+///////////////////////////////////////////////////
+var appXPath = "";
+
+options = JSON.stringify({
+            pageHeight: pageHeight,
+            pageWidth: pageWidth,
+            scale: zoom,
+            adjustPageHeight: 1,
+            ignoreLayout: 1,
+            appXPathQuery: appXPath
+        });
+vrvToolkit.setOptions(options);
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% highlight javascript %}
+//////////////////////////////////////////
+/* Key events for switching the reading */
+//////////////////////////////////////////
+if (event.keyCode == 49) {
+    appXPath = ""
+    loadFile();
+}
+else if (event.keyCode == 50) {
+    appXPath = "./rdg[contains(@source, '1570')]";
+    loadFile();
+}
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% highlight javascript %}
+///////////////////////////////////////////////////
+/* Highlights the lem in blue and the rdg in red */
+///////////////////////////////////////////////////
+$(".lem").attr("fill", "#00e").attr("stroke", "#00e");
+$(".rdg").attr("fill", "#d00").attr("stroke", "#d00");
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% include html-tutorial.html id="code1" file="topic05-apparatus.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic05-apparatus.html %}
+{% endhighlight %}
+</div>

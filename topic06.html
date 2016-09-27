@@ -1,0 +1,58 @@
+---
+---
+<h3>Accessing MEI attributes</h3>
+
+<p>
+   [Description is missing]
+</p>
+
+
+{% highlight javascript %}
+/////////////////////////////////////////////////////
+/* For all notes, get their attribute hash in JSON */
+/////////////////////////////////////////////////////
+$(".note").each(function(i) {
+    attrStr = vrvToolkit.getElementAttr($(this).attr("id"));
+    var attr = JSON.parse(attrStr);
+    if (attr.pname && (attr.pname == pname)) {
+        $(this).attr("fill", "#f00").attr("stroke", "#f00");
+    }
+});
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% highlight javascript %}
+///////////////////////////////////////////
+/* Key events for switching pname choice */
+///////////////////////////////////////////
+if (event.keyCode == 67)
+    pname = "c";
+else if (event.keyCode == 68)
+    pname = "d";
+else if (event.keyCode == 69)
+    pname = "e";
+else if (event.keyCode == 70)
+    pname = "f";
+else if (event.keyCode == 71)
+    pname = "g";
+else if (event.keyCode == 65)
+    pname = "a";
+else if (event.keyCode == 66)
+    pname = "b";
+
+loadPage();
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% include html-tutorial.html id="code1" file="topic06-attributes.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic06-attributes.html %}
+{% endhighlight %}
+</div>

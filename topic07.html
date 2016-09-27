@@ -1,0 +1,48 @@
+---
+---
+<h3>Applying an XSLT</h3>
+
+<p>
+   [Description is missing]
+</p>
+
+
+{% highlight javascript %}
+////////////////////////////////////////////////////////
+/* A function that applies the XSLT and load the data */
+////////////////////////////////////////////////////////
+function loadFile() {
+    var file = "mei/Beethoven_StringQuartet_op.18_no.2.mei";
+    var xsl = Saxon.requestXML("xslt/stripStaff.xsl");
+    var xml = Saxon.requestXML(file);
+    var proc = Saxon.newXSLT20Processor(xsl);
+    proc.setParameter(null, "voice", voice);
+    loadData(Saxon.serializeXML(proc.transformToDocument(xml)));
+}
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% highlight javascript %}
+/////////////////////////
+/* Selecting the voice */
+/////////////////////////
+if ((event.keyCode > 48) &&  (event.keyCode < 59)) {
+    voice = event.keyCode - 48;
+    //console.log(voice);
+    loadFile();
+}
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% include html-tutorial.html id="code1" file="topic07-saxonce.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic07-saxonce.html %}
+{% endhighlight %}
+</div>

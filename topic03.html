@@ -1,0 +1,34 @@
+---
+---
+<h3>Highlighting content</h3>
+
+<p>
+   [Description is missing]
+</p>
+
+{% highlight javascript %}
+$(".dynam" ).attr("fill", "#d00").attr("stroke", "#d00");
+{% endhighlight %}
+
+{% highlight javascript %}
+$(".measure .staff:nth-child(2)" ).attr("fill", "#00e").attr("stroke", "#00e");
+{% endhighlight %}
+
+{% highlight javascript %}
+$(".measure .staff:nth-child(4) .staffDef" ).attr("fill", "#0c0").attr("stroke", "#0c0");
+{% endhighlight %}
+
+{% highlight javascript %}
+$(".system .measure:gt(4) .staff:nth-child(4)").attr("fill", "#ccc").attr("stroke", "#ccc");
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% include html-tutorial.html id="code1" file="topic03-highlighting.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic03-highlighting.html %}
+{% endhighlight %}
+</div>

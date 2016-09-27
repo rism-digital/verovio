@@ -1,0 +1,99 @@
+---
+---
+<h3>Interacting with editorial choices</h3>
+
+<p>
+   [Description is missing]
+</p>
+
+
+{% highlight javascript %}
+function loadPage() {
+    ////////////////////////////////////////////////////
+    /* Reload the page with the choice if we made one */
+    ////////////////////////////////////////////////////
+    if (choiceId != "") {
+        var elementPage = vrvToolkit.getPageWithElement(choiceId);
+        if (elementPage == 0) console.log("ID not found");
+        else page = elementPage;
+        choiceId = "";
+    }
+    
+    svg = vrvToolkit.renderPage(page, "");
+    $("#choice_overlay").hide();
+    $("#svg_output").html(svg);
+    
+    /////////////////////////////////////////////////////
+    /* Highlights the orign in blue and the reg in red */
+    /////////////////////////////////////////////////////
+    $(".orig, .unclear").attr("fill", "#00e").attr("stroke", "#00e");
+    $(".reg").attr("fill", "#d00").attr("stroke", "#d00");
+    
+    ///////////////////////////////////////////////
+    /* Bind a click event on all choice children */
+    ///////////////////////////////////////////////
+    $(".orig, .reg, .unclear").each(function() {
+        ///////////////////////////////////////////////////////////
+        /* Make the bounding box clickable (works on Opera only )*/
+        ///////////////////////////////////////////////////////////
+        $(this).attr("pointer-events", "bounding-box");
+        $(this).click(function(event) {
+            //////////////////////////////////////////////////////////////////////////////////////
+            /* Create a list of links for each alternative sibling of the selected choice child */
+            //////////////////////////////////////////////////////////////////////////////////////
+            links = "";
+            $(this).siblings().each(function() {
+                /////////////////////////////////////////////////////////////////
+                /* Display the @label for the link but it can be anything else */
+                /////////////////////////////////////////////////////////////////
+                attrStr = vrvToolkit.getElementAttr($(this).attr("id"));
+                var attr = JSON.parse(attrStr);
+                if (attr.label) {
+                    links += '<p><a href="javascript:choose(\'' + $(this).parent().attr("id") + '\', \'' + $(this).attr("id") + '\')">' + attr.label + "</a></p>";
+                }
+            });
+            //////////////////////
+            /* Show the overlay */
+            //////////////////////
+            $("#choice_overlay").html(links);
+            $("#choice_overlay").attr("style", "left: " + event.pageX + "px;" + "top: " + event.pageY + "px;").show();
+        });
+    });
+};
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% highlight javascript %}
+////////////////////////////////////////////
+/* A function for choosing a choice child */
+////////////////////////////////////////////
+function choose(choice, child) {
+    //////////////////////////////////////////////////////
+    /* Keep track of the selected child for each choice */
+    //////////////////////////////////////////////////////
+    choices[choice] = child;
+    choiceXPathQueries = [];
+    //////////////////////////////////////
+    /* Make each of them an xpath query */
+    //////////////////////////////////////
+    for (key in choices) {
+        choiceXPathQueries.push("./*[@xml:id='" + choices[key] + "']")
+    }
+    choiceId = choice;
+    loadFile();
+}
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% include html-tutorial.html id="code1" file="topic09-choice.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic09-choice.html %}
+{% endhighlight %}
+</div>

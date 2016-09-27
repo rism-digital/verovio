@@ -1,0 +1,90 @@
+---
+---
+<h3>Playing the MIDI output</h3>
+
+<p>
+   [Description is missing]
+</p>
+
+{% highlight javascript %}
+////////////////////////////////////////////
+/* A function that start playing the file */
+////////////////////////////////////////////
+function play_midi() {
+    if (isPlaying == false) {
+        var base64midi = vrvToolkit.renderToMidi();
+        var song = 'data:audio/midi;base64,' + base64midi;
+        $("#player").show();
+        $("#player").midiPlayer.play(song);
+        isPlaying = true;
+    }
+}
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% highlight javascript %}
+//////////////////////////////////////////////////////
+/* Two callback functions passed to the MIDI player */
+//////////////////////////////////////////////////////
+var midiUpdate = function(time) {
+    var vrvTime = Math.max(0, 2 * time - 800);
+    var elementsattime = JSON.parse(vrvToolkit.getElementsAtTime(vrvTime))
+    if (elementsattime.page > 0) {
+        if (elementsattime.page != page) {
+            page = elementsattime.page;
+            loadPage();
+        }
+        if ((elementsattime.notes.length > 0) && (ids != elementsattime.notes)) {
+            ids.forEach(function(noteid) {
+                if ($.inArray(noteid, elementsattime.notes) == -1) {
+                    $("#" + noteid).attr("fill", "#000").attr("stroke", "#000"); 
+                }
+            });
+            ids = elementsattime.notes;
+            ids.forEach(function(noteid) {
+                if ($.inArray(noteid, elementsattime.notes) != -1) {
+                    $("#" + noteid).attr("fill", "#c00").attr("stroke", "#c00");; 
+                }
+            }); 
+        }
+    }
+}
+
+var midiStop = function() {
+    ids.forEach(function(noteid) {
+        $("#" + noteid).attr("fill", "#000").attr("stroke", "#000"); 
+    });
+    $("#player").hide();
+    isPlaying = false;
+}
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% highlight javascript %}
+////////////////////////////////////////
+/* Bind a on click event to each note */
+////////////////////////////////////////
+$(".note").click(function() {
+    var id = $(this).attr("id");
+    var time = vrvToolkit.getTimeForElement(id);
+    // bug! time needs to be divided by 2
+    $("#midi-player").midiPlayer.seek(time / 2);
+});
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% include html-tutorial.html id="code1" file="topic08-midi.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic08-midi.html %}
+{% endhighlight %}
+</div>

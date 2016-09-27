@@ -6,7 +6,7 @@ active: tutorial
 how-active: how-features
 version-footer: true
 tutorials:
-    - id: "intro"
+    - id: "topic"
       name: "Introduction"
     - id: "topic00"
       name: "Getting started"
@@ -39,14 +39,7 @@ tutorials:
     
     <div class="col-md-9">
         <div class="panel-body">
-            <h3>Tutorial</h3>
-            <p>
-                This section shows some of the features of Verovio. All the examples are rendered dynamically in the web-browser with its <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript toolkit</a> version.
-            </p>
-            
-            <div id="tutorial">
-            </div>
-            
+            <div id="tutorial"></div>    
         </div>
     </div>
 </div>
@@ -95,7 +88,7 @@ tutorials:
         if (!id) {
             id = "{{ page.tutorials[0].id }}";
         }
-        var file = "tutorial/" + id + ".html";
+        var file = "" + id + ".html";
         // load the file    
         $( "#tutorial" ).load( file, function() {
               $(".toggle_code").click(function(){

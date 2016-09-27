@@ -1,0 +1,40 @@
+---
+---
+<h3>Handling events</h3>
+
+<p>
+   [Description is missing]
+</p>
+
+{% highlight javascript %}
+/////////////////////////////////////////////
+/* A function that loads the selected page */
+/////////////////////////////////////////////
+function loadPage() {
+    svg = vrvToolkit.renderPage(page, "");
+    $("#svg_output").html(svg);
+};
+
+////////////////////////////////////////////////////////////
+/* A function that redoes the layout and reloads the page */
+////////////////////////////////////////////////////////////
+function applyZoom() {
+    setOptions();
+    vrvToolkit.redoLayout();
+    
+    page = 1;
+    loadPage();
+}
+{% endhighlight %}
+
+
+<p>
+   [More information]
+</p>
+
+{% include html-tutorial.html id="code1" file="topic02-events.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic02-events.html %}
+{% endhighlight %}
+</div>
