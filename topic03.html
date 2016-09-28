@@ -3,7 +3,7 @@
 <h3>Highlighting content</h3>
 
 <p>
-      This example shows how Verovio can access MEI elements for interaction. With the jQuery-Selector $("xx") all xx-Elements inside a MEI file are selected, so $("dynam") selects all &lt;dynam&gt; elements in a file. You can select a whole class $(".class") or even a single element by using $("#id").
+      This example shows how Verovio can access MEI elements for highlighting content. With the jQuery-Selector $(".class") all specified class-Elements inside the rendered SVG are selected, e.g. $("dynam") selects all &lt;dynam&gt; elements in a file. Instead of selecting a whole class $(".class") you can point to a single element by using $("#id").
 </p>
 
 {% highlight javascript %}
@@ -23,7 +23,7 @@ $(".system .measure:gt(4) .staff:nth-child(4)").attr("fill", "#ccc").attr("strok
 {% endhighlight %}
 
 <p>
-   [More information]
+   Keep care of using both "fill" and "stroke" when changing the color of an element. 
 </p>
 
 {% include html-tutorial.html id="code1" file="topic03-highlighting.html" %}
