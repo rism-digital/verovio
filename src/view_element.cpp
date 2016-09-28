@@ -1357,6 +1357,11 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         currentFont.SetStyle(syl->GetFontstyle());
         dc->SetFont(&currentFont);
     }
+    else if (staff->m_drawingStaffDef->HasLyricName()) {
+      currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
+      currentFont.SetFaceName(staff->m_drawingStaffDef->GetLyricName().c_str());
+      dc->SetFont(&currentFont);
+    }
     else {
         dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
     }

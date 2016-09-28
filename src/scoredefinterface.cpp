@@ -28,6 +28,7 @@ ScoreDefInterface::ScoreDefInterface()
     , AttCleffingLog()
     , AttKeySigDefaultLog()
     , AttKeySigDefaultVis()
+    , AttLyricstyle()
     , AttMensuralLog()
     , AttMensuralShared()
     , AttMeterSigDefaultLog()
@@ -38,6 +39,7 @@ ScoreDefInterface::ScoreDefInterface()
     RegisterInterfaceAttClass(ATT_CLEFFINGLOG);
     RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTLOG);
     RegisterInterfaceAttClass(ATT_KEYSIGDEFAULTVIS);
+    RegisterInterfaceAttClass(ATT_LYRICSTYLE);
     RegisterInterfaceAttClass(ATT_MENSURALLOG);
     RegisterInterfaceAttClass(ATT_MENSURALSHARED);
     RegisterInterfaceAttClass(ATT_METERSIGDEFAULTLOG);
@@ -57,6 +59,7 @@ void ScoreDefInterface::Reset()
     ResetCleffingLog();
     ResetKeySigDefaultLog();
     ResetKeySigDefaultVis();
+    ResetLyricstyle();
     ResetMensuralLog();
     ResetMensuralShared();
     ResetMeterSigDefaultLog();
