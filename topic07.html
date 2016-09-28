@@ -3,7 +3,11 @@
 <h3>Applying an XSLT</h3>
 
 <p>
-   [Description is missing]
+   In some cases, it might be necessary to pre-process the MEI file before passing it to Verovio. In this example, we show how XSLT can be applied to an MEI using <a href="http://www.saxonica.com/ce/index.xml" target="_blank">Saxon-CE</a>. This means that the transformation happen in the browser and supports XSTL 2.0.
+</p>
+
+<p>
+    In this example, we use a small XSL stylesheet that extract only one voice. The voice to be extracted is passed as parameter to the stylesheet. Then, the output for the transformation is passed to the <code>loadData</code> method.
 </p>
 
 
@@ -22,7 +26,7 @@ function loadFile() {
 {% endhighlight %}
 
 <p>
-   [More information]
+    In this case, the voice selection is made through key 1, 2, 3, 4 for the violin 1, 2, the alto or the cello respectively.
 </p>
 
 {% highlight javascript %}
@@ -35,10 +39,6 @@ if ((event.keyCode > 48) &&  (event.keyCode < 59)) {
     loadFile();
 }
 {% endhighlight %}
-
-<p>
-   [More information]
-</p>
 
 {% include html-tutorial.html id="code1" file="topic07-saxonce.html" %}
 <div id="code1-xml" style="display: none">
