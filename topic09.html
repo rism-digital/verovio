@@ -3,9 +3,8 @@
 <h3>Interacting with editorial choices</h3>
 
 <p>
-   [Description is missing]
+    With Verovio it is possible to interactively switch between different editorial choices in the MEI file. In this example, the MEI file contains several <code>orig</code>, <code>reg</code> and <code>unclear</code> elements that indicate choices in the encoded outline. These choices are indicated on the score by coloured highlights, and clicking on these highlights offers the ability to choose a different rendering.
 </p>
-
 
 {% highlight javascript %}
 function loadPage() {
@@ -63,7 +62,7 @@ function loadPage() {
 {% endhighlight %}
 
 <p>
-   [More information]
+   Choosing an option is handled by the 'choose' function, which will use Verovio's XPath features to select one notation choice and render it.
 </p>
 
 {% highlight javascript %}
@@ -86,10 +85,6 @@ function choose(choice, child) {
     loadFile();
 }
 {% endhighlight %}
-
-<p>
-   [More information]
-</p>
 
 {% include html-tutorial.html id="code1" file="topic09-choice.html" %}
 <div id="code1-xml" style="display: none">
