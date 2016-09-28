@@ -1,94 +1,90 @@
 ---
 ---
-<h3>Interacting with editorial choices</h3>
+<h3>Playing the MIDI output</h3>
 
 <p>
-    With Verovio it is possible to interactively switch between different editorial choices in the MEI file. In this example, the MEI file contains several <code>orig</code>, <code>reg</code> and <code>unclear</code> elements that indicate choices in the encoded outline. These choices are indicated on the score by coloured highlights, and clicking on these highlights offers the ability to choose a different rendering.
-</p>
-
-{% highlight javascript %}
-function loadPage() {
-    ////////////////////////////////////////////////////
-    /* Reload the page with the choice if we made one */
-    ////////////////////////////////////////////////////
-    if (choiceId != "") {
-        var elementPage = vrvToolkit.getPageWithElement(choiceId);
-        if (elementPage == 0) console.log("ID not found");
-        else page = elementPage;
-        choiceId = "";
-    }
-    
-    svg = vrvToolkit.renderPage(page, "");
-    $("#choice_overlay").hide();
-    $("#svg_output").html(svg);
-    
-    /////////////////////////////////////////////////////
-    /* Highlights the orign in blue and the reg in red */
-    /////////////////////////////////////////////////////
-    $(".orig, .unclear").attr("fill", "#00e").attr("stroke", "#00e");
-    $(".reg").attr("fill", "#d00").attr("stroke", "#d00");
-    
-    ///////////////////////////////////////////////
-    /* Bind a click event on all choice children */
-    ///////////////////////////////////////////////
-    $(".orig, .reg, .unclear").each(function() {
-        ///////////////////////////////////////////////////////////
-        /* Make the bounding box clickable (works on Opera only )*/
-        ///////////////////////////////////////////////////////////
-        $(this).attr("pointer-events", "bounding-box");
-        $(this).click(function(event) {
-            //////////////////////////////////////////////////////////////////////////////////////
-            /* Create a list of links for each alternative sibling of the selected choice child */
-            //////////////////////////////////////////////////////////////////////////////////////
-            links = "";
-            $(this).siblings().each(function() {
-                /////////////////////////////////////////////////////////////////
-                /* Display the @label for the link but it can be anything else */
-                /////////////////////////////////////////////////////////////////
-                attrStr = vrvToolkit.getElementAttr($(this).attr("id"));
-                var attr = JSON.parse(attrStr);
-                if (attr.label) {
-                    links += '<p><a href="javascript:choose(\'' + $(this).parent().attr("id") + '\', \'' + $(this).attr("id") + '\')">' + attr.label + "</a></p>";
-                }
-            });
-            //////////////////////
-            /* Show the overlay */
-            //////////////////////
-            $("#choice_overlay").html(links);
-            $("#choice_overlay").attr("style", "left: " + event.pageX + "px;" + "top: " + event.pageY + "px;").show();
-        });
-    });
-};
-{% endhighlight %}
-
-<p>
-   Choosing an option is handled by the 'choose' function, which will use Verovio's XPath features to select one notation choice and render it.
+   [Description is missing]
 </p>
 
 {% highlight javascript %}
 ////////////////////////////////////////////
-/* A function for choosing a choice child */
+/* A function that start playing the file */
 ////////////////////////////////////////////
-function choose(choice, child) {
-    //////////////////////////////////////////////////////
-    /* Keep track of the selected child for each choice */
-    //////////////////////////////////////////////////////
-    choices[choice] = child;
-    choiceXPathQueries = [];
-    //////////////////////////////////////
-    /* Make each of them an xpath query */
-    //////////////////////////////////////
-    for (key in choices) {
-        choiceXPathQueries.push("./*[@xml:id='" + choices[key] + "']")
+function play_midi() {
+    if (isPlaying == false) {
+        var base64midi = vrvToolkit.renderToMidi();
+        var song = 'data:audio/midi;base64,' + base64midi;
+        $("#player").show();
+        $("#player").midiPlayer.play(song);
+        isPlaying = true;
     }
-    choiceId = choice;
-    loadFile();
 }
 {% endhighlight %}
 
-{% include html-tutorial.html id="code1" file="topic09-choice.html" %}
+<p>
+   [More information]
+</p>
+
+{% highlight javascript %}
+//////////////////////////////////////////////////////
+/* Two callback functions passed to the MIDI player */
+//////////////////////////////////////////////////////
+var midiUpdate = function(time) {
+    var vrvTime = Math.max(0, 2 * time - 800);
+    var elementsattime = JSON.parse(vrvToolkit.getElementsAtTime(vrvTime))
+    if (elementsattime.page > 0) {
+        if (elementsattime.page != page) {
+            page = elementsattime.page;
+            loadPage();
+        }
+        if ((elementsattime.notes.length > 0) && (ids != elementsattime.notes)) {
+            ids.forEach(function(noteid) {
+                if ($.inArray(noteid, elementsattime.notes) == -1) {
+                    $("#" + noteid).attr("fill", "#000").attr("stroke", "#000"); 
+                }
+            });
+            ids = elementsattime.notes;
+            ids.forEach(function(noteid) {
+                if ($.inArray(noteid, elementsattime.notes) != -1) {
+                    $("#" + noteid).attr("fill", "#c00").attr("stroke", "#c00");; 
+                }
+            }); 
+        }
+    }
+}
+
+var midiStop = function() {
+    ids.forEach(function(noteid) {
+        $("#" + noteid).attr("fill", "#000").attr("stroke", "#000"); 
+    });
+    $("#player").hide();
+    isPlaying = false;
+}
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% highlight javascript %}
+////////////////////////////////////////
+/* Bind a on click event to each note */
+////////////////////////////////////////
+$(".note").click(function() {
+    var id = $(this).attr("id");
+    var time = vrvToolkit.getTimeForElement(id);
+    // bug! time needs to be divided by 2
+    $("#midi-player").midiPlayer.seek(time / 2);
+});
+{% endhighlight %}
+
+<p>
+   [More information]
+</p>
+
+{% include html-tutorial.html id="code1" file="topic09-midi.html" %}
 <div id="code1-xml" style="display: none">
 {% highlight html %}
-{% include_relative gh-tutorial/topic09-choice.html %}
+{% include_relative gh-tutorial/topic09-midi.html %}
 {% endhighlight %}
 </div>
