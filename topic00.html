@@ -5,6 +5,9 @@
 <p>
    This example shows a minimal integration of the JavaScript toolkit of Verovio within a web page. Once Verovio is included and an instance of the toolkit is created, an ajax call can be made to load the MEI file. On success of the ajax call, the MEI data is passed to the toolkit that renders it and return it as SVG. The SVG can then simply be inserted in a &lt;div&gt; of the page.
 </p>
+<p>With some browsers, like Firefox, you can run it by opening the HTML file in the browser.<br />
+With other browsers, you might need to run a server : in the terminal, go to the folder where the HTML file is and type the following command : <code>python -m SimpleHTTPServer 8003</code>. The file will then be available on http://localhost:8803.</p>
+
 
 {% highlight javascript %}
 ///////////////////////////
