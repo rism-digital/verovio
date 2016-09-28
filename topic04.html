@@ -3,12 +3,12 @@
 <h3>Accessing MEI elements</h3>
 
 <p>
-   [Needs comment]
+   This example shows how Verovio can load the score at a given point, depending on the id of an element. The selected element always being displayed, even when zooming or resizing the window.
 </p>
 
 {% highlight javascript %}
 /////////////////////////////
-/* An id in the file below */
+/* An id of a chord element in the file below */
 /////////////////////////////
 id = "chord-L1186F7";
 {% endhighlight %}
@@ -32,7 +32,7 @@ function loadPage() {
 
     svg = vrvToolkit.renderPage(page, "");
     $("#svg_output").html(svg);
-    
+
     ///////////////////////////
     /* Highlight the element */
     ///////////////////////////
@@ -41,7 +41,7 @@ function loadPage() {
 {% endhighlight %}
 
 <p>
-   [More information]
+   Note that highlighting is just added for clarity, it's not mandatory for this feature.
 </p>
 
 {% include html-tutorial.html id="code1" file="topic04-access.html" %}
