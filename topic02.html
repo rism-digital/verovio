@@ -3,7 +3,7 @@
 <h3>Handling events</h3>
 
 <p>
-   Verovio can handle events.
+   This example shows how Verovio can handle events. You can bind to e.g. zoom events by adding a (key) event listener.
 </p>
 
 {% highlight javascript %}
@@ -21,15 +21,61 @@ function loadPage() {
 function applyZoom() {
     setOptions();
     vrvToolkit.redoLayout();
-    
+
     page = 1;
     loadPage();
 }
 {% endhighlight %}
 
+<p>
+   The function above will renew the layout with the new options and reload the page.
+</p>
+
+{% highlight javascript %}
+////////////////////////////////////////////////
+/* Some functions for handling zoom events */
+////////////////////////////////////////////////
+function zoomOut() {
+    if (zoom < 20) {
+        return;
+    }
+    zoom = zoom / 2;
+    applyZoom();
+}
+
+function zoomIn() {
+    if (zoom > 80) {
+        return;
+    }
+    zoom = zoom * 2;
+    applyZoom();
+}
+
+$(document).ready(function() {
+
+    ////////////////////////
+    /* Binding the events */
+    ////////////////////////
+    $(window).keyup(function(event){
+
+        // see http://www.javascripter.net/faq/keycodes.htm
+        if ((event.keyCode == 107) || (event.keyCode == 187) || (event.keyCode == 61) ) {
+            zoomIn();
+        }
+        else if ((event.keyCode == 109) || (event.keyCode == 189) || (event.keyCode == 173)) {
+            zoomOut();
+        }
+    });
+
+    $(window).resize(function(){
+        applyZoom();
+    });
+});
+{% endhighlight %}
+
 
 <p>
-   [More information]
+   The applyZoom function from above is triggerd by resizing the page or pressing key "+" or "-".
 </p>
 
 {% include html-tutorial.html id="code1" file="topic02-events.html" %}
