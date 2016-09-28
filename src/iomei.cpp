@@ -719,6 +719,7 @@ void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
 
     WriteXmlId(currentNode, hairpin);
     WriteTimeSpanningInterface(currentNode, hairpin);
+    hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
 };
@@ -738,6 +739,7 @@ void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
 
     WriteXmlId(currentNode, octave);
     WriteTimeSpanningInterface(currentNode, octave);
+    octave->WriteColor(currentNode);
     octave->WriteOctavedisplacement(currentNode);
 };
 
@@ -749,6 +751,7 @@ void MeiOutput::WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal)
     WriteTimePointInterface(currentNode, pedal);
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
+    pedal->WriteColor(currentNode);
 };
 
 void MeiOutput::WriteMeiSlur(pugi::xml_node currentNode, Slur *slur)
@@ -757,6 +760,7 @@ void MeiOutput::WriteMeiSlur(pugi::xml_node currentNode, Slur *slur)
 
     WriteXmlId(currentNode, slur);
     WriteTimeSpanningInterface(currentNode, slur);
+    slur->WriteColor(currentNode);
     slur->WriteCurvature(currentNode);
 };
 
@@ -787,6 +791,7 @@ void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
 
     WriteXmlId(currentNode, tie);
     WriteTimeSpanningInterface(currentNode, tie);
+    tie->WriteColor(currentNode);
 };
 
 void MeiOutput::WriteMeiLayer(pugi::xml_node currentNode, Layer *layer)
@@ -985,6 +990,7 @@ void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
     WriteLayerElement(currentNode, rest);
     WriteDurationInterface(currentNode, rest);
     WritePositionInterface(currentNode, rest);
+    rest->WriteColor(currentNode);
 }
 
 void MeiOutput::WriteMeiProport(pugi::xml_node currentNode, Proport *proport)
@@ -1017,6 +1023,7 @@ void MeiOutput::WriteMeiVerse(pugi::xml_node currentNode, Verse *verse)
     assert(verse);
 
     WriteLayerElement(currentNode, verse);
+    verse->WriteColor(currentNode);
     verse->WriteCommon(currentNode);
 }
 
@@ -2095,6 +2102,7 @@ bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
     SetMeiUuid(hairpin, vrvHairpin);
 
     ReadTimeSpanningInterface(hairpin, vrvHairpin);
+    vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadPlacement(hairpin);
 
@@ -2120,6 +2128,7 @@ bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node octave)
     SetMeiUuid(octave, vrvOctave);
 
     ReadTimeSpanningInterface(octave, vrvOctave);
+    vrvOctave->ReadColor(octave);
     vrvOctave->ReadOctavedisplacement(octave);
 
     parent->AddChild(vrvOctave);
@@ -2134,6 +2143,7 @@ bool MeiInput::ReadMeiPedal(Object *parent, pugi::xml_node pedal)
     ReadTimePointInterface(pedal, vrvPedal);
     vrvPedal->ReadPedalLog(pedal);
     vrvPedal->ReadPlacement(pedal);
+    vrvPedal->ReadColor(pedal);
 
     parent->AddChild(vrvPedal);
     return true;
@@ -2145,6 +2155,7 @@ bool MeiInput::ReadMeiSlur(Object *parent, pugi::xml_node slur)
     SetMeiUuid(slur, vrvSlur);
 
     ReadTimeSpanningInterface(slur, vrvSlur);
+    vrvSlur->ReadColor(slur);
     vrvSlur->ReadCurvature(slur);
 
     parent->AddChild(vrvSlur);
@@ -2169,6 +2180,7 @@ bool MeiInput::ReadMeiTie(Object *parent, pugi::xml_node tie)
     SetMeiUuid(tie, vrvTie);
 
     ReadTimeSpanningInterface(tie, vrvTie);
+    vrvTie->ReadColor(tie);
     vrvTie->ReadCurvature(tie);
 
     parent->AddChild(vrvTie);
@@ -2602,6 +2614,7 @@ bool MeiInput::ReadMeiRest(Object *parent, pugi::xml_node rest)
 
     ReadDurationInterface(rest, vrvRest);
     ReadPositionInterface(rest, vrvRest);
+    vrvRest->ReadColor(rest);
 
     parent->AddChild(vrvRest);
     return true;
@@ -2659,6 +2672,7 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
     Verse *vrvVerse = new Verse();
     ReadLayerElement(verse, vrvVerse);
 
+    vrvVerse->ReadColor(verse);
     vrvVerse->ReadCommon(verse);
 
     parent->AddChild(vrvVerse);

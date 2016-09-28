@@ -19,7 +19,7 @@ namespace vrv {
 // Octave
 //----------------------------------------------------------------------------
 
-class Octave : public ControlElement, public TimeSpanningInterface, public AttOctavedisplacement {
+class Octave : public ControlElement, public TimeSpanningInterface, public AttColor, public AttOctavedisplacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

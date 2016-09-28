@@ -167,6 +167,13 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         }
     }
 
+    if (object->HasAttClass(ATT_COLOR)) {
+        AttColor *att = dynamic_cast<AttColor *>(object);
+        assert(att);
+        m_currentNode.append_attribute("fill") = att->GetColor().c_str();
+        m_currentNode.append_attribute("stroke") = att->GetColor().c_str();
+    }
+
     // m_currentNode.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity:
     // %f;",
     // GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(),
