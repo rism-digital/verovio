@@ -6,19 +6,22 @@
    [Description is missing]
 </p>
 
+<p>This one highlights all the dynamics with a red color.<p>
 {% highlight javascript %}
 $(".dynam" ).attr("fill", "#d00").attr("stroke", "#d00");
 {% endhighlight %}
 
-This one colors the second staff with color <var>Blue 2<var>.
+<p>This one colors the second staff completely with color <var>Blue 2<var>.<p>
 {% highlight javascript %}
 $(".measure .staff:nth-child(2)" ).attr("fill", "#00e").attr("stroke", "#00e");
 {% endhighlight %}
 
+<p>In the forth staff this will color only the staffDef glyphs, i.e. clefs, keys and meter signatures at the beginning of each line.<p>
 {% highlight javascript %}
 $(".measure .staff:nth-child(4) .staffDef" ).attr("fill", "#0c0").attr("stroke", "#0c0");
 {% endhighlight %}
 
+<p>Finally in the forth staff this greys out all measures following the forth.<p>
 {% highlight javascript %}
 $(".system .measure:gt(4) .staff:nth-child(4)").attr("fill", "#ccc").attr("stroke", "#ccc");
 {% endhighlight %}
