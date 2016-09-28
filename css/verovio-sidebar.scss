@@ -72,8 +72,10 @@ body {
 .row-offcanvas.active #sidebar{
     width : $sidebar-width;
 }
-.row-offcanvas.active{
-    padding-right : $sidebar-width;
+@media screen and (min-width: 768px) {
+    .row-offcanvas.active{
+        padding-right : $sidebar-width;
+    }
 }
 
 .sidebar-offcanvas {
