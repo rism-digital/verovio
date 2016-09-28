@@ -26,10 +26,10 @@ downloads:
     - name: "Ahle, Jesu, meines Herzens Freud"
       description: "Choral, 1 page - 70Kb"
       link: "Ahle_Jesu_meines_Herzens_Freud.mei"
-      
+
 #    - name: "Guami Canzona 24"
 #      description: "8 voices and b.c., 10 pages - 235Kb"
-#      link: "Guami_Canzona_24.mei"     
+#      link: "Guami_Canzona_24.mei"
 #    - name: "Chopin op.6/1"
 #      description: "Mazurka in F-sharp Minor, 3 pages - 270Kb"
 #      link: "Chopin_Mazurka_op.6.1.mei"
@@ -48,13 +48,13 @@ downloads:
     var spacingSystem = 2;
     var swipe_pages = false;
     var format = 'mei';
-    var outputFilename = 'output.mei' 
+    var outputFilename = 'output.mei'
     var ids = [];
-    
+
     // reload cookies
     if ( $.cookie('zoom') ) zoom = $.cookie('zoom');
     console.log(zoom);
-    
+
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
@@ -72,9 +72,9 @@ downloads:
         //console.log( options );
         vrvToolkit.setOptions( options );
     }
-    
+
     function upload_file() {
-        
+
         $('#submit-btn').popover('hide');
         var f = $("#mei_files").prop('files')[0];
         var reader = new FileReader();
@@ -90,14 +90,14 @@ downloads:
         // Read in the image file as a data URL.
         reader.readAsText(f);
     };
-    
+
     function load_data(data) {
         set_options();
-        
+
         console.time("loading");
         try {
             vrvToolkit.loadData(data);
-            
+
             if (vrvToolkit.getPageCount() == 0) {
                 $("#overlay").hide().css("cursor", "auto");
                 log = vrvToolkit.getLog();
@@ -151,7 +151,7 @@ downloads:
         page = 1;
         load_page();
     };
-    
+
     function last_page() {
         page = vrvToolkit.getPageCount();
         load_page();
@@ -164,7 +164,7 @@ downloads:
         if (page != 1) {
             measure = $("#svg_output .measure").attr("id");
         }
-        
+
         vrvToolkit.redoLayout();
 
         $("#total_text").html(vrvToolkit.getPageCount());
@@ -215,12 +215,12 @@ downloads:
             text = $("#zoom_text").val();
             zoom_val = Number(text.replace("%", ""));
             if (zoom_val < 10) zoom_val = 10;
-            else if (zoom_val > 160) zoom_val = 160;    
+            else if (zoom_val > 160) zoom_val = 160;
             zoom = zoom_val;
             apply_zoom();
         }
     }
-    
+
     function adjust_page_height() {
         // adjust the height of the panel
         if ( $('#svg_panel svg') ) {
@@ -228,18 +228,18 @@ downloads:
             if ( zoomed_height < $('#svg_panel svg').height() ) {
                 zoomed_height = $('#svg_panel svg').height();
             }
-            $('#svg_output').height( zoomed_height ); // slighly more for making sure we have no scroll bar    
+            $('#svg_output').height( zoomed_height ); // slighly more for making sure we have no scroll bar
             //$('#svg_panel svg').height(pageHeight * zoom / 100 );
-            //$('#svg_panel svg').width(pageWidth * zoom / 100 );    
+            //$('#svg_panel svg').width(pageWidth * zoom / 100 );
         }
-        
+
         // also update the zoom control
         $("#zoom_text").val(zoom + "%");
-        
+
         // enable the swipe (or not)
         enable_swipe( ( $('#svg_panel svg') && ( $('#svg_panel svg').width() <= $('#svg_panel').width() ) ) );
     }
-     
+
     function swipe_prev(event, direction, distance, duration, fingerCount) {
           prev_page();
      }
@@ -251,11 +251,11 @@ downloads:
      function swipe_zoom_in(event, target) {
          zoom_in();
      }
-    
+
      function swipe_zoom_out(event, target) {
          zoom_out();
      }
-    
+
     function enable_swipe( pages ) {
         if ( pages && !swipe_pages ) {
             $("#svg_output").swipe( "destroy" );
@@ -266,7 +266,7 @@ downloads:
         else if ( !pages && swipe_pages ) {
             $("#svg_output").swipe( "destroy" );
             $("#svg_output").swipe( { tap: swipe_zoom_in, doubleTap: swipe_zoom_out, allowPageScroll:"auto"} );
-            swipe_pages = false;        
+            swipe_pages = false;
         }
     }
 
@@ -274,7 +274,7 @@ downloads:
         var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
         return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
     }
-    
+
     function play_midi() {
         var base64midi = vrvToolkit.renderToMidi();
         var song = 'data:audio/midi;base64,' + base64midi;
@@ -282,7 +282,7 @@ downloads:
         $("#play-button").hide();
         $("#player").midiPlayer.play(song);
     }
-    
+
     var midiUpdate = function(time) {
         var vrvTime = Math.max(0, 2 * time - 800);
         var elementsattime = JSON.parse(vrvToolkit.getElementsAtTime(vrvTime))
@@ -295,8 +295,8 @@ downloads:
                 ids.forEach(function(noteid) {
                     if ($.inArray(noteid, elementsattime.notes) == -1) {
                         $("#" + noteid ).attr("fill", "#000");
-                        $("#" + noteid ).attr("stroke", "#000"); 
-                        //$("#" + noteid ).removeClassSVG("highlighted"); 
+                        $("#" + noteid ).attr("stroke", "#000");
+                        //$("#" + noteid ).removeClassSVG("highlighted");
                     }
                 });
                 ids = elementsattime.notes;
@@ -304,24 +304,24 @@ downloads:
                     if ($.inArray(noteid, elementsattime.notes) != -1) {
                     //console.log(noteid);
                         $("#" + noteid ).attr("fill", "#c00");
-                        $("#" + noteid ).attr("stroke", "#c00");; 
-                        //$("#" + noteid ).addClassSVG("highlighted"); 
+                        $("#" + noteid ).attr("stroke", "#c00");;
+                        //$("#" + noteid ).addClassSVG("highlighted");
                     }
-                }); 
+                });
             }
         }
     }
-    
+
     var midiStop = function() {
         ids.forEach(function(noteid) {
             $("#" + noteid ).attr("fill", "#000");
-            $("#" + noteid ).attr("stroke", "#000"); 
-            //$("#" + noteid ).removeClassSVG("highlighted"); 
+            $("#" + noteid ).attr("stroke", "#000");
+            //$("#" + noteid ).removeClassSVG("highlighted");
         });
         $("#player").hide();
         $("#play-button").show();
     }
-    
+
     $.fn.addClassSVG = function(className){
         $(this).attr('class', function(index, existingClassNames) {
             return existingClassNames + ' ' + className;
@@ -357,20 +357,20 @@ downloads:
         </div>
     </div>
 </div>
-    
+
 <!-- top navbar -->
 <div id="navbar" class="navbar navbar-default navbar-with-sidebar">
     <button type="button" class="navbar-toggle sidebar-toggle" data-toggle="offcanvas" data-target=".sidebar-nav">
          <span class="icon-bar"></span>
          <span class="icon-bar"></span>
-         <span class="icon-bar"></span> 
+         <span class="icon-bar"></span>
     </button>
     <div class="btn-group">
         <button id="play-button" onclick="play_midi();" class="btn btn-sm btn-default" type="button" style="display: none;">
             <span class="glyphicon glyphicon-volume-up"/>
         </button>
     </div>
-    
+
     <button type="button" id="mei_download" class="navbar-toggle menu-download" style="display: none;">
         <span class="glyphicon glyphicon-download"></span><span> MEI</span>
     </button>
@@ -455,7 +455,7 @@ downloads:
             <!-- /.col-md-6 -->
         </div>
     </div>
-    
+
     <div class="sidebar-panel">
         <div class="row">
             <div class="col-xs-12">
@@ -479,14 +479,14 @@ downloads:
             <!-- /.row -->
         </div>
     </div>
-    
+
     <div class="hidden-xs hidden-sm sidebar-panel">
         <div class="row">
             <div class="col-xs-12">
                 <h4>Select MEI file</h4>
             </div>
         </div>
-        
+
         <div id="options_panel_body">
             <form id="upload_form" onsubmit="upload_file( $('#upload_form') ); return false" class="form-inline" role="form">
                 <div class="row">
@@ -503,29 +503,29 @@ downloads:
                     <p id="log_p"></p>
                 </div>
                 -->
-        
+
             </form>
         </div>
     </div>
-    
+
     <div class="sidebar-panel">
         <p>This viewer uses the latest development version <a href="" id="version">[version]</a> and might be unstable.</p>
         <p>Do you need the old MEI viewer? It is available <a href="{{ site.baseurl }}/mei-viewer-old.xhtml">here</a>.</p>
     </div>
-    
+
 </div>
 
 
 <script type="text/javascript">
 //<![CDATA[
     $( document ).ready(function() {
-        
+
         var version = vrvToolkit.getVersion();
         var n = version.lastIndexOf('-');
         var commit = version.substring(n + 1);
         $('#version').text( version );
-        $("#version").attr( "href", "http://github.com/rism-ch/verovio/commit/" + commit ) ; 
-        
+        $("#version").attr( "href", "http://github.com/rism-ch/verovio/commit/" + commit ) ;
+
         $(window).keyup(function(event){
             // We need to make sure not to capture event on text fields
             if ( $(event.target).hasClass('form-control') ) {
@@ -550,11 +550,11 @@ downloads:
                 zoom_out();
             }
         });
-        
+
         $(window).resize(function(){
             apply_zoom();
         });
-        
+
         $( "#toggle_log" ).click(function() {
             log = !log;
             $( "#log_panel_body" ).toggle();
@@ -566,23 +566,25 @@ downloads:
             outputFilename = outputFilename.replace(/\.[^\.]+$/, '.mei');
             saveAs(new Blob([vrvToolkit.getMEI(-1, true)], {type: "text/xml;charset=utf-8"}), outputFilename);
         });
-        
+
         // Set the popover for the btn
         $( ".popover-btn" ).popover( );
-        
+
         // Adjust the size of the svg_output and the zoom according to the div (screen) size
+        console.log("ça se passe quand ?");
         width = $('#svg_panel').width();
+
         zoom = Math.min( Math.floor( 100 * width / 2100 ), zoom );
         //$("#svg_output").height( zoom * 30 ); // slighly more for making sure we have no scroll bar (3000 for default height of 2970)
-        
+
         // Init the swipe
         enable_swipe( true );
-    
+
         // Load the default file or the file passed in the URL
         var file = getParameterByName("file");
         var musicxml = getParameterByName("musicxml");
         var local = getParameterByName("local");
-        
+
         if (musicxml == "true") {
             format = 'musicxml';
             $("#mei_download").show();
@@ -607,7 +609,7 @@ downloads:
                 }
             });
         }
-        
+
         $("#player").midiPlayer({
             color: "#c00",
             onUnpdate: midiUpdate,
