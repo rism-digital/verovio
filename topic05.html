@@ -3,7 +3,11 @@
 <h3>Selecting readings</h3>
 
 <p>
-   [Description is missing]
+   Verovio supports variant readings with <code>&lt;app&gt;</code> and <code>&lt;rdg&gt;</code>/<code>&lt;lem&gt;</code> elements. During the rendering, only the <code>&lt;lem&gt;</code> (or the first <code>&lt;rdg&gt;</code> if none is provided) is rendered.
+</p>
+
+<p>
+    In this example we can see how <code>&lt;app&gt;</code> children can be highlighted and how it is possible to switch to another variant. For this, we use an <code>appXPath</code> variable that is passed to the toolkit as <code>appXPathQuery</code> option.
 </p>
 
 
@@ -25,7 +29,11 @@ vrvToolkit.setOptions(options);
 {% endhighlight %}
 
 <p>
-   [More information]
+   In this example, we switch from one variant to another by pressing 1 (the lemma) and 2 (the source '1570'). Of course, any other selection input would be possible.
+</p>
+
+<p>
+   Because the variant selection is performed when loading the file into Verovio, changing a variant selection requires the file to be relaoded. For this reason, we call <code>loadFile()</code> (and not <code>loadPage()</code>) when having change the variant selection.
 </p>
 
 {% highlight javascript %}
@@ -43,7 +51,7 @@ else if (event.keyCode == 50) {
 {% endhighlight %}
 
 <p>
-   [More information]
+    We can easily highlight lemma or reading using the selector as seen in the tutorial about highlighting.
 </p>
 
 {% highlight javascript %}
@@ -53,10 +61,6 @@ else if (event.keyCode == 50) {
 $(".lem").attr("fill", "#00e").attr("stroke", "#00e");
 $(".rdg").attr("fill", "#d00").attr("stroke", "#d00");
 {% endhighlight %}
-
-<p>
-   [More information]
-</p>
 
 {% include html-tutorial.html id="code1" file="topic05-apparatus.html" %}
 <div id="code1-xml" style="display: none">
