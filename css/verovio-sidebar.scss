@@ -22,7 +22,7 @@ body {
     border: 0px;
 }
 .navbar-brand {
-    margin-right: 30px;
+    /*margin-right: 30px;*/
 }
 
 
@@ -60,32 +60,26 @@ body {
     overflow-x: hidden;
 }
 
-.row-offcanvas.active {
-    overflow-x: visible;
+#sidebar{
+    position:fixed;
+    right : 0;
+    width:0;
+    -webkit-transition: all 0.25s ease-out;
+    -moz-transition: all 0.25s ease-out;
+    -o-transition: all 0.25s ease-out;
+    transition: all 0.25s ease-out;
 }
-
-.row-offcanvas-right
-.sidebar-offcanvas {
-    right: - $sidebar-fullwidth;
+.row-offcanvas.active #sidebar{
+    width : $sidebar-width;
 }
-
-.row-offcanvas-left
-.sidebar-offcanvas {
-    left: - $sidebar-fullwidth;
-}
-
-.row-offcanvas-right.active {
-    right: $sidebar-fullwidth;
-}
-
-.row-offcanvas-left.active {
-    left: $sidebar-fullwidth;
+@media screen and (min-width: 768px) {
+    .row-offcanvas.active{
+        padding-right : $sidebar-width;
+    }
 }
 
 .sidebar-offcanvas {
     height: 100%;
-    position: absolute;
-    margin: $sidebar-margin;
     top: 0;
     width: $sidebar-width;
     overflow-y: auto;
