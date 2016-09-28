@@ -57,7 +57,7 @@ downloads:
 
     function set_options( ) {
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
-        pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
+        pageWidth = ($(".row-offcanvas").width()) * 100 / zoom ; // - $( "#sidbar" ).width();
         border = 50;
         options = JSON.stringify({
                     inputFormat: format,
@@ -158,6 +158,7 @@ downloads:
     };
 
     function apply_zoom() {
+        console.log("apply zoom")
         $.cookie('zoom', zoom, { expires: 30 });
         set_options();
         var measure = 0;
@@ -358,37 +359,9 @@ downloads:
     </div>
 </div>
 
-<!-- top navbar -->
-<div id="navbar" class="navbar navbar-default navbar-with-sidebar">
-    <button type="button" class="navbar-toggle sidebar-toggle" data-toggle="offcanvas" data-target=".sidebar-nav">
-         <span class="icon-bar"></span>
-         <span class="icon-bar"></span>
-         <span class="icon-bar"></span>
-    </button>
-    <div class="btn-group">
-        <button id="play-button" onclick="play_midi();" class="btn btn-sm btn-default" type="button" style="display: none;">
-            <span class="glyphicon glyphicon-volume-up"/>
-        </button>
-    </div>
-
-    <button type="button" id="mei_download" class="navbar-toggle menu-download" style="display: none;">
-        <span class="glyphicon glyphicon-download"></span><span> MEI</span>
-    </button>
-    <a class="navbar-brand logo-nav" href="{{ site.baseurl }}/index.xhtml">
-        <img src="{{ site.baseurl }}/images/verovio-fadded-50.png" />
-    </a>
-    <div style="clear: both;"></div>
-    <hr/>
-</div>
-
-<div id="svg_panel" style="background-color: #fff;">
-    <div id="player" style="z-index: 20; position: absolute; display: none;"></div>
-    <div id="svg_output" style="overflow:hidden;" />
-</div>
-
 
 <!-- sidebar -->
-<div class="sidebar-offcanvas" id="sidebar" role="navigation">
+<div class="sidebar-offcanvas sidebar-right" id="sidebar" role="navigation">
     <div class="sidebar-panel">
         <div class="row">
             <div class="col-xs-12">
@@ -516,6 +489,42 @@ downloads:
 </div>
 
 
+
+
+
+
+<div id="page-content-wrapper">
+    <!-- top navbar -->
+    <div id="navbar" class="navbar navbar-default navbar-with-sidebar">
+        <button type="button" class="navbar-toggle sidebar-toggle" data-toggle="offcanvas" data-target=".sidebar-nav">
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+             <span class="icon-bar"></span>
+        </button>
+        <div class="btn-group">
+            <button id="play-button" onclick="play_midi();" class="btn btn-sm btn-default" type="button" style="display: none;">
+                <span class="glyphicon glyphicon-volume-up"/>
+            </button>
+        </div>
+
+        <button type="button" id="mei_download" class="navbar-toggle menu-download" style="display: none;">
+            <span class="glyphicon glyphicon-download"></span><span> MEI</span>
+        </button>
+        <a class="navbar-brand logo-nav" href="{{ site.baseurl }}/index.xhtml">
+            <img src="{{ site.baseurl }}/images/verovio-fadded-50.png" />
+        </a>
+        <div style="clear: both;"></div>
+        <hr/>
+    </div>
+
+    <div id="svg_panel" style="background-color: #fff;">
+        <div id="player" style="z-index: 20; position: absolute; display: none;"></div>
+        <div id="svg_output" style="overflow:hidden;" />
+    </div>
+</div>
+
+
+
 <script type="text/javascript">
 //<![CDATA[
     $( document ).ready(function() {
@@ -571,7 +580,6 @@ downloads:
         $( ".popover-btn" ).popover( );
 
         // Adjust the size of the svg_output and the zoom according to the div (screen) size
-        console.log("ça se passe quand ?");
         width = $('#svg_panel').width();
 
         zoom = Math.min( Math.floor( 100 * width / 2100 ), zoom );
@@ -609,7 +617,9 @@ downloads:
                 }
             });
         }
-
+        $(".row-offcanvas").on('transitionend webkitTransitionEnd oTransitionEnd mozTransitionend MSTransitionEnd',
+            function() { apply_zoom();
+        });
         $("#player").midiPlayer({
             color: "#c00",
             onUnpdate: midiUpdate,
