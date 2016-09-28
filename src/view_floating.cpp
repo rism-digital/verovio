@@ -441,9 +441,18 @@ void View::DrawOctave(
         }
     }
     int w, h;
+    int lineWidthFactor = 1;
     std::wstring str;
     str.push_back(code);
-    int lineWidth = m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+    if (octave->HasLwidth()) {
+      if (octave->GetLwidth() == "wide") {
+        lineWidthFactor *= 4;
+      }
+      else if (octave->GetLwidth() == "medium") {
+        lineWidthFactor *= 2;
+      }
+    }
+    int lineWidth = lineWidthFactor * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
     dc->GetSmuflTextExtent(str, &w, &h);
     int yCode = (disPlace == PLACE_above) ? y1 - h : y1;
@@ -453,6 +462,12 @@ void View::DrawOctave(
     y2 += (disPlace == PLACE_above) ? -h : h;
     // adjust is to avoid the figure to touch the line
     x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+
+    if (octave->HasLform()) {
+      if (octave->GetLform() == LINEFORM_solid) {
+        h *= 0;
+      }
+    }
 
     dc->SetPen(m_currentColour, lineWidth, AxSOLID, h / 3);
     dc->SetBrush(m_currentColour, AxSOLID);

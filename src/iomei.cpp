@@ -740,6 +740,7 @@ void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
     WriteXmlId(currentNode, octave);
     WriteTimeSpanningInterface(currentNode, octave);
     octave->WriteColor(currentNode);
+    octave->WriteLinerendBase(currentNode);
     octave->WriteOctavedisplacement(currentNode);
 };
 
@@ -749,9 +750,9 @@ void MeiOutput::WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal)
 
     WriteXmlId(currentNode, pedal);
     WriteTimePointInterface(currentNode, pedal);
+    pedal->WriteColor(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
-    pedal->WriteColor(currentNode);
 };
 
 void MeiOutput::WriteMeiSlur(pugi::xml_node currentNode, Slur *slur)
@@ -842,6 +843,7 @@ void MeiOutput::WriteMeiBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt)
     assert(beatRpt);
 
     WriteLayerElement(currentNode, beatRpt);
+    beatRpt->WriteColor(currentNode);
     beatRpt->WriteBeatRptVis(currentNode);
 }
 
@@ -2129,6 +2131,7 @@ bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node octave)
 
     ReadTimeSpanningInterface(octave, vrvOctave);
     vrvOctave->ReadColor(octave);
+    vrvOctave->ReadLinerendBase(octave);
     vrvOctave->ReadOctavedisplacement(octave);
 
     parent->AddChild(vrvOctave);
@@ -2403,6 +2406,7 @@ bool MeiInput::ReadMeiBeatRpt(Object *parent, pugi::xml_node beatRpt)
     BeatRpt *vrvBeatRpt = new BeatRpt();
     ReadLayerElement(beatRpt, vrvBeatRpt);
 
+    vrvBeatRpt->ReadColor(beatRpt);
     vrvBeatRpt->ReadBeatRptVis(beatRpt);
 
     parent->AddChild(vrvBeatRpt);
