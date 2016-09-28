@@ -22,7 +22,7 @@ $.ajax({
     , dataType: "text"
     , success: function(data) {
         var svg = vrvToolkit.renderData(data);
-        $("#output").html(svg);
+        $("#svg_output").html(svg);
     }
 });
 {% endhighlight %}
