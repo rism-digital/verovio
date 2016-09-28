@@ -3,7 +3,15 @@
 <h3>Accessing MEI attributes</h3>
 
 <p>
-   [Description is missing]
+   In the SVG output of Verovio, the MEI element name is preserved as class and the <code>xml:id</code> attribute is passed as <code>id</code>. This is a very minimal information that is not always sufficient for interaction. In many cases, it is indeed to have more information about the other attributes of the elements.
+</p>
+
+<p>
+    In this example, we show how the full attribute list of an element can be retrieved and use for further interaction.
+</p>
+
+<p>
+    The toolkit method <code>getElementAttr(id)</code> returns a hash of all the attributes for the element with the corresponding xml:id. It this example, we highlight in red all the notes that have a specified <code>@pname</code> attribute.
 </p>
 
 
@@ -21,7 +29,7 @@ $(".note").each(function(i) {
 {% endhighlight %}
 
 <p>
-   [More information]
+   The pname value to be highlighted is simply done via the keyboard input.
 </p>
 
 {% highlight javascript %}
@@ -45,10 +53,6 @@ else if (event.keyCode == 66)
 
 loadPage();
 {% endhighlight %}
-
-<p>
-   [More information]
-</p>
 
 {% include html-tutorial.html id="code1" file="topic06-attributes.html" %}
 <div id="code1-xml" style="display: none">
