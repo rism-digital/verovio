@@ -24,13 +24,13 @@ function setOptions() {
     //////////////////////////////////////////////////////////////
     pageHeight = $(document).height() * 100 / zoom ;
     pageWidth = $(window).width() * 100 / zoom ;
-    options = JSON.stringify({
+    options = {
                 pageHeight: pageHeight,
                 pageWidth: pageWidth,
                 scale: zoom,
                 adjustPageHeight: 1,
                 ignoreLayout: 1
-            });
+            };
     vrvToolkit.setOptions(options);
 }
 {% endhighlight %}
