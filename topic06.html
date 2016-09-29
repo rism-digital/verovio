@@ -29,7 +29,7 @@ vrvToolkit.setOptions(options);
 {% endhighlight %}
 
 <p>
-   In this example, we switch from one variant to another by pressing 1 (the lemma) and 2 (the source '1570'). Of course, any other selection input would be possible.
+   In this example, we switch from one variant to another by pressing 1 (the lemma) and 2 (the source '#source.1570'). Of course, any other selection input would be possible.
 </p>
 
 <p>
@@ -45,7 +45,7 @@ if (event.keyCode == 49) {
     loadFile();
 }
 else if (event.keyCode == 50) {
-    appXPath = "./rdg[contains(@source, '1570')]";
+    appXPath = "./rdg[contains(@source, '#source.1570')]";
     loadFile();
 }
 {% endhighlight %}
