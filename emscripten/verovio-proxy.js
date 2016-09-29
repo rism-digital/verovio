@@ -104,15 +104,27 @@ verovio.toolkit.prototype.redoLayout = function () {
 }
 
 verovio.toolkit.prototype.renderData = function (data, options) {
-	return verovio.vrvToolkit.renderData(this.ptr, data, options);
+	if (typeof options == 'string') {
+		console.warn("DEPRECATION WARNING: Passing a String to renderData will be removed in next version of Verovio. Pass a JSON Object instead.");
+		verovio.vrvToolkit.renderData(this.ptr, data, options);
+	}
+	return verovio.vrvToolkit.renderData(this.ptr, data, JSON.Stringify(options));
 };
 
 verovio.toolkit.prototype.renderPage = function (pageNo, options) {
-	return verovio.vrvToolkit.renderPage(this.ptr, pageNo, options);
+	if (typeof options == 'string') {
+		console.warn("DEPRECATION WARNING: Passing a String to renderPage will be removed in next version of Verovio. Pass a JSON Object instead.");
+		verovio.vrvToolkit.renderPage(this.ptr, pageNo, options);
+	}
+	return verovio.vrvToolkit.renderPage(this.ptr, pageNo, JSON.Stringify(options));
 };
 
 verovio.toolkit.prototype.renderToMidi = function (options) {
-	return verovio.vrvToolkit.renderToMidi(this.ptr, options);
+	if (typeof options == 'string') {
+		console.warn("DEPRECATION WARNING: Passing a String to renderToMidi will be removed in next version of Verovio. Pass a JSON Object instead.");
+		verovio.vrvToolkit.renderToMidi(this.ptr, options);
+	}
+	return verovio.vrvToolkit.renderToMidi(this.ptr, JSON.Stringify(options));
 };
 
 verovio.toolkit.prototype.getElementsAtTime = function (millisec) {
