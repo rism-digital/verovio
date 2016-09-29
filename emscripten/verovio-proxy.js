@@ -75,68 +75,81 @@ verovio.toolkit = function() {
 }
 
 verovio.toolkit.prototype.destroy = function () {
-  	verovio.vrvToolkit.destructor(this.ptr);
+	verovio.vrvToolkit.destructor(this.ptr);
 	verovio.ptr = 0;
 };
 
 verovio.toolkit.prototype.getLog = function () {
-  	return verovio.vrvToolkit.getLog(this.ptr);
+	return verovio.vrvToolkit.getLog(this.ptr);
 };
 
 verovio.toolkit.prototype.getVersion = function () {
-  	return verovio.vrvToolkit.getVersion(this.ptr);
+	return verovio.vrvToolkit.getVersion(this.ptr);
 };
 
 verovio.toolkit.prototype.getPageCount = function () {
-  	return verovio.vrvToolkit.getPageCount(this.ptr);
+	return verovio.vrvToolkit.getPageCount(this.ptr);
 };
 
 verovio.toolkit.prototype.getPageWithElement = function (xmlId) {
-  	return verovio.vrvToolkit.getPageWithElement(this.ptr, xmlId);
+	return verovio.vrvToolkit.getPageWithElement(this.ptr, xmlId);
 };
 
 verovio.toolkit.prototype.loadData = function (data) {
-  	return verovio.vrvToolkit.loadData(this.ptr, data);
+	return verovio.vrvToolkit.loadData(this.ptr, data);
 };
 
 verovio.toolkit.prototype.redoLayout = function () {
-  	verovio.vrvToolkit.redoLayout(this.ptr);
+	verovio.vrvToolkit.redoLayout(this.ptr);
 }
 
 verovio.toolkit.prototype.renderData = function (data, options) {
-  	return verovio.vrvToolkit.renderData(this.ptr, data, options);
+	return verovio.vrvToolkit.renderData(this.ptr, data, options);
 };
 
 verovio.toolkit.prototype.renderPage = function (pageNo, options) {
-  	return verovio.vrvToolkit.renderPage(this.ptr, pageNo, options);
+	return verovio.vrvToolkit.renderPage(this.ptr, pageNo, options);
 };
 
 verovio.toolkit.prototype.renderToMidi = function (options) {
-  	return verovio.vrvToolkit.renderToMidi(this.ptr, options);
+	return verovio.vrvToolkit.renderToMidi(this.ptr, options);
 };
 
 verovio.toolkit.prototype.getElementsAtTime = function (millisec) {
-  	return verovio.vrvToolkit.getElementsAtTime(this.ptr, millisec);
+	return JSON.parse(verovio.vrvToolkit.getElementsAtTime(this.ptr, millisec));
 };
 
 verovio.toolkit.prototype.getTimeForElement = function (xmlId) {
-  	return verovio.vrvToolkit.getTimeForElement(this.ptr, xmlId);
+	return verovio.vrvToolkit.getTimeForElement(this.ptr, xmlId);
 };
 
 verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
-  	return verovio.vrvToolkit.getMEI(this.ptr, pageNo, scoreBased);
+	return verovio.vrvToolkit.getMEI(this.ptr, pageNo, scoreBased);
 };
 
 verovio.toolkit.prototype.setOptions = function (options) {
-	verovio.vrvToolkit.setOptions(this.ptr, options);
+	if (typeof options == 'string') {
+		console.warn("DEPRECATION WARNING: Passing a String to setOptions will be removed in next version of Verovio. Pass a JSON Object instead.");
+		verovio.vrvToolkit.setOptions(this.ptr, options);
+	}
+	else {
+		verovio.vrvToolkit.setOptions(this.ptr, JSON.stringify(options));
+	}
 };
 
 verovio.toolkit.prototype.edit = function (editorAction) {
-	return verovio.vrvToolkit.edit(this.ptr, editorAction);
+	if (typeof editorAction == 'string') {
+		console.warn("DEPRECATION WARNING: Passing a String to edit will be removed in next version of Verovio. Pass a JSON Object instead.");
+		return verovio.vrvToolkit.edit(this.ptr, editorAction);
+	}
+	else {
+		return verovio.vrvToolkit.edit(this.ptr, JSON.stringify(editorAction));
+	}
+	
 };
 
 verovio.toolkit.prototype.getElementAttr = function (xmlId) {
-  	return verovio.vrvToolkit.getElementAttr(this.ptr, xmlId);
+	return JSON.parse(verovio.vrvToolkit.getElementAttr(this.ptr, xmlId));
 };
 
 /***************************************************************************************************************************/
