@@ -20,8 +20,7 @@
 /* For all notes, get their attribute hash in JSON */
 /////////////////////////////////////////////////////
 $(".note").each(function(i) {
-    attrStr = vrvToolkit.getElementAttr($(this).attr("id"));
-    var attr = JSON.parse(attrStr);
+    var attr = vrvToolkit.getElementAttr($(this).attr("id"));
     if (attr.pname && (attr.pname == pname)) {
         $(this).attr("fill", "#f00").attr("stroke", "#f00");
     }

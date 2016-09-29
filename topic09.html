@@ -3,7 +3,11 @@
 <h3>Playing the MIDI output</h3>
 
 <p>
-   [Description is missing]
+    Verovio can produce basic MIDI files and this feature is also available in the JavaScript toolkit. It can be used to play an MEI file directly in the browser as demonstrated in this example.
+</p>
+
+<p>
+    The <code>renderToMidi</code> method of the toolkit returns a MIDI file encoded in base64. The file can be passed to a player. In this case, we use this <a href="https://github.com/rism-ch/midi-player/" target="_blank">JavaScript MIDI player</a>.
 </p>
 
 {% highlight javascript %}
@@ -22,7 +26,7 @@ function play_midi() {
 {% endhighlight %}
 
 <p>
-   [More information]
+   The player provides us with callback functions that allow note highlighting. Each time the <code>midiUpdate</code> function is called, we can move the next page (if necessary) and highlight the notes that are currently played. Notice that we also need to de-highlight the notes that are not played anymore by resetting their color to black.
 </p>
 
 {% highlight javascript %}
@@ -31,7 +35,7 @@ function play_midi() {
 //////////////////////////////////////////////////////
 var midiUpdate = function(time) {
     var vrvTime = Math.max(0, 2 * time - 800);
-    var elementsattime = JSON.parse(vrvToolkit.getElementsAtTime(vrvTime))
+    var elementsattime = vrvToolkit.getElementsAtTime(vrvTime);
     if (elementsattime.page > 0) {
         if (elementsattime.page != page) {
             page = elementsattime.page;
@@ -63,7 +67,7 @@ var midiStop = function() {
 {% endhighlight %}
 
 <p>
-   [More information]
+   Oppositely, it is also possible to click on a note for jumping in the piece.
 </p>
 
 {% highlight javascript %}
@@ -77,10 +81,6 @@ $(".note").click(function() {
     $("#midi-player").midiPlayer.seek(time / 2);
 });
 {% endhighlight %}
-
-<p>
-   [More information]
-</p>
 
 {% include html-tutorial.html id="code1" file="topic09-midi.html" %}
 <div id="code1-xml" style="display: none">

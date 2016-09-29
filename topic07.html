@@ -45,8 +45,7 @@ function loadPage() {
                 /////////////////////////////////////////////////////////////////
                 /* Display the @label for the link but it can be anything else */
                 /////////////////////////////////////////////////////////////////
-                attrStr = vrvToolkit.getElementAttr($(this).attr("id"));
-                var attr = JSON.parse(attrStr);
+                var attr = vrvToolkit.getElementAttr($(this).attr("id"));
                 if (attr.label) {
                     links += '<p><a href="javascript:choose(\'' + $(this).parent().attr("id") + '\', \'' + $(this).attr("id") + '\')">' + attr.label + "</a></p>";
                 }
