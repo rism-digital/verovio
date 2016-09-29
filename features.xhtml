@@ -93,8 +93,7 @@ version-footer: true
     var vrvToolkit = new verovio.toolkit();
 
     function load_data(data, output_div) {
-        options = JSON.stringify({
-                    inputFormat: 'mei',
+        options = {
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
                     adjustPageHeight: adjustPageHeight,
@@ -104,9 +103,8 @@ version-footer: true
                     choiceXPathQueries: choiceXPathQueries,
                     noLayout: noLayout,
                     scale: zoom
-                });
-        
-                console.log(options);
+                };
+        console.log(options);
         var svg = vrvToolkit.renderData( data + "\n", options );
         output_div.html(svg);
     }

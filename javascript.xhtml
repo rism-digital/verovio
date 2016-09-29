@@ -43,7 +43,7 @@ how-active: how-js
     /* Render the data and insert it as content of the #output div */
     document.getElementById("output").innerHTML = vrvToolkit.renderData( 
         data, 
-        JSON.stringify({ inputFormat: 'pae' }) 
+        { inputFormat: 'pae' }
     );
 </script>
 {% endhighlight %}
@@ -66,7 +66,7 @@ how-active: how-js
     var vrvToolkit = new verovio.toolkit();
     /* Load the file using HTTP GET */
     $.get( "examples/hello-world/Haydn_StringQuartet_Op1_No1-p1.mei", function( data ) {
-        var svg = vrvToolkit.renderData( data + "\n", "" );
+        var svg = vrvToolkit.renderData(data, {});
         $("#output").html(svg);
     }, 'text');
 </script>
@@ -85,13 +85,13 @@ how-active: how-js
                 All the options of the <a href="{{ site.baseurl }}/command-line.xhtml">command-line</a> version are supported, with the only difference that their name is in <code>camelCase</code> instead of <code>dash-case</code>. Only the <code>--all-pages</code> option is not supported. The options are passed to the Verovio toolkit in JSON.
             </p>
 {% highlight javascript %}
-options = JSON.stringify({
+options = {
     pageHeight: 2100,
     pageWidth: 4200,
     ignoreLayout: 1,
     border: 100,
     scale: 50
-});
+};
 {% endhighlight %}
 
             <h4>Methods</h4>

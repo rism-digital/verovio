@@ -46,36 +46,6 @@ tutorials:
 
 <script type="text/javascript">
 //<![CDATA[
-
-    var zoom = 40;
-    var pageHeight = 2970;
-    var pageWidth = 2100;
-    var adjustPageHeight = 1;
-    var border = 25;
-    var spacingStaff = 4;
-    var appXPathQuery = "";
-    var choiceXPathQueries = ""
-    var noLayout = 0;
-    var vrvToolkit = new verovio.toolkit();
-
-    function load_data(data, output_div) {
-        options = JSON.stringify({
-                    inputFormat: 'mei',
-                    pageHeight: pageHeight,
-                    pageWidth: pageWidth,
-                    adjustPageHeight: adjustPageHeight,
-                    border: border,
-                    spacingStaff: spacingStaff,
-                    appXPathQuery: appXPathQuery,
-                    choiceXPathQueries: choiceXPathQueries,
-                    noLayout: noLayout,
-                    scale: zoom
-                });
-        
-                console.log(options);
-        var svg = vrvToolkit.renderData( data + "\n", options );
-        output_div.html(svg);
-    }
     
     function getParameterByName(name) {
         var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);

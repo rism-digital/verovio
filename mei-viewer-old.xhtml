@@ -64,14 +64,14 @@ downloads:
         pageHeight = $("#pageHeight", option_form).val().length ? Number( $("#pageHeight", option_form).val() ) : 2970;
         pageWidth = $("#pageWidth", option_form).val().length ? Number( $("#pageWidth", option_form).val() ) : 2100;
         border = $("#border", option_form).val().length ? Number( $("#border", option_form).val() ) : 50;
-        options = JSON.stringify({
+        options = {
                     inputFormat: 'mei',
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
                     border: border,
                     scale: 10,
                     ignoreLayout: ignoreLayout
-                });
+                };
         vrvToolkit.setOptions( options );
         vrvToolkit.loadData(data);
         
@@ -103,7 +103,7 @@ downloads:
             // reset the id to ""
             $("#thumbnails_hidden_placeholder div a canvas").attr('id', '' );
             var image = new Image();
-            var svg = vrvToolkit.renderPage(idx + 1, "");
+            var svg = vrvToolkit.renderPage(idx + 1, {});
             image.src = 'data:image/svg+xml,' + escape(svg);
             image.onload = function(){
                 var canvas = document.getElementById(cv_id);
@@ -114,7 +114,7 @@ downloads:
                 context.drawImage(image, 0, 0);    
             }
             // alternative with canvg (slower but nicer)
-            //canvg( cv_id, vrvToolkit.renderPage( 1, ""), { ignoreMouse: true, ignoreAnimation: true } )
+            //canvg( cv_id, vrvToolkit.renderPage( 1, {}), { ignoreMouse: true, ignoreAnimation: true } )
          }
         
     }
@@ -123,7 +123,7 @@ downloads:
     function load_page() {
         $("#jump_text").val(page);
 
-        svg = vrvToolkit.renderPage(page, "");
+        svg = vrvToolkit.renderPage(page, {});
         $("#svg_output").html(svg);
         
         apply_zoom();        
@@ -157,14 +157,7 @@ downloads:
         load_page();
     };
 
-    function apply_zoom() {
-        /*
-        vrvToolkit.setOptions(JSON.stringify({
-            scale: zoom
-        }));
-        load_page();
-        */
-        
+    function apply_zoom() {        
         adjust_page_height();
     }
 

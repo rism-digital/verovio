@@ -247,7 +247,7 @@ var adjustPageHeight = 1;
 var vrvToolkit = new verovio.toolkit();
 
 function load_data(data, output_div) {
-	options = JSON.stringify({
+	options = {
 		inputFormat: 'humdrum',
 		pageHeight: pageHeight,
 		pageWidth: pageWidth,
@@ -255,7 +255,7 @@ function load_data(data, output_div) {
 		spacingStaff: spacingStaff,
 		border: border,
 		scale: zoom
-	});
+	};
 
 	var svg = vrvToolkit.renderData(data, options);
 	output_div.html(svg);

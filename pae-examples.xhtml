@@ -19,7 +19,7 @@ version-footer: true
     var vrvToolkit = new verovio.toolkit();
 
     function load_data(data, output_div) {
-        options = JSON.stringify({
+        options = {
                     inputFormat: 'pae',
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
@@ -27,8 +27,7 @@ version-footer: true
                     spacingStaff: spacingStaff,
                     border: border,
                     scale: zoom
-                });
-
+                };
         var svg = vrvToolkit.renderData( data + "\n", options );
         console.log( options );
         output_div.html(svg);

@@ -24,7 +24,7 @@ show_all_tests: false
     var format = 'musicxml';
     
     function set_options( ) {
-        options = JSON.stringify({
+        options = {
                     inputFormat: format,
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
@@ -34,7 +34,7 @@ show_all_tests: false
                     spacingSystem: spacingSystem,
                     spacingStaff: spacingStaff,
                     ignoreLayout: 1
-                });
+                };
         //console.log( options );
         vrvToolkit.setOptions( options );
     }
@@ -57,7 +57,7 @@ show_all_tests: false
         }
         console.timeEnd("loading");
         
-        svg = vrvToolkit.renderPage(page, "");
+        svg = vrvToolkit.renderPage(page, {});
         $(div).html(svg);
     }
     
