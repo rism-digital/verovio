@@ -341,24 +341,16 @@ bool LogBufferContains(std::string s)
     return false;
 }
 
-void AppendLogBuffer(bool checkDuplicate, std::string message, int level)
+void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level)
 {
     if (checkDuplicate && LogBufferContains(message)) return;
     logBuffer.push_back(message);
-    
+
     switch (level) {
-        case CONSOLE_ERROR:
-            EM_ASM_ARGS({ console.error(Pointer_stringify($0)); }, message.c_str());
-            break;
-        case CONSOLE_WARN:
-            EM_ASM_ARGS({ console.warn(Pointer_stringify($0)); }, message.c_str());
-            break;
-        case CONSOLE_INFO:
-            EM_ASM_ARGS({ console.info(Pointer_stringify($0)); }, message.c_str());
-            break;
-        default:
-            EM_ASM_ARGS({ console.log(Pointer_stringify($0)); }, message.c_str());
-            break;
+        case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(Pointer_stringify($0)); }, message.c_str()); break;
+        case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(Pointer_stringify($0)); }, message.c_str()); break;
+        case CONSOLE_INFO: EM_ASM_ARGS({ console.info(Pointer_stringify($0)); }, message.c_str()); break;
+        default: EM_ASM_ARGS({ console.log(Pointer_stringify($0)); }, message.c_str()); break;
     }
 }
 

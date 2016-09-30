@@ -16,9 +16,9 @@
 #include <vector>
 
 #ifndef _WIN32
-    #include <sys/time.h>
+#include <sys/time.h>
 #else
-    #include <time.h>
+#include <time.h>
 #endif
 
 namespace vrv {
@@ -41,10 +41,10 @@ void DisableLog();
  * Member and functions specific to emscripten loging that uses a vector of string to buffer the logs.
  */
 #ifdef EMSCRIPTEN
-enum console_log_level { CONSOLE_LOG = 0, CONSOLE_INFO, CONSOLE_WARN, CONSOLE_ERROR };
+enum consoleLogLevel { CONSOLE_LOG = 0, CONSOLE_INFO, CONSOLE_WARN, CONSOLE_ERROR };
 extern std::vector<std::string> logBuffer;
 bool LogBufferContains(std::string s);
-void AppendLogBuffer(bool checkDuplicate, std::string message, int level);
+void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level);
 #endif
 
 /**
