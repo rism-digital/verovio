@@ -252,7 +252,7 @@ void LogDebug(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s);
+    AppendLogBuffer(true, s, CONSOLE_LOG);
     va_end(args);
 #else
     va_list args;
@@ -273,14 +273,14 @@ void LogError(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     s = "[Error] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s);
+    AppendLogBuffer(true, s, CONSOLE_ERROR);
     va_end(args);
 #else
     va_list args;
     va_start(args, fmt);
-    printf("[Error] ");
-    vprintf(fmt, args);
-    printf("\n");
+    fprintf(stderr, "[Error] ");
+    fprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
     va_end(args);
 #endif
 }
@@ -293,7 +293,7 @@ void LogMessage(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     s = "[Message] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s);
+    AppendLogBuffer(true, s, CONSOLE_INFO);
     va_end(args);
 #else
     va_list args;
@@ -313,7 +313,7 @@ void LogWarning(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     s = "[Warning] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s);
+    AppendLogBuffer(true, s, CONSOLE_WARN);
     va_end(args);
 #else
     va_list args;
@@ -341,12 +341,19 @@ bool LogBufferContains(std::string s)
     return false;
 }
 
-void AppendLogBuffer(bool checkDuplicate, std::string message)
+void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level)
 {
     if (checkDuplicate && LogBufferContains(message)) return;
     logBuffer.push_back(message);
-    EM_ASM_ARGS({ console.log(Pointer_stringify($0)); }, message.c_str());
+
+    switch (level) {
+        case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(Pointer_stringify($0)); }, message.c_str()); break;
+        case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(Pointer_stringify($0)); }, message.c_str()); break;
+        case CONSOLE_INFO: EM_ASM_ARGS({ console.info(Pointer_stringify($0)); }, message.c_str()); break;
+        default: EM_ASM_ARGS({ console.log(Pointer_stringify($0)); }, message.c_str()); break;
+    }
 }
+
 #endif
 
 bool Check(Object *object)

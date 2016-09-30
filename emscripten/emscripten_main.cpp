@@ -68,7 +68,7 @@ double vrvToolkit_getTimeForElement(Toolkit *tk, const char *xmlId)
 bool vrvToolkit_loadData(Toolkit *tk, const char *data)
 {
     tk->ResetLogBuffer();
-    return tk->LoadString(data);
+    return tk->LoadData(data);
 }
 
 const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based)
