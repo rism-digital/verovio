@@ -64,8 +64,8 @@ verovio.ptr = 0;
 
 verovio.toolkit = function() {
 	// check if we already have one instance
-	if (verovio.ptr != 0) {
-		console.log("For now only one instance of the toolkit can be created");
+	if (verovio.ptr !== 0) {
+		console.warn("For now only one instance of the toolkit can be created");
 		this.ptr = verovio.ptr;
 		return;
 	}
@@ -104,7 +104,7 @@ verovio.toolkit.prototype.redoLayout = function () {
 }
 
 verovio.toolkit.prototype.renderData = function (data, options) {
-	if (typeof options == 'string') {
+	if (typeof options === 'string') {
 		console.warn("DEPRECATION WARNING: Passing a String to renderData will be removed in next version of Verovio. Pass a JSON Object instead.");
 		verovio.vrvToolkit.renderData(this.ptr, data, options);
 	}
@@ -112,7 +112,7 @@ verovio.toolkit.prototype.renderData = function (data, options) {
 };
 
 verovio.toolkit.prototype.renderPage = function (pageNo, options) {
-	if (typeof options == 'string') {
+	if (typeof options === 'string') {
 		console.warn("DEPRECATION WARNING: Passing a String to renderPage will be removed in next version of Verovio. Pass a JSON Object instead.");
 		verovio.vrvToolkit.renderPage(this.ptr, pageNo, options);
 	}
@@ -120,7 +120,7 @@ verovio.toolkit.prototype.renderPage = function (pageNo, options) {
 };
 
 verovio.toolkit.prototype.renderToMidi = function (options) {
-	if (typeof options == 'string') {
+	if (typeof options === 'string') {
 		console.warn("DEPRECATION WARNING: Passing a String to renderToMidi will be removed in next version of Verovio. Pass a JSON Object instead.");
 		verovio.vrvToolkit.renderToMidi(this.ptr, options);
 	}
@@ -140,7 +140,7 @@ verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
 };
 
 verovio.toolkit.prototype.setOptions = function (options) {
-	if (typeof options == 'string') {
+	if (typeof options === 'string') {
 		console.warn("DEPRECATION WARNING: Passing a String to setOptions will be removed in next version of Verovio. Pass a JSON Object instead.");
 		verovio.vrvToolkit.setOptions(this.ptr, options);
 	}
@@ -150,7 +150,7 @@ verovio.toolkit.prototype.setOptions = function (options) {
 };
 
 verovio.toolkit.prototype.edit = function (editorAction) {
-	if (typeof editorAction == 'string') {
+	if (typeof editorAction === 'string') {
 		console.warn("DEPRECATION WARNING: Passing a String to edit will be removed in next version of Verovio. Pass a JSON Object instead.");
 		return verovio.vrvToolkit.edit(this.ptr, editorAction);
 	}
