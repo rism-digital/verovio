@@ -278,9 +278,9 @@ void LogError(const char *fmt, ...)
 #else
     va_list args;
     va_start(args, fmt);
-    printf("[Error] ");
-    vprintf(fmt, args);
-    printf("\n");
+    fprintf(stderr, "[Error] ");
+    fprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
     va_end(args);
 #endif
 }
