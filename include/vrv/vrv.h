@@ -41,9 +41,10 @@ void DisableLog();
  * Member and functions specific to emscripten loging that uses a vector of string to buffer the logs.
  */
 #ifdef EMSCRIPTEN
+enum console_log_level { CONSOLE_LOG = 0, CONSOLE_INFO, CONSOLE_WARN, CONSOLE_ERROR };
 extern std::vector<std::string> logBuffer;
 bool LogBufferContains(std::string s);
-void AppendLogBuffer(bool checkDuplicate, std::string message);
+void AppendLogBuffer(bool checkDuplicate, std::string message, int level);
 #endif
 
 /**
