@@ -1,5 +1,8 @@
 ---
+next_text: Highlighting content
+next_id: topic03
 ---
+
 <h3>Handling events</h3>
 
 <p>
@@ -83,4 +86,8 @@ $(document).ready(function() {
 {% highlight html %}
 {% include_relative gh-tutorial/topic02-events.html %}
 {% endhighlight %}
+</div>
+
+<div class="pull-right">
+    <p><a href="./tutorial.xhtml?id={{ page.next_id }}">{{ page.next_text }}</a> →</p>
 </div>
