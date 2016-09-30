@@ -39,6 +39,7 @@ void Pedal::Reset()
 {
     ControlElement::Reset();
     TimePointInterface::Reset();
+    ResetColor();
     ResetPedalLog();
     ResetPlacement();
 }

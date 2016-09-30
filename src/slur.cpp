@@ -38,6 +38,7 @@ void Slur::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
+    ResetColor();
     ResetCurvature();
 }
 

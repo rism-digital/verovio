@@ -39,6 +39,7 @@ void Hairpin::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
+    ResetColor();
     ResetHairpinLog();
     ResetPlacement();
 }

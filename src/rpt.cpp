@@ -41,6 +41,7 @@ void BeatRpt::Reset()
 {
     LayerElement::Reset();
     ResetBeatRptVis();
+    ResetColor();
 }
 
 double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit) const

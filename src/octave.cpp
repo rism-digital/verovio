@@ -39,6 +39,8 @@ void Octave::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
+    ResetColor();
+    ResetLinerendBase();
     ResetOctavedisplacement();
 }
 

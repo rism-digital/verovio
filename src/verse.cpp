@@ -42,6 +42,7 @@ Verse::~Verse()
 void Verse::Reset()
 {
     LayerElement::Reset();
+    ResetColor();
     ResetCommon();
 }
 
