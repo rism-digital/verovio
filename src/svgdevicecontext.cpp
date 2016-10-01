@@ -171,8 +171,8 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         AttColor *att = dynamic_cast<AttColor *>(object);
         assert(att);
         if (att->GetColor().length() > 0) {
-        m_currentNode.append_attribute("fill") = att->GetColor().c_str();
-        m_currentNode.append_attribute("stroke") = att->GetColor().c_str();
+            m_currentNode.append_attribute("fill") = att->GetColor().c_str();
+            m_currentNode.append_attribute("stroke") = att->GetColor().c_str();
         }
     }
 
