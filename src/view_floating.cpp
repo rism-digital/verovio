@@ -445,12 +445,12 @@ void View::DrawOctave(
     std::wstring str;
     str.push_back(code);
     if (octave->HasLwidth()) {
-      if (octave->GetLwidth() == "wide") {
-        lineWidthFactor *= 4;
-      }
-      else if (octave->GetLwidth() == "medium") {
-        lineWidthFactor *= 2;
-      }
+        if (octave->GetLwidth() == "wide") {
+            lineWidthFactor *= 4;
+        }
+        else if (octave->GetLwidth() == "medium") {
+            lineWidthFactor *= 2;
+        }
     }
     int lineWidth = lineWidthFactor * m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
@@ -464,9 +464,9 @@ void View::DrawOctave(
     x1 += m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
 
     if (octave->HasLform()) {
-      if (octave->GetLform() == LINEFORM_solid) {
-        h *= 0;
-      }
+        if (octave->GetLform() == LINEFORM_solid) {
+            h *= 0;
+        }
     }
 
     dc->SetPen(m_currentColour, lineWidth, AxSOLID, h / 3);
