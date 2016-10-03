@@ -18,7 +18,11 @@ namespace vrv {
 // Pedal
 //----------------------------------------------------------------------------
 
-class Pedal : public ControlElement, public TimePointInterface, public AttPedalLog, public AttPlacement, public AttColor {
+class Pedal : public ControlElement,
+              public TimePointInterface,
+              public AttColor,
+              public AttPedalLog,
+              public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
