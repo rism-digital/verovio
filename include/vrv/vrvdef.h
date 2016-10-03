@@ -110,6 +110,7 @@ enum ClassId {
     // Ids for LayerElement child classes
     LAYER_ELEMENT,
     ACCID,
+    ARTIC,
     BARLINE,
     BARLINE_ATTR_LEFT,
     BARLINE_ATTR_RIGHT,
