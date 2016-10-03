@@ -23,4 +23,4 @@ Example output
 
 This page was generated with version 0.9.12
 
-![Example page]((http://www.verovio.org/images/verovio-exp-0.9.12.png)
+![Example page](http://www.verovio.org/images/verovio-exp-0.9.12.png)
