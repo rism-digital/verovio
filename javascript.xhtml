@@ -4,6 +4,36 @@ verovio-light: true
 title: Verovio – JS Toolkit
 active: how
 how-active: how-js
+methods:
+  - ["bool edit(editorAction)", "Experimental method for editing the loaded data. Returns true on success and false otherwise."]
+  
+  - ["object getElementsAtTime(millisec)", "Returns a JSON object with all the notes that are being played as a certain time. This can be called only if <code>renderToMidi</code> has been called previously."]
+
+  - ["object getElementAttr(xmlId)", "Returns a JSON object with all the attributes for the element with the corresponding xmlId."]
+
+  - ["string getLog()", "Returns the log message of the last performed operation, for example after having called <code>loadData</code>."]
+  
+  - ["string getMEI(page, scoreBased)", "Returns the MEI data loaded in the toolkit. If a page number is provide (i.e. > 0), then only that page is exported. In score-based MEI, then only the <code>section</code> element will be output. Set scoreBased to 1 for standard score-based MEI and 0 for the internal page-based MEI."]
+
+  - ["int getPageCount()", "Returns the number of pages. This can be called once the data has been loaded with <code>loadData</code>. Page numbering is 1-based."]
+
+  - ["int getPageWithElement(xmlId)", "Returns the page (i.e., the screen) where the element with the passed xmlId currently is. The will change according to the page height and with when the layout is performed by the toolkit."]
+
+  - ["int getTimeForElement(xmlId)", "Returns the time in millisecond at which a note is being played. This can be called only if <code>renderToMidi</code> has been called previously"]
+
+  - ["string getVersion()", "Returns the version of the toolkit (version number and git commit)."]
+
+  - ["void loadData(data)", "Loads the data passed as a parameter. The data is a string of the music encoding (e.g., the MEI encoding). The method also performs the layout if necessary or if requested. It does not render the data, this can be accomplished subsequently by calling <code>renderPage</code>. The data stays in memory until new data is loaded or until the toolkit instance is deleted."]
+
+  - ["void redoLayout()", "Redo the layout of the entire file. This has to be called for example when the size of the page (i.e., the screen) has changed."]
+
+  - ["string renderData(data, options)", "Loads and the data with the options passed as JSON object and renders the first page. This methods is a shortcut for <code>loadData</code> and then <code>renderPage</code> and is appropriate for rendering small data snippets. The data does stay in memory once loaded. Also, up to version 0.9.12, the JSON object had to be stringified."]
+
+  - ["string renderPage(pageNumber, options)", "Renders a page for the data loaded in the toolkit and returns it in SVG. The page numbering is 1-based. Options for rendering can be passed as JSON objects. The options affecting the layout (e.g., <code>pageHeight</code>, or <code>ignoreLayout</code>) cannot be modified when rendering a page and reloading the data if necessary for this. Also, up to version 0.9.12, the JSON object had to be stringified."]
+
+  - ["string renderToMidi(options)", "Renders a page to a base64 encoded MIDI file. There is currently not option to be passed to this method."]
+
+  - ["void setOptions(options)", "Sets the options as JSON for the toolkit instance. Up to version 0.9.12, the JSON object had to be stringified."]
 ---
 
 <div class="row">
@@ -27,38 +57,7 @@ how-active: how-js
             </p>
             {% highlight html %}<script src="http://www.verovio.org/javascript/latest/verovio-toolkit.js"></script>{% endhighlight %}
             <p>
-                Once included, it can be used to render music notation on the fly:
-            </p>
-{% highlight html %}
-<!-- The div where we are going to insert the SVG -->
-<div id="output"/>
-<script type="text/javascript">
-    /* The Plain and Easy code to be rendered */
-    var data = "@clef:G-2\n\
-                @keysig:xFCGD\n\
-                @timesig:3/8\n\
-                @data:'6B/{8B+(6B''E'B})({AFD})/{6.E3G},8B-/({6'EGF})({FAG})({GEB})/";
-    /* Create the Verovio toolkit instance */
-    var vrvToolkit = new verovio.toolkit();
-    /* Render the data and insert it as content of the #output div */
-    document.getElementById("output").innerHTML = vrvToolkit.renderData( 
-        data, 
-        JSON.stringify({ inputFormat: 'pae' }) 
-    );
-</script>
-{% endhighlight %}
-
-            <p>
-                <a href="{{ site.baseurl }}/hello-pae-world.html" target="_blank">
-                    <button type="button" class="btn btn-default btn-sm">
-                      <span class="glyphicon glyphicon-eye-open"></span>  See it in action
-                    </button>
-                </a>
-            </p>
-            <hr/>
-
-            <p>
-                With jQuery, it is easy to load an MEI file and to render it in the same way:
+                Once included, and with jQuery, it is easy to load an MEI file and to render it on the fly:
             </p>
 {% highlight html %}
 <div id="output"/>
@@ -66,7 +65,7 @@ how-active: how-js
     var vrvToolkit = new verovio.toolkit();
     /* Load the file using HTTP GET */
     $.get( "examples/hello-world/Haydn_StringQuartet_Op1_No1-p1.mei", function( data ) {
-        var svg = vrvToolkit.renderData( data + "\n", "" );
+        var svg = vrvToolkit.renderData(data, {});
         $("#output").html(svg);
     }, 'text');
 </script>
@@ -79,67 +78,38 @@ how-active: how-js
                     </button>
                 </a>
             </p>
+            
+            <p>
+                See the  <a href="{{ site.baseurl }}/tutorial.xhtml">tutorial</a> for additional information about the integration of the JavaScript toolkit in web environments.
+            </p>
 
             <h4>Options</h4>
             <p>
                 All the options of the <a href="{{ site.baseurl }}/command-line.xhtml">command-line</a> version are supported, with the only difference that their name is in <code>camelCase</code> instead of <code>dash-case</code>. Only the <code>--all-pages</code> option is not supported. The options are passed to the Verovio toolkit in JSON.
             </p>
 {% highlight javascript %}
-options = JSON.stringify({
+options = {
     pageHeight: 2100,
     pageWidth: 4200,
     ignoreLayout: 1,
     border: 100,
     scale: 50
-});
+};
 {% endhighlight %}
 
             <h4>Methods</h4>
             <p>
                 In addition to the constructor and destructor, the Verovio JavaScript toolkit provides a certain number of methods for manipulating the data.
             </p>
+            
+            {% for method in page.methods %}
             <div class="panel panel-default">
-                <div class="panel-heading panel-option"><code>void setOptions( string data )</code></div>
-                  <div class="panel-body panel-option">
-                    Sets the options as JSON string for the toolkit instance.
-                  </div>
+                <div class="panel-heading panel-option"><code>{{ method[0] }}</code></div>
+                    <div class="panel-body panel-option">
+                        {{ method[1] }}
+                    </div>
             </div>
-            <div class="panel panel-default">
-                <div class="panel-heading panel-option"><code>void loadData( string data )</code></div>
-                  <div class="panel-body panel-option">
-                    Loads the data passed as a parameter. The data is a string of the music encoding (e.g., the MEI encoding). The method also performs the layout if necessary or if requested. It does not render the data, this can be accomplished subsequently by calling <code>renderPage</code>. The data stays in memory until new data is loaded or until the toolkit instance is deleted.
-                  </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading panel-option"><code>int getPageCount()</code></div>
-                  <div class="panel-body panel-option">
-                    Returns the number of pages. This can be called once the data has been loaded with <code>loadData</code>. Page numbering is 1-based.
-                  </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading panel-option"><code>string renderPage( int pageNumber, string options )</code></div>
-                  <div class="panel-body panel-option">
-                    Renders a page for the data loaded in the toolkit and returns it in SVG. The page numbering is 1-based. Options for rendering can be passed as JSON string. The options affecting the layout (e.g., <code>pageHeight</code>, or <code>ignoreLayout</code>) cannot be modified when rendering a page and reloading the data if necessary for this.
-                  </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading panel-option"><code>string renderData( string data, string options )</code></div>
-                  <div class="panel-body panel-option">
-                    Loads and the data with the options passed as JSON string and renders the first page. This methods is a shortcut for <code>loadData</code> and then <code>renderPage</code> and is appropriate for rendering small data snippets. The does stay in memory once loaded.
-                  </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading panel-option"><code>string getLog()</code></div>
-                  <div class="panel-body panel-option">
-                    Returns the log message of the last performed operation, for example after having called <code>loadData</code>.
-                  </div>
-            </div>
-            <div class="panel panel-default">
-                <div class="panel-heading panel-option"><code>string getVersion()</code></div>
-                  <div class="panel-body panel-option">
-                    Returns the version of the toolkit (version number and git commit).
-                  </div>
-            </div>
+            {% endfor %}
             
             <h4>Compatibility</h4>
             <p>

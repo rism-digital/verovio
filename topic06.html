@@ -1,0 +1,77 @@
+---
+next_text: Interacting with editorial choices
+next_id: topic07
+---
+
+<h3>Selecting readings</h3>
+
+<p>
+   Verovio supports variant readings with <code>&lt;app&gt;</code> and <code>&lt;rdg&gt;</code>/<code>&lt;lem&gt;</code> elements. During the rendering, only the <code>&lt;lem&gt;</code> (or the first <code>&lt;rdg&gt;</code> if none is provided) is rendered.
+</p>
+
+<p>
+    In this example we can see how <code>&lt;app&gt;</code> children can be highlighted and how it is possible to switch to another variant. For this, we use an <code>appXPath</code> variable that is passed to the toolkit as <code>appXPathQuery</code> option.
+</p>
+
+
+{% highlight javascript %}
+///////////////////////////////////////////////////
+/* A variable for selecting the <rdg> in a <app> */
+///////////////////////////////////////////////////
+var appXPath = "";
+
+options = {
+            pageHeight: pageHeight,
+            pageWidth: pageWidth,
+            scale: zoom,
+            adjustPageHeight: 1,
+            ignoreLayout: 1,
+            appXPathQuery: appXPath
+        };
+vrvToolkit.setOptions(options);
+{% endhighlight %}
+
+<p>
+   In this example, we switch from one variant to another by pressing 1 (the lemma) and 2 (the source '#source.1570'). Of course, any other selection input would be possible.
+</p>
+
+<p>
+   Because the variant selection is performed when loading the file into Verovio, changing a variant selection requires the file to be relaoded. For this reason, we call <code>loadFile()</code> (and not <code>loadPage()</code>) when having change the variant selection.
+</p>
+
+{% highlight javascript %}
+//////////////////////////////////////////
+/* Key events for switching the reading */
+//////////////////////////////////////////
+if (event.keyCode == 49) {
+    appXPath = ""
+    loadFile();
+}
+else if (event.keyCode == 50) {
+    appXPath = "./rdg[contains(@source, '#source.1570')]";
+    loadFile();
+}
+{% endhighlight %}
+
+<p>
+    We can easily highlight lemma or readings using the selector as seen in the tutorial about highlighting.
+</p>
+
+{% highlight javascript %}
+///////////////////////////////////////////////////
+/* Highlights the lem in blue and the rdg in red */
+///////////////////////////////////////////////////
+$(".lem").attr("fill", "#00e").attr("stroke", "#00e");
+$(".rdg").attr("fill", "#d00").attr("stroke", "#d00");
+{% endhighlight %}
+
+{% include html-tutorial.html id="code1" file="topic06-apparatus.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic06-apparatus.html %}
+{% endhighlight %}
+</div>
+
+<div class="pull-right">
+    <p><a href="./tutorial.xhtml?id={{ page.next_id }}">{{ page.next_text }}</a> →</p>
+</div>

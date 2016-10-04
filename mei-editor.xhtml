@@ -58,8 +58,7 @@ context-menus:
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
         border = 50;
-        options = JSON.stringify({
-                    inputFormat: 'mei',
+        options = {
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
                     border: border,
@@ -67,7 +66,7 @@ context-menus:
                     adjustPageHeight: 1,
                     ignoreLayout: 1,
                     font: font
-                });
+                };
         vrvToolkit.setOptions( options );
     }
     
@@ -82,7 +81,7 @@ context-menus:
         if (show_xml) {
             $('#show_notation').trigger("click");
         }
-        svg = vrvToolkit.renderPage(page, "");
+        svg = vrvToolkit.renderPage(page, {});
         $("#svg_output").html(svg);
         //d3.select("#svg_output").select("svg").selectAll(".note").on("mousedown", select);
         //d3.select("#svg_output").selectAll("*").style("opacity", "0.0");
@@ -132,8 +131,7 @@ context-menus:
         if ( mute ) {
             return;
         }
-        attrStr = vrvToolkit.getElementAttr( id );
-        var attr = JSON.parse(attrStr);
+        var attr = vrvToolkit.getElementAttr( id );
         if (!attr.pname || !attr.oct ) {
             return;
         }
@@ -267,9 +265,9 @@ context-menus:
         if (drag_id.length == 0) {
             return;
         }
-        editorAction = JSON.stringify({ action: 'set', param: { elementId: drag_id[0],
+        editorAction = { action: 'set', param: { elementId: drag_id[0],
             attrType: attr, attrValue: value }   
-        });
+        };
         var res = vrvToolkit.edit( editorAction );
         reload_page( drag_id[0] );  
     };
@@ -279,9 +277,9 @@ context-menus:
             console.log("Select two (different) notes!")
             return;
         }
-        editorAction = JSON.stringify({ action: 'insert', param: { elementType: elementType,
+        editorAction = { action: 'insert', param: { elementType: elementType,
             startid: drag_id[1], endid: drag_id[0] }   
-        });
+        };
         var res = vrvToolkit.edit( editorAction );
         reload_page( drag_id[0] );  
     };
@@ -306,10 +304,10 @@ context-menus:
         this.__origin__ = [ d3.event.x,  d3.event.y];
         // we use this to distinct from click (selection)
         dragging = true;
-        editorAction = JSON.stringify({ action: 'drag', param: { elementId: drag_id[0], 
+        editorAction = { action: 'drag', param: { elementId: drag_id[0], 
                         x: parseInt(drag_start[0] + this.__origin__[0]),
                         y: parseInt(drag_start[1] + this.__origin__[1]) }   
-        });
+        };
         play_note( drag_id[0], true );
         // do something with the error...
         var res = vrvToolkit.edit( editorAction );
@@ -322,14 +320,14 @@ context-menus:
             delete this.__origin__; 
             reset_overlay();
             /*
-            editorAction = JSON.stringify({
+            editorAction = {
                         action: 'set',
                         param: { 
                             elementId: drag_id[0], 
                             attrType: "accid",
                             attrValue: "s" 
                         }   
-                    });
+                    };
             // do something with the error...
             var res = vrvToolkit.edit( editorAction );
             */

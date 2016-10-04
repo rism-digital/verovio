@@ -41,15 +41,14 @@ downloads:
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
         border = 50;
-        options = JSON.stringify({
-                    inputFormat: 'mei',
+        options = {
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
                     border: border,
                     scale: zoom,
                     adjustPageHeight: 1,
                     ignoreLayout: 1
-                });
+                };
         vrvToolkit.setOptions( options );
     }
     
@@ -70,7 +69,7 @@ downloads:
     function load_page() {
         $("#jump_text").val(page);
 
-        svg = vrvToolkit.renderPage(page, "");
+        svg = vrvToolkit.renderPage(page, {});
         $("#svg_output").html(svg);
 
         adjust_page_height();

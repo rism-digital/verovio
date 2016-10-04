@@ -1,0 +1,79 @@
+---
+layout: verovio
+verovio-light: true
+title: Verovio – Tutorial
+active: tutorial
+how-active: how-tutorial
+version-footer: false
+tutorials:
+    - id: "topic"
+      name: "Introduction"
+    - id: "topic00"
+      name: "Getting started"
+    - id: "topic01"
+      name: "Managing options"
+    - id: "topic02"
+      name: "Handling events"
+    - id: "topic03"
+      name: "Highlighting content"
+    - id: "topic04"
+      name: "Accessing MEI elements"
+    - id: "topic05"
+      name: "Accessing MEI attributes"
+    - id: "topic06"
+      name: "Selecting readings"
+    - id: "topic07"
+      name: "Interacting with editorial choices"
+    - id: "topic08"
+      name: "Applying an XSLT"
+    - id: "topic09"
+      name: "Playing the MIDI output"
+    - id: "topic10"
+      name: "Applying SVG filters to elements"
+---
+
+<div class="row">
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include tutorial-sidebar.html %}
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="panel-body">
+            <div id="tutorial"></div>    
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+    
+    function getParameterByName(name) {
+        var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+        return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+    }
+
+    $( document ).ready(function() {
+        
+        var id = getParameterByName("id");
+        if (!id) {
+            id = "{{ page.tutorials[0].id }}";
+        }
+        var file = "" + id + ".html";
+        // load the file    
+        $( "#tutorial" ).load( file, function() {
+              $(".toggle_code").click(function(){
+                  $( "#" + $(this).attr("id") + "-xml" ).toggle();
+                    $("span", this).toggleClass("glyphicon-eye-open glyphicon-eye-close");
+              });
+          
+        });
+        // activate the link menu
+        $( "#link-" + id ).addClass( "active" );
+        
+        
+        
+    });
+//]]>
+</script>

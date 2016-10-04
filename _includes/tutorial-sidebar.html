@@ -1,0 +1,5 @@
+<div class="list-group">
+    {% for t in page.tutorials %}
+    <a id="link-{{ t.id }}" class="list-group-item" href="{{ site.baseurl }}/tutorial.xhtml?id={{ t.id }}">{{ t.name }}</a>
+    {% endfor %}
+</div>

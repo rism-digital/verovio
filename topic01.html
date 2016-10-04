@@ -1,0 +1,55 @@
+---
+next_text: Handling events
+next_id: topic02
+---
+
+<h3>Managing options</h3>
+
+<p>
+   In this example, we can see how rendering options can be passed to the Verovio JavaScript toolkit. In particular, we set the zoom and we also adjust the size according to the window. We also set a the <code>ignoreLayout</code> option to <code>1</code> which tells Verovio not to take into account the layout information provided in the MEI but instead to do the layout according to the current page (i.e., window) size. As a result, the output is now adjusted to the window size.
+</p>
+
+{% highlight javascript %}
+///////////////////////////
+/* Some global variables */
+///////////////////////////
+var vrvToolkit = new verovio.toolkit();
+var zoom = 30;
+var pageHeight = 2970;
+var pageWidth = 2100;
+
+///////////////////////////////////////////////////
+/* A function for setting options to the toolkit */
+///////////////////////////////////////////////////
+function setOptions() {
+    //////////////////////////////////////////////////////////////
+    /* Adjust the height and width according to the window size */
+    //////////////////////////////////////////////////////////////
+    pageHeight = $(document).height() * 100 / zoom ;
+    pageWidth = $(window).width() * 100 / zoom ;
+    options = {
+                pageHeight: pageHeight,
+                pageWidth: pageWidth,
+                scale: zoom,
+                adjustPageHeight: 1,
+                ignoreLayout: 1
+            };
+    vrvToolkit.setOptions(options);
+}
+{% endhighlight %}
+
+
+<p>
+   Note that the options have to be passed as a string to the toolkit.
+</p>
+
+{% include html-tutorial.html id="code1" file="topic01-options.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic01-options.html %}
+{% endhighlight %}
+</div>
+
+<div class="pull-right">
+    <p><a href="./tutorial.xhtml?id={{ page.next_id }}">{{ page.next_text }}</a> →</p>
+</div>

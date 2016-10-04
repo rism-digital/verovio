@@ -7,7 +7,10 @@ projects:
     - [["http://www.marenzio.org", "mode"], ["http://beethovens-werkstatt.de/prototyp-2-0/", "bw"],["http://dme.mozarteum.at", "dme"]]
     - [["http://mith.us/ema/omas", "omas"],["http://freischuetz-digital.de", "freischuetz"],["http://simssa.ca/", "simssa"]]
     - [["http://oerc.ox.ac.uk/", "oerc"],["http://www.kb.dk/en/nb/dcm/projekter/mermeid.html", "mermeid"],["http://scorelib.huma-num.fr/", "neuma"]]
-    - [["http://ncodamusic.org/", "ncoda"], ["http://www.rism.info", "rism"], []]
+    - [["http://ncodamusic.org/", "ncoda"], ["http://www.rism.info", "rism"], ["http://kern.ccarh.org", "ccarh"]]
+    - [["http://en.chopin.nifc.pl/institute/library/archives", "nifc"], [], []]
+movies:
+    - ["choice", "editor"]
 ---
 <div class="row home-row"> 
     <div class="col-md-5 col-sm-12 home-panel">
@@ -75,10 +78,14 @@ projects:
 
 <div class="row home-row"> 
     <div class="col-sm-6 hidden-xs">
-        <div class="panel-body panel-video">
-            <video autoplay="true" loop="true" class="img-responsive window-shadow">
+        <div id="video" class="panel-body panel-video">
+            <video autoplay="false" loop="true" class="img-responsive window-shadow hidden">
                 <source src="/movies/editor.webm" type="video/webm"/>
                 <source src="/movies/editor.mp4" type="video/mp4"/>
+            </video>
+            <video autoplay="false" loop="true" class="img-responsive window-shadow hidden">
+                <source src="/movies/choice.webm" type="video/webm"/>
+                <source src="/movies/choice.mp4" type="video/mp4"/>
             </video>
         </div>
     </div>
@@ -165,8 +172,10 @@ projects:
 </div>
 
 <script type="text/javascript">
-//<![CDATA[    
+//<![CDATA[
     $( document ).ready(function() {
+        rand = Math.floor( Math.random() * 2);
+        $('#video video').eq(rand).removeClass("hidden").attr("autoplay", "true");
     });
 //]]>
 </script>
