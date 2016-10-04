@@ -5,8 +5,12 @@ title: Verovio – Features
 active: how
 how-active: how-features
 features:
+    - id: "shared"
+      menu: "1. Shared"
     - id: "tempi-directives"
       name: "Tempi and directives"
+    - id: "cmn"
+      menu: "4. Common Music Notation"
     - id: "scoredef"
       name: "Score and barlines"
     - id: "score-changes"
@@ -40,7 +44,11 @@ features:
     - id: "editorial"
       name: "[11] Editorial markup"
     - id: "harmony"
+      menu: "14. Harmony"
+    - id: "harmony"
       name: "Indications of harmony"
+    - id: "voctext"
+      menu: "15. Vocal text"
     - id: "lyrics"
       name: "Lyrics"
 
@@ -59,7 +67,11 @@ version-footer: true
         <div class="panel panel-default">
             <div class="list-group sublist-group">
                 {% for f in page.features %}
-                <a id="link-{{ f.id }}" class="list-group-item" href="{{ site.baseurl }}/features.xhtml?id={{ f.id }}">{{ f.name }}</a>
+                    {% if f.menu %}
+                        <span class="list-group-item">{{ f.menu }}</span>
+                    {% else %}
+                        <a id="link-{{ f.id }}" class="list-group-item" href="{{ site.baseurl }}/features.xhtml?id={{ f.id }}">{{ f.name }}</a>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
