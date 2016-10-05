@@ -67,6 +67,12 @@ typedef std::vector<std::pair<std::string, std::string> > ArrayOfStrAttr;
  */
 
 /**
+ * A typedef for a list of positive integer.
+ * E.g., list { xsd:positiveInteger+ }
+ */
+typedef std::vector<data_ARTICULATION> data_ARTICULATION_List;
+
+/**
  * MEI data.BEATRPT_REND
  */
 enum data_BEATRPT_REND {

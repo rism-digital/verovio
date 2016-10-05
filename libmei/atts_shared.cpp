@@ -179,14 +179,14 @@ AttArticulation::~AttArticulation()
 
 void AttArticulation::ResetArticulation()
 {
-    m_artic = ARTICULATION_NONE;
+    m_artic = std::vector<data_ARTICULATION>();
 }
 
 bool AttArticulation::ReadArticulation(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("artic")) {
-        this->SetArtic(StrToArticulation(element.attribute("artic").value()));
+        this->SetArtic(StrToArticulationList(element.attribute("artic").value()));
         element.remove_attribute("artic");
         hasAttribute = true;
     }
@@ -197,7 +197,7 @@ bool AttArticulation::WriteArticulation(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasArtic()) {
-        element.append_attribute("artic") = ArticulationToStr(this->GetArtic()).c_str();
+        element.append_attribute("artic") = ArticulationListToStr(this->GetArtic()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -205,7 +205,7 @@ bool AttArticulation::WriteArticulation(pugi::xml_node element)
 
 bool AttArticulation::HasArtic() const
 {
-    return (m_artic != ARTICULATION_NONE);
+    return (m_artic != std::vector<data_ARTICULATION>());
 }
 
 /* include <attartic> */
@@ -8496,7 +8496,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttArticulation *att = dynamic_cast<AttArticulation *>(element);
         assert(att);
         if (attrType == "artic") {
-            att->SetArtic(att->StrToArticulation(attrValue));
+            att->SetArtic(att->StrToArticulationList(attrValue));
             return true;
         }
     }
@@ -10131,7 +10131,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttArticulation *att = dynamic_cast<const AttArticulation *>(element);
         assert(att);
         if (att->HasArtic()) {
-            attributes->push_back(std::make_pair("artic", att->ArticulationToStr(att->GetArtic())));
+            attributes->push_back(std::make_pair("artic", att->ArticulationListToStr(att->GetArtic())));
         }
     }
     if (element->HasAttClass(ATT_ARTICULATIONPERFORMED)) {

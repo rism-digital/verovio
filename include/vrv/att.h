@@ -106,6 +106,9 @@ public:
 
     /** @name Converters for writing and reading */
     ///@{
+    std::string ArticulationListToStr(data_ARTICULATION_List data) const;
+    data_ARTICULATION_List StrToArticulationList(std::string value) const;
+
     std::string BeatrptRendToStr(data_BEATRPT_REND data) const;
     data_BEATRPT_REND StrToBeatrptRend(std::string value) const;
 

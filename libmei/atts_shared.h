@@ -157,8 +157,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetArtic(data_ARTICULATION artic_) { m_artic = artic_; }
-    data_ARTICULATION GetArtic() const { return m_artic; }
+    void SetArtic(data_ARTICULATION_List artic_) { m_artic = artic_; }
+    data_ARTICULATION_List GetArtic() const { return m_artic; }
     bool HasArtic() const;
     ///@}
 
@@ -170,7 +170,7 @@ private:
      * should be encoded in the artic attribute; for example, fingerings should be
      * encoded using the <fingering> element.
      **/
-    data_ARTICULATION m_artic;
+    data_ARTICULATION_List m_artic;
 
     /* include <attartic> */
 };
