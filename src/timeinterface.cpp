@@ -57,7 +57,7 @@ void TimePointInterface::SetStart(LayerElement *start)
 
 void TimePointInterface::AddStaff(int n)
 {
-    xsd_posIntList staves = this->GetStaff();
+    xsdPositiveInteger_List staves = this->GetStaff();
     if (std::find(staves.begin(), staves.end(), n) == staves.end()) {
         staves.push_back(n);
         this->SetStaff(staves);

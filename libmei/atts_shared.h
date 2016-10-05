@@ -5049,8 +5049,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStaff(xsd_posIntList staff_) { m_staff = staff_; }
-    xsd_posIntList GetStaff() const { return m_staff; }
+    void SetStaff(xsdPositiveInteger_List staff_) { m_staff = staff_; }
+    xsdPositiveInteger_List GetStaff() const { return m_staff; }
     bool HasStaff() const;
     ///@}
 
@@ -5060,7 +5060,7 @@ private:
      * applies.
      * Mandatory when applicable.
      **/
-    xsd_posIntList m_staff;
+    xsdPositiveInteger_List m_staff;
 
     /* include <attstaff> */
 };
