@@ -1250,6 +1250,8 @@ void PaeInput::parseNote(pae::Note *note)
             pushContainer(chord);
             m_is_in_chord = true;
         }
+        mnote->SetDots(0);
+        mnote->SetDur(DURATION_NONE);
     }
 
     // Add the note to the current container
@@ -1268,6 +1270,10 @@ void PaeInput::parseNote(pae::Note *note)
 
     // last note of a chord
     if (!note->chord && m_is_in_chord) {
+        Note *mnote = dynamic_cast<Note *>(element);
+        assert(mnote);
+        mnote->SetDots(0);
+        mnote->SetDur(DURATION_NONE);
         popContainer();
         m_is_in_chord = false;
     }
