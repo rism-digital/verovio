@@ -5,12 +5,12 @@ title: Verovio – Features
 active: how
 how-active: how-features
 features:
-    - id: "shared"
-      menu: "1. Shared"
+    - id: "shared_menu"
+      menu: "1 Shared"
     - id: "tempi-directives"
       name: "Tempi and directives"
-    - id: "cmn"
-      menu: "4. Common Music Notation"
+    - id: "cmn_menu"
+      menu: "4 Common Music Notation"
     - id: "scoredef"
       name: "Score and barlines"
     - id: "score-changes"
@@ -37,18 +37,24 @@ features:
       name: "Piano pedals"
     - id: "repeats"
       name: "Repeats and endings"
+    - id: "mensural_menu"
+      menu: "5 Mensural notation"
     - id: "mensural"
-      name: "[5] Mensural notation"
+      name: "Mensural notation"
+    - id: "app_menu"
+      menu: "10 Critical apparatus"
     - id: "app"
-      name: "[10] Critical apparatus"
+      name: "Apps and readings"
+    - id: "editorial_menu"
+      menu: "11 Editorial and choice markup"
     - id: "editorial"
-      name: "[11] Editorial markup"
-    - id: "harmony"
-      menu: "14. Harmony"
+      name: "Editorial markup"
+    - id: "harmony_menu"
+      menu: "14 Harmony"
     - id: "harmony"
       name: "Indications of harmony"
-    - id: "voctext"
-      menu: "15. Vocal text"
+    - id: "vocaltext_menu"
+      menu: "15 Vocal text"
     - id: "lyrics"
       name: "Lyrics"
 
@@ -68,7 +74,7 @@ version-footer: true
             <div class="list-group sublist-group">
                 {% for f in page.features %}
                     {% if f.menu %}
-                        <span class="list-group-item">{{ f.menu }}</span>
+                        <span class="list-group-item list-group-item-warning"><i>{{ f.menu }}</i></span>
                     {% else %}
                         <a id="link-{{ f.id }}" class="list-group-item" href="{{ site.baseurl }}/features.xhtml?id={{ f.id }}">{{ f.name }}</a>
                     {% endif %}
@@ -83,7 +89,10 @@ version-footer: true
             <p>
                 This section shows some of the features of Verovio. All the examples are rendered dynamically in the web-browser with its <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript toolkit</a> version.
             </p>
-            
+            <p>
+                The order of the provided example features is related to the corresponding modules of the <a href="http://music-encoding.org/documentation/3.0.0/chapters/" target="_blank">MEI guidelines</a>.
+            </p>
+
             <div id="feature">
             </div>
             
@@ -131,7 +140,7 @@ version-footer: true
         
         var id = getParameterByName("id");
         if (!id) {
-            id = "{{ page.features[0].id }}";
+            id = "{{ page.features[1].id }}";
         }
         var file = "features/" + id + ".html";    
         // load the file    
