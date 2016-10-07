@@ -2,21 +2,22 @@
     <head>
         <title>{{ page.title }}</title>
         <link rel="icon" type="image/x-icon" href="{{ site.baseurl }}/favicon.ico" />
+        <link rel="apple-touch-icon" href="{{ site.baseurl }}/images/verovio-logo-big.png">
         <meta name="viewport" content="width=device-width, initial-scale=1.0" /><!-- Latest compiled and minified CSS -->
         <link rel="stylesheet" href="{{ site.baseurl }}/css/bootstrap/css/bootstrap.min.css" type="text/css" /><!-- Optional theme -->
         <link rel="stylesheet" href="{{ site.baseurl }}/css/bootstrap/css/bootstrap-theme.min.css" type="text/css" />
         <link rel="stylesheet" href="{{ site.baseurl }}/css/fileinput.min.css" />
-        
+
         <!-- syntax highlighting CSS -->
         <link rel="stylesheet" href="{{ site.baseurl }}/css/syntax.css" />
 
         <!-- Custom CSS -->
         <link rel="stylesheet" href="{{ site.baseurl }}/css/verovio.css" />
         <link rel="stylesheet" href="{{ site.baseurl }}/css/midiplayer.css" />
-        
+
     </head>
     <body>
-        
+
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script src="{{ site.baseurl }}/javascript/jquery.min.js" type="text/javascript" ></script>
         <script src="{{ site.baseurl }}/javascript/carousel.js" type="text/javascript" ></script>
@@ -36,20 +37,20 @@
         <!--script src="{{ site.baseurl }}/javascript/canvg/rgbcolor.js" type="text/javascript" ></script-->
         <!--script src="{{ site.baseurl }}/javascript/canvg/StackBlur.js" type="text/javascript" ></script-->
         <!--script src="{{ site.baseurl }}/javascript/canvg/canvg.js" type="text/javascript" ></script-->
-        
+
         {% include header.html %}
-        
+
         {% if page.active != "hfome" %}
         {% include top-header.html %}
         {% endif %}
-        
+
         <div class="container with-footer">
-            
+
             {{ content }}
-            
+
         </div>
-        
-        <footer class="footer navbar-fixed-bottom">            
+
+        <footer class="footer navbar-fixed-bottom">
             <p>
                 {% if page.version-footer %}
                 Notation generated with Verovio version <a href="" id="version">[version]</a>
@@ -60,15 +61,15 @@
         <script type="text/javascript">
         //<![CDATA[
             $(document).ready(function() {
-                
+
                 {% if page.version-footer %}
                 var version = vrvToolkit.getVersion();
                 var n = version.lastIndexOf('-');
                 var commit = version.substring(n + 1);
                 $('#version').text( version );
-                $("#version").attr( "href", "http://github.com/rism-ch/verovio/commit/" + commit ) ; 
+                $("#version").attr( "href", "http://github.com/rism-ch/verovio/commit/" + commit ) ;
                 {% endif %}
-                
+
             });
         //]]>
         </script>
