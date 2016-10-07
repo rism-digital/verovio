@@ -1,0 +1,51 @@
+---
+---
+
+<h3>Applying SVG filters to elements</h3>
+
+<p>
+      In this example, we show how SVG filter can be applied to the SVG output of Verovio. The filter is defined in SVG and applied via CSS. More precisely, we define a composite highlighting red shadow filter that will be applied to notes on mouse over.
+</p>
+
+{% highlight xml %}
+<!--///////////////////////////-->
+<!-- A div with the SVG filter -->
+<!--///////////////////////////-->
+<div style="height: 0px;">
+    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" overflow="visible">
+        <defs>
+            <filter id="highlighting" x="-50%" y="-50%" width="200%" height="200%">
+                <feFlood flood-color="red" result="base"/>
+                <feGaussianBlur in="SourceAlpha" result="blur-out" stdDeviation="50"/>
+                <feOffset in="blur-out" result="the-shadow"/>
+                <feColorMatrix in="the-shadow" result="color-out" type="matrix"
+                    values="0 0 0 0   0 
+                            0 0 0 0   0 
+                            0 0 0 0   0 
+                            0 0 0 1.5 0"/>
+                <feComposite result="drop" in="base" in2="color-out" operator="in"/>
+                <feBlend in="SourceGraphic" in2="drop" mode="normal"/>
+            </filter>
+        </defs>
+    </svg>
+</div>
+{% endhighlight %}
+
+<p>The filter can then be apply with a simple CSS.</p>
+{% highlight css %}
+<!--////////////////////////////////////////-->
+<!-- A CSS for applying the filter on notes -->
+<!--////////////////////////////////////////-->
+<style>
+    g.note:hover {
+        filter: url(#highlighting);
+    }
+</style>
+{% endhighlight %}
+
+{% include html-tutorial.html id="code1" file="topic10-svgfilter.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic10-svgfilter.html %}
+{% endhighlight %}
+</div>

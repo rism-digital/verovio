@@ -1,0 +1,45 @@
+---
+next_text: Accessing MEI elements
+next_id: topic04
+---
+
+<h3>Highlighting content</h3>
+
+<p>
+      This example shows how Verovio can access MEI elements for highlighting content. With the jQuery-Selector $(".class") all specified class-Elements inside the rendered SVG are selected, e.g. $("dynam") selects all &lt;dynam&gt; elements in a file. Instead of selecting a whole class $(".class") you can point to a single element by using $("#id").
+</p>
+
+<p>This one highlights all the dynamics with a red color.</p>
+{% highlight javascript %}
+$(".dynam" ).attr("fill", "#d00").attr("stroke", "#d00");
+{% endhighlight %}
+
+<p>This one colors the second staff completely with color <var>Blue 2</var>.</p>
+{% highlight javascript %}
+$(".measure .staff:nth-child(2)" ).attr("fill", "#00e").attr("stroke", "#00e");
+{% endhighlight %}
+
+<p>In the forth staff this will color only the staffDef glyphs, i.e. clefs, keys and meter signatures at the beginning of each line.</p>
+{% highlight javascript %}
+$(".measure .staff:nth-child(4) .staffDef" ).attr("fill", "#0c0").attr("stroke", "#0c0");
+{% endhighlight %}
+
+<p>Finally in the forth staff this greys out all measures following the forth.</p>
+{% highlight javascript %}
+$(".system .measure:gt(4) .staff:nth-child(4)").attr("fill", "#ccc").attr("stroke", "#ccc");
+{% endhighlight %}
+
+<p>
+   Keep care of using both "fill" and "stroke" when changing the color of an element. Also notice that from this example on, an additional JavaScript file <code>javascript/basic-events.js</code> that regroups the basic event handling functions from the previous example is included.
+</p>
+
+{% include html-tutorial.html id="code1" file="topic03-highlighting.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic03-highlighting.html %}
+{% endhighlight %}
+</div>
+
+<div class="pull-right">
+    <p><a href="./tutorial.xhtml?id={{ page.next_id }}">{{ page.next_text }}</a> →</p>
+</div>

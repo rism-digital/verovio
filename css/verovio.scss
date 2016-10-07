@@ -58,6 +58,11 @@ svg:not(:root){
     background: linear-gradient($primary-color, $primary-color-light); /* Standard syntax */
 }
 
+#page-content-wrapper{
+    width:100%;
+}
+
+
 /* This is a fix for bootstrap 3.1 to override width: auto; */
 .form-control {
     width: 100% !important;
@@ -74,7 +79,7 @@ hr.panel {
 hr.home {
     margin-top: 10px;
     margin-bottom: 10px;
-    
+
 }
 
 .btn-heading {
@@ -94,8 +99,12 @@ p a {
     width: 100%;
 }
 
-.sublist-group a {
+.sublist-group a, .sublist-group span {
     padding: 4px 15px;
+}
+
+.list-group-item-menu {
+    background-color: #efefef;
 }
 
 .panel-body h3 {
@@ -166,7 +175,7 @@ table .img-responsive {
 }
 
 // Does not work with Firefox and not very well with Safari
-@media print 
+@media print
 {
     body {
         margin: 0px;
@@ -202,7 +211,7 @@ table .img-responsive {
     color: #fff;
     font-size: 20px;
     font-weight: bold;
-    cursor: wait;   
+    cursor: wait;
 }
 
 span.keyboard-00 { background-image: url(icons/00.png) !important; }
@@ -229,7 +238,7 @@ span.keyboard-rest,
 span.keyboard-dot,
 span.keyboard-barline
 {
-    top: 3px; 
+    top: 3px;
     height: 18px;
     margin: 0px !important;
     left: -4px;

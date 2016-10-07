@@ -1,0 +1,47 @@
+---
+next_text: Managing options
+next_id: topic01
+---
+
+<h3>Getting started</h3>
+
+<p>
+   This example shows a minimal integration of the JavaScript toolkit of Verovio within a web page. Once Verovio is included and an instance of the toolkit is created, an ajax call can be made to load the MEI file. On success of the ajax call, the MEI data is passed to the toolkit that renders it and return it as SVG. The SVG can then simply be inserted in a &lt;div&gt; of the page.
+</p>
+
+
+
+{% highlight javascript %}
+///////////////////////////
+/* Create the vrvToolkit */
+///////////////////////////
+var vrvToolkit = new verovio.toolkit();
+
+////////////////////////////////////
+/* Load the file using a HTTP GET */
+////////////////////////////////////
+$.ajax({
+    url: "mei/Beethoven_StringQuartet_Op18_No2.mei"
+    , dataType: "text"
+    , success: function(data) {
+        var svg = vrvToolkit.renderData(data);
+        $("#svg_output").html(svg);
+    }
+});
+{% endhighlight %}
+
+
+<p>
+   Note that the dataType for the ajax call has to be set to 'text' in order to make sure that the server returns a string.
+</p>
+
+{% include html-tutorial.html id="code1" file="topic00-hello-mei-world.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic00-hello-mei-world.html %}
+{% endhighlight %}
+</div>
+
+<div class="pull-right">
+    <p><a href="./tutorial.xhtml?id={{ page.next_id }}">{{ page.next_text }}</a> →</p>
+</div>    

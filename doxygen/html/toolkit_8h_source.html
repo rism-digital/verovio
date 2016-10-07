@@ -147,7 +147,7 @@ $(document).ready(function(){initNavTree('toolkit_8h_source.html','');});
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_toolkit.html#a3859f9341d415376b7d8f11a1aa8e352">LoadFile</a>(<span class="keyword">const</span> std::string &amp;filename);</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_toolkit.html#ac93d1ccc3cdc4bdce58046432f5f4e7b">LoadString</a>(<span class="keyword">const</span> std::string &amp;data);</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_toolkit.html#a9a08fd8e89da6c2c709eaae69e28b2b1">LoadData</a>(<span class="keyword">const</span> std::string &amp;data);</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_toolkit.html#a968a2feb41a558700a2e9061489ce90a">SaveFile</a>(<span class="keyword">const</span> std::string &amp;filename);</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;</div>
@@ -308,9 +308,9 @@ $(document).ready(function(){initNavTree('toolkit_8h_source.html','');});
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html_acde5671467b4de6cacd55e7e8be87e93"><div class="ttname"><a href="classvrv_1_1_toolkit.html#acde5671467b4de6cacd55e7e8be87e93">vrv::Toolkit::GetElementAttr</a></div><div class="ttdeci">std::string GetElementAttr(const std::string &amp;xmlId)</div><div class="ttdoc">Return element attributes as a JSON string. </div></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html"><div class="ttname"><a href="classvrv_1_1_toolkit.html">vrv::Toolkit</a></div><div class="ttdef"><b>Definition:</b> toolkit.h:35</div></div>
-<div class="ttc" id="classvrv_1_1_toolkit_html_ac93d1ccc3cdc4bdce58046432f5f4e7b"><div class="ttname"><a href="classvrv_1_1_toolkit.html#ac93d1ccc3cdc4bdce58046432f5f4e7b">vrv::Toolkit::LoadString</a></div><div class="ttdeci">bool LoadString(const std::string &amp;data)</div><div class="ttdoc">Load a string data with the specified type. </div></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html_a4618bafecb91784806f78751ea6b3f42"><div class="ttname"><a href="classvrv_1_1_toolkit.html#a4618bafecb91784806f78751ea6b3f42">vrv::Toolkit::GetElementsAtTime</a></div><div class="ttdeci">std::string GetElementsAtTime(int millisec)</div><div class="ttdoc">Returns array of IDs of elements being currently played. </div></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html_aa956c1056f02604d11c926fd348ae989"><div class="ttname"><a href="classvrv_1_1_toolkit.html#aa956c1056f02604d11c926fd348ae989">vrv::Toolkit::Drag</a></div><div class="ttdeci">bool Drag(std::string elementId, int x, int y)</div><div class="ttdoc">Experimental editor methods. </div></div>
+<div class="ttc" id="classvrv_1_1_toolkit_html_a9a08fd8e89da6c2c709eaae69e28b2b1"><div class="ttname"><a href="classvrv_1_1_toolkit.html#a9a08fd8e89da6c2c709eaae69e28b2b1">vrv::Toolkit::LoadData</a></div><div class="ttdeci">bool LoadData(const std::string &amp;data)</div><div class="ttdoc">Load a string data with the specified type. </div></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html_a47607d8329d2a8cca35b6c549f466094"><div class="ttname"><a href="classvrv_1_1_toolkit.html#a47607d8329d2a8cca35b6c549f466094">vrv::Toolkit::RenderToMidiFile</a></div><div class="ttdeci">bool RenderToMidiFile(const std::string &amp;filename)</div><div class="ttdoc">Creates a midi file, opens it, and writes to it. </div></div>
 <div class="ttc" id="classvrv_1_1_doc_html"><div class="ttname"><a href="classvrv_1_1_doc.html">vrv::Doc</a></div><div class="ttdoc">This class is a hold the data and corresponds to the model of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> doc.h:32</div></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html_a42b40d3cd04322fc299f2134e03a2580"><div class="ttname"><a href="classvrv_1_1_toolkit.html#a42b40d3cd04322fc299f2134e03a2580">vrv::Toolkit::ParseOptions</a></div><div class="ttdeci">bool ParseOptions(const std::string &amp;json_options)</div><div class="ttdoc">Parse the options passed as JSON string. </div></div>
@@ -327,7 +327,7 @@ $(document).ready(function(){initNavTree('toolkit_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>toolkit.h</b></li>
-    <li class="footer">Generated on Wed Sep 14 2016 07:50:45 by
+    <li class="footer">Generated on Wed Oct 5 2016 08:23:48 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

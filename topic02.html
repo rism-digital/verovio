@@ -1,0 +1,93 @@
+---
+next_text: Highlighting content
+next_id: topic03
+---
+
+<h3>Handling events</h3>
+
+<p>
+   This example shows how Verovio can handle events. You can bind to e.g. zoom events by adding a (key) event listener.
+</p>
+
+{% highlight javascript %}
+/////////////////////////////////////////////
+/* A function that loads the selected page */
+/////////////////////////////////////////////
+function loadPage() {
+    svg = vrvToolkit.renderPage(page, {});
+    $("#svg_output").html(svg);
+};
+
+////////////////////////////////////////////////////////////
+/* A function that redoes the layout and reloads the page */
+////////////////////////////////////////////////////////////
+function applyZoom() {
+    setOptions();
+    vrvToolkit.redoLayout();
+
+    page = 1;
+    loadPage();
+}
+{% endhighlight %}
+
+<p>
+   The function above will renew the layout with the new options and reload the page.
+</p>
+
+{% highlight javascript %}
+////////////////////////////////////////////////
+/* Some functions for handling zoom events */
+////////////////////////////////////////////////
+function zoomOut() {
+    if (zoom < 20) {
+        return;
+    }
+    zoom = zoom / 2;
+    applyZoom();
+}
+
+function zoomIn() {
+    if (zoom > 80) {
+        return;
+    }
+    zoom = zoom * 2;
+    applyZoom();
+}
+
+$(document).ready(function() {
+
+    ////////////////////////
+    /* Binding the events */
+    ////////////////////////
+    $(window).keyup(function(event){
+
+        // see http://www.javascripter.net/faq/keycodes.htm
+        if ((event.keyCode == 107) || (event.keyCode == 187) || (event.keyCode == 61) ) {
+            zoomIn();
+        }
+        else if ((event.keyCode == 109) || (event.keyCode == 189) || (event.keyCode == 173)) {
+            zoomOut();
+        }
+    });
+
+    $(window).resize(function(){
+        applyZoom();
+    });
+});
+{% endhighlight %}
+
+
+<p>
+   The applyZoom function from above is triggerd by resizing the page or pressing key "+" or "-".
+</p>
+
+{% include html-tutorial.html id="code1" file="topic02-events.html" %}
+<div id="code1-xml" style="display: none">
+{% highlight html %}
+{% include_relative gh-tutorial/topic02-events.html %}
+{% endhighlight %}
+</div>
+
+<div class="pull-right">
+    <p><a href="./tutorial.xhtml?id={{ page.next_id }}">{{ page.next_text }}</a> →</p>
+</div>

@@ -167,6 +167,7 @@ var midiPlayer_onStop = null;
 var midiPlayer_onUpdate = null;
 
 var MidiPlayer = {
+    filePackagePrefixURL: "./",
     noInitialRun: true,
     totalDependencies: 1,
     monitorRunDependencies: function(left) {
@@ -345,7 +346,7 @@ function runConversion() {
                     setTimeout(function() {convertFile("player.midi", byteArray);}, 200);
                 }
                 else {
-                    setTimeout(function() {convertFile("player.midi", byteArray);}, 200);
+                    convertFile("player.midi", byteArray);
                 }
             }
         };

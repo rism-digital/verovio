@@ -22,7 +22,7 @@ midiplayer: true
     var ids = []
 
     function load_data(data) {
-        options = JSON.stringify({
+        options = {
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
                     adjustPageHeight: adjustPageHeight,
@@ -30,7 +30,7 @@ midiplayer: true
                     spacingSystem: spacingSystem,
                     border: border,
                     scale: zoom
-                });
+                };
 
         var svg = vrvToolkit.renderData( data + "\n", options );
         console.log( svg );
@@ -55,7 +55,7 @@ midiplayer: true
     var midiUpdate = function(time) {
         // bug! time needs to be * 2 (- 400 for adjustment)
         var vrvTime = Math.max(0, 2 * time - 400);
-        var elementsattime = JSON.parse(vrvToolkit.getElementsAtTime(vrvTime))
+        var elementsattime = vrvToolkit.getElementsAtTime(vrvTime);
         if (elementsattime.page > 0) {
             if ((elementsattime.notes.length > 0) && (ids != elementsattime.notes)) {
                 ids.forEach(function(noteid) {

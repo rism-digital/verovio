@@ -35,7 +35,7 @@ downloads:
         pageHeight = ($(document).height() - $( "#navbar" ).height() - 4) * 100 / zoom ;
         pageWidth = ($(document).width()) * 100 / zoom ; // - $( "#sidbar" ).width();
         border = 50;
-        options = JSON.stringify({
+        options = {
                     inputFormat: format,
                     pageHeight: pageHeight,
                     pageWidth: pageWidth,
@@ -44,7 +44,7 @@ downloads:
                     spacingSystem: spacingSystem,
                     adjustPageHeight: 1,
                     ignoreLayout: 1
-                });
+                };
         //console.log( options );
         vrvToolkit.setOptions( options );
     }
@@ -79,7 +79,7 @@ downloads:
         $("#overlay").hide().css("cursor", "auto");
         $("#jump_text").val(page);
 
-        svg = vrvToolkit.renderPage(page, "");
+        svg = vrvToolkit.renderPage(page, {});
         $("#svg_output").html(svg);
 
         adjust_page_height();
@@ -241,7 +241,7 @@ downloads:
     
     var midiUpdate = function(time) {
         var vrvTime = Math.max(0, 2 * time);
-        var elementsattime = JSON.parse(vrvToolkit.getElementsAtTime(vrvTime))
+        var elementsattime = vrvToolkit.getElementsAtTime(vrvTime);
         if (elementsattime.page > 0) {
             if (elementsattime.page != page) {
                 page = elementsattime.page;
