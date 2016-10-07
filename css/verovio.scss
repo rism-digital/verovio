@@ -99,8 +99,12 @@ p a {
     width: 100%;
 }
 
-.sublist-group a {
+.sublist-group a, .sublist-group span {
     padding: 4px 15px;
+}
+
+.list-group-item-menu {
+    background-color: #efefef;
 }
 
 .panel-body h3 {

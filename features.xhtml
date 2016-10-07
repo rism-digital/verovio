@@ -5,44 +5,59 @@ title: Verovio – Features
 active: how
 how-active: how-features
 features:
+    - id: "shared_menu"
+      menu: "Shared"
+    - id: "tempi-directives"
+      name: "Tempi and directives"
+    - id: "cmn_menu"
+      menu: "Common Music Notation"
     - id: "scoredef"
       name: "Score and barlines"
     - id: "score-changes"
       name: "Score changes"
     - id: "chords"
-      name: "Chords"  
-    - id: "ties-slurs"
-      name: "Ties and slurs"
-    - id: "tuplets"
-      name: "Tuplets"  
-    - id: "lyrics"
-      name: "Lyrics"
-    - id: "dynams-hairpins"
-      name: "Dynamics and hairpins"
-    - id: "tempi-directives"
-      name: "Tempi and directives"
-    - id: "app"
-      name: "Critical apparatus"
-    - id: "editorial"
-      name: "Editorial markup"
-    - id: "cross-staff"
-      name: "Cross-staff notation"
-    - id: "octave-shift"
-      name: "Octave shift"
+      name: "Chords"
     - id: "gracenotes"
       name: "Grace notes"
-    - id: "piano-pedals"
-      name: "Piano pedals"
     - id: "beams"
       name: "Beam breaks"
-    - id: "repeats"
-      name: "Repeats and endings"
+    - id: "cross-staff"
+      name: "Cross-staff notation"
+    - id: "ties-slurs"
+      name: "Ties and slurs"
+    - id: "dynams-hairpins"
+      name: "Dynamics and hairpins"
+    - id: "tuplets"
+      name: "Tuplets"
     - id: "tremolos"
       name: "Tremolos"
-    - id: "harmony"
-      name: "Indications of harmony"
+    - id: "octave-shift"
+      name: "Octave shift"
+    - id: "piano-pedals"
+      name: "Piano pedals"
+    - id: "repeats"
+      name: "Repeats and endings"
+    - id: "mensural_menu"
+      menu: "Mensural notation"
     - id: "mensural"
       name: "Mensural notation"
+    - id: "app_menu"
+      menu: "Critical apparatus"
+    - id: "app"
+      name: "Apps and readings"
+    - id: "editorial_menu"
+      menu: "Editorial markup"
+    - id: "editorial"
+      name: "Editorial and choice markup"
+    - id: "harmony_menu"
+      menu: "Harmony"
+    - id: "harmony"
+      name: "Indications of harmony"
+    - id: "vocaltext_menu"
+      menu: "Vocal text"
+    - id: "lyrics"
+      name: "Lyrics"
+
 version-footer: true
 
 
@@ -58,7 +73,11 @@ version-footer: true
         <div class="panel panel-default">
             <div class="list-group sublist-group">
                 {% for f in page.features %}
-                <a id="link-{{ f.id }}" class="list-group-item" href="{{ site.baseurl }}/features.xhtml?id={{ f.id }}">{{ f.name }}</a>
+                    {% if f.menu %}
+                        <span class="list-group-item list-group-item-menu"><i>{{ f.menu }}</i></span>
+                    {% else %}
+                        <a id="link-{{ f.id }}" class="list-group-item" href="{{ site.baseurl }}/features.xhtml?id={{ f.id }}">{{ f.name }}</a>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
@@ -70,7 +89,10 @@ version-footer: true
             <p>
                 This section shows some of the features of Verovio. All the examples are rendered dynamically in the web-browser with its <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript toolkit</a> version.
             </p>
-            
+            <p>
+                The order of the provided example features is related to the corresponding modules of the <a href="http://music-encoding.org/documentation/3.0.0/chapters/" target="_blank">MEI guidelines</a>.
+            </p>
+
             <div id="feature">
             </div>
             
@@ -118,7 +140,7 @@ version-footer: true
         
         var id = getParameterByName("id");
         if (!id) {
-            id = "{{ page.features[0].id }}";
+            id = "{{ page.features[1].id }}";
         }
         var file = "features/" + id + ".html";    
         // load the file    

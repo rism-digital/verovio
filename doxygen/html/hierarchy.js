@@ -44,6 +44,16 @@ var hierarchy =
     [ "AttClefshape", null, [
       [ "vrv::Clef", "classvrv_1_1_clef.html", null ]
     ] ],
+    [ "AttColor", null, [
+      [ "vrv::BeatRpt", "classvrv_1_1_beat_rpt.html", null ],
+      [ "vrv::Hairpin", "classvrv_1_1_hairpin.html", null ],
+      [ "vrv::Octave", "classvrv_1_1_octave.html", null ],
+      [ "vrv::Pedal", "classvrv_1_1_pedal.html", null ],
+      [ "vrv::Rest", "classvrv_1_1_rest.html", null ],
+      [ "vrv::Slur", "classvrv_1_1_slur.html", null ],
+      [ "vrv::Tie", "classvrv_1_1_tie.html", null ],
+      [ "vrv::Verse", "classvrv_1_1_verse.html", null ]
+    ] ],
     [ "AttColoration", null, [
       [ "vrv::Note", "classvrv_1_1_note.html", null ]
     ] ],
@@ -145,6 +155,12 @@ var hierarchy =
     ] ],
     [ "AttLineloc", null, [
       [ "vrv::Clef", "classvrv_1_1_clef.html", null ]
+    ] ],
+    [ "AttLinerendBase", null, [
+      [ "vrv::Octave", "classvrv_1_1_octave.html", null ]
+    ] ],
+    [ "AttLyricstyle", null, [
+      [ "vrv::ScoreDefInterface", "classvrv_1_1_score_def_interface.html", null ]
     ] ],
     [ "AttMeasureLog", null, [
       [ "vrv::Measure", "classvrv_1_1_measure.html", null ]
