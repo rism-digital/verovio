@@ -8,6 +8,9 @@
                 <title>Ties on chords example (3)</title>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>
@@ -31,9 +34,9 @@
                                     </beam>
                                 </layer>
                             </staff>
-                            <tie startid="s2n3" endid="s2n7" bulge="1.0" curvedir="below"/>
-                            <tie startid="s2n2" endid="s2n8" bulge="1.0" curvedir="above"/>
-                            <tie startid="s2n1" endid="s2n9" bulge="1.0" curvedir="above"/>
+                            <tie startid="#s2n3" endid="#s2n7" bulge="1.0" curvedir="below"/>
+                            <tie startid="#s2n2" endid="#s2n8" bulge="1.0" curvedir="above"/>
+                            <tie startid="#s2n1" endid="#s2n9" bulge="1.0" curvedir="above"/>
                         </measure>
                         <measure n="2">
                             <staff n="1">
@@ -46,10 +49,10 @@
                                     </chord>
                                 </layer>
                             </staff>
-                            <tie startid="s2n6" endid="s2n11"/>
-                            <tie startid="s2n7" endid="s2n12"/>
-                            <tie startid="s2n8" endid="s2n13"/>
-                            <tie startid="s2n9" endid="s2n14"/>
+                            <tie startid="#s2n6" endid="#s2n11"/>
+                            <tie startid="#s2n7" endid="#s2n12"/>
+                            <tie startid="#s2n8" endid="#s2n13"/>
+                            <tie startid="#s2n9" endid="#s2n14"/>
                         </measure>
                         <measure n="3">
                             <staff n="1">
@@ -62,9 +65,9 @@
                                     </chord>
                                 </layer>
                             </staff>
-                            <tie startid="s2n12" endid="s2n17" bulge="1.0" curvedir="below"/>
-                            <tie startid="s2n13" endid="s2n18" bulge="1.0" curvedir="above"/>
-                            <tie startid="s2n14" endid="s2n19" bulge="1.0" curvedir="above"/>
+                            <tie startid="#s2n12" endid="#s2n17" bulge="1.0" curvedir="below"/>
+                            <tie startid="#s2n13" endid="#s2n18" bulge="1.0" curvedir="above"/>
+                            <tie startid="#s2n14" endid="#s2n19" bulge="1.0" curvedir="above"/>
                         </measure>
                         <measure n="4" right="invis">
                             <staff n="1">

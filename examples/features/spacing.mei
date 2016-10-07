@@ -5,17 +5,13 @@
     <meiHead>
         <fileDesc>
             <titleStmt>
-                <title />
+                <title>Spacing example</title>
             </titleStmt>
-            <pubStmt>
-                <date>31 January 2014</date>
-            </pubStmt>
+            <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
-        <encodingDesc>
-            <projectDesc>
-                <p>Spacing example</p>
-            </projectDesc>
-        </encodingDesc>
     </meiHead>
     <music>
         <body>
@@ -23,7 +19,8 @@
                 <score>
                     <scoreDef>
                         <staffGrp symbol="bracket">
-                            <staffDef n="1" xml:id="s1" clef.line="2" clef.shape="G" key.sig="1f" label="Violino I" lines="5"/>
+                            <staffDef n="1" xml:id="s1" clef.line="2" clef.shape="G" key.sig="1f"
+                                label="Violino I" lines="5"/>
                         </staffGrp>
                     </scoreDef>
                     <section>
@@ -31,33 +28,33 @@
                             <staff xml:id="staff-000000119844232" n="1">
                                 <layer xml:id="layer-000000047223408" n="1">
                                     <beam>
-                                        <note pname="e" oct="4" dur="16" />
-                                        <note pname="e" oct="4" dur="16" />
-                                        <note pname="e" oct="4" dur="16" />
-                                        <note pname="e" oct="4" dur="16" />
+                                        <note pname="e" oct="4" dur="16"/>
+                                        <note pname="e" oct="4" dur="16"/>
+                                        <note pname="e" oct="4" dur="16"/>
+                                        <note pname="e" oct="4" dur="16"/>
                                     </beam>
                                     <beam>
-                                        <note pname="e" oct="4" dur="8" />
-                                        <note pname="e" oct="4" dur="8" />
+                                        <note pname="e" oct="4" dur="8"/>
+                                        <note pname="e" oct="4" dur="8"/>
                                     </beam>
                                     <beam>
-                                        <note pname="e" oct="4" dur="8" dots="1" />
-                                        <note pname="e" oct="4" dur="8" dots="1" />
+                                        <note pname="e" oct="4" dur="8" dots="1"/>
+                                        <note pname="e" oct="4" dur="8" dots="1"/>
                                     </beam>
-                                    <note pname="e" oct="4" dur="4" />
-                                    <note pname="e" oct="4" dur="4" />
-                                    <note pname="e" oct="4" dur="4" dots="1" />
-                                    <note pname="e" oct="4" dur="4" dots="1" />
-                                    <note pname="e" oct="4" dur="2" />
-                                    <note pname="e" oct="4" dur="2" />
-                                    <note pname="e" oct="4" dur="2" dots="1" />
-                                    <note pname="e" oct="4" dur="2" dots="1" />
-                                    <note pname="e" oct="4" dur="1" />
-                                    <note pname="e" oct="4" dur="1" />
+                                    <note pname="e" oct="4" dur="4"/>
+                                    <note pname="e" oct="4" dur="4"/>
+                                    <note pname="e" oct="4" dur="4" dots="1"/>
+                                    <note pname="e" oct="4" dur="4" dots="1"/>
+                                    <note pname="e" oct="4" dur="2"/>
+                                    <note pname="e" oct="4" dur="2"/>
+                                    <note pname="e" oct="4" dur="2" dots="1"/>
+                                    <note pname="e" oct="4" dur="2" dots="1"/>
+                                    <note pname="e" oct="4" dur="1"/>
+                                    <note pname="e" oct="4" dur="1"/>
                                 </layer>
                             </staff>
                         </measure>
-                     </section>      
+                    </section>
                 </score>
             </mdiv>
         </body>

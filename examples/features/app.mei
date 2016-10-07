@@ -8,6 +8,12 @@
                 <title>Critical apparatus example</title>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
+            <sourceDesc>
+                <source xml:id="source1570"></source>
+            </sourceDesc>
         </fileDesc>
     </meiHead>
     <music>
@@ -29,7 +35,7 @@
                                     </staffGrp>
                                 </scoreDef>
                             </rdg>
-                            <rdg source="1570">
+                            <rdg source="#source1570">
                                 <scoreDef>
                                     <staffGrp n="1" symbol="bracket">
                                         <staffDef label="Sextus" n="2"/>
@@ -47,7 +53,7 @@
                                                     <syl xml:id="syl-001" wordpos="t">Di</syl>
                                                 </verse>
                                             </lem>
-                                            <rdg xml:id="rdg-001" source="1570">
+                                            <rdg xml:id="rdg-001" source="#source1570">
                                                 <verse xml:id="d2e208" n="1">
                                                     <syl xml:id="syl-002" wordpos="t">When</syl>
                                                 </verse>
@@ -67,7 +73,7 @@
                                                     <syl con="d" wordpos="i">net</syl>
                                                 </verse>
                                             </lem>
-                                            <rdg source="1570">
+                                            <rdg source="#source1570">
                                                 <verse xml:id="d2e376" n="1">
                                                     <syl con="d" wordpos="i">Me</syl>
                                                 </verse>
@@ -81,7 +87,7 @@
                                                     <syl con="d" wordpos="i">ta</syl>
                                                 </verse>
                                             </lem>
-                                            <rdg source="1570">
+                                            <rdg source="#source1570">
                                                 <verse xml:id="d2e400" n="1">
                                                     <syl con="d" wordpos="i">li</syl>
                                                 </verse>
@@ -101,7 +107,7 @@
                                                     <syl con="d" wordpos="i">re_a</syl>
                                                 </verse>
                                             </lem>
-                                            <rdg source="1570">
+                                            <rdg source="#source1570">
                                                 <verse xml:id="d2e612" n="1">
                                                     <syl con="d" wordpos="i">boe</syl>
                                                 </verse>
@@ -116,7 +122,7 @@
                                                     <syl con="d" wordpos="i">mo</syl>
                                                 </verse>
                                             </lem>
-                                            <rdg source="1570">
+                                            <rdg source="#source1570">
                                                 <verse xml:id="d2e638" n="1">
                                                     <syl wordpos="t">us'</syl>
                                                 </verse>
@@ -142,7 +148,7 @@
                                                 </verse>
                                             </note>
                                         </lem>
-                                        <rdg source="1570">
+                                        <rdg source="#source1570">
                                             <note dur="1" dur.ges="1024p" oct="5" pname="c" xml:id="p1ccd5n0v1b4s2-2">
                                                 <verse label="line1-e" xml:id="d2e802" n="1">
                                                     <syl wordpos="t">soul,</syl>

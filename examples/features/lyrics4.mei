@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink"
+    meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Lyrics styling example</title>
+            </titleStmt>
+            <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef meter.count="2" meter.unit="4">
+                        <staffGrp symbol="bracket">
+                            <staffDef n="1" xml:id="P1" lines="5" clef.line="2" clef.shape="G"
+                                key.sig="2s" lyric.name="Helvetica"/>
+                            <staffDef n="2" xml:id="P2" lines="5" clef.line="2" clef.shape="G"
+                                key.sig="2s" lyric.style="italic"/>
+                            <staffDef n="3" xml:id="P3" lines="5" clef.line="2" clef.shape="G"
+                                key.sig="2s" lyric.weight="bold"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1" xml:id="d1e103">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e130" pname="a" oct="4" dur="8" dots="1"
+                                        stem.dir="up">
+                                        <verse n="1">
+                                            <syl>Lift</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e150" pname="a" oct="4" dur="16" stem.dir="up">
+                                        <verse n="1">
+                                            <syl>thine</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e169" pname="a" oct="4" dur="8" stem.dir="up">
+                                        <verse n="1">
+                                            <syl>eyes</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e188" pname="d" oct="5" dur="8" stem.dir="down">
+                                        <verse n="1">
+                                            <syl>o</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note xml:id="d1e228" pname="f" oct="4" dur="8" dots="1"
+                                        stem.dir="up" accid.ges="s">
+                                        <verse n="1">
+                                            <syl>Lift</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e250" pname="f" oct="4" dur="16" stem.dir="up"
+                                        accid.ges="s">
+                                        <verse n="1">
+                                            <syl>thine</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e271" pname="f" oct="4" dur="8" stem.dir="up"
+                                        accid.ges="s">
+                                        <verse n="1">
+                                            <syl>eyes</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e292" pname="a" oct="4" dur="8" stem.dir="up">
+                                        <verse n="1">
+                                            <syl>o</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d1e332" pname="d" oct="4" dur="8" dots="1"
+                                        stem.dir="up">
+                                        <verse n="1">
+                                            <syl>Lift</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e352" pname="d" oct="4" dur="16" stem.dir="up">
+                                        <verse n="1">
+                                            <syl>thine</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e371" pname="d" oct="4" dur="8" stem.dir="up">
+                                        <verse n="1">
+                                            <syl>eyes</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e390" pname="f" oct="4" dur="8" stem.dir="up"
+                                        accid.ges="s">
+                                        <verse n="1">
+                                            <syl>o</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                        <measure n="2" xml:id="d1e411">
+                            <staff n="1">
+                                <layer n="1">
+                                    <note xml:id="d1e413" pname="f" oct="5" dur="8" dots="1"
+                                        stem.dir="down" accid.ges="s">
+                                        <verse n="1">
+                                            <syl>lift</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e435" pname="e" oct="5" dur="16" stem.dir="down">
+                                        <verse n="1">
+                                            <syl>thine</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e454" pname="d" oct="5" dur="4" stem.dir="down">
+                                        <verse n="1">
+                                            <syl>eyes</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="2">
+                                <layer n="1">
+                                    <note xml:id="d1e474" pname="d" oct="5" dur="8" dots="1"
+                                        stem.dir="down">
+                                        <verse n="1">
+                                            <syl>lift</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e494" pname="a" oct="4" dur="16" stem.dir="up">
+                                        <verse n="1">
+                                            <syl>thine</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e513" pname="a" oct="4" dur="4" stem.dir="up">
+                                        <verse n="1">
+                                            <syl>eyes</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                            <staff n="3">
+                                <layer n="1">
+                                    <note xml:id="d1e533" pname="a" oct="4" dur="8" dots="1"
+                                        stem.dir="up">
+                                        <verse n="1">
+                                            <syl>lift</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e553" pname="g" oct="4" dur="16" stem.dir="up">
+                                        <verse n="1">
+                                            <syl>thine</syl>
+                                        </verse>
+                                    </note>
+                                    <note xml:id="d1e572" pname="f" oct="4" dur="4" stem.dir="up"
+                                        accid.ges="s">
+                                        <verse n="1">
+                                            <syl>eyes</syl>
+                                        </verse>
+                                    </note>
+                                </layer>
+                            </staff>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>

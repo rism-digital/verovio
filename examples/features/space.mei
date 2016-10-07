@@ -8,6 +8,9 @@
                 <title>Space example</title>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>
@@ -26,66 +29,98 @@
                                 <layer n="1">
                                     <space dur="4"/>
                                     <beam>
-                                        <note xml:id="d1e458_2" pname="e" oct="4" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e509_2" pname="f" oct="4" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e532_2" pname="g" oct="4" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e555_2" pname="a" oct="4" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e602_2" pname="b" oct="4" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e625_2" pname="c" oct="5" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e648_2" pname="d" oct="5" dur="32" stem.dir="up">
+                                        <note xml:id="d1e458_2" pname="e" oct="4" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e509_2" pname="f" oct="4" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e532_2" pname="g" oct="4" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e555_2" pname="a" oct="4" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e602_2" pname="b" oct="4" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e625_2" pname="c" oct="5" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e648_2" pname="d" oct="5" dur="32"
+                                            stem.dir="up">
                                             <accid accid="s"/>
                                         </note>
-                                        <note xml:id="d1e673_2" pname="e" oct="5" dur="32" stem.dir="up"/>
+                                        <note xml:id="d1e673_2" pname="e" oct="5" dur="32"
+                                            stem.dir="up"/>
                                     </beam>
                                     <tuplet num="6" numbase="4">
                                         <beam>
-                                            <note xml:id="d1e246_1" pname="f" oct="5" dur="16" stem.dir="down"/>
-                                            <note xml:id="d1e277_1" pname="g" oct="5" dur="16" stem.dir="down"/>
-                                            <note xml:id="d1e305_1" pname="a" oct="5" dur="16" stem.dir="down"/>
-                                            <note xml:id="d1e331_1" pname="b" oct="5" dur="16" stem.dir="down"/>
-                                            <note xml:id="d1e357_1" pname="c" oct="6" dur="16" stem.dir="down"/>
-                                            <note xml:id="d1e385_1" pname="d" oct="6" dur="16" stem.dir="down">
+                                            <note xml:id="d1e246_1" pname="f" oct="5" dur="16"
+                                                stem.dir="down"/>
+                                            <note xml:id="d1e277_1" pname="g" oct="5" dur="16"
+                                                stem.dir="down"/>
+                                            <note xml:id="d1e305_1" pname="a" oct="5" dur="16"
+                                                stem.dir="down"/>
+                                            <note xml:id="d1e331_1" pname="b" oct="5" dur="16"
+                                                stem.dir="down"/>
+                                            <note xml:id="d1e357_1" pname="c" oct="6" dur="16"
+                                                stem.dir="down"/>
+                                            <note xml:id="d1e385_1" pname="d" oct="6" dur="16"
+                                                stem.dir="down">
                                                 <accid accid="s"/>
                                             </note>
                                         </beam>
                                     </tuplet>
                                     <beam>
-                                        <note xml:id="d1e417_1" pname="e" oct="6" dur="8" stem.dir="down"/>
-                                        <note xml:id="d1e436_1" pname="e" oct="6" dur="8" stem.dir="down"/>
+                                        <note xml:id="d1e417_1" pname="e" oct="6" dur="8"
+                                            stem.dir="down"/>
+                                        <note xml:id="d1e436_1" pname="e" oct="6" dur="8"
+                                            stem.dir="down"/>
                                     </beam>
                                 </layer>
                             </staff>
                             <staff n="2">
                                 <layer n="1">
                                     <beam>
-                                        <note xml:id="d1e458_1" pname="a" oct="3" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e509_1" pname="b" oct="3" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e532_1" pname="a" oct="3" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e555_1" pname="g" oct="3" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e602_1" pname="a" oct="3" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e625_1" pname="b" oct="3" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e648_1" pname="c" oct="4" dur="32" stem.dir="up"/>
-                                        <note xml:id="d1e673_1" pname="d" oct="4" dur="32" stem.dir="up">
+                                        <note xml:id="d1e458_1" pname="a" oct="3" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e509_1" pname="b" oct="3" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e532_1" pname="a" oct="3" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e555_1" pname="g" oct="3" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e602_1" pname="a" oct="3" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e625_1" pname="b" oct="3" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e648_1" pname="c" oct="4" dur="32"
+                                            stem.dir="up"/>
+                                        <note xml:id="d1e673_1" pname="d" oct="4" dur="32"
+                                            stem.dir="up">
                                             <accid accid="s"/>
                                         </note>
                                     </beam>
                                 </layer>
                                 <layer n="2">
                                     <beam>
-                                        <note xml:id="d1e484_1" pname="c" oct="3" dur="8" stem.dir="down"/>
-                                        <note xml:id="d1e580_1" pname="a" oct="3" dur="8" stem.dir="down"/>
-                                        <note xml:id="d1e700_1" pname="e" oct="3" dur="8" stem.dir="down"/>
-                                        <note xml:id="d1e720_1" pname="a" oct="3" dur="8" stem.dir="down"/>
+                                        <note xml:id="d1e484_1" pname="c" oct="3" dur="8"
+                                            stem.dir="down"/>
+                                        <note xml:id="d1e580_1" pname="a" oct="3" dur="8"
+                                            stem.dir="down"/>
+                                        <note xml:id="d1e700_1" pname="e" oct="3" dur="8"
+                                            stem.dir="down"/>
+                                        <note xml:id="d1e720_1" pname="a" oct="3" dur="8"
+                                            stem.dir="down"/>
                                     </beam>
                                     <beam>
-                                        <note xml:id="d1e739_1" pname="b" oct="2" dur="8" stem.dir="down"/>
-                                        <note xml:id="d1e758_1" pname="g" oct="3" dur="8" stem.dir="down"/>
-                                        <note xml:id="d1e779_1" pname="e" oct="3" dur="8" stem.dir="down"/>
-                                        <note xml:id="d1e798_1" pname="g" oct="3" dur="8" stem.dir="down"/>
+                                        <note xml:id="d1e739_1" pname="b" oct="2" dur="8"
+                                            stem.dir="down"/>
+                                        <note xml:id="d1e758_1" pname="g" oct="3" dur="8"
+                                            stem.dir="down"/>
+                                        <note xml:id="d1e779_1" pname="e" oct="3" dur="8"
+                                            stem.dir="down"/>
+                                        <note xml:id="d1e798_1" pname="g" oct="3" dur="8"
+                                            stem.dir="down"/>
                                     </beam>
                                 </layer>
                             </staff>
-                            <slur startid="d1e246_1" endid="d1e385_1"/>
+                            <slur startid="#d1e246_1" endid="#d1e385_1"/>
                         </measure>
                     </section>
                 </score>

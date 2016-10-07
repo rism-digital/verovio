@@ -8,6 +8,9 @@
                 <title>Single-note (bowed) temolo example</title>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>
@@ -40,7 +43,7 @@
                                         </bTrem>
                                         <bTrem>
                                             <note pname="f" oct="4" dur="8" stem.mod="2slash"/>
-                                        </bTrem>                                        
+                                        </bTrem>
                                     </beam>
                                     <fTrem slash="3">
                                         <note pname="d" oct="4" dur="2"/>

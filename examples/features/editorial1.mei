@@ -8,6 +8,9 @@
                 <title>Editorial markup example</title>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>
@@ -30,7 +33,7 @@
                                         <unclear>
                                             <note pname="g" oct="4" dur="8" />
                                         </unclear>
-                                        
+
                                         <note pname="e" oct="4" dur="8" />
                                     </beam>
                                     </sic>
