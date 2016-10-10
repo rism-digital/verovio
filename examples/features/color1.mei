@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Color example</title>
+            </titleStmt>
+            <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef n="1" clef.shape="G" lines="5" clef.line="2"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure n="1">
+                            <staff n="1">
+                                <layer n="1">
+                                    <rest color="#EF0B12" xml:id="d414233e2590" dur="8"/>
+                                    <note xml:id="d414233e2598" pname="f" oct="4" dur="8" stem.dir="up"/>
+                                    <beatRpt color="purple" xml:id="d414233e2636" rend="1"/>
+                                    <note dur="4" oct="4" pname="g" xml:id="d414233e2644"/>
+                                    <note dur="4" oct="4" pname="g" xml:id="d414233e2665"/>
+                                </layer>
+                            </staff>
+                            <tie color="hsl(240,85%,35%)" startid="#d414233e2644" endid="#d414233e2665"/>
+                            <hairpin color="rgb(24,231,76)" form="cres" place="above" startid="#d414233e2598" endid="#d414233e2665"/>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
