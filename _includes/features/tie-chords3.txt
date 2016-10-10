@@ -9,7 +9,7 @@
       </beam>
     </layer>
   </staff>
-  <tie startid="s2n3" endid="s2n7" bulge="1.0" curvedir="below"/>
-  <tie startid="s2n2" endid="s2n8" bulge="1.0" curvedir="above"/>
-  <tie startid="s2n1" endid="s2n9" bulge="1.0" curvedir="above"/>
+  <tie startid="#s2n3" endid="#s2n7" bulge="1.0" curvedir="below"/>
+  <tie startid="#s2n2" endid="#s2n8" bulge="1.0" curvedir="above"/>
+  <tie startid="#s2n1" endid="#s2n9" bulge="1.0" curvedir="above"/>
 </measure>
