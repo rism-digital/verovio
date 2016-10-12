@@ -805,9 +805,17 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, S
         assert(mRest);
         place = mRest->GetFermata();
     }
-    if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? PLACE_above : PLACE_above;
+    else if (element->HasInterface(INTERFACE_PITCH)) {
+        AttFermatapresent *interface = dynamic_cast<AttFermatapresent *>(element);
+        assert(interface);
+        place = interface->GetFermata();
     }
+    // We handle only @fermata for now. The always have a above or below value
+    /*
+    if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+        if (place != PLACE_NONE) place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? PLACE_above : PLACE_above;
+    }
+    */
 
     // First case, notes
     if ((element->Is() == NOTE) || (element->Is() == CHORD)) {
