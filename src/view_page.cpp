@@ -597,7 +597,6 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if (barLine->HasRepetitionDots()) {
-            int i;
             StaffDef *childStaffDef = NULL;
             ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
             for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
