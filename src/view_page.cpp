@@ -599,8 +599,9 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         if (barLine->HasRepetitionDots()) {
             int i;
             StaffDef *childStaffDef = NULL;
-            for (i = 0; i < staffGrp->GetChildCount(); i++) {
-                childStaffDef = dynamic_cast<StaffDef *>(staffGrp->GetChild(i));
+            ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
+            for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
+                childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
                     AttCommonNComparison comparison(STAFF, childStaffDef->GetN());
                     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
