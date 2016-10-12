@@ -20,7 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <mRest>
  */
-class MRest : public LayerElement, public AttVisibility {
+class MRest : public LayerElement, public AttVisibility, public AttFermatapresent {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
