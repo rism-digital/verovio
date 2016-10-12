@@ -1532,7 +1532,10 @@ bool MeiInput::ReadMei(pugi::xml_node root)
     pugi::xml_node mdiv;
     pugi::xml_node pages;
     if (!root.empty()) {
-        music = root.child("music");
+        if (std::string(root.name()) == "music")
+            music = root;
+        else
+            music = root.child("music");
     }
     if (!music.empty()) {
         body = music.child("body");
