@@ -10,7 +10,7 @@
         </beam>
         <choice>
           <orig>
-            <beatRpt rend="16"/>
+            <beatRpt rend="1"/>
           </orig>
           <reg>
             <beam>

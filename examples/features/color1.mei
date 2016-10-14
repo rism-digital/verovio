@@ -23,7 +23,7 @@
                         </staffGrp>
                     </scoreDef>
                     <section>
-                        <measure n="1">
+                        <measure label="feature-example" n="1">
                             <staff n="1">
                                 <layer n="1">
                                     <rest color="#EF0B12" xml:id="d414233e2590" dur="8"/>

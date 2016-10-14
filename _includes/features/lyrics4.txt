@@ -1,7 +1,7 @@
 <scoreDef meter.count="2" meter.unit="4">
   <staffGrp symbol="bracket">
-    <staffDef n="1" lines="5" clef.line="2" clef.shape="G" key.sig="2s" lyric.name="Helvetica"/>
-    <staffDef n="2" lines="5" clef.line="2" clef.shape="G" key.sig="2s" lyric.style="italic"/>
-    <staffDef n="3" lines="5" clef.line="2" clef.shape="G" key.sig="2s" lyric.weight="bold"/>
+    <staffDef n="1" xml:id="P1" lines="5" clef.line="2" clef.shape="G" key.sig="2s" lyric.name="Helvetica"/>
+    <staffDef n="2" xml:id="P2" lines="5" clef.line="2" clef.shape="G" key.sig="2s" lyric.style="italic"/>
+    <staffDef n="3" xml:id="P3" lines="5" clef.line="2" clef.shape="G" key.sig="2s" lyric.weight="bold"/>
   </staffGrp>
 </scoreDef>

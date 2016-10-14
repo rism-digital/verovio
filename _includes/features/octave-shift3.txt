@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <section>
   <measure n="1">
     <staff n="1">

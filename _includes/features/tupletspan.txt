@@ -6,15 +6,13 @@
         <note xml:id="d1e41.1" pname="d" oct="5" dur="8"/>
         <note xml:id="d1e66.1" pname="e" oct="5" dur="16"/>
         <note xml:id="d1e90.1" pname="d" oct="5" dur="16"/>
-        <note xml:id="d1e114.1" pname="e" oct="5" dur="8" accid="s">
-        </note>
+        <note xml:id="d1e114.1" pname="e" oct="5" dur="8" accid="s"/>
       </beam>
       <beam>
         <note xml:id="d1e41.2" pname="d" oct="5" dur="8"/>
         <note xml:id="d1e66.2" pname="e" oct="5" dur="16" dots="1"/>
         <note xml:id="d1e90.2" pname="d" oct="5" dur="32"/>
-        <note xml:id="d1e114.2" pname="e" oct="5" dur="8" accid="s">
-        </note>
+        <note xml:id="d1e114.2" pname="e" oct="5" dur="8" accid="s"/>
       </beam>
       <beam>
         <note xml:id="d1e41.3" pname="d" oct="5" dur="16"/>
