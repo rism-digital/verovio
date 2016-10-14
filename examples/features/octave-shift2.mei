@@ -8,6 +8,9 @@
                 <title>Octave shift example (below and with @tstamp)</title>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>
@@ -25,19 +28,19 @@
                                 <layer n="1">
                                     <note dur="2" oct="3" oct.ges="2" pname="e" xml:id="n1"/>
                                     <beam>
-                                        <note dur="8" oct="3" oct.ges="2"  pname="f"/>
-                                        <note dur="8" oct="3" oct.ges="2"  pname="a"/>
-                                        <note dur="8" oct="3" oct.ges="2"  pname="g"/>
-                                        <note dur="8" oct="3" oct.ges="2"  pname="b"/>
+                                        <note dur="8" oct="3" oct.ges="2" pname="f"/>
+                                        <note dur="8" oct="3" oct.ges="2" pname="a"/>
+                                        <note dur="8" oct="3" oct.ges="2" pname="g"/>
+                                        <note dur="8" oct="3" oct.ges="2" pname="b"/>
                                     </beam>
                                 </layer>
                             </staff>
-                            <octave startid="#n1" endid="#n2" dis="8" dis.place="below"></octave>
+                            <octave startid="#n1" endid="#n2" dis="8" dis.place="below"/>
                         </measure>
                         <measure n="2" right="dbl">
                             <staff n="1">
                                 <layer n="1">
-                                    <note dur="1" oct="4" oct.ges="3"  pname="c" xml:id="n2"/>
+                                    <note dur="1" oct="4" oct.ges="3" pname="c" xml:id="n2"/>
                                 </layer>
                             </staff>
                         </measure>
@@ -46,19 +49,19 @@
                                 <layer n="1">
                                     <note dur="2" oct="4" oct.ges="2" pname="e" xml:id="n3"/>
                                     <beam>
-                                        <note dur="8" oct="4" oct.ges="2"  pname="f"/>
-                                        <note dur="8" oct="4" oct.ges="2"  pname="a"/>
-                                        <note dur="8" oct="4" oct.ges="2"  pname="g"/>
-                                        <note dur="8" oct="4" oct.ges="2"  pname="b"/>
+                                        <note dur="8" oct="4" oct.ges="2" pname="f"/>
+                                        <note dur="8" oct="4" oct.ges="2" pname="a"/>
+                                        <note dur="8" oct="4" oct.ges="2" pname="g"/>
+                                        <note dur="8" oct="4" oct.ges="2" pname="b"/>
                                     </beam>
                                 </layer>
                             </staff>
-                            <octave startid="#n3" tstamp2="1m+4.0" dis="15" dis.place="below"></octave>
+                            <octave startid="#n3" tstamp2="1m+4.0" dis="15" dis.place="below"/>
                         </measure>
                         <measure n="5" right="dbl">
                             <staff n="1">
                                 <layer n="1">
-                                    <note dur="1" oct="5" oct.ges="3"  pname="c"/>
+                                    <note dur="1" oct="5" oct.ges="3" pname="c"/>
                                 </layer>
                             </staff>
                         </measure>

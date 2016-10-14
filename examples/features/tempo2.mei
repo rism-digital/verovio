@@ -8,6 +8,9 @@
                 <title>Hairpin example on multiple lines</title>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>
@@ -57,7 +60,7 @@
                                 </layer>
                             </staff>
                             <dynam tstamp="1.1" place="below" staff="1">p</dynam>
-                            <tempo staff="1" label="feature-example">
+                            <tempo tstamp="1" staff="1" label="feature-example">
                                 <rend fontweight="normal">Modérément animé</rend>
                             </tempo>
                             <slur curvedir="below" startid="#d1e116" staff="1" tstamp2="5.0"/>

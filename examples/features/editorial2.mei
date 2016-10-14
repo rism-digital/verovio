@@ -8,6 +8,9 @@
                 <title>Editorial markup (text) example</title>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>
@@ -29,7 +32,7 @@
                             </staff>
                             <tempo staff="1" tstamp="1.0"  label="feature-example">Allegro <add>molto <unclear>vivace</unclear></add></tempo>
                         </measure>
-                        <measure right="">
+                        <measure>
                             <staff n="1">
                                 <layer n="1">
                                     <note dur="4" pname="g" oct="5"/>

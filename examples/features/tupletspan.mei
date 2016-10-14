@@ -8,6 +8,9 @@
                 <title>TupletSpan example</title>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>            
         </fileDesc>
     </meiHead>
     <music>
@@ -64,9 +67,9 @@
                                     <note xml:id="d1e427.2" dur="4" pname="a" oct="3"/>
                                 </layer>
                             </staff>
-                            <tupletSpan startid="d1e41.1" endid="d1e114.1" num="3" numbase="2"/>
-                            <tupletSpan startid="d1e41.2" endid="d1e114.2" num="3" numbase="2"/>
-                            <tupletSpan startid="d1e41.3" endid="d1e114.3" num="3" numbase="2"/>
+                            <tupletSpan startid="#d1e41.1" endid="#d1e114.1" num="3" numbase="2"/>
+                            <tupletSpan startid="#d1e41.2" endid="#d1e114.2" num="3" numbase="2"/>
+                            <tupletSpan startid="#d1e41.3" endid="#d1e114.3" num="3" numbase="2"/>
                         </measure>
                     </section>
                 </score>

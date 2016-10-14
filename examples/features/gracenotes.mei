@@ -6,11 +6,11 @@
         <fileDesc>
             <titleStmt>
                 <title>Grace notes example</title>
-                <respStmt>
-                    <persName/>
-                </respStmt>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>

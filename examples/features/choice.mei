@@ -7,7 +7,10 @@
             <titleStmt>
                 <title>Choice</title>
             </titleStmt>
-            <pubStmt></pubStmt>
+            <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>
@@ -31,7 +34,7 @@
                                     </beam>
                                     <choice>
                                         <orig>
-                                            <beatRpt rend="16"/>    
+                                            <beatRpt rend="1"/>
                                         </orig>
                                         <reg>
                                             <beam>

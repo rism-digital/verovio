@@ -8,6 +8,9 @@
                 <title>Ties on chords example</title>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>
@@ -61,11 +64,11 @@
                                     </chord>
                                 </layer>
                             </staff>
-                            <tie startid="n01" endid="n06"/>
-                            <tie startid="n02" endid="n07"/>
-                            <tie startid="n03" endid="n08"/>
-                            <tie startid="n04" endid="n09"/>
-                            <tie startid="n05" endid="n10"/>
+                            <tie startid="#n01" endid="#n06"/>
+                            <tie startid="#n02" endid="#n07"/>
+                            <tie startid="#n03" endid="#n08"/>
+                            <tie startid="#n04" endid="#n09"/>
+                            <tie startid="#n05" endid="#n10"/>
                         </measure>
                         <measure n="3" right="end">
                             <staff n="1">

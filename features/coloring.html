@@ -1,0 +1,40 @@
+---
+---
+<h4>Coloring</h4>
+
+<p>
+    Verovio supports the <code>@color</code> attributes on many elements.
+</p>
+
+<div id="svg_output" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code1" file="color1.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/color1.txt %}
+{% endhighlight %}
+</div>
+
+<hr/>
+<p>
+    For coloring texts the <code>&lt;rend&gt;</code> element has to be used.
+</p>
+
+<script type="text/javascript">
+//<![CDATA[
+    zoom = 40;
+    pageWidth = 1450;
+
+
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
+
+    $.get( "{{ site.baseurl }}/examples/features/color1.mei" , function( data ) {
+        load_data( data, $('#svg_output') );
+    });
+
+//]]>
+</script>

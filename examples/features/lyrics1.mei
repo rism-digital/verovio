@@ -7,7 +7,10 @@
             <titleStmt>
                 <title>Lyric example</title>
             </titleStmt>
-            <pubStmt></pubStmt>
+            <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>
@@ -15,7 +18,7 @@
             <mdiv>
                 <score>
                     <scoreDef>
-                        <staffGrp> 
+                        <staffGrp>
                             <staffDef clef.line="2" clef.shape="G" lines="5" n="1" xml:id="sd1"/>
                         </staffGrp>
                     </scoreDef>
@@ -79,7 +82,7 @@
                                     <note dur="4" oct="4" pname="d" xml:id="dd4n384v1b3s1"/>
                                 </layer>
                             </staff>
-                            <slur startid="ed4n256v1b3s1" endid="dd4n384v1b3s1"/>
+                            <slur startid="#ed4n256v1b3s1" endid="#dd4n384v1b3s1"/>
                         </measure>
                         <measure n="4" right="invis">
                             <staff n="1">

@@ -3,7 +3,7 @@
 <h4>Octave shift</h4>
 
 <p>
-    Verovio supports <code>&lt;oct&gt;</code> for octave shifts. For correct MIDI output, the <code>@oct.ges</code> attribute needs to be provided.
+    Verovio supports <code>&lt;octave&gt;</code> for octave shifts. For correct MIDI output, the <code>@oct.ges</code> attribute needs to be provided.
 </p>
 
 <div id="svg_output-1" style="overflow:auto;"/>
@@ -30,25 +30,43 @@
 {% endhighlight %}
 </div>
 
+<!-- ***************************** -->
+<hr/>
+<p>
+    Basic styling options for <code>&lt;octave&gt;</code> are provided via the <code>@lform</code> and <code>@lwidth</code> attributes.
+</p>
+
+<div id="svg_output-3" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code3" file="octave-shift3.mei" %}
+<div id="code3-xml" style="display: none">
+{% highlight xml %}
+{% include features/octave-shift3.txt %}
+{% endhighlight %}
+</div>
+
 <script type="text/javascript">
 //<![CDATA[
     zoom = 40;
     pageWidth = 1500;
     border = 10;
-    
+
     // adjust the zoom for small screens
     width = $('#feature').width();
     if ( width < zoom * pageWidth / 100 ) {
         zoom = width * 100 / pageWidth;
     }
-    
+
     $.get( "{{ site.baseurl }}/examples/features/octave-shift1.mei" , function( data ) {
         load_data( data, $('#svg_output-1') );
     });
-    
+
     $.get( "{{ site.baseurl }}/examples/features/octave-shift2.mei" , function( data ) {
         load_data( data, $('#svg_output-2') );
     });
+
+    $.get( "{{ site.baseurl }}/examples/features/octave-shift3.mei" , function( data ) {
+        load_data( data, $('#svg_output-3') );
+    });
 //]]>
 </script>
-

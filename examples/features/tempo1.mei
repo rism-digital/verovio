@@ -8,6 +8,9 @@
                 <title>Hairpin example on multiple lines</title>
             </titleStmt>
             <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
         </fileDesc>
     </meiHead>
     <music>
@@ -24,27 +27,28 @@
                             <staff n="1">
                                 <layer n="1">
                                     <beam>
-                                        <note xml:id="m0_s2_e1" pname="e" oct="5" dur="8" />
-                                        <note xml:id="m0_s2_e2" pname="f" oct="5" dur="8" />
+                                        <note xml:id="m0_s2_e1" pname="e" oct="5" dur="8"/>
+                                        <note xml:id="m0_s2_e2" pname="f" oct="5" dur="8"/>
                                     </beam>
                                 </layer>
                             </staff>
-                            <tempo tstamp="1" staff="1">Andante con moto <rend fontname="VerovioText">&#xE1D3;</rend> = 70 </tempo>
-                            <slur startid="#m0_s2_e1" endid="m0_s2_e2"/>
+                            <tempo tstamp="1" staff="1">Andante con moto <rend
+                                    fontname="VerovioText">&#xE1D3;</rend> = 70 </tempo>
+                            <slur startid="#m0_s2_e1" endid="#m0_s2_e2"/>
                         </measure>
                         <measure n="1">
                             <staff n="1">
                                 <layer n="1">
-                                    <note xml:id="m1_s2_e1" pname="g" oct="5" dur="4" dots="1" />
-                                    <note xml:id="m1_s2_e2" pname="g" oct="5" dur="8" />
-                                    <note xml:id="m1_s2_e3" pname="g" oct="5" dur="4" />
+                                    <note xml:id="m1_s2_e1" pname="g" oct="5" dur="4" dots="1"/>
+                                    <note xml:id="m1_s2_e2" pname="g" oct="5" dur="8"/>
+                                    <note xml:id="m1_s2_e3" pname="g" oct="5" dur="4"/>
                                     <beam>
-                                        <note xml:id="m1_s2_e4" pname="g" oct="5" dur="8" />
-                                        <note xml:id="m1_s2_e5" pname="c" oct="6" dur="8" />
+                                        <note xml:id="m1_s2_e4" pname="g" oct="5" dur="8"/>
+                                        <note xml:id="m1_s2_e5" pname="c" oct="6" dur="8"/>
                                     </beam>
                                 </layer>
                             </staff>
-                            <slur startid="#m1_s2_e4" endid="m1_s2_e5"/>
+                            <slur startid="#m1_s2_e4" endid="#m1_s2_e5"/>
                         </measure>
                     </section>
                 </score>
