@@ -29,7 +29,7 @@ var NAVTREEINDEX =
 "classvrv_1_1_set_current_score_def_params.html#a10934c7ebfd2e38b2f94a7cb4ded02ae",
 "classvrv_1_1_svg_device_context.html#aa9b9c3d319fb507ad296bad981e60653",
 "classvrv_1_1_toolkit.html#aeda33e694a8e690ab4c8e790690b8083",
-"measure_8h_source.html"
+"ligature_8h_source.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
