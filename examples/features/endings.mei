@@ -86,13 +86,13 @@
                             <staff n="1">
                                 <layer n="1">
                                     <beam>
-                                        <note xml:id="note-L95F3" dots="1" dur="8" oct="5" pname="c" accid.ges="n">
+                                        <note dots="1" dur="8" oct="5" pname="c" accid.ges="n">
                                             <verse n="1">
                                                 <syl>Haus;</syl>
                                             </verse>
                                         </note>
                                         <note dur="16" oct="5" pname="d" accid.ges="n" />
-                                        <note xml:id="note-L98F3" dur="8" oct="5" pname="e" accid.ges="n" />
+                                        <note dur="8" oct="5" pname="e" accid.ges="n" />
                                     </beam>
                                     <note dur="8" oct="4" pname="g" accid.ges="n">
                                         <verse n="1">

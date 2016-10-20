@@ -135,7 +135,8 @@ var hierarchy =
       [ "vrv::ScoreDef", "classvrv_1_1_score_def.html", null ]
     ] ],
     [ "AttFermatapresent", null, [
-      [ "vrv::DurationInterface", "classvrv_1_1_duration_interface.html", null ]
+      [ "vrv::DurationInterface", "classvrv_1_1_duration_interface.html", null ],
+      [ "vrv::MRest", "classvrv_1_1_m_rest.html", null ]
     ] ],
     [ "AttGraced", null, [
       [ "vrv::Note", "classvrv_1_1_note.html", null ]
