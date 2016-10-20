@@ -194,6 +194,15 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("class") = baseClass.c_str();
     m_currentNode.append_attribute("id") = gId.c_str();
+
+    if (object->HasAttClass(ATT_COLOR)) {
+        AttColor *att = dynamic_cast<AttColor *>(object);
+        assert(att);
+        if (att->HasColor()) {
+            m_currentNode.append_attribute("fill") = att->GetColor().c_str();
+            m_currentNode.append_attribute("stroke") = att->GetColor().c_str();
+        }
+    }
 }
 
 void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
