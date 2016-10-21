@@ -46,7 +46,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     assert(note);
 
     int staffSize = staff->m_drawingStaffSize;
-    // Mensural noteheads are usually quite a bit smaller than CMN noteheads for the same size
+    // Mensural noteheads are usually somewhat smaller than CMN noteheads for the same size
     // staff; use _pseudoStaffSize_ to force this for fonts that don't consider that fact.
     int pseudoStaffSize = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
     int noteY = element->GetDrawingY();
@@ -109,7 +109,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
             int sbStaffSize = 0.8*staff->m_drawingStaffSize;    // FIXME: should be pseudoStaffSize, but that's too small; why??
             //LogDebug("<DrawDiamond SB: pseudoStaffSize=%d m_drawing=%d sb=%d 2*sb=%d (int)(1.2*sb)=%d",
             //  pseudoStaffSize, staff->m_drawingStaffSize, sbStaffSize, 2*sbStaffSize, (int)(1.2*sbStaffSize));
-            DrawDiamond(dc, xNote, noteY, 2*sbStaffSize, (int)(1.2*sbStaffSize), !note->GetColored());
+            DrawDiamond(dc, xNote, noteY, 2*sbStaffSize, (int)(1.2*sbStaffSize), !note->GetColored(), 20);
         }
         else {
             if (note->GetColored())
@@ -127,7 +127,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
             // mensural notation. But an unfilled (void) narrow diamond is fine, so we draw one.
             int sbStaffSize = 0.8*staff->m_drawingStaffSize;    // FIXME: should be pseudoStaffSize, but that's too small; why??
             DrawDiamond(dc, xNote, noteY, 2*sbStaffSize, (int)(TEMP_MINIMA_WIDTH_FACTOR*2*sbStaffSize),
-                        !note->GetColored());
+                        !note->GetColored(), 20);
         }
         else {
             if (note->GetColored()) {

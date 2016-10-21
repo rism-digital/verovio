@@ -174,8 +174,8 @@ namespace vrv {
 
 /* Style parameters for mensural notation */
 // Ratios of mensural notehead, accidental, aug. dot size to CMN for the same staff size
-#define TEMP_MNOTEHEAD_SIZE_FACTOR 0.55
-#define TEMP_MACCID_SIZE_FACTOR 0.65
+#define TEMP_MNOTEHEAD_SIZE_FACTOR 0.80
+#define TEMP_MACCID_SIZE_FACTOR 0.80
 #define TEMP_MAUGDOT_SIZE_FACTOR 0.60
 // Width of the minima diamond relative to its height
 #define TEMP_MINIMA_WIDTH_FACTOR 0.60

@@ -1932,7 +1932,7 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
             break;
         }
         elementName = std::string(xmlElement.name());
-        // LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
+        LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
         if (!IsAllowed(elementName, filter)) {
             LogWarning("Element <%s> within %s is illegal and will be ignored", xmlElement.name(),
                 filter->GetClassName().c_str());

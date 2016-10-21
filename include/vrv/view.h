@@ -372,7 +372,8 @@ protected:
     void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
-    void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill);
+    void DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill,
+                     int linewidth);
     void DrawDot(DeviceContext *dc, int x, int y, int staffSize);
     ///@}
 
