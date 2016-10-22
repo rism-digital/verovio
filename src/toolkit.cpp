@@ -247,6 +247,12 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
         if (initial.find("<mei>") != string::npos) {
             return MEI;
         }
+        if (initial.find("<music>") != string::npos) {
+            return MEI;
+        }
+        if (initial.find("<music ") != string::npos) {
+            return MEI;
+        }
         if (initial.find("<pages>") != string::npos) {
             return MEI;
         }
