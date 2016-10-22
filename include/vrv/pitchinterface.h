@@ -30,7 +30,7 @@ public:
     PitchInterface();
     virtual ~PitchInterface();
     virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_PITCH; };
+    virtual InterfaceId IsInterface() { return INTERFACE_PITCH; }
     ///@}
 
     /**

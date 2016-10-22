@@ -10,6 +10,7 @@
 
 #include "atts_mensural.h"
 #include "atts_shared.h"
+#include "atts_midi.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -31,6 +32,7 @@ class ScoreDefInterface : public Interface,
                           public AttMensuralShared,
                           public AttMeterSigDefaultLog,
                           public AttMeterSigDefaultVis,
+                          public AttMiditempo,
                           public AttMultinummeasures {
 public:
     /**
@@ -41,7 +43,7 @@ public:
     ScoreDefInterface();
     virtual ~ScoreDefInterface();
     virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_SCOREDEF; };
+    virtual InterfaceId IsInterface() { return INTERFACE_SCOREDEF; }
     ///@}
 
 private:

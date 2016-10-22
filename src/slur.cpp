@@ -21,7 +21,7 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-Slur::Slur() : FloatingElement("slur-"), TimeSpanningInterface(), AttCurvature()
+Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttCurvature()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
     RegisterAttClass(ATT_CURVATURE);
@@ -35,7 +35,7 @@ Slur::~Slur()
 
 void Slur::Reset()
 {
-    FloatingElement::Reset();
+    ControlElement::Reset();
     TimeSpanningInterface::Reset();
     ResetCurvature();
 }

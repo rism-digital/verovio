@@ -36,23 +36,23 @@ public:
     Page();
     virtual ~Page();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Page"; };
-    virtual ClassId Is() const { return PAGE; };
+    virtual std::string GetClassName() const { return "Page"; }
+    virtual ClassId Is() const { return PAGE; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddSystem(System *system);
+    virtual void AddChild(Object *object);
     ///@}
 
-    int GetSystemCount() const { return (int)m_children.size(); };
+    int GetSystemCount() const { return (int)m_children.size(); }
 
     /**
      * Return the index position of the page in its document parent
      */
-    int GetPageIdx() const { return Object::GetIdx(); };
+    int GetPageIdx() const { return Object::GetIdx(); }
 
     /**
      * Return the position of the staff on the page, from top to bottom

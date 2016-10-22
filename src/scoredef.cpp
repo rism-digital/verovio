@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "clef.h"
+#include "editorial.h"
 #include "functorparams.h"
 #include "keysig.h"
 #include "mensur.h"
@@ -127,7 +128,6 @@ Clef *ScoreDefElement::GetClefCopy() const
     }
     // Always check if HasClefInfo() is true before asking for a copy
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
 
@@ -142,7 +142,6 @@ KeySig *ScoreDefElement::GetKeySigCopy() const
     }
     // Always check if HasKeySigInfo() is true before asking for a copy
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
 
@@ -157,7 +156,6 @@ Mensur *ScoreDefElement::GetMensurCopy() const
     }
     // Always check if HasMensurInfo() is true before asking for a copy
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
 
@@ -172,7 +170,6 @@ MeterSig *ScoreDefElement::GetMeterSigCopy() const
     }
     // Always check if HasMeterSigInfo() is true before asking for a copy
     assert(copy);
-    copy->SetScoreOrStaffDefAttr(true);
     return copy;
 }
 
@@ -180,8 +177,10 @@ MeterSig *ScoreDefElement::GetMeterSigCopy() const
 // ScoreDef
 //----------------------------------------------------------------------------
 
-ScoreDef::ScoreDef() : ScoreDefElement("scoredef-"), ObjectListInterface()
+ScoreDef::ScoreDef() : ScoreDefElement("scoredef-"), ObjectListInterface(), AttEndings()
 {
+    RegisterAttClass(ATT_ENDINGS);
+
     Reset();
 }
 
@@ -192,17 +191,28 @@ ScoreDef::~ScoreDef()
 void ScoreDef::Reset()
 {
     ScoreDefElement::Reset();
+    ResetEndings();
 
     m_drawLabels = false;
     m_drawingWidth = 0;
     m_setAsDrawing = false;
 }
 
-void ScoreDef::AddStaffGrp(StaffGrp *staffGrp)
+void ScoreDef::AddChild(Object *child)
 {
-    assert(m_children.empty());
-    staffGrp->SetParent(this);
-    m_children.push_back(staffGrp);
+    if (child->Is() == STAFFGRP) {
+        assert(dynamic_cast<StaffGrp *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
@@ -247,8 +257,7 @@ void ScoreDef::ReplaceDrawingValues(ScoreDef *newScoreDef)
     if (mensur) delete mensur;
     if (meterSig) delete meterSig;
 
-    // The keySig cancellation flag is the same as keySig because we draw cancellation with new key sig
-    this->SetRedrawFlags(drawClef, drawKeySig, drawMensur, drawMeterSig, drawKeySig, false);
+    this->SetRedrawFlags(drawClef, drawKeySig, drawMensur, drawMeterSig, false);
 }
 
 void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
@@ -268,7 +277,6 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
         }
         if (newStaffDef->HasKeySigInfo()) {
             staffDef->SetDrawKeySig(true);
-            staffDef->SetDrawKeySigCancellation(true);
             KeySig *keySig = newStaffDef->GetKeySigCopy();
             staffDef->SetCurrentKeySig(keySig);
             delete keySig;
@@ -286,7 +294,10 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
             delete meterSig;
         }
         // copy other attributes if present
-        if (newStaffDef->HasLabel()) staffDef->SetLabel(newStaffDef->GetLabel());
+        if (newStaffDef->HasLabel()) {
+            LogMessage(newStaffDef->GetLabel().c_str());
+            staffDef->SetLabel(newStaffDef->GetLabel());
+        }
         if (newStaffDef->HasLabelAbbr()) staffDef->SetLabelAbbr(newStaffDef->GetLabelAbbr());
     }
     else {
@@ -329,8 +340,7 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     return staffDef;
 }
 
-void ScoreDef::SetRedrawFlags(
-    bool clef, bool keySig, bool mensur, bool meterSig, bool keySigCancellation, bool applyToAll)
+void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll)
 {
     m_setAsDrawing = true;
 
@@ -339,7 +349,6 @@ void ScoreDef::SetRedrawFlags(
     setStaffDefRedrawFlagsParams.m_keySig = keySig;
     setStaffDefRedrawFlagsParams.m_mensur = mensur;
     setStaffDefRedrawFlagsParams.m_meterSig = meterSig;
-    setStaffDefRedrawFlagsParams.m_keySigCancellation = keySigCancellation;
     setStaffDefRedrawFlagsParams.m_applyToAll = applyToAll;
     Functor setStaffDefDraw(&Object::SetStaffDefRedrawFlags);
     this->Process(&setStaffDefDraw, &setStaffDefRedrawFlagsParams);
@@ -386,17 +395,24 @@ void StaffGrp::Reset()
     ResetStaffGrpVis();
 }
 
-void StaffGrp::AddStaffDef(StaffDef *staffDef)
+void StaffGrp::AddChild(Object *child)
 {
-    staffDef->SetParent(this);
-    m_children.push_back(staffDef);
-    Modify();
-}
+    if (child->Is() == STAFFDEF) {
+        assert(dynamic_cast<StaffDef *>(child));
+    }
+    else if (child->Is() == STAFFGRP) {
+        assert(dynamic_cast<StaffGrp *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
 
-void StaffGrp::AddStaffGrp(StaffGrp *staffGrp)
-{
-    staffGrp->SetParent(this);
-    m_children.push_back(staffGrp);
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
@@ -461,6 +477,17 @@ void StaffDef::Reset()
 // ScoreDef functor methods
 //----------------------------------------------------------------------------
 
+int ScoreDef::ConvertToPageBased(FunctorParams *functorParams)
+{
+    ConvertToPageBasedParams *params = dynamic_cast<ConvertToPageBasedParams *>(functorParams);
+    assert(params);
+
+    // Move itself to the pageBasedSystem - do not process children
+    this->MoveItselfTo(params->m_pageBasedSystem);
+
+    return FUNCTOR_SIBLINGS;
+}
+
 int ScoreDef::CastOffSystems(FunctorParams *functorParams)
 {
     CastOffSystemsParams *params = dynamic_cast<CastOffSystemsParams *>(functorParams);
@@ -474,12 +501,23 @@ int ScoreDef::CastOffSystems(FunctorParams *functorParams)
     // from the content System because this screws up the iterator. Relinquish gives up
     // the ownership of the Measure - the contentSystem will be deleted afterwards.
     ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(params->m_contentSystem->Relinquish(this->GetIdx()));
-    params->m_currentSystem->AddScoreDef(scoreDef);
+    // move as pending since we want it at the beginning of the system in case of system break coming
+    params->m_pendingObjects.push_back(scoreDef);
     // This is not perfect since now the scoreDefWith is the one of the intermediate scoreDefs (and not
     // the initial one - for this to be corrected, we would need two parameters, one for the current initial
     // scoreDef and one for the current that will be the initial one at the next system
     // Also, the abbr label (width) changes would not be taken into account
     params->m_currentScoreDefWidth = this->GetDrawingWidth() + params->m_contentSystem->GetDrawingAbbrLabelsWidth();
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int ScoreDef::CastOffEncoding(FunctorParams *functorParams)
+{
+    CastOffEncodingParams *params = dynamic_cast<CastOffEncodingParams *>(functorParams);
+    assert(params);
+
+    MoveItselfTo(params->m_currentSystem);
 
     return FUNCTOR_SIBLINGS;
 }
@@ -525,9 +563,6 @@ int StaffDef::SetStaffDefRedrawFlags(FunctorParams *functorParams)
     }
     if (params->m_meterSig || params->m_applyToAll) {
         this->SetDrawMeterSig(params->m_meterSig);
-    }
-    if (params->m_keySigCancellation || params->m_applyToAll) {
-        this->SetDrawKeySigCancellation(params->m_keySigCancellation);
     }
 
     return FUNCTOR_CONTINUE;

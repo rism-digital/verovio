@@ -11,6 +11,8 @@ function print_help {
 VEROVIO_ROOT=..
 VEROVIO_INCLUDE=../include
 VEROVIO_INCLUDE_VRV=../include/vrv
+VEROVIO_INCLUDE_HUM=../include/hum
+VEROVIO_INCLUDE_JSON=../include/json
 VEROVIO_INCLUDE_MIDI=../include/midi
 VEROVIO_INCLUDE_PUGI=../include/pugi
 VEROVIO_INCLUDE_UTF8=../include/utf8
@@ -98,6 +100,8 @@ python $EMCC $CHATTY \
 	-I./lib/jsonxx \
 	-I$VEROVIO_INCLUDE \
 	-I$VEROVIO_INCLUDE_VRV \
+	-I$VEROVIO_INCLUDE_HUM \
+	-I$VEROVIO_INCLUDE_JSON \
 	-I$VEROVIO_INCLUDE_MIDI \
 	-I$VEROVIO_INCLUDE_PUGI \
 	-I$VEROVIO_INCLUDE_UTF8 \
@@ -130,6 +134,7 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/hairpin.cpp \
 	$VEROVIO_ROOT/src/io.cpp \
 	$VEROVIO_ROOT/src/iodarms.cpp \
+	$VEROVIO_ROOT/src/iohumdrum.cpp \
 	$VEROVIO_ROOT/src/iomei.cpp \
 	$VEROVIO_ROOT/src/iomusxml.cpp \
 	$VEROVIO_ROOT/src/iopae.cpp \
@@ -181,6 +186,8 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/src/view_text.cpp \
 	$VEROVIO_ROOT/src/view_tuplet.cpp \
 	$VEROVIO_ROOT/src/vrv.cpp \
+	$VEROVIO_ROOT/src/hum/humlib.cpp \
+	$VEROVIO_ROOT/src/json/jsonxx.cc \
 	$VEROVIO_ROOT/src/pugi/pugixml.cpp \
 	$VEROVIO_ROOT/src/midi/Binasc.cpp \
 	$VEROVIO_ROOT/src/midi/MidiEvent.cpp \
@@ -194,7 +201,6 @@ python $EMCC $CHATTY \
 	$VEROVIO_ROOT/libmei/atts_mensural.cpp \
 	$VEROVIO_ROOT/libmei/atts_pagebased.cpp \
 	$VEROVIO_ROOT/libmei/atts_shared.cpp \
-	lib/jsonxx/jsonxx.cc \
 	--embed-file data/ \
 	-s EXPORTED_FUNCTIONS="[\
 		'_vrvToolkit_constructor',\

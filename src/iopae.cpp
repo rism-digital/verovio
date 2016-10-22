@@ -24,11 +24,11 @@
 #include "metersig.h"
 #include "multirest.h"
 #include "note.h"
-#include "page.h"
 #include "rest.h"
+#include "score.h"
 #include "scoredef.h"
+#include "section.h"
 #include "staff.h"
-#include "system.h"
 #include "tuplet.h"
 #include "vrv.h"
 
@@ -94,7 +94,7 @@ bool PaeInput::ImportFile()
 #endif
 }
 
-bool PaeInput::ImportString(std::string pae)
+bool PaeInput::ImportString(std::string const &pae)
 {
 #ifndef NO_PAE_SUPPORT
     std::istringstream in_stream(pae);
@@ -137,7 +137,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     while (!infile.eof()) {
         infile.getline(data_line, 10000);
         if (infile.eof()) {
-            LogDebug("Truncated file or ending tag missing");
+            // LogDebug("Truncated file or ending tag missing");
             // exit(1);
         }
         getAtRecordKeyValue(data_key, data_value, data_line);
@@ -370,8 +370,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     }
 
     m_doc->SetType(Raw);
-    Page *page = new Page();
-    System *system = new System();
+    Score *score = m_doc->CreateScoreBuffer();
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
 
     int measure_count = 1;
 
@@ -383,8 +385,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         m_layer = new Layer();
         m_layer->SetN(1);
 
-        m_staff->AddLayer(m_layer);
-        m_measure->AddStaff(m_staff);
+        m_staff->AddChild(m_layer);
+        m_measure->AddChild(m_staff);
 
         pae::Measure obj = *it;
 
@@ -403,10 +405,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
                 delete obj.meter;
                 obj.meter = NULL;
             }
-            system->AddScoreDef(scoreDef);
+            section->AddChild(scoreDef);
         }
 
-        system->AddMeasure(m_measure);
+        section->AddChild(m_measure);
 
         convertMeasure(&obj);
         measure_count++;
@@ -434,11 +436,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         m_doc->m_scoreDef.SetMeterSym(scoreDefMeterSig->GetSym());
         delete scoreDefMeterSig;
     }
-    staffGrp->AddStaffDef(staffDef);
-    m_doc->m_scoreDef.AddStaffGrp(staffGrp);
+    staffGrp->AddChild(staffDef);
+    m_doc->m_scoreDef.AddChild(staffGrp);
 
-    page->AddSystem(system);
-    m_doc->AddPage(page);
+    m_doc->ConvertToPageBasedDoc();
 }
 
 //////////////////////////////
@@ -531,7 +532,7 @@ int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index
     // int j = 0;
     do {
         int dot;
-        data_DURATION dur;
+        data_DURATION dur = DURATION_4;
         // measure->dots.setSize(j+1);
         i += getDuration(incipit, &dur, &dot, i);
         measure->durations.push_back(dur);
@@ -1119,13 +1120,13 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
 void PaeInput::convertMeasure(pae::Measure *measure)
 {
     if (measure->clef != NULL) {
-        m_layer->AddLayerElement(measure->clef);
+        m_layer->AddChild(measure->clef);
     }
 
     if (measure->wholerest > 0) {
         MultiRest *mr = new MultiRest();
         mr->SetNum(measure->wholerest);
-        m_layer->AddLayerElement(mr);
+        m_layer->AddChild(mr);
     }
 
     m_nested_objects.clear();
@@ -1292,26 +1293,10 @@ void PaeInput::popContainer()
 void PaeInput::addLayerElement(LayerElement *element)
 {
     if (m_nested_objects.size() > 0) {
-        LayerElement *bottom = m_nested_objects.back();
-
-        if (bottom->Is() == BEAM) {
-            Beam *beam = dynamic_cast<Beam *>(bottom);
-            assert(beam);
-            beam->AddLayerElement(element);
-        }
-        else if (bottom->Is() == TUPLET) {
-            Tuplet *tuplet = dynamic_cast<Tuplet *>(bottom);
-            assert(tuplet);
-            tuplet->AddLayerElement(element);
-        }
-        else if (bottom->Is() == CHORD) {
-            Chord *chord = dynamic_cast<Chord *>(bottom);
-            assert(chord);
-            chord->AddLayerElement(element);
-        }
+        m_nested_objects.back()->AddChild(element);
     }
     else {
-        m_layer->AddLayerElement(element);
+        m_layer->AddChild(element);
     }
 }
 

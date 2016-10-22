@@ -43,17 +43,17 @@ public:
     Ligature();
     virtual ~Ligature();
     virtual void Reset();
-    virtual std::string GetClassName() { return "Ligature"; };
-    virtual ClassId Is() { return LIGATURE; };
+    virtual std::string GetClassName() const { return "Ligature"; }
+    virtual ClassId Is() const { return LIGATURE; }
     ///@}
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     /**
      * Add an element (only notes are supported) to a ligature.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
     virtual void FilterList(ListOfObjects *childlist);
 

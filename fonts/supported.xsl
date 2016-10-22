@@ -107,8 +107,8 @@
             <glyph glyph-code="E066" smufl-name="fClef15ma"/>
             <!--<glyph glyph-code="E067" smufl-name="fClefArrowUp"/>-->
             <!--<glyph glyph-code="E068" smufl-name="fClefArrowDown"/>-->
-            <!--<glyph glyph-code="E069" smufl-name="unpitchedPercussionClef1"/>-->
-            <!--<glyph glyph-code="E06A" smufl-name="unpitchedPercussionClef2"/>-->
+            <glyph glyph-code="E069" smufl-name="unpitchedPercussionClef1"/>
+            <glyph glyph-code="E06A" smufl-name="unpitchedPercussionClef2"/>
             <!--<glyph glyph-code="E06B" smufl-name="semipitchedPercussionClef1"/>-->
             <!--<glyph glyph-code="E06C" smufl-name="semipitchedPercussionClef2"/>-->
             <!--<glyph glyph-code="E06F" smufl-name="cClefTriangular"/>-->

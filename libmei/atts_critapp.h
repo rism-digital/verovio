@@ -49,8 +49,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetCause(std::string cause_) { m_cause = cause_; };
-    std::string GetCause() const { return m_cause; };
+    void SetCause(std::string cause_) { m_cause = cause_; }
+    std::string GetCause() const { return m_cause; }
     bool HasCause() const;
     ///@}
 
@@ -88,8 +88,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetSource(std::string source_) { m_source = source_; };
-    std::string GetSource() const { return m_source; };
+    void SetSource(std::string source_) { m_source = source_; }
+    std::string GetSource() const { return m_source; }
     bool HasSource() const;
     ///@}
 

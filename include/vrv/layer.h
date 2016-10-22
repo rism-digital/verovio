@@ -39,22 +39,22 @@ public:
     Layer();
     virtual ~Layer();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Layer"; };
-    virtual ClassId Is() const { return LAYER; };
+    virtual std::string GetClassName() const { return "Layer"; }
+    virtual ClassId Is() const { return LAYER; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddLayerElement(LayerElement *element, int idx = -1);
+    virtual void AddChild(Object *object);
     ///@}
 
     /**
      * Return the index position of the layer in its staff parent.
      * The index position is 0-based.
      */
-    int GetLayerIdx() const { return Object::GetIdx(); };
+    int GetLayerIdx() const { return Object::GetIdx(); }
 
     LayerElement *GetPrevious(LayerElement *element);
     LayerElement *GetAtPos(int x);
@@ -79,8 +79,8 @@ public:
      * This stays STEMDIRECTION_NONE with on single layer in the staff.
      */
     ///@{
-    void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; };
-    data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; };
+    void SetDrawingStemDir(data_STEMDIRECTION stemDirection) { m_drawingStemDir = stemDirection; }
+    data_STEMDIRECTION GetDrawingStemDir() const { return m_drawingStemDir; }
     ///@}
 
     Clef *GetCurrentClef() const;
@@ -88,53 +88,69 @@ public:
     Mensur *GetCurrentMensur() const;
     MeterSig *GetCurrentMeterSig() const;
 
-    void ResetStaffDefOjects();
+    void ResetStaffDefObjects();
 
     /**
      * Set drawing clef, keysig and mensur if necessary and if available.
      */
-    void SetDrawingAndCurrentValues(StaffDef *currentStaffDef);
+    void SetDrawingStaffDefValues(StaffDef *currentStaffDef);
 
-    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; };
-    void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; };
-    Clef *GetStaffDefClef() { return m_staffDefClef; };
-    KeySig *GetStaffDefKeySig() { return m_staffDefKeySig; };
-    Mensur *GetStaffDefMensur() { return m_staffDefMensur; };
-    MeterSig *GetStaffDefMeterSig() { return m_staffDefMeterSig; };
+    bool DrawKeySigCancellation() const { return m_drawKeySigCancellation; }
+    void SetDrawKeySigCancellation(bool drawKeySigCancellation) { m_drawKeySigCancellation = drawKeySigCancellation; }
+    Clef *GetStaffDefClef() { return m_staffDefClef; }
+    KeySig *GetStaffDefKeySig() { return m_staffDefKeySig; }
+    Mensur *GetStaffDefMensur() { return m_staffDefMensur; }
+    MeterSig *GetStaffDefMeterSig() { return m_staffDefMeterSig; }
+    bool HasStaffDef() { return (m_staffDefClef || m_staffDefKeySig || m_staffDefMensur || m_staffDefMeterSig); }
+
+    /**
+     * Set drawing clef, keysig and mensur if necessary and if available.
+     */
+    void SetDrawingCautionValues(StaffDef *currentStaffDef);
+
+    bool DrawCautionKeySigCancel() const { return m_drawCautionKeySigCancel; }
+    void SetDrawCautionKeySigCancel(bool drawCautionKeySig) { m_drawCautionKeySigCancel = drawCautionKeySig; }
+    Clef *GetCautionStaffDefClef() { return m_cautionStaffDefClef; }
+    KeySig *GetCautionStaffDefKeySig() { return m_cautionStaffDefKeySig; }
+    Mensur *GetCautionStaffDefMensur() { return m_cautionStaffDefMensur; }
+    MeterSig *GetCautionStaffDefMeterSig() { return m_cautionStaffDefMeterSig; }
+    bool HasCautionStaffDef()
+    {
+        return (
+            m_cautionStaffDefClef || m_cautionStaffDefKeySig || m_cautionStaffDefMensur || m_cautionStaffDefMeterSig);
+    }
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * Unset the initial scoreDef of each system and measure
+     * See Object::UnsetCurrentScoreDef
      */
     virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
-     * Align horizontally the content of a layer.
+     * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
-     * Align horizontally the content of a layer.
+     * See Object::AlignHorizontallyEnd
      */
     virtual int AlignHorizontallyEnd(FunctorParams *functorParams);
 
     /**
-     * Builds a tree of ints (IntTree) with the staff/layer/verse numbers
-     * and for staff/layer to be then processed.
+     * See Object::PrepareProcessingLists
      */
     virtual int PrepareProcessingLists(FunctorParams *functorParams);
 
     /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     * See Object::SetDrawingXY
      */
     virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
-     * Functor for setting mRpt drawing numbers (if required)
-     * See implementation and Object::PrepareRpt
+     * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
 
@@ -159,6 +175,13 @@ private:
     Mensur *m_staffDefMensur;
     MeterSig *m_staffDefMeterSig;
     bool m_drawKeySigCancellation;
+
+    /** */
+    Clef *m_cautionStaffDefClef;
+    KeySig *m_cautionStaffDefKeySig;
+    Mensur *m_cautionStaffDefMensur;
+    MeterSig *m_cautionStaffDefMeterSig;
+    bool m_drawCautionKeySigCancel;
 };
 
 } // namespace vrv

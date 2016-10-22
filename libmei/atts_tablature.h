@@ -49,12 +49,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTabFret(data_FRETNUMBER tabFret_) { m_tabFret = tabFret_; };
-    data_FRETNUMBER GetTabFret() const { return m_tabFret; };
+    void SetTabFret(data_FRETNUMBER tabFret_) { m_tabFret = tabFret_; }
+    data_FRETNUMBER GetTabFret() const { return m_tabFret; }
     bool HasTabFret() const;
     //
-    void SetTabString(data_STRINGNUMBER tabString_) { m_tabString = tabString_; };
-    data_STRINGNUMBER GetTabString() const { return m_tabString; };
+    void SetTabString(data_STRINGNUMBER tabString_) { m_tabString = tabString_; }
+    data_STRINGNUMBER GetTabString() const { return m_tabString; }
     bool HasTabString() const;
     ///@}
 
@@ -91,8 +91,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetTabStrings(std::string tabStrings_) { m_tabStrings = tabStrings_; };
-    std::string GetTabStrings() const { return m_tabStrings; };
+    void SetTabStrings(std::string tabStrings_) { m_tabStrings = tabStrings_; }
+    std::string GetTabStrings() const { return m_tabStrings; }
     bool HasTabStrings() const;
     ///@}
 

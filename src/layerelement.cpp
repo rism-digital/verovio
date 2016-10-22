@@ -71,7 +71,7 @@ void LayerElement::Reset()
     m_drawingX = 0;
     m_drawingY = 0;
 
-    m_isScoreOrStaffDefAttr = false;
+    m_scoreDefRole = NONE;
     m_alignment = NULL;
     m_beamElementCoord = NULL;
 }
@@ -135,8 +135,17 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
     if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
         DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
-        if (durationInterface->GetNoteOrChordDur(this) < DUR_2)
-            return this->GetDrawingY() + doc->GetDrawingUnit(staffSize);
+        if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
+            if (this->Is() == CHORD) {
+                int yChordMax = 0, yChordMin = 0;
+                Chord *chord = dynamic_cast<Chord *>(this);
+                assert(chord);
+                chord->GetYExtremes(&yChordMax, &yChordMin);
+                return yChordMax + doc->GetDrawingUnit(staffSize);
+            }
+            else
+                return this->GetDrawingY() + doc->GetDrawingUnit(staffSize);
+        }
         // We should also take into accound the stem shift to the right
         StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
@@ -155,8 +164,17 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize)
     if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
         DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
-        if (durationInterface->GetNoteOrChordDur(this) < DUR_2)
-            return this->GetDrawingY() - doc->GetDrawingUnit(staffSize);
+        if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
+            if (this->Is() == CHORD) {
+                int yChordMax = 0, yChordMin = 0;
+                Chord *chord = dynamic_cast<Chord *>(this);
+                assert(chord);
+                chord->GetYExtremes(&yChordMax, &yChordMin);
+                return yChordMin - doc->GetDrawingUnit(staffSize);
+            }
+            else
+                return this->GetDrawingY() - doc->GetDrawingUnit(staffSize);
+        }
         // We should also take into accound the stem shift to the right
         StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
@@ -276,6 +294,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
+    this->SetScoreDefRole(params->m_scoreDefRole);
+
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
@@ -287,17 +307,19 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_BARLINE;
     }
     else if (this->Is() == CLEF) {
-        if (this->GetScoreOrStaffDefAttr()) {
+        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
             type = ALIGNMENT_SCOREDEF_CLEF;
-        }
+        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+            type = ALIGNMENT_SCOREDEF_CAUTION_CLEF;
         else {
             type = ALIGNMENT_CLEF;
         }
     }
     else if (this->Is() == KEYSIG) {
-        if (this->GetScoreOrStaffDefAttr()) {
+        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
             type = ALIGNMENT_SCOREDEF_KEYSIG;
-        }
+        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+            type = ALIGNMENT_SCOREDEF_CAUTION_KEYSIG;
         else {
             // type = ALIGNMENT_KEYSIG;
             // We force this because they should appear only at the beginning of a measure and should be non-justifiable
@@ -306,9 +328,10 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
     }
     else if (this->Is() == MENSUR) {
-        if (this->GetScoreOrStaffDefAttr()) {
+        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
             type = ALIGNMENT_SCOREDEF_MENSUR;
-        }
+        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+            type = ALIGNMENT_SCOREDEF_CAUTION_MENSUR;
         else {
             // replace the current mensur
             params->m_currentMensur = dynamic_cast<Mensur *>(this);
@@ -317,9 +340,10 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
     }
     else if (this->Is() == METERSIG) {
-        if (this->GetScoreOrStaffDefAttr()) {
+        if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
             type = ALIGNMENT_SCOREDEF_METERSIG;
-        }
+        else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
+            type = ALIGNMENT_SCOREDEF_CAUTION_METERSIG;
         else {
             // replace the current meter signature
             params->m_currentMeterSig = dynamic_cast<MeterSig *>(this);
@@ -339,7 +363,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->IsGraceNote()) {
         type = ALIGNMENT_GRACENOTE;
     }
-    else if ((this->Is() == BEAM) || (this->Is() == TUPLET) || (this->Is() == VERSE) || (this->Is() == SYL)) {
+    else if ((this->Is() == BEAM) || (this->Is() == TUPLET)) {
         type = ALIGNMENT_CONTAINER;
     }
     else if (this->Is() == DOT) {
@@ -347,6 +371,20 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (this->Is() == ACCID) {
         type = ALIGNMENT_ACCID;
+    }
+    else if (this->Is() == SYL) {
+        // Refer to the note parent
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        assert(note);
+        m_alignment = note->GetAlignment();
+        return FUNCTOR_CONTINUE;
+    }
+    else if (this->Is() == VERSE) {
+        // Idem
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        assert(note);
+        m_alignment = note->GetAlignment();
+        return FUNCTOR_CONTINUE;
     }
 
     // get the duration of the event
@@ -513,9 +551,9 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::TimeSpanningLayerElements(FunctorParams *functorParams)
+int LayerElement::FindTimeSpanningLayerElements(FunctorParams *functorParams)
 {
-    TimeSpanningLayerElementsParams *params = dynamic_cast<TimeSpanningLayerElementsParams *>(functorParams);
+    FindTimeSpanningLayerElementsParams *params = dynamic_cast<FindTimeSpanningLayerElementsParams *>(functorParams);
     assert(params);
 
     if ((this->GetDrawingX() > params->m_minPos) && (this->GetDrawingX() < params->m_maxPos)) {
@@ -542,7 +580,7 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
         // assert(rest);
         // LogMessage("Rest %f", GetAlignmentDuration());
         // increase the currentTime accordingly
-        params->m_currentMeasureTime += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
+        params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
     }
     else if (this->Is() == NOTE) {
         Note *note = dynamic_cast<Note *>(this);
@@ -558,7 +596,7 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
             dur = chord->GetAlignmentDuration();
         else
             dur = note->GetAlignmentDuration();
-        dur = dur * 120 / (DUR_MAX / DURATION_4);
+        dur = dur * params->m_currentBpm / (DUR_MAX / DURATION_4);
 
         // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
         // note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
@@ -624,7 +662,7 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
 
         // increase the currentTime accordingly, but only if not in a chord - checkit with note->IsChordTone()
         if (!(note->IsChordTone())) {
-            params->m_currentMeasureTime += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
+            params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
         }
     }
     else if (this->Is() == SPACE) {
@@ -632,7 +670,7 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
         // assert(space);
         // LogMessage("Space %f", GetAlignmentDuration());
         // increase the currentTime accordingly
-        params->m_currentMeasureTime += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
+        params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
     }
     return FUNCTOR_CONTINUE;
 }
@@ -647,7 +685,7 @@ int LayerElement::GenerateMIDIEnd(FunctorParams *functorParams)
         // assert(chord);
         // LogMessage("Chord %f", GetAlignmentDuration());
         // increase the currentTime accordingly.
-        params->m_currentMeasureTime += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
+        params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
     }
 
     return FUNCTOR_CONTINUE;
@@ -673,7 +711,7 @@ int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
     }
 
     // increase the currentTime accordingly
-    params->m_currentValue += GetAlignmentDuration() * 120 / (DUR_MAX / DURATION_4);
+    params->m_currentValue += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
 
     // now if we have cummulated in the layer a longer duration for the current measure, replace it
     if (params->m_maxValues.back() < params->m_currentValue) params->m_maxValues.back() = params->m_currentValue;

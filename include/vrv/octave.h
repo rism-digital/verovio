@@ -10,7 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
-#include "floatingelement.h"
+#include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -19,7 +19,7 @@ namespace vrv {
 // Octave
 //----------------------------------------------------------------------------
 
-class Octave : public FloatingElement, public TimeSpanningInterface, public AttOctavedisplacement {
+class Octave : public ControlElement, public TimeSpanningInterface, public AttOctavedisplacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -29,8 +29,8 @@ public:
     Octave();
     virtual ~Octave();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Octave"; };
-    virtual ClassId Is() const { return OCTAVE; };
+    virtual std::string GetClassName() const { return "Octave"; }
+    virtual ClassId Is() const { return OCTAVE; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

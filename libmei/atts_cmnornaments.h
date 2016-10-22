@@ -49,12 +49,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetForm(mordentLog_FORM form_) { m_form = form_; };
-    mordentLog_FORM GetForm() const { return m_form; };
+    void SetForm(mordentLog_FORM form_) { m_form = form_; }
+    mordentLog_FORM GetForm() const { return m_form; }
     bool HasForm() const;
     //
-    void SetLong(data_BOOLEAN long_) { m_long = long_; };
-    data_BOOLEAN GetLong() const { return m_long; };
+    void SetLong(data_BOOLEAN long_) { m_long = long_; }
+    data_BOOLEAN GetLong() const { return m_long; }
     bool HasLong() const;
     ///@}
 
@@ -94,8 +94,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOrnam(data_ORNAM_cmn ornam_) { m_ornam = ornam_; };
-    data_ORNAM_cmn GetOrnam() const { return m_ornam; };
+    void SetOrnam(data_ORNAM_cmn ornam_) { m_ornam = ornam_; }
+    data_ORNAM_cmn GetOrnam() const { return m_ornam; }
     bool HasOrnam() const;
     ///@}
 
@@ -134,12 +134,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetAccidupper(data_ACCIDENTAL_EXPLICIT accidupper_) { m_accidupper = accidupper_; };
-    data_ACCIDENTAL_EXPLICIT GetAccidupper() const { return m_accidupper; };
+    void SetAccidupper(data_ACCIDENTAL_EXPLICIT accidupper_) { m_accidupper = accidupper_; }
+    data_ACCIDENTAL_EXPLICIT GetAccidupper() const { return m_accidupper; }
     bool HasAccidupper() const;
     //
-    void SetAccidlower(data_ACCIDENTAL_EXPLICIT accidlower_) { m_accidlower = accidlower_; };
-    data_ACCIDENTAL_EXPLICIT GetAccidlower() const { return m_accidlower; };
+    void SetAccidlower(data_ACCIDENTAL_EXPLICIT accidlower_) { m_accidlower = accidlower_; }
+    data_ACCIDENTAL_EXPLICIT GetAccidlower() const { return m_accidlower; }
     bool HasAccidlower() const;
     ///@}
 
@@ -176,12 +176,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetDelayed(data_BOOLEAN delayed_) { m_delayed = delayed_; };
-    data_BOOLEAN GetDelayed() const { return m_delayed; };
+    void SetDelayed(data_BOOLEAN delayed_) { m_delayed = delayed_; }
+    data_BOOLEAN GetDelayed() const { return m_delayed; }
     bool HasDelayed() const;
     //
-    void SetForm(turnLog_FORM form_) { m_form = form_; };
-    turnLog_FORM GetForm() const { return m_form; };
+    void SetForm(turnLog_FORM form_) { m_form = form_; }
+    turnLog_FORM GetForm() const { return m_form; }
     bool HasForm() const;
     ///@}
 

@@ -10,12 +10,13 @@
 //----------------------------------------------------------------------------
 
 #include <assert.h>
+#define _USE_MATH_DEFINES // needed by Windows for math constants like "M_PI"
 #include <math.h>
 
 //----------------------------------------------------------------------------
 
 #include "doc.h"
-#include "floatingelement.h"
+#include "floatingobject.h"
 #include "glyph.h"
 #include "layerelement.h"
 #include "view.h"
@@ -146,6 +147,9 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     std::transform(baseClass.begin(), baseClass.begin() + 1, baseClass.begin(), ::tolower);
     if (gClass.length() > 0) {
         baseClass.append(" " + gClass);
+    }
+    if (object->HasSVGClass()) {
+        baseClass.append(" " + object->GetSVGClass());
     }
 
     m_currentNode = m_currentNode.append_child("g");
@@ -690,10 +694,10 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
     if (drawBoundingBox && view) {
         BoundingBox *box = object;
         // For floating elements, get the current bounding box set by System::SetCurrentFloatingPositioner
-        if (object->IsFloatingElement()) {
-            FloatingElement *floatingElement = dynamic_cast<FloatingElement *>(object);
-            assert(floatingElement);
-            box = floatingElement->GetCurrentFloatingPositioner();
+        if (object->IsFloatingObject()) {
+            FloatingObject *floatingObject = dynamic_cast<FloatingObject *>(object);
+            assert(floatingObject);
+            box = floatingObject->GetCurrentFloatingPositioner();
             // No bounding box found, ignore the object - this happens when the @staff is missing because the element is
             // never drawn but there is still a EndGraphic call.
             if (!box) return;

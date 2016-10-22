@@ -36,7 +36,7 @@ public:
     TimePointInterface();
     virtual ~TimePointInterface();
     virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_TIME_POINT; };
+    virtual InterfaceId IsInterface() { return INTERFACE_TIME_POINT; }
     ///@}
 
     /**
@@ -45,7 +45,7 @@ public:
      */
     ///@{
     void SetStart(LayerElement *start);
-    LayerElement *GetStart() { return m_start; };
+    LayerElement *GetStart() { return m_start; }
     ///@}
 
     /**
@@ -56,7 +56,7 @@ public:
     /**
      * Return true if a start is given (@startid or @tstamp)
      */
-    bool HasStart() { return (m_start); };
+    bool HasStart() { return (m_start); }
 
     /**
      * Return the start measure of the TimePointInterface
@@ -82,7 +82,7 @@ public:
      * We have functor in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor method. These not called by the Process/Call loop but by the implementaion
-     * classes explicitely. See FloatingElement::FillStaffCurrentTimeSpanning for an example.
+     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
      */
 
     /**
@@ -135,7 +135,7 @@ public:
     TimeSpanningInterface();
     virtual ~TimeSpanningInterface();
     virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; };
+    virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
@@ -146,7 +146,7 @@ public:
      */
     ///@{
     void SetEnd(LayerElement *end);
-    LayerElement *GetEnd() { return m_end; };
+    LayerElement *GetEnd() { return m_end; }
     ///@}
 
     /**
@@ -157,7 +157,7 @@ public:
     /**
      *
      */
-    bool HasStartAndEnd() { return (m_start && m_end); };
+    bool HasStartAndEnd() { return (m_start && m_end); }
 
     /**
      * Return the end measure of the TimePointInterface
@@ -182,7 +182,7 @@ public:
      * We have functors in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor methods. These are not called by the Process/Call loop but by the implementation
-     * classes explicitely. See FloatingElement::FillStaffCurrentTimeSpanning for an example.
+     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
      */
 
     /**

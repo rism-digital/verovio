@@ -29,14 +29,14 @@ public:
     Dot();
     virtual ~Dot();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Dot"; };
-    virtual ClassId Is() const { return DOT; };
+    virtual std::string GetClassName() const { return "Dot"; }
+    virtual ClassId Is() const { return DOT; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     //----------//
     // Functors //
@@ -48,7 +48,7 @@ public:
     virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 

@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "doc.h"
+#include "editorial.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "keysig.h"
@@ -60,14 +61,28 @@ void Staff::Reset()
     m_drawingStaffDef = NULL;
 }
 
-void Staff::AddLayer(Layer *layer)
+void Staff::AddChild(Object *child)
 {
-    layer->SetParent(this);
-    m_children.push_back(layer);
-
-    if (layer->GetN() < 1) {
-        layer->SetN(this->GetLayerCount());
+    if (child->Is() == LAYER) {
+        Layer *layer = dynamic_cast<Layer *>(child);
+        assert(layer);
+        if (layer && (layer->GetN() < 1)) {
+            // This is not 100% safe if we have a <app> and <rdg> with more than
+            // one layer as a previous child.
+            layer->SetN(this->GetChildCount());
+        }
     }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
 }
 
 int Staff::GetVerticalSpacing()

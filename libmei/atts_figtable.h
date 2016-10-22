@@ -49,12 +49,12 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetColspan(int colspan_) { m_colspan = colspan_; };
-    int GetColspan() const { return m_colspan; };
+    void SetColspan(int colspan_) { m_colspan = colspan_; }
+    int GetColspan() const { return m_colspan; }
     bool HasColspan() const;
     //
-    void SetRowspan(int rowspan_) { m_rowspan = rowspan_; };
-    int GetRowspan() const { return m_rowspan; };
+    void SetRowspan(int rowspan_) { m_rowspan = rowspan_; }
+    int GetRowspan() const { return m_rowspan; }
     bool HasRowspan() const;
     ///@}
 

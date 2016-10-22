@@ -47,7 +47,7 @@ public:
         m_drawingBoundingBoxes = false;
         m_isDeactivatedX = false;
         m_isDeactivatedY = false;
-    };
+    }
     virtual ~DeviceContext(){};
     virtual ClassId Is() const;
     ///@}
@@ -181,14 +181,14 @@ public:
     ///@}
 
     /** Colour conversion method **/
-    static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); };
+    static int RGB2Int(char red, char green, char blue) { return (red << 16 | green << 8 | blue); }
 
     /**
      * @name Getter and setter for drawing bounding box option (debug)
      */
     ///@{
-    virtual void SetDrawBoundingBoxes(bool b) { m_drawingBoundingBoxes = b; };
-    virtual bool GetDrawBoundingBoxes() { return m_drawingBoundingBoxes; };
+    virtual void SetDrawBoundingBoxes(bool b) { m_drawingBoundingBoxes = b; }
+    virtual bool GetDrawBoundingBoxes() { return m_drawingBoundingBoxes; }
     ///@}
 
 protected:
