@@ -2125,11 +2125,11 @@
             <description>Medieval and Renaissance clefs</description>
             <!--<glyph glyph-code="E900" smufl-name="mensuralGclef"/>-->
             <glyph glyph-code="E901" smufl-name="mensuralGclefPetrucci"/>
-            <!--<glyph glyph-code="E902" smufl-name="chantFclef"/>-->
+            <glyph glyph-code="E902" smufl-name="chantFclef"/>
             <!--<glyph glyph-code="E903" smufl-name="mensuralFclef"/>-->
             <glyph glyph-code="E904" smufl-name="mensuralFclefPetrucci"/>
             <!--<glyph glyph-code="E905" smufl-name="mensuralCclef"/>-->
-            <!--<glyph glyph-code="E906" smufl-name="chantCclef"/>-->
+            <glyph glyph-code="E906" smufl-name="chantCclef"/>
             <!--<glyph glyph-code="E907" smufl-name="mensuralCclefPetrucciPosLowest"/>-->
             <!--<glyph glyph-code="E908" smufl-name="mensuralCclefPetrucciPosLow"/>-->
             <glyph glyph-code="E909" smufl-name="mensuralCclefPetrucciPosMiddle"/>
