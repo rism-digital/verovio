@@ -250,6 +250,7 @@ protected:
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken);
     void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
+    void addOrnamentMarkers(hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
