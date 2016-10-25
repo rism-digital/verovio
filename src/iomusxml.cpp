@@ -481,6 +481,24 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (clefLine && HasContent(clefLine.node())) {
                 staffDef->SetClefLine(staffDef->AttCleffingLog::StrToInt(clefLine.node().text().as_string()));
             }
+            // clef octave change
+            pugi::xpath_node clefOctaveChange;
+            xpath = StringFormat("clef[@number='%d']/clef-octave-change", i + 1);
+            clefOctaveChange = it->select_single_node(xpath.c_str());
+            if (!clefOctaveChange) {
+                clefOctaveChange = it->select_single_node("clef/clef-octave-change");
+            }
+            if (clefOctaveChange && HasContent(clefOctaveChange.node())) {
+                int change = clefOctaveChange.node().text().as_int();
+                if (abs(change) == 1)
+                    staffDef->SetClefDis(OCTAVE_DIS_8);
+                else if (abs(change) == 2)
+                    staffDef->SetClefDis(OCTAVE_DIS_15);
+                if (change < 0)
+                    staffDef->SetClefDisPlace(PLACE_below);
+                else
+                    staffDef->SetClefDisPlace(PLACE_above);
+            }
             // key sig
             pugi::xpath_node keyFifths;
             xpath = StringFormat("key[@number='%d']/fifths", i + 1);
@@ -602,6 +620,19 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Measure *measure
             Clef *meiClef = new Clef();
             meiClef->SetShape(meiClef->AttClefshape::StrToClefshape(GetContent(clefSign.node())));
             meiClef->SetLine(meiClef->AttClefshape::StrToInt(clefLine.node().text().as_string()));
+            // clef octave change
+            pugi::xpath_node clefOctaveChange = clef.node().select_single_node("clef-octave-change");
+            if (clefOctaveChange && HasContent(clefOctaveChange.node())) {
+                int change = clefOctaveChange.node().text().as_int();
+                if (abs(change) == 1)
+                    meiClef->SetDis(OCTAVE_DIS_8);
+                else if (abs(change) == 2)
+                    meiClef->SetDis(OCTAVE_DIS_15);
+                if (change < 0)
+                    meiClef->SetDisPlace(PLACE_below);
+                else
+                    meiClef->SetDisPlace(PLACE_above);
+            }
             AddLayerElement(layer, meiClef);
         }
     }

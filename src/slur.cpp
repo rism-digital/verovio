@@ -21,9 +21,10 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttCurvature()
+Slur::Slur() : ControlElement("slur-"), TimeSpanningInterface(), AttColor(), AttCurvature()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_CURVATURE);
 
     Reset();
@@ -37,6 +38,7 @@ void Slur::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
+    ResetColor();
     ResetCurvature();
 }
 

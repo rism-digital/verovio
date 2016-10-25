@@ -885,8 +885,8 @@ public:
     // constructors and destructors
     ObjectListInterface(){};
     virtual ~ObjectListInterface(){};
-    ObjectListInterface(const ObjectListInterface &interface); // copy constructor;
-    ObjectListInterface &operator=(const ObjectListInterface &interface); // copy assignement;
+    ObjectListInterface(const ObjectListInterface &listInterface); // copy constructor;
+    ObjectListInterface &operator=(const ObjectListInterface &listInterface); // copy assignement;
 
     /**
      * Look for the Object in the list and return its position (-1 if not found)

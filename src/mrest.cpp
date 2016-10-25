@@ -13,9 +13,10 @@ namespace vrv {
 // MRest
 //----------------------------------------------------------------------------
 
-MRest::MRest() : LayerElement("mrest-"), AttVisibility()
+MRest::MRest() : LayerElement("mrest-"), AttVisibility(), AttFermatapresent()
 {
     RegisterAttClass(ATT_VISIBILITY);
+    RegisterAttClass(ATT_FERMATAPRESENT);
 
     Reset();
 }
@@ -28,6 +29,7 @@ void MRest::Reset()
 {
     LayerElement::Reset();
     ResetVisibility();
+    ResetFermatapresent();
 }
 
 } // namespace vrv
