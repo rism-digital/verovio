@@ -16,7 +16,6 @@
         </svg>
     </xsl:template>
 
-
     <xsl:template match="svg:font-face" exclude-result-prefixes="svg xlink" >
         <font-face xmlns="http://www.w3.org/2000/svg">
             <xsl:copy-of select="@units-per-em"/>
@@ -35,11 +34,12 @@
             <!-- redirect to a file for each glyph -->
             <xsl:result-document href="../data/{$fontName}/{$glyphCode}-{$smuflName}.xml">
                 <symbol id="{$glyphCode}" viewBox="0 0 {$unitsPerEm} {$unitsPerEm}" overflow="inherit">
-                    <g transform="scale(1,-1)">
-                        <path>
-                            <xsl:copy-of select="@d"/>
-                        </path>
-                    </g>
+                    <path>
+                        <xsl:attribute name="transform">
+                            <xsl:value-of select="'scale(1,-1)'"/>
+                        </xsl:attribute>
+                        <xsl:copy-of select="@d"/>
+                    </path>
                 </symbol>
             </xsl:result-document>
 
