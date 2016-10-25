@@ -625,9 +625,9 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
      {
      DrawVerticalLine (dc,y3,y4,x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
      View::s_drawingLigObliqua = true;
-     //oblique = OFF;
+     //oblique = false;
      //			if (val == DUR_1)	// left tail up if DUR_1
-     //				queue_lig = ON;
+     //				queue_lig = true;
      }
      else	// 2nd pass: oblique lines and final flagStemHeighte
      {
@@ -649,7 +649,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
      flagStemHeighte
 
      View::s_drawingLigObliqua = false;
-     //			queue_lig = OFF;	// ??defuses alg.queue DUR_BR??
+     //			queue_lig = false;	// ??defuses alg.queue DUR_BR??
 
      }
      }
@@ -694,14 +694,14 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     if (note->GetActualDur() == DUR_LG) {
         verticalCenter = staff->GetDrawingY() - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2;
         // ENZ
-        up = (y < verticalCenter) ? ON : OFF;
+        up = (y < verticalCenter) ? true : false;
         // ENZ
         if (note->GetDrawingStemDir() != STEMDIRECTION_NONE) {
             if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
-                up = ON;
+                up = true;
             }
             else {
-                up = OFF;
+                up = false;
             }
         }
 
@@ -724,7 +724,7 @@ void View::DrawProportFigures(DeviceContext *dc, int x, int y, int num, int numB
     assert(dc);
     assert(staff);
 
-    int ynum, yden;
+    int ynum = 0, yden = 0;
     int textSize = PROPRT_SIZE_FACTOR * staff->m_drawingStaffSize;
     std::wstring wtext;
 

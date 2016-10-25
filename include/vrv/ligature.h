@@ -47,6 +47,8 @@ public:
     virtual ClassId Is() const { return LIGATURE; }
     ///@}
 
+    virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
+
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
