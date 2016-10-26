@@ -821,6 +821,7 @@ void MeiOutput::WriteMeiAccid(pugi::xml_node currentNode, Accid *accid)
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
     accid->WriteAccidLog(currentNode);
+    accid->WriteColor(currentNode);
 }
 
 void MeiOutput::WriteMeiBarLine(pugi::xml_node currentNode, BarLine *barLine)
@@ -977,6 +978,7 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     WriteDurationInterface(currentNode, note);
     WritePitchInterface(currentNode, note);
     note->WriteAccidentalPerformed(currentNode);
+    note->WriteColor(currentNode);
     note->WriteColoration(currentNode);
     note->WriteGraced(currentNode);
     note->WriteNoteLogMensural(currentNode);
@@ -1044,6 +1046,7 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
     assert(rend);
 
     WriteXmlId(currentNode, rend);
+    rend->WriteColor(currentNode);
     rend->WriteCommon(currentNode);
     rend->WriteTypography(currentNode);
 }
@@ -2379,6 +2382,7 @@ bool MeiInput::ReadMeiAccid(Object *parent, pugi::xml_node accid)
     ReadPositionInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidLog(accid);
+    vrvAccid->ReadColor(accid);
 
     parent->AddChild(vrvAccid);
     return true;
@@ -2604,6 +2608,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
     vrvNote->ReadAccidentalPerformed(note);
+    vrvNote->ReadColor(note);
     vrvNote->ReadColoration(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadNoteLogMensural(note);
@@ -2732,6 +2737,7 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
 {
     Rend *vrvRend = new Rend();
 
+    vrvRend->ReadColor(rend);
     vrvRend->ReadCommon(rend);
     vrvRend->ReadTypography(rend);
 

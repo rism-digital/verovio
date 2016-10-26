@@ -17,7 +17,7 @@ namespace vrv {
 // Accid
 //----------------------------------------------------------------------------
 
-class Accid : public LayerElement, public PositionInterface, public AttAccidental, public AttAccidLog {
+class Accid : public LayerElement, public PositionInterface, public AttAccidental, public AttAccidLog, public AttColor {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

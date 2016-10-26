@@ -33,6 +33,7 @@ Note::Note()
     , DurationInterface()
     , PitchInterface()
     , AttAccidentalPerformed()
+    , AttColor()
     , AttColoration()
     , AttGraced()
     , AttNoteLogMensural()
@@ -44,6 +45,7 @@ Note::Note()
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterAttClass(ATT_ACCIDENTALPERFORMED);
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
@@ -78,6 +80,7 @@ void Note::Reset()
     DurationInterface::Reset();
     PitchInterface::Reset();
     ResetAccidentalPerformed();
+    ResetColor();
     ResetColoration();
     ResetGraced();
     ResetNoteLogMensural();
