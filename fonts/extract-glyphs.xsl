@@ -29,14 +29,13 @@
         <xsl:if test="$supported/*/glyph[concat('uni', @glyph-code)=$thisGlyph]">
             <xsl:variable name="glyphCode" select="substring-after(@glyph-name, 'uni')"/>
             <xsl:variable name="smuflName" select="$supported/*/glyph[@glyph-code=$glyphCode]/@smufl-name"/>
-            <xsl:variable name="horiz-adv-x" select="@horiz-adv-x"/>
 
             <!-- redirect to a file for each glyph -->
             <xsl:result-document href="../data/{$fontName}/{$glyphCode}-{$smuflName}.xml">
                 <symbol id="{$glyphCode}" viewBox="0 0 {$unitsPerEm} {$unitsPerEm}" overflow="inherit">
                     <path>
                         <xsl:attribute name="transform">
-                            <xsl:value-of select="'scale(1,-1)'"/>
+                            <xsl:text>scale(1,-1)</xsl:text>
                         </xsl:attribute>
                         <xsl:copy-of select="@d"/>
                     </path>
@@ -44,7 +43,10 @@
             </xsl:result-document>
 
             <!-- write the glyph to the bounding box svg file -->
-            <path xmlns="http://www.w3.org/2000/svg" transform="scale(1.0,-1.0)" id="{$glyphCode}" horiz-adv-x="{$horiz-adv-x}">
+            <path xmlns="http://www.w3.org/2000/svg" id="{$glyphCode}" horiz-adv-x="{@horiz-adv-x}">
+                <xsl:attribute name="transform">
+                    <xsl:text>scale(1,-1)</xsl:text>
+                </xsl:attribute>
                 <xsl:copy-of select="@d"/>
             </path>
         </xsl:if>
