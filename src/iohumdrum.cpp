@@ -3619,6 +3619,11 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
                 syl->SetWordpos(sylLog_WORDPOS_t);
                 syl->SetCon(sylLog_CON_u);
             }
+            // remove the last dash in a line (double dash which indicates
+            // a dash in the original word separator).
+            if ((!content.empty()) && content.back() == '-') {
+                content.resize(content.size() - 1);
+            }
             addTextElement(syl, content);
         }
     }
