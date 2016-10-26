@@ -34,6 +34,7 @@
 #include <assert.h>
 #include <sstream>
 #include <vector>
+#include <cctype>
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
@@ -4302,7 +4303,7 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
                     MatchState = MatchNumber;
                     ProcessedChar = true;
                 }
-                else if ((ThisCh >= 'a' and ThisCh <= 'z') or (ThisCh >= 'A' and ThisCh <= 'Z')) {
+                else if ((ThisCh >= 'a' && ThisCh <= 'z') || (ThisCh >= 'A' && ThisCh <= 'Z')) {
                     MatchingName.append(1, ThisCh);
                     MatchState = MatchName;
                     ProcessedChar = true;
@@ -4313,8 +4314,8 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
                 }
                 break;
             case (int)MatchName:
-                if ((ThisCh >= 'a' and ThisCh <= 'z') or (ThisCh >= 'A' and ThisCh <= 'Z')
-                    or (ThisCh >= '0' and ThisCh <= '9')) {
+                if ((ThisCh >= 'a' && ThisCh <= 'z') || (ThisCh >= 'A' && ThisCh <= 'Z')
+                    || (ThisCh >= '0' && ThisCh <= '9')) {
                     MatchingName.append(1, ThisCh);
                     ProcessedChar = true;
                 }
@@ -4336,7 +4337,7 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
                         GotCharCode = true;
                     }
                 }
-                if (not ProcessedChar) {
+                if (!ProcessedChar) {
                     Out.put('&');
                     for (unsigned int i = 0; i < MatchingName.size(); ++i) {
                         Out.put(MatchingName[i]);
@@ -4345,12 +4346,12 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
                 }
                 break;
             case (int)MatchNumber:
-                if (ThisCh == 'x' or ThisCh == 'X') {
+                if (ThisCh == 'x' || ThisCh == 'X') {
                     ProcessedChar = true;
                     MatchState = MatchHexNumber;
                     CharCode = 0;
                 }
-                else if (ThisCh >= '0' and ThisCh <= '9') {
+                else if (ThisCh >= '0' && ThisCh <= '9') {
                     CharCode = ThisCh - '0';
                     MatchState = MatchDecimalNumber;
                     ProcessedChar = true;
@@ -4360,7 +4361,7 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
                 }
                 break;
             case (int)MatchDecimalNumber:
-                if (ThisCh >= '0' and ThisCh <= '9') {
+                if (ThisCh >= '0' && ThisCh <= '9') {
                     CharCode = CharCode * 10 + ThisCh - '0';
                     ProcessedChar = true;
                 }
@@ -4373,15 +4374,15 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
                 }
                 break;
             case (int)MatchHexNumber:
-                if (ThisCh >= '0' and ThisCh <= '9') {
+                if (ThisCh >= '0' && ThisCh <= '9') {
                     CharCode = CharCode * 16 + ThisCh - '0';
                     ProcessedChar = true;
                 }
-                else if (ThisCh >= 'a' and ThisCh <= 'f') {
+                else if (ThisCh >= 'a' && ThisCh <= 'f') {
                     CharCode = CharCode * 16 + ThisCh - 'a' + 10;
                     ProcessedChar = true;
                 }
-                else if (ThisCh >= 'A' and ThisCh <= 'F') {
+                else if (ThisCh >= 'A' && ThisCh <= 'F') {
                     CharCode = CharCode * 16 + ThisCh - 'A' + 10;
                     ProcessedChar = true;
                 }
@@ -4398,7 +4399,7 @@ void HumdrumInput::UnquoteHTML(std::istream &In, std::ostream &Out)
             WriteUTF8(Out, CharCode);
             MatchState = NoMatch;
         }
-        else if (not ProcessedChar and MatchState == NoMatch) {
+        else if (!ProcessedChar && MatchState == NoMatch) {
             if (ThisCh == '&') {
                 MatchState = MatchBegin;
                 MatchingName.erase();

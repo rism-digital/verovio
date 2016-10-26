@@ -21,9 +21,10 @@ namespace vrv {
 // Hairpin
 //----------------------------------------------------------------------------
 
-Hairpin::Hairpin() : ControlElement("hairpin-"), TimeSpanningInterface(), AttHairpinLog(), AttPlacement()
+Hairpin::Hairpin() : ControlElement("hairpin-"), TimeSpanningInterface(), AttColor(), AttHairpinLog(), AttPlacement()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_HAIRPINLOG);
     RegisterAttClass(ATT_PLACEMENT);
 
@@ -38,6 +39,7 @@ void Hairpin::Reset()
 {
     ControlElement::Reset();
     TimeSpanningInterface::Reset();
+    ResetColor();
     ResetHairpinLog();
     ResetPlacement();
 }

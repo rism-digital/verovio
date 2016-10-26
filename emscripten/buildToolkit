@@ -224,9 +224,9 @@ sub getSources {
 	push @sources, "$VEROVIO_ROOT/libmei/atts_critapp.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mei.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mensural.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_midi.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_pagebased.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_shared.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_midi.cpp";
 
 	return join " ", @sources
 }
@@ -247,6 +247,9 @@ sub syncSvgResources {
 
 	# Then copy data directory contents
 	`cp -r $VEROVIO_ROOT/data/* $DATA_DIR/`;
+
+	# Remove .DS_Store from the data directory
+	`find $DATA_DIR/ -name '.DS_Store' -type f -delete`;
 
 	return unless $exclusion;
 	my @list = split /[^A-Za-z0-9_]+/, $exclusion;

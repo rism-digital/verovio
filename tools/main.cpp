@@ -6,11 +6,16 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <assert.h>
-#include <getopt.h>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
+
+#ifndef _WIN32
+#include <getopt.h>
+#else
+#include "win_getopt.h"
+#endif
 
 //----------------------------------------------------------------------------
 
@@ -52,7 +57,7 @@ bool dir_exists(string dir)
 
 void display_version()
 {
-    cerr << "Verovio " << GetVersion() << endl;
+    cerr << "Verovio " << vrv::GetVersion() << endl;
 }
 
 void display_usage()
@@ -370,11 +375,11 @@ int main(int argc, char **argv)
 
     // Load the std input or load the file
     if (infile == "-") {
-        stringstream data_stream;
+        ostringstream data_stream;
         for (string line; getline(cin, line);) {
             data_stream << line << endl;
         }
-        if (!toolkit.LoadString(data_stream.str())) {
+        if (!toolkit.LoadData(data_stream.str())) {
             cerr << "The input could not be loaded." << endl;
             exit(1);
         }

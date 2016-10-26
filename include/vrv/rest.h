@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class models the MEI <rest> element.
  */
-class Rest : public LayerElement, public DurationInterface, public PositionInterface {
+class Rest : public LayerElement, public DurationInterface, public PositionInterface, public AttColor {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

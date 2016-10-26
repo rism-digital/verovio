@@ -50,6 +50,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <set>
 #include <algorithm>
+#include <cctype>
+#include <functional>
+#include <locale>
 
 using std::string;
 using std::vector;
@@ -1668,4 +1671,3 @@ class Options {
 } // end of namespace hum
 
 #endif /* _MINHUMDRUM_H */
-

@@ -1239,16 +1239,19 @@ void PaeInput::parseNote(pae::Note *note)
     }
 
     // note in a chord
-    if ((note->chord)) {
+    if (note->chord) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         // first note?
         if (!m_is_in_chord) {
             Chord *chord = new Chord();
+            chord->SetDots(mnote->GetDots());
             chord->SetDur(mnote->GetDur());
             pushContainer(chord);
             m_is_in_chord = true;
         }
+        mnote->SetDots(0);
+        mnote->SetDur(DURATION_NONE);
     }
 
     // Add the note to the current container
@@ -1267,6 +1270,10 @@ void PaeInput::parseNote(pae::Note *note)
 
     // last note of a chord
     if (!note->chord && m_is_in_chord) {
+        Note *mnote = dynamic_cast<Note *>(element);
+        assert(mnote);
+        mnote->SetDots(0);
+        mnote->SetDur(DURATION_NONE);
         popContainer();
         m_is_in_chord = false;
     }

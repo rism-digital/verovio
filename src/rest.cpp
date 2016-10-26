@@ -13,11 +13,11 @@ namespace vrv {
 // Rest
 //----------------------------------------------------------------------------
 
-Rest::Rest() : LayerElement("rest-"), DurationInterface(), PositionInterface()
+Rest::Rest() : LayerElement("rest-"), DurationInterface(), PositionInterface(), AttColor()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
-
+    RegisterAttClass(ATT_COLOR);
     Reset();
 }
 
@@ -30,6 +30,7 @@ void Rest::Reset()
     LayerElement::Reset();
     DurationInterface::Reset();
     PositionInterface::Reset();
+    ResetColor();
 }
 
 } // namespace vrv

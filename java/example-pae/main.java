@@ -1,15 +1,8 @@
-/*
-run mvn package
-two times
-then
-javac -cp .:target/VerovioToolkit-1.0-SNAPSHOT.jar  main.java
-java -cp .:target/VerovioToolkit-1.0-SNAPSHOT.jar  main
-*/
-
 import java.io.IOException;
 
+/* import the toolkit */
 import org.rismch.verovio.toolkit;
-import org.rismch.verovio.convertFileFormat;
+import org.rismch.verovio.fileFormat;
 import org.rismch.verovio.NativeUtils;
 
 public class main {
@@ -19,7 +12,13 @@ public class main {
 		} catch (IOException e) {
 			System.out.println("Could not load Verovio native lib: " + e.getMessage());
 		}
-		toolkit toolkit = new toolkit();
+        
+        /*
+         * create the toolkit and set the resource path
+         * (if the fonts are installed (see the ./tools) then there is not need to do this)
+         */
+        toolkit vrvToolkit = new toolkit(false);
+        vrvToolkit.setResourcePath("../../data");
 
 		String s;
 		String out;
@@ -32,14 +31,13 @@ public class main {
 		s = s + "@data:" + "'4CCDE" + "\n";
 		s = s + "@end:00000400004625-1.1.1\n";
 		
-		
-		toolkit.setFormat(convertFileFormat.paeFile);
-		toolkit.loadString(s);
+		/* set the format to PAE and load the data */
+		vrvToolkit.setFormat(fileFormat.PAE);
+		vrvToolkit.loadData(s);
 
-		out = toolkit.renderToSvg();
-		
+        /* convert it and write it to the standard output */
+		out = vrvToolkit.renderToSvg();
 		System.out.println(out);
-
 	}
 }
 
