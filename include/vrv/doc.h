@@ -75,6 +75,7 @@ public:
     int GetPageCount() const;
 
     bool GetMidiExportDone() const;
+
     /**
      * @name Get the height or width for a glyph taking into account the staff and grace sizes
      */

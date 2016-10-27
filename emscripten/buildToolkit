@@ -155,6 +155,7 @@ $exports .= "'_vrvToolkit_getElementsAtTime',";
 $exports .= "'_vrvToolkit_getLog',";
 $exports .= "'_vrvToolkit_getVersion',";
 $exports .= "'_vrvToolkit_getMEI',";
+$exports .= "'_vrvToolkit_getHumdrum',";
 $exports .= "'_vrvToolkit_getPageCount',";
 $exports .= "'_vrvToolkit_getPageWithElement',";
 $exports .= "'_vrvToolkit_getTimeForElement',";

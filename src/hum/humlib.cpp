@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Sep  7 23:43:43 CEST 2016
+// Last Modified: Wed Oct 26 18:05:53 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -1210,7 +1210,17 @@ vector<string> HumHash::getKeyList(const string& keys) const {
 
 void HumHash::setPrefix(const string& value) {
 	prefix = value;
+}
 
+
+
+//////////////////////////////
+//
+// HumHash::getPrefix -- get the prefix.
+//
+
+string HumHash::getPrefix(void) const {
+	return prefix;
 }
 
 
@@ -3202,19 +3212,51 @@ void HumdrumFileBase::createLinesFromTokens(void) {
 
 ////////////////////////////
 //
-// HumdrumFileBase::append -- Add a line to the file's contents.  The file's
+// HumdrumFileBase::appendLine -- Add a line to the file's contents.  The file's
 //    spine and rhythmic structure should be recalculated after an append.
 //
 
-void HumdrumFileBase::append(const char* line) {
+void HumdrumFileBase::appendLine(const char* line) {
 	HumdrumLine* s = new HumdrumLine(line);
 	lines.push_back(s);
 }
 
 
-void HumdrumFileBase::append(const string& line) {
+void HumdrumFileBase::appendLine(const string& line) {
 	HumdrumLine* s = new HumdrumLine(line);
 	lines.push_back(s);
+}
+
+
+void HumdrumFileBase::appendLine(HumdrumLine* line) {
+	// deletion will be handled by class.
+	lines.push_back(line);
+}
+
+
+
+////////////////////////////
+//
+// HumdrumFileBase::appendLine -- Add a line to the file's contents.  The file's
+//    spine and rhythmic structure should be recalculated after an append.
+//
+
+
+void HumdrumFileBase::insertLine(int index, const char* line) { 
+	HumdrumLine* s = new HumdrumLine(line);
+	lines.insert(lines.begin() + index, s);
+}
+
+
+void HumdrumFileBase::insertLine(int index, const string& line) { 
+	HumdrumLine* s = new HumdrumLine(line);
+	lines.insert(lines.begin() + index, s);
+}
+
+
+void HumdrumFileBase::insertLine(int index, HumdrumLine* line) { 
+	// deletion will be handled by class.
+	lines.insert(lines.begin() + index, line);
 }
 
 
@@ -6205,7 +6247,7 @@ bool HumdrumLine::isKernBoundaryEnd(void) const {
 	if (!isData()) {
 		return false;
 	}
-	HumdrumToken* ntok;
+	HTp ntok;
 	for (int i=0; i<getFieldCount(); i++) {
 		if (!token(i)->isDataType("**kern")) {
 			continue;
@@ -6637,7 +6679,7 @@ HumNum HumdrumLine::getDurationFromBarline(HumNum scale) const {
 //    for the given spine/track.
 //
 
-HumdrumToken* HumdrumLine::getTrackStart(int track) const {
+HTp HumdrumLine::getTrackStart(int track) const {
 	if (owner == NULL) {
 		return NULL;
 	} else {
@@ -6842,14 +6884,14 @@ string HumdrumLine::getTokenString(int index) const {
 
 int HumdrumLine::createTokensFromLine(void) {
 	tokens.resize(0);
-	HumdrumToken* token = new HumdrumToken();
+	HTp token = new HumdrumToken();
 	token->setOwner(this);
 	char ch;
 
 	if (this->size() == 0) {
 		tokens.push_back(token);
 	} else if (this->compare(0, 2, "!!") == 0) {
-		*token = *this;
+		*token = (string)(*this);
 		tokens.push_back(token);
 	} else {
 		for (int i=0; i<(int)size(); i++) {
@@ -6902,7 +6944,7 @@ void HumdrumLine::createLineFromTokens(void) {
 //   list will contain one empty string.
 //
 
-void HumdrumLine::getTokens(vector<HumdrumToken*>& list) {
+void HumdrumLine::getTokens(vector<HTp>& list) {
 	if (tokens.size() == 0) {
 		createTokensFromLine();
 	}
@@ -7418,6 +7460,68 @@ void HumdrumLine::setParameters(const string& pdata) {
 
 //////////////////////////////
 //
+// HumdrumLine::appendToken -- add a token at the end of the current
+//      list of tokens in the line.
+//
+
+void HumdrumLine::appendToken(HTp token) { 
+	// deletion will be handled by class.
+	tokens.push_back(token);
+}
+
+
+void HumdrumLine::appendToken(const HumdrumToken& token) { 
+	HTp newtok = new HumdrumToken(token);
+	tokens.push_back(newtok);
+}
+
+
+void HumdrumLine::appendToken(const string& token) { 
+	HTp newtok = new HumdrumToken(token);
+	tokens.push_back(newtok);
+}
+
+
+void HumdrumLine::appendToken(const char* token) { 
+	HTp newtok = new HumdrumToken(token);
+	tokens.push_back(newtok);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumLine::insertToken -- add a token at the end of the current
+//      list of tokens in the line.
+//
+
+void HumdrumLine::insertToken(int index, HTp token) { 
+	// deletion will be handled by class.
+	tokens.insert(tokens.begin() + index, token);
+}
+
+
+void HumdrumLine::insertToken(int index, const HumdrumToken& token) { 
+	HTp newtok = new HumdrumToken(token);
+	tokens.insert(tokens.begin() + index, newtok);
+}
+
+
+void HumdrumLine::insertToken(int index, const string& token) { 
+	HTp newtok = new HumdrumToken(token);
+	tokens.insert(tokens.begin() + index, newtok);
+}
+
+
+void HumdrumLine::insertToken(int index, const char* token) { 
+	HTp newtok = new HumdrumToken(token);
+	tokens.insert(tokens.begin() + index, newtok);
+}
+
+
+
+//////////////////////////////
+//
 // operator<< -- Print a HumdrumLine. Needed to avoid interaction with
 //     HumHash parent class.
 //
@@ -7426,6 +7530,7 @@ ostream& operator<<(ostream& out, HumdrumLine& line) {
 	out << (string)line;
 	return out;
 }
+
 
 
 
@@ -7464,6 +7569,13 @@ HumdrumToken::HumdrumToken(const string& aString) : string(aString) {
 }
 
 HumdrumToken::HumdrumToken(const char* aString) : string(aString) {
+	rhycheck = 0;
+	setPrefix("!");
+	strand = -1;
+}
+
+HumdrumToken::HumdrumToken(const HumdrumToken& aToken) : 
+		string((string)aToken) {
 	rhycheck = 0;
 	setPrefix("!");
 	strand = -1;
@@ -9277,7 +9389,42 @@ HTp HumdrumToken::getSlurEndToken(void) {
 
 
 
-#ifdef _USE_HUMLIB_OPTIONS_
+//////////////////////////////
+//
+// HumdrumToken::operator= -- Copy operator.
+//
+
+HumdrumToken& HumdrumToken::operator=(HumdrumToken& aToken) {
+	if (this == &aToken) {
+		return *this;
+	}
+	(string)(*this) = (string)aToken;
+	rhycheck = aToken.rhycheck;
+	setPrefix(aToken.getPrefix());
+	strand = aToken.strand;
+	return *this;
+}
+
+
+HumdrumToken& HumdrumToken::operator=(const string& aToken) { 
+	(string)(*this) = aToken;
+	rhycheck = 0;
+	setPrefix("!");
+	strand = -1;
+	return *this;
+}
+
+
+HumdrumToken& HumdrumToken::operator=(const char* aToken) { 
+	(string)(*this) = aToken;
+	rhycheck = 0;
+	setPrefix("!");
+	strand = -1;
+	return *this;
+}
+
+
+
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -10490,8 +10637,6 @@ ostream& Options::printRegister(ostream& out) {
    }
    return out;
 }
-
-#endif /* _USE_HUMLIB_OPTIONS_ */
 
 
 
