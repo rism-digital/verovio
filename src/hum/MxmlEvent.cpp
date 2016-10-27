@@ -691,13 +691,13 @@ string MxmlEvent::getKernPitch(void) const {
 string MxmlEvent::getPrefixNoteInfo(void) const {
 	int tiestart = 0;
 	int tiestop  = 0;
-	bool rest    = false;
+	// bool rest    = false;
 
 	xml_node child = m_node.first_child();
 
 	while (child) {
 		if (strcmp(child.name(), "rest") == 0) {
-			rest = true;
+			// rest = true;
 		} else if (strcmp(child.name(), "tie") == 0) {
 			xml_attribute tietype = child.attribute("type");
 			if (tietype) {
@@ -737,13 +737,13 @@ string MxmlEvent::getPostfixNoteInfo(void) const {
 	int tiestart     = 0;
 	int tiestop      = 0;
 
-	bool rest = false;
+	// bool rest = false;
 	xml_node child = m_node.first_child();
 	xml_node notations;
 
 	while (child) {
 		if (strcmp(child.name(), "rest") == 0) {
-			rest = true;
+			// rest = true;
 		} else if (strcmp(child.name(), "beam") == 0) {
 			const char* beaminfo = child.child_value();
 			if (strcmp(beaminfo, "begin") == 0) {

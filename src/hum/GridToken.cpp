@@ -210,6 +210,20 @@ void GridToken::incrementDuration(HumNum duration) {
 
 //////////////////////////////
 //
+// GridToken::forgetToken -- The HumdrumToken was passed off
+//      to some other object which is now responsible for 
+//      deleting it.
+//
+
+void GridToken::forgetToken(void) {
+	setTransfered(true);
+	m_token = NULL;
+}
+
+
+
+//////////////////////////////
+//
 // GridToken::getDuration -- Return the total duration of the
 //   durational item, the sum of the nextdur and prevdur.
 //

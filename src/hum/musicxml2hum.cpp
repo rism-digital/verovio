@@ -189,7 +189,7 @@ void musicxml2hum_interface::printPartInfo(vector<string>& partids,
 		vector<MxmlPart>& partdata) {
 	cout << "\nPart information in the file:" << endl;
 	int maxmeasure = 0;
-	for (int i=0; i<partids.size(); i++) {
+	for (int i=0; i<(int)partids.size(); i++) {
 		cout << "\tPART " << i+1 << " id = " << partids[i] << endl;
 		cout << "\tMAXSTAFF " << partdata[i].getStaffCount() << endl;
 		cout << "\t\tpart name:\t"
@@ -251,7 +251,7 @@ bool musicxml2hum_interface::stitchParts(HumGrid& outdata,
 	}
 
 	vector<int> partstaves(partdata.size(), 0);
-	for (i=0; i<partstaves.size(); i++) {
+	for (i=0; i<(int)partstaves.size(); i++) {
 		partstaves[i] = partdata[i].getStaffCount();
 	}
 
@@ -553,8 +553,8 @@ void musicxml2hum_interface::appendZeroEvents(
 	int pindex = 0;
 	xml_node child;
 
-	for (int i=0; i<nowevents.size(); i++) {
-		for (int j=0; j<nowevents[i]->zerodur.size(); j++) {
+	for (int i=0; i<(int)nowevents.size(); i++) {
+		for (int j=0; j<(int)nowevents[i]->zerodur.size(); j++) {
 			xml_node element = nowevents[i]->zerodur[j]->getNode();
 			if (nodeType(element, "attributes")) {
 				child = element.first_child();

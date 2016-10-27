@@ -65,9 +65,8 @@ void HumGrid::transferTokens(HumdrumFile& outfile) {
 	insertStaffIndications(outfile);
 	insertPartIndications(outfile);
 	insertExclusiveInterpretationLine(outfile);
-	int m; // measure index
-	for (m=0; m<(int)this->size(); m++) {
-		at(m)->transferTokens(outfile, m_recip);
+	for (int measure=0; measure<(int)this->size(); measure++) {
+		at(measure)->transferTokens(outfile, m_recip);
 	}
 	insertDataTerminationLine(outfile);
 }

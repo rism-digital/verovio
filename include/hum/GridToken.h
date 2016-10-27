@@ -49,6 +49,7 @@ class GridToken {
 		HumNum getDurationToPrev  (void) const;
 		void   setDurationToPrev  (HumNum dur);
 		void   incrementDuration  (HumNum duration);
+		void   forgetToken        (void);
 
 	protected:
 		void   setTransfered      (bool state);

@@ -119,10 +119,8 @@ public:
     std::string RenderToMidi();
 
     bool GetHumdrumFile(const std::string &filename);
-    std::string GetHumdrum();
     bool GetHumdrum(std::ostream& output);
-    void SetHumdrumBuffer(const std::string& content);
-    const char* GetHumdrumBuffer(void);
+    std::string GetHumdrum();
 
     /**
      * Returns array of IDs of elements being currently played.
@@ -397,10 +395,7 @@ private:
     bool m_noJustification;
     bool m_showBoundingBoxes;
 
-    char mA[100000];
-    char* m_humdrumBuffer;
-    char mB[100000];
-
+    std::string m_humdrumBuffer;
     char *m_cString;
 };
 

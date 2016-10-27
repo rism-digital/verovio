@@ -64,7 +64,6 @@ Toolkit::Toolkit(bool initFont)
     m_showBoundingBoxes = false;
     m_scoreBasedMei = false;
 
-    m_humdrumBuffer = NULL;
     m_cString = NULL;
 
     if (initFont) {
@@ -74,11 +73,6 @@ Toolkit::Toolkit(bool initFont)
 
 Toolkit::~Toolkit()
 {
-    if (m_humdrumBuffer) {
-LogError("DELETING HUMDRUMBUFFER");
-        free(m_humdrumBuffer);
-        m_humdrumBuffer = NULL;
-    }
     if (m_cString) {
         free(m_cString);
     }
@@ -387,7 +381,7 @@ bool Toolkit::LoadData(const std::string &data)
         input = new DarmsInput(&m_doc, "");
     }
     else if (inputFormat == HUMDRUM) {
-        LogMessage("Importing Humdrum data");
+        // LogMessage("Importing Humdrum data");
 
         Doc tempdoc;
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
@@ -410,7 +404,7 @@ bool Toolkit::LoadData(const std::string &data)
     }
     else if (inputFormat == MUSICXML) {
         // input = new MusicXmlInput(&m_doc, "");
-        LogMessage("Importing MusicXML data");
+        // LogMessage("Importing MusicXML data via Humdrum");
 
         hum::musicxml2hum_interface converter;
         pugi::xml_document xmlfile;
@@ -422,10 +416,7 @@ bool Toolkit::LoadData(const std::string &data)
             return false;
         }
         
-	SetHumdrumBuffer(conversion.str());
-	LogError("CONVERSION IS:");
-	LogError(GetHumdrumBuffer());
-	LogError("GOT HERE =======================================");
+        m_humdrumBuffer = conversion.str();
 
         Doc tempdoc;
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
@@ -511,47 +502,6 @@ bool Toolkit::LoadData(const std::string &data)
     m_view.SetDoc(&m_doc);
 
     return true;
-}
-
-void Toolkit::SetHumdrumBuffer(const string& content) {
-    int size = content.size();
-    if (m_humdrumBuffer) {
-        free(m_humdrumBuffer);
-        m_humdrumBuffer = NULL;
-    }
-    m_humdrumBuffer = (char *)malloc(size + 1);
-stringstream ss;
-ss << "NEW HUMDRUMBUFFER ADDRESS IS " << &m_humdrumBuffer << "\n";
-LogError(ss.str().c_str());
-
-    // something went wrong
-    if (!m_humdrumBuffer) {
-        return;
-    }
-
-    strcpy(m_humdrumBuffer, content.c_str());
-
-    LogError("NEW CONTENTS of m_humdrumBuffer is:");
-    LogError(m_humdrumBuffer);
-    LogError("=====================================");
-    LogError("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-}
-
-const char* Toolkit::GetHumdrumBuffer(void) {
-    if (m_humdrumBuffer) {
-stringstream ss;
-ss << "BUFFER SIZE IS " << strlen(m_humdrumBuffer) << "\n";
-ss << "BUFFER ADDRESS IS " << &m_humdrumBuffer << "\n";
-LogError(ss.str().c_str());
-LogError("BUFFER CONTENTS IS : ");
-LogError(m_humdrumBuffer);
-LogError("===========================================");
-LogError("*******************************************");
-        return m_humdrumBuffer;
-    }
-    else {
-        return "[unspecified]";
-    }
 }
 
 std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
@@ -835,7 +785,7 @@ bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
 
 std::string Toolkit::GetHumdrum()
 {
-    return GetHumdrumBuffer();
+    return m_humdrumBuffer;
 }
 
 bool Toolkit::GetHumdrumFile(const std::string &filename)
@@ -855,7 +805,7 @@ bool Toolkit::GetHumdrumFile(const std::string &filename)
 
 bool Toolkit::GetHumdrum(ostream& output)
 {
-    output << GetHumdrumBuffer();
+    output << m_humdrumBuffer;
     return true;
 }
 
