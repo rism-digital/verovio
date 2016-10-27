@@ -1380,6 +1380,7 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
         m_currentstaff = i + 1;
         m_staff = stafflist[i];
         m_staff->SetN(m_currentstaff);
+
         status &= convertMeasureStaff(kernstarts[i]->getTrack(), startline, endline, i + 1, layers[i]);
         if (!status) {
             break;
@@ -1418,13 +1419,27 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 {
     m_layer = new Layer();
     m_currentlayer = layerindex + 1;
+
     m_layer->SetN(layerindex + 1);
     m_staff->AddChild(m_layer);
 
+    vector<int> &rkern = m_rkern;
+    int staffindex = rkern[track];
+    vector<HTp> &layerdata = m_layertokens[staffindex][layerindex];
+
+	if (layerdata.size() > 0) {
+		if (layerdata[0]->size() > 0) {
+			setLocationId(m_layer, layerdata[0], -1);
+		}
+	}
+
+	if ((layerindex == 0) && (layerdata.size() > 0)) {
+		if ((layerdata[0]->size() > 0) && (layerdata[0]->at(0) == '=')) {
+   			setLocationId(m_staff, layerdata[0], -1);
+		}
+	}
+
     if (m_comment) {
-        vector<int> &rkern = m_rkern;
-        int staffindex = rkern[track];
-        vector<HTp> &layerdata = m_layertokens[staffindex][layerindex];
         string comment;
         comment += " kern: ";
         for (int i = 0; i < (int)layerdata.size(); i++) {
@@ -3966,6 +3981,8 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     m_sections.back()->AddChild(m_measure);
     m_measures.push_back(m_measure);
 
+    setLocationId(m_measure, startline, -1, -1);
+
     int measurenumber = getMeasureNumber(startline, endline);
     if (measurenumber >= 0) {
         m_measure->SetN(measurenumber);
@@ -4479,6 +4496,25 @@ void HumdrumInput::setLocationId(Object *object, HTp token, int subtoken)
     id += "F" + to_string(field);
     if (subtoken >= 0) {
         id += "S" + to_string(subtoken + 1);
+    }
+    object->SetUuid(id);
+}
+
+void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex,int subtokenindex)
+{
+    int line = lineindex + 1;
+    int field = fieldindex + 1;
+    int subtoken = subtokenindex + 1;
+    string id = object->GetClassName();
+    std::transform(id.begin(), id.end(), id.begin(), ::tolower);
+    if (line > 0) {
+        id += "-L" + to_string(line);
+    }
+    if (field > 0) {
+        id += "F" + to_string(field);
+    }
+    if (subtoken > 0) {
+        id += "S" + to_string(subtoken);
     }
     object->SetUuid(id);
 }
