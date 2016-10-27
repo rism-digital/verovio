@@ -623,9 +623,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int sym = 0;
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
                           || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
-                          || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black)
-        ? true
-        : false;
+                          || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
 
     int shapeOctaveDis = Clef::ClefId(clef->GetShape(), 0, clef->GetDis(), clef->GetDisPlace());
 
@@ -667,12 +665,23 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     // mensural clefs
     if (isMensural) {
-        if (sym == SMUFL_E050_gClef)
-            sym = SMUFL_E901_mensuralGclefPetrucci;
-        else if (sym == SMUFL_E05C_cClef)
-            sym = SMUFL_E909_mensuralCclefPetrucciPosMiddle;
-        else if (sym == SMUFL_E062_fClef)
-            sym = SMUFL_E904_mensuralFclefPetrucci;
+        if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
+            // ??AS SOON AS PLAINCHANT CLEFS ARE AVAILABLE, USE THEM HERE!
+            if (sym == SMUFL_E050_gClef)
+                sym = SMUFL_E901_mensuralGclefPetrucci;
+            else if (sym == SMUFL_E05C_cClef)
+                sym = SMUFL_E909_mensuralCclefPetrucciPosMiddle;    // ??WANT E906_chantCclef
+            else if (sym == SMUFL_E062_fClef)
+                sym = SMUFL_E904_mensuralFclefPetrucci;    // ??WANT E902_chantFclef
+        }
+        else {
+            if (sym == SMUFL_E050_gClef)
+                sym = SMUFL_E901_mensuralGclefPetrucci;
+            else if (sym == SMUFL_E05C_cClef)
+                sym = SMUFL_E909_mensuralCclefPetrucciPosMiddle;
+            else if (sym == SMUFL_E062_fClef)
+                sym = SMUFL_E904_mensuralFclefPetrucci;
+        }
     }
 
     if (sym == 0) {

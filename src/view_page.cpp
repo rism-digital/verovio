@@ -583,7 +583,7 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
         Staff *last = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparisonLast, 1));
 
         if (!first || !last) {
-            LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawBarLines", firstDef->GetN(),
+            LogDebug("Could not get staff (%d; %d) while drawing staffGrp - Vrv::DrawStaffGrp", firstDef->GetN(),
                 lastDef->GetN());
             return;
         }
