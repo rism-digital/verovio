@@ -27,8 +27,9 @@ namespace vrv {
 // Verse
 //----------------------------------------------------------------------------
 
-Verse::Verse() : LayerElement("verse-"), AttCommon()
+Verse::Verse() : LayerElement("verse-"), AttColor(), AttCommon()
 {
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COMMON);
 
     Reset();
@@ -41,6 +42,7 @@ Verse::~Verse()
 void Verse::Reset()
 {
     LayerElement::Reset();
+    ResetColor();
     ResetCommon();
 }
 

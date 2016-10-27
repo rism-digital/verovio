@@ -7,6 +7,8 @@
 
 // Change method names to lowerCamelCase
 %rename("%(lowercamelcase)s") "";
+// Ignore enum items (e.g., for fileFormat.PAE)
+%rename("%(upper)s", %$isenumitem) "";
 
 // Method to ignore
 %ignore vrv::Toolkit::GetShowBoundingBoxes( );

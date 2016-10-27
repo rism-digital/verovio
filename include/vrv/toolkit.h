@@ -26,7 +26,7 @@
 
 namespace vrv {
 
-typedef enum { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML } FileFormat;
+enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML };
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -57,7 +57,7 @@ public:
     /**
      * Load a string data with the specified type.
      */
-    bool LoadString(const std::string &data);
+    bool LoadData(const std::string &data);
 
     /**
      * Save an MEI file.
