@@ -22,6 +22,7 @@
 
 #ifndef NO_HUMDRUM_SUPPORT
 #include "humlib.h"
+#include "musicxml2hum.h"
 #include "pugixml.hpp"
 #endif /* NO_HUMDRUM_SUPPORT */
 
@@ -248,6 +249,7 @@ protected:
     void storeOriginalClefApp(void);
     void addSpace(vector<string> &elements, vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken);
+    void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
     void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
     void addOrnamentMarkers(hum::HTp token);

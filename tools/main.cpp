@@ -350,8 +350,8 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if (outformat != "svg" && outformat != "mei" && outformat != "midi") {
-        cerr << "Output format can only be 'mei', 'svg', or 'midi'." << endl;
+    if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "humdrum") {
+        cerr << "Output format can only be 'mei', 'svg', 'midi', or 'humdrum'." << endl;
         exit(1);
     }
 
@@ -440,6 +440,23 @@ int main(int argc, char **argv)
         }
         else {
             cerr << "Output written to " << outfile << "." << endl;
+        }
+    }
+    else if (outformat == "humdrum") {
+	outfile += ".krn";
+        if (std_output) {
+            if (!toolkit.GetHumdrum(std::cout)) {
+                cerr << "Unable to write Humdrum to standard output." << endl;
+                exit(1);
+            }
+        } else {
+            if (!toolkit.GetHumdrumFile(outfile)) {
+                cerr << "Unable to write Humdrum to " << outfile << "." << endl;
+                exit(1);
+            }
+            else {
+                cerr << "Output written to " << outfile << "." << endl;
+            }
         }
     }
     else {
