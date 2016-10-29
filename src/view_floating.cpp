@@ -1444,10 +1444,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
     dc->StartGraphic(dir, "", dir->GetUuid());
 
-    // Use Romam bold for tempo
     FontInfo dirTxt;
-    dirTxt.SetFaceName("Times");
-    dirTxt.SetStyle(FONTSTYLE_italic);
 
     // If we have not timestamp
     int x = dir->GetStart()->GetDrawingX();
@@ -1496,10 +1493,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         dynamSymbol = dynam->GetSymbolStr();
     }
 
-    // Use Romam bold for tempo
     FontInfo dynamTxt;
-    dynamTxt.SetFaceName("Times");
-    dynamTxt.SetStyle(FONTSTYLE_italic);
 
     // If we have not timestamp
     int x = dynam->GetStart()->GetDrawingX();
@@ -1551,9 +1545,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     dc->StartGraphic(harm, "", harm->GetUuid());
 
-    // Use Romam bold for tempo
     FontInfo dirTxt;
-    dirTxt.SetFaceName("Times");
 
     // If we have not timestamp
     int x = harm->GetStart()->GetDrawingX();
@@ -1633,10 +1625,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     dc->StartGraphic(tempo, "", tempo->GetUuid());
 
-    // Use Romam bold for tempo
     FontInfo tempoTxt;
-    tempoTxt.SetFaceName("Times");
-    tempoTxt.SetWeight(FONTWEIGHT_bold);
 
     // If we have not timestamp
     int x = measure->GetDrawingX();
