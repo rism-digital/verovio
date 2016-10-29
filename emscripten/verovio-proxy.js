@@ -28,7 +28,7 @@ verovio.vrvToolkit.getLog = Module.cwrap('vrvToolkit_getLog', 'string', ['number
 verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number', 'number', 'number']);
 
 // char *getHumdrum(Toolkit *ic)
-verovio.vrvToolkit.getHumdrum = Module.cwrap('vrvToolkit_getHumdrum', 'string', []);
+verovio.vrvToolkit.getHumdrum = Module.cwrap('vrvToolkit_getHumdrum', 'string');
 
 // int getPageCount(Toolkit *ic)
 verovio.vrvToolkit.getPageCount = Module.cwrap('vrvToolkit_getPageCount', 'number', ['number']);

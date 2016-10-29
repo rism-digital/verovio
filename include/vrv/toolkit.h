@@ -118,8 +118,11 @@ public:
      */
     std::string RenderToMidi();
 
+    const char *GetHumdrumBuffer();
+    void SetHumdrumBuffer(const char* contents);
+
     bool GetHumdrumFile(const std::string &filename);
-    bool GetHumdrum(std::ostream& output);
+    void GetHumdrum(std::ostream& output);
     std::string GetHumdrum();
 
     /**
@@ -395,7 +398,7 @@ private:
     bool m_noJustification;
     bool m_showBoundingBoxes;
 
-    std::string m_humdrumBuffer;
+    static char* m_humdrumBuffer;
     char *m_cString;
 };
 
