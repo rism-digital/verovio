@@ -86,17 +86,18 @@ bool MxmlMeasure::parseMeasure(xml_node mel) {
 		m_events.push_back(event);
 		output &= event->parseEvent(el);
 	}
-	
-	setStartTime();
+
+	setStartTimeOfMeasure();
 	calculateDuration();
 
 	// For debugging:
-	//
-	// cout << endl;
-	// cout << "MEASURE DURATION: " << getDuration() << endl;
-	// for (int i=0; i<(int)m_events.size(); i++) {
-	// 	m_events[i]->printEvent();
-	// }
+	/*
+	cout << endl;
+	cout << "MEASURE DURATION: " << getDuration() << endl;
+	for (int i=0; i<(int)m_events.size(); i++) {
+		m_events[i]->printEvent();
+	}
+	*/
 
 	sortEvents();
 
@@ -107,20 +108,25 @@ bool MxmlMeasure::parseMeasure(xml_node mel) {
 
 //////////////////////////////
 //
-// MxmlMeasure::setStartTime --
+// MxmlMeasure::setStartTimeOfMeasure --
 //
 
-void MxmlMeasure::setStartTime(void) {
+void MxmlMeasure::setStartTimeOfMeasure(void) {
 	if (!m_owner) {
-		setStartTime(0);
+		setStartTimeOfMeasure(0);
 		return;
 	}
 	MxmlMeasure* previous = m_owner->getPreviousMeasure(this);
 	if (!previous) {
-		setStartTime(0);
+		setStartTimeOfMeasure(0);
 		return;
 	}
-	setStartTime(previous->getStartTime() + previous->getDuration());
+	setStartTimeOfMeasure(previous->getStartTime() + previous->getDuration());
+}
+
+
+void MxmlMeasure::setStartTimeOfMeasure(HumNum value) {
+	m_starttime = value;
 }
 
 
@@ -133,31 +139,14 @@ void MxmlMeasure::setStartTime(void) {
 void MxmlMeasure::calculateDuration(void) {
 	HumNum maxdur   = 0;
 	HumNum sum      = 0;
-	HumNum chorddur = 0;
 	for (int i=0; i<(int)m_events.size(); i++) {
 		m_events[i]->setStartTime(sum + getStartTime());
-		if (m_events[i]->isChord()) {
-			m_events[i]->setStartTime(m_events[i]->getStartTime() - chorddur);
-		} else {
-			chorddur = m_events[i]->getDuration();
-		}
 		sum += m_events[i]->getDuration();
 		if (maxdur < sum) {
 			maxdur = sum;
 		}
 	}
 	setDuration(maxdur);
-}
-
-
-
-//////////////////////////////
-//
-// MxmlMeasure::setStartTime --
-//
-
-void MxmlMeasure::setStartTime(HumNum value) {
-	m_starttime = value;
 }
 
 
@@ -278,13 +267,15 @@ long MxmlMeasure::getQTicks(void) const {
 
 //////////////////////////////
 //
-// MxmlMeasure::attachToLastEvent --
+// MxmlMeasure::attachLastEventToPrevious --
 //
 
-void MxmlMeasure::attachToLastEvent(MxmlEvent* event) const {
-	if (m_events.size() == 0) {
-		return;
-	}
+void MxmlMeasure::attachLastEventToPrevious(void) {
+ 	if (m_events.size() < 2) {
+ 		return;
+ 	}
+	MxmlEvent* event = m_events.back();
+	m_events.resize(m_events.size() - 1);
 	m_events.back()->link(event);
 }
 
@@ -387,21 +378,6 @@ void MxmlMeasure::sortEvents(void) {
 	set<HumNum> times;
 
 	for (i=0; i<(int)m_events.size(); i++) {
-
-		// skip storing certain types of events:
-		switch (m_events[i]->getType()) {
-			case mevent_forward:
-			case mevent_backup:
-				continue;
-			case mevent_note:
-				if (m_events[i]->isChord()) {
-					continue;
-				}
-				break;
-			default:
-				break;
-		}
-
 		times.insert(m_events[i]->getStartTime());
 	}
 
@@ -427,11 +403,11 @@ void MxmlMeasure::sortEvents(void) {
 			case mevent_forward:
 			case mevent_backup:
 				continue;
-			case mevent_note:
-				if (m_events[i]->isChord()) {
-					continue;
-				}
-				break;
+			//case mevent_note:
+			//	if (m_events[i]->isChord()) {
+			//		continue;
+			//	}
+			//	break;
 			default:
 				break;
 		}

@@ -232,7 +232,6 @@ void musicxml2hum_interface::printPartInfo(vector<string>& partids,
 bool musicxml2hum_interface::stitchParts(HumGrid& outdata,
 		vector<string>& partids, map<string, xml_node>& partinfo,
 		map<string, xml_node>& partcontent, vector<MxmlPart>& partdata) {
-
 	if (partdata.size() == 0) {
 		return false;
 	}
@@ -241,7 +240,8 @@ bool musicxml2hum_interface::stitchParts(HumGrid& outdata,
 
 	int i;
 	int measurecount = partdata[0].getMeasureCount();
-	for (i=1; i<(int)partdata.size(); i++) {
+	// i used to start at 1 for some strange reason.
+	for (i=0; i<(int)partdata.size(); i++) {
 		if (measurecount != partdata[i].getMeasureCount()) {
 			cerr << "ERROR: cannot handle parts with different measure\n";
 			cerr << "counts yet. Compare " << measurecount << " to ";
@@ -403,7 +403,6 @@ bool musicxml2hum_interface::insertMeasure(HumGrid& outdata, int mnum,
 		}
 	}
 
-
 	bool allend = false;
 	vector<SimultaneousEvents*> nowevents;
 	vector<int> nowparts;
@@ -418,11 +417,13 @@ bool musicxml2hum_interface::insertMeasure(HumGrid& outdata, int mnum,
 			if (curindex[i] >= (int)(*sevents[i]).size()) {
 				continue;
 			}
+
 			if ((*sevents[i])[curindex[i]].starttime == processtime) {
 				nowevents.push_back(&(*sevents[i])[curindex[i]]);
 				nowparts.push_back(i);
 				curindex[i]++;
 			}
+
 			if (curindex[i] < (int)(*sevents[i]).size()) {
 				allend = false;
 				if ((nexttime < 0) ||
@@ -525,9 +526,38 @@ void musicxml2hum_interface::addEvent(GridSlice& slice,
 	stringstream ss;
 	ss << prefix << recip << pitch << postfix;
 
+	// check for chord notes.
+	if (event->isChord()) {
+		addChordNotes(ss, event, recip);
+	} else {
+	}
+
 	HTp token = new HumdrumToken(ss.str());
 	slice.at(partindex)->at(staffindex)->setTokenLayer(voiceindex, token,
 		event->getDuration());
+}
+
+
+
+//////////////////////////////
+//
+// musicxml2hum_interface::addChordNotes --
+//
+
+void musicxml2hum_interface::addChordNotes(ostream& output, MxmlEvent* head, 
+		const string& recip) {
+	vector<MxmlEvent*> links = head->getLinkedNotes();
+	MxmlEvent* note;
+	string pitch;
+	string prefix;
+	string postfix;
+	for (int i=0; i<(int)links.size(); i++) {
+		note = links.at(i);
+		pitch   = note->getKernPitch();
+		prefix  = note->getPrefixNoteInfo();
+		postfix = note->getPostfixNoteInfo();
+		output << " " << prefix << recip << pitch << postfix;
+	}
 }
 
 

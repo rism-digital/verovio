@@ -76,7 +76,11 @@ void MxmlEvent::clear(void) {
 	m_linked = false;
 	m_voice = m_staff = 0;
 	m_sequence = -1;
-	m_links.clear();
+	for (int i=0; i<m_links.size(); i++) {
+		delete m_links[i];
+		m_links[i] = NULL;
+	}
+	m_links.resize(0);
 }
 
 
@@ -298,7 +302,7 @@ void MxmlEvent::attachToLastEvent(void) {
 	if (!m_owner) {
 		return;
 	}
-	m_owner->attachToLastEvent(this);
+	m_owner->attachLastEventToPrevious();
 }
 
 
@@ -355,6 +359,17 @@ bool MxmlEvent::isChord(void) const {
 	} else {
 		return false;
 	}
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::getLinkedNotes --
+//
+
+vector<MxmlEvent*> MxmlEvent::getLinkedNotes(void) {
+	return m_links;
 }
 
 
@@ -651,7 +666,7 @@ string MxmlEvent::getKernPitch(void) const {
 	}
 
 	int count = 1;
-	char pc = 'C';
+	char pc = 'X';
 	if (step.size() > 0) {
 		pc = step[0];
 	}

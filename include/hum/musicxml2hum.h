@@ -122,6 +122,7 @@ class musicxml2hum_interface {
 
 		void addEvent          (GridSlice& slice, MxmlEvent* event);
 		void fillEmpties       (GridPart* part, const char* string);
+		void addChordNotes     (ostream& output, MxmlEvent* head, const string& recip);
 
 	public:
 

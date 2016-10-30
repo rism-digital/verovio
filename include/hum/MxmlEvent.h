@@ -75,6 +75,7 @@ class MxmlEvent {
 		void               link               (MxmlEvent* event);
 		bool               isLinked           (void) const;
 		void               setLinked          (void);
+		vector<MxmlEvent*> getLinkedNotes     (void);
 		void               attachToLastEvent  (void);
 		bool               isChord            (void) const;
 		void               printEvent         (void) const;

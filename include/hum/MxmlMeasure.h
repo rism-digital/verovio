@@ -52,8 +52,8 @@ class MxmlMeasure {
 		void          clear              (void);
 		bool          parseMeasure       (xml_node mel);
 		bool          parseMeasure       (xpath_node mel);
-		void          setStartTime       (HumNum value);
-		void          setStartTime       (void);
+		void          setStartTimeOfMeasure (HumNum value);
+		void          setStartTimeOfMeasure (void);
 		void          setDuration        (HumNum value);
 		HumNum        getStartTime       (void) const;
 		HumNum        getDuration        (void) const;
@@ -63,7 +63,7 @@ class MxmlMeasure {
 		int           getPartIndex       (void) const;
 		int           setQTicks          (long value);
 		long          getQTicks          (void) const;
-		void          attachToLastEvent  (MxmlEvent* event) const;
+		void          attachLastEventToPrevious  (void);
 		void          calculateDuration  (void);
 		int           getEventCount      (void) const;
 		vector<SimultaneousEvents>* getSortedEvents(void);
