@@ -925,8 +925,6 @@ void Toolkit::SetCString(const std::string &data)
 
 void Toolkit::SetHumdrumBuffer(const char *data)
 {
-    std::cerr << "SetHumdrumBuffer: " << data << endl;
-    std::cerr << "SIZE OF BUFFER " << strlen(data) << endl;
     if (m_humdrumBuffer) {
         free(m_humdrumBuffer);
         m_humdrumBuffer = NULL;
