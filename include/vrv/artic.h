@@ -31,6 +31,11 @@ public:
     virtual ClassId Is() const { return ARTIC; }
     ///@}
 
+    /**
+     * Static method that retrieve the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
+     */
+    static wchar_t GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place);
+
     //----------//
     // Functors //
     //----------//

@@ -317,7 +317,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    wchar_t code = SMUFL_E4A0_articAccentAbove;
+    wchar_t code;
 
     int x = parent->GetDrawingX();
     int xShift, yShift;
@@ -330,12 +330,17 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     std::vector<data_ARTICULATION> articList = artic->GetArtic();
     for (articIter = articList.begin(); articIter != articList.end(); articIter++) {
 
+        code = Artic::GetSmuflCode(*articIter, place);
+
+        // Skip it if we do not have it in the font (for now)
+        if (code == 0) continue;
+
         xShift = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
         yShift = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
 
         y -= (place == STAFFREL_above) ? 0 : yShift;
 
-        DrawSmuflCode(dc, x - xShift, y, SMUFL_E4A0_articAccentAbove, staff->m_drawingStaffSize, drawingCueSize);
+        DrawSmuflCode(dc, x - xShift, y, code, staff->m_drawingStaffSize, drawingCueSize);
 
         y += (place == STAFFREL_above) ? yShift + m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize)
                                        : -m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
