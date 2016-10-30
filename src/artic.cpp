@@ -14,7 +14,6 @@
 //----------------------------------------------------------------------------
 
 #include "functorparams.h"
-#include "note.h"
 
 namespace vrv {
 
@@ -22,12 +21,12 @@ namespace vrv {
 // Artic
 //----------------------------------------------------------------------------
 
-Artic::Artic() : LayerElement("artic-"), PositionInterface(), AttArticulation(), AttColor()
+Artic::Artic() : LayerElement("artic-"), AttArticulation(), AttColor(), AttPlacement()
 {
 
-    RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_ARTICULATION);
     RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_PLACEMENT);
 
     Reset();
 }
@@ -39,9 +38,9 @@ Artic::~Artic()
 void Artic::Reset()
 {
     LayerElement::Reset();
-    PositionInterface::Reset();
     ResetArticulation();
     ResetColor();
+    ResetPlacement();
 }
 
 //----------------------------------------------------------------------------

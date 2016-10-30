@@ -8,8 +8,8 @@
 #ifndef __VRV_ARTIC_H__
 #define __VRV_ARTIC_H__
 
+#include "atts_shared.h"
 #include "layerelement.h"
-#include "positioninterface.h"
 
 namespace vrv {
 
@@ -17,7 +17,7 @@ namespace vrv {
 // Artic
 //----------------------------------------------------------------------------
 
-class Artic : public LayerElement, public PositionInterface, public AttArticulation, public AttColor {
+class Artic : public LayerElement, public AttArticulation, public AttColor, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -30,8 +30,6 @@ public:
     virtual std::string GetClassName() const { return "Artic"; }
     virtual ClassId Is() const { return ARTIC; }
     ///@}
-
-    virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }

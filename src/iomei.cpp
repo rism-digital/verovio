@@ -17,6 +17,7 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "artic.h"
 #include "beam.h"
 #include "boundary.h"
 #include "chord.h"
@@ -823,6 +824,16 @@ void MeiOutput::WriteMeiAccid(pugi::xml_node currentNode, Accid *accid)
     accid->WriteAccidLog(currentNode);
 }
 
+void MeiOutput::WriteMeiArtic(pugi::xml_node currentNode, Artic *artic)
+{
+    assert(artic);
+
+    WriteLayerElement(currentNode, artic);
+    artic->WriteArticulation(currentNode);
+    artic->WriteColor(currentNode);
+    artic->WritePlacement(currentNode);
+}
+
 void MeiOutput::WriteMeiBarLine(pugi::xml_node currentNode, BarLine *barLine)
 {
     assert(barLine);
@@ -1438,6 +1449,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         if (element == "note") {
             return true;
         }
+        else if (element == "artic") {
+            return true;
+        }
         else {
             return false;
         }
@@ -1469,6 +1483,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for note
     else if (filterParent->Is() == NOTE) {
         if (element == "accid") {
+            return true;
+        }
+        else if (element == "artic") {
             return true;
         }
         else if (element == "syl") {
@@ -2273,6 +2290,9 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
         else if (elementName == "accid") {
             success = ReadMeiAccid(parent, xmlElement);
         }
+        else if (elementName == "artic") {
+            success = ReadMeiArtic(parent, xmlElement);
+        }
         else if (elementName == "barLine") {
             success = ReadMeiBarLine(parent, xmlElement);
         }
@@ -2377,6 +2397,19 @@ bool MeiInput::ReadMeiAccid(Object *parent, pugi::xml_node accid)
     vrvAccid->ReadAccidLog(accid);
 
     parent->AddChild(vrvAccid);
+    return true;
+}
+
+bool MeiInput::ReadMeiArtic(Object *parent, pugi::xml_node artic)
+{
+    Artic *vrvArtic = new Artic();
+    ReadLayerElement(artic, vrvArtic);
+
+    vrvArtic->ReadArticulation(artic);
+    vrvArtic->ReadColor(artic);
+    vrvArtic->ReadPlacement(artic);
+
+    parent->AddChild(vrvArtic);
     return true;
 }
 
