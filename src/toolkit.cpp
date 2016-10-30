@@ -388,7 +388,7 @@ bool Toolkit::LoadData(const std::string &data)
         input = new DarmsInput(&m_doc, "");
     }
     else if (inputFormat == HUMDRUM) {
-        LogMessage("Importing Humdrum data");
+        // LogMessage("Importing Humdrum data");
 
         Doc tempdoc;
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
@@ -413,7 +413,7 @@ bool Toolkit::LoadData(const std::string &data)
         // using iomusicxml:
         // input = new MusicXmlInput(&m_doc, "");
 
-        LogMessage("Importing MusicXML data via Humdrum");
+        // LogMessage("Importing MusicXML data via Humdrum");
 
         // First convert from MusicXML into Humdrum:
         hum::musicxml2hum_interface converter;
