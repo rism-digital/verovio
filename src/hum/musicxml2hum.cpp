@@ -678,6 +678,43 @@ void musicxml2hum_interface::insertPartClefs(xml_node clef, GridPart& part) {
 		clef = convertClefToHumdrum(clef, token, staffnum);
 		part[staffnum]->setTokenLayer(0, token, 0);
 	}
+
+	// go back and fill in all NULL pointers with null interpretations
+	fillEmpties(&part, "*");
+}
+
+
+
+//////////////////////////////
+//
+// musicxml2hum_interface::fillEmpties --
+//
+
+void musicxml2hum_interface::fillEmpties(GridPart* part, const char* string) {
+	int staffcount = (int)part->size();
+	GridVoice* gv;
+	int vcount;
+
+ 	for (int s=0; s<staffcount; s++) {
+		GridStaff* staff = part->at(s);
+		if (staff == NULL) {
+			cerr << "Strange error here" << endl;
+			continue;
+		}
+		vcount = (int)staff->size();
+		if (vcount == 0) {
+			gv = new GridVoice(string, 0);
+			staff->push_back(gv);
+		} else {
+			for (int v=0; v<vcount; v++) {
+				gv = staff->at(v);
+				if (gv == NULL) {
+					gv = new GridVoice(string, 0);
+					staff->at(v) = gv;
+				}
+			}
+		}
+	}
 }
 
 

@@ -443,10 +443,11 @@ int main(int argc, char **argv)
         }
     }
     else if (outformat == "humdrum") {
-	outfile += ".krn";
+        outfile += ".krn";
         if (std_output) {
             toolkit.GetHumdrum(std::cout);
-        } else {
+        }
+        else {
             if (!toolkit.GetHumdrumFile(outfile)) {
                 cerr << "Unable to write Humdrum to " << outfile << "." << endl;
                 exit(1);

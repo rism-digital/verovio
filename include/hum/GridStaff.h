@@ -20,7 +20,7 @@
 #include "humlib.h"
 #include "grid.h"
 #include "GridSide.h"
-#include "GridToken.h"
+#include "GridVoice.h"
 
 #include <vector>
 
@@ -30,11 +30,11 @@ using namespace std;
 namespace hum {
 
 
-class GridStaff : public vector<GridToken*> {
+class GridStaff : public vector<GridVoice*> {
 	public:
 		GridStaff(void);
 		~GridStaff();
-		GridToken* setTokenLayer (int layerindex, HTp token, HumNum duration);
+		GridVoice* setTokenLayer (int layerindex, HTp token, HumNum duration);
 		void setNullTokenLayer   (int layerindex, SliceType type, HumNum nextdur,
 		                          HumNum prevdur);
 		void appendTokenLayer    (int layerindex, HTp token, HumNum duration,

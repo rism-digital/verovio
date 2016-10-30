@@ -44,7 +44,7 @@ class HumGrid : public vector<GridMeasure*> {
 		void buildSingleList                   (void);
 		void extendDurationToken               (int slicei, int parti,
 		                                        int staffi, int voicei);
-		GridToken* getGridToken(int slicei, int parti, int staffi, int voicei);
+		GridVoice* getGridVoice(int slicei, int parti, int staffi, int voicei);
 		void addMeasureLines                   (void);
 		void addLastMeasure                    (void);
 		bool manipulatorCheck                  (void);

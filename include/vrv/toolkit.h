@@ -119,10 +119,10 @@ public:
     std::string RenderToMidi();
 
     const char *GetHumdrumBuffer();
-    void SetHumdrumBuffer(const char* contents);
+    void SetHumdrumBuffer(const char *contents);
 
     bool GetHumdrumFile(const std::string &filename);
-    void GetHumdrum(std::ostream& output);
+    void GetHumdrum(std::ostream &output);
     std::string GetHumdrum();
 
     /**
@@ -398,7 +398,7 @@ private:
     bool m_noJustification;
     bool m_showBoundingBoxes;
 
-    static char* m_humdrumBuffer;
+    static char *m_humdrumBuffer;
     char *m_cString;
 };
 
