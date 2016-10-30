@@ -16,6 +16,7 @@
 //----------------------------------------------------------------------------
 
 #include "accid.h"
+#include "artic.h"
 #include "beam.h"
 #include "chord.h"
 #include "clef.h"
@@ -67,6 +68,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
 
     if (element->Is() == ACCID) {
         DrawAccid(dc, element, layer, staff, measure);
+    }
+    else if (element->Is() == ARTIC) {
+        DrawArtic(dc, element, layer, staff, measure);
     }
     else if (element->Is() == BARLINE) {
         DrawBarLine(dc, element, layer, staff, measure);
@@ -238,6 +242,106 @@ void View::DrawAccid(
     }
 
     DrawSmuflCode(dc, x, y, symc, pseudoStaffSize, accid->m_drawingCueSize);
+
+    dc->EndGraphic(element, this);
+}
+
+void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    Artic *artic = dynamic_cast<Artic *>(element);
+    assert(artic);
+
+    if (artic->GetFirstParent(CHORD)) {
+        artic->SetEmptyBB();
+        return;
+    }
+
+    /************** Get the parent and the stem direction **************/
+
+    LayerElement *parent = NULL;
+    Note *parentNote = NULL;
+    Chord *parentChord = dynamic_cast<Chord *>(artic->GetFirstParent(CHORD));
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+    data_STAFFREL place = STAFFREL_NONE;
+    bool drawingCueSize = false;
+
+    if (!parentChord) {
+        parentNote = dynamic_cast<Note *>(artic->GetFirstParent(NOTE));
+        parent = parentNote;
+    }
+    else {
+        parent = parentChord;
+    }
+
+    if (!parentChord && !parentNote) {
+        // no parent chord or note, nothing we can do...
+        return;
+    }
+
+    stemDir = parentNote ? parentNote->GetDrawingStemDir() : parentChord->GetDrawingStemDir();
+    drawingCueSize = parent->IsCueSize();
+
+    /************** placement **************/
+
+    // for now we ignore within @place
+    if (artic->HasPlace() && (artic->GetPlace() != STAFFREL_within))
+        place = artic->GetPlace();
+    else if (stemDir == STEMDIRECTION_up)
+        place = STAFFREL_below;
+    else
+        place = STAFFREL_above;
+
+    //
+
+    int y;
+    int yChordMax, yChordMin;
+
+    // first get the min max of the chord (if any)
+    if (parentChord) {
+        parentChord->GetYExtremes(&yChordMax, &yChordMin);
+    }
+
+    // artic is above
+    if (place == STAFFREL_above) {
+        y = parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+        y += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+    else {
+        y = parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+        y -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+
+    wchar_t code = SMUFL_E4A0_articAccentAbove;
+
+    int x = parent->GetDrawingX();
+    int xShift, yShift;
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
+
+    std::vector<data_ARTICULATION>::iterator articIter;
+    std::vector<data_ARTICULATION> articList = artic->GetArtic();
+    for (articIter = articList.begin(); articIter != articList.end(); articIter++) {
+
+        xShift = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
+        yShift = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
+
+        y -= (place == STAFFREL_above) ? 0 : yShift;
+
+        DrawSmuflCode(dc, x - xShift, y, SMUFL_E4A0_articAccentAbove, staff->m_drawingStaffSize, drawingCueSize);
+
+        y += (place == STAFFREL_above) ? yShift + m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize)
+                                       : -m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
+    }
+
+    dc->ResetFont();
 
     dc->EndGraphic(element, this);
 }
@@ -1374,7 +1478,6 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
         dc->SetFont(m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize));
     }
 
-    
     bool setX = false;
     bool setY = false;
     int x = syl->GetDrawingX();

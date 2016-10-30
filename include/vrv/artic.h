@@ -31,9 +31,6 @@ public:
     virtual ClassId Is() const { return ARTIC; }
     ///@}
 
-    /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; }
-
     //----------//
     // Functors //
     //----------//
