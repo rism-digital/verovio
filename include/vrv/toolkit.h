@@ -26,7 +26,7 @@
 
 namespace vrv {
 
-typedef enum { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML } FileFormat;
+enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML };
 
 //----------------------------------------------------------------------------
 // Toolkit

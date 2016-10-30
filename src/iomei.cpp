@@ -822,6 +822,7 @@ void MeiOutput::WriteMeiAccid(pugi::xml_node currentNode, Accid *accid)
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
     accid->WriteAccidLog(currentNode);
+    accid->WriteColor(currentNode);
 }
 
 void MeiOutput::WriteMeiArtic(pugi::xml_node currentNode, Artic *artic)
@@ -947,6 +948,7 @@ void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
 
     WriteLayerElement(currentNode, mRest);
     mRest->WriteVisibility(currentNode);
+    mRest->WriteFermatapresent(currentNode);
 }
 
 void MeiOutput::WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt)
@@ -987,6 +989,7 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     WriteDurationInterface(currentNode, note);
     WritePitchInterface(currentNode, note);
     note->WriteAccidentalPerformed(currentNode);
+    note->WriteColor(currentNode);
     note->WriteColoration(currentNode);
     note->WriteGraced(currentNode);
     note->WriteNoteLogMensural(currentNode);
@@ -1054,6 +1057,7 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
     assert(rend);
 
     WriteXmlId(currentNode, rend);
+    rend->WriteColor(currentNode);
     rend->WriteCommon(currentNode);
     rend->WriteTypography(currentNode);
 }
@@ -1549,7 +1553,10 @@ bool MeiInput::ReadMei(pugi::xml_node root)
     pugi::xml_node mdiv;
     pugi::xml_node pages;
     if (!root.empty()) {
-        music = root.child("music");
+        if (std::string(root.name()) == "music")
+            music = root;
+        else
+            music = root.child("music");
     }
     if (!music.empty()) {
         body = music.child("body");
@@ -2395,6 +2402,7 @@ bool MeiInput::ReadMeiAccid(Object *parent, pugi::xml_node accid)
     ReadPositionInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidLog(accid);
+    vrvAccid->ReadColor(accid);
 
     parent->AddChild(vrvAccid);
     return true;
@@ -2579,6 +2587,7 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
     ReadLayerElement(mRest, vrvMRest);
 
     vrvMRest->ReadVisibility(mRest);
+    vrvMRest->ReadFermatapresent(mRest);
 
     parent->AddChild(vrvMRest);
     return true;
@@ -2632,6 +2641,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
     vrvNote->ReadAccidentalPerformed(note);
+    vrvNote->ReadColor(note);
     vrvNote->ReadColoration(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadNoteLogMensural(note);
@@ -2760,6 +2770,7 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
 {
     Rend *vrvRend = new Rend();
 
+    vrvRend->ReadColor(rend);
     vrvRend->ReadCommon(rend);
     vrvRend->ReadTypography(rend);
 
