@@ -403,11 +403,6 @@ void MxmlMeasure::sortEvents(void) {
 			case mevent_forward:
 			case mevent_backup:
 				continue;
-			//case mevent_note:
-			//	if (m_events[i]->isChord()) {
-			//		continue;
-			//	}
-			//	break;
 			default:
 				break;
 		}

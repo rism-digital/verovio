@@ -74,6 +74,7 @@ class MxmlEvent {
 		bool               hasChild           (const char* query) const;
 		void               link               (MxmlEvent* event);
 		bool               isLinked           (void) const;
+		bool               isRest             (void);
 		void               setLinked          (void);
 		vector<MxmlEvent*> getLinkedNotes     (void);
 		void               attachToLastEvent  (void);
@@ -116,8 +117,9 @@ class MxmlEvent {
 		int    getDotCount               (void) const;
 
 	public:
-		static HumNum getEmbeddedDuration   (xml_node el = xml_node(NULL));
-		static HumNum getQuarterDurationFromType        (const char* type);
+		static HumNum getEmbeddedDuration  (xml_node el = xml_node(NULL));
+		static HumNum getQuarterDurationFromType (const char* type);
+		static bool   nodeType             (xml_node node, const char* testname);
 
 	friend MxmlMeasure;
 	friend MxmlPart;

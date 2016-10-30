@@ -312,6 +312,9 @@ bool HumGrid::manipulatorCheck(void) {
 	GridSlice* s2;
 	bool output = false;
 	for (m=0; m<(int)this->size(); m++) {
+		if (this->at(m)->size() == 0) {
+			continue;
+		}
 		for (auto it = this->at(m)->begin(); it != this->at(m)->end(); it++) {
 			s1 = *it;
 			auto nextone = it;
@@ -359,6 +362,12 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 	int v;
 	bool needmanip = false;
 
+	if (ice1 == NULL) {
+		return NULL;
+	}
+	if (ice2 == NULL) {
+		return NULL;
+	}
 	p1count = (int)ice1->size();
 	p2count = (int)ice2->size();
 	if (p1count != p2count) {
@@ -481,34 +490,34 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 void HumGrid::addMeasureLines(void) {
 	HumNum timestamp;
 	GridSlice* mslice;
+	GridSlice* endslice;
 	GridPart* part;
 	GridStaff* staff;
 	GridVoice* gt;
-	int staffcount;
-	int partcount;
-	int vcount;
-	int nextvcount;
-	int lcount;
 	HTp token;
-	GridSlice* endslice;
-	int m;
-	int p;
-	int s;
-	for (m=0; m<(int)this->size()-1; m++) {
+	int staffcount, partcount, vcount, nextvcount, lcount;
+	for (int m=0; m<(int)this->size()-1; m++) {
 		GridMeasure* measure = this->at(m);
 		GridMeasure* nextmeasure = this->at(m+1);
+		if (nextmeasure->size() == 0) {
+			// next measure is empty for some reason so give up
+			continue;
+		} 
 		timestamp = nextmeasure->front()->getTimestamp();
 		mslice = new GridSlice(timestamp, SliceType::Measures);
+		if (measure->size() == 0) {
+			continue;
+		}
 		endslice = measure->back();
 		measure->push_back(mslice);
 		partcount = (int)nextmeasure->front()->size();
 		mslice->resize(partcount);
-		for (p=0; p<partcount; p++) {
+		for (int p=0; p<partcount; p++) {
 			part = new GridPart();
 			mslice->at(p) = part;
 			staffcount = (int)nextmeasure->front()->at(p)->size();
 			mslice->at(p)->resize(staffcount);
-			for (s=0; s<(int)staffcount; s++) {
+			for (int s=0; s<(int)staffcount; s++) {
 				staff = new GridStaff;
 				mslice->at(p)->at(s) = staff;
 

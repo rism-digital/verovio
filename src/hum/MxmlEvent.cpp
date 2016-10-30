@@ -267,13 +267,15 @@ void MxmlEvent::setDurationByTicks(long value, xml_node el) {
 
 	if (el) {
 		HumNum checkval = getEmbeddedDuration(el);
-		if (checkval != val) {
+		if ((checkval == 0) && isRest()) {
+			// This is a whole rest.
+			// val = val
+		} else if (checkval != val) {
 			// cerr << "WARNING: True duration " << checkval << " does not match";
 			// cerr << " tick duration (buggy data: " << val << ")" << endl;
 			val = checkval;
 		}
 	}
-
 
 	setDuration(val);
 }
@@ -343,6 +345,27 @@ void MxmlEvent::setLinked(void) {
 
 bool MxmlEvent::isLinked(void) const {
 	return m_linked;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::isRest -- 
+//
+
+bool MxmlEvent::isRest(void) {
+	if (!m_node) {
+		return false;
+	}
+	xml_node child = m_node.first_child();
+	while (child) {
+		if (nodeType(child, "rest")) {
+			return true;
+		}
+		child = child.next_sibling();
+	}
+	return false;
 }
 
 
@@ -1071,6 +1094,19 @@ HumNum MxmlEvent::getQuarterDurationFromType(const char* type) {
 	}
 }
 
+
+//////////////////////////////
+//
+// MxmlEvent::nodeType -- return true if node type matches string.
+//
+
+bool MxmlEvent::nodeType(xml_node node, const char* testname) {
+	if (strcmp(node.name(), testname) == 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
 
 } // end namespace hum
