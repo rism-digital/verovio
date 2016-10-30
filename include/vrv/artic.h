@@ -32,9 +32,16 @@ public:
     ///@}
 
     /**
-     * Static method that retrieve the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
+     * Static method that retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
      */
     static wchar_t GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place);
+
+    /**
+     * Static method that retrieves the vertical correctoin for a SMuFL code for with data_STAFFREL.
+     * The reason for this is that SMuFL sometimes has the glyph below the line, sometimes above.
+     * See bow indications for an example where is is always above
+     */
+    static bool VerticalCorr(wchar_t code, data_STAFFREL place);
 
     //----------//
     // Functors //

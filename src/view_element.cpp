@@ -321,6 +321,7 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     int x = parent->GetDrawingX();
     int xShift, yShift;
+    int baselineCorr;
 
     dc->StartGraphic(element, "", element->GetUuid());
 
@@ -337,9 +338,14 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
         xShift = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
         yShift = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
+
+        // Adjust the baseline for glyph above the baseline in SMuFL
+        baselineCorr = 0;
+        if (Artic::VerticalCorr(code, place)) baselineCorr = yShift;
+
         yShift += m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
 
-        DrawSmuflCode(dc, x - xShift, y, code, staff->m_drawingStaffSize, drawingCueSize);
+        DrawSmuflCode(dc, x - xShift, y - baselineCorr, code, staff->m_drawingStaffSize, drawingCueSize);
 
         y += (place == STAFFREL_above) ? yShift : -yShift;
     }

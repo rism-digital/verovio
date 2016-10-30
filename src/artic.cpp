@@ -66,8 +66,9 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
             // case ARTICULATION_flip;
             // case ARTICULATION_smear;
             // case ARTICULATION_shake;
-            // case ARTICULATION_dnbow;
-            // case ARTICULATION_upbow;
+            case ARTICULATION_dnbow: return SMUFL_E610_stringsDownBow;
+            case ARTICULATION_upbow:
+                return SMUFL_E612_stringsUpBow;
             // case ARTICULATION_harm;
             // case ARTICULATION_snap;
             // case ARTICULATION_fingernail;
@@ -98,6 +99,10 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
             case ARTICULATION_marc_stacc:
                 return SMUFL_E4AF_articMarcatoStaccatoBelow;
             //
+            case ARTICULATION_dnbow: return SMUFL_E611_stringsDownBowTurned;
+            case ARTICULATION_upbow:
+                return SMUFL_E613_stringsUpBowTurned;
+            //
             case ARTICULATION_ten_stacc:
                 return SMUFL_E4B3_articTenutoStaccatoBelow;
             //
@@ -106,6 +111,18 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
     }
     else
         return 0;
+}
+
+bool Artic::VerticalCorr(wchar_t code, data_STAFFREL place)
+{
+    if (place == STAFFREL_above)
+        return false;
+    else if (code == SMUFL_E611_stringsDownBowTurned)
+        return true;
+    else if (code == SMUFL_E613_stringsUpBowTurned)
+        return true;
+    else
+        return false;
 }
 
 //----------------------------------------------------------------------------
