@@ -3,9 +3,9 @@ FontName: Leipzig
 FullName: Leipzig
 FamilyName: Leipzig
 Weight: Regular
-Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.10
-UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoACgAA"
-Version: 5.2.10
+Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.11
+UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoACgAA"
+Version: 5.2.11
 ItalicAngle: 0
 UnderlinePosition: -50
 UnderlineWidth: 50
@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1477859225
+ModificationTime: 1477898830
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -50,11 +50,11 @@ NameList: Adobe Glyph List
 DisplaySize: -72
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 58896 18 7
+WinInfo: 58860 18 7
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
-BeginChars: 1114115 180
+BeginChars: 1114115 181
 
 StartChar: uniE0A3
 Encoding: 57507 57507 0
@@ -10057,21 +10057,21 @@ EndChar
 
 StartChar: uniE610
 Encoding: 58896 58896 176
-Width: 210
+Width: 240
 VWidth: 0
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 210 m 25
- 210 210 l 25
- 210 0 l 25
- 182 0 l 25
- 182 116 l 25
+0 230 m 29
+ 240 230 l 29
+ 240 0 l 25
+ 212 0 l 25
+ 212 116 l 25
  28 116 l 25
  28 0 l 25
  0 0 l 25
- 0 210 l 25
+ 0 230 l 29
 EndSplineSet
 EndChar
 
@@ -10113,21 +10113,42 @@ EndChar
 
 StartChar: uniE611
 Encoding: 58897 58897 179
-Width: 210
+Width: 240
 VWidth: 0
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 0 m 29
- 210 0 l 29
- 210 210 l 29
- 182 210 l 29
- 182 94 l 29
- 28 94 l 29
- 28 210 l 29
- 0 210 l 29
- 0 0 l 29
+0 0 m 25
+ 240 0 l 25
+ 240 230 l 25
+ 212 230 l 25
+ 212 114 l 25
+ 28 114 l 25
+ 28 230 l 29
+ 0 230 l 25
+ 0 0 l 25
+EndSplineSet
+EndChar
+
+StartChar: uniE614
+Encoding: 58900 58900 180
+Width: 206
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 103 m 0
+ 0 160 46 206 103 206 c 0
+ 160 206 206 160 206 103 c 0
+ 206 46 160 0 103 0 c 0
+ 46 0 0 46 0 103 c 0
+28 103 m 0
+ 28 62 62 28 103 28 c 0
+ 144 28 178 62 178 103 c 0
+ 178 144 144 178 103 178 c 0
+ 62 178 28 144 28 103 c 0
 EndSplineSet
 EndChar
 EndChars

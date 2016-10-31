@@ -13,16 +13,17 @@ Version 5.2.7 - adjusting pedal glyphs
 Version 5.2.8 - adding perc clef
 Version 5.2.9 - adding two mensural clefs
 Version 5.2.10 - adding articulations and two fermatas and bow directions
+Version 5.2.11 - adding harmonic and reviewing bows
 
 
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20161003 at Sun Oct 30 21:18:52 2016
+Created by FontForge 20161003 at Mon Oct 31 08:27:10 2016
  By laurent
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.10
+Version 5.2.11
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="347" >
@@ -863,13 +864,15 @@ c-12 -11.333 -18.333 -25 -19 -41c0 -14 5.66699 -26.667 17 -38s26 -17.333 44 -18c
 d="M0 0v28h347v-28h-347zM310 85h-77l-89 161l-83 -161h-24l137 265z" />
     <glyph glyph-name="uniE4BD" unicode="&#xe4bd;" 
 d="M347 0v-28h-347v28h347zM37 -85h77l89 -161l83 161h24l-137 -265z" />
-    <glyph glyph-name="uniE610" unicode="&#xe610;" horiz-adv-x="210" 
-d="M0 210h210v-210h-28v116h-154v-116h-28v210z" />
+    <glyph glyph-name="uniE610" unicode="&#xe610;" horiz-adv-x="240" 
+d="M0 230h240v-230h-28v116h-184v-116h-28v230z" />
     <glyph glyph-name="uniE612" unicode="&#xe612;" horiz-adv-x="218" 
 d="M218 260l-109 -260l-109 260h24l85 -196l85 196h24z" />
     <glyph glyph-name="uniE613" unicode="&#xe613;" horiz-adv-x="218" 
 d="M218 0l-109 260l-109 -260h24l85 196l85 -196h24z" />
-    <glyph glyph-name="uniE611" unicode="&#xe611;" horiz-adv-x="210" 
-d="M0 0h210v210h-28v-116h-154v116h-28v-210z" />
+    <glyph glyph-name="uniE611" unicode="&#xe611;" horiz-adv-x="240" 
+d="M0 0h240v230h-28v-116h-184v116h-28v-230z" />
+    <glyph glyph-name="uniE614" unicode="&#xe614;" horiz-adv-x="206" 
+d="M0 103c0 57 46 103 103 103s103 -46 103 -103s-46 -103 -103 -103s-103 46 -103 103zM28 103c0 -41 34 -75 75 -75s75 34 75 75s-34 75 -75 75s-75 -34 -75 -75z" />
   </font>
 </defs></svg>
