@@ -320,7 +320,8 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     wchar_t code;
 
     int x = parent->GetDrawingX();
-    int xShift, yShift;
+    int yShift;
+    int xCorr;
     int baselineCorr;
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -333,20 +334,22 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
         code = Artic::GetSmuflCode(*articIter, place);
 
-        // Skip it if we do not have it in the font (for now)
+        // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
         if (code == 0) continue;
 
-        xShift = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
+        // The correction for centering the glyph
+        xCorr = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
+        // The position of the next glyph (and for correcting the baseline if necessary
         yShift = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
 
         // Adjust the baseline for glyph above the baseline in SMuFL
         baselineCorr = 0;
         if (Artic::VerticalCorr(code, place)) baselineCorr = yShift;
 
+        DrawSmuflCode(dc, x - xCorr, y - baselineCorr, code, staff->m_drawingStaffSize, drawingCueSize);
+
+        // Adjusting the y position for the next artic
         yShift += m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
-
-        DrawSmuflCode(dc, x - xShift, y - baselineCorr, code, staff->m_drawingStaffSize, drawingCueSize);
-
         y += (place == STAFFREL_above) ? yShift : -yShift;
     }
 
