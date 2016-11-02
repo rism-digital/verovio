@@ -269,6 +269,7 @@ Object::~Object()
 void Object::Init(std::string classid)
 {
     m_parent = NULL;
+    m_isAttribute = false;
     m_isModified = true;
     m_classid = classid;
     this->GenerateUuid();

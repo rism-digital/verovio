@@ -273,6 +273,11 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("accid");
         WriteMeiAccid(m_currentNode, dynamic_cast<Accid *>(object));
     }
+    else if (object->Is() == ARTIC) {
+        // Do not add a node for object representing an attribute
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("artic");
+        WriteMeiArtic(m_currentNode, dynamic_cast<Artic *>(object));
+    }
     else if (object->Is() == BARLINE) {
         m_currentNode = m_currentNode.append_child("barLine");
         WriteMeiBarLine(m_currentNode, dynamic_cast<BarLine *>(object));
@@ -482,6 +487,10 @@ bool MeiOutput::WriteObjectEnd(Object *object)
         BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(object);
         assert(interface);
         if (interface->IsBoundary()) return true;
+    }
+    // Object representing an attribute have no node to pop
+    else if (object->IsAttribute()) {
+        return true;
     }
     else if (m_scoreBasedMEI && (object->Is() == SYSTEM)) {
         return true;
@@ -828,6 +837,12 @@ void MeiOutput::WriteMeiAccid(pugi::xml_node currentNode, Accid *accid)
 void MeiOutput::WriteMeiArtic(pugi::xml_node currentNode, Artic *artic)
 {
     assert(artic);
+
+    // Only write att.articulation if representing an attribute
+    if (artic->IsAttribute()) {
+        artic->WriteArticulation(currentNode);
+        return;
+    }
 
     WriteLayerElement(currentNode, artic);
     artic->WriteArticulation(currentNode);
@@ -2649,6 +2664,15 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadStemsCmn(note);
     vrvNote->ReadTiepresent(note);
     vrvNote->ReadVisibility(note);
+
+    AttArticulation artic;
+    artic.ReadArticulation(note);
+    if (artic.HasArtic()) {
+        Artic *vrvArtic = new Artic();
+        vrvArtic->IsAttribute(true);
+        vrvArtic->SetArtic(artic.GetArtic());
+        vrvNote->AddChild(vrvArtic);
+    }
 
     parent->AddChild(vrvNote);
     return ReadMeiLayerChildren(vrvNote, note, vrvNote);

@@ -422,6 +422,14 @@ public:
     void Modify(bool modified = true);
 
     /**
+     * @name Setter and getter of the attribute flag
+     */
+    ///@{
+    bool IsAttribute() const { return m_isAttribute; }
+    void IsAttribute(bool isAttribute) { m_isAttribute = isAttribute; }
+    ///@}
+
+    /**
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
@@ -868,6 +876,12 @@ private:
      * the object when printing an MEI element.
      */
     std::string m_comment;
+
+    /**
+     * A flag indicating if the Object represents an attribute in the original MEI.
+     * For example, a Artic child in Note for an original @artic
+     */
+    bool m_isAttribute;
 };
 
 //----------------------------------------------------------------------------
