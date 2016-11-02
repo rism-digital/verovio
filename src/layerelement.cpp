@@ -372,7 +372,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->Is() == ACCID) {
         type = ALIGNMENT_ACCID;
     }
-    else if (this->Is() == SYL) {
+    else if ((this->Is() == SYL) || (this->Is() == ARTIC)) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
