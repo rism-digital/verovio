@@ -144,6 +144,13 @@ bool Artic::VerticalCorr(wchar_t code, data_STAFFREL place)
         return false;
 }
 
+bool Artic::IsCentered(data_ARTICULATION artic)
+{
+    if (artic == ARTICULATION_stacc) return true;
+    if (artic == ARTICULATION_ten) return true;
+    return false;
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------

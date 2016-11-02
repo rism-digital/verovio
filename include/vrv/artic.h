@@ -48,6 +48,11 @@ public:
      */
     static bool VerticalCorr(wchar_t code, data_STAFFREL place);
 
+    /**
+     * Static method that returns true if the data_ARTICULATION has to be centered between staff lines
+     */
+    static bool IsCentered(data_ARTICULATION artic);
+
     //----------//
     // Functors //
     //----------//
