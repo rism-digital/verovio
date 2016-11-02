@@ -246,7 +246,8 @@ void View::DrawAccid(
     dc->EndGraphic(element, this);
 }
 
-void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawArtic(
+    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, bool drawingList)
 {
     assert(dc);
     assert(element);
@@ -257,8 +258,11 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Artic *artic = dynamic_cast<Artic *>(element);
     assert(artic);
 
-    if (artic->GetFirstParent(CHORD)) {
-        artic->SetEmptyBB();
+    Chord *chord = dynamic_cast<Chord *>(artic->GetFirstParent(CHORD));
+    if (chord && !drawingList) {
+        dc->StartGraphic(element, "", element->GetUuid());
+        dc->EndGraphic(element, this);
+        chord->AddToDrawingList(artic);
         return;
     }
 
@@ -330,7 +334,10 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int xCorr;
     int baselineCorr;
 
-    dc->StartGraphic(element, "", element->GetUuid());
+    if (drawingList)
+        dc->ResumeGraphic(element, element->GetUuid());
+    else
+        dc->StartGraphic(element, "", element->GetUuid());
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
 
@@ -361,7 +368,10 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->ResetFont();
 
-    dc->EndGraphic(element, this);
+    if (drawingList)
+        dc->EndResumedGraphic(element, this);
+    else
+        dc->EndGraphic(element, this);
 }
 
 void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -545,6 +555,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Chord *chord = dynamic_cast<Chord *>(element);
     assert(chord);
 
+    chord->ResetDrawingList();
+
     int staffSize = staff->m_drawingStaffSize;
     int staffY = staff->GetDrawingY();
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
@@ -727,6 +739,15 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->ResetPen();
     dc->ResetBrush();
+
+    ListOfObjects *drawingList = chord->GetDrawingList();
+    ListOfObjects::iterator listIter;
+
+    for (listIter = drawingList->begin(); listIter != drawingList->end(); ++listIter) {
+        if (((*listIter)->Is() == ARTIC)) {
+            DrawArtic(dc, dynamic_cast<LayerElement *>(*listIter), layer, staff, measure, true);
+        }
+    }
 }
 
 void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

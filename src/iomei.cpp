@@ -2490,6 +2490,15 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
     vrvChord->ReadTiepresent(chord);
     vrvChord->ReadVisibility(chord);
 
+    AttArticulation artic;
+    artic.ReadArticulation(chord);
+    if (artic.HasArtic()) {
+        Artic *vrvArtic = new Artic();
+        vrvArtic->IsAttribute(true);
+        vrvArtic->SetArtic(artic.GetArtic());
+        vrvChord->AddChild(vrvArtic);
+    }
+
     parent->AddChild(vrvChord);
     return ReadMeiLayerChildren(vrvChord, chord, vrvChord);
 }
