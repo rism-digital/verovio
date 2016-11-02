@@ -310,10 +310,16 @@ void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // artic is above
     if (place == STAFFREL_above) {
         y = parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+        if (!Artic::InStaff(artic->GetArtic())) {
+            y = std::max(y, staff->GetDrawingY());
+        }
         y += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     else {
         y = parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+        if (!Artic::InStaff(artic->GetArtic())) {
+            y = std::min(y, staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize));
+        }
         y -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 

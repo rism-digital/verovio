@@ -43,6 +43,11 @@ public:
      */
     static bool VerticalCorr(wchar_t code, data_STAFFREL place);
 
+    /**
+     * Static method that check if the articList contains only data_ARTICULATION that can be shown within a staff.
+     */
+    static bool InStaff(std::vector<data_ARTICULATION> articList);
+
     //----------//
     // Functors //
     //----------//
@@ -50,7 +55,11 @@ public:
 private:
     //
 public:
-    //
+    /**
+     * A static array for storing the implemented editorial elements
+     */
+    static std::vector<data_ARTICULATION> s_outStaffArtic;
+
 private:
 };
 

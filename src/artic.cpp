@@ -18,6 +18,9 @@
 
 namespace vrv {
 
+std::vector<data_ARTICULATION> Artic::s_outStaffArtic
+    = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc_stacc, ARTICULATION_upbow };
+
 //----------------------------------------------------------------------------
 // Artic
 //----------------------------------------------------------------------------
@@ -123,6 +126,21 @@ bool Artic::VerticalCorr(wchar_t code, data_STAFFREL place)
         return true;
     else
         return false;
+}
+
+bool Artic::InStaff(std::vector<data_ARTICULATION> articList)
+{
+    std::vector<data_ARTICULATION>::iterator iter;
+    auto end = Artic::s_outStaffArtic.end();
+
+    for (iter = articList.begin(); iter != articList.end(); iter++) {
+        // return false if one cannot be rendered on the staff
+        auto i = std::find(Artic::s_outStaffArtic.begin(), end, *iter);
+        if (i != end) {
+            return false;
+        }
+    }
+    return true;
 }
 
 //----------------------------------------------------------------------------
