@@ -32,6 +32,11 @@ public:
     ///@}
 
     /**
+     * Check if the articList contains only data_ARTICULATION that can be shown within a staff.
+     */
+    bool InStaff();
+
+    /**
      * Static method that retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
      */
     static wchar_t GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place);
@@ -42,11 +47,6 @@ public:
      * See bow indications for an example where is is always above
      */
     static bool VerticalCorr(wchar_t code, data_STAFFREL place);
-
-    /**
-     * Static method that check if the articList contains only data_ARTICULATION that can be shown within a staff.
-     */
-    static bool InStaff(std::vector<data_ARTICULATION> articList);
 
     //----------//
     // Functors //
