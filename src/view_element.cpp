@@ -296,12 +296,15 @@ void View::DrawArtic(
     // for now we ignore within @place
     if (artic->HasPlace() && (artic->GetPlace() != STAFFREL_within))
         place = artic->GetPlace();
+    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+        place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? STAFFREL_above : STAFFREL_below;
+    }
     else if (stemDir == STEMDIRECTION_up)
         place = STAFFREL_below;
     else
         place = STAFFREL_above;
 
-    //
+    /************** calculate the y position **************/
 
     int y;
     int yChordMax, yChordMin;
@@ -326,6 +329,8 @@ void View::DrawArtic(
         }
         y -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
+
+    /************** draw the artic **************/
 
     wchar_t code;
 
