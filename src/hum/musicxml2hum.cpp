@@ -13,6 +13,8 @@
 #include "musicxml2hum.h"
 #include "HumGrid.h"
 
+#include <string.h>
+
 using namespace std;
 using namespace pugi;
 
@@ -514,6 +516,7 @@ void musicxml2hum_interface::addEvent(GridSlice& slice,
 	int partindex;  // which part the event occurs in
 	int staffindex; // which staff the event occurs in (need to fix)
 	int voiceindex; // which voice the event occurs in (use for staff)
+	bool invisible = isInvisible(event);
 
 	partindex  = event->getPartIndex();
 	staffindex = event->getStaffIndex();
@@ -525,16 +528,37 @@ void musicxml2hum_interface::addEvent(GridSlice& slice,
 	string postfix = event->getPostfixNoteInfo();
 	stringstream ss;
 	ss << prefix << recip << pitch << postfix;
+	if (invisible) {
+		ss << "yy";
+	}
 
 	// check for chord notes.
 	if (event->isChord()) {
 		addChordNotes(ss, event, recip);
-	} else {
 	}
 
 	HTp token = new HumdrumToken(ss.str());
 	slice.at(partindex)->at(staffindex)->setTokenLayer(voiceindex, token,
 		event->getDuration());
+}
+
+
+
+//////////////////////////////
+//
+// musicxml2hum_interface::isInvisible --
+//
+
+bool musicxml2hum_interface::isInvisible(MxmlEvent* event) {
+	xml_node node = event->getNode();
+	if (!node) {
+		return false;
+	}
+	if (strcmp(node.attribute("print-object").value(), "no") == 0) {
+		return true;
+	}
+
+	return false;
 }
 
 
