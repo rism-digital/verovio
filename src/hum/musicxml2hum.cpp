@@ -958,6 +958,7 @@ xml_node musicxml2hum_interface::convertClefToHumdrum(xml_node clef,
 
 	string sign;
 	int line = 0;
+	int octadjust = 0;
 
 	xml_node child = clef.first_child();
 	while (child) {
@@ -965,13 +966,25 @@ xml_node musicxml2hum_interface::convertClefToHumdrum(xml_node clef,
 			sign = child.child_value();
 		} else if (nodeType(child, "line")) {
 			line = atoi(child.child_value());
+		} else if (nodeType(child, "clef-octave-change")) {
+			octadjust = atoi(child.child_value());
 		}
 		child = child.next_sibling();
 	}
 
 	// Check for percussion clefs, etc., here.
 	stringstream ss;
-	ss << "*clef" << sign << line;
+	ss << "*clef" << sign;
+	if (octadjust < 0) {
+		for (int i=0; i < -octadjust; i++) {
+			ss << "v";
+		}
+	} else if (octadjust > 0) {
+		for (int i=0; i<octadjust; i++) {
+			ss << "^";
+		}
+	}
+	ss << line;
 	token = new HumdrumToken(ss.str());
 
 	clef = clef.next_sibling();
