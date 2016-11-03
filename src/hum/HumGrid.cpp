@@ -51,8 +51,11 @@ HumGrid::~HumGrid(void) {
 // HumGrid::transferTokens --
 //
 
-void HumGrid::transferTokens(HumdrumFile& outfile) {
-	buildSingleList();
+bool HumGrid::transferTokens(HumdrumFile& outfile) {
+	bool status = buildSingleList();
+	if (!status) {
+		return false;
+	}
 	calculateGridDurations();
 	addNullTokens();
 	addMeasureLines();
@@ -66,9 +69,13 @@ void HumGrid::transferTokens(HumdrumFile& outfile) {
 	insertPartIndications(outfile);
 	insertExclusiveInterpretationLine(outfile);
 	for (int measure=0; measure<(int)this->size(); measure++) {
-		at(measure)->transferTokens(outfile, m_recip);
+		status &= at(measure)->transferTokens(outfile, m_recip);
+		if (!status) {
+			break;
+		}
 	}
 	insertDataTerminationLine(outfile);
+	return true;
 }
 
 
@@ -585,7 +592,7 @@ void HumGrid::addLastMeasure(void) {
 // HumGrid::buildSingleList --
 //
 
-void HumGrid::buildSingleList(void) {
+bool HumGrid::buildSingleList(void) {
 	m_allslices.resize(0);
 
 	int gridcount = 0;
@@ -608,6 +615,8 @@ void HumGrid::buildSingleList(void) {
 		dur = (ts2 - ts1); // whole-note units
 		m_allslices[i]->setDuration(dur);
 	}
+
+	return !m_allslices.empty();
 }
 
 

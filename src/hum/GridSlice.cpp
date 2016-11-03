@@ -137,8 +137,6 @@ HTp GridSlice::createRecipTokenFromDuration(HumNum duration) {
 	         to_string(duration.getNumerator());
 	token = new HumdrumToken(str);
 	return token;
-
-
 }
 
 

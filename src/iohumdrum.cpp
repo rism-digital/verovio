@@ -795,21 +795,49 @@ void HumdrumInput::prepareTimeSigDur(void)
 {
     vector<HumNum> &sigdurs = m_timesigdurs;
     HumdrumFile &infile = m_infile;
+    vector<HTp> spinestarts;
+
     sigdurs.resize(infile.getLineCount());
     std::fill(sigdurs.begin(), sigdurs.end(), -1);
+
+    infile.getKernSpineStartList(spinestarts);
+    HTp kernspine = NULL;
+    if (spinestarts.size() == 0) {
+        infile.getSpineStartList(spinestarts, "**recip");
+        if (spinestarts.size() == 0) {
+            // no **kern or **recip so give up
+            return;
+        }
+        else {
+            kernspine = spinestarts[0];
+        }
+    }
+    else {
+        kernspine = spinestarts[0];
+    }
+    if (kernspine == NULL) {
+        return;
+    }
+
     HumNum curdur = -1;
     int top;
     int bot;
     int bot2;
-    int i;
-    for (i = 0; i < infile.getLineCount(); i++) {
-        if (!infile[i].isInterpretation()) {
-            sigdurs[i] = curdur;
+    int line;
+
+    kernspine = kernspine->getNextToken();
+    while (kernspine) {
+        line = kernspine->getLineIndex();
+        if (!kernspine->isInterpretation()) {
+            sigdurs[line] = curdur;
+            kernspine = kernspine->getNextToken();
+            continue;
         }
-        if (sscanf(infile[i].token(0)->c_str(), "*M%d/%d%%%d", &top, &bot, &bot2) == 3) {
+
+        if (sscanf(kernspine->c_str(), "*M%d/%d%%%d", &top, &bot, &bot2) == 3) {
             // deal with triplet-whole note beats later
         }
-        else if (sscanf(infile[i].token(0)->c_str(), "*M%d/%d", &top, &bot) == 2) {
+        else if (sscanf(kernspine->c_str(), "*M%d/%d", &top, &bot) == 2) {
             curdur = top;
             if (bot == 0) { // breve
                 curdur *= 2;
@@ -819,10 +847,12 @@ void HumdrumInput::prepareTimeSigDur(void)
             }
             curdur *= 4; // convert to quarter note units;
         }
-        sigdurs[i] = curdur;
+        sigdurs[line] = curdur;
+        kernspine = kernspine->getNextToken();
     }
 
-    for (i = (int)sigdurs.size() - 2; i >= 0; i--) {
+    sigdurs.back() = curdur;
+    for (int i = (int)sigdurs.size() - 2; i >= 0; i--) {
         if (infile[i].getDuration() == 0) {
             sigdurs[i] = sigdurs[i + 1];
         }
@@ -1603,6 +1633,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         if (timesigdurs[startline] == duration) {
             MRest *mrest = new MRest();
             m_layer->AddChild(mrest);
+            // Assign a Humdrum ID here.
         }
         else {
             Rest *rest = new Rest();
