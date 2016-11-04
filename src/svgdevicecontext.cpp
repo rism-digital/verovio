@@ -159,14 +159,6 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         m_currentNode.append_attribute("id") = gId.c_str();
     }
 
-    if (object->HasAttClass(ATT_VISIBILITY)) {
-        AttVisibility *att = dynamic_cast<AttVisibility *>(object);
-        assert(att);
-        if (att->GetVisible() == BOOLEAN_false) {
-            m_currentNode.append_attribute("visibility") = "hidden";
-        }
-    }
-
     if (object->HasAttClass(ATT_COLOR)) {
         AttColor *att = dynamic_cast<AttColor *>(object);
         assert(att);
@@ -176,6 +168,14 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         }
     }
 
+    if (object->HasAttClass(ATT_VISIBILITY)) {
+        AttVisibility *att = dynamic_cast<AttVisibility *>(object);
+        assert(att);
+        if (att->GetVisible() == BOOLEAN_false) {
+            m_currentNode.append_attribute("visibility") = "hidden";
+        }
+    }
+    
     // m_currentNode.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; fill: #%s; fill-opacity:
     // %f;",
     // GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(),
@@ -240,6 +240,12 @@ void SvgDeviceContext::StartPage()
     // Initialize the flag to false because we want to know if the font needs to be included in the SVG
     m_vrvTextFont = false;
 
+    // default styles
+    m_currentNode = m_currentNode.append_child("style");
+    m_currentNode.append_attribute("type") = "text/css";
+    m_currentNode.append_child(pugi::node_pcdata).set_value("g.page-margin{font-family:Times;} g.tempo{font-weight:bold;} g.dir, g.dynam {font-style:italic;}");
+    m_currentNode = m_svgNodeStack.back();
+    
     // a graphic for definition scaling
     m_currentNode = m_currentNode.append_child("svg");
     m_svgNodeStack.push_back(m_currentNode);
@@ -253,7 +259,7 @@ void SvgDeviceContext::StartPage()
     m_currentNode.append_attribute("class") = "page-margin";
     m_currentNode.append_attribute("transform")
         = StringFormat("translate(%d, %d)", (int)((double)m_originX), (int)((double)m_originY)).c_str();
-    m_currentNode.append_attribute("style") = "stroke: #000; stroke-opacity: 1.0; fill: #000; fill-opacity: 1.0";
+    m_currentNode.append_attribute("style") = "stroke: #000; fill: #000;";
 }
 
 void SvgDeviceContext::EndPage()
@@ -327,15 +333,13 @@ void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
               bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
               )
               .c_str();
-    // pathChild.append_attribute("style") = StringFormat("fill:#000; fill-opacity:1.0; stroke:#000000;
-    // stroke-linecap:round; stroke-linejoin:round;
-    // stroke-opacity:1.0; stroke-width: %d", m_penStack.top().GetWidth()).c_str();
-    // without colour
-    pathChild.append_attribute("style")
-        = StringFormat(
-              "fill-opacity:1.0; stroke-linecap:round; stroke-linejoin:round; stroke-opacity:1.0; stroke-width: %d",
-              m_penStack.top().GetWidth())
-              .c_str();
+    // pathChild.append_attribute("fill") = "#000000";
+    // pathChild.append_attribute("fill-opacity") = "1";
+    // pathChild.append_attribute("stroke") = "#000000";
+    pathChild.append_attribute("stroke-linecap") = "round";
+    pathChild.append_attribute("stroke-linejoin") = "round";
+    // pathChild.append_attribute("stroke-opacity") = "1";
+    pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
 }
 
 void SvgDeviceContext::DrawCircle(int x, int y, int radius)
@@ -359,16 +363,11 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     ellipseChild.append_attribute("cy") = y + rh;
     ellipseChild.append_attribute("rx") = rw;
     ellipseChild.append_attribute("ry") = rh;
-
-    // ellipseChild.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; stroke-width: %d; fill:
-    // #%s; fill-opacity: %f;",
-    // GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), currentPen.GetWidth(),
-    //    GetColour(currentBrush.GetColour()).c_str(), currentBrush.GetOpacity()).c_str();
-    // without colour
-    ellipseChild.append_attribute("style")
-        = StringFormat("stroke-opacity: %f; stroke-width: %d; fill-opacity: %f;", currentPen.GetOpacity(),
-              currentPen.GetWidth(), currentBrush.GetOpacity())
-              .c_str();
+    // ellipseChild.append_attribute("fill") = "#000000";
+    if (currentBrush.GetOpacity() != 1.0) ellipseChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
+    // ellipseChild.append_attribute("stroke") = "#000000";
+    if (currentPen.GetOpacity() != 1.0) ellipseChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
+    if (currentPen.GetWidth() != 1) ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
 }
 
 void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, double start, double end)
@@ -433,25 +432,21 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)),
                                           abs(int(ry)), fArc, fSweep, int(xe), int(ye))
                                           .c_str();
-    // pathChild.append_attribute("style") = StringFormat("stroke: #%s; stroke-opacity: %f; stroke-width: %d; fill: #%s;
-    // fill-opacity: %f;",
-    // GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), currentPen.GetWidth(),
-    //                                                        GetColour(currentBrush.GetColour()).c_str(),
-    //                                                        currentBrush.GetOpacity()).c_str();
-    // without colour
-    pathChild.append_attribute("style") = StringFormat("stroke-opacity: %f; stroke-width: %d; fill-opacity: %f;",
-                                              currentPen.GetOpacity(), currentPen.GetWidth(), currentBrush.GetOpacity())
-                                              .c_str();
+    // pathChild.append_attribute("fill") = "#000000";
+    if (currentBrush.GetOpacity() != 1.0) pathChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
+    // pathChild.append_attribute("stroke") = "#000000";
+    if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
+    if (currentPen.GetWidth() != 1) pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
 }
 
 void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
 {
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d L%d %d", x1, y1, x2, y2).c_str();
-    pathChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
     if (m_penStack.top().GetDashLenght() > 0)
         pathChild.append_attribute("stroke-dasharray")
             = StringFormat("%d, %d", m_penStack.top().GetDashLenght(), m_penStack.top().GetDashLenght()).c_str();
+    if (m_penStack.top().GetWidth() != 1) pathChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
 }
 
 void SvgDeviceContext::DrawPolygon(int n, Point points[], int xoffset, int yoffset, int fill_style)
@@ -508,10 +503,10 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     pugi::xml_node rectChild = AppendChild("rect");
     rectChild.append_attribute("x") = x;
     rectChild.append_attribute("y") = y;
-    rectChild.append_attribute("width") = width;
     rectChild.append_attribute("height") = height;
+    rectChild.append_attribute("width") = width;
     rectChild.append_attribute("rx") = radius;
-    rectChild.append_attribute("style") = StringFormat("stroke-width: %d;", m_penStack.top().GetWidth()).c_str();
+    rectChild.append_attribute("stroke-width") = m_penStack.top().GetWidth();
     // rectChild.append_attribute("fill-opacity") = "0.0"; // for empty rectangles with bounding boxes
 }
 
@@ -531,8 +526,9 @@ void SvgDeviceContext::StartText(int x, int y, char alignment)
     m_svgNodeStack.push_back(m_currentNode);
     m_currentNode.append_attribute("x") = x;
     m_currentNode.append_attribute("y") = y;
-    m_currentNode.append_attribute("dx") = 0;
-    m_currentNode.append_attribute("dy") = 0;
+    // unless dx, dy have a value they don't need to be set
+    // m_currentNode.append_attribute("dx") = 0;
+    // m_currentNode.append_attribute("dy") = 0;
     if (!anchor.empty()) {
         m_currentNode.append_attribute("text-anchor") = anchor.c_str();
     }

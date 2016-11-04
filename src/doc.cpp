@@ -96,7 +96,6 @@ void Doc::Reset()
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
-    m_drawingLyricFont.SetFaceName("Times");
 }
 
 void Doc::SetType(DocType type)
