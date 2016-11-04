@@ -436,6 +436,7 @@ bool HumdrumInput::convertHumdrum(void)
     prepareVerses();
     prepareStaffGroup();
 
+	// m_meausreIndex not currently used but might be useful sometime.
     m_measureIndex = 0;
     int line = kernstarts[0]->getLineIndex();
     while (line < infile.getLineCount() - 1 && (line >= 0)) {
@@ -1665,7 +1666,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (!layerdata[i]->isClef()) {
                 continue;
             }
-            if (m_measureIndex > 0) {
+            if (layerdata[i]->getDurationFromBarline() > 0) {
+				// only insert a clef change after the whole-note rest
+				// if the clef change is not really an initial clef.
                 insertClefElement(elements, pointers, layerdata[i]);
             }
         }
