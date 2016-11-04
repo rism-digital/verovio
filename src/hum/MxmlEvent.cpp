@@ -76,7 +76,11 @@ void MxmlEvent::clear(void) {
 	m_linked = false;
 	m_voice = m_staff = 0;
 	m_sequence = -1;
-	m_links.clear();
+	for (int i=0; i<m_links.size(); i++) {
+		delete m_links[i];
+		m_links[i] = NULL;
+	}
+	m_links.resize(0);
 }
 
 
@@ -263,13 +267,15 @@ void MxmlEvent::setDurationByTicks(long value, xml_node el) {
 
 	if (el) {
 		HumNum checkval = getEmbeddedDuration(el);
-		if (checkval != val) {
+		if ((checkval == 0) && isRest()) {
+			// This is a whole rest.
+			// val = val
+		} else if (checkval != val) {
 			// cerr << "WARNING: True duration " << checkval << " does not match";
 			// cerr << " tick duration (buggy data: " << val << ")" << endl;
 			val = checkval;
 		}
 	}
-
 
 	setDuration(val);
 }
@@ -298,7 +304,7 @@ void MxmlEvent::attachToLastEvent(void) {
 	if (!m_owner) {
 		return;
 	}
-	m_owner->attachToLastEvent(this);
+	m_owner->attachLastEventToPrevious();
 }
 
 
@@ -345,6 +351,27 @@ bool MxmlEvent::isLinked(void) const {
 
 //////////////////////////////
 //
+// MxmlEvent::isRest -- 
+//
+
+bool MxmlEvent::isRest(void) {
+	if (!m_node) {
+		return false;
+	}
+	xml_node child = m_node.first_child();
+	while (child) {
+		if (nodeType(child, "rest")) {
+			return true;
+		}
+		child = child.next_sibling();
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
 // MxmlEvent::isChord -- Returns true if the event is the primary note
 //    in a chord.
 //
@@ -355,6 +382,17 @@ bool MxmlEvent::isChord(void) const {
 	} else {
 		return false;
 	}
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::getLinkedNotes --
+//
+
+vector<MxmlEvent*> MxmlEvent::getLinkedNotes(void) {
+	return m_links;
 }
 
 
@@ -651,7 +689,7 @@ string MxmlEvent::getKernPitch(void) const {
 	}
 
 	int count = 1;
-	char pc = 'C';
+	char pc = 'X';
 	if (step.size() > 0) {
 		pc = step[0];
 	}
@@ -691,13 +729,13 @@ string MxmlEvent::getKernPitch(void) const {
 string MxmlEvent::getPrefixNoteInfo(void) const {
 	int tiestart = 0;
 	int tiestop  = 0;
-	bool rest    = false;
+	// bool rest    = false;
 
 	xml_node child = m_node.first_child();
 
 	while (child) {
 		if (strcmp(child.name(), "rest") == 0) {
-			rest = true;
+			// rest = true;
 		} else if (strcmp(child.name(), "tie") == 0) {
 			xml_attribute tietype = child.attribute("type");
 			if (tietype) {
@@ -737,13 +775,13 @@ string MxmlEvent::getPostfixNoteInfo(void) const {
 	int tiestart     = 0;
 	int tiestop      = 0;
 
-	bool rest = false;
+	// bool rest = false;
 	xml_node child = m_node.first_child();
 	xml_node notations;
 
 	while (child) {
 		if (strcmp(child.name(), "rest") == 0) {
-			rest = true;
+			// rest = true;
 		} else if (strcmp(child.name(), "beam") == 0) {
 			const char* beaminfo = child.child_value();
 			if (strcmp(beaminfo, "begin") == 0) {
@@ -1056,6 +1094,19 @@ HumNum MxmlEvent::getQuarterDurationFromType(const char* type) {
 	}
 }
 
+
+//////////////////////////////
+//
+// MxmlEvent::nodeType -- return true if node type matches string.
+//
+
+bool MxmlEvent::nodeType(xml_node node, const char* testname) {
+	if (strcmp(node.name(), testname) == 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
 
 
 } // end namespace hum

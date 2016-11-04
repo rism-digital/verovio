@@ -24,7 +24,7 @@ namespace hum {
 // GridStaff::GridStaff -- Constructor.
 //
 
-GridStaff::GridStaff(void) : vector<GridToken*>(0) {
+GridStaff::GridStaff(void) : vector<GridVoice*>(0) {
 	// do nothing;
 }
 
@@ -52,7 +52,7 @@ GridStaff::~GridStaff(void) {
 //    other new ones with NULLs.
 //
 
-GridToken* GridStaff::setTokenLayer(int layerindex, HTp token,
+GridVoice* GridStaff::setTokenLayer(int layerindex, HTp token,
 		HumNum duration) {
 	if (layerindex > (int)this->size()-1) {
 		int oldsize = this->size();
@@ -64,7 +64,7 @@ GridToken* GridStaff::setTokenLayer(int layerindex, HTp token,
 	if (this->at(layerindex) != NULL) {
 		delete this->at(layerindex);
 	}
-	GridToken* gt = new GridToken(token, duration);
+	GridVoice* gt = new GridVoice(token, duration);
 	this->at(layerindex) = gt;
 	return gt;
 }
@@ -120,7 +120,7 @@ void GridStaff::setNullTokenLayer(int layerindex, SliceType type,
 void GridStaff::appendTokenLayer(int layerindex, HTp token, HumNum duration,
 		const string& spacer) {
 
-	GridToken* gt;
+	GridVoice* gt;
 	if (layerindex > (int)this->size()-1) {
 		int oldsize = this->size();
 		this->resize(layerindex+1);
@@ -135,7 +135,7 @@ void GridStaff::appendTokenLayer(int layerindex, HTp token, HumNum duration,
 		newtoken += (string)*token;
 		(string)*(this->at(layerindex)->getToken()) = newtoken;
 	} else {
-		gt = new GridToken(token, duration);
+		gt = new GridVoice(token, duration);
 		this->at(layerindex) = gt;
 	}
 }
@@ -153,7 +153,7 @@ ostream& operator<<(ostream& output, GridStaff* staff) {
 		return output;
 	}
 	for (int t=0; t<(int)staff->size(); t++) {
-		GridToken* gt = staff->at(t);
+		GridVoice* gt = staff->at(t);
 		cout << "(v" << t << ":)";
 		if (gt == NULL) {
 			cout << "{gt:n}";

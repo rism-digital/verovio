@@ -32,9 +32,9 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <cctype>
 #include <sstream>
 #include <vector>
-#include <cctype>
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
@@ -436,9 +436,12 @@ bool HumdrumInput::convertHumdrum(void)
     prepareVerses();
     prepareStaffGroup();
 
+	// m_meausreIndex not currently used but might be useful sometime.
+    m_measureIndex = 0;
     int line = kernstarts[0]->getLineIndex();
     while (line < infile.getLineCount() - 1 && (line >= 0)) {
         status &= convertSystemMeasure(line);
+        m_measureIndex++;
     }
 
     createHeader();
@@ -474,7 +477,8 @@ bool HumdrumInput::convertHumdrum(void)
 //     <fileDesc> . . . . . . . . . Full bibliographic description of file.
 //        <titleStmt> (required) == Title and responsibility container.
 //           <title>  (required) == Title of bibliographic entry.
-//           <respStmt>          == Names of those repsonsible for intellectual/artistic content.
+//           <respStmt>          == Names of those repsonsible for
+// intellectual/artistic content.
 //        <pubStmt>   (required) == Pub. name, address, date and related info.
 //
 //        <sourceDesc>           == Sources used to create electronic file.
@@ -483,10 +487,12 @@ bool HumdrumInput::convertHumdrum(void)
 //              <seriesStmt> <noteStmt> <history> <langUsage> <key> <tempo>
 //              <meter> <perfMedium> <classification> <contents> <relatedItem>
 //
-//      <encodingDesc>  . . . . . . Relation of file to sources and how it was created.
+//      <encodingDesc>  . . . . . . Relation of file to sources and how it was
+// created.
 //         <appInfo>? <editorialDecl>?
 //
-//     <workDesc>  . . . . . . . . Groupling for non-bibliograhpic aspects of text.
+//     <workDesc>  . . . . . . . . Groupling for non-bibliograhpic aspects of
+// text.
 //        <identifier> <titleStmt> <history> <langUsage> <key> <tempo> <meter>
 //        <perfMedium> <notesStmt> <classification> <castList> <incipit>
 //        <contents> <relatedItem>
@@ -527,7 +533,7 @@ void HumdrumInput::createHeader(void)
     // <encodingDesc> /////////
     pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
     pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-    
+
     pugi::xml_node p1 = projectDesc.append_child("p");
     p1.append_child(pugi::node_pcdata)
     .set_value(StringFormat("Transcoded from Humdrum with Verovio version %s", GetVersion().c_str()).c_str());
@@ -537,18 +543,18 @@ void HumdrumInput::createHeader(void)
         pugi::xml_node p2 = projectDesc.append_child("p");
         p2.append_child(pugi::node_pcdata).set_value(ENC.c_str());
     }
-    
+
     string datestr = getDateString();
     date.append_child(pugi::node_pcdata).set_value(datestr.c_str());
 
     // <sourceDesc> /////////
-    
+
     // <workDesc> /////////////
     pugi::xml_node workDesc = m_doc->m_header.append_child("workDesc");
     pugi::xml_node work = workDesc.append_child("work");
     pugi::xml_node identifier= work.append_child("identifier");
     pugi::xml_node titleStmt = work.append_child("titleStmt");
-    
+
     string SCT = getReferenceValue("SCT", references);
     if (SCT.size()) {
         identifier.append_child(pugi::node_pcdata).set_value(SCT.c_str());
@@ -557,7 +563,7 @@ void HumdrumInput::createHeader(void)
     if (respPeople.size() > 0) {
         insertRespStmt(titleStmt, respPeople);
     }
-    
+
     // <extMeta> /////////////
     if (references.size() > 0) {
         insertExtMeta(references);
@@ -616,7 +622,8 @@ void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, vector<vector<strin
 
 //////////////////////////////
 //
-// HumdrumInput::getRespPeople -- Get the respStmnt people, such as the composer and/or lyricist.
+// HumdrumInput::getRespPeople -- Get the respStmnt people, such as the composer
+// and/or lyricist.
 //
 // Roles (4th parameter in addPerson(), is free-form, but should use the roles
 // are listed in these two webpages:
@@ -643,8 +650,10 @@ void HumdrumInput::getRespPeople(vector<vector<string> > &respPeople, vector<Hum
     addPerson(respPeople, references, "ODE", "dedicatee"); // dte
     addPerson(respPeople, references, "OCO", "patron"); // commissioner, pat
     addPerson(respPeople, references, "OCL", "collector"); // col
-    // EED and ENC added to pubStmt and encodingDesc respectively
-    // addPerson(respPeople, references, "ENC", "encoder");           // mrk, Markup editor
+    addPerson(respPeople, references, "EED", "digital editor");
+    // ENC added to encodingDesc
+    // addPerson(respPeople, references, "ENC", "encoder"); // mrk,
+    // Markup editor
 }
 
 //////////////////////////////
@@ -815,21 +824,49 @@ void HumdrumInput::prepareTimeSigDur(void)
 {
     vector<HumNum> &sigdurs = m_timesigdurs;
     HumdrumFile &infile = m_infile;
+    vector<HTp> spinestarts;
+
     sigdurs.resize(infile.getLineCount());
     std::fill(sigdurs.begin(), sigdurs.end(), -1);
+
+    infile.getKernSpineStartList(spinestarts);
+    HTp kernspine = NULL;
+    if (spinestarts.size() == 0) {
+        infile.getSpineStartList(spinestarts, "**recip");
+        if (spinestarts.size() == 0) {
+            // no **kern or **recip so give up
+            return;
+        }
+        else {
+            kernspine = spinestarts[0];
+        }
+    }
+    else {
+        kernspine = spinestarts[0];
+    }
+    if (kernspine == NULL) {
+        return;
+    }
+
     HumNum curdur = -1;
     int top;
     int bot;
     int bot2;
-    int i;
-    for (i = 0; i < infile.getLineCount(); i++) {
-        if (!infile[i].isInterpretation()) {
-            sigdurs[i] = curdur;
+    int line;
+
+    kernspine = kernspine->getNextToken();
+    while (kernspine) {
+        line = kernspine->getLineIndex();
+        if (!kernspine->isInterpretation()) {
+            sigdurs[line] = curdur;
+            kernspine = kernspine->getNextToken();
+            continue;
         }
-        if (sscanf(infile[i].token(0)->c_str(), "*M%d/%d%%%d", &top, &bot, &bot2) == 3) {
+
+        if (sscanf(kernspine->c_str(), "*M%d/%d%%%d", &top, &bot, &bot2) == 3) {
             // deal with triplet-whole note beats later
         }
-        else if (sscanf(infile[i].token(0)->c_str(), "*M%d/%d", &top, &bot) == 2) {
+        else if (sscanf(kernspine->c_str(), "*M%d/%d", &top, &bot) == 2) {
             curdur = top;
             if (bot == 0) { // breve
                 curdur *= 2;
@@ -839,10 +876,12 @@ void HumdrumInput::prepareTimeSigDur(void)
             }
             curdur *= 4; // convert to quarter note units;
         }
-        sigdurs[i] = curdur;
+        sigdurs[line] = curdur;
+        kernspine = kernspine->getNextToken();
     }
 
-    for (i = (int)sigdurs.size() - 2; i >= 0; i--) {
+    sigdurs.back() = curdur;
+    for (int i = (int)sigdurs.size() - 2; i >= 0; i--) {
         if (infile[i].getDuration() == 0) {
             sigdurs[i] = sigdurs[i + 1];
         }
@@ -1452,17 +1491,17 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
     int staffindex = rkern[track];
     vector<HTp> &layerdata = m_layertokens[staffindex][layerindex];
 
-	if (layerdata.size() > 0) {
-		if (layerdata[0]->size() > 0) {
-			setLocationId(m_layer, layerdata[0], -1);
-		}
-	}
+    if (layerdata.size() > 0) {
+        if (layerdata[0]->size() > 0) {
+            setLocationId(m_layer, layerdata[0], -1);
+        }
+    }
 
-	if ((layerindex == 0) && (layerdata.size() > 0)) {
-		if ((layerdata[0]->size() > 0) && (layerdata[0]->at(0) == '=')) {
-   			setLocationId(m_staff, layerdata[0], -1);
-		}
-	}
+    if ((layerindex == 0) && (layerdata.size() > 0)) {
+        if ((layerdata[0]->size() > 0) && (layerdata[0]->at(0) == '=')) {
+            setLocationId(m_staff, layerdata[0], -1);
+        }
+    }
 
     if (m_comment) {
         string comment;
@@ -1491,7 +1530,8 @@ void HumdrumInput::printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, cons
         cerr << "LAYER SIZE = " << layerdata.size() << "\tTGSIZE" << tg.size() << endl;
         return;
     }
-    cerr << "TOK\tGRP\tBRAK\tNUM\tNBASE\tNSCAL\tBSTART\tBEND\tGBST\tGBEND\tTSTART\tTEND\tPRIORITY\n";
+    cerr << "TOK\tGRP\tBRAK\tNUM\tNBASE\tNSCAL\tBSTART\tBEND\tGBST\tGBEND\tTSTART"
+            "\tTEND\tPRIORITY\n";
     for (int i = 0; i < (int)tg.size(); i++) {
         cerr << *layerdata[i] << "\t";
         cerr << tg[i].group << "\t";
@@ -1622,6 +1662,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         if (timesigdurs[startline] == duration) {
             MRest *mrest = new MRest();
             m_layer->AddChild(mrest);
+            // Assign a Humdrum ID here.
         }
         else {
             Rest *rest = new Rest();
@@ -1651,7 +1692,11 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (!layerdata[i]->isClef()) {
                 continue;
             }
-            insertClefElement(elements, pointers, layerdata[i]);
+            if (layerdata[i]->getDurationFromBarline() > 0) {
+				// only insert a clef change after the whole-note rest
+				// if the clef change is not really an initial clef.
+                insertClefElement(elements, pointers, layerdata[i]);
+            }
         }
 
         // Uncomment this when MRest::SetFermata() is implemented:
@@ -2298,7 +2343,8 @@ void HumdrumInput::processSlur(HTp token)
 
 /////////////////////////////
 //
-// HumdrumInput::insertClefElement -- A clef which starts after the beginning of the movement.
+// HumdrumInput::insertClefElement -- A clef which starts after the beginning of
+// the movement.
 //
 
 void HumdrumInput::insertClefElement(vector<string> &elements, vector<void *> pointers, HTp token)
@@ -4525,7 +4571,7 @@ void HumdrumInput::setLocationId(Object *object, HTp token, int subtoken)
     object->SetUuid(id);
 }
 
-void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex,int subtokenindex)
+void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, int subtokenindex)
 {
     int line = lineindex + 1;
     int field = fieldindex + 1;

@@ -41,9 +41,10 @@ const char *UTF_16_LE_BOM = "\xFF\xFE";
 // Toolkit
 //----------------------------------------------------------------------------
 
+char *Toolkit::m_humdrumBuffer = NULL;
+
 Toolkit::Toolkit(bool initFont)
 {
-
     m_scale = DEFAULT_SCALE;
     m_format = AUTO;
 
@@ -64,8 +65,8 @@ Toolkit::Toolkit(bool initFont)
     m_showBoundingBoxes = false;
     m_scoreBasedMei = false;
 
-    m_humdrumBuffer = NULL;
     m_cString = NULL;
+    m_humdrumBuffer = NULL;
 
     if (initFont) {
         Resources::InitFonts();
@@ -74,13 +75,13 @@ Toolkit::Toolkit(bool initFont)
 
 Toolkit::~Toolkit()
 {
-    if (m_humdrumBuffer) {
-LogError("DELETING HUMDRUMBUFFER");
-        free(m_humdrumBuffer);
-        m_humdrumBuffer = NULL;
-    }
     if (m_cString) {
         free(m_cString);
+        m_cString = NULL;
+    }
+    if (m_humdrumBuffer) {
+        free(m_humdrumBuffer);
+        m_humdrumBuffer = NULL;
     }
 }
 
@@ -387,7 +388,7 @@ bool Toolkit::LoadData(const std::string &data)
         input = new DarmsInput(&m_doc, "");
     }
     else if (inputFormat == HUMDRUM) {
-        LogMessage("Importing Humdrum data");
+        // LogMessage("Importing Humdrum data");
 
         Doc tempdoc;
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
@@ -403,15 +404,18 @@ bool Toolkit::LoadData(const std::string &data)
         delete tempinput;
 
         input = new MeiInput(&m_doc, "");
-
     }
     else if (inputFormat == MEI) {
         input = new MeiInput(&m_doc, "");
     }
     else if (inputFormat == MUSICXML) {
+        // This is the direct converter from MusicXML to MEI
+        // using iomusicxml:
         // input = new MusicXmlInput(&m_doc, "");
-        LogMessage("Importing MusicXML data");
 
+        // LogMessage("Importing MusicXML data via Humdrum");
+
+        // First convert from MusicXML into Humdrum:
         hum::musicxml2hum_interface converter;
         pugi::xml_document xmlfile;
         xmlfile.load(data.c_str());
@@ -421,12 +425,10 @@ bool Toolkit::LoadData(const std::string &data)
             LogError("Error converting MusicXML");
             return false;
         }
-        
-	SetHumdrumBuffer(conversion.str());
-	LogError("CONVERSION IS:");
-	LogError(GetHumdrumBuffer());
-	LogError("GOT HERE =======================================");
+        std::string buffer = conversion.str();
+        SetHumdrumBuffer(buffer.c_str());
 
+        // Now convert Humdrum into MEI:
         Doc tempdoc;
         FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
         if (!tempinput->ImportString(conversion.str())) {
@@ -434,14 +436,11 @@ bool Toolkit::LoadData(const std::string &data)
             delete tempinput;
             return false;
         }
-
         MeiOutput meioutput(&tempdoc, "");
         meioutput.SetScoreBasedMEI(true);
         newData = meioutput.GetOutput();
         delete tempinput;
-
         input = new MeiInput(&m_doc, "");
-
     }
     else {
         LogMessage("Unknown format");
@@ -511,47 +510,6 @@ bool Toolkit::LoadData(const std::string &data)
     m_view.SetDoc(&m_doc);
 
     return true;
-}
-
-void Toolkit::SetHumdrumBuffer(const string& content) {
-    int size = content.size();
-    if (m_humdrumBuffer) {
-        free(m_humdrumBuffer);
-        m_humdrumBuffer = NULL;
-    }
-    m_humdrumBuffer = (char *)malloc(size + 1);
-stringstream ss;
-ss << "NEW HUMDRUMBUFFER ADDRESS IS " << &m_humdrumBuffer << "\n";
-LogError(ss.str().c_str());
-
-    // something went wrong
-    if (!m_humdrumBuffer) {
-        return;
-    }
-
-    strcpy(m_humdrumBuffer, content.c_str());
-
-    LogError("NEW CONTENTS of m_humdrumBuffer is:");
-    LogError(m_humdrumBuffer);
-    LogError("=====================================");
-    LogError("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-}
-
-const char* Toolkit::GetHumdrumBuffer(void) {
-    if (m_humdrumBuffer) {
-stringstream ss;
-ss << "BUFFER SIZE IS " << strlen(m_humdrumBuffer) << "\n";
-ss << "BUFFER ADDRESS IS " << &m_humdrumBuffer << "\n";
-LogError(ss.str().c_str());
-LogError("BUFFER CONTENTS IS : ");
-LogError(m_humdrumBuffer);
-LogError("===========================================");
-LogError("*******************************************");
-        return m_humdrumBuffer;
-    }
-    else {
-        return "[unspecified]";
-    }
 }
 
 std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
@@ -848,15 +806,14 @@ bool Toolkit::GetHumdrumFile(const std::string &filename)
         return false;
     }
 
-    bool status = GetHumdrum(output);
+    GetHumdrum(output);
     output.close();
-    return status;
+    return true;
 }
 
-bool Toolkit::GetHumdrum(ostream& output)
+void Toolkit::GetHumdrum(ostream &output)
 {
     output << GetHumdrumBuffer();
-    return true;
 }
 
 std::string Toolkit::RenderToMidi()
@@ -966,6 +923,25 @@ void Toolkit::SetCString(const std::string &data)
     strcpy(m_cString, data.c_str());
 }
 
+void Toolkit::SetHumdrumBuffer(const char *data)
+{
+    if (m_humdrumBuffer) {
+        free(m_humdrumBuffer);
+        m_humdrumBuffer = NULL;
+    }
+
+    int size = strlen(data) + 1;
+
+    m_humdrumBuffer = (char *)malloc(size);
+
+    if (!m_humdrumBuffer) {
+        // something went wrong
+        return;
+    }
+
+    strcpy(m_humdrumBuffer, data);
+}
+
 const char *Toolkit::GetCString()
 {
     if (m_cString) {
@@ -973,6 +949,16 @@ const char *Toolkit::GetCString()
     }
     else {
         return "[unspecified]";
+    }
+}
+
+const char *Toolkit::GetHumdrumBuffer()
+{
+    if (m_humdrumBuffer) {
+        return m_humdrumBuffer;
+    }
+    else {
+        return "[empty]";
     }
 }
 

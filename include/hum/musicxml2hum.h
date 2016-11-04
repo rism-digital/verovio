@@ -121,6 +121,9 @@ class musicxml2hum_interface {
 		                        HTp& token, int& staffindex);
 
 		void addEvent          (GridSlice& slice, MxmlEvent* event);
+		void fillEmpties       (GridPart* part, const char* string);
+		void addChordNotes     (ostream& output, MxmlEvent* head, const string& recip);
+		bool isInvisible       (MxmlEvent* event);
 
 	public:
 

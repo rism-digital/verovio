@@ -6,7 +6,7 @@ wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/Gri
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/GridSide.h -O GridSide.h
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/GridSlice.h -O GridSlice.h
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/GridStaff.h -O GridStaff.h
-wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/GridToken.h -O GridToken.h
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/GridVoice.h -O GridVoice.h
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/HumGrid.h -O HumGrid.h
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/MxmlEvent.h -O MxmlEvent.h
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/MxmlMeasure.h -O MxmlMeasure.h

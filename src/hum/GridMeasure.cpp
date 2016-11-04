@@ -50,10 +50,11 @@ GridMeasure::~GridMeasure(void) {
 // GridMeasure::transferTokens --
 //
 
-void GridMeasure::transferTokens(HumdrumFile& outfile, bool recip) {
+bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip) {
 	for (auto it : *this) {
 		it->transferTokens(outfile, recip);
 	}
+	return true;
 }
 
 } // end namespace hum

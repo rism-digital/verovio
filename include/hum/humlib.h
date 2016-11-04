@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Oct 26 18:05:53 PDT 2016
+// Last Modified: Thu Oct 27 13:03:37 PDT 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -793,7 +793,9 @@ class HumdrumLine : public string, public HumHash {
 		// useful: you can read in a HumdrumFile, tweak the tokens, then
 		// reconstruct the full line and print out again.
 		// This variable is filled by HumdrumFile::read().
-		vector<HTp> tokens;
+		// The contents of this vector should be deleted when deconstructing
+		// a HumdrumLine object.
+		vector<HumdrumToken*> tokens;
 
 		// duration: This is the "duration" of a line.  The duration is
 		// equal to the minimum time unit of all durational tokens on the
@@ -834,6 +836,8 @@ ostream& operator<< (ostream& out, HumdrumLine& line);
 
 
 
+
+typedef HumdrumToken* HTp;
 
 class HumdrumToken : public string, public HumHash {
 	public:
@@ -934,9 +938,9 @@ class HumdrumToken : public string, public HumHash {
 		int      getSubtokenCount          (const string& separator = " ") const;
 		string   getSubtoken               (int index,
 		                                    const string& separator = " ") const;
-		void     setParameters             (HumdrumToken* ptok);
+		void     setParameters             (HTp ptok);
 		void     setParameters             (const string& pdata,
-		                                    HumdrumToken* ptok = NULL);
+		                                    HTp ptok = NULL);
 		int      getStrandIndex            (void) const;
 		int      getSlurStartElisionLevel  (void) const;
 		int      getSlurEndElisionLevel    (void) const;
@@ -955,21 +959,21 @@ class HumdrumToken : public string, public HumHash {
 		// next/previous token functions:
 		int           getNextTokenCount         (void) const;
 		int           getPreviousTokenCount     (void) const;
-		HumdrumToken* getNextToken              (int index = 0) const;
-		HumdrumToken* getPreviousToken          (int index = 0) const;
-		vector<HumdrumToken*> getNextTokens     (void) const;
-		vector<HumdrumToken*> getPreviousTokens (void) const;
+		HTp           getNextToken              (int index = 0) const;
+		HTp           getPreviousToken          (int index = 0) const;
+		vector<HTp>   getNextTokens     (void) const;
+		vector<HTp>   getPreviousTokens (void) const;
 
 		int      getPreviousNonNullDataTokenCount(void);
 		int      getPreviousNNDTCount(void) {
 		               return getPreviousNonNullDataTokenCount(); }
-		HumdrumToken* getPreviousNonNullDataToken(int index = 0);
-		HumdrumToken* getPreviousNNDT(int index) {
+		HTp      getPreviousNonNullDataToken(int index = 0);
+		HTp      getPreviousNNDT(int index) {
 		               return getPreviousNonNullDataToken(index); }
 		int      getNextNonNullDataTokenCount(void);
 		int      getNextNNDTCount(void) { return getNextNonNullDataTokenCount(); }
-		HumdrumToken* getNextNonNullDataToken(int index = 0);
-		HumdrumToken* getNextNNDT(int index = 0) {
+		HTp      getNextNonNullDataToken(int index = 0);
+		HTp      getNextNNDT(int index = 0) {
 		               return getNextNonNullDataToken(index); }
 
 		// slur-analysis based functions:
@@ -983,8 +987,8 @@ class HumdrumToken : public string, public HumHash {
 		void     setTrack          (int aTrack);
 		void     setSubtrack       (int aSubtrack);
 		void     setSubtrackCount  (int count);
-		void     setPreviousToken  (HumdrumToken* aToken);
-		void     setNextToken      (HumdrumToken* aToken);
+		void     setPreviousToken  (HTp aToken);
+		void     setNextToken      (HTp aToken);
 		void     makeForwardLink   (HumdrumToken& nextToken);
 		void     makeBackwardLink  (HumdrumToken& previousToken);
 		void     setOwner          (HumdrumLine* aLine);
@@ -1021,22 +1025,22 @@ class HumdrumToken : public string, public HumHash {
 		// following token, but there can be two tokens if the current
 		// token is *^, and there will be zero following tokens after a
 		// spine terminating token (*-).
-		vector<HumdrumToken*> nextTokens;     // link to next token(s) in spine
+		vector<HTp> nextTokens;     // link to next token(s) in spine
 
 		// previousTokens: Simiar to nextTokens, but for the immediately
 		// follow token(s) in the data.  Typically there will be one
 		// preceding token, but there can be multiple tokens when the previous
 		// line has *v merge tokens for the spine.  Exclusive interpretations
 		// have no tokens preceding them.
-		vector<HumdrumToken*> previousTokens; // link to last token(s) in spine
+		vector<HTp> previousTokens; // link to last token(s) in spine
 
 		// nextNonNullTokens: This is a list of non-tokens in the spine
 		// that follow this one.
-		vector<HumdrumToken*> nextNonNullTokens;
+		vector<HTp> nextNonNullTokens;
 
 		// previousNonNullTokens: This is a list of non-tokens in the spine
 		// that preced this one.
-		vector<HumdrumToken*> previousNonNullTokens;
+		vector<HTp> previousNonNullTokens;
 
 		// rhycheck: Used to perfrom HumdrumFileStructure::analyzeRhythm
 		// recursively.
@@ -1055,10 +1059,8 @@ class HumdrumToken : public string, public HumHash {
 };
 
 
-typedef HumdrumToken* HTp;
-
 ostream& operator<<(ostream& out, const HumdrumToken& token);
-ostream& operator<<(ostream& out, HumdrumToken* token);
+ostream& operator<<(ostream& out, HTp token);
 
 ostream& printSequence(vector<vector<HTp> >& sequence, ostream& out=std::cout);
 ostream& printSequence(vector<HTp>& sequence, ostream& out = std::cout);
@@ -1256,6 +1258,7 @@ class HumdrumFileBase : public HumHash {
 	protected:
 
 		// lines: an array representing lines from the input file.
+		// The contents of lines must be deallocated when deconstructing object.
 		vector<HumdrumLine*> lines;
 
 		// trackstarts: list of addresses of the exclusive interpreations

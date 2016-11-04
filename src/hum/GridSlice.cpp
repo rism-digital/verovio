@@ -41,7 +41,7 @@ GridSlice::GridSlice(HumNum timestamp, SliceType type, int partcount) {
 
 //
 // This constructor allocates the matching part and staff count of the
-// input slice parameter.  There will be no GridTokens allocated inside the
+// input slice parameter.  There will be no GridVoices allocated inside the
 // GridStaffs (they will be required to have at least one).
 //
 
@@ -137,8 +137,6 @@ HTp GridSlice::createRecipTokenFromDuration(HumNum duration) {
 	         to_string(duration.getNumerator());
 	token = new HumdrumToken(str);
 	return token;
-
-
 }
 
 
@@ -203,9 +201,10 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 				token = new HumdrumToken(".a");
 				line->appendToken(token);
 			} else {
-				for (v=0; v<staff.size(); v++) {
+				for (v=0; v<(int)staff.size(); v++) {
 					if (staff.at(v)->getToken()) {
 						line->appendToken(staff.at(v)->getToken());
+						staff.at(v)->forgetToken();
 					} else {
 						token = new HumdrumToken(".b");
 						line->appendToken(token);
@@ -307,30 +306,30 @@ ostream& operator<<(ostream& output, GridSlice* slice) {
 	}
 	for (int p=0; p<(int)slice->size(); p++) {
 		GridPart* part = slice->at(p);
-		cout << "(p" << p << ":)";
+		output << "(p" << p << ":)";
 		if (part == NULL) {
-			cout << "{n}";
+			output << "{n}";
 			continue;
 		}
 		for (int s=0; s<(int)part->size(); s++) {
 			GridStaff* staff = part->at(s);
-			cout << "(s" << s << ":)";
+			output << "(s" << s << ":)";
 			if (staff == NULL) {
-				cout << "{n}";
+				output << "{n}";
 				continue;
 			}
 			for (int t=0; t<(int)staff->size(); t++) {
-				GridToken* gt = staff->at(t);
-				cout << "(v" << t << ":)";
+				GridVoice* gt = staff->at(t);
+				output << "(v" << t << ":)";
 				if (gt == NULL) {
-					cout << "{n}";
+					output << "{n}";
 					continue;
 				} else {
 					HTp token = gt->getToken();
 					if (token == NULL) {
-						cout << "{n}";
+						output << "{n}";
 					} else {
-						cout << " \"" << *token << "\" ";
+						output << " \"" << *token << "\" ";
 					}
 				}
 			

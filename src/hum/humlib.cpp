@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Oct 26 18:05:53 PDT 2016
+// Last Modified: Thu Oct 27 13:03:37 PDT 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -1884,12 +1884,14 @@ void HumInstrument::sortData(void) {
 //
 
 HumNum::HumNum(void){
-	setValue(0);
+	top = 0;
+	bot = 1;
 }
 
 
 HumNum::HumNum(int value){
-	setValue(value);
+	top = value;
+	bot = 1;
 }
 
 
@@ -1909,7 +1911,8 @@ HumNum::HumNum(const char* ratstring) {
 
 
 HumNum::HumNum(const HumNum& rat) {
-	*this = rat;
+	top = rat.top;
+	bot = rat.bot;
 }
 
 
@@ -2870,6 +2873,12 @@ HumdrumFileBase::HumdrumFileBase(istream& contents) : HumHash() {
 
 HumdrumFileBase::~HumdrumFileBase() {
 	// do nothing
+	for (int i=0; i<(int)lines.size(); i++) {
+		if (lines[i] != NULL) {
+			delete lines[i];
+			lines[i] = NULL;
+		}
+	}
 }
 
 
@@ -6081,6 +6090,7 @@ HumdrumLine::HumdrumLine(void) : string() {
 	setPrefix("!!");
 }
 
+
 HumdrumLine::HumdrumLine(const string& aString) : string(aString) {
 	owner = NULL;
 	if ((this->size() > 0) && (this->back() == 0x0d)) {
@@ -6090,6 +6100,7 @@ HumdrumLine::HumdrumLine(const string& aString) : string(aString) {
 	durationFromStart = -1;
 	setPrefix("!!");
 }
+
 
 HumdrumLine::HumdrumLine(const char* aString) : string(aString) {
 	owner = NULL;
@@ -6110,7 +6121,12 @@ HumdrumLine::HumdrumLine(const char* aString) : string(aString) {
 
 HumdrumLine::~HumdrumLine() {
 	// free stored HumdrumTokens:
-	clear();
+	for (int i=0; i<(int)tokens.size(); i++) {
+		if (tokens[i] != NULL) {
+			delete tokens[i];
+			tokens[i] = NULL;
+		}
+	}
 }
 
 
@@ -6182,8 +6198,10 @@ void HumdrumLine::setLineFromCsv(const string& csv, const string& separator) {
 
 void HumdrumLine::clear(void) {
 	for (int i=0; i<(int)tokens.size(); i++) {
-		delete tokens[i];
-		tokens[i] = NULL;
+		if (tokens[i] != NULL) {
+			delete tokens[i];
+			tokens[i] = NULL;
+		}
 	}
 }
 
@@ -9896,7 +9914,7 @@ int Options::getArgumentCount(void) {
 
 vector<string>& Options::getArgList(vector<string>& output) {
    output.resize(argument.size());
-   for (int i=0; i<argument.size(); i++) {
+   for (int i=0; i<(int)argument.size(); i++) {
       output[i] = *argument[i];
    }
    return output;
@@ -10642,6 +10660,254 @@ ostream& Options::printRegister(ostream& out) {
 
 //////////////////////////////
 //
+// Convert::recipToDuration -- Convert **recip rhythmic values into
+//     rational number durations in terms of quarter notes.  For example "4"
+//     will be converted to 1, "4." to 3/2 (1+1/2).  The second parameter
+//     is a scaling factor which can change the rhythmic value's base duration.
+//     Giving a scale of 1 will return the duration in whole note units, so
+//     "4" will return a value of 1/4 (one quarter of a whole note).  Using
+//     3/2 will give the duration in terms of dotted-quarter note units.
+//     The third parameter is the sub-token separate.  For example if the input
+//     string contains a space, anything after the first space will be ignored
+//     when extracting the string.  **kern data which also includes the pitch
+//     along with the rhythm can also be given and will be ignored.
+// default value: scale = 4 (duration in terms of quarter notes)
+// default value: separator = " " (sub-token separator)
+//
+
+HumNum Convert::recipToDuration(const string& recip, HumNum scale,
+		string separator) {
+	size_t loc;
+	loc = recip.find(separator);
+	string subtok;
+	if (loc != string::npos) {
+		subtok = recip.substr(0, loc);
+	} else {
+		subtok = recip;
+	}
+
+	loc = recip.find('q');
+	if (loc != string::npos) {
+		// grace note, ignore printed rhythm
+		HumNum zero(0);
+		return zero;
+	}
+
+	int dotcount = 0;
+	int i;
+	int numi = -1;
+	for (i=0; i<(int)subtok.size(); i++) {
+		if (subtok[i] == '.') {
+			dotcount++;
+		}
+		if ((numi < 0) && isdigit(subtok[i])) {
+			numi = i;
+		}
+	}
+	loc = subtok.find("%");
+	int numerator = 1;
+	int denominator = 1;
+	HumNum output;
+	if (loc != string::npos) {
+		// reciprocal rhythm
+		numerator = 1;
+		denominator = subtok[numi++] - '0';
+		while ((numi<(int)subtok.size()) && isdigit(subtok[numi])) {
+			denominator = denominator * 10 + (subtok[numi++] - '0');
+		}
+		if ((loc + 1 < subtok.size()) && isdigit(subtok[loc+1])) {
+			int xi = (int)loc + 1;
+			numerator = subtok[xi++] - '0';
+			while ((xi<(int)subtok.size()) && isdigit(subtok[xi])) {
+				numerator = numerator * 10 + (subtok[xi++] - '0');
+			}
+		}
+		output.setValue(numerator, denominator);
+	} else if (numi < 0) {
+		// no rhythm found
+		HumNum zero(0);
+		return zero;
+	} else if (subtok[numi] == '0') {
+		// 0-symbol
+		int zerocount = 1;
+		for (i=numi+1; i<(int)subtok.size(); i++) {
+			if (subtok[i] == '0') {
+				zerocount++;
+			} else {
+				break;
+			}
+		}
+		numerator = (int)pow(2, zerocount);
+		output.setValue(numerator, 1);
+	} else {
+		// plain rhythm
+		denominator = subtok[numi++] - '0';
+		while ((numi<(int)subtok.size()) && isdigit(subtok[numi])) {
+			denominator = denominator * 10 + (subtok[numi++] - '0');
+		}
+		output.setValue(1, denominator);
+	}
+
+	if (dotcount <= 0) {
+		return output * scale;
+	}
+
+	int bot = (int)pow(2.0, dotcount);
+	int top = (int)pow(2.0, dotcount + 1) - 1;
+	HumNum factor(top, bot);
+	return output * factor * scale;
+}
+
+
+//////////////////////////////
+//
+// Convert::recipToDurationNoDots -- Same as recipToDuration(), but ignore
+//   any augmentation dots.
+//
+
+HumNum Convert::recipToDurationNoDots(const string& recip, HumNum scale,
+		string separator) {
+	string temp = recip;
+	std::replace(temp.begin(), temp.end(), '.', 'Z');
+	return Convert::recipToDuration(temp, scale, separator);
+}
+
+
+
+
+//////////////////////////////
+//
+// Convert::replaceOccurrences -- Similar to s// regular expressions
+//    operator.  This function replaces the search string in the source
+//    string with the replace string.
+//
+
+void Convert::replaceOccurrences(string& source, const string& search,
+		const string& replace) {
+	for (int loc=0; ; loc += (int)replace.size()) {
+		loc = (int)source.find(search, loc);
+		if (loc == (int)string::npos) {
+			break;
+		}
+		source.erase(loc, search.length());
+		source.insert(loc, replace);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Convert::splitString -- Splits a string into a list of strings
+//   separated by the given character.  Empty strings will be generated
+//   if the separator occurs at the start/end of the input string, and
+//   if two or more separates are adjacent to each other.
+// default value: separator = ' ';
+//
+
+vector<string> Convert::splitString(const string& data, char separator) {
+	stringstream ss(data);
+	string key;
+	vector<string> output;
+	while (getline(ss, key, separator)) {
+		output.push_back(key);
+	}
+	if (output.size() == 0) {
+		output.push_back(data);
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::repeatString -- Returns a string which repeats the given
+//   pattern by the given count.
+//
+
+string Convert::repeatString(const string& pattern, int count) {
+	string output;
+	for (int i=0; i<count; i++) {
+		output += pattern;
+	}
+	return output;
+}
+
+
+//////////////////////////////
+//
+// Convert::encodeXml -- Encode a string for XML printing.  Ampersands
+//    get converted to &amp;, < to &lt; > to &gt;, " to &quot; and
+//    ' to &apos;.
+//
+
+string Convert::encodeXml(const string& input) {
+	string output;
+	output.reserve(input.size()*2);
+	for (int i=0; i<(int)input.size(); i++) {
+		switch (input[i]) {
+			case '&':  output += "&amp;";   break;
+			case '<':  output += "&lt;";    break;
+			case '>':  output += "&gt;";    break;
+			case '"':  output += "&quot;";  break;
+			case '\'': output += "&apos;";  break;
+			default:   output += input[i];
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::getHumNumAttributes -- Returns XML attributes for a HumNum
+//   number.  First @float which gives the floating-point representation.
+//   If the number has a fractional part, then also add @ratfrac with the
+//   fractional representation of the non-integer portion number.
+//
+
+string Convert::getHumNumAttributes(const HumNum& num) {
+	string output;
+	if (num.isInteger()) {
+		output += " float=\"" + to_string(num.getNumerator()) + "\"";
+	} else {
+		stringstream sstr;
+		sstr << num.toFloat();
+		output += " float=\"" + sstr.str() + "\"";
+	}
+	if (!num.isInteger()) {
+		HumNum rem = num.getRemainder();
+		output += " ratfrac=\"" + to_string(rem.getNumerator()) +
+				+ "/" + to_string(rem.getDenominator()) + "\"";
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Convert::trimWhiteSpace -- remove spaces, tabs and/or newlines
+//     from the beginning and end of input string.
+//
+
+string Convert::trimWhiteSpace(const string& input) {
+	string s = input;
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+			std::not1(std::ptr_fun<int, int>(std::isspace))));
+	s.erase(std::find_if(s.rbegin(), s.rend(),
+			std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
+	return s;
+}
+
+
+
+
+
+//////////////////////////////
+//
 // Convert::isKernRest -- Returns true if the input string represents
 //   a **kern rest.
 //
@@ -11242,254 +11508,6 @@ int Convert::pitchToWbh(int dpc, int acc, int octave, int maxacc) {
 		return output;
 	}
 	return (output + acc) * octave + maxacc;
-}
-
-
-
-
-
-//////////////////////////////
-//
-// Convert::recipToDuration -- Convert **recip rhythmic values into
-//     rational number durations in terms of quarter notes.  For example "4"
-//     will be converted to 1, "4." to 3/2 (1+1/2).  The second parameter
-//     is a scaling factor which can change the rhythmic value's base duration.
-//     Giving a scale of 1 will return the duration in whole note units, so
-//     "4" will return a value of 1/4 (one quarter of a whole note).  Using
-//     3/2 will give the duration in terms of dotted-quarter note units.
-//     The third parameter is the sub-token separate.  For example if the input
-//     string contains a space, anything after the first space will be ignored
-//     when extracting the string.  **kern data which also includes the pitch
-//     along with the rhythm can also be given and will be ignored.
-// default value: scale = 4 (duration in terms of quarter notes)
-// default value: separator = " " (sub-token separator)
-//
-
-HumNum Convert::recipToDuration(const string& recip, HumNum scale,
-		string separator) {
-	size_t loc;
-	loc = recip.find(separator);
-	string subtok;
-	if (loc != string::npos) {
-		subtok = recip.substr(0, loc);
-	} else {
-		subtok = recip;
-	}
-
-	loc = recip.find('q');
-	if (loc != string::npos) {
-		// grace note, ignore printed rhythm
-		HumNum zero(0);
-		return zero;
-	}
-
-	int dotcount = 0;
-	int i;
-	int numi = -1;
-	for (i=0; i<(int)subtok.size(); i++) {
-		if (subtok[i] == '.') {
-			dotcount++;
-		}
-		if ((numi < 0) && isdigit(subtok[i])) {
-			numi = i;
-		}
-	}
-	loc = subtok.find("%");
-	int numerator = 1;
-	int denominator = 1;
-	HumNum output;
-	if (loc != string::npos) {
-		// reciprocal rhythm
-		numerator = 1;
-		denominator = subtok[numi++] - '0';
-		while ((numi<(int)subtok.size()) && isdigit(subtok[numi])) {
-			denominator = denominator * 10 + (subtok[numi++] - '0');
-		}
-		if ((loc + 1 < subtok.size()) && isdigit(subtok[loc+1])) {
-			int xi = (int)loc + 1;
-			numerator = subtok[xi++] - '0';
-			while ((xi<(int)subtok.size()) && isdigit(subtok[xi])) {
-				numerator = numerator * 10 + (subtok[xi++] - '0');
-			}
-		}
-		output.setValue(numerator, denominator);
-	} else if (numi < 0) {
-		// no rhythm found
-		HumNum zero(0);
-		return zero;
-	} else if (subtok[numi] == '0') {
-		// 0-symbol
-		int zerocount = 1;
-		for (i=numi+1; i<(int)subtok.size(); i++) {
-			if (subtok[i] == '0') {
-				zerocount++;
-			} else {
-				break;
-			}
-		}
-		numerator = (int)pow(2, zerocount);
-		output.setValue(numerator, 1);
-	} else {
-		// plain rhythm
-		denominator = subtok[numi++] - '0';
-		while ((numi<(int)subtok.size()) && isdigit(subtok[numi])) {
-			denominator = denominator * 10 + (subtok[numi++] - '0');
-		}
-		output.setValue(1, denominator);
-	}
-
-	if (dotcount <= 0) {
-		return output * scale;
-	}
-
-	int bot = (int)pow(2.0, dotcount);
-	int top = (int)pow(2.0, dotcount + 1) - 1;
-	HumNum factor(top, bot);
-	return output * factor * scale;
-}
-
-
-//////////////////////////////
-//
-// Convert::recipToDurationNoDots -- Same as recipToDuration(), but ignore
-//   any augmentation dots.
-//
-
-HumNum Convert::recipToDurationNoDots(const string& recip, HumNum scale,
-		string separator) {
-	string temp = recip;
-	std::replace(temp.begin(), temp.end(), '.', 'Z');
-	return Convert::recipToDuration(temp, scale, separator);
-}
-
-
-
-
-//////////////////////////////
-//
-// Convert::replaceOccurrences -- Similar to s// regular expressions
-//    operator.  This function replaces the search string in the source
-//    string with the replace string.
-//
-
-void Convert::replaceOccurrences(string& source, const string& search,
-		const string& replace) {
-	for (int loc=0; ; loc += (int)replace.size()) {
-		loc = (int)source.find(search, loc);
-		if (loc == (int)string::npos) {
-			break;
-		}
-		source.erase(loc, search.length());
-		source.insert(loc, replace);
-	}
-}
-
-
-
-//////////////////////////////
-//
-// Convert::splitString -- Splits a string into a list of strings
-//   separated by the given character.  Empty strings will be generated
-//   if the separator occurs at the start/end of the input string, and
-//   if two or more separates are adjacent to each other.
-// default value: separator = ' ';
-//
-
-vector<string> Convert::splitString(const string& data, char separator) {
-	stringstream ss(data);
-	string key;
-	vector<string> output;
-	while (getline(ss, key, separator)) {
-		output.push_back(key);
-	}
-	if (output.size() == 0) {
-		output.push_back(data);
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// Convert::repeatString -- Returns a string which repeats the given
-//   pattern by the given count.
-//
-
-string Convert::repeatString(const string& pattern, int count) {
-	string output;
-	for (int i=0; i<count; i++) {
-		output += pattern;
-	}
-	return output;
-}
-
-
-//////////////////////////////
-//
-// Convert::encodeXml -- Encode a string for XML printing.  Ampersands
-//    get converted to &amp;, < to &lt; > to &gt;, " to &quot; and
-//    ' to &apos;.
-//
-
-string Convert::encodeXml(const string& input) {
-	string output;
-	output.reserve(input.size()*2);
-	for (int i=0; i<(int)input.size(); i++) {
-		switch (input[i]) {
-			case '&':  output += "&amp;";   break;
-			case '<':  output += "&lt;";    break;
-			case '>':  output += "&gt;";    break;
-			case '"':  output += "&quot;";  break;
-			case '\'': output += "&apos;";  break;
-			default:   output += input[i];
-		}
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// Convert::getHumNumAttributes -- Returns XML attributes for a HumNum
-//   number.  First @float which gives the floating-point representation.
-//   If the number has a fractional part, then also add @ratfrac with the
-//   fractional representation of the non-integer portion number.
-//
-
-string Convert::getHumNumAttributes(const HumNum& num) {
-	string output;
-	if (num.isInteger()) {
-		output += " float=\"" + to_string(num.getNumerator()) + "\"";
-	} else {
-		stringstream sstr;
-		sstr << num.toFloat();
-		output += " float=\"" + sstr.str() + "\"";
-	}
-	if (!num.isInteger()) {
-		HumNum rem = num.getRemainder();
-		output += " ratfrac=\"" + to_string(rem.getNumerator()) +
-				+ "/" + to_string(rem.getDenominator()) + "\"";
-	}
-	return output;
-}
-
-
-
-//////////////////////////////
-//
-// Convert::trimWhiteSpace -- remove spaces, tabs and/or newlines
-//     from the beginning and end of input string.
-//
-
-string Convert::trimWhiteSpace(const string& input) {
-	string s = input;
-	s.erase(s.begin(), std::find_if(s.begin(), s.end(),
-			std::not1(std::ptr_fun<int, int>(std::isspace))));
-	s.erase(std::find_if(s.rbegin(), s.rend(),
-			std::not1(std::ptr_fun<int, int>(std::isspace))).base(), s.end());
-	return s;
 }
 
 

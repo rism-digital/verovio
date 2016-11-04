@@ -366,7 +366,7 @@ int main(int argc, char **argv)
         outfile = removeExtension(infile);
     }
     else if (outfile == "-") {
-        DisableLog();
+        // DisableLog();
         std_output = true;
     }
     else {
@@ -443,13 +443,11 @@ int main(int argc, char **argv)
         }
     }
     else if (outformat == "humdrum") {
-	outfile += ".krn";
+        outfile += ".krn";
         if (std_output) {
-            if (!toolkit.GetHumdrum(std::cout)) {
-                cerr << "Unable to write Humdrum to standard output." << endl;
-                exit(1);
-            }
-        } else {
+            toolkit.GetHumdrum(std::cout);
+        }
+        else {
             if (!toolkit.GetHumdrumFile(outfile)) {
                 cerr << "Unable to write Humdrum to " << outfile << "." << endl;
                 exit(1);

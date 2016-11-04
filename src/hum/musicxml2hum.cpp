@@ -13,6 +13,8 @@
 #include "musicxml2hum.h"
 #include "HumGrid.h"
 
+#include <string.h>
+
 using namespace std;
 using namespace pugi;
 
@@ -189,7 +191,7 @@ void musicxml2hum_interface::printPartInfo(vector<string>& partids,
 		vector<MxmlPart>& partdata) {
 	cout << "\nPart information in the file:" << endl;
 	int maxmeasure = 0;
-	for (int i=0; i<partids.size(); i++) {
+	for (int i=0; i<(int)partids.size(); i++) {
 		cout << "\tPART " << i+1 << " id = " << partids[i] << endl;
 		cout << "\tMAXSTAFF " << partdata[i].getStaffCount() << endl;
 		cout << "\t\tpart name:\t"
@@ -232,7 +234,6 @@ void musicxml2hum_interface::printPartInfo(vector<string>& partids,
 bool musicxml2hum_interface::stitchParts(HumGrid& outdata,
 		vector<string>& partids, map<string, xml_node>& partinfo,
 		map<string, xml_node>& partcontent, vector<MxmlPart>& partdata) {
-
 	if (partdata.size() == 0) {
 		return false;
 	}
@@ -241,7 +242,8 @@ bool musicxml2hum_interface::stitchParts(HumGrid& outdata,
 
 	int i;
 	int measurecount = partdata[0].getMeasureCount();
-	for (i=1; i<(int)partdata.size(); i++) {
+	// i used to start at 1 for some strange reason.
+	for (i=0; i<(int)partdata.size(); i++) {
 		if (measurecount != partdata[i].getMeasureCount()) {
 			cerr << "ERROR: cannot handle parts with different measure\n";
 			cerr << "counts yet. Compare " << measurecount << " to ";
@@ -251,7 +253,7 @@ bool musicxml2hum_interface::stitchParts(HumGrid& outdata,
 	}
 
 	vector<int> partstaves(partdata.size(), 0);
-	for (i=0; i<partstaves.size(); i++) {
+	for (i=0; i<(int)partstaves.size(); i++) {
 		partstaves[i] = partdata[i].getStaffCount();
 	}
 
@@ -403,7 +405,6 @@ bool musicxml2hum_interface::insertMeasure(HumGrid& outdata, int mnum,
 		}
 	}
 
-
 	bool allend = false;
 	vector<SimultaneousEvents*> nowevents;
 	vector<int> nowparts;
@@ -418,11 +419,13 @@ bool musicxml2hum_interface::insertMeasure(HumGrid& outdata, int mnum,
 			if (curindex[i] >= (int)(*sevents[i]).size()) {
 				continue;
 			}
+
 			if ((*sevents[i])[curindex[i]].starttime == processtime) {
 				nowevents.push_back(&(*sevents[i])[curindex[i]]);
 				nowparts.push_back(i);
 				curindex[i]++;
 			}
+
 			if (curindex[i] < (int)(*sevents[i]).size()) {
 				allend = false;
 				if ((nexttime < 0) ||
@@ -513,6 +516,7 @@ void musicxml2hum_interface::addEvent(GridSlice& slice,
 	int partindex;  // which part the event occurs in
 	int staffindex; // which staff the event occurs in (need to fix)
 	int voiceindex; // which voice the event occurs in (use for staff)
+	bool invisible = isInvisible(event);
 
 	partindex  = event->getPartIndex();
 	staffindex = event->getStaffIndex();
@@ -524,10 +528,60 @@ void musicxml2hum_interface::addEvent(GridSlice& slice,
 	string postfix = event->getPostfixNoteInfo();
 	stringstream ss;
 	ss << prefix << recip << pitch << postfix;
+	if (invisible) {
+		ss << "yy";
+	}
+
+	// check for chord notes.
+	if (event->isChord()) {
+		addChordNotes(ss, event, recip);
+	}
 
 	HTp token = new HumdrumToken(ss.str());
 	slice.at(partindex)->at(staffindex)->setTokenLayer(voiceindex, token,
 		event->getDuration());
+}
+
+
+
+//////////////////////////////
+//
+// musicxml2hum_interface::isInvisible --
+//
+
+bool musicxml2hum_interface::isInvisible(MxmlEvent* event) {
+	xml_node node = event->getNode();
+	if (!node) {
+		return false;
+	}
+	if (strcmp(node.attribute("print-object").value(), "no") == 0) {
+		return true;
+	}
+
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// musicxml2hum_interface::addChordNotes --
+//
+
+void musicxml2hum_interface::addChordNotes(ostream& output, MxmlEvent* head, 
+		const string& recip) {
+	vector<MxmlEvent*> links = head->getLinkedNotes();
+	MxmlEvent* note;
+	string pitch;
+	string prefix;
+	string postfix;
+	for (int i=0; i<(int)links.size(); i++) {
+		note = links.at(i);
+		pitch   = note->getKernPitch();
+		prefix  = note->getPrefixNoteInfo();
+		postfix = note->getPostfixNoteInfo();
+		output << " " << prefix << recip << pitch << postfix;
+	}
 }
 
 
@@ -553,8 +607,8 @@ void musicxml2hum_interface::appendZeroEvents(
 	int pindex = 0;
 	xml_node child;
 
-	for (int i=0; i<nowevents.size(); i++) {
-		for (int j=0; j<nowevents[i]->zerodur.size(); j++) {
+	for (int i=0; i<(int)nowevents.size(); i++) {
+		for (int j=0; j<(int)nowevents[i]->zerodur.size(); j++) {
 			xml_node element = nowevents[i]->zerodur[j]->getNode();
 			if (nodeType(element, "attributes")) {
 				child = element.first_child();
@@ -677,6 +731,43 @@ void musicxml2hum_interface::insertPartClefs(xml_node clef, GridPart& part) {
 	while (clef) {
 		clef = convertClefToHumdrum(clef, token, staffnum);
 		part[staffnum]->setTokenLayer(0, token, 0);
+	}
+
+	// go back and fill in all NULL pointers with null interpretations
+	fillEmpties(&part, "*");
+}
+
+
+
+//////////////////////////////
+//
+// musicxml2hum_interface::fillEmpties --
+//
+
+void musicxml2hum_interface::fillEmpties(GridPart* part, const char* string) {
+	int staffcount = (int)part->size();
+	GridVoice* gv;
+	int vcount;
+
+ 	for (int s=0; s<staffcount; s++) {
+		GridStaff* staff = part->at(s);
+		if (staff == NULL) {
+			cerr << "Strange error here" << endl;
+			continue;
+		}
+		vcount = (int)staff->size();
+		if (vcount == 0) {
+			gv = new GridVoice(string, 0);
+			staff->push_back(gv);
+		} else {
+			for (int v=0; v<vcount; v++) {
+				gv = staff->at(v);
+				if (gv == NULL) {
+					gv = new GridVoice(string, 0);
+					staff->at(v) = gv;
+				}
+			}
+		}
 	}
 }
 
@@ -891,6 +982,7 @@ xml_node musicxml2hum_interface::convertClefToHumdrum(xml_node clef,
 
 	string sign;
 	int line = 0;
+	int octadjust = 0;
 
 	xml_node child = clef.first_child();
 	while (child) {
@@ -898,13 +990,25 @@ xml_node musicxml2hum_interface::convertClefToHumdrum(xml_node clef,
 			sign = child.child_value();
 		} else if (nodeType(child, "line")) {
 			line = atoi(child.child_value());
+		} else if (nodeType(child, "clef-octave-change")) {
+			octadjust = atoi(child.child_value());
 		}
 		child = child.next_sibling();
 	}
 
 	// Check for percussion clefs, etc., here.
 	stringstream ss;
-	ss << "*clef" << sign << line;
+	ss << "*clef" << sign;
+	if (octadjust < 0) {
+		for (int i=0; i < -octadjust; i++) {
+			ss << "v";
+		}
+	} else if (octadjust > 0) {
+		for (int i=0; i<octadjust; i++) {
+			ss << "^";
+		}
+	}
+	ss << line;
 	token = new HumdrumToken(ss.str());
 
 	clef = clef.next_sibling();

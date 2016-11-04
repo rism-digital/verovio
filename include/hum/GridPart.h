@@ -36,6 +36,9 @@ class GridPart : public vector<GridStaff*> {
 		GridSide m_partsides;
 };
 
+ostream& operator<<(ostream& output, GridPart* part);
+ostream& operator<<(ostream& output, GridPart& part);
+
 
 } // end namespace hum
 

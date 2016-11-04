@@ -30,7 +30,7 @@ class HumGrid : public vector<GridMeasure*> {
 	public:
 		HumGrid(void);
 		~HumGrid();
-		void transferTokens(HumdrumFile& outfile);
+		bool transferTokens(HumdrumFile& outfile);
 
 	protected:
 		void calculateGridDurations            (void);
@@ -41,10 +41,10 @@ class HumGrid : public vector<GridMeasure*> {
 		void insertPartIndications             (HumdrumFile& outfile);
 		void insertStaffIndications            (HumdrumFile& outfile);
 		void addNullTokens                     (void);
-		void buildSingleList                   (void);
+		bool buildSingleList                   (void);
 		void extendDurationToken               (int slicei, int parti,
 		                                        int staffi, int voicei);
-		GridToken* getGridToken(int slicei, int parti, int staffi, int voicei);
+		GridVoice* getGridVoice(int slicei, int parti, int staffi, int voicei);
 		void addMeasureLines                   (void);
 		void addLastMeasure                    (void);
 		bool manipulatorCheck                  (void);

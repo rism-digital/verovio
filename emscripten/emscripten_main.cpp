@@ -79,7 +79,9 @@ const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based)
 
 const char *vrvToolkit_getHumdrum(Toolkit *tk)
 {
-    return tk->GetHumdrumBuffer();
+    const char* buffer = tk->GetHumdrumBuffer();
+    cerr << "BUFFER = " << buffer << endl;
+    return buffer;
 }
 
 const char *vrvToolkit_renderPage(Toolkit *tk, int page_no, const char *c_options)
