@@ -348,6 +348,10 @@ private:
     // m_staffstates == state variables for each staff.
     vector<humaux::StaffStateVariables> m_staffstates;
 
+	// m_measureIndex == state variable for keeping track of the 
+	// current measure number being converted.
+	int m_measureIndex;
+
 #endif /* NO_HUMDRUM_SUPPORT */
 };
 

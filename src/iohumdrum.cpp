@@ -436,9 +436,11 @@ bool HumdrumInput::convertHumdrum(void)
     prepareVerses();
     prepareStaffGroup();
 
+    m_measureIndex = 0;
     int line = kernstarts[0]->getLineIndex();
     while (line < infile.getLineCount() - 1 && (line >= 0)) {
         status &= convertSystemMeasure(line);
+        m_measureIndex++;
     }
 
     createHeader();
@@ -1663,7 +1665,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (!layerdata[i]->isClef()) {
                 continue;
             }
-            insertClefElement(elements, pointers, layerdata[i]);
+            if (m_measureIndex > 0) {
+                insertClefElement(elements, pointers, layerdata[i]);
+            }
         }
 
         // Uncomment this when MRest::SetFermata() is implemented:
