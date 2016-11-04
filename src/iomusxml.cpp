@@ -511,8 +511,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 std::string value;
                 if (key < 0)
                     value = StringFormat("%df", abs(key));
-                else
+                else if (key > 0)
                     value = StringFormat("%ds", key);
+                else value = "0";
                 staffDef->SetKeySig(staffDef->AttKeySigDefaultLog::StrToKeysignature(value));
             }
             // time
@@ -716,17 +717,24 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         }
     }
 
-    if (node.select_single_node("rest")) {
+    pugi::xpath_node rest = node.select_single_node("rest");
+    if (rest) {
+        std::string stepStr = GetContentOfChild(rest.node(), "display-step");
+        std::string octaveStr = GetContentOfChild(rest.node(), "display-octave");
         // we assume /note without /type to be mRest
         if (typeStr.empty()) {
             MRest *mRest = new MRest();
             layer->AddChild(mRest);
+            if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
+            if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
         }
         else {
             Rest *rest = new Rest();
             element = rest;
             rest->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) rest->SetDots(dots);
+            if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
+            if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
             AddLayerElement(layer, rest);
         }
     }
