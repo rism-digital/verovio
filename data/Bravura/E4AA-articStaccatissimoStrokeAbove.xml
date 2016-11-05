@@ -1,5 +1,4 @@
 <symbol id="E4AA" viewBox="0 0 2048 2048" overflow="inherit">
-   <g transform="scale(1,-1)">
-      <path d="M98 575v-557q0 -18 -18 -18h-62q-18 0 -18 18v557q0 18 18 19h62q18 -1 18 -19z"/>
-   </g>
+   <path transform="scale(1,-1)"
+         d="M98 575v-557q0 -18 -18 -18h-62q-18 0 -18 18v557q0 18 18 19h62q18 -1 18 -19z"/>
 </symbol>
