@@ -13,7 +13,7 @@ namespace vrv {
 // MRest
 //----------------------------------------------------------------------------
 
-MRest::MRest() : LayerElement("mrest-"), AttVisibility(), AttFermatapresent(), PositionInterface()
+MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttVisibility(), AttFermatapresent()
 {
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_VISIBILITY);
