@@ -27,6 +27,7 @@
 #include "score.h"
 #include "section.h"
 #include "slur.h"
+#include "space.h"
 #include "staff.h"
 #include "syl.h"
 #include "text.h"
@@ -721,8 +722,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     if (rest) {
         std::string stepStr = GetContentOfChild(rest.node(), "display-step");
         std::string octaveStr = GetContentOfChild(rest.node(), "display-octave");
+        if (GetAttributeValue(node, "print-object") == "no") {
+            Space *space = new Space();
+            element = space;
+            space->SetDur(ConvertTypeToDur(typeStr));
+            AddLayerElement(layer, space);
+        }
         // we assume /note without /type to be mRest
-        if (typeStr.empty()) {
+        else if (typeStr.empty()) {
             MRest *mRest = new MRest();
             layer->AddChild(mRest);
             if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
@@ -741,6 +748,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     else {
         Note *note = new Note();
         element = note;
+        if (GetAttributeValue(node, "print-object") == "no") note->SetVisible(BOOLEAN_false);
 
         // Accidental
         std::string accidentalStr = GetContentOfChild(node, "accidental");
