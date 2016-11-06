@@ -267,7 +267,7 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
 
 void MusicXmlInput::OpenTie(Staff *staff, Layer *layer, Note *note, Tie *tie)
 {
-    tie->SetStartid(note->GetUuid());
+    tie->SetStartid(StringFormat("#%s",note->GetUuid().c_str()));
     musicxml::OpenTie openTie(staff->GetN(), layer->GetN(), note->GetPname(), note->GetOct());
     m_tieStack.push_back(std::make_pair(tie, openTie));
 }
@@ -278,7 +278,7 @@ void MusicXmlInput::CloseTie(Staff *staff, Layer *layer, Note *note, bool isClos
     for (iter = m_tieStack.begin(); iter != m_tieStack.end(); iter++) {
         if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN())
             && (iter->second.m_pname == note->GetPname()) && iter->second.m_oct == note->GetOct()) {
-            iter->first->SetEndid(note->GetUuid());
+            iter->first->SetEndid(StringFormat("#%s",note->GetUuid().c_str()));
             m_tieStack.erase(iter);
             if (!isClosingTie) {
                 LogWarning("Closing tie for note '%s' even thought tie /tie@[type='stop'] is missing in the MusicXML",
@@ -290,8 +290,8 @@ void MusicXmlInput::CloseTie(Staff *staff, Layer *layer, Note *note, bool isClos
 }
 
 void MusicXmlInput::OpenSlur(Staff *staff, Layer *layer, int number, LayerElement *element, Slur *slur)
-{
-    slur->SetStartid(element->GetUuid());
+    {
+        slur->SetStartid(StringFormat("#%s",element->GetUuid().c_str()));
     musicxml::OpenSlur openSlur(staff->GetN(), layer->GetN(), number);
     m_slurStack.push_back(std::make_pair(slur, openSlur));
 }
@@ -302,7 +302,7 @@ void MusicXmlInput::CloseSlur(Staff *staff, Layer *layer, int number, LayerEleme
     for (iter = m_slurStack.begin(); iter != m_slurStack.end(); iter++) {
         if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN())
             && (iter->second.m_number == number)) {
-            iter->first->SetEndid(element->GetUuid());
+            iter->first->SetEndid(StringFormat("#%s",element->GetUuid().c_str()));
             m_slurStack.erase(iter);
             return;
         }
@@ -692,6 +692,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     std::string typeStr = GetContentOfChild(node, "type");
     int dots = (int)node.select_nodes("dot").size();
 
+    // fermata
+    pugi::xpath_node fermata = notations.node().select_single_node("fermata");
+    std::string fermataStr;
+    if (fermata) fermataStr = GetAttributeValue(fermata.node(), "type");
+
     // beam start
     bool beamStart = node.select_single_node("beam[@number='1'][text()='begin']");
     if (beamStart) {
@@ -731,15 +736,17 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         // we assume /note without /type to be mRest
         else if (typeStr.empty()) {
             MRest *mRest = new MRest();
-            layer->AddChild(mRest);
+            if (!fermataStr.empty()) mRest->SetFermata(ConvertTypeToPlace(fermataStr));
             if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
+            AddLayerElement(layer, mRest);
         }
         else {
             Rest *rest = new Rest();
             element = rest;
             rest->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) rest->SetDots(dots);
+            if (!fermataStr.empty()) rest->SetFermata(ConvertTypeToPlace(fermataStr));
             if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
             AddLayerElement(layer, rest);
@@ -782,6 +789,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 note->SetAccidGes((data_ACCIDENTAL_IMPLICIT)ConvertAlterToAccid(alterStr));
             }
         }
+
+        // Add fermata
+        if (!fermataStr.empty()) note->SetFermata(ConvertTypeToPlace(fermataStr));
 
         // Look at the next note to see if we are starting or ending a chord
         pugi::xpath_node nextNote = node.select_single_node("./following-sibling::note");
@@ -972,6 +982,14 @@ data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
     if (value == "B") return PITCHNAME_b;
     LogWarning("Unsupported pitch name '%s'", value.c_str());
     return PITCHNAME_NONE;
+}
+
+data_PLACE MusicXmlInput::ConvertTypeToPlace(std::string value)
+{
+    if (value == "upright") return PLACE_above;
+    if (value == "inverted") return PLACE_below;
+    LogWarning("Unsupported type '%s'", value.c_str());
+    return PLACE_NONE;
 }
 
 } // namespace vrv
