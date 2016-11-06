@@ -358,7 +358,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
     int yShift = 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     data_STAFFREL place = articPart->GetPlace();
 
-    int y = articPart->GetDrawingY() + articPart->GetDrawingYRel();
+    int y = articPart->GetDrawingY();
     y += (place == STAFFREL_above) ? yShift : -yShift;
 
     int xCorr;

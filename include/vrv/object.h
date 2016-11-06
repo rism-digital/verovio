@@ -527,6 +527,11 @@ public:
     ///@{
 
     /**
+     * Adjust the position the outside articulations.
+     */
+    virtual int AdjustArticulations(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Adjust the position of all floating positionner, staff by staff.
      */
     virtual int AdjustFloatingPostioners(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }

@@ -78,6 +78,11 @@ public:
     //----------//
 
     /**
+     * See Object::AdjustArticulations
+     */
+    virtual int AdjustArticulations(FunctorParams *functorParams);
+
+    /**
      * See Object::PrepareArtic
      */
     virtual int PrepareArtic(FunctorParams *functorParams);
@@ -128,6 +133,13 @@ public:
     ///@{
     int GetDrawingYRel() const { return m_drawingYRel; }
     void SetDrawingYRel(int drawingYRel);
+    ///@}
+
+    /**
+     * @name Overwritten version that takes into account m_drawingYRel
+     */
+    ///@{
+    virtual int GetDrawingY() const;
     ///@}
 
     /**

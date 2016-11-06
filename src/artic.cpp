@@ -244,6 +244,21 @@ void ArticPart::Reset()
     m_drawingYRel = 0;
 }
 
+int ArticPart::GetDrawingY() const
+{
+    return BoundingBox::GetDrawingY() - this->GetDrawingYRel();
+}
+
+void ArticPart::SetDrawingYRel(int drawingYRel)
+{
+    if (GetPlace() == STAFFREL_above) {
+        if (drawingYRel < m_drawingYRel) m_drawingYRel = drawingYRel;
+    }
+    else {
+        if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
+    }
+};
+
 bool ArticPart::AlwaysAbove()
 {
     std::vector<data_ARTICULATION>::iterator iter;
@@ -263,6 +278,34 @@ bool ArticPart::AlwaysAbove()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int Artic::AdjustArticulations(FunctorParams *functorParams)
+{
+    AdjustArticulationsParams *params = dynamic_cast<AdjustArticulationsParams *>(functorParams);
+    assert(params);
+
+    ArticPart *insidePart = this->GetInsidePart();
+    ArticPart *outsidePart = this->GetOutsidePart();
+
+    if (!outsidePart) return FUNCTOR_SIBLINGS;
+
+    if (insidePart) {
+        if (insidePart->GetPlace() == outsidePart->GetPlace()) {
+            if (insidePart->GetPlace() == STAFFREL_above) {
+                int inTop = insidePart->GetContentTop();
+                int outBottom = outsidePart->GetContentBottom();
+                if (inTop > outBottom) outsidePart->SetDrawingYRel(outBottom - inTop);
+            }
+            else {
+                int inBottom = insidePart->GetContentBottom();
+                int outTop = outsidePart->GetContentTop();
+                if (inBottom < outTop) outsidePart->SetDrawingYRel(outTop - inBottom);
+            }
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
 
 int Artic::PrepareArtic(FunctorParams *functorParams)
 {
