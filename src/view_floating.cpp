@@ -149,7 +149,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
-        AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
+        MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_DEFAULT);
         Alignment *pos
             = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
         x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
@@ -164,7 +164,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
-        AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
+        MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_DEFAULT);
         Alignment *pos
             = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
         x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
@@ -1630,7 +1630,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     // If we have not timestamp
     int x = measure->GetDrawingX();
     // First try to see if we have a meter sig attribute for this measure
-    AttMeasureAlignerType alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
+    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
     Alignment *pos
         = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
     if (!pos) {

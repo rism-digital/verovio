@@ -117,16 +117,16 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttMeasureAlignerType
+// MeasureAlignerTypeComparison
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is an Alignment of a certain type
  */
-class AttMeasureAlignerType : public AttComparison {
+class MeasureAlignerTypeComparison : public AttComparison {
 
 public:
-    AttMeasureAlignerType(const AlignmentType type) : AttComparison(OBJECT) { m_type = type; }
+    MeasureAlignerTypeComparison(const AlignmentType type) : AttComparison(OBJECT) { m_type = type; }
 
     void SetType(AlignmentType type) { m_type = type; }
 
@@ -142,16 +142,16 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttNoteOnsetOffsetComparison
+// NoteOnsetOffsetComparison
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
-class AttNoteOnsetOffsetComparison : public AttComparison {
+class NoteOnsetOffsetComparison : public AttComparison {
 
 public:
-    AttNoteOnsetOffsetComparison(const double time) : AttComparison(NOTE) { m_time = time; }
+    NoteOnsetOffsetComparison(const double time) : AttComparison(NOTE) { m_time = time; }
 
     void SetTime(int time) { m_time = time; }
 
