@@ -717,6 +717,12 @@ public:
     virtual int PrepareLyricsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Functor for setting the artic parts.
+     * Splits the artic content into different artic parts if necessary
+     */
+    virtual int PrepareArtic(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Functor for setting mRpt drawing numbers (if required)
      * The functor is processed by staff/layer using an ArrayOfAttComparisons filter.
      */

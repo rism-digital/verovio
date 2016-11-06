@@ -72,6 +72,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is() == ARTIC) {
         DrawArtic(dc, element, layer, staff, measure);
     }
+    else if (element->Is() == ARTIC_PART) {
+        DrawArticPart(dc, element, layer, staff, measure);
+    }
     else if (element->Is() == BARLINE) {
         DrawBarLine(dc, element, layer, staff, measure);
     }
@@ -293,11 +296,18 @@ void View::DrawArtic(
 
     /************** placement **************/
 
+    bool allowAbove = true;
+
     // for now we ignore within @place
-    if (artic->HasPlace() && (artic->GetPlace() != STAFFREL_within))
+    if (artic->HasPlace() && (artic->GetPlace() != STAFFREL_within)) {
         place = artic->GetPlace();
+        // If we have a place indication do not allow to be changed to above
+        allowAbove = false;
+    }
     else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
         place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? STAFFREL_above : STAFFREL_below;
+        // If we have more than one layer do not allow to be changed to above
+        allowAbove = false;
     }
     else if (stemDir == STEMDIRECTION_up)
         place = STAFFREL_below;
@@ -306,48 +316,62 @@ void View::DrawArtic(
 
     /************** calculate the y position **************/
 
-    int y;
-    int yChordMax, yChordMin;
+    int yInAbove = parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
+    int yInBelow = parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+    int yOutAbove = std::max(yInAbove, staff->GetDrawingY());
+    int yOutBelow = std::min(yInBelow, staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize));
 
-    // first get the min max of the chord (if any)
-    if (parentChord) {
-        parentChord->GetYExtremes(&yChordMax, &yChordMin);
-    }
-
-    // artic is above
-    if (place == STAFFREL_above) {
-        y = parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
-        if (!artic->InStaff()) {
-            y = std::max(y, staff->GetDrawingY());
-        }
-        y += 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
-    else {
-        y = parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
-        if (!artic->InStaff()) {
-            y = std::min(y, staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize));
-        }
-        y -= 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
+    artic->UpdateOutsidePartPosition(yOutAbove, yOutBelow, place, allowAbove);
+    artic->UpdateInsidePartPosition(yInAbove, yInBelow, place);
 
     /************** draw the artic **************/
-
-    wchar_t code;
-
-    int x = parent->GetDrawingX();
-    int yShift;
-    int xCorr;
-    int baselineCorr;
 
     if (drawingList)
         dc->ResumeGraphic(element, element->GetUuid());
     else
         dc->StartGraphic(element, "", element->GetUuid());
 
+    DrawLayerChildren(dc, artic, layer, staff, measure);
+
+    if (drawingList)
+        dc->EndResumedGraphic(element, this);
+    else
+        dc->EndGraphic(element, this);
+}
+
+void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+
+    ArticPart *articPart = dynamic_cast<ArticPart *>(element);
+    assert(articPart);
+
+    /************** draw the artic **************/
+
+    wchar_t code;
+
+    int x = articPart->GetDrawingX();
+    int yShift = 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    data_STAFFREL place = articPart->GetPlace();
+
+    int y = articPart->GetDrawingY() + articPart->GetDrawingYRel();
+    y += (place == STAFFREL_above) ? yShift : -yShift;
+
+    int xCorr;
+    int baselineCorr;
+
+    bool drawingCueSize = true;
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
 
     std::vector<data_ARTICULATION>::iterator articIter;
-    std::vector<data_ARTICULATION> articList = artic->GetArtic();
+    std::vector<data_ARTICULATION> articList = articPart->GetArtic();
     for (articIter = articList.begin(); articIter != articList.end(); articIter++) {
 
         code = Artic::GetSmuflCode(*articIter, place);
@@ -371,12 +395,7 @@ void View::DrawArtic(
         y += (place == STAFFREL_above) ? yShift : -yShift;
     }
 
-    dc->ResetFont();
-
-    if (drawingList)
-        dc->EndResumedGraphic(element, this);
-    else
-        dc->EndGraphic(element, this);
+    dc->EndGraphic(element, this);
 }
 
 void View::DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

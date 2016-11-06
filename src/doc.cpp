@@ -141,7 +141,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 {
     CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
     if (m_scoreDef.HasMidiBpm()) calcMaxMeasureDurationParams.m_currentBpm = m_scoreDef.GetMidiBpm();
-    
+
     // We first calculate the maximum duration of each measure
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
     this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams);
@@ -374,6 +374,10 @@ void Doc::PrepareDrawing()
     PrepareFloatingGrpsParams prepareFloatingGrpsParams;
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams);
+
+    FunctorParams prepareArticParams;
+    Functor prepareArtic(&Object::PrepareArtic);
+    this->Process(&prepareArtic, &prepareArticParams);
 
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t

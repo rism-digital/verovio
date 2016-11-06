@@ -13,13 +13,17 @@
 
 //----------------------------------------------------------------------------
 
+#include "attcomparison.h"
 #include "functorparams.h"
 #include "smufl.h"
+#include "vrv.h"
 
 namespace vrv {
 
 std::vector<data_ARTICULATION> Artic::s_outStaffArtic
-    = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc_stacc, ARTICULATION_upbow };
+    = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_marc_stacc, ARTICULATION_upbow };
+
+std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow };
 
 //----------------------------------------------------------------------------
 // Artic
@@ -47,8 +51,26 @@ void Artic::Reset()
     ResetPlacement();
 }
 
-bool Artic::InStaff()
+void Artic::AddChild(Object *child)
 {
+    if (child->Is() == ARTIC_PART) {
+        assert(dynamic_cast<ArticPart *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
+}
+
+void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur)
+{
+    assert(insideSlur);
+    assert(outsideSlur);
+
     std::vector<data_ARTICULATION>::iterator iter;
     auto end = Artic::s_outStaffArtic.end();
     std::vector<data_ARTICULATION> articList = this->GetArtic();
@@ -56,11 +78,49 @@ bool Artic::InStaff()
     for (iter = articList.begin(); iter != articList.end(); iter++) {
         // return false if one cannot be rendered on the staff
         auto i = std::find(Artic::s_outStaffArtic.begin(), end, *iter);
-        if (i != end) {
-            return false;
-        }
+        if (i != end)
+            outsideSlur->push_back(*iter);
+        else
+            insideSlur->push_back(*iter);
     }
-    return true;
+}
+
+void Artic::UpdateOutsidePartPosition(int yAbove, int yBelow, data_STAFFREL place, bool allowAbove)
+{
+    ArticPart *outsidePart = GetOutsidePart();
+    if (!outsidePart) return;
+
+    if (place == STAFFREL_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_above;
+
+    outsidePart->SetPlace(place);
+    if (place == STAFFREL_above)
+        outsidePart->SetDrawingY(yAbove);
+    else
+        outsidePart->SetDrawingY(yBelow);
+}
+
+void Artic::UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place)
+{
+    ArticPart *insidePart = GetInsidePart();
+    if (!insidePart) return;
+
+    insidePart->SetPlace(place);
+    if (place == STAFFREL_above)
+        insidePart->SetDrawingY(yAbove);
+    else
+        insidePart->SetDrawingY(yBelow);
+}
+
+ArticPart *Artic::GetInsidePart()
+{
+    ArticPartTypeComparison articPartComparison(ARTIC_PART_INSIDE);
+    return dynamic_cast<ArticPart *>(FindChildByAttComparison(&articPartComparison, 1));
+}
+
+ArticPart *Artic::GetOutsidePart()
+{
+    ArticPartTypeComparison articPartComparison(ARTIC_PART_OUTSIDE);
+    return dynamic_cast<ArticPart *>(FindChildByAttComparison(&articPartComparison, 1));
 }
 
 wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
@@ -152,7 +212,92 @@ bool Artic::IsCentered(data_ARTICULATION artic)
 }
 
 //----------------------------------------------------------------------------
+// ArticPart
+//----------------------------------------------------------------------------
+
+ArticPart::ArticPart(ArticPartType type, Artic *artic)
+    : LayerElement("artic-part-"), AttArticulation(), AttColor(), AttPlacement()
+{
+    assert(artic);
+
+    RegisterAttClass(ATT_ARTICULATION);
+    RegisterAttClass(ATT_COLOR);
+    RegisterAttClass(ATT_PLACEMENT);
+
+    m_type = type;
+    this->SetColor(artic->GetColor());
+
+    Reset();
+}
+
+ArticPart::~ArticPart()
+{
+}
+
+void ArticPart::Reset()
+{
+    LayerElement::Reset();
+    ResetArticulation();
+    ResetColor();
+    ResetPlacement();
+
+    m_drawingYRel = 0;
+}
+
+bool ArticPart::AlwaysAbove()
+{
+    std::vector<data_ARTICULATION>::iterator iter;
+    auto end = Artic::s_aboveStaffArtic.end();
+    std::vector<data_ARTICULATION> articList = this->GetArtic();
+
+    for (iter = articList.begin(); iter != articList.end(); iter++) {
+        // return false if one has always to be rendered above the staff
+        auto i = std::find(Artic::s_aboveStaffArtic.begin(), end, *iter);
+        if (i != end) {
+            return true;
+        }
+    }
+    return false;
+}
+
+//----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
+
+int Artic::PrepareArtic(FunctorParams *functorParams)
+{
+    std::vector<data_ARTICULATION> insideSlur;
+    std::vector<data_ARTICULATION> outsideSlur;
+
+    this->SplitArtic(&insideSlur, &outsideSlur);
+
+    if (insideSlur.size() > 0) {
+        ArticPart *articPart = new ArticPart(ARTIC_PART_INSIDE, this);
+        articPart->SetArtic(insideSlur);
+        this->AddChild(articPart);
+    }
+    if (outsideSlur.size() > 0) {
+        ArticPart *articPart = new ArticPart(ARTIC_PART_OUTSIDE, this);
+        articPart->SetArtic(outsideSlur);
+        this->AddChild(articPart);
+    }
+
+    return FUNCTOR_CONTINUE;
+};
+
+int Artic::ResetDrawing(FunctorParams *functorParams)
+{
+    // Remove all ArticPart children
+    ClearChildren();
+
+    return FUNCTOR_CONTINUE;
+};
+
+int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
+{
+    m_drawingYRel = 0;
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

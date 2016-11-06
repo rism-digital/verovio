@@ -9,6 +9,7 @@
 #define __VRV_ATT_COMPARISON_H__
 
 #include "aligner.h"
+#include "artic.h"
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "note.h"
@@ -88,6 +89,31 @@ public:
 private:
     int m_extremeDur;
     DurExtreme m_extremeType;
+};
+
+//----------------------------------------------------------------------------
+// ArticPartTypeComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is an Alignment of a certain type
+ */
+class ArticPartTypeComparison : public AttComparison {
+
+public:
+    ArticPartTypeComparison(const ArticPartType type) : AttComparison(OBJECT) { m_type = type; }
+
+    void SetType(ArticPartType type) { m_type = type; }
+
+    virtual bool operator()(Object *object)
+    {
+        ArticPart *articPart = dynamic_cast<ArticPart *>(object);
+        if (!articPart) return false;
+        return (articPart->GetType() == m_type);
+    }
+
+private:
+    ArticPartType m_type;
 };
 
 //----------------------------------------------------------------------------

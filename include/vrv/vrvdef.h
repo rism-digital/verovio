@@ -111,6 +111,7 @@ enum ClassId {
     LAYER_ELEMENT,
     ACCID,
     ARTIC,
+    ARTIC_PART,
     BARLINE,
     BARLINE_ATTR_LEFT,
     BARLINE_ATTR_RIGHT,
@@ -308,6 +309,12 @@ enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAU
  */
 
 enum { DRAWING_GRP_NONE = 0, DRAWING_GRP_VERSE, DRAWING_GRP_HARM, DRAWING_GRP_OTHER };
+
+//----------------------------------------------------------------------------
+// Artic part types
+//----------------------------------------------------------------------------
+
+enum ArticPartType { ARTIC_PART_INSIDE = 0, ARTIC_PART_OUTSIDE };
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines
