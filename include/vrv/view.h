@@ -429,9 +429,14 @@ private:
     ///@}
 
     /**
-     * @name Used for calculating clustered information/dot position
+     * Used for calculating clustered information/dot position
      */
     bool IsOnStaffLine(int y, Staff *staff);
+
+    /**
+     * Find the nearest unit position in the direction indicated by place.
+     */
+    int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place);
 
     /**
      * Make sure dots on chords are vertically aligned correctly

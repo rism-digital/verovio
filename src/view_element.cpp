@@ -316,8 +316,10 @@ void View::DrawArtic(
 
     /************** calculate the y position **************/
 
-    int yInAbove = parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize);
-    int yInBelow = parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize);
+    int staffYBottom = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+    // Avoid in artic to be in legder lines
+    int yInAbove = std::max(parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize), staffYBottom);
+    int yInBelow = std::min(parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize), staff->GetDrawingY());
     int yOutAbove = std::max(yInAbove, staff->GetDrawingY());
     int yOutBelow = std::min(yInBelow, staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize));
 
@@ -355,11 +357,12 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
     wchar_t code;
 
     int x = articPart->GetDrawingX();
-    int yShift = 1 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    data_STAFFREL place = articPart->GetPlace();
+    // HARDCODED value, we double the default margin for now - should go in styling
+    int yShift = 2 * m_doc->GetTopMargin(articPart->Is()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+        / PARAM_DENOMINATOR;
+    int direction = (articPart->GetPlace() == STAFFREL_above) ? 1 : -1;
 
     int y = articPart->GetDrawingY();
-    y += (place == STAFFREL_above) ? yShift : -yShift;
 
     int xCorr;
     int baselineCorr;
@@ -374,25 +377,41 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
     std::vector<data_ARTICULATION> articList = articPart->GetArtic();
     for (articIter = articList.begin(); articIter != articList.end(); articIter++) {
 
-        code = Artic::GetSmuflCode(*articIter, place);
+        code = Artic::GetSmuflCode(*articIter, articPart->GetPlace());
 
         // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
         if (code == 0) continue;
 
+        if (articPart->GetType() == ARTIC_PART_INSIDE) {
+            // If we are above the top of the  staff, just pile them up
+            if ((articPart->GetPlace() == STAFFREL_above) && (y > staff->GetDrawingY())) y += yShift;
+            // If we are below the bottom, just pile the down
+            else if ((articPart->GetPlace() == STAFFREL_below)
+                && (y < staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)))
+                y -= yShift;
+            // Otherwise make it fit the staff space
+            else {
+                y = GetNearestInterStaffPosition(y, staff, articPart->GetPlace());
+                if (IsOnStaffLine(y, staff)) y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * direction;
+            }
+        }
+        // Artic part outside just need to be piled up or down
+        else
+            y += yShift * direction;
+
         // The correction for centering the glyph
         xCorr = m_doc->GetGlyphWidth(code, staff->m_drawingStaffSize, drawingCueSize) / 2;
         // The position of the next glyph (and for correcting the baseline if necessary
-        yShift = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
+        int glyphHeight = m_doc->GetGlyphHeight(code, staff->m_drawingStaffSize, drawingCueSize);
 
         // Adjust the baseline for glyph above the baseline in SMuFL
         baselineCorr = 0;
-        if (Artic::VerticalCorr(code, place)) baselineCorr = yShift;
+        if (Artic::VerticalCorr(code, articPart->GetPlace())) baselineCorr = glyphHeight;
 
         DrawSmuflCode(dc, x - xCorr, y - baselineCorr, code, staff->m_drawingStaffSize, drawingCueSize);
 
         // Adjusting the y position for the next artic
-        yShift += m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
-        y += (place == STAFFREL_above) ? yShift : -yShift;
+        y += glyphHeight * direction;
     }
 
     dc->EndGraphic(element, this);
@@ -2364,7 +2383,25 @@ int View::GetSylY(Syl *syl, Staff *staff)
 
 bool View::IsOnStaffLine(int y, Staff *staff)
 {
+    int y1 = y - staff->GetDrawingY();
+    int y2 = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    LogDebug("IsOnStaff %d %d", y1, y2);
+
     return ((y - staff->GetDrawingY()) % (2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) == 0);
+}
+
+int View::GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place)
+{
+    int yPos = y - staff->GetDrawingY();
+    int distance = yPos % m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    if (place == STAFFREL_above) {
+        if (distance > 0) distance = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) - distance;
+        return y - distance + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
+    else {
+        if (distance < 0) distance = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + distance;
+        return y - distance - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    }
 }
 
 void View::PrepareChordDots(DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff)

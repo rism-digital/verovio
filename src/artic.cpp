@@ -14,8 +14,10 @@
 //----------------------------------------------------------------------------
 
 #include "attcomparison.h"
+#include "doc.h"
 #include "functorparams.h"
 #include "smufl.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -289,17 +291,22 @@ int Artic::AdjustArticulations(FunctorParams *functorParams)
 
     if (!outsidePart) return FUNCTOR_SIBLINGS;
 
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+    int margin = params->m_doc->GetTopMargin(insidePart->Is())
+        * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
+
     if (insidePart) {
         if (insidePart->GetPlace() == outsidePart->GetPlace()) {
             if (insidePart->GetPlace() == STAFFREL_above) {
                 int inTop = insidePart->GetContentTop();
                 int outBottom = outsidePart->GetContentBottom();
-                if (inTop > outBottom) outsidePart->SetDrawingYRel(outBottom - inTop);
+                if (inTop > outBottom) outsidePart->SetDrawingYRel(outBottom - inTop - margin);
             }
             else {
                 int inBottom = insidePart->GetContentBottom();
                 int outTop = outsidePart->GetContentTop();
-                if (inBottom < outTop) outsidePart->SetDrawingYRel(outTop - inBottom);
+                if (inBottom < outTop) outsidePart->SetDrawingYRel(outTop - inBottom + margin);
             }
         }
     }
