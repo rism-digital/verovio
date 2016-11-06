@@ -3,9 +3,9 @@ FontName: Leipzig
 FullName: Leipzig
 FamilyName: Leipzig
 Weight: Regular
-Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.11
-UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoACgAA"
-Version: 5.2.11
+Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.12
+UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoACgAA"
+Version: 5.2.12
 ItalicAngle: 0
 UnderlinePosition: -50
 UnderlineWidth: 50
@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1477898830
+ModificationTime: 1478462323
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -50,7 +50,7 @@ NameList: Adobe Glyph List
 DisplaySize: -72
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 58860 18 7
+WinInfo: 58500 18 7
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
@@ -58,7 +58,7 @@ BeginChars: 1114115 181
 
 StartChar: uniE0A3
 Encoding: 57507 57507 0
-Width: 320
+Width: 314
 VWidth: 2048
 Flags: HW
 LayerCount: 2
@@ -80,7 +80,6 @@ SplineSet
  314 -43 208 -132 96 -132 c 0,26,27
  32 -132 0 -100 0 -36 c 0,28,29
 EndSplineSet
-Validated: 5
 EndChar
 
 StartChar: uniE080
@@ -460,7 +459,7 @@ EndChar
 
 StartChar: uniE0A4
 Encoding: 57508 57508 12
-Width: 320
+Width: 314
 VWidth: 2048
 Flags: HW
 LayerCount: 2
@@ -469,10 +468,9 @@ SplineSet
 0 -39 m 0
  0 29 73 133 200 133 c 0
  266 133 314 96 314 38 c 0
- 314 -46 208 -133 96 -133 c 4
+ 314 -46 208 -133 96 -133 c 0
  32 -133 0 -103 0 -39 c 0
 EndSplineSet
-Validated: 1
 EndChar
 
 StartChar: uniE05C
@@ -4962,13 +4960,13 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 236 m 5
- 347 117 l 5
- 0 0 l 5
- 0 28 l 5
- 257 117 l 5
- 0 208 l 5
- 0 236 l 5
+0 236 m 1
+ 347 117 l 1
+ 0 0 l 1
+ 0 33 l 1
+ 252 117 l 1
+ 0 203 l 1
+ 0 236 l 1
 EndSplineSet
 EndChar
 
@@ -4980,13 +4978,13 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 -236 m 5
- 347 -117 l 5
- 0 0 l 5
- 0 -28 l 5
- 257 -117 l 5
- 0 -208 l 5
- 0 -236 l 5
+0 -236 m 1
+ 347 -117 l 1
+ 0 0 l 1
+ 0 -33 l 1
+ 252 -117 l 5
+ 0 -203 l 1
+ 0 -236 l 1
 EndSplineSet
 EndChar
 
@@ -5038,25 +5036,25 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 0 m 29
- 28 0 l 29
- 28 240 l 29
- 0 240 l 29
- 0 0 l 29
+0 0 m 25
+ 33 0 l 29
+ 33 240 l 29
+ 0 240 l 25
+ 0 0 l 25
 EndSplineSet
 EndChar
 
 StartChar: uniE4AB
 Encoding: 58539 58539 97
-Width: 28
+Width: 34
 VWidth: 0
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
 0 0 m 25
- 28 0 l 25
- 28 -240 l 25
+ 33 0 l 25
+ 33 -240 l 25
  0 -240 l 25
  0 0 l 25
 EndSplineSet
@@ -5284,13 +5282,13 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-273 0 m 5
- 196 0 l 5
- 107 161 l 5
- 24 0 l 5
- 0 0 l 5
- 137 265 l 5
- 273 0 l 5
+273 0 m 1
+ 191 0 l 1
+ 107 154 l 1
+ 29 0 l 1
+ 0 0 l 1
+ 137 265 l 1
+ 273 0 l 1
 EndSplineSet
 EndChar
 
@@ -5303,9 +5301,9 @@ LayerCount: 2
 Fore
 SplineSet
 1 0 m 1
- 78 0 l 1
- 167 -161 l 1
- 250 0 l 1
+ 83 0 l 1
+ 167 -154 l 1
+ 245 0 l 1
  274 0 l 1
  137 -265 l 1
  1 0 l 1
@@ -9515,11 +9513,11 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 0 m 29
- 0 28 l 29
- 347 28 l 29
- 347 0 l 29
- 0 0 l 29
+0 0 m 25
+ 0 33 l 29
+ 347 33 l 29
+ 347 0 l 25
+ 0 0 l 25
 EndSplineSet
 EndChar
 
@@ -9532,8 +9530,8 @@ LayerCount: 2
 Fore
 SplineSet
 0 0 m 25
- 0 -28 l 25
- 347 -28 l 25
+ 0 -33 l 29
+ 347 -33 l 29
  347 0 l 25
  0 0 l 25
 EndSplineSet
@@ -9587,13 +9585,13 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-273 110 m 5
- 196 110 l 5
- 107 271 l 5
- 24 110 l 5
- 0 110 l 5
- 137 375 l 5
- 273 110 l 5
+273 110 m 1
+ 191 110 l 1
+ 107 264 l 1
+ 29 110 l 1
+ 0 110 l 1
+ 137 375 l 1
+ 273 110 l 1
 87 45 m 0
  87 58.3330078125 91.3330078125 69.6669921875 100 79 c 128
  108.666992188 88.3330078125 119.333007812 93.3330078125 132 94 c 1
@@ -9623,13 +9621,13 @@ SplineSet
  113.666992188 -5.6669921875 124.333007812 -0.6669921875 137 0 c 1
  151 0 162.666992188 -4 172 -12 c 128
  181.333007812 -20 186.333007812 -31 187 -45 c 0
-1 -110 m 5
- 78 -110 l 5
- 167 -271 l 5
- 250 -110 l 5
- 274 -110 l 5
- 137 -375 l 5
- 1 -110 l 5
+1 -110 m 1
+ 83 -110 l 1
+ 167 -264 l 1
+ 245 -110 l 1
+ 274 -110 l 1
+ 137 -375 l 1
+ 1 -110 l 1
 EndSplineSet
 EndChar
 
@@ -9641,21 +9639,21 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-125 45 m 4
- 125 58.3330078125 129.333007812 69.6669921875 138 79 c 132
- 146.666992188 88.3330078125 157.333007812 93.3330078125 170 94 c 5
- 184 94 195.666992188 90 205 82 c 132
- 214.333007812 74 219.333007812 63 220 49 c 4
- 220 35.6669921875 215.666992188 24.3330078125 207 15 c 132
- 198.333007812 5.6669921875 187.666992188 0.6669921875 175 0 c 5
- 161 0 149.333007812 4 140 12 c 132
- 130.666992188 20 125.666992188 31 125 45 c 4
+125 45 m 0
+ 125 58.3330078125 129.333007812 69.6669921875 138 79 c 128
+ 146.666992188 88.3330078125 157.333007812 93.3330078125 170 94 c 1
+ 184 94 195.666992188 90 205 82 c 128
+ 214.333007812 74 219.333007812 63 220 49 c 0
+ 220 35.6669921875 215.666992188 24.3330078125 207 15 c 128
+ 198.333007812 5.6669921875 187.666992188 0.6669921875 175 0 c 1
+ 161 0 149.333007812 4 140 12 c 128
+ 130.666992188 20 125.666992188 31 125 45 c 0
 0 346 m 1
  347 227 l 1
  0 110 l 1
- 0 138 l 1
- 257 227 l 1
- 0 318 l 1
+ 0 143 l 1
+ 252 227 l 1
+ 0 313 l 1
  0 346 l 1
 EndSplineSet
 EndChar
@@ -9668,21 +9666,21 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-125 -45 m 4
- 125 -58.3330078125 129.333007812 -69.6669921875 138 -79 c 132
- 146.666992188 -88.3330078125 157.333007812 -93.3330078125 170 -94 c 5
- 184 -94 195.666992188 -90 205 -82 c 132
- 214.333007812 -74 219.333007812 -63 220 -49 c 4
- 220 -35.6669921875 215.666992188 -24.3330078125 207 -15 c 132
- 198.333007812 -5.6669921875 187.666992188 -0.6669921875 175 0 c 5
- 161 0 149.333007812 -4 140 -12 c 132
- 130.666992188 -20 125.666992188 -31 125 -45 c 4
+125 -45 m 0
+ 125 -58.3330078125 129.333007812 -69.6669921875 138 -79 c 128
+ 146.666992188 -88.3330078125 157.333007812 -93.3330078125 170 -94 c 1
+ 184 -94 195.666992188 -90 205 -82 c 128
+ 214.333007812 -74 219.333007812 -63 220 -49 c 0
+ 220 -35.6669921875 215.666992188 -24.3330078125 207 -15 c 128
+ 198.333007812 -5.6669921875 187.666992188 -0.6669921875 175 0 c 1
+ 161 0 149.333007812 -4 140 -12 c 128
+ 130.666992188 -20 125.666992188 -31 125 -45 c 0
 0 -346 m 1
  347 -227 l 1
  0 -110 l 1
- 0 -138 l 1
- 257 -227 l 1
- 0 -318 l 1
+ 0 -143 l 1
+ 252 -227 l 5
+ 0 -313 l 1
  0 -346 l 1
 EndSplineSet
 EndChar
@@ -9704,11 +9702,11 @@ SplineSet
  198.333007812 5.6669921875 187.666992188 0.6669921875 175 0 c 1
  161 0 149.333007812 4 140 12 c 128
  130.666992188 20 125.666992188 31 125 45 c 0
-0 140 m 29
- 0 168 l 29
- 347 168 l 29
- 347 140 l 29
- 0 140 l 29
+0 140 m 25
+ 0 173 l 29
+ 347 173 l 29
+ 347 140 l 25
+ 0 140 l 25
 EndSplineSet
 EndChar
 
@@ -9729,11 +9727,11 @@ SplineSet
  198.333007812 -5.6669921875 187.666992188 -0.6669921875 175 0 c 1
  161 0 149.333007812 -4 140 -12 c 128
  130.666992188 -20 125.666992188 -31 125 -45 c 0
-0 -140 m 29
- 0 -168 l 29
- 347 -168 l 29
- 347 -140 l 29
- 0 -140 l 29
+0 -140 m 25
+ 0 -173 l 29
+ 347 -173 l 29
+ 347 -140 l 25
+ 0 -140 l 25
 EndSplineSet
 EndChar
 
@@ -9745,18 +9743,18 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 308 m 5
- 347 189 l 5
- 0 72 l 5
- 0 100 l 5
- 257 189 l 5
- 0 280 l 5
- 0 308 l 5
-0 0 m 29
- 0 28 l 29
- 347 28 l 29
- 347 0 l 29
- 0 0 l 29
+0 308 m 1
+ 347 189 l 1
+ 0 72 l 1
+ 0 105 l 1
+ 252 189 l 5
+ 0 275 l 1
+ 0 308 l 1
+0 0 m 25
+ 0 33 l 25
+ 347 33 l 25
+ 347 0 l 25
+ 0 0 l 25
 EndSplineSet
 EndChar
 
@@ -9768,18 +9766,18 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 -308 m 5
- 347 -189 l 5
- 0 -72 l 5
- 0 -100 l 5
- 257 -189 l 5
- 0 -280 l 5
- 0 -308 l 5
-0 0 m 29
- 0 -28 l 29
- 347 -28 l 29
- 347 0 l 29
- 0 0 l 29
+0 -308 m 1
+ 347 -189 l 1
+ 0 -72 l 1
+ 0 -105 l 1
+ 252 -189 l 5
+ 0 -275 l 1
+ 0 -308 l 1
+0 0 m 25
+ 0 -33 l 25
+ 347 -33 l 25
+ 347 0 l 25
+ 0 0 l 25
 EndSplineSet
 EndChar
 
@@ -10017,18 +10015,18 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 0 m 29
- 0 28 l 29
- 347 28 l 29
- 347 0 l 29
- 0 0 l 29
-310 85 m 5
- 233 85 l 5
- 144 246 l 5
- 61 85 l 5
- 37 85 l 5
- 174 350 l 5
- 310 85 l 5
+0 0 m 25
+ 0 33 l 25
+ 347 33 l 25
+ 347 0 l 25
+ 0 0 l 25
+310 85 m 1
+ 228 85 l 1
+ 144 239 l 5
+ 66 85 l 1
+ 37 85 l 1
+ 174 350 l 1
+ 310 85 l 1
 EndSplineSet
 EndChar
 
@@ -10041,14 +10039,14 @@ LayerCount: 2
 Fore
 SplineSet
 347 0 m 25
- 347 -28 l 25
- 0 -28 l 25
+ 347 -33 l 25
+ 0 -33 l 25
  0 0 l 25
  347 0 l 25
 37 -85 m 1
- 114 -85 l 1
- 203 -246 l 1
- 286 -85 l 1
+ 119 -85 l 1
+ 203 -239 l 5
+ 281 -85 l 1
  310 -85 l 1
  173 -350 l 1
  37 -85 l 1
