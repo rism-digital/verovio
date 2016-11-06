@@ -267,7 +267,7 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
 
 void MusicXmlInput::OpenTie(Staff *staff, Layer *layer, Note *note, Tie *tie)
 {
-    tie->SetStartid(StringFormat("#%s",note->GetUuid().c_str()));
+    tie->SetStartid("#" + note->GetUuid());
     musicxml::OpenTie openTie(staff->GetN(), layer->GetN(), note->GetPname(), note->GetOct());
     m_tieStack.push_back(std::make_pair(tie, openTie));
 }
@@ -278,7 +278,7 @@ void MusicXmlInput::CloseTie(Staff *staff, Layer *layer, Note *note, bool isClos
     for (iter = m_tieStack.begin(); iter != m_tieStack.end(); iter++) {
         if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN())
             && (iter->second.m_pname == note->GetPname()) && iter->second.m_oct == note->GetOct()) {
-            iter->first->SetEndid(StringFormat("#%s",note->GetUuid().c_str()));
+            iter->first->SetEndid("#" + note->GetUuid());
             m_tieStack.erase(iter);
             if (!isClosingTie) {
                 LogWarning("Closing tie for note '%s' even thought tie /tie@[type='stop'] is missing in the MusicXML",
@@ -290,8 +290,8 @@ void MusicXmlInput::CloseTie(Staff *staff, Layer *layer, Note *note, bool isClos
 }
 
 void MusicXmlInput::OpenSlur(Staff *staff, Layer *layer, int number, LayerElement *element, Slur *slur)
-    {
-        slur->SetStartid(StringFormat("#%s",element->GetUuid().c_str()));
+{
+    slur->SetStartid("#" + element->GetUuid());
     musicxml::OpenSlur openSlur(staff->GetN(), layer->GetN(), number);
     m_slurStack.push_back(std::make_pair(slur, openSlur));
 }
@@ -302,7 +302,7 @@ void MusicXmlInput::CloseSlur(Staff *staff, Layer *layer, int number, LayerEleme
     for (iter = m_slurStack.begin(); iter != m_slurStack.end(); iter++) {
         if ((iter->second.m_staffN == staff->GetN()) && (iter->second.m_layerN == layer->GetN())
             && (iter->second.m_number == number)) {
-            iter->first->SetEndid(StringFormat("#%s",element->GetUuid().c_str()));
+            iter->first->SetEndid("#" + element->GetUuid());
             m_slurStack.erase(iter);
             return;
         }
