@@ -103,6 +103,20 @@ public:
     ///@}
 
     /**
+     * @name Get positions for self and content
+     */
+    ///@{
+    int GetSelfBottom() const { return (this->GetDrawingY() + m_selfBB_y1); }
+    int GetSelfTop() const { return (this->GetDrawingY() + m_selfBB_y2); }
+    int GetSelfLeft() const { return (this->GetDrawingX() + m_selfBB_x1); }
+    int GetSelfRight() const { return (this->GetDrawingX() + m_selfBB_x2); }
+    int GetContentBottom() const { return (this->GetDrawingY() + m_contentBB_y1); }
+    int GetContentTop() const { return (this->GetDrawingY() + m_contentBB_y2); }
+    int GetContentLeft() const { return (this->GetDrawingX() + m_contentBB_x1); }
+    int GetContentRight() const { return (this->GetDrawingX() + m_contentBB_x2); }
+    ///@}
+
+    /**
      * Is true if the bounding box (self or content) has been updated at least once.
      * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
      */
