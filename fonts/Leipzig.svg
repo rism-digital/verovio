@@ -20,7 +20,7 @@ Version 5.2.12 - reviewing artic width
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20161003 at Sun Nov  6 20:58:43 2016
+Created by FontForge 20161003 at Sun Nov  6 21:07:21 2016
  By laurent
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
@@ -428,9 +428,9 @@ d="M0 236l347 -119l-347 -117v33l252 84l-252 86v33z" />
     <glyph glyph-name="uniE4A1" unicode="&#xe4a1;" 
 d="M0 -236l347 119l-347 117v-33l252 -84l-252 -86v-33z" />
     <glyph glyph-name="uniE4A8" unicode="&#xe4a8;" horiz-adv-x="153" 
-d="M153 214h-37c-10 -4 -18.667 -14 -26 -30c-3.333 -7.333 -8 -12 -14 -14c-4 1.333 -10.667 10 -20 26c-4.667 8.667 -11.333 14.667 -20 18h-36l76 -214z" />
+d="M153 224h-37c-10 -4 -18.667 -14 -26 -30c-3.33301 -7.33301 -8 -12 -14 -14c-4 1.33301 -10.667 10 -20 26c-4.66699 8.66699 -11.333 14.667 -20 18h-36l76 -224z" />
     <glyph glyph-name="uniE4A9" unicode="&#xe4a9;" horiz-adv-x="153" 
-d="M153 -214h-37c-10 4 -18.667 14 -26 30c-3.333 7.333 -8 12 -14 14c-4 -1.333 -10.667 -10 -20 -26c-4.667 -8.667 -11.333 -14.667 -20 -18h-36l76 214z" />
+d="M153 -224h-37c-10 4 -18.667 14 -26 30c-3.33301 7.33301 -8 12 -14 14c-4 -1.33301 -10.667 -10 -20 -26c-4.66699 -8.66699 -11.333 -14.667 -20 -18h-36l76 224z" />
     <glyph glyph-name="uniE4AA" unicode="&#xe4aa;" horiz-adv-x="1000" 
 d="M0 0h33v240h-33v-240z" />
     <glyph glyph-name="uniE4AB" unicode="&#xe4ab;" horiz-adv-x="34" 
@@ -811,9 +811,9 @@ d="M0 0v33h347v-33h-347z" />
     <glyph glyph-name="uniE4A5" unicode="&#xe4a5;" 
 d="M0 0v-33h347v33h-347z" />
     <glyph glyph-name="uniE4A6" unicode="&#xe4a6;" horiz-adv-x="110" 
-d="M110 214v5c3 4 -7 6 -19 10c-13.9424 4.64746 -24 4 -35 5c-13.5322 -1.54688 -27.5107 -2.65332 -42 -7c-10 -3 -11 -3 -14 -8v-5l55 -214z" />
+d="M110 224v5c3 4 -7 6 -19 10c-13.9424 4.64746 -24 4 -35 5c-13.5322 -1.54688 -27.5107 -2.65332 -42 -7c-10 -3 -11 -3 -14 -8v-5l55 -224z" />
     <glyph glyph-name="uniE4A7" unicode="&#xe4a7;" horiz-adv-x="110" 
-d="M110 -214v-5c3 -4 -7 -6 -19 -10c-13.9424 -4.64746 -24 -4 -35 -5c-13.5322 1.54688 -27.5107 2.65332 -42 7c-10 3 -11 3 -14 8v5l55 214z" />
+d="M110 -224v-5c3 -4 -7 -6 -19 -10c-13.9424 -4.64746 -24 -4 -35 -5c-13.5322 1.54688 -27.5107 2.65332 -42 7c-10 3 -11 3 -14 8v5l55 224z" />
     <glyph glyph-name="uniE4AE" unicode="&#xe4ae;" horiz-adv-x="274" 
 d="M273 110h-82l-84 154l-78 -154h-29l137 265zM87 45c0 13.333 4.33301 24.667 13 34c8.66699 9.33301 19.333 14.333 32 15c14 0 25.667 -4 35 -12s14.333 -19 15 -33c0 -13.333 -4.33301 -24.667 -13 -34s-19.333 -14.333 -32 -15c-14 0 -25.667 4 -35 12
 c-9.33301 8 -14.333 19 -15 33z" />
