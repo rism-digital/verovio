@@ -111,6 +111,7 @@ private:
     void ReadMusicXmlAttributes(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, int measureNb);
+    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNb);
     ///@}
@@ -188,9 +189,11 @@ private:
     ///@{
     data_ACCIDENTAL_EXPLICIT ConvertAccidentalToAccid(std::string value);
     data_ACCIDENTAL_EXPLICIT ConvertAlterToAccid(std::string value);
+    data_BARRENDITION ConvertStyleToRend(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
     data_PLACE ConvertTypeToPlace(std::string value);
+    data_STAFFREL ConvertPlacementToPlace(std::string value);
     ///@}
 
 private:

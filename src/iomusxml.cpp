@@ -18,6 +18,8 @@
 #include "beam.h"
 #include "chord.h"
 #include "clef.h"
+#include "dir.h"
+#include "dynam.h"
 #include "doc.h"
 #include "layer.h"
 #include "measure.h"
@@ -599,6 +601,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
         else if (IsElement(*it, "barline")) {
             ReadMusicXmlBarLine(*it, measure, measureNb);
         }
+        else if (IsElement(*it, "direction")) {
+            ReadMusicXmlDirection(*it, measure, measureNb);
+        }
         else if (IsElement(*it, "note")) {
             ReadMusicXmlNote(*it, measure, measureNb);
         }
@@ -648,24 +653,46 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, i
 {
     data_BARRENDITION barRendition = BARRENDITION_NONE;
     std::string barStyle = GetContentOfChild(node, "bar-style");
-    if (!barStyle.empty()) {
-        if (barStyle == "light-light") {
-            barRendition = BARRENDITION_dbl;
-        }
-        else if (barStyle == "light-heavy") {
-            barRendition = BARRENDITION_end;
-        }
-        // we need to handle more styles
-        else {
-            barRendition = BARRENDITION_single;
-        }
-    }
+    if (!barStyle.empty()) barRendition = ConvertStyleToRend(barStyle);
     // only left or right can be supported
     if (HasAttributeWithValue(node, "location", "left")) {
         measure->SetLeft(barRendition);
     }
     else {
         measure->SetRight(barRendition);
+    }
+}
+    
+void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure, int measureNb)
+{
+    assert(node);
+    assert(measure);
+
+    pugi::xpath_node type = node.select_single_node("direction-type");
+    std::string placeStr = GetAttributeValue(node, "placement");
+    
+    // Directive
+    std::string textStr = GetContentOfChild(type.node(), "words");
+    if (!textStr.empty()) {
+        Dir *dir = new Dir();
+        if (!placeStr.empty()) dir->SetPlace(ConvertPlacementToPlace(placeStr));
+        Text *text = new Text();
+        text->SetText(UTF8to16(textStr));
+        dir->AddChild(text);
+        m_controlElements.push_back(std::make_pair(measureNb, dir));
+    }
+    
+    // Dynamics
+    pugi::xpath_node dynam = type.node().select_single_node("dynamics");
+    if (dynam){
+        std::string dynamStr = GetContentOfChild(dynam.node(), "other-dynamics");
+        if (dynamStr.empty()) dynamStr = dynam.node().first_child().name();
+        Dynam *dynam = new Dynam();
+        if (!placeStr.empty()) dynam->SetPlace(ConvertPlacementToPlace(placeStr));
+        Text *text = new Text();
+        text->SetText(UTF8to16(dynamStr));
+        dynam->AddChild(text);
+        m_controlElements.push_back(std::make_pair(measureNb, dynam));
     }
 }
 
@@ -953,6 +980,23 @@ data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAlterToAccid(std::string value)
     return ACCIDENTAL_EXPLICIT_NONE;
 }
 
+data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value)
+{
+    if (value == "dashed") return BARRENDITION_dashed;
+    if (value == "dotted") return BARRENDITION_dotted;
+    if (value == "light-light") return BARRENDITION_dbl;
+    if (value == "regular") return BARRENDITION_dbldashed;
+    if (value == "regular") return BARRENDITION_dbldotted;
+    if (value == "light-heavy") return BARRENDITION_end;
+    if (value == "none") return BARRENDITION_invis;
+    // if (value == "") return BARRENDITION_rptstart;
+    // if (value == "") return BARRENDITION_rptboth;
+    // if (value == "") return BARRENDITION_rptend;
+    if (value == "regular") return BARRENDITION_single;
+    LogWarning("Unsupported bar-style '%s'", value.c_str());
+    return BARRENDITION_NONE;
+}
+
 data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
 {
     if (value == "maxima") return DURATION_maxima; // this is a mensural MEI value
@@ -986,10 +1030,22 @@ data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
 
 data_PLACE MusicXmlInput::ConvertTypeToPlace(std::string value)
 {
+    if (value == "above") return PLACE_above;
+    if (value == "below") return PLACE_below;
+    // for fermatas
     if (value == "upright") return PLACE_above;
     if (value == "inverted") return PLACE_below;
     LogWarning("Unsupported type '%s'", value.c_str());
     return PLACE_NONE;
+}
+
+data_STAFFREL MusicXmlInput::ConvertPlacementToPlace(std::string value)
+{
+    if (value == "above") return STAFFREL_above;
+    if (value == "below") return STAFFREL_below;
+    // if (value == "xxx") return STAFFREL_within;
+    LogWarning("Unsupported placement '%s'", value.c_str());
+    return STAFFREL_NONE;
 }
 
 } // namespace vrv
