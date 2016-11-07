@@ -962,6 +962,7 @@ void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
     assert(mRest);
 
     WriteLayerElement(currentNode, mRest);
+    WritePositionInterface(currentNode, mRest);
     mRest->WriteVisibility(currentNode);
     mRest->WriteFermatapresent(currentNode);
 }
@@ -2609,6 +2610,7 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
 {
     MRest *vrvMRest = new MRest();
     ReadLayerElement(mRest, vrvMRest);
+    ReadPositionInterface(mRest, vrvMRest);
 
     vrvMRest->ReadVisibility(mRest);
     vrvMRest->ReadFermatapresent(mRest);
