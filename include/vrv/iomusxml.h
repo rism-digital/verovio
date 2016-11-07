@@ -190,6 +190,7 @@ private:
     data_ACCIDENTAL_EXPLICIT ConvertAlterToAccid(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
+    data_PLACE ConvertTypeToPlace(std::string value);
     ///@}
 
 private:
