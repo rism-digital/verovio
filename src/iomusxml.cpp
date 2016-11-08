@@ -362,7 +362,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             std::string partId = xpathNode.node().attribute("id").as_string();
             std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[1]", partId.c_str());
             pugi::xpath_node partFirstMeasureAttributes = root.select_single_node(xpath.c_str());
-            if (!partFirstMeasureAttributes) {
+            if (!partFirstMeasureAttributes.node().select_single_node("attributes")) {
                 LogWarning("Could not find the 'attributes' element in the first measure of part '%s'", partId.c_str());
                 continue;
             }
