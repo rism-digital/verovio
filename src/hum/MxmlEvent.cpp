@@ -76,7 +76,7 @@ void MxmlEvent::clear(void) {
 	m_linked = false;
 	m_voice = m_staff = 0;
 	m_sequence = -1;
-	for (int i=0; i<m_links.size(); i++) {
+	for (int i=0; i<(int)m_links.size(); i++) {
 		delete m_links[i];
 		m_links[i] = NULL;
 	}

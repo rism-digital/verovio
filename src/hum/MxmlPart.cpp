@@ -272,7 +272,7 @@ int MxmlPart::getVerseCount(void) const {
 
 int MxmlPart::getVerseCount(int staffindex) const {
 	int staffnum = staffindex + 1;
-	if (staffnum < m_verseCount.size()) {
+	if (staffnum < (int)m_verseCount.size()) {
 		return m_verseCount[staffnum];
 	} else {
 		return 0;
@@ -296,7 +296,7 @@ void MxmlPart::receiveVerseCount(int staffindex, int count) {
 	if (staffnum < 0) {
 		return;
 	}
-	if (staffnum < m_verseCount.size()) {
+	if (staffnum < (int)m_verseCount.size()) {
 		if (count > m_verseCount[staffnum]) {
 			m_verseCount[staffnum] = count;
 		} 

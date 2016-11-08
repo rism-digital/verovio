@@ -97,7 +97,7 @@ bool musicxml2hum_interface::convert(ostream& out, xml_document& doc) {
 	// tranfer verse counts from parts/staves to HumGrid:
 	// should also do part verse counts here (-1 staffindex).
 	int versecount;
-	for (int p=0; p<partdata.size(); p++) {
+	for (int p=0; p<(int)partdata.size(); p++) {
 		for (int s=0; s<partdata[p].getStaffCount(); s++) {
 			versecount = partdata[p].getVerseCount(s);
 			outdata.setVerseCount(p, s, versecount);
