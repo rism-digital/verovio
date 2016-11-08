@@ -351,12 +351,13 @@ bool HumdrumInput::ImportString(std::string const &content)
                 i += 2;
                 exinterp = "**";
                 continue;
-            } else if ((i == 0) && (content[i] == '*') && (content[i+1] == '*')) {
+            }
+            else if ((i == 0) && (content[i] == '*') && (content[i + 1] == '*')) {
                 found = true;
                 i += 2;
                 exinterp = "**";
                 continue;
-			}
+            }
 
             if (!found) {
                 continue;
@@ -442,7 +443,7 @@ bool HumdrumInput::convertHumdrum(void)
     prepareVerses();
     prepareStaffGroup();
 
-	// m_meausreIndex not currently used but might be useful sometime.
+    // m_meausreIndex not currently used but might be useful sometime.
     m_measureIndex = 0;
     int line = kernstarts[0]->getLineIndex();
     while (line < infile.getLineCount() - 1 && (line >= 0)) {
@@ -1673,8 +1674,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 continue;
             }
             if (layerdata[i]->getDurationFromBarline() > 0) {
-				// only insert a clef change after the whole-note rest
-				// if the clef change is not really an initial clef.
+                // only insert a clef change after the whole-note rest
+                // if the clef change is not really an initial clef.
                 insertClefElement(elements, pointers, layerdata[i]);
             }
         }
