@@ -56,15 +56,19 @@ class MxmlPart {
 		int           getPartIndex         (void) const;
 		int           getStaffCount        (void) const;
 		int           getVerseCount        (void) const;
+		int           getVerseCount        (int staffindex) const;
 
 	private:
 		void          receiveStaffNumberFromChild (int staffnum);
+		void          receiveVerseCount    (int count);
+		void          receiveVerseCount    (int staffnum, int count);
 
 	protected:
 		vector<MxmlMeasure*> m_measures;
 		vector<long>         m_qtick;
 		int                  m_partnum;
 		int                  m_maxstaff;
+		vector<int>          m_verseCount;
 		
 	friend MxmlMeasure;
 	friend MxmlEvent;

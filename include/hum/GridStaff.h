@@ -30,7 +30,7 @@ using namespace std;
 namespace hum {
 
 
-class GridStaff : public vector<GridVoice*> {
+class GridStaff : public vector<GridVoice*>, public GridSide {
 	public:
 		GridStaff(void);
 		~GridStaff();
@@ -39,9 +39,7 @@ class GridStaff : public vector<GridVoice*> {
 		                          HumNum prevdur);
 		void appendTokenLayer    (int layerindex, HTp token, HumNum duration,
 		                          const string& spacer = " ");
-
-	private:
-		GridSide m_staffsides;
+		int getMaxVerseCount     (void);
 };
 
 ostream& operator<<(ostream& output, GridStaff* staff);

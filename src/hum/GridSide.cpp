@@ -28,17 +28,74 @@ GridSide::GridSide(void) {
 	// do nothing;
 }
 
+
+
 //////////////////////////////
 //
 // GridSide::~GridSide -- Deconstructor.
 //
 
 GridSide::~GridSide(void) {
-	// do nothing: for the moment;
-	// all HumdrumTokens* stored in this
-	// structure should be transferred into
-	// a HumdrumFile structure.
+	for (int i=0; i<(int)m_verses.size(); i++) {
+		if (m_verses[i]) {
+			delete m_verses[i];
+			m_verses[i] = NULL;
+		}
+	}
+	m_verses.resize(0);
 }
+
+
+
+//////////////////////////////
+//
+// GridSide::setVerse --
+//
+
+void GridSide::setVerse(int index, HTp token) {
+   if (index == (int)m_verses.size()) {
+		m_verses.push_back(token);
+		return;
+	} else if (index < 0) {
+		return;
+	} else if (index < (int)m_verses.size()) {
+		m_verses[index] = token;
+	} else {
+		int oldsize = (int)m_verses.size();
+		int newsize = index + 1;
+		m_verses.resize(newsize);
+		for (int i=oldsize; i<newsize; i++) {
+			m_verses[i] = NULL;
+		}
+		m_verses[index] = token;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// GridSide::getVerse --
+//
+
+HTp GridSide::getVerse(int index) {
+	if (index < 0 || index >= getVerseCount()) {
+		return NULL;
+	}
+	return m_verses[index];
+}
+
+
+
+//////////////////////////////
+//
+// GridSide::getVerseCount --
+//
+
+int GridSide::getVerseCount(void) {
+ 	return (int)m_verses.size();
+}
+
 
 
 } // end namespace hum

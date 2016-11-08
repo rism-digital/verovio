@@ -32,7 +32,6 @@ using namespace pugi;
 namespace hum {
 
 
-
 class musicxml2hum_interface {
 	public:
 		musicxml2hum_interface       (void);
@@ -124,6 +123,7 @@ class musicxml2hum_interface {
 		void fillEmpties       (GridPart* part, const char* string);
 		void addChordNotes     (ostream& output, MxmlEvent* head, const string& recip);
 		bool isInvisible       (MxmlEvent* event);
+		int  addLyrics         (GridStaff* staff, MxmlEvent* event);
 
 	public:
 

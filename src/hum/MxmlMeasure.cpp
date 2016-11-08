@@ -208,6 +208,28 @@ MxmlPart* MxmlMeasure::getOwner(void) const {
 
 //////////////////////////////
 //
+// MxmlMeasure::reportVerseCountToOwner --
+//
+
+void MxmlMeasure::reportVerseCountToOwner(int count) {
+	if (!m_owner) {
+		return;
+	}
+	m_owner->receiveVerseCount(count);
+}
+
+
+void MxmlMeasure::reportVerseCountToOwner(int staffindex, int count) {
+	if (!m_owner) {
+		return;
+	}
+	m_owner->receiveVerseCount(staffindex, count);
+}
+
+
+
+//////////////////////////////
+//
 // MxmlMeasure::getPartNumber --
 //
 

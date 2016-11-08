@@ -26,14 +26,20 @@
 
 using namespace std;
 
-
 namespace hum {
+
+
+class HumGrid;
+
 
 class GridSlice : public vector<GridPart*> {
 	public:
-		GridSlice(HumNum timestamp, SliceType type, int partcount = 0);
-		GridSlice(HumNum timestamp, SliceType type, const GridSlice& slice);
-		GridSlice(HumNum timestamp, SliceType type, GridSlice* slice);
+		GridSlice(HumGrid* grid, HumNum timestamp, SliceType type,
+		          int partcount = 0);
+		GridSlice(HumGrid* grid, HumNum timestamp, SliceType type,
+		          const GridSlice& slice);
+		GridSlice(HumGrid* grid, HumNum timestamp, SliceType type,
+		          GridSlice* slice);
 		~GridSlice();
 
 		bool isNoteSlice(void)     { return m_type == SliceType::Notes; }
@@ -48,15 +54,22 @@ class GridSlice : public vector<GridPart*> {
 		void transferTokens    (HumdrumFile& outfile, bool recip);
 		void initializePartStaves (vector<MxmlPart>& partdata);
 
-		HumNum getDuration        (void);
-		void   setDuration        (HumNum duration);
-		HumNum getTimestamp       (void);
-		void   setTimestamp       (HumNum timestamp);
+		HumNum   getDuration        (void);
+		void     setDuration        (HumNum duration);
+		HumNum   getTimestamp       (void);
+		void     setTimestamp       (HumNum timestamp);
+		void     setOwner           (HumGrid* owner);
+		HumGrid* getOwner           (void);
+
+		void transferSides        (HumdrumLine& line, GridSide& sides, 
+		                           const string& empty, int count);
+		int getVerseCount         (int partindex, int staffindex);
 
 	protected:
 		HTp  createRecipTokenFromDuration  (HumNum duration);
 
 	private:
+		HumGrid*   m_owner;
 		HumNum     m_timestamp;
 		HumNum     m_duration;
 		SliceType  m_type;

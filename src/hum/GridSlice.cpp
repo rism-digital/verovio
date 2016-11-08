@@ -27,9 +27,11 @@ namespace hum {
 // default value: partcount = 0
 //
 
-GridSlice::GridSlice(HumNum timestamp, SliceType type, int partcount) {
+GridSlice::GridSlice(HumGrid* owner, HumNum timestamp, SliceType type,
+		int partcount) {
 	m_timestamp = timestamp;
 	m_type = type;
+	m_owner = owner;
 	if (partcount > 0) {
 		this->resize(partcount);
 		for (int p=0; p<partcount; p++) {
@@ -45,9 +47,11 @@ GridSlice::GridSlice(HumNum timestamp, SliceType type, int partcount) {
 // GridStaffs (they will be required to have at least one).
 //
 
-GridSlice::GridSlice(HumNum timestamp, SliceType type, const GridSlice& slice) {
+GridSlice::GridSlice(HumGrid* owner, HumNum timestamp, SliceType type,
+		const GridSlice& slice) {
 	m_timestamp = timestamp;
 	m_type = type;
+	m_owner = owner;
 	int partcount = (int)slice.size();
 	int staffcount;
 	if (partcount > 0) {
@@ -65,9 +69,11 @@ GridSlice::GridSlice(HumNum timestamp, SliceType type, const GridSlice& slice) {
 }
 
 
-GridSlice::GridSlice(HumNum timestamp, SliceType type, GridSlice* slice) {
+GridSlice::GridSlice(HumGrid* owner, HumNum timestamp, SliceType type,
+		GridSlice* slice) {
 	m_timestamp = timestamp;
 	m_type = type;
+	m_owner = owner;
 	int partcount = (int)slice->size();
 	int staffcount;
 	if (partcount > 0) {
@@ -132,7 +138,6 @@ HTp GridSlice::createRecipTokenFromDuration(HumNum duration) {
 	// try to fit to two dots
 	// try to fit to three dots
 
-
 	str = to_string(duration.getDenominator()) + "%" +
 	         to_string(duration.getNumerator());
 	token = new HumdrumToken(str);
@@ -166,21 +171,25 @@ bool GridSlice::isInterpretationSlice(void) {
 //
 
 void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
-
 	HTp token;
 	HumdrumLine* line = new HumdrumLine;
+	string empty = ".";
 
 	if (recip) {
 		if (isNoteSlice()) {
 			token = createRecipTokenFromDuration(getDuration());
 		} else if (isClefSlice()) {
 			token = new HumdrumToken("*");
+			empty = "*";
 		} else if (isMeasureSlice()) {
 			token = new HumdrumToken("=");
+			empty = "=";
 		} else if (isInterpretationSlice()) {
 			token = new HumdrumToken("*");
+			empty = "*";
 		} else {
 			token = new HumdrumToken("55");
+			empty = "!z";
 		}
 		line->appendToken(token);
 	}
@@ -210,11 +219,62 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 						line->appendToken(token);
 					}
 				}
+				int count = getVerseCount(p, s);
+				transferSides(*line, staff, empty, count);
 			}
 		}
 	}
 
 	outfile.appendLine(line);
+}
+
+
+
+//////////////////////////////
+//
+// GridSlice::getVerseCount --
+//
+
+int GridSlice::getVerseCount(int partindex, int staffindex) {
+	HumGrid* grid = getOwner();
+	if (!grid) {
+		return 0;
+	}
+	return grid->getVerseCount(partindex, staffindex);
+}
+
+
+
+//////////////////////////////
+//
+// GridSlice::transferSides --
+//
+
+void GridSlice::transferSides(HumdrumLine& line, GridSide& sides, 
+		const string& empty, int count) {
+
+	// existing verses:
+	int vcount = sides.getVerseCount();
+	HTp newtoken;
+
+	for (int i=0; i<vcount; i++) {
+		HTp verse = sides.getVerse(i);
+		if (verse) {
+			line.appendToken(verse);
+			sides.setVerse(i, NULL); // needed to avoid double delete
+		} else {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+
+	if (vcount < count) {
+		for (int i=vcount; i<count; i++) {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+
 }
 
 
@@ -292,6 +352,29 @@ HumNum GridSlice::getTimestamp(void) {
 void GridSlice::setTimestamp(HumNum timestamp) {
 	m_timestamp = timestamp;
 }
+
+
+
+//////////////////////////////
+//
+// GridSlice::setOwner --
+//
+
+void GridSlice::setOwner(HumGrid* owner) {
+	m_owner = owner;
+}
+
+
+
+//////////////////////////////
+//
+// GridSlice::getOwner --
+//
+
+HumGrid* GridSlice::getOwner(void) {
+	return m_owner;
+}
+
 
 
 //////////////////////////////

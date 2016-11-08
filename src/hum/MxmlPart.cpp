@@ -74,6 +74,7 @@ void MxmlPart::clear(void) {
 	m_measures.clear();
 	m_partnum = 0;
 	m_maxstaff = 0;
+	m_verseCount.resize(0);
 }
 
 
@@ -261,8 +262,55 @@ int MxmlPart::getStaffCount(void) const {
 //
 
 int MxmlPart::getVerseCount(void) const {
-	return 0;
+	if (m_verseCount.size() == 0) {
+		return 0;
+	} else {
+		return m_verseCount[0];
+	}
 }
+
+
+int MxmlPart::getVerseCount(int staffindex) const {
+	int staffnum = staffindex + 1;
+	if (staffnum < m_verseCount.size()) {
+		return m_verseCount[staffnum];
+	} else {
+		return 0;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// MxmlPart::receiveVerseCount --
+//
+
+void MxmlPart::receiveVerseCount(int count) {
+	receiveVerseCount(0, count);
+}
+
+
+void MxmlPart::receiveVerseCount(int staffindex, int count) {
+	int staffnum = staffindex + 1;
+	if (staffnum < 0) {
+		return;
+	}
+	if (staffnum < m_verseCount.size()) {
+		if (count > m_verseCount[staffnum]) {
+			m_verseCount[staffnum] = count;
+		} 
+	} else {
+		int oldsize = (int)m_verseCount.size();
+		int newsize = staffnum + 1;
+		m_verseCount.resize(newsize);
+		for (int i=oldsize; i<newsize; i++) {
+			m_verseCount[i] = 0;
+		}
+		m_verseCount[staffnum] = count;
+	}
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////

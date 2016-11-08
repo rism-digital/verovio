@@ -23,8 +23,8 @@ namespace hum {
 // GridMeasure::GridMeasure -- Constructor.
 //
 
-GridMeasure::GridMeasure(void) {
-	// do nothing;
+GridMeasure::GridMeasure(HumGrid* owner) {
+	m_owner = owner;
 }
 
 
@@ -56,6 +56,29 @@ bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip) {
 	}
 	return true;
 }
+
+
+
+//////////////////////////////
+//
+// GridMeasure::getOwner --
+//
+
+HumGrid* GridMeasure::getOwner(void) {
+	return m_owner;
+}
+
+
+
+//////////////////////////////
+//
+// GridMeasure::setOwner --
+//
+
+void GridMeasure::setOwner(HumGrid* owner) {
+	m_owner = owner;
+}
+
 
 } // end namespace hum
 

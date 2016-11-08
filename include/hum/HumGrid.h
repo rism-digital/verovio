@@ -30,7 +30,9 @@ class HumGrid : public vector<GridMeasure*> {
 	public:
 		HumGrid(void);
 		~HumGrid();
-		bool transferTokens(HumdrumFile& outfile);
+		bool transferTokens   (HumdrumFile& outfile);
+		int  getVerseCount    (int partindex, int staffindex);
+		void setVerseCount    (int partindex, int staffindex, int count);
 
 	protected:
 		void calculateGridDurations            (void);
@@ -57,10 +59,19 @@ class HumGrid : public vector<GridMeasure*> {
 		                                        GridStaff* oldlaststaff,
 		                                        GridStaff* newstaff,
 		                                        GridStaff* newlaststaff);
+		void insertExInterpSides               (HumdrumLine* line, int part,
+		                                        int staff);
+		void insertSideTerminals               (HumdrumLine* line, int part, 
+		                                        int staff);
+		void insertSidePartInfo                (HumdrumLine* line, int part,
+		                                        int staff);
+		void insertSideStaffInfo               (HumdrumLine* line, int part,
+		                                        int staff, int staffnum);
 
 	private:
 		bool m_recip = true;
 		vector<GridSlice*> m_allslices;
+		vector<vector<int> > m_verseCount;
 
 };
 

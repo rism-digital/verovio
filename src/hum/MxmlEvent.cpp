@@ -158,6 +158,27 @@ MxmlMeasure* MxmlEvent::getOwner(void) const {
 
 //////////////////////////////
 //
+// MxmlEvent::reportVerseCountToOwner --
+//
+
+void MxmlEvent::reportVerseCountToOwner(int count) {
+	if (!m_owner) {
+		return;
+	}
+	m_owner->reportVerseCountToOwner(count);
+}
+
+
+void MxmlEvent::reportVerseCountToOwner(int staffindex, int count) {
+	if (!m_owner) {
+		return;
+	}
+	m_owner->reportVerseCountToOwner(staffindex, count);
+}
+
+
+//////////////////////////////
+//
 // MxmlEvent::getPartNumber --
 //
 
@@ -377,7 +398,7 @@ bool MxmlEvent::isRest(void) {
 //
 
 bool MxmlEvent::isChord(void) const {
-	if ((m_links.size() > 0) && (strcmp(m_node.name(), "note") == 0)) {
+	if ((m_links.size() > 0) && nodeType(m_node, "note")) {
 		return true;
 	} else {
 		return false;
@@ -532,31 +553,31 @@ bool MxmlEvent::parseEvent(xpath_node el) {
 bool MxmlEvent::parseEvent(xml_node el) {
 	m_node = el;
 
-	if (strcmp(m_node.name(), "attributes") == 0) {
+	if (nodeType(m_node, "attributes")) {
 		m_eventtype = mevent_attributes;
-	} else if (strcmp(m_node.name(), "backup") == 0) {
+	} else if (nodeType(m_node, "backup")) {
 		m_eventtype = mevent_backup;
-	} else if (strcmp(m_node.name(), "barline") == 0) {
+	} else if (nodeType(m_node, "barline")) {
 		m_eventtype = mevent_barline;
-	} else if (strcmp(m_node.name(), "bookmark") == 0) {
+	} else if (nodeType(m_node, "bookmark")) {
 		m_eventtype = mevent_bookmark;
-	} else if (strcmp(m_node.name(), "direction") == 0) {
+	} else if (nodeType(m_node, "direction")) {
 		m_eventtype = mevent_direction;
-	} else if (strcmp(m_node.name(), "figured-bass") == 0) {
+	} else if (nodeType(m_node, "figured-bass")) {
 		m_eventtype = mevent_figured_bass;
-	} else if (strcmp(m_node.name(), "forward") == 0) {
+	} else if (nodeType(m_node, "forward")) {
 		m_eventtype = mevent_forward;
-	} else if (strcmp(m_node.name(), "grouping") == 0) {
+	} else if (nodeType(m_node, "grouping")) {
 		m_eventtype = mevent_grouping;
-	} else if (strcmp(m_node.name(), "harmony") == 0) {
+	} else if (nodeType(m_node, "harmony")) {
 		m_eventtype = mevent_harmony;
-	} else if (strcmp(m_node.name(), "link") == 0) {
+	} else if (nodeType(m_node, "link")) {
 		m_eventtype = mevent_link;
-	} else if (strcmp(m_node.name(), "note") == 0) {
+	} else if (nodeType(m_node, "note")) {
 		m_eventtype = mevent_note;
-	} else if (strcmp(m_node.name(), "print") == 0) {
+	} else if (nodeType(m_node, "print")) {
 		m_eventtype = mevent_print;
-	} else if (strcmp(m_node.name(), "sound") == 0) {
+	} else if (nodeType(m_node, "sound")) {
 		m_eventtype = mevent_sound;
 	} else {
 		m_eventtype = mevent_unknown;
@@ -565,15 +586,13 @@ bool MxmlEvent::parseEvent(xml_node el) {
 	int tempvoice    = 0;
 	int tempstaff    = 0;
 	int tempduration = 0;
-	const char* tempname;
 
 	for (auto el = m_node.first_child(); el; el = el.next_sibling()) {
-		tempname = el.name();
-		if (strcmp(tempname, "staff") == 0) {
+		if (nodeType(el, "staff")) {
 			tempstaff = atoi(el.child_value());
-		} else if (strcmp(tempname, "voice") == 0) {
+		} else if (nodeType(el, "voice")) {
 			tempvoice = atoi(el.child_value());
-		} else if (strcmp(tempname, "duration") == 0) {
+		} else if (nodeType(el, "duration")) {
 			tempduration = atoi(el.child_value());
 		}
 	}
@@ -664,18 +683,18 @@ string MxmlEvent::getKernPitch(void) const {
 	int octave = 4;
 
 	while (child) {
-		if (strcmp(child.name(), "rest") == 0) {
+		if (nodeType(child, "rest")) {
 			rest = true;
 			break;
 		}
-		if (strcmp(child.name(), "pitch") == 0) {
+		if (nodeType(child, "pitch")) {
 			xml_node grandchild = child.first_child();
 			while (grandchild) {
-				if (strcmp(grandchild.name(), "step") == 0) {
+				if (nodeType(grandchild, "step")) {
 					step = grandchild.child_value();
-				} else if (strcmp(grandchild.name(), "alter") == 0) {
+				} else if (nodeType(grandchild, "alter")) {
 					alter = atoi(grandchild.child_value());
-				} else if (strcmp(grandchild.name(), "octave") == 0) {
+				} else if (nodeType(grandchild, "octave")) {
 					octave = atoi(grandchild.child_value());
 				}
 				grandchild = grandchild.next_sibling();
@@ -734,9 +753,9 @@ string MxmlEvent::getPrefixNoteInfo(void) const {
 	xml_node child = m_node.first_child();
 
 	while (child) {
-		if (strcmp(child.name(), "rest") == 0) {
+		if (nodeType(child, "rest")) {
 			// rest = true;
-		} else if (strcmp(child.name(), "tie") == 0) {
+		} else if (nodeType(child, "tie")) {
 			xml_attribute tietype = child.attribute("type");
 			if (tietype) {
 				if (strcmp(tietype.value(), "start") == 0) {
@@ -780,7 +799,7 @@ string MxmlEvent::getPostfixNoteInfo(void) const {
 	xml_node notations;
 
 	while (child) {
-		if (strcmp(child.name(), "rest") == 0) {
+		if (nodeType(child, "rest")) {
 			// rest = true;
 		} else if (strcmp(child.name(), "beam") == 0) {
 			const char* beaminfo = child.child_value();
@@ -795,16 +814,16 @@ string MxmlEvent::getPostfixNoteInfo(void) const {
 			} else if (strcmp(beaminfo, "backward hook") == 0) {
 				hookbacks++;
 			}
-		} else if (strcmp(child.name(), "stem") == 0) {
+		} else if (nodeType(child, "stem")) {
 			const char* stemdir = child.child_value();
 			if (strcmp(stemdir, "up") == 0) {
 				stem = 1;
 			} else if (strcmp(stemdir, "down") == 0) {
 				stem = -1;
 			}
-		} else if (strcmp(child.name(), "notations") == 0) {
+		} else if (nodeType(child, "notations")) {
 			notations = child;
-		} else if (strcmp(child.name(), "tie") == 0) {
+		} else if (nodeType(child, "tie")) {
 			xml_attribute tietype = child.attribute("type");
 			if (tietype) {
 				if (strcmp(tietype.value(), "start") == 0) {

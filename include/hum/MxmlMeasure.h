@@ -77,6 +77,8 @@ class MxmlMeasure {
 		void  sortEvents                  (void);
 		void  receiveStaffNumberFromChild (int staffnum);
    	void  reportStaffNumberToOwner    (int staffnum);
+		void  reportVerseCountToOwner     (int count);
+		void  reportVerseCountToOwner     (int staffindex, int count);
 
 	protected:
 		HumNum             m_starttime; // start time of measure in quarter notes

@@ -31,6 +31,10 @@ class GridSide {
 		GridSide(void);
 		~GridSide();
 
+		int   getVerseCount  (void);
+		HTp   getVerse       (int index);
+		void  setVerse       (int index, HTp token);
+
 	private:
 		vector<HumdrumToken*> m_verses;
 		vector<HumdrumToken*> m_dynamics;

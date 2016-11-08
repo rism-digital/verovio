@@ -14,6 +14,7 @@
 #include "HumGrid.h"
 
 #include <string.h>
+#include <stdlib.h>
 
 using namespace std;
 using namespace pugi;
@@ -92,6 +93,16 @@ bool musicxml2hum_interface::convert(ostream& out, xml_document& doc) {
 
 	HumGrid outdata;
 	status &= stitchParts(outdata, partids, partinfo, partcontent, partdata);
+
+	// tranfer verse counts from parts/staves to HumGrid:
+	// should also do part verse counts here (-1 staffindex).
+	int versecount;
+	for (int p=0; p<partdata.size(); p++) {
+		for (int s=0; s<partdata[p].getStaffCount(); s++) {
+			versecount = partdata[p].getVerseCount(s);
+			outdata.setVerseCount(p, s, versecount);
+		}
+	}
 
 	HumdrumFile outfile;
 	outdata.transferTokens(outfile);
@@ -238,8 +249,6 @@ bool musicxml2hum_interface::stitchParts(HumGrid& outdata,
 		return false;
 	}
 
-//	insertExclusiveInterpretationLine(outfile, partdata);
-
 	int i;
 	int measurecount = partdata[0].getMeasureCount();
 	// i used to start at 1 for some strange reason.
@@ -306,33 +315,6 @@ void musicxml2hum_interface::cleanupMeasures(HumdrumFile& outfile,
 
 //////////////////////////////
 //
-// musicxml2hum_interface::insertExclusiveInterpretationLine --
-//
-
-void musicxml2hum_interface::insertExclusiveInterpretationLine(
-		HumdrumFile& outfile, vector<MxmlPart>& partdata) {
-
-	HumdrumLine* line = new HumdrumLine;
-	HumdrumToken* token;
-
-	int i, j;
-	for (i=0; i<(int)partdata.size(); i++) {
-		for (j=0; j<(int)partdata[i].getStaffCount(); j++) {
-			token = new HumdrumToken("**kern");
-			line->appendToken(token);
-		}
-		for (j=0; j<(int)partdata[i].getVerseCount(); j++) {
-			token = new HumdrumToken("**kern");
-			line->appendToken(token);
-		}
-	}
-	outfile.appendLine(line);
-}
-
-
-
-//////////////////////////////
-//
 // musicxml2hum_interface::insertSingleMeasure --
 //
 
@@ -382,7 +364,7 @@ void musicxml2hum_interface::insertAllToken(HumdrumFile& outfile,
 bool musicxml2hum_interface::insertMeasure(HumGrid& outdata, int mnum,
 		vector<MxmlPart>& partdata, vector<int> partstaves) {
 
-	GridMeasure* gm = new GridMeasure;
+	GridMeasure* gm = new GridMeasure(&outdata);
 	outdata.push_back(gm);
 
 	vector<MxmlMeasure*> measuredata;
@@ -491,7 +473,8 @@ void musicxml2hum_interface::appendNonZeroEvents(
 		HumNum nowtime,
 		vector<MxmlPart>& partdata) {
 
-	GridSlice* slice = new GridSlice(nowtime, SliceType::Notes);
+	GridSlice* slice = new GridSlice(outdata.getOwner(), nowtime, 
+			SliceType::Notes);
 	outdata.push_back(slice);
 	slice->initializePartStaves(partdata);
 
@@ -507,7 +490,7 @@ void musicxml2hum_interface::appendNonZeroEvents(
 
 //////////////////////////////
 //
-// musicxml2hum_interface::addEvent --
+// musicxml2hum_interface::addEvent -- Add a note or rest.
 //
 
 void musicxml2hum_interface::addEvent(GridSlice& slice,
@@ -540,6 +523,96 @@ void musicxml2hum_interface::addEvent(GridSlice& slice,
 	HTp token = new HumdrumToken(ss.str());
 	slice.at(partindex)->at(staffindex)->setTokenLayer(voiceindex, token,
 		event->getDuration());
+
+	int vcount = addLyrics(slice.at(partindex)->at(staffindex), event);
+	if (vcount > 0) {
+		event->reportVerseCountToOwner(staffindex, vcount);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// musicxml2hum_interface::addLyrics --
+//
+
+int musicxml2hum_interface::addLyrics(GridStaff* staff, MxmlEvent* event) {
+	xml_node node = event->getNode();
+	if (!node) {
+		return 0;
+	}
+	xml_node child = node.first_child();
+	xml_node grandchild;
+	// int max;
+	int number;
+	vector<xml_node> verses;
+	string syllabic;
+	string text;
+	while (child) {
+		if (!nodeType(child, "lyric")) {
+			child = child.next_sibling();
+			continue;
+		}
+		number = atoi(child.attribute("number").value());
+		if (number == (int)verses.size() + 1) {
+			verses.push_back(child);
+		} else if ((number > 0) && (number < (int)verses.size())) {
+			// replace a verse for some reason.
+			verses[number-1] = child;
+		} else if (number > 0) {
+			int oldsize = (int)verses.size();
+			int newsize = number;
+			verses.resize(newsize);
+			for (int i=oldsize; i<newsize; i++) {
+				verses[i] = xml_node(NULL);
+			}
+			verses[number-1] = child;
+		}
+		child = child.next_sibling();
+	}
+
+	string finaltext;
+	HTp token;
+	for (int i=0; i<(int)verses.size(); i++) {
+		if (!verses[i]) {
+			// no verse so doing an empty slot.
+		} else {
+			child = verses[i].first_child();
+			finaltext = "";
+			while (child) {
+				if (nodeType(child, "syllabic")) {
+					syllabic = child.child_value();
+				} else if (nodeType(child, "text")) {
+					text = child.child_value();
+				}
+				child = child.next_sibling();
+			}
+			if (syllabic == "middle" ) {
+				finaltext += "-";
+				finaltext += text;
+				finaltext += "-";
+			} else if (syllabic == "end") {
+				finaltext += "-";
+				finaltext += text;
+			} else if (syllabic == "begin") {
+				finaltext += text;
+				finaltext += "-";
+			} else {
+				finaltext += text;
+			}
+		}
+
+		if (verses[i]) {
+			token = new HumdrumToken(finaltext);
+			staff->setVerse(i,token);
+		} else {
+			token = new HumdrumToken(".");
+			staff->setVerse(i,token);
+		}
+	}
+
+	return (int)staff->getVerseCount();
 }
 
 
@@ -660,7 +733,8 @@ void musicxml2hum_interface::appendZeroEvents(
 void musicxml2hum_interface::addClefLine(GridMeasure& outdata, 
 		vector<xml_node>& clefs, vector<MxmlPart>& partdata, HumNum nowtime) {
 
-	GridSlice* slice = new GridSlice(nowtime, SliceType::Clefs);
+	GridSlice* slice = new GridSlice(outdata.getOwner(), nowtime, 
+		SliceType::Clefs);
 	outdata.push_back(slice);
 	slice->initializePartStaves(partdata);
 
@@ -681,7 +755,8 @@ void musicxml2hum_interface::addClefLine(GridMeasure& outdata,
 void musicxml2hum_interface::addTimeSigLine(GridMeasure& outdata, 
 		vector<xml_node>& timesigs, vector<MxmlPart>& partdata, HumNum nowtime) {
 
-	GridSlice* slice = new GridSlice(nowtime, SliceType::TimeSigs);
+	GridSlice* slice = new GridSlice(outdata.getOwner(), nowtime, 
+		SliceType::TimeSigs);
 	outdata.push_back(slice);
 	slice->initializePartStaves(partdata);
 
@@ -702,7 +777,8 @@ void musicxml2hum_interface::addTimeSigLine(GridMeasure& outdata,
 void musicxml2hum_interface::addKeySigLine(GridMeasure& outdata, 
 		vector<xml_node>& keysigs, vector<MxmlPart>& partdata, HumNum nowtime) {
 
-	GridSlice* slice = new GridSlice(nowtime, SliceType::KeySigs);
+	GridSlice* slice = new GridSlice(outdata.getOwner(), nowtime, 
+		SliceType::KeySigs);
 	outdata.push_back(slice);
 	slice->initializePartStaves(partdata);
 

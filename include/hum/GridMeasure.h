@@ -30,10 +30,15 @@ namespace hum {
 
 class GridMeasure : public list<GridSlice*> {
 	public:
-		GridMeasure(void);
+		GridMeasure(HumGrid* owner);
 		~GridMeasure();
 
 		bool transferTokens    (HumdrumFile& outfile, bool recip);
+		HumGrid* getOwner    (void);
+		void     setOwner    (HumGrid* owner);
+
+	private:
+		HumGrid* m_owner;
 };
 
 

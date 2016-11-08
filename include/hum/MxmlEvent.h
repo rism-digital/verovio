@@ -97,6 +97,8 @@ class MxmlEvent {
 		xml_node           getNode            (void);
 		void               addNotations       (stringstream& ss, 
 		                                       xml_node notations) const;
+		void               reportVerseCountToOwner (int count);
+		void               reportVerseCountToOwner (int staffnum, int count);
 
 	protected:
 		HumNum             m_starttime;  // start time in quarter notes of event
