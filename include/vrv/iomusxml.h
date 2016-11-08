@@ -189,7 +189,7 @@ private:
     ///@{
     data_ACCIDENTAL_EXPLICIT ConvertAccidentalToAccid(std::string value);
     data_ACCIDENTAL_EXPLICIT ConvertAlterToAccid(std::string value);
-    data_BARRENDITION ConvertStyleToRend(std::string value);
+    data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
     data_DURATION ConvertTypeToDur(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
     data_PLACE ConvertTypeToPlace(std::string value);

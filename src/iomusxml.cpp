@@ -360,13 +360,14 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         else if (IsElement(xpathNode.node(), "score-part")) {
             // get the attributes element of the first measure of the part
             std::string partId = xpathNode.node().attribute("id").as_string();
-            std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[@number='1']", partId.c_str());
+            std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[1]", partId.c_str());
             pugi::xpath_node partFirstMeasureAttributes = root.select_single_node(xpath.c_str());
             if (!partFirstMeasureAttributes) {
                 LogWarning("Could not find the 'attributes' element in the first measure of part '%s'", partId.c_str());
                 continue;
             }
             std::string partName = GetContentOfChild(xpathNode.node(), "part-name");
+            std::string partAbbr = GetContentOfChild(xpathNode.node(), "part-abbreviation");
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             int nbStaves
@@ -374,6 +375,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
                 partStaffGrp->SetLabel(partName);
+                partStaffGrp->SetLabelAbbr(partAbbr);
                 partStaffGrp->SetSymbol(staffgroupingsym_SYMBOL_brace);
                 partStaffGrp->SetBarthru(BOOLEAN_true);
                 m_staffGrpStack.back()->AddChild(partStaffGrp);
@@ -397,6 +399,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             ReadMusicXmlPart(part.node(), section, nbStaves, staffOffset);
             // increment the staffOffset for reading the next part
             staffOffset += nbStaves;
+        }
+        else {
         }
     }
     // here we could check that we have that there is only one staffGrp left in m_staffGrpStack
@@ -653,7 +657,8 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, i
 {
     data_BARRENDITION barRendition = BARRENDITION_NONE;
     std::string barStyle = GetContentOfChild(node, "bar-style");
-    if (!barStyle.empty()) barRendition = ConvertStyleToRend(barStyle);
+    pugi::xpath_node repeat = node.select_single_node("repeat");
+    if (!barStyle.empty()) barRendition = ConvertStyleToRend(barStyle, repeat);
     // only left or right can be supported
     if (HasAttributeWithValue(node, "location", "left")) {
         measure->SetLeft(barRendition);
@@ -662,7 +667,7 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, i
         measure->SetRight(barRendition);
     }
 }
-    
+
 void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure, int measureNb)
 {
     assert(node);
@@ -670,7 +675,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
 
     pugi::xpath_node type = node.select_single_node("direction-type");
     std::string placeStr = GetAttributeValue(node, "placement");
-    
+
     // Directive
     std::string textStr = GetContentOfChild(type.node(), "words");
     if (!textStr.empty()) {
@@ -681,7 +686,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
         dir->AddChild(text);
         m_controlElements.push_back(std::make_pair(measureNb, dir));
     }
-    
+
     // Dynamics
     pugi::xpath_node dynam = type.node().select_single_node("dynamics");
     if (dynam){
@@ -980,18 +985,18 @@ data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAlterToAccid(std::string value)
     return ACCIDENTAL_EXPLICIT_NONE;
 }
 
-data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value)
+data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repeat)
 {
     if (value == "dashed") return BARRENDITION_dashed;
     if (value == "dotted") return BARRENDITION_dotted;
     if (value == "light-light") return BARRENDITION_dbl;
     if (value == "regular") return BARRENDITION_dbldashed;
     if (value == "regular") return BARRENDITION_dbldotted;
-    if (value == "light-heavy") return BARRENDITION_end;
+    if (value == "light-heavy" and !repeat) return BARRENDITION_end;
     if (value == "none") return BARRENDITION_invis;
-    // if (value == "") return BARRENDITION_rptstart;
+    if (value == "heavy-light" and repeat) return BARRENDITION_rptstart;
     // if (value == "") return BARRENDITION_rptboth;
-    // if (value == "") return BARRENDITION_rptend;
+    if (value == "light-heavy" and repeat) return BARRENDITION_rptend;
     if (value == "regular") return BARRENDITION_single;
     LogWarning("Unsupported bar-style '%s'", value.c_str());
     return BARRENDITION_NONE;
