@@ -346,12 +346,18 @@ bool HumdrumInput::ImportString(std::string const &content)
         int comma = 0;
         int tab = 0;
         for (int i = 0; i < (int)content.size() - 3; i++) {
-            if (content[i] == '\n' && content[i + 1] == '*' && content[i + 2] == '*') {
+            if (((content[i] == '\n') || (content[i] == 0x0d)) && (content[i + 1] == '*') && (content[i + 2] == '*')) {
                 found = true;
                 i += 2;
                 exinterp = "**";
                 continue;
-            }
+            } else if ((i == 0) && (content[i] == '*') && (content[i+1] == '*')) {
+                found = true;
+                i += 2;
+                exinterp = "**";
+                continue;
+			}
+
             if (!found) {
                 continue;
             }

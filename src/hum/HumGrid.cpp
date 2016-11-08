@@ -86,7 +86,6 @@ void HumGrid::setVerseCount(int partindex, int staffindex, int count) {
 		int oldsize = (int)m_verseCount.at(partindex).size();
 		int newsize = staffnumber + 1;
 		m_verseCount.at(partindex).resize(newsize);
-		m_verseCount.resize(newsize);
 		for (int i=oldsize; i<newsize; i++) {
 			m_verseCount.at(partindex).at(i) = 0;
 		}
