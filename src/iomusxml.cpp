@@ -361,8 +361,8 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // get the attributes element of the first measure of the part
             std::string partId = xpathNode.node().attribute("id").as_string();
             std::string xpath = StringFormat("/score-partwise/part[@id='%s']/measure[1]", partId.c_str());
-            pugi::xpath_node partFirstMeasureAttributes = root.select_single_node(xpath.c_str());
-            if (!partFirstMeasureAttributes.node().select_single_node("attributes")) {
+            pugi::xpath_node partFirstMeasure = root.select_single_node(xpath.c_str());
+            if (!partFirstMeasure.node().select_single_node("attributes")) {
                 LogWarning("Could not find the 'attributes' element in the first measure of part '%s'", partId.c_str());
                 continue;
             }
@@ -371,7 +371,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
             // create the staffDef(s)
             StaffGrp *partStaffGrp = new StaffGrp();
             int nbStaves
-                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasureAttributes.node(), partStaffGrp, staffOffset);
+                = ReadMusicXmlPartAttributesAsStaffDef(partFirstMeasure.node(), partStaffGrp, staffOffset);
             // if we have more than one staff in the part we create a new staffGrp
             if (nbStaves > 1) {
                 partStaffGrp->SetLabel(partName);
@@ -562,7 +562,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         LogWarning("No measure to load");
         return false;
     }
-
+    
     int i = 0;
     for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it) {
         pugi::xpath_node xmlMeasure = *it;
