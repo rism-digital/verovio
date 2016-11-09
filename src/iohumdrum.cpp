@@ -2831,8 +2831,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // Go back and link all partial beamed tuplets and non-beamed tuplets.
     HumNum groupdur;
     for (int i = 0; i < (int)poweroftwo.size(); i++) {
-
-        if (beamstarts[i]) {
+        if ((!beamstarts.empty()) && beamstarts[i]) {
             beamstate = true;
         }
 
@@ -2848,7 +2847,6 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         // search for how long the group should occur.
         j = i + 1;
         int ending = (int)poweroftwo.size() - 1;
-        ;
         groupdur = 0;
         while (j < (int)poweroftwo.size()) {
             if (poweroftwo[j]) {
@@ -2888,7 +2886,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             i = ending;
         }
 
-        if (beamends[i]) {
+        if ((!beamends.empty()) && beamends[i]) {
             beamstate = false;
         }
     }
