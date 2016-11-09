@@ -104,6 +104,12 @@ bool musicxml2hum_interface::convert(ostream& out, xml_document& doc) {
 		}
 	}
 
+	// transfer harmony counts from parts to HumGrid:
+	for (int p=0; p<(int)partdata.size(); p++) {
+		int harmonyCount = partdata[p].getHarmonyCount();
+		outdata.setHarmonyCount(p, harmonyCount);
+	}
+
 	HumdrumFile outfile;
 	outdata.transferTokens(outfile);
 	for (int i=0; i<outfile.getLineCount(); i++) {
@@ -528,6 +534,85 @@ void musicxml2hum_interface::addEvent(GridSlice& slice,
 	if (vcount > 0) {
 		event->reportVerseCountToOwner(staffindex, vcount);
 	}
+
+// ggg
+	int hcount = addHarmony(slice.at(partindex), event);
+	if (hcount > 0) {
+		event->reportHarmonyCountToOwner(hcount);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// musicxml2hum_interface::addHarmony --
+//
+
+int musicxml2hum_interface::addHarmony(GridPart* part, MxmlEvent* event) {
+	xml_node hnode = event->getHNode();
+	if (!hnode) {
+		return 0;
+	}
+	
+	// ggg fill in X with the harmony values from the <harmony> node
+	string hstring = getHarmonyString(hnode);
+	HTp htok = new HumdrumToken(hstring);
+	part->setHarmony(htok);
+
+	return 1;
+}
+
+
+
+//////////////////////////////
+//
+// musicxml2hum_interface::getHarmonyString --
+//   <harmony default-y="40">
+//       <root>
+//           <root-step>C</root-step>
+//       </root>
+//       <kind>major-ninth</kind>
+//       <bass>
+//           <bass-step>E</bass-step>
+//       </bass>
+//   </harmony>
+//
+
+string musicxml2hum_interface::getHarmonyString(xml_node hnode) {
+	if (!hnode) {
+		return "";
+	}
+	xml_node child = hnode.first_child();
+	if (!child) {
+		return "";
+	}
+	string root;
+	string kind;
+	string bass;
+	while (child) {
+		if (nodeType(child, "root")) {
+			// presuming root-step is first child:
+			root = child.first_child().child_value();
+		} else if (nodeType(child, "kind")) {
+			kind = child.child_value();
+		} else if (nodeType(child, "bass")) {
+			// presuming bass-step is first child:
+			bass = child.first_child().child_value();
+		}
+		child = child.next_sibling();
+	}
+	stringstream ss;
+	ss << root;
+	if (root.size() && kind.size()) {
+		ss << " ";
+	}
+	ss << kind;
+	if (bass.size()) {
+		ss << "/";
+	}
+	ss << bass;
+	return ss.str();
 }
 
 

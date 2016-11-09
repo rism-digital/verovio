@@ -31,8 +31,10 @@ class HumGrid : public vector<GridMeasure*> {
 		HumGrid(void);
 		~HumGrid();
 		bool transferTokens   (HumdrumFile& outfile);
+		int  getHarmonyCount  (int partindex);
 		int  getVerseCount    (int partindex, int staffindex);
 		void setVerseCount    (int partindex, int staffindex, int count);
+		void setHarmonyCount  (int partindex, int count);
 
 	protected:
 		void calculateGridDurations            (void);
@@ -70,8 +72,9 @@ class HumGrid : public vector<GridMeasure*> {
 
 	private:
 		bool m_recip = true;
-		vector<GridSlice*> m_allslices;
+		vector<GridSlice*>   m_allslices;
 		vector<vector<int> > m_verseCount;
+		vector<int>          m_harmonyCount;
 
 };
 

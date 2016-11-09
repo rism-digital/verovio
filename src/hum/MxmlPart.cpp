@@ -75,6 +75,7 @@ void MxmlPart::clear(void) {
 	m_partnum = 0;
 	m_maxstaff = 0;
 	m_verseCount.resize(0);
+	m_harmonyCount = 0;
 }
 
 
@@ -258,6 +259,17 @@ int MxmlPart::getStaffCount(void) const {
 
 //////////////////////////////
 //
+// MxmlPart::getHarmonyCount -- Return the number of verses in the part.
+//
+
+int MxmlPart::getHarmonyCount(void) const {
+	return m_harmonyCount;
+}
+
+
+
+//////////////////////////////
+//
 // MxmlPart::getVerseCount -- Return the number of verses in the part.
 //
 
@@ -277,6 +289,17 @@ int MxmlPart::getVerseCount(int staffindex) const {
 	} else {
 		return 0;
 	}
+}
+
+
+
+//////////////////////////////
+//
+// MxmlPart::receiveHarmonyCount --
+//
+
+void MxmlPart::receiveHarmonyCount(int count) {
+	m_harmonyCount = count;
 }
 
 

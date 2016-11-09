@@ -95,10 +95,12 @@ class MxmlEvent {
 		string             getPrefixNoteInfo  (void) const;
 		string             getPostfixNoteInfo (void) const;
 		xml_node           getNode            (void);
+		xml_node           getHNode           (void);
 		void               addNotations       (stringstream& ss, 
 		                                       xml_node notations) const;
 		void               reportVerseCountToOwner (int count);
 		void               reportVerseCountToOwner (int staffnum, int count);
+		void               reportHarmonyCountToOwner (int count);
 
 	protected:
 		HumNum             m_starttime;  // start time in quarter notes of event
@@ -113,6 +115,7 @@ class MxmlEvent {
 		short              m_staff;      // staff number in part for event
 		short              m_voice;      // voice number in part for event
       int                m_maxstaff;   // maximum staff number for measure
+		xml_node           m_hnode;      // harmony label starting at note event
 
 	private:
    	void   reportStaffNumberToOwner  (int staffnum);

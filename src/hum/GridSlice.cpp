@@ -223,6 +223,8 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 				transferSides(*line, staff, empty, count);
 			}
 		}
+		int hcount = getHarmonyCount(p);
+		transferSides(*line, part, empty, hcount);
 	}
 
 	outfile.appendLine(line);
@@ -247,10 +249,48 @@ int GridSlice::getVerseCount(int partindex, int staffindex) {
 
 //////////////////////////////
 //
+// GridSlice::getHarmonyCount --
+//
+
+int GridSlice::getHarmonyCount(int partindex) {
+	HumGrid* grid = getOwner();
+	if (!grid) {
+		return 0;
+	}
+	return grid->getHarmonyCount(partindex);
+}
+
+
+
+//////////////////////////////
+//
 // GridSlice::transferSides --
 //
 
-void GridSlice::transferSides(HumdrumLine& line, GridSide& sides, 
+
+void GridSlice::transferSides(HumdrumLine& line, GridPart& sides,
+		const string& empty, int count) {
+	int hcount = sides.getHarmonyCount();
+	HTp newtoken;
+	for (int i=0; i<hcount; i++) {
+		HTp harmony = sides.getHarmony();
+		if (harmony) {
+			line.appendToken(harmony);
+			sides.detachHarmony();
+		} else {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+	for (int i=hcount; i<count; i++) {
+		newtoken = new HumdrumToken(empty);
+		line.appendToken(newtoken);
+	}
+// ggg
+}
+
+
+void GridSlice::transferSides(HumdrumLine& line, GridStaff& sides, 
 		const string& empty, int count) {
 
 	// existing verses:

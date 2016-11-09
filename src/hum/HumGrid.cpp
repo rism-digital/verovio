@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sun Oct 16 16:08:05 PDT 2016
-// Last Modified: Sun Oct 16 16:08:08 PDT 2016
+// Last Modified: Tue Nov  8 19:59:10 PST 2016
 // Filename:      HumGrid.cpp
 // URL:           https://github.com/craigsapp/hum2ly/blob/master/src/HumGrid.cpp
 // Syntax:        C++11
@@ -28,6 +28,8 @@ namespace hum {
 HumGrid::HumGrid(void) {
 	// for now, limit to 100 parts:
 	m_verseCount.resize(100);
+	m_harmonyCount.resize(100);
+	fill(m_harmonyCount.begin(), m_harmonyCount.end(), 0);
 }
 
 
@@ -43,6 +45,19 @@ HumGrid::~HumGrid(void) {
 			delete this->at(i);
 		}
 	}
+}
+
+
+//////////////////////////////
+//
+// HumGrid::getHarmonyCount --
+//
+
+int HumGrid::getHarmonyCount(int partindex) {
+	if ((partindex < 0) || (partindex >= (int)m_harmonyCount.size())) {
+		return 0;
+	}
+	return m_harmonyCount.at(partindex);
 }
 
 
@@ -63,6 +78,20 @@ int HumGrid::getVerseCount(int partindex, int staffindex) {
 	}
 	int value = m_verseCount.at(partindex).at(staffnumber);
 	return value;
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::setHarmonyCount -- part size hardwired to 100 for now.
+//
+
+void HumGrid::setHarmonyCount(int partindex, int count) {
+	if ((partindex < 0) || (partindex > (int)m_harmonyCount.size())) {
+		return;
+	}
+	m_harmonyCount[partindex] = count;
 }
 
 
@@ -231,8 +260,8 @@ GridSlice* HumGrid::checkManipulatorContract(GridSlice* curr) {
 
 	// need to split *v's from different adjacent staves onto separate lines.
 
-	GridSlice* newmanip = new GridSlice(this, curr->getTimestamp(), curr->getType(),
-		curr);
+	GridSlice* newmanip = new GridSlice(this, curr->getTimestamp(), 
+		curr->getType(), curr);
 
 	lastvoice = NULL;
 	GridStaff* laststaff    = NULL;
@@ -908,11 +937,23 @@ void HumGrid::insertExclusiveInterpretationLine(HumdrumFile& outfile) {
 //
 
 void HumGrid::insertExInterpSides(HumdrumLine* line, int part, int staff) {
-	int versecount = getVerseCount(part, staff);
-	for (int i=0; i<versecount; i++) {
-		HTp token = new HumdrumToken("**text");
-		line->appendToken(token);
+
+	if (staff >= 0) {
+		int versecount = getVerseCount(part, staff); // verses related to staff
+		for (int i=0; i<versecount; i++) {
+			HTp token = new HumdrumToken("**text");
+			line->appendToken(token);
+		}
 	}
+
+	if (staff < 0) {
+		int harmonyCount = getHarmonyCount(part);
+		for (int i=0; i<harmonyCount; i++) {
+			HTp token = new HumdrumToken("**mxhm");
+			line->appendToken(token);
+		}
+	}
+
 }
 
 
@@ -953,6 +994,7 @@ void HumGrid::insertPartIndications(HumdrumFile& outfile) {
 			line->appendToken(token);
 			insertSidePartInfo(line, p, s);
 		}
+		insertSidePartInfo(line, p, -1);   // insert part sides
 	}
 	outfile.insertLine(0, line);
 }
@@ -965,13 +1007,23 @@ void HumGrid::insertPartIndications(HumdrumFile& outfile) {
 //
 
 void HumGrid::insertSidePartInfo(HumdrumLine* line, int part, int staff) {
-	int versecount = getVerseCount(part, staff);
 	HTp token;
 	string text;
-	for (int i=0; i<versecount; i++) {
-		text = "*part" + to_string(part+1);
-		token = new HumdrumToken(text);
-		line->appendToken(token);
+
+	if (staff < 0) {
+		int harmcount = getHarmonyCount(part);
+		for (int i=0; i<harmcount; i++) {
+			text = "*part" + to_string(part+1);
+			token = new HumdrumToken(text);
+			line->appendToken(token);
+		}
+	} else {
+		int versecount = getVerseCount(part, staff);
+		for (int i=0; i<versecount; i++) {
+			text = "*part" + to_string(part+1);
+			token = new HumdrumToken(text);
+			line->appendToken(token);
+		}
 	}
 }
 
@@ -1021,6 +1073,7 @@ void HumGrid::insertStaffIndications(HumdrumFile& outfile) {
 			line->appendToken(token);
 			insertSideStaffInfo(line, p, s, staffcount+1);
 		}
+		insertSideStaffInfo(line, p, -1, -1);  // insert part sides
 	}
 	outfile.insertLine(0, line);
 }
@@ -1034,14 +1087,31 @@ void HumGrid::insertStaffIndications(HumdrumFile& outfile) {
 
 void HumGrid::insertSideStaffInfo(HumdrumLine* line, int part, int staff, 
 		int staffnum) {
-	int versecount = getVerseCount(part, staff);
 	HTp token;
 	string text;
+
+	// part-specific sides (no staff markers)
+	if (staffnum < 0) {
+		int harmcount = getHarmonyCount(part);
+		for (int i=0; i<harmcount; i++) {
+			token = new HumdrumToken("*");
+			line->appendToken(token);
+		}
+		return;
+	}
+
+	int versecount = getVerseCount(part, staff);
 	for (int i=0; i<versecount; i++) {
-		text = "*staff" + to_string(staffnum);
-		token = new HumdrumToken(text);
+		if (staffnum > 0) {
+			text = "*staff" + to_string(staffnum);
+			token = new HumdrumToken(text);
+		} else {
+			token = new HumdrumToken("*");
+		}
 		line->appendToken(token);
 	}
+
+
 }
 
 
@@ -1079,6 +1149,7 @@ void HumGrid::insertDataTerminationLine(HumdrumFile& outfile) {
 			line->appendToken(token);
 			insertSideTerminals(line, p, s);
 		}
+		insertSideTerminals(line, p, -1);   // insert part sides
 	}
 	outfile.appendLine(line);
 }
@@ -1091,11 +1162,20 @@ void HumGrid::insertDataTerminationLine(HumdrumFile& outfile) {
 //
 
 void HumGrid::insertSideTerminals(HumdrumLine* line, int part, int staff) {
-	int versecount = getVerseCount(part, staff);
 	HTp token;
-	for (int i=0; i<versecount; i++) {
-		token = new HumdrumToken("*-");
-		line->appendToken(token);
+
+	if (staff < 0) {
+		int harmcount = getHarmonyCount(part);
+		for (int i=0; i<harmcount; i++) {
+			token = new HumdrumToken("*-");
+			line->appendToken(token);
+		}
+	} else {
+		int versecount = getVerseCount(part, staff);
+		for (int i=0; i<versecount; i++) {
+			token = new HumdrumToken("*-");
+			line->appendToken(token);
+		}
 	}
 }
 

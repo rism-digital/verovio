@@ -24,9 +24,11 @@ namespace hum {
 // GridStaff::GridStaff -- Constructor.
 //
 
-GridStaff::GridStaff(void) : vector<GridVoice*>(0) {
+GridStaff::GridStaff(void) : vector<GridVoice*>(0), GridSide() {
 	// do nothing;
 }
+
+
 
 //////////////////////////////
 //
@@ -100,10 +102,6 @@ void GridStaff::setNullTokenLayer(int layerindex, SliceType type,
 	}
 	HumdrumToken* token = new  HumdrumToken(nulltoken);
 	setTokenLayer(layerindex, token, nextdur);
-	
-	
-	
-
 
 }
 

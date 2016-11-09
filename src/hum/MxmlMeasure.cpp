@@ -230,6 +230,20 @@ void MxmlMeasure::reportVerseCountToOwner(int staffindex, int count) {
 
 //////////////////////////////
 //
+// MxmlMeasure::reportHarmonyCountToOwner --
+//
+
+void MxmlMeasure::reportHarmonyCountToOwner(int count) {
+	if (!m_owner) {
+		return;
+	}
+	m_owner->receiveHarmonyCount(count);
+}
+
+
+
+//////////////////////////////
+//
 // MxmlMeasure::getPartNumber --
 //
 

@@ -177,6 +177,21 @@ void MxmlEvent::reportVerseCountToOwner(int staffindex, int count) {
 }
 
 
+
+//////////////////////////////
+//
+// MxmlEvent::reportHarmonyCountToOwner --
+//
+
+void MxmlEvent::reportHarmonyCountToOwner(int count) {
+	if (!m_owner) {
+		return;
+	}
+	m_owner->reportHarmonyCountToOwner(count);
+}
+
+
+
 //////////////////////////////
 //
 // MxmlEvent::getPartNumber --
@@ -638,6 +653,17 @@ bool MxmlEvent::parseEvent(xml_node el) {
 			break;
 	}
 
+	// if the previous sibling was a <harmony>, then store
+	// for later parsing.  May have to check even further back
+	// until another note or barline was found.
+	xml_node lastsib = el.previous_sibling();
+	if (!lastsib) {
+		return true;
+	}
+	if (nodeType(lastsib, "harmony")) {
+		m_hnode = lastsib;
+	}
+
 	return true;
 }
 
@@ -963,6 +989,17 @@ void MxmlEvent::addNotations(stringstream& ss, xml_node notations) const {
 
 xml_node MxmlEvent::getNode(void) {
 	return m_node;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::getHNode -- Return <harmony> element.
+//
+
+xml_node MxmlEvent::getHNode(void) {
+	return m_hnode;
 }
 
 

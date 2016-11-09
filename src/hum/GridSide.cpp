@@ -25,7 +25,7 @@ namespace hum {
 //
 
 GridSide::GridSide(void) {
-	// do nothing;
+	m_harmony = NULL;
 }
 
 
@@ -36,6 +36,7 @@ GridSide::GridSide(void) {
 //
 
 GridSide::~GridSide(void) {
+
 	for (int i=0; i<(int)m_verses.size(); i++) {
 		if (m_verses[i]) {
 			delete m_verses[i];
@@ -43,6 +44,19 @@ GridSide::~GridSide(void) {
 		}
 	}
 	m_verses.resize(0);
+
+	for (int i=0; i<(int)m_dynamics.size(); i++) {
+		if (m_dynamics[i]) {
+			delete m_dynamics[i];
+			m_dynamics[i] = NULL;
+		}
+	}
+	m_dynamics.resize(0);
+
+	if (m_harmony) {
+		delete m_harmony;
+		m_harmony = NULL;
+	}
 }
 
 
@@ -96,6 +110,57 @@ int GridSide::getVerseCount(void) {
  	return (int)m_verses.size();
 }
 
+
+
+//////////////////////////////
+//
+// GridSide::getHarmonyCount --
+//
+
+int GridSide::getHarmonyCount(void) { 
+	if (m_harmony == NULL) {
+		return 0;
+	} else {
+		return 1;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// GridSide::setHarmony --
+//
+
+void GridSide::setHarmony(HTp token) { 
+	if (m_harmony) {
+		delete m_harmony;
+		m_harmony = NULL;
+	}
+	m_harmony = token;
+}
+
+
+
+///////////////////////////
+//
+// GridSide::detachHarmony --
+//
+
+void GridSide::detachHarmony(void) { 
+	m_harmony = NULL;
+}
+
+
+
+//////////////////////////////
+//
+// GridSide::getHarmony --
+//
+
+HTp GridSide::getHarmony(void) { 
+	return m_harmony;
+}
 
 
 } // end namespace hum

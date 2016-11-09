@@ -124,6 +124,8 @@ class musicxml2hum_interface {
 		void addChordNotes     (ostream& output, MxmlEvent* head, const string& recip);
 		bool isInvisible       (MxmlEvent* event);
 		int  addLyrics         (GridStaff* staff, MxmlEvent* event);
+		int  addHarmony        (GridPart* oart, MxmlEvent* event);
+		string getHarmonyString(xml_node hnode);
 
 	public:
 
