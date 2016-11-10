@@ -884,9 +884,13 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             pugi::xml_node lyric = it->node();
             int lyricNumber = atoi(GetAttributeValue(lyric, "number").c_str());
             lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+            std::string lyricColor = GetAttributeValue(lyric, "color");
             std::string textStr = GetContentOfChild(lyric, "text");
+            std::string textStyle = GetAttributeValue(lyric.select_single_node("text").node(), "font-style");
+            std::string textWeight = GetAttributeValue(lyric.select_single_node("text").node(), "font-weight");
             Verse *verse = new Verse();
             verse->SetN(lyricNumber);
+            if (!lyricColor.empty()) verse->SetColor(lyricColor.c_str());
             Syl *syl = new Syl();
             if (lyric.select_single_node("extend")) {
                 syl->SetCon(sylLog_CON_u);
@@ -897,6 +901,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             }
             else if (GetContentOfChild(lyric, "syllabic") == "end") {
                 syl->SetWordpos(sylLog_WORDPOS_t);
+            if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
+            if (!textWeight.empty()) syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
             }
 
             Text *text = new Text();
@@ -907,17 +913,19 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         }
 
         // Ties
-        pugi::xpath_node tie1 = node.select_single_node("tie[1]");
-        pugi::xpath_node tie2 = node.select_single_node("tie[2]");
-        std::string tieStr1, tieStr2;
-        if (tie1) tieStr1 = GetAttributeValue(tie1.node(), "type");
-        if (tie2) tieStr2 = GetAttributeValue(tie2.node(), "type");
-        // First close tie
-        bool isClosingTie = ((tieStr1 == "stop") || (tieStr2 == "stop"));
-        CloseTie(staff, layer, note, isClosingTie);
+        pugi::xpath_node startTie = notations.node().select_single_node("tied[@type='start']");
+        pugi::xpath_node endTie = notations.node().select_single_node("tied[@type='stop']");
+        CloseTie(staff, layer, note, endTie);
         // Then open a new tie
-        if ((tieStr1 == "start") || (tieStr2 == "start")) {
+        if ((startTie)) {
             Tie *tie = new Tie();
+            // color
+            std::string colorStr = GetAttributeValue(startTie.node(), "color");
+            if (!colorStr.empty()) tie->SetColor(colorStr.c_str());
+            // placement
+            std::string placeStr = GetAttributeValue(startTie.node(), "placement");
+            if (!placeStr.empty()) tie->SetCurvedir(tie->AttCurvature::StrToCurvatureCurvedir(placeStr.c_str()));
+            // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
             OpenTie(staff, layer, note, tie);
         }
@@ -944,13 +952,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         slurNumber = (slurNumber < 1) ? 1 : slurNumber;
         if (HasAttributeWithValue(slur, "type", "start")) {
             Slur *meiSlur = new Slur();
+            // color
+            std::string colorStr = GetAttributeValue(slur, "color");
+            if (!colorStr.empty()) meiSlur->SetColor(colorStr.c_str());
             // placement
-            if (HasAttributeWithValue(slur, "placement", "above")) {
-                meiSlur->SetCurvedir(curvature_CURVEDIR_above);
-            }
-            else if (HasAttributeWithValue(slur, "placement", "below")) {
-                meiSlur->SetCurvedir(curvature_CURVEDIR_below);
-            }
+            std::string placeStr = GetAttributeValue(slur, "placement");
+            if (!placeStr.empty()) meiSlur->SetCurvedir(meiSlur->AttCurvature::StrToCurvatureCurvedir(placeStr.c_str()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
             OpenSlur(staff, layer, slurNumber, element, meiSlur);
