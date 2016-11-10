@@ -16,6 +16,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <algorithm>
+
 using namespace std;
 using namespace pugi;
 
@@ -90,6 +92,12 @@ bool musicxml2hum_interface::convert(ostream& out, xml_document& doc) {
 
 	// for debugging:
 	// printPartInfo(partids, partinfo, partcontent, partdata);
+
+	// check the voice info
+	for (int i=0; i<(int)partdata.size(); i++) {
+		partdata[i].prepareVoiceMapping();
+		// partdata[i].printStaffVoiceInfo();
+	}
 
 	HumGrid outdata;
 	status &= stitchParts(outdata, partids, partinfo, partcontent, partdata);
@@ -515,6 +523,12 @@ void musicxml2hum_interface::addEvent(GridSlice& slice,
 	string pitch   = event->getKernPitch();
 	string prefix  = event->getPrefixNoteInfo();
 	string postfix = event->getPostfixNoteInfo();
+	bool   grace   = event->isGrace();
+
+if (grace) {
+	cerr << "!! NOTE IS GRACE" << endl;
+}
+
 	stringstream ss;
 	ss << prefix << recip << pitch << postfix;
 	if (invisible) {
@@ -590,20 +604,52 @@ string musicxml2hum_interface::getHarmonyString(xml_node hnode) {
 	string root;
 	string kind;
 	string bass;
+	int rootalter = 0;
+	int bassalter = 0;
+	xml_node grandchild;
 	while (child) {
 		if (nodeType(child, "root")) {
-			// presuming root-step is first child:
-			root = child.first_child().child_value();
+			grandchild = child.first_child();
+			while (grandchild) {
+				if (nodeType(grandchild, "root-step")) {
+					root = grandchild.child_value();
+				} if (nodeType(grandchild, "root-alter")) {
+					rootalter = atoi(grandchild.child_value());
+				}
+				grandchild = grandchild.next_sibling();
+			}
 		} else if (nodeType(child, "kind")) {
 			kind = child.child_value();
+			if (kind == "") {
+				kind = child.attribute("text").value();
+				transform(kind.begin(), kind.end(), kind.begin(), ::tolower);
+			}
 		} else if (nodeType(child, "bass")) {
-			// presuming bass-step is first child:
-			bass = child.first_child().child_value();
+			grandchild = child.first_child();
+			while (grandchild) {
+				if (nodeType(grandchild, "bass-step")) {
+					bass = grandchild.child_value();
+				} if (nodeType(grandchild, "bass-alter")) {
+					bassalter = atoi(grandchild.child_value());
+				}
+				grandchild = grandchild.next_sibling();
+			}
 		}
 		child = child.next_sibling();
 	}
 	stringstream ss;
 	ss << root;
+
+	if (rootalter > 0) {
+		for (int i=0; i<rootalter; i++) {
+			ss << "#";
+		}
+	} else if (rootalter < 0) {
+		for (int i=0; i<-rootalter; i++) {
+			ss << "-";
+		}
+	}
+
 	if (root.size() && kind.size()) {
 		ss << " ";
 	}
@@ -612,7 +658,19 @@ string musicxml2hum_interface::getHarmonyString(xml_node hnode) {
 		ss << "/";
 	}
 	ss << bass;
-	return ss.str();
+
+	if (bassalter > 0) {
+		for (int i=0; i<bassalter; i++) {
+			ss << "#";
+		}
+	} else if (bassalter < 0) {
+		for (int i=0; i<-bassalter; i++) {
+			ss << "-";
+		}
+	}
+
+	string output = cleanSpaces(ss.str());
+	return output;
 }
 
 
@@ -669,7 +727,16 @@ int musicxml2hum_interface::addLyrics(GridStaff* staff, MxmlEvent* event) {
 				if (nodeType(child, "syllabic")) {
 					syllabic = child.child_value();
 				} else if (nodeType(child, "text")) {
-					text = child.child_value();
+					text = cleanSpaces(child.child_value());
+				}
+				// escape text which would otherwise be reinterpreated
+				// as Humdrum syntax.
+				if (!text.empty()) {
+					if (text[0] == '!') {
+						text.insert(0, 1, '\\');
+					} else if (text[0] == '*') {
+						text.insert(0, 1, '\\');
+					}
 				}
 				child = child.next_sibling();
 			}
@@ -688,6 +755,10 @@ int musicxml2hum_interface::addLyrics(GridStaff* staff, MxmlEvent* event) {
 			}
 		}
 
+		if (finaltext.empty()) {
+			continue;
+		}
+
 		if (verses[i]) {
 			token = new HumdrumToken(finaltext);
 			staff->setVerse(i,token);
@@ -698,6 +769,49 @@ int musicxml2hum_interface::addLyrics(GridStaff* staff, MxmlEvent* event) {
 	}
 
 	return (int)staff->getVerseCount();
+}
+
+
+
+//////////////////////////////
+//
+// cleanSpaces -- remove trailing and leading spaces from text.
+//    Also removed doubled spaces, and converts tabs and newlines
+//    into spaces.
+//
+
+string musicxml2hum_interface::cleanSpaces(const string& input) {
+	int endi = (int)input.size() - 1;
+	while (endi >= 0) {
+		if (isspace(input[endi])) {
+			endi--;
+			continue;
+		}
+		break;
+	}
+	int starti = 0;
+	while (starti <= endi) {
+		if (isspace(input[starti])) {
+			starti++;
+			continue;
+		}
+		break;
+
+	}
+	string output;
+   for (int i=starti; i<=endi; i++) {
+		if (!isspace(input[i])) {
+			output += input[i];
+			continue;
+		}
+		output += " ";
+		i++;
+		while ((i < endi) && isspace(input[i])) {
+			i++;
+		}
+		i--;
+	}
+	return output;
 }
 
 
@@ -1045,12 +1159,12 @@ xml_node musicxml2hum_interface::convertKeySigToHumdrum(xml_node keysig,
 	} else if (fifths < 0) {
 		switch (fifths) {
 			case 7: ss << "f-";
-			case 6: ss << "g#";
-			case 5: ss << "c#";
-			case 4: ss << "d#";
-			case 3: ss << "a#";
-			case 2: ss << "e#";
-			case 1: ss << "b#";
+			case 6: ss << "g-";
+			case 5: ss << "c-";
+			case 4: ss << "d-";
+			case 3: ss << "a-";
+			case 2: ss << "e-";
+			case 1: ss << "b-";
 		}
 	}
 	ss << "]";

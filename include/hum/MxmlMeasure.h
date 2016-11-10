@@ -72,11 +72,13 @@ class MxmlMeasure {
 		void          setNextMeasure     (MxmlMeasure* event);
 		MxmlMeasure*  getPreviousMeasure (void) const;
 		MxmlMeasure*  getNextMeasure     (void) const;
+		int           getVoiceIndex      (int voicenum);
+		int           getStaffIndex      (int voicenum);
 
 	private:
 		void  sortEvents                  (void);
-		void  receiveStaffNumberFromChild (int staffnum);
-   	void  reportStaffNumberToOwner    (int staffnum);
+		void  receiveStaffNumberFromChild (int staffnum, int voicenum);
+   	void  reportStaffNumberToOwner    (int staffnum, int voicenum);
 		void  reportVerseCountToOwner     (int count);
 		void  reportVerseCountToOwner     (int staffindex, int count);
 		void  reportHarmonyCountToOwner   (int count);

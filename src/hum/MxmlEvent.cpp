@@ -298,6 +298,12 @@ void MxmlEvent::setDurationByTicks(long value, xml_node el) {
 		setDuration(0);
 		return;
 	}
+
+	if (isGrace()) {
+		setDuration(0);
+		return;
+	}
+
 	HumNum val = value;
 	val /= ticks;
 
@@ -424,6 +430,32 @@ bool MxmlEvent::isChord(void) const {
 
 //////////////////////////////
 //
+// MxmlEvent::isGrace -- Returns true if the event is the primary note
+//    in a chord.
+//
+
+bool MxmlEvent::isGrace(void) {
+	xml_node child = this->getNode();
+	if (!nodeType(child, "note")) {
+		return false;
+	}
+	child = child.first_child();
+	while (child) {
+		if (nodeType(child, "grace")) {
+			return true;
+		} else if (nodeType(child, "pitch")) {
+			// grace element has to come before pitch
+			return false;
+		}
+		child = child.first_child();
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
 // MxmlEvent::getLinkedNotes --
 //
 
@@ -480,13 +512,54 @@ int MxmlEvent::getVoiceNumber(void) const {
 //
 // MxmlEvent::getVoiceIndex -- Return the voice number of the event.
 //    But mod 4 which presumably sets the voice number on a staff.
+//    This is not always true: "PrintMusic 2010 for Windows" may
+//    use voice 2 for staff 2. In this case the voice index should
+//    be calculated by %2 rather than %4.
+//    default value: maxvoice = 4.
+//
+//    This function will replace with a query to MxmlPart
+//    as to what the voice on a staff should be.
 //
 
-int MxmlEvent::getVoiceIndex(void) const {
+int MxmlEvent::getVoiceIndex(int maxvoice) const {
+	if (m_owner) {
+		int voiceindex = m_owner->getVoiceIndex(m_voice);
+		if (voiceindex >= 0) {
+			return voiceindex;
+		}
+	}
+
+	// don't know what the voice mapping is, so make one up:
+	if (maxvoice < 1) {
+		maxvoice = 4;
+	}
 	if (m_voice) {
-		return (m_voice - 1) % 4;
+		return (m_voice - 1) % maxvoice;
 	} else {
 		return 0;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::getStaffIndex -- 
+//
+
+int MxmlEvent::getStaffIndex(void) const {
+	if (m_owner) {
+		int staffindex = m_owner->getStaffIndex(m_voice);
+		if (staffindex >= 0) {
+			return staffindex;
+		}
+	}
+
+	// don't know what the modified staff is, so give the original staff index:
+	if (!m_staff) {
+		return 0;
+	} else {
+		return m_staff - 1;
 	}
 }
 
@@ -524,21 +597,6 @@ int MxmlEvent::getStaffNumber(void) const {
 		return 1;
 	} else {
 		return m_staff;
-	}
-}
-
-
-
-//////////////////////////////
-//
-// MxmlEvent::getStaffIndex -- 
-//
-
-int MxmlEvent::getStaffIndex(void) const {
-	if (!m_staff) {
-		return 0;
-	} else {
-		return m_staff - 1;
 	}
 }
 
@@ -590,6 +648,8 @@ bool MxmlEvent::parseEvent(xml_node el) {
 		m_eventtype = mevent_link;
 	} else if (nodeType(m_node, "note")) {
 		m_eventtype = mevent_note;
+		m_staff = 1;
+		m_voice = 1;
 	} else if (nodeType(m_node, "print")) {
 		m_eventtype = mevent_print;
 	} else if (nodeType(m_node, "sound")) {
@@ -598,8 +658,8 @@ bool MxmlEvent::parseEvent(xml_node el) {
 		m_eventtype = mevent_unknown;
 	}
 
-	int tempvoice    = 0;
-	int tempstaff    = 0;
+	int tempvoice    = m_voice;
+	int tempstaff    = m_staff;
 	int tempduration = 0;
 
 	for (auto el = m_node.first_child(); el; el = el.next_sibling()) {
@@ -614,7 +674,7 @@ bool MxmlEvent::parseEvent(xml_node el) {
 
 	m_voice = (short)tempvoice;
 	m_staff = (short)tempstaff;
-   reportStaffNumberToOwner(m_staff);
+   reportStaffNumberToOwner(m_staff, m_voice);
 
 	switch (m_eventtype) {
 		case mevent_note:
@@ -679,8 +739,32 @@ string MxmlEvent::getRecip(void) const {
 	HumNum dur = m_duration;
 	dur /= 4;  // convert to whole-note units;
 	int n = getDotCount();
-	if (n) {
+	if (n > 0) {
 		dur = dur * (1 << n) / ((1 << (n+1)) - 1);
+	} else if (n < 0) {
+		// calculate a dot count and adjust duration as needed
+		if (dur.getNumerator() == 1) {
+			// do nothing since it won't need dots
+		} else {
+			// otherwise check to three augmentation dots
+			HumNum onedotdur = dur * (1 << 1) / ((1 << 2) - 1);
+			if (onedotdur.getNumerator() == 1) {
+				dur = onedotdur;
+				n = 1;
+			} else {
+				HumNum twodotdur = dur * (1 << 2) / ((1 << 3) - 1);
+				if (twodotdur.getNumerator() == 1) {
+					dur = twodotdur;
+					n = 2;
+				} else {
+					HumNum threedotdur = dur * (1 << 3) / ((1 << 4) - 1);
+					if (threedotdur.getNumerator() == 1) {
+						dur = threedotdur;
+						n = 3;
+					}
+				}
+			}
+		}
 	}
 	stringstream ss;
 	ss << dur.getDenominator();
@@ -708,27 +792,31 @@ string MxmlEvent::getKernPitch(void) const {
 	int alter  = 0;
 	int octave = 4;
 
-	while (child) {
-		if (nodeType(child, "rest")) {
-			rest = true;
-			break;
-		}
-		if (nodeType(child, "pitch")) {
-			xml_node grandchild = child.first_child();
-			while (grandchild) {
-				if (nodeType(grandchild, "step")) {
-					step = grandchild.child_value();
-				} else if (nodeType(grandchild, "alter")) {
-					alter = atoi(grandchild.child_value());
-				} else if (nodeType(grandchild, "octave")) {
-					octave = atoi(grandchild.child_value());
-				}
-				grandchild = grandchild.next_sibling();
+	if (nodeType(m_node, "forward")) {
+		rest = true;
+	} else {
+		while (child) {
+			if (nodeType(child, "rest")) {
+				rest = true;
+				break;
 			}
+			if (nodeType(child, "pitch")) {
+				xml_node grandchild = child.first_child();
+				while (grandchild) {
+					if (nodeType(grandchild, "step")) {
+						step = grandchild.child_value();
+					} else if (nodeType(grandchild, "alter")) {
+						alter = atoi(grandchild.child_value());
+					} else if (nodeType(grandchild, "octave")) {
+						octave = atoi(grandchild.child_value());
+					}
+					grandchild = grandchild.next_sibling();
+				}
+			}
+			child = child.next_sibling();
 		}
-		child = child.next_sibling();
 	}
-
+	
 	if (rest) {
 		return "r";
 	}
@@ -1014,9 +1102,9 @@ xml_node MxmlEvent::getHNode(void) {
 // MxmlEvent::reportStaffNumberToOwner --
 //
 
-void MxmlEvent::reportStaffNumberToOwner(int staffnum) {
+void MxmlEvent::reportStaffNumberToOwner(int staffnum, int voicenum) {
 	if (m_owner != NULL) {
-		m_owner->receiveStaffNumberFromChild(staffnum);
+		m_owner->receiveStaffNumberFromChild(staffnum, voicenum);
 	}
 }
 
@@ -1025,14 +1113,20 @@ void MxmlEvent::reportStaffNumberToOwner(int staffnum) {
 //////////////////////////////
 //
 //  MxmlEvent::getDotCount -- return the number of augmentation dots
-//     which are children of the given event element.
+//     which are children of the given event element.  Returns -1
+//     if the dot count should be calculated for a duration (such as whole
+//     measure rests).
 //
 
 int MxmlEvent::getDotCount(void) const {
 	xml_node child = m_node.first_child();
 	int output = 0;
+	bool foundType = false;
 	while (child) {
-		if (output && (strcmp(child.name(), "dot") != 0)) {
+		if (nodeType(child, "type")) {
+			foundType = true;
+		}
+		if (output && !nodeType(child, "dot")) {
 			return output;
 		}
 		if (strcmp(child.name(), "dot") == 0) {
@@ -1040,7 +1134,11 @@ int MxmlEvent::getDotCount(void) const {
 		}
 		child = child.next_sibling();
 	}
-	return output;
+	if (foundType) {
+		return output;
+	} else {
+		return -1;
+	}
 }
 
 
