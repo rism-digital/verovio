@@ -305,7 +305,7 @@ protected:
      * @name Methods for drawing Floating child classes.
      * They are base drawing methods that are called directly from DrawFloatingElement.
      * Call appropriate method of child classes (Slur, Tempo, Tie, etc).
-     * Defined in view_floating.cpp
+     * Defined in view_control.cpp
      */
     ///@{
     void DrawControlElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
@@ -330,7 +330,7 @@ protected:
     /**
      * @name Methods for drawing SystemElement child classes.
      * They are base drawing methods that are called directly from DrawSystemElement.
-     * Defined in view_floating.cpp
+     * Defined in view_control.cpp
      */
     ///@{
     void DrawSystemElement(DeviceContext *dc, SystemElement *element, System *system);
