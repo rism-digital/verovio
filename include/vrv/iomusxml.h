@@ -193,7 +193,6 @@ private:
     data_DURATION ConvertTypeToDur(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
     data_PLACE ConvertTypeToPlace(std::string value);
-    data_STAFFREL ConvertPlacementToPlace(std::string value);
     ///@}
 
 private:

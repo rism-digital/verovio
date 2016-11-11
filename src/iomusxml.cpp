@@ -571,12 +571,6 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
     int i = 0;
     for (pugi::xpath_node_set::const_iterator it = measures.begin(); it != measures.end(); ++it) {
         pugi::xpath_node xmlMeasure = *it;
-        if (HasAttributeWithValue(xmlMeasure.node().select_single_node("print").node(), "new-system", "yes")) {
-            LogDebug("System breaks not supported");
-        }
-        if (HasAttributeWithValue(xmlMeasure.node().select_single_node("print").node(), "new-page", "yes")) {
-            LogDebug("Page breaks not supported");
-        }
         Measure *measure = new Measure();
         ReadMusicXmlMeasure(xmlMeasure.node(), measure, nbStaves, staffOffset);
         // Add the measure to the system - if already there from a previous part we'll just merge the content
@@ -692,13 +686,24 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     std::string placeStr = GetAttributeValue(node, "placement");
 
     // Directive
-    std::string textStr = GetContentOfChild(type.node(), "words");
-    if (!textStr.empty()) {
+    pugi::xpath_node words = type.node().select_single_node("words");
+    if (words) {
+        std::string textStr = GetContentOfChild(type.node(), "words");
+        std::string textStyle = GetAttributeValue(words.node(), "font-style");
+        std::string textWeight = GetAttributeValue(words.node(), "font-weight");
         Dir *dir = new Dir();
         if (!placeStr.empty()) dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
-        dir->AddChild(text);
+        if (!textStyle.empty() || !textWeight.empty()) {
+            Rend *rend = new Rend();
+            if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));
+            if (!textWeight.empty()) rend->SetFontweight(rend->AttTypography::StrToFontweight(textWeight.c_str()));
+            rend->AddChild(text);
+            dir->AddChild(rend);
+            //LogWarning("Kacke1");
+        }
+        else dir->AddChild(text);
         m_controlElements.push_back(std::make_pair(measureNum, dir));
     }
 
@@ -742,7 +747,10 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     // fermata
     pugi::xpath_node fermata = notations.node().select_single_node("fermata");
     std::string fermataStr;
-    if (fermata) fermataStr = GetAttributeValue(fermata.node(), "type");
+    if (fermata) {
+        fermataStr = GetAttributeValue(fermata.node(), "type");
+        if (fermataStr.empty()) fermataStr = "upright";
+    }
 
     // beam start
     bool beamStart = node.select_single_node("beam[@number='1'][text()='begin']");
@@ -837,9 +845,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             }
         }
 
-        // Add fermata
-        if (!fermataStr.empty()) note->SetFermata(ConvertTypeToPlace(fermataStr));
-
         // Look at the next note to see if we are starting or ending a chord
         pugi::xpath_node nextNote = node.select_single_node("./following-sibling::note");
         bool nextIsChord = false;
@@ -851,6 +856,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 chord->SetDur(ConvertTypeToDur(typeStr));
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
+                if (!fermataStr.empty()) chord->SetFermata(ConvertTypeToPlace(fermataStr));
                 AddLayerElement(layer, chord);
                 m_elementStack.push_back(chord);
             }
@@ -876,6 +882,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             note->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
+            if (!fermataStr.empty()) note->SetFermata(ConvertTypeToPlace(fermataStr));
         }
 
         // Verse / syl
