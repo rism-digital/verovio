@@ -90,18 +90,54 @@ bool MxmlMeasure::parseMeasure(xml_node mel) {
 	setStartTimeOfMeasure();
 	calculateDuration();
 
-	// For debugging:
-	/*
-	cout << endl;
-	cout << "MEASURE DURATION: " << getDuration() << endl;
-	for (int i=0; i<(int)m_events.size(); i++) {
-		m_events[i]->printEvent();
-	}
-	*/
+   bool needdummy = false;
+
+   MxmlMeasure* pmeasure = getPreviousMeasure();
+   if (getTimeSignatureDuration() == 0) {
+      if (pmeasure) {
+         setTimeSignatureDuration(pmeasure->getTimeSignatureDuration());
+      }
+   }
+
+   if (getDuration() == 0) {
+      if (pmeasure) {
+         setDuration(pmeasure->getTimeSignatureDuration());
+      } else {
+         setTimeSignatureDuration(getTimeSignatureDuration());
+      }
+      needdummy = true;
+   } 
+
+
+   if (needdummy || getEventCount() == 0) {
+      // if the duration of the measure is zero, then set the duration
+      // of the measure to the duration of the time signature
+      // This is needed for certain cases of multi-measure rests, where no
+      // full-measure rest is given in the measure (Sibelius does this).
+      setDuration(getTimeSignatureDuration());
+		addDummyRest();
+   }
+
 
 	sortEvents();
 
 	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::addDummyRest --
+//
+
+void MxmlMeasure::addDummyRest(void) {
+      HumNum measuredur = getTimeSignatureDuration();
+      HumNum starttime = getStartTime();
+		MxmlEvent* event = new MxmlEvent(this);
+		m_events.push_back(event);
+      MxmlMeasure* measure = this;
+      event->makeDummyRest(measure, starttime, measuredur);
 }
 
 
@@ -543,6 +579,38 @@ void MxmlMeasure::sortEvents(void) {
 
 void MxmlMeasure::receiveStaffNumberFromChild(int staffnum, int voicenum) {
 	reportStaffNumberToOwner(staffnum, voicenum);
+}
+
+
+//////////////////////////////
+//
+// MxmlMeasure::receiveTimeSigDurFromChild --
+//
+
+void MxmlMeasure::receiveTimeSigDurFromChild(HumNum duration) {
+   setTimeSignatureDuration(duration);
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::setTimeSignatureDuration --
+//
+
+void MxmlMeasure::setTimeSignatureDuration(HumNum duration) {
+   m_timesigdur = duration;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::getTimeSignatureDuration --
+//
+
+HumNum MxmlMeasure::getTimeSignatureDuration(void) {
+   return m_timesigdur;
 }
 
 

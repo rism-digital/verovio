@@ -137,6 +137,7 @@ bool MxmlPart::addMeasure(xml_node mel) {
 	}
 	m_measures.push_back(meas);
 	int status = meas->parseMeasure(mel);
+
 	return status;
 }
 

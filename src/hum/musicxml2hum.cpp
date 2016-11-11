@@ -197,9 +197,21 @@ bool musicxml2hum_interface::fillPartData(vector<MxmlPart>& partdata,
 
 bool musicxml2hum_interface::fillPartData(MxmlPart& partdata,
 		const string& id, xml_node partdeclaration, xml_node partcontent) {
+	int count;
 	auto measures = partcontent.select_nodes("./measure");
 	for (int i=0; i<(int)measures.size(); i++) {
 		partdata.addMeasure(measures[i].node());
+		count = partdata.getMeasureCount();
+		if (count > 1) {
+			HumNum dur = partdata.getMeasure(count - 1)->getTimeSignatureDuration();
+			if (dur == 0) {
+				HumNum dur = partdata.getMeasure(count - 2)->getTimeSignatureDuration();
+				if (dur > 0) {
+					partdata.getMeasure(count - 1)->setTimeSignatureDuration(dur);
+				}
+			}
+		}
+
 	}
 	return true;
 }
@@ -392,8 +404,19 @@ bool musicxml2hum_interface::insertMeasure(HumGrid& outdata, int mnum,
 	vector<HumNum> curtime(partdata.size());
 	vector<int> curindex(partdata.size(), 0); // assuming data in a measure...
 	HumNum nexttime = -1;
+
+	HumNum tsdur;
 	for (i=0; i<(int)curtime.size(); i++) {
-		curtime[i] = (*sevents[i])[curindex[i]].starttime;
+		tsdur = measuredata[i]->getTimeSignatureDuration();
+		if ((tsdur == 0) && (i > 0)) {
+			tsdur = measuredata[i-1]->getTimeSignatureDuration();
+			measuredata[i]->setTimeSignatureDuration(tsdur);
+		}
+		if (!(*sevents[i]).empty()) {
+			curtime[i] = (*sevents[i])[curindex[i]].starttime;
+		} else {
+			curtime[i] = tsdur;
+		}
 		if (nexttime < 0) {
 			nexttime = curtime[i];
 		} else if (curtime[i] < nexttime) {

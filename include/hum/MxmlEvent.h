@@ -97,11 +97,14 @@ class MxmlEvent {
 		string             getPostfixNoteInfo (void) const;
 		xml_node           getNode            (void);
 		xml_node           getHNode           (void);
+		HumNum             getTimeSigDur      (void);
 		void               addNotations       (stringstream& ss, 
 		                                       xml_node notations) const;
 		void               reportVerseCountToOwner (int count);
 		void               reportVerseCountToOwner (int staffnum, int count);
 		void               reportHarmonyCountToOwner (int count);
+      void               makeDummyRest      (MxmlMeasure* owner, HumNum startime,
+		                                       HumNum duration);
 
 	protected:
 		HumNum             m_starttime;  // start time in quarter notes of event
@@ -120,6 +123,7 @@ class MxmlEvent {
 
 	private:
    	void   reportStaffNumberToOwner  (int staffnum, int voicenum);
+		void   reportTimeSigDurToOwner   (HumNum duration);
 		int    getDotCount               (void) const;
 
 	public:

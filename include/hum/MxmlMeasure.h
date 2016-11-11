@@ -74,10 +74,14 @@ class MxmlMeasure {
 		MxmlMeasure*  getNextMeasure     (void) const;
 		int           getVoiceIndex      (int voicenum);
 		int           getStaffIndex      (int voicenum);
+		void          setTimeSignatureDuration(HumNum duration);
+		HumNum        getTimeSignatureDuration(void);
+		void          addDummyRest       (void);
 
 	private:
 		void  sortEvents                  (void);
 		void  receiveStaffNumberFromChild (int staffnum, int voicenum);
+		void  receiveTimeSigDurFromChild  (HumNum duration);
    	void  reportStaffNumberToOwner    (int staffnum, int voicenum);
 		void  reportVerseCountToOwner     (int count);
 		void  reportVerseCountToOwner     (int staffindex, int count);
@@ -86,6 +90,8 @@ class MxmlMeasure {
 	protected:
 		HumNum             m_starttime; // start time of measure in quarter notes
 		HumNum             m_duration;  // duration of measure in quarter notes
+		HumNum             m_timesigdur; // duration of measure according to 
+													// prevailing time signature.
 		MxmlPart*          m_owner;     // part which contains measure
 		MxmlMeasure*       m_previous;  // previous measure in part or null
 		MxmlMeasure*       m_following; // following measure in part or null
