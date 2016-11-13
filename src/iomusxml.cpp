@@ -283,7 +283,7 @@ void MusicXmlInput::CloseTie(Staff *staff, Layer *layer, Note *note, bool isClos
             iter->first->SetEndid("#" + note->GetUuid());
             m_tieStack.erase(iter);
             if (!isClosingTie) {
-                LogWarning("Closing tie for note '%s' even thought tie /tie@[type='stop'] is missing in the MusicXML",
+                LogWarning("Closing tie for note '%s' even though tie /tie[@type='stop'] is missing in the MusicXML",
                     note->GetUuid().c_str());
             }
             return;
@@ -311,6 +311,7 @@ void MusicXmlInput::CloseSlur(Staff *staff, Layer *layer, int number, LayerEleme
     }
     LogWarning("Closing slur for element '%s' could not be matched", element->GetUuid().c_str());
 }
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Parsing methods
@@ -686,25 +687,28 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     std::string placeStr = GetAttributeValue(node, "placement");
 
     // Directive
-    pugi::xpath_node words = type.node().select_single_node("words");
-    if (words) {
-        std::string textStr = GetContentOfChild(type.node(), "words");
-        std::string textStyle = GetAttributeValue(words.node(), "font-style");
-        std::string textWeight = GetAttributeValue(words.node(), "font-weight");
+    pugi::xpath_node_set words = type.node().select_nodes("words");
+    if (words.size() != 0) {
         Dir *dir = new Dir();
-        if (!placeStr.empty()) dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
-        Text *text = new Text();
-        text->SetText(UTF8to16(textStr));
-        if (!textStyle.empty() || !textWeight.empty()) {
-            Rend *rend = new Rend();
-            if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));
-            if (!textWeight.empty()) rend->SetFontweight(rend->AttTypography::StrToFontweight(textWeight.c_str()));
-            rend->AddChild(text);
-            dir->AddChild(rend);
-            //LogWarning("Kacke1");
+        for (pugi::xpath_node_set::const_iterator it = words.begin(); it != words.end(); ++it) {
+            pugi::xml_node textNode = it->node();
+            std::string textStr = GetContent(textNode);
+            std::string textStyle = GetAttributeValue(textNode, "font-style");
+            std::string textWeight = GetAttributeValue(textNode, "font-weight");
+            if (!placeStr.empty()) dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
+            Text *text = new Text();
+            text->SetText(UTF8to16(textStr));
+            if (!textStyle.empty() || !textWeight.empty()) {
+                Rend *rend = new Rend();
+                if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));
+                if (!textWeight.empty()) rend->SetFontweight(rend->AttTypography::StrToFontweight(textWeight.c_str()));
+                rend->AddChild(text);
+                dir->AddChild(rend);
+            }
+            else dir->AddChild(text);
         }
-        else dir->AddChild(text);
         m_controlElements.push_back(std::make_pair(measureNum, dir));
+        m_dirStack.push_back(dir);
     }
 
     // Dynamics
@@ -718,6 +722,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
         text->SetText(UTF8to16(dynamStr));
         dynam->AddChild(text);
         m_controlElements.push_back(std::make_pair(measureNum, dynam));
+        m_dynamStack.push_back(dynam);
     }
 }
 
@@ -985,6 +990,23 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     if (beamEnd) {
         RemoveLastFromStack(BEAM);
     }
+    
+    // add StartIDs to dir and dynam
+    if (!m_dirStack.empty()) {
+        std::vector<Dir *>::iterator iter;
+        for (iter = m_dirStack.begin(); iter != m_dirStack.end(); iter++) {
+            (*iter)->SetStartid("#" + element->GetUuid());
+        }
+        m_dirStack.clear();
+    }
+    if (!m_dynamStack.empty()) {
+        std::vector<Dynam *>::iterator iter;
+        for (iter = m_dynamStack.begin(); iter != m_dynamStack.end(); iter++) {
+            (*iter)->SetStartid("#" + element->GetUuid());
+        }
+        m_dynamStack.clear();
+    }
+    
 }
 
 //////////////////////////////////////////////////////////////////////////////

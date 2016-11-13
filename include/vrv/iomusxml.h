@@ -24,6 +24,8 @@
 namespace vrv {
 
 class ControlElement;
+class Dir;
+class Dynam;
 class Layer;
 class LayerElement;
 class Measure;
@@ -204,7 +206,9 @@ private:
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /** The stack for open ties */
     std::vector<std::pair<Tie *, musicxml::OpenTie> > m_tieStack;
-
+    /** The stacks for directives and dynamics */
+    std::vector<Dir *> m_dirStack;
+    std::vector<Dynam *> m_dynamStack;
     /**
      * The stack of floating elements (tie, slur, etc.) to be added at the
      * end of each measure
