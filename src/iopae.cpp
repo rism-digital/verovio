@@ -891,14 +891,14 @@ int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
 /**********************************
  *
  * getBarLine -- read the barLine.
- * Translation from abc to verovio representaion:
+ * Translation from PAE to verovio representaion:
  *
- BARRENDITION_single     |
+ BARRENDITION_single     /
  BARRENDITION_end        does not exist
- BARRENDITION_rptboth    :||:
- BARRENDITION_rptend     :|
- BARRENDITION_rptstart   |:
- BARRENDITION_dbl        ||
+ BARRENDITION_rptboth    ://:
+ BARRENDITION_rptend     ://
+ BARRENDITION_rptstart   //:
+ BARRENDITION_dbl        //
  */
 
 int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int index)

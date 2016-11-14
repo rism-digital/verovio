@@ -320,9 +320,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 {
     assert(root);
 
-    pugi::xpath_node title = root.select_single_node("/score-partwise/work/work-title");
-    if (title) ReadMusicXmlTitle(title.node());
-
     Score *score = m_doc->CreateScoreBuffer();
     // the section
     Section *section = new Section();
@@ -428,34 +425,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     m_doc->ConvertToPageBasedDoc();
 
     return true;
-}
-
-void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node title)
-{
-    // <fileDesc> /////////////
-    pugi::xml_node fileDesc = m_doc->m_header.append_child("fileDesc");
-    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
-    pugi::xml_node meiTitle = titleStmt.append_child("title");
-    meiTitle.text().set(GetContent(title).c_str());
-
-    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-    pubStmt.append_child(pugi::node_pcdata);
-
-    pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
-    pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
-    pugi::xml_node app = appInfo.append_child("application");
-    pugi::xml_node appName = app.append_child("name");
-    appName.append_child(pugi::node_pcdata).set_value("Verovio");
-    pugi::xml_node appText = app.append_child("p");
-    appText.append_child(pugi::node_pcdata).set_value("Transcoded from MusicXML");
-
-    // isodate and version
-    time_t t = time(0); // get time now
-    struct tm *now = localtime(&t);
-    std::string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1,
-        now->tm_mday, now->tm_hour, now->tm_min, now->tm_sec);
-    app.append_attribute("isodate").set_value(dateStr.c_str());
-    app.append_attribute("version").set_value(GetVersion().c_str());
 }
 
 int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, StaffGrp *staffGrp, int staffOffset)
@@ -698,21 +667,15 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, i
     data_BARRENDITION barRendition = BARRENDITION_NONE;
     std::string barStyle = GetContentOfChild(node, "bar-style");
     pugi::xpath_node repeat = node.select_single_node("repeat");
-    if (!barStyle.empty()) {
-        barRendition = ConvertStyleToRend(barStyle, repeat);
-        if (HasAttributeWithValue(node, "location", "left")) {
-            measure->SetLeft(barRendition);
-        }
-        else if (HasAttributeWithValue(node, "location", "middle")) {
-            LogWarning("Unsupported barline location '%s'", GetAttributeValue(node, "location").c_str());
-        }
-        else
-            measure->SetRight(barRendition);
+    if (!barStyle.empty()) barRendition = ConvertStyleToRend(barStyle, repeat);
+    if (HasAttributeWithValue(node, "location", "left")) {
+        measure->SetLeft(barRendition);
     }
-    pugi::xpath_node ending = node.select_single_node("ending");
-    if (ending) {
-        // LogWarning("Endings not supported");
+    else if (HasAttributeWithValue(node, "location", "middle")) {
+        LogWarning("Unsupported barline location '%s'", GetAttributeValue(node, "location").c_str());
     }
+    else
+        measure->SetRight(barRendition);
 }
 
 void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure, int measureNum)
