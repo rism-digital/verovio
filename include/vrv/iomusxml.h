@@ -94,6 +94,11 @@ private:
     bool ReadMusicXml(pugi::xml_node root);
 
     /**
+     * Method to fill MEI header with title
+     */
+    void ReadMusicXmlTitle(pugi::xml_node title);
+
+    /**
      * @name Top level methods for reading MusicXml part and measure elements.
      */
     ///@{
