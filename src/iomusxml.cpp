@@ -25,6 +25,7 @@
 #include "measure.h"
 #include "mrest.h"
 #include "note.h"
+#include "pedal.h"
 #include "rest.h"
 #include "score.h"
 #include "section.h"
@@ -685,6 +686,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
 
     pugi::xpath_node type = node.select_single_node("direction-type");
     std::string placeStr = GetAttributeValue(node, "placement");
+    pugi::xpath_node sound = node.select_single_node("sound");
 
     // Directive
     pugi::xpath_node_set words = type.node().select_nodes("words");
@@ -723,6 +725,17 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
         dynam->AddChild(text);
         m_controlElements.push_back(std::make_pair(measureNum, dynam));
         m_dynamStack.push_back(dynam);
+    }
+    
+    // Pedal
+    pugi::xpath_node xmlPedal = type.node().select_single_node("pedal");
+    if (xmlPedal) {
+        Pedal *pedal = new Pedal();
+        if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        std::string pedalType = GetAttributeValue(xmlPedal.node(), "type");
+        if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+        m_controlElements.push_back(std::make_pair(measureNum, pedal));
+        m_pedalStack.push_back(pedal);
     }
 }
 
@@ -991,10 +1004,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         RemoveLastFromStack(BEAM);
     }
     
-    // add StartIDs to dir and dynam
+    // add StartIDs to dir, dynam, and pedal
     if (!m_dirStack.empty()) {
         std::vector<Dir *>::iterator iter;
         for (iter = m_dirStack.begin(); iter != m_dirStack.end(); iter++) {
+            (*iter)->SetStaff(staff->Att::StrToXsdPosintlist(std::to_string(staff->GetN())));
             (*iter)->SetStartid("#" + element->GetUuid());
         }
         m_dirStack.clear();
@@ -1002,9 +1016,18 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     if (!m_dynamStack.empty()) {
         std::vector<Dynam *>::iterator iter;
         for (iter = m_dynamStack.begin(); iter != m_dynamStack.end(); iter++) {
+            (*iter)->SetStaff(staff->Att::StrToXsdPosintlist(std::to_string(staff->GetN())));
             (*iter)->SetStartid("#" + element->GetUuid());
         }
         m_dynamStack.clear();
+    }
+    if (!m_pedalStack.empty()) {
+        std::vector<Pedal *>::iterator iter;
+        for (iter = m_pedalStack.begin(); iter != m_pedalStack.end(); iter++) {
+            (*iter)->SetStaff(staff->Att::StrToXsdPosintlist(std::to_string(staff->GetN())));
+            (*iter)->SetStartid("#" + element->GetUuid());
+        }
+        m_pedalStack.clear();
     }
     
 }
@@ -1093,6 +1116,14 @@ data_PLACE MusicXmlInput::ConvertTypeToPlace(std::string value)
     if (value == "inverted") return PLACE_below;
     LogWarning("Unsupported type '%s'", value.c_str());
     return PLACE_NONE;
+}
+
+pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
+{
+    if (value == "start") return pedalLog_DIR_down;
+    if (value == "stop") return pedalLog_DIR_up;
+    LogWarning("Unsupported type '%s' for pedal", value.c_str());
+    return pedalLog_DIR_NONE;
 }
 
 } // namespace vrv

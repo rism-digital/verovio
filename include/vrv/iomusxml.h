@@ -29,6 +29,7 @@ class Dynam;
 class Layer;
 class LayerElement;
 class Measure;
+class Pedal;
 class Section;
 class Slur;
 class StaffGrp;
@@ -195,6 +196,7 @@ private:
     data_DURATION ConvertTypeToDur(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
     data_PLACE ConvertTypeToPlace(std::string value);
+    pedalLog_DIR ConvertPedalTypeToDir(std::string value);
     ///@}
 
 private:
@@ -209,6 +211,7 @@ private:
     /** The stacks for directives and dynamics */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
+    std::vector<Pedal *> m_pedalStack;
     /**
      * The stack of floating elements (tie, slur, etc.) to be added at the
      * end of each measure
