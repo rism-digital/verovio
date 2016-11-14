@@ -1,8 +1,8 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        iopae.cpp
-// Author:      Rodolfo Zitellini // this is the important stuff!
-// Created:     2012
-// Copyright (c) Laurent Pugin. All rights reserved.
+// Name:        ioabc.cpp
+// Author:      Klaus Rettinghaus
+// Created:     2016
+// Copyright (c) Klaus Rettinghaus. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
 #include "iopae.h"
@@ -34,7 +34,7 @@
 
 //----------------------------------------------------------------------------
 
-#ifndef NO_PAE_SUPPORT
+#ifndef NO_ABC_SUPPORT
 #include <regex.h>
 #endif
 
@@ -60,10 +60,10 @@ char data_key[MAX_DATA_LEN];
 char data_value[MAX_DATA_LEN]; // ditto as above
 
 //----------------------------------------------------------------------------
-// PaeInput
+// AbcInput
 //----------------------------------------------------------------------------
 
-PaeInput::PaeInput(Doc *doc, std::string filename)
+AbcInput::AbcInput(Doc *doc, std::string filename)
     : // This is pretty bad. We open a bad fileoinputstream as we don't use it
     FileInputStream(doc)
 {
@@ -75,15 +75,15 @@ PaeInput::PaeInput(Doc *doc, std::string filename)
     m_is_in_chord = false;
 }
 
-PaeInput::~PaeInput()
+AbcInput::~AbcInput()
 {
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-bool PaeInput::ImportFile()
+bool AbcInput::ImportFile()
 {
-#ifndef NO_PAE_SUPPORT
+#ifndef NO_ABC_SUPPORT
     std::ifstream infile;
     infile.open(m_filename.c_str());
     parsePlainAndEasy(infile);
@@ -94,9 +94,9 @@ bool PaeInput::ImportFile()
 #endif
 }
 
-bool PaeInput::ImportString(std::string const &pae)
+bool AbcInput::ImportString(std::string const &pae)
 {
-#ifndef NO_PAE_SUPPORT
+#ifndef NO_ABC_SUPPORT
     std::istringstream in_stream(pae);
     parsePlainAndEasy(in_stream);
     return true;
@@ -106,14 +106,14 @@ bool PaeInput::ImportString(std::string const &pae)
 #endif
 }
 
-#ifndef NO_PAE_SUPPORT
+#ifndef NO_ABC_SUPPORT
 
 //////////////////////////////
 //
 // parsePlainAndEasy --
 //
 
-void PaeInput::parsePlainAndEasy(std::istream &infile)
+void AbcInput::parsePlainAndEasy(std::istream &infile)
 {
     // buffers
     char c_clef[1024] = { 0 };
@@ -447,7 +447,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 // getOctave --
 //
 #define BASE_OCT 4
-int PaeInput::getOctave(const char *incipit, char *octave, int index)
+int AbcInput::getOctave(const char *incipit, char *octave, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -475,7 +475,7 @@ int PaeInput::getOctave(const char *incipit, char *octave, int index)
 // getDuration --
 //
 
-int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot, int index)
+int AbcInput::getDuration(const char *incipit, data_DURATION *duration, int *dot, int index)
 {
 
     int i = index;
@@ -520,7 +520,7 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
 // getDurations --
 //
 
-int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index)
+int AbcInput::getDurations(const char *incipit, pae::Measure *measure, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -554,7 +554,7 @@ int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index
 // getAccidental --
 //
 
-int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accident, int index)
+int AbcInput::getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accident, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -584,7 +584,7 @@ int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accid
 // getTupletOrFermata --
 //
 
-int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
+int AbcInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -669,7 +669,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 // getTupletFermataEnd --
 //
 // this can be deleted in the future?
-int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int index)
+int AbcInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
     // int length = strlen(incipit);
@@ -685,7 +685,7 @@ int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int inde
 // getGraceNote --
 //
 
-int PaeInput::getGraceNote(const char *incipit, pae::Note *note, int index)
+int AbcInput::getGraceNote(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -717,7 +717,7 @@ int PaeInput::getGraceNote(const char *incipit, pae::Note *note, int index)
 // getPitch --
 //
 
-data_PITCHNAME PaeInput::getPitch(char c_note)
+data_PITCHNAME AbcInput::getPitch(char c_note)
 {
     data_PITCHNAME pitch = PITCHNAME_c;
 
@@ -740,7 +740,7 @@ data_PITCHNAME PaeInput::getPitch(char c_note)
 // getTimeInfo -- read the key signature.
 //
 
-int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, int index)
+int AbcInput::getTimeInfo(const char *incipit, MeterSig *meter, int index)
 {
     int i = index;
     int length = (int)strlen(incipit);
@@ -818,7 +818,7 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, int index)
 // getClefInfo -- read the key signature.
 //
 
-int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
+int AbcInput::getClefInfo(const char *incipit, Clef *mclef, int index)
 {
     // a clef is maximum 3 character length
     // go through the 3 character and retrieve the letter (clef) and the line
@@ -872,7 +872,7 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
 // getWholeRest -- read the getWholeRest.
 //
 
-int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
+int AbcInput::getWholeRest(const char *incipit, int *wholerest, int index)
 {
     int length = (int)strlen(incipit);
     int i = index;
@@ -901,23 +901,23 @@ int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
  BARRENDITION_dbl        ||
  */
 
-int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int index)
+int AbcInput::getBarLine(const char *incipit, data_BARRENDITION *output, int index)
 {
     regex_t re;
 
-    regcomp(&re, "^://:", REG_EXTENDED);
+    regcomp(&re, "^:||:", REG_EXTENDED);
     int is_barline_rptboth = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
 
-    regcomp(&re, "^://", REG_EXTENDED);
+    regcomp(&re, "^:|", REG_EXTENDED);
     int is_barline_rptend = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
 
-    regcomp(&re, "^//:", REG_EXTENDED);
+    regcomp(&re, "^|:", REG_EXTENDED);
     int is_barline_rptstart = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
 
-    regcomp(&re, "^//", REG_EXTENDED);
+    regcomp(&re, "^||", REG_EXTENDED);
     int is_barline_dbl = regexec(&re, incipit + index, 0, NULL, 0);
     regfree(&re);
 
@@ -950,7 +950,7 @@ int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int ind
 // getAbbreviation -- read abbreviation
 //
 
-int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int index)
+int AbcInput::getAbbreviation(const char *incipit, pae::Measure *measure, int index)
 {
     int length = (int)strlen(incipit);
     int i = index;
@@ -978,7 +978,7 @@ int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int in
 // getKeyInfo -- read the key signature.
 //
 
-int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
+int AbcInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 {
     int alt_nr = 0;
 
@@ -1018,7 +1018,7 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 // getNote --
 //
 
-int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measure, int index)
+int AbcInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measure, int index)
 {
     regex_t re;
     int oct;
@@ -1117,7 +1117,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
 // convertMeasure --
 //
 
-void PaeInput::convertMeasure(pae::Measure *measure)
+void AbcInput::convertMeasure(pae::Measure *measure)
 {
     if (measure->clef != NULL) {
         m_layer->AddChild(measure->clef);
@@ -1140,7 +1140,7 @@ void PaeInput::convertMeasure(pae::Measure *measure)
     m_measure->SetRight(measure->barLine);
 }
 
-void PaeInput::parseNote(pae::Note *note)
+void AbcInput::parseNote(pae::Note *note)
 {
 
     LayerElement *element;
@@ -1279,17 +1279,17 @@ void PaeInput::parseNote(pae::Note *note)
     }
 }
 
-void PaeInput::pushContainer(LayerElement *container)
+void AbcInput::pushContainer(LayerElement *container)
 {
     addLayerElement(container);
     m_nested_objects.push_back(container);
 }
 
-void PaeInput::popContainer()
+void AbcInput::popContainer()
 {
     // assert(m_nested_objects.size() > 0);
     if (m_nested_objects.size() == 0) {
-        LogError("PaeInput::popContainer: tried to pop an object from empty stack. Cross-measure objects (tuplets, "
+        LogError("AbcInput::popContainer: tried to pop an object from empty stack. Cross-measure objects (tuplets, "
                  "beams) are not supported.");
     }
     else {
@@ -1297,7 +1297,7 @@ void PaeInput::popContainer()
     }
 }
 
-void PaeInput::addLayerElement(LayerElement *element)
+void AbcInput::addLayerElement(LayerElement *element)
 {
     if (m_nested_objects.size() > 0) {
         m_nested_objects.back()->AddChild(element);
@@ -1318,7 +1318,7 @@ void PaeInput::addLayerElement(LayerElement *element)
 //   only one per line
 //
 
-void PaeInput::getAtRecordKeyValue(char *key, char *value, const char *input)
+void AbcInput::getAtRecordKeyValue(char *key, char *value, const char *input)
 {
 
 #define SKIPSPACE                                                                                                      \
@@ -1326,7 +1326,7 @@ void PaeInput::getAtRecordKeyValue(char *key, char *value, const char *input)
         index++;                                                                                                       \
     }
 
-    char MARKER = '@';
+    char MARKER = 'K';
     char SEPARATOR = ':';
     char EMPTY = '\0';
 
@@ -1344,10 +1344,10 @@ void PaeInput::getAtRecordKeyValue(char *key, char *value, const char *input)
     char ch;
     int index = 0;
 
-    // find starting @ symbol (ignoring any starting space)
+    // find starting K (ignoring any starting space)
     SKIPSPACE
     if (input[index] != MARKER) {
-        // invalid record format since it does not start with @
+        // invalid record format since it does not start with K
         return;
     }
     index++;
@@ -1391,6 +1391,6 @@ void PaeInput::getAtRecordKeyValue(char *key, char *value, const char *input)
     }
 }
 
-#endif // NO_PAE_SUPPORT
+#endif // NO_ABC_SUPPORT
 
 } // namespace vrv
