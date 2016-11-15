@@ -1325,7 +1325,16 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
         DrawSmuflCode(dc, xNote, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
 
-        if (!(inBeam && drawingDur > DUR_4) && !inFTrem && !inChord) {
+        // Stemless note (@stem.len="0")
+        if (note->HasStemLen() && note->GetStemLen() == 0) {
+            // Store the start and end values
+            StemmedDrawingInterface *interface = note->GetStemmedDrawingInterface();
+            assert(interface);
+            interface->SetDrawingStemStart(Point(xStem, noteY));
+            interface->SetDrawingStemEnd(Point(xStem, noteY));
+            interface->SetDrawingStemDir(note->GetDrawingStemDir());
+        }
+        else if (!(inBeam && drawingDur > DUR_4) && !inFTrem && !inChord) {
             DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
         }
     }
