@@ -1,5 +1,7 @@
 var NAVTREEINDEX9 =
 {
+"classvrv_1_1_toolkit.html#ae9f3a2ee4ec7dbf8764c3dc7c58adbc8":[0,0,0,172,28],
+"classvrv_1_1_toolkit.html#aed5c67aae6d92d7c8d1d68edf5a5ae65":[0,0,0,172,60],
 "classvrv_1_1_toolkit.html#aeda33e694a8e690ab4c8e790690b8083":[0,0,0,172,5],
 "classvrv_1_1_toolkit.html#af24ccae4968a35e71b5fd82b70ee086c":[0,0,0,172,19],
 "classvrv_1_1_toolkit.html#af7f2364ddf6649f9272d80a770c5a570":[0,0,0,172,40],
@@ -195,14 +197,14 @@ var NAVTREEINDEX9 =
 "ending_8h_source.html":[1,0,23],
 "files.html":[1,0],
 "floatingobject_8h_source.html":[1,0,24],
-"functions.html":[0,3,0,0],
 "functions.html":[0,3,0],
+"functions.html":[0,3,0,0],
 "functions_c.html":[0,3,0,1],
 "functions_d.html":[0,3,0,2],
 "functions_e.html":[0,3,0,3],
 "functions_f.html":[0,3,0,4],
-"functions_func.html":[0,3,1,0],
 "functions_func.html":[0,3,1],
+"functions_func.html":[0,3,1,0],
 "functions_func_c.html":[0,3,1,1],
 "functions_func_d.html":[0,3,1,2],
 "functions_func_e.html":[0,3,1,3],
@@ -247,7 +249,5 @@ var NAVTREEINDEX9 =
 "iohumdrum_8h_source.html":[1,0,31],
 "iomei_8h_source.html":[1,0,32],
 "iomusxml_8h_source.html":[1,0,33],
-"keysig_8h_source.html":[1,0,34],
-"layer_8h_source.html":[1,0,35],
-"layerelement_8h_source.html":[1,0,36]
+"keysig_8h_source.html":[1,0,34]
 };

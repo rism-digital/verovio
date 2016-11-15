@@ -355,104 +355,105 @@ $(document).ready(function(){initNavTree('iohumdrum_8h_source.html','');});
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    <span class="keywordtype">void</span> setLocationId(<a class="code" href="classvrv_1_1_object.html">vrv::Object</a> *<span class="keywordtype">object</span>, hum::HTp token, <span class="keywordtype">int</span> subtoken);</div>
 <div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    <span class="keywordtype">void</span> addMidiTempo(<a class="code" href="classvrv_1_1_score_def.html">vrv::ScoreDef</a> &amp;m_scoreDef, hum::HTp kernpart);</div>
 <div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keywordtype">void</span> addInstrumentDefinition(<a class="code" href="classvrv_1_1_staff_def.html">vrv::StaffDef</a> *staffdef, hum::HTp partstart);</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="comment">// header related functions: ///////////////////////////////////////////</span></div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="keywordtype">void</span> createHeader(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordtype">void</span> insertTitle(pugi::xml_node &amp;titleStmt, <span class="keyword">const</span> vector&lt;hum::HumdrumLine *&gt; &amp;references);</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="keywordtype">void</span> insertExtMeta(vector&lt;hum::HumdrumLine *&gt; &amp;references);</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keywordtype">void</span> addPerson(vector&lt;vector&lt;string&gt; &gt; &amp;respPeople, vector&lt;hum::HumdrumLine *&gt; &amp;references, <span class="keyword">const</span> <span class="keywordtype">string</span> &amp;key,</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">string</span> &amp;role);</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordtype">void</span> getRespPeople(vector&lt;vector&lt;string&gt; &gt; &amp;respPeople, vector&lt;hum::HumdrumLine *&gt; &amp;references);</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keywordtype">void</span> insertRespStmt(pugi::xml_node &amp;titleStmt, vector&lt;vector&lt;string&gt; &gt; &amp;respPeople);</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;</div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> PARENT, <span class="keyword">class</span> CHILD&gt; <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_humdrum_input.html#aebdd0f0aabbcd60b1676a90f718490cd">appendElement</a>(PARENT parent, CHILD child);</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> ELEMENT&gt; <span class="keywordtype">void</span> convertRhythm(ELEMENT element, hum::HTp token, <span class="keywordtype">int</span> subtoken = -1);</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> ELEMENT&gt; hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;</div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> ELEMENT&gt; <span class="keywordtype">void</span> setStaff(ELEMENT element, <span class="keywordtype">int</span> staffnum);</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;</div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> CHILD&gt; <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_humdrum_input.html#aebdd0f0aabbcd60b1676a90f718490cd">appendElement</a>(<span class="keyword">const</span> vector&lt;string&gt; &amp;name, <span class="keyword">const</span> vector&lt;void *&gt; &amp;pointers, CHILD child);</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> ELEMENT&gt; <span class="keywordtype">void</span> addTextElement(ELEMENT *element, <span class="keyword">const</span> <span class="keywordtype">string</span> &amp;content);</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">string</span> <a class="code" href="classvrv_1_1_humdrum_input.html#ad1c249101a3f89a9a64bdaa35cc2ab0a">unescapeHtmlEntities</a>(<span class="keyword">const</span> <span class="keywordtype">string</span> &amp;input);</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> WriteUTF8(std::ostream &amp;Out, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> Ch);</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> UnquoteHTML(std::istream &amp;In, std::ostream &amp;Out);</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="keyword">static</span> hum::HumNum removeFactorsOfTwo(hum::HumNum value, <span class="keywordtype">int</span> &amp;tcount, <span class="keywordtype">int</span> &amp;bcount);</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span> getDotPowerOfTwo(hum::HumNum value);</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span> nextLowerPowerOfTwo(<span class="keywordtype">int</span> x);</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">string</span> getDateString(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">string</span> getReferenceValue(<span class="keyword">const</span> <span class="keywordtype">string</span> &amp;key, vector&lt;hum::HumdrumLine *&gt; &amp;references);</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    std::string m_filename; <span class="comment">// Filename to read/was read.</span></div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="comment">// m_debug == mostly for printing MEI data to standard input.</span></div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <span class="keywordtype">int</span> m_debug;</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;    <span class="comment">// m_comment == Display **kern data embedded in comments for each</span></div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="comment">// staff layer.</span></div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    <span class="keywordtype">int</span> m_comment;</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <span class="comment">// m_doc is inherited root document object.</span></div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    <span class="comment">// m_score stores the music</span></div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <a class="code" href="classvrv_1_1_score.html">Score</a> *m_score;</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;    <span class="comment">// m_sections stores segments of the music</span></div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    vector&lt;Section *&gt; m_sections;</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="comment">// State variables for doing the conversion without having to pass</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="comment">// these variables as parameters:</span></div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    <a class="code" href="classvrv_1_1_staff_grp.html">vrv::StaffGrp</a> *m_staffgroup; <span class="comment">// information about parts</span></div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    vector&lt;vrv::StaffDef *&gt; m_staffdef; <span class="comment">// information about a staff</span></div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    vector&lt;vrv::Measure *&gt; m_measures;</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <a class="code" href="classvrv_1_1_measure.html">vrv::Measure</a> *m_measure; <span class="comment">// current measure, or NULL</span></div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <a class="code" href="classvrv_1_1_staff.html">vrv::Staff</a> *m_staff; <span class="comment">// current staff, or NULL</span></div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <span class="keywordtype">int</span> m_currentstaff;</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    <a class="code" href="classvrv_1_1_layer.html">vrv::Layer</a> *m_layer; <span class="comment">// current layer, or NULL</span></div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    <span class="keywordtype">int</span> m_currentlayer;</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;    <span class="comment">// m_layertokens == Humdrum **kern tokens for each staff/layer to be</span></div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="comment">// converted.</span></div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    vector&lt;vector&lt;vector&lt;hum::HTp&gt; &gt; &gt; m_layertokens;</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    <span class="comment">// m_kernspines == list of tracks in Humdrum file being parsed which</span></div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="comment">// contain **kern data.</span></div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    vector&lt;hum::HTp&gt; m_kernstarts;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;    <span class="comment">// m_rkern == reverse listing of staff to Humdrum file track.</span></div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    vector&lt;int&gt; m_rkern;</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;</div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;    <span class="comment">// m_infile == Humdrum file used for conversion.</span></div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    hum::HumdrumFile m_infile;</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;    <span class="comment">// m_timesigdurs == Prevailing time signature duration of measure</span></div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    vector&lt;hum::HumNum&gt; m_timesigdurs;</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    <span class="comment">// m_tupletscaling == tuplet-scaling factor for the current note.</span></div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    hum::HumNum m_tupletscaling;</div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    <span class="comment">// m_omd == temporary variable for printing tempo designation.</span></div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    <span class="keywordtype">bool</span> m_omd;</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;    <span class="comment">// m_oclef == temporary variable for printing &quot;original-clef&quot; &lt;app&gt;</span></div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    vector&lt;std::pair&lt;int, hum::HTp&gt; &gt; m_oclef;</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="comment">// m_staffstates == state variables for each staff.</span></div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    vector&lt;humaux::StaffStateVariables&gt; m_staffstates;</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* NO_HUMDRUM_SUPPORT */</span><span class="preprocessor"></span></div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;};</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;} <span class="comment">// namespace vrv</span></div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;<span class="preprocessor">#endif // __VRV_IOHUMDRUM_H__</span></div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordtype">void</span> addOrnamentMarkers(hum::HTp token);</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="comment">// header related functions: ///////////////////////////////////////////</span></div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordtype">void</span> createHeader(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="keywordtype">void</span> insertTitle(pugi::xml_node &amp;titleStmt, <span class="keyword">const</span> vector&lt;hum::HumdrumLine *&gt; &amp;references);</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    <span class="keywordtype">void</span> insertExtMeta(vector&lt;hum::HumdrumLine *&gt; &amp;references);</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="keywordtype">void</span> addPerson(vector&lt;vector&lt;string&gt; &gt; &amp;respPeople, vector&lt;hum::HumdrumLine *&gt; &amp;references, <span class="keyword">const</span> <span class="keywordtype">string</span> &amp;key,</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;        <span class="keyword">const</span> <span class="keywordtype">string</span> &amp;role);</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keywordtype">void</span> getRespPeople(vector&lt;vector&lt;string&gt; &gt; &amp;respPeople, vector&lt;hum::HumdrumLine *&gt; &amp;references);</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="keywordtype">void</span> insertRespStmt(pugi::xml_node &amp;titleStmt, vector&lt;vector&lt;string&gt; &gt; &amp;respPeople);</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> PARENT, <span class="keyword">class</span> CHILD&gt; <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_humdrum_input.html#aebdd0f0aabbcd60b1676a90f718490cd">appendElement</a>(PARENT parent, CHILD child);</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> ELEMENT&gt; <span class="keywordtype">void</span> convertRhythm(ELEMENT element, hum::HTp token, <span class="keywordtype">int</span> subtoken = -1);</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> ELEMENT&gt; hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;</div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> ELEMENT&gt; <span class="keywordtype">void</span> setStaff(ELEMENT element, <span class="keywordtype">int</span> staffnum);</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;</div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> CHILD&gt; <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_humdrum_input.html#aebdd0f0aabbcd60b1676a90f718490cd">appendElement</a>(<span class="keyword">const</span> vector&lt;string&gt; &amp;name, <span class="keyword">const</span> vector&lt;void *&gt; &amp;pointers, CHILD child);</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    <span class="keyword">template</span> &lt;<span class="keyword">class</span> ELEMENT&gt; <span class="keywordtype">void</span> addTextElement(ELEMENT *element, <span class="keyword">const</span> <span class="keywordtype">string</span> &amp;content);</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">string</span> <a class="code" href="classvrv_1_1_humdrum_input.html#ad1c249101a3f89a9a64bdaa35cc2ab0a">unescapeHtmlEntities</a>(<span class="keyword">const</span> <span class="keywordtype">string</span> &amp;input);</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> WriteUTF8(std::ostream &amp;Out, <span class="keywordtype">unsigned</span> <span class="keywordtype">int</span> Ch);</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">void</span> UnquoteHTML(std::istream &amp;In, std::ostream &amp;Out);</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;    <span class="keyword">static</span> hum::HumNum removeFactorsOfTwo(hum::HumNum value, <span class="keywordtype">int</span> &amp;tcount, <span class="keywordtype">int</span> &amp;bcount);</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span> getDotPowerOfTwo(hum::HumNum value);</div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">int</span> nextLowerPowerOfTwo(<span class="keywordtype">int</span> x);</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">string</span> getDateString(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">string</span> getReferenceValue(<span class="keyword">const</span> <span class="keywordtype">string</span> &amp;key, vector&lt;hum::HumdrumLine *&gt; &amp;references);</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    std::string m_filename; <span class="comment">// Filename to read/was read.</span></div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <span class="comment">// m_debug == mostly for printing MEI data to standard input.</span></div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;    <span class="keywordtype">int</span> m_debug;</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;    <span class="comment">// m_comment == Display **kern data embedded in comments for each</span></div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;    <span class="comment">// staff layer.</span></div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;    <span class="keywordtype">int</span> m_comment;</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    <span class="comment">// m_doc is inherited root document object.</span></div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="comment">// m_score stores the music</span></div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <a class="code" href="classvrv_1_1_score.html">Score</a> *m_score;</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;    <span class="comment">// m_sections stores segments of the music</span></div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;    vector&lt;Section *&gt; m_sections;</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;    <span class="comment">// State variables for doing the conversion without having to pass</span></div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;    <span class="comment">// these variables as parameters:</span></div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;    <a class="code" href="classvrv_1_1_staff_grp.html">vrv::StaffGrp</a> *m_staffgroup; <span class="comment">// information about parts</span></div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    vector&lt;vrv::StaffDef *&gt; m_staffdef; <span class="comment">// information about a staff</span></div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    vector&lt;vrv::Measure *&gt; m_measures;</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    <a class="code" href="classvrv_1_1_measure.html">vrv::Measure</a> *m_measure; <span class="comment">// current measure, or NULL</span></div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    <a class="code" href="classvrv_1_1_staff.html">vrv::Staff</a> *m_staff; <span class="comment">// current staff, or NULL</span></div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;    <span class="keywordtype">int</span> m_currentstaff;</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;    <a class="code" href="classvrv_1_1_layer.html">vrv::Layer</a> *m_layer; <span class="comment">// current layer, or NULL</span></div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;    <span class="keywordtype">int</span> m_currentlayer;</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="comment">// m_layertokens == Humdrum **kern tokens for each staff/layer to be</span></div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="comment">// converted.</span></div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    vector&lt;vector&lt;vector&lt;hum::HTp&gt; &gt; &gt; m_layertokens;</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;    <span class="comment">// m_kernspines == list of tracks in Humdrum file being parsed which</span></div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;    <span class="comment">// contain **kern data.</span></div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;    vector&lt;hum::HTp&gt; m_kernstarts;</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="comment">// m_rkern == reverse listing of staff to Humdrum file track.</span></div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    vector&lt;int&gt; m_rkern;</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    <span class="comment">// m_infile == Humdrum file used for conversion.</span></div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;    hum::HumdrumFile m_infile;</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;    <span class="comment">// m_timesigdurs == Prevailing time signature duration of measure</span></div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;    vector&lt;hum::HumNum&gt; m_timesigdurs;</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <span class="comment">// m_tupletscaling == tuplet-scaling factor for the current note.</span></div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;    hum::HumNum m_tupletscaling;</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;    <span class="comment">// m_omd == temporary variable for printing tempo designation.</span></div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;    <span class="keywordtype">bool</span> m_omd;</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    <span class="comment">// m_oclef == temporary variable for printing &quot;original-clef&quot; &lt;app&gt;</span></div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;    vector&lt;std::pair&lt;int, hum::HTp&gt; &gt; m_oclef;</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="comment">// m_staffstates == state variables for each staff.</span></div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;    vector&lt;humaux::StaffStateVariables&gt; m_staffstates;</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="preprocessor">#endif </span><span class="comment">/* NO_HUMDRUM_SUPPORT */</span><span class="preprocessor"></span></div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;};</div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;</div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;} <span class="comment">// namespace vrv</span></div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;<span class="preprocessor">#endif // __VRV_IOHUMDRUM_H__</span></div>
 <div class="ttc" id="classvrv_1_1_staff_grp_html"><div class="ttname"><a href="classvrv_1_1_staff_grp.html">vrv::StaffGrp</a></div><div class="ttdoc">This class represents a MEI staffGrp. </div><div class="ttdef"><b>Definition:</b> scoredef.h:212</div></div>
 <div class="ttc" id="classvrv_1_1_staff_def_html"><div class="ttname"><a href="classvrv_1_1_staff_def.html">vrv::StaffDef</a></div><div class="ttdoc">This class represents a MEI staffDef. </div><div class="ttdef"><b>Definition:</b> scoredef.h:265</div></div>
 <div class="ttc" id="classvrv_1_1_score_def_html"><div class="ttname"><a href="classvrv_1_1_score_def.html">vrv::ScoreDef</a></div><div class="ttdoc">This class represents a MEI scoreDef. </div><div class="ttdef"><b>Definition:</b> scoredef.h:109</div></div>
@@ -476,7 +477,7 @@ $(document).ready(function(){initNavTree('iohumdrum_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>iohumdrum.h</b></li>
-    <li class="footer">Generated on Fri Oct 14 2016 13:38:36 by
+    <li class="footer">Generated on Tue Nov 15 2016 19:26:12 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

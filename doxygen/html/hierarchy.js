@@ -45,10 +45,13 @@ var hierarchy =
       [ "vrv::Clef", "classvrv_1_1_clef.html", null ]
     ] ],
     [ "AttColor", null, [
+      [ "vrv::Accid", "classvrv_1_1_accid.html", null ],
       [ "vrv::BeatRpt", "classvrv_1_1_beat_rpt.html", null ],
       [ "vrv::Hairpin", "classvrv_1_1_hairpin.html", null ],
+      [ "vrv::Note", "classvrv_1_1_note.html", null ],
       [ "vrv::Octave", "classvrv_1_1_octave.html", null ],
       [ "vrv::Pedal", "classvrv_1_1_pedal.html", null ],
+      [ "vrv::Rend", "classvrv_1_1_rend.html", null ],
       [ "vrv::Rest", "classvrv_1_1_rest.html", null ],
       [ "vrv::Slur", "classvrv_1_1_slur.html", null ],
       [ "vrv::Tie", "classvrv_1_1_tie.html", null ],
@@ -290,6 +293,7 @@ var hierarchy =
         [ "vrv::Accid", "classvrv_1_1_accid.html", null ],
         [ "vrv::Custos", "classvrv_1_1_custos.html", null ],
         [ "vrv::Dot", "classvrv_1_1_dot.html", null ],
+        [ "vrv::MRest", "classvrv_1_1_m_rest.html", null ],
         [ "vrv::Rest", "classvrv_1_1_rest.html", null ]
       ] ]
     ] ],
