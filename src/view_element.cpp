@@ -778,7 +778,7 @@ void View::DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *
     }
 }
 
-void View::DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(element);
@@ -859,7 +859,7 @@ void View::DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, S
             DrawSmuflCode(dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false);
         }
     }
-    else if ((element->Is() == MREST) || (element->Is() == MREST)) {
+    else if ((element->Is() == REST) || (element->Is() == MREST)) {
         if (place == PLACE_above) {
             y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             DrawSmuflCode(dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);
@@ -1019,7 +1019,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     DrawRestWhole(dc, xCentered, y, DUR_1, 0, false, staff);
 
     if (mRest->GetFermata() != PLACE_NONE) {
-        DrawFermata(dc, element, layer, staff, measure);
+        DrawFermataAttr(dc, element, layer, staff, measure);
     }
 
     dc->EndGraphic(element, this);
@@ -1379,7 +1379,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (!inChord) DrawLayerChildren(dc, note, layer, staff, measure);
 
     if (note->GetFermata() != PLACE_NONE) {
-        DrawFermata(dc, element, layer, staff, measure);
+        DrawFermataAttr(dc, element, layer, staff, measure);
     }
 
     if (note->m_embellishment == EMB_TRILL) {
@@ -1423,7 +1423,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     if (rest->GetFermata() != PLACE_NONE) {
-        DrawFermata(dc, element, layer, staff, measure);
+        DrawFermataAttr(dc, element, layer, staff, measure);
     }
 }
 
