@@ -1216,9 +1216,9 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
 
     if (!current->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
-        assert(false); // quite drastic but this should never happen. If nothing has to be drawn
         LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
-        // then the BB should be set to empty with  Object::SetEmptyBB()
+        assert(false); // quite drastic but this should never happen. If nothing has to be drawn
+        				// then the BB should be set to empty with  Object::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
 
@@ -1230,6 +1230,7 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    //LogDebug("SetBoundingBoxXShift: '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
     // The negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset

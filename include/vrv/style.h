@@ -102,7 +102,7 @@ namespace vrv {
 #define MAX_LEFT_MARGIN_DEFAULT 10.0
 
 #define DEFAULT_LEFT_MARGIN_ACCID 1.0
-#define DEFAULT_LEFT_MARGIN_BARLINE DEFAULT_LEFT_MARGIN_DEFAULT
+#define DEFAULT_LEFT_MARGIN_BARLINE 1.0
 #define DEFAULT_LEFT_MARGIN_BARLINE_ATTR_LEFT 0.0
 #define DEFAULT_LEFT_MARGIN_BARLINE_ATTR_RIGHT 1.0
 #define DEFAULT_LEFT_MARGIN_BEATRPT 2.0
@@ -184,11 +184,11 @@ namespace vrv {
 // Vertical position of center of mensuration sign as distance below top of the staff
 #define MSIGN_STAFFLINES_BELOW_TOP 2.0
 // Size of dot inside mensuration signs relative to space between staff lines
-#define MSIGN_DOT_DIAM 0.4
+#define MSIGN_DOT_DIAM 0.5
 // Relative size of figures in proportions
-#define PROPRT_SIZE_FACTOR 1.0
+#define PROPRT_SIZE_FACTOR 0.5
 // Linewidth for staff lines in mensural notation, rel. to "normal" width of staff lines */
-#define MENSURAL_LINEWIDTH_FACTOR 1.0
+#define MENSURAL_LINEWIDTH_FACTOR 0.5
 
 /**
  * This class contains the document default environment variables.

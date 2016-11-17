@@ -888,7 +888,7 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 
     // For clef changes, do not take into account the interval so we keep them left aligned
     // This is not perfect because the previous time is the one of the previous aligner and
-    // there is maybe space between the last note and the clef on their layer
+    // there may be space between the last note and the clef on their layer.
     if (this->m_type == ALIGNMENT_CLEF) intervalTime = 0.0;
 
     if (intervalTime > 0.0) {

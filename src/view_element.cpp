@@ -666,13 +666,13 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // mensural clefs
     if (isMensural) {
         if (staff->m_drawingNotationType == NOTATIONTYPE_mensural_black) {
-            // ??AS SOON AS PLAINCHANT CLEFS ARE AVAILABLE, USE THEM HERE!
             if (sym == SMUFL_E050_gClef)
+                 // G clef doesn't exist in black notation, so should never get here, but just in case.
                 sym = SMUFL_E901_mensuralGclefPetrucci;
             else if (sym == SMUFL_E05C_cClef)
-                sym = SMUFL_E909_mensuralCclefPetrucciPosMiddle;    // ??WANT E906_chantCclef
+                sym = SMUFL_E906_chantCclef;
             else if (sym == SMUFL_E062_fClef)
-                sym = SMUFL_E904_mensuralFclefPetrucci;    // ??WANT E902_chantFclef
+                sym = SMUFL_E902_chantFclef;
         }
         else {
             if (sym == SMUFL_E050_gClef)
