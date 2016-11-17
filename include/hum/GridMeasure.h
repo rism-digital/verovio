@@ -18,7 +18,6 @@
 #define _GRIDMEASURE_H
 
 #include "humlib.h"
-#include "GridSlice.h"
 
 #include <list>
 
@@ -27,18 +26,26 @@ using namespace std;
 
 namespace hum {
 
+class GridSlice;
+class HumGrid;
 
 class GridMeasure : public list<GridSlice*> {
 	public:
 		GridMeasure(HumGrid* owner);
 		~GridMeasure();
 
-		bool transferTokens    (HumdrumFile& outfile, bool recip);
-		HumGrid* getOwner    (void);
-		void     setOwner    (HumGrid* owner);
+		bool         transferTokens (HumdrumFile& outfile, bool recip);
+		HumGrid*     getOwner       (void);
+		void         setOwner       (HumGrid* owner);
+		HumNum       getDuration    (void);
+		void         setDuration    (HumNum duration);
+		HumNum       getTimestamp   (void);
+		void         setTimestamp   (HumNum timestamp);
 
 	private:
 		HumGrid* m_owner;
+		HumNum   m_duration;
+		HumNum   m_timestamp;
 };
 
 

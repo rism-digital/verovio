@@ -74,7 +74,10 @@ void MxmlEvent::clear(void) {
 	m_eventtype = mevent_unknown;
 	m_owner = NULL;
 	m_linked = false;
-	m_voice = m_staff = 0;
+	m_voice = -1;
+	m_staff = 0;
+	m_invisible = false;
+	m_voiceindex = -1;
 	m_sequence = -1;
 	for (int i=0; i<(int)m_links.size(); i++) {
 		delete m_links[i];
@@ -88,20 +91,25 @@ void MxmlEvent::clear(void) {
 ///////////////////////////////
 //
 // MxmlEvent::makeDummyRest --
+//   default values:
+//     staffindex = 0;
+//     voiceindex = 0;
 //
 
-void MxmlEvent::makeDummyRest(MxmlMeasure* owner, HumNum starttime, HumNum duration) {
+void MxmlEvent::makeDummyRest(MxmlMeasure* owner, HumNum starttime,
+		HumNum duration, int staffindex, int voiceindex) {
 	m_starttime = starttime;
 	m_duration = duration;
-	m_eventtype = mevent_forward;
+	m_eventtype = mevent_forward;  // not a real rest (will be invisible)
 	// m_node remains null
 	// m_links remains empty
 	m_linked = false;
 	m_sequence = -m_counter;
 	m_counter++;
-	m_voice = 1;
-	m_staff = 1;  // need to add multiple events, one for each staff in the part.
-	m_maxstaff = 1;
+	m_voice = 1;  // don't know what the original voice number is
+	m_voiceindex = voiceindex;
+	m_staff = staffindex + 1;
+	m_maxstaff = m_staff;  // how is this used/set?
 	//	m_hnode remains null
 }
 
@@ -375,9 +383,9 @@ void MxmlEvent::attachToLastEvent(void) {
 
 //////////////////////////////
 //
-// MxmlEvent::link --  This function is used to link secondary 
+// MxmlEvent::link --  This function is used to link secondary
 //   elements to a primary one.  Currently only used for chord notes.
-//   The first note of a chord will be stored in event lists, and 
+//   The first note of a chord will be stored in event lists, and
 //   secondary notes will be suppressed from the list and instead
 //   accessed through the m_links structure.
 //
@@ -415,7 +423,7 @@ bool MxmlEvent::isLinked(void) const {
 
 //////////////////////////////
 //
-// MxmlEvent::isRest -- 
+// MxmlEvent::isRest --
 //
 
 bool MxmlEvent::isRest(void) {
@@ -478,6 +486,23 @@ bool MxmlEvent::isGrace(void) {
 
 //////////////////////////////
 //
+// MxmlEvent::isFloating -- For a harmony or basso continuo item
+//     which is not attached to a note onset.
+//
+
+bool MxmlEvent::isFloating(void) {
+	xml_node empty = xml_node(NULL);
+	if (m_node == empty && (m_hnode != empty)) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
 // MxmlEvent::getLinkedNotes --
 //
 
@@ -504,8 +529,8 @@ void MxmlEvent::printEvent(void) const {
 
 //////////////////////////////
 //
-// MxmlEvent::getSequenceNumber -- Return the sequence number of the 
-//   event in the input data file.  Useful for sorting items which 
+// MxmlEvent::getSequenceNumber -- Return the sequence number of the
+//   event in the input data file.  Useful for sorting items which
 //   occur at the same time.
 //
 
@@ -532,6 +557,17 @@ int MxmlEvent::getVoiceNumber(void) const {
 
 //////////////////////////////
 //
+// MxmlEvent::setVoiceIndex --
+//
+
+void MxmlEvent::setVoiceIndex(int index) {
+	m_voiceindex = index;
+}
+
+
+
+//////////////////////////////
+//
 // MxmlEvent::getVoiceIndex -- Return the voice number of the event.
 //    But mod 4 which presumably sets the voice number on a staff.
 //    This is not always true: "PrintMusic 2010 for Windows" may
@@ -544,12 +580,26 @@ int MxmlEvent::getVoiceNumber(void) const {
 //
 
 int MxmlEvent::getVoiceIndex(int maxvoice) const {
+	if (m_voiceindex >= 0) {
+		return m_voiceindex;
+	}
+
 	if (m_owner) {
 		int voiceindex = m_owner->getVoiceIndex(m_voice);
 		if (voiceindex >= 0) {
 			return voiceindex;
 		}
 	}
+
+	// the following case handles notes/rests which do not contain
+	// a voice number.  Assume that this item should be placed
+	// in the first voice.
+	if (m_voiceindex < 0) {
+		if (nodeType(m_node, "note")) {
+			return 0;
+		}
+	}
+
 
 	// don't know what the voice mapping is, so make one up:
 	if (maxvoice < 1) {
@@ -566,10 +616,35 @@ int MxmlEvent::getVoiceIndex(int maxvoice) const {
 
 //////////////////////////////
 //
-// MxmlEvent::getStaffIndex -- 
+// MxmlEvent::forceInvisible --
+//
+
+void MxmlEvent::forceInvisible(void) {
+	m_invisible = true;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::isInvisible --
+//
+
+bool MxmlEvent::isInvisible(void) {
+	return m_invisible;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::getStaffIndex --
 //
 
 int MxmlEvent::getStaffIndex(void) const {
+	if (m_staff > 0) {
+		return m_staff - 1;
+	}
 	if (m_owner) {
 		int staffindex = m_owner->getStaffIndex(m_voice);
 		if (staffindex >= 0) {
@@ -611,7 +686,7 @@ void MxmlEvent::setStaffNumber(int value) {
 
 //////////////////////////////
 //
-// MxmlEvent::getStaffNumber -- 
+// MxmlEvent::getStaffNumber --
 //
 
 int MxmlEvent::getStaffNumber(void) const {
@@ -641,13 +716,14 @@ measure_event_type MxmlEvent::getType(void) const {
 //
 
 bool MxmlEvent::parseEvent(xpath_node el) {
-	return parseEvent(el.node());
+	return parseEvent(el.node(), xml_node(NULL));
 }
 
 
-bool MxmlEvent::parseEvent(xml_node el) {
+bool MxmlEvent::parseEvent(xml_node el, xml_node nextel) {
 	m_node = el;
 
+	bool floatingharmony = false;
 	if (nodeType(m_node, "attributes")) {
 		m_eventtype = mevent_attributes;
 	} else if (nodeType(m_node, "backup")) {
@@ -662,16 +738,24 @@ bool MxmlEvent::parseEvent(xml_node el) {
 		m_eventtype = mevent_figured_bass;
 	} else if (nodeType(m_node, "forward")) {
 		m_eventtype = mevent_forward;
+		m_staff = -1; // set default staff if not supplied
+		m_voice = -1; // set default staff if not supplied
 	} else if (nodeType(m_node, "grouping")) {
 		m_eventtype = mevent_grouping;
 	} else if (nodeType(m_node, "harmony")) {
 		m_eventtype = mevent_harmony;
+		if (!nodeType(nextel, "note")) {
+			// harmony is not attached to a note
+			floatingharmony = true;
+			m_staff = -1;
+			m_voice = -1;
+		}
 	} else if (nodeType(m_node, "link")) {
 		m_eventtype = mevent_link;
 	} else if (nodeType(m_node, "note")) {
 		m_eventtype = mevent_note;
-		m_staff = 1;
-		m_voice = 1;
+		m_staff = 1; // set default staff if not supplied
+		m_voice = -1; // set default staff if not supplied
 	} else if (nodeType(m_node, "print")) {
 		m_eventtype = mevent_print;
 	} else if (nodeType(m_node, "sound")) {
@@ -680,8 +764,8 @@ bool MxmlEvent::parseEvent(xml_node el) {
 		m_eventtype = mevent_unknown;
 	}
 
-	int tempvoice    = m_voice;
-	int tempstaff    = m_staff;
+	int tempstaff    = 1;
+	int tempvoice    = -1;
 	int tempduration = 0;
 
 	for (auto el = m_node.first_child(); el; el = el.next_sibling()) {
@@ -694,9 +778,40 @@ bool MxmlEvent::parseEvent(xml_node el) {
 		}
 	}
 
-	m_voice = (short)tempvoice;
-	m_staff = (short)tempstaff;
-   reportStaffNumberToOwner(m_staff, m_voice);
+	bool emptyvoice = false;
+	if (!floatingharmony) {
+		if (tempvoice < 0) {
+			emptyvoice = true;
+			if (nodeType(el, "note")) {
+				this->setVoiceIndex(0);
+			}
+		}
+	}
+
+	if (m_eventtype == mevent_forward) {
+		xml_node pel = el.previous_sibling();
+		if (nodeType(pel, "harmony")) {
+			// This is a spacer forward which is not in any voice/layer,
+			// so invalidate is staff/voice to prevent it from being
+			// converted to a rest.
+			m_voice = -1;
+			tempvoice = -1;
+			m_staff = -1;
+			tempstaff = -1;
+		}
+	}
+
+	if (tempvoice >= 0) {
+		m_voice = (short)tempvoice;
+	}
+	if (tempstaff > 0) {
+		m_staff = (short)tempstaff;
+	}
+	if (!emptyvoice) {
+   	reportStaffNumberToOwner(m_staff, m_voice);
+	} else {
+		// no voice child element, or not a note or rest.
+	}
 	HumNum timesigdur;
 
 	switch (m_eventtype) {
@@ -726,29 +841,41 @@ bool MxmlEvent::parseEvent(xml_node el) {
 			}
 			break;
 
+		case mevent_harmony:
 		case mevent_barline:
 		case mevent_bookmark:
 		case mevent_direction:
 		case mevent_figured_bass:
 		case mevent_grouping:
-		case mevent_harmony:
 		case mevent_link:
 		case mevent_print:
 		case mevent_sound:
 		case mevent_unknown:
 			setDuration(tempduration);
 			break;
+		case mevent_float:
+			// assigned later for floating harmony
+			break;
 	}
 
-	// if the previous sibling was a <harmony>, then store
-	// for later parsing.  May have to check even further back
-	// until another note or barline was found.
-	xml_node lastsib = el.previous_sibling();
-	if (!lastsib) {
-		return true;
-	}
-	if (nodeType(lastsib, "harmony")) {
-		m_hnode = lastsib;
+	if (floatingharmony) {
+		m_hnode = el;
+		m_eventtype = mevent_float;
+		m_duration = 0;
+		m_node = xml_node(NULL);
+		m_voice = 1;
+		m_voiceindex = 0;
+	} else {
+		// if the previous sibling was a <harmony>, then store
+		// for later parsing.  May have to check even further back
+		// until another note or barline was found.
+		xml_node lastsib = el.previous_sibling();
+		if (!lastsib) {
+			return true;
+		}
+		if (nodeType(lastsib, "harmony")) {
+			m_hnode = lastsib;
+		}
 	}
 
 	return true;
@@ -854,9 +981,9 @@ string MxmlEvent::getRecip(void) const {
 // MxmlEvent::getKernPitch -- return **kern pitch of note/rest.
 //
 
-string MxmlEvent::getKernPitch(void) const {
+string MxmlEvent::getKernPitch(void) {
 	bool rest = false;
-	
+
 	if (!m_node) {
 		// this is for an interpreted whole-measure rest.  Needed
 		// for multi-measure rests as generated by Sibelius.
@@ -871,6 +998,7 @@ string MxmlEvent::getKernPitch(void) const {
 
 	if (nodeType(m_node, "forward")) {
 		rest = true;
+		forceInvisible();
 	} else {
 		while (child) {
 			if (nodeType(child, "rest")) {
@@ -893,7 +1021,7 @@ string MxmlEvent::getKernPitch(void) const {
 			child = child.next_sibling();
 		}
 	}
-	
+
 	if (rest) {
 		return "r";
 	}
@@ -1160,6 +1288,22 @@ xml_node MxmlEvent::getNode(void) {
 
 //////////////////////////////
 //
+// MxmlEvent::getElementName --
+//
+
+string MxmlEvent::getElementName(void) {
+	if (m_node) {
+		string name = m_node.name();
+		return name;
+	} else {
+		return "NULL";
+	}
+}
+
+
+
+//////////////////////////////
+//
 // MxmlEvent::getHNode -- Return <harmony> element.
 //
 
@@ -1263,7 +1407,7 @@ HumNum MxmlEvent::getEmbeddedDuration(xml_node el) {
 	HumNum tfactor    = 1;
 
 	while (child) {
-		if (strcmp(child.name(), "dot") == 0) { 
+		if (strcmp(child.name(), "dot") == 0) {
 			dots++;
 		} else if (strcmp(child.name(), "type") == 0) {
 			type = getQuarterDurationFromType(child.child_value());
@@ -1306,7 +1450,7 @@ HumNum MxmlEvent::getEmbeddedDuration(xml_node el) {
 			cerr << "Warning: cannot handle this tuplet dots yet" << endl;
 		}
 	}
-	
+
 	return duration;
 }
 
@@ -1318,7 +1462,7 @@ HumNum MxmlEvent::getEmbeddedDuration(xml_node el) {
 //
 
 HumNum MxmlEvent::getQuarterDurationFromType(const char* type) {
-	if      (strcmp(type, "quarter") == 0) { return 1;              } 
+	if      (strcmp(type, "quarter") == 0) { return 1;              }
 	else if (strcmp(type, "eighth") == 0)  { return HumNum(1, 2);   }
 	else if (strcmp(type, "half") == 0)    { return 2;              }
 	else if (strcmp(type, "16th") == 0)    { return HumNum(1, 4);   }

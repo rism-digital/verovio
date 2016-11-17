@@ -64,6 +64,7 @@ void MxmlMeasure::clear(void) {
 	}
 	m_events.clear();
 	m_owner = NULL;
+	m_timesigdur = 1;
 	m_previous = m_following = NULL;
 }
 
@@ -81,10 +82,14 @@ bool MxmlMeasure::parseMeasure(xpath_node mel) {
 
 bool MxmlMeasure::parseMeasure(xml_node mel) {
 	bool output = true;
+	vector<vector<int> > staffVoiceCounts;
+
+	xml_node nextel;
 	for (auto el = mel.first_child(); el; el = el.next_sibling()) {
 		MxmlEvent* event = new MxmlEvent(this);
 		m_events.push_back(event);
-		output &= event->parseEvent(el);
+		nextel = el.next_sibling();
+		output &= event->parseEvent(el, nextel);
 	}
 
 	setStartTimeOfMeasure();
@@ -106,8 +111,7 @@ bool MxmlMeasure::parseMeasure(xml_node mel) {
          setTimeSignatureDuration(getTimeSignatureDuration());
       }
       needdummy = true;
-   } 
-
+   }
 
    if (needdummy || getEventCount() == 0) {
       // if the duration of the measure is zero, then set the duration
@@ -118,6 +122,15 @@ bool MxmlMeasure::parseMeasure(xml_node mel) {
 		addDummyRest();
    }
 
+   // Neeed to check for empty voice/layers occuring lower in the
+   // voice index list than layers which contain notes.  For example
+   // if voice/layer 2 contains notes, but voice/layer 1 does not, then
+   // a dummy full-measure rest should fill voice/layer 1.  The voice
+   // layer 1 should be filled with the duration of the measure according
+   // to the other voice/layers in the measure.  This is done later
+   // after a voice analysis has been done in
+   // musicxml2hum_interface::insertMeasure(), specifically:
+	// musicxml2hum_interface::checkForDummyRests().
 
 	sortEvents();
 
@@ -128,16 +141,49 @@ bool MxmlMeasure::parseMeasure(xml_node mel) {
 
 //////////////////////////////
 //
+// MxmlMeasure::forceLastInvisible --
+//
+
+void MxmlMeasure::forceLastInvisible(void) {
+   if (!m_events.empty()) {
+      m_events.back()->forceInvisible();
+   }
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::getEventList --
+//
+
+vector<MxmlEvent*>& MxmlMeasure::getEventList(void) {
+   return m_events;
+}
+
+
+
+//////////////////////////////
+//
 // MxmlMeasure::addDummyRest --
 //
 
 void MxmlMeasure::addDummyRest(void) {
-      HumNum measuredur = getTimeSignatureDuration();
-      HumNum starttime = getStartTime();
-		MxmlEvent* event = new MxmlEvent(this);
-		m_events.push_back(event);
-      MxmlMeasure* measure = this;
-      event->makeDummyRest(measure, starttime, measuredur);
+   HumNum measuredur = getTimeSignatureDuration();
+   HumNum starttime = getStartTime();
+   MxmlEvent* event = new MxmlEvent(this);
+   m_events.push_back(event);
+   MxmlMeasure* measure = this;
+   event->makeDummyRest(measure, starttime, measuredur);
+}
+
+
+void MxmlMeasure::addDummyRest(HumNum starttime, HumNum duration,
+		int staffindex, int voiceindex) {
+	MxmlEvent* event = new MxmlEvent(this);
+	m_events.push_back(event);
+   MxmlMeasure* measure = this;
+   event->makeDummyRest(measure, starttime, duration, staffindex, voiceindex);
 }
 
 
@@ -473,7 +519,13 @@ int MxmlMeasure::getStaffIndex(int voicenum) {
 
 //////////////////////////////
 //
-// MxmlMeasure::sortEvents --
+// MxmlMeasure::sortEvents -- Sorts events for the measure into
+//   time order.  They are split into zero-duration evnets and
+//   non-zero events.  mevent_floating type are placed into the 
+//   non-zero events eventhough they have zero duration (this is
+//   for harmony not attached to a note attack, and will be
+//   eventually including basso continuo figuration having the
+//   same situation).
 //
 
 void MxmlMeasure::sortEvents(void) {
@@ -509,7 +561,8 @@ void MxmlMeasure::sortEvents(void) {
             if (m_events[i]->getDuration() == this->getDuration()) {
                  // forward elements are encoded as whole-measure rests
                  // if they fill the duration of a measure
-            } else {
+            } else if (m_events[i]->getVoiceIndex() < 0) {
+               // Skip forward elements which are not invisible rests
                continue;
             }
             break;
@@ -519,14 +572,15 @@ void MxmlMeasure::sortEvents(void) {
 
 		starttime = m_events[i]->getStartTime();
 		duration  = m_events[i]->getDuration();
-		if (duration == 0) {
+		if (m_events[i]->isFloating()) {
+			mapping[starttime]->nonzerodur.push_back(m_events[i]);
+		} else if (duration == 0) {
 			mapping[starttime]->zerodur.push_back(m_events[i]);
 		} else {
 			mapping[starttime]->nonzerodur.push_back(m_events[i]);
 		}
 	}
 
-	
 	/* debugging information:
 
 	int j;
@@ -573,7 +627,7 @@ void MxmlMeasure::sortEvents(void) {
 //
 // MxmlMeasure::receiveStaffNumberFromChild -- Receive a staff number
 //    placement for a note or rest and pass it along to the part class
-//    so that it can keep track of the maximum staff number used in 
+//    so that it can keep track of the maximum staff number used in
 //    the part.
 //
 
@@ -619,7 +673,7 @@ HumNum MxmlMeasure::getTimeSignatureDuration(void) {
 //
 // MxmlMeasure::reportStaffNumberToOwner -- Send a staff number
 //    placement for a note or rest and pass it along to the part class
-//    so that it can keep track of the maximum staff number used in 
+//    so that it can keep track of the maximum staff number used in
 //    the part.
 //
 

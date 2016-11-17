@@ -35,8 +35,7 @@ class GridStaff : public vector<GridVoice*>, public GridSide {
 		GridStaff(void);
 		~GridStaff();
 		GridVoice* setTokenLayer (int layerindex, HTp token, HumNum duration);
-		void setNullTokenLayer   (int layerindex, SliceType type, HumNum nextdur,
-		                          HumNum prevdur);
+		void setNullTokenLayer   (int layerindex, SliceType type, HumNum nextdur);
 		void appendTokenLayer    (int layerindex, HTp token, HumNum duration,
 		                          const string& spacer = " ");
 		int getMaxVerseCount     (void);

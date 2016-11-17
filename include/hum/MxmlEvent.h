@@ -46,7 +46,8 @@ enum measure_event_type {
 	mevent_link,
 	mevent_note,
 	mevent_print,
-	mevent_sound
+	mevent_sound,
+	mevent_float       // category for GridSides not attached to note onsets
 };
 
 
@@ -55,7 +56,7 @@ class MxmlEvent {
 		                   MxmlEvent          (MxmlMeasure* measure);
 		                  ~MxmlEvent          ();
 		void               clear              (void);
-		bool               parseEvent         (xml_node el);
+		bool               parseEvent         (xml_node el, xml_node nextel);
 		bool               parseEvent         (xpath_node el);
 		void               setTickStart       (long value, long ticks);
 		void               setTickDur         (long value, long ticks);
@@ -76,6 +77,7 @@ class MxmlEvent {
 		bool               isLinked           (void) const;
 		bool               isRest             (void);
 		bool               isGrace            (void);
+		bool               isFloating         (void);
 		void               setLinked          (void);
 		vector<MxmlEvent*> getLinkedNotes     (void);
 		void               attachToLastEvent  (void);
@@ -92,19 +94,26 @@ class MxmlEvent {
 		int                getPartNumber      (void) const;
 		int                getPartIndex       (void) const;
 		string             getRecip           (void) const;
-		string             getKernPitch       (void) const;
+		string             getKernPitch       (void);
 		string             getPrefixNoteInfo  (void) const;
 		string             getPostfixNoteInfo (void) const;
 		xml_node           getNode            (void);
 		xml_node           getHNode           (void);
 		HumNum             getTimeSigDur      (void);
+		string             getElementName     (void);
 		void               addNotations       (stringstream& ss, 
 		                                       xml_node notations) const;
 		void               reportVerseCountToOwner (int count);
 		void               reportVerseCountToOwner (int staffnum, int count);
 		void               reportHarmonyCountToOwner (int count);
-      void               makeDummyRest      (MxmlMeasure* owner, HumNum startime,
-		                                       HumNum duration);
+      void               makeDummyRest      (MxmlMeasure* owner, 
+		                                       HumNum startime,
+		                                       HumNum duration,
+		                                       int staffindex = 0,
+		                                       int voiceindex = 0);
+		void               setVoiceIndex      (int voiceindex);
+		void               forceInvisible     (void);
+		bool               isInvisible        (void);
 
 	protected:
 		HumNum             m_starttime;  // start time in quarter notes of event
@@ -118,8 +127,10 @@ class MxmlEvent {
 		static int         m_counter;    // counter for sequence variable
 		short              m_staff;      // staff number in part for event
 		short              m_voice;      // voice number in part for event
+		int                m_voiceindex; // voice index of item (remapping)
       int                m_maxstaff;   // maximum staff number for measure
 		xml_node           m_hnode;      // harmony label starting at note event
+		bool               m_invisible;  // for forceInvisible();
 
 	private:
    	void   reportStaffNumberToOwner  (int staffnum, int voicenum);

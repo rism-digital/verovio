@@ -77,7 +77,7 @@ GridVoice::~GridVoice() {
 //      object.
 //
 
-bool GridVoice::isTransfered(void) { 
+bool GridVoice::isTransfered(void) {
 	return m_transfered;
 }
 
@@ -198,7 +198,7 @@ HumNum GridVoice::getDurationToPrev(void) const {
 
 //////////////////////////////
 //
-// GridVoice::incrementDuration -- 
+// GridVoice::incrementDuration --
 //
 
 void GridVoice::incrementDuration(HumNum duration) {
@@ -211,7 +211,7 @@ void GridVoice::incrementDuration(HumNum duration) {
 //////////////////////////////
 //
 // GridVoice::forgetToken -- The HumdrumToken was passed off
-//      to some other object which is now responsible for 
+//      to some other object which is now responsible for
 //      deleting it.
 //
 

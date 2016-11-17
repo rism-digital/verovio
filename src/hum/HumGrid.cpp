@@ -72,7 +72,7 @@ int HumGrid::getVerseCount(int partindex, int staffindex) {
 		return 0;
 	}
 	int staffnumber = staffindex + 1;
-	if ((staffnumber < 0) || 
+	if ((staffnumber < 1) ||
 			(staffnumber >= (int)m_verseCount.at(partindex).size())) {
 		return 0;
 	}
@@ -137,7 +137,7 @@ bool HumGrid::transferTokens(HumdrumFile& outfile) {
 	calculateGridDurations();
 	addNullTokens();
 	addMeasureLines();
-	buildSingleList(); 
+	buildSingleList();
 	addLastMeasure();
 	if (manipulatorCheck()) {
 		cleanupManipulators();
@@ -160,7 +160,7 @@ bool HumGrid::transferTokens(HumdrumFile& outfile) {
 
 //////////////////////////////
 //
-// HumGrid::cleanupManipulators -- 
+// HumGrid::cleanupManipulators --
 //
 
 void HumGrid::cleanupManipulators(void) {
@@ -196,6 +196,7 @@ void HumGrid::cleanManipulator(vector<GridSlice*>& newslices, GridSlice* curr) {
 	GridSlice* output;
 
 	// deal with *^ manipulators:
+
 // ggg implement later:
 //	while (output = checkManipulatorExpand(curr)) {
 //		newslices.push_back(output);
@@ -260,7 +261,7 @@ GridSlice* HumGrid::checkManipulatorContract(GridSlice* curr) {
 
 	// need to split *v's from different adjacent staves onto separate lines.
 
-	GridSlice* newmanip = new GridSlice(this, curr->getTimestamp(), 
+	GridSlice* newmanip = new GridSlice(curr->getMeasure(), curr->getTimestamp(),
 		curr->getType(), curr);
 
 	lastvoice = NULL;
@@ -314,7 +315,7 @@ GridSlice* HumGrid::checkManipulatorContract(GridSlice* curr) {
 // converts to:
 // new:            *v   *v        *    *
 // old:            *              *v   *v
-// 
+//
 //
 
 void HumGrid::transferMerges(GridStaff* oldstaff, GridStaff* oldlaststaff,
@@ -468,7 +469,15 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 		}
 		for (s=0; s<s1count; s++) {
 			v1count = (int)ice1->at(p)->at(s)->size();
+			// the voice count always must be at least 1.  This case
+			// is related to inserting clefs in other parts.
+			if (v1count < 1) {
+				v1count = 1;
+			}
 			v2count = (int)ice2->at(p)->at(s)->size();
+			if (v2count < 1) {
+				v2count = 1;
+			}
 			if (v1count == v2count) {
 				continue;
 			}
@@ -488,7 +497,8 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 	// staves have *v manipulators.
 
 	GridSlice* mslice;
-	mslice = new GridSlice(this, ice2->getTimestamp(), SliceType::Manipulators);
+	mslice = new GridSlice(ice1->getMeasure(), ice2->getTimestamp(),
+			SliceType::Manipulators);
 
 	int z;
 	HTp token;
@@ -581,15 +591,17 @@ void HumGrid::addMeasureLines(void) {
 	GridVoice* gt;
 	HTp token;
 	int staffcount, partcount, vcount, nextvcount, lcount;
+	GridMeasure* measure;
+	GridMeasure* nextmeasure;
 	for (int m=0; m<(int)this->size()-1; m++) {
-		GridMeasure* measure = this->at(m);
-		GridMeasure* nextmeasure = this->at(m+1);
+		measure = this->at(m);
+		nextmeasure = this->at(m+1);
 		if (nextmeasure->size() == 0) {
 			// next measure is empty for some reason so give up
 			continue;
-		} 
+		}
 		timestamp = nextmeasure->front()->getTimestamp();
-		mslice = new GridSlice(this, timestamp, SliceType::Measures);
+		mslice = new GridSlice(measure, timestamp, SliceType::Measures);
 		if (measure->size() == 0) {
 			continue;
 		}
@@ -643,7 +655,8 @@ void HumGrid::addLastMeasure(void) {
 	// to get correct:
 	HumNum timestamp = model->getTimestamp();
 
-	GridSlice* mslice = new GridSlice(this, timestamp, SliceType::Measures);
+	GridSlice* mslice = new GridSlice(model->getMeasure(), timestamp,
+			SliceType::Measures);
 	this->back()->push_back(mslice);
 	mslice->setTimestamp(timestamp);
 	int partcount = model->size();
@@ -683,7 +696,7 @@ bool HumGrid::buildSingleList(void) {
 			m_allslices.push_back(it);
 		}
 	}
-	
+
 	HumNum ts1;
 	HumNum ts2;
 	HumNum dur;
@@ -710,6 +723,18 @@ void HumGrid::addNullTokens(void) {
 	int s; // staff index
 	int v; // voice index
 
+	if (0) {
+		cerr << "SLICE TIMESTAMPS: " << endl;
+		for (int x=0; x<(int)m_allslices.size(); x++) {
+			cerr << "\tTIMESTAMP " << x << "= " 
+			     << m_allslices[x]->getTimestamp()
+			     << "\tDUR=" << m_allslices[x]->getDuration()
+			     << "\t"
+			     << m_allslices[x]
+			     << endl;
+		}
+	}
+
 	for (i=0; i<(int)m_allslices.size(); i++) {
 		GridSlice& slice = *m_allslices.at(i);
 		if (!slice.isNoteSlice()) {
@@ -730,8 +755,8 @@ void HumGrid::addNullTokens(void) {
 						continue;
 					}
 					// found a note/rest which should have a non-zero
-					// duration that needs to be extended to the next 
-					// duration in the 
+					// duration that needs to be extended to the next
+					// duration in the
 					extendDurationToken(i, p, s, v);
 				}
 			}
@@ -746,52 +771,88 @@ void HumGrid::addNullTokens(void) {
 // HumGrid::extendDurationToken --
 //
 
-void HumGrid::extendDurationToken(int slicei, int parti, int staffi, 
+void HumGrid::extendDurationToken(int slicei, int parti, int staffi,
 		int voicei) {
-
-	GridVoice* gt = m_allslices.at(slicei)->at(parti)->at(staffi)->at(voicei);
-	if (gt == NULL) {
-		cerr << "Strange error: null starting token" << endl;
+	if ((slicei < 0) || (slicei >= ((int)m_allslices.size()) - 1)) {
+		// nothing after this line, so can extend further.
 		return;
 	}
 
-	int lasts = slicei;
-	int s = slicei+1;
-	HumNum lastdur = gt->getDurationToNext();
- 	HTp token = gt->getToken();
+	GridVoice* gv = m_allslices.at(slicei)->at(parti)->at(staffi)->at(voicei);
+ 	HTp token = gv->getToken();
+	if (!token) {
+		cerr << "STRANGE: token should not be null" << endl;
+		return;
+	}
 	if (*token == ".") {
 		// null data token so ignore;
+		// change this later to add a duration for the null token below.
 		return;
 	}
+	
+	HumNum tokendur = Convert::recipToDuration((string)*token);
+	HumNum currts   = m_allslices.at(slicei)->getTimestamp();
+	HumNum nextts   = m_allslices.at(slicei+1)->getTimestamp();
+	HumNum slicedur = nextts - currts;
+	HumNum timeleft = tokendur - slicedur;
 
-// cerr << ">> processing " << gt->getToken() << " DUR = " << lastdur  << endl;
-
-	if (lastdur == 0) {
-		// nothing to do
-		return;
+	if (0) {
+		cerr << "===================" << endl;
+		cerr << "EXTENDING TOKEN    " << token      << endl;
+		cerr << "\tTOKEN DUR:       " << tokendur   << endl;
+		cerr << "\tTOKEN START:     " << currts     << endl;
+		cerr << "\tSLICE DUR:       " << slicedur   << endl;
+		cerr << "\tNEXT SLICE START:" << nextts     << endl;
+		cerr << "\tTIME LEFT:       " << timeleft   << endl;
+		cerr << "\t-----------------" << endl;
 	}
-	GridVoice* lastgt = gt;
-	HumNum nextdur;
-	HumNum prevdur;
-	HumNum slicedur;
-	while (s < (int)m_allslices.size()) {
-		lastgt = getGridVoice(lasts, parti, staffi, voicei);
-		if (lastgt == NULL) {
-			cerr << "Strange error in extendDurationToken()" << endl;
+
+	if (timeleft != 0) {
+		// fill in null tokens for the required duration.
+		if (timeleft < 0) {
+			cerr << "ERROR: Negative duration" << endl;
 			return;
 		}
-		GridStaff* gs = m_allslices.at(s)->at(parti)->at(staffi);
-		SliceType type = m_allslices.at(s)->getType();
-		slicedur = m_allslices.at(lasts)->getDuration();
-		nextdur = lastgt->getDurationToNext() - slicedur;
-		if (nextdur == 0) {
-			// found end of note
-			break;
+
+		SliceType type;
+		GridStaff* gs;
+		int s = slicei+1;
+
+		while ((s < (int)m_allslices.size()) && (timeleft > 0)) {
+			currts = nextts;
+			if (s < (int)m_allslices.size() - 1) {
+				nextts = m_allslices.at(s+1)->getTimestamp();
+			} else {
+				nextts = currts + m_allslices.at(s)->getDuration();
+			}
+			slicedur = nextts - currts;
+			type = m_allslices[s]->getType();
+
+			gs = m_allslices.at(s)->at(parti)->at(staffi);
+			if (gs == NULL) {
+				cerr << "Strange error2 in extendDurationToken()" << endl;
+				return;
+			}
+			gs->setNullTokenLayer(voicei, type, slicedur);
+			
+			if (m_allslices.at(s)->isDataSlice()) {
+				gs->setNullTokenLayer(voicei, type, slicedur);
+				timeleft = timeleft - slicedur;
+			} else {
+				// store a null token for the non-data slice, but probably skip
+				// if there is a token already there (such as a clef-change).
+				gs->setNullTokenLayer(voicei, type, slicedur);
+			}
+			s++;
+			if (s == (int)m_allslices.size() - 1) {
+				m_allslices[s]->setDuration(timeleft);
+			}
 		}
-		prevdur = lastgt->getDurationToPrev() + slicedur;
-		gs->setNullTokenLayer(voicei, type, nextdur, prevdur);
-		lasts = s++;
 	}
+	// walk through zero-dur items and fill them in, but stop at
+	// a token (likely a grace note which should not be erased).
+// ggg
+
 }
 
 
@@ -802,7 +863,8 @@ void HumGrid::extendDurationToken(int slicei, int parti, int staffi,
 //    NULL otherwise. Requires HumGrid::buildSingleList() being run first.
 //
 
-GridVoice* HumGrid::getGridVoice(int slicei, int parti, int staffi, int voicei) {
+GridVoice* HumGrid::getGridVoice(int slicei, int parti, int staffi,
+		int voicei) {
 	if (slicei >= (int)m_allslices.size()) {
 		cerr << "Strange error 1a" << endl;
 		return NULL;
@@ -1085,7 +1147,7 @@ void HumGrid::insertStaffIndications(HumdrumFile& outfile) {
 // HumGrid::insertSideStaffInfo --
 //
 
-void HumGrid::insertSideStaffInfo(HumdrumLine* line, int part, int staff, 
+void HumGrid::insertSideStaffInfo(HumdrumLine* line, int part, int staff,
 		int staffnum) {
 	HTp token;
 	string text;
@@ -1119,7 +1181,7 @@ void HumGrid::insertSideStaffInfo(HumdrumLine* line, int part, int staff,
 //////////////////////////////
 //
 // HumGrid::insertDataTerminationLine -- Currently presumes
-//    that the last entry contains spines.  And the first 
+//    that the last entry contains spines.  And the first
 //    measure in the HumGrid object must contain a slice.
 //    Also need to compensate for *v on previous line.
 //

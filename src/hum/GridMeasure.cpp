@@ -51,6 +51,32 @@ GridMeasure::~GridMeasure(void) {
 //
 
 bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip) {
+
+	// If the last data slice duration is zero, then calculate
+	// the true duration from the duration of the measure.
+	if (this->size() > 0) {
+		GridSlice* slice = back();
+		if (slice->isMeasureSlice() && (this->size() >= 2)) {
+			auto ending = this->end();
+			--ending;
+			--ending;
+			while ((ending != this->begin()) && (!(*ending)->isDataSlice())) {
+				--ending;
+			}
+			slice = *ending;
+		} else {
+			slice = NULL;
+		}
+		if ((slice != NULL) && slice->isDataSlice() 
+				&& (slice->getDuration() == 0)) {
+			HumNum mts  = getTimestamp();
+			HumNum mdur = getDuration();
+			HumNum sts  = slice->getTimestamp();
+			HumNum slicedur = (mts + mdur) - sts;
+			slice->setDuration(slicedur);
+		}
+	}
+
 	for (auto it : *this) {
 		it->transferTokens(outfile, recip);
 	}
@@ -78,6 +104,52 @@ HumGrid* GridMeasure::getOwner(void) {
 void GridMeasure::setOwner(HumGrid* owner) {
 	m_owner = owner;
 }
+
+
+
+//////////////////////////////
+//
+// GridMeasure::setDuration --
+//
+
+void GridMeasure::setDuration(HumNum duration) {
+	m_duration = duration;
+}
+
+
+
+//////////////////////////////
+//
+// GridMeasure::getDuration --
+//
+
+HumNum GridMeasure::getDuration(void) {
+	return m_duration;
+}
+
+
+
+//////////////////////////////
+//
+// GridMeasure::getTimestamp --
+//
+
+HumNum GridMeasure::getTimestamp(void) {
+	return m_timestamp;
+}
+
+
+
+//////////////////////////////
+//
+// GridMeasure::setTimestamp --
+//
+
+void GridMeasure::setTimestamp(HumNum timestamp) {
+	m_timestamp = timestamp;
+}
+
+
 
 
 } // end namespace hum

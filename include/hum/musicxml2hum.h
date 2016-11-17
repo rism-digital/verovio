@@ -71,11 +71,11 @@ class musicxml2hum_interface {
 		bool   fillPartData         (MxmlPart& partdata, const string& id,
 		                             xml_node partdeclaration,
 		                             xml_node partcontent);
-		void   appendZeroEvents     (GridMeasure& outfile,
+		void   appendZeroEvents     (GridMeasure* outfile,
 		                             vector<SimultaneousEvents*>& nowevents,
 		                             HumNum nowtime,
 		                             vector<MxmlPart>& partdata);
-		void   appendNonZeroEvents   (GridMeasure& outdata,
+		void   appendNonZeroEvents   (GridMeasure* outdata,
 		                              vector<SimultaneousEvents*>& nowevents,
 		                              HumNum nowtime,
 		                              vector<MxmlPart>& partdata);
@@ -86,7 +86,7 @@ class musicxml2hum_interface {
 		bool insertMeasure    (HumGrid& outdata, int mnum,
 		                       vector<MxmlPart>& partdata,
 		                       vector<int> partstaves);
-		bool convertNowEvents (GridMeasure& outdata, 
+		bool convertNowEvents (GridMeasure* outdata, 
 		                       vector<SimultaneousEvents*>& nowevents,
 		                       vector<int>& nowparts, 
 		                       HumNum nowtime,
@@ -102,18 +102,18 @@ class musicxml2hum_interface {
 		void cleanupMeasures   (HumdrumFile& outfile,
 		                        vector<HumdrumLine*> measures);
 
-		void addClefLine       (GridMeasure& outdata, vector<xml_node>& clefs,
+		void addClefLine       (GridMeasure* outdata, vector<xml_node>& clefs,
 		                        vector<MxmlPart>& partdata, HumNum nowtime);
 		void insertPartClefs   (xml_node clef, GridPart& part);
 		xml_node convertClefToHumdrum(xml_node clef, HTp& token, int& staffindex);
 
-		void addKeySigLine    (GridMeasure& outdata, vector<xml_node>& keysigs,
+		void addKeySigLine    (GridMeasure* outdata, vector<xml_node>& keysigs,
 		                        vector<MxmlPart>& partdata, HumNum nowtime);
 		void insertPartKeySigs (xml_node keysig, GridPart& part);
 		xml_node convertKeySigToHumdrum(xml_node keysig, 
 		                        HTp& token, int& staffindex);
 
-		void addTimeSigLine    (GridMeasure& outdata, vector<xml_node>& timesigs,
+		void addTimeSigLine    (GridMeasure* outdata, vector<xml_node>& timesigs,
 		                        vector<MxmlPart>& partdata, HumNum nowtime);
 		void insertPartTimeSigs (xml_node timesig, GridPart& part);
 		xml_node convertTimeSigToHumdrum(xml_node timesig, 
@@ -121,12 +121,15 @@ class musicxml2hum_interface {
 
 		void addEvent          (GridSlice& slice, MxmlEvent* event);
 		void fillEmpties       (GridPart* part, const char* string);
-		void addChordNotes     (ostream& output, MxmlEvent* head, const string& recip);
+		void addSecondaryChordNotes (ostream& output, MxmlEvent* head, const string& recip);
 		bool isInvisible       (MxmlEvent* event);
 		int  addLyrics         (GridStaff* staff, MxmlEvent* event);
 		int  addHarmony        (GridPart* oart, MxmlEvent* event);
 		string getHarmonyString(xml_node hnode);
 		string cleanSpaces     (const string& input);
+		void checkForDummyRests(MxmlMeasure* measure);
+		void reindexVoices     (vector<MxmlPart>& partdata);
+		void reindexMeasure    (MxmlMeasure* measure);
 
 	public:
 
@@ -134,6 +137,8 @@ class musicxml2hum_interface {
 
 	private:
 		Options m_options;
+		bool DebugQ;
+		bool VoiceDebugQ;
 
 };
 

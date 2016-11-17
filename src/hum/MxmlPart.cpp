@@ -311,6 +311,8 @@ void MxmlPart::receiveHarmonyCount(int count) {
 //
 
 void MxmlPart::receiveVerseCount(int count) {
+if (count > 0)  {
+}
 	receiveVerseCount(0, count);
 }
 

@@ -117,7 +117,7 @@ int GridSide::getVerseCount(void) {
 // GridSide::getHarmonyCount --
 //
 
-int GridSide::getHarmonyCount(void) { 
+int GridSide::getHarmonyCount(void) {
 	if (m_harmony == NULL) {
 		return 0;
 	} else {
@@ -132,7 +132,7 @@ int GridSide::getHarmonyCount(void) {
 // GridSide::setHarmony --
 //
 
-void GridSide::setHarmony(HTp token) { 
+void GridSide::setHarmony(HTp token) {
 	if (m_harmony) {
 		delete m_harmony;
 		m_harmony = NULL;
@@ -147,7 +147,7 @@ void GridSide::setHarmony(HTp token) {
 // GridSide::detachHarmony --
 //
 
-void GridSide::detachHarmony(void) { 
+void GridSide::detachHarmony(void) {
 	m_harmony = NULL;
 }
 
@@ -158,7 +158,7 @@ void GridSide::detachHarmony(void) {
 // GridSide::getHarmony --
 //
 
-HTp GridSide::getHarmony(void) { 
+HTp GridSide::getHarmony(void) {
 	return m_harmony;
 }
 
