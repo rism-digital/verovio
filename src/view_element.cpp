@@ -404,7 +404,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int s;
     // by default draw 3 slashes (e.g., for a temolo on a whole note)
     if (stemMod == STEMMODIFIER_NONE) stemMod = STEMMODIFIER_3slash;
-    for (s = 0; s < stemMod; s++) {
+    for (s = 1; s < stemMod; s++) {
         DrawObliquePolygon(dc, x - width / 2, y, x + width / 2, y + height, height);
         y += step;
     }
