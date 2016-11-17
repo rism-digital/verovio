@@ -821,21 +821,33 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     // ornaments
     pugi::xpath_node ornaments = notations.node().select_single_node("ornaments");
     pugi::xpath_node tremolo = ornaments.node().select_single_node("tremolo");
-    std::string slashNum = "0";
+    std::string tremSlashNum = "0";
     std::string ornamStr;
     if (ornaments) {
       if (HasAttributeWithValue(tremolo.node(), "type", "single")) {
           BTrem *bTrem = new BTrem();
           AddLayerElement(layer, bTrem);
           m_elementStack.push_back(bTrem);
-          slashNum = GetContent(tremolo.node());
+          tremSlashNum = GetContent(tremolo.node());
         }
       else {
         if (ornaments.node().select_single_node("inverted-turn")) ornamStr = ornamStr + "s";
-        if (ornaments.node().select_single_node("mordent")) ornamStr = ornamStr + "m";
-        if (ornaments.node().select_single_node("inverted-mordent")) ornamStr = ornamStr + "M";
-        if (ornaments.node().select_single_node("trill-mark")) ornamStr = ornamStr + "t";
-        if (ornaments.node().select_single_node("turn")) ornamStr = ornamStr + "S";
+          if (ornaments.node().select_single_node("mordent")) {
+              if (!ornamStr.empty()) ornamStr = ornamStr + " ";
+              ornamStr = ornamStr + "m";
+          }
+          if (ornaments.node().select_single_node("inverted-mordent")) {
+              if (!ornamStr.empty()) ornamStr = ornamStr + " ";
+              ornamStr = ornamStr + "M";
+          }
+          if (ornaments.node().select_single_node("trill-mark")) {
+              if (!ornamStr.empty()) ornamStr = ornamStr + " ";
+              ornamStr = ornamStr + "t";
+          }
+          if (ornaments.node().select_single_node("turn")) {
+              if (!ornamStr.empty()) ornamStr = ornamStr + " ";
+              ornamStr = ornamStr + "S";
+          }
       }
     }
 
@@ -949,7 +961,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 chord->SetDur(ConvertTypeToDur(typeStr));
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
-                if (slashNum != "0") chord->SetStemMod(chord->AttStems::StrToStemmodifier(slashNum + "slash"));
+                if (tremSlashNum != "0") chord->SetStemMod(chord->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
                 if (!fermataStr.empty()) chord->SetFermata(ConvertTypeToPlace(fermataStr));
                 AddLayerElement(layer, chord);
                 m_elementStack.push_back(chord);
@@ -976,7 +988,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             note->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
-            if (slashNum != "0") note->SetStemMod(note->AttStems::StrToStemmodifier(slashNum + "slash"));
+            if (tremSlashNum != "0") note->SetStemMod(note->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
             if (!fermataStr.empty()) note->SetFermata(ConvertTypeToPlace(fermataStr));
         }
 
