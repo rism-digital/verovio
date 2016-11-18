@@ -21,6 +21,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "harm.h"
 #include "layer.h"
 #include "measure.h"
 #include "mrest.h"
@@ -344,6 +345,22 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
   }
 }
 
+void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
+{
+    std::string mm = GetContent(metronome.select_single_node("per-minute").node());
+    // att.mmtempo has yet to be implemented
+    // if (atoi(mm.c_str())) tempo->SetMm(atoi(mm.c_str()));
+    if (metronome.select_single_node("beat-unit").node()) {
+        // tempo->SetMmUnit(ConvertTypeToDur(GetContent(metronome.select_single_node("beat-unit").node())));
+    }
+    if (metronome.select_single_node("beat-unit-dot")) {
+        // tempo->SetMmDots((int)metronome.select_nodes("beat-unit-dot").size());
+    }
+    Text *text = new Text();
+    text->SetText(UTF8to16(StringFormat("M.M. = %s",mm.c_str())));
+    tempo->AddChild(text);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 // Parsing methods
 
@@ -387,8 +404,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
                 m_staffGrpStack.back()->AddChild(staffGrp);
                 m_staffGrpStack.push_back(staffGrp);
             }
-            // this is the end of a part-group - we assume each opened part-group to
-            // be closed
+            // this is the end of a part-group - we assume each opened part-group to be closed
             else {
                 m_staffGrpStack.pop_back();
             }
@@ -441,8 +457,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
         else {
         }
     }
-    // here we could check that we have that there is only one staffGrp left in
-    // m_staffGrpStack
+    // here we could check that we have that there is only one staffGrp left in m_staffGrpStack
 
     Measure *measure = NULL;
     std::vector<std::pair<int, ControlElement *> >::iterator iter;
@@ -502,8 +517,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
 
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
         // We read all attribute elements until we reach something else
-        // However, print might be present too. What else? This is not clear
-        // and not robust.
+        // However, print might be present too. What else? This is not clear and not robust.
         if (!IsElement(*it, "attributes") && !IsElement(*it, "print")) break;
 
         // we do not want to read it again, just change the name
@@ -534,8 +548,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 staffGrp->AddChild(staffDef);
             }
 
-            // clef sign - first look if we have a clef-sign with the corresponding
-            // staff @number
+            // clef sign - first look if we have a clef-sign with the corresponding staff @number
             pugi::xpath_node clefSign;
             xpath = StringFormat("clef[@number='%d']/sign", i + 1);
             clefSign = it->select_single_node(xpath.c_str());
@@ -641,8 +654,7 @@ bool MusicXmlInput::ReadMusicXmlPart(pugi::xml_node node, Section *section, int 
         pugi::xpath_node xmlMeasure = *it;
         Measure *measure = new Measure();
         ReadMusicXmlMeasure(xmlMeasure.node(), measure, nbStaves, staffOffset);
-        // Add the measure to the system - if already there from a previous part
-        // we'll just merge the content
+        // Add the measure to the system - if already there from a previous part we'll just merge the content
         AddMeasure(section, measure, i);
         i++;
     }
@@ -684,6 +696,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
         }
         else if (IsElement(*it, "forward")) {
             ReadMusicXmlForward(*it, measure, measureNum);
+        }
+        else if (IsElement(*it, "harmony")) {
+            ReadMusicXmlHarmony(*it, measure, measureNum);
         }
         else if (IsElement(*it, "note")) {
             ReadMusicXmlNote(*it, measure, measureNum);
@@ -759,27 +774,16 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
 
     pugi::xpath_node type = node.select_single_node("direction-type");
     std::string placeStr = GetAttributeValue(node, "placement");
-    // pugi::xpath_node sound = node.select_single_node("sound");
+    pugi::xpath_node sound = node.select_single_node("sound");
 
-    // Directive and Tempo
+    // Directive
     pugi::xpath_node_set words = type.node().select_nodes("words");
-    int midiTempo = atoi(GetAttributeValue(node.select_single_node("sound").node(), "tempo").c_str());
-    if (words.size() != 0) {
-        if (midiTempo) {
-          Tempo *tempo = new Tempo();
-          if (!placeStr.empty()) tempo->SetPlace(tempo->AttPlacement::StrToStaffrel(placeStr.c_str()));
-          if (midiTempo != 0) tempo->SetMidiBpm(midiTempo);
-          TextRendition(words, tempo);
-          m_controlElements.push_back(std::make_pair(measureNum, tempo));
-          m_tempoStack.push_back(tempo);
-        }
-        else {
-          Dir *dir = new Dir();
-          if (!placeStr.empty()) dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
-          TextRendition(words, dir);
-          m_controlElements.push_back(std::make_pair(measureNum, dir));
-          m_dirStack.push_back(dir);
-        }
+    if (words.size() != 0 && !sound) {
+        Dir *dir = new Dir();
+        if (!placeStr.empty()) dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        TextRendition(words, dir);
+        m_controlElements.push_back(std::make_pair(measureNum, dir));
+        m_dirStack.push_back(dir);
     }
 
     // Dynamics
@@ -807,8 +811,21 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
         m_pedalStack.push_back(pedal);
     }
 
+    // Tempo
+    pugi::xpath_node metronome = type.node().select_single_node("metronome");
+    if (sound || metronome) {
+        Tempo *tempo = new Tempo();
+        if (!placeStr.empty()) tempo->SetPlace(tempo->AttPlacement::StrToStaffrel(placeStr.c_str()));
+        int midiTempo = atoi(GetAttributeValue(node.select_single_node("sound").node(), "tempo").c_str());
+        if (midiTempo) tempo->SetMidiBpm(midiTempo);
+        if (words.size() != 0) TextRendition(words, tempo);
+        if (metronome) PrintMetronome(metronome.node(), tempo);
+        m_controlElements.push_back(std::make_pair(measureNum, tempo));
+        m_tempoStack.push_back(tempo);
+    }
+
     // other cases
-    if (words.size() == 0 && !dynam && !xmlPedal) {
+    if (words.size() == 0 && !dynam && !metronome && !xmlPedal) {
         LogWarning("Unsupported direction-type '%s'", type.node().first_child().name());
     }
 }
@@ -816,6 +833,25 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
 void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, int measureNum)
 {
     // LogWarning("Forward elements not supported");
+}
+
+void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, int measureNum)
+{
+    assert(node);
+    assert(measure);
+    
+    std::string placeStr = GetAttributeValue(node, "placement");
+
+    std::string harmText = GetContentOfChild(node, "root/root-step");
+    pugi::xpath_node kind = node.select_single_node("kind");
+    if (kind) harmText = harmText + GetAttributeValue(node.select_single_node("kind").node(), "text").c_str();
+    Harm *harm = new Harm();
+    Text *text = new Text();
+    if (!placeStr.empty()) harm->SetPlace(harm->AttPlacement::StrToStaffrel(placeStr.c_str()));
+    text->SetText(UTF8to16(harmText));
+    harm->AddChild(text);
+    m_controlElements.push_back(std::make_pair(measureNum, harm));
+    m_harmStack.push_back(harm);
 }
 
 void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int measureNum)
@@ -894,12 +930,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 
     // tuplet start
     // For now tuplet with beam if starting at the same time. However, this will
-    // quite likely not
-    // work if we have a tuplet over serveral beams. We would need to check which
-    // one is ending first
-    // in order to determine which one is on top of the hierarchy. Also, it is not
-    // 100% sure that we
-    // can represent them as tuplet and beam elements.
+    // quite likely not work if we have a tuplet over serveral beams. We would need to check which
+    // one is ending first in order to determine which one is on top of the hierarchy.
+    // Also, it is not 100% sure that we can represent them as tuplet and beam elements.
     pugi::xpath_node tupletStart = notations.node().select_single_node("tuplet[@type='start']");
     if (tupletStart) {
         Tuplet *tuplet = new Tuplet();
@@ -1140,11 +1173,13 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     }
 
     // tremolo end
-    if (HasAttributeWithValue(tremolo.node(), "type", "single")) {
-        RemoveLastFromStack(BTREM);
-    }
-    if (HasAttributeWithValue(tremolo.node(), "type", "stop")) {
-        RemoveLastFromStack(FTREM);
+    if (tremolo) {
+        if (HasAttributeWithValue(tremolo.node(), "type", "single")) {
+            RemoveLastFromStack(BTREM);
+        }
+        if (HasAttributeWithValue(tremolo.node(), "type", "stop")) {
+            RemoveLastFromStack(FTREM);
+        }
     }
 
     // tuplet end
@@ -1175,6 +1210,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             (*iter)->SetStartid("#" + element->GetUuid());
         }
         m_dynamStack.clear();
+    }
+    if (!m_harmStack.empty()) {
+        std::vector<Harm *>::iterator iter;
+        for (iter = m_harmStack.begin(); iter != m_harmStack.end(); iter++) {
+            (*iter)->SetStaff(staff->Att::StrToXsdPosintlist(std::to_string(staff->GetN())));
+            (*iter)->SetStartid("#" + element->GetUuid());
+        }
+        m_harmStack.clear();
     }
     if (!m_pedalStack.empty()) {
         std::vector<Pedal *>::iterator iter;

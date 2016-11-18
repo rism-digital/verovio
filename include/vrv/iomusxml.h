@@ -26,6 +26,7 @@ namespace vrv {
 class ControlElement;
 class Dir;
 class Dynam;
+class Harm;
 class Layer;
 class LayerElement;
 class Measure;
@@ -122,6 +123,7 @@ private:
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNb);
+    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNb);
     ///@}
 
@@ -194,11 +196,12 @@ private:
     ///@}
 
     /**
-     * @name Helper method for rendering text elements
+     * @name Helper methods for rendering text elements
      */
     ///@{
     ///@}
     void TextRendition(pugi::xpath_node_set words, ControlElement *element);
+    void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
 
     /**
      * @name Methods for converting MusicXML string values to MEI attributes.
@@ -225,6 +228,7 @@ private:
     /** The stacks for directives and dynamics */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
+    std::vector<Harm *> m_harmStack;
     std::vector<Pedal *> m_pedalStack;
     std::vector<Tempo *> m_tempoStack;
     /**
