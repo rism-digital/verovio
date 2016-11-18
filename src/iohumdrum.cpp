@@ -1486,6 +1486,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             HumNum tstamp = getMeasureTstamp(token, staffindex);
             harm->SetTstamp(tstamp.getFloat());
             setStaff(harm, staffindex + 1);
+            setLocationId(harm, token, -1);
         }
     }
 }
@@ -1521,7 +1522,6 @@ string HumdrumInput::cleanHarmString(const string &content)
             output.push_back(content[i]);
         }
     }
-    cerr << "OUTPUT STRING " << output << endl;
     return output;
 }
 
