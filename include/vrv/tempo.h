@@ -11,6 +11,7 @@
 #include "controlelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
+#include "atts_midi.h"
 
 namespace vrv {
 
@@ -23,7 +24,7 @@ class TextElement;
 /**
  * This class is an interface for <tempo> elements at the measure level
  */
-class Tempo : public ControlElement, public TextDirInterface, public TimePointInterface {
+class Tempo : public ControlElement, public TextDirInterface, public TimePointInterface, public AttMiditempo {
 public:
     /**
      * @name Constructors, destructors, reset methods

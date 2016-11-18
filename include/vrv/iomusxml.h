@@ -33,6 +33,7 @@ class Pedal;
 class Section;
 class Slur;
 class StaffGrp;
+class Tempo;
 class Tie;
 /// class Tuplet;
 
@@ -190,6 +191,14 @@ private:
     void CloseTie(Staff *staff, Layer *layer, Note *note, bool isClosingTie);
     void OpenSlur(Staff *staff, Layer *layer, int number, LayerElement *element, Slur *slur);
     void CloseSlur(Staff *staff, Layer *layer, int number, LayerElement *element);
+    ///@}
+
+    /**
+     * @name Helper method for rendering text elements
+     */
+    ///@{
+    ///@}
+    void TextRendition(pugi::xpath_node_set words, ControlElement *element);
 
     /**
      * @name Methods for converting MusicXML string values to MEI attributes.
@@ -217,6 +226,7 @@ private:
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
     std::vector<Pedal *> m_pedalStack;
+    std::vector<Tempo *> m_tempoStack;
     /**
      * The stack of floating elements (tie, slur, etc.) to be added at the
      * end of each measure
