@@ -944,10 +944,10 @@ void View::GetSpanningPointPositions(
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); itPoint++) {
         Point p;
         if (curveDir == curvature_CURVEDIR_above) {
-            p.y = itPoint->first->GetDrawingTop(m_doc, staffSize);
+            p.y = itPoint->first->GetDrawingTop(m_doc, staffSize, true, ARTIC_PART_OUTSIDE);
         }
         else {
-            p.y = itPoint->first->GetDrawingBottom(m_doc, staffSize);
+            p.y = itPoint->first->GetDrawingBottom(m_doc, staffSize, true, ARTIC_PART_OUTSIDE);
         }
         p.x = itPoint->first->GetDrawingX();
         // Not sure if it is better to add the margin before or after the rotation...

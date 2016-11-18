@@ -228,9 +228,11 @@ ArticPart::ArticPart(ArticPartType type, Artic *artic)
     RegisterAttClass(ATT_PLACEMENT);
 
     m_type = type;
-    this->SetColor(artic->GetColor());
 
     Reset();
+
+    // preserve the color from the parent artic
+    this->SetColor(artic->GetColor());
 }
 
 ArticPart::~ArticPart()

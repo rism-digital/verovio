@@ -73,6 +73,14 @@ public:
      */
     static bool IsCentered(data_ARTICULATION artic);
 
+    /**
+     * Return the inside and outside part of an artic if any (NULL otherwiser)
+     */
+    ///@{
+    ArticPart *GetInsidePart();
+    ArticPart *GetOutsidePart();
+    ///@}
+
     //----------//
     // Functors //
     //----------//
@@ -93,8 +101,6 @@ public:
     virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
-    ArticPart *GetInsidePart();
-    ArticPart *GetOutsidePart();
     //
 public:
     /**
@@ -112,6 +118,10 @@ private:
 //----------------------------------------------------------------------------
 // ArticPart
 //----------------------------------------------------------------------------
+
+/**
+ * This class models a sub-part of an artic element and has not direct MEI correspondant.
+ */
 
 class ArticPart : public LayerElement, public AttArticulation, public AttColor, public AttPlacement {
 public:

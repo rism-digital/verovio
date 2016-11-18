@@ -318,8 +318,8 @@ void View::DrawArtic(
 
     int staffYBottom = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
-    int yInAbove = std::max(parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize), staffYBottom);
-    int yInBelow = std::min(parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize), staff->GetDrawingY());
+    int yInAbove = std::max(parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false), staffYBottom);
+    int yInBelow = std::min(parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false), staff->GetDrawingY());
     int yOutAbove = std::max(yInAbove, staff->GetDrawingY());
     int yOutBelow = std::min(yInBelow, staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize));
 
@@ -496,7 +496,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     Chord *childChord = NULL;
     Point stemPoint;
     bool drawingCueSize = false;
-    int x, y, yUnused;
+    int x, y;
 
     childChord = dynamic_cast<Chord *>(bTrem->FindChildByType(CHORD));
     // Get from the chord or note child
@@ -542,30 +542,27 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     if (stemDir == STEMDIRECTION_up) {
         if (drawingDur > DUR_1) {
-            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize) - 3 * height;
+            // Since we are adding the slashing on the stem, ignore artic
+            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - 3 * height;
             x = stemPoint.x;
         }
         else {
-            if (childElement->Is() == NOTE)
-                y = childElement->GetDrawingY();
-            else
-                childChord->GetYExtremes(&y, &yUnused);
-            y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
+            // Take into account artic (not likely, though)
+            y = childElement->GetDrawingTop(m_doc, staff->m_drawingStaffSize)
+                + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
             x = childElement->GetDrawingX();
         }
         step = -step;
     }
     else {
         if (drawingDur > DUR_1) {
-            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize) + 1 * height;
+            // Idem as above
+            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) + 1 * height;
             x = stemPoint.x + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
         }
         else {
-            if (childElement->Is() == NOTE)
-                y = childElement->GetDrawingY();
-            else
-                childChord->GetYExtremes(&yUnused, &y);
-            y -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 6;
+            y = childElement->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
+                - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
             x = childElement->GetDrawingX();
         }
     }
@@ -2383,9 +2380,9 @@ int View::GetSylY(Syl *syl, Staff *staff)
 
 bool View::IsOnStaffLine(int y, Staff *staff)
 {
-    int y1 = y - staff->GetDrawingY();
-    int y2 = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    LogDebug("IsOnStaff %d %d", y1, y2);
+    // int y1 = y - staff->GetDrawingY();
+    // int y2 = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    // LogDebug("IsOnStaff %d %d", y1, y2);
 
     return ((y - staff->GetDrawingY()) % (2 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)) == 0);
 }
