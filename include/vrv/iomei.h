@@ -45,6 +45,7 @@ class DurationInterface;
 class Dynam;
 class Ending;
 class Expan;
+class Fermata;
 class FloatingElement;
 class FTrem;
 class Hairpin;
@@ -208,6 +209,7 @@ private:
     void WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
     void WriteMeiDir(pugi::xml_node currentNode, Dir *dir);
     void WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam);
+    void WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata);
     void WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteMeiHarm(pugi::xml_node currentNode, Harm *harm);
     void WriteMeiOctave(pugi::xml_node currentNode, Octave *octave);
@@ -425,6 +427,7 @@ private:
     bool ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText);
     bool ReadMeiDir(Object *parent, pugi::xml_node dir);
     bool ReadMeiDynam(Object *parent, pugi::xml_node dynam);
+    bool ReadMeiFermata(Object *parent, pugi::xml_node fermata);
     bool ReadMeiHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadMeiHarm(Object *parent, pugi::xml_node harm);
     bool ReadMeiOctave(Object *parent, pugi::xml_node octave);
