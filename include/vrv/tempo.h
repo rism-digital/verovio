@@ -8,10 +8,10 @@
 #ifndef __VRV_TEMPO_H__
 #define __VRV_TEMPO_H__
 
+#include "atts_midi.h"
 #include "controlelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
-#include "atts_midi.h"
 
 namespace vrv {
 
