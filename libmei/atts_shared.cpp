@@ -6911,7 +6911,7 @@ AttStems::~AttStems()
 void AttStems::ResetStems()
 {
     m_stemDir = STEMDIRECTION_NONE;
-    m_stemLen = "";
+    m_stemLen = -1;
     m_stemMod = STEMMODIFIER_NONE;
     m_stemPos = STEMPOSITION_NONE;
     m_stemX = 0.0;
@@ -6927,7 +6927,7 @@ bool AttStems::ReadStems(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("stem.len")) {
-        this->SetStemLen(StrToStr(element.attribute("stem.len").value()));
+        this->SetStemLen(StrToInt(element.attribute("stem.len").value()));
         element.remove_attribute("stem.len");
         hasAttribute = true;
     }
@@ -6962,7 +6962,7 @@ bool AttStems::WriteStems(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasStemLen()) {
-        element.append_attribute("stem.len") = StrToStr(this->GetStemLen()).c_str();
+        element.append_attribute("stem.len") = IntToStr(this->GetStemLen()).c_str();
         wroteAttribute = true;
     }
     if (this->HasStemMod()) {
@@ -6991,7 +6991,7 @@ bool AttStems::HasStemDir() const
 
 bool AttStems::HasStemLen() const
 {
-    return (m_stemLen != "");
+    return (m_stemLen != -1);
 }
 
 bool AttStems::HasStemMod() const
@@ -9800,7 +9800,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "stem.len") {
-            att->SetStemLen(att->StrToStr(attrValue));
+            att->SetStemLen(att->StrToInt(attrValue));
             return true;
         }
         if (attrType == "stem.mod") {
@@ -11225,7 +11225,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("stem.dir", att->StemdirectionToStr(att->GetStemDir())));
         }
         if (att->HasStemLen()) {
-            attributes->push_back(std::make_pair("stem.len", att->StrToStr(att->GetStemLen())));
+            attributes->push_back(std::make_pair("stem.len", att->IntToStr(att->GetStemLen())));
         }
         if (att->HasStemMod()) {
             attributes->push_back(std::make_pair("stem.mod", att->StemmodifierToStr(att->GetStemMod())));

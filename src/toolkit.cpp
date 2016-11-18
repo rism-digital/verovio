@@ -222,6 +222,9 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
     if (data.size() == 0) {
         return UNKNOWN;
     }
+    if (data[0] == 0) {
+        return UNKNOWN;
+    }
     if (data[0] == '@') {
         return PAE;
     }
