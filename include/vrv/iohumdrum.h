@@ -286,6 +286,7 @@ protected:
     static int nextLowerPowerOfTwo(int x);
     static string getDateString(void);
     static string getReferenceValue(const string &key, vector<hum::HumdrumLine *> &references);
+    string cleanHarmString(const string &content);
 
 private:
     std::string m_filename; // Filename to read/was read.

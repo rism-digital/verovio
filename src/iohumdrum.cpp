@@ -1478,7 +1478,8 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             }
             Harm *harm = new Harm;
             Text *text = new Text;
-            text->SetText(UTF8to16(*token));
+            string content = cleanHarmString(*token);
+            text->SetText(UTF8to16(content));
             harm->AddChild(text);
             m_measure->AddChild(harm);
             int staffindex = m_rkern[track];
@@ -1487,6 +1488,41 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             setStaff(harm, staffindex + 1);
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::cleanHarmString --
+//
+
+string HumdrumInput::cleanHarmString(const string &content)
+{
+    string output;
+    bool foundspace = false;
+    bool foundslash = false;
+    for (int i = 0; i < (int)content.size(); i++) {
+        if (foundspace && !foundslash) {
+            output.push_back(content[i]);
+            continue;
+        }
+        if (content[i] == ' ') {
+            foundspace = true;
+        }
+        if (content[i] == '/') {
+            foundslash = true;
+        }
+        if (content[i] == '-') {
+            output += "\u266D"; // unicode flat
+        }
+        else if (content[i] == '#') {
+            output += "\u266F"; // unicode sharp
+        }
+        else {
+            output.push_back(content[i]);
+        }
+    }
+    cerr << "OUTPUT STRING " << output << endl;
+    return output;
 }
 
 //////////////////////////////
