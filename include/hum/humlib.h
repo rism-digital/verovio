@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Oct 27 13:03:37 PDT 2016
+// Last Modified: Thu Nov 17 20:34:30 PST 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -758,15 +758,16 @@ class HumdrumLine : public string, public HumHash {
 		void     insertToken            (int index, const string& token);
 		void     insertToken            (int index, const char* token);
 
+		void     setDuration            (HumNum aDur);
+		void     setDurationFromStart   (HumNum dur);
+		void     setDurationFromBarline (HumNum dur);
+		void     setDurationToBarline   (HumNum dur);
+
 	protected:
 		bool     analyzeTracks          (string& err);
 		bool     analyzeTokenDurations  (string& err);
 		void     setLineIndex           (int index);
 		void     clear                  (void);
-		void     setDuration            (HumNum aDur);
-		void     setDurationFromStart   (HumNum dur);
-		void     setDurationFromBarline (HumNum dur);
-		void     setDurationToBarline   (HumNum dur);
 		void     setOwner               (void* hfile);
 		int      createTokensFromLine   (void);
 		void     setParameters          (HumdrumLine* pLine);
@@ -1412,6 +1413,7 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		bool          analyzeStructure             (void);
 		bool          analyzeStrands               (void);
 		bool          analyzeRhythm                (void);
+		bool          assignRhythmFromRecip        (HTp spinestart);
 		bool          analyzeMeter                 (void);
 		bool          analyzeTokenDurations        (void);
 		bool          analyzeGlobalParameters      (void);

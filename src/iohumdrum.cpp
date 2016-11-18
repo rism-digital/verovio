@@ -51,6 +51,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "hairpin.h"
+#include "harm.h"
 #include "iomei.h"
 #include "layer.h"
 #include "measure.h"
@@ -272,6 +273,7 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
     m_currentlayer = -1;
     m_currentstaff = -1;
     m_tupletscaling = 1;
+    m_harm = false;
 
 #ifdef USE_EMSCRIPTEN
     m_debug = 0;
@@ -428,6 +430,14 @@ bool HumdrumInput::convertHumdrum(void)
     // Create a list of the parts and which spine represents them.
     vector<HTp> &kernstarts = m_kernstarts;
     kernstarts = infile.getKernSpineStartList();
+
+    vector<HTp> spinestarts;
+    infile.getSpineStartList(spinestarts);
+    for (auto it : spinestarts) {
+        if (it->isDataType("**mxhm")) {
+            m_harm = true;
+        }
+    }
 
     if (kernstarts.size() == 0) {
         // no parts in file, give up.  Perhaps return an error.
@@ -1432,7 +1442,51 @@ bool HumdrumInput::convertMeasureStaves(int startline, int endline)
         }
     }
 
+    if (m_harm) {
+        addHarmFloatsForMeasure(startline, endline);
+    }
+
     return status;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addHarmFloatsForMeasure --
+//
+
+void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
+{
+    if (!m_measure) {
+        return;
+    }
+    HumdrumFile &infile = m_infile;
+    for (int i = startline; i < endline; i++) {
+        if (!infile[i].isData()) {
+            continue;
+        }
+        int track = 0;
+        for (int j = 0; j < infile[i].getFieldCount(); j++) {
+            HTp token = infile.token(i, j);
+            if (token->isDataType("**kern")) {
+                track = token->getTrack();
+            }
+            if (token->isNull()) {
+                continue;
+            }
+            if (!token->isDataType("**mxhm")) {
+                continue;
+            }
+            Harm *harm = new Harm;
+            Text *text = new Text;
+            text->SetText(UTF8to16(*token));
+            harm->AddChild(text);
+            m_measure->AddChild(harm);
+            int staffindex = m_rkern[track];
+            HumNum tstamp = getMeasureTstamp(token, staffindex);
+            harm->SetTstamp(tstamp.getFloat());
+            setStaff(harm, staffindex + 1);
+        }
+    }
 }
 
 //////////////////////////////

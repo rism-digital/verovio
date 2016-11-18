@@ -238,6 +238,7 @@ protected:
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
     void insertClefElement(vector<string> &elements, vector<void *> pointers, hum::HTp clef);
     void processSlur(hum::HTp token);
+    void addHarmFloatsForMeasure(int startine, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirection(hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex);
@@ -327,7 +328,7 @@ private:
     // contain **kern data.
     vector<hum::HTp> m_kernstarts;
 
-    // m_rkern == reverse listing of staff to Humdrum file track.
+    // m_rkern == reverse mapping of Humdrum track to staff number..
     vector<int> m_rkern;
 
     // m_infile == Humdrum file used for conversion.
@@ -348,9 +349,14 @@ private:
     // m_staffstates == state variables for each staff.
     vector<humaux::StaffStateVariables> m_staffstates;
 
-	// m_measureIndex == state variable for keeping track of the 
-	// current measure number being converted.
-	int m_measureIndex;
+    // m_measureIndex == state variable for keeping track of the
+    // current measure number being converted.
+    int m_measureIndex;
+
+    // m_harm == state variable for keeping track of whether or not
+    // the file to convert contains **mxhm spines that should be
+    // converted into <harm> element in the MEI conversion.
+    bool m_harm;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
