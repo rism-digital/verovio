@@ -74,8 +74,8 @@ void Page::LayOut(bool force)
     }
 
     this->LayOutHorizontally();
-    this->LayOutVertically();
     this->JustifyHorizontally();
+    this->LayOutVertically();
 
     m_layoutDone = true;
 }
