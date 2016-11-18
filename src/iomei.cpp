@@ -803,6 +803,7 @@ void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
     WriteXmlId(currentNode, tie);
     WriteTimeSpanningInterface(currentNode, tie);
     tie->WriteColor(currentNode);
+    tie->WriteCurvature(currentNode);
 };
 
 void MeiOutput::WriteMeiLayer(pugi::xml_node currentNode, Layer *layer)
