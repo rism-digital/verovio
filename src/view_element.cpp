@@ -1742,30 +1742,29 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
 
         if (place == PLACE_above) {
             // check if the notehead is in the staff.
-            if (element->GetDrawingTop(m_doc, staff->m_drawingStaffSize) < staff->GetDrawingY()) {
+            int top = element->GetDrawingTop(m_doc, staff->m_drawingStaffSize, true, ARTIC_PART_OUTSIDE);
+            if (top < staff->GetDrawingY()) {
                 // in the staff, set the fermata 20 pixels above the last line (+ embellishment offset)
                 y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + emb_offset;
             }
             else {
                 // out of the staff, place the trill above the notehead
-                y = element->GetDrawingTop(m_doc, staff->m_drawingStaffSize)
-                    + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + emb_offset;
+                y = top + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + emb_offset;
             }
             // draw the up-fermata - need cue size support
             DrawSmuflCode(dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);
         }
         else {
+            int bottom = element->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, true, ARTIC_PART_OUTSIDE);
             // This works as above, only we check that the note head is not
-            if (element->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
-                > (staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize))) {
+            if (bottom > (staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize))) {
                 // notehead in staff, set  under
                 y = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize)
                     - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
             else {
                 // notehead under staff, set under notehead
-                y = element->GetDrawingBottom(m_doc, staff->m_drawingStaffSize)
-                    - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+                y = bottom - m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
             // draw the down-fermata - need cue size support
             DrawSmuflCode(dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false);
