@@ -96,7 +96,7 @@ class MxmlEvent {
 		string             getRecip           (void) const;
 		string             getKernPitch       (void);
 		string             getPrefixNoteInfo  (void) const;
-		string             getPostfixNoteInfo (void) const;
+		string             getPostfixNoteInfo (bool primarynote) const;
 		xml_node           getNode            (void);
 		xml_node           getHNode           (void);
 		HumNum             getTimeSigDur      (void);

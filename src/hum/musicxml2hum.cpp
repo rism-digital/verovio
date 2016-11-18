@@ -755,12 +755,13 @@ void musicxml2hum_interface::addEvent(GridSlice& slice,
 	string postfix;
 	bool grace = false;
 	bool invisible = false;
+	bool primarynote = true;
 
 	if (!event->isFloating()) {
 		recip   = event->getRecip();
 		pitch   = event->getKernPitch();
 		prefix  = event->getPrefixNoteInfo();
-		postfix = event->getPostfixNoteInfo();
+		postfix = event->getPostfixNoteInfo(primarynote);
 		grace   = event->isGrace();
 
 		invisible = isInvisible(event);
@@ -1114,11 +1115,12 @@ void musicxml2hum_interface::addSecondaryChordNotes(ostream& output,
 	string pitch;
 	string prefix;
 	string postfix;
+	bool primarynote = false;
 	for (int i=0; i<(int)links.size(); i++) {
 		note = links.at(i);
 		pitch   = note->getKernPitch();
 		prefix  = note->getPrefixNoteInfo();
-		postfix = note->getPostfixNoteInfo();
+		postfix = note->getPostfixNoteInfo(primarynote);
 		output << " " << prefix << recip << pitch << postfix;
 	}
 }
@@ -1138,9 +1140,10 @@ void musicxml2hum_interface::appendZeroEvents(GridMeasure* outdata,
 	bool haskeysig  = false;
 	bool hastimesig = false;
 
-	vector<xml_node> clefs(partdata.size(), xml_node(NULL));
-	vector<xml_node> keysigs(partdata.size(), xml_node(NULL));
-	vector<xml_node> timesigs(partdata.size(), xml_node(NULL));
+	vector<vector<xml_node> > clefs(partdata.size());
+	vector<vector<xml_node> > keysigs(partdata.size());
+	vector<vector<xml_node> > timesigs(partdata.size());
+
 	int pindex = 0;
 	xml_node child;
 
@@ -1152,18 +1155,18 @@ void musicxml2hum_interface::appendZeroEvents(GridMeasure* outdata,
 				while (child) {
 					pindex = nowevents[i]->zerodur[j]->getPartIndex();
 
-					if (nodeType(child, "clef") && !clefs[pindex]) {
-						clefs[pindex] = child;
+					if (nodeType(child, "clef")) {
+						clefs[pindex].push_back(child);
 						hasclef = true;
 					}
 
-					if (nodeType(child, "key") && !keysigs[pindex]) {
-						keysigs[pindex] = child;
+					if (nodeType(child, "key")) {
+						keysigs[pindex].push_back(child);
 						haskeysig = true;
 					}
 
-					if (nodeType(child, "time") && !timesigs[pindex]) {
-						timesigs[pindex] = child;
+					if (nodeType(child, "time")) {
+						timesigs[pindex].push_back(child);
 						hastimesig = true;
 					}
 
@@ -1195,7 +1198,8 @@ void musicxml2hum_interface::appendZeroEvents(GridMeasure* outdata,
 //
 
 void musicxml2hum_interface::addClefLine(GridMeasure* outdata,
-		vector<xml_node>& clefs, vector<MxmlPart>& partdata, HumNum nowtime) {
+		vector<vector<xml_node> >& clefs, vector<MxmlPart>& partdata,
+		HumNum nowtime) {
 
 	GridSlice* slice = new GridSlice(outdata, nowtime,
 		SliceType::Clefs);
@@ -1203,8 +1207,10 @@ void musicxml2hum_interface::addClefLine(GridMeasure* outdata,
 	slice->initializePartStaves(partdata);
 
 	for (int i=0; i<(int)partdata.size(); i++) {
-		if (clefs[i]) {
-			insertPartClefs(clefs[i], *slice->at(i));
+		for (int j=0; j<(int)clefs[i].size(); j++) {
+			if (clefs[i][j]) {
+				insertPartClefs(clefs[i][j], *slice->at(i));
+			}
 		}
 	}
 }
@@ -1217,7 +1223,8 @@ void musicxml2hum_interface::addClefLine(GridMeasure* outdata,
 //
 
 void musicxml2hum_interface::addTimeSigLine(GridMeasure* outdata,
-		vector<xml_node>& timesigs, vector<MxmlPart>& partdata, HumNum nowtime) {
+		vector<vector<xml_node> >& timesigs, vector<MxmlPart>& partdata,
+		HumNum nowtime) {
 
 	GridSlice* slice = new GridSlice(outdata, nowtime,
 		SliceType::TimeSigs);
@@ -1225,8 +1232,10 @@ void musicxml2hum_interface::addTimeSigLine(GridMeasure* outdata,
 	slice->initializePartStaves(partdata);
 
 	for (int i=0; i<(int)partdata.size(); i++) {
-		if (timesigs[i]) {
-			insertPartTimeSigs(timesigs[i], *slice->at(i));
+		for (int j=0; j<(int)timesigs[i].size(); j++) {
+			if (timesigs[i][j]) {
+				insertPartTimeSigs(timesigs[i][j], *slice->at(i));
+			}
 		}
 	}
 }
@@ -1235,11 +1244,13 @@ void musicxml2hum_interface::addTimeSigLine(GridMeasure* outdata,
 
 //////////////////////////////
 //
-// musicxml2hum_interface::addKeySigLine --
+// musicxml2hum_interface::addKeySigLine -- Only adding one key signature
+//   for each part for now.
 //
 
 void musicxml2hum_interface::addKeySigLine(GridMeasure* outdata,
-		vector<xml_node>& keysigs, vector<MxmlPart>& partdata, HumNum nowtime) {
+		vector<vector<xml_node> >& keysigs,
+		vector<MxmlPart>& partdata, HumNum nowtime) {
 
 	GridSlice* slice = new GridSlice(outdata, nowtime,
 		SliceType::KeySigs);
@@ -1247,8 +1258,10 @@ void musicxml2hum_interface::addKeySigLine(GridMeasure* outdata,
 	slice->initializePartStaves(partdata);
 
 	for (int i=0; i<(int)partdata.size(); i++) {
-		if (keysigs[i]) {
-			insertPartKeySigs(keysigs[i], *slice->at(i));
+		for (int j=0; j<(int)keysigs[i].size(); j++) {
+			if (keysigs[i][j]) {
+				insertPartKeySigs(keysigs[i][j], *slice->at(i));
+			}
 		}
 	}
 }
@@ -1347,10 +1360,12 @@ void musicxml2hum_interface::insertPartKeySigs(xml_node keysig, GridPart& part) 
 
 //////////////////////////////
 //
-// musicxml2hum_interface::insertPartTimeSigs --
+// musicxml2hum_interface::insertPartTimeSigs -- Only allowing one
+//		time signature per part for now.
 //
 
-void musicxml2hum_interface::insertPartTimeSigs(xml_node timesig, GridPart& part) {
+void musicxml2hum_interface::insertPartTimeSigs(xml_node timesig,
+		GridPart& part) {
 	if (!timesig) {
 		// no timesig
 		return;

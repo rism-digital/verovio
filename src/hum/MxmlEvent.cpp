@@ -1103,7 +1103,7 @@ string MxmlEvent::getPrefixNoteInfo(void) const {
 // MxmlEvent::getPostfixNoteInfo --
 //
 
-string MxmlEvent::getPostfixNoteInfo(void) const {
+string MxmlEvent::getPostfixNoteInfo(bool primarynote) const {
 	int beamstarts   = 0;
 	int beamends     = 0;
 	int beamconts    = 0;
@@ -1159,15 +1159,24 @@ string MxmlEvent::getPostfixNoteInfo(void) const {
 
 	addNotations(ss, notations);
 
-	switch (stem) {
-		case  1:	ss << '/'; break;
-		case -1:	ss << '\\'; break;
+	if (primarynote) {
+		// only add these signifiers if this is the first
+		// note in a chord.  This is mostly important for
+		// beam descriptions, as there can be only one beam
+		// for each chord in a **kern token.  stems are not
+		// given since they are not needed for secondary
+		// chord notes (but nothing bad will happen if they
+		// are included on secondary notes.
+		switch (stem) {
+			case  1:	ss << '/'; break;
+			case -1:	ss << '\\'; break;
+		}
+		int i;
+		for (i=0; i<beamends; i++)     { ss << "J"; }
+		for (i=0; i<hookbacks; i++)    { ss << "k"; }
+		for (i=0; i<hookforwards; i++) { ss << "K"; }
+		for (i=0; i<beamstarts; i++)   { ss << "L"; }
 	}
-	int i;
-	for (i=0; i<beamends; i++)     { ss << "J"; }
-	for (i=0; i<hookbacks; i++)    { ss << "k"; }
-	for (i=0; i<hookforwards; i++) { ss << "K"; }
-	for (i=0; i<beamstarts; i++)   { ss << "L"; }
 
 	if (tiestart && tiestop) {
 		ss << "_";
