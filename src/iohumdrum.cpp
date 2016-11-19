@@ -1498,29 +1498,190 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
 
 string HumdrumInput::cleanHarmString(const string &content)
 {
-    string output;
+    string root;
+    string kind;
+    string bass;
+
     bool foundspace = false;
     bool foundslash = false;
     for (int i = 0; i < (int)content.size(); i++) {
+        if (content[i] == '/') {
+            foundslash = true;
+        }
         if (foundspace && !foundslash) {
-            output.push_back(content[i]);
+            kind.push_back(content[i]);
             continue;
         }
         if (content[i] == ' ') {
             foundspace = true;
+            continue;
         }
         if (content[i] == '/') {
             foundslash = true;
+            continue;
         }
-        if (content[i] == '-') {
-            output += "\u266D"; // unicode flat
+        if (!foundspace) {
+            if (content[i] == '-') {
+                root += "\u266D"; // unicode flat
+            }
+            else if (content[i] == '#') {
+                root += "\u266F"; // unicode sharp
+            }
+            else {
+                root.push_back(content[i]);
+            }
         }
-        else if (content[i] == '#') {
-            output += "\u266F"; // unicode sharp
+        else if (foundslash) {
+            if (content[i] == '-') {
+                bass += "\u266D"; // unicode flat
+            }
+            else if (content[i] == '#') {
+                bass += "\u266F"; // unicode sharp
+            }
+            else {
+                bass.push_back(content[i]);
+            }
         }
         else {
-            output.push_back(content[i]);
+            cerr << "should not get here with correct input " << content << endl;
         }
+    }
+
+    bool replacing = false;
+    if (kind == "major-minor") {
+        kind = "Mm7";
+        replacing = true;
+    }
+    else if (kind == "minor-major") {
+        kind = "mM7";
+        replacing = true;
+    }
+
+    if (replace(kind, "major-", "M")) {
+        replacing = true;
+    }
+    else if (replace(kind, "minor-", "m")) {
+        replacing = true;
+    }
+    else if (replace(kind, "dominant-", "dom")) {
+        replacing = true;
+    }
+    else if (replace(kind, "augmented-", "+")) {
+        replacing = true;
+    }
+    else if (replace(kind, "suspended-", "sus")) {
+        replacing = true;
+    }
+    else if (replace(kind, "diminished-", "\00B0")) { // degree sign
+        replacing = true;
+    }
+    if (replace(kind, "seventh", "7")) {
+        replacing = true;
+    }
+    else if (replace(kind, "ninth", "9")) {
+        replacing = true;
+    }
+    else if (replace(kind, "11th", "11")) {
+        replacing = true;
+    }
+    else if (replace(kind, "13th", "13")) {
+        replacing = true;
+    }
+    else if (replace(kind, "second", "2")) {
+        replacing = true;
+    }
+    else if (replace(kind, "fourth", "4")) {
+        replacing = true;
+    }
+    else if (replace(kind, "sixth", "6")) {
+        replacing = true;
+    }
+
+    if (kind == "major") {
+        kind = "";
+        replacing = true;
+    }
+    else if (kind == "maj") {
+        kind = "";
+        replacing = true;
+    }
+    else if (kind == "ma") {
+        kind = ""; // degree sign
+        replacing = true;
+    }
+    else if (kind == "minor") {
+        kind = "m";
+        replacing = true;
+    }
+    else if (kind == "min") {
+        kind = "m";
+        replacing = true;
+    }
+    else if (kind == "augmented") {
+        kind = "+";
+        replacing = true;
+    }
+    else if (kind == "minor-seventh") {
+        kind = "m7";
+        replacing = true;
+    }
+    else if (kind == "major-seventh") {
+        kind = "M7";
+        replacing = true;
+    }
+    else if (kind == "dominant-11th") {
+        kind = "dom11";
+        replacing = true;
+    }
+    else if (kind == "dominant-13th") {
+        kind = "dom13";
+        replacing = true;
+    }
+    else if (kind == "dominant-ninth") {
+        kind = "dom9";
+        replacing = true;
+    }
+    else if (kind == "half-diminished") {
+        kind = "\u00F8"; // o-slash
+        replacing = true;
+    }
+    else if (kind == "diminished") {
+        kind = "\u00B0"; // degree sign
+        replacing = true;
+    }
+    else if (kind == "dominant") {
+        kind = "dom";
+        replacing = true;
+    }
+    else if (kind == "m7b5") {
+        replacing = true;
+        kind = "m7\u266D"
+               "5";
+    }
+    if ((kind != "") && !replacing) {
+        root += ' ';
+    }
+    if (bass != "") {
+        kind += '/';
+    }
+    string output = root + kind + bass;
+    return output;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::replace -- simple substring replacement implementation.
+//    Returns true if there was any replacment done.
+//
+
+bool HumdrumInput::replace(string &str, const string &oldStr, const string &newStr)
+{
+    string::size_type pos = 0u;
+    bool output = false;
+    while ((pos = str.find(oldStr, pos)) != string::npos) {
+        output = true;
+        str.replace(pos, oldStr.length(), newStr);
+        pos += newStr.length();
     }
     return output;
 }

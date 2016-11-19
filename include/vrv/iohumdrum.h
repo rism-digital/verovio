@@ -286,6 +286,8 @@ protected:
     static int nextLowerPowerOfTwo(int x);
     static string getDateString(void);
     static string getReferenceValue(const string &key, vector<hum::HumdrumLine *> &references);
+	static bool replace(string& str, const string& oldStr,
+	                     const string& newStr);
     string cleanHarmString(const string &content);
 
 private:
