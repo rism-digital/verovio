@@ -56,8 +56,9 @@ class MxmlEvent {
 		                   MxmlEvent          (MxmlMeasure* measure);
 		                  ~MxmlEvent          ();
 		void               clear              (void);
-		bool               parseEvent         (xml_node el, xml_node nextel);
-		bool               parseEvent         (xpath_node el);
+		bool               parseEvent         (xml_node el, xml_node nextel,
+		                                       HumNum starttime);
+		bool               parseEvent         (xpath_node el, HumNum starttime);
 		void               setTickStart       (long value, long ticks);
 		void               setTickDur         (long value, long ticks);
 		void               setStartTime       (HumNum value);
@@ -65,7 +66,7 @@ class MxmlEvent {
 		void               setDurationByTicks (long value,
 		                                       xml_node el = xml_node(NULL));
 		HumNum             getStartTime       (void) const;
-		HumNum             getDuration        (void) const;
+		HumNum             getDuration        (void);
 		void               setOwner           (MxmlMeasure* measure);
 		MxmlMeasure*       getOwner           (void) const;
 		const char*        getName            (void) const;
@@ -82,7 +83,7 @@ class MxmlEvent {
 		vector<MxmlEvent*> getLinkedNotes     (void);
 		void               attachToLastEvent  (void);
 		bool               isChord            (void) const;
-		void               printEvent         (void) const;
+		void               printEvent         (void);
 		int                getSequenceNumber  (void) const;
 		int                getVoiceNumber     (void) const;
 		void               setVoiceNumber     (int value);

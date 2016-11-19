@@ -157,7 +157,7 @@ HumNum MxmlEvent::getStartTime(void) const {
 //      of quarter note durations.
 //
 
-HumNum MxmlEvent::getDuration(void) const {
+HumNum MxmlEvent::getDuration(void) {
 	return m_duration;
 }
 
@@ -345,10 +345,15 @@ void MxmlEvent::setDurationByTicks(long value, xml_node el) {
 		} else if (checkval != val) {
 			// cerr << "WARNING: True duration " << checkval << " does not match";
 			// cerr << " tick duration (buggy data: " << val << ")" << endl;
-			val = checkval;
+			double difference = fabs(checkval.getFloat() - val.getFloat());
+			if (difference < 0.1) {
+				// only correct if the duration is small, since some programs
+				// will mark rests such as half notes as whole notes (since they
+				// are displayed as centered whole notes)
+				val = checkval;
+			}
 		}
 	}
-
 	setDuration(val);
 }
 
@@ -517,7 +522,7 @@ vector<MxmlEvent*> MxmlEvent::getLinkedNotes(void) {
 // MxmlEvent::printEvent -- Useful for debugging.
 //
 
-void MxmlEvent::printEvent(void) const {
+void MxmlEvent::printEvent(void) {
 	cout << getStartTime() << "\t" << getDuration() << "\t" << m_node.name();
 	if (isChord()) {
 		cout << "\tCHORD";
@@ -715,12 +720,12 @@ measure_event_type MxmlEvent::getType(void) const {
 // MxmlEvent::parseEvent --
 //
 
-bool MxmlEvent::parseEvent(xpath_node el) {
-	return parseEvent(el.node(), xml_node(NULL));
+bool MxmlEvent::parseEvent(xpath_node el, HumNum starttime) {
+	return parseEvent(el.node(), xml_node(NULL), starttime);
 }
 
 
-bool MxmlEvent::parseEvent(xml_node el, xml_node nextel) {
+bool MxmlEvent::parseEvent(xml_node el, xml_node nextel, HumNum starttime) {
 	m_node = el;
 
 	bool floatingharmony = false;
@@ -767,7 +772,6 @@ bool MxmlEvent::parseEvent(xml_node el, xml_node nextel) {
 	int tempstaff    = 1;
 	int tempvoice    = -1;
 	int tempduration = 0;
-
 	for (auto el = m_node.first_child(); el; el = el.next_sibling()) {
 		if (nodeType(el, "staff")) {
 			tempstaff = atoi(el.child_value());
@@ -813,6 +817,15 @@ bool MxmlEvent::parseEvent(xml_node el, xml_node nextel) {
 		// no voice child element, or not a note or rest.
 	}
 	HumNum timesigdur;
+	HumNum difference;
+	HumNum dur;
+	MxmlMeasure* measure = getOwner();
+	HumNum mst;
+	if (measure) {
+		mst = measure->getStartTime();
+	}
+
+	setStartTime(starttime);
 
 	switch (m_eventtype) {
 		case mevent_note:
@@ -831,6 +844,12 @@ bool MxmlEvent::parseEvent(xml_node el, xml_node nextel) {
 
 		case mevent_backup:
 			setDurationByTicks(-tempduration);
+			dur = getDuration();
+			difference = starttime - mst + dur;
+			if (difference < 0) {
+				// cerr << "Warning: backup before start of measure " << endl;
+				setDuration(dur - difference);
+			}
 			break;
 
 		case mevent_attributes:

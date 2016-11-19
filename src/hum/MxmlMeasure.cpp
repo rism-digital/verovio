@@ -83,17 +83,27 @@ bool MxmlMeasure::parseMeasure(xpath_node mel) {
 bool MxmlMeasure::parseMeasure(xml_node mel) {
 	bool output = true;
 	vector<vector<int> > staffVoiceCounts;
+	setStartTimeOfMeasure();
+
+	HumNum starttime = getStartTime();
+	HumNum st   = starttime;
+	HumNum maxst = starttime;
 
 	xml_node nextel;
 	for (auto el = mel.first_child(); el; el = el.next_sibling()) {
 		MxmlEvent* event = new MxmlEvent(this);
 		m_events.push_back(event);
 		nextel = el.next_sibling();
-		output &= event->parseEvent(el, nextel);
+		output &= event->parseEvent(el, nextel, starttime);
+		starttime += event->getDuration();
+		if (starttime > maxst) {
+			maxst = starttime;
+		}
 	}
+	setDuration(maxst - st);
 
-	setStartTimeOfMeasure();
-	calculateDuration();
+	// Should no longer be needed:
+	// calculateDuration();
 
    bool needdummy = false;
 
@@ -112,6 +122,8 @@ bool MxmlMeasure::parseMeasure(xml_node mel) {
       }
       needdummy = true;
    }
+
+	// Maybe check for overfull measures around here
 
    if (needdummy || getEventCount() == 0) {
       // if the duration of the measure is zero, then set the duration
