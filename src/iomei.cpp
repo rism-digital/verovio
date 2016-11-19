@@ -17,6 +17,7 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "artic.h"
 #include "beam.h"
 #include "boundary.h"
 #include "chord.h"
@@ -272,6 +273,11 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("accid");
         WriteMeiAccid(m_currentNode, dynamic_cast<Accid *>(object));
     }
+    else if (object->Is() == ARTIC) {
+        // Do not add a node for object representing an attribute
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("artic");
+        WriteMeiArtic(m_currentNode, dynamic_cast<Artic *>(object));
+    }
     else if (object->Is() == BARLINE) {
         m_currentNode = m_currentNode.append_child("barLine");
         WriteMeiBarLine(m_currentNode, dynamic_cast<BarLine *>(object));
@@ -481,6 +487,10 @@ bool MeiOutput::WriteObjectEnd(Object *object)
         BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(object);
         assert(interface);
         if (interface->IsBoundary()) return true;
+    }
+    // Object representing an attribute have no node to pop
+    else if (object->IsAttribute()) {
+        return true;
     }
     else if (m_scoreBasedMEI && (object->Is() == SYSTEM)) {
         return true;
@@ -784,6 +794,7 @@ void MeiOutput::WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo)
     WriteXmlId(currentNode, tempo);
     WriteTextDirInterface(currentNode, tempo);
     WriteTimePointInterface(currentNode, tempo);
+    tempo->WriteMiditempo(currentNode);
 }
 
 void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
@@ -823,6 +834,22 @@ void MeiOutput::WriteMeiAccid(pugi::xml_node currentNode, Accid *accid)
     accid->WriteAccidental(currentNode);
     accid->WriteAccidLog(currentNode);
     accid->WriteColor(currentNode);
+}
+
+void MeiOutput::WriteMeiArtic(pugi::xml_node currentNode, Artic *artic)
+{
+    assert(artic);
+
+    // Only write att.articulation if representing an attribute
+    if (artic->IsAttribute()) {
+        artic->WriteArticulation(currentNode);
+        return;
+    }
+
+    WriteLayerElement(currentNode, artic);
+    artic->WriteArticulation(currentNode);
+    artic->WriteColor(currentNode);
+    artic->WritePlacement(currentNode);
 }
 
 void MeiOutput::WriteMeiBarLine(pugi::xml_node currentNode, BarLine *barLine)
@@ -1444,6 +1471,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         if (element == "note") {
             return true;
         }
+        else if (element == "artic") {
+            return true;
+        }
         else {
             return false;
         }
@@ -1475,6 +1505,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for note
     else if (filterParent->Is() == NOTE) {
         if (element == "accid") {
+            return true;
+        }
+        else if (element == "artic") {
             return true;
         }
         else if (element == "syl") {
@@ -2181,6 +2214,7 @@ bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
 
     ReadTextDirInterface(tempo, vrvTempo);
     ReadTimePointInterface(tempo, vrvTempo);
+    vrvTempo->ReadMiditempo(tempo);
 
     parent->AddChild(vrvTempo);
     return ReadMeiTextChildren(vrvTempo, tempo);
@@ -2281,6 +2315,9 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
         // content
         else if (elementName == "accid") {
             success = ReadMeiAccid(parent, xmlElement);
+        }
+        else if (elementName == "artic") {
+            success = ReadMeiArtic(parent, xmlElement);
         }
         else if (elementName == "barLine") {
             success = ReadMeiBarLine(parent, xmlElement);
@@ -2390,6 +2427,19 @@ bool MeiInput::ReadMeiAccid(Object *parent, pugi::xml_node accid)
     return true;
 }
 
+bool MeiInput::ReadMeiArtic(Object *parent, pugi::xml_node artic)
+{
+    Artic *vrvArtic = new Artic();
+    ReadLayerElement(artic, vrvArtic);
+
+    vrvArtic->ReadArticulation(artic);
+    vrvArtic->ReadColor(artic);
+    vrvArtic->ReadPlacement(artic);
+
+    parent->AddChild(vrvArtic);
+    return true;
+}
+
 bool MeiInput::ReadMeiBarLine(Object *parent, pugi::xml_node barLine)
 {
     BarLine *vrvBarLine = new BarLine();
@@ -2443,6 +2493,15 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
     vrvChord->ReadStemsCmn(chord);
     vrvChord->ReadTiepresent(chord);
     vrvChord->ReadVisibility(chord);
+
+    AttArticulation artic;
+    artic.ReadArticulation(chord);
+    if (artic.HasArtic()) {
+        Artic *vrvArtic = new Artic();
+        vrvArtic->IsAttribute(true);
+        vrvArtic->SetArtic(artic.GetArtic());
+        vrvChord->AddChild(vrvArtic);
+    }
 
     parent->AddChild(vrvChord);
     return ReadMeiLayerChildren(vrvChord, chord, vrvChord);
@@ -2619,6 +2678,15 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadStemsCmn(note);
     vrvNote->ReadTiepresent(note);
     vrvNote->ReadVisibility(note);
+
+    AttArticulation artic;
+    artic.ReadArticulation(note);
+    if (artic.HasArtic()) {
+        Artic *vrvArtic = new Artic();
+        vrvArtic->IsAttribute(true);
+        vrvArtic->SetArtic(artic.GetArtic());
+        vrvNote->AddChild(vrvArtic);
+    }
 
     parent->AddChild(vrvNote);
     return ReadMeiLayerChildren(vrvNote, note, vrvNote);

@@ -103,6 +103,20 @@ public:
     ///@}
 
     /**
+     * @name Get positions for self and content
+     */
+    ///@{
+    int GetSelfBottom() const { return (this->GetDrawingY() + m_selfBB_y1); }
+    int GetSelfTop() const { return (this->GetDrawingY() + m_selfBB_y2); }
+    int GetSelfLeft() const { return (this->GetDrawingX() + m_selfBB_x1); }
+    int GetSelfRight() const { return (this->GetDrawingX() + m_selfBB_x2); }
+    int GetContentBottom() const { return (this->GetDrawingY() + m_contentBB_y1); }
+    int GetContentTop() const { return (this->GetDrawingY() + m_contentBB_y2); }
+    int GetContentLeft() const { return (this->GetDrawingX() + m_contentBB_x1); }
+    int GetContentRight() const { return (this->GetDrawingX() + m_contentBB_x2); }
+    ///@}
+
+    /**
      * Is true if the bounding box (self or content) has been updated at least once.
      * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
      */
@@ -422,6 +436,14 @@ public:
     void Modify(bool modified = true);
 
     /**
+     * @name Setter and getter of the attribute flag
+     */
+    ///@{
+    bool IsAttribute() const { return m_isAttribute; }
+    void IsAttribute(bool isAttribute) { m_isAttribute = isAttribute; }
+    ///@}
+
+    /**
      * Saves the object (and its children) using the specified output stream.
      * Creates functors that will parse the tree.
      */
@@ -503,6 +525,11 @@ public:
      * @name Functors for aligning the content horizontally
      */
     ///@{
+
+    /**
+     * Adjust the position the outside articulations.
+     */
+    virtual int AdjustArticulations(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of all floating positionner, staff by staff.
@@ -709,6 +736,12 @@ public:
     virtual int PrepareLyricsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Functor for setting the artic parts.
+     * Splits the artic content into different artic parts if necessary
+     */
+    virtual int PrepareArtic(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Functor for setting mRpt drawing numbers (if required)
      * The functor is processed by staff/layer using an ArrayOfAttComparisons filter.
      */
@@ -868,6 +901,12 @@ private:
      * the object when printing an MEI element.
      */
     std::string m_comment;
+
+    /**
+     * A flag indicating if the Object represents an attribute in the original MEI.
+     * For example, a Artic child in Note for an original @artic
+     */
+    bool m_isAttribute;
 };
 
 //----------------------------------------------------------------------------

@@ -76,6 +76,20 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustArticulationsParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the Doc
+ **/
+
+class AdjustArticulationsParams : public FunctorParams {
+public:
+    AdjustArticulationsParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AdjustFloatingPostionersParams
 //----------------------------------------------------------------------------
 
