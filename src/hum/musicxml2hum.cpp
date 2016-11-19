@@ -110,6 +110,8 @@ bool musicxml2hum_interface::convert(ostream& out, xml_document& doc) {
 	HumGrid outdata;
 	status &= stitchParts(outdata, partids, partinfo, partcontent, partdata);
 
+	outdata.removeRedundantClefChanges();
+
 	// tranfer verse counts from parts/staves to HumGrid:
 	// should also do part verse counts here (-1 staffindex).
 	int versecount;

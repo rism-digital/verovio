@@ -43,7 +43,9 @@ enum class SliceType {
 			LocalComments,
 	_Spined,
 		GlobalComment,
-		ReferenceRecord
+		ReferenceRecord,
+	_Other,
+		Invalid
 };
 
 

@@ -601,6 +601,21 @@ ostream& operator<<(ostream& output, GridSlice* slice) {
 
 
 
+//////////////////////////////
+//
+// GridSlice::invalidate -- Mark the slice as invalid, which means that
+//    it should not be transferred to the output Humdrum file in HumGrid.
+//    Tokens stored in the GridSlice will be deleted by GridSlice when it
+//    is destroyed.
+//
+
+void GridSlice::invalidate(void) {
+		m_type = SliceType::Invalid;
+		// should only do with 0 duration slices, but force to 0 if not already.
+		setDuration(0);
+}
+
+
 } // end namespace hum
 
 

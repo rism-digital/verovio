@@ -49,6 +49,7 @@ class GridSlice : public vector<GridPart*> {
 		bool isClefSlice(void)     { return m_type == SliceType::Clefs; }
 		bool isTimeSigSlice(void)  { return m_type == SliceType::TimeSigs; }
 		bool isMeterSigSlice(void) { return m_type == SliceType::MeterSigs; }
+		bool isInvalidSlice(void)  { return m_type == SliceType::Invalid; }
 		bool isInterpretationSlice(void);
 		bool isDataSlice(void);
 		SliceType getType(void)    { return m_type; }
@@ -65,6 +66,7 @@ class GridSlice : public vector<GridPart*> {
 		HumNum       getMeasureDuration (void);
 		HumNum       getMeasureTimestamp(void);
 		GridMeasure* getMeasure         (void);
+		void         invalidate         (void);
 
 		void transferSides        (HumdrumLine& line, GridStaff& sides, 
 		                           const string& empty, int maxvcount,

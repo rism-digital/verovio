@@ -1243,6 +1243,84 @@ void HumGrid::insertSideTerminals(HumdrumLine* line, int part, int staff) {
 
 
 
+//////////////////////////////
+//
+// HumGrid::removeRedundantClefChanges -- Will also have to consider
+//		the meter signature.
+//
+
+void HumGrid::removeRedundantClefChanges(void) {
+	// curclef is a list of the current staff on the part:staff.
+	vector<vector<string> > curclef;
+
+	bool hasduplicate = false;
+	GridMeasure* measure;
+	GridVoice* voice;
+	HTp token;
+	for (int m=0; m<(int)this->size(); m++) {
+		measure = this->at(m);
+		for (auto slice : *measure) {
+			if (!slice->isClefSlice()) {
+				continue;
+			}
+			bool allempty = true;
+			for (int p=0; p<(int)slice->size(); p++) {
+				for (int s=0; s<(int)slice->at(p)->size(); s++) {
+					if (slice->at(p)->at(s)->size() < 1) {
+						continue;
+					}
+					voice = slice->at(p)->at(s)->at(0);
+					token = voice->getToken();
+					if (!token) {
+						continue;
+					}
+					if (string(*token) == "*") {
+						continue;
+					}
+					if (token->find("clef") == string::npos) {
+						// something (probably invalid) which is not a clef change
+						allempty = false;
+						continue;
+					}
+					if (p >= (int)curclef.size()) {
+						curclef.resize(p+1);
+					}
+					if (s >= (int)curclef[p].size()) {
+						// first clef on the staff, so can't be a duplicate
+						curclef[p].resize(s+1);
+						curclef[p][s] = *token;
+						allempty = false;
+						continue;
+					} else {
+						if (curclef[p][s] == (string)*token) {
+							// clef is already active, so remove this one
+							hasduplicate = true;
+							voice->setToken("*");
+						} else {
+							// new clef change
+							curclef[p][s] = *token;
+							allempty = false;
+						}
+					}
+				}
+			}
+			if (!hasduplicate) {
+				continue;
+			}
+			// Check the slice to see if it empty, and delete if so.
+			// This algorithm does not consider GridSide content.
+			if (allempty) {
+				slice->invalidate();
+			}
+			
+		}
+	}
+
+
+}
+
+
+
 } // end namespace hum
 
 

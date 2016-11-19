@@ -35,6 +35,7 @@ class HumGrid : public vector<GridMeasure*> {
 		int  getVerseCount    (int partindex, int staffindex);
 		void setVerseCount    (int partindex, int staffindex, int count);
 		void setHarmonyCount  (int partindex, int count);
+		void removeRedundantClefChanges(void);
 
 	protected:
 		void calculateGridDurations            (void);

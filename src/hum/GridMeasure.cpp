@@ -78,6 +78,11 @@ bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip) {
 	}
 
 	for (auto it : *this) {
+		if (it->isInvalidSlice()) {
+			// ignore slices to be removed from output (used for 
+			// removing redundant clef slices).
+			continue;
+		}
 		it->transferTokens(outfile, recip);
 	}
 	return true;
