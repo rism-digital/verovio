@@ -13,6 +13,10 @@ var hierarchy =
     [ "AttAccidLog", null, [
       [ "vrv::Accid", "classvrv_1_1_accid.html", null ]
     ] ],
+    [ "AttArticulation", null, [
+      [ "vrv::Artic", "classvrv_1_1_artic.html", null ],
+      [ "vrv::ArticPart", "classvrv_1_1_artic_part.html", null ]
+    ] ],
     [ "AttAugmentdots", null, [
       [ "vrv::DurationInterface", "classvrv_1_1_duration_interface.html", [
         [ "vrv::Chord", "classvrv_1_1_chord.html", null ],
@@ -46,6 +50,8 @@ var hierarchy =
     ] ],
     [ "AttColor", null, [
       [ "vrv::Accid", "classvrv_1_1_accid.html", null ],
+      [ "vrv::Artic", "classvrv_1_1_artic.html", null ],
+      [ "vrv::ArticPart", "classvrv_1_1_artic_part.html", null ],
       [ "vrv::BeatRpt", "classvrv_1_1_beat_rpt.html", null ],
       [ "vrv::Hairpin", "classvrv_1_1_hairpin.html", null ],
       [ "vrv::Note", "classvrv_1_1_note.html", null ],
@@ -110,10 +116,11 @@ var hierarchy =
       [ "vrv::StaffGrp", "classvrv_1_1_staff_grp.html", null ]
     ] ],
     [ "vrv::AttComparison", "classvrv_1_1_att_comparison.html", [
+      [ "vrv::ArticPartTypeComparison", "classvrv_1_1_artic_part_type_comparison.html", null ],
       [ "vrv::AttCommonNComparison", "classvrv_1_1_att_common_n_comparison.html", null ],
       [ "vrv::AttDurExtreme", "classvrv_1_1_att_dur_extreme.html", null ],
-      [ "vrv::AttMeasureAlignerType", "classvrv_1_1_att_measure_aligner_type.html", null ],
-      [ "vrv::AttNoteOnsetOffsetComparison", "classvrv_1_1_att_note_onset_offset_comparison.html", null ]
+      [ "vrv::MeasureAlignerTypeComparison", "classvrv_1_1_measure_aligner_type_comparison.html", null ],
+      [ "vrv::NoteOnsetOffsetComparison", "classvrv_1_1_note_onset_offset_comparison.html", null ]
     ] ],
     [ "AttConverter", null, [
       [ "vrv::Att", "classvrv_1_1_att.html", null ]
@@ -228,6 +235,8 @@ var hierarchy =
       [ "vrv::PitchInterface", "classvrv_1_1_pitch_interface.html", null ]
     ] ],
     [ "AttPlacement", null, [
+      [ "vrv::Artic", "classvrv_1_1_artic.html", null ],
+      [ "vrv::ArticPart", "classvrv_1_1_artic_part.html", null ],
       [ "vrv::Hairpin", "classvrv_1_1_hairpin.html", null ],
       [ "vrv::Pedal", "classvrv_1_1_pedal.html", null ],
       [ "vrv::TextDirInterface", "classvrv_1_1_text_dir_interface.html", null ]
@@ -379,6 +388,8 @@ var hierarchy =
         [ "vrv::Layer", "classvrv_1_1_layer.html", null ],
         [ "vrv::LayerElement", "classvrv_1_1_layer_element.html", [
           [ "vrv::Accid", "classvrv_1_1_accid.html", null ],
+          [ "vrv::Artic", "classvrv_1_1_artic.html", null ],
+          [ "vrv::ArticPart", "classvrv_1_1_artic_part.html", null ],
           [ "vrv::BarLine", "classvrv_1_1_bar_line.html", null ],
           [ "vrv::Beam", "classvrv_1_1_beam.html", null ],
           [ "vrv::BeatRpt", "classvrv_1_1_beat_rpt.html", null ],
@@ -432,6 +443,7 @@ var hierarchy =
     ] ],
     [ "vrv::DrawingListInterface", "classvrv_1_1_drawing_list_interface.html", [
       [ "vrv::Beam", "classvrv_1_1_beam.html", null ],
+      [ "vrv::Chord", "classvrv_1_1_chord.html", null ],
       [ "vrv::Layer", "classvrv_1_1_layer.html", null ],
       [ "vrv::System", "classvrv_1_1_system.html", null ]
     ] ],
@@ -439,6 +451,7 @@ var hierarchy =
     [ "vrv::Functor", "classvrv_1_1_functor.html", null ],
     [ "vrv::FunctorParams", "classvrv_1_1_functor_params.html", [
       [ "vrv::AddLayerElementToFlatListParams", "classvrv_1_1_add_layer_element_to_flat_list_params.html", null ],
+      [ "vrv::AdjustArticulationsParams", "classvrv_1_1_adjust_articulations_params.html", null ],
       [ "vrv::AdjustFloatingPostionerGrpsParams", "classvrv_1_1_adjust_floating_postioner_grps_params.html", null ],
       [ "vrv::AdjustFloatingPostionersParams", "classvrv_1_1_adjust_floating_postioners_params.html", null ],
       [ "vrv::AlignHorizontallyParams", "classvrv_1_1_align_horizontally_params.html", null ],

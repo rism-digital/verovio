@@ -260,6 +260,15 @@
                 </changeDesc>
                 <date isodate="2016-05-12"/>
             </change>
+            <change n="12">
+                <respStmt>
+                    <persName resp="Laurent Pugin"/>
+                </respStmt>
+                <changeDesc>
+                    <p>Making some slurs pointing to the chords and not to the notes</p>
+                </changeDesc>
+                <date isodate="2016-11-18"/>
+            </change>
         </revisionDesc>
     </meiHead>
     <music>
@@ -4991,8 +5000,8 @@
                             </staff>
                             <slur curvedir="above" startid="#d648110e28741" endid="d648110e28796" />
                             <hairpin tstamp="1.125" tstamp2="1m+3.708" form="cres" place="below" staff="1" opening="1.5" startto="-5" endto="-7"/>
-                            <slur curvedir="below" startid="#d648110e28960" endid="d648110e29009" />
-                            <slur curvedir="below" startid="#d648110e29071" endid="d648110e29124" />
+                            <slur curvedir="below" startid="#d649424e1" endid="d649428e1" />
+                            <slur curvedir="below" startid="#d649432e1" endid="d649436e1" />
                             <hairpin tstamp="1.083" tstamp2="1m+3.375" form="cres" place="below" staff="2" opening="1.5" startto="-6" endto="-7"/>
                             <slur curvedir="below" startid="#d648110e29192" endid="d648110e29222" />
                             <slur curvedir="below" startid="#d648110e29267" endid="d648110e29299" />
@@ -5132,8 +5141,8 @@
                             <slur curvedir="above" startid="#d648110e29566" endid="d648110e29616" />
                             <slur curvedir="above" startid="#d648110e29656" endid="d648110e29683" />
                             <slur curvedir="above" startid="#d648110e29727" endid="d648110e29756" />
-                            <slur curvedir="below" startid="#d648110e29793" endid="d648110e29842" />
-                            <slur curvedir="below" startid="#d648110e29904" endid="d648110e29957" />
+                            <slur curvedir="below" startid="#d649465e1" endid="d649469e1" />
+                            <slur curvedir="below" startid="#d649473e1" endid="d649477e1" />
                             <slur curvedir="below" startid="#d648110e30025" endid="d648110e30055" />
                             <slur curvedir="below" startid="#d648110e30098" endid="d648110e30125" />
                             <slur curvedir="below" startid="#d648110e30167" endid="d648110e30196" />
@@ -5257,7 +5266,7 @@
                             <hairpin tstamp="1.125" tstamp2="0m+3.583" form="dim" place="below" staff="2" opening="0" startto="-5" endto="-2"/>
                             <slur curvedir="below" startid="#d648110e30702" endid="d648110e30731" />
                             <slur curvedir="below" startid="#d648110e30773" endid="d648110e30800" />
-                            <slur curvedir="above" startid="#d648110e30852" endid="d648110e30901" />
+                            <slur curvedir="above" startid="#d649506e1" endid="#d649510e1" />
                             <slur curvedir="below" startid="#d648110e30963" endid="d648110e30992" />
                             <slur curvedir="above" startid="#d648110e31036" endid="d648110e31065" />
                             <hairpin tstamp="1" tstamp2="0m+3.542" form="dim" place="below" staff="3" opening="0" endto="-11"/>
@@ -8564,7 +8573,7 @@
                             <slur curvedir="below" startid="#d648110e53331" endid="d648110e53385" />
                             <hairpin tstamp="1.125" tstamp2="0m+2.875" form="dim" place="below" staff="1" opening="1.5" startto="-45" endto="-3"/>
                             <hairpin tstamp="1.25" tstamp2="0m+2.875" form="dim" place="below" staff="2" opening="1.5" startto="-42" endto="-3"/>
-                            <slur curvedir="below" startid="#d648110e53430" endid="d648110e53467" />
+                            <slur curvedir="below" startid="#d650764e1" endid="#d650768e1" />
                         </measure>
                         <measure n="96" xml:id="d648110e53593" right="end">
                             <staff n="1">

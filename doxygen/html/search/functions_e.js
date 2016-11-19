@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['save',['Save',['../classvrv_1_1_measure.html#a53146c5860c0e95b6510108dbc5493d8',1,'vrv::Measure::Save()'],['../classvrv_1_1_object.html#a9ed5a5a188e80752f5f553f0267059dd',1,'vrv::Object::Save(FileOutputStream *output)'],['../classvrv_1_1_object.html#a8ec6663670b4b6522cb4892babf36742',1,'vrv::Object::Save(FunctorParams *functorParams)']]],
+  ['save',['Save',['../classvrv_1_1_artic_part.html#af6ed201057713592e24e522c25ed71e8',1,'vrv::ArticPart::Save()'],['../classvrv_1_1_measure.html#a53146c5860c0e95b6510108dbc5493d8',1,'vrv::Measure::Save()'],['../classvrv_1_1_object.html#a9ed5a5a188e80752f5f553f0267059dd',1,'vrv::Object::Save(FileOutputStream *output)'],['../classvrv_1_1_object.html#a8ec6663670b4b6522cb4892babf36742',1,'vrv::Object::Save(FunctorParams *functorParams)']]],
   ['savefile',['SaveFile',['../classvrv_1_1_toolkit.html#a968a2feb41a558700a2e9061489ce90a',1,'vrv::Toolkit']]],
   ['setaligmentypos',['SetAligmentYPos',['../classvrv_1_1_staff_alignment.html#ae7bd328453964356db5606f39f799f0e',1,'vrv::StaffAlignment::SetAligmentYPos()'],['../classvrv_1_1_object.html#a2581ff91e16fef7b848dc2ba968c678f',1,'vrv::Object::SetAligmentYPos()'],['../classvrv_1_1_system.html#a8157619b0b1f921dab8ad800bf95a91d',1,'vrv::System::SetAligmentYPos()']]],
   ['setalignment',['SetAlignment',['../classvrv_1_1_bar_line.html#a70df30f78536cb17a7381478310792f7',1,'vrv::BarLine']]],
@@ -31,6 +31,7 @@ var searchData=
   ['setscoredefdrawingwidth',['SetScoreDefDrawingWidth',['../classvrv_1_1_view.html#a303f43f2ba8d9098e6391efc79711fbf',1,'vrv::View']]],
   ['setstaffdefredrawflags',['SetStaffDefRedrawFlags',['../classvrv_1_1_object.html#af661ccbb821d7e2a22e313069c8b8cf6',1,'vrv::Object::SetStaffDefRedrawFlags()'],['../classvrv_1_1_staff_def.html#a56d69722b3495b9e5e91d38229753caa',1,'vrv::StaffDef::SetStaffDefRedrawFlags()']]],
   ['setuuidstr',['SetUuidStr',['../classvrv_1_1_time_point_interface.html#acf47474d192a6a9c14732c4055605a6d',1,'vrv::TimePointInterface']]],
+  ['splitartic',['SplitArtic',['../classvrv_1_1_artic.html#ab6b401bb7dfd502eccd21bf9614bc905',1,'vrv::Artic']]],
   ['stacknote',['StackNote',['../classvrv_1_1_grace_aligner.html#a7d499779f4f450b7c946e42e192c8b50',1,'vrv::GraceAligner']]],
   ['strtostr',['StrToStr',['../classvrv_1_1_att.html#a0a89abf0ef2104b4ef015fcdbf66f03d',1,'vrv::Att']]]
 ];

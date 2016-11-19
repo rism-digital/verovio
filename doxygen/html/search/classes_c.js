@@ -2,6 +2,7 @@ var searchData=
 [
   ['measure',['Measure',['../classvrv_1_1_measure.html',1,'vrv']]],
   ['measurealigner',['MeasureAligner',['../classvrv_1_1_measure_aligner.html',1,'vrv']]],
+  ['measurealignertypecomparison',['MeasureAlignerTypeComparison',['../classvrv_1_1_measure_aligner_type_comparison.html',1,'vrv']]],
   ['meiinput',['MeiInput',['../classvrv_1_1_mei_input.html',1,'vrv']]],
   ['meioutput',['MeiOutput',['../classvrv_1_1_mei_output.html',1,'vrv']]],
   ['mensur',['Mensur',['../classvrv_1_1_mensur.html',1,'vrv']]],

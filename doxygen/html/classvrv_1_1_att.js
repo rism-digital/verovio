@@ -2,6 +2,7 @@ var classvrv_1_1_att =
 [
     [ "Att", "classvrv_1_1_att.html#ab2fe2a045e5d42cc66eb3777b401184a", null ],
     [ "~Att", "classvrv_1_1_att.html#ace6d34f667598b67ab1ddd304df63765", null ],
+    [ "ArticulationListToStr", "classvrv_1_1_att.html#ac905322c52ebd05cc659de969a95f2fb", null ],
     [ "BeatrptRendToStr", "classvrv_1_1_att.html#aa379d81915fdd759846b0198d89a9e82", null ],
     [ "DblToStr", "classvrv_1_1_att.html#a0f73478df5e0a31768f8dd2dfad07ba1", null ],
     [ "DurationToStr", "classvrv_1_1_att.html#a7687335e15f812e400b85ab0fbead1a9", null ],
@@ -20,6 +21,7 @@ var classvrv_1_1_att =
     [ "PitchnameToStr", "classvrv_1_1_att.html#af20e1c1220e776d5a601de28b6b3e3d2", null ],
     [ "ProlatioToStr", "classvrv_1_1_att.html#a77f8b084397812dc7b8feb1239e34eab", null ],
     [ "StemdirectionToStr", "classvrv_1_1_att.html#a29a0fa4c27b3f60d87a1daf798477810", null ],
+    [ "StrToArticulationList", "classvrv_1_1_att.html#ad2e8be1ab333607dbf2d8b29a3960c4c", null ],
     [ "StrToBeatrptRend", "classvrv_1_1_att.html#a13803bb78b919e447f91891031f91b45", null ],
     [ "StrToDbl", "classvrv_1_1_att.html#a08e338f8c01167e1e1b63775deeac622", null ],
     [ "StrToDuration", "classvrv_1_1_att.html#a916f3bbc21999b717d03987502b9a11b", null ],
@@ -41,8 +43,8 @@ var classvrv_1_1_att =
     [ "StrToStr", "classvrv_1_1_att.html#a0a89abf0ef2104b4ef015fcdbf66f03d", null ],
     [ "StrToTempus", "classvrv_1_1_att.html#a9b1d7bf9754bf2e38ac776a70e4217ec", null ],
     [ "StrToTie", "classvrv_1_1_att.html#aa95bf3b2ccab23f2f54458772fd89318", null ],
-    [ "StrToXsdPosintlist", "classvrv_1_1_att.html#a18cfc4eeb3961c051dc22f5e85bd90b5", null ],
+    [ "StrToXsdPositiveIntegerList", "classvrv_1_1_att.html#a60559f77ab37ee6df2501f098509fc95", null ],
     [ "TempusToStr", "classvrv_1_1_att.html#a49b7ec0058aea1b16ca943d1a3cc9db5", null ],
     [ "TieToStr", "classvrv_1_1_att.html#a8f10ab7d20be6d0ffb67b07122fe6860", null ],
-    [ "XsdPosintlistToStr", "classvrv_1_1_att.html#a2c88347a45ca672bb537d20fcdd842f6", null ]
+    [ "XsdPositiveIntegerListToStr", "classvrv_1_1_att.html#a67d1bd905ca48dee9001a0fd555ba31b", null ]
 ];
