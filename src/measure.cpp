@@ -567,12 +567,25 @@ int Measure::PrepareFloatingGrps(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::PrepareTimePointingEnd(FunctorParams *functorParams)
+{
+    PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
+    assert(params);
+
+    ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
+    while (iter != params->m_timePointingInterfaces.end()) {
+        iter = params->m_timePointingInterfaces.erase(iter);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
 {
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
-    ArrayOfInterfaceClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         // At the end of the measure (going backward) we remove element for which we do not need to match the end
         // (for

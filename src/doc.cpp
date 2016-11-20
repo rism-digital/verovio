@@ -228,6 +228,13 @@ void Doc::PrepareDrawing()
         this->Process(&prepareTimeSpanning, &prepareTimeSpanningParams);
     }
 
+    // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
+    PrepareTimePointingParams prepareTimePointingParams;
+    Functor prepareTimePointing(&Object::PrepareTimePointing);
+    Functor prepareTimePointingEnd(&Object::PrepareTimePointingEnd);
+    this->Process(
+        &prepareTimePointing, &prepareTimePointingParams, &prepareTimePointingEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
+
     // Now try to match the @tstamp and @tstamp2 attributes.
     PrepareTimestampsParams prepareTimestampsParams;
     prepareTimestampsParams.m_timeSpanningInterfaces = prepareTimeSpanningParams.m_timeSpanningInterfaces;
