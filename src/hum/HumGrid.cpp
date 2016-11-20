@@ -30,6 +30,10 @@ HumGrid::HumGrid(void) {
 	m_verseCount.resize(100);
 	m_harmonyCount.resize(100);
 	fill(m_harmonyCount.begin(), m_harmonyCount.end(), 0);
+
+	// default options
+	m_musicxmlbarlines = true;
+	m_recip = true;
 }
 
 
@@ -593,6 +597,12 @@ void HumGrid::addMeasureLines(void) {
 	int staffcount, partcount, vcount, nextvcount, lcount;
 	GridMeasure* measure;
 	GridMeasure* nextmeasure;
+
+	vector<int> barnums;
+	if (!m_musicxmlbarlines) {
+		getMetricBarNumbers(barnums);
+	}
+
 	for (int m=0; m<(int)this->size()-1; m++) {
 		measure = this->at(m);
 		nextmeasure = this->at(m+1);
@@ -627,7 +637,13 @@ void HumGrid::addMeasureLines(void) {
 					lcount = nextvcount;
 				}
 				for (int v=0; v<lcount; v++) {
-					token = new HumdrumToken("=");
+					if (m_musicxmlbarlines) {
+						// m+1 because of the measure number
+						// comes from the previous measure.
+						token = new HumdrumToken("=" + to_string(m+1));
+					} else {
+						token = new HumdrumToken("=" + to_string(barnums[m]));
+					}
 					gt = new GridVoice(token, 0);
 					mslice->at(p)->at(s)->push_back(gt);
 				}
@@ -637,6 +653,21 @@ void HumGrid::addMeasureLines(void) {
 	}
 
    // add last measure later
+}
+
+
+
+//////////////////////////////
+//
+// HumGrid::addMetricBarNumbers --
+//
+
+void HumGrid::getMetricBarNumbers(vector<int>& barnums) {
+	int mcount = (int)this->size();
+	barnums.resize(mcount);
+	for (int m=0; m<(int)this->size(); m++) {
+		barnums[m] = (int)barnums.size()-m+1;
+	}
 }
 
 

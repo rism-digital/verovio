@@ -133,6 +133,7 @@ class MxmlEvent {
 		xml_node           m_hnode;      // harmony label starting at note event
 		bool               m_invisible;  // for forceInvisible();
 
+
 	private:
    	void   reportStaffNumberToOwner  (int staffnum, int voicenum);
 		void   reportTimeSigDurToOwner   (HumNum duration);

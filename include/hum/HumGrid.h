@@ -38,44 +38,48 @@ class HumGrid : public vector<GridMeasure*> {
 		void removeRedundantClefChanges(void);
 
 	protected:
-		void calculateGridDurations            (void);
+		void calculateGridDurations        (void);
 		void insertExclusiveInterpretationLine (HumdrumFile& outfile);
-		void insertDataTerminationLine         (HumdrumFile& outfile);
-		void appendMeasureLine						(HumdrumFile& outfile,
-		                                        GridSlice& slice);
-		void insertPartIndications             (HumdrumFile& outfile);
-		void insertStaffIndications            (HumdrumFile& outfile);
-		void addNullTokens                     (void);
-		bool buildSingleList                   (void);
-		void extendDurationToken               (int slicei, int parti,
-		                                        int staffi, int voicei);
+		void insertDataTerminationLine     (HumdrumFile& outfile);
+		void appendMeasureLine             (HumdrumFile& outfile,
+		                                    GridSlice& slice);
+		void insertPartIndications         (HumdrumFile& outfile);
+		void insertStaffIndications        (HumdrumFile& outfile);
+		void addNullTokens                 (void);
+		bool buildSingleList               (void);
+		void extendDurationToken           (int slicei, int parti,
+		                                    int staffi, int voicei);
 		GridVoice* getGridVoice(int slicei, int parti, int staffi, int voicei);
-		void addMeasureLines                   (void);
-		void addLastMeasure                    (void);
-		bool manipulatorCheck                  (void);
-		GridSlice* manipulatorCheck            (GridSlice* ice1, GridSlice* ice2);
-		void cleanupManipulators               (void);
-		void cleanManipulator                  (vector<GridSlice*>& newslices, 
-		                                        GridSlice* curr);
-		GridSlice* checkManipulatorContract    (GridSlice* curr);
-		void transferMerges                    (GridStaff* oldstaff,
-		                                        GridStaff* oldlaststaff,
-		                                        GridStaff* newstaff,
-		                                        GridStaff* newlaststaff);
-		void insertExInterpSides               (HumdrumLine* line, int part,
-		                                        int staff);
-		void insertSideTerminals               (HumdrumLine* line, int part, 
-		                                        int staff);
-		void insertSidePartInfo                (HumdrumLine* line, int part,
-		                                        int staff);
-		void insertSideStaffInfo               (HumdrumLine* line, int part,
-		                                        int staff, int staffnum);
+		void addMeasureLines                (void);
+		void addLastMeasure                 (void);
+		bool manipulatorCheck               (void);
+		GridSlice* manipulatorCheck         (GridSlice* ice1, GridSlice* ice2);
+		void cleanupManipulators            (void);
+		void cleanManipulator               (vector<GridSlice*>& newslices, 
+		                                     GridSlice* curr);
+		GridSlice* checkManipulatorContract (GridSlice* curr);
+		void transferMerges                 (GridStaff* oldstaff,
+		                                     GridStaff* oldlaststaff,
+		                                     GridStaff* newstaff,
+		                                     GridStaff* newlaststaff);
+		void insertExInterpSides            (HumdrumLine* line, int part,
+		                                     int staff);
+		void insertSideTerminals            (HumdrumLine* line, int part, 
+		                                     int staff);
+		void insertSidePartInfo             (HumdrumLine* line, int part,
+		                                     int staff);
+		void insertSideStaffInfo            (HumdrumLine* line, int part,
+		                                     int staff, int staffnum);
+		void getMetricBarNumbers            (vector<int>& barnums);
 
 	private:
-		bool m_recip = true;
 		vector<GridSlice*>   m_allslices;
 		vector<vector<int> > m_verseCount;
 		vector<int>          m_harmonyCount;
+
+		// options:
+		bool m_recip;               // include **recip spine in output
+		bool m_musicxmlbarlines;    // use measure numbers from <measure> element
 
 };
 
