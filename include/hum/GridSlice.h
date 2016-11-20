@@ -49,6 +49,7 @@ class GridSlice : public vector<GridPart*> {
 		bool isClefSlice(void)     { return m_type == SliceType::Clefs; }
 		bool isTimeSigSlice(void)  { return m_type == SliceType::TimeSigs; }
 		bool isMeterSigSlice(void) { return m_type == SliceType::MeterSigs; }
+		bool isManipulatorSlice(void) { return m_type==SliceType::Manipulators; }
 		bool isInvalidSlice(void)  { return m_type == SliceType::Invalid; }
 		bool isInterpretationSlice(void);
 		bool isDataSlice(void);

@@ -36,6 +36,7 @@ class HumGrid : public vector<GridMeasure*> {
 		void setVerseCount    (int partindex, int staffindex, int count);
 		void setHarmonyCount  (int partindex, int count);
 		void removeRedundantClefChanges(void);
+		bool hasPickup         (void);
 
 	protected:
 		void calculateGridDurations        (void);
@@ -76,6 +77,7 @@ class HumGrid : public vector<GridMeasure*> {
 		vector<GridSlice*>   m_allslices;
 		vector<vector<int> > m_verseCount;
 		vector<int>          m_harmonyCount;
+		bool                 m_pickup;
 
 		// options:
 		bool m_recip;               // include **recip spine in output

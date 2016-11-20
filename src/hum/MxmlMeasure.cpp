@@ -64,7 +64,7 @@ void MxmlMeasure::clear(void) {
 	}
 	m_events.clear();
 	m_owner = NULL;
-	m_timesigdur = 1;
+	m_timesigdur = -1;
 	m_previous = m_following = NULL;
 }
 
@@ -108,17 +108,17 @@ bool MxmlMeasure::parseMeasure(xml_node mel) {
    bool needdummy = false;
 
    MxmlMeasure* pmeasure = getPreviousMeasure();
-   if (getTimeSignatureDuration() == 0) {
+   if (getTimeSigDur() <= 0) {
       if (pmeasure) {
-         setTimeSignatureDuration(pmeasure->getTimeSignatureDuration());
+         setTimeSigDur(pmeasure->getTimeSigDur());
       }
    }
 
    if (getDuration() == 0) {
       if (pmeasure) {
-         setDuration(pmeasure->getTimeSignatureDuration());
+         setDuration(pmeasure->getTimeSigDur());
       } else {
-         setTimeSignatureDuration(getTimeSignatureDuration());
+         setTimeSigDur(getTimeSigDur());
       }
       needdummy = true;
    }
@@ -130,7 +130,7 @@ bool MxmlMeasure::parseMeasure(xml_node mel) {
       // of the measure to the duration of the time signature
       // This is needed for certain cases of multi-measure rests, where no
       // full-measure rest is given in the measure (Sibelius does this).
-      setDuration(getTimeSignatureDuration());
+      setDuration(getTimeSigDur());
 		addDummyRest();
    }
 
@@ -181,7 +181,7 @@ vector<MxmlEvent*>& MxmlMeasure::getEventList(void) {
 //
 
 void MxmlMeasure::addDummyRest(void) {
-   HumNum measuredur = getTimeSignatureDuration();
+   HumNum measuredur = getTimeSigDur();
    HumNum starttime = getStartTime();
    MxmlEvent* event = new MxmlEvent(this);
    m_events.push_back(event);
@@ -654,17 +654,17 @@ void MxmlMeasure::receiveStaffNumberFromChild(int staffnum, int voicenum) {
 //
 
 void MxmlMeasure::receiveTimeSigDurFromChild(HumNum duration) {
-   setTimeSignatureDuration(duration);
+   setTimeSigDur(duration);
 }
 
 
 
 //////////////////////////////
 //
-// MxmlMeasure::setTimeSignatureDuration --
+// MxmlMeasure::setTimeSigDur --
 //
 
-void MxmlMeasure::setTimeSignatureDuration(HumNum duration) {
+void MxmlMeasure::setTimeSigDur(HumNum duration) {
    m_timesigdur = duration;
 }
 
@@ -672,10 +672,10 @@ void MxmlMeasure::setTimeSignatureDuration(HumNum duration) {
 
 //////////////////////////////
 //
-// MxmlMeasure::getTimeSignatureDuration --
+// MxmlMeasure::getTimeSigDur --
 //
 
-HumNum MxmlMeasure::getTimeSignatureDuration(void) {
+HumNum MxmlMeasure::getTimeSigDur(void) {
    return m_timesigdur;
 }
 

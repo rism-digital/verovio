@@ -34,18 +34,25 @@ class GridMeasure : public list<GridSlice*> {
 		GridMeasure(HumGrid* owner);
 		~GridMeasure();
 
-		bool         transferTokens (HumdrumFile& outfile, bool recip);
+		bool         transferTokens (HumdrumFile& outfile, bool recip,
+		                             bool addbar);
 		HumGrid*     getOwner       (void);
 		void         setOwner       (HumGrid* owner);
 		HumNum       getDuration    (void);
 		void         setDuration    (HumNum duration);
 		HumNum       getTimestamp   (void);
 		void         setTimestamp   (HumNum timestamp);
+		HumNum       getTimeSigDur  (void);
+		void         setTimeSigDur  (HumNum duration);
+
+	protected:
+		void         appendInitialBarline(HumdrumFile& infile);
 
 	private:
 		HumGrid* m_owner;
 		HumNum   m_duration;
 		HumNum   m_timestamp;
+		HumNum   m_timesigdur;
 };
 
 

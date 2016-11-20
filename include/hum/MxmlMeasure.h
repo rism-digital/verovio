@@ -75,8 +75,8 @@ class MxmlMeasure {
 		MxmlMeasure*  getNextMeasure     (void) const;
 		int           getVoiceIndex      (int voicenum);
 		int           getStaffIndex      (int voicenum);
-		void          setTimeSignatureDuration(HumNum duration);
-		HumNum        getTimeSignatureDuration(void);
+		void          setTimeSigDur      (HumNum duration);
+		HumNum        getTimeSigDur      (void);
 		void          addDummyRest       (void);
 		void          addDummyRest       (HumNum starttime, HumNum duration, 
 		                                  int staffindex, int voiceindex);

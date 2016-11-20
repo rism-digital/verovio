@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Nov 17 20:34:30 PST 2016
+// Last Modified: Sun Nov 20 12:55:14 PST 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -3266,6 +3266,17 @@ void HumdrumFileBase::insertLine(int index, const string& line) {
 void HumdrumFileBase::insertLine(int index, HumdrumLine* line) { 
 	// deletion will be handled by class.
 	lines.insert(lines.begin() + index, line);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileBase::back --
+//
+
+HumdrumLine* HumdrumFileBase::back(void) {
+	return lines.back();
 }
 
 

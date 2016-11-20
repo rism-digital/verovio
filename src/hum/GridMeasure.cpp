@@ -50,7 +50,8 @@ GridMeasure::~GridMeasure(void) {
 // GridMeasure::transferTokens --
 //
 
-bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip) {
+bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip,
+		bool addbar) {
 
 	// If the last data slice duration is zero, then calculate
 	// the true duration from the duration of the measure.
@@ -77,15 +78,55 @@ bool GridMeasure::transferTokens(HumdrumFile& outfile, bool recip) {
 		}
 	}
 
+	bool founddata = false;
+	bool addedbar = false;
+
 	for (auto it : *this) {
 		if (it->isInvalidSlice()) {
 			// ignore slices to be removed from output (used for 
 			// removing redundant clef slices).
 			continue;
 		}
+		if (it->isDataSlice()) {
+			founddata = true;
+		}
+		if (it->isManipulatorSlice()) {
+			// didn't acutally find data, but the barline should
+			// be placed before any manipulator (a spine split), since
+			// that is more a property of the data than of the header
+			// interpretations.
+			founddata = true;
+		}
+		if (founddata && addbar && !addedbar) {
+			appendInitialBarline(outfile);
+			addedbar = true;
+		}
 		it->transferTokens(outfile, recip);
 	}
 	return true;
+}
+
+
+
+//////////////////////////////
+//
+// GridMeasure::appendInitialBarline -- The barline will be
+//    duplicated to all spines later.
+//
+
+void GridMeasure::appendInitialBarline(HumdrumFile& infile) {
+	if (infile.getLineCount() == 0) {
+		// strange case which should never happen.
+		return;
+	}
+	int fieldcount = infile.back()->getFieldCount();
+	HumdrumLine* line = new HumdrumLine;
+	HTp token;
+	for (int i=0; i<fieldcount; i++) {
+		token = new HumdrumToken("=1-");
+		line->appendToken(token);
+	}
+	infile.push_back(line);
 }
 
 
@@ -154,6 +195,27 @@ void GridMeasure::setTimestamp(HumNum timestamp) {
 	m_timestamp = timestamp;
 }
 
+
+
+//////////////////////////////
+//
+// GridMeasure::getTimeSigDur --
+//
+
+HumNum GridMeasure::getTimeSigDur(void) {
+	return m_timesigdur;
+}
+
+
+
+//////////////////////////////
+//
+// GridMeasure::setTimeSigDur --
+//
+
+void GridMeasure::setTimeSigDur(HumNum duration) {
+	m_timesigdur = duration;
+}
 
 
 

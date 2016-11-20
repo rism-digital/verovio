@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Nov 17 20:34:30 PST 2016
+// Last Modified: Sun Nov 20 12:55:14 PST 2016
 // Filename:      /include/humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1198,10 +1198,16 @@ class HumdrumFileBase : public HumHash {
 		void          appendLine               (const char* line);
 		void          appendLine               (const string& line);
 		void          appendLine               (HumdrumLine* line);
+      void          push_back(const char* line)   { appendLine(line); }
+      void          push_back(const string& line) { appendLine(line); }
+      void          push_back(HumdrumLine* line)  { appendLine(line); }
 
 		void          insertLine               (int index, const char* line);
 		void          insertLine               (int index, const string& line);
 		void          insertLine               (int index, HumdrumLine* line);
+
+		HumdrumLine*  back                     (void);
+
 
 		vector<HumdrumLine*> getReferenceRecords(void);
 

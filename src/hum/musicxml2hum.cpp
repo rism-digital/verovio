@@ -327,12 +327,12 @@ bool musicxml2hum_interface::fillPartData(MxmlPart& partdata,
 		partdata.addMeasure(measures[i].node());
 		count = partdata.getMeasureCount();
 		if (count > 1) {
-			HumNum dur = partdata.getMeasure(count-1)->getTimeSignatureDuration();
+			HumNum dur = partdata.getMeasure(count-1)->getTimeSigDur();
 			if (dur == 0) {
 				HumNum dur = partdata.getMeasure(count-2)
-						->getTimeSignatureDuration();
+						->getTimeSigDur();
 				if (dur > 0) {
-					partdata.getMeasure(count - 1)->setTimeSignatureDuration(dur);
+					partdata.getMeasure(count - 1)->setTimeSigDur(dur);
 				}
 			}
 		}
@@ -521,6 +521,7 @@ bool musicxml2hum_interface::insertMeasure(HumGrid& outdata, int mnum,
 		if (i==0) {
 			gm->setDuration(partdata[i].getMeasure(mnum)->getDuration());
 			gm->setTimestamp(partdata[i].getMeasure(mnum)->getTimestamp());
+			gm->setTimeSigDur(partdata[i].getMeasure(mnum)->getTimeSigDur());
 		}
 		checkForDummyRests(partdata[i].getMeasure(mnum));
 		sevents.push_back(measuredata.back()->getSortedEvents());
@@ -533,10 +534,10 @@ bool musicxml2hum_interface::insertMeasure(HumGrid& outdata, int mnum,
 
 	HumNum tsdur;
 	for (i=0; i<(int)curtime.size(); i++) {
-		tsdur = measuredata[i]->getTimeSignatureDuration();
+		tsdur = measuredata[i]->getTimeSigDur();
 		if ((tsdur == 0) && (i > 0)) {
-			tsdur = measuredata[i-1]->getTimeSignatureDuration();
-			measuredata[i]->setTimeSignatureDuration(tsdur);
+			tsdur = measuredata[i-1]->getTimeSigDur();
+			measuredata[i]->setTimeSigDur(tsdur);
 		}
 		if (VoiceDebugQ) {
 			vector<MxmlEvent*>& events = measuredata[i]->getEventList();
@@ -1429,25 +1430,21 @@ xml_node musicxml2hum_interface::convertKeySigToHumdrum(xml_node keysig,
 	stringstream ss;
 	ss << "*k[";
 	if (fifths > 0) {
-		switch (fifths) {
-			case 7: ss << "b#";
-			case 6: ss << "e#";
-			case 5: ss << "a#";
-			case 4: ss << "d#";
-			case 3: ss << "g#";
-			case 2: ss << "c#";
-			case 1: ss << "f#";
-		}
+		if (fifths > 0) { ss << "f#"; }
+		if (fifths > 1) { ss << "c#"; }
+		if (fifths > 2) { ss << "g#"; }
+		if (fifths > 3) { ss << "d#"; }
+		if (fifths > 4) { ss << "a#"; }
+		if (fifths > 5) { ss << "e#"; }
+		if (fifths > 6) { ss << "b#"; }
 	} else if (fifths < 0) {
-		switch (fifths) {
-			case 7: ss << "f-";
-			case 6: ss << "g-";
-			case 5: ss << "c-";
-			case 4: ss << "d-";
-			case 3: ss << "a-";
-			case 2: ss << "e-";
-			case 1: ss << "b-";
-		}
+		if (fifths < -6) { ss << "b-"; }
+		if (fifths < -5) { ss << "e-"; }
+		if (fifths < -4) { ss << "a-"; }
+		if (fifths < -3) { ss << "d-"; }
+		if (fifths < -2) { ss << "c-"; }
+		if (fifths < -1) { ss << "g-"; }
+		if (fifths < 0)  { ss << "f-"; }
 	}
 	ss << "]";
 
