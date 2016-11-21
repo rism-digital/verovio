@@ -51,9 +51,9 @@ void View::DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int nbr
 
 /*
  * Draw rectangle partly filled in, as specified by <fillSection>: 1=top, 2=bottom, 3=left side,
- * 4=right side; 0=don't fill in any part. ??SO FAR, <fillSection> IS IGNORED.
+ * 4=right side; 0=don't fill in any part. FIXME: <fillSection> IS IGNORED.
  */
-void View::DrawPartFullRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection)
+void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection)
 {
     assert(dc); // DC cannot be NULL
 
@@ -72,7 +72,8 @@ void View::DrawPartFullRectangle(DeviceContext *dc, int x1, int y1, int x2, int 
     return;
 }
 
-void View::DrawFullRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2) /* dessine rectangle plein */
+/* Draw a filled rectangle with horizontal and vertical sides. */
+void View::DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2)
 {
     assert(dc);
 
@@ -89,6 +90,8 @@ void View::DrawFullRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2) 
     return;
 }
 
+/* Draw an oblique quadrilateral: specifically, a parallelogram with vertical left
+    and right sides, and with opposite vertices at (x1,y1) and (x2,y2). */
 void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height)
 {
     Point p[4];
@@ -105,6 +108,36 @@ void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2,
     p[2].y = p[1].y - height;
     p[3].x = p[0].x;
     p[3].y = p[0].y - height;
+
+    dc->DrawPolygon(4, p);
+
+    dc->ResetPen();
+    dc->ResetBrush();
+}
+
+/* Draw an empty ("void") diamond with its top lefthand point at (x1, y1). */
+
+void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill)
+{
+    Point p[4];
+
+    int linewidth = 40; // This should be made a parameter for DrawDiammond
+    dc->SetPen(m_currentColour, linewidth, AxSOLID);
+    if (fill)
+        dc->SetBrush(m_currentColour, AxSOLID);
+    else
+        dc->SetBrush(m_currentColour, AxTRANSPARENT);
+
+    int dHeight = ToDeviceContextX(height);
+    int dWidth = ToDeviceContextX(width);
+    p[0].x = ToDeviceContextX(x1);
+    p[0].y = ToDeviceContextY(y1);
+    p[1].x = ToDeviceContextX(x1 + dWidth / 2);
+    p[1].y = ToDeviceContextY(y1 + dHeight / 2);
+    p[2].x = p[0].x + dWidth;
+    p[2].y = p[0].y;
+    p[3].x = ToDeviceContextX(x1 + dWidth / 2);
+    p[3].y = ToDeviceContextY(y1 - dHeight / 2);
 
     dc->DrawPolygon(4, p);
 

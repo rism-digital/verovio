@@ -41,8 +41,8 @@ public:
     Syl();
     virtual ~Syl();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Syl"; };
-    virtual ClassId Is() const { return SYL; };
+    virtual std::string GetClassName() const { return "Syl"; }
+    virtual ClassId Is() const { return SYL; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
@@ -52,28 +52,26 @@ public:
      * Add an element (text, rend. etc.) to a syl.
      * Only supported elements will be actually added to the child list.
      */
-    void AddTextElement(TextElement *element);
+    virtual void AddChild(Object *object);
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * Functor for setting wordpos and connector ends
-     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter
-     * See PrepareDarwing
+     * See Object::PrepareLyrics
      */
-    virtual int PrepareLyrics(ArrayPtrVoid *params);
+    virtual int PrepareLyrics(FunctorParams *functorParams);
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);
+    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(ArrayPtrVoid *params);
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
     //

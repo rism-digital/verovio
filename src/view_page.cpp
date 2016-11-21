@@ -15,10 +15,13 @@
 
 #include "attcomparison.h"
 #include "beam.h"
+#include "clef.h"
+#include "controlelement.h"
 #include "devicecontext.h"
 #include "doc.h"
 #include "editorial.h"
-#include "floatingelement.h"
+#include "ending.h"
+#include "functorparams.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -49,27 +52,14 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
 
     int i;
-    System *system = NULL;
-    Measure *measure = NULL;
-    Staff *staff = NULL;
-    Layer *layer = NULL;
-    bool processLayerElement = false;
-    ArrayPtrVoid params;
-    params.push_back(m_doc);
-    params.push_back(&system);
-    params.push_back(&measure);
-    params.push_back(&staff);
-    params.push_back(&layer);
-    params.push_back(this);
-    params.push_back(&processLayerElement);
     Functor setDrawingXY(&Object::SetDrawingXY);
-    params.push_back(&setDrawingXY);
+    SetDrawingXYParams setDrawingXYParams(m_doc, this, &setDrawingXY);
     // First pass without processing the LayerElements - we need this for cross-staff going down because
     // the elements will need the position of the staff below to have been set before
-    m_currentPage->Process(&setDrawingXY, &params);
+    m_currentPage->Process(&setDrawingXY, &setDrawingXYParams);
     // Second pass that process the LayerElements (only)
-    processLayerElement = true;
-    m_currentPage->Process(&setDrawingXY, &params);
+    setDrawingXYParams.m_processLayerElements = true;
+    m_currentPage->Process(&setDrawingXY, &setDrawingXYParams);
 
     // Keep the width of the initial scoreDef
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
@@ -89,7 +79,7 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
 
     for (i = 0; i < m_currentPage->GetSystemCount(); i++) {
         // cast to System check in DrawSystem
-        system = dynamic_cast<System *>(m_currentPage->GetChild(i));
+        System *system = dynamic_cast<System *>(m_currentPage->GetChild(i));
         DrawSystem(dc, system);
     }
 
@@ -129,7 +119,7 @@ void View::SetScoreDefDrawingWidth(DeviceContext *dc, ScoreDef *scoreDef)
         + m_doc->GetRightMargin(CLEF);
     if (numAlteration > 0) {
         width += m_doc->GetLeftMargin(KEYSIG)
-            + m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_STYLE_KEYSIG_STEP
+            + m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, 100, false) * TEMP_KEYSIG_STEP
             + m_doc->GetRightMargin(KEYSIG);
     }
 
@@ -154,7 +144,7 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     Measure *measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE));
     if (measure) {
         // NULL for the BarLine parameters indicates that we are drawing the scoreDef
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, system->GetDrawingX(), NULL);
+        DrawScoreDef(dc, system->GetDrawingScoreDef(), measure, system->GetDrawingX(), NULL);
         // Draw mesure number if > 1
         // This needs to be improved because we are now using (tuplet) oblique figures.
         // We should also have a better way to specify if the number has to be displayed or not
@@ -175,8 +165,10 @@ void View::DrawSystem(DeviceContext *dc, System *system)
     // first draw the beams
     DrawSystemList(dc, system, SYL);
     DrawSystemList(dc, system, HAIRPIN);
+    DrawSystemList(dc, system, OCTAVE);
     DrawSystemList(dc, system, TIE);
     DrawSystemList(dc, system, SLUR);
+    DrawSystemList(dc, system, ENDING);
 
     dc->EndGraphic(system, this);
 }
@@ -193,6 +185,9 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         if (((*iter)->Is() == classId) && (classId == HAIRPIN)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
+        if (((*iter)->Is() == classId) && (classId == OCTAVE)) {
+            DrawTimeSpanningElement(dc, *iter, system);
+        }
         if (((*iter)->Is() == classId) && (classId == SYL)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
@@ -201,6 +196,10 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
         }
         if (((*iter)->Is() == classId) && (classId == SLUR)) {
             DrawTimeSpanningElement(dc, *iter, system);
+        }
+        if (((*iter)->Is() == classId) && (classId == ENDING)) {
+            // cast to Ending check in DrawEnding
+            DrawEnding(dc, dynamic_cast<Ending *>(*iter), system);
         }
     }
 }
@@ -223,7 +222,7 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
 
         DrawStaffDefLabels(dc, measure, scoreDef, !scoreDef->DrawLabels());
         // if this was true (non-abbreviated labels), set it to false for next one
-        scoreDef->SetDrawLabels(false);
+        // scoreDef->SetDrawLabels(false);
     }
     else {
         barLine->SetDrawingX(x);
@@ -444,7 +443,7 @@ void View::DrawBracket(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     // the glyphs and the line
     y1 += m_doc->GetDrawingStemWidth(100);
     y2 -= m_doc->GetDrawingStemWidth(100);
-    DrawFullRectangle(dc, x1, y1, x2, y2);
+    DrawFilledRectangle(dc, x1, y1, x2, y2);
 
     return;
 }
@@ -598,10 +597,10 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if (barLine->HasRepetitionDots()) {
-            int i;
             StaffDef *childStaffDef = NULL;
-            for (i = 0; i < staffGrp->GetChildCount(); i++) {
-                childStaffDef = dynamic_cast<StaffDef *>(staffGrp->GetChild(i));
+            ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
+            for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
+                childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
                     AttCommonNComparison comparison(STAFF, childStaffDef->GetN());
                     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
@@ -649,9 +648,9 @@ void View::DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barL
     }
     else if (barLine->GetForm() == BARRENDITION_dbl) {
         // Narrow the bars a little bit - should be centered?
-        x1 += barLineWidth;
+        x2 -= barLineWidth;
         DrawVerticalLine(dc, y_top, y_bottom, x, barLineWidth);
-        DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
+        DrawVerticalLine(dc, y_top, y_bottom, x2, barLineWidth);
     }
     else if (barLine->GetForm() == BARRENDITION_end) {
         DrawVerticalLine(dc, y_top, y_bottom, x1, barLineWidth);
@@ -670,10 +669,8 @@ void View::DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, 
     assert(barLine);
 
     int x = barLine->GetDrawingX();
-    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
-        - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
-    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false)
-        + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x1 = x - 2 * m_doc->GetDrawingBeamWidth(100, false) - m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
+    int x2 = x + 2 * m_doc->GetDrawingBeamWidth(100, false) + m_doc->GetDrawingBarLineWidth(staff->m_drawingStaffSize);
 
     int y_bottom = staff->GetDrawingY() - staffDef->GetLines() * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int y_top = y_bottom + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -708,16 +705,20 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     DrawMeasureChildren(dc, measure, measure, system);
 
     if (measure->GetLeftBarLineType() != BARRENDITION_NONE) {
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetLeftBarLineX(),
+        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetLeftBarLineXRel(),
             measure->GetLeftBarLine());
     }
     if (measure->GetRightBarLineType() != BARRENDITION_NONE) {
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarLineX(),
+        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarLineXRel(),
             measure->GetRightBarLine());
     }
 
     if (measure->IsMeasuredMusic()) {
         dc->EndGraphic(measure, this);
+    }
+
+    if (measure->GetDrawingEnding()) {
+        system->AddToDrawingList(measure->GetDrawingEnding());
     }
 }
 
@@ -738,9 +739,9 @@ int View::CalculatePitchPosY(Staff *staff, data_PITCHNAME pname, int dec_clef, i
     // Old Wolfgang code with octave stored in an unsigned char - this could be refactored
     oct -= OCTAVE_OFFSET;
     y_int = ((dec_clef + oct * 7) - 9) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    if (staff->m_drawingLines > 5) {
-        y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    }
+    // if (staff->m_drawingLines > 5) {
+    y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+    //}
 
     /* exprime distance separant m_drawingY de
     position 1e Si, corrigee par dec_clef et oct. Elle est additionnee
@@ -751,7 +752,7 @@ int View::CalculatePitchPosY(Staff *staff, data_PITCHNAME pname, int dec_clef, i
     return 0;
 }
 
-int View::CalculateRestPosY(Staff *staff, char duration)
+int View::CalculateRestPosY(Staff *staff, char duration, bool hasMultipleLayer, bool isFirstLayer)
 {
     assert(staff); // Pointer to staff cannot be NULL
 
@@ -775,6 +776,13 @@ int View::CalculateRestPosY(Staff *staff, char duration)
             offset = 12;
             break; // Signal an error, put the clef up high
     }
+    if (hasMultipleLayer) {
+        if (isFirstLayer)
+            offset += 2;
+        else
+            offset -= 2;
+    }
+
     return base + staff_space * offset;
 }
 
@@ -787,18 +795,13 @@ void View::DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *
 
     dc->StartGraphic(staff, "", staff->GetUuid());
 
-    // Doing it here might be problematic with cross-staff, even though the default value will be 5
-    if (StaffDef *staffDef = m_drawingScoreDef.GetStaffDef(staff->GetN())) {
-        staff->m_drawingLines = staffDef->GetLines();
-        staff->m_drawingNotationType = staffDef->GetNotationtype();
-        if (staffDef->HasScale()) {
-            staff->m_drawingStaffSize = staffDef->GetScale();
-        }
-    }
-
     DrawStaffLines(dc, staff, measure, system);
 
+    DrawStaffDef(dc, staff, measure);
+
     DrawStaffChildren(dc, staff, staff, measure);
+
+    DrawStaffDefCautionary(dc, staff, measure);
 
     std::vector<Object *>::iterator iter;
     for (iter = staff->m_timeSpanningElements.begin(); iter != staff->m_timeSpanningElements.end(); ++iter) {
@@ -848,6 +851,66 @@ void View::DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, Sys
     return;
 }
 
+void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(staff);
+    assert(measure);
+
+    // StaffDef information is always in the first layer
+    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    if (!layer || !layer->HasStaffDef()) return;
+
+    StaffDef staffDef;
+    dc->StartGraphic(&staffDef, "", staffDef.GetUuid());
+
+    // draw the scoreDef if required
+    if (layer->GetStaffDefClef()) {
+        DrawLayerElement(dc, layer->GetStaffDefClef(), layer, staff, measure);
+    }
+    if (layer->GetStaffDefKeySig()) {
+        DrawLayerElement(dc, layer->GetStaffDefKeySig(), layer, staff, measure);
+    }
+    if (layer->GetStaffDefMensur()) {
+        DrawLayerElement(dc, layer->GetStaffDefMensur(), layer, staff, measure);
+    }
+    if (layer->GetStaffDefMeterSig()) {
+        DrawLayerElement(dc, layer->GetStaffDefMeterSig(), layer, staff, measure);
+    }
+
+    dc->EndGraphic(&staffDef, this);
+}
+
+void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(staff);
+    assert(measure);
+
+    // StaffDef cautionary information is always in the first layer
+    Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
+    if (!layer || !layer->HasCautionStaffDef()) return;
+
+    StaffDef staffDef;
+    dc->StartGraphic(&staffDef, "cautionary", staffDef.GetUuid());
+
+    // draw the scoreDef if required
+    if (layer->GetCautionStaffDefClef()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefClef(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefKeySig()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefKeySig(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefMensur()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefMensur(), layer, staff, measure);
+    }
+    if (layer->GetCautionStaffDefMeterSig()) {
+        DrawLayerElement(dc, layer->GetCautionStaffDefMeterSig(), layer, staff, measure);
+    }
+
+    dc->EndGraphic(&staffDef, this);
+}
+
 //----------------------------------------------------------------------------
 // View - Layer
 //----------------------------------------------------------------------------
@@ -867,7 +930,6 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
         = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a, PITCHNAME_b };
     int y_dec, yb, plafond;
     int degres, octaves, position, code;
-    char clefId = 0;
 
     int staffSize = parentStaff->m_drawingStaffSize;
     // calculer position du do central en fonction clef
@@ -883,7 +945,6 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
 
     Clef *clef = layer->GetClef(pelement);
     if (clef) {
-        clefId = clef->GetClefId();
         yb += (clef->GetClefOffset()) * m_doc->GetDrawingUnit(staffSize); // UT1 reel
     }
     yb -= 4 * m_doc->GetDrawingOctaveSize(staffSize); // UT, note la plus grave
@@ -909,31 +970,19 @@ void View::DrawLayer(DeviceContext *dc, Layer *layer, Staff *staff, Measure *mea
     assert(staff);
     assert(measure);
 
-    dc->StartGraphic(layer, "", layer->GetUuid());
-
     // first we need to clear the drawing list of postponed elements
     layer->ResetDrawingList();
 
-    // draw the scoreDef if required
-    if (layer->GetDrawingClef()) {
-        DrawLayerElement(dc, layer->GetDrawingClef(), layer, staff, measure);
-    }
-    if (layer->GetDrawingKeySig()) {
-        DrawLayerElement(dc, layer->GetDrawingKeySig(), layer, staff, measure);
-    }
-    if (layer->GetDrawingMensur()) {
-        DrawLayerElement(dc, layer->GetDrawingMensur(), layer, staff, measure);
-    }
-    if (layer->GetDrawingMeterSig()) {
-        DrawLayerElement(dc, layer->GetDrawingMeterSig(), layer, staff, measure);
-    }
+    // Now start to draw the layer content
+
+    dc->StartGraphic(layer, "", layer->GetUuid());
 
     DrawLayerChildren(dc, layer, layer, staff, measure);
 
+    dc->EndGraphic(layer, this);
+
     // first draw the postponed tuplets
     DrawLayerList(dc, layer, staff, measure, TUPLET);
-
-    dc->EndGraphic(layer, this);
 }
 
 void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure *measure, const ClassId classId)
@@ -977,16 +1026,20 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
             // cast to Measure check in DrawMeasure
             DrawMeasure(dc, dynamic_cast<Measure *>(current), system);
         }
-        else if (current->IsEditorialElement()) {
-            // cast to EditorialElement check in DrawSystemEditorial element
-            DrawSystemEditorialElement(dc, dynamic_cast<EditorialElement *>(current), system);
-        }
         // scoreDef are not drawn directly, but anything else should not be possible
         else if (current->Is() == SCOREDEF) {
             // nothing to do, then
             ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(current);
             assert(scoreDef);
             SetScoreDefDrawingWidth(dc, scoreDef);
+        }
+        else if (current->IsSystemElement()) {
+            // cast to EditorialElement check in DrawSystemEditorial element
+            DrawSystemElement(dc, dynamic_cast<SystemElement *>(current), system);
+        }
+        else if (current->IsEditorialElement()) {
+            // cast to EditorialElement check in DrawSystemEditorial element
+            DrawSystemEditorialElement(dc, dynamic_cast<EditorialElement *>(current), system);
         }
         else {
             assert(false);
@@ -1007,9 +1060,9 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
             // cast to Staff check in DrawStaff
             DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
         }
-        else if (current->IsFloatingElement()) {
-            // cast to FloatingElement check in DrawFloatingElement
-            DrawFloatingElement(dc, dynamic_cast<FloatingElement *>(current), measure, system);
+        else if (current->IsControlElement()) {
+            // cast to ControlElement check in DrawControlElement
+            DrawControlElement(dc, dynamic_cast<ControlElement *>(current), measure, system);
         }
         else if (current->IsEditorialElement()) {
             // cast to EditorialElement check in DrawMeasureEditorialElement
@@ -1095,23 +1148,29 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, boo
 void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *element, System *system)
 {
     assert(element);
-    if (element->Is() == APP) {
-        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_SYSTEM);
-    }
+    if (element->Is() == APP)
+        assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
+    else if (element->Is() == CHOICE)
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
 
-    dc->StartGraphic(element, "", element->GetUuid());
-    if (element->m_visibility == Visible) {
-        DrawSystemChildren(dc, element, system);
-    }
+    std::string boundaryStart;
+    if (element->IsBoundaryElement()) boundaryStart = "boundaryStart";
+
+    dc->StartGraphic(element, boundaryStart, element->GetUuid());
+    // EditorialElements at the system level that are visible have no children
+    // if (element->m_visibility == Visible) {
+    //    DrawSystemChildren(dc, element, system);
+    //}
     dc->EndGraphic(element, this);
 }
 
 void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *element, Measure *measure, System *system)
 {
     assert(element);
-    if (element->Is() == APP) {
+    if (element->Is() == APP)
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_MEASURE);
-    }
+    else if (element->Is() == CHOICE)
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_MEASURE);
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1123,9 +1182,10 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
 void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *element, Staff *staff, Measure *measure)
 {
     assert(element);
-    if (element->Is() == APP) {
+    if (element->Is() == APP)
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_STAFF);
-    }
+    else if (element->Is() == CHOICE)
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_STAFF);
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1138,9 +1198,10 @@ void View::DrawLayerEditorialElement(
     DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(element);
-    if (element->Is() == APP) {
+    if (element->Is() == APP)
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_LAYER);
-    }
+    else if (element->Is() == CHOICE)
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_LAYER);
 
     dc->StartGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {
@@ -1152,9 +1213,10 @@ void View::DrawLayerEditorialElement(
 void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY)
 {
     assert(element);
-    if (element->Is() == APP) {
+    if (element->Is() == APP)
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TEXT);
-    }
+    else if (element->Is() == CHOICE)
+        assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_TEXT);
 
     dc->StartTextGraphic(element, "", element->GetUuid());
     if (element->m_visibility == Visible) {

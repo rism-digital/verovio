@@ -19,8 +19,6 @@
 using namespace std;
 using namespace vrv;
 
-bool initialized = false;
-
 extern "C" {
 
 /****************************************************************
@@ -28,13 +26,6 @@ extern "C" {
 ****************************************************************/
 void *vrvToolkit_constructor()
 {
-
-    // Init the random number generator
-    // for mei ids
-    if (!initialized) {
-        std::srand(std::time(0));
-        initialized = true;
-    }
 
     // set the resource path in the js blob
     Resources::SetPath("/data");
@@ -77,7 +68,7 @@ double vrvToolkit_getTimeForElement(Toolkit *tk, const char *xmlId)
 bool vrvToolkit_loadData(Toolkit *tk, const char *data)
 {
     tk->ResetLogBuffer();
-    return tk->LoadString(data);
+    return tk->LoadData(data);
 }
 
 const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based)

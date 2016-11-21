@@ -13,7 +13,8 @@
 
 namespace vrv {
 
-class  Object;
+class Object;
+class FunctorParams;
 class LayerElement;
 class Measure;
 
@@ -23,7 +24,7 @@ class Measure;
 
 /**
  * This class is an interface for elements having a single time point, such as tempo, reh, etc..
- * It is not an abstract class but should not be instanciated directly.
+ * It is not an abstract class but should not be instantiated directly.
  */
 class TimePointInterface : public Interface, public AttStaffident, public AttStartid, public AttTimestampMusical {
 public:
@@ -35,7 +36,7 @@ public:
     TimePointInterface();
     virtual ~TimePointInterface();
     virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_TIME_POINT; };
+    virtual InterfaceId IsInterface() { return INTERFACE_TIME_POINT; }
     ///@}
 
     /**
@@ -44,13 +45,23 @@ public:
      */
     ///@{
     void SetStart(LayerElement *start);
-    LayerElement *GetStart() { return m_start; };
+    LayerElement *GetStart() { return m_start; }
     ///@}
+
+    /**
+     * Set first LayerElement by verifying it is the correct one.
+     */
+    bool SetStartOnly(LayerElement *start);
+
+    /**
+     * Add a staff n to the AttStaffident vector (if not already there)
+     */
+    void AddStaff(int n);
 
     /**
      * Return true if a start is given (@startid or @tstamp)
      */
-    bool HasStart() { return (m_start); };
+    bool HasStart() { return (m_start); }
 
     /**
      * Return the start measure of the TimePointInterface
@@ -73,21 +84,26 @@ public:
     //-----------------//
 
     /**
+     * See Object::PrepareTimeSpanning
+     */
+    virtual int InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object);
+
+    /**
      * We have functor in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor method. These not called by the Process/Call loop but by the implementaion
-     * classes explicitely. See FloatingElement::FillStaffCurrentTimeSpanning for an example.
+     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
      */
 
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
 
 protected:
     /**
@@ -117,7 +133,7 @@ private:
 
 /**
  * This class is an interface for spanning elements, such as slur, hairpin, etc..
- * It is not an abstract class but should not be instanciated directly.
+ * It is not an abstract class but should not be instantiated directly.
  */
 class TimeSpanningInterface : public TimePointInterface, public AttStartendid, public AttTimestamp2Musical {
 public:
@@ -129,7 +145,7 @@ public:
     TimeSpanningInterface();
     virtual ~TimeSpanningInterface();
     virtual void Reset();
-    virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; };
+    virtual InterfaceId IsInterface() { return INTERFACE_TIME_SPANNING; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
@@ -140,7 +156,7 @@ public:
      */
     ///@{
     void SetEnd(LayerElement *end);
-    LayerElement *GetEnd() { return m_end; };
+    LayerElement *GetEnd() { return m_end; }
     ///@}
 
     /**
@@ -151,7 +167,7 @@ public:
     /**
      *
      */
-    bool HasStartAndEnd() { return (m_start && m_end); };
+    bool HasStartAndEnd() { return (m_start && m_end); }
 
     /**
      * Return the end measure of the TimePointInterface
@@ -176,28 +192,28 @@ public:
      * We have functors in the interface for avoiding code duplication in each implementation class.
      * Since we are in an interface, we need to pass the  Object (implementation) to
      * the functor methods. These are not called by the Process/Call loop but by the implementation
-     * classes explicitely. See FloatingElement::FillStaffCurrentTimeSpanning for an example.
+     * classes explicitely. See FloatingObject::FillStaffCurrentTimeSpanning for an example.
      */
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int InterfaceFillStaffCurrentTimeSpanning(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfaceFillStaffCurrentTimeSpanning(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int InterfacePrepareTimeSpanning(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::PrepareTimestamps
      */
-    virtual int InterfacePrepareTimestamps(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfacePrepareTimestamps(FunctorParams *functorParams, Object *object);
 
     /**
      * See Object::ResetDrawing
      */
-    virtual int InterfaceResetDrawing(ArrayPtrVoid *params,  Object *object);
+    virtual int InterfaceResetDrawing(FunctorParams *functorParams, Object *object);
 
 private:
     //

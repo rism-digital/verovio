@@ -13,8 +13,13 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string>
-#include <sys/time.h>
 #include <vector>
+
+#ifndef _WIN32
+#include <sys/time.h>
+#else
+#include <time.h>
+#endif
 
 namespace vrv {
 
@@ -36,9 +41,10 @@ void DisableLog();
  * Member and functions specific to emscripten loging that uses a vector of string to buffer the logs.
  */
 #ifdef EMSCRIPTEN
+enum consoleLogLevel { CONSOLE_LOG = 0, CONSOLE_INFO, CONSOLE_WARN, CONSOLE_ERROR };
 extern std::vector<std::string> logBuffer;
 bool LogBufferContains(std::string s);
-void AppendLogBuffer(bool checkDuplicate, std::string message);
+void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level);
 #endif
 
 /**
@@ -122,8 +128,8 @@ public:
      */
     ///@{
     /** Resource path */
-    static std::string GetPath() { return m_path; };
-    static void SetPath(std::string path) { m_path = path; };
+    static std::string GetPath() { return m_path; }
+    static void SetPath(std::string path) { m_path = path; }
     /** Init the SMufL music and text fonts */
     static bool InitFonts();
     /** Init the text font (bounding boxes and ASCII only) */

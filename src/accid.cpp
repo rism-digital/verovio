@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functorparams.h"
 #include "note.h"
 
 namespace vrv {
@@ -21,12 +22,13 @@ namespace vrv {
 // Accid
 //----------------------------------------------------------------------------
 
-Accid::Accid() : LayerElement("accid-"), PositionInterface(), AttAccidental(), AttAccidLog()
+Accid::Accid() : LayerElement("accid-"), PositionInterface(), AttAccidental(), AttAccidLog(), AttColor()
 {
 
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_ACCIDENTAL);
     RegisterAttClass(ATT_ACCIDLOG);
+    RegisterAttClass(ATT_COLOR);
 
     Reset();
 }
@@ -41,17 +43,15 @@ void Accid::Reset()
     PositionInterface::Reset();
     ResetAccidental();
     ResetAccidLog();
+    ResetColor();
 }
 
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Accid::PreparePointersByLayer(ArrayPtrVoid *params)
+int Accid::PreparePointersByLayer(FunctorParams *functorParams)
 {
-    // param 0: the current Note (not used)
-    // Note **currentNote = static_cast<Note**>((*params).at(0));
-
     Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
     if (!note) {
         return FUNCTOR_CONTINUE;

@@ -15,6 +15,7 @@
 
 #include "attcomparison.h"
 #include "iodarms.h"
+#include "iohumdrum.h"
 #include "iomei.h"
 #include "iomusxml.h"
 #include "iopae.h"
@@ -44,7 +45,7 @@ Toolkit::Toolkit(bool initFont)
 {
 
     m_scale = DEFAULT_SCALE;
-    m_format = MEI;
+    m_format = AUTO;
 
     // default page size
     m_pageHeight = DEFAULT_PAGE_HEIGHT;
@@ -180,18 +181,113 @@ bool Toolkit::SetFormat(std::string const &informat)
     else if (informat == "darms") {
         m_format = DARMS;
     }
+    else if (informat == "humdrum") {
+        m_format = HUMDRUM;
+    }
     else if (informat == "mei") {
         m_format = MEI;
     }
     else if (informat == "musicxml") {
         m_format = MUSICXML;
     }
+    else if (informat == "auto") {
+        m_format = AUTO;
+    }
     else {
-        LogError("Input format can only be: mei, pae, xml or darms");
+        LogError("Input format can only be: mei, humdrum, pae, musicxml or darms");
         return false;
     }
     return true;
 };
+
+void Toolkit::SetAppXPathQueries(std::vector<std::string> const &xPathQueries)
+{
+    m_appXPathQueries = xPathQueries;
+    m_appXPathQueries.erase(std::remove_if(m_appXPathQueries.begin(), m_appXPathQueries.end(),
+                                [](const std::string &s) { return s.empty(); }),
+        m_appXPathQueries.end());
+}
+
+void Toolkit::SetChoiceXPathQueries(std::vector<std::string> const &xPathQueries)
+{
+    m_choiceXPathQueries = xPathQueries;
+    m_choiceXPathQueries.erase(std::remove_if(m_choiceXPathQueries.begin(), m_choiceXPathQueries.end(),
+                                   [](const std::string &s) { return s.empty(); }),
+        m_choiceXPathQueries.end());
+}
+
+FileFormat Toolkit::IdentifyInputFormat(const string &data)
+{
+    size_t searchLimit = 600;
+    if (data.size() == 0) {
+        return UNKNOWN;
+    }
+    if (data[0] == 0) {
+        return UNKNOWN;
+    }
+    if (data[0] == '@') {
+        return PAE;
+    }
+    if (data[0] == '*' || data[0] == '!') {
+        return HUMDRUM;
+    }
+    if ((unsigned int)data[0] == 0xff || (unsigned int)data[0] == 0xfe) {
+        // Handle UTF-16 content here later.
+        cerr << "Warning: Cannot yet auto-detect format of UTF-16 data files." << endl;
+        return UNKNOWN;
+    }
+    if (data[0] == '<') {
+        // <mei> == root node for standard organization of MEI data
+        // <pages> == root node for pages organization of MEI data
+        // <score-partwise> == root node for part-wise organization of MusicXML data
+        // <score-timewise> == root node for time-wise organization of MusicXML data
+        // <opus> == root node for multi-movement/work organization of MusicXML data
+        string initial = data.substr(0, searchLimit);
+
+        if (initial.find("<mei ") != string::npos) {
+            return MEI;
+        }
+        if (initial.find("<mei>") != string::npos) {
+            return MEI;
+        }
+        if (initial.find("<music>") != string::npos) {
+            return MEI;
+        }
+        if (initial.find("<music ") != string::npos) {
+            return MEI;
+        }
+        if (initial.find("<pages>") != string::npos) {
+            return MEI;
+        }
+        if (initial.find("<pages ") != string::npos) {
+            return MEI;
+        }
+        if (initial.find("<score-partwise>") != string::npos) {
+            return MUSICXML;
+        }
+        if (initial.find("<score-timewise>") != string::npos) {
+            return MUSICXML;
+        }
+        if (initial.find("<opus>") != string::npos) {
+            return MUSICXML;
+        }
+        if (initial.find("<score-partwise ") != string::npos) {
+            return MUSICXML;
+        }
+        if (initial.find("<score-timewise ") != string::npos) {
+            return MUSICXML;
+        }
+        if (initial.find("<opus ") != string::npos) {
+            return MUSICXML;
+        }
+
+        cerr << "Warning: Trying to load unknown XML data which cannot be identified." << endl;
+        return UNKNOWN;
+    }
+
+    // Assume that the input is DARMS if other input types were not detected.
+    return DARMS;
+}
 
 bool Toolkit::SetFont(std::string const &font)
 {
@@ -218,7 +314,7 @@ bool Toolkit::LoadFile(const std::string &filename)
     std::string content(fileSize, 0);
     in.read(&content[0], fileSize);
 
-    return LoadString(content);
+    return LoadData(content);
 }
 
 bool Toolkit::IsUTF16(const std::string &filename)
@@ -268,22 +364,45 @@ bool Toolkit::LoadUTF16File(const std::string &filename)
     std::string utf8line;
     utf8::utf16to8(utf16line.begin(), utf16line.end(), back_inserter(utf8line));
 
-    return LoadString(utf8line);
+    return LoadData(utf8line);
 }
 
-bool Toolkit::LoadString(const std::string &data)
+bool Toolkit::LoadData(const std::string &data)
 {
+    string newData;
     FileInputStream *input = NULL;
-    if (m_format == PAE) {
+
+    auto inputFormat = m_format;
+    if (inputFormat == AUTO) {
+        inputFormat = IdentifyInputFormat(data);
+    }
+
+    if (inputFormat == PAE) {
         input = new PaeInput(&m_doc, "");
     }
-    else if (m_format == DARMS) {
+    else if (inputFormat == DARMS) {
         input = new DarmsInput(&m_doc, "");
     }
-    else if (m_format == MEI) {
+    else if (inputFormat == HUMDRUM) {
+        Doc tempdoc;
+        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        if (!tempinput->ImportString(data)) {
+            LogError("Error importing Humdrum data");
+            delete tempinput;
+            return false;
+        }
+
+        MeiOutput meioutput(&tempdoc, "");
+        meioutput.SetScoreBasedMEI(true);
+        newData = meioutput.GetOutput();
+        delete tempinput;
+
         input = new MeiInput(&m_doc, "");
     }
-    else if (m_format == MUSICXML) {
+    else if (inputFormat == MEI) {
+        input = new MeiInput(&m_doc, "");
+    }
+    else if (inputFormat == MUSICXML) {
         input = new MusicXmlInput(&m_doc, "");
     }
     else {
@@ -297,18 +416,19 @@ bool Toolkit::LoadString(const std::string &data)
         return false;
     }
 
-    // ignore layout?
-    if (m_ignoreLayout || m_noLayout) {
-        input->IgnoreLayoutInformation();
+    // xpath queries?
+    if (m_appXPathQueries.size() > 0) {
+        input->SetAppXPathQueries(m_appXPathQueries);
     }
-
-    // rdg xpath query?
-    if (m_appXPathQuery.length() > 0) {
-        input->SetAppXPathQuery(m_appXPathQuery);
+    if (m_choiceXPathQueries.size() > 0) {
+        input->SetChoiceXPathQueries(m_choiceXPathQueries);
+    }
+    if (m_mdivXPathQuery.length() > 0) {
+        input->SetMdivXPathQuery(m_mdivXPathQuery);
     }
 
     // load the file
-    if (!input->ImportString(data)) {
+    if (!input->ImportString(newData.size() ? newData : data)) {
         LogError("Error importing data");
         delete input;
         return false;
@@ -327,20 +447,21 @@ bool Toolkit::LoadString(const std::string &data)
 
     m_doc.PrepareDrawing();
 
-    if (input->HasMeasureWithinEditoMarkup() && !m_noLayout) {
-        LogWarning(
-            "Only continous layout is possible with <measure> within editorial markup, switching to --no-layout");
-        this->SetNoLayout(true);
-    }
-
     // Do the layout? this depends on the options and the file. PAE and
     // DARMS have no layout information. MEI files _can_ have it, but it
     // might have been ignored because of the --ignore-layout option.
     // Regardless, we won't do layout if the --no-layout option was set.
-    if (!input->HasLayoutInformation() && !m_noLayout) {
-        // LogElapsedTimeStart();
-        m_doc.CastOff();
-        // LogElapsedTimeEnd("layout");
+    if (!m_noLayout) {
+        if (input->HasLayoutInformation() && !m_ignoreLayout) {
+            // LogElapsedTimeStart();
+            m_doc.CastOffEncodingDoc();
+            // LogElapsedTimeEnd("layout");
+        }
+        else {
+            // LogElapsedTimeStart();
+            m_doc.CastOffDoc();
+            // LogElapsedTimeEnd("layout");
+        }
     }
 
     // disable justification if there's no layout or no justification
@@ -377,7 +498,7 @@ bool Toolkit::SaveFile(const std::string &filename)
 
 bool Toolkit::ParseOptions(const std::string &json_options)
 {
-#ifdef USE_EMSCRIPTEN
+#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
 
     jsonxx::Object json;
 
@@ -407,7 +528,39 @@ bool Toolkit::ParseOptions(const std::string &json_options)
 
     if (json.has<jsonxx::Number>("spacingSystem")) SetSpacingSystem(json.get<jsonxx::Number>("spacingSystem"));
 
-    if (json.has<jsonxx::String>("appXPathQuery")) SetAppXPathQuery(json.get<jsonxx::String>("appXPathQuery"));
+    if (json.has<jsonxx::String>("appXPathQuery")) {
+        std::vector<std::string> queries = { json.get<jsonxx::String>("appXPathQuery") };
+        SetAppXPathQueries(queries);
+    }
+
+    if (json.has<jsonxx::Array>("appXPathQueries")) {
+        jsonxx::Array values = json.get<jsonxx::Array>("appXPathQueries");
+        std::vector<std::string> queries;
+        int i;
+        for (i = 0; i < values.size(); i++) {
+            if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
+        }
+        SetAppXPathQueries(queries);
+    }
+
+    if (json.has<jsonxx::String>("choiceXPathQuery")) {
+        std::vector<std::string> queries = { json.get<jsonxx::String>("choiceXPathQuery") };
+        SetChoiceXPathQueries(queries);
+    }
+
+    if (json.has<jsonxx::Array>("choiceXPathQueries")) {
+        jsonxx::Array values = json.get<jsonxx::Array>("choiceXPathQueries");
+        std::vector<std::string> queries;
+        int i;
+        for (i = 0; i < values.size(); i++) {
+            if (values.has<jsonxx::String>(i)) queries.push_back(values.get<jsonxx::String>(i));
+        }
+        SetChoiceXPathQueries(queries);
+    }
+
+    if (json.has<jsonxx::String>("mdivXPathQuery")) SetMdivXPathQuery(json.get<jsonxx::String>("mdivXPathQuery"));
+
+    if (json.has<jsonxx::Number>("xmlIdSeed")) Object::SeedUuid(json.get<jsonxx::Number>("xmlIdSeed"));
 
     // Parse the various flags
     // Note: it seems that there is a bug with jsonxx and emscripten
@@ -425,7 +578,6 @@ bool Toolkit::ParseOptions(const std::string &json_options)
         SetShowBoundingBoxes(json.get<jsonxx::Number>("showBoundingBoxes"));
 
     return true;
-
 #else
     // The non-js version of the app should not use this function.
     return false;
@@ -434,7 +586,7 @@ bool Toolkit::ParseOptions(const std::string &json_options)
 
 std::string Toolkit::GetElementAttr(const std::string &xmlId)
 {
-#ifdef USE_EMSCRIPTEN
+#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
     jsonxx::Object o;
 
     if (!m_doc.GetDrawingPage()) return o.json();
@@ -545,8 +697,8 @@ void Toolkit::RedoLayout()
     m_doc.SetSpacingStaff(this->GetSpacingStaff());
     m_doc.SetSpacingSystem(this->GetSpacingSystem());
 
-    m_doc.UnCastOff();
-    m_doc.CastOff();
+    m_doc.UnCastOffDoc();
+    m_doc.CastOffDoc();
 }
 
 std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
@@ -619,12 +771,12 @@ std::string Toolkit::RenderToMidi()
 
 std::string Toolkit::GetElementsAtTime(int millisec)
 {
-#ifdef USE_EMSCRIPTEN
+#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
     jsonxx::Object o;
     jsonxx::Array a;
 
     double time = (double)(millisec * 120 / 1000);
-    AttNoteOnsetOffsetComparison matchTime(time);
+    NoteOnsetOffsetComparison matchTime(time);
     ArrayOfObjects notes;
     // Here we would need to check that the midi export is done
     if (m_doc.GetMidiExportDone()) {
@@ -688,7 +840,7 @@ double Toolkit::GetTimeForElement(const std::string &xmlId)
     if (element->Is() == NOTE) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
-        timeofElement = note->m_playingOnset;
+        timeofElement = note->m_playingOnset * 1000 / 120;
     }
     return timeofElement;
 }
@@ -765,7 +917,7 @@ bool Toolkit::Insert(std::string elementType, std::string startid, std::string e
         Slur *slur = new Slur();
         slur->SetStartid(startid);
         slur->SetEndid(endid);
-        measure->AddFloatingElement(slur);
+        measure->AddChild(slur);
         m_doc.PrepareDrawing();
         return true;
     }

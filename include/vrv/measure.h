@@ -15,7 +15,9 @@
 
 namespace vrv {
 
-class FloatingElement;
+class Ending;
+class ControlElement;
+class ScoreDef;
 class TimestampAttr;
 
 //----------------------------------------------------------------------------
@@ -39,21 +41,20 @@ public:
     Measure(bool measuredMusic = true, int logMeasureNb = -1);
     virtual ~Measure();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Measure"; };
-    virtual ClassId Is() const { return MEASURE; };
+    virtual std::string GetClassName() const { return "Measure"; }
+    virtual ClassId Is() const { return MEASURE; }
     ///@}
 
     /**
      * Return true if measured music (otherwise we have fake measures)
      */
-    bool IsMeasuredMusic() const { return m_measuredMusic; };
+    bool IsMeasuredMusic() const { return m_measuredMusic; }
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddStaff(Staff *staff);
-    void AddFloatingElement(FloatingElement *element);
+    virtual void AddChild(Object *object);
     ///@}
 
     /**
@@ -65,7 +66,7 @@ public:
     /**
      * Return the index position of the measure in its system parent
      */
-    int GetMeasureIdx() const { return Object::GetIdx(); };
+    int GetMeasureIdx() const { return Object::GetIdx(); }
 
     /**
      * @name Set and get the left and right barline types
@@ -73,14 +74,14 @@ public:
      * Barline object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
      * MeiOutput::ReadMeiMeasure
      * Alternatively, we could keep them in sync here:
-     * data_BARRENDITION GetLeftBarLineType() { m_leftBarLine.SetRend(GetRight()); return m_leftBarLine.GetRend(); };
-     * void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetRend(type); SetLeft(type); };
+     * data_BARRENDITION GetLeftBarLineType() { m_leftBarLine.SetRend(GetRight()); return m_leftBarLine.GetRend(); }
+     * void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetRend(type); SetLeft(type); }
      */
     ///@{
-    data_BARRENDITION GetLeftBarLineType() const { return m_leftBarLine.GetForm(); };
-    void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetForm(type); };
-    data_BARRENDITION GetRightBarLineType() const { return m_rightBarLine.GetForm(); };
-    void SetRightBarLineType(data_BARRENDITION type) { m_rightBarLine.SetForm(type); };
+    data_BARRENDITION GetLeftBarLineType() const { return m_leftBarLine.GetForm(); }
+    void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetForm(type); }
+    data_BARRENDITION GetRightBarLineType() const { return m_rightBarLine.GetForm(); }
+    void SetRightBarLineType(data_BARRENDITION type) { m_rightBarLine.SetForm(type); }
     ///@}
 
     /**
@@ -90,11 +91,11 @@ public:
      * not for creating other measure objects.
      */
     ///@{
-    BarLine *const GetLeftBarLine() { return &m_leftBarLine; };
-    BarLine *const GetRightBarLine() { return &m_rightBarLine; };
+    BarLine *const GetLeftBarLine() { return &m_leftBarLine; }
+    BarLine *const GetRightBarLine() { return &m_rightBarLine; }
     ///@}
 
-    int GetXRel() const;
+    // int GetXRel() const;
 
     /**
      * Return the non-justifiable left margin for the measure
@@ -102,11 +103,15 @@ public:
     int GetNonJustifiableLeftMargin() const { return m_measureAligner.GetNonJustifiableMargin(); }
 
     /**
-     * @name Return the X rel position of the right and left barLine (without their width)
+     * @name Return the X1 and X2 rel position of the right and left barLine
      */
     ///@{
-    int GetLeftBarLineX() const;
-    int GetRightBarLineX() const;
+    int GetLeftBarLineXRel() const;
+    int GetLeftBarLineX1Rel() const;
+    int GetLeftBarLineX2Rel() const;
+    int GetRightBarLineXRel() const;
+    int GetRightBarLineX1Rel() const;
+    int GetRightBarLineX2Rel() const;
     ///@}
 
     /**
@@ -114,107 +119,160 @@ public:
      */
     int GetWidth() const;
 
+    /**
+     * @name Setter and getter of the drawing scoreDef
+     */
+    ///@{
+    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
+    void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
+    ///@}
+
+    /**
+     * @name Setter and getter of the drawing ending
+     */
+    ///@{
+    Ending *GetDrawingEnding() const { return m_drawingEnding; }
+    void SetDrawingEnding(Ending *ending) { m_drawingEnding = ending; }
+    ///@}
+
+    /*
+     * Return the first staff of each staffGrp according to the scoreDef
+     */
+    std::vector<Staff *> GetFirstStaffGrpStaves(ScoreDef *scoreDef);
+
     //----------//
     // Functors //
     //----------//
 
     /**
-     * @name Reset the horizontal alignment
+     * See Object::ConvertToPageBased
+     */
+    virtual int ConvertToPageBased(FunctorParams *functorParams);
+
+    /**
+     * See Object::Save
      */
     ///@{
-    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params);
+    virtual int Save(FunctorParams *functorParams);
+    virtual int SaveEnd(FunctorParams *functorParams);
     ///@}
 
     /**
-     * AlignHorizontally the content of a measure.
+     * See Object::UnsetCurrentScoreDef
      */
-    virtual int AlignHorizontally(ArrayPtrVoid *params);
+    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
-     * Align horizontally the content of a layer.
+     * See Object::ResetHorizontalAlignment
      */
-    virtual int AlignHorizontallyEnd(ArrayPtrVoid *params);
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
     /**
-     * AlignVertically the content of a measure.
+     * See Object::AlignHorizontally
      */
-    virtual int AlignVertically(ArrayPtrVoid *params);
+    virtual int AlignHorizontally(FunctorParams *functorParams);
+    virtual int AlignHorizontallyEnd(FunctorParams *functorParams);
 
     /**
-     * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
-     * Special case that redirects the functor to the GraceAligner.
+     * See Object::AlignVertically
      */
-    virtual int IntegrateBoundingBoxGraceXShift(ArrayPtrVoid *params);
+    virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
-     * Correct the X alignment once the content of a system has been aligned and laid out.
-     * Special case that redirects the functor to the MeasureAligner.
+     * See Object::IntegrateBoundingBoxGraceXShift
      */
-    virtual int IntegrateBoundingBoxXShift(ArrayPtrVoid *params);
+    virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams);
 
     /**
-     * Set the position of the Alignment.
-     * Special case that redirects the functor to the MeasureAligner.
+     * See Object::IntegrateBoundingBoxXShift
      */
-    virtual int SetAlignmentXPos(ArrayPtrVoid *params);
+    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams);
 
     /**
-     * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
-     * This method also moves the end position of the measure according to the barLine width.
+     * See Object::SetAlignmentXPos
      */
-    virtual int AlignMeasures(ArrayPtrVoid *params);
+    virtual int SetAlignmentXPos(FunctorParams *functorParams);
 
     /**
-     * Justify the X positions
-     * Special case that redirects the functor to the MeasureAligner.
+     * See Object::SetBoundingBoxXShift
      */
-    virtual int JustifyX(ArrayPtrVoid *params);
+    ///@{
+    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
+    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
-     * Fill a page by adding systems with the appropriate length
-     *
+     * See Object::AlignMeasures
      */
-    virtual int CastOffSystems(ArrayPtrVoid *params);
+    virtual int AlignMeasures(FunctorParams *functorParams);
 
     /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     * See Object::JustifyX
      */
-    virtual int SetDrawingXY(ArrayPtrVoid *params);
+    virtual int JustifyX(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::CastOffSystems
      */
-    virtual int ResetDrawing(ArrayPtrVoid *params);
+    virtual int CastOffSystems(FunctorParams *functorParams);
+
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
+
+    /**
+     * See Object::SetDrawingXY
+     */
+    virtual int SetDrawingXY(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
      * See Object::FillStaffCurrentTimeSpanningEnd
      */
-    virtual int FillStaffCurrentTimeSpanningEnd(ArrayPtrVoid *params);
+    virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareTimeSpanning.
+     * See Object::PrepareFloatingGrps
      */
-    virtual int PrepareTimeSpanningEnd(ArrayPtrVoid *params);
+    virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
     /**
-     * See Object:ExportMIDI
+     * See Object::PrepareTimePointingEnd
      */
-    virtual int ExportMIDI(ArrayPtrVoid *params);
+    virtual int PrepareTimePointingEnd(FunctorParams *functorParams);
 
     /**
-     * See Object:ExportMIDI
+     * See Object::PrepareTimeSpanningEnd
      */
-    virtual int ExportMIDIEnd(ArrayPtrVoid *params);
+    virtual int PrepareTimeSpanningEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareBoundaries
+     */
+    virtual int PrepareBoundaries(FunctorParams *functorParams);
+
+    /**
+     * @name See Object::GenerateMIDI
+     */
+    ///@{
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+    virtual int GenerateMIDIEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::CalcMaxMeasureDuration
      */
-    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
+    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareTimestamps.
+     * See Object::PrepareTimestamps
      */
-    virtual int PrepareTimestampsEnd(ArrayPtrVoid *params);
+    virtual int PrepareTimestampsEnd(FunctorParams *functorParams);
 
 public:
     /**
@@ -245,6 +303,20 @@ private:
     BarLineAttr m_leftBarLine;
     BarLineAttr m_rightBarLine;
     ///@}
+
+    /**
+     * A pointer to the drawing ScoreDef instance. It is owned by the measure and added to a measure when a scoreDef
+     * change before or requires it. This include scoreDef elements before it but also clef changes within the previous
+     * measure.
+     */
+    ScoreDef *m_drawingScoreDef;
+
+    /**
+     * A pointer to the ending to which the measure belongs. Set by PrepareBoundaries and passed to the System drawing
+     * list
+     * in DrawMeasure
+     */
+    Ending *m_drawingEnding;
 };
 
 } // namespace vrv

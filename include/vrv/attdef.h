@@ -36,9 +36,9 @@ typedef std::vector<std::pair<std::string, std::string> > ArrayOfStrAttr;
 #define DUR_MX -1 // maxima
 #define DUR_LG 0 // longa
 #define DUR_BR 1 // brevis
-#define DUR_1 2 // whole note
-#define DUR_2 3 // ...
-#define DUR_4 4
+#define DUR_1 2 // whole note (semibrevis)
+#define DUR_2 3 // half note (minima)
+#define DUR_4 4 // ...
 #define DUR_8 5
 #define DUR_16 6
 #define DUR_32 7
@@ -65,6 +65,12 @@ typedef std::vector<std::pair<std::string, std::string> > ArrayOfStrAttr;
  * is a pattern and not a closed list and cannot be generated automatically
  * easily (e.g., data_DURATION)
  */
+
+/**
+ * A typedef for a list of positive integer.
+ * E.g., list { xsd:positiveInteger+ }
+ */
+typedef std::vector<data_ARTICULATION> data_ARTICULATION_List;
 
 /**
  * MEI data.BEATRPT_REND
@@ -141,6 +147,26 @@ enum data_KEYSIGNATURE {
 typedef std::pair<int, double> data_MEASUREBEAT;
 
 /**
+ * MEI data.MIDIBPM
+ */
+typedef int data_MIDIBPM;
+
+/**
+ * MEI data.MIDICHANNEL
+ */
+typedef int data_MIDICHANNEL;
+
+/**
+ * MEI data.MIDIMSPB
+ */
+typedef int data_MIDIMSPB;
+
+/**
+ * MEI data.MIDIVALUE
+ */
+typedef int data_MIDIVALUE;
+
+/**
  * MEI data.MODUSMAIOR
  * NONE is -3 for perfect value (abs) by default
  */
@@ -161,6 +187,11 @@ enum data_OCTAVE_DIS { OCTAVE_DIS_NONE = 0, OCTAVE_DIS_8 = 8, OCTAVE_DIS_15 = 15
  * MEI data.ORIENTATION
  */
 enum data_ORIENTATION { ORIENTATION_NONE = 0, ORIENTATION_reversed, ORIENTATION_90CW, ORIENTATION_90CCW };
+
+/**
+ * MEI data.PERCENT
+ */
+typedef int data_PERCENT;
 
 /**
  * MEI data.PITCHNAME
@@ -227,7 +258,7 @@ enum data_TEMPUS { TEMPUS_NONE = -3, TEMPUS_2 = 2, TEMPUS_3 };
  * A typedef for a list of positive integer.
  * E.g., list { xsd:positiveInteger+ }
  */
-typedef std::vector<int> xsd_posIntList;
+typedef std::vector<int> xsdPositiveInteger_List;
 
 } // namespace vrv
 

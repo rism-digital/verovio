@@ -6,13 +6,16 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include <assert.h>
-#include <cstdlib>
-#include <ctime>
-#include <getopt.h>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <sys/stat.h>
+
+#ifndef _WIN32
+#include <getopt.h>
+#else
+#include "win_getopt.h"
+#endif
 
 //----------------------------------------------------------------------------
 
@@ -54,15 +57,15 @@ bool dir_exists(string dir)
 
 void display_version()
 {
-    cerr << "Verovio " << GetVersion() << endl;
+    cerr << "Verovio " << vrv::GetVersion() << endl;
 }
 
 void display_usage()
 {
 
     display_version();
-    cerr << endl << "Usage:" << endl << endl;
-    cerr << " verovio [-f format] [-s scale] [-t type] [-r resources] [-o outfile] infile" << endl << endl;
+    cerr << endl << "Example usage:" << endl << endl;
+    cerr << " verovio [-s scale] [-t type] [-r resources] [-o outfile] infile" << endl << endl;
 
     // These need to be kept in alphabetical order:
     // -options with both short and long forms first
@@ -70,7 +73,7 @@ void display_usage()
     // -then debugging options
 
     // Options with both short and long forms
-    cerr << "Options" << endl;
+    cerr << "Options (marked as * are repeatable)" << endl;
 
     cerr << " -                          Use \"-\" as input file for reading from the standard input" << endl;
 
@@ -100,24 +103,30 @@ void display_usage()
 
     cerr << " --all-pages                Output all pages with one output file per page" << endl;
 
+    cerr << " --app-xpath-query=QR*      Set the xPath query for selecting <app> child elements," << endl;
+    cerr << "                            for example: \"./rdg[contains(@source, 'source-id')]\";" << endl;
+    cerr << "                            by default the <lem> or the first <rdg> is selected" << endl;
+
+    cerr << " --choice-xpath-query=QR*   Set the xPath query for selecting <choice> child elements," << endl;
+    cerr << "                            for example: \"./orig\"; by default the first child is selected" << endl;
+
     cerr << " --even-note-spacing        Space notes evenly and close together regardless of their durations" << endl;
 
-    cerr << " --font=FONT                Select the music font to use (default is Leipzig; Bravura and Gootville are "
-            "also available)"
-         << endl;
+    cerr << " --font=FONT                Select the music font to use (default is Leipzig;" << endl;
+    cerr << "                            Bravura and Gootville are also available)" << endl;
 
     cerr << " --help                     Display this message" << endl;
 
     cerr << " --ignore-layout            Ignore all encoded layout information (if any)" << endl;
     cerr << "                            and fully recalculate the layout" << endl;
 
+    cerr << " --mdiv-xpath-query=QR      Set the xPath query for selecting the <mdiv> to be rendered;" << endl;
+    cerr << "                            only one <mdiv> can be rendered" << endl;
+
     cerr << " --no-layout                Ignore all encoded layout information (if any)" << endl;
     cerr << "                            and output one single page with one single system" << endl;
 
     cerr << " --page=PAGE                Select the page to engrave (default is 1)" << endl;
-
-    cerr << " --rdg-xpath-query=QUERY    Set the xPath query for selecting <rdg> elements," << endl;
-    cerr << "                            for example: \"./rdg[contains(@source, 'source-id')]\"" << endl;
 
     cerr << " --spacing-linear=SP        Specify the linear spacing factor (default is " << DEFAULT_SPACING_LINEAR
          << ")" << endl;
@@ -128,6 +137,8 @@ void display_usage()
     cerr << " --spacing-staff=SP         Specify the spacing above each staff (in MEI vu)" << endl;
 
     cerr << " --spacing-system=SP        Specify the spacing above each system (in MEI vu)" << endl;
+
+    cerr << " --xml-id-seed=INT          Seed the random number generator for XML IDs" << endl;
 
     // Debugging options
     cerr << endl << "Debugging options" << endl;
@@ -145,12 +156,10 @@ int main(int argc, char **argv)
     string outfile;
     string outformat = "svg";
     string font = "";
+    vector<string> appXPathQueries;
+    vector<string> choiceXPathQueries;
     bool std_output = false;
 
-    // Init random number generator for uuids
-    std::srand((unsigned int)std::time(0));
-
-    FileFormat type;
     int no_mei_hdr = 0;
     int adjust_page_height = 0;
     int all_pages = 0;
@@ -168,9 +177,6 @@ int main(int argc, char **argv)
     // The fonts will be loaded later with Resources::InitFonts()
     Toolkit toolkit(false);
 
-    // read pae by default
-    type = MEI;
-
     if (argc < 2) {
         cerr << "Expected one input file but found none." << endl << endl;
         display_usage();
@@ -179,33 +185,44 @@ int main(int argc, char **argv)
     int c;
 
     static struct option long_options[] = { { "adjust-page-height", no_argument, &adjust_page_height, 1 },
-        { "all-pages", no_argument, &all_pages, 1 }, { "border", required_argument, 0, 'b' },
+        { "all-pages", no_argument, &all_pages, 1 }, { "app-xpath-query", required_argument, 0, 0 },
+        { "border", required_argument, 0, 'b' }, { "choice-xpath-query", required_argument, 0, 0 },
         { "even-note-spacing", no_argument, &even_note_spacing, 1 }, { "font", required_argument, 0, 0 },
         { "format", required_argument, 0, 'f' }, { "help", no_argument, &show_help, 1 },
-        { "ignore-layout", no_argument, &ignore_layout, 1 }, { "no-layout", no_argument, &no_layout, 1 },
-        { "no-mei-hdr", no_argument, &no_mei_hdr, 1 }, { "no-justification", no_argument, &no_justification, 1 },
-        { "outfile", required_argument, 0, 'o' }, { "page", required_argument, 0, 0 },
-        { "page-height", required_argument, 0, 'h' }, { "page-width", required_argument, 0, 'w' },
-        { "rdg-xpath-query", required_argument, 0, 0 }, { "resources", required_argument, 0, 'r' },
+        { "ignore-layout", no_argument, &ignore_layout, 1 }, { "mdiv-xpath-query", required_argument, 0, 0 },
+        { "no-layout", no_argument, &no_layout, 1 }, { "no-mei-hdr", no_argument, &no_mei_hdr, 1 },
+        { "no-justification", no_argument, &no_justification, 1 }, { "outfile", required_argument, 0, 'o' },
+        { "page", required_argument, 0, 0 }, { "page-height", required_argument, 0, 'h' },
+        { "page-width", required_argument, 0, 'w' }, { "resources", required_argument, 0, 'r' },
         { "scale", required_argument, 0, 's' }, { "show-bounding-boxes", no_argument, &show_bounding_boxes, 1 },
         { "spacing-linear", required_argument, 0, 0 }, { "spacing-non-linear", required_argument, 0, 0 },
         { "spacing-staff", required_argument, 0, 0 }, { "spacing-system", required_argument, 0, 0 },
-        { "type", required_argument, 0, 't' }, { "version", no_argument, &show_version, 1 }, { 0, 0, 0, 0 } };
+        { "type", required_argument, 0, 't' }, { "version", no_argument, &show_version, 1 },
+        { "xml-id-seed", required_argument, 0, 0 }, { 0, 0, 0, 0 } };
 
     int option_index = 0;
     while ((c = getopt_long(argc, argv, "b:f:h:o:p:r:s:t:w:v", long_options, &option_index)) != -1) {
         switch (c) {
             case 0:
-                if (long_options[option_index].flag != 0) break;
+                if (long_options[option_index].flag != 0)
+                    break;
+                else if (strcmp(long_options[option_index].name, "app-xpath-query") == 0) {
+                    cout << string(optarg) << endl;
+                    appXPathQueries.push_back(string(optarg));
+                }
+                else if (strcmp(long_options[option_index].name, "choice-xpath-query") == 0) {
+                    cout << string(optarg) << endl;
+                    choiceXPathQueries.push_back(string(optarg));
+                }
                 if (strcmp(long_options[option_index].name, "font") == 0) {
                     font = string(optarg);
                 }
+                else if (strcmp(long_options[option_index].name, "mdiv-xpath-query") == 0) {
+                    cout << string(optarg) << endl;
+                    toolkit.SetMdivXPathQuery(string(optarg));
+                }
                 else if (strcmp(long_options[option_index].name, "page") == 0) {
                     page = atoi(optarg);
-                }
-                else if (strcmp(long_options[option_index].name, "rdg-xpath-query") == 0) {
-                    cout << string(optarg) << endl;
-                    toolkit.SetAppXPathQuery(string(optarg));
                 }
                 else if (strcmp(long_options[option_index].name, "spacing-linear") == 0) {
                     if (!toolkit.SetSpacingLinear(atof(optarg))) {
@@ -226,6 +243,9 @@ int main(int argc, char **argv)
                     if (!toolkit.SetSpacingSystem(atoi(optarg))) {
                         exit(1);
                     }
+                }
+                else if (strcmp(long_options[option_index].name, "xml-id-seed") == 0) {
+                    Object::SeedUuid(atoi(optarg));
                 }
                 break;
 
@@ -274,6 +294,13 @@ int main(int argc, char **argv)
 
             default: break;
         }
+    }
+
+    if (appXPathQueries.size() > 0) {
+        toolkit.SetAppXPathQueries(appXPathQueries);
+    }
+    if (choiceXPathQueries.size() > 0) {
+        toolkit.SetChoiceXPathQueries(choiceXPathQueries);
     }
 
     if (show_version) {
@@ -348,11 +375,11 @@ int main(int argc, char **argv)
 
     // Load the std input or load the file
     if (infile == "-") {
-        stringstream data_stream;
+        ostringstream data_stream;
         for (string line; getline(cin, line);) {
             data_stream << line << endl;
         }
-        if (!toolkit.LoadString(data_stream.str())) {
+        if (!toolkit.LoadData(data_stream.str())) {
             cerr << "The input could not be loaded." << endl;
             exit(1);
         }

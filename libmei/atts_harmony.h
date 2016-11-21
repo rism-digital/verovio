@@ -49,8 +49,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetFret(data_FRET fret_) { m_fret = fret_; };
-    data_FRET GetFret() const { return m_fret; };
+    void SetFret(data_FRET fret_) { m_fret = fret_; }
+    data_FRET GetFret() const { return m_fret; }
     bool HasFret() const;
     ///@}
 
@@ -85,8 +85,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetChordref(std::string chordref_) { m_chordref = chordref_; };
-    std::string GetChordref() const { return m_chordref; };
+    void SetChordref(std::string chordref_) { m_chordref = chordref_; }
+    std::string GetChordref() const { return m_chordref; }
     bool HasChordref() const;
     ///@}
 
@@ -121,8 +121,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetRendgrid(harmVis_RENDGRID rendgrid_) { m_rendgrid = rendgrid_; };
-    harmVis_RENDGRID GetRendgrid() const { return m_rendgrid; };
+    void SetRendgrid(harmVis_RENDGRID rendgrid_) { m_rendgrid = rendgrid_; }
+    harmVis_RENDGRID GetRendgrid() const { return m_rendgrid; }
     bool HasRendgrid() const;
     ///@}
 

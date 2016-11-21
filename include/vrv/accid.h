@@ -17,7 +17,7 @@ namespace vrv {
 // Accid
 //----------------------------------------------------------------------------
 
-class Accid : public LayerElement, public PositionInterface, public AttAccidental, public AttAccidLog {
+class Accid : public LayerElement, public PositionInterface, public AttAccidental, public AttAccidLog, public AttColor {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -27,14 +27,14 @@ public:
     Accid();
     virtual ~Accid();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Accid"; };
-    virtual ClassId Is() const { return ACCID; };
+    virtual std::string GetClassName() const { return "Accid"; }
+    virtual ClassId Is() const { return ACCID; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     //----------//
     // Functors //
@@ -43,7 +43,7 @@ public:
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer(ArrayPtrVoid *params);
+    virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
 private:
     //

@@ -8,7 +8,8 @@
 #ifndef __VRV_TEMPO_H__
 #define __VRV_TEMPO_H__
 
-#include "floatingelement.h"
+#include "atts_midi.h"
+#include "controlelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
 
@@ -23,7 +24,7 @@ class TextElement;
 /**
  * This class is an interface for <tempo> elements at the measure level
  */
-class Tempo : public FloatingElement, public TextDirInterface, public TimePointInterface {
+class Tempo : public ControlElement, public TextDirInterface, public TimePointInterface, public AttMiditempo {
 public:
     /**
      * @name Constructors, destructors, reset methods
@@ -33,8 +34,8 @@ public:
     Tempo();
     virtual ~Tempo();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Tempo"; };
-    virtual ClassId Is() const { return TEMPO; };
+    virtual std::string GetClassName() const { return "Tempo"; }
+    virtual ClassId Is() const { return TEMPO; }
     ///@}
 
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }
@@ -44,7 +45,11 @@ public:
      * Add an element (text, rend. etc.) to a tempo.
      * Only supported elements will be actually added to the child list.
      */
-    void AddTextElement(TextElement *element);
+    virtual void AddChild(Object *object);
+
+    //----------//
+    // Functors //
+    //----------//
 
 private:
     //

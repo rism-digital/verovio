@@ -208,14 +208,14 @@ AttIntervalharmonic::~AttIntervalharmonic()
 
 void AttIntervalharmonic::ResetIntervalharmonic()
 {
-    m_inth = "";
+    m_inth = INTERVAL_HARMONIC_NONE;
 }
 
 bool AttIntervalharmonic::ReadIntervalharmonic(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("inth")) {
-        this->SetInth(StrToStr(element.attribute("inth").value()));
+        this->SetInth(StrToIntervalHarmonic(element.attribute("inth").value()));
         element.remove_attribute("inth");
         hasAttribute = true;
     }
@@ -226,7 +226,7 @@ bool AttIntervalharmonic::WriteIntervalharmonic(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasInth()) {
-        element.append_attribute("inth") = StrToStr(this->GetInth()).c_str();
+        element.append_attribute("inth") = IntervalHarmonicToStr(this->GetInth()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -234,53 +234,53 @@ bool AttIntervalharmonic::WriteIntervalharmonic(pugi::xml_node element)
 
 bool AttIntervalharmonic::HasInth() const
 {
-    return (m_inth != "");
+    return (m_inth != INTERVAL_HARMONIC_NONE);
 }
 
 /* include <attinth> */
 
 //----------------------------------------------------------------------------
-// AttIntervallicdesc
+// AttIntervalmelodic
 //----------------------------------------------------------------------------
 
-AttIntervallicdesc::AttIntervallicdesc() : Att()
+AttIntervalmelodic::AttIntervalmelodic() : Att()
 {
-    ResetIntervallicdesc();
+    ResetIntervalmelodic();
 }
 
-AttIntervallicdesc::~AttIntervallicdesc()
+AttIntervalmelodic::~AttIntervalmelodic()
 {
 }
 
-void AttIntervallicdesc::ResetIntervallicdesc()
+void AttIntervalmelodic::ResetIntervalmelodic()
 {
-    m_intm = INTERVAL_AMOUNT_NONE;
+    m_intm = INTERVAL_MELODIC_NONE;
 }
 
-bool AttIntervallicdesc::ReadIntervallicdesc(pugi::xml_node element)
+bool AttIntervalmelodic::ReadIntervalmelodic(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("intm")) {
-        this->SetIntm(StrToIntervalAmount(element.attribute("intm").value()));
+        this->SetIntm(StrToIntervalMelodic(element.attribute("intm").value()));
         element.remove_attribute("intm");
         hasAttribute = true;
     }
     return hasAttribute;
 }
 
-bool AttIntervallicdesc::WriteIntervallicdesc(pugi::xml_node element)
+bool AttIntervalmelodic::WriteIntervalmelodic(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasIntm()) {
-        element.append_attribute("intm") = IntervalAmountToStr(this->GetIntm()).c_str();
+        element.append_attribute("intm") = IntervalMelodicToStr(this->GetIntm()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
 }
 
-bool AttIntervallicdesc::HasIntm() const
+bool AttIntervalmelodic::HasIntm() const
 {
-    return (m_intm != INTERVAL_AMOUNT_NONE);
+    return (m_intm != INTERVAL_MELODIC_NONE);
 }
 
 /* include <attintm> */
@@ -465,15 +465,15 @@ bool Att::SetAnalysis(Object *element, std::string attrType, std::string attrVal
         AttIntervalharmonic *att = dynamic_cast<AttIntervalharmonic *>(element);
         assert(att);
         if (attrType == "inth") {
-            att->SetInth(att->StrToStr(attrValue));
+            att->SetInth(att->StrToIntervalHarmonic(attrValue));
             return true;
         }
     }
-    if (element->HasAttClass(ATT_INTERVALLICDESC)) {
-        AttIntervallicdesc *att = dynamic_cast<AttIntervallicdesc *>(element);
+    if (element->HasAttClass(ATT_INTERVALMELODIC)) {
+        AttIntervalmelodic *att = dynamic_cast<AttIntervalmelodic *>(element);
         assert(att);
         if (attrType == "intm") {
-            att->SetIntm(att->StrToIntervalAmount(attrValue));
+            att->SetIntm(att->StrToIntervalMelodic(attrValue));
             return true;
         }
     }
@@ -540,14 +540,14 @@ void Att::GetAnalysis(const Object *element, ArrayOfStrAttr *attributes)
         const AttIntervalharmonic *att = dynamic_cast<const AttIntervalharmonic *>(element);
         assert(att);
         if (att->HasInth()) {
-            attributes->push_back(std::make_pair("inth", att->StrToStr(att->GetInth())));
+            attributes->push_back(std::make_pair("inth", att->IntervalHarmonicToStr(att->GetInth())));
         }
     }
-    if (element->HasAttClass(ATT_INTERVALLICDESC)) {
-        const AttIntervallicdesc *att = dynamic_cast<const AttIntervallicdesc *>(element);
+    if (element->HasAttClass(ATT_INTERVALMELODIC)) {
+        const AttIntervalmelodic *att = dynamic_cast<const AttIntervalmelodic *>(element);
         assert(att);
         if (att->HasIntm()) {
-            attributes->push_back(std::make_pair("intm", att->IntervalAmountToStr(att->GetIntm())));
+            attributes->push_back(std::make_pair("intm", att->IntervalMelodicToStr(att->GetIntm())));
         }
     }
     if (element->HasAttClass(ATT_MELODICFUNCTION)) {

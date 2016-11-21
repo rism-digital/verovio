@@ -39,7 +39,7 @@ public:
     LayerElement(std::string classid);
     virtual ~LayerElement();
     virtual void Reset();
-    virtual ClassId Is() const { return LAYER_ELEMENT; };
+    virtual ClassId Is() const { return LAYER_ELEMENT; }
     ///@}
 
     /**
@@ -59,8 +59,8 @@ public:
      * NB In the scoreDef or staffDef itself, it can be either an attribute or an element.
      */
     ///@{
-    bool GetScoreOrStaffDefAttr() const { return m_isScoreOrStaffDefAttr; };
-    void SetScoreOrStaffDefAttr(bool isScoreOrStaffDefAttr) { m_isScoreOrStaffDefAttr = isScoreOrStaffDefAttr; };
+    ElementScoreDefRole GetScoreDefRole() const { return m_scoreDefRole; }
+    void SetScoreDefRole(ElementScoreDefRole scoreDefRole) { m_scoreDefRole = scoreDefRole; }
     ///@}
 
     /**
@@ -71,10 +71,12 @@ public:
     bool IsGraceNote() const;
     /** Return true if the element is a note or a note child and the note has a @grace */
     bool IsCueSize();
+    /** Return true if the element is a note within a ligature */
+    bool IsInLigature();
     /** Return true if the element is a note or a chord within a fTrem */
     bool IsInFTrem();
     /** Return true if the element has to be aligned horizontally */
-    virtual bool HasToBeAligned() const { return false; };
+    virtual bool HasToBeAligned() const { return false; }
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
@@ -87,14 +89,18 @@ public:
     /**
      * Returns the drawing top and bottom taking into accound stem, etc.
      * We pass the doc as parameter in order to have access to the current drawing parameters.
+     * withArtic specifies if the articulation sign needs to be taken into account or not.
+     * articPartType indicates if the inside or outside artic part has to be taken into account (inside is taken
+     * into account in any case)
      */
-    int GetDrawingTop(Doc *doc, int staffSize);
-    int GetDrawingBottom(Doc *doc, int staffSize);
+    int GetDrawingTop(Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
+    int GetDrawingBottom(
+        Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
 
     /**
      * Alignment getter
      */
-    Alignment *GetAlignment() const { return m_alignment; };
+    Alignment *GetAlignment() const { return m_alignment; }
 
     int GetXRel() const;
 
@@ -108,46 +114,54 @@ public:
     //----------//
 
     /**
-     * @name Reset the horizontal alignment
+     * See Object::ResetHorizontalAlignment
      */
-    ///@{
-    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params);
-    ///@}
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
 
     /**
      * See Object::AlignHorizontally
      */
-    virtual int AlignHorizontally(ArrayPtrVoid *params);
+    virtual int AlignHorizontally(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareTimePointing
+     */
+    virtual int PrepareTimePointing(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareTimeSpanning
      */
-    virtual int PrepareTimeSpanning(ArrayPtrVoid *params);
+    virtual int PrepareTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     * See Object::SetDrawingXY
      */
-    virtual int SetDrawingXY(ArrayPtrVoid *params);
-
-    virtual int TimeSpanningLayerElements(ArrayPtrVoid *params);
+    virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
-     * See Object:ExportMIDI
+     * See Object::FindTimeSpanningLayerElements
      */
-    virtual int ExportMIDI(ArrayPtrVoid *params);
+    virtual int FindTimeSpanningLayerElements(FunctorParams *functorParams);
 
     /**
-     *  See Object:ExportMIDI
+     * See Object::GenerateMIDI
      */
-    virtual int ExportMIDIEnd(ArrayPtrVoid *params);
+    virtual int GenerateMIDI(FunctorParams *functorParams);
+    virtual int GenerateMIDIEnd(FunctorParams *functorParams);
 
     /**
      * See Object::CalcMaxMeasureDuration
      */
-    virtual int CalcMaxMeasureDuration(ArrayPtrVoid *params);
+    virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
 
 private:
-    //
+    int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
+
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;
@@ -167,7 +181,7 @@ protected:
 
 private:
     /** Indicates whether it is a ScoreDef or StaffDef attribute */
-    bool m_isScoreOrStaffDefAttr;
+    ElementScoreDefRole m_scoreDefRole;
 };
 
 } // namespace vrv

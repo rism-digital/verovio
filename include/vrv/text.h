@@ -20,7 +20,7 @@ namespace vrv {
 /**
  * This class models the MEI <rend>
  */
-class Rend : public TextElement, public AttCommon, public AttTypography {
+class Rend : public TextElement, public AttColor, public AttCommon, public AttTypography {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -30,15 +30,15 @@ public:
     Rend();
     virtual ~Rend();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Rend"; };
-    virtual ClassId Is() const { return REND; };
+    virtual std::string GetClassName() const { return "Rend"; }
+    virtual ClassId Is() const { return REND; }
     ///@}
 
     /**
      * Add an element (text, rend. etc.) to a rend.
      * Only supported elements will be actually added to the child list.
      */
-    void AddTextElement(TextElement *element);
+    virtual void AddChild(Object *object);
 
 private:
     //
@@ -64,8 +64,8 @@ public:
     Text();
     virtual ~Text();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Text"; };
-    virtual ClassId Is() const { return TEXT; };
+    virtual std::string GetClassName() const { return "Text"; }
+    virtual ClassId Is() const { return TEXT; }
     ///@}
 
     /**
@@ -74,8 +74,8 @@ public:
      * See MeiInput::ReadText and MeiInput ::WriteText
      */
     ///@{
-    void SetText(std::wstring text) { m_text = text; };
-    std::wstring GetText() const { return m_text; };
+    void SetText(std::wstring text) { m_text = text; }
+    std::wstring GetText() const { return m_text; }
     ///@}
 
 private:

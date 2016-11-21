@@ -82,7 +82,7 @@ namespace vrv {
 #define MIN_LYRIC_SIZE 2.0
 #define MAX_LYRIC_SIZE 8.0
 
-#define DEFAULT_MEASURE_WIDTH 12.0
+#define DEFAULT_MEASURE_WIDTH 15.0
 #define MIN_MEASURE_WIDTH 1.0
 #define MAX_MEASURE_WIDTH 30.0
 
@@ -93,7 +93,7 @@ namespace vrv {
 #define DEFAULT_SLUR_THICKNESS 0.6
 
 /** The default position at the beginning of a measure */
-#define DEFAULT_LEFT_POSITION 1.3
+#define DEFAULT_LEFT_POSITION 0.8
 
 /** Left margins */
 
@@ -103,13 +103,14 @@ namespace vrv {
 
 #define DEFAULT_LEFT_MARGIN_ACCID 1.0
 #define DEFAULT_LEFT_MARGIN_BARLINE DEFAULT_LEFT_MARGIN_DEFAULT
-#define DEFAULT_LEFT_MARGIN_BARLINE_ATTR 2.0
+#define DEFAULT_LEFT_MARGIN_BARLINE_ATTR_LEFT 0.0
+#define DEFAULT_LEFT_MARGIN_BARLINE_ATTR_RIGHT 1.0
 #define DEFAULT_LEFT_MARGIN_BEATRPT 2.0
 #define DEFAULT_LEFT_MARGIN_CHORD 1.0
-#define DEFAULT_LEFT_MARGIN_CLEF DEFAULT_LEFT_MARGIN_DEFAULT
-#define DEFAULT_LEFT_MARGIN_KEYSIG DEFAULT_LEFT_MARGIN_DEFAULT
-#define DEFAULT_LEFT_MARGIN_MENSUR DEFAULT_LEFT_MARGIN_DEFAULT
-#define DEFAULT_LEFT_MARGIN_METERSIG DEFAULT_LEFT_MARGIN_DEFAULT
+#define DEFAULT_LEFT_MARGIN_CLEF 0.5
+#define DEFAULT_LEFT_MARGIN_KEYSIG 1.0
+#define DEFAULT_LEFT_MARGIN_MENSUR 1.0
+#define DEFAULT_LEFT_MARGIN_METERSIG 1.0
 #define DEFAULT_LEFT_MARGIN_MREST DEFAULT_LEFT_MARGIN_DEFAULT
 #define DEFAULT_LEFT_MARGIN_MRPT2 DEFAULT_LEFT_MARGIN_DEFAULT
 #define DEFAULT_LEFT_MARGIN_MULTIREST DEFAULT_RIGHT_MARGIN_DEFAULT
@@ -119,23 +120,24 @@ namespace vrv {
 
 /** Right margins */
 
-#define DEFAULT_RIGHT_MARGIN_DEFAULT 1.0
+#define DEFAULT_RIGHT_MARGIN_DEFAULT 0.0
 #define MIN_RIGHT_MARGIN_DEFAULT 0.0
 #define MAX_RIGHT_MARGIN_DEFAULT 10.0
 
 #define DEFAULT_RIGHT_MARGIN_ACCID 0.0
 #define DEFAULT_RIGHT_MARGIN_BARLINE 2.0
-#define DEFAULT_RIGHT_MARGIN_BARLINE_ATTR 0.0
+#define DEFAULT_RIGHT_MARGIN_BARLINE_ATTR_LEFT 0.0
+#define DEFAULT_RIGHT_MARGIN_BARLINE_ATTR_RIGHT 0.0
 #define DEFAULT_RIGHT_MARGIN_BEATRPT DEFAULT_RIGHT_MARGIN_DEFAULT
 #define DEFAULT_RIGHT_MARGIN_CHORD 0.0
-#define DEFAULT_RIGHT_MARGIN_CLEF 2.0
-#define DEFAULT_RIGHT_MARGIN_KEYSIG 2.0
-#define DEFAULT_RIGHT_MARGIN_MENSUR 2.0
-#define DEFAULT_RIGHT_MARGIN_METERSIG 2.0
-#define DEFAULT_RIGHT_MARGIN_MREST DEFAULT_RIGHT_MARGIN_DEFAULT
-#define DEFAULT_RIGHT_MARGIN_MRPT2 DEFAULT_RIGHT_MARGIN_DEFAULT
-#define DEFAULT_RIGHT_MARGIN_MULTIREST DEFAULT_RIGHT_MARGIN_DEFAULT
-#define DEFAULT_RIGHT_MARGIN_MULTIRPT DEFAULT_RIGHT_MARGIN_DEFAULT
+#define DEFAULT_RIGHT_MARGIN_CLEF 1.0
+#define DEFAULT_RIGHT_MARGIN_KEYSIG 1.0
+#define DEFAULT_RIGHT_MARGIN_MENSUR 1.0
+#define DEFAULT_RIGHT_MARGIN_METERSIG 1.0
+#define DEFAULT_RIGHT_MARGIN_MREST 0.0
+#define DEFAULT_RIGHT_MARGIN_MRPT2 0.0
+#define DEFAULT_RIGHT_MARGIN_MULTIREST 0.0
+#define DEFAULT_RIGHT_MARGIN_MULTIRPT 0.0
 #define DEFAULT_RIGHT_MARGIN_NOTE 0.0
 #define DEFAULT_RIGHT_MARGIN_REST 0.0
 
@@ -156,37 +158,41 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 // the space between the staff and an editorial accid in units
-#define TEMP_STYLE_ACCID_EDIT_SPACE 3.5 * PARAM_DENOMINATOR
+#define TEMP_ACCID_EDIT_SPACE 3.5 * PARAM_DENOMINATOR
 
 // the space between each lyric line in units
-#define TEMP_STYLE_LYIRC_LINE_SPACE 4.0 * PARAM_DENOMINATOR
+#define TEMP_LYRIC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
 
 // the key signature spacing factor
-#define TEMP_STYLE_KEYSIG_STEP 1.3
+#define TEMP_KEYSIG_STEP 1.3
 
 // the maximum angle of a slur
-#define TEMP_STYLE_SLUR_MAX_SLOPE (45 * M_PI / 180)
-#define TEMP_STYLE_SLUR_CURVE_FACTOR 5 // a factor for allow more (0) or less (100) curved slurs
-#define TEMP_STYLE_SLUR_HEIGHT_FACTOR 8 // high value means flatter slurs
-#define TEMP_STYLE_SLUR_CONTROL_POINT_FACTOR 5 // higher value means more curved at the end
+#define TEMP_SLUR_MAX_SLOPE (45 * M_PI / 180)
+#define TEMP_SLUR_CURVE_FACTOR 40 // a factor to allow more (0) or less (100) curved slurs
+#define TEMP_SLUR_HEIGHT_FACTOR 8 // high value means flatter slurs
+#define TEMP_SLUR_CONTROL_POINT_FACTOR 5 // higher value means more curved at the end
 
 /* Style parameters for mensural notation */
-// Ratio of mensural notehead size to CMN notehead size for the same staff size
-#define MNOTEHEAD_SIZE_FACTOR 0.90
+// Ratios of mensural notehead, accidental, aug. dot size to CMN for the same staff size
+#define TEMP_MNOTEHEAD_SIZE_FACTOR 1.0
+#define TEMP_MACCID_SIZE_FACTOR 1.0
+#define TEMP_MAUGDOT_SIZE_FACTOR 1.0
+// Width of the minima diamond relative to its height
+#define TEMP_MINIMA_WIDTH_FACTOR 1.0
 // Size of mensuration sign circle relative to space between staff lines
 #define MSIGN_CIRCLE_DIAM 1.7
 // Vertical position of center of mensuration sign as distance below top of the staff
 #define MSIGN_STAFFLINES_BELOW_TOP 2.0
 // Size of dot inside mensuration signs relative to space between staff lines
-#define MSIGN_DOT_DIAM 0.5
+#define MSIGN_DOT_DIAM 0.4
 // Relative size of figures in proportions
-#define PROPRT_SIZE_FACTOR 0.50
+#define PROPRT_SIZE_FACTOR 1.0
 // Linewidth for staff lines in mensural notation, rel. to "normal" width of staff lines */
-#define MENSURAL_LINEWIDTH_FACTOR 0.5
+#define MENSURAL_LINEWIDTH_FACTOR 1.0
 
 /**
  * This class contains the document default environment variables.
- * Some of them are not available as is in MEI - to be solved
+ * FIXME: Some of them are not available as is in MEI - to be solved
  */
 class Style {
 public:
@@ -247,7 +253,8 @@ public:
     /** The layout left margin by element */
     char m_leftMarginAccid;
     char m_leftMarginBarLine;
-    char m_leftMarginBarLineAttr;
+    char m_leftMarginBarLineAttrLeft;
+    char m_leftMarginBarLineAttrRight;
     char m_leftMarginBeatRpt;
     char m_leftMarginChord;
     char m_leftMarginClef;
@@ -266,7 +273,8 @@ public:
     /** The layout right margin by element */
     char m_rightMarginAccid;
     char m_rightMarginBarLine;
-    char m_rightMarginBarLineAttr;
+    char m_rightMarginBarLineAttrLeft;
+    char m_rightMarginBarLineAttrRight;
     char m_rightMarginBeatRpt;
     char m_rightMarginChord;
     char m_rightMarginClef;

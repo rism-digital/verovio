@@ -10,11 +10,14 @@
 
 #include "aligner.h"
 #include "drawinginterface.h"
+#include "editorial.h"
 #include "object.h"
 
 namespace vrv {
 
+class BoundaryEnd;
 class DeviceContext;
+class Ending;
 class Measure;
 class ScoreDef;
 
@@ -37,25 +40,24 @@ public:
     System();
     virtual ~System();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "System"; };
-    virtual ClassId Is() const { return SYSTEM; };
+    virtual std::string GetClassName() const { return "System"; }
+    virtual ClassId Is() const { return SYSTEM; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddMeasure(Measure *measure);
-    void AddScoreDef(ScoreDef *scoreDef);
+    virtual void AddChild(Object *object);
     ///@}
 
     /**
      * @name Set and get the labels drawing width (normal and abbreviated)
      */
     ///@{
-    int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; };
+    int GetDrawingLabelsWidth() const { return m_drawingLabelsWidth; }
     void SetDrawingLabelsWidth(int width);
-    int GetDrawingAbbrLabelsWidth() const { return m_drawingAbbrLabelsWidth; };
+    int GetDrawingAbbrLabelsWidth() const { return m_drawingAbbrLabelsWidth; }
     void SetDrawingAbbrLabelsWidth(int width);
     ///@}
 
@@ -72,86 +74,102 @@ public:
     /**
      * Return the index position of the system in its page parent
      */
-    int GetSystemIdx() const { return Object::GetIdx(); };
+    int GetSystemIdx() const { return Object::GetIdx(); }
 
-    void SetCurrentFloatingPositioner(int staffN, FloatingElement *element, int x, int y);
+    void SetCurrentFloatingPositioner(int staffN, FloatingObject *object, int x, int y);
+
+    /**
+     * @name Setter and getter of the drawing scoreDef
+     */
+    ///@{
+    ScoreDef *GetDrawingScoreDef() const { return m_drawingScoreDef; }
+    void SetDrawingScoreDef(ScoreDef *drawingScoreDef);
+    ///@}
 
     //----------//
     // Functors //
     //----------//
 
     /**
-     * @name Reset the horizontal and vertical alignment
+     * See Object::UnsetCurrentScoreDef
      */
-    ///@{
-    virtual int ResetHorizontalAlignment(ArrayPtrVoid *params);
-    virtual int ResetVerticalAlignment(ArrayPtrVoid *params);
-    ///@}
+    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
-     * Align the content of a system vertically.
+     * See Object::ResetHorizontalAlignment
      */
-    virtual int AlignVertically(ArrayPtrVoid *params);
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
 
     /**
-     * Set the position of the StaffAlignment.
-     * Redirect the functor to the SytemAligner
+     * See Object::ResetVerticalAlignment
      */
-    virtual int SetAligmentYPos(ArrayPtrVoid *params);
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
 
     /**
-     * Correct the Y alignment once the content of a system has been aligned and laid out.
-     * Special case that redirects the functor to the SystemAligner.
+     * See Object::AlignHorizontally
      */
-    virtual int IntegrateBoundingBoxYShift(ArrayPtrVoid *params);
+    virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
-     * Align the system by adjusting the m_drawingYRel position looking at the SystemAligner.
+     * See Object::AlignVertically
      */
-    virtual int AlignSystems(ArrayPtrVoid *params);
+    virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
-     * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
-     * In System object resets the shift to 0;
+     * See Object::SetAligmentYPos
      */
-    virtual int AlignMeasures(ArrayPtrVoid *params);
+    virtual int SetAligmentYPos(FunctorParams *functorParams);
 
     /**
-     * Store the width of the system in the MeasureAligner for justification
+     * See Object::IntegrateBoundingBoxYShift
      */
-    virtual int AlignMeasuresEnd(ArrayPtrVoid *params);
+    virtual int IntegrateBoundingBoxYShift(FunctorParams *functorParams);
 
     /**
-     * Justify the X positions
-     * Special case that redirects the functor to the MeasureAligner.
+     * See Object::AlignSystems
      */
-    virtual int JustifyX(ArrayPtrVoid *params);
+    virtual int AlignSystems(FunctorParams *functorParams);
+
+    /**
+     * See Object::AlignMeasures
+     */
+    virtual int AlignMeasures(FunctorParams *functorParams);
+    virtual int AlignMeasuresEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::JustifyX
+     */
+    virtual int JustifyX(FunctorParams *functorParams);
 
     /**
      * See Object::CalcStaffOverlap
      */
-    virtual int CalcStaffOverlap(ArrayPtrVoid *params);
+    virtual int CalcStaffOverlap(FunctorParams *functorParams);
 
     /**
-     *
+     * See Object::AdjustFloatingPostioners
      */
-    virtual int AdjustFloatingPostioners(ArrayPtrVoid *params);
+    virtual int AdjustFloatingPostioners(FunctorParams *functorParams);
 
     /**
      * See Object::CastOffPages
      */
-    virtual int CastOffPages(ArrayPtrVoid *params);
+    virtual int CastOffPages(FunctorParams *functorParams);
 
     /**
-     * Undo the cast of the system.
-     * This is used by Doc::ContinuousLayout
+     * See Object::UnCastOff
      */
-    virtual int UnCastOff(ArrayPtrVoid *params);
+    virtual int UnCastOff(FunctorParams *functorParams);
 
     /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     * See Object::SetDrawingXY
      */
-    virtual int SetDrawingXY(ArrayPtrVoid *params);
+    virtual int SetDrawingXY(FunctorParams *functorParams);
+
+    /**
+     * See Object::CastOffSystemsEnd
+     */
+    virtual int CastOffSystemsEnd(FunctorParams *functorParams);
 
 public:
     SystemAligner m_systemAligner;
@@ -194,9 +212,11 @@ public:
      */
     ///@{
     int m_drawingTotalWidth;
+    int m_drawingJustifiableWidth;
     ///@}
 
 private:
+    ScoreDef *m_drawingScoreDef;
 };
 
 } // namespace vrv

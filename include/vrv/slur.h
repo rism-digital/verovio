@@ -8,7 +8,7 @@
 #ifndef __VRV_SLUR_H__
 #define __VRV_SLUR_H__
 
-#include "floatingelement.h"
+#include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -17,7 +17,7 @@ namespace vrv {
 // Slur
 //----------------------------------------------------------------------------
 
-class Slur : public FloatingElement, public TimeSpanningInterface, public AttCurvature {
+class Slur : public ControlElement, public TimeSpanningInterface, public AttColor, public AttCurvature {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -27,12 +27,16 @@ public:
     Slur();
     virtual ~Slur();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Slur"; };
-    virtual ClassId Is() const { return SLUR; };
+    virtual std::string GetClassName() const { return "Slur"; }
+    virtual ClassId Is() const { return SLUR; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }
+
+    //----------//
+    // Functors //
+    //----------//
 
 private:
     //

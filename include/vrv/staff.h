@@ -16,6 +16,7 @@ namespace vrv {
 class DeviceContext;
 class Layer;
 class StaffAlignment;
+class StaffDef;
 class Syl;
 class TimeSpanningInterface;
 
@@ -40,36 +41,30 @@ public:
     Staff(int n = -1);
     virtual ~Staff();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Staff"; };
-    virtual ClassId Is() const { return STAFF; };
+    virtual std::string GetClassName() const { return "Staff"; }
+    virtual ClassId Is() const { return STAFF; }
     ///@}
 
     /**
      * @name Methods for adding allowed content
      */
     ///@{
-    void AddLayer(Layer *layer);
+    virtual void AddChild(Object *object);
     ///@}
 
-    int GetLayerCount() const { return (int)m_children.size(); };
+    int GetLayerCount() const { return (int)m_children.size(); }
 
     /**
      * Return the index position of the staff in its measure parent
      */
-    int GetStaffIdx() const { return Object::GetIdx(); };
+    int GetStaffIdx() const { return Object::GetIdx(); }
 
     /**
      * Return the default horizontal spacing of staves.
      */
     int GetVerticalSpacing();
 
-    /**
-     * Reset the alignment values (m_drawingY, m_drawingYRel, etc.)
-     * Called by  AlignVertically
-     */
-    virtual void ResetVerticalAlignment();
-
-    StaffAlignment *GetAlignment() const { return m_staffAlignment; };
+    StaffAlignment *GetAlignment() const { return m_staffAlignment; }
 
     int GetYRel() const;
 
@@ -78,42 +73,39 @@ public:
     //----------//
 
     /**
-     * Currently unused - kept for "documentation"
+     * See Object::UnsetCurrentScoreDef
      */
-    virtual bool GetPosOnPage(ArrayPtrVoid *params);
+    virtual int UnsetCurrentScoreDef(FunctorParams *functorParams);
 
     /**
-     * Align the content of a staff vertically.
+     * See Object::ResetVerticalAlignment
      */
-    virtual int AlignVertically(ArrayPtrVoid *params);
+    virtual int ResetVerticalAlignment(FunctorParams *functorParams);
+
+    /**
+     * See Object::AlignVertically
+     */
+    virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
      * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);
+    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * Functor for setting running lyrics in staves
-     * This is necessary for <syl> that starts in one measure and ends in another one
-     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * See Object::ResetDrawing
      */
-    virtual int FillStaffCurrentLyrics(ArrayPtrVoid *params);
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::SetDrawingXY
      */
-    virtual int ResetDrawing(ArrayPtrVoid *params);
+    virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     * See Object::PrepareRpt
      */
-    virtual int SetDrawingXY(ArrayPtrVoid *params);
-
-    /**
-     * Functor for setting mRpt drawing numbers (if required)
-     * See implementation and Object::PrepareRpt
-     */
-    virtual int PrepareRpt(ArrayPtrVoid *params);
+    virtual int PrepareRpt(FunctorParams *functorParams);
 
 public:
     /**
@@ -139,10 +131,12 @@ public:
     std::vector<Object *> m_timeSpanningElements;
 
     /**
- * The Y absolute position of the staff for facsimile (transcription) encodings.
- * This is the top left corner of the staff (the X position is the position of the system).
- */
+     * The Y absolute position of the staff for facsimile (transcription) encodings.
+     * This is the top left corner of the staff (the X position is the position of the system).
+     */
     int m_yAbs;
+
+    StaffDef *m_drawingStaffDef;
 
 private:
     /**

@@ -17,6 +17,7 @@
 #include "editorial.h"
 #include "smufl.h"
 #include "text.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -28,7 +29,7 @@ std::wstring dynamSmufl[] = { L"\uE520", L"\uE521", L"\uE522", L"\uE523", L"\uE5
 // Dynam
 //----------------------------------------------------------------------------
 
-Dynam::Dynam() : FloatingElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
+Dynam::Dynam() : ControlElement("dynam-"), TextListInterface(), TextDirInterface(), TimeSpanningInterface()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
@@ -42,16 +43,26 @@ Dynam::~Dynam()
 
 void Dynam::Reset()
 {
-    FloatingElement::Reset();
+    ControlElement::Reset();
     TextDirInterface::Reset();
     TimeSpanningInterface::Reset();
 }
 
-void Dynam::AddTextElement(TextElement *element)
+void Dynam::AddChild(Object *child)
 {
-    assert(dynamic_cast<TextElement *>(element) || dynamic_cast<EditorialElement *>(element));
-    element->SetParent(this);
-    m_children.push_back(element);
+    if (child->IsTextElement()) {
+        assert(dynamic_cast<TextElement *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 
@@ -148,28 +159,5 @@ std::wstring Dynam::GetSymbolStr() const
 //----------------------------------------------------------------------------
 // Dynam functor methods
 //----------------------------------------------------------------------------
-
-int Dynam::AlignVertically(ArrayPtrVoid *params)
-{
-    // param 0: the systemAligner
-    // param 1: the staffIdx (unused)
-    // param 2: the staffN (unused)
-    // param 3: the doc (unused)
-    SystemAligner **systemAligner = static_cast<SystemAligner **>((*params).at(0));
-
-    std::vector<int> staffList = this->GetStaff();
-    std::vector<int>::iterator iter;
-    for (iter = staffList.begin(); iter != staffList.end(); iter++) {
-        // this gets (or creates) the measureAligner for the measure
-        StaffAlignment *alignment = (*systemAligner)->GetStaffAlignmentForStaffN(*iter);
-
-        if (!alignment) continue;
-
-        if (this->GetPlace() == STAFFREL_above) alignment->SetDynamAbove();
-        if (this->GetPlace() == STAFFREL_below) alignment->SetDynamBelow();
-    }
-
-    return FUNCTOR_CONTINUE;
-}
 
 } // namespace vrv

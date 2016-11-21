@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "functorparams.h"
 #include "note.h"
 
 namespace vrv {
@@ -43,17 +44,17 @@ void Dot::Reset()
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Dot::PreparePointersByLayer(ArrayPtrVoid *params)
+int Dot::PreparePointersByLayer(FunctorParams *functorParams)
 {
-    // param 0: the current Note
-    Note **currentNote = static_cast<Note **>((*params).at(0));
+    PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
+    assert(params);
 
-    m_drawingNote = (*currentNote);
+    m_drawingNote = params->m_currentNote;
 
     return FUNCTOR_CONTINUE;
 }
 
-int Dot::ResetDrawing(ArrayPtrVoid *params)
+int Dot::ResetDrawing(FunctorParams *functorParams)
 {
     this->m_drawingNote = NULL;
     return FUNCTOR_CONTINUE;

@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -21,9 +22,10 @@ namespace vrv {
 // Rend
 //----------------------------------------------------------------------------
 
-Rend::Rend() : TextElement("rend-"), AttCommon(), AttTypography()
+Rend::Rend() : TextElement("rend-"), AttColor(), AttCommon(), AttTypography()
 
 {
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPOGRAPHY);
 
@@ -37,15 +39,29 @@ Rend::~Rend()
 void Rend::Reset()
 {
     TextElement::Reset();
+    ResetColor();
     ResetCommon();
     ResetTypography();
 }
 
-void Rend::AddTextElement(TextElement *element)
+void Rend::AddChild(Object *child)
 {
-    //assert(dynamic_cast<Rend *>(element) || dynamic_cast<Text *>(element) || dynamic_cast<EditorialElement *>(element));
-    element->SetParent(this);
-    m_children.push_back(element);
+    if (child->Is() == REND) {
+        assert(dynamic_cast<Rend *>(child));
+    }
+    else if (child->Is() == TEXT) {
+        assert(dynamic_cast<Text *>(child));
+    }
+    else if (child->IsEditorialElement()) {
+        assert(dynamic_cast<EditorialElement *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+
+    child->SetParent(this);
+    m_children.push_back(child);
     Modify();
 }
 

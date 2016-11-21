@@ -9,7 +9,7 @@
 #define __VRV_HAIRPIN_H__
 
 #include "atts_cmn.h"
-#include "floatingelement.h"
+#include "controlelement.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -18,7 +18,7 @@ namespace vrv {
 // Hairpin
 //----------------------------------------------------------------------------
 
-class Hairpin : public FloatingElement, public TimeSpanningInterface, public AttHairpinLog, public AttPlacement {
+class Hairpin : public ControlElement, public TimeSpanningInterface, public AttColor, public AttHairpinLog, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -28,8 +28,8 @@ public:
     Hairpin();
     virtual ~Hairpin();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Hairpin"; };
-    virtual ClassId Is() const { return HAIRPIN; };
+    virtual std::string GetClassName() const { return "Hairpin"; }
+    virtual ClassId Is() const { return HAIRPIN; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
@@ -38,12 +38,6 @@ public:
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * Align the content of a staff vertically.
-     * See Object::AlignVertically
-     */
-    virtual int AlignVertically(ArrayPtrVoid *params);
 
 protected:
     //

@@ -16,6 +16,7 @@
 
 #include "beam.h"
 #include "chord.h"
+#include "clef.h"
 #include "doc.h"
 #include "keysig.h"
 #include "layer.h"
@@ -23,10 +24,10 @@
 #include "metersig.h"
 #include "multirest.h"
 #include "note.h"
-#include "page.h"
 #include "rest.h"
+#include "score.h"
 #include "scoredef.h"
-#include "system.h"
+#include "section.h"
 #include "staff.h"
 #include "tuplet.h"
 #include "vrv.h"
@@ -93,7 +94,7 @@ bool PaeInput::ImportFile()
 #endif
 }
 
-bool PaeInput::ImportString(std::string pae)
+bool PaeInput::ImportString(std::string const &pae)
 {
 #ifndef NO_PAE_SUPPORT
     std::istringstream in_stream(pae);
@@ -127,6 +128,8 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     pae::Measure current_measure;
     pae::Note current_note;
     Clef *staffDefClef = NULL;
+    MeterSig *scoreDefMeterSig = NULL;
+    KeySig *scoreDefKeySig = NULL;
 
     std::vector<pae::Measure> staff;
 
@@ -134,7 +137,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     while (!infile.eof()) {
         infile.getline(data_line, 10000);
         if (infile.eof()) {
-            LogDebug("Truncated file or ending tag missing");
+            // LogDebug("Truncated file or ending tag missing");
             // exit(1);
         }
         getAtRecordKeyValue(data_key, data_value, data_line);
@@ -173,17 +176,32 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
     if (strlen(c_keysig)) {
         KeySig *k = new KeySig();
         getKeyInfo(c_keysig, k);
-        current_measure.key = k;
+        if (!scoreDefKeySig) {
+            scoreDefKeySig = k;
+        }
+        else {
+            if (current_measure.key) {
+                delete current_measure.key;
+            }
+            current_measure.key = k;
+        }
     }
     if (strlen(c_timesig)) {
         MeterSig *meter = new MeterSig;
         getTimeInfo(c_timesig, meter);
-        // What about previous values? Potential memory leak? LP
-        current_measure.meter = meter;
+        if (!scoreDefMeterSig) {
+            scoreDefMeterSig = meter;
+        }
+        else {
+            if (current_measure.meter) {
+                delete current_measure.meter;
+            }
+            current_measure.meter = meter;
+        }
     }
 
     // read the incipit string
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     int i = 0;
     while (i < length) {
         // eat the input...
@@ -351,9 +369,11 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         current_measure.notes.clear();
     }
 
-    m_doc->Reset(Raw);
-    Page *page = new Page();
-    System *system = new System();
+    m_doc->SetType(Raw);
+    Score *score = m_doc->CreateScoreBuffer();
+    // the section
+    Section *section = new Section();
+    score->AddChild(section);
 
     int measure_count = 1;
 
@@ -365,11 +385,31 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         m_layer = new Layer();
         m_layer->SetN(1);
 
-        m_staff->AddLayer(m_layer);
-        m_measure->AddStaff(m_staff);
-        system->AddMeasure(m_measure);
+        m_staff->AddChild(m_layer);
+        m_measure->AddChild(m_staff);
 
         pae::Measure obj = *it;
+
+        // Add a score def if we have a new key sig or meter sig
+        if (obj.key || obj.meter) {
+            ScoreDef *scoreDef = new ScoreDef();
+            if (obj.key) {
+                scoreDef->SetKeySig(obj.key->ConvertToKeySigLog());
+                delete obj.key;
+                obj.key = NULL;
+            }
+            if (obj.meter) {
+                scoreDef->SetMeterCount(obj.meter->GetCount());
+                scoreDef->SetMeterUnit(obj.meter->GetUnit());
+                scoreDef->SetMeterSym(obj.meter->GetSym());
+                delete obj.meter;
+                obj.meter = NULL;
+            }
+            section->AddChild(scoreDef);
+        }
+
+        section->AddChild(m_measure);
+
         convertMeasure(&obj);
         measure_count++;
     }
@@ -386,11 +426,20 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         staffDef->SetClefDisPlace(staffDefClef->GetDisPlace());
         delete staffDefClef;
     }
-    staffGrp->AddStaffDef(staffDef);
-    m_doc->m_scoreDef.AddStaffGrp(staffGrp);
+    if (scoreDefKeySig) {
+        m_doc->m_scoreDef.SetKeySig(scoreDefKeySig->ConvertToKeySigLog());
+        delete scoreDefKeySig;
+    }
+    if (scoreDefMeterSig) {
+        m_doc->m_scoreDef.SetMeterCount(scoreDefMeterSig->GetCount());
+        m_doc->m_scoreDef.SetMeterUnit(scoreDefMeterSig->GetUnit());
+        m_doc->m_scoreDef.SetMeterSym(scoreDefMeterSig->GetSym());
+        delete scoreDefMeterSig;
+    }
+    staffGrp->AddChild(staffDef);
+    m_doc->m_scoreDef.AddChild(staffGrp);
 
-    page->AddSystem(system);
-    m_doc->AddPage(page);
+    m_doc->ConvertToPageBasedDoc();
 }
 
 //////////////////////////////
@@ -401,7 +450,7 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
 int PaeInput::getOctave(const char *incipit, char *octave, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     if (incipit[i] == '\'') {
         *octave = BASE_OCT;
         while ((i + 1 < length) && (incipit[i + 1] == '\'')) {
@@ -430,7 +479,7 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
 {
 
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     switch (incipit[i]) {
         case '0': *duration = DURATION_long; break;
@@ -456,11 +505,11 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
         (*dot)++;
         i++;
     }
-    if ((*dot == 1) && (*duration == 7)) {
+    if ((*dot == 1) && (incipit[i] == 7)) {
         // neumatic notation
         *duration = DURATION_breve;
         *dot = 0;
-        LogWarning("Found a note in neumatic notation (7.), using quarter note instead");
+        LogWarning("Found a note in neumatic notation (7.), using breve instead");
     }
 
     return i - index;
@@ -474,7 +523,7 @@ int PaeInput::getDuration(const char *incipit, data_DURATION *duration, int *dot
 int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     measure->durations_offset = 0;
     measure->durations.clear();
@@ -483,7 +532,7 @@ int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index
     // int j = 0;
     do {
         int dot;
-        data_DURATION dur;
+        data_DURATION dur = DURATION_4;
         // measure->dots.setSize(j+1);
         i += getDuration(incipit, &dur, &dot, i);
         measure->durations.push_back(dur);
@@ -508,7 +557,7 @@ int PaeInput::getDurations(const char *incipit, pae::Measure *measure, int index
 int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accident, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     if (incipit[i] == 'n') {
         *accident = ACCIDENTAL_EXPLICIT_n;
@@ -538,7 +587,7 @@ int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accid
 int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     // detect if it is a fermata or a tuplet
     regex_t re;
@@ -639,7 +688,7 @@ int PaeInput::getTupletFermataEnd(const char *incipit, pae::Note *note, int inde
 int PaeInput::getGraceNote(const char *incipit, pae::Note *note, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     // acciaccatura
     if (incipit[i] == 'g') {
@@ -694,7 +743,7 @@ data_PITCHNAME PaeInput::getPitch(char c_note)
 int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, int index)
 {
     int i = index;
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
 
     if (!isdigit(incipit[i]) && (incipit[i] != 'c') && (incipit[i] != 'o')) {
         return 0;
@@ -775,7 +824,7 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
     // go through the 3 character and retrieve the letter (clef) and the line
     // mensural clef (with + in between) currently ignored
     // clef with octava correct?
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     int i = 0;
     char clef = 'G';
     char line = '2';
@@ -825,7 +874,7 @@ int PaeInput::getClefInfo(const char *incipit, Clef *mclef, int index)
 
 int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
 {
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     int i = index;
 
     *wholerest = 1;
@@ -903,7 +952,7 @@ int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int ind
 
 int PaeInput::getAbbreviation(const char *incipit, pae::Measure *measure, int index)
 {
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     int i = index;
     int j;
 
@@ -934,7 +983,7 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
     int alt_nr = 0;
 
     // at the key information line, extract data
-    size_t length = strlen(incipit);
+    int length = (int)strlen(incipit);
     int i = index;
     bool end_of_keysig = false;
     while ((i < length) && (!end_of_keysig)) {
@@ -974,7 +1023,6 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     regex_t re;
     int oct;
     int i = index;
-    bool acc;
     int app;
     int tuplet_num;
 
@@ -1029,7 +1077,6 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     oct = note->octave;
     measure->notes.push_back(*note);
 
-    acc = note->acciaccatura;
     app = note->appoggiatura;
     tuplet_num = note->tuplet_note;
 
@@ -1054,7 +1101,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     // durations
     if (measure->durations.size() > 0) {
         measure->durations_offset++;
-        if (measure->durations_offset >= measure->durations.size()) {
+        if (measure->durations_offset >= (int)measure->durations.size()) {
             measure->durations_offset = 0;
         }
     }
@@ -1073,21 +1120,13 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
 void PaeInput::convertMeasure(pae::Measure *measure)
 {
     if (measure->clef != NULL) {
-        m_layer->AddLayerElement(measure->clef);
-    }
-
-    if (measure->key != NULL) {
-        m_layer->AddLayerElement(measure->key);
-    }
-
-    if (measure->meter != NULL) {
-        m_layer->AddLayerElement(measure->meter);
+        m_layer->AddChild(measure->clef);
     }
 
     if (measure->wholerest > 0) {
         MultiRest *mr = new MultiRest();
         mr->SetNum(measure->wholerest);
-        m_layer->AddLayerElement(mr);
+        m_layer->AddChild(mr);
     }
 
     m_nested_objects.clear();
@@ -1098,9 +1137,7 @@ void PaeInput::convertMeasure(pae::Measure *measure)
     }
 
     // Set barLine
-    // FIXME use flags for proper barLine identification
-    BarLine *const bline = m_measure->GetRightBarLine();
-    bline->SetForm(measure->barLine);
+    m_measure->SetRight(measure->barLine);
 }
 
 void PaeInput::parseNote(pae::Note *note)
@@ -1202,16 +1239,19 @@ void PaeInput::parseNote(pae::Note *note)
     }
 
     // note in a chord
-    if ((note->chord)) {
+    if (note->chord) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         // first note?
         if (!m_is_in_chord) {
             Chord *chord = new Chord();
+            chord->SetDots(mnote->GetDots());
             chord->SetDur(mnote->GetDur());
             pushContainer(chord);
             m_is_in_chord = true;
         }
+        mnote->SetDots(0);
+        mnote->SetDur(DURATION_NONE);
     }
 
     // Add the note to the current container
@@ -1230,6 +1270,10 @@ void PaeInput::parseNote(pae::Note *note)
 
     // last note of a chord
     if (!note->chord && m_is_in_chord) {
+        Note *mnote = dynamic_cast<Note *>(element);
+        assert(mnote);
+        mnote->SetDots(0);
+        mnote->SetDur(DURATION_NONE);
         popContainer();
         m_is_in_chord = false;
     }
@@ -1256,26 +1300,10 @@ void PaeInput::popContainer()
 void PaeInput::addLayerElement(LayerElement *element)
 {
     if (m_nested_objects.size() > 0) {
-        LayerElement *bottom = m_nested_objects.back();
-
-        if (bottom->Is() == BEAM) {
-            Beam *beam = dynamic_cast<Beam *>(bottom);
-            assert(beam);
-            beam->AddLayerElement(element);
-        }
-        else if (bottom->Is() == TUPLET) {
-            Tuplet *tuplet = dynamic_cast<Tuplet *>(bottom);
-            assert(tuplet);
-            tuplet->AddLayerElement(element);
-        }
-        else if (bottom->Is() == CHORD) {
-            Chord *chord = dynamic_cast<Chord *>(bottom);
-            assert(chord);
-            chord->AddLayerElement(element);
-        }
+        m_nested_objects.back()->AddChild(element);
     }
     else {
-        m_layer->AddLayerElement(element);
+        m_layer->AddChild(element);
     }
 }
 
@@ -1302,7 +1330,7 @@ void PaeInput::getAtRecordKeyValue(char *key, char *value, const char *input)
     char SEPARATOR = ':';
     char EMPTY = '\0';
 
-    size_t length = strlen(input);
+    int length = (int)strlen(input);
     int count = 0;
 
     // zero out strings

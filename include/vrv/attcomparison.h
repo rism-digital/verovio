@@ -9,6 +9,7 @@
 #define __VRV_ATT_COMPARISON_H__
 
 #include "aligner.h"
+#include "artic.h"
 #include "atts_shared.h"
 #include "durationinterface.h"
 #include "note.h"
@@ -28,7 +29,7 @@ enum DurExtreme { LONGEST = 0, SHORTEST };
 class AttCommonNComparison : public AttComparison {
 
 public:
-    AttCommonNComparison(ClassId AttClassId, const int n) : AttComparison(AttClassId) { m_n = n; };
+    AttCommonNComparison(ClassId AttClassId, const int n) : AttComparison(AttClassId) { m_n = n; }
 
     void SetN(int n) { m_n = n; }
 
@@ -65,7 +66,7 @@ public:
             m_extremeDur = -VRV_UNSET;
         else
             m_extremeDur = VRV_UNSET;
-    };
+    }
 
     virtual bool operator()(Object *object)
     {
@@ -91,16 +92,41 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttMeasureAlignerType
+// ArticPartTypeComparison
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is an Alignment of a certain type
  */
-class AttMeasureAlignerType : public AttComparison {
+class ArticPartTypeComparison : public AttComparison {
 
 public:
-    AttMeasureAlignerType(const AlignmentType type) : AttComparison(OBJECT) { m_type = type; };
+    ArticPartTypeComparison(const ArticPartType type) : AttComparison(OBJECT) { m_type = type; }
+
+    void SetType(ArticPartType type) { m_type = type; }
+
+    virtual bool operator()(Object *object)
+    {
+        ArticPart *articPart = dynamic_cast<ArticPart *>(object);
+        if (!articPart) return false;
+        return (articPart->GetType() == m_type);
+    }
+
+private:
+    ArticPartType m_type;
+};
+
+//----------------------------------------------------------------------------
+// MeasureAlignerTypeComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is an Alignment of a certain type
+ */
+class MeasureAlignerTypeComparison : public AttComparison {
+
+public:
+    MeasureAlignerTypeComparison(const AlignmentType type) : AttComparison(OBJECT) { m_type = type; }
 
     void SetType(AlignmentType type) { m_type = type; }
 
@@ -116,16 +142,16 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// AttNoteOnsetOffsetComparison
+// NoteOnsetOffsetComparison
 //----------------------------------------------------------------------------
 
 /**
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
-class AttNoteOnsetOffsetComparison : public AttComparison {
+class NoteOnsetOffsetComparison : public AttComparison {
 
 public:
-    AttNoteOnsetOffsetComparison(const double time) : AttComparison(NOTE) { m_time = time; };
+    NoteOnsetOffsetComparison(const double time) : AttComparison(NOTE) { m_time = time; }
 
     void SetTime(int time) { m_time = time; }
 

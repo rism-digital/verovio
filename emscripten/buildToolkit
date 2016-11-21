@@ -1,0 +1,267 @@
+#!/usr/bin/perl
+#
+# Description: Compile script for the JavaScript toolkit version of verovio.
+#
+# Changes from bash script version:
+#   Allow for excluding specific fonts.
+#      Example:      ./buildToolkit -x "Gootville,Bravura"
+#      Long Example: ./buildToolkit --exclude "Gootville,Bravura"
+#   Allow exclusion of specific importers (only works with PAE and Humdrum for now).
+#      Example:      ./buildToolkit -P
+#      Long Example: ./buildToolkit --no-pae
+#   Made VEROVIO_ROOT selectable from the command-line in case it or this directory needs to move.
+#      Example:      ./buildToolkit -r ../..
+#      Long Example: ./buildToolkit --root ../..
+#   Automated generation of source code filelist.
+# Note:
+#   VERSION_NAME not significantly used so removed.
+#   For smallest toolkit footprint use these options:
+#     ./buildToolkit -x "Gootville,Bravura" -DHPX
+#   (no Gootville or Bravura fonts; no importers)
+#
+
+use strict;
+use Getopt::Long;
+
+chomp (my $EMCC = `which emcc`);
+chomp (my $PYTHON = `which python`);
+die "ERROR: emscripten compiler (emcc) not found.\n" unless $EMCC;
+die "ERROR: python interpreter not found.\n" unless $PYTHON;
+
+my $VEROVIO_ROOT  = "..";
+
+# Default compiling uses ASM and large file support.
+# Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
+# Empirically, the memory amount required is roughly 5 times the file size.
+# This can be disabled in the light version, which uses the default memory settings.
+my $ASM = "-O3";
+$ASM .= " -DNDEBUG";
+$ASM .= " --memory-init-file 0";
+$ASM .= " -std=c++11";
+$ASM .= " -s ASM_JS=1";
+$ASM .= " -s OUTLINING_LIMIT=10000";
+$ASM .= " -s TOTAL_MEMORY=128*1024*1024";
+$ASM .= " -s TOTAL_STACK=64*1024*1024";
+
+my ($ASM_NAME, $WEBWORKER, $WEBWORKER_NAME, $VERSION, $CHATTY);
+
+
+sub print_help {
+print <<"EOT";
+
+Options:
+-c      Chatty mode: display compiler progress
+-l      Light version with no increased memory allocation
+-r DIR  Verovio root directory
+-v N    Version number (e.g., 1.0.0); no number by default
+-w      WebWorker-compatible build
+-x      Font exclusion list (case-sensitive)
+-D      Disable DARMS importer
+-H      Disable Humdrum importer
+-P      Disable PAE importer
+-X      Disable MusicXML importer
+
+EOT
+}
+
+
+# Parse command-line options
+my ($lightQ, $version, $chattyQ, $webworkerQ, $helpQ, $exclusion);
+my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
+Getopt::Long::Configure("bundling");
+GetOptions (
+   'c|chatty'      => \$chattyQ,
+   'h|?|help'      => \$helpQ,
+   'l|light'       => \$lightQ,
+   'r|root=s'      => \$VEROVIO_ROOT,
+   'v|version=s'   => \$VERSION,
+   'w|webworker'   => \$webworkerQ,
+   'x|exclusion=s' => \$exclusion,
+
+   'D|no-darms'    => \$nodarms,
+   'H|no-humdrum'  => \$nohumdrum,
+   'P|no-pae'      => \$nopae,
+   'X|no-musicxml' => \$nomusicxml
+);
+
+# Process command-line options:
+
+if ($lightQ) {
+	print "Creating low-memory (light) toolkit version\n";
+	$ASM = "-O3 -DNDEBUG --memory-init-file 0 -std=c++11 -s ASM_JS=1";
+	$ASM_NAME = "-light";
+}
+
+if ($chattyQ) {
+	$CHATTY = "-v";
+	print "Emscripten compile script: $EMCC\n";
+}
+
+if ($webworkerQ) {
+	print "Building with webworker compatibility.\n";
+	$WEBWORKER = 1;
+	$WEBWORKER_NAME = "-webworker";
+}
+
+if ($helpQ) {
+	print_help();
+	exit 2;
+}
+
+my $FILENAME = "verovio-toolkit$ASM_NAME$WEBWORKER_NAME.js";
+
+my $DATA_DIR  = "data";
+my $BUILD_DIR = "build";
+$BUILD_DIR .= "/$VERSION" if $VERSION;
+
+print "Compiled files will be written to $BUILD_DIR\n";
+
+`mkdir -p $BUILD_DIR`;
+`mkdir -p $DATA_DIR`;
+
+syncSvgResources($exclusion);
+
+# Generate the git commit file
+print "Creating commit version header file...\n";
+`$VEROVIO_ROOT/tools/get_git_commit.sh`;
+
+my $VEROVIO_INCLUDE = "$VEROVIO_ROOT/include";
+my $VEROVIO_LIBMEI  = "$VEROVIO_ROOT/libmei";
+
+my $includes = "";
+$includes .= " -I$VEROVIO_INCLUDE";
+$includes .= " -I$VEROVIO_INCLUDE/vrv";
+$includes .= " -I$VEROVIO_INCLUDE/hum";
+$includes .= " -I$VEROVIO_INCLUDE/json";
+$includes .= " -I$VEROVIO_INCLUDE/midi";
+$includes .= " -I$VEROVIO_INCLUDE/pugi";
+$includes .= " -I$VEROVIO_INCLUDE/utf8";
+$includes .= " -I$VEROVIO_LIBMEI";
+
+my $defines = "-DUSE_EMSCRIPTEN";
+$defines .= " -DNO_PAE_SUPPORT"      if $nopae;
+$defines .= " -DNO_DARMS_SUPPORT"    if $nodarms;
+$defines .= " -DNO_HUMDRUM_SUPPORT"  if $nohumdrum;
+$defines .= " -DNO_MUSICXML_SUPPORT" if $nomusicxml;
+
+my $sources = getSources();
+my $embed   = "--embed-file $DATA_DIR/";
+my $output  = "-o $BUILD_DIR/verovio.js";
+
+my $exports = "-s EXPORTED_FUNCTIONS=\"[";
+$exports .= "'_vrvToolkit_constructor',";
+$exports .= "'_vrvToolkit_destructor',";
+$exports .= "'_vrvToolkit_getElementsAtTime',";
+$exports .= "'_vrvToolkit_getLog',";
+$exports .= "'_vrvToolkit_getVersion',";
+$exports .= "'_vrvToolkit_getMEI',";
+$exports .= "'_vrvToolkit_getPageCount',";
+$exports .= "'_vrvToolkit_getPageWithElement',";
+$exports .= "'_vrvToolkit_getTimeForElement',";
+$exports .= "'_vrvToolkit_loadData',";
+$exports .= "'_vrvToolkit_redoLayout',";
+$exports .= "'_vrvToolkit_renderData',";
+$exports .= "'_vrvToolkit_renderPage',";
+$exports .= "'_vrvToolkit_renderToMidi',";
+$exports .= "'_vrvToolkit_setOptions',";
+$exports .= "'_vrvToolkit_edit',";
+$exports .= "'_vrvToolkit_getElementAttr'";
+$exports .= "]\"";
+
+my $command = "$PYTHON $EMCC $CHATTY $includes $defines $ASM $sources $embed $exports $output";
+print "Compiling...";
+print "$command\n" if $CHATTY;
+`$command`;
+
+if ($? == 0) {
+	print " Done.\n";
+
+	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
+	if ($WEBWORKER) {
+		`cat $BUILD_DIR/verovio.js verovio-proxy.js > $BUILD_DIR/$FILENAME`;
+	} else {
+		`cat $BUILD_DIR/verovio.js verovio-proxy.js verovio-unload-listener.js > $BUILD_DIR/$FILENAME`;
+	}
+
+	# create a gzip version
+	`(cd $BUILD_DIR && gzip -c $FILENAME > $FILENAME.gz)`;
+	print "$BUILD_DIR/$FILENAME.gz was created\n";
+
+	# all good
+	print "$BUILD_DIR/$FILENAME was created\n";
+
+	# create also a zip file if version name is given
+	if ($VERSION) {
+		`(cd $BUILD_DIR && zip $FILENAME.zip $FILENAME)`;
+		print "$BUILD_DIR/$FILENAME.zip was created\n";
+	}
+} else {
+	print " Failed.\n";
+}
+
+exit 0;
+
+
+###########################################################################
+
+
+##############################
+##
+## getSources -- return a list of code to be compiled.  This could be generalized
+##    to automatically extract a list of the code from the source directory.
+##
+
+sub getSources {
+	my @sources;
+	push @sources, "./emscripten_main.cpp";
+	push @sources, glob "$VEROVIO_ROOT/src/*.cpp";
+	push @sources, glob "$VEROVIO_ROOT/src/*/*.cpp";
+	push @sources, glob "$VEROVIO_ROOT/src/*/*.cc";
+
+	# libmei: only a subset is included:
+	push @sources, "$VEROVIO_ROOT/libmei/attconverter.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_cmn.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_critapp.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_mei.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_mensural.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_midi.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_pagebased.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_shared.cpp";
+
+	return join " ", @sources
+}
+
+
+
+##############################
+##
+## syncSvgResources -- copy SVG resources for embedding in toolkit.
+##
+
+sub syncSvgResources {
+	my ($exclusion) = @_;
+	print "Syncing SVG resources...\n";
+
+	# First clear old contents of data directory
+	`rm -rf $DATA_DIR/*` if $DATA_DIR;
+
+	# Then copy data directory contents
+	`cp -r $VEROVIO_ROOT/data/* $DATA_DIR/`;
+
+	# Remove .DS_Store from the data directory
+	`find $DATA_DIR/ -name '.DS_Store' -type f -delete`;
+
+	return unless $exclusion;
+	my @list = split /[^A-Za-z0-9_]+/, $exclusion;
+	foreach my $item (@list) {
+		next unless $item;
+		my @matches = glob "$DATA_DIR/$item*";
+		if (@matches) {
+			print "\tRemoving $item from embedded resources\n";
+			`rm -rf $DATA_DIR/$item*`;
+		}
+	}
+}
+
+
+

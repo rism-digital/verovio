@@ -24,7 +24,7 @@
 
 namespace vrv {
 
-#define TUPLET_OFFSET (25 * DEFINITON_FACTOR)
+#define TUPLET_OFFSET (25 * DEFINITION_FACTOR)
 
 /**
  * Analyze a tuplet object and figure out if all the notes are in the same beam
@@ -41,7 +41,7 @@ bool View::OneBeamInTuplet(Tuplet *tuplet)
     if (tuplet->GetFirstParent(BEAM, MAX_BEAM_DEPTH) && (tuplet->GetNoteCount() != 0)) return true;
 
     // No we contain a beam? Go on and search for it in the children
-    for (unsigned int i = 0; i < tuplet->GetChildCount(); i++) {
+    for (int i = 0; i < tuplet->GetChildCount(); i++) {
         currentBeam = dynamic_cast<Beam *>(tuplet->GetChild(i));
 
         // first child is not a beam, or it is a beam but we have more than one child

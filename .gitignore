@@ -34,3 +34,5 @@ java/verovio_wrap.cxx
 java/main.class
 java/src/
 java/target/
+output.mei
+main.class

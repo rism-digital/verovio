@@ -43,7 +43,7 @@ public:
     ///@{
     BBoxDeviceContext(View *view, int width, int height, unsigned char update = BBOX_BOTH);
     virtual ~BBoxDeviceContext();
-    virtual ClassId Is() const { return BBOX_DEVICE_CONTEXT; };
+    virtual ClassId Is() const { return BBOX_DEVICE_CONTEXT; }
     ///@}
 
     /**

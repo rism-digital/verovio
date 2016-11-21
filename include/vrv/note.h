@@ -47,12 +47,14 @@ class Note : public LayerElement,
              public DurationInterface,
              public PitchInterface,
              public AttAccidentalPerformed,
+             public AttColor,
              public AttColoration,
              public AttGraced,
              public AttNoteLogMensural,
              public AttStems,
              public AttStemsCmn,
-             public AttTiepresent {
+             public AttTiepresent,
+             public AttVisibility {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -62,8 +64,8 @@ public:
     Note();
     virtual ~Note();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Note"; };
-    virtual ClassId Is() const { return NOTE; };
+    virtual std::string GetClassName() const { return "Note"; }
+    virtual ClassId Is() const { return NOTE; }
     ///@}
 
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }
@@ -74,13 +76,13 @@ public:
     }
 
     /** Override the method since alignment is required */
-    virtual bool HasToBeAligned() const { return true; };
+    virtual bool HasToBeAligned() const { return true; }
 
     /**
      * Add an element (a verse or an accid) to a note.
      * Only Verse and Accid elements will be actually added to the note.
      */
-    void AddLayerElement(LayerElement *element);
+    virtual void AddChild(Object *object);
 
     /**
      * @name Setter and getter for tie attribute and other pointers
@@ -89,7 +91,7 @@ public:
     void ResetDrawingAccid();
     void ResetDrawingTieAttr();
     void SetDrawingTieAttr();
-    Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; };
+    Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
     ///@}
 
     /**
@@ -98,8 +100,8 @@ public:
     ///@{
     Alignment *GetGraceAlignment();
     void SetGraceAlignment(Alignment *graceAlignment);
-    bool HasGraceAlignment() const { return (m_graceAlignment != NULL); };
-    void ResetGraceAlignment() { m_graceAlignment = NULL; };
+    bool HasGraceAlignment() const { return (m_graceAlignment != NULL); }
+    void ResetGraceAlignment() { m_graceAlignment = NULL; }
     ///@}
 
     /**
@@ -114,7 +116,7 @@ public:
     /**
      * Returns a single integer representing pitch and octave.
      */
-    int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; };
+    int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; }
 
     //----------//
     // Functors //
@@ -123,28 +125,27 @@ public:
     /**
      * See Object::PrepareTieAttr
      */
-    virtual int PrepareTieAttr(ArrayPtrVoid *params);
+    virtual int PrepareTieAttr(FunctorParams *functorParams);
 
     /**
-     * Functor for setting wordpos and connector ends
-     * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
+     * See Object::PrepareLyrics
      */
-    virtual int PrepareLyrics(ArrayPtrVoid *params);
+    virtual int PrepareLyrics(FunctorParams *functorParams);
 
     /**
      * See Object::PreparePointersByLayer
      */
-    virtual int PreparePointersByLayer(ArrayPtrVoid *params);
+    virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
     /**
-     * Processes The FloatingElement owned by the note (e.g, @tie).
+     * See Object::FillStaffCurrentTimeSpanning
      */
-    virtual int FillStaffCurrentTimeSpanning(ArrayPtrVoid *params);
+    virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * Reset the drawing values before calling PrepareDrawing after changes.
+     * See Object::ResetDrawing
      */
-    virtual int ResetDrawing(ArrayPtrVoid *params);
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 private:
     //

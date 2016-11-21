@@ -11,15 +11,27 @@
 
 #include <assert.h>
 #include <cmath>
-#include <dirent.h>
 #include <sstream>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <vector>
 
+#ifndef _WIN32
+#include <dirent.h>
+#else
+#include "win_dirent.h"
+#include "win_time.h"
+#endif
+
 //----------------------------------------------------------------------------
 
+// Windows has no Bourne shell (sh), therefore no "git_commit.h" is created.
+#ifndef _WIN32
 #include "git_commit.h"
+#else
+#define GIT_COMMIT "[undefined]"
+#endif
+
 #include "glyph.h"
 #include "smufl.h"
 #include "vrvdef.h"
@@ -29,6 +41,10 @@
 #include "checked.h"
 #include "pugixml.hpp"
 #include "unchecked.h"
+
+#ifdef EMSCRIPTEN
+#include <emscripten.h>
+#endif
 
 #define STRING_FORMAT_MAX_LEN 2048
 
@@ -192,6 +208,7 @@ bool Resources::InitTextFont()
             if (current.attribute("w")) width = atof(current.attribute("w").value());
             if (current.attribute("h")) height = atof(current.attribute("h").value());
             glyph.SetBoundingBox(x, y, width, height);
+            if (current.attribute("h-a-x")) glyph.SetHorizAdvX(atof(current.attribute("h-a-x").value()));
             m_textFont[code] = glyph;
         }
     }
@@ -235,7 +252,7 @@ void LogDebug(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     s = "[Debug] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s);
+    AppendLogBuffer(true, s, CONSOLE_LOG);
     va_end(args);
 #else
     va_list args;
@@ -256,14 +273,14 @@ void LogError(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     s = "[Error] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s);
+    AppendLogBuffer(true, s, CONSOLE_ERROR);
     va_end(args);
 #else
     va_list args;
     va_start(args, fmt);
-    printf("[Error] ");
-    vprintf(fmt, args);
-    printf("\n");
+    fprintf(stderr, "[Error] ");
+    fprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
     va_end(args);
 #endif
 }
@@ -276,7 +293,7 @@ void LogMessage(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     s = "[Message] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s);
+    AppendLogBuffer(true, s, CONSOLE_INFO);
     va_end(args);
 #else
     va_list args;
@@ -296,7 +313,7 @@ void LogWarning(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     s = "[Warning] " + StringFormatVariable(fmt, args) + "\n";
-    AppendLogBuffer(true, s);
+    AppendLogBuffer(true, s, CONSOLE_WARN);
     va_end(args);
 #else
     va_list args;
@@ -324,15 +341,19 @@ bool LogBufferContains(std::string s)
     return false;
 }
 
-void AppendLogBuffer(bool checkDuplicate, std::string message)
+void AppendLogBuffer(bool checkDuplicate, std::string message, consoleLogLevel level)
 {
-    if (checkDuplicate) {
-        if (!LogBufferContains(message)) logBuffer.push_back(message);
-    }
-    else {
-        logBuffer.push_back(message);
+    if (checkDuplicate && LogBufferContains(message)) return;
+    logBuffer.push_back(message);
+
+    switch (level) {
+        case CONSOLE_ERROR: EM_ASM_ARGS({ console.error(Pointer_stringify($0)); }, message.c_str()); break;
+        case CONSOLE_WARN: EM_ASM_ARGS({ console.warn(Pointer_stringify($0)); }, message.c_str()); break;
+        case CONSOLE_INFO: EM_ASM_ARGS({ console.info(Pointer_stringify($0)); }, message.c_str()); break;
+        default: EM_ASM_ARGS({ console.log(Pointer_stringify($0)); }, message.c_str()); break;
     }
 }
+
 #endif
 
 bool Check(Object *object)

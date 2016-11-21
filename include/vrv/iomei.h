@@ -27,10 +27,13 @@ class Add;
 class AnchoredText;
 class Annot;
 class App;
+class Artic;
 class BarLine;
 class Beam;
 class BeatRpt;
+class BoundaryEnd;
 class BTrem;
+class Choice;
 class Chord;
 class Clef;
 class Corr;
@@ -41,10 +44,12 @@ class Dot;
 class Dir;
 class DurationInterface;
 class Dynam;
+class Ending;
 class Expan;
 class FloatingElement;
 class FTrem;
 class Hairpin;
+class Harm;
 class Layer;
 class LayerElement;
 class Lem;
@@ -57,7 +62,10 @@ class MRpt2;
 class MultiRest;
 class MultiRpt;
 class Note;
+class Octave;
 class Orig;
+class Pb;
+class Pedal;
 class PitchInterface;
 class PositionInterface;
 class Proport;
@@ -66,8 +74,11 @@ class Reg;
 class Rend;
 class Rest;
 class Restore;
+class Score;
 class ScoreDef;
 class ScoreDefInterface;
+class Sb;
+class Section;
 class Sic;
 class Slur;
 class Space;
@@ -126,7 +137,7 @@ public:
     /**
      * Setter for score-based MEI output (not implemented)
      */
-    void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; };
+    void SetScoreBasedMEI(bool scoreBasedMEI) { m_scoreBasedMEI = scoreBasedMEI; }
 
 private:
     bool WriteMeiDoc(Doc *doc);
@@ -137,11 +148,22 @@ private:
     void WriteXmlId(pugi::xml_node currentNode, Object *object);
 
     /**
+     * @name Methods for writing MEI score-based elements
+     */
+    ///@{
+    void WriteMeiSection(pugi::xml_node currentNode, Section *section);
+    void WriteMeiEnding(pugi::xml_node currentNote, Ending *ending);
+    void WriteMeiPb(pugi::xml_node currentNode, Pb *pb);
+    void WriteMeiSb(pugi::xml_node currentNode, Sb *sb);
+    ///@}
+
+    /**
      * @name Methods for writing MEI containers (measures, staff, etc) scoreDef and related.
      */
     ///@{
     void WriteMeiPage(pugi::xml_node currentNode, Page *page);
     void WriteMeiSystem(pugi::xml_node currentNode, System *system);
+    void WriteMeiBoundaryEnd(pugi::xml_node currentNode, BoundaryEnd *boundaryEnd);
     void WriteMeiScoreDef(pugi::xml_node currentNode, ScoreDef *scoreDef);
     void WriteMeiStaffGrp(pugi::xml_node currentNode, StaffGrp *staffGrp);
     void WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef);
@@ -156,6 +178,7 @@ private:
      */
     ///@{
     void WriteMeiAccid(pugi::xml_node currentNode, Accid *accid);
+    void WriteMeiArtic(pugi::xml_node currentNode, Artic *artic);
     void WriteMeiBarLine(pugi::xml_node currentNode, BarLine *barLine);
     void WriteMeiBeam(pugi::xml_node currentNode, Beam *beam);
     void WriteMeiBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt);
@@ -181,13 +204,16 @@ private:
     ///@}
 
     /**
-     * @name Methods for writing FloatingElement
+     * @name Methods for writing ControlElement
      */
     ///@{
     void WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
     void WriteMeiDir(pugi::xml_node currentNode, Dir *dir);
     void WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam);
     void WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
+    void WriteMeiHarm(pugi::xml_node currentNode, Harm *harm);
+    void WriteMeiOctave(pugi::xml_node currentNode, Octave *octave);
+    void WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal);
     void WriteMeiSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteMeiTie(pugi::xml_node currentNode, Tie *tie);
@@ -209,6 +235,7 @@ private:
     void WriteMeiAdd(pugi::xml_node currentNode, Add *add);
     void WriteMeiAnnot(pugi::xml_node currentNode, Annot *annot);
     void WriteMeiApp(pugi::xml_node currentNode, App *app);
+    void WriteMeiChoice(pugi::xml_node currentNode, Choice *choice);
     void WriteMeiCorr(pugi::xml_node currentNode, Corr *corr);
     void WriteMeiDamage(pugi::xml_node currentNode, Damage *damage);
     void WriteMeiDel(pugi::xml_node currentNode, Del *del);
@@ -295,19 +322,43 @@ public:
     virtual ~MeiInput();
 
     virtual bool ImportFile();
-    virtual bool ImportString(std::string mei);
+    virtual bool ImportString(std::string const &mei);
 
     /**
-     * Set an xPath query for selecting specific <rdg>.
+     * Set the xPath queries for selecting specific <rdg>.
      * By default, the first <lem> or <rdg> is loaded.
-     * If a query is provided, the element retrieved by the specified xPath
+     * If one (or more) query is provided, the element matching the specified xPath
      * query will be selected (if any, otherwise the first one will be used).
      */
-    virtual void SetAppXPathQuery(std::string appXPathQuery) { m_appXPathQuery = appXPathQuery; };
+    virtual void SetAppXPathQueries(std::vector<std::string> &xPathQueries) { m_appXPathQueries = xPathQueries; }
+
+    /**
+     * Set the xPath queries for selecting <choice> children.
+     * Works similarly as SetAppXPathQueries. By default, the first child is made visible
+     */
+    virtual void SetChoiceXPathQueries(std::vector<std::string> &xPathQueries) { m_choiceXPathQueries = xPathQueries; }
+
+    /**
+     * Set the XPath query for selecting a specific <mdiv>
+     * Only one mdiv can be selected. This also works differently that <app> and <choice> selection because only the
+     * selected mdiv will be loaded.
+     */
+    virtual void SetMdivXPathQuery(std::string &xPathQuery) { m_mdivXPathQuery = xPathQuery; }
 
 private:
     bool ReadMei(pugi::xml_node root);
     bool ReadMeiHeader(pugi::xml_node meihead);
+
+    /**
+     * @name Methods for reading MEI score-based elements
+     */
+    ///@{
+    bool ReadMeiSection(Object *parent, pugi::xml_node section);
+    bool ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiEnding(Object *parent, pugi::xml_node ending);
+    bool ReadMeiPb(Object *parent, pugi::xml_node pb);
+    bool ReadMeiSb(Object *parent, pugi::xml_node sb);
+    ///@}
 
     /**
      * @name Methods for reading  MEI containers (measures, staff, etc) scoreDef and related.
@@ -322,6 +373,7 @@ private:
     bool ReadMeiPageChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiSystem(Object *parent, pugi::xml_node system);
     bool ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode);
+    bool ReadMeiBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd);
     bool ReadMeiScoreDef(Object *parent, pugi::xml_node scoreDef);
     bool ReadMeiScoreDefChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiStaffGrp(Object *parent, pugi::xml_node staffGrp);
@@ -341,6 +393,7 @@ private:
      */
     ///@{
     bool ReadMeiAccid(Object *parent, pugi::xml_node accid);
+    bool ReadMeiArtic(Object *parent, pugi::xml_node artic);
     bool ReadMeiBarLine(Object *parent, pugi::xml_node barLine);
     bool ReadMeiBeam(Object *parent, pugi::xml_node beam);
     bool ReadMeiBeatRpt(Object *parent, pugi::xml_node beatRpt);
@@ -351,6 +404,7 @@ private:
     bool ReadMeiDot(Object *parent, pugi::xml_node dot);
     bool ReadMeiFTrem(Object *parent, pugi::xml_node fTrem);
     bool ReadMeiKeySig(Object *parent, pugi::xml_node keySig);
+    bool ReadMeiLigature(Object *parent, pugi::xml_node ligature);
     bool ReadMeiMensur(Object *parent, pugi::xml_node mensur);
     bool ReadMeiMeterSig(Object *parent, pugi::xml_node meterSig);
     bool ReadMeiMRest(Object *parent, pugi::xml_node mRest);
@@ -375,6 +429,9 @@ private:
     bool ReadMeiDir(Object *parent, pugi::xml_node dir);
     bool ReadMeiDynam(Object *parent, pugi::xml_node dynam);
     bool ReadMeiHairpin(Object *parent, pugi::xml_node hairpin);
+    bool ReadMeiHarm(Object *parent, pugi::xml_node harm);
+    bool ReadMeiOctave(Object *parent, pugi::xml_node octave);
+    bool ReadMeiPedal(Object *parent, pugi::xml_node pedal);
     bool ReadMeiSlur(Object *parent, pugi::xml_node slur);
     bool ReadMeiTempo(Object *parent, pugi::xml_node tempo);
     bool ReadMeiTie(Object *parent, pugi::xml_node tie);
@@ -399,6 +456,8 @@ private:
     bool ReadMeiAnnot(Object *parent, pugi::xml_node annot);
     bool ReadMeiApp(Object *parent, pugi::xml_node app, EditorialLevel level, Object *filter = NULL);
     bool ReadMeiAppChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiChoice(Object *parent, pugi::xml_node choice, EditorialLevel level, Object *filter = NULL);
+    bool ReadMeiChoiceChildren(Object *parent, pugi::xml_node parentNode, EditorialLevel level, Object *filter = NULL);
     bool ReadMeiCorr(Object *parent, pugi::xml_node corr, EditorialLevel level, Object *filter = NULL);
     bool ReadMeiDamage(Object *parent, pugi::xml_node damage, EditorialLevel level, Object *filter = NULL);
     bool ReadMeiDel(Object *parent, pugi::xml_node del, EditorialLevel level, Object *filter = NULL);
@@ -443,28 +502,16 @@ private:
     void ReadUnsupportedAttr(pugi::xml_node element, Object *object);
 
     /**
-     * Method for adding the element to the appropriate parent (e.g., Layer, Beam).
-     * This used for any element that supports different types of child.
-     * For example, the StaffGrp can contain StaffGrp or StaffDef.
-     * These methods dynamically case the parent to the appropriate class.
-     */
-    ///@{
-    void AddLayerElement(Object *parent, LayerElement *element);
-    void AddFloatingElement(Object *parent, FloatingElement *element);
-    void AddTextElement(Object *parent, TextElement *element);
-    void AddScoreDef(Object *parent, ScoreDef *element);
-    void AddStaffGrp(Object *parent, StaffGrp *element);
-    ///@}
-
-    /**
      * Returns true if the element is name is an editorial element (e.g., "app", "supplied", etc.)
      */
     bool IsEditorialElementName(std::string elementName);
 
     /**
-     * Read score-based MEI
+     * Read score-based MEI.
+     * The data is read into an object, which is then converted to page-based MEI.
+     * See MeiInput::ReadMei, Doc::CreateScoreBuffer and Doc::ConvertToPageBasedDoc
      */
-    bool ReadScoreBasedMei(pugi::xml_node element);
+    bool ReadScoreBasedMei(pugi::xml_node element, Score *parent);
 
     /**
      * @name Various methods for reading / converting values.
@@ -483,15 +530,17 @@ public:
 private:
     std::string m_filename;
 
-    /** The current page when reading score-based MEI */
-    Page *m_page;
-    /** The current system when reading score-based MEI */
-    System *m_system;
+    /** A vector for storing xpath queries for selecting <app> children */
+    std::vector<std::string> m_appXPathQueries;
+    /** A vector the storing xpath queries for selecting <choice> children */
+    std::vector<std::string> m_choiceXPathQueries;
+    /** A string for storing the xpath query for selecting a <mdiv> */
+    std::string m_mdivXPathQuery;
 
     /**
-     *
+     * A flag indicating wheather we are reading page-based or score-based MEI
      */
-    std::string m_appXPathQuery;
+    bool m_readingScoreBased;
 
     /**
      * This is used when reading a standard MEI file to specify if a scoreDef has already been read or not.
@@ -506,7 +555,7 @@ private:
     /**
      * A static array for storing the implemented editorial elements
      */
-    static std::string s_editorialElementNames[];
+    static std::vector<std::string> s_editorialElementNames;
 };
 
 } // namespace vrv
