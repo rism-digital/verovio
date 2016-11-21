@@ -23,6 +23,6 @@ The Verovio coding style is available [here](doc/guidelines.md).
 Example output
 --------------
 
-This page was generated with version 0.9.12-dev-03f3615
+This page was generated with version 0.9.13-dev-b953d3b
 
-![Example page](/images/page-0.9.12-dev-03f3615.png)
+![Example page](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/images/verovio-exp-0.9.13-dev.png)
