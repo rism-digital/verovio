@@ -218,6 +218,9 @@ protected:
     ///@{
     void DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure,
         Accid *prevAccid = NULL);
+    void DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure,
+        bool drawingList = false);
+    void DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -301,7 +304,7 @@ protected:
      * @name Methods for drawing Floating child classes.
      * They are base drawing methods that are called directly from DrawFloatingElement.
      * Call appropriate method of child classes (Slur, Tempo, Tie, etc).
-     * Defined in view_floating.cpp
+     * Defined in view_control.cpp
      */
     ///@{
     void DrawControlElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
@@ -326,7 +329,7 @@ protected:
     /**
      * @name Methods for drawing SystemElement child classes.
      * They are base drawing methods that are called directly from DrawSystemElement.
-     * Defined in view_floating.cpp
+     * Defined in view_control.cpp
      */
     ///@{
     void DrawSystemElement(DeviceContext *dc, SystemElement *element, System *system);
@@ -425,9 +428,14 @@ private:
     ///@}
 
     /**
-     * @name Used for calculating clustered information/dot position
+     * Used for calculating clustered information/dot position
      */
     bool IsOnStaffLine(int y, Staff *staff);
+
+    /**
+     * Find the nearest unit position in the direction indicated by place.
+     */
+    int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place);
 
     /**
      * Make sure dots on chords are vertically aligned correctly
