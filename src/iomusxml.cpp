@@ -21,6 +21,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "hairpin.h"
 #include "harm.h"
 #include "layer.h"
 #include "measure.h"
@@ -800,6 +801,28 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
         m_dynamStack.push_back(dynam);
     }
 
+    // Hairpins
+    pugi::xpath_node wedge = type.node().select_single_node("wedge");
+    if (wedge) {
+        if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
+            
+        }
+        else {
+            Hairpin *hairpin = new Hairpin();
+            if (HasAttributeWithValue(wedge.node(), "type", "crescendo")) {
+                hairpin->SetForm(hairpinLog_FORM_cres);
+            }
+            else if (HasAttributeWithValue(wedge.node(), "type", "diminuendo")) {
+                hairpin->SetForm(hairpinLog_FORM_dim);
+            }
+            std::string colorStr = GetAttributeValue(wedge.node(), "color");
+            if (!colorStr.empty()) hairpin->SetColor(colorStr.c_str());
+            if (!placeStr.empty()) hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
+            // add it to the stack
+            m_controlElements.push_back(std::make_pair(measureNum, hairpin));
+        }
+    }
+
     // Pedal
     pugi::xpath_node xmlPedal = type.node().select_single_node("pedal");
     if (xmlPedal) {
@@ -825,7 +848,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     }
 
     // other cases
-    if (words.size() == 0 && !dynam && !metronome && !xmlPedal) {
+    if (words.size() == 0 && !dynam && !metronome && !xmlPedal && !wedge) {
         LogWarning("Unsupported direction-type '%s'", type.node().first_child().name());
     }
 }
