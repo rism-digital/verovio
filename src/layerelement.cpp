@@ -130,9 +130,56 @@ Beam *LayerElement::IsInBeam()
     return NULL;
 }
 
-int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
+int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type)
+{
+    // It would not crash otherwise but there is not reason to call it
+    assert((this->Is() == NOTE) || (this->Is() == CHORD));
+
+    ArticPart *firstArticPart = NULL;
+    ArticPart *lastArticPart = NULL;
+
+    // We limit support to two artic elements, get them by searching in both directions
+    Artic *firstArtic = dynamic_cast<Artic *>(this->FindChildByType(ARTIC));
+    Artic *lastArtic = dynamic_cast<Artic *>(this->FindChildByType(ARTIC, MAX_ACCID_DEPTH, BACKWARD));
+    // If they are the same (we have only one artic child), then ignore the second one
+    if (firstArtic == lastArtic) lastArtic = NULL;
+    // Look for the outside part first if necessary
+    if (type == ARTIC_PART_OUTSIDE) {
+        if (firstArtic) firstArticPart = firstArtic->GetOutsidePart();
+        if (lastArtic) lastArticPart = lastArtic->GetOutsidePart();
+        // Ignore them if on the opposite side of what we are looking for
+        if (firstArticPart && (firstArticPart->GetPlace() != place)) firstArticPart = NULL;
+        if (lastArticPart && (lastArticPart->GetPlace() != place)) lastArticPart = NULL;
+    }
+    // Looking at the inside if nothing is given outside
+    if (firstArtic && !firstArticPart) {
+        firstArticPart = firstArtic->GetInsidePart();
+        if (firstArticPart && (firstArticPart->GetPlace() != place)) firstArticPart = NULL;
+    }
+    if (lastArtic && !lastArticPart) {
+        lastArticPart = lastArtic->GetInsidePart();
+        if (lastArticPart && (lastArticPart->GetPlace() != place)) lastArticPart = NULL;
+    }
+
+    if (place == STAFFREL_above) {
+        int firstY = !firstArticPart ? VRV_UNSET : firstArticPart->GetSelfTop();
+        int lastY = !lastArticPart ? VRV_UNSET : lastArticPart->GetSelfTop();
+        return std::max(firstY, lastY);
+    }
+    else {
+        int firstY = !firstArticPart ? -VRV_UNSET : firstArticPart->GetSelfBottom();
+        int lastY = !lastArticPart ? -VRV_UNSET : lastArticPart->GetSelfBottom();
+        return std::min(firstY, lastY);
+    }
+}
+
+int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPartType type)
 {
     if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
+        if (withArtic) {
+            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
+            if (articY != VRV_UNSET) return articY;
+        }
         DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
@@ -159,9 +206,13 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize)
     return this->GetDrawingY();
 }
 
-int LayerElement::GetDrawingBottom(Doc *doc, int staffSize)
+int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, ArticPartType type)
 {
     if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
+        if (withArtic) {
+            int articY = GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
+            if (articY != -VRV_UNSET) return articY;
+        }
         DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
@@ -372,7 +423,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->Is() == ACCID) {
         type = ALIGNMENT_ACCID;
     }
-    else if (this->Is() == SYL) {
+    else if ((this->Is() == SYL) || (this->Is() == ARTIC) || (this->Is() == ARTIC_PART)) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
@@ -417,12 +468,31 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
+{
+    PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
+    assert(params);
+
+    ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
+    while (iter != params->m_timePointingInterfaces.end()) {
+        if (iter->first->SetStartOnly(this)) {
+            // We have both the start and the end that are matched
+            iter = params->m_timePointingInterfaces.erase(iter);
+        }
+        else {
+            iter++;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
 {
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
-    ArrayOfInterfaceClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         if (iter->first->SetStartAndEnd(this)) {
             // We have both the start and the end that are matched

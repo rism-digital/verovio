@@ -141,7 +141,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 {
     CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
     if (m_scoreDef.HasMidiBpm()) calcMaxMeasureDurationParams.m_currentBpm = m_scoreDef.GetMidiBpm();
-    
+
     // We first calculate the maximum duration of each measure
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
     this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams);
@@ -227,6 +227,13 @@ void Doc::PrepareDrawing()
         prepareTimeSpanningParams.m_fillList = false;
         this->Process(&prepareTimeSpanning, &prepareTimeSpanningParams);
     }
+
+    // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
+    PrepareTimePointingParams prepareTimePointingParams;
+    Functor prepareTimePointing(&Object::PrepareTimePointing);
+    Functor prepareTimePointingEnd(&Object::PrepareTimePointingEnd);
+    this->Process(
+        &prepareTimePointing, &prepareTimePointingParams, &prepareTimePointingEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
 
     // Now try to match the @tstamp and @tstamp2 attributes.
     PrepareTimestampsParams prepareTimestampsParams;
@@ -374,6 +381,10 @@ void Doc::PrepareDrawing()
     PrepareFloatingGrpsParams prepareFloatingGrpsParams;
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams);
+
+    FunctorParams prepareArticParams;
+    Functor prepareArtic(&Object::PrepareArtic);
+    this->Process(&prepareArtic, &prepareArticParams);
 
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
