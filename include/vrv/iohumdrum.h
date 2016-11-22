@@ -254,6 +254,7 @@ protected:
     void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
     void addOrnamentMarkers(hum::HTp token);
+	void setNextLeftBarStyle(data_BARRENDITION style);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -360,6 +361,11 @@ private:
     // the file to convert contains **mxhm spines that should be
     // converted into <harm> element in the MEI conversion.
     bool m_harm;
+
+	// m_leftbarstyle is a barline left-hand style to store in the next measure.
+	// When processing a measure, this variable should be checked and used
+	// in @left="style" for the measure.
+	data_BARRENDITION m_leftbarstyle;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

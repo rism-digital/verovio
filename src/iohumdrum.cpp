@@ -4282,6 +4282,11 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     m_sections.back()->AddChild(m_measure);
     m_measures.push_back(m_measure);
 
+    if (m_leftbarstyle != BARRENDITION_NONE) {
+        m_measure->SetLeft(m_leftbarstyle);
+        m_leftbarstyle = BARRENDITION_NONE;
+    }
+
     setLocationId(m_measure, startline, -1, -1);
 
     int measurenumber = getMeasureNumber(startline, endline);
@@ -4374,19 +4379,29 @@ void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
         m_measure->SetRight(BARRENDITION_end);
     }
     else if (endbar.find(":|!|:") != string::npos) {
-        m_measure->SetRight(BARRENDITION_rptboth);
+        // m_measure->SetRight(BARRENDITION_rptboth);
+        m_measure->SetRight(BARRENDITION_rptend);
+        setNextLeftBarStyle(BARRENDITION_rptstart);
     }
     else if (endbar.find(":!!:") != string::npos) {
-        m_measure->SetRight(BARRENDITION_rptboth);
+        // m_measure->SetRight(BARRENDITION_rptboth);
+        m_measure->SetRight(BARRENDITION_rptend);
+        setNextLeftBarStyle(BARRENDITION_rptstart);
     }
     else if (endbar.find(":||:") != string::npos) {
-        m_measure->SetRight(BARRENDITION_rptboth);
+        // m_measure->SetRight(BARRENDITION_rptboth);
+        m_measure->SetRight(BARRENDITION_rptend);
+        setNextLeftBarStyle(BARRENDITION_rptstart);
     }
     else if (endbar.find(":!:") != string::npos) {
-        m_measure->SetRight(BARRENDITION_rptboth);
+        // m_measure->SetRight(BARRENDITION_rptboth);
+        m_measure->SetRight(BARRENDITION_rptend);
+        setNextLeftBarStyle(BARRENDITION_rptstart);
     }
     else if (endbar.find(":|:") != string::npos) {
-        m_measure->SetRight(BARRENDITION_rptboth);
+        // m_measure->SetRight(BARRENDITION_rptboth);
+        m_measure->SetRight(BARRENDITION_rptend);
+        setNextLeftBarStyle(BARRENDITION_rptstart);
     }
     else if (endbar.find(":|") != string::npos) {
         m_measure->SetRight(BARRENDITION_rptend);
@@ -4395,14 +4410,27 @@ void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
         m_measure->SetRight(BARRENDITION_rptend);
     }
     else if (startbar.find("!:") != string::npos) {
-        m_measure->SetLeft(BARRENDITION_rptstart);
+        // m_measure->SetLeft(BARRENDITION_rptstart);
+        setNextLeftBarStyle(BARRENDITION_rptstart);
     }
     else if (endbar.find("|:") != string::npos) {
-        m_measure->SetRight(BARRENDITION_rptstart);
+        // m_measure->SetLeft(BARRENDITION_rptstart);
+        setNextLeftBarStyle(BARRENDITION_rptstart);
     }
     else if (endbar.find("-") != string::npos) {
         m_measure->SetRight(BARRENDITION_invis);
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::setNextLeftBarStyle -- Store a bar style to apply
+//      on the left side of the next measure.
+//
+
+void HumdrumInput::setNextLeftBarStyle(data_BARRENDITION style)
+{
+    m_leftbarstyle = style;
 }
 
 //////////////////////////////
@@ -4453,6 +4481,7 @@ void HumdrumInput::setupMeiDocument(void)
     Section *section = new Section();
     m_sections.push_back(section);
     m_score->AddChild(m_sections.back());
+    m_leftbarstyle = BARRENDITION_NONE;
 }
 
 //////////////////////////////
