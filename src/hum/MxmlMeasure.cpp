@@ -66,6 +66,7 @@ void MxmlMeasure::clear(void) {
 	m_owner = NULL;
 	m_timesigdur = -1;
 	m_previous = m_following = NULL;
+	m_style = MeasureStyle::Plain;
 }
 
 
@@ -648,6 +649,7 @@ void MxmlMeasure::receiveStaffNumberFromChild(int staffnum, int voicenum) {
 }
 
 
+
 //////////////////////////////
 //
 // MxmlMeasure::receiveTimeSigDurFromChild --
@@ -693,6 +695,68 @@ void MxmlMeasure::reportStaffNumberToOwner(int staffnum, int voicenum) {
 	if (m_owner != NULL) {
 		m_owner->receiveStaffNumberFromChild(staffnum, voicenum);
 	}
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::receiveMeasureStyleFromChild --
+//
+
+void  MxmlMeasure::receiveMeasureStyleFromChild(MeasureStyle style) {
+	if (style == MeasureStyle::RepeatForward) {
+		MxmlMeasure* previous = getPreviousMeasure();
+		if (previous) {
+			previous->setStyle(style);
+		}
+	} else {
+		setStyle(style);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::getStyle --
+//
+
+MeasureStyle MxmlMeasure::getStyle(void) {
+	return m_style;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::getBarStyle --
+//
+
+MeasureStyle MxmlMeasure::getBarStyle(void) { 
+	return getStyle();
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::setStyle --
+//
+
+void MxmlMeasure::setStyle(MeasureStyle style) {
+	m_style = style;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlMeasure::setBarStyle --
+//
+
+void MxmlMeasure::setBarStyle(MeasureStyle style) { 
+	m_style = style;
 }
 
 

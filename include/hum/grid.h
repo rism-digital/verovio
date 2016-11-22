@@ -49,6 +49,16 @@ enum class SliceType {
 };
 
 
+// MeasureType is a list of the style types for a measure (ending type for now)
+
+enum class MeasureStyle {
+	Plain,
+	RepeatBackward,
+	RepeatForward,
+	Final
+};
+
+
 } // end namespace hum
 
 

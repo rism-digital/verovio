@@ -15,6 +15,7 @@
 #define _MXMLEVENT_H
 
 #include "humlib.h"
+#include "grid.h"
 
 #include "pugiconfig.hpp"
 #include "pugixml.hpp"
@@ -107,6 +108,7 @@ class MxmlEvent {
 		void               reportVerseCountToOwner (int count);
 		void               reportVerseCountToOwner (int staffnum, int count);
 		void               reportHarmonyCountToOwner (int count);
+		void               reportMeasureStyleToOwner (MeasureStyle style);
       void               makeDummyRest      (MxmlMeasure* owner, 
 		                                       HumNum startime,
 		                                       HumNum duration,
@@ -115,6 +117,7 @@ class MxmlEvent {
 		void               setVoiceIndex      (int voiceindex);
 		void               forceInvisible     (void);
 		bool               isInvisible        (void);
+		void               setBarlineStyle    (xml_node node);
 
 	protected:
 		HumNum             m_starttime;  // start time in quarter notes of event

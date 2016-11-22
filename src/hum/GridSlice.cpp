@@ -222,7 +222,8 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 		} else if (isMeasureSlice()) {
 			voice = this->at(0)->at(0)->at(0);
 			token = new HumdrumToken((string)*voice->getToken());
-			empty = "=";
+//ggg
+			empty = (string)*token;
 		} else if (isInterpretationSlice()) {
 			token = new HumdrumToken("*");
 			empty = "*";

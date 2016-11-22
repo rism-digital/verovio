@@ -221,6 +221,18 @@ void MxmlEvent::reportHarmonyCountToOwner(int count) {
 }
 
 
+//////////////////////////////
+//
+// MxmlEvent::reportMeasureStyleToOwner --
+
+void MxmlEvent::reportMeasureStyleToOwner (MeasureStyle style) {
+	if (!m_owner) {
+		return;
+	}
+	m_owner->receiveMeasureStyleFromChild(style);
+}
+
+
 
 //////////////////////////////
 //
@@ -735,6 +747,7 @@ bool MxmlEvent::parseEvent(xml_node el, xml_node nextel, HumNum starttime) {
 		m_eventtype = mevent_backup;
 	} else if (nodeType(m_node, "barline")) {
 		m_eventtype = mevent_barline;
+		setBarlineStyle(m_node);
 	} else if (nodeType(m_node, "bookmark")) {
 		m_eventtype = mevent_bookmark;
 	} else if (nodeType(m_node, "direction")) {
@@ -941,6 +954,55 @@ HumNum MxmlEvent::getTimeSigDur(void) {
 	output /= beattype;
 	output *= 4; // convert to quarter note duration
 	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::setBarlineStyle --
+// "==" -> Final
+//    <barline location="right">
+//       <bar-style>light-heavy</bar-style>
+//    </barline>
+//
+// ":|!" -> RepeatBackward
+//    <barline location="right">
+//       <bar-style>light-heavy</bar-style>
+//       <repeat direction="backward"/>
+//    </barline>
+//
+//  "!|:" -> RepeatForward
+//    <barline location="left">
+//        <repeat direction="forward"/>
+//    </barline>
+//
+
+void MxmlEvent::setBarlineStyle(xml_node node) {
+	xml_node child = node.first_child();
+	int repeat = 0;
+	string barstyle;
+	while (child) {
+		if (nodeType(child, "bar-style")) {
+			barstyle = child.child_value();
+		} else if (nodeType(child, "repeat")) {
+			if (strcmp(child.attribute("direction").value(), "backward") == 0) {
+				repeat = -1;
+			} else if (strcmp(child.attribute("direction").value(),
+					"forward") == 0) {
+				repeat = +1;
+			}
+		}
+		child = child.next_sibling();
+	}
+
+	if ((repeat == 0) && (barstyle == "light-heavy")) {
+		reportMeasureStyleToOwner(MeasureStyle::Final);
+	} else if ((repeat == -1) && (barstyle == "light-heavy")) {
+		reportMeasureStyleToOwner(MeasureStyle::RepeatBackward);
+	} else if (repeat == +1) {
+		reportMeasureStyleToOwner(MeasureStyle::RepeatForward);
+	}
 }
 
 

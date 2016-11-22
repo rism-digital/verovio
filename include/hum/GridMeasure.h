@@ -18,6 +18,7 @@
 #define _GRIDMEASURE_H
 
 #include "humlib.h"
+#include "grid.h"
 
 #include <list>
 
@@ -44,15 +45,27 @@ class GridMeasure : public list<GridSlice*> {
 		void         setTimestamp   (HumNum timestamp);
 		HumNum       getTimeSigDur  (void);
 		void         setTimeSigDur  (HumNum duration);
+		MeasureStyle getStyle       (void) { return m_style; }
+		MeasureStyle getBarStyle    (void) { return getStyle(); }
+		void         setStyle       (MeasureStyle style) { m_style = style; }
+		void         setBarStyle    (MeasureStyle style) { setStyle(style); }
+
+		bool         isFinal(void) 
+		                  {return m_style == MeasureStyle::Final;}
+		bool         isRepeatBackward(void) 
+		                  { return m_style == MeasureStyle::RepeatBackward; }
+		bool         isRepeatForward(void) 
+		                  { return m_style == MeasureStyle::RepeatForward; }
 
 	protected:
 		void         appendInitialBarline(HumdrumFile& infile);
 
 	private:
-		HumGrid* m_owner;
-		HumNum   m_duration;
-		HumNum   m_timestamp;
-		HumNum   m_timesigdur;
+		HumGrid*     m_owner;
+		HumNum       m_duration;
+		HumNum       m_timestamp;
+		HumNum       m_timesigdur;
+		MeasureStyle m_style;
 };
 
 

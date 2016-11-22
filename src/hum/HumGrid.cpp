@@ -337,7 +337,7 @@ void HumGrid::transferMerges(GridStaff* oldstaff, GridStaff* oldlaststaff,
 	}
 	// New staves are presumed to be totally empty.
 
-	GridVoice* gt;
+	GridVoice* gv;
 
 	// First create "*" tokens for newstaff slice where there are
 	// "*v" in old staff.  All other tokens should be set to "*".
@@ -345,11 +345,11 @@ void HumGrid::transferMerges(GridStaff* oldstaff, GridStaff* oldlaststaff,
 	int t;
 	for (t=0; t<tcount; t++) {
 		if (*oldstaff->at(t)->getToken() == "*v") {
-			gt = new GridVoice("*", 0);
-			newstaff->push_back(gt);
+			gv = new GridVoice("*", 0);
+			newstaff->push_back(gv);
 		} else {
-			gt = new GridVoice("*", 0);
-			newstaff->push_back(gt);
+			gv = new GridVoice("*", 0);
+			newstaff->push_back(gv);
 		}
 	}
 
@@ -367,15 +367,15 @@ void HumGrid::transferMerges(GridStaff* oldstaff, GridStaff* oldlaststaff,
 		if (*oldlaststaff->at(t)->getToken() == "*v") {
 			newlaststaff->push_back(oldlaststaff->at(t));
 			if (addednull == false) {
-				gt = new GridVoice("*", 0);
-				oldlaststaff->at(t) = gt;
+				gv = new GridVoice("*", 0);
+				oldlaststaff->at(t) = gv;
 				addednull = true;
 			} else {
 				oldlaststaff->at(t) = NULL;
 			}
 		} else {
-			gt = new GridVoice("*", 0);
-			newlaststaff->push_back(gt);
+			gv = new GridVoice("*", 0);
+			newlaststaff->push_back(gv);
 		}
 	}
 
@@ -468,6 +468,9 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 	p2count = (int)ice2->size();
 	if (p1count != p2count) {
 		cerr << "Warning: Something weird happend here" << endl;
+		cerr << "p1count = " << p1count << endl;
+		cerr << "p2count = " << p2count << endl;
+		cerr << "The above two values should be the same." << endl;
 		return NULL;
 	}
 	for (p=0; p<p1count; p++) {
@@ -512,7 +515,7 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 
 	int z;
 	HTp token;
-	GridVoice* gt;
+	GridVoice* gv;
 	p1count = (int)ice1->size();
 	mslice->resize(p1count);
 	for (p=0; p<p1count; p++) {
@@ -526,8 +529,8 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 			if (v1count == v2count) {
 				for (v=0; v<v1count; v++) {
 					token = new HumdrumToken("*");
-					gt = new GridVoice(token, 0);
-					mslice->at(p)->at(s)->push_back(gt);
+					gv = new GridVoice(token, 0);
+					mslice->at(p)->at(s)->push_back(gv);
 				}
 			} else if (v1count < v2count) {
 				// need to grow
@@ -536,33 +539,33 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 					// all subspines split
 					for (z=0; z<v1count; z++) {
 						token = new HumdrumToken("*^");
-						gt = new GridVoice(token, 0);
-						mslice->at(p)->at(s)->push_back(gt);
+						gv = new GridVoice(token, 0);
+						mslice->at(p)->at(s)->push_back(gv);
 					}
 				} else if (grow > 2 * v1count) {
 					// too large to split all at the same time, deal with later
 					for (z=0; z<v1count-1; z++) {
 						token = new HumdrumToken("*^");
-						gt = new GridVoice(token, 0);
-						mslice->at(p)->at(s)->push_back(gt);
+						gv = new GridVoice(token, 0);
+						mslice->at(p)->at(s)->push_back(gv);
 					}
 					int extra = v2count - (v1count - 1) * 2;
 					token = new HumdrumToken("*^" + to_string(extra));
-					gt = new GridVoice(token, 0);
-					mslice->at(p)->at(s)->push_back(gt);
+					gv = new GridVoice(token, 0);
+					mslice->at(p)->at(s)->push_back(gv);
 				} else {
 					// only split spines at end of list
 					int doubled = v2count - v1count;
 					int notdoubled = v1count - doubled;
 					for (z=0; z<notdoubled; z++) {
 						token = new HumdrumToken("*");
-						gt = new GridVoice(token, 0);
-						mslice->at(p)->at(s)->push_back(gt);
+						gv = new GridVoice(token, 0);
+						mslice->at(p)->at(s)->push_back(gv);
 					}
 					for (z=0; z<doubled; z++) {
 						token = new HumdrumToken("*^");
-						gt = new GridVoice(token, 0);
-						mslice->at(p)->at(s)->push_back(gt);
+						gv = new GridVoice(token, 0);
+						mslice->at(p)->at(s)->push_back(gv);
 					}
 				}
 			} else if (v1count > v2count) {
@@ -571,13 +574,13 @@ GridSlice* HumGrid::manipulatorCheck(GridSlice* ice1, GridSlice* ice2) {
 				int notshrink = v1count - shrink;
 				for (z=0; z<notshrink; z++) {
 					token = new HumdrumToken("*");
-					gt = new GridVoice(token, 0);
-					mslice->at(p)->at(s)->push_back(gt);
+					gv = new GridVoice(token, 0);
+					mslice->at(p)->at(s)->push_back(gv);
 				}
 				for (z=0; z<shrink; z++) {
 					token = new HumdrumToken("*v");
-					gt = new GridVoice(token, 0);
-					mslice->at(p)->at(s)->push_back(gt);
+					gv = new GridVoice(token, 0);
+					mslice->at(p)->at(s)->push_back(gv);
 				}
 			}
 		}
@@ -598,11 +601,11 @@ void HumGrid::addMeasureLines(void) {
 	GridSlice* endslice;
 	GridPart* part;
 	GridStaff* staff;
-	GridVoice* gt;
+	GridVoice* gv;
 	HTp token;
 	int staffcount, partcount, vcount, nextvcount, lcount;
-	GridMeasure* measure;
-	GridMeasure* nextmeasure;
+	GridMeasure* measure = NULL;
+	GridMeasure* nextmeasure = NULL;
 
 	vector<int> barnums;
 	if (!m_musicxmlbarlines) {
@@ -625,6 +628,7 @@ void HumGrid::addMeasureLines(void) {
 		measure->push_back(mslice);
 		partcount = (int)nextmeasure->front()->size();
 		mslice->resize(partcount);
+
 		for (int p=0; p<partcount; p++) {
 			part = new GridPart();
 			mslice->at(p) = part;
@@ -643,26 +647,54 @@ void HumGrid::addMeasureLines(void) {
 					lcount = nextvcount;
 				}
 				for (int v=0; v<lcount; v++) {
-					if (m_musicxmlbarlines) {
-						// m+1 because of the measure number
-						// comes from the previous measure.
-						token = new HumdrumToken("=" + to_string(m+1));
-					} else {
-						if (barnums[m] > 0) {
-							token = new HumdrumToken("=" + to_string(barnums[m]));
-						} else {
-							token = new HumdrumToken("=");
-						}
-					}
-					gt = new GridVoice(token, 0);
-					mslice->at(p)->at(s)->push_back(gt);
+					token = createBarToken(m, barnums[m], measure);
 				}
-
+				gv = new GridVoice(token, 0);
+				mslice->at(p)->at(s)->push_back(gv);
 			}
 		}
 	}
+}
 
-   // add last measure later
+
+
+//////////////////////////////
+//
+// HumGrid::createBarToken --
+//
+
+HTp HumGrid::createBarToken(int m, int barnum, GridMeasure* measure) {
+	string barstyle = getBarStyle(measure);
+	HTp token = NULL;
+	string number = "";
+	if (barnum > 0) {
+		number = to_string(barnum);
+	}
+	if (m_musicxmlbarlines) {
+		// m+1 because of the measure number
+		// comes from the previous measure.
+		if (barstyle == "=") {
+			token = new HumdrumToken("==" + to_string(m+1));
+		} else {
+			token = new HumdrumToken("=" + to_string(m+1) + barstyle);
+		}
+	} else {
+		if (barnum > 0) {
+			if (barstyle == "=") {
+				token = new HumdrumToken("==" + number);
+			} else {
+				token = new HumdrumToken("=" 
+						+ number + barstyle);
+			}
+		} else {
+			if (barstyle == "=") {
+				token = new HumdrumToken("==");
+			} else {
+				token = new HumdrumToken("=" + barstyle);
+			}
+		}
+	}
+	return token;
 }
 
 
@@ -717,6 +749,25 @@ void HumGrid::getMetricBarNumbers(vector<int>& barnums) {
 
 //////////////////////////////
 //
+// HumGrid::getBarStyle --
+//
+
+string HumGrid::getBarStyle(GridMeasure* measure) {
+	string output = "";
+	if (measure->isFinal()) {
+		output = "=";
+	} else if (measure->isRepeatBackward()) {
+		output = ":|!";
+	} else if (measure->isRepeatForward()) {
+		output = "!|:";
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
 // HumGrid::addLastMeasure --
 //
 
@@ -728,6 +779,13 @@ void HumGrid::addLastMeasure(void) {
 	// probably not the correct timestamp, but probably not important
 	// to get correct:
 	HumNum timestamp = model->getTimestamp();
+
+	if (this->empty()) {
+		return;
+	}
+	GridMeasure* measure = this->back();
+
+	string barstyle = getBarStyle(measure);
 
 	GridSlice* mslice = new GridSlice(model->getMeasure(), timestamp,
 			SliceType::Measures);
@@ -743,9 +801,9 @@ void HumGrid::addLastMeasure(void) {
 		for (int s=0; s<staffcount; s++) {
 			GridStaff* staff = new GridStaff;
 			mslice->at(p)->at(s) = staff;
-			HTp token = new HumdrumToken("=");
-			GridVoice* gt = new GridVoice(token, 0);
-			mslice->at(p)->at(s)->push_back(gt);
+			HTp token = new HumdrumToken("=" + barstyle);
+			GridVoice* gv = new GridVoice(token, 0);
+			mslice->at(p)->at(s)->push_back(gv);
 		}
 	}
 }
@@ -824,8 +882,8 @@ void HumGrid::addNullTokens(void) {
 						// in theory should not happen
 						continue;
 					}
-					GridVoice& gt = *staff.at(v);
-					if (gt.isNull()) {
+					GridVoice& gv = *staff.at(v);
+					if (gv.isNull()) {
 						continue;
 					}
 					// found a note/rest which should have a non-zero
@@ -973,12 +1031,12 @@ GridVoice* HumGrid::getGridVoice(int slicei, int parti, int staffi,
 		cerr << "Strange error 4a" << endl;
 		return NULL;
 	}
-	GridVoice* gt = gst->at(voicei);
-	if (gt == NULL) {
+	GridVoice* gv = gst->at(voicei);
+	if (gv == NULL) {
 		cerr << "Strange error 4b" << endl;
 		return NULL;
 	}
-	return gt;
+	return gv;
 }
 
 

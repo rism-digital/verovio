@@ -512,19 +512,25 @@ bool musicxml2hum_interface::insertMeasure(HumGrid& outdata, int mnum,
 	GridMeasure* gm = new GridMeasure(&outdata);
 	outdata.push_back(gm);
 
+	MxmlMeasure* xmeasure;
 	vector<MxmlMeasure*> measuredata;
 	vector<vector<SimultaneousEvents>* > sevents;
 	int i;
 
 	for (i=0; i<(int)partdata.size(); i++) {
-		measuredata.push_back(partdata[i].getMeasure(mnum));
+		xmeasure = partdata[i].getMeasure(mnum);
+		measuredata.push_back(xmeasure);
 		if (i==0) {
 			gm->setDuration(partdata[i].getMeasure(mnum)->getDuration());
 			gm->setTimestamp(partdata[i].getMeasure(mnum)->getTimestamp());
 			gm->setTimeSigDur(partdata[i].getMeasure(mnum)->getTimeSigDur());
 		}
-		checkForDummyRests(partdata[i].getMeasure(mnum));
-		sevents.push_back(measuredata.back()->getSortedEvents());
+		checkForDummyRests(xmeasure);
+		sevents.push_back(xmeasure->getSortedEvents());
+		if (i == 0) {
+			// only checking measure style of first barline
+			gm->setBarStyle(xmeasure->getBarStyle());
+		}
 	}
 
 	vector<HumNum> curtime(partdata.size());
@@ -1438,13 +1444,13 @@ xml_node musicxml2hum_interface::convertKeySigToHumdrum(xml_node keysig,
 		if (fifths > 5) { ss << "e#"; }
 		if (fifths > 6) { ss << "b#"; }
 	} else if (fifths < 0) {
-		if (fifths < -6) { ss << "b-"; }
-		if (fifths < -5) { ss << "e-"; }
-		if (fifths < -4) { ss << "a-"; }
+		if (fifths < 0)  { ss << "b-"; }
+		if (fifths < -2) { ss << "e-"; }
+		if (fifths < -1) { ss << "a-"; }
 		if (fifths < -3) { ss << "d-"; }
-		if (fifths < -2) { ss << "c-"; }
-		if (fifths < -1) { ss << "g-"; }
-		if (fifths < 0)  { ss << "f-"; }
+		if (fifths < -4) { ss << "g-"; }
+		if (fifths < -5) { ss << "c-"; }
+		if (fifths < -6) { ss << "f-"; }
 	}
 	ss << "]";
 

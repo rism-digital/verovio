@@ -72,6 +72,9 @@ class HumGrid : public vector<GridMeasure*> {
 		void insertSideStaffInfo            (HumdrumLine* line, int part,
 		                                     int staff, int staffnum);
 		void getMetricBarNumbers            (vector<int>& barnums);
+		HTp createBarToken                  (int m, int barnum,
+		                                     GridMeasure* measure);
+		string getBarStyle                  (GridMeasure* measure);
 
 	private:
 		vector<GridSlice*>   m_allslices;
