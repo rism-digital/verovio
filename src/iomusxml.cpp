@@ -866,8 +866,14 @@ void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, i
     std::string placeStr = GetAttributeValue(node, "placement");
 
     std::string harmText = GetContentOfChild(node, "root/root-step");
+    pugi::xpath_node alter = node.select_single_node("root/root-alter");
+    if (alter) {
+        if (GetContent(alter.node()) == "-1") harmText = harmText + "♭";
+        else if (GetContent(alter.node()) == "0") harmText = harmText + "♮";
+        else if (GetContent(alter.node()) == "1") harmText = harmText + "♯";
+    }
     pugi::xpath_node kind = node.select_single_node("kind");
-    if (kind) harmText = harmText + GetAttributeValue(node.select_single_node("kind").node(), "text").c_str();
+    if (kind) harmText = harmText + GetAttributeValue(kind.node(), "text").c_str();
     Harm *harm = new Harm();
     Text *text = new Text();
     if (!placeStr.empty()) harm->SetPlace(harm->AttPlacement::StrToStaffrel(placeStr.c_str()));
@@ -967,6 +973,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             tuplet->SetNum(atoi(GetContent(actualNotes.node()).c_str()));
             tuplet->SetNumbase(atoi(GetContent(normalNotes.node()).c_str()));
         }
+        tuplet->SetBracketVisible(ConvertWordToBool(GetAttributeValue(notations.node().select_single_node("tuplet").node(), "bracket")));
     }
 
     pugi::xpath_node rest = node.select_single_node("rest");
@@ -1302,6 +1309,13 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repe
     if (value == "regular") return BARRENDITION_single;
     LogWarning("Unsupported bar-style '%s'", value.c_str());
     return BARRENDITION_NONE;
+}
+
+data_BOOLEAN MusicXmlInput::ConvertWordToBool(std::string value)
+{
+    if (value == "yes") return BOOLEAN_true;
+    if (value == "no") return BOOLEAN_false;
+    return BOOLEAN_NONE;
 }
 
 data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
