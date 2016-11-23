@@ -1363,7 +1363,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     if (!current->HasToBeAligned()) {
         // if nothing to do with this type of element
-        // return FUNCTOR_CONTINUE;
+        return FUNCTOR_CONTINUE;
     }
 
     if (!current->HasUpdatedBB()) {
