@@ -1029,8 +1029,11 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     if (this->Is() == MEASURE) {
         Measure *measure = dynamic_cast<Measure *>(this);
         assert(measure);
+        bool systemBreak = false;
+        bool scoreDefInsert = false;
         // This is the first measure of the system - more to do...
         if (params->m_currentSystem) {
+            systemBreak = true;
             // We had a scoreDef so we need to put cautionnary values
             // This will also happend with clef in the last measure - however, the cautionnary functor will not do
             // anything then
@@ -1049,11 +1052,13 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
             params->m_drawLabels = false;
         }
         if (params->m_upcomingScoreDef->m_setAsDrawing) {
+            scoreDefInsert = true;
             measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
             params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, true);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
+        measure->SetDrawingBarLines(params->m_previousMeasure, systemBreak, scoreDefInsert);
         params->m_previousMeasure = measure;
         return FUNCTOR_CONTINUE;
     }
