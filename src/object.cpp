@@ -1363,13 +1363,14 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     if (!current->HasToBeAligned()) {
         // if nothing to do with this type of element
-        return FUNCTOR_CONTINUE;
+        // return FUNCTOR_CONTINUE;
     }
 
     if (!current->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
-        assert(false); // quite drastic but this should never happen. If nothing has to be drawn
-        LogDebug("Un-updated bounding box for '%s' '%s'", current->GetClassName().c_str(), current->GetUuid().c_str());
+        // assert(false); // quite drastic but this should never happen. If nothing has to be drawn
+        // LogDebug("Un-updated bounding box for '%s' '%s'", current->GetClassName().c_str(),
+        // current->GetUuid().c_str());
         // then the BB should be set to empty with  Object::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
