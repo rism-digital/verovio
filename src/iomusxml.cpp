@@ -1044,7 +1044,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         pugi::xpath_node articulations = notations.node().select_single_node("articulations");
         std::vector<data_ARTICULATION> artics;
         if (articulations) {
-            // Artic *artic = new Artic();
+            Artic *artic = new Artic();
             if (articulations.node().select_single_node("accent")) artics.push_back(ARTICULATION_acc);
             if (articulations.node().select_single_node("detached-legato")) artics.push_back(ARTICULATION_ten_stacc);
             if (articulations.node().select_single_node("spiccato")) artics.push_back(ARTICULATION_spicc);
@@ -1052,7 +1052,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             if (articulations.node().select_single_node("staccato")) artics.push_back(ARTICULATION_stacc);
             if (articulations.node().select_single_node("strong-accent")) artics.push_back(ARTICULATION_marc);
             if (articulations.node().select_single_node("tenuto")) artics.push_back(ARTICULATION_ten);
-            artics.clear();
+            artic->SetArtic(artics);
+            note->AddChild(artic);
         }
 
         // stem direction - taken into account below for the chord or the note
