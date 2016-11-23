@@ -855,7 +855,21 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
 
 void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, int measureNum)
 {
-    // LogWarning("Forward elements not supported");
+    assert(node);
+    assert(measure);
+    
+    // to find the layer we need to check the surrounding notes
+    pugi::xpath_node prevNote = node.select_single_node("preceding-sibling::note[1]");
+    pugi::xpath_node nextNote = node.select_single_node("following-sibling::note[1]");
+    
+    Layer *layer = NULL;
+    if (nextNote) layer = SelectLayer(nextNote.node(), measure);
+    else layer = SelectLayer(prevNote.node(), measure);
+    assert(layer);
+    
+    Space *space = new Space();
+    // space->SetDur(ConvertTypeToDur(typeStr));
+    AddLayerElement(layer, space);
 }
 
 void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, int measureNum)
