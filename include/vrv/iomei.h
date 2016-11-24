@@ -27,7 +27,6 @@ class Add;
 class AnchoredText;
 class Annot;
 class App;
-class Artic;
 class BarLine;
 class Beam;
 class BeatRpt;
@@ -178,7 +177,6 @@ private:
      */
     ///@{
     void WriteMeiAccid(pugi::xml_node currentNode, Accid *accid);
-    void WriteMeiArtic(pugi::xml_node currentNode, Artic *artic);
     void WriteMeiBarLine(pugi::xml_node currentNode, BarLine *barLine);
     void WriteMeiBeam(pugi::xml_node currentNode, Beam *beam);
     void WriteMeiBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt);
@@ -393,7 +391,6 @@ private:
      */
     ///@{
     bool ReadMeiAccid(Object *parent, pugi::xml_node accid);
-    bool ReadMeiArtic(Object *parent, pugi::xml_node artic);
     bool ReadMeiBarLine(Object *parent, pugi::xml_node barLine);
     bool ReadMeiBeam(Object *parent, pugi::xml_node beam);
     bool ReadMeiBeatRpt(Object *parent, pugi::xml_node beatRpt);

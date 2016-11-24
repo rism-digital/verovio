@@ -157,8 +157,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetArtic(data_ARTICULATION_List artic_) { m_artic = artic_; }
-    data_ARTICULATION_List GetArtic() const { return m_artic; }
+    void SetArtic(data_ARTICULATION artic_) { m_artic = artic_; }
+    data_ARTICULATION GetArtic() const { return m_artic; }
     bool HasArtic() const;
     ///@}
 
@@ -170,7 +170,7 @@ private:
      * should be encoded in the artic attribute; for example, fingerings should be
      * encoded using the <fingering> element.
      **/
-    data_ARTICULATION_List m_artic;
+    data_ARTICULATION m_artic;
 
     /* include <attartic> */
 };
@@ -5049,8 +5049,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetStaff(xsdPositiveInteger_List staff_) { m_staff = staff_; }
-    xsdPositiveInteger_List GetStaff() const { return m_staff; }
+    void SetStaff(xsd_posIntList staff_) { m_staff = staff_; }
+    xsd_posIntList GetStaff() const { return m_staff; }
     bool HasStaff() const;
     ///@}
 
@@ -5060,7 +5060,7 @@ private:
      * applies.
      * Mandatory when applicable.
      **/
-    xsdPositiveInteger_List m_staff;
+    xsd_posIntList m_staff;
 
     /* include <attstaff> */
 };

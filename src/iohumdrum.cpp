@@ -1290,7 +1290,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
 
 template <class ELEMENT> void HumdrumInput::setStaff(ELEMENT element, int staffnum)
 {
-    xsdPositiveInteger_List stafflist;
+    xsd_posIntList stafflist;
     stafflist.push_back(staffnum);
     element->SetStaff(stafflist);
 }

@@ -76,20 +76,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustArticulationsParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the Doc
- **/
-
-class AdjustArticulationsParams : public FunctorParams {
-public:
-    AdjustArticulationsParams(Doc *doc) { m_doc = doc; }
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // AdjustFloatingPostionersParams
 //----------------------------------------------------------------------------
 
@@ -746,20 +732,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// PrepareTimePointingParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: std::vector< Object*>* that holds the current elements to match
- **/
-
-class PrepareTimePointingParams : public FunctorParams {
-public:
-    PrepareTimePointingParams() {}
-    ArrayOfPointingInterClassIdPairs m_timePointingInterfaces;
-};
-
-//----------------------------------------------------------------------------
 // PrepareTimeSpanningParams
 //----------------------------------------------------------------------------
 
@@ -771,7 +743,7 @@ public:
 class PrepareTimeSpanningParams : public FunctorParams {
 public:
     PrepareTimeSpanningParams() { m_fillList = true; }
-    ArrayOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
+    ArrayOfInterfaceClassIdPairs m_timeSpanningInterfaces;
     bool m_fillList;
 };
 
@@ -787,7 +759,7 @@ public:
 class PrepareTimestampsParams : public FunctorParams {
 public:
     PrepareTimestampsParams() {}
-    ArrayOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
+    ArrayOfInterfaceClassIdPairs m_timeSpanningInterfaces;
     ArrayOfObjectBeatPairs m_tstamps;
 };
 

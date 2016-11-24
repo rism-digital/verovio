@@ -242,12 +242,7 @@ public:
     virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
     /**
-     * See Object::PrepareTimePointingEnd
-     */
-    virtual int PrepareTimePointingEnd(FunctorParams *functorParams);
-
-    /**
-     * See Object::PrepareTimeSpanningEnd
+     * See Object::PrepareTimeSpanning
      */
     virtual int PrepareTimeSpanningEnd(FunctorParams *functorParams);
 

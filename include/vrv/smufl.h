@@ -81,34 +81,10 @@ enum {
     SMUFL_E26B_accidentalParensRight = 0xE26B,
     SMUFL_E4A0_articAccentAbove = 0xE4A0,
     SMUFL_E4A1_articAccentBelow = 0xE4A1,
-    SMUFL_E4A2_articStaccatoAbove = 0xE4A2,
-    SMUFL_E4A3_articStaccatoBelow = 0xE4A3,
-    SMUFL_E4A4_articTenutoAbove = 0xE4A4,
-    SMUFL_E4A5_articTenutoBelow = 0xE4A5,
-    SMUFL_E4A6_articStaccatissimoAbove = 0xE4A6,
-    SMUFL_E4A7_articStaccatissimoBelow = 0xE4A7,
     SMUFL_E4A8_articStaccatissimoWedgeAbove = 0xE4A8,
     SMUFL_E4A9_articStaccatissimoWedgeBelow = 0xE4A9,
-    SMUFL_E4AA_articStaccatissimoStrokeAbove = 0xE4AA,
-    SMUFL_E4AB_articStaccatissimoStrokeBelow = 0xE4AB,
     SMUFL_E4AC_articMarcatoAbove = 0xE4AC,
     SMUFL_E4AD_articMarcatoBelow = 0xE4AD,
-    SMUFL_E4AE_articMarcatoStaccatoAbove = 0xE4AE,
-    SMUFL_E4AF_articMarcatoStaccatoBelow = 0xE4AF,
-    SMUFL_E4B0_articAccentStaccatoAbove = 0xE4B0,
-    SMUFL_E4B1_articAccentStaccatoBelow = 0xE4B1,
-    SMUFL_E4B2_articTenutoStaccatoAbove = 0xE4B2,
-    SMUFL_E4B3_articTenutoStaccatoBelow = 0xE4B3,
-    SMUFL_E4B4_articTenutoAccentAbove = 0xE4B4,
-    SMUFL_E4B5_articTenutoAccentBelow = 0xE4B5,
-    SMUFL_E4B6_articStressAbove = 0xE4B6,
-    SMUFL_E4B7_articStressBelow = 0xE4B7,
-    SMUFL_E4B8_articUnstressAbove = 0xE4B8,
-    SMUFL_E4B9_articUnstressBelow = 0xE4B9,
-    SMUFL_E4BA_articLaissezVibrerAbove = 0xE4BA,
-    SMUFL_E4BB_articLaissezVibrerBelow = 0xE4BB,
-    SMUFL_E4BC_articMarcatoTenutoAbove = 0xE4BC,
-    SMUFL_E4BD_articMarcatoTenutoBelow = 0xE4BD,
     SMUFL_E4C0_fermataAbove = 0xE4C0,
     SMUFL_E4C1_fermataBelow = 0xE4C1,
     SMUFL_E4E5_restQuarter = 0xE4E5,
@@ -168,10 +144,6 @@ enum {
     SMUFL_E56C_ornamentMordent = 0xE56C,
     SMUFL_E56D_ornamentMordentInverted = 0xE56D,
     SMUFL_E56E_ornamentTremblement = 0xE56E,
-    SMUFL_E610_stringsDownBow = 0xE610,
-    SMUFL_E611_stringsDownBowTurned = 0xE611,
-    SMUFL_E612_stringsUpBow = 0xE612,
-    SMUFL_E613_stringsUpBowTurned = 0xE613,
     SMUFL_E650_keyboardPedalPed = 0xE650,
     SMUFL_E655_keyboardPedalUp = 0xE655,
     SMUFL_E880_tuplet0 = 0xE880,
@@ -197,7 +169,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 172
+#define SMUFL_COUNT 144
 
 } // vrv namespace
 

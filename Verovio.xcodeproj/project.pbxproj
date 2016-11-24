@@ -48,7 +48,7 @@
 		4D43C30C1A9BB22A00EA28F3 /* view_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */; };
 		4D50B53A1C1B40C90081D56E /* atttypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D50B5391C1B40C90081D56E /* atttypes.h */; };
 		4D50B53B1C1B47540081D56E /* atts_pagebased.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */; };
-		4D543E221B80AACF004B823C /* view_control.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D543E211B80AACF004B823C /* view_control.cpp */; };
+		4D543E221B80AACF004B823C /* view_floating.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D543E211B80AACF004B823C /* view_floating.cpp */; };
 		4D5572401CF3F32A008D06A0 /* octave.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D55723F1CF3F32A008D06A0 /* octave.cpp */; };
 		4D5572441CF57B5C008D06A0 /* pedal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5572431CF57B5C008D06A0 /* pedal.cpp */; };
 		4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
@@ -86,7 +86,6 @@
 		4DA60EE71B6307B9006E2DFC /* textdirinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */; };
 		4DA80D961A6ACF5D0089802D /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA80D951A6ACF5D0089802D /* style.cpp */; };
 		4DA80D971A6ACF5D0089802D /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA80D951A6ACF5D0089802D /* style.cpp */; };
-		4DAA46681DA2B3E600FF1E1A /* artic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DAA46671DA2B3E600FF1E1A /* artic.cpp */; };
 		4DB0B0161C44129300DBDCC3 /* timestamp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB0B0151C44129300DBDCC3 /* timestamp.cpp */; };
 		4DB0B0171C44129300DBDCC3 /* timestamp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB0B0151C44129300DBDCC3 /* timestamp.cpp */; };
 		4DB0B0191C4412A400DBDCC3 /* timestamp.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DB0B0181C4412A400DBDCC3 /* timestamp.h */; };
@@ -305,7 +304,7 @@
 		4D422103199805F700963292 /* att.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = att.cpp; path = src/att.cpp; sourceTree = "<group>"; };
 		4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_mensural.cpp; path = src/view_mensural.cpp; sourceTree = "<group>"; };
 		4D50B5391C1B40C90081D56E /* atttypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atttypes.h; path = libmei/atttypes.h; sourceTree = "<group>"; };
-		4D543E211B80AACF004B823C /* view_control.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_control.cpp; path = src/view_control.cpp; sourceTree = "<group>"; };
+		4D543E211B80AACF004B823C /* view_floating.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = view_floating.cpp; path = src/view_floating.cpp; sourceTree = "<group>"; };
 		4D55723F1CF3F32A008D06A0 /* octave.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = octave.cpp; path = src/octave.cpp; sourceTree = "<group>"; };
 		4D5572411CF3F33C008D06A0 /* octave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = octave.h; path = include/vrv/octave.h; sourceTree = "<group>"; };
 		4D5572421CF57B4C008D06A0 /* pedal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pedal.h; path = include/vrv/pedal.h; sourceTree = "<group>"; };
@@ -344,8 +343,6 @@
 		4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = textdirinterface.cpp; path = src/textdirinterface.cpp; sourceTree = "<group>"; };
 		4DA80D941A6940120089802D /* style.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = style.h; path = include/vrv/style.h; sourceTree = "<group>"; };
 		4DA80D951A6ACF5D0089802D /* style.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = style.cpp; path = src/style.cpp; sourceTree = "<group>"; };
-		4DAA46661DA2B3DC00FF1E1A /* artic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = artic.h; path = include/vrv/artic.h; sourceTree = "<group>"; };
-		4DAA46671DA2B3E600FF1E1A /* artic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = artic.cpp; path = src/artic.cpp; sourceTree = "<group>"; };
 		4DB0B0151C44129300DBDCC3 /* timestamp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timestamp.cpp; path = src/timestamp.cpp; sourceTree = "<group>"; };
 		4DB0B0181C4412A400DBDCC3 /* timestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = timestamp.h; path = include/vrv/timestamp.h; sourceTree = "<group>"; };
 		4DB3072D1AC9ED1800EE0982 /* space.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space.h; path = include/vrv/space.h; sourceTree = "<group>"; };
@@ -826,8 +823,8 @@
 				8F086EE0188539540037FD8E /* view.cpp */,
 				8F59293118854BF800FE51AD /* view.h */,
 				8F086EDA188539540037FD8E /* view_beam.cpp */,
-				4D543E211B80AACF004B823C /* view_control.cpp */,
 				8F086EDC188539540037FD8E /* view_element.cpp */,
+				4D543E211B80AACF004B823C /* view_floating.cpp */,
 				8F086EDD188539540037FD8E /* view_graph.cpp */,
 				4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */,
 				8F086EDE188539540037FD8E /* view_page.cpp */,
@@ -842,8 +839,6 @@
 			children = (
 				4DC34BA519BC4A82006175CD /* accid.cpp */,
 				4DC34B9F19BC4A70006175CD /* accid.h */,
-				4DAA46671DA2B3E600FF1E1A /* artic.cpp */,
-				4DAA46661DA2B3DC00FF1E1A /* artic.h */,
 				8F086EB8188539540037FD8E /* barline.cpp */,
 				8F59290F18854BF800FE51AD /* barline.h */,
 				8F086EBA188539540037FD8E /* beam.cpp */,
@@ -1065,10 +1060,9 @@
 				8F086EE4188539540037FD8E /* barline.cpp in Sources */,
 				8F086EE5188539540037FD8E /* bboxdevicecontext.cpp in Sources */,
 				8F086EE6188539540037FD8E /* beam.cpp in Sources */,
-				4DAA46681DA2B3E600FF1E1A /* artic.cpp in Sources */,
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
-				4D543E221B80AACF004B823C /* view_control.cpp in Sources */,
+				4D543E221B80AACF004B823C /* view_floating.cpp in Sources */,
 				4D95D4FC1D74551100B2B856 /* score.cpp in Sources */,
 				8F086EE9188539540037FD8E /* doc.cpp in Sources */,
 				8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */,

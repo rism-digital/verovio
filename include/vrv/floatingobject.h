@@ -82,11 +82,6 @@ public:
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareTimePointing
-     */
-    virtual int PrepareTimePointing(FunctorParams *functorParams);
-
-    /**
      * See Object::PrepareTimeSpanning
      */
     virtual int PrepareTimeSpanning(FunctorParams *functorParams);

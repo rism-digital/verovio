@@ -49,11 +49,6 @@ public:
     ///@}
 
     /**
-     * Set first LayerElement by verifying it is the correct one.
-     */
-    bool SetStartOnly(LayerElement *start);
-
-    /**
      * Add a staff n to the AttStaffident vector (if not already there)
      */
     void AddStaff(int n);
@@ -82,11 +77,6 @@ public:
     //-----------------//
     // Pseudo functors //
     //-----------------//
-
-    /**
-     * See Object::PrepareTimeSpanning
-     */
-    virtual int InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object);
 
     /**
      * We have functor in the interface for avoiding code duplication in each implementation class.

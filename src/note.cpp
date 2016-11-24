@@ -13,7 +13,6 @@
 
 //----------------------------------------------------------------------------
 
-#include "artic.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "slur.h"
@@ -111,9 +110,6 @@ void Note::AddChild(Object *child)
 {
     if (child->Is() == ACCID) {
         assert(dynamic_cast<Accid *>(child));
-    }
-    else if (child->Is() == ARTIC) {
-        assert(dynamic_cast<Artic *>(child));
     }
     else if (child->Is() == SYL) {
         assert(dynamic_cast<Syl *>(child));

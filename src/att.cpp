@@ -61,27 +61,6 @@ int Att::StrToInt(std::string value) const
 
 // Converters for writing and reading
 
-std::string Att::ArticulationListToStr(data_ARTICULATION_List data) const
-{
-    std::ostringstream ss;
-    for (size_t i = 0; i < data.size(); ++i) {
-        if (i != 0) ss << " ";
-        ss << ArticulationToStr(data[i]);
-    }
-    return ss.str();
-}
-
-data_ARTICULATION_List Att::StrToArticulationList(std::string value) const
-{
-    data_ARTICULATION_List list;
-    std::istringstream iss(value);
-    std::string token;
-    while (std::getline(iss, token, ' ')) {
-        list.push_back(StrToArticulation(token));
-    }
-    return list;
-}
-
 std::string Att::BeatrptRendToStr(data_BEATRPT_REND data) const
 {
     std::string value;
@@ -476,7 +455,7 @@ data_TIE Att::StrToTie(std::string value) const
     return TIE_NONE;
 }
 
-std::string Att::XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const
+std::string Att::XsdPosintlistToStr(xsd_posIntList data) const
 {
     std::ostringstream ss;
     for (size_t i = 0; i < data.size(); ++i) {
@@ -486,9 +465,9 @@ std::string Att::XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const
     return ss.str();
 }
 
-xsdPositiveInteger_List Att::StrToXsdPositiveIntegerList(std::string value) const
+xsd_posIntList Att::StrToXsdPosintlist(std::string value) const
 {
-    xsdPositiveInteger_List list;
+    xsd_posIntList list;
     std::istringstream iss(value);
     std::string token;
     while (std::getline(iss, token, ' ')) {

@@ -179,14 +179,14 @@ AttArticulation::~AttArticulation()
 
 void AttArticulation::ResetArticulation()
 {
-    m_artic = std::vector<data_ARTICULATION>();
+    m_artic = ARTICULATION_NONE;
 }
 
 bool AttArticulation::ReadArticulation(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("artic")) {
-        this->SetArtic(StrToArticulationList(element.attribute("artic").value()));
+        this->SetArtic(StrToArticulation(element.attribute("artic").value()));
         element.remove_attribute("artic");
         hasAttribute = true;
     }
@@ -197,7 +197,7 @@ bool AttArticulation::WriteArticulation(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasArtic()) {
-        element.append_attribute("artic") = ArticulationListToStr(this->GetArtic()).c_str();
+        element.append_attribute("artic") = ArticulationToStr(this->GetArtic()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -205,7 +205,7 @@ bool AttArticulation::WriteArticulation(pugi::xml_node element)
 
 bool AttArticulation::HasArtic() const
 {
-    return (m_artic != std::vector<data_ARTICULATION>());
+    return (m_artic != ARTICULATION_NONE);
 }
 
 /* include <attartic> */
@@ -6672,7 +6672,7 @@ bool AttStaffident::ReadStaffident(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("staff")) {
-        this->SetStaff(StrToXsdPositiveIntegerList(element.attribute("staff").value()));
+        this->SetStaff(StrToXsdPosintlist(element.attribute("staff").value()));
         element.remove_attribute("staff");
         hasAttribute = true;
     }
@@ -6683,7 +6683,7 @@ bool AttStaffident::WriteStaffident(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasStaff()) {
-        element.append_attribute("staff") = XsdPositiveIntegerListToStr(this->GetStaff()).c_str();
+        element.append_attribute("staff") = XsdPosintlistToStr(this->GetStaff()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -8496,7 +8496,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttArticulation *att = dynamic_cast<AttArticulation *>(element);
         assert(att);
         if (attrType == "artic") {
-            att->SetArtic(att->StrToArticulationList(attrValue));
+            att->SetArtic(att->StrToArticulation(attrValue));
             return true;
         }
     }
@@ -9752,7 +9752,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
         AttStaffident *att = dynamic_cast<AttStaffident *>(element);
         assert(att);
         if (attrType == "staff") {
-            att->SetStaff(att->StrToXsdPositiveIntegerList(attrValue));
+            att->SetStaff(att->StrToXsdPosintlist(attrValue));
             return true;
         }
     }
@@ -10131,7 +10131,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttArticulation *att = dynamic_cast<const AttArticulation *>(element);
         assert(att);
         if (att->HasArtic()) {
-            attributes->push_back(std::make_pair("artic", att->ArticulationListToStr(att->GetArtic())));
+            attributes->push_back(std::make_pair("artic", att->ArticulationToStr(att->GetArtic())));
         }
     }
     if (element->HasAttClass(ATT_ARTICULATIONPERFORMED)) {
@@ -11184,7 +11184,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
         const AttStaffident *att = dynamic_cast<const AttStaffident *>(element);
         assert(att);
         if (att->HasStaff()) {
-            attributes->push_back(std::make_pair("staff", att->XsdPositiveIntegerListToStr(att->GetStaff())));
+            attributes->push_back(std::make_pair("staff", att->XsdPosintlistToStr(att->GetStaff())));
         }
     }
     if (element->HasAttClass(ATT_STAFFLOC)) {
