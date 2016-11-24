@@ -262,6 +262,58 @@ int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 };
 
+void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert)
+{
+    // here we transfer the @left and @right values to the barLine objects
+    if (!previous) {
+        this->SetDrawingLeftBarLine(this->GetLeft());
+        this->SetDrawingRightBarLine(this->GetRight());
+        return;
+    }
+    if (systemBreak) {
+        // we have rptboth on one of the two sides, split them
+        if ((previous->GetRight() == BARRENDITION_rptboth) || (this->GetLeft() == BARRENDITION_rptboth)) {
+            previous->SetDrawingRightBarLine(BARRENDITION_rptend);
+            this->SetDrawingLeftBarLine(BARRENDITION_rptstart);
+        }
+        // we have a rptstart, make sure the previous measure get a right rptend
+        else if ((previous->GetRight() == BARRENDITION_NONE) && (this->GetLeft() == BARRENDITION_rptstart)) {
+            previous->SetDrawingRightBarLine(BARRENDITION_rptend);
+            this->SetDrawingLeftBarLine(BARRENDITION_rptstart);
+        }
+        else {
+            this->SetDrawingLeftBarLine(this->GetLeft());
+        }
+        this->SetDrawingRightBarLine(this->GetRight());
+    }
+    else if (!scoreDefInsert) {
+        // we have rptboth split in the two measures, make them one rptboth
+        if ((previous->GetRight() == BARRENDITION_rptend) && (this->GetLeft() == BARRENDITION_rptstart)) {
+            previous->SetDrawingRightBarLine(BARRENDITION_rptboth);
+            this->SetDrawingLeftBarLine(BARRENDITION_NONE);
+        }
+        // we have an rptend before, make sure there in none on the left
+        else if (previous->GetRight() == BARRENDITION_rptend) {
+            this->SetDrawingLeftBarLine(BARRENDITION_NONE);
+        }
+        // we have an rptstart coming, make sure there is none on the right before
+        else if (this->GetLeft() == BARRENDITION_rptstart) {
+            // always set the right barline to invis for spacing
+            previous->SetDrawingRightBarLine(BARRENDITION_invis);
+            this->SetDrawingLeftBarLine(BARRENDITION_rptstart);
+        }
+        else {
+            this->SetDrawingLeftBarLine(this->GetLeft());
+        }
+        this->SetDrawingRightBarLine(this->GetRight());
+    }
+    else {
+        // with a scoredef inbetween always set it to what we have in the encoding
+        this->SetDrawingLeftBarLine(this->GetLeft());
+        this->SetDrawingRightBarLine(this->GetRight());
+    }
+}
+
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_drawingXRel = 0;
@@ -283,10 +335,6 @@ int Measure::AlignHorizontally(FunctorParams *functorParams)
 
     // clear the content of the measureAligner
     m_measureAligner.Reset();
-
-    // here we transfer the @left and @right values to the barLine objects
-    this->SetLeftBarLineType(this->GetLeft());
-    this->SetRightBarLineType(this->GetRight());
 
     // point to it
     params->m_measureAligner = &m_measureAligner;
@@ -312,7 +360,8 @@ int Measure::AlignHorizontallyEnd(FunctorParams *functorParams)
     assert(params);
 
     // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a
-    // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work in
+    // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work
+    // in
     // MEI anyway.
     m_timestampAligner.Process(params->m_functor, params);
 
