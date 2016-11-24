@@ -24,6 +24,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "ending.h"
+#include "fermata.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
@@ -75,6 +76,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Dynam *dynam = dynamic_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
+    }
+    else if (element->Is() == FERMATA) {
+        Fermata *fermata = dynamic_cast<Fermata *>(element);
+        assert(fermata);
+        DrawFermata(dc, fermata, measure, system);
     }
     else if (element->Is() == HARM) {
         Harm *harm = dynamic_cast<Harm *>(element);
@@ -1482,7 +1488,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     assert(measure);
     assert(dynam);
 
-    // We cannot draw a return that has no start position
+    // We cannot draw dynamics that have no start position
     if (!dynam->GetStart()) return;
 
     dc->StartGraphic(dynam, "", dynam->GetUuid());
@@ -1533,6 +1539,56 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     dc->EndGraphic(dynam, this);
 }
 
+void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(fermata);
+
+    // We cannot draw a fermata that has no start position
+    if (!fermata->GetStart()) return;
+
+    dc->StartGraphic(fermata, "", fermata->GetUuid());
+
+    int x = fermata->GetStart()->GetDrawingX();
+
+    // for a start always put fermatas up
+    int code = SMUFL_E4C0_fermataAbove;
+    // check for form
+    if (fermata->HasForm()) {
+        if (fermata->GetForm() == fermataVis_FORM_inv) code = SMUFL_E4C1_fermataBelow;
+        if (fermata->GetForm() == fermataVis_FORM_norm) code = SMUFL_E4C0_fermataAbove;
+    }
+    else if (fermata->GetPlace() == STAFFREL_below)
+        code = SMUFL_E4C1_fermataBelow;
+    // check for shape
+    if (fermata->HasShape()) {
+        if (fermata->GetShape() != fermataVis_SHAPE_curved) {
+            // Until other fermata glyphs are added we leave this part blank
+        }
+    }
+
+    std::wstring str;
+    str.push_back(code);
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = fermata->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, x, (*staffIter)->GetDrawingY());
+        int y = fermata->GetDrawingY();
+
+        // Adjust the x position
+        int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
+
+        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        dc->ResetFont();
+    }
+
+    dc->EndGraphic(fermata, this);
+}
+
 void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system)
 {
     assert(dc);
@@ -1540,7 +1596,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     assert(measure);
     assert(harm);
 
-    // We cannot draw a dir that has no start position
+    // We cannot draw a harmony indication that has no start position
     if (!harm->GetStart()) return;
 
     dc->StartGraphic(harm, "", harm->GetUuid());

@@ -17,6 +17,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "fermata.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "octave.h"
@@ -118,6 +119,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
     else if (object->Is() == ENDING) {
         // endings always above;
         m_place = STAFFREL_above;
+    }
+    else if (object->Is() == FERMATA) {
+        Fermata *fermata = dynamic_cast<Fermata *>(object);
+        assert(fermata);
+        // fermata above by default
+        m_place = fermata->HasPlace() ? fermata->GetPlace() : STAFFREL_above;
     }
     else if (object->Is() == HAIRPIN) {
         Hairpin *hairpin = dynamic_cast<Hairpin *>(object);
