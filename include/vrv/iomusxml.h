@@ -221,6 +221,8 @@ private:
 private:
     /** The filename */
     std::string m_filename;
+    /** MIDI ticks */
+    int m_ppq;
     /** The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
     std::vector<LayerElement *> m_elementStack;
     /** The stack for open slurs */

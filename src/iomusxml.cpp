@@ -633,6 +633,9 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                         staffDef->AttMeterSigDefaultLog::StrToInt(beatType.node().text().as_string()));
                 }
             }
+            // ppq
+            pugi::xpath_node divisions = it->select_single_node("divisions");
+            if (divisions) m_ppq = atoi(GetContent(divisions.node()).c_str());
         }
     }
 
@@ -689,6 +692,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
         if (IsElement(*it, "attributes")) {
             ReadMusicXmlAttributes(*it, measure, measureNum);
         }
+        else if (IsElement(*it, "backup")) {
+            ReadMusicXmlBackup(*it, measure, measureNum);
+        }
         else if (IsElement(*it, "barline")) {
             ReadMusicXmlBarLine(*it, measure, measureNum);
         }
@@ -744,6 +750,8 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Measure *measure
 
 void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, int measureNum)
 {
+    assert(node);
+    assert(measure);
 }
 
 void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, int measureNum)
@@ -836,7 +844,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
 
     // Tempo
     pugi::xpath_node metronome = type.node().select_single_node("metronome");
-    if (sound || metronome) {
+    if ((sound && words.size() != 0) || metronome) {
         Tempo *tempo = new Tempo();
         if (!placeStr.empty()) tempo->SetPlace(tempo->AttPlacement::StrToStaffrel(placeStr.c_str()));
         int midiTempo = atoi(GetAttributeValue(node.select_single_node("sound").node(), "tempo").c_str());
@@ -867,8 +875,10 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, i
     else layer = SelectLayer(prevNote.node(), measure);
     assert(layer);
     
+    std::string durStr = std::to_string(m_ppq / atoi(GetContentOfChild(node, "duration").c_str()) * 4);
+    
     Space *space = new Space();
-    // space->SetDur(ConvertTypeToDur(typeStr));
+    space->SetDur(space->AttDurationMusical::StrToDuration(durStr));
     AddLayerElement(layer, space);
 }
 
