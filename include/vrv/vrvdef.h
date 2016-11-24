@@ -99,6 +99,7 @@ enum ClassId {
     ANCHORED_TEXT,
     DIR,
     DYNAM,
+    FERMATA,
     HAIRPIN,
     HARM,
     OCTAVE,

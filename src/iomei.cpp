@@ -28,6 +28,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
+#include "fermata.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
@@ -238,6 +239,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == DYNAM) {
         m_currentNode = m_currentNode.append_child("dynam");
         WriteMeiDynam(m_currentNode, dynamic_cast<Dynam *>(object));
+    }
+    else if (object->Is() == FERMATA) {
+        m_currentNode = m_currentNode.append_child("fermata");
+        WriteMeiFermata(m_currentNode, dynamic_cast<Fermata *>(object));
     }
     else if (object->Is() == HAIRPIN) {
         m_currentNode = m_currentNode.append_child("hairpin");
@@ -721,6 +726,17 @@ void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteXmlId(currentNode, dynam);
     WriteTextDirInterface(currentNode, dynam);
     WriteTimeSpanningInterface(currentNode, dynam);
+};
+
+void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
+{
+    assert(fermata);
+    
+    WriteXmlId(currentNode, fermata);
+    WriteTimePointInterface(currentNode, fermata);
+    fermata->WriteColor(currentNode);
+    fermata->WriteFermataVis(currentNode);
+    fermata->WritePlacement(currentNode);
 };
 
 void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
@@ -2069,6 +2085,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "dynam") {
             success = ReadMeiDynam(parent, current);
         }
+        else if (std::string(current.name()) == "fermata") {
+            success = ReadMeiFermata(parent, current);
+        }
         else if (std::string(current.name()) == "hairpin") {
             success = ReadMeiHairpin(parent, current);
         }
@@ -2138,6 +2157,20 @@ bool MeiInput::ReadMeiDynam(Object *parent, pugi::xml_node dynam)
 
     parent->AddChild(vrvDynam);
     return ReadMeiTextChildren(vrvDynam, dynam);
+}
+
+bool MeiInput::ReadMeiFermata(Object *parent, pugi::xml_node fermata)
+{
+    Fermata *vrvFermata = new Fermata();
+    SetMeiUuid(fermata, vrvFermata);
+    
+    ReadTimePointInterface(fermata, vrvFermata);
+    vrvFermata->ReadColor(fermata);
+    vrvFermata->ReadFermataVis(fermata);
+    vrvFermata->ReadPlacement(fermata);
+    
+    parent->AddChild(vrvFermata);
+    return true;
 }
 
 bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
