@@ -1243,7 +1243,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     if (!m_dirStack.empty()) {
         std::vector<Dir *>::iterator iter;
         for (iter = m_dirStack.begin(); iter != m_dirStack.end(); iter++) {
-            (*iter)->SetStaff(staff->Att::StrToXsdPosintlist(std::to_string(staff->GetN())));
+            (*iter)->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             (*iter)->SetStartid("#" + element->GetUuid());
         }
         m_dirStack.clear();
@@ -1251,7 +1251,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     if (!m_dynamStack.empty()) {
         std::vector<Dynam *>::iterator iter;
         for (iter = m_dynamStack.begin(); iter != m_dynamStack.end(); iter++) {
-            (*iter)->SetStaff(staff->Att::StrToXsdPosintlist(std::to_string(staff->GetN())));
+            (*iter)->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             (*iter)->SetStartid("#" + element->GetUuid());
         }
         m_dynamStack.clear();
@@ -1259,7 +1259,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     if (!m_harmStack.empty()) {
         std::vector<Harm *>::iterator iter;
         for (iter = m_harmStack.begin(); iter != m_harmStack.end(); iter++) {
-            (*iter)->SetStaff(staff->Att::StrToXsdPosintlist(std::to_string(staff->GetN())));
+            (*iter)->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             (*iter)->SetStartid("#" + element->GetUuid());
         }
         m_harmStack.clear();
@@ -1267,7 +1267,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     if (!m_pedalStack.empty()) {
         std::vector<Pedal *>::iterator iter;
         for (iter = m_pedalStack.begin(); iter != m_pedalStack.end(); iter++) {
-            (*iter)->SetStaff(staff->Att::StrToXsdPosintlist(std::to_string(staff->GetN())));
+            (*iter)->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             (*iter)->SetStartid("#" + element->GetUuid());
         }
         m_pedalStack.clear();
@@ -1275,7 +1275,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     if (!m_tempoStack.empty()) {
         std::vector<Tempo *>::iterator iter;
         for (iter = m_tempoStack.begin(); iter != m_tempoStack.end(); iter++) {
-            (*iter)->SetStaff(staff->Att::StrToXsdPosintlist(std::to_string(staff->GetN())));
+            (*iter)->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
             (*iter)->SetStartid("#" + element->GetUuid());
         }
         m_tempoStack.clear();
