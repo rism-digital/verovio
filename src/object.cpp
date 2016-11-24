@@ -1029,8 +1029,11 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     if (this->Is() == MEASURE) {
         Measure *measure = dynamic_cast<Measure *>(this);
         assert(measure);
+        bool systemBreak = false;
+        bool scoreDefInsert = false;
         // This is the first measure of the system - more to do...
         if (params->m_currentSystem) {
+            systemBreak = true;
             // We had a scoreDef so we need to put cautionnary values
             // This will also happend with clef in the last measure - however, the cautionnary functor will not do
             // anything then
@@ -1049,11 +1052,13 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
             params->m_drawLabels = false;
         }
         if (params->m_upcomingScoreDef->m_setAsDrawing) {
+            scoreDefInsert = true;
             measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
             params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, true);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
+        measure->SetDrawingBarLines(params->m_previousMeasure, systemBreak, scoreDefInsert);
         params->m_previousMeasure = measure;
         return FUNCTOR_CONTINUE;
     }
@@ -1363,13 +1368,14 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     if (!current->HasToBeAligned()) {
         // if nothing to do with this type of element
-        return FUNCTOR_CONTINUE;
+        // return FUNCTOR_CONTINUE;
     }
 
     if (!current->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
-        assert(false); // quite drastic but this should never happen. If nothing has to be drawn
-        LogDebug("Un-updated bounding box for '%s' '%s'", current->GetClassName().c_str(), current->GetUuid().c_str());
+        // assert(false); // quite drastic but this should never happen. If nothing has to be drawn
+        // LogDebug("Un-updated bounding box for '%s' '%s'", current->GetClassName().c_str(),
+        // current->GetUuid().c_str());
         // then the BB should be set to empty with  Object::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
