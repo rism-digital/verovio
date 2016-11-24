@@ -265,7 +265,7 @@ int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
 void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert)
 {
     // First set the right barline. If none then set a single one.
-    data_BARRENDITION rightBarline = (this->HasRight()) ? BARRENDITION_single : this->GetRight();
+    data_BARRENDITION rightBarline = (this->HasRight()) ? this->GetRight() : BARRENDITION_single;
     this->SetDrawingRightBarLine(rightBarline);
 
     // Now adjust the right barline of the previous measure (if any) and the left one
