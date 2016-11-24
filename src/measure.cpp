@@ -298,6 +298,12 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
             previous->SetDrawingRightBarLine(BARRENDITION_invis);
             this->SetDrawingLeftBarLine(BARRENDITION_rptstart);
         }
+        // we have an rptboth coming, make sure there is none on the right before (ignore any other value)
+        else if (this->GetLeft() == BARRENDITION_rptboth) {
+            // always set the right barline to invis for spacing
+            previous->SetDrawingRightBarLine(BARRENDITION_invis);
+            this->SetDrawingLeftBarLine(BARRENDITION_rptboth);
+        }
         // nothing we can do with any other value?
         else {
             this->SetDrawingLeftBarLine(this->GetLeft());
