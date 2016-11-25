@@ -868,8 +868,8 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, i
     pugi::xpath_node nextNote = node.select_single_node("following-sibling::note[1]");
     if (nextNote) {
         Layer *layer = SelectLayer(nextNote.node(), measure);
-        std::string durStr = std::to_string(4* m_ppq / atoi(GetContentOfChild(node, "duration").c_str()));
-        
+        std::string durStr = std::to_string(4 * m_ppq / atoi(GetContentOfChild(node, "duration").c_str()));
+
         Space *space = new Space();
         space->SetDur(space->AttDurationMusical::StrToDuration(durStr));
         AddLayerElement(layer, space);
