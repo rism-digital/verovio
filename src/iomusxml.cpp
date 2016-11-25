@@ -783,11 +783,10 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
 
     pugi::xpath_node type = node.select_single_node("direction-type");
     std::string placeStr = GetAttributeValue(node, "placement");
-    pugi::xpath_node sound = node.select_single_node("sound");
 
     // Directive
     pugi::xpath_node_set words = type.node().select_nodes("words");
-    if (words.size() != 0 && !sound) {
+    if (words.size() != 0 && !node.select_single_node("sound[@tempo]")) {
         Dir *dir = new Dir();
         if (!placeStr.empty()) dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         TextRendition(words, dir);
@@ -843,7 +842,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
 
     // Tempo
     pugi::xpath_node metronome = type.node().select_single_node("metronome");
-    if ((sound && words.size() != 0) || metronome) {
+    if (node.select_single_node("sound[@tempo]") || metronome) {
         Tempo *tempo = new Tempo();
         if (!placeStr.empty()) tempo->SetPlace(tempo->AttPlacement::StrToStaffrel(placeStr.c_str()));
         int midiTempo = atoi(GetAttributeValue(node.select_single_node("sound").node(), "tempo").c_str());
@@ -865,22 +864,16 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, i
     assert(node);
     assert(measure);
 
-    // to find the layer we need to check the surrounding notes
-    pugi::xpath_node prevNote = node.select_single_node("preceding-sibling::note[1]");
+    // We only need a <space> if a note follows
     pugi::xpath_node nextNote = node.select_single_node("following-sibling::note[1]");
-
-    Layer *layer = NULL;
-    if (nextNote)
-        layer = SelectLayer(nextNote.node(), measure);
-    else
-        layer = SelectLayer(prevNote.node(), measure);
-    assert(layer);
-    
-    std::string durStr = std::to_string(m_ppq / atoi(GetContentOfChild(node, "duration").c_str()) * 4);
-
-    Space *space = new Space();
-    space->SetDur(space->AttDurationMusical::StrToDuration(durStr));
-    AddLayerElement(layer, space);
+    if (nextNote) {
+        Layer *layer = SelectLayer(nextNote.node(), measure);
+        std::string durStr = std::to_string(4* m_ppq / atoi(GetContentOfChild(node, "duration").c_str()));
+        
+        Space *space = new Space();
+        space->SetDur(space->AttDurationMusical::StrToDuration(durStr));
+        AddLayerElement(layer, space);
+    }
 }
 
 void MusicXmlInput::ReadMusicXmlHarmony(pugi::xml_node node, Measure *measure, int measureNum)
