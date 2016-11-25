@@ -111,6 +111,15 @@ enum {
     SMUFL_E4BD_articMarcatoTenutoBelow = 0xE4BD,
     SMUFL_E4C0_fermataAbove = 0xE4C0,
     SMUFL_E4C1_fermataBelow = 0xE4C1,
+    SMUFL_E4C2_fermataVeryShortAbove = 0xE4C2,
+    SMUFL_E4C3_fermataVeryShortBelow = 0xE4C3,
+    SMUFL_E4C4_fermataShortAbove = 0xE4C4,
+    SMUFL_E4C5_fermataShortBelow = 0xE4C5,
+    SMUFL_E4C6_fermataLongAbove = 0xE4C6,
+    SMUFL_E4C7_fermataLongBelow = 0xE4C7,
+    SMUFL_E4C8_fermataVeryLongAbove = 0xE4C8,
+    SMUFL_E4C9_fermataVeryLongBelow = 0xE4C9,
+    SMUFL_E4CE_breathMarkComma = 0xE4CE,
     SMUFL_E4E5_restQuarter = 0xE4E5,
     SMUFL_E4E6_rest8th = 0xE4E6,
     SMUFL_E4E7_rest16th = 0xE4E7,
@@ -194,10 +203,16 @@ enum {
     SMUFL_E939_mensuralNoteheadSemibrevisVoid = 0xE939,
     SMUFL_E93C_mensuralNoteheadMinimaWhite = 0xE93C,
     SMUFL_E93D_mensuralNoteheadSemiminimaWhite = 0xE93D,
+    SMUFL_E93E_mensuralCombStemUp = 0xE93E,
+    SMUFL_E93F_mensuralCombStemDown = 0xE93F,
+    SMUFL_E949_mensuralCombStemUpFlagSemiminima = 0xE949,
+    SMUFL_E94A_mensuralCombStemDownFlagSemiminima = 0xE94A,
+    SMUFL_E94B_mensuralCombStemUpFlagFusa = 0xE94B,
+    SMUFL_E94C_mensuralCombStemDownFlagFusa = 0xE94C,
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 172
+#define SMUFL_COUNT 187
 
 } // vrv namespace
 
