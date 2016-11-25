@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1480006123
+ModificationTime: 1480059231
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -50,11 +50,11 @@ NameList: Adobe Glyph List
 DisplaySize: -72
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 58518 18 7
+WinInfo: 59562 18 7
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
-BeginChars: 1114115 188
+BeginChars: 1114115 194
 
 StartChar: uniE0A3
 Encoding: 57507 57507 0
@@ -5426,11 +5426,11 @@ Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-155 194 m 5
- 312 0 l 5
- 155 -192 l 5
- 0 0 l 5
- 155 194 l 5
+155 194 m 1
+ 312 0 l 1
+ 155 -192 l 1
+ 0 0 l 1
+ 155 194 l 1
 EndSplineSet
 EndChar
 
@@ -10474,6 +10474,132 @@ SplineSet
  55 26.3333333333 73.6666666667 41 87 61 c 132
  100.333333333 81 107 101.666666667 107 123 c 4
  107 143 101.333333333 157.333333333 90 166 c 5
+EndSplineSet
+EndChar
+
+StartChar: uniE93E
+Encoding: 59710 59710 188
+Width: 30
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 760 m 1
+ 30 760 l 1
+ 30 0 l 1
+ 0 0 l 1
+ 0 760 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE93F
+Encoding: 59711 59711 189
+Width: 30
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 -760 m 1
+ 30 -760 l 1
+ 30 0 l 1
+ 0 0 l 1
+ 0 -760 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE949
+Encoding: 59721 59721 190
+Width: 186
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 760 m 1
+ 30 760 l 1
+ 186 533 l 1
+ 156 533 l 1
+ 0 760 l 1
+0 760 m 1
+ 30 760 l 1
+ 30 0 l 1
+ 0 0 l 1
+ 0 760 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE94B
+Encoding: 59723 59723 191
+Width: 186
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 643 m 5
+ 30 643 l 5
+ 186 416 l 5
+ 156 416 l 5
+ 0 643 l 5
+0 760 m 5
+ 30 760 l 5
+ 186 533 l 5
+ 156 533 l 5
+ 0 760 l 5
+0 760 m 5
+ 30 760 l 5
+ 30 0 l 5
+ 0 0 l 5
+ 0 760 l 5
+EndSplineSet
+EndChar
+
+StartChar: uniE94A
+Encoding: 59722 59722 192
+Width: 186
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 -760 m 1
+ 30 -760 l 1
+ 186 -533 l 1
+ 156 -533 l 1
+ 0 -760 l 1
+0 -760 m 1
+ 30 -760 l 1
+ 30 0 l 1
+ 0 0 l 1
+ 0 -760 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE94C
+Encoding: 59724 59724 193
+Width: 186
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 -643 m 1
+ 30 -643 l 1
+ 186 -416 l 1
+ 156 -416 l 1
+ 0 -643 l 1
+0 -760 m 1
+ 30 -760 l 1
+ 186 -533 l 1
+ 156 -533 l 1
+ 0 -760 l 1
+0 -760 m 1
+ 30 -760 l 1
+ 30 0 l 1
+ 0 0 l 1
+ 0 -760 l 1
 EndSplineSet
 EndChar
 EndChars

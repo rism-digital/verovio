@@ -203,10 +203,16 @@ enum {
     SMUFL_E939_mensuralNoteheadSemibrevisVoid = 0xE939,
     SMUFL_E93C_mensuralNoteheadMinimaWhite = 0xE93C,
     SMUFL_E93D_mensuralNoteheadSemiminimaWhite = 0xE93D,
+    SMUFL_E93E_mensuralCombStemUp = 0xE93E,
+    SMUFL_E93F_mensuralCombStemDown = 0xE93F,
+    SMUFL_E949_mensuralCombStemUpFlagSemiminima = 0xE949,
+    SMUFL_E94A_mensuralCombStemDownFlagSemiminima = 0xE94A,
+    SMUFL_E94B_mensuralCombStemUpFlagFusa = 0xE94B,
+    SMUFL_E94C_mensuralCombStemDownFlagFusa = 0xE94C,
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 181
+#define SMUFL_COUNT 187
 
 } // vrv namespace
 
