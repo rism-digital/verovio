@@ -1,5 +1,3 @@
 <symbol id="E220" viewBox="0 0 1000 1000" overflow="inherit">
-   <g transform="scale(1,-1)">
-      <path d="M-163 -124v83l326 166v-86z"/>
-   </g>
+   <path transform="scale(1,-1)" d="M-163 -124v83l326 166v-86z"/>
 </symbol>

@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        iomusxml.h
-// Author:      Laurent Pugin
+// Author:      Laurent Pugin and Klaus Rettinghaus
 // Created:     22/09/2015
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
@@ -24,12 +24,17 @@
 namespace vrv {
 
 class ControlElement;
+class Dir;
+class Dynam;
+class Harm;
 class Layer;
 class LayerElement;
 class Measure;
+class Pedal;
 class Section;
 class Slur;
 class StaffGrp;
+class Tempo;
 class Tie;
 /// class Tuplet;
 
@@ -91,6 +96,11 @@ private:
     bool ReadMusicXml(pugi::xml_node root);
 
     /**
+     * Method to fill MEI header with title
+     */
+    void ReadMusicXmlTitle(pugi::xml_node title);
+
+    /**
      * @name Top level methods for reading MusicXml part and measure elements.
      */
     ///@{
@@ -111,7 +121,9 @@ private:
     void ReadMusicXmlAttributes(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, int measureNb);
+    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNb);
+    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, int measureNb);
     void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNb);
     ///@}
 
@@ -181,6 +193,15 @@ private:
     void CloseTie(Staff *staff, Layer *layer, Note *note, bool isClosingTie);
     void OpenSlur(Staff *staff, Layer *layer, int number, LayerElement *element, Slur *slur);
     void CloseSlur(Staff *staff, Layer *layer, int number, LayerElement *element);
+    ///@}
+
+    /**
+     * @name Helper methods for rendering text elements
+     */
+    ///@{
+    ///@}
+    void TextRendition(pugi::xpath_node_set words, ControlElement *element);
+    void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
 
     /**
      * @name Methods for converting MusicXML string values to MEI attributes.
@@ -188,8 +209,11 @@ private:
     ///@{
     data_ACCIDENTAL_EXPLICIT ConvertAccidentalToAccid(std::string value);
     data_ACCIDENTAL_EXPLICIT ConvertAlterToAccid(std::string value);
+    data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
     data_DURATION ConvertTypeToDur(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
+    data_PLACE ConvertTypeToPlace(std::string value);
+    pedalLog_DIR ConvertPedalTypeToDir(std::string value);
     ///@}
 
 private:
@@ -201,7 +225,12 @@ private:
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /** The stack for open ties */
     std::vector<std::pair<Tie *, musicxml::OpenTie> > m_tieStack;
-
+    /** The stacks for directives and dynamics */
+    std::vector<Dir *> m_dirStack;
+    std::vector<Dynam *> m_dynamStack;
+    std::vector<Harm *> m_harmStack;
+    std::vector<Pedal *> m_pedalStack;
+    std::vector<Tempo *> m_tempoStack;
     /**
      * The stack of floating elements (tie, slur, etc.) to be added at the
      * end of each measure

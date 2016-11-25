@@ -1290,7 +1290,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
 
 template <class ELEMENT> void HumdrumInput::setStaff(ELEMENT element, int staffnum)
 {
-    xsd_posIntList stafflist;
+    xsdPositiveInteger_List stafflist;
     stafflist.push_back(staffnum);
     element->SetStaff(stafflist);
 }
@@ -1666,6 +1666,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
 
         handleGroupStarts(tg[i], elements, pointers, layerdata[i]);
+        addOrnamentMarkers(layerdata[i]);
 
         if (layerdata[i]->isChord()) {
             Chord *chord = new Chord;
@@ -1726,6 +1727,40 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addOrnamentMarkers -- Temporarily convert
+//   mordents and trills to text markers (<dir>) for DH.
+//   These markers will overwrite any other existing text directions.
+//
+
+void HumdrumInput::addOrnamentMarkers(HTp token)
+{
+    if (!token) {
+        return;
+    }
+    if (strchr(token->c_str(), 'm') != NULL) {
+        token->setValue("LO", "TX", "t", "m");
+        token->setValue("LO", "TX", "a", "true");
+    }
+    else if (strchr(token->c_str(), 'M') != NULL) {
+        token->setValue("LO", "TX", "t", "M");
+        token->setValue("LO", "TX", "a", "true");
+    }
+    else if (strchr(token->c_str(), 't') != NULL) {
+        token->setValue("LO", "TX", "t", "t");
+        token->setValue("LO", "TX", "a", "true");
+    }
+    else if (strchr(token->c_str(), 'T') != NULL) {
+        token->setValue("LO", "TX", "t", "T");
+        token->setValue("LO", "TX", "a", "true");
+    }
+    else if (strchr(token->c_str(), 'O') != NULL) {
+        token->setValue("LO", "TX", "t", "*");
+        token->setValue("LO", "TX", "a", "true");
+    }
 }
 
 //////////////////////////////

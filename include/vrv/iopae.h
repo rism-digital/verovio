@@ -196,7 +196,7 @@ namespace pae {
             meter = NULL;
             key = NULL;
             notes.clear();
-            barLine = BARRENDITION_NONE;
+            barLine = BARRENDITION_invis;
             wholerest = 0;
             abbreviation_offset = -1;
         }

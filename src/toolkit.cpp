@@ -222,6 +222,9 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
     if (data.size() == 0) {
         return UNKNOWN;
     }
+    if (data[0] == 0) {
+        return UNKNOWN;
+    }
     if (data[0] == '@') {
         return PAE;
     }
@@ -773,7 +776,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
     jsonxx::Array a;
 
     double time = (double)(millisec * 120 / 1000);
-    AttNoteOnsetOffsetComparison matchTime(time);
+    NoteOnsetOffsetComparison matchTime(time);
     ArrayOfObjects notes;
     // Here we would need to check that the midi export is done
     if (m_doc.GetMidiExportDone()) {

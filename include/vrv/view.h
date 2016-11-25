@@ -25,6 +25,7 @@ class Doc;
 class Dynam;
 class EditorialElement;
 class Ending;
+class Fermata;
 class Hairpin;
 class Harm;
 class Layer;
@@ -218,6 +219,9 @@ protected:
     ///@{
     void DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure,
         Accid *prevAccid = NULL);
+    void DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure,
+        bool drawingList = false);
+    void DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawBarLine(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawBeatRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -226,7 +230,6 @@ protected:
     void DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
-    void DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawLigature(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawMeterSig(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -252,7 +255,7 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
-    void DrawFermata(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
+    void DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawLedgerLines(
         DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
@@ -302,7 +305,7 @@ protected:
      * @name Methods for drawing Floating child classes.
      * They are base drawing methods that are called directly from DrawFloatingElement.
      * Call appropriate method of child classes (Slur, Tempo, Tie, etc).
-     * Defined in view_floating.cpp
+     * Defined in view_control.cpp
      */
     ///@{
     void DrawControlElement(DeviceContext *dc, ControlElement *element, Measure *measure, System *system);
@@ -312,6 +315,7 @@ protected:
     void DrawTimeSpanningElement(DeviceContext *dc, Object *object, System *system);
     void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
+    void DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, System *system);
     void DrawHairpin(
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system);
@@ -327,7 +331,7 @@ protected:
     /**
      * @name Methods for drawing SystemElement child classes.
      * They are base drawing methods that are called directly from DrawSystemElement.
-     * Defined in view_floating.cpp
+     * Defined in view_control.cpp
      */
     ///@{
     void DrawSystemElement(DeviceContext *dc, SystemElement *element, System *system);
@@ -427,9 +431,14 @@ private:
     ///@}
 
     /**
-     * @name Used for calculating clustered information/dot position
+     * Used for calculating clustered information/dot position
      */
     bool IsOnStaffLine(int y, Staff *staff);
+
+    /**
+     * Find the nearest unit position in the direction indicated by place.
+     */
+    int GetNearestInterStaffPosition(int y, Staff *staff, data_STAFFREL place);
 
     /**
      * Make sure dots on chords are vertically aligned correctly
