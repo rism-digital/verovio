@@ -2087,7 +2087,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
 }
 
 // Draw a trill above the notehead
-// This function works as the up-fermata portion of DrawFermata
+// This function works as the up-fermata portion of DrawFermataAttr
 // if there are many symbols to draw we could make a generalized function
 void View::DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff)
 {
