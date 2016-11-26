@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "artic.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "slur.h"
@@ -33,6 +34,7 @@ Note::Note()
     , DurationInterface()
     , PitchInterface()
     , AttAccidentalPerformed()
+    , AttColor()
     , AttColoration()
     , AttGraced()
     , AttNoteLogMensural()
@@ -44,6 +46,7 @@ Note::Note()
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
     RegisterAttClass(ATT_ACCIDENTALPERFORMED);
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
@@ -78,6 +81,7 @@ void Note::Reset()
     DurationInterface::Reset();
     PitchInterface::Reset();
     ResetAccidentalPerformed();
+    ResetColor();
     ResetColoration();
     ResetGraced();
     ResetNoteLogMensural();
@@ -107,6 +111,9 @@ void Note::AddChild(Object *child)
 {
     if (child->Is() == ACCID) {
         assert(dynamic_cast<Accid *>(child));
+    }
+    else if (child->Is() == ARTIC) {
+        assert(dynamic_cast<Artic *>(child));
     }
     else if (child->Is() == SYL) {
         assert(dynamic_cast<Syl *>(child));

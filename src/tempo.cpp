@@ -24,10 +24,11 @@ namespace vrv {
 // Tempo
 //----------------------------------------------------------------------------
 
-Tempo::Tempo() : ControlElement("tempo-"), TextDirInterface(), TimePointInterface()
+Tempo::Tempo() : ControlElement("tempo-"), TextDirInterface(), TimePointInterface(), AttMiditempo()
 {
     RegisterInterface(TextDirInterface::GetAttClasses(), TextDirInterface::IsInterface());
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
+    RegisterAttClass(ATT_MIDITEMPO);
 
     Reset();
 }
@@ -41,6 +42,7 @@ void Tempo::Reset()
     ControlElement::Reset();
     TextDirInterface::Reset();
     TimePointInterface::Reset();
+    ResetMiditempo();
 }
 
 void Tempo::AddChild(Object *child)
