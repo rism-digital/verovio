@@ -494,7 +494,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     xLeft = xn - m_doc->GetDrawingBrevisWidth(pseudoStaffSize);
     xRight = xn + m_doc->GetDrawingBrevisWidth(pseudoStaffSize);
     if (note->GetActualDur() == DUR_MX) {
-        // Maxima is three times the width of brevis
+        // Maxima is twice the width of brevis
         xLeft -= m_doc->GetDrawingBrevisWidth(pseudoStaffSize);
         xRight += m_doc->GetDrawingBrevisWidth(pseudoStaffSize);
     }
@@ -509,7 +509,7 @@ void View::DrawMaximaToBrevis(DeviceContext *dc, int y, LayerElement *element, L
     }
 
     if (!fillNotehead) {
-        //	double base des carrees
+        //	double the bases of rectangles
         DrawObliquePolygon(dc, xLeft, yTop, xRight, yTop, -height);
         DrawObliquePolygon(dc, xLeft, yBottom, xRight, yBottom, height);
     }
@@ -607,7 +607,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     // if (!note->m_ligObliqua && (!View::s_drawingLigObliqua))	// rectangular notes, incl. ligature
     {
-        if (note->GetColored() != BOOLEAN_true) { //	double the base of squares
+        if (note->GetColored() != BOOLEAN_true) { //	double the bases of rectangles
             DrawObliquePolygon(dc, x1, y1, x2, y1, -epaisseur);
             DrawObliquePolygon(dc, x1, y2, x2, y2, epaisseur);
         }
