@@ -1559,19 +1559,16 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
 
     // for a start always put fermatas up
     int code = SMUFL_E4C0_fermataAbove;
-    // check for form
-    if (fermata->HasForm()) {
-        if (fermata->GetForm() == fermataVis_FORM_inv) code = SMUFL_E4C1_fermataBelow;
-        if (fermata->GetForm() == fermataVis_FORM_norm) code = SMUFL_E4C0_fermataAbove;
-    }
-    else if (fermata->GetPlace() == STAFFREL_below)
-        code = SMUFL_E4C1_fermataBelow;
     // check for shape
-    if (fermata->HasShape()) {
-        if (fermata->GetShape() != fermataVis_SHAPE_curved) {
-            // Until other fermata glyphs are added we leave this part blank
-        }
+    if (fermata->GetShape() == fermataVis_SHAPE_angular) {
+        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm))) code = SMUFL_E4C5_fermataShortBelow;
+        else code = SMUFL_E4C4_fermataShortAbove;
     }
+    else if (fermata->GetShape() == fermataVis_SHAPE_square) {
+        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm))) code = SMUFL_E4C7_fermataLongBelow;
+        else code = SMUFL_E4C6_fermataLongAbove;
+    }
+    else if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm))) code = SMUFL_E4C1_fermataBelow;
 
     std::wstring str;
     str.push_back(code);
