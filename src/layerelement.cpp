@@ -641,7 +641,7 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    // Here we need to check if the LayerElement as a duration, otherwise we can continue
+    // Here we need to check if the LayerElement has a duration, otherwise we can continue
     if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
 
     // Now deal with the different elements
@@ -722,10 +722,11 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
         int pitch = midiBase + (oct + 1) * 12;
         int channel = 0;
         int velocity = 64;
-        params->m_midiFile->addNoteOn(
+        if (note->GetTie() != TIE_t && note->GetTie() != TIE_m) params->m_midiFile->addNoteOn(
             params->m_midiTrack, params->m_totalTime + params->m_currentMeasureTime, channel, pitch, velocity);
-        params->m_midiFile->addNoteOff(
+        if (note->GetTie() != TIE_i && note->GetTie() != TIE_m) params->m_midiFile->addNoteOff(
             params->m_midiTrack, params->m_totalTime + params->m_currentMeasureTime + dur, channel, pitch);
+        if (note)
 
         note->m_playingOnset = params->m_totalTime + params->m_currentMeasureTime;
         note->m_playingOffset = params->m_totalTime + params->m_currentMeasureTime + dur;
