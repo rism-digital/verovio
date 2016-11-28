@@ -468,12 +468,31 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
+{
+    PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
+    assert(params);
+
+    ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
+    while (iter != params->m_timePointingInterfaces.end()) {
+        if (iter->first->SetStartOnly(this)) {
+            // We have both the start and the end that are matched
+            iter = params->m_timePointingInterfaces.erase(iter);
+        }
+        else {
+            iter++;
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
 {
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
-    ArrayOfInterfaceClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         if (iter->first->SetStartAndEnd(this)) {
             // We have both the start and the end that are matched

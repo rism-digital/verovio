@@ -26,6 +26,7 @@ namespace vrv {
 class ControlElement;
 class Dir;
 class Dynam;
+class Hairpin;
 class Harm;
 class Layer;
 class LayerElement;
@@ -210,6 +211,7 @@ private:
     data_ACCIDENTAL_EXPLICIT ConvertAccidentalToAccid(std::string value);
     data_ACCIDENTAL_EXPLICIT ConvertAlterToAccid(std::string value);
     data_BARRENDITION ConvertStyleToRend(std::string value, bool repeat);
+    data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
     data_PLACE ConvertTypeToPlace(std::string value);
@@ -219,13 +221,15 @@ private:
 private:
     /** The filename */
     std::string m_filename;
+    /** MIDI ticks */
+    int m_ppq;
     /** The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
     std::vector<LayerElement *> m_elementStack;
     /** The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /** The stack for open ties */
     std::vector<std::pair<Tie *, musicxml::OpenTie> > m_tieStack;
-    /** The stacks for directives and dynamics */
+    /** The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
     std::vector<Harm *> m_harmStack;

@@ -1147,17 +1147,17 @@
             <glyph glyph-code="E4C1" smufl-name="fermataBelow"/>
             <!--<glyph glyph-code="E4C2" smufl-name="fermataVeryShortAbove"/>-->
             <!--<glyph glyph-code="E4C3" smufl-name="fermataVeryShortBelow"/>-->
-            <!--<glyph glyph-code="E4C4" smufl-name="fermataShortAbove"/>-->
-            <!--<glyph glyph-code="E4C5" smufl-name="fermataShortBelow"/>-->
-            <!--<glyph glyph-code="E4C6" smufl-name="fermataLongAbove"/>-->
-            <!--<glyph glyph-code="E4C7" smufl-name="fermataLongBelow"/>-->
+            <glyph glyph-code="E4C4" smufl-name="fermataShortAbove"/>
+            <glyph glyph-code="E4C5" smufl-name="fermataShortBelow"/>
+            <glyph glyph-code="E4C6" smufl-name="fermataLongAbove"/>
+            <glyph glyph-code="E4C7" smufl-name="fermataLongBelow"/>
             <!--<glyph glyph-code="E4C8" smufl-name="fermataVeryLongAbove"/>-->
             <!--<glyph glyph-code="E4C9" smufl-name="fermataVeryLongBelow"/>-->
             <!--<glyph glyph-code="E4CA" smufl-name="fermataLongHenzeAbove"/>-->
             <!--<glyph glyph-code="E4CB" smufl-name="fermataLongHenzeBelow"/>-->
             <!--<glyph glyph-code="E4CC" smufl-name="fermataShortHenzeAbove"/>-->
             <!--<glyph glyph-code="E4CD" smufl-name="fermataShortHenzeBelow"/>-->
-            <!--<glyph glyph-code="E4CE" smufl-name="breathMarkComma"/>-->
+            <glyph glyph-code="E4CE" smufl-name="breathMarkComma"/>
             <!--<glyph glyph-code="E4CF" smufl-name="breathMarkTick"/>-->
             <!--<glyph glyph-code="E4D0" smufl-name="breathMarkUpbow"/>-->
             <!--<glyph glyph-code="E4D1" smufl-name="caesura"/>-->
@@ -2194,8 +2194,8 @@
                 smufl-name="mensuralNoteheadSemibrevisBlackVoidTurned"/>-->
             <glyph glyph-code="E93C" smufl-name="mensuralNoteheadMinimaWhite"/>
             <glyph glyph-code="E93D" smufl-name="mensuralNoteheadSemiminimaWhite"/>
-            <!--<glyph glyph-code="E93E" smufl-name="mensuralCombStemUp"/>-->
-            <!--<glyph glyph-code="E93F" smufl-name="mensuralCombStemDown"/>-->
+            <glyph glyph-code="E93E" smufl-name="mensuralCombStemUp"/>
+            <glyph glyph-code="E93F" smufl-name="mensuralCombStemDown"/>
             <!--<glyph glyph-code="E940" smufl-name="mensuralCombStemDiagonal"/>-->
             <!--<glyph glyph-code="E941" smufl-name="mensuralCombStemUpFlagRight"/>-->
             <!--<glyph glyph-code="E942" smufl-name="mensuralCombStemDownFlagRight"/>-->
@@ -2205,10 +2205,10 @@
             <!--<glyph glyph-code="E946" smufl-name="mensuralCombStemDownFlagFlared"/>-->
             <!--<glyph glyph-code="E947" smufl-name="mensuralCombStemUpFlagExtended"/>-->
             <!--<glyph glyph-code="E948" smufl-name="mensuralCombStemDownFlagExtended"/>-->
-            <!--<glyph glyph-code="E949" smufl-name="mensuralCombStemUpFlagSemiminima"/>-->
-            <!--<glyph glyph-code="E94A" smufl-name="mensuralCombStemDownFlagSemiminima"/>-->
-            <!--<glyph glyph-code="E94B" smufl-name="mensuralCombStemUpFlagFusa"/>-->
-            <!--<glyph glyph-code="E94C" smufl-name="mensuralCombStemDownFlagFusa"/>-->
+            <glyph glyph-code="E949" smufl-name="mensuralCombStemUpFlagSemiminima"/>
+            <glyph glyph-code="E94A" smufl-name="mensuralCombStemDownFlagSemiminima"/>
+            <glyph glyph-code="E94B" smufl-name="mensuralCombStemUpFlagFusa"/>
+            <glyph glyph-code="E94C" smufl-name="mensuralCombStemDownFlagFusa"/>
             <range_end>U+E94F</range_end>
             <range_start>U+E930</range_start>
         </medievalAndRenaissanceNoteheadsAndStems>

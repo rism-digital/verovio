@@ -99,6 +99,7 @@ enum ClassId {
     ANCHORED_TEXT,
     DIR,
     DYNAM,
+    FERMATA,
     HAIRPIN,
     HARM,
     OCTAVE,
@@ -187,6 +188,7 @@ class Note;
 class Object;
 class Point;
 class Staff;
+class TimePointInterface;
 class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
@@ -205,7 +207,9 @@ typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointP
 
 typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;
 
-typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfInterfaceClassIdPairs;
+typedef std::vector<std::pair<TimePointInterface *, ClassId> > ArrayOfPointingInterClassIdPairs;
+
+typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfSpanningInterClassIdPairs;
 
 typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 
