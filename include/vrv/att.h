@@ -49,6 +49,7 @@ public:
     // static bool SetCmnornaments(Object *element, std::string attrType, std::string attrValue);
     static bool SetCritapp(Object *element, std::string attrType, std::string attrValue);
     // static bool SetEdittrans(Object *element, std::string attrType, std::string attrValue);
+    static bool SetExternalsymbols(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
     // static bool SetHarmony(Object *element, std::string attrType, std::string attrValue);
@@ -72,6 +73,7 @@ public:
     // static void GetCmnornaments(Object *element, ArrayOfStrAttr *attributes);
     static void GetCritapp(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetEdittrans(Object *element, ArrayOfStrAttr *attributes);
+    static void GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFacsimile(Object *element, ArrayOfStrAttr *attributes);
     // static void GetFigtable(Object *element, ArrayOfStrAttr *attributes);
     // static void GetHarmony(Object *element, ArrayOfStrAttr *attributes);

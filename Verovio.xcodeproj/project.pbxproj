@@ -12,6 +12,9 @@
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
 		4067E4C81DDDAF0000C6E059 /* fermata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067E4C71DDDAF0000C6E059 /* fermata.cpp */; };
 		4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
+		4D1031861DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
+		4D1031871DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
+		4D1031881DECB83E0098EA1C /* atts_externalsymbols.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1031851DECB83E0098EA1C /* atts_externalsymbols.h */; };
 		4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7661C688F5A0086DC0E /* Binasc.cpp */; };
 		4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7661C688F5A0086DC0E /* Binasc.cpp */; };
 		4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */; };
@@ -280,6 +283,8 @@
 		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; };
 		4067E4C71DDDAF0000C6E059 /* fermata.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fermata.cpp; path = src/fermata.cpp; sourceTree = "<group>"; };
 		4067E4C91DDDAF6400C6E059 /* fermata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fermata.h; path = include/vrv/fermata.h; sourceTree = "<group>"; };
+		4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_externalsymbols.cpp; path = libmei/atts_externalsymbols.cpp; sourceTree = "<group>"; };
+		4D1031851DECB83E0098EA1C /* atts_externalsymbols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_externalsymbols.h; path = libmei/atts_externalsymbols.h; sourceTree = "<group>"; };
 		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = src/midi/Binasc.cpp; sourceTree = "<group>"; };
 		4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEvent.cpp; path = src/midi/MidiEvent.cpp; sourceTree = "<group>"; };
 		4D1BE7681C688F5A0086DC0E /* MidiEventList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEventList.cpp; path = src/midi/MidiEventList.cpp; sourceTree = "<group>"; };
@@ -644,6 +649,8 @@
 				4DEE28F41940BCC100C76319 /* atts_critapp.h */,
 				4DEE28F51940BCC100C76319 /* atts_edittrans.cpp */,
 				4DEE28F61940BCC100C76319 /* atts_edittrans.h */,
+				4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */,
+				4D1031851DECB83E0098EA1C /* atts_externalsymbols.h */,
 				4DEE28F71940BCC100C76319 /* atts_facsimile.cpp */,
 				4DEE28F81940BCC100C76319 /* atts_facsimile.h */,
 				4DEE28F91940BCC100C76319 /* atts_figtable.cpp */,
@@ -942,6 +949,7 @@
 				4D1BE77F1C69434C0086DC0E /* Binasc.h in Headers */,
 				4D9C53131B52E4AE0003C6EC /* unchecked.h in Headers */,
 				4DF28A031A754DE400BA9F7D /* controlelement.h in Headers */,
+				4D1031881DECB83E0098EA1C /* atts_externalsymbols.h in Headers */,
 				8F59294D18854BF800FE51AD /* pitchinterface.h in Headers */,
 				4DF9D2851C18DC490069E8C8 /* atts_mei.h in Headers */,
 				4D1BE7781C6942930086DC0E /* pugiconfig.hpp in Headers */,
@@ -1108,6 +1116,7 @@
 				4DF440771D39575500152B7E /* ending.cpp in Sources */,
 				4DB351141C8040B1002DD057 /* dir.cpp in Sources */,
 				8F086EF8188539540037FD8E /* note.cpp in Sources */,
+				4D1031861DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */,
 				8F086EF9188539540037FD8E /* object.cpp in Sources */,
 				8F086EFA188539540037FD8E /* page.cpp in Sources */,
 				8F086EFB188539540037FD8E /* pitchinterface.cpp in Sources */,
@@ -1177,6 +1186,7 @@
 				8F3DD36818854B410051330C /* doc.cpp in Sources */,
 				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
 				8F3DD36C18854B410051330C /* object.cpp in Sources */,
+				4D1031871DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */,
 				8F3DD36E18854B410051330C /* vrv.cpp in Sources */,
 				8F3DD35E18854B390051330C /* view.cpp in Sources */,
 				4DDBBB5E1C7AE45900054AFF /* hairpin.cpp in Sources */,

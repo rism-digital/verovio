@@ -392,7 +392,11 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     attributes->clear();
 
     Att::GetCmn(this, attributes);
+    Att::GetCritapp(this, attributes);
+    Att::GetExternalsymbols(this, attributes);
+    Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
+    Att::GetMidi(this, attributes);
     Att::GetPagebased(this, attributes);
     Att::GetShared(this, attributes);
 
