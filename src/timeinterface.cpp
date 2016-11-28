@@ -121,9 +121,13 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
     if (this->HasStaff()) {
         staffList = this->GetStaff();
     }
-    else if (m_start) {
+    else if (m_start && (m_start->Is() != TIMESTAMP_ATTR)) {
         Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstParent(STAFF));
         if (staff) staffList.push_back(staff->GetN());
+    }
+    else if (measure->GetChildCount(STAFF) == 1) {
+        // If we have no @staff or startid but only one staff child assume it is the first one (@n1 is assumed)
+        staffList.push_back(1);
     }
     for (iter = staffList.begin(); iter != staffList.end(); iter++) {
         AttCommonNComparison comparison(STAFF, *iter);

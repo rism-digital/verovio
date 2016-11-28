@@ -3584,7 +3584,7 @@ AttMeasureLog::~AttMeasureLog()
 void AttMeasureLog::ResetMeasureLog()
 {
     m_left = BARRENDITION_NONE;
-    m_right = BARRENDITION_single;
+    m_right = BARRENDITION_NONE;
 }
 
 bool AttMeasureLog::ReadMeasureLog(pugi::xml_node element)
@@ -3624,7 +3624,7 @@ bool AttMeasureLog::HasLeft() const
 
 bool AttMeasureLog::HasRight() const
 {
-    return (m_right != BARRENDITION_single);
+    return (m_right != BARRENDITION_NONE);
 }
 
 /* include <attright> */
