@@ -1145,14 +1145,14 @@
             <description>Holds and pauses</description>
             <glyph glyph-code="E4C0" smufl-name="fermataAbove"/>
             <glyph glyph-code="E4C1" smufl-name="fermataBelow"/>
-            <glyph glyph-code="E4C2" smufl-name="fermataVeryShortAbove"/>
-            <glyph glyph-code="E4C3" smufl-name="fermataVeryShortBelow"/>
+            <!--<glyph glyph-code="E4C2" smufl-name="fermataVeryShortAbove"/>-->
+            <!--<glyph glyph-code="E4C3" smufl-name="fermataVeryShortBelow"/>-->
             <glyph glyph-code="E4C4" smufl-name="fermataShortAbove"/>
             <glyph glyph-code="E4C5" smufl-name="fermataShortBelow"/>
             <glyph glyph-code="E4C6" smufl-name="fermataLongAbove"/>
             <glyph glyph-code="E4C7" smufl-name="fermataLongBelow"/>
-            <glyph glyph-code="E4C8" smufl-name="fermataVeryLongAbove"/>
-            <glyph glyph-code="E4C9" smufl-name="fermataVeryLongBelow"/>
+            <!--<glyph glyph-code="E4C8" smufl-name="fermataVeryLongAbove"/>-->
+            <!--<glyph glyph-code="E4C9" smufl-name="fermataVeryLongBelow"/>-->
             <!--<glyph glyph-code="E4CA" smufl-name="fermataLongHenzeAbove"/>-->
             <!--<glyph glyph-code="E4CB" smufl-name="fermataLongHenzeBelow"/>-->
             <!--<glyph glyph-code="E4CC" smufl-name="fermataShortHenzeAbove"/>-->
