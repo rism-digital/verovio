@@ -434,7 +434,7 @@ int main(int argc, char **argv)
             cerr << "Midi cannot write to standard output." << endl;
             exit(1);
         }
-        else if (!toolkit.RenderToMidiFile(outfile)) {
+        else if (!toolkit.SaveMidiFile(outfile)) {
             cerr << "Unable to write MIDI to " << outfile << "." << endl;
             exit(1);
         }
@@ -450,7 +450,7 @@ int main(int argc, char **argv)
                 cerr << "MEI output of all pages to standard output is not possible." << endl;
                 exit(1);
             }
-            else if (!toolkit.SaveFile(outfile)) {
+            else if (!toolkit.SaveMeiFile(outfile)) {
                 cerr << "Unable to write MEI to " << outfile << "." << endl;
                 exit(1);
             }

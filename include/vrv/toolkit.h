@@ -62,7 +62,7 @@ public:
     /**
      * Save an MEI file.
      */
-    bool SaveFile(const std::string &filename);
+    bool SaveMeiFile(const std::string &filename);
 
     /**
      * Parse the options passed as JSON string.
@@ -111,7 +111,7 @@ public:
      * Creates a midi file, opens it, and writes to it.
      * currently generates a dummy midi file.
      */
-    bool RenderToMidiFile(const std::string &filename);
+    bool SaveMidiFile(const std::string &filename);
 
     /**
      * Creates a midi file, opens it, and returns it (base64 encoded).

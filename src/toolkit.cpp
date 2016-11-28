@@ -17,6 +17,7 @@
 #include "iodarms.h"
 #include "iohumdrum.h"
 #include "iomei.h"
+#include "iomidi.h"
 #include "iomusxml.h"
 #include "iopae.h"
 #include "layer.h"
@@ -29,8 +30,6 @@
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
-
-#include "MidiFile.h"
 
 namespace vrv {
 
@@ -485,7 +484,7 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
     return meioutput.GetOutput(pageNo);
 }
 
-bool Toolkit::SaveFile(const std::string &filename)
+bool Toolkit::SaveMeiFile(const std::string &filename)
 {
     MeiOutput meioutput(&m_doc, filename.c_str());
     meioutput.SetScoreBasedMEI(m_scoreBasedMei);
@@ -761,10 +760,10 @@ std::string Toolkit::RenderToMidi()
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
 
-    stringstream strstrem;
-    outputfile.write(strstrem);
+    stringstream strstream;
+    outputfile.write(strstream);
     std::string outputstr = Base64Encode(
-        reinterpret_cast<const unsigned char *>(strstrem.str().c_str()), (unsigned int)strstrem.str().length());
+        reinterpret_cast<const unsigned char *>(strstream.str().c_str()), (unsigned int)strstream.str().length());
 
     return outputstr;
 }
@@ -804,7 +803,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 #endif
 }
 
-bool Toolkit::RenderToMidiFile(const std::string &filename)
+bool Toolkit::SaveMidiFile(const std::string &filename)
 {
     MidiFile outputfile;
     outputfile.absoluteTicks();
