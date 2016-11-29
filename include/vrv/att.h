@@ -98,12 +98,14 @@ public:
     ///@{
     std::string DblToStr(double data) const;
     std::string IntToStr(int data) const;
+    std::string WcharTToStr(wchar_t data) const;
     ///@}
 
     /** @name Basic converters for reading */
     ///@{
     double StrToDbl(std::string value) const;
     int StrToInt(std::string value) const;
+    wchar_t StrToWcharT(std::string value) const;
     ///@}
 
     /** @name Converters for writing and reading */

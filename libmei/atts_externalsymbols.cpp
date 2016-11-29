@@ -42,7 +42,7 @@ AttExtsym::~AttExtsym()
 void AttExtsym::ResetExtsym()
 {
     m_glyphname = "";
-    m_glyphnum = "";
+    m_glyphnum = 0;
 }
 
 bool AttExtsym::ReadExtsym(pugi::xml_node element)
@@ -54,7 +54,7 @@ bool AttExtsym::ReadExtsym(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("glyphnum")) {
-        this->SetGlyphnum(StrToStr(element.attribute("glyphnum").value()));
+        this->SetGlyphnum(StrToWcharT(element.attribute("glyphnum").value()));
         element.remove_attribute("glyphnum");
         hasAttribute = true;
     }
@@ -69,7 +69,7 @@ bool AttExtsym::WriteExtsym(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasGlyphnum()) {
-        element.append_attribute("glyphnum") = StrToStr(this->GetGlyphnum()).c_str();
+        element.append_attribute("glyphnum") = WcharTToStr(this->GetGlyphnum()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -82,7 +82,7 @@ bool AttExtsym::HasGlyphname() const
 
 bool AttExtsym::HasGlyphnum() const
 {
-    return (m_glyphnum != "");
+    return (m_glyphnum != 0);
 }
 
 /* include <attglyphnum> */
@@ -97,7 +97,7 @@ bool Att::SetExternalsymbols(Object *element, std::string attrType, std::string 
             return true;
         }
         if (attrType == "glyphnum") {
-            att->SetGlyphnum(att->StrToStr(attrValue));
+            att->SetGlyphnum(att->StrToWcharT(attrValue));
             return true;
         }
     }
@@ -114,7 +114,7 @@ void Att::GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("glyphname", att->StrToStr(att->GetGlyphname())));
         }
         if (att->HasGlyphnum()) {
-            attributes->push_back(std::make_pair("glyphnum", att->StrToStr(att->GetGlyphnum())));
+            attributes->push_back(std::make_pair("glyphnum", att->WcharTToStr(att->GetGlyphnum())));
         }
     }
 }

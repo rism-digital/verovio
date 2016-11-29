@@ -53,8 +53,8 @@ public:
     std::string GetGlyphname() const { return m_glyphname; }
     bool HasGlyphname() const;
     //
-    void SetGlyphnum(std::string glyphnum_) { m_glyphnum = glyphnum_; }
-    std::string GetGlyphnum() const { return m_glyphnum; }
+    void SetGlyphnum(wchar_t glyphnum_) { m_glyphnum = glyphnum_; }
+    wchar_t GetGlyphnum() const { return m_glyphnum; }
     bool HasGlyphnum() const;
     ///@}
 
@@ -65,7 +65,7 @@ private:
      * Numeric glyph reference in hexadecimal notation, e.g.
      * "#xE000" or "U+E000". N.B. SMuFL version 1.18 uses the range U+E000 - U+ECBF.
      **/
-    std::string m_glyphnum;
+    wchar_t m_glyphnum;
 
     /* include <attglyphnum> */
 };
