@@ -805,11 +805,11 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 
 bool Toolkit::SaveMidiFile(const std::string &filename)
 {
-    MidiFile outputfile;
-    outputfile.absoluteTicks();
-    m_doc.ExportMIDI(&outputfile);
-    outputfile.sortTracks();
-    outputfile.write(filename);
+    MidiFile midioutput;
+    midioutput.absoluteTicks();
+    m_doc.ExportMIDI(&midioutput);
+    midioutput.sortTracks();
+    midioutput.write(filename);
 
     return true;
 }
