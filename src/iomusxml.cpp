@@ -633,6 +633,17 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                         staffDef->AttMeterSigDefaultLog::StrToInt(beatType.node().text().as_string()));
                 }
             }
+            // transpose
+            pugi::xpath_node transpose;
+            xpath = StringFormat("transpose[@number='%d']", i + 1);
+            transpose = it->select_single_node(xpath.c_str());
+            if (!transpose) {
+                transpose = it->select_single_node("transpose");
+            }
+            if (transpose) {
+                staffDef->SetTransDiat(atof(GetContentOfChild(transpose.node(), "diatonic").c_str()));
+                staffDef->SetTransSemi(atof(GetContentOfChild(transpose.node(), "chromatic").c_str()));
+            }
             // ppq
             pugi::xpath_node divisions = it->select_single_node("divisions");
             if (divisions) m_ppq = atoi(GetContent(divisions.node()).c_str());
@@ -917,6 +928,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 
     LayerElement *element = NULL;
 
+    std::string noteColor = GetAttributeValue(node, "color");
+
     pugi::xpath_node notations = node.select_single_node("notations");
 
     // duration string and dots
@@ -1002,7 +1015,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     if (rest) {
         std::string stepStr = GetContentOfChild(rest.node(), "display-step");
         std::string octaveStr = GetContentOfChild(rest.node(), "display-octave");
-        if (GetAttributeValue(node, "print-object") == "no") {
+        if (HasAttributeWithValue(node, "print-object", "no")) {
             Space *space = new Space();
             element = space;
             space->SetDur(ConvertTypeToDur(typeStr));
@@ -1030,7 +1043,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     else {
         Note *note = new Note();
         element = note;
-        if (GetAttributeValue(node, "print-object") == "no") note->SetVisible(BOOLEAN_false);
+        if (HasAttributeWithValue(node, "print-object", "no")) note->SetVisible(BOOLEAN_false);
+        if (!noteColor.empty()) note->SetColor(noteColor.c_str());
 
         // accidental
         pugi::xpath_node accidental = node.select_single_node("accidental");
@@ -1187,7 +1201,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             artic->SetArtic(artics);
             element->AddChild(artic);
         }
-
+        
         // add the note to the layer or to the current container
         AddLayerElement(layer, note);
 
