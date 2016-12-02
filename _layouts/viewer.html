@@ -31,7 +31,7 @@
     <!-- verovio -->
     {% if page.verovio-light %}
     <script src="{{ site.baseurl }}/javascript/develop/verovio-toolkit-light.js" type="text/javascript"></script>
-    {% else page.verovio-wasm %}
+    {% elsif page.verovio-wasm %}
     <!-- verovio is preloaded in the page -->
     {% else %}
     <script src="{{ site.baseurl }}/javascript/develop/verovio-toolkit.js" type="text/javascript"></script>
