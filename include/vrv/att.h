@@ -49,6 +49,7 @@ public:
     // static bool SetCmnornaments(Object *element, std::string attrType, std::string attrValue);
     static bool SetCritapp(Object *element, std::string attrType, std::string attrValue);
     // static bool SetEdittrans(Object *element, std::string attrType, std::string attrValue);
+    static bool SetExternalsymbols(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
     // static bool SetHarmony(Object *element, std::string attrType, std::string attrValue);
@@ -72,6 +73,7 @@ public:
     // static void GetCmnornaments(Object *element, ArrayOfStrAttr *attributes);
     static void GetCritapp(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetEdittrans(Object *element, ArrayOfStrAttr *attributes);
+    static void GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFacsimile(Object *element, ArrayOfStrAttr *attributes);
     // static void GetFigtable(Object *element, ArrayOfStrAttr *attributes);
     // static void GetHarmony(Object *element, ArrayOfStrAttr *attributes);
@@ -96,12 +98,14 @@ public:
     ///@{
     std::string DblToStr(double data) const;
     std::string IntToStr(int data) const;
+    std::string WcharTToStr(wchar_t data) const;
     ///@}
 
     /** @name Basic converters for reading */
     ///@{
     double StrToDbl(std::string value) const;
     int StrToInt(std::string value) const;
+    wchar_t StrToWcharT(std::string value) const;
     ///@}
 
     /** @name Converters for writing and reading */

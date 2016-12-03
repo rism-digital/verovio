@@ -25,6 +25,7 @@ class Doc;
 class Dynam;
 class EditorialElement;
 class Ending;
+class Fermata;
 class Hairpin;
 class Harm;
 class Layer;
@@ -314,6 +315,7 @@ protected:
     void DrawTimeSpanningElement(DeviceContext *dc, Object *object, System *system);
     void DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system);
     void DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *system);
+    void DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, System *system);
     void DrawHairpin(
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system);

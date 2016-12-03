@@ -9,9 +9,8 @@
 
 //----------------------------------------------------------------------------
 
-#include <iostream>
-
 #include <assert.h>
+#include <iostream>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -264,27 +263,24 @@ int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
 
 void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert)
 {
-    // here we transfer the @left and @right values to the barLine objects
+    // First set the right barline. If none then set a single one.
+    data_BARRENDITION rightBarline = (this->HasRight()) ? this->GetRight() : BARRENDITION_single;
+    this->SetDrawingRightBarLine(rightBarline);
+
+    // Now adjust the right barline of the previous measure (if any) and the left one
     if (!previous) {
         this->SetDrawingLeftBarLine(this->GetLeft());
-        this->SetDrawingRightBarLine(this->GetRight());
-        return;
     }
-    if (systemBreak) {
-        // we have rptboth on one of the two sides, split them
+    else if (systemBreak) {
+        // we have rptboth on one of the two sides, split them (ignore any other value)
         if ((previous->GetRight() == BARRENDITION_rptboth) || (this->GetLeft() == BARRENDITION_rptboth)) {
             previous->SetDrawingRightBarLine(BARRENDITION_rptend);
             this->SetDrawingLeftBarLine(BARRENDITION_rptstart);
         }
-        // we have a rptstart, make sure the previous measure get a right rptend
-        else if ((previous->GetRight() == BARRENDITION_NONE) && (this->GetLeft() == BARRENDITION_rptstart)) {
-            previous->SetDrawingRightBarLine(BARRENDITION_rptend);
-            this->SetDrawingLeftBarLine(BARRENDITION_rptstart);
-        }
+        // nothing to do with any other value?
         else {
             this->SetDrawingLeftBarLine(this->GetLeft());
         }
-        this->SetDrawingRightBarLine(this->GetRight());
     }
     else if (!scoreDefInsert) {
         // we have rptboth split in the two measures, make them one rptboth
@@ -292,25 +288,30 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
             previous->SetDrawingRightBarLine(BARRENDITION_rptboth);
             this->SetDrawingLeftBarLine(BARRENDITION_NONE);
         }
-        // we have an rptend before, make sure there in none on the left
+        // we have an rptend before, make sure there in none on the left (ignore any other value)
         else if (previous->GetRight() == BARRENDITION_rptend) {
             this->SetDrawingLeftBarLine(BARRENDITION_NONE);
         }
-        // we have an rptstart coming, make sure there is none on the right before
+        // we have an rptstart coming, make sure there is none on the right before (ignore any other value)
         else if (this->GetLeft() == BARRENDITION_rptstart) {
             // always set the right barline to invis for spacing
             previous->SetDrawingRightBarLine(BARRENDITION_invis);
             this->SetDrawingLeftBarLine(BARRENDITION_rptstart);
         }
+        // we have an rptboth coming, make sure there is none on the right before (ignore any other value)
+        else if (this->GetLeft() == BARRENDITION_rptboth) {
+            // always set the right barline to invis for spacing
+            previous->SetDrawingRightBarLine(BARRENDITION_invis);
+            this->SetDrawingLeftBarLine(BARRENDITION_rptboth);
+        }
+        // nothing we can do with any other value?
         else {
             this->SetDrawingLeftBarLine(this->GetLeft());
         }
-        this->SetDrawingRightBarLine(this->GetRight());
     }
     else {
         // with a scoredef inbetween always set it to what we have in the encoding
         this->SetDrawingLeftBarLine(this->GetLeft());
-        this->SetDrawingRightBarLine(this->GetRight());
     }
 }
 
