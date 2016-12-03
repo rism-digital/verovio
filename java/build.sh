@@ -22,6 +22,7 @@ FILES="$SRCFILES \
  ../libmei/attconverter.cpp \
  ../libmei/atts_cmn.cpp \
  ../libmei/atts_critapp.cpp \
+ ../libmei/atts_externalsymbols.cpp \
  ../libmei/atts_mei.cpp \
  ../libmei/atts_mensural.cpp \
  ../libmei/atts_midi.cpp \

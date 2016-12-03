@@ -930,7 +930,10 @@ bool Toolkit::Set(std::string elementId, std::string attrType, std::string attrV
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
     if (Att::SetCmn(element, attrType, attrValue)) return true;
     if (Att::SetCritapp(element, attrType, attrValue)) return true;
+    if (Att::SetExternalsymbols(element, attrType, attrValue)) return true;
+    if (Att::SetMei(element, attrType, attrValue)) return true;
     if (Att::SetMensural(element, attrType, attrValue)) return true;
+    if (Att::SetMidi(element, attrType, attrValue)) return true;
     if (Att::SetPagebased(element, attrType, attrValue)) return true;
     if (Att::SetShared(element, attrType, attrValue)) return true;
     return false;
