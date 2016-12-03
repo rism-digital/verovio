@@ -74,8 +74,8 @@ void Page::LayOut(bool force)
     }
 
     this->LayOutHorizontally();
-    this->LayOutVertically();
     this->JustifyHorizontally();
+    this->LayOutVertically();
 
     m_layoutDone = true;
 }
@@ -192,6 +192,11 @@ void Page::LayOutVertically()
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
+
+    // Adjust the position of outside articulations
+    AdjustArticulationsParams adjustArticulationsParams(doc);
+    Functor adjustArticulations(&Object::AdjustArticulations);
+    this->Process(&adjustArticulations, &adjustArticulationsParams);
 
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     SetOverflowBBoxesParams setOverflowBBoxesParams(doc);

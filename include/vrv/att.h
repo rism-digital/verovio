@@ -49,6 +49,7 @@ public:
     // static bool SetCmnornaments(Object *element, std::string attrType, std::string attrValue);
     static bool SetCritapp(Object *element, std::string attrType, std::string attrValue);
     // static bool SetEdittrans(Object *element, std::string attrType, std::string attrValue);
+    static bool SetExternalsymbols(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
     // static bool SetHarmony(Object *element, std::string attrType, std::string attrValue);
@@ -72,6 +73,7 @@ public:
     // static void GetCmnornaments(Object *element, ArrayOfStrAttr *attributes);
     static void GetCritapp(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetEdittrans(Object *element, ArrayOfStrAttr *attributes);
+    static void GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes);
     // static void GetFacsimile(Object *element, ArrayOfStrAttr *attributes);
     // static void GetFigtable(Object *element, ArrayOfStrAttr *attributes);
     // static void GetHarmony(Object *element, ArrayOfStrAttr *attributes);
@@ -96,16 +98,21 @@ public:
     ///@{
     std::string DblToStr(double data) const;
     std::string IntToStr(int data) const;
+    std::string WcharTToStr(wchar_t data) const;
     ///@}
 
     /** @name Basic converters for reading */
     ///@{
     double StrToDbl(std::string value) const;
     int StrToInt(std::string value) const;
+    wchar_t StrToWcharT(std::string value) const;
     ///@}
 
     /** @name Converters for writing and reading */
     ///@{
+    std::string ArticulationListToStr(data_ARTICULATION_List data) const;
+    data_ARTICULATION_List StrToArticulationList(std::string value) const;
+
     std::string BeatrptRendToStr(data_BEATRPT_REND data) const;
     data_BEATRPT_REND StrToBeatrptRend(std::string value) const;
 
@@ -160,8 +167,8 @@ public:
     std::string TieToStr(data_TIE data) const;
     data_TIE StrToTie(std::string value) const;
 
-    std::string XsdPosintlistToStr(xsd_posIntList data) const;
-    xsd_posIntList StrToXsdPosintlist(std::string value) const;
+    std::string XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const;
+    xsdPositiveInteger_List StrToXsdPositiveIntegerList(std::string value) const;
     ///@}
 };
 

@@ -1167,6 +1167,13 @@ void PaeInput::parseNote(pae::Note *note)
         mnote->SetDots(note->dots);
         mnote->SetDur(note->duration);
 
+        // pseudo chant notation with 7. in PAE - make them quater notes without stem
+        if ((mnote->GetDur() == DURATION_128) && (mnote->GetDots() == 1)) {
+            mnote->SetDur(DURATION_4);
+            mnote->SetDots(0);
+            mnote->SetStemLen(0);
+        }
+
         if (note->fermata) {
             mnote->SetFermata(PLACE_above); // always above for now
         }

@@ -55,9 +55,19 @@ void TimePointInterface::SetStart(LayerElement *start)
     m_start = start;
 }
 
+bool TimePointInterface::SetStartOnly(LayerElement *element)
+{
+    // LogDebug("%s - %s - %s", element->GetUuid().c_str(), m_startUuid.c_str(), m_endUuid.c_str() );
+    if (!m_start && !m_startUuid.empty() && (element->GetUuid() == m_startUuid)) {
+        this->SetStart(element);
+        return true;
+    }
+    return false;
+}
+
 void TimePointInterface::AddStaff(int n)
 {
-    xsd_posIntList staves = this->GetStaff();
+    xsdPositiveInteger_List staves = this->GetStaff();
     if (std::find(staves.begin(), staves.end(), n) == staves.end()) {
         staves.push_back(n);
         this->SetStaff(staves);
@@ -111,9 +121,13 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
     if (this->HasStaff()) {
         staffList = this->GetStaff();
     }
-    else if (m_start) {
+    else if (m_start && (m_start->Is() != TIMESTAMP_ATTR)) {
         Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstParent(STAFF));
         if (staff) staffList.push_back(staff->GetN());
+    }
+    else if (measure->GetChildCount(STAFF) == 1) {
+        // If we have no @staff or startid but only one staff child assume it is the first one (@n1 is assumed)
+        staffList.push_back(1);
     }
     for (iter = staffList.begin(); iter != staffList.end(); iter++) {
         AttCommonNComparison comparison(STAFF, *iter);
@@ -225,10 +239,25 @@ int TimePointInterface::InterfaceResetDrawing(FunctorParams *functorParams, Obje
     return FUNCTOR_CONTINUE;
 }
 
+int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParams, Object *object)
+{
+    PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
+    assert(params);
+
+    if (!this->HasStartid()) return FUNCTOR_CONTINUE;
+
+    this->SetUuidStr();
+    params->m_timePointingInterfaces.push_back(std::make_pair(this, object->Is()));
+
+    return FUNCTOR_CONTINUE;
+}
+
 int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorParams, Object *object)
 {
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
+
+    if (!this->HasStartid() && !this->HasEndid()) return FUNCTOR_CONTINUE;
 
     if (params->m_fillList == false) {
         return FUNCTOR_CONTINUE;
