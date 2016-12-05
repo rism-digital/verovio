@@ -149,7 +149,7 @@ void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
 {
     int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
 
-    dc->SetPen(m_currentColour, 1, AxSOLID);
+    dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(y), r);
