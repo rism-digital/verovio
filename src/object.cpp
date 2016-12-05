@@ -482,7 +482,7 @@ void Object::ClearRelinquishedChildren()
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end();) {
         if ((*iter)->m_parent != this) {
-            m_children.erase(iter);
+            iter = m_children.erase(iter);
         }
         else
             iter++;
