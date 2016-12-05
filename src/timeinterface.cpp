@@ -257,7 +257,9 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorPa
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
-    if (!this->HasStartid() && !this->HasEndid()) return FUNCTOR_CONTINUE;
+    if (!this->HasStartid() && !this->HasEndid()) {
+        return FUNCTOR_CONTINUE;
+    }
 
     if (params->m_fillList == false) {
         return FUNCTOR_CONTINUE;
@@ -279,6 +281,9 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
         if (this->HasTstamp2())
             LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
                 object->GetClassName().c_str(), object->GetUuid().c_str());
+        if (this->GetStartid() == this->GetEndid()) {
+            LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid", object->GetClassName().c_str(), object->GetUuid().c_str());
+        }
         return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
     }
     else if (!HasTstamp2()) {
