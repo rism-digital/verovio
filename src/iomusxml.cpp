@@ -825,14 +825,12 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
         int hairpinNumber = atoi(GetAttributeValue(wedge.node(), "number").c_str());
         hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
         if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
-            if (!m_hairpinStack.empty()) {
-                std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
-                for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); iter++) {
-                    if (iter->second.m_dirN == hairpinNumber) {
-                        iter->first->SetEndid(iter->second.m_ID);
-                        m_hairpinStack.erase(iter);
-                        return;
-                    }
+            std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
+            for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); iter++) {
+                if (iter->second.m_dirN == hairpinNumber) {
+                    iter->first->SetEndid(iter->second.m_ID);
+                    m_hairpinStack.erase(iter);
+                    return;
                 }
             }
         }
@@ -1316,7 +1314,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         }
         m_tempoStack.clear();
     }
-    // add StartID and EndID to hairpins
+    // add StartID to hairpins
     if (!m_hairpinStack.empty()) {
         std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
         for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); iter++) {
