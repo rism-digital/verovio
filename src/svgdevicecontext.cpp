@@ -430,9 +430,11 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
         int(ye)).c_str();
     // pathChild.append_attribute("fill") = "#000000";
     if (currentBrush.GetOpacity() != 1.0) pathChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
-    // pathChild.append_attribute("stroke") = "#000000";
     if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
-    if (currentPen.GetWidth() > 1) pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    if (currentPen.GetWidth() > 0) {
+        pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
+        pathChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+    }
 }
 
 void SvgDeviceContext::DrawLine(int x1, int y1, int x2, int y2)
