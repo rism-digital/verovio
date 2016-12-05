@@ -822,10 +822,23 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     // Hairpins
     pugi::xpath_node wedge = type.node().select_single_node("wedge");
     if (wedge) {
+        int hairpinNumber = atoi(GetAttributeValue(wedge.node(), "number").c_str());
+        hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
         if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
+            if (!m_hairpinStack.empty()) {
+                std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
+                for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); iter++) {
+                    if (iter->second.m_dirN == hairpinNumber) {
+                        iter->first->SetEndid(iter->second.m_ID);
+                        m_hairpinStack.erase(iter);
+                        return;
+                    }
+                }
+            }
         }
         else {
             Hairpin *hairpin = new Hairpin();
+            musicxml::OpenHairpin openHairpin(hairpinNumber, "");
             if (HasAttributeWithValue(wedge.node(), "type", "crescendo")) {
                 hairpin->SetForm(hairpinLog_FORM_cres);
             }
@@ -835,8 +848,8 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             std::string colorStr = GetAttributeValue(wedge.node(), "color");
             if (!colorStr.empty()) hairpin->SetColor(colorStr.c_str());
             if (!placeStr.empty()) hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
-            // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, hairpin));
+            m_hairpinStack.push_back(std::make_pair(hairpin, openHairpin));
         }
     }
 
@@ -1302,6 +1315,16 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             (*iter)->SetStartid("#" + element->GetUuid());
         }
         m_tempoStack.clear();
+    }
+    // add StartID and EndID to hairpins
+    if (!m_hairpinStack.empty()) {
+        std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
+        for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); iter++) {
+            if(!iter->first->HasStartid()) {
+                iter->first->SetStartid("#" + element->GetUuid());
+            }
+            iter->second.m_ID = "#" + element->GetUuid();
+        }
     }
 }
 
