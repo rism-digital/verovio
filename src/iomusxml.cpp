@@ -1214,7 +1214,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             artic->SetArtic(artics);
             element->AddChild(artic);
         }
-        
+
         // add the note to the layer or to the current container
         AddLayerElement(layer, note);
 
@@ -1320,7 +1320,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     if (!m_hairpinStack.empty()) {
         std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
         for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); iter++) {
-            if(!iter->first->HasStartid()) {
+            if (!iter->first->HasStartid()) {
                 iter->first->SetStartid("#" + element->GetUuid());
             }
             iter->second.m_ID = "#" + element->GetUuid();
