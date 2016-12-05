@@ -793,7 +793,9 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
     ListOfObjects::iterator it = m_list.begin();
-    std::advance(it, GetListIndex(startFrom));
+	int idx = GetListIndex(startFrom);
+	if (idx == -1) return NULL;
+    std::advance(it, idx);
     it = std::find_if(it, m_list.end(), ObjectComparison(classId));
     return (it == m_list.end()) ? NULL : *it;
 }
@@ -801,7 +803,9 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
 Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
 {
     ListOfObjects::iterator it = m_list.begin();
-    std::advance(it, GetListIndex(startFrom));
+	int idx = GetListIndex(startFrom);
+	if (idx == -1) return NULL;
+    std::advance(it, idx);
     ListOfObjects::reverse_iterator rit(it);
     rit = std::find_if(rit, m_list.rend(), ObjectComparison(classId));
     return (rit == m_list.rend()) ? NULL : *rit;
