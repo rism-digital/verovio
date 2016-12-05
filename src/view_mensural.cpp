@@ -86,10 +86,8 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     else {
         if (drawingDur < DUR_1)
             note->SetDrawingStemDir(STEMDIRECTION_down);
-        else if (drawingDur == DUR_2)
+        else if (drawingDur >= DUR_2)
             note->SetDrawingStemDir(STEMDIRECTION_up);
-        else
-            note->SetDrawingStemDir((noteY >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up);
     }
 
     xNote = xStem - radius;
@@ -245,8 +243,8 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->EndGraphic(element, this);
 }
 
-void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius,
-    int xn, int originY, int heightY)
+void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir,
+                            int radius, int xn, int originY, int heightY)
 {
     assert(object->GetDurationInterface());
 
@@ -275,8 +273,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
         heightY = -heightY;
     }
 
-    // If we have flags, add them to the height. If duration is longa or maxima and (probably
-    // a redundant test) note is mensural, move stem to the right side of the notehead.
+    // If we have flags, add them to the height.
     int y1 = originY;
     int y2 = ((drawingDur > DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
     int x2;
@@ -308,25 +305,28 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     int halfStemWidth = m_doc->GetDrawingStemWidth(staffSize) / 2;
     // draw the stems and the flags
     if (dir == STEMDIRECTION_up) {
-        DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
 
         if (drawingDur > DUR_4) {
-            DrawSmuflCode(dc, x2 - halfStemWidth, y2, SMUFL_E240_flag8thUp, staff->m_drawingStaffSize, drawingCueSize);
+            DrawSmuflCode(dc, x2 - halfStemWidth, stemY1, SMUFL_E949_mensuralCombStemUpFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
             for (int i = 0; i < nbFlags; i++)
-                DrawSmuflCode(dc, x2 - halfStemWidth, y2 - (i + 1) * flagStemHeight, SMUFL_E240_flag8thUp,
+                DrawSmuflCode(dc, x2 - halfStemWidth, y2 - (i + 1) * flagStemHeight,
+                    SMUFL_E949_mensuralCombStemUpFlagSemiminima,
                     staff->m_drawingStaffSize, drawingCueSize);
         }
+        else
+            DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
     }
     else {
-        DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
-
         if (drawingDur > DUR_4) {
             DrawSmuflCode(
-                dc, x2 - halfStemWidth, y2, SMUFL_E241_flag8thDown, staff->m_drawingStaffSize, drawingCueSize);
+                dc, x2 - halfStemWidth, stemY1, SMUFL_E94A_mensuralCombStemDownFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
             for (int i = 0; i < nbFlags; i++)
-                DrawSmuflCode(dc, x2 - halfStemWidth, y2 + (i + 1) * flagStemHeight, SMUFL_E241_flag8thDown,
+                DrawSmuflCode(dc, x2 - halfStemWidth, y2 + (i + 1) * flagStemHeight, SMUFL_E94A_mensuralCombStemDownFlagSemiminima,
                     staff->m_drawingStaffSize, drawingCueSize);
         }
+        else
+            DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
+
     }
 
     // Store the start and end values
@@ -352,9 +352,7 @@ void View::DrawMensurCircle(DeviceContext *dc, int x, int yy, Staff *staff)
     r = (int)(MSIGN_CIRCLE_DIAM / 2.0 * r);
 
     int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
-    lineWidth = lineWidth * 1.0;
     dc->SetPen(m_currentColour, lineWidth, AxSOLID);
-    dc->SetPen(m_currentColour, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize), AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
 
     dc->DrawCircle(ToDeviceContextX(x), y, r);
@@ -368,7 +366,8 @@ void View::DrawMensurHalfCircle(DeviceContext *dc, int x, int yy, Staff *staff)
     assert(dc);
     assert(staff);
 
-    dc->SetPen(m_currentColour, m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize), AxSOLID);
+    int lineWidth = m_doc->GetDrawingStaffLineWidth(staff->m_drawingStaffSize);
+    dc->SetPen(m_currentColour, lineWidth, AxSOLID);
     dc->SetBrush(m_currentColour, AxTRANSPARENT);
 
     /* DrawEllipticArc expects x and y to specify the coordinates of the upper-left corner of the
