@@ -33,32 +33,41 @@ namespace vrv {
 
 class MidiOutput : public FileOutputStream {
 public:
-  /** @name Constructors and destructor */
-  ///@{
-  MidiOutput(Doc *doc, std::string filename);
-  virtual ~MidiOutput();
-  ///@}
+    /** @name Constructors and destructor */
+    ///@{
+    MidiOutput(Doc *doc, std::string filename);
+    virtual ~MidiOutput();
+    ///@}
 
-  /**
-   * The main method for exporting the file to MEI.
-   */
-  virtual bool ExportFile();
+    /**
+     * The main method for exporting the file to MEI.
+     */
+    virtual bool ExportFile();
 
-  /**
-   * Export the document to a MIDI file.
-   * Run trough all the layer and fill the midi file content.
-   */
-  void ExportMIDI(MidiFile *midiFile);
+    /**
+     * Export the document to a MIDI file.
+     * Run trough all the layer and fill the midi file content.
+     */
+    void ExportMIDI(MidiFile *midiFile);
 
-  bool GetMidiExportDone() const;
+    bool GetMidiExportDone() const;
 
 private:
-  /**
-   * A flag to indicate if the MIDI export has been done.
-   * This is necessary for retrieving notes being played at a certain time.
-   */
-  bool m_midiExportDone;
+    /**
+     * A flag to indicate if the MIDI export has been done.
+     * This is necessary for retrieving notes being played at a certain time.
+     */
+    bool m_midiExportDone;
+};
 
+//----------------------------------------------------------------------------
+// MidiInput
+//----------------------------------------------------------------------------
+
+/**
+ * This class is just an empty container
+*/
+class MidiInput : public FileInputStream {
 };
 
 } // namespace vrv
