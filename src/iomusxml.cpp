@@ -633,6 +633,17 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                         staffDef->AttMeterSigDefaultLog::StrToInt(beatType.node().text().as_string()));
                 }
             }
+            // transpose
+            pugi::xpath_node transpose;
+            xpath = StringFormat("transpose[@number='%d']", i + 1);
+            transpose = it->select_single_node(xpath.c_str());
+            if (!transpose) {
+                transpose = it->select_single_node("transpose");
+            }
+            if (transpose) {
+                staffDef->SetTransDiat(atof(GetContentOfChild(transpose.node(), "diatonic").c_str()));
+                staffDef->SetTransSemi(atof(GetContentOfChild(transpose.node(), "chromatic").c_str()));
+            }
             // ppq
             pugi::xpath_node divisions = it->select_single_node("divisions");
             if (divisions) m_ppq = atoi(GetContent(divisions.node()).c_str());
@@ -811,10 +822,21 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     // Hairpins
     pugi::xpath_node wedge = type.node().select_single_node("wedge");
     if (wedge) {
+        int hairpinNumber = atoi(GetAttributeValue(wedge.node(), "number").c_str());
+        hairpinNumber = (hairpinNumber < 1) ? 1 : hairpinNumber;
         if (HasAttributeWithValue(wedge.node(), "type", "stop")) {
+            std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
+            for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); iter++) {
+                if (iter->second.m_dirN == hairpinNumber) {
+                    iter->first->SetEndid(iter->second.m_ID);
+                    m_hairpinStack.erase(iter);
+                    return;
+                }
+            }
         }
         else {
             Hairpin *hairpin = new Hairpin();
+            musicxml::OpenHairpin openHairpin(hairpinNumber, "");
             if (HasAttributeWithValue(wedge.node(), "type", "crescendo")) {
                 hairpin->SetForm(hairpinLog_FORM_cres);
             }
@@ -824,8 +846,8 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             std::string colorStr = GetAttributeValue(wedge.node(), "color");
             if (!colorStr.empty()) hairpin->SetColor(colorStr.c_str());
             if (!placeStr.empty()) hairpin->SetPlace(hairpin->AttPlacement::StrToStaffrel(placeStr.c_str()));
-            // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, hairpin));
+            m_hairpinStack.push_back(std::make_pair(hairpin, openHairpin));
         }
     }
 
@@ -917,6 +939,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 
     LayerElement *element = NULL;
 
+    std::string noteColor = GetAttributeValue(node, "color");
+
     pugi::xpath_node notations = node.select_single_node("notations");
 
     // duration string and dots
@@ -1002,7 +1026,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     if (rest) {
         std::string stepStr = GetContentOfChild(rest.node(), "display-step");
         std::string octaveStr = GetContentOfChild(rest.node(), "display-octave");
-        if (GetAttributeValue(node, "print-object") == "no") {
+        if (HasAttributeWithValue(node, "print-object", "no")) {
             Space *space = new Space();
             element = space;
             space->SetDur(ConvertTypeToDur(typeStr));
@@ -1030,7 +1054,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     else {
         Note *note = new Note();
         element = note;
-        if (GetAttributeValue(node, "print-object") == "no") note->SetVisible(BOOLEAN_false);
+        if (HasAttributeWithValue(node, "print-object", "no")) note->SetVisible(BOOLEAN_false);
+        if (!noteColor.empty()) note->SetColor(noteColor.c_str());
 
         // accidental
         pugi::xpath_node accidental = node.select_single_node("accidental");
@@ -1289,6 +1314,16 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         }
         m_tempoStack.clear();
     }
+    // add StartID to hairpins
+    if (!m_hairpinStack.empty()) {
+        std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
+        for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); iter++) {
+            if (!iter->first->HasStartid()) {
+                iter->first->SetStartid("#" + element->GetUuid());
+            }
+            iter->second.m_ID = "#" + element->GetUuid();
+        }
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -1325,11 +1360,11 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repe
     if (value == "light-light") return BARRENDITION_dbl;
     if (value == "regular") return BARRENDITION_dbldashed;
     if (value == "regular") return BARRENDITION_dbldotted;
-    if (value == "light-heavy" and !repeat) return BARRENDITION_end;
+    if ((value == "light-heavy") && !repeat) return BARRENDITION_end;
     if (value == "none") return BARRENDITION_invis;
-    if (value == "heavy-light" and repeat) return BARRENDITION_rptstart;
+    if ((value == "heavy-light") && repeat) return BARRENDITION_rptstart;
     // if (value == "") return BARRENDITION_rptboth;
-    if (value == "light-heavy" and repeat) return BARRENDITION_rptend;
+    if ((value == "light-heavy") && repeat) return BARRENDITION_rptend;
     if (value == "regular") return BARRENDITION_single;
     LogWarning("Unsupported bar-style '%s'", value.c_str());
     return BARRENDITION_NONE;
