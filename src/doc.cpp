@@ -161,7 +161,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
-
+    
     // Set tempo
     if (m_scoreDef.HasMidiBpm()) {
         midiFile->addTrack(0);
@@ -179,6 +179,10 @@ void Doc::ExportMIDI(MidiFile *midiFile)
         // Get the transposition (semi-tone) value for the staff
         if (StaffDef *staffDef = this->m_scoreDef.GetStaffDef(staves->first)) {
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
+            // Set time signature
+            if (staffDef->HasMeterCount() && staffDef->HasMeterUnit()) {
+                midiFile->addTimeSignature(0, 0, staffDef->GetMeterCount(), staffDef->GetMeterUnit());
+            }
         }
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {

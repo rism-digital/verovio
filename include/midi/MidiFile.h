@@ -78,11 +78,14 @@ class MidiFile {
 
       // track-related functions:
       MidiEventList& operator[]           (int aTrack);
-      int       getTrackCount             (void);
-      int       getNumTracks              (void);
-      int       size                      (void);
+      const MidiEventList& operator[]     (int aTrack) const;
+      int       getTrackCount             (void) const;
+      int       getNumTracks              (void) const;
+      int       size                      (void) const;
 
       // join/split track functionality:
+      void      markSequence              (void);
+      void      clearSequence             (void);
       void      joinTracks                (void);
       void      splitTracks               (void);
       void      splitTracksByChannel      (void);
@@ -126,8 +129,13 @@ class MidiFile {
       double    getTimeInSeconds          (int tickvalue);
       int       getAbsoluteTickTime       (double starttime);
 
+      double    getTotalTimeInSeconds     (void);
+      int       getTotalTimeInTicks       (void);
+      double    getTotalTimeInQuarters    (void);
+
       // note-analysis functions:
-      int 	linkNotePairs             (void);
+      int       linkNotePairs             (void);
+      int       linkEventPairs            (void);
       void      clearLinks                (void);
 
       // filename functions:
@@ -135,12 +143,9 @@ class MidiFile {
       void      setFilename               (const string& aname);
       const char* getFilename             (void);
 
-
-
       int       addEvent                  (int aTrack, int aTick,
-                                             vector<uchar>& midiData);
+                                           vector<uchar>& midiData);
       int       addEvent                  (MidiEvent& mfevent);
-
 
       // MIDI message adding convenience functions:
       int       addNoteOn                 (int aTrack, int aTick,
@@ -149,6 +154,8 @@ class MidiFile {
                                            int aChannel, int key, int vel);
       int       addNoteOff                (int aTrack, int aTick,
                                            int aChannel, int key);
+      int       addController             (int aTrack, int aTick,
+                                           int aChannel, int num, int value);
       int       addPatchChange            (int aTrack, int aTick,
                                            int aChannel, int patchnum);
       int       addTimbre                 (int aTrack, int aTick,
@@ -169,8 +176,20 @@ class MidiFile {
                                            const string& name);
       int       addLyric                  (int aTrack, int aTick,
                                            const string& text);
+      int       addMarker                 (int aTrack, int aTick,
+                                           const string& text);
+      int       addCue                    (int aTrack, int aTick,
+                                           const string& text);
       int       addTempo                  (int aTrack, int aTick,
                                            double aTempo);
+      int       addTimeSignature          (int aTrack, int aTick,
+                                           int top, int bottom,
+	                                   int clocksPerClick = 24,
+                                           int num32dsPerQuarter = 8);
+      int       addCompoundTimeSignature  (int aTrack, int aTick,
+                                           int top, int bottom,
+	                                   int clocksPerClick = 36,
+                                           int num32dsPerQuarter = 8);
 
       void      erase                     (void);
       void      clear                     (void);
@@ -178,8 +197,6 @@ class MidiFile {
       MidiEvent&  getEvent                (int aTrack, int anIndex);
 
       MidiFile& operator=(MidiFile other);
-
-
 
       // static functions:
       static uchar    readByte                (istream& input);
@@ -214,7 +231,8 @@ class MidiFile {
       int        extractMidiData  (istream& inputfile, vector<uchar>& array,
                                        uchar& runningCommand);
       ulong      readVLValue      (istream& inputfile);
-      ulong      unpackVLV        (uchar a, uchar b, uchar c, uchar d, uchar e);
+      ulong      unpackVLV        (uchar a = 0, uchar b = 0, uchar c = 0,
+                                   uchar d = 0);
       void       writeVLValue     (long aValue, vector<uchar>& data);
       int        makeVLV          (uchar *buffer, int number);
       static int ticksearch       (const void* A, const void* B);
