@@ -803,7 +803,7 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 #endif
 }
 
-bool Toolkit::SaveMidiFile(const std::string &filename)
+bool Toolkit::RenderToMidiFile(const std::string &filename)
 {
     MidiFile midioutput;
     midioutput.absoluteTicks();

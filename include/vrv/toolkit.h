@@ -111,7 +111,7 @@ public:
      * Creates a midi file, opens it, and writes to it.
      * currently generates a dummy midi file.
      */
-    bool SaveMidiFile(const std::string &filename);
+    bool RenderToMidiFile(const std::string &filename);
 
     /**
      * Creates a midi file, opens it, and returns it (base64 encoded).
