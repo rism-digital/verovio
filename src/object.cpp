@@ -269,6 +269,7 @@ Object::~Object()
 void Object::Init(std::string classid)
 {
     m_parent = NULL;
+    m_isAttribute = false;
     m_isModified = true;
     m_classid = classid;
     this->GenerateUuid();
@@ -391,7 +392,11 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     attributes->clear();
 
     Att::GetCmn(this, attributes);
+    Att::GetCritapp(this, attributes);
+    Att::GetExternalsymbols(this, attributes);
+    Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
+    Att::GetMidi(this, attributes);
     Att::GetPagebased(this, attributes);
     Att::GetShared(this, attributes);
 
@@ -477,7 +482,7 @@ void Object::ClearRelinquishedChildren()
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end();) {
         if ((*iter)->m_parent != this) {
-            m_children.erase(iter);
+            iter = m_children.erase(iter);
         }
         else
             iter++;
@@ -549,7 +554,7 @@ void Object::GenerateUuid()
     int nr = std::rand();
     char str[17];
     // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
+    snprintf(str, 16, "%016d", nr);
 
     m_uuid = m_classid + std::string(str);
     std::transform(m_uuid.begin(), m_uuid.end(), m_uuid.begin(), ::tolower);
@@ -788,7 +793,9 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
     ListOfObjects::iterator it = m_list.begin();
-    std::advance(it, GetListIndex(startFrom));
+    int idx = GetListIndex(startFrom);
+    if (idx == -1) return NULL;
+    std::advance(it, idx);
     it = std::find_if(it, m_list.end(), ObjectComparison(classId));
     return (it == m_list.end()) ? NULL : *it;
 }
@@ -796,7 +803,9 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
 Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
 {
     ListOfObjects::iterator it = m_list.begin();
-    std::advance(it, GetListIndex(startFrom));
+    int idx = GetListIndex(startFrom);
+    if (idx == -1) return NULL;
+    std::advance(it, idx);
     ListOfObjects::reverse_iterator rit(it);
     rit = std::find_if(rit, m_list.rend(), ObjectComparison(classId));
     return (rit == m_list.rend()) ? NULL : *rit;
@@ -1028,8 +1037,11 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     if (this->Is() == MEASURE) {
         Measure *measure = dynamic_cast<Measure *>(this);
         assert(measure);
+        bool systemBreak = false;
+        bool scoreDefInsert = false;
         // This is the first measure of the system - more to do...
         if (params->m_currentSystem) {
+            systemBreak = true;
             // We had a scoreDef so we need to put cautionnary values
             // This will also happend with clef in the last measure - however, the cautionnary functor will not do
             // anything then
@@ -1048,11 +1060,13 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
             params->m_drawLabels = false;
         }
         if (params->m_upcomingScoreDef->m_setAsDrawing) {
+            scoreDefInsert = true;
             measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
             params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, true);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
+        measure->SetDrawingBarLines(params->m_previousMeasure, systemBreak, scoreDefInsert);
         params->m_previousMeasure = measure;
         return FUNCTOR_CONTINUE;
     }

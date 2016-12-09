@@ -903,38 +903,42 @@ int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
 
 int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int index)
 {
-    regex_t re;
 
-    regcomp(&re, "^://:", REG_EXTENDED);
-    int is_barline_rptboth = regexec(&re, incipit + index, 0, NULL, 0);
-    regfree(&re);
+    bool is_barline_rptboth = false;
+    bool is_barline_rptend = false;
+    bool is_barline_rptstart = false;
+    bool is_barline_dbl = false;
 
-    regcomp(&re, "^://", REG_EXTENDED);
-    int is_barline_rptend = regexec(&re, incipit + index, 0, NULL, 0);
-    regfree(&re);
+    if (strncmp(incipit + index, "://:", 4) == 0) {
+        is_barline_rptboth = true;
+    }
 
-    regcomp(&re, "^//:", REG_EXTENDED);
-    int is_barline_rptstart = regexec(&re, incipit + index, 0, NULL, 0);
-    regfree(&re);
+    if (strncmp(incipit + index, "://", 3) == 0) {
+        is_barline_rptend = true;
+    }
 
-    regcomp(&re, "^//", REG_EXTENDED);
-    int is_barline_dbl = regexec(&re, incipit + index, 0, NULL, 0);
-    regfree(&re);
+    if (strncmp(incipit + index, "//:", 3) == 0) {
+        is_barline_rptstart = true;
+    }
+
+    if (strncmp(incipit + index, "//", 2) == 0) {
+        is_barline_dbl = true;
+    }
 
     int i = 0; // number of characters
-    if (is_barline_rptboth == 0) {
+    if (is_barline_rptboth) {
         *output = BARRENDITION_rptboth;
         i = 3;
     }
-    else if (is_barline_rptstart == 0) {
+    else if (is_barline_rptstart) {
         *output = BARRENDITION_rptstart;
         i = 2;
     }
-    else if (is_barline_rptend == 0) {
+    else if (is_barline_rptend) {
         *output = BARRENDITION_rptend;
         i = 2;
     }
-    else if (is_barline_dbl == 0) {
+    else if (is_barline_dbl) {
         *output = BARRENDITION_dbl;
         i = 1;
     }
@@ -1044,7 +1048,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     }
     note->pitch = getPitch(incipit[i]);
 
-    // lookout, hack. If it is a rest (PITCHNAME_NONE val) then create the rest object.
+    // lookout, hack. If a rest (PITCHNAME_NONE val) then create rest object.
     // it will be added instead of the note
     if (note->pitch == PITCHNAME_NONE) {
         note->rest = true;
@@ -1063,7 +1067,8 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     int has_tie = regexec(&re, incipit + i + 1, 0, NULL, 0);
     regfree(&re);
     if (has_tie == 0) {
-        if (note->tie == 0) note->tie = 1; // reset 1 for the first note, >1 for next ones is incremented under
+        // reset 1 for first note, >1 for next ones is incremented under
+        if (note->tie == 0) note->tie = 1; 
     }
 
     // chord
@@ -1166,6 +1171,13 @@ void PaeInput::parseNote(pae::Note *note)
 
         mnote->SetDots(note->dots);
         mnote->SetDur(note->duration);
+
+        // pseudo chant notation with 7. in PAE - make quater notes without stem
+        if ((mnote->GetDur() == DURATION_128) && (mnote->GetDots() == 1)) {
+            mnote->SetDur(DURATION_4);
+            mnote->SetDots(0);
+            mnote->SetStemLen(0);
+        }
 
         if (note->fermata) {
             mnote->SetFermata(PLACE_above); // always above for now
@@ -1289,8 +1301,8 @@ void PaeInput::popContainer()
 {
     // assert(m_nested_objects.size() > 0);
     if (m_nested_objects.size() == 0) {
-        LogError("PaeInput::popContainer: tried to pop an object from empty stack. Cross-measure objects (tuplets, "
-                 "beams) are not supported.");
+        LogError("PaeInput::popContainer: tried to pop an object from empty stack. "
+                 "Cross-measure objects (tuplets, beams) are not supported.");
     }
     else {
         m_nested_objects.pop_back();

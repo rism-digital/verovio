@@ -17,6 +17,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "fermata.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "octave.h"
@@ -118,6 +119,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
     else if (object->Is() == ENDING) {
         // endings always above;
         m_place = STAFFREL_above;
+    }
+    else if (object->Is() == FERMATA) {
+        Fermata *fermata = dynamic_cast<Fermata *>(object);
+        assert(fermata);
+        // fermata above by default
+        m_place = fermata->HasPlace() ? fermata->GetPlace() : STAFFREL_above;
     }
     else if (object->Is() == HAIRPIN) {
         Hairpin *hairpin = dynamic_cast<Hairpin *>(object);
@@ -242,6 +249,17 @@ int FloatingObject::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_currentPositioner = NULL;
 
+    return FUNCTOR_CONTINUE;
+}
+
+int FloatingObject::PrepareTimePointing(FunctorParams *functorParams)
+{
+    // Pass it to the pseudo functor of the interface
+    if (this->HasInterface(INTERFACE_TIME_POINT)) {
+        TimePointInterface *interface = this->GetTimePointInterface();
+        assert(interface);
+        return interface->InterfacePrepareTimePointing(functorParams, this);
+    }
     return FUNCTOR_CONTINUE;
 }
 

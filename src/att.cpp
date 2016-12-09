@@ -48,18 +48,72 @@ std::string Att::IntToStr(int data) const
     return StringFormat("%d", data);
 }
 
+std::string Att::WcharTToStr(wchar_t data) const
+{
+    char buf[5];
+    memset(buf, 0, 5);
+    sprintf(buf, "%.4X", data);
+    return StringFormat("U+%s", buf);
+}
+
 // Basic converters for reading
 
 double Att::StrToDbl(std::string value) const
 {
     return atof(value.c_str());
 }
+
 int Att::StrToInt(std::string value) const
 {
     return atoi(value.c_str());
 }
 
+wchar_t Att::StrToWcharT(std::string value) const
+{
+    std::string prefix1 = "U+";
+    std::string prefix2 = "#x";
+    if (value.compare(0, prefix1.length(), prefix1) == 0) {
+        value.erase(0, 2);
+    }
+    else if (value.compare(0, prefix2.length(), prefix2) == 0) {
+        value.erase(0, 2);
+    }
+    else {
+        LogWarning("Unable to parse glyph code '%s'", value.c_str());
+        return 0;
+    }
+    wchar_t wc = (wchar_t)strtol(value.c_str(), NULL, 16);
+    // Check that the value is in a SMuFL private area range - this does not check that it is an
+    // existing SMuFL glyph num or that it is supported by Verovio
+    if ((wc >= 0xE000) && (wc <= 0xF8FF))
+        return wc;
+    else
+        LogWarning("Value '%s' is not in the SMuFL (private area) range", value.c_str());
+    return 0;
+}
+
 // Converters for writing and reading
+
+std::string Att::ArticulationListToStr(data_ARTICULATION_List data) const
+{
+    std::ostringstream ss;
+    for (size_t i = 0; i < data.size(); ++i) {
+        if (i != 0) ss << " ";
+        ss << ArticulationToStr(data[i]);
+    }
+    return ss.str();
+}
+
+data_ARTICULATION_List Att::StrToArticulationList(std::string value) const
+{
+    data_ARTICULATION_List list;
+    std::istringstream iss(value);
+    std::string token;
+    while (std::getline(iss, token, ' ')) {
+        list.push_back(StrToArticulation(token));
+    }
+    return list;
+}
 
 std::string Att::BeatrptRendToStr(data_BEATRPT_REND data) const
 {
@@ -455,7 +509,7 @@ data_TIE Att::StrToTie(std::string value) const
     return TIE_NONE;
 }
 
-std::string Att::XsdPosintlistToStr(xsd_posIntList data) const
+std::string Att::XsdPositiveIntegerListToStr(xsdPositiveInteger_List data) const
 {
     std::ostringstream ss;
     for (size_t i = 0; i < data.size(); ++i) {
@@ -465,9 +519,9 @@ std::string Att::XsdPosintlistToStr(xsd_posIntList data) const
     return ss.str();
 }
 
-xsd_posIntList Att::StrToXsdPosintlist(std::string value) const
+xsdPositiveInteger_List Att::StrToXsdPositiveIntegerList(std::string value) const
 {
-    xsd_posIntList list;
+    xsdPositiveInteger_List list;
     std::istringstream iss(value);
     std::string token;
     while (std::getline(iss, token, ' ')) {
