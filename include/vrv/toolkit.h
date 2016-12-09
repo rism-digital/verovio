@@ -62,7 +62,7 @@ public:
     /**
      * Save an MEI file.
      */
-    bool SaveMeiFile(const std::string &filename);
+    bool SaveFile(const std::string &filename);
 
     /**
      * Parse the options passed as JSON string.

@@ -484,7 +484,7 @@ std::string Toolkit::GetMEI(int pageNo, bool scoreBased)
     return meioutput.GetOutput(pageNo);
 }
 
-bool Toolkit::SaveMeiFile(const std::string &filename)
+bool Toolkit::SaveFile(const std::string &filename)
 {
     MeiOutput meioutput(&m_doc, filename.c_str());
     meioutput.SetScoreBasedMEI(m_scoreBasedMei);

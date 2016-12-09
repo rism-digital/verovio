@@ -450,7 +450,7 @@ int main(int argc, char **argv)
                 cerr << "MEI output of all pages to standard output is not possible." << endl;
                 exit(1);
             }
-            else if (!toolkit.SaveMeiFile(outfile)) {
+            else if (!toolkit.SaveFile(outfile)) {
                 cerr << "Unable to write MEI to " << outfile << "." << endl;
                 exit(1);
             }

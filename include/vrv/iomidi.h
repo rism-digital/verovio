@@ -40,9 +40,14 @@ public:
     ///@}
 
     /**
-     * The main method for exporting the file to MEI.
+     * The main method for exporting the file to MIDI.
      */
     virtual bool ExportFile();
+
+    /**
+     * Return the output as a string by writing it to the stringstream member.
+     */
+    std::string GetOutput(int page = -1);
 
     /**
      * Export the document to a MIDI file.
@@ -58,6 +63,15 @@ private:
      * This is necessary for retrieving notes being played at a certain time.
      */
     bool m_midiExportDone;
+    std::string m_filename;
+    std::ostringstream m_streamStringOutput;
+    bool m_writeToStreamString;
+    int m_page;
+    bool m_scoreBasedMEI;
+    pugi::xml_node m_mei;
+    /** @name Current element */
+    pugi::xml_node m_currentNode;
+    std::list<pugi::xml_node> m_nodeStack;
 };
 
 //----------------------------------------------------------------------------
