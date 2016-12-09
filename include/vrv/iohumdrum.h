@@ -158,6 +158,14 @@ namespace humaux {
     };
 }
 
+
+class HumdrumSignifiers {
+	public:
+		bool empty = true;
+		char nostem = '\0';  // !!!RDF**kern: i = no stem
+};
+
+
 #endif /* NO_HUMDRUM_SUPPORT */
 
 //----------------------------------------------------------------------------
@@ -255,6 +263,7 @@ protected:
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
     void addOrnamentMarkers(hum::HTp token);
 	void setNextLeftBarStyle(data_BARRENDITION style);
+	void parseSignifiers(hum::HumdrumFile& infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -366,6 +375,11 @@ private:
 	// When processing a measure, this variable should be checked and used
 	// in @left="style" for the measure.
 	data_BARRENDITION m_leftbarstyle;
+
+	// m_signifiers == a list of user defined signfiers in **kern spine data
+	// which indicate non-standard **kern parametesr that can be converted
+	// into notation.
+	HumdrumSignifiers m_signifiers;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

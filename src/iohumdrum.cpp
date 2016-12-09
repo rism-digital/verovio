@@ -421,6 +421,7 @@ bool HumdrumInput::convertHumdrum(void)
 {
     HumdrumFile &infile = m_infile;
     infile.analyzeKernSlurs();
+	parseSignifiers(infile);
 
     bool status = true; // for keeping track of problems in conversion process.
 
@@ -2029,6 +2030,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processSlur(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
             processDirection(layerdata[i], staffindex);
+			if (m_signifiers.nostem && 
+				layerdata[i]->find(m_signifiers.nostem) != string::npos) {
+				note->SetStemLen(0);
+			}
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -4848,6 +4853,47 @@ void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, 
     }
     object->SetUuid(id);
 }
+
+
+//////////////////////////////
+//
+// HumdrumInput::parseSignifiers -- search for !!!RDF records which
+//     define special purpose notational features in Humdrum data spines.
+//     Currently recognized ones are:
+// !!!RDF**kern: i = no stem
+// only single-character signifiers are allowed (could be made a string)
+//
+
+void HumdrumInput::parseSignifiers(HumdrumFile& infile) {
+	vector<HumdrumLine*> refs = infile.getReferenceRecords();
+	for (int i=0; i<(int)refs.size(); i++) {
+		string key = refs[i]->getReferenceKey();
+		if (key != "RDF**kern") {
+			continue;
+		}
+		string value = refs[i]->getReferenceValue();
+		auto equals = value.find('=');
+		if (equals == string::npos) {
+			continue;
+		}
+		char signifier = 0;
+		for (int j=0; j<equals; j++) {
+			if (isspace(value[j])) {
+				continue;
+			}
+			signifier = value[j];
+			break;
+		}
+		if (!signifier) {
+			continue;
+		}
+		// check for known signifier meanings:
+		if (value.find("no stem", equals) != string::npos) {
+			m_signifiers.nostem = signifier;
+		}
+	}
+}
+
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
