@@ -2333,7 +2333,7 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
             break;
         }
         elementName = std::string(xmlElement.name());
-        LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
+        //LogDebug("ReadMeiLayerChildren: element <%s>", xmlElement.name());
         if (!IsAllowed(elementName, filter)) {
             std::string meiElementName = filter->GetClassName();
             std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);

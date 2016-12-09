@@ -243,6 +243,8 @@ void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, St
     dc->EndGraphic(element, this);
 }
 
+/* This function draws any flags as well as the stem. */
+    
 void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir,
                             int radius, int xn, int originY, int heightY)
 {
@@ -254,6 +256,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     int drawingDur = (object->GetDurationInterface())->GetActualDur();
     bool drawingCueSize = object->IsCueSize();
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+    bool mensural_black = (staff->m_drawingNotationType==NOTATIONTYPE_mensural_black);
 
     baseStem = m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
     flagStemHeight = m_doc->GetDrawingDoubleUnit(staffSize);
@@ -262,9 +265,17 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
         flagStemHeight = m_doc->GetGraceSize(flagStemHeight);
     }
 
-    nbFlags = drawingDur - DUR_8;
+    nbFlags = (mensural_black? drawingDur - DUR_2 : drawingDur - DUR_4);
     totalFlagStemHeight = flagStemHeight * (nbFlags * 2 - 1) / 2;
-
+    
+    /* FIXME: SMuFL provides combining stem-and-flag characters with one and two flags, but
+        at the moment, I'm using only the one flag ones, partly out of concern for possible
+        three-flag notes. Do such notes actually exist? Jason Stoessel says not in black
+        notation, but maybe in white? */
+    
+    /* In black notation, the semiminima gets one flag; in white notation, it gets none.
+        In both cases, as in CWMN, each shorter duration gets one additional flag. */
+    
     if (dir == STEMDIRECTION_down) {
         // flip all lengths. Exception: in mensural notation, the stem will never be at left,
         //   so leave radius as is.
@@ -275,7 +286,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
 
     // If we have flags, add them to the height.
     int y1 = originY;
-    int y2 = ((drawingDur > DUR_8) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
+    int y2 = ((nbFlags>0) ? (y1 + baseStem + totalFlagStemHeight) : (y1 + baseStem)) + heightY;
     int x2;
     if (drawingDur < DUR_BR)
         x2 = xn + radius;
@@ -293,9 +304,10 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     // this will not work if the pseudo size is changed
     int shortening = 0.9 * m_doc->GetDrawingUnit(staffSize);
 
+    LogDebug("DrawMensuralStem: drawingDur=%d mensural_black=%d nbFlags=%d", drawingDur, mensural_black, nbFlags);
     int stemY1 = (dir == STEMDIRECTION_up) ? y1 + shortening : y1 - shortening;
     int stemY2 = y2;
-    if (drawingDur > DUR_4) {
+    if (nbFlags>0) {
         // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
         int shortener = (drawingCueSize) ? m_doc->GetGraceSize(m_doc->GetDrawingUnit(staffSize))
                                          : m_doc->GetDrawingUnit(staffSize);
@@ -306,10 +318,9 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     // draw the stems and the flags
     if (dir == STEMDIRECTION_up) {
 
-        if (drawingDur > DUR_4) {
-            DrawSmuflCode(dc, x2 - halfStemWidth, stemY1, SMUFL_E949_mensuralCombStemUpFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
+        if (nbFlags>0) {
             for (int i = 0; i < nbFlags; i++)
-                DrawSmuflCode(dc, x2 - halfStemWidth, y2 - (i + 1) * flagStemHeight,
+                DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 - i * flagStemHeight,
                     SMUFL_E949_mensuralCombStemUpFlagSemiminima,
                     staff->m_drawingStaffSize, drawingCueSize);
         }
@@ -317,11 +328,9 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
             DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
     }
     else {
-        if (drawingDur > DUR_4) {
-            DrawSmuflCode(
-                dc, x2 - halfStemWidth, stemY1, SMUFL_E94A_mensuralCombStemDownFlagSemiminima, staff->m_drawingStaffSize, drawingCueSize);
+        if (nbFlags>0) {
             for (int i = 0; i < nbFlags; i++)
-                DrawSmuflCode(dc, x2 - halfStemWidth, y2 + (i + 1) * flagStemHeight, SMUFL_E94A_mensuralCombStemDownFlagSemiminima,
+                DrawSmuflCode(dc, x2 - halfStemWidth, stemY1 + i * flagStemHeight, SMUFL_E94A_mensuralCombStemDownFlagSemiminima,
                     staff->m_drawingStaffSize, drawingCueSize);
         }
         else
