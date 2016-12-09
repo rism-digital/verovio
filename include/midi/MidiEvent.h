@@ -35,11 +35,11 @@ class MidiEvent : public MidiMessage {
 
                 ~MidiEvent     ();
 
-      MidiEvent& operator=     (MidiEvent& mfevent);
-      MidiEvent& operator=     (MidiMessage& message);
-      MidiEvent& operator=     (vector<uchar>& bytes);
-      MidiEvent& operator=     (vector<char>& bytes);
-      MidiEvent& operator=     (vector<int>& bytes);
+      MidiEvent& operator=     (const MidiEvent& mfevent);
+      MidiEvent& operator=     (const MidiMessage& message);
+      MidiEvent& operator=     (const vector<uchar>& bytes);
+      MidiEvent& operator=     (const vector<char>& bytes);
+      MidiEvent& operator=     (const vector<int>& bytes);
       void       clearVariables(void);
 
       // functions related to event linking (note-ons to note-offs).
@@ -57,6 +57,7 @@ class MidiEvent : public MidiMessage {
       int       tick;
       int       track;
       double    seconds;
+      int       seq;
 
    private:
       MidiEvent* eventlink;      // used to match note-ons and note-offs

@@ -10,6 +10,7 @@
 		152886C51C9CA86100B515BB /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
+		400362DE1DEE2C51006A5C2A /* iomidi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 400362DD1DEE2C51006A5C2A /* iomidi.cpp */; };
 		4067E4C81DDDAF0000C6E059 /* fermata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067E4C71DDDAF0000C6E059 /* fermata.cpp */; };
 		4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
 		4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7661C688F5A0086DC0E /* Binasc.cpp */; };
@@ -278,6 +279,8 @@
 		1579B3421B15033100B16F5C /* proport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = proport.cpp; path = src/proport.cpp; sourceTree = "<group>"; };
 		2D2A79991A69812C000A441B /* chord.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chord.cpp; path = src/chord.cpp; sourceTree = "<group>"; };
 		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; };
+		400362DC1DEE2B8A006A5C2A /* iomidi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iomidi.h; path = include/vrv/iomidi.h; sourceTree = "<group>"; };
+		400362DD1DEE2C51006A5C2A /* iomidi.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iomidi.cpp; path = src/iomidi.cpp; sourceTree = "<group>"; };
 		4067E4C71DDDAF0000C6E059 /* fermata.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fermata.cpp; path = src/fermata.cpp; sourceTree = "<group>"; };
 		4067E4C91DDDAF6400C6E059 /* fermata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fermata.h; path = include/vrv/fermata.h; sourceTree = "<group>"; };
 		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = src/midi/Binasc.cpp; sourceTree = "<group>"; };
@@ -792,6 +795,8 @@
 				4DA20ECF1D0F150900706C4A /* iohumdrum.h */,
 				8F086EC2188539540037FD8E /* iomei.cpp */,
 				8F59291918854BF800FE51AD /* iomei.h */,
+				400362DD1DEE2C51006A5C2A /* iomidi.cpp */,
+				400362DC1DEE2B8A006A5C2A /* iomidi.h */,
 				8F086EC3188539540037FD8E /* iomusxml.cpp */,
 				8F59291A18854BF800FE51AD /* iomusxml.h */,
 				8F086EC4188539540037FD8E /* iopae.cpp */,
@@ -1080,6 +1085,7 @@
 				8F086EEB188539540037FD8E /* toolkit.cpp in Sources */,
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
+				400362DE1DEE2C51006A5C2A /* iomidi.cpp in Sources */,
 				4D796B5E1D78641900A15238 /* harm.cpp in Sources */,
 				4DB3072F1AC9ED2500EE0982 /* space.cpp in Sources */,
 				8F086EED188539540037FD8E /* iodarms.cpp in Sources */,
