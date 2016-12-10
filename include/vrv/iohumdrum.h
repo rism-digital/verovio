@@ -158,13 +158,11 @@ namespace humaux {
     };
 }
 
-
 class HumdrumSignifiers {
-	public:
-		bool empty = true;
-		char nostem = '\0';  // !!!RDF**kern: i = no stem
+public:
+    bool empty = true;
+    char nostem = '\0'; // !!!RDF**kern: i = no stem
 };
-
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
@@ -262,8 +260,8 @@ protected:
     void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
     void addOrnamentMarkers(hum::HTp token);
-	void setNextLeftBarStyle(data_BARRENDITION style);
-	void parseSignifiers(hum::HumdrumFile& infile);
+    void setNextLeftBarStyle(data_BARRENDITION style);
+    void parseSignifiers(hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -277,7 +275,7 @@ protected:
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
 
-    template <class ELEMENT> void convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
+    template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
 
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
 
@@ -296,8 +294,7 @@ protected:
     static int nextLowerPowerOfTwo(int x);
     static string getDateString(void);
     static string getReferenceValue(const string &key, vector<hum::HumdrumLine *> &references);
-	static bool replace(string& str, const string& oldStr,
-	                     const string& newStr);
+    static bool replace(string &str, const string &oldStr, const string &newStr);
     string cleanHarmString(const string &content);
 
 private:
@@ -371,15 +368,15 @@ private:
     // converted into <harm> element in the MEI conversion.
     bool m_harm;
 
-	// m_leftbarstyle is a barline left-hand style to store in the next measure.
-	// When processing a measure, this variable should be checked and used
-	// in @left="style" for the measure.
-	data_BARRENDITION m_leftbarstyle;
+    // m_leftbarstyle is a barline left-hand style to store in the next measure.
+    // When processing a measure, this variable should be checked and used
+    // in @left="style" for the measure.
+    data_BARRENDITION m_leftbarstyle;
 
-	// m_signifiers == a list of user defined signfiers in **kern spine data
-	// which indicate non-standard **kern parametesr that can be converted
-	// into notation.
-	HumdrumSignifiers m_signifiers;
+    // m_signifiers == a list of user defined signfiers in **kern spine data
+    // which indicate non-standard **kern parametesr that can be converted
+    // into notation.
+    HumdrumSignifiers m_signifiers;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

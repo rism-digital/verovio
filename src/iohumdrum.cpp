@@ -421,7 +421,7 @@ bool HumdrumInput::convertHumdrum(void)
 {
     HumdrumFile &infile = m_infile;
     infile.analyzeKernSlurs();
-	parseSignifiers(infile);
+    parseSignifiers(infile);
 
     bool status = true; // for keeping track of problems in conversion process.
 
@@ -799,6 +799,9 @@ void HumdrumInput::prepareVerses(void)
                 break;
             }
             else if (line.token(j)->isDataType("**text")) {
+                ss[i].verse = true;
+            }
+            else if (line.token(j)->isDataType("**silbe")) {
                 ss[i].verse = true;
             }
         }
@@ -2030,10 +2033,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processSlur(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
             processDirection(layerdata[i], staffindex);
-			if (m_signifiers.nostem && 
-				layerdata[i]->find(m_signifiers.nostem) != string::npos) {
-				note->SetStemLen(0);
-			}
+            if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
+                note->SetStemLen(0);
+            }
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -2915,6 +2917,12 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             continue;
         }
         if (layerdata[i]->isGrace()) {
+            indexmapping2.push_back(-1);
+            continue;
+        }
+        // don't consider notes without durations
+        HumNum dur = Convert::recipToDuration(layerdata[i]);
+        if (dur == 0) {
             indexmapping2.push_back(-1);
             continue;
         }
@@ -3800,7 +3808,13 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
     }
 
     if (!chordQ) {
-        convertRhythm(note, token, subtoken);
+        HumNum dur = convertRhythm(note, token, subtoken);
+        if (dur == 0) {
+            note->SetDur(DURATION_4);
+            note->SetStemLen(0);
+            // if you want a stemless grace note, then set the
+            // stemlength to zero explicitly.
+        }
     }
 
     if (!chordQ) {
@@ -3897,7 +3911,7 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
                 break;
             }
         }
-        else if (line.token(i)->isDataType("**text")) {
+        else if (line.token(i)->isDataType("**text") || line.token(i)->isDataType("**silbe")) {
             versenum++;
             if (line.token(i)->isNull()) {
                 continue;
@@ -3955,9 +3969,10 @@ void HumdrumInput::convertVerses(Note *note, HTp token, int subtoken)
 // HumdrumInput::convertRhythm --
 //     default value:
 //         subtoken = -1;
+//         isnote = true
 //
 
-template <class ELEMENT> void HumdrumInput::convertRhythm(ELEMENT element, HTp token, int subtoken)
+template <class ELEMENT> HumNum HumdrumInput::convertRhythm(ELEMENT element, HTp token, int subtoken)
 {
     string tstring;
     if (subtoken < 0) {
@@ -3968,7 +3983,11 @@ template <class ELEMENT> void HumdrumInput::convertRhythm(ELEMENT element, HTp t
     }
 
     // Remove grace note information (for generating printed duration)
-    tstring.erase(std::remove(tstring.begin(), tstring.end(), 'q'), tstring.end());
+    bool grace = false;
+    if (tstring.find('q') != string::npos) {
+        grace = true;
+        tstring.erase(std::remove(tstring.begin(), tstring.end(), 'q'), tstring.end());
+    }
 
     int dotcount = characterCountInSubtoken(tstring, '.');
     if (dotcount > 0) {
@@ -3982,7 +4001,17 @@ template <class ELEMENT> void HumdrumInput::convertRhythm(ELEMENT element, HTp t
 
     dur *= m_tupletscaling;
 
-    if (dur.isInteger()) {
+    if ((!grace) && (dur == 0) && (element)) {
+        return 0;
+        // duration should be set to "1" to make it look like
+        // a stemless note with a quarter note duration to make
+        // it a quarter notehead shape (maybe just set the notehead
+        // shape to a quarter note).  But cannot set the stem
+        // length in this function since non-notes can have
+        // durations (rests and spaces), so the calling function
+        // has to take character.
+    }
+    else if (dur.isInteger()) {
         switch (dur.getNumerator()) {
             case 1: element->SetDur(DURATION_1); break;
             case 2: element->SetDur(DURATION_breve); break;
@@ -4005,6 +4034,7 @@ template <class ELEMENT> void HumdrumInput::convertRhythm(ELEMENT element, HTp t
             case 2048: element->SetDur(DURATION_2048); break;
         }
     }
+    return dur;
 }
 
 //////////////////////////////
@@ -4854,7 +4884,6 @@ void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, 
     object->SetUuid(id);
 }
 
-
 //////////////////////////////
 //
 // HumdrumInput::parseSignifiers -- search for !!!RDF records which
@@ -4864,36 +4893,36 @@ void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, 
 // only single-character signifiers are allowed (could be made a string)
 //
 
-void HumdrumInput::parseSignifiers(HumdrumFile& infile) {
-	vector<HumdrumLine*> refs = infile.getReferenceRecords();
-	for (int i=0; i<(int)refs.size(); i++) {
-		string key = refs[i]->getReferenceKey();
-		if (key != "RDF**kern") {
-			continue;
-		}
-		string value = refs[i]->getReferenceValue();
-		auto equals = value.find('=');
-		if (equals == string::npos) {
-			continue;
-		}
-		char signifier = 0;
-		for (int j=0; j<equals; j++) {
-			if (isspace(value[j])) {
-				continue;
-			}
-			signifier = value[j];
-			break;
-		}
-		if (!signifier) {
-			continue;
-		}
-		// check for known signifier meanings:
-		if (value.find("no stem", equals) != string::npos) {
-			m_signifiers.nostem = signifier;
-		}
-	}
+void HumdrumInput::parseSignifiers(HumdrumFile &infile)
+{
+    vector<HumdrumLine *> refs = infile.getReferenceRecords();
+    for (int i = 0; i < (int)refs.size(); i++) {
+        string key = refs[i]->getReferenceKey();
+        if (key != "RDF**kern") {
+            continue;
+        }
+        string value = refs[i]->getReferenceValue();
+        auto equals = value.find('=');
+        if (equals == string::npos) {
+            continue;
+        }
+        char signifier = 0;
+        for (int j = 0; j < equals; j++) {
+            if (isspace(value[j])) {
+                continue;
+            }
+            signifier = value[j];
+            break;
+        }
+        if (!signifier) {
+            continue;
+        }
+        // check for known signifier meanings:
+        if (value.find("no stem", equals) != string::npos) {
+            m_signifiers.nostem = signifier;
+        }
+    }
 }
-
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
