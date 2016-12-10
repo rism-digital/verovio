@@ -360,11 +360,12 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     ellipseChild.append_attribute("cy") = y + rh;
     ellipseChild.append_attribute("rx") = rw;
     ellipseChild.append_attribute("ry") = rh;
-    // ellipseChild.append_attribute("fill") = "#000000";
     if (currentBrush.GetOpacity() != 1.0) ellipseChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
-    // ellipseChild.append_attribute("stroke") = "#000000";
     if (currentPen.GetOpacity() != 1.0) ellipseChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
-    if (currentPen.GetWidth() > 1) ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
+    if (currentPen.GetWidth() > 0) {
+        ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
+        ellipseChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+    }
 }
 
 void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, double start, double end)
