@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Dec  8 14:59:42 PST 2016
+// Last Modified: Sat Dec 10 15:59:41 PST 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -10439,6 +10439,43 @@ HumdrumToken* HumdrumToken::getPreviousToken(int index) const {
 	} else {
 		return NULL;
 	}
+}
+
+
+//////////////////////////////
+//
+// HumdrumToken::getNextFieldToken --
+//
+
+HTp HumdrumToken::getNextFieldToken(void) const {
+	HumdrumLine* line = getLine();
+	if (!line) {
+		return NULL;
+	}
+	int field = getFieldIndex();
+	if (field >= line->getFieldCount()  - 1) {
+		return NULL;
+	}
+	return line->token(field+1);
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumToken::getPreviousFieldToken --
+//
+
+HTp HumdrumToken::getPreviousFieldToken(void) const {
+	HumdrumLine* line = getLine();
+	if (!line) {
+		return NULL;
+	}
+	int field = getFieldIndex();
+	if (field < 1) {
+		return NULL;
+	}
+	return line->token(field-1);
 }
 
 

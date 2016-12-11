@@ -262,6 +262,7 @@ protected:
     void addOrnamentMarkers(hum::HTp token);
     void setNextLeftBarStyle(data_BARRENDITION style);
     void parseSignifiers(hum::HumdrumFile &infile);
+    string getAutoClef(hum::HTp partstart, int partnumber);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);

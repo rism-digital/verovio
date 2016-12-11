@@ -1016,6 +1016,10 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
     if (clef.size() > 0) {
         setClef(m_staffdef.back(), clef);
     }
+    else {
+        string autoclef = getAutoClef(partstart, partnumber);
+        setClef(m_staffdef.back(), autoclef);
+    }
 
     if (label.size() > 0) {
         m_staffdef.back()->SetLabel(label);
@@ -1038,6 +1042,97 @@ void HumdrumInput::fillPartInfo(HTp partstart, int partnumber)
     }
 
     addInstrumentDefinition(m_staffdef.back(), partstart);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getAutoClef -- extimate a clef for a part
+//     which does not have a specified clef.  Choice will be
+//     treble or bass.
+//
+
+string HumdrumInput::getAutoClef(HTp partstart, int partnumber)
+{
+    HTp tok = partstart;
+    int ptrack = partstart->getTrack();
+    vector<int> dhist(100, 0);
+    int diatonic;
+    while (tok) {
+        if (tok->isInterpretation()) {
+            if (tok->compare(0, 5, "*clef") == 0) {
+                break;
+            }
+        }
+        if (!tok->isData()) {
+            tok = tok->getNextToken();
+            continue;
+        }
+        if (!(tok->isNull() || tok->isRest())) {
+            diatonic = Convert::kernToBase7(tok);
+            if ((diatonic > 0) && (diatonic < 100)) {
+                dhist[diatonic]++;
+            }
+        }
+        HTp ftok = tok->getNextFieldToken();
+        while (ftok && (ptrack == ftok->getTrack())) {
+            if (!(ftok->isNull() || ftok->isRest())) {
+                diatonic = Convert::kernToBase7(ftok);
+                if ((diatonic > 0) && (diatonic < 100)) {
+                    dhist[diatonic]++;
+                }
+            }
+            ftok = ftok->getNextFieldToken();
+        }
+
+        tok = tok->getNextToken();
+    }
+
+    int low = 100;
+    int high = 0;
+    for (int i = 0; i < 100; i++) {
+        if (dhist[i]) {
+            low = i;
+            break;
+        }
+    }
+    for (int i = 99; i >= 0; i--) {
+        if (dhist[i]) {
+            high = i;
+            break;
+        }
+    }
+    if (high < low) {
+        return "";
+    }
+    int E3 = Convert::kernToBase7("E");
+    int G4 = Convert::kernToBase7("g");
+    if ((low > E3) && (high > G4)) {
+        return "clefG2";
+    }
+    if ((low < E3) && (high < G4)) {
+        return "clefF4";
+    }
+    // calculate weighted mean
+    int wsum = 0;
+    for (int i = low; i <= high; i++) {
+        wsum += dhist[i];
+    }
+    if (wsum == 0) {
+        // no pitches...
+        return "";
+    }
+    int topsum = 0;
+    for (int i = low; i <= high; i++) {
+        topsum += i * wsum;
+    }
+    int C4 = Convert::kernToBase7("c");
+    double wm = (double)topsum / (double)wsum;
+    if (wm < C4) {
+        return "clefF4";
+    }
+    else {
+        return "clefG2";
+    }
 }
 
 //////////////////////////////

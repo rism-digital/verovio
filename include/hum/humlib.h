@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Dec  8 18:16:53 PST 2016
+// Last Modified: Sat Dec 10 15:59:41 PST 2016
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1150,6 +1150,10 @@ class HumdrumToken : public string, public HumHash {
 		HTp         getPreviousToken       (int index = 0) const;
 		vector<HTp> getNextTokens          (void) const;
 		vector<HTp> getPreviousTokens      (void) const;
+
+		// next/previous token on line:
+		HTp      getNextFieldToken           (void) const;
+		HTp      getPreviousFieldToken       (void) const;
 
 		int      getPreviousNonNullDataTokenCount(void);
 		int      getPreviousNNDTCount      (void)
