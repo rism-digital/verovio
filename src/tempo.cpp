@@ -13,8 +13,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "editorial.h"
 #include "controlelement.h"
+#include "editorial.h"
 #include "text.h"
 #include "vrv.h"
 
