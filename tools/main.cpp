@@ -439,6 +439,7 @@ int main(int argc, char **argv)
             exit(1);
         }
         else {
+            cerr << toolkit.GetTimeMap(200);
             cerr << "Output written to " << outfile << "." << endl;
         }
     }

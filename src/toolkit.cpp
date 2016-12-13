@@ -804,6 +804,41 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 #endif
 }
 
+std::string Toolkit::GetTimeMap(const int pageNo)
+{
+    jsonxx::Object o;
+    
+    if (!m_doc.HasPage(pageNo - 1)) return "";
+    
+    // Here we would need to check that the midi export is done
+    if (!m_doc.GetMidiExportDone()) {
+        LogError("The MIDI export has to be performed prior to calling this method");
+        return "";
+    }
+    
+    Page *page = dynamic_cast<Page*>(m_doc.GetChild(pageNo - 1));
+    assert(page);
+    
+    
+    AttComparison attComparison(NOTE);
+    ArrayOfObjects notes;
+    page->FindAllChildByAttComparison(&notes, &attComparison);
+    
+    ArrayOfObjects::iterator iter;
+    for (iter = notes.begin(); iter != notes.end(); iter++) {
+        Note *note = dynamic_cast<Note*>(*iter);
+        assert(note);
+        jsonxx::Array a;
+        jsonxx::Object on;
+        on << "on" << note->m_playingOnset;
+        jsonxx::Object off;
+        off << "off" << note->m_playingOffset;
+        a << on << off;
+        o << note->GetUuid() << a;
+    }
+    return o.json();
+}
+
 bool Toolkit::RenderToMidiFile(const std::string &filename)
 {
     MidiFile outputfile;
