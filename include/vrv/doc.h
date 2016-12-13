@@ -12,6 +12,7 @@
 #include "scoredef.h"
 #include "style.h"
 
+#include "iomidi.h"
 class MidiFile;
 
 namespace vrv {
@@ -195,7 +196,7 @@ public:
 
     /**
      * Export the document to a MIDI file.
-     * Run trough all the layer and fill the midi file content.
+     * Run trough all the layers and fill the midi file content.
      */
     void ExportMIDI(MidiFile *midiFile);
 

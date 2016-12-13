@@ -17,6 +17,7 @@
 #include "iodarms.h"
 #include "iohumdrum.h"
 #include "iomei.h"
+#include "iomidi.h"
 #include "iomusxml.h"
 #include "iopae.h"
 #include "layer.h"
@@ -29,8 +30,6 @@
 #include "vrv.h"
 
 //----------------------------------------------------------------------------
-
-#include "MidiFile.h"
 
 namespace vrv {
 
@@ -761,10 +760,10 @@ std::string Toolkit::RenderToMidi()
     m_doc.ExportMIDI(&outputfile);
     outputfile.sortTracks();
 
-    stringstream strstrem;
-    outputfile.write(strstrem);
+    stringstream strstream;
+    outputfile.write(strstream);
     std::string outputstr = Base64Encode(
-        reinterpret_cast<const unsigned char *>(strstrem.str().c_str()), (unsigned int)strstrem.str().length());
+        reinterpret_cast<const unsigned char *>(strstream.str().c_str()), (unsigned int)strstream.str().length());
 
     return outputstr;
 }
@@ -841,11 +840,11 @@ std::string Toolkit::GetTimeMap(const int pageNo)
 
 bool Toolkit::RenderToMidiFile(const std::string &filename)
 {
-    MidiFile outputfile;
-    outputfile.absoluteTicks();
-    m_doc.ExportMIDI(&outputfile);
-    outputfile.sortTracks();
-    outputfile.write(filename);
+    MidiFile midioutput;
+    midioutput.absoluteTicks();
+    m_doc.ExportMIDI(&midioutput);
+    midioutput.sortTracks();
+    midioutput.write(filename);
 
     return true;
 }

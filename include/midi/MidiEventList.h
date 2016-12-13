@@ -28,14 +28,16 @@ class MidiEventList {
                  MidiEventList     (MidiEventList&& other);
 
       MidiEvent&  operator[]       (int index);
+      const MidiEvent&  operator[] (int index) const;
       MidiEvent&  back             (void);
       MidiEvent&  last             (void);
       MidiEvent&  getEvent         (int index);
       void        clear            (void);
       void        reserve          (int rsize);
-      int         getSize          (void);
-      int         size             (void);
+      int         getSize          (void) const;
+      int         size             (void) const;
       int         linkNotePairs    (void);
+      int         linkEventPairs   (void);
       void        clearLinks       (void);
       MidiEvent** data             (void);
 

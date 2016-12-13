@@ -79,11 +79,10 @@ MidiFile::MidiFile(const char* filename) {
 
 
 MidiFile::MidiFile(const string& filename) {
-
    ticksPerQuarterNote = 120;            // TQP time base of file
    trackCount = 1;                       // # of tracks in file
    theTrackState = TRACK_STATE_SPLIT;    // joined or split
-   theTimeState = TIME_STATE_DELTA;      // absolute or delta
+   theTimeState = TIME_STATE_ABSOLUTE;   // absolute or delta
    events.resize(1);
    events[0] = new MidiEventList;
    readFileName.resize(1);
@@ -99,7 +98,7 @@ MidiFile::MidiFile(istream& input) {
    ticksPerQuarterNote = 120;            // TQP time base of file
    trackCount = 1;                       // # of tracks in file
    theTrackState = TRACK_STATE_SPLIT;    // joined or split
-   theTimeState = TIME_STATE_DELTA;      // absolute or delta
+   theTimeState = TIME_STATE_ABSOLUTE;   // absolute or delta
    events.resize(1);
    events[0] = new MidiEventList;
    readFileName.resize(1);
@@ -120,7 +119,7 @@ MidiFile::MidiFile(istream& input) {
 MidiFile::MidiFile(const MidiFile& other) {
    events.reserve(other.events.size());
    auto it = other.events.begin();
-   std::generate_n(std::back_inserter(events), other.events.size(), 
+   std::generate_n(std::back_inserter(events), other.events.size(),
          [&]() -> MidiEventList* {
       return new MidiEventList(**it++);
    });
@@ -250,7 +249,7 @@ int MidiFile::read(istream& input) {
       binarydata.seekg(0, ios_base::beg);
       if (binarydata.peek() != 'M') {
          cerr << "Bad MIDI data input" << endl;
-	      rwstatus = 0;
+         rwstatus = 0;
          return rwstatus;
       } else {
          rwstatus = read(binarydata);
@@ -520,6 +519,7 @@ int MidiFile::read(istream& input) {
    }
 
    theTimeState = TIME_STATE_ABSOLUTE;
+   markSequence();
    return 1;
 }
 
@@ -819,6 +819,10 @@ MidiEventList& MidiFile::operator[](int aTrack) {
    return *events[aTrack];
 }
 
+const MidiEventList& MidiFile::operator[](int aTrack) const {
+   return *events[aTrack];
+}
+
 
 //////////////////////////////
 //
@@ -826,7 +830,7 @@ MidiEventList& MidiFile::operator[](int aTrack) {
 //   the Midi File.
 //
 
-int MidiFile::getTrackCount(void) {
+int MidiFile::getTrackCount(void) const {
    return (int)events.size();
 }
 
@@ -834,7 +838,7 @@ int MidiFile::getTrackCount(void) {
 // Alias for getTrackCount()
 //
 
-int MidiFile::getNumTracks(void) {
+int MidiFile::getNumTracks(void) const {
    return getTrackCount();
 }
 
@@ -842,9 +846,52 @@ int MidiFile::getNumTracks(void) {
 // Alias for getTrackCount()
 //
 
-int MidiFile::size(void) {
+int MidiFile::size(void) const {
    return getTrackCount();
 }
+
+
+
+//////////////////////////////
+//
+// MidiFile::markSequence -- Assign a sequence serial number to
+//   every MidiEvent in every track in the MIDI file.  This is
+//   useful if you want to preseve the order of MIDI messages in
+//   a track when they occur at the same tick time.  Particularly
+//   for use with joinTracks() or sortTracks().  markSequence will
+//   be done automatically when a MIDI file is read, in case the
+//   ordering of events occuring at the same time is important.
+//   Use clearSequence() to use the default sorting behavior of
+//   sortTracks().
+//
+
+void MidiFile::markSequence(void) {
+   int sequence = 1;
+   for (int i=0; i<size(); i++) {
+      for (int j=0; j<events[i]->size(); j++) {
+         (*events[i])[j].seq = sequence++;
+      }
+   }
+}
+
+
+
+//////////////////////////////
+//
+// MidiFile::clearSequence -- Remove any seqence serial numbers from
+//   MidiEvents in the MidiFile.  This will cause the default ordering by
+//   sortTracks() to be used, in which case the ordering of MidiEvents
+//   occurding at the same tick may switch their ordering.
+//
+
+void MidiFile::clearSequence(void) {
+   for (int i=0; i<size(); i++) {
+      for (int j=0; j<events[i]->size(); j++) {
+         (*events[i])[j].seq = 0;
+      }
+   }
+}
+
 
 
 
@@ -1068,7 +1115,7 @@ int MidiFile::hasSplitTracks(void) {
 // MidiFile::getSplitTrack --  Return the track index when the MidiFile
 //   is in the split state.  This function returns the original track
 //   when the MidiFile is in the joined state.  The MidiEvent::track
-//   variable is used to store the original track index when the 
+//   variable is used to store the original track index when the
 //   MidiFile is converted to the joined-track state.
 //
 
@@ -1125,7 +1172,13 @@ void MidiFile::deltaTicks(void) {
       }
       for (j=1; j<(int)events[i]->size(); j++) {
          temp = (*events[i])[j].tick;
-         (*events[i])[j].tick = temp - timedata[i];
+         int deltatick = temp - timedata[i];
+         if (deltatick < 0) {
+            cerr << "Error: negative delta tick value: " << deltatick << endl
+                 << "Timestamps must be sorted first"
+                 << " (use MidiFile::sortTracks() before writing)." << endl;
+         }
+         (*events[i])[j].tick = deltatick;
          timedata[i] = temp;
       }
    }
@@ -1184,7 +1237,7 @@ int MidiFile::getTickState(void) {
 
 //////////////////////////////
 //
-// MidiFile::isDeltaTicks -- Returns true if MidiEvent .tick 
+// MidiFile::isDeltaTicks -- Returns true if MidiEvent .tick
 //    variables are in delta time mode.
 //
 
@@ -1196,7 +1249,7 @@ int MidiFile::isDeltaTicks(void) {
 
 //////////////////////////////
 //
-// MidiFile::isAbsoluteTicks -- Returns true if MidiEvent .tick 
+// MidiFile::isAbsoluteTicks -- Returns true if MidiEvent .tick
 //    variables are in absolute time mode.
 //
 
@@ -1328,7 +1381,7 @@ int MidiFile::addMetaEvent(int aTrack, int aTick, int aType,
    int length = (int)metaData.size();
    vector<uchar> fulldata;
    uchar size[23] = {0};
-   int lengthsize =  makeVLV(size, length);
+   int lengthsize = makeVLV(size, length);
 
    fulldata.resize(2+lengthsize+length);
    fulldata[0] = 0xff;
@@ -1364,7 +1417,7 @@ int MidiFile::addMetaEvent(int aTrack, int aTick, int aType,
 // MidiFile::addCopyright --  Add a copyright notice meta-message (#2).
 //
 
-int MidiFile::addCopyright(int aTrack, int aTick, const string& text) { 
+int MidiFile::addCopyright(int aTrack, int aTick, const string& text) {
    MidiEvent* me = new MidiEvent;
    me->makeCopyright(text);
    me->tick = aTick;
@@ -1394,7 +1447,7 @@ int MidiFile::addTrackName(int aTrack, int aTick, const string& name) {
 // MidiFile::addInstrumentName --  Add an instrument name meta-message (#4).
 //
 
-int MidiFile::addInstrumentName(int aTrack, int aTick, const string& name) { 
+int MidiFile::addInstrumentName(int aTrack, int aTick, const string& name) {
    MidiEvent* me = new MidiEvent;
    me->makeInstrumentName(name);
    me->tick = aTick;
@@ -1411,7 +1464,7 @@ int MidiFile::addInstrumentName(int aTrack, int aTick, const string& name) {
 
 int MidiFile::addLyric(int aTrack, int aTick, const string& text) {
    MidiEvent* me = new MidiEvent;
-   me->makeCopyright(text);
+   me->makeLyric(text);
    me->tick = aTick;
    events[aTrack]->push_back_no_copy(me);
    return events[aTrack]->size() - 1;
@@ -1421,7 +1474,37 @@ int MidiFile::addLyric(int aTrack, int aTick, const string& text) {
 
 //////////////////////////////
 //
-// MidiFile::addTempo -- Add a tempo meta message.
+// MidiFile::addMarker -- Add a marker meta-message (meta #6).
+//
+
+int MidiFile::addMarker(int aTrack, int aTick, const string& text) {
+   MidiEvent* me = new MidiEvent;
+   me->makeMarker(text);
+   me->tick = aTick;
+   events[aTrack]->push_back_no_copy(me);
+   return events[aTrack]->size() - 1;
+}
+
+
+
+//////////////////////////////
+//
+// MidiFile::addCue -- Add a cue-point meta-message (meta #7).
+//
+
+int MidiFile::addCue(int aTrack, int aTick, const string& text) {
+   MidiEvent* me = new MidiEvent;
+   me->makeCue(text);
+   me->tick = aTick;
+   events[aTrack]->push_back_no_copy(me);
+   return events[aTrack]->size() - 1;
+}
+
+
+
+//////////////////////////////
+//
+// MidiFile::addTempo -- Add a tempo meta message (meta #0x51).
 //
 
 int MidiFile::addTempo(int aTrack, int aTick, double aTempo) {
@@ -1436,7 +1519,64 @@ int MidiFile::addTempo(int aTrack, int aTick, double aTempo) {
 
 //////////////////////////////
 //
-// MidiFile::makeVLV --
+// MidiFile::addTimeSignature -- Add a time signature meta message
+//      (meta #0x58).  The "bottom" parameter must be a power of two;
+//      otherwise, it will be set to the next highest power of two.
+//
+// Default values:
+//     clocksPerClick     == 24 (quarter note)
+//     num32ndsPerQuarter ==  8 (8 32nds per quarter note)
+//
+// Time signature of 4/4 would be:
+//    top    = 4
+//    bottom = 4 (converted to 2 in the MIDI file for 2nd power of 2).
+//    clocksPerClick = 24 (2 eighth notes based on num32ndsPerQuarter)
+//    num32ndsPerQuarter = 8
+//
+// Time signature of 6/8 would be:
+//    top    = 6
+//    bottom = 8 (converted to 3 in the MIDI file for 3rd power of 2).
+//    clocksPerClick = 36 (3 eighth notes based on num32ndsPerQuarter)
+//    num32ndsPerQuarter = 8
+//
+
+int MidiFile::addTimeSignature(int aTrack, int aTick, int top, int bottom,
+      int clocksPerClick, int num32ndsPerQuarter) {
+   MidiEvent* me = new MidiEvent;
+   me->makeTimeSignature(top, bottom, clocksPerClick, num32ndsPerQuarter);
+   me->tick = aTick;
+   events[aTrack]->push_back_no_copy(me);
+   return events[aTrack]->size() - 1;
+}
+
+
+
+//////////////////////////////
+//
+// MidiFile::addCompoundTimeSignature -- Add a time signature meta message
+//      (meta #0x58), where the clocksPerClick parameter is set to three
+//      eighth notes for compount meters such as 6/8 which represents
+//      two beats per measure.
+//
+// Default values:
+//     clocksPerClick     == 36 (quarter note)
+//     num32ndsPerQuarter ==  8 (8 32nds per quarter note)
+//
+
+int MidiFile::addCompoundTimeSignature(int aTrack, int aTick, int top,
+      int bottom, int clocksPerClick, int num32ndsPerQuarter) {
+   return addTimeSignature(aTrack, aTick, top, bottom, clocksPerClick,
+      num32ndsPerQuarter);
+}
+
+
+
+//////////////////////////////
+//
+// MidiFile::makeVLV --  This function is used to create
+//   size byte(s) for meta-messages.  If the size of the data
+//   in the meta-message is greater than 127, then the size
+//   should (?) be specified as a VLV.
 //
 
 int MidiFile::makeVLV(uchar *buffer, int number) {
@@ -1444,8 +1584,12 @@ int MidiFile::makeVLV(uchar *buffer, int number) {
    unsigned long value = (unsigned long)number;
 
    if (value >= (1 << 28)) {
-      cout << "Error: number too large to handle" << endl;
-      exit(1);
+      cerr << "Error: Meta-message size too large to handle" << endl;
+      buffer[0] = 0;
+      buffer[1] = 0;
+      buffer[2] = 0;
+      buffer[3] = 0;
+      return 1;
    }
 
    buffer[0] = (value >> 21) & 0x7f;
@@ -1504,7 +1648,7 @@ int MidiFile::addNoteOn(int aTrack, int aTick, int aChannel, int key, int vel) {
 // MidiFile::addNoteOff -- Add a note-off message (using 0x80 messages).
 //
 
-int MidiFile::addNoteOff(int aTrack, int aTick, int aChannel, int key, 
+int MidiFile::addNoteOff(int aTrack, int aTick, int aChannel, int key,
       int vel) {
    MidiEvent* me = new MidiEvent;
    me->makeNoteOff(aChannel, key, vel);
@@ -1533,11 +1677,28 @@ int MidiFile::addNoteOff(int aTrack, int aTick, int aChannel, int key) {
 
 //////////////////////////////
 //
+// MidiFile::addController -- Add a controller message in the given
+//    track at the given tick time in the given channel.
+//
+
+int MidiFile::addController(int aTrack, int aTick, int aChannel,
+      int num, int value) {
+   MidiEvent* me = new MidiEvent;
+   me->makeController(aChannel, num, value);
+   me->tick = aTick;
+   events[aTrack]->push_back_no_copy(me);
+   return events[aTrack]->size() - 1;
+}
+
+
+
+//////////////////////////////
+//
 // MidiFile::addPatchChange -- Add a patch-change message in the given
 //    track at the given tick time in the given channel.
 //
 
-int MidiFile::addPatchChange(int aTrack, int aTick, int aChannel, 
+int MidiFile::addPatchChange(int aTrack, int aTick, int aChannel,
       int patchnum) {
    MidiEvent* me = new MidiEvent;
    me->makePatchChange(aChannel, patchnum);
@@ -1551,7 +1712,7 @@ int MidiFile::addPatchChange(int aTrack, int aTick, int aChannel,
 //////////////////////////////
 //
 // MidiFile::addTimbre -- Add a patch-change message in the given
-//    track at the given tick time in the given channel.  Alias for 
+//    track at the given tick time in the given channel.  Alias for
 //    MidiFile::addPatchChange().
 //
 
@@ -1688,6 +1849,8 @@ void MidiFile::clear(void) {
    events[0] = new MidiEventList;
    timemapvalid=0;
    timemap.clear();
+   theTrackState = TRACK_STATE_SPLIT;
+   theTimeState = TIME_STATE_ABSOLUTE;
 }
 
 
@@ -1844,7 +2007,9 @@ void MidiFile::setMillisecondTicks(void) {
 //
 
 void MidiFile::sortTrack(MidiEventList& trackData) {
-   qsort(trackData.data(), trackData.size(), sizeof(MidiEvent*), eventcompare);
+   if (theTimeState == TIME_STATE_ABSOLUTE) {
+      qsort(trackData.data(), trackData.size(), sizeof(MidiEvent*), eventcompare);
+   }
 }
 
 
@@ -1855,8 +2020,10 @@ void MidiFile::sortTrack(MidiEventList& trackData) {
 //
 
 void MidiFile::sortTracks(void) {
-   for (int i=0; i<getTrackCount(); i++) {
-      sortTrack(*events[i]);
+   if (theTimeState == TIME_STATE_ABSOLUTE) {
+      for (int i=0; i<getTrackCount(); i++) {
+         sortTrack(*events[i]);
+      }
    }
 }
 
@@ -1968,6 +2135,75 @@ int MidiFile::getAbsoluteTickTime(double starttime) {
 
 //////////////////////////////
 //
+// MidiFile::getTotalTimeInSeconds -- Returns the duration of the MidiFile
+//    event list in seconds.  If doTimeAnalysis() is not called before this
+//    function is called, it will be called automatically.
+//
+
+double MidiFile::getTotalTimeInSeconds(void) {
+   if (timemapvalid == 0) {
+      buildTimeMap();
+      if (timemapvalid == 0) {
+         return -1.0;    // something went wrong
+      }
+   }
+   double output = 0.0;
+   for (int i=0; i<(int)events.size(); i++) {
+      if (events[i]->last().seconds > output) {
+         output = events[i]->last().seconds;
+      }
+   }
+   return output;
+}
+
+
+
+///////////////////////////////
+//
+// MidiFile::getTotalTimeInTicks -- Returns the absolute tick value for the
+//    latest event in any track.  If the MidiFile is in TIME_STATE_DELTA,
+//    then temporarily got into TIME_STATE_ABSOLUTE to do the calculations.
+//    Note that this is expensive, so you should normally call this function
+//    while in aboslute tick mode.
+//
+
+int MidiFile::getTotalTimeInTicks(void) {
+   int oldTimeState = getTickState();
+   if (oldTimeState == TIME_STATE_DELTA) {
+      absoluteTicks();
+   }
+   if (oldTimeState == TIME_STATE_DELTA) {
+      deltaTicks();
+   }
+   int output = 0.0;
+   for (int i=0; i<(int)events.size(); i++) {
+      if (events[i]->last().tick > output) {
+         output = events[i]->last().tick;
+      }
+   }
+   return output;
+}
+
+
+
+///////////////////////////////
+//
+// MidiFile::getTotalTimeInQuarters -- Returns the Duration of the MidiFile
+//    in units of quarter notes.  If the MidiFile is in TIME_STATE_DELTA,
+//    then temporarily got into TIME_STATE_ABSOLUTE to do the calculations.
+//    Note that this is expensive, so you should normally call this function
+//    while in aboslute tick mode.
+//
+
+double MidiFile::getTotalTimeInQuarters(void) {
+   double totalTicks = getTotalTimeInTicks();
+   return totalTicks / getTicksPerQuarterNote();
+}
+
+
+
+//////////////////////////////
+//
 // MidiFile::doTimeAnalysis -- Identify the real-time position of
 //    all events by monitoring the tempo in relations to the tick
 //    times in the file.
@@ -1998,6 +2234,10 @@ int MidiFile::linkNotePairs(void) {
    return sum;
 }
 
+
+int MidiFile::linkEventPairs(void) {
+    return linkNotePairs();
+}
 
 
 //////////////////////////////
@@ -2091,7 +2331,7 @@ int MidiFile::linearTickInterpolationAtSecond(double seconds) {
 
 //////////////////////////////
 //
-// MidiFile::linearSecondInterpolationAtTick -- return the time in seconds 
+// MidiFile::linearSecondInterpolationAtTick -- return the time in seconds
 //    value at the given input tick time. (Ticks input could be made double).
 //
 
@@ -2324,7 +2564,7 @@ int MidiFile::extractMidiData(istream& input, vector<uchar>& array,
                }
                }
                break;
-            // The 0xf0 and 0xf7 meta commands deal with system-exclusive 
+            // The 0xf0 and 0xf7 meta commands deal with system-exclusive
             // messages. 0xf0 is used to either start a message or to store
             // a complete message.  The 0xf0 is part of the outgoing MIDI
             // bytes.  The 0xf7 message is used to send arbitrary bytes,
@@ -2362,20 +2602,24 @@ int MidiFile::extractMidiData(istream& input, vector<uchar>& array,
 //////////////////////////////
 //
 // MidiFile::readVLValue -- The VLV value is expected to be unpacked into
-//   a 4-byte integer, so only up to 5 bytes will be considered.
+//   a 4-byte integer no greater than 0x0fffFFFF, so a VLV value up to
+//   4-bytes in size (FF FF FF 7F) will only be considered.  Longer
+//   VLV values are not allowed in standard MIDI files, so the extract
+//   delta time would be truncated and the extra byte(s) will be parsed
+//   incorrectly as a MIDI command.
 //
 
 ulong MidiFile::readVLValue(istream& input) {
-   uchar b[5] = {0};
+   uchar b[4] = {0};
 
-   for (int i=0; i<5; i++) {
+   for (int i=0; i<4; i++) {
       b[i] = MidiFile::readByte(input);
       if (b[i] < 0x80) {
          break;
       }
    }
 
-   return unpackVLV(b[0], b[1], b[2], b[3], b[4]);
+   return unpackVLV(b[0], b[1], b[2], b[3]);
 }
 
 
@@ -2383,18 +2627,20 @@ ulong MidiFile::readVLValue(istream& input) {
 //////////////////////////////
 //
 // MidiFile::unpackVLV -- converts a VLV value to an unsigned long value.
-// default values: a = b = c = d = e = 0;
+//     The bytes a, b, c, d are in big-endian order (the order they would
+//     be read out of the MIDI file).
+// default values: a = b = c = d = 0;
 //
 
-ulong MidiFile::unpackVLV(uchar a, uchar b, uchar c, uchar d, uchar e) {
-   if (e > 0x7f) {
+ulong MidiFile::unpackVLV(uchar a, uchar b, uchar c, uchar d) {
+   if (d > 0x7f) {
       cerr << "Error: VLV value was too long" << endl;
-      exit(1);
+      return 0;
    }
 
-   uchar bytes[5] = {a, b, c, d, e};
+   uchar bytes[4] = {a, b, c, d};
    int count = 0;
-   while (bytes[count] > 0x7f && count < 5) {
+   while (bytes[count] > 0x7f && count < 4) {
       count++;
    }
    count++;
@@ -2414,25 +2660,31 @@ ulong MidiFile::unpackVLV(uchar a, uchar b, uchar c, uchar d, uchar e) {
 //
 // MidiFile::writeVLValue -- write a number to the midifile
 //    as a variable length value which segments a file into 7-bit
-//    values.  Maximum size of aValue is 0x7fffffff
+//    values and adds a contination bit to each.  Maximum size of input 
+//    aValue is 0x0FFFffff.
 //
 
 void MidiFile::writeVLValue(long aValue, vector<uchar>& outdata) {
-   uchar bytes[5] = {0};
-   bytes[0] = (uchar)(((ulong)aValue >> 28) & 0x7f);  // most significant 5 bits
-   bytes[1] = (uchar)(((ulong)aValue >> 21) & 0x7f);  // next largest 7 bits
-   bytes[2] = (uchar)(((ulong)aValue >> 14) & 0x7f);
-   bytes[3] = (uchar)(((ulong)aValue >> 7)  & 0x7f);
-   bytes[4] = (uchar)(((ulong)aValue)       & 0x7f);  // least significant 7 bits
+   uchar bytes[4] = {0};
+
+   if ((unsigned long)aValue >= (1 << 28)) {
+      cerr << "Error: number too large to convert to VLV" << endl;
+      aValue = 0x0FFFffff;
+   }
+
+   bytes[0] = (uchar)(((ulong)aValue >> 21) & 0x7f);  // most significant 7 bits
+   bytes[1] = (uchar)(((ulong)aValue >> 14) & 0x7f);
+   bytes[2] = (uchar)(((ulong)aValue >> 7)  & 0x7f);
+   bytes[3] = (uchar)(((ulong)aValue)       & 0x7f);  // least significant 7 bits
 
    int start = 0;
-   while (start<5 && bytes[start] == 0)  start++;
+   while ((start<4) && (bytes[start] == 0))  start++;
 
-   for (int i=start; i<4; i++) {
+   for (int i=start; i<3; i++) {
       bytes[i] = bytes[i] | 0x80;
       outdata.push_back(bytes[i]);
    }
-   outdata.push_back(bytes[4]);
+   outdata.push_back(bytes[3]);
 }
 
 
@@ -2489,6 +2741,14 @@ int eventcompare(const void* a, const void* b) {
       return +1;
    } else if (aevent.tick < bevent.tick) {
       // aevent occurs before bevent
+      return -1;
+   } else if (aevent.seq > bevent.seq) {
+      // aevent sequencing state occurs after bevent
+      // see MidiFile::markSequence()
+      return +1;
+   } else if (aevent.seq < bevent.seq) {
+      // aevent sequencing state occurs before bevent
+      // see MidiFile::markSequence()
       return -1;
    } else if (aevent[0] == 0xff && aevent[1] == 0x2f) {
       // end-of-track meta-message should always be last (but won't really
@@ -2592,7 +2852,7 @@ ulong MidiFile::readLittleEndian4Bytes(istream& input) {
    input.read((char*)buffer, 4);
    if (input.eof()) {
       cerr << "Error: unexpected end of file." << endl;
-      exit(1);
+      return 0;
    }
    return buffer[3] | (buffer[2] << 8) | (buffer[1] << 16) | (buffer[0] << 24);
 }
@@ -2611,7 +2871,7 @@ ushort MidiFile::readLittleEndian2Bytes(istream& input) {
    input.read((char*)buffer, 2);
    if (input.eof()) {
       cerr << "Error: unexpected end of file." << endl;
-      exit(1);
+      return 0;
    }
    return buffer[1] | (buffer[0] << 8);
 }
@@ -2629,7 +2889,7 @@ uchar MidiFile::readByte(istream& input) {
    input.read((char*)buffer, 1);
    if (input.eof()) {
       cerr << "Error: unexpected end of file." << endl;
-      exit(1);
+      return 0;
    }
    return buffer[0];
 }
