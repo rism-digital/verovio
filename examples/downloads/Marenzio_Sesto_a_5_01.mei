@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" xmlns:xlink="http://www.w3.org/1999/xlink"
     meiversion="3.0.0">
     <meiHead>
@@ -27,7 +29,9 @@
                     <itemList>
                         <item>
                             <physLoc>
-                                <identifier>I-Bc</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >I-Bc</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>Complete</annot>
@@ -35,7 +39,9 @@
                         </item>
                         <item>
                             <physLoc>
-                                <identifier>P-Kj</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >P-Kj</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>TB</annot>
@@ -43,7 +49,9 @@
                         </item>
                         <item>
                             <physLoc>
-                                <identifier>GB-Lwa</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >GB-Lwa</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>Complete</annot>
@@ -51,7 +59,9 @@
                         </item>
                         <item>
                             <physLoc>
-                                <identifier>D-Mbs</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >D-Mbs</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>Complete</annot>
@@ -59,7 +69,9 @@
                         </item>
                         <item>
                             <physLoc>
-                                <identifier>I-Nf</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >I-Nf</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>[unavailable]</annot>
@@ -67,7 +79,9 @@
                         </item>
                         <item>
                             <physLoc>
-                                <identifier>I-Rsc</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >I-Rsc</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>AQ incomplete</annot>
@@ -75,7 +89,9 @@
                         </item>
                         <item>
                             <physLoc>
-                                <identifier>I-Vnm</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >I-Vnm</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>B</annot>
@@ -96,7 +112,9 @@
                     <itemList>
                         <item>
                             <physLoc>
-                                <identifier>I-Bc</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >I-Bc</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>Complete</annot>
@@ -118,7 +136,9 @@
                     <itemList>
                         <item>
                             <physLoc>
-                                <identifier>I-Bc</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >I-Bc</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>Complete</annot>
@@ -139,7 +159,9 @@
                     <itemList>
                         <item>
                             <physLoc>
-                                <identifier>A-Wn</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >A-Wn</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>Complete</annot>
@@ -160,7 +182,9 @@
                     <itemList>
                         <item>
                             <physLoc>
-                                <identifier>I-Bc</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >I-Bc</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>Q</annot>
@@ -168,7 +192,9 @@
                         </item>
                         <item>
                             <physLoc>
-                                <identifier>US-BEm</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >US-BEm</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>T</annot>
@@ -176,7 +202,9 @@
                         </item>
                         <item>
                             <physLoc>
-                                <identifier>I-PS</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >I-PS</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>CAB; TQ incomplete</annot>
@@ -208,7 +236,9 @@
                     <itemList>
                         <item>
                             <physLoc>
-                                <identifier>GB-Lbl</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >GB-Lbl</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>BQ</annot>
@@ -216,7 +246,9 @@
                         </item>
                         <item>
                             <physLoc>
-                                <identifier>I-Vnm</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >I-Vnm</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>A</annot>
@@ -250,7 +282,9 @@
                     <itemList>
                         <item>
                             <physLoc>
-                                <identifier>I-Bc</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >I-Bc</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>Complete</annot>
@@ -271,7 +305,9 @@
                     <itemList>
                         <item>
                             <physLoc>
-                                <identifier>I-PAmc</identifier>
+                                <repository>
+                                    <identifier authURI="http://www.rism.info/" authority="RISM"
+                                        >I-PAmc</identifier></repository>
                             </physLoc>
                             <notesStmt>
                                 <annot>CATB</annot>
