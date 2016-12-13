@@ -1,8 +1,10 @@
 var searchData=
 [
+  ['s_5fabovestaffartic',['s_aboveStaffArtic',['../classvrv_1_1_artic.html#a0d6b92f3ac12b0890dfc98e3b3f93cda',1,'vrv::Artic']]],
   ['s_5fnum',['s_num',['../classvrv_1_1_mensur.html#a55614f0e13b3a2d805aa41cbb646830c',1,'vrv::Mensur']]],
   ['s_5fnumbase',['s_numBase',['../classvrv_1_1_mensur.html#a01c074d466cb310af3cedc0bf574cb2d',1,'vrv::Mensur']]],
-  ['save',['Save',['../classvrv_1_1_measure.html#a53146c5860c0e95b6510108dbc5493d8',1,'vrv::Measure::Save()'],['../classvrv_1_1_object.html#a9ed5a5a188e80752f5f553f0267059dd',1,'vrv::Object::Save(FileOutputStream *output)'],['../classvrv_1_1_object.html#a8ec6663670b4b6522cb4892babf36742',1,'vrv::Object::Save(FunctorParams *functorParams)']]],
+  ['s_5foutstaffartic',['s_outStaffArtic',['../classvrv_1_1_artic.html#a8e18feb79b45f9e8aea83b262ef87339',1,'vrv::Artic']]],
+  ['save',['Save',['../classvrv_1_1_artic_part.html#af6ed201057713592e24e522c25ed71e8',1,'vrv::ArticPart::Save()'],['../classvrv_1_1_measure.html#a53146c5860c0e95b6510108dbc5493d8',1,'vrv::Measure::Save()'],['../classvrv_1_1_object.html#a9ed5a5a188e80752f5f553f0267059dd',1,'vrv::Object::Save(FileOutputStream *output)'],['../classvrv_1_1_object.html#a8ec6663670b4b6522cb4892babf36742',1,'vrv::Object::Save(FunctorParams *functorParams)']]],
   ['savefile',['SaveFile',['../classvrv_1_1_toolkit.html#a968a2feb41a558700a2e9061489ce90a',1,'vrv::Toolkit']]],
   ['saveparams',['SaveParams',['../classvrv_1_1_save_params.html',1,'vrv']]],
   ['sb',['Sb',['../classvrv_1_1_sb.html',1,'vrv']]],
@@ -52,6 +54,7 @@ var searchData=
   ['sic',['Sic',['../classvrv_1_1_sic.html',1,'vrv']]],
   ['slur',['Slur',['../classvrv_1_1_slur.html',1,'vrv']]],
   ['space',['Space',['../classvrv_1_1_space.html',1,'vrv']]],
+  ['splitartic',['SplitArtic',['../classvrv_1_1_artic.html#ab6b401bb7dfd502eccd21bf9614bc905',1,'vrv::Artic']]],
   ['stacknote',['StackNote',['../classvrv_1_1_grace_aligner.html#a7d499779f4f450b7c946e42e192c8b50',1,'vrv::GraceAligner']]],
   ['staff',['Staff',['../classvrv_1_1_staff.html',1,'vrv']]],
   ['staffalignment',['StaffAlignment',['../classvrv_1_1_staff_alignment.html',1,'vrv']]],

@@ -18,6 +18,7 @@ var searchData=
   ['interfaceresetdrawing',['InterfaceResetDrawing',['../classvrv_1_1_boundary_start_interface.html#a96d71aa252b0356881df01923675fa74',1,'vrv::BoundaryStartInterface::InterfaceResetDrawing()'],['../classvrv_1_1_time_point_interface.html#a28c0d2e97af7e3b9a28898175dff2867',1,'vrv::TimePointInterface::InterfaceResetDrawing()'],['../classvrv_1_1_time_spanning_interface.html#a662b369eb4ed6068d8b9da4de73108ed',1,'vrv::TimeSpanningInterface::InterfaceResetDrawing()']]],
   ['inttree',['IntTree',['../structvrv_1_1_int_tree.html',1,'vrv']]],
   ['isboundaryelement',['IsBoundaryElement',['../classvrv_1_1_object.html#a5b1d528341ef806d382cdd1c27911021',1,'vrv::Object']]],
+  ['iscentered',['IsCentered',['../classvrv_1_1_artic.html#a0f3c3112f20c06ce5f18d8a97c9ecea7',1,'vrv::Artic']]],
   ['ischordtone',['IsChordTone',['../classvrv_1_1_note.html#a8fac70447933b92e2615280b6909e351',1,'vrv::Note']]],
   ['iscuesize',['IsCueSize',['../classvrv_1_1_layer_element.html#ac2c174a795b8db2b6d464485563b4bf0',1,'vrv::LayerElement']]],
   ['isfirstinbeam',['IsFirstInBeam',['../classvrv_1_1_beam.html#a6b77b30f89dcc0f8b266138baa8904eb',1,'vrv::Beam::IsFirstInBeam()'],['../classvrv_1_1_duration_interface.html#ac7abd60beb364ff44323e4e60e11d59f',1,'vrv::DurationInterface::IsFirstInBeam()']]],

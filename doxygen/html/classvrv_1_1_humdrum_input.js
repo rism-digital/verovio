@@ -5,6 +5,7 @@ var classvrv_1_1_humdrum_input =
     [ "addCautionaryAccidental", "classvrv_1_1_humdrum_input.html#a8277396c33fdabde39753b50449cb56e", null ],
     [ "addInstrumentDefinition", "classvrv_1_1_humdrum_input.html#a1e14b7af054912c41d97830f0ad66aa0", null ],
     [ "addMidiTempo", "classvrv_1_1_humdrum_input.html#ae4750a3c4c90ef1137a048d919a0d192", null ],
+    [ "addOrnamentMarkers", "classvrv_1_1_humdrum_input.html#a5b5795f5d08ead5b6d1dc6db7816b990", null ],
     [ "addPerson", "classvrv_1_1_humdrum_input.html#a0f397cab2c097889ebf3c0b81e265fc5", null ],
     [ "addSpace", "classvrv_1_1_humdrum_input.html#adc95172c99cf0eb8feda9e06e03cacd2", null ],
     [ "addTextElement", "classvrv_1_1_humdrum_input.html#a9f3ef5d7ed76a7ceae4d5239f4dc0cfe", null ],

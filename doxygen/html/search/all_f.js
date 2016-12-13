@@ -10,6 +10,7 @@ var searchData=
   ['positioninchord',['PositionInChord',['../classvrv_1_1_chord.html#ad9046f9798eab922478f13c533e5e22f',1,'vrv::Chord']]],
   ['positioninligature',['PositionInLigature',['../classvrv_1_1_ligature.html#a8bab53f0b12355d5250c75c6de55f80e',1,'vrv::Ligature']]],
   ['positioninterface',['PositionInterface',['../classvrv_1_1_position_interface.html',1,'vrv']]],
+  ['prepareartic',['PrepareArtic',['../classvrv_1_1_artic.html#a0c860640f08eb9e224ecb11181fd1060',1,'vrv::Artic::PrepareArtic()'],['../classvrv_1_1_object.html#a0674d22a5359f7cbbf5b1ce8221bdae2',1,'vrv::Object::PrepareArtic()']]],
   ['prepareboundaries',['PrepareBoundaries',['../classvrv_1_1_boundary_end.html#aeb741e55b22fa843466a6e46075818ce',1,'vrv::BoundaryEnd::PrepareBoundaries()'],['../classvrv_1_1_editorial_element.html#ae619830b7bf77603328d2d4e6742c10f',1,'vrv::EditorialElement::PrepareBoundaries()'],['../classvrv_1_1_ending.html#a1704ee591ae157f7e7f553e176d8aab6',1,'vrv::Ending::PrepareBoundaries()'],['../classvrv_1_1_measure.html#a951466390e4c4a3a4d47687714853f8a',1,'vrv::Measure::PrepareBoundaries()'],['../classvrv_1_1_object.html#af5acc10b3d917c8065eb86db13ae6112',1,'vrv::Object::PrepareBoundaries()'],['../classvrv_1_1_section.html#a8908d7a3629b999b424bdf2c6d894143',1,'vrv::Section::PrepareBoundaries()']]],
   ['prepareboundariesparams',['PrepareBoundariesParams',['../classvrv_1_1_prepare_boundaries_params.html',1,'vrv']]],
   ['preparedrawing',['PrepareDrawing',['../classvrv_1_1_doc.html#a957061578a058f9ddeabb0a66cf80cd8',1,'vrv::Doc']]],

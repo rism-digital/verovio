@@ -3,6 +3,7 @@ var files =
     [ "accid.h", "accid_8h_source.html", null ],
     [ "aligner.h", "aligner_8h_source.html", null ],
     [ "anchoredtext.h", "anchoredtext_8h_source.html", null ],
+    [ "artic.h", "artic_8h_source.html", null ],
     [ "att.h", "att_8h_source.html", null ],
     [ "attcomparison.h", "attcomparison_8h_source.html", null ],
     [ "attdef.h", "attdef_8h_source.html", null ],
