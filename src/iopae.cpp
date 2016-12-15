@@ -596,9 +596,7 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
     // Previously these were extended regex syntax, but this case
     // is the same in ECMAScript syntax.
     std::regex exp("^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", std::regex_constants::ECMAScript);
-    // std::regex_constants::format_first_ony is for demo purposes.
-    // It is not really need in this case do to "^" (start-of-line anchor).
-    bool is_tuplet = regex_search(incipit + i, exp, std::regex_constants::format_first_only);
+    bool is_tuplet = regex_search(incipit + i, exp);
 
     if (is_tuplet) {
         int t = i;
