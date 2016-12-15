@@ -161,7 +161,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
-    
+
     // Set tempo
     if (m_scoreDef.HasMidiBpm()) {
         midiFile->addTrack(0);

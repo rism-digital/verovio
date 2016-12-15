@@ -350,8 +350,8 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if (outformat != "svg" && outformat != "mei" && outformat != "midi") {
-        cerr << "Output format can only be 'mei', 'svg', or 'midi'." << endl;
+    if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "tmap") {
+        cerr << "Output format can only be 'mei', 'svg', 'midi', or 'tmap'." << endl;
         exit(1);
     }
 
@@ -441,6 +441,27 @@ int main(int argc, char **argv)
         else {
             cerr << toolkit.GetTimeMap(200);
             cerr << "Output written to " << outfile << "." << endl;
+        }
+    }
+    else if (outformat == "tmap") {
+        toolkit.RenderToMidi();
+        int p;
+        for (p = from; p < to; p++) {
+            std::string cur_outfile = outfile;
+            if (all_pages) {
+                cur_outfile += StringFormat("_%03d", p);
+            }
+            cur_outfile += ".json";
+            if (std_output) {
+                cout << toolkit.GetTimeMap(p);
+            }
+            else if (!toolkit.GetTimeMapToFile(cur_outfile, p)) {
+                cerr << "Unable to write JSON TimeMap to " << cur_outfile << "." << endl;
+                exit(1);
+            }
+            else {
+                cerr << "Output written to " << cur_outfile << "." << endl;
+            }
         }
     }
     else {

@@ -160,6 +160,11 @@ public:
     std::string GetTimeMap(const int pageNo);
 
     /**
+     * Write the timemap to a file
+     */
+    bool GetTimeMapToFile(const std::string &filename, int pageNo = 1);
+
+    /**
     * @name Set and get a std::string into a char * buffer.
     * This is used for returning a string buffer to emscripten.
     * The buffer is freed when reset or in MusController destructor.

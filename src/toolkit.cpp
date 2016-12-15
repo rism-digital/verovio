@@ -806,36 +806,54 @@ std::string Toolkit::GetElementsAtTime(int millisec)
 std::string Toolkit::GetTimeMap(const int pageNo)
 {
     jsonxx::Object o;
-    
+
     if (!m_doc.HasPage(pageNo - 1)) return "";
-    
+
     // Here we would need to check that the midi export is done
     if (!m_doc.GetMidiExportDone()) {
         LogError("The MIDI export has to be performed prior to calling this method");
         return "";
     }
-    
-    Page *page = dynamic_cast<Page*>(m_doc.GetChild(pageNo - 1));
+
+    Page *page = dynamic_cast<Page *>(m_doc.GetChild(pageNo - 1));
     assert(page);
-    
-    
+
     AttComparison attComparison(NOTE);
     ArrayOfObjects notes;
     page->FindAllChildByAttComparison(&notes, &attComparison);
-    
+
+    double timeofElement;
     ArrayOfObjects::iterator iter;
     for (iter = notes.begin(); iter != notes.end(); iter++) {
-        Note *note = dynamic_cast<Note*>(*iter);
+        Note *note = dynamic_cast<Note *>(*iter);
         assert(note);
         jsonxx::Array a;
         jsonxx::Object on;
-        on << "on" << note->m_playingOnset;
+        timeofElement = note->m_playingOnset * 1000 / 120;
+        on << "on" << timeofElement;
         jsonxx::Object off;
-        off << "off" << note->m_playingOffset;
+        off << "off" << note->m_playingOffset * 1000 / 120;
         a << on << off;
         o << note->GetUuid() << a;
     }
     return o.json();
+}
+
+bool Toolkit::GetTimeMapToFile(const std::string &filename, int pageNo)
+{
+    std::string output = GetTimeMap(pageNo);
+
+    std::ofstream outfile;
+    outfile.open(filename.c_str());
+
+    if (!outfile.is_open()) {
+        // add message?
+        return false;
+    }
+
+    outfile << output;
+    outfile.close();
+    return true;
 }
 
 bool Toolkit::RenderToMidiFile(const std::string &filename)
