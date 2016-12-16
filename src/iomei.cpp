@@ -717,6 +717,7 @@ void MeiOutput::WriteMeiDir(pugi::xml_node currentNode, Dir *dir)
     WriteXmlId(currentNode, dir);
     WriteTextDirInterface(currentNode, dir);
     WriteTimeSpanningInterface(currentNode, dir);
+    dir->WriteLang(currentNode);
 };
 
 void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
@@ -810,6 +811,7 @@ void MeiOutput::WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo)
     WriteXmlId(currentNode, tempo);
     WriteTextDirInterface(currentNode, tempo);
     WriteTimePointInterface(currentNode, tempo);
+    tempo->WriteLang(currentNode);
     tempo->WriteMiditempo(currentNode);
 }
 
@@ -1074,6 +1076,7 @@ void MeiOutput::WriteMeiVerse(pugi::xml_node currentNode, Verse *verse)
 
     WriteLayerElement(currentNode, verse);
     verse->WriteColor(currentNode);
+    verse->WriteLang(currentNode);
     verse->WriteCommon(currentNode);
 }
 
@@ -2142,6 +2145,7 @@ bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
 
     ReadTextDirInterface(dir, vrvDir);
     ReadTimeSpanningInterface(dir, vrvDir);
+    vrvDir->ReadLang(dir);
 
     parent->AddChild(vrvDir);
     return ReadMeiTextChildren(vrvDir, dir);
@@ -2247,6 +2251,7 @@ bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
 
     ReadTextDirInterface(tempo, vrvTempo);
     ReadTimePointInterface(tempo, vrvTempo);
+    vrvTempo->ReadLang(tempo);
     vrvTempo->ReadMiditempo(tempo);
 
     parent->AddChild(vrvTempo);
@@ -2791,6 +2796,7 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
     ReadLayerElement(verse, vrvVerse);
 
     vrvVerse->ReadColor(verse);
+    vrvVerse->ReadLang(verse);
     vrvVerse->ReadCommon(verse);
 
     parent->AddChild(vrvVerse);
