@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Dec 10 15:59:41 PST 2016
+// Last Modified: Fri Dec 16 22:15:25 PST 2016
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -67,6 +67,7 @@ using std::istream;
 using std::map;
 using std::ostream;
 using std::pair;
+using std::regex;
 using std::set;
 using std::string;
 using std::stringstream;
@@ -342,11 +343,21 @@ ostream& operator<<(ostream& out, const vector<A>& v);
 class HumRegex {
 	public:
 		            HumRegex           (void);
-		            HumRegex           (const string& exp);
+		            HumRegex           (const string& exp,
+		                                const string& options = "");
 		           ~HumRegex           ();
 
+		// setting persistent options for regular expression contruction
+		void        setIgnoreCase      (void);
+		bool        getIgnoreCase      (void);
+		void        unsetIgnoreCase    (void);
+
+		// setting persistent search/match options
+		void        setGlobal          (void);
+		bool        getGlobal          (void);
+		void        unsetGlobal        (void);
+
 		// replacing
-
 		string&     replaceDestructive (string& input, const string& replacement,
 		                                const string& exp);
 		string&     replaceDestructive (string& input, const string& replacement,
@@ -370,6 +381,14 @@ class HumRegex {
 		string      replaceCopy        (string* input, const string& replacement,
 		                                const string& exp,
 		                                const string& options);
+		// matching (full-string match)
+		bool        match              (const string& input, const string& exp);
+		bool        match              (const string& input, const string& exp,
+		                                const string& options);
+		bool        match              (const string* input, const string& exp);
+		bool        match              (const string* input, const string& exp,
+		                                const string& options);
+
 
 		// searching
 		// http://www.cplusplus.com/reference/regex/regex_search
@@ -405,13 +424,11 @@ class HumRegex {
 		                                const string& buffer,
 		                                const string& separator);
 
-		// setting option flags:
-		void        setIgnoreCase      (void);
-		void        setNoIgnoreCase    (void);
-
 	protected:
+		std::regex_constants::syntax_option_type
+				getTemporaryRegexFlags(const string& sflags);
 		std::regex_constants::match_flag_type
-				getTemporaryFlags(const string& sflags);
+				getTemporarySearchFlags(const string& sflags);
 
 
 	private:
@@ -421,6 +438,7 @@ class HumRegex {
 		// http://en.cppreference.com/w/cpp/regex/basic_regex
 		// .assign(string) == set the regular expression.
 		// operator=       == set the regular expression.
+		// .flags()        == return syntax_option_type used to construct.
 		std::regex m_regex;
 
 		// m_matches: stores the matches from a search:
@@ -438,39 +456,41 @@ class HumRegex {
 		// .end()       == end of submatch list.
 		std::smatch m_matches;
 
-		// m_flags: stores default settings for regex processing
+		// m_regexflags: store default settings for regex processing
 		// http://en.cppreference.com/w/cpp/regex/syntax_option_type
 		// http://en.cppreference.com/w/cpp/regex/basic_regex
+		// /usr/local/Cellar/gcc49/4.9.3/include/c++/4.9.3/bits/regex_constants.h 
 		//
-		// Options:
-		//    regex::icase      == Ignore case.
-		//    regex::nosubs     == Don't collect submatches.
-		//    regex::optimize   == Make matching faster, but
-		//                                   construction slower.
-		//    regex::collate    == locale character ranges.
-		//    regex::multiline  == C++17 only.
+		// Options (in the namespace std::regex_constants):
+		//    icase      == Ignore case.
+		//    nosubs     == Don't collect submatches.
+		//    optimize   == Make matching faster, but construction slower.
+		//    collate    == locale character ranges.
+		//    multiline  == C++17 only.
 		//
-		// only one of the following can be given.  EMCAScript will be
-		// used by default if non specified.
-		//    regex::EMCAScript == Use EMCAScript regex syntax.
-		//    regex::basic      == Use basic POSIX syntax.
-		//    regex::extended   == Use extended POSIX syntax.
-		//    regex::awk        == Use awk POSIX syntax.
-		//    regex::grep       == Use grep POSIX syntax.
-		//    regex::extended   == Use egrep POSIX syntax.
-		// or:
-		// http://www.cplusplus.com/reference/regex/regex_search/
-		//    match_default     == clear all options
-		//    match_not_bol     == not beginning of line
-		//    match_not_eol     == not end of line
-		//    match_not_bow     == not beginning of word for \b
-		//    match_not_eow     == not end of word for \b
-		//    match_any         == any match acceptable if more than 1 possible.
-		//    match_not_null    == empty sequence does note match
+		// Only one of the following can be given.  EMCAScript will be
+		// used by default if none specified.
+		//    EMCAScript == Use EMCAScript regex syntax.
+		//    basic      == Use basic POSIX syntax.
+		//    extended   == Use extended POSIX syntax.
+		//    awk        == Use awk POSIX syntax.
+		//    grep       == Use grep POSIX syntax.
+		//    egrep      == Use egrep POSIX syntax.
+		std::regex_constants::syntax_option_type m_regexflags;
+
+		// m_flags: store default settings for regex processing
+		// http://www.cplusplus.com/reference/regex/regex_search
+		//    match_default     == clear all options.
+		//    match_not_bol     == not beginning of line.
+		//    match_not_eol     == not end of line.
+		//    match_not_bow     == not beginning of word for \b.
+		//    match_not_eow     == not end of word for \b.
+		//    match_any         == any match acceptable if more than 1 possible..
+		//    match_not_null    == empty sequence does note match.
 		//    match_continuous  ==
 		//    match_prev_avail  ==
 		//    format_default    == same as match_default.
-		std::regex_constants::match_flag_type m_flags;
+		std::regex_constants::match_flag_type m_searchflags;
 
 };
 
@@ -1392,6 +1412,8 @@ class HumdrumFileBase : public HumHash {
 		                                        const string& separator = ",");
 		ostream&      printFieldNumber         (int fieldnum, ostream& out);
 		ostream&      printFieldIndex          (int fieldind, ostream& out);
+		void          usage                    (const string& command);
+		void          example                  (void);
 
 		HTp           getTrackStart            (int track) const;
 		HTp           getSpineStart            (int spine) const
@@ -1432,6 +1454,8 @@ class HumdrumFileBase : public HumHash {
 //		void          adjustMergeSpineLines    (void);
 
 		HumdrumLine*  back                     (void);
+		void          makeBooleanTrackList     (vector<bool>& spinelist,
+		                                        const string& spinestring);
 
 
 		vector<HumdrumLine*> getReferenceRecords(void);
@@ -1602,6 +1626,7 @@ class HumdrumFileStructure : public HumdrumFileBase {
 		              HumdrumFileStructure         (const string& filename);
 		              HumdrumFileStructure         (istream& contents);
 		             ~HumdrumFileStructure         ();
+		bool          hasFilters                   (void);
 
 		// TSV reading functions:
 		bool          read                         (istream& contents);
@@ -2355,6 +2380,10 @@ class Convert {
 		static void    wbhToPitch           (int& dpc, int& acc, int& octave,
 		                                     int maxacc, int wbh);
 		static int     kernClefToBaseline   (const string& input);
+		static string  base40ToTrans        (int base40);
+		static int     transToBase40        (const string& input);
+		static int     base40IntervalToLineOfFifths(int trans);
+		static string  keyNumberToKern      (int number);
 
 		// data-type specific (other than pitch/rhythm),
 		// defined in Convert-kern.cpp
@@ -2367,7 +2396,7 @@ class Convert {
 		static int  getKernSlurEndElisionLevel  (const string& kerndata);
 
 		static bool isKernSecondaryTiedNote (const string& kerndata);
-		static string  getKernPitchAttributes (const string& kerndata);
+		static string getKernPitchAttributes(const string& kerndata);
 
 		// String processing, defined in Convert-string.cpp
 		static vector<string> splitString   (const string& data,
@@ -2385,6 +2414,9 @@ class Convert {
 		static bool    contains(const string& input, char pattern);
 		static bool    contains(string* input, const string& pattern);
 		static bool    contains(string* input, char pattern);
+		static void    makeBooleanTrackList(vector<bool>& spinelist,
+		                                     const string& spinestring, 
+		                                     int maxtrack);
 
 		// Mathematical processing, defined in Convert-math.cpp
 		static int     getLcm               (const vector<int>& numbers);
@@ -2394,6 +2426,7 @@ class Convert {
 		                                    double delta = 0.00001);
 		static double  significantDigits    (double value, int digits);
 		static bool    isNaN                (double value);
+		static double  pearsonCorrelation   (vector<double> x, vector<double> y);
 
 };
 
@@ -2401,37 +2434,37 @@ class Convert {
 
 class Option_register {
 	public:
-		             Option_register     (void);
-		             Option_register     (const string& aDefinition, char aType,
+		         Option_register     (void);
+		         Option_register     (const string& aDefinition, char aType,
 		                                  const string& aDefaultOption);
-		             Option_register     (const string& aDefinition, char aType,
+		         Option_register     (const string& aDefinition, char aType,
 		                                  const string& aDefaultOption,
 		                                  const string& aModifiedOption);
-		            ~Option_register     ();
+		        ~Option_register     ();
 
-		void          clearModified      (void);
-		const string& getDefinition      (void);
-		const string& getDefault         (void);
-		const string& getOption          (void);
-		const string& getModified        (void);
-		const string& getDescription     (void);
-		int           isModified         (void);
-		char          getType            (void);
-		void          reset              (void);
-		void          setDefault         (const string& aString);
-		void          setDefinition      (const string& aString);
-		void          setDescription     (const string& aString);
-		void          setModified        (const string& aString);
-		void          setType            (char aType);
-		ostream&      print              (ostream& out);
+		void     clearModified      (void);
+		string   getDefinition      (void);
+		string   getDefault         (void);
+		string   getOption          (void);
+		string   getModified        (void);
+		string   getDescription     (void);
+		int      isModified         (void);
+		char     getType            (void);
+		void     reset              (void);
+		void     setDefault         (const string& aString);
+		void     setDefinition      (const string& aString);
+		void     setDescription     (const string& aString);
+		void     setModified        (const string& aString);
+		void     setType            (char aType);
+		ostream& print              (ostream& out);
 
 	protected:
-		string       definition;
-		string       description;
-		string       defaultOption;
-		string       modifiedOption;
-		int          modifiedQ;
-		char         type;
+		string   m_definition;
+		string   m_description;
+		string   m_defaultOption;
+		string   m_modifiedOption;
+		int      m_modifiedQ;
+		char     m_type;
 };
 
 
@@ -2446,15 +2479,15 @@ class Options {
 		int             define            (const string& aDefinition);
 		int             define            (const string& aDefinition,
 		                                   const string& description);
-		const string&   getArg            (int index);
-		const string&   getArgument       (int index);
+		string          getArg            (int index);
+		string          getArgument       (int index);
 		int             getArgCount       (void);
 		int             getArgumentCount  (void);
 		vector<string>& getArgList        (vector<string>& output);
 		vector<string>& getArgumentList   (vector<string>& output);
 		int             getBoolean        (const string& optionName);
 		string          getCommand        (void);
-		const string&   getCommandLine    (void);
+		string          getCommandLine    (void);
 		string          getDefinition     (const string& optionName);
 		double          getDouble         (const string& optionName);
 		char            getFlag           (void);
@@ -2472,6 +2505,11 @@ class Options {
 		void            process           (int argc, char** argv,
 		                                      int error_check = 1,
 		                                      int suppress = 0);
+		void            process           (vector<string>& argv,
+		                                      int error_check = 1,
+		                                      int suppress = 0);
+		void            process           (string& argv, int error_check = 1,
+		                                      int suppress = 0);
 		void            reset             (void);
 		void            xverify           (int argc, char** argv,
 		                                      int error_check = 1,
@@ -2482,35 +2520,58 @@ class Options {
 		void            setModified       (const string& optionName,
 		                                   const string& optionValue);
 		void            setOptions        (int argc, char** argv);
+		void            setOptions        (vector<string>& argv);
+		void            setOptions        (string& args);
 		void            appendOptions     (int argc, char** argv);
-		void            appendOptions     (const string& strang);
-		void            appendOptions     (const vector<string>& argv);
+		void            appendOptions     (string& args);
+		void            appendOptions     (vector<string>& argv);
 		ostream&        printRegister     (ostream& out);
 		int             isDefined         (const string& name);
+		static vector<string>  tokenizeCommandLine(string& args);
 
 	protected:
-		int                      m_options_error_check;  // for verify command
-		int                      m_oargc;
-		vector<string>           m_oargv;
-		string                   m_commandString;
-		char                     m_optionFlag;
-		vector<string*>          m_argument;
+		// m_argv: the list of raw command line strings including
+		// a mix of options and non-option argument.
+		vector<string> m_argv;
 
+		// m_arguments: list of parsed command-line arguments which
+		// are not options, or the command (argv[0]);
+		vector<string> m_arguments;
+
+		// m_optionRegister: store for the states/values of each option.
 		vector<Option_register*> m_optionRegister;
-		map<string, int>         m_optionList;
 
-		int                      m_processedQ;
-		int                      m_suppressQ;       // prevent --options option
-		int                      m_optionsArgument; // indicates --options present
+		// m_optionFlag: the character which indicates an option.
+		// Generally a dash, but could be made a slash for Windows environments.
+		char m_optionFlag = '-';
 
-		vector<string>           m_extraArgv;
-		vector<string>           m_extraArgv_strings;
+		// m_optionList:
+		map<string, int> m_optionList;
 
-		int         getRegIndex           (const string& optionName);
-		int         optionQ               (const string& aString, int& argp);
-		int         storeOption           (int gargp, int& position,
-		                                   int& running);
+		//
+		// boolern options for object:
+		//
 
+		// m_options_error_check: for .verify() function.
+		bool m_options_error_checkQ = true;
+
+		// m_processedQ: true if process() was run.  This will parse
+		// the command-line arguments into a list of options, and also
+		// enable boolean versions of the options.
+		bool m_processedQ = false;
+
+		// m_suppressQ: true means to suppress automatic --options option
+		// listing.
+		bool m_suppressQ = false;
+
+		// m_optionsArgument: indicate that --options was used.
+		bool m_optionsArgQ = false;
+
+
+	private:
+		int     getRegIndex    (const string& optionName);
+		bool    isOption       (const string& aString, int& argp);
+		int     storeOption    (int gargp, int& position, int& running);
 };
 
 #define OPTION_BOOLEAN_TYPE   'b'
@@ -2759,6 +2820,140 @@ class Tool_autostem : public HumTool {
 };
 
 
+class Tool_extract : public HumTool {
+	public:
+		         Tool_extract  (void);
+		        ~Tool_extract  () {};
+
+		bool     run                    (HumdrumFile& infile);
+		bool     run                    (const string& indata, ostream& out);
+		bool     run                    (HumdrumFile& infile, ostream& out);
+
+	protected:
+
+		// auto transpose functions:
+		void     initialize             (HumdrumFile& infile);
+
+		// function declarations
+		void    processFile             (HumdrumFile& infile);
+		void    excludeFields           (HumdrumFile& infile, vector<int>& field,
+		                                 vector<int>& subfield, vector<int>& model);
+		void    extractFields           (HumdrumFile& infile, vector<int>& field,
+		                                 vector<int>& subfield, vector<int>& model);
+		void    extractTrace            (HumdrumFile& infile, const string& tracefile);
+		void    getInterpretationFields (vector<int>& field, vector<int>& subfield,
+		                                 vector<int>& model, HumdrumFile& infile,
+		                                 string& interps, int state);
+		//void    extractInterpretations  (HumdrumFile& infile, string& interps);
+		void    example                 (void);
+		void    usage                   (const string& command);
+		void    fillFieldData           (vector<int>& field, vector<int>& subfield,
+		                                 vector<int>& model, string& fieldstring,
+		                                 HumdrumFile& infile);
+		void    processFieldEntry       (vector<int>& field, vector<int>& subfield,
+		                                 vector<int>& model, const string& astring,
+		                                 HumdrumFile& infile);
+		void    removeDollarsFromString (string& buffer, int maxtrack);
+		int     isInList                (int number, vector<int>& listofnum);
+		void    getTraceData            (vector<int>& startline,
+		                                 vector<vector<int> >& fields,
+		                                 const string& tracefile, HumdrumFile& infile);
+		void    printTraceLine          (HumdrumFile& infile, int line,
+		                                 vector<int>& field);
+		void    dealWithSpineManipulators(HumdrumFile& infile, int line,
+		                                 vector<int>& field, vector<int>& subfield,
+		                                 vector<int>& model);
+		void    storeToken              (vector<string>& storage,
+		                                 const string& string);
+		void    storeToken              (vector<string>& storage, int index,
+		                                 const string& string);
+		void    printMultiLines         (vector<int>& vsplit, vector<int>& vserial,
+		                                 vector<string>& tempout);
+		void    reverseSpines           (vector<int>& field, vector<int>& subfield,
+		                                 vector<int>& model, HumdrumFile& infile,
+		                                 const string& exinterp);
+		void    getSearchPat            (string& spat, int target,
+		                                 const string& modifier);
+		void    expandSpines            (vector<int>& field, vector<int>& subfield,
+		                                 vector<int>& model, HumdrumFile& infile,
+		                                 string& interp);
+		void    dealWithSecondarySubspine(vector<int>& field, vector<int>& subfield,
+		                                 vector<int>& model, int targetindex,
+		                                 HumdrumFile& infile, int line, int spine,
+		                                 int submodel);
+		void    dealWithCospine         (vector<int>& field, vector<int>& subfield,
+		                                 vector<int>& model, int targetindex,
+		                                 HumdrumFile& infile, int line, int cospine,
+		                                 int comodel, int submodel,
+		                                 const string& cointerp);
+		void    printCotokenInfo        (int& start, HumdrumFile& infile, int line,
+		                                 int spine, vector<string>& cotokens,
+		                                 vector<int>& spineindex,
+		                                 vector<int>& subspineindex);
+		void    fillFieldDataByGrep     (vector<int>& field, vector<int>& subfield,
+		                                 vector<int>& model, const string& grepString,
+		                                 HumdrumFile& infile, int state);
+
+	private:
+
+		// global variables
+		int          excludeQ = 0;        // used with -x option
+		int          expandQ  = 0;        // used with -e option
+		string       expandInterp = "";   // used with -E option
+		int          interpQ  = 0;        // used with -i option
+		string       interps  = "";       // used with -i option
+		int          debugQ   = 0;        // used with --debug option
+		int          kernQ    = 0;        // used with -k option
+		int          fieldQ   = 0;        // used with -f or -p option
+		string       fieldstring = "";    // used with -f or -p option
+		vector<int>  field;               // used with -f or -p option
+		vector<int>  subfield;            // used with -f or -p option
+		vector<int>  model;               // used with -p, or -e options and similar
+		int          countQ   = 0;        // used with -C option
+		int          traceQ   = 0;        // used with -t option
+		string       tracefile = "";      // used with -t option
+		int          reverseQ = 0;        // used with -r option
+		string       reverseInterp = "**kern"; // used with -r and -R options.
+		// sub-spine "b" expansion model: how to generate data for a secondary
+		// spine if the primary spine is not divided.  Models are:
+		//    'd': duplicate primary spine (or "a" subspine) data (default)
+		//    'n': null = use a null token
+		//    'r': rest = use a rest instead of a primary spine note (in **kern)
+		//         data.  'n' will be used for non-kern spines when 'r' is used.
+		int          submodel = 'd';       // used with -m option
+		string editorialInterpretation = "yy";
+		string      cointerp = "**kern";   // used with -c option
+		int         comodel  = 0;          // used with -M option
+		string subtokenseparator = " "; // used with a future option
+		int         interpstate = 0;       // used -I or with -i
+		int         grepQ       = 0;       // used with -g option
+		string      grepString  = "";      // used with -g option
+
+};
+
+
+
+class Tool_filter : public HumTool {
+	public:
+		         Tool_filter   (void);
+		        ~Tool_filter   () {};
+
+		bool     run             (HumdrumFile& infile);
+		bool     run             (const string& indata, ostream& out);
+		bool     run             (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     getCommandList  (vector<pair<string, string> >& commands,
+		                          HumdrumFile& infile);
+		void     initialize      (HumdrumFile& infile);
+
+	private:
+		string   m_variant;        // used with -v option.
+		bool     m_debugQ = false; // used with --debug option
+
+};
+
+
 class Tool_metlev : public HumTool {
 	public:
 		      Tool_metlev      (void);
@@ -2798,7 +2993,140 @@ class Tool_recip : public HumTool {
 	private:
 		vector<HTp> m_kernspines;
 		bool        m_graceQ = true;
+		string      m_exinterp = "**recip";
 
+};
+
+
+
+class Tool_satb2gs : public HumTool {
+	public:
+		         Tool_satb2gs    (void);
+		        ~Tool_satb2gs    () {};
+
+		bool     run             (HumdrumFile& infile);
+		bool     run             (const string& indata, ostream& out);
+		bool     run             (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     initialize      (HumdrumFile& infile);
+		void     processFile     (HumdrumFile& infile);
+		void     example         (void);
+		void     usage           (const string& command);
+		void     convertData     (HumdrumFile& infile);
+		int      getSatbTracks   (vector<int>& tracks, HumdrumFile& infile);
+		void     printSpine      (HumdrumFile& infile, int row, int col, 
+		                          vector<int>& satbtracks);
+		void     printExInterp   (HumdrumFile& infile, int line, 
+		                          vector<int>& tracks);
+		void     printLastLine   (HumdrumFile& infile, int line, 
+		                          vector<int>& tracks);
+	private:
+		int    debugQ    = 0;             // used with --debug option
+};
+
+
+
+class Tool_transpose : public HumTool {
+	public:
+		         Tool_transpose  (void);
+		        ~Tool_transpose  () {};
+
+		bool     run             (HumdrumFile& infile);
+		bool     run             (const string& indata, ostream& out);
+		bool     run             (HumdrumFile& infile, ostream& out);
+
+	protected:
+
+		// auto transpose functions:
+		void     initialize             (HumdrumFile& infile);
+		void     convertScore           (HumdrumFile& infile, int style);
+		void     processFile            (HumdrumFile& infile,
+		                                 vector<bool>& spineprocess);
+		void     convertToConcertPitches(HumdrumFile& infile, int line,
+		                                 vector<int>& tvals);
+		void     convertToWrittenPitches(HumdrumFile& infile, int line,
+		                                 vector<int>& tvals);
+		void     printNewKeySignature   (const string& keysig, int trans);
+		void     processInterpretationLine(HumdrumFile& infile, int line,
+		                                 vector<int>& tvals, int style);
+		int      isKeyMarker            (const string& str);
+		void     printNewKeyInterpretation(HumdrumLine& aRecord,
+		                                 int index, int transval);
+		int      hasTrMarkers           (HumdrumFile& infile, int line);
+		void     printHumdrumKernToken  (HumdrumLine& record, int index,
+		                                 int transval);
+		int      checkForDeletedLine    (HumdrumFile& infile, int line);
+		int      getBase40ValueFromInterval(const string& string);
+		void     example                (void);
+		void     usage                  (const string& command);
+		void     printHumdrumDataRecord (HumdrumLine& record,
+		                                 vector<bool>& spineprocess);
+
+		double   pearsonCorrelation     (int size, double* x, double* y);
+		void     doAutoTransposeAnalysis(HumdrumFile& infile);
+		void     addToHistogramDouble   (vector<vector<double> >& histogram,
+		                                 int pc, double start, double dur,
+		                                 double tdur, int segments);
+		double   storeHistogramForTrack (vector<vector<double> >& histogram, 
+		                                 HumdrumFile& infile, int track,
+		                                 int segments);
+		void     printHistograms        (int segments, vector<int> ktracks, 
+		                                vector<vector<vector<double> > >&
+		                                 trackhist);
+		void     doAutoKeyAnalysis      (vector<vector<vector<double> > >&
+		                                 analysis, int level, int hop, int count,
+		                                 int segments, vector<int>& ktracks, 
+		                                 vector<vector<vector<double> > >&
+		                                 trackhist);
+		void     doTrackKeyAnalysis     (vector<vector<double> >& analysis,
+		                                 int level, int hop, int count, 
+		                                 vector<vector<double> >& trackhist,
+		                                 vector<double>& majorweights,
+		                                 vector<double>& minorweights);
+		void     identifyKeyDouble      (vector<double>& correls, 
+		                                 vector<double>& histogram, 
+		                                 vector<double>& majorweights, 
+		                                 vector<double>& minorweights);
+		void     fillWeightsWithKostkaPayne(vector<double>& maj,
+		                                 vector<double>& min);
+		void     printRawTrackAnalysis  (vector<vector<vector<double> > >&
+		                                 analysis, vector<int>& ktracks);
+		void     doSingleAnalysis       (vector<double>& analysis,
+		                                 int startindex, int length,
+		                                 vector<vector<double> >& trackhist, 
+		                                 vector<double>& majorweights, 
+		                                 vector<double>& minorweights);
+		void     identifyKey            (vector<double>& correls, 
+		                                 vector<double>& histogram,
+		                                 vector<double>& majorweights, 
+		                                 vector<double>& minorweights);
+		void     doTranspositionAnalysis(vector<vector<vector<double> > >&
+		                                 analysis);
+		int      calculateTranspositionFromKey(int targetkey,
+		                                 HumdrumFile& infile);
+		void     printTransposedToken   (HumdrumFile& infile, int row, int col,
+		                                 int transval);
+		void     printTransposeInformation(HumdrumFile& infile,
+		                                 vector<bool>& spineprocess,
+		                                 int line, int transval);
+		int      getTransposeInfo       (HumdrumFile& infile, int row, int col);
+		void     printNewKernString     (const string& string, int transval);
+
+	private:
+		int      transval     = 0;   // used with -b option
+		int      ssetkeyQ     = 0;   // used with -k option
+		int      ssetkey      = 0;   // used with -k option
+		int      currentkey   = 0;
+		int      autoQ        = 0;   // used with --auto option
+		int      debugQ       = 0;   // used with --debug option
+		int      spineQ       = 0;   // used with -s option
+		string   spinestring  = "";  // used with -s option
+		int      octave       = 0;   // used with -o option
+		int      concertQ     = 0;   // used with -C option
+		int      writtenQ     = 0;   // used with -W option
+		int      quietQ       = 0;   // used with -q option
+		int      instrumentQ  = 0;   // used with -I option
 };
 
 

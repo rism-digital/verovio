@@ -317,6 +317,7 @@ bool HumdrumInput::ImportFile()
         if (!result) {
             return false;
         }
+
         return convertHumdrum();
     }
     catch (char *str) {
@@ -420,6 +421,16 @@ bool HumdrumInput::ImportString(std::string const &content)
 bool HumdrumInput::convertHumdrum(void)
 {
     HumdrumFile &infile = m_infile;
+
+	// apply Humdrum tools if there are any filters in the file.
+	if (infile.hasFilters()) {
+		Tool_filter filter;
+		filter.run(infile);
+		if (filter.hasNonHumdrumOutput()) {
+			infile.readString(filter.getTextOutput());
+		}
+	}
+
     infile.analyzeKernSlurs();
     parseSignifiers(infile);
 
