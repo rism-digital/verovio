@@ -133,6 +133,7 @@ bool MusicXmlInput::HasContent(pugi::xml_node node)
 
 std::string MusicXmlInput::GetAttributeValue(pugi::xml_node node, std::string attribute)
 {
+    LogWarning("Attr: %s", attribute.c_str());
     assert(node);
 
     if (node.attribute(attribute.c_str())) {
@@ -1148,38 +1149,46 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         pugi::xpath_node_set lyrics = node.select_nodes("lyric");
         for (pugi::xpath_node_set::const_iterator it = lyrics.begin(); it != lyrics.end(); ++it) {
             pugi::xml_node lyric = it->node();
-            int lyricNumber = atoi(GetAttributeValue(lyric, "number").c_str());
-            lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
-            std::string lyricColor = GetAttributeValue(lyric, "color");
-            std::string textStr = GetContentOfChild(lyric, "text");
-            std::string textStyle = GetAttributeValue(lyric.select_single_node("text").node(), "font-style");
-            std::string textWeight = GetAttributeValue(lyric.select_single_node("text").node(), "font-weight");
-            Verse *verse = new Verse();
-            verse->SetN(lyricNumber);
-            if (!lyricColor.empty()) verse->SetColor(lyricColor.c_str());
-            Syl *syl = new Syl();
-            if (lyric.select_single_node("extend")) {
-                syl->SetCon(sylLog_CON_u);
+            pugi::xpath_node textNode = lyric.select_single_node("text");
+            if (textNode) {
+                int lyricNumber = atoi(GetAttributeValue(lyric, "number").c_str());
+                lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+                std::string lyricColor = GetAttributeValue(lyric, "color");
+                Verse *verse = new Verse();
+                verse->SetN(lyricNumber);
+                if (!lyricColor.empty()) verse->SetColor(lyricColor.c_str());
+                if (GetAttributeValue(lyric, "print-object") != "no") {
+                    // std::string textColor = GetAttributeValue(textNode.node(), "color");
+                    std::string textStyle = GetAttributeValue(textNode.node(), "font-style");
+                    std::string textWeight = GetAttributeValue(textNode.node(), "font-weight");
+                    std::string lang = GetAttributeValue(textNode.node(), "xml:lang");
+                    std::string textStr = GetContentOfChild(lyric, "text");
+                    Syl *syl = new Syl();
+                    if (lyric.select_single_node("extend")) {
+                        syl->SetCon(sylLog_CON_u);
+                    }
+                    if (GetContentOfChild(lyric, "syllabic") == "begin") {
+                        syl->SetCon(sylLog_CON_d);
+                        syl->SetWordpos(sylLog_WORDPOS_i);
+                    }
+                    else if (GetContentOfChild(lyric, "syllabic") == "middle") {
+                        syl->SetCon(sylLog_CON_d);
+                        syl->SetWordpos(sylLog_WORDPOS_m);
+                    }
+                    else if (GetContentOfChild(lyric, "syllabic") == "end") {
+                        syl->SetWordpos(sylLog_WORDPOS_t);
+                    }
+                    if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
+                    if (!textWeight.empty()) syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
+                    if (!lang.empty()) syl->SetLang(lang.c_str());
+                    
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(textStr));
+                    syl->AddChild(text);
+                    verse->AddChild(syl);
+                }
+                note->AddChild(verse);
             }
-            if (GetContentOfChild(lyric, "syllabic") == "begin") {
-                syl->SetCon(sylLog_CON_d);
-                syl->SetWordpos(sylLog_WORDPOS_i);
-            }
-            else if (GetContentOfChild(lyric, "syllabic") == "middle") {
-                syl->SetCon(sylLog_CON_d);
-                syl->SetWordpos(sylLog_WORDPOS_m);
-            }
-            else if (GetContentOfChild(lyric, "syllabic") == "end") {
-                syl->SetWordpos(sylLog_WORDPOS_t);
-            }
-            if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
-            if (!textWeight.empty()) syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
-
-            Text *text = new Text();
-            text->SetText(UTF8to16(textStr));
-            syl->AddChild(text);
-            verse->AddChild(syl);
-            note->AddChild(verse);
         }
 
         // ties

@@ -1085,6 +1085,7 @@ void MeiOutput::WriteMeiSyl(pugi::xml_node currentNode, Syl *syl)
     assert(syl);
 
     WriteLayerElement(currentNode, syl);
+    syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
 }
@@ -2770,6 +2771,7 @@ bool MeiInput::ReadMeiSyl(Object *parent, pugi::xml_node syl)
     Syl *vrvSyl = new Syl();
     ReadLayerElement(syl, vrvSyl);
 
+    vrvSyl->ReadLang(syl);
     vrvSyl->ReadTypography(syl);
     vrvSyl->ReadSylLog(syl);
 
