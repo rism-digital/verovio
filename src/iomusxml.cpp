@@ -133,7 +133,6 @@ bool MusicXmlInput::HasContent(pugi::xml_node node)
 
 std::string MusicXmlInput::GetAttributeValue(pugi::xml_node node, std::string attribute)
 {
-    LogWarning("Attr: %s", attribute.c_str());
     assert(node);
 
     if (node.attribute(attribute.c_str())) {
