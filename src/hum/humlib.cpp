@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Fri Dec 16 22:15:25 PST 2016
+// Last Modified: Sat Dec 17 01:06:37 PST 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -8306,6 +8306,13 @@ void HumdrumFileContent::getTimeSigs(vector<pair<int, HumNum> >& output,
 
 	HTp token = getTrackStart(track);
 	while (token) {
+		if (token->isData()) {
+			if (firstdata < 0) {
+				firstdata = token->getLineIndex();
+			}
+			token = token->getNextToken();
+			continue;
+		}
 		if (!token->isInterpretation()) {
 			token = token->getNextToken();
 			continue;
@@ -8317,17 +8324,11 @@ void HumdrumFileContent::getTimeSigs(vector<pair<int, HumNum> >& output,
 			if (firstsig < 0) {
 				firstsig = token->getLineIndex();
 			}
-			if (firstdata < 0) {
-				firstdata = token->getLineIndex();
-			}
 		} else if (sscanf(token->c_str(), "*M%d/%d", &top, &bot) == 2) {
 			current.first = top;
 			current.second = bot;
 			if (firstsig < 0) {
 				firstsig = token->getLineIndex();
-			}
-			if (firstdata < 0) {
-				firstdata = token->getLineIndex();
 			}
 		}
 		output[token->getLineIndex()] = current;
@@ -8336,7 +8337,7 @@ void HumdrumFileContent::getTimeSigs(vector<pair<int, HumNum> >& output,
 
 	// Back-fill the list if the first time signature occurs before
 	// the start of the data:
-	if ((firstsig >= 0) && (firstdata > firstsig)) {
+	if ((firstsig > 0) && (firstdata >= firstsig)) {
 		current = output[firstsig];
 		for (int i=0; i<firstsig; i++) {
 			output[i] = current;
@@ -8352,6 +8353,8 @@ void HumdrumFileContent::getTimeSigs(vector<pair<int, HumNum> >& output,
 	for (int i=starti+1; i<(int)output.size(); i++) {
 		if (output[i].first == 0) {
 			output[i] = current;
+		} else {
+			current = output[i];
 		}
 	}
 }
@@ -13040,13 +13043,13 @@ bool HumdrumToken::isKeyDesignation(void) {
 //
 
 bool HumdrumToken::isTimeSignature(void) {
-	if (this->size() < 5) {
+	if (this->size() < 3) {
 		return false;
 	}
 	if (this->compare(0, 2, "*M") != 0) {
 		return false;
 	}
-	if (!isdigit((*this)[3])) {
+	if (!isdigit((*this)[2])) {
 		return false;
 	}
 	if (this->find("/") == string::npos) {

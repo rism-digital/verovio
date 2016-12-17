@@ -242,7 +242,8 @@ protected:
     void removeTuplet(vector<string> &elements, vector<void *> &pointers);
     void removeGBeam(vector<string> &elements, vector<void *> &pointers);
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
-    void insertClefElement(vector<string> &elements, vector<void *> pointers, hum::HTp clef);
+    void insertClefElement(vector<string> &elements, vector<void *> &pointers, hum::HTp clef);
+    void insertMeterSigElement(vector<string> &elements, vector<void *> &pointers, vector<hum::HTp>& layeritems, int index);
     void processSlur(hum::HTp token);
     void addHarmFloatsForMeasure(int startine, int endline);
     void processDynamics(hum::HTp token, int staffindex);

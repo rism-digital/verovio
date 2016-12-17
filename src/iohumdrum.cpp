@@ -2087,6 +2087,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     insertClefElement(elements, pointers, layerdata[i]);
                 }
             }
+            if (layerdata[i]->isTimeSignature()) {
+                insertMeterSigElement(elements, pointers, layerdata, i);
+            }
         }
         if (!layerdata[i]->isData()) {
             continue;
@@ -2688,11 +2691,44 @@ void HumdrumInput::processSlur(HTp token)
 
 /////////////////////////////
 //
+// HumdrumInput::insertMeterSigElement -- A time signature or meter signature
+//    that starts after the beginning of a movement.
+//
+
+void HumdrumInput::insertMeterSigElement(vector<string> &elements, vector<void*>& pointers, vector<HTp>& layerdata, int index) {
+	HTp tsig = layerdata[index];
+	if (tsig->getDurationFromStart() <= 0) {
+		return;
+	}
+	smatch matches;
+	int count = -1;
+	int unit  = -1;
+	if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
+		count = stoi(matches[1]);
+		unit = stoi(matches[2]);
+	} else if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)"))) {
+		count = stoi(matches[1]);
+	}
+	// deal with non-rational units here.
+	if (count < 0) {
+		return;
+	}
+    MeterSig *msig = new MeterSig;
+    appendElement(elements, pointers, msig);
+	msig->SetCount(count);
+	if (unit > 0) {
+		msig->SetUnit(unit);
+	}
+	// check for mensuration here.
+}
+
+/////////////////////////////
+//
 // HumdrumInput::insertClefElement -- A clef which starts after the beginning of
 // the movement.
 //
 
-void HumdrumInput::insertClefElement(vector<string> &elements, vector<void *> pointers, HTp token)
+void HumdrumInput::insertClefElement(vector<string> &elements, vector<void *>& pointers, HTp token)
 {
     Clef *clef = new Clef;
     appendElement(elements, pointers, clef);
@@ -3084,7 +3120,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     }
 
     // Calculate grace note beam starts and ends.
-    // Presuming no clef changess, etc. found between notes in
+    // Presuming no clef changes, etc. found between notes in
     // a gracenote beam.  Generalize further if so.
     // gbeamstart == boolean for starting of a grace note beam
     // gbeamend == boolean ending of a grace note beam
