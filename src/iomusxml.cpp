@@ -330,6 +330,7 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
         std::string textFont = GetAttributeValue(textNode, "font-family");
         std::string textStyle = GetAttributeValue(textNode, "font-style");
         std::string textWeight = GetAttributeValue(textNode, "font-weight");
+        std::string lang = GetAttributeValue(textNode, "xml:lang");
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
         if (!textColor.empty() || !textFont.empty() || !textStyle.empty() || !textWeight.empty()) {
@@ -794,13 +795,15 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
 
     pugi::xpath_node type = node.select_single_node("direction-type");
     std::string placeStr = GetAttributeValue(node, "placement");
-    std::string lang = GetAttributeValue(node, "xml:lang");
+    pugi::xpath_node_set words = type.node().select_nodes("words");
 
     // Directive
-    pugi::xpath_node_set words = type.node().select_nodes("words");
     if (words.size() != 0 && !node.select_single_node("sound[@tempo]")) {
         Dir *dir = new Dir();
-        if (!lang.empty()) dir->SetLang(lang.c_str());
+        if (words.size() == 1) {
+            std::string lang = GetAttributeValue(words.first().node(), "xml:lang");
+            if (!lang.empty()) dir->SetLang(lang.c_str());
+        }
         if (!placeStr.empty()) dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         TextRendition(words, dir);
         m_controlElements.push_back(std::make_pair(measureNum, dir));
@@ -868,7 +871,10 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     pugi::xpath_node metronome = type.node().select_single_node("metronome");
     if (node.select_single_node("sound[@tempo]") || metronome) {
         Tempo *tempo = new Tempo();
-        if (!lang.empty()) tempo->SetLang(lang.c_str());
+        if (words.size() == 1) {
+            std::string lang = GetAttributeValue(words.first().node(), "xml:lang");
+            if (!lang.empty()) tempo->SetLang(lang.c_str());
+        }
         if (!placeStr.empty()) tempo->SetPlace(tempo->AttPlacement::StrToStaffrel(placeStr.c_str()));
         int midiTempo = atoi(GetAttributeValue(node.select_single_node("sound").node(), "tempo").c_str());
         if (midiTempo) tempo->SetMidiBpm(midiTempo);
