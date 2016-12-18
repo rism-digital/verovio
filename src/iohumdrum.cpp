@@ -338,7 +338,6 @@ bool HumdrumInput::ImportString(std::string const &content)
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
-
     try {
         m_doc->Reset();
         HumdrumFile &infile = m_infile;
@@ -409,6 +408,19 @@ bool HumdrumInput::ImportString(std::string const &content)
 
 //////////////////////////////
 //
+// HumdrumInput::GetHumdrumString -- direct Humdrum output before
+//    convesion.
+//
+
+string HumdrumInput::GetHumdrumString(void)
+{
+    stringstream tempout;
+    tempout << m_infile;
+    return tempout.str();
+}
+
+//////////////////////////////
+//
 // HumdrumInput::convertHumdrum -- Top level method called from ImportFile or
 //     ImportString.  Convert a HumdrumFile structure into an MEI
 //     structure.  Returns false if there was an error in the conversion
@@ -422,14 +434,26 @@ bool HumdrumInput::convertHumdrum(void)
 {
     HumdrumFile &infile = m_infile;
 
-	// apply Humdrum tools if there are any filters in the file.
-	if (infile.hasFilters()) {
-		Tool_filter filter;
-		filter.run(infile);
-		if (filter.hasNonHumdrumOutput()) {
-			infile.readString(filter.getTextOutput());
-		}
-	}
+    if (GetOutputFormat() == "humdrum") {
+        // allow for filtering in toolkit.
+        return true;
+    }
+
+    // apply Humdrum tools if there are any filters in the file.
+    if (infile.hasFilters()) {
+        Tool_filter filter;
+        filter.run(infile);
+        if (filter.hasNonHumdrumOutput()) {
+            infile.readString(filter.getTextOutput());
+        }
+        else {
+            // humdrum structure not always correct in output from tools
+            // yet, so reload.
+            stringstream tempdata;
+            tempdata << infile;
+            infile.readString(tempdata.str());
+        }
+    }
 
     infile.analyzeKernSlurs();
     parseSignifiers(infile);
@@ -1407,7 +1431,8 @@ bool HumdrumInput::convertSystemMeasure(int &line)
 
     storeStaffLayerTokensForMeasure(startline, endline);
 
-    return convertMeasureStaves(startline, endline);
+    auto status = convertMeasureStaves(startline, endline);
+    return status;
 }
 
 //////////////////////////////
@@ -1492,6 +1517,10 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
         lasttrack = -1;
         for (j = 0; j < infile[i].getFieldCount(); j++) {
             track = infile[i].token(j)->getTrack();
+            if (track < 1) {
+                // not a kern spine.
+                continue;
+            }
             staffindex = rkern[track];
             if (staffindex < 0) {
                 continue;
@@ -1510,6 +1539,7 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
                 lt[staffindex].resize(lt[staffindex].size() + 1);
                 lt[staffindex].back().clear(); // probably not necessary
             }
+
             lt[staffindex][layerindex].push_back(infile[i].token(j));
         }
     }
@@ -1973,7 +2003,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     vector<int> &rkern = m_rkern;
     int staffindex = rkern[track];
     if (staffindex < 0) {
-        // some strange unexpected problem
+        // not a kern spine.
         return false;
     }
     vector<HTp> &layerdata = m_layertokens[staffindex][layerindex];
@@ -2695,31 +2725,34 @@ void HumdrumInput::processSlur(HTp token)
 //    that starts after the beginning of a movement.
 //
 
-void HumdrumInput::insertMeterSigElement(vector<string> &elements, vector<void*>& pointers, vector<HTp>& layerdata, int index) {
-	HTp tsig = layerdata[index];
-	if (tsig->getDurationFromStart() <= 0) {
-		return;
-	}
-	smatch matches;
-	int count = -1;
-	int unit  = -1;
-	if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
-		count = stoi(matches[1]);
-		unit = stoi(matches[2]);
-	} else if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)"))) {
-		count = stoi(matches[1]);
-	}
-	// deal with non-rational units here.
-	if (count < 0) {
-		return;
-	}
+void HumdrumInput::insertMeterSigElement(
+    vector<string> &elements, vector<void *> &pointers, vector<HTp> &layerdata, int index)
+{
+    HTp tsig = layerdata[index];
+    if (tsig->getDurationFromStart() <= 0) {
+        return;
+    }
+    smatch matches;
+    int count = -1;
+    int unit = -1;
+    if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
+        count = stoi(matches[1]);
+        unit = stoi(matches[2]);
+    }
+    else if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)"))) {
+        count = stoi(matches[1]);
+    }
+    // deal with non-rational units here.
+    if (count < 0) {
+        return;
+    }
     MeterSig *msig = new MeterSig;
     appendElement(elements, pointers, msig);
-	msig->SetCount(count);
-	if (unit > 0) {
-		msig->SetUnit(unit);
-	}
-	// check for mensuration here.
+    msig->SetCount(count);
+    if (unit > 0) {
+        msig->SetUnit(unit);
+    }
+    // check for mensuration here.
 }
 
 /////////////////////////////
@@ -2728,7 +2761,7 @@ void HumdrumInput::insertMeterSigElement(vector<string> &elements, vector<void*>
 // the movement.
 //
 
-void HumdrumInput::insertClefElement(vector<string> &elements, vector<void *>& pointers, HTp token)
+void HumdrumInput::insertClefElement(vector<string> &elements, vector<void *> &pointers, HTp token)
 {
     Clef *clef = new Clef;
     appendElement(elements, pointers, clef);

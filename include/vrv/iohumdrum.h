@@ -179,6 +179,8 @@ public:
     virtual bool ImportFile();
     virtual bool ImportString(std::string const &humdrum);
 
+	string GetHumdrumString(void);
+
 #ifndef NO_HUMDRUM_SUPPORT
 
     string GetMeiString(void);

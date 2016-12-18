@@ -291,6 +291,16 @@ public:
     ///@}
 
     /**
+     * @name Get the output file format (defined as FileFormat)
+     * The SetOutputFormat with FileFormat does not perform any validation
+     */
+    ///@{
+    bool SetOutputFormat(std::string const &outformat);
+    void SetOutputFormat(FileFormat format) { m_outformat = format; }
+    int GetOutputFormat() { return m_outformat; }
+    ///@}
+
+    /**
      * @name Identify the input file type for auto loading of input data
      */
     ///@{
@@ -376,6 +386,7 @@ private:
     View m_view;
     int m_scale;
     FileFormat m_format;
+    FileFormat m_outformat;
 
     int m_pageHeight;
     int m_pageWidth;

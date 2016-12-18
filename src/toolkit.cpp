@@ -180,6 +180,21 @@ bool Toolkit::SetSpacingNonLinear(float spacingNonLinear)
     return true;
 }
 
+bool Toolkit::SetOutputFormat(std::string const &outformat)
+{
+    if (outformat == "humdrum") {
+        m_outformat = HUMDRUM;
+    }
+    else if (outformat == "mei") {
+        m_outformat = MEI;
+    }
+    else {
+        LogError("Output format can only be: mei, humdrum, midi or svg");
+        return false;
+    }
+    return true;
+}
+
 bool Toolkit::SetFormat(std::string const &informat)
 {
     if (informat == "pae") {
@@ -205,7 +220,7 @@ bool Toolkit::SetFormat(std::string const &informat)
         return false;
     }
     return true;
-};
+}
 
 void Toolkit::SetAppXPathQueries(std::vector<std::string> const &xPathQueries)
 {
@@ -394,11 +409,21 @@ bool Toolkit::LoadData(const std::string &data)
         // LogMessage("Importing Humdrum data");
 
         Doc tempdoc;
-        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        HumdrumInput *tempinput = new HumdrumInput(&tempdoc, "");
+
+        if (GetOutputFormat() == HUMDRUM) {
+            tempinput->SetOutputFormat("humdrum");
+        }
+
         if (!tempinput->ImportString(data)) {
             LogError("Error importing Humdrum data");
             delete tempinput;
             return false;
+        }
+
+        if (GetOutputFormat() == HUMDRUM) {
+            SetHumdrumBuffer(tempinput->GetHumdrumString().c_str());
+            return true;
         }
 
         MeiOutput meioutput(&tempdoc, "");
@@ -933,16 +958,50 @@ void Toolkit::SetHumdrumBuffer(const char *data)
         m_humdrumBuffer = NULL;
     }
 
+#ifndef NO_HUMDRUM_SUPPORT
+    hum::HumdrumFile file;
+    file.readString(data);
+    // apply Humdrum tools if there are any filters in the file.
+    if (file.hasFilters()) {
+        string output;
+        hum::Tool_filter filter;
+        filter.run(file);
+        if (filter.hasNonHumdrumOutput()) {
+            output = filter.getTextOutput();
+        }
+        else {
+            // humdrum structure not always correct in output from tools
+            // yet, so reload.
+            stringstream tempdata;
+            tempdata << file;
+            output = tempdata.str();
+        }
+        m_humdrumBuffer = (char *)malloc(output.size() + 1);
+        if (!m_humdrumBuffer) {
+            // something went wrong
+            return;
+        }
+        strcpy(m_humdrumBuffer, output.c_str());
+    }
+    else {
+        int size = strlen(data) + 1;
+        m_humdrumBuffer = (char *)malloc(size);
+        if (!m_humdrumBuffer) {
+            // something went wrong
+            return;
+        }
+        strcpy(m_humdrumBuffer, data);
+    }
+
+#else
     int size = strlen(data) + 1;
-
     m_humdrumBuffer = (char *)malloc(size);
-
     if (!m_humdrumBuffer) {
         // something went wrong
         return;
     }
-
     strcpy(m_humdrumBuffer, data);
+#endif
 }
 
 const char *Toolkit::GetCString()
@@ -961,6 +1020,7 @@ const char *Toolkit::GetHumdrumBuffer()
         return m_humdrumBuffer;
     }
     else {
+        cerr << "NOTHING IN HUMDRUM BUFFER" << endl;
         return "[empty]";
     }
 }

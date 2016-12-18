@@ -271,7 +271,10 @@ int main(int argc, char **argv)
 
             case 'r': vrv::Resources::SetPath(optarg); break;
 
-            case 't': outformat = string(optarg); break;
+            case 't':
+                outformat = string(optarg);
+                toolkit.SetOutputFormat(string(optarg));
+                break;
 
             case 's':
                 if (!toolkit.SetScale(atoi(optarg))) {
@@ -391,15 +394,17 @@ int main(int argc, char **argv)
         }
     }
 
-    // Check the page range
-    if (page > toolkit.GetPageCount()) {
-        cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount()
-             << ")." << endl;
-        exit(1);
-    }
-    if (page < 1) {
-        cerr << "The page number has to be greater than 0." << endl;
-        exit(1);
+    if (toolkit.GetOutputFormat() != HUMDRUM) {
+        // Check the page range
+        if (page > toolkit.GetPageCount()) {
+            cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount()
+                 << ")." << endl;
+            exit(1);
+        }
+        if (page < 1) {
+            cerr << "The page number has to be greater than 0." << endl;
+            exit(1);
+        }
     }
 
     int from = page;
