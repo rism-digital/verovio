@@ -24,7 +24,11 @@ class TextElement;
 /**
  * This class is an interface for <tempo> elements at the measure level
  */
-class Tempo : public ControlElement, public TextDirInterface, public TimePointInterface, public AttMiditempo {
+class Tempo : public ControlElement,
+              public TextDirInterface,
+              public TimePointInterface,
+              public AttLang,
+              public AttMiditempo {
 public:
     /**
      * @name Constructors, destructors, reset methods
