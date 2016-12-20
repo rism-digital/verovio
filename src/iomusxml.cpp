@@ -335,6 +335,9 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
         text->SetText(UTF8to16(textStr));
         if (!textColor.empty() || !textFont.empty() || !textStyle.empty() || !textWeight.empty()) {
             Rend *rend = new Rend();
+            if (words.size() > 1 && !lang.empty()) {
+                rend->SetLang(lang.c_str());
+            }
             if (!textColor.empty()) rend->SetColor(textColor.c_str());
             if (!textFont.empty()) rend->SetFontfam(textFont.c_str());
             if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));

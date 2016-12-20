@@ -208,6 +208,14 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         assert(att);
         if (att->HasColor()) m_currentNode.append_attribute("fill") = att->GetColor().c_str();
     }
+    
+    if (object->HasAttClass(ATT_LANG)) {
+        AttLang *att = dynamic_cast<AttLang *>(object);
+        assert(att);
+        if (att->HasLang()) {
+            m_currentNode.append_attribute("xml:lang") = att->GetLang().c_str();
+        }
+    }
 }
 
 void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
