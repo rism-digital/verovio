@@ -1172,6 +1172,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                     std::string lang = GetAttributeValue(textNode.node(), "xml:lang");
                     std::string textStr = GetContentOfChild(lyric, "text");
                     Syl *syl = new Syl();
+                    if (!lang.empty()) syl->SetLang(lang.c_str());
                     if (lyric.select_single_node("extend")) {
                         syl->SetCon(sylLog_CON_u);
                     }
@@ -1188,7 +1189,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                     }
                     if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
                     if (!textWeight.empty()) syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
-                    if (!lang.empty()) syl->SetLang(lang.c_str());
                     
                     Text *text = new Text();
                     text->SetText(UTF8to16(textStr));
