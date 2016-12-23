@@ -2751,11 +2751,11 @@ void HumdrumInput::insertMeterSigElement(
     smatch matches;
     int count = -1;
     int unit = -1;
-    if (regex_search(*tsig, matches, regex(R "(^\*M(\d+)/(\d+))"))) {
+    if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
         count = stoi(matches[1]);
         unit = stoi(matches[2]);
     }
-    else if (regex_search(*tsig, matches, regex(R "(^\*M(\d+)"))) {
+    else if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)"))) {
         count = stoi(matches[1]);
     }
     // deal with non-rational units here.
