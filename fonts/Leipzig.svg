@@ -18,14 +18,15 @@ Version 5.2.12 - reviewing artic width
 Version 5.2.13 - adding (very)short/long fermata and breath comma
 Version 5.2.14 - adding mensural stems
 Version 5.2.15 - changing ascent/descent to 750/250
+Version 5.1.16 - adding mensural rests
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20161003 at Thu Dec 15 07:50:30 2016
+Created by FontForge 20161003 at Fri Dec 23 13:58:58 2016
  By laurent
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.15
+Version 5.2.16
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="347" >
@@ -40,7 +41,7 @@ Version 5.2.15
     bbox="-189.105 -893 1833 1317"
     underline-thickness="50"
     underline-position="-50"
-    unicode-range="U+007A-E94C"
+    unicode-range="U+007A-E9F9"
   />
     <missing-glyph />
     <glyph glyph-name="uniE0A3" unicode="&#xe0a3;" horiz-adv-x="314" 
@@ -927,5 +928,25 @@ d="M0 643h30l156 -227h-30zM0 760h30l156 -227h-30zM0 760h30v-760h-30v760z" />
 d="M0 -760h30l156 227h-30zM0 -760h30v760h-30v-760z" />
     <glyph glyph-name="uniE94C" unicode="&#xe94c;" horiz-adv-x="186" 
 d="M0 -643h30l156 227h-30zM0 -760h30l156 227h-30zM0 -760h30v760h-30v-760z" />
+    <glyph glyph-name="uniE9F3" unicode="&#xe9f3;" horiz-adv-x="1000" 
+d="M0 250h40v-250h-40v250z" />
+    <glyph glyph-name="uniE9F2" unicode="&#xe9f2;" horiz-adv-x="1000" 
+d="M0 250h40v-500h-40v500z" />
+    <glyph glyph-name="uniE9F1" unicode="&#xe9f1;" horiz-adv-x="1000" 
+d="M0 500h40v-1000h-40v1000z" />
+    <glyph glyph-name="uniE9F0" unicode="&#xe9f0;" horiz-adv-x="1000" 
+d="M0 500h40v-1000h-40v1000zM90 500h40v-1000h-40v1000z" />
+    <glyph glyph-name="uniE9F4" unicode="&#xe9f4;" horiz-adv-x="1000" 
+d="M0 250h40v-250h-40v250z" />
+    <glyph glyph-name="uniE9F5" unicode="&#xe9f5;" horiz-adv-x="1000" 
+d="M0 250h40v-140h-40v140z" />
+    <glyph glyph-name="uniE9F6" unicode="&#xe9f6;" horiz-adv-x="1000" 
+d="M0 140h40v-140h-40v140z" />
+    <glyph glyph-name="uniE9F7" unicode="&#xe9f7;" horiz-adv-x="1000" 
+d="M40 96v-96h-40v140h40l78 -69h-48z" />
+    <glyph glyph-name="uniE9F8" unicode="&#xe9f8;" horiz-adv-x="1000" 
+d="M78 96v-96h40v140h-40l-78 -69h48z" />
+    <glyph glyph-name="uniE9F9" unicode="&#xe9f9;" horiz-adv-x="1000" 
+d="M78 96v-13l-78 -69h48l30 25v-39h40v140h-40l-78 -69h48z" />
   </font>
 </defs></svg>
