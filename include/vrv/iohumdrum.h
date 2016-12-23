@@ -161,7 +161,18 @@ namespace humaux {
 class HumdrumSignifiers {
 public:
     bool empty = true;
+    // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
+
+    // coloring of notes (add rests later):
+    // !!!RDF**kern: i = marked note, color="#553325"
+    // !!!RDF**kern: i = matched note, color=red
+    // !!!RDF**kern: i = color="blue"
+    // default is red if no color given:
+    // !!!RDF**kern: i = matched note
+    // !!!RDF**kern: i = marked note
+    vector<char> mark;
+    vector<string> mcolor;
 };
 
 #endif /* NO_HUMDRUM_SUPPORT */
@@ -179,7 +190,7 @@ public:
     virtual bool ImportFile();
     virtual bool ImportString(std::string const &humdrum);
 
-	string GetHumdrumString(void);
+    string GetHumdrumString(void);
 
 #ifndef NO_HUMDRUM_SUPPORT
 
@@ -245,7 +256,8 @@ protected:
     void removeGBeam(vector<string> &elements, vector<void *> &pointers);
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
     void insertClefElement(vector<string> &elements, vector<void *> &pointers, hum::HTp clef);
-    void insertMeterSigElement(vector<string> &elements, vector<void *> &pointers, vector<hum::HTp>& layeritems, int index);
+    void insertMeterSigElement(
+        vector<string> &elements, vector<void *> &pointers, vector<hum::HTp> &layeritems, int index);
     void processSlur(hum::HTp token);
     void addHarmFloatsForMeasure(int startine, int endline);
     void processDynamics(hum::HTp token, int staffindex);
@@ -266,6 +278,7 @@ protected:
     void setNextLeftBarStyle(data_BARRENDITION style);
     void parseSignifiers(hum::HumdrumFile &infile);
     string getAutoClef(hum::HTp partstart, int partnumber);
+    void colorNote(vrv::Note *note, hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);

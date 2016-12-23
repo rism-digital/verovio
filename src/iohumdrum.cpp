@@ -2175,6 +2175,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
                 note->SetStemLen(0);
             }
+            colorNote(note, layerdata[i]);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -2190,6 +2191,21 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     }
 
     return true;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::colorNote --
+//
+
+void HumdrumInput::colorNote(Note *note, HTp token)
+{
+    for (int i = 0; i < m_signifiers.mark.size(); i++) {
+        if (token->find(m_signifiers.mark[i]) != string::npos) {
+            note->SetColor(m_signifiers.mcolor[i]);
+            break;
+        }
+    }
 }
 
 //////////////////////////////
@@ -2735,11 +2751,11 @@ void HumdrumInput::insertMeterSigElement(
     smatch matches;
     int count = -1;
     int unit = -1;
-    if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
+    if (regex_search(*tsig, matches, regex(R "(^\*M(\d+)/(\d+))"))) {
         count = stoi(matches[1]);
         unit = stoi(matches[2]);
     }
-    else if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)"))) {
+    else if (regex_search(*tsig, matches, regex(R "(^\*M(\d+)"))) {
         count = stoi(matches[1]);
     }
     // deal with non-rational units here.
@@ -5074,6 +5090,7 @@ void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, 
 
 void HumdrumInput::parseSignifiers(HumdrumFile &infile)
 {
+    HumRegex hre;
     vector<HumdrumLine *> refs = infile.getReferenceRecords();
     for (int i = 0; i < (int)refs.size(); i++) {
         string key = refs[i]->getReferenceKey();
@@ -5097,8 +5114,24 @@ void HumdrumInput::parseSignifiers(HumdrumFile &infile)
             continue;
         }
         // check for known signifier meanings:
+
+        // stemless note:
+        // !!!RDF**kern: i = no stem
         if (value.find("no stem", equals) != string::npos) {
             m_signifiers.nostem = signifier;
+            continue;
+        }
+
+        // colored notes
+        // !!!RDF**kern: i = marked note, color="#ff0000"
+        // !!!RDF**kern: i = matched note, color=blue
+        if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
+            m_signifiers.mark.push_back(signifier);
+            m_signifiers.mcolor.push_back(hre.getMatch(1));
+        }
+        else if (hre.search(value, "marked note|matched note")) {
+            m_signifiers.mark.push_back(signifier);
+            m_signifiers.mcolor.push_back("red");
         }
     }
 }
