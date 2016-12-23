@@ -4627,6 +4627,10 @@ void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
         // m_measure->SetLeft(BARRENDITION_rptstart);
         setNextLeftBarStyle(BARRENDITION_rptstart);
     }
+    else if (endbar.find("||") != string::npos) {
+        // m_measure->SetLeft(BARRENDITION_dbl);
+        setNextLeftBarStyle(BARRENDITION_dbl);
+    }
     else if (endbar.find("-") != string::npos) {
         m_measure->SetRight(BARRENDITION_invis);
     }
