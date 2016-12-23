@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Dec 17 05:19:47 EST 2016
+// Last Modified: Thu Dec 22 23:10:51 PST 2016
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2440,8 +2440,10 @@ class Option_register {
 		         Option_register     (const string& aDefinition, char aType,
 		                                  const string& aDefaultOption,
 		                                  const string& aModifiedOption);
+		         Option_register     (const Option_register& reg);
 		        ~Option_register     ();
 
+		Option_register& operator=(const Option_register& reg);
 		void     clearModified      (void);
 		string   getDefinition      (void);
 		string   getDefault         (void);
@@ -2459,12 +2461,12 @@ class Option_register {
 		ostream& print              (ostream& out);
 
 	protected:
-		string   m_definition;
-		string   m_description;
-		string   m_defaultOption;
-		string   m_modifiedOption;
-		int      m_modifiedQ;
-		char     m_type;
+		string       m_definition;
+		string       m_description;
+		string       m_defaultOption;
+		string       m_modifiedOption;
+		int          m_modifiedQ;
+		char         m_type;
 };
 
 
@@ -2472,8 +2474,10 @@ class Options {
 	public:
 		                Options           (void);
 		                Options           (int argc, char** argv);
+		                Options           (const Options& options);
 		               ~Options           ();
 
+		Options&        operator=         (const Options& options);
 		int             argc              (void) const;
 		const vector<string>& argv        (void) const;
 		int             define            (const string& aDefinition);
@@ -2501,14 +2505,14 @@ class Options {
 		ostream&        print             (ostream& out);
 		ostream&        printOptionList   (ostream& out);
 		ostream&        printOptionListBooleanState(ostream& out);
-		void            process           (int error_check = 1, int suppress = 0);
-		void            process           (int argc, char** argv,
+		bool            process           (int error_check = 1, int suppress = 0);
+		bool            process           (int argc, char** argv,
 		                                      int error_check = 1,
 		                                      int suppress = 0);
-		void            process           (vector<string>& argv,
+		bool            process           (vector<string>& argv,
 		                                      int error_check = 1,
 		                                      int suppress = 0);
-		void            process           (string& argv, int error_check = 1,
+		bool            process           (string& argv, int error_check = 1,
 		                                      int suppress = 0);
 		void            reset             (void);
 		void            xverify           (int argc, char** argv,
@@ -2528,6 +2532,9 @@ class Options {
 		ostream&        printRegister     (ostream& out);
 		int             isDefined         (const string& name);
 		static vector<string>  tokenizeCommandLine(string& args);
+		bool            hasParseError     (void);
+		string          getParseError     (void);
+		ostream&        getParseError     (ostream& out);
 
 	protected:
 		// m_argv: the list of raw command line strings including
@@ -2567,6 +2574,8 @@ class Options {
 		// m_optionsArgument: indicate that --options was used.
 		bool m_optionsArgQ = false;
 
+		// m_error: used to store errors in parsing command-line options.
+		stringstream m_error;
 
 	private:
 		int     getRegIndex    (const string& optionName);
@@ -2586,19 +2595,41 @@ class Options {
 
 class HumTool : public Options {
 	public:
-		         HumTool              (void);
-		        ~HumTool              ();
+		         HumTool         (void);
+		        ~HumTool         ();
 
-		bool     hasNonHumdrumOutput  (void);
-		string   getTextOutput        (void);
-		ostream& getTextOutput        (ostream& out);
-		bool     hasError             (void);
-		string   getError             (void);
-		ostream& getError             (ostream& out);
+		void     clearOutput     (void);
+
+		bool     hasAnyText      (void);
+		string   getAllText      (void);
+		ostream& getAllText      (ostream& out);
+
+		bool     hasHumdrumText  (void);
+		string   getHumdrumText  (void);
+		ostream& getHumdrumText  (ostream& out);
+
+		bool     hasJsonText     (void);
+		string   getJsonText     (void);
+		ostream& getJsonText     (ostream& out);
+
+		bool     hasFreeText     (void);
+		string   getFreeText     (void);
+		ostream& getFreeText     (ostream& out);
+
+		bool     hasWarning      (void);
+		string   getWarning      (void);
+		ostream& getWarning      (ostream& out);
+
+		bool     hasError        (void);
+		string   getError        (void);
+		ostream& getError        (ostream& out);
 
 	protected:
-		stringstream m_text;   // output for non-humdrum output;
-	  	stringstream m_error;  // output for error text;
+		stringstream m_humdrum_text;  // output text in Humdrum syntax.
+		stringstream m_json_text;     // output text in JSON syntax.
+		stringstream m_free_text;     // output for plain text content.
+	  	stringstream m_warning_text;  // output for warning messages;
+	  	stringstream m_error_text;    // output for error messages;
 
 };
 
@@ -2624,7 +2655,10 @@ using namespace std;                           \
 using namespace hum;                           \
 int main(int argc, char** argv) {              \
 	CLASS interface;                            \
-	interface.process(argc, argv);              \
+	if (!interface.process(argc, argv)) {       \
+		interface.getError(cerr);                \
+		return -1;                               \
+	}                                           \
 	HumdrumFile infile;                         \
 	if (interface.getArgCount() > 0) {          \
 		infile.read(interface.getArgument(1));   \
@@ -2632,8 +2666,13 @@ int main(int argc, char** argv) {              \
 		infile.read(cin);                        \
 	}                                           \
 	int status = interface.run(infile, cout);   \
+	if (interface.hasWarning()) {               \
+		interface.getWarning(cerr);              \
+		return 0;                                \
+	}                                           \
 	if (interface.hasError()) {                 \
 		interface.getError(cerr);                \
+		return -1;                               \
 	}                                           \
 	return !status;                             \
 }
@@ -2656,15 +2695,29 @@ using namespace std;                                             \
 using namespace hum;                                             \
 int main(int argc, char** argv) {                                \
 	CLASS interface;                                              \
-	interface.process(argc, argv);                                \
+	if (!interface.process(argc, argv)) {                         \
+		interface.getError(cerr);                                  \
+		return -1;                                                 \
+	}                                                             \
 	HumdrumFileStream streamer(static_cast<Options&>(interface)); \
 	HumdrumFile infile;                                           \
 	bool status = true;                                           \
 	while (streamer.read(infile)) {                               \
-		status &= interface.run(infile, cout);                     \
+		status &= interface.run(infile);                           \
+		if (interface.hasWarning()) {                              \
+			interface.getWarning(cerr);                             \
+		}                                                          \
+		if (interface.hasAnyText()) {                              \
+		   interface.getAllText(cout);                             \
+		}                                                          \
 		if (interface.hasError()) {                                \
 			interface.getError(cerr);                               \
+         return -1;                                              \
 		}                                                          \
+		if (!interface.hasAnyText()) {                             \
+			cout << infile;                                         \
+		}                                                          \
+		interface.clearOutput();                                   \
 	}                                                             \
 	return !status;                                               \
 }
@@ -2973,6 +3026,159 @@ class Tool_metlev : public HumTool {
 
 };
 
+
+
+class MyCoord {
+	public:
+		     MyCoord   (void) { clear(); }
+		void clear   (void) { x = y = -1; }
+		bool isValid (void) { return ((x < 0) || (y < 0)) ? false : true; }
+		int  x;
+		int  y;
+};
+
+class MeasureInfo {
+	public:
+		MeasureInfo(void) { clear(); }
+		void clear(void)  { num = seg = start = stop = -1; 
+			sclef.resize(0); skeysig.resize(0); skey.resize(0);
+			stimesig.resize(0); smet.resize(0); stempo.resize(0);
+			eclef.resize(0); ekeysig.resize(0); ekey.resize(0);
+			etimesig.resize(0); emet.resize(0); etempo.resize(0);
+			file = NULL;
+		}
+		void setTrackCount(int tcount) {
+			sclef.resize(tcount+1);
+			skeysig.resize(tcount+1);
+			skey.resize(tcount+1);
+			stimesig.resize(tcount+1);
+			smet.resize(tcount+1);
+			stempo.resize(tcount+1);
+			eclef.resize(tcount+1);
+			ekeysig.resize(tcount+1);
+			ekey.resize(tcount+1);
+			etimesig.resize(tcount+1);
+			emet.resize(tcount+1);
+			etempo.resize(tcount+1);
+			int i;
+			for (i=0; i<tcount+1; i++) {
+				sclef[i].clear();
+				skeysig[i].clear();
+				skey[i].clear();
+				stimesig[i].clear();
+				smet[i].clear();
+				stempo[i].clear();
+				eclef[i].clear();
+				ekeysig[i].clear();
+				ekey[i].clear();
+				etimesig[i].clear();
+				emet[i].clear();
+				etempo[i].clear();
+			}
+			tracks = tcount;
+		}
+		int num;          // measure number
+		int seg;          // measure segment
+		int start;        // starting line of segment
+		int stop;         // ending line of segment
+		int tracks;       // number of primary tracks in file.
+		HumdrumFile* file;
+	 
+		// musical settings at start of measure
+		vector<MyCoord> sclef;     // starting clef of segment
+		vector<MyCoord> skeysig;   // starting keysig of segment
+		vector<MyCoord> skey;      // starting key of segment
+		vector<MyCoord> stimesig;  // starting timesig of segment
+		vector<MyCoord> smet;      // starting met of segment
+		vector<MyCoord> stempo;    // starting tempo of segment
+
+		// musical settings at start of measure
+		vector<MyCoord> eclef;     // ending clef    of segment
+		vector<MyCoord> ekeysig;   // ending keysig  of segment
+		vector<MyCoord> ekey;      // ending key     of segment
+		vector<MyCoord> etimesig;  // ending timesig of segment
+		vector<MyCoord> emet;      // ending met     of segment
+		vector<MyCoord> etempo;    // ending tempo   of segment
+};
+
+
+
+class Tool_myank : public HumTool {
+	public:
+		         Tool_myank            (void);
+		        ~Tool_myank            () {};
+
+		bool     run                   (HumdrumFile& infile);
+		bool     run                   (const string& indata, ostream& out);
+		bool     run                   (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void     initialize            (HumdrumFile& infile);
+		void      checkOptions         (Options& opts, int argc, char** argv);
+		void      example              (void);
+		void      usage                (const string& command);
+		void      myank                (HumdrumFile& infile, 
+		                                vector<MeasureInfo>& outmeasure);
+		void      removeDollarsFromString(string& buffer, int maxx);
+		void      processFieldEntry    (vector<MeasureInfo>& field, 
+		                                const string& str, 
+		                                HumdrumFile& infile, int maxmeasure, 
+		                                vector<MeasureInfo>& inmeasures, 
+		                                vector<int>& inmap);
+		void      expandMeasureOutList (vector<MeasureInfo>& measureout, 
+		                                vector<MeasureInfo>& measurein, 
+		                                HumdrumFile& infile, const string& optionstring);
+		void      getMeasureStartStop  (vector<MeasureInfo>& measurelist, 
+		                                HumdrumFile& infile);
+		void      printEnding          (HumdrumFile& infile, int lastline, int adjlin);
+		void      printStarting        (HumdrumFile& infile);
+		void      reconcileSpineBoundary(HumdrumFile& infile, int index1, int index2);
+		void      reconcileStartingPosition(HumdrumFile& infile, int index2);
+		void      printJoinLine        (vector<int>& splits, int index, int count);
+		void      printInvisibleMeasure(HumdrumFile& infile, int line);
+		void      fillGlobalDefaults   (HumdrumFile& infile, 
+		                                vector<MeasureInfo>& measurein, 
+		                                vector<int>& inmap);
+		void      adjustGlobalInterpretations(HumdrumFile& infile, int ii,
+		                                vector<MeasureInfo>& outmeasures,
+		                                int index);
+		void      adjustGlobalInterpretationsStart(HumdrumFile& infile, int ii,
+		                                vector<MeasureInfo>& outmeasures, 
+		                                int index);
+		void      getMarkString        (ostream& out, HumdrumFile& infile);
+		void      printDoubleBarline   (HumdrumFile& infile, int line);
+		void      insertZerothMeasure  (vector<MeasureInfo>& measurelist, 
+		                                HumdrumFile& infile);
+		void      getMetStates         (vector<vector<MyCoord> >& metstates, 
+		                                HumdrumFile& infile);
+		MyCoord     getLocalMetInfo      (HumdrumFile& infile, int row, int track);
+		int       atEndOfFile          (HumdrumFile& infile, int line);
+		void      processFile          (HumdrumFile& infile);
+		int       getSectionCount      (HumdrumFile& infile);
+		void      getSectionString     (string& sstring, HumdrumFile& infile,
+		                                int sec);
+
+	private:
+		int    debugQ      = 0;             // used with --debug option
+		int    inputlist   = 0;             // used with --inlist option
+		int    inlistQ     = 0;             // used with --inlist option
+		int    outlistQ    = 0;             // used with --outlist option
+		int    verboseQ    = 0;             // used with -v option
+		int    invisibleQ  = 1;             // used with --visible option
+		int    maxQ        = 0;             // used with --max option
+		int    minQ        = 0;             // used with --min option
+		int    instrumentQ = 0;             // used with -I option
+		int    nolastbarQ  = 0;             // used with -B option
+		int    markQ       = 0;             // used with --mark option
+		int    doubleQ     = 0;             // used with --mdsep option
+		int    barnumtextQ = 0;             // used with -T option
+		int    Section     = 0;             // used with --section option
+		int    sectionCountQ = 0;           // used with --section-count option
+		vector<MeasureInfo> MeasureOutList; // used with -m option
+		vector<MeasureInfo> MeasureInList;  // used with -m option
+		vector<vector<MyCoord> > metstates;
+
+};
 
 
 class Tool_recip : public HumTool {

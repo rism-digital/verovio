@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Dec 17 05:19:47 EST 2016
+// Last Modified: Thu Dec 22 23:10:51 PST 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -5117,7 +5117,7 @@ HumTool::HumTool(void) {
 
 //////////////////////////////
 //
-// HumTool::HumTool --
+// HumTool::~HumTool --
 //
 
 HumTool::~HumTool() {
@@ -5128,11 +5128,183 @@ HumTool::~HumTool() {
 
 //////////////////////////////
 //
-// HumTool::hasError --
+// HumTool::hasAnyText -- Returns true if the output contains
+//    text content in Humdrum syntax.
+//
+
+bool HumTool::hasAnyText(void) {
+	return (m_humdrum_text.rdbuf()->in_avail()
+			|| m_free_text.rdbuf()->in_avail()
+			|| m_json_text.rdbuf()->in_avail());
+}
+
+
+
+//////////////////////////////
+//
+// HumTool::getAllText -- Get the text content from any output
+//     streams except warnings and errors.
+//
+
+string HumTool::getAllText(void) {
+	return  m_humdrum_text.str()
+	      + m_json_text.str()
+	      + m_free_text.str();
+}
+
+//
+// ostream version:
+//
+
+ostream& HumTool::getAllText(ostream& out) {
+	out << m_humdrum_text.str();
+	out << m_json_text.str();
+	out << m_free_text.str();
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// HumTool::hasHumdrumText -- Returns true if the output contains
+//    text content in Humdrum syntax.
+//
+
+bool HumTool::hasHumdrumText(void) {
+	return m_humdrum_text.rdbuf()->in_avail();
+}
+
+
+
+//////////////////////////////
+//
+// HumTool::getHumdrumText -- Get the text content which represents
+//     Humdrum syntax.
+//
+
+string HumTool::getHumdrumText(void) {
+	return m_humdrum_text.str();
+}
+
+//
+// ostream version:
+//
+
+ostream& HumTool::getHumdrumText(ostream& out) {
+	out << m_humdrum_text.str();
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// HumTool::hasFreeText --
+//
+
+bool HumTool::hasFreeText(void) {
+	return m_free_text.rdbuf()->in_avail();
+}
+
+
+
+//////////////////////////////
+//
+// HumTool::getFreeText -- Return any free-form text output from the 
+//     tool.
+//
+
+string HumTool::getFreeText(void) {
+	return m_free_text.str();
+}
+
+//
+// ostream version:
+//
+
+ostream& HumTool::getFreeText(ostream& out) {
+	out << m_free_text.str();
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// HumTool::hasJsonText --
+//
+
+bool HumTool::hasJsonText(void) {
+	return m_json_text.rdbuf()->in_avail();
+}
+
+
+
+//////////////////////////////
+//
+// HumTool::getFreeText -- Return any JSON text output from the 
+//     tool.
+//
+
+string HumTool::getJsonText(void) {
+	return m_json_text.str();
+}
+
+//
+// ostream version:
+//
+
+ostream& HumTool::getJsonText(ostream& out) {
+	out << m_json_text.str();
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// HumTool::hasWarning --
+//
+
+bool HumTool::hasWarning(void) {
+	return m_warning_text.rdbuf()->in_avail();
+}
+
+
+
+//////////////////////////////
+//
+// HumTool::getWarning -- Return any warning messages generated when
+//     running the tool.
+//
+
+string HumTool::getWarning(void) {
+	return m_warning_text.str();
+}
+
+//
+// ostream version:
+//
+
+ostream& HumTool::getWarning(ostream& out) {
+	out << m_warning_text.str();
+	return out;
+}
+
+
+
+//////////////////////////////
+//
+// HumTool::hasError -- Return true if there is an error in processing
+//    the options or input file(s).
 //
 
 bool HumTool::hasError(void) {
-	return m_error.rdbuf()->in_avail();
+	if (hasParseError()) {
+		return true;
+	}
+	return m_error_text.rdbuf()->in_avail();
 }
 
 
@@ -5140,11 +5312,14 @@ bool HumTool::hasError(void) {
 //////////////////////////////
 //
 // HumTool::getError -- Return any error messages generated when
-//     running the tool.
+//     running the tool.   This includes option parsing errors as
+//     well.
 //
 
 string HumTool::getError(void) {
-	return m_error.str();
+	string output = getParseError();
+	output += m_error_text.str();
+	return output;
 }
 
 //
@@ -5152,40 +5327,25 @@ string HumTool::getError(void) {
 //
 
 ostream& HumTool::getError(ostream& out) {
-	out << m_text.str();
+	out << getParseError();
+	out << m_error_text.str();
 	return out;
-}
-
-
-
-//////////////////////////////
-//
-// HumTool::hasNonHumdrumOutput --
-//
-
-bool HumTool::hasNonHumdrumOutput(void) {
-	return m_text.rdbuf()->in_avail();
 }
 
 
 //////////////////////////////
 //
-// HumTool::hasNonHumdrumOutput --
+// HumTool::clearOutput -- clear write buffers to get ready to
+//     process another file.
 //
 
-string HumTool::getTextOutput(void) {
-	return m_text.str();
+void HumTool::clearOutput(void) {
+	m_humdrum_text.str("");
+	m_json_text.str("");
+	m_free_text.str("");
+  	m_warning_text.str("");
+  	m_error_text.str("");
 }
-
-//
-// ostream version:
-//
-
-ostream& HumTool::getTextOutput(ostream& out) {
-	out << m_text.str();
-	return out;
-}
-
 
 
 
@@ -15032,6 +15192,36 @@ Option_register::Option_register(const string& aDefinition, char aType,
 }
 
 
+Option_register::Option_register(const Option_register& reg) {
+	m_definition = reg.m_definition;
+	m_description = reg.m_description;
+	m_defaultOption = reg.m_defaultOption;
+	m_modifiedOption = reg.m_modifiedOption;
+	m_modifiedQ = reg.m_modifiedQ;
+	m_type = reg.m_type;
+}
+
+
+
+//////////////////////////////
+//
+// Option_register::operator= --
+//
+
+Option_register& Option_register::operator=(const Option_register& reg) {
+	if (this == &reg) {
+		return *this;
+	}
+	m_definition = reg.m_definition;
+	m_description = reg.m_description;
+	m_defaultOption = reg.m_defaultOption;
+	m_modifiedOption = reg.m_modifiedOption;
+	m_modifiedQ = reg.m_modifiedQ;
+	m_type = reg.m_type;
+	return *this;
+}
+
+
 
 //////////////////////////////
 //
@@ -15252,6 +15442,23 @@ Options::Options(int argc, char** argv) {
 }
 
 
+Options::Options(const Options& options) {
+	m_argv = options.m_argv;
+	m_arguments = options.m_arguments;
+	m_optionFlag = options.m_optionFlag;
+	m_optionList = options.m_optionList;
+	m_options_error_checkQ = options.m_options_error_checkQ;
+	m_processedQ = options.m_processedQ;
+	m_suppressQ = options.m_suppressQ;
+	m_optionsArgQ = options.m_optionsArgQ;
+	for (int i=0; i<(int)options.m_optionRegister.size(); i++) {
+		Option_register* orr = new Option_register(*options.m_optionRegister[i]);
+		m_optionRegister.push_back(orr);
+	}
+
+}
+
+
 
 //////////////////////////////
 //
@@ -15260,6 +15467,41 @@ Options::Options(int argc, char** argv) {
 
 Options::~Options() {
 	reset();
+}
+
+
+
+//////////////////////////////
+//
+// Options::operator= --
+//
+
+Options& Options::operator=(const Options& options) {
+	if (this == &options) {
+		return *this;
+	}
+	m_argv = options.m_argv;
+	m_arguments = options.m_arguments;
+	m_optionFlag = options.m_optionFlag;
+	m_optionList = options.m_optionList;
+	m_options_error_checkQ = options.m_options_error_checkQ;
+	m_processedQ = options.m_processedQ;
+	m_suppressQ = options.m_suppressQ;
+	m_optionsArgQ = options.m_optionsArgQ;
+
+	for (int i=0; i<(int)m_optionRegister.size(); i++) {
+		delete m_optionRegister[i];
+		m_optionRegister[i] = NULL;
+	}
+	m_optionRegister.clear();
+	
+	for (int i=0; i<(int)options.m_optionRegister.size(); i++) {
+		Option_register* orr = new Option_register(*options.m_optionRegister[i]);
+		m_optionRegister.push_back(orr);
+	}
+
+	m_error.str("");
+	return *this;
 }
 
 
@@ -15304,8 +15546,8 @@ int Options::define(const string& aDefinition) {
 	// Error if definition string doesn't contain an equals sign
 	auto location = aDefinition.find("=");
 	if (location == string::npos) {
-		cerr << "Error: no \"=\" in option definition: " << aDefinition << endl;
-		exit(1);
+		m_error << "Error: no \"=\" in option definition: " << aDefinition << endl;
+		return -1;
 	}
 
 	string aliases = aDefinition.substr(0, location);
@@ -15324,9 +15566,9 @@ int Options::define(const string& aDefinition) {
 
 	// Option types are only a single charater (b, i, d, c or s)
 	if (otype.size() != 1) {
-		cerr << "Error: option type is invalid: " << otype
+		m_error << "Error: option type is invalid: " << otype
 			  << " in option definition: " << aDefinition << endl;
-		exit(1);
+		return -1;
 	}
 
 	// Check to make sure that the type is known
@@ -15336,9 +15578,9 @@ int Options::define(const string& aDefinition) {
 		 otype[0] != OPTION_DOUBLE_TYPE  &&
 		 otype[0] != OPTION_BOOLEAN_TYPE &&
 		 otype[0] != OPTION_CHAR_TYPE ) {
-		cerr << "Error: unknown option type \'" << otype[0]
+		m_error << "Error: unknown option type \'" << otype[0]
 			  << "\' in defintion: " << aDefinition << endl;
-		exit(1);
+		return -1;
 	}
 
 	// Set up space for a option entry in the registry
@@ -15355,11 +15597,11 @@ int Options::define(const string& aDefinition) {
 			continue;
 		} else if (aliases[i] == '|') {
 			if (isDefined(optionName)) {
-				cerr << "Option \"" << optionName << "\" from definition:" << endl;
-				cerr << "\t" << aDefinition << endl;
-				cerr << "is already defined in: " << endl;
-				cerr << "\t" << getDefinition(optionName) << endl;
-				exit(1);
+				m_error << "Option \"" << optionName << "\" from definition:" << endl;
+				m_error << "\t" << aDefinition << endl;
+				m_error << "is already defined in: " << endl;
+				m_error << "\t" << getDefinition(optionName) << endl;
+				return -1;
 			}
 			if (optionName.size() > 0) {
 				m_optionList[optionName] = definitionIndex;
@@ -15416,8 +15658,8 @@ string Options::getArg(int index) {
 		}
 	}
 	if (index < 1 || index > (int)m_arguments.size()) {
-		cerr << "Error: argument " << index << " does not exist." << endl;
-		exit(1);
+		m_error << "Error: argument " << index << " does not exist." << endl;
+		return "";
 	}
 	return m_arguments[index - 1];
 }
@@ -15862,26 +16104,30 @@ char Options::getType(const string& optionName) {
 //   	default values: error_check = 1, suppress = 0;
 //
 
-void Options::process(int argc, char** argv, int error_check, int suppress) {
+bool Options::process(int argc, char** argv, int error_check, int suppress) {
 	setOptions(argc, argv);
 	xverify(error_check, suppress);
+	return !hasParseError();
 }
 
 
-void Options::process(vector<string>& argv, int error_check, int suppress) {
+bool Options::process(vector<string>& argv, int error_check, int suppress) {
 	setOptions(argv);
 	xverify(error_check, suppress);
+	return !hasParseError();
 }
 
 
-void Options::process(string& argv, int error_check, int suppress) {
+bool Options::process(string& argv, int error_check, int suppress) {
 	setOptions(argv);
 	xverify(error_check, suppress);
+	return !hasParseError();
 }
 
 
-void Options::process(int error_check, int suppress) {
+bool Options::process(int error_check, int suppress) {
 	xverify(error_check, suppress);
+	return !hasParseError();
 }
 
 
@@ -15913,8 +16159,15 @@ void Options::xverify(int error_check, int suppress) {
 	bool optionend = false;
 	int i          = 1;
 	int oldi;
+	int terminate = 1000; // for malformed options (missing arguments)
+	int tcount = 0;
 
-	while (i < (int)m_argv.size() && !optionend) {
+	while ((i < (int)m_argv.size()) && !optionend) {
+		tcount++;
+		if (tcount > terminate) {
+			m_error << "Error: missing option argument" << endl;
+			break;
+		}
 		if (isOption(m_argv[i], i)) {
 			oldi = i;
 			i = storeOption(i, position, running);
@@ -15933,8 +16186,10 @@ void Options::xverify(int error_check, int suppress) {
 				i++;
 			}
 		}
+		if (hasParseError()) {
+			break;
+		}
 	}
-
 }
 
 
@@ -15960,15 +16215,15 @@ int Options::getRegIndex(const string& optionName) {
 
 	if (optionName == "options") {
 		print(cout);
-		exit(0);
+		return -1;
 	}
 
 	auto it = m_optionList.find(optionName);
 	if (it == m_optionList.end()) {
 		if (m_options_error_checkQ) {
-			cerr << "Error: unknown option \"" << optionName << "\"." << endl;
+			m_error << "Error: unknown option \"" << optionName << "\"." << endl;
 			print(cout);
-			exit(1);
+			return -1;
 		} else {
 			return -1;
 		}
@@ -16065,9 +16320,9 @@ int Options::storeOption(int index, int& position, int& running) {
 			}
 			if (m_argv[index][position] == '=') {
 				if (optionType == OPTION_BOOLEAN_TYPE) {
-					cerr << "Error: boolean variable cannot have any options: "
+					m_error << "Error: boolean variable cannot have any options: "
 						  << tempname << endl;
-					exit(1);
+					return -1;
 				}
 				position++;
 			}
@@ -16096,8 +16351,8 @@ int Options::storeOption(int index, int& position, int& running) {
 	}
 
 	if (index >= (int)m_argv.size()) {
-		cerr << "Error: last option requires a parameter" << endl;
-		exit(1);
+		m_error << "Error: last option requires a parameter" << endl;
+		return -1;
 	}
 	setModified(tempname, &m_argv[index][position]);
 
@@ -16152,6 +16407,35 @@ ostream& Options::printRegister(ostream& out) {
 
 
 
+/////////////////////////////
+//
+// Options::hasParseError -- Returns true if there was an error parsing
+//     the arguments.
+//
+
+bool Options::hasParseError(void) {
+	return !m_error.str().empty();
+}
+
+
+
+//////////////////////////////
+//
+// Options::getParseError --
+//
+
+string Options::getParseError(void) {
+	return m_error.str();
+}
+
+
+ostream& Options::getParseError(ostream& out) {
+	out << m_error.str();
+	return m_error;
+}
+
+
+
 
 /////////////////////////////////
 //
@@ -16175,8 +16459,8 @@ Tool_autobeam::Tool_autobeam(void) {
 bool Tool_autobeam::run(const string& indata, ostream& out) {
 	HumdrumFile infile(indata);
 	bool status = run(infile);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -16186,8 +16470,8 @@ bool Tool_autobeam::run(const string& indata, ostream& out) {
 
 bool Tool_autobeam::run(HumdrumFile& infile, ostream& out) {
 	int status = run(infile);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -16512,8 +16796,8 @@ Tool_autostem::Tool_autostem(void) {
 bool Tool_autostem::run(const string& indata, ostream& out) {
 	HumdrumFile infile(indata);
 	int status = run(infile, out);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -16523,8 +16807,8 @@ bool Tool_autostem::run(const string& indata, ostream& out) {
 
 bool Tool_autostem::run(HumdrumFile& infile, ostream& out) {
 	int status = run(infile);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -16564,12 +16848,12 @@ void Tool_autostem::initialize(HumdrumFile& infile) {
 	// handle basic options:
 
 	if (getBoolean("author")) {
-		m_text << "Written by Craig Stuart Sapp, "
+		m_free_text << "Written by Craig Stuart Sapp, "
 			  << "craig@ccrma.stanford.edu, December 2010" << endl;
 		m_quit = true;
 	} else if (getBoolean("version")) {
-		m_text << getCommand() << ", version: 26 December 2010" << endl;
-		m_text << "compiled: " << __DATE__ << endl;
+		m_free_text << getCommand() << ", version: 26 December 2010" << endl;
+		m_free_text << "compiled: " << __DATE__ << endl;
 		m_quit = true;
 	} else if (getBoolean("help")) {
 		usage();
@@ -16773,11 +17057,11 @@ void Tool_autostem::assignStemDirections(vector<vector<int> >& stemdir,
 
 	if (debugQ) {
 		for (int i=0; i<(int)beamednotes.size(); i++) {
-			m_text << "!! ";
+			m_humdrum_text << "!! ";
 			for (int j=0; j<(int)beamednotes[i].size(); j++) {
-				m_text << infile[beamednotes[i][j].i][beamednotes[i][j].j] << "\t";
+				m_humdrum_text << infile[beamednotes[i][j].i][beamednotes[i][j].j] << "\t";
 			}
-			m_text << "\n";
+			m_humdrum_text << "\n";
 		}
 	}
 
@@ -17489,7 +17773,7 @@ void Tool_autostem::getClefInfo(vector<vector<int> >& baseline,
 //
 
 void Tool_autostem::example(void) {
-	m_text << getCommand() << " file.krn" << endl;
+	m_error_text << getCommand() << " file.krn" << endl;
 }
 
 
@@ -17500,7 +17784,7 @@ void Tool_autostem::example(void) {
 //
 
 void Tool_autostem::usage(void) {
-	m_text << "Usage: " << getCommand() << " [file(s)] " << endl;
+	m_error_text << "Usage: " << getCommand() << " [file(s)] " << endl;
 }
 
 
@@ -17759,8 +18043,8 @@ Tool_extract::Tool_extract(void) {
 bool Tool_extract::run(const string& indata, ostream& out) {
 	HumdrumFile infile(indata);
 	bool status = run(infile);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -17770,8 +18054,8 @@ bool Tool_extract::run(const string& indata, ostream& out) {
 
 bool Tool_extract::run(HumdrumFile& infile, ostream& out) {
 	int status = run(infile);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -17799,7 +18083,7 @@ bool Tool_extract::run(HumdrumFile& infile) {
 
 void Tool_extract::processFile(HumdrumFile& infile) {
 	if (countQ) {
-		m_text << infile.getMaxTrack() << endl;
+		m_free_text << infile.getMaxTrack() << endl;
 		return;
 	}
 	if (expandQ) {
@@ -17817,21 +18101,21 @@ void Tool_extract::processFile(HumdrumFile& infile) {
 	}
 
 	if (debugQ && !traceQ) {
-		m_text << "!! Field Expansion List:";
+		m_free_text << "!! Field Expansion List:";
 		for (int j=0; j<(int)field.size(); j++) {
-			m_text << " " << field[j];
+			m_free_text << " " << field[j];
 			if (subfield[j]) {
-				m_text << (char)subfield[j];
+				m_free_text << (char)subfield[j];
 			}
 			if (model[j]) {
-				m_text << (char)model[j];
+				m_free_text << (char)model[j];
 			}
 		}
-		m_text << endl;
+		m_free_text << endl;
 	}
 
 	// preserve SEGMENT filename if present (now printed in main())
-	// infile.printNonemptySegmentLabel(m_text);
+	// infile.printNonemptySegmentLabel(m_humdrum_text);
 
 	// analyze the input file according to command-line options
 	if (fieldQ || grepQ) {
@@ -17841,7 +18125,7 @@ void Tool_extract::processFile(HumdrumFile& infile) {
 	} else if (traceQ) {
 		extractTrace(infile, tracefile);
 	} else {
-		m_text << infile;
+		m_humdrum_text << infile;
 	}
 }
 
@@ -17922,9 +18206,9 @@ void Tool_extract::getInterpretationFields(vector<int>& field, vector<int>& subf
 	}
 
 	if (debugQ) {
-		m_text << "!! Interpretation strings to search for: " << endl;
+		m_humdrum_text << "!! Interpretation strings to search for: " << endl;
 		for (i=0; i<(int)sstrings.size(); i++) {
-			m_text << "!!\t" << sstrings[i] << endl;
+			m_humdrum_text << "!!\t" << sstrings[i] << endl;
 		}
 	}
 
@@ -18044,17 +18328,17 @@ void Tool_extract::expandSpines(vector<int>& field, vector<int>& subfield, vecto
 	}
 
 	if (debugQ) {
-		m_text << "!!expand: ";
+		m_humdrum_text << "!!expand: ";
 		for (i=0; i<(int)field.size(); i++) {
-			m_text << field[i];
+			m_humdrum_text << field[i];
 			if (subfield[i]) {
-				m_text << (char)subfield[i];
+				m_humdrum_text << (char)subfield[i];
 			}
 			if (i < (int)field.size()-1) {
-				m_text << ",";
+				m_humdrum_text << ",";
 			}
 		}
-		m_text << endl;
+		m_humdrum_text << endl;
 	}
 }
 
@@ -18116,11 +18400,11 @@ void Tool_extract::reverseSpines(vector<int>& field, vector<int>& subfield, vect
 	}
 
 	if (debugQ) {
-		m_text << "!!reverse: ";
+		m_humdrum_text << "!!reverse: ";
 		for (i=0; i<(int)field.size(); i++) {
-			m_text << field[i] << " ";
+			m_humdrum_text << field[i] << " ";
 		}
-		m_text << endl;
+		m_humdrum_text << endl;
 	}
 
 	subfield.resize(field.size());
@@ -18384,7 +18668,7 @@ void Tool_extract::excludeFields(HumdrumFile& infile, vector<int>& field,
 	int start = 0;
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].hasSpines()) {
-			m_text << infile[i] << '\n';
+			m_humdrum_text << infile[i] << '\n';
 			continue;
 		} else {
 			start = 0;
@@ -18393,13 +18677,13 @@ void Tool_extract::excludeFields(HumdrumFile& infile, vector<int>& field,
 					continue;
 				}
 				if (start != 0) {
-					m_text << '\t';
+					m_humdrum_text << '\t';
 				}
 				start = 1;
-				m_text << infile.token(i, j);
+				m_humdrum_text << infile.token(i, j);
 			}
 			if (start != 0) {
-				m_text << endl;
+				m_humdrum_text << endl;
 			}
 		}
 	}
@@ -18424,7 +18708,7 @@ void Tool_extract::extractFields(HumdrumFile& infile, vector<int>& field,
 
 	for (int i=0; i<infile.getLineCount(); i++) {
 		if (!infile[i].hasSpines()) {
-			m_text << infile[i] << '\n';
+			m_humdrum_text << infile[i] << '\n';
 			continue;
 		}
 
@@ -18450,20 +18734,20 @@ void Tool_extract::extractFields(HumdrumFile& infile, vector<int>& field,
 			}
 			if (target == 0) {
 				if (start != 0) {
-					 m_text << '\t';
+					 m_humdrum_text << '\t';
 				}
 				start = 1;
 				if (!infile[i].isManipulator()) {
 					if (infile[i].isLocalComment()) {
-						m_text << "!";
+						m_humdrum_text << "!";
 					} else if (infile[i].isBarline()) {
-						m_text << infile[i][0];
+						m_humdrum_text << infile[i][0];
 					} else if (infile[i].isData()) {
-				       m_text << ".";
+				       m_humdrum_text << ".";
 					    // interpretations handled in dealWithSpineManipulators()
 					    // [obviously not, so adding a blank one here
 					} else if (infile[i].isInterpretation()) {
-					    m_text << "*";
+					    m_humdrum_text << "*";
 					 }
 				}
 			} else {
@@ -18477,24 +18761,24 @@ void Tool_extract::extractFields(HumdrumFile& infile, vector<int>& field,
 					    if (hre.search(infile.token(i,j)->getSpineInfo(), spat) ||
 					          !hre.search(infile.token(i, j)->getSpineInfo(), "\\(")) {
 					       if (start != 0) {
-					          m_text << '\t';
+					          m_humdrum_text << '\t';
 					       }
 					       start = 1;
-					       m_text << infile.token(i, j);
+					       m_humdrum_text << infile.token(i, j);
 					    }
 					    break;
 					 case 'b':
 					    getSearchPat(spat, target, "b");
 					    if (hre.search(infile.token(i, j)->getSpineInfo(), spat)) {
 					       if (start != 0) {
-					          m_text << '\t';
+					          m_humdrum_text << '\t';
 					       }
 					       start = 1;
-					       m_text << infile.token(i, j);
+					       m_humdrum_text << infile.token(i, j);
 					    } else if (!hre.search(infile.token(i, j)->getSpineInfo(),
 					          "\\(")) {
 					       if (start != 0) {
-					          m_text << '\t';
+					          m_humdrum_text << '\t';
 					       }
 					       start = 1;
 					       dealWithSecondarySubspine(field, subfield, model, t,
@@ -18503,7 +18787,7 @@ void Tool_extract::extractFields(HumdrumFile& infile, vector<int>& field,
 					    break;
 					 case 'c':
 					    if (start != 0) {
-					       m_text << '\t';
+					       m_humdrum_text << '\t';
 					    }
 					    start = 1;
 					    dealWithCospine(field, subfield, model, t, infile, i, j,
@@ -18511,16 +18795,16 @@ void Tool_extract::extractFields(HumdrumFile& infile, vector<int>& field,
 					    break;
 					 default:
 					    if (start != 0) {
-					       m_text << '\t';
+					       m_humdrum_text << '\t';
 					    }
 					    start = 1;
-					    m_text << infile.token(i, j);
+					    m_humdrum_text << infile.token(i, j);
 					 }
 				}
 			}
 		}
 		if (start != 0) {
-			m_text << endl;
+			m_humdrum_text << endl;
 		}
 	}
 }
@@ -18544,17 +18828,17 @@ void Tool_extract::dealWithCospine(vector<int>& field, vector<int>& subfield, ve
 	int index;
 
 	if (infile[line].isInterpretation()) {
-		m_text << infile.token(line, cospine);
+		m_humdrum_text << infile.token(line, cospine);
 		return;
 	}
 
 	if (infile[line].isBarline()) {
-		m_text << infile.token(line, cospine);
+		m_humdrum_text << infile.token(line, cospine);
 		return;
 	}
 
 	if (infile[line].isLocalComment()) {
-		m_text << infile.token(line, cospine);
+		m_humdrum_text << infile.token(line, cospine);
 		return;
 	}
 
@@ -18596,17 +18880,17 @@ void Tool_extract::dealWithCospine(vector<int>& field, vector<int>& subfield, ve
 	}
 
 	if (debugQ) {
-		m_text << "\n!!codata:\n";
+		m_humdrum_text << "\n!!codata:\n";
 		for (i=0; i<(int)cotokens.size(); i++) {
-			m_text << "!!\t" << i << "\t" << cotokens[i];
+			m_humdrum_text << "!!\t" << i << "\t" << cotokens[i];
 			if (i < (int)spineindex.size()) {
-				m_text << "\tspine=" << spineindex[i];
-				m_text << "\tsubspine=" << subspineindex[i];
+				m_humdrum_text << "\tspine=" << spineindex[i];
+				m_humdrum_text << "\tsubspine=" << subspineindex[i];
 			} else {
-				m_text << "\tspine=.";
-				m_text << "\tsubspine=.";
+				m_humdrum_text << "\tspine=.";
+				m_humdrum_text << "\tsubspine=.";
 			}
-			m_text << endl;
+			m_humdrum_text << endl;
 		}
 	}
 
@@ -18662,12 +18946,12 @@ void Tool_extract::printCotokenInfo(int& start, HumdrumFile& infile, int line, i
 			if (start == 0) {
 				start++;
 			} else {
-				m_text << subtokenseparator;
+				m_humdrum_text << subtokenseparator;
 			}
 			if (i<(int)cotokens.size()) {
-				m_text << cotokens[i];
+				m_humdrum_text << cotokens[i];
 			} else {
-				m_text << ".";
+				m_humdrum_text << ".";
 			}
 		found = 1;
 		}
@@ -18676,9 +18960,9 @@ void Tool_extract::printCotokenInfo(int& start, HumdrumFile& infile, int line, i
 		if (start == 0) {
 			start++;
 		} else {
-			m_text << subtokenseparator;
+			m_humdrum_text << subtokenseparator;
 		}
-		m_text << ".";
+		m_humdrum_text << ".";
 	}
 }
 
@@ -18701,32 +18985,32 @@ void Tool_extract::dealWithSecondarySubspine(vector<int>& field, vector<int>& su
 	string buffer;
 	if (infile[line].isLocalComment()) {
 		if ((submodel == 'n') || (submodel == 'r')) {
-			m_text << "!";
+			m_humdrum_text << "!";
 		} else {
-			m_text << infile.token(i, j);
+			m_humdrum_text << infile.token(i, j);
 		}
 	} else if (infile[line].isBarline()) {
-		m_text << infile.token(i, j);
+		m_humdrum_text << infile.token(i, j);
 	} else if (infile[line].isInterpretation()) {
 		if ((submodel == 'n') || (submodel == 'r')) {
-			m_text << "*";
+			m_humdrum_text << "*";
 		} else {
-			m_text << infile.token(i, j);
+			m_humdrum_text << infile.token(i, j);
 		}
 	} else if (infile[line].isData()) {
 		if (submodel == 'n') {
-			m_text << ".";
+			m_humdrum_text << ".";
 		} else if (submodel == 'r') {
 			if (*infile.token(i, j) == ".") {
-				m_text << ".";
+				m_humdrum_text << ".";
 			} else if (infile.token(i, j)->find('q') != string::npos) {
-				m_text << ".";
+				m_humdrum_text << ".";
 			} else if (infile.token(i, j)->find('Q') != string::npos) {
-				m_text << ".";
+				m_humdrum_text << ".";
 			} else {
 				buffer = *infile.token(i, j);
 				if (hre.search(buffer, "{")) {
-					m_text << "{";
+					m_humdrum_text << "{";
 				}
 				// remove secondary chord notes:
 				hre.replaceDestructive(buffer, "", " .*");
@@ -18744,10 +19028,10 @@ void Tool_extract::dealWithSecondarySubspine(vector<int>& field, vector<int>& su
 						 hre.replaceDestructive(buffer, editorialInterpretation, "(?<=r)");
 					}
 				}
-				m_text << buffer;
+				m_humdrum_text << buffer;
 			}
 		} else {
-			m_text << infile.token(i, j);
+			m_humdrum_text << infile.token(i, j);
 		}
 	} else {
 		cerr << "Should not get to this line of code" << endl;
@@ -19020,20 +19304,20 @@ void Tool_extract::dealWithSpineManipulators(HumdrumFile& infile, int line,
 	}
 
 	if (debugQ && xdebug) {
-		m_text << "!! *x serials = ";
+		m_humdrum_text << "!! *x serials = ";
 		for (int ii=0; ii<(int)xserial.size(); ii++) {
-			m_text << xserial[ii] << " ";
+			m_humdrum_text << xserial[ii] << " ";
 		}
-		m_text << "\n";
+		m_humdrum_text << "\n";
 	}
 
 	if (debugQ && vdebug) {
-		m_text << "!!LINE: " << infile[line] << endl;
-		m_text << "!! *v serials = ";
+		m_humdrum_text << "!!LINE: " << infile[line] << endl;
+		m_humdrum_text << "!! *v serials = ";
 		for (int ii=0; ii<(int)vserial.size(); ii++) {
-			m_text << vserial[ii] << " ";
+			m_humdrum_text << vserial[ii] << " ";
 		}
-		m_text << "\n";
+		m_humdrum_text << "\n";
 	}
 
 	// check for proper *x syntax /////////////////////////////////
@@ -19102,11 +19386,11 @@ void Tool_extract::dealWithSpineManipulators(HumdrumFile& infile, int line,
 	}
 
 	if (debugQ) {
-		m_text << "!!vsplit array: ";
+		m_humdrum_text << "!!vsplit array: ";
 		for (i=0; i<(int)vsplit.size(); i++) {
-			m_text << " " << vsplit[i];
+			m_humdrum_text << " " << vsplit[i];
 		}
-		m_text << endl;
+		m_humdrum_text << endl;
 	}
 
 	if (vsplit.size() > 0) {
@@ -19131,14 +19415,14 @@ void Tool_extract::dealWithSpineManipulators(HumdrumFile& infile, int line,
 	for (i=0; i<(int)tempout.size(); i++) {
 		if (tempout[i] != "") {
 			if (start != 0) {
-				m_text << "\t";
+				m_humdrum_text << "\t";
 			}
-			m_text << tempout[i];
+			m_humdrum_text << tempout[i];
 			start++;
 		}
 	}
 	if (start) {
-		m_text << '\n';
+		m_humdrum_text << '\n';
 	}
 }
 
@@ -19162,11 +19446,11 @@ void Tool_extract::printMultiLines(vector<int>& vsplit, vector<int>& vserial,
 	}
 
 	if (debugQ) {
-		m_text << "!!tempout: ";
+		m_humdrum_text << "!!tempout: ";
 		for (i=0; i<(int)tempout.size(); i++) {
-			m_text << tempout[i] << " ";
+			m_humdrum_text << tempout[i] << " ";
 		}
-		m_text << endl;
+		m_humdrum_text << endl;
 	}
 
 	if (splitpoint == -1) {
@@ -19178,9 +19462,9 @@ void Tool_extract::printMultiLines(vector<int>& vsplit, vector<int>& vserial,
 	for (i=0; i<splitpoint; i++) {
 		if (tempout[i] != "") {
 			if (start) {
-				m_text << "\t";
+				m_humdrum_text << "\t";
 			}
-			m_text << tempout[i];
+			m_humdrum_text << tempout[i];
 			start = 1;
 			if (tempout[i] == "*v") {
 				if (printv) {
@@ -19198,14 +19482,14 @@ void Tool_extract::printMultiLines(vector<int>& vsplit, vector<int>& vserial,
 	for (i=splitpoint; i<(int)vsplit.size(); i++) {
 		if (tempout[i] != "") {
 			if (start) {
-				m_text << "\t";
+				m_humdrum_text << "\t";
 			}
-			m_text << "*";
+			m_humdrum_text << "*";
 		}
 	}
 
 	if (start) {
-		m_text << "\n";
+		m_humdrum_text << "\n";
 	}
 
 	vsplit[splitpoint] = 0;
@@ -19318,11 +19602,11 @@ void Tool_extract::extractTrace(HumdrumFile& infile, const string& tracefile) {
 
 	if (debugQ) {
 		for (i=0; i<(int)startline.size(); i++) {
-			m_text << "!!TRACE " << startline[i]+1 << ":\t";
+			m_humdrum_text << "!!TRACE " << startline[i]+1 << ":\t";
 			for (j=0; j<(int)fields[i].size(); j++) {
-				m_text << fields[i][j] << " ";
+				m_humdrum_text << fields[i][j] << " ";
 			}
-			m_text << "\n";
+			m_humdrum_text << "\n";
 		}
 	}
 
@@ -19330,7 +19614,7 @@ void Tool_extract::extractTrace(HumdrumFile& infile, const string& tracefile) {
 	if (startline.size() == 0) {
 		for (i=0; i<infile.getLineCount(); i++) {
 			if (!infile[i].hasSpines()) {
-				m_text << infile[i] << '\n';
+				m_humdrum_text << infile[i] << '\n';
 			}
 		}
 		return;
@@ -19338,7 +19622,7 @@ void Tool_extract::extractTrace(HumdrumFile& infile, const string& tracefile) {
 
 	for (i=0; i<startline[0]; i++) {
 		if (!infile[i].hasSpines()) {
-			m_text << infile[i] << '\n';
+			m_humdrum_text << infile[i] << '\n';
 		}
 	}
 
@@ -19351,7 +19635,7 @@ void Tool_extract::extractTrace(HumdrumFile& infile, const string& tracefile) {
 		}
 		for (i=startline[j]; i<endline; i++) {
 			if (!infile[i].hasSpines()) {
-				m_text << infile[i] << '\n';
+				m_humdrum_text << infile[i] << '\n';
 			} else {
 				printTraceLine(infile, i, fields[j]);
 			}
@@ -19380,14 +19664,14 @@ void Tool_extract::printTraceLine(HumdrumFile& infile, int line, vector<int>& fi
 				continue;
 			}
 			if (start != 0) {
-				m_text << '\t';
+				m_humdrum_text << '\t';
 			}
 			start = 1;
-			m_text << infile.token(line, j);
+			m_humdrum_text << infile.token(line, j);
 		}
 	}
 	if (start != 0) {
-		m_text << endl;
+		m_humdrum_text << endl;
 	}
 }
 
@@ -19399,7 +19683,7 @@ void Tool_extract::printTraceLine(HumdrumFile& infile, int line, vector<int>& fi
 //
 
 void Tool_extract::example(void) {
-	m_text <<
+	m_free_text <<
 	"					                                                          \n"
 	<< endl;
 }
@@ -19412,7 +19696,7 @@ void Tool_extract::example(void) {
 //
 
 void Tool_extract::usage(const string& command) {
-	m_text <<
+	m_free_text <<
 	"					                                                          \n"
 	<< endl;
 }
@@ -19427,12 +19711,12 @@ void Tool_extract::usage(const string& command) {
 void Tool_extract::initialize(HumdrumFile& infile) {
 	// handle basic options:
 	if (getBoolean("author")) {
-		m_text << "Written by Craig Stuart Sapp, "
+		m_free_text << "Written by Craig Stuart Sapp, "
 			  << "craig@ccrma.stanford.edu, Feb 2008" << endl;
 		exit(0);
 	} else if (getBoolean("version")) {
-		m_text << getArg(0) << ", version: Feb 2008" << endl;
-		m_text << "compiled: " << __DATE__ << endl;
+		m_free_text << getArg(0) << ", version: Feb 2008" << endl;
+		m_free_text << "compiled: " << __DATE__ << endl;
 		exit(0);
 	} else if (getBoolean("help")) {
 		usage(getCommand().c_str());
@@ -19506,12 +19790,17 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 
 
 
-#define RUNTOOL(NAME, INFILE, COMMAND)             \
+#define RUNTOOL(NAME, INFILE, COMMAND, STATUS)     \
 	Tool_##NAME *tool = new Tool_##NAME;            \
 	tool->process(COMMAND);                         \
 	tool->run(INFILE);                              \
-	if (tool->hasNonHumdrumOutput()) {              \
-		INFILE.readString(tool->getTextOutput());    \
+	if (tool->hasError()) {                         \
+		status = false;                              \
+		tool->getError(cerr);                        \
+		delete tool;                                 \
+		break;                                       \
+	} else if (tool->hasHumdrumText()) {            \
+		INFILE.readString(tool->getHumdrumText());   \
 	}                                               \
 	delete tool;
 
@@ -19535,8 +19824,8 @@ Tool_filter::Tool_filter(void) {
 bool Tool_filter::run(const string& indata, ostream& out) {
 	HumdrumFile infile(indata);
 	bool status = run(infile);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -19546,8 +19835,8 @@ bool Tool_filter::run(const string& indata, ostream& out) {
 
 bool Tool_filter::run(HumdrumFile& infile, ostream& out) {
 	int status = run(infile);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -19561,30 +19850,33 @@ bool Tool_filter::run(HumdrumFile& infile, ostream& out) {
 bool Tool_filter::run(HumdrumFile& infile) {
 	initialize(infile);
 
+	bool status = true;
 	vector<pair<string, string> > commands;
 	getCommandList(commands, infile);
 	for (int i=0; i<(int)commands.size(); i++) {
 		if (commands[i].first == "autobeam") {
-			RUNTOOL(autobeam, infile, commands[i].second);
+			RUNTOOL(autobeam, infile, commands[i].second, status);
 		} else if (commands[i].first == "autostem") {
-			RUNTOOL(autostem, infile, commands[i].second);
+			RUNTOOL(autostem, infile, commands[i].second, status);
 		} else if (commands[i].first == "extract") {
-			RUNTOOL(extract, infile, commands[i].second);
+			RUNTOOL(extract, infile, commands[i].second, status);
 		} else if (commands[i].first == "metlev") {
-			RUNTOOL(metlev, infile, commands[i].second);
+			RUNTOOL(metlev, infile, commands[i].second, status);
 		} else if (commands[i].first == "satb2gs") {
-			RUNTOOL(satb2gs, infile, commands[i].second);
+			RUNTOOL(satb2gs, infile, commands[i].second, status);
 		} else if (commands[i].first == "recip") {
-			RUNTOOL(recip, infile, commands[i].second);
+			RUNTOOL(recip, infile, commands[i].second, status);
 		} else if (commands[i].first == "transpose") {
-			RUNTOOL(transpose, infile, commands[i].second);
+			RUNTOOL(transpose, infile, commands[i].second, status);
+		} else if (commands[i].first == "myank") {
+			RUNTOOL(myank, infile, commands[i].second, status);
 		}
 	}
 
 	// Re-load the text for each line from their tokens in case any
 	// updates are needed from token changes.
 	infile.createLinesFromTokens();
-	return true;
+	return status;
 }
 
 
@@ -19677,7 +19969,7 @@ bool Tool_metlev::run(HumdrumFile& infile, ostream& out) {
 bool Tool_metlev::run(HumdrumFile& infile) {
 	int lineCount = infile.getLineCount();
 	if (lineCount == 0) {
-		m_error << "No input data";
+		m_error_text << "No input data";
 		return false;
 	}
 
@@ -19698,7 +19990,7 @@ bool Tool_metlev::run(HumdrumFile& infile) {
 	if (m_kernspines.size() > 0) {
 		track = m_kernspines[0]->getTrack();
 	} else {
-		m_error << "No **kern spines in input file" << endl;
+		m_error_text << "No **kern spines in input file" << endl;
 		return false;
 	}
 	infile.getMetricLevels(beatlev, track, NAN);
@@ -19751,9 +20043,9 @@ bool Tool_metlev::run(HumdrumFile& infile) {
 		return true;
 	} else if (getBoolean("composite")) {
 		infile.prependDataSpine(beatlev, "nan", exinterp);
-		infile.printFieldIndex(0, m_text);
+		infile.printFieldIndex(0, m_humdrum_text);
 		infile.clear();
-		infile.readString(m_text.str());
+		infile.readString(m_humdrum_text.str());
 	} else {
 		vector<vector<double> > results;
 		fillVoiceResults(results, infile, beatlev);
@@ -19838,6 +20130,2273 @@ void Tool_metlev::fillVoiceResults(vector<vector<double> >& results,
 
 /////////////////////////////////
 //
+// Tool_myank::Tool_myank -- Set the recognized options for the tool.
+//
+
+Tool_myank::Tool_myank(void) {
+	define("v|verbose=b",    "Verbose output of data");
+	define("debug=b",        "Debugging information");
+	define("inlist=b",       "Show input measure list");
+	define("outlist=b",      "Show output measure list");
+	define("mark|marks=b",   "Yank measure with marked notes");
+	define("T|M|bar-number-text=b", "print barnum with LO text above system ");
+	define("d|double|dm|md|mdsep|mdseparator=b", "Put double barline between non-consecutive measure segments");
+	define("m|b|measures|bars|measure|bar=s", "Measures to yank");
+	define("I|i|instrument=b", "Include instrument codes from start of data");
+	define("visible|not-invisible=b", "Do not make initial measure invisible");
+	define("B|noendbar=b", "Do not print barline at end of data");
+	define("max=b",  "print maximum measure number");
+	define("min=b",  "print minimum measure number");
+	define("section-count=b", "count the number of sections, JRP style");
+	define("section=i:0", "extract given section number (indexed from 1");
+	define("author=b",        "Program author");
+	define("version=b",       "Program version");
+	define("example=b",       "Program examples");
+	define("h|help=b",        "Short description");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_myank::run -- Primary interfaces to the tool.
+//
+
+bool Tool_myank::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_myank::run(HumdrumFile& infile, ostream& out) {
+	int status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+//
+// In-place processing of file:
+//
+
+bool Tool_myank::run(HumdrumFile& infile) {
+	initialize(infile);
+	processFile(infile);
+	// Re-load the text for each line from their tokens.
+	infile.createLinesFromTokens();
+	return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////
+
+ostream& operator<<(ostream& out, MyCoord& value) {
+	out << "(" << value.x << "," << value.y << ")";
+	return out;
+}
+
+
+ostream& operator<<(ostream& out, MeasureInfo& info) {
+	if (info.file == NULL) {
+		return out;
+	}
+	HumdrumFile& infile = *(info.file);
+	out << "================================== " << endl;
+	out << "NUMBER         = " << info.num << endl;
+	out << "SEGMENT        = " << info.seg << endl;
+	out << "START          = " << info.start << endl;
+	out << "STOP           = " << info.stop << endl;
+
+	for (int i=1; i<(int)info.sclef.size(); i++) {
+		out << "TRACK " << i << ":" << endl;
+		if (info.sclef[i].isValid()) {
+			out << "   START CLEF    = " << infile.token(info.sclef[i].x, info.sclef[i].y)       << endl;
+		}
+		if (info.skeysig[i].isValid()) {
+			out << "   START KEYSIG  = " << infile.token(info.skeysig[i].x, info.skeysig[i].y)   << endl;
+		}
+		if (info.skey[i].isValid()) {
+			out << "   START KEY     = " << infile.token(info.skey[i].x, info.skey[i].y)         << endl;
+		}
+		if (info.stimesig[i].isValid()) {
+			out << "   START TIMESIG = " << infile.token(info.stimesig[i].x, info.stimesig[i].y) << endl;
+		}
+		if (info.smet[i].isValid()) {
+			out << "   START MET     = " << infile.token(info.smet[i].x, info.smet[i].y)         << endl;
+		}
+		if (info.stempo[i].isValid()) {
+			out << "   START TEMPO   = " << infile.token(info.stempo[i].x, info.stempo[i].y)     << endl;
+		}
+	
+		if (info.eclef[i].isValid()) {
+			out << "   END CLEF    = " << infile.token(info.eclef[i].x, info.eclef[i].y)       << endl;
+		}
+		if (info.ekeysig[i].isValid()) {
+			out << "   END KEYSIG  = " << infile.token(info.ekeysig[i].x, info.ekeysig[i].y)   << endl;
+		}
+		if (info.ekey[i].isValid()) {
+			out << "   END KEY     = " << infile.token(info.ekey[i].x, info.ekey[i].y)         << endl;
+		}
+		if (info.etimesig[i].isValid()) {
+			out << "   END TIMESIG = " << infile.token(info.etimesig[i].x, info.etimesig[i].y) << endl;
+		}
+		if (info.emet[i].isValid()) {
+			out << "   END MET     = " << infile.token(info.emet[i].x, info.emet[i].y)         << endl;
+		}
+		if (info.etempo[i].isValid()) {
+			out << "   END TEMPO   = " << infile.token(info.etempo[i].x, info.etempo[i].y)     << endl;
+		}
+	}
+
+	return out;
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////
+//
+// Tool_myank::initialize -- extract time signature lines for
+//    each **kern spine in file.
+//
+
+void Tool_myank::initialize(HumdrumFile& infile) {
+	// handle basic options:
+	if (getBoolean("author")) {
+		m_free_text << "Written by Craig Stuart Sapp, "
+			  << "craig@ccrma.stanford.edu, December 2010" << endl;
+		return;
+	} else if (getBoolean("version")) {
+		m_free_text << getCommand() << ", version: 26 December 2010" << endl;
+		m_free_text << "compiled: " << __DATE__ << endl;
+		return;
+	} else if (getBoolean("help")) {
+		usage(getCommand());
+		return;
+	} else if (getBoolean("example")) {
+		example();
+		return;
+	}
+
+	debugQ        = getBoolean("debug");
+	inlistQ       = getBoolean("inlist");
+	outlistQ      = getBoolean("outlist");
+	verboseQ      = getBoolean("verbose");
+	maxQ          = getBoolean("max");
+	minQ          = getBoolean("min");
+
+	invisibleQ    = !getBoolean("not-invisible");
+	instrumentQ   =  getBoolean("instrument");
+	nolastbarQ    =  getBoolean("noendbar");
+	markQ         =  getBoolean("mark");
+	doubleQ       =  getBoolean("mdsep");
+	barnumtextQ   =  getBoolean("bar-number-text");
+	sectionCountQ =  getBoolean("section-count");
+	Section       =  getInteger("section");
+
+	if (!Section) {
+		if (!(getBoolean("measures") || markQ)) {
+			// if -m option is not given, then --mark option presumed
+			markQ = 1;
+			// cerr << "Error: the -m option is required" << endl;
+			// exit(1);
+		}
+	}
+
+}
+
+
+
+////////////////////////
+//
+// Tool_myank::processFile --
+//
+
+void Tool_myank::processFile(HumdrumFile& infile) {
+	if (sectionCountQ) {
+		int sections = getSectionCount(infile);
+		m_humdrum_text << sections << endl;
+		return;
+	}
+
+	getMetStates(metstates, infile);
+	getMeasureStartStop(MeasureInList, infile);
+
+	string measurestring = getString("measure");
+	if (markQ) {
+		stringstream mstring;
+		getMarkString(mstring, infile); 
+		measurestring = mstring.str();
+		if (debugQ) {
+			m_free_text << "MARK STRING: " << mstring.str() << endl;
+		}
+	} else if (Section) {
+		string sstring;
+		getSectionString(sstring, infile, Section);
+		measurestring = sstring;
+	}
+	if (debugQ) {
+		m_free_text << "MARK MEASURES: " << measurestring << endl;
+	}
+	
+	// expand to multiple measures later.
+	expandMeasureOutList(MeasureOutList, MeasureInList, infile, 
+			measurestring);
+
+	if (inlistQ) {
+		m_free_text << "INPUT MEASURE MAP: " << endl;
+		for (int i=0; i<(int)MeasureInList.size(); i++) {
+			m_free_text << MeasureInList[i];
+		}
+	}
+	if (outlistQ) {
+		m_free_text << "OUTPUT MEASURE MAP: " << endl;
+		for (int i=0; i<(int)MeasureOutList.size(); i++) {
+			m_free_text << MeasureOutList[i];
+		}
+	}
+
+	if (MeasureOutList.size() == 0) {
+		// disallow processing files with no barlines
+		return;
+	}
+
+	myank(infile, MeasureOutList);
+}
+
+
+
+////////////////////////
+//
+// Tool_myank::getMetStates --  Store the current *met for every token
+// in the score, keeping track of meter without metric symbols.
+//
+
+void Tool_myank::getMetStates(vector<vector<MyCoord> >& metstates, 
+		HumdrumFile& infile) {
+	vector<MyCoord> current;
+	current.resize(infile.getMaxTrack()+1);
+	metstates.resize(infile.getLineCount());
+	HumRegex hre;
+
+	int track;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isInterpretation()) {
+			for (int j=0; j<infile[i].getFieldCount(); j++) {
+				track = infile.token(i, j)->getTrack();
+				if (hre.search(infile.token(i, j), R"(^\*met\([^\)]+\))")) {
+					current[track].x = i;
+					current[track].y = j;
+				} else if (hre.search(infile.token(i, j), R"(^\*M\d+\d+)")) {
+					current[track] = getLocalMetInfo(infile, i, track);   
+				}
+			}
+		}
+
+		// metstates[i].resize(infile[i].getFieldCount());
+		// for (j=0; j<infile[i].getFieldCount(); j++) {
+		//    track = infile.token(i, j)->getTrack();
+		//    metstates[i][j] = current[track];
+		// }
+		metstates[i].resize(infile.getMaxTrack()+1);
+		for (int j=1; j<=infile.getMaxTrack(); j++) {
+			metstates[i][j] = current[j];
+		}
+	}
+
+	if (debugQ) {
+		for (int i=0; i<infile.getLineCount(); i++) {
+			for (int j=1; j<(int)metstates[i].size(); j++) {
+				if (metstates[i][j].x < 0) {
+					m_humdrum_text << ".";
+				} else {
+					m_humdrum_text << infile.token(metstates[i][j].x, metstates[i][j].y);
+				}
+				m_humdrum_text << "\t";
+			}
+			m_humdrum_text << infile[i] << endl;
+		}
+
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::getLocalMetInfo -- search in the non-data region indicated by the 
+// input row for a *met entry in the input track.  Return empty 
+// value if none found.
+//
+
+MyCoord Tool_myank::getLocalMetInfo(HumdrumFile& infile, int row, int track) {
+	MyCoord output;
+	int startline = -1;
+	int stopline = -1;
+	int i = row;
+	int j;
+	int xtrac;
+	HumRegex hre;
+
+	while (i>=0) {
+		if (infile[i].isData()) {
+			startline = i+1;
+			break;
+		}
+		i--;
+	}
+	if (startline < 0) {
+		startline = 0;
+	}
+	i = row; 
+	while (i<infile.getLineCount()){ 
+		if (infile[i].isData()) {
+			stopline = i-1;
+			break;
+		}
+		i++;
+	}
+	if (stopline >= infile.getLineCount()) {
+		stopline = infile.getLineCount()-1;
+	}
+	for (i=startline; i<=stopline; i++) {
+		if (!infile[i].isInterpretation()) {
+			continue;
+		}
+		for (j=0; j<infile[i].getFieldCount(); j++) {
+			xtrac = infile.token(i, j)->getTrack();
+			if (track != xtrac) {
+				continue;
+			}
+			if (hre.search(infile.token(i, j), R"(^\*met\([^\)]+\))")) {
+				output.x = i;
+				output.x = j;
+			}
+		}
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::getMarkString -- return a list of measures which contain marked
+//    notes (primarily from search matches).
+// This function scans for reference records in this form:
+// !!!RDF**kern: @= matched note
+// or
+// !!!RDF**kern: i= marked note
+// If it finds any lines like that, it will extract the character before
+// the equals sign, and scan for it in the **kern data in the file.
+// any measure which contains such a mark will be stored in the output
+// string.
+//
+
+void Tool_myank::getMarkString(ostream& out, HumdrumFile& infile)  {
+	string mchar; // list of characters which are marks
+	char target;
+	HumRegex hre;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isReference()) {
+			continue;
+		}
+		if (hre.search(infile.token(i, 0), 
+				R"(!!!RDF\*\*kern\s*:\s*([^=])\s*=\s*match)", "i")) {
+			target = hre.getMatch(1)[0];
+			mchar.push_back(target);
+		} else if (hre.search(infile.token(i, 0), 
+				R"(!!!RDF\*\*kern\s*:\s*([^=])\s*=\s*mark)", "i")) {
+			target = hre.getMatch(1)[0];
+			mchar.push_back(target);
+		}
+	}
+
+	if (debugQ) {
+		for (int i=0; i<(int)mchar.size(); i++) {
+			m_free_text << "\tMARK CHARCTER: " << mchar[i] << endl;
+		}
+	}
+
+	if (mchar.size() == 0) {
+		return;
+	}
+
+	// now search for measures which contains any of those character
+	// in **kern data:
+	int curmeasure = 0;
+	int inserted = 0;
+	int hasmark = 0;
+	string str;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isBarline()) {
+			if (hre.search(infile.token(i, 0), "^=.*?(\\d+)", "")) {
+				curmeasure = stoi(hre.getMatch(1));
+				hasmark = 0;
+			}
+		}
+		if (hasmark) {
+			continue;
+		}
+		if (!infile[i].isData()) {
+			continue;
+		}
+		for (int j=0; j<infile[i].getFieldCount(); j++) {
+			if (infile.token(i, j)->isKern()) {
+				int k=0;
+				str = *infile.token(i, j);
+				while (str[k] != '\0') {
+					for (int m=0; m<(int)mchar.size(); m++) {
+						if (str[k] == mchar[m]) {
+							if (inserted) {
+							   out << ',';
+							} else {
+							   inserted++;
+							}
+							out << curmeasure;
+							hasmark = 1;
+							goto outerforloop;
+						}
+					}
+					k++;
+				}
+			}
+		}
+outerforloop: ;
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::myank -- yank the specified measures.
+//
+
+void Tool_myank::myank(HumdrumFile& infile, vector<MeasureInfo>& outmeasures) {
+	if (outmeasures.size() > 0) {
+		printStarting(infile);
+	}
+
+	int lastline = -1;
+	int h, i, j;
+	int counter;
+	int printed = 0;
+	int mcount = 0;
+	int measurestart = 1;
+	int datastart = 0;
+	int bartextcount = 0;
+	for (h=0; h<(int)outmeasures.size(); h++) {
+		measurestart = 1;
+		printed = 0;
+		counter = 0;
+		if (debugQ) {
+			m_humdrum_text << "!! =====================================\n";
+			m_humdrum_text << "!! processing " << outmeasures[h].num << endl;
+		}
+		if (h > 0) {
+			reconcileSpineBoundary(infile, outmeasures[h-1].stop,
+				outmeasures[h].start);
+		} else {
+			reconcileStartingPosition(infile, outmeasures[0].start);
+		}
+		for (i=outmeasures[h].start; i<outmeasures[h].stop; i++) {
+			counter++;
+			if ((!printed) && ((mcount == 0) || (counter == 2))) {
+				if ((datastart == 0) && outmeasures[h].num == 0) {
+					// not ideal setup...
+					datastart = 1;
+				} else{ 
+					adjustGlobalInterpretations(infile, i, outmeasures, h);
+					printed = 1;
+				}
+			}
+			if (infile[i].isData() && (mcount == 0)) {
+				mcount++;
+			}
+			if (infile[i].isBarline()) {
+				mcount++;
+			}
+			if ((mcount == 1) && invisibleQ && infile[i].isBarline()) {
+				printInvisibleMeasure(infile, i);
+				measurestart = 0;
+				if ((bartextcount++ == 0) && infile[i].isBarline()) {
+					int barline = 0;
+					sscanf(infile.token(i, 0)->c_str(), "=%d", &barline);
+					if (barnumtextQ && (barline > 0)) {
+						m_humdrum_text << "!!LO:TX:Z=20:X=-90:t=" << barline << endl;
+					}
+				}
+			} else if (doubleQ && measurestart) {
+				printDoubleBarline(infile, i);
+				measurestart = 0;
+			} else {
+				m_humdrum_text << infile[i] << "\n";
+				if (barnumtextQ && (bartextcount++ == 0) && infile[i].isBarline()) {
+					int barline = 0;
+					sscanf(infile.token(i, 0)->c_str(), "=%d", &barline);
+					if (barline > 0) {
+						m_humdrum_text << "!!LO:TX:Z=20:X=-25:t=" << barline << endl;
+					}
+				}
+			}
+			lastline = i;
+		}
+	}
+
+	HumRegex hre;
+	string token;
+	int lasti;
+	if (outmeasures.size() > 0) {
+		lasti = outmeasures.back().stop;
+	} else {
+		lasti = -1;
+	}
+	if ((!nolastbarQ) &&  (lasti >= 0) && infile[lasti].isBarline()) {
+		for (j=0; j<infile[lasti].getFieldCount(); j++) {
+			token = *infile.token(lasti, j);
+			hre.replaceDestructive(token, "", "\\d+");
+			if (doubleQ) {
+				if (hre.search(token, "=(.+)")) {
+					// don't add double barline, there is already
+					// some style on the barline
+				} else {
+					// add a double barline
+					hre.replaceDestructive(token, "||", "$");
+				}
+			}
+			m_humdrum_text << token;
+			if (j < infile[lasti].getFieldCount() - 1) {
+				m_humdrum_text << '\t';
+			}
+		}
+		m_humdrum_text << '\n';
+	}
+
+	if (debugQ) {
+		m_free_text << "PROCESSING ENDING" << endl;
+	}
+
+	if (lastline >= 0) {
+		//printEnding(infile, lastline);
+		printEnding(infile, outmeasures.back().stop, lasti);
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::adjustGlobalInterpretations --
+//
+
+void Tool_myank::adjustGlobalInterpretations(HumdrumFile& infile, int ii,
+		vector<MeasureInfo>& outmeasures, int index) {
+
+	if (index <= 0) {
+		adjustGlobalInterpretationsStart(infile, ii, outmeasures, index);
+		return;
+	}
+
+	// the following lines will not work when non-contiguous measures are
+	// elided.
+	//   if (!infile[ii].isInterpretation()) { 
+	//      return;
+	//   }
+
+	int clefQ    = 0;
+	int keysigQ  = 0;
+	int keyQ     = 0;
+	int timesigQ = 0;
+	int metQ     = 0;
+	int tempoQ   = 0;
+
+	int x, y;
+	int xo, yo;
+
+	int tracks = infile.getMaxTrack();
+
+	// these lines may cause bugs, but they get rid of zeroth measure
+	// problem.
+// ggg
+//   if ((outmeasures.size() > 1) && (outmeasures[index-1].num == 0)) {
+//      return;
+//   }
+//   if ((outmeasures.size() > 0) && (outmeasures[index].num == 0)) {
+//      return;
+//   }
+
+	for (int i=1; i<=tracks; i++) {
+		if (!clefQ && (outmeasures[index].sclef.size() > 0)) {
+			x  = outmeasures[index].sclef[i].x;
+			y  = outmeasures[index].sclef[i].y;
+			xo = outmeasures[index-1].eclef[i].x;
+			yo = outmeasures[index-1].eclef[i].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					clefQ = 1;
+				}
+			}
+		}
+
+		if (!keysigQ && (outmeasures[index].skeysig.size() > 0)) {
+			x  = outmeasures[index].skeysig[i].x;
+			y  = outmeasures[index].skeysig[i].y;
+			xo = outmeasures[index-1].ekeysig[i].x;
+			yo = outmeasures[index-1].ekeysig[i].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					keysigQ = 1;
+				}
+			}
+		}
+
+		if (!keyQ && (outmeasures[index].skey.size() > 0)) {
+			x  = outmeasures[index].skey[i].x;
+			y  = outmeasures[index].skey[i].y;
+			xo = outmeasures[index-1].ekey[i].x;
+			yo = outmeasures[index-1].ekey[i].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					keyQ = 1;
+				}
+			}
+		}
+
+		if (!timesigQ && (outmeasures[index].stimesig.size() > 0)) {
+			x  = outmeasures[index].stimesig[i].x;
+			y  = outmeasures[index].stimesig[i].y;
+			xo = outmeasures[index-1].etimesig[i].x;
+			yo = outmeasures[index-1].etimesig[i].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					timesigQ = 1;
+				}
+			}
+		}
+
+		if (!metQ && (outmeasures[index].smet.size() > 0)) {
+			x  = outmeasures[index].smet[i].x;
+			y  = outmeasures[index].smet[i].y;
+			xo = outmeasures[index-1].emet[i].x;
+			yo = outmeasures[index-1].emet[i].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					metQ = 1;
+				}
+			}
+		}
+
+		if (!tempoQ && (outmeasures[index].stempo.size() > 0)) {
+			x  = outmeasures[index].stempo[i].x;
+			y  = outmeasures[index].stempo[i].y;
+			xo = outmeasures[index-1].etempo[i].x;
+			yo = outmeasures[index-1].etempo[i].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					tempoQ = 1;
+				}
+			}
+		}
+	}
+
+	int track;
+
+	if (clefQ) {
+		for (int i=0; i<infile[ii].getFieldCount(); i++) {
+			track = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].sclef[track].x;
+			y  = outmeasures[index].sclef[track].y;
+			xo = outmeasures[index-1].eclef[track].x;
+			yo = outmeasures[index-1].eclef[track].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					m_humdrum_text << infile.token(x, y);
+				} else {
+					m_humdrum_text << "*";
+				}
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+
+	if (keysigQ) {
+		for (int i=0; i<infile[ii].getFieldCount(); i++) {
+			track = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].skeysig[track].x;
+			y  = outmeasures[index].skeysig[track].y;
+			xo = outmeasures[index-1].ekeysig[track].x;
+			yo = outmeasures[index-1].ekeysig[track].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					m_humdrum_text << infile.token(x, y);
+				} else {
+					m_humdrum_text << "*";
+				}
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+
+	if (keyQ) {
+		for (int i=0; i<infile[ii].getFieldCount(); i++) {
+			track = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].skey[track].x;
+			y  = outmeasures[index].skey[track].y;
+			xo = outmeasures[index-1].ekey[track].x;
+			yo = outmeasures[index-1].ekey[track].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					m_humdrum_text << infile.token(x, y);
+				} else {
+					m_humdrum_text << "*";
+				}
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+
+	if (timesigQ) {
+		for (int i=0; i<infile[ii].getFieldCount(); i++) {
+			track = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].stimesig[track].x;
+			y  = outmeasures[index].stimesig[track].y;
+			xo = outmeasures[index-1].etimesig[track].x;
+			yo = outmeasures[index-1].etimesig[track].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					m_humdrum_text << infile.token(x, y);
+				} else {
+					m_humdrum_text << "*";
+				}
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+
+	if (metQ) {
+		for (int i=0; i<infile[ii].getFieldCount(); i++) {
+			track = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].smet[track].x;
+			y  = outmeasures[index].smet[track].y;
+			xo = outmeasures[index-1].emet[track].x;
+			yo = outmeasures[index-1].emet[track].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					m_humdrum_text << infile.token(x, y);
+				} else {
+					m_humdrum_text << "*";
+				}
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+
+	if (tempoQ) {
+		for (int i=0; i<infile[ii].getFieldCount(); i++) {
+			track = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].stempo[track].x;
+			y  = outmeasures[index].stempo[track].y;
+			xo = outmeasures[index-1].etempo[track].x;
+			yo = outmeasures[index-1].etempo[track].y;
+			if ((x>=0)&&(y>=0)&&(xo>=0)&&(yo>=0)) {
+				if (*infile.token(x, y) != *infile.token(xo, yo)) {
+					m_humdrum_text << infile.token(x, y);
+				} else {
+					m_humdrum_text << "*";
+				}
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::adjustGlobalInterpretationsStart --
+//
+
+void Tool_myank::adjustGlobalInterpretationsStart(HumdrumFile& infile, int ii,
+		vector<MeasureInfo>& outmeasures, int index) {
+	if (index != 0) {
+		cerr << "Error in adjustGlobalInterpetationsStart" << endl;
+		exit(1);
+	}
+
+	int i;
+
+	int clefQ    = 0;
+	int keysigQ  = 0;
+	int keyQ     = 0;
+	int timesigQ = 0;
+	int metQ     = 0;
+	int tempoQ   = 0;
+
+	int x, y;
+
+	// ignore the zeroth measure
+	// (may not be proper).
+// ggg
+	if (outmeasures[index].num == 0) {
+		return;
+	}
+
+	int tracks = infile.getMaxTrack();
+
+	for (i=1; i<=tracks; i++) {
+
+		if (!clefQ) {
+			x  = outmeasures[index].sclef[i].x;
+			y  = outmeasures[index].sclef[i].y;
+
+			if ((x>=0)&&(y>=0)) {
+				clefQ = 1;
+			}
+		}
+
+		if (!keysigQ) {
+			x  = outmeasures[index].skeysig[i].x;
+			y  = outmeasures[index].skeysig[i].y;
+			if ((x>=0)&&(y>=0)) {
+				keysigQ = 1;
+			}
+		}
+
+		if (!keyQ) {
+			x  = outmeasures[index].skey[i].x;
+			y  = outmeasures[index].skey[i].y;
+			if ((x>=0)&&(y>=0)) {
+				keyQ = 1;
+			}
+		}
+
+		if (!timesigQ) {
+			x  = outmeasures[index].stimesig[i].x;
+			y  = outmeasures[index].stimesig[i].y;
+			if ((x>=0)&&(y>=0)) {
+				timesigQ = 1;
+			}
+		}
+
+		if (!metQ) {
+			x  = outmeasures[index].smet[i].x;
+			y  = outmeasures[index].smet[i].y;
+			if ((x>=0)&&(y>=0)) {
+				metQ = 1;
+			}
+		}
+
+		if (!tempoQ) {
+			x  = outmeasures[index].stempo[i].x;
+			y  = outmeasures[index].stempo[i].y;
+			if ((x>=0)&&(y>=0)) {
+				tempoQ = 1;
+			}
+		}
+	}
+
+	int ptrack;
+
+	if (clefQ) {
+		for (i=0; i<infile[ii].getFieldCount(); i++) {
+			ptrack = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].sclef[ptrack].x;
+			y  = outmeasures[index].sclef[ptrack].y;
+			if ((x>=0)&&(y>=0)) {
+				m_humdrum_text << infile.token(x, y);
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+
+	if (keysigQ) {
+		for (i=0; i<infile[ii].getFieldCount(); i++) {
+			ptrack = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].skeysig[ptrack].x;
+			y  = outmeasures[index].skeysig[ptrack].y;
+			if ((x>=0)&&(y>=0)) {
+				m_humdrum_text << infile.token(x, y);
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+
+	if (keyQ) {
+		for (i=0; i<infile[ii].getFieldCount(); i++) {
+			ptrack = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].skey[ptrack].x;
+			y  = outmeasures[index].skey[ptrack].y;
+			if ((x>=0)&&(y>=0)) {
+				m_humdrum_text << infile.token(x, y);
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+
+	if (timesigQ) {
+		for (i=0; i<infile[ii].getFieldCount(); i++) {
+			ptrack = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].stimesig[ptrack].x;
+			y  = outmeasures[index].stimesig[ptrack].y;
+			if ((x>=0)&&(y>=0)) {
+				m_humdrum_text << infile.token(x, y);
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+	if (metQ) {
+		for (i=0; i<infile[ii].getFieldCount(); i++) {
+			ptrack = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].smet[ptrack].x;
+			y  = outmeasures[index].smet[ptrack].y;
+			if ((x>=0)&&(y>=0)) {
+				m_humdrum_text << infile.token(x, y);
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+
+	if (tempoQ) {
+		for (i=0; i<infile[ii].getFieldCount(); i++) {
+			ptrack = infile.token(ii, i)->getTrack();
+			x  = outmeasures[index].stempo[ptrack].x;
+			y  = outmeasures[index].stempo[ptrack].y;
+			if ((x>=0)&&(y>=0)) {
+				m_humdrum_text << infile.token(x, y);
+			} else {
+				m_humdrum_text << "*";
+			}
+			if (i < infile[ii].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+		}
+		m_humdrum_text << "\n";
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::printDoubleBarline --
+//
+
+void Tool_myank::printDoubleBarline(HumdrumFile& infile, int line) {
+
+
+	if (!infile[line].isBarline()) {
+		m_humdrum_text << infile[line] << "\n";
+		return;
+	}
+
+	HumRegex hre;
+	int j;
+	for (j=0; j<infile[line].getFieldCount(); j++) {
+		if (hre.search(infile.token(line, j), "(=\\d*)(.*)", "")) {
+			m_humdrum_text << hre.getMatch(1);
+			m_humdrum_text << "||";
+		} else {
+			m_humdrum_text << "=||";
+		}
+		if (j < infile[line].getFieldCount()-1) {
+			m_humdrum_text << "\t";
+		}
+	}
+	m_humdrum_text << "\n";
+
+	if (barnumtextQ) {
+		int barline = 0;
+		sscanf(infile.token(line, 0)->c_str(), "=%d", &barline);
+		if (barline > 0) {
+			m_humdrum_text << "!!LO:TX:Z=20:X=-25:t=" << barline << endl;
+		}
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::printInvisibleMeasure --
+//
+
+void Tool_myank::printInvisibleMeasure(HumdrumFile& infile, int line) {
+	if (!infile[line].isBarline()) {
+		m_humdrum_text << infile[line] << "\n";
+		return;
+	}
+
+	HumRegex hre;
+	int j;
+	for (j=0; j<infile[line].getFieldCount(); j++) {
+		if (infile.token(line, j)->find('-') != string::npos) {
+			m_humdrum_text << infile.token(line, j);
+			if (j < infile[line].getFieldCount()-1) {
+				m_humdrum_text << "\t";
+			}
+			continue;
+		}
+		if (hre.search(infile.token(line, j), "(=\\d*)(.*)", "")) {
+			m_humdrum_text << hre.getMatch(1);
+			m_humdrum_text << "-";
+			m_humdrum_text << hre.getMatch(2);
+		} else {
+			m_humdrum_text << infile.token(line, j); 
+		}
+		if (j < infile[line].getFieldCount()-1) {
+			m_humdrum_text << "\t";
+		}
+	}
+	m_humdrum_text << "\n";
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::reconcileSpineBoundary -- merge spines correctly between segments.
+//    will not be able to handle all permutations of spine manipulators.
+//    So don't expect exotic manipulators to work...
+//
+
+void Tool_myank::reconcileSpineBoundary(HumdrumFile& infile, int index1, int index2) {
+
+	if (debugQ) {
+		m_humdrum_text << "RECONCILING LINES " << index1+1 << " and " << index2+1 << endl;
+		m_humdrum_text << "FIELD COUNT OF " << index1+1 << " is " 
+			  << infile[index1].getFieldCount() << endl;
+		m_humdrum_text << "FIELD COUNT OF " << index2+1 << " is " 
+			  << infile[index2].getFieldCount() << endl;
+	}
+
+	// check to see if any changes need reconciling; otherwise, exit function
+	int i, j; 
+	if (infile[index1].getFieldCount() == infile[index2].getFieldCount()) {
+		int same = 1;
+		for (i=0; i<infile[index1].getFieldCount(); i++) {
+			if (infile.token(index1,i)->getSpineInfo() != infile.token(index2, i)->getSpineInfo()) {
+				same = 0;
+			}
+		}
+		if (same != 0) {
+			return;
+		}
+	}
+
+	// handle splits all at once
+	string buff1;
+	string buff2;
+
+	vector<int> splits(infile[index1].getFieldCount());
+	fill(splits.begin(), splits.end(), 0);
+
+	int hassplit = 0;
+	for (i=0; i<infile[index1].getFieldCount(); i++) {
+		buff1 = "(";
+		buff1 += infile.token(index1, i)->getSpineInfo();
+		buff1 += ")";
+		buff2 = buff1;
+		buff1 += "a";
+		buff2 += "b";
+		for (j=0; j<infile[index2].getFieldCount()-1; j++) {
+			if ((buff1 == infile.token(index2, j)->getSpineInfo()
+					&& (buff2 == infile.token(index2,j+1)->getSpineInfo()))) {
+				splits[i] = 1;
+				hassplit++;
+			}
+		}
+	}
+
+	if (hassplit) {
+		for (i=0; i<(int)splits.size(); i++) {
+			if (splits[i]) {
+				m_humdrum_text << "*^";
+			} else {
+				m_humdrum_text << '*';
+			}
+			if (i < splits.size()-1) {
+				m_humdrum_text << '\t';
+			}
+		}
+		m_humdrum_text << '\n';
+	}
+
+	// make splits cumulative;
+	//for (i=1; i<(int)splits.size(); i++) {
+	//   splits[i] += splits[i-1];
+	//}
+  
+	HumRegex hre1;
+	HumRegex hre2;
+	// handle joins one at a time, only look for binary joins at the moment.
+	// assuming that no *x has been used to mix the voices up.
+	for (i=0; i<infile[index1].getFieldCount()-1; i++) {
+		if (!hre1.search(infile.token(index1, i)->getSpineInfo(), "\\((.*)\\)a")) {
+			continue;
+		}
+		if (!hre2.search(infile.token(index1, i+1)->getSpineInfo(), "\\((.*)\\)b")) {
+			continue;
+		}
+		if (hre1.getMatch(1) != hre2.getMatch(1)) {
+			// spines are not split from same source
+			continue;
+		}
+
+		// found an "a" and "b" portion of a spine split, now search
+		// through the target line for a joint of those two sub-spines
+		for (j=0; j<infile[index2].getFieldCount(); j++) {
+			if (infile.token(index2, j)->getSpineInfo() != hre1.getMatch(1)) {
+				continue;
+			}
+			// found a simple binary spine join: emmit a spine manipulator line
+			printJoinLine(splits, i, 2);
+		}
+	}
+	
+	// handle *x switches, not perfect since ordering might need to be
+	// handled between manipulators...
+	
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::printJoinLine -- count is currently ignored, but may in the future
+//    allow for more than two spines to join at the same time.
+//
+
+void Tool_myank::printJoinLine(vector<int>& splits, int index, int count) {
+	int i;
+	for (i=0; i<(int)splits.size(); i++) {
+		if (i == index) {
+			m_humdrum_text << "*v\t*v";
+			i+=count-1;
+		} else {
+			m_humdrum_text << "*";
+		}
+		if (i<splits.size()-1) {
+			m_humdrum_text << "\t";
+		}
+	}
+	m_humdrum_text << "\n";
+
+	// merge splits by one element
+	for (i=index+1; i<(int)splits.size()-1; i++) {
+		splits[i] = splits[i+1];
+	}
+	splits.resize(splits.size()-1);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::reconcileStartingPosition -- merge spines from start of data and 
+//    first measure in output.
+//
+
+void Tool_myank::reconcileStartingPosition(HumdrumFile& infile, int index2) {
+	int i;
+	for (i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isInterpretation()) {
+			reconcileSpineBoundary(infile, i, index2);
+			break;
+		}
+	}
+}
+
+  
+
+//////////////////////////////
+//
+// Tool_myank::printStarting -- print header information before start of data.
+//
+
+void Tool_myank::printStarting(HumdrumFile& infile) {
+	int i, j;
+	int exi = -1;
+	for (i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isInterpretation()) {
+			// the first interpretation is the exclusive one
+			m_humdrum_text << infile[i] << "\n";
+			exi = i;
+			break;
+		}
+		m_humdrum_text << infile[i] << "\n";
+	}
+
+	int hasI = 0;
+
+	if (instrumentQ) {
+		// print any tandem interpretations which start with *I found
+		// at the start of the data before measures, notes, or any
+		// spine manipulator lines
+		for (i=exi+1; i<infile.getLineCount(); i++) {
+			if (infile[i].isData()) {
+				break;
+			}
+			if (infile[i].isBarline()) {
+				break;
+			}
+			if (!infile[i].isInterpretation()) {
+				continue;
+			}
+			if (infile[i].isManipulator()) {
+				break;
+			}
+			hasI = 0;
+			for (j=0; j<infile[i].getFieldCount(); j++) {
+				if (infile.token(i, j)->compare(0, 2, "*I") == 0) {
+					hasI = 1;
+					break;
+				}
+			}
+			if (hasI) {
+				for (j=0; j<infile[i].getFieldCount(); j++) {
+					if (infile.token(i, j)->compare(0, 2, "*I") == 0) {
+						m_humdrum_text << infile.token(i, j);
+					} else {
+						m_humdrum_text << "*";
+					}
+					if (j < infile[i].getFieldCount() - 1) {
+						m_humdrum_text << "\t";
+					}
+				}
+				m_humdrum_text << "\n";
+			}
+		}
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::printEnding -- print the measure
+//
+
+void Tool_myank::printEnding(HumdrumFile& infile, int lastline, int adjlin) {
+	if (debugQ) {
+		m_humdrum_text << "IN printEnding" << endl;
+	}
+	int ending = -1;
+	int marker = -1;
+	int i;
+	for (i=infile.getLineCount()-1; i>=0; i--) {
+		if (infile[i].isInterpretation() && (ending <0) 
+				&& (*infile.token(i, 0) == "*-")) {
+			ending = i;
+		}
+		if (infile[i].isData()) {
+			marker = i+1;
+			break;
+		}
+		if (infile[i].isBarline()) {
+			marker = i+1;
+			break;
+		}
+	}
+
+	if (ending >= 0) {
+		reconcileSpineBoundary(infile, adjlin, ending);
+	}
+	
+	int startline  = ending;
+	if (marker >= 0) {
+		// capture any comment which occur after the last measure
+		// line in the data.
+		startline = marker;
+	}
+
+	// reconcileSpineBoundary(infile, lastline, startline);
+
+	if (startline >= 0) {
+		for (i=startline; i<infile.getLineCount(); i++) {
+			m_humdrum_text << infile[i] << "\n";
+		}
+	}
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::getMeasureStartStop --  Get a list of the (numbered) measures in the
+//    input file, and store the start/stop lines for those measures.
+//    All data before the first numbered measure is in measure 0.  
+//    although, if the first measure is not labeled, then ...
+//
+
+void Tool_myank::getMeasureStartStop(vector<MeasureInfo>& measurelist, HumdrumFile& infile) {
+	measurelist.reserve(infile.getLineCount());
+	measurelist.resize(0);
+
+	MeasureInfo current;
+	int i, ii;
+	int lastend = -1;
+	int dataend = -1;
+	int barnum1 = -1;
+	int barnum2 = -1;
+	HumRegex hre;
+
+	insertZerothMeasure(measurelist, infile);
+
+	for (i=0; i<infile.getLineCount(); i++) {
+		if (infile[i].isInterpretation()) {
+			if (*infile.token(i, 0) == "*-") {
+				dataend = i;
+				break;
+			}
+		}
+		if (!infile[i].isBarline()) {
+			continue;
+		}
+		//if (!hre.search(infile.token(i, 0), "^=.*(\\d+)")) {
+		//   continue;
+		//}
+		//barnum1 = stoi(hre.getMatch(1));
+		if (!sscanf(infile.token(i, 0)->c_str(), "=%d", &barnum1)) {
+			continue;
+		}
+		current.clear();
+		current.start = i;
+		current.num   = barnum1;
+		for (ii=i+1; ii<infile.getLineCount(); ii++) {
+			if (!infile[ii].isBarline()) {
+				continue;
+			}
+			//if (hre.search(infile.token(ii, 0), "^=.*(\\d+)")) {
+			//   barnum2 = stoi(hre.getMatch(1));
+			//   current.stop = ii;
+			//   lastend = ii;
+			//   i = ii - 1;
+			//   measurelist.push_back(current);
+			//   break;
+			//}
+			if (hre.search(infile.token(ii, 0), "=[^\\d]*(\\d+)")) {
+			// if (sscanf(infile.token(ii, 0), "=%d", &barnum2)) {
+				barnum2 = stoi(hre.getMatch(1));
+				current.stop = ii;
+				lastend = ii;
+				i = ii - 1;
+				current.file = &infile;
+				measurelist.push_back(current);
+				break;
+			} else {
+				if (atEndOfFile(infile, ii)) {
+					break;
+				}
+			}
+		}
+	}
+
+	int lastdata    = -1;   // last line in file with data
+	int lastmeasure = -1;   // last line in file with measure
+
+	for (i=infile.getLineCount()-1; i>=0; i--) {
+		if ((lastdata < 0) && infile[i].isData()) {
+			lastdata = i; 
+		}
+		if ((lastmeasure < 0) && infile[i].isBarline()) {
+			lastmeasure = i; 
+		}
+		if ((lastmeasure >= 0) && (lastdata >= 0)) {
+			break;
+		}
+	}
+
+	if (lastmeasure < lastdata) {
+		// no final barline, so set to ignore
+		lastmeasure = -1;
+		lastdata    = -1;
+	}
+ 
+	if ((barnum2 >= 0) && (lastend >= 0) && (dataend >= 0)) {
+		current.clear();
+		current.num = barnum2;
+		current.start = lastend;
+		current.stop = dataend;
+		if (lastmeasure > lastdata) {
+			current.stop = lastmeasure;
+		}
+		current.file = &infile;
+		measurelist.push_back(current);
+	}
+
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::getSectionCount -- Count the number of sections in a file according to
+//     JRP rules: sections are defined by double barlines. There may be some
+//     corner cases to consider.
+//
+
+int Tool_myank::getSectionCount(HumdrumFile& infile) {
+	int i;
+	int count = 0;
+	int dataQ = 0;
+	for (i=0; i<infile.getLineCount(); i++) {
+		if (!dataQ && infile[i].isData()) {
+			dataQ = 1;
+			count++;
+			continue;
+		}
+		if (infile[i].isBarline()) {
+			if (infile.token(i, 0)->find("||") != string::npos) {
+				dataQ = 0;
+			}
+		}
+	}
+	return count;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::getSectionString -- return the measure range of a section.
+//
+
+void Tool_myank::getSectionString(string& sstring, HumdrumFile& infile, int sec) {
+	int i;
+	int first = -1;
+	int second = -1;
+	int barnum = 0;
+	int count = 0;
+	int dataQ = 0;
+	HumRegex hre;
+	for (i=0; i<infile.getLineCount(); i++) {
+		if (!dataQ && infile[i].isData()) {
+			dataQ = 1;
+			count++;
+			if (count == sec) {
+				first = barnum;
+			} else if (count == sec+1) {
+				second = barnum - 1;
+			}
+			continue;
+		}
+		if (infile[i].isBarline()) {
+			if (infile.token(i, 0)->find("||") != string::npos) {
+				dataQ = 0;
+			}
+			if (hre.search(infile.token(i, 0), "(\\d+)")) {
+				barnum = hre.getMatchInt(1);
+			} 
+		}
+	}
+	if (second < 0) {
+		second = barnum;
+	}
+	sstring = to_string(first);
+	sstring += "-";
+	sstring += to_string(second);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::atEndOfFile --
+//
+
+int Tool_myank::atEndOfFile(HumdrumFile& infile, int line) {
+	int i;
+	for (i=line+1; i<infile.getLineCount(); i++) {
+		if (infile[i].isData()) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::insertZerothMeasure --
+//
+
+void Tool_myank::insertZerothMeasure(vector<MeasureInfo>& measurelist, 
+		HumdrumFile& infile) {
+
+	HumRegex hre;
+	int exinterpline = -1;
+	int startline = -1;
+	int stopline = -1;
+	int i;
+	for (i=9; i<infile.getLineCount(); i++) {
+		if ((exinterpline < 0) && infile[i].isInterpretation()) {
+			exinterpline = i;
+		}
+		if ((startline < 0) && (infile[i].isData())) {
+			startline = i;
+		}
+		if (infile[i].isBarline() && hre.search(infile.token(i, 0), "^=.*\\d+", "")) {
+			stopline = i;
+			break;
+		}
+	}
+
+	if (exinterpline < 0) {
+		// somethind weird happend, just return
+		return;
+	}
+	if (startline < 0) {
+		// no zeroth measure;
+		return;
+	}
+	if (stopline < 0) {
+		// strange situation, no measure numbers
+		// consider what to do later...
+		return;
+	}
+
+	MeasureInfo current;
+	current.clear();
+	current.num = 0;
+	// current.start = startline;
+	current.start = exinterpline+1;
+	current.stop = stopline;
+	measurelist.push_back(current);
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::expandMeasureOutList -- read the measure list for the sequence of measures
+//     to extract.
+//
+
+void Tool_myank::expandMeasureOutList(vector<MeasureInfo>& measureout, 
+		vector<MeasureInfo>& measurein, HumdrumFile& infile, 
+		const string& optionstring) {
+
+	HumRegex hre;
+	// find the largest measure number in the score
+	int maxmeasure = -1;
+	int minmeasure = -1;
+	int i;
+	for (i=0; i<(int)measurein.size(); i++) {
+		if (maxmeasure < measurein[i].num) {
+			maxmeasure = measurein[i].num;
+		}
+		if ((minmeasure == -1) || (minmeasure > measurein[i].num)) {
+			minmeasure = measurein[i].num;
+		}
+	}
+	if (maxmeasure <= 0) {
+		cerr << "Error: There are no measure numbers present in the data" << endl;
+		exit(1);
+	}
+	if (maxmeasure > 1123123) {
+		cerr << "Error: ridiculusly large measure number: " << maxmeasure << endl;
+		exit(1);
+	}
+	if (maxQ) {
+		if (measurein.size() == 0) {
+			m_humdrum_text << 0 << endl;
+		} else {
+			m_humdrum_text << maxmeasure << endl;
+		}
+		exit(0);
+	} else if (minQ) {
+		int ii;
+		for (ii=0; ii<infile.getLineCount(); ii++) {
+			if (infile[ii].isBarline()) {
+				if (hre.search(infile.token(ii, 0), "=\\d", "")) {
+					break;
+				} else {
+					m_humdrum_text << 0 << endl;
+					exit(0);
+				}
+			}
+			if (infile[ii].isData()) {
+				m_humdrum_text << 0 << endl;
+				exit(0);
+			}
+		}
+		if (measurein.size() == 0) {
+			m_humdrum_text << 0 << endl;
+		} else {
+			m_humdrum_text << minmeasure << endl;
+		}
+		exit(0);
+	}
+
+	// create reverse-lookup list
+	vector<int> inmap(maxmeasure+1);
+	fill(inmap.begin(), inmap.end(), -1);
+	for (i=0; i<(int)measurein.size(); i++) {
+		inmap[measurein[i].num] = i;
+	}
+
+	fillGlobalDefaults(infile, measurein, inmap);
+	string ostring = optionstring;
+	removeDollarsFromString(ostring, maxmeasure);
+
+	if (debugQ) {
+		m_free_text << "Option string expanded: " << ostring << endl;
+	}
+
+	hre.replaceDestructive(ostring, "", "\\s+", "g");  // remove any spaces between items.
+	hre.replaceDestructive(ostring, "-", "--+", "g");  // remove extra dashes
+	int value = 0;
+	int start = 0;
+	vector<MeasureInfo>& range = measureout;
+	range.reserve(10000);
+	value = hre.search(ostring, "^([^,]+,?)");
+	while (value != 0) {
+		start += value - 1;
+		start += hre.getMatch(1).size();
+		processFieldEntry(range, hre.getMatch(1), infile, maxmeasure,
+			 measurein, inmap);
+		value = hre.search(ostring.c_str() + start, "^([^,]+,?)");
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::fillGlobalDefaults -- keep track of the clef, key signature, key, etc.
+//
+
+void Tool_myank::fillGlobalDefaults(HumdrumFile& infile, vector<MeasureInfo>& measurein, 
+		vector<int>& inmap) {
+	int i, j;
+	HumRegex hre;
+
+	int tracks = infile.getMaxTrack();
+
+	vector<MyCoord> currclef(tracks+1);
+	vector<MyCoord> currkeysig(tracks+1);
+	vector<MyCoord> currkey(tracks+1);
+	vector<MyCoord> currtimesig(tracks+1);
+	vector<MyCoord> currmet(tracks+1);
+	vector<MyCoord> currtempo(tracks+1);
+
+	MyCoord undefMyCoord;
+	undefMyCoord.clear();
+
+	fill(currclef.begin(), currclef.end(), undefMyCoord);
+	fill(currkeysig.begin(), currkeysig.end(), undefMyCoord);
+	fill(currkey.begin(), currkey.end(), undefMyCoord);
+	fill(currtimesig.begin(), currtimesig.end(), undefMyCoord);
+	fill(currmet.begin(), currmet.end(), undefMyCoord);
+	fill(currtempo.begin(), currtempo.end(), undefMyCoord);
+
+	int currmeasure = -1;
+	int lastmeasure = -1;
+	int datafound   = 0;
+	int track;
+	int thingy = 0;
+
+	for (i=0; i<infile.getLineCount(); i++) {
+		if ((currmeasure == -1) && (thingy == 0) && infile[i].isData()) {
+			currmeasure = 0;
+		}
+		if (infile[i].isBarline()) {
+			if (!hre.search(infile.token(i, 0), "(\\d+)", "")) {
+				continue;
+			}
+			thingy = 1;
+
+			// store state of global music values at end of measure
+			if (currmeasure >= 0) {
+				measurein[inmap[currmeasure]].eclef    = currclef;
+				measurein[inmap[currmeasure]].ekeysig  = currkeysig;
+				measurein[inmap[currmeasure]].ekey     = currkey;
+				measurein[inmap[currmeasure]].etimesig = currtimesig;
+				measurein[inmap[currmeasure]].emet     = currmet;
+				measurein[inmap[currmeasure]].etempo   = currtempo;
+			}
+
+			lastmeasure = currmeasure;
+			currmeasure = hre.getMatchInt(1);
+
+			if (currmeasure < inmap.size()) {
+				// [20120818] Had to compensate for last measure being single
+				// and un-numbered.
+				if (inmap[currmeasure] < 0) {
+					// [20111008] Had to compensate for "==85" barline
+					datafound = 0;
+					break;
+				}
+				measurein[inmap[currmeasure]].sclef    = currclef;
+				measurein[inmap[currmeasure]].skeysig  = currkeysig;
+				measurein[inmap[currmeasure]].skey     = currkey;
+				measurein[inmap[currmeasure]].stimesig = currtimesig;
+				// measurein[inmap[currmeasure]].smet     = metstates[i];
+				measurein[inmap[currmeasure]].smet     = currmet;
+				measurein[inmap[currmeasure]].stempo   = currtempo;
+			}
+
+			datafound   = 0;
+			continue;
+		}
+		if (infile[i].isInterpretation()) {
+			for (j=0; j<infile[i].getFieldCount(); j++) {
+				if (!infile.token(i, j)->isKern()) {
+					continue;
+				}
+				track = infile.token(i, j)->getTrack();
+
+				if ((datafound == 0) && (lastmeasure >= 0)) {
+					if (infile.token(i, j)->compare(0, 5, "*clef") == 0) {
+						measurein[inmap[currmeasure]].sclef[track].x = -1;
+						measurein[inmap[currmeasure]].sclef[track].y = -1;
+					} else if (hre.search(infile.token(i, j), "^\\*k\\[.*\\]", "")) {
+						measurein[inmap[currmeasure]].skeysig[track].x = -1;
+						measurein[inmap[currmeasure]].skeysig[track].y = -1;
+					} else if (hre.search(infile.token(i, j), "^\\*[A-G][#-]?:", "i")) {
+						measurein[inmap[currmeasure]].skey[track].x = -1;
+						measurein[inmap[currmeasure]].skey[track].y = -1;
+					} else if (hre.search(infile.token(i, j), R"(^\*M\d+/\d+)")) {
+						measurein[inmap[currmeasure]].stimesig[track].x = -1;
+						measurein[inmap[currmeasure]].stimesig[track].y = -1;
+					} else if (hre.search(infile.token(i, j), R"(^\*met\(.*\))")) {
+						measurein[inmap[currmeasure]].smet[track].x = -1;
+						measurein[inmap[currmeasure]].smet[track].y = -1;
+					} else if (hre.search(infile.token(i, j), "^\\*MM\\d+", "i")) {
+						measurein[inmap[currmeasure]].stempo[track].x = -1;
+						measurein[inmap[currmeasure]].stempo[track].y = -1;
+					}
+				} 
+
+				if (infile.token(i, j)->compare(0, 5, "*clef") == 0) {
+					currclef[track].x = i;
+					currclef[track].y = j;
+					continue;
+				}
+				if (hre.search(infile.token(i, j), R"(^\*k\[.*\])")) {
+					currkeysig[track].x = i;
+					currkeysig[track].y = j;
+					continue;
+				}
+				if (hre.search(infile.token(i, j), "^\\*[A-G][#-]?:", "i")) {
+					currkey[track].x = i;
+					currkey[track].y = j;
+					continue;
+				}
+				if (hre.search(infile.token(i, j), R"(^\*M\d+/\d+)")) {
+					currtimesig[track].x = i;
+					currtimesig[track].y = j;
+					continue;
+				}
+				if (hre.search(infile.token(i, j), R"(^\*met\(.*\))")) {
+					currmet[track].x = i;
+					currmet[track].y = j;
+					continue;
+				}
+				if (hre.search(infile.token(i, j), R"(^\*MM[\d.]+)")) {
+					currtempo[track].x = i;
+					currtempo[track].y = j;
+					continue;
+				}
+
+			}
+		}
+		if (infile[i].isData()) {
+			datafound = 1;
+		}
+	}
+
+	// store state of global music values at end of music
+	if ((currmeasure >= 0) && (currmeasure < inmap.size()) 
+			&& (inmap[currmeasure] >= 0)) {
+		measurein[inmap[currmeasure]].eclef    = currclef;
+		measurein[inmap[currmeasure]].ekeysig  = currkeysig;
+		measurein[inmap[currmeasure]].ekey     = currkey;
+		measurein[inmap[currmeasure]].etimesig = currtimesig;
+		measurein[inmap[currmeasure]].emet     = currmet;
+		measurein[inmap[currmeasure]].etempo   = currtempo;
+	}
+
+	// go through the measure list and clean up start/end states
+	for (i=0; i<(int)measurein.size()-2; i++) {
+
+		if (measurein[i].sclef.size() == 0) {
+			measurein[i].sclef.resize(tracks+1);
+			fill(measurein[i].sclef.begin(), measurein[i].sclef.end(), undefMyCoord);
+		}
+		if (measurein[i].eclef.size() == 0) {
+			measurein[i].eclef.resize(tracks+1);
+			fill(measurein[i].eclef.begin(), measurein[i].eclef.end(), undefMyCoord);
+		}
+		if (measurein[i+1].sclef.size() == 0) {
+			measurein[i+1].sclef.resize(tracks+1);
+			fill(measurein[i+1].sclef.begin(), measurein[i+1].sclef.end(), undefMyCoord);
+		}
+		if (measurein[i+1].eclef.size() == 0) {
+			measurein[i+1].eclef.resize(tracks+1);
+			fill(measurein[i+1].eclef.begin(), measurein[i+1].eclef.end(), undefMyCoord);
+		}
+		for (j=1; j<(int)measurein[i].sclef.size(); j++) {
+			if (!measurein[i].eclef[j].isValid()) {
+				if (measurein[i].sclef[j].isValid()) {
+					measurein[i].eclef[j] = measurein[i].sclef[j];
+				}
+			}
+			if (!measurein[i+1].sclef[j].isValid()) {
+				if (measurein[i].eclef[j].isValid()) {
+					measurein[i+1].sclef[j] = measurein[i].eclef[j];
+				}
+			}
+		}
+
+		if (measurein[i].skeysig.size() == 0) {
+			measurein[i].skeysig.resize(tracks+1);
+			fill(measurein[i].skeysig.begin(), measurein[i].skeysig.end(), undefMyCoord);
+		}
+		if (measurein[i].ekeysig.size() == 0) {
+			measurein[i].ekeysig.resize(tracks+1);
+			fill(measurein[i].ekeysig.begin(), measurein[i].ekeysig.end(), undefMyCoord);
+		}
+		if (measurein[i+1].skeysig.size() == 0) {
+			measurein[i+1].skeysig.resize(tracks+1);
+			fill(measurein[i+1].skeysig.begin(), measurein[i+1].skeysig.end(), undefMyCoord);
+		}
+		if (measurein[i+1].ekeysig.size() == 0) {
+			measurein[i+1].ekeysig.resize(tracks+1);
+			fill(measurein[i+1].ekeysig.begin(), measurein[i+1].ekeysig.end(), undefMyCoord);
+		}
+		for (j=1; j<(int)measurein[i].skeysig.size(); j++) {
+			if (!measurein[i].ekeysig[j].isValid()) {
+				if (measurein[i].skeysig[j].isValid()) {
+					measurein[i].ekeysig[j] = measurein[i].skeysig[j];
+				}
+			}
+			if (!measurein[i+1].skeysig[j].isValid()) {
+				if (measurein[i].ekeysig[j].isValid()) {
+					measurein[i+1].skeysig[j] = measurein[i].ekeysig[j];
+				}
+			}
+		}
+
+		if (measurein[i].skey.size() == 0) {
+			measurein[i].skey.resize(tracks+1);
+			fill(measurein[i].skey.begin(), measurein[i].skey.end(), undefMyCoord);
+		}
+		if (measurein[i].ekey.size() == 0) {
+			measurein[i].ekey.resize(tracks+1);
+			fill(measurein[i].ekey.begin(), measurein[i].ekey.end(), undefMyCoord);
+		}
+		if (measurein[i+1].skey.size() == 0) {
+			measurein[i+1].skey.resize(tracks+1);
+			fill(measurein[i+1].skey.begin(), measurein[i+1].skey.end(), undefMyCoord);
+		}
+		if (measurein[i+1].ekey.size() == 0) {
+			measurein[i+1].ekey.resize(tracks+1);
+			fill(measurein[i+1].ekey.begin(), measurein[i+1].ekey.end(), undefMyCoord);
+		}
+		for (j=1; j<(int)measurein[i].skey.size(); j++) {
+			if (!measurein[i].ekey[j].isValid()) {
+				if (measurein[i].skey[j].isValid()) {
+					measurein[i].ekey[j] = measurein[i].skey[j];
+				}
+			}
+			if (!measurein[i+1].skey[j].isValid()) {
+				if (measurein[i].ekey[j].isValid()) {
+					measurein[i+1].skey[j] = measurein[i].ekey[j];
+				}
+			}
+		}
+
+		if (measurein[i].stimesig.size() == 0) {
+			measurein[i].stimesig.resize(tracks+1);
+			fill(measurein[i].stimesig.begin(), measurein[i].stimesig.end(), undefMyCoord);
+		}
+		if (measurein[i].etimesig.size() == 0) {
+			measurein[i].etimesig.resize(tracks+1);
+			fill(measurein[i].etimesig.begin(), measurein[i].etimesig.end(), undefMyCoord);
+		}
+		if (measurein[i+1].stimesig.size() == 0) {
+			measurein[i+1].stimesig.resize(tracks+1);
+			fill(measurein[i+1].stimesig.begin(), measurein[i+1].stimesig.end(), undefMyCoord);
+		}
+		if (measurein[i+1].etimesig.size() == 0) {
+			measurein[i+1].etimesig.resize(tracks+1);
+			fill(measurein[i+1].etimesig.begin(), measurein[i+1].etimesig.end(), undefMyCoord);
+		}
+		for (j=1; j<(int)measurein[i].stimesig.size(); j++) {
+			if (!measurein[i].etimesig[j].isValid()) {
+				if (measurein[i].stimesig[j].isValid()) {
+					measurein[i].etimesig[j] = measurein[i].stimesig[j];
+				}
+			}
+			if (!measurein[i+1].stimesig[j].isValid()) {
+				if (measurein[i].etimesig[j].isValid()) {
+					measurein[i+1].stimesig[j] = measurein[i].etimesig[j];
+				}
+			}
+		}
+
+		if (measurein[i].smet.size() == 0) {
+			measurein[i].smet.resize(tracks+1);
+			fill(measurein[i].smet.begin(), measurein[i].smet.end(), undefMyCoord);
+		}
+		if (measurein[i].emet.size() == 0) {
+			measurein[i].emet.resize(tracks+1);
+			fill(measurein[i].emet.begin(), measurein[i].emet.end(), undefMyCoord);
+		}
+		if (measurein[i+1].smet.size() == 0) {
+			measurein[i+1].smet.resize(tracks+1);
+			fill(measurein[i+1].smet.begin(), measurein[i].smet.end(), undefMyCoord);
+		}
+		if (measurein[i+1].emet.size() == 0) {
+			measurein[i+1].emet.resize(tracks+1);
+			fill(measurein[i+1].emet.begin(), measurein[i].emet.end(), undefMyCoord);
+		}
+		for (j=1; j<(int)measurein[i].smet.size(); j++) {
+			if (!measurein[i].emet[j].isValid()) {
+				if (measurein[i].smet[j].isValid()) {
+					measurein[i].emet[j] = measurein[i].smet[j];
+				}
+			}
+			if (!measurein[i+1].smet[j].isValid()) {
+				if (measurein[i].emet[j].isValid()) {
+					measurein[i+1].smet[j] = measurein[i].emet[j];
+				}
+			}
+		}
+
+		if (measurein[i].stempo.size() == 0) {
+			measurein[i].stempo.resize(tracks+1);
+			fill(measurein[i].stempo.begin(), measurein[i].stempo.end(), undefMyCoord);
+		}
+		if (measurein[i].etempo.size() == 0) {
+			measurein[i].etempo.resize(tracks+1);
+			fill(measurein[i].etempo.begin(), measurein[i].etempo.end(), undefMyCoord);
+		}
+		if (measurein[i+1].stempo.size() == 0) {
+			measurein[i+1].stempo.resize(tracks+1);
+			fill(measurein[i+1].stempo.begin(), measurein[i+1].stempo.end(), undefMyCoord);
+		}
+		if (measurein[i+1].etempo.size() == 0) {
+			measurein[i+1].etempo.resize(tracks+1);
+			fill(measurein[i+1].etempo.begin(), measurein[i+1].etempo.end(), undefMyCoord);
+		}
+		for (j=1; j<(int)measurein[i].stempo.size(); j++) {
+			if (!measurein[i].etempo[j].isValid()) {
+				if (measurein[i].stempo[j].isValid()) {
+					measurein[i].etempo[j] = measurein[i].stempo[j];
+				}
+			}
+			if (!measurein[i+1].stempo[j].isValid()) {
+				if (measurein[i].etempo[j].isValid()) {
+					measurein[i+1].stempo[j] = measurein[i].etempo[j];
+				}
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::processFieldEntry -- 
+//   3-6 expands to 3 4 5 6
+//   $   expands to maximum spine track
+//   $0  expands to maximum spine track
+//   $1  expands to maximum spine track minus 1, etc.
+//   2-$1 expands to 2 through the maximum minus one.
+//   6-3 expands to 6 5 4 3
+//   $2-5 expands to the maximum minus 2 down through 5.
+//   Ignore negative values and values which exceed the maximum value.
+//
+
+void Tool_myank::processFieldEntry(vector<MeasureInfo>& field,
+		const string& str, HumdrumFile& infile, int maxmeasure,
+		vector<MeasureInfo>& inmeasures, vector<int>& inmap) {
+
+	MeasureInfo current;
+
+	HumRegex hre;
+	string buffer = str;
+
+	// remove any comma left at end of input string (or anywhere else)
+	hre.replaceDestructive(buffer, "", ",", "g");
+
+	if (hre.search(buffer, "^(\\d+)[a-z]?-(\\d+)[a-z]?$")) {
+		int firstone = hre.getMatchInt(1);
+		int lastone  = hre.getMatchInt(2);
+
+		// limit the range to 0 to maxmeasure
+		if (firstone > maxmeasure) { firstone = maxmeasure; }
+		if (lastone  > maxmeasure) { lastone  = maxmeasure; }
+		if (firstone < 0         ) { firstone = 0         ; }
+		if (lastone  < 0         ) { lastone  = 0         ; }
+
+		if ((firstone < 1) && (firstone != 0)) {
+			cerr << "Error: range token: \"" << str << "\"" 
+				  << " contains too small a number at start: " << firstone << endl;
+			cerr << "Minimum number allowed is " << 1 << endl;
+			exit(1);
+		}
+		if ((lastone < 1) && (lastone != 0)) {
+			cerr << "Error: range token: \"" << str << "\"" 
+				  << " contains too small a number at end: " << lastone << endl;
+			cerr << "Minimum number allowed is " << 1 << endl;
+			exit(1);
+		}
+
+		if (firstone > lastone) {
+			for (int i=firstone; i>=lastone; i--) {
+				if (inmap[i] >= 0) {
+					if ((field.size() > 0) && 
+							(field.back().stop == inmeasures[inmap[i]].start)) {
+						field.back().stop = inmeasures[inmap[i]].stop;
+					} else {
+						current.clear();
+						current.file = &infile;
+						current.num = i;
+						current.start = inmeasures[inmap[i]].start;
+						current.stop = inmeasures[inmap[i]].stop;
+
+						current.sclef    = inmeasures[inmap[i]].sclef;
+						current.skeysig  = inmeasures[inmap[i]].skeysig;
+						current.skey     = inmeasures[inmap[i]].skey;
+						current.stimesig = inmeasures[inmap[i]].stimesig;
+						current.smet     = inmeasures[inmap[i]].smet;
+						current.stempo   = inmeasures[inmap[i]].stempo;
+
+						current.eclef    = inmeasures[inmap[i]].eclef;
+						current.ekeysig  = inmeasures[inmap[i]].ekeysig;
+						current.ekey     = inmeasures[inmap[i]].ekey;
+						current.etimesig = inmeasures[inmap[i]].etimesig;
+						current.emet     = inmeasures[inmap[i]].emet;
+						current.etempo   = inmeasures[inmap[i]].etempo;
+
+						field.push_back(current);
+					}
+				}
+			}
+		} else {
+			for (int i=firstone; i<=lastone; i++) {
+				if (inmap[i] >= 0) {
+					if ((field.size() > 0) && 
+							(field.back().stop == inmeasures[inmap[i]].start)) {
+						field.back().stop = inmeasures[inmap[i]].stop;
+					} else {
+						current.clear();
+						current.file = &infile;
+						current.num = i;
+						current.start = inmeasures[inmap[i]].start;
+						current.stop = inmeasures[inmap[i]].stop;
+
+						current.sclef    = inmeasures[inmap[i]].sclef;
+						current.skeysig  = inmeasures[inmap[i]].skeysig;
+						current.skey     = inmeasures[inmap[i]].skey;
+						current.stimesig = inmeasures[inmap[i]].stimesig;
+						current.smet     = inmeasures[inmap[i]].smet;
+						current.stempo   = inmeasures[inmap[i]].stempo;
+
+						current.eclef    = inmeasures[inmap[i]].eclef;
+						current.ekeysig  = inmeasures[inmap[i]].ekeysig;
+						current.ekey     = inmeasures[inmap[i]].ekey;
+						current.etimesig = inmeasures[inmap[i]].etimesig;
+						current.emet     = inmeasures[inmap[i]].emet;
+						current.etempo   = inmeasures[inmap[i]].etempo;
+
+						field.push_back(current);
+					}
+				}
+			}
+		}
+	} else if (hre.search(buffer, "^(\\d+)([a-z]*)")) {
+		int value = hre.getMatchInt(1);
+		// do something with letter later...
+
+		if ((value < 1) && (value != 0)) {
+			cerr << "Error: range token: \"" << str << "\"" 
+				  << " contains too small a number at end: " << value << endl;
+			cerr << "Minimum number allowed is " << 1 << endl;
+			exit(1);
+		}
+		if (inmap[value] >= 0) {
+			if ((field.size() > 0) && 
+					(field.back().stop == inmeasures[inmap[value]].start)) {
+				field.back().stop = inmeasures[inmap[value]].stop;
+			} else {
+				current.clear();
+				current.file = &infile;
+				current.num = value;
+				current.start = inmeasures[inmap[value]].start;
+				current.stop = inmeasures[inmap[value]].stop;
+
+				current.sclef    = inmeasures[inmap[value]].sclef;
+				current.skeysig  = inmeasures[inmap[value]].skeysig;
+				current.skey     = inmeasures[inmap[value]].skey;
+				current.stimesig = inmeasures[inmap[value]].stimesig;
+				current.smet     = inmeasures[inmap[value]].smet;
+				current.stempo   = inmeasures[inmap[value]].stempo;
+
+				current.eclef    = inmeasures[inmap[value]].eclef;
+				current.ekeysig  = inmeasures[inmap[value]].ekeysig;
+				current.ekey     = inmeasures[inmap[value]].ekey;
+				current.etimesig = inmeasures[inmap[value]].etimesig;
+				current.emet     = inmeasures[inmap[value]].emet;
+				current.etempo   = inmeasures[inmap[value]].etempo;
+
+				field.push_back(current);
+			}
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::removeDollarsFromString -- substitute $ sign for maximum track count.
+//
+
+void Tool_myank::removeDollarsFromString(string& buffer, int maxx) {
+	HumRegex hre;
+	HumRegex hre2;
+	string tbuf;
+	string obuf;
+	int outval;
+	int value;
+
+	if (debugQ) {
+		m_free_text << "MEASURE STRING BEFORE DOLLAR REMOVAL: " << buffer << endl;
+	}
+
+	while (hre.search(buffer, "(\\$\\d*)", "")) {
+		tbuf = hre.getMatch(1);
+		if (hre2.search(tbuf, "(\\$\\d+)")) {
+		  sscanf(hre2.getMatch(1).c_str(), "$%d", &value);
+		  outval = maxx - value;
+		} else {
+			outval = maxx;
+		}
+
+		if (outval < 0) {
+			outval = 0;
+		}
+		
+		tbuf = to_string(outval);
+		obuf = "\\";
+		obuf += hre.getMatch(1);
+		hre.replaceDestructive(buffer, tbuf, obuf);
+	}
+	if (debugQ) {
+		m_free_text << "DOLLAR EXPAND: " << buffer << endl;
+	}
+}
+
+
+
+
+
+
+//////////////////////////////
+//
+// Tool_myank::example -- example function calls to the program.
+//
+
+void Tool_myank::example(void) {
+
+
+}
+
+
+
+//////////////////////////////
+//
+// Tool_myank::usage -- command-line usage description and brief summary
+//
+
+void Tool_myank::usage(const string& ommand) {
+
+}
+
+
+
+
+/////////////////////////////////
+//
 // Tool_gridtest::Tool_recip -- Set the recognized options for the tool.
 //
 
@@ -19878,7 +22437,7 @@ bool Tool_recip::run(HumdrumFile& infile) {
 
 	int lineCount = infile.getLineCount();
 	if (lineCount == 0) {
-		m_error << "No input data";
+		m_error_text << "No input data";
 		return false;
 	}
 
@@ -19969,9 +22528,9 @@ void Tool_recip::doCompositeAnalysis(HumdrumFile& infile) {
 		return;
 	} else {
 		infile.prependDataSpine(recips, "", m_exinterp);
-		infile.printFieldIndex(0, m_text);
+		infile.printFieldIndex(0, m_humdrum_text);
 		infile.clear();
-		infile.readString(m_text.str());
+		infile.readString(m_humdrum_text.str());
 	}
 }
 
@@ -20071,8 +22630,8 @@ Tool_satb2gs::Tool_satb2gs(void) {
 bool Tool_satb2gs::run(const string& indata, ostream& out) {
 	HumdrumFile infile(indata);
 	bool status = run(infile);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -20082,8 +22641,8 @@ bool Tool_satb2gs::run(const string& indata, ostream& out) {
 
 bool Tool_satb2gs::run(HumdrumFile& infile, ostream& out) {
 	int status = run(infile);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -20112,12 +22671,12 @@ bool Tool_satb2gs::run(HumdrumFile& infile) {
 void Tool_satb2gs::initialize(HumdrumFile& infile) {
    // handle basic options:
    if (getBoolean("author")) {
-      m_text << "Written by Craig Stuart Sapp, "
+      m_free_text << "Written by Craig Stuart Sapp, "
            << "craig@ccrma.stanford.edu, Feb 2011" << endl;
       exit(0);
    } else if (getBoolean("version")) {
-      m_text << getCommand() << ", version: 16 Dec 2016" << endl;
-      m_text << "compiled: " << __DATE__ << endl;
+      m_free_text << getCommand() << ", version: 16 Dec 2016" << endl;
+      m_free_text << "compiled: " << __DATE__ << endl;
       exit(0);
    } else if (getBoolean("help")) {
       usage(getCommand());
@@ -20146,14 +22705,14 @@ void Tool_satb2gs::processFile(HumdrumFile& infile) {
 	int exinterpline = getSatbTracks(satbtracks, infile);
 	int lastline = -1;
 	for (int i=0; i<exinterpline; i++) {
-		m_text << infile[i] << endl;
+		m_humdrum_text << infile[i] << endl;
 	}
 
 	printExInterp(infile, exinterpline, satbtracks);
 
 	for (int i=exinterpline+1; i<infile.getLineCount(); i++) {
 		if (infile[i].getFieldCount() == 1) {
-			m_text << infile[i] << endl;
+			m_humdrum_text << infile[i] << endl;
 			continue;
 		}
 		if (*infile.token(i, 0) == "*-") {
@@ -20163,10 +22722,10 @@ void Tool_satb2gs::processFile(HumdrumFile& infile) {
 		for (int j=0; j<infile[i].getFieldCount(); j++) {
 			printSpine(infile, i, j, satbtracks);
 			if (j < infile[i].getFieldCount() - 1) {
-				m_text << '\t';
+				m_humdrum_text << '\t';
 			}
 		}
-		m_text << '\n';
+		m_humdrum_text << '\n';
 	}
 
 	if (lastline < 0) {
@@ -20175,7 +22734,7 @@ void Tool_satb2gs::processFile(HumdrumFile& infile) {
 	printLastLine(infile, lastline, satbtracks);
 
 	for (int i=lastline+1; i<infile.getLineCount(); i++) {
-		m_text << infile[i] << endl;
+		m_humdrum_text << infile[i] << endl;
 	}
 }
 
@@ -20208,8 +22767,8 @@ void Tool_satb2gs::printLastLine(HumdrumFile& infile, int line, vector<int>& tra
 	string strang = output.str();
 	HumRegex hre;
 	hre.replaceDestructive(strang, "", "\t+$");
-	m_text << strang;
-	m_text << endl;
+	m_humdrum_text << strang;
+	m_humdrum_text << endl;
 
 	stringstream output2;
 	for (int j=0; j<infile[line].getFieldCount() - 1; j++) {
@@ -20230,16 +22789,16 @@ void Tool_satb2gs::printLastLine(HumdrumFile& infile, int line, vector<int>& tra
 	output2 << ends;
 	strang = output2.str();
 	hre.replaceDestructive(strang, "", "\t+$");
-	m_text << strang;
-	m_text << endl;
+	m_humdrum_text << strang;
+	m_humdrum_text << endl;
 
 	for (int j=0; j<infile[line].getFieldCount()-2; j++) {
-		m_text << infile.token(line, j);
+		m_humdrum_text << infile.token(line, j);
 		if (j < infile[line].getFieldCount() - 3) {
-			m_text << "\t";
+			m_humdrum_text << "\t";
 		}
 	}
-	m_text << "\n";
+	m_humdrum_text << "\n";
 
 }
 
@@ -20267,8 +22826,8 @@ void Tool_satb2gs::printExInterp(HumdrumFile& infile, int line,
 	string strang = output.str();
 	HumRegex hre;
 	hre.replaceDestructive(strang, "", "\t+$");
-	m_text << strang;
-	m_text << endl;
+	m_humdrum_text << strang;
+	m_humdrum_text << endl;
 
 	stringstream output2;
 	stringstream output3;
@@ -20293,13 +22852,13 @@ void Tool_satb2gs::printExInterp(HumdrumFile& infile, int line,
 
 	strang = output3.str();
 	hre.replaceDestructive(strang, "", "\t+$");
-	m_text << strang;
-	m_text << endl;
+	m_humdrum_text << strang;
+	m_humdrum_text << endl;
 
 	strang = output2.str();
 	hre.replaceDestructive(strang, "", "\t+$");
-	m_text << strang;
-	m_text << endl;
+	m_humdrum_text << strang;
+	m_humdrum_text << endl;
 
 }
 
@@ -20327,7 +22886,7 @@ void Tool_satb2gs::printSpine(HumdrumFile& infile, int row, int col,
 
 	if (target < 0) {
 		// does not need to be switched
-		m_text << infile.token(row, col);
+		m_humdrum_text << infile.token(row, col);
 		return;
 	}
 
@@ -20367,7 +22926,7 @@ void Tool_satb2gs::printSpine(HumdrumFile& infile, int row, int col,
 		track = infile.token(row, j)->getTrack();
 		if (track == target) {
 			if (count > 0) {
-				m_text << '\t';
+				m_humdrum_text << '\t';
 			}
 			strang = *infile.token(row,j);
 			hre.replaceDestructive(strang, "!*clef", "^\\*clef");
@@ -20411,7 +22970,7 @@ void Tool_satb2gs::printSpine(HumdrumFile& infile, int row, int col,
 
 			}
 
-			m_text << strang;
+			m_humdrum_text << strang;
 			count++;
 		}
 	}
@@ -20448,7 +23007,7 @@ int Tool_satb2gs::getSatbTracks(vector<int>& tracks, HumdrumFile& infile) {
 	}
 
 	if (tracks.size() != 4) {
-		cerr << "Error: there are " << tracks.size() << " **kern spines"
+		m_error_text << "Error: there are " << tracks.size() << " **kern spines"
 			  << " in input data (needs to be 4)" << endl;
 		exit(1);
 	}
@@ -20524,8 +23083,8 @@ Tool_transpose::Tool_transpose(void) {
 bool Tool_transpose::run(const string& indata, ostream& out) {
 	HumdrumFile infile(indata);
 	bool status = run(infile);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -20535,8 +23094,8 @@ bool Tool_transpose::run(const string& indata, ostream& out) {
 
 bool Tool_transpose::run(HumdrumFile& infile, ostream& out) {
 	int status = run(infile);
-	if (hasNonHumdrumOutput()) {
-		getTextOutput(out);
+	if (hasAnyText()) {
+		getAllText(out);
 	} else {
 		out << infile;
 	}
@@ -20554,7 +23113,7 @@ bool Tool_transpose::run(HumdrumFile& infile) {
 		transval = calculateTranspositionFromKey(ssetkey, infile);
 		transval = transval + octave * 40;
 		if (debugQ) {
-			m_text << "!!Key TRANSVAL = " << transval;
+			m_humdrum_text << "!!Key TRANSVAL = " << transval;
 		}
 	}
 
@@ -20562,8 +23121,8 @@ bool Tool_transpose::run(HumdrumFile& infile) {
 		// returns the base-12 pitch transposition for use in conjunction
 		// with the mkeyscape --rotate option
 		int value = 60 - Convert::base40ToMidiNoteNumber(162 - transval);
-		m_text << value << endl;
-		exit(0);
+		m_free_text << value << endl;
+		return false;
 	}
 
 	if (concertQ) {
@@ -20616,27 +23175,27 @@ void Tool_transpose::convertScore(HumdrumFile& infile, int style) {
 			// transpose notes according to tvals data
 			for (j=0; j<infile[i].getFieldCount(); j++) {
 				if (!infile.token(i, j)->isKern()) {
-					m_text << infile.token(i, j);
+					m_humdrum_text << infile.token(i, j);
 					if (j < infile[i].getFieldCount() - 1) {
-					 		m_text << "\t";
+					 		m_humdrum_text << "\t";
 					}
 					continue;
 				}
 				ptrack = infile.token(i, j)->getTrack();
 				if (tvals[ptrack] == 0) {
-					  m_text << infile.token(i, j);
+					  m_humdrum_text << infile.token(i, j);
 				} else {
 					  printTransposedToken(infile, i, j, tvals[ptrack]);
 				}
 				if (j < infile[i].getFieldCount() - 1) {
-					  m_text << "\t";
+					  m_humdrum_text << "\t";
 				}
 			}
-			m_text << "\n";
+			m_humdrum_text << "\n";
 			break;
 
 		} else {
-			m_text << infile[i] << "\n";
+			m_humdrum_text << infile[i] << "\n";
 		}
 	}
 }
@@ -20659,17 +23218,17 @@ void Tool_transpose::processInterpretationLine(HumdrumFile& infile, int line,
 			case STYLE_WRITTEN:
 				convertToWrittenPitches(infile, line, tvals);
 				break;
-			default: m_text << infile[line];
+			default: m_humdrum_text << infile[line];
 		}
-		m_text << "\n";
+		m_humdrum_text << "\n";
 		return;
 	}
 
 	for (int j=0; j<infile[line].getFieldCount(); j++) {
 		if (!infile.token(line, j)->isKern()) {
-			m_text << infile.token(line, j);
+			m_humdrum_text << infile.token(line, j);
 			if (j<infile[line].getFieldCount()-1) {
-				m_text << "\t";
+				m_humdrum_text << "\t";
 			}
 			continue;
 		}
@@ -20684,7 +23243,7 @@ void Tool_transpose::processInterpretationLine(HumdrumFile& infile, int line,
 			if (tvals[ptrack] != 0) {
 				printNewKeySignature(hre.getMatch(1), tvals[ptrack]);
 			} else {
-				m_text << infile.token(line, j);
+				m_humdrum_text << infile.token(line, j);
 			}
 
 		} else if (isKeyMarker(*infile.token(line, j))) {
@@ -20692,18 +23251,18 @@ void Tool_transpose::processInterpretationLine(HumdrumFile& infile, int line,
 			if (tvals[ptrack] != 0) {
 				printNewKeyInterpretation(infile[line], j, tvals[ptrack]);
 			} else {
-				m_text << infile.token(line, j);
+				m_humdrum_text << infile.token(line, j);
 			}
 
 		} else {
 			// other interpretations just echoed to output:
-			m_text << infile.token(line, j);
+			m_humdrum_text << infile.token(line, j);
 		}
 		if (j<infile[line].getFieldCount()-1) {
-			m_text << "\t";
+			m_humdrum_text << "\t";
 		}
 	}
-	m_text << "\n";
+	m_humdrum_text << "\n";
 
 }
 
@@ -20722,9 +23281,9 @@ void Tool_transpose::convertToWrittenPitches(HumdrumFile& infile, int line,
 	int ptrack;
 	for (j=0; j<infile[line].getFieldCount(); j++) {
 		if (!infile.token(line, j)->isKern()) {
-			m_text << infile.token(line, j);
+			m_humdrum_text << infile.token(line, j);
 			if (j < infile[line].getFieldCount() - 1) {
-				m_text << "\t";
+				m_humdrum_text << "\t";
 			}
 			continue;
 		}
@@ -20734,14 +23293,14 @@ void Tool_transpose::convertToWrittenPitches(HumdrumFile& infile, int line,
 
 			string output = "*Tr";
 			output += Convert::base40ToTrans(base);
-			m_text << output;
+			m_humdrum_text << output;
 			ptrack = infile.token(line, j)->getTrack();
 			tvals[ptrack] = base;
 		} else {
-			m_text << infile.token(line, j);
+			m_humdrum_text << infile.token(line, j);
 		}
 		if (j < infile[line].getFieldCount() - 1) {
-			m_text << "\t";
+			m_humdrum_text << "\t";
 		}
 	}
 }
@@ -20760,9 +23319,9 @@ void Tool_transpose::convertToConcertPitches(HumdrumFile& infile, int line, vect
 	int ptrack;
 	for (j=0; j<infile[line].getFieldCount(); j++) {
 		if (!infile.token(line, j)->isKern()) {
-			m_text << infile.token(line, j);
+			m_humdrum_text << infile.token(line, j);
 			if (j < infile[line].getFieldCount() - 1) {
-				m_text << "\t";
+				m_humdrum_text << "\t";
 			}
 			continue;
 		}
@@ -20771,14 +23330,14 @@ void Tool_transpose::convertToConcertPitches(HumdrumFile& infile, int line, vect
 			base = Convert::transToBase40(*infile.token(line, j));
 			string output = "*ITr";
 			output += Convert::base40ToTrans(base);
-			m_text << output;
+			m_humdrum_text << output;
 			ptrack = infile.token(line, j)->getTrack();
 			tvals[ptrack] = -base;
 		} else {
-			m_text << infile.token(line, j);
+			m_humdrum_text << infile.token(line, j);
 		}
 		if (j < infile[line].getFieldCount() - 1) {
-			m_text << "\t";
+			m_humdrum_text << "\t";
 		}
 	}
 }
@@ -20834,7 +23393,7 @@ int Tool_transpose::isKeyMarker(const string& str) {
 void Tool_transpose::printTransposedToken(HumdrumFile& infile, int row, int col, int transval) {
 	if (infile.token(row, col)->isKern()) {
 		// don't know how to transpose this type of data, so leave it as is
-		m_text << infile.token(row, col);
+		m_humdrum_text << infile.token(row, col);
 		return;
 	}
 
@@ -20936,7 +23495,7 @@ void Tool_transpose::printTransposeInformation(HumdrumFile& infile,
 		}
 		ptrack = infile.token(line, j)->getTrack();
 		startvalues[ptrack] = getTransposeInfo(infile, line, j);
-		// m_text << "Found transpose value " << startvalues[ptrack] << endl;
+		// m_humdrum_text << "Found transpose value " << startvalues[ptrack] << endl;
 	}
 
 	int entry = 0;
@@ -20968,30 +23527,30 @@ void Tool_transpose::printTransposeInformation(HumdrumFile& infile,
 
 	for (j=0; j<infile[line].getFieldCount(); j++) {
 		if (!infile.token(line, j)->isKern()) {
-			m_text << "*";
+			m_humdrum_text << "*";
 			if (j < infile[line].getFieldCount()-1) {
-				m_text << "\t";
+				m_humdrum_text << "\t";
 			}
 			continue;
 		}
 		ptrack = infile.token(line, j)->getTrack();
 		if (finalvalues[ptrack] == 0) {
-			m_text << "*";
+			m_humdrum_text << "*";
 		} else {
 			if (instrumentQ) {
-				m_text << "*ITr";
-				m_text << Convert::base40ToTrans(-finalvalues[ptrack]);
+				m_humdrum_text << "*ITr";
+				m_humdrum_text << Convert::base40ToTrans(-finalvalues[ptrack]);
 			} else {
-				m_text << "*Tr";
-				m_text << Convert::base40ToTrans(finalvalues[ptrack]);
+				m_humdrum_text << "*Tr";
+				m_humdrum_text << Convert::base40ToTrans(finalvalues[ptrack]);
 			}
 		}
 		if (j < infile[line].getFieldCount()-1) {
-			m_text << "\t";
+			m_humdrum_text << "\t";
 		}
 
 	}
-	m_text << "\n";
+	m_humdrum_text << "\n";
 }
 
 
@@ -21081,15 +23640,15 @@ int Tool_transpose::checkForDeletedLine(HumdrumFile& infile, int line) {
 	// print non-deleted elements in line.
 	for (j=0; j<infile[line].getFieldCount(); j++) {;
 		if ((string)(*infile.token(line, j)) == "deletedTr") {
-			m_text << "*";
+			m_humdrum_text << "*";
 		} else {
-			m_text << infile.token(line, j);
+			m_humdrum_text << infile.token(line, j);
 		}
 		if (j < infile[line].getFieldCount() - 1) {
-			m_text << "\t";
+			m_humdrum_text << "\t";
 		}
 	}
-	m_text << "\n";
+	m_humdrum_text << "\n";
 
 	return 1;
 }
@@ -21120,13 +23679,13 @@ void Tool_transpose::processFile(HumdrumFile& infile,
 
 		if (infile[i].isData()) {
 			printHumdrumDataRecord(infile[i], spineprocess);
-			m_text << "\n";
+			m_humdrum_text << "\n";
 		} else if (infile[i].isInterpretation()) {
 			for (j=0; j<infile[i].getFieldCount(); j++) {
 				if (!infile.token(i, j)->isKern()) {
-					m_text << infile.token(i, j);
+					m_humdrum_text << infile.token(i, j);
 					if (j<infile[i].getFieldCount()-1) {
-						m_text << "\t";
+						m_humdrum_text << "\t";
 					}
 					continue;
 				}
@@ -21141,7 +23700,7 @@ void Tool_transpose::processFile(HumdrumFile& infile,
 							"^\\*k\\[([a-gA-G#-]*)\\]", "i")) {
 						printNewKeySignature(hre.getMatch(1), transval);
 						if (j<infile[i].getFieldCount()-1) {
-						m_text << "\t";
+						m_humdrum_text << "\t";
 						}
 						continue;
 				}
@@ -21154,20 +23713,20 @@ void Tool_transpose::processFile(HumdrumFile& infile,
 					if (diatonic >= 0 && diatonic <= 6) {
 					  	printNewKeyInterpretation(infile[i], j, transval);
 					  	if (j<infile[i].getFieldCount()-1) {
-							m_text << "\t";
+							m_humdrum_text << "\t";
 					  	}
 					  	continue;
 					}
 				}
-				m_text << infile.token(i, j);
+				m_humdrum_text << infile.token(i, j);
 				if (j<infile[i].getFieldCount()-1) {
-					m_text << "\t";
+					m_humdrum_text << "\t";
 				}
 			}
-			m_text << "\n";
+			m_humdrum_text << "\n";
 
 		} else {
-			m_text << infile[i] << "\n";
+			m_humdrum_text << infile[i] << "\n";
 		}
 	}
 }
@@ -21191,7 +23750,7 @@ void Tool_transpose::printNewKeySignature(const string& keysig, int trans) {
 
 	int xxx = Convert::base40IntervalToLineOfFifths(trans);
 	int newkey = xxx + counter;
-	m_text << Convert::keyNumberToKern(newkey);
+	m_humdrum_text << Convert::keyNumberToKern(newkey);
 }
 
 
@@ -21215,11 +23774,11 @@ void Tool_transpose::printNewKeyInterpretation(HumdrumLine& aRecord,
 	base40 = base40 % 40;
 	base40 = base40 + (3 + mode) * 40;
 
-	m_text << "*" << Convert::base40ToKern(base40) << ":";
+	m_humdrum_text << "*" << Convert::base40ToKern(base40) << ":";
 
 	HumRegex hre;
 	if (hre.search((string)*aRecord.token(index), ":(.+)$", "")) {
-		m_text << hre.getMatch(1);
+		m_humdrum_text << hre.getMatch(1);
 	}
 }
 
@@ -21236,17 +23795,17 @@ void Tool_transpose::printHumdrumDataRecord(HumdrumLine& record,
 	for (i=0; i<record.getFieldCount(); i++) {
 		if (!record.token(i)->isKern()) {
 			// don't try to transpose non-kern spines
-			m_text << record.token(i);
+			m_humdrum_text << record.token(i);
 			if (i<record.getFieldCount()-1) {
-				m_text << "\t";
+				m_humdrum_text << "\t";
 			}
 			continue;
 		}
 		if (!spineprocess[record.token(i)->getTrack()]) {
 			// don't try to transpose spines which were not indicated.
-			m_text << record.token(i);
+			m_humdrum_text << record.token(i);
 			if (i<record.getFieldCount()-1) {
-				m_text << "\t";
+				m_humdrum_text << "\t";
 			}
 			continue;
 		}
@@ -21254,7 +23813,7 @@ void Tool_transpose::printHumdrumDataRecord(HumdrumLine& record,
 		printHumdrumKernToken(record, i, transval);
 
 		if (i<record.getFieldCount()-1) {
-			m_text << "\t";
+			m_humdrum_text << "\t";
 		}
 		continue;
 	}
@@ -21272,11 +23831,11 @@ void Tool_transpose::printHumdrumKernToken(HumdrumLine& record, int index,
 		int transval) {
 	if (record.token(index)->isNull()) {
 		// null record element (no pitch).
-		m_text << record.token(index);
+		m_humdrum_text << record.token(index);
 		return;
 	}
 	if (!record.token(index)->isKern()) {
-		m_text << record.token(index);
+		m_humdrum_text << record.token(index);
 		return;
 	}
 	string buffer;
@@ -21285,7 +23844,7 @@ void Tool_transpose::printHumdrumKernToken(HumdrumLine& record, int index,
 		buffer = record.token(index)->getSubtoken(k);
 		printNewKernString(buffer, transval);
 		if (k<tokencount-1) {
-			m_text << " ";
+			m_humdrum_text << " ";
 		}
 	}
 }
@@ -21301,12 +23860,12 @@ void Tool_transpose::printHumdrumKernToken(HumdrumLine& record, int index,
 void Tool_transpose::printNewKernString(const string& input, int transval) {
 	if (input.rfind('r') != string::npos) {
 		// don't transpose rests...
-		m_text << input;
+		m_humdrum_text << input;
 		return;
 	}
 	if (input == ".") {
 		// don't transpose null tokens...
-		m_text << input;
+		m_humdrum_text << input;
 		return;
 	}
 
@@ -21320,7 +23879,7 @@ void Tool_transpose::printNewKernString(const string& input, int transval) {
 		string oldpitch = hre.getMatch(1);
 		output = hre.replaceCopy(input, newpitch, oldpitch);
 	}
-	m_text << output;
+	m_humdrum_text << output;
 }
 
 
@@ -21475,7 +24034,7 @@ void Tool_transpose::doAutoTransposeAnalysis(HumdrumFile& infile) {
 	}
 
 	if (debugQ) {
-		m_text << "Segment pitch histograms: " << endl;
+		m_free_text << "Segment pitch histograms: " << endl;
 		printHistograms(segments, ktracks, trackhist);
 	}
 
@@ -21505,7 +24064,7 @@ void Tool_transpose::doAutoTransposeAnalysis(HumdrumFile& infile) {
 
 	// print analyses raw results
 
-	m_text << "Raw key analysis by track:" << endl;
+	m_free_text << "Raw key analysis by track:" << endl;
 	printRawTrackAnalysis(analysis, ktracks);
 
 	doTranspositionAnalysis(analysis);
@@ -21543,7 +24102,7 @@ void Tool_transpose::doTranspositionAnalysis(vector<vector<vector<double> > >& a
 					if (value > 6) {
 						  value = 12 - value;
 					}
-					m_text << value << endl;
+					m_free_text << value << endl;
 				}
 			}
 		}
@@ -21565,9 +24124,9 @@ void Tool_transpose::printRawTrackAnalysis(vector<vector<vector<double> > >& ana
 	int value2;
 
 	for (i=0; i<(int)analysis[0].size(); i++) {
-		m_text << "Frame\t" << i << ":";
+		m_free_text << "Frame\t" << i << ":";
 		for (j=0; j<(int)analysis.size(); j++) {
-			m_text << "\t";
+			m_free_text << "\t";
 	 		value = (int)analysis[j][i][24];
 	 		if (value >= 12) {
 				value = value - 12;
@@ -21576,12 +24135,12 @@ void Tool_transpose::printRawTrackAnalysis(vector<vector<vector<double> > >& ana
 	 		if (value2 >= 12) {
 				value2 = value2 - 12;
 			}
-			m_text << value;
+			m_free_text << value;
 	 		// if (value != value2) {
-	 		//    m_text << "," << value2;
+	 		//    m_free_text << "," << value2;
 			// }
 		}
-		m_text << "\n";
+		m_free_text << "\n";
 	}
 }
 
@@ -21812,30 +24371,30 @@ vector<vector<vector<double> > >& trackhist) {
 	int start;
 
 	for (i=0; i<segments; i++) {
-//m_text << "i=" << i << endl;
-		m_text << "segment " << i
+//m_free_text << "i=" << i << endl;
+		m_free_text << "segment " << i
 				<< " ==========================================\n";
 		for (j=0; j<12; j++) {
 			start = 0;
-//m_text << "j=" << i << endl;
+//m_free_text << "j=" << i << endl;
 			for (k=1; k<(int)ktracks.size(); k++) {
-//m_text << "k=" << i << endl;
+//m_free_text << "k=" << i << endl;
 				if (!ktracks[k]) {
 					continue;
 				}
 				if (!start) {
-					m_text << j;
+					m_free_text << j;
 					start = 1;
 				}
-				m_text << "\t";
-				m_text << trackhist[k][i][j];
+				m_free_text << "\t";
+				m_free_text << trackhist[k][i][j];
 			}
 	 if (start) {
-				m_text << "\n";
+				m_free_text << "\n";
 			}
 		}
 	}
-	m_text << "==========================================\n";
+	m_free_text << "==========================================\n";
 }
 
 
@@ -21958,12 +24517,12 @@ void Tool_transpose::initialize(HumdrumFile& infile) {
 
 	// handle basic options:
 	if (getBoolean("author")) {
-		m_text << "Written by Craig Stuart Sapp, "
+		m_free_text << "Written by Craig Stuart Sapp, "
 			  << "craig@ccrma.stanford.edu, 12 Apr 2004" << endl;
 		exit(0);
 	} else if (getBoolean("version")) {
-		m_text << getArg(0) << ", version: 10 Dec 2016" << endl;
-		m_text << "compiled: " << __DATE__ << endl;
+		m_free_text << getArg(0) << ", version: 10 Dec 2016" << endl;
+		m_free_text << "compiled: " << __DATE__ << endl;
 		exit(0);
 	} else if (getBoolean("help")) {
 		usage(getArg(0));

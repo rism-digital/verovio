@@ -443,8 +443,8 @@ bool HumdrumInput::convertHumdrum(void)
     if (infile.hasFilters()) {
         Tool_filter filter;
         filter.run(infile);
-        if (filter.hasNonHumdrumOutput()) {
-            infile.readString(filter.getTextOutput());
+        if (filter.hasHumdrumText()) {
+            infile.readString(filter.getHumdrumText());
         }
         else {
             // humdrum structure not always correct in output from tools

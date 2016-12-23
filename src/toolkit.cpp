@@ -966,8 +966,8 @@ void Toolkit::SetHumdrumBuffer(const char *data)
         string output;
         hum::Tool_filter filter;
         filter.run(file);
-        if (filter.hasNonHumdrumOutput()) {
-            output = filter.getTextOutput();
+        if (filter.hasHumdrumText()) {
+            output = filter.getHumdrumText();
         }
         else {
             // humdrum structure not always correct in output from tools
