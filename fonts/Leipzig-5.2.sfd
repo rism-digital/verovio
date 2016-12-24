@@ -3,14 +3,14 @@ FontName: Leipzig
 FullName: Leipzig
 FamilyName: Leipzig
 Weight: Regular
-Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.13
-UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA"
-Version: 5.2.13
+Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.16
+UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.1.16 - adding mensural rests"
+Version: 5.2.16
 ItalicAngle: 0
 UnderlinePosition: -50
 UnderlineWidth: 50
-Ascent: 800
-Descent: 200
+Ascent: 750
+Descent: 250
 InvalidEm: 0
 LayerCount: 2
 Layer: 0 0 "Back" 1
@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1480059231
+ModificationTime: 1482497938
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -50,11 +50,11 @@ NameList: Adobe Glyph List
 DisplaySize: -72
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 59562 18 7
+WinInfo: 59814 18 7
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
-BeginChars: 1114115 194
+BeginChars: 1114115 204
 
 StartChar: uniE0A3
 Encoding: 57507 57507 0
@@ -461,12 +461,12 @@ StartChar: uniE0A4
 Encoding: 57508 57508 12
 Width: 314
 VWidth: 2048
-Flags: HW
+Flags: HMW
 LayerCount: 2
 Fore
 SplineSet
 0 -39 m 0
- 0 29 73 133 200 133 c 0
+ 0 29 73 133 200 133 c 4
  266 133 314 96 314 38 c 0
  314 -46 208 -133 96 -133 c 0
  32 -133 0 -103 0 -39 c 0
@@ -10524,7 +10524,7 @@ SplineSet
  0 760 l 1
 0 760 m 1
  30 760 l 1
- 30 0 l 1
+ 30 0 l 5
  0 0 l 1
  0 760 l 1
 EndSplineSet
@@ -10600,6 +10600,184 @@ SplineSet
  30 0 l 1
  0 0 l 1
  0 -760 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE9F3
+Encoding: 59891 59891 194
+Width: 1000
+VWidth: 0
+Flags: H
+LayerCount: 2
+Fore
+SplineSet
+0 250 m 5
+ 40 250 l 5
+ 40 0 l 5
+ 0 0 l 5
+ 0 250 l 5
+EndSplineSet
+EndChar
+
+StartChar: uniE9F2
+Encoding: 59890 59890 195
+Width: 1000
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 250 m 1
+ 40 250 l 1
+ 40 -250 l 1
+ 0 -250 l 1
+ 0 250 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE9F1
+Encoding: 59889 59889 196
+Width: 1000
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 500 m 5
+ 40 500 l 5
+ 40 -500 l 5
+ 0 -500 l 5
+ 0 -333.333007812 0 333.333333333 0 500 c 5
+EndSplineSet
+EndChar
+
+StartChar: uniE9F0
+Encoding: 59888 59888 197
+Width: 1000
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 500 m 5
+ 40 500 l 5
+ 40 -500 l 5
+ 0 -500 l 5
+ 0 -333.333007812 0 333.333333333 0 500 c 5
+90 500 m 1
+ 130 500 l 1
+ 130 -500 l 1
+ 90 -500 l 1
+ 90 -333.333007812 90 333.333007812 90 500 c 1
+EndSplineSet
+EndChar
+
+StartChar: uniE9F4
+Encoding: 59892 59892 198
+Width: 1000
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 250 m 5
+ 40 250 l 5
+ 40 0 l 5
+ 0 0 l 5
+ 0 250 l 5
+EndSplineSet
+EndChar
+
+StartChar: uniE9F5
+Encoding: 59893 59893 199
+Width: 1000
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 250 m 1
+ 40 250 l 1
+ 40 110 l 1
+ 0 110 l 1
+ 0 250 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE9F6
+Encoding: 59894 59894 200
+Width: 1000
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 140 m 5
+ 40 140 l 5
+ 40 0 l 5
+ 0 0 l 5
+ 0 140 l 5
+EndSplineSet
+EndChar
+
+StartChar: uniE9F7
+Encoding: 59895 59895 201
+Width: 1000
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+40 96 m 5
+ 40 0 l 5
+ 0 0 l 5
+ 0 140 l 5
+ 40 140 l 5
+ 118 71 l 5
+ 70 71 l 5
+ 40 96 l 5
+EndSplineSet
+EndChar
+
+StartChar: uniE9F8
+Encoding: 59896 59896 202
+Width: 1000
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+78 96 m 1
+ 78 0 l 1
+ 118 0 l 1
+ 118 140 l 1
+ 78 140 l 1
+ 0 71 l 1
+ 48 71 l 1
+ 78 96 l 1
+EndSplineSet
+EndChar
+
+StartChar: uniE9F9
+Encoding: 59897 59897 203
+Width: 1000
+VWidth: 0
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+78 96 m 5
+ 78 83 l 5
+ 0 14 l 5
+ 48 14 l 5
+ 78 39 l 5
+ 78 0 l 5
+ 118 0 l 5
+ 118 140 l 5
+ 78 140 l 5
+ 0 71 l 5
+ 48 71 l 5
+ 78 96 l 5
 EndSplineSet
 EndChar
 EndChars
