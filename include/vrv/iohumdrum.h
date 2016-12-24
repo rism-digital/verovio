@@ -279,6 +279,7 @@ protected:
     void parseSignifiers(hum::HumdrumFile &infile);
     string getAutoClef(hum::HTp partstart, int partnumber);
     void colorNote(vrv::Note *note, hum::HTp token);
+    vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -394,6 +395,9 @@ private:
     // which indicate non-standard **kern parametesr that can be converted
     // into notation.
     HumdrumSignifiers m_signifiers;
+
+    // m_multirest == boolean states to keep track of muti-rest cases.
+    vector<int> m_multirest;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

@@ -35,6 +35,7 @@
 #include <cctype>
 #include <sstream>
 #include <vector>
+#include <regex>
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
@@ -56,6 +57,7 @@
 #include "layer.h"
 #include "measure.h"
 #include "mrest.h"
+#include "multirest.h"
 #include "note.h"
 #include "octave.h"
 #include "page.h"
@@ -455,6 +457,8 @@ bool HumdrumInput::convertHumdrum(void)
         }
     }
 
+    m_multirest = analyzeMultiRest(infile);
+
     infile.analyzeKernSlurs();
     parseSignifiers(infile);
 
@@ -493,8 +497,8 @@ bool HumdrumInput::convertHumdrum(void)
     m_measureIndex = 0;
     int line = kernstarts[0]->getLineIndex();
     while (line < infile.getLineCount() - 1 && (line >= 0)) {
-        status &= convertSystemMeasure(line);
         m_measureIndex++;
+        status &= convertSystemMeasure(line);
     }
 
     createHeader();
@@ -1423,6 +1427,11 @@ bool HumdrumInput::convertSystemMeasure(int &line)
         line = -endline;
         return true;
     }
+    else if (m_multirest[line] < 0) {
+        // this is a whole-measure rest, but it is part of a multirest sequence.
+        line = endline;
+        return true;
+    }
     else {
         line = endline;
     }
@@ -2056,8 +2065,15 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     // whole-measure rests later.  Also have to deal with
     // pedal mark in mrest meaures.
     if (hasFullMeasureRest(layerdata, timesigdurs[startline], duration)) {
-        MRest *mrest = new MRest();
-        appendElement(layer, mrest);
+        if (m_multirest[startline] > 1) {
+            MultiRest *multirest = new MultiRest();
+            multirest->SetNum(m_multirest[startline]);
+            appendElement(layer, multirest);
+        }
+        else {
+            MRest *mrest = new MRest();
+            appendElement(layer, mrest);
+        }
 
         // Basic compensation for clef change (can be improved later):
         for (i = 0; i < (int)layerdata.size(); i++) {
@@ -5134,6 +5150,118 @@ void HumdrumInput::parseSignifiers(HumdrumFile &infile)
             m_signifiers.mcolor.push_back("red");
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::analyzeMultiRest --
+//
+
+vector<int> HumdrumInput::analyzeMultiRest(HumdrumFile &infile)
+{
+    vector<int> barindex(1, 0); // line number of barline
+    vector<int> datacount(1, 0);
+    vector<int> dataline(1, 0);
+    vector<HumNum> bardur(1, 0);
+
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        if (infile[i].isData()) {
+            datacount.back() = datacount.back() + 1;
+            if (datacount.back() == 1) {
+                dataline.back() = i;
+            }
+        }
+        if (!infile[i].isBarline()) {
+            continue;
+        }
+        barindex.push_back(i);
+        datacount.push_back(0);
+        dataline.push_back(0);
+        bardur.push_back(infile[i].getDurationToBarline());
+    }
+
+    vector<int> wholerest(barindex.size(), 0);
+    bool restQ;
+    int line;
+    for (int i = 0; i < barindex.size(); i++) {
+        if (datacount[i] == 1) {
+            restQ = true;
+            line = dataline[i];
+            for (int j = 0; j < infile[line].getFieldCount(); j++) {
+                if (!infile.token(line, j)->isKern()) {
+                    continue;
+                }
+                if (!infile.token(line, j)->isRest()) {
+                    restQ = false;
+                    break;
+                }
+            }
+            if (restQ) {
+                wholerest[i] = 1;
+            }
+        }
+    }
+
+    for (int i = wholerest.size() - 2; i >= 0; i--) {
+        if (bardur[i] != bardur[i + 1]) {
+            continue;
+        }
+        if (regex_search(*infile.token(barindex[i + 1], 0), regex("[^=0-9]"))) {
+            cerr << "FOUND BARLINE WITH STYLING SO DONT INCLUDE" << endl;
+            continue;
+        }
+        if (wholerest[i] && wholerest[i + 1]) {
+            wholerest[i] += wholerest[i + 1];
+            wholerest[i + 1] = -1;
+        }
+    }
+
+    vector<int> output(infile.getLineCount(), 0);
+    for (int i = 0; i < wholerest.size(); i++) {
+        output[dataline[i]] = wholerest[i];
+    }
+    for (int i = infile.getLineCount() - 2; i >= 0; i--) {
+        if (!infile[i + 1].isBarline()) {
+            output[i] = output[i + 1];
+        }
+    }
+
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        cout << infile[i] << "\t" << output[i] << "\n";
+    }
+    // Example analysis, with measure 4 staring a rest with num="6".
+    // Measures 5-9 marked as whole-measure rests which will be merged into
+    // the multi rest.
+    //	**kern	**kern	0
+    //	*M4/4	*M4/4	0
+    //	=1-	=1-	0
+    //	1c	1d	0
+    //	=2	=2	0
+    //	1d	1g	0
+    //	=3	=3	0
+    //	1r	1e	0
+    //	=4	=4	6
+    //	1r	1r	6
+    //	=5	=5	-1
+    //	1r	1r	-1
+    //	=6	=6	-1
+    //	1r	1r	-1
+    //	=7	=7	-1
+    //	1r	1r	-1
+    //	=8	=8	-1
+    //	1r	1r	-1
+    //	=9	=9	-1
+    //	1r	1r	-1
+    //	=10	=10	0
+    //	1f	1r	0
+    //	=11	=11	0
+    //	1g	1g	0
+    //	=12	=12	0
+    //	1a	1g	0
+    //	==	==	0
+    //	*-	*-	0
+
+    return output;
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */
