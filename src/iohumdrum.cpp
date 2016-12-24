@@ -5226,9 +5226,9 @@ vector<int> HumdrumInput::analyzeMultiRest(HumdrumFile &infile)
         }
     }
 
-    for (int i = 0; i < infile.getLineCount(); i++) {
-        cout << infile[i] << "\t" << output[i] << "\n";
-    }
+    //for (int i = 0; i < infile.getLineCount(); i++) {
+    //    cout << infile[i] << "\t" << output[i] << "\n";
+    //}
     // Example analysis, with measure 4 staring a rest with num="6".
     // Measures 5-9 marked as whole-measure rests which will be merged into
     // the multi rest.
