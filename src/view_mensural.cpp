@@ -593,6 +593,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     epaisseur = std::max(2, m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, false) / 2);
     xn = element->GetDrawingX();
     y = 99;
+    //    LogDebug("DrawLigatureNote: _ligObliqua=%d drawingX=%d y=%d", note->m_ligObliqua, xn, y);
     LogDebug("DrawLigatureNote: drawingX=%d y=%d", xn, y);
 
     /*
