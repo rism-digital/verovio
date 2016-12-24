@@ -5164,11 +5164,17 @@ vector<int> HumdrumInput::analyzeMultiRest(HumdrumFile &infile)
     vector<int> dataline(1, 0);
     vector<HumNum> bardur(1, 0);
 
+    // count number of non-null data lines for each measure.
     for (int i = 0; i < infile.getLineCount(); i++) {
         if (infile[i].isData()) {
-            datacount.back() = datacount.back() + 1;
-            if (datacount.back() == 1) {
-                dataline.back() = i;
+            if (!infile[i].isAllNull()) {
+                datacount.back() = datacount.back() + 1;
+                if (datacount.back() == 1) {
+                    dataline.back() = i;
+                }
+            }
+            else {
+                // line is all null tokens.
             }
         }
         if (!infile[i].isBarline()) {
@@ -5180,6 +5186,7 @@ vector<int> HumdrumInput::analyzeMultiRest(HumdrumFile &infile)
         bardur.push_back(infile[i].getDurationToBarline());
     }
 
+    // check to see if measures with single data item is a rest.
     vector<int> wholerest(barindex.size(), 0);
     bool restQ;
     int line;
@@ -5207,7 +5214,6 @@ vector<int> HumdrumInput::analyzeMultiRest(HumdrumFile &infile)
             continue;
         }
         if (regex_search(*infile.token(barindex[i + 1], 0), regex("[^=0-9]"))) {
-            cerr << "FOUND BARLINE WITH STYLING SO DONT INCLUDE" << endl;
             continue;
         }
         if (wholerest[i] && wholerest[i + 1]) {
@@ -5222,13 +5228,15 @@ vector<int> HumdrumInput::analyzeMultiRest(HumdrumFile &infile)
     }
     for (int i = infile.getLineCount() - 2; i >= 0; i--) {
         if (!infile[i + 1].isBarline()) {
-            output[i] = output[i + 1];
+            if (output[i + 1] != 0) {
+                output[i] = output[i + 1];
+            }
         }
     }
 
-    //for (int i = 0; i < infile.getLineCount(); i++) {
-    //    cout << infile[i] << "\t" << output[i] << "\n";
-    //}
+    // for (int i = 0; i < infile.getLineCount(); i++) {
+    //     cout << infile[i] << "\t" << output[i] << "\n";
+    // }
     // Example analysis, with measure 4 staring a rest with num="6".
     // Measures 5-9 marked as whole-measure rests which will be merged into
     // the multi rest.
