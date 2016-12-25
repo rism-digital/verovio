@@ -161,8 +161,10 @@ namespace humaux {
 class HumdrumSignifiers {
 public:
     bool empty = true;
+
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
+	char editacc = '\0'; // !!!RDF**kern: i = editorial accidental
 
     // coloring of notes (add rests later):
     // !!!RDF**kern: i = marked note, color="#553325"

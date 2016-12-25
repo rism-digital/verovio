@@ -3983,6 +3983,13 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
         case 6: note->SetPname(PITCHNAME_b); break;
     }
 
+	bool editorial = false;
+	if (m_signifiers.editacc) {
+		if (token->find(m_signifiers.editacc) != string::npos) {
+			editorial = true;
+		}
+	}
+
     int accidCount = Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
@@ -3992,19 +3999,36 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
         showInAccid = false;
     }
 
-    if (showInAccid) {
-        switch (accidCount) {
-            // case +3: note->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
-            case +2: note->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
-            case +1: note->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
-            case 0: note->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
-            case -1: note->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
-            case -2:
-                note->SetAccid(ACCIDENTAL_EXPLICIT_ff);
-                break;
-                // case -3: note->SetAccid(ACCIDENTAL_EXPLICIT_tf); break;
-        }
-    }
+	if (!editorial) {
+    	if (showInAccid) {
+        	switch (accidCount) {
+            	// case +3: note->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
+            	case +2: note->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
+            	case +1: note->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
+            	case 0: note->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
+            	case -1: note->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
+            	case -2:
+                	note->SetAccid(ACCIDENTAL_EXPLICIT_ff);
+                	break;
+                	// case -3: note->SetAccid(ACCIDENTAL_EXPLICIT_tf); break;
+        	}
+    	}
+	} else {
+		Accid *accid = new Accid;
+        appendElement(note, accid);
+		accid->SetFunc(accidLog_FUNC_edit);
+		
+       	switch (accidCount) {
+           	case +2: accid->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
+           	case +1: accid->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
+           	case 0: accid->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
+           	case -1: accid->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
+           	case -2:
+               	accid->SetAccid(ACCIDENTAL_EXPLICIT_ff);
+               	break;
+       	}
+	}
+
     if (showInAccidGes) {
         switch (accidCount) {
             // case +3: note->SetAccidGes(ACCIDENTAL_IMPLICIT_ts); break;
@@ -5140,6 +5164,12 @@ void HumdrumInput::parseSignifiers(HumdrumFile &infile)
         // !!!RDF**kern: i = no stem
         if (value.find("no stem", equals) != string::npos) {
             m_signifiers.nostem = signifier;
+            continue;
+        }
+
+		// editorial accidentals:
+        if (value.find("editorial accidental", equals) != string::npos) {
+            m_signifiers.editacc = signifier;
             continue;
         }
 
