@@ -27,9 +27,10 @@ namespace vrv {
 // Syl
 //----------------------------------------------------------------------------
 
-Syl::Syl() : LayerElement("syl-"), TextListInterface(), TimeSpanningInterface(), AttTypography(), AttSylLog()
+Syl::Syl() : LayerElement("syl-"), TextListInterface(), TimeSpanningInterface(), AttLang(), AttTypography(), AttSylLog()
 {
     RegisterInterface(TimeSpanningInterface::GetAttClasses(), TimeSpanningInterface::IsInterface());
+    RegisterAttClass(ATT_LANG);
     RegisterAttClass(ATT_TYPOGRAPHY);
     RegisterAttClass(ATT_SYLLOG);
 
@@ -44,6 +45,7 @@ void Syl::Reset()
 {
     LayerElement::Reset();
     TimeSpanningInterface::Reset();
+    ResetLang();
     ResetTypography();
     ResetSylLog();
 
