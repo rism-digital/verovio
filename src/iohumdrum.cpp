@@ -457,6 +457,11 @@ bool HumdrumInput::convertHumdrum(void)
         }
     }
 
+cerr << " =================================================== " << endl;
+cerr << "FILTERED INPUT " << endl;
+cerr << infile << endl;
+cerr << " =================================================== " << endl;
+
     m_multirest = analyzeMultiRest(infile);
 
     infile.analyzeKernSlurs();

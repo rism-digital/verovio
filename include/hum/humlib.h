@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Dec 22 23:10:51 PST 2016
+// Last Modified: Sat Dec 24 17:17:32 PST 2016
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2869,6 +2869,28 @@ class Tool_autostem : public HumTool {
 		int    Borderline    = 0;       // really used with -u option
 		int    notlongQ      = 0;       // used with -L option
 		bool   m_quit        = false;
+
+};
+
+
+class Tool_dissonant : public HumTool {
+	public:
+		         Tool_dissonant    (void);
+		        ~Tool_dissonant    () {};
+
+		bool     run               (HumdrumFile& infile);
+		bool     run               (const string& indata, ostream& out);
+		bool     run               (HumdrumFile& infile, ostream& out);
+
+	protected:
+		void    doAnalysis         (vector<vector<string> >& results,
+		                            NoteGrid& grid,
+		                            bool debug);
+		void    doAnalysisForVoice (vector<string>& results, NoteGrid& grid,
+		                            int vindex, bool debug);
+
+	private:
+		vector<HTp> m_kernspines;
 
 };
 

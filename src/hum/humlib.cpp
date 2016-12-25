@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Thu Dec 22 23:10:51 PST 2016
+// Last Modified: Sat Dec 24 17:17:32 PST 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -10444,6 +10444,7 @@ HumdrumLine::HumdrumLine(const string& aString) : string(aString) {
 	m_duration = -1;
 	m_durationFromStart = -1;
 	setPrefix("!!");
+	createTokensFromLine();
 }
 
 
@@ -10455,6 +10456,7 @@ HumdrumLine::HumdrumLine(const char* aString) : string(aString) {
 	m_duration = -1;
 	m_durationFromStart = -1;
 	setPrefix("!!");
+	createTokensFromLine();
 }
 
 
@@ -18003,6 +18005,290 @@ void Tool_autostem::countBeamStuff(const string& token, int& start, int& stop,
 
 /////////////////////////////////
 //
+// Tool_dissonant::Tool_dissonant -- Set the recognized options for the tool.
+//
+
+Tool_dissonant::Tool_dissonant(void) {
+	define("r|raw=b",             "print raw grid");
+	define("d|diatonic=b",        "print diatonic grid");
+	define("D|no-dissonant=b",    "don't do dissonance anaysis");
+	define("m|midi-pitch=b",      "print midi-pitch grid");
+	define("b|base-40=b",         "print base-40 grid");
+	define("l|metric-levels=b",   "use metric levels in analysis");
+	define("k|kern=b",            "print kern pitch grid");
+	define("debug=b",             "print grid cell information");
+	define("e|exinterp=s:**data", "specify exinterp for **data spine");
+	define("c|colorize=b",        "color dissonant notes");
+}
+
+
+
+/////////////////////////////////
+//
+// Tool_dissonant::run -- Do the main work of the tool.
+//
+
+bool Tool_dissonant::run(const string& indata, ostream& out) {
+	HumdrumFile infile(indata);
+	bool status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_dissonant::run(HumdrumFile& infile, ostream& out) {
+	int status = run(infile);
+	if (hasAnyText()) {
+		getAllText(out);
+	} else {
+		out << infile;
+	}
+	return status;
+}
+
+
+bool Tool_dissonant::run(HumdrumFile& infile) {
+	NoteGrid grid(infile);
+
+	if (getBoolean("debug")) {
+		grid.printGridInfo(cerr);
+		// return 1;
+	} else if (getBoolean("raw")) {
+		grid.printRawGrid(m_free_text);
+		return 1;
+	} else if (getBoolean("diatonic")) {
+		grid.printDiatonicGrid(m_free_text);
+		return 1;
+	} else if (getBoolean("midi-pitch")) {
+		grid.printMidiGrid(m_free_text);
+		return 1;
+	} else if (getBoolean("base-40")) {
+		grid.printBase40Grid(m_free_text);
+		return 1;
+	} else if (getBoolean("kern")) {
+		grid.printKernGrid(m_free_text);
+		return 1;
+	}
+
+	vector<vector<string> > results;
+
+	results.resize(grid.getVoiceCount());
+	for (int i=0; i<(int)results.size(); i++) {
+		results[i].resize(infile.getLineCount());
+	}
+	doAnalysis(results, grid, getBoolean("debug"));
+
+	string exinterp = getString("exinterp");
+	vector<HTp> kernspines = infile.getKernSpineStartList();
+	infile.appendDataSpine(results.back(), "", exinterp);
+	for (int i = (int)results.size()-1; i>0; i--) {
+		int track = kernspines[i]->getTrack();
+		infile.insertDataSpineBefore(track, results[i-1], "", exinterp);
+	}
+
+	if (getBoolean("colorize")) {
+		infile.appendLine("!!!RDF**kern: @ = dissonant marked note, color=\"#33bb00\"");
+	}
+	infile.createLinesFromTokens();
+
+	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_dissonant::doAnalysis -- do a basic melodic analysis of all parts.
+//
+
+void Tool_dissonant::doAnalysis(vector<vector<string> >& results,
+		NoteGrid& grid, bool debug) {
+	for (int i=0; i<grid.getVoiceCount(); i++) {
+		doAnalysisForVoice(results[i], grid, i, debug);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// Tool_dissonant::doAnalysisForVoice -- do analysis for a single voice by
+//     subtracting NoteCells to calculate the diatonic intervals.
+//
+
+void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
+		int vindex, bool debug) {
+	vector<NoteCell*> attacks;
+	grid.getNoteAndRestAttacks(attacks, vindex);
+
+	if (debug) {
+		cerr << "=======================================================";
+		cerr << endl;
+		cerr << "Note attacks for voice number "
+		     << grid.getVoiceCount()-vindex << ":" << endl;
+		for (int i=0; i<(int)attacks.size(); i++) {
+			attacks[i]->printNoteInfo(cerr);
+		}
+	}
+	bool nodissonanceQ = getBoolean("no-dissonant");
+	bool colorizeQ = getBoolean("colorize");
+
+	HumNum durp;     // duration of previous melodic note;
+	HumNum dur;      // duration of current note;
+	HumNum durn;     // duration of next melodic note;
+	HumNum durnn;    // duration of next next melodic note;
+	double intp;     // diatonic interval from previous melodic note
+	double intn;     // diatonic interval to next melodic note
+	double levp;     // metric level of the previous melodic note
+	double lev;      // metric level of the current note
+	double levn;     // metric level of the next melodic note
+	int lineindex;   // line in original Humdrum file content that contains note
+	int sliceindex;  // current timepoint in NoteGrid.
+	vector<double> harmint(grid.getVoiceCount());  // harmonic intervals;
+	bool dissonant;  // true if  note is dissonant with other sounding notes.
+
+	for (int i=1; i<(int)attacks.size() - 1; i++) {
+		sliceindex = attacks[i]->getSliceIndex();
+		lineindex = attacks[i]->getLineIndex();
+
+		// calculate harmonic intervals:
+		for (int j=0; j<(int)harmint.size(); j++) {
+			if (j == vindex) {
+				harmint[j] = 0;
+			}
+			if (j < vindex) {
+				harmint[j] = *grid.cell(vindex, sliceindex) -
+						*grid.cell(j, sliceindex);
+			} else {
+				harmint[j] = *grid.cell(j, sliceindex) -
+						*grid.cell(vindex, sliceindex);
+			}
+		}
+		// check if current note is dissonant to another sounding note:
+		dissonant = false;
+		for (int j=0; j<(int)harmint.size(); j++) {
+			if (j == vindex) {
+				// don't compare to self
+				continue;
+			}
+			if (harmint[j] == NAN) {
+				// rest, so ignore
+				continue;
+			}
+			int value = (int)harmint[j];
+			if (value > 7) {
+				value = value % 7; // remove octaves from interval
+			} else if (value < -7) {
+				value = -(-value % 7); // remove octaves from interval
+			}
+
+			if ((value == 1) || (value == -1)) {
+				// forms a second with another sounding note
+				dissonant = true;
+				results[lineindex] = "d2";
+				break;
+			} else if ((value == 6) || (value == -6)) {
+				// forms a seventh with another sounding note
+				dissonant = true;
+				results[lineindex] = "d7";
+				break;
+			}
+		}
+	
+		// Don't label current note if not dissonant with other sounding notes.
+		if (!dissonant) {
+			if (!nodissonanceQ) {
+				continue;
+			}
+		}
+
+		if (colorizeQ) {
+			// mark note
+			char marker = '@';
+			string text = *attacks[i]->getToken();
+			if (text.find(marker) == string::npos) {
+				text += marker;
+				attacks[i]->getToken()->setText(text);
+			}
+		}
+
+		durp = attacks[i-1]->getDuration();
+		dur  = attacks[i]->getDuration();
+		durn = attacks[i+1]->getDuration();
+		intp = *attacks[i] - *attacks[i-1];
+		intn = *attacks[i+1] - *attacks[i];
+		levp = attacks[i-1]->getMetricLevel();
+		lev  = attacks[i]->getMetricLevel();
+		levn = attacks[i+1]->getMetricLevel();
+
+		if ((dur <= durp) && (lev >= levp) && (lev >= levn)) { // weak dissonances
+			if (intp == -1) { // descending dissonances
+				if (intn == -1) {
+					results[lineindex] = "pd"; // downward passing tone
+				} else if (intn == 1) {
+					results[lineindex] = "nd"; // lower neighbor
+				} else if (intn == 0) {
+					results[lineindex] = "ad"; // descending anticipation
+				} else if (intn > 1) {
+					results[lineindex] = "ed"; // lower échappée
+				} else if (intn == -2) {
+					results[lineindex] = "scd"; // short descending nota cambiata
+				} else if (intn < -2) {
+					results[lineindex] = "ipd"; // incomplete posterior lower neighbor
+				}
+			} else if (intp == 1) { // ascending dissonances
+				if (intn == 1) {
+					results[lineindex] = "pu"; // rising passing tone
+				} else if (intn == -1) {
+					results[lineindex] = "nu"; // upper neighbor
+				} else if (intn < -1) {
+					results[lineindex] = "eu"; // upper échappée
+				} else if (intn == 0) {
+					results[lineindex] = "au"; // rising anticipation
+				} else if (intn == 2) {
+					results[lineindex] = "scu"; // short ascending nota cambiata
+				} else if (intn > 2) {
+					results[lineindex] = "ipu"; // incomplete posterior upper neighbor
+				}
+			} else if ((intp < -2) && (intn == 1)) {
+				results[lineindex] = "iad"; // incomplete anterior lower neighbor
+			} else if ((intp > 2) && (intn == -1)) {
+				results[lineindex] = "iau"; // incomplete anterior upper neighbor
+			}
+		}
+		// TODO: add check to see if results already has a result.
+		if (i < ((int)attacks.size() - 2)) { // expand the analysis window
+			double interval3 = *attacks[i+2] - *attacks[i+1];
+			HumNum durnn = attacks[i+2]->getDuration();	// dur of note after next
+			double levnn = attacks[i+2]->getMetricLevel(); // lev of note after next
+
+			if ((dur == durn) && (lev == 1) && (levn == 2) && (levnn == 0) &&
+				(intp == -1) && (intn == -1) && (interval3 == 1)) {
+				results[lineindex] = "ci"; // chanson idiom
+			} else if ((durp >= 2) && (dur == 1) && (lev < levn) &&
+				(intp == -1) && (intn == -1)) {
+				results[lineindex] = "dq"; // dissonant third quarter
+			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
+				(intp == -1) && (intn == -2) && (interval3 == 1)) {
+				results[lineindex] = "lcd"; // long descending nota cambiata
+			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
+				(intp == 1) && (intn == 2) && (interval3 == -1)) {
+				results[lineindex] = "lcu"; // long ascending nota cambiata
+			}
+		}
+	}
+}
+
+
+
+
+
+/////////////////////////////////
+//
 // Tool_extract::Tool_extract -- Set the recognized options for the tool.
 //
 
@@ -18044,6 +18330,7 @@ bool Tool_extract::run(const string& indata, ostream& out) {
 	HumdrumFile infile(indata);
 	bool status = run(infile);
 	if (hasAnyText()) {
+cerr << "GOT HERE BBB" << endl;
 		getAllText(out);
 	} else {
 		out << infile;
@@ -18055,6 +18342,7 @@ bool Tool_extract::run(const string& indata, ostream& out) {
 bool Tool_extract::run(HumdrumFile& infile, ostream& out) {
 	int status = run(infile);
 	if (hasAnyText()) {
+cerr << "GOT HERE AAA" << endl;
 		getAllText(out);
 	} else {
 		out << infile;
@@ -18488,28 +18776,28 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 		int lastone  = hre.getMatchInt(2);
 
 		if ((firstone < 1) && (firstone != 0)) {
-			cerr << "Error: range token: \"" << astring << "\""
+			m_error_text << "Error: range token: \"" << astring << "\""
 				  << " contains too small a number at start: " << firstone << endl;
-			cerr << "Minimum number allowed is " << 1 << endl;
-			exit(1);
+			m_error_text << "Minimum number allowed is " << 1 << endl;
+			return;
 		}
 		if ((lastone < 1) && (lastone != 0)) {
-			cerr << "Error: range token: \"" << astring << "\""
+			m_error_text << "Error: range token: \"" << astring << "\""
 				  << " contains too small a number at end: " << lastone << endl;
-			cerr << "Minimum number allowed is " << 1 << endl;
-			exit(1);
+			m_error_text << "Minimum number allowed is " << 1 << endl;
+			return;
 		}
 		if (firstone > maxtrack) {
-			cerr << "Error: range token: \"" << astring << "\""
+			m_error_text << "Error: range token: \"" << astring << "\""
 				  << " contains number too large at start: " << firstone << endl;
-			cerr << "Maximum number allowed is " << maxtrack << endl;
-			exit(1);
+			m_error_text << "Maximum number allowed is " << maxtrack << endl;
+			return;
 		}
 		if (lastone > maxtrack) {
-			cerr << "Error: range token: \"" << astring << "\""
+			m_error_text << "Error: range token: \"" << astring << "\""
 				  << " contains number too large at end: " << lastone << endl;
-			cerr << "Maximum number allowed is " << maxtrack << endl;
-			exit(1);
+			m_error_text << "Maximum number allowed is " << maxtrack << endl;
+			return;
 		}
 
 		if (firstone > lastone) {
@@ -18549,16 +18837,16 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 		}
 
 		if ((value < 1) && (value != 0)) {
-			cerr << "Error: range token: \"" << astring << "\""
+			m_error_text << "Error: range token: \"" << astring << "\""
 				  << " contains too small a number at end: " << value << endl;
-			cerr << "Minimum number allowed is " << 1 << endl;
-			exit(1);
+			m_error_text << "Minimum number allowed is " << 1 << endl;
+			return;
 		}
 		if (value > maxtrack) {
-			cerr << "Error: range token: \"" << astring << "\""
+			m_error_text << "Error: range token: \"" << astring << "\""
 				  << " contains number too large at start: " << value << endl;
-			cerr << "Maximum number allowed is " << maxtrack << endl;
-			exit(1);
+			m_error_text << "Maximum number allowed is " << maxtrack << endl;
+			return;
 		}
 		field.push_back(value);
 		if (value == 0) {
@@ -19034,8 +19322,8 @@ void Tool_extract::dealWithSecondarySubspine(vector<int>& field, vector<int>& su
 			m_humdrum_text << infile.token(i, j);
 		}
 	} else {
-		cerr << "Should not get to this line of code" << endl;
-		exit(1);
+		m_error_text << "Should not get to this line of code" << endl;
+		return;
 	}
 }
 
@@ -19049,8 +19337,8 @@ void Tool_extract::dealWithSecondarySubspine(vector<int>& field, vector<int>& su
 
 void Tool_extract::getSearchPat(string& spat, int target, const string& modifier) {
 	if (modifier.size() > 20) {
-		cerr << "Error in GetSearchPat" << endl;
-		exit(1);
+		m_error_text << "Error in GetSearchPat" << endl;
+		return;
 	}
 	spat.reserve(16);
 	spat = "\\(";
@@ -19551,8 +19839,8 @@ void Tool_extract::getTraceData(vector<int>& startline, vector<vector<int> >& fi
 	ifstream input;
 	input.open(tracefile.c_str());
 	if (!input.is_open()) {
-		cerr << "Error: cannot open file for reading: " << tracefile << endl;
-		exit(1);
+		m_error_text << "Error: cannot open file for reading: " << tracefile << endl;
+		return;
 	}
 
 	string temps;
@@ -19713,17 +20001,17 @@ void Tool_extract::initialize(HumdrumFile& infile) {
 	if (getBoolean("author")) {
 		m_free_text << "Written by Craig Stuart Sapp, "
 			  << "craig@ccrma.stanford.edu, Feb 2008" << endl;
-		exit(0);
+		return;
 	} else if (getBoolean("version")) {
 		m_free_text << getArg(0) << ", version: Feb 2008" << endl;
 		m_free_text << "compiled: " << __DATE__ << endl;
-		exit(0);
+		return;
 	} else if (getBoolean("help")) {
 		usage(getCommand().c_str());
-		exit(0);
+		return;
 	} else if (getBoolean("example")) {
 		example();
-		exit(0);
+		return;
 	}
 
 	excludeQ    = getBoolean("x");
@@ -19858,6 +20146,8 @@ bool Tool_filter::run(HumdrumFile& infile) {
 			RUNTOOL(autobeam, infile, commands[i].second, status);
 		} else if (commands[i].first == "autostem") {
 			RUNTOOL(autostem, infile, commands[i].second, status);
+		} else if (commands[i].first == "dissonant") {
+			RUNTOOL(dissonant, infile, commands[i].second, status);
 		} else if (commands[i].first == "extract") {
 			RUNTOOL(extract, infile, commands[i].second, status);
 		} else if (commands[i].first == "metlev") {
