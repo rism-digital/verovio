@@ -32,9 +32,9 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <cctype>
 #include <sstream>
 #include <vector>
-#include <cctype>
 
 #endif /* NO_HUMDRUM_SUPPORT */
 

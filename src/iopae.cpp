@@ -1068,7 +1068,7 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     regfree(&re);
     if (has_tie == 0) {
         // reset 1 for first note, >1 for next ones is incremented under
-        if (note->tie == 0) note->tie = 1; 
+        if (note->tie == 0) note->tie = 1;
     }
 
     // chord

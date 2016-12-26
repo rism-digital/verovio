@@ -72,7 +72,7 @@ public:
 
     // read
     virtual bool ImportFile() { return true; }
-    virtual bool ImportString(std::string const & data) { return true; }
+    virtual bool ImportString(std::string const &data) { return true; }
 
     /**
      * Getter for layoutInformation flag that is set to true during import
