@@ -521,10 +521,10 @@ Object *Object::FindChildExtremeByAttComparison(AttComparison *attComparison, in
 }
 
 void Object::FindAllChildByAttComparison(
-    ArrayOfObjects *objects, AttComparison *attComparison, int deepness, bool direction)
+    ArrayOfObjects *objects, AttComparison *attComparison, int deepness, bool direction, bool clear)
 {
     assert(objects);
-    objects->clear();
+    if (clear) objects->clear();
 
     Functor findAllByAttComparison(&Object::FindAllByAttComparison);
     FindAllByAttComparisonParams findAllByAttComparisonParams(attComparison, objects);

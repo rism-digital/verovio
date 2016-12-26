@@ -781,6 +781,35 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     assert(slur->GetCurrentFloatingPositioner());
     slur->GetCurrentFloatingPositioner()->UpdateSlurPosition(points, angle, thickness, drawingCurveDir);
 
+    /************** articulation **************/
+
+    // First get all artic children
+    AttComparison matchType(ARTIC);
+    ArrayOfObjects artics;
+    ArrayOfObjects::iterator articIter;
+    start->FindAllChildByAttComparison(&artics, &matchType);
+    end->FindAllChildByAttComparison(&artics, &matchType, UNLIMITED_DEPTH, FORWARD, false);
+    
+    // Then the @n of each first staffDef
+    for (articIter = artics.begin(); articIter != artics.end(); articIter++) {
+        Artic *artic = dynamic_cast<Artic *>(*articIter);
+        assert(artic);
+        ArticPart *outsidePart = artic->GetOutsidePart();
+        if (outsidePart) {
+            outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner());
+            if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                LogMessage("push it above");
+                artic->SetColor("red");
+            }
+            else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                LogMessage("push it below");
+                artic->SetColor("green");
+            }
+            else
+                LogMessage("ignore");
+        }
+    }
+
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
@@ -1561,14 +1590,22 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     int code = SMUFL_E4C0_fermataAbove;
     // check for shape
     if (fermata->GetShape() == fermataVis_SHAPE_angular) {
-        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm))) code = SMUFL_E4C5_fermataShortBelow;
-        else code = SMUFL_E4C4_fermataShortAbove;
+        if (fermata->GetForm() == fermataVis_FORM_inv
+            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+            code = SMUFL_E4C5_fermataShortBelow;
+        else
+            code = SMUFL_E4C4_fermataShortAbove;
     }
     else if (fermata->GetShape() == fermataVis_SHAPE_square) {
-        if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm))) code = SMUFL_E4C7_fermataLongBelow;
-        else code = SMUFL_E4C6_fermataLongAbove;
+        if (fermata->GetForm() == fermataVis_FORM_inv
+            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+            code = SMUFL_E4C7_fermataLongBelow;
+        else
+            code = SMUFL_E4C6_fermataLongAbove;
     }
-    else if (fermata->GetForm() == fermataVis_FORM_inv || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm))) code = SMUFL_E4C1_fermataBelow;
+    else if (fermata->GetForm() == fermataVis_FORM_inv
+        || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        code = SMUFL_E4C1_fermataBelow;
 
     std::wstring str;
     str.push_back(code);

@@ -383,7 +383,7 @@ public:
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
     void FindAllChildByAttComparison(ArrayOfObjects *objects, AttComparison *attComparison,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)

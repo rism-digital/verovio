@@ -165,6 +165,8 @@ public:
      */
     bool AlwaysAbove();
 
+    void AddSlurPositioner(FloatingPositioner *positioner);
+
     //----------//
     // Functors //
     //----------//
@@ -193,6 +195,8 @@ private:
      * It is re-computed everytime the object is drawn and it is not stored in the file.
      */
     int m_drawingYRel;
+
+    std::vector<FloatingPositioner *> m_slurPositioners;
 };
 
 } // namespace vrv

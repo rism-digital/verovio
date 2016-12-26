@@ -280,6 +280,13 @@ bool ArticPart::AlwaysAbove()
     return false;
 }
 
+void ArticPart::AddSlurPositioner(FloatingPositioner *positioner)
+{
+    if (std::find(m_slurPositioners.begin(), m_slurPositioners.end(), positioner) == m_slurPositioners.end()) {
+        m_slurPositioners.push_back(positioner);
+    }
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
