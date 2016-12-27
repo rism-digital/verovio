@@ -457,11 +457,6 @@ bool HumdrumInput::convertHumdrum(void)
         }
     }
 
-cerr << " =================================================== " << endl;
-cerr << "FILTERED INPUT " << endl;
-cerr << infile << endl;
-cerr << " =================================================== " << endl;
-
     m_multirest = analyzeMultiRest(infile);
 
     infile.analyzeKernSlurs();
@@ -3993,11 +3988,15 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
     int accidCount = Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
-    if (token->hasCautionaryAccidental(stindex)) {
-        addCautionaryAccidental(note, token, accidCount);
-        showInAccidGes = true;
-        showInAccid = false;
-    }
+	if (!editorial) {
+		// don't mark cautionary accidentals if the note has
+		// an editorial accidental.
+    	if (token->hasCautionaryAccidental(stindex)) {
+        	addCautionaryAccidental(note, token, accidCount);
+        	showInAccidGes = true;
+        	showInAccid = false;
+    	}
+	}
 
 	if (!editorial) {
     	if (showInAccid) {

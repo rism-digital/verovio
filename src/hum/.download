@@ -11,6 +11,6 @@ wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/HumGrid
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/MxmlEvent.cpp -O MxmlEvent.cpp
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/MxmlMeasure.cpp -O MxmlMeasure.cpp
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/MxmlPart.cpp -O MxmlPart.cpp
-wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/musicxml2hum.cpp -O musicxml2hum.cpp
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/tool-musicxml2hum.cpp -O tool-musicxml2hum.cpp
 
 

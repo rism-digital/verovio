@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Dec 24 17:17:32 PST 2016
+// Last Modified: Mon Dec 26 16:35:10 PST 2016
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -11321,6 +11321,12 @@ string HumdrumLine::getTokenString(int index) const {
 //
 
 int HumdrumLine::createTokensFromLine(void) {
+	// delete previous tokens (will need to re-analyze structure
+	// of file after this).
+	for (int i=0; i < (int)m_tokens.size(); i++) {
+		delete m_tokens[i];
+		m_tokens[i] = NULL;
+	}
 	m_tokens.resize(0);
 	HTp token;
 	char ch;
@@ -18018,7 +18024,8 @@ Tool_dissonant::Tool_dissonant(void) {
 	define("k|kern=b",            "print kern pitch grid");
 	define("debug=b",             "print grid cell information");
 	define("e|exinterp=s:**data", "specify exinterp for **data spine");
-	define("c|colorize=b",        "color dissonant notes");
+	define("c|colorize=b",        "color dissonant notes by beat level");
+	define("C|colorize2=b",       "color dissonant notes by dissonant interval");
 }
 
 
@@ -18074,6 +18081,14 @@ bool Tool_dissonant::run(HumdrumFile& infile) {
 		return 1;
 	}
 
+	diss2Q = false;
+	diss7Q = false;
+	diss4Q = false;
+
+	dissL0Q = false;
+	dissL1Q = false;
+	dissL2Q = false;
+
 	vector<vector<string> > results;
 
 	results.resize(grid.getVoiceCount());
@@ -18090,12 +18105,41 @@ bool Tool_dissonant::run(HumdrumFile& infile) {
 		infile.insertDataSpineBefore(track, results[i-1], "", exinterp);
 	}
 
-	if (getBoolean("colorize")) {
-		infile.appendLine("!!!RDF**kern: @ = dissonant marked note, color=\"#33bb00\"");
-	}
+	printColorLegend(infile);
 	infile.createLinesFromTokens();
 
 	return true;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_dissonant::printColorLegend --
+//
+
+void Tool_dissonant::printColorLegend(HumdrumFile& infile) {
+	if (getBoolean("colorize")) {
+		if (dissL0Q) {
+			infile.appendLine("!!!RDF**kern: N = strong dissonant marked note, color=\"#bb3300\"");
+		}
+		if (dissL1Q) {
+			infile.appendLine("!!!RDF**kern: @ = weak 1 dissonant marked note, color=\"#33bb00\"");
+		}
+		if (dissL2Q) {
+			infile.appendLine("!!!RDF**kern: + = weak 2 dissonant marked note, color=\"#0099ff\"");
+		}
+	} else if (getBoolean("colorize2")) {
+		if (diss2Q) {
+			infile.appendLine("!!!RDF**kern: @ = dissonant 2nd, marked note, color=\"#33bb00\"");
+		}
+		if (diss7Q) {
+			infile.appendLine("!!!RDF**kern: + = dissonant 7th, marked note, color=\"#0099ff\"");
+		}
+		if (diss4Q) {
+			infile.appendLine("!!!RDF**kern: N = dissonant 4th marked note, color=\"#bb3300\"");
+		}
+	}
 }
 
 
@@ -18136,6 +18180,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 	}
 	bool nodissonanceQ = getBoolean("no-dissonant");
 	bool colorizeQ = getBoolean("colorize");
+	bool colorize2Q = getBoolean("colorize2");
 
 	HumNum durp;     // duration of previous melodic note;
 	HumNum dur;      // duration of current note;
@@ -18150,13 +18195,23 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 	int sliceindex;  // current timepoint in NoteGrid.
 	vector<double> harmint(grid.getVoiceCount());  // harmonic intervals;
 	bool dissonant;  // true if  note is dissonant with other sounding notes.
-
+	char marking = '\0';
+	
 	for (int i=1; i<(int)attacks.size() - 1; i++) {
 		sliceindex = attacks[i]->getSliceIndex();
 		lineindex = attacks[i]->getLineIndex();
+		marking = '\0';
 
 		// calculate harmonic intervals:
+		double lowestnote = 1000;
+		double tpitch;
 		for (int j=0; j<(int)harmint.size(); j++) {
+			tpitch = grid.cell(j, sliceindex)->getAbsDiatonicPitch();
+			if (!Convert::isNaN(tpitch)) {
+				if (tpitch < lowestnote) {
+					lowestnote = tpitch;
+				}
+			}
 			if (j == vindex) {
 				harmint[j] = 0;
 			}
@@ -18168,6 +18223,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 						*grid.cell(vindex, sliceindex);
 			}
 		}
+
 		// check if current note is dissonant to another sounding note:
 		dissonant = false;
 		for (int j=0; j<(int)harmint.size(); j++) {
@@ -18175,7 +18231,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 				// don't compare to self
 				continue;
 			}
-			if (harmint[j] == NAN) {
+			if (Convert::isNaN(harmint[j])) {
 				// rest, so ignore
 				continue;
 			}
@@ -18189,13 +18245,26 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 			if ((value == 1) || (value == -1)) {
 				// forms a second with another sounding note
 				dissonant = true;
+				diss2Q = true;
+				marking = '@';
 				results[lineindex] = "d2";
 				break;
 			} else if ((value == 6) || (value == -6)) {
 				// forms a seventh with another sounding note
 				dissonant = true;
+				diss7Q = true;
+				marking = '+';
 				results[lineindex] = "d7";
 				break;
+			}
+		}
+		double vpitch = grid.cell(vindex, sliceindex)->getAbsDiatonicPitch();
+		if (vpitch - lowestnote > 0) {
+			if (int(vpitch - lowestnote) % 7 == 3) {
+				diss4Q = true;
+				marking = 'N';
+				results[lineindex] = "d4";
+				dissonant = true;
 			}
 		}
 	
@@ -18207,14 +18276,28 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 		}
 
 		if (colorizeQ) {
+			int metriclevel = attacks[i]->getMetricLevel();
+			if (metriclevel <= 0) {
+				dissL0Q = true;
+				marking = 'N';
+			} else if (metriclevel < 2) {
+				dissL1Q = true;
+				marking = '@';
+			} else {
+				dissL2Q = true;
+				marking = '+';
+			}
+
+		}
+
+		if ((colorizeQ || colorize2Q) && marking) {
 			// mark note
-			char marker = '@';
 			string text = *attacks[i]->getToken();
-			if (text.find(marker) == string::npos) {
-				text += marker;
+			if (text.find(marking) == string::npos) {
+				text += marking;
 				attacks[i]->getToken()->setText(text);
 			}
-		}
+		} 
 
 		durp = attacks[i-1]->getDuration();
 		dur  = attacks[i]->getDuration();
@@ -20163,10 +20246,34 @@ bool Tool_filter::run(HumdrumFile& infile) {
 		}
 	}
 
+	removeFilterLines(infile);
+
 	// Re-load the text for each line from their tokens in case any
 	// updates are needed from token changes.
 	infile.createLinesFromTokens();
 	return status;
+}
+
+
+
+//////////////////////////////
+//
+// Tool_filter::removeFilterLines --
+//
+
+void Tool_filter::removeFilterLines(HumdrumFile& infile) {
+	HumRegex hre;
+	string text;
+	for (int i=0; i<infile.getLineCount(); i++) {
+		if (!infile[i].isReference()) {
+			continue;
+		}
+		if (infile.token(i, 0)->compare(0, 10, "!!!filter:") == 0) { 
+			text = infile.token(i, 0)->getText();
+			hre.replaceDestructive(text, "!!!Xfilter:", "^!!!filter:");
+			infile.token(i, 0)->setText(text);
+		}
+	}
 }
 
 
@@ -21573,7 +21680,7 @@ void Tool_myank::reconcileSpineBoundary(HumdrumFile& infile, int index1, int ind
 			} else {
 				m_humdrum_text << '*';
 			}
-			if (i < splits.size()-1) {
+			if (i < (int)splits.size()-1) {
 				m_humdrum_text << '\t';
 			}
 		}
@@ -21634,7 +21741,7 @@ void Tool_myank::printJoinLine(vector<int>& splits, int index, int count) {
 		} else {
 			m_humdrum_text << "*";
 		}
-		if (i<splits.size()-1) {
+		if (i<(int)splits.size()-1) {
 			m_humdrum_text << "\t";
 		}
 	}
@@ -22183,7 +22290,7 @@ void Tool_myank::fillGlobalDefaults(HumdrumFile& infile, vector<MeasureInfo>& me
 			lastmeasure = currmeasure;
 			currmeasure = hre.getMatchInt(1);
 
-			if (currmeasure < inmap.size()) {
+			if (currmeasure < (int)inmap.size()) {
 				// [20120818] Had to compensate for last measure being single
 				// and un-numbered.
 				if (inmap[currmeasure] < 0) {
@@ -22271,7 +22378,7 @@ void Tool_myank::fillGlobalDefaults(HumdrumFile& infile, vector<MeasureInfo>& me
 	}
 
 	// store state of global music values at end of music
-	if ((currmeasure >= 0) && (currmeasure < inmap.size()) 
+	if ((currmeasure >= 0) && (currmeasure < (int)inmap.size()) 
 			&& (inmap[currmeasure] >= 0)) {
 		measurein[inmap[currmeasure]].eclef    = currclef;
 		measurein[inmap[currmeasure]].ekeysig  = currkeysig;
@@ -22410,11 +22517,11 @@ void Tool_myank::fillGlobalDefaults(HumdrumFile& infile, vector<MeasureInfo>& me
 		}
 		if (measurein[i+1].smet.size() == 0) {
 			measurein[i+1].smet.resize(tracks+1);
-			fill(measurein[i+1].smet.begin(), measurein[i].smet.end(), undefMyCoord);
+			fill(measurein[i+1].smet.begin(), measurein[i+1].smet.end(), undefMyCoord);
 		}
 		if (measurein[i+1].emet.size() == 0) {
 			measurein[i+1].emet.resize(tracks+1);
-			fill(measurein[i+1].emet.begin(), measurein[i].emet.end(), undefMyCoord);
+			fill(measurein[i+1].emet.begin(), measurein[i+1].emet.end(), undefMyCoord);
 		}
 		for (j=1; j<(int)measurein[i].smet.size(); j++) {
 			if (!measurein[i].emet[j].isValid()) {

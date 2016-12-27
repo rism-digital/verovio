@@ -421,8 +421,8 @@ bool Toolkit::LoadData(const std::string &data)
             return false;
         }
 
+        SetHumdrumBuffer(tempinput->GetHumdrumString().c_str());
         if (GetOutputFormat() == HUMDRUM) {
-            SetHumdrumBuffer(tempinput->GetHumdrumString().c_str());
             return true;
         }
 
@@ -444,7 +444,7 @@ bool Toolkit::LoadData(const std::string &data)
         // LogMessage("Importing MusicXML data via Humdrum");
 
         // First convert from MusicXML into Humdrum:
-        hum::musicxml2hum_interface converter;
+        hum::Tool_musicxml2hum converter;
         pugi::xml_document xmlfile;
         xmlfile.load(data.c_str());
         stringstream conversion;
@@ -982,6 +982,7 @@ void Toolkit::SetHumdrumBuffer(const char *data)
             return;
         }
         strcpy(m_humdrumBuffer, output.c_str());
+	cerr << "STORING HUMDRUM DATA: " << output << endl;
     }
     else {
         int size = strlen(data) + 1;
