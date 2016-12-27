@@ -282,6 +282,7 @@ protected:
     string getAutoClef(hum::HTp partstart, int partnumber);
     void colorNote(vrv::Note *note, hum::HTp token);
     vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
+	void addArtiulations(vrv::Note *note, hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);

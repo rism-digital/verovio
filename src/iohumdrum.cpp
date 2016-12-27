@@ -46,6 +46,7 @@
 #ifndef NO_HUMDRUM_SUPPORT
 
 #include "accid.h"
+#include "artic.h"
 #include "beam.h"
 #include "chord.h"
 #include "dir.h"
@@ -2192,6 +2193,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 note->SetStemLen(0);
             }
             colorNote(note, layerdata[i]);
+            addArtiulations(note, layerdata[i]);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -2208,6 +2210,29 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
     return true;
 }
+
+
+
+//////////////////////////////
+//
+// HumdrumInput::addArticulations --
+//
+
+void HumdrumInput::addArtiulations(Note *note, HTp token) {
+	std::vector<data_ARTICULATION> artics;
+
+	if (token->find('\'') != string::npos) {
+		artics.push_back(ARTICULATION_stacc);
+	}
+
+	if (artics.size() > 0) {
+		Artic *artic = new Artic;
+        appendElement(note, artic);
+		artic->SetArtic(artics);
+	}
+}
+
+
 
 //////////////////////////////
 //
