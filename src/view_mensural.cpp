@@ -21,6 +21,7 @@
 #include "mensur.h"
 #include "note.h"
 #include "proport.h"
+#include "rest.h"
 #include "smufl.h"
 #include "staff.h"
 #include "style.h"
@@ -196,6 +197,47 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     DrawLayerChildren(dc, note, layer, staff, measure);
 }
 
+    void View::DrawMensuralRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+    {
+        assert(dc);
+        assert(element);
+        assert(layer);
+        assert(staff);
+        assert(measure);
+        
+        wchar_t charCode;
+
+        Rest *rest = dynamic_cast<Rest *>(element);
+        assert(rest);
+
+        int staffSize = staff->m_drawingStaffSize;
+        // Mensural symbols are usually somewhat smaller than CMN symbols for the same size
+        // staff; use _pseudoStaffSize_ to force this for fonts that don't consider that fact.
+        int pseudoStaffSize = (int)(TEMP_MNOTEHEAD_SIZE_FACTOR * staff->m_drawingStaffSize);
+
+        bool drawingCueSize = rest->IsCueSize();
+        int drawingDur = rest->GetActualDur();
+        int x = element->GetDrawingX();
+        int y = element->GetDrawingY();
+        
+        if (drawingDur > DUR_2) {
+            x -= m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize) / 2;
+        }
+        
+        switch (drawingDur) {
+            case DUR_LG: DrawRestLong(dc, x, y, staff); break;
+            case DUR_BR: DrawRestBreve(dc, x, y, staff); break;
+            case DUR_1:
+            case DUR_2: DrawRestWhole(dc, x, y, drawingDur, rest->GetDots(), drawingCueSize, staff); break;
+            default: //DrawRestQuarter(dc, x, y, drawingDur, rest->GetDots(), drawingCueSize, staff);
+                    charCode = SMUFL_E9F6_mensuralRestSemiminima;
+                    DrawSmuflCode(dc, x, y, charCode, pseudoStaffSize, false);
+        }
+    }
+
+
+
+    
 void View::DrawMensur(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -304,7 +346,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     // this will not work if the pseudo size is changed
     int shortening = 0.9 * m_doc->GetDrawingUnit(staffSize);
 
-    LogDebug("DrawMensuralStem: drawingDur=%d mensural_black=%d nbFlags=%d", drawingDur, mensural_black, nbFlags);
+    //LogDebug("DrawMensuralStem: drawingDur=%d mensural_black=%d nbFlags=%d", drawingDur, mensural_black, nbFlags);
     int stemY1 = (dir == STEMDIRECTION_up) ? y1 + shortening : y1 - shortening;
     int stemY2 = y2;
     if (nbFlags>0) {

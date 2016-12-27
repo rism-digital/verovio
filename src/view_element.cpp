@@ -1502,6 +1502,11 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
 
+    if (rest->IsMensural()) {
+        DrawMensuralRest(dc, element, layer, staff, measure);
+        return;
+    }
+
     bool drawingCueSize = rest->IsCueSize();
     int drawingDur = rest->GetActualDur();
     int x = element->GetDrawingX();
