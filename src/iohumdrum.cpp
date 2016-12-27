@@ -2216,13 +2216,75 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 //////////////////////////////
 //
 // HumdrumInput::addArticulations --
+// 
+// from: libmei/atttypes.h:
+// enum data_ARTICULATION {
+//    ARTICULATION_NONE = 0,             implemented:
+//    ARTICULATION_acc,                        *
+//    ARTICULATION_stacc,                      *
+//    ARTICULATION_ten,                        *
+//    ARTICULATION_stacciss,                   *
+//    ARTICULATION_marc,                       *
+//    ARTICULATION_marc_stacc,                 *
+//    ARTICULATION_spicc,
+//    ARTICULATION_doit,
+//    ARTICULATION_scoop,
+//    ARTICULATION_rip,
+//    ARTICULATION_plop,
+//    ARTICULATION_fall,
+//    ARTICULATION_longfall,
+//    ARTICULATION_bend,
+//    ARTICULATION_flip,
+//    ARTICULATION_smear,
+//    ARTICULATION_shake,
+//    ARTICULATION_dnbow,
+//    ARTICULATION_upbow,
+//    ARTICULATION_harm,                       *
+//    ARTICULATION_snap,
+//    ARTICULATION_fingernail,
+//    ARTICULATION_ten_stacc,                  *
+//    ARTICULATION_damp,
+//    ARTICULATION_dampall,
+//    ARTICULATION_open,
+//    ARTICULATION_stop,
+//    ARTICULATION_dbltongue,
+//    ARTICULATION_trpltongue,
+//    ARTICULATION_heel,
+//    ARTICULATION_toe,
+//    ARTICULATION_tap,
+//    ARTICULATION_lhpizz,
+//    ARTICULATION_dot,
+//    ARTICULATION_stroke,
+//};
 //
 
 void HumdrumInput::addArtiulations(Note *note, HTp token) {
 	std::vector<data_ARTICULATION> artics;
 
 	if (token->find('\'') != string::npos) {
-		artics.push_back(ARTICULATION_stacc);
+		if (token->find("''") != string::npos) {
+			artics.push_back(ARTICULATION_stacciss);
+		} else if (token->find("^^") != string::npos) {
+			artics.push_back(ARTICULATION_marc_stacc);
+		//} else if (token->find('^') != string::npos) {
+		//	artics.push_back(ARTICULATION_acc_stacc);
+		} else if (token->find('~') != string::npos) {
+			artics.push_back(ARTICULATION_ten_stacc);
+		} else {
+			artics.push_back(ARTICULATION_stacc);
+		}
+	} else if (token->find('`') != string::npos) {
+		artics.push_back(ARTICULATION_stacciss);
+	} else if (token->find('^') != string::npos) {
+		if (token->find("^^") != string::npos) {
+			artics.push_back(ARTICULATION_marc);
+		} else {
+			artics.push_back(ARTICULATION_acc);
+		}
+	} else if (token->find('~') != string::npos) {
+		artics.push_back(ARTICULATION_ten);
+	} else if (token->find('o') != string::npos) {
+		artics.push_back(ARTICULATION_harm);
 	}
 
 	if (artics.size() > 0) {
