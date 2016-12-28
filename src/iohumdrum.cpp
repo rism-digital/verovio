@@ -1543,7 +1543,9 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
                 layerindex++;
             }
             lasttrack = track;
-            if (infile[i].token(j)->isNull()) {
+            if (infile[i].token(j)->isData() && infile[i].token(j)->isNull()) {
+                // keeping null interpretations to search for clef
+                // in primary layer for secondary layer duplication.
                 continue;
             }
             if ((int)lt[staffindex].size() < layerindex + 1) {
@@ -2123,7 +2125,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         if (prespace[i] > 0) {
             addSpace(elements, pointers, prespace[i]);
         }
-        if (layerdata[i]->isNull()) {
+        if (layerdata[i]->isData() && layerdata[i]->isNull()) {
             continue;
         }
         if (layerdata[i]->isInterpretation()) {
@@ -2133,6 +2135,21 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (layerdata[i]->getDurationFromStart() != 0) {
                 if (layerdata[i]->isClef()) {
                     insertClefElement(elements, pointers, layerdata[i]);
+                }
+                else if (layerdata[i]->isNull()) {
+                    // duplicate clef changes in secondary layers
+                    int xtrack = layerdata[i]->getTrack();
+                    HTp tok = layerdata[i]->getPreviousFieldToken();
+                    while (tok) {
+                        int ttrack = tok->getTrack();
+                        if (ttrack == xtrack) {
+                            if (tok->isClef()) {
+                                insertClefElement(elements, pointers, tok);
+                                break;
+                            }
+                        }
+                        tok = layerdata[i]->getPreviousFieldToken();
+                    }
                 }
             }
             if (layerdata[i]->isTimeSignature()) {
