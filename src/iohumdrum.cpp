@@ -2156,7 +2156,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                                 break;
                             }
                         }
-                        tok = layerdata[i]->getPreviousFieldToken();
+                        tok = tok->getPreviousFieldToken();
                     }
                 }
             }
