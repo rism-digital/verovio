@@ -22,8 +22,8 @@
 
 #ifndef NO_HUMDRUM_SUPPORT
 #include "humlib.h"
-#include "tool-musicxml2hum.h"
 #include "pugixml.hpp"
+#include "tool-musicxml2hum.h"
 #endif /* NO_HUMDRUM_SUPPORT */
 
 //----------------------------------------------------------------------------
@@ -164,7 +164,7 @@ public:
 
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
-	char editacc = '\0'; // !!!RDF**kern: i = editorial accidental
+    char editacc = '\0'; // !!!RDF**kern: i = editorial accidental
 
     // coloring of notes (add rests later):
     // !!!RDF**kern: i = marked note, color="#553325"
@@ -234,7 +234,7 @@ protected:
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
     void processTieStart(Note *note, hum::HTp token, const string &tstring);
     void processTieEnd(Note *note, hum::HTp token, const string &tstring);
-    void printNoteArticulations(Note *note, hum::HTp token, const string &tstring);
+    void addFermata(hum::HTp token);
     void getTimingInformation(vector<hum::HumNum> &prespace, vector<hum::HTp> &layerdata, hum::HumNum layerstarttime,
         hum::HumNum layerendtime);
     void convertChord(Chord *chord, hum::HTp token, int staffindex);
@@ -295,7 +295,7 @@ protected:
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
 
-	template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
+    template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
 
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
 

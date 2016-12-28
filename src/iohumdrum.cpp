@@ -33,9 +33,9 @@
 #include <algorithm>
 #include <assert.h>
 #include <cctype>
+#include <regex>
 #include <sstream>
 #include <vector>
-#include <regex>
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
@@ -52,6 +52,7 @@
 #include "dir.h"
 #include "dynam.h"
 #include "editorial.h"
+#include "fermata.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "iomei.h"
@@ -2157,7 +2158,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processSlur(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
             processDirection(layerdata[i], staffindex);
-			addArticulations(chord, layerdata[i]);
+            addArticulations(chord, layerdata[i]);
+            addFermata(layerdata[i]);
         }
         else if (layerdata[i]->isRest()) {
             if (layerdata[i]->find("yy") != string::npos) {
@@ -2195,6 +2197,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             colorNote(note, layerdata[i]);
             addArticulations(note, layerdata[i]);
+            addFermata(layerdata[i]);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -2212,12 +2215,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     return true;
 }
 
-
-
 //////////////////////////////
 //
 // HumdrumInput::addArticulations --
-// 
+//
 // from: libmei/atttypes.h:
 // enum data_ARTICULATION {
 //    ARTICULATION_NONE = 0,             implemented:
@@ -2259,43 +2260,50 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 //};
 //
 
-template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hum::HTp token) {
-	std::vector<data_ARTICULATION> artics;
+template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hum::HTp token)
+{
+    std::vector<data_ARTICULATION> artics;
 
-	if (token->find('\'') != string::npos) {
-		if (token->find("''") != string::npos) {
-			artics.push_back(ARTICULATION_stacciss);
-		} else if (token->find("^^") != string::npos) {
-			artics.push_back(ARTICULATION_marc_stacc);
-		//} else if (token->find('^') != string::npos) {
-		//	artics.push_back(ARTICULATION_acc_stacc);
-		} else if (token->find('~') != string::npos) {
-			artics.push_back(ARTICULATION_ten_stacc);
-		} else {
-			artics.push_back(ARTICULATION_stacc);
-		}
-	} else if (token->find('`') != string::npos) {
-		artics.push_back(ARTICULATION_stacciss);
-	} else if (token->find('^') != string::npos) {
-		if (token->find("^^") != string::npos) {
-			artics.push_back(ARTICULATION_marc);
-		} else {
-			artics.push_back(ARTICULATION_acc);
-		}
-	} else if (token->find('~') != string::npos) {
-		artics.push_back(ARTICULATION_ten);
-	} else if (token->find('o') != string::npos) {
-		artics.push_back(ARTICULATION_harm);
-	}
+    if (token->find('\'') != string::npos) {
+        if (token->find("''") != string::npos) {
+            artics.push_back(ARTICULATION_stacciss);
+        }
+        else if (token->find("^^") != string::npos) {
+            artics.push_back(ARTICULATION_marc_stacc);
+            //} else if (token->find('^') != string::npos) {
+            //	artics.push_back(ARTICULATION_acc_stacc);
+        }
+        else if (token->find('~') != string::npos) {
+            artics.push_back(ARTICULATION_ten_stacc);
+        }
+        else {
+            artics.push_back(ARTICULATION_stacc);
+        }
+    }
+    else if (token->find('`') != string::npos) {
+        artics.push_back(ARTICULATION_stacciss);
+    }
+    else if (token->find('^') != string::npos) {
+        if (token->find("^^") != string::npos) {
+            artics.push_back(ARTICULATION_marc);
+        }
+        else {
+            artics.push_back(ARTICULATION_acc);
+        }
+    }
+    else if (token->find('~') != string::npos) {
+        artics.push_back(ARTICULATION_ten);
+    }
+    else if (token->find('o') != string::npos) {
+        artics.push_back(ARTICULATION_harm);
+    }
 
-	if (artics.size() > 0) {
-		Artic *artic = new Artic;
+    if (artics.size() > 0) {
+        Artic *artic = new Artic;
         appendElement(element, artic);
-		artic->SetArtic(artics);
-	}
+        artic->SetArtic(artics);
+    }
 }
-
-
 
 //////////////////////////////
 //
@@ -4066,55 +4074,54 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
         case 6: note->SetPname(PITCHNAME_b); break;
     }
 
-	bool editorial = false;
-	if (m_signifiers.editacc) {
-		if (token->find(m_signifiers.editacc) != string::npos) {
-			editorial = true;
-		}
-	}
+    bool editorial = false;
+    if (m_signifiers.editacc) {
+        if (token->find(m_signifiers.editacc) != string::npos) {
+            editorial = true;
+        }
+    }
 
     int accidCount = Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
-	if (!editorial) {
-		// don't mark cautionary accidentals if the note has
-		// an editorial accidental.
-    	if (token->hasCautionaryAccidental(stindex)) {
-        	addCautionaryAccidental(note, token, accidCount);
-        	showInAccidGes = true;
-        	showInAccid = false;
-    	}
-	}
+    if (!editorial) {
+        // don't mark cautionary accidentals if the note has
+        // an editorial accidental.
+        if (token->hasCautionaryAccidental(stindex)) {
+            addCautionaryAccidental(note, token, accidCount);
+            showInAccidGes = true;
+            showInAccid = false;
+        }
+    }
 
-	if (!editorial) {
-    	if (showInAccid) {
-        	switch (accidCount) {
-            	// case +3: note->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
-            	case +2: note->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
-            	case +1: note->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
-            	case 0: note->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
-            	case -1: note->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
-            	case -2:
-                	note->SetAccid(ACCIDENTAL_EXPLICIT_ff);
-                	break;
-                	// case -3: note->SetAccid(ACCIDENTAL_EXPLICIT_tf); break;
-        	}
-    	}
-	} else {
-		Accid *accid = new Accid;
+    if (!editorial) {
+        if (showInAccid) {
+            switch (accidCount) {
+                // case +3: note->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
+                case +2: note->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
+                case +1: note->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
+                case 0: note->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
+                case -1: note->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
+                case -2:
+                    note->SetAccid(ACCIDENTAL_EXPLICIT_ff);
+                    break;
+                    // case -3: note->SetAccid(ACCIDENTAL_EXPLICIT_tf); break;
+            }
+        }
+    }
+    else {
+        Accid *accid = new Accid;
         appendElement(note, accid);
-		accid->SetFunc(accidLog_FUNC_edit);
-		
-       	switch (accidCount) {
-           	case +2: accid->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
-           	case +1: accid->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
-           	case 0: accid->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
-           	case -1: accid->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
-           	case -2:
-               	accid->SetAccid(ACCIDENTAL_EXPLICIT_ff);
-               	break;
-       	}
-	}
+        accid->SetFunc(accidLog_FUNC_edit);
+
+        switch (accidCount) {
+            case +2: accid->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
+            case +1: accid->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
+            case 0: accid->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
+            case -1: accid->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
+            case -2: accid->SetAccid(ACCIDENTAL_EXPLICIT_ff); break;
+        }
+    }
 
     if (showInAccidGes) {
         switch (accidCount) {
@@ -4152,9 +4159,6 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
     if (tstring.find("yy") != string::npos) {
         note->SetVisible(BOOLEAN_false);
     }
-
-    // handle note articulations
-    printNoteArticulations(note, token, tstring);
 
     // handle ties
     if ((tstring.find("[") != string::npos) || (tstring.find("_") != string::npos)) {
@@ -4362,28 +4366,36 @@ template <class ELEMENT> HumNum HumdrumInput::convertRhythm(ELEMENT element, HTp
 
 //////////////////////////////
 //
-// HumdrumInput::printNoteArticulations -- Print articulations for notes.
+// HumdrumInput::addFermata -- Add floating fermatas for note/chord.
 //
 
-void HumdrumInput::printNoteArticulations(Note *note, HTp token, const string &tstring)
+void HumdrumInput::addFermata(HTp token)
 {
-    // bool chordQ = token->isChord();
     int layer = m_currentlayer;
+    int staff = m_currentstaff;
 
-    if (tstring.find(";") != string::npos) {
-        if ((tstring.find("yy") == string::npos) && (tstring.find(";y") == string::npos)) {
+    if (token->find(";") != string::npos) {
+        if ((token->find("yy") == string::npos) && (token->find(";y") == string::npos)) {
+            Fermata *fermata = new Fermata;
+            appendElement(m_measure, fermata);
+            setStaff(fermata, staff);
+            HumNum tstamp = getMeasureTstamp(token, staff - 1);
+            fermata->SetTstamp(tstamp.getFloat());
+
             if (layer == 1) {
-                note->SetFermata(PLACE_above);
+                // note->SetFermata(PLACE_above);
+                fermata->SetPlace(STAFFREL_above);
             }
             else if (layer == 2) {
-                note->SetFermata(PLACE_below);
+                // note->SetFermata(PLACE_below);
+                fermata->SetPlace(STAFFREL_below);
             }
-            else {
-                // who knows, maybe check the stem direction or see
-                // if another note in a different layer already
-                // has a fermata (so you would not want to overwrite them).
-                note->SetFermata(PLACE_above);
-            }
+            // else {
+            //    // who knows, maybe check the stem direction or see
+            //    // if another note in a different layer already
+            //    // has a fermata (so you would not want to overwrite them).
+            //    note->SetFermata(PLACE_above);
+            //}
         }
     }
 }
@@ -5254,7 +5266,7 @@ void HumdrumInput::parseSignifiers(HumdrumFile &infile)
             continue;
         }
 
-		// editorial accidentals:
+        // editorial accidentals:
         if (value.find("editorial accidental", equals) != string::npos) {
             m_signifiers.editacc = signifier;
             continue;
