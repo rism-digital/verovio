@@ -2561,6 +2561,9 @@ void HumdrumInput::processDynamics(HTp token, int staffindex)
         else if (letters == "fp") {
             dynamic = "fp";
         }
+        else if (letters == "ffp") {
+            dynamic = "ffp";
+        }
         else if (letters == "sfp") {
             dynamic = "sfp";
         }
