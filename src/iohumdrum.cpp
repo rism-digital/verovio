@@ -2157,6 +2157,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processSlur(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
             processDirection(layerdata[i], staffindex);
+			addArticulations(chord, layerdata[i]);
         }
         else if (layerdata[i]->isRest()) {
             if (layerdata[i]->find("yy") != string::npos) {
@@ -2193,7 +2194,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 note->SetStemLen(0);
             }
             colorNote(note, layerdata[i]);
-            addArtiulations(note, layerdata[i]);
+            addArticulations(note, layerdata[i]);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -2258,7 +2259,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 //};
 //
 
-void HumdrumInput::addArtiulations(Note *note, HTp token) {
+template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hum::HTp token) {
 	std::vector<data_ARTICULATION> artics;
 
 	if (token->find('\'') != string::npos) {
@@ -2289,7 +2290,7 @@ void HumdrumInput::addArtiulations(Note *note, HTp token) {
 
 	if (artics.size() > 0) {
 		Artic *artic = new Artic;
-        appendElement(note, artic);
+        appendElement(element, artic);
 		artic->SetArtic(artics);
 	}
 }

@@ -282,7 +282,6 @@ protected:
     string getAutoClef(hum::HTp partstart, int partnumber);
     void colorNote(vrv::Note *note, hum::HTp token);
     vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
-	void addArtiulations(vrv::Note *note, hum::HTp token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -295,6 +294,8 @@ protected:
 
     /// Templates ///////////////////////////////////////////////////////////
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
+
+	template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
 
     template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
 
