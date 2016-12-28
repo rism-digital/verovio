@@ -1285,7 +1285,7 @@ void HumdrumInput::setTimeSig(StaffDef *part, const string &timesig)
 // HumdrumInput::setKeySig -- Convert a Humdrum keysig to an MEI keysig.
 //
 
-void HumdrumInput::setKeySig(StaffDef *part, const string &keysig)
+template <class ELEMENT> void HumdrumInput::setKeySig(ELEMENT element, const string &keysig)
 {
     bool fs = keysig.find("f#") != string::npos;
     bool cs = keysig.find("c#") != string::npos;
@@ -1304,53 +1304,53 @@ void HumdrumInput::setKeySig(StaffDef *part, const string &keysig)
     bool fb = keysig.find("f-") != string::npos;
 
     if (fs && !cs && !gs && !ds && !as && !es && !bs) {
-        part->SetKeySig(KEYSIGNATURE_1s);
+        element->SetKeySig(KEYSIGNATURE_1s);
     }
     else if (fs && cs && !gs && !ds && !as && !es && !bs) {
-        part->SetKeySig(KEYSIGNATURE_2s);
+        element->SetKeySig(KEYSIGNATURE_2s);
     }
     else if (fs && cs && gs && !ds && !as && !es && !bs) {
-        part->SetKeySig(KEYSIGNATURE_3s);
+        element->SetKeySig(KEYSIGNATURE_3s);
     }
     else if (fs && cs && gs && ds && !as && !es && !bs) {
-        part->SetKeySig(KEYSIGNATURE_4s);
+        element->SetKeySig(KEYSIGNATURE_4s);
     }
     else if (fs && cs && gs && ds && as && !es && !bs) {
-        part->SetKeySig(KEYSIGNATURE_5s);
+        element->SetKeySig(KEYSIGNATURE_5s);
     }
     else if (fs && cs && gs && ds && as && es && !bs) {
-        part->SetKeySig(KEYSIGNATURE_6s);
+        element->SetKeySig(KEYSIGNATURE_6s);
     }
     else if (fs && cs && gs && ds && as && es && bs) {
-        part->SetKeySig(KEYSIGNATURE_7s);
+        element->SetKeySig(KEYSIGNATURE_7s);
     }
     else if (bb && !eb && !ab && !db && !gb && !cb && !fb) {
-        part->SetKeySig(KEYSIGNATURE_1f);
+        element->SetKeySig(KEYSIGNATURE_1f);
     }
     else if (bb && eb && !ab && !db && !gb && !cb && !fb) {
-        part->SetKeySig(KEYSIGNATURE_2f);
+        element->SetKeySig(KEYSIGNATURE_2f);
     }
     else if (bb && eb && ab && !db && !gb && !cb && !fb) {
-        part->SetKeySig(KEYSIGNATURE_3f);
+        element->SetKeySig(KEYSIGNATURE_3f);
     }
     else if (bb && eb && ab && db && !gb && !cb && !fb) {
-        part->SetKeySig(KEYSIGNATURE_4f);
+        element->SetKeySig(KEYSIGNATURE_4f);
     }
     else if (bb && eb && ab && db && gb && !cb && !fb) {
-        part->SetKeySig(KEYSIGNATURE_5f);
+        element->SetKeySig(KEYSIGNATURE_5f);
     }
     else if (bb && eb && ab && db && gb && cb && !fb) {
-        part->SetKeySig(KEYSIGNATURE_6f);
+        element->SetKeySig(KEYSIGNATURE_6f);
     }
     else if (bb && eb && ab && db && gb && cb && fb) {
-        part->SetKeySig(KEYSIGNATURE_7f);
+        element->SetKeySig(KEYSIGNATURE_7f);
     }
     else if (!bb && !eb && !ab && !db && !gb && !cb && !fb && !fs && !cs && !gs && !ds && !as && !es && !bs) {
-        part->SetKeySig(KEYSIGNATURE_0);
+        element->SetKeySig(KEYSIGNATURE_0);
     }
     else {
         // nonstandard keysignature, so give a NONE style.
-        part->SetKeySig(KEYSIGNATURE_NONE);
+        element->SetKeySig(KEYSIGNATURE_NONE);
     }
 }
 
@@ -2136,7 +2136,10 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 }
             }
             if (layerdata[i]->isTimeSignature()) {
-                insertMeterSigElement(elements, pointers, layerdata, i);
+                // Now done at the measure level.  This location might
+                // be good for time signatures which change in the
+                // middle of measures.
+                // insertMeterSigElement(elements, pointers, layerdata, i);
             }
         }
         if (!layerdata[i]->isData()) {
@@ -2884,6 +2887,66 @@ void HumdrumInput::insertMeterSigElement(
         msig->SetUnit(unit);
     }
     // check for mensuration here.
+}
+
+/////////////////////////////
+//
+// HumdrumInput::addSystemKeyTimeChange -- Add key or time signature changes
+//    for a measure.  The scoreDef element is inserted before the measure in
+//    which the change occurs. Presuming all staves have same changes for now.
+//
+
+void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
+{
+    HumdrumFile &infile = m_infile;
+
+    HTp keysig = NULL;
+    HTp timesig = NULL;
+
+    for (int i = startline; i <= endline; i++) {
+        if (infile[i].isData()) {
+            break;
+        }
+        if (!infile[i].isInterpretation()) {
+            continue;
+        }
+        for (int j = 0; j < infile[i].getFieldCount(); j++) {
+            if ((!timesig) && regex_search(*infile.token(i, j), regex(R"(^\*M\d+/\d+)"))) {
+                timesig = infile.token(i, j);
+            }
+            if ((!keysig) && regex_search(*infile.token(i, j), regex(R"(^\*k\[.*\])"))) {
+                keysig = infile.token(i, j);
+            }
+        }
+    }
+
+    if ((keysig == NULL) && (timesig == NULL)) {
+        // no key or time signature changes.
+        return;
+    }
+
+    ScoreDef *scoreDef = new ScoreDef;
+    m_sections.back()->AddChild(scoreDef);
+
+    //    <scoreDef meter.count="6" meter.unit="8" key.sig="1f"/>
+
+    if (timesig) {
+        // cerr << "TIMESIG = " << timesig << endl;
+        int count = -1;
+        int unit = -1;
+        smatch matches;
+        if (regex_search(*timesig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
+            count = stoi(matches[1]);
+            unit = stoi(matches[2]);
+            scoreDef->SetMeterCount(count);
+            scoreDef->SetMeterUnit(unit);
+        }
+    }
+
+    if (keysig) {
+        // cerr << "KEYSIG = " << keysig << endl;
+        setKeySig(scoreDef, *((string *)keysig));
+    }
 }
 
 /////////////////////////////
@@ -4643,12 +4706,18 @@ vector<int> HumdrumInput::getStaffLayerCounts(void)
 //////////////////////////////
 //
 // HumdrumInput::setupSystemMeasure -- prepare a new system measure.
+//   Also checks if the key or time signatures change at the start
+//   of the measures (other than the first measure of a score).
 //
 
 void HumdrumInput::setupSystemMeasure(int startline, int endline)
 {
     if (m_oclef.size()) {
         storeOriginalClefApp();
+    }
+
+    if (m_infile[startline].getDurationFromStart() > 0) {
+        addSystemKeyTimeChange(startline, endline);
     }
 
     m_measure = new Measure();

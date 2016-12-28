@@ -215,7 +215,6 @@ protected:
     vector<int> getStaffLayerCounts(void);
     void prepareStaffGroup(void);
     void setClef(StaffDef *part, const string &clef);
-    void setKeySig(StaffDef *part, const string &keysig);
     void setTimeSig(StaffDef *part, const string &timesig);
     void setMeterSymbol(StaffDef *part, const string &metersig);
     void fillPartInfo(hum::HTp partstart, int partnumber);
@@ -282,6 +281,7 @@ protected:
     string getAutoClef(hum::HTp partstart, int partnumber);
     void colorNote(vrv::Note *note, hum::HTp token);
     vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
+    void addSystemKeyTimeChange(int startline, int endline);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -293,6 +293,7 @@ protected:
     void insertRespStmt(pugi::xml_node &titleStmt, vector<vector<string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
+    template <class ELEMENT> void setKeySig(ELEMENT element, const string &keysig);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
 
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
