@@ -9,6 +9,7 @@
 
 #include <assert.h>
 #include <iostream>
+#include <math.h>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -37,6 +38,8 @@
 #include "vrv.h"
 
 namespace vrv {
+
+int BoundingBox::s_deCasteljau[4][4];
 
 //----------------------------------------------------------------------------
 // BoundingBox
@@ -182,10 +185,71 @@ bool BoundingBox::HorizontalOverlap(const BoundingBox *other) const
     return true;
 }
 
-int BoundingBox::CalcVerticalOverlap(const BoundingBox *other) const
+bool BoundingBox::IsWithin(const Point point) const
 {
-    assert(other);
-    return 0;
+    if (m_drawingX + m_contentBB_x2 < point.x) return false;
+    if (m_drawingX + m_contentBB_x1 > point.x) return false;
+    if (m_drawingY + m_contentBB_y2 < point.y) return false;
+    if (m_drawingY + m_contentBB_y1 > point.y) return false;
+    return true;
+}
+
+//----------------------------------------------------------------------------
+// Static methods for BoundingBox
+//----------------------------------------------------------------------------
+
+void BoundingBox::SwapPoints(Point *x1, Point *x2)
+{
+    Point a;
+    a = *x1;
+    *x1 = *x2;
+    *x2 = a;
+}
+
+Point BoundingBox::CalcPositionAfterRotation(Point point, float rot_alpha, Point center)
+{
+    float s = sin(rot_alpha);
+    float c = cos(rot_alpha);
+
+    // translate point back to origin:
+    point.x -= center.x;
+    point.y -= center.y;
+
+    // rotate point
+    float xnew = point.x * c - point.y * s;
+    float ynew = point.x * s + point.y * c;
+
+    // translate point back:
+    point.x = xnew + center.x;
+    point.y = ynew + center.y;
+    return point;
+}
+
+int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x)
+{
+    // berzier parameter is point1, point2, control1, control2; change it to p1-c1-c2-p2
+    Point bezierPCCP[4];
+    bezierPCCP[0] = bezier[0];
+    bezierPCCP[1] = bezier[2];
+    bezierPCCP[2] = bezier[3];
+    bezierPCCP[3] = bezier[1];
+
+    int i, j;
+    double t = 0.0;
+    // avoid division by 0
+    if (bezierPCCP[3].x != bezierPCCP[0].x)
+        t = (double)(x - bezierPCCP[0].x) / (double)(bezierPCCP[3].x - bezierPCCP[0].x);
+    t = std::min(1.0, std::max(0.0, t));
+    int n = 4;
+
+    for (i = 0; i < n; i++) BoundingBox::s_deCasteljau[0][i] = bezierPCCP[i].y;
+    for (j = 1; j < n; j++) {
+        for (int i = 0; i < 4 - j; i++) {
+            BoundingBox::s_deCasteljau[j][i]
+                = BoundingBox::s_deCasteljau[j - 1][i] * (1 - t) + BoundingBox::s_deCasteljau[j - 1][i + 1] * t;
+        }
+    }
+    return BoundingBox::s_deCasteljau[n - 1][0];
 }
 
 //----------------------------------------------------------------------------

@@ -449,33 +449,6 @@ private:
      */
     bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjustHorizontally);
 
-    /**
-     * Swap the points passed as reference.
-     * This is useful for example when calculating bezier positions.
-     */
-    static void SwapPoints(Point *x1, Point *x2);
-
-    /**
-     * Calculate the position of a point after a rotation of rot_alpha around the center
-     */
-    static Point CalcPositionAfterRotation(Point point, float rot_alpha, Point center);
-
-    /**
-     * Calculate the position of a point after a rotation of rot_alpha around the center
-     */
-    static int CalcBezierAtPosition(const Point bezier[4], int x);
-
-    /**
-     * Swap values passed as reference.
-     * This is useful for example when switching to the device context world.
-     */
-    static void SwapY(int *y1, int *y2)
-    {
-        int tmp = *y1;
-        *y1 = *y2;
-        *y2 = tmp;
-    }
-
 public:
     /** Document */
     Doc *m_doc;
@@ -511,9 +484,6 @@ protected:
     ScoreDef m_drawingScoreDef;
 
 private:
-    /** buffer for De-Casteljau algorithm */
-    static int s_deCasteljau[4][4];
-
     /** @name Internal values for storing temporary values for ligatures */
     ///@{
     static int s_drawingLigX[2], s_drawingLigY[2];

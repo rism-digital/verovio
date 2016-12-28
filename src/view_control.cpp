@@ -240,7 +240,7 @@ void View::DrawHairpin(
     int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
     // We calculate points for cresc by default. Start/End have to be swapped
-    if (form == hairpinLog_FORM_dim) View::SwapY(&startY, &endY);
+    if (form == hairpinLog_FORM_dim) BoundingBox::SwapY(&startY, &endY);
 
     // int y1 = GetHairpinY(hairpin->GetPlace(), staff);
     int y1 = hairpin->GetDrawingY();
@@ -831,7 +831,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
 
     float slurAngle = GetAdjustedSlurAngle(p1, p2, curveDir);
 
-    Point rotatedP2 = View::CalcPositionAfterRotation(*p2, -slurAngle, *p1);
+    Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(*p2, -slurAngle, *p1);
     // LogDebug("P1 %d %d, P2 %d %d, Angle %f, Pres %d %d", x1, y1, x2, y2, slurAnge, rotadedP2.x, rotatedP2.y);
 
     /************** height **************/
@@ -925,9 +925,9 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
         rotatedC2 = adjustedRotatedC2;
     }
 
-    points[1] = View::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
-    points[2] = View::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
-    points[3] = View::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
+    points[1] = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
+    points[2] = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
+    points[3] = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
 
     return slurAngle;
 }
@@ -992,7 +992,7 @@ void View::GetSpanningPointPositions(
         // Not sure if it is better to add the margin before or after the rotation...
         // if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 2;
         // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
-        itPoint->second = View::CalcPositionAfterRotation(p, -angle, p1);
+        itPoint->second = BoundingBox::CalcPositionAfterRotation(p, -angle, p1);
         // This would add it after
         if (curveDir == curvature_CURVEDIR_above) {
             itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 2;
@@ -1035,7 +1035,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
         float posXRatio = 1.0;
         int posX;
         for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-            y = View::CalcBezierAtPosition(bezier, itPoint->second.x);
+            y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
 
             // Weight the desired height according to the x position if wanted
             posXRatio = 1.0;
@@ -1137,7 +1137,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
     int y;
 
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-        y = View::CalcBezierAtPosition(bezier, itPoint->second.x);
+        y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
 
         // Weight the desired height according to the x position on the other side
         posXRatio = 1.0;
@@ -1178,7 +1178,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
     if (spanningPoints->empty()) return;
 
     // Unrotated the slur
-    *p2 = View::CalcPositionAfterRotation(*p2, (*angle), *p1);
+    *p2 = BoundingBox::CalcPositionAfterRotation(*p2, (*angle), *p1);
 
     if (curveDir == curvature_CURVEDIR_above) {
         p1->y += maxShiftLeft;
@@ -1190,7 +1190,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
     }
 
     *angle = GetAdjustedSlurAngle(p1, p2, curveDir);
-    *p2 = View::CalcPositionAfterRotation(*p2, -(*angle), *p1);
+    *p2 = BoundingBox::CalcPositionAfterRotation(*p2, -(*angle), *p1);
 }
 
 void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic)

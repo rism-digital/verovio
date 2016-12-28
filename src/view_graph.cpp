@@ -57,7 +57,7 @@ void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, in
 {
     assert(dc); // DC cannot be NULL
 
-    SwapY(&y1, &y2);
+    BoundingBox::SwapY(&y1, &y2);
 
     // dc->SetPen(m_currentColour, 0, AxSOLID );
     // dc->SetBrush(AxWHITE, AxTRANSPARENT);
@@ -77,7 +77,7 @@ void View::DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2
 {
     assert(dc);
 
-    SwapY(&y1, &y2);
+    BoundingBox::SwapY(&y1, &y2);
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
@@ -231,8 +231,8 @@ void View::DrawThickBezierCurve(
     c1Rotated.y += thickness / 2;
     c2Rotated.y += thickness / 2;
     if (angle != 0.0) {
-        c1Rotated = CalcPositionAfterRotation(c1Rotated, angle, c1);
-        c2Rotated = CalcPositionAfterRotation(c2Rotated, angle, c2);
+        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, c1);
+        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, c2);
     }
 
     bez1[0] = ToDeviceContext(p1);
@@ -248,8 +248,8 @@ void View::DrawThickBezierCurve(
     c1Rotated.y -= thickness / 2;
     c2Rotated.y -= thickness / 2;
     if (angle != 0.0) {
-        c1Rotated = CalcPositionAfterRotation(c1Rotated, angle, c1);
-        c2Rotated = CalcPositionAfterRotation(c2Rotated, angle, c2);
+        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, c1);
+        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, c2);
     }
 
     // second bez. goes back
