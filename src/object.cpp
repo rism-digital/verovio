@@ -185,7 +185,7 @@ bool BoundingBox::HorizontalOverlap(const BoundingBox *other) const
     return true;
 }
 
-bool BoundingBox::IsWithin(const Point point) const
+bool BoundingBox::Encloses(const Point point) const
 {
     if (m_drawingX + m_contentBB_x2 < point.x) return false;
     if (m_drawingX + m_contentBB_x1 > point.x) return false;
@@ -250,6 +250,42 @@ int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x)
         }
     }
     return BoundingBox::s_deCasteljau[n - 1][0];
+}
+
+void BoundingBox::CalcThickBezier(const Point bezier[4], int thickness, float angle, Point *bezier1, Point *bezier2)
+{
+    assert(bezier1 && bezier2); // size should be 4 each
+
+    Point c1Rotated = bezier[2];
+    Point c2Rotated = bezier[3];
+    c1Rotated.y += thickness / 2;
+    c2Rotated.y += thickness / 2;
+    if (angle != 0.0) {
+        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[2]);
+        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[3]);
+    }
+
+    bezier1[0] = bezier[0];
+    bezier2[0] = bezier1[0];
+
+    // Points for first bez, they go from xy to x1y1
+    bezier1[1] = c1Rotated;
+    bezier1[2] = c2Rotated;
+    bezier1[3] = bezier[1];
+
+    c1Rotated = bezier[2];
+    c2Rotated = bezier[3];
+    c1Rotated.y -= thickness / 2;
+    c2Rotated.y -= thickness / 2;
+    if (angle != 0.0) {
+        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[2]);
+        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[3]);
+    }
+
+    // second bez. goes back
+    bezier2[1] = c1Rotated;
+    bezier2[2] = c2Rotated;
+    bezier2[3] = bezier[1];
 }
 
 //----------------------------------------------------------------------------

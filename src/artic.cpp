@@ -15,6 +15,7 @@
 
 #include "attcomparison.h"
 #include "doc.h"
+#include "floatingobject.h"
 #include "functorparams.h"
 #include "smufl.h"
 #include "staff.h"
@@ -280,10 +281,17 @@ bool ArticPart::AlwaysAbove()
     return false;
 }
 
-void ArticPart::AddSlurPositioner(FloatingPositioner *positioner)
+void ArticPart::AddSlurPositioner(FloatingPositioner *positioner, bool start)
 {
-    if (std::find(m_slurPositioners.begin(), m_slurPositioners.end(), positioner) == m_slurPositioners.end()) {
-        m_slurPositioners.push_back(positioner);
+    if (start) {
+        if (std::find(m_startSlurPositioners.begin(), m_startSlurPositioners.end(), positioner)
+            == m_startSlurPositioners.end())
+            m_startSlurPositioners.push_back(positioner);
+    }
+    else {
+        if (std::find(m_endSlurPositioners.begin(), m_endSlurPositioners.end(), positioner)
+            == m_endSlurPositioners.end())
+            m_endSlurPositioners.push_back(positioner);
     }
 }
 
@@ -291,9 +299,9 @@ void ArticPart::AddSlurPositioner(FloatingPositioner *positioner)
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Artic::AdjustArticulations(FunctorParams *functorParams)
+int Artic::AdjustArtic(FunctorParams *functorParams)
 {
-    AdjustArticulationsParams *params = dynamic_cast<AdjustArticulationsParams *>(functorParams);
+    AdjustArticParams *params = dynamic_cast<AdjustArticParams *>(functorParams);
     assert(params);
 
     ArticPart *insidePart = this->GetInsidePart();
@@ -357,8 +365,55 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
 int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_drawingYRel = 0;
+    m_startSlurPositioners.clear();
+    m_endSlurPositioners.clear();
 
     return FUNCTOR_CONTINUE;
+}
+
+int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
+{
+    AdjustArticWithSlursParams *params = dynamic_cast<AdjustArticWithSlursParams *>(functorParams);
+    assert(params);
+
+    if (m_startSlurPositioners.empty() && m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;
+
+    std::vector<FloatingPositioner *>::iterator iter;
+    for (iter = m_endSlurPositioners.begin(); iter != m_endSlurPositioners.end(); iter++) {
+        if (this->Encloses((*iter)->m_slurPoints[1])) this->SetColor("red");
+        // LogDebug("%d, %d, %d, %d", (*iter)->m_slurPoints[0]), (*iter)->m_slurPoints[1]), (*iter)->m_slurPoints[2]),
+        // (*iter)->m_slurPoints[3]);
+    }
+
+    /*
+    ArticPart *insidePart = this->GetInsidePart();
+    ArticPart *outsidePart = this->GetOutsidePart();
+
+    if (!outsidePart) return FUNCTOR_SIBLINGS;
+
+    if (insidePart) {
+
+        Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+        assert(staff);
+        int margin = params->m_doc->GetTopMargin(insidePart->Is())
+        * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
+
+        if (insidePart->GetPlace() == outsidePart->GetPlace()) {
+            if (insidePart->GetPlace() == STAFFREL_above) {
+                int inTop = insidePart->GetContentTop();
+                int outBottom = outsidePart->GetContentBottom();
+                if (inTop > outBottom) outsidePart->SetDrawingYRel(outBottom - inTop - margin);
+            }
+            else {
+                int inBottom = insidePart->GetContentBottom();
+                int outTop = outsidePart->GetContentTop();
+                if (inBottom < outTop) outsidePart->SetDrawingYRel(outTop - inBottom + margin);
+            }
+        }
+    }
+    */
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

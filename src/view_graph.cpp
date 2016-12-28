@@ -225,37 +225,25 @@ void View::DrawThickBezierCurve(
 {
     assert(dc);
 
+    Point bez[4];
+    bez[0] = p1;
+    bez[1] = p2;
+    bez[2] = c1;
+    bez[3] = c2;
+
     Point bez1[4], bez2[4]; // filled array with control points and end point
-    Point c1Rotated = c1;
-    Point c2Rotated = c2;
-    c1Rotated.y += thickness / 2;
-    c2Rotated.y += thickness / 2;
-    if (angle != 0.0) {
-        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, c1);
-        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, c2);
-    }
 
-    bez1[0] = ToDeviceContext(p1);
-    bez2[0] = bez1[0];
+    BoundingBox::CalcThickBezier(bez, thickness, angle, bez1, bez2);
 
-    // Points for first bez, they go from xy to x1y1
-    bez1[1] = ToDeviceContext(c1Rotated);
-    bez1[2] = ToDeviceContext(c2Rotated);
-    bez1[3] = ToDeviceContext(p2);
+    bez1[0] = ToDeviceContext(bez1[0]);
+    bez1[1] = ToDeviceContext(bez1[1]);
+    bez1[2] = ToDeviceContext(bez1[2]);
+    bez1[3] = ToDeviceContext(bez1[3]);
 
-    c1Rotated = c1;
-    c2Rotated = c2;
-    c1Rotated.y -= thickness / 2;
-    c2Rotated.y -= thickness / 2;
-    if (angle != 0.0) {
-        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, c1);
-        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, c2);
-    }
-
-    // second bez. goes back
-    bez2[1] = ToDeviceContext(c1Rotated);
-    bez2[2] = ToDeviceContext(c2Rotated);
-    bez2[3] = ToDeviceContext(p2);
+    bez2[0] = ToDeviceContext(bez2[0]);
+    bez2[1] = ToDeviceContext(bez2[1]);
+    bez2[2] = ToDeviceContext(bez2[2]);
+    bez2[3] = ToDeviceContext(bez2[3]);
 
     // Actually draw it
     dc->SetPen(m_currentColour, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), AxSOLID);

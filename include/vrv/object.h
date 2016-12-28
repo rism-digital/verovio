@@ -127,7 +127,9 @@ public:
      */
     bool HorizontalOverlap(const BoundingBox *other) const;
 
-    bool IsWithin(const Point point) const;
+    bool Encloses(const Point point) const;
+
+    bool Intesects(FloatingPositioner *slurPositioner) const;
 
     /**
      * Swap the points passed as reference.
@@ -144,6 +146,11 @@ public:
      * Calculate the position of a point after a rotation of rot_alpha around the center
      */
     static int CalcBezierAtPosition(const Point bezier[4], int x);
+
+    /**
+     * Calculate the position of the bezier above and below for a thick bezier
+     */
+    static void CalcThickBezier(const Point bezier[4], int thickness, float angle, Point *bezier1, Point *bezier2);
 
     /**
      * Swap values passed as reference.
@@ -558,7 +565,12 @@ public:
     /**
      * Adjust the position the outside articulations.
      */
-    virtual int AdjustArticulations(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustArtic(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the outside articulations with slur.
+     */
+    virtual int AdjustArticWithSlurs(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of all floating positionner, staff by staff.

@@ -160,6 +160,7 @@ protected:
 
     data_STAFFREL m_place;
 
+public:
     Point m_slurPoints[4];
     float m_slurAngle;
     int m_slurThickness;

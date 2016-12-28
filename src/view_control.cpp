@@ -787,26 +787,41 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     AttComparison matchType(ARTIC);
     ArrayOfObjects artics;
     ArrayOfObjects::iterator articIter;
-    start->FindAllChildByAttComparison(&artics, &matchType);
-    end->FindAllChildByAttComparison(&artics, &matchType, UNLIMITED_DEPTH, FORWARD, false);
-    
-    // Then the @n of each first staffDef
-    for (articIter = artics.begin(); articIter != artics.end(); articIter++) {
-        Artic *artic = dynamic_cast<Artic *>(*articIter);
-        assert(artic);
-        ArticPart *outsidePart = artic->GetOutsidePart();
-        if (outsidePart) {
-            outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner());
-            if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
-                LogMessage("push it above");
-                artic->SetColor("red");
+
+    // the normal case or start
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        start->FindAllChildByAttComparison(&artics, &matchType);
+        // Then the @n of each first staffDef
+        for (articIter = artics.begin(); articIter != artics.end(); articIter++) {
+            Artic *artic = dynamic_cast<Artic *>(*articIter);
+            assert(artic);
+            ArticPart *outsidePart = artic->GetOutsidePart();
+            if (outsidePart) {
+                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
+                }
+                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
+                }
             }
-            else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
-                LogMessage("push it below");
-                artic->SetColor("green");
+        }
+    }
+    // normal case or end
+    if ((spanningType == SPANNING_START_END) || (SPANNING_END)) {
+        end->FindAllChildByAttComparison(&artics, &matchType);
+        // Then the @n of each first staffDef
+        for (articIter = artics.begin(); articIter != artics.end(); articIter++) {
+            Artic *artic = dynamic_cast<Artic *>(*articIter);
+            assert(artic);
+            ArticPart *outsidePart = artic->GetOutsidePart();
+            if (outsidePart) {
+                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
+                }
+                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
+                }
             }
-            else
-                LogMessage("ignore");
         }
     }
 

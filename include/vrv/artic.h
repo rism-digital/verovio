@@ -86,9 +86,9 @@ public:
     //----------//
 
     /**
-     * See Object::AdjustArticulations
+     * See Object::AdjustArtic
      */
-    virtual int AdjustArticulations(FunctorParams *functorParams);
+    virtual int AdjustArtic(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareArtic
@@ -165,7 +165,7 @@ public:
      */
     bool AlwaysAbove();
 
-    void AddSlurPositioner(FloatingPositioner *positioner);
+    void AddSlurPositioner(FloatingPositioner *positioner, bool start);
 
     //----------//
     // Functors //
@@ -176,6 +176,11 @@ public:
      */
     virtual int Save(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
     virtual int SaveEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * See Object::AdjustArticWithSlurs
+     */
+    virtual int AdjustArticWithSlurs(FunctorParams *functorParams);
 
     /**
      * See Object::ResetVerticalAlignment
@@ -196,7 +201,9 @@ private:
      */
     int m_drawingYRel;
 
-    std::vector<FloatingPositioner *> m_slurPositioners;
+public:
+    std::vector<FloatingPositioner *> m_startSlurPositioners;
+    std::vector<FloatingPositioner *> m_endSlurPositioners;
 };
 
 } // namespace vrv
