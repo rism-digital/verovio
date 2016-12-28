@@ -2134,7 +2134,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             handleStaffStateVariables(layerdata[i]);
             if (layerdata[i]->getDurationFromStart() != 0) {
                 if (layerdata[i]->isClef()) {
-                    insertClefElement(elements, pointers, layerdata[i]);
+                    Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
+                    setLocationId(clef, layerdata[i], -1);
                 }
                 else if (layerdata[i]->isNull()) {
                     // duplicate clef changes in secondary layers
@@ -2144,7 +2145,14 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         int ttrack = tok->getTrack();
                         if (ttrack == xtrack) {
                             if (tok->isClef()) {
-                                insertClefElement(elements, pointers, tok);
+                                Clef *clef = insertClefElement(elements, pointers, tok);
+                                setLocationId(clef, layerdata[i], -1);
+                                // Uncomment when clef->SetSameas() is available:
+                                // string sameas = "#clef-L";
+                                // sameas += to_string(tok->getLineNumber());
+                                // sameas += "F";
+                                // sameas += to_string(tok->getFieldNumber());
+                                // clef->SetSameas(sameas);
                                 break;
                             }
                         }
@@ -2972,7 +2980,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 // the movement.
 //
 
-void HumdrumInput::insertClefElement(vector<string> &elements, vector<void *> &pointers, HTp token)
+Clef *HumdrumInput::insertClefElement(vector<string> &elements, vector<void *> &pointers, HTp token)
 {
     Clef *clef = new Clef;
     appendElement(elements, pointers, clef);
@@ -3007,6 +3015,8 @@ void HumdrumInput::insertClefElement(vector<string> &elements, vector<void *> &p
         clef->SetDis(OCTAVE_DIS_8);
         clef->SetDisPlace(PLACE_below);
     }
+
+    return clef;
 }
 
 //////////////////////////////
