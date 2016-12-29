@@ -1548,6 +1548,11 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
                 // in primary layer for secondary layer duplication.
                 continue;
             }
+            if (infile[i].token(j)->isCommentLocal() && infile[i].token(j)->isNull()) {
+                // don't store empty comments as well. (maybe ignore all
+                // comments anyway).
+                continue;
+            }
             if ((int)lt[staffindex].size() < layerindex + 1) {
                 lt[staffindex].resize(lt[staffindex].size() + 1);
                 lt[staffindex].back().clear(); // probably not necessary
@@ -4137,14 +4142,15 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
     }
     ss[staffindex].ottavanoteend = note;
 
-	// acc/unacc need to be switched in verovio, so switch also here later:
+    // acc/unacc need to be switched in verovio, so switch also here later:
     if (tstring.find("qq") != string::npos) {
         note->SetGrace(GRACE_unacc);
         // set the visual duration to an eighth note if there
         // is no rhythm specified (will be overwritten later
         // if there is a rhythm).
         note->SetDur(DURATION_8);
-    } else if (tstring.find("q") != string::npos) {
+    }
+    else if (tstring.find("q") != string::npos) {
         note->SetGrace(GRACE_acc);
         // set the visual duration to an eighth note if there
         // is no rhythm specified (will be overwritten later
