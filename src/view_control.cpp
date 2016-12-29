@@ -772,7 +772,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     Point points[4];
     points[0] = Point(x1, y1);
-    points[1] = Point(x2, y2);
+    points[3] = Point(x2, y2);
 
     float angle = AdjustSlur(slur, staff, layer1->GetN(), drawingCurveDir, points);
 
@@ -829,7 +829,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(slur, "spanning-slur", "");
-    DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize, angle);
+    DrawThickBezierCurve(dc, points, thickness, staff->m_drawingStaffSize, angle);
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
@@ -840,7 +840,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
 {
     // For readability makes them p1 and p2
     Point *p1 = &points[0];
-    Point *p2 = &points[1];
+    Point *p2 = &points[3];
 
     /************** angle **************/
 
@@ -940,9 +940,9 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
         rotatedC2 = adjustedRotatedC2;
     }
 
-    points[1] = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
-    points[2] = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
-    points[3] = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
+    points[1] = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
+    points[2] = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
+    points[3] = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
 
     return slurAngle;
 }
@@ -1023,9 +1023,9 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 {
     Point bezier[4];
     bezier[0] = *p1;
-    bezier[1] = *p2;
-    bezier[2] = *c1;
-    bezier[3] = *c2;
+    bezier[1] = *c1;
+    bezier[2] = *c2;
+    bezier[3] = *p2;
 
     ArrayOfLayerElementPointPairs::iterator itPoint;
     int y;
@@ -1106,8 +1106,8 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 
     // Check if we need further adjustment of the points with the adjusted curve
     /*
-    bezier[2] = *c1;
-    bezier[3] = *c2;
+    bezier[1] = *c1;
+    bezier[2] = *c2;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
         y = View::CalcBezierAtPosition(bezier, itPoint->second.x);
         if (up) {
@@ -1136,9 +1136,9 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
 {
     Point bezier[4];
     bezier[0] = *p1;
-    bezier[1] = *p2;
-    bezier[2] = *c1;
-    bezier[3] = *c2;
+    bezier[1] = *c1;
+    bezier[2] = *c2;
+    bezier[3] = *p2;
 
     int maxShiftLeft = 0;
     int maxShiftRight = 0;
@@ -1377,11 +1377,17 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         c2.y = y2 - height;
     }
 
+    Point bezier[4];
+    bezier[0] = Point(x1, y1);
+    bezier[1] = c1;
+    bezier[2] = c2;
+    bezier[3] = Point(x2, y2);
+
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(tie, "spanning-tie", "");
-    DrawThickBezierCurve(dc, Point(x1, y1), Point(x2, y2), c1, c2, thickness, staff->m_drawingStaffSize);
+    DrawThickBezierCurve(dc, bezier, thickness, staff->m_drawingStaffSize);
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else

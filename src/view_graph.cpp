@@ -220,20 +220,13 @@ void View::DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int 
     }
 }
 
-void View::DrawThickBezierCurve(
-    DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle)
+void View::DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle)
 {
     assert(dc);
 
-    Point bez[4];
-    bez[0] = p1;
-    bez[1] = p2;
-    bez[2] = c1;
-    bez[3] = c2;
-
     Point bez1[4], bez2[4]; // filled array with control points and end point
 
-    BoundingBox::CalcThickBezier(bez, thickness, angle, bez1, bez2);
+    BoundingBox::CalcThickBezier(bezier, thickness, angle, bez1, bez2);
 
     bez1[0] = ToDeviceContext(bez1[0]);
     bez1[1] = ToDeviceContext(bez1[1]);

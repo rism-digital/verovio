@@ -227,22 +227,14 @@ Point BoundingBox::CalcPositionAfterRotation(Point point, float rot_alpha, Point
 
 int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x)
 {
-    // berzier parameter is point1, point2, control1, control2; change it to p1-c1-c2-p2
-    Point bezierPCCP[4];
-    bezierPCCP[0] = bezier[0];
-    bezierPCCP[1] = bezier[2];
-    bezierPCCP[2] = bezier[3];
-    bezierPCCP[3] = bezier[1];
-
     int i, j;
     double t = 0.0;
     // avoid division by 0
-    if (bezierPCCP[3].x != bezierPCCP[0].x)
-        t = (double)(x - bezierPCCP[0].x) / (double)(bezierPCCP[3].x - bezierPCCP[0].x);
+    if (bezier[3].x != bezier[0].x) t = (double)(x - bezier[0].x) / (double)(bezier[3].x - bezier[0].x);
     t = std::min(1.0, std::max(0.0, t));
     int n = 4;
 
-    for (i = 0; i < n; i++) BoundingBox::s_deCasteljau[0][i] = bezierPCCP[i].y;
+    for (i = 0; i < n; i++) BoundingBox::s_deCasteljau[0][i] = bezier[i].y;
     for (j = 1; j < n; j++) {
         for (int i = 0; i < 4 - j; i++) {
             BoundingBox::s_deCasteljau[j][i]
@@ -252,40 +244,41 @@ int BoundingBox::CalcBezierAtPosition(const Point bezier[4], int x)
     return BoundingBox::s_deCasteljau[n - 1][0];
 }
 
-void BoundingBox::CalcThickBezier(const Point bezier[4], int thickness, float angle, Point *bezier1, Point *bezier2)
+void BoundingBox::CalcThickBezier(
+    const Point bezier[4], int thickness, float angle, Point *topBezier, Point *bottomBezier)
 {
-    assert(bezier1 && bezier2); // size should be 4 each
+    assert(topBezier && bottomBezier); // size should be 4 each
 
-    Point c1Rotated = bezier[2];
-    Point c2Rotated = bezier[3];
+    Point c1Rotated = bezier[1];
+    Point c2Rotated = bezier[2];
     c1Rotated.y += thickness / 2;
     c2Rotated.y += thickness / 2;
     if (angle != 0.0) {
-        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[2]);
-        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[3]);
+        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[1]);
+        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[2]);
     }
 
-    bezier1[0] = bezier[0];
-    bezier2[0] = bezier1[0];
+    topBezier[0] = bezier[0];
+    bottomBezier[0] = topBezier[0];
 
     // Points for first bez, they go from xy to x1y1
-    bezier1[1] = c1Rotated;
-    bezier1[2] = c2Rotated;
-    bezier1[3] = bezier[1];
+    topBezier[1] = c1Rotated;
+    topBezier[2] = c2Rotated;
+    topBezier[3] = bezier[3];
 
-    c1Rotated = bezier[2];
-    c2Rotated = bezier[3];
+    c1Rotated = bezier[1];
+    c2Rotated = bezier[2];
     c1Rotated.y -= thickness / 2;
     c2Rotated.y -= thickness / 2;
     if (angle != 0.0) {
-        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[2]);
-        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[3]);
+        c1Rotated = BoundingBox::CalcPositionAfterRotation(c1Rotated, angle, bezier[1]);
+        c2Rotated = BoundingBox::CalcPositionAfterRotation(c2Rotated, angle, bezier[2]);
     }
 
     // second bez. goes back
-    bezier2[1] = c1Rotated;
-    bezier2[2] = c2Rotated;
-    bezier2[3] = bezier[1];
+    bottomBezier[1] = c1Rotated;
+    bottomBezier[2] = c2Rotated;
+    bottomBezier[3] = bezier[3];
 }
 
 //----------------------------------------------------------------------------

@@ -383,8 +383,7 @@ protected:
     void DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int nbr);
     void DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int nbr);
     void DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin);
-    void DrawThickBezierCurve(
-        DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle = 0.0);
+    void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100);
     void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
