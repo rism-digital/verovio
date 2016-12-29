@@ -4137,7 +4137,14 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
     }
     ss[staffindex].ottavanoteend = note;
 
-    if (tstring.find("q") != string::npos) {
+	// acc/unacc need to be switched in verovio, so switch also here later:
+    if (tstring.find("qq") != string::npos) {
+        note->SetGrace(GRACE_unacc);
+        // set the visual duration to an eighth note if there
+        // is no rhythm specified (will be overwritten later
+        // if there is a rhythm).
+        note->SetDur(DURATION_8);
+    } else if (tstring.find("q") != string::npos) {
         note->SetGrace(GRACE_acc);
         // set the visual duration to an eighth note if there
         // is no rhythm specified (will be overwritten later
