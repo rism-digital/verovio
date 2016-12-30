@@ -18,6 +18,7 @@
 #include "io.h"
 #include "vrvdef.h"
 #include "clef.h"
+#include "ending.h"
 
 //----------------------------------------------------------------------------
 
@@ -283,6 +284,7 @@ protected:
     void colorNote(vrv::Note *note, hum::HTp token);
     vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
     void addSystemKeyTimeChange(int startline, int endline);
+    void prepareEndings(void);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -325,16 +327,16 @@ private:
     std::string m_filename; // Filename to read/was read.
 
     // m_debug == mostly for printing MEI data to standard input.
-    int m_debug;
+    int m_debug = 0;
 
     // m_comment == Display **kern data embedded in comments for each
     // staff layer.
-    int m_comment;
+    int m_comment = 1;
 
     // m_doc is inherited root document object.
 
     // m_score stores the music
-    Score *m_score;
+    Score *m_score = NULL;
 
     // m_sections stores segments of the music
     vector<Section *> m_sections;
@@ -345,13 +347,26 @@ private:
     // these variables as parameters:
     //
 
-    vrv::StaffGrp *m_staffgroup; // information about parts
-    vector<vrv::StaffDef *> m_staffdef; // information about a staff
+    // m_staffgroup == information about parts
+    vrv::StaffGrp *m_staffgroup = NULL;
+
+    // m_staffdef == information about a staff.
+    vector<vrv::StaffDef *> m_staffdef;
+
     vector<vrv::Measure *> m_measures;
-    vrv::Measure *m_measure; // current measure, or NULL
-    vrv::Staff *m_staff; // current staff, or NULL
-    int m_currentstaff;
-    vrv::Layer *m_layer; // current layer, or NULL
+
+    // m_measure == current measure, or NULL.
+    vrv::Measure *m_measure = NULL;
+
+    // m_staff == current staff, or NULL.
+    vrv::Staff *m_staff = NULL;
+
+    // m_currentstaff == The current staff being parsed.
+    int m_currentstaff = -1;
+
+    // m_layer == current layer, or NULL.
+    vrv::Layer *m_layer = NULL;
+
     int m_currentlayer;
 
     // m_layertokens == Humdrum **kern tokens for each staff/layer to be
@@ -372,10 +387,10 @@ private:
     vector<hum::HumNum> m_timesigdurs;
 
     // m_tupletscaling == tuplet-scaling factor for the current note.
-    hum::HumNum m_tupletscaling;
+    hum::HumNum m_tupletscaling = 1;
 
     // m_omd == temporary variable for printing tempo designation.
-    bool m_omd;
+    bool m_omd = false;
 
     // m_oclef == temporary variable for printing "original-clef" <app>
     vector<std::pair<int, hum::HTp> > m_oclef;
@@ -404,6 +419,15 @@ private:
 
     // m_multirest == boolean states to keep track of muti-rest cases.
     vector<int> m_multirest;
+
+    // m_ending == keep track of 1st/second endings.
+    vector<int> m_ending;
+
+    // m_currentending == keep track of current ending.
+    int m_endingnum = 0;
+
+    // m_currentending == keep track of current ending.
+    vrv::Ending *m_currentending = NULL;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

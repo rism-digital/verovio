@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <sstream>
+#include <string>
 
 //----------------------------------------------------------------------------
 
@@ -35,7 +36,7 @@
 //----------------------------------------------------------------------------
 
 #ifndef NO_PAE_SUPPORT
-#include <regex.h>
+#include <regex>
 #endif
 
 namespace vrv {
@@ -589,13 +590,15 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
     int i = index;
     int length = (int)strlen(incipit);
 
-    // detect if it is a fermata or a tuplet
-    regex_t re;
-    regcomp(&re, "^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", REG_EXTENDED);
-    int is_tuplet = regexec(&re, incipit + i, 0, NULL, 0);
-    regfree(&re);
+    // Detect if it is a fermata or a tuplet.
+    //
+    // std::regex_constants::ECMAScript is the default syntax, so optional.
+    // Previously these were extended regex syntax, but this case
+    // is the same in ECMAScript syntax.
+    std::regex exp("^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", std::regex_constants::ECMAScript);
+    bool is_tuplet = regex_search(incipit + i, exp);
 
-    if (is_tuplet == 0) {
+    if (is_tuplet) {
         int t = i;
         int t2 = 0;
         int tuplet_val = 0;
@@ -765,27 +768,18 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, int index)
     strncpy(timesig_str, incipit + index, i - index);
 
     std::ostringstream sout;
-    regex_t re;
 
-    // check if format X/X or one digit only
-    regcomp(&re, "^[0-9]*/[0-9]*$", REG_EXTENDED);
-    int is_standard = regexec(&re, timesig_str, 0, NULL, 0);
-    regfree(&re);
-    regcomp(&re, "^[0-9]*$", REG_EXTENDED);
-    int is_one_number = regexec(&re, timesig_str, 0, NULL, 0);
-    regfree(&re);
-
-    if (is_standard == 0) {
-        char buf_str[1024];
-        strcpy(buf_str, timesig_str);
-        int beats = atoi(strtok(buf_str, "/"));
-        int note_value = atoi(strtok(NULL, "/"));
-        meter->SetCount(beats);
-        meter->SetUnit(note_value);
+    // regex_match matches to the entire input string (regex_search does
+    // partial matches.  In this case cmatch is used to store the submatches
+    // (enclosed in parentheses) for later reference.  Use std::smatch when
+    // dealing with strings, or std::wmatch with wstrings.
+    std::cmatch matches;
+    if (regex_match(timesig_str, matches, std::regex("(\\d+)/(\\d+)"))) {
+        meter->SetCount(std::stoi(matches[1]));
+        meter->SetUnit(std::stoi(matches[2]));
     }
-    else if (is_one_number == 0) {
-        int beats = atoi(timesig_str);
-        meter->SetCount(beats);
+    else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
+        meter->SetCount(std::stoi(timesig_str));
     }
     else if (strcmp(timesig_str, "c") == 0) {
         // C
@@ -1024,7 +1018,6 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 
 int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measure, int index)
 {
-    regex_t re;
     int oct;
     int i = index;
     int app;
@@ -1055,27 +1048,20 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     }
 
     // trills
-    regcomp(&re, "^[^ABCDEFG]*t", REG_EXTENDED);
-    int has_trill = regexec(&re, incipit + i + 1, 0, NULL, 0);
-    regfree(&re);
-    if (has_trill == 0) {
+    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*t"))) {
         note->trill = true;
     }
 
     // tie
-    regcomp(&re, "^[^ABCDEFG]*\\+", REG_EXTENDED);
-    int has_tie = regexec(&re, incipit + i + 1, 0, NULL, 0);
-    regfree(&re);
-    if (has_tie == 0) {
+    if (regex_search(incipit + i + 1, std::regex("^[A-G]*\\+"))) {
         // reset 1 for first note, >1 for next ones is incremented under
-        if (note->tie == 0) note->tie = 1; 
+        if (note->tie == 0) {
+            note->tie = 1;
+        }
     }
 
     // chord
-    regcomp(&re, "^[^ABCDEFG]*\\^", REG_EXTENDED);
-    int is_chord = regexec(&re, incipit + i + 1, 0, NULL, 0);
-    regfree(&re);
-    if (is_chord == 0) {
+    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\^"))) {
         note->chord = true;
     }
 
