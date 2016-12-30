@@ -32,9 +32,10 @@
 
 #include <algorithm>
 #include <assert.h>
+#include <cctype>
+#include <regex>
 #include <sstream>
 #include <vector>
-#include <cctype>
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
@@ -50,6 +51,7 @@
 #include "dir.h"
 #include "dynam.h"
 #include "editorial.h"
+#include "ending.h"
 #include "hairpin.h"
 #include "iomei.h"
 #include "layer.h"
@@ -261,26 +263,7 @@ HumdrumInput::HumdrumInput(Doc *doc, std::string filename) : FileInputStream(doc
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
-
     m_filename = filename;
-
-    m_staffgroup = NULL;
-    m_score = NULL;
-    m_measure = NULL;
-    m_staff = NULL;
-    m_layer = NULL;
-    m_currentlayer = -1;
-    m_currentstaff = -1;
-    m_tupletscaling = 1;
-
-#ifdef USE_EMSCRIPTEN
-    m_debug = 0;
-#else
-    m_debug = 0;
-#endif
-    m_comment = 1;
-    m_omd = false;
-
 #endif /* NO_HUMDRUM_SUPPORT */
 }
 
@@ -293,9 +276,7 @@ HumdrumInput::~HumdrumInput()
 {
 
 #ifndef NO_HUMDRUM_SUPPORT
-
     clear();
-
 #endif /* NO_HUMDRUM_SUPPORT */
 }
 
@@ -434,6 +415,7 @@ bool HumdrumInput::convertHumdrum(void)
     m_staffstates.resize(kernstarts.size());
 
     prepareVerses();
+    prepareEndings();
     prepareStaffGroup();
 
     int line = kernstarts[0]->getLineIndex();
@@ -3958,7 +3940,22 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     }
 
     m_measure = new Measure();
-    m_sections.back()->AddChild(m_measure);
+    if ((m_ending[startline] != 0) && (m_endingnum != m_ending[startline])) {
+        // create a new ending
+        m_currentending = new Ending;
+        m_currentending->SetN(m_ending[startline]);
+        m_sections.back()->AddChild(m_currentending);
+        m_currentending->AddChild(m_measure);
+    }
+    else if (m_ending[startline]) {
+        // inside a current ending
+        m_currentending->AddChild(m_measure);
+    }
+    else {
+        // outside of an ending
+        m_sections.back()->AddChild(m_measure);
+    }
+    m_endingnum = m_ending[startline];
     m_measures.push_back(m_measure);
 
     int measurenumber = getMeasureNumber(startline, endline);
@@ -4476,6 +4473,50 @@ void HumdrumInput::setLocationId(Object *object, HTp token, int subtoken)
         id += "S" + to_string(subtoken + 1);
     }
     object->SetUuid(id);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::prepareEndings --
+//
+
+void HumdrumInput::prepareEndings(void)
+{
+    vector<int> &ending = m_ending;
+    HumdrumFile &infile = m_infile;
+
+    ending.resize(infile.getLineCount());
+    std::fill(ending.begin(), ending.end(), 0);
+    int endnum = 0;
+
+    for (int i = 0; i < infile.getLineCount(); i++) {
+        ending[i] = endnum;
+        if (!infile[i].isInterpretation()) {
+            continue;
+        }
+        if (infile.token(i, 0)->compare(0, 2, "*>") != 0) {
+            continue;
+        }
+        if (infile.token(i, 0)->find("[") != string::npos) {
+            // ignore expansion lists
+            continue;
+        }
+        smatch matches;
+        if (regex_search(*((string *)infile.token(i, 0)), matches, regex("(\\d+)$"))) {
+            endnum = stoi(matches[1]);
+            ending[i] = endnum;
+        }
+        else {
+            endnum = 0;
+            ending[i] = endnum;
+        }
+        for (int j = i - 1; j >= 0; j--) {
+            if (infile[j].isData()) {
+                break;
+            }
+            ending[j] = ending[i];
+        }
+    }
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */
