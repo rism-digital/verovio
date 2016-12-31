@@ -697,9 +697,8 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
             if (interface->HasStartAndEnd()) {
                 auto item
                     = std::find_if(params->m_timeSpanningInterfaces.begin(), params->m_timeSpanningInterfaces.end(),
-                        [interface](std::pair<TimeSpanningInterface *, ClassId> pair) {
-                            return (pair.first == interface);
-                        });
+                        [interface](
+                            std::pair<TimeSpanningInterface *, ClassId> pair) { return (pair.first == interface); });
                 if (item != params->m_timeSpanningInterfaces.end()) {
                     // LogDebug("Found it!");
                     params->m_timeSpanningInterfaces.erase(item);

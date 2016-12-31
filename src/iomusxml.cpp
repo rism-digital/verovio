@@ -1188,8 +1188,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                         syl->SetWordpos(sylLog_WORDPOS_t);
                     }
                     if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
-                    if (!textWeight.empty()) syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
-                    
+                    if (!textWeight.empty())
+                        syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
+
                     Text *text = new Text();
                     text->SetText(UTF8to16(textStr));
                     syl->AddChild(text);
