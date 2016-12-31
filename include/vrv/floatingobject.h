@@ -147,9 +147,9 @@ public:
 
     data_STAFFREL GetDrawingPlace() const { return m_place; }
 
-    void UpdateSlurPosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
+    void UpdateCurvePosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
 
-    int CalcXMaxY(const Point points[4]);
+    int CalcXMinMaxY(const Point points[4]);
 
     /**
      * @name Get and set the Y drawing relative position
@@ -171,11 +171,11 @@ protected:
     data_STAFFREL m_place;
 
 public:
-    Point m_slurPoints[4];
-    float m_slurAngle;
-    int m_slurThickness;
-    curvature_CURVEDIR m_slurDir;
-    int m_slurXMaxY;
+    Point m_cuvrePoints[4];
+    float m_cuvreAngle;
+    int m_cuvreThickness;
+    curvature_CURVEDIR m_cuvreDir;
+    int m_cuvreXMinMaxY;
 };
 
 } // namespace vrv

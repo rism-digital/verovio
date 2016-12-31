@@ -380,7 +380,7 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
 
     std::vector<FloatingPositioner *>::iterator iter;
     for (iter = m_endSlurPositioners.begin(); iter != m_endSlurPositioners.end(); iter++) {
-        // if (this->Encloses((*iter)->m_slurPoints[1])) this->SetColor("red");
+        // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
         int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {
             this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -389,7 +389,7 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
     }
 
     for (iter = m_startSlurPositioners.begin(); iter != m_startSlurPositioners.end(); iter++) {
-        // if (this->Encloses((*iter)->m_slurPoints[1])) this->SetColor("red");
+        // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
         int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {
             this->SetDrawingYRel(this->GetDrawingYRel() - shift);

@@ -779,7 +779,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / PARAM_DENOMINATOR;
 
     assert(slur->GetCurrentFloatingPositioner());
-    slur->GetCurrentFloatingPositioner()->UpdateSlurPosition(points, angle, thickness, drawingCurveDir);
+    slur->GetCurrentFloatingPositioner()->UpdateCurvePosition(points, angle, thickness, drawingCurveDir);
 
     /************** articulation **************/
 
@@ -1393,6 +1393,9 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
     bezier[1] = c1;
     bezier[2] = c2;
     bezier[3] = Point(x2, y2);
+
+    assert(tie->GetCurrentFloatingPositioner());
+    tie->GetCurrentFloatingPositioner()->UpdateCurvePosition(bezier, 0.0, thickness, drawingCurveDir);
 
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());

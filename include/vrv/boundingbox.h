@@ -79,7 +79,7 @@ public:
 
     bool Encloses(const Point point) const;
 
-    int Intersects(FloatingPositioner *slurPositioner, int margin = 0) const;
+    int Intersects(FloatingPositioner *curve, int margin = 0) const;
 
     /**
      * Swap the points passed as reference.

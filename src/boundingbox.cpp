@@ -177,42 +177,42 @@ bool BoundingBox::Encloses(const Point point) const
     return true;
 }
 
-int BoundingBox::Intersects(FloatingPositioner *slurPositioner, int margin) const
+int BoundingBox::Intersects(FloatingPositioner *curve, int margin) const
 {
-    assert(slurPositioner);
-    assert(slurPositioner->GetObject());
-    assert(slurPositioner->GetObject()->Is() == SLUR);
+    assert(curve);
+    assert(curve->GetObject());
+    assert((curve->GetObject()->Is() == SLUR) || (curve->GetObject()->Is() == TIE));
 
     // for lisability
-    Point p1 = slurPositioner->m_slurPoints[0];
-    Point p2 = slurPositioner->m_slurPoints[3];
+    Point p1 = curve->m_cuvrePoints[0];
+    Point p2 = curve->m_cuvrePoints[3];
 
     // first check if they overlap at all
     if (p2.x < this->GetContentLeft()) return 0;
     if (p1.x > this->GetContentRight()) return 0;
 
     Point topBezier[4], bottomBezier[4];
-    BoundingBox::CalcThickBezier(slurPositioner->m_slurPoints, slurPositioner->m_slurThickness,
-        slurPositioner->m_slurAngle, topBezier, bottomBezier);
+    BoundingBox::CalcThickBezier(
+        curve->m_cuvrePoints, curve->m_cuvreThickness, curve->m_cuvreAngle, topBezier, bottomBezier);
 
-    // The slur overflows on both sides
+    // The curve overflows on both sides
     if ((p1.x < this->GetContentLeft()) && p2.x > this->GetContentRight()) {
         // LogDebug("overflows both sides");
-        if (slurPositioner->m_slurDir == curvature_CURVEDIR_above) {
-            // The slur is already belowe the content
-            if ((slurPositioner->GetContentTop() + margin) < this->GetContentBottom()) return 0;
-            int xMaxY = slurPositioner->CalcXMaxY(topBezier);
-            // Check if the box is below
+        if (curve->m_cuvreDir == curvature_CURVEDIR_above) {
+            // The curve is already below the content
+            if ((curve->GetContentTop() + margin) < this->GetContentBottom()) return 0;
+            int xMaxY = curve->CalcXMinMaxY(topBezier);
+            // Check if the box is below (should be + margin, but because of de Casteljau different it is ommitted)
             int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft());
             int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentRight());
             // Everything is underneath
-            if ((leftY >= this->GetContentTop() + margin) && (rightY >= this->GetContentTop() + margin)) return 0;
+            if ((leftY >= this->GetContentTop()) && (rightY >= this->GetContentTop())) return 0;
             // Recalculate for above
             leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentLeft()) + margin;
             rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentRight()) + margin;
-            // The box is above the summit of the slur
+            // The box is above the summit of the curve
             if ((this->GetContentLeft() < (p1.x + xMaxY)) && (this->GetContentRight() > (p1.x + xMaxY)))
-                return (slurPositioner->GetContentTop() - this->GetContentBottom() + margin);
+                return (curve->GetContentTop() - this->GetContentBottom() + margin);
             // The content is on the left
             if (this->GetContentRight() < (p1.x + xMaxY))
                 return (rightY - this->GetContentBottom());
@@ -220,20 +220,39 @@ int BoundingBox::Intersects(FloatingPositioner *slurPositioner, int margin) cons
                 return (leftY - this->GetContentBottom());
         }
         else {
+            // The curve is already above the content
+            if ((curve->GetContentBottom() - margin) > this->GetContentTop()) return 0;
+            int xMinY = curve->CalcXMinMaxY(bottomBezier);
+            // Check if the box is above
+            int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentLeft());
+            int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentRight());
+            // Everything is above (should be - margin, but because of de Casteljau different it is ommitted)
+            if ((leftY <= this->GetContentBottom()) && (rightY <= this->GetContentBottom())) return 0;
+            // Recalculate for below
+            leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft()) - margin;
+            rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentRight()) - margin;
+            // The box is above the summit of the curve
+            if ((this->GetContentLeft() < (p1.x + xMinY)) && (this->GetContentRight() > (p1.x + xMinY)))
+                return (curve->GetContentBottom() - this->GetContentTop() - margin);
+            // The content is on the left
+            if (this->GetContentRight() < (p1.x + xMinY))
+                return (rightY - this->GetContentTop());
+            else
+                return (leftY - this->GetContentTop());
         }
     }
-    // The slur overflows on the left
+    // The curve overflows on the left
     else if ((p1.x < this->GetContentLeft()) && p2.x <= this->GetContentRight()) {
         // LogDebug("left T-L %d %d ; B-R %d %d", this->GetContentTop(), this->GetContentLeft(),
         // this->GetContentBottom(), this->GetContentRight());
-        if (slurPositioner->m_slurDir == curvature_CURVEDIR_above) {
-            int xMaxY = slurPositioner->CalcXMaxY(topBezier);
+        if (curve->m_cuvreDir == curvature_CURVEDIR_above) {
+            int xMaxY = curve->CalcXMinMaxY(topBezier);
             // The starting point is above the top
             if (p2.y > this->GetContentTop() + margin) return 0;
-            // The left point is beyond (before) the summit of the slur
+            // The left point is beyond (before) the summit of the curve
             if (this->GetContentLeft() < (p1.x + xMaxY))
-                return (slurPositioner->GetContentTop() - this->GetContentBottom() + margin);
-            // Calcultate the Y position of the slur one the left
+                return (curve->GetContentTop() - this->GetContentBottom() + margin);
+            // Calcultate the Y position of the curve one the left
             int leftY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentLeft()) + margin;
             // LogDebug("leftY %d, %d, %d", leftY, this->GetContentBottom(), this->GetContentTop());
             // The content left is below the bottom
@@ -242,21 +261,33 @@ int BoundingBox::Intersects(FloatingPositioner *slurPositioner, int margin) cons
             return (leftY - this->GetContentBottom());
         }
         else {
-            if (p2.y < this->GetContentBottom() - margin) return 0;
+            int xMinY = curve->CalcXMinMaxY(topBezier);
+            // The starting point is below the bottom
+            if (p2.y < this->GetContentBottom() + margin) return 0;
+            // The left point is beyond (before) the summit of the curve
+            if (this->GetContentLeft() < (p1.x + xMinY))
+                return (curve->GetContentBottom() - this->GetContentTop() - margin);
+            // Calcultate the Y position of the curve one the left
+            int leftY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentLeft()) - margin;
+            // LogDebug("leftY %d, %d, %d", leftY, this->GetContentBottom(), this->GetContentTop());
+            // The content left is above the top
+            if (leftY > this->GetContentTop()) return 0;
+            // Else return the shift needed
+            return (leftY - this->GetContentTop());
         }
     }
-    // The slur overflows on the right
+    // The curve overflows on the right
     else if ((p1.x >= this->GetContentLeft()) && p2.x > this->GetContentRight()) {
         // LogDebug("right T-L %d %d ; B-R %d %d", this->GetContentTop(), this->GetContentLeft(),
         // this->GetContentBottom(), this->GetContentRight());
-        if (slurPositioner->m_slurDir == curvature_CURVEDIR_above) {
-            int xMaxY = slurPositioner->CalcXMaxY(topBezier);
+        if (curve->m_cuvreDir == curvature_CURVEDIR_above) {
+            int xMaxY = curve->CalcXMinMaxY(topBezier);
             // The starting point is above the top
             if (p1.y > this->GetContentTop() + margin) return 0;
-            // The right point is beyond the summit of the slur
+            // The right point is beyond the summit of the curve
             if (this->GetContentRight() > (p1.x + xMaxY))
-                return (slurPositioner->GetContentTop() - this->GetContentBottom() + margin);
-            // Calcultate the Y position of the slur one the right
+                return (curve->GetContentTop() - this->GetContentBottom() + margin);
+            // Calcultate the Y position of the curve one the right
             int rightY = BoundingBox::CalcBezierAtPosition(topBezier, this->GetContentRight()) + margin;
             // LogDebug("rightY %d, %d, %d", rightY, this->GetContentBottom(), this->GetContentTop());
             // The content right is below the bottom
@@ -265,13 +296,25 @@ int BoundingBox::Intersects(FloatingPositioner *slurPositioner, int margin) cons
             return (rightY - this->GetContentBottom());
         }
         else {
-            if (p1.y < this->GetContentBottom() - margin) return 0;
+            int xMinY = curve->CalcXMinMaxY(bottomBezier);
+            // The starting point is below the bottom
+            if (p1.y < this->GetContentBottom() + margin) return 0;
+            // The right point is beyond the summit of the curve
+            if (this->GetContentRight() > (p1.x + xMinY))
+                return (curve->GetContentBottom() - this->GetContentTop() - margin);
+            // Calcultate the Y position of the curve one the right
+            int rightY = BoundingBox::CalcBezierAtPosition(bottomBezier, this->GetContentRight()) - margin;
+            // LogDebug("rightY %d, %d, %d", rightY, this->GetContentBottom(), this->GetContentTop());
+            // The content right is above the top
+            if (rightY > this->GetContentTop()) return 0;
+            // Return the shift needed
+            return (rightY - this->GetContentTop());
         }
     }
-    // The slur in inside the left and right side of the content
+    // The curve in inside the left and right side of the content
     else if ((p1.x >= this->GetContentLeft()) && p2.x <= this->GetContentRight()) {
         // LogDebug("inside");
-        return (slurPositioner->GetContentTop() - this->GetContentBottom() + margin);
+        return (curve->GetContentTop() - this->GetContentBottom() + margin);
     }
     else {
         LogDebug("This should not happen");

@@ -169,14 +169,14 @@ void FloatingPositioner::ResetPositioner()
     BoundingBox::ResetBoundingBox();
 
     m_drawingYRel = 0;
-    m_slurPoints[0] = Point(0, 0);
-    m_slurPoints[1] = Point(0, 0);
-    m_slurPoints[2] = Point(0, 0);
-    m_slurPoints[3] = Point(0, 0);
-    m_slurAngle = 0.0;
-    m_slurThickness = 0;
-    m_slurDir = curvature_CURVEDIR_NONE;
-    m_slurXMaxY = -1;
+    m_cuvrePoints[0] = Point(0, 0);
+    m_cuvrePoints[1] = Point(0, 0);
+    m_cuvrePoints[2] = Point(0, 0);
+    m_cuvrePoints[3] = Point(0, 0);
+    m_cuvreAngle = 0.0;
+    m_cuvreThickness = 0;
+    m_cuvreDir = curvature_CURVEDIR_NONE;
+    m_cuvreXMinMaxY = -1;
 }
 
 int FloatingPositioner::GetDrawingX() const
@@ -189,37 +189,37 @@ int FloatingPositioner::GetDrawingY() const
     return BoundingBox::GetDrawingY() - this->GetDrawingYRel();
 }
 
-void FloatingPositioner::UpdateSlurPosition(
+void FloatingPositioner::UpdateCurvePosition(
     const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir)
 {
-    m_slurPoints[0] = points[0];
-    m_slurPoints[1] = points[1];
-    m_slurPoints[2] = points[2];
-    m_slurPoints[3] = points[3];
-    m_slurAngle = angle;
-    m_slurThickness = thickness;
-    m_slurDir = curveDir;
-    m_slurXMaxY = -1;
+    m_cuvrePoints[0] = points[0];
+    m_cuvrePoints[1] = points[1];
+    m_cuvrePoints[2] = points[2];
+    m_cuvrePoints[3] = points[3];
+    m_cuvreAngle = angle;
+    m_cuvreThickness = thickness;
+    m_cuvreDir = curveDir;
+    m_cuvreXMinMaxY = -1;
 }
 
-int FloatingPositioner::CalcXMaxY(const Point points[4])
+int FloatingPositioner::CalcXMinMaxY(const Point points[4])
 {
     assert(this->GetObject());
-    assert(this->GetObject()->Is() == SLUR);
-    assert(m_slurDir != curvature_CURVEDIR_NONE);
+    assert((this->GetObject()->Is() == SLUR) || (this->GetObject()->Is() == TIE));
+    assert(m_cuvreDir != curvature_CURVEDIR_NONE);
 
-    if (m_slurXMaxY != -1) return m_slurXMaxY;
+    if (m_cuvreXMinMaxY != -1) return m_cuvreXMinMaxY;
     Point pos;
     int width, height;
     int minYPos, maxYPos;
 
     BoundingBox::ApproximateBezierBoundingBox(points, pos, width, height, minYPos, maxYPos);
-    if (m_slurDir == curvature_CURVEDIR_above)
-        m_slurXMaxY = maxYPos;
+    if (m_cuvreDir == curvature_CURVEDIR_above)
+        m_cuvreXMinMaxY = maxYPos;
     else
-        m_slurXMaxY = minYPos;
+        m_cuvreXMinMaxY = minYPos;
 
-    return m_slurXMaxY;
+    return m_cuvreXMinMaxY;
 }
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)
@@ -253,13 +253,13 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         }
     }
     else {
-        FloatingPositioner *slurPositioner = dynamic_cast<FloatingPositioner *>(horizOverlapingBBox);
-        if (slurPositioner) {
-            assert(slurPositioner->m_object);
+        FloatingPositioner *curve = dynamic_cast<FloatingPositioner *>(horizOverlapingBBox);
+        if (curve) {
+            assert(curve->m_object);
         }
         if (this->m_place == STAFFREL_above) {
-            if (slurPositioner && (slurPositioner->m_object->Is() == SLUR)) {
-                int shift = this->Intersects(slurPositioner, doc->GetDrawingUnit(staffSize));
+            if (curve && ((curve->m_object->Is() == SLUR) || (curve->m_object->Is() == TIE))) {
+                int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
                     // LogDebug("Shift %d", shift);
@@ -271,6 +271,14 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             this->SetDrawingYRel(yRel);
         }
         else {
+            if (curve && ((curve->m_object->Is() == SLUR) || (curve->m_object->Is() == TIE))) {
+                int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
+                if (shift != 0) {
+                    this->SetDrawingYRel(this->GetDrawingYRel() - shift);
+                    // LogDebug("Shift %d", shift);
+                }
+                return true;
+            }
             yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
                 + m_contentBB_y2;
             yRel += doc->GetTopMargin(this->m_object->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
