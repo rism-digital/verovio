@@ -380,38 +380,22 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
 
     std::vector<FloatingPositioner *>::iterator iter;
     for (iter = m_endSlurPositioners.begin(); iter != m_endSlurPositioners.end(); iter++) {
-        if (this->Encloses((*iter)->m_slurPoints[1])) this->SetColor("red");
-        // LogDebug("%d, %d, %d, %d", (*iter)->m_slurPoints[0]), (*iter)->m_slurPoints[1]), (*iter)->m_slurPoints[2]),
-        // (*iter)->m_slurPoints[3]);
-    }
-
-    /*
-    ArticPart *insidePart = this->GetInsidePart();
-    ArticPart *outsidePart = this->GetOutsidePart();
-
-    if (!outsidePart) return FUNCTOR_SIBLINGS;
-
-    if (insidePart) {
-
-        Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
-        assert(staff);
-        int margin = params->m_doc->GetTopMargin(insidePart->Is())
-        * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
-
-        if (insidePart->GetPlace() == outsidePart->GetPlace()) {
-            if (insidePart->GetPlace() == STAFFREL_above) {
-                int inTop = insidePart->GetContentTop();
-                int outBottom = outsidePart->GetContentBottom();
-                if (inTop > outBottom) outsidePart->SetDrawingYRel(outBottom - inTop - margin);
-            }
-            else {
-                int inBottom = insidePart->GetContentBottom();
-                int outTop = outsidePart->GetContentTop();
-                if (inBottom < outTop) outsidePart->SetDrawingYRel(outTop - inBottom + margin);
-            }
+        // if (this->Encloses((*iter)->m_slurPoints[1])) this->SetColor("red");
+        int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
+        if (shift != 0) {
+            this->SetDrawingYRel(this->GetDrawingYRel() - shift);
+            // this->SetColor("red");
         }
     }
-    */
+
+    for (iter = m_startSlurPositioners.begin(); iter != m_startSlurPositioners.end(); iter++) {
+        // if (this->Encloses((*iter)->m_slurPoints[1])) this->SetColor("red");
+        int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
+        if (shift != 0) {
+            this->SetDrawingYRel(this->GetDrawingYRel() - shift);
+            // this->SetColor("green");
+        }
+    }
 
     return FUNCTOR_SIBLINGS;
 }

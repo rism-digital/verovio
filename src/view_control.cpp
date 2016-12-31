@@ -830,13 +830,24 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     else
         dc->StartGraphic(slur, "spanning-slur", "");
     DrawThickBezierCurve(dc, points, thickness, staff->m_drawingStaffSize, angle);
+
+    /*
+    int i;
+    int dist = (points[3].x - points[0].x) / 10;
+    for (i = 0; i < 10; i++) {
+        int x = points[0].x + (i * dist);
+        int y = BoundingBox::CalcBezierAtPosition(points, x);
+        DrawDot(dc, x, y, staff->m_drawingStaffSize);
+    }
+    */
+
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
         dc->EndGraphic(slur, this);
 }
 
-float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[])
+float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4])
 {
     // For readability makes them p1 and p2
     Point *p1 = &points[0];

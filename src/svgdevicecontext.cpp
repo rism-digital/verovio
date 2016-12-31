@@ -524,7 +524,13 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute("height") = height;
     rectChild.append_attribute("width") = width;
     if (radius != 0) rectChild.append_attribute("rx") = radius;
-    // rectChild.append_attribute("fill-opacity") = "0.0"; // for empty rectangles with bounding boxes
+    // for empty rectangles with bounding boxes
+    /*
+    rectChild.append_attribute("fill-opacity") = "0.0";
+    rectChild.append_attribute("stroke-opacity") = "1.0";
+    rectChild.append_attribute("stroke-width") = "10";
+    rectChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+    */
 }
 
 void SvgDeviceContext::StartText(int x, int y, char alignment)
@@ -735,7 +741,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         }
 
         SetPen(AxRED, 10, AxDOT_DASH);
-        SetBrush(AxWHITE, AxTRANSPARENT);
+        // SetBrush(AxWHITE, AxTRANSPARENT);
         StartGraphic(object, "self-bounding-box", "0");
         if (object->HasSelfBB()) {
             this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->m_selfBB_x1),

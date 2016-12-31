@@ -133,6 +133,14 @@ public:
 
     virtual void ResetPositioner();
 
+    /**
+     * @name Get and set the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
+
     FloatingObject *GetObject() const { return m_object; }
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
@@ -140,6 +148,8 @@ public:
     data_STAFFREL GetDrawingPlace() const { return m_place; }
 
     void UpdateSlurPosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
+
+    int CalcXMaxY(const Point points[4]);
 
     /**
      * @name Get and set the Y drawing relative position
@@ -165,6 +175,7 @@ public:
     float m_slurAngle;
     int m_slurThickness;
     curvature_CURVEDIR m_slurDir;
+    int m_slurXMaxY;
 };
 
 } // namespace vrv

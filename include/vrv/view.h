@@ -416,7 +416,7 @@ private:
     /**
      * @name Internal methods used for calculating slurs
      */
-    float AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[]);
+    float AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4]);
     int AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
         Point *c2, curvature_CURVEDIR curveDir, float angle, bool posRatio = true);
     void AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,

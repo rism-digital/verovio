@@ -25,6 +25,7 @@
 #include "slur.h"
 #include "tempo.h"
 #include "timeinterface.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -81,13 +82,14 @@ void FloatingObject::UpdateSelfBBoxY(int y1, int y2)
 
 int FloatingObject::GetDrawingX() const
 {
-    return m_drawingX;
+    if (!m_currentPositioner) return 0;
+    return m_currentPositioner->GetDrawingX();
 }
 
 int FloatingObject::GetDrawingY() const
 {
     if (!m_currentPositioner) return 0;
-    return m_currentPositioner->GetDrawingY() - m_currentPositioner->GetDrawingYRel();
+    return m_currentPositioner->GetDrawingY();
 }
 
 void FloatingObject::SetCurrentFloatingPositioner(FloatingPositioner *boundingBox)
@@ -174,6 +176,17 @@ void FloatingPositioner::ResetPositioner()
     m_slurAngle = 0.0;
     m_slurThickness = 0;
     m_slurDir = curvature_CURVEDIR_NONE;
+    m_slurXMaxY = -1;
+}
+
+int FloatingPositioner::GetDrawingX() const
+{
+    return m_drawingX;
+}
+
+int FloatingPositioner::GetDrawingY() const
+{
+    return BoundingBox::GetDrawingY() - this->GetDrawingYRel();
 }
 
 void FloatingPositioner::UpdateSlurPosition(
@@ -186,6 +199,27 @@ void FloatingPositioner::UpdateSlurPosition(
     m_slurAngle = angle;
     m_slurThickness = thickness;
     m_slurDir = curveDir;
+    m_slurXMaxY = -1;
+}
+
+int FloatingPositioner::CalcXMaxY(const Point points[4])
+{
+    assert(this->GetObject());
+    assert(this->GetObject()->Is() == SLUR);
+    assert(m_slurDir != curvature_CURVEDIR_NONE);
+
+    if (m_slurXMaxY != -1) return m_slurXMaxY;
+    Point pos;
+    int width, height;
+    int minYPos, maxYPos;
+
+    BoundingBox::ApproximateBezierBoundingBox(points, pos, width, height, minYPos, maxYPos);
+    if (m_slurDir == curvature_CURVEDIR_above)
+        m_slurXMaxY = maxYPos;
+    else
+        m_slurXMaxY = minYPos;
+
+    return m_slurXMaxY;
 }
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)
@@ -219,7 +253,19 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
         }
     }
     else {
+        FloatingPositioner *slurPositioner = dynamic_cast<FloatingPositioner *>(horizOverlapingBBox);
+        if (slurPositioner) {
+            assert(slurPositioner->m_object);
+        }
         if (this->m_place == STAFFREL_above) {
+            if (slurPositioner && (slurPositioner->m_object->Is() == SLUR)) {
+                int shift = this->Intersects(slurPositioner, doc->GetDrawingUnit(staffSize));
+                if (shift != 0) {
+                    this->SetDrawingYRel(this->GetDrawingYRel() - shift);
+                    // LogDebug("Shift %d", shift);
+                }
+                return true;
+            }
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + m_contentBB_y1;
             yRel -= doc->GetBottomMargin(this->m_object->Is()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
