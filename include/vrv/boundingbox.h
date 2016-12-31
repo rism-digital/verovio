@@ -114,6 +114,9 @@ public:
         *y2 = tmp;
     }
 
+    static void ApproximateBezierBoundingBox(
+        const Point bezier[4], Point &pos, int &width, int &height, int &minYPos, int &maxYPos);
+
 private:
     bool m_updatedBBoxX;
     bool m_updatedBBoxY;

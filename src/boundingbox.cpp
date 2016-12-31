@@ -18,6 +18,8 @@
 #include "floatingobject.h"
 #include "vrv.h"
 
+#define BEZIER_APPROXIMATION 50.0
+
 namespace vrv {
 
 int BoundingBox::s_deCasteljau[4][4];
@@ -337,6 +339,72 @@ void BoundingBox::CalcThickBezier(
     bottomBezier[1] = c1Rotated;
     bottomBezier[2] = c2Rotated;
     bottomBezier[3] = bezier[3];
+}
+
+void BoundingBox::ApproximateBezierBoundingBox(
+    const Point bezier[4], Point &pos, int &width, int &height, int &minYPos, int &maxYPos)
+{
+    int ax = bezier[0].x;
+    int ay = bezier[0].y;
+    int bx = bezier[1].x;
+    int by = bezier[1].y;
+    int cx = bezier[2].x;
+    int cy = bezier[2].y;
+    int dx = bezier[3].x;
+    int dy = bezier[3].y;
+
+    double px, py, qx, qy, rx, ry, sx, sy, tx, ty, tobx, toby, tocx, tocy, todx, tody, toqx, toqy, torx, tory, totx,
+        toty;
+    int x, y, minx, miny, maxx, maxy;
+
+    minx = miny = -VRV_UNSET;
+    maxx = maxy = VRV_UNSET;
+
+    tobx = bx - ax;
+    toby = by - ay; // directions
+    tocx = cx - bx;
+    tocy = cy - by;
+    todx = dx - cx;
+    tody = dy - cy;
+    double step = 1.0 / BEZIER_APPROXIMATION;
+    int i;
+    for (i = 0; i < (int)(BEZIER_APPROXIMATION + 1.0); i++) {
+        double d = i * step;
+        px = ax + d * tobx;
+        py = ay + d * toby;
+        qx = bx + d * tocx;
+        qy = by + d * tocy;
+        rx = cx + d * todx;
+        ry = cy + d * tody;
+        toqx = qx - px;
+        toqy = qy - py;
+        torx = rx - qx;
+        tory = ry - qy;
+
+        sx = px + d * toqx;
+        sy = py + d * toqy;
+        tx = qx + d * torx;
+        ty = qy + d * tory;
+        totx = tx - sx;
+        toty = ty - sy;
+
+        x = sx + d * totx;
+        y = sy + d * toty;
+        minx = std::min(minx, x);
+        if (miny > y) {
+            miny = y;
+            minYPos = (bezier[3].x - bezier[0].x) * d;
+        }
+        maxx = std::max(maxx, x);
+        if (maxy < y) {
+            maxy = y;
+            maxYPos = (bezier[3].x - bezier[0].x) * d;
+        }
+    }
+    pos.x = minx;
+    pos.y = miny;
+    width = maxx - minx;
+    height = maxy - miny;
 }
 
 } // namespace vrv
