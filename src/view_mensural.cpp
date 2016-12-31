@@ -28,8 +28,8 @@
 
 namespace vrv {
 
-int View::s_drawingLigX[2], View::s_drawingLigY[2]; // pour garder coord. des ligatures
-bool View::s_drawingLigObliqua = false; // marque le 1e passage pour une oblique
+int View::s_drawingLigX[2], View::s_drawingLigY[2]; // to keep coords. of ligatures
+bool View::s_drawingLigObliqua = false; // mark the first pass for an oblique
 
 //----------------------------------------------------------------------------
 // View - Mensural
@@ -158,9 +158,8 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         bool aboveStaff = (noteY > staffTop);
 
         distance = (aboveStaff ? (noteY - staffY) : staffY - m_doc->GetDrawingStaffSize(staffSize) - noteY);
-        highestNewLine
-            = ((distance % m_doc->GetDrawingDoubleUnit(staffSize) > 0) ? (distance - m_doc->GetDrawingUnit(staffSize))
-                                                                       : distance);
+        highestNewLine = ((distance % m_doc->GetDrawingDoubleUnit(staffSize) > 0) ?
+                          (distance - m_doc->GetDrawingUnit(staffSize)) : distance);
         numLines = highestNewLine / m_doc->GetDrawingDoubleUnit(staffSize);
 
         DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
@@ -227,11 +226,14 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         switch (drawingDur) {
             case DUR_LG: DrawRestLong(dc, x, y, staff); break;
             case DUR_BR: DrawRestBreve(dc, x, y, staff); break;
-            case DUR_1:
-            case DUR_2: DrawRestWhole(dc, x, y, drawingDur, rest->GetDots(), drawingCueSize, staff); break;
-            default: //DrawRestQuarter(dc, x, y, drawingDur, rest->GetDots(), drawingCueSize, staff);
-                    charCode = SMUFL_E9F6_mensuralRestSemiminima;
-                    DrawSmuflCode(dc, x, y, charCode, pseudoStaffSize, false);
+            case DUR_1: DrawRestWhole(dc, x, y, drawingDur, rest->GetDots(), drawingCueSize, staff); break;
+            default:
+                if (drawingDur==DUR_2) charCode = SMUFL_E9F5_mensuralRestMinima;
+                else if (drawingDur==DUR_4) charCode = SMUFL_E9F6_mensuralRestSemiminima;
+                else if (drawingDur==DUR_8) charCode = SMUFL_E9F7_mensuralRestFusa;
+                else if (drawingDur==DUR_16) charCode = SMUFL_E9F8_mensuralRestSemifusa;
+                else charCode = SMUFL_E04B_segnoSerpent2;                   // This should never happen
+                DrawSmuflCode(dc, x, y, charCode, pseudoStaffSize, false);
         }
     }
 
@@ -310,17 +312,16 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     nbFlags = (mensural_black? drawingDur - DUR_2 : drawingDur - DUR_4);
     totalFlagStemHeight = flagStemHeight * (nbFlags * 2 - 1) / 2;
     
-    /* FIXME: SMuFL provides combining stem-and-flag characters with one and two flags, but
-        at the moment, I'm using only the one flag ones, partly out of concern for possible
-        three-flag notes. Do such notes actually exist? Jason Stoessel says not in black
-        notation, but maybe in white? */
+    /* SMuFL provides combining stem-and-flag characters with one and two flags, but
+        at the moment, I'm using only the one flag ones, partly out of concern for
+        possible three-flag notes. */
     
     /* In black notation, the semiminima gets one flag; in white notation, it gets none.
         In both cases, as in CWMN, each shorter duration gets one additional flag. */
     
     if (dir == STEMDIRECTION_down) {
-        // flip all lengths. Exception: in mensural notation, the stem will never be at left,
-        //   so leave radius as is.
+        // flip all lengths. Exception: in mensural notation, the stem will never be at
+        //   left, so leave radius as is.
         baseStem = -baseStem;
         totalFlagStemHeight = -totalFlagStemHeight;
         heightY = -heightY;
@@ -672,7 +673,7 @@ void View::DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *lay
     /*
      else			// handle obliques
      {
-     if (!View::s_drawingLigObliqua)	// 1st pass: Initial flagStemHeighte
+     if (!View::s_drawingLigObliqua)	// 1st pass: Initial flagStemHeight
      {
      DrawVerticalLine (dc,y3,y4,x1, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
      View::s_drawingLigObliqua = true;
