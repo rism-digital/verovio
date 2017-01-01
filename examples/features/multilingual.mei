@@ -22,8 +22,8 @@
                             <staffDef clef.shape="G" clef.line="2" n="1" lines="5"/>
                         </staffGrp>
                     </scoreDef>
-                    <section label="feature-example">
-                        <measure n="1">
+                    <section>
+                        <measure n="1" label="feature-example">
                             <staff n="1">
                                 <layer n="1">
                                     <beam>
