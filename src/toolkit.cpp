@@ -421,7 +421,9 @@ bool Toolkit::LoadData(const std::string &data)
             return false;
         }
 
+#ifndef NO_HUMDRUM_SUPPORT
         SetHumdrumBuffer(tempinput->GetHumdrumString().c_str());
+#endif
         if (GetOutputFormat() == HUMDRUM) {
             return true;
         }
@@ -444,6 +446,7 @@ bool Toolkit::LoadData(const std::string &data)
         // LogMessage("Importing MusicXML data via Humdrum");
 
         // First convert from MusicXML into Humdrum:
+#ifndef NO_HUMDRUM_SUPPORT
         hum::Tool_musicxml2hum converter;
         pugi::xml_document xmlfile;
         xmlfile.load(data.c_str());
@@ -469,6 +472,7 @@ bool Toolkit::LoadData(const std::string &data)
         newData = meioutput.GetOutput();
         delete tempinput;
         input = new MeiInput(&m_doc, "");
+#endif
     }
     else {
         LogMessage("Unknown format");

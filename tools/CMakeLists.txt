@@ -39,10 +39,11 @@ endif()
 
 if(NO_HUMDRUM_SUPPORT)
     add_definitions(-DNO_HUMDRUM_SUPPORT)
+else()
+    file(GLOB hum_SRC "../src/hum/*.cpp")
 endif()
 
 file(GLOB verovio_SRC "../src/*.cpp")
-file(GLOB hum_SRC "../src/hum/*.cpp")
 file(GLOB midi_SRC "../src/midi/*.cpp")
 
 add_executable (
