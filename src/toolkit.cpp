@@ -17,7 +17,7 @@
 #include "iodarms.h"
 #include "iohumdrum.h"
 #include "iomei.h"
-//#include "iomusxml.h"
+#include "iomusxml.h"
 #include "iopae.h"
 #include "layer.h"
 #include "measure.h"
@@ -212,6 +212,9 @@ bool Toolkit::SetFormat(std::string const &informat)
     else if (informat == "musicxml") {
         m_format = MUSICXML;
     }
+    else if (informat == "musicxml-hum") {
+        m_format = MUSICXMLHUM;
+    }
     else if (informat == "auto") {
         m_format = AUTO;
     }
@@ -285,22 +288,22 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
             return MEI;
         }
         if (initial.find("<score-partwise>") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
         if (initial.find("<score-timewise>") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
         if (initial.find("<opus>") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
         if (initial.find("<score-partwise ") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
         if (initial.find("<score-timewise ") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
         if (initial.find("<opus ") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
 
         cerr << "Warning: Trying to load unknown XML data which cannot be identified." << endl;
@@ -441,12 +444,15 @@ bool Toolkit::LoadData(const std::string &data)
     else if (inputFormat == MUSICXML) {
         // This is the direct converter from MusicXML to MEI
         // using iomusicxml:
-        // input = new MusicXmlInput(&m_doc, "");
-
-        // LogMessage("Importing MusicXML data via Humdrum");
-
-        // First convert from MusicXML into Humdrum:
-#ifndef NO_HUMDRUM_SUPPORT
+        input = new MusicXmlInput(&m_doc, "");
+    }
+    else if (inputFormat == MUSICXMLHUM) {
+// This is the indirect converter from MusicXML to MEI
+// using iohumdrum:
+#ifdef NO_HUMDRUM_SUPPORT
+        // if no Humdrum support fallback to iomusicxml:
+        input = new MusicXmlInput(&m_doc, "");
+#else
         hum::Tool_musicxml2hum converter;
         pugi::xml_document xmlfile;
         xmlfile.load(data.c_str());
@@ -986,7 +992,6 @@ void Toolkit::SetHumdrumBuffer(const char *data)
             return;
         }
         strcpy(m_humdrumBuffer, output.c_str());
-	cerr << "STORING HUMDRUM DATA: " << output << endl;
     }
     else {
         int size = strlen(data) + 1;
@@ -1025,7 +1030,6 @@ const char *Toolkit::GetHumdrumBuffer()
         return m_humdrumBuffer;
     }
     else {
-        cerr << "NOTHING IN HUMDRUM BUFFER" << endl;
         return "[empty]";
     }
 }
