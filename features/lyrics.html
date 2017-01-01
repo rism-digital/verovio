@@ -60,6 +60,21 @@
 {% endhighlight %}
 </div>
 
+<!-- ***************************** -->
+<h5>Multiple languages</h5>
+<p>
+    Verovio recognizes <code>@xml.lang</code> in text elements like <code>&lt;verse&gt;</code> and <code>&lt;syl&gt;</code> and transfers them to the SVG output.
+</p>
+
+<div id="svg_output-5" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code5" file="multilingual.mei" %}
+<div id="code5-xml" style="display: none">
+{% highlight xml %}
+{% include features/multilingual.txt %}
+{% endhighlight %}
+</div>
+
 <script type="text/javascript">
 //<![CDATA[
     zoom = 40;
@@ -88,6 +103,10 @@
 
     $.get( "{{ site.baseurl }}/examples/features/lyrics4.mei" , function( data ) {
         load_data( data, $('#svg_output-4') );
+    });
+
+    $.get( "{{ site.baseurl }}/examples/features/multilingual.mei" , function( data ) {
+        load_data( data, $('#svg_output-5') );
     });
 //]]>
 </script>
