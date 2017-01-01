@@ -194,9 +194,14 @@ void Page::LayOutVertically()
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of outside articulations
-    AdjustArticulationsParams adjustArticulationsParams(doc);
-    Functor adjustArticulations(&Object::AdjustArticulations);
-    this->Process(&adjustArticulations, &adjustArticulationsParams);
+    AdjustArticParams adjustArticParams(doc);
+    Functor adjustArtic(&Object::AdjustArtic);
+    this->Process(&adjustArtic, &adjustArticParams);
+
+    // Adjust the position of outside articulations with slurs end and start positions
+    AdjustArticWithSlursParams adjustArticWithSlursParams(doc);
+    Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
+    this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
 
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     SetOverflowBBoxesParams setOverflowBBoxesParams(doc);

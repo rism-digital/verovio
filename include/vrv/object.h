@@ -17,6 +17,7 @@
 //----------------------------------------------------------------------------
 
 #include "attclasses.h"
+#include "boundingbox.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -63,92 +64,6 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 #define UNLIMITED_DEPTH -10000
 #define FORWARD true
 #define BACKWARD false
-
-//----------------------------------------------------------------------------
-// BoundingBox
-//----------------------------------------------------------------------------
-
-/**
- * This class represents a basic object in the layout domain
- */
-class BoundingBox {
-public:
-    // constructors and destructors
-    BoundingBox();
-    virtual ~BoundingBox(){};
-    virtual ClassId Is() const;
-
-    virtual void UpdateContentBBoxX(int x1, int x2);
-    virtual void UpdateContentBBoxY(int y1, int y2);
-    virtual void UpdateSelfBBoxX(int x1, int x2);
-    virtual void UpdateSelfBBoxY(int y1, int y2);
-    bool HasContentBB();
-    bool HasSelfBB();
-    void SetEmptyBB();
-    bool HasEmptyBB();
-
-    /**
-     * Reset the bounding box values
-     */
-    virtual void ResetBoundingBox();
-
-    /**
-     * @name Get and set the X and Y drawing position
-     */
-    ///@{
-    virtual int GetDrawingX() const { return m_drawingX; }
-    virtual int GetDrawingY() const { return m_drawingY; }
-    void SetDrawingX(int drawingX) { m_drawingX = drawingX; }
-    void SetDrawingY(int drawingY) { m_drawingY = drawingY; }
-    ///@}
-
-    /**
-     * @name Get positions for self and content
-     */
-    ///@{
-    int GetSelfBottom() const { return (this->GetDrawingY() + m_selfBB_y1); }
-    int GetSelfTop() const { return (this->GetDrawingY() + m_selfBB_y2); }
-    int GetSelfLeft() const { return (this->GetDrawingX() + m_selfBB_x1); }
-    int GetSelfRight() const { return (this->GetDrawingX() + m_selfBB_x2); }
-    int GetContentBottom() const { return (this->GetDrawingY() + m_contentBB_y1); }
-    int GetContentTop() const { return (this->GetDrawingY() + m_contentBB_y2); }
-    int GetContentLeft() const { return (this->GetDrawingX() + m_contentBB_x1); }
-    int GetContentRight() const { return (this->GetDrawingX() + m_contentBB_x2); }
-    ///@}
-
-    /**
-     * Is true if the bounding box (self or content) has been updated at least once.
-     * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
-     */
-    bool HasUpdatedBB() const { return (m_updatedBBoxX && m_updatedBBoxY); }
-
-    /**
-     * Returns true if the bounding box has a horizontal overlap with the other one.
-     */
-    bool HorizontalOverlap(const BoundingBox *other) const;
-
-    int CalcVerticalOverlap(const BoundingBox *other) const;
-
-private:
-    bool m_updatedBBoxX;
-    bool m_updatedBBoxY;
-
-protected:
-    /**
-     * The Y drawing position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingY;
-    /**
-     * The X drawing position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingX;
-
-public:
-    int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
-    int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
-};
 
 //----------------------------------------------------------------------------
 // Object
@@ -383,7 +298,7 @@ public:
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
     void FindAllChildByAttComparison(ArrayOfObjects *objects, AttComparison *attComparison,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -529,7 +444,12 @@ public:
     /**
      * Adjust the position the outside articulations.
      */
-    virtual int AdjustArticulations(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustArtic(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the outside articulations with slur.
+     */
+    virtual int AdjustArticWithSlurs(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of all floating positionner, staff by staff.

@@ -75,6 +75,18 @@ namespace musicxml {
         int m_number;
     };
 
+    class OpenHairpin {
+    public:
+        OpenHairpin(int dirN, std::string lastID)
+        {
+            m_dirN = dirN;
+            m_ID = lastID;
+        }
+
+        int m_dirN;
+        std::string m_ID;
+    };
+
 } // namespace musicxml
 
 //----------------------------------------------------------------------------
@@ -229,6 +241,8 @@ private:
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
     /** The stack for open ties */
     std::vector<std::pair<Tie *, musicxml::OpenTie> > m_tieStack;
+    /** The stack for hairpins */
+    std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> > m_hairpinStack;
     /** The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;

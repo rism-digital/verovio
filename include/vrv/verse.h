@@ -19,7 +19,7 @@ class Syl;
 // Verse
 //----------------------------------------------------------------------------
 
-class Verse : public LayerElement, public AttColor, public AttCommon, public AttTypography {
+class Verse : public LayerElement, public AttColor, public AttCommon, public AttLang, public AttTypography {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
