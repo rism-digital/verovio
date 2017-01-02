@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        iohumdrum.cpp
 // Author:      Craig Stuart Sapp
-// Created:     06/06/2015
+// Created:     06/06/2016
 // vim:         ts=4
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
@@ -2099,7 +2099,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     prepareBeamAndTupletGroups(layerdata, tg);
 
     if (m_debug) {
-        // printGroupInfo(tg, layerdata);
+        printGroupInfo(tg, layerdata);
     }
 
     m_tupletscaling = 1;
@@ -3469,6 +3469,16 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
     }
 
+    vector<bool> beamstarts2(poweroftwo.size(), false);
+    for (int i = 0; i < beamstarts.size(); i++) {
+        beamstarts2[beamstarts[i]] = true;
+    }
+
+    vector<bool> beamends2(poweroftwo.size(), false);
+    for (int i = 0; i < beamends.size(); i++) {
+        beamends2[beamends[i]] = true;
+    }
+
     // beamstate == boolean for keeping track of whether or not a beam
     // is currently active.
     bool beamstate = false;
@@ -3476,7 +3486,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // Go back and link all partial beamed tuplets and non-beamed tuplets.
     HumNum groupdur;
     for (int i = 0; i < (int)poweroftwo.size(); i++) {
-        if ((!beamstarts.empty()) && beamstarts[i]) {
+        if ((!beamstarts.empty()) && beamstarts2[i]) {
             beamstate = true;
         }
 
@@ -3518,20 +3528,15 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             for (j = i; j <= ending; j++) {
                 tupletgroups[j] = tupletnum;
                 // Only turn on a tuplet bracket if the tuplet is not inside
-                // of a beam (may have to change if a tuplet bracked is
+                // of a beam (may have to change if a tuplet bracket is
                 // desired within a beam).
-                if (beamstate) {
-                    tupletbracket[j] = 0;
-                }
-                else {
-                    tupletbracket[j] = 1;
-                }
+                tupletbracket[j] = true;
             }
             tupletnum++;
             i = ending;
         }
 
-        if ((!beamends.empty()) && beamends[i]) {
+        if ((!beamends2.empty()) && beamends2[i]) {
             beamstate = false;
         }
     }
