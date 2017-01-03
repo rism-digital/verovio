@@ -3410,7 +3410,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // fulldur == full duration of the note/rest including augmentation dots.
     vector<HumNum> fulldur(duritems.size());
 
-    // dursm = a cumulative sum of the full durs, starting at 0 for
+    // dursum = a cumulative sum of the full durs, starting at 0 for
     // the first index.
     vector<HumNum> dursum(duritems.size());
 
@@ -3460,8 +3460,19 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         if (binarybeams[i]) {
             continue;
         }
+        bool ingroup = false;
         if (beampowdot[i] >= 0) {
             for (j = beamstarts[i]; j <= beamends[i]; j++) {
+                // may have to deal with dotted triplets (which appear to be powers of two)
+                if (poweroftwo[j]) {
+                    if (ingroup) {
+                        ingroup = false;
+                        tupletnum++;
+                    }
+                    tupletbracket[j] = 0;
+                    continue;
+                }
+                ingroup = true;
                 tupletgroups[j] = tupletnum;
                 tupletbracket[j] = 0;
             }
@@ -3485,6 +3496,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
     // Go back and link all partial beamed tuplets and non-beamed tuplets.
     HumNum groupdur;
+    bool hasRest = false;
     for (int i = 0; i < (int)poweroftwo.size(); i++) {
         if ((!beamstarts.empty()) && beamstarts2[i]) {
             beamstate = true;
@@ -3504,6 +3516,9 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         int ending = (int)poweroftwo.size() - 1;
         groupdur = 0;
         while (j < (int)poweroftwo.size()) {
+            if ((!hasRest) && (duritems[j]->isRest())) {
+                hasRest = true;
+            }
             if (poweroftwo[j]) {
                 ending = j - 1;
                 break;
@@ -3530,7 +3545,9 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 // Only turn on a tuplet bracket if the tuplet is not inside
                 // of a beam (may have to change if a tuplet bracket is
                 // desired within a beam).
-                tupletbracket[j] = true;
+                if (!hasRest) {
+                    tupletbracket[j] = true;
+                }
             }
             tupletnum++;
             i = ending;
@@ -3580,6 +3597,11 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             // this still needs to be fixed: dotted tuplets.
             tuptop[i] = dotlessdur[i].getDenominator();
             tupbot[i] = dotlessdur[i].getNumerator();
+        }
+        if ((tuptop[i] == 1) && (tupbot[i] == 1)) {
+            tuptop[i] = 0;
+            tupbot[i] = 0;
+            cerr << "NOT A TUPLET " << endl;
         }
     }
 
@@ -3668,7 +3690,8 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             }
             else if (tg[i].beamend && tg[i].tupletend) {
                 if (tg[i].bracket > 0) {
-                    tg[i].priority = 'B'; // close beam first
+                    // tg[i].priority = 'B'; // close beam first
+                    tg[i].priority = 'T'; // maybe close tuplet first (check more cases)
                 }
                 else {
                     tg[i].priority = 'T'; // close tuplet first
