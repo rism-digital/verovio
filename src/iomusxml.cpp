@@ -1018,8 +1018,10 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             tuplet->SetNum(atoi(GetContent(actualNotes.node()).c_str()));
             tuplet->SetNumbase(atoi(GetContent(normalNotes.node()).c_str()));
         }
+        tuplet->SetNumFormat(ConvertTupletNumberValue(GetAttributeValue(notations.node().select_single_node("tuplet").node(), "show-number")));
         tuplet->SetBracketVisible(
             ConvertWordToBool(GetAttributeValue(notations.node().select_single_node("tuplet").node(), "bracket")));
+        if (HasAttributeWithValue(notations.node().select_single_node("tuplet").node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
     }
 
     pugi::xpath_node rest = node.select_single_node("rest");
@@ -1054,7 +1056,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     else {
         Note *note = new Note();
         element = note;
-        if (HasAttributeWithValue(node, "print-object", "no")) note->SetVisible(BOOLEAN_false);
+        note->SetVisible(ConvertWordToBool(GetAttributeValue(node, "print-object")));
         if (!noteColor.empty()) note->SetColor(noteColor.c_str());
 
         // accidental
@@ -1121,11 +1123,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         pugi::xpath_node grace = node.select_single_node("grace");
         if (grace) {
             std::string slashStr = GetAttributeValue(grace.node(), "slash");
-            if (slashStr == "yes") {
+            if (slashStr == "no") {
                 note->SetGrace(GRACE_acc);
             }
-            else if (slashStr == "no") {
+            else if (slashStr == "yes") {
                 note->SetGrace(GRACE_unacc);
+                note->SetStemMod(STEMMODIFIER_1slash);
             }
             else {
                 note->SetGrace(GRACE_unknown);
@@ -1395,6 +1398,7 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
     return DURATION_NONE;
 }
 
+
 data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
 {
     if (value == "C") return PITCHNAME_c;
@@ -1425,6 +1429,13 @@ pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
     if (value == "stop") return pedalLog_DIR_up;
     LogWarning("Unsupported type '%s' for pedal", value.c_str());
     return pedalLog_DIR_NONE;
+}
+
+tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(std::string value)
+{
+    if (value == "actual") return tupletVis_NUMFORMAT_count;
+    if (value == "both") return tupletVis_NUMFORMAT_ratio;
+    return tupletVis_NUMFORMAT_NONE;
 }
 
 } // namespace vrv

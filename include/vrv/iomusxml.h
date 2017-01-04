@@ -228,6 +228,7 @@ private:
     data_PITCHNAME ConvertStepToPitchName(std::string value);
     data_PLACE ConvertTypeToPlace(std::string value);
     pedalLog_DIR ConvertPedalTypeToDir(std::string value);
+    tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
     ///@}
 
 private:
