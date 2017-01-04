@@ -758,6 +758,7 @@ void MeiOutput::WriteMeiHarm(pugi::xml_node currentNode, Harm *harm)
     WriteXmlId(currentNode, harm);
     WriteTextDirInterface(currentNode, harm);
     WriteTimeSpanningInterface(currentNode, harm);
+    harm->WriteLang(currentNode);
 };
 
 void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
@@ -2200,6 +2201,7 @@ bool MeiInput::ReadMeiHarm(Object *parent, pugi::xml_node harm)
 
     ReadTextDirInterface(harm, vrvHarm);
     ReadTimeSpanningInterface(harm, vrvHarm);
+    vrvHarm->ReadLang(harm);
 
     parent->AddChild(vrvHarm);
     return ReadMeiTextChildren(vrvHarm, harm);
