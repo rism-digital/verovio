@@ -39,21 +39,20 @@ endif()
 
 if(NO_HUMDRUM_SUPPORT)
     add_definitions(-DNO_HUMDRUM_SUPPORT)
+else()
+    file(GLOB hum_SRC "../src/hum/*.cpp")
 endif()
 
 file(GLOB verovio_SRC "../src/*.cpp")
+file(GLOB midi_SRC "../src/midi/*.cpp")
 
 add_executable (
     verovio
     main.cpp
     ${verovio_SRC}
+    ${hum_SRC}
+    ${midi_SRC}
     ../src/pugi/pugixml.cpp
-    ../src/midi/Binasc.cpp
-    ../src/midi/MidiEvent.cpp
-    ../src/midi/MidiEventList.cpp
-    ../src/midi/MidiFile.cpp
-    ../src/midi/MidiMessage.cpp
-    ../src/hum/humlib.cpp
     ../libmei/attconverter.cpp
     ../libmei/atts_cmn.cpp
     ../libmei/atts_critapp.cpp

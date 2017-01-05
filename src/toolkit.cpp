@@ -41,9 +41,10 @@ const char *UTF_16_LE_BOM = "\xFF\xFE";
 // Toolkit
 //----------------------------------------------------------------------------
 
+char *Toolkit::m_humdrumBuffer = NULL;
+
 Toolkit::Toolkit(bool initFont)
 {
-
     m_scale = DEFAULT_SCALE;
     m_format = AUTO;
 
@@ -65,6 +66,7 @@ Toolkit::Toolkit(bool initFont)
     m_scoreBasedMei = false;
 
     m_cString = NULL;
+    m_humdrumBuffer = NULL;
 
     if (initFont) {
         Resources::InitFonts();
@@ -75,6 +77,11 @@ Toolkit::~Toolkit()
 {
     if (m_cString) {
         free(m_cString);
+        m_cString = NULL;
+    }
+    if (m_humdrumBuffer) {
+        free(m_humdrumBuffer);
+        m_humdrumBuffer = NULL;
     }
 }
 
@@ -173,6 +180,21 @@ bool Toolkit::SetSpacingNonLinear(float spacingNonLinear)
     return true;
 }
 
+bool Toolkit::SetOutputFormat(std::string const &outformat)
+{
+    if (outformat == "humdrum") {
+        m_outformat = HUMDRUM;
+    }
+    else if (outformat == "mei") {
+        m_outformat = MEI;
+    }
+    else {
+        LogError("Output format can only be: mei, humdrum, midi or svg");
+        return false;
+    }
+    return true;
+}
+
 bool Toolkit::SetFormat(std::string const &informat)
 {
     if (informat == "pae") {
@@ -190,6 +212,9 @@ bool Toolkit::SetFormat(std::string const &informat)
     else if (informat == "musicxml") {
         m_format = MUSICXML;
     }
+    else if (informat == "musicxml-hum") {
+        m_format = MUSICXMLHUM;
+    }
     else if (informat == "auto") {
         m_format = AUTO;
     }
@@ -198,7 +223,7 @@ bool Toolkit::SetFormat(std::string const &informat)
         return false;
     }
     return true;
-};
+}
 
 void Toolkit::SetAppXPathQueries(std::vector<std::string> const &xPathQueries)
 {
@@ -263,22 +288,22 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
             return MEI;
         }
         if (initial.find("<score-partwise>") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
         if (initial.find("<score-timewise>") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
         if (initial.find("<opus>") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
         if (initial.find("<score-partwise ") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
         if (initial.find("<score-timewise ") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
         if (initial.find("<opus ") != string::npos) {
-            return MUSICXML;
+            return MUSICXMLHUM;
         }
 
         cerr << "Warning: Trying to load unknown XML data which cannot be identified." << endl;
@@ -384,12 +409,26 @@ bool Toolkit::LoadData(const std::string &data)
         input = new DarmsInput(&m_doc, "");
     }
     else if (inputFormat == HUMDRUM) {
+        // LogMessage("Importing Humdrum data");
+
         Doc tempdoc;
-        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        HumdrumInput *tempinput = new HumdrumInput(&tempdoc, "");
+
+        if (GetOutputFormat() == HUMDRUM) {
+            tempinput->SetOutputFormat("humdrum");
+        }
+
         if (!tempinput->ImportString(data)) {
             LogError("Error importing Humdrum data");
             delete tempinput;
             return false;
+        }
+
+#ifndef NO_HUMDRUM_SUPPORT
+        SetHumdrumBuffer(tempinput->GetHumdrumString().c_str());
+#endif
+        if (GetOutputFormat() == HUMDRUM) {
+            return true;
         }
 
         MeiOutput meioutput(&tempdoc, "");
@@ -403,10 +442,46 @@ bool Toolkit::LoadData(const std::string &data)
         input = new MeiInput(&m_doc, "");
     }
     else if (inputFormat == MUSICXML) {
+        // This is the direct converter from MusicXML to MEI
+        // using iomusicxml:
         input = new MusicXmlInput(&m_doc, "");
     }
+    else if (inputFormat == MUSICXMLHUM) {
+// This is the indirect converter from MusicXML to MEI
+// using iohumdrum:
+#ifdef NO_HUMDRUM_SUPPORT
+        // if no Humdrum support fallback to iomusicxml:
+        input = new MusicXmlInput(&m_doc, "");
+#else
+        hum::Tool_musicxml2hum converter;
+        pugi::xml_document xmlfile;
+        xmlfile.load(data.c_str());
+        stringstream conversion;
+        bool status = converter.convert(conversion, xmlfile);
+        if (!status) {
+            LogError("Error converting MusicXML");
+            return false;
+        }
+        std::string buffer = conversion.str();
+        SetHumdrumBuffer(buffer.c_str());
+
+        // Now convert Humdrum into MEI:
+        Doc tempdoc;
+        FileInputStream *tempinput = new HumdrumInput(&tempdoc, "");
+        if (!tempinput->ImportString(conversion.str())) {
+            LogError("Error importing Humdrum data");
+            delete tempinput;
+            return false;
+        }
+        MeiOutput meioutput(&tempdoc, "");
+        meioutput.SetScoreBasedMEI(true);
+        newData = meioutput.GetOutput();
+        delete tempinput;
+        input = new MeiInput(&m_doc, "");
+#endif
+    }
     else {
-        LogError("Unknown format");
+        LogMessage("Unknown format");
         return false;
     }
 
@@ -754,6 +829,31 @@ bool Toolkit::RenderToSvgFile(const std::string &filename, int pageNo)
     return true;
 }
 
+std::string Toolkit::GetHumdrum()
+{
+    return GetHumdrumBuffer();
+}
+
+bool Toolkit::GetHumdrumFile(const std::string &filename)
+{
+    std::ofstream output;
+    output.open(filename.c_str());
+
+    if (!output.is_open()) {
+        // add message?
+        return false;
+    }
+
+    GetHumdrum(output);
+    output.close();
+    return true;
+}
+
+void Toolkit::GetHumdrum(ostream &output)
+{
+    output << GetHumdrumBuffer();
+}
+
 std::string Toolkit::RenderToMidi()
 {
     MidiFile outputfile;
@@ -861,6 +961,59 @@ void Toolkit::SetCString(const std::string &data)
     strcpy(m_cString, data.c_str());
 }
 
+void Toolkit::SetHumdrumBuffer(const char *data)
+{
+    if (m_humdrumBuffer) {
+        free(m_humdrumBuffer);
+        m_humdrumBuffer = NULL;
+    }
+
+#ifndef NO_HUMDRUM_SUPPORT
+    hum::HumdrumFile file;
+    file.readString(data);
+    // apply Humdrum tools if there are any filters in the file.
+    if (file.hasFilters()) {
+        string output;
+        hum::Tool_filter filter;
+        filter.run(file);
+        if (filter.hasHumdrumText()) {
+            output = filter.getHumdrumText();
+        }
+        else {
+            // humdrum structure not always correct in output from tools
+            // yet, so reload.
+            stringstream tempdata;
+            tempdata << file;
+            output = tempdata.str();
+        }
+        m_humdrumBuffer = (char *)malloc(output.size() + 1);
+        if (!m_humdrumBuffer) {
+            // something went wrong
+            return;
+        }
+        strcpy(m_humdrumBuffer, output.c_str());
+    }
+    else {
+        int size = strlen(data) + 1;
+        m_humdrumBuffer = (char *)malloc(size);
+        if (!m_humdrumBuffer) {
+            // something went wrong
+            return;
+        }
+        strcpy(m_humdrumBuffer, data);
+    }
+
+#else
+    int size = strlen(data) + 1;
+    m_humdrumBuffer = (char *)malloc(size);
+    if (!m_humdrumBuffer) {
+        // something went wrong
+        return;
+    }
+    strcpy(m_humdrumBuffer, data);
+#endif
+}
+
 const char *Toolkit::GetCString()
 {
     if (m_cString) {
@@ -868,6 +1021,16 @@ const char *Toolkit::GetCString()
     }
     else {
         return "[unspecified]";
+    }
+}
+
+const char *Toolkit::GetHumdrumBuffer()
+{
+    if (m_humdrumBuffer) {
+        return m_humdrumBuffer;
+    }
+    else {
+        return "[empty]";
     }
 }
 
