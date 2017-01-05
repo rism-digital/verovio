@@ -5478,7 +5478,7 @@ vector<int> HumdrumInput::analyzeMultiRest(HumdrumFile &infile)
         }
     }
 
-    for (int i = wholerest.size() - 2; i >= 0; i--) {
+    for (int i = (int)wholerest.size() - 2; i >= 0; i--) {
         if (bardur[i] != bardur[i + 1]) {
             continue;
         }

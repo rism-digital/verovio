@@ -693,15 +693,15 @@ bool Tool_musicxml2hum::convertNowEvents(GridMeasure* outdata,
 		return true;
 	}
 
-	if (0 && VoiceDebugQ) {
-		for (int j=0; j<(int)nowevents.size(); j++) {
-			vector<MxmlEvent*> nz = nowevents[j]->nonzerodur;
-			for (int i=0; i<(int)nz.size(); i++) {
-				cerr << "NOWEVENT NZ NAME: " << nz[i]->getElementName()
-				     << "<\t" << nz[i]->getKernPitch() << endl;
-			}
-		}
-	}
+	//if (0 && VoiceDebugQ) {
+	//	for (int j=0; j<(int)nowevents.size(); j++) {
+	//		vector<MxmlEvent*> nz = nowevents[j]->nonzerodur;
+	//		for (int i=0; i<(int)nz.size(); i++) {
+	//			cerr << "NOWEVENT NZ NAME: " << nz[i]->getElementName()
+	//			     << "<\t" << nz[i]->getKernPitch() << endl;
+	//		}
+	//	}
+	//}
 
 	appendZeroEvents(outdata, nowevents, nowtime, partdata);
 
