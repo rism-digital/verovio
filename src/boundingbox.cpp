@@ -314,7 +314,12 @@ int BoundingBox::Intersects(FloatingPositioner *curve, int margin) const
     // The curve in inside the left and right side of the content
     else if ((p1.x >= this->GetContentLeft()) && p2.x <= this->GetContentRight()) {
         // LogDebug("inside");
-        return (curve->GetContentTop() - this->GetContentBottom() + margin);
+        if (curve->m_cuvreDir == curvature_CURVEDIR_above) {
+            return (curve->GetContentTop() - this->GetContentBottom() + margin);
+        }
+        else {
+            return (curve->GetContentBottom() - this->GetContentTop() - margin);
+        }
     }
     else {
         LogDebug("This should not happen");
