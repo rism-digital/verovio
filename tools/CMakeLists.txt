@@ -4,8 +4,13 @@ project(Verovio)
 
 set(CMAKE_BUILD_TYPE Release)
 
-option(NO_PAE_SUPPORT     "Disable Plain and Easy support" OFF)
-option(NO_HUMDRUM_SUPPORT "Disable Humdrum support"        OFF)
+option(NO_PAE_SUPPORT           "Disable Plain and Easy support"               OFF)
+option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
+option(DEFAULT_MUSICXML_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
+
+if (NO_HUMDRUM_SUPPORT AND DEFAULT_MUSICXML_HUMDRUM)
+    message(SEND_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
+endif()
 
 include_directories(
     ../include
@@ -41,6 +46,9 @@ if(NO_HUMDRUM_SUPPORT)
     add_definitions(-DNO_HUMDRUM_SUPPORT)
 else()
     file(GLOB hum_SRC "../src/hum/*.cpp")
+    if (DEFAULT_MUSICXML_HUMDRUM)
+        add_definitions(-DDEFAULT_MUSICXML_HUMDRUM)
+    endif()
 endif()
 
 file(GLOB verovio_SRC "../src/*.cpp")
