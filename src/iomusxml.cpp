@@ -1018,10 +1018,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             tuplet->SetNum(atoi(GetContent(actualNotes.node()).c_str()));
             tuplet->SetNumbase(atoi(GetContent(normalNotes.node()).c_str()));
         }
-        tuplet->SetNumFormat(ConvertTupletNumberValue(GetAttributeValue(notations.node().select_single_node("tuplet").node(), "show-number")));
-        tuplet->SetBracketVisible(
-            ConvertWordToBool(GetAttributeValue(notations.node().select_single_node("tuplet").node(), "bracket")));
-        if (HasAttributeWithValue(notations.node().select_single_node("tuplet").node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
+        tuplet->SetNumFormat(ConvertTupletNumberValue(GetAttributeValue(tupletStart.node(), "show-number")));
+        tuplet->SetNumPlace(ConvertTypeToPlace(GetAttributeValue(tupletStart.node(), "placement")));
+        if (HasAttributeWithValue(tupletStart.node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
+        tuplet->SetBracketPlace(ConvertTypeToPlace(GetAttributeValue(tupletStart.node(), "placement")));
+        tuplet->SetBracketVisible(ConvertWordToBool(GetAttributeValue(tupletStart.node(), "bracket")));
     }
 
     pugi::xpath_node rest = node.select_single_node("rest");
@@ -1398,7 +1399,6 @@ data_DURATION MusicXmlInput::ConvertTypeToDur(std::string value)
     return DURATION_NONE;
 }
 
-
 data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
 {
     if (value == "C") return PITCHNAME_c;
@@ -1419,7 +1419,6 @@ data_PLACE MusicXmlInput::ConvertTypeToPlace(std::string value)
     // for fermatas
     if (value == "upright") return PLACE_above;
     if (value == "inverted") return PLACE_below;
-    LogWarning("Unsupported type '%s'", value.c_str());
     return PLACE_NONE;
 }
 
