@@ -3456,6 +3456,13 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     vector<int> tupletbracket(poweroftwo.size(), -1);
     int tupletnum = 1;
     int j;
+
+    // adjusted tuplet number by tuplet group
+    vector<int> adjustcount;
+
+    HumNum tupletdur = 0;
+    int tupletcount = 0;
+    int samedurtup = true;
     for (int i = 0; i < (int)beampowdot.size(); i++) {
         if (binarybeams[i]) {
             continue;
@@ -3474,9 +3481,29 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 }
                 ingroup = true;
                 tupletgroups[j] = tupletnum;
+                if (tupletcount == 0) {
+                    samedurtup = true;
+                    tupletdur = fulldur[j];
+                }
+                else if (tupletdur != fulldur[j]) {
+                    samedurtup = false;
+                }
+                tupletcount++;
+
                 tupletbracket[j] = 0;
             }
+            if (samedurtup) {
+                if (tupletnum >= adjustcount.size()) {
+                    int oldsize = (int)adjustcount.size();
+                    adjustcount.resize(tupletnum + 1);
+                    for (int z = (int)oldsize; z < adjustcount.size(); z++) {
+                        adjustcount[z] = 0;
+                    }
+                }
+                adjustcount[tupletnum] = tupletcount;
+            }
             tupletnum++;
+            tupletcount = 0;
         }
     }
 
@@ -3679,6 +3706,13 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             }
             else {
                 tg[i].numscale = 1;
+            }
+            if (tg[i].group > 0) {
+                if (tg[i].group < (int)adjustcount.size()) {
+                    if (adjustcount[tg[i].group] % tg[i].num == 0) {
+                        tg[i].numscale = adjustcount[tg[i].group] / tg[i].num;
+                    }
+                }
             }
             if (tg[i].beamstart && tg[i].tupletstart) {
                 if (tg[i].bracket > 0) {
