@@ -765,13 +765,24 @@ void Tool_musicxml2hum::addEvent(GridSlice& slice,
 	bool grace = false;
 	bool invisible = false;
 	bool primarynote = true;
+	bool slurstart = false;
+	bool slurstop = false;
 
 	if (!event->isFloating()) {
-		recip   = event->getRecip();
-		pitch   = event->getKernPitch();
-		prefix  = event->getPrefixNoteInfo();
-		postfix = event->getPostfixNoteInfo(primarynote);
-		grace   = event->isGrace();
+		recip     = event->getRecip();
+		pitch     = event->getKernPitch();
+		prefix    = event->getPrefixNoteInfo();
+		postfix   = event->getPostfixNoteInfo(primarynote);
+		grace     = event->isGrace();
+		slurstart = event->hasSlurStart();
+		slurstop  = event->hasSlurStop();
+
+		if (slurstart) {
+			prefix.insert(0, "(");
+		}
+		if (slurstop) {
+			postfix.push_back(')');
+		}
 
 		invisible = isInvisible(event);
 		if (event->isInvisible()) {
@@ -1130,6 +1141,7 @@ void Tool_musicxml2hum::addSecondaryChordNotes(ostream& output,
 		pitch   = note->getKernPitch();
 		prefix  = note->getPrefixNoteInfo();
 		postfix = note->getPostfixNoteInfo(primarynote);
+		// maybe add slurs for secondary chord notes here.
 		output << " " << prefix << recip << pitch << postfix;
 	}
 }

@@ -494,7 +494,82 @@ bool MxmlEvent::isGrace(void) {
 			// grace element has to come before pitch
 			return false;
 		}
-		child = child.first_child();
+		child = child.next_sibling();
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::hasSlurStart --
+//
+//  <note>
+//     <notations>
+//         <slur type="start" orientation="under" number="1">
+//
+//
+
+bool MxmlEvent::hasSlurStart(void) {
+	xml_node child = this->getNode();
+	if (!nodeType(child, "note")) {
+		return false;
+	}
+	child = child.first_child();
+	while (child) {
+		if (nodeType(child, "notations")) {
+			xml_node grandchild = child.first_child();
+			while (grandchild) {
+				if (nodeType(grandchild, "slur")) {
+					xml_attribute slurtype = grandchild.attribute("type");
+					if (slurtype) {
+						if (strcmp(slurtype.value(), "start") == 0) {
+							return true;
+						}
+					}
+				}
+				grandchild = grandchild.next_sibling();
+			}
+		}
+		child = child.next_sibling();
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::hasSlurStop --
+//
+//  <note>
+//     <notations>
+//         <slur type="start" orientation="under" number="1">
+//
+
+bool MxmlEvent::hasSlurStop(void) {
+	xml_node child = this->getNode();
+	if (!nodeType(child, "note")) {
+		return false;
+	}
+	child = child.first_child();
+	while (child) {
+		if (nodeType(child, "notations")) {
+			xml_node grandchild = child.first_child();
+			while (grandchild) {
+				if (nodeType(grandchild, "slur")) {
+					xml_attribute slurtype = grandchild.attribute("type");
+					if (slurtype) {
+						if (strcmp(slurtype.value(), "stop") == 0) {
+							return true;
+						}
+					}
+				}
+				grandchild = grandchild.next_sibling();
+			}
+		}
+		child = child.next_sibling();
 	}
 	return false;
 }
