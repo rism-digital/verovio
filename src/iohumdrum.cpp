@@ -3712,6 +3712,9 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                     if (adjustcount[tg[i].group] % tg[i].num == 0) {
                         tg[i].numscale = adjustcount[tg[i].group] / tg[i].num;
                     }
+                    if (tg[i].numscale == 0) {
+                       tg[i].numscale = 1;
+                    }
                 }
             }
             if (tg[i].beamstart && tg[i].tupletstart) {
