@@ -1153,6 +1153,7 @@ string MxmlEvent::getKernPitch(void) {
 	string step;
 	int alter  = 0;
 	int octave = 4;
+	bool naturalQ = false;
 
 	if (nodeType(m_node, "forward")) {
 		rest = true;
@@ -1174,6 +1175,10 @@ string MxmlEvent::getKernPitch(void) {
 						octave = atoi(grandchild.child_value());
 					}
 					grandchild = grandchild.next_sibling();
+				}
+			} else if (nodeType(child, "accidental")) {
+				if (strcmp(child.child_value(), "natural") == 0) {
+					naturalQ = true;
 				}
 			}
 			child = child.next_sibling();
@@ -1208,12 +1213,12 @@ string MxmlEvent::getKernPitch(void) {
 		for (int i=0; i>alter; i--) {
 			output += '-';
 		}
+	} else if (naturalQ) {
+		output += 'n';
 	}
-	// print cautionary natural sign here...
 
 	return output;
 }
-
 
 
 
