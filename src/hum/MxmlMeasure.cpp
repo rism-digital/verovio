@@ -752,6 +752,7 @@ void MxmlMeasure::setStyle(MeasureStyle style) {
 		m_style = MeasureStyle::RepeatBoth;
 	} else if ((m_style == MeasureStyle::RepeatForward) && 
 			(style == MeasureStyle::RepeatBackward)) {
+		m_style = MeasureStyle::RepeatBoth;
 	} else {
 		// some sort of problem to deal with later
 		m_style = style;
