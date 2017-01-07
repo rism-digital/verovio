@@ -50,6 +50,8 @@ class GridMeasure : public list<GridSlice*> {
 		void         setStyle       (MeasureStyle style) { m_style = style; }
 		void         setBarStyle    (MeasureStyle style) { setStyle(style); }
 
+		bool         isDouble(void) 
+		                  {return m_style == MeasureStyle::Double;}
 		bool         isFinal(void) 
 		                  {return m_style == MeasureStyle::Final;}
 		bool         isRepeatBackward(void) 

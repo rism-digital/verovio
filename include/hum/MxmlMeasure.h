@@ -93,6 +93,7 @@ class MxmlMeasure {
 		void  setBarStyle                (MeasureStyle style);
 		void  makeFinalBarline(void) { m_style = MeasureStyle::Final; }
 		bool  isFinal(void)   { return m_style == MeasureStyle::Final; }
+		bool  isDouble(void)   { return m_style == MeasureStyle::Double; }
 		bool  isRepeatBackward(void)   { return m_style == MeasureStyle::RepeatBackward; }
 
 	private:

@@ -754,7 +754,9 @@ void HumGrid::getMetricBarNumbers(vector<int>& barnums) {
 
 string HumGrid::getBarStyle(GridMeasure* measure) {
 	string output = "";
-	if (measure->isFinal()) {
+	if (measure->isDouble()) {
+		output = "||";
+	} else if (measure->isFinal()) {
 		output = "=";
 	} else if (measure->isRepeatBackward()) {
 		output = ":|!";

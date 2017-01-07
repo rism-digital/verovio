@@ -1071,7 +1071,9 @@ void MxmlEvent::setBarlineStyle(xml_node node) {
 		child = child.next_sibling();
 	}
 
-	if ((repeat == 0) && (barstyle == "light-heavy")) {
+	if ((repeat == 0) && (barstyle == "light-light")) {
+		reportMeasureStyleToOwner(MeasureStyle::Double);
+	} else if ((repeat == 0) && (barstyle == "light-heavy")) {
 		reportMeasureStyleToOwner(MeasureStyle::Final);
 	} else if ((repeat == -1) && (barstyle == "light-heavy")) {
 		reportMeasureStyleToOwner(MeasureStyle::RepeatBackward);
