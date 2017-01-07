@@ -243,6 +243,12 @@ void Toolkit::SetChoiceXPathQueries(std::vector<std::string> const &xPathQueries
 
 FileFormat Toolkit::IdentifyInputFormat(const string &data)
 {
+#ifdef MUSICXML_DEFAULT_HUMDRUM
+    FileFormat musicxmlDefault = MUSICXMLHUM;
+#else
+    FileFormat musicxmlDefault = MUSICXML;
+#endif
+    
     size_t searchLimit = 600;
     if (data.size() == 0) {
         return UNKNOWN;
@@ -288,22 +294,22 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
             return MEI;
         }
         if (initial.find("<score-partwise>") != string::npos) {
-            return MUSICXMLHUM;
+            return musicxmlDefault;
         }
         if (initial.find("<score-timewise>") != string::npos) {
-            return MUSICXMLHUM;
+            return musicxmlDefault;
         }
         if (initial.find("<opus>") != string::npos) {
-            return MUSICXMLHUM;
+            return musicxmlDefault;
         }
         if (initial.find("<score-partwise ") != string::npos) {
-            return MUSICXMLHUM;
+            return musicxmlDefault;
         }
         if (initial.find("<score-timewise ") != string::npos) {
-            return MUSICXMLHUM;
+            return musicxmlDefault;
         }
         if (initial.find("<opus ") != string::npos) {
-            return MUSICXMLHUM;
+            return musicxmlDefault;
         }
 
         cerr << "Warning: Trying to load unknown XML data which cannot be identified." << endl;
@@ -408,6 +414,7 @@ bool Toolkit::LoadData(const std::string &data)
     else if (inputFormat == DARMS) {
         input = new DarmsInput(&m_doc, "");
     }
+#ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == HUMDRUM) {
         // LogMessage("Importing Humdrum data");
 
@@ -424,9 +431,8 @@ bool Toolkit::LoadData(const std::string &data)
             return false;
         }
 
-#ifndef NO_HUMDRUM_SUPPORT
         SetHumdrumBuffer(tempinput->GetHumdrumString().c_str());
-#endif
+        
         if (GetOutputFormat() == HUMDRUM) {
             return true;
         }
@@ -438,21 +444,17 @@ bool Toolkit::LoadData(const std::string &data)
 
         input = new MeiInput(&m_doc, "");
     }
+#endif
     else if (inputFormat == MEI) {
         input = new MeiInput(&m_doc, "");
     }
     else if (inputFormat == MUSICXML) {
-        // This is the direct converter from MusicXML to MEI
-        // using iomusicxml:
+        // This is the direct converter from MusicXML to MEI using iomusicxml:
         input = new MusicXmlInput(&m_doc, "");
     }
+#ifndef NO_HUMDRUM_SUPPORT
     else if (inputFormat == MUSICXMLHUM) {
-// This is the indirect converter from MusicXML to MEI
-// using iohumdrum:
-#ifdef NO_HUMDRUM_SUPPORT
-        // if no Humdrum support fallback to iomusicxml:
-        input = new MusicXmlInput(&m_doc, "");
-#else
+        // This is the indirect converter from MusicXML to MEI using iohumdrum:
         hum::Tool_musicxml2hum converter;
         pugi::xml_document xmlfile;
         xmlfile.load(data.c_str());
@@ -478,10 +480,10 @@ bool Toolkit::LoadData(const std::string &data)
         newData = meioutput.GetOutput();
         delete tempinput;
         input = new MeiInput(&m_doc, "");
-#endif
     }
+#endif
     else {
-        LogMessage("Unknown format");
+        LogMessage("Unsupported format");
         return false;
     }
 
