@@ -132,10 +132,19 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 
 	HumdrumFile outfile;
 	outdata.transferTokens(outfile);
+
 	for (int i=0; i<outfile.getLineCount(); i++) {
 		outfile[i].createLineFromTokens();
 	}
 	out << outfile;
+	
+	// add RDFs
+	if (m_slurabove) {
+		out << "!!!RDF**kern: > = slur above" << endl;
+	}
+	if (m_slurbelow) {
+		out << "!!!RDF**kern: > = slur below" << endl;
+	}
 
 	return status;
 }
@@ -767,6 +776,7 @@ void Tool_musicxml2hum::addEvent(GridSlice& slice,
 	bool primarynote = true;
 	bool slurstart = false;
 	bool slurstop = false;
+	int slurdir = 0;
 
 	if (!event->isFloating()) {
 		recip     = event->getRecip();
@@ -774,11 +784,20 @@ void Tool_musicxml2hum::addEvent(GridSlice& slice,
 		prefix    = event->getPrefixNoteInfo();
 		postfix   = event->getPostfixNoteInfo(primarynote);
 		grace     = event->isGrace();
-		slurstart = event->hasSlurStart();
+		slurstart = event->hasSlurStart(slurdir);
 		slurstop  = event->hasSlurStop();
 
 		if (slurstart) {
 			prefix.insert(0, "(");
+			if (slurdir) {
+				if (slurdir > 0) {
+					prefix.insert(1, ">");
+					m_slurabove++;
+				} else if (slurdir < 0) {
+					prefix.insert(1, "<");
+					m_slurbelow++;
+				}
+			}
 		}
 		if (slurstop) {
 			postfix.push_back(')');

@@ -139,6 +139,8 @@ class Tool_musicxml2hum {
 		Options m_options;
 		bool DebugQ;
 		bool VoiceDebugQ;
+		int m_slurabove = 0;
+		int m_slurbelow = 0;
 
 };
 

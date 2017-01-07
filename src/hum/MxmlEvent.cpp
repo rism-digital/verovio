@@ -503,18 +503,22 @@ bool MxmlEvent::isGrace(void) {
 
 //////////////////////////////
 //
-// MxmlEvent::hasSlurStart --
+// MxmlEvent::hasSlurStart -- 
+//   direction: 0=unspecified, 1=positive curvature, -1=negative curvature.
 //
 //  <note>
 //     <notations>
 //         <slur type="start" orientation="under" number="1">
+//         <slur type="start" orientation="over" number="1">
 //
 //
 
-bool MxmlEvent::hasSlurStart(void) {
+bool MxmlEvent::hasSlurStart(int& direction) {
+	direction = 0;
+	bool output = false;
 	xml_node child = this->getNode();
 	if (!nodeType(child, "note")) {
-		return false;
+		return output;
 	}
 	child = child.first_child();
 	while (child) {
@@ -525,16 +529,25 @@ bool MxmlEvent::hasSlurStart(void) {
 					xml_attribute slurtype = grandchild.attribute("type");
 					if (slurtype) {
 						if (strcmp(slurtype.value(), "start") == 0) {
-							return true;
+							output = true;
 						}
 					}
+					xml_attribute orientation = grandchild.attribute("orientation");
+					if (orientation) {
+						if (strcmp(orientation.value(), "over") == 0) {
+							direction = 1;
+						} else if (strcmp(orientation.value(), "under") == 0) {
+							direction = -1;
+						}
+					}
+					return output;
 				}
 				grandchild = grandchild.next_sibling();
 			}
 		}
 		child = child.next_sibling();
 	}
-	return false;
+	return output;
 }
 
 
