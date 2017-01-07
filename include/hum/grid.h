@@ -55,6 +55,7 @@ enum class MeasureStyle {
 	Plain,
 	RepeatBackward,
 	RepeatForward,
+	RepeatBoth,
 	Double,
 	Final
 };
