@@ -2861,6 +2861,12 @@ void HumdrumInput::processSlur(HTp token)
     else if (slurstart->getValueBool("LO", "S", "b")) {
         slur->SetCurvedir(curvature_CURVEDIR_below);
     }
+    else if (m_signifiers.slurabove && (slurstart->find(m_signifiers.slurabove) != string::npos)) {
+        slur->SetCurvedir(curvature_CURVEDIR_above);
+    }
+    else if (m_signifiers.slurbelow && (slurstart->find(m_signifiers.slurbelow) != string::npos)) {
+        slur->SetCurvedir(curvature_CURVEDIR_below);
+    }
 }
 
 /////////////////////////////
@@ -3713,7 +3719,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                         tg[i].numscale = adjustcount[tg[i].group] / tg[i].num;
                     }
                     if (tg[i].numscale == 0) {
-                       tg[i].numscale = 1;
+                        tg[i].numscale = 1;
                     }
                 }
             }
@@ -5435,6 +5441,16 @@ void HumdrumInput::parseSignifiers(HumdrumFile &infile)
         // !!!RDF**kern: i = no stem
         if (value.find("no stem", equals) != string::npos) {
             m_signifiers.nostem = signifier;
+            continue;
+        }
+
+        // slur directions
+        if (value.find("slur above", equals) != string::npos) {
+            m_signifiers.slurabove = signifier;
+            continue;
+        }
+        if (value.find("slur below", equals) != string::npos) {
+            m_signifiers.slurbelow = signifier;
             continue;
         }
 

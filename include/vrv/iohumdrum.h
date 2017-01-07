@@ -167,6 +167,8 @@ public:
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
     char editacc = '\0'; // !!!RDF**kern: i = editorial accidental
+	char slurbelow = '\0'; // !!!RDF**kern: i = slur below
+	char slurabove = '\0'; // !!!RDF**kern: i = slur above
 
     // coloring of notes (add rests later):
     // !!!RDF**kern: i = marked note, color="#553325"
