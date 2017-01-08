@@ -1193,9 +1193,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             // color
             std::string colorStr = GetAttributeValue(startTie.node(), "color");
             if (!colorStr.empty()) tie->SetColor(colorStr.c_str());
-            // placement
-            std::string placeStr = GetAttributeValue(startTie.node(), "placement");
-            if (!placeStr.empty()) tie->SetCurvedir(tie->AttCurvature::StrToCurvatureCurvedir(placeStr.c_str()));
+            // placement and orientation
+            tie->SetCurvedir(ConvertOrientationToCurvedir(GetAttributeValue(startTie.node(), "orientation").c_str()));
+            if (!GetAttributeValue(startTie.node(), "placement").empty())
+                tie->SetCurvedir(
+                    tie->AttCurvature::StrToCurvatureCurvedir(GetAttributeValue(startTie.node(), "placement").c_str()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
             OpenTie(staff, layer, note, tie);
@@ -1242,10 +1244,13 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             // color
             std::string colorStr = GetAttributeValue(slur, "color");
             if (!colorStr.empty()) meiSlur->SetColor(colorStr.c_str());
-            // placement
-            std::string placeStr = GetAttributeValue(slur, "placement");
-            if (!placeStr.empty())
-                meiSlur->SetCurvedir(meiSlur->AttCurvature::StrToCurvatureCurvedir(placeStr.c_str()));
+            // lineform
+            // meiSlur->SetLform(meiSlur->AttLineVis::StrToLineform(GetAttributeValue(slur, "line-type ").c_str()));
+            // placement and orientation
+            meiSlur->SetCurvedir(ConvertOrientationToCurvedir(GetAttributeValue(slur, "orientation").c_str()));
+            if (!GetAttributeValue(slur, "placement").empty())
+                meiSlur->SetCurvedir(
+                    meiSlur->AttCurvature::StrToCurvatureCurvedir(GetAttributeValue(slur, "placement").c_str()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
             OpenSlur(staff, layer, slurNumber, element, meiSlur);
@@ -1420,6 +1425,13 @@ data_PLACE MusicXmlInput::ConvertTypeToPlace(std::string value)
     if (value == "upright") return PLACE_above;
     if (value == "inverted") return PLACE_below;
     return PLACE_NONE;
+}
+
+curvature_CURVEDIR MusicXmlInput::ConvertOrientationToCurvedir(std::string value)
+{
+    if (value == "over") return curvature_CURVEDIR_above;
+    if (value == "under") return curvature_CURVEDIR_below;
+    return curvature_CURVEDIR_NONE;
 }
 
 pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
