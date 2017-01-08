@@ -1498,8 +1498,8 @@ xml_node Tool_musicxml2hum::convertKeySigToHumdrum(xml_node keysig,
 		if (fifths > 6) { ss << "b#"; }
 	} else if (fifths < 0) {
 		if (fifths < 0)  { ss << "b-"; }
-		if (fifths < -2) { ss << "e-"; }
-		if (fifths < -1) { ss << "a-"; }
+		if (fifths < -1) { ss << "e-"; }
+		if (fifths < -2) { ss << "a-"; }
 		if (fifths < -3) { ss << "d-"; }
 		if (fifths < -4) { ss << "g-"; }
 		if (fifths < -5) { ss << "c-"; }
