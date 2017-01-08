@@ -1166,7 +1166,12 @@ string MxmlEvent::getKernPitch(void) {
 	string step;
 	int alter  = 0;
 	int octave = 4;
-	bool naturalQ = false;
+	bool explicitQ    = false;
+	bool naturalQ     = false;
+	bool sharpQ       = false;
+	bool flatQ        = false;
+	bool doubleflatQ  = false;
+	bool doublesharpQ = false;
 
 	if (nodeType(m_node, "forward")) {
 		rest = true;
@@ -1192,6 +1197,19 @@ string MxmlEvent::getKernPitch(void) {
 			} else if (nodeType(child, "accidental")) {
 				if (strcmp(child.child_value(), "natural") == 0) {
 					naturalQ = true;
+					explicitQ = true;
+				} else if (strcmp(child.child_value(), "sharp") == 0) {
+					sharpQ = true;
+					explicitQ = true;
+				} else if (strcmp(child.child_value(), "flat") == 0) {
+					flatQ = true;
+					explicitQ = true;
+				} else if (strcmp(child.child_value(), "double-flat") == 0) {
+					doubleflatQ = true;
+					explicitQ = true;
+				} else if (strcmp(child.child_value(), "double-sharp") == 0) {
+					doublesharpQ = true;
+					explicitQ = true;
 				}
 			}
 			child = child.next_sibling();
@@ -1226,8 +1244,11 @@ string MxmlEvent::getKernPitch(void) {
 		for (int i=0; i>alter; i--) {
 			output += '-';
 		}
-	} else if (naturalQ) {
+	}
+	if (naturalQ) {
 		output += 'n';
+	} else if (explicitQ) {
+		output += 'X';
 	}
 
 	return output;

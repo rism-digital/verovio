@@ -137,7 +137,7 @@ bool Tool_musicxml2hum::convert(ostream& out, xml_document& doc) {
 		outfile[i].createLineFromTokens();
 	}
 	out << outfile;
-	
+
 	// add RDFs
 	if (m_slurabove) {
 		out << "!!!RDF**kern: > = slur above" << endl;
@@ -1154,13 +1154,35 @@ void Tool_musicxml2hum::addSecondaryChordNotes(ostream& output,
 	string pitch;
 	string prefix;
 	string postfix;
+	bool slurstart = false;
+	bool slurstop  = false;
+	int  slurdir = 0;
+
 	bool primarynote = false;
 	for (int i=0; i<(int)links.size(); i++) {
 		note = links.at(i);
 		pitch   = note->getKernPitch();
 		prefix  = note->getPrefixNoteInfo();
 		postfix = note->getPostfixNoteInfo(primarynote);
-		// maybe add slurs for secondary chord notes here.
+		slurstart = note->hasSlurStart(slurdir);
+		slurstop  = note->hasSlurStop();
+
+		if (slurstart) {
+			prefix.insert(0, "(");
+			if (slurdir) {
+				if (slurdir > 0) {
+					prefix.insert(1, ">");
+					m_slurabove++;
+				} else if (slurdir < 0) {
+					prefix.insert(1, "<");
+					m_slurbelow++;
+				}
+			}
+		}
+		if (slurstop) {
+			postfix.push_back(')');
+		}
+
 		output << " " << prefix << recip << pitch << postfix;
 	}
 }
