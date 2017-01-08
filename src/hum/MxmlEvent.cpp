@@ -1168,10 +1168,10 @@ string MxmlEvent::getKernPitch(void) {
 	int octave = 4;
 	bool explicitQ    = false;
 	bool naturalQ     = false;
-	bool sharpQ       = false;
-	bool flatQ        = false;
-	bool doubleflatQ  = false;
-	bool doublesharpQ = false;
+	// bool sharpQ       = false;
+	// bool flatQ        = false;
+	// bool doubleflatQ  = false;
+	// bool doublesharpQ = false;
 
 	if (nodeType(m_node, "forward")) {
 		rest = true;
@@ -1199,16 +1199,16 @@ string MxmlEvent::getKernPitch(void) {
 					naturalQ = true;
 					explicitQ = true;
 				} else if (strcmp(child.child_value(), "sharp") == 0) {
-					sharpQ = true;
+					// sharpQ = true;
 					explicitQ = true;
 				} else if (strcmp(child.child_value(), "flat") == 0) {
-					flatQ = true;
+					// flatQ = true;
 					explicitQ = true;
 				} else if (strcmp(child.child_value(), "double-flat") == 0) {
-					doubleflatQ = true;
+					// doubleflatQ = true;
 					explicitQ = true;
 				} else if (strcmp(child.child_value(), "double-sharp") == 0) {
-					doublesharpQ = true;
+					// doublesharpQ = true;
 					explicitQ = true;
 				}
 			}

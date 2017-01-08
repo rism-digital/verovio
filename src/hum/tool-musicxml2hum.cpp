@@ -809,7 +809,12 @@ void Tool_musicxml2hum::addEvent(GridSlice& slice,
 		}
 
 		if (grace) {
-			cerr << "!! NOTE IS GRACE" << endl;
+			HumNum dur = event->getEmbeddedDuration(event->getNode()) / 4;
+			if (dur.getNumerator() == 1) {
+				recip = to_string(dur.getDenominator()) + "q";
+			} else {
+				recip = "q";
+			}
 		}
 	}
 
@@ -876,7 +881,7 @@ int Tool_musicxml2hum::addHarmony(GridPart* part, MxmlEvent* event) {
 		return 0;
 	}
 
-	// ggg fill in X with the harmony values from the <harmony> node
+	// fill in X with the harmony values from the <harmony> node
 	string hstring = getHarmonyString(hnode);
 	HTp htok = new HumdrumToken(hstring);
 	part->setHarmony(htok);
@@ -1206,37 +1211,52 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 	vector<vector<xml_node> > keysigs(partdata.size());
 	vector<vector<xml_node> > timesigs(partdata.size());
 
+	vector<vector<vector<vector<MxmlEvent*> > > > gracebefore(partdata.size());
+	vector<vector<vector<vector<MxmlEvent*> > > > graceafter(partdata.size());
+	bool foundnongrace = false;
+
 	int pindex = 0;
 	xml_node child;
 
 	for (int i=0; i<(int)nowevents.size(); i++) {
 		for (int j=0; j<(int)nowevents[i]->zerodur.size(); j++) {
 			xml_node element = nowevents[i]->zerodur[j]->getNode();
+
 			if (nodeType(element, "attributes")) {
 				child = element.first_child();
 				while (child) {
 					pindex = nowevents[i]->zerodur[j]->getPartIndex();
-
 					if (nodeType(child, "clef")) {
 						clefs[pindex].push_back(child);
 						hasclef = true;
+						foundnongrace = true;
 					}
 
 					if (nodeType(child, "key")) {
 						keysigs[pindex].push_back(child);
 						haskeysig = true;
+						foundnongrace = true;
 					}
 
 					if (nodeType(child, "time")) {
 						timesigs[pindex].push_back(child);
 						hastimesig = true;
+						foundnongrace = true;
 					}
 
 					child = child.next_sibling();
 				}
+			} else if (nodeType(element, "note")) {
+				if (foundnongrace) {
+					addEventToList(graceafter, nowevents[i]->zerodur[j]);
+				} else {
+					addEventToList(gracebefore, nowevents[i]->zerodur[j]);
+				}
 			}
 		}
 	}
+
+	addGraceLines(outdata, gracebefore, partdata, nowtime);
 
 	if (hasclef) {
 		addClefLine(outdata, clefs, partdata, nowtime);
@@ -1250,6 +1270,79 @@ void Tool_musicxml2hum::appendZeroEvents(GridMeasure* outdata,
 		addTimeSigLine(outdata, timesigs, partdata, nowtime);
 	}
 
+	addGraceLines(outdata, graceafter, partdata, nowtime);
+}
+
+
+
+///////////////////////////////
+//
+// Tool_musicxml2hum::addEventToList --
+//
+
+void Tool_musicxml2hum::addEventToList(vector<vector<vector<vector<MxmlEvent*> > > >& list, 
+		MxmlEvent* event) {
+	int pindex = event->getPartIndex();
+	int staffindex = event->getStaffIndex();
+	int voiceindex = event->getVoiceIndex();
+	if (pindex >= (int)list.size()) {
+		list.resize(pindex+1);
+	}
+	if (staffindex >= (int)list[pindex].size()) {
+		list[pindex].resize(staffindex+1);
+	}
+	if (voiceindex >= (int)list[pindex][staffindex].size()) {
+		list[pindex][staffindex].resize(voiceindex+1);
+	}
+	list[pindex][staffindex][voiceindex].push_back(event);
+}
+
+
+
+///////////////////////////////
+//
+// Tool_musicxml2hum::addGraceLines -- Add grace note lines.  The number of 
+//     lines is equal to the maximum number of successive grace notes in
+//     any part.  Grace notes are filled in reverse sequence.
+//
+
+void Tool_musicxml2hum::addGraceLines(GridMeasure* outdata,
+		vector<vector<vector<vector<MxmlEvent*> > > >& notes,
+		vector<MxmlPart>& partdata, HumNum nowtime) {
+
+	int maxcount = 0;
+
+	for (int i=0; i<(int)notes.size(); i++) {
+		for (int j=0; j<(int)notes.at(i).size(); j++) {
+			for (int k=0; k<(int)notes.at(i).at(j).size(); k++) {
+				if (maxcount < (int)notes.at(i).at(j).at(k).size()) {
+					maxcount = (int)notes.at(i).at(j).at(k).size();
+				}
+			}
+		}
+	}
+
+	if (maxcount == 0) {
+		return;
+	}
+
+	vector<GridSlice*> slices(maxcount);
+	for (int i=0; i<(int)slices.size(); i++) {
+		slices[i] = new GridSlice(outdata, nowtime, SliceType::GraceNotes);
+		outdata->push_back(slices[i]);
+		slices[i]->initializePartStaves(partdata);
+	}
+
+	for (int i=0; i<(int)notes.size(); i++) {
+		for (int j=0; j<(int)notes[i].size(); j++) {
+			for (int k=0; k<(int)notes[i][j].size(); k++) {
+				int startm = maxcount - (int)notes[i][j][k].size();
+				for (int m=0; m<(int)notes[i][j][k].size(); m++) {
+					addEvent(*slices.at(startm+m), notes[i][j][k][m]);
+				}
+			}
+		}
+	}
 }
 
 
