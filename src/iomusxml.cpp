@@ -1030,8 +1030,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             tuplet->SetNum(atoi(GetContent(actualNotes.node()).c_str()));
             tuplet->SetNumbase(atoi(GetContent(normalNotes.node()).c_str()));
         }
-        tuplet->SetBracketVisible(
-            ConvertWordToBool(GetAttributeValue(notations.node().select_single_node("tuplet").node(), "bracket")));
+        tuplet->SetNumFormat(ConvertTupletNumberValue(GetAttributeValue(tupletStart.node(), "show-number")));
+        tuplet->SetNumPlace(ConvertTypeToPlace(GetAttributeValue(tupletStart.node(), "placement")));
+        if (HasAttributeWithValue(tupletStart.node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
+        tuplet->SetBracketPlace(ConvertTypeToPlace(GetAttributeValue(tupletStart.node(), "placement")));
+        tuplet->SetBracketVisible(ConvertWordToBool(GetAttributeValue(tupletStart.node(), "bracket")));
     }
 
     pugi::xpath_node rest = node.select_single_node("rest");
@@ -1066,7 +1069,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     else {
         Note *note = new Note();
         element = note;
-        if (HasAttributeWithValue(node, "print-object", "no")) note->SetVisible(BOOLEAN_false);
+        note->SetVisible(ConvertWordToBool(GetAttributeValue(node, "print-object")));
         if (!noteColor.empty()) note->SetColor(noteColor.c_str());
 
         // accidental
@@ -1133,11 +1136,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         pugi::xpath_node grace = node.select_single_node("grace");
         if (grace) {
             std::string slashStr = GetAttributeValue(grace.node(), "slash");
-            if (slashStr == "yes") {
+            if (slashStr == "no") {
                 note->SetGrace(GRACE_acc);
             }
-            else if (slashStr == "no") {
+            else if (slashStr == "yes") {
                 note->SetGrace(GRACE_unacc);
+                note->SetStemMod(STEMMODIFIER_1slash);
             }
             else {
                 note->SetGrace(GRACE_unknown);
@@ -1210,9 +1214,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             // color
             std::string colorStr = GetAttributeValue(startTie.node(), "color");
             if (!colorStr.empty()) tie->SetColor(colorStr.c_str());
-            // placement
-            std::string placeStr = GetAttributeValue(startTie.node(), "placement");
-            if (!placeStr.empty()) tie->SetCurvedir(tie->AttCurvature::StrToCurvatureCurvedir(placeStr.c_str()));
+            // placement and orientation
+            tie->SetCurvedir(ConvertOrientationToCurvedir(GetAttributeValue(startTie.node(), "orientation").c_str()));
+            if (!GetAttributeValue(startTie.node(), "placement").empty())
+                tie->SetCurvedir(
+                    tie->AttCurvature::StrToCurvatureCurvedir(GetAttributeValue(startTie.node(), "placement").c_str()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, tie));
             OpenTie(staff, layer, note, tie);
@@ -1259,10 +1265,13 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             // color
             std::string colorStr = GetAttributeValue(slur, "color");
             if (!colorStr.empty()) meiSlur->SetColor(colorStr.c_str());
-            // placement
-            std::string placeStr = GetAttributeValue(slur, "placement");
-            if (!placeStr.empty())
-                meiSlur->SetCurvedir(meiSlur->AttCurvature::StrToCurvatureCurvedir(placeStr.c_str()));
+            // lineform
+            // meiSlur->SetLform(meiSlur->AttLineVis::StrToLineform(GetAttributeValue(slur, "line-type ").c_str()));
+            // placement and orientation
+            meiSlur->SetCurvedir(ConvertOrientationToCurvedir(GetAttributeValue(slur, "orientation").c_str()));
+            if (!GetAttributeValue(slur, "placement").empty())
+                meiSlur->SetCurvedir(
+                    meiSlur->AttCurvature::StrToCurvatureCurvedir(GetAttributeValue(slur, "placement").c_str()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
             OpenSlur(staff, layer, slurNumber, element, meiSlur);
@@ -1436,8 +1445,14 @@ data_PLACE MusicXmlInput::ConvertTypeToPlace(std::string value)
     // for fermatas
     if (value == "upright") return PLACE_above;
     if (value == "inverted") return PLACE_below;
-    LogWarning("Unsupported type '%s'", value.c_str());
     return PLACE_NONE;
+}
+
+curvature_CURVEDIR MusicXmlInput::ConvertOrientationToCurvedir(std::string value)
+{
+    if (value == "over") return curvature_CURVEDIR_above;
+    if (value == "under") return curvature_CURVEDIR_below;
+    return curvature_CURVEDIR_NONE;
 }
 
 pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
@@ -1446,6 +1461,13 @@ pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
     if (value == "stop") return pedalLog_DIR_up;
     LogWarning("Unsupported type '%s' for pedal", value.c_str());
     return pedalLog_DIR_NONE;
+}
+
+tupletVis_NUMFORMAT MusicXmlInput::ConvertTupletNumberValue(std::string value)
+{
+    if (value == "actual") return tupletVis_NUMFORMAT_count;
+    if (value == "both") return tupletVis_NUMFORMAT_ratio;
+    return tupletVis_NUMFORMAT_NONE;
 }
 
 } // namespace vrv
