@@ -722,10 +722,12 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
         int pitch = midiBase + (oct + 1) * 12;
         int channel = 0;
         int velocity = 64;
-        if (note->GetTie() != TIE_t && note->GetTie() != TIE_m) params->m_midiFile->addNoteOn(
-            params->m_midiTrack, params->m_totalTime + params->m_currentMeasureTime, channel, pitch, velocity);
-        if (note->GetTie() != TIE_i && note->GetTie() != TIE_m) params->m_midiFile->addNoteOff(
-            params->m_midiTrack, params->m_totalTime + params->m_currentMeasureTime + dur, channel, pitch);
+        if (note->GetTie() != TIE_t && note->GetTie() != TIE_m)
+            params->m_midiFile->addNoteOn(
+                params->m_midiTrack, params->m_totalTime + params->m_currentMeasureTime, channel, pitch, velocity);
+        if (note->GetTie() != TIE_i && note->GetTie() != TIE_m)
+            params->m_midiFile->addNoteOff(
+                params->m_midiTrack, params->m_totalTime + params->m_currentMeasureTime + dur, channel, pitch);
 
         note->m_playingOnset = params->m_totalTime + params->m_currentMeasureTime;
         note->m_playingOffset = params->m_totalTime + params->m_currentMeasureTime + dur;

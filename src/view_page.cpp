@@ -153,8 +153,8 @@ void View::DrawSystem(DeviceContext *dc, System *system)
             if (staff) {
                 dc->SetFont(m_doc->GetDrawingSmuflFont(100, false));
                 dc->DrawMusicText(IntToTupletFigures(measure->GetN()), ToDeviceContextX(system->GetDrawingX()),
-                    ToDeviceContextY(staff->GetDrawingY()
-                                      + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
+                    ToDeviceContextY(
+                        staff->GetDrawingY() + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
                 dc->ResetFont();
             }
         }

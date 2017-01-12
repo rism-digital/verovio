@@ -38,7 +38,7 @@ MidiOutput::~MidiOutput()
 bool MidiOutput::ExportFile()
 {
 
-  return false;
+    return false;
 }
 
 std::string MidiOutput::GetOutput(int page)

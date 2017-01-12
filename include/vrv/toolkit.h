@@ -17,11 +17,8 @@
 
 //----------------------------------------------------------------------------
 
-#if defined(USE_EMSCRIPTEN) || defined(PYTHON_BINDING)
-#include "jsonxx.h"
-#endif
-
 #include "checked.h"
+#include "jsonxx.h"
 #include "unchecked.h"
 
 namespace vrv {
@@ -154,6 +151,18 @@ public:
      * Returns 0 if no element is found.
      */
     double GetTimeForElement(const std::string &xmlId);
+
+    /**
+     * Return a timemap with all note on and off for each note.
+     * The pageNo parameter in 1-based.
+     * RenderToMidi() must be called prior to using this method.
+     */
+    std::string GetTimeMap(const int pageNo);
+
+    /**
+     * Write the timemap to a file
+     */
+    bool GetTimeMapToFile(const std::string &filename, int pageNo = 1);
 
     /**
     * @name Set and get a std::string into a char * buffer.

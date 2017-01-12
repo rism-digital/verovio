@@ -135,6 +135,7 @@
 		4DF440781D39575500152B7E /* ending.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF440761D39575500152B7E /* ending.cpp */; };
 		4DF4407A1D3D085600152B7E /* functorparams.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF440791D3D085600152B7E /* functorparams.h */; };
 		4DF4407D1D511D0200152B7E /* boundary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF4407C1D511D0200152B7E /* boundary.cpp */; };
+		4DF678831E001C7700A0A3BD /* jsonxx.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4DF678821E001C7700A0A3BD /* jsonxx.cc */; };
 		4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */; };
 		4DF9D2841C18DC490069E8C8 /* atts_mei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */; };
 		4DF9D2851C18DC490069E8C8 /* atts_mei.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF9D2821C18DC490069E8C8 /* atts_mei.h */; };
@@ -419,6 +420,8 @@
 		4DF440791D3D085600152B7E /* functorparams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = functorparams.h; path = include/vrv/functorparams.h; sourceTree = "<group>"; };
 		4DF4407B1D511CEE00152B7E /* boundary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = boundary.h; path = include/vrv/boundary.h; sourceTree = "<group>"; };
 		4DF4407C1D511D0200152B7E /* boundary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = boundary.cpp; path = src/boundary.cpp; sourceTree = "<group>"; };
+		4DF678821E001C7700A0A3BD /* jsonxx.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = jsonxx.cc; path = src/json/jsonxx.cc; sourceTree = "<group>"; };
+		4DF678841E001C8300A0A3BD /* jsonxx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = jsonxx.h; path = include/json/jsonxx.h; sourceTree = "<group>"; };
 		4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_mei.cpp; path = libmei/atts_mei.cpp; sourceTree = "<group>"; };
 		4DF9D2821C18DC490069E8C8 /* atts_mei.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_mei.h; path = libmei/atts_mei.h; sourceTree = "<group>"; };
 		4DF9D2861C18DE270069E8C8 /* atts_performance.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = atts_performance.cpp; path = libmei/atts_performance.cpp; sourceTree = "<group>"; };
@@ -710,6 +713,15 @@
 			name = controlelements;
 			sourceTree = "<group>";
 		};
+		4DF678811E001C5A00A0A3BD /* json */ = {
+			isa = PBXGroup;
+			children = (
+				4DF678821E001C7700A0A3BD /* jsonxx.cc */,
+				4DF678841E001C8300A0A3BD /* jsonxx.h */,
+			);
+			name = json;
+			sourceTree = "<group>";
+		};
 		8F086E9E188534680037FD8E = {
 			isa = PBXGroup;
 			children = (
@@ -717,6 +729,7 @@
 				4D7D8A3C1886E36200D78B62 /* tools */,
 				8F086F351885397A0037FD8E /* source */,
 				4DA20ED21D0F153100706C4A /* hum */,
+				4DF678811E001C5A00A0A3BD /* json */,
 				4D1BE7751C688F6F0086DC0E /* midi */,
 				4D22C42118891D7300D0831F /* pugixml */,
 				4DBC09271B51960100B1832C /* utf8 */,
@@ -1087,6 +1100,7 @@
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
 				400362DE1DEE2C51006A5C2A /* iomidi.cpp in Sources */,
 				4D796B5E1D78641900A15238 /* harm.cpp in Sources */,
+				4DF678831E001C7700A0A3BD /* jsonxx.cc in Sources */,
 				4DB3072F1AC9ED2500EE0982 /* space.cpp in Sources */,
 				8F086EED188539540037FD8E /* iodarms.cpp in Sources */,
 				8F086EEE188539540037FD8E /* iomei.cpp in Sources */,
