@@ -138,7 +138,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             // check if we have more than duration in the beam
             if (!params.m_changingDur && currentDur != lastDur) params.m_changingDur = true;
             lastDur = currentDur;
-            
+
             elementCount++;
         }
 
@@ -249,10 +249,10 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     marqueurs partitionnant les sous-groupes; la troisieme boucle for est
     pilotee par l'indice de l'array; elle dessine horizontalement les barres
     de chaque sous-groupe en suivant les marqueurs */
-    
+
     // Map the indexes of the notes/chords since we need to ignore rests when drawing partials
     // However, exception for the first and last element of a beam
-    std::vector<int>noteIndexes;
+    std::vector<int> noteIndexes;
     for (i = 0; i < elementCount; i++) {
         if ((*beamElementCoords).at(i)->m_element->Is() == REST)
             if (i > 0 && i < elementCount - 1) continue;
@@ -275,7 +275,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         while (testDur <= params.m_shortestDur) {
             // true at the beginning of a beam or after a breakSec
             bool start = true;
-            
+
             int idx = 0;
             int nextIdx = 0;
 
@@ -283,7 +283,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             for (i = 0; i < noteCount - 1; i++) {
                 idx = noteIndexes.at(i);
                 nextIdx = noteIndexes.at(i + 1);
-                
+
                 bool breakSec = (((*beamElementCoords).at(idx)->m_breaksec)
                     && (testDur - DUR_8 >= (*beamElementCoords).at(idx)->m_breaksec));
                 (*beamElementCoords).at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_NONE;
@@ -319,7 +319,8 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             // partial is needed
             if (((*beamElementCoords).at(idx)->m_dur >= (char)testDur)) {
                 // and the previous one had no partial - put it left
-                if ((noteCount == 1) || ((*beamElementCoords).at(noteIndexes.at(i - 1))->m_dur < (char)testDur) || start) {
+                if ((noteCount == 1) || ((*beamElementCoords).at(noteIndexes.at(i - 1))->m_dur < (char)testDur)
+                    || start) {
                     (*beamElementCoords).at(idx)->m_partialFlags[testDur - DUR_8] = PARTIAL_LEFT;
                 }
             }
@@ -334,8 +335,8 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                     y1 = (*beamElementCoords).at(idx)->m_yBeam + barY;
                     y2 = (*beamElementCoords).at(noteIndexes.at(i + 1))->m_yBeam + barY;
                     polygonHeight = params.m_beamWidthBlack * shiftY;
-                    DrawObliquePolygon(dc, (*beamElementCoords).at(idx)->m_x, y1, (*beamElementCoords).at(noteIndexes.at(i + 1))->m_x, y2,
-                        polygonHeight);
+                    DrawObliquePolygon(dc, (*beamElementCoords).at(idx)->m_x, y1,
+                        (*beamElementCoords).at(noteIndexes.at(i + 1))->m_x, y2, polygonHeight);
                 }
                 else if ((*beamElementCoords).at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_RIGHT) {
                     y1 = (*beamElementCoords).at(idx)->m_yBeam + barY;

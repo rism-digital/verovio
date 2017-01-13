@@ -82,7 +82,7 @@ namespace musicxml {
             m_dirN = dirN;
             m_ID = lastID;
         }
-        
+
         int m_dirN;
         std::string m_ID;
     };
@@ -227,7 +227,9 @@ private:
     data_DURATION ConvertTypeToDur(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
     data_PLACE ConvertTypeToPlace(std::string value);
+    curvature_CURVEDIR ConvertOrientationToCurvedir(std::string);
     pedalLog_DIR ConvertPedalTypeToDir(std::string value);
+    tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
     ///@}
 
 private:

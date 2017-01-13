@@ -6,6 +6,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 #include "vrv.h"
+#include <iostream>
 
 //----------------------------------------------------------------------------
 
@@ -14,6 +15,7 @@
 #include <sstream>
 #include <stdarg.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <vector>
 
 #ifndef _WIN32
@@ -257,9 +259,9 @@ void LogDebug(const char *fmt, ...)
 #else
     va_list args;
     va_start(args, fmt);
-    printf("[Debug] ");
-    vprintf(fmt, args);
-    printf("\n");
+    fprintf(stderr, "[Debug] ");
+    vfprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
     va_end(args);
 #endif
 #endif
@@ -279,7 +281,7 @@ void LogError(const char *fmt, ...)
     va_list args;
     va_start(args, fmt);
     fprintf(stderr, "[Error] ");
-    fprintf(stderr, fmt, args);
+    vfprintf(stderr, fmt, args);
     fprintf(stderr, "\n");
     va_end(args);
 #endif
@@ -298,9 +300,9 @@ void LogMessage(const char *fmt, ...)
 #else
     va_list args;
     va_start(args, fmt);
-    printf("[Message] ");
-    vprintf(fmt, args);
-    printf("\n");
+    fprintf(stderr, "[Message] ");
+    vfprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
     va_end(args);
 #endif
 }
@@ -318,9 +320,9 @@ void LogWarning(const char *fmt, ...)
 #else
     va_list args;
     va_start(args, fmt);
-    printf("[Warning] ");
-    vprintf(fmt, args);
-    printf("\n");
+    fprintf(stderr, "[Warning] ");
+    vfprintf(stderr, fmt, args);
+    fprintf(stderr, "\n");
     va_end(args);
 #endif
 }

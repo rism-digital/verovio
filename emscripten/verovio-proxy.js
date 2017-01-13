@@ -27,6 +27,9 @@ verovio.vrvToolkit.getLog = Module.cwrap('vrvToolkit_getLog', 'string', ['number
 // char *getMEI(Toolkit *ic, int pageNo, int scoreBased )
 verovio.vrvToolkit.getMEI = Module.cwrap('vrvToolkit_getMEI', 'string', ['number', 'number', 'number']);
 
+// char *getHumdrum(Toolkit *ic)
+verovio.vrvToolkit.getHumdrum = Module.cwrap('vrvToolkit_getHumdrum', 'string');
+
 // int getPageCount(Toolkit *ic)
 verovio.vrvToolkit.getPageCount = Module.cwrap('vrvToolkit_getPageCount', 'number', ['number']);
 
@@ -100,6 +103,10 @@ verovio.toolkit.prototype.getLog = function () {
 
 verovio.toolkit.prototype.getMEI = function (pageNo, scoreBased) {
 	return verovio.vrvToolkit.getMEI(this.ptr, pageNo, scoreBased);
+};
+
+verovio.toolkit.prototype.getHumdrum = function () {
+	return verovio.vrvToolkit.getHumdrum(this.ptr);
 };
 
 verovio.toolkit.prototype.getPageCount = function () {

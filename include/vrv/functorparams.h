@@ -76,16 +76,30 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustArticulationsParams
+// AdjustArticParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: the Doc
  **/
 
-class AdjustArticulationsParams : public FunctorParams {
+class AdjustArticParams : public FunctorParams {
 public:
-    AdjustArticulationsParams(Doc *doc) { m_doc = doc; }
+    AdjustArticParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustArticWithSlursParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the Doc
+ **/
+
+class AdjustArticWithSlursParams : public FunctorParams {
+public:
+    AdjustArticWithSlursParams(Doc *doc) { m_doc = doc; }
     Doc *m_doc;
 };
 

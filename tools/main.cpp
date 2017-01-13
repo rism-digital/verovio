@@ -79,7 +79,7 @@ void display_usage()
 
     cerr << " -b, --border=BORDER        Add border (default is " << DEFAULT_PAGE_LEFT_MAR << ")" << endl;
 
-    cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae, xml (default is pae)" << endl;
+    cerr << " -f, --format=INPUT_FORMAT  Select input format: darms, mei, pae, xml (default is mei)" << endl;
 
     cerr << " -h, --page-height=HEIGHT   Specify the page height (default is " << DEFAULT_PAGE_HEIGHT << ")" << endl;
 
@@ -271,7 +271,10 @@ int main(int argc, char **argv)
 
             case 'r': vrv::Resources::SetPath(optarg); break;
 
-            case 't': outformat = string(optarg); break;
+            case 't':
+                outformat = string(optarg);
+                toolkit.SetOutputFormat(string(optarg));
+                break;
 
             case 's':
                 if (!toolkit.SetScale(atoi(optarg))) {
@@ -350,8 +353,8 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if (outformat != "svg" && outformat != "mei" && outformat != "midi") {
-        cerr << "Output format can only be 'mei', 'svg', or 'midi'." << endl;
+    if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "humdrum") {
+        cerr << "Output format can only be 'mei', 'svg', 'midi', or 'humdrum'." << endl;
         exit(1);
     }
 
@@ -366,7 +369,7 @@ int main(int argc, char **argv)
         outfile = removeExtension(infile);
     }
     else if (outfile == "-") {
-        DisableLog();
+        // DisableLog();
         std_output = true;
     }
     else {
@@ -391,15 +394,17 @@ int main(int argc, char **argv)
         }
     }
 
-    // Check the page range
-    if (page > toolkit.GetPageCount()) {
-        cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount()
-             << ")." << endl;
-        exit(1);
-    }
-    if (page < 1) {
-        cerr << "The page number has to be greater than 0." << endl;
-        exit(1);
+    if (toolkit.GetOutputFormat() != HUMDRUM) {
+        // Check the page range
+        if (page > toolkit.GetPageCount()) {
+            cerr << "The page requested (" << page << ") is not in the page range (max is " << toolkit.GetPageCount()
+                 << ")." << endl;
+            exit(1);
+        }
+        if (page < 1) {
+            cerr << "The page number has to be greater than 0." << endl;
+            exit(1);
+        }
     }
 
     int from = page;
@@ -440,6 +445,21 @@ int main(int argc, char **argv)
         }
         else {
             cerr << "Output written to " << outfile << "." << endl;
+        }
+    }
+    else if (outformat == "humdrum") {
+        outfile += ".krn";
+        if (std_output) {
+            toolkit.GetHumdrum(std::cout);
+        }
+        else {
+            if (!toolkit.GetHumdrumFile(outfile)) {
+                cerr << "Unable to write Humdrum to " << outfile << "." << endl;
+                exit(1);
+            }
+            else {
+                cerr << "Output written to " << outfile << "." << endl;
+            }
         }
     }
     else {

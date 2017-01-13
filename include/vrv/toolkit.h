@@ -26,7 +26,7 @@
 
 namespace vrv {
 
-enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML };
+enum FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM };
 
 //----------------------------------------------------------------------------
 // Toolkit
@@ -117,6 +117,13 @@ public:
      * Creates a midi file, opens it, and returns it (base64 encoded).
      */
     std::string RenderToMidi();
+
+    const char *GetHumdrumBuffer();
+    void SetHumdrumBuffer(const char *contents);
+
+    bool GetHumdrumFile(const std::string &filename);
+    void GetHumdrum(std::ostream &output);
+    std::string GetHumdrum();
 
     /**
      * Returns array of IDs of elements being currently played.
@@ -284,6 +291,16 @@ public:
     ///@}
 
     /**
+     * @name Get the output file format (defined as FileFormat)
+     * The SetOutputFormat with FileFormat does not perform any validation
+     */
+    ///@{
+    bool SetOutputFormat(std::string const &outformat);
+    void SetOutputFormat(FileFormat format) { m_outformat = format; }
+    int GetOutputFormat() { return m_outformat; }
+    ///@}
+
+    /**
      * @name Identify the input file type for auto loading of input data
      */
     ///@{
@@ -369,6 +386,7 @@ private:
     View m_view;
     int m_scale;
     FileFormat m_format;
+    FileFormat m_outformat;
 
     int m_pageHeight;
     int m_pageWidth;
@@ -391,6 +409,7 @@ private:
     bool m_noJustification;
     bool m_showBoundingBoxes;
 
+    static char *m_humdrumBuffer;
     char *m_cString;
 };
 

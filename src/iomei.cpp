@@ -732,7 +732,7 @@ void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
 void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
 {
     assert(fermata);
-    
+
     WriteXmlId(currentNode, fermata);
     WriteTimePointInterface(currentNode, fermata);
     fermata->WriteColor(currentNode);
@@ -758,6 +758,7 @@ void MeiOutput::WriteMeiHarm(pugi::xml_node currentNode, Harm *harm)
     WriteXmlId(currentNode, harm);
     WriteTextDirInterface(currentNode, harm);
     WriteTimeSpanningInterface(currentNode, harm);
+    harm->WriteLang(currentNode);
 };
 
 void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
@@ -2169,12 +2170,12 @@ bool MeiInput::ReadMeiFermata(Object *parent, pugi::xml_node fermata)
 {
     Fermata *vrvFermata = new Fermata();
     SetMeiUuid(fermata, vrvFermata);
-    
+
     ReadTimePointInterface(fermata, vrvFermata);
     vrvFermata->ReadColor(fermata);
     vrvFermata->ReadFermataVis(fermata);
     vrvFermata->ReadPlacement(fermata);
-    
+
     parent->AddChild(vrvFermata);
     return true;
 }
@@ -2200,6 +2201,7 @@ bool MeiInput::ReadMeiHarm(Object *parent, pugi::xml_node harm)
 
     ReadTextDirInterface(harm, vrvHarm);
     ReadTimeSpanningInterface(harm, vrvHarm);
+    vrvHarm->ReadLang(harm);
 
     parent->AddChild(vrvHarm);
     return ReadMeiTextChildren(vrvHarm, harm);
