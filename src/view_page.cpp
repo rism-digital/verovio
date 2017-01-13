@@ -153,8 +153,8 @@ void View::DrawSystem(DeviceContext *dc, System *system)
             if (staff) {
                 dc->SetFont(m_doc->GetDrawingSmuflFont(100, false));
                 dc->DrawMusicText(IntToTupletFigures(measure->GetN()), ToDeviceContextX(system->GetDrawingX()),
-                    ToDeviceContextY(staff->GetDrawingY()
-                                      + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
+                    ToDeviceContextY(
+                        staff->GetDrawingY() + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
                 dc->ResetFont();
             }
         }
@@ -460,7 +460,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     int penWidth = m_doc->GetDrawingStemWidth(100);
     y1 -= penWidth;
     y2 += penWidth;
-    SwapY(&y1, &y2);
+    BoundingBox::SwapY(&y1, &y2);
 
     int ymed, xdec, fact;
 
@@ -704,11 +704,11 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     DrawMeasureChildren(dc, measure, measure, system);
 
-    if (measure->GetLeftBarLineType() != BARRENDITION_NONE) {
+    if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
         DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetLeftBarLineXRel(),
             measure->GetLeftBarLine());
     }
-    if (measure->GetRightBarLineType() != BARRENDITION_NONE) {
+    if (measure->GetDrawingRightBarLine() != BARRENDITION_NONE) {
         DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarLineXRel(),
             measure->GetRightBarLine());
     }
