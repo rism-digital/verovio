@@ -24,6 +24,7 @@
 #include "pedal.h"
 #include "slur.h"
 #include "tempo.h"
+#include "trill.h"
 #include "timeinterface.h"
 
 namespace vrv {
@@ -155,6 +156,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         assert(tempo);
         // tempo above by default;
         m_place = tempo->HasPlace() ? tempo->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is() == TRILL) {
+        Trill *trill = dynamic_cast<Trill *>(object);
+        assert(trill);
+        // trill above by default;
+        m_place = trill->HasPlace() ? trill->GetPlace() : STAFFREL_above;
     }
     else {
         m_place = STAFFREL_NONE;
