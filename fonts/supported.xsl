@@ -1454,7 +1454,7 @@
             <glyph glyph-code="E611" smufl-name="stringsDownBowTurned"/>
             <glyph glyph-code="E612" smufl-name="stringsUpBow"/>
             <glyph glyph-code="E613" smufl-name="stringsUpBowTurned"/>
-            <!--<glyph glyph-code="E614" smufl-name="stringsHarmonic"/>-->
+            <glyph glyph-code="E614" smufl-name="stringsHarmonic"/>
             <!--<glyph glyph-code="E615" smufl-name="stringsHalfHarmonic"/>-->
             <!--<glyph glyph-code="E616" smufl-name="stringsMuteOn"/>-->
             <!--<glyph glyph-code="E617" smufl-name="stringsMuteOff"/>-->
