@@ -8,6 +8,7 @@
 #ifndef __VRV_TEMPO_H__
 #define __VRV_TEMPO_H__
 
+#include "atts_midi.h"
 #include "controlelement.h"
 #include "textdirinterface.h"
 #include "timeinterface.h"
@@ -23,7 +24,11 @@ class TextElement;
 /**
  * This class is an interface for <tempo> elements at the measure level
  */
-class Tempo : public ControlElement, public TextDirInterface, public TimePointInterface {
+class Tempo : public ControlElement,
+              public TextDirInterface,
+              public TimePointInterface,
+              public AttLang,
+              public AttMiditempo {
 public:
     /**
      * @name Constructors, destructors, reset methods

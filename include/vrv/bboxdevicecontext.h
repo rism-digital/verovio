@@ -155,8 +155,6 @@ private:
     View *m_view;
 
     void UpdateBB(int x1, int y1, int x2, int y2);
-
-    void ApproximateBezierBoundingBox(Point bezier[], Point *pos, int *width, int *height);
 };
 
 } // namespace vrv

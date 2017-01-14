@@ -76,6 +76,34 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustArticParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the Doc
+ **/
+
+class AdjustArticParams : public FunctorParams {
+public:
+    AdjustArticParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustArticWithSlursParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the Doc
+ **/
+
+class AdjustArticWithSlursParams : public FunctorParams {
+public:
+    AdjustArticWithSlursParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AdjustFloatingPostionersParams
 //----------------------------------------------------------------------------
 
@@ -732,6 +760,20 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// PrepareTimePointingParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: std::vector< Object*>* that holds the current elements to match
+ **/
+
+class PrepareTimePointingParams : public FunctorParams {
+public:
+    PrepareTimePointingParams() {}
+    ArrayOfPointingInterClassIdPairs m_timePointingInterfaces;
+};
+
+//----------------------------------------------------------------------------
 // PrepareTimeSpanningParams
 //----------------------------------------------------------------------------
 
@@ -743,7 +785,7 @@ public:
 class PrepareTimeSpanningParams : public FunctorParams {
 public:
     PrepareTimeSpanningParams() { m_fillList = true; }
-    ArrayOfInterfaceClassIdPairs m_timeSpanningInterfaces;
+    ArrayOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
     bool m_fillList;
 };
 
@@ -759,7 +801,7 @@ public:
 class PrepareTimestampsParams : public FunctorParams {
 public:
     PrepareTimestampsParams() {}
-    ArrayOfInterfaceClassIdPairs m_timeSpanningInterfaces;
+    ArrayOfSpanningInterClassIdPairs m_timeSpanningInterfaces;
     ArrayOfObjectBeatPairs m_tstamps;
 };
 

@@ -17,6 +17,7 @@
 //----------------------------------------------------------------------------
 
 #include "attclasses.h"
+#include "boundingbox.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -63,78 +64,6 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 #define UNLIMITED_DEPTH -10000
 #define FORWARD true
 #define BACKWARD false
-
-//----------------------------------------------------------------------------
-// BoundingBox
-//----------------------------------------------------------------------------
-
-/**
- * This class represents a basic object in the layout domain
- */
-class BoundingBox {
-public:
-    // constructors and destructors
-    BoundingBox();
-    virtual ~BoundingBox(){};
-    virtual ClassId Is() const;
-
-    virtual void UpdateContentBBoxX(int x1, int x2);
-    virtual void UpdateContentBBoxY(int y1, int y2);
-    virtual void UpdateSelfBBoxX(int x1, int x2);
-    virtual void UpdateSelfBBoxY(int y1, int y2);
-    bool HasContentBB();
-    bool HasSelfBB();
-    void SetEmptyBB();
-    bool HasEmptyBB();
-
-    /**
-     * Reset the bounding box values
-     */
-    virtual void ResetBoundingBox();
-
-    /**
-     * @name Get and set the X and Y drawing position
-     */
-    ///@{
-    virtual int GetDrawingX() const { return m_drawingX; }
-    virtual int GetDrawingY() const { return m_drawingY; }
-    void SetDrawingX(int drawingX) { m_drawingX = drawingX; }
-    void SetDrawingY(int drawingY) { m_drawingY = drawingY; }
-    ///@}
-
-    /**
-     * Is true if the bounding box (self or content) has been updated at least once.
-     * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
-     */
-    bool HasUpdatedBB() const { return (m_updatedBBoxX && m_updatedBBoxY); }
-
-    /**
-     * Returns true if the bounding box has a horizontal overlap with the other one.
-     */
-    bool HorizontalOverlap(const BoundingBox *other) const;
-
-    int CalcVerticalOverlap(const BoundingBox *other) const;
-
-private:
-    bool m_updatedBBoxX;
-    bool m_updatedBBoxY;
-
-protected:
-    /**
-     * The Y drawing position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingY;
-    /**
-     * The X drawing position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingX;
-
-public:
-    int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
-    int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
-};
 
 //----------------------------------------------------------------------------
 // Object
@@ -369,7 +298,7 @@ public:
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
     void FindAllChildByAttComparison(ArrayOfObjects *objects, AttComparison *attComparison,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -420,6 +349,14 @@ public:
      * Mark the object and its parent (if any) as modified
      */
     void Modify(bool modified = true);
+
+    /**
+     * @name Setter and getter of the attribute flag
+     */
+    ///@{
+    bool IsAttribute() const { return m_isAttribute; }
+    void IsAttribute(bool isAttribute) { m_isAttribute = isAttribute; }
+    ///@}
 
     /**
      * Saves the object (and its children) using the specified output stream.
@@ -503,6 +440,16 @@ public:
      * @name Functors for aligning the content horizontally
      */
     ///@{
+
+    /**
+     * Adjust the position the outside articulations.
+     */
+    virtual int AdjustArtic(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the outside articulations with slur.
+     */
+    virtual int AdjustArticWithSlurs(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of all floating positionner, staff by staff.
@@ -669,6 +616,12 @@ public:
     virtual int PrepareProcessingLists(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Match start for TimePointingInterface elements (such as fermata or harm).
+     */
+    virtual int PrepareTimePointing(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareTimePointingEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Match start and end for TimeSpanningInterface elements (such as tie or slur).
      * If fillList is set to false, only the remaining elements will be matched.
      * This is used when processing a second time in the other direction
@@ -707,6 +660,12 @@ public:
      */
     virtual int PrepareLyrics(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
     virtual int PrepareLyricsEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Functor for setting the artic parts.
+     * Splits the artic content into different artic parts if necessary
+     */
+    virtual int PrepareArtic(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
@@ -868,6 +827,12 @@ private:
      * the object when printing an MEI element.
      */
     std::string m_comment;
+
+    /**
+     * A flag indicating if the Object represents an attribute in the original MEI.
+     * For example, a Artic child in Note for an original @artic
+     */
+    bool m_isAttribute;
 };
 
 //----------------------------------------------------------------------------
@@ -885,8 +850,8 @@ public:
     // constructors and destructors
     ObjectListInterface(){};
     virtual ~ObjectListInterface(){};
-    ObjectListInterface(const ObjectListInterface &interface); // copy constructor;
-    ObjectListInterface &operator=(const ObjectListInterface &interface); // copy assignement;
+    ObjectListInterface(const ObjectListInterface &listInterface); // copy constructor;
+    ObjectListInterface &operator=(const ObjectListInterface &listInterface); // copy assignement;
 
     /**
      * Look for the Object in the list and return its position (-1 if not found)

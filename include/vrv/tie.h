@@ -17,7 +17,7 @@ namespace vrv {
 // Tie
 //----------------------------------------------------------------------------
 
-class Tie : public ControlElement, public TimeSpanningInterface, public AttCurvature {
+class Tie : public ControlElement, public TimeSpanningInterface, public AttColor, public AttCurvature {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

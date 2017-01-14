@@ -294,10 +294,7 @@ void ScoreDef::ReplaceDrawingValues(StaffDef *newStaffDef)
             delete meterSig;
         }
         // copy other attributes if present
-        if (newStaffDef->HasLabel()) {
-            LogMessage(newStaffDef->GetLabel().c_str());
-            staffDef->SetLabel(newStaffDef->GetLabel());
-        }
+        if (newStaffDef->HasLabel()) staffDef->SetLabel(newStaffDef->GetLabel());
         if (newStaffDef->HasLabelAbbr()) staffDef->SetLabelAbbr(newStaffDef->GetLabelAbbr());
     }
     else {

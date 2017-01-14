@@ -17,12 +17,15 @@
 #include "attdef.h"
 #include "io.h"
 #include "vrvdef.h"
+#include "clef.h"
+#include "ending.h"
 
 //----------------------------------------------------------------------------
 
 #ifndef NO_HUMDRUM_SUPPORT
 #include "humlib.h"
 #include "pugixml.hpp"
+#include "tool-musicxml2hum.h"
 #endif /* NO_HUMDRUM_SUPPORT */
 
 //----------------------------------------------------------------------------
@@ -157,6 +160,25 @@ namespace humaux {
     };
 }
 
+class HumdrumSignifiers {
+public:
+    bool empty = true;
+
+    // boolean switches:
+    char nostem = '\0'; // !!!RDF**kern: i = no stem
+    char editacc = '\0'; // !!!RDF**kern: i = editorial accidental
+
+    // coloring of notes (add rests later):
+    // !!!RDF**kern: i = marked note, color="#553325"
+    // !!!RDF**kern: i = matched note, color=red
+    // !!!RDF**kern: i = color="blue"
+    // default is red if no color given:
+    // !!!RDF**kern: i = matched note
+    // !!!RDF**kern: i = marked note
+    vector<char> mark;
+    vector<string> mcolor;
+};
+
 #endif /* NO_HUMDRUM_SUPPORT */
 
 //----------------------------------------------------------------------------
@@ -174,6 +196,7 @@ public:
 
 #ifndef NO_HUMDRUM_SUPPORT
 
+    string GetHumdrumString(void);
     string GetMeiString(void);
 
 protected:
@@ -193,7 +216,6 @@ protected:
     vector<int> getStaffLayerCounts(void);
     void prepareStaffGroup(void);
     void setClef(StaffDef *part, const string &clef);
-    void setKeySig(StaffDef *part, const string &keysig);
     void setTimeSig(StaffDef *part, const string &timesig);
     void setMeterSymbol(StaffDef *part, const string &metersig);
     void fillPartInfo(hum::HTp partstart, int partnumber);
@@ -212,7 +234,7 @@ protected:
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
     void processTieStart(Note *note, hum::HTp token, const string &tstring);
     void processTieEnd(Note *note, hum::HTp token, const string &tstring);
-    void printNoteArticulations(Note *note, hum::HTp token, const string &tstring);
+    void addFermata(hum::HTp token);
     void getTimingInformation(vector<hum::HumNum> &prespace, vector<hum::HTp> &layerdata, hum::HumNum layerstarttime,
         hum::HumNum layerendtime);
     void convertChord(Chord *chord, hum::HTp token, int staffindex);
@@ -235,8 +257,11 @@ protected:
     void removeTuplet(vector<string> &elements, vector<void *> &pointers);
     void removeGBeam(vector<string> &elements, vector<void *> &pointers);
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
-    void insertClefElement(vector<string> &elements, vector<void *> pointers, hum::HTp clef);
+    vrv::Clef* insertClefElement(vector<string> &elements, vector<void *> &pointers, hum::HTp clef);
+    void insertMeterSigElement(
+        vector<string> &elements, vector<void *> &pointers, vector<hum::HTp> &layeritems, int index);
     void processSlur(hum::HTp token);
+    void addHarmFloatsForMeasure(int startine, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirection(hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex);
@@ -248,8 +273,17 @@ protected:
     void storeOriginalClefApp(void);
     void addSpace(vector<string> &elements, vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken);
+    void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
     void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
+    void addOrnamentMarkers(hum::HTp token);
+    void setNextLeftBarStyle(data_BARRENDITION style);
+    void parseSignifiers(hum::HumdrumFile &infile);
+    string getAutoClef(hum::HTp partstart, int partnumber);
+    void colorNote(vrv::Note *note, hum::HTp token);
+    vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
+    void addSystemKeyTimeChange(int startline, int endline);
+    void prepareEndings(void);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -261,9 +295,12 @@ protected:
     void insertRespStmt(pugi::xml_node &titleStmt, vector<vector<string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
+    template <class ELEMENT> void setKeySig(ELEMENT element, const string &keysig);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
 
-    template <class ELEMENT> void convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
+    template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
+
+    template <class ELEMENT> hum::HumNum convertRhythm(ELEMENT element, hum::HTp token, int subtoken = -1);
 
     template <class ELEMENT> hum::HumNum setDuration(ELEMENT element, hum::HumNum duration);
 
@@ -282,21 +319,23 @@ protected:
     static int nextLowerPowerOfTwo(int x);
     static string getDateString(void);
     static string getReferenceValue(const string &key, vector<hum::HumdrumLine *> &references);
+    static bool replace(string &str, const string &oldStr, const string &newStr);
+    string cleanHarmString(const string &content);
 
 private:
     std::string m_filename; // Filename to read/was read.
 
     // m_debug == mostly for printing MEI data to standard input.
-    int m_debug;
+    int m_debug = 0;
 
     // m_comment == Display **kern data embedded in comments for each
     // staff layer.
-    int m_comment;
+    int m_comment = 1;
 
     // m_doc is inherited root document object.
 
     // m_score stores the music
-    Score *m_score;
+    Score *m_score = NULL;
 
     // m_sections stores segments of the music
     vector<Section *> m_sections;
@@ -307,13 +346,26 @@ private:
     // these variables as parameters:
     //
 
-    vrv::StaffGrp *m_staffgroup; // information about parts
-    vector<vrv::StaffDef *> m_staffdef; // information about a staff
+    // m_staffgroup == information about parts
+    vrv::StaffGrp *m_staffgroup = NULL;
+
+    // m_staffdef == information about a staff.
+    vector<vrv::StaffDef *> m_staffdef;
+
     vector<vrv::Measure *> m_measures;
-    vrv::Measure *m_measure; // current measure, or NULL
-    vrv::Staff *m_staff; // current staff, or NULL
-    int m_currentstaff;
-    vrv::Layer *m_layer; // current layer, or NULL
+
+    // m_measure == current measure, or NULL.
+    vrv::Measure *m_measure = NULL;
+
+    // m_staff == current staff, or NULL.
+    vrv::Staff *m_staff = NULL;
+
+    // m_currentstaff == The current staff being parsed.
+    int m_currentstaff = -1;
+
+    // m_layer == current layer, or NULL.
+    vrv::Layer *m_layer = NULL;
+
     int m_currentlayer;
 
     // m_layertokens == Humdrum **kern tokens for each staff/layer to be
@@ -324,7 +376,7 @@ private:
     // contain **kern data.
     vector<hum::HTp> m_kernstarts;
 
-    // m_rkern == reverse listing of staff to Humdrum file track.
+    // m_rkern == reverse mapping of Humdrum track to staff number..
     vector<int> m_rkern;
 
     // m_infile == Humdrum file used for conversion.
@@ -334,16 +386,47 @@ private:
     vector<hum::HumNum> m_timesigdurs;
 
     // m_tupletscaling == tuplet-scaling factor for the current note.
-    hum::HumNum m_tupletscaling;
+    hum::HumNum m_tupletscaling = 1;
 
     // m_omd == temporary variable for printing tempo designation.
-    bool m_omd;
+    bool m_omd = false;
 
     // m_oclef == temporary variable for printing "original-clef" <app>
     vector<std::pair<int, hum::HTp> > m_oclef;
 
     // m_staffstates == state variables for each staff.
     vector<humaux::StaffStateVariables> m_staffstates;
+
+    // m_measureIndex == state variable for keeping track of the
+    // current measure number being converted.
+    int m_measureIndex;
+
+    // m_harm == state variable for keeping track of whether or not
+    // the file to convert contains **mxhm spines that should be
+    // converted into <harm> element in the MEI conversion.
+    bool m_harm;
+
+    // m_leftbarstyle is a barline left-hand style to store in the next measure.
+    // When processing a measure, this variable should be checked and used
+    // in @left="style" for the measure.
+    data_BARRENDITION m_leftbarstyle;
+
+    // m_signifiers == a list of user defined signfiers in **kern spine data
+    // which indicate non-standard **kern parametesr that can be converted
+    // into notation.
+    HumdrumSignifiers m_signifiers;
+
+    // m_multirest == boolean states to keep track of muti-rest cases.
+    vector<int> m_multirest;
+
+    // m_ending == keep track of 1st/second endings.
+    vector<int> m_ending;
+
+    // m_currentending == keep track of current ending.
+    int m_endingnum = 0;
+
+    // m_currentending == keep track of current ending.
+    vrv::Ending *m_currentending = NULL;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

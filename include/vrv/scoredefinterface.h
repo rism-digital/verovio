@@ -9,8 +9,8 @@
 #define __VRV_SCOREDEF_INTERFACE_H__
 
 #include "atts_mensural.h"
-#include "atts_shared.h"
 #include "atts_midi.h"
+#include "atts_shared.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -28,6 +28,7 @@ class ScoreDefInterface : public Interface,
                           public AttCleffingLog,
                           public AttKeySigDefaultLog,
                           public AttKeySigDefaultVis,
+                          public AttLyricstyle,
                           public AttMensuralLog,
                           public AttMensuralShared,
                           public AttMeterSigDefaultLog,

@@ -18,7 +18,11 @@ namespace vrv {
 // Hairpin
 //----------------------------------------------------------------------------
 
-class Hairpin : public ControlElement, public TimeSpanningInterface, public AttHairpinLog, public AttPlacement {
+class Hairpin : public ControlElement,
+                public TimeSpanningInterface,
+                public AttColor,
+                public AttHairpinLog,
+                public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

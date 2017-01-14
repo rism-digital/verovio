@@ -131,7 +131,7 @@ my $VEROVIO_LIBMEI  = "$VEROVIO_ROOT/libmei";
 my $includes = "";
 $includes .= " -I$VEROVIO_INCLUDE";
 $includes .= " -I$VEROVIO_INCLUDE/vrv";
-$includes .= " -I$VEROVIO_INCLUDE/hum";
+$includes .= " -I$VEROVIO_INCLUDE/hum" if !$nohumdrum;
 $includes .= " -I$VEROVIO_INCLUDE/json";
 $includes .= " -I$VEROVIO_INCLUDE/midi";
 $includes .= " -I$VEROVIO_INCLUDE/pugi";
@@ -155,6 +155,7 @@ $exports .= "'_vrvToolkit_getElementsAtTime',";
 $exports .= "'_vrvToolkit_getLog',";
 $exports .= "'_vrvToolkit_getVersion',";
 $exports .= "'_vrvToolkit_getMEI',";
+$exports .= "'_vrvToolkit_getHumdrum',";
 $exports .= "'_vrvToolkit_getPageCount',";
 $exports .= "'_vrvToolkit_getPageWithElement',";
 $exports .= "'_vrvToolkit_getTimeForElement',";
@@ -215,18 +216,23 @@ sub getSources {
 	my @sources;
 	push @sources, "./emscripten_main.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*.cpp";
-	push @sources, glob "$VEROVIO_ROOT/src/*/*.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*/*.cc";
+	if ($nohumdrum) {
+		push @sources, grep(!/src\/hum\//, glob "$VEROVIO_ROOT/src/*/*.cpp");
+	} else {
+		push @sources, glob "$VEROVIO_ROOT/src/*/*.cpp";
+	}
 
 	# libmei: only a subset is included:
 	push @sources, "$VEROVIO_ROOT/libmei/attconverter.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_cmn.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_critapp.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_externalsymbols.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mei.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mensural.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_midi.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_pagebased.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_shared.cpp";
-	push @sources, "$VEROVIO_ROOT/libmei/atts_midi.cpp";
 
 	return join " ", @sources
 }
@@ -247,6 +253,9 @@ sub syncSvgResources {
 
 	# Then copy data directory contents
 	`cp -r $VEROVIO_ROOT/data/* $DATA_DIR/`;
+
+	# Remove .DS_Store from the data directory
+	`find $DATA_DIR/ -name '.DS_Store' -type f -delete`;
 
 	return unless $exclusion;
 	my @list = split /[^A-Za-z0-9_]+/, $exclusion;
