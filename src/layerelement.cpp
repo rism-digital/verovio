@@ -775,7 +775,7 @@ int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
 
-        // Fow just ignore grace notes
+        // For now just ignore grace notes
         if (note->HasGrace()) return FUNCTOR_CONTINUE;
 
         // The is increased by the chord element
