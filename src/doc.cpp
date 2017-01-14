@@ -184,7 +184,7 @@ void Doc::ExportMIDI(MidiFile *midiFile)
             }
             midiTrack = staffDef->GetN();
             midiFile->addTrack();
-            midiFile->addTrackName(midiTrack, 0, staffDef->GetLabel());
+            if (staffDef->HasLabel()) midiFile->addTrackName(midiTrack, 0, staffDef->GetLabel());
         }
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
