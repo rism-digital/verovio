@@ -107,6 +107,7 @@ enum ClassId {
     SLUR,
     TEMPO,
     TIE,
+    TRILL,
     CONTROL_ELEMENT_max,
     // Ids for LayerElement child classes
     LAYER_ELEMENT,

@@ -45,6 +45,7 @@ class Tempo;
 class Text;
 class TextElement;
 class Tie;
+class Trill;
 class Tuplet;
 class Verse;
 
@@ -267,7 +268,7 @@ protected:
     void DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
     void DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn,
         int originY, int heightY = 0);
-    void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff);
+    void DrawTrillAttr(DeviceContext *dc, LayerElement *element, Staff *staff);
     ///@}
 
     /**
@@ -326,6 +327,7 @@ protected:
         DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system);
     ///@}
 
     /**

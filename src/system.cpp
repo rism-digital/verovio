@@ -315,6 +315,8 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = FERMATA;
     m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = TRILL;
+    m_systemAligner.Process(params->m_functor, params);
     params->m_classId = OCTAVE;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = HAIRPIN;
