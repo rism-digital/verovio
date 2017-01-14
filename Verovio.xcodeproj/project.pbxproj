@@ -11,6 +11,7 @@
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
 		4067E4C81DDDAF0000C6E059 /* fermata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067E4C71DDDAF0000C6E059 /* fermata.cpp */; };
+		40F910081E2799740081B7BB /* trill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40F910071E2799740081B7BB /* trill.cpp */; };
 		4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
 		4D1031861DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
 		4D1031871DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
@@ -295,6 +296,8 @@
 		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; };
 		4067E4C71DDDAF0000C6E059 /* fermata.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fermata.cpp; path = src/fermata.cpp; sourceTree = "<group>"; };
 		4067E4C91DDDAF6400C6E059 /* fermata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fermata.h; path = include/vrv/fermata.h; sourceTree = "<group>"; };
+		40F910061E2799640081B7BB /* trill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trill.h; path = include/vrv/trill.h; sourceTree = "<group>"; };
+		40F910071E2799740081B7BB /* trill.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = trill.cpp; path = src/trill.cpp; sourceTree = "<group>"; };
 		4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_externalsymbols.cpp; path = libmei/atts_externalsymbols.cpp; sourceTree = "<group>"; };
 		4D1031851DECB83E0098EA1C /* atts_externalsymbols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_externalsymbols.h; path = libmei/atts_externalsymbols.h; sourceTree = "<group>"; };
 		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = src/midi/Binasc.cpp; sourceTree = "<group>"; };
@@ -770,6 +773,8 @@
 				4DB3510F1C80409E002DD057 /* tempo.h */,
 				8F086ED8188539540037FD8E /* tie.cpp */,
 				8F59292F18854BF800FE51AD /* tie.h */,
+				40F910071E2799740081B7BB /* trill.cpp */,
+				40F910061E2799640081B7BB /* trill.h */,
 			);
 			name = controlelements;
 			sourceTree = "<group>";
@@ -1197,6 +1202,7 @@
 				4D5572401CF3F32A008D06A0 /* octave.cpp in Sources */,
 				8F086EFF188539540037FD8E /* slur.cpp in Sources */,
 				8F086F00188539540037FD8E /* staff.cpp in Sources */,
+				40F910081E2799740081B7BB /* trill.cpp in Sources */,
 				4DA1448A1C2AB28700CB7CEE /* textelement.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
 				4DA80D961A6ACF5D0089802D /* style.cpp in Sources */,

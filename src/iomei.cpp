@@ -57,6 +57,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
+#include "trill.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -271,6 +272,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == TIE) {
         m_currentNode = m_currentNode.append_child("tie");
         WriteMeiTie(m_currentNode, dynamic_cast<Tie *>(object));
+    }
+    else if (object->Is() == TRILL) {
+        m_currentNode = m_currentNode.append_child("trill");
+        WriteMeiTrill(m_currentNode, dynamic_cast<Trill *>(object));
     }
 
     // Layer elements
@@ -824,6 +829,16 @@ void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
     WriteTimeSpanningInterface(currentNode, tie);
     tie->WriteColor(currentNode);
     tie->WriteCurvature(currentNode);
+};
+
+void MeiOutput::WriteMeiTrill(pugi::xml_node currentNode, Trill *trill)
+{
+    assert(trill);
+    
+    WriteXmlId(currentNode, trill);
+    WriteTimePointInterface(currentNode, trill);
+    trill->WriteColor(currentNode);
+    trill->WritePlacement(currentNode);
 };
 
 void MeiOutput::WriteMeiLayer(pugi::xml_node currentNode, Layer *layer)
@@ -2118,6 +2133,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "tie") {
             success = ReadMeiTie(parent, current);
         }
+        else if (std::string(current.name()) == "trill") {
+            success = ReadMeiTrill(parent, current);
+        }
         else if (std::string(current.name()) == "tupletSpan") {
             if (!ReadTupletSpanAsTuplet(dynamic_cast<Measure *>(parent), current)) {
                 LogWarning("<tupletSpan> is not readable as <tuplet> and will be ignored");
@@ -2272,6 +2290,19 @@ bool MeiInput::ReadMeiTie(Object *parent, pugi::xml_node tie)
     vrvTie->ReadCurvature(tie);
 
     parent->AddChild(vrvTie);
+    return true;
+}
+
+bool MeiInput::ReadMeiTrill(Object *parent, pugi::xml_node trill)
+{
+    Trill *vrvTrill = new Trill();
+    SetMeiUuid(trill, vrvTrill);
+    
+    ReadTimePointInterface(trill, vrvTrill);
+    vrvTrill->ReadColor(trill);
+    vrvTrill->ReadPlacement(trill);
+    
+    parent->AddChild(vrvTrill);
     return true;
 }
 
