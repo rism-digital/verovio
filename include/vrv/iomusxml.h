@@ -226,8 +226,8 @@ private:
     data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
-    data_PLACE ConvertTypeToPlace(std::string value);
     curvature_CURVEDIR ConvertOrientationToCurvedir(std::string);
+    fermataVis_SHAPE ConvertFermataShape(std::string);
     pedalLog_DIR ConvertPedalTypeToDir(std::string value);
     tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
     ///@}

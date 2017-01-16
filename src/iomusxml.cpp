@@ -21,6 +21,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "fermata.h"
 #include "hairpin.h"
 #include "harm.h"
 #include "layer.h"
@@ -947,38 +948,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     std::string typeStr = GetContentOfChild(node, "type");
     int dots = (int)node.select_nodes("dot").size();
 
-    // fermata
-    pugi::xpath_node fermata = notations.node().select_single_node("fermata");
-    std::string fermataStr;
-    if (fermata) {
-        fermataStr = GetAttributeValue(fermata.node(), "type");
-        if (fermataStr.empty()) fermataStr = "upright";
-    }
-
-    // ornaments
-    pugi::xpath_node ornaments = notations.node().select_single_node("ornaments");
-    pugi::xpath_node tremolo = ornaments.node().select_single_node("tremolo");
+    // tremolos
+    pugi::xpath_node tremolo = notations.node().select_single_node("ornaments/tremolo");
     std::string tremSlashNum = "0";
-    std::string ornamStr;
-    if (ornaments && !tremolo) {
-        if (ornaments.node().select_single_node("inverted-turn")) ornamStr = ornamStr + "s";
-        if (ornaments.node().select_single_node("mordent")) {
-            if (!ornamStr.empty()) ornamStr = ornamStr + " ";
-            ornamStr = ornamStr + "m";
-        }
-        if (ornaments.node().select_single_node("inverted-mordent")) {
-            if (!ornamStr.empty()) ornamStr = ornamStr + " ";
-            ornamStr = ornamStr + "M";
-        }
-        if (ornaments.node().select_single_node("trill-mark")) {
-            if (!ornamStr.empty()) ornamStr = ornamStr + " ";
-            ornamStr = ornamStr + "t";
-        }
-        if (ornaments.node().select_single_node("turn")) {
-            if (!ornamStr.empty()) ornamStr = ornamStr + " ";
-            ornamStr = ornamStr + "S";
-        }
-    }
     if (tremolo) {
         if (HasAttributeWithValue(tremolo.node(), "type", "single")) {
             BTrem *bTrem = new BTrem();
@@ -1018,10 +990,13 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             tuplet->SetNum(atoi(GetContent(actualNotes.node()).c_str()));
             tuplet->SetNumbase(atoi(GetContent(normalNotes.node()).c_str()));
         }
+        if (!GetAttributeValue(tupletStart.node(), "placement").empty()) {
+            tuplet->SetNumPlace(tuplet->AttTupletVis::StrToPlace(GetAttributeValue(tupletStart.node(), "placement")));
+            tuplet->SetBracketPlace(
+                tuplet->AttTupletVis::StrToPlace(GetAttributeValue(tupletStart.node(), "placement")));
+        }
         tuplet->SetNumFormat(ConvertTupletNumberValue(GetAttributeValue(tupletStart.node(), "show-number")));
-        tuplet->SetNumPlace(ConvertTypeToPlace(GetAttributeValue(tupletStart.node(), "placement")));
         if (HasAttributeWithValue(tupletStart.node(), "show-number", "none")) tuplet->SetNumVisible(BOOLEAN_false);
-        tuplet->SetBracketPlace(ConvertTypeToPlace(GetAttributeValue(tupletStart.node(), "placement")));
         tuplet->SetBracketVisible(ConvertWordToBool(GetAttributeValue(tupletStart.node(), "bracket")));
     }
 
@@ -1038,9 +1013,14 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         // we assume /note without /type to be mRest
         else if (typeStr.empty()) {
             MRest *mRest = new MRest();
-            if (!fermataStr.empty()) mRest->SetFermata(ConvertTypeToPlace(fermataStr));
             if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
+            if (notations.node().select_single_node("fermata")) {
+                if (HasAttributeWithValue(notations.node().select_single_node("fermata").node(), "type", "inverted"))
+                    mRest->SetFermata(PLACE_below);
+                else
+                    mRest->SetFermata(PLACE_above);
+            }
             AddLayerElement(layer, mRest);
         }
         else {
@@ -1048,7 +1028,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             element = rest;
             rest->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) rest->SetDots(dots);
-            if (!fermataStr.empty()) rest->SetFermata(ConvertTypeToPlace(fermataStr));
             if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
             AddLayerElement(layer, rest);
@@ -1113,7 +1092,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
                 if (tremSlashNum != "0") chord->SetStemMod(chord->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
-                if (!fermataStr.empty()) chord->SetFermata(ConvertTypeToPlace(fermataStr));
                 AddLayerElement(layer, chord);
                 m_elementStack.push_back(chord);
                 element = chord;
@@ -1142,7 +1120,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
             if (tremSlashNum != "0") note->SetStemMod(note->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
-            if (!fermataStr.empty()) note->SetFermata(ConvertTypeToPlace(fermataStr));
         }
 
         // verse / syl
@@ -1218,6 +1195,11 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             artic->SetArtic(artics);
             element->AddChild(artic);
         }
+        pugi::xpath_node technical = notations.node().select_single_node("technical");
+        if (technical) {
+            if (technical.node().select_single_node("open-string")) artics.push_back(ARTICULATION_open);
+            if (technical.node().select_single_node("harmonic")) artics.push_back(ARTICULATION_ten_stacc);
+        }
 
         // add the note to the layer or to the current container
         AddLayerElement(layer, note);
@@ -1232,6 +1214,29 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 
     // element will be NULL in case of mRest
     if (!element) return;
+
+    // fermatas
+    pugi::xpath_node xmlFermata = notations.node().select_single_node("fermata");
+    if (xmlFermata) {
+        Fermata *fermata = new Fermata();
+        m_controlElements.push_back(std::make_pair(measureNum, fermata));
+        fermata->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        fermata->SetStartid("#" + element->GetUuid());
+        // color
+        std::string colorStr = GetAttributeValue(xmlFermata.node(), "color");
+        if (!colorStr.empty()) fermata->SetColor(colorStr.c_str());
+        // shape
+        fermata->SetShape(ConvertFermataShape(GetContent(xmlFermata.node())));
+        // form and place
+        if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
+            fermata->SetForm(fermataVis_FORM_inv);
+            fermata->SetPlace(STAFFREL_below);
+        }
+        else {
+            fermata->SetForm(fermataVis_FORM_norm);
+            fermata->SetPlace(STAFFREL_above);
+        }
+    }
 
     // slur
     pugi::xpath_node_set slurs = notations.node().select_nodes("slur");
@@ -1417,21 +1422,19 @@ data_PITCHNAME MusicXmlInput::ConvertStepToPitchName(std::string value)
     return PITCHNAME_NONE;
 }
 
-data_PLACE MusicXmlInput::ConvertTypeToPlace(std::string value)
-{
-    if (value == "above") return PLACE_above;
-    if (value == "below") return PLACE_below;
-    // for fermatas
-    if (value == "upright") return PLACE_above;
-    if (value == "inverted") return PLACE_below;
-    return PLACE_NONE;
-}
-
 curvature_CURVEDIR MusicXmlInput::ConvertOrientationToCurvedir(std::string value)
 {
     if (value == "over") return curvature_CURVEDIR_above;
     if (value == "under") return curvature_CURVEDIR_below;
     return curvature_CURVEDIR_NONE;
+}
+
+fermataVis_SHAPE MusicXmlInput::ConvertFermataShape(std::string value)
+{
+    if (value == "normal") return fermataVis_SHAPE_curved;
+    if (value == "angled") return fermataVis_SHAPE_angular;
+    if (value == "square") return fermataVis_SHAPE_square;
+    return fermataVis_SHAPE_NONE;
 }
 
 pedalLog_DIR MusicXmlInput::ConvertPedalTypeToDir(std::string value)
