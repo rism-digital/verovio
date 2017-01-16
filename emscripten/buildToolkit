@@ -131,7 +131,7 @@ my $VEROVIO_LIBMEI  = "$VEROVIO_ROOT/libmei";
 my $includes = "";
 $includes .= " -I$VEROVIO_INCLUDE";
 $includes .= " -I$VEROVIO_INCLUDE/vrv";
-$includes .= " -I$VEROVIO_INCLUDE/hum";
+$includes .= " -I$VEROVIO_INCLUDE/hum" if !$nohumdrum;
 $includes .= " -I$VEROVIO_INCLUDE/json";
 $includes .= " -I$VEROVIO_INCLUDE/midi";
 $includes .= " -I$VEROVIO_INCLUDE/pugi";
@@ -155,6 +155,7 @@ $exports .= "'_vrvToolkit_getElementsAtTime',";
 $exports .= "'_vrvToolkit_getLog',";
 $exports .= "'_vrvToolkit_getVersion',";
 $exports .= "'_vrvToolkit_getMEI',";
+$exports .= "'_vrvToolkit_getHumdrum',";
 $exports .= "'_vrvToolkit_getPageCount',";
 $exports .= "'_vrvToolkit_getPageWithElement',";
 $exports .= "'_vrvToolkit_getTimeForElement',";
@@ -215,8 +216,12 @@ sub getSources {
 	my @sources;
 	push @sources, "./emscripten_main.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*.cpp";
-	push @sources, glob "$VEROVIO_ROOT/src/*/*.cpp";
 	push @sources, glob "$VEROVIO_ROOT/src/*/*.cc";
+	if ($nohumdrum) {
+		push @sources, grep(!/src\/hum\//, glob "$VEROVIO_ROOT/src/*/*.cpp");
+	} else {
+		push @sources, glob "$VEROVIO_ROOT/src/*/*.cpp";
+	}
 
 	# libmei: only a subset is included:
 	push @sources, "$VEROVIO_ROOT/libmei/attconverter.cpp";

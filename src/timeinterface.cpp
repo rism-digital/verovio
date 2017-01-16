@@ -282,7 +282,8 @@ int TimeSpanningInterface::InterfacePrepareTimestamps(FunctorParams *functorPara
             LogWarning("%s with @xml:id %s has both a @endid and an @tstamp2; @tstamp2 is ignored",
                 object->GetClassName().c_str(), object->GetUuid().c_str());
         if (this->GetStartid() == this->GetEndid()) {
-            LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid", object->GetClassName().c_str(), object->GetUuid().c_str());
+            LogWarning("%s with @xml:id %s will not get rendered as it has identical values in @startid and @endid",
+                object->GetClassName().c_str(), object->GetUuid().c_str());
         }
         return TimePointInterface::InterfacePrepareTimestamps(functorParams, object);
     }

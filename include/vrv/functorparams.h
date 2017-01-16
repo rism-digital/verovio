@@ -76,16 +76,30 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustArticulationsParams
+// AdjustArticParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: the Doc
  **/
 
-class AdjustArticulationsParams : public FunctorParams {
+class AdjustArticParams : public FunctorParams {
 public:
-    AdjustArticulationsParams(Doc *doc) { m_doc = doc; }
+    AdjustArticParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustArticWithSlursParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the Doc
+ **/
+
+class AdjustArticWithSlursParams : public FunctorParams {
+public:
+    AdjustArticWithSlursParams(Doc *doc) { m_doc = doc; }
     Doc *m_doc;
 };
 
@@ -509,7 +523,7 @@ public:
     GenerateMIDIParams(MidiFile *midiFile)
     {
         m_midiFile = midiFile;
-        m_midiTrack = 0;
+        m_midiTrack = 1;
         m_currentMeasureTime = 0.0;
         m_totalTime = 0.0;
         m_transSemi = 0;

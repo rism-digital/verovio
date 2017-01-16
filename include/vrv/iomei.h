@@ -94,6 +94,7 @@ class TextElement;
 class Tie;
 class TimePointInterface;
 class TimeSpanningInterface;
+class Trill;
 class Tuplet;
 class Unclear;
 class Verse;
@@ -219,6 +220,7 @@ private:
     void WriteMeiSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteMeiTie(pugi::xml_node currentNode, Tie *tie);
+    void WriteMeiTrill(pugi::xml_node currentNode, Trill *trill);
     ///@}
 
     /**
@@ -438,6 +440,7 @@ private:
     bool ReadMeiSlur(Object *parent, pugi::xml_node slur);
     bool ReadMeiTempo(Object *parent, pugi::xml_node tempo);
     bool ReadMeiTie(Object *parent, pugi::xml_node tie);
+    bool ReadMeiTrill(Object *parent, pugi::xml_node trill);
     ///@}
 
     /**

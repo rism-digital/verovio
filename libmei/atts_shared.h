@@ -5792,8 +5792,8 @@ private:
      **/
     double m_transDiat;
     /**
-     * Records the amount of pitch shift in semitones, e.g., C to C♯ = 1, C to D♭ =
-     * 1, necessary to calculate the sounded pitch from the written one.
+     * Records the amount of pitch shift in semitones, e.g., C to C♯ = 1, C to D♭ = 1,
+     * necessary to calculate the sounded pitch from the written one.
      **/
     double m_transSemi;
 

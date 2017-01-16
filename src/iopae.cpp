@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <sstream>
+#include <string>
 
 //----------------------------------------------------------------------------
 
@@ -35,7 +36,7 @@
 //----------------------------------------------------------------------------
 
 #ifndef NO_PAE_SUPPORT
-#include <regex.h>
+#include <regex>
 #endif
 
 namespace vrv {
@@ -589,13 +590,15 @@ int PaeInput::getTupletFermata(const char *incipit, pae::Note *note, int index)
     int i = index;
     int length = (int)strlen(incipit);
 
-    // detect if it is a fermata or a tuplet
-    regex_t re;
-    regcomp(&re, "^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", REG_EXTENDED);
-    int is_tuplet = regexec(&re, incipit + i, 0, NULL, 0);
-    regfree(&re);
+    // Detect if it is a fermata or a tuplet.
+    //
+    // std::regex_constants::ECMAScript is the default syntax, so optional.
+    // Previously these were extended regex syntax, but this case
+    // is the same in ECMAScript syntax.
+    std::regex exp("^([^)]*[ABCDEFG-][^)]*[ABCDEFG-][^)]*)", std::regex_constants::ECMAScript);
+    bool is_tuplet = regex_search(incipit + i, exp);
 
-    if (is_tuplet == 0) {
+    if (is_tuplet) {
         int t = i;
         int t2 = 0;
         int tuplet_val = 0;
@@ -765,27 +768,18 @@ int PaeInput::getTimeInfo(const char *incipit, MeterSig *meter, int index)
     strncpy(timesig_str, incipit + index, i - index);
 
     std::ostringstream sout;
-    regex_t re;
 
-    // check if format X/X or one digit only
-    regcomp(&re, "^[0-9]*/[0-9]*$", REG_EXTENDED);
-    int is_standard = regexec(&re, timesig_str, 0, NULL, 0);
-    regfree(&re);
-    regcomp(&re, "^[0-9]*$", REG_EXTENDED);
-    int is_one_number = regexec(&re, timesig_str, 0, NULL, 0);
-    regfree(&re);
-
-    if (is_standard == 0) {
-        char buf_str[1024];
-        strcpy(buf_str, timesig_str);
-        int beats = atoi(strtok(buf_str, "/"));
-        int note_value = atoi(strtok(NULL, "/"));
-        meter->SetCount(beats);
-        meter->SetUnit(note_value);
+    // regex_match matches to the entire input string (regex_search does
+    // partial matches.  In this case cmatch is used to store the submatches
+    // (enclosed in parentheses) for later reference.  Use std::smatch when
+    // dealing with strings, or std::wmatch with wstrings.
+    std::cmatch matches;
+    if (regex_match(timesig_str, matches, std::regex("(\\d+)/(\\d+)"))) {
+        meter->SetCount(std::stoi(matches[1]));
+        meter->SetUnit(std::stoi(matches[2]));
     }
-    else if (is_one_number == 0) {
-        int beats = atoi(timesig_str);
-        meter->SetCount(beats);
+    else if (regex_match(timesig_str, matches, std::regex("\\d+"))) {
+        meter->SetCount(std::stoi(timesig_str));
     }
     else if (strcmp(timesig_str, "c") == 0) {
         // C
@@ -903,38 +897,42 @@ int PaeInput::getWholeRest(const char *incipit, int *wholerest, int index)
 
 int PaeInput::getBarLine(const char *incipit, data_BARRENDITION *output, int index)
 {
-    regex_t re;
 
-    regcomp(&re, "^://:", REG_EXTENDED);
-    int is_barline_rptboth = regexec(&re, incipit + index, 0, NULL, 0);
-    regfree(&re);
+    bool is_barline_rptboth = false;
+    bool is_barline_rptend = false;
+    bool is_barline_rptstart = false;
+    bool is_barline_dbl = false;
 
-    regcomp(&re, "^://", REG_EXTENDED);
-    int is_barline_rptend = regexec(&re, incipit + index, 0, NULL, 0);
-    regfree(&re);
+    if (strncmp(incipit + index, "://:", 4) == 0) {
+        is_barline_rptboth = true;
+    }
 
-    regcomp(&re, "^//:", REG_EXTENDED);
-    int is_barline_rptstart = regexec(&re, incipit + index, 0, NULL, 0);
-    regfree(&re);
+    if (strncmp(incipit + index, "://", 3) == 0) {
+        is_barline_rptend = true;
+    }
 
-    regcomp(&re, "^//", REG_EXTENDED);
-    int is_barline_dbl = regexec(&re, incipit + index, 0, NULL, 0);
-    regfree(&re);
+    if (strncmp(incipit + index, "//:", 3) == 0) {
+        is_barline_rptstart = true;
+    }
+
+    if (strncmp(incipit + index, "//", 2) == 0) {
+        is_barline_dbl = true;
+    }
 
     int i = 0; // number of characters
-    if (is_barline_rptboth == 0) {
+    if (is_barline_rptboth) {
         *output = BARRENDITION_rptboth;
         i = 3;
     }
-    else if (is_barline_rptstart == 0) {
+    else if (is_barline_rptstart) {
         *output = BARRENDITION_rptstart;
         i = 2;
     }
-    else if (is_barline_rptend == 0) {
+    else if (is_barline_rptend) {
         *output = BARRENDITION_rptend;
         i = 2;
     }
-    else if (is_barline_dbl == 0) {
+    else if (is_barline_dbl) {
         *output = BARRENDITION_dbl;
         i = 1;
     }
@@ -1020,7 +1018,6 @@ int PaeInput::getKeyInfo(const char *incipit, KeySig *key, int index)
 
 int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measure, int index)
 {
-    regex_t re;
     int oct;
     int i = index;
     int app;
@@ -1044,33 +1041,25 @@ int PaeInput::getNote(const char *incipit, pae::Note *note, pae::Measure *measur
     }
     note->pitch = getPitch(incipit[i]);
 
-    // lookout, hack. If it is a rest (PITCHNAME_NONE val) then create the rest object.
+    // lookout, hack. If a rest (PITCHNAME_NONE val) then create rest object.
     // it will be added instead of the note
     if (note->pitch == PITCHNAME_NONE) {
         note->rest = true;
     }
 
     // trills
-    regcomp(&re, "^[^ABCDEFG]*t", REG_EXTENDED);
-    int has_trill = regexec(&re, incipit + i + 1, 0, NULL, 0);
-    regfree(&re);
-    if (has_trill == 0) {
+    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*t"))) {
         note->trill = true;
     }
 
     // tie
-    regcomp(&re, "^[^ABCDEFG]*\\+", REG_EXTENDED);
-    int has_tie = regexec(&re, incipit + i + 1, 0, NULL, 0);
-    regfree(&re);
-    if (has_tie == 0) {
-        if (note->tie == 0) note->tie = 1; // reset 1 for the first note, >1 for next ones is incremented under
+    if (regex_search(incipit + i + 1, std::regex("^[A-G]*\\+"))) {
+        // reset 1 for first note, >1 for next ones is incremented under
+        if (note->tie == 0) note->tie = 1;
     }
 
     // chord
-    regcomp(&re, "^[^ABCDEFG]*\\^", REG_EXTENDED);
-    int is_chord = regexec(&re, incipit + i + 1, 0, NULL, 0);
-    regfree(&re);
-    if (is_chord == 0) {
+    if (regex_search(incipit + i + 1, std::regex("^[^A-G]*\\^"))) {
         note->chord = true;
     }
 
@@ -1167,7 +1156,7 @@ void PaeInput::parseNote(pae::Note *note)
         mnote->SetDots(note->dots);
         mnote->SetDur(note->duration);
 
-        // pseudo chant notation with 7. in PAE - make them quater notes without stem
+        // pseudo chant notation with 7. in PAE - make quater notes without stem
         if ((mnote->GetDur() == DURATION_128) && (mnote->GetDots() == 1)) {
             mnote->SetDur(DURATION_4);
             mnote->SetDots(0);
@@ -1296,8 +1285,8 @@ void PaeInput::popContainer()
 {
     // assert(m_nested_objects.size() > 0);
     if (m_nested_objects.size() == 0) {
-        LogError("PaeInput::popContainer: tried to pop an object from empty stack. Cross-measure objects (tuplets, "
-                 "beams) are not supported.");
+        LogError("PaeInput::popContainer: tried to pop an object from empty stack. "
+                 "Cross-measure objects (tuplets, beams) are not supported.");
     }
     else {
         m_nested_objects.pop_back();

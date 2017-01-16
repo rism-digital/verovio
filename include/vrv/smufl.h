@@ -181,6 +181,7 @@ enum {
     SMUFL_E611_stringsDownBowTurned = 0xE611,
     SMUFL_E612_stringsUpBow = 0xE612,
     SMUFL_E613_stringsUpBowTurned = 0xE613,
+    SMUFL_E614_stringsHarmonic = 0xE614,
     SMUFL_E650_keyboardPedalPed = 0xE650,
     SMUFL_E655_keyboardPedalUp = 0xE655,
     SMUFL_E880_tuplet0 = 0xE880,
@@ -209,10 +210,19 @@ enum {
     SMUFL_E94A_mensuralCombStemDownFlagSemiminima = 0xE94A,
     SMUFL_E94B_mensuralCombStemUpFlagFusa = 0xE94B,
     SMUFL_E94C_mensuralCombStemDownFlagFusa = 0xE94C,
+    SMUFL_E9F0_mensuralRestMaxima = 0xE9F0,
+    SMUFL_E9F1_mensuralRestLongaPerfecta = 0xE9F1,
+    SMUFL_E9F2_mensuralRestLongaImperfecta = 0xE9F2,
+    SMUFL_E9F3_mensuralRestBrevis = 0xE9F3,
+    SMUFL_E9F4_mensuralRestSemibrevis = 0xE9F4,
+    SMUFL_E9F5_mensuralRestMinima = 0xE9F5,
+    SMUFL_E9F6_mensuralRestSemiminima = 0xE9F6,
+    SMUFL_E9F7_mensuralRestFusa = 0xE9F7,
+    SMUFL_E9F8_mensuralRestSemifusa = 0xE9F8,
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 187
+#define SMUFL_COUNT 197
 
 } // vrv namespace
 

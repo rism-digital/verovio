@@ -30,6 +30,7 @@ class TextElement;
 class Syl : public LayerElement,
             public TextListInterface,
             public TimeSpanningInterface,
+            public AttLang,
             public AttTypography,
             public AttSylLog {
 public:

@@ -45,6 +45,7 @@ class Tempo;
 class Text;
 class TextElement;
 class Tie;
+class Trill;
 class Tuplet;
 class Verse;
 
@@ -267,7 +268,7 @@ protected:
     void DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
     void DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn,
         int originY, int heightY = 0);
-    void DrawTrill(DeviceContext *dc, LayerElement *element, Staff *staff);
+    void DrawTrillAttr(DeviceContext *dc, LayerElement *element, Staff *staff);
     ///@}
 
     /**
@@ -326,6 +327,7 @@ protected:
         DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
+    void DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system);
     ///@}
 
     /**
@@ -383,8 +385,7 @@ protected:
     void DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int nbr);
     void DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int nbr);
     void DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin);
-    void DrawThickBezierCurve(
-        DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle = 0.0);
+    void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
     void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100);
     void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
@@ -417,7 +418,7 @@ private:
     /**
      * @name Internal methods used for calculating slurs
      */
-    float AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[]);
+    float AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4]);
     int AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
         Point *c2, curvature_CURVEDIR curveDir, float angle, bool posRatio = true);
     void AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2, Point *c1,
@@ -448,33 +449,6 @@ private:
      * Changes and/or calculates the horizontal alignment of accidentals to prevent overlapping
      */
     bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjustHorizontally);
-
-    /**
-     * Swap the points passed as reference.
-     * This is useful for example when calculating bezier positions.
-     */
-    static void SwapPoints(Point *x1, Point *x2);
-
-    /**
-     * Calculate the position of a point after a rotation of rot_alpha around the center
-     */
-    static Point CalcPositionAfterRotation(Point point, float rot_alpha, Point center);
-
-    /**
-     * Calculate the position of a point after a rotation of rot_alpha around the center
-     */
-    static int CalcBezierAtPosition(const Point bezier[4], int x);
-
-    /**
-     * Swap values passed as reference.
-     * This is useful for example when switching to the device context world.
-     */
-    static void SwapY(int *y1, int *y2)
-    {
-        int tmp = *y1;
-        *y1 = *y2;
-        *y2 = tmp;
-    }
 
 public:
     /** Document */
@@ -511,9 +485,6 @@ protected:
     ScoreDef m_drawingScoreDef;
 
 private:
-    /** buffer for De-Casteljau algorithm */
-    static int s_deCasteljau[4][4];
-
     /** @name Internal values for storing temporary values for ligatures */
     ///@{
     static int s_drawingLigX[2], s_drawingLigY[2];

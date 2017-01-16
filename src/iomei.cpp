@@ -57,6 +57,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
+#include "trill.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -271,6 +272,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is() == TIE) {
         m_currentNode = m_currentNode.append_child("tie");
         WriteMeiTie(m_currentNode, dynamic_cast<Tie *>(object));
+    }
+    else if (object->Is() == TRILL) {
+        m_currentNode = m_currentNode.append_child("trill");
+        WriteMeiTrill(m_currentNode, dynamic_cast<Trill *>(object));
     }
 
     // Layer elements
@@ -717,6 +722,7 @@ void MeiOutput::WriteMeiDir(pugi::xml_node currentNode, Dir *dir)
     WriteXmlId(currentNode, dir);
     WriteTextDirInterface(currentNode, dir);
     WriteTimeSpanningInterface(currentNode, dir);
+    dir->WriteLang(currentNode);
 };
 
 void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
@@ -731,7 +737,7 @@ void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
 void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
 {
     assert(fermata);
-    
+
     WriteXmlId(currentNode, fermata);
     WriteTimePointInterface(currentNode, fermata);
     fermata->WriteColor(currentNode);
@@ -757,6 +763,7 @@ void MeiOutput::WriteMeiHarm(pugi::xml_node currentNode, Harm *harm)
     WriteXmlId(currentNode, harm);
     WriteTextDirInterface(currentNode, harm);
     WriteTimeSpanningInterface(currentNode, harm);
+    harm->WriteLang(currentNode);
 };
 
 void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
@@ -810,6 +817,7 @@ void MeiOutput::WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo)
     WriteXmlId(currentNode, tempo);
     WriteTextDirInterface(currentNode, tempo);
     WriteTimePointInterface(currentNode, tempo);
+    tempo->WriteLang(currentNode);
     tempo->WriteMiditempo(currentNode);
 }
 
@@ -821,6 +829,16 @@ void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
     WriteTimeSpanningInterface(currentNode, tie);
     tie->WriteColor(currentNode);
     tie->WriteCurvature(currentNode);
+};
+
+void MeiOutput::WriteMeiTrill(pugi::xml_node currentNode, Trill *trill)
+{
+    assert(trill);
+
+    WriteXmlId(currentNode, trill);
+    WriteTimePointInterface(currentNode, trill);
+    trill->WriteColor(currentNode);
+    trill->WritePlacement(currentNode);
 };
 
 void MeiOutput::WriteMeiLayer(pugi::xml_node currentNode, Layer *layer)
@@ -1074,6 +1092,7 @@ void MeiOutput::WriteMeiVerse(pugi::xml_node currentNode, Verse *verse)
 
     WriteLayerElement(currentNode, verse);
     verse->WriteColor(currentNode);
+    verse->WriteLang(currentNode);
     verse->WriteCommon(currentNode);
 }
 
@@ -1082,6 +1101,7 @@ void MeiOutput::WriteMeiSyl(pugi::xml_node currentNode, Syl *syl)
     assert(syl);
 
     WriteLayerElement(currentNode, syl);
+    syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
 }
@@ -1093,6 +1113,7 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
     WriteXmlId(currentNode, rend);
     rend->WriteColor(currentNode);
     rend->WriteCommon(currentNode);
+    rend->WriteLang(currentNode);
     rend->WriteTypography(currentNode);
 }
 
@@ -2112,6 +2133,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "tie") {
             success = ReadMeiTie(parent, current);
         }
+        else if (std::string(current.name()) == "trill") {
+            success = ReadMeiTrill(parent, current);
+        }
         else if (std::string(current.name()) == "tupletSpan") {
             if (!ReadTupletSpanAsTuplet(dynamic_cast<Measure *>(parent), current)) {
                 LogWarning("<tupletSpan> is not readable as <tuplet> and will be ignored");
@@ -2142,6 +2166,7 @@ bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
 
     ReadTextDirInterface(dir, vrvDir);
     ReadTimeSpanningInterface(dir, vrvDir);
+    vrvDir->ReadLang(dir);
 
     parent->AddChild(vrvDir);
     return ReadMeiTextChildren(vrvDir, dir);
@@ -2163,12 +2188,12 @@ bool MeiInput::ReadMeiFermata(Object *parent, pugi::xml_node fermata)
 {
     Fermata *vrvFermata = new Fermata();
     SetMeiUuid(fermata, vrvFermata);
-    
+
     ReadTimePointInterface(fermata, vrvFermata);
     vrvFermata->ReadColor(fermata);
     vrvFermata->ReadFermataVis(fermata);
     vrvFermata->ReadPlacement(fermata);
-    
+
     parent->AddChild(vrvFermata);
     return true;
 }
@@ -2194,6 +2219,7 @@ bool MeiInput::ReadMeiHarm(Object *parent, pugi::xml_node harm)
 
     ReadTextDirInterface(harm, vrvHarm);
     ReadTimeSpanningInterface(harm, vrvHarm);
+    vrvHarm->ReadLang(harm);
 
     parent->AddChild(vrvHarm);
     return ReadMeiTextChildren(vrvHarm, harm);
@@ -2247,6 +2273,7 @@ bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
 
     ReadTextDirInterface(tempo, vrvTempo);
     ReadTimePointInterface(tempo, vrvTempo);
+    vrvTempo->ReadLang(tempo);
     vrvTempo->ReadMiditempo(tempo);
 
     parent->AddChild(vrvTempo);
@@ -2263,6 +2290,19 @@ bool MeiInput::ReadMeiTie(Object *parent, pugi::xml_node tie)
     vrvTie->ReadCurvature(tie);
 
     parent->AddChild(vrvTie);
+    return true;
+}
+
+bool MeiInput::ReadMeiTrill(Object *parent, pugi::xml_node trill)
+{
+    Trill *vrvTrill = new Trill();
+    SetMeiUuid(trill, vrvTrill);
+
+    ReadTimePointInterface(trill, vrvTrill);
+    vrvTrill->ReadColor(trill);
+    vrvTrill->ReadPlacement(trill);
+
+    parent->AddChild(vrvTrill);
     return true;
 }
 
@@ -2765,6 +2805,7 @@ bool MeiInput::ReadMeiSyl(Object *parent, pugi::xml_node syl)
     Syl *vrvSyl = new Syl();
     ReadLayerElement(syl, vrvSyl);
 
+    vrvSyl->ReadLang(syl);
     vrvSyl->ReadTypography(syl);
     vrvSyl->ReadSylLog(syl);
 
@@ -2791,6 +2832,7 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
     ReadLayerElement(verse, vrvVerse);
 
     vrvVerse->ReadColor(verse);
+    vrvVerse->ReadLang(verse);
     vrvVerse->ReadCommon(verse);
 
     parent->AddChild(vrvVerse);
@@ -2843,6 +2885,7 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
 
     vrvRend->ReadColor(rend);
     vrvRend->ReadCommon(rend);
+    vrvRend->ReadLang(rend);
     vrvRend->ReadTypography(rend);
 
     parent->AddChild(vrvRend);

@@ -82,7 +82,7 @@ namespace musicxml {
             m_dirN = dirN;
             m_ID = lastID;
         }
-        
+
         int m_dirN;
         std::string m_ID;
     };

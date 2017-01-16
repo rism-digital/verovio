@@ -331,10 +331,14 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
         std::string textFont = GetAttributeValue(textNode, "font-family");
         std::string textStyle = GetAttributeValue(textNode, "font-style");
         std::string textWeight = GetAttributeValue(textNode, "font-weight");
+        std::string lang = GetAttributeValue(textNode, "xml:lang");
         Text *text = new Text();
         text->SetText(UTF8to16(textStr));
         if (!textColor.empty() || !textFont.empty() || !textStyle.empty() || !textWeight.empty()) {
             Rend *rend = new Rend();
+            if (words.size() > 1 && !lang.empty()) {
+                rend->SetLang(lang.c_str());
+            }
             if (!textColor.empty()) rend->SetColor(textColor.c_str());
             if (!textFont.empty()) rend->SetFontfam(textFont.c_str());
             if (!textStyle.empty()) rend->SetFontstyle(rend->AttTypography::StrToFontstyle(textStyle.c_str()));
@@ -384,6 +388,9 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     m_staffGrpStack.push_back(staffGrp);
 
     int staffOffset = 0;
+
+    pugi::xpath_node scoreMidiBpm = root.select_single_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
+    if (scoreMidiBpm) m_doc->m_scoreDef.SetMidiBpm(atoi(GetAttributeValue(scoreMidiBpm.node(), "tempo").c_str()));
 
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
@@ -795,11 +802,15 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
 
     pugi::xpath_node type = node.select_single_node("direction-type");
     std::string placeStr = GetAttributeValue(node, "placement");
+    pugi::xpath_node_set words = type.node().select_nodes("words");
 
     // Directive
-    pugi::xpath_node_set words = type.node().select_nodes("words");
     if (words.size() != 0 && !node.select_single_node("sound[@tempo]")) {
         Dir *dir = new Dir();
+        if (words.size() == 1) {
+            std::string lang = GetAttributeValue(words.first().node(), "xml:lang");
+            if (!lang.empty()) dir->SetLang(lang.c_str());
+        }
         if (!placeStr.empty()) dir->SetPlace(dir->AttPlacement::StrToStaffrel(placeStr.c_str()));
         TextRendition(words, dir);
         m_controlElements.push_back(std::make_pair(measureNum, dir));
@@ -867,6 +878,10 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
     pugi::xpath_node metronome = type.node().select_single_node("metronome");
     if (node.select_single_node("sound[@tempo]") || metronome) {
         Tempo *tempo = new Tempo();
+        if (words.size() == 1) {
+            std::string lang = GetAttributeValue(words.first().node(), "xml:lang");
+            if (!lang.empty()) tempo->SetLang(lang.c_str());
+        }
         if (!placeStr.empty()) tempo->SetPlace(tempo->AttPlacement::StrToStaffrel(placeStr.c_str()));
         int midiTempo = atoi(GetAttributeValue(node.select_single_node("sound").node(), "tempo").c_str());
         if (midiTempo) tempo->SetMidiBpm(midiTempo);
@@ -1126,38 +1141,47 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         pugi::xpath_node_set lyrics = node.select_nodes("lyric");
         for (pugi::xpath_node_set::const_iterator it = lyrics.begin(); it != lyrics.end(); ++it) {
             pugi::xml_node lyric = it->node();
-            int lyricNumber = atoi(GetAttributeValue(lyric, "number").c_str());
-            lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
-            std::string lyricColor = GetAttributeValue(lyric, "color");
-            std::string textStr = GetContentOfChild(lyric, "text");
-            std::string textStyle = GetAttributeValue(lyric.select_single_node("text").node(), "font-style");
-            std::string textWeight = GetAttributeValue(lyric.select_single_node("text").node(), "font-weight");
-            Verse *verse = new Verse();
-            verse->SetN(lyricNumber);
-            if (!lyricColor.empty()) verse->SetColor(lyricColor.c_str());
-            Syl *syl = new Syl();
-            if (lyric.select_single_node("extend")) {
-                syl->SetCon(sylLog_CON_u);
-            }
-            if (GetContentOfChild(lyric, "syllabic") == "begin") {
-                syl->SetCon(sylLog_CON_d);
-                syl->SetWordpos(sylLog_WORDPOS_i);
-            }
-            else if (GetContentOfChild(lyric, "syllabic") == "middle") {
-                syl->SetCon(sylLog_CON_d);
-                syl->SetWordpos(sylLog_WORDPOS_m);
-            }
-            else if (GetContentOfChild(lyric, "syllabic") == "end") {
-                syl->SetWordpos(sylLog_WORDPOS_t);
-            }
-            if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
-            if (!textWeight.empty()) syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
+            pugi::xpath_node textNode = lyric.select_single_node("text");
+            if (textNode) {
+                int lyricNumber = atoi(GetAttributeValue(lyric, "number").c_str());
+                lyricNumber = (lyricNumber < 1) ? 1 : lyricNumber;
+                std::string lyricColor = GetAttributeValue(lyric, "color");
+                Verse *verse = new Verse();
+                verse->SetN(lyricNumber);
+                if (!lyricColor.empty()) verse->SetColor(lyricColor.c_str());
+                if (GetAttributeValue(lyric, "print-object") != "no") {
+                    // std::string textColor = GetAttributeValue(textNode.node(), "color");
+                    std::string textStyle = GetAttributeValue(textNode.node(), "font-style");
+                    std::string textWeight = GetAttributeValue(textNode.node(), "font-weight");
+                    std::string lang = GetAttributeValue(textNode.node(), "xml:lang");
+                    std::string textStr = GetContentOfChild(lyric, "text");
+                    Syl *syl = new Syl();
+                    if (!lang.empty()) syl->SetLang(lang.c_str());
+                    if (lyric.select_single_node("extend")) {
+                        syl->SetCon(sylLog_CON_u);
+                    }
+                    if (GetContentOfChild(lyric, "syllabic") == "begin") {
+                        syl->SetCon(sylLog_CON_d);
+                        syl->SetWordpos(sylLog_WORDPOS_i);
+                    }
+                    else if (GetContentOfChild(lyric, "syllabic") == "middle") {
+                        syl->SetCon(sylLog_CON_d);
+                        syl->SetWordpos(sylLog_WORDPOS_m);
+                    }
+                    else if (GetContentOfChild(lyric, "syllabic") == "end") {
+                        syl->SetWordpos(sylLog_WORDPOS_t);
+                    }
+                    if (!textStyle.empty()) syl->SetFontstyle(syl->AttTypography::StrToFontstyle(textStyle.c_str()));
+                    if (!textWeight.empty())
+                        syl->SetFontweight(syl->AttTypography::StrToFontweight(textWeight.c_str()));
 
-            Text *text = new Text();
-            text->SetText(UTF8to16(textStr));
-            syl->AddChild(text);
-            verse->AddChild(syl);
-            note->AddChild(verse);
+                    Text *text = new Text();
+                    text->SetText(UTF8to16(textStr));
+                    syl->AddChild(text);
+                    verse->AddChild(syl);
+                }
+                note->AddChild(verse);
+            }
         }
 
         // ties
@@ -1374,11 +1398,11 @@ data_BARRENDITION MusicXmlInput::ConvertStyleToRend(std::string value, bool repe
     if (value == "light-light") return BARRENDITION_dbl;
     if (value == "regular") return BARRENDITION_dbldashed;
     if (value == "regular") return BARRENDITION_dbldotted;
-    if (value == "light-heavy" and !repeat) return BARRENDITION_end;
+    if ((value == "light-heavy") && !repeat) return BARRENDITION_end;
     if (value == "none") return BARRENDITION_invis;
-    if (value == "heavy-light" and repeat) return BARRENDITION_rptstart;
+    if ((value == "heavy-light") && repeat) return BARRENDITION_rptstart;
     // if (value == "") return BARRENDITION_rptboth;
-    if (value == "light-heavy" and repeat) return BARRENDITION_rptend;
+    if ((value == "light-heavy") && repeat) return BARRENDITION_rptend;
     if (value == "regular") return BARRENDITION_single;
     LogWarning("Unsupported bar-style '%s'", value.c_str());
     return BARRENDITION_NONE;

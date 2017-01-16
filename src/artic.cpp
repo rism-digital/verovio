@@ -15,6 +15,7 @@
 
 #include "attcomparison.h"
 #include "doc.h"
+#include "floatingobject.h"
 #include "functorparams.h"
 #include "smufl.h"
 #include "staff.h"
@@ -22,10 +23,11 @@
 
 namespace vrv {
 
-std::vector<data_ARTICULATION> Artic::s_outStaffArtic
-    = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_marc_stacc, ARTICULATION_upbow };
+std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc,
+    ARTICULATION_marc_stacc, ARTICULATION_upbow, ARTICULATION_harm };
 
-std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow };
+std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic
+    = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
 
 //----------------------------------------------------------------------------
 // Artic
@@ -148,9 +150,9 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
             // case ARTICULATION_smear;
             // case ARTICULATION_shake;
             case ARTICULATION_dnbow: return SMUFL_E610_stringsDownBow;
-            case ARTICULATION_upbow:
-                return SMUFL_E612_stringsUpBow;
-            // case ARTICULATION_harm;
+            case ARTICULATION_upbow: return SMUFL_E612_stringsUpBow;
+            case ARTICULATION_harm:
+                return SMUFL_E614_stringsHarmonic;
             // case ARTICULATION_snap;
             // case ARTICULATION_fingernail;
             case ARTICULATION_ten_stacc:
@@ -182,8 +184,9 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
                 return SMUFL_E4A7_articStaccatissimoBelow;
             //
             case ARTICULATION_dnbow: return SMUFL_E611_stringsDownBowTurned;
-            case ARTICULATION_upbow:
-                return SMUFL_E613_stringsUpBowTurned;
+            case ARTICULATION_upbow: return SMUFL_E613_stringsUpBowTurned;
+            case ARTICULATION_harm:
+                return SMUFL_E614_stringsHarmonic;
             //
             case ARTICULATION_ten_stacc:
                 return SMUFL_E4B3_articTenutoStaccatoBelow;
@@ -280,13 +283,27 @@ bool ArticPart::AlwaysAbove()
     return false;
 }
 
+void ArticPart::AddSlurPositioner(FloatingPositioner *positioner, bool start)
+{
+    if (start) {
+        if (std::find(m_startSlurPositioners.begin(), m_startSlurPositioners.end(), positioner)
+            == m_startSlurPositioners.end())
+            m_startSlurPositioners.push_back(positioner);
+    }
+    else {
+        if (std::find(m_endSlurPositioners.begin(), m_endSlurPositioners.end(), positioner)
+            == m_endSlurPositioners.end())
+            m_endSlurPositioners.push_back(positioner);
+    }
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Artic::AdjustArticulations(FunctorParams *functorParams)
+int Artic::AdjustArtic(FunctorParams *functorParams)
 {
-    AdjustArticulationsParams *params = dynamic_cast<AdjustArticulationsParams *>(functorParams);
+    AdjustArticParams *params = dynamic_cast<AdjustArticParams *>(functorParams);
     assert(params);
 
     ArticPart *insidePart = this->GetInsidePart();
@@ -350,8 +367,39 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
 int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_drawingYRel = 0;
+    m_startSlurPositioners.clear();
+    m_endSlurPositioners.clear();
 
     return FUNCTOR_CONTINUE;
+}
+
+int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
+{
+    AdjustArticWithSlursParams *params = dynamic_cast<AdjustArticWithSlursParams *>(functorParams);
+    assert(params);
+
+    if (m_startSlurPositioners.empty() && m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;
+
+    std::vector<FloatingPositioner *>::iterator iter;
+    for (iter = m_endSlurPositioners.begin(); iter != m_endSlurPositioners.end(); iter++) {
+        // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
+        int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
+        if (shift != 0) {
+            this->SetDrawingYRel(this->GetDrawingYRel() - shift);
+            // this->SetColor("red");
+        }
+    }
+
+    for (iter = m_startSlurPositioners.begin(); iter != m_startSlurPositioners.end(); iter++) {
+        // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
+        int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
+        if (shift != 0) {
+            this->SetDrawingYRel(this->GetDrawingYRel() - shift);
+            // this->SetColor("green");
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

@@ -1454,7 +1454,7 @@
             <glyph glyph-code="E611" smufl-name="stringsDownBowTurned"/>
             <glyph glyph-code="E612" smufl-name="stringsUpBow"/>
             <glyph glyph-code="E613" smufl-name="stringsUpBowTurned"/>
-            <!--<glyph glyph-code="E614" smufl-name="stringsHarmonic"/>-->
+            <glyph glyph-code="E614" smufl-name="stringsHarmonic"/>
             <!--<glyph glyph-code="E615" smufl-name="stringsHalfHarmonic"/>-->
             <!--<glyph glyph-code="E616" smufl-name="stringsMuteOn"/>-->
             <!--<glyph glyph-code="E617" smufl-name="stringsMuteOff"/>-->
@@ -2350,15 +2350,15 @@
         </medievalAndRenaissanceAccidentals>
         <medievalAndRenaissanceRests>
             <description>Medieval and Renaissance rests</description>
-            <!--<glyph glyph-code="E9F0" smufl-name="mensuralRestMaxima"/>-->
-            <!--<glyph glyph-code="E9F1" smufl-name="mensuralRestLongaPerfecta"/>-->
-            <!--<glyph glyph-code="E9F2" smufl-name="mensuralRestLongaImperfecta"/>-->
-            <!--<glyph glyph-code="E9F3" smufl-name="mensuralRestBrevis"/>-->
-            <!--<glyph glyph-code="E9F4" smufl-name="mensuralRestSemibrevis"/>-->
-            <!--<glyph glyph-code="E9F5" smufl-name="mensuralRestMinima"/>-->
-            <!--<glyph glyph-code="E9F6" smufl-name="mensuralRestSemiminima"/>-->
-            <!--<glyph glyph-code="E9F7" smufl-name="mensuralRestFusa"/>-->
-            <!--<glyph glyph-code="E9F8" smufl-name="mensuralRestSemifusa"/>-->
+            <glyph glyph-code="E9F0" smufl-name="mensuralRestMaxima"/>
+            <glyph glyph-code="E9F1" smufl-name="mensuralRestLongaPerfecta"/>
+            <glyph glyph-code="E9F2" smufl-name="mensuralRestLongaImperfecta"/>
+            <glyph glyph-code="E9F3" smufl-name="mensuralRestBrevis"/>
+            <glyph glyph-code="E9F4" smufl-name="mensuralRestSemibrevis"/>
+            <glyph glyph-code="E9F5" smufl-name="mensuralRestMinima"/>
+            <glyph glyph-code="E9F6" smufl-name="mensuralRestSemiminima"/>
+            <glyph glyph-code="E9F7" smufl-name="mensuralRestFusa"/>
+            <glyph glyph-code="E9F8" smufl-name="mensuralRestSemifusa"/>
             <range_end>U+E9FF</range_end>
             <range_start>U+E9F0</range_start>
         </medievalAndRenaissanceRests>
