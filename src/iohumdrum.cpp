@@ -2879,11 +2879,11 @@ void HumdrumInput::insertMeterSigElement(
     smatch matches;
     int count = -1;
     int unit = -1;
-    if (regex_search(*tsig, matches, regex(R "(^\*M(\d+)/(\d+))"))) {
+    if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
         count = stoi(matches[1]);
         unit = stoi(matches[2]);
     }
-    else if (regex_search(*tsig, matches, regex(R "(^\*M(\d+)"))) {
+    else if (regex_search(*tsig, matches, regex(R"(^\*M(\d+)"))) {
         count = stoi(matches[1]);
     }
     // deal with non-rational units here.
@@ -2921,10 +2921,10 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             continue;
         }
         for (int j = 0; j < infile[i].getFieldCount(); j++) {
-            if ((!timesig) && regex_search(*infile.token(i, j), regex(R "(^\*M\d+/\d+)"))) {
+            if ((!timesig) && regex_search(*infile.token(i, j), regex(R"(^\*M\d+/\d+)"))) {
                 timesig = infile.token(i, j);
             }
-            if ((!keysig) && regex_search(*infile.token(i, j), regex(R "(^\*k\[.*\])"))) {
+            if ((!keysig) && regex_search(*infile.token(i, j), regex(R"(^\*k\[.*\])"))) {
                 keysig = infile.token(i, j);
             }
         }
@@ -2945,7 +2945,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
         int count = -1;
         int unit = -1;
         smatch matches;
-        if (regex_search(*timesig, matches, regex(R "(^\*M(\d+)/(\d+))"))) {
+        if (regex_search(*timesig, matches, regex(R"(^\*M(\d+)/(\d+))"))) {
             count = stoi(matches[1]);
             unit = stoi(matches[2]);
             scoreDef->SetMeterCount(count);
