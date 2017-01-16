@@ -2325,7 +2325,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
 
 void HumdrumInput::colorNote(Note *note, HTp token)
 {
-    for (int i = 0; i < m_signifiers.mark.size(); i++) {
+    for (int i = 0; i < (int)m_signifiers.mark.size(); i++) {
         if (token->find(m_signifiers.mark[i]) != string::npos) {
             note->SetColor(m_signifiers.mcolor[i]);
             break;
@@ -3499,10 +3499,10 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 tupletbracket[j] = 0;
             }
             if (samedurtup) {
-                if (tupletnum >= adjustcount.size()) {
+                if (tupletnum >= (int)adjustcount.size()) {
                     int oldsize = (int)adjustcount.size();
                     adjustcount.resize(tupletnum + 1);
-                    for (int z = (int)oldsize; z < adjustcount.size(); z++) {
+                    for (int z = (int)oldsize; z < (int)adjustcount.size(); z++) {
                         adjustcount[z] = 0;
                     }
                 }
@@ -3514,25 +3514,25 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     }
 
     vector<bool> beamstarts2(poweroftwo.size(), false);
-    for (int i = 0; i < beamstarts.size(); i++) {
+    for (int i = 0; i < (int)beamstarts.size(); i++) {
         beamstarts2[beamstarts[i]] = true;
     }
 
     vector<bool> beamends2(poweroftwo.size(), false);
-    for (int i = 0; i < beamends.size(); i++) {
+    for (int i = 0; i < (int)beamends.size(); i++) {
         beamends2[beamends[i]] = true;
     }
 
     // beamstate == boolean for keeping track of whether or not a beam
     // is currently active.
-    bool beamstate = false;
+    // bool beamstate = false;
 
     // Go back and link all partial beamed tuplets and non-beamed tuplets.
     HumNum groupdur;
     bool hasRest = false;
     for (int i = 0; i < (int)poweroftwo.size(); i++) {
         if ((!beamstarts.empty()) && beamstarts2[i]) {
-            beamstate = true;
+            // beamstate = true;
         }
 
         if (poweroftwo[i]) {
@@ -3587,7 +3587,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
 
         if ((!beamends2.empty()) && beamends2[i]) {
-            beamstate = false;
+            // beamstate = false;
         }
     }
 
@@ -5425,7 +5425,7 @@ void HumdrumInput::parseSignifiers(HumdrumFile &infile)
             continue;
         }
         char signifier = 0;
-        for (int j = 0; j < equals; j++) {
+        for (int j = 0; j < (int)equals; j++) {
             if (isspace(value[j])) {
                 continue;
             }
@@ -5512,7 +5512,7 @@ vector<int> HumdrumInput::analyzeMultiRest(HumdrumFile &infile)
     vector<int> wholerest(barindex.size(), 0);
     bool restQ;
     int line;
-    for (int i = 0; i < barindex.size(); i++) {
+    for (int i = 0; i < (int)barindex.size(); i++) {
         if (datacount[i] == 1) {
             restQ = true;
             line = dataline[i];
@@ -5545,7 +5545,7 @@ vector<int> HumdrumInput::analyzeMultiRest(HumdrumFile &infile)
     }
 
     vector<int> output(infile.getLineCount(), 0);
-    for (int i = 0; i < wholerest.size(); i++) {
+    for (int i = 0; i < (int)wholerest.size(); i++) {
         output[dataline[i]] = wholerest[i];
     }
     for (int i = infile.getLineCount() - 2; i >= 0; i--) {
