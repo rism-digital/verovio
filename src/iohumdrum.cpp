@@ -2861,6 +2861,12 @@ void HumdrumInput::processSlur(HTp token)
     else if (slurstart->getValueBool("LO", "S", "b")) {
         slur->SetCurvedir(curvature_CURVEDIR_below);
     }
+    else if (m_signifiers.slurabove && (slurstart->find(m_signifiers.slurabove) != string::npos)) {
+        slur->SetCurvedir(curvature_CURVEDIR_above);
+    }
+    else if (m_signifiers.slurbelow && (slurstart->find(m_signifiers.slurbelow) != string::npos)) {
+        slur->SetCurvedir(curvature_CURVEDIR_below);
+    }
 }
 
 /////////////////////////////
@@ -3456,6 +3462,13 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     vector<int> tupletbracket(poweroftwo.size(), -1);
     int tupletnum = 1;
     int j;
+
+    // adjusted tuplet number by tuplet group
+    vector<int> adjustcount;
+
+    HumNum tupletdur = 0;
+    int tupletcount = 0;
+    int samedurtup = true;
     for (int i = 0; i < (int)beampowdot.size(); i++) {
         if (binarybeams[i]) {
             continue;
@@ -3474,9 +3487,29 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                 }
                 ingroup = true;
                 tupletgroups[j] = tupletnum;
+                if (tupletcount == 0) {
+                    samedurtup = true;
+                    tupletdur = fulldur[j];
+                }
+                else if (tupletdur != fulldur[j]) {
+                    samedurtup = false;
+                }
+                tupletcount++;
+
                 tupletbracket[j] = 0;
             }
+            if (samedurtup) {
+                if (tupletnum >= adjustcount.size()) {
+                    int oldsize = (int)adjustcount.size();
+                    adjustcount.resize(tupletnum + 1);
+                    for (int z = (int)oldsize; z < adjustcount.size(); z++) {
+                        adjustcount[z] = 0;
+                    }
+                }
+                adjustcount[tupletnum] = tupletcount;
+            }
             tupletnum++;
+            tupletcount = 0;
         }
     }
 
@@ -3679,6 +3712,16 @@ void HumdrumInput::prepareBeamAndTupletGroups(
             }
             else {
                 tg[i].numscale = 1;
+            }
+            if (tg[i].group > 0) {
+                if (tg[i].group < (int)adjustcount.size()) {
+                    if (adjustcount[tg[i].group] % tg[i].num == 0) {
+                        tg[i].numscale = adjustcount[tg[i].group] / tg[i].num;
+                    }
+                    if (tg[i].numscale == 0) {
+                        tg[i].numscale = 1;
+                    }
+                }
             }
             if (tg[i].beamstart && tg[i].tupletstart) {
                 if (tg[i].bracket > 0) {
@@ -4923,8 +4966,8 @@ void HumdrumInput::setSystemMeasureStyle(int startline, int endline)
         setNextLeftBarStyle(BARRENDITION_rptstart);
     }
     else if (endbar.find("||") != string::npos) {
-        // m_measure->SetLeft(BARRENDITION_dbl);
-        setNextLeftBarStyle(BARRENDITION_dbl);
+        m_measure->SetRight(BARRENDITION_dbl);
+        // setNextLeftBarStyle(BARRENDITION_dbl);
     }
     else if (endbar.find("-") != string::npos) {
         m_measure->SetRight(BARRENDITION_invis);
@@ -5401,6 +5444,16 @@ void HumdrumInput::parseSignifiers(HumdrumFile &infile)
             continue;
         }
 
+        // slur directions
+        if (value.find("slur above", equals) != string::npos) {
+            m_signifiers.slurabove = signifier;
+            continue;
+        }
+        if (value.find("slur below", equals) != string::npos) {
+            m_signifiers.slurbelow = signifier;
+            continue;
+        }
+
         // editorial accidentals:
         if (value.find("editorial accidental", equals) != string::npos) {
             m_signifiers.editacc = signifier;
@@ -5478,7 +5531,7 @@ vector<int> HumdrumInput::analyzeMultiRest(HumdrumFile &infile)
         }
     }
 
-    for (int i = wholerest.size() - 2; i >= 0; i--) {
+    for (int i = (int)wholerest.size() - 2; i >= 0; i--) {
         if (bardur[i] != bardur[i + 1]) {
             continue;
         }

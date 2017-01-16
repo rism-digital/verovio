@@ -996,7 +996,7 @@ void Toolkit::SetHumdrumBuffer(const char *data)
         strcpy(m_humdrumBuffer, output.c_str());
     }
     else {
-        int size = strlen(data) + 1;
+        int size = (int)strlen(data) + 1;
         m_humdrumBuffer = (char *)malloc(size);
         if (!m_humdrumBuffer) {
             // something went wrong

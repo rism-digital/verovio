@@ -80,6 +80,8 @@ class MxmlEvent {
 		bool               isRest             (void);
 		bool               isGrace            (void);
 		bool               isFloating         (void);
+		bool               hasSlurStart       (int& direction);
+		bool               hasSlurStop        (void);
 		void               setLinked          (void);
 		vector<MxmlEvent*> getLinkedNotes     (void);
 		void               attachToLastEvent  (void);

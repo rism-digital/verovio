@@ -50,12 +50,16 @@ class GridMeasure : public list<GridSlice*> {
 		void         setStyle       (MeasureStyle style) { m_style = style; }
 		void         setBarStyle    (MeasureStyle style) { setStyle(style); }
 
+		bool         isDouble(void) 
+		                  {return m_style == MeasureStyle::Double;}
 		bool         isFinal(void) 
 		                  {return m_style == MeasureStyle::Final;}
 		bool         isRepeatBackward(void) 
 		                  { return m_style == MeasureStyle::RepeatBackward; }
 		bool         isRepeatForward(void) 
 		                  { return m_style == MeasureStyle::RepeatForward; }
+		bool         isRepeatBoth(void) 
+		                  { return m_style == MeasureStyle::RepeatBoth; }
 
 	protected:
 		void         appendInitialBarline(HumdrumFile& infile);
