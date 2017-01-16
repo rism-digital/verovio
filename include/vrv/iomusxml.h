@@ -37,6 +37,7 @@ class Slur;
 class StaffGrp;
 class Tempo;
 class Tie;
+class Trill;
 /// class Tuplet;
 
 //----------------------------------------------------------------------------

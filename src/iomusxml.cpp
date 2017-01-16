@@ -40,6 +40,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
+#include "trill.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -1221,8 +1222,16 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         }
         pugi::xpath_node technical = notations.node().select_single_node("technical");
         if (technical) {
+            artics.clear();
+            Artic *artic = new Artic();
+            if (technical.node().select_single_node("down-bow")) artics.push_back(ARTICULATION_dnbow);
+            if (technical.node().select_single_node("harmonic")) artics.push_back(ARTICULATION_harm);
             if (technical.node().select_single_node("open-string")) artics.push_back(ARTICULATION_open);
-            if (technical.node().select_single_node("harmonic")) artics.push_back(ARTICULATION_ten_stacc);
+            if (technical.node().select_single_node("snap-pizzicato")) artics.push_back(ARTICULATION_snap);
+            if (technical.node().select_single_node("stopped")) artics.push_back(ARTICULATION_stop);
+            if (technical.node().select_single_node("up-bow")) artics.push_back(ARTICULATION_upbow);
+            artic->SetArtic(artics);
+            element->AddChild(artic);
         }
 
         // add the note to the layer or to the current container
@@ -1260,6 +1269,21 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             fermata->SetForm(fermataVis_FORM_norm);
             fermata->SetPlace(STAFFREL_above);
         }
+    }
+
+    // trill
+    pugi::xpath_node xmlTrill = notations.node().select_single_node("ornaments/trill-mark");
+    if (xmlTrill) {
+        Trill *trill = new Trill();
+        m_controlElements.push_back(std::make_pair(measureNum, trill));
+        trill->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        trill->SetStartid("#" + element->GetUuid());
+        // color
+        std::string colorStr = GetAttributeValue(xmlTrill.node(), "color");
+        if (!colorStr.empty()) trill->SetColor(colorStr.c_str());
+        // place
+        std::string placeStr = GetAttributeValue(xmlTrill.node(), "placement");
+        if (!placeStr.empty()) trill->SetPlace(trill->AttPlacement::StrToStaffrel(placeStr.c_str()));
     }
 
     // slur
