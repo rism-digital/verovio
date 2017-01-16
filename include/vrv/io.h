@@ -51,7 +51,6 @@ public:
     //
 protected:
     Doc *m_doc;
-
 };
 
 //----------------------------------------------------------------------------
@@ -69,8 +68,8 @@ public:
     FileInputStream(Doc *doc);
     virtual ~FileInputStream();
 
-	void SetOutputFormat(const std::string& format) { m_outformat = format; }
-	std::string GetOutputFormat(void) { return m_outformat; }
+    void SetOutputFormat(const std::string &format) { m_outformat = format; }
+    std::string GetOutputFormat(void) { return m_outformat; }
 
     // read
     virtual bool ImportFile() { return true; }

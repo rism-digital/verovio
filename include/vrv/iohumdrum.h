@@ -15,10 +15,10 @@
 //----------------------------------------------------------------------------
 
 #include "attdef.h"
-#include "io.h"
-#include "vrvdef.h"
 #include "clef.h"
 #include "ending.h"
+#include "io.h"
+#include "vrvdef.h"
 
 //----------------------------------------------------------------------------
 
@@ -257,7 +257,7 @@ protected:
     void removeTuplet(vector<string> &elements, vector<void *> &pointers);
     void removeGBeam(vector<string> &elements, vector<void *> &pointers);
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
-    vrv::Clef* insertClefElement(vector<string> &elements, vector<void *> &pointers, hum::HTp clef);
+    vrv::Clef *insertClefElement(vector<string> &elements, vector<void *> &pointers, hum::HTp clef);
     void insertMeterSigElement(
         vector<string> &elements, vector<void *> &pointers, vector<hum::HTp> &layeritems, int index);
     void processSlur(hum::HTp token);

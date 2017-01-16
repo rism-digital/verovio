@@ -24,8 +24,8 @@
 #include "pedal.h"
 #include "slur.h"
 #include "tempo.h"
-#include "trill.h"
 #include "timeinterface.h"
+#include "trill.h"
 #include "vrv.h"
 
 namespace vrv {

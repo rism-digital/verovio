@@ -14,8 +14,8 @@
 #include <cmath>
 #include <sstream>
 #include <stdarg.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <vector>
 
 #ifndef _WIN32
