@@ -1478,7 +1478,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     if (note->m_embellishment == EMB_TRILL) {
-        DrawTrillAttr(dc, element, staff);
+        DrawOrnamAttr(dc, element, staff);
     }
 }
 
@@ -2089,7 +2089,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
 // Draw a trill above the notehead
 // This function works as the up-fermata portion of DrawFermataAttr
 // if there are many symbols to draw we could make a generalized function
-void View::DrawTrillAttr(DeviceContext *dc, LayerElement *element, Staff *staff)
+void View::DrawOrnamAttr(DeviceContext *dc, LayerElement *element, Staff *staff)
 {
     int x, y;
 
