@@ -10,7 +10,7 @@ projects:
     - [["http://ncodamusic.org/", "ncoda"], ["http://www.rism.info", "rism"], ["http://kern.ccarh.org", "ccarh"]]
     - [["http://en.chopin.nifc.pl/institute/library/archives", "nifc"], ["http://www.oeaw.ac.at/ikm/forschung/digital-musicology/digitale-musikanalyse-mit-mei/", "oeaw"], []]
 movies:
-    - ["choice", "editor"]
+    - ["choice", "editor", "layout"]
 ---
 <div class="row home-row">
     <div class="col-md-5 col-sm-12 home-panel">
@@ -86,6 +86,10 @@ movies:
             <video autoplay="false" loop="true" class="img-responsive window-shadow hidden">
                 <source src="/movies/choice.webm" type="video/webm"/>
                 <source src="/movies/choice.mp4" type="video/mp4"/>
+            </video>
+            <video autoplay="false" loop="true" class="img-responsive window-shadow hidden">
+                <source src="/movies/layout.webm" type="video/webm"/>
+                <source src="/movies/layout.mp4" type="video/mp4"/>
             </video>
         </div>
     </div>
@@ -174,7 +178,7 @@ movies:
 <script type="text/javascript">
 //<![CDATA[
     $( document ).ready(function() {
-        rand = Math.floor( Math.random() * 2);
+        rand = Math.floor( Math.random() * 3);
         $('#video video').eq(rand).removeClass("hidden").attr("autoplay", "true");
     });
 //]]>
