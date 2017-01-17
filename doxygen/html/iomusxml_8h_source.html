@@ -106,7 +106,7 @@ $(document).ready(function(){initNavTree('iomusxml_8h_source.html','');});
 </div><!--header-->
 <div class="contents">
 <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;<span class="comment">// Name:        iomusxml.h</span></div>
-<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Author:      Laurent Pugin</span></div>
+<div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;<span class="comment">// Author:      Laurent Pugin and Klaus Rettinghaus</span></div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="comment">// Created:     22/09/2015</span></div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;<span class="comment">// Copyright (c) Authors and others. All rights reserved.</span></div>
 <div class="line"><a name="l00007"></a><span class="lineno">    7</span>&#160;<span class="comment"></span></div>
@@ -131,138 +131,168 @@ $(document).ready(function(){initNavTree('iomusxml_8h_source.html','');});
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">class </span>ControlElement;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">class </span>Dir;</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">class </span>Dynam;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">class </span>Layer;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">class </span>LayerElement;</div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">class </span>Measure;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">class </span>Pedal;</div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">class </span>Section;</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">class </span>Slur;</div>
-<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">class </span>StaffGrp;</div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">class </span>Tie;</div>
-<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;</div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="comment">// namespace for local MusicXml classes</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;</div>
-<div class="line"><a name="l00043"></a><span class="lineno"><a class="line" href="namespacevrv_1_1musicxml.html">   43</a></span>&#160;<span class="keyword">namespace </span>musicxml {</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;    <span class="keyword">class </span>OpenTie {</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        OpenTie(<span class="keywordtype">int</span> staffN, <span class="keywordtype">int</span> layerN, data_PITCHNAME pname, <span class="keywordtype">char</span> oct)</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        {</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;            m_staffN = staffN;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;            m_layerN = layerN;</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            m_pname = pname;</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            m_oct = oct;</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        }</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        <span class="keywordtype">int</span> m_staffN;</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        <span class="keywordtype">int</span> m_layerN;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        data_PITCHNAME m_pname;</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordtype">char</span> m_oct;</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    };</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keyword">class </span>OpenSlur {</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        OpenSlur(<span class="keywordtype">int</span> staffN, <span class="keywordtype">int</span> layerN, <span class="keywordtype">int</span> number)</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;            m_staffN = staffN;</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;            m_layerN = layerN;</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;            m_number = number;</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        }</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordtype">int</span> m_staffN;</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <span class="keywordtype">int</span> m_layerN;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keywordtype">int</span> m_number;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    };</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;} <span class="comment">// namespace musicxml</span></div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="comment">// MusicXmlInput</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
-<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="classvrv_1_1_music_xml_input.html">   81</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_music_xml_input.html">MusicXmlInput</a> : <span class="keyword">public</span> <a class="code" href="classvrv_1_1_file_input_stream.html">FileInputStream</a> {</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="comment">// constructors and destructors</span></div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <a class="code" href="classvrv_1_1_music_xml_input.html">MusicXmlInput</a>(<a class="code" href="classvrv_1_1_doc.html">Doc</a> *doc, std::string filename);</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_music_xml_input.html">MusicXmlInput</a>();</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> ImportFile();</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> ImportString(std::string <span class="keyword">const</span> &amp;musicxml);</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">class </span>Hairpin;</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">class </span>Harm;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">class </span>Layer;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">class </span>LayerElement;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">class </span>Measure;</div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">class </span>Pedal;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="keyword">class </span>Section;</div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="keyword">class </span>Slur;</div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="keyword">class </span>StaffGrp;</div>
+<div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="keyword">class </span>Tempo;</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="keyword">class </span>Tie;</div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;</div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="comment">// namespace for local MusicXml classes</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;</div>
+<div class="line"><a name="l00046"></a><span class="lineno"><a class="line" href="namespacevrv_1_1musicxml.html">   46</a></span>&#160;<span class="keyword">namespace </span>musicxml {</div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;    <span class="keyword">class </span>OpenTie {</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        OpenTie(<span class="keywordtype">int</span> staffN, <span class="keywordtype">int</span> layerN, data_PITCHNAME pname, <span class="keywordtype">char</span> oct)</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        {</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            m_staffN = staffN;</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;            m_layerN = layerN;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;            m_pname = pname;</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;            m_oct = oct;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        }</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        <span class="keywordtype">int</span> m_staffN;</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        <span class="keywordtype">int</span> m_layerN;</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;        data_PITCHNAME m_pname;</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <span class="keywordtype">char</span> m_oct;</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;    };</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">class </span>OpenSlur {</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        OpenSlur(<span class="keywordtype">int</span> staffN, <span class="keywordtype">int</span> layerN, <span class="keywordtype">int</span> number)</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        {</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;            m_staffN = staffN;</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;            m_layerN = layerN;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;            m_number = number;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keywordtype">int</span> m_staffN;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        <span class="keywordtype">int</span> m_layerN;</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        <span class="keywordtype">int</span> m_number;</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    };</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="keyword">class </span>OpenHairpin {</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        OpenHairpin(<span class="keywordtype">int</span> dirN, std::string lastID)</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        {</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;            m_dirN = dirN;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;            m_ID = lastID;</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        }</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        <span class="keywordtype">int</span> m_dirN;</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        std::string m_ID;</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    };</div>
 <div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordtype">bool</span> ReadMusicXml(pugi::xml_node root);</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;} <span class="comment">// namespace musicxml</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="comment">// MusicXmlInput</span></div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordtype">bool</span> ReadMusicXmlPart(pugi::xml_node node, <a class="code" href="classvrv_1_1_section.html">Section</a> *section, <span class="keywordtype">int</span> nbStaves, <span class="keywordtype">int</span> staffOffset);</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;    <span class="keywordtype">bool</span> ReadMusicXmlMeasure(pugi::xml_node node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> nbStaves, <span class="keywordtype">int</span> staffOffset);</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;    <span class="keywordtype">int</span> ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, <a class="code" href="classvrv_1_1_staff_grp.html">StaffGrp</a> *staffGrp, <span class="keywordtype">int</span> staffOffset);</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlAttributes(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlBackup(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlBarLine(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlDirection(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlForward(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlNote(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordtype">void</span> AddMeasure(<a class="code" href="classvrv_1_1_section.html">Section</a> *section, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> i);</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordtype">void</span> AddLayerElement(<a class="code" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element);</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <a class="code" href="classvrv_1_1_layer.html">Layer</a> *SelectLayer(pugi::xml_node node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure);</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <a class="code" href="classvrv_1_1_layer.html">Layer</a> *SelectLayer(<span class="keywordtype">int</span> staffNb, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure);</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <a class="code" href="classvrv_1_1_layer.html">Layer</a> *SelectLayer(<span class="keywordtype">int</span> layerNb, <a class="code" href="classvrv_1_1_staff.html">Staff</a> *staff);</div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classvrv_1_1_music_xml_input.html">   96</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_music_xml_input.html">MusicXmlInput</a> : <span class="keyword">public</span> <a class="code" href="classvrv_1_1_file_input_stream.html">FileInputStream</a> {</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    <span class="comment">// constructors and destructors</span></div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <a class="code" href="classvrv_1_1_music_xml_input.html">MusicXmlInput</a>(<a class="code" href="classvrv_1_1_doc.html">Doc</a> *doc, std::string filename);</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_music_xml_input.html">MusicXmlInput</a>();</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> ImportFile();</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> ImportString(std::string <span class="keyword">const</span> &amp;musicxml);</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <span class="keywordtype">bool</span> ReadMusicXml(pugi::xml_node root);</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlTitle(pugi::xml_node title);</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="keywordtype">bool</span> ReadMusicXmlPart(pugi::xml_node node, <a class="code" href="classvrv_1_1_section.html">Section</a> *section, <span class="keywordtype">int</span> nbStaves, <span class="keywordtype">int</span> staffOffset);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keywordtype">bool</span> ReadMusicXmlMeasure(pugi::xml_node node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> nbStaves, <span class="keywordtype">int</span> staffOffset);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    <span class="keywordtype">int</span> ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, <a class="code" href="classvrv_1_1_staff_grp.html">StaffGrp</a> *staffGrp, <span class="keywordtype">int</span> staffOffset);</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlAttributes(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlBackup(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlBarLine(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlDirection(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlForward(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlHarmony(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="keywordtype">void</span> ReadMusicXmlNote(pugi::xml_node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> measureNb);</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="keywordtype">void</span> AddMeasure(<a class="code" href="classvrv_1_1_section.html">Section</a> *section, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure, <span class="keywordtype">int</span> i);</div>
 <div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keywordtype">void</span> RemoveLastFromStack(ClassId classId);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="keywordtype">bool</span> HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    <span class="keywordtype">bool</span> IsElement(pugi::xml_node node, std::string name);</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordtype">bool</span> HasContentWithValue(pugi::xml_node node, std::string value);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    <span class="keywordtype">bool</span> HasContent(pugi::xml_node);</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    std::string GetAttributeValue(pugi::xml_node node, std::string attribute);</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    std::string GetContent(pugi::xml_node node);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    std::string GetContentOfChild(pugi::xml_node node, std::string child);</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="keywordtype">void</span> OpenTie(<a class="code" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="code" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="code" href="classvrv_1_1_note.html">Note</a> *note, <a class="code" href="classvrv_1_1_tie.html">Tie</a> *tie);</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordtype">void</span> CloseTie(<a class="code" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="code" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="code" href="classvrv_1_1_note.html">Note</a> *note, <span class="keywordtype">bool</span> isClosingTie);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keywordtype">void</span> OpenSlur(<a class="code" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="code" href="classvrv_1_1_layer.html">Layer</a> *layer, <span class="keywordtype">int</span> number, <a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="code" href="classvrv_1_1_slur.html">Slur</a> *slur);</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="keywordtype">void</span> CloseSlur(<a class="code" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="code" href="classvrv_1_1_layer.html">Layer</a> *layer, <span class="keywordtype">int</span> number, <a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element);</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;    data_ACCIDENTAL_EXPLICIT ConvertAccidentalToAccid(std::string value);</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    data_ACCIDENTAL_EXPLICIT ConvertAlterToAccid(std::string value);</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    data_BARRENDITION ConvertStyleToRend(std::string value, <span class="keywordtype">bool</span> repeat);</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    data_DURATION ConvertTypeToDur(std::string value);</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    data_PITCHNAME ConvertStepToPitchName(std::string value);</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    data_PLACE ConvertTypeToPlace(std::string value);</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    pedalLog_DIR ConvertPedalTypeToDir(std::string value);</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    std::string m_filename;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    std::vector&lt;LayerElement *&gt; m_elementStack;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    std::vector&lt;std::pair&lt;Slur *, musicxml::OpenSlur&gt; &gt; m_slurStack;</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    std::vector&lt;std::pair&lt;Tie *, musicxml::OpenTie&gt; &gt; m_tieStack;</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    std::vector&lt;Dir *&gt; m_dirStack;</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    std::vector&lt;Dynam *&gt; m_dynamStack;</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    std::vector&lt;Pedal *&gt; m_pedalStack;</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    std::vector&lt;std::pair&lt;int, ControlElement *&gt; &gt; m_controlElements;</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;};</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;} <span class="comment">// namespace vrv {</span></div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;<span class="preprocessor">#endif // __VRV_IOMUSXML_H__</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    <span class="keywordtype">void</span> AddLayerElement(<a class="code" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <a class="code" href="classvrv_1_1_layer.html">Layer</a> *SelectLayer(pugi::xml_node node, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure);</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <a class="code" href="classvrv_1_1_layer.html">Layer</a> *SelectLayer(<span class="keywordtype">int</span> staffNb, <a class="code" href="classvrv_1_1_measure.html">Measure</a> *measure);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;    <a class="code" href="classvrv_1_1_layer.html">Layer</a> *SelectLayer(<span class="keywordtype">int</span> layerNb, <a class="code" href="classvrv_1_1_staff.html">Staff</a> *staff);</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="keywordtype">void</span> RemoveLastFromStack(ClassId classId);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordtype">bool</span> HasAttributeWithValue(pugi::xml_node node, std::string attribute, std::string value);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;    <span class="keywordtype">bool</span> IsElement(pugi::xml_node node, std::string name);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    <span class="keywordtype">bool</span> HasContentWithValue(pugi::xml_node node, std::string value);</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keywordtype">bool</span> HasContent(pugi::xml_node);</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;    std::string GetAttributeValue(pugi::xml_node node, std::string attribute);</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    std::string GetContent(pugi::xml_node node);</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    std::string GetContentOfChild(pugi::xml_node node, std::string child);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keywordtype">void</span> OpenTie(<a class="code" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="code" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="code" href="classvrv_1_1_note.html">Note</a> *note, <a class="code" href="classvrv_1_1_tie.html">Tie</a> *tie);</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordtype">void</span> CloseTie(<a class="code" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="code" href="classvrv_1_1_layer.html">Layer</a> *layer, <a class="code" href="classvrv_1_1_note.html">Note</a> *note, <span class="keywordtype">bool</span> isClosingTie);</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keywordtype">void</span> OpenSlur(<a class="code" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="code" href="classvrv_1_1_layer.html">Layer</a> *layer, <span class="keywordtype">int</span> number, <a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element, <a class="code" href="classvrv_1_1_slur.html">Slur</a> *slur);</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordtype">void</span> CloseSlur(<a class="code" href="classvrv_1_1_staff.html">Staff</a> *staff, <a class="code" href="classvrv_1_1_layer.html">Layer</a> *layer, <span class="keywordtype">int</span> number, <a class="code" href="classvrv_1_1_layer_element.html">LayerElement</a> *element);</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordtype">void</span> TextRendition(pugi::xpath_node_set words, <a class="code" href="classvrv_1_1_control_element.html">ControlElement</a> *element);</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keywordtype">void</span> PrintMetronome(pugi::xml_node metronome, <a class="code" href="classvrv_1_1_tempo.html">Tempo</a> *tempo);</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    data_ACCIDENTAL_EXPLICIT ConvertAccidentalToAccid(std::string value);</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    data_ACCIDENTAL_EXPLICIT ConvertAlterToAccid(std::string value);</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    data_BARRENDITION ConvertStyleToRend(std::string value, <span class="keywordtype">bool</span> repeat);</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    data_BOOLEAN ConvertWordToBool(std::string value);</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    data_DURATION ConvertTypeToDur(std::string value);</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    data_PITCHNAME ConvertStepToPitchName(std::string value);</div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    data_PLACE ConvertTypeToPlace(std::string value);</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    curvature_CURVEDIR ConvertOrientationToCurvedir(std::string);</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    pedalLog_DIR ConvertPedalTypeToDir(std::string value);</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    std::string m_filename;</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordtype">int</span> m_ppq;</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    std::vector&lt;LayerElement *&gt; m_elementStack;</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    std::vector&lt;std::pair&lt;Slur *, musicxml::OpenSlur&gt; &gt; m_slurStack;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    std::vector&lt;std::pair&lt;Tie *, musicxml::OpenTie&gt; &gt; m_tieStack;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    std::vector&lt;std::pair&lt;Hairpin *, musicxml::OpenHairpin&gt; &gt; m_hairpinStack;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    std::vector&lt;Dir *&gt; m_dirStack;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;    std::vector&lt;Dynam *&gt; m_dynamStack;</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    std::vector&lt;Harm *&gt; m_harmStack;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    std::vector&lt;Pedal *&gt; m_pedalStack;</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    std::vector&lt;Tempo *&gt; m_tempoStack;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    std::vector&lt;std::pair&lt;int, ControlElement *&gt; &gt; m_controlElements;</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;};</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;} <span class="comment">// namespace vrv {</span></div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;<span class="preprocessor">#endif // __VRV_IOMUSXML_H__</span></div>
 <div class="ttc" id="classvrv_1_1_staff_grp_html"><div class="ttname"><a href="classvrv_1_1_staff_grp.html">vrv::StaffGrp</a></div><div class="ttdoc">This class represents a MEI staffGrp. </div><div class="ttdef"><b>Definition:</b> scoredef.h:212</div></div>
 <div class="ttc" id="classvrv_1_1_section_html"><div class="ttname"><a href="classvrv_1_1_section.html">vrv::Section</a></div><div class="ttdoc">This class represents a MEI section. </div><div class="ttdef"><b>Definition:</b> section.h:27</div></div>
 <div class="ttc" id="classvrv_1_1_layer_html"><div class="ttname"><a href="classvrv_1_1_layer.html">vrv::Layer</a></div><div class="ttdoc">This class represents a layer in a laid-out score (Doc). </div><div class="ttdef"><b>Definition:</b> layer.h:32</div></div>
+<div class="ttc" id="classvrv_1_1_tempo_html"><div class="ttname"><a href="classvrv_1_1_tempo.html">vrv::Tempo</a></div><div class="ttdoc">This class is an interface for <tempo> elements at the measure level. </div><div class="ttdef"><b>Definition:</b> tempo.h:27</div></div>
 <div class="ttc" id="classvrv_1_1_staff_html"><div class="ttname"><a href="classvrv_1_1_staff.html">vrv::Staff</a></div><div class="ttdoc">This class represents a staff in a laid-out score (Doc). </div><div class="ttdef"><b>Definition:</b> staff.h:33</div></div>
-<div class="ttc" id="classvrv_1_1_file_input_stream_html"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html">vrv::FileInputStream</a></div><div class="ttdoc">This class is a base class for file input stream classes. </div><div class="ttdef"><b>Definition:</b> io.h:66</div></div>
+<div class="ttc" id="classvrv_1_1_control_element_html"><div class="ttname"><a href="classvrv_1_1_control_element.html">vrv::ControlElement</a></div><div class="ttdoc">This class represents elements appearing within a measure. </div><div class="ttdef"><b>Definition:</b> controlelement.h:24</div></div>
+<div class="ttc" id="classvrv_1_1_file_input_stream_html"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html">vrv::FileInputStream</a></div><div class="ttdoc">This class is a base class for file input stream classes. </div><div class="ttdef"><b>Definition:</b> io.h:64</div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
 <div class="ttc" id="classvrv_1_1_slur_html"><div class="ttname"><a href="classvrv_1_1_slur.html">vrv::Slur</a></div><div class="ttdef"><b>Definition:</b> slur.h:20</div></div>
 <div class="ttc" id="classvrv_1_1_note_html"><div class="ttname"><a href="classvrv_1_1_note.html">vrv::Note</a></div><div class="ttdef"><b>Definition:</b> note.h:45</div></div>
-<div class="ttc" id="classvrv_1_1_music_xml_input_html"><div class="ttname"><a href="classvrv_1_1_music_xml_input.html">vrv::MusicXmlInput</a></div><div class="ttdef"><b>Definition:</b> iomusxml.h:81</div></div>
+<div class="ttc" id="classvrv_1_1_music_xml_input_html"><div class="ttname"><a href="classvrv_1_1_music_xml_input.html">vrv::MusicXmlInput</a></div><div class="ttdef"><b>Definition:</b> iomusxml.h:96</div></div>
 <div class="ttc" id="classvrv_1_1_doc_html"><div class="ttname"><a href="classvrv_1_1_doc.html">vrv::Doc</a></div><div class="ttdoc">This class is a hold the data and corresponds to the model of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> doc.h:32</div></div>
 <div class="ttc" id="classvrv_1_1_measure_html"><div class="ttname"><a href="classvrv_1_1_measure.html">vrv::Measure</a></div><div class="ttdoc">This class represents a measure in a page-based score (Doc). </div><div class="ttdef"><b>Definition:</b> measure.h:33</div></div>
 <div class="ttc" id="classvrv_1_1_layer_element_html"><div class="ttname"><a href="classvrv_1_1_layer_element.html">vrv::LayerElement</a></div><div class="ttdoc">This class is a base class for the Layer (<layer>) content. </div><div class="ttdef"><b>Definition:</b> layerelement.h:31</div></div>
@@ -273,7 +303,7 @@ $(document).ready(function(){initNavTree('iomusxml_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>iomusxml.h</b></li>
-    <li class="footer">Generated on Sat Nov 19 2016 14:58:21 by
+    <li class="footer">Generated on Tue Jan 17 2017 09:15:16 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

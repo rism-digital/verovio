@@ -14,11 +14,13 @@ var searchData=
   ['setcurrentfloatingpositioner',['SetCurrentFloatingPositioner',['../classvrv_1_1_staff_alignment.html#ae216a9f53e02724b1ee6170b95e1784b',1,'vrv::StaffAlignment']]],
   ['setcurrentscoredef',['SetCurrentScoreDef',['../classvrv_1_1_object.html#add47b63f56af38add94c019fa227e178',1,'vrv::Object']]],
   ['setdoc',['SetDoc',['../classvrv_1_1_view.html#a851d75c2d465a1c90b7d97082b961a1b',1,'vrv::View']]],
+  ['setdrawingbarlines',['SetDrawingBarLines',['../classvrv_1_1_measure.html#a3e6d67be8ba77e3cdb621f905d21e0bb',1,'vrv::Measure']]],
   ['setdrawingcautionvalues',['SetDrawingCautionValues',['../classvrv_1_1_layer.html#a5adbee5370bec875186360c8721425cd',1,'vrv::Layer']]],
   ['setdrawingpage',['SetDrawingPage',['../classvrv_1_1_doc.html#a136fd09720322fbf70dd48fbf026c9f4',1,'vrv::Doc']]],
   ['setdrawingstaffdefvalues',['SetDrawingStaffDefValues',['../classvrv_1_1_layer.html#a421c1c5be200da96251d817767f13f3d',1,'vrv::Layer']]],
   ['setdrawingxy',['SetDrawingXY',['../classvrv_1_1_layer.html#a2721fd9ae908eaefe374e7446d23fd92',1,'vrv::Layer::SetDrawingXY()'],['../classvrv_1_1_layer_element.html#a7521de85b3446993ea071063d3ee97c7',1,'vrv::LayerElement::SetDrawingXY()'],['../classvrv_1_1_measure.html#a77198a19a151b1b02136da0b42f46b65',1,'vrv::Measure::SetDrawingXY()'],['../classvrv_1_1_object.html#af9ef702b57e1c01b048380105c664b68',1,'vrv::Object::SetDrawingXY()'],['../classvrv_1_1_staff.html#a509c2cc1748e8661220e2bcd337ece23',1,'vrv::Staff::SetDrawingXY()'],['../classvrv_1_1_system.html#a53dfdd8b4362c7157b1ea84f341d0eb3',1,'vrv::System::SetDrawingXY()']]],
   ['setfont',['SetFont',['../classvrv_1_1_resources.html#a2f74660bac3475bd1a846bd096e3abf1',1,'vrv::Resources']]],
+  ['setkeysig',['setKeySig',['../classvrv_1_1_humdrum_input.html#aa35bb575feb37bd06d8bc01fe21fc110',1,'vrv::HumdrumInput']]],
   ['setmaxtime',['SetMaxTime',['../classvrv_1_1_measure_aligner.html#aab4edf29c88be6e12e726668af041d9d',1,'vrv::MeasureAligner']]],
   ['setmdivxpathquery',['SetMdivXPathQuery',['../classvrv_1_1_file_input_stream.html#a54d4f2123a797f2c76d53bbd3afe92a9',1,'vrv::FileInputStream::SetMdivXPathQuery()'],['../classvrv_1_1_mei_input.html#aa039e44d5ddd789af9f4a64c9a2ef667',1,'vrv::MeiInput::SetMdivXPathQuery()']]],
   ['setoverflowbboxes',['SetOverflowBBoxes',['../classvrv_1_1_object.html#a45993175bb6a94cbbd0a5b69251e25eb',1,'vrv::Object']]],
@@ -30,8 +32,11 @@ var searchData=
   ['setscorebasedmei',['SetScoreBasedMEI',['../classvrv_1_1_mei_output.html#a20c066584aea082583dd117483369b42',1,'vrv::MeiOutput']]],
   ['setscoredefdrawingwidth',['SetScoreDefDrawingWidth',['../classvrv_1_1_view.html#a303f43f2ba8d9098e6391efc79711fbf',1,'vrv::View']]],
   ['setstaffdefredrawflags',['SetStaffDefRedrawFlags',['../classvrv_1_1_object.html#af661ccbb821d7e2a22e313069c8b8cf6',1,'vrv::Object::SetStaffDefRedrawFlags()'],['../classvrv_1_1_staff_def.html#a56d69722b3495b9e5e91d38229753caa',1,'vrv::StaffDef::SetStaffDefRedrawFlags()']]],
+  ['setstartonly',['SetStartOnly',['../classvrv_1_1_time_point_interface.html#a4c3a7f2c3fd21358c4c25dbae8443f4a',1,'vrv::TimePointInterface']]],
   ['setuuidstr',['SetUuidStr',['../classvrv_1_1_time_point_interface.html#acf47474d192a6a9c14732c4055605a6d',1,'vrv::TimePointInterface']]],
   ['splitartic',['SplitArtic',['../classvrv_1_1_artic.html#ab6b401bb7dfd502eccd21bf9614bc905',1,'vrv::Artic']]],
   ['stacknote',['StackNote',['../classvrv_1_1_grace_aligner.html#a7d499779f4f450b7c946e42e192c8b50',1,'vrv::GraceAligner']]],
-  ['strtostr',['StrToStr',['../classvrv_1_1_att.html#a0a89abf0ef2104b4ef015fcdbf66f03d',1,'vrv::Att']]]
+  ['strtostr',['StrToStr',['../classvrv_1_1_att.html#a0a89abf0ef2104b4ef015fcdbf66f03d',1,'vrv::Att']]],
+  ['swappoints',['SwapPoints',['../classvrv_1_1_bounding_box.html#a03c7599c94a2202fd36c24a924afb7cf',1,'vrv::BoundingBox']]],
+  ['swapy',['SwapY',['../classvrv_1_1_bounding_box.html#ae1dfaf62bcd9253e2ae59a29de330694',1,'vrv::BoundingBox']]]
 ];

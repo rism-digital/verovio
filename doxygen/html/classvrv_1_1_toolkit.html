@@ -157,6 +157,21 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_toolkit.html#a6ae456f82e585835f461c792dc5c4f2a">RenderToMidi</a> ()</td></tr>
 <tr class="memdesc:a6ae456f82e585835f461c792dc5c4f2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a midi file, opens it, and returns it (base64 encoded). <br /></td></tr>
 <tr class="separator:a6ae456f82e585835f461c792dc5c4f2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11e13d1850cadf28b00a85fde655e133"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a11e13d1850cadf28b00a85fde655e133"></a>
+const char *&#160;</td><td class="memItemRight" valign="bottom"><b>GetHumdrumBuffer</b> ()</td></tr>
+<tr class="separator:a11e13d1850cadf28b00a85fde655e133"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ae3fb587d96567263bfebc1261ff4d9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ae3fb587d96567263bfebc1261ff4d9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetHumdrumBuffer</b> (const char *contents)</td></tr>
+<tr class="separator:a5ae3fb587d96567263bfebc1261ff4d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade214f7c4d835643aa13046d8ae000ef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade214f7c4d835643aa13046d8ae000ef"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>GetHumdrumFile</b> (const std::string &amp;filename)</td></tr>
+<tr class="separator:ade214f7c4d835643aa13046d8ae000ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a942ab5856517907ea4f2082d9f35f532"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a942ab5856517907ea4f2082d9f35f532"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>GetHumdrum</b> (std::ostream &amp;output)</td></tr>
+<tr class="separator:a942ab5856517907ea4f2082d9f35f532"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b23b93998cb39e2016130b01d1db1b3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1b23b93998cb39e2016130b01d1db1b3"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>GetHumdrum</b> ()</td></tr>
+<tr class="separator:a1b23b93998cb39e2016130b01d1db1b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4618bafecb91784806f78751ea6b3f42"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4618bafecb91784806f78751ea6b3f42"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_toolkit.html#a4618bafecb91784806f78751ea6b3f42">GetElementsAtTime</a> (int millisec)</td></tr>
 <tr class="memdesc:a4618bafecb91784806f78751ea6b3f42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns array of IDs of elements being currently played. <br /></td></tr>
@@ -302,6 +317,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetFormat</b> (FileFo
 <tr class="memitem:a7ab609ab4a5f9acb23478a4589a36296"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ab609ab4a5f9acb23478a4589a36296"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>GetFormat</b> ()</td></tr>
 <tr class="separator:a7ab609ab4a5f9acb23478a4589a36296"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Get the output file format (defined as FileFormat)</div></td></tr>
+<tr><td colspan="2"><div class="groupText"><p>The SetOutputFormat with FileFormat does not perform any validation </p>
+</div></td></tr>
+<tr class="memitem:a552d5e79cde019c7d1b6daaf7460b771"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a552d5e79cde019c7d1b6daaf7460b771"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>SetOutputFormat</b> (std::string const &amp;outformat)</td></tr>
+<tr class="separator:a552d5e79cde019c7d1b6daaf7460b771"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e712832127ecd3558f792aa33b648b4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1e712832127ecd3558f792aa33b648b4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetOutputFormat</b> (FileFormat format)</td></tr>
+<tr class="separator:a1e712832127ecd3558f792aa33b648b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afb492c2d7fae21767655a503ac7daaa7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afb492c2d7fae21767655a503ac7daaa7"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>GetOutputFormat</b> ()</td></tr>
+<tr class="separator:afb492c2d7fae21767655a503ac7daaa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Identify the input file type for auto loading of input data</div></td></tr>
 <tr class="memitem:a14e074a753dc128bd75e7ffaa93af6e6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a14e074a753dc128bd75e7ffaa93af6e6"></a>
 FileFormat&#160;</td><td class="memItemRight" valign="bottom"><b>IdentifyInputFormat</b> (const std::string &amp;data)</td></tr>
@@ -638,7 +665,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>Set</b> (std::string 
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_toolkit.html">Toolkit</a></li>
-    <li class="footer">Generated on Sat Nov 19 2016 14:58:26 by
+    <li class="footer">Generated on Tue Jan 17 2017 09:15:24 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

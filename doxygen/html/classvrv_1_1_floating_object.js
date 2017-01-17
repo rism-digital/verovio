@@ -9,6 +9,7 @@ var classvrv_1_1_floating_object =
     [ "GetDrawingX", "classvrv_1_1_floating_object.html#a3ccbab79475f98bf8969131316ab6baa", null ],
     [ "GetDrawingY", "classvrv_1_1_floating_object.html#aaf6095fa171444982c486c1acfab7a1b", null ],
     [ "Is", "classvrv_1_1_floating_object.html#a4e3728d5694239818bf65d3d66c6a37b", null ],
+    [ "PrepareTimePointing", "classvrv_1_1_floating_object.html#a2c126764fd8116a54fa94700ef98494f", null ],
     [ "PrepareTimeSpanning", "classvrv_1_1_floating_object.html#ad0b4a076b299fc6e9ed32cc51aab1bf7", null ],
     [ "PrepareTimestamps", "classvrv_1_1_floating_object.html#ada6846dddeb271c4eb74a753ed763ed7", null ],
     [ "Reset", "classvrv_1_1_floating_object.html#a598b5443645caf3544285c9b99bfcdbb", null ],

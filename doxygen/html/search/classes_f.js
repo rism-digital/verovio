@@ -14,6 +14,7 @@ var searchData=
   ['prepareprocessinglistsparams',['PrepareProcessingListsParams',['../classvrv_1_1_prepare_processing_lists_params.html',1,'vrv']]],
   ['preparerptparams',['PrepareRptParams',['../classvrv_1_1_prepare_rpt_params.html',1,'vrv']]],
   ['preparetieattrparams',['PrepareTieAttrParams',['../classvrv_1_1_prepare_tie_attr_params.html',1,'vrv']]],
+  ['preparetimepointingparams',['PrepareTimePointingParams',['../classvrv_1_1_prepare_time_pointing_params.html',1,'vrv']]],
   ['preparetimespanningparams',['PrepareTimeSpanningParams',['../classvrv_1_1_prepare_time_spanning_params.html',1,'vrv']]],
   ['preparetimestampsparams',['PrepareTimestampsParams',['../classvrv_1_1_prepare_timestamps_params.html',1,'vrv']]],
   ['proport',['Proport',['../classvrv_1_1_proport.html',1,'vrv']]]

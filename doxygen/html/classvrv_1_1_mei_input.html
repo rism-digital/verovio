@@ -153,6 +153,12 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>ImportString<
 <tr class="memitem:a3c5007e9133b8710a0cb4c8a9eac6281 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3c5007e9133b8710a0cb4c8a9eac6281"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>FileInputStream</b> (<a class="el" href="classvrv_1_1_doc.html">Doc</a> *doc)</td></tr>
 <tr class="separator:a3c5007e9133b8710a0cb4c8a9eac6281 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a264531c9577569a19cebbeb1bdebb4e4 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a264531c9577569a19cebbeb1bdebb4e4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>SetOutputFormat</b> (const std::string &amp;format)</td></tr>
+<tr class="separator:a264531c9577569a19cebbeb1bdebb4e4 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a504908f66e93184ae0e3efabbe29e933 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a504908f66e93184ae0e3efabbe29e933"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>GetOutputFormat</b> (void)</td></tr>
+<tr class="separator:a504908f66e93184ae0e3efabbe29e933 inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaab137b06a33e650c5a4b85f29dbac4a inherit pub_methods_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaab137b06a33e650c5a4b85f29dbac4a"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_file_input_stream.html#aaab137b06a33e650c5a4b85f29dbac4a">HasLayoutInformation</a> ()</td></tr>
 <tr class="memdesc:aaab137b06a33e650c5a4b85f29dbac4a inherit pub_methods_classvrv_1_1_file_input_stream"><td class="mdescLeft">&#160;</td><td class="mdescRight">Getter for layoutInformation flag that is set to true during import if layout information is found (and not to be ignored). <br /></td></tr>
@@ -167,6 +173,9 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a46152aad3fa73405859f3fab30020e10 inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_file_input_stream.html#a46152aad3fa73405859f3fab30020e10">m_hasLayoutInformation</a></td></tr>
 <tr class="memdesc:a46152aad3fa73405859f3fab30020e10 inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="mdescLeft">&#160;</td><td class="mdescRight">Becomes true if layout information is found during the import.  <a href="#a46152aad3fa73405859f3fab30020e10">More...</a><br /></td></tr>
 <tr class="separator:a46152aad3fa73405859f3fab30020e10 inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aee5d1ee1caafa0f4fc7b2d462d70caf2 inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aee5d1ee1caafa0f4fc7b2d462d70caf2"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_outformat</b> = &quot;mei&quot;</td></tr>
+<tr class="separator:aee5d1ee1caafa0f4fc7b2d462d70caf2 inherit pro_attribs_classvrv_1_1_file_input_stream"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class is a file input stream for reading MEI files. </p>
@@ -268,7 +277,7 @@ Additional Inherited Members</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_mei_input.html">MeiInput</a></li>
-    <li class="footer">Generated on Sat Nov 19 2016 14:58:23 by
+    <li class="footer">Generated on Tue Jan 17 2017 09:15:20 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

@@ -131,7 +131,7 @@ $(document).ready(function(){initNavTree('toolkit_8h_source.html','');});
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">namespace </span><a class="code" href="namespacevrv.html">vrv</a> {</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;</div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">enum</span> FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML };</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">enum</span> FileFormat { UNKNOWN = 0, AUTO, MEI, HUMDRUM, PAE, DARMS, MUSICXML, MUSICXMLHUM };</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="comment">// Toolkit</span></div>
@@ -169,133 +169,146 @@ $(document).ready(function(){initNavTree('toolkit_8h_source.html','');});
 <div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    std::string <a class="code" href="classvrv_1_1_toolkit.html#a6ae456f82e585835f461c792dc5c4f2a">RenderToMidi</a>();</div>
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    std::string <a class="code" href="classvrv_1_1_toolkit.html#a4618bafecb91784806f78751ea6b3f42">GetElementsAtTime</a>(<span class="keywordtype">int</span> millisec);</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    std::string <a class="code" href="classvrv_1_1_toolkit.html#aa24d4bd31c529959c92e4114c15304bb">GetMEI</a>(<span class="keywordtype">int</span> pageNo = 0, <span class="keywordtype">bool</span> scoreBased = <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    std::string <a class="code" href="classvrv_1_1_toolkit.html#acde5671467b4de6cacd55e7e8be87e93">GetElementAttr</a>(<span class="keyword">const</span> std::string &amp;xmlId);</div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_toolkit.html#a19431c36d29a2301ee946da2cd01946e">RedoLayout</a>();</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *GetHumdrumBuffer();</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="keywordtype">void</span> SetHumdrumBuffer(<span class="keyword">const</span> <span class="keywordtype">char</span> *contents);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordtype">bool</span> GetHumdrumFile(<span class="keyword">const</span> std::string &amp;filename);</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordtype">void</span> GetHumdrum(std::ostream &amp;output);</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    std::string GetHumdrum();</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    std::string <a class="code" href="classvrv_1_1_toolkit.html#a4618bafecb91784806f78751ea6b3f42">GetElementsAtTime</a>(<span class="keywordtype">int</span> millisec);</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    std::string <a class="code" href="classvrv_1_1_toolkit.html#aa24d4bd31c529959c92e4114c15304bb">GetMEI</a>(<span class="keywordtype">int</span> pageNo = 0, <span class="keywordtype">bool</span> scoreBased = <span class="keyword">false</span>);</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    std::string <a class="code" href="classvrv_1_1_toolkit.html#acde5671467b4de6cacd55e7e8be87e93">GetElementAttr</a>(<span class="keyword">const</span> std::string &amp;xmlId);</div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_toolkit.html#a234616d8b4ab54ec1b7efb79e5ae464d">GetPageWithElement</a>(<span class="keyword">const</span> std::string &amp;xmlId);</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_toolkit.html#a19431c36d29a2301ee946da2cd01946e">RedoLayout</a>();</div>
 <div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keywordtype">double</span> <a class="code" href="classvrv_1_1_toolkit.html#a5d2a4df7406fd1aae9d71bdd9f3a1042">GetTimeForElement</a>(<span class="keyword">const</span> std::string &amp;xmlId);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keywordtype">int</span> <a class="code" href="classvrv_1_1_toolkit.html#a234616d8b4ab54ec1b7efb79e5ae464d">GetPageWithElement</a>(<span class="keyword">const</span> std::string &amp;xmlId);</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordtype">void</span> SetCString(<span class="keyword">const</span> std::string &amp;data);</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *GetCString();</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keywordtype">bool</span> SetBorder(<span class="keywordtype">int</span> border);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordtype">int</span> GetBorder() { <span class="keywordflow">return</span> m_border; }</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    <span class="keywordtype">bool</span> SetScale(<span class="keywordtype">int</span> scale);</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordtype">int</span> GetScale() { <span class="keywordflow">return</span> m_scale; }</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;    <span class="keywordtype">bool</span> SetPageHeight(<span class="keywordtype">int</span> h);</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;    <span class="keywordtype">int</span> GetPageHeight() { <span class="keywordflow">return</span> m_pageHeight; }</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordtype">bool</span> SetPageWidth(<span class="keywordtype">int</span> w);</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <span class="keywordtype">int</span> GetPageWidth() { <span class="keywordflow">return</span> m_pageWidth; }</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keywordtype">bool</span> SetSpacingStaff(<span class="keywordtype">int</span> spacingStaff);</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;    <span class="keywordtype">bool</span> SetSpacingSystem(<span class="keywordtype">int</span> spacingSystem);</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordtype">int</span> GetSpacingStaff() { <span class="keywordflow">return</span> m_spacingStaff; }</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keywordtype">int</span> GetSpacingSystem() { <span class="keywordflow">return</span> m_spacingSystem; }</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keywordtype">bool</span> SetSpacingLinear(<span class="keywordtype">float</span> spacingLinear);</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;    <span class="keywordtype">float</span> GetSpacingLinear() { <span class="keywordflow">return</span> m_spacingLinear; }</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keywordtype">bool</span> SetSpacingNonLinear(<span class="keywordtype">float</span> spacingNonLinear);</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keywordtype">float</span> GetSpacingNonLinear() { <span class="keywordflow">return</span> m_spacingNonLinear; }</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keywordtype">void</span> SetNoLayout(<span class="keywordtype">bool</span> l) { m_noLayout = l; }</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordtype">int</span> GetNoLayout() { <span class="keywordflow">return</span> m_noLayout; }</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordtype">void</span> SetIgnoreLayout(<span class="keywordtype">bool</span> l) { m_ignoreLayout = l; }</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="keywordtype">int</span> GetIgnoreLayout() { <span class="keywordflow">return</span> m_ignoreLayout; }</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;    <span class="keywordtype">void</span> SetAdjustPageHeight(<span class="keywordtype">bool</span> a) { m_adjustPageHeight = a; }</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;    <span class="keywordtype">int</span> GetAdjustPageHeight() { <span class="keywordflow">return</span> m_adjustPageHeight; }</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    <span class="keywordtype">void</span> SetEvenNoteSpacing(<span class="keywordtype">bool</span> even) { m_evenNoteSpacing = even; }</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    <span class="keywordtype">int</span> GetEvenNoteSpacing() { <span class="keywordflow">return</span> m_evenNoteSpacing; }</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;    <span class="keywordtype">void</span> SetNoJustification(<span class="keywordtype">bool</span> j) { m_noJustification = j; }</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;    <span class="keywordtype">int</span> GetNoJustification() { <span class="keywordflow">return</span> m_noJustification; }</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="keywordtype">void</span> SetShowBoundingBoxes(<span class="keywordtype">bool</span> b) { m_showBoundingBoxes = b; }</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    <span class="keywordtype">int</span> GetShowBoundingBoxes() { <span class="keywordflow">return</span> m_showBoundingBoxes; }</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="keywordtype">bool</span> SetFormat(std::string <span class="keyword">const</span> &amp;informat);</div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;    <span class="keywordtype">void</span> SetFormat(FileFormat format) { m_format = format; }</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;    <span class="keywordtype">int</span> GetFormat() { <span class="keywordflow">return</span> m_format; }</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    FileFormat IdentifyInputFormat(<span class="keyword">const</span> std::string &amp;data);</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;    <span class="keywordtype">double</span> <a class="code" href="classvrv_1_1_toolkit.html#a5d2a4df7406fd1aae9d71bdd9f3a1042">GetTimeForElement</a>(<span class="keyword">const</span> std::string &amp;xmlId);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;    <span class="keywordtype">void</span> SetCString(<span class="keyword">const</span> std::string &amp;data);</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keyword">const</span> <span class="keywordtype">char</span> *GetCString();</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="keywordtype">bool</span> SetBorder(<span class="keywordtype">int</span> border);</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keywordtype">int</span> GetBorder() { <span class="keywordflow">return</span> m_border; }</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    <span class="keywordtype">bool</span> SetScale(<span class="keywordtype">int</span> scale);</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;    <span class="keywordtype">int</span> GetScale() { <span class="keywordflow">return</span> m_scale; }</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keywordtype">bool</span> SetPageHeight(<span class="keywordtype">int</span> h);</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;    <span class="keywordtype">int</span> GetPageHeight() { <span class="keywordflow">return</span> m_pageHeight; }</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordtype">bool</span> SetPageWidth(<span class="keywordtype">int</span> w);</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    <span class="keywordtype">int</span> GetPageWidth() { <span class="keywordflow">return</span> m_pageWidth; }</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    <span class="keywordtype">bool</span> SetSpacingStaff(<span class="keywordtype">int</span> spacingStaff);</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    <span class="keywordtype">bool</span> SetSpacingSystem(<span class="keywordtype">int</span> spacingSystem);</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    <span class="keywordtype">int</span> GetSpacingStaff() { <span class="keywordflow">return</span> m_spacingStaff; }</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    <span class="keywordtype">int</span> GetSpacingSystem() { <span class="keywordflow">return</span> m_spacingSystem; }</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keywordtype">bool</span> SetSpacingLinear(<span class="keywordtype">float</span> spacingLinear);</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keywordtype">float</span> GetSpacingLinear() { <span class="keywordflow">return</span> m_spacingLinear; }</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="keywordtype">bool</span> SetSpacingNonLinear(<span class="keywordtype">float</span> spacingNonLinear);</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    <span class="keywordtype">float</span> GetSpacingNonLinear() { <span class="keywordflow">return</span> m_spacingNonLinear; }</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="keywordtype">void</span> SetNoLayout(<span class="keywordtype">bool</span> l) { m_noLayout = l; }</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    <span class="keywordtype">int</span> GetNoLayout() { <span class="keywordflow">return</span> m_noLayout; }</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="keywordtype">void</span> SetIgnoreLayout(<span class="keywordtype">bool</span> l) { m_ignoreLayout = l; }</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;    <span class="keywordtype">int</span> GetIgnoreLayout() { <span class="keywordflow">return</span> m_ignoreLayout; }</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="keywordtype">void</span> SetAdjustPageHeight(<span class="keywordtype">bool</span> a) { m_adjustPageHeight = a; }</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    <span class="keywordtype">int</span> GetAdjustPageHeight() { <span class="keywordflow">return</span> m_adjustPageHeight; }</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="keywordtype">void</span> SetEvenNoteSpacing(<span class="keywordtype">bool</span> even) { m_evenNoteSpacing = even; }</div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;    <span class="keywordtype">int</span> GetEvenNoteSpacing() { <span class="keywordflow">return</span> m_evenNoteSpacing; }</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <span class="keywordtype">void</span> SetNoJustification(<span class="keywordtype">bool</span> j) { m_noJustification = j; }</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="keywordtype">int</span> GetNoJustification() { <span class="keywordflow">return</span> m_noJustification; }</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;    <span class="keywordtype">void</span> SetShowBoundingBoxes(<span class="keywordtype">bool</span> b) { m_showBoundingBoxes = b; }</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;    <span class="keywordtype">int</span> GetShowBoundingBoxes() { <span class="keywordflow">return</span> m_showBoundingBoxes; }</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="keywordtype">bool</span> SetFormat(std::string <span class="keyword">const</span> &amp;informat);</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="keywordtype">void</span> SetFormat(FileFormat format) { m_format = format; }</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    <span class="keywordtype">int</span> GetFormat() { <span class="keywordflow">return</span> m_format; }</div>
 <div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;    <span class="keywordtype">void</span> SetAppXPathQueries(std::vector&lt;std::string&gt; <span class="keyword">const</span> &amp;xPathQueries);</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;    std::vector&lt;std::string&gt; GetAppXPathQuery() { <span class="keywordflow">return</span> m_appXPathQueries; }</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;    <span class="keywordtype">void</span> SetChoiceXPathQueries(std::vector&lt;std::string&gt; <span class="keyword">const</span> &amp;xPathQueries);</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    std::vector&lt;std::string&gt; GetChoiceXPathQueries() { <span class="keywordflow">return</span> m_choiceXPathQueries; }</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;    <span class="keywordtype">void</span> SetMdivXPathQuery(std::string <span class="keyword">const</span> &amp;xPathQuery) { m_mdivXPathQuery = xPathQuery; };</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;    std::string GetMdivXPathQuery() { <span class="keywordflow">return</span> m_mdivXPathQuery; };</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;    <span class="keywordtype">void</span> SetScoreBasedMei(<span class="keywordtype">bool</span> scoreBasedMei) { m_scoreBasedMei = scoreBasedMei; }</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;    <span class="keywordtype">bool</span> GetScoreBasedMei() { <span class="keywordflow">return</span> m_scoreBasedMei; }</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;    <span class="keywordtype">bool</span> SetFont(std::string <span class="keyword">const</span> &amp;font);</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;    <span class="keywordtype">int</span> GetPageCount();</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_toolkit.html#aa956c1056f02604d11c926fd348ae989">Drag</a>(std::string elementId, <span class="keywordtype">int</span> x, <span class="keywordtype">int</span> y);</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="keywordtype">bool</span> Insert(std::string elementType, std::string startId, std::string endId);</div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;    <span class="keywordtype">bool</span> Set(std::string elementId, std::string attrType, std::string attrValue);</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;    <span class="keywordtype">bool</span> SetOutputFormat(std::string <span class="keyword">const</span> &amp;outformat);</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;    <span class="keywordtype">void</span> SetOutputFormat(FileFormat format) { m_outformat = format; }</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;    <span class="keywordtype">int</span> GetOutputFormat() { <span class="keywordflow">return</span> m_outformat; }</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;    FileFormat IdentifyInputFormat(<span class="keyword">const</span> std::string &amp;data);</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;    <span class="keywordtype">void</span> SetAppXPathQueries(std::vector&lt;std::string&gt; <span class="keyword">const</span> &amp;xPathQueries);</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;    std::vector&lt;std::string&gt; GetAppXPathQuery() { <span class="keywordflow">return</span> m_appXPathQueries; }</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;    <span class="keywordtype">void</span> SetChoiceXPathQueries(std::vector&lt;std::string&gt; <span class="keyword">const</span> &amp;xPathQueries);</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;    std::vector&lt;std::string&gt; GetChoiceXPathQueries() { <span class="keywordflow">return</span> m_choiceXPathQueries; }</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;    <span class="keywordtype">void</span> SetMdivXPathQuery(std::string <span class="keyword">const</span> &amp;xPathQuery) { m_mdivXPathQuery = xPathQuery; };</div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;    std::string GetMdivXPathQuery() { <span class="keywordflow">return</span> m_mdivXPathQuery; };</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;    <span class="keywordtype">void</span> SetScoreBasedMei(<span class="keywordtype">bool</span> scoreBasedMei) { m_scoreBasedMei = scoreBasedMei; }</div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;    <span class="keywordtype">bool</span> GetScoreBasedMei() { <span class="keywordflow">return</span> m_scoreBasedMei; }</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;    <span class="keywordtype">bool</span> SetFont(std::string <span class="keyword">const</span> &amp;font);</div>
 <div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;    <span class="keywordtype">bool</span> IsUTF16(<span class="keyword">const</span> std::string &amp;filename);</div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;    <span class="keywordtype">bool</span> LoadUTF16File(<span class="keyword">const</span> std::string &amp;filename);</div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;<span class="preprocessor">#ifdef USE_EMSCRIPTEN</span></div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;</div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;    <span class="keywordtype">bool</span> ParseDragAction(jsonxx::Object param, std::string *elementId, <span class="keywordtype">int</span> *x, <span class="keywordtype">int</span> *y);</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    <span class="keywordtype">bool</span> ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startid, std::string *endid);</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;    <span class="keywordtype">bool</span> ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;</div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <a class="code" href="classvrv_1_1_doc.html">Doc</a> m_doc;</div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;    <a class="code" href="classvrv_1_1_view.html">View</a> m_view;</div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;    <span class="keywordtype">int</span> m_scale;</div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;    FileFormat m_format;</div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;    <span class="keywordtype">int</span> GetPageCount();</div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_toolkit.html#aa956c1056f02604d11c926fd348ae989">Drag</a>(std::string elementId, <span class="keywordtype">int</span> x, <span class="keywordtype">int</span> y);</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;    <span class="keywordtype">bool</span> Insert(std::string elementType, std::string startId, std::string endId);</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;    <span class="keywordtype">bool</span> Set(std::string elementId, std::string attrType, std::string attrValue);</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;</div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;    <span class="keywordtype">bool</span> IsUTF16(<span class="keyword">const</span> std::string &amp;filename);</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;    <span class="keywordtype">bool</span> LoadUTF16File(<span class="keyword">const</span> std::string &amp;filename);</div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;</div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;<span class="preprocessor">#ifdef USE_EMSCRIPTEN</span></div>
 <div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;    <span class="keywordtype">int</span> m_pageHeight;</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;    <span class="keywordtype">int</span> m_pageWidth;</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <span class="keywordtype">int</span> m_border; <span class="comment">// to be replace by pageRightMar, pageLeftMar, pageTopMar</span></div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;<span class="comment"></span>    <span class="keywordtype">int</span> m_spacingStaff;</div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    <span class="keywordtype">int</span> m_spacingSystem;</div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;</div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;    <span class="keywordtype">bool</span> m_noLayout;</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;    <span class="keywordtype">bool</span> m_ignoreLayout;</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;    <span class="keywordtype">bool</span> m_adjustPageHeight;</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    std::vector&lt;std::string&gt; m_appXPathQueries;</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;    std::vector&lt;std::string&gt; m_choiceXPathQueries;</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    std::string m_mdivXPathQuery;</div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <span class="keywordtype">bool</span> m_scoreBasedMei;</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    <span class="keywordtype">bool</span> m_evenNoteSpacing;</div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    <span class="keywordtype">float</span> m_spacingLinear;</div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    <span class="keywordtype">float</span> m_spacingNonLinear;</div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;    <span class="comment">// for debugging</span></div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="keywordtype">bool</span> m_noJustification;</div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <span class="keywordtype">bool</span> m_showBoundingBoxes;</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;    <span class="keywordtype">char</span> *m_cString;</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;};</div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;</div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;} <span class="comment">// namespace vrv</span></div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;    <span class="keywordtype">bool</span> ParseDragAction(jsonxx::Object param, std::string *elementId, <span class="keywordtype">int</span> *x, <span class="keywordtype">int</span> *y);</div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;    <span class="keywordtype">bool</span> ParseInsertAction(jsonxx::Object param, std::string *elementType, std::string *startid, std::string *endid);</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;    <span class="keywordtype">bool</span> ParseSetAction(jsonxx::Object param, std::string *elementId, std::string *attrType, std::string *attrValue);</div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;    <a class="code" href="classvrv_1_1_doc.html">Doc</a> m_doc;</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;    <a class="code" href="classvrv_1_1_view.html">View</a> m_view;</div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;    <span class="keywordtype">int</span> m_scale;</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;    FileFormat m_format;</div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;    FileFormat m_outformat;</div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;</div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;    <span class="keywordtype">int</span> m_pageHeight;</div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;    <span class="keywordtype">int</span> m_pageWidth;</div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;    <span class="keywordtype">int</span> m_border; <span class="comment">// to be replace by pageRightMar, pageLeftMar, pageTopMar</span></div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;<span class="comment"></span>    <span class="keywordtype">int</span> m_spacingStaff;</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;    <span class="keywordtype">int</span> m_spacingSystem;</div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;</div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;    <span class="keywordtype">bool</span> m_noLayout;</div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    <span class="keywordtype">bool</span> m_ignoreLayout;</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;    <span class="keywordtype">bool</span> m_adjustPageHeight;</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;    std::vector&lt;std::string&gt; m_appXPathQueries;</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;    std::vector&lt;std::string&gt; m_choiceXPathQueries;</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;    std::string m_mdivXPathQuery;</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;    <span class="keywordtype">bool</span> m_scoreBasedMei;</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;    <span class="keywordtype">bool</span> m_evenNoteSpacing;</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;    <span class="keywordtype">float</span> m_spacingLinear;</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;    <span class="keywordtype">float</span> m_spacingNonLinear;</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;    <span class="comment">// for debugging</span></div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;    <span class="keywordtype">bool</span> m_noJustification;</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;    <span class="keywordtype">bool</span> m_showBoundingBoxes;</div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;</div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;    <span class="keyword">static</span> <span class="keywordtype">char</span> *m_humdrumBuffer;</div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;    <span class="keywordtype">char</span> *m_cString;</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;};</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;} <span class="comment">// namespace vrv</span></div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html_a968a2feb41a558700a2e9061489ce90a"><div class="ttname"><a href="classvrv_1_1_toolkit.html#a968a2feb41a558700a2e9061489ce90a">vrv::Toolkit::SaveFile</a></div><div class="ttdeci">bool SaveFile(const std::string &amp;filename)</div><div class="ttdoc">Save an MEI file. </div></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html_a3bb84a41b8217a9b7f4e3963be756956"><div class="ttname"><a href="classvrv_1_1_toolkit.html#a3bb84a41b8217a9b7f4e3963be756956">vrv::Toolkit::RenderToSvgFile</a></div><div class="ttdeci">bool RenderToSvgFile(const std::string &amp;filename, int pageNo=1)</div><div class="ttdoc">Render the page in SVG and save it to the file. </div></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html_a3859f9341d415376b7d8f11a1aa8e352"><div class="ttname"><a href="classvrv_1_1_toolkit.html#a3859f9341d415376b7d8f11a1aa8e352">vrv::Toolkit::LoadFile</a></div><div class="ttdeci">bool LoadFile(const std::string &amp;filename)</div><div class="ttdoc">Load a file with the specified type. </div></div>
@@ -319,7 +332,7 @@ $(document).ready(function(){initNavTree('toolkit_8h_source.html','');});
 <div class="ttc" id="classvrv_1_1_toolkit_html_a234616d8b4ab54ec1b7efb79e5ae464d"><div class="ttname"><a href="classvrv_1_1_toolkit.html#a234616d8b4ab54ec1b7efb79e5ae464d">vrv::Toolkit::GetPageWithElement</a></div><div class="ttdeci">int GetPageWithElement(const std::string &amp;xmlId)</div><div class="ttdoc">Return the page on which the element is the ID (xml:id) is rendered. </div></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html_a6ae456f82e585835f461c792dc5c4f2a"><div class="ttname"><a href="classvrv_1_1_toolkit.html#a6ae456f82e585835f461c792dc5c4f2a">vrv::Toolkit::RenderToMidi</a></div><div class="ttdeci">std::string RenderToMidi()</div><div class="ttdoc">Creates a midi file, opens it, and returns it (base64 encoded). </div></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html_af7f2364ddf6649f9272d80a770c5a570"><div class="ttname"><a href="classvrv_1_1_toolkit.html#af7f2364ddf6649f9272d80a770c5a570">vrv::Toolkit::RenderToSvg</a></div><div class="ttdeci">std::string RenderToSvg(int pageNo=1, bool xml_declaration=false)</div><div class="ttdoc">Render the page in SVG and returns it as a string. </div></div>
-<div class="ttc" id="classvrv_1_1_view_html"><div class="ttname"><a href="classvrv_1_1_view.html">vrv::View</a></div><div class="ttdoc">This class is a drawing context and corresponds to the view of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> view.h:59</div></div>
+<div class="ttc" id="classvrv_1_1_view_html"><div class="ttname"><a href="classvrv_1_1_view.html">vrv::View</a></div><div class="ttdoc">This class is a drawing context and corresponds to the view of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> view.h:61</div></div>
 <div class="ttc" id="classvrv_1_1_toolkit_html_a19431c36d29a2301ee946da2cd01946e"><div class="ttname"><a href="classvrv_1_1_toolkit.html#a19431c36d29a2301ee946da2cd01946e">vrv::Toolkit::RedoLayout</a></div><div class="ttdeci">void RedoLayout()</div><div class="ttdoc">Redo the layout of the loaded data. </div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
@@ -327,7 +340,7 @@ $(document).ready(function(){initNavTree('toolkit_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>toolkit.h</b></li>
-    <li class="footer">Generated on Sat Nov 19 2016 14:58:21 by
+    <li class="footer">Generated on Tue Jan 17 2017 09:15:17 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

@@ -143,59 +143,63 @@ $(document).ready(function(){initNavTree('io_8h_source.html','');});
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="comment">//</span></div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="keyword">protected</span>:</div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <a class="code" href="classvrv_1_1_doc.html">Doc</a> *m_doc;</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;};</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;};</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;<span class="comment">// FileInputStream</span></div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;<span class="comment">// FileInputStream</span></div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment">//----------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;</div>
-<div class="line"><a name="l00066"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html">   66</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_file_input_stream.html">FileInputStream</a> : <span class="keyword">public</span> std::ifstream {</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <span class="comment">// constructors and destructors</span></div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <a class="code" href="classvrv_1_1_file_input_stream.html">FileInputStream</a>(<a class="code" href="classvrv_1_1_doc.html">Doc</a> *doc, std::string filename);</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;    <a class="code" href="classvrv_1_1_file_input_stream.html">FileInputStream</a>(<a class="code" href="classvrv_1_1_doc.html">Doc</a> *doc);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_file_input_stream.html">FileInputStream</a>();</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="comment">// read</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> ImportFile() { <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> ImportString(std::string <span class="keyword">const</span> &amp; data) { <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;</div>
-<div class="line"><a name="l00081"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html#aaab137b06a33e650c5a4b85f29dbac4a">   81</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_file_input_stream.html#aaab137b06a33e650c5a4b85f29dbac4a">HasLayoutInformation</a>() { <span class="keywordflow">return</span> <a class="code" href="classvrv_1_1_file_input_stream.html#a46152aad3fa73405859f3fab30020e10">m_hasLayoutInformation</a>; }</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
-<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html#afc335afede6007a0137b49e94645d6cb">   86</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_file_input_stream.html#afc335afede6007a0137b49e94645d6cb">SetAppXPathQueries</a>(std::vector&lt;std::string&gt; &amp;xPathQueries) {}</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
-<div class="line"><a name="l00091"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html#a8424703873e2e41d7346834840760ae0">   91</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_file_input_stream.html#a8424703873e2e41d7346834840760ae0">SetChoiceXPathQueries</a>(std::vector&lt;std::string&gt; &amp;xPathQueries) {}</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;</div>
-<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html#a54d4f2123a797f2c76d53bbd3afe92a9">   96</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_file_input_stream.html#a54d4f2123a797f2c76d53bbd3afe92a9">SetMdivXPathQuery</a>(std::string &amp;xPathQuery) {}</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="keyword">private</span>:</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    <span class="keywordtype">void</span> Init();</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;    <a class="code" href="classvrv_1_1_doc.html">Doc</a> *m_doc;</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
-<div class="line"><a name="l00114"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html#a46152aad3fa73405859f3fab30020e10">  114</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_file_input_stream.html#a46152aad3fa73405859f3fab30020e10">m_hasLayoutInformation</a>;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;};</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;} <span class="comment">// namespace vrv</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="ttc" id="classvrv_1_1_file_input_stream_html_a54d4f2123a797f2c76d53bbd3afe92a9"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html#a54d4f2123a797f2c76d53bbd3afe92a9">vrv::FileInputStream::SetMdivXPathQuery</a></div><div class="ttdeci">virtual void SetMdivXPathQuery(std::string &amp;xPathQuery)</div><div class="ttdoc">Set XPath query for <mdiv> (MEI only) </div><div class="ttdef"><b>Definition:</b> io.h:96</div></div>
-<div class="ttc" id="classvrv_1_1_file_input_stream_html_a8424703873e2e41d7346834840760ae0"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html#a8424703873e2e41d7346834840760ae0">vrv::FileInputStream::SetChoiceXPathQueries</a></div><div class="ttdeci">virtual void SetChoiceXPathQueries(std::vector&lt; std::string &gt; &amp;xPathQueries)</div><div class="ttdoc">Set XPath queries for <choice> (MEI only) </div><div class="ttdef"><b>Definition:</b> io.h:91</div></div>
-<div class="ttc" id="classvrv_1_1_file_input_stream_html_a46152aad3fa73405859f3fab30020e10"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html#a46152aad3fa73405859f3fab30020e10">vrv::FileInputStream::m_hasLayoutInformation</a></div><div class="ttdeci">bool m_hasLayoutInformation</div><div class="ttdoc">Becomes true if layout information is found during the import. </div><div class="ttdef"><b>Definition:</b> io.h:114</div></div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
+<div class="line"><a name="l00064"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html">   64</a></span>&#160;<span class="keyword">class </span><a class="code" href="classvrv_1_1_file_input_stream.html">FileInputStream</a> : <span class="keyword">public</span> std::ifstream {</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;    <span class="comment">// constructors and destructors</span></div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;    <a class="code" href="classvrv_1_1_file_input_stream.html">FileInputStream</a>(<a class="code" href="classvrv_1_1_doc.html">Doc</a> *doc, std::string filename);</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    <a class="code" href="classvrv_1_1_file_input_stream.html">FileInputStream</a>(<a class="code" href="classvrv_1_1_doc.html">Doc</a> *doc);</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    <span class="keyword">virtual</span> ~<a class="code" href="classvrv_1_1_file_input_stream.html">FileInputStream</a>();</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <span class="keywordtype">void</span> SetOutputFormat(<span class="keyword">const</span> std::string &amp;format) { m_outformat = format; }</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    std::string GetOutputFormat(<span class="keywordtype">void</span>) { <span class="keywordflow">return</span> m_outformat; }</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="comment">// read</span></div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> ImportFile() { <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> ImportString(std::string <span class="keyword">const</span> &amp;data) { <span class="keywordflow">return</span> <span class="keyword">true</span>; }</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
+<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html#aaab137b06a33e650c5a4b85f29dbac4a">   82</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_file_input_stream.html#aaab137b06a33e650c5a4b85f29dbac4a">HasLayoutInformation</a>() { <span class="keywordflow">return</span> <a class="code" href="classvrv_1_1_file_input_stream.html#a46152aad3fa73405859f3fab30020e10">m_hasLayoutInformation</a>; }</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
+<div class="line"><a name="l00087"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html#afc335afede6007a0137b49e94645d6cb">   87</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_file_input_stream.html#afc335afede6007a0137b49e94645d6cb">SetAppXPathQueries</a>(std::vector&lt;std::string&gt; &amp;xPathQueries) {}</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;</div>
+<div class="line"><a name="l00092"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html#a8424703873e2e41d7346834840760ae0">   92</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_file_input_stream.html#a8424703873e2e41d7346834840760ae0">SetChoiceXPathQueries</a>(std::vector&lt;std::string&gt; &amp;xPathQueries) {}</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;</div>
+<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html#a54d4f2123a797f2c76d53bbd3afe92a9">   97</a></span>&#160;    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code" href="classvrv_1_1_file_input_stream.html#a54d4f2123a797f2c76d53bbd3afe92a9">SetMdivXPathQuery</a>(std::string &amp;xPathQuery) {}</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="keyword">private</span>:</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;    <span class="keywordtype">void</span> Init();</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="keyword">public</span>:</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="keyword">protected</span>:</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;    <a class="code" href="classvrv_1_1_doc.html">Doc</a> *m_doc;</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;</div>
+<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="classvrv_1_1_file_input_stream.html#a46152aad3fa73405859f3fab30020e10">  116</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classvrv_1_1_file_input_stream.html#a46152aad3fa73405859f3fab30020e10">m_hasLayoutInformation</a>;</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    std::string m_outformat = <span class="stringliteral">&quot;mei&quot;</span>;</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;};</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;} <span class="comment">// namespace vrv</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="ttc" id="classvrv_1_1_file_input_stream_html_a54d4f2123a797f2c76d53bbd3afe92a9"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html#a54d4f2123a797f2c76d53bbd3afe92a9">vrv::FileInputStream::SetMdivXPathQuery</a></div><div class="ttdeci">virtual void SetMdivXPathQuery(std::string &amp;xPathQuery)</div><div class="ttdoc">Set XPath query for <mdiv> (MEI only) </div><div class="ttdef"><b>Definition:</b> io.h:97</div></div>
+<div class="ttc" id="classvrv_1_1_file_input_stream_html_a8424703873e2e41d7346834840760ae0"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html#a8424703873e2e41d7346834840760ae0">vrv::FileInputStream::SetChoiceXPathQueries</a></div><div class="ttdeci">virtual void SetChoiceXPathQueries(std::vector&lt; std::string &gt; &amp;xPathQueries)</div><div class="ttdoc">Set XPath queries for <choice> (MEI only) </div><div class="ttdef"><b>Definition:</b> io.h:92</div></div>
+<div class="ttc" id="classvrv_1_1_file_input_stream_html_a46152aad3fa73405859f3fab30020e10"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html#a46152aad3fa73405859f3fab30020e10">vrv::FileInputStream::m_hasLayoutInformation</a></div><div class="ttdeci">bool m_hasLayoutInformation</div><div class="ttdoc">Becomes true if layout information is found during the import. </div><div class="ttdef"><b>Definition:</b> io.h:116</div></div>
 <div class="ttc" id="classvrv_1_1_file_output_stream_html_a3525afe514206a9f3f143eab6712c74b"><div class="ttname"><a href="classvrv_1_1_file_output_stream.html#a3525afe514206a9f3f143eab6712c74b">vrv::FileOutputStream::WriteObjectEnd</a></div><div class="ttdeci">virtual bool WriteObjectEnd(Object *object)</div><div class="ttdoc">Dummy object method that must be overridden in child class. </div><div class="ttdef"><b>Definition:</b> io.h:48</div></div>
-<div class="ttc" id="classvrv_1_1_file_input_stream_html_afc335afede6007a0137b49e94645d6cb"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html#afc335afede6007a0137b49e94645d6cb">vrv::FileInputStream::SetAppXPathQueries</a></div><div class="ttdeci">virtual void SetAppXPathQueries(std::vector&lt; std::string &gt; &amp;xPathQueries)</div><div class="ttdoc">Set XPath queries for <app> (MEI only) </div><div class="ttdef"><b>Definition:</b> io.h:86</div></div>
-<div class="ttc" id="classvrv_1_1_file_input_stream_html"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html">vrv::FileInputStream</a></div><div class="ttdoc">This class is a base class for file input stream classes. </div><div class="ttdef"><b>Definition:</b> io.h:66</div></div>
+<div class="ttc" id="classvrv_1_1_file_input_stream_html_afc335afede6007a0137b49e94645d6cb"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html#afc335afede6007a0137b49e94645d6cb">vrv::FileInputStream::SetAppXPathQueries</a></div><div class="ttdeci">virtual void SetAppXPathQueries(std::vector&lt; std::string &gt; &amp;xPathQueries)</div><div class="ttdoc">Set XPath queries for <app> (MEI only) </div><div class="ttdef"><b>Definition:</b> io.h:87</div></div>
+<div class="ttc" id="classvrv_1_1_file_input_stream_html"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html">vrv::FileInputStream</a></div><div class="ttdoc">This class is a base class for file input stream classes. </div><div class="ttdef"><b>Definition:</b> io.h:64</div></div>
 <div class="ttc" id="namespacevrv_html"><div class="ttname"><a href="namespacevrv.html">vrv</a></div><div class="ttdef"><b>Definition:</b> accid.h:14</div></div>
 <div class="ttc" id="classvrv_1_1_file_output_stream_html_af5892c4fce1abb0d138ab885a7744f5e"><div class="ttname"><a href="classvrv_1_1_file_output_stream.html#af5892c4fce1abb0d138ab885a7744f5e">vrv::FileOutputStream::WriteObject</a></div><div class="ttdeci">virtual bool WriteObject(Object *object)</div><div class="ttdoc">Dummy object method that must be overridden in child class. </div><div class="ttdef"><b>Definition:</b> io.h:43</div></div>
-<div class="ttc" id="classvrv_1_1_object_html"><div class="ttname"><a href="classvrv_1_1_object.html">vrv::Object</a></div><div class="ttdoc">This class represents a basic object. </div><div class="ttdef"><b>Definition:</b> object.h:160</div></div>
+<div class="ttc" id="classvrv_1_1_object_html"><div class="ttname"><a href="classvrv_1_1_object.html">vrv::Object</a></div><div class="ttdoc">This class represents a basic object. </div><div class="ttdef"><b>Definition:</b> object.h:75</div></div>
 <div class="ttc" id="classvrv_1_1_file_output_stream_html"><div class="ttname"><a href="classvrv_1_1_file_output_stream.html">vrv::FileOutputStream</a></div><div class="ttdoc">This class is a base class for file output stream classes. </div><div class="ttdef"><b>Definition:</b> io.h:27</div></div>
 <div class="ttc" id="classvrv_1_1_doc_html"><div class="ttname"><a href="classvrv_1_1_doc.html">vrv::Doc</a></div><div class="ttdoc">This class is a hold the data and corresponds to the model of a MVC design pattern. </div><div class="ttdef"><b>Definition:</b> doc.h:32</div></div>
-<div class="ttc" id="classvrv_1_1_file_input_stream_html_aaab137b06a33e650c5a4b85f29dbac4a"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html#aaab137b06a33e650c5a4b85f29dbac4a">vrv::FileInputStream::HasLayoutInformation</a></div><div class="ttdeci">bool HasLayoutInformation()</div><div class="ttdoc">Getter for layoutInformation flag that is set to true during import if layout information is found (a...</div><div class="ttdef"><b>Definition:</b> io.h:81</div></div>
+<div class="ttc" id="classvrv_1_1_file_input_stream_html_aaab137b06a33e650c5a4b85f29dbac4a"><div class="ttname"><a href="classvrv_1_1_file_input_stream.html#aaab137b06a33e650c5a4b85f29dbac4a">vrv::FileInputStream::HasLayoutInformation</a></div><div class="ttdeci">bool HasLayoutInformation()</div><div class="ttdoc">Getter for layoutInformation flag that is set to true during import if layout information is found (a...</div><div class="ttdef"><b>Definition:</b> io.h:82</div></div>
 <div class="ttc" id="classvrv_1_1_file_output_stream_html_aa1ad330aa13c1290d2714366aa5e8d48"><div class="ttname"><a href="classvrv_1_1_file_output_stream.html#aa1ad330aa13c1290d2714366aa5e8d48">vrv::FileOutputStream::ExportFile</a></div><div class="ttdeci">virtual bool ExportFile()</div><div class="ttdoc">Dummy export method that must be overridden in child class. </div><div class="ttdef"><b>Definition:</b> io.h:38</div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
@@ -203,7 +207,7 @@ $(document).ready(function(){initNavTree('io_8h_source.html','');});
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_d44c64559bbebec7f509842c48db8b23.html">include</a></li><li class="navelem"><a class="el" href="dir_c4b80f8a98d79512eca1f5c943145ccd.html">vrv</a></li><li class="navelem"><b>io.h</b></li>
-    <li class="footer">Generated on Sat Nov 19 2016 14:58:21 by
+    <li class="footer">Generated on Tue Jan 17 2017 09:15:16 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

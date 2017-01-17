@@ -5,7 +5,8 @@ var searchData=
   ['addstaff',['AddStaff',['../classvrv_1_1_time_point_interface.html#a67678cf06ae06579a830344df5c5598a',1,'vrv::TimePointInterface']]],
   ['addtimestamp',['AddTimestamp',['../classvrv_1_1_measure.html#a67df4d10c89fedc0a403cb7169170d0a',1,'vrv::Measure']]],
   ['addtodrawinglist',['AddToDrawingList',['../classvrv_1_1_drawing_list_interface.html#a1d255ea3d329ebbd6d7cd32fbe88646d',1,'vrv::DrawingListInterface']]],
-  ['adjustarticulations',['AdjustArticulations',['../classvrv_1_1_artic.html#a6c43dfeb07659028316506c8ba341835',1,'vrv::Artic::AdjustArticulations()'],['../classvrv_1_1_object.html#adad3ef8545f0bb674aa28b02307604e3',1,'vrv::Object::AdjustArticulations()']]],
+  ['adjustartic',['AdjustArtic',['../classvrv_1_1_artic.html#adcdab0ebbd513631481f06ace96baaa7',1,'vrv::Artic::AdjustArtic()'],['../classvrv_1_1_object.html#a925e8aab6550be46c08701d2b5e4264c',1,'vrv::Object::AdjustArtic()']]],
+  ['adjustarticwithslurs',['AdjustArticWithSlurs',['../classvrv_1_1_artic_part.html#aa6daf94a8dd5e1c474b759bd5ce2ff13',1,'vrv::ArticPart::AdjustArticWithSlurs()'],['../classvrv_1_1_object.html#a9564b69ba3bc3f0884b6985f66fd83a7',1,'vrv::Object::AdjustArticWithSlurs()']]],
   ['adjustfloatingpostionergrps',['AdjustFloatingPostionerGrps',['../classvrv_1_1_staff_alignment.html#a64432d721e2715e588aa3db97911252c',1,'vrv::StaffAlignment::AdjustFloatingPostionerGrps()'],['../classvrv_1_1_object.html#ad465f471ea8ef35bb04fc01ed0fd96ff',1,'vrv::Object::AdjustFloatingPostionerGrps()']]],
   ['adjustfloatingpostioners',['AdjustFloatingPostioners',['../classvrv_1_1_staff_alignment.html#abf325c8a8d0e9aefdb7097cc58268a81',1,'vrv::StaffAlignment::AdjustFloatingPostioners()'],['../classvrv_1_1_object.html#ae7f8d5a9f06c95c995b993b67cea04d6',1,'vrv::Object::AdjustFloatingPostioners()'],['../classvrv_1_1_system.html#a66a414f599962c78dc36365d4cce7c9d',1,'vrv::System::AdjustFloatingPostioners()']]],
   ['adjustpname',['AdjustPname',['../classvrv_1_1_layer_element.html#a66e4b5ef78333ed791976d269d9979b2',1,'vrv::LayerElement']]],
@@ -15,6 +16,5 @@ var searchData=
   ['alignstack',['AlignStack',['../classvrv_1_1_grace_aligner.html#a1e4d3cfbb5784cb1d4524fe20089a166',1,'vrv::GraceAligner']]],
   ['alignsystems',['AlignSystems',['../classvrv_1_1_object.html#a63b4bc5ad7f6d79e24e1fa94a18b1be2',1,'vrv::Object::AlignSystems()'],['../classvrv_1_1_system.html#a1f768818060e11b8722854d86591389a',1,'vrv::System::AlignSystems()']]],
   ['alignvertically',['AlignVertically',['../classvrv_1_1_measure.html#ae07050f3560322d506406ee7784c67d2',1,'vrv::Measure::AlignVertically()'],['../classvrv_1_1_object.html#ab0497dd399535cd5eb3e76ecb70adc9d',1,'vrv::Object::AlignVertically()'],['../classvrv_1_1_staff.html#a117c874984f47c04a116e5a369f73b52',1,'vrv::Staff::AlignVertically()'],['../classvrv_1_1_system.html#a5ea92acba6b1e62923e9411ee702670c',1,'vrv::System::AlignVertically()'],['../classvrv_1_1_verse.html#ab0782d026d9a53cd1c20d31a356c7dca',1,'vrv::Verse::AlignVertically()']]],
-  ['alwaysabove',['AlwaysAbove',['../classvrv_1_1_artic_part.html#a34749c355d29ec5731bab47e4126a677',1,'vrv::ArticPart']]],
-  ['appendelement',['appendElement',['../classvrv_1_1_humdrum_input.html#aebdd0f0aabbcd60b1676a90f718490cd',1,'vrv::HumdrumInput']]]
+  ['alwaysabove',['AlwaysAbove',['../classvrv_1_1_artic_part.html#a34749c355d29ec5731bab47e4126a677',1,'vrv::ArticPart']]]
 ];

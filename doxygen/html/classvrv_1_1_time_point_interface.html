@@ -124,23 +124,29 @@ Inheritance diagram for vrv::TimePointInterface:</div>
  <div class="center">
   <img src="classvrv_1_1_time_point_interface.png" usemap="#vrv::TimePointInterface_map" alt=""/>
   <map id="vrv::TimePointInterface_map" name="vrv::TimePointInterface_map">
-<area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="0,0,166,24"/>
-<area href="classvrv_1_1_pedal.html" alt="vrv::Pedal" shape="rect" coords="88,112,254,136"/>
-<area href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. " alt="vrv::Tempo" shape="rect" coords="264,112,430,136"/>
-<area href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. " alt="vrv::TimeSpanningInterface" shape="rect" coords="440,112,606,136"/>
-<area href="classvrv_1_1_dir.html" alt="vrv::Dir" shape="rect" coords="616,168,782,192"/>
-<area href="classvrv_1_1_dynam.html" alt="vrv::Dynam" shape="rect" coords="616,224,782,248"/>
-<area href="classvrv_1_1_hairpin.html" alt="vrv::Hairpin" shape="rect" coords="616,280,782,304"/>
-<area href="classvrv_1_1_harm.html" alt="vrv::Harm" shape="rect" coords="616,336,782,360"/>
-<area href="classvrv_1_1_octave.html" alt="vrv::Octave" shape="rect" coords="616,392,782,416"/>
-<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="616,448,782,472"/>
-<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="616,504,782,528"/>
-<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="616,560,782,584"/>
+<area href="classvrv_1_1_interface.html" title="This is a base class for regrouping MEI att classes. " alt="vrv::Interface" shape="rect" coords="88,0,254,24"/>
+<area href="classvrv_1_1_fermata.html" alt="vrv::Fermata" shape="rect" coords="0,112,166,136"/>
+<area href="classvrv_1_1_pedal.html" alt="vrv::Pedal" shape="rect" coords="176,112,342,136"/>
+<area href="classvrv_1_1_tempo.html" title="This class is an interface for <tempo> elements at the measure level. " alt="vrv::Tempo" shape="rect" coords="352,112,518,136"/>
+<area href="classvrv_1_1_time_spanning_interface.html" title="This class is an interface for spanning elements, such as slur, hairpin, etc. " alt="vrv::TimeSpanningInterface" shape="rect" coords="528,112,694,136"/>
+<area href="classvrv_1_1_trill.html" alt="vrv::Trill" shape="rect" coords="704,112,870,136"/>
+<area href="classvrv_1_1_dir.html" alt="vrv::Dir" shape="rect" coords="704,168,870,192"/>
+<area href="classvrv_1_1_dynam.html" alt="vrv::Dynam" shape="rect" coords="704,224,870,248"/>
+<area href="classvrv_1_1_hairpin.html" alt="vrv::Hairpin" shape="rect" coords="704,280,870,304"/>
+<area href="classvrv_1_1_harm.html" alt="vrv::Harm" shape="rect" coords="704,336,870,360"/>
+<area href="classvrv_1_1_octave.html" alt="vrv::Octave" shape="rect" coords="704,392,870,416"/>
+<area href="classvrv_1_1_slur.html" alt="vrv::Slur" shape="rect" coords="704,448,870,472"/>
+<area href="classvrv_1_1_syl.html" title="Syl is a TimeSpanningInterface for managing syllable connectors. " alt="vrv::Syl" shape="rect" coords="704,504,870,528"/>
+<area href="classvrv_1_1_tie.html" alt="vrv::Tie" shape="rect" coords="704,560,870,584"/>
 </map>
  </div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a4c3a7f2c3fd21358c4c25dbae8443f4a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c3a7f2c3fd21358c4c25dbae8443f4a"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#a4c3a7f2c3fd21358c4c25dbae8443f4a">SetStartOnly</a> (<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *start)</td></tr>
+<tr class="memdesc:a4c3a7f2c3fd21358c4c25dbae8443f4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set first <a class="el" href="classvrv_1_1_layer_element.html" title="This class is a base class for the Layer (<layer>) content. ">LayerElement</a> by verifying it is the correct one. <br /></td></tr>
+<tr class="separator:a4c3a7f2c3fd21358c4c25dbae8443f4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67678cf06ae06579a830344df5c5598a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67678cf06ae06579a830344df5c5598a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#a67678cf06ae06579a830344df5c5598a">AddStaff</a> (int n)</td></tr>
 <tr class="memdesc:a67678cf06ae06579a830344df5c5598a"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_add.html">Add</a> a staff n to the AttStaffident vector (if not already there) <br /></td></tr>
@@ -162,6 +168,10 @@ Looks that the parent staff if the using  or at the  values. <br /></td></tr>
 std::vector&lt; <a class="el" href="classvrv_1_1_staff.html">Staff</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#acc143d64530139d69ea66c3c413581d0">GetTstampStaves</a> (<a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure)</td></tr>
 <tr class="memdesc:acc143d64530139d69ea66c3c413581d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a vector of staves looking at the  attribute or at the parent staff or the . <br /></td></tr>
 <tr class="separator:acc143d64530139d69ea66c3c413581d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af12c0fb8fe5605633e3ceeb75806d798"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af12c0fb8fe5605633e3ceeb75806d798"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#af12c0fb8fe5605633e3ceeb75806d798">InterfacePrepareTimePointing</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
+<tr class="memdesc:af12c0fb8fe5605633e3ceeb75806d798"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#acf5548dc77c315039ea5b8ce9e323bc3" title="Match start and end for TimeSpanningInterface elements (such as tie or slur). ">Object::PrepareTimeSpanning</a>. <br /></td></tr>
+<tr class="separator:af12c0fb8fe5605633e3ceeb75806d798"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad4fd22f92288ae7c9f8a7b2500ee6a5"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#aad4fd22f92288ae7c9f8a7b2500ee6a5">InterfacePrepareTimestamps</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
 <tr class="memdesc:aad4fd22f92288ae7c9f8a7b2500ee6a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">We have functor in the interface for avoiding code duplication in each implementation class.  <a href="#aad4fd22f92288ae7c9f8a7b2500ee6a5">More...</a><br /></td></tr>
 <tr class="separator:aad4fd22f92288ae7c9f8a7b2500ee6a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -311,7 +321,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_time_point_interface.html">TimePointInterface</a></li>
-    <li class="footer">Generated on Sat Nov 19 2016 14:58:26 by
+    <li class="footer">Generated on Tue Jan 17 2017 09:15:23 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

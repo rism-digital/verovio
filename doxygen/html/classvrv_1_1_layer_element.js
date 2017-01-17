@@ -22,6 +22,7 @@ var classvrv_1_1_layer_element =
     [ "IsInFTrem", "classvrv_1_1_layer_element.html#a5e102d2a23409364dc3c0180f56352d9", null ],
     [ "IsInLigature", "classvrv_1_1_layer_element.html#a91e31547d4c4d212c7fe546a9920248d", null ],
     [ "operator=", "classvrv_1_1_layer_element.html#a319bbc28b17b11be635f53ade3d64325", null ],
+    [ "PrepareTimePointing", "classvrv_1_1_layer_element.html#a3be9e2b87933dfacf3e4603d58053282", null ],
     [ "PrepareTimeSpanning", "classvrv_1_1_layer_element.html#a72dc4f513f06956e474ca0bfca73aeb2", null ],
     [ "Reset", "classvrv_1_1_layer_element.html#afda62d2037293f7448dc26ca2e445b68", null ],
     [ "ResetHorizontalAlignment", "classvrv_1_1_layer_element.html#ad80313afbd3e9a3d22a320cfbc6b5685", null ],

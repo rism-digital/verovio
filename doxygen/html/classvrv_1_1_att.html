@@ -145,6 +145,9 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>DblToStr</b> (
 <tr class="memitem:afcb7dfcb288e34d5b27f714253445797"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afcb7dfcb288e34d5b27f714253445797"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>IntToStr</b> (int data) const </td></tr>
 <tr class="separator:afcb7dfcb288e34d5b27f714253445797"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a152c24d88749a6289203886bc54e2842"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a152c24d88749a6289203886bc54e2842"></a>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><b>WcharTToStr</b> (wchar_t data) const </td></tr>
+<tr class="separator:a152c24d88749a6289203886bc54e2842"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Basic converters for reading</div></td></tr>
 <tr class="memitem:a08e338f8c01167e1e1b63775deeac622"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a08e338f8c01167e1e1b63775deeac622"></a>
 double&#160;</td><td class="memItemRight" valign="bottom"><b>StrToDbl</b> (std::string value) const </td></tr>
@@ -152,6 +155,9 @@ double&#160;</td><td class="memItemRight" valign="bottom"><b>StrToDbl</b> (std::
 <tr class="memitem:a667e3c390957f72f70bb5ea9e4851d41"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a667e3c390957f72f70bb5ea9e4851d41"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>StrToInt</b> (std::string value) const </td></tr>
 <tr class="separator:a667e3c390957f72f70bb5ea9e4851d41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12271f72bdeedb1b6ffa63df57ffe631"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a12271f72bdeedb1b6ffa63df57ffe631"></a>
+wchar_t&#160;</td><td class="memItemRight" valign="bottom"><b>StrToWcharT</b> (std::string value) const </td></tr>
+<tr class="separator:a12271f72bdeedb1b6ffa63df57ffe631"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Converters for writing and reading</div></td></tr>
 <tr class="memitem:ac905322c52ebd05cc659de969a95f2fb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac905322c52ebd05cc659de969a95f2fb"></a>
 std::string&#160;</td><td class="memItemRight" valign="bottom"><b>ArticulationListToStr</b> (data_ARTICULATION_List data) const </td></tr>
@@ -285,6 +291,9 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><b>SetCmn</b> (<a
 <tr class="memitem:a7ef8353ae144c376f9540c6a200bba1a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ef8353ae144c376f9540c6a200bba1a"></a>
 static bool&#160;</td><td class="memItemRight" valign="bottom"><b>SetCritapp</b> (<a class="el" href="classvrv_1_1_object.html">Object</a> *element, std::string attrType, std::string attrValue)</td></tr>
 <tr class="separator:a7ef8353ae144c376f9540c6a200bba1a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2bdf651912f63ec6643117c0bd9f0b3e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2bdf651912f63ec6643117c0bd9f0b3e"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><b>SetExternalsymbols</b> (<a class="el" href="classvrv_1_1_object.html">Object</a> *element, std::string attrType, std::string attrValue)</td></tr>
+<tr class="separator:a2bdf651912f63ec6643117c0bd9f0b3e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a700319c89c5dee1cdfc6245b5fa7784e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a700319c89c5dee1cdfc6245b5fa7784e"></a>
 static bool&#160;</td><td class="memItemRight" valign="bottom"><b>SetMei</b> (<a class="el" href="classvrv_1_1_object.html">Object</a> *element, std::string attrType, std::string attrValue)</td></tr>
 <tr class="separator:a700319c89c5dee1cdfc6245b5fa7784e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -307,6 +316,9 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:a74e5fe03eba140d024ad926dc656dd31"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a74e5fe03eba140d024ad926dc656dd31"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetCritapp</b> (const <a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
 <tr class="separator:a74e5fe03eba140d024ad926dc656dd31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a19b45facda7dc30dcb35d992ed005aa9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a19b45facda7dc30dcb35d992ed005aa9"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetExternalsymbols</b> (const <a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
+<tr class="separator:a19b45facda7dc30dcb35d992ed005aa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f5d5e5d651192892f87902e528d827f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3f5d5e5d651192892f87902e528d827f"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetMei</b> (const <a class="el" href="classvrv_1_1_object.html">Object</a> *element, ArrayOfStrAttr *attributes)</td></tr>
 <tr class="separator:a3f5d5e5d651192892f87902e528d827f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -335,7 +347,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>GetShared</b> 
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_att.html">Att</a></li>
-    <li class="footer">Generated on Sat Nov 19 2016 14:58:21 by
+    <li class="footer">Generated on Tue Jan 17 2017 09:15:17 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

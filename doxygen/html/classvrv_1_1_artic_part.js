@@ -2,6 +2,8 @@ var classvrv_1_1_artic_part =
 [
     [ "ArticPart", "classvrv_1_1_artic_part.html#adf327922da14dc06bd8ef283be522297", null ],
     [ "~ArticPart", "classvrv_1_1_artic_part.html#ad149bc5142543782242299a612252e2b", null ],
+    [ "AddSlurPositioner", "classvrv_1_1_artic_part.html#abc314f7ecd790375d3f557fb09b7ae72", null ],
+    [ "AdjustArticWithSlurs", "classvrv_1_1_artic_part.html#aa6daf94a8dd5e1c474b759bd5ce2ff13", null ],
     [ "AlwaysAbove", "classvrv_1_1_artic_part.html#a34749c355d29ec5731bab47e4126a677", null ],
     [ "GetClassName", "classvrv_1_1_artic_part.html#a7621ed57942486c54c406886a37f3bd3", null ],
     [ "GetDrawingY", "classvrv_1_1_artic_part.html#a222d0d204e7aae984544607ac72aade1", null ],
@@ -13,5 +15,7 @@ var classvrv_1_1_artic_part =
     [ "Save", "classvrv_1_1_artic_part.html#af6ed201057713592e24e522c25ed71e8", null ],
     [ "SaveEnd", "classvrv_1_1_artic_part.html#ae224d733df6730af38961c2711e60cd3", null ],
     [ "SetDrawingYRel", "classvrv_1_1_artic_part.html#ae656ce37c4f0874137c09945f11ac7a8", null ],
-    [ "SetType", "classvrv_1_1_artic_part.html#a3866663b3e9d0e74fe30990abe927c5d", null ]
+    [ "SetType", "classvrv_1_1_artic_part.html#a3866663b3e9d0e74fe30990abe927c5d", null ],
+    [ "m_endSlurPositioners", "classvrv_1_1_artic_part.html#ae524c0c4869f698b1ce0e1b24acb4774", null ],
+    [ "m_startSlurPositioners", "classvrv_1_1_artic_part.html#ab71f54833d2ceb8bc034ff4ccd0d53fc", null ]
 ];

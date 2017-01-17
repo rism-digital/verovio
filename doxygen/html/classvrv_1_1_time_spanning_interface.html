@@ -197,6 +197,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>SetEnd</b> (<a class=
 <a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>GetEnd</b> ()</td></tr>
 <tr class="separator:ae3bf35a85b17a514c8559bf5e8385fc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classvrv_1_1_time_point_interface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classvrv_1_1_time_point_interface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classvrv_1_1_time_point_interface.html">vrv::TimePointInterface</a></td></tr>
+<tr class="memitem:a4c3a7f2c3fd21358c4c25dbae8443f4a inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c3a7f2c3fd21358c4c25dbae8443f4a"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#a4c3a7f2c3fd21358c4c25dbae8443f4a">SetStartOnly</a> (<a class="el" href="classvrv_1_1_layer_element.html">LayerElement</a> *start)</td></tr>
+<tr class="memdesc:a4c3a7f2c3fd21358c4c25dbae8443f4a inherit pub_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set first <a class="el" href="classvrv_1_1_layer_element.html" title="This class is a base class for the Layer (<layer>) content. ">LayerElement</a> by verifying it is the correct one. <br /></td></tr>
+<tr class="separator:a4c3a7f2c3fd21358c4c25dbae8443f4a inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67678cf06ae06579a830344df5c5598a inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67678cf06ae06579a830344df5c5598a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#a67678cf06ae06579a830344df5c5598a">AddStaff</a> (int n)</td></tr>
 <tr class="memdesc:a67678cf06ae06579a830344df5c5598a inherit pub_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classvrv_1_1_add.html">Add</a> a staff n to the AttStaffident vector (if not already there) <br /></td></tr>
@@ -218,6 +222,10 @@ Looks that the parent staff if the using  or at the  values. <br /></td></tr>
 std::vector&lt; <a class="el" href="classvrv_1_1_staff.html">Staff</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#acc143d64530139d69ea66c3c413581d0">GetTstampStaves</a> (<a class="el" href="classvrv_1_1_measure.html">Measure</a> *measure)</td></tr>
 <tr class="memdesc:acc143d64530139d69ea66c3c413581d0 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return a vector of staves looking at the  attribute or at the parent staff or the . <br /></td></tr>
 <tr class="separator:acc143d64530139d69ea66c3c413581d0 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af12c0fb8fe5605633e3ceeb75806d798 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af12c0fb8fe5605633e3ceeb75806d798"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_time_point_interface.html#af12c0fb8fe5605633e3ceeb75806d798">InterfacePrepareTimePointing</a> (<a class="el" href="classvrv_1_1_functor_params.html">FunctorParams</a> *functorParams, <a class="el" href="classvrv_1_1_object.html">Object</a> *object)</td></tr>
+<tr class="memdesc:af12c0fb8fe5605633e3ceeb75806d798 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classvrv_1_1_object.html#acf5548dc77c315039ea5b8ce9e323bc3" title="Match start and end for TimeSpanningInterface elements (such as tie or slur). ">Object::PrepareTimeSpanning</a>. <br /></td></tr>
+<tr class="separator:af12c0fb8fe5605633e3ceeb75806d798 inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a470841fa6a90f560e791882bd0d7ff3d inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a470841fa6a90f560e791882bd0d7ff3d"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>TimePointInterface</b> ()</td></tr>
 <tr class="separator:a470841fa6a90f560e791882bd0d7ff3d inherit pub_methods_classvrv_1_1_time_point_interface"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -343,7 +351,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>m_startUuid</b
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_time_spanning_interface.html">TimeSpanningInterface</a></li>
-    <li class="footer">Generated on Sat Nov 19 2016 14:58:26 by
+    <li class="footer">Generated on Tue Jan 17 2017 09:15:23 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

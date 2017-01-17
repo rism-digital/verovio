@@ -106,6 +106,7 @@ $(document).ready(function(){initNavTree('classvrv_1_1_floating_positioner.html'
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classvrv_1_1_floating_positioner-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -147,9 +148,19 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>CalcDrawingYRel</b> (
 <tr class="memitem:ae5a734dadc458d91881922e24c838f30"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae5a734dadc458d91881922e24c838f30"></a>
 data_STAFFREL&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingPlace</b> () const </td></tr>
 <tr class="separator:ae5a734dadc458d91881922e24c838f30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a106c1db85065df383e66b034739d6243"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a106c1db85065df383e66b034739d6243"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateSlurPosition</b> (const <a class="el" href="classvrv_1_1_point.html">Point</a> points[4], float angle, int thickness, curvature_CURVEDIR curveDir)</td></tr>
-<tr class="separator:a106c1db85065df383e66b034739d6243"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4958542dae25dd4f448ca6fb79640ab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa4958542dae25dd4f448ca6fb79640ab"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>UpdateCurvePosition</b> (const <a class="el" href="classvrv_1_1_point.html">Point</a> points[4], float angle, int thickness, curvature_CURVEDIR curveDir)</td></tr>
+<tr class="separator:aa4958542dae25dd4f448ca6fb79640ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28d264f2aa6274709617d07b781986ae"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a28d264f2aa6274709617d07b781986ae"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>CalcXMinMaxY</b> (const <a class="el" href="classvrv_1_1_point.html">Point</a> points[4])</td></tr>
+<tr class="separator:a28d264f2aa6274709617d07b781986ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr><td colspan="2"><div class="groupHeader">Get and set the X and Y drawing position</div></td></tr>
+<tr class="memitem:a9cc591b8ae64180ec7372dc9b66a721f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9cc591b8ae64180ec7372dc9b66a721f"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingX</b> () const </td></tr>
+<tr class="separator:a9cc591b8ae64180ec7372dc9b66a721f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a85e0e8450434c2b6af48ec2e7282f46c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a85e0e8450434c2b6af48ec2e7282f46c"></a>
+virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingY</b> () const </td></tr>
+<tr class="separator:a85e0e8450434c2b6af48ec2e7282f46c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Get and set the Y drawing relative position</div></td></tr>
 <tr class="memitem:a6c2eeffe3373608c37f794723d27e125"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6c2eeffe3373608c37f794723d27e125"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingYRel</b> () const </td></tr>
@@ -193,15 +204,12 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a60ca75d9acad2568e82f073931cdcba5">HorizontalOverlap</a> (const <a class="el" href="classvrv_1_1_bounding_box.html">BoundingBox</a> *other) const </td></tr>
 <tr class="memdesc:a60ca75d9acad2568e82f073931cdcba5 inherit pub_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true if the bounding box has a horizontal overlap with the other one. <br /></td></tr>
 <tr class="separator:a60ca75d9acad2568e82f073931cdcba5 inherit pub_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5dc95395e417eeb69ea8354971cf789f inherit pub_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5dc95395e417eeb69ea8354971cf789f"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>CalcVerticalOverlap</b> (const <a class="el" href="classvrv_1_1_bounding_box.html">BoundingBox</a> *other) const </td></tr>
-<tr class="separator:a5dc95395e417eeb69ea8354971cf789f inherit pub_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a839b35e413290077916841c247f16a2b inherit pub_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a839b35e413290077916841c247f16a2b"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingX</b> () const </td></tr>
-<tr class="separator:a839b35e413290077916841c247f16a2b inherit pub_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3cb043cbfdeb57ec1ace4cd0843d179b inherit pub_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3cb043cbfdeb57ec1ace4cd0843d179b"></a>
-virtual int&#160;</td><td class="memItemRight" valign="bottom"><b>GetDrawingY</b> () const </td></tr>
-<tr class="separator:a3cb043cbfdeb57ec1ace4cd0843d179b inherit pub_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a058d929710f16b634bd9fdabd36b4080 inherit pub_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a058d929710f16b634bd9fdabd36b4080"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>Encloses</b> (const <a class="el" href="classvrv_1_1_point.html">Point</a> point) const </td></tr>
+<tr class="separator:a058d929710f16b634bd9fdabd36b4080 inherit pub_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a56051ee06a205598f619caaf8d2ced31 inherit pub_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a56051ee06a205598f619caaf8d2ced31"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>Intersects</b> (<a class="el" href="classvrv_1_1_floating_positioner.html">FloatingPositioner</a> *curve, int margin=0) const </td></tr>
+<tr class="separator:a56051ee06a205598f619caaf8d2ced31 inherit pub_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9dd32339b692888f07aecc17d7c5e800 inherit pub_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9dd32339b692888f07aecc17d7c5e800"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>SetDrawingX</b> (int drawingX)</td></tr>
 <tr class="separator:a9dd32339b692888f07aecc17d7c5e800 inherit pub_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -233,39 +241,23 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>GetContentLeft</b> () 
 int&#160;</td><td class="memItemRight" valign="bottom"><b>GetContentRight</b> () const </td></tr>
 <tr class="separator:aaa761e415b7ee6f35aa1d8ad4b698eb5 inherit pub_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr class="memitem:a52d529c02864d41c1b31cad82be18881"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_floating_positioner.html#a52d529c02864d41c1b31cad82be18881">m_drawingYRel</a></td></tr>
-<tr class="memdesc:a52d529c02864d41c1b31cad82be18881"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Y drawing relative position of the object.  <a href="#a52d529c02864d41c1b31cad82be18881">More...</a><br /></td></tr>
-<tr class="separator:a52d529c02864d41c1b31cad82be18881"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37c2446744eb4ae4149628468b066c5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37c2446744eb4ae4149628468b066c5e"></a>
-<a class="el" href="classvrv_1_1_floating_object.html">FloatingObject</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_object</b></td></tr>
-<tr class="separator:a37c2446744eb4ae4149628468b066c5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a230809600834d92bdbe3258fc931f172"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a230809600834d92bdbe3258fc931f172"></a>
-data_STAFFREL&#160;</td><td class="memItemRight" valign="bottom"><b>m_place</b></td></tr>
-<tr class="separator:a230809600834d92bdbe3258fc931f172"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2b5202a597d6321a8b6f4527179b014d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2b5202a597d6321a8b6f4527179b014d"></a>
-<a class="el" href="classvrv_1_1_point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_slurPoints</b> [4]</td></tr>
-<tr class="separator:a2b5202a597d6321a8b6f4527179b014d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac079171fde828b1c6f33460d3bfdb083"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac079171fde828b1c6f33460d3bfdb083"></a>
-float&#160;</td><td class="memItemRight" valign="bottom"><b>m_slurAngle</b></td></tr>
-<tr class="separator:ac079171fde828b1c6f33460d3bfdb083"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a583feee22c16eb85fcf854600ee9bff1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a583feee22c16eb85fcf854600ee9bff1"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><b>m_slurThickness</b></td></tr>
-<tr class="separator:a583feee22c16eb85fcf854600ee9bff1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a19f771616e13cca4bb1d255b8475d56d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a19f771616e13cca4bb1d255b8475d56d"></a>
-curvature_CURVEDIR&#160;</td><td class="memItemRight" valign="bottom"><b>m_slurDir</b></td></tr>
-<tr class="separator:a19f771616e13cca4bb1d255b8475d56d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_attribs_classvrv_1_1_bounding_box"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classvrv_1_1_bounding_box')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classvrv_1_1_bounding_box.html">vrv::BoundingBox</a></td></tr>
-<tr class="memitem:a2cad01887f9798966dcfc898c35dbace inherit pro_attribs_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a2cad01887f9798966dcfc898c35dbace">m_drawingY</a></td></tr>
-<tr class="memdesc:a2cad01887f9798966dcfc898c35dbace inherit pro_attribs_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Y drawing position of the object.  <a href="#a2cad01887f9798966dcfc898c35dbace">More...</a><br /></td></tr>
-<tr class="separator:a2cad01887f9798966dcfc898c35dbace inherit pro_attribs_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a944504a24876da460d162b82d567ca69 inherit pro_attribs_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a944504a24876da460d162b82d567ca69">m_drawingX</a></td></tr>
-<tr class="memdesc:a944504a24876da460d162b82d567ca69 inherit pro_attribs_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">The X drawing position of the object.  <a href="#a944504a24876da460d162b82d567ca69">More...</a><br /></td></tr>
-<tr class="separator:a944504a24876da460d162b82d567ca69 inherit pro_attribs_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:af0fb574dfbcd8a8fe385d3f263a839fd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af0fb574dfbcd8a8fe385d3f263a839fd"></a>
+<a class="el" href="classvrv_1_1_point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><b>m_cuvrePoints</b> [4]</td></tr>
+<tr class="separator:af0fb574dfbcd8a8fe385d3f263a839fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a116792dc9e2f82c919a31612343240af"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a116792dc9e2f82c919a31612343240af"></a>
+float&#160;</td><td class="memItemRight" valign="bottom"><b>m_cuvreAngle</b></td></tr>
+<tr class="separator:a116792dc9e2f82c919a31612343240af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9a142a2900790e599511b387eee6ea9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9a142a2900790e599511b387eee6ea9"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>m_cuvreThickness</b></td></tr>
+<tr class="separator:ae9a142a2900790e599511b387eee6ea9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5419c0671043a9bc35d2c26ae745a3b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab5419c0671043a9bc35d2c26ae745a3b"></a>
+curvature_CURVEDIR&#160;</td><td class="memItemRight" valign="bottom"><b>m_cuvreDir</b></td></tr>
+<tr class="separator:ab5419c0671043a9bc35d2c26ae745a3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adac191d051aadf1533deaaecb1e5d21f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adac191d051aadf1533deaaecb1e5d21f"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><b>m_cuvreXMinMaxY</b></td></tr>
+<tr class="separator:adac191d051aadf1533deaaecb1e5d21f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_attribs_classvrv_1_1_bounding_box"><td colspan="2" onclick="javascript:toggleInherit('pub_attribs_classvrv_1_1_bounding_box')"><img src="closed.png" alt="-"/>&#160;Public Attributes inherited from <a class="el" href="classvrv_1_1_bounding_box.html">vrv::BoundingBox</a></td></tr>
 <tr class="memitem:afad8fd1b368422b83377b7e86bb7845b inherit pub_attribs_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afad8fd1b368422b83377b7e86bb7845b"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>m_contentBB_x1</b></td></tr>
@@ -291,6 +283,50 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>m_selfBB_x2</b></td></
 <tr class="memitem:a981739fd2685aa7f711069c765e569eb inherit pub_attribs_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a981739fd2685aa7f711069c765e569eb"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><b>m_selfBB_y2</b></td></tr>
 <tr class="separator:a981739fd2685aa7f711069c765e569eb inherit pub_attribs_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
+<tr class="memitem:a52d529c02864d41c1b31cad82be18881"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_floating_positioner.html#a52d529c02864d41c1b31cad82be18881">m_drawingYRel</a></td></tr>
+<tr class="memdesc:a52d529c02864d41c1b31cad82be18881"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Y drawing relative position of the object.  <a href="#a52d529c02864d41c1b31cad82be18881">More...</a><br /></td></tr>
+<tr class="separator:a52d529c02864d41c1b31cad82be18881"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37c2446744eb4ae4149628468b066c5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37c2446744eb4ae4149628468b066c5e"></a>
+<a class="el" href="classvrv_1_1_floating_object.html">FloatingObject</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>m_object</b></td></tr>
+<tr class="separator:a37c2446744eb4ae4149628468b066c5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a230809600834d92bdbe3258fc931f172"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a230809600834d92bdbe3258fc931f172"></a>
+data_STAFFREL&#160;</td><td class="memItemRight" valign="bottom"><b>m_place</b></td></tr>
+<tr class="separator:a230809600834d92bdbe3258fc931f172"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_attribs_classvrv_1_1_bounding_box"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classvrv_1_1_bounding_box')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classvrv_1_1_bounding_box.html">vrv::BoundingBox</a></td></tr>
+<tr class="memitem:a2cad01887f9798966dcfc898c35dbace inherit pro_attribs_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a2cad01887f9798966dcfc898c35dbace">m_drawingY</a></td></tr>
+<tr class="memdesc:a2cad01887f9798966dcfc898c35dbace inherit pro_attribs_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">The Y drawing position of the object.  <a href="#a2cad01887f9798966dcfc898c35dbace">More...</a><br /></td></tr>
+<tr class="separator:a2cad01887f9798966dcfc898c35dbace inherit pro_attribs_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a944504a24876da460d162b82d567ca69 inherit pro_attribs_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a944504a24876da460d162b82d567ca69">m_drawingX</a></td></tr>
+<tr class="memdesc:a944504a24876da460d162b82d567ca69 inherit pro_attribs_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">The X drawing position of the object.  <a href="#a944504a24876da460d162b82d567ca69">More...</a><br /></td></tr>
+<tr class="separator:a944504a24876da460d162b82d567ca69 inherit pro_attribs_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pub_static_methods_classvrv_1_1_bounding_box"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classvrv_1_1_bounding_box')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classvrv_1_1_bounding_box.html">vrv::BoundingBox</a></td></tr>
+<tr class="memitem:a03c7599c94a2202fd36c24a924afb7cf inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a03c7599c94a2202fd36c24a924afb7cf">SwapPoints</a> (<a class="el" href="classvrv_1_1_point.html">Point</a> *x1, <a class="el" href="classvrv_1_1_point.html">Point</a> *x2)</td></tr>
+<tr class="memdesc:a03c7599c94a2202fd36c24a924afb7cf inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap the points passed as reference.  <a href="#a03c7599c94a2202fd36c24a924afb7cf">More...</a><br /></td></tr>
+<tr class="separator:a03c7599c94a2202fd36c24a924afb7cf inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a98acbd56bdb3e5379fab4d9c999d2140 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a98acbd56bdb3e5379fab4d9c999d2140"></a>
+static <a class="el" href="classvrv_1_1_point.html">Point</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a98acbd56bdb3e5379fab4d9c999d2140">CalcPositionAfterRotation</a> (<a class="el" href="classvrv_1_1_point.html">Point</a> point, float rot_alpha, <a class="el" href="classvrv_1_1_point.html">Point</a> center)</td></tr>
+<tr class="memdesc:a98acbd56bdb3e5379fab4d9c999d2140 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the position of a point after a rotation of rot_alpha around the center. <br /></td></tr>
+<tr class="separator:a98acbd56bdb3e5379fab4d9c999d2140 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a91eb3e2ee9b00bc764283fe1710e199b inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a91eb3e2ee9b00bc764283fe1710e199b"></a>
+static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#a91eb3e2ee9b00bc764283fe1710e199b">CalcBezierAtPosition</a> (const <a class="el" href="classvrv_1_1_point.html">Point</a> bezier[4], int x)</td></tr>
+<tr class="memdesc:a91eb3e2ee9b00bc764283fe1710e199b inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the position of a point after a rotation of rot_alpha around the center. <br /></td></tr>
+<tr class="separator:a91eb3e2ee9b00bc764283fe1710e199b inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae087d56d7ff270c908e3a723be01f6e7 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae087d56d7ff270c908e3a723be01f6e7"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#ae087d56d7ff270c908e3a723be01f6e7">CalcThickBezier</a> (const <a class="el" href="classvrv_1_1_point.html">Point</a> bezier[4], int thickness, float angle, <a class="el" href="classvrv_1_1_point.html">Point</a> *topBezier, <a class="el" href="classvrv_1_1_point.html">Point</a> *bottomBezier)</td></tr>
+<tr class="memdesc:ae087d56d7ff270c908e3a723be01f6e7 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate the position of the bezier above and below for a thick bezier. <br /></td></tr>
+<tr class="separator:ae087d56d7ff270c908e3a723be01f6e7 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1dfaf62bcd9253e2ae59a29de330694 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrv_1_1_bounding_box.html#ae1dfaf62bcd9253e2ae59a29de330694">SwapY</a> (int *y1, int *y2)</td></tr>
+<tr class="memdesc:ae1dfaf62bcd9253e2ae59a29de330694 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swap values passed as reference.  <a href="#ae1dfaf62bcd9253e2ae59a29de330694">More...</a><br /></td></tr>
+<tr class="separator:ae1dfaf62bcd9253e2ae59a29de330694 inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae9a22cf5d306abb22ff5f557e81bd9af inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9a22cf5d306abb22ff5f557e81bd9af"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><b>ApproximateBezierBoundingBox</b> (const <a class="el" href="classvrv_1_1_point.html">Point</a> bezier[4], <a class="el" href="classvrv_1_1_point.html">Point</a> &amp;pos, int &amp;width, int &amp;height, int &amp;minYPos, int &amp;maxYPos)</td></tr>
+<tr class="separator:ae9a22cf5d306abb22ff5f557e81bd9af inherit pub_static_methods_classvrv_1_1_bounding_box"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This class represents a basic object in the layout domain. </p>
@@ -327,7 +363,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><b>m_selfBB_y2</b></td></
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>vrv</b></li><li class="navelem"><a class="el" href="classvrv_1_1_floating_positioner.html">FloatingPositioner</a></li>
-    <li class="footer">Generated on Sat Nov 19 2016 14:58:22 by
+    <li class="footer">Generated on Tue Jan 17 2017 09:15:19 by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.10 </li>
   </ul>

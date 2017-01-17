@@ -2,7 +2,7 @@ var classvrv_1_1_bounding_box =
 [
     [ "BoundingBox", "classvrv_1_1_bounding_box.html#a5601855899250709d9fa94f3c280aa72", null ],
     [ "~BoundingBox", "classvrv_1_1_bounding_box.html#a9f87f4407c2c8d88ab5e4eacfe1ac1f0", null ],
-    [ "CalcVerticalOverlap", "classvrv_1_1_bounding_box.html#a5dc95395e417eeb69ea8354971cf789f", null ],
+    [ "Encloses", "classvrv_1_1_bounding_box.html#a058d929710f16b634bd9fdabd36b4080", null ],
     [ "GetContentBottom", "classvrv_1_1_bounding_box.html#ad024cf98698e81e6b9b3e78621e64bcc", null ],
     [ "GetContentLeft", "classvrv_1_1_bounding_box.html#aab20270b388898d54205f28c7ee2acfc", null ],
     [ "GetContentRight", "classvrv_1_1_bounding_box.html#aaa761e415b7ee6f35aa1d8ad4b698eb5", null ],
@@ -18,6 +18,7 @@ var classvrv_1_1_bounding_box =
     [ "HasSelfBB", "classvrv_1_1_bounding_box.html#ac3c3373f16515029c78eca7216247386", null ],
     [ "HasUpdatedBB", "classvrv_1_1_bounding_box.html#aeb5057a5a2ede55ec9f7ddbeed3b5a9a", null ],
     [ "HorizontalOverlap", "classvrv_1_1_bounding_box.html#a60ca75d9acad2568e82f073931cdcba5", null ],
+    [ "Intersects", "classvrv_1_1_bounding_box.html#a56051ee06a205598f619caaf8d2ced31", null ],
     [ "Is", "classvrv_1_1_bounding_box.html#a36bfdadf291d96c5f48d9d52927cdf87", null ],
     [ "ResetBoundingBox", "classvrv_1_1_bounding_box.html#ae79b9324168608f36cb71c8ca4174220", null ],
     [ "SetDrawingX", "classvrv_1_1_bounding_box.html#a9dd32339b692888f07aecc17d7c5e800", null ],
