@@ -31,6 +31,8 @@ features:
       name: "Tuplets"
     - id: "tremolos"
       name: "Tremolos"
+    - id: "fermatas"
+      name: "Fermatas"
     - id: "octave-shift"
       name: "Octave shift"
     - id: "piano-pedals"
@@ -41,6 +43,10 @@ features:
       menu: "Mensural notation"
     - id: "mensural"
       name: "Mensural notation"
+    - id: "cmn_ornam"
+      menu: "Common Music Notation Ornaments"
+    - id: "trills"
+      name: "Trills"
     - id: "app_menu"
       menu: "Critical apparatus"
     - id: "app"
@@ -82,7 +88,7 @@ version-footer: true
             </div>
         </div>
     </div>
-    
+
     <div class="col-md-9">
         <div class="panel-body">
             <h3>Features</h3>
@@ -95,7 +101,7 @@ version-footer: true
 
             <div id="feature">
             </div>
-            
+
         </div>
     </div>
 </div>
@@ -130,30 +136,30 @@ version-footer: true
         var svg = vrvToolkit.renderData( data, options );
         output_div.html(svg);
     }
-    
+
     function getParameterByName(name) {
         var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
         return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
     }
 
     $( document ).ready(function() {
-        
+
         var id = getParameterByName("id");
         if (!id) {
             id = "{{ page.features[1].id }}";
         }
-        var file = "features/" + id + ".html";    
-        // load the file    
-        $( "#feature" ).load( file, function() {          
+        var file = "features/" + id + ".html";
+        // load the file
+        $( "#feature" ).load( file, function() {
               $(".toggle_code").click(function(){
                   $( "#" + $(this).attr("id") + "-xml" ).toggle();
                     $("span", this).toggleClass("glyphicon-eye-open glyphicon-eye-close");
               });
-          
+
         });
         // activate the link menu
         $( "#link-" + id ).addClass( "active" );
-                
+
     });
 //]]>
 </script>

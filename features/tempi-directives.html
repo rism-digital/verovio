@@ -57,14 +57,14 @@
 //<![CDATA[
     zoom = 40;
     pageWidth = 1450;
-    
-    
+
+
     // adjust the zoom for small screens
     width = $('#feature').width();
     if ( width < zoom * pageWidth / 100 ) {
         zoom = width * 100 / pageWidth;
     }
-    
+
     $.get( "{{ site.baseurl }}/examples/features/tempo1.mei" , function( data ) {
         load_data( data, $('#svg_output-1') );
     });
@@ -72,7 +72,7 @@
     $.get( "{{ site.baseurl }}/examples/features/tempo2.mei" , function( data ) {
         load_data( data, $('#svg_output-2') );
     });
-    
+
     $.get( "{{ site.baseurl }}/examples/features/dir1.mei" , function( data ) {
         load_data( data, $('#svg_output-3') );
     });
