@@ -1,5 +1,5 @@
 ---
-mei-doc-root: http://music-encoding.org/documentation/guidelines2013/ 
+mei-doc-root: http://music-encoding.org/documentation/3.0.0/
 ---
 {% comment %}
 {_% mei_supported_to_liquid supported-mei.yml %_}
@@ -8,11 +8,11 @@ mei-doc-root: http://music-encoding.org/documentation/guidelines2013/
 <p>
     This page documents the elements and attributes that are currently supported by Verovio. It is also important to note that the hierarchy of elements supported by Verovio is limited and that it will also determine wherether an MEI document can be rendered or not.
 </p>
-                    
+
 <h4>MEI elements</h4>
 <p>
     Verovio supports a subset of MEI elements and attributes that are documented here. Additional elements and attributes will be added in the future.
-</p>                
+</p>
 
     {% for class in page.doc.classes %}
         {% include mei-class.html %}
@@ -21,18 +21,18 @@ mei-doc-root: http://music-encoding.org/documentation/guidelines2013/
 <h4>Page-based customization elements</h4>
 <p>
     A few elements supported by Verovio are defined in the page-based customization describe on the <a href="{{ site.baseurl}}/structure.xhtml">structure</a> page.
-</p>                    
+</p>
     {% for class in page.doc.page-based-classes %}
         {% include mei-class.html %}
     {% endfor %}
-    
+
 <h4>Load-only MEI elements</h4>
 <p>
     Verovio can load both page-based customized and uncustomized MEI documents. When loading uncustomized MEI documents, some MEI elements are loaded by Verovio and converted to a page-based representation. Typically, <code>&lt;pb&gt;</code> milestone elements are converted to <code>&lt;page&gt;</code> container elements. Oppositely, <code>&lt;section&gt;</code> container elements are converted to <code>&lt;secb&gt;</code> milestone elements.
 </p>
 <p>
     There are also some MEI elements that Verovio can load but only if they can be converted to an alternate MEI representation. For example, Verovio can load <code>&lt;tupletSpan&gt;</code> elements but only when then can be appropriately converted to <code>&lt;tuplet&gt;</code> elements. Verovio tries to perfom the convertions when loading the document. This has nothing to do with the page-based customization.
-</p>                    
+</p>
     {% for class in page.doc.loaded-classes %}
         {% include mei-class.html %}
     {% endfor %}

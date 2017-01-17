@@ -1,0 +1,85 @@
+<score>
+  <scoreDef>
+    <staffGrp>
+      <staffDef clef.shape="C" clef.line="1" n="1" lines="5"/>
+    </staffGrp>
+  </scoreDef>
+  <section>
+    <measure n="1" right="dbl">
+      <staff n="1">
+        <layer n="1">
+          <note dur="4" oct="4" pname="g" stem.dir="down"/>
+        </layer>
+      </staff>
+      <trill staff="1" tstamp="1"/>
+    </measure>
+    <measure n="2" right="dbl">
+      <staff n="1">
+        <layer n="1">
+          <beam>
+            <note dur="32" oct="4" pname="a" stem.dir="down"/>
+            <note dur="32" oct="4" pname="g" stem.dir="down"/>
+            <note dur="32" oct="4" pname="a" stem.dir="down"/>
+            <note dur="32" oct="4" pname="g" stem.dir="down"/>
+            <note dur="32" oct="4" pname="a" stem.dir="down"/>
+            <note dur="32" oct="4" pname="g" stem.dir="down"/>
+            <note dur="32" oct="4" pname="a" stem.dir="down"/>
+            <note dur="32" oct="4" pname="g" stem.dir="down"/>
+          </beam>
+        </layer>
+      </staff>
+    </measure>
+    <scoreDef key.sig="2s"/>
+    <measure n="3" right="dbl">
+      <staff n="1">
+        <layer n="1">
+          <note dur="4" oct="4" pname="b" stem.dir="down"/>
+        </layer>
+      </staff>
+      <trill staff="1" tstamp="1" place="above"/>
+    </measure>
+    <measure n="4" right="dbl">
+      <staff n="1">
+        <layer n="1">
+          <beam>
+            <note dur="32" oct="5" pname="c" stem.dir="down">
+              <accid accid="s"/>
+            </note>
+            <note dur="32" oct="4" pname="b" stem.dir="down"/>
+            <note dur="32" oct="5" pname="c" accid.ges="s" stem.dir="down"/>
+            <note dur="32" oct="4" pname="b" stem.dir="down"/>
+            <note dur="32" oct="5" pname="c" accid.ges="s" stem.dir="down"/>
+            <note dur="32" oct="4" pname="b" stem.dir="down"/>
+            <note dur="32" oct="5" pname="c" accid.ges="s" stem.dir="down"/>
+            <note dur="32" oct="4" pname="b" stem.dir="down"/>
+          </beam>
+        </layer>
+      </staff>
+    </measure>
+    <scoreDef key.sig="2s"/>
+    <measure n="5" right="dbl">
+      <staff n="1">
+        <layer n="1">
+          <note dur="4" oct="5" pname="c" accid.ges="s" stem.dir="down"/>
+        </layer>
+      </staff>
+      <trill staff="1" tstamp="1" place="below" color="orange"/>
+    </measure>
+    <measure n="6" right="dbl">
+      <staff n="1">
+        <layer n="1">
+          <beam>
+            <note dur="32" oct="5" pname="d" stem.dir="down"/>
+            <note dur="32" oct="5" pname="c" accid="s" stem.dir="down"/>
+            <note dur="32" oct="5" pname="d" stem.dir="down"/>
+            <note dur="32" oct="5" pname="c" accid.ges="s" stem.dir="down"/>
+            <note dur="32" oct="5" pname="d" stem.dir="down"/>
+            <note dur="32" oct="5" pname="c" accid.ges="s" stem.dir="down"/>
+            <note dur="32" oct="5" pname="d" stem.dir="down"/>
+            <note dur="32" oct="5" pname="c" accid.ges="s" stem.dir="down"/>
+          </beam>
+        </layer>
+      </staff>
+    </measure>
+  </section>
+</score>
