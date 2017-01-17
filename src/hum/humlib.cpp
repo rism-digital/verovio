@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Dec 26 16:35:10 PST 2016
+// Last Modified: Thu Jan  5 04:39:32 PST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -4864,7 +4864,7 @@ string HumRegex::getSuffix(void) {
 //
 
 int HumRegex::getMatchStartIndex(int index) {
-	return m_matches.position(index);
+	return (int)m_matches.position(index);
 }
 
 
@@ -4888,7 +4888,7 @@ int HumRegex::getMatchEndIndex(int index) {
 //
 
 int HumRegex::getMatchLength(int index) {
-	return m_matches.length(index);
+	return (int)m_matches.length(index);
 }
 
 
@@ -5601,7 +5601,7 @@ void HumdrumFileBase::readFromHttpUri(const string& webaddress) {
 
 //////////////////////////////
 //
-// readFromHttpUri -- Read a Humdrum file from an http:// web address
+// readStringFromHttpUri -- Read a Humdrum file from an http:// web address
 //
 
 void HumdrumFileBase::readStringFromHttpUri(stringstream& inputdata,
@@ -5643,7 +5643,7 @@ void HumdrumFileBase::readStringFromHttpUri(stringstream& inputdata,
 
 	#define URI_BUFFER_SIZE (10000)
 	char buffer[URI_BUFFER_SIZE];
-	int message_len;
+	unsigned int message_len;
 	stringstream header;
 	int foundcontent   = 0;
 	int newlinecounter = 0;
@@ -5676,7 +5676,7 @@ void HumdrumFileBase::readStringFromHttpUri(stringstream& inputdata,
 
 	header << ends; // necessary?
 	while (header.getline(buffer, URI_BUFFER_SIZE)) {
-		int len = strlen(buffer);
+		int len = (int)strlen(buffer);
 		for (i=0; i<len; i++) {
 			buffer[i] = std::tolower(buffer[i]);
 		}
@@ -5722,7 +5722,7 @@ void HumdrumFileBase::readStringFromHttpUri(stringstream& inputdata,
 			if (foundcontent) {
 				inputdata.write(buffer, message_len);
 			} else {
-				for (i=0; i<message_len; i++) {
+				for (i=0; i<(int)message_len; i++) {
 					if (foundcontent) {
 						inputdata << buffer[i];
 					} else {
@@ -5778,7 +5778,7 @@ void HumdrumFileBase::readStringFromHttpUri(stringstream& inputdata,
 int HumdrumFileBase::getChunk(int socket_id, stringstream& inputdata,
 		char* buffer, int bufsize) {
 	int chunksize = 0;
-	int message_len;
+	unsigned int message_len;
 	char digit[2] = {0};
 	int founddigit = 0;
 
@@ -5786,7 +5786,7 @@ int HumdrumFileBase::getChunk(int socket_id, stringstream& inputdata,
 	while ((message_len = ::read(socket_id, buffer, 1)) != 0) {
 		if (isxdigit(buffer[0])) {
 			digit[0] = buffer[0];
-			chunksize = (chunksize << 4) | strtol(digit, NULL, 16);
+			chunksize = (chunksize << 4) | (int)strtol(digit, NULL, 16);
 			founddigit = 1;
 		} else if (founddigit) {
 			break;
@@ -5832,7 +5832,7 @@ int HumdrumFileBase::getFixedDataSize(int socket_id, int datalength,
 		if (readcount + readsize > datalength) {
 			readsize = datalength - readcount;
 		}
-		message_len = ::read(socket_id, buffer, readsize);
+		message_len = (int)::read(socket_id, buffer, readsize);
 		if (message_len == 0) {
 			// shouldn't happen, but who knows...
 			break;
@@ -9902,7 +9902,7 @@ bool HumdrumFileStructure::prepareDurations(HumdrumToken* token, int state,
 	// Process secondary tracks next:
 	int newstate = state;
 
-	for (int i=reservoir.size()-1; i>=0; i--) {
+	for (int i=(int)reservoir.size()-1; i>=0; i--) {
 		prepareDurations(reservoir[i], newstate, startdurs[i]);
 	}
 
@@ -15594,13 +15594,12 @@ int Options::define(const string& aDefinition) {
 	// Set up space for a option entry in the registry
 	definitionEntry = new Option_register(aDefinition, otype[0], ovalue);
 
-	auto definitionIndex = m_optionRegister.size();
+	int definitionIndex = m_optionRegister.size();
 
 	// Store option aliases
 	string optionName;
-	unsigned int i;
 	aliases += '|';
-	for (i=0; i<aliases.size(); i++) {
+	for (int i=0; i<(int)aliases.size(); i++) {
 		if (::isspace(aliases[i])) {
 			continue;
 		} else if (aliases[i] == '|') {
@@ -15687,7 +15686,7 @@ string Options::getArgument(int index) {
 //
 
 int Options::getArgCount(void) {
-	return m_arguments.size();
+	return (int)m_arguments.size();
 }
 
 // Alias:
@@ -17922,7 +17921,7 @@ void Tool_autostem::getBeamState(vector<vector<string > >& beams,
 				for (int ii=0; ii<flagl; ii++) {
 					gbinfo += "\\";
 				}
-				len = gbinfo.size();
+				len = (int)gbinfo.size();
 				if (len > 6) {
 					cerr << "Error too many grace note beams" << endl;
 					exit(1);
@@ -17973,7 +17972,7 @@ void Tool_autostem::getBeamState(vector<vector<string > >& beams,
 				for (int ii=0; ii<flagl; ii++) {
 					gbinfo += "\\";
 				}
-				len = gbinfo.size();
+				len = (int)gbinfo.size();
 				if (len > 6) {
 					cerr << "Error too many grace note beams" << endl;
 					exit(1);
@@ -18192,7 +18191,9 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 	double lev;      // metric level of the current note
 	double levn;     // metric level of the next melodic note
 	int lineindex;   // line in original Humdrum file content that contains note
+	// int lineindexn;  // next line in original Humdrum file content that contains note
 	int sliceindex;  // current timepoint in NoteGrid.
+	// int alineindexn; // next line in Humdrum file that contains note in accompaniment voice
 	vector<double> harmint(grid.getVoiceCount());  // harmonic intervals;
 	bool dissonant;  // true if  note is dissonant with other sounding notes.
 	char marking = '\0';
@@ -18299,6 +18300,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 			}
 		} 
 
+		// variables for dissonant voice
 		durp = attacks[i-1]->getDuration();
 		dur  = attacks[i]->getDuration();
 		durn = attacks[i+1]->getDuration();
@@ -18307,6 +18309,10 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 		levp = attacks[i-1]->getMetricLevel();
 		lev  = attacks[i]->getMetricLevel();
 		levn = attacks[i+1]->getMetricLevel();
+		// lineindexn = attacks[i+1]->getLineIndex();
+
+		// variables for accompaniment voice
+		// int alineindexn = grid.cell(j, sliceindex);
 
 		if ((dur <= durp) && (lev >= levp) && (lev >= levn)) { // weak dissonances
 			if (intp == -1) { // descending dissonances
@@ -18319,7 +18325,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 				} else if (intn > 1) {
 					results[lineindex] = "ed"; // lower échappée
 				} else if (intn == -2) {
-					results[lineindex] = "scd"; // short descending nota cambiata
+					results[lineindex] = "cd"; // descending nota cambiata
 				} else if (intn < -2) {
 					results[lineindex] = "ipd"; // incomplete posterior lower neighbor
 				}
@@ -18333,7 +18339,7 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 				} else if (intn == 0) {
 					results[lineindex] = "au"; // rising anticipation
 				} else if (intn == 2) {
-					results[lineindex] = "scu"; // short ascending nota cambiata
+					results[lineindex] = "cu"; // ascending nota cambiata
 				} else if (intn > 2) {
 					results[lineindex] = "ipu"; // incomplete posterior upper neighbor
 				}
@@ -18342,9 +18348,10 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 			} else if ((intp > 2) && (intn == -1)) {
 				results[lineindex] = "iau"; // incomplete anterior upper neighbor
 			}
-		}
-		// TODO: add check to see if results already has a result.
-		if (i < ((int)attacks.size() - 2)) { // expand the analysis window
+		} else if ((durp >= 2) && (dur == 1) && (lev < levn) &&
+			(intp == -1) && (intn == -1)) {
+			results[lineindex] = "dq"; // dissonant third quarter
+		} else if (i < ((int)attacks.size() - 2)) { // expand the analysis window
 			double interval3 = *attacks[i+2] - *attacks[i+1];
 			HumNum durnn = attacks[i+2]->getDuration();	// dur of note after next
 			double levnn = attacks[i+2]->getMetricLevel(); // lev of note after next
@@ -18352,15 +18359,6 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 			if ((dur == durn) && (lev == 1) && (levn == 2) && (levnn == 0) &&
 				(intp == -1) && (intn == -1) && (interval3 == 1)) {
 				results[lineindex] = "ci"; // chanson idiom
-			} else if ((durp >= 2) && (dur == 1) && (lev < levn) &&
-				(intp == -1) && (intn == -1)) {
-				results[lineindex] = "dq"; // dissonant third quarter
-			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
-				(intp == -1) && (intn == -2) && (interval3 == 1)) {
-				results[lineindex] = "lcd"; // long descending nota cambiata
-			} else if ((dur <= durp) && (lev >= levp) && (lev >= levn) &&
-				(intp == 1) && (intn == 2) && (interval3 == -1)) {
-				results[lineindex] = "lcu"; // long ascending nota cambiata
 			}
 		}
 	}
@@ -18741,7 +18739,7 @@ void Tool_extract::reverseSpines(vector<int>& field, vector<int>& subfield, vect
 	field.resize(0);
 
 	int i, j;
-	int lasti = target.size();
+	int lasti = (int)target.size();
 	for (i=(int)target.size()-1; i>0; i--) {
 		if (target[i]) {
 			lasti = i;
@@ -18838,7 +18836,7 @@ void Tool_extract::processFieldEntry(vector<int>& field,
 	vector<HTp> ktracks;
 	infile.getKernSpineStartList(ktracks);
 	if (kernQ) {
-		maxtrack = ktracks.size();
+		maxtrack = (int)ktracks.size();
 	}
 
 	int modletter;

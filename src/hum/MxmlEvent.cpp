@@ -494,7 +494,95 @@ bool MxmlEvent::isGrace(void) {
 			// grace element has to come before pitch
 			return false;
 		}
-		child = child.first_child();
+		child = child.next_sibling();
+	}
+	return false;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::hasSlurStart -- 
+//   direction: 0=unspecified, 1=positive curvature, -1=negative curvature.
+//
+//  <note>
+//     <notations>
+//         <slur type="start" orientation="under" number="1">
+//         <slur type="start" orientation="over" number="1">
+//
+//
+
+bool MxmlEvent::hasSlurStart(int& direction) {
+	direction = 0;
+	bool output = false;
+	xml_node child = this->getNode();
+	if (!nodeType(child, "note")) {
+		return output;
+	}
+	child = child.first_child();
+	while (child) {
+		if (nodeType(child, "notations")) {
+			xml_node grandchild = child.first_child();
+			while (grandchild) {
+				if (nodeType(grandchild, "slur")) {
+					xml_attribute slurtype = grandchild.attribute("type");
+					if (slurtype) {
+						if (strcmp(slurtype.value(), "start") == 0) {
+							output = true;
+						}
+					}
+					xml_attribute orientation = grandchild.attribute("orientation");
+					if (orientation) {
+						if (strcmp(orientation.value(), "over") == 0) {
+							direction = 1;
+						} else if (strcmp(orientation.value(), "under") == 0) {
+							direction = -1;
+						}
+					}
+					return output;
+				}
+				grandchild = grandchild.next_sibling();
+			}
+		}
+		child = child.next_sibling();
+	}
+	return output;
+}
+
+
+
+//////////////////////////////
+//
+// MxmlEvent::hasSlurStop --
+//
+//  <note>
+//     <notations>
+//         <slur type="start" orientation="under" number="1">
+//
+
+bool MxmlEvent::hasSlurStop(void) {
+	xml_node child = this->getNode();
+	if (!nodeType(child, "note")) {
+		return false;
+	}
+	child = child.first_child();
+	while (child) {
+		if (nodeType(child, "notations")) {
+			xml_node grandchild = child.first_child();
+			while (grandchild) {
+				if (nodeType(grandchild, "slur")) {
+					xml_attribute slurtype = grandchild.attribute("type");
+					if (slurtype) {
+						if (strcmp(slurtype.value(), "stop") == 0) {
+							return true;
+						}
+					}
+				}
+				grandchild = grandchild.next_sibling();
+			}
+		}
+		child = child.next_sibling();
 	}
 	return false;
 }
@@ -996,7 +1084,9 @@ void MxmlEvent::setBarlineStyle(xml_node node) {
 		child = child.next_sibling();
 	}
 
-	if ((repeat == 0) && (barstyle == "light-heavy")) {
+	if ((repeat == 0) && (barstyle == "light-light")) {
+		reportMeasureStyleToOwner(MeasureStyle::Double);
+	} else if ((repeat == 0) && (barstyle == "light-heavy")) {
 		reportMeasureStyleToOwner(MeasureStyle::Final);
 	} else if ((repeat == -1) && (barstyle == "light-heavy")) {
 		reportMeasureStyleToOwner(MeasureStyle::RepeatBackward);
@@ -1076,6 +1166,12 @@ string MxmlEvent::getKernPitch(void) {
 	string step;
 	int alter  = 0;
 	int octave = 4;
+	bool explicitQ    = false;
+	bool naturalQ     = false;
+	// bool sharpQ       = false;
+	// bool flatQ        = false;
+	// bool doubleflatQ  = false;
+	// bool doublesharpQ = false;
 
 	if (nodeType(m_node, "forward")) {
 		rest = true;
@@ -1097,6 +1193,23 @@ string MxmlEvent::getKernPitch(void) {
 						octave = atoi(grandchild.child_value());
 					}
 					grandchild = grandchild.next_sibling();
+				}
+			} else if (nodeType(child, "accidental")) {
+				if (strcmp(child.child_value(), "natural") == 0) {
+					naturalQ = true;
+					explicitQ = true;
+				} else if (strcmp(child.child_value(), "sharp") == 0) {
+					// sharpQ = true;
+					explicitQ = true;
+				} else if (strcmp(child.child_value(), "flat") == 0) {
+					// flatQ = true;
+					explicitQ = true;
+				} else if (strcmp(child.child_value(), "double-flat") == 0) {
+					// doubleflatQ = true;
+					explicitQ = true;
+				} else if (strcmp(child.child_value(), "double-sharp") == 0) {
+					// doublesharpQ = true;
+					explicitQ = true;
 				}
 			}
 			child = child.next_sibling();
@@ -1132,11 +1245,14 @@ string MxmlEvent::getKernPitch(void) {
 			output += '-';
 		}
 	}
-	// print cautionary natural sign here...
+	if (naturalQ) {
+		output += 'n';
+	} else if (explicitQ) {
+		output += 'X';
+	}
 
 	return output;
 }
-
 
 
 

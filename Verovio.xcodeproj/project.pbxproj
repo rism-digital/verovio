@@ -57,17 +57,6 @@
 		4D5572401CF3F32A008D06A0 /* octave.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D55723F1CF3F32A008D06A0 /* octave.cpp */; };
 		4D5572441CF57B5C008D06A0 /* pedal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5572431CF57B5C008D06A0 /* pedal.cpp */; };
 		4D5FA9111E16A93F00F3B919 /* boundingbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA9101E16A93F00F3B919 /* boundingbox.cpp */; };
-		4D5FA9141E1E6A1000F3B919 /* tool-musicxml2hum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA9131E1E6A1000F3B919 /* tool-musicxml2hum.cpp */; };
-		4D5FA91F1E1E6E1800F3B919 /* GridMeasure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA9151E1E6E1800F3B919 /* GridMeasure.cpp */; };
-		4D5FA9201E1E6E1800F3B919 /* GridPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA9161E1E6E1800F3B919 /* GridPart.cpp */; };
-		4D5FA9211E1E6E1800F3B919 /* GridSide.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA9171E1E6E1800F3B919 /* GridSide.cpp */; };
-		4D5FA9221E1E6E1800F3B919 /* GridSlice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA9181E1E6E1800F3B919 /* GridSlice.cpp */; };
-		4D5FA9231E1E6E1800F3B919 /* GridStaff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA9191E1E6E1800F3B919 /* GridStaff.cpp */; };
-		4D5FA9241E1E6E1800F3B919 /* GridVoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA91A1E1E6E1800F3B919 /* GridVoice.cpp */; };
-		4D5FA9251E1E6E1800F3B919 /* HumGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA91B1E1E6E1800F3B919 /* HumGrid.cpp */; };
-		4D5FA9261E1E6E1800F3B919 /* MxmlEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA91C1E1E6E1800F3B919 /* MxmlEvent.cpp */; };
-		4D5FA9271E1E6E1800F3B919 /* MxmlMeasure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA91D1E1E6E1800F3B919 /* MxmlMeasure.cpp */; };
-		4D5FA9281E1E6E1800F3B919 /* MxmlPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA91E1E1E6E1800F3B919 /* MxmlPart.cpp */; };
 		4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D763EC71987D04E003FCAB5 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
 		4D763EC91987D067003FCAB5 /* metersig.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D763EC81987D067003FCAB5 /* metersig.h */; };
@@ -95,7 +84,6 @@
 		4DA1448B1C2AB28700CB7CEE /* textelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA144891C2AB28700CB7CEE /* textelement.cpp */; };
 		4DA1448D1C2AB29400CB7CEE /* textelement.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA1448C1C2AB29400CB7CEE /* textelement.h */; };
 		4DA20ED11D0F151900706C4A /* iohumdrum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA20ED01D0F151900706C4A /* iohumdrum.cpp */; };
-		4DA20ED51D0F156600706C4A /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA20ED41D0F156600706C4A /* humlib.cpp */; };
 		4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
 		4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
 		4DA60EE11B6307A8006E2DFC /* textdirinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */; };
@@ -335,29 +323,6 @@
 		4D5572431CF57B5C008D06A0 /* pedal.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pedal.cpp; path = src/pedal.cpp; sourceTree = "<group>"; };
 		4D5FA90F1E16A85800F3B919 /* boundingbox.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = boundingbox.h; path = include/vrv/boundingbox.h; sourceTree = "<group>"; };
 		4D5FA9101E16A93F00F3B919 /* boundingbox.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = boundingbox.cpp; path = src/boundingbox.cpp; sourceTree = "<group>"; };
-		4D5FA9121E1E69FD00F3B919 /* tool-musicxml2hum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tool-musicxml2hum.h"; path = "include/hum/tool-musicxml2hum.h"; sourceTree = "<group>"; };
-		4D5FA9131E1E6A1000F3B919 /* tool-musicxml2hum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "tool-musicxml2hum.cpp"; path = "src/hum/tool-musicxml2hum.cpp"; sourceTree = "<group>"; };
-		4D5FA9151E1E6E1800F3B919 /* GridMeasure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridMeasure.cpp; path = src/hum/GridMeasure.cpp; sourceTree = "<group>"; };
-		4D5FA9161E1E6E1800F3B919 /* GridPart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridPart.cpp; path = src/hum/GridPart.cpp; sourceTree = "<group>"; };
-		4D5FA9171E1E6E1800F3B919 /* GridSide.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridSide.cpp; path = src/hum/GridSide.cpp; sourceTree = "<group>"; };
-		4D5FA9181E1E6E1800F3B919 /* GridSlice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridSlice.cpp; path = src/hum/GridSlice.cpp; sourceTree = "<group>"; };
-		4D5FA9191E1E6E1800F3B919 /* GridStaff.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridStaff.cpp; path = src/hum/GridStaff.cpp; sourceTree = "<group>"; };
-		4D5FA91A1E1E6E1800F3B919 /* GridVoice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridVoice.cpp; path = src/hum/GridVoice.cpp; sourceTree = "<group>"; };
-		4D5FA91B1E1E6E1800F3B919 /* HumGrid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HumGrid.cpp; path = src/hum/HumGrid.cpp; sourceTree = "<group>"; };
-		4D5FA91C1E1E6E1800F3B919 /* MxmlEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MxmlEvent.cpp; path = src/hum/MxmlEvent.cpp; sourceTree = "<group>"; };
-		4D5FA91D1E1E6E1800F3B919 /* MxmlMeasure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MxmlMeasure.cpp; path = src/hum/MxmlMeasure.cpp; sourceTree = "<group>"; };
-		4D5FA91E1E1E6E1800F3B919 /* MxmlPart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MxmlPart.cpp; path = src/hum/MxmlPart.cpp; sourceTree = "<group>"; };
-		4D5FA9291E1E6E3C00F3B919 /* grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grid.h; path = include/hum/grid.h; sourceTree = "<group>"; };
-		4D5FA92A1E1E6E3C00F3B919 /* GridMeasure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridMeasure.h; path = include/hum/GridMeasure.h; sourceTree = "<group>"; };
-		4D5FA92B1E1E6E3C00F3B919 /* GridPart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridPart.h; path = include/hum/GridPart.h; sourceTree = "<group>"; };
-		4D5FA92C1E1E6E3C00F3B919 /* GridSide.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridSide.h; path = include/hum/GridSide.h; sourceTree = "<group>"; };
-		4D5FA92D1E1E6E3C00F3B919 /* GridSlice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridSlice.h; path = include/hum/GridSlice.h; sourceTree = "<group>"; };
-		4D5FA92E1E1E6E3C00F3B919 /* GridStaff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridStaff.h; path = include/hum/GridStaff.h; sourceTree = "<group>"; };
-		4D5FA92F1E1E6E3C00F3B919 /* GridVoice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridVoice.h; path = include/hum/GridVoice.h; sourceTree = "<group>"; };
-		4D5FA9301E1E6E3C00F3B919 /* HumGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HumGrid.h; path = include/hum/HumGrid.h; sourceTree = "<group>"; };
-		4D5FA9311E1E6E3C00F3B919 /* MxmlEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MxmlEvent.h; path = include/hum/MxmlEvent.h; sourceTree = "<group>"; };
-		4D5FA9321E1E6E3C00F3B919 /* MxmlMeasure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MxmlMeasure.h; path = include/hum/MxmlMeasure.h; sourceTree = "<group>"; };
-		4D5FA9331E1E6E3C00F3B919 /* MxmlPart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MxmlPart.h; path = include/hum/MxmlPart.h; sourceTree = "<group>"; };
 		4D763EC51987D04D003FCAB5 /* metersig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = metersig.cpp; path = src/metersig.cpp; sourceTree = "<group>"; };
 		4D763EC81987D067003FCAB5 /* metersig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = metersig.h; path = include/vrv/metersig.h; sourceTree = "<group>"; };
 		4D796B5C1D78641200A15238 /* harm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = harm.h; path = include/vrv/harm.h; sourceTree = "<group>"; };
@@ -386,8 +351,6 @@
 		4DA1448C1C2AB29400CB7CEE /* textelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textelement.h; path = include/vrv/textelement.h; sourceTree = "<group>"; };
 		4DA20ECF1D0F150900706C4A /* iohumdrum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = iohumdrum.h; path = include/vrv/iohumdrum.h; sourceTree = "<group>"; };
 		4DA20ED01D0F151900706C4A /* iohumdrum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = iohumdrum.cpp; path = src/iohumdrum.cpp; sourceTree = "<group>"; };
-		4DA20ED31D0F155500706C4A /* humlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = humlib.h; path = include/hum/humlib.h; sourceTree = "<group>"; };
-		4DA20ED41D0F156600706C4A /* humlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = humlib.cpp; path = src/hum/humlib.cpp; sourceTree = "<group>"; };
 		4DA60EDF1B6307A8006E2DFC /* textdirinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = textdirinterface.h; path = include/vrv/textdirinterface.h; sourceTree = "<group>"; };
 		4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = textdirinterface.cpp; path = src/textdirinterface.cpp; sourceTree = "<group>"; };
 		4DA80D941A6940120089802D /* style.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = style.h; path = include/vrv/style.h; sourceTree = "<group>"; };
@@ -632,38 +595,6 @@
 			name = textelements;
 			sourceTree = "<group>";
 		};
-		4DA20ED21D0F153100706C4A /* hum */ = {
-			isa = PBXGroup;
-			children = (
-				4DA20ED41D0F156600706C4A /* humlib.cpp */,
-				4DA20ED31D0F155500706C4A /* humlib.h */,
-				4D5FA9291E1E6E3C00F3B919 /* grid.h */,
-				4D5FA9151E1E6E1800F3B919 /* GridMeasure.cpp */,
-				4D5FA92A1E1E6E3C00F3B919 /* GridMeasure.h */,
-				4D5FA9161E1E6E1800F3B919 /* GridPart.cpp */,
-				4D5FA92B1E1E6E3C00F3B919 /* GridPart.h */,
-				4D5FA9171E1E6E1800F3B919 /* GridSide.cpp */,
-				4D5FA92C1E1E6E3C00F3B919 /* GridSide.h */,
-				4D5FA9181E1E6E1800F3B919 /* GridSlice.cpp */,
-				4D5FA92D1E1E6E3C00F3B919 /* GridSlice.h */,
-				4D5FA9191E1E6E1800F3B919 /* GridStaff.cpp */,
-				4D5FA92E1E1E6E3C00F3B919 /* GridStaff.h */,
-				4D5FA91A1E1E6E1800F3B919 /* GridVoice.cpp */,
-				4D5FA92F1E1E6E3C00F3B919 /* GridVoice.h */,
-				4D5FA91B1E1E6E1800F3B919 /* HumGrid.cpp */,
-				4D5FA9301E1E6E3C00F3B919 /* HumGrid.h */,
-				4D5FA91C1E1E6E1800F3B919 /* MxmlEvent.cpp */,
-				4D5FA9311E1E6E3C00F3B919 /* MxmlEvent.h */,
-				4D5FA91D1E1E6E1800F3B919 /* MxmlMeasure.cpp */,
-				4D5FA9321E1E6E3C00F3B919 /* MxmlMeasure.h */,
-				4D5FA91E1E1E6E1800F3B919 /* MxmlPart.cpp */,
-				4D5FA9331E1E6E3C00F3B919 /* MxmlPart.h */,
-				4D5FA9131E1E6A1000F3B919 /* tool-musicxml2hum.cpp */,
-				4D5FA9121E1E69FD00F3B919 /* tool-musicxml2hum.h */,
-			);
-			name = hum;
-			sourceTree = "<group>";
-		};
 		4DBC09271B51960100B1832C /* utf8 */ = {
 			isa = PBXGroup;
 			children = (
@@ -785,7 +716,6 @@
 				4DEE28EC1940BCA100C76319 /* libmei */,
 				4D7D8A3C1886E36200D78B62 /* tools */,
 				8F086F351885397A0037FD8E /* source */,
-				4DA20ED21D0F153100706C4A /* hum */,
 				4D1BE7751C688F6F0086DC0E /* midi */,
 				4D22C42118891D7300D0831F /* pugixml */,
 				4DBC09271B51960100B1832C /* utf8 */,
@@ -1149,7 +1079,6 @@
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
 				4D543E221B80AACF004B823C /* view_control.cpp in Sources */,
-				4D5FA91F1E1E6E1800F3B919 /* GridMeasure.cpp in Sources */,
 				4D95D4FC1D74551100B2B856 /* score.cpp in Sources */,
 				8F086EE9188539540037FD8E /* doc.cpp in Sources */,
 				8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */,
@@ -1163,7 +1092,6 @@
 				8F086EEF188539540037FD8E /* iomusxml.cpp in Sources */,
 				8F086EF0188539540037FD8E /* iopae.cpp in Sources */,
 				4D8CD8A61B4E922A00F0756F /* atts_critapp.cpp in Sources */,
-				4D5FA9221E1E6E1800F3B919 /* GridSlice.cpp in Sources */,
 				4067E4C81DDDAF0000C6E059 /* fermata.cpp in Sources */,
 				8F086EF1188539540037FD8E /* keysig.cpp in Sources */,
 				4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */,
@@ -1174,7 +1102,6 @@
 				8F086EF3188539540037FD8E /* layerelement.cpp in Sources */,
 				4DF4407D1D511D0200152B7E /* boundary.cpp in Sources */,
 				8F086EF5188539540037FD8E /* measure.cpp in Sources */,
-				4D5FA9211E1E6E1800F3B919 /* GridSide.cpp in Sources */,
 				4D95D4F91D718D4A00B2B856 /* systemelement.cpp in Sources */,
 				4DDBBB5B1C7AE45900054AFF /* dynam.cpp in Sources */,
 				4D5572441CF57B5C008D06A0 /* pedal.cpp in Sources */,
@@ -1182,11 +1109,9 @@
 				4DB726C51B8BB0E80040231B /* text.cpp in Sources */,
 				4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */,
-				4D5FA9281E1E6E1800F3B919 /* MxmlPart.cpp in Sources */,
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
 				4DF440771D39575500152B7E /* ending.cpp in Sources */,
 				4DB351141C8040B1002DD057 /* dir.cpp in Sources */,
-				4D5FA9241E1E6E1800F3B919 /* GridVoice.cpp in Sources */,
 				8F086EF8188539540037FD8E /* note.cpp in Sources */,
 				4D5FA9111E16A93F00F3B919 /* boundingbox.cpp in Sources */,
 				4D1031861DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */,
@@ -1207,7 +1132,6 @@
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
 				4DA80D961A6ACF5D0089802D /* style.cpp in Sources */,
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
-				4D5FA9271E1E6E1800F3B919 /* MxmlMeasure.cpp in Sources */,
 				4D20B5EC1B873A1300EA9EC3 /* scoredefinterface.cpp in Sources */,
 				4D95D4F21D6E042400B2B856 /* section.cpp in Sources */,
 				4D1BE7731C688F5A0086DC0E /* MidiMessage.cpp in Sources */,
@@ -1216,20 +1140,16 @@
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
 				4D1BE7711C688F5A0086DC0E /* MidiFile.cpp in Sources */,
 				8F086F05188539540037FD8E /* tuplet.cpp in Sources */,
-				4D5FA9261E1E6E1800F3B919 /* MxmlEvent.cpp in Sources */,
 				4D1BE7851C6A40A80086DC0E /* pugixml.cpp in Sources */,
 				4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				8F086F06188539540037FD8E /* view_beam.cpp in Sources */,
-				4D5FA9141E1E6A1000F3B919 /* tool-musicxml2hum.cpp in Sources */,
 				8F086F08188539540037FD8E /* view_element.cpp in Sources */,
-				4D5FA9231E1E6E1800F3B919 /* GridStaff.cpp in Sources */,
 				8F086F09188539540037FD8E /* view_graph.cpp in Sources */,
 				8F086F0A188539540037FD8E /* view_page.cpp in Sources */,
 				8F086F0B188539540037FD8E /* view_tuplet.cpp in Sources */,
 				4DB726C01B8B9F480040231B /* rpt.cpp in Sources */,
 				2D2A799A1A69812C000A441B /* chord.cpp in Sources */,
 				8F086F0C188539540037FD8E /* view.cpp in Sources */,
-				4D5FA9201E1E6E1800F3B919 /* GridPart.cpp in Sources */,
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
@@ -1239,7 +1159,6 @@
 				4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */,
 				4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */,
 				4D422104199805F800963292 /* att.cpp in Sources */,
-				4D5FA9251E1E6E1800F3B919 /* HumGrid.cpp in Sources */,
 				4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
 				4DF289FF1A7545E500BA9F7D /* timeinterface.cpp in Sources */,
@@ -1247,7 +1166,6 @@
 				4D1D73401A1D08DC001E08F6 /* glyph.cpp in Sources */,
 				4D9A9C1E19A1DE2000028D93 /* syl.cpp in Sources */,
 				4DA3FCD319B61DB300CBDFE6 /* atts_cmn.cpp in Sources */,
-				4DA20ED51D0F156600706C4A /* humlib.cpp in Sources */,
 				4DF28A051A754DF000BA9F7D /* floatingobject.cpp in Sources */,
 				4DF9D2831C18DC490069E8C8 /* atts_mei.cpp in Sources */,
 				4D3FF8DB19BADD7A00B105B5 /* atts_pagebased.cpp in Sources */,
@@ -1372,6 +1290,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
+					NO_HUMDRUM_SUPPORT,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -1414,6 +1333,7 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = NO_HUMDRUM_SUPPORT;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
