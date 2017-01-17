@@ -9,8 +9,6 @@ projects:
     - [["http://oerc.ox.ac.uk/", "oerc"],["http://www.kb.dk/en/nb/dcm/projekter/mermeid.html", "mermeid"],["http://scorelib.huma-num.fr/", "neuma"]]
     - [["http://ncodamusic.org/", "ncoda"], ["http://www.rism.info", "rism"], ["http://kern.ccarh.org", "ccarh"]]
     - [["http://en.chopin.nifc.pl/institute/library/archives", "nifc"], ["http://www.oeaw.ac.at/ikm/forschung/digital-musicology/digitale-musikanalyse-mit-mei/", "oeaw"], []]
-movies:
-    - ["choice", "editor", "layout"]
 ---
 <div class="row home-row">
     <div class="col-md-5 col-sm-12 home-panel">
@@ -78,25 +76,48 @@ movies:
 
 <div class="row home-row">
     <div class="col-sm-6 hidden-xs">
-        <div id="video" class="panel-body panel-video">
-            <video autoplay="false" loop="true" class="img-responsive window-shadow hidden">
-                <source src="/movies/editor.webm" type="video/webm"/>
-                <source src="/movies/editor.mp4" type="video/mp4"/>
-            </video>
-            <video autoplay="false" loop="true" class="img-responsive window-shadow hidden">
-                <source src="/movies/choice.webm" type="video/webm"/>
-                <source src="/movies/choice.mp4" type="video/mp4"/>
-            </video>
-            <video autoplay="false" loop="true" class="img-responsive window-shadow hidden">
-                <source src="/movies/layout.webm" type="video/webm"/>
-                <source src="/movies/layout.mp4" type="video/mp4"/>
-            </video>
+        <div id="video-carousel" class="carousel slide" data-ride="carousel" data-interval="1100">
+            <!-- Indicators -->
+            <ol class="carousel-indicators">
+                <li data-target="#video-carousel" data-slide-to="0"></li>
+                <li data-target="#video-carousel" data-slide-to="1"></li>
+                <li data-target="#video-carousel" data-slide-to="2"></li>
+                <li data-target="#video-carousel" data-slide-to="2"></li>
+            </ol>
+
+            <!-- Wrapper for slides -->
+            <div class="carousel-inner" role="listbox">
+                <div class="item">
+                    <video autoplay="false" loop="true" class="img-responsive">
+                        <source src="/movies/editor.webm" type="video/webm"/>
+                        <source src="/movies/editor.mp4" type="video/mp4"/>
+                    </video>.
+                </div>
+                <div class="item">
+                    <video autoplay="false" loop="true" class="img-responsive">
+                        <source src="/movies/reflow.webm" type="video/webm"/>
+                        <source src="/movies/reflow.mp4" type="video/mp4"/>
+                    </video>
+                </div>
+                <div class="item">
+                    <video autoplay="false" loop="true" class="img-responsive">
+                        <source src="/movies/layout.webm" type="video/webm"/>
+                        <source src="/movies/layout.mp4" type="video/mp4"/>
+                    </video>
+                </div>
+                <div class="item">
+                    <video autoplay="false" loop="true" class="img-responsive">
+                        <source src="/movies/choice.webm" type="video/webm"/>
+                        <source src="/movies/choice.mp4" type="video/mp4"/>
+                    </video>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-sm-6 col-xs-12">
         <div class="panel-body home-panel">
             <p>
-                The SVG output of Verovio is designed as an <strong>intermediate layer</strong> that facilitates the development of <strong>interactive applications</strong>, such as music notation editors or interactive digital editions.
+                The SVG output of Verovio is designed as an <strong>intermediate reflowable layer</strong> that facilitates the development of <strong>interactive applications</strong>, such as music notation editors or interactive digital editions.
             </p>
             <table align="center">
                 <tr>
@@ -178,8 +199,9 @@ movies:
 <script type="text/javascript">
 //<![CDATA[
     $( document ).ready(function() {
-        rand = Math.floor( Math.random() * 3);
-        $('#video video').eq(rand).removeClass("hidden").attr("autoplay", "true");
+        rand = Math.floor( Math.random() * 4);
+        $('#video-carousel .carousel-indicators li').eq(rand).addClass("active");
+        $('#video-carousel .carousel-inner div').eq(rand).addClass("active");
     });
 //]]>
 </script>

@@ -169,6 +169,20 @@ code.panel-header {
     display: none;
 }
 
+.carousel-indicators {
+  bottom:-50px;
+}
+
+.carousel-indicators li {
+  border-color:#999;
+  background-color:#ccc;
+}
+
+.carousel-inner {
+   margin-bottom:50px;
+   border:  2px solid #ccc;
+}
+
 // Fixing image within tables
 table .img-responsive {
     width:100%;
