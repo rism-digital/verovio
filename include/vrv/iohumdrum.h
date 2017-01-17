@@ -15,10 +15,10 @@
 //----------------------------------------------------------------------------
 
 #include "attdef.h"
-#include "io.h"
-#include "vrvdef.h"
 #include "clef.h"
 #include "ending.h"
+#include "io.h"
+#include "vrvdef.h"
 
 //----------------------------------------------------------------------------
 
@@ -167,6 +167,8 @@ public:
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
     char editacc = '\0'; // !!!RDF**kern: i = editorial accidental
+	char slurbelow = '\0'; // !!!RDF**kern: i = slur below
+	char slurabove = '\0'; // !!!RDF**kern: i = slur above
 
     // coloring of notes (add rests later):
     // !!!RDF**kern: i = marked note, color="#553325"
@@ -257,7 +259,7 @@ protected:
     void removeTuplet(vector<string> &elements, vector<void *> &pointers);
     void removeGBeam(vector<string> &elements, vector<void *> &pointers);
     void removeBeam(vector<string> &elements, vector<void *> &pointers);
-    vrv::Clef* insertClefElement(vector<string> &elements, vector<void *> &pointers, hum::HTp clef);
+    vrv::Clef *insertClefElement(vector<string> &elements, vector<void *> &pointers, hum::HTp clef);
     void insertMeterSigElement(
         vector<string> &elements, vector<void *> &pointers, vector<hum::HTp> &layeritems, int index);
     void processSlur(hum::HTp token);

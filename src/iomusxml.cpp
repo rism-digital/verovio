@@ -390,7 +390,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
 
     pugi::xpath_node scoreMidiBpm = root.select_single_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
     if (scoreMidiBpm) m_doc->m_scoreDef.SetMidiBpm(atoi(GetAttributeValue(scoreMidiBpm.node(), "tempo").c_str()));
-    
+
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
         pugi::xpath_node xpathNode = *it;
@@ -526,7 +526,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
         // We read all attribute elements until we reach something else
         // However, print might be present too. What else? This is not clear and not robust.
-        if (!IsElement(*it, "attributes") && !IsElement(*it, "print")) break;
+        if (!IsElement(*it, "attributes") && !IsElement(*it, "print") && !IsElement(*it, "sound")) break;
 
         // we do not want to read it again, just change the name
         it->set_name("mei-read");

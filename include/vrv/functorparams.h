@@ -523,7 +523,7 @@ public:
     GenerateMIDIParams(MidiFile *midiFile)
     {
         m_midiFile = midiFile;
-        m_midiTrack = 0;
+        m_midiTrack = 1;
         m_currentMeasureTime = 0.0;
         m_totalTime = 0.0;
         m_transSemi = 0;

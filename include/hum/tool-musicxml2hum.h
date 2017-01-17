@@ -79,6 +79,11 @@ class Tool_musicxml2hum {
 		                              vector<SimultaneousEvents*>& nowevents,
 		                              HumNum nowtime,
 		                              vector<MxmlPart>& partdata);
+		void   addGraceLines         (GridMeasure* outdata,
+		                              vector<vector<vector<vector<MxmlEvent*> > > >& notes,
+		                              vector<MxmlPart>& partdata, HumNum nowtime);
+		void   addEventToList        (vector<vector<vector<vector<MxmlEvent*> > > >& list, 
+		                              MxmlEvent* event);
 
 		bool convert          (ostream& out);
 		bool convertPart      (ostream& out, const string& partname,
@@ -139,6 +144,8 @@ class Tool_musicxml2hum {
 		Options m_options;
 		bool DebugQ;
 		bool VoiceDebugQ;
+		int m_slurabove = 0;
+		int m_slurbelow = 0;
 
 };
 

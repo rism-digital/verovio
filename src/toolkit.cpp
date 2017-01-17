@@ -248,7 +248,7 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
 #else
     FileFormat musicxmlDefault = MUSICXML;
 #endif
-    
+
     size_t searchLimit = 600;
     if (data.size() == 0) {
         return UNKNOWN;
@@ -432,7 +432,7 @@ bool Toolkit::LoadData(const std::string &data)
         }
 
         SetHumdrumBuffer(tempinput->GetHumdrumString().c_str());
-        
+
         if (GetOutputFormat() == HUMDRUM) {
             return true;
         }
@@ -996,7 +996,7 @@ void Toolkit::SetHumdrumBuffer(const char *data)
         strcpy(m_humdrumBuffer, output.c_str());
     }
     else {
-        int size = strlen(data) + 1;
+        int size = (int)strlen(data) + 1;
         m_humdrumBuffer = (char *)malloc(size);
         if (!m_humdrumBuffer) {
             // something went wrong
@@ -1006,7 +1006,7 @@ void Toolkit::SetHumdrumBuffer(const char *data)
     }
 
 #else
-    int size = strlen(data) + 1;
+    size_t size = (int)strlen(data) + 1;
     m_humdrumBuffer = (char *)malloc(size);
     if (!m_humdrumBuffer) {
         // something went wrong
