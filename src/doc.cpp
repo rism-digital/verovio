@@ -164,7 +164,6 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
     // Set tempo
     if (m_scoreDef.HasMidiBpm()) {
-        midiFile->addTrack(0);
         midiFile->addTempo(0, 0, m_scoreDef.GetMidiBpm());
     }
 
@@ -179,10 +178,12 @@ void Doc::ExportMIDI(MidiFile *midiFile)
         // Get the transposition (semi-tone) value for the staff
         if (StaffDef *staffDef = this->m_scoreDef.GetStaffDef(staves->first)) {
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
+            midiTrack = staffDef->GetN();
+            midiFile->addTrack();
+            if (staffDef->HasLabel()) midiFile->addTrackName(midiTrack, 0, staffDef->GetLabel());
         }
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            midiFile->addTrack(1);
             filters.clear();
             // Create ad comparison object for each type / @n
             AttCommonNComparison matchStaff(STAFF, staves->first);
@@ -192,14 +193,13 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
             GenerateMIDIParams generateMIDIParams(midiFile);
             generateMIDIParams.m_maxValues = calcMaxMeasureDurationParams.m_maxValues;
+            generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
 
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);
-
-            midiTrack++;
         }
     }
 

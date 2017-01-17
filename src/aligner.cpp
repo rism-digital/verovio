@@ -99,12 +99,6 @@ StaffAlignment::StaffAlignment() : Object()
     m_yShift = 0;
     m_verseCount = 0;
     m_staff = NULL;
-    m_dirAbove = false;
-    m_dirBelow = false;
-    m_dynamAbove = false;
-    m_dynamBelow = false;
-    m_hairpinAbove = false;
-    m_hairpinBelow = false;
 
     m_overflowAbove = 0;
     m_overflowBelow = 0;

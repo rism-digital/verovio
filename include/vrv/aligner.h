@@ -254,17 +254,6 @@ private:
      * Stores the number of verse of the staves attached to the aligner
      */
     int m_verseCount;
-    /**
-     * @name indicator for the presence of above and below dynam/hairpin
-     */
-    ///@{
-    bool m_dirAbove;
-    bool m_dirBelow;
-    bool m_dynamAbove;
-    bool m_dynamBelow;
-    bool m_hairpinAbove;
-    bool m_hairpinBelow;
-    ///@}
 
     /**
      * @name values for storing the overlow and overlap

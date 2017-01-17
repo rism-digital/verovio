@@ -181,6 +181,7 @@ enum {
     SMUFL_E611_stringsDownBowTurned = 0xE611,
     SMUFL_E612_stringsUpBow = 0xE612,
     SMUFL_E613_stringsUpBowTurned = 0xE613,
+    SMUFL_E614_stringsHarmonic = 0xE614,
     SMUFL_E650_keyboardPedalPed = 0xE650,
     SMUFL_E655_keyboardPedalUp = 0xE655,
     SMUFL_E880_tuplet0 = 0xE880,
@@ -221,7 +222,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 196
+#define SMUFL_COUNT 197
 
 } // vrv namespace
 

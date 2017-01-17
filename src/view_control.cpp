@@ -60,9 +60,9 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(measure);
     assert(element);
 
-    // For dir, dynam, and harm, we do not consider the @tstamp2 for rendering
+    // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
     if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DIR) && (element->Is() != DYNAM)
-        && (element->Is() != HARM)) {
+        && (element->Is() != FERMATA) && (element->Is() != HARM)) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -1810,34 +1810,34 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     assert(system);
     assert(measure);
     assert(trill);
-    
-    // We cannot draw a fermata that has no start position
+
+    // We cannot draw a trill that has no start position
     if (!trill->GetStart()) return;
-    
+
     dc->StartGraphic(trill, "", trill->GetUuid());
-    
+
     int x = trill->GetStart()->GetDrawingX();
-    
+
     // for a start always put trill up
     int code = SMUFL_E566_ornamentTrill;
-    
+
     std::wstring str;
     str.push_back(code);
-    
+
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = trill->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, x, (*staffIter)->GetDrawingY());
         int y = trill->GetDrawingY();
-        
+
         // Adjust the x position
         int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
-        
+
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
         DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
         dc->ResetFont();
     }
-    
+
     dc->EndGraphic(trill, this);
 }
 
