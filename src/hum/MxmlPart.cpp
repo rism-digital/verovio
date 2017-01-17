@@ -465,6 +465,7 @@ void MxmlPart::prepareVoiceMapping(void) {
 	for (j=1; j<=maxvoicenum; j++) {
 		maxcount = -1;
 		homestaffnum = -1;
+		homevoicenum = -1;
 		for (i=1; i<(int)sv.size(); i++) {
 			if (j >= (int)sv[i].size()) {
 				continue;
