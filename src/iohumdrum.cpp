@@ -76,6 +76,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
+#include "trill.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -2172,6 +2173,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processDynamics(layerdata[i], staffindex);
             processDirection(layerdata[i], staffindex);
             addArticulations(chord, layerdata[i]);
+            addTrill(layerdata[i]);
             addFermata(layerdata[i]);
         }
         else if (layerdata[i]->isRest()) {
@@ -2210,6 +2212,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             colorNote(note, layerdata[i]);
             addArticulations(note, layerdata[i]);
+            addTrill(layerdata[i]);
             addFermata(layerdata[i]);
         }
 
@@ -2345,23 +2348,15 @@ void HumdrumInput::addOrnamentMarkers(HTp token)
     if (!token) {
         return;
     }
-    if (strchr(token->c_str(), 'm') != NULL) {
+    if (strchr(token->c_str(), 'm') != NULL) {  // mordent
         token->setValue("LO", "TX", "t", "m");
         token->setValue("LO", "TX", "a", "true");
     }
-    else if (strchr(token->c_str(), 'M') != NULL) {
+    else if (strchr(token->c_str(), 'M') != NULL) {  // mordent
         token->setValue("LO", "TX", "t", "M");
         token->setValue("LO", "TX", "a", "true");
     }
-    else if (strchr(token->c_str(), 't') != NULL) {
-        token->setValue("LO", "TX", "t", "t");
-        token->setValue("LO", "TX", "a", "true");
-    }
-    else if (strchr(token->c_str(), 'T') != NULL) {
-        token->setValue("LO", "TX", "t", "T");
-        token->setValue("LO", "TX", "a", "true");
-    }
-    else if (strchr(token->c_str(), 'O') != NULL) {
+    else if (strchr(token->c_str(), 'O') != NULL) { // generic ornament
         token->setValue("LO", "TX", "t", "*");
         token->setValue("LO", "TX", "a", "true");
     }
@@ -4555,6 +4550,34 @@ void HumdrumInput::addFermata(HTp token)
             //}
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addTrill -- Add for note.
+//
+// Todo: check the interval of the trill to see 
+// if an accidental needs to be placed above it.
+//    t = minor second trill
+//    T = major second trill
+//
+
+void HumdrumInput::addTrill(HTp token)
+{
+	if (!((token->find("T") != string::npos) || (token->find("t") != string::npos))) {
+		// no trill on note(s)
+		return;
+	}
+
+    // int layer = m_currentlayer; // maybe place below if in layer 2
+    int staff = m_currentstaff;
+
+    Trill *trill = new Trill;
+    appendElement(m_measure, trill);
+    setStaff(trill, staff);
+	// using tstamp for now, but @startid is perhaps better?
+    HumNum tstamp = getMeasureTstamp(token, staff - 1);
+    trill->SetTstamp(tstamp.getFloat());
 }
 
 //////////////////////////////
