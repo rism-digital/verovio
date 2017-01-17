@@ -1,0 +1,73 @@
+---
+---
+<h4>Articulations</h4>
+
+<p>
+    Verovio supports both <code>@artic</code> on notes and <code>&lt;artic&gt;</code> for the encoding articulations. Currently, the articulation values supported are:
+</p>
+<ul>
+    <li><code>acc</code></li>
+    <li><code>stacc</code></li>
+    <li><code>ten</code></li>
+    <li><code>stacciss</code></li>
+    <li><code>marc</code></li>
+    <li><code>marc-stacc</code></li>
+    <li><code>spicc</code></li>
+    <li><code>ten-stacc</code></li>
+    <li><code>dnbow</code></li>
+    <li><code>upbow</code></li>
+    <li><code>harm</code></li>
+</ul>
+
+<div id="svg_output-1" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code1" file="artic1.mei" %}
+<div id="code1-xml" style="display: none">
+{% highlight xml %}
+{% include features/artic1.txt %}
+{% endhighlight %}
+</div>
+
+<!-- ***************************** -->
+<hr/>
+<p>
+    Verovio will try to place articulation signs above or below appropriately, including when more that one value is given in the <code>@artic</code> attribute.
+</p>
+
+
+<div id="svg_output-2" style="overflow:auto;"/>
+
+{% include mei-excerpt.html id="code2" file="artic2.mei" %}
+<div id="code2-xml" style="display: none">
+{% highlight xml %}
+{% include features/artic2.txt %}
+{% endhighlight %}
+</div>
+
+<!-- ***************************** -->
+<hr/>
+<p>
+    The placement above or below with attribute <code>@place</code> is also supported. Up to two <code>artic</code> child elements (one above and one below) are supported. 
+</p>
+
+<script type="text/javascript">
+//<![CDATA[
+    zoom = 60;
+    pageWidth = 1500;
+    border = 10;
+
+    // adjust the zoom for small screens
+    width = $('#feature').width();
+    if ( width < zoom * pageWidth / 100 ) {
+        zoom = width * 100 / pageWidth;
+    }
+
+    $.get( "{{ site.baseurl }}/examples/features/artic1.mei" , function( data ) {
+        load_data( data, $('#svg_output-1') );
+    });
+
+    $.get( "{{ site.baseurl }}/examples/features/artic2.mei" , function( data ) {
+        load_data( data, $('#svg_output-2') );
+    });
+//]]>
+</script>
