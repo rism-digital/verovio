@@ -176,6 +176,21 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         }
     }
 
+    if (object->HasAttClass(ATT_TYPOGRAPHY)) {
+        AttTypography *att = dynamic_cast<AttTypography *>(object);
+        assert(att);
+        if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
+        if (att->GetFontstyle() != FONTSTYLE_NONE) {
+            if (att->GetFontstyle() == FONTSTYLE_italic) m_currentNode.append_attribute("font-style") = "italic";
+            else if (att->GetFontstyle() == FONTSTYLE_normal) m_currentNode.append_attribute("font-style") = "normal";
+            else if (att->GetFontstyle() == FONTSTYLE_oblique) m_currentNode.append_attribute("font-style") = "oblique";
+        }
+        if (att->GetFontweight() != FONTWEIGHT_NONE) {
+            if (att->GetFontweight() == FONTWEIGHT_bold) m_currentNode.append_attribute("font-weight") = "bold";
+            else m_currentNode.append_attribute("font-weight") = "normal";
+        }
+    }
+
     if (object->HasAttClass(ATT_VISIBILITY)) {
         AttVisibility *att = dynamic_cast<AttVisibility *>(object);
         assert(att);
@@ -214,6 +229,21 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         assert(att);
         if (att->HasLang()) {
             m_currentNode.append_attribute("xml:lang") = att->GetLang().c_str();
+        }
+    }
+
+    if (object->HasAttClass(ATT_TYPOGRAPHY)) {
+        AttTypography *att = dynamic_cast<AttTypography *>(object);
+        assert(att);
+        if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
+        if (att->GetFontstyle() != FONTSTYLE_NONE) {
+            if (att->GetFontstyle() == FONTSTYLE_italic) m_currentNode.append_attribute("font-style") = "italic";
+            else if (att->GetFontstyle() == FONTSTYLE_normal) m_currentNode.append_attribute("font-style") = "normal";
+            else if (att->GetFontstyle() == FONTSTYLE_oblique) m_currentNode.append_attribute("font-style") = "oblique";
+        }
+        if (att->GetFontweight() != FONTWEIGHT_NONE) {
+            if (att->GetFontweight() == FONTWEIGHT_bold) m_currentNode.append_attribute("font-weight") = "bold";
+            else m_currentNode.append_attribute("font-weight") = "normal";
         }
     }
 }
@@ -611,25 +641,6 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     }
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
-    }
-    if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
-        if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
-            textChild.append_attribute("font-style") = "italic";
-        }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
-            textChild.append_attribute("font-style") = "normal";
-        }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_oblique) {
-            textChild.append_attribute("font-style") = "oblique";
-        }
-    }
-    if (m_fontStack.top()->GetWeight() != FONTWEIGHT_NONE) {
-        if (m_fontStack.top()->GetWeight() == FONTWEIGHT_bold) {
-            textChild.append_attribute("font-weight") = "bold";
-        }
-        else if (m_fontStack.top()->GetWeight() == FONTWEIGHT_normal) {
-            textChild.append_attribute("font-weight") = "normal";
-        }
     }
     textChild.append_attribute("class") = "text";
     textChild.append_attribute("xml:space") = "preserve";
