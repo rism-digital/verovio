@@ -2290,7 +2290,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             //	artics.push_back(ARTICULATION_acc_stacc);
         }
         else if (token->find('^') != string::npos) {
-			// no composite articulation for "acc-stacc"
+            // no composite articulation for "acc-stacc"
             artics.push_back(ARTICULATION_acc);
             artics.push_back(ARTICULATION_stacc);
         }
