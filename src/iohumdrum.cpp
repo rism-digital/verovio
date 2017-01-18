@@ -2243,7 +2243,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 //    ARTICULATION_ten,                        *
 //    ARTICULATION_stacciss,                   *
 //    ARTICULATION_marc,                       *
-//    ARTICULATION_marc_stacc,                 *
+//    ARTICULATION_marc_stacc,                 * or use "marc stacc"
 //    ARTICULATION_spicc,
 //    ARTICULATION_doit,
 //    ARTICULATION_scoop,
@@ -2260,7 +2260,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 //    ARTICULATION_harm,                       *
 //    ARTICULATION_snap,
 //    ARTICULATION_fingernail,
-//    ARTICULATION_ten_stacc,                  *
+//    ARTICULATION_ten_stacc,                  * or use "ten stacc"
 //    ARTICULATION_damp,
 //    ARTICULATION_dampall,
 //    ARTICULATION_open,
@@ -2288,6 +2288,11 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             artics.push_back(ARTICULATION_marc_stacc);
             //} else if (token->find('^') != string::npos) {
             //	artics.push_back(ARTICULATION_acc_stacc);
+        }
+        else if (token->find('^') != string::npos) {
+			// no composite articulation for "acc-stacc"
+            artics.push_back(ARTICULATION_acc);
+            artics.push_back(ARTICULATION_stacc);
         }
         else if (token->find('~') != string::npos) {
             artics.push_back(ARTICULATION_ten_stacc);
@@ -2348,11 +2353,11 @@ void HumdrumInput::addOrnamentMarkers(HTp token)
     if (!token) {
         return;
     }
-    if (strchr(token->c_str(), 'm') != NULL) {  // mordent
+    if (strchr(token->c_str(), 'm') != NULL) { // mordent
         token->setValue("LO", "TX", "t", "m");
         token->setValue("LO", "TX", "a", "true");
     }
-    else if (strchr(token->c_str(), 'M') != NULL) {  // mordent
+    else if (strchr(token->c_str(), 'M') != NULL) { // mordent
         token->setValue("LO", "TX", "t", "M");
         token->setValue("LO", "TX", "a", "true");
     }
@@ -4556,7 +4561,7 @@ void HumdrumInput::addFermata(HTp token)
 //
 // HumdrumInput::addTrill -- Add for note.
 //
-// Todo: check the interval of the trill to see 
+// Todo: check the interval of the trill to see
 // if an accidental needs to be placed above it.
 //    t = minor second trill
 //    T = major second trill
@@ -4564,10 +4569,10 @@ void HumdrumInput::addFermata(HTp token)
 
 void HumdrumInput::addTrill(HTp token)
 {
-	if (!((token->find("T") != string::npos) || (token->find("t") != string::npos))) {
-		// no trill on note(s)
-		return;
-	}
+    if (!((token->find("T") != string::npos) || (token->find("t") != string::npos))) {
+        // no trill on note(s)
+        return;
+    }
 
     // int layer = m_currentlayer; // maybe place below if in layer 2
     int staff = m_currentstaff;
@@ -4575,7 +4580,7 @@ void HumdrumInput::addTrill(HTp token)
     Trill *trill = new Trill;
     appendElement(m_measure, trill);
     setStaff(trill, staff);
-	// using tstamp for now, but @startid is perhaps better?
+    // using tstamp for now, but @startid is perhaps better?
     HumNum tstamp = getMeasureTstamp(token, staff - 1);
     trill->SetTstamp(tstamp.getFloat());
 }
