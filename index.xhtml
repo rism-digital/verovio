@@ -10,9 +10,9 @@ projects:
     - [["http://ncodamusic.org/", "ncoda"], ["http://www.rism.info", "rism"], ["http://kern.ccarh.org", "ccarh"]]
     - [["http://en.chopin.nifc.pl/institute/library/archives", "nifc"], ["http://www.oeaw.ac.at/ikm/forschung/digital-musicology/digitale-musikanalyse-mit-mei/", "oeaw"], []]
 ---
-<div class="row home-row">
-    <div class="col-md-5 col-sm-12 home-panel">
-        <div class="panel-body">
+<div class="row home-row home-row-flex">
+    <div class="col-md-5 col-sm-12">
+        <div class="panel-body home-panel">
             <p>
                 Verovio is a fast, portable and lightweight <strong>open-source</strong> library for engraving <strong>Music Encoding Initiative</strong> (MEI) music scores into SVG.
             </p>
@@ -46,35 +46,7 @@ projects:
     </div>
 </div>
 
-
-<div class="row home-row">
-<!--
-    <div class="col-xs-12">
-        <div class="panel-body">
-            <p>
-                Verovio is designed to be usable in a wide range of technical environments (C++, JavaScript, Python). It is available under the <a href="http://www.gnu.org/copyleft/lgpl.html" target="_blank">LGPLv3 license</a>
-            </p>
-        </div>
-    </div>
-</div>
-<div class="row">
--->
-    <div class="col-sm-4 hidden-xs">
-        <img src="{{ site.baseurl }}/images/mobiles.png" class="img-responsive"/>
-    </div>
-    <div class="col-sm-8 col-xs-12">
-        <div class="panel-body home-panel">
-            <p>
-                Verovio is designed to be usable in a wide range of technical environments (<a href="{{ site.baseurl }}/command-line.xhtml">C++</a>, <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript</a>, <a href="{{ site.baseurl }}/python.xhtml">Python</a>).
-            </p>
-            <p>
-                It works on desktop computers but also tablets and mobile devices. Verovio also provides basic support for other music notation format, such as <a href="{{ site.baseurl }}/musicxml.xhtml">MusicXML import</a> and <a href="{{ site.baseurl }}/midi.xhtml">MIDI output</a>.
-            </p>
-        </div>
-    </div>
-</div>
-
-<div class="row home-row">
+<div class="row home-row home-row-flex">
     <div class="col-sm-6 hidden-xs">
         <div id="video-carousel" class="carousel slide" data-ride="carousel" data-interval="11000">
             <!-- Indicators -->
@@ -130,6 +102,53 @@ projects:
     </div>
 </div>
 
+<div class="row home-row">
+    <div class="col-lg-4 col-sm-12">
+        <p>
+            Verovio is developed by the <a href="http://rism-ch.org/" target="_blank">Swiss RISM Office</a> and is supported by the Swiss National Science Foundation and the Salzburg Mozarteum Foundation. 
+        </p>
+        <p>
+            The source code is available on <a href="https://github.com/rism-ch/verovio">GitHub</a> under the <a href="http://www.gnu.org/copyleft/lgpl.html" target="_blank">LGPLv3 license</a>.
+        </p>
+    </div>
+    <div class="col-lg-8 col-sm-12">
+        <table align="center">
+            <tr>
+                <td>
+                    <a href="http://www.rism-ch.org" target="_blank">
+                        <img alt="RISM logo" src="{{ site.baseurl }}/images/rism-ch.png" style="padding: 10px" class="img-responsive"/>
+                    </a>
+                </td>
+                <td>
+                    <a href="http://www.snf.ch" target="_blank">
+                        <img alt="SNF logo" src="{{ site.baseurl }}/images/snf.png" style="padding: 10px" class="img-responsive"/>
+                    </a>
+                </td>
+                <td>
+                    <a href="http://www.mozarteum.at" target="_blank">
+                        <img alt="SNF logo" src="{{ site.baseurl }}/images/mozarteum.png" style="padding: 10px;" class="img-responsive"/>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="row home-row home-row-flex">
+    <div class="col-sm-4 hidden-xs">
+        <img src="{{ site.baseurl }}/images/mobiles.png" class="img-responsive"/>
+    </div>
+    <div class="col-sm-8 col-xs-12">
+        <div class="panel-body home-panel">
+            <p>
+                Verovio is designed to be usable in a wide range of technical environments (<a href="{{ site.baseurl }}/command-line.xhtml">C++</a>, <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript</a>, <a href="{{ site.baseurl }}/python.xhtml">Python</a>).
+            </p>
+            <p>
+                It works on desktop computers but also tablets and mobile devices. Verovio also provides basic support for other music notation format, such as <a href="{{ site.baseurl }}/musicxml.xhtml">MusicXML import</a> and <a href="{{ site.baseurl }}/midi.xhtml">MIDI output</a>.
+            </p>
+        </div>
+    </div>
+</div>
 
 <div class="row home-row">
     <div class="col-xs-12">
@@ -169,27 +188,6 @@ projects:
             <tr>
                 <td>
                     <img alt="Verovio canon" src="{{ site.baseurl }}/images/verovio-canon.png" class="img-responsive"/>
-                </td>
-            </tr>
-        </table>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-12">
-        <p>
-            Verovio is developed by the <a href="http://rism-ch.org/" target="_blank">Swiss RISM Office</a> and is supported by the Swiss National Science Foundation. It is available under the <a href="http://www.gnu.org/copyleft/lgpl.html" target="_blank">LGPLv3 license</a>.
-        </p>
-        <table align="center">
-            <tr>
-                <td>
-                    <a href="http://www.rism-ch.org" target="_blank">
-                        <img alt="RISM logo" src="{{ site.baseurl }}/images/rism_header_72a.png" style="padding: 20px 0px;" class="img-responsive"/>
-                    </a>
-                </td>
-                <td>
-                    <a href="http://www.snf.ch" target="_blank">
-                        <img alt="SNF logo" src="{{ site.baseurl }}/images/snf.png" style="padding: 20px" class="img-responsive"/>
-                    </a>
                 </td>
             </tr>
         </table>

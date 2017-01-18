@@ -16,14 +16,14 @@
     <music>
         <body>
             <mdiv>
-                <score label="feature-example">
+                <score>
                     <scoreDef>
                         <staffGrp>
                             <staffDef clef.shape="C" clef.line="1" n="1" lines="5" />
                         </staffGrp>
                     </scoreDef>
                     <section>
-                        <measure n="1" right="dbl">
+                        <measure n="1" right="dbl" label="feature-example">
                             <staff n="1">
                                 <layer n="1">
                                     <note dur="4" oct="4" pname="g" stem.dir="down" />
