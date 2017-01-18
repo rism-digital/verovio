@@ -3,7 +3,7 @@
 <h4>Dynamics</h4>
 
 <p>
-    Verovio supports <code>&lt;dynam&gt;</code> elements. Horizontal positioning can be specified using either the <code>@startid</code> or <code>@tstamp</code> attribute. 
+    Verovio supports <code>&lt;dynam&gt;</code> elements. Horizontal positioning can be specified using either the <code>@startid</code> or <code>@tstamp</code> attribute.
 </p>
 <p>
     When the text of the dynamic has corresponding code in SMUFL, the music font will be used. For example, for  <code>&lt;dynam&gt;p&lt;/dynam&gt;</code>, the SMuFL character U+E520 (dynamicPiano) will be used. Dynamics with corresponding SMuFL code are centered under the horizontal alignment points.
@@ -87,14 +87,14 @@
 //<![CDATA[
     zoom = 40;
     pageWidth = 1450;
-    
-    
+
+
     // adjust the zoom for small screens
     width = $('#feature').width();
     if ( width < zoom * pageWidth / 100 ) {
         zoom = width * 100 / pageWidth;
     }
-    
+
     $.get( "{{ site.baseurl }}/examples/features/dynam1.mei" , function( data ) {
         load_data( data, $('#svg_output-1') );
     });
@@ -102,16 +102,16 @@
     $.get( "{{ site.baseurl }}/examples/features/dynam2.mei" , function( data ) {
         load_data( data, $('#svg_output-2') );
     });
-    
+
     $.get( "{{ site.baseurl }}/examples/features/dynam3.mei" , function( data ) {
         load_data( data, $('#svg_output-3') );
     });
-    
+
     $.get( "{{ site.baseurl }}/examples/features/hairpin1.mei" , function( data ) {
         pageWidth = 1000;
         load_data( data, $('#svg_output-4') );
     });
-    
+
     $.get( "{{ site.baseurl }}/examples/features/hairpin2.mei" , function( data ) {
         spacingStaff = 8;
         pageWidth = 1450;

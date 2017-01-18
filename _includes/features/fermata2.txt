@@ -1,0 +1,31 @@
+<section>
+  <measure n="1">
+    <staff n="1">
+      <layer n="1">
+        <note xml:id="note-000000191714646" dur="4" oct="3" pname="f" stem.dir="down"/>
+        <chord xml:id="chord-000000067789064" dur="4" stem.dir="up">
+          <note xml:id="note-000000002150297" oct="2" pname="e"/>
+          <note xml:id="note-000000188536483" oct="3" pname="c"/>
+          <note xml:id="note-000000214724163" oct="3" pname="f"/>
+          <note xml:id="note-000000055724040" oct="3" pname="a"/>
+          <note xml:id="note-000000001818902" oct="4" pname="d"/>
+        </chord>
+        <rest xml:id="rest-000000131319457" dur="4"/>
+        <rest xml:id="rest-000000070546468" dur="4"/>
+      </layer>
+    </staff>
+    <fermata staff="1" startid="#note-000000191714646"/>
+    <fermata staff="1" startid="#chord-000000067789064" form="inv" place="below" shape="angular"/>
+    <fermata staff="1" startid="#rest-000000131319457" form="norm" place="above" shape="square"/>
+    <fermata staff="1" startid="#rest-000000070546468" form="inv" place="above" shape="square"/>
+    <fermata staff="1" tstamp="5" place="above"/>
+    <fermata staff="1" tstamp="5" place="below"/>
+  </measure>
+  <measure xml:id="measure-000000189229453" n="2" right="end">
+    <staff xml:id="staff-000000199557099" n="1">
+      <layer xml:id="layer-000000065308385" n="1">
+        <mRest xml:id="mrest-000000001988686" fermata="above"/>
+      </layer>
+    </staff>
+  </measure>
+</section>

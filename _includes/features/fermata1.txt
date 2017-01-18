@@ -1,0 +1,25 @@
+<section>
+  <measure n="1">
+    <staff n="1">
+      <layer n="1">
+        <note dur="4" oct="3" pname="f" stem.dir="down" fermata="above"/>
+        <chord dur="4" stem.dir="up" fermata="below">
+          <note oct="2" pname="e"/>
+          <note oct="3" pname="c"/>
+          <note oct="3" pname="f"/>
+          <note oct="3" pname="a"/>
+          <note oct="4" pname="d"/>
+        </chord>
+        <rest dur="4"/>
+        <rest dur="4" fermata="above"/>
+      </layer>
+    </staff>
+  </measure>
+  <measure n="2" right="end">
+    <staff n="1">
+      <layer n="1">
+        <mRest fermata="above"/>
+      </layer>
+    </staff>
+  </measure>
+</section>
