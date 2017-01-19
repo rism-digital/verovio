@@ -191,10 +191,10 @@ classes:
       - duration.musical # durationInterface
       - duration.performed # durationInterface
       - duration.ratio # durationInterface
-      - fermatapresent # durationInterface
       - articulation
       - color
       - common
+      - fermatapresent
       - stemmed
       - tiepresent
     attributes: []
@@ -284,6 +284,8 @@ classes:
       - mmeterSigDefault.vis
     attributes: []
   - id: "mRest"
+    att-classes:
+      - fermatapresent
   - id: "multiRest"
     att-classes:
       - numbered
@@ -295,13 +297,13 @@ classes:
       - duration.musical # durationInterface
       - duration.performed # durationInterface
       - duration.ratio # durationInterface
-      - fermatapresent # durationInterface
       - accidental # pitchInterface
       - octave # pitchInterface
       - pitch # pitchInterface
       - articulation
       - color
       - coloration
+      - fermatapresent
       - note.log.mensural
       - stemmed
       - tiepresent
@@ -343,12 +345,11 @@ classes:
       - duration.musical # durationInterface
       - duration.performed # durationInterface
       - duration.ratio # durationInterface
-      - fermatapresent # durationInterface
       - color
+      - fermatapresent
+      - staffloc.pitched
     attributes:
       - ["dur.ges", "Gestural duration, for logical durations (e.g. display a breve but space it as a quarter).", ""]
-      - ["oloc", "", ""]
-      - ["ploc", "", ""]
   - id: "scoreDef"
     att-classes:
       - cleffing.log
