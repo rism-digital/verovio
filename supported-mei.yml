@@ -1,7 +1,10 @@
 att-classes:
   - id: "accidental"
     attributes:
-    - ["accid", "Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.", ""]
+    - ["accid", "Supported values: 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.", ""]
+  - id: "articulation"
+    attributes:
+    - ["artic", "", ""]
   - id: "augmentdots"
     attributes:
     - ["dots", "", ""]
@@ -10,7 +13,10 @@ att-classes:
     - ["breaksec", "", ""]
   - id: "barLine.log"
     attributes:
-    - ["rend", "Supported values are: 'single', 'rptboth', 'rptstart', 'rptend', 'dbl', and 'end'.", ""]
+    - ["rend", "Supported values: 'single', 'rptboth', 'rptstart', 'rptend', 'dbl', and 'end'.", ""]
+  - id: "color"
+    attributes:
+    - ["color", "", ""]
   - id: "coloration"
     attributes:
     - ["colored", "", ""]
@@ -22,7 +28,7 @@ att-classes:
     - ["clef.place", "Supported values: 'below'", ""]
   - id: "clefshape"
     attributes:
-    - ["shape", "Supported values are 'C', 'F' and 'G'.", ""]
+    - ["shape", "Supported values: 'C', 'F' and 'G'.", ""]
   - id: "common"
     attributes:
     - ["label", "", ""]
@@ -39,36 +45,46 @@ att-classes:
     - ["numbase", "", ""]
   - id: "fermatapresent"
     attributes:
-    - ["fermata", "Currently always place above", ""]
+    - ["fermata", "", ""]
+  - id: "fermata.vis"
+    attributes:
+    - ["form", "", ""]
+    - ["shape", "", ""]
   - id: "keySigDefault.log"
     attributes:
-    - ["key.accid", "", ""] 
-    - ["key.mode", "", ""] 
-    - ["key.pname", "", ""] 
+    - ["key.accid", "", ""]
+    - ["key.mode", "", ""]
+    - ["key.pname", "", ""]
     - ["key.sig", "Mixed key signatures are not supported.", ""]
+  - id: "lang"
+    attributes:
+    - ["xml:lang", "", ""]
   - id: "lineloc"
     attributes:
-    - ["line", "Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'.", ""]
+    - ["line", "Supported values are 1–5 for shape 'C', 1–2 for 'G' and 3–5 for 'F'.", ""]
   - id: "measure.log"
     attributes:
-    - ["left", "", ""] 
-    - ["right", "", ""] 
+    - ["left", "", ""]
+    - ["right", "", ""]
   - id: "mensur.log"
     attributes:
-    - ["dot", "", ""] 
-    - ["sign", "", ""] 
+    - ["dot", "", ""]
+    - ["sign", "", ""]
   - id: "meterSig.log"
     attributes:
-    - ["count", "", ""] 
-    - ["sym", "", ""] 
-    - ["unit", "", ""] 
+    - ["count", "", ""]
+    - ["sym", "", ""]
+    - ["unit", "", ""]
   - id: "meterSigDefault.log"
     attributes:
-    - ["meter.count", "", ""] 
-    - ["meter.unit", "", ""] 
+    - ["meter.count", "", ""]
+    - ["meter.unit", "", ""]
   - id: "meterSigDefault.vis"
     attributes:
-    - ["meter.sym", "", ""] 
+    - ["meter.sym", "", ""]
+  - id: "miditempo"
+    attributes:
+    - ["midi.bpm", "", ""]
   - id: "numbered"
     attributes:
       - ["num", "", ""]
@@ -82,13 +98,19 @@ att-classes:
   - id: "pitch"
     attributes:
     - ["pitch", "", ""]
+  - id: "placement"
+    attributes:
+    - ["place", "Supported values: 'above' and 'below'", ""]
   - id: "slashcount"
     attributes:
-    - ["slash", "", ""] 
+    - ["slash", "", ""]
   - id: "staffloc.pitched"
     attributes:
     - ["oloc", "", ""]
     - ["ploc", "", ""]
+  - id: "staffident"
+    attributes:
+    - ["staff", "", ""]
   - id: "startendid"
     attributes:
     - ["endid", "", ""]
@@ -97,30 +119,44 @@ att-classes:
     - ["startid", "", ""]
   - id: "stemmed"
     attributes:
-    - ["stem.dir", "", ""] 
-    - ["stem.len", "Not supported yet", ""] 
-    - ["stem.pos", "Not supported yet", ""] 
-    - ["stem.x", "Not supported yet", ""] 
-    - ["stem.y", "Not supported yet", ""] 
+    - ["stem.dir", "", ""]
+    - ["stem.len", "Supported values: 0", ""]
+    - ["stem.pos", "Not supported yet", ""]
+    - ["stem.x", "Not supported yet", ""]
+    - ["stem.y", "Not supported yet", ""]
+  - id: "linerend.base"
+    attributes:
+    - ["lform", "Supported values: 'dashed' and 'solid'", ""]
+    - ["lwidth", "Supported values: 'narrow', 'medium', and 'wide'", ""]
   - id: "syl.log"
     attributes:
-    - ["con", "Not supported yet", ""] 
-    - ["wordpos", "Not supported yet", ""] 
+    - ["con", "Not supported yet", ""]
+    - ["wordpos", "Not supported yet", ""]
   - id: "tiepresent"
     attributes:
-    - ["tie", "", ""] 
-
+    - ["tie", "", ""]
+  - id: "timestamp.musical"
+    attributes:
+    - ["tstamp", "", ""]
+  - id: "timestamp2.musical"
+    attributes:
+    - ["tstamp2", "", ""]
+  - id: "typography"
+    attributes:
+    - ["fontname", "", ""]
+    - ["fontstyle", "", ""]
+    - ["fontweight", "", ""]
   - id: "note.log.mensural"
     attributes:
-    - ["lig", "", ""] 
+    - ["lig", "", ""]
   - id: "mensural.log"
     attributes:
-    - ["mensur.dot", "", ""] 
-    - ["mensur.sign", "", ""] 
-    - ["mensur.slash", "Only 1 slash is supported.", ""] 
+    - ["mensur.dot", "", ""]
+    - ["mensur.sign", "", ""]
+    - ["mensur.slash", "Only 1 slash is supported.", ""]
   - id: "mensur.vis"
     attributes:
-    - ["orient", "Only reversed is supported.", ""] 
+    - ["orient", "Only reversed is supported.", ""]
 
 classes:
   - id: "accid"
@@ -132,7 +168,18 @@ classes:
     att-classes:
       - common
     attributes: []
+  - id: "artic"
+    att-classes:
+      - articulation
+      - color
+      - placement
+    attributes: []
   - id: "beam"
+  - id: "beatRpt"
+    att-classes:
+      - color
+    attributes:
+      - ["form", "", ""]
   - id: "barLine"
     att-classes:
       - barLine.log
@@ -142,10 +189,12 @@ classes:
       - augmentdots # durationInterface
       - beamsecondary # durationInterface
       - duration.musical # durationInterface
-      - duration.performed # durationInterface      
+      - duration.performed # durationInterface
       - duration.ratio # durationInterface
-      - fermatapresent # durationInterface
+      - articulation
+      - color
       - common
+      - fermatapresent
       - stemmed
       - tiepresent
     attributes: []
@@ -159,9 +208,50 @@ classes:
     att-classes:
       - staffloc.pitched # postionInterface
     attributes: []
+  - id: "dir"
+    att-classes:
+      - lang
+      - staffident
+      - startid
+      - timestamp.musical
+    attributes: []
   - id: "dot"
     att-classes:
       - staffloc.pitched # postionInterface
+    attributes: []
+  - id: "dynam"
+    att-classes:
+      - lang
+      - staffident
+      - startid
+      - timestamp.musical
+    attributes: []
+  - id: "fermata"
+    att-classes:
+      - color
+      - fermata.vis
+      - placement
+      - staffident
+      - startid
+      - timestamp.musical
+    attributes: []
+  - id: "harm"
+    att-classes:
+      - lang
+      - placement
+      - staffident
+      - startid
+      - timestamp.musical
+    attributes: []
+  - id: "hairpin"
+    att-classes:
+      - color
+      - placement
+      - staffident
+      - startendid
+      - startid
+      - timestamp.musical
+      - timestamp2.musical
     attributes: []
   - id: "layer"
     att-classes:
@@ -177,12 +267,12 @@ classes:
       - mensural.shared
       - mensur.log
       - mensur.vis
-      - slash.count  
+      - slash.count
     attributes: []
   - id: "measure"
     att-classes:
       - common
-      - measure.log  
+      - measure.log
     attributes: []
   - id: "mensur"
     att-classes:
@@ -194,6 +284,8 @@ classes:
       - mmeterSigDefault.vis
     attributes: []
   - id: "mRest"
+    att-classes:
+      - fermatapresent
   - id: "multiRest"
     att-classes:
       - numbered
@@ -203,35 +295,61 @@ classes:
       - augmentdots # durationInterface
       - beamsecondary # durationInterface
       - duration.musical # durationInterface
-      - duration.performed # durationInterface      
+      - duration.performed # durationInterface
       - duration.ratio # durationInterface
-      - fermatapresent # durationInterface
       - accidental # pitchInterface
       - octave # pitchInterface
       - pitch # pitchInterface
+      - articulation
+      - color
       - coloration
+      - fermatapresent
       - note.log.mensural
       - stemmed
       - tiepresent
     attributes:
       - ["grace", "Currently all values will be treated undifferently", ""]
+  - id: "octave"
+    att-classes:
+      - color
+      - linerend.base
+      - staffident
+      - startendid
+      - startid
+      - timestamp.musical
+      - timestamp2.musical
+    attributes: []
+  - id: "pedal"
+    att-classes:
+      - color
+      - staffident
+      - startid
+      - timestamp.musical
+    attributes: []
   - id: "rdg"
     att-classes:
       - common
     attributes:
       - ["source", "Only for selection with the --rdg-xpath-query option", ""]
+  - id: "rend"
+    att-classes:
+      - color
+      - common
+      - lang
+      - typography
+    attributes: []
   - id: "rest"
     att-classes:
       - augmentdots # durationInterface
       - beamsecondary # durationInterface
       - duration.musical # durationInterface
-      - duration.performed # durationInterface      
+      - duration.performed # durationInterface
       - duration.ratio # durationInterface
-      - fermatapresent # durationInterface
+      - color
+      - fermatapresent
+      - staffloc.pitched
     attributes:
       - ["dur.ges", "Gestural duration, for logical durations (e.g. display a breve but space it as a quarter).", ""]
-      - ["oloc", "", ""]
-      - ["ploc", "", ""]
   - id: "scoreDef"
     att-classes:
       - cleffing.log
@@ -241,6 +359,8 @@ classes:
     attributes: []
   - id: "slur"
     att-classes:
+      - color
+      - staffident
       - startendid
       - startid
     attributes: []
@@ -255,6 +375,7 @@ classes:
       - keySigDefault.log
       - meterSigDefault.log
       - mensural.log
+      - miditempo
     attributes:
       - ["n", "The order of the <code>&lt;staffDef&gt;</code> elements must correspond to the values (1-based).", ""]
   - id: "staffGrp"
@@ -267,19 +388,40 @@ classes:
     attributes: []
   - id: "syl"
     att-classes:
+      - lang
       - syl.log
+      - typography
+    attributes: []
+  - id: "tempo"
+    att-classes:
+      - lang
+      - miditempo
+      - staffident
     attributes: []
   - id: "tie"
     att-classes:
+      - color
+      - staffident
       - startendid
       - startid
     attributes: []
+  - id: "trill"
+    att-classes:
+      - color
+      - placement
+      - staffident
+      - startid
+      - timestamp.musical
+    attributes: []
   - id: "tuplet"
-    attributes:   
+    att-classes:
       - duration.ratio
+    attributes: []
   - id: "verse"
     att-classes:
+      - color
       - common
+      - lang
     attributes: []
 
 page-based-classes:
