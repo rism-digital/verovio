@@ -34,6 +34,7 @@ var classvrv_1_1_view =
     [ "DrawDurationElement", "classvrv_1_1_view.html#a34c710188868cba6cfb43733b0304180", null ],
     [ "DrawDynam", "classvrv_1_1_view.html#af3d784a5dec18db724d2f6bd62e81f79", null ],
     [ "DrawEnding", "classvrv_1_1_view.html#acc532452a05e2e979e7600ea137ac639", null ],
+    [ "DrawFermata", "classvrv_1_1_view.html#a68bfc41507957f09694cb83a2027ea38", null ],
     [ "DrawFermata", "classvrv_1_1_view.html#a663d4f61c8b05fbe66d3e2f8d369af5e", null ],
     [ "DrawFilledRectangle", "classvrv_1_1_view.html#a5d7fe1e4eeaaecd22a796703ee9c630f", null ],
     [ "DrawFTrem", "classvrv_1_1_view.html#a2cc270dfd01f43d976d0b9dfe8ee7dd2", null ],

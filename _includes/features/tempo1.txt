@@ -8,5 +8,5 @@
     </layer>
   </staff>
   <tempo tstamp="1" staff="1">Andante con moto <rend fontname="VerovioText"></rend> = 70 </tempo>
-  <slur startid="#m0_s2_e1" endid="m0_s2_e2"/>
+  <slur startid="#m0_s2_e1" endid="#m0_s2_e2"/>
 </measure>

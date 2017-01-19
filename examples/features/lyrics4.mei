@@ -18,7 +18,7 @@
         <body>
             <mdiv>
                 <score>
-                    <scoreDef meter.count="2" meter.unit="4">
+                    <scoreDef meter.count="2" meter.unit="4" label="feature-example">
                         <staffGrp symbol="bracket">
                             <staffDef n="1" xml:id="P1" lines="5" clef.line="2" clef.shape="G"
                                 key.sig="2s" lyric.name="Helvetica"/>

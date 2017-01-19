@@ -1,0 +1,57 @@
+---
+layout: verovio
+verovio-light: true
+title: Verovio Overview
+active: how
+how-active: how-overview
+---
+
+<div class="row">
+    <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
+        <div class="panel panel-default">
+            {% include how-sidebar.html %}
+        </div>
+    </div>
+
+    <div class="col-md-9">
+        <div class="panel-body">
+            <h3>Overview</h3>
+            <p>Verovio is a C++ codebase that can be compiled and wrapped into different programming languages and integrated into various environments.</p>
+
+            <h4>Workflow</h4>
+            <p>
+                The <a href="command-line.xhtml">Command-line interface</a> or the <a href="python.xhtml">Python toolkit</a> can be used in scripting environments or server side. Typical use cases would be :
+            </p>
+            <ul>
+              <li>generate SVG and MIDI from MEI documents or other supported formats,</li>
+              <li>generate MEI documents from other supported formats (e.g., convert files).</li>
+            </ul>
+            <p>
+                Resulting SVG or MEI documents can then be embedded in a HTML page or used as such.
+            </p>
+            
+            <img src="{{ site.baseurl }}/images/overview_server.png" class="img-responsive"/>
+            <br/>
+
+            <p>
+                The <a href="javascript.xhtml">JavaScript toolkit</a> makes it possible to generate SVG and MIDI directly in the browser. It is easy to set up and platform independent. Interaction with the user can then be handled with basic JavaScript or CSS. <a href="tutorial.xhtml?id=topic02">An example of how to handle events</a> is given in the tutorial. It is also possible to process the MEI via XSLT in the browser before to load it into Verovio.
+            </p>
+            <img src="{{ site.baseurl }}/images/overview_client.png" class="img-responsive"/>
+            <br/>
+
+            <p>
+                Both approaches can be combined: one may choose to process the MEI and to generate the SVG server side for better performance, and then handle interactions client side with JavaScript and CSS.</p>
+            <img src="{{ site.baseurl }}/images/overview_hybrid.png" class="img-responsive"/>
+            <br/>
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+//<![CDATA[
+    $( document ).ready(function() {
+
+    });
+//]]>
+</script>
