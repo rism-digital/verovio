@@ -2065,6 +2065,12 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             appendElement(layer, mrest);
             int layer = m_currentlayer;
             for (int z = 0; z < (int)layerdata.size(); z++) {
+                if (layerdata[z]->isInterpretation()) {
+                    handlePedalMark(layerdata[z]);
+                }
+                if (!layerdata[z]->isData()) {
+                    continue;
+                }
                 if (!layerdata[z]->isRest()) {
                     continue;
                 }
@@ -2117,7 +2123,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
         if (layerdata[i]->isInterpretation()) {
             handleOttavaMark(layerdata[i], note);
-            handlePedalMark(layerdata[i], note);
+            handlePedalMark(layerdata[i]);
             handleStaffStateVariables(layerdata[i]);
             if (layerdata[i]->getDurationFromStart() != 0) {
                 if (layerdata[i]->isClef()) {
@@ -2811,12 +2817,16 @@ HTp HumdrumInput::getHairpinEnd(HTp token, const string &endchar)
 //////////////////////////////
 //
 // HumdrumInput::getMeasureTstamp --
+//     defatult value: fract = 0.0;
 //
 
-HumNum HumdrumInput::getMeasureTstamp(HTp token, int staffindex)
+HumNum HumdrumInput::getMeasureTstamp(HTp token, int staffindex, HumNum fract)
 {
     vector<humaux::StaffStateVariables> &ss = m_staffstates;
     HumNum qbeat = token->getDurationFromBarline();
+    if (fract > 0) {
+        qbeat += fract * token->getDuration().getAbs();
+    }
     HumNum mfactor = ss[staffindex].meter_bottom / 4;
     HumNum mbeat = qbeat * mfactor + 1;
     return mbeat;
@@ -3909,7 +3919,7 @@ void HumdrumInput::handleOttavaMark(HTp token, Note *note)
 //    of the last note in the previous measure among all layers).
 //
 
-void HumdrumInput::handlePedalMark(HTp token, Note *note)
+void HumdrumInput::handlePedalMark(HTp token)
 {
     int staffindex = m_currentstaff - 1;
 
@@ -3928,7 +3938,7 @@ void HumdrumInput::handlePedalMark(HTp token, Note *note)
         if (pdata != NULL) {
             Pedal *pedal = new Pedal;
             m_measure->AddChild(pedal);
-            HumNum tstamp = getMeasureTstamp(pdata, staffindex);
+            HumNum tstamp = getMeasureTstamp(pdata, staffindex, HumNum(1, 1));
             pedal->SetTstamp(tstamp.getFloat());
             pedal->SetDir(pedalLog_DIR_up);
             setStaff(pedal, m_currentstaff);

@@ -245,7 +245,7 @@ protected:
     void convertVerses(Note *note, hum::HTp token, int subtoken);
     void checkForOmd(int startline, int endline);
     void handleOttavaMark(hum::HTp token, Note *note);
-    void handlePedalMark(hum::HTp token, Note *note);
+    void handlePedalMark(hum::HTp token);
     void prepareBeamAndTupletGroups(const vector<hum::HTp> &layerdata, vector<humaux::HumdrumBeamAndTuplet> &hg);
     void printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, const vector<hum::HTp> &layerdata);
     void insertTuplet(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg,
@@ -267,7 +267,7 @@ protected:
     void addHarmFloatsForMeasure(int startine, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirection(hum::HTp token, int staffindex);
-    hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex);
+    hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
     hum::HTp getPreviousDataToken(hum::HTp token);
     hum::HTp getHairpinEnd(hum::HTp token, const string &endchar);
     hum::HTp getDecrescendoEnd(hum::HTp token);
