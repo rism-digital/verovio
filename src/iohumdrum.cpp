@@ -105,6 +105,8 @@ namespace humaux {
     {
         m_endmeasure = m_startmeasure = NULL;
         m_inserted = false;
+        m_above = false;
+        m_below = false;
         m_pitch = 0;
         m_layer = -1;
     }
@@ -116,6 +118,8 @@ namespace humaux {
         m_starttime = anothertie.m_starttime;
         m_endtime = anothertie.m_endtime;
         m_inserted = anothertie.m_inserted;
+        m_above = anothertie.m_above;
+        m_below = anothertie.m_below;
         m_startid = anothertie.m_startid;
         m_endid = anothertie.m_endid;
         m_startmeasure = anothertie.m_startmeasure;
@@ -136,6 +140,8 @@ namespace humaux {
         m_starttime = anothertie.m_starttime;
         m_endtime = anothertie.m_endtime;
         m_inserted = anothertie.m_inserted;
+        m_above = anothertie.m_above;
+        m_below = anothertie.m_below;
         m_startid = anothertie.m_startid;
         m_endid = anothertie.m_endid;
         m_startmeasure = anothertie.m_startmeasure;
@@ -149,9 +155,15 @@ namespace humaux {
     {
         m_endmeasure = m_startmeasure = NULL;
         m_inserted = false;
+        m_above = false;
+        m_below = false;
         m_startid.clear();
         m_endid.clear();
     }
+
+    void HumdrumTie::setTieAbove(void) { m_above = true; }
+
+    void HumdrumTie::setTieBelow(void) { m_below = true; }
 
     void HumdrumTie::insertTieIntoDom(void)
     {
@@ -177,6 +189,13 @@ namespace humaux {
         vrv::Tie *tie = new vrv::Tie;
         tie->SetStartid("#" + m_startid);
         tie->SetEndid("#" + m_endid);
+
+        if (m_above) {
+            tie->SetCurvedir(curvature_CURVEDIR_above);
+        }
+        if (m_below) {
+            tie->SetCurvedir(curvature_CURVEDIR_below);
+        }
 
         bool samemeasure = false;
         if (m_startmeasure == m_endmeasure) {
@@ -2326,10 +2345,34 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         artics.push_back(ARTICULATION_harm);
     }
 
+    int direction = 0;
+
+    // deal with articulation positions in more detail later.
+    if (m_signifiers.above) {
+        string pattern = "['`^~o]+";
+        pattern.push_back(m_signifiers.above);
+        if (regex_search(*token, regex(pattern))) {
+            direction = 1;
+        }
+    }
+    if (m_signifiers.below) {
+        string pattern = "['`^~o]+";
+        pattern.push_back(m_signifiers.below);
+        if (regex_search(*token, regex(pattern))) {
+            direction = -1;
+        }
+    }
+
     if (artics.size() > 0) {
         Artic *artic = new Artic;
         appendElement(element, artic);
         artic->SetArtic(artics);
+        if (direction > 0) {
+            artic->SetPlace(STAFFREL_above);
+        }
+        else if (direction < 0) {
+            artic->SetPlace(STAFFREL_below);
+        }
     }
 }
 
@@ -2869,14 +2912,25 @@ void HumdrumInput::processSlur(HTp token)
     if (slurstart->getValueBool("LO", "S", "a")) {
         slur->SetCurvedir(curvature_CURVEDIR_above);
     }
-    else if (slurstart->getValueBool("LO", "S", "b")) {
+
+    if (slurstart->getValueBool("LO", "S", "b")) {
         slur->SetCurvedir(curvature_CURVEDIR_below);
     }
-    else if (m_signifiers.slurabove && (slurstart->find(m_signifiers.slurabove) != string::npos)) {
-        slur->SetCurvedir(curvature_CURVEDIR_above);
+
+    if (m_signifiers.above) {
+        string marker = "(";
+        marker.push_back(m_signifiers.above);
+        if (slurstart->find(marker) != string::npos) {
+            slur->SetCurvedir(curvature_CURVEDIR_above);
+        }
     }
-    else if (m_signifiers.slurbelow && (slurstart->find(m_signifiers.slurbelow) != string::npos)) {
-        slur->SetCurvedir(curvature_CURVEDIR_below);
+
+    if (m_signifiers.below) {
+        string marker = "(";
+        marker.push_back(m_signifiers.below);
+        if (slurstart->find(marker) != string::npos) {
+            slur->SetCurvedir(curvature_CURVEDIR_below);
+        }
     }
 }
 
@@ -4614,6 +4668,21 @@ void HumdrumInput::processTieStart(Note *note, HTp token, const string &tstring)
 
     ss[rtrack].ties.emplace_back();
     ss[rtrack].ties.back().setStart(noteuuid, m_measure, cl, tstring, pitch, timestamp, endtime);
+
+    if (m_signifiers.above) {
+        string marker = "[";
+        marker.push_back(m_signifiers.above);
+        if (tstring.find(marker) != string::npos) {
+            ss[rtrack].ties.back().setTieAbove();
+        }
+    }
+    if (m_signifiers.below) {
+        string marker = "[";
+        marker.push_back(m_signifiers.below);
+        if (tstring.find(marker) != string::npos) {
+            ss[rtrack].ties.back().setTieBelow();
+        }
+    }
 }
 
 //////////////////////////////
@@ -5484,12 +5553,12 @@ void HumdrumInput::parseSignifiers(HumdrumFile &infile)
         }
 
         // slur directions
-        if (value.find("slur above", equals) != string::npos) {
-            m_signifiers.slurabove = signifier;
+        if (value.find("above", equals) != string::npos) {
+            m_signifiers.above = signifier;
             continue;
         }
-        if (value.find("slur below", equals) != string::npos) {
-            m_signifiers.slurbelow = signifier;
+        if (value.find("below", equals) != string::npos) {
+            m_signifiers.below = signifier;
             continue;
         }
 

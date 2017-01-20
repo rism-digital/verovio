@@ -75,6 +75,8 @@ namespace humaux {
         int getLayer(void);
         bool isInserted(void);
         void clear();
+        void setTieAbove(void);
+        void setTieBelow(void);
 
     private:
         string m_starttoken;
@@ -84,6 +86,8 @@ namespace humaux {
         int m_pitch;
         int m_layer;
         bool m_inserted;
+        bool m_above;
+        bool m_below;
         string m_startid;
         string m_endid;
         Measure *m_startmeasure;
@@ -167,8 +171,8 @@ public:
     // boolean switches:
     char nostem = '\0'; // !!!RDF**kern: i = no stem
     char editacc = '\0'; // !!!RDF**kern: i = editorial accidental
-    char slurbelow = '\0'; // !!!RDF**kern: i = slur below
-    char slurabove = '\0'; // !!!RDF**kern: i = slur above
+    char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
+    char above = '\0'; // !!!RDF**kern: i = above (previous signifier is "above")
 
     // coloring of notes (add rests later):
     // !!!RDF**kern: i = marked note, color="#553325"
