@@ -462,6 +462,7 @@ bool HumdrumInput::convertHumdrum(void)
 
     infile.analyzeKernSlurs();
     parseSignifiers(infile);
+    checkForColorSpine(infile);
 
     bool status = true; // for keeping track of problems in conversion process.
 
@@ -2236,7 +2237,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
                 note->SetStemLen(0);
             }
-            colorNote(note, *layerdata[i]);
+            int line = layerdata[i]->getLineIndex();
+            int field = layerdata[i]->getFieldIndex();
+            colorNote(note, *layerdata[i], line, field);
             addArticulations(note, layerdata[i]);
             addTrill(layerdata[i]);
             addFermata(layerdata[i]);
@@ -2381,14 +2384,55 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
 // HumdrumInput::colorNote --
 //
 
-void HumdrumInput::colorNote(Note *note, const string &token)
+void HumdrumInput::colorNote(Note *note, const string &token, int line, int field)
 {
+    string spinecolor;
+    if (m_has_color_spine) {
+        spinecolor = getSpineColor(line, field);
+    }
+    if (spinecolor != "") {
+        note->SetColor(spinecolor);
+    }
+
     for (int i = 0; i < (int)m_signifiers.mark.size(); i++) {
         if (token.find(m_signifiers.mark[i]) != string::npos) {
             note->SetColor(m_signifiers.mcolor[i]);
             break;
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getSpineColor --  But suppress black colors which are
+//     the default color of notes.
+//
+
+string HumdrumInput::getSpineColor(int line, int field)
+{
+    HumdrumFile &infile = m_infile;
+    string output;
+    for (int i = field + 1; i < infile[line].getFieldCount(); i++) {
+        if (!infile.token(line, i)->isDataType("**color")) {
+            continue;
+        }
+        output = *infile.token(line, i)->resolveNull();
+        if (output == ".") {
+            output = "";
+        }
+        else if (output == "black") {
+            output = "";
+        }
+        else if (output == "#000000") {
+            output = "";
+        }
+        else if (output == "#000") {
+            output = "";
+        }
+        break;
+    }
+
+    return output;
 }
 
 //////////////////////////////
@@ -4253,7 +4297,9 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
 
     bool octaveupQ = ss[staffindex].ottavameasure ? true : false;
 
-    colorNote(note, tstring);
+    int line = token->getLineIndex();
+    int field = token->getFieldIndex();
+    colorNote(note, tstring, line, field);
 
     if ((ss[staffindex].ottavameasure != NULL) && (ss[staffindex].ottavanotestart == NULL)) {
         ss[staffindex].ottavanotestart = note;
@@ -5765,6 +5811,18 @@ void HumdrumInput::prepareEndings(void)
             ending[j] = ending[i];
         }
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::checkForColorSpine -- Look for a **color spine in the input data.
+//
+
+void HumdrumInput::checkForColorSpine(HumdrumFile &infile)
+{
+    vector<HTp> colorspines;
+    infile.getSpineStartList(colorspines, "**color");
+    m_has_color_spine = colorspines.empty() ? false : true;
 }
 
 #endif /* NO_HUMDRUM_SUPPORT */

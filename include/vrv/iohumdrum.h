@@ -287,7 +287,9 @@ protected:
     void setNextLeftBarStyle(data_BARRENDITION style);
     void parseSignifiers(hum::HumdrumFile &infile);
     string getAutoClef(hum::HTp partstart, int partnumber);
-    void colorNote(vrv::Note *note, const string& token);
+    void colorNote(vrv::Note *note, const string &token, int line, int field);
+    string getSpineColor(int line, int field);
+    void checkForColorSpine(hum::HumdrumFile &infile);
     vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
     void addSystemKeyTimeChange(int startline, int endline);
     void prepareEndings(void);
@@ -434,6 +436,9 @@ private:
 
     // m_currentending == keep track of current ending.
     vrv::Ending *m_currentending = NULL;
+
+    // m_has_color_spine == true if a color spine is present.
+    bool m_has_color_spine = false;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };
