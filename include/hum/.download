@@ -12,6 +12,6 @@ wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/Mxm
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/MxmlMeasure.h -O MxmlMeasure.h
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/MxmlPart.h -O MxmlPart.h
 wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/grid.h -O grid.h
-wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/musicxml2hum.h -O musicxml2hum.h
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/include/tool-musicxml2hum.h -O tool-musicxml2hum.h
 
 

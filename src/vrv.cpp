@@ -14,8 +14,8 @@
 #include <cmath>
 #include <sstream>
 #include <stdarg.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <vector>
 
 #ifndef _WIN32
@@ -278,9 +278,9 @@ void LogError(const char *fmt, ...)
     AppendLogBuffer(true, s, CONSOLE_ERROR);
     va_end(args);
 #else
-    fprintf(stderr, "[Error] ");
     va_list args;
     va_start(args, fmt);
+    fprintf(stderr, "[Error] ");
     vfprintf(stderr, fmt, args);
     fprintf(stderr, "\n");
     va_end(args);

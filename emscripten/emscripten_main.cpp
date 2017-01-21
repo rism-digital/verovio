@@ -80,7 +80,6 @@ const char *vrvToolkit_getMEI(Toolkit *tk, int page_no, bool score_based)
 const char *vrvToolkit_getHumdrum(Toolkit *tk)
 {
     const char* buffer = tk->GetHumdrumBuffer();
-    cerr << "BUFFER = " << buffer << endl;
     return buffer;
 }
 

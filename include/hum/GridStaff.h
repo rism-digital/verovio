@@ -30,18 +30,15 @@ using namespace std;
 namespace hum {
 
 
-class GridStaff : public vector<GridVoice*> {
+class GridStaff : public vector<GridVoice*>, public GridSide {
 	public:
 		GridStaff(void);
 		~GridStaff();
 		GridVoice* setTokenLayer (int layerindex, HTp token, HumNum duration);
-		void setNullTokenLayer   (int layerindex, SliceType type, HumNum nextdur,
-		                          HumNum prevdur);
+		void setNullTokenLayer   (int layerindex, SliceType type, HumNum nextdur);
 		void appendTokenLayer    (int layerindex, HTp token, HumNum duration,
 		                          const string& spacer = " ");
-
-	private:
-		GridSide m_staffsides;
+		int getMaxVerseCount     (void);
 };
 
 ostream& operator<<(ostream& output, GridStaff* staff);

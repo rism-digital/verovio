@@ -18,6 +18,7 @@
 #define _MXMLMEASURE_H
 
 #include "humlib.h"
+#include "grid.h"
 
 #include "pugiconfig.hpp"
 #include "pugixml.hpp"
@@ -29,6 +30,7 @@ using namespace std;
 
 
 namespace hum {
+
 
 class MxmlEvent;
 class MxmlPart;
@@ -56,6 +58,7 @@ class MxmlMeasure {
 		void          setStartTimeOfMeasure (void);
 		void          setDuration        (HumNum value);
 		HumNum        getStartTime       (void) const;
+		HumNum        getTimestamp       (void) const { return getStartTime(); }
 		HumNum        getDuration        (void) const;
 		void          setOwner           (MxmlPart* part);
 		MxmlPart*     getOwner           (void) const;
@@ -68,24 +71,53 @@ class MxmlMeasure {
 		int           getEventCount      (void) const;
 		vector<SimultaneousEvents>* getSortedEvents(void);
 		MxmlEvent*    getEvent           (int index) const;
-		void          setPreviousMeasure (MxmlMeasure* event);
+
 		void          setNextMeasure     (MxmlMeasure* event);
-		MxmlMeasure*  getPreviousMeasure (void) const;
 		MxmlMeasure*  getNextMeasure     (void) const;
+		MxmlMeasure*  getPreviousMeasure (void) const;
+		void          setPreviousMeasure (MxmlMeasure* event);
+
+		int           getVoiceIndex      (int voicenum);
+		int           getStaffIndex      (int voicenum);
+		void          setTimeSigDur      (HumNum duration);
+		HumNum        getTimeSigDur      (void);
+		void          addDummyRest       (void);
+		void          addDummyRest       (HumNum starttime, HumNum duration, 
+		                                  int staffindex, int voiceindex);
+		vector<MxmlEvent*>& getEventList (void);
+		void  sortEvents                 (void);
+		void  forceLastInvisible         (void);
+		MeasureStyle  getStyle           (void);
+		MeasureStyle  getBarStyle        (void);
+		void  setStyle                   (MeasureStyle style);
+		void  setBarStyle                (MeasureStyle style);
+		void  makeFinalBarline(void)   { m_style = MeasureStyle::Final; }
+		bool  isFinal(void)            { return m_style == MeasureStyle::Final; }
+		bool  isDouble(void)           { return m_style == MeasureStyle::Double; }
+		bool  isRepeatBackward(void)   { return m_style == MeasureStyle::RepeatBackward; }
+		bool  isRepeatForward(void)    { return m_style == MeasureStyle::RepeatForward; }
+		bool  isRepeatBoth(void)       { return m_style == MeasureStyle::RepeatBoth; }
 
 	private:
-		void  sortEvents                  (void);
-		void  receiveStaffNumberFromChild (int staffnum);
-   	void  reportStaffNumberToOwner    (int staffnum);
+		void  receiveStaffNumberFromChild (int staffnum, int voicenum);
+		void  receiveTimeSigDurFromChild  (HumNum duration);
+		void  receiveMeasureStyleFromChild(MeasureStyle style);
+   	void  reportStaffNumberToOwner    (int staffnum, int voicenum);
+		void  reportVerseCountToOwner     (int count);
+		void  reportVerseCountToOwner     (int staffindex, int count);
+		void  reportHarmonyCountToOwner   (int count);
 
 	protected:
 		HumNum             m_starttime; // start time of measure in quarter notes
 		HumNum             m_duration;  // duration of measure in quarter notes
+		HumNum             m_timesigdur; // duration of measure according to 
+													// prevailing time signature.
 		MxmlPart*          m_owner;     // part which contains measure
 		MxmlMeasure*       m_previous;  // previous measure in part or null
 		MxmlMeasure*       m_following; // following measure in part or null
 		vector<MxmlEvent*> m_events;    // list of semi-ordered events in measure
 		vector<SimultaneousEvents> m_sortedevents; // list of time-sorted events
+		MeasureStyle       m_style;     // measure style type
 
 	friend MxmlEvent;
 	friend MxmlPart;

@@ -56,15 +56,33 @@ class MxmlPart {
 		int           getPartIndex         (void) const;
 		int           getStaffCount        (void) const;
 		int           getVerseCount        (void) const;
+		int           getVerseCount        (int staffindex) const;
+		int           getHarmonyCount      (void) const;
+		void          trackStaffVoices     (int staffnum, int voicenum);
+		void          printStaffVoiceInfo  (void);
+		void          prepareVoiceMapping  (void);
+		int           getVoiceIndex        (int voicenum);
+		int           getStaffIndex        (int voicenum);
 
 	private:
-		void          receiveStaffNumberFromChild (int staffnum);
+		void          receiveStaffNumberFromChild (int staffnum, int voicenum);
+		void          receiveVerseCount    (int count);
+		void          receiveVerseCount    (int staffnum, int count);
+		void          receiveHarmonyCount  (int count);
 
 	protected:
 		vector<MxmlMeasure*> m_measures;
 		vector<long>         m_qtick;
 		int                  m_partnum;
 		int                  m_maxstaff;
+		vector<int>          m_verseCount;
+		int                  m_harmonyCount;
+
+		// m_staffvoicehist: counts of staff and voice numbers.  
+		// staff=0 is used for items such as measures.
+		// voice=0 is used for nonduration items such as harmony.
+		vector<vector<int> > m_staffvoicehist;
+	 	vector<pair<int, int> > m_voicemapping; // voicenum -> (staff, voiceindex)
 		
 	friend MxmlMeasure;
 	friend MxmlEvent;

@@ -27,6 +27,7 @@ class Add;
 class AnchoredText;
 class Annot;
 class App;
+class Artic;
 class BarLine;
 class Beam;
 class BeatRpt;
@@ -45,6 +46,7 @@ class DurationInterface;
 class Dynam;
 class Ending;
 class Expan;
+class Fermata;
 class FloatingElement;
 class FTrem;
 class Hairpin;
@@ -92,6 +94,7 @@ class TextElement;
 class Tie;
 class TimePointInterface;
 class TimeSpanningInterface;
+class Trill;
 class Tuplet;
 class Unclear;
 class Verse;
@@ -177,6 +180,7 @@ private:
      */
     ///@{
     void WriteMeiAccid(pugi::xml_node currentNode, Accid *accid);
+    void WriteMeiArtic(pugi::xml_node currentNode, Artic *artic);
     void WriteMeiBarLine(pugi::xml_node currentNode, BarLine *barLine);
     void WriteMeiBeam(pugi::xml_node currentNode, Beam *beam);
     void WriteMeiBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt);
@@ -208,6 +212,7 @@ private:
     void WriteMeiAnchoredText(pugi::xml_node currentNode, AnchoredText *anchoredText);
     void WriteMeiDir(pugi::xml_node currentNode, Dir *dir);
     void WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam);
+    void WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata);
     void WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteMeiHarm(pugi::xml_node currentNode, Harm *harm);
     void WriteMeiOctave(pugi::xml_node currentNode, Octave *octave);
@@ -215,6 +220,7 @@ private:
     void WriteMeiSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteMeiTie(pugi::xml_node currentNode, Tie *tie);
+    void WriteMeiTrill(pugi::xml_node currentNode, Trill *trill);
     ///@}
 
     /**
@@ -391,6 +397,7 @@ private:
      */
     ///@{
     bool ReadMeiAccid(Object *parent, pugi::xml_node accid);
+    bool ReadMeiArtic(Object *parent, pugi::xml_node artic);
     bool ReadMeiBarLine(Object *parent, pugi::xml_node barLine);
     bool ReadMeiBeam(Object *parent, pugi::xml_node beam);
     bool ReadMeiBeatRpt(Object *parent, pugi::xml_node beatRpt);
@@ -425,6 +432,7 @@ private:
     bool ReadMeiAnchoredText(Object *parent, pugi::xml_node anchoredText);
     bool ReadMeiDir(Object *parent, pugi::xml_node dir);
     bool ReadMeiDynam(Object *parent, pugi::xml_node dynam);
+    bool ReadMeiFermata(Object *parent, pugi::xml_node fermata);
     bool ReadMeiHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadMeiHarm(Object *parent, pugi::xml_node harm);
     bool ReadMeiOctave(Object *parent, pugi::xml_node octave);
@@ -432,6 +440,7 @@ private:
     bool ReadMeiSlur(Object *parent, pugi::xml_node slur);
     bool ReadMeiTempo(Object *parent, pugi::xml_node tempo);
     bool ReadMeiTie(Object *parent, pugi::xml_node tie);
+    bool ReadMeiTrill(Object *parent, pugi::xml_node trill);
     ///@}
 
     /**

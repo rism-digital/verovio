@@ -18,7 +18,7 @@
 #define _GRIDMEASURE_H
 
 #include "humlib.h"
-#include "GridSlice.h"
+#include "grid.h"
 
 #include <list>
 
@@ -27,13 +27,49 @@ using namespace std;
 
 namespace hum {
 
+class GridSlice;
+class HumGrid;
 
 class GridMeasure : public list<GridSlice*> {
 	public:
-		GridMeasure(void);
+		GridMeasure(HumGrid* owner);
 		~GridMeasure();
 
-		bool transferTokens    (HumdrumFile& outfile, bool recip);
+		bool         transferTokens (HumdrumFile& outfile, bool recip,
+		                             bool addbar);
+		HumGrid*     getOwner       (void);
+		void         setOwner       (HumGrid* owner);
+		HumNum       getDuration    (void);
+		void         setDuration    (HumNum duration);
+		HumNum       getTimestamp   (void);
+		void         setTimestamp   (HumNum timestamp);
+		HumNum       getTimeSigDur  (void);
+		void         setTimeSigDur  (HumNum duration);
+		MeasureStyle getStyle       (void) { return m_style; }
+		MeasureStyle getBarStyle    (void) { return getStyle(); }
+		void         setStyle       (MeasureStyle style) { m_style = style; }
+		void         setBarStyle    (MeasureStyle style) { setStyle(style); }
+
+		bool         isDouble(void) 
+		                  {return m_style == MeasureStyle::Double;}
+		bool         isFinal(void) 
+		                  {return m_style == MeasureStyle::Final;}
+		bool         isRepeatBackward(void) 
+		                  { return m_style == MeasureStyle::RepeatBackward; }
+		bool         isRepeatForward(void) 
+		                  { return m_style == MeasureStyle::RepeatForward; }
+		bool         isRepeatBoth(void) 
+		                  { return m_style == MeasureStyle::RepeatBoth; }
+
+	protected:
+		void         appendInitialBarline(HumdrumFile& infile);
+
+	private:
+		HumGrid*     m_owner;
+		HumNum       m_duration;
+		HumNum       m_timestamp;
+		HumNum       m_timesigdur;
+		MeasureStyle m_style;
 };
 
 

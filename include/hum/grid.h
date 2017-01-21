@@ -43,7 +43,21 @@ enum class SliceType {
 			LocalComments,
 	_Spined,
 		GlobalComment,
-		ReferenceRecord
+		ReferenceRecord,
+	_Other,
+		Invalid
+};
+
+
+// MeasureType is a list of the style types for a measure (ending type for now)
+
+enum class MeasureStyle {
+	Plain,
+	RepeatBackward,
+	RepeatForward,
+	RepeatBoth,
+	Double,
+	Final
 };
 
 

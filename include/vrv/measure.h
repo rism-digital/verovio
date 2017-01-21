@@ -74,15 +74,21 @@ public:
      * Barline object when reading and writing MEI. See MeiInput::ReadMeiMeasure and
      * MeiOutput::ReadMeiMeasure
      * Alternatively, we could keep them in sync here:
-     * data_BARRENDITION GetLeftBarLineType() { m_leftBarLine.SetRend(GetRight()); return m_leftBarLine.GetRend(); }
+     * data_BARRENDITION GetDrawingLeftBarLine() { m_leftBarLine.SetRend(GetRight()); return m_leftBarLine.GetRend(); }
      * void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetRend(type); SetLeft(type); }
      */
     ///@{
-    data_BARRENDITION GetLeftBarLineType() const { return m_leftBarLine.GetForm(); }
-    void SetLeftBarLineType(data_BARRENDITION type) { m_leftBarLine.SetForm(type); }
-    data_BARRENDITION GetRightBarLineType() const { return m_rightBarLine.GetForm(); }
-    void SetRightBarLineType(data_BARRENDITION type) { m_rightBarLine.SetForm(type); }
+    data_BARRENDITION GetDrawingLeftBarLine() const { return m_leftBarLine.GetForm(); }
+    void SetDrawingLeftBarLine(data_BARRENDITION type) { m_leftBarLine.SetForm(type); }
+    data_BARRENDITION GetDrawingRightBarLine() const { return m_rightBarLine.GetForm(); }
+    void SetDrawingRightBarLine(data_BARRENDITION type) { m_rightBarLine.SetForm(type); }
     ///@}
+
+    /**
+     * Set the drawing barlines for the measure.
+     * Also adjust the right barline of the previous measure and the left one if necessary.
+     */
+    void SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert);
 
     /**
      * @name Set and get the barlines.
@@ -242,7 +248,12 @@ public:
     virtual int PrepareFloatingGrps(FunctorParams *functoParams);
 
     /**
-     * See Object::PrepareTimeSpanning
+     * See Object::PrepareTimePointingEnd
+     */
+    virtual int PrepareTimePointingEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareTimeSpanningEnd
      */
     virtual int PrepareTimeSpanningEnd(FunctorParams *functorParams);
 

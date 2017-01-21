@@ -29,11 +29,10 @@ using namespace std;
 namespace hum {
 
 
-class GridPart : public vector<GridStaff*> {
+class GridPart : public vector<GridStaff*>, public GridSide {
 	public:
 		GridPart(void);
 		~GridPart();
-		GridSide m_partsides;
 };
 
 ostream& operator<<(ostream& output, GridPart* part);

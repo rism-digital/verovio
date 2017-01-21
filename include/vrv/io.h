@@ -51,8 +51,6 @@ public:
     //
 protected:
     Doc *m_doc;
-
-private:
 };
 
 //----------------------------------------------------------------------------
@@ -70,9 +68,12 @@ public:
     FileInputStream(Doc *doc);
     virtual ~FileInputStream();
 
+    void SetOutputFormat(const std::string &format) { m_outformat = format; }
+    std::string GetOutputFormat(void) { return m_outformat; }
+
     // read
     virtual bool ImportFile() { return true; }
-    virtual bool ImportString(std::string const & data) { return true; }
+    virtual bool ImportString(std::string const &data) { return true; }
 
     /**
      * Getter for layoutInformation flag that is set to true during import
@@ -103,6 +104,7 @@ private:
 
 public:
     //
+
 protected:
     Doc *m_doc;
 
@@ -112,6 +114,8 @@ protected:
      * file contains <pb> and <sb>. This will stay wrong with PAE import
      */
     bool m_hasLayoutInformation;
+
+    std::string m_outformat = "mei";
 };
 
 } // namespace vrv

@@ -1110,32 +1110,34 @@
             <description>Articulation</description>
             <glyph glyph-code="E4A0" smufl-name="articAccentAbove"/>-->
             <glyph glyph-code="E4A1" smufl-name="articAccentBelow"/>-->
-            <!--<glyph glyph-code="E4A2" smufl-name="articStaccatoAbove"/>-->
-            <!--<glyph glyph-code="E4A3" smufl-name="articStaccatoBelow"/>-->
-            <!--<glyph glyph-code="E4A4" smufl-name="articTenutoAbove"/>-->
-            <!--<glyph glyph-code="E4A5" smufl-name="articTenutoBelow"/>-->
-            <!--<glyph glyph-code="E4A6" smufl-name="articStaccatissimoAbove"/>-->
-            <!--<glyph glyph-code="E4A7" smufl-name="articStaccatissimoBelow"/>-->
+            <glyph glyph-code="E4A2" smufl-name="articStaccatoAbove"/>
+            <glyph glyph-code="E4A3" smufl-name="articStaccatoBelow"/>
+            <glyph glyph-code="E4A4" smufl-name="articTenutoAbove"/>
+            <glyph glyph-code="E4A5" smufl-name="articTenutoBelow"/>
+            <glyph glyph-code="E4A6" smufl-name="articStaccatissimoAbove"/>
+            <glyph glyph-code="E4A7" smufl-name="articStaccatissimoBelow"/>
             <glyph glyph-code="E4A8" smufl-name="articStaccatissimoWedgeAbove"/>
             <glyph glyph-code="E4A9" smufl-name="articStaccatissimoWedgeBelow"/>
-            <!--<glyph glyph-code="E4AA" smufl-name="articStaccatissimoStrokeAbove"/>-->
-            <!--<glyph glyph-code="E4AB" smufl-name="articStaccatissimoStrokeBelow"/>-->
+            <glyph glyph-code="E4AA" smufl-name="articStaccatissimoStrokeAbove"/>
+            <glyph glyph-code="E4AB" smufl-name="articStaccatissimoStrokeBelow"/>
             <glyph glyph-code="E4AC" smufl-name="articMarcatoAbove"/>
             <glyph glyph-code="E4AD" smufl-name="articMarcatoBelow"/>
-            <!--<glyph glyph-code="E4AE" smufl-name="articMarcatoStaccatoAbove"/>-->
-            <!--<glyph glyph-code="E4AF" smufl-name="articMarcatoStaccatoBelow"/>-->
-            <!--<glyph glyph-code="E4B0" smufl-name="articAccentStaccatoAbove"/>-->
-            <!--<glyph glyph-code="E4B1" smufl-name="articAccentStaccatoBelow"/>-->
-            <!--<glyph glyph-code="E4B2" smufl-name="articTenutoStaccatoAbove"/>-->
-            <!--<glyph glyph-code="E4B3" smufl-name="articTenutoStaccatoBelow"/>-->
-            <!--<glyph glyph-code="E4B4" smufl-name="articTenutoAccentAbove"/>-->
-            <!--<glyph glyph-code="E4B5" smufl-name="articTenutoAccentBelow"/>-->
-            <!--<glyph glyph-code="E4B6" smufl-name="articStressAbove"/>-->
-            <!--<glyph glyph-code="E4B7" smufl-name="articStressBelow"/>-->
-            <!--<glyph glyph-code="E4B8" smufl-name="articUnstressAbove"/>-->
-            <!--<glyph glyph-code="E4B9" smufl-name="articUnstressBelow"/>-->
-            <!--<glyph glyph-code="E4BA" smufl-name="articLaissezVibrerAbove"/>-->
-            <!--<glyph glyph-code="E4BB" smufl-name="articLaissezVibrerBelow"/>-->
+            <glyph glyph-code="E4AE" smufl-name="articMarcatoStaccatoAbove"/>
+            <glyph glyph-code="E4AF" smufl-name="articMarcatoStaccatoBelow"/>
+            <glyph glyph-code="E4B0" smufl-name="articAccentStaccatoAbove"/>
+            <glyph glyph-code="E4B1" smufl-name="articAccentStaccatoBelow"/>
+            <glyph glyph-code="E4B2" smufl-name="articTenutoStaccatoAbove"/>
+            <glyph glyph-code="E4B3" smufl-name="articTenutoStaccatoBelow"/>
+            <glyph glyph-code="E4B4" smufl-name="articTenutoAccentAbove"/>
+            <glyph glyph-code="E4B5" smufl-name="articTenutoAccentBelow"/>
+            <glyph glyph-code="E4B6" smufl-name="articStressAbove"/>
+            <glyph glyph-code="E4B7" smufl-name="articStressBelow"/>
+            <glyph glyph-code="E4B8" smufl-name="articUnstressAbove"/>
+            <glyph glyph-code="E4B9" smufl-name="articUnstressBelow"/>
+            <glyph glyph-code="E4BA" smufl-name="articLaissezVibrerAbove"/>
+            <glyph glyph-code="E4BB" smufl-name="articLaissezVibrerBelow"/>
+            <glyph glyph-code="E4BC" smufl-name="articMarcatoTenutoAbove"/>
+            <glyph glyph-code="E4BD" smufl-name="articMarcatoTenutoBelow"/>
             <range_end>U+E4BF</range_end>
             <range_start>U+E4A0</range_start>
         </articulation>
@@ -1143,19 +1145,19 @@
             <description>Holds and pauses</description>
             <glyph glyph-code="E4C0" smufl-name="fermataAbove"/>
             <glyph glyph-code="E4C1" smufl-name="fermataBelow"/>
-            <!--<glyph glyph-code="E4C2" smufl-name="fermataVeryShortAbove"/>-->
-            <!--<glyph glyph-code="E4C3" smufl-name="fermataVeryShortBelow"/>-->
-            <!--<glyph glyph-code="E4C4" smufl-name="fermataShortAbove"/>-->
-            <!--<glyph glyph-code="E4C5" smufl-name="fermataShortBelow"/>-->
-            <!--<glyph glyph-code="E4C6" smufl-name="fermataLongAbove"/>-->
-            <!--<glyph glyph-code="E4C7" smufl-name="fermataLongBelow"/>-->
-            <!--<glyph glyph-code="E4C8" smufl-name="fermataVeryLongAbove"/>-->
-            <!--<glyph glyph-code="E4C9" smufl-name="fermataVeryLongBelow"/>-->
+            <glyph glyph-code="E4C2" smufl-name="fermataVeryShortAbove"/>
+            <glyph glyph-code="E4C3" smufl-name="fermataVeryShortBelow"/>
+            <glyph glyph-code="E4C4" smufl-name="fermataShortAbove"/>
+            <glyph glyph-code="E4C5" smufl-name="fermataShortBelow"/>
+            <glyph glyph-code="E4C6" smufl-name="fermataLongAbove"/>
+            <glyph glyph-code="E4C7" smufl-name="fermataLongBelow"/>
+            <glyph glyph-code="E4C8" smufl-name="fermataVeryLongAbove"/>
+            <glyph glyph-code="E4C9" smufl-name="fermataVeryLongBelow"/>
             <!--<glyph glyph-code="E4CA" smufl-name="fermataLongHenzeAbove"/>-->
             <!--<glyph glyph-code="E4CB" smufl-name="fermataLongHenzeBelow"/>-->
             <!--<glyph glyph-code="E4CC" smufl-name="fermataShortHenzeAbove"/>-->
             <!--<glyph glyph-code="E4CD" smufl-name="fermataShortHenzeBelow"/>-->
-            <!--<glyph glyph-code="E4CE" smufl-name="breathMarkComma"/>-->
+            <glyph glyph-code="E4CE" smufl-name="breathMarkComma"/>
             <!--<glyph glyph-code="E4CF" smufl-name="breathMarkTick"/>-->
             <!--<glyph glyph-code="E4D0" smufl-name="breathMarkUpbow"/>-->
             <!--<glyph glyph-code="E4D1" smufl-name="caesura"/>-->
@@ -1448,11 +1450,11 @@
         </windTechniques>
         <stringTechniques>
             <description>String techniques</description>
-            <!--<glyph glyph-code="E610" smufl-name="stringsDownBow"/>-->
-            <!--<glyph glyph-code="E611" smufl-name="stringsDownBowTurned"/>-->
-            <!--<glyph glyph-code="E612" smufl-name="stringsUpBow"/>-->
-            <!--<glyph glyph-code="E613" smufl-name="stringsUpBowTurned"/>-->
-            <!--<glyph glyph-code="E614" smufl-name="stringsHarmonic"/>-->
+            <glyph glyph-code="E610" smufl-name="stringsDownBow"/>
+            <glyph glyph-code="E611" smufl-name="stringsDownBowTurned"/>
+            <glyph glyph-code="E612" smufl-name="stringsUpBow"/>
+            <glyph glyph-code="E613" smufl-name="stringsUpBowTurned"/>
+            <glyph glyph-code="E614" smufl-name="stringsHarmonic"/>
             <!--<glyph glyph-code="E615" smufl-name="stringsHalfHarmonic"/>-->
             <!--<glyph glyph-code="E616" smufl-name="stringsMuteOn"/>-->
             <!--<glyph glyph-code="E617" smufl-name="stringsMuteOff"/>-->
@@ -2192,8 +2194,8 @@
                 smufl-name="mensuralNoteheadSemibrevisBlackVoidTurned"/>-->
             <glyph glyph-code="E93C" smufl-name="mensuralNoteheadMinimaWhite"/>
             <glyph glyph-code="E93D" smufl-name="mensuralNoteheadSemiminimaWhite"/>
-            <!--<glyph glyph-code="E93E" smufl-name="mensuralCombStemUp"/>-->
-            <!--<glyph glyph-code="E93F" smufl-name="mensuralCombStemDown"/>-->
+            <glyph glyph-code="E93E" smufl-name="mensuralCombStemUp"/>
+            <glyph glyph-code="E93F" smufl-name="mensuralCombStemDown"/>
             <!--<glyph glyph-code="E940" smufl-name="mensuralCombStemDiagonal"/>-->
             <!--<glyph glyph-code="E941" smufl-name="mensuralCombStemUpFlagRight"/>-->
             <!--<glyph glyph-code="E942" smufl-name="mensuralCombStemDownFlagRight"/>-->
@@ -2203,10 +2205,10 @@
             <!--<glyph glyph-code="E946" smufl-name="mensuralCombStemDownFlagFlared"/>-->
             <!--<glyph glyph-code="E947" smufl-name="mensuralCombStemUpFlagExtended"/>-->
             <!--<glyph glyph-code="E948" smufl-name="mensuralCombStemDownFlagExtended"/>-->
-            <!--<glyph glyph-code="E949" smufl-name="mensuralCombStemUpFlagSemiminima"/>-->
-            <!--<glyph glyph-code="E94A" smufl-name="mensuralCombStemDownFlagSemiminima"/>-->
-            <!--<glyph glyph-code="E94B" smufl-name="mensuralCombStemUpFlagFusa"/>-->
-            <!--<glyph glyph-code="E94C" smufl-name="mensuralCombStemDownFlagFusa"/>-->
+            <glyph glyph-code="E949" smufl-name="mensuralCombStemUpFlagSemiminima"/>
+            <glyph glyph-code="E94A" smufl-name="mensuralCombStemDownFlagSemiminima"/>
+            <glyph glyph-code="E94B" smufl-name="mensuralCombStemUpFlagFusa"/>
+            <glyph glyph-code="E94C" smufl-name="mensuralCombStemDownFlagFusa"/>
             <range_end>U+E94F</range_end>
             <range_start>U+E930</range_start>
         </medievalAndRenaissanceNoteheadsAndStems>
@@ -2348,15 +2350,15 @@
         </medievalAndRenaissanceAccidentals>
         <medievalAndRenaissanceRests>
             <description>Medieval and Renaissance rests</description>
-            <!--<glyph glyph-code="E9F0" smufl-name="mensuralRestMaxima"/>-->
-            <!--<glyph glyph-code="E9F1" smufl-name="mensuralRestLongaPerfecta"/>-->
-            <!--<glyph glyph-code="E9F2" smufl-name="mensuralRestLongaImperfecta"/>-->
-            <!--<glyph glyph-code="E9F3" smufl-name="mensuralRestBrevis"/>-->
-            <!--<glyph glyph-code="E9F4" smufl-name="mensuralRestSemibrevis"/>-->
-            <!--<glyph glyph-code="E9F5" smufl-name="mensuralRestMinima"/>-->
-            <!--<glyph glyph-code="E9F6" smufl-name="mensuralRestSemiminima"/>-->
-            <!--<glyph glyph-code="E9F7" smufl-name="mensuralRestFusa"/>-->
-            <!--<glyph glyph-code="E9F8" smufl-name="mensuralRestSemifusa"/>-->
+            <glyph glyph-code="E9F0" smufl-name="mensuralRestMaxima"/>
+            <glyph glyph-code="E9F1" smufl-name="mensuralRestLongaPerfecta"/>
+            <glyph glyph-code="E9F2" smufl-name="mensuralRestLongaImperfecta"/>
+            <glyph glyph-code="E9F3" smufl-name="mensuralRestBrevis"/>
+            <glyph glyph-code="E9F4" smufl-name="mensuralRestSemibrevis"/>
+            <glyph glyph-code="E9F5" smufl-name="mensuralRestMinima"/>
+            <glyph glyph-code="E9F6" smufl-name="mensuralRestSemiminima"/>
+            <glyph glyph-code="E9F7" smufl-name="mensuralRestFusa"/>
+            <glyph glyph-code="E9F8" smufl-name="mensuralRestSemifusa"/>
             <range_end>U+E9FF</range_end>
             <range_start>U+E9F0</range_start>
         </medievalAndRenaissanceRests>

@@ -5,10 +5,13 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
+#include "object.h"
+
 //----------------------------------------------------------------------------
 
 #include <assert.h>
 #include <iostream>
+#include <math.h>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -37,156 +40,6 @@
 #include "vrv.h"
 
 namespace vrv {
-
-//----------------------------------------------------------------------------
-// BoundingBox
-//----------------------------------------------------------------------------
-
-BoundingBox::BoundingBox()
-{
-    ResetBoundingBox();
-}
-
-ClassId BoundingBox::Is() const
-{
-    // we should always have the method overridden
-    assert(false);
-    return BOUNDING_BOX;
-};
-
-void BoundingBox::UpdateContentBBoxX(int x1, int x2)
-{
-    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
-
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
-
-    min_x -= m_drawingX;
-    max_x -= m_drawingX;
-
-    if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
-    if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
-
-    m_updatedBBoxX = true;
-    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // GetClassName().c_str());
-}
-
-void BoundingBox::UpdateContentBBoxY(int y1, int y2)
-{
-    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
-
-    int min_y = std::min(y1, y2);
-    int max_y = std::max(y1, y2);
-
-    min_y -= m_drawingY;
-    max_y -= m_drawingY;
-
-    if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
-    if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
-
-    m_updatedBBoxY = true;
-    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // GetClassName().c_str());
-}
-
-void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
-{
-    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
-
-    min_x -= m_drawingX;
-    max_x -= m_drawingX;
-
-    if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
-    if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
-
-    m_updatedBBoxX = true;
-
-    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-}
-
-void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
-{
-    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-
-    int min_y = std::min(y1, y2);
-    int max_y = std::max(y1, y2);
-
-    min_y -= m_drawingY;
-    max_y -= m_drawingY;
-
-    if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
-    if (m_selfBB_y2 < max_y) m_selfBB_y2 = max_y;
-
-    m_updatedBBoxY = true;
-
-    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-}
-
-void BoundingBox::ResetBoundingBox()
-{
-    m_contentBB_x1 = 0xFFFFFFF;
-    m_contentBB_y1 = 0xFFFFFFF;
-    m_contentBB_x2 = -0xFFFFFFF;
-    m_contentBB_y2 = -0xFFFFFFF;
-    m_selfBB_x1 = 0xFFFFFFF;
-    m_selfBB_y1 = 0xFFFFFFF;
-    m_selfBB_x2 = -0xFFFFFFF;
-    m_selfBB_y2 = -0xFFFFFFF;
-
-    m_updatedBBoxX = false;
-    m_updatedBBoxY = false;
-}
-
-void BoundingBox::SetEmptyBB()
-{
-    m_contentBB_x1 = 0;
-    m_contentBB_y1 = 0;
-    m_contentBB_x2 = 0;
-    m_contentBB_y2 = 0;
-    m_selfBB_x1 = 0;
-    m_selfBB_y1 = 0;
-    m_selfBB_x2 = 0;
-    m_selfBB_y2 = 0;
-
-    m_updatedBBoxX = true;
-    m_updatedBBoxY = true;
-}
-
-bool BoundingBox::HasEmptyBB()
-{
-    return (HasUpdatedBB() && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
-        && (m_contentBB_y2 == 0));
-}
-
-bool BoundingBox::HasContentBB()
-{
-    return ((m_contentBB_x1 != 0xFFFF) && (m_contentBB_y1 != 0xFFFF) && (m_contentBB_x2 != -0xFFFF)
-        && (m_contentBB_y2 != -0xFFFF));
-}
-
-bool BoundingBox::HasSelfBB()
-{
-    return ((m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF));
-}
-
-bool BoundingBox::HorizontalOverlap(const BoundingBox *other) const
-{
-    assert(other);
-
-    if (m_drawingX + m_contentBB_x2 < other->GetDrawingX() + other->m_contentBB_x1) return false;
-    if (m_drawingX + m_contentBB_x1 > other->GetDrawingX() + other->m_contentBB_x2) return false;
-    return true;
-}
-
-int BoundingBox::CalcVerticalOverlap(const BoundingBox *other) const
-{
-    assert(other);
-    return 0;
-}
 
 //----------------------------------------------------------------------------
 // Object
@@ -269,6 +122,7 @@ Object::~Object()
 void Object::Init(std::string classid)
 {
     m_parent = NULL;
+    m_isAttribute = false;
     m_isModified = true;
     m_classid = classid;
     this->GenerateUuid();
@@ -391,7 +245,11 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     attributes->clear();
 
     Att::GetCmn(this, attributes);
+    Att::GetCritapp(this, attributes);
+    Att::GetExternalsymbols(this, attributes);
+    Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
+    Att::GetMidi(this, attributes);
     Att::GetPagebased(this, attributes);
     Att::GetShared(this, attributes);
 
@@ -477,7 +335,7 @@ void Object::ClearRelinquishedChildren()
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end();) {
         if ((*iter)->m_parent != this) {
-            m_children.erase(iter);
+            iter = m_children.erase(iter);
         }
         else
             iter++;
@@ -516,10 +374,10 @@ Object *Object::FindChildExtremeByAttComparison(AttComparison *attComparison, in
 }
 
 void Object::FindAllChildByAttComparison(
-    ArrayOfObjects *objects, AttComparison *attComparison, int deepness, bool direction)
+    ArrayOfObjects *objects, AttComparison *attComparison, int deepness, bool direction, bool clear)
 {
     assert(objects);
-    objects->clear();
+    if (clear) objects->clear();
 
     Functor findAllByAttComparison(&Object::FindAllByAttComparison);
     FindAllByAttComparisonParams findAllByAttComparisonParams(attComparison, objects);
@@ -549,7 +407,7 @@ void Object::GenerateUuid()
     int nr = std::rand();
     char str[17];
     // I do not want to use a stream for doing this!
-    snprintf(str, 17, "%016d", nr);
+    snprintf(str, 16, "%016d", nr);
 
     m_uuid = m_classid + std::string(str);
     std::transform(m_uuid.begin(), m_uuid.end(), m_uuid.begin(), ::tolower);
@@ -788,7 +646,9 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
     ListOfObjects::iterator it = m_list.begin();
-    std::advance(it, GetListIndex(startFrom));
+    int idx = GetListIndex(startFrom);
+    if (idx == -1) return NULL;
+    std::advance(it, idx);
     it = std::find_if(it, m_list.end(), ObjectComparison(classId));
     return (it == m_list.end()) ? NULL : *it;
 }
@@ -796,7 +656,9 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
 Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
 {
     ListOfObjects::iterator it = m_list.begin();
-    std::advance(it, GetListIndex(startFrom));
+    int idx = GetListIndex(startFrom);
+    if (idx == -1) return NULL;
+    std::advance(it, idx);
     ListOfObjects::reverse_iterator rit(it);
     rit = std::find_if(rit, m_list.rend(), ObjectComparison(classId));
     return (rit == m_list.rend()) ? NULL : *rit;
@@ -1028,8 +890,11 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     if (this->Is() == MEASURE) {
         Measure *measure = dynamic_cast<Measure *>(this);
         assert(measure);
+        bool systemBreak = false;
+        bool scoreDefInsert = false;
         // This is the first measure of the system - more to do...
         if (params->m_currentSystem) {
+            systemBreak = true;
             // We had a scoreDef so we need to put cautionnary values
             // This will also happend with clef in the last measure - however, the cautionnary functor will not do
             // anything then
@@ -1048,11 +913,13 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
             params->m_drawLabels = false;
         }
         if (params->m_upcomingScoreDef->m_setAsDrawing) {
+            scoreDefInsert = true;
             measure->SetDrawingScoreDef(params->m_upcomingScoreDef);
             params->m_currentScoreDef = measure->GetDrawingScoreDef();
             params->m_upcomingScoreDef->SetRedrawFlags(false, false, false, false, true);
             params->m_upcomingScoreDef->m_setAsDrawing = false;
         }
+        measure->SetDrawingBarLines(params->m_previousMeasure, systemBreak, scoreDefInsert);
         params->m_previousMeasure = measure;
         return FUNCTOR_CONTINUE;
     }

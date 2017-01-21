@@ -82,6 +82,11 @@ public:
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
 
     /**
+     * See Object::PrepareTimePointing
+     */
+    virtual int PrepareTimePointing(FunctorParams *functorParams);
+
+    /**
      * See Object::PrepareTimeSpanning
      */
     virtual int PrepareTimeSpanning(FunctorParams *functorParams);
@@ -128,13 +133,23 @@ public:
 
     virtual void ResetPositioner();
 
+    /**
+     * @name Get and set the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
+
     FloatingObject *GetObject() const { return m_object; }
 
     bool CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignment, BoundingBox *horizOverlapingBBox);
 
     data_STAFFREL GetDrawingPlace() const { return m_place; }
 
-    void UpdateSlurPosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
+    void UpdateCurvePosition(const Point points[4], float angle, int thickness, curvature_CURVEDIR curveDir);
+
+    int CalcXMinMaxY(const Point points[4]);
 
     /**
      * @name Get and set the Y drawing relative position
@@ -155,10 +170,12 @@ protected:
 
     data_STAFFREL m_place;
 
-    Point m_slurPoints[4];
-    float m_slurAngle;
-    int m_slurThickness;
-    curvature_CURVEDIR m_slurDir;
+public:
+    Point m_cuvrePoints[4];
+    float m_cuvreAngle;
+    int m_cuvreThickness;
+    curvature_CURVEDIR m_cuvreDir;
+    int m_cuvreXMinMaxY;
 };
 
 } // namespace vrv

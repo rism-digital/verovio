@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        view_floating.cpp
+// Name:        view_control.cpp
 // Author:      Laurent Pugin
 // Created:     2015
 // Copyright (c) Authors and others. All rights reserved.
@@ -24,6 +24,7 @@
 #include "doc.h"
 #include "dynam.h"
 #include "ending.h"
+#include "fermata.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
@@ -43,6 +44,7 @@
 #include "text.h"
 #include "tie.h"
 #include "timeinterface.h"
+#include "trill.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -58,9 +60,9 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(measure);
     assert(element);
 
-    // For dir, dynam, and harm, we do not consider the @tstamp2 for rendering
+    // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
     if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DIR) && (element->Is() != DYNAM)
-        && (element->Is() != HARM)) {
+        && (element->Is() != FERMATA) && (element->Is() != HARM)) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -76,6 +78,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
     }
+    else if (element->Is() == FERMATA) {
+        Fermata *fermata = dynamic_cast<Fermata *>(element);
+        assert(fermata);
+        DrawFermata(dc, fermata, measure, system);
+    }
     else if (element->Is() == HARM) {
         Harm *harm = dynamic_cast<Harm *>(element);
         assert(harm);
@@ -90,6 +97,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Tempo *tempo = dynamic_cast<Tempo *>(element);
         assert(tempo);
         DrawTempo(dc, tempo, measure, system);
+    }
+    else if (element->Is() == TRILL) {
+        Trill *trill = dynamic_cast<Trill *>(element);
+        assert(trill);
+        DrawTrill(dc, trill, measure, system);
     }
 }
 
@@ -149,7 +161,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
-        AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
+        MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_DEFAULT);
         Alignment *pos
             = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
         x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
@@ -164,7 +176,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
-        AttMeasureAlignerType alignmentComparison(ALIGNMENT_DEFAULT);
+        MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_DEFAULT);
         Alignment *pos
             = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
         x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
@@ -194,6 +206,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             DrawOctave(dc, dynamic_cast<Octave *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is() == SLUR) {
+            // For slurs we limit support to one value in @staff
+            if (staffIter != staffList.begin()) continue;
             // cast to Slur check in DrawSlur
             DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
@@ -202,6 +216,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             DrawSylConnector(dc, dynamic_cast<Syl *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
         else if (element->Is() == TIE) {
+            // For ties we limit support to one value in @staff
+            if (staffIter != staffList.begin()) continue;
             // cast to Slur check in DrawTie
             DrawTie(dc, dynamic_cast<Tie *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
@@ -230,7 +246,7 @@ void View::DrawHairpin(
     int endY = m_doc->GetDrawingHairpinSize(staff->m_drawingStaffSize, false);
 
     // We calculate points for cresc by default. Start/End have to be swapped
-    if (form == hairpinLog_FORM_dim) View::SwapY(&startY, &endY);
+    if (form == hairpinLog_FORM_dim) BoundingBox::SwapY(&startY, &endY);
 
     // int y1 = GetHairpinY(hairpin->GetPlace(), staff);
     int y1 = hairpin->GetDrawingY();
@@ -762,37 +778,92 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     Point points[4];
     points[0] = Point(x1, y1);
-    points[1] = Point(x2, y2);
+    points[3] = Point(x2, y2);
 
     float angle = AdjustSlur(slur, staff, layer1->GetN(), drawingCurveDir, points);
 
     int thickness = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * m_doc->GetSlurThickness() / PARAM_DENOMINATOR;
 
     assert(slur->GetCurrentFloatingPositioner());
-    slur->GetCurrentFloatingPositioner()->UpdateSlurPosition(points, angle, thickness, drawingCurveDir);
+    slur->GetCurrentFloatingPositioner()->UpdateCurvePosition(points, angle, thickness, drawingCurveDir);
+
+    /************** articulation **************/
+
+    // First get all artic children
+    AttComparison matchType(ARTIC);
+    ArrayOfObjects artics;
+    ArrayOfObjects::iterator articIter;
+
+    // the normal case or start
+    if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
+        start->FindAllChildByAttComparison(&artics, &matchType);
+        // Then the @n of each first staffDef
+        for (articIter = artics.begin(); articIter != artics.end(); articIter++) {
+            Artic *artic = dynamic_cast<Artic *>(*articIter);
+            assert(artic);
+            ArticPart *outsidePart = artic->GetOutsidePart();
+            if (outsidePart) {
+                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
+                }
+                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), true);
+                }
+            }
+        }
+    }
+    // normal case or end
+    if ((spanningType == SPANNING_START_END) || (SPANNING_END)) {
+        end->FindAllChildByAttComparison(&artics, &matchType);
+        // Then the @n of each first staffDef
+        for (articIter = artics.begin(); articIter != artics.end(); articIter++) {
+            Artic *artic = dynamic_cast<Artic *>(*articIter);
+            assert(artic);
+            ArticPart *outsidePart = artic->GetOutsidePart();
+            if (outsidePart) {
+                if ((outsidePart->GetPlace() == STAFFREL_above) && (drawingCurveDir == curvature_CURVEDIR_above)) {
+                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
+                }
+                else if ((outsidePart->GetPlace() == STAFFREL_below) && (drawingCurveDir == curvature_CURVEDIR_below)) {
+                    outsidePart->AddSlurPositioner(slur->GetCurrentFloatingPositioner(), false);
+                }
+            }
+        }
+    }
 
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(slur, "spanning-slur", "");
-    DrawThickBezierCurve(dc, points[0], points[1], points[2], points[3], thickness, staff->m_drawingStaffSize, angle);
+    DrawThickBezierCurve(dc, points, thickness, staff->m_drawingStaffSize, angle);
+
+    /*
+    int i;
+    int dist = (points[3].x - points[0].x) / 10;
+    for (i = 0; i < 10; i++) {
+        int x = points[0].x + (i * dist);
+        int y = BoundingBox::CalcBezierAtPosition(points, x);
+        DrawDot(dc, x, y, staff->m_drawingStaffSize);
+    }
+    */
+
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
         dc->EndGraphic(slur, this);
 }
 
-float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[])
+float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR curveDir, Point points[4])
 {
     // For readability makes them p1 and p2
     Point *p1 = &points[0];
-    Point *p2 = &points[1];
+    Point *p2 = &points[3];
 
     /************** angle **************/
 
     float slurAngle = GetAdjustedSlurAngle(p1, p2, curveDir);
 
-    Point rotatedP2 = View::CalcPositionAfterRotation(*p2, -slurAngle, *p1);
+    Point rotatedP2 = BoundingBox::CalcPositionAfterRotation(*p2, -slurAngle, *p1);
     // LogDebug("P1 %d %d, P2 %d %d, Angle %f, Pres %d %d", x1, y1, x2, y2, slurAnge, rotadedP2.x, rotatedP2.y);
 
     /************** height **************/
@@ -886,9 +957,9 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
         rotatedC2 = adjustedRotatedC2;
     }
 
-    points[1] = View::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
-    points[2] = View::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
-    points[3] = View::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
+    points[1] = BoundingBox::CalcPositionAfterRotation(rotatedC1, slurAngle, *p1);
+    points[2] = BoundingBox::CalcPositionAfterRotation(rotatedC2, slurAngle, *p1);
+    points[3] = BoundingBox::CalcPositionAfterRotation(rotatedP2, slurAngle, *p1);
 
     return slurAngle;
 }
@@ -944,16 +1015,16 @@ void View::GetSpanningPointPositions(
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end(); itPoint++) {
         Point p;
         if (curveDir == curvature_CURVEDIR_above) {
-            p.y = itPoint->first->GetDrawingTop(m_doc, staffSize);
+            p.y = itPoint->first->GetDrawingTop(m_doc, staffSize, true, ARTIC_PART_OUTSIDE);
         }
         else {
-            p.y = itPoint->first->GetDrawingBottom(m_doc, staffSize);
+            p.y = itPoint->first->GetDrawingBottom(m_doc, staffSize, true, ARTIC_PART_OUTSIDE);
         }
         p.x = itPoint->first->GetDrawingX();
         // Not sure if it is better to add the margin before or after the rotation...
         // if (up) p.y += m_doc->GetDrawingUnit(staffSize) * 2;
         // else p.y -= m_doc->GetDrawingUnit(staffSize) * 2;
-        itPoint->second = View::CalcPositionAfterRotation(p, -angle, p1);
+        itPoint->second = BoundingBox::CalcPositionAfterRotation(p, -angle, p1);
         // This would add it after
         if (curveDir == curvature_CURVEDIR_above) {
             itPoint->second.y += m_doc->GetDrawingUnit(staffSize) * 2;
@@ -969,9 +1040,9 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 {
     Point bezier[4];
     bezier[0] = *p1;
-    bezier[1] = *p2;
-    bezier[2] = *c1;
-    bezier[3] = *c2;
+    bezier[1] = *c1;
+    bezier[2] = *c2;
+    bezier[3] = *p2;
 
     ArrayOfLayerElementPointPairs::iterator itPoint;
     int y;
@@ -996,7 +1067,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
         float posXRatio = 1.0;
         int posX;
         for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-            y = View::CalcBezierAtPosition(bezier, itPoint->second.x);
+            y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
 
             // Weight the desired height according to the x position if wanted
             posXRatio = 1.0;
@@ -1052,8 +1123,8 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
 
     // Check if we need further adjustment of the points with the adjusted curve
     /*
-    bezier[2] = *c1;
-    bezier[3] = *c2;
+    bezier[1] = *c1;
+    bezier[2] = *c2;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
         y = View::CalcBezierAtPosition(bezier, itPoint->second.x);
         if (up) {
@@ -1082,9 +1153,9 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
 {
     Point bezier[4];
     bezier[0] = *p1;
-    bezier[1] = *p2;
-    bezier[2] = *c1;
-    bezier[3] = *c2;
+    bezier[1] = *c1;
+    bezier[2] = *c2;
+    bezier[3] = *p2;
 
     int maxShiftLeft = 0;
     int maxShiftRight = 0;
@@ -1098,7 +1169,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
     int y;
 
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-        y = View::CalcBezierAtPosition(bezier, itPoint->second.x);
+        y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
 
         // Weight the desired height according to the x position on the other side
         posXRatio = 1.0;
@@ -1139,7 +1210,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
     if (spanningPoints->empty()) return;
 
     // Unrotated the slur
-    *p2 = View::CalcPositionAfterRotation(*p2, (*angle), *p1);
+    *p2 = BoundingBox::CalcPositionAfterRotation(*p2, (*angle), *p1);
 
     if (curveDir == curvature_CURVEDIR_above) {
         p1->y += maxShiftLeft;
@@ -1151,7 +1222,7 @@ void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spannin
     }
 
     *angle = GetAdjustedSlurAngle(p1, p2, curveDir);
-    *p2 = View::CalcPositionAfterRotation(*p2, -(*angle), *p1);
+    *p2 = BoundingBox::CalcPositionAfterRotation(*p2, -(*angle), *p1);
 }
 
 void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic)
@@ -1323,11 +1394,20 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
         c2.y = y2 - height;
     }
 
+    Point bezier[4];
+    bezier[0] = Point(x1, y1);
+    bezier[1] = c1;
+    bezier[2] = c2;
+    bezier[3] = Point(x2, y2);
+
+    assert(tie->GetCurrentFloatingPositioner());
+    tie->GetCurrentFloatingPositioner()->UpdateCurvePosition(bezier, 0.0, thickness, drawingCurveDir);
+
     if (graphic)
         dc->ResumeGraphic(graphic, graphic->GetUuid());
     else
         dc->StartGraphic(tie, "spanning-tie", "");
-    DrawThickBezierCurve(dc, Point(x1, y1), Point(x2, y2), c1, c2, thickness, staff->m_drawingStaffSize);
+    DrawThickBezierCurve(dc, bezier, thickness, staff->m_drawingStaffSize);
     if (graphic)
         dc->EndResumedGraphic(graphic, this);
     else
@@ -1444,10 +1524,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
     dc->StartGraphic(dir, "", dir->GetUuid());
 
-    // Use Romam bold for tempo
     FontInfo dirTxt;
-    dirTxt.SetFaceName("Times");
-    dirTxt.SetStyle(FONTSTYLE_italic);
 
     // If we have not timestamp
     int x = dir->GetStart()->GetDrawingX();
@@ -1485,7 +1562,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     assert(measure);
     assert(dynam);
 
-    // We cannot draw a return that has no start position
+    // We cannot draw dynamics that have no start position
     if (!dynam->GetStart()) return;
 
     dc->StartGraphic(dynam, "", dynam->GetUuid());
@@ -1496,10 +1573,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
         dynamSymbol = dynam->GetSymbolStr();
     }
 
-    // Use Romam bold for tempo
     FontInfo dynamTxt;
-    dynamTxt.SetFaceName("Times");
-    dynamTxt.SetStyle(FONTSTYLE_italic);
 
     // If we have not timestamp
     int x = dynam->GetStart()->GetDrawingX();
@@ -1539,6 +1613,61 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     dc->EndGraphic(dynam, this);
 }
 
+void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(fermata);
+
+    // We cannot draw a fermata that has no start position
+    if (!fermata->GetStart()) return;
+
+    dc->StartGraphic(fermata, "", fermata->GetUuid());
+
+    int x = fermata->GetStart()->GetDrawingX();
+
+    // for a start always put fermatas up
+    int code = SMUFL_E4C0_fermataAbove;
+    // check for shape
+    if (fermata->GetShape() == fermataVis_SHAPE_angular) {
+        if (fermata->GetForm() == fermataVis_FORM_inv
+            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+            code = SMUFL_E4C5_fermataShortBelow;
+        else
+            code = SMUFL_E4C4_fermataShortAbove;
+    }
+    else if (fermata->GetShape() == fermataVis_SHAPE_square) {
+        if (fermata->GetForm() == fermataVis_FORM_inv
+            || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+            code = SMUFL_E4C7_fermataLongBelow;
+        else
+            code = SMUFL_E4C6_fermataLongAbove;
+    }
+    else if (fermata->GetForm() == fermataVis_FORM_inv
+        || (fermata->GetPlace() == STAFFREL_below && !(fermata->GetForm() == fermataVis_FORM_norm)))
+        code = SMUFL_E4C1_fermataBelow;
+
+    std::wstring str;
+    str.push_back(code);
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = fermata->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, x, (*staffIter)->GetDrawingY());
+        int y = fermata->GetDrawingY();
+
+        // Adjust the x position
+        int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
+
+        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        dc->ResetFont();
+    }
+
+    dc->EndGraphic(fermata, this);
+}
+
 void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system)
 {
     assert(dc);
@@ -1546,14 +1675,12 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     assert(measure);
     assert(harm);
 
-    // We cannot draw a dir that has no start position
+    // We cannot draw a harmony indication that has no start position
     if (!harm->GetStart()) return;
 
     dc->StartGraphic(harm, "", harm->GetUuid());
 
-    // Use Romam bold for tempo
     FontInfo dirTxt;
-    dirTxt.SetFaceName("Times");
 
     // If we have not timestamp
     int x = harm->GetStart()->GetDrawingX();
@@ -1633,15 +1760,12 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     dc->StartGraphic(tempo, "", tempo->GetUuid());
 
-    // Use Romam bold for tempo
     FontInfo tempoTxt;
-    tempoTxt.SetFaceName("Times");
-    tempoTxt.SetWeight(FONTWEIGHT_bold);
 
     // If we have not timestamp
     int x = measure->GetDrawingX();
     // First try to see if we have a meter sig attribute for this measure
-    AttMeasureAlignerType alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
+    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_SCOREDEF_METERSIG);
     Alignment *pos
         = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
     if (!pos) {
@@ -1678,6 +1802,43 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     }
 
     dc->EndGraphic(tempo, this);
+}
+
+void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(trill);
+
+    // We cannot draw a trill that has no start position
+    if (!trill->GetStart()) return;
+
+    dc->StartGraphic(trill, "", trill->GetUuid());
+
+    int x = trill->GetStart()->GetDrawingX();
+
+    // for a start always put trill up
+    int code = SMUFL_E566_ornamentTrill;
+
+    std::wstring str;
+    str.push_back(code);
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = trill->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, x, (*staffIter)->GetDrawingY());
+        int y = trill->GetDrawingY();
+
+        // Adjust the x position
+        int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
+
+        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        dc->ResetFont();
+    }
+
+    dc->EndGraphic(trill, this);
 }
 
 //----------------------------------------------------------------------------

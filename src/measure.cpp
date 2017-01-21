@@ -9,9 +9,8 @@
 
 //----------------------------------------------------------------------------
 
-#include <iostream>
-
 #include <assert.h>
+#include <iostream>
 #include <math.h>
 
 //----------------------------------------------------------------------------
@@ -262,6 +261,60 @@ int Measure::UnsetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 };
 
+void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool scoreDefInsert)
+{
+    // First set the right barline. If none then set a single one.
+    data_BARRENDITION rightBarline = (this->HasRight()) ? this->GetRight() : BARRENDITION_single;
+    this->SetDrawingRightBarLine(rightBarline);
+
+    // Now adjust the right barline of the previous measure (if any) and the left one
+    if (!previous) {
+        this->SetDrawingLeftBarLine(this->GetLeft());
+    }
+    else if (systemBreak) {
+        // we have rptboth on one of the two sides, split them (ignore any other value)
+        if ((previous->GetRight() == BARRENDITION_rptboth) || (this->GetLeft() == BARRENDITION_rptboth)) {
+            previous->SetDrawingRightBarLine(BARRENDITION_rptend);
+            this->SetDrawingLeftBarLine(BARRENDITION_rptstart);
+        }
+        // nothing to do with any other value?
+        else {
+            this->SetDrawingLeftBarLine(this->GetLeft());
+        }
+    }
+    else if (!scoreDefInsert) {
+        // we have rptboth split in the two measures, make them one rptboth
+        if ((previous->GetRight() == BARRENDITION_rptend) && (this->GetLeft() == BARRENDITION_rptstart)) {
+            previous->SetDrawingRightBarLine(BARRENDITION_rptboth);
+            this->SetDrawingLeftBarLine(BARRENDITION_NONE);
+        }
+        // we have an rptend before, make sure there in none on the left (ignore any other value)
+        else if (previous->GetRight() == BARRENDITION_rptend) {
+            this->SetDrawingLeftBarLine(BARRENDITION_NONE);
+        }
+        // we have an rptstart coming, make sure there is none on the right before (ignore any other value)
+        else if (this->GetLeft() == BARRENDITION_rptstart) {
+            // always set the right barline to invis for spacing
+            previous->SetDrawingRightBarLine(BARRENDITION_invis);
+            this->SetDrawingLeftBarLine(BARRENDITION_rptstart);
+        }
+        // we have an rptboth coming, make sure there is none on the right before (ignore any other value)
+        else if (this->GetLeft() == BARRENDITION_rptboth) {
+            // always set the right barline to invis for spacing
+            previous->SetDrawingRightBarLine(BARRENDITION_invis);
+            this->SetDrawingLeftBarLine(BARRENDITION_rptboth);
+        }
+        // nothing we can do with any other value?
+        else {
+            this->SetDrawingLeftBarLine(this->GetLeft());
+        }
+    }
+    else {
+        // with a scoredef inbetween always set it to what we have in the encoding
+        this->SetDrawingLeftBarLine(this->GetLeft());
+    }
+}
+
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_drawingXRel = 0;
@@ -283,10 +336,6 @@ int Measure::AlignHorizontally(FunctorParams *functorParams)
 
     // clear the content of the measureAligner
     m_measureAligner.Reset();
-
-    // here we transfer the @left and @right values to the barLine objects
-    this->SetLeftBarLineType(this->GetLeft());
-    this->SetRightBarLineType(this->GetRight());
 
     // point to it
     params->m_measureAligner = &m_measureAligner;
@@ -312,7 +361,8 @@ int Measure::AlignHorizontallyEnd(FunctorParams *functorParams)
     assert(params);
 
     // We also need to align the timestamps - we do it at the end since we need the *meterSig to be initialized by a
-    // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work in
+    // Layer. Obviously this will not work with different time signature. However, I am not sure how this would work
+    // in
     // MEI anyway.
     m_timestampAligner.Process(params->m_functor, params);
 
@@ -567,12 +617,25 @@ int Measure::PrepareFloatingGrps(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::PrepareTimePointingEnd(FunctorParams *functorParams)
+{
+    PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
+    assert(params);
+
+    ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
+    while (iter != params->m_timePointingInterfaces.end()) {
+        iter = params->m_timePointingInterfaces.erase(iter);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::PrepareTimeSpanningEnd(FunctorParams *functorParams)
 {
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
 
-    ArrayOfInterfaceClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
+    ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
         // At the end of the measure (going backward) we remove element for which we do not need to match the end
         // (for
@@ -634,9 +697,8 @@ int Measure::PrepareTimestampsEnd(FunctorParams *functorParams)
             if (interface->HasStartAndEnd()) {
                 auto item
                     = std::find_if(params->m_timeSpanningInterfaces.begin(), params->m_timeSpanningInterfaces.end(),
-                        [interface](std::pair<TimeSpanningInterface *, ClassId> pair) {
-                            return (pair.first == interface);
-                        });
+                        [interface](
+                            std::pair<TimeSpanningInterface *, ClassId> pair) { return (pair.first == interface); });
                 if (item != params->m_timeSpanningInterfaces.end()) {
                     // LogDebug("Found it!");
                     params->m_timeSpanningInterfaces.erase(item);

@@ -25,7 +25,7 @@ namespace vrv {
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 13
+#define VERSION_REVISION 14
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
 
@@ -99,6 +99,7 @@ enum ClassId {
     ANCHORED_TEXT,
     DIR,
     DYNAM,
+    FERMATA,
     HAIRPIN,
     HARM,
     OCTAVE,
@@ -106,10 +107,13 @@ enum ClassId {
     SLUR,
     TEMPO,
     TIE,
+    TRILL,
     CONTROL_ELEMENT_max,
     // Ids for LayerElement child classes
     LAYER_ELEMENT,
     ACCID,
+    ARTIC,
+    ARTIC_PART,
     BARLINE,
     BARLINE_ATTR_LEFT,
     BARLINE_ATTR_RIGHT,
@@ -185,6 +189,7 @@ class Note;
 class Object;
 class Point;
 class Staff;
+class TimePointInterface;
 class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
@@ -203,7 +208,9 @@ typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointP
 
 typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;
 
-typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfInterfaceClassIdPairs;
+typedef std::vector<std::pair<TimePointInterface *, ClassId> > ArrayOfPointingInterClassIdPairs;
+
+typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfSpanningInterClassIdPairs;
 
 typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 
@@ -307,6 +314,12 @@ enum ElementScoreDefRole { NONE = 0, SYSTEM_SCOREDEF, INTERMEDIATE_SCOREDEF, CAU
  */
 
 enum { DRAWING_GRP_NONE = 0, DRAWING_GRP_VERSE, DRAWING_GRP_HARM, DRAWING_GRP_OTHER };
+
+//----------------------------------------------------------------------------
+// Artic part types
+//----------------------------------------------------------------------------
+
+enum ArticPartType { ARTIC_PART_INSIDE = 0, ARTIC_PART_OUTSIDE };
 
 //----------------------------------------------------------------------------
 // Legacy Wolfgang defines

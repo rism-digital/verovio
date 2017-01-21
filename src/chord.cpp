@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "artic.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "note.h"
@@ -28,6 +29,7 @@ namespace vrv {
 Chord::Chord()
     : LayerElement("chord-")
     , ObjectListInterface()
+    , DrawingListInterface()
     , StemmedDrawingInterface()
     , DurationInterface()
     , AttCommon()
@@ -57,6 +59,7 @@ Chord::~Chord()
 void Chord::Reset()
 {
     LayerElement::Reset();
+    DrawingListInterface::Reset();
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetCommon();
@@ -83,7 +86,10 @@ void Chord::ClearClusters() const
 
 void Chord::AddChild(Object *child)
 {
-    if (child->Is() == NOTE) {
+    if (child->Is() == ARTIC) {
+        assert(dynamic_cast<Artic *>(child));
+    }
+    else if (child->Is() == NOTE) {
         assert(dynamic_cast<Note *>(child));
     }
     else if (child->IsEditorialElement()) {

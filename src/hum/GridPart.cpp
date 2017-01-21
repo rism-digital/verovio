@@ -24,7 +24,7 @@ namespace hum {
 // GridPart::GridPart -- Constructor.
 //
 
-GridPart::GridPart(void) {
+GridPart::GridPart(void) : GridSide() {
 	// do nothing;
 }
 

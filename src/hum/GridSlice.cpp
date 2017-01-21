@@ -27,9 +27,16 @@ namespace hum {
 // default value: partcount = 0
 //
 
-GridSlice::GridSlice(HumNum timestamp, SliceType type, int partcount) {
+GridSlice::GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
+		int partcount) {
 	m_timestamp = timestamp;
-	m_type = type;
+	m_type      = type;
+	m_owner     = NULL;
+	m_measure   = measure;
+	if (m_measure) {
+		m_owner = measure->getOwner();
+		m_measure = measure;
+	}
 	if (partcount > 0) {
 		this->resize(partcount);
 		for (int p=0; p<partcount; p++) {
@@ -45,9 +52,17 @@ GridSlice::GridSlice(HumNum timestamp, SliceType type, int partcount) {
 // GridStaffs (they will be required to have at least one).
 //
 
-GridSlice::GridSlice(HumNum timestamp, SliceType type, const GridSlice& slice) {
+GridSlice::GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
+		const GridSlice& slice) {
 	m_timestamp = timestamp;
 	m_type = type;
+	if (m_measure) {
+		m_owner = measure->getOwner();
+		m_measure = measure;
+	} else {
+		m_owner = NULL;
+		m_measure = NULL;
+	}
 	int partcount = (int)slice.size();
 	int staffcount;
 	if (partcount > 0) {
@@ -65,9 +80,17 @@ GridSlice::GridSlice(HumNum timestamp, SliceType type, const GridSlice& slice) {
 }
 
 
-GridSlice::GridSlice(HumNum timestamp, SliceType type, GridSlice* slice) {
+GridSlice::GridSlice(GridMeasure* measure, HumNum timestamp, SliceType type,
+		GridSlice* slice) {
 	m_timestamp = timestamp;
 	m_type = type;
+	if (m_measure) {
+		m_owner = measure->getOwner();
+		m_measure = measure;
+	} else {
+		m_owner = NULL;
+		m_measure = NULL;
+	}
 	int partcount = (int)slice->size();
 	int staffcount;
 	if (partcount > 0) {
@@ -104,7 +127,7 @@ GridSlice::~GridSlice(void) {
 
 //////////////////////////////
 //
-// GridSlice::createRecipTokenFromDuration --  Will not be able to 
+// GridSlice::createRecipTokenFromDuration --  Will not be able to
 //   distinguish between triplet notes and dotted normal equivalents,
 //   this can be changed later by checking neighboring durations in the
 //   list for the presence of triplets.
@@ -116,6 +139,9 @@ HTp GridSlice::createRecipTokenFromDuration(HumNum duration) {
 	string str;
 	HumNum dotdur;
 	if (duration.getNumerator() == 0) {
+		// if the GridSlice is at the end of a measure, the
+      // time between the starttime/endtime of the GridSlice should
+		// be subtracted from the endtime of the current GridMeasure.
 		token = new HumdrumToken("g");
 		return token;
 	} else if (duration.getNumerator() == 1) {
@@ -129,9 +155,9 @@ HTp GridSlice::createRecipTokenFromDuration(HumNum duration) {
 		}
 	}
 
-	// try to fit to two dots
-	// try to fit to three dots
+	// try to fit to two dots here
 
+	// try to fit to three dots here
 
 	str = to_string(duration.getDenominator()) + "%" +
 	         to_string(duration.getNumerator());
@@ -161,26 +187,52 @@ bool GridSlice::isInterpretationSlice(void) {
 
 //////////////////////////////
 //
+// GridSlice::isDataSlice --
+//
+
+bool GridSlice::isDataSlice(void) {
+	SliceType type = getType();
+	if (type <= SliceType::_Data) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+
+
+//////////////////////////////
+//
 // GridSlice::transferTokens -- Create a HumdrumLine and append it to
 //    the data.
 //
 
 void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
-
 	HTp token;
 	HumdrumLine* line = new HumdrumLine;
+	GridVoice* voice;
+	string empty = ".";
 
 	if (recip) {
 		if (isNoteSlice()) {
 			token = createRecipTokenFromDuration(getDuration());
 		} else if (isClefSlice()) {
 			token = new HumdrumToken("*");
+			empty = "*";
 		} else if (isMeasureSlice()) {
-			token = new HumdrumToken("=");
+			voice = this->at(0)->at(0)->at(0);
+			token = new HumdrumToken((string)*voice->getToken());
+//ggg
+			empty = (string)*token;
 		} else if (isInterpretationSlice()) {
 			token = new HumdrumToken("*");
+			empty = "*";
+		} else if (isGraceSlice()) {
+			token = new HumdrumToken("q");
+			empty = ".";
 		} else {
 			token = new HumdrumToken("55");
+			empty = "!z";
 		}
 		line->appendToken(token);
 	}
@@ -191,27 +243,38 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 	int v; // voice index
 
 	for (p=(int)size()-1; p>=0; p--) {
+
 		GridPart& part = *this->at(p);
 		for (s=(int)part.size()-1; s>=0; s--) {
 			GridStaff& staff = *part.at(s);
 			if (staff.size() == 0) {
 				// fix this later.  For now if there are no notes
-				// on the staff, add a null token.  Fix so that 
+				// on the staff, add a null token.  Fix so that
 				// all open voices are given null tokens.
-				token = new HumdrumToken(".a");
+				token = new HumdrumToken(empty);
 				line->appendToken(token);
 			} else {
 				for (v=0; v<(int)staff.size(); v++) {
-					if (staff.at(v)->getToken()) {
+					if (staff.at(v) && staff.at(v)->getToken()) {
 						line->appendToken(staff.at(v)->getToken());
 						staff.at(v)->forgetToken();
+					} else if (!staff.at(v)) {
+						token = new HumdrumToken(".z");
+						line->appendToken(token);
 					} else {
 						token = new HumdrumToken(".b");
 						line->appendToken(token);
 					}
 				}
+
 			}
+			int maxvcount = getVerseCount(p, s);
+			int maxhcount = getHarmonyCount(p, s);
+			transferSides(*line, staff, empty, maxvcount, maxhcount);
 		}
+		int maxhcount = getHarmonyCount(p);
+		int maxvcount = getVerseCount(p, -1);
+		transferSides(*line, part, empty, maxvcount, maxhcount);
 	}
 
 	outfile.appendLine(line);
@@ -221,7 +284,176 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 
 //////////////////////////////
 //
-// GridSlice::initializePartStaves --
+// GridSlice::getMeasureDuration --
+//
+
+HumNum GridSlice::getMeasureDuration(void) {
+	GridMeasure* measure = getMeasure();
+	if (!measure) {
+		return -1;
+	} else {
+		return measure->getDuration();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// GridSlice::getMeasureTimestamp -- Return the start time of the measure.
+//
+
+HumNum GridSlice::getMeasureTimestamp(void) {
+	GridMeasure* measure = getMeasure();
+	if (!measure) {
+		return -1;
+	} else {
+		return measure->getTimestamp();
+	}
+}
+
+
+
+//////////////////////////////
+//
+// GridSlice::getVerseCount --
+//
+
+int GridSlice::getVerseCount(int partindex, int staffindex) {
+	HumGrid* grid = getOwner();
+	if (!grid) {
+		return 0;
+	}
+	return grid->getVerseCount(partindex, staffindex);
+}
+
+
+
+//////////////////////////////
+//
+// GridSlice::getHarmonyCount --
+//    default value: staffindex = -1; (currently not looking for
+//        harmony data attached directly to staff (only to part.)
+//
+
+int GridSlice::getHarmonyCount(int partindex, int staffindex) {
+	HumGrid* grid = getOwner();
+	if (!grid) {
+		return 0;
+	}
+	if (staffindex >= 0) {
+		// ignoring staff-level harmony
+		return 0;
+	} else {
+		return grid->getHarmonyCount(partindex);
+	}
+}
+
+
+
+//////////////////////////////
+//
+// GridSlice::transferSides --
+//
+
+
+// this version is used to transfer Sides from the Part
+void GridSlice::transferSides(HumdrumLine& line, GridPart& sides,
+		const string& empty, int maxvcount, int maxhcount) {
+
+	int hcount = sides.getHarmonyCount();
+	int vcount = sides.getVerseCount();
+	HTp newtoken;
+
+	for (int i=0; i<vcount; i++) {
+		HTp verse = sides.getVerse(i);
+		if (verse) {
+			line.appendToken(verse);
+			sides.detachHarmony();
+		} else {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+
+	for (int i=vcount; i<maxvcount; i++) {
+		newtoken = new HumdrumToken(empty);
+		line.appendToken(newtoken);
+	}
+
+	for (int i=0; i<hcount; i++) {
+		HTp harmony = sides.getHarmony();
+		if (harmony) {
+			line.appendToken(harmony);
+			sides.detachHarmony();
+		} else {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+
+	for (int i=hcount; i<maxhcount; i++) {
+		newtoken = new HumdrumToken(empty);
+		line.appendToken(newtoken);
+	}
+}
+
+
+// this version is used to transfer Sides from the Staff
+void GridSlice::transferSides(HumdrumLine& line, GridStaff& sides,
+		const string& empty, int maxvcount, int maxhcount) {
+
+	// existing verses:
+	int vcount = sides.getVerseCount();
+
+	// there should not be any harony attached to staves
+	// (only to parts, so hcount should only be zero):
+	int hcount = sides.getHarmonyCount();
+	HTp newtoken;
+
+
+	for (int i=0; i<vcount; i++) {
+		HTp verse = sides.getVerse(i);
+		if (verse) {
+			line.appendToken(verse);
+			sides.setVerse(i, NULL); // needed to avoid double delete
+		} else {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+
+	if (vcount < maxvcount) {
+		for (int i=vcount; i<maxvcount; i++) {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+
+	for (int i=0; i<hcount; i++) {
+		HTp harmony = sides.getHarmony();
+		if (harmony) {
+			line.appendToken(harmony);
+			sides.detachHarmony();
+		} else {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+
+	if (hcount < maxhcount) {
+		for (int i=hcount; i<maxhcount; i++) {
+			newtoken = new HumdrumToken(empty);
+			line.appendToken(newtoken);
+		}
+	}
+}
+
+
+
+//////////////////////////////
+//
+// GridSlice::initializePartStaves -- Also initialize sides
 //
 
 void GridSlice::initializePartStaves(vector<MxmlPart>& partdata) {
@@ -294,6 +526,40 @@ void GridSlice::setTimestamp(HumNum timestamp) {
 }
 
 
+
+//////////////////////////////
+//
+// GridSlice::setOwner --
+//
+
+void GridSlice::setOwner(HumGrid* owner) {
+	m_owner = owner;
+}
+
+
+
+//////////////////////////////
+//
+// GridSlice::getOwner --
+//
+
+HumGrid* GridSlice::getOwner(void) {
+	return m_owner;
+}
+
+
+
+//////////////////////////////
+//
+// GridSlice::getMeasure --
+//
+
+GridMeasure* GridSlice::getMeasure(void) {
+	return m_measure;
+}
+
+
+
 //////////////////////////////
 //
 // operator<< -- print token content of a slice
@@ -332,13 +598,28 @@ ostream& operator<<(ostream& output, GridSlice* slice) {
 						output << " \"" << *token << "\" ";
 					}
 				}
-			
+
 			}
 		}
 	}
 	return output;
 }
 
+
+
+//////////////////////////////
+//
+// GridSlice::invalidate -- Mark the slice as invalid, which means that
+//    it should not be transferred to the output Humdrum file in HumGrid.
+//    Tokens stored in the GridSlice will be deleted by GridSlice when it
+//    is destroyed.
+//
+
+void GridSlice::invalidate(void) {
+		m_type = SliceType::Invalid;
+		// should only do with 0 duration slices, but force to 0 if not already.
+		setDuration(0);
+}
 
 
 } // end namespace hum

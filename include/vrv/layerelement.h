@@ -89,9 +89,13 @@ public:
     /**
      * Returns the drawing top and bottom taking into accound stem, etc.
      * We pass the doc as parameter in order to have access to the current drawing parameters.
+     * withArtic specifies if the articulation sign needs to be taken into account or not.
+     * articPartType indicates if the inside or outside artic part has to be taken into account (inside is taken
+     * into account in any case)
      */
-    int GetDrawingTop(Doc *doc, int staffSize);
-    int GetDrawingBottom(Doc *doc, int staffSize);
+    int GetDrawingTop(Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
+    int GetDrawingBottom(
+        Doc *doc, int staffSize, bool withArtic = true, ArticPartType articPartType = ARTIC_PART_INSIDE);
 
     /**
      * Alignment getter
@@ -125,6 +129,11 @@ public:
     virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
+     * See Object::PrepareTimePointing
+     */
+    virtual int PrepareTimePointing(FunctorParams *functorParams);
+
+    /**
      * See Object::PrepareTimeSpanning
      */
     virtual int PrepareTimeSpanning(FunctorParams *functorParams);
@@ -151,7 +160,8 @@ public:
     virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
 
 private:
-    //
+    int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
+
 public:
     /** Absolute position X. This is used for facsimile (transcription) encoding */
     int m_xAbs;

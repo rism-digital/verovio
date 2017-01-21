@@ -4,8 +4,13 @@ project(Verovio)
 
 set(CMAKE_BUILD_TYPE Release)
 
-option(NO_PAE_SUPPORT     "Disable Plain and Easy support" OFF)
-option(NO_HUMDRUM_SUPPORT "Disable Humdrum support"        OFF)
+option(NO_PAE_SUPPORT           "Disable Plain and Easy support"               OFF)
+option(NO_HUMDRUM_SUPPORT       "Disable Humdrum support"                      OFF)
+option(MUSICXML_DEFAULT_HUMDRUM "Enable MusicXML to Humdrum by default"        OFF)
+
+if (NO_HUMDRUM_SUPPORT AND MUSICXML_DEFAULT_HUMDRUM)
+    message(SEND_ERROR "Default MusicXML to Humdrum cannot be enabled by default without Humdrum support")
+endif()
 
 include_directories(
     ../include
@@ -39,10 +44,14 @@ endif()
 
 if(NO_HUMDRUM_SUPPORT)
     add_definitions(-DNO_HUMDRUM_SUPPORT)
+else()
+    file(GLOB hum_SRC "../src/hum/*.cpp")
+    if (MUSICXML_DEFAULT_HUMDRUM)
+        add_definitions(-DMUSICXML_DEFAULT_HUMDRUM)
+    endif()
 endif()
 
 file(GLOB verovio_SRC "../src/*.cpp")
-file(GLOB hum_SRC "../src/hum/*.cpp")
 file(GLOB midi_SRC "../src/midi/*.cpp")
 
 add_executable (
@@ -55,6 +64,7 @@ add_executable (
     ../libmei/attconverter.cpp
     ../libmei/atts_cmn.cpp
     ../libmei/atts_critapp.cpp
+    ../libmei/atts_externalsymbols.cpp
     ../libmei/atts_mei.cpp
     ../libmei/atts_mensural.cpp
     ../libmei/atts_midi.cpp

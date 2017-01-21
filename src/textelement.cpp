@@ -19,12 +19,12 @@ namespace vrv {
 // TextElement
 //----------------------------------------------------------------------------
 
-TextElement::TextElement() :  Object("te-")
+TextElement::TextElement() : Object("te-")
 {
     Reset();
 }
 
-TextElement::TextElement(std::string classid) :  Object(classid)
+TextElement::TextElement(std::string classid) : Object(classid)
 {
     Reset();
 }

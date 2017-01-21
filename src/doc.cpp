@@ -96,7 +96,6 @@ void Doc::Reset()
 
     m_drawingSmuflFontSize = 0;
     m_drawingLyricFontSize = 0;
-    m_drawingLyricFont.SetFaceName("Times");
 }
 
 void Doc::SetType(DocType type)
@@ -141,8 +140,7 @@ void Doc::Refresh()
 void Doc::ExportMIDI(MidiFile *midiFile)
 {
     CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
-    if (m_scoreDef.HasMidiBpm()) calcMaxMeasureDurationParams.m_currentBpm = m_scoreDef.GetMidiBpm();
-    
+
     // We first calculate the maximum duration of each measure
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
     this->Process(&calcMaxMeasureDuration, &calcMaxMeasureDurationParams);
@@ -164,6 +162,11 @@ void Doc::ExportMIDI(MidiFile *midiFile)
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
 
+    // Set tempo
+    if (m_scoreDef.HasMidiBpm()) {
+        midiFile->addTempo(0, 0, m_scoreDef.GetMidiBpm());
+    }
+
     // Process notes and chords, rests, spaces layer by layer
     // track 0 (included by default) is reserved for meta messages common to all tracks
     int midiTrack = 1;
@@ -175,10 +178,12 @@ void Doc::ExportMIDI(MidiFile *midiFile)
         // Get the transposition (semi-tone) value for the staff
         if (StaffDef *staffDef = this->m_scoreDef.GetStaffDef(staves->first)) {
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
+            midiTrack = staffDef->GetN();
+            midiFile->addTrack();
+            if (staffDef->HasLabel()) midiFile->addTrackName(midiTrack, 0, staffDef->GetLabel());
         }
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            midiFile->addTrack(1);
             filters.clear();
             // Create ad comparison object for each type / @n
             AttCommonNComparison matchStaff(STAFF, staves->first);
@@ -188,15 +193,13 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
             GenerateMIDIParams generateMIDIParams(midiFile);
             generateMIDIParams.m_maxValues = calcMaxMeasureDurationParams.m_maxValues;
+            generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
 
-            if (m_scoreDef.HasMidiBpm()) generateMIDIParams.m_currentBpm = m_scoreDef.GetMidiBpm();
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);
-
-            midiTrack++;
         }
     }
 
@@ -228,6 +231,13 @@ void Doc::PrepareDrawing()
         prepareTimeSpanningParams.m_fillList = false;
         this->Process(&prepareTimeSpanning, &prepareTimeSpanningParams);
     }
+
+    // Try to match all time pointing elements (tempo, fermata, etc) by processing backwards
+    PrepareTimePointingParams prepareTimePointingParams;
+    Functor prepareTimePointing(&Object::PrepareTimePointing);
+    Functor prepareTimePointingEnd(&Object::PrepareTimePointingEnd);
+    this->Process(
+        &prepareTimePointing, &prepareTimePointingParams, &prepareTimePointingEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
 
     // Now try to match the @tstamp and @tstamp2 attributes.
     PrepareTimestampsParams prepareTimestampsParams;
@@ -375,6 +385,10 @@ void Doc::PrepareDrawing()
     PrepareFloatingGrpsParams prepareFloatingGrpsParams;
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams);
+
+    FunctorParams prepareArticParams;
+    Functor prepareArtic(&Object::PrepareArtic);
+    this->Process(&prepareArtic, &prepareArticParams);
 
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
