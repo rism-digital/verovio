@@ -4634,7 +4634,11 @@ void HumdrumInput::addFermata(HTp token)
 
 void HumdrumInput::addTrill(HTp token)
 {
-    if (!((token->find("T") != string::npos) || (token->find("t") != string::npos))) {
+    size_t tpos = token->find("T");
+    if (tpos == string::npos) {
+        tpos = token->find("t");
+    }
+    if (tpos == string::npos) {
         // no trill on note(s)
         return;
     }
@@ -4648,6 +4652,21 @@ void HumdrumInput::addTrill(HTp token)
     // using tstamp for now, but @startid is perhaps better?
     HumNum tstamp = getMeasureTstamp(token, staff - 1);
     trill->SetTstamp(tstamp.getFloat());
+
+    if (m_signifiers.above) {
+        if (tpos < token->size() - 1) {
+            if ((*token)[tpos + 1] == m_signifiers.above) {
+                trill->SetPlace(STAFFREL_above);
+            }
+        }
+    }
+    if (m_signifiers.below) {
+        if (tpos < token->size() - 1) {
+            if ((*token)[tpos + 1] == m_signifiers.below) {
+                trill->SetPlace(STAFFREL_below);
+            }
+        }
+    }
 }
 
 //////////////////////////////
