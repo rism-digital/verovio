@@ -287,7 +287,7 @@ protected:
     void setNextLeftBarStyle(data_BARRENDITION style);
     void parseSignifiers(hum::HumdrumFile &infile);
     string getAutoClef(hum::HTp partstart, int partnumber);
-    void colorNote(vrv::Note *note, hum::HTp token);
+    void colorNote(vrv::Note *note, const string& token);
     vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
     void addSystemKeyTimeChange(int startline, int endline);
     void prepareEndings(void);

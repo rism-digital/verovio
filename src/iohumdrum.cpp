@@ -2236,7 +2236,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
                 note->SetStemLen(0);
             }
-            colorNote(note, layerdata[i]);
+            colorNote(note, *layerdata[i]);
             addArticulations(note, layerdata[i]);
             addTrill(layerdata[i]);
             addFermata(layerdata[i]);
@@ -2381,10 +2381,10 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
 // HumdrumInput::colorNote --
 //
 
-void HumdrumInput::colorNote(Note *note, HTp token)
+void HumdrumInput::colorNote(Note *note, const string &token)
 {
     for (int i = 0; i < (int)m_signifiers.mark.size(); i++) {
-        if (token->find(m_signifiers.mark[i]) != string::npos) {
+        if (token.find(m_signifiers.mark[i]) != string::npos) {
             note->SetColor(m_signifiers.mcolor[i]);
             break;
         }
@@ -4252,6 +4252,8 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
     bool chordQ = token->isChord();
 
     bool octaveupQ = ss[staffindex].ottavameasure ? true : false;
+
+    colorNote(note, tstring);
 
     if ((ss[staffindex].ottavameasure != NULL) && (ss[staffindex].ottavanotestart == NULL)) {
         ss[staffindex].ottavanotestart = note;
