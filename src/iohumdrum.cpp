@@ -4237,6 +4237,28 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
 
     int layer = m_currentlayer;
 
+    if (m_signifiers.above) {
+        string pattern = "[ra-gA-G]+[-#nxXyY]*";
+        pattern.push_back(m_signifiers.above);
+        if (regex_search(tstring, regex(pattern))) {
+            int newstaff = m_currentstaff - 1;
+            if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+                setStaff(rest, newstaff);
+            }
+        }
+    }
+    if (m_signifiers.below) {
+        string pattern = "[ra-gA-G]+[-#nxXyY]*";
+        pattern.push_back(m_signifiers.below);
+        if (regex_search(tstring, regex(pattern))) {
+            int newstaff = m_currentstaff + 1;
+            if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+                setStaff(rest, newstaff);
+            }
+        }
+    }
+
+    // Delete these temporary staff position methods later:
     if (tstring.find("jj") != string::npos) {
         int newstaff = m_currentstaff - 1;
         if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
@@ -4439,6 +4461,28 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
         processTieEnd(note, token, tstring);
     }
 
+    if (m_signifiers.above) {
+        string pattern = "[ra-gA-G]+[-#nxXyY]*";
+        pattern.push_back(m_signifiers.above);
+        if (regex_search(tstring, regex(pattern))) {
+            int newstaff = m_currentstaff - 1;
+            if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+                setStaff(note, newstaff);
+            }
+        }
+    }
+    if (m_signifiers.below) {
+        string pattern = "[ra-gA-G]+[-#nxXyY]*";
+        pattern.push_back(m_signifiers.below);
+        if (regex_search(tstring, regex(pattern))) {
+            int newstaff = m_currentstaff + 1;
+            if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
+                setStaff(note, newstaff);
+            }
+        }
+    }
+
+    // Delete these temporary staff position methods later:
     if (tstring.find("jj") != string::npos) {
         int newstaff = m_currentstaff - 1;
         if ((newstaff > 0) && (newstaff <= (int)m_kernstarts.size())) {
