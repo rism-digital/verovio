@@ -574,49 +574,68 @@ void HumdrumInput::createHeader(void)
 
     insertTitle(filetitle, references);
 
+    // <pubStmt> /////////////
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-    string EED = getReferenceValue("EED", references);
-    if (EED.size()) {
-        pugi::xml_node pubRespStmt = pubStmt.append_child("respStmt");
-        pugi::xml_node editor = pubRespStmt.append_child("persName");
-        editor.append_attribute("role") = "editor";
-        editor.append_child(pugi::node_pcdata).set_value(EED.c_str());
+    if (getReferenceValue("PUB", references) != "unpublished") {
+        string EED = getReferenceValue("EED", references);
+        if (!EED.empty()) {
+            pugi::xml_node pubRespStmt = pubStmt.append_child("respStmt");
+            pugi::xml_node editor = pubRespStmt.append_child("persName");
+            editor.append_attribute("role") = "editor";
+            editor.append_child(pugi::node_pcdata).set_value(EED.c_str());
+        }
+        string YER = getReferenceValue("YER", references);
+        if (!YER.empty()) {
+            pugi::xml_node pubDate = pubStmt.append_child("date");
+            pubDate.append_child(pugi::node_pcdata).set_value(YER.c_str());
+        }
+        if (!getReferenceValue("YEC", references).empty() || !getReferenceValue("YEM", references).empty()) {
+            pugi::xml_node availability = pubStmt.append_child("availability");
+            pugi::xml_node useRestrict = availability.append_child("useRestrict");
+            for (int i = 0; i < (int)references.size(); i++) {
+                if (references[i]->getReferenceKey() == "YEC") {
+                    useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+                    useRestrict.append_child(pugi::node_pcdata).set_value(" - ");
+                }
+                if (references[i]->getReferenceKey() == "YEM") {
+                    useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+                    useRestrict.append_child(pugi::node_pcdata).set_value(" ");
+                }
+            }
+        }
     }
-    string YEM = getReferenceValue("YEM", references);
-    if (YEM.size()) {
-        pugi::xml_node availability = pubStmt.append_child("availability");
-        pugi::xml_node useRestrict = availability.append_child("useRestrict");
-        useRestrict.append_child(pugi::node_pcdata).set_value(YEM.c_str());
+    else {
+        pubStmt.append_child("unpublished");
     }
-    pugi::xml_node date = pubStmt.append_child("date");
 
     // <encodingDesc> /////////
     pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
     pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
 
-    pugi::xml_node p1 = projectDesc.append_child("p");
-    p1.append_child(pugi::node_pcdata)
-    .set_value(StringFormat("Transcoded from Humdrum with Verovio version %s", GetVersion().c_str()).c_str());
+    pugi::xml_node appInfo = projectDesc.append_child("application");
+    appInfo.append_attribute("isodate") = getDateString().c_str();
+    appInfo.append_attribute("version") = GetVersion().c_str();
+    pugi::xml_node name = appInfo.append_child("name");
+    name.append_child(pugi::node_pcdata).set_value("Verovio");
+    pugi::xml_node p1 = appInfo.append_child("p");
+    p1.append_child(pugi::node_pcdata).set_value("Transcoded from Humdrum");
     string ENC = getReferenceValue("ENC", references);
-    if (ENC.size()) {
+    if (!ENC.empty()) {
         ENC = "Encoded by: " + ENC;
         pugi::xml_node p2 = projectDesc.append_child("p");
         p2.append_child(pugi::node_pcdata).set_value(ENC.c_str());
     }
-
-    string datestr = getDateString();
-    date.append_child(pugi::node_pcdata).set_value(datestr.c_str());
 
     // <sourceDesc> /////////
 
     // <workDesc> /////////////
     pugi::xml_node workDesc = m_doc->m_header.append_child("workDesc");
     pugi::xml_node work = workDesc.append_child("work");
-    pugi::xml_node identifier= work.append_child("identifier");
     pugi::xml_node titleStmt = work.append_child("titleStmt");
 
     string SCT = getReferenceValue("SCT", references);
-    if (SCT.size()) {
+    if (!SCT.empty()) {
+        pugi::xml_node identifier= work.append_child("identifier");
         identifier.append_child(pugi::node_pcdata).set_value(SCT.c_str());
     }
     insertTitle(titleStmt, references);
@@ -679,6 +698,31 @@ void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, vector<vector<strin
         person.text().set(unescapeHtmlEntities(respPeople[i][0]).c_str());
     }
 }
+
+//////////////////////////////
+//
+// HumdrumInput::getTitleByType --
+//
+// Roles (4th parameter in addPerson(), is free-form, but should use the roles
+// are listed in these two webpages:
+//    http://www.loc.gov/marc/relators/relacode.html
+//       list of three-letter relator codes
+//    http://www.loc.gov/marc/relators/relaterm.html
+//       short descriptions of relator codes
+//
+
+//void HumdrumInput::getTitleByType(vector<vector<string> > &respPeople, vector<HumdrumLine *> &references)
+//{
+    
+    // precalculate a reference map here to make more O(N) rather than O(N^2)
+    //addTitle(respPeople, references, "OTL", "main"); // cmp
+    //addTitle(respPeople, references, "OTP", "translated");
+    //addTitle(respPeople, references, "COS", "uniform");
+    //addTitle(respPeople, references, "LYR", "translated"); // lyr
+    //addTitle(respPeople, references, "LIB", "translated"); // lbt
+    //addTitle(respPeople, references, "LAR", "arranger"); // arr
+//}
+
 
 //////////////////////////////
 //
