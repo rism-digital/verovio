@@ -2014,14 +2014,88 @@ void HumdrumInput::printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, cons
 
 //////////////////////////////
 //
+// HumdrumInput::setBeamDirection -- Set a beam up or down.
+//
+
+void HumdrumInput::setBeamDirection(
+    int direction, const vector<humaux::HumdrumBeamAndTuplet> &tgs, vector<HTp> &layerdata, int layerindex, bool grace)
+{
+    const humaux::HumdrumBeamAndTuplet &tg = tgs[layerindex];
+    int beamstart = tg.beamstart;
+    if (grace) {
+        beamstart = tg.gbeamstart;
+    }
+    int beamend;
+
+    for (int i = layerindex; i < (int)layerdata.size(); i++) {
+        beamend = tgs[i].beamend;
+        if (grace) {
+            beamend = tgs[i].gbeamend;
+        }
+        if (!layerdata[i]->isData()) {
+            continue;
+        }
+        if (layerdata[i]->isNull()) {
+            continue;
+        }
+        if (layerdata[i]->isRest()) {
+            // not adding stem direction to rests
+            continue;
+        }
+        if ((layerdata[i]->getDuration() == 0) && !grace) {
+            // ignore grace note beams
+            continue;
+        }
+        else if ((layerdata[i]->getDuration() != 0) && grace) {
+            // ignore non-grace note beams
+            continue;
+        }
+        layerdata[i]->setValue("", "auto", "stem.dir", to_string(direction));
+        if (beamend == beamstart) {
+            // last note of beam so exit
+            break;
+        }
+    }
+}
+
+//////////////////////////////
+//
 // HumdrumInput::handleGroupStarts --
 //
 
-void HumdrumInput::handleGroupStarts(
-    const humaux::HumdrumBeamAndTuplet &tg, vector<string> &elements, vector<void *> &pointers, HTp token)
+void HumdrumInput::handleGroupStarts(const vector<humaux::HumdrumBeamAndTuplet> &tgs, vector<string> &elements,
+    vector<void *> &pointers, vector<HTp> &layerdata, int layerindex)
 {
+    const humaux::HumdrumBeamAndTuplet &tg = tgs[layerindex];
+    HTp token = layerdata[layerindex];
     vector<humaux::StaffStateVariables> &ss = m_staffstates;
     int staffindex = m_currentstaff - 1;
+
+    if (tg.beamstart || tg.gbeamstart) {
+        int direction = 0;
+        if (m_signifiers.above) {
+            string pattern = "[LJKk]+";
+            pattern.push_back(m_signifiers.above);
+            if (regex_search(*token, regex(pattern))) {
+                direction = 1;
+            }
+        }
+        if (m_signifiers.below) {
+            string pattern = "[LJKk]+";
+            pattern.push_back(m_signifiers.below);
+            if (regex_search(*token, regex(pattern))) {
+                direction = -1;
+            }
+        }
+        if (direction) {
+            if (tg.beamstart) {
+                setBeamDirection(direction, tgs, layerdata, layerindex, false);
+            }
+            else {
+                setBeamDirection(direction, tgs, layerdata, layerindex, true);
+            }
+        }
+    }
 
     if (tg.beamstart && tg.tupletstart) {
         if (tg.priority == 'T') {
@@ -2254,7 +2328,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             continue;
         }
 
-        handleGroupStarts(tg[i], elements, pointers, layerdata[i]);
+        handleGroupStarts(tg, elements, pointers, layerdata, i);
         addOrnamentMarkers(layerdata[i]);
 
         if (layerdata[i]->isChord()) {
@@ -4162,6 +4236,7 @@ void HumdrumInput::convertChord(Chord *chord, HTp token, int staffindex)
     else if (token->find("\\") != string::npos) {
         chord->SetStemDir(STEMDIRECTION_down);
     }
+    checkForAutoStem(chord, token);
 
     token->setValue("MEI", "xml:id", chord->GetUuid());
     int index = (int)m_measures.size() - 1;
@@ -4364,6 +4439,22 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
     token->setValue("MEI", "measureIndex", index);
 }
 
+//////////////////////////////
+//
+// HumdrumInput::checkForAutoStem -- For notes and chords (and possibly Rests).
+//
+
+template <class ELEMENT> void HumdrumInput::checkForAutoStem(ELEMENT element, HTp token)
+{
+    string stemdir = token->getValue("", "auto", "stem.dir");
+    if (stemdir == "1") {
+        element->SetStemDir(STEMDIRECTION_up);
+    }
+    else if (stemdir == "-1") {
+        element->SetStemDir(STEMDIRECTION_down);
+    }
+}
+
 /////////////////////////////
 //
 // HumdrumInput::convertNote --
@@ -4516,6 +4607,7 @@ void HumdrumInput::convertNote(Note *note, HTp token, int staffindex, int subtok
         else if (tstring.find("\\") != string::npos) {
             note->SetStemDir(STEMDIRECTION_down);
         }
+        checkForAutoStem(note, token);
     }
 
     if (tstring.find("yy") != string::npos) {

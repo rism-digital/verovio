@@ -257,8 +257,10 @@ protected:
     void insertBeam(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
     void insertGBeam(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
     void analyzeLayerBeams(vector<int> &beamnum, vector<int> &gbeamnum, const vector<hum::HTp> &layerdata);
-    void handleGroupStarts(
-        const humaux::HumdrumBeamAndTuplet &tg, vector<string> &elements, vector<void *> &pointers, hum::HTp token);
+    void setBeamDirection(int direction, const vector<humaux::HumdrumBeamAndTuplet> &tgs, vector<hum::HTp> &layerdata,
+        int layerindex, bool grace);
+    void handleGroupStarts(const vector<humaux::HumdrumBeamAndTuplet> &tgs, vector<string> &elements,
+        vector<void *> &pointers, vector<hum::HTp> &layerdata, int layerindex);
     void handleGroupEnds(const humaux::HumdrumBeamAndTuplet &tg, vector<string> &elements, vector<void *> &pointers);
     void handleStaffStateVariables(hum::HTp token);
     void removeTuplet(vector<string> &elements, vector<void *> &pointers);
@@ -318,6 +320,7 @@ protected:
     template <class CHILD> void appendElement(const vector<string> &name, const vector<void *> &pointers, CHILD child);
 
     template <class ELEMENT> void addTextElement(ELEMENT *element, const string &content);
+    template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
 
     /// Static functions ////////////////////////////////////////////////////
     static string unescapeHtmlEntities(const string &input);
