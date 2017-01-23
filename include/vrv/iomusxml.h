@@ -31,13 +31,13 @@ class Harm;
 class Layer;
 class LayerElement;
 class Measure;
+class Octave;
 class Pedal;
 class Section;
 class Slur;
 class StaffGrp;
 class Tempo;
 class Tie;
-/// class Tuplet;
 
 //----------------------------------------------------------------------------
 // namespace for local MusicXml classes
@@ -77,14 +77,14 @@ namespace musicxml {
 
     class OpenHairpin {
     public:
-        OpenHairpin(int dirN, std::string lastID)
+        OpenHairpin(int dirN, std::string endID)
         {
             m_dirN = dirN;
-            m_ID = lastID;
+            m_endID = endID;
         }
 
         int m_dirN;
-        std::string m_ID;
+        std::string m_endID;
     };
 
 } // namespace musicxml
@@ -226,8 +226,8 @@ private:
     data_BOOLEAN ConvertWordToBool(std::string value);
     data_DURATION ConvertTypeToDur(std::string value);
     data_PITCHNAME ConvertStepToPitchName(std::string value);
-    data_PLACE ConvertTypeToPlace(std::string value);
     curvature_CURVEDIR ConvertOrientationToCurvedir(std::string);
+    fermataVis_SHAPE ConvertFermataShape(std::string);
     pedalLog_DIR ConvertPedalTypeToDir(std::string value);
     tupletVis_NUMFORMAT ConvertTupletNumberValue(std::string value);
     ///@}
@@ -235,8 +235,12 @@ private:
 private:
     /** The filename */
     std::string m_filename;
+    /** octave offset **/
+    std::vector<int> m_octDis;
     /** MIDI ticks */
     int m_ppq;
+    /** LastElementID **/
+    std::string m_ID;
     /** The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
     std::vector<LayerElement *> m_elementStack;
     /** The stack for open slurs */
@@ -249,6 +253,7 @@ private:
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
     std::vector<Harm *> m_harmStack;
+    std::vector<Octave *> m_octaveStack;
     std::vector<Pedal *> m_pedalStack;
     std::vector<Tempo *> m_tempoStack;
     /**
