@@ -2388,17 +2388,19 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
             artics.push_back(ARTICULATION_stacciss);
         }
         else if (token->find("^^") != string::npos) {
-            artics.push_back(ARTICULATION_marc_stacc);
-            //} else if (token->find('^') != string::npos) {
-            //	artics.push_back(ARTICULATION_acc_stacc);
+            // artics.push_back(ARTICULATION_marc_stacc);
+            artics.push_back(ARTICULATION_stacc);
+            artics.push_back(ARTICULATION_marc);
         }
         else if (token->find('^') != string::npos) {
             // no composite articulation for "acc-stacc"
-            artics.push_back(ARTICULATION_acc);
             artics.push_back(ARTICULATION_stacc);
+            artics.push_back(ARTICULATION_acc);
         }
         else if (token->find('~') != string::npos) {
-            artics.push_back(ARTICULATION_ten_stacc);
+            // artics.push_back(ARTICULATION_ten_stacc);
+            artics.push_back(ARTICULATION_stacc);
+            artics.push_back(ARTICULATION_ten);
         }
         else {
             artics.push_back(ARTICULATION_stacc);
