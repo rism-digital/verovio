@@ -4,11 +4,11 @@
 <p>
     This page documents the elements and attributes that are currently supported by Verovio. It is also important to note that the hierarchy of elements supported by Verovio is limited and that it will also determine wherether an MEI document can be rendered or not.
 </p>
-                    
+
 <h4>MEI elements</h4>
 <p>
     Verovio supports a subset of MEI elements and attributes that are documented here. Additional elements and attributes will be added in the future.
-</p>                
+</p>
 
     
         <div class="panel panel-default">
@@ -50,7 +50,7 @@
             
                 <tr>
                       <td><code>@accid</code></td>
-                      <td>Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.</td>
+                      <td>Supported values: 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.</td>
                     <td>accidental</td>
                 </tr>
             
@@ -136,6 +136,69 @@
         
         <div class="row">
             <div class="col-xs-10">
+                <code class="panel-header">&lt;artic&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/artic" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@artic</code></td>
+                      <td></td>
+                    <td>articulation</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@place</code></td>
+                      <td>Supported values: 'above' and 'below'</td>
+                    <td>placement</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
                 <code class="panel-header">&lt;beam&gt;</code>
             </div>
             <div class="col-xs-2">
@@ -149,6 +212,86 @@
             </div>
         </div>
     
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
+                <code class="panel-header">&lt;beatRpt&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/beatRpt" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@form</code></td>
+                      <td></td>
+                    <td></td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
     </div>
     
 </div>
@@ -192,7 +335,7 @@
             
                 <tr>
                       <td><code>@rend</code></td>
-                      <td>Supported values are: 'single', 'rptboth', 'rptstart', 'rptend', 'dbl', and 'end'.</td>
+                      <td>Supported values: 'single', 'rptboth', 'rptstart', 'rptend', 'dbl', and 'end'.</td>
                     <td>barLine.log</td>
                 </tr>
             
@@ -242,9 +385,21 @@
             <tbody>
             
                 <tr>
+                      <td><code>@artic</code></td>
+                      <td></td>
+                    <td>articulation</td>
+                </tr>
+            
+                <tr>
                       <td><code>@breaksec</code></td>
                       <td></td>
                     <td>beamsecondary</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
                 </tr>
             
                 <tr>
@@ -261,7 +416,7 @@
             
                 <tr>
                       <td><code>@fermata</code></td>
-                      <td>Currently always place above</td>
+                      <td></td>
                     <td>fermatapresent</td>
                 </tr>
             
@@ -297,7 +452,7 @@
             
                 <tr>
                       <td><code>@stem.len</code></td>
-                      <td>Not supported yet</td>
+                      <td>Supported values: 0</td>
                     <td>stemmed</td>
                 </tr>
             
@@ -384,13 +539,13 @@
             
                 <tr>
                       <td><code>@line</code></td>
-                      <td>Supported values are 1-5 for shape 'C', 1-2 for 'G' and 3-5 for 'F'.</td>
+                      <td>Supported values are 1–5 for shape 'C', 1–2 for 'G' and 3–5 for 'F'.</td>
                     <td>lineloc</td>
                 </tr>
             
                 <tr>
                       <td><code>@shape</code></td>
-                      <td>Supported values are 'C', 'F' and 'G'.</td>
+                      <td>Supported values: 'C', 'F' and 'G'.</td>
                     <td>clefshape</td>
                 </tr>
             
@@ -464,6 +619,75 @@
         
         <div class="row">
             <div class="col-xs-10">
+                <code class="panel-header">&lt;dir&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/dir" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@staff</code></td>
+                      <td></td>
+                    <td>staffident</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@startid</code></td>
+                      <td></td>
+                    <td>startid</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@tstamp</code></td>
+                      <td></td>
+                    <td>timestamp.musical</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@xml:lang</code></td>
+                      <td></td>
+                    <td>lang</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
                 <code class="panel-header">&lt;dot&gt;</code>
             </div>
             <div class="col-xs-2">
@@ -506,6 +730,324 @@
                       <td><code>@ploc</code></td>
                       <td></td>
                     <td>staffloc.pitched</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
+                <code class="panel-header">&lt;dynam&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/dynam" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@staff</code></td>
+                      <td></td>
+                    <td>staffident</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@startid</code></td>
+                      <td></td>
+                    <td>startid</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@tstamp</code></td>
+                      <td></td>
+                    <td>timestamp.musical</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@xml:lang</code></td>
+                      <td></td>
+                    <td>lang</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
+                <code class="panel-header">&lt;fermata&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/fermata" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@form</code></td>
+                      <td></td>
+                    <td>fermata.vis</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@place</code></td>
+                      <td>Supported values: 'above' and 'below'</td>
+                    <td>placement</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@shape</code></td>
+                      <td></td>
+                    <td>fermata.vis</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@staff</code></td>
+                      <td></td>
+                    <td>staffident</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@startid</code></td>
+                      <td></td>
+                    <td>startid</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@tstamp</code></td>
+                      <td></td>
+                    <td>timestamp.musical</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
+                <code class="panel-header">&lt;harm&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/harm" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@place</code></td>
+                      <td>Supported values: 'above' and 'below'</td>
+                    <td>placement</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@staff</code></td>
+                      <td></td>
+                    <td>staffident</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@startid</code></td>
+                      <td></td>
+                    <td>startid</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@tstamp</code></td>
+                      <td></td>
+                    <td>timestamp.musical</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@xml:lang</code></td>
+                      <td></td>
+                    <td>lang</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
+                <code class="panel-header">&lt;hairpin&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/hairpin" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@endid</code></td>
+                      <td></td>
+                    <td>startendid</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@place</code></td>
+                      <td>Supported values: 'above' and 'below'</td>
+                    <td>placement</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@staff</code></td>
+                      <td></td>
+                    <td>staffident</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@startid</code></td>
+                      <td></td>
+                    <td>startid</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@tstamp</code></td>
+                      <td></td>
+                    <td>timestamp.musical</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@tstamp2</code></td>
+                      <td></td>
+                    <td>timestamp2.musical</td>
                 </tr>
             
             </tbody>
@@ -914,6 +1456,35 @@
     
     </div>
     
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@fermata</code></td>
+                      <td></td>
+                    <td>fermatapresent</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
 </div>
     
         <div class="panel panel-default">
@@ -1006,14 +1577,26 @@
             
                 <tr>
                       <td><code>@accid</code></td>
-                      <td>Supported values are 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.</td>
+                      <td>Supported values: 's', 'f', 'n', 'x', 'ff', 'ns' and 'nf'.</td>
                     <td>accidental</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@artic</code></td>
+                      <td></td>
+                    <td>articulation</td>
                 </tr>
             
                 <tr>
                       <td><code>@breaksec</code></td>
                       <td></td>
                     <td>beamsecondary</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
                 </tr>
             
                 <tr>
@@ -1036,7 +1619,7 @@
             
                 <tr>
                       <td><code>@fermata</code></td>
-                      <td>Currently always place above</td>
+                      <td></td>
                     <td>fermatapresent</td>
                 </tr>
             
@@ -1084,7 +1667,7 @@
             
                 <tr>
                       <td><code>@stem.len</code></td>
-                      <td>Not supported yet</td>
+                      <td>Supported values: 0</td>
                     <td>stemmed</td>
                 </tr>
             
@@ -1110,6 +1693,168 @@
                       <td><code>@tie</code></td>
                       <td></td>
                     <td>tiepresent</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
+                <code class="panel-header">&lt;octave&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/octave" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@endid</code></td>
+                      <td></td>
+                    <td>startendid</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@lform</code></td>
+                      <td>Supported values: 'dashed' and 'solid'</td>
+                    <td>linerend.base</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@lwidth</code></td>
+                      <td>Supported values: 'narrow', 'medium', and 'wide'</td>
+                    <td>linerend.base</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@staff</code></td>
+                      <td></td>
+                    <td>staffident</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@startid</code></td>
+                      <td></td>
+                    <td>startid</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@tstamp</code></td>
+                      <td></td>
+                    <td>timestamp.musical</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@tstamp2</code></td>
+                      <td></td>
+                    <td>timestamp2.musical</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
+                <code class="panel-header">&lt;pedal&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/pedal" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@staff</code></td>
+                      <td></td>
+                    <td>staffident</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@startid</code></td>
+                      <td></td>
+                    <td>startid</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@tstamp</code></td>
+                      <td></td>
+                    <td>timestamp.musical</td>
                 </tr>
             
             </tbody>
@@ -1188,6 +1933,93 @@
         
         <div class="row">
             <div class="col-xs-10">
+                <code class="panel-header">&lt;rend&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/rend" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@fontname</code></td>
+                      <td></td>
+                    <td>typography</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@fontstyle</code></td>
+                      <td></td>
+                    <td>typography</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@fontweight</code></td>
+                      <td></td>
+                    <td>typography</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@label</code></td>
+                      <td></td>
+                    <td>common</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@n</code></td>
+                      <td>Only numeric values are supported</td>
+                    <td>common</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@xml:lang</code></td>
+                      <td></td>
+                    <td>lang</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
                 <code class="panel-header">&lt;rest&gt;</code>
             </div>
             <div class="col-xs-2">
@@ -1227,6 +2059,12 @@
                 </tr>
             
                 <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
                       <td><code>@dots</code></td>
                       <td></td>
                     <td>augmentdots</td>
@@ -1246,7 +2084,7 @@
             
                 <tr>
                       <td><code>@fermata</code></td>
-                      <td>Currently always place above</td>
+                      <td></td>
                     <td>fermatapresent</td>
                 </tr>
             
@@ -1265,13 +2103,13 @@
                 <tr>
                       <td><code>@oloc</code></td>
                       <td></td>
-                    <td></td>
+                    <td>staffloc.pitched</td>
                 </tr>
             
                 <tr>
                       <td><code>@ploc</code></td>
                       <td></td>
-                    <td></td>
+                    <td>staffloc.pitched</td>
                 </tr>
             
             </tbody>
@@ -1443,9 +2281,21 @@
             <tbody>
             
                 <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
                       <td><code>@endid</code></td>
                       <td></td>
                     <td>startendid</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@staff</code></td>
+                      <td></td>
+                    <td>staffident</td>
                 </tr>
             
                 <tr>
@@ -1641,6 +2491,12 @@
                 </tr>
             
                 <tr>
+                      <td><code>@midi.bpm</code></td>
+                      <td></td>
+                    <td>miditempo</td>
+                </tr>
+            
+                <tr>
                       <td><code>@n</code></td>
                       <td>The order of the <code>&lt;staffDef&gt;</code> elements must correspond to the values (1-based).</td>
                     <td></td>
@@ -1806,9 +2662,96 @@
                 </tr>
             
                 <tr>
+                      <td><code>@fontname</code></td>
+                      <td></td>
+                    <td>typography</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@fontstyle</code></td>
+                      <td></td>
+                    <td>typography</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@fontweight</code></td>
+                      <td></td>
+                    <td>typography</td>
+                </tr>
+            
+                <tr>
                       <td><code>@wordpos</code></td>
                       <td>Not supported yet</td>
                     <td>syl.log</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@xml:lang</code></td>
+                      <td></td>
+                    <td>lang</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
+                <code class="panel-header">&lt;tempo&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/tempo" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@midi.bpm</code></td>
+                      <td></td>
+                    <td>miditempo</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@staff</code></td>
+                      <td></td>
+                    <td>staffident</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@xml:lang</code></td>
+                      <td></td>
+                    <td>lang</td>
                 </tr>
             
             </tbody>
@@ -1857,15 +2800,102 @@
             <tbody>
             
                 <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
                       <td><code>@endid</code></td>
                       <td></td>
                     <td>startendid</td>
                 </tr>
             
                 <tr>
+                      <td><code>@staff</code></td>
+                      <td></td>
+                    <td>staffident</td>
+                </tr>
+            
+                <tr>
                       <td><code>@startid</code></td>
                       <td></td>
                     <td>startid</td>
+                </tr>
+            
+            </tbody>
+        </table>
+        
+        
+    </div>
+    
+</div>
+    
+        <div class="panel panel-default">
+    <div class="panel-heading panel-supported-mei">
+        
+        <div class="row">
+            <div class="col-xs-10">
+                <code class="panel-header">&lt;trill&gt;</code>
+            </div>
+            <div class="col-xs-2">
+                
+                <a href="http://music-encoding.org/documentation/3.0.0/trill" target="_blank">
+                    <button type="button" class="btn btn-default btn-xs btn-heading pull-right">
+                        MEI-doc <span class="glyphicon glyphicon-new-window"></span>
+                    </button>
+                </a>
+                
+            </div>
+        </div>
+    
+    </div>
+    
+    <div class="panel-body panel-option">
+        
+        <table class="table table-condensed">
+            <colgroup>
+                <col class="col-xs-1"/>
+                <col class="col-xs-6"/>
+                <col class="col-xs-1"/>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Attribute</th>
+                    <th>Comment</th>
+                    <th>Att-class</th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@place</code></td>
+                      <td>Supported values: 'above' and 'below'</td>
+                    <td>placement</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@staff</code></td>
+                      <td></td>
+                    <td>staffident</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@startid</code></td>
+                      <td></td>
+                    <td>startid</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@tstamp</code></td>
+                      <td></td>
+                    <td>timestamp.musical</td>
                 </tr>
             
             </tbody>
@@ -1914,9 +2944,15 @@
             <tbody>
             
                 <tr>
-                      <td><code>@</code></td>
+                      <td><code>@num</code></td>
                       <td></td>
-                    <td></td>
+                    <td>duration.ratio</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@numbase</code></td>
+                      <td></td>
+                    <td>duration.ratio</td>
                 </tr>
             
             </tbody>
@@ -1965,6 +3001,12 @@
             <tbody>
             
                 <tr>
+                      <td><code>@color</code></td>
+                      <td></td>
+                    <td>color</td>
+                </tr>
+            
+                <tr>
                       <td><code>@label</code></td>
                       <td></td>
                     <td>common</td>
@@ -1974,6 +3016,12 @@
                       <td><code>@n</code></td>
                       <td>Only numeric values are supported</td>
                     <td>common</td>
+                </tr>
+            
+                <tr>
+                      <td><code>@xml:lang</code></td>
+                      <td></td>
+                    <td>lang</td>
                 </tr>
             
             </tbody>
@@ -1988,7 +3036,7 @@
 <h4>Page-based customization elements</h4>
 <p>
     A few elements supported by Verovio are defined in the page-based customization describe on the <a href="/structure.xhtml">structure</a> page.
-</p>                    
+</p>
     
         <div class="panel panel-default">
     <div class="panel-heading panel-supported-mei">
@@ -2149,14 +3197,14 @@
     
 </div>
     
-    
+
 <h4>Load-only MEI elements</h4>
 <p>
     Verovio can load both page-based customized and uncustomized MEI documents. When loading uncustomized MEI documents, some MEI elements are loaded by Verovio and converted to a page-based representation. Typically, <code>&lt;pb&gt;</code> milestone elements are converted to <code>&lt;page&gt;</code> container elements. Oppositely, <code>&lt;section&gt;</code> container elements are converted to <code>&lt;secb&gt;</code> milestone elements.
 </p>
 <p>
     There are also some MEI elements that Verovio can load but only if they can be converted to an alternate MEI representation. For example, Verovio can load <code>&lt;tupletSpan&gt;</code> elements but only when then can be appropriately converted to <code>&lt;tuplet&gt;</code> elements. Verovio tries to perfom the convertions when loading the document. This has nothing to do with the page-based customization.
-</p>                    
+</p>
     
         <div class="panel panel-default">
     <div class="panel-heading panel-supported-mei">
@@ -2267,7 +3315,6 @@
     
 </div>
     
-    
         <div class="panel panel-default">
     <div class="panel-heading panel-supported-mei">
         
@@ -2297,4 +3344,3 @@
     
 </div>
     
-
