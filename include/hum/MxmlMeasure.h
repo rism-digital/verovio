@@ -91,9 +91,12 @@ class MxmlMeasure {
 		MeasureStyle  getBarStyle        (void);
 		void  setStyle                   (MeasureStyle style);
 		void  setBarStyle                (MeasureStyle style);
-		void  makeFinalBarline(void) { m_style = MeasureStyle::Final; }
-		bool  isFinal(void)   { return m_style == MeasureStyle::Final; }
+		void  makeFinalBarline(void)   { m_style = MeasureStyle::Final; }
+		bool  isFinal(void)            { return m_style == MeasureStyle::Final; }
+		bool  isDouble(void)           { return m_style == MeasureStyle::Double; }
 		bool  isRepeatBackward(void)   { return m_style == MeasureStyle::RepeatBackward; }
+		bool  isRepeatForward(void)    { return m_style == MeasureStyle::RepeatForward; }
+		bool  isRepeatBoth(void)       { return m_style == MeasureStyle::RepeatBoth; }
 
 	private:
 		void  receiveStaffNumberFromChild (int staffnum, int voicenum);

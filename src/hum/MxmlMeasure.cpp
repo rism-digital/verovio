@@ -745,7 +745,18 @@ MeasureStyle MxmlMeasure::getBarStyle(void) {
 //
 
 void MxmlMeasure::setStyle(MeasureStyle style) {
-	m_style = style;
+	if (m_style == MeasureStyle::Plain) {
+		m_style = style;
+	} else if ((m_style == MeasureStyle::RepeatBackward) && 
+			(style == MeasureStyle::RepeatForward)) {
+		m_style = MeasureStyle::RepeatBoth;
+	} else if ((m_style == MeasureStyle::RepeatForward) && 
+			(style == MeasureStyle::RepeatBackward)) {
+		m_style = MeasureStyle::RepeatBoth;
+	} else {
+		// some sort of problem to deal with later
+		m_style = style;
+	}
 }
 
 

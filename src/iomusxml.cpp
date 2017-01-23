@@ -526,7 +526,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
         // We read all attribute elements until we reach something else
         // However, print might be present too. What else? This is not clear and not robust.
-        if (!IsElement(*it, "attributes") && !IsElement(*it, "print")) break;
+        if (!IsElement(*it, "attributes") && !IsElement(*it, "print") && !IsElement(*it, "sound")) break;
 
         // we do not want to read it again, just change the name
         it->set_name("mei-read");

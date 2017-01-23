@@ -60,9 +60,9 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(measure);
     assert(element);
 
-    // For dir, dynam, and harm, we do not consider the @tstamp2 for rendering
+    // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
     if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DIR) && (element->Is() != DYNAM)
-        && (element->Is() != HARM)) {
+        && (element->Is() != FERMATA) && (element->Is() != HARM)) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
@@ -1811,7 +1811,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     assert(measure);
     assert(trill);
 
-    // We cannot draw a fermata that has no start position
+    // We cannot draw a trill that has no start position
     if (!trill->GetStart()) return;
 
     dc->StartGraphic(trill, "", trill->GetUuid());

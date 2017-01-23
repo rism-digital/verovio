@@ -14,6 +14,7 @@
 
 #include "HumGrid.h"
 #include <string.h>
+#include <iomanip>
 
 using namespace std;
 
@@ -602,7 +603,7 @@ void HumGrid::addMeasureLines(void) {
 	GridPart* part;
 	GridStaff* staff;
 	GridVoice* gv;
-	HTp token;
+	string token;
 	int staffcount, partcount, vcount, nextvcount, lcount;
 	GridMeasure* measure = NULL;
 	GridMeasure* nextmeasure = NULL;
@@ -648,9 +649,9 @@ void HumGrid::addMeasureLines(void) {
 				}
 				for (int v=0; v<lcount; v++) {
 					token = createBarToken(m, barnums[m], measure);
+					gv = new GridVoice(token, 0);
+					mslice->at(p)->at(s)->push_back(gv);
 				}
-				gv = new GridVoice(token, 0);
-				mslice->at(p)->at(s)->push_back(gv);
 			}
 		}
 	}
@@ -663,9 +664,9 @@ void HumGrid::addMeasureLines(void) {
 // HumGrid::createBarToken --
 //
 
-HTp HumGrid::createBarToken(int m, int barnum, GridMeasure* measure) {
+string HumGrid::createBarToken(int m, int barnum, GridMeasure* measure) {
+	string token;
 	string barstyle = getBarStyle(measure);
-	HTp token = NULL;
 	string number = "";
 	if (barnum > 0) {
 		number = to_string(barnum);
@@ -674,23 +675,29 @@ HTp HumGrid::createBarToken(int m, int barnum, GridMeasure* measure) {
 		// m+1 because of the measure number
 		// comes from the previous measure.
 		if (barstyle == "=") {
-			token = new HumdrumToken("==" + to_string(m+1));
+			token = "==";
+			token += to_string(m+1);
 		} else {
-			token = new HumdrumToken("=" + to_string(m+1) + barstyle);
+			token = "=";
+			token += to_string(m+1);
+			token += barstyle;
 		}
 	} else {
 		if (barnum > 0) {
 			if (barstyle == "=") {
-				token = new HumdrumToken("==" + number);
+				token = "==";
+				token += number;
 			} else {
-				token = new HumdrumToken("=" 
-						+ number + barstyle);
+				token = "=";
+				token += number;
+				token += barstyle;
 			}
 		} else {
 			if (barstyle == "=") {
-				token = new HumdrumToken("==");
+				token = "==";
 			} else {
-				token = new HumdrumToken("=" + barstyle);
+				token = "=";
+				token += barstyle;
 			}
 		}
 	}
@@ -754,8 +761,12 @@ void HumGrid::getMetricBarNumbers(vector<int>& barnums) {
 
 string HumGrid::getBarStyle(GridMeasure* measure) {
 	string output = "";
-	if (measure->isFinal()) {
+	if (measure->isDouble()) {
+		output = "||";
+	} else if (measure->isFinal()) {
 		output = "=";
+	} else if (measure->isRepeatBoth()) {
+		output = ":|!|:";
 	} else if (measure->isRepeatBackward()) {
 		output = ":|!";
 	} else if (measure->isRepeatForward()) {

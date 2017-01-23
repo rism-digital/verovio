@@ -188,6 +188,9 @@ bool Toolkit::SetOutputFormat(std::string const &outformat)
     else if (outformat == "mei") {
         m_outformat = MEI;
     }
+    else if (outformat == "midi") {
+        m_outformat = MIDI;
+    }
     else {
         LogError("Output format can only be: mei, humdrum, midi or svg");
         return false;
@@ -996,7 +999,7 @@ void Toolkit::SetHumdrumBuffer(const char *data)
         strcpy(m_humdrumBuffer, output.c_str());
     }
     else {
-        int size = strlen(data) + 1;
+        int size = (int)strlen(data) + 1;
         m_humdrumBuffer = (char *)malloc(size);
         if (!m_humdrumBuffer) {
             // something went wrong
@@ -1006,7 +1009,7 @@ void Toolkit::SetHumdrumBuffer(const char *data)
     }
 
 #else
-    int size = strlen(data) + 1;
+    size_t size = (int)strlen(data) + 1;
     m_humdrumBuffer = (char *)malloc(size);
     if (!m_humdrumBuffer) {
         // something went wrong

@@ -227,6 +227,9 @@ void GridSlice::transferTokens(HumdrumFile& outfile, bool recip) {
 		} else if (isInterpretationSlice()) {
 			token = new HumdrumToken("*");
 			empty = "*";
+		} else if (isGraceSlice()) {
+			token = new HumdrumToken("q");
+			empty = ".";
 		} else {
 			token = new HumdrumToken("55");
 			empty = "!z";
