@@ -46,7 +46,6 @@ class Note : public LayerElement,
              public StemmedDrawingInterface,
              public DurationInterface,
              public PitchInterface,
-             public AttAccidentalPerformed,
              public AttColor,
              public AttColoration,
              public AttGraced,
@@ -88,7 +87,7 @@ public:
      * @name Setter and getter for tie attribute and other pointers
      */
     ///@{
-    void ResetDrawingAccid();
+    Accid *GetDrawingAccid();
     void ResetDrawingTieAttr();
     void SetDrawingTieAttr();
     Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
@@ -159,15 +158,6 @@ public:
     /** flags for determining clusters in chord **/
     ChordCluster *m_cluster; // cluster this belongs to
     int m_clusterPosition; // 1-indexed position in said cluster; 0 if does not have position
-
-    /** other information necessary for notes in chords **/
-    Accid *m_drawingAccid;
-
-    /**
-     * Flag indicating if the drawing accid is an attribute.
-     * If yes, then it is owned by the Note and will be deleted
-     */
-    bool m_isDrawingAccidAttr;
 
     double m_playingOnset;
     double m_playingOffset;

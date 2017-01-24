@@ -27,6 +27,7 @@ Accid::Accid() : LayerElement("accid-"), PositionInterface(), AttAccidental(), A
 
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_ACCIDENTAL);
+    RegisterAttClass(ATT_ACCIDENTALPERFORMED);
     RegisterAttClass(ATT_ACCIDLOG);
     RegisterAttClass(ATT_COLOR);
 
@@ -42,6 +43,7 @@ void Accid::Reset()
     LayerElement::Reset();
     PositionInterface::Reset();
     ResetAccidental();
+    ResetAccidentalPerformed();
     ResetAccidLog();
     ResetColor();
 }
@@ -49,20 +51,5 @@ void Accid::Reset()
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
-
-int Accid::PreparePointersByLayer(FunctorParams *functorParams)
-{
-    Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
-    if (!note) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (note->m_drawingAccid != NULL) {
-        note->ResetDrawingAccid();
-    }
-    note->m_drawingAccid = this;
-
-    return FUNCTOR_CONTINUE;
-}
 
 } // namespace vrv

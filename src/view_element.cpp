@@ -163,7 +163,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
 //----------------------------------------------------------------------------
 
 void View::DrawAccid(
-    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid)
+    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(element);
@@ -195,8 +195,8 @@ void View::DrawAccid(
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if (accid->m_parent) {
-        accid->SetDrawingY(accid->GetDrawingY()
-            + CalculatePitchPosY(staff, accid->GetPloc(), layer->GetClefOffset(accid), accid->GetOloc()));
+        //accid->SetDrawingY(accid->GetDrawingY()
+        //    + CalculatePitchPosY(staff, accid->GetPloc(), layer->GetClefOffset(accid), accid->GetOloc()));
         accid->m_drawingCueSize = accid->IsCueSize();
     }
 
@@ -641,10 +641,6 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         }
     }
 
-    /************ Draw children (notes) ************/
-
-    DrawLayerChildren(dc, chord, layer, staff, measure);
-
     /************ Dots ************/
 
     chord->m_dots.clear();
@@ -681,6 +677,11 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         for (std::list<int>::iterator it = dotsList->begin(); it != dotsList->end(); ++it)
             DrawDots(dc, dotsX, *it, numDots, staff);
     }
+    
+    
+    /************ Draw children (notes) ************/
+    
+    //DrawLayerChildren(dc, chord, layer, staff, measure);
 
     /************ Accidentals ************/
 
@@ -706,7 +707,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
         // iterate through the list of notes with accidentals
         for (idx = 0; idx < size; idx++) {
-            Accid *curAccid = noteList.at(idx)->m_drawingAccid;
+            Accid *curAccid = noteList.at(idx)->GetDrawingAccid();
 
             // if the note does not need to be moved, save a new cluster start position
             if (CalculateAccidX(staff, curAccid, chord, false)) {
@@ -729,18 +730,18 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
             // if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
             while (fwIdx <= bwIdx) {
-                Accid *accidFwd = noteList.at(fwIdx)->m_drawingAccid;
-                Accid *accidBwd = noteList.at(bwIdx)->m_drawingAccid;
+                Accid *accidFwd = noteList.at(fwIdx)->GetDrawingAccid();
+                Accid *accidBwd = noteList.at(bwIdx)->GetDrawingAccid();
 
                 // if the top note has an accidental, draw it and update prevAccid
                 accidFwd->SetDrawingX(xAccid);
                 CalculateAccidX(staff, accidFwd, chord, true);
-                DrawAccid(dc, accidFwd, layer, staff, measure);
+                //DrawAccid(dc, accidFwd, layer, staff, measure);
                 // same, except with an extra check that we're not doing the same note twice
                 if (fwIdx != bwIdx) {
                     accidBwd->SetDrawingX(xAccid);
                     CalculateAccidX(staff, accidBwd, chord, true);
-                    DrawAccid(dc, accidBwd, layer, staff, measure);
+                    //DrawAccid(dc, accidBwd, layer, staff, measure);
                     bwIdx--;
                 }
 
@@ -749,6 +750,10 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             fwIdx = idx;
         }
     }
+    
+    /************ Draw children (notes) ************/
+    
+    DrawLayerChildren(dc, chord, layer, staff, measure);
 
     /************ Ledger lines ************/
 
@@ -1436,30 +1441,28 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     /************** Accidentals/dots/peripherals: **************/
 
-    if (note->m_drawingAccid) {
-        xAccid = xNote;
-        if (note->m_drawingAccid->GetFunc() != accidLog_FUNC_edit) {
-            xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, drawingCueSize);
+    if (!inChord) {
+        Accid *accid = note->GetDrawingAccid();
+        if (accid) {
+            xAccid = xNote;
+            if (accid->GetFunc() != accidLog_FUNC_edit) {
+                xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, drawingCueSize);
+            }
+            accid->SetDrawingX(xAccid);
         }
 
-        note->m_drawingAccid->SetDrawingX(xAccid);
-        note->m_drawingAccid->SetDrawingY(noteY);
+        if (note->GetDots()) {
+            int xDot;
+            if (note->GetActualDur() < DUR_2
+                || (note->GetActualDur() > DUR_8 && !inBeam && (note->GetDrawingStemDir() == STEMDIRECTION_up))) {
+                xDot = xStem + m_doc->GetDrawingUnit(staffSize) * 7 / 2;
+            }
+            else {
+                xDot = xStem + m_doc->GetDrawingUnit(staffSize) * 5 / 2;
+            }
 
-        // postpone drawing the accidental until later if it's in a chord or if it is not an attribute
-        if (!inChord && note->m_isDrawingAccidAttr) DrawAccid(dc, note->m_drawingAccid, layer, staff, measure);
-    }
-
-    if (note->GetDots() && !inChord) {
-        int xDot;
-        if (note->GetActualDur() < DUR_2
-            || (note->GetActualDur() > DUR_8 && !inBeam && (note->GetDrawingStemDir() == STEMDIRECTION_up))) {
-            xDot = xStem + m_doc->GetDrawingUnit(staffSize) * 7 / 2;
+            DrawDots(dc, xDot, noteY, note->GetDots(), staff);
         }
-        else {
-            xDot = xStem + m_doc->GetDrawingUnit(staffSize) * 5 / 2;
-        }
-
-        DrawDots(dc, xDot, noteY, note->GetDots(), staff);
     }
 
     if (note->GetDrawingTieAttr()) {
@@ -1470,8 +1473,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (system) system->AddToDrawingList(note->GetDrawingTieAttr());
     }
 
-    // This will draw lyrics, accid, etc. (but only if not in chord)
-    if (!inChord) DrawLayerChildren(dc, note, layer, staff, measure);
+    DrawLayerChildren(dc, note, layer, staff, measure);
 
     if (note->HasFermata()) {
         DrawFermataAttr(dc, element, layer, staff, measure);
