@@ -585,22 +585,26 @@ void HumdrumInput::createHeader(void)
         if (!EED.empty()) {
             pugi::xml_node pubRespStmt = pubStmt.append_child("respStmt");
             pugi::xml_node editor = pubRespStmt.append_child("persName");
+            editor.append_attribute("analog") = "humdrum:EED";
             editor.append_attribute("role") = "editor";
             editor.append_child(pugi::node_pcdata).set_value(EED.c_str());
         }
         string YEP = getReferenceValue("YEP", references);
         if (!YEP.empty()) {
             pugi::xml_node publisher = pubStmt.append_child("publisher");
+            publisher.append_attribute("analog") = "humdrum:YEP";
             publisher.append_child(pugi::node_pcdata).set_value(YEP.c_str());
         }
         string YEN = getReferenceValue("YEN", references);
         if (!YEN.empty()) {
             pugi::xml_node pubPlace = pubStmt.append_child("pubPlace");
+            pubPlace.append_attribute("analog") = "humdrum:YEN";
             pubPlace.append_child(pugi::node_pcdata).set_value(YEN.c_str());
         }
         string YER = getReferenceValue("YER", references);
         if (!YER.empty()) {
             pugi::xml_node pubDate = pubStmt.append_child("date");
+            pubDate.append_attribute("analog") = "humdrum:YER";
             pubDate.append_child(pugi::node_pcdata).set_value(YER.c_str());
         }
         if (!getReferenceValue("YEC", references).empty() || !getReferenceValue("YEM", references).empty()) {
@@ -609,6 +613,7 @@ void HumdrumInput::createHeader(void)
                 string key = references[i]->getReferenceKey();
                 if (key == "YEC" || key == "YEM") {
                     pugi::xml_node useRestrict = availability.append_child("useRestrict");
+                    useRestrict.append_attribute("analog") = StringFormat("humdrum:%s", key.c_str()).c_str();
                     useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
                 }
             }
@@ -675,6 +680,7 @@ void HumdrumInput::createHeader(void)
     string SCT = getReferenceValue("SCT", references);
     if (!SCT.empty()) {
         pugi::xml_node identifier = work.append_child("identifier");
+        identifier.append_attribute("analog") = "humdrum:SCT";
         identifier.append_child(pugi::node_pcdata).set_value(SCT.c_str());
     }
     pugi::xml_node titleStmt = work.append_child("titleStmt");
@@ -734,6 +740,8 @@ void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, vector<vector<strin
     pugi::xml_node respStmt = titleStmt.append_child("respStmt");
     for (int i = 0; i < (int)respPeople.size(); i++) {
         pugi::xml_node person = respStmt.append_child("persName");
+        person.append_attribute("analog")
+            = StringFormat("humdrum:%s", unescapeHtmlEntities(respPeople[i][2]).c_str()).c_str();
         person.append_attribute("role") = unescapeHtmlEntities(respPeople[i][1]).c_str();
         person.text().set(unescapeHtmlEntities(respPeople[i][0]).c_str());
     }
@@ -786,9 +794,10 @@ void HumdrumInput::addPerson(
     for (int i = 0; i < (int)references.size(); i++) {
         if (references[i]->getReferenceKey() == key) {
             respPeople.resize(respPeople.size() + 1);
-            respPeople.back().resize(2);
+            respPeople.back().resize(3);
             respPeople.back()[0] = references[i]->getReferenceValue();
             respPeople.back()[1] = role;
+            respPeople.back()[2] = key;
         }
     }
 }
@@ -805,6 +814,10 @@ void HumdrumInput::insertExtMeta(vector<HumdrumLine *> &references)
     xmldata << "<extMeta>\n";
     xmldata << "\t<frames xmlns:humxml=\"http://www.humdrum.org/ns/humxml\">\n";
     for (int i = 0; i < (int)references.size(); i++) {
+        string key = references[i]->getReferenceKey();
+        if (!(key.compare(0, 2, "OT") && key.compare(0, 2, "YE") && key.compare(0, 1, "X"))) {
+            continue;
+        }
         references[i]->printXml(xmldata, 4);
     }
     xmldata << "\t</frames>\n";
@@ -881,6 +894,7 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLi
         pugi::xml_node title = titleStmt.append_child("title");
         titlecount++;
         title.text().set(unescapeHtmlEntities(value).c_str());
+        title.append_attribute("analog") = StringFormat("humdrum:%s", key.substr(0, 3).c_str()).c_str();
         if (key.compare(0, 3, "OTL") == 0) {
             if (!lang || plang) {
                 title.append_attribute("type") = "main";
