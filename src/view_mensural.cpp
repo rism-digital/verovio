@@ -224,19 +224,18 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         }
         
         switch (drawingDur) {
-            case DUR_LG: DrawRestLong(dc, x, y, staff); break;
-            case DUR_BR: DrawRestBreve(dc, x, y, staff); break;
-            case DUR_1: DrawRestWhole(dc, x, y, drawingDur, rest->GetDots(), drawingCueSize, staff); break;
-            default:
-                if (drawingDur==DUR_2) charCode = SMUFL_E9F5_mensuralRestMinima;
-                else if (drawingDur==DUR_4) charCode = SMUFL_E9F6_mensuralRestSemiminima;
-                else if (drawingDur==DUR_8) charCode = SMUFL_E9F7_mensuralRestFusa;
-                else if (drawingDur==DUR_16) charCode = SMUFL_E9F8_mensuralRestSemifusa;
-                else charCode = SMUFL_E04B_segnoSerpent2;                   // This should never happen
-                DrawSmuflCode(dc, x, y, charCode, pseudoStaffSize, false);
+            case DUR_MX: charCode = SMUFL_E9F0_mensuralRestMaxima; break;
+            case DUR_LG: charCode = SMUFL_E9F1_mensuralRestLongaPerfecta; break;
+            case DUR_BR: charCode = SMUFL_E9F3_mensuralRestBrevis; break;
+            case DUR_1: charCode = SMUFL_E9F4_mensuralRestSemibrevis; break;
+            case DUR_2: charCode = SMUFL_E9F5_mensuralRestMinima; break;
+            case DUR_4: charCode = SMUFL_E9F6_mensuralRestSemiminima; break;
+            case DUR_8: charCode = SMUFL_E9F7_mensuralRestFusa; break;
+            case DUR_16: charCode = SMUFL_E9F8_mensuralRestSemifusa; break;
+            default: charCode = SMUFL_E04B_segnoSerpent2;                   // This should never happen
         }
+        DrawSmuflCode(dc, x, y, charCode, pseudoStaffSize, false);
     }
-
 
 
     
