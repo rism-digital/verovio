@@ -3023,6 +3023,20 @@ void HumdrumInput::processSlur(HTp token)
     Measure *startmeasure = m_measures[mindex];
 
     Slur *slur = new Slur;
+
+    // start ID can sometimes not be set yet due to cross layer slurs.
+    string startid = slurstart->getValue("MEI", "xml:id");
+    string endid = token->getValue("MEI", "xml:id");
+
+    if (startid == "") {
+        startid = "note-L";
+        startid += to_string(slurstart->getLineNumber());
+        startid += "F";
+        startid += to_string(slurstart->getFieldNumber());
+        slurstart->setValue("MEI", "xml:id", startid);
+        startid = slurstart->getValue("MEI", "xml:id");
+    }
+
     slur->SetEndid("#" + token->getValue("MEI", "xml:id"));
     slur->SetStartid("#" + slurstart->getValue("MEI", "xml:id"));
 

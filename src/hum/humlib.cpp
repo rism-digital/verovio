@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 22 17:10:05 PST 2017
+// Last Modified: Mon Jan 23 18:51:52 PST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -8398,10 +8398,10 @@ bool HumdrumFileContent::analyzeKernSlurs(HTp spinestart) {
 
 							// search for an open slur in another track:
 							
+							bool found = false;
 							for (int itrack=0; itrack<(int)sluropens[elision].size(); itrack++) {
 								if (sluropens[elision][itrack].size() > 0) {
 
-									// link to this slur start in another layer instead
 									sluropens[elision][itrack].back()->setValue("auto",
 											"slurEnd", tracktokens[row][track]);
 									sluropens[elision][itrack].back()->setValue("auto",
@@ -8415,12 +8415,16 @@ bool HumdrumFileContent::analyzeKernSlurs(HTp spinestart) {
 										sluropens[elision][itrack].back()->getDurationFromStart());
 									sluropens[elision][itrack].pop_back();
 
+
+									found = true;
 									break;
 								}
 							}
-							tracktokens[row][track]->setValue("auto", "hangingSlur", "true");
-							tracktokens[row][track]->setValue("auto", "slurDration",
-								tracktokens[row][track]->getDurationToEnd());
+							if (!found) {
+								tracktokens[row][track]->setValue("auto", "hangingSlur", "true");
+								tracktokens[row][track]->setValue("auto", "slurDration",
+									tracktokens[row][track]->getDurationToEnd());
+							}
 						}
 					}
 					// if elision level is less than 0 something strange happened.
@@ -18460,7 +18464,6 @@ bool Tool_extract::run(const string& indata, ostream& out) {
 	HumdrumFile infile(indata);
 	bool status = run(infile);
 	if (hasAnyText()) {
-cerr << "GOT HERE BBB" << endl;
 		getAllText(out);
 	} else {
 		out << infile;
@@ -18472,7 +18475,6 @@ cerr << "GOT HERE BBB" << endl;
 bool Tool_extract::run(HumdrumFile& infile, ostream& out) {
 	int status = run(infile);
 	if (hasAnyText()) {
-cerr << "GOT HERE AAA" << endl;
 		getAllText(out);
 	} else {
 		out << infile;
