@@ -882,30 +882,31 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLi
         titlecount++;
         title.text().set(unescapeHtmlEntities(value).c_str());
         if (key.compare(0, 3, "OTL") == 0) {
-          if (!lang || plang) {
-            title.append_attribute("type") = "main";
-          }
-          else {
-            title.append_attribute("type") = "translated";
-          }
-          if (lang) {
-              title.append_attribute("xml:lang") = language.c_str();
-          }
+            if (!lang || plang) {
+                title.append_attribute("type") = "main";
+            }
+            else {
+                title.append_attribute("type") = "translated";
+            }
+            if (lang) {
+                title.append_attribute("xml:lang") = language.c_str();
+            }
         }
         else if (key.compare(0, 3, "OTA") == 0) {
-          title.append_attribute("type") = "alternative";
-          if (lang) {
-              title.append_attribute("xml:lang") = language.c_str();
-          }
+            title.append_attribute("type") = "alternative";
+            if (lang) {
+                title.append_attribute("xml:lang") = language.c_str();
+            }
         }
         else if (key.compare(0, 3, "OTP") == 0) {
-          title.append_attribute("type") = "uniform";
-          if (lang) {
-              title.append_attribute("xml:lang") = language.c_str();
-          }
+            title.append_attribute("type") = "alternative";
+            title.append_attribute("label") = "popular";
+            if (lang) {
+                title.append_attribute("xml:lang") = language.c_str();
+            }
         }
         else {
-          title.append_attribute("type") = "translated";
+            title.append_attribute("type") = "translated";
         }
     }
 
