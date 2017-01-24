@@ -3019,7 +3019,16 @@ void HumdrumInput::processSlur(HTp token)
         return;
     }
 
-    int mindex = slurstart->getValueInt("MEI", "measureIndex");
+    int mindex;
+    string mindexstring = slurstart->getValue("MEI", "measureIndex");
+    if (mindexstring == "") {
+        // cross-layer sluring into later layer.  The beginning of the slur
+        // is in the same measure since it has not yet been processed.
+        mindex = token->getValueInt("MEI", "measureIndex");
+    }
+    else {
+        mindex = slurstart->getValueInt("MEI", "measureIndex");
+    }
     Measure *startmeasure = m_measures[mindex];
 
     Slur *slur = new Slur;
