@@ -269,7 +269,7 @@ protected:
     vrv::Clef *insertClefElement(vector<string> &elements, vector<void *> &pointers, hum::HTp clef);
     void insertMeterSigElement(
         vector<string> &elements, vector<void *> &pointers, vector<hum::HTp> &layeritems, int index);
-    void processSlur(hum::HTp token);
+    void processSlur(hum::HTp token, int number = 0);
     void addHarmFloatsForMeasure(int startine, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirection(hum::HTp token, int staffindex);

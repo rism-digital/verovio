@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Jan 22 17:10:05 PST 2017
+// Last Modified: Tue Jan 24 05:36:04 PST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -1149,8 +1149,8 @@ class HumdrumToken : public string, public HumHash {
 		int      getStrandIndex            (void) const;
 		int      getSlurStartElisionLevel  (void) const;
 		int      getSlurEndElisionLevel    (void) const;
-		HTp      getSlurStartToken         (void);
-		HTp      getSlurEndToken           (void);
+		HTp      getSlurStartToken         (int number = 0);
+		HTp      getSlurEndToken           (int number = 0);
 		ostream& printCsv                  (ostream& out = cout);
 		ostream& printXml                  (ostream& out = cout, int level = 0,
 		                                    const string& indent = "\t");
@@ -1794,6 +1794,7 @@ class HumdrumFileContent : public HumdrumFileStructure {
 		                                   const string& keysig);
 		void   resetDiatonicStatesWithKeySignature(vector<int>& states,
 				                             vector<int>& signature);
+		void    linkSlurEndpoints         (HTp slurstart, HTp slurend);
 };
 
 

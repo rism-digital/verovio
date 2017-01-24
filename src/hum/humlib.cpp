@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Mon Jan 23 18:51:52 PST 2017
+// Last Modified: Tue Jan 24 05:36:04 PST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -8318,118 +8318,87 @@ bool HumdrumFileContent::analyzeKernSlurs(HTp spinestart) {
 		sluropens[i].resize(8);  // maximum of 8 layers
 	}
 
-	int elision;
+	int opencount = 0;
+	int closecount = 0;
+	int elision = 0;
+	HTp token;
 	for (int row=0; row<(int)tracktokens.size(); row++) {
 		for (int track=0; track<(int)tracktokens[row].size(); track++) {
-			if (tracktokens[row][track]->hasSlurStart() &&
-					tracktokens[row][track]->hasSlurEnd()) {
+			token = tracktokens[row][track];
+			opencount = count(token->begin(), token->end(), '(');
+			closecount = count(token->begin(), token->end(), ')');
 
+			if (token->hasSlurStart() && token->hasSlurEnd()) {
 				// If note has slur start and stop on the same note,
 				// then this means to end the previous slur and start
 				// a new one.  This is a special case of an elided slur
 				// where the elision is not explicitly marked.
-
-				// slur ending code:
-				elision = tracktokens[row][track]->getSlurEndElisionLevel();
+				elision = token->getSlurEndElisionLevel();
 				if (elision >= 0) {
-
 					if (sluropens[elision][track].size() > 0) {
-						sluropens[elision][track].back()->setValue("auto",
-								"slurEnd", tracktokens[row][track]);
-						sluropens[elision][track].back()->setValue("auto",
-								"id", sluropens[elision][track].back());
-						tracktokens[row][track]->setValue("auto", "slurStart",
-								sluropens[elision][track].back());
-						tracktokens[row][track]->setValue("auto", "id",
-								tracktokens[row][track]);
-						sluropens[elision][track].back()->setValue("auto", "slurDuration",
-							tracktokens[row][track]->getDurationFromStart() -
-							sluropens[elision][track].back()->getDurationFromStart());
+						linkSlurEndpoints(sluropens[elision][track].back(), token);
+						// remove slur opening from buffer
 						sluropens[elision][track].pop_back();
-
 					} else {
 						// no starting slur marker to match to this slur end.
-						tracktokens[row][track]->setValue("auto", "hangingSlur", "true");
-						tracktokens[row][track]->setValue("auto", "slurDration",
-							tracktokens[row][track]->getDurationToEnd());
+						token->setValue("auto", "hangingSlur", "true");
+						token->setValue("auto", "slurDration",
+								token->getDurationToEnd());
 					}
 				}
-
 				// slur starting code:
-				elision = tracktokens[row][track]->getSlurStartElisionLevel();
+				elision = token->getSlurStartElisionLevel();
 				if (elision >= 0) {
-					sluropens[elision][track].push_back(tracktokens[row][track]);
+					sluropens[elision][track].push_back(token);
 				}
 
 			} else {
 				// not a single-note elided slur
 
-				if (tracktokens[row][track]->hasSlurStart()) {
-					elision = tracktokens[row][track]->getSlurStartElisionLevel();
+				if (token->hasSlurStart()) {
+					elision = token->getSlurStartElisionLevel();
 					if (elision >= 0) {
-						sluropens[elision][track].push_back(tracktokens[row][track]);
-					}
-				}
-
-				if (tracktokens[row][track]->hasSlurEnd()) {
-
-					// elision = tracktokens[row][track]->getSlurEndElisionLevel();
-					elision = tracktokens[row][track]->getSlurEndElisionLevel();
-					if (elision >= 0) {
-
-						if (sluropens[elision][track].size() > 0) {
-
-							sluropens[elision][track].back()->setValue("auto",
-									"slurEnd", tracktokens[row][track]);
-							sluropens[elision][track].back()->setValue("auto",
-									"id", sluropens[elision][track].back());
-							tracktokens[row][track]->setValue("auto", "slurStart",
-									sluropens[elision][track].back());
-							tracktokens[row][track]->setValue("auto", "id",
-									tracktokens[row][track]);
-							sluropens[elision][track].back()->setValue("auto", "slurDuration",
-								tracktokens[row][track]->getDurationFromStart() -
-								sluropens[elision][track].back()->getDurationFromStart());
-							sluropens[elision][track].pop_back();
-
-						} else {
-							// No starting slur marker to match to this slur end in the
-							// given track.
-
-							// search for an open slur in another track:
-							
-							bool found = false;
-							for (int itrack=0; itrack<(int)sluropens[elision].size(); itrack++) {
-								if (sluropens[elision][itrack].size() > 0) {
-
-									sluropens[elision][itrack].back()->setValue("auto",
-											"slurEnd", tracktokens[row][track]);
-									sluropens[elision][itrack].back()->setValue("auto",
-											"id", sluropens[elision][itrack].back());
-									tracktokens[row][track]->setValue("auto", "slurStart",
-											sluropens[elision][itrack].back());
-									tracktokens[row][track]->setValue("auto", "id",
-											tracktokens[row][track]);
-									sluropens[elision][itrack].back()->setValue("auto", "slurDuration",
-										tracktokens[row][track]->getDurationFromStart() -
-										sluropens[elision][itrack].back()->getDurationFromStart());
-									sluropens[elision][itrack].pop_back();
-
-
-									found = true;
-									break;
-								}
-							}
-							if (!found) {
-								tracktokens[row][track]->setValue("auto", "hangingSlur", "true");
-								tracktokens[row][track]->setValue("auto", "slurDration",
-									tracktokens[row][track]->getDurationToEnd());
-							}
+						for (int i=0; i<opencount; i++) {
+							sluropens[elision][track].push_back(token);
 						}
 					}
-					// if elision level is less than 0 something strange happened.
-
 				}
+
+				for (int i=0; i<closecount; i++) {
+					if (!token->hasSlurEnd()) {
+						continue;
+					}
+					// elision = tracktokens[row][track]->getSlurEndElisionLevel();
+					elision = token->getSlurEndElisionLevel();
+					if (elision < 0) {
+						continue;
+					}
+					if (sluropens[elision][track].size() > 0) {
+						linkSlurEndpoints(sluropens[elision][track].back(), token);
+						// remove slur opening from buffer
+						sluropens[elision][track].pop_back();
+					} else {
+						// No starting slur marker to match to this slur end in the
+						// given track.
+						// search for an open slur in another track:
+						bool found = false;
+						for (int itrack=0; itrack<(int)sluropens[elision].size(); itrack++) {
+							if (sluropens[elision][itrack].size() > 0) {
+								linkSlurEndpoints(sluropens[elision][itrack].back(), token);
+								// remove slur opening from buffer
+								sluropens[elision][itrack].pop_back();
+								found = true;
+								break;
+							}
+						}
+						if (!found) {
+							token->setValue("auto", "hangingSlur", "true");
+							token->setValue("auto", "slurDration",
+								token->getDurationToEnd());
+						}
+					}
+				}
+
 			}
 		}
 	}
@@ -8446,6 +8415,35 @@ bool HumdrumFileContent::analyzeKernSlurs(HTp spinestart) {
 	}
 
 	return true;
+}
+
+
+
+//////////////////////////////
+//
+// HumdrumFileContent::linkSlurEndpoints --  Allow up to two slur starts/ends
+//      on a note.
+//
+
+void HumdrumFileContent::linkSlurEndpoints(HTp slurstart, HTp slurend) {
+	string durtag = "slurDuration";
+	string endtag = "slurEnd";
+	if (slurstart->getValue("auto", "slurEnd") != "") {
+		endtag += "2";
+		durtag += "2";
+	}
+	string starttag = "slurStart";
+	if (slurend->getValue("auto", "slurStart") != "") {
+		starttag += "2";
+	}
+
+	slurstart->setValue("auto", endtag, slurend);
+	slurstart->setValue("auto", "id", slurstart);
+	slurend->setValue("auto", starttag, slurstart);
+	slurend->setValue("auto", "id", slurend);
+	HumNum duration = slurend->getDurationFromStart() 
+			- slurstart->getDurationFromStart();
+	slurstart->setValue("auto", durtag, duration);
 }
 
 
@@ -14265,8 +14263,12 @@ ostream& printSequence(vector<HTp>& sequence, ostream& out) {
 //				<parameter key="slurEnd" value="HT_140366146702320" idref=""/>
 //
 
-HTp HumdrumToken::getSlurStartToken(void) {
-	return getValueHTp("auto", "slurStart");
+HTp HumdrumToken::getSlurStartToken(int number) {
+	string tag = "slurStart";
+	if (number > 1) {
+		tag += to_string(number);
+	}
+	return getValueHTp("auto", tag);
 }
 
 
@@ -14279,8 +14281,12 @@ HTp HumdrumToken::getSlurStartToken(void) {
 //				<parameter key="slurStart" value="HT_140366146702320" idref=""/>
 //
 
-HTp HumdrumToken::getSlurEndToken(void) {
-	return getValueHTp("auto", "slurEnd");
+HTp HumdrumToken::getSlurEndToken(int number) {
+	string tag = "slurEnd";
+	if (number > 1) {
+		tag += to_string(number);
+	}
+	return getValueHTp("auto", tag);
 }
 
 
