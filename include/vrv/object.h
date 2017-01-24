@@ -649,7 +649,6 @@ public:
     /**
      * Process by Layer and set drawing pointers.
      * Set Dot::m_drawingNote for Dot elements in mensural mode
-     * Set Note::m_drawingAccid for Note elements having an Accid child
      */
     virtual int PreparePointersByLayer(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 

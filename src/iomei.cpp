@@ -863,9 +863,17 @@ void MeiOutput::WriteMeiAccid(pugi::xml_node currentNode, Accid *accid)
 {
     assert(accid);
 
+    // Only write att.accidental and accidentalPerformed if representing an attribute
+    if (accid->IsAttribute()) {
+        accid->WriteAccidental(currentNode);
+        accid->WriteAccidentalPerformed(currentNode);
+        return;
+    }
+    
     WriteLayerElement(currentNode, accid);
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
+    accid->WriteAccidentalPerformed(currentNode);
     accid->WriteAccidLog(currentNode);
     accid->WriteColor(currentNode);
 }
@@ -1040,7 +1048,6 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     WriteLayerElement(currentNode, note);
     WriteDurationInterface(currentNode, note);
     WritePitchInterface(currentNode, note);
-    note->WriteAccidentalPerformed(currentNode);
     note->WriteColor(currentNode);
     note->WriteColoration(currentNode);
     note->WriteGraced(currentNode);
@@ -1143,7 +1150,6 @@ void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *inte
 {
     assert(interface);
 
-    interface->WriteAccidental(element);
     interface->WriteNoteGes(element);
     interface->WriteOctave(element);
     interface->WritePitch(element);
@@ -2493,6 +2499,7 @@ bool MeiInput::ReadMeiAccid(Object *parent, pugi::xml_node accid)
 
     ReadPositionInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
+    vrvAccid->ReadAccidentalPerformed(accid);
     vrvAccid->ReadAccidLog(accid);
     vrvAccid->ReadColor(accid);
 
@@ -2742,7 +2749,6 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
 
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
-    vrvNote->ReadAccidentalPerformed(note);
     vrvNote->ReadColor(note);
     vrvNote->ReadColoration(note);
     vrvNote->ReadGraced(note);
@@ -2759,6 +2765,18 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
         vrvArtic->IsAttribute(true);
         vrvArtic->SetArtic(artic.GetArtic());
         vrvNote->AddChild(vrvArtic);
+    }
+    
+    AttAccidental accidental;
+    accidental.ReadAccidental(note);
+    AttAccidentalPerformed accidentalPerformed;
+    accidentalPerformed.ReadAccidentalPerformed(note);
+    if (accidental.HasAccid() || accidentalPerformed.HasAccidGes()) {
+        Accid *vrvAccid = new Accid();
+        vrvAccid->IsAttribute(true);
+        vrvAccid->SetAccid(accidental.GetAccid());
+        vrvAccid->SetAccidGes(accidentalPerformed.GetAccidGes());
+        vrvNote->AddChild(vrvAccid);
     }
 
     parent->AddChild(vrvNote);
@@ -2921,7 +2939,6 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
 
 bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interface)
 {
-    interface->ReadAccidental(element);
     interface->ReadNoteGes(element);
     interface->ReadOctave(element);
     interface->ReadPitch(element);

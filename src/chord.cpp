@@ -185,7 +185,7 @@ void Chord::ResetAccidList()
     for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
         Note *note = dynamic_cast<Note *>(*it);
         assert(note);
-        if (note->m_drawingAccid != NULL) {
+        if (note->GetDrawingAccid() != NULL) {
             m_accidList.push_back(note);
         }
     }

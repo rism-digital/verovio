@@ -1141,7 +1141,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             //
             if (!accidental && !alterStr.empty()) {
                 // add accid.ges once supported
-                note->SetAccidGes((data_ACCIDENTAL_IMPLICIT)ConvertAlterToAccid(alterStr));
+                Accid *accid = dynamic_cast<Accid*>(note->GetFirst(ACCID));
+                if (!accid) {
+                    accid = new Accid();
+                    note->AddChild(accid);
+                }
+                accid->SetAccidGes((data_ACCIDENTAL_IMPLICIT)ConvertAlterToAccid(alterStr));
             }
         }
 

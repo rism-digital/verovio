@@ -706,7 +706,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
         // iterate through the list of notes with accidentals
         for (idx = 0; idx < size; idx++) {
-            Accid *curAccid = noteList.at(idx)->m_drawingAccid;
+            Accid *curAccid = noteList.at(idx)->GetDrawingAccid();
 
             // if the note does not need to be moved, save a new cluster start position
             if (CalculateAccidX(staff, curAccid, chord, false)) {
@@ -729,8 +729,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
             // if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
             while (fwIdx <= bwIdx) {
-                Accid *accidFwd = noteList.at(fwIdx)->m_drawingAccid;
-                Accid *accidBwd = noteList.at(bwIdx)->m_drawingAccid;
+                Accid *accidFwd = noteList.at(fwIdx)->GetDrawingAccid();
+                Accid *accidBwd = noteList.at(bwIdx)->GetDrawingAccid();
 
                 // if the top note has an accidental, draw it and update prevAccid
                 accidFwd->SetDrawingX(xAccid);
@@ -1436,17 +1436,15 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     /************** Accidentals/dots/peripherals: **************/
 
-    if (note->m_drawingAccid) {
+    Accid *accid = note->GetDrawingAccid();
+    if (accid) {
         xAccid = xNote;
-        if (note->m_drawingAccid->GetFunc() != accidLog_FUNC_edit) {
+        if (accid->GetFunc() != accidLog_FUNC_edit) {
             xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, drawingCueSize);
         }
 
-        note->m_drawingAccid->SetDrawingX(xAccid);
-        note->m_drawingAccid->SetDrawingY(noteY);
-
-        // postpone drawing the accidental until later if it's in a chord or if it is not an attribute
-        if (!inChord && note->m_isDrawingAccidAttr) DrawAccid(dc, note->m_drawingAccid, layer, staff, measure);
+        accid->SetDrawingX(xAccid);
+        accid->SetDrawingY(noteY);
     }
 
     if (note->GetDots() && !inChord) {
