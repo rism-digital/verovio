@@ -2388,6 +2388,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             elements.pop_back();
             pointers.pop_back();
             processSlur(layerdata[i]);
+            processSlur(layerdata[i], 2);
             processDynamics(layerdata[i], staffindex);
             processDirection(layerdata[i], staffindex);
             addArticulations(chord, layerdata[i]);
@@ -2402,6 +2403,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 appendElement(elements, pointers, irest);
                 convertRhythm(irest, layerdata[i]);
                 processSlur(layerdata[i]);
+                processSlur(layerdata[i], 2);
                 processDynamics(layerdata[i], staffindex);
                 processDirection(layerdata[i], staffindex);
             }
@@ -2411,6 +2413,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 appendElement(elements, pointers, rest);
                 convertRest(rest, layerdata[i]);
                 processSlur(layerdata[i]);
+                processSlur(layerdata[i], 2);
                 processDynamics(layerdata[i], staffindex);
                 processDirection(layerdata[i], staffindex);
             }
@@ -2423,6 +2426,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             appendElement(elements, pointers, note);
             convertNote(note, layerdata[i], staffindex);
             processSlur(layerdata[i]);
+            processSlur(layerdata[i], 2);
             processDynamics(layerdata[i], staffindex);
             processDirection(layerdata[i], staffindex);
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
@@ -3129,9 +3133,9 @@ template <class ELEMENT> void HumdrumInput::addTextElement(ELEMENT *element, con
 // HumdrumInput::processSlur --
 //
 
-void HumdrumInput::processSlur(HTp token)
+void HumdrumInput::processSlur(HTp token, int number)
 {
-    HTp slurstart = token->getSlurStartToken();
+    HTp slurstart = token->getSlurStartToken(number);
     if (!slurstart) {
         return;
     }
@@ -4455,7 +4459,7 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
     int layer = m_currentlayer;
 
     if (m_signifiers.above) {
-        string pattern = "[ra-gA-G]+[-#nxXyY]*";
+        string pattern = "[ra-gA-G]+[-#nxXyY\\/]*";
         pattern.push_back(m_signifiers.above);
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff - 1;
@@ -4465,7 +4469,7 @@ void HumdrumInput::convertRest(Rest *rest, HTp token, int subtoken)
         }
     }
     if (m_signifiers.below) {
-        string pattern = "[ra-gA-G]+[-#nxXyY]*";
+        string pattern = "[ra-gA-G]+[-#nxXyY\\/]*";
         pattern.push_back(m_signifiers.below);
         if (regex_search(tstring, regex(pattern))) {
             int newstaff = m_currentstaff + 1;
