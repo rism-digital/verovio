@@ -121,7 +121,7 @@ std::vector<Staff *> TimePointInterface::GetTstampStaves(Measure *measure)
     if (this->HasStaff()) {
         staffList = this->GetStaff();
     }
-    else if (m_start && (m_start->Is() != TIMESTAMP_ATTR)) {
+    else if (m_start && !m_start->Is(TIMESTAMP_ATTR)) {
         Staff *staff = dynamic_cast<Staff *>(m_start->GetFirstParent(STAFF));
         if (staff) staffList.push_back(staff->GetN());
     }
@@ -247,7 +247,7 @@ int TimePointInterface::InterfacePrepareTimePointing(FunctorParams *functorParam
     if (!this->HasStartid()) return FUNCTOR_CONTINUE;
 
     this->SetUuidStr();
-    params->m_timePointingInterfaces.push_back(std::make_pair(this, object->Is()));
+    params->m_timePointingInterfaces.push_back(std::make_pair(this, object->GetClassId()));
 
     return FUNCTOR_CONTINUE;
 }
@@ -266,7 +266,7 @@ int TimeSpanningInterface::InterfacePrepareTimeSpanning(FunctorParams *functorPa
     }
 
     this->SetUuidStr();
-    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->Is()));
+    params->m_timeSpanningInterfaces.push_back(std::make_pair(this, object->GetClassId()));
 
     return FUNCTOR_CONTINUE;
 }

@@ -33,7 +33,7 @@ BoundingBox::BoundingBox()
     ResetBoundingBox();
 }
 
-ClassId BoundingBox::Is() const
+ClassId BoundingBox::GetClassId() const
 {
     // we should always have the method overridden
     assert(false);
@@ -181,7 +181,7 @@ int BoundingBox::Intersects(FloatingPositioner *curve, int margin) const
 {
     assert(curve);
     assert(curve->GetObject());
-    assert((curve->GetObject()->Is() == SLUR) || (curve->GetObject()->Is() == TIE));
+    assert((curve->GetObject()->Is(SLUR)) || (curve->GetObject()->Is(TIE)));
 
     // for lisability
     Point p1 = curve->m_cuvrePoints[0];

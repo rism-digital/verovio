@@ -130,7 +130,7 @@ void Object::Init(std::string classid)
     Reset();
 }
 
-ClassId Object::Is() const
+ClassId Object::GetClassId() const
 {
     // we should always have the method overridden
     assert(false);
@@ -151,7 +151,7 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
 
 bool Object::IsBoundaryElement()
 {
-    if (this->IsEditorialElement() || (this->Is() == ENDING) || (this->Is() == SECTION)) {
+    if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
         BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(this);
         assert(interface);
         return (interface->IsBoundary());
@@ -164,7 +164,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
     if (this == sourceParent) {
         assert("Object cannot be copied to itself");
     }
-    if (!allowTypeChange && (this->Is() != sourceParent->Is())) {
+    if (!allowTypeChange && (this->GetClassId() != sourceParent->GetClassId())) {
         assert("Object must be of the same type");
     }
 
@@ -475,7 +475,7 @@ Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
         return NULL;
     }
 
-    if (m_parent->Is() == classId) {
+    if (m_parent->GetClassId() == classId) {
         return m_parent;
     }
     else {
@@ -489,7 +489,7 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
         return NULL;
     }
 
-    if (m_parent->Is() == classId) {
+    if (m_parent->GetClassId() == classId) {
         return this;
     }
     else {
@@ -551,7 +551,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                     // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
                     // the attribute (see below)
                     Object *o = *iter;
-                    if (o->Is() == (*attComparisonIter)->GetType()) {
+                    if (o->GetClassId() == (*attComparisonIter)->GetType()) {
                         hasAttComparison = true;
                         break;
                     }
@@ -720,7 +720,7 @@ void TextListInterface::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        if (((*iter)->Is() != TEXT)) {
+        if (!(*iter)->Is(TEXT)) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
             iter = childList->erase(iter);
             continue;
@@ -840,7 +840,7 @@ int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
     assert(params->m_currentScoreDef);
 
     // starting a new staff
-    if (this->Is() == STAFF) {
+    if (this->Is(STAFF)) {
         Staff *staff = dynamic_cast<Staff *>(this);
         assert(staff);
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
@@ -848,7 +848,7 @@ int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new layer
-    if (this->Is() == LAYER) {
+    if (this->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(this);
         assert(layer);
         layer->SetDrawingCautionValues(params->m_currentStaffDef);
@@ -866,7 +866,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     assert(params->m_upcomingScoreDef);
 
     // starting a new page
-    if (this->Is() == PAGE) {
+    if (this->Is(PAGE)) {
         Page *page = dynamic_cast<Page *>(this);
         assert(page);
         if (page->m_parent->GetChildIndex(page) == 0) {
@@ -878,7 +878,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new system
-    if (this->Is() == SYSTEM) {
+    if (this->Is(SYSTEM)) {
         System *system = dynamic_cast<System *>(this);
         assert(system);
         // This is the only thing we do for now - we need to wait until we reach the first measure
@@ -887,7 +887,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new measure
-    if (this->Is() == MEASURE) {
+    if (this->Is(MEASURE)) {
         Measure *measure = dynamic_cast<Measure *>(this);
         assert(measure);
         bool systemBreak = false;
@@ -925,7 +925,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new scoreDef
-    if (this->Is() == SCOREDEF) {
+    if (this->Is(SCOREDEF)) {
         ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(this);
         assert(scoreDef);
         // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
@@ -935,14 +935,14 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new staffDef
-    if (this->Is() == STAFFDEF) {
+    if (this->Is(STAFFDEF)) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(this);
         assert(staffDef);
         params->m_upcomingScoreDef->ReplaceDrawingValues(staffDef);
     }
 
     // starting a new staff
-    if (this->Is() == STAFF) {
+    if (this->Is(STAFF)) {
         Staff *staff = dynamic_cast<Staff *>(this);
         assert(staff);
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
@@ -952,7 +952,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new layer
-    if (this->Is() == LAYER) {
+    if (this->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(this);
         assert(layer);
         // setting the layer stem direction. Alternatively, this could be done in
@@ -971,7 +971,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new clef
-    if (this->Is() == CLEF) {
+    if (this->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(this);
         assert(clef);
         assert(params->m_currentStaffDef);
@@ -983,7 +983,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new keysig
-    if (this->Is() == KEYSIG) {
+    if (this->Is(KEYSIG)) {
         KeySig *keysig = dynamic_cast<KeySig *>(this);
         assert(keysig);
         assert(params->m_currentStaffDef);
@@ -1003,12 +1003,12 @@ int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
     assert(params);
 
     // starting new layer
-    if (this->Is() == LAYER) {
+    if (this->Is(LAYER)) {
         params->m_graceMinPos = 0;
         return FUNCTOR_CONTINUE;
     }
 
-    if (this->Is() != NOTE) {
+    if (!this->Is(NOTE)) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -1061,7 +1061,7 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
     assert(params);
 
     // starting new layer
-    if (this->Is() == LAYER) {
+    if (this->Is(LAYER)) {
         params->m_minPos = params->m_layerMinPos;
         return FUNCTOR_CONTINUE;
     }
@@ -1089,11 +1089,11 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if ((current->Is() == NOTE) && current->GetFirstParent(CHORD, MAX_CHORD_DEPTH)) {
+    if ((current->Is(NOTE)) && current->GetFirstParent(CHORD, MAX_CHORD_DEPTH)) {
         return FUNCTOR_CONTINUE;
     }
 
-    if ((current->Is() == ACCID) && current->GetFirstParent(NOTE, MAX_ACCID_DEPTH)) {
+    if ((current->Is(ACCID)) && current->GetFirstParent(NOTE, MAX_ACCID_DEPTH)) {
         return FUNCTOR_CONTINUE;
     }
 
@@ -1106,7 +1106,7 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
     // that's part of a ligature.
     if (!current->IsGraceNote() && !current->IsInLigature())
         negative_offset
-            += (params->m_doc->GetLeftMargin(current->Is()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+            += (params->m_doc->GetLeftMargin(current->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
     // This should never happen but can with glyphs not exactly registered at x=0 in the SMuFL font used
     if (negative_offset < 0) negative_offset = 0;
@@ -1145,7 +1145,7 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
     // Move to right by the symbol type's right margin, unless it's a note that's
     // part of a ligature.
     if (!current->HasEmptyBB() && !current->IsInLigature())
-        width += params->m_doc->GetRightMargin(current->Is()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+        width += params->m_doc->GetRightMargin(current->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     params->m_minPos = current->GetAlignment()->GetXRel() + width;
     current->GetAlignment()->SetMaxWidth(width);
 
@@ -1158,7 +1158,7 @@ int Object::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
     assert(params);
 
     // ending a layer
-    if (this->Is() == LAYER) {
+    if (this->Is(LAYER)) {
         // mininimum position is the with the layer
         // we keep it if it's higher than what we had so far
         // this will be used for shifting the right barLine
@@ -1175,7 +1175,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     assert(params);
 
     // starting a new staff
-    if (this->Is() == STAFF) {
+    if (this->Is(STAFF)) {
         Staff *currentStaff = dynamic_cast<Staff *>(this);
         assert(currentStaff);
         assert(currentStaff->GetAlignment());
@@ -1188,7 +1188,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     }
 
     // starting new layer
-    if (this->Is() == LAYER) {
+    if (this->Is(LAYER)) {
         Layer *currentLayer = dynamic_cast<Layer *>(this);
         assert(currentLayer);
         // set scoreDef attr
@@ -1219,7 +1219,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (this->Is() == SYL) {
+    if (this->Is(SYL)) {
         // We don't want to add the syl to the overflow since lyrics require a full line anyway
         return FUNCTOR_CONTINUE;
     }
@@ -1269,7 +1269,7 @@ int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
     assert(params);
 
     // starting new layer
-    if (this->Is() == LAYER) {
+    if (this->Is(LAYER)) {
         Layer *currentLayer = dynamic_cast<Layer *>(this);
         assert(currentLayer);
         // set scoreDef attr

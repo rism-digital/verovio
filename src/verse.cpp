@@ -50,7 +50,7 @@ void Verse::Reset()
 
 void Verse::AddChild(Object *child)
 {
-    if (child->Is() == SYL) {
+    if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));
     }
     else if (child->IsEditorialElement()) {

@@ -100,27 +100,27 @@ void Note::Reset()
 void Note::AddChild(Object *child)
 {
     // additional verification for accid and artic - this will no be raised with editorial markup, though
-    if (child->Is() == ACCID) {
+    if (child->Is(ACCID)) {
         IsAttributeComparison isAttributeComparison(ACCID);
         if (this->FindChildByAttComparison(&isAttributeComparison))
             LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
     }
-    else if (child->Is() == ARTIC) {
+    else if (child->Is(ARTIC)) {
         IsAttributeComparison isAttributeComparison(ARTIC);
         if (this->FindChildByAttComparison(&isAttributeComparison))
             LogWarning("Having both @artic and <artic> child will cause problems");
     }
     
-    if (child->Is() == ACCID) {
+    if (child->Is(ACCID)) {
         assert(dynamic_cast<Accid *>(child));
     }
-    else if (child->Is() == ARTIC) {
+    else if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
     }
-    else if (child->Is() == SYL) {
+    else if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));
     }
-    else if (child->Is() == VERSE) {
+    else if (child->Is(VERSE)) {
         assert(dynamic_cast<Verse *>(child));
     }
     else if (child->IsEditorialElement()) {

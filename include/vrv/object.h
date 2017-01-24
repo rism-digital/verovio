@@ -82,7 +82,7 @@ public:
     Object();
     Object(std::string classid);
     virtual ~Object();
-    virtual ClassId Is() const;
+    virtual ClassId GetClassId() const;
     virtual std::string GetClassName() const { return "[MISSING]"; }
     ///@}
 
@@ -102,12 +102,12 @@ public:
      * See classId enum.
      */
     ///@{
-    bool IsControlElement() const { return (this->Is() > CONTROL_ELEMENT && this->Is() < CONTROL_ELEMENT_max); }
-    bool IsEditorialElement() const { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); }
-    bool IsLayerElement() const { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); }
-    bool IsScoreDefElement() const { return (this->Is() > SCOREDEF_ELEMENT && this->Is() < SCOREDEF_ELEMENT_max); }
-    bool IsSystemElement() const { return (this->Is() > SYSTEM_ELEMENT && this->Is() < SYSTEM_ELEMENT_max); }
-    bool IsTextElement() const { return (this->Is() > TEXT_ELEMENT && this->Is() < TEXT_ELEMENT_max); }
+    bool IsControlElement() const { return (this->GetClassId() > CONTROL_ELEMENT && this->GetClassId() < CONTROL_ELEMENT_max); }
+    bool IsEditorialElement() const { return (this->GetClassId() > EDITORIAL_ELEMENT && this->GetClassId() < EDITORIAL_ELEMENT_max); }
+    bool IsLayerElement() const { return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max); }
+    bool IsScoreDefElement() const { return (this->GetClassId() > SCOREDEF_ELEMENT && this->GetClassId() < SCOREDEF_ELEMENT_max); }
+    bool IsSystemElement() const { return (this->GetClassId() > SYSTEM_ELEMENT && this->GetClassId() < SYSTEM_ELEMENT_max); }
+    bool IsTextElement() const { return (this->GetClassId() > TEXT_ELEMENT && this->GetClassId() < TEXT_ELEMENT_max); }
     ///@}
 
     /**
@@ -995,7 +995,7 @@ public:
         if (m_classId == UNSPECIFIED) {
             return true;
         }
-        return (object->Is() == m_classId);
+        return (object->GetClassId() == m_classId);
     }
 
 private:

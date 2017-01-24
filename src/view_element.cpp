@@ -66,88 +66,88 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         m_currentColour = AxBLACK;
     }
 
-    if (element->Is() == ACCID) {
+    if (element->Is(ACCID)) {
         DrawAccid(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == ARTIC) {
+    else if (element->Is(ARTIC)) {
         DrawArtic(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == ARTIC_PART) {
+    else if (element->Is(ARTIC_PART)) {
         DrawArticPart(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == BARLINE) {
+    else if (element->Is(BARLINE)) {
         DrawBarLine(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == BEAM) {
+    else if (element->Is(BEAM)) {
         DrawBeam(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == BEATRPT) {
+    else if (element->Is(BEATRPT)) {
         DrawBeatRpt(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == BTREM) {
+    else if (element->Is(BTREM)) {
         DrawBTrem(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == CHORD) {
+    else if (element->Is(CHORD)) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == CLEF) {
+    else if (element->Is(CLEF)) {
         DrawClef(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == CUSTOS) {
+    else if (element->Is(CUSTOS)) {
         DrawCustos(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == DOT) {
+    else if (element->Is(DOT)) {
         DrawDot(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == FTREM) {
+    else if (element->Is(FTREM)) {
         DrawFTrem(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == KEYSIG) {
+    else if (element->Is(KEYSIG)) {
         DrawKeySig(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == LIGATURE) {
+    else if (element->Is(LIGATURE)) {
         DrawLigature(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MENSUR) {
+    else if (element->Is(MENSUR)) {
         DrawMensur(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == METERSIG) {
+    else if (element->Is(METERSIG)) {
         DrawMeterSig(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MREST) {
+    else if (element->Is(MREST)) {
         DrawMRest(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MRPT) {
+    else if (element->Is(MRPT)) {
         DrawMRpt(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MRPT2) {
+    else if (element->Is(MRPT2)) {
         DrawMRpt2(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MULTIREST) {
+    else if (element->Is(MULTIREST)) {
         DrawMultiRest(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MULTIRPT) {
+    else if (element->Is(MULTIRPT)) {
         DrawMultiRpt(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == NOTE) {
+    else if (element->Is(NOTE)) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == PROPORT) {
+    else if (element->Is(PROPORT)) {
         DrawProport(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == REST) {
+    else if (element->Is(REST)) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == SPACE) {
+    else if (element->Is(SPACE)) {
         DrawSpace(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == SYL) {
+    else if (element->Is(SYL)) {
         DrawSyl(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == TUPLET) {
+    else if (element->Is(TUPLET)) {
         DrawTuplet(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == VERSE) {
+    else if (element->Is(VERSE)) {
         DrawVerse(dc, element, layer, staff, measure);
     }
     else {
@@ -358,7 +358,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     int x = articPart->GetDrawingX();
     // HARDCODED value, we double the default margin for now - should go in styling
-    int yShift = 2 * m_doc->GetTopMargin(articPart->Is()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+    int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
         / PARAM_DENOMINATOR;
     int direction = (articPart->GetPlace() == STAFFREL_above) ? 1 : -1;
 
@@ -795,7 +795,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     ListOfObjects::iterator listIter;
 
     for (listIter = drawingList->begin(); listIter != drawingList->end(); ++listIter) {
-        if (((*listIter)->Is() == ARTIC)) {
+        if (((*listIter)->Is(ARTIC))) {
             DrawArtic(dc, dynamic_cast<LayerElement *>(*listIter), layer, staff, measure, true);
         }
     }
@@ -1720,7 +1720,7 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
     // We move the fermata position of half of the fermata size
     x = element->GetDrawingX();
 
-    if (element->Is() == MREST) {
+    if (element->Is(MREST)) {
         int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
         x = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
     }
@@ -1732,9 +1732,9 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
     data_PLACE place = fermatapresent->GetFermata();
 
     // First case, notes
-    if ((element->Is() == NOTE) || (element->Is() == CHORD)) {
+    if ((element->Is(NOTE)) || (element->Is(CHORD))) {
         // To be fixed once m_embellishment is removed
-        if (element->Is() == NOTE) {
+        if (element->Is(NOTE)) {
             Note *note = dynamic_cast<Note *>(element);
             assert(note);
             if (note->m_embellishment) {
@@ -1772,7 +1772,7 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
             DrawSmuflCode(dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false);
         }
     }
-    else if ((element->Is() == REST) || (element->Is() == MREST)) {
+    else if ((element->Is(REST)) || (element->Is(MREST))) {
         if (place == PLACE_above) {
             y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             DrawSmuflCode(dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);

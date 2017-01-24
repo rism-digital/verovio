@@ -34,7 +34,7 @@ public:
     virtual ~Octave();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Octave"; }
-    virtual ClassId Is() const { return OCTAVE; }
+    virtual ClassId GetClassId() const { return OCTAVE; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

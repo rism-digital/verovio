@@ -35,7 +35,7 @@ public:
     virtual ~Harm();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Harm"; }
-    virtual ClassId Is() const { return HARM; }
+    virtual ClassId GetClassId() const { return HARM; }
     ///@}
 
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }

@@ -28,7 +28,7 @@ public:
     virtual ~Accid();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Accid"; }
-    virtual ClassId Is() const { return ACCID; }
+    virtual ClassId GetClassId() const { return ACCID; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }

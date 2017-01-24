@@ -29,7 +29,7 @@ public:
     virtual ~Trill();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Trill"; }
-    virtual ClassId Is() const { return TRILL; }
+    virtual ClassId GetClassId() const { return TRILL; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

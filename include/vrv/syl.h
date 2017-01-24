@@ -43,7 +43,7 @@ public:
     virtual ~Syl();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Syl"; }
-    virtual ClassId Is() const { return SYL; }
+    virtual ClassId GetClassId() const { return SYL; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

@@ -24,7 +24,7 @@ namespace vrv {
 // DeviceContext
 //----------------------------------------------------------------------------
 
-ClassId DeviceContext::Is() const
+ClassId DeviceContext::GetClassId() const
 {
     // we should always have the method overridden
     assert(false);

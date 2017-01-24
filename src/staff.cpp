@@ -63,7 +63,7 @@ void Staff::Reset()
 
 void Staff::AddChild(Object *child)
 {
-    if (child->Is() == LAYER) {
+    if (child->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(child);
         assert(layer);
         if (layer && (layer->GetN() < 1)) {

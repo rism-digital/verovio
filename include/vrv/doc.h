@@ -35,7 +35,7 @@ public:
     // constructors and destructors
     Doc();
     virtual ~Doc();
-    virtual ClassId Is() const { return DOC; }
+    virtual ClassId GetClassId() const { return DOC; }
 
     virtual void AddChild(Object *object);
 

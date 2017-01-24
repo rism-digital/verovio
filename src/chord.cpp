@@ -86,10 +86,10 @@ void Chord::ClearClusters() const
 
 void Chord::AddChild(Object *child)
 {
-    if (child->Is() == ARTIC) {
+    if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
     }
-    else if (child->Is() == NOTE) {
+    else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -130,7 +130,7 @@ void Chord::FilterList(ListOfObjects *childList)
             continue;
         }
         else {
-            if ((*iter)->Is() == NOTE) {
+            if ((*iter)->Is(NOTE)) {
                 iter++;
             }
             else {
@@ -282,7 +282,7 @@ void Chord::SetDrawingStemDir(data_STEMDIRECTION stemDir)
     m_drawingStemDir = stemDir;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        if ((*it)->Is() != NOTE) continue;
+        if (!(*it)->Is(NOTE)) continue;
         Note *note = dynamic_cast<Note *>(*it);
         assert(note);
         note->SetDrawingStemDir(stemDir);
@@ -294,7 +294,7 @@ void Chord::SetDrawingStemStart(Point stemStart)
     m_drawingStemStart = stemStart;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        if ((*it)->Is() != NOTE) continue;
+        if (!(*it)->Is(NOTE)) continue;
         Note *note = dynamic_cast<Note *>(*it);
         assert(note);
         note->SetDrawingStemStart(stemStart);
@@ -306,7 +306,7 @@ void Chord::SetDrawingStemEnd(Point stemEnd)
     m_drawingStemEnd = stemEnd;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        if ((*it)->Is() != NOTE) continue;
+        if (!(*it)->Is(NOTE)) continue;
         Note *note = dynamic_cast<Note *>(*it);
         assert(note);
         note->SetDrawingStemEnd(stemEnd);

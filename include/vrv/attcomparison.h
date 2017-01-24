@@ -179,7 +179,7 @@ public:
     {
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
-        if (object->Is() != NOTE) return false;
+        if (!object->Is(NOTE)) return false;
         Note *note = dynamic_cast<Note *>(object);
         assert(note);
         return ((note->m_playingOnset < m_time) && (note->m_playingOffset > m_time));

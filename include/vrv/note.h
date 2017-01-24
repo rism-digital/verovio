@@ -64,7 +64,7 @@ public:
     virtual ~Note();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Note"; }
-    virtual ClassId Is() const { return NOTE; }
+    virtual ClassId GetClassId() const { return NOTE; }
     ///@}
 
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }

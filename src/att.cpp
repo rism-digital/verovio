@@ -536,7 +536,7 @@ xsdPositiveInteger_List Att::StrToXsdPositiveIntegerList(std::string value) cons
 
 bool AttComparison::operator()(Object *object)
 {
-    if (object->Is() == m_classId) {
+    if (object->Is(m_classId)) {
         return true;
     }
     return false;
@@ -544,7 +544,7 @@ bool AttComparison::operator()(Object *object)
 
 bool AttComparison::MatchesType(Object *object)
 {
-    if (object->Is() == m_classId) {
+    if (object->Is(m_classId)) {
         return true;
     }
     return false;
