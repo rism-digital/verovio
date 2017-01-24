@@ -62,15 +62,15 @@ namespace humaux {
         ~HumdrumTie();
         HumdrumTie &operator=(const HumdrumTie &anothertie);
         void insertTieIntoDom(void);
-        void setStart(const string &id, Measure *starting, int layer, const string &token, int pitch,
+        void setStart(const std::string &id, Measure *starting, int layer, const std::string &token, int pitch,
             hum::HumNum starttime, hum::HumNum endtime);
-        void setEnd(const string &id, Measure *ending, const string &token);
-        void setEndAndInsert(const string &id, Measure *ending, const string &token);
+        void setEnd(const std::string &id, Measure *ending, const std::string &token);
+        void setEndAndInsert(const std::string &id, Measure *ending, const std::string &token);
         hum::HumNum getEndTime(void);
         hum::HumNum getStartTime(void);
         hum::HumNum getDuration(void);
-        string getStartToken(void);
-        string getEndToken(void);
+        std::string getStartToken(void);
+        std::string getEndToken(void);
         int getPitch(void);
         int getLayer(void);
         bool isInserted(void);
@@ -79,8 +79,8 @@ namespace humaux {
         void setTieBelow(void);
 
     private:
-        string m_starttoken;
-        string m_endtoken;
+        std::string m_starttoken;
+        std::string m_endtoken;
         hum::HumNum m_starttime;
         hum::HumNum m_endtime;
         int m_pitch;
@@ -88,8 +88,8 @@ namespace humaux {
         bool m_inserted;
         bool m_above;
         bool m_below;
-        string m_startid;
-        string m_endid;
+        std::string m_startid;
+        std::string m_endid;
         Measure *m_startmeasure;
         Measure *m_endmeasure;
     };
@@ -202,8 +202,8 @@ public:
 
 #ifndef NO_HUMDRUM_SUPPORT
 
-    string GetHumdrumString(void);
-    string GetMeiString(void);
+    std::string GetHumdrumString(void);
+    std::string GetMeiString(void);
 
 protected:
     void clear(void);
@@ -221,25 +221,25 @@ protected:
     void setSystemMeasureStyle(int startline, int endline);
     vector<int> getStaffLayerCounts(void);
     void prepareStaffGroup(void);
-    void setClef(StaffDef *part, const string &clef);
-    void setTimeSig(StaffDef *part, const string &timesig);
-    void setMeterSymbol(StaffDef *part, const string &metersig);
+    void setClef(StaffDef *part, const std::string &clef);
+    void setTimeSig(StaffDef *part, const std::string &timesig);
+    void setMeterSymbol(StaffDef *part, const std::string &metersig);
     void fillPartInfo(hum::HTp partstart, int partnumber);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex(void);
     void prepareTimeSigDur(void);
     void printMeasureTokens(void);
-    int characterCount(const string &text, char symbol);
+    int characterCount(const std::string &text, char symbol);
     int characterCount(hum::HTp token, char symbol);
     int characterCountInSubtoken(hum::HTp token, char symbol);
-    int characterCountInSubtoken(const string &text, char symbol);
+    int characterCountInSubtoken(const std::string &text, char symbol);
     bool emptyMeasures(void);
     bool hasFullMeasureRest(vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur);
     void convertNote(vrv::Note *note, hum::HTp token, int staffindex, int subtoken = -1);
     void addCautionaryAccidental(Note *note, hum::HTp token, int acount);
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
-    void processTieStart(Note *note, hum::HTp token, const string &tstring);
-    void processTieEnd(Note *note, hum::HTp token, const string &tstring);
+    void processTieStart(Note *note, hum::HTp token, const std::string &tstring);
+    void processTieEnd(Note *note, hum::HTp token, const std::string &tstring);
     void addFermata(hum::HTp token);
     void addTrill(hum::HTp token);
     void getTimingInformation(vector<hum::HumNum> &prespace, vector<hum::HTp> &layerdata, hum::HumNum layerstarttime,
@@ -275,7 +275,7 @@ protected:
     void processDirection(hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
     hum::HTp getPreviousDataToken(hum::HTp token);
-    hum::HTp getHairpinEnd(hum::HTp token, const string &endchar);
+    hum::HTp getHairpinEnd(hum::HTp token, const std::string &endchar);
     hum::HTp getDecrescendoEnd(hum::HTp token);
     hum::HTp getCrescendoEnd(hum::HTp token);
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
@@ -288,9 +288,9 @@ protected:
     void addOrnamentMarkers(hum::HTp token);
     void setNextLeftBarStyle(data_BARRENDITION style);
     void parseSignifiers(hum::HumdrumFile &infile);
-    string getAutoClef(hum::HTp partstart, int partnumber);
-    void colorNote(vrv::Note *note, const string &token, int line, int field);
-    string getSpineColor(int line, int field);
+    std::string getAutoClef(hum::HTp partstart, int partnumber);
+    void colorNote(vrv::Note *note, const std::string &token, int line, int field);
+    std::string getSpineColor(int line, int field);
     void checkForColorSpine(hum::HumdrumFile &infile);
     vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
     void addSystemKeyTimeChange(int startline, int endline);
@@ -300,13 +300,13 @@ protected:
     void createHeader(void);
     void insertTitle(pugi::xml_node &titleStmt, const vector<hum::HumdrumLine *> &references);
     void insertExtMeta(vector<hum::HumdrumLine *> &references);
-    void addPerson(vector<vector<string> > &respPeople, vector<hum::HumdrumLine *> &references, const string &key,
-        const string &role);
+    void addPerson(vector<vector<string> > &respPeople, vector<hum::HumdrumLine *> &references, const std::string &key,
+        const std::string &role);
     void getRespPeople(vector<vector<string> > &respPeople, vector<hum::HumdrumLine *> &references);
     void insertRespStmt(pugi::xml_node &titleStmt, vector<vector<string> > &respPeople);
 
     /// Templates ///////////////////////////////////////////////////////////
-    template <class ELEMENT> void setKeySig(ELEMENT element, const string &keysig);
+    template <class ELEMENT> void setKeySig(ELEMENT element, const std::string &keysig);
     template <class PARENT, class CHILD> void appendElement(PARENT parent, CHILD child);
 
     template <class ELEMENT> void addArticulations(ELEMENT element, hum::HTp token);
@@ -319,20 +319,20 @@ protected:
 
     template <class CHILD> void appendElement(const vector<string> &name, const vector<void *> &pointers, CHILD child);
 
-    template <class ELEMENT> void addTextElement(ELEMENT *element, const string &content);
+    template <class ELEMENT> void addTextElement(ELEMENT *element, const std::string &content);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
 
     /// Static functions ////////////////////////////////////////////////////
-    static string unescapeHtmlEntities(const string &input);
+    static std::string unescapeHtmlEntities(const std::string &input);
     static void WriteUTF8(std::ostream &Out, unsigned int Ch);
     static void UnquoteHTML(std::istream &In, std::ostream &Out);
     static hum::HumNum removeFactorsOfTwo(hum::HumNum value, int &tcount, int &bcount);
     static int getDotPowerOfTwo(hum::HumNum value);
     static int nextLowerPowerOfTwo(int x);
-    static string getDateString(void);
-    static string getReferenceValue(const string &key, vector<hum::HumdrumLine *> &references);
-    static bool replace(string &str, const string &oldStr, const string &newStr);
-    string cleanHarmString(const string &content);
+    static std::string getDateString(void);
+    static std::string getReferenceValue(const std::string &key, vector<hum::HumdrumLine *> &references);
+    static bool replace(std::string &str, const std::string &oldStr, const std::string &newStr);
+    std::string cleanHarmString(const std::string &content);
 
 private:
     std::string m_filename; // Filename to read/was read.
