@@ -280,7 +280,8 @@ bool MeiOutput::WriteObject(Object *object)
 
     // Layer elements
     else if (object->Is() == ACCID) {
-        m_currentNode = m_currentNode.append_child("accid");
+        // Do not add a node for object representing an attribute
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("accid");
         WriteMeiAccid(m_currentNode, dynamic_cast<Accid *>(object));
     }
     else if (object->Is() == ARTIC) {
@@ -485,8 +486,9 @@ bool MeiOutput::WriteObject(Object *object)
         assert(false); // let's make it stop because this should not happen
     }
 
-    // LogDebug("Current: %s ", m_currentNode.value());
-    m_nodeStack.push_back(m_currentNode);
+    // Object representing an attribute have no node to push
+    if (!object->IsAttribute())
+        m_nodeStack.push_back(m_currentNode);
 
     return true;
 }

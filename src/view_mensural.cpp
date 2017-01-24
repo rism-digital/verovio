@@ -192,9 +192,6 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
         accid->SetDrawingX(xAccid);
         accid->SetDrawingY(noteY);
-
-        // postpone drawing the accidental until later if it's in a chord or if it is not an attribute
-        //if (note->m_isDrawingAccidAttr) DrawAccid(dc, note->m_drawingAccid, layer, staff, measure);
     }
 
     DrawLayerChildren(dc, note, layer, staff, measure);

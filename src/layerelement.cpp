@@ -421,9 +421,15 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_DOT;
     }
     else if (this->Is() == ACCID) {
+        // Refer to the note parent (if any?)
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        if (note) {
+            m_alignment = note->GetAlignment();
+            return FUNCTOR_CONTINUE;
+        }
         type = ALIGNMENT_ACCID;
     }
-    else if ((this->Is() == SYL) || (this->Is() == ARTIC) || (this->Is() == ARTIC_PART)) {
+    else if ((this->Is() == ARTIC) || (this->Is() == ARTIC_PART) || (this->Is() == SYL)) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
@@ -592,6 +598,7 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
     // Finally, adjust Y for notes and rests
     if (this->Is() == NOTE) {
         Note *note = dynamic_cast<Note *>(this);
+        assert(note);
         this->SetDrawingY(this->GetDrawingY()
             + params->m_view->CalculatePitchPosY(
                   staffY, note->GetPname(), layerY->GetClefOffset(layerElementY), note->GetOct()));
@@ -616,6 +623,16 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
                 + params->m_view->CalculatePitchPosY(
                       staffY, rest->GetPloc(), layerY->GetClefOffset(layerElementY), rest->GetOloc()));
         }
+    }
+    else if (this->Is() == ACCID) {
+        Accid *accid = dynamic_cast<Accid *>(this);
+        assert(accid);
+        Note *note = dynamic_cast<Note*>(this->GetFirstParent(NOTE));
+        if (note) {
+            accid->SetDrawingY(note->GetDrawingY());
+        }
+
+        
     }
 
     return FUNCTOR_CONTINUE;
