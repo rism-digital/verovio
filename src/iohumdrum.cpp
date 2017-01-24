@@ -570,40 +570,131 @@ void HumdrumInput::createHeader(void)
 
     // <fileDesc> /////////////
     pugi::xml_node fileDesc = m_doc->m_header.append_child("fileDesc");
-    pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
+    pugi::xml_node fileTitle = fileDesc.append_child("titleStmt");
 
+    string OTL = getReferenceValue("OTL", references);
+    pugi::xml_node title = fileTitle.append_child("title");
+    if (!OTL.empty()) {
+        title.append_child(pugi::node_pcdata).set_value(OTL.c_str());
+    }
+
+    // <pubStmt> /////////////
+    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
+    if (getReferenceValue("PUB", references) != "unpublished") {
+        string EED = getReferenceValue("EED", references);
+        if (!EED.empty()) {
+            pugi::xml_node pubRespStmt = pubStmt.append_child("respStmt");
+            pugi::xml_node editor = pubRespStmt.append_child("persName");
+            editor.append_attribute("analog") = "humdrum:EED";
+            editor.append_attribute("role") = "editor";
+            editor.append_child(pugi::node_pcdata).set_value(EED.c_str());
+        }
+        string YEP = getReferenceValue("YEP", references);
+        if (!YEP.empty()) {
+            pugi::xml_node publisher = pubStmt.append_child("publisher");
+            publisher.append_attribute("analog") = "humdrum:YEP";
+            publisher.append_child(pugi::node_pcdata).set_value(YEP.c_str());
+        }
+        string YEN = getReferenceValue("YEN", references);
+        if (!YEN.empty()) {
+            pugi::xml_node pubPlace = pubStmt.append_child("pubPlace");
+            pubPlace.append_attribute("analog") = "humdrum:YEN";
+            pubPlace.append_child(pugi::node_pcdata).set_value(YEN.c_str());
+        }
+        string YER = getReferenceValue("YER", references);
+        if (!YER.empty()) {
+            pugi::xml_node pubDate = pubStmt.append_child("date");
+            pubDate.append_attribute("analog") = "humdrum:YER";
+            pubDate.append_child(pugi::node_pcdata).set_value(YER.c_str());
+        }
+        if (!getReferenceValue("YEC", references).empty() || !getReferenceValue("YEM", references).empty()) {
+            pugi::xml_node availability = pubStmt.append_child("availability");
+            for (int i = 0; i < (int)references.size(); i++) {
+                string key = references[i]->getReferenceKey();
+                if (key == "YEC" || key == "YEM") {
+                    pugi::xml_node useRestrict = availability.append_child("useRestrict");
+                    useRestrict.append_attribute("analog") = StringFormat("humdrum:%s", key.c_str()).c_str();
+                    useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+                }
+            }
+        }
+    }
+    else {
+        pubStmt.append_child("unpublished");
+    }
+
+    // <encodingDesc> /////////
+    pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
+
+    // <appInfo> /////////
+    pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
+    pugi::xml_node application = appInfo.append_child("application");
+    application.append_attribute("isodate") = getDateString().c_str();
+    application.append_attribute("version") = GetVersion().c_str();
+    pugi::xml_node name = application.append_child("name");
+    name.append_child(pugi::node_pcdata).set_value("Verovio");
+    pugi::xml_node p1 = application.append_child("p");
+    p1.append_child(pugi::node_pcdata).set_value("Transcoded from Humdrum");
+    // <editorialDecl> /////////
+    string RNB = getReferenceValue("RNB", references);
+    string RWG = getReferenceValue("RWG", references);
+    if (!RNB.empty() || !RWG.empty()) {
+        pugi::xml_node editorialDecl = encodingDesc.append_child("editorialDecl");
+        for (int i = 0; i < (int)references.size(); i++) {
+            string key = references[i]->getReferenceKey();
+            if (key == "RNB") {
+                pugi::xml_node note = editorialDecl.append_child("p");
+                note.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+                note.append_attribute("label") = "note";
+            }
+            if (key == "RWG") {
+                pugi::xml_node warning = editorialDecl.append_child("p");
+                warning.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+                warning.append_attribute("label") = "warning";
+            }
+        }
+    }
+    // <projectDesc> /////////
+    string ENC = getReferenceValue("ENC", references);
+    string EEV = getReferenceValue("EEV", references);
+    if (!ENC.empty() || !EEV.empty()) {
+        pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
+        if (!ENC.empty()) {
+            ENC = "Encoded by: " + ENC;
+            pugi::xml_node p2 = projectDesc.append_child("p");
+            p2.append_child(pugi::node_pcdata).set_value(ENC.c_str());
+        }
+        if (!EEV.empty()) {
+            EEV = "Version: " + EEV;
+            pugi::xml_node p3 = projectDesc.append_child("p");
+            p3.append_child(pugi::node_pcdata).set_value(EEV.c_str());
+        }
+    }
+
+    // <sourceDesc> /////////
+
+    // <workDesc> /////////////
+    pugi::xml_node workDesc = m_doc->m_header.append_child("workDesc");
+    pugi::xml_node work = workDesc.append_child("work");
+
+    string SCT = getReferenceValue("SCT", references);
+    if (!SCT.empty()) {
+        pugi::xml_node identifier = work.append_child("identifier");
+        identifier.append_attribute("analog") = "humdrum:SCT";
+        identifier.append_child(pugi::node_pcdata).set_value(SCT.c_str());
+    }
+    pugi::xml_node titleStmt = work.append_child("titleStmt");
     insertTitle(titleStmt, references);
     if (respPeople.size() > 0) {
         insertRespStmt(titleStmt, respPeople);
     }
 
-    pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-    pugi::xml_node date = pubStmt.append_child("date");
-
-    // <encodingDesc> /////////
-
-    // <workDesc> /////////////
-
-    // <encodingDesc> /////////
-    pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
-    pugi::xml_node projectDesc = encodingDesc.append_child("projectDesc");
-
-    pugi::xml_node p1 = projectDesc.append_child("p");
-    p1.append_child(pugi::node_pcdata)
-        .set_value(StringFormat("Transcoded from Humdrum with Verovio version %s", GetVersion().c_str()).c_str());
-    string ENC = getReferenceValue("ENC", references);
-    if (ENC.size()) {
-        ENC = "Encoded by: " + ENC;
-        pugi::xml_node p2 = projectDesc.append_child("p");
-        p2.append_child(pugi::node_pcdata).set_value(ENC.c_str());
-    }
-
-    string datestr = getDateString();
-    date.append_child(pugi::node_pcdata).set_value(datestr.c_str());
-
+    // <extMeta> /////////////
     if (references.size() > 0) {
         insertExtMeta(references);
     }
+
+    // pugi::xml_node creation = work.append_child("creation");
 }
 
 //////////////////////////////
@@ -631,7 +722,7 @@ string HumdrumInput::getDateString(void)
 {
     time_t t = time(0); // get time now
     struct tm *now = localtime(&t);
-    string dateStr = StringFormat("%d-%02d-%02d %02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1, now->tm_mday,
+    string dateStr = StringFormat("%d-%02d-%02dT%02d:%02d:%02d", now->tm_year + 1900, now->tm_mon + 1, now->tm_mday,
         now->tm_hour, now->tm_min, now->tm_sec);
     return dateStr;
 }
@@ -649,6 +740,8 @@ void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, vector<vector<strin
     pugi::xml_node respStmt = titleStmt.append_child("respStmt");
     for (int i = 0; i < (int)respPeople.size(); i++) {
         pugi::xml_node person = respStmt.append_child("persName");
+        person.append_attribute("analog")
+            = StringFormat("humdrum:%s", unescapeHtmlEntities(respPeople[i][2]).c_str()).c_str();
         person.append_attribute("role") = unescapeHtmlEntities(respPeople[i][1]).c_str();
         person.text().set(unescapeHtmlEntities(respPeople[i][0]).c_str());
     }
@@ -671,22 +764,22 @@ void HumdrumInput::getRespPeople(vector<vector<string> > &respPeople, vector<Hum
 {
 
     // precalculate a reference map here to make more O(N) rather than O(N^2)
-    addPerson(respPeople, references, "COM", "Composer"); // cmp
+    addPerson(respPeople, references, "COM", "composer"); // cmp
     addPerson(respPeople, references, "COA", "attributed composer");
     addPerson(respPeople, references, "COS", "suspected composer");
-    addPerson(respPeople, references, "LYR", "Lyricist"); // lyr
-    addPerson(respPeople, references, "LIB", "Librettist"); // lbt
-    addPerson(respPeople, references, "LAR", "Arranger"); // arr
-    addPerson(respPeople, references, "LOR", "Adapter"); // orchestrator, adp
-    addPerson(respPeople, references, "RPN", "Producer"); // pro
-    addPerson(respPeople, references, "MPN", "Performer"); // prf, also: Singer/Instrumentalist
-    addPerson(respPeople, references, "MCN", "Conductor"); // cnd
-    addPerson(respPeople, references, "ODE", "Dedicatee"); // dte
-    addPerson(respPeople, references, "OCO", "Patron"); // commissioner, pat
-    addPerson(respPeople, references, "OCL", "Collector"); // col
-    addPerson(respPeople, references, "EED", "digital editor");
-    // ENC added to encodingDesc
-    // addPerson(respPeople, references, "ENC", "encoder");           // mrk,
+    addPerson(respPeople, references, "LYR", "lyricist"); // lyr
+    addPerson(respPeople, references, "LIB", "librettist"); // lbt
+    addPerson(respPeople, references, "LAR", "arranger"); // arr
+    addPerson(respPeople, references, "LOR", "adapter"); // orchestrator, adp
+    addPerson(respPeople, references, "RPN", "producer"); // pro
+    addPerson(respPeople, references, "MPN", "performer"); // prf, also: Singer/Instrumentalist
+    addPerson(respPeople, references, "MCN", "conductor"); // cnd
+    addPerson(respPeople, references, "ODE", "dedicatee"); // dte
+    addPerson(respPeople, references, "OCO", "patron"); // commissioner, pat
+    addPerson(respPeople, references, "OCL", "collector"); // col
+    // ENC and EED are handled separately
+    // addPerson(respPeople, references, "EED", "digital editor");
+    // addPerson(respPeople, references, "ENC", "encoder"); // mrk,
     // Markup editor
 }
 
@@ -701,9 +794,10 @@ void HumdrumInput::addPerson(
     for (int i = 0; i < (int)references.size(); i++) {
         if (references[i]->getReferenceKey() == key) {
             respPeople.resize(respPeople.size() + 1);
-            respPeople.back().resize(2);
+            respPeople.back().resize(3);
             respPeople.back()[0] = references[i]->getReferenceValue();
             respPeople.back()[1] = role;
+            respPeople.back()[2] = key;
         }
     }
 }
@@ -720,6 +814,10 @@ void HumdrumInput::insertExtMeta(vector<HumdrumLine *> &references)
     xmldata << "<extMeta>\n";
     xmldata << "\t<frames xmlns:humxml=\"http://www.humdrum.org/ns/humxml\">\n";
     for (int i = 0; i < (int)references.size(); i++) {
+        string key = references[i]->getReferenceKey();
+        if (!(key.compare(0, 2, "OT") && key.compare(0, 2, "YE") && key.compare(0, 1, "X"))) {
+            continue;
+        }
         references[i]->printXml(xmldata, 4);
     }
     xmldata << "\t</frames>\n";
@@ -756,7 +854,7 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLi
         plang = false;
         lang = false;
         key = references[i]->getReferenceKey();
-        if (key.compare(0, 3, "OTL") != 0) {
+        if (key.compare(0, 2, "OT") && key.compare(0, 1, "X")) {
             continue;
         }
         value = references[i]->getReferenceValue();
@@ -796,14 +894,33 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<HumdrumLi
         pugi::xml_node title = titleStmt.append_child("title");
         titlecount++;
         title.text().set(unescapeHtmlEntities(value).c_str());
-        if (lang) {
-            title.append_attribute("xml:lang") = language.c_str();
-            if (plang) {
+        title.append_attribute("analog") = StringFormat("humdrum:%s", key.substr(0, 3).c_str()).c_str();
+        if (key.compare(0, 3, "OTL") == 0) {
+            if (!lang || plang) {
                 title.append_attribute("type") = "main";
             }
             else {
                 title.append_attribute("type") = "translated";
             }
+            if (lang) {
+                title.append_attribute("xml:lang") = language.c_str();
+            }
+        }
+        else if (key.compare(0, 3, "OTA") == 0) {
+            title.append_attribute("type") = "alternative";
+            if (lang) {
+                title.append_attribute("xml:lang") = language.c_str();
+            }
+        }
+        else if (key.compare(0, 3, "OTP") == 0) {
+            title.append_attribute("type") = "alternative";
+            title.append_attribute("label") = "popular";
+            if (lang) {
+                title.append_attribute("xml:lang") = language.c_str();
+            }
+        }
+        else {
+            title.append_attribute("type") = "translated";
         }
     }
 
