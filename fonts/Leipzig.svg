@@ -18,15 +18,16 @@ Version 5.2.12 - reviewing artic width
 Version 5.2.13 - adding (very)short/long fermata and breath comma
 Version 5.2.14 - adding mensural stems
 Version 5.2.15 - changing ascent/descent to 750/250
-Version 5.1.16 - adding mensural rests
+Version 5.2.16 - adding mensural rests
+Version 5.2.17 - correcting mensural rests position
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20161003 at Fri Dec 23 13:58:58 2016
+Created by FontForge 20161003 at Wed Jan 25 08:41:28 2017
  By laurent
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.16
+Version 5.2.17
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="347" >
@@ -937,16 +938,16 @@ d="M0 500h40v-1000h-40v1000z" />
     <glyph glyph-name="uniE9F0" unicode="&#xe9f0;" horiz-adv-x="1000" 
 d="M0 500h40v-1000h-40v1000zM90 500h40v-1000h-40v1000z" />
     <glyph glyph-name="uniE9F4" unicode="&#xe9f4;" horiz-adv-x="1000" 
-d="M0 250h40v-250h-40v250z" />
-    <glyph glyph-name="uniE9F5" unicode="&#xe9f5;" horiz-adv-x="1000" 
 d="M0 250h40v-140h-40v140z" />
-    <glyph glyph-name="uniE9F6" unicode="&#xe9f6;" horiz-adv-x="1000" 
+    <glyph glyph-name="uniE9F5" unicode="&#xe9f5;" horiz-adv-x="1000" 
 d="M0 140h40v-140h-40v140z" />
-    <glyph glyph-name="uniE9F7" unicode="&#xe9f7;" horiz-adv-x="1000" 
+    <glyph glyph-name="uniE9F6" unicode="&#xe9f6;" horiz-adv-x="1000" 
 d="M40 96v-96h-40v140h40l78 -69h-48z" />
-    <glyph glyph-name="uniE9F8" unicode="&#xe9f8;" horiz-adv-x="1000" 
+    <glyph glyph-name="uniE9F7" unicode="&#xe9f7;" horiz-adv-x="1000" 
 d="M78 96v-96h40v140h-40l-78 -69h48z" />
-    <glyph glyph-name="uniE9F9" unicode="&#xe9f9;" horiz-adv-x="1000" 
+    <glyph glyph-name="uniE9F8" unicode="&#xe9f8;" horiz-adv-x="1000" 
 d="M78 96v-13l-78 -69h48l30 25v-39h40v140h-40l-78 -69h48z" />
+    <glyph glyph-name="uniE9F9" unicode="&#xe9f9;" horiz-adv-x="1000" 
+ />
   </font>
 </defs></svg>
