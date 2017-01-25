@@ -1151,7 +1151,12 @@ void PaeInput::parseNote(pae::Note *note)
 
         mnote->SetPname(note->pitch);
         mnote->SetOct(note->octave);
-        mnote->SetAccid(note->accidental);
+        if (note->accidental != ACCIDENTAL_EXPLICIT_NONE) {
+            Accid *accid = new Accid();
+            accid->SetAccid(note->accidental);
+            mnote->AddChild(accid);
+        }
+
 
         mnote->SetDots(note->dots);
         mnote->SetDur(note->duration);

@@ -421,9 +421,15 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         type = ALIGNMENT_DOT;
     }
     else if (this->Is() == ACCID) {
+        // Refer to the note parent (if any?)
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        if (note) {
+            m_alignment = note->GetAlignment();
+            return FUNCTOR_CONTINUE;
+        }
         type = ALIGNMENT_ACCID;
     }
-    else if ((this->Is() == SYL) || (this->Is() == ARTIC) || (this->Is() == ARTIC_PART)) {
+    else if ((this->Is() == ARTIC) || (this->Is() == ARTIC_PART) || (this->Is() == SYL)) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
@@ -592,6 +598,7 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
     // Finally, adjust Y for notes and rests
     if (this->Is() == NOTE) {
         Note *note = dynamic_cast<Note *>(this);
+        assert(note);
         this->SetDrawingY(this->GetDrawingY()
             + params->m_view->CalculatePitchPosY(
                   staffY, note->GetPname(), layerY->GetClefOffset(layerElementY), note->GetOct()));
@@ -616,6 +623,16 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
                 + params->m_view->CalculatePitchPosY(
                       staffY, rest->GetPloc(), layerY->GetClefOffset(layerElementY), rest->GetOloc()));
         }
+    }
+    else if (this->Is() == ACCID) {
+        Accid *accid = dynamic_cast<Accid *>(this);
+        assert(accid);
+        Note *note = dynamic_cast<Note*>(this->GetFirstParent(NOTE));
+        if (note) {
+            accid->SetDrawingY(note->GetDrawingY());
+        }
+
+        
     }
 
     return FUNCTOR_CONTINUE;
@@ -671,6 +688,8 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
         // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
         // note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
         // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
+        
+        Accid *accid = note->GetDrawingAccid();
 
         // Create midi note
         int midiBase = 0;
@@ -686,9 +705,9 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
             case PITCHNAME_NONE: break;
         }
         // Check for accidentals
-        if (note->HasAccidGes()) {
-            data_ACCIDENTAL_IMPLICIT acc_imp = note->GetAccidGes();
-            switch (acc_imp) {
+        if (accid && accid->HasAccidGes()) {
+            data_ACCIDENTAL_IMPLICIT accImp = accid->GetAccidGes();
+            switch (accImp) {
                 case ACCIDENTAL_IMPLICIT_s: midiBase += 1; break;
                 case ACCIDENTAL_IMPLICIT_f: midiBase -= 1; break;
                 case ACCIDENTAL_IMPLICIT_ss: midiBase += 2; break;
@@ -696,9 +715,9 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
                 default: break;
             }
         }
-        else if (note->m_drawingAccid) {
-            data_ACCIDENTAL_EXPLICIT acc_exp = note->m_drawingAccid->GetAccid();
-            switch (acc_exp) {
+        else if (accid) {
+            data_ACCIDENTAL_EXPLICIT accExp = accid->GetAccid();
+            switch (accExp) {
                 case ACCIDENTAL_EXPLICIT_s: midiBase += 1; break;
                 case ACCIDENTAL_EXPLICIT_f: midiBase -= 1; break;
                 case ACCIDENTAL_EXPLICIT_ss: midiBase += 2; break;

@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "accid.h"
 #include "attdef.h"
 #include "clef.h"
 #include "ending.h"
@@ -236,7 +237,7 @@ protected:
     bool emptyMeasures(void);
     bool hasFullMeasureRest(vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur);
     void convertNote(vrv::Note *note, hum::HTp token, int staffindex, int subtoken = -1);
-    void addCautionaryAccidental(Note *note, hum::HTp token, int acount);
+    void addCautionaryAccidental(Accid *accid, hum::HTp token, int acount);
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
     void processTieStart(Note *note, hum::HTp token, const std::string &tstring);
     void processTieEnd(Note *note, hum::HTp token, const std::string &tstring);

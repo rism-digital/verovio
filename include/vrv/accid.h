@@ -17,7 +17,7 @@ namespace vrv {
 // Accid
 //----------------------------------------------------------------------------
 
-class Accid : public LayerElement, public PositionInterface, public AttAccidental, public AttAccidLog, public AttColor {
+class Accid : public LayerElement, public PositionInterface, public AttAccidental, public AttAccidentalPerformed, public AttAccidLog, public AttColor {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -39,11 +39,6 @@ public:
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * See Object::PreparePointersByLayer
-     */
-    virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
 private:
     //

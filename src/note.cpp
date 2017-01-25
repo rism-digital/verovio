@@ -13,6 +13,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "attcomparison.h"
 #include "artic.h"
 #include "editorial.h"
 #include "functorparams.h"
@@ -33,7 +34,6 @@ Note::Note()
     , StemmedDrawingInterface()
     , DurationInterface()
     , PitchInterface()
-    , AttAccidentalPerformed()
     , AttColor()
     , AttColoration()
     , AttGraced()
@@ -45,7 +45,6 @@ Note::Note()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterInterface(PitchInterface::GetAttClasses(), PitchInterface::IsInterface());
-    RegisterAttClass(ATT_ACCIDENTALPERFORMED);
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
@@ -56,8 +55,6 @@ Note::Note()
     RegisterAttClass(ATT_VISIBILITY);
 
     m_drawingTieAttr = NULL;
-    m_drawingAccid = NULL;
-    m_isDrawingAccidAttr = false;
 
     Reset();
 }
@@ -68,10 +65,6 @@ Note::~Note()
     if (m_drawingTieAttr) {
         delete m_drawingTieAttr;
     }
-    // We delete it only if it is an attribute - otherwise we do not own it
-    if (m_drawingAccid && m_isDrawingAccidAttr) {
-        delete m_drawingAccid;
-    }
 }
 
 void Note::Reset()
@@ -80,7 +73,6 @@ void Note::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     PitchInterface::Reset();
-    ResetAccidentalPerformed();
     ResetColor();
     ResetColoration();
     ResetGraced();
@@ -94,8 +86,6 @@ void Note::Reset()
     m_embellishment = EMB_NONE;
     // tie pointers
     ResetDrawingTieAttr();
-    // accid pointer
-    ResetDrawingAccid();
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
@@ -109,6 +99,18 @@ void Note::Reset()
 
 void Note::AddChild(Object *child)
 {
+    // additional verification for accid and artic - this will no be raised with editorial markup, though
+    if (child->Is() == ACCID) {
+        IsAttributeComparison isAttributeComparison(ACCID);
+        if (this->FindChildByAttComparison(&isAttributeComparison))
+            LogWarning("Having both @accid or @accid.ges and <accid> child will cause problems");
+    }
+    else if (child->Is() == ARTIC) {
+        IsAttributeComparison isAttributeComparison(ARTIC);
+        if (this->FindChildByAttComparison(&isAttributeComparison))
+            LogWarning("Having both @artic and <artic> child will cause problems");
+    }
+    
     if (child->Is() == ACCID) {
         assert(dynamic_cast<Accid *>(child));
     }
@@ -162,16 +164,12 @@ void Note::ResetDrawingTieAttr()
     }
 }
 
-void Note::ResetDrawingAccid()
+Accid *Note::GetDrawingAccid()
 {
-    if (m_drawingAccid) {
-        // We delete it only if it is an attribute - otherwise we do not own it
-        if (m_isDrawingAccidAttr) delete m_drawingAccid;
-        m_drawingAccid = NULL;
-        m_isDrawingAccidAttr = false;
-    }
-    // we should never have no m_drawingAccid but have the attr flag to true
-    assert(!m_isDrawingAccidAttr);
+    Accid *accid = dynamic_cast<Accid*>(this->FindChildByType(ACCID));
+    if (accid && this->HasGrace())
+        accid->m_drawingCueSize = true;
+    return accid;
 }
 
 Chord *Note::IsChordTone()
@@ -268,18 +266,6 @@ int Note::PreparePointersByLayer(FunctorParams *functorParams)
 {
     PreparePointersByLayerParams *params = dynamic_cast<PreparePointersByLayerParams *>(functorParams);
     assert(params);
-
-    this->ResetDrawingAccid();
-    // LogDebug("PreparePointersByLayer: accid=%d ACC_EXP_NONE=%d", this->GetAccid(), ACCIDENTAL_EXPLICIT_NONE);
-    if (this->GetAccid() != ACCIDENTAL_EXPLICIT_NONE) {
-        this->m_isDrawingAccidAttr = true;
-        this->m_drawingAccid = new Accid();
-        this->m_drawingAccid->SetOloc(this->GetOct());
-        this->m_drawingAccid->SetPloc(this->GetPname());
-        this->m_drawingAccid->SetAccid(this->GetAccid());
-        // We need to set the drawing cue size since there will be no access to the note
-        this->m_drawingAccid->m_drawingCueSize = this->HasGrace();
-    }
 
     params->m_currentNote = this;
 
