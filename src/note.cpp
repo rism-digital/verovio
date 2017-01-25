@@ -165,7 +165,7 @@ void Note::ResetDrawingTieAttr()
 Accid *Note::GetDrawingAccid()
 {
     Accid *accid = dynamic_cast<Accid *>(this->FindChildByType(ACCID));
-    if (accid && this->HasGrace()) accid->m_drawingCueSize = true;
+    if (accid) accid->m_drawingCueSize = this->HasGrace();
     return accid;
 }
 
