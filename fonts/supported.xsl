@@ -612,6 +612,8 @@
             <glyph glyph-code="E269" smufl-name="accidentalSharpSharp"/>
             <glyph glyph-code="E26A" smufl-name="accidentalParensLeft"/>
             <glyph glyph-code="E26B" smufl-name="accidentalParensRight"/>
+            <glyph glyph-code="E26C" smufl-name="accidentalBracketLeft"/>
+            <glyph glyph-code="E26D" smufl-name="accidentalBracketRight"/>
             <range_end>U+E26F</range_end>
             <range_start>U+E260</range_start>
         </standardAccidentals12Edo>
