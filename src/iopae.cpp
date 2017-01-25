@@ -30,6 +30,7 @@
 #include "scoredef.h"
 #include "section.h"
 #include "staff.h"
+#include "trill.h"
 #include "tuplet.h"
 #include "vrv.h"
 
@@ -1172,7 +1173,9 @@ void PaeInput::parseNote(pae::Note *note)
         }
 
         if (note->trill == true) {
-            mnote->m_embellishment = EMB_TRILL;
+            Trill *trill = new Trill();
+            trill->SetStart(mnote);
+            m_measure->AddChild(trill);
         }
 
         if (m_last_tied_note != NULL) {
