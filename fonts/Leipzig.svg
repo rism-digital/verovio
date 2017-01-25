@@ -20,14 +20,15 @@ Version 5.2.14 - adding mensural stems
 Version 5.2.15 - changing ascent/descent to 750/250
 Version 5.2.16 - adding mensural rests
 Version 5.2.17 - correcting mensural rests position
+Version 5.2.18 - adding accid square brackets and reviewing bow directions
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20161003 at Wed Jan 25 08:41:28 2017
+Created by FontForge 20161003 at Wed Jan 25 10:52:57 2017
  By laurent
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.17
+Version 5.2.18
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="347" >
@@ -868,14 +869,14 @@ c-12 -11.333 -18.333 -25 -19 -41c0 -14 5.66699 -26.667 17 -38s26 -17.333 44 -18c
 d="M0 0v33h347v-33h-347zM310 85h-82l-84 154l-78 -154h-29l137 265z" />
     <glyph glyph-name="uniE4BD" unicode="&#xe4bd;" 
 d="M347 0v-33h-347v33h347zM37 -85h82l84 -154l78 154h29l-137 -265z" />
-    <glyph glyph-name="uniE610" unicode="&#xe610;" horiz-adv-x="240" 
-d="M0 230h240v-230h-28v116h-184v-116h-28v230z" />
-    <glyph glyph-name="uniE612" unicode="&#xe612;" horiz-adv-x="218" 
-d="M218 260l-109 -260l-109 260h24l85 -196l85 196h24z" />
-    <glyph glyph-name="uniE613" unicode="&#xe613;" horiz-adv-x="218" 
-d="M218 0l-109 260l-109 -260h24l85 196l85 -196h24z" />
-    <glyph glyph-name="uniE611" unicode="&#xe611;" horiz-adv-x="240" 
-d="M0 0h240v230h-28v-116h-184v116h-28v-230z" />
+    <glyph glyph-name="uniE610" unicode="&#xe610;" horiz-adv-x="310" 
+d="M0 240h310v-240h-33v116h-244v-116h-33v240z" />
+    <glyph glyph-name="uniE612" unicode="&#xe612;" horiz-adv-x="284" 
+d="M283 338l-141 -338l-142 338h38l104 -248l104 248h37z" />
+    <glyph glyph-name="uniE613" unicode="&#xe613;" horiz-adv-x="284" 
+d="M283 0l-141 338l-142 -338h38l104 248l104 -248h37z" />
+    <glyph glyph-name="uniE611" unicode="&#xe611;" horiz-adv-x="310" 
+d="M0 0h310v240h-33v-116h-244v116h-33v-240z" />
     <glyph glyph-name="uniE614" unicode="&#xe614;" horiz-adv-x="206" 
 d="M0 103c0 57 46 103 103 103s103 -46 103 -103s-46 -103 -103 -103s-103 46 -103 103zM28 103c0 -41 34 -75 75 -75s75 34 75 75s-34 75 -75 75s-75 -34 -75 -75z" />
     <glyph glyph-name="uniE4C8" unicode="&#xe4c8;" horiz-adv-x="790" 
@@ -949,5 +950,9 @@ d="M78 96v-96h40v140h-40l-78 -69h48z" />
 d="M78 96v-13l-78 -69h48l30 25v-39h40v140h-40l-78 -69h48z" />
     <glyph glyph-name="uniE9F9" unicode="&#xe9f9;" horiz-adv-x="1000" 
  />
+    <glyph glyph-name="uniE26C" unicode="&#xe26c;" horiz-adv-x="90" 
+d="M0 260h90v-38h-52v-444h52v-38h-90v520z" />
+    <glyph glyph-name="uniE26D" unicode="&#xe26d;" horiz-adv-x="90" 
+d="M90 260h-90v-38h52v-444h-52v-38h90v520z" />
   </font>
 </defs></svg>
