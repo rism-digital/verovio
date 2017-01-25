@@ -182,7 +182,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->StartGraphic(element, "", element->GetUuid());
 
     /************** mensural resizing - to be removed **************/
-    
+
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
         || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
         || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
@@ -198,7 +198,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     std::wstring accidStr = accid->GetSymbolStr();
     bool center = false;
-    
+
     if (accid->GetFunc() == accidLog_FUNC_edit) {
         center = true;
         accid->m_drawingCueSize = true;
@@ -208,15 +208,14 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
         if (note) {
             // Check if the note is on the top line or above (add a unit for the note head half size)
-            if (note->GetDrawingY() >= y)
-                y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            if (note->GetDrawingY() >= y) y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             // Check if the top of the stem is above
             if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd().y > y))
                 y = note->GetDrawingStemEnd().y;
 
             // adjust the x position so it is centered
             wchar_t noteHead = (note->GetActualDur() < DUR_2) ? SMUFL_E0A2_noteheadWhole : SMUFL_E0A3_noteheadHalf;
-            int radius   = m_doc->GetGlyphWidth(noteHead, staff->m_drawingStaffSize, note->IsCueSize());
+            int radius = m_doc->GetGlyphWidth(noteHead, staff->m_drawingStaffSize, note->IsCueSize());
             accid->SetDrawingX(accid->GetDrawingX() + radius / 2);
         }
         TextExtend extend;

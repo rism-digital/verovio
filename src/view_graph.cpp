@@ -185,10 +185,9 @@ void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool
 
     int xDC = ToDeviceContextX(x);
 
-
     dc->SetBrush(m_currentColour, AxSOLID);
     dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
-    
+
     if (center) {
         TextExtend extend;
         dc->GetSmuflTextExtent(s, &extend);

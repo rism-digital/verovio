@@ -192,10 +192,10 @@ public:
     virtual void SetDrawBoundingBoxes(bool b) { m_drawingBoundingBoxes = b; }
     virtual bool GetDrawBoundingBoxes() { return m_drawingBoundingBoxes; }
     ///@}
-    
+
 private:
     void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);
-    
+
 public:
     //
 protected:

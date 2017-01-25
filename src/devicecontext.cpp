@@ -143,7 +143,7 @@ void DeviceContext::GetSmuflTextExtent(const std::wstring &string, TextExtend *e
 {
     assert(m_fontStack.top());
     assert(extend);
-    
+
     extend->m_width = 0;
     extend->m_height = 0;
 
@@ -156,17 +156,17 @@ void DeviceContext::GetSmuflTextExtent(const std::wstring &string, TextExtend *e
         AddGlyphToTextExtend(glyph, extend);
     }
 }
-    
+
 void DeviceContext::AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend)
 {
     assert(glyph);
     assert(extend);
-    
+
     int x, y, partial_w, partial_h, adv_x;
     double tmp;
-    
+
     glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
-    
+
     tmp = partial_w * m_fontStack.top()->GetPointSize();
     partial_w = ceil(tmp / (double)glyph->GetUnitsPerEm());
     tmp = partial_h * m_fontStack.top()->GetPointSize();
@@ -175,11 +175,11 @@ void DeviceContext::AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend)
     y = ceil(tmp / (double)glyph->GetUnitsPerEm());
     tmp = x * m_fontStack.top()->GetPointSize();
     x = ceil(tmp / (double)glyph->GetUnitsPerEm());
-    
+
     adv_x = glyph->GetHorizAdvX();
     tmp = adv_x * m_fontStack.top()->GetPointSize();
     adv_x = ceil(tmp / (double)glyph->GetUnitsPerEm());
-    
+
     extend->m_width += std::max(partial_w + x, adv_x);
     extend->m_height = std::max(partial_h, extend->m_height);
     extend->m_ascent = std::max(partial_h + y, extend->m_ascent);

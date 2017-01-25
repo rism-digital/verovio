@@ -23,7 +23,8 @@ namespace vrv {
 // Accid
 //----------------------------------------------------------------------------
 
-Accid::Accid() : LayerElement("accid-"), PositionInterface(), AttAccidental(), AttAccidLog(), AttColor(), AttEnclosingchars()
+Accid::Accid()
+    : LayerElement("accid-"), PositionInterface(), AttAccidental(), AttAccidLog(), AttColor(), AttEnclosingchars()
 {
 
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
@@ -53,9 +54,8 @@ void Accid::Reset()
 
 std::wstring Accid::GetSymbolStr() const
 {
-    if (!this->HasAccid())
-        return L"";
-    
+    if (!this->HasAccid()) return L"";
+
     int symc = SMUFL_E261_accidentalNatural;
     switch (this->GetAccid()) {
         case ACCIDENTAL_EXPLICIT_s: symc = SMUFL_E262_accidentalSharp; break;
@@ -63,9 +63,13 @@ std::wstring Accid::GetSymbolStr() const
         case ACCIDENTAL_EXPLICIT_ss: symc = SMUFL_E269_accidentalSharpSharp; break;
         case ACCIDENTAL_EXPLICIT_x: symc = SMUFL_E263_accidentalDoubleSharp; break;
         case ACCIDENTAL_EXPLICIT_ff: symc = SMUFL_E264_accidentalDoubleFlat; break;
-        case ACCIDENTAL_EXPLICIT_sx: symc = SMUFL_E265_accidentalTripleSharp; break; // Missing in SMuFL
+        case ACCIDENTAL_EXPLICIT_sx:
+            symc = SMUFL_E265_accidentalTripleSharp;
+            break; // Missing in SMuFL
         case ACCIDENTAL_EXPLICIT_xs: symc = SMUFL_E265_accidentalTripleSharp; break;
-        case ACCIDENTAL_EXPLICIT_ts: symc = SMUFL_E265_accidentalTripleSharp; break; // Missing in SMuFL
+        case ACCIDENTAL_EXPLICIT_ts:
+            symc = SMUFL_E265_accidentalTripleSharp;
+            break; // Missing in SMuFL
         case ACCIDENTAL_EXPLICIT_tf: symc = SMUFL_E266_accidentalTripleFlat; break;
         case ACCIDENTAL_EXPLICIT_n: symc = SMUFL_E261_accidentalNatural; break;
         case ACCIDENTAL_EXPLICIT_nf: symc = SMUFL_E267_accidentalNaturalFlat; break;
@@ -83,7 +87,7 @@ std::wstring Accid::GetSymbolStr() const
         default: break;
     }
     std::wstring symbolStr;
-    
+
     if (this->HasEnclose()) {
         if (this->GetEnclose() == ENCLOSURE_brack) {
             symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
