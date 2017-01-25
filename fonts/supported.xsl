@@ -619,13 +619,13 @@
         </standardAccidentals12Edo>
         <gouldArrowQuartertoneAccidentals24Edo>
             <description>Gould arrow quartertone accidentals (24-EDO)</description>
-            <!--<glyph glyph-code="E270" smufl-name="accidentalQuarterToneFlatArrowUp"/>-->
-            <!--<glyph glyph-code="E271" smufl-name="accidentalThreeQuarterTonesFlatArrowDown"/>-->
-            <!--<glyph glyph-code="E272" smufl-name="accidentalQuarterToneSharpNaturalArrowUp"/>-->
-            <!--<glyph glyph-code="E273"
-                smufl-name="accidentalQuarterToneFlatNaturalArrowDown"/>-->
-            <!--<glyph glyph-code="E274" smufl-name="accidentalThreeQuarterTonesSharpArrowUp"/>-->
-            <!--<glyph glyph-code="E275" smufl-name="accidentalQuarterToneSharpArrowDown"/>-->
+            <glyph glyph-code="E270" smufl-name="accidentalQuarterToneFlatArrowUp"/>
+            <glyph glyph-code="E271" smufl-name="accidentalThreeQuarterTonesFlatArrowDown"/>
+            <glyph glyph-code="E272" smufl-name="accidentalQuarterToneSharpNaturalArrowUp"/>
+            <glyph glyph-code="E273"
+                smufl-name="accidentalQuarterToneFlatNaturalArrowDown"/>
+            <glyph glyph-code="E274" smufl-name="accidentalThreeQuarterTonesSharpArrowUp"/>
+            <glyph glyph-code="E275" smufl-name="accidentalQuarterToneSharpArrowDown"/>
             <!--<glyph glyph-code="E276" smufl-name="accidentalFiveQuarterTonesSharpArrowUp"/>-->
             <!--<glyph glyph-code="E277"
                 smufl-name="accidentalThreeQuarterTonesSharpArrowDown"/>-->
@@ -638,11 +638,10 @@
         </gouldArrowQuartertoneAccidentals24Edo>
         <steinZimmermannAccidentals24Edo>
             <description>Stein-Zimmermann accidentals (24-EDO)</description>
-            <!--<glyph glyph-code="E280" smufl-name="accidentalQuarterToneFlatStein"/>-->
-            <!--<glyph glyph-code="E281"
-                smufl-name="accidentalThreeQuarterTonesFlatZimmermann"/>-->
-            <!--<glyph glyph-code="E282" smufl-name="accidentalQuarterToneSharpStein"/>-->
-            <!--<glyph glyph-code="E283" smufl-name="accidentalThreeQuarterTonesSharpStein"/>-->
+            <glyph glyph-code="E280" smufl-name="accidentalQuarterToneFlatStein"/>
+            <glyph glyph-code="E281" smufl-name="accidentalThreeQuarterTonesFlatZimmermann"/>
+            <glyph glyph-code="E282" smufl-name="accidentalQuarterToneSharpStein"/>
+            <glyph glyph-code="E283" smufl-name="accidentalThreeQuarterTonesSharpStein"/>
             <!--<glyph glyph-code="E284" smufl-name="accidentalNarrowReversedFlat"/>-->
             <!--<glyph glyph-code="E285" smufl-name="accidentalNarrowReversedFlatAndFlat"/>-->
             <range_end>U+E28F</range_end>
