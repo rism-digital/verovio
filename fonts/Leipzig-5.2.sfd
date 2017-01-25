@@ -3,9 +3,9 @@ FontName: Leipzig
 FullName: Leipzig
 FamilyName: Leipzig
 Weight: Regular
-Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.16
-UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.1.16 - adding mensural rests"
-Version: 5.2.16
+Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.17
+UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.2.16 - adding mensural rests+AAoA-Version 5.2.17 - correcting mensural rests position"
+Version: 5.2.17
 ItalicAngle: 0
 UnderlinePosition: -50
 UnderlineWidth: 50
@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1482497938
+ModificationTime: 1485330088
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -10682,30 +10682,14 @@ Fore
 SplineSet
 0 250 m 5
  40 250 l 5
- 40 0 l 5
- 0 0 l 5
+ 40 110 l 5
+ 0 110 l 5
  0 250 l 5
 EndSplineSet
 EndChar
 
 StartChar: uniE9F5
 Encoding: 59893 59893 199
-Width: 1000
-VWidth: 0
-Flags: HW
-LayerCount: 2
-Fore
-SplineSet
-0 250 m 1
- 40 250 l 1
- 40 110 l 1
- 0 110 l 1
- 0 250 l 1
-EndSplineSet
-EndChar
-
-StartChar: uniE9F6
-Encoding: 59894 59894 200
 Width: 1000
 VWidth: 0
 Flags: HW
@@ -10720,8 +10704,8 @@ SplineSet
 EndSplineSet
 EndChar
 
-StartChar: uniE9F7
-Encoding: 59895 59895 201
+StartChar: uniE9F6
+Encoding: 59894 59894 200
 Width: 1000
 VWidth: 0
 Flags: HW
@@ -10739,27 +10723,27 @@ SplineSet
 EndSplineSet
 EndChar
 
-StartChar: uniE9F8
-Encoding: 59896 59896 202
+StartChar: uniE9F7
+Encoding: 59895 59895 201
 Width: 1000
 VWidth: 0
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-78 96 m 1
- 78 0 l 1
- 118 0 l 1
- 118 140 l 1
- 78 140 l 1
- 0 71 l 1
- 48 71 l 1
- 78 96 l 1
+78 96 m 5
+ 78 0 l 5
+ 118 0 l 5
+ 118 140 l 5
+ 78 140 l 5
+ 0 71 l 5
+ 48 71 l 5
+ 78 96 l 5
 EndSplineSet
 EndChar
 
-StartChar: uniE9F9
-Encoding: 59897 59897 203
+StartChar: uniE9F8
+Encoding: 59896 59896 202
 Width: 1000
 VWidth: 0
 Flags: HW
@@ -10779,6 +10763,14 @@ SplineSet
  48 71 l 5
  78 96 l 5
 EndSplineSet
+EndChar
+
+StartChar: uniE9F9
+Encoding: 59897 59897 203
+Width: 1000
+VWidth: 0
+Flags: HW
+LayerCount: 2
 EndChar
 EndChars
 EndSplineFont
