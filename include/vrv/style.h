@@ -157,9 +157,6 @@ namespace vrv {
 // Style
 //----------------------------------------------------------------------------
 
-// the space between the staff and an editorial accid in units
-#define TEMP_ACCID_EDIT_SPACE 3.5 * PARAM_DENOMINATOR
-
 // the space between each lyric line in units
 #define TEMP_LYRIC_LINE_SPACE 5.0 * PARAM_DENOMINATOR
 

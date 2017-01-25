@@ -119,9 +119,8 @@ void DeviceContext::GetTextExtent(const std::string &string, TextExtend *extend)
 void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend)
 {
     assert(m_fontStack.top());
+    assert(extend);
 
-    int x, y, partial_w, partial_h, adv_x;
-    double tmp;
     extend->m_width = 0;
     extend->m_height = 0;
 
@@ -136,36 +135,17 @@ void DeviceContext::GetTextExtent(const std::wstring &string, TextExtend *extend
         if (!glyph) {
             glyph = unkown;
         }
-        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
-
-        tmp = partial_w * m_fontStack.top()->GetPointSize();
-        partial_w = ceil(tmp / (double)glyph->GetUnitsPerEm());
-        tmp = partial_h * m_fontStack.top()->GetPointSize();
-        partial_h = ceil(tmp / (double)glyph->GetUnitsPerEm());
-        tmp = y * m_fontStack.top()->GetPointSize();
-        y = ceil(tmp / (double)glyph->GetUnitsPerEm());
-        tmp = x * m_fontStack.top()->GetPointSize();
-        x = ceil(tmp / (double)glyph->GetUnitsPerEm());
-
-        adv_x = glyph->GetHorizAdvX();
-        tmp = adv_x * m_fontStack.top()->GetPointSize();
-        adv_x = ceil(tmp / (double)glyph->GetUnitsPerEm());
-
-        extend->m_width += std::max(partial_w + x, adv_x);
-
-        extend->m_height = std::max(partial_h, extend->m_height);
-        extend->m_ascent = std::max(partial_h + y, extend->m_ascent);
-        extend->m_descent = std::max(-y, extend->m_descent);
+        AddGlyphToTextExtend(glyph, extend);
     }
 }
 
-void DeviceContext::GetSmuflTextExtent(const std::wstring &string, int *w, int *h)
+void DeviceContext::GetSmuflTextExtent(const std::wstring &string, TextExtend *extend)
 {
     assert(m_fontStack.top());
-
-    int x, y, partial_w, partial_h;
-    (*w) = 0;
-    (*h) = 0;
+    assert(extend);
+    
+    extend->m_width = 0;
+    extend->m_height = 0;
 
     for (unsigned int i = 0; i < string.length(); i++) {
         wchar_t c = string[i];
@@ -173,16 +153,37 @@ void DeviceContext::GetSmuflTextExtent(const std::wstring &string, int *w, int *
         if (!glyph) {
             continue;
         }
-        glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
-
-        partial_w *= m_fontStack.top()->GetPointSize();
-        partial_w /= glyph->GetUnitsPerEm();
-        partial_h *= m_fontStack.top()->GetPointSize();
-        partial_h /= glyph->GetUnitsPerEm();
-
-        (*w) += partial_w;
-        (*h) = std::max(partial_h, (*h));
+        AddGlyphToTextExtend(glyph, extend);
     }
+}
+    
+void DeviceContext::AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend)
+{
+    assert(glyph);
+    assert(extend);
+    
+    int x, y, partial_w, partial_h, adv_x;
+    double tmp;
+    
+    glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
+    
+    tmp = partial_w * m_fontStack.top()->GetPointSize();
+    partial_w = ceil(tmp / (double)glyph->GetUnitsPerEm());
+    tmp = partial_h * m_fontStack.top()->GetPointSize();
+    partial_h = ceil(tmp / (double)glyph->GetUnitsPerEm());
+    tmp = y * m_fontStack.top()->GetPointSize();
+    y = ceil(tmp / (double)glyph->GetUnitsPerEm());
+    tmp = x * m_fontStack.top()->GetPointSize();
+    x = ceil(tmp / (double)glyph->GetUnitsPerEm());
+    
+    adv_x = glyph->GetHorizAdvX();
+    tmp = adv_x * m_fontStack.top()->GetPointSize();
+    adv_x = ceil(tmp / (double)glyph->GetUnitsPerEm());
+    
+    extend->m_width += std::max(partial_w + x, adv_x);
+    extend->m_height = std::max(partial_h, extend->m_height);
+    extend->m_ascent = std::max(partial_h + y, extend->m_ascent);
+    extend->m_descent = std::max(-y, extend->m_descent);
 }
 
 } // namespace vrv

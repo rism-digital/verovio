@@ -18,6 +18,7 @@
 
 namespace vrv {
 
+class Glyph;
 class Object;
 class View;
 
@@ -78,7 +79,7 @@ public:
     ///@{
     virtual void GetTextExtent(const std::string &string, TextExtend *extend);
     virtual void GetTextExtent(const std::wstring &string, TextExtend *extend);
-    virtual void GetSmuflTextExtent(const std::wstring &string, int *w, int *h);
+    virtual void GetSmuflTextExtent(const std::wstring &string, TextExtend *extend);
 
     /**
      * @name Getters
@@ -191,7 +192,12 @@ public:
     virtual void SetDrawBoundingBoxes(bool b) { m_drawingBoundingBoxes = b; }
     virtual bool GetDrawBoundingBoxes() { return m_drawingBoundingBoxes; }
     ///@}
-
+    
+private:
+    void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);
+    
+public:
+    //
 protected:
     bool m_drawingBoundingBoxes;
 

@@ -196,33 +196,40 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     /************** editorial accidental **************/
 
+    std::wstring accidStr = accid->GetSymbolStr();
     bool center = false;
+    
     if (accid->GetFunc() == accidLog_FUNC_edit) {
         center = true;
+        accid->m_drawingCueSize = true;
         // position is currently only above the staff
         int y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
         if (note) {
-            if (note->GetDrawingY() > y)
+            // Check if the note is on the top line or above (add a unit for the note head half size)
+            if (note->GetDrawingY() >= y)
                 y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+            // Check if the top of the stem is above
             if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd().y > y))
                 y = note->GetDrawingStemEnd().y;
 
             // adjust the x position so it is centered
-            int radius
-                = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, accid->m_drawingCueSize);
-            if (note->GetActualDur() < DUR_2) radius += radius / 3;
+            wchar_t noteHead = (note->GetActualDur() < DUR_2) ? SMUFL_E0A2_noteheadWhole : SMUFL_E0A3_noteheadHalf;
+            int radius   = m_doc->GetGlyphWidth(noteHead, staff->m_drawingStaffSize, note->IsCueSize());
             accid->SetDrawingX(accid->GetDrawingX() + radius / 2);
         }
-        accid->SetDrawingY(
-            y + TEMP_ACCID_EDIT_SPACE * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR);
+        TextExtend extend;
+        dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->m_drawingCueSize));
+        dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
+        dc->ResetFont();
+        accid->SetDrawingY(y + extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     }
 
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    DrawSmuflString(dc, x, y, accid->GetSymbolStr(), center, staff->m_drawingStaffSize, accid->m_drawingCueSize);
+    DrawSmuflString(dc, x, y, accidStr, center, staff->m_drawingStaffSize, accid->m_drawingCueSize);
 
     dc->EndGraphic(element, this);
 }
@@ -655,10 +662,6 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         for (std::list<int>::iterator it = dotsList->begin(); it != dotsList->end(); ++it)
             DrawDots(dc, dotsX, *it, numDots, staff);
     }
-
-    /************ Draw children (notes) ************/
-
-    // DrawLayerChildren(dc, chord, layer, staff, measure);
 
     /************ Accidentals ************/
 
@@ -1196,15 +1199,15 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     }
 
     // Draw the text above
-    int w, h;
     int start_offset = 0; // offset from x to center text
 
     // convert to string
     std::wstring wtext = IntToTimeSigFigures(num);
 
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
-    dc->GetSmuflTextExtent(wtext, &w, &h);
-    start_offset = (x2 - x1 - w) / 2; // calculate offset to center text
+    TextExtend extend;
+    dc->GetSmuflTextExtent(wtext, &extend);
+    start_offset = (x2 - x1 - extend.m_width) / 2; // calculate offset to center text
     DrawSmuflString(dc, x1 + start_offset, staff->GetDrawingY() + 3 * m_doc->GetDrawingUnit(staff->m_drawingStaffSize),
         wtext, false);
     dc->ResetFont();
@@ -1423,10 +1426,10 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (accid) {
             xAccid = xNote;
             if (accid->GetFunc() != accidLog_FUNC_edit) {
-                int w, h;
+                TextExtend extend;
                 dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
-                dc->GetSmuflTextExtent(accid->GetSymbolStr(), &w, &h);
-                xAccid -= (w + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+                dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
+                xAccid -= (extend.m_width + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
                 dc->ResetFont();
             }
             accid->SetDrawingX(xAccid);
@@ -1849,9 +1852,9 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
 
     std::wstring widthText = (numText.length() > numBaseText.length()) ? numText : numBaseText;
 
-    int w = 0, h = 0;
-    dc->GetSmuflTextExtent(widthText, &w, &h);
-    x += (w / 2);
+    TextExtend extend;
+    dc->GetSmuflTextExtent(widthText, &extend);
+    x += (extend.m_width / 2);
     DrawSmuflString(dc, x, ynum, numText, true, staff->m_drawingStaffSize);
 
     if (numBase) {
@@ -1880,11 +1883,10 @@ void View::DrawMRptPart(DeviceContext *dc, int x, wchar_t smuflCode, int num, bo
     if (num > 0) {
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, false));
         // calculate the width of the figures
-        int txt_length = 0;
-        int txt_height = 0;
+        TextExtend extend;
         std::wstring figures = IntToTupletFigures(num);
-        dc->GetSmuflTextExtent(figures, &txt_length, &txt_height);
-        dc->DrawMusicText(figures, ToDeviceContextX(xCentered - txt_length / 2),
+        dc->GetSmuflTextExtent(figures, &extend);
+        dc->DrawMusicText(figures, ToDeviceContextX(xCentered - extend.m_width / 2),
             ToDeviceContextY(staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize)));
         dc->ResetFont();
     }
