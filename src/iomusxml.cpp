@@ -1475,7 +1475,7 @@ data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAlterToAccid(std::string value)
 {
     if (value == "1") return ACCIDENTAL_EXPLICIT_s;
     if (value == "-1") return ACCIDENTAL_EXPLICIT_f;
-    if (value == "2") return ACCIDENTAL_EXPLICIT_ss;
+    if (value == "2") return ACCIDENTAL_EXPLICIT_x;
     if (value == "-2") return ACCIDENTAL_EXPLICIT_ff;
     if (value == "0") return ACCIDENTAL_EXPLICIT_n;
     LogWarning("Unsupported alter value '%s'", value.c_str());

@@ -179,19 +179,20 @@ void View::DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staf
     return;
 }
 
-void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize)
+void View::DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize, bool dimin)
 {
     assert(dc);
 
     int xDC = ToDeviceContextX(x);
 
-    if (center) {
-        int w, h;
-        dc->GetSmuflTextExtent(s, &w, &h);
-        xDC -= w / 2;
-    }
     dc->SetBrush(m_currentColour, AxSOLID);
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, 0));
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staffSize, dimin));
+
+    if (center) {
+        TextExtend extend;
+        dc->GetSmuflTextExtent(s, &extend);
+        xDC -= extend.m_width / 2;
+    }
 
     dc->DrawMusicText(s, xDC, ToDeviceContextY(y));
 

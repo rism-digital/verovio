@@ -42,6 +42,12 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
+    /**
+     * Retrieve SMuFL string for the accidental.
+     * This will include brackets
+     */
+    std::wstring GetSymbolStr() const;
+
     //----------//
     // Functors //
     //----------//
