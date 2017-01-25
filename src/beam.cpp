@@ -42,22 +42,22 @@ void Beam::Reset()
 
 void Beam::AddChild(Object *child)
 {
-    if (child->Is() == BEAM) {
+    if (child->Is(BEAM)) {
         assert(dynamic_cast<Beam *>(child));
     }
-    else if (child->Is() == CHORD) {
+    else if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
     }
-    else if (child->Is() == CLEF) {
+    else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
     }
-    else if (child->Is() == NOTE) {
+    else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
     }
-    else if (child->Is() == REST) {
+    else if (child->Is(REST)) {
         assert(dynamic_cast<Rest *>(child));
     }
-    else if (child->Is() == TUPLET) {
+    else if (child->Is(TUPLET)) {
         assert(dynamic_cast<Tuplet *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -94,7 +94,7 @@ void Beam::FilterList(ListOfObjects *childList)
         else {
             // Drop notes that are signaled as grace notes
 
-            if ((*iter)->Is() == NOTE) {
+            if ((*iter)->Is(NOTE)) {
                 Note *n = dynamic_cast<Note *>(*iter);
                 assert(n);
                 // if we are at the beginning of the beam
@@ -129,7 +129,7 @@ int Beam::GetPosition(LayerElement *element)
     this->GetList(this);
     int position = this->GetListIndex(element);
     // Check if this is a note in the chord
-    if ((position == -1) && (element->Is() == NOTE)) {
+    if ((position == -1) && (element->Is(NOTE))) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         Chord *chord = note->IsChordTone();

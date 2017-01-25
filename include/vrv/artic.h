@@ -30,7 +30,7 @@ public:
     virtual ~Artic();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Artic"; }
-    virtual ClassId Is() const { return ARTIC; }
+    virtual ClassId GetClassId() const { return ARTIC; }
     ///@}
 
     /**
@@ -134,7 +134,7 @@ public:
     virtual ~ArticPart();
     virtual void Reset();
     virtual std::string GetClassName() const { return "ArticPart"; }
-    virtual ClassId Is() const { return ARTIC_PART; }
+    virtual ClassId GetClassId() const { return ARTIC_PART; }
     ///@}
 
     /**

@@ -35,7 +35,7 @@ public:
     FloatingObject(std::string classid);
     virtual ~FloatingObject();
     virtual void Reset();
-    virtual ClassId Is() const { return FLOATING_OBJECT; }
+    virtual ClassId GetClassId() const { return FLOATING_OBJECT; }
     ///@}
 
     virtual void UpdateContentBBoxX(int x1, int x2);
@@ -129,7 +129,7 @@ public:
     // constructors and destructors
     FloatingPositioner(FloatingObject *object);
     virtual ~FloatingPositioner(){};
-    virtual ClassId Is() const { return FLOATING_POSITIONER; }
+    virtual ClassId GetClassId() const { return FLOATING_POSITIONER; }
 
     virtual void ResetPositioner();
 

@@ -69,7 +69,7 @@ void Ligature::ClearClusters()
 
 void Ligature::AddChild(Object *child)
 {
-    if (child->Is() == NOTE) {
+    if (child->Is(NOTE)) {
         assert(dynamic_cast<LayerElement *>(child));
     }
     else if (child->IsEditorialElement()) {

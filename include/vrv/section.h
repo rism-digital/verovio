@@ -35,7 +35,7 @@ public:
     virtual ~Section();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Section"; }
-    virtual ClassId Is() const { return SECTION; }
+    virtual ClassId GetClassId() const { return SECTION; }
     ///@}
 
     /**
@@ -100,7 +100,7 @@ public:
     virtual ~Pb();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Pb"; }
-    virtual ClassId Is() const { return PB; }
+    virtual ClassId GetClassId() const { return PB; }
     ///@}
 
     //----------//
@@ -149,7 +149,7 @@ public:
     virtual ~Sb();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Sb"; }
-    virtual ClassId Is() const { return SB; }
+    virtual ClassId GetClassId() const { return SB; }
     ///@}
 
     //----------//

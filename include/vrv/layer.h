@@ -40,7 +40,7 @@ public:
     virtual ~Layer();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Layer"; }
-    virtual ClassId Is() const { return LAYER; }
+    virtual ClassId GetClassId() const { return LAYER; }
     ///@}
 
     /**

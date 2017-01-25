@@ -30,7 +30,7 @@ public:
     virtual ~Dot();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Dot"; }
-    virtual ClassId Is() const { return DOT; }
+    virtual ClassId GetClassId() const { return DOT; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }

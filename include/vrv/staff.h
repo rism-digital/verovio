@@ -42,7 +42,7 @@ public:
     virtual ~Staff();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Staff"; }
-    virtual ClassId Is() const { return STAFF; }
+    virtual ClassId GetClassId() const { return STAFF; }
     ///@}
 
     /**

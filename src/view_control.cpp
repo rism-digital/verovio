@@ -61,44 +61,44 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
     assert(element);
 
     // For dir, dynam, fermata, and harm, we do not consider the @tstamp2 for rendering
-    if (element->HasInterface(INTERFACE_TIME_SPANNING) && (element->Is() != DIR) && (element->Is() != DYNAM)
-        && (element->Is() != FERMATA) && (element->Is() != HARM)) {
+    if (element->HasInterface(INTERFACE_TIME_SPANNING) && !element->Is(DIR) && !element->Is(DYNAM)
+        && !element->Is(FERMATA) && !element->Is(HARM)) {
         // create placeholder
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
         system->AddToDrawingList(element);
     }
-    else if (element->Is() == DIR) {
+    else if (element->Is(DIR)) {
         Dir *dir = dynamic_cast<Dir *>(element);
         assert(dir);
         DrawDir(dc, dir, measure, system);
     }
-    else if (element->Is() == DYNAM) {
+    else if (element->Is(DYNAM)) {
         Dynam *dynam = dynamic_cast<Dynam *>(element);
         assert(dynam);
         DrawDynam(dc, dynam, measure, system);
     }
-    else if (element->Is() == FERMATA) {
+    else if (element->Is(FERMATA)) {
         Fermata *fermata = dynamic_cast<Fermata *>(element);
         assert(fermata);
         DrawFermata(dc, fermata, measure, system);
     }
-    else if (element->Is() == HARM) {
+    else if (element->Is(HARM)) {
         Harm *harm = dynamic_cast<Harm *>(element);
         assert(harm);
         DrawHarm(dc, harm, measure, system);
     }
-    else if (element->Is() == PEDAL) {
+    else if (element->Is(PEDAL)) {
         Pedal *pedal = dynamic_cast<Pedal *>(element);
         assert(pedal);
         DrawPedal(dc, pedal, measure, system);
     }
-    else if (element->Is() == TEMPO) {
+    else if (element->Is(TEMPO)) {
         Tempo *tempo = dynamic_cast<Tempo *>(element);
         assert(tempo);
         DrawTempo(dc, tempo, measure, system);
     }
-    else if (element->Is() == TRILL) {
+    else if (element->Is(TRILL)) {
         Trill *trill = dynamic_cast<Trill *>(element);
         assert(trill);
         DrawTrill(dc, trill, measure, system);
@@ -111,13 +111,11 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     assert(element);
     assert(system);
 
-    if (dc->Is() == BBOX_DEVICE_CONTEXT) {
+    if (dc->Is(BBOX_DEVICE_CONTEXT)) {
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if ((element->Is() == SLUR) || (element->Is() == HAIRPIN) || (element->Is() == OCTAVE)
-                || (element->Is() == TIE))
-                return;
+            if ((element->Is(SLUR)) || (element->Is(HAIRPIN)) || (element->Is(OCTAVE)) || (element->Is(TIE))) return;
         }
     }
 
@@ -197,25 +195,25 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
             system->SetCurrentFloatingPositioner(
                 (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), x1, (*staffIter)->GetDrawingY());
 
-        if (element->Is() == HAIRPIN) {
+        if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
             DrawHairpin(dc, dynamic_cast<Hairpin *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
-        else if (element->Is() == OCTAVE) {
+        else if (element->Is(OCTAVE)) {
             // cast to Slur check in DrawOctave
             DrawOctave(dc, dynamic_cast<Octave *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
-        else if (element->Is() == SLUR) {
+        else if (element->Is(SLUR)) {
             // For slurs we limit support to one value in @staff
             if (staffIter != staffList.begin()) continue;
             // cast to Slur check in DrawSlur
             DrawSlur(dc, dynamic_cast<Slur *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
-        else if (element->Is() == SYL) {
+        else if (element->Is(SYL)) {
             // cast to Syl check in DrawSylConnector
             DrawSylConnector(dc, dynamic_cast<Syl *>(element), x1, x2, *staffIter, spanningType, graphic);
         }
-        else if (element->Is() == TIE) {
+        else if (element->Is(TIE)) {
             // For ties we limit support to one value in @staff
             if (staffIter != staffList.begin()) continue;
             // cast to Slur check in DrawTie
@@ -268,13 +266,13 @@ void View::DrawHairpin(
     Layer *layer2 = NULL;
 
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
-    if (start->Is() == TIMESTAMP_ATTR)
+    if (start->Is(TIMESTAMP_ATTR))
         layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     else
         layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
 
     // idem
-    if (end->Is() == TIMESTAMP_ATTR)
+    if (end->Is(TIMESTAMP_ATTR))
         layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     else
         layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
@@ -536,24 +534,24 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         return;
     }
 
-    if (start->Is() == NOTE) {
+    if (start->Is(NOTE)) {
         startNote = dynamic_cast<Note *>(start);
         assert(startNote);
         startParentChord = startNote->IsChordTone();
         startStemDir = startNote->GetDrawingStemDir();
     }
-    else if (start->Is() == CHORD) {
+    else if (start->Is(CHORD)) {
         startChord = dynamic_cast<Chord *>(start);
         assert(startChord);
         startStemDir = startChord->GetDrawingStemDir();
     }
-    if (end->Is() == NOTE) {
+    if (end->Is(NOTE)) {
         endNote = dynamic_cast<Note *>(end);
         assert(endNote);
         endParentChord = endNote->IsChordTone();
         endStemDir = endNote->GetDrawingStemDir();
     }
-    else if (end->Is() == CHORD) {
+    else if (end->Is(CHORD)) {
         endChord = dynamic_cast<Chord *>(end);
         assert(endChord);
         endStemDir = endChord->GetDrawingStemDir();
@@ -563,13 +561,13 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     Layer *layer2 = NULL;
 
     // For now, with timestamps, get the first layer. We should eventually look at the @layerident (not implemented)
-    if (start->Is() == TIMESTAMP_ATTR)
+    if (start->Is(TIMESTAMP_ATTR))
         layer1 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     else
         layer1 = dynamic_cast<Layer *>(start->GetFirstParent(LAYER));
 
     // idem
-    if (end->Is() == TIMESTAMP_ATTR)
+    if (end->Is(TIMESTAMP_ATTR))
         layer2 = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     else
         layer2 = dynamic_cast<Layer *>(end->GetFirstParent(LAYER));
@@ -659,7 +657,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             // d(^)
             else {
                 // put it on the side, move it left, but not if we have a @stamp
-                if (start->Is() != TIMESTAMP_ATTR) x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 2;
+                if (!start->Is(TIMESTAMP_ATTR)) x1 += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 4 / 2;
                 if (startChord || startParentChord)
                     y1 = yChordMin + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
                 else
@@ -721,7 +719,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
             // (_)P
             else {
                 // put it on the side, move it right, but not if we have a @stamp2
-                if (end->Is() != TIMESTAMP_ATTR) x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+                if (!end->Is(TIMESTAMP_ATTR)) x2 -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
                 if (endChord || endParentChord)
                     y2 = yChordMin - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 3;
                 else
@@ -737,7 +735,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         else
             y2 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y1);
     }
-    if (end->Is() == TIMESTAMP_ATTR) {
+    if (end->Is(TIMESTAMP_ATTR)) {
         if (drawingCurveDir == curvature_CURVEDIR_above)
             y2 = std::max(staff->GetDrawingY(), y1);
         else
@@ -749,7 +747,7 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
         else
             y1 = std::min(staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize), y2);
     }
-    if (start->Is() == TIMESTAMP_ATTR) {
+    if (start->Is(TIMESTAMP_ATTR)) {
         if (drawingCurveDir == curvature_CURVEDIR_above)
             y1 = std::max(staff->GetDrawingY(), y2);
         else
@@ -915,7 +913,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
          it != findTimeSpanningLayerElementsParams.m_spanningContent.end(); it++) {
         Note *note = NULL;
         // We keep only notes and chords for now
-        if (((*it)->Is() != NOTE) && ((*it)->Is() != CHORD)) continue;
+        if (!(*it)->Is(NOTE) && !(*it)->Is(CHORD)) continue;
         // Also skip notes that are part of a chords since we already have the chord
         if ((note = dynamic_cast<Note *>(*it)) && note->IsChordTone()) continue;
         Point p;
@@ -1851,29 +1849,29 @@ void View::DrawSystemElement(DeviceContext *dc, SystemElement *element, System *
     assert(element);
     assert(system);
 
-    if (element->Is() == BOUNDARY_END) {
+    if (element->Is(BOUNDARY_END)) {
         BoundaryEnd *boundaryEnd = dynamic_cast<BoundaryEnd *>(element);
         assert(boundaryEnd);
         assert(boundaryEnd->GetStart());
         dc->StartGraphic(element, boundaryEnd->GetStart()->GetUuid(), element->GetUuid());
         dc->EndGraphic(element, this);
     }
-    else if (element->Is() == ENDING) {
+    else if (element->Is(ENDING)) {
         // Create placeholder - A graphic for the end boundary will be created
         // but only if it is on a different system - See View::DrawEnding
         // The Ending is added to the System drawing list by View::DrawMeasure
         dc->StartGraphic(element, "boundaryStart", element->GetUuid());
         dc->EndGraphic(element, this);
     }
-    else if (element->Is() == PB) {
+    else if (element->Is(PB)) {
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
     }
-    else if (element->Is() == SB) {
+    else if (element->Is(SB)) {
         dc->StartGraphic(element, "", element->GetUuid());
         dc->EndGraphic(element, this);
     }
-    else if (element->Is() == SECTION) {
+    else if (element->Is(SECTION)) {
         dc->StartGraphic(element, "boundaryStart", element->GetUuid());
         dc->EndGraphic(element, this);
     }
@@ -1885,7 +1883,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     assert(ending);
     assert(system);
 
-    if (dc->Is() == BBOX_DEVICE_CONTEXT) {
+    if (dc->Is(BBOX_DEVICE_CONTEXT)) {
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {

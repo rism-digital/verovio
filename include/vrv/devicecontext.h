@@ -49,7 +49,8 @@ public:
         m_isDeactivatedY = false;
     }
     virtual ~DeviceContext(){};
-    virtual ClassId Is() const;
+    virtual ClassId GetClassId() const;
+    bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
     ///@}
 
     /**

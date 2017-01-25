@@ -3,9 +3,9 @@ FontName: Leipzig
 FullName: Leipzig
 FamilyName: Leipzig
 Weight: Regular
-Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.16
-UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.1.16 - adding mensural rests"
-Version: 5.2.16
+Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.18
+UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.2.16 - adding mensural rests+AAoA-Version 5.2.17 - correcting mensural rests position+AAoA-Version 5.2.18 - adding accid square brackets and reviewing bow directions"
+Version: 5.2.18
 ItalicAngle: 0
 UnderlinePosition: -50
 UnderlineWidth: 50
@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1482497938
+ModificationTime: 1485337977
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -50,11 +50,11 @@ NameList: Adobe Glyph List
 DisplaySize: -72
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 59814 18 7
+WinInfo: 58464 18 7
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
-BeginChars: 1114115 204
+BeginChars: 1114115 206
 
 StartChar: uniE0A3
 Encoding: 57507 57507 0
@@ -10055,77 +10055,77 @@ EndChar
 
 StartChar: uniE610
 Encoding: 58896 58896 176
-Width: 240
+Width: 310
 VWidth: 0
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 230 m 29
- 240 230 l 29
- 240 0 l 25
- 212 0 l 25
- 212 116 l 25
- 28 116 l 25
- 28 0 l 25
- 0 0 l 25
- 0 230 l 29
+0 240 m 5
+ 310 240 l 29
+ 310 0 l 29
+ 277 0 l 29
+ 277 116 l 29
+ 33 116 l 5
+ 33 0 l 29
+ 0 0 l 29
+ 0 240 l 5
 EndSplineSet
 EndChar
 
 StartChar: uniE612
 Encoding: 58898 58898 177
-Width: 218
+Width: 284
 VWidth: 2048
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-218 260 m 1
- 109 0 l 1
- 0 260 l 1
- 24 260 l 5
- 109 64 l 1
- 194 260 l 1
- 218 260 l 1
+283 338 m 5
+ 142 0 l 5
+ 0 338 l 5
+ 38 338 l 5
+ 142 90 l 5
+ 246 338 l 5
+ 283 338 l 5
 EndSplineSet
 EndChar
 
 StartChar: uniE613
 Encoding: 58899 58899 178
-Width: 218
+Width: 284
 VWidth: 2048
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-218 0 m 5
- 109 260 l 5
+283 0 m 5
+ 142 338 l 5
  0 0 l 5
- 24 0 l 5
- 109 196 l 5
- 194 0 l 5
- 218 0 l 5
+ 38 0 l 5
+ 142 248 l 5
+ 246 0 l 5
+ 283 0 l 5
 EndSplineSet
 EndChar
 
 StartChar: uniE611
 Encoding: 58897 58897 179
-Width: 240
+Width: 310
 VWidth: 0
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-0 0 m 25
- 240 0 l 25
- 240 230 l 25
- 212 230 l 25
- 212 114 l 25
- 28 114 l 25
- 28 230 l 29
- 0 230 l 25
- 0 0 l 25
+0 0 m 5
+ 310 0 l 29
+ 310 240 l 29
+ 277 240 l 29
+ 277 124 l 29
+ 33 124 l 5
+ 33 240 l 29
+ 0 240 l 29
+ 0 0 l 5
 EndSplineSet
 EndChar
 
@@ -10682,30 +10682,14 @@ Fore
 SplineSet
 0 250 m 5
  40 250 l 5
- 40 0 l 5
- 0 0 l 5
+ 40 110 l 5
+ 0 110 l 5
  0 250 l 5
 EndSplineSet
 EndChar
 
 StartChar: uniE9F5
 Encoding: 59893 59893 199
-Width: 1000
-VWidth: 0
-Flags: HW
-LayerCount: 2
-Fore
-SplineSet
-0 250 m 1
- 40 250 l 1
- 40 110 l 1
- 0 110 l 1
- 0 250 l 1
-EndSplineSet
-EndChar
-
-StartChar: uniE9F6
-Encoding: 59894 59894 200
 Width: 1000
 VWidth: 0
 Flags: HW
@@ -10720,8 +10704,8 @@ SplineSet
 EndSplineSet
 EndChar
 
-StartChar: uniE9F7
-Encoding: 59895 59895 201
+StartChar: uniE9F6
+Encoding: 59894 59894 200
 Width: 1000
 VWidth: 0
 Flags: HW
@@ -10739,27 +10723,27 @@ SplineSet
 EndSplineSet
 EndChar
 
-StartChar: uniE9F8
-Encoding: 59896 59896 202
+StartChar: uniE9F7
+Encoding: 59895 59895 201
 Width: 1000
 VWidth: 0
 Flags: HW
 LayerCount: 2
 Fore
 SplineSet
-78 96 m 1
- 78 0 l 1
- 118 0 l 1
- 118 140 l 1
- 78 140 l 1
- 0 71 l 1
- 48 71 l 1
- 78 96 l 1
+78 96 m 5
+ 78 0 l 5
+ 118 0 l 5
+ 118 140 l 5
+ 78 140 l 5
+ 0 71 l 5
+ 48 71 l 5
+ 78 96 l 5
 EndSplineSet
 EndChar
 
-StartChar: uniE9F9
-Encoding: 59897 59897 203
+StartChar: uniE9F8
+Encoding: 59896 59896 202
 Width: 1000
 VWidth: 0
 Flags: HW
@@ -10778,6 +10762,54 @@ SplineSet
  0 71 l 5
  48 71 l 5
  78 96 l 5
+EndSplineSet
+EndChar
+
+StartChar: uniE9F9
+Encoding: 59897 59897 203
+Width: 1000
+VWidth: 0
+Flags: HW
+LayerCount: 2
+EndChar
+
+StartChar: uniE26C
+Encoding: 57964 57964 204
+Width: 90
+VWidth: 2048
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+0 260 m 5
+ 90 260 l 5
+ 90 222 l 5
+ 38 222 l 5
+ 38 -222 l 5
+ 90 -222 l 5
+ 90 -260 l 5
+ 0 -260 l 5
+ 0 260 l 5
+EndSplineSet
+EndChar
+
+StartChar: uniE26D
+Encoding: 57965 57965 205
+Width: 90
+VWidth: 2048
+Flags: HW
+LayerCount: 2
+Fore
+SplineSet
+90 260 m 1
+ 0 260 l 1
+ 0 222 l 1
+ 52 222 l 1
+ 52 -222 l 1
+ 0 -222 l 1
+ 0 -260 l 1
+ 90 -260 l 1
+ 90 260 l 1
 EndSplineSet
 EndChar
 EndChars

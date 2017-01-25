@@ -265,7 +265,7 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
 {
     std::vector<LayerElement *>::reverse_iterator riter;
     for (riter = m_elementStack.rbegin(); riter != m_elementStack.rend(); riter++) {
-        if ((*riter)->Is() == classId) {
+        if ((*riter)->Is(classId)) {
             m_elementStack.erase((riter + 1).base());
             return;
         }
@@ -881,7 +881,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             m_octDis[staffN] = 0;
             std::vector<std::pair<int, ControlElement *> >::iterator iter;
             for (iter = m_controlElements.begin(); iter != m_controlElements.end(); iter++) {
-                if (iter->second->Is() == OCTAVE) {
+                if (iter->second->Is(OCTAVE)) {
                     Octave *octave = dynamic_cast<Octave *>(iter->second);
                     std::vector<int> staffAttr = octave->GetStaff();
                     if (std::find(staffAttr.begin(), staffAttr.end(), staffN) != staffAttr.end()
@@ -1141,7 +1141,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             //
             if (!accidental && !alterStr.empty()) {
                 // add accid.ges once supported
-                Accid *accid = dynamic_cast<Accid*>(note->GetFirst(ACCID));
+                Accid *accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
                     note->AddChild(accid);
@@ -1156,7 +1156,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         if (nextNote.node().select_single_node("chord")) nextIsChord = true;
         // create the chord if we are starting a new chord
         if (nextIsChord) {
-            if (m_elementStack.empty() || m_elementStack.back()->Is() != CHORD) {
+            if (m_elementStack.empty() || !m_elementStack.back()->Is(CHORD)) {
                 Chord *chord = new Chord();
                 chord->SetDur(ConvertTypeToDur(typeStr));
                 if (dots > 0) chord->SetDots(dots);
@@ -1185,7 +1185,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         }
 
         // set attributes to the note if we are not in a chord
-        if (m_elementStack.empty() || m_elementStack.back()->Is() != CHORD) {
+        if (m_elementStack.empty() || !m_elementStack.back()->Is(CHORD)) {
             note->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
@@ -1293,7 +1293,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 
         // if we are ending a chord remove it from the stack
         if (!nextIsChord) {
-            if (!m_elementStack.empty() && m_elementStack.back()->Is() == CHORD) {
+            if (!m_elementStack.empty() && m_elementStack.back()->Is(CHORD)) {
                 RemoveLastFromStack(CHORD);
             }
         }
@@ -1460,7 +1460,7 @@ data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAccidentalToAccid(std::string val
     if (value == "sharp") return ACCIDENTAL_EXPLICIT_s;
     if (value == "flat") return ACCIDENTAL_EXPLICIT_f;
     if (value == "sharp-sharp") return ACCIDENTAL_EXPLICIT_ss;
-    if (value == "double-sharp") return ACCIDENTAL_EXPLICIT_ss;
+    if (value == "double-sharp") return ACCIDENTAL_EXPLICIT_x;
     if (value == "flat-flat") return ACCIDENTAL_EXPLICIT_ff;
     if (value == "double-flat") return ACCIDENTAL_EXPLICIT_ff;
     if (value == "natural") return ACCIDENTAL_EXPLICIT_n;
@@ -1472,7 +1472,7 @@ data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAlterToAccid(std::string value)
 {
     if (value == "1") return ACCIDENTAL_EXPLICIT_s;
     if (value == "-1") return ACCIDENTAL_EXPLICIT_f;
-    if (value == "2") return ACCIDENTAL_EXPLICIT_ss;
+    if (value == "2") return ACCIDENTAL_EXPLICIT_x;
     if (value == "-2") return ACCIDENTAL_EXPLICIT_ff;
     if (value == "0") return ACCIDENTAL_EXPLICIT_n;
     LogWarning("Unsupported alter value '%s'", value.c_str());

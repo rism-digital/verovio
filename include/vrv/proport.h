@@ -31,7 +31,7 @@ public:
     virtual ~Proport();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Proport"; }
-    virtual ClassId Is() const { return PROPORT; }
+    virtual ClassId GetClassId() const { return PROPORT; }
     virtual Object *Clone() const { return new Proport(*this); }
     ///@}
 
