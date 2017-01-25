@@ -30,7 +30,7 @@ public:
     virtual ~Verse();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Verse"; }
-    virtual ClassId Is() const { return VERSE; }
+    virtual ClassId GetClassId() const { return VERSE; }
     ///@}
 
     /**

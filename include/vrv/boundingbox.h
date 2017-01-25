@@ -26,7 +26,8 @@ public:
     // constructors and destructors
     BoundingBox();
     virtual ~BoundingBox(){};
-    virtual ClassId Is() const;
+    virtual ClassId GetClassId() const;
+    bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
 
     virtual void UpdateContentBBoxX(int x1, int x2);
     virtual void UpdateContentBBoxY(int y1, int y2);

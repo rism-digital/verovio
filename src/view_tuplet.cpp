@@ -142,7 +142,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         // cycle into the elements and count the up and down dirs
         ListOfObjects::iterator iter = tupletChildren->begin();
         while (iter != tupletChildren->end()) {
-            if ((*iter)->Is() == NOTE) {
+            if ((*iter)->Is(NOTE)) {
                 Note *currentNote = dynamic_cast<Note *>(*iter);
                 assert(currentNote);
                 if (currentNote->GetDrawingStemDir() == STEMDIRECTION_up)
@@ -185,7 +185,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             // average. In this case we offset down or up all the points
             iter = tupletChildren->begin();
             while (iter != tupletChildren->end()) {
-                if ((*iter)->Is() == NOTE) {
+                if ((*iter)->Is(NOTE)) {
                     Note *currentNote = dynamic_cast<Note *>(*iter);
                     assert(currentNote);
 
@@ -220,7 +220,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             // Find the tallest stem and set y to it (with the offset distance)
             iter = tupletChildren->begin();
             while (iter != tupletChildren->end()) {
-                if ((*iter)->Is() == NOTE) {
+                if ((*iter)->Is(NOTE)) {
                     Note *currentNote = dynamic_cast<Note *>(*iter);
                     assert(currentNote);
 

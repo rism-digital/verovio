@@ -49,7 +49,7 @@ public:
     virtual ~Chord();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Chord"; }
-    virtual ClassId Is() const { return CHORD; }
+    virtual ClassId GetClassId() const { return CHORD; }
     ///@}
 
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }

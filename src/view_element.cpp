@@ -66,88 +66,88 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
         m_currentColour = AxBLACK;
     }
 
-    if (element->Is() == ACCID) {
+    if (element->Is(ACCID)) {
         DrawAccid(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == ARTIC) {
+    else if (element->Is(ARTIC)) {
         DrawArtic(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == ARTIC_PART) {
+    else if (element->Is(ARTIC_PART)) {
         DrawArticPart(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == BARLINE) {
+    else if (element->Is(BARLINE)) {
         DrawBarLine(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == BEAM) {
+    else if (element->Is(BEAM)) {
         DrawBeam(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == BEATRPT) {
+    else if (element->Is(BEATRPT)) {
         DrawBeatRpt(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == BTREM) {
+    else if (element->Is(BTREM)) {
         DrawBTrem(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == CHORD) {
+    else if (element->Is(CHORD)) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == CLEF) {
+    else if (element->Is(CLEF)) {
         DrawClef(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == CUSTOS) {
+    else if (element->Is(CUSTOS)) {
         DrawCustos(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == DOT) {
+    else if (element->Is(DOT)) {
         DrawDot(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == FTREM) {
+    else if (element->Is(FTREM)) {
         DrawFTrem(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == KEYSIG) {
+    else if (element->Is(KEYSIG)) {
         DrawKeySig(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == LIGATURE) {
+    else if (element->Is(LIGATURE)) {
         DrawLigature(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MENSUR) {
+    else if (element->Is(MENSUR)) {
         DrawMensur(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == METERSIG) {
+    else if (element->Is(METERSIG)) {
         DrawMeterSig(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MREST) {
+    else if (element->Is(MREST)) {
         DrawMRest(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MRPT) {
+    else if (element->Is(MRPT)) {
         DrawMRpt(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MRPT2) {
+    else if (element->Is(MRPT2)) {
         DrawMRpt2(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MULTIREST) {
+    else if (element->Is(MULTIREST)) {
         DrawMultiRest(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == MULTIRPT) {
+    else if (element->Is(MULTIRPT)) {
         DrawMultiRpt(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == NOTE) {
+    else if (element->Is(NOTE)) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == PROPORT) {
+    else if (element->Is(PROPORT)) {
         DrawProport(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == REST) {
+    else if (element->Is(REST)) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == SPACE) {
+    else if (element->Is(SPACE)) {
         DrawSpace(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == SYL) {
+    else if (element->Is(SYL)) {
         DrawSyl(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == TUPLET) {
+    else if (element->Is(TUPLET)) {
         DrawTuplet(dc, element, layer, staff, measure);
     }
-    else if (element->Is() == VERSE) {
+    else if (element->Is(VERSE)) {
         DrawVerse(dc, element, layer, staff, measure);
     }
     else {
@@ -162,8 +162,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
 // View - LayerElement
 //----------------------------------------------------------------------------
 
-void View::DrawAccid(
-    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, Accid *prevAccid)
+void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(element);
@@ -195,8 +194,8 @@ void View::DrawAccid(
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if (accid->m_parent) {
-        accid->SetDrawingY(accid->GetDrawingY()
-            + CalculatePitchPosY(staff, accid->GetPloc(), layer->GetClefOffset(accid), accid->GetOloc()));
+        // accid->SetDrawingY(accid->GetDrawingY()
+        //    + CalculatePitchPosY(staff, accid->GetPloc(), layer->GetClefOffset(accid), accid->GetOloc()));
         accid->m_drawingCueSize = accid->IsCueSize();
     }
 
@@ -358,7 +357,7 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     int x = articPart->GetDrawingX();
     // HARDCODED value, we double the default margin for now - should go in styling
-    int yShift = 2 * m_doc->GetTopMargin(articPart->Is()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
+    int yShift = 2 * m_doc->GetTopMargin(articPart->GetClassId()) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)
         / PARAM_DENOMINATOR;
     int direction = (articPart->GetPlace() == STAFFREL_above) ? 1 : -1;
 
@@ -641,10 +640,6 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         }
     }
 
-    /************ Draw children (notes) ************/
-
-    DrawLayerChildren(dc, chord, layer, staff, measure);
-
     /************ Dots ************/
 
     chord->m_dots.clear();
@@ -682,6 +677,10 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             DrawDots(dc, dotsX, *it, numDots, staff);
     }
 
+    /************ Draw children (notes) ************/
+
+    // DrawLayerChildren(dc, chord, layer, staff, measure);
+
     /************ Accidentals ************/
 
     // navigate through list of notes, starting with outside and working in
@@ -706,7 +705,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
         // iterate through the list of notes with accidentals
         for (idx = 0; idx < size; idx++) {
-            Accid *curAccid = noteList.at(idx)->m_drawingAccid;
+            Accid *curAccid = noteList.at(idx)->GetDrawingAccid();
 
             // if the note does not need to be moved, save a new cluster start position
             if (CalculateAccidX(staff, curAccid, chord, false)) {
@@ -729,18 +728,18 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
             // if it's even, this will catch the overlap; if it's odd, there's an if in the middle there
             while (fwIdx <= bwIdx) {
-                Accid *accidFwd = noteList.at(fwIdx)->m_drawingAccid;
-                Accid *accidBwd = noteList.at(bwIdx)->m_drawingAccid;
+                Accid *accidFwd = noteList.at(fwIdx)->GetDrawingAccid();
+                Accid *accidBwd = noteList.at(bwIdx)->GetDrawingAccid();
 
                 // if the top note has an accidental, draw it and update prevAccid
                 accidFwd->SetDrawingX(xAccid);
                 CalculateAccidX(staff, accidFwd, chord, true);
-                DrawAccid(dc, accidFwd, layer, staff, measure);
+                // DrawAccid(dc, accidFwd, layer, staff, measure);
                 // same, except with an extra check that we're not doing the same note twice
                 if (fwIdx != bwIdx) {
                     accidBwd->SetDrawingX(xAccid);
                     CalculateAccidX(staff, accidBwd, chord, true);
-                    DrawAccid(dc, accidBwd, layer, staff, measure);
+                    // DrawAccid(dc, accidBwd, layer, staff, measure);
                     bwIdx--;
                 }
 
@@ -749,6 +748,10 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             fwIdx = idx;
         }
     }
+
+    /************ Draw children (notes) ************/
+
+    DrawLayerChildren(dc, chord, layer, staff, measure);
 
     /************ Ledger lines ************/
 
@@ -790,7 +793,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     ListOfObjects::iterator listIter;
 
     for (listIter = drawingList->begin(); listIter != drawingList->end(); ++listIter) {
-        if (((*listIter)->Is() == ARTIC)) {
+        if (((*listIter)->Is(ARTIC))) {
             DrawArtic(dc, dynamic_cast<LayerElement *>(*listIter), layer, staff, measure, true);
         }
     }
@@ -1436,30 +1439,28 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     /************** Accidentals/dots/peripherals: **************/
 
-    if (note->m_drawingAccid) {
-        xAccid = xNote;
-        if (note->m_drawingAccid->GetFunc() != accidLog_FUNC_edit) {
-            xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, drawingCueSize);
+    if (!inChord) {
+        Accid *accid = note->GetDrawingAccid();
+        if (accid) {
+            xAccid = xNote;
+            if (accid->GetFunc() != accidLog_FUNC_edit) {
+                xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, drawingCueSize);
+            }
+            accid->SetDrawingX(xAccid);
         }
 
-        note->m_drawingAccid->SetDrawingX(xAccid);
-        note->m_drawingAccid->SetDrawingY(noteY);
+        if (note->GetDots()) {
+            int xDot;
+            if (note->GetActualDur() < DUR_2
+                || (note->GetActualDur() > DUR_8 && !inBeam && (note->GetDrawingStemDir() == STEMDIRECTION_up))) {
+                xDot = xStem + m_doc->GetDrawingUnit(staffSize) * 7 / 2;
+            }
+            else {
+                xDot = xStem + m_doc->GetDrawingUnit(staffSize) * 5 / 2;
+            }
 
-        // postpone drawing the accidental until later if it's in a chord or if it is not an attribute
-        if (!inChord && note->m_isDrawingAccidAttr) DrawAccid(dc, note->m_drawingAccid, layer, staff, measure);
-    }
-
-    if (note->GetDots() && !inChord) {
-        int xDot;
-        if (note->GetActualDur() < DUR_2
-            || (note->GetActualDur() > DUR_8 && !inBeam && (note->GetDrawingStemDir() == STEMDIRECTION_up))) {
-            xDot = xStem + m_doc->GetDrawingUnit(staffSize) * 7 / 2;
+            DrawDots(dc, xDot, noteY, note->GetDots(), staff);
         }
-        else {
-            xDot = xStem + m_doc->GetDrawingUnit(staffSize) * 5 / 2;
-        }
-
-        DrawDots(dc, xDot, noteY, note->GetDots(), staff);
     }
 
     if (note->GetDrawingTieAttr()) {
@@ -1470,8 +1471,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (system) system->AddToDrawingList(note->GetDrawingTieAttr());
     }
 
-    // This will draw lyrics, accid, etc. (but only if not in chord)
-    if (!inChord) DrawLayerChildren(dc, note, layer, staff, measure);
+    DrawLayerChildren(dc, note, layer, staff, measure);
 
     if (note->HasFermata()) {
         DrawFermataAttr(dc, element, layer, staff, measure);
@@ -1718,7 +1718,7 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
     // We move the fermata position of half of the fermata size
     x = element->GetDrawingX();
 
-    if (element->Is() == MREST) {
+    if (element->Is(MREST)) {
         int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
         x = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
     }
@@ -1730,9 +1730,9 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
     data_PLACE place = fermatapresent->GetFermata();
 
     // First case, notes
-    if ((element->Is() == NOTE) || (element->Is() == CHORD)) {
+    if ((element->Is(NOTE)) || (element->Is(CHORD))) {
         // To be fixed once m_embellishment is removed
-        if (element->Is() == NOTE) {
+        if (element->Is(NOTE)) {
             Note *note = dynamic_cast<Note *>(element);
             assert(note);
             if (note->m_embellishment) {
@@ -1770,7 +1770,7 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
             DrawSmuflCode(dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false);
         }
     }
-    else if ((element->Is() == REST) || (element->Is() == MREST)) {
+    else if ((element->Is(REST)) || (element->Is(MREST))) {
         if (place == PLACE_above) {
             y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             DrawSmuflCode(dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);
