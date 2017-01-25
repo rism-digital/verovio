@@ -181,6 +181,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic(element, "", element->GetUuid());
 
+    /************** mensural resizing - to be removed **************/
+    
     bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
         || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
         || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
@@ -192,27 +194,20 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     else
         pseudoStaffSize = staff->m_drawingStaffSize;
 
-    // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
-    if (accid->m_parent) {
-        // accid->SetDrawingY(accid->GetDrawingY()
-        //    + CalculatePitchPosY(staff, accid->GetPloc(), layer->GetClefOffset(accid), accid->GetOloc()));
-        accid->m_drawingCueSize = accid->IsCueSize();
-    }
-
     /************** editorial accidental **************/
 
+    bool center = false;
     if (accid->GetFunc() == accidLog_FUNC_edit) {
+        center = true;
         // position is currently only above the staff
         int y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
         if (note) {
-            if (note->GetDrawingY() > y) {
+            if (note->GetDrawingY() > y)
                 y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-            }
-            if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd().y > y)) {
+            if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd().y > y))
                 y = note->GetDrawingStemEnd().y;
-            }
 
             // adjust the x position so it is centered
             int radius
@@ -227,23 +222,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
-    int symc = SMUFL_E261_accidentalNatural;
-    switch (accid->GetAccid()) {
-        case ACCIDENTAL_EXPLICIT_n: symc = SMUFL_E261_accidentalNatural; break;
-        case ACCIDENTAL_EXPLICIT_ss: symc = SMUFL_E263_accidentalDoubleSharp; break;
-        case ACCIDENTAL_EXPLICIT_s: symc = SMUFL_E262_accidentalSharp; break;
-        case ACCIDENTAL_EXPLICIT_ff: symc = SMUFL_E264_accidentalDoubleFlat; break;
-        case ACCIDENTAL_EXPLICIT_f: symc = SMUFL_E260_accidentalFlat; break;
-        case ACCIDENTAL_EXPLICIT_su:
-            symc = SMUFL_E268_accidentalNaturalSharp;
-            break; // Not sure this is correct...
-        case ACCIDENTAL_EXPLICIT_fu:
-            symc = SMUFL_E267_accidentalNaturalFlat;
-            break; // Same
-        default: break;
-    }
-
-    DrawSmuflCode(dc, x, y, symc, pseudoStaffSize, accid->m_drawingCueSize);
+    DrawSmuflString(dc, x, y, accid->GetSymbolStr(), center, staff->m_drawingStaffSize, accid->m_drawingCueSize);
 
     dc->EndGraphic(element, this);
 }
@@ -1444,7 +1423,11 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         if (accid) {
             xAccid = xNote;
             if (accid->GetFunc() != accidLog_FUNC_edit) {
-                xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, drawingCueSize);
+                int w, h;
+                dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
+                dc->GetSmuflTextExtent(accid->GetSymbolStr(), &w, &h);
+                xAccid -= (w + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+                dc->ResetFont();
             }
             accid->SetDrawingX(xAccid);
         }

@@ -46,7 +46,7 @@ public:
      * Retrieve SMuFL string for the accidental.
      * This will include brackets
      */
-    std::wstring GetSmuflString(Doc *doc);
+    std::wstring GetSymbolStr() const;
 
     //----------//
     // Functors //
