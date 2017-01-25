@@ -82,8 +82,6 @@ void Note::Reset()
     ResetTiepresent();
     ResetVisibility();
 
-    // TO BE REMOVED
-    m_embellishment = EMB_NONE;
     // tie pointers
     ResetDrawingTieAttr();
 
