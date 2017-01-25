@@ -2048,8 +2048,8 @@ void HumdrumInput::printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, cons
 // HumdrumInput::setBeamDirection -- Set a beam up or down.
 //
 
-void HumdrumInput::setBeamDirection(
-    int direction, const vector<humaux::HumdrumBeamAndTuplet> &tgs, vector<hum::HTp> &layerdata, int layerindex, bool grace)
+void HumdrumInput::setBeamDirection(int direction, const vector<humaux::HumdrumBeamAndTuplet> &tgs,
+    vector<hum::HTp> &layerdata, int layerindex, bool grace)
 {
     const humaux::HumdrumBeamAndTuplet &tg = tgs[layerindex];
     int beamstart = tg.beamstart;
@@ -2634,6 +2634,10 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
     }
     else if (strchr(token->c_str(), 'M') != NULL) { // mordent
         token->setValue("LO", "TX", "t", "M");
+        token->setValue("LO", "TX", "a", "true");
+    }
+    else if (strchr(token->c_str(), ':') != NULL) { // arpeggio
+        token->setValue("LO", "TX", "t", "arp.");
         token->setValue("LO", "TX", "a", "true");
     }
     else if (strchr(token->c_str(), 'O') != NULL) { // generic ornament
@@ -4597,12 +4601,16 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     int accidCount = hum::Convert::kernToAccidentalCount(tstring);
     bool showInAccid = token->hasVisibleAccidental(stindex);
     bool showInAccidGes = !showInAccid;
+    Accid *accid = new Accid;
+    appendElement(note, accid);
+	setLocationId(accid, token, subtoken);
+
     if (!editorial) {
         // don't mark cautionary accidentals if the note has
         // an editorial accidental.
         if (token->hasCautionaryAccidental(stindex)) {
-            addCautionaryAccidental(note, token, accidCount);
-            showInAccidGes = true;
+            addCautionaryAccidental(accid, token, accidCount);
+            showInAccidGes = false;
             showInAccid = false;
         }
     }
@@ -4610,23 +4618,18 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     if (!editorial) {
         if (showInAccid) {
             switch (accidCount) {
-                // case +3: note->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
-                case +2: note->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
-                case +1: note->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
-                case 0: note->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
-                case -1: note->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
-                case -2:
-                    note->SetAccid(ACCIDENTAL_EXPLICIT_ff);
-                    break;
-                    // case -3: note->SetAccid(ACCIDENTAL_EXPLICIT_tf); break;
+                // case +3: accid->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
+                // case -3: accid->SetAccid(ACCIDENTAL_EXPLICIT_tf); break;
+                case +2: accid->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
+                case +1: accid->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
+                case 0: accid->SetAccid(ACCIDENTAL_EXPLICIT_n); break;
+                case -1: accid->SetAccid(ACCIDENTAL_EXPLICIT_f); break;
+                case -2: accid->SetAccid(ACCIDENTAL_EXPLICIT_ff); break;
             }
         }
     }
     else {
-        Accid *accid = new Accid;
-        appendElement(note, accid);
         accid->SetFunc(accidLog_FUNC_edit);
-
         switch (accidCount) {
             case +2: accid->SetAccid(ACCIDENTAL_EXPLICIT_x); break;
             case +1: accid->SetAccid(ACCIDENTAL_EXPLICIT_s); break;
@@ -4639,14 +4642,12 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     if (showInAccidGes) {
         switch (accidCount) {
             // case +3: note->SetAccidGes(ACCIDENTAL_IMPLICIT_ts); break;
-            case +2: note->SetAccidGes(ACCIDENTAL_IMPLICIT_ss); break;
-            case +1: note->SetAccidGes(ACCIDENTAL_IMPLICIT_s); break;
-            case 0: note->SetAccidGes(ACCIDENTAL_IMPLICIT_n); break;
-            case -1: note->SetAccidGes(ACCIDENTAL_IMPLICIT_f); break;
-            case -2:
-                note->SetAccidGes(ACCIDENTAL_IMPLICIT_ff);
-                break;
-                // case -3: note->SetAccidGes(ACCIDENTAL_IMPLICIT_tf); break;
+            // case -3: note->SetAccidGes(ACCIDENTAL_IMPLICIT_tf); break;
+            case +2: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_ss); break;
+            case +1: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_s); break;
+            case 0: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_n); break;
+            case -1: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_f); break;
+            case -2: accid->SetAccidGes(ACCIDENTAL_IMPLICIT_ff); break;
         }
     }
 
@@ -4733,10 +4734,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
 // HumdrumInput::addCautionaryAccidental --
 //
 
-void HumdrumInput::addCautionaryAccidental(Note *note, hum::HTp token, int acount)
+void HumdrumInput::addCautionaryAccidental(Accid *accid, hum::HTp token, int acount)
 {
-    Accid *accid = new Accid;
-    note->AddChild(accid);
     accid->SetFunc(accidLog_FUNC_caution);
     switch (acount) {
         case +3: accid->SetAccid(ACCIDENTAL_EXPLICIT_ts); break;
