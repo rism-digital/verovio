@@ -566,7 +566,7 @@ int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accid
     else if (incipit[i] == 'x') {
         *accident = ACCIDENTAL_EXPLICIT_s;
         if ((i + 1 < length) && (incipit[i + 1] == 'x')) {
-            *accident = ACCIDENTAL_EXPLICIT_ss;
+            *accident = ACCIDENTAL_EXPLICIT_x;
             i++;
         }
     }

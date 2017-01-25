@@ -1460,7 +1460,7 @@ data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAccidentalToAccid(std::string val
     if (value == "sharp") return ACCIDENTAL_EXPLICIT_s;
     if (value == "flat") return ACCIDENTAL_EXPLICIT_f;
     if (value == "sharp-sharp") return ACCIDENTAL_EXPLICIT_ss;
-    if (value == "double-sharp") return ACCIDENTAL_EXPLICIT_ss;
+    if (value == "double-sharp") return ACCIDENTAL_EXPLICIT_x;
     if (value == "flat-flat") return ACCIDENTAL_EXPLICIT_ff;
     if (value == "double-flat") return ACCIDENTAL_EXPLICIT_ff;
     if (value == "natural") return ACCIDENTAL_EXPLICIT_n;
@@ -1472,7 +1472,7 @@ data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAlterToAccid(std::string value)
 {
     if (value == "1") return ACCIDENTAL_EXPLICIT_s;
     if (value == "-1") return ACCIDENTAL_EXPLICIT_f;
-    if (value == "2") return ACCIDENTAL_EXPLICIT_ss;
+    if (value == "2") return ACCIDENTAL_EXPLICIT_x;
     if (value == "-2") return ACCIDENTAL_EXPLICIT_ff;
     if (value == "0") return ACCIDENTAL_EXPLICIT_n;
     LogWarning("Unsupported alter value '%s'", value.c_str());
