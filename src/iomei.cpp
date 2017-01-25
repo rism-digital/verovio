@@ -877,6 +877,7 @@ void MeiOutput::WriteMeiAccid(pugi::xml_node currentNode, Accid *accid)
     accid->WriteAccidentalPerformed(currentNode);
     accid->WriteAccidLog(currentNode);
     accid->WriteColor(currentNode);
+    accid->WriteEnclosingchars(currentNode);
 }
 
 void MeiOutput::WriteMeiArtic(pugi::xml_node currentNode, Artic *artic)
@@ -2503,6 +2504,7 @@ bool MeiInput::ReadMeiAccid(Object *parent, pugi::xml_node accid)
     vrvAccid->ReadAccidentalPerformed(accid);
     vrvAccid->ReadAccidLog(accid);
     vrvAccid->ReadColor(accid);
+    vrvAccid->ReadEnclosingchars(accid);
 
     parent->AddChild(vrvAccid);
     return true;

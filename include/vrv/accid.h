@@ -22,7 +22,8 @@ class Accid : public LayerElement,
               public AttAccidental,
               public AttAccidentalPerformed,
               public AttAccidLog,
-              public AttColor {
+              public AttColor,
+              public AttEnclosingchars {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
