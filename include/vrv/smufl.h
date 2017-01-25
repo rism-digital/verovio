@@ -79,6 +79,8 @@ enum {
     SMUFL_E269_accidentalSharpSharp = 0xE269,
     SMUFL_E26A_accidentalParensLeft = 0xE26A,
     SMUFL_E26B_accidentalParensRight = 0xE26B,
+    SMUFL_E26C_accidentalBracketLeft = 0xE26C,
+    SMUFL_E26D_accidentalBracketRight = 0xE26D,
     SMUFL_E4A0_articAccentAbove = 0xE4A0,
     SMUFL_E4A1_articAccentBelow = 0xE4A1,
     SMUFL_E4A2_articStaccatoAbove = 0xE4A2,
@@ -222,7 +224,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 197
+#define SMUFL_COUNT 199
 
 } // vrv namespace
 
