@@ -13,8 +13,8 @@
 
 //----------------------------------------------------------------------------
 
-#include "attcomparison.h"
 #include "artic.h"
+#include "attcomparison.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "slur.h"
@@ -110,7 +110,7 @@ void Note::AddChild(Object *child)
         if (this->FindChildByAttComparison(&isAttributeComparison))
             LogWarning("Having both @artic and <artic> child will cause problems");
     }
-    
+
     if (child->Is(ACCID)) {
         assert(dynamic_cast<Accid *>(child));
     }
@@ -166,9 +166,8 @@ void Note::ResetDrawingTieAttr()
 
 Accid *Note::GetDrawingAccid()
 {
-    Accid *accid = dynamic_cast<Accid*>(this->FindChildByType(ACCID));
-    if (accid && this->HasGrace())
-        accid->m_drawingCueSize = true;
+    Accid *accid = dynamic_cast<Accid *>(this->FindChildByType(ACCID));
+    if (accid && this->HasGrace()) accid->m_drawingCueSize = true;
     return accid;
 }
 

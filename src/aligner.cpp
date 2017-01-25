@@ -608,8 +608,9 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
         [params](FloatingPositioner *positioner) {
             assert(positioner->GetObject());
             // search in the desired classIds
-            return ((std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->GetClassId())
-                        != params->m_classIds.end())
+            return (
+                (std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->GetClassId())
+                    != params->m_classIds.end())
                 && (positioner->GetObject()->GetDrawingGrpId() != 0));
         });
 

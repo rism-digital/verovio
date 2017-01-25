@@ -250,12 +250,14 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
     if (horizOverlapingBBox == NULL) {
         if (this->m_place == STAFFREL_above) {
             yRel = m_contentBB_y1;
-            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
+                / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
         else {
             yRel = staffAlignment->GetStaffHeight() + m_contentBB_y2;
-            yRel += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel
+                += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
     }
@@ -274,7 +276,8 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 return true;
             }
             yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + m_contentBB_y1;
-            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
+                / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
         else {
@@ -288,7 +291,8 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             }
             yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
                 + m_contentBB_y2;
-            yRel += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+            yRel
+                += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
     }

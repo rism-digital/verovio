@@ -1105,8 +1105,8 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
     // Increase negative_offset by the symbol type's left margin, unless it's a note
     // that's part of a ligature.
     if (!current->IsGraceNote() && !current->IsInLigature())
-        negative_offset
-            += (params->m_doc->GetLeftMargin(current->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+        negative_offset += (params->m_doc->GetLeftMargin(current->GetClassId()) * params->m_doc->GetDrawingUnit(100)
+            / PARAM_DENOMINATOR);
 
     // This should never happen but can with glyphs not exactly registered at x=0 in the SMuFL font used
     if (negative_offset < 0) negative_offset = 0;
@@ -1145,7 +1145,8 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
     // Move to right by the symbol type's right margin, unless it's a note that's
     // part of a ligature.
     if (!current->HasEmptyBB() && !current->IsInLigature())
-        width += params->m_doc->GetRightMargin(current->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+        width += params->m_doc->GetRightMargin(current->GetClassId()) * params->m_doc->GetDrawingUnit(100)
+            / PARAM_DENOMINATOR;
     params->m_minPos = current->GetAlignment()->GetXRel() + width;
     current->GetAlignment()->SetMaxWidth(width);
 

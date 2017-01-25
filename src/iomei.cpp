@@ -487,8 +487,7 @@ bool MeiOutput::WriteObject(Object *object)
     }
 
     // Object representing an attribute have no node to push
-    if (!object->IsAttribute())
-        m_nodeStack.push_back(m_currentNode);
+    if (!object->IsAttribute()) m_nodeStack.push_back(m_currentNode);
 
     return true;
 }
@@ -871,7 +870,7 @@ void MeiOutput::WriteMeiAccid(pugi::xml_node currentNode, Accid *accid)
         accid->WriteAccidentalPerformed(currentNode);
         return;
     }
-    
+
     WriteLayerElement(currentNode, accid);
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
@@ -2768,7 +2767,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
         vrvArtic->SetArtic(artic.GetArtic());
         vrvNote->AddChild(vrvArtic);
     }
-    
+
     AttAccidental accidental;
     accidental.ReadAccidental(note);
     AttAccidentalPerformed accidentalPerformed;

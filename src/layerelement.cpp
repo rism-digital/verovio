@@ -627,12 +627,10 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
     else if (this->Is(ACCID)) {
         Accid *accid = dynamic_cast<Accid *>(this);
         assert(accid);
-        Note *note = dynamic_cast<Note*>(this->GetFirstParent(NOTE));
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         if (note) {
             accid->SetDrawingY(note->GetDrawingY());
         }
-
-        
     }
 
     return FUNCTOR_CONTINUE;
@@ -688,7 +686,7 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
         // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
         // note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
         // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
-        
+
         Accid *accid = note->GetDrawingAccid();
 
         // Create midi note

@@ -1157,7 +1157,6 @@ void PaeInput::parseNote(pae::Note *note)
             mnote->AddChild(accid);
         }
 
-
         mnote->SetDots(note->dots);
         mnote->SetDur(note->duration);
 

@@ -102,11 +102,26 @@ public:
      * See classId enum.
      */
     ///@{
-    bool IsControlElement() const { return (this->GetClassId() > CONTROL_ELEMENT && this->GetClassId() < CONTROL_ELEMENT_max); }
-    bool IsEditorialElement() const { return (this->GetClassId() > EDITORIAL_ELEMENT && this->GetClassId() < EDITORIAL_ELEMENT_max); }
-    bool IsLayerElement() const { return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max); }
-    bool IsScoreDefElement() const { return (this->GetClassId() > SCOREDEF_ELEMENT && this->GetClassId() < SCOREDEF_ELEMENT_max); }
-    bool IsSystemElement() const { return (this->GetClassId() > SYSTEM_ELEMENT && this->GetClassId() < SYSTEM_ELEMENT_max); }
+    bool IsControlElement() const
+    {
+        return (this->GetClassId() > CONTROL_ELEMENT && this->GetClassId() < CONTROL_ELEMENT_max);
+    }
+    bool IsEditorialElement() const
+    {
+        return (this->GetClassId() > EDITORIAL_ELEMENT && this->GetClassId() < EDITORIAL_ELEMENT_max);
+    }
+    bool IsLayerElement() const
+    {
+        return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max);
+    }
+    bool IsScoreDefElement() const
+    {
+        return (this->GetClassId() > SCOREDEF_ELEMENT && this->GetClassId() < SCOREDEF_ELEMENT_max);
+    }
+    bool IsSystemElement() const
+    {
+        return (this->GetClassId() > SYSTEM_ELEMENT && this->GetClassId() < SYSTEM_ELEMENT_max);
+    }
     bool IsTextElement() const { return (this->GetClassId() > TEXT_ELEMENT && this->GetClassId() < TEXT_ELEMENT_max); }
     ///@}
 

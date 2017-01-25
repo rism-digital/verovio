@@ -27,10 +27,10 @@ enum DurExtreme { LONGEST = 0, SHORTEST };
  * This class evaluates if the object is of a certain ClassId and is an attribute in the original MEI.
  */
 class IsAttributeComparison : public AttComparison {
-    
+
 public:
-    IsAttributeComparison(ClassId AttClassId) : AttComparison(AttClassId) { }
-    
+    IsAttributeComparison(ClassId AttClassId) : AttComparison(AttClassId) {}
+
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;

@@ -162,8 +162,7 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
 // View - LayerElement
 //----------------------------------------------------------------------------
 
-void View::DrawAccid(
-    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(element);
@@ -195,7 +194,7 @@ void View::DrawAccid(
 
     // Parent will be NULL if we are drawing a note @accid (see DrawNote) - the y value is already set
     if (accid->m_parent) {
-        //accid->SetDrawingY(accid->GetDrawingY()
+        // accid->SetDrawingY(accid->GetDrawingY()
         //    + CalculatePitchPosY(staff, accid->GetPloc(), layer->GetClefOffset(accid), accid->GetOloc()));
         accid->m_drawingCueSize = accid->IsCueSize();
     }
@@ -677,11 +676,10 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         for (std::list<int>::iterator it = dotsList->begin(); it != dotsList->end(); ++it)
             DrawDots(dc, dotsX, *it, numDots, staff);
     }
-    
-    
+
     /************ Draw children (notes) ************/
-    
-    //DrawLayerChildren(dc, chord, layer, staff, measure);
+
+    // DrawLayerChildren(dc, chord, layer, staff, measure);
 
     /************ Accidentals ************/
 
@@ -736,12 +734,12 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                 // if the top note has an accidental, draw it and update prevAccid
                 accidFwd->SetDrawingX(xAccid);
                 CalculateAccidX(staff, accidFwd, chord, true);
-                //DrawAccid(dc, accidFwd, layer, staff, measure);
+                // DrawAccid(dc, accidFwd, layer, staff, measure);
                 // same, except with an extra check that we're not doing the same note twice
                 if (fwIdx != bwIdx) {
                     accidBwd->SetDrawingX(xAccid);
                     CalculateAccidX(staff, accidBwd, chord, true);
-                    //DrawAccid(dc, accidBwd, layer, staff, measure);
+                    // DrawAccid(dc, accidBwd, layer, staff, measure);
                     bwIdx--;
                 }
 
@@ -750,9 +748,9 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             fwIdx = idx;
         }
     }
-    
+
     /************ Draw children (notes) ************/
-    
+
     DrawLayerChildren(dc, chord, layer, staff, measure);
 
     /************ Ledger lines ************/
