@@ -389,6 +389,7 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     m_staffGrpStack.push_back(staffGrp);
 
     int staffOffset = 0;
+    m_octDis.push_back(0);
 
     pugi::xpath_node scoreMidiBpm = root.select_single_node("/score-partwise/part[1]/measure[1]/sound[@tempo][1]");
     if (scoreMidiBpm) m_doc->m_scoreDef.SetMidiBpm(atoi(GetAttributeValue(scoreMidiBpm.node(), "tempo").c_str()));
@@ -1106,10 +1107,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             if (!accidColor.empty()) accid->SetColor(accidColor.c_str());
             if (HasAttributeWithValue(accidental.node(), "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
             if (HasAttributeWithValue(accidental.node(), "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
-            // if (HasAttributeWithValue(accidental.node(), "parentheses", "yes"))
-            // accid->SetEnclose(ENCLOSURE_paren);
-            // if (HasAttributeWithValue(accidental.node(), "bracket", "yes"))
-            // accid->SetEnclose(ENCLOSURE_brack);
+            if (HasAttributeWithValue(accidental.node(), "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
+            if (HasAttributeWithValue(accidental.node(), "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
             note->AddChild(accid);
         }
 
@@ -1140,7 +1139,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             std::string alterStr = GetContentOfChild(pitch.node(), "alter");
             //
             if (!accidental && !alterStr.empty()) {
-                // add accid.ges once supported
                 Accid *accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
                     accid = new Accid();
@@ -1458,12 +1456,17 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 data_ACCIDENTAL_EXPLICIT MusicXmlInput::ConvertAccidentalToAccid(std::string value)
 {
     if (value == "sharp") return ACCIDENTAL_EXPLICIT_s;
-    if (value == "flat") return ACCIDENTAL_EXPLICIT_f;
-    if (value == "sharp-sharp") return ACCIDENTAL_EXPLICIT_ss;
-    if (value == "double-sharp") return ACCIDENTAL_EXPLICIT_ss;
-    if (value == "flat-flat") return ACCIDENTAL_EXPLICIT_ff;
-    if (value == "double-flat") return ACCIDENTAL_EXPLICIT_ff;
     if (value == "natural") return ACCIDENTAL_EXPLICIT_n;
+    if (value == "flat") return ACCIDENTAL_EXPLICIT_f;
+    if (value == "double-sharp") return ACCIDENTAL_EXPLICIT_x;
+    if (value == "sharp-sharp") return ACCIDENTAL_EXPLICIT_ss;
+    if (value == "flat-flat") return ACCIDENTAL_EXPLICIT_ff;
+    if (value == "natural-sharp") return ACCIDENTAL_EXPLICIT_ns;
+    if (value == "natural-flat") return ACCIDENTAL_EXPLICIT_nf;
+    if (value == "quarter-flat") return ACCIDENTAL_EXPLICIT_1qf;
+    if (value == "quarter-sharp") return ACCIDENTAL_EXPLICIT_1qs;
+    if (value == "three-quarters-flat") return ACCIDENTAL_EXPLICIT_3qf;
+    if (value == "three-quarters-sharp") return ACCIDENTAL_EXPLICIT_3qs;
     LogWarning("Unsupported accidental value '%s'", value.c_str());
     return ACCIDENTAL_EXPLICIT_NONE;
 }
