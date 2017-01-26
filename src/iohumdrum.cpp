@@ -2371,8 +2371,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             convertChord(chord, layerdata[i], staffindex);
             elements.pop_back();
             pointers.pop_back();
-            processSlur(layerdata[i]);
-            processSlur(layerdata[i], 2);
+            processSlurs(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
             processDirection(layerdata[i], staffindex);
             addArticulations(chord, layerdata[i]);
@@ -2386,8 +2385,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 setLocationId(irest, layerdata[i], -1);
                 appendElement(elements, pointers, irest);
                 convertRhythm(irest, layerdata[i]);
-                processSlur(layerdata[i]);
-                processSlur(layerdata[i], 2);
+                processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
                 processDirection(layerdata[i], staffindex);
             }
@@ -2396,8 +2394,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 setLocationId(rest, layerdata[i], -1);
                 appendElement(elements, pointers, rest);
                 convertRest(rest, layerdata[i]);
-                processSlur(layerdata[i]);
-                processSlur(layerdata[i], 2);
+                processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
                 processDirection(layerdata[i], staffindex);
             }
@@ -2409,8 +2406,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             setLocationId(note, layerdata[i], -1);
             appendElement(elements, pointers, note);
             convertNote(note, layerdata[i], staffindex);
-            processSlur(layerdata[i]);
-            processSlur(layerdata[i], 2);
+            processSlurs(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
             processDirection(layerdata[i], staffindex);
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
@@ -3118,72 +3114,129 @@ template <class ELEMENT> void HumdrumInput::addTextElement(ELEMENT *element, con
 
 /////////////////////////////
 //
-// HumdrumInput::processSlur --
+// HumdrumInput::processSlurs --
 //
 
-void HumdrumInput::processSlur(hum::HTp token, int number)
+void HumdrumInput::processSlurs(hum::HTp slurend)
 {
-    hum::HTp slurstart = token->getSlurStartToken(number);
-    if (!slurstart) {
-        return;
-    }
+    int startcount = slurend->getValueInt("auto", "slurStartCount");
+    vector<bool> indexused(32, false);
 
-    int mindex;
-    std::string mindexstring = slurstart->getValue("MEI", "measureIndex");
-    if (mindexstring == "") {
-        // cross-layer sluring into later layer.  The beginning of the slur
-        // is in the same measure since it has not yet been processed.
-        mindex = token->getValueInt("MEI", "measureIndex");
-    }
-    else {
-        mindex = slurstart->getValueInt("MEI", "measureIndex");
-    }
-    Measure *startmeasure = m_measures[mindex];
+    for (int i = 0; i < startcount; i++) {
 
-    Slur *slur = new Slur;
+        hum::HTp slurstart = slurend->getSlurStartToken(i + 1);
+        if (!slurstart) {
+            return;
+        }
 
-    // start ID can sometimes not be set yet due to cross layer slurs.
-    std::string startid = slurstart->getValue("MEI", "xml:id");
-    std::string endid = token->getValue("MEI", "xml:id");
+        int mindex;
+        std::string mindexstring = slurstart->getValue("MEI", "measureIndex");
+        if (mindexstring == "") {
+            // cross-layer sluring into later layer.  The beginning of the slur
+            // is in the same measure since it has not yet been processed.
+            mindex = slurend->getValueInt("MEI", "measureIndex");
+        }
+        else {
+            mindex = slurstart->getValueInt("MEI", "measureIndex");
+        }
+        Measure *startmeasure = m_measures[mindex];
 
-    if (startid == "") {
-        startid = "note-L";
-        startid += to_string(slurstart->getLineNumber());
-        startid += "F";
-        startid += to_string(slurstart->getFieldNumber());
-        slurstart->setValue("MEI", "xml:id", startid);
-        startid = slurstart->getValue("MEI", "xml:id");
-    }
+        Slur *slur = new Slur;
 
-    slur->SetEndid("#" + token->getValue("MEI", "xml:id"));
-    slur->SetStartid("#" + slurstart->getValue("MEI", "xml:id"));
+        // start ID can sometimes not be set yet due to cross layer slurs.
+        std::string startid = slurstart->getValue("MEI", "xml:id");
+        std::string endid = slurend->getValue("MEI", "xml:id");
 
-    startmeasure->AddChild(slur);
-    setStaff(slur, m_currentstaff);
+        if (startid == "") {
+            startid = "note-L";
+            startid += to_string(slurstart->getLineNumber());
+            startid += "F";
+            startid += to_string(slurstart->getFieldNumber());
+            slurstart->setValue("MEI", "xml:id", startid);
+            startid = slurstart->getValue("MEI", "xml:id");
+        }
 
-    if (slurstart->getValueBool("LO", "S", "a")) {
-        slur->SetCurvedir(curvature_CURVEDIR_above);
-    }
+        slur->SetEndid("#" + slurend->getValue("MEI", "xml:id"));
+        slur->SetStartid("#" + slurstart->getValue("MEI", "xml:id"));
 
-    if (slurstart->getValueBool("LO", "S", "b")) {
-        slur->SetCurvedir(curvature_CURVEDIR_below);
-    }
+        startmeasure->AddChild(slur);
+        setStaff(slur, m_currentstaff);
 
-    if (m_signifiers.above) {
-        std::string marker = "(";
-        marker.push_back(m_signifiers.above);
-        if (slurstart->find(marker) != string::npos) {
+        if (slurstart->getValueBool("LO", "S", "a")) {
             slur->SetCurvedir(curvature_CURVEDIR_above);
         }
-    }
 
-    if (m_signifiers.below) {
-        std::string marker = "(";
-        marker.push_back(m_signifiers.below);
-        if (slurstart->find(marker) != string::npos) {
+        if (slurstart->getValueBool("LO", "S", "b")) {
             slur->SetCurvedir(curvature_CURVEDIR_below);
         }
+
+        std::string eid = slurend->getValue("auto", "id");
+        int slurindex = getSlurEndIndex(slurstart, eid, indexused);
+        if (slurindex < 0) {
+            continue;
+        }
+        indexused.at(slurindex) = true;
+
+        if (m_signifiers.above) {
+            int count = -1;
+            for (int j = (int)slurstart->size() - 2; j >= 0; j--) {
+                if (slurstart->at(j) == '(') {
+                    count++;
+                }
+                if (count == slurindex) {
+                    if (slurstart->at(j + 1) == m_signifiers.above) {
+                        slur->SetCurvedir(curvature_CURVEDIR_above);
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (m_signifiers.below) {
+            int count = -1;
+            for (int j = (int)slurstart->size() - 2; j >= 0; j--) {
+                if (slurstart->at(j) == '(') {
+                    count++;
+                }
+                if (count == slurindex) {
+                    if (slurstart->at(j + 1) == m_signifiers.below) {
+                        slur->SetCurvedir(curvature_CURVEDIR_below);
+                    }
+                    break;
+                }
+            }
+        }
     }
+}
+
+/////////////////////////////
+//
+// HumdrumInput::getSlurEndIndex --
+//
+
+int HumdrumInput::getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused)
+{
+    int endcount = token->getValueInt("auto", "slurEndCount");
+    std::string parameter;
+    std::string endid;
+
+    int save = -1;
+    for (int i = 0; i < endcount; i++) {
+        parameter = "slurEnd";
+        if (i > 0) {
+            parameter += to_string(i + 1);
+        }
+        endid = token->getValue("auto", parameter);
+        if (endid == targetid) {
+            if (indexused.at(i)) {
+                save = i;
+                continue;
+            }
+            return i;
+        }
+    }
+
+    return save;
 }
 
 /////////////////////////////
@@ -4603,7 +4656,7 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     bool showInAccidGes = !showInAccid;
     Accid *accid = new Accid;
     appendElement(note, accid);
-	setLocationId(accid, token, subtoken);
+    setLocationId(accid, token, subtoken);
 
     if (!editorial) {
         // don't mark cautionary accidentals if the note has
