@@ -27,7 +27,7 @@ public:
     // constructors and destructors
     Score();
     virtual ~Score();
-    virtual ClassId Is() const { return SCORE; }
+    virtual ClassId GetClassId() const { return SCORE; }
 
     virtual void AddChild(Object *object);
 

@@ -48,10 +48,10 @@ void Rend::Reset()
 
 void Rend::AddChild(Object *child)
 {
-    if (child->Is() == REND) {
+    if (child->Is(REND)) {
         assert(dynamic_cast<Rend *>(child));
     }
-    else if (child->Is() == TEXT) {
+    else if (child->Is(TEXT)) {
         assert(dynamic_cast<Text *>(child));
     }
     else if (child->IsEditorialElement()) {

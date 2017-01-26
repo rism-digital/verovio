@@ -942,7 +942,7 @@ double Toolkit::GetTimeForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindChildByUuid(xmlId);
     double timeofElement = 0.0;
-    if (element->Is() == NOTE) {
+    if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         timeofElement = note->m_playingOnset * 1000 / 120;
@@ -1043,7 +1043,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
 {
     if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-    if (element->Is() == NOTE) {
+    if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         Layer *layer = dynamic_cast<Layer *>(note->GetFirstParent(LAYER));

@@ -33,7 +33,7 @@ public:
     virtual ~Pedal();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Pedal"; }
-    virtual ClassId Is() const { return PEDAL; }
+    virtual ClassId GetClassId() const { return PEDAL; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

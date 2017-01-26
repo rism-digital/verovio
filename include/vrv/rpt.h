@@ -32,7 +32,7 @@ public:
     virtual ~BeatRpt();
     virtual void Reset();
     virtual std::string GetClassName() const { return "BeatRpt"; }
-    virtual ClassId Is() const { return BEATRPT; }
+    virtual ClassId GetClassId() const { return BEATRPT; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -69,7 +69,7 @@ public:
     virtual ~BTrem();
     virtual void Reset();
     virtual std::string GetClassName() const { return "BTrem"; }
-    virtual ClassId Is() const { return BTREM; }
+    virtual ClassId GetClassId() const { return BTREM; }
     ///@}
 
     /**
@@ -103,7 +103,7 @@ public:
     virtual ~FTrem();
     virtual void Reset();
     virtual std::string GetClassName() const { return "FTrem"; }
-    virtual ClassId Is() const { return FTREM; }
+    virtual ClassId GetClassId() const { return FTREM; }
     ///@}
 
     /**
@@ -143,7 +143,7 @@ public:
     virtual ~MRpt();
     virtual void Reset();
     virtual std::string GetClassName() const { return "MRpt"; }
-    virtual ClassId Is() const { return MRPT; }
+    virtual ClassId GetClassId() const { return MRPT; }
     ///@}
 
     //----------//
@@ -182,7 +182,7 @@ public:
     virtual ~MRpt2();
     virtual void Reset();
     virtual std::string GetClassName() const { return "MRpt2"; }
-    virtual ClassId Is() const { return MRPT2; }
+    virtual ClassId GetClassId() const { return MRPT2; }
     ///@}
 
 private:
@@ -210,7 +210,7 @@ public:
     virtual ~MultiRpt();
     virtual void Reset();
     virtual std::string GetClassName() const { return "MultiRpt"; }
-    virtual ClassId Is() const { return MULTIRPT; }
+    virtual ClassId GetClassId() const { return MULTIRPT; }
     ///@}
 
 private:

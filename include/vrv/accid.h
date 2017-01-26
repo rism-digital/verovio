@@ -17,7 +17,13 @@ namespace vrv {
 // Accid
 //----------------------------------------------------------------------------
 
-class Accid : public LayerElement, public PositionInterface, public AttAccidental, public AttAccidLog, public AttColor {
+class Accid : public LayerElement,
+              public PositionInterface,
+              public AttAccidental,
+              public AttAccidentalPerformed,
+              public AttAccidLog,
+              public AttColor,
+              public AttEnclosingchars {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -28,7 +34,7 @@ public:
     virtual ~Accid();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Accid"; }
-    virtual ClassId Is() const { return ACCID; }
+    virtual ClassId GetClassId() const { return ACCID; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }
@@ -36,14 +42,15 @@ public:
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
 
+    /**
+     * Retrieve SMuFL string for the accidental.
+     * This will include brackets
+     */
+    std::wstring GetSymbolStr() const;
+
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * See Object::PreparePointersByLayer
-     */
-    virtual int PreparePointersByLayer(FunctorParams *functorParams);
 
 private:
     //

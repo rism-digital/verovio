@@ -11,6 +11,18 @@
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
 		4067E4C81DDDAF0000C6E059 /* fermata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067E4C71DDDAF0000C6E059 /* fermata.cpp */; };
+		40CA065D1E351161009CFDD7 /* GridMeasure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06511E351161009CFDD7 /* GridMeasure.cpp */; };
+		40CA065E1E351161009CFDD7 /* GridPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06521E351161009CFDD7 /* GridPart.cpp */; };
+		40CA065F1E351161009CFDD7 /* GridSide.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06531E351161009CFDD7 /* GridSide.cpp */; };
+		40CA06601E351161009CFDD7 /* GridSlice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06541E351161009CFDD7 /* GridSlice.cpp */; };
+		40CA06611E351161009CFDD7 /* GridStaff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06551E351161009CFDD7 /* GridStaff.cpp */; };
+		40CA06621E351161009CFDD7 /* GridVoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06561E351161009CFDD7 /* GridVoice.cpp */; };
+		40CA06631E351161009CFDD7 /* HumGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06571E351161009CFDD7 /* HumGrid.cpp */; };
+		40CA06641E351161009CFDD7 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
+		40CA06651E351161009CFDD7 /* MxmlEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06591E351161009CFDD7 /* MxmlEvent.cpp */; };
+		40CA06661E351161009CFDD7 /* MxmlMeasure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065A1E351161009CFDD7 /* MxmlMeasure.cpp */; };
+		40CA06671E351161009CFDD7 /* MxmlPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065B1E351161009CFDD7 /* MxmlPart.cpp */; };
+		40CA06681E351161009CFDD7 /* tool-musicxml2hum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065C1E351161009CFDD7 /* tool-musicxml2hum.cpp */; };
 		40F910081E2799740081B7BB /* trill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40F910071E2799740081B7BB /* trill.cpp */; };
 		4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
 		4D1031861DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
@@ -284,6 +296,31 @@
 		2D2A799B1A698137000A441B /* chord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chord.h; path = include/vrv/chord.h; sourceTree = "<group>"; };
 		4067E4C71DDDAF0000C6E059 /* fermata.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fermata.cpp; path = src/fermata.cpp; sourceTree = "<group>"; };
 		4067E4C91DDDAF6400C6E059 /* fermata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fermata.h; path = include/vrv/fermata.h; sourceTree = "<group>"; };
+		40CA06441E351125009CFDD7 /* grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grid.h; path = include/hum/grid.h; sourceTree = "<group>"; };
+		40CA06451E351125009CFDD7 /* GridMeasure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridMeasure.h; path = include/hum/GridMeasure.h; sourceTree = "<group>"; };
+		40CA06461E351125009CFDD7 /* GridPart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridPart.h; path = include/hum/GridPart.h; sourceTree = "<group>"; };
+		40CA06471E351125009CFDD7 /* GridSide.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridSide.h; path = include/hum/GridSide.h; sourceTree = "<group>"; };
+		40CA06481E351125009CFDD7 /* GridSlice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridSlice.h; path = include/hum/GridSlice.h; sourceTree = "<group>"; };
+		40CA06491E351125009CFDD7 /* GridStaff.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridStaff.h; path = include/hum/GridStaff.h; sourceTree = "<group>"; };
+		40CA064A1E351125009CFDD7 /* GridVoice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridVoice.h; path = include/hum/GridVoice.h; sourceTree = "<group>"; };
+		40CA064B1E351125009CFDD7 /* HumGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HumGrid.h; path = include/hum/HumGrid.h; sourceTree = "<group>"; };
+		40CA064C1E351125009CFDD7 /* humlib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = humlib.h; path = include/hum/humlib.h; sourceTree = "<group>"; };
+		40CA064D1E351125009CFDD7 /* MxmlEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MxmlEvent.h; path = include/hum/MxmlEvent.h; sourceTree = "<group>"; };
+		40CA064E1E351125009CFDD7 /* MxmlMeasure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MxmlMeasure.h; path = include/hum/MxmlMeasure.h; sourceTree = "<group>"; };
+		40CA064F1E351125009CFDD7 /* MxmlPart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MxmlPart.h; path = include/hum/MxmlPart.h; sourceTree = "<group>"; };
+		40CA06501E351125009CFDD7 /* tool-musicxml2hum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tool-musicxml2hum.h"; path = "include/hum/tool-musicxml2hum.h"; sourceTree = "<group>"; };
+		40CA06511E351161009CFDD7 /* GridMeasure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridMeasure.cpp; path = src/hum/GridMeasure.cpp; sourceTree = "<group>"; };
+		40CA06521E351161009CFDD7 /* GridPart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridPart.cpp; path = src/hum/GridPart.cpp; sourceTree = "<group>"; };
+		40CA06531E351161009CFDD7 /* GridSide.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridSide.cpp; path = src/hum/GridSide.cpp; sourceTree = "<group>"; };
+		40CA06541E351161009CFDD7 /* GridSlice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridSlice.cpp; path = src/hum/GridSlice.cpp; sourceTree = "<group>"; };
+		40CA06551E351161009CFDD7 /* GridStaff.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridStaff.cpp; path = src/hum/GridStaff.cpp; sourceTree = "<group>"; };
+		40CA06561E351161009CFDD7 /* GridVoice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = GridVoice.cpp; path = src/hum/GridVoice.cpp; sourceTree = "<group>"; };
+		40CA06571E351161009CFDD7 /* HumGrid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HumGrid.cpp; path = src/hum/HumGrid.cpp; sourceTree = "<group>"; };
+		40CA06581E351161009CFDD7 /* humlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = humlib.cpp; path = src/hum/humlib.cpp; sourceTree = "<group>"; };
+		40CA06591E351161009CFDD7 /* MxmlEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MxmlEvent.cpp; path = src/hum/MxmlEvent.cpp; sourceTree = "<group>"; };
+		40CA065A1E351161009CFDD7 /* MxmlMeasure.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MxmlMeasure.cpp; path = src/hum/MxmlMeasure.cpp; sourceTree = "<group>"; };
+		40CA065B1E351161009CFDD7 /* MxmlPart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MxmlPart.cpp; path = src/hum/MxmlPart.cpp; sourceTree = "<group>"; };
+		40CA065C1E351161009CFDD7 /* tool-musicxml2hum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "tool-musicxml2hum.cpp"; path = "src/hum/tool-musicxml2hum.cpp"; sourceTree = "<group>"; };
 		40F910061E2799640081B7BB /* trill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = trill.h; path = include/vrv/trill.h; sourceTree = "<group>"; };
 		40F910071E2799740081B7BB /* trill.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = trill.cpp; path = src/trill.cpp; sourceTree = "<group>"; };
 		4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_externalsymbols.cpp; path = libmei/atts_externalsymbols.cpp; sourceTree = "<group>"; };
@@ -531,6 +568,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		40CA06431E351112009CFDD7 /* humdrum */ = {
+			isa = PBXGroup;
+			children = (
+				40CA06441E351125009CFDD7 /* grid.h */,
+				40CA06511E351161009CFDD7 /* GridMeasure.cpp */,
+				40CA06451E351125009CFDD7 /* GridMeasure.h */,
+				40CA06521E351161009CFDD7 /* GridPart.cpp */,
+				40CA06461E351125009CFDD7 /* GridPart.h */,
+				40CA06531E351161009CFDD7 /* GridSide.cpp */,
+				40CA06471E351125009CFDD7 /* GridSide.h */,
+				40CA06541E351161009CFDD7 /* GridSlice.cpp */,
+				40CA06481E351125009CFDD7 /* GridSlice.h */,
+				40CA06551E351161009CFDD7 /* GridStaff.cpp */,
+				40CA06491E351125009CFDD7 /* GridStaff.h */,
+				40CA06561E351161009CFDD7 /* GridVoice.cpp */,
+				40CA064A1E351125009CFDD7 /* GridVoice.h */,
+				40CA06571E351161009CFDD7 /* HumGrid.cpp */,
+				40CA064B1E351125009CFDD7 /* HumGrid.h */,
+				40CA06581E351161009CFDD7 /* humlib.cpp */,
+				40CA064C1E351125009CFDD7 /* humlib.h */,
+				40CA06591E351161009CFDD7 /* MxmlEvent.cpp */,
+				40CA064D1E351125009CFDD7 /* MxmlEvent.h */,
+				40CA065A1E351161009CFDD7 /* MxmlMeasure.cpp */,
+				40CA064E1E351125009CFDD7 /* MxmlMeasure.h */,
+				40CA065B1E351161009CFDD7 /* MxmlPart.cpp */,
+				40CA064F1E351125009CFDD7 /* MxmlPart.h */,
+				40CA065C1E351161009CFDD7 /* tool-musicxml2hum.cpp */,
+				40CA06501E351125009CFDD7 /* tool-musicxml2hum.h */,
+			);
+			name = humdrum;
+			sourceTree = "<group>";
+		};
 		4D1BE7751C688F6F0086DC0E /* midi */ = {
 			isa = PBXGroup;
 			children = (
@@ -713,6 +782,7 @@
 		8F086E9E188534680037FD8E = {
 			isa = PBXGroup;
 			children = (
+				40CA06431E351112009CFDD7 /* humdrum */,
 				4DEE28EC1940BCA100C76319 /* libmei */,
 				4D7D8A3C1886E36200D78B62 /* tools */,
 				8F086F351885397A0037FD8E /* source */,
@@ -1077,15 +1147,18 @@
 				8F086EE6188539540037FD8E /* beam.cpp in Sources */,
 				4DAA46681DA2B3E600FF1E1A /* artic.cpp in Sources */,
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
+				40CA06601E351161009CFDD7 /* GridSlice.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
 				4D543E221B80AACF004B823C /* view_control.cpp in Sources */,
 				4D95D4FC1D74551100B2B856 /* score.cpp in Sources */,
 				8F086EE9188539540037FD8E /* doc.cpp in Sources */,
 				8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */,
+				40CA06611E351161009CFDD7 /* GridStaff.cpp in Sources */,
 				8F086EEB188539540037FD8E /* toolkit.cpp in Sources */,
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
 				4D796B5E1D78641900A15238 /* harm.cpp in Sources */,
+				40CA06631E351161009CFDD7 /* HumGrid.cpp in Sources */,
 				4DB3072F1AC9ED2500EE0982 /* space.cpp in Sources */,
 				8F086EED188539540037FD8E /* iodarms.cpp in Sources */,
 				8F086EEE188539540037FD8E /* iomei.cpp in Sources */,
@@ -1108,9 +1181,12 @@
 				8F086EF6188539540037FD8E /* mensur.cpp in Sources */,
 				4DB726C51B8BB0E80040231B /* text.cpp in Sources */,
 				4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
+				40CA06641E351161009CFDD7 /* humlib.cpp in Sources */,
+				40CA06671E351161009CFDD7 /* MxmlPart.cpp in Sources */,
 				4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
 				4DF440771D39575500152B7E /* ending.cpp in Sources */,
+				40CA065D1E351161009CFDD7 /* GridMeasure.cpp in Sources */,
 				4DB351141C8040B1002DD057 /* dir.cpp in Sources */,
 				8F086EF8188539540037FD8E /* note.cpp in Sources */,
 				4D5FA9111E16A93F00F3B919 /* boundingbox.cpp in Sources */,
@@ -1118,6 +1194,7 @@
 				8F086EF9188539540037FD8E /* object.cpp in Sources */,
 				8F086EFA188539540037FD8E /* page.cpp in Sources */,
 				8F086EFB188539540037FD8E /* pitchinterface.cpp in Sources */,
+				40CA06621E351161009CFDD7 /* GridVoice.cpp in Sources */,
 				8F086EFC188539540037FD8E /* positioninterface.cpp in Sources */,
 				4DB0B0161C44129300DBDCC3 /* timestamp.cpp in Sources */,
 				4D1BE76F1C688F5A0086DC0E /* MidiEventList.cpp in Sources */,
@@ -1129,6 +1206,7 @@
 				8F086F00188539540037FD8E /* staff.cpp in Sources */,
 				40F910081E2799740081B7BB /* trill.cpp in Sources */,
 				4DA1448A1C2AB28700CB7CEE /* textelement.cpp in Sources */,
+				40CA06661E351161009CFDD7 /* MxmlMeasure.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
 				4DA80D961A6ACF5D0089802D /* style.cpp in Sources */,
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
@@ -1137,10 +1215,12 @@
 				4D1BE7731C688F5A0086DC0E /* MidiMessage.cpp in Sources */,
 				4DCA95D81A515D0E008AD7E9 /* editorial.cpp in Sources */,
 				4DB351151C8040B1002DD057 /* tempo.cpp in Sources */,
+				40CA06651E351161009CFDD7 /* MxmlEvent.cpp in Sources */,
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
 				4D1BE7711C688F5A0086DC0E /* MidiFile.cpp in Sources */,
 				8F086F05188539540037FD8E /* tuplet.cpp in Sources */,
 				4D1BE7851C6A40A80086DC0E /* pugixml.cpp in Sources */,
+				40CA06681E351161009CFDD7 /* tool-musicxml2hum.cpp in Sources */,
 				4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				8F086F06188539540037FD8E /* view_beam.cpp in Sources */,
 				8F086F08188539540037FD8E /* view_element.cpp in Sources */,
@@ -1150,6 +1230,7 @@
 				4DB726C01B8B9F480040231B /* rpt.cpp in Sources */,
 				2D2A799A1A69812C000A441B /* chord.cpp in Sources */,
 				8F086F0C188539540037FD8E /* view.cpp in Sources */,
+				40CA065F1E351161009CFDD7 /* GridSide.cpp in Sources */,
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
@@ -1160,6 +1241,7 @@
 				4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */,
 				4D422104199805F800963292 /* att.cpp in Sources */,
 				4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */,
+				40CA065E1E351161009CFDD7 /* GridPart.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
 				4DF289FF1A7545E500BA9F7D /* timeinterface.cpp in Sources */,
 				4DF9D29A1C1B3F0A0069E8C8 /* attconverter.cpp in Sources */,
@@ -1290,7 +1372,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
-					NO_HUMDRUM_SUPPORT,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
@@ -1333,7 +1414,6 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = NO_HUMDRUM_SUPPORT;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;

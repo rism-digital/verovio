@@ -32,7 +32,7 @@ public:
     virtual void Reset();
     virtual Object *Clone() const { return new BarLine(*this); }
     virtual std::string GetClassName() const { return "BarLine"; }
-    virtual ClassId Is() const { return BARLINE; }
+    virtual ClassId GetClassId() const { return BARLINE; }
     ///@}
 
     /** Override the method since alignment is required */
@@ -74,7 +74,7 @@ public:
     virtual ~BarLineAttr();
     virtual Object *Clone() const { return new BarLineAttr(*this); }
     virtual std::string GetClassName() const { return "BarLineAttr"; }
-    virtual ClassId Is() const { return (m_isLeft ? BARLINE_ATTR_LEFT : BARLINE_ATTR_RIGHT); }
+    virtual ClassId GetClassId() const { return (m_isLeft ? BARLINE_ATTR_LEFT : BARLINE_ATTR_RIGHT); }
     ///@}
 
     void SetLeft() { m_isLeft = true; }

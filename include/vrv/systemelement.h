@@ -32,7 +32,7 @@ public:
     SystemElement(std::string classid);
     virtual ~SystemElement();
     virtual void Reset();
-    virtual ClassId Is() const { return SYSTEM_ELEMENT; }
+    virtual ClassId GetClassId() const { return SYSTEM_ELEMENT; }
     ///@}
 
     //----------//

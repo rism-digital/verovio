@@ -35,7 +35,7 @@ public:
     virtual ~BoundaryEnd();
     virtual void Reset();
     virtual std::string GetClassName() const { return "boundaryEnd"; }
-    virtual ClassId Is() const { return BOUNDARY_END; }
+    virtual ClassId GetClassId() const { return BOUNDARY_END; }
     ///@}
 
     void SetMeasure(Measure *measure) { m_drawingMeasure = measure; }

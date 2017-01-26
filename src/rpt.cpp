@@ -72,13 +72,13 @@ void BTrem::Reset()
 
 void BTrem::AddChild(Object *child)
 {
-    if (child->Is() == CHORD) {
+    if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
     }
-    else if (child->Is() == CLEF) {
+    else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
     }
-    else if (child->Is() == NOTE) {
+    else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -118,13 +118,13 @@ void FTrem::Reset()
 
 void FTrem::AddChild(Object *child)
 {
-    if (child->Is() == CHORD) {
+    if (child->Is(CHORD)) {
         assert(dynamic_cast<Chord *>(child));
     }
-    else if (child->Is() == CLEF) {
+    else if (child->Is(CLEF)) {
         assert(dynamic_cast<Clef *>(child));
     }
-    else if (child->Is() == NOTE) {
+    else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -145,7 +145,7 @@ void FTrem::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        if (((*iter)->Is() != NOTE) && ((*iter)->Is() != CHORD)) {
+        if (!(*iter)->Is(NOTE) && !(*iter)->Is(CHORD)) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
             iter = childList->erase(iter);
             continue;

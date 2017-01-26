@@ -28,7 +28,7 @@ public:
     virtual ~Custos();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Custos"; }
-    virtual ClassId Is() const { return CUSTOS; }
+    virtual ClassId GetClassId() const { return CUSTOS; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }

@@ -72,10 +72,10 @@ void System::Reset()
 
 void System::AddChild(Object *child)
 {
-    if (child->Is() == MEASURE) {
+    if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
     }
-    else if (child->Is() == SCOREDEF) {
+    else if (child->Is(SCOREDEF)) {
         assert(dynamic_cast<ScoreDef *>(child));
     }
     else if (child->IsSystemElement()) {

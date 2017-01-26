@@ -142,7 +142,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         // cycle into the elements and count the up and down dirs
         ListOfObjects::iterator iter = tupletChildren->begin();
         while (iter != tupletChildren->end()) {
-            if ((*iter)->Is() == NOTE) {
+            if ((*iter)->Is(NOTE)) {
                 Note *currentNote = dynamic_cast<Note *>(*iter);
                 assert(currentNote);
                 if (currentNote->GetDrawingStemDir() == STEMDIRECTION_up)
@@ -185,7 +185,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             // average. In this case we offset down or up all the points
             iter = tupletChildren->begin();
             while (iter != tupletChildren->end()) {
-                if ((*iter)->Is() == NOTE) {
+                if ((*iter)->Is(NOTE)) {
                     Note *currentNote = dynamic_cast<Note *>(*iter);
                     assert(currentNote);
 
@@ -220,7 +220,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             // Find the tallest stem and set y to it (with the offset distance)
             iter = tupletChildren->begin();
             while (iter != tupletChildren->end()) {
-                if ((*iter)->Is() == NOTE) {
+                if ((*iter)->Is(NOTE)) {
                     Note *currentNote = dynamic_cast<Note *>(*iter);
                     assert(currentNote);
 
@@ -267,9 +267,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
 
     tuplet->ResetList(tuplet);
 
-    int txt_length = 0;
-    int txt_height = 0;
-
+    TextExtend extend;
     std::wstring notes;
 
     //
@@ -277,7 +275,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
 
     if (tuplet->GetNum() > 0) {
         notes = IntToTupletFigures((short int)tuplet->GetNum());
-        dc->GetSmuflTextExtent(notes, &txt_length, &txt_height);
+        dc->GetSmuflTextExtent(notes, &extend);
     }
 
     Point start, end, center;
@@ -286,7 +284,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     // Calculate position for number 0x82
     // since the number is slanted, move the center left
     // by 4 pixels so it seems more centered to the eye
-    int txt_x = center.x - (txt_length / 2);
+    int txt_x = center.x - (extend.m_width / 2);
     // we need to move down the figure of half of it height, which is about an accid width;
     // also, cue size is not supported. Does it has to?
     int txt_y
@@ -317,7 +315,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
         // x = 10 pixels before the number
         int x = txt_x - 40;
         // xa = just after, the number is abundant so I do not add anything
-        int xa = txt_x + txt_length + 20;
+        int xa = txt_x + extend.m_width + 20;
 
         // calculate the y coords in the slope
         double y1 = (double)start.y + m * (x - (double)start.x);

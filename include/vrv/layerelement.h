@@ -39,7 +39,7 @@ public:
     LayerElement(std::string classid);
     virtual ~LayerElement();
     virtual void Reset();
-    virtual ClassId Is() const { return LAYER_ELEMENT; }
+    virtual ClassId GetClassId() const { return LAYER_ELEMENT; }
     ///@}
 
     /**

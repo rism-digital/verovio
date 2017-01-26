@@ -18,6 +18,7 @@
 
 namespace vrv {
 
+class Glyph;
 class Object;
 class View;
 
@@ -49,7 +50,8 @@ public:
         m_isDeactivatedY = false;
     }
     virtual ~DeviceContext(){};
-    virtual ClassId Is() const;
+    virtual ClassId GetClassId() const;
+    bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
     ///@}
 
     /**
@@ -77,7 +79,7 @@ public:
     ///@{
     virtual void GetTextExtent(const std::string &string, TextExtend *extend);
     virtual void GetTextExtent(const std::wstring &string, TextExtend *extend);
-    virtual void GetSmuflTextExtent(const std::wstring &string, int *w, int *h);
+    virtual void GetSmuflTextExtent(const std::wstring &string, TextExtend *extend);
 
     /**
      * @name Getters
@@ -191,6 +193,11 @@ public:
     virtual bool GetDrawBoundingBoxes() { return m_drawingBoundingBoxes; }
     ///@}
 
+private:
+    void AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend);
+
+public:
+    //
 protected:
     bool m_drawingBoundingBoxes;
 

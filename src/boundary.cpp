@@ -96,7 +96,7 @@ int BoundaryEnd::PrepareBoundaries(FunctorParams *functorParams)
 
     // Endings are also set as Measure::m_drawingEnding for all meaasures in between - when we reach the end boundary of
     // an ending, we need to set the m_currentEnding to NULL
-    if (params->m_currentEnding && this->GetStart()->Is() == ENDING) {
+    if (params->m_currentEnding && this->GetStart()->Is(ENDING)) {
         params->m_currentEnding = NULL;
         // With ending we need the drawing measure - this will crash with en empty ending at the beginning of a score...
         assert(m_drawingMeasure);
@@ -156,7 +156,7 @@ int BoundaryEnd::PrepareFloatingGrps(FunctorParams *functorParams)
 
     // We are reaching the end of an ending - put it to the param and it will be grouped with the next one if there is
     // not measure in between
-    if (this->GetStart()->Is() == ENDING) {
+    if (this->GetStart()->Is(ENDING)) {
         params->m_previousEnding = dynamic_cast<Ending *>(this->GetStart());
         assert(params->m_previousEnding);
     }

@@ -57,7 +57,7 @@ void Artic::Reset()
 
 void Artic::AddChild(Object *child)
 {
-    if (child->Is() == ARTIC_PART) {
+    if (child->Is(ARTIC_PART)) {
         assert(dynamic_cast<ArticPart *>(child));
     }
     else {
@@ -315,7 +315,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 
         Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
         assert(staff);
-        int margin = params->m_doc->GetTopMargin(insidePart->Is())
+        int margin = params->m_doc->GetTopMargin(insidePart->GetClassId())
             * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
 
         if (insidePart->GetPlace() == outsidePart->GetPlace()) {

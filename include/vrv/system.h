@@ -41,7 +41,7 @@ public:
     virtual ~System();
     virtual void Reset();
     virtual std::string GetClassName() const { return "System"; }
-    virtual ClassId Is() const { return SYSTEM; }
+    virtual ClassId GetClassId() const { return SYSTEM; }
     ///@}
 
     /**
