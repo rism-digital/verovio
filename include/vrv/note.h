@@ -35,13 +35,6 @@ typedef std::vector<Note *> ChordCluster;
  * This class models the MEI <note> element.
  */
 
-// embellishments
-// for the moment only the trill is implemented
-// to be change to MEI Att
-#define EMB_NONE 0
-#define EMB_TRILL 1
-#define EMB_MORDENT 2
-
 class Note : public LayerElement,
              public StemmedDrawingInterface,
              public DurationInterface,
@@ -149,9 +142,6 @@ public:
 private:
     //
 public:
-    /** embellishment on this note **/
-    unsigned int m_embellishment; // To be changed to Att
-
     /** drawing stem length */
     int d_stemLen;
 

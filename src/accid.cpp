@@ -50,6 +50,8 @@ void Accid::Reset()
     ResetAccidLog();
     ResetColor();
     ResetEnclosingchars();
+    
+    m_drawingCueSize = false;
 }
 
 std::wstring Accid::GetSymbolStr() const

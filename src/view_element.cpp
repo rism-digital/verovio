@@ -1462,9 +1462,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         DrawFermataAttr(dc, element, layer, staff, measure);
     }
 
-    if (note->m_embellishment == EMB_TRILL) {
-        DrawOrnamAttr(dc, element, staff);
-    }
 }
 
 void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1698,7 +1695,6 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
     assert(measure);
 
     int x, y;
-    int emb_offset = 0; // if there is and embellishment, offset the note up
 
     // We move the fermata position of half of the fermata size
     x = element->GetDrawingX();
@@ -1716,25 +1712,16 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
 
     // First case, notes
     if ((element->Is(NOTE)) || (element->Is(CHORD))) {
-        // To be fixed once m_embellishment is removed
-        if (element->Is(NOTE)) {
-            Note *note = dynamic_cast<Note *>(element);
-            assert(note);
-            if (note->m_embellishment) {
-                emb_offset = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-            }
-        }
-
         if (place == PLACE_above) {
             // check if the notehead is in the staff.
             int top = element->GetDrawingTop(m_doc, staff->m_drawingStaffSize, true, ARTIC_PART_OUTSIDE);
             if (top < staff->GetDrawingY()) {
-                // in the staff, set the fermata 20 pixels above the last line (+ embellishment offset)
-                y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + emb_offset;
+                // in the staff, set the fermata 20 pixels above the last line
+                y = staff->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
             else {
                 // out of the staff, place the trill above the notehead
-                y = top + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) + emb_offset;
+                y = top + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             }
             // draw the up-fermata - need cue size support
             DrawSmuflCode(dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);
@@ -2068,27 +2055,6 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
     if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_acc)) {
         DrawAcciaccaturaSlash(dc, object);
     }
-}
-
-// Draw a trill above the notehead
-// This function works as the up-fermata portion of DrawFermataAttr
-// if there are many symbols to draw we could make a generalized function
-void View::DrawOrnamAttr(DeviceContext *dc, LayerElement *element, Staff *staff)
-{
-    int x, y;
-
-    // It shoud be moved according to half of the trill size
-    x = element->GetDrawingX() - m_doc->GetGlyphWidth(SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false);
-
-    // HARDCODED
-    if ((element->GetDrawingY()) < staff->GetDrawingY()) {
-        y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    }
-    else {
-        y = (element->GetDrawingY()) + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    }
-
-    DrawSmuflCode(dc, x, y, SMUFL_E566_ornamentTrill, staff->m_drawingStaffSize, false);
 }
 
 //----------------------------------------------------------------------------
