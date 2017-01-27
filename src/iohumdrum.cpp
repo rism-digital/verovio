@@ -1746,7 +1746,7 @@ void HumdrumInput::addHarmFloatsForMeasure(int startline, int endline)
             hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
             harm->SetTstamp(tstamp.getFloat());
             setStaff(harm, staffindex + 1);
-            setLocationId(harm, token, -1);
+            setLocationId(harm, token);
         }
     }
 }
@@ -1985,13 +1985,13 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 
     if (layerdata.size() > 0) {
         if (layerdata[0]->size() > 0) {
-            setLocationId(m_layer, layerdata[0], -1);
+            setLocationId(m_layer, layerdata[0]);
         }
     }
 
     if ((layerindex == 0) && (layerdata.size() > 0)) {
         if ((layerdata[0]->size() > 0) && (layerdata[0]->at(0) == '=')) {
-            setLocationId(m_staff, layerdata[0], -1);
+            setLocationId(m_staff, layerdata[0]);
         }
     }
 
@@ -2323,7 +2323,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (layerdata[i]->getDurationFromStart() != 0) {
                 if (layerdata[i]->isClef()) {
                     Clef *clef = insertClefElement(elements, pointers, layerdata[i]);
-                    setLocationId(clef, layerdata[i], -1);
+                    setLocationId(clef, layerdata[i]);
                 }
                 else if (layerdata[i]->isNull()) {
                     // duplicate clef changes in secondary layers
@@ -2334,7 +2334,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                         if (ttrack == xtrack) {
                             if (tok->isClef()) {
                                 Clef *clef = insertClefElement(elements, pointers, tok);
-                                setLocationId(clef, layerdata[i], -1);
+                                setLocationId(clef, layerdata[i]);
                                 // Uncomment when clef->SetSameas() is available:
                                 // std::string sameas = "#clef-L";
                                 // sameas += to_string(tok->getLineNumber());
@@ -2364,7 +2364,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 
         if (layerdata[i]->isChord()) {
             Chord *chord = new Chord;
-            setLocationId(chord, layerdata[i], -1);
+            setLocationId(chord, layerdata[i]);
             appendElement(elements, pointers, chord);
             elements.push_back("chord");
             pointers.push_back((void *)chord);
@@ -2382,7 +2382,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (layerdata[i]->find("yy") != string::npos) {
                 // Invisible rest (or note which should be invisible.
                 Space *irest = new Space;
-                setLocationId(irest, layerdata[i], -1);
+                setLocationId(irest, layerdata[i]);
                 appendElement(elements, pointers, irest);
                 convertRhythm(irest, layerdata[i]);
                 processSlurs(layerdata[i]);
@@ -2391,7 +2391,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
             else {
                 Rest *rest = new Rest;
-                setLocationId(rest, layerdata[i], -1);
+                setLocationId(rest, layerdata[i]);
                 appendElement(elements, pointers, rest);
                 convertRest(rest, layerdata[i]);
                 processSlurs(layerdata[i]);
@@ -2403,7 +2403,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             // should be a note
             note = new Note;
             note->SetSVGClass("highlight");
-            setLocationId(note, layerdata[i], -1);
+            setLocationId(note, layerdata[i]);
             appendElement(elements, pointers, note);
             convertNote(note, layerdata[i], staffindex);
             processSlurs(layerdata[i]);
@@ -2553,6 +2553,7 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         else if (direction < 0) {
             artic->SetPlace(STAFFREL_below);
         }
+        setLocationId(artic, token);
     }
 }
 
@@ -5875,6 +5876,7 @@ std::string HumdrumInput::GetMeiString(void)
 //
 // HumdrumInput::setLocationId -- use the file location of the item
 //    for the ID.
+//     default value: subtoken = -1 (don't display subtoken number);
 //
 
 void HumdrumInput::setLocationId(Object *object, hum::HTp token, int subtoken)

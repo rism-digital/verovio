@@ -283,7 +283,7 @@ protected:
     int getMeasureDifference(hum::HTp starttok, hum::HTp endtok);
     void storeOriginalClefApp(void);
     void addSpace(vector<string> &elements, vector<void *> &pointers, hum::HumNum duration);
-    void setLocationId(vrv::Object *object, hum::HTp token, int subtoken);
+    void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
     void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
