@@ -2624,12 +2624,28 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
     if (!token) {
         return;
     }
-    if (strchr(token->c_str(), 'm') != NULL) { // mordent
+    if (strchr(token->c_str(), 'm') != NULL) { // minor mordent
         token->setValue("LO", "TX", "t", "m");
         token->setValue("LO", "TX", "a", "true");
     }
-    else if (strchr(token->c_str(), 'M') != NULL) { // mordent
+    else if (strchr(token->c_str(), 'M') != NULL) { // major mordent
         token->setValue("LO", "TX", "t", "M");
+        token->setValue("LO", "TX", "a", "true");
+    }
+    else if (strchr(token->c_str(), 'w') != NULL) { // minor inverted mordent
+        token->setValue("LO", "TX", "t", "w");
+        token->setValue("LO", "TX", "a", "true");
+    }
+    else if (strchr(token->c_str(), 'W') != NULL) { // major inverted mordent
+        token->setValue("LO", "TX", "t", "W");
+        token->setValue("LO", "TX", "a", "true");
+    }
+    else if (strchr(token->c_str(), 'S') != NULL) { // turn
+        token->setValue("LO", "TX", "t", "S");
+        token->setValue("LO", "TX", "a", "true");
+    }
+    else if (strchr(token->c_str(), '$') != NULL) { // inverted turn
+        token->setValue("LO", "TX", "t", "$");
         token->setValue("LO", "TX", "a", "true");
     }
     else if (strchr(token->c_str(), ':') != NULL) { // arpeggio
