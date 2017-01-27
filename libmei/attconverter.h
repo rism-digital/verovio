@@ -83,6 +83,9 @@ public:
     std::string GraceToStr(data_GRACE data) const;
     data_GRACE StrToGrace(std::string value) const;
 
+    std::string HeadshapeListToStr(data_HEADSHAPE_list data) const;
+    data_HEADSHAPE_list StrToHeadshapeList(std::string value) const;
+
     std::string HorizontalalignmentToStr(data_HORIZONTALALIGNMENT data) const;
     data_HORIZONTALALIGNMENT StrToHorizontalalignment(std::string value) const;
 
