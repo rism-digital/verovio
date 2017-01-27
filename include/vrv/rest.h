@@ -32,7 +32,7 @@ public:
     virtual ~Rest();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Rest"; }
-    virtual ClassId Is() const { return REST; }
+    virtual ClassId GetClassId() const { return REST; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }

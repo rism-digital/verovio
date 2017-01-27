@@ -42,7 +42,7 @@ public:
     virtual ~Measure();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Measure"; }
-    virtual ClassId Is() const { return MEASURE; }
+    virtual ClassId GetClassId() const { return MEASURE; }
     ///@}
 
     /**

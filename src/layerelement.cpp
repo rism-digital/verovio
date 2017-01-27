@@ -93,7 +93,7 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
 
 bool LayerElement::IsGraceNote() const
 {
-    if (this->Is() != NOTE) return false;
+    if (!this->Is(NOTE)) return false;
     Note const *note = dynamic_cast<Note const *>(this);
     assert(note);
     return (note && note->HasGrace());
@@ -101,19 +101,19 @@ bool LayerElement::IsGraceNote() const
 
 bool LayerElement::IsInLigature()
 {
-    if (this->Is() != NOTE) return false;
+    if (!this->Is(NOTE)) return false;
     return (this->GetFirstParent(LIGATURE, MAX_LIGATURE_DEPTH));
 }
 
 bool LayerElement::IsInFTrem()
 {
-    if ((this->Is() != NOTE) || (this->Is() == CHORD)) return false;
+    if ((!this->Is(NOTE)) || (this->Is(CHORD))) return false;
     return (this->GetFirstParent(FTREM, MAX_FTREM_DEPTH));
 }
 
 Beam *LayerElement::IsInBeam()
 {
-    if ((this->Is() != NOTE) && (this->Is() != CHORD)) return NULL;
+    if (!this->Is(NOTE) && !this->Is(CHORD)) return NULL;
     Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
     if (beamParent != NULL) {
         // This note is beamed and cue-sized
@@ -133,7 +133,7 @@ Beam *LayerElement::IsInBeam()
 int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type)
 {
     // It would not crash otherwise but there is not reason to call it
-    assert((this->Is() == NOTE) || (this->Is() == CHORD));
+    assert((this->Is(NOTE)) || (this->Is(CHORD)));
 
     ArticPart *firstArticPart = NULL;
     ArticPart *lastArticPart = NULL;
@@ -175,7 +175,7 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPa
 
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPartType type)
 {
-    if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
+    if ((this->Is(NOTE)) || (this->Is(CHORD))) {
         if (withArtic) {
             int articY = GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
             if (articY != VRV_UNSET) return articY;
@@ -183,7 +183,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPa
         DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
-            if (this->Is() == CHORD) {
+            if (this->Is(CHORD)) {
                 int yChordMax = 0, yChordMin = 0;
                 Chord *chord = dynamic_cast<Chord *>(this);
                 assert(chord);
@@ -208,7 +208,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPa
 
 int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, ArticPartType type)
 {
-    if ((this->Is() == NOTE) || (this->Is() == CHORD)) {
+    if ((this->Is(NOTE)) || (this->Is(CHORD))) {
         if (withArtic) {
             int articY = GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
             if (articY != -VRV_UNSET) return articY;
@@ -216,7 +216,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
         DurationInterface *durationInterface = this->GetDurationInterface();
         assert(durationInterface);
         if (durationInterface->GetNoteOrChordDur(this) < DUR_2) {
-            if (this->Is() == CHORD) {
+            if (this->Is(CHORD)) {
                 int yChordMax = 0, yChordMin = 0;
                 Chord *chord = dynamic_cast<Chord *>(this);
                 assert(chord);
@@ -241,7 +241,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
 
 bool LayerElement::IsCueSize()
 {
-    if (this->Is() == NOTE) {
+    if (this->Is(NOTE)) {
         const Note *note = dynamic_cast<const Note *>(this);
         assert(note);
         return (note->HasGrace());
@@ -289,14 +289,14 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         }
         return durationValue;
     }
-    else if (this->Is() == BEATRPT) {
+    else if (this->Is(BEATRPT)) {
         BeatRpt *beatRpt = dynamic_cast<BeatRpt *>(this);
         assert(beatRpt);
         int meterUnit = 4;
         if (meterSig && meterSig->HasUnit()) meterSig->GetUnit();
         return beatRpt->GetBeatRptAlignmentDuration(meterUnit);
     }
-    else if (this->Is() == TIMESTAMP_ATTR) {
+    else if (this->Is(TIMESTAMP_ATTR)) {
         TimestampAttr *timestampAttr = dynamic_cast<TimestampAttr *>(this);
         assert(timestampAttr);
         int meterUnit = 4;
@@ -324,7 +324,7 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_drawingX = 0;
     m_alignment = NULL;
-    if (this->Is() == NOTE) {
+    if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
         note->ResetGraceAlignment();
@@ -354,10 +354,10 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
 
     AlignmentType type = ALIGNMENT_DEFAULT;
-    if (this->Is() == BARLINE) {
+    if (this->Is(BARLINE)) {
         type = ALIGNMENT_BARLINE;
     }
-    else if (this->Is() == CLEF) {
+    else if (this->Is(CLEF)) {
         if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
             type = ALIGNMENT_SCOREDEF_CLEF;
         else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
@@ -366,7 +366,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
             type = ALIGNMENT_CLEF;
         }
     }
-    else if (this->Is() == KEYSIG) {
+    else if (this->Is(KEYSIG)) {
         if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
             type = ALIGNMENT_SCOREDEF_KEYSIG;
         else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
@@ -378,7 +378,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
             type = ALIGNMENT_SCOREDEF_KEYSIG;
         }
     }
-    else if (this->Is() == MENSUR) {
+    else if (this->Is(MENSUR)) {
         if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
             type = ALIGNMENT_SCOREDEF_MENSUR;
         else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
@@ -390,7 +390,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
             type = ALIGNMENT_MENSUR;
         }
     }
-    else if (this->Is() == METERSIG) {
+    else if (this->Is(METERSIG)) {
         if ((this->GetScoreDefRole() == SYSTEM_SCOREDEF) || (this->GetScoreDefRole() == INTERMEDIATE_SCOREDEF))
             type = ALIGNMENT_SCOREDEF_METERSIG;
         else if (this->GetScoreDefRole() == CAUTIONARY_SCOREDEF)
@@ -405,22 +405,22 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
             type = ALIGNMENT_SCOREDEF_METERSIG;
         }
     }
-    else if ((this->Is() == MULTIREST) || (this->Is() == MREST) || (this->Is() == MRPT)) {
+    else if (this->Is(MULTIREST) || this->Is(MREST) || this->Is(MRPT)) {
         type = ALIGNMENT_FULLMEASURE;
     }
-    else if ((this->Is() == MRPT2) || (this->Is() == MULTIRPT)) {
+    else if (this->Is(MRPT2) || this->Is(MULTIRPT)) {
         type = ALIGNMENT_FULLMEASURE2;
     }
     else if (this->IsGraceNote()) {
         type = ALIGNMENT_GRACENOTE;
     }
-    else if ((this->Is() == BEAM) || (this->Is() == TUPLET)) {
+    else if (this->Is(BEAM) || this->Is(TUPLET)) {
         type = ALIGNMENT_CONTAINER;
     }
-    else if (this->Is() == DOT) {
+    else if (this->Is(DOT)) {
         type = ALIGNMENT_DOT;
     }
-    else if (this->Is() == ACCID) {
+    else if (this->Is(ACCID)) {
         // Refer to the note parent (if any?)
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         if (note) {
@@ -429,14 +429,14 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
         type = ALIGNMENT_ACCID;
     }
-    else if ((this->Is() == ARTIC) || (this->Is() == ARTIC_PART) || (this->Is() == SYL)) {
+    else if (this->Is(ARTIC) || this->Is(ARTIC_PART) || this->Is(SYL)) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
         m_alignment = note->GetAlignment();
         return FUNCTOR_CONTINUE;
     }
-    else if (this->Is() == VERSE) {
+    else if (this->Is(VERSE)) {
         // Idem
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
@@ -450,7 +450,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
     // So use it as current time - we can do this because the timestamp loop is redirected from the measure
     // The time will be reset to 0.0 when starting a new layer anyway
-    if (this->Is() == TIMESTAMP_ATTR)
+    if (this->Is(TIMESTAMP_ATTR))
         params->m_time = duration;
     else
         params->m_measureAligner->SetMaxTime(params->m_time + duration);
@@ -467,7 +467,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     // LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str());
 
     // increase the time position, but only when not a timestamp (it would actually do nothing)
-    if (this->Is() != TIMESTAMP_ATTR) {
+    if (!this->Is(TIMESTAMP_ATTR)) {
         params->m_time += duration;
     }
 
@@ -526,7 +526,7 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
             assert(params->m_doc->GetType() == Raw);
             this->SetDrawingX(this->GetXRel() + params->m_currentMeasure->GetDrawingX());
             // Grace notes, also take into account the GraceAlignment
-            if (this->Is() == NOTE) {
+            if (this->Is(NOTE)) {
                 Note *note = dynamic_cast<Note *>(this);
                 assert(note);
                 if (note->HasGraceAlignment()) {
@@ -596,14 +596,14 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
     }
 
     // Finally, adjust Y for notes and rests
-    if (this->Is() == NOTE) {
+    if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
         this->SetDrawingY(this->GetDrawingY()
             + params->m_view->CalculatePitchPosY(
                   staffY, note->GetPname(), layerY->GetClefOffset(layerElementY), note->GetOct()));
     }
-    else if (this->Is() == REST) {
+    else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);
         assert(rest);
         // Automatically calculate rest position, if so requested
@@ -624,15 +624,13 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
                       staffY, rest->GetPloc(), layerY->GetClefOffset(layerElementY), rest->GetOloc()));
         }
     }
-    else if (this->Is() == ACCID) {
+    else if (this->Is(ACCID)) {
         Accid *accid = dynamic_cast<Accid *>(this);
         assert(accid);
-        Note *note = dynamic_cast<Note*>(this->GetFirstParent(NOTE));
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         if (note) {
             accid->SetDrawingY(note->GetDrawingY());
         }
-
-        
     }
 
     return FUNCTOR_CONTINUE;
@@ -662,14 +660,14 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
     if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
 
     // Now deal with the different elements
-    if (this->Is() == REST) {
+    if (this->Is(REST)) {
         // Rest *rest = dynamic_cast<Rest *>(this);
         // assert(rest);
         // LogMessage("Rest %f", GetAlignmentDuration());
         // increase the currentTime accordingly
         params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
     }
-    else if (this->Is() == NOTE) {
+    else if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
 
@@ -688,7 +686,7 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
         // LogDebug("Note Alignment Duration %f - Dur %d - Diatonic Pitch %d - Track %d", GetAlignmentDuration(),
         // note->GetNoteOrChordDur(this), note->GetDiatonicPitch(), *midiTrack);
         // LogDebug("Oct %d - Pname %d - Accid %d", note->GetOct(), note->GetPname(), note->GetAccid());
-        
+
         Accid *accid = note->GetDrawingAccid();
 
         // Create midi note
@@ -754,7 +752,7 @@ int LayerElement::GenerateMIDI(FunctorParams *functorParams)
             params->m_currentMeasureTime += GetAlignmentDuration() * params->m_currentBpm / (DUR_MAX / DURATION_4);
         }
     }
-    else if (this->Is() == SPACE) {
+    else if (this->Is(SPACE)) {
         // Space *space = dynamic_cast<Space *>(this);
         // assert(space);
         // LogMessage("Space %f", GetAlignmentDuration());
@@ -769,7 +767,7 @@ int LayerElement::GenerateMIDIEnd(FunctorParams *functorParams)
     GenerateMIDIParams *params = dynamic_cast<GenerateMIDIParams *>(functorParams);
     assert(params);
 
-    if (this->Is() == CHORD) {
+    if (this->Is(CHORD)) {
         // Chord *chord = dynamic_cast<Chord *>(this);
         // assert(chord);
         // LogMessage("Chord %f", GetAlignmentDuration());
@@ -788,7 +786,7 @@ int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
     // Here we need to check if the LayerElement as a duration, otherwise we can continue
     if (!this->HasInterface(INTERFACE_DURATION)) return FUNCTOR_CONTINUE;
 
-    if (this->Is() == NOTE) {
+    if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
 

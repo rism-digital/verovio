@@ -69,7 +69,7 @@ public:
     // constructors and destructors
     SystemAligner();
     virtual ~SystemAligner();
-    virtual ClassId Is() const { return SYSTEM_ALIGNER; }
+    virtual ClassId GetClassId() const { return SYSTEM_ALIGNER; }
 
     int GetStaffAlignmentCount() const { return (int)m_children.size(); }
 
@@ -126,7 +126,7 @@ public:
     ///@{
     StaffAlignment();
     virtual ~StaffAlignment();
-    virtual ClassId Is() const { return STAFF_ALIGNMENT; }
+    virtual ClassId GetClassId() const { return STAFF_ALIGNMENT; }
     ///@}
 
     /**
@@ -290,7 +290,7 @@ public:
     Alignment(double time, AlignmentType type = ALIGNMENT_DEFAULT);
     virtual ~Alignment();
     virtual void Reset();
-    virtual ClassId Is() const { return ALIGNMENT; }
+    virtual ClassId GetClassId() const { return ALIGNMENT; }
     ///@}
 
     void SetXRel(int x_rel);
@@ -435,7 +435,7 @@ public:
     // constructors and destructors
     MeasureAligner();
     virtual ~MeasureAligner();
-    virtual ClassId Is() const { return MEASURE_ALIGNER; }
+    virtual ClassId GetClassId() const { return MEASURE_ALIGNER; }
 
     int GetAlignmentCount() const { return (int)m_children.size(); }
 
@@ -536,7 +536,7 @@ public:
     // constructors and destructors
     GraceAligner();
     virtual ~GraceAligner();
-    virtual ClassId Is() const { return GRACE_ALIGNER; }
+    virtual ClassId GetClassId() const { return GRACE_ALIGNER; }
 
     /**
      * Because the grace notes appear from left to right but need to be aligned
@@ -590,7 +590,7 @@ public:
     // constructors and destructors
     TimestampAligner();
     virtual ~TimestampAligner();
-    virtual ClassId Is() const { return TIMESTAMP_ALIGNER; }
+    virtual ClassId GetClassId() const { return TIMESTAMP_ALIGNER; }
 
     /**
      * Reset the aligner (clear the content)

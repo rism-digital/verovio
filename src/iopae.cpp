@@ -30,6 +30,7 @@
 #include "scoredef.h"
 #include "section.h"
 #include "staff.h"
+#include "trill.h"
 #include "tuplet.h"
 #include "vrv.h"
 
@@ -566,7 +567,7 @@ int PaeInput::getAccidental(const char *incipit, data_ACCIDENTAL_EXPLICIT *accid
     else if (incipit[i] == 'x') {
         *accident = ACCIDENTAL_EXPLICIT_s;
         if ((i + 1 < length) && (incipit[i + 1] == 'x')) {
-            *accident = ACCIDENTAL_EXPLICIT_ss;
+            *accident = ACCIDENTAL_EXPLICIT_x;
             i++;
         }
     }
@@ -1157,7 +1158,6 @@ void PaeInput::parseNote(pae::Note *note)
             mnote->AddChild(accid);
         }
 
-
         mnote->SetDots(note->dots);
         mnote->SetDur(note->duration);
 
@@ -1173,7 +1173,9 @@ void PaeInput::parseNote(pae::Note *note)
         }
 
         if (note->trill == true) {
-            mnote->m_embellishment = EMB_TRILL;
+            Trill *trill = new Trill();
+            trill->SetStart(mnote);
+            m_measure->AddChild(trill);
         }
 
         if (m_last_tied_note != NULL) {
@@ -1211,7 +1213,7 @@ void PaeInput::parseNote(pae::Note *note)
     // Acciaccaturas are similar but do not get beamed (do they)
     // this case is simpler. NOTE a note can not be acciacctura AND appoggiatura
     // Acciaccatura rests do not exist
-    if (note->acciaccatura && (element->Is() == NOTE)) {
+    if (note->acciaccatura && (element->Is(NOTE))) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         mnote->SetDur(DURATION_8);
@@ -1219,7 +1221,7 @@ void PaeInput::parseNote(pae::Note *note)
         mnote->SetStemDir(STEMDIRECTION_up);
     }
 
-    if ((note->appoggiatura > 0) && (element->Is() == NOTE)) {
+    if ((note->appoggiatura > 0) && (element->Is(NOTE))) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         mnote->SetGrace(GRACE_unacc);

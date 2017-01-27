@@ -28,7 +28,7 @@ public:
     virtual ~Tie();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Tie"; }
-    virtual ClassId Is() const { return TIE; }
+    virtual ClassId GetClassId() const { return TIE; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
