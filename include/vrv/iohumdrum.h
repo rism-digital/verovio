@@ -259,8 +259,8 @@ protected:
     void printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, const vector<hum::HTp> &layerdata);
     void insertTuplet(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg,
         hum::HTp token, bool suppress);
-    void insertBeam(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
-    void insertGBeam(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
+    vrv::Beam *insertBeam(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
+    vrv::Beam *insertGBeam(vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
     void analyzeLayerBeams(vector<int> &beamnum, vector<int> &gbeamnum, const vector<hum::HTp> &layerdata);
     void setBeamDirection(int direction, const vector<humaux::HumdrumBeamAndTuplet> &tgs, vector<hum::HTp> &layerdata,
         int layerindex, bool grace);
@@ -291,6 +291,8 @@ protected:
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
     void setSlurLocationId(vrv::Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex);
     void setTieLocationId(vrv::Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex);
+    void setBeamLocationId(vrv::Object *object, const vector<humaux::HumdrumBeamAndTuplet> &tgs,
+        vector<hum::HTp> &layerdata, int startindex);
     void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
     void addOrnamentMarkers(hum::HTp token);

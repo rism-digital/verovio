@@ -2105,6 +2105,7 @@ void HumdrumInput::setBeamDirection(int direction, const vector<humaux::HumdrumB
 void HumdrumInput::handleGroupStarts(const vector<humaux::HumdrumBeamAndTuplet> &tgs, vector<string> &elements,
     vector<void *> &pointers, vector<hum::HTp> &layerdata, int layerindex)
 {
+    Beam *beam;
     const humaux::HumdrumBeamAndTuplet &tg = tgs[layerindex];
     hum::HTp token = layerdata[layerindex];
     vector<humaux::StaffStateVariables> &ss = m_staffstates;
@@ -2139,15 +2140,18 @@ void HumdrumInput::handleGroupStarts(const vector<humaux::HumdrumBeamAndTuplet> 
     if (tg.beamstart && tg.tupletstart) {
         if (tg.priority == 'T') {
             insertTuplet(elements, pointers, tg, token, ss[staffindex].suppress_beam_tuplet);
-            insertBeam(elements, pointers, tg);
+            beam = insertBeam(elements, pointers, tg);
+            setBeamLocationId(beam, tgs, layerdata, layerindex);
         }
         else {
-            insertBeam(elements, pointers, tg);
+            beam = insertBeam(elements, pointers, tg);
+            setBeamLocationId(beam, tgs, layerdata, layerindex);
             insertTuplet(elements, pointers, tg, token, ss[staffindex].suppress_beam_tuplet);
         }
     }
     else if (tg.beamstart) {
-        insertBeam(elements, pointers, tg);
+        beam = insertBeam(elements, pointers, tg);
+        setBeamLocationId(beam, tgs, layerdata, layerindex);
     }
     else if (tg.tupletstart) {
         insertTuplet(elements, pointers, tg, token, ss[staffindex].suppress_bracket_tuplet);
@@ -2156,7 +2160,8 @@ void HumdrumInput::handleGroupStarts(const vector<humaux::HumdrumBeamAndTuplet> 
     if (tg.gbeamstart) {
         // Grace note beams should not interact with
         // regular beams or tuplets.
-        insertGBeam(elements, pointers, tg);
+        beam = insertGBeam(elements, pointers, tg);
+        setBeamLocationId(beam, tgs, layerdata, layerindex);
     }
 }
 
@@ -3573,13 +3578,14 @@ void HumdrumInput::insertTuplet(vector<string> &elements, vector<void *> &pointe
 // HumdrumInput::insertBeam --
 //
 
-void HumdrumInput::insertBeam(
+Beam *HumdrumInput::insertBeam(
     vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg)
 {
     Beam *beam = new Beam;
     appendElement(elements, pointers, beam);
     elements.push_back("beam");
     pointers.push_back((void *)beam);
+    return beam;
 }
 
 //////////////////////////////
@@ -3587,13 +3593,14 @@ void HumdrumInput::insertBeam(
 // HumdrumInput::insertGBeam --
 //
 
-void HumdrumInput::insertGBeam(
+Beam *HumdrumInput::insertGBeam(
     vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg)
 {
     Beam *gbeam = new Beam;
     appendElement(elements, pointers, gbeam);
     elements.push_back("gbeam");
     pointers.push_back((void *)gbeam);
+    return gbeam;
 }
 
 //////////////////////////////
@@ -5920,6 +5927,45 @@ void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, 
     if (subtoken > 0) {
         id += "S" + to_string(subtoken);
     }
+    object->SetUuid(id);
+}
+
+/////////////////////////////
+//
+// HumdrumInput::setBeamLocationId --
+//
+
+void HumdrumInput::setBeamLocationId(
+    Object *object, const vector<humaux::HumdrumBeamAndTuplet> &tgs, vector<hum::HTp> &layerdata, int startindex)
+{
+    int startnum = tgs[startindex].beamstart;
+    hum::HTp starttoken = layerdata[startindex];
+    int startline = starttoken->getLineNumber();
+    int startfield = starttoken->getFieldNumber();
+
+    std::string id = object->GetClassName();
+    std::transform(id.begin(), id.end(), id.begin(), ::tolower);
+    id += "-L" + to_string(startline);
+    id += "F" + to_string(startfield);
+
+    int endnum = -1;
+    int endindex = -1;
+    for (int i = startindex + 1; i < (int)tgs.size(); i++) {
+        if (tgs[i].beamend == startnum) {
+            endnum = startnum;
+            endindex = i;
+            break;
+        }
+    }
+
+    if (endindex > 0) {
+        hum::HTp endtoken = layerdata[endindex];
+        int endline = endtoken->getLineNumber();
+        int endfield = endtoken->getFieldNumber();
+        id += "-L" + to_string(endline);
+        id += "F" + to_string(endfield);
+    }
+
     object->SetUuid(id);
 }
 
