@@ -2283,7 +2283,14 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                     continue;
                 }
                 if (layerdata[z]->find(";") != string::npos) {
-                    if (layer == 2) {
+                    int direction = getDirection(*layerdata[z], ";");
+                    if (direction < 0) {
+                        mrest->SetFermata(PLACE_below);
+                    }
+                    else if (direction > 0) {
+                        mrest->SetFermata(PLACE_above);
+                    }
+                    else if (layer == 2) {
                         mrest->SetFermata(PLACE_below);
                     }
                     else {
@@ -2568,6 +2575,37 @@ template <class ELEMENT> void HumdrumInput::addArticulations(ELEMENT element, hu
         }
         setLocationId(artic, token);
     }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getDirection --
+//    0  = no direction specified
+//    1  = place above
+//    -1 = place below
+//
+
+int HumdrumInput::getDirection(const string &token, const std::string &target)
+{
+    string newtarget;
+
+    if (m_signifiers.above) {
+        newtarget = target;
+        newtarget.push_back(m_signifiers.above);
+        if (token.find(newtarget) != std::string::npos) {
+            return +1;
+        }
+    }
+
+    if (m_signifiers.below) {
+        newtarget = target;
+        newtarget.push_back(m_signifiers.below);
+        if (token.find(newtarget) != std::string::npos) {
+            return -1;
+        }
+    }
+
+    return 0;
 }
 
 //////////////////////////////
@@ -4569,7 +4607,14 @@ void HumdrumInput::convertRest(Rest *rest, hum::HTp token, int subtoken)
 
     if (tstring.find(";") != string::npos) {
         if ((tstring.find("yy") == string::npos) && (tstring.find(";y") == string::npos)) {
-            if (layer == 1) {
+            int direction = getDirection(tstring, ";");
+            if (direction < 0) {
+                rest->SetFermata(PLACE_below);
+            }
+            else if (direction > 0) {
+                rest->SetFermata(PLACE_above);
+            }
+            else if (layer == 1) {
                 rest->SetFermata(PLACE_above);
             }
             else if (layer == 2) {
@@ -5003,7 +5048,14 @@ void HumdrumInput::addFermata(hum::HTp token)
             hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
             fermata->SetTstamp(tstamp.getFloat());
 
-            if (layer == 1) {
+            int direction = getDirection(*token, ";");
+            if (direction < 0) {
+                fermata->SetPlace(STAFFREL_below);
+            }
+            else if (direction > 0) {
+                fermata->SetPlace(STAFFREL_above);
+            }
+            else if (layer == 1) {
                 // note->SetFermata(PLACE_above);
                 fermata->SetPlace(STAFFREL_above);
             }
