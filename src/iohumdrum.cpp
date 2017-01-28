@@ -3175,6 +3175,7 @@ void HumdrumInput::processSlurs(hum::HTp slurend)
 
         slur->SetEndid("#" + slurend->getValue("MEI", "xml:id"));
         slur->SetStartid("#" + slurstart->getValue("MEI", "xml:id"));
+        setSlurLocationId(slur, slurstart, slurend, i);
 
         startmeasure->AddChild(slur);
         setStaff(slur, m_currentstaff);
@@ -5909,6 +5910,88 @@ void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, 
     if (subtoken > 0) {
         id += "S" + to_string(subtoken);
     }
+    object->SetUuid(id);
+}
+
+/////////////////////////////
+//
+// HumdrumInput::setSlurLocationId -- Not dealing with cross-over slurs yet, such as &( and &).
+//
+
+void HumdrumInput::setSlurLocationId(Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex)
+{
+    int startline = slurstart->getLineNumber();
+    int startfield = slurstart->getFieldNumber();
+    std::string id = object->GetClassName();
+    std::transform(id.begin(), id.end(), id.begin(), ::tolower);
+    id += "-L" + to_string(startline);
+    id += "F" + to_string(startfield);
+    int count1 = slurstart->getValueInt("auto", "slurEndCount");
+    int count2 = slurend->getValueInt("auto", "slurStartCount");
+    int num1 = 0;
+    int num2 = eindex + 1;
+
+    if ((count1 > 1) || (count2 > 1)) {
+        // resolve which slur is being created.
+        std::string endid = slurend->getValue("auto", "id");
+        std::string startid = slurstart->getValue("auto", "id");
+        std::vector<int> index1(count1, 0);
+        std::vector<int> index2(count2, 0);
+        int counter;
+
+        if (count1 > 0) {
+            counter = 0;
+            for (int i = 0; i < count1; i++) {
+                std::string param = "slurEnd";
+                if (i > 0) {
+                    param += to_string(i + 1);
+                }
+                std::string tid = slurstart->getValue("auto", param);
+                if (tid == endid) {
+                    index1[i] = ++counter;
+                }
+            }
+        }
+
+        if (count2 > 0) {
+            counter = 0;
+            for (int i = 0; i < count2; i++) {
+                std::string param = "slurStart";
+                if (i > 0) {
+                    param += to_string(i + 1);
+                }
+                std::string tid = slurend->getValue("auto", param);
+                if (tid == startid) {
+                    index2[i] = ++counter;
+                }
+            }
+        }
+
+        int targetindex = index2[eindex];
+        auto location = std::find(index1.begin(), index1.end(), targetindex);
+        if (location != index1.end()) {
+            num1 = int(index1.end() - location);
+        }
+    }
+
+    if (num1 > 0) {
+        id += "N";
+        id += to_string(num1);
+    }
+
+    int endline = slurend->getLineNumber();
+    int endfield = slurend->getFieldNumber();
+
+    id += "-L";
+    id += to_string(endline);
+    id += "F";
+    id += to_string(endfield);
+
+    if (num2 > 0) {
+        id += "N";
+        id += to_string(num2);
+    }
+
     object->SetUuid(id);
 }
 
