@@ -154,25 +154,25 @@ namespace humaux {
 
     void HumdrumTie::setTieBelow(void) { m_below = true; }
 
-    void HumdrumTie::insertTieIntoDom(void)
+    Tie *HumdrumTie::insertTieIntoDom(void)
     {
         if (m_inserted) {
             // don't insert again
-            return;
+            return NULL;
         }
         if ((m_startmeasure == NULL) && (m_endmeasure == NULL)) {
             // What are you trying to do?
-            return;
+            return NULL;
         }
         if (m_startmeasure == NULL) {
             // This is a tie with no start.  Don't know what to do with this
             // for now (but is possible due to repeated music).
-            return;
+            return NULL;
         }
         if (m_endmeasure == NULL) {
             // This is a tie with no end.  Don't know what to do with this
             // for now (but is possible due to repeated music).
-            return;
+            return NULL;
         }
 
         vrv::Tie *tie = new vrv::Tie;
@@ -201,10 +201,12 @@ namespace humaux {
             m_startmeasure->AddChild(tie);
             m_inserted = true;
         }
+
+        return tie;
     }
 
     void HumdrumTie::setStart(const std::string &id, Measure *starting, int layer, const std::string &token, int pitch,
-        hum::HumNum starttime, hum::HumNum endtime)
+        hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok)
     {
         m_starttoken = token;
         m_starttime = starttime;
@@ -213,6 +215,8 @@ namespace humaux {
         m_layer = layer;
         m_startmeasure = starting;
         m_startid = id;
+        m_subindex = subindex;
+        m_starttokenpointer = starttok;
     }
 
     void HumdrumTie::setEnd(const std::string &id, Measure *ending, const std::string &token)
@@ -222,10 +226,10 @@ namespace humaux {
         m_endid = id;
     }
 
-    void HumdrumTie::setEndAndInsert(const std::string &id, Measure *ending, const std::string &token)
+    Tie *HumdrumTie::setEndAndInsert(const std::string &id, Measure *ending, const std::string &token)
     {
         setEnd(id, ending, token);
-        insertTieIntoDom();
+        return insertTieIntoDom();
     }
 
     bool HumdrumTie::isInserted(void) { return m_inserted; }
@@ -241,6 +245,10 @@ namespace humaux {
     hum::HumNum HumdrumTie::getDuration(void) { return m_endtime - m_starttime; }
 
     std::string HumdrumTie::getStartToken(void) { return m_starttoken; }
+
+    hum::HTp HumdrumTie::getStartTokenPointer(void) { return m_starttokenpointer; }
+
+    int HumdrumTie::getStartSubindex(void) { return m_subindex; }
 
     std::string HumdrumTie::getEndToken(void) { return m_endtoken; }
 
@@ -4748,11 +4756,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
 
     // handle ties
     if ((tstring.find("[") != string::npos) || (tstring.find("_") != string::npos)) {
-        processTieStart(note, token, tstring);
+        processTieStart(note, token, tstring, subtoken);
     }
 
     if ((tstring.find("_") != string::npos) || (tstring.find("]") != string::npos)) {
-        processTieEnd(note, token, tstring);
+        processTieEnd(note, token, tstring, subtoken);
     }
 
     if (m_signifiers.above) {
@@ -5058,7 +5066,7 @@ void HumdrumInput::addTrill(hum::HTp token)
 // HumdrumInput::processTieStart --
 //
 
-void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string &tstring)
+void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
     vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum timestamp = token->getDurationFromStart();
@@ -5070,7 +5078,7 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
     int pitch = hum::Convert::kernToMidiNoteNumber(tstring);
 
     ss[rtrack].ties.emplace_back();
-    ss[rtrack].ties.back().setStart(noteuuid, m_measure, cl, tstring, pitch, timestamp, endtime);
+    ss[rtrack].ties.back().setStart(noteuuid, m_measure, cl, tstring, pitch, timestamp, endtime, subindex, token);
 
     if (m_signifiers.above) {
         std::string marker = "[";
@@ -5093,7 +5101,7 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 // processTieEnd --
 //
 
-void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &tstring)
+void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
     vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum timestamp = token->getDurationFromStart();
@@ -5137,7 +5145,9 @@ void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &
         return;
     }
 
-    found->setEndAndInsert(noteuuid, m_measure, tstring);
+    Tie *tie = found->setEndAndInsert(noteuuid, m_measure, tstring);
+    setTieLocationId(tie, found->getStartTokenPointer(), found->getStartSubindex(), token, subindex);
+
     if (found->isInserted()) {
         // Only deleting the finished tie if it was successful.  Undeleted
         // ones can be checked later.  They are either encoding errors, or
@@ -5910,6 +5920,37 @@ void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, 
     if (subtoken > 0) {
         id += "S" + to_string(subtoken);
     }
+    object->SetUuid(id);
+}
+
+/////////////////////////////
+//
+// HumdrumInput::setTieLocationId --
+//
+
+void HumdrumInput::setTieLocationId(Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex)
+{
+
+    int startline = tiestart->getLineNumber();
+    int startfield = tiestart->getFieldNumber();
+    int endline = tieend->getLineNumber();
+    int endfield = tieend->getFieldNumber();
+
+    std::string id = object->GetClassName();
+    std::transform(id.begin(), id.end(), id.begin(), ::tolower);
+
+    id += "-L" + to_string(startline);
+    id += "F" + to_string(startfield);
+    if (sindex >= 0) {
+        id += "S" + to_string(sindex + 1);
+    }
+
+    id += "-L" + to_string(endline);
+    id += "F" + to_string(endfield);
+    if (eindex >= 0) {
+        id += "S" + to_string(eindex + 1);
+    }
+
     object->SetUuid(id);
 }
 

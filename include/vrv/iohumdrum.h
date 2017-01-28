@@ -62,16 +62,18 @@ namespace humaux {
         HumdrumTie(const HumdrumTie &anothertie);
         ~HumdrumTie();
         HumdrumTie &operator=(const HumdrumTie &anothertie);
-        void insertTieIntoDom(void);
+        vrv::Tie *insertTieIntoDom(void);
         void setStart(const std::string &id, Measure *starting, int layer, const std::string &token, int pitch,
-            hum::HumNum starttime, hum::HumNum endtime);
+            hum::HumNum starttime, hum::HumNum endtime, int subindex, hum::HTp starttok);
         void setEnd(const std::string &id, Measure *ending, const std::string &token);
-        void setEndAndInsert(const std::string &id, Measure *ending, const std::string &token);
+        vrv::Tie *setEndAndInsert(const std::string &id, Measure *ending, const std::string &token);
         hum::HumNum getEndTime(void);
         hum::HumNum getStartTime(void);
         hum::HumNum getDuration(void);
         std::string getStartToken(void);
+        hum::HTp getStartTokenPointer(void);
         std::string getEndToken(void);
+        int getStartSubindex(void);
         int getPitch(void);
         int getLayer(void);
         bool isInserted(void);
@@ -93,6 +95,8 @@ namespace humaux {
         std::string m_endid;
         Measure *m_startmeasure;
         Measure *m_endmeasure;
+        hum::HTp m_starttokenpointer = NULL;
+        int m_subindex; // the subtoken index for the start of the slur
     };
 
     class HumdrumBeamAndTuplet {
@@ -239,8 +243,8 @@ protected:
     void convertNote(vrv::Note *note, hum::HTp token, int staffindex, int subtoken = -1);
     void addCautionaryAccidental(Accid *accid, hum::HTp token, int acount);
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
-    void processTieStart(Note *note, hum::HTp token, const std::string &tstring);
-    void processTieEnd(Note *note, hum::HTp token, const std::string &tstring);
+    void processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex);
+    void processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void addFermata(hum::HTp token);
     void addTrill(hum::HTp token);
     void getTimingInformation(vector<hum::HumNum> &prespace, vector<hum::HTp> &layerdata, hum::HumNum layerstarttime,
@@ -271,7 +275,7 @@ protected:
     void insertMeterSigElement(
         vector<string> &elements, vector<void *> &pointers, vector<hum::HTp> &layeritems, int index);
     void processSlurs(hum::HTp token);
-	int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool>& indexused);
+    int getSlurEndIndex(hum::HTp token, std::string targetid, std::vector<bool> &indexused);
     void addHarmFloatsForMeasure(int startine, int endline);
     void processDynamics(hum::HTp token, int staffindex);
     void processDirection(hum::HTp token, int staffindex);
@@ -285,7 +289,8 @@ protected:
     void addSpace(vector<string> &elements, vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
-	void setSlurLocationId(vrv::Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex);
+    void setSlurLocationId(vrv::Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex);
+    void setTieLocationId(vrv::Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex);
     void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
     void addOrnamentMarkers(hum::HTp token);
