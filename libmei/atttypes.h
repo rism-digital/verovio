@@ -318,6 +318,12 @@ enum data_HEADSHAPE_list {
     HEADSHAPE_list_slash,
     HEADSHAPE_list_square,
     HEADSHAPE_list_x,
+    
+    /* The following SMuFL glyphs are not part of MEI's data.HEADSHAPE.list */
+    HEADSHAPE_list_circlex,
+    HEADSHAPE_list_filldiamond,
+    HEADSHAPE_list_fillisotriangle,
+
 };
 
 /**

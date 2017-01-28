@@ -1053,6 +1053,7 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     note->WriteColor(currentNode);
     note->WriteColoration(currentNode);
     note->WriteGraced(currentNode);
+    note->WriteNoteheads(currentNode);
     note->WriteNoteLogMensural(currentNode);
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
@@ -2755,6 +2756,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadColor(note);
     vrvNote->ReadColoration(note);
     vrvNote->ReadGraced(note);
+    vrvNote->ReadNoteheads(note);
     vrvNote->ReadNoteLogMensural(note);
     vrvNote->ReadStems(note);
     vrvNote->ReadStemsCmn(note);

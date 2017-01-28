@@ -47,6 +47,51 @@
 #include "verse.h"
 #include "vrv.h"
 
+/**
+  * Translates a MEI head.shape attribute value to a SMuFL glph code
+  * (see http://music-encoding.org/documentation/3.0.0/data.HEADSHAPE.list)
+  * Note that only a few of the strings have been mapped thus far.
+ **/
+/*wchar_t getFontNumber(std::string s)
+{
+    if (s == "filldiamond") return vrv::SMUFL_E0DB_noteheadDiamondBlack;
+    if (s == "diamond") return vrv::SMUFL_E0DD_noteheadDiamondWhite;
+    if (s == "fillisotriangle") return vrv::SMUFL_E0BE_noteheadTriangleUpBlack;
+    if (s == "isotriangle") return vrv::SMUFL_E0BD_noteheadTriangleUpWhite;
+    if (s == "x") return vrv::SMUFL_E0A9_noteheadXBlack;
+    if (s == "circlex") return vrv::SMUFL_E0B3_noteheadCircleX;
+    return 0;
+}
+*/
+wchar_t getFontNumber(vrv::data_HEADSHAPE_list s)
+{
+    wchar_t result = vrv::HEADSHAPE_list_NONE;
+    switch (s) {
+    /* These are not yet all of the MEI headshape glyphs */
+    case vrv::HEADSHAPE_list_diamond: 
+        result= vrv::SMUFL_E0DD_noteheadDiamondWhite;
+        break;
+    case vrv::HEADSHAPE_list_isotriangle: 
+        result= vrv::SMUFL_E0BD_noteheadTriangleUpWhite;
+        break;
+    case vrv::HEADSHAPE_list_x: 
+        result= vrv::SMUFL_E0A9_noteheadXBlack;
+        break;
+    /* The following SMuFL glyphs are not part of MEI's data.HEADSHAPE.list */
+    case vrv::HEADSHAPE_list_circlex: 
+        result= vrv::SMUFL_E0B3_noteheadCircleX;
+        break;
+    case vrv::HEADSHAPE_list_filldiamond: 
+        result= vrv::SMUFL_E0DB_noteheadDiamondBlack;
+        break;
+    case vrv::HEADSHAPE_list_fillisotriangle: 
+        result= vrv::SMUFL_E0BE_noteheadTriangleUpBlack;
+        break;
+    }
+    return result;
+
+}
+
 namespace vrv {
 
 void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1400,6 +1445,10 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
         else {
             fontNo = SMUFL_E0A4_noteheadBlack;
+        }
+
+        if (note->HasHeadShape()) {
+            fontNo = getFontNumber(note->GetHeadShape());
         }
 
         DrawSmuflCode(dc, xNote, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);

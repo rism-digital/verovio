@@ -676,6 +676,10 @@ std::string AttConverter::HeadshapeListToStr(data_HEADSHAPE_list data) const
         case HEADSHAPE_list_slash: value = "slash"; break;
         case HEADSHAPE_list_square: value = "square"; break;
         case HEADSHAPE_list_x: value = "x"; break;
+        /* The following SMuFL glyphs are not part of MEI's data.HEADSHAPE.list */
+        case HEADSHAPE_list_circlex: value = "circlex"; break;
+        case HEADSHAPE_list_filldiamond: value = "filldiamond"; break;
+        case HEADSHAPE_list_fillisotriangle: value = "fillisotriangle"; break;
         default:
             LogWarning("Unknown value '%d' for data.HEADSHAPE.list", data);
             value = "";
@@ -702,6 +706,12 @@ data_HEADSHAPE_list AttConverter::StrToHeadshapeList(std::string value) const
     if (value == "slash") return HEADSHAPE_list_slash;
     if (value == "square") return HEADSHAPE_list_square;
     if (value == "x") return HEADSHAPE_list_x;
+
+    /* The following SMuFL glyphs are not part of MEI's data.HEADSHAPE.list */
+    if (value == "circlex") return HEADSHAPE_list_circlex;
+    if (value == "filldiamond") return HEADSHAPE_list_filldiamond;
+    if (value == "fillisotriangle") return HEADSHAPE_list_fillisotriangle;
+
     LogWarning("Unsupported value '%s' for data.HEADSHAPE.list", value.c_str());
     return HEADSHAPE_list_NONE;
 }
