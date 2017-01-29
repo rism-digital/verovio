@@ -245,7 +245,7 @@ protected:
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
     void processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
-    void addFermata(hum::HTp token);
+    void addFermata(hum::HTp token, vrv::Object *parent);
     void addTrill(hum::HTp token);
     void getTimingInformation(std::vector<hum::HumNum> &prespace, std::vector<hum::HTp> &layerdata,
         hum::HumNum layerstarttime, hum::HumNum layerendtime);

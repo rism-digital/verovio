@@ -2396,7 +2396,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processDirection(layerdata[i], staffindex);
             addArticulations(chord, layerdata[i]);
             addTrill(layerdata[i]);
-            addFermata(layerdata[i]);
+            addFermata(layerdata[i], chord);
         }
         else if (layerdata[i]->isRest()) {
             if (layerdata[i]->find("yy") != string::npos) {
@@ -2437,7 +2437,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             colorNote(note, *layerdata[i], line, field);
             addArticulations(note, layerdata[i]);
             addTrill(layerdata[i]);
-            addFermata(layerdata[i]);
+            addFermata(layerdata[i], note);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -5035,7 +5035,7 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
 // HumdrumInput::addFermata -- Add floating fermatas for note/chord.
 //
 
-void HumdrumInput::addFermata(hum::HTp token)
+void HumdrumInput::addFermata(hum::HTp token, Object *parent)
 {
     int layer = m_currentlayer;
     int staff = m_currentstaff;
@@ -5046,7 +5046,14 @@ void HumdrumInput::addFermata(hum::HTp token)
             appendElement(m_measure, fermata);
             setStaff(fermata, staff);
             hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
-            fermata->SetTstamp(tstamp.getFloat());
+            if (token->find("q") != std::string::npos) {
+                // grace notes cannot be addressed with @tstamp, so
+                // have to use @startid
+                fermata->SetStartid("#" + parent->GetUuid());
+            }
+            else {
+                fermata->SetTstamp(tstamp.getFloat());
+            }
             // if a barline, then can have two fermatas
             setLocationId(fermata, token);
 
