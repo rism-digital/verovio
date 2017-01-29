@@ -265,6 +265,7 @@ namespace humaux {
         ottavameasure = NULL;
         ties.clear();
         meter_bottom = 4;
+        meter_top = 4;
     }
 
 } // end namespace humaux
@@ -467,10 +468,10 @@ bool HumdrumInput::convertHumdrum(void)
     setupMeiDocument();
 
     // Create a list of the parts and which spine represents them.
-    vector<hum::HTp> &kernstarts = m_kernstarts;
+    std::vector<hum::HTp> &kernstarts = m_kernstarts;
     kernstarts = infile.getKernSpineStartList();
 
-    vector<hum::HTp> spinestarts;
+    std::vector<hum::HTp> spinestarts;
     infile.getSpineStartList(spinestarts);
     for (auto it : spinestarts) {
         if (it->isDataType("**mxhm")) {
@@ -561,8 +562,8 @@ bool HumdrumInput::convertHumdrum(void)
 void HumdrumInput::createHeader(void)
 {
     hum::HumdrumFile &infile = m_infile;
-    vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
-    vector<vector<string> > respPeople;
+    std::vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
+    std::vector<std::vector<string> > respPeople;
     getRespPeople(respPeople, references);
 
     // <fileDesc> /////////////
@@ -694,7 +695,7 @@ void HumdrumInput::createHeader(void)
 // HumdrumInput::getReferenceValue --
 //
 
-string HumdrumInput::getReferenceValue(const std::string &key, vector<hum::HumdrumLine *> &references)
+string HumdrumInput::getReferenceValue(const std::string &key, std::vector<hum::HumdrumLine *> &references)
 {
     for (int i = 0; i < (int)references.size(); i++) {
         if (key == references[i]->getReferenceKey()) {
@@ -724,7 +725,7 @@ string HumdrumInput::getDateString(void)
 // HumdrumInput::insertRespStmt -- Print a list of composer and/or lyricist.
 //
 
-void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, vector<vector<string> > &respPeople)
+void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::vector<string> > &respPeople)
 {
     if (respPeople.size() == 0) {
         return;
@@ -752,7 +753,8 @@ void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, vector<vector<strin
 //       short descriptions of relator codes
 //
 
-void HumdrumInput::getRespPeople(vector<vector<string> > &respPeople, vector<hum::HumdrumLine *> &references)
+void HumdrumInput::getRespPeople(
+    std::vector<std::vector<string> > &respPeople, std::vector<hum::HumdrumLine *> &references)
 {
 
     // precalculate a reference map here to make more O(N) rather than O(N^2)
@@ -780,7 +782,7 @@ void HumdrumInput::getRespPeople(vector<vector<string> > &respPeople, vector<hum
 // HumdrumInput::addPerson --
 //
 
-void HumdrumInput::addPerson(vector<vector<string> > &respPeople, vector<hum::HumdrumLine *> &references,
+void HumdrumInput::addPerson(std::vector<std::vector<string> > &respPeople, std::vector<hum::HumdrumLine *> &references,
     const std::string &key, const std::string &role)
 {
     for (int i = 0; i < (int)references.size(); i++) {
@@ -800,7 +802,7 @@ void HumdrumInput::addPerson(vector<vector<string> > &respPeople, vector<hum::Hu
 //     <extMeta> element.
 //
 
-void HumdrumInput::insertExtMeta(vector<hum::HumdrumLine *> &references)
+void HumdrumInput::insertExtMeta(std::vector<hum::HumdrumLine *> &references)
 {
     stringstream xmldata;
     xmldata << "<extMeta>\n";
@@ -832,7 +834,7 @@ void HumdrumInput::insertExtMeta(vector<hum::HumdrumLine *> &references)
 // HumdrumInput::insertTitle --
 //
 
-void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<hum::HumdrumLine *> &references)
+void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const std::vector<hum::HumdrumLine *> &references)
 {
     std::string key;
     std::string value;
@@ -931,10 +933,10 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const vector<hum::Humd
 void HumdrumInput::prepareVerses(void)
 {
     int i, j;
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     // ss[*].verse should already be set to false.
 
-    vector<hum::HTp> &kern = m_kernstarts;
+    std::vector<hum::HTp> &kern = m_kernstarts;
 
     if (kern.size() == 0) {
         return;
@@ -968,9 +970,9 @@ void HumdrumInput::prepareVerses(void)
 
 void HumdrumInput::prepareTimeSigDur(void)
 {
-    vector<hum::HumNum> &sigdurs = m_timesigdurs;
+    std::vector<hum::HumNum> &sigdurs = m_timesigdurs;
     hum::HumdrumFile &infile = m_infile;
-    vector<hum::HTp> spinestarts;
+    std::vector<hum::HTp> spinestarts;
 
     sigdurs.resize(infile.getLineCount());
     std::fill(sigdurs.begin(), sigdurs.end(), -1);
@@ -1041,9 +1043,9 @@ void HumdrumInput::prepareTimeSigDur(void)
 
 void HumdrumInput::calculateReverseKernIndex(void)
 {
-    vector<int> &rkern = m_rkern;
+    std::vector<int> &rkern = m_rkern;
     hum::HumdrumFile &infile = m_infile;
-    const vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
 
     rkern.resize(infile.getSpineCount() + 1);
     std::fill(rkern.begin(), rkern.end(), -1);
@@ -1059,7 +1061,7 @@ void HumdrumInput::calculateReverseKernIndex(void)
 
 void HumdrumInput::prepareStaffGroup(void)
 {
-    const vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
 
     m_staffgroup = new StaffGrp();
     m_doc->m_scoreDef.AddChild(m_staffgroup);
@@ -1118,7 +1120,7 @@ void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart)
 
 void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber)
 {
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     std::string label;
     std::string abbreviation;
@@ -1157,6 +1159,7 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber)
         else if (sscanf(part->c_str(), "*M%d/%d", &top, &bot) == 2) {
             timesig = *part;
             ss[partnumber - 1].meter_bottom = bot;
+            ss[partnumber - 1].meter_top = top;
         }
         part = part->getNextToken();
     }
@@ -1206,7 +1209,7 @@ string HumdrumInput::getAutoClef(hum::HTp partstart, int partnumber)
 {
     hum::HTp tok = partstart;
     int ptrack = partstart->getTrack();
-    vector<int> dhist(100, 0);
+    std::vector<int> dhist(100, 0);
     int diatonic;
     while (tok) {
         if (tok->isInterpretation()) {
@@ -1568,7 +1571,7 @@ void HumdrumInput::checkForOmd(int startline, int endline)
     }
     m_omd = true;
 
-    const vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
     if (kernstarts.size() == 0) {
         return;
     }
@@ -1615,9 +1618,9 @@ template <class ELEMENT> void HumdrumInput::setStaff(ELEMENT element, int staffn
 void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
 {
     hum::HumdrumFile &infile = m_infile;
-    const vector<hum::HTp> &kernstarts = m_kernstarts;
-    const vector<int> &rkern = m_rkern;
-    vector<vector<vector<hum::HTp> > > &lt = m_layertokens;
+    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<int> &rkern = m_rkern;
+    std::vector<std::vector<std::vector<hum::HTp> > > &lt = m_layertokens;
 
     lt.clear();
     lt.resize(kernstarts.size());
@@ -1683,14 +1686,14 @@ void HumdrumInput::storeStaffLayerTokensForMeasure(int startline, int endline)
 
 bool HumdrumInput::convertMeasureStaves(int startline, int endline)
 {
-    const vector<hum::HTp> &kernstarts = m_kernstarts;
+    const std::vector<hum::HTp> &kernstarts = m_kernstarts;
 
-    vector<int> layers = getStaffLayerCounts();
+    std::vector<int> layers = getStaffLayerCounts();
 
     int i;
 
     // pre-allocate
-    vector<Staff *> stafflist(kernstarts.size());
+    std::vector<Staff *> stafflist(kernstarts.size());
     for (i = 0; i < (int)kernstarts.size(); i++) {
         stafflist[i] = new Staff();
         m_measure->AddChild(stafflist[i]);
@@ -1987,9 +1990,9 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
     m_layer->SetN(layerindex + 1);
     m_staff->AddChild(m_layer);
 
-    vector<int> &rkern = m_rkern;
+    std::vector<int> &rkern = m_rkern;
     int staffindex = rkern[track];
-    vector<hum::HTp> &layerdata = m_layertokens[staffindex][layerindex];
+    std::vector<hum::HTp> &layerdata = m_layertokens[staffindex][layerindex];
 
     if (layerdata.size() > 0) {
         if (layerdata[0]->size() > 0) {
@@ -2024,7 +2027,7 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 // HumdrumInput::printGroupInfo --
 //
 
-void HumdrumInput::printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, const vector<hum::HTp> &layerdata)
+void HumdrumInput::printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg, const std::vector<hum::HTp> &layerdata)
 {
     if (layerdata.size() != tg.size()) {
         cerr << "LAYER SIZE = " << layerdata.size() << "\tTGSIZE" << tg.size() << endl;
@@ -2056,8 +2059,8 @@ void HumdrumInput::printGroupInfo(vector<humaux::HumdrumBeamAndTuplet> &tg, cons
 // HumdrumInput::setBeamDirection -- Set a beam up or down.
 //
 
-void HumdrumInput::setBeamDirection(int direction, const vector<humaux::HumdrumBeamAndTuplet> &tgs,
-    vector<hum::HTp> &layerdata, int layerindex, bool grace)
+void HumdrumInput::setBeamDirection(int direction, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
+    std::vector<hum::HTp> &layerdata, int layerindex, bool grace)
 {
     const humaux::HumdrumBeamAndTuplet &tg = tgs[layerindex];
     int beamstart = tg.beamstart;
@@ -2102,13 +2105,13 @@ void HumdrumInput::setBeamDirection(int direction, const vector<humaux::HumdrumB
 // HumdrumInput::handleGroupStarts --
 //
 
-void HumdrumInput::handleGroupStarts(const vector<humaux::HumdrumBeamAndTuplet> &tgs, vector<string> &elements,
-    vector<void *> &pointers, vector<hum::HTp> &layerdata, int layerindex)
+void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
+    std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> &layerdata, int layerindex)
 {
     Beam *beam;
     const humaux::HumdrumBeamAndTuplet &tg = tgs[layerindex];
     hum::HTp token = layerdata[layerindex];
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     int staffindex = m_currentstaff - 1;
 
     if (tg.beamstart || tg.gbeamstart) {
@@ -2171,7 +2174,7 @@ void HumdrumInput::handleGroupStarts(const vector<humaux::HumdrumBeamAndTuplet> 
 //
 
 void HumdrumInput::handleGroupEnds(
-    const humaux::HumdrumBeamAndTuplet &tg, vector<string> &elements, vector<void *> &pointers)
+    const humaux::HumdrumBeamAndTuplet &tg, std::vector<string> &elements, std::vector<void *> &pointers)
 {
     if (tg.beamend && tg.tupletend) {
         if (tg.priority == 'T') {
@@ -2206,14 +2209,14 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
 {
     int i;
     hum::HumdrumFile &infile = m_infile;
-    vector<hum::HumNum> &timesigdurs = m_timesigdurs;
-    vector<int> &rkern = m_rkern;
+    std::vector<hum::HumNum> &timesigdurs = m_timesigdurs;
+    std::vector<int> &rkern = m_rkern;
     int staffindex = rkern[track];
     if (staffindex < 0) {
         // not a kern spine.
         return false;
     }
-    vector<hum::HTp> &layerdata = m_layertokens[staffindex][layerindex];
+    std::vector<hum::HTp> &layerdata = m_layertokens[staffindex][layerindex];
     Layer *&layer = m_layer;
 
     if (layerdata.size() == 0) {
@@ -2234,7 +2237,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
     hum::HumNum layerstarttime = infile[startline].getDurationFromStart();
     hum::HumNum layerendtime = infile[endline].getDurationFromStart();
 
-    vector<hum::HumNum> prespace;
+    std::vector<hum::HumNum> prespace;
     getTimingInformation(prespace, layerdata, layerstarttime, layerendtime);
 
     if (emptyMeasures()) {
@@ -2251,8 +2254,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         return true;
     }
 
-    vector<string> elements;
-    vector<void *> pointers;
+    std::vector<string> elements;
+    std::vector<void *> pointers;
     elements.push_back("layer");
     pointers.push_back((void *)layer);
 
@@ -2312,13 +2315,20 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             }
         }
 
+        // check for fermatas to be placed on next barline
+        if ((layerindex == 0) && (!layerdata.empty()) && (layerdata.back()->at(0) == '=')) {
+            if (layerdata.back()->find(";") != std::string::npos) {
+                addFermata(layerdata.back(), NULL);
+            }
+        }
+
         // probably better to mark the rest in Humdrum data
         // as a full-measure rest here, and then process the
         // measure as normal below.
         return true;
     }
 
-    vector<humaux::HumdrumBeamAndTuplet> tg;
+    std::vector<humaux::HumdrumBeamAndTuplet> tg;
     prepareBeamAndTupletGroups(layerdata, tg);
 
     if (m_debug) {
@@ -2449,6 +2459,13 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             // rhythmically too short, so add a space element to match the
             // amount of underfilling.
             addSpace(elements, pointers, prespace.back());
+        }
+    }
+
+    // check for fermatas to be placed on next barline
+    if ((layerindex == 0) && (!layerdata.empty()) && (layerdata.back()->at(0) == '=')) {
+        if (layerdata.back()->find(";") != std::string::npos) {
+            addFermata(layerdata.back(), NULL);
         }
     }
 
@@ -2716,7 +2733,7 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
 //    to match the required duration.
 //
 
-void HumdrumInput::addSpace(vector<string> &elements, vector<void *> &pointers, hum::HumNum duration)
+void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &pointers, hum::HumNum duration)
 {
     while (duration > 0) {
         Space *space = new Space;
@@ -2796,7 +2813,7 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
     std::string tok;
     std::string dynamic;
     hum::HumdrumLine *line = token->getLine();
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     if (line == NULL) {
         return;
     }
@@ -3153,12 +3170,12 @@ hum::HTp HumdrumInput::getHairpinEnd(hum::HTp token, const std::string &endchar)
 //////////////////////////////
 //
 // HumdrumInput::getMeasureTstamp --
-//     defatult value: fract = 0.0;
+//     default value: fract = 0.0;
 //
 
 hum::HumNum HumdrumInput::getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum fract)
 {
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum qbeat = token->getDurationFromBarline();
     if (fract > 0) {
         qbeat += fract * token->getDuration().getAbs();
@@ -3166,6 +3183,19 @@ hum::HumNum HumdrumInput::getMeasureTstamp(hum::HTp token, int staffindex, hum::
     hum::HumNum mfactor = ss[staffindex].meter_bottom / 4;
     hum::HumNum mbeat = qbeat * mfactor + 1;
     return mbeat;
+}
+
+//////////////////////////////
+//
+// HumdrumInput::getMeasureEndTstamp -- Return the tstamp of the end of the
+//     measure (the next barline). (@meter.count + 1)
+//     default value: fract = 0.0;
+//
+
+hum::HumNum HumdrumInput::getMeasureEndTstamp(int staffindex)
+{
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    return ss[staffindex].meter_top + 1;
 }
 
 /////////////////////////////
@@ -3188,7 +3218,7 @@ template <class ELEMENT> void HumdrumInput::addTextElement(ELEMENT *element, con
 void HumdrumInput::processSlurs(hum::HTp slurend)
 {
     int startcount = slurend->getValueInt("auto", "slurStartCount");
-    vector<bool> indexused(32, false);
+    std::vector<bool> indexused(32, false);
 
     for (int i = 0; i < startcount; i++) {
 
@@ -3315,7 +3345,7 @@ int HumdrumInput::getSlurEndIndex(hum::HTp token, std::string targetid, std::vec
 //
 
 void HumdrumInput::insertMeterSigElement(
-    vector<string> &elements, vector<void *> &pointers, vector<hum::HTp> &layerdata, int index)
+    std::vector<string> &elements, std::vector<void *> &pointers, std::vector<hum::HTp> &layerdata, int index)
 {
     hum::HTp tsig = layerdata[index];
     if (tsig->getDurationFromStart() <= 0) {
@@ -3353,6 +3383,7 @@ void HumdrumInput::insertMeterSigElement(
 
 void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 {
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumdrumFile &infile = m_infile;
 
     hum::HTp keysig = NULL;
@@ -3395,6 +3426,11 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
             unit = stoi(matches[2]);
             scoreDef->SetMeterCount(count);
             scoreDef->SetMeterUnit(unit);
+            for (int i = 0; i < (int)ss.size(); i++) {
+                // assuming only a single time sig. at a time.
+                ss[i].meter_top = count;
+                ss[i].meter_bottom = unit;
+            }
         }
     }
 
@@ -3410,7 +3446,7 @@ void HumdrumInput::addSystemKeyTimeChange(int startline, int endline)
 // the movement.
 //
 
-Clef *HumdrumInput::insertClefElement(vector<string> &elements, vector<void *> &pointers, hum::HTp token)
+Clef *HumdrumInput::insertClefElement(std::vector<string> &elements, std::vector<void *> &pointers, hum::HTp token)
 {
     Clef *clef = new Clef;
     appendElement(elements, pointers, clef);
@@ -3454,11 +3490,12 @@ Clef *HumdrumInput::insertClefElement(vector<string> &elements, vector<void *> &
 // HumdrumInput::analyzeLayerBeams --
 //
 
-void HumdrumInput::analyzeLayerBeams(vector<int> &beamnum, vector<int> &gbeamnum, const vector<hum::HTp> &layerdata)
+void HumdrumInput::analyzeLayerBeams(
+    std::vector<int> &beamnum, std::vector<int> &gbeamnum, const std::vector<hum::HTp> &layerdata)
 {
 
-    vector<int> beamstate(layerdata.size(), 0);
-    vector<int> gbeamstate(layerdata.size(), 0); // for grace notes
+    std::vector<int> beamstate(layerdata.size(), 0);
+    std::vector<int> gbeamstate(layerdata.size(), 0); // for grace notes
     int negativeQ = 0;
     int gnegativeQ = 0;
 
@@ -3562,10 +3599,10 @@ void HumdrumInput::analyzeLayerBeams(vector<int> &beamnum, vector<int> &gbeamnum
 // HumdrumInput::insertTuplet --
 //
 
-void HumdrumInput::insertTuplet(vector<string> &elements, vector<void *> &pointers,
+void HumdrumInput::insertTuplet(std::vector<string> &elements, std::vector<void *> &pointers,
     const humaux::HumdrumBeamAndTuplet &tg, hum::HTp token, bool suppress)
 {
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     Tuplet *tuplet = new Tuplet;
     appendElement(elements, pointers, tuplet);
@@ -3617,7 +3654,7 @@ void HumdrumInput::insertTuplet(vector<string> &elements, vector<void *> &pointe
 //
 
 Beam *HumdrumInput::insertBeam(
-    vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg)
+    std::vector<string> &elements, std::vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg)
 {
     Beam *beam = new Beam;
     appendElement(elements, pointers, beam);
@@ -3632,7 +3669,7 @@ Beam *HumdrumInput::insertBeam(
 //
 
 Beam *HumdrumInput::insertGBeam(
-    vector<string> &elements, vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg)
+    std::vector<string> &elements, std::vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg)
 {
     Beam *gbeam = new Beam;
     appendElement(elements, pointers, gbeam);
@@ -3646,7 +3683,7 @@ Beam *HumdrumInput::insertGBeam(
 // HumdrumInput::removeBeam --
 //
 
-void HumdrumInput::removeBeam(vector<string> &elements, vector<void *> &pointers)
+void HumdrumInput::removeBeam(std::vector<string> &elements, std::vector<void *> &pointers)
 {
     if (elements.back() != "beam") {
         cerr << "ERROR REMOVING BEAM" << endl;
@@ -3665,7 +3702,7 @@ void HumdrumInput::removeBeam(vector<string> &elements, vector<void *> &pointers
 // HumdrumInput::removeGBeam --
 //
 
-void HumdrumInput::removeGBeam(vector<string> &elements, vector<void *> &pointers)
+void HumdrumInput::removeGBeam(std::vector<string> &elements, std::vector<void *> &pointers)
 {
     if (elements.back() != "gbeam") {
         cerr << "ERROR REMOVING GBEAM" << endl;
@@ -3684,7 +3721,7 @@ void HumdrumInput::removeGBeam(vector<string> &elements, vector<void *> &pointer
 // HumdrumInput::removeTuplet --
 //
 
-void HumdrumInput::removeTuplet(vector<string> &elements, vector<void *> &pointers)
+void HumdrumInput::removeTuplet(std::vector<string> &elements, std::vector<void *> &pointers)
 {
     if (elements.back() != "tuplet") {
         cerr << "ERROR REMOVING Tuplet" << endl;
@@ -3709,11 +3746,11 @@ void HumdrumInput::removeTuplet(vector<string> &elements, vector<void *> &pointe
 //
 
 void HumdrumInput::prepareBeamAndTupletGroups(
-    const vector<hum::HTp> &layerdata, vector<humaux::HumdrumBeamAndTuplet> &tg)
+    const std::vector<hum::HTp> &layerdata, std::vector<humaux::HumdrumBeamAndTuplet> &tg)
 {
 
-    vector<int> beamnum;
-    vector<int> gbeamnum;
+    std::vector<int> beamnum;
+    std::vector<int> gbeamnum;
     analyzeLayerBeams(beamnum, gbeamnum, layerdata);
 
     int i;
@@ -3722,17 +3759,17 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // duritems == a list of items in the layer which have duration.
     // Grace notes, barlines, interpretations, local comments, global comments,
     // etc. are filtered out for the analysis.
-    vector<hum::HTp> duritems;
+    std::vector<hum::HTp> duritems;
 
     // indexmapping == maping from a duritem index to a layerdata index.
-    vector<int> indexmapping;
+    std::vector<int> indexmapping;
 
     // indexmapping2 == mapping from a layerdata index to a duritem index,
     // with -1 meaning no mapping.
-    vector<int> indexmapping2;
+    std::vector<int> indexmapping2;
 
     // durbeamnum == beam numbers for durational items only.
-    vector<int> durbeamnum;
+    std::vector<int> durbeamnum;
 
     // Extract a list of the layer items which have duration:
     for (i = 0; i < (int)layerdata.size(); i++) {
@@ -3763,9 +3800,9 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // poweroftwo == keeps track whether durations are based on a power
     // (non-tuplet) or not (tuplet).  Notes/rests with false poweroftwo
     // will be grouped into tuplets.
-    vector<bool> poweroftwo(duritems.size());
+    std::vector<bool> poweroftwo(duritems.size());
     bool hastupletQ = false;
-    vector<hum::HumNum> dotlessdur(duritems.size());
+    std::vector<hum::HumNum> dotlessdur(duritems.size());
     for (i = 0; i < (int)duritems.size(); i++) {
         hum::HumNum duration = hum::Convert::recipToDurationNoDots(*duritems[i]);
         dotlessdur[i] = duration;
@@ -3773,7 +3810,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         hastupletQ |= !poweroftwo[i];
     }
 
-    // Count the number of beams.  The durbeamnum vector contains a list
+    // Count the number of beams.  The durbeamnum std::vector contains a list
     // of beam numbers starting from 1 (or 0 if a note/rest has no beam).
     int beamcount = 0;
     for (i = 0; i < (int)durbeamnum.size(); i++) {
@@ -3784,9 +3821,9 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
     // beamstarts and beamends are lists of the starting and ending
     // index for beams of duration items in the layer.  The index is
-    // into the durlist vector (list of items which posses duration).
-    vector<int> beamstarts(beamcount, -1);
-    vector<int> beamends(beamcount, 0);
+    // into the durlist std::vector (list of items which posses duration).
+    std::vector<int> beamstarts(beamcount, -1);
+    std::vector<int> beamends(beamcount, 0);
     for (i = 0; i < (int)durbeamnum.size(); i++) {
         if (durbeamnum[i]) {
             if (beamstarts[durbeamnum[i] - 1] < 0) {
@@ -3798,8 +3835,8 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
     // beamstartboolean == starting of a beam on a particular note
     // beamendboolean == ending of a beam on a particular note
-    vector<int> beamstartboolean(durbeamnum.size(), 0);
-    vector<int> beamendboolean(durbeamnum.size(), 0);
+    std::vector<int> beamstartboolean(durbeamnum.size(), 0);
+    std::vector<int> beamendboolean(durbeamnum.size(), 0);
     for (i = 0; i < (int)beamstarts.size(); i++) {
         beamstartboolean[beamstarts[i]] = i + 1;
         beamendboolean[beamends[i]] = i + 1;
@@ -3810,9 +3847,9 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // a gracenote beam.  Generalize further if so.
     // gbeamstart == boolean for starting of a grace note beam
     // gbeamend == boolean ending of a grace note beam
-    vector<int> gbeamstart(layerdata.size(), 0);
-    vector<int> gbeamend(layerdata.size(), 0);
-    vector<int> gstate(layerdata.size(), 0);
+    std::vector<int> gbeamstart(layerdata.size(), 0);
+    std::vector<int> gbeamend(layerdata.size(), 0);
+    std::vector<int> gstate(layerdata.size(), 0);
     for (i = 0; i < (int)gbeamnum.size(); i++) {
         if (!gbeamnum[i]) {
             continue;
@@ -3855,15 +3892,15 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     }
 
     // fulldur == full duration of the note/rest including augmentation dots.
-    vector<hum::HumNum> fulldur(duritems.size());
+    std::vector<hum::HumNum> fulldur(duritems.size());
 
     // dursum = a cumulative sum of the full durs, starting at 0 for
     // the first index.
-    vector<hum::HumNum> dursum(duritems.size());
+    std::vector<hum::HumNum> dursum(duritems.size());
 
     hum::HumNum sum = 0;
-    vector<int> twocounttop(dotlessdur.size(), 0);
-    vector<int> twocountbot(dotlessdur.size(), 0);
+    std::vector<int> twocounttop(dotlessdur.size(), 0);
+    std::vector<int> twocountbot(dotlessdur.size(), 0);
     for (i = 0; i < (int)dotlessdur.size(); i++) {
         dotlessdur[i] = removeFactorsOfTwo(dotlessdur[i], twocounttop[i], twocountbot[i]);
         fulldur[i] = hum::Convert::recipToDuration(*duritems[i]);
@@ -3872,7 +3909,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     }
 
     // beamdur = a list of the durations for each beam.
-    vector<hum::HumNum> beamdur(beamstarts.size());
+    std::vector<hum::HumNum> beamdur(beamstarts.size());
     for (i = 0; i < (int)beamdur.size(); i++) {
         beamdur[i] = dursum[beamends[i]] - dursum[beamstarts[i]] + fulldur[beamends[i]];
     }
@@ -3880,12 +3917,12 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // beampowdot == the number of augmentation dots on a power of two for
     // the duration of the beam.  -1 means could not be made power of two with
     // dots.
-    vector<int> beampowdot(beamstarts.size(), -1);
+    std::vector<int> beampowdot(beamstarts.size(), -1);
     for (i = 0; i < (int)beampowdot.size(); i++) {
         beampowdot[i] = getDotPowerOfTwo(beamdur[i]);
     }
 
-    vector<bool> binarybeams(beamstarts.size(), false);
+    std::vector<bool> binarybeams(beamstarts.size(), false);
     for (i = 0; i < (int)binarybeams.size(); i++) {
         if (poweroftwo[beamstarts[i]]) {
             binarybeams[i] = true;
@@ -3896,16 +3933,16 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     // a tuplet group.  Perhaps bias towards beampowdot being 0, and try to
     // beam groups to include non-beamed tuplets into lower powdots.
     // Should check that the factors of notes in the beam group all match...
-    vector<int> tupletgroups(poweroftwo.size(), 0);
+    std::vector<int> tupletgroups(poweroftwo.size(), 0);
 
     // tupletbracket == boolean for if the tuplet group requires a bracket.
     // It will require a bracket if they are not all enclosed in a beam.
-    vector<int> tupletbracket(poweroftwo.size(), -1);
+    std::vector<int> tupletbracket(poweroftwo.size(), -1);
     int tupletnum = 1;
     int j;
 
     // adjusted tuplet number by tuplet group
-    vector<int> adjustcount;
+    std::vector<int> adjustcount;
 
     hum::HumNum tupletdur = 0;
     int tupletcount = 0;
@@ -3954,12 +3991,12 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
     }
 
-    vector<bool> beamstarts2(poweroftwo.size(), false);
+    std::vector<bool> beamstarts2(poweroftwo.size(), false);
     for (int i = 0; i < (int)beamstarts.size(); i++) {
         beamstarts2[beamstarts[i]] = true;
     }
 
-    vector<bool> beamends2(poweroftwo.size(), false);
+    std::vector<bool> beamends2(poweroftwo.size(), false);
     for (int i = 0; i < (int)beamends.size(); i++) {
         beamends2[beamends[i]] = true;
     }
@@ -4034,10 +4071,10 @@ void HumdrumInput::prepareBeamAndTupletGroups(
 
     // tupletstartboolean == starting of a tuplet group
     // tupletendboolean == ending of a tuplet group
-    vector<int> tupletstartboolean(tupletgroups.size(), 0);
-    vector<int> tupletendboolean(tupletgroups.size(), 0);
-    vector<bool> tstart(tupletgroups.size(), false);
-    vector<bool> tend(tupletgroups.size(), false);
+    std::vector<int> tupletstartboolean(tupletgroups.size(), 0);
+    std::vector<int> tupletendboolean(tupletgroups.size(), 0);
+    std::vector<bool> tstart(tupletgroups.size(), false);
+    std::vector<bool> tend(tupletgroups.size(), false);
     for (i = 0; i < (int)tupletgroups.size(); i++) {
         if (!tupletgroups[i]) {
             continue;
@@ -4057,8 +4094,8 @@ void HumdrumInput::prepareBeamAndTupletGroups(
         }
     }
 
-    vector<int> tuptop(tupletgroups.size(), -1);
-    vector<int> tupbot(tupletgroups.size(), -1);
+    std::vector<int> tuptop(tupletgroups.size(), -1);
+    std::vector<int> tupbot(tupletgroups.size(), -1);
     for (i = 0; i < (int)tupletgroups.size(); i++) {
         if (!tupletgroups[i]) {
             continue;
@@ -4086,7 +4123,7 @@ void HumdrumInput::prepareBeamAndTupletGroups(
     int starti = -1;
     hum::HumNum vdur;
     hum::HumNum val2;
-    vector<int> tupletscale;
+    std::vector<int> tupletscale;
     for (i = 0; i < (int)tupletstartboolean.size(); i++) {
         if (tupletstartboolean[i]) {
             state = 1;
@@ -4278,7 +4315,7 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
 {
     int staffindex = m_currentstaff - 1;
     std::string value = *token;
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     if (value == "*Xbeamtup") {
         ss[staffindex].suppress_beam_tuplet = true;
     }
@@ -4312,7 +4349,7 @@ void HumdrumInput::handleStaffStateVariables(hum::HTp token)
 
 void HumdrumInput::handleOttavaMark(hum::HTp token, Note *note)
 {
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     int staffindex = m_currentstaff - 1;
 
     if (*token == "*8va") {
@@ -4437,15 +4474,15 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
 //     of each event so that partial layers can be filled in with <space>
 //     elements if necessary.
 
-void HumdrumInput::getTimingInformation(
-    vector<hum::HumNum> &prespace, vector<hum::HTp> &layerdata, hum::HumNum layerstarttime, hum::HumNum layerendtime)
+void HumdrumInput::getTimingInformation(std::vector<hum::HumNum> &prespace, std::vector<hum::HTp> &layerdata,
+    hum::HumNum layerstarttime, hum::HumNum layerendtime)
 {
     prespace.resize(layerdata.size());
     if (prespace.size() > 0) {
         prespace[0] = 0;
     }
-    vector<hum::HumNum> startdur(layerdata.size());
-    vector<hum::HumNum> duration(layerdata.size());
+    std::vector<hum::HumNum> startdur(layerdata.size());
+    std::vector<hum::HumNum> duration(layerdata.size());
     hum::HumNum correction = 0;
     for (int i = 0; i < (int)layerdata.size(); i++) {
         startdur[i] = layerdata[i]->getDurationFromStart();
@@ -4484,7 +4521,7 @@ void HumdrumInput::getTimingInformation(
 //     time signature.
 //
 
-bool HumdrumInput::hasFullMeasureRest(vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur)
+bool HumdrumInput::hasFullMeasureRest(std::vector<hum::HTp> &layerdata, hum::HumNum timesigdur, hum::HumNum measuredur)
 {
     if (timesigdur != measuredur) {
         return false;
@@ -4529,7 +4566,7 @@ template <class PARENT, class CHILD> void HumdrumInput::appendElement(PARENT par
 //
 
 template <class CHILD>
-void HumdrumInput::appendElement(const vector<string> &name, const vector<void *> &pointers, CHILD child)
+void HumdrumInput::appendElement(const std::vector<string> &name, const std::vector<void *> &pointers, CHILD child)
 {
     if (name.back() == "beam") {
         appendElement((Beam *)pointers.back(), child);
@@ -4659,7 +4696,7 @@ template <class ELEMENT> void HumdrumInput::checkForAutoStem(ELEMENT element, hu
 
 void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int subtoken)
 {
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
     std::string tstring;
     int stindex = 0;
@@ -4887,7 +4924,7 @@ void HumdrumInput::addCautionaryAccidental(Accid *accid, hum::HTp token, int aco
 void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
 {
     int staff = m_rkern[token->getTrack()];
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     if (!ss[staff].verse) {
         return;
     }
@@ -5033,6 +5070,7 @@ template <class ELEMENT> hum::HumNum HumdrumInput::convertRhythm(ELEMENT element
 //////////////////////////////
 //
 // HumdrumInput::addFermata -- Add floating fermatas for note/chord.
+//     default value: parent = NULL
 //
 
 void HumdrumInput::addFermata(hum::HTp token, Object *parent)
@@ -5040,44 +5078,75 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
     int layer = m_currentlayer;
     int staff = m_currentstaff;
 
-    if (token->find(";") != string::npos) {
-        if ((token->find("yy") == string::npos) && (token->find(";y") == string::npos)) {
-            Fermata *fermata = new Fermata;
-            appendElement(m_measure, fermata);
-            setStaff(fermata, staff);
-            hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
-            if (token->find("q") != std::string::npos) {
-                // grace notes cannot be addressed with @tstamp, so
-                // have to use @startid
-                fermata->SetStartid("#" + parent->GetUuid());
-            }
-            else {
-                fermata->SetTstamp(tstamp.getFloat());
-            }
-            // if a barline, then can have two fermatas
-            setLocationId(fermata, token);
+    if (token->find(";") == std::string::npos) {
+        return;
+    }
 
-            int direction = getDirection(*token, ";");
-            if (direction < 0) {
-                fermata->SetPlace(STAFFREL_below);
+    if ((token->find("yy") == std::string::npos) && (token->find(";y") == std::string::npos)) {
+        Fermata *fermata = new Fermata;
+        appendElement(m_measure, fermata);
+        setStaff(fermata, staff);
+
+        Fermata *fermata2 = NULL;
+        if (token->find(";;") != std::string::npos) {
+            fermata2 = new Fermata;
+            appendElement(m_measure, fermata2);
+            setStaff(fermata2, staff);
+        }
+
+        if (parent && (token->find("q") != std::string::npos)) {
+            // grace notes cannot be addressed with @tstamp, so
+            // have to use @startid
+            std::string id = "#" + parent->GetUuid();
+            fermata->SetStartid(id);
+            if (fermata2) {
+                fermata2->SetStartid(id);
             }
-            else if (direction > 0) {
-                fermata->SetPlace(STAFFREL_above);
+        }
+        else if (!token->empty() && (token->at(0) == '=')) {
+            // barline fermata
+            hum::HumNum tstamp = getMeasureEndTstamp(staff - 1);
+            fermata->SetTstamp(tstamp.getFloat());
+            if (fermata2) {
+                fermata2->SetTstamp(tstamp.getFloat());
             }
-            else if (layer == 1) {
-                // note->SetFermata(PLACE_above);
-                fermata->SetPlace(STAFFREL_above);
+        }
+        else {
+            hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
+            fermata->SetTstamp(tstamp.getFloat());
+            if (fermata2) {
+                fermata2->SetTstamp(tstamp.getFloat());
             }
-            else if (layer == 2) {
-                // note->SetFermata(PLACE_below);
-                fermata->SetPlace(STAFFREL_below);
-            }
-            // else {
-            //    // who knows, maybe check the stem direction or see
-            //    // if another note in a different layer already
-            //    // has a fermata (so you would not want to overwrite them).
-            //    note->SetFermata(PLACE_above);
-            //}
+        }
+        // if a barline, then can have two fermatas
+        if (fermata2) {
+            setLocationIdNSuffix(fermata, token, 1);
+            setLocationIdNSuffix(fermata2, token, 2);
+        }
+        else {
+            setLocationId(fermata, token);
+        }
+
+        if (fermata2) {
+            fermata->SetPlace(STAFFREL_above);
+            fermata2->SetPlace(STAFFREL_below);
+            return;
+        }
+
+        int direction = getDirection(*token, ";");
+        if (direction < 0) {
+            fermata->SetPlace(STAFFREL_below);
+        }
+        else if (direction > 0) {
+            fermata->SetPlace(STAFFREL_above);
+        }
+        else if (layer == 1) {
+            // note->SetFermata(PLACE_above);
+            fermata->SetPlace(STAFFREL_above);
+        }
+        else if (layer == 2) {
+            // note->SetFermata(PLACE_below);
+            fermata->SetPlace(STAFFREL_below);
         }
     }
 }
@@ -5136,7 +5205,7 @@ void HumdrumInput::addTrill(hum::HTp token)
 
 void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum timestamp = token->getDurationFromStart();
     hum::HumNum endtime = timestamp + token->getDuration();
     int track = token->getTrack();
@@ -5171,7 +5240,7 @@ void HumdrumInput::processTieStart(Note *note, hum::HTp token, const std::string
 
 void HumdrumInput::processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex)
 {
-    vector<humaux::StaffStateVariables> &ss = m_staffstates;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
     hum::HumNum timestamp = token->getDurationFromStart();
     int track = token->getTrack();
     int staffnum = m_rkern[track];
@@ -5271,7 +5340,7 @@ int HumdrumInput::characterCountInSubtoken(hum::HTp token, char symbol)
 
 void HumdrumInput::printMeasureTokens(void)
 {
-    vector<vector<vector<hum::HTp> > > &lt = m_layertokens;
+    std::vector<std::vector<std::vector<hum::HTp> > > &lt = m_layertokens;
     int i, j, k;
     cerr << endl;
     for (i = 0; i < (int)lt.size(); i++) {
@@ -5370,10 +5439,10 @@ template <class ELEMENT> hum::HumNum HumdrumInput::setDuration(ELEMENT element, 
 //    part within the measure.
 //
 
-vector<int> HumdrumInput::getStaffLayerCounts(void)
+std::vector<int> HumdrumInput::getStaffLayerCounts(void)
 {
-    vector<vector<vector<hum::HTp> > > &lt = m_layertokens;
-    vector<int> output(lt.size(), 0);
+    std::vector<std::vector<std::vector<hum::HTp> > > &lt = m_layertokens;
+    std::vector<int> output(lt.size(), 0);
 
     int i;
     for (i = 0; i < (int)lt.size(); i++) {
@@ -5991,13 +6060,30 @@ void HumdrumInput::setLocationId(Object *object, int lineindex, int fieldindex, 
     object->SetUuid(id);
 }
 
+//////////////////////////////
+//
+// HumdrumInput::setLocationIdNSuffix --
+//
+
+void HumdrumInput::setLocationIdNSuffix(Object *object, hum::HTp token, int number)
+{
+    int line = token->getLineIndex() + 1;
+    int field = token->getFieldIndex() + 1;
+    std::string id = object->GetClassName();
+    std::transform(id.begin(), id.end(), id.begin(), ::tolower);
+    id += "-L" + to_string(line);
+    id += "F" + to_string(field);
+    id += "N" + to_string(number);
+    object->SetUuid(id);
+}
+
 /////////////////////////////
 //
 // HumdrumInput::setBeamLocationId --
 //
 
-void HumdrumInput::setBeamLocationId(
-    Object *object, const vector<humaux::HumdrumBeamAndTuplet> &tgs, vector<hum::HTp> &layerdata, int startindex)
+void HumdrumInput::setBeamLocationId(Object *object, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
+    std::vector<hum::HTp> &layerdata, int startindex)
 {
     int startnum = tgs[startindex].beamstart;
     hum::HTp starttoken = layerdata[startindex];
@@ -6155,7 +6241,7 @@ void HumdrumInput::setSlurLocationId(Object *object, hum::HTp slurstart, hum::HT
 void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
 {
     hum::HumRegex hre;
-    vector<hum::HumdrumLine *> refs = infile.getReferenceRecords();
+    std::vector<hum::HumdrumLine *> refs = infile.getReferenceRecords();
     for (int i = 0; i < (int)refs.size(); i++) {
         std::string key = refs[i]->getReferenceKey();
         if (key != "RDF**kern") {
@@ -6221,12 +6307,12 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
 // HumdrumInput::analyzeMultiRest --
 //
 
-vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
+std::vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
 {
-    vector<int> barindex(1, 0); // line number of barline
-    vector<int> datacount(1, 0);
-    vector<int> dataline(1, 0);
-    vector<hum::HumNum> bardur(1, 0);
+    std::vector<int> barindex(1, 0); // line number of barline
+    std::vector<int> datacount(1, 0);
+    std::vector<int> dataline(1, 0);
+    std::vector<hum::HumNum> bardur(1, 0);
 
     // count number of non-null data lines for each measure.
     for (int i = 0; i < infile.getLineCount(); i++) {
@@ -6251,7 +6337,7 @@ vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
     }
 
     // check to see if measures with single data item is a rest.
-    vector<int> wholerest(barindex.size(), 0);
+    std::vector<int> wholerest(barindex.size(), 0);
     bool restQ;
     int line;
     for (int i = 0; i < (int)barindex.size(); i++) {
@@ -6286,7 +6372,7 @@ vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
         }
     }
 
-    vector<int> output(infile.getLineCount(), 0);
+    std::vector<int> output(infile.getLineCount(), 0);
     for (int i = 0; i < (int)wholerest.size(); i++) {
         output[dataline[i]] = wholerest[i];
     }
@@ -6343,7 +6429,7 @@ vector<int> HumdrumInput::analyzeMultiRest(hum::HumdrumFile &infile)
 
 void HumdrumInput::prepareEndings(void)
 {
-    vector<int> &ending = m_ending;
+    std::vector<int> &ending = m_ending;
     hum::HumdrumFile &infile = m_infile;
 
     ending.resize(infile.getLineCount());
@@ -6387,7 +6473,7 @@ void HumdrumInput::prepareEndings(void)
 
 void HumdrumInput::checkForColorSpine(hum::HumdrumFile &infile)
 {
-    vector<hum::HTp> colorspines;
+    std::vector<hum::HTp> colorspines;
     infile.getSpineStartList(colorspines, "**color");
     m_has_color_spine = colorspines.empty() ? false : true;
 }

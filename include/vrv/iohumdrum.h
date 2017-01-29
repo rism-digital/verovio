@@ -158,6 +158,7 @@ namespace humaux {
         // meter_bottom == Used to keep track of bottom value of time signature.
         // This is needed to calculate tstamps.
         hum::HumNum meter_bottom;
+        int meter_top;
 
         // ties == keep track of ties for each staff/layer/pitch
         // and allow for cross-layer ties (no cross staff ties, but that
@@ -245,7 +246,7 @@ protected:
     void convertRest(vrv::Rest *rest, hum::HTp token, int subtoken = -1);
     void processTieStart(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
-    void addFermata(hum::HTp token, vrv::Object *parent);
+    void addFermata(hum::HTp token, vrv::Object *parent = NULL);
     void addTrill(hum::HTp token);
     void getTimingInformation(std::vector<hum::HumNum> &prespace, std::vector<hum::HTp> &layerdata,
         hum::HumNum layerstarttime, hum::HumNum layerendtime);
@@ -285,6 +286,7 @@ protected:
     void processDynamics(hum::HTp token, int staffindex);
     void processDirection(hum::HTp token, int staffindex);
     hum::HumNum getMeasureTstamp(hum::HTp token, int staffindex, hum::HumNum frac = 0);
+    hum::HumNum getMeasureEndTstamp(int staffindex);
     hum::HTp getPreviousDataToken(hum::HTp token);
     hum::HTp getHairpinEnd(hum::HTp token, const std::string &endchar);
     hum::HTp getDecrescendoEnd(hum::HTp token);
@@ -294,6 +296,7 @@ protected:
     void addSpace(std::vector<std::string> &elements, std::vector<void *> &pointers, hum::HumNum duration);
     void setLocationId(vrv::Object *object, hum::HTp token, int subtoken = -1);
     void setLocationId(vrv::Object *object, int lineindex, int fieldindex, int subtokenindex);
+    void setLocationIdNSuffix(vrv::Object *object, hum::HTp token, int number);
     void setSlurLocationId(vrv::Object *object, hum::HTp slurstart, hum::HTp slurend, int eindex);
     void setTieLocationId(vrv::Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex);
     void setBeamLocationId(vrv::Object *object, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
