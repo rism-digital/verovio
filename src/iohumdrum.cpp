@@ -2467,6 +2467,19 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         if (layerdata.back()->find(";") != std::string::npos) {
             addFermata(layerdata.back(), NULL);
         }
+
+        // check for rptend here, since the one for the last measure in the music is
+        // missed by the inline processing.  But maybe limit this one to only checking for
+        // the last measure.  Or move barline styling here...
+        if ((layerdata.back()->find(":|") != std::string::npos)
+            || (layerdata.back()->find(":!") != std::string::npos)) {
+            m_measure->SetRight(BARRENDITION_rptend);
+        }
+    }
+    if ((layerindex == 0) && (!layerdata.empty()) && (layerdata[0]->at(0) == '=')) {
+        if ((layerdata[0]->find("|:") != std::string::npos) || (layerdata[0]->find("!:") != std::string::npos)) {
+            m_measure->SetLeft(BARRENDITION_rptstart);
+        }
     }
 
     return true;
