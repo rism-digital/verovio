@@ -5047,6 +5047,8 @@ void HumdrumInput::addFermata(hum::HTp token)
             setStaff(fermata, staff);
             hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
             fermata->SetTstamp(tstamp.getFloat());
+            // if a barline, then can have two fermatas
+            setLocationId(fermata, token);
 
             int direction = getDirection(*token, ";");
             if (direction < 0) {
