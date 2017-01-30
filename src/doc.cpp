@@ -276,7 +276,7 @@ void Doc::PrepareDrawing()
     // GetTie values and pitch and oct for matching notes
     std::vector<AttComparison *> filters;
     for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+        staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n

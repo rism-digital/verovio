@@ -384,10 +384,30 @@ Alignment::~Alignment()
     }
 }
 
+void Alignment::AddChild(Object *child)
+{
+    assert(dynamic_cast<AlignmentReference*>(child));
+    
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
+}
+
+
 void Alignment::AddLayerElementRef(LayerElement *element)
 {
     assert(element->IsLayerElement());
     m_layerElementsRef.push_back(element);
+    
+    if (!element->HasToBeAligned()) return;
+    
+    //
+    int n = 0;
+    Staff *staffRef = element->m_crossStaff;
+    if (!staffRef) staffRef = dynamic_cast<Staff*>(element->GetFirstParent(STAFF));
+    if (staffRef) n = staffRef->GetN();
+    AlignmentReference *alignmentRef = new AlignmentReference(n, element);
+    this->AddChild(alignmentRef);
 }
 
 void Alignment::SetXRel(int x_rel)
@@ -415,6 +435,35 @@ GraceAligner *Alignment::GetGraceAligner()
         m_graceAligner = new GraceAligner();
     }
     return m_graceAligner;
+}
+    
+    
+//----------------------------------------------------------------------------
+// AlignmentReference
+//----------------------------------------------------------------------------
+
+AlignmentReference::AlignmentReference() : Object(), AttCommon()
+{
+    RegisterAttClass(ATT_COMMON);
+    
+    Reset();
+}
+
+AlignmentReference::AlignmentReference(int n, Object *elementRef) : Object(), AttCommon()
+{
+    RegisterAttClass(ATT_COMMON);
+    
+    Reset();
+    this->SetN(n);
+    m_elementRef = elementRef;
+}
+
+void AlignmentReference::Reset()
+{
+    Object::Reset();
+    ResetCommon();
+    
+    m_elementRef = NULL;
 }
 
 //----------------------------------------------------------------------------
@@ -762,6 +811,10 @@ int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
+    
+    LogDebug("Alignment type %d", m_type);
+    
+    /*
 
     // Here we want to process only the left scoreDef up to the left barline
     if (this->m_type > ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
@@ -784,6 +837,8 @@ int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
         this->SetXShift(params->m_minPos - this->GetXRel());
         params->m_minPos = this->GetXRel();
     }
+     
+    */
 
     return FUNCTOR_CONTINUE;
 }
@@ -792,6 +847,11 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
+    
+    params->m_boundingBoxes = params->m_nextBoundingBoxes;
+    params->m_nextBoundingBoxes.clear();
+    
+    /*
 
     // Because these do not get shifted with their bounding box because their bounding box is calculated
     // according to
@@ -826,7 +886,28 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
     else {
         this->SetXShift(params->m_minPos - this->GetXRel());
     }
+     
+    */
 
+    return FUNCTOR_CONTINUE;
+}
+    
+int AlignmentReference::SetBoundingBoxXShift(FunctorParams *functorParams)
+{
+    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    assert(params);
+    
+    LogDebug("AlignmentRef staff %d", GetN());
+    this->m_elementRef->Process(params->m_functor, params, params->m_functorEnd);
+    
+    return FUNCTOR_CONTINUE;
+}
+
+int AlignmentReference::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
+{
+    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    assert(params);
+    
     return FUNCTOR_CONTINUE;
 }
 

@@ -389,16 +389,32 @@ int Measure::SetBoundingBoxXShift(FunctorParams *functorParams)
     assert(params);
 
     // we reset the measure width and the minimum position
-    params->m_measureWidth = 0;
-    params->m_layerMinPos = 0;
+    //params->m_measureWidth = 0;
+    //params->m_layerMinPos = 0;
     params->m_minPos = 0;
-
+    
+    ArrayOfObjects staves;
+    AttComparison attComparison(STAFF);
+    this->FindAllChildByAttComparison(&staves, &attComparison);
+    ArrayOfObjects::iterator iter;
+    std::vector<AttComparison *> filters;
+    for(iter = staves.begin(); iter != staves.end(); iter++) {
+        filters.clear();
+        Staff *staff = dynamic_cast<Staff*>(*iter);
+        assert(staff);
+        // Create ad comparison object for each type / @n
+        AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staff->GetN());
+        filters.push_back(&matchStaff);
+        
+        m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
+    }
+    
     // Process the left scoreDef elements and the left barLine
-    m_measureAligner.Process(params->m_functor, params);
+    // m_measureAligner.Process(params->m_functor, params);
 
-    params->m_layerMinPos = params->m_minPos;
+    //params->m_layerMinPos = params->m_minPos;
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 int Measure::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
@@ -407,7 +423,7 @@ int Measure::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
     assert(params);
 
     // use the measure width as minimum position of the barLine
-    params->m_minPos = params->m_measureWidth;
+    //params->m_minPos = params->m_measureWidth;
 
     // Process the right barLine and the right scoreDef elements
     m_measureAligner.Process(params->m_functorEnd, params);

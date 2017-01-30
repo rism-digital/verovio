@@ -48,6 +48,7 @@ enum ClassId {
     FLOATING_POSITIONER,
     //
     ALIGNMENT,
+    ALIGNMENT_REFERENCE,
     CLEF_ATTR,
     DOC,
     GRACE_ALIGNER,

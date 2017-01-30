@@ -1060,6 +1060,8 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
 
+    /*
+    
     // starting new layer
     if (this->Is(LAYER)) {
         params->m_minPos = params->m_layerMinPos;
@@ -1149,6 +1151,8 @@ int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
             / PARAM_DENOMINATOR;
     params->m_minPos = current->GetAlignment()->GetXRel() + width;
     current->GetAlignment()->SetMaxWidth(width);
+     
+    */
 
     return FUNCTOR_CONTINUE;
 }
@@ -1157,6 +1161,8 @@ int Object::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
+    
+    /*
 
     // ending a layer
     if (this->Is(LAYER)) {
@@ -1166,6 +1172,8 @@ int Object::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
         params->m_measureWidth = std::max(params->m_measureWidth, params->m_minPos);
         return FUNCTOR_CONTINUE;
     }
+     
+    */
 
     return FUNCTOR_CONTINUE;
 }

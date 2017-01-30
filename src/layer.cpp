@@ -221,11 +221,22 @@ void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
     // Remove any previous value in the Layer
     this->ResetStaffDefObjects();
 
-    if (currentStaffDef->DrawClef()) this->m_staffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
-    if (currentStaffDef->DrawKeySig()) this->m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
-    if (currentStaffDef->DrawMensur()) this->m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
-    if (currentStaffDef->DrawMeterSig())
+    if (currentStaffDef->DrawClef()) {
+        this->m_staffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
+        this->m_staffDefClef->SetParent(this);
+    }
+    if (currentStaffDef->DrawKeySig()) {
+        this->m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+        this->m_staffDefKeySig->SetParent(this);
+    }
+    if (currentStaffDef->DrawMensur()) {
+        this->m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
+        this->m_staffDefMensur->SetParent(this);
+    }
+    if (currentStaffDef->DrawMeterSig()) {
         this->m_staffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
+        this->m_staffDefMeterSig->SetParent(this);
+    }
 
     // Don't draw on the next one
     currentStaffDef->SetDrawClef(false);
@@ -241,12 +252,23 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
         return;
     }
 
-    if (currentStaffDef->DrawClef()) this->m_cautionStaffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
+    if (currentStaffDef->DrawClef()) {
+        this->m_cautionStaffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
+        this->m_cautionStaffDefClef->SetParent(this);
+    }
     // special case - see above
-    if (currentStaffDef->DrawKeySig()) this->m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
-    if (currentStaffDef->DrawMensur()) this->m_cautionStaffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
-    if (currentStaffDef->DrawMeterSig())
+    if (currentStaffDef->DrawKeySig()){
+        this->m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+        this->m_cautionStaffDefKeySig->SetParent(this);
+    }
+    if (currentStaffDef->DrawMensur()){
+        this->m_cautionStaffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
+        this->m_cautionStaffDefMensur->SetParent(this);
+    }
+    if (currentStaffDef->DrawMeterSig()) {
         this->m_cautionStaffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
+        this->m_cautionStaffDefMeterSig->SetParent(this);
+    }
 
     // Don't draw on the next one
     currentStaffDef->SetDrawClef(false);

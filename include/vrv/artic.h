@@ -136,6 +136,9 @@ public:
     virtual std::string GetClassName() const { return "ArticPart"; }
     virtual ClassId GetClassId() const { return ARTIC_PART; }
     ///@}
+    
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() const { return true; }
 
     /**
      * @name Get and set the Y drawing relative position

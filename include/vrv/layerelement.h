@@ -127,6 +127,11 @@ public:
      * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);
+    
+    /**
+     * See Object::SetBoundingBoxXShift
+     */
+    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareTimePointing

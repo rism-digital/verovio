@@ -8,6 +8,7 @@
 #ifndef __VRV_ALIGNER_H__
 #define __VRV_ALIGNER_H__
 
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -292,6 +293,8 @@ public:
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT; }
     ///@}
+    
+    virtual void AddChild(Object *object);
 
     void SetXRel(int x_rel);
     int GetXRel() const { return m_xRel; }
@@ -366,8 +369,7 @@ public:
     virtual int JustifyX(FunctorParams *functorParams);
 
     /**
-     * Lay out the X positions of the staff content looking that the bounding boxes.
-     * The m_xShift is updated appropriately
+     * See Object::SetBoundingBoxXShift
      */
     ///@{
     virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
@@ -421,7 +423,44 @@ private:
      */
     ArrayOfObjects m_layerElementsRef;
 };
+    
+//----------------------------------------------------------------------------
+// AlignmentReference
+//----------------------------------------------------------------------------
 
+/**
+ * This class stores an alignement position elements will point to
+ */
+class AlignmentReference : public Object, public AttCommon {
+public:
+     /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    AlignmentReference();
+    AlignmentReference(int n, Object *elementRef);
+    virtual ~AlignmentReference() {}
+    virtual void Reset();
+    virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
+    ///@}
+    
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::SetBoundingBoxXShift
+     */
+    ///@{
+    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
+    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
+    ///@}
+    
+private:
+    Object *m_elementRef;
+};
+    
 //----------------------------------------------------------------------------
 // MeasureAligner
 //----------------------------------------------------------------------------
