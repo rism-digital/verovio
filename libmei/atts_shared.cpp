@@ -4656,7 +4656,7 @@ void AttNoteheads::ResetNoteheads()
     m_headFillcolor = "";
     m_headMod = "";
     m_headRotation = "";
-    m_headShape = "";
+    m_headShape = HEADSHAPE_list_NONE;
     m_headVisible = BOOLEAN_NONE;
 }
 
@@ -4689,7 +4689,7 @@ bool AttNoteheads::ReadNoteheads(pugi::xml_node element)
         hasAttribute = true;
     }
     if (element.attribute("head.shape")) {
-        this->SetHeadShape(StrToStr(element.attribute("head.shape").value()));
+        this->SetHeadShape(StrToHeadshapeList(element.attribute("head.shape").value()));
         element.remove_attribute("head.shape");
         hasAttribute = true;
     }
@@ -4725,7 +4725,7 @@ bool AttNoteheads::WriteNoteheads(pugi::xml_node element)
         wroteAttribute = true;
     }
     if (this->HasHeadShape()) {
-        element.append_attribute("head.shape") = StrToStr(this->GetHeadShape()).c_str();
+        element.append_attribute("head.shape") = HeadshapeListToStr(this->GetHeadShape()).c_str();
         wroteAttribute = true;
     }
     if (this->HasHeadVisible()) {
@@ -4762,7 +4762,7 @@ bool AttNoteheads::HasHeadRotation() const
 
 bool AttNoteheads::HasHeadShape() const
 {
-    return (m_headShape != "");
+    return (m_headShape != HEADSHAPE_list_NONE);
 }
 
 bool AttNoteheads::HasHeadVisible() const
@@ -9380,7 +9380,7 @@ bool Att::SetShared(Object *element, std::string attrType, std::string attrValue
             return true;
         }
         if (attrType == "head.shape") {
-            att->SetHeadShape(att->StrToStr(attrValue));
+            att->SetHeadShape(att->StrToHeadshapeList(attrValue));
             return true;
         }
         if (attrType == "head.visible") {
@@ -10871,7 +10871,7 @@ void Att::GetShared(const Object *element, ArrayOfStrAttr *attributes)
             attributes->push_back(std::make_pair("head.rotation", att->StrToStr(att->GetHeadRotation())));
         }
         if (att->HasHeadShape()) {
-            attributes->push_back(std::make_pair("head.shape", att->StrToStr(att->GetHeadShape())));
+            attributes->push_back(std::make_pair("head.shape", att->HeadshapeListToStr(att->GetHeadShape())));
         }
         if (att->HasHeadVisible()) {
             attributes->push_back(std::make_pair("head.visible", att->BooleanToStr(att->GetHeadVisible())));

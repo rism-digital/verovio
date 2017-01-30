@@ -11,23 +11,137 @@
 		1579B3431B15033100B16F5C /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
 		4067E4C81DDDAF0000C6E059 /* fermata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067E4C71DDDAF0000C6E059 /* fermata.cpp */; };
-		40CA065D1E351161009CFDD7 /* GridMeasure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06511E351161009CFDD7 /* GridMeasure.cpp */; };
-		40CA065E1E351161009CFDD7 /* GridPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06521E351161009CFDD7 /* GridPart.cpp */; };
-		40CA065F1E351161009CFDD7 /* GridSide.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06531E351161009CFDD7 /* GridSide.cpp */; };
-		40CA06601E351161009CFDD7 /* GridSlice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06541E351161009CFDD7 /* GridSlice.cpp */; };
-		40CA06611E351161009CFDD7 /* GridStaff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06551E351161009CFDD7 /* GridStaff.cpp */; };
-		40CA06621E351161009CFDD7 /* GridVoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06561E351161009CFDD7 /* GridVoice.cpp */; };
-		40CA06631E351161009CFDD7 /* HumGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06571E351161009CFDD7 /* HumGrid.cpp */; };
-		40CA06641E351161009CFDD7 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
-		40CA06651E351161009CFDD7 /* MxmlEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06591E351161009CFDD7 /* MxmlEvent.cpp */; };
-		40CA06661E351161009CFDD7 /* MxmlMeasure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065A1E351161009CFDD7 /* MxmlMeasure.cpp */; };
-		40CA06671E351161009CFDD7 /* MxmlPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065B1E351161009CFDD7 /* MxmlPart.cpp */; };
-		40CA06681E351161009CFDD7 /* tool-musicxml2hum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065C1E351161009CFDD7 /* tool-musicxml2hum.cpp */; };
 		40F910081E2799740081B7BB /* trill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40F910071E2799740081B7BB /* trill.cpp */; };
 		4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
 		4D1031861DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
 		4D1031871DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
 		4D1031881DECB83E0098EA1C /* atts_externalsymbols.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D1031851DECB83E0098EA1C /* atts_externalsymbols.h */; };
+		4D1693F51E3A44F300569BF4 /* aligner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB6188539540037FD8E /* aligner.cpp */; };
+		4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB8188539540037FD8E /* barline.cpp */; };
+		4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EB9188539540037FD8E /* bboxdevicecontext.cpp */; };
+		4D1693F81E3A44F300569BF4 /* beam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBA188539540037FD8E /* beam.cpp */; };
+		4D1693F91E3A44F300569BF4 /* artic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DAA46671DA2B3E600FF1E1A /* artic.cpp */; };
+		4D1693FA1E3A44F300569BF4 /* clef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBB188539540037FD8E /* clef.cpp */; };
+		4D1693FB1E3A44F300569BF4 /* devicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBC188539540037FD8E /* devicecontext.cpp */; };
+		4D1693FC1E3A44F300569BF4 /* view_control.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D543E211B80AACF004B823C /* view_control.cpp */; };
+		4D1693FD1E3A44F300569BF4 /* score.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4FB1D74551100B2B856 /* score.cpp */; };
+		4D1693FE1E3A44F300569BF4 /* doc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBD188539540037FD8E /* doc.cpp */; };
+		4D1693FF1E3A44F300569BF4 /* durationinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBE188539540037FD8E /* durationinterface.cpp */; };
+		4D1694001E3A44F300569BF4 /* toolkit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EBF188539540037FD8E /* toolkit.cpp */; };
+		4D1694011E3A44F300569BF4 /* MidiEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */; };
+		4D1694021E3A44F300569BF4 /* io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC0188539540037FD8E /* io.cpp */; };
+		4D1694031E3A44F300569BF4 /* harm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D796B5D1D78641900A15238 /* harm.cpp */; };
+		4D1694041E3A44F300569BF4 /* space.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB3072E1AC9ED2500EE0982 /* space.cpp */; };
+		4D1694051E3A44F300569BF4 /* iodarms.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC1188539540037FD8E /* iodarms.cpp */; };
+		4D1694061E3A44F300569BF4 /* iomei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC2188539540037FD8E /* iomei.cpp */; };
+		4D1694071E3A44F300569BF4 /* iomusxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC3188539540037FD8E /* iomusxml.cpp */; };
+		4D1694081E3A44F300569BF4 /* iopae.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC4188539540037FD8E /* iopae.cpp */; };
+		4D1694091E3A44F300569BF4 /* atts_critapp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28F31940BCC100C76319 /* atts_critapp.cpp */; };
+		4D16940A1E3A44F300569BF4 /* fermata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067E4C71DDDAF0000C6E059 /* fermata.cpp */; };
+		4D16940B1E3A44F300569BF4 /* keysig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC5188539540037FD8E /* keysig.cpp */; };
+		4D16940C1E3A44F300569BF4 /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
+		4D16940D1E3A44F300569BF4 /* hairpin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBB5A1C7AE45900054AFF /* hairpin.cpp */; };
+		4D16940E1E3A44F300569BF4 /* view_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D43C30B1A9BB22A00EA28F3 /* view_mensural.cpp */; };
+		4D16940F1E3A44F300569BF4 /* layer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC6188539540037FD8E /* layer.cpp */; };
+		4D1694101E3A44F300569BF4 /* proport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1579B3421B15033100B16F5C /* proport.cpp */; };
+		4D1694111E3A44F300569BF4 /* layerelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC7188539540037FD8E /* layerelement.cpp */; };
+		4D1694121E3A44F300569BF4 /* boundary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF4407C1D511D0200152B7E /* boundary.cpp */; };
+		4D1694131E3A44F300569BF4 /* measure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EC9188539540037FD8E /* measure.cpp */; };
+		4D1694141E3A44F300569BF4 /* systemelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F81D718D4A00B2B856 /* systemelement.cpp */; };
+		4D1694151E3A44F300569BF4 /* dynam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBB591C7AE45900054AFF /* dynam.cpp */; };
+		4D1694161E3A44F300569BF4 /* pedal.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5572431CF57B5C008D06A0 /* pedal.cpp */; };
+		4D1694171E3A44F300569BF4 /* mensur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ECA188539540037FD8E /* mensur.cpp */; };
+		4D1694181E3A44F300569BF4 /* text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726C41B8BB0E80040231B /* text.cpp */; };
+		4D1694191E3A44F300569BF4 /* drawinginterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D798CBC1B8AEDBA007281CA /* drawinginterface.cpp */; };
+		4D16941A1E3A44F300569BF4 /* view_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */; };
+		4D16941B1E3A44F300569BF4 /* multirest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ECB188539540037FD8E /* multirest.cpp */; };
+		4D16941C1E3A44F300569BF4 /* ending.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF440761D39575500152B7E /* ending.cpp */; };
+		4D16941D1E3A44F300569BF4 /* dir.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB351111C8040B1002DD057 /* dir.cpp */; };
+		4D16941E1E3A44F300569BF4 /* note.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ECC188539540037FD8E /* note.cpp */; };
+		4D16941F1E3A44F300569BF4 /* boundingbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D5FA9101E16A93F00F3B919 /* boundingbox.cpp */; };
+		4D1694201E3A44F300569BF4 /* atts_externalsymbols.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */; };
+		4D1694211E3A44F300569BF4 /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ECD188539540037FD8E /* object.cpp */; };
+		4D1694221E3A44F300569BF4 /* page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ECE188539540037FD8E /* page.cpp */; };
+		4D1694231E3A44F300569BF4 /* pitchinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ECF188539540037FD8E /* pitchinterface.cpp */; };
+		4D1694241E3A44F300569BF4 /* positioninterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED0188539540037FD8E /* positioninterface.cpp */; };
+		4D1694251E3A44F300569BF4 /* timestamp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB0B0151C44129300DBDCC3 /* timestamp.cpp */; };
+		4D1694261E3A44F300569BF4 /* MidiEventList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7681C688F5A0086DC0E /* MidiEventList.cpp */; };
+		4D1694271E3A44F300569BF4 /* iohumdrum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA20ED01D0F151900706C4A /* iohumdrum.cpp */; };
+		4D1694281E3A44F300569BF4 /* rest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED1188539540037FD8E /* rest.cpp */; };
+		4D1694291E3A44F300569BF4 /* scoredef.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED2188539540037FD8E /* scoredef.cpp */; };
+		4D16942A1E3A44F300569BF4 /* octave.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D55723F1CF3F32A008D06A0 /* octave.cpp */; };
+		4D16942B1E3A44F300569BF4 /* slur.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED3188539540037FD8E /* slur.cpp */; };
+		4D16942C1E3A44F300569BF4 /* staff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED4188539540037FD8E /* staff.cpp */; };
+		4D16942D1E3A44F300569BF4 /* trill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40F910071E2799740081B7BB /* trill.cpp */; };
+		4D16942E1E3A44F300569BF4 /* textelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA144891C2AB28700CB7CEE /* textelement.cpp */; };
+		4D16942F1E3A44F300569BF4 /* svgdevicecontext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED5188539540037FD8E /* svgdevicecontext.cpp */; };
+		4D1694301E3A44F300569BF4 /* style.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA80D951A6ACF5D0089802D /* style.cpp */; };
+		4D1694311E3A44F300569BF4 /* system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED7188539540037FD8E /* system.cpp */; };
+		4D1694321E3A44F300569BF4 /* scoredefinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D20B5EB1B873A1300EA9EC3 /* scoredefinterface.cpp */; };
+		4D1694331E3A44F300569BF4 /* section.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F11D6E042400B2B856 /* section.cpp */; };
+		4D1694341E3A44F300569BF4 /* MidiMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE76A1C688F5A0086DC0E /* MidiMessage.cpp */; };
+		4D1694351E3A44F300569BF4 /* editorial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA95D71A515D0E008AD7E9 /* editorial.cpp */; };
+		4D1694361E3A44F300569BF4 /* tempo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB351121C8040B1002DD057 /* tempo.cpp */; };
+		4D1694371E3A44F300569BF4 /* tie.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED8188539540037FD8E /* tie.cpp */; };
+		4D1694381E3A44F300569BF4 /* MidiFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7691C688F5A0086DC0E /* MidiFile.cpp */; };
+		4D1694391E3A44F300569BF4 /* tuplet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086ED9188539540037FD8E /* tuplet.cpp */; };
+		4D16943A1E3A44F300569BF4 /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7841C6A40A80086DC0E /* pugixml.cpp */; };
+		4D16943B1E3A44F300569BF4 /* Binasc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7661C688F5A0086DC0E /* Binasc.cpp */; };
+		4D16943C1E3A44F300569BF4 /* view_beam.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDA188539540037FD8E /* view_beam.cpp */; };
+		4D16943D1E3A44F300569BF4 /* view_element.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDC188539540037FD8E /* view_element.cpp */; };
+		4D16943E1E3A44F300569BF4 /* view_graph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDD188539540037FD8E /* view_graph.cpp */; };
+		4D16943F1E3A44F300569BF4 /* view_page.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDE188539540037FD8E /* view_page.cpp */; };
+		4D1694401E3A44F300569BF4 /* view_tuplet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EDF188539540037FD8E /* view_tuplet.cpp */; };
+		4D1694411E3A44F300569BF4 /* rpt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB726BF1B8B9F480040231B /* rpt.cpp */; };
+		4D1694421E3A44F300569BF4 /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
+		4D1694431E3A44F300569BF4 /* view.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EE0188539540037FD8E /* view.cpp */; };
+		4D1694441E3A44F300569BF4 /* vrv.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8F086EE1188539540037FD8E /* vrv.cpp */; };
+		4D1694451E3A44F300569BF4 /* mrest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D22C41818890E6100D0831F /* mrest.cpp */; };
+		4D1694461E3A44F300569BF4 /* textdirinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DA60EE31B6307B9006E2DFC /* textdirinterface.cpp */; };
+		4D1694471E3A44F300569BF4 /* ligature.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 152886C41C9CA86100B515BB /* ligature.cpp */; };
+		4D1694481E3A44F300569BF4 /* controlelement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D95D4F51D71866200B2B856 /* controlelement.cpp */; };
+		4D1694491E3A44F300569BF4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D983004192E959E00320037 /* main.cpp */; };
+		4D16944A1E3A44F300569BF4 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
+		4D16944B1E3A44F300569BF4 /* metersig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D763EC51987D04D003FCAB5 /* metersig.cpp */; };
+		4D16944C1E3A44F300569BF4 /* att.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D422103199805F700963292 /* att.cpp */; };
+		4D16944D1E3A44F300569BF4 /* atts_mensural.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29031940BCC100C76319 /* atts_mensural.cpp */; };
+		4D16944E1E3A44F300569BF4 /* verse.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C18199F561200028D93 /* verse.cpp */; };
+		4D16944F1E3A44F300569BF4 /* timeinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */; };
+		4D1694501E3A44F300569BF4 /* attconverter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2961C1B3F0A0069E8C8 /* attconverter.cpp */; };
+		4D1694511E3A44F300569BF4 /* glyph.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D733F1A1D08DC001E08F6 /* glyph.cpp */; };
+		4D1694521E3A44F300569BF4 /* syl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D9A9C1D19A1DE2000028D93 /* syl.cpp */; };
+		4D1694531E3A44F300569BF4 /* atts_cmn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE28EF1940BCC100C76319 /* atts_cmn.cpp */; };
+		4D1694541E3A44F300569BF4 /* floatingobject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF28A041A754DF000BA9F7D /* floatingobject.cpp */; };
+		4D1694551E3A44F300569BF4 /* atts_mei.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF9D2811C18DC490069E8C8 /* atts_mei.cpp */; };
+		4D1694561E3A44F300569BF4 /* atts_pagebased.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D3FF8D919BADD7A00B105B5 /* atts_pagebased.cpp */; };
+		4D1694571E3A44F300569BF4 /* anchoredtext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DB351101C8040B1002DD057 /* anchoredtext.cpp */; };
+		4D1694581E3A44F300569BF4 /* accid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA519BC4A82006175CD /* accid.cpp */; };
+		4D1694591E3A44F300569BF4 /* custos.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA619BC4A83006175CD /* custos.cpp */; };
+		4D16945A1E3A44F300569BF4 /* dot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DC34BA719BC4A83006175CD /* dot.cpp */; };
+		4D1694611E3A453A00569BF4 /* GridMeasure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06511E351161009CFDD7 /* GridMeasure.cpp */; };
+		4D1694621E3A453F00569BF4 /* GridMeasure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06511E351161009CFDD7 /* GridMeasure.cpp */; };
+		4D1694631E3A454300569BF4 /* GridPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06521E351161009CFDD7 /* GridPart.cpp */; };
+		4D1694641E3A454400569BF4 /* GridPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06521E351161009CFDD7 /* GridPart.cpp */; };
+		4D1694651E3A455100569BF4 /* GridSide.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06531E351161009CFDD7 /* GridSide.cpp */; };
+		4D1694661E3A455100569BF4 /* GridSlice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06541E351161009CFDD7 /* GridSlice.cpp */; };
+		4D1694671E3A455100569BF4 /* GridStaff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06551E351161009CFDD7 /* GridStaff.cpp */; };
+		4D1694681E3A455100569BF4 /* GridVoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06561E351161009CFDD7 /* GridVoice.cpp */; };
+		4D1694691E3A455100569BF4 /* HumGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06571E351161009CFDD7 /* HumGrid.cpp */; };
+		4D16946A1E3A455100569BF4 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
+		4D16946B1E3A455200569BF4 /* MxmlEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06591E351161009CFDD7 /* MxmlEvent.cpp */; };
+		4D16946C1E3A455200569BF4 /* MxmlMeasure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065A1E351161009CFDD7 /* MxmlMeasure.cpp */; };
+		4D16946D1E3A455200569BF4 /* MxmlPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065B1E351161009CFDD7 /* MxmlPart.cpp */; };
+		4D16946E1E3A455200569BF4 /* tool-musicxml2hum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065C1E351161009CFDD7 /* tool-musicxml2hum.cpp */; };
+		4D16946F1E3A455200569BF4 /* GridSide.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06531E351161009CFDD7 /* GridSide.cpp */; };
+		4D1694701E3A455200569BF4 /* GridSlice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06541E351161009CFDD7 /* GridSlice.cpp */; };
+		4D1694711E3A455200569BF4 /* GridStaff.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06551E351161009CFDD7 /* GridStaff.cpp */; };
+		4D1694721E3A455200569BF4 /* GridVoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06561E351161009CFDD7 /* GridVoice.cpp */; };
+		4D1694731E3A455200569BF4 /* HumGrid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06571E351161009CFDD7 /* HumGrid.cpp */; };
+		4D1694741E3A455200569BF4 /* humlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06581E351161009CFDD7 /* humlib.cpp */; };
+		4D1694751E3A455200569BF4 /* MxmlEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA06591E351161009CFDD7 /* MxmlEvent.cpp */; };
+		4D1694761E3A455200569BF4 /* MxmlMeasure.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065A1E351161009CFDD7 /* MxmlMeasure.cpp */; };
+		4D1694771E3A455200569BF4 /* MxmlPart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065B1E351161009CFDD7 /* MxmlPart.cpp */; };
+		4D1694781E3A455200569BF4 /* tool-musicxml2hum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40CA065C1E351161009CFDD7 /* tool-musicxml2hum.cpp */; };
 		4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7661C688F5A0086DC0E /* Binasc.cpp */; };
 		4D1BE76C1C688F5A0086DC0E /* Binasc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7661C688F5A0086DC0E /* Binasc.cpp */; };
 		4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */; };
@@ -276,6 +390,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		4D16945C1E3A44F300569BF4 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
 		8F086EA7188534680037FD8E /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -325,6 +448,7 @@
 		40F910071E2799740081B7BB /* trill.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = trill.cpp; path = src/trill.cpp; sourceTree = "<group>"; };
 		4D1031841DECB83E0098EA1C /* atts_externalsymbols.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_externalsymbols.cpp; path = libmei/atts_externalsymbols.cpp; sourceTree = "<group>"; };
 		4D1031851DECB83E0098EA1C /* atts_externalsymbols.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_externalsymbols.h; path = libmei/atts_externalsymbols.h; sourceTree = "<group>"; };
+		4D1694601E3A44F300569BF4 /* Verovio-Humdrum */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Verovio-Humdrum"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4D1BE7661C688F5A0086DC0E /* Binasc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Binasc.cpp; path = src/midi/Binasc.cpp; sourceTree = "<group>"; };
 		4D1BE7671C688F5A0086DC0E /* MidiEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEvent.cpp; path = src/midi/MidiEvent.cpp; sourceTree = "<group>"; };
 		4D1BE7681C688F5A0086DC0E /* MidiEventList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiEventList.cpp; path = src/midi/MidiEventList.cpp; sourceTree = "<group>"; };
@@ -551,6 +675,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		4D16945B1E3A44F300569BF4 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8F086EA6188534680037FD8E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -798,6 +929,7 @@
 			children = (
 				8F086EA9188534680037FD8E /* Verovio */,
 				8F086F4D18853CA90037FD8E /* liblibverovio.dylib */,
+				4D1694601E3A44F300569BF4 /* Verovio-Humdrum */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1059,6 +1191,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		4D1693F21E3A44F300569BF4 /* Verovio-Humdrum */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D16945D1E3A44F300569BF4 /* Build configuration list for PBXNativeTarget "Verovio-Humdrum" */;
+			buildPhases = (
+				4D1693F31E3A44F300569BF4 /* ShellScript */,
+				4D1693F41E3A44F300569BF4 /* Sources */,
+				4D16945B1E3A44F300569BF4 /* Frameworks */,
+				4D16945C1E3A44F300569BF4 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Verovio-Humdrum";
+			productName = Verovio;
+			productReference = 4D1694601E3A44F300569BF4 /* Verovio-Humdrum */;
+			productType = "com.apple.product-type.tool";
+		};
 		8F086EA8188534680037FD8E /* Verovio */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 8F086EB3188534690037FD8E /* Build configuration list for PBXNativeTarget "Verovio" */;
@@ -1115,12 +1265,26 @@
 			projectRoot = "";
 			targets = (
 				8F086EA8188534680037FD8E /* Verovio */,
+				4D1693F21E3A44F300569BF4 /* Verovio-Humdrum */,
 				8F086F4C18853CA90037FD8E /* libverovio */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		4D1693F31E3A44F300569BF4 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd ${SRCROOT}/tools\n./get_git_commit.sh";
+		};
 		4D9C5F361ADBADDA005D3031 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1137,6 +1301,127 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		4D1693F41E3A44F300569BF4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D1693F51E3A44F300569BF4 /* aligner.cpp in Sources */,
+				4D1693F61E3A44F300569BF4 /* barline.cpp in Sources */,
+				4D1693F71E3A44F300569BF4 /* bboxdevicecontext.cpp in Sources */,
+				4D1693F81E3A44F300569BF4 /* beam.cpp in Sources */,
+				4D1693F91E3A44F300569BF4 /* artic.cpp in Sources */,
+				4D1693FA1E3A44F300569BF4 /* clef.cpp in Sources */,
+				4D1694661E3A455100569BF4 /* GridSlice.cpp in Sources */,
+				4D1693FB1E3A44F300569BF4 /* devicecontext.cpp in Sources */,
+				4D1693FC1E3A44F300569BF4 /* view_control.cpp in Sources */,
+				4D1693FD1E3A44F300569BF4 /* score.cpp in Sources */,
+				4D1693FE1E3A44F300569BF4 /* doc.cpp in Sources */,
+				4D1693FF1E3A44F300569BF4 /* durationinterface.cpp in Sources */,
+				4D1694671E3A455100569BF4 /* GridStaff.cpp in Sources */,
+				4D1694001E3A44F300569BF4 /* toolkit.cpp in Sources */,
+				4D1694011E3A44F300569BF4 /* MidiEvent.cpp in Sources */,
+				4D1694021E3A44F300569BF4 /* io.cpp in Sources */,
+				4D1694031E3A44F300569BF4 /* harm.cpp in Sources */,
+				4D1694691E3A455100569BF4 /* HumGrid.cpp in Sources */,
+				4D1694041E3A44F300569BF4 /* space.cpp in Sources */,
+				4D1694051E3A44F300569BF4 /* iodarms.cpp in Sources */,
+				4D1694061E3A44F300569BF4 /* iomei.cpp in Sources */,
+				4D1694071E3A44F300569BF4 /* iomusxml.cpp in Sources */,
+				4D1694081E3A44F300569BF4 /* iopae.cpp in Sources */,
+				4D1694091E3A44F300569BF4 /* atts_critapp.cpp in Sources */,
+				4D16940A1E3A44F300569BF4 /* fermata.cpp in Sources */,
+				4D16940B1E3A44F300569BF4 /* keysig.cpp in Sources */,
+				4D16940C1E3A44F300569BF4 /* atts_midi.cpp in Sources */,
+				4D16940D1E3A44F300569BF4 /* hairpin.cpp in Sources */,
+				4D16940E1E3A44F300569BF4 /* view_mensural.cpp in Sources */,
+				4D16940F1E3A44F300569BF4 /* layer.cpp in Sources */,
+				4D1694101E3A44F300569BF4 /* proport.cpp in Sources */,
+				4D1694111E3A44F300569BF4 /* layerelement.cpp in Sources */,
+				4D1694121E3A44F300569BF4 /* boundary.cpp in Sources */,
+				4D1694131E3A44F300569BF4 /* measure.cpp in Sources */,
+				4D1694141E3A44F300569BF4 /* systemelement.cpp in Sources */,
+				4D1694151E3A44F300569BF4 /* dynam.cpp in Sources */,
+				4D1694161E3A44F300569BF4 /* pedal.cpp in Sources */,
+				4D1694171E3A44F300569BF4 /* mensur.cpp in Sources */,
+				4D1694181E3A44F300569BF4 /* text.cpp in Sources */,
+				4D1694191E3A44F300569BF4 /* drawinginterface.cpp in Sources */,
+				4D16946A1E3A455100569BF4 /* humlib.cpp in Sources */,
+				4D16946D1E3A455200569BF4 /* MxmlPart.cpp in Sources */,
+				4D16941A1E3A44F300569BF4 /* view_text.cpp in Sources */,
+				4D16941B1E3A44F300569BF4 /* multirest.cpp in Sources */,
+				4D16941C1E3A44F300569BF4 /* ending.cpp in Sources */,
+				4D1694611E3A453A00569BF4 /* GridMeasure.cpp in Sources */,
+				4D16941D1E3A44F300569BF4 /* dir.cpp in Sources */,
+				4D16941E1E3A44F300569BF4 /* note.cpp in Sources */,
+				4D16941F1E3A44F300569BF4 /* boundingbox.cpp in Sources */,
+				4D1694201E3A44F300569BF4 /* atts_externalsymbols.cpp in Sources */,
+				4D1694211E3A44F300569BF4 /* object.cpp in Sources */,
+				4D1694221E3A44F300569BF4 /* page.cpp in Sources */,
+				4D1694231E3A44F300569BF4 /* pitchinterface.cpp in Sources */,
+				4D1694681E3A455100569BF4 /* GridVoice.cpp in Sources */,
+				4D1694241E3A44F300569BF4 /* positioninterface.cpp in Sources */,
+				4D1694251E3A44F300569BF4 /* timestamp.cpp in Sources */,
+				4D1694261E3A44F300569BF4 /* MidiEventList.cpp in Sources */,
+				4D1694271E3A44F300569BF4 /* iohumdrum.cpp in Sources */,
+				4D1694281E3A44F300569BF4 /* rest.cpp in Sources */,
+				4D1694291E3A44F300569BF4 /* scoredef.cpp in Sources */,
+				4D16942A1E3A44F300569BF4 /* octave.cpp in Sources */,
+				4D16942B1E3A44F300569BF4 /* slur.cpp in Sources */,
+				4D16942C1E3A44F300569BF4 /* staff.cpp in Sources */,
+				4D16942D1E3A44F300569BF4 /* trill.cpp in Sources */,
+				4D16942E1E3A44F300569BF4 /* textelement.cpp in Sources */,
+				4D16946C1E3A455200569BF4 /* MxmlMeasure.cpp in Sources */,
+				4D16942F1E3A44F300569BF4 /* svgdevicecontext.cpp in Sources */,
+				4D1694301E3A44F300569BF4 /* style.cpp in Sources */,
+				4D1694311E3A44F300569BF4 /* system.cpp in Sources */,
+				4D1694321E3A44F300569BF4 /* scoredefinterface.cpp in Sources */,
+				4D1694331E3A44F300569BF4 /* section.cpp in Sources */,
+				4D1694341E3A44F300569BF4 /* MidiMessage.cpp in Sources */,
+				4D1694351E3A44F300569BF4 /* editorial.cpp in Sources */,
+				4D1694361E3A44F300569BF4 /* tempo.cpp in Sources */,
+				4D16946B1E3A455200569BF4 /* MxmlEvent.cpp in Sources */,
+				4D1694371E3A44F300569BF4 /* tie.cpp in Sources */,
+				4D1694381E3A44F300569BF4 /* MidiFile.cpp in Sources */,
+				4D1694391E3A44F300569BF4 /* tuplet.cpp in Sources */,
+				4D16943A1E3A44F300569BF4 /* pugixml.cpp in Sources */,
+				4D16946E1E3A455200569BF4 /* tool-musicxml2hum.cpp in Sources */,
+				4D16943B1E3A44F300569BF4 /* Binasc.cpp in Sources */,
+				4D16943C1E3A44F300569BF4 /* view_beam.cpp in Sources */,
+				4D16943D1E3A44F300569BF4 /* view_element.cpp in Sources */,
+				4D16943E1E3A44F300569BF4 /* view_graph.cpp in Sources */,
+				4D16943F1E3A44F300569BF4 /* view_page.cpp in Sources */,
+				4D1694401E3A44F300569BF4 /* view_tuplet.cpp in Sources */,
+				4D1694411E3A44F300569BF4 /* rpt.cpp in Sources */,
+				4D1694421E3A44F300569BF4 /* chord.cpp in Sources */,
+				4D1694431E3A44F300569BF4 /* view.cpp in Sources */,
+				4D1694651E3A455100569BF4 /* GridSide.cpp in Sources */,
+				4D1694441E3A44F300569BF4 /* vrv.cpp in Sources */,
+				4D1694451E3A44F300569BF4 /* mrest.cpp in Sources */,
+				4D1694461E3A44F300569BF4 /* textdirinterface.cpp in Sources */,
+				4D1694471E3A44F300569BF4 /* ligature.cpp in Sources */,
+				4D1694481E3A44F300569BF4 /* controlelement.cpp in Sources */,
+				4D1694491E3A44F300569BF4 /* main.cpp in Sources */,
+				4D16944A1E3A44F300569BF4 /* atts_shared.cpp in Sources */,
+				4D16944B1E3A44F300569BF4 /* metersig.cpp in Sources */,
+				4D16944C1E3A44F300569BF4 /* att.cpp in Sources */,
+				4D16944D1E3A44F300569BF4 /* atts_mensural.cpp in Sources */,
+				4D1694631E3A454300569BF4 /* GridPart.cpp in Sources */,
+				4D16944E1E3A44F300569BF4 /* verse.cpp in Sources */,
+				4D16944F1E3A44F300569BF4 /* timeinterface.cpp in Sources */,
+				4D1694501E3A44F300569BF4 /* attconverter.cpp in Sources */,
+				4D1694511E3A44F300569BF4 /* glyph.cpp in Sources */,
+				4D1694521E3A44F300569BF4 /* syl.cpp in Sources */,
+				4D1694531E3A44F300569BF4 /* atts_cmn.cpp in Sources */,
+				4D1694541E3A44F300569BF4 /* floatingobject.cpp in Sources */,
+				4D1694551E3A44F300569BF4 /* atts_mei.cpp in Sources */,
+				4D1694561E3A44F300569BF4 /* atts_pagebased.cpp in Sources */,
+				4D1694571E3A44F300569BF4 /* anchoredtext.cpp in Sources */,
+				4D1694581E3A44F300569BF4 /* accid.cpp in Sources */,
+				4D1694591E3A44F300569BF4 /* custos.cpp in Sources */,
+				4D16945A1E3A44F300569BF4 /* dot.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		8F086EA5188534680037FD8E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1147,18 +1432,15 @@
 				8F086EE6188539540037FD8E /* beam.cpp in Sources */,
 				4DAA46681DA2B3E600FF1E1A /* artic.cpp in Sources */,
 				8F086EE7188539540037FD8E /* clef.cpp in Sources */,
-				40CA06601E351161009CFDD7 /* GridSlice.cpp in Sources */,
 				8F086EE8188539540037FD8E /* devicecontext.cpp in Sources */,
 				4D543E221B80AACF004B823C /* view_control.cpp in Sources */,
 				4D95D4FC1D74551100B2B856 /* score.cpp in Sources */,
 				8F086EE9188539540037FD8E /* doc.cpp in Sources */,
 				8F086EEA188539540037FD8E /* durationinterface.cpp in Sources */,
-				40CA06611E351161009CFDD7 /* GridStaff.cpp in Sources */,
 				8F086EEB188539540037FD8E /* toolkit.cpp in Sources */,
 				4D1BE76D1C688F5A0086DC0E /* MidiEvent.cpp in Sources */,
 				8F086EEC188539540037FD8E /* io.cpp in Sources */,
 				4D796B5E1D78641900A15238 /* harm.cpp in Sources */,
-				40CA06631E351161009CFDD7 /* HumGrid.cpp in Sources */,
 				4DB3072F1AC9ED2500EE0982 /* space.cpp in Sources */,
 				8F086EED188539540037FD8E /* iodarms.cpp in Sources */,
 				8F086EEE188539540037FD8E /* iomei.cpp in Sources */,
@@ -1181,12 +1463,9 @@
 				8F086EF6188539540037FD8E /* mensur.cpp in Sources */,
 				4DB726C51B8BB0E80040231B /* text.cpp in Sources */,
 				4D798CBD1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
-				40CA06641E351161009CFDD7 /* humlib.cpp in Sources */,
-				40CA06671E351161009CFDD7 /* MxmlPart.cpp in Sources */,
 				4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */,
 				8F086EF7188539540037FD8E /* multirest.cpp in Sources */,
 				4DF440771D39575500152B7E /* ending.cpp in Sources */,
-				40CA065D1E351161009CFDD7 /* GridMeasure.cpp in Sources */,
 				4DB351141C8040B1002DD057 /* dir.cpp in Sources */,
 				8F086EF8188539540037FD8E /* note.cpp in Sources */,
 				4D5FA9111E16A93F00F3B919 /* boundingbox.cpp in Sources */,
@@ -1194,7 +1473,6 @@
 				8F086EF9188539540037FD8E /* object.cpp in Sources */,
 				8F086EFA188539540037FD8E /* page.cpp in Sources */,
 				8F086EFB188539540037FD8E /* pitchinterface.cpp in Sources */,
-				40CA06621E351161009CFDD7 /* GridVoice.cpp in Sources */,
 				8F086EFC188539540037FD8E /* positioninterface.cpp in Sources */,
 				4DB0B0161C44129300DBDCC3 /* timestamp.cpp in Sources */,
 				4D1BE76F1C688F5A0086DC0E /* MidiEventList.cpp in Sources */,
@@ -1206,7 +1484,6 @@
 				8F086F00188539540037FD8E /* staff.cpp in Sources */,
 				40F910081E2799740081B7BB /* trill.cpp in Sources */,
 				4DA1448A1C2AB28700CB7CEE /* textelement.cpp in Sources */,
-				40CA06661E351161009CFDD7 /* MxmlMeasure.cpp in Sources */,
 				8F086F01188539540037FD8E /* svgdevicecontext.cpp in Sources */,
 				4DA80D961A6ACF5D0089802D /* style.cpp in Sources */,
 				8F086F03188539540037FD8E /* system.cpp in Sources */,
@@ -1215,12 +1492,10 @@
 				4D1BE7731C688F5A0086DC0E /* MidiMessage.cpp in Sources */,
 				4DCA95D81A515D0E008AD7E9 /* editorial.cpp in Sources */,
 				4DB351151C8040B1002DD057 /* tempo.cpp in Sources */,
-				40CA06651E351161009CFDD7 /* MxmlEvent.cpp in Sources */,
 				8F086F04188539540037FD8E /* tie.cpp in Sources */,
 				4D1BE7711C688F5A0086DC0E /* MidiFile.cpp in Sources */,
 				8F086F05188539540037FD8E /* tuplet.cpp in Sources */,
 				4D1BE7851C6A40A80086DC0E /* pugixml.cpp in Sources */,
-				40CA06681E351161009CFDD7 /* tool-musicxml2hum.cpp in Sources */,
 				4D1BE76B1C688F5A0086DC0E /* Binasc.cpp in Sources */,
 				8F086F06188539540037FD8E /* view_beam.cpp in Sources */,
 				8F086F08188539540037FD8E /* view_element.cpp in Sources */,
@@ -1230,7 +1505,6 @@
 				4DB726C01B8B9F480040231B /* rpt.cpp in Sources */,
 				2D2A799A1A69812C000A441B /* chord.cpp in Sources */,
 				8F086F0C188539540037FD8E /* view.cpp in Sources */,
-				40CA065F1E351161009CFDD7 /* GridSide.cpp in Sources */,
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
@@ -1241,7 +1515,6 @@
 				4D763EC61987D04E003FCAB5 /* metersig.cpp in Sources */,
 				4D422104199805F800963292 /* att.cpp in Sources */,
 				4D4221061998A8CE00963292 /* atts_mensural.cpp in Sources */,
-				40CA065E1E351161009CFDD7 /* GridPart.cpp in Sources */,
 				4D9A9C19199F561200028D93 /* verse.cpp in Sources */,
 				4DF289FF1A7545E500BA9F7D /* timeinterface.cpp in Sources */,
 				4DF9D29A1C1B3F0A0069E8C8 /* attconverter.cpp in Sources */,
@@ -1265,11 +1538,13 @@
 				8F3DD36718854B410051330C /* aligner.cpp in Sources */,
 				8F3DD36818854B410051330C /* doc.cpp in Sources */,
 				8F3DD36A18854B410051330C /* toolkit.cpp in Sources */,
+				4D1694781E3A455200569BF4 /* tool-musicxml2hum.cpp in Sources */,
 				8F3DD36C18854B410051330C /* object.cpp in Sources */,
 				4D1031871DECB83E0098EA1C /* atts_externalsymbols.cpp in Sources */,
 				8F3DD36E18854B410051330C /* vrv.cpp in Sources */,
 				8F3DD35E18854B390051330C /* view.cpp in Sources */,
 				4DDBBB5E1C7AE45900054AFF /* hairpin.cpp in Sources */,
+				4D1694621E3A453F00569BF4 /* GridMeasure.cpp in Sources */,
 				8F3DD36018854B390051330C /* view_beam.cpp in Sources */,
 				8F3DD36218854B390051330C /* view_element.cpp in Sources */,
 				8F3DD36318854B390051330C /* view_graph.cpp in Sources */,
@@ -1277,12 +1552,16 @@
 				8F3DD36418854B390051330C /* view_page.cpp in Sources */,
 				8F3DD36518854B390051330C /* view_tuplet.cpp in Sources */,
 				4D1BE7861C6A40A80086DC0E /* pugixml.cpp in Sources */,
+				4D1694751E3A455200569BF4 /* MxmlEvent.cpp in Sources */,
 				4DB726C61B8BB0E80040231B /* text.cpp in Sources */,
 				8F3DD33C18854B2E0051330C /* barline.cpp in Sources */,
+				4D1694711E3A455200569BF4 /* GridStaff.cpp in Sources */,
 				8F3DD33E18854B2E0051330C /* beam.cpp in Sources */,
+				4D1694731E3A455200569BF4 /* HumGrid.cpp in Sources */,
 				8F3DD34018854B2E0051330C /* clef.cpp in Sources */,
 				8F3DD34218854B2E0051330C /* durationinterface.cpp in Sources */,
 				4DDBBB5C1C7AE45900054AFF /* dynam.cpp in Sources */,
+				4D1694641E3A454400569BF4 /* GridPart.cpp in Sources */,
 				8F3DD34418854B2E0051330C /* keysig.cpp in Sources */,
 				4D1BE7741C688F5A0086DC0E /* MidiMessage.cpp in Sources */,
 				4DF28A001A7545E500BA9F7D /* timeinterface.cpp in Sources */,
@@ -1293,6 +1572,7 @@
 				8F3DD34618854B2E0051330C /* layerelement.cpp in Sources */,
 				4D798CBE1B8AEDBA007281CA /* drawinginterface.cpp in Sources */,
 				8F3DD34818854B2E0051330C /* mensur.cpp in Sources */,
+				4D1694721E3A455200569BF4 /* GridVoice.cpp in Sources */,
 				8F3DD34A18854B2E0051330C /* multirest.cpp in Sources */,
 				8F3DD34C18854B2E0051330C /* note.cpp in Sources */,
 				4D8CD8A71B4E927300F0756F /* atts_critapp.cpp in Sources */,
@@ -1300,12 +1580,16 @@
 				4DA1448B1C2AB28700CB7CEE /* textelement.cpp in Sources */,
 				8F3DD35018854B2E0051330C /* positioninterface.cpp in Sources */,
 				8F3DD35218854B2E0051330C /* rest.cpp in Sources */,
+				4D16946F1E3A455200569BF4 /* GridSide.cpp in Sources */,
 				8F3DD35418854B2E0051330C /* slur.cpp in Sources */,
+				4D1694741E3A455200569BF4 /* humlib.cpp in Sources */,
 				8F3DD35818854B2E0051330C /* tie.cpp in Sources */,
 				4D1BE7721C688F5A0086DC0E /* MidiFile.cpp in Sources */,
+				4D1694761E3A455200569BF4 /* MxmlMeasure.cpp in Sources */,
 				8F3DD35A18854B2E0051330C /* tuplet.cpp in Sources */,
 				8F3DD32E18854B250051330C /* layer.cpp in Sources */,
 				8F3DD33018854B250051330C /* measure.cpp in Sources */,
+				4D1694701E3A455200569BF4 /* GridSlice.cpp in Sources */,
 				8F3DD33218854B250051330C /* page.cpp in Sources */,
 				8F3DD33418854B250051330C /* scoredef.cpp in Sources */,
 				8F3DD33618854B250051330C /* staff.cpp in Sources */,
@@ -1334,6 +1618,7 @@
 				4D9A9C1A199F561200028D93 /* verse.cpp in Sources */,
 				4D9A9C1F19A1DE2000028D93 /* syl.cpp in Sources */,
 				4DB0B0171C44129300DBDCC3 /* timestamp.cpp in Sources */,
+				4D1694771E3A455200569BF4 /* MxmlPart.cpp in Sources */,
 				4DF28A061A754DF000BA9F7D /* floatingobject.cpp in Sources */,
 				4DA3FCD419B61DB400CBDFE6 /* atts_cmn.cpp in Sources */,
 				4DC34BA919BC4A83006175CD /* accid.cpp in Sources */,
@@ -1345,6 +1630,22 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin XCBuildConfiguration section */
+		4D16945E1E3A44F300569BF4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Debug;
+		};
+		4D16945F1E3A44F300569BF4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				USER_HEADER_SEARCH_PATHS = "";
+			};
+			name = Release;
+		};
 		8F086EB1188534690037FD8E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1414,6 +1715,7 @@
 				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = "";
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -1436,6 +1738,11 @@
 		8F086EB4188534690037FD8E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+					NO_HUMDRUM_SUPPORT,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -1444,6 +1751,7 @@
 		8F086EB5188534690037FD8E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = NO_HUMDRUM_SUPPORT;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -1476,6 +1784,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4D16945D1E3A44F300569BF4 /* Build configuration list for PBXNativeTarget "Verovio-Humdrum" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D16945E1E3A44F300569BF4 /* Debug */,
+				4D16945F1E3A44F300569BF4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		8F086EA3188534680037FD8E /* Build configuration list for PBXProject "Verovio" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
