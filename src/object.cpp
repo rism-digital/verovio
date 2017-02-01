@@ -245,6 +245,7 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     attributes->clear();
 
     Att::GetCmn(this, attributes);
+    Att::GetCmnornaments(this, attributes);
     Att::GetCritapp(this, attributes);
     Att::GetExternalsymbols(this, attributes);
     Att::GetMei(this, attributes);
