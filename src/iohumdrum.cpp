@@ -2805,6 +2805,7 @@ void HumdrumInput::processDirection(hum::HTp token, int staffindex)
     m_measure->AddChild(dir);
     setStaff(dir, m_currentstaff);
     addTextElement(dir, text);
+    setLocationId(dir, token);
     hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
     dir->SetTstamp(tstamp.getFloat());
 
