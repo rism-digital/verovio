@@ -5194,6 +5194,7 @@ void HumdrumInput::addTrill(hum::HTp token)
     // using tstamp for now, but @startid is perhaps better?
     hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
     trill->SetTstamp(tstamp.getFloat());
+    setLocationId(trill, token);
 
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
