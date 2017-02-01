@@ -226,6 +226,7 @@ sub getSources {
 	# libmei: only a subset is included:
 	push @sources, "$VEROVIO_ROOT/libmei/attconverter.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_cmn.cpp";
+	push @sources, "$VEROVIO_ROOT/libmei/atts_cmnornaments.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_critapp.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_externalsymbols.cpp";
 	push @sources, "$VEROVIO_ROOT/libmei/atts_mei.cpp";
