@@ -31,6 +31,7 @@
 #include "layer.h"
 #include "layerelement.h"
 #include "measure.h"
+#include "mordent.h"
 #include "note.h"
 #include "octave.h"
 #include "pedal.h"
@@ -45,6 +46,7 @@
 #include "tie.h"
 #include "timeinterface.h"
 #include "trill.h"
+#include "turn.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -88,6 +90,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         assert(harm);
         DrawHarm(dc, harm, measure, system);
     }
+    else if (element->Is(MORDENT)) {
+        Mordent *mordent = dynamic_cast<Mordent *>(element);
+        assert(mordent);
+        DrawMordent(dc, mordent, measure, system);
+    }
     else if (element->Is(PEDAL)) {
         Pedal *pedal = dynamic_cast<Pedal *>(element);
         assert(pedal);
@@ -102,6 +109,11 @@ void View::DrawControlElement(DeviceContext *dc, ControlElement *element, Measur
         Trill *trill = dynamic_cast<Trill *>(element);
         assert(trill);
         DrawTrill(dc, trill, measure, system);
+    }
+    else if (element->Is(TURN)) {
+        Turn *turn = dynamic_cast<Turn *>(element);
+        assert(turn);
+        DrawTurn(dc, turn, measure, system);
     }
 }
 
@@ -1709,6 +1721,45 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     dc->EndGraphic(harm, this);
 }
 
+void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(mordent);
+
+    // We cannot draw a trill that has no start position
+    if (!mordent->GetStart()) return;
+
+    dc->StartGraphic(mordent, "", mordent->GetUuid());
+
+    int x = mordent->GetStart()->GetDrawingX();
+
+    // set norm as default
+    int code = SMUFL_E56D_ornamentMordentInverted;
+    if (mordent->GetForm() == mordentLog_FORM_inv) code = SMUFL_E56C_ornamentMordent;
+    if (mordent->GetLong() == true) code = SMUFL_E56E_ornamentTremblement;
+
+    std::wstring str;
+    str.push_back(code);
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = mordent->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, x, (*staffIter)->GetDrawingY());
+        int y = mordent->GetDrawingY();
+
+        // Adjust the x position
+        int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
+
+        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        dc->ResetFont();
+    }
+
+    dc->EndGraphic(mordent, this);
+}
+
 void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system)
 {
     assert(dc);
@@ -1837,6 +1888,45 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     }
 
     dc->EndGraphic(trill, this);
+}
+
+void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *system)
+{
+    assert(dc);
+    assert(system);
+    assert(measure);
+    assert(turn);
+
+    // We cannot draw a trill that has no start position
+    if (!turn->GetStart()) return;
+
+    dc->StartGraphic(turn, "", turn->GetUuid());
+
+    int x = turn->GetStart()->GetDrawingX();
+    if (turn->GetDelayed() == true) LogWarning("delayed turns not supported");
+
+    // set norm as default
+    int code = SMUFL_E567_ornamentTurn;
+    if (turn->GetForm() == turnLog_FORM_inv) code = SMUFL_E568_ornamentTurnInverted;
+
+    std::wstring str;
+    str.push_back(code);
+
+    std::vector<Staff *>::iterator staffIter;
+    std::vector<Staff *> staffList = turn->GetTstampStaves(measure);
+    for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), turn, x, (*staffIter)->GetDrawingY());
+        int y = turn->GetDrawingY();
+
+        // Adjust the x position
+        int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
+
+        dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+        DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
+        dc->ResetFont();
+    }
+
+    dc->EndGraphic(turn, this);
 }
 
 //----------------------------------------------------------------------------
