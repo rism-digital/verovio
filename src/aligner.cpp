@@ -399,10 +399,8 @@ void Alignment::AddLayerElementRef(LayerElement *element)
     assert(element->IsLayerElement());
     m_layerElementsRef.push_back(element);
     
-    //if (!element->HasToBeAligned()) return;
-    
-    //
-    int n = 0;
+    // -1 will be used for barlines attributes
+    int n = -1;
     Staff *staffRef = element->m_crossStaff;
     if (!staffRef) staffRef = dynamic_cast<Staff*>(element->GetFirstParent(STAFF));
     if (staffRef) n = staffRef->GetN();
@@ -816,33 +814,18 @@ int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
     
     this->SetXRel(this->GetXRel() + params->m_cumulatedXShift);
     
-    if (m_type == ALIGNMENT_CONTAINER) return FUNCTOR_SIBLINGS;
-    
-    /*
-
-    // Here we want to process only the left scoreDef up to the left barline
-    if (this->m_type > ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
-
-    ArrayOfObjects::iterator iter;
-
-    // Because we are processing the elements vertically we need to reset minPos for each element
-    int previousMinPos = params->m_minPos;
-    for (iter = m_layerElementsRef.begin(); iter != m_layerElementsRef.end(); iter++) {
-        params->m_minPos = previousMinPos;
-        (*iter)->Process(params->m_functor, params);
+    if (GetType() == ALIGNMENT_CONTAINER) {
+        return FUNCTOR_SIBLINGS;
     }
-
-    // If we have elements for this alignment, then adjust the minPos
-    if (!m_layerElementsRef.empty()) {
-        params->m_minPos = this->GetXRel() + this->GetMaxWidth();
+    else if (GetType() == ALIGNMENT_FULLMEASURE) {
+        params->m_minPos = std::max(this->GetXRel() + params->m_doc->m_drawingMinMeasureWidth, params->m_minPos);
     }
-    // Otherwise, just set its xShift because this was not done by the functor
-    else {
-        this->SetXShift(params->m_minPos - this->GetXRel());
-        params->m_minPos = this->GetXRel();
+    else if (GetType() == ALIGNMENT_FULLMEASURE2) {
+        params->m_minPos = std::max(this->GetXRel() + 2 * params->m_doc->m_drawingMinMeasureWidth, params->m_minPos);
     }
-     
-    */
+    else if (m_type == ALIGNMENT_MEASURE_END) {
+        this->SetXRel(params->m_minPos);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -851,6 +834,8 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
+    
+    params->m_minPos = params->m_upcomingMinPos;
     
     // No upcoming bounding boxes, we keep the previous ones (e.g., the alignment has nothing for this staff)
     // Eventually we might want to have a more sophisticated pruning algorithm

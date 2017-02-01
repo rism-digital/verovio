@@ -387,50 +387,26 @@ int Measure::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
-
-    // we reset the measure width and the minimum position
-    //params->m_measureWidth = 0;
-    //params->m_layerMinPos = 0;
-    params->m_minPos = 0;
     
-    ArrayOfObjects staves;
-    AttComparison attComparison(STAFF);
-    this->FindAllChildByAttComparison(&staves, &attComparison);
-    ArrayOfObjects::iterator iter;
+    std::vector<int>::iterator iter;
     std::vector<AttComparison *> filters;
-    for(iter = staves.begin(); iter != staves.end(); iter++) {
-        params->m_cumulatedXShift = 0;
+    for(iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
         params->m_minPos = 0;
+        params->m_upcomingMinPos = 0;
+        params->m_cumulatedXShift = 0;
         filters.clear();
-        Staff *staff = dynamic_cast<Staff*>(*iter);
-        assert(staff);
         // Create ad comparison object for each type / @n
-        AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staff->GetN());
+        std::vector<int> ns;
+        // -1 for barline attributes that need to be taken into account each time
+        ns.push_back(-1);
+        ns.push_back(*iter);
+        AttCommonNComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
         
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
-    int x = 0;
-    // Process the left scoreDef elements and the left barLine
-    //m_measureAligner.Process(params->m_functor, params);
-
-    //params->m_layerMinPos = params->m_minPos;
 
     return FUNCTOR_SIBLINGS;
-}
-
-int Measure::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
-{
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
-    assert(params);
-
-    // use the measure width as minimum position of the barLine
-    //params->m_minPos = params->m_measureWidth;
-
-    // Process the right barLine and the right scoreDef elements
-    m_measureAligner.Process(params->m_functorEnd, params);
-
-    return FUNCTOR_CONTINUE;
 }
 
 int Measure::IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams)

@@ -516,7 +516,7 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
         params->m_cumulatedXShift += (-offset);
     }
     
-    params->m_minPos = this->GetAlignment()->GetXRel() + this->GetSelfX2();
+    params->m_upcomingMinPos = std::max(this->GetAlignment()->GetXRel() + this->GetSelfX2(), params->m_upcomingMinPos);
     
     return FUNCTOR_CONTINUE;
     

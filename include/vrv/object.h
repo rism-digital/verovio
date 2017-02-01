@@ -526,8 +526,8 @@ public:
      * The m_xShift is updated appropriately
      * At the end, lay out the X positions of the staff content looking at the bounding boxes.
      */
-    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
+    virtual int SetBoundingBoxXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     ///@}
 

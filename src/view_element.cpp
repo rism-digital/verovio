@@ -198,12 +198,13 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     std::wstring accidStr = accid->GetSymbolStr();
     bool center = false;
+    
+    int x = accid->GetDrawingX();
+    int y = accid->GetDrawingY();
 
     if (accid->GetFunc() == accidLog_FUNC_edit) {
         center = true;
         accid->m_drawingCueSize = true;
-        // position is currently only above the staff
-        int y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
         if (note) {
@@ -216,17 +217,14 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // adjust the x position so it is centered
             wchar_t noteHead = (note->GetActualDur() < DUR_2) ? SMUFL_E0A2_noteheadWhole : SMUFL_E0A3_noteheadHalf;
             int radius = m_doc->GetGlyphWidth(noteHead, staff->m_drawingStaffSize, note->IsCueSize());
-            accid->SetDrawingX(accid->GetDrawingX() + radius / 2);
+            x += (radius / 2);
         }
         TextExtend extend;
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->m_drawingCueSize));
         dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
         dc->ResetFont();
-        accid->SetDrawingY(y + extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
-
-    int x = accid->GetDrawingX();
-    int y = accid->GetDrawingY();
 
     DrawSmuflString(dc, x, y, accidStr, center, staff->m_drawingStaffSize, accid->m_drawingCueSize);
 

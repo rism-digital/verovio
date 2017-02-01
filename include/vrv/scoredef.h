@@ -138,6 +138,11 @@ public:
      * Get the staffDef with number n (NULL if not found).
      */
     StaffDef *GetStaffDef(int n);
+    
+    /**
+     * Return all the @n values of the staffDef in a scoreDef
+     */
+    std::vector<int> GetStaffNs();
 
     /**
      * Set the redraw flag to all staffDefs.

@@ -149,7 +149,7 @@ void Page::LayOutHorizontally()
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor setBoundingBoxXShift(&Object::SetBoundingBoxXShift);
     Functor setBoundingBoxXShiftEnd(&Object::SetBoundingBoxXShiftEnd);
-    SetBoundingBoxXShiftParams setBoundingBoxXShiftParams(doc, &setBoundingBoxXShift, &setBoundingBoxXShiftEnd);
+    SetBoundingBoxXShiftParams setBoundingBoxXShiftParams(doc, &setBoundingBoxXShift, &setBoundingBoxXShiftEnd, doc->m_scoreDef.GetStaffNs());
     this->Process(&setBoundingBoxXShift, &setBoundingBoxXShiftParams, &setBoundingBoxXShiftEnd);
 
     // Integrate the X bounding box shift of the elements
@@ -256,7 +256,7 @@ void Page::JustifyHorizontally()
     Functor justifyX(&Object::JustifyX);
     JustifyXParams justifyXParams(&justifyX);
     justifyXParams.m_systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar;
-    this->Process(&justifyX, &justifyXParams);
+    //this->Process(&justifyX, &justifyXParams);
 }
 
 int Page::GetContentHeight() const

@@ -204,7 +204,6 @@ public:
      */
     ///@{
     virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
     ///@}
 
     /**

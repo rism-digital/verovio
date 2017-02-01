@@ -936,10 +936,12 @@ public:
 
 class SetBoundingBoxXShiftParams : public FunctorParams {
 public:
-    SetBoundingBoxXShiftParams(Doc *doc, Functor *functor, Functor *functorEnd)
+    SetBoundingBoxXShiftParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
     {
         m_minPos = 0;
+        m_upcomingMinPos = 0;
         m_cumulatedXShift = 0;
+        m_staffNs = staffNs;
         //m_layerMinPos = 0;
         //m_measureWidth = 0;
         m_doc = doc;
@@ -947,7 +949,9 @@ public:
         m_functorEnd = functorEnd;
     }
     int m_minPos;
+    int m_upcomingMinPos;
     int m_cumulatedXShift;
+    std::vector<int> m_staffNs;
     std::vector<BoundingBox*> m_boundingBoxes;
     std::vector<BoundingBox*> m_upcomingBoundingBoxes;
     //int m_layerMinPos;
