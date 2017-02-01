@@ -29,11 +29,11 @@ public:
     Mordent();
     virtual ~Mordent();
     virtual void Reset();
-    virtual std::string GetClassName() const { remordent "Mordent"; }
-    virtual ClassId GetClassId() const { remordent MORDENT; }
+    virtual std::string GetClassName() const { return "Mordent"; }
+    virtual ClassId GetClassId() const { return MORDENT; }
     ///@}
 
-    virtual TimePointInterface *GetTimePointInterface() { remordent dynamic_cast<TimePointInterface *>(this); }
+    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
 
     //----------//
     // Functors //
