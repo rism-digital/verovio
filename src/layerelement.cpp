@@ -490,6 +490,7 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
     
     if (!this->HasToBeAligned()) {
         // if nothing to do with this type of element
+        // this happens for example with Artic where only ArticPart children are aligned
         return FUNCTOR_CONTINUE;
     }
     
@@ -501,12 +502,28 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
     
-    params->m_nextBoundingBoxes.push_back(this);
+    if (this->HasEmptyBB()) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    // We add it to the upcoming bouding boxes
+    params->m_upcomingBoundingBoxes.push_back(this);
+    
+    int selfLeft = this->GetAlignment()->GetXRel() + this->GetSelfX1();
+    int offset = selfLeft - params->m_minPos;
+    if (offset < 0) {
+        this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
+        params->m_cumulatedXShift += (-offset);
+    }
+    
+    params->m_minPos = this->GetAlignment()->GetXRel() + this->GetSelfX2();
+    
+    return FUNCTOR_CONTINUE;
     
     // The negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    int negative_offset = -(this->m_selfBB_x1);
+    int negative_offset = -(this->GetSelfX1());
     
     // Increase negative_offset by the symbol type's left margin, unless it's a note
     // that's part of a ligature.
@@ -548,7 +565,7 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
     */
     
     // the next minimal position is given by the right side of the bounding box + the spacing of the element
-    int width = this->m_selfBB_x2;
+    int width = this->GetSelfX2();
     
     // Move to right by the symbol type's right margin, unless it's a note that's
     // part of a ligature.

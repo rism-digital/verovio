@@ -857,7 +857,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     bool cueSize = false;
     // force cue size for intermediate clefs
-    if (clef->GetFirstParent(LAYER)) cueSize = true;
+    // if (clef->GetFirstParent(LAYER)) cueSize = true;
 
     // if (!cueSize)
     //    x -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;

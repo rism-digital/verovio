@@ -1026,7 +1026,7 @@ int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
     // the negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
-    int negative_offset = -(note->m_contentBB_x1)
+    int negative_offset = -(note->GetContentX1())
         + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
 
     if (params->m_graceMinPos > 0) {
@@ -1044,13 +1044,13 @@ int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
     }
 
     // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    params->m_graceMinPos = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2
+    params->m_graceMinPos = note->GetGraceAlignment()->GetXRel() + note->GetContentX2()
         + params->m_doc->GetRightMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     //(*minPos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
     // note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) *
     // doc->GetDrawingUnit(100) /
     // PARAM_DENOMINATOR);
-    note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2);
+    note->GetGraceAlignment()->SetMaxWidth(note->GetContentX2());
 
     return FUNCTOR_CONTINUE;
 }
@@ -1235,11 +1235,6 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     LayerElement *current = dynamic_cast<LayerElement *>(this);
     assert(current);
-
-    if (!current->HasToBeAligned()) {
-        // if nothing to do with this type of element
-        // return FUNCTOR_CONTINUE;
-    }
 
     if (!current->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account

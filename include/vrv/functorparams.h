@@ -939,6 +939,7 @@ public:
     SetBoundingBoxXShiftParams(Doc *doc, Functor *functor, Functor *functorEnd)
     {
         m_minPos = 0;
+        m_cumulatedXShift = 0;
         //m_layerMinPos = 0;
         //m_measureWidth = 0;
         m_doc = doc;
@@ -946,8 +947,9 @@ public:
         m_functorEnd = functorEnd;
     }
     int m_minPos;
+    int m_cumulatedXShift;
     std::vector<BoundingBox*> m_boundingBoxes;
-    std::vector<BoundingBox*> m_nextBoundingBoxes;
+    std::vector<BoundingBox*> m_upcomingBoundingBoxes;
     //int m_layerMinPos;
     //int m_measureWidth;
     Doc *m_doc;

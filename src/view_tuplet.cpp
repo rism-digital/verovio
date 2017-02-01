@@ -101,7 +101,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
 
         // yes they are in a beam
         x = firstElement->GetDrawingX()
-            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->m_selfBB_x2) / 2;
+            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->GetSelfX2()) / 2;
 
         // align the center point at the exact center of the first an last stem
         // TUPLET_OFFSET is summed so it does not collide with the stem
@@ -131,12 +131,12 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         // In this case use the center of the notehead to calculate the exact center
         // as it looks better
         x = firstElement->GetDrawingX()
-            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->m_selfBB_x2) / 2;
+            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->GetSelfX2()) / 2;
 
         // Return the start and end position for the brackes
         // starting from the first edge and last of the BBoxes
-        start->x = firstElement->m_selfBB_x1 + firstElement->GetDrawingX();
-        end->x = lastElement->m_selfBB_x2 + lastElement->GetDrawingX();
+        start->x = firstElement->GetSelfX1() + firstElement->GetDrawingX();
+        end->x = lastElement->GetSelfX2() + lastElement->GetDrawingX();
 
         // The first step is to calculate all the stem directions
         // cycle into the elements and count the up and down dirs

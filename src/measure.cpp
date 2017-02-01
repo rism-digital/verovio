@@ -129,7 +129,7 @@ int Measure::GetLeftBarLineX1Rel() const
 {
     int x = GetLeftBarLineXRel();
     if (m_leftBarLine.HasUpdatedBB()) {
-        x += m_leftBarLine.m_contentBB_x1;
+        x += m_leftBarLine.GetContentX1();
     }
     return x;
 }
@@ -138,7 +138,7 @@ int Measure::GetLeftBarLineX2Rel() const
 {
     int x = GetLeftBarLineXRel();
     if (m_leftBarLine.HasUpdatedBB()) {
-        x += m_leftBarLine.m_contentBB_x2;
+        x += m_leftBarLine.GetContentX2();
     }
     return x;
 }
@@ -155,7 +155,7 @@ int Measure::GetRightBarLineX1Rel() const
 {
     int x = GetRightBarLineXRel();
     if (m_rightBarLine.HasUpdatedBB()) {
-        x += m_rightBarLine.m_contentBB_x1;
+        x += m_rightBarLine.GetContentX1();
     }
     return x;
 }
@@ -164,7 +164,7 @@ int Measure::GetRightBarLineX2Rel() const
 {
     int x = GetRightBarLineXRel();
     if (m_rightBarLine.HasUpdatedBB()) {
-        x += m_rightBarLine.m_contentBB_x2;
+        x += m_rightBarLine.GetContentX2();
     }
     return x;
 }
@@ -399,6 +399,8 @@ int Measure::SetBoundingBoxXShift(FunctorParams *functorParams)
     ArrayOfObjects::iterator iter;
     std::vector<AttComparison *> filters;
     for(iter = staves.begin(); iter != staves.end(); iter++) {
+        params->m_cumulatedXShift = 0;
+        params->m_minPos = 0;
         filters.clear();
         Staff *staff = dynamic_cast<Staff*>(*iter);
         assert(staff);
@@ -408,9 +410,9 @@ int Measure::SetBoundingBoxXShift(FunctorParams *functorParams)
         
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
-    
+    int x = 0;
     // Process the left scoreDef elements and the left barLine
-    // m_measureAligner.Process(params->m_functor, params);
+    //m_measureAligner.Process(params->m_functor, params);
 
     //params->m_layerMinPos = params->m_minPos;
 

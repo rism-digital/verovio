@@ -175,9 +175,9 @@ int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
     if (box->Is(FLOATING_POSITIONER)) {
         FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
         assert(positioner);
-        return positioner->GetDrawingY() + positioner->m_contentBB_y2;
+        return positioner->GetContentTop();
     }
-    return box->GetDrawingY() + box->m_contentBB_y2;
+    return box->GetContentTop();
 }
 
 int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
@@ -185,9 +185,9 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     if (box->Is(FLOATING_POSITIONER)) {
         FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
         assert(positioner);
-        return -(positioner->GetDrawingY() + positioner->m_contentBB_y1 + m_staffHeight);
+        return -(positioner->GetContentBottom() + m_staffHeight);
     }
-    return -(box->GetDrawingY() + box->m_contentBB_y1 + m_staffHeight);
+    return -(box->GetContentBottom() + m_staffHeight);
 }
 
 void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, int x, int y)
@@ -399,7 +399,7 @@ void Alignment::AddLayerElementRef(LayerElement *element)
     assert(element->IsLayerElement());
     m_layerElementsRef.push_back(element);
     
-    if (!element->HasToBeAligned()) return;
+    //if (!element->HasToBeAligned()) return;
     
     //
     int n = 0;
@@ -814,6 +814,10 @@ int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
     
     LogDebug("Alignment type %d", m_type);
     
+    this->SetXRel(this->GetXRel() + params->m_cumulatedXShift);
+    
+    if (m_type == ALIGNMENT_CONTAINER) return FUNCTOR_SIBLINGS;
+    
     /*
 
     // Here we want to process only the left scoreDef up to the left barline
@@ -848,8 +852,12 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
     
-    params->m_boundingBoxes = params->m_nextBoundingBoxes;
-    params->m_nextBoundingBoxes.clear();
+    // No upcoming bounding boxes, we keep the previous ones (e.g., the alignment has nothing for this staff)
+    // Eventually we might want to have a more sophisticated pruning algorithm
+    if (params->m_upcomingBoundingBoxes.empty()) return FUNCTOR_CONTINUE;
+    
+    params->m_boundingBoxes = params->m_upcomingBoundingBoxes;
+    params->m_upcomingBoundingBoxes.clear();
     
     /*
 
@@ -956,11 +964,13 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 
     // Do not set an x pos for anything before the barline (including it)
     if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
-    // Do not set an x pos for anything after the barline (but still for it)
-    if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) return FUNCTOR_CONTINUE;
-
+    
     int intervalXRel = 0;
     double intervalTime = (m_time - params->m_previousTime);
+    
+    if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
+        intervalTime = 0.0;
+    }
 
     // For clef changes, do not take into account the interval so we keep them left aligned
     // This is not perfect because the previous time is the one of the previous aligner and
