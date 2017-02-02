@@ -53,6 +53,7 @@
 #include "iomei.h"
 #include "layer.h"
 #include "measure.h"
+#include "mordent.h"
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
@@ -72,6 +73,7 @@
 #include "tie.h"
 #include "trill.h"
 #include "tuplet.h"
+#include "turn.h"
 #include "verse.h"
 #include "vrv.h"
 //#include "attcomparison.h"
@@ -2390,7 +2392,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
 
         handleGroupStarts(tg, elements, pointers, layerdata, i);
-        addOrnamentMarkers(layerdata[i]);
 
         if (layerdata[i]->isChord()) {
             Chord *chord = new Chord;
@@ -2405,8 +2406,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processDynamics(layerdata[i], staffindex);
             processDirection(layerdata[i], staffindex);
             addArticulations(chord, layerdata[i]);
-            addTrill(layerdata[i]);
-            addFermata(layerdata[i], chord);
+            addOrnaments(chord, layerdata[i]);
         }
         else if (layerdata[i]->isRest()) {
             if (layerdata[i]->find("yy") != string::npos) {
@@ -2446,7 +2446,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             int field = layerdata[i]->getFieldIndex();
             colorNote(note, *layerdata[i], line, field);
             addArticulations(note, layerdata[i]);
-            addTrill(layerdata[i]);
+            addOrnaments(note, layerdata[i]);
             addFermata(layerdata[i], note);
         }
 
@@ -2706,30 +2706,6 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
     if (!token) {
         return;
     }
-    if (strchr(token->c_str(), 'm') != NULL) { // minor mordent
-        token->setValue("LO", "TX", "t", "m");
-        token->setValue("LO", "TX", "a", "true");
-    }
-    else if (strchr(token->c_str(), 'M') != NULL) { // major mordent
-        token->setValue("LO", "TX", "t", "M");
-        token->setValue("LO", "TX", "a", "true");
-    }
-    else if (strchr(token->c_str(), 'w') != NULL) { // minor inverted mordent
-        token->setValue("LO", "TX", "t", "w");
-        token->setValue("LO", "TX", "a", "true");
-    }
-    else if (strchr(token->c_str(), 'W') != NULL) { // major inverted mordent
-        token->setValue("LO", "TX", "t", "W");
-        token->setValue("LO", "TX", "a", "true");
-    }
-    else if (strchr(token->c_str(), 'S') != NULL) { // turn
-        token->setValue("LO", "TX", "t", "S");
-        token->setValue("LO", "TX", "a", "true");
-    }
-    else if (strchr(token->c_str(), '$') != NULL) { // inverted turn
-        token->setValue("LO", "TX", "t", "$");
-        token->setValue("LO", "TX", "a", "true");
-    }
     else if (strchr(token->c_str(), ':') != NULL) { // arpeggio
         token->setValue("LO", "TX", "t", "arp.");
         token->setValue("LO", "TX", "a", "true");
@@ -2944,6 +2920,9 @@ void HumdrumInput::processDynamics(hum::HTp token, int staffindex)
         }
         else if (letters == "fz") {
             dynamic = "fz";
+        }
+        else if (letters == "ffz") {
+            dynamic = "ffz";
         }
         else if (letters == "fp") {
             dynamic = "fp";
@@ -5167,7 +5146,212 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
 
 //////////////////////////////
 //
-// HumdrumInput::addTrill -- Add for note.
+// HumdrumInput::addOrnaments --
+//   S = turn
+//   $ = inverted turn
+//   SS = turn centered between two notes
+//   $$ = inverted turn centered between two notes
+//   M  = mordent, majaor second for top interval
+//   m  = mordent, minor second for top interval
+//   W  = inverted mordent, major second for top interval
+//   w  = inverted mordent, minor second for top interval
+//   T  = trill, major second
+//   t  = trill, minor second
+//   TT  = trill, major second with wavy line after it
+//   tt  = trill, minor second with wavy line after it
+//
+
+void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
+{
+    vector<bool> chartable(256, false);
+    for (int i = 0; i < token->size(); i++) {
+        chartable[token->at(i)] = true;
+    }
+
+    if (chartable['T'] || chartable['t']) {
+        addTrill(token);
+    }
+    if (chartable[';']) {
+        addFermata(token, object);
+    }
+    if (chartable['W'] || chartable['w'] || chartable['M'] || chartable['m']) {
+        addMordent(object, token);
+    }
+    if (chartable['S'] || chartable['$']) {
+        addTurn(object, token);
+    }
+    addOrnamentMarkers(token);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addTurn -- Add turn for note.
+//  only one of these four possibilities:
+//   	S = turn
+//   	$ = inverted turn
+//   	SS = turn, centered between two notes
+//   	$$ = inverted turn, centered between two notes
+//
+//
+
+void HumdrumInput::addTurn(Object *linked, hum::HTp token)
+{
+    bool invertedQ = false;
+    bool centeredQ = false;
+
+    size_t tpos;
+
+    tpos = token->find("SS");
+    if (tpos != std::string::npos) {
+        centeredQ = true;
+        tpos += 1;
+    }
+    else {
+        tpos = token->find("$$");
+        if (tpos != std::string::npos) {
+            invertedQ = true;
+            centeredQ = true;
+            tpos += 1;
+        }
+        else {
+            tpos = token->find("$");
+            if (tpos != std::string::npos) {
+                invertedQ = true;
+            }
+            else {
+                tpos = token->find("S");
+            }
+        }
+    }
+    if (tpos == std::string::npos) {
+        // no turn on note
+        return;
+    }
+
+    // int layer = m_currentlayer; // maybe place below if in layer 2
+    int staff = m_currentstaff;
+    int staffindex = staff - 1;
+    std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
+
+    Turn *turn = new Turn;
+    appendElement(m_measure, turn);
+    setStaff(turn, staff);
+
+    hum::HumNum tstamp = getMeasureTstamp(token, staffindex);
+    if (centeredQ) {
+        hum::HumNum duration = token->getDuration();
+        duration *= ss[staffindex].meter_bottom;
+        duration /= 4;
+        duration /= 2;
+        tstamp += duration;
+        turn->SetTstamp(tstamp.getFloat());
+    }
+    else if (!linked) {
+        turn->SetTstamp(tstamp.getFloat());
+    }
+    else {
+        turn->SetStartid("#" + linked->GetUuid());
+    }
+
+    if (invertedQ) {
+        turn->SetForm(turnLog_FORM_inv);
+        // } else {
+        //    turn->SetForm(turnLog_FORM_norm);
+    }
+
+    setLocationId(turn, token);
+
+    if (m_signifiers.above) {
+        if (tpos < token->size() - 1) {
+            if ((*token)[tpos + 1] == m_signifiers.above) {
+                turn->SetPlace(STAFFREL_above);
+            }
+        }
+    }
+    if (m_signifiers.below) {
+        if (tpos < token->size() - 1) {
+            if ((*token)[tpos + 1] == m_signifiers.below) {
+                turn->SetPlace(STAFFREL_below);
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addMordent -- Add mordent for note.
+//   	M = mordent, major second top interval
+//   	m = mordent, minor second top interval
+//   	W = inverted mordent, major second top interval
+//   	w = inverted mordent, minor second top interval
+//
+//
+
+void HumdrumInput::addMordent(Object *linked, hum::HTp token)
+{
+    bool invertedQ = false;
+    size_t tpos = token->find("W");
+    if (tpos != std::string::npos) {
+        invertedQ = true;
+    }
+    else {
+        tpos = token->find("w");
+        if (tpos != std::string::npos) {
+            invertedQ = true;
+        }
+        else {
+            tpos = token->find("M");
+            if (tpos == std::string::npos) {
+                tpos = token->find("m");
+            }
+        }
+    }
+    if (tpos == std::string::npos) {
+        // no mordent on note
+        return;
+    }
+
+    // int layer = m_currentlayer; // maybe place below if in layer 2
+    int staff = m_currentstaff;
+
+    Mordent *mordent = new Mordent;
+    appendElement(m_measure, mordent);
+    setStaff(mordent, staff);
+    if (linked) {
+        mordent->SetStartid("#" + linked->GetUuid());
+    }
+    else {
+        hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
+        mordent->SetTstamp(tstamp.getFloat());
+    }
+    setLocationId(mordent, token);
+
+    if (invertedQ) {
+        mordent->SetForm(mordentLog_FORM_inv);
+        // } else {
+        //    mordent->SetForm(mordentLog_FORM_norm);
+    }
+    // also "long" form to consider
+
+    if (m_signifiers.above) {
+        if (tpos < token->size() - 1) {
+            if ((*token)[tpos + 1] == m_signifiers.above) {
+                mordent->SetPlace(STAFFREL_above);
+            }
+        }
+    }
+    if (m_signifiers.below) {
+        if (tpos < token->size() - 1) {
+            if ((*token)[tpos + 1] == m_signifiers.below) {
+                mordent->SetPlace(STAFFREL_below);
+            }
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::addTrill -- Add trill for note.
 //
 // Todo: check the interval of the trill to see
 // if an accidental needs to be placed above it.

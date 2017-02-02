@@ -248,6 +248,9 @@ protected:
     void processTieEnd(Note *note, hum::HTp token, const std::string &tstring, int subindex);
     void addFermata(hum::HTp token, vrv::Object *parent = NULL);
     void addTrill(hum::HTp token);
+    void addTurn(vrv::Object *linked, hum::HTp token);
+    void addMordent(vrv::Object *linked, hum::HTp token);
+    void addOrnaments(vrv::Object *object, hum::HTp token);
     void getTimingInformation(std::vector<hum::HumNum> &prespace, std::vector<hum::HTp> &layerdata,
         hum::HumNum layerstarttime, hum::HumNum layerendtime);
     void convertChord(Chord *chord, hum::HTp token, int staffindex);
