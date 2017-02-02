@@ -51,6 +51,12 @@ public:
     ///@{
     virtual void AddChild(Object *object);
     ///@}
+    
+    /**
+     * @name Get the Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingY() const;
 
     int GetLayerCount() const { return (int)m_children.size(); }
 
@@ -59,14 +65,7 @@ public:
      */
     int GetStaffIdx() const { return Object::GetIdx(); }
 
-    /**
-     * Return the default horizontal spacing of staves.
-     */
-    int GetVerticalSpacing();
-
     StaffAlignment *GetAlignment() const { return m_staffAlignment; }
-
-    int GetYRel() const;
 
     //----------//
     // Functors //

@@ -382,48 +382,6 @@ int Layer::SetDrawingXY(FunctorParams *functorParams)
 
     params->m_currentLayer = this;
 
-    // Second pass where we do just process layer elements
-    if (params->m_processLayerElements) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // set the values for the scoreDef elements when required
-    if (this->GetStaffDefClef()) {
-        this->GetStaffDefClef()->SetDrawingX(
-            this->GetStaffDefClef()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetStaffDefKeySig()) {
-        this->GetStaffDefKeySig()->SetDrawingX(
-            this->GetStaffDefKeySig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetStaffDefMensur()) {
-        this->GetStaffDefMensur()->SetDrawingX(
-            this->GetStaffDefMensur()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetStaffDefMeterSig()) {
-        this->GetStaffDefMeterSig()->SetDrawingX(
-            this->GetStaffDefMeterSig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-
-    // Cautionary values
-    // set the values for the scoreDef elements when required
-    if (this->GetCautionStaffDefClef()) {
-        this->GetCautionStaffDefClef()->SetDrawingX(
-            this->GetCautionStaffDefClef()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetCautionStaffDefKeySig()) {
-        this->GetCautionStaffDefKeySig()->SetDrawingX(
-            this->GetCautionStaffDefKeySig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetCautionStaffDefMensur()) {
-        this->GetCautionStaffDefMensur()->SetDrawingX(
-            this->GetCautionStaffDefMensur()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetCautionStaffDefMeterSig()) {
-        this->GetCautionStaffDefMeterSig()->SetDrawingX(
-            this->GetCautionStaffDefMeterSig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-
     return FUNCTOR_CONTINUE;
 }
 

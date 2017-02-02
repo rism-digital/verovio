@@ -141,21 +141,6 @@ public:
     virtual bool HasToBeAligned() const { return true; }
 
     /**
-     * @name Get and set the Y drawing relative position
-     */
-    ///@{
-    int GetDrawingYRel() const { return m_drawingYRel; }
-    void SetDrawingYRel(int drawingYRel);
-    ///@}
-
-    /**
-     * @name Overwritten version that takes into account m_drawingYRel
-     */
-    ///@{
-    virtual int GetDrawingY() const;
-    ///@}
-
-    /**
      * @name Set and get the type of the alignment
      */
     ///@{
@@ -197,12 +182,6 @@ public:
 private:
     /** the type of artic part */
     ArticPartType m_type;
-
-    /**
-     * The Y drawing relative position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingYRel;
 
 public:
     std::vector<FloatingPositioner *> m_startSlurPositioners;

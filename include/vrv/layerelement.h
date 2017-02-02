@@ -85,6 +85,24 @@ public:
      */
     Beam *IsInBeam();
     ///@}
+    
+    /**
+     * @name Get the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
+    
+    /**
+     * @name Get and set the X and Y drawing relative positions
+     */
+    ///@{
+    int GetDrawingXRel() const { return m_drawingXRel; }
+    void SetDrawingXRel(int drawingXRel);
+    int GetDrawingYRel() const { return m_drawingYRel; }
+    void SetDrawingYRel(int drawingYRel);
+    ///@}
 
     /**
      * Returns the drawing top and bottom taking into accound stem, etc.
@@ -132,7 +150,12 @@ public:
      * See Object::SetBoundingBoxXShift
      */
     virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-
+    
+    /**
+     * See Object::PrepareCrossStaff
+     */
+    virtual int PrepareCrossStaff(FunctorParams *functorParams);
+    
     /**
      * See Object::PrepareTimePointing
      */
@@ -187,6 +210,18 @@ protected:
 private:
     /** Indicates whether it is a ScoreDef or StaffDef attribute */
     ElementScoreDefRole m_scoreDefRole;
+    
+    /**
+     * The Y drawing relative position of the object.
+     * It is re-computed everytime the object is drawn and it is not stored in the file.
+     */
+    int m_drawingYRel;
+    
+    /**
+     * The X drawing relative position of the object.
+     * It is re-computed everytime the object is drawn and it is not stored in the file.
+     */
+    int m_drawingXRel;
 };
 
 } // namespace vrv

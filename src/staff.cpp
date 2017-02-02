@@ -55,7 +55,6 @@ void Staff::Reset()
     m_drawingLines = 5;
     m_drawingNotationType = NOTATIONTYPE_NONE;
     m_yAbs = VRV_UNSET;
-    m_drawingY = 0;
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
@@ -84,18 +83,15 @@ void Staff::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-
-int Staff::GetVerticalSpacing()
+    
+int Staff::GetDrawingY() const
 {
-    return 160; // arbitrary generic value
-}
+    if (!m_staffAlignment) return 0;
+    
+    System *system = dynamic_cast<System*>(this->GetFirstParent(SYSTEM));
+    assert(system);
 
-int Staff::GetYRel() const
-{
-    if (m_staffAlignment) {
-        return m_staffAlignment->GetYRel();
-    }
-    return 0;
+    return (system->GetDrawingY() + m_staffAlignment->GetYRel());
 }
 
 //----------------------------------------------------------------------------
@@ -111,7 +107,6 @@ int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
 
 int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    m_drawingY = 0;
     m_staffAlignment = NULL;
 
     return FUNCTOR_CONTINUE;
@@ -180,9 +175,6 @@ int Staff::SetDrawingXY(FunctorParams *functorParams)
 
     params->m_currentStaff = this;
 
-    // Second pass where we do just process layer elements
-    if (params->m_processLayerElements) return FUNCTOR_CONTINUE;
-
     // Setting the drawing values for the staff (lines, scale)
     if (StaffDef *staffDef = params->m_doc->m_scoreDef.GetStaffDef(this->GetN())) {
         this->m_drawingLines = staffDef->GetLines();
@@ -190,18 +182,6 @@ int Staff::SetDrawingXY(FunctorParams *functorParams)
         if (staffDef->HasScale()) {
             this->m_drawingStaffSize = staffDef->GetScale();
         }
-    }
-
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_yAbs
-    if (this->m_yAbs == VRV_UNSET) {
-        assert(params->m_doc->GetType() == Raw);
-        this->SetDrawingY(this->GetYRel() + params->m_currentSystem->GetDrawingY());
-    }
-    else {
-        assert(params->m_doc->GetType() == Transcription);
-        this->SetDrawingY(this->m_yAbs);
     }
 
     return FUNCTOR_CONTINUE;

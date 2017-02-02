@@ -50,6 +50,14 @@ public:
     ///@{
     virtual void AddChild(Object *object);
     ///@}
+    
+    /**
+     * @name Get the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
 
     /**
      * @name Set and get the labels drawing width (normal and abbreviated)
@@ -65,11 +73,6 @@ public:
      * Return the height of the system
      */
     int GetHeight() const;
-
-    /**
-     * Return the default horizontal spacing of system.
-     */
-    int GetVerticalSpacing() const;
 
     /**
      * Return the index position of the system in its page parent
@@ -160,11 +163,6 @@ public:
      * See Object::UnCastOff
      */
     virtual int UnCastOff(FunctorParams *functorParams);
-
-    /**
-     * See Object::SetDrawingXY
-     */
-    virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
      * See Object::CastOffSystemsEnd

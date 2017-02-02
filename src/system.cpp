@@ -60,10 +60,8 @@ void System::Reset()
     m_systemRightMar = 0;
     m_xAbs = VRV_UNSET;
     m_drawingXRel = 0;
-    m_drawingX = 0;
     m_yAbs = VRV_UNSET;
     m_drawingYRel = 0;
-    m_drawingY = 0;
     m_drawingTotalWidth = 0;
     m_drawingJustifiableWidth = 0;
     m_drawingLabelsWidth = 0;
@@ -93,10 +91,15 @@ void System::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-
-int System::GetVerticalSpacing() const
+    
+int System::GetDrawingX() const
 {
-    return 0; // arbitrary generic value
+    return m_drawingXRel;
+}
+
+int System::GetDrawingY() const
+{
+    return m_drawingYRel;
 }
 
 int System::GetHeight() const
@@ -157,7 +160,6 @@ int System::UnsetCurrentScoreDef(FunctorParams *functorParams)
 int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_drawingXRel = 0;
-    m_drawingX = 0;
     m_drawingLabelsWidth = 0;
     m_drawingAbbrLabelsWidth = 0;
 
@@ -167,7 +169,6 @@ int System::ResetHorizontalAlignment(FunctorParams *functorParams)
 int System::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_drawingYRel = 0;
-    m_drawingY = 0;
 
     m_systemAligner.Reset();
 
@@ -381,33 +382,6 @@ int System::UnCastOff(FunctorParams *functorParams)
     // Use the MoveChildrenFrom method that moves and relinquishes them
     // See Object::Relinquish
     params->m_currentSystem->MoveChildrenFrom(this);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int System::SetDrawingXY(FunctorParams *functorParams)
-{
-    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
-    assert(params);
-
-    params->m_currentSystem = this;
-
-    // Second pass where we do just process layer elements
-    if (params->m_processLayerElements) return FUNCTOR_CONTINUE;
-
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingYRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_yAbs
-    if (this->m_yAbs == VRV_UNSET) {
-        assert(params->m_doc->GetType() == Raw);
-        this->SetDrawingX(this->m_drawingXRel);
-        this->SetDrawingY(this->m_drawingYRel);
-    }
-    else {
-        assert(params->m_doc->GetType() == Transcription);
-        this->SetDrawingX(this->m_xAbs);
-        this->SetDrawingY(this->m_yAbs);
-    }
 
     return FUNCTOR_CONTINUE;
 }

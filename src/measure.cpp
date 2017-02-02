@@ -46,6 +46,9 @@ Measure::Measure(bool measureMusic, int logMeasureNb) : Object("measure-"), AttC
     m_measureAligner.SetParent(this);
     // Idem for timestamps
     m_timestampAligner.SetParent(this);
+    // Idem for barlines
+    m_leftBarLine.SetParent(this);
+    m_rightBarLine.SetParent(this);
 
     // owned pointers need to be set to NULL;
     m_drawingScoreDef = NULL;
@@ -77,7 +80,6 @@ void Measure::Reset()
     m_timestampAligner.Reset();
     m_xAbs = VRV_UNSET;
     m_drawingXRel = 0;
-    m_drawingX = 0;
 
     // by default, we have a single barLine on the right (none on the left)
     m_rightBarLine.SetForm(this->GetRight());
@@ -115,6 +117,13 @@ void Measure::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
+}
+    
+int Measure::GetDrawingX() const
+{
+    System *system = dynamic_cast<System*>(this->GetFirstParent(SYSTEM));
+    assert(system);
+    return (system->GetDrawingX() + this->GetDrawingXRel());
 }
 
 int Measure::GetLeftBarLineXRel() const
@@ -318,7 +327,6 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_drawingXRel = 0;
-    m_drawingX = 0;
     if (m_measureAligner.GetLeftAlignment()) {
         m_measureAligner.GetLeftAlignment()->SetXRel(0);
     }
@@ -520,39 +528,6 @@ int Measure::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::SetDrawingXY(FunctorParams *functorParams)
-{
-    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
-    assert(params);
-
-    params->m_currentMeasure = this;
-
-    // Second pass where we do just process layer elements
-    if (params->m_processLayerElements) {
-        // However, we need to process the timestamps
-        m_timestampAligner.Process(params->m_functor, params);
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_xAbs
-    if (this->m_xAbs == VRV_UNSET) {
-        assert(params->m_doc->GetType() == Raw);
-        this->SetDrawingX(this->m_drawingXRel + params->m_currentSystem->GetDrawingX());
-    }
-    else {
-        assert(params->m_doc->GetType() == Transcription);
-        this->SetDrawingX(this->m_xAbs);
-    }
-
-    // Process the timestamps - we can do it already since the first pass in only taking care of X position for the
-    // LayerElements
-    m_timestampAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
 {
     FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
@@ -594,6 +569,16 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
     // Keep a pointer to the measure for when we are reaching the end (see BoundaryEnd::PrepareBoundaries)
     params->m_lastMeasure = this;
 
+    return FUNCTOR_CONTINUE;
+}
+    
+int Measure::PrepareCrossStaff(FunctorParams *functorParams)
+{
+    PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
+    assert(params);
+    
+    params->m_currentMeasure = this;
+    
     return FUNCTOR_CONTINUE;
 }
 

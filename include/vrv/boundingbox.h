@@ -44,13 +44,11 @@ public:
     virtual void ResetBoundingBox();
 
     /**
-     * @name Get and set the X and Y drawing position
+     * @name Get the X and Y drawing position
      */
     ///@{
-    virtual int GetDrawingX() const { return m_drawingX; }
-    virtual int GetDrawingY() const { return m_drawingY; }
-    void SetDrawingX(int drawingX) { m_drawingX = drawingX; }
-    void SetDrawingY(int drawingY) { m_drawingY = drawingY; }
+    virtual int GetDrawingX() const = 0;
+    virtual int GetDrawingY() const = 0;
     ///@}
 
     /**
@@ -135,18 +133,6 @@ private:
     
     int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
     int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
-
-protected:
-    /**
-     * The Y drawing position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingY;
-    /**
-     * The X drawing position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingX;
 };
 
 } // namespace vrv

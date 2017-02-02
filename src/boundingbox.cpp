@@ -46,9 +46,11 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 
     int min_x = std::min(x1, x2);
     int max_x = std::max(x1, x2);
+    
+    int drawingX = GetDrawingX();
 
-    min_x -= m_drawingX;
-    max_x -= m_drawingX;
+    min_x -= drawingX;
+    max_x -= drawingX;
 
     if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
     if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
@@ -65,8 +67,10 @@ void BoundingBox::UpdateContentBBoxY(int y1, int y2)
     int min_y = std::min(y1, y2);
     int max_y = std::max(y1, y2);
 
-    min_y -= m_drawingY;
-    max_y -= m_drawingY;
+    int drawingY = GetDrawingY();
+    
+    min_y -= drawingY;
+    max_y -= drawingY;
 
     if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
     if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
@@ -83,8 +87,10 @@ void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
     int min_x = std::min(x1, x2);
     int max_x = std::max(x1, x2);
 
-    min_x -= m_drawingX;
-    max_x -= m_drawingX;
+    int drawingX = GetDrawingX();
+    
+    min_x -= drawingX;
+    max_x -= drawingX;
 
     if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
     if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
@@ -101,8 +107,10 @@ void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
     int min_y = std::min(y1, y2);
     int max_y = std::max(y1, y2);
 
-    min_y -= m_drawingY;
-    max_y -= m_drawingY;
+    int drawingY = GetDrawingY();
+    
+    min_y -= drawingY;
+    max_y -= drawingY;
 
     if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
     if (m_selfBB_y2 < max_y) m_selfBB_y2 = max_y;
@@ -111,6 +119,22 @@ void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
 
     // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
+ 
+/*
+int BoundingBox::GetDrawingX() const
+{
+    // This should never happen because the method should be overridden
+    assert(false);
+    return 0;
+}
+
+int BoundingBox::GetDrawingY() const
+{
+    // This should never happen because the method should be overridden
+    assert(false);
+    return 0;
+}
+*/
 
 void BoundingBox::ResetBoundingBox()
 {

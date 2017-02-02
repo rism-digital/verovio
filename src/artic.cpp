@@ -96,11 +96,14 @@ void Artic::UpdateOutsidePartPosition(int yAbove, int yBelow, data_STAFFREL plac
 
     if (place == STAFFREL_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_above;
 
+    assert(false);
+    /*
     outsidePart->SetPlace(place);
     if (place == STAFFREL_above)
         outsidePart->SetDrawingY(yAbove);
     else
         outsidePart->SetDrawingY(yBelow);
+    */
 }
 
 void Artic::UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place)
@@ -108,11 +111,14 @@ void Artic::UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place
     ArticPart *insidePart = GetInsidePart();
     if (!insidePart) return;
 
+    assert(false);
+    /*
     insidePart->SetPlace(place);
     if (place == STAFFREL_above)
         insidePart->SetDrawingY(yAbove);
     else
         insidePart->SetDrawingY(yBelow);
+    */
 }
 
 ArticPart *Artic::GetInsidePart()
@@ -248,15 +254,9 @@ void ArticPart::Reset()
     ResetArticulation();
     ResetColor();
     ResetPlacement();
-
-    m_drawingYRel = 0;
 }
 
-int ArticPart::GetDrawingY() const
-{
-    return BoundingBox::GetDrawingY() - this->GetDrawingYRel();
-}
-
+/*
 void ArticPart::SetDrawingYRel(int drawingYRel)
 {
     if (GetPlace() == STAFFREL_above) {
@@ -266,6 +266,7 @@ void ArticPart::SetDrawingYRel(int drawingYRel)
         if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
     }
 };
+*/
 
 bool ArticPart::AlwaysAbove()
 {
@@ -322,11 +323,13 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
             if (insidePart->GetPlace() == STAFFREL_above) {
                 int inTop = insidePart->GetContentTop();
                 int outBottom = outsidePart->GetContentBottom();
+                assert(false);
                 if (inTop > outBottom) outsidePart->SetDrawingYRel(outBottom - inTop - margin);
             }
             else {
                 int inBottom = insidePart->GetContentBottom();
                 int outTop = outsidePart->GetContentTop();
+                assert(false);
                 if (inBottom < outTop) outsidePart->SetDrawingYRel(outTop - inBottom + margin);
             }
         }
@@ -366,7 +369,6 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
 
 int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    m_drawingYRel = 0;
     m_startSlurPositioners.clear();
     m_endSlurPositioners.clear();
 
@@ -385,6 +387,7 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
         // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
         int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {
+            assert(false);
             this->SetDrawingYRel(this->GetDrawingYRel() - shift);
             // this->SetColor("red");
         }
@@ -394,6 +397,7 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
         // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
         int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {
+            assert(false);
             this->SetDrawingYRel(this->GetDrawingYRel() - shift);
             // this->SetColor("green");
         }

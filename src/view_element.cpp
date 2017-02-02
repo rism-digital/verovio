@@ -710,6 +710,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                 Accid *accidFwd = noteList.at(fwIdx)->GetDrawingAccid();
                 Accid *accidBwd = noteList.at(bwIdx)->GetDrawingAccid();
 
+                assert(false);
+                /*
                 // if the top note has an accidental, draw it and update prevAccid
                 accidFwd->SetDrawingX(xAccid);
                 CalculateAccidX(staff, accidFwd, chord, true);
@@ -721,6 +723,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                     // DrawAccid(dc, accidBwd, layer, staff, measure);
                     bwIdx--;
                 }
+                */
 
                 fwIdx++;
             }
@@ -880,8 +883,9 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    element->SetDrawingY(element->GetDrawingY()
-        + CalculatePitchPosY(staff, custos->GetPloc(), layer->GetClefOffset(element), custos->GetOloc()));
+    assert(false);
+    //element->SetDrawingY(element->GetDrawingY()
+    //    + CalculatePitchPosY(staff, custos->GetPloc(), layer->GetClefOffset(element), custos->GetOloc()));
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -907,8 +911,9 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    element->SetDrawingY(element->GetDrawingY()
-        + CalculatePitchPosY(staff, dot->GetPloc(), layer->GetClefOffset(element), dot->GetOloc()));
+    assert(false);
+    //element->SetDrawingY(element->GetDrawingY()
+    //    + CalculatePitchPosY(staff, dot->GetPloc(), layer->GetClefOffset(element), dot->GetOloc()));
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -1429,7 +1434,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 xAccid -= (extend.m_width + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
                 dc->ResetFont();
             }
-            accid->SetDrawingX(xAccid);
+            assert(false);
+            //accid->SetDrawingX(xAccid);
         }
 
         if (note->GetDots()) {
@@ -1526,8 +1532,9 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     }
 
     // move the position back - to be updated HARDCODED also see View::DrawSylConnector and View::DrawSylConnectorLines
-    syl->SetDrawingX(syl->GetStart()->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
-    syl->SetDrawingY(GetSylY(syl, staff));
+    assert(false);
+    //syl->SetDrawingX(syl->GetStart()->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
+    //syl->SetDrawingY(GetSylY(syl, staff));
 
     dc->StartGraphic(syl, "", syl->GetUuid());
     dc->DeactivateGraphicY();
@@ -2272,7 +2279,8 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     // If we need to move the accidental horizontally, move it by currentX half-units.
     if (adjustHorizontally) {
         int xShift = currentX * halfUnit;
-        accid->SetDrawingX(accid->GetDrawingX() - xShift);
+        assert(false);
+        //accid->SetDrawingX(accid->GetDrawingX() - xShift);
 
         // mark the spaces as taken (true in accidSpace)
         for (int xIdx = currentX; xIdx > currentX - ACCID_WIDTH; xIdx--) {

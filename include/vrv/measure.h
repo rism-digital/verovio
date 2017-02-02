@@ -62,6 +62,20 @@ public:
      * The TimestampAttr it not added as child of the measure but to the Measure::m_timestamps array.
      */
     void AddTimestamp(TimestampAttr *timestampAttr);
+    
+    /**
+     * Get the X drawing position
+     */
+    virtual int GetDrawingX() const;
+    
+    /**
+     * @name Get and set the X drawing relative positions
+     */
+    ///@{
+    int GetDrawingXRel() const { return m_drawingXRel; }
+    void SetDrawingXRel(int drawingXRel);
+    ///@}
+
 
     /**
      * Return the index position of the measure in its system parent
@@ -100,8 +114,6 @@ public:
     BarLine *const GetLeftBarLine() { return &m_leftBarLine; }
     BarLine *const GetRightBarLine() { return &m_rightBarLine; }
     ///@}
-
-    // int GetXRel() const;
 
     /**
      * Return the non-justifiable left margin for the measure
@@ -227,11 +239,6 @@ public:
     virtual int CastOffEncoding(FunctorParams *functorParams);
 
     /**
-     * See Object::SetDrawingXY
-     */
-    virtual int SetDrawingXY(FunctorParams *functorParams);
-
-    /**
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
@@ -240,6 +247,11 @@ public:
      * See Object::FillStaffCurrentTimeSpanningEnd
      */
     virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams);
+    
+    /**
+     * See Object::PrepareCrossStaff
+     */
+    virtual int PrepareCrossStaff(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareFloatingGrps

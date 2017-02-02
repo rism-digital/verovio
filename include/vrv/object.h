@@ -265,6 +265,14 @@ public:
      * Return the index position of the object in its parent (-1 if not found)
      */
     int GetIdx() const;
+    
+    /**
+     * @name Get the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
 
     /**
      * Look for the Object in the children and return its position (-1 if not found)
@@ -624,6 +632,11 @@ public:
      * @name Functors for preparing drawing
      */
     ///@{
+    
+    /**
+     * See cross-staff / layer pointers on LayerElement
+     */
+    virtual int PrepareCrossStaff(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.

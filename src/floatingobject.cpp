@@ -188,12 +188,14 @@ void FloatingPositioner::ResetPositioner()
 
 int FloatingPositioner::GetDrawingX() const
 {
-    return m_drawingX;
+    assert(false);
+    //return m_drawingX;
 }
 
 int FloatingPositioner::GetDrawingY() const
 {
-    return BoundingBox::GetDrawingY() - this->GetDrawingYRel();
+    assert(false);
+    //return BoundingBox::GetDrawingY() - this->GetDrawingYRel();
 }
 
 void FloatingPositioner::UpdateCurvePosition(

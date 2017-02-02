@@ -202,8 +202,9 @@ void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, int x,
         m_floatingPositioners.push_back(box);
         item = m_floatingPositioners.end() - 1;
     }
-    (*item)->SetDrawingX(x);
-    (*item)->SetDrawingY(y);
+    assert(false);
+    //(*item)->SetDrawingX(x);
+    //(*item)->SetDrawingY(y);
     // LogDebug("BB %d", item->second.m_contentBB_x1);
     object->SetCurrentFloatingPositioner((*item));
 }
@@ -835,7 +836,7 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
     
-    params->m_minPos = params->m_upcomingMinPos;
+    //params->m_minPos = params->m_upcomingMinPos;
     
     // No upcoming bounding boxes, we keep the previous ones (e.g., the alignment has nothing for this staff)
     // Eventually we might want to have a more sophisticated pruning algorithm

@@ -68,8 +68,8 @@ void LayerElement::Reset()
     Object::Reset();
 
     m_xAbs = VRV_UNSET;
-    m_drawingX = 0;
-    m_drawingY = 0;
+    m_drawingYRel = 0;
+    m_drawingXRel = 0;
 
     m_scoreDefRole = NONE;
     m_alignment = NULL;
@@ -131,6 +131,30 @@ Beam *LayerElement::IsInBeam()
         }
     }
     return NULL;
+}
+
+int LayerElement::GetDrawingX() const
+{
+    assert(m_alignment);
+    
+    Measure *measure = dynamic_cast<Measure*>(this->GetFirstParent(MEASURE));
+    assert(measure);
+    return (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel());
+}
+    
+int LayerElement::GetDrawingY() const
+{
+    // First look if we have a crossStaff situation
+    Object *object = m_crossStaff;
+    // Otherwise get the first staff
+    if (!object)
+        object = this->GetFirstParent(STAFF);
+    // Otherwise the first measure (this is the case with barLineAttr
+    if (!object)
+        object = this->GetFirstParent(MEASURE);
+    
+    assert(object);
+    return object->GetDrawingY() - this->GetDrawingYRel();
 }
 
 int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type)
@@ -325,7 +349,7 @@ int LayerElement::GetXRel() const
 
 int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
-    m_drawingX = 0;
+    m_drawingXRel = 0;
     m_alignment = NULL;
     if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
@@ -338,8 +362,8 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    m_drawingY = 0;
-
+    m_drawingYRel = 0;
+    
     return FUNCTOR_CONTINUE;
 }
 
@@ -516,7 +540,7 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
         params->m_cumulatedXShift += (-offset);
     }
     
-    params->m_upcomingMinPos = std::max(this->GetAlignment()->GetXRel() + this->GetSelfX2(), params->m_upcomingMinPos);
+    params->m_minPos = this->GetAlignment()->GetXRel() + this->GetSelfX2();
     
     return FUNCTOR_CONTINUE;
     
@@ -673,6 +697,56 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
     
     return FUNCTOR_CONTINUE;
 }
+    
+int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
+{
+    PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
+    assert(params);
+    
+    m_crossStaff = NULL;
+    m_crossLayer = NULL;
+    
+    // Look for cross-staff situations
+    // If we have one, make is available in m_crossStaff
+    DurationInterface *durElement = this->GetDurationInterface();
+    if (!durElement || !durElement->HasStaff()) {
+        return FUNCTOR_CONTINUE;
+    }
+    
+    AttCommonNComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
+    m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByAttComparison(&comparisonFirst, 1));
+    if (!m_crossStaff) {
+        LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0),
+                       this->GetUuid().c_str());
+        return FUNCTOR_CONTINUE;
+    }
+    
+    Staff *parentStaff = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
+    assert(parentStaff);
+    // Check if we have a cross-staff to itself...
+    if (m_crossStaff == parentStaff) {
+        LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff",
+                   durElement->GetStaff().at(0), this->GetUuid().c_str());
+        m_crossStaff = NULL;
+        return FUNCTOR_CONTINUE;
+    }
+    
+    Layer *parentLayer = dynamic_cast<Layer*>(this->GetFirstParent(LAYER));
+    assert(parentLayer);
+    // Now try to get the corresponding layer - for now look for the same layer @n
+    int layerN = parentLayer->GetN();
+    // When we will have allowed @layer in <note>, we will have to do:
+    // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
+    AttCommonNComparison comparisonFirstLayer(LAYER, layerN);
+    m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
+    if (!m_crossLayer) {
+        LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
+                   durElement->GetStaff().at(0), this->GetUuid().c_str());
+        m_crossStaff = NULL;
+    }
+
+    return FUNCTOR_CONTINUE;
+}
 
 int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
 {
@@ -714,6 +788,7 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
 
 int LayerElement::SetDrawingXY(FunctorParams *functorParams)
 {
+    /*
     SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
     assert(params);
 
@@ -832,6 +907,7 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
             accid->SetDrawingY(note->GetDrawingY());
         }
     }
+    */
 
     return FUNCTOR_CONTINUE;
 }

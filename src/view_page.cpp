@@ -57,9 +57,6 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     // First pass without processing the LayerElements - we need this for cross-staff going down because
     // the elements will need the position of the staff below to have been set before
     m_currentPage->Process(&setDrawingXY, &setDrawingXYParams);
-    // Second pass that process the LayerElements (only)
-    setDrawingXYParams.m_processLayerElements = true;
-    m_currentPage->Process(&setDrawingXY, &setDrawingXYParams);
 
     // Keep the width of the initial scoreDef
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
@@ -225,7 +222,6 @@ void View::DrawScoreDef(DeviceContext *dc, ScoreDef *scoreDef, Measure *measure,
         // scoreDef->SetDrawLabels(false);
     }
     else {
-        barLine->SetDrawingX(x);
         dc->StartGraphic(barLine, "", barLine->GetUuid());
         DrawBarLines(dc, measure, staffGrp, barLine);
         dc->EndGraphic(barLine, this);
@@ -705,11 +701,11 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     DrawMeasureChildren(dc, measure, measure, system);
 
     if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetLeftBarLineXRel(),
+        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetLeftBarLine()->GetDrawingX(),
             measure->GetLeftBarLine());
     }
     if (measure->GetDrawingRightBarLine() != BARRENDITION_NONE) {
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarLineXRel(),
+        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetRightBarLine()->GetDrawingX(),
             measure->GetRightBarLine());
     }
 
@@ -861,8 +857,8 @@ void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
     Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     if (!layer || !layer->HasStaffDef()) return;
 
-    StaffDef staffDef;
-    dc->StartGraphic(&staffDef, "", staffDef.GetUuid());
+    //StaffDef staffDef;
+    //dc->StartGraphic(&staffDef, "", staffDef.GetUuid());
 
     // draw the scoreDef if required
     if (layer->GetStaffDefClef()) {
@@ -878,7 +874,7 @@ void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
         DrawLayerElement(dc, layer->GetStaffDefMeterSig(), layer, staff, measure);
     }
 
-    dc->EndGraphic(&staffDef, this);
+    //dc->EndGraphic(&staffDef, this);
 }
 
 void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure)
@@ -891,8 +887,8 @@ void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *meas
     Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     if (!layer || !layer->HasCautionStaffDef()) return;
 
-    StaffDef staffDef;
-    dc->StartGraphic(&staffDef, "cautionary", staffDef.GetUuid());
+    //StaffDef staffDef;
+    //dc->StartGraphic(&staffDef, "cautionary", staffDef.GetUuid());
 
     // draw the scoreDef if required
     if (layer->GetCautionStaffDefClef()) {
@@ -908,7 +904,7 @@ void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *meas
         DrawLayerElement(dc, layer->GetCautionStaffDefMeterSig(), layer, staff, measure);
     }
 
-    dc->EndGraphic(&staffDef, this);
+    //dc->EndGraphic(&staffDef, this);
 }
 
 //----------------------------------------------------------------------------

@@ -124,6 +124,9 @@ void Page::LayOutHorizontally()
         setAlignmentXPosParams.m_longestActualDur = longestActualDur;
         this->Process(&setAlignmentX, &setAlignmentXPosParams);
     }
+    
+    // Set the pitch / pos alignement
+    Functor setAlignmentYPos(&Object::SetAlignmentYPosParams);
 
     // Render it for filling the bounding box
     View view;

@@ -668,6 +668,23 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// PrepareCrossStaffParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the current measure
+ **/
+
+class PrepareCrossStaffParams : public FunctorParams {
+public:
+    PrepareCrossStaffParams()
+    {
+        m_currentMeasure = NULL;
+    }
+    Measure *m_currentMeasure;
+};
+
+//----------------------------------------------------------------------------
 // PrepareLyricsParams
 //----------------------------------------------------------------------------
 
@@ -1033,21 +1050,17 @@ public:
     SetDrawingXYParams(Doc *doc, View *view, Functor *functor)
     {
         m_doc = doc;
-        m_currentSystem = NULL;
         m_currentMeasure = NULL;
         m_currentStaff = NULL;
         m_currentLayer = NULL;
         m_view = view;
-        m_processLayerElements = false;
         m_functor = functor;
     }
     Doc *m_doc;
-    System *m_currentSystem;
     Measure *m_currentMeasure;
     Staff *m_currentStaff;
     Layer *m_currentLayer;
     View *m_view;
-    bool m_processLayerElements;
     Functor *m_functor;
 };
 

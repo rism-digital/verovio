@@ -190,8 +190,9 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
             xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, false);
         }
 
-        accid->SetDrawingX(xAccid);
-        accid->SetDrawingY(noteY);
+        assert(false);
+        //accid->SetDrawingX(xAccid);
+        //accid->SetDrawingY(noteY);
     }
 
     DrawLayerChildren(dc, note, layer, staff, measure);
