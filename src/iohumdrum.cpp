@@ -2447,7 +2447,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             colorNote(note, *layerdata[i], line, field);
             addArticulations(note, layerdata[i]);
             addOrnaments(note, layerdata[i]);
-            addFermata(layerdata[i], note);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
