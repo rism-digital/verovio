@@ -26,9 +26,10 @@ namespace vrv {
 // BeatRpt
 //----------------------------------------------------------------------------
 
-BeatRpt::BeatRpt() : LayerElement("beatrpt-"), AttBeatRptVis()
+BeatRpt::BeatRpt() : LayerElement("beatrpt-"), AttColor(), AttBeatRptVis()
 {
     RegisterAttClass(ATT_BEATRPTVIS);
+    RegisterAttClass(ATT_COLOR);
     Reset();
 }
 
@@ -40,6 +41,7 @@ void BeatRpt::Reset()
 {
     LayerElement::Reset();
     ResetBeatRptVis();
+    ResetColor();
 }
 
 double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit) const

@@ -18,11 +18,14 @@ FILES="$SRCFILES \
  ../src/midi/MidiEventList.cpp \
  ../src/midi/MidiFile.cpp \
  ../src/midi/MidiMessage.cpp \
+ ../src/hum/humlib.cpp \
  ../libmei/attconverter.cpp \
  ../libmei/atts_cmn.cpp \
  ../libmei/atts_critapp.cpp \
+ ../libmei/atts_externalsymbols.cpp \
  ../libmei/atts_mei.cpp \
  ../libmei/atts_mensural.cpp \
+ ../libmei/atts_midi.cpp \
  ../libmei/atts_pagebased.cpp \
  ../libmei/atts_shared.cpp"
 

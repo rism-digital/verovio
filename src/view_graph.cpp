@@ -57,7 +57,7 @@ void View::DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, in
 {
     assert(dc); // DC cannot be NULL
 
-    SwapY(&y1, &y2);
+    BoundingBox::SwapY(&y1, &y2);
 
     // dc->SetPen(m_currentColour, 0, AxSOLID );
     // dc->SetBrush(AxWHITE, AxTRANSPARENT);
@@ -77,7 +77,7 @@ void View::DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2
 {
     assert(dc);
 
-    SwapY(&y1, &y2);
+    BoundingBox::SwapY(&y1, &y2);
 
     dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
@@ -116,74 +116,40 @@ void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2,
 }
 
 /* Draw an empty ("void") diamond with its top lefthand point at (x1, y1). */
-    
+
 void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill)
 {
     Point p[4];
-    
-    dc->SetPen(m_currentColour, 0, AxSOLID);
-    dc->SetBrush(AxWHITE, AxTRANSPARENT);
-    
-#define TEMPORARY_KLUDGE_NO
-#ifdef TEMPORARY_KLUDGE
-    if (fill) {
-        int dHeight = ToDeviceContextX(height);
-        int dWidth = ToDeviceContextX(width);
-        p[0].x = ToDeviceContextX(x1);
-        p[0].y = ToDeviceContextY(y1);
-        p[1].x = ToDeviceContextX(x1+dWidth/2);
-        p[1].y = ToDeviceContextY(y1+dHeight/2);
-        p[2].x = p[0].x+dWidth;
-        p[2].y = p[0].y;
-        p[3].x = ToDeviceContextX(x1+dWidth/2);
-        p[3].y = ToDeviceContextY(y1-dHeight/2);
-        
-        dc->DrawPolygon(4, p);
-    }
-    else {
-        // This block of code is just because DrawPolygon() _always_ fills. Until that's fixed...
-        int linewidth = 40;
-        p[0].x = x1+width/2;
-        //y1 += linewidth/2;
-        p[0].y = y1-(height/2);
-        p[0].y = y1-(height/2)-linewidth;
-        p[0].y = y1-(height/2)-(linewidth/2);
-        p[1].x = p[0].x+width/2;
-        p[1].y = p[0].y+height/2;
-        p[2].x = p[0].x;
-        p[2].y = p[1].y+height/2;
-        p[3].x = p[0].x-width/2;
-        p[3].y = p[1].y;
-        DrawObliquePolygon(dc, p[0].x, p[0].y, p[1].x, p[1].y, linewidth);
-        DrawObliquePolygon(dc, p[1].x, p[1].y, p[2].x, p[2].y, linewidth);
-        DrawObliquePolygon(dc, p[2].x, p[2].y, p[3].x, p[3].y, linewidth);
-        DrawObliquePolygon(dc, p[3].x, p[3].y, p[0].x, p[0].y, linewidth);
-    }
-#else
+
+    int linewidth = 40; // This should be made a parameter for DrawDiammond
+    dc->SetPen(m_currentColour, linewidth, AxSOLID);
+    if (fill)
+        dc->SetBrush(m_currentColour, AxSOLID);
+    else
+        dc->SetBrush(m_currentColour, AxTRANSPARENT);
+
     int dHeight = ToDeviceContextX(height);
     int dWidth = ToDeviceContextX(width);
     p[0].x = ToDeviceContextX(x1);
     p[0].y = ToDeviceContextY(y1);
-    p[1].x = ToDeviceContextX(x1+dWidth/2);
-    p[1].y = ToDeviceContextY(y1+dHeight/2);
-    p[2].x = p[0].x+dWidth;
+    p[1].x = ToDeviceContextX(x1 + dWidth / 2);
+    p[1].y = ToDeviceContextY(y1 + dHeight / 2);
+    p[2].x = p[0].x + dWidth;
     p[2].y = p[0].y;
-    p[3].x = ToDeviceContextX(x1+dWidth/2);
-    p[3].y = ToDeviceContextY(y1-dHeight/2);
-    
+    p[3].x = ToDeviceContextX(x1 + dWidth / 2);
+    p[3].y = ToDeviceContextY(y1 - dHeight / 2);
+
     dc->DrawPolygon(4, p);
-#endif
+
     dc->ResetPen();
     dc->ResetBrush();
-    
 }
 
-    
 void View::DrawDot(DeviceContext *dc, int x, int y, int staffSize)
 {
     int r = std::max(ToDeviceContextX(m_doc->GetDrawingDoubleUnit(staffSize) / 5), 2);
 
-    dc->SetPen(m_currentColour, 1, AxSOLID);
+    dc->SetPen(m_currentColour, 0, AxSOLID);
     dc->SetBrush(m_currentColour, AxSOLID);
 
     dc->DrawCircle(ToDeviceContextX(x), ToDeviceContextY(y), r);
@@ -254,42 +220,23 @@ void View::DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int 
     }
 }
 
-void View::DrawThickBezierCurve(
-    DeviceContext *dc, Point p1, Point p2, Point c1, Point c2, int thickness, int staffSize, float angle)
+void View::DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle)
 {
     assert(dc);
 
     Point bez1[4], bez2[4]; // filled array with control points and end point
-    Point c1Rotated = c1;
-    Point c2Rotated = c2;
-    c1Rotated.y += thickness / 2;
-    c2Rotated.y += thickness / 2;
-    if (angle != 0.0) {
-        c1Rotated = CalcPositionAfterRotation(c1Rotated, angle, c1);
-        c2Rotated = CalcPositionAfterRotation(c2Rotated, angle, c2);
-    }
 
-    bez1[0] = ToDeviceContext(p1);
-    bez2[0] = bez1[0];
+    BoundingBox::CalcThickBezier(bezier, thickness, angle, bez1, bez2);
 
-    // Points for first bez, they go from xy to x1y1
-    bez1[1] = ToDeviceContext(c1Rotated);
-    bez1[2] = ToDeviceContext(c2Rotated);
-    bez1[3] = ToDeviceContext(p2);
+    bez1[0] = ToDeviceContext(bez1[0]);
+    bez1[1] = ToDeviceContext(bez1[1]);
+    bez1[2] = ToDeviceContext(bez1[2]);
+    bez1[3] = ToDeviceContext(bez1[3]);
 
-    c1Rotated = c1;
-    c2Rotated = c2;
-    c1Rotated.y -= thickness / 2;
-    c2Rotated.y -= thickness / 2;
-    if (angle != 0.0) {
-        c1Rotated = CalcPositionAfterRotation(c1Rotated, angle, c1);
-        c2Rotated = CalcPositionAfterRotation(c2Rotated, angle, c2);
-    }
-
-    // second bez. goes back
-    bez2[1] = ToDeviceContext(c1Rotated);
-    bez2[2] = ToDeviceContext(c2Rotated);
-    bez2[3] = ToDeviceContext(p2);
+    bez2[0] = ToDeviceContext(bez2[0]);
+    bez2[1] = ToDeviceContext(bez2[1]);
+    bez2[2] = ToDeviceContext(bez2[2]);
+    bez2[3] = ToDeviceContext(bez2[3]);
 
     // Actually draw it
     dc->SetPen(m_currentColour, std::max(1, m_doc->GetDrawingStemWidth(staffSize) / 2), AxSOLID);

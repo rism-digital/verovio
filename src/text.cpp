@@ -22,10 +22,12 @@ namespace vrv {
 // Rend
 //----------------------------------------------------------------------------
 
-Rend::Rend() : TextElement("rend-"), AttCommon(), AttTypography()
+Rend::Rend() : TextElement("rend-"), AttColor(), AttCommon(), AttLang(), AttTypography()
 
 {
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_LANG);
     RegisterAttClass(ATT_TYPOGRAPHY);
 
     Reset();
@@ -38,7 +40,9 @@ Rend::~Rend()
 void Rend::Reset()
 {
     TextElement::Reset();
+    ResetColor();
     ResetCommon();
+    ResetLang();
     ResetTypography();
 }
 

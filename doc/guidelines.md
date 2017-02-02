@@ -174,3 +174,19 @@ In the implementation, the same order must be followed, for the constructor call
 
         Reset();
     }
+
+Resetting the attributes is required and follows the same order
+
+    void Note::Reset()
+    {
+        LayerElement::Reset();
+        StemmedDrawingInterface::Reset();
+        DurationInterface::Reset();
+        PitchInterface::Reset();
+        ResetColoration();
+        ResetGraced();
+        ResetStems();
+        ResetTiepresent();
+        
+        // ...
+    }

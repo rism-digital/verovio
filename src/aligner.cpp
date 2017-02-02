@@ -181,7 +181,7 @@ int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
     if (box->Is() == FLOATING_POSITIONER) {
         FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
         assert(positioner);
-        return positioner->GetDrawingY() - positioner->GetDrawingYRel() + positioner->m_contentBB_y2;
+        return positioner->GetDrawingY() + positioner->m_contentBB_y2;
     }
     return box->GetDrawingY() + box->m_contentBB_y2;
 }
@@ -191,7 +191,7 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     if (box->Is() == FLOATING_POSITIONER) {
         FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
         assert(positioner);
-        return -(positioner->GetDrawingY() - positioner->GetDrawingYRel() + positioner->m_contentBB_y1 + m_staffHeight);
+        return -(positioner->GetDrawingY() + positioner->m_contentBB_y1 + m_staffHeight);
     }
     return -(box->GetDrawingY() + box->m_contentBB_y1 + m_staffHeight);
 }

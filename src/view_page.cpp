@@ -153,8 +153,8 @@ void View::DrawSystem(DeviceContext *dc, System *system)
             if (staff) {
                 dc->SetFont(m_doc->GetDrawingSmuflFont(100, false));
                 dc->DrawMusicText(IntToTupletFigures(measure->GetN()), ToDeviceContextX(system->GetDrawingX()),
-                    ToDeviceContextY(staff->GetDrawingY()
-                                      + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
+                    ToDeviceContextY(
+                        staff->GetDrawingY() + 3 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)));
                 dc->ResetFont();
             }
         }
@@ -460,7 +460,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     int penWidth = m_doc->GetDrawingStemWidth(100);
     y1 -= penWidth;
     y2 += penWidth;
-    SwapY(&y1, &y2);
+    BoundingBox::SwapY(&y1, &y2);
 
     int ymed, xdec, fact;
 
@@ -597,10 +597,10 @@ void View::DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp,
 
         // Now we have a barthru barLine, but we have dots so we still need to go through each staff
         if (barLine->HasRepetitionDots()) {
-            int i;
             StaffDef *childStaffDef = NULL;
-            for (i = 0; i < staffGrp->GetChildCount(); i++) {
-                childStaffDef = dynamic_cast<StaffDef *>(staffGrp->GetChild(i));
+            ListOfObjects *childList = staffGrp->GetList(staffGrp); // make sure it's initialized
+            for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
+                childStaffDef = dynamic_cast<StaffDef *>((*it));
                 if (childStaffDef) {
                     AttCommonNComparison comparison(STAFF, childStaffDef->GetN());
                     Staff *staff = dynamic_cast<Staff *>(measure->FindChildByAttComparison(&comparison, 1));
@@ -704,11 +704,11 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 
     DrawMeasureChildren(dc, measure, measure, system);
 
-    if (measure->GetLeftBarLineType() != BARRENDITION_NONE) {
+    if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
         DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetLeftBarLineXRel(),
             measure->GetLeftBarLine());
     }
-    if (measure->GetRightBarLineType() != BARRENDITION_NONE) {
+    if (measure->GetDrawingRightBarLine() != BARRENDITION_NONE) {
         DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetDrawingX() + measure->GetRightBarLineXRel(),
             measure->GetRightBarLine());
     }

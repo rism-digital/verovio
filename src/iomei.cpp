@@ -17,6 +17,7 @@
 
 #include "accid.h"
 #include "anchoredtext.h"
+#include "artic.h"
 #include "beam.h"
 #include "boundary.h"
 #include "chord.h"
@@ -27,6 +28,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
+#include "fermata.h"
 #include "functorparams.h"
 #include "hairpin.h"
 #include "harm.h"
@@ -55,6 +57,7 @@
 #include "tempo.h"
 #include "text.h"
 #include "tie.h"
+#include "trill.h"
 #include "tuplet.h"
 #include "verse.h"
 #include "vrv.h"
@@ -238,6 +241,10 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("dynam");
         WriteMeiDynam(m_currentNode, dynamic_cast<Dynam *>(object));
     }
+    else if (object->Is() == FERMATA) {
+        m_currentNode = m_currentNode.append_child("fermata");
+        WriteMeiFermata(m_currentNode, dynamic_cast<Fermata *>(object));
+    }
     else if (object->Is() == HAIRPIN) {
         m_currentNode = m_currentNode.append_child("hairpin");
         WriteMeiHairpin(m_currentNode, dynamic_cast<Hairpin *>(object));
@@ -266,11 +273,20 @@ bool MeiOutput::WriteObject(Object *object)
         m_currentNode = m_currentNode.append_child("tie");
         WriteMeiTie(m_currentNode, dynamic_cast<Tie *>(object));
     }
+    else if (object->Is() == TRILL) {
+        m_currentNode = m_currentNode.append_child("trill");
+        WriteMeiTrill(m_currentNode, dynamic_cast<Trill *>(object));
+    }
 
     // Layer elements
     else if (object->Is() == ACCID) {
         m_currentNode = m_currentNode.append_child("accid");
         WriteMeiAccid(m_currentNode, dynamic_cast<Accid *>(object));
+    }
+    else if (object->Is() == ARTIC) {
+        // Do not add a node for object representing an attribute
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("artic");
+        WriteMeiArtic(m_currentNode, dynamic_cast<Artic *>(object));
     }
     else if (object->Is() == BARLINE) {
         m_currentNode = m_currentNode.append_child("barLine");
@@ -481,6 +497,10 @@ bool MeiOutput::WriteObjectEnd(Object *object)
         BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(object);
         assert(interface);
         if (interface->IsBoundary()) return true;
+    }
+    // Object representing an attribute have no node to pop
+    else if (object->IsAttribute()) {
+        return true;
     }
     else if (m_scoreBasedMEI && (object->Is() == SYSTEM)) {
         return true;
@@ -702,6 +722,7 @@ void MeiOutput::WriteMeiDir(pugi::xml_node currentNode, Dir *dir)
     WriteXmlId(currentNode, dir);
     WriteTextDirInterface(currentNode, dir);
     WriteTimeSpanningInterface(currentNode, dir);
+    dir->WriteLang(currentNode);
 };
 
 void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
@@ -713,12 +734,24 @@ void MeiOutput::WriteMeiDynam(pugi::xml_node currentNode, Dynam *dynam)
     WriteTimeSpanningInterface(currentNode, dynam);
 };
 
+void MeiOutput::WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata)
+{
+    assert(fermata);
+
+    WriteXmlId(currentNode, fermata);
+    WriteTimePointInterface(currentNode, fermata);
+    fermata->WriteColor(currentNode);
+    fermata->WriteFermataVis(currentNode);
+    fermata->WritePlacement(currentNode);
+};
+
 void MeiOutput::WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin)
 {
     assert(hairpin);
 
     WriteXmlId(currentNode, hairpin);
     WriteTimeSpanningInterface(currentNode, hairpin);
+    hairpin->WriteColor(currentNode);
     hairpin->WriteHairpinLog(currentNode);
     hairpin->WritePlacement(currentNode);
 };
@@ -730,6 +763,7 @@ void MeiOutput::WriteMeiHarm(pugi::xml_node currentNode, Harm *harm)
     WriteXmlId(currentNode, harm);
     WriteTextDirInterface(currentNode, harm);
     WriteTimeSpanningInterface(currentNode, harm);
+    harm->WriteLang(currentNode);
 };
 
 void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
@@ -738,6 +772,8 @@ void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
 
     WriteXmlId(currentNode, octave);
     WriteTimeSpanningInterface(currentNode, octave);
+    octave->WriteColor(currentNode);
+    octave->WriteLinerendBase(currentNode);
     octave->WriteOctavedisplacement(currentNode);
 };
 
@@ -747,6 +783,7 @@ void MeiOutput::WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal)
 
     WriteXmlId(currentNode, pedal);
     WriteTimePointInterface(currentNode, pedal);
+    pedal->WriteColor(currentNode);
     pedal->WritePedalLog(currentNode);
     pedal->WritePlacement(currentNode);
 };
@@ -757,6 +794,7 @@ void MeiOutput::WriteMeiSlur(pugi::xml_node currentNode, Slur *slur)
 
     WriteXmlId(currentNode, slur);
     WriteTimeSpanningInterface(currentNode, slur);
+    slur->WriteColor(currentNode);
     slur->WriteCurvature(currentNode);
 };
 
@@ -779,6 +817,8 @@ void MeiOutput::WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo)
     WriteXmlId(currentNode, tempo);
     WriteTextDirInterface(currentNode, tempo);
     WriteTimePointInterface(currentNode, tempo);
+    tempo->WriteLang(currentNode);
+    tempo->WriteMiditempo(currentNode);
 }
 
 void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
@@ -787,6 +827,18 @@ void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
 
     WriteXmlId(currentNode, tie);
     WriteTimeSpanningInterface(currentNode, tie);
+    tie->WriteColor(currentNode);
+    tie->WriteCurvature(currentNode);
+};
+
+void MeiOutput::WriteMeiTrill(pugi::xml_node currentNode, Trill *trill)
+{
+    assert(trill);
+    
+    WriteXmlId(currentNode, trill);
+    WriteTimePointInterface(currentNode, trill);
+    trill->WriteColor(currentNode);
+    trill->WritePlacement(currentNode);
 };
 
 void MeiOutput::WriteMeiLayer(pugi::xml_node currentNode, Layer *layer)
@@ -815,6 +867,23 @@ void MeiOutput::WriteMeiAccid(pugi::xml_node currentNode, Accid *accid)
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
     accid->WriteAccidLog(currentNode);
+    accid->WriteColor(currentNode);
+}
+
+void MeiOutput::WriteMeiArtic(pugi::xml_node currentNode, Artic *artic)
+{
+    assert(artic);
+
+    // Only write att.articulation if representing an attribute
+    if (artic->IsAttribute()) {
+        artic->WriteArticulation(currentNode);
+        return;
+    }
+
+    WriteLayerElement(currentNode, artic);
+    artic->WriteArticulation(currentNode);
+    artic->WriteColor(currentNode);
+    artic->WritePlacement(currentNode);
 }
 
 void MeiOutput::WriteMeiBarLine(pugi::xml_node currentNode, BarLine *barLine)
@@ -837,6 +906,7 @@ void MeiOutput::WriteMeiBeatRpt(pugi::xml_node currentNode, BeatRpt *beatRpt)
     assert(beatRpt);
 
     WriteLayerElement(currentNode, beatRpt);
+    beatRpt->WriteColor(currentNode);
     beatRpt->WriteBeatRptVis(currentNode);
 }
 
@@ -928,7 +998,9 @@ void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
     assert(mRest);
 
     WriteLayerElement(currentNode, mRest);
+    WritePositionInterface(currentNode, mRest);
     mRest->WriteVisibility(currentNode);
+    mRest->WriteFermatapresent(currentNode);
 }
 
 void MeiOutput::WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt)
@@ -969,6 +1041,7 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     WriteDurationInterface(currentNode, note);
     WritePitchInterface(currentNode, note);
     note->WriteAccidentalPerformed(currentNode);
+    note->WriteColor(currentNode);
     note->WriteColoration(currentNode);
     note->WriteGraced(currentNode);
     note->WriteNoteLogMensural(currentNode);
@@ -985,6 +1058,7 @@ void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
     WriteLayerElement(currentNode, rest);
     WriteDurationInterface(currentNode, rest);
     WritePositionInterface(currentNode, rest);
+    rest->WriteColor(currentNode);
 }
 
 void MeiOutput::WriteMeiProport(pugi::xml_node currentNode, Proport *proport)
@@ -1017,6 +1091,8 @@ void MeiOutput::WriteMeiVerse(pugi::xml_node currentNode, Verse *verse)
     assert(verse);
 
     WriteLayerElement(currentNode, verse);
+    verse->WriteColor(currentNode);
+    verse->WriteLang(currentNode);
     verse->WriteCommon(currentNode);
 }
 
@@ -1025,6 +1101,7 @@ void MeiOutput::WriteMeiSyl(pugi::xml_node currentNode, Syl *syl)
     assert(syl);
 
     WriteLayerElement(currentNode, syl);
+    syl->WriteLang(currentNode);
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
 }
@@ -1034,7 +1111,9 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
     assert(rend);
 
     WriteXmlId(currentNode, rend);
+    rend->WriteColor(currentNode);
     rend->WriteCommon(currentNode);
+    rend->WriteLang(currentNode);
     rend->WriteTypography(currentNode);
 }
 
@@ -1084,6 +1163,7 @@ void MeiOutput::WriteScoreDefInterface(pugi::xml_node element, ScoreDefInterface
     interface->WriteCleffingLog(element);
     interface->WriteKeySigDefaultLog(element);
     interface->WriteKeySigDefaultVis(element);
+    interface->WriteLyricstyle(element);
     interface->WriteMensuralLog(element);
     interface->WriteMensuralShared(element);
     interface->WriteMeterSigDefaultLog(element);
@@ -1428,6 +1508,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         if (element == "note") {
             return true;
         }
+        else if (element == "artic") {
+            return true;
+        }
         else {
             return false;
         }
@@ -1459,6 +1542,9 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
     // filter for note
     else if (filterParent->Is() == NOTE) {
         if (element == "accid") {
+            return true;
+        }
+        else if (element == "artic") {
             return true;
         }
         else if (element == "syl") {
@@ -1522,7 +1608,10 @@ bool MeiInput::ReadMei(pugi::xml_node root)
     pugi::xml_node mdiv;
     pugi::xml_node pages;
     if (!root.empty()) {
-        music = root.child("music");
+        if (std::string(root.name()) == "music")
+            music = root;
+        else
+            music = root.child("music");
     }
     if (!music.empty()) {
         body = music.child("body");
@@ -1637,7 +1726,7 @@ bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
             success = ReadMeiSb(parent, current);
         }
         // unmeasured music
-        else if (std::string(current.name()) == "sb") {
+        else if (std::string(current.name()) == "staff") {
             if (!unmeasured) {
                 if (parent->Is() == SECTION) {
                     unmeasured = new Measure(false);
@@ -2017,6 +2106,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "dynam") {
             success = ReadMeiDynam(parent, current);
         }
+        else if (std::string(current.name()) == "fermata") {
+            success = ReadMeiFermata(parent, current);
+        }
         else if (std::string(current.name()) == "hairpin") {
             success = ReadMeiHairpin(parent, current);
         }
@@ -2040,6 +2132,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "tie") {
             success = ReadMeiTie(parent, current);
+        }
+        else if (std::string(current.name()) == "trill") {
+            success = ReadMeiTrill(parent, current);
         }
         else if (std::string(current.name()) == "tupletSpan") {
             if (!ReadTupletSpanAsTuplet(dynamic_cast<Measure *>(parent), current)) {
@@ -2071,6 +2166,7 @@ bool MeiInput::ReadMeiDir(Object *parent, pugi::xml_node dir)
 
     ReadTextDirInterface(dir, vrvDir);
     ReadTimeSpanningInterface(dir, vrvDir);
+    vrvDir->ReadLang(dir);
 
     parent->AddChild(vrvDir);
     return ReadMeiTextChildren(vrvDir, dir);
@@ -2088,12 +2184,27 @@ bool MeiInput::ReadMeiDynam(Object *parent, pugi::xml_node dynam)
     return ReadMeiTextChildren(vrvDynam, dynam);
 }
 
+bool MeiInput::ReadMeiFermata(Object *parent, pugi::xml_node fermata)
+{
+    Fermata *vrvFermata = new Fermata();
+    SetMeiUuid(fermata, vrvFermata);
+
+    ReadTimePointInterface(fermata, vrvFermata);
+    vrvFermata->ReadColor(fermata);
+    vrvFermata->ReadFermataVis(fermata);
+    vrvFermata->ReadPlacement(fermata);
+
+    parent->AddChild(vrvFermata);
+    return true;
+}
+
 bool MeiInput::ReadMeiHairpin(Object *parent, pugi::xml_node hairpin)
 {
     Hairpin *vrvHairpin = new Hairpin();
     SetMeiUuid(hairpin, vrvHairpin);
 
     ReadTimeSpanningInterface(hairpin, vrvHairpin);
+    vrvHairpin->ReadColor(hairpin);
     vrvHairpin->ReadHairpinLog(hairpin);
     vrvHairpin->ReadPlacement(hairpin);
 
@@ -2108,6 +2219,7 @@ bool MeiInput::ReadMeiHarm(Object *parent, pugi::xml_node harm)
 
     ReadTextDirInterface(harm, vrvHarm);
     ReadTimeSpanningInterface(harm, vrvHarm);
+    vrvHarm->ReadLang(harm);
 
     parent->AddChild(vrvHarm);
     return ReadMeiTextChildren(vrvHarm, harm);
@@ -2119,6 +2231,8 @@ bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node octave)
     SetMeiUuid(octave, vrvOctave);
 
     ReadTimeSpanningInterface(octave, vrvOctave);
+    vrvOctave->ReadColor(octave);
+    vrvOctave->ReadLinerendBase(octave);
     vrvOctave->ReadOctavedisplacement(octave);
 
     parent->AddChild(vrvOctave);
@@ -2133,6 +2247,7 @@ bool MeiInput::ReadMeiPedal(Object *parent, pugi::xml_node pedal)
     ReadTimePointInterface(pedal, vrvPedal);
     vrvPedal->ReadPedalLog(pedal);
     vrvPedal->ReadPlacement(pedal);
+    vrvPedal->ReadColor(pedal);
 
     parent->AddChild(vrvPedal);
     return true;
@@ -2144,6 +2259,7 @@ bool MeiInput::ReadMeiSlur(Object *parent, pugi::xml_node slur)
     SetMeiUuid(slur, vrvSlur);
 
     ReadTimeSpanningInterface(slur, vrvSlur);
+    vrvSlur->ReadColor(slur);
     vrvSlur->ReadCurvature(slur);
 
     parent->AddChild(vrvSlur);
@@ -2157,6 +2273,8 @@ bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
 
     ReadTextDirInterface(tempo, vrvTempo);
     ReadTimePointInterface(tempo, vrvTempo);
+    vrvTempo->ReadLang(tempo);
+    vrvTempo->ReadMiditempo(tempo);
 
     parent->AddChild(vrvTempo);
     return ReadMeiTextChildren(vrvTempo, tempo);
@@ -2168,9 +2286,23 @@ bool MeiInput::ReadMeiTie(Object *parent, pugi::xml_node tie)
     SetMeiUuid(tie, vrvTie);
 
     ReadTimeSpanningInterface(tie, vrvTie);
+    vrvTie->ReadColor(tie);
     vrvTie->ReadCurvature(tie);
 
     parent->AddChild(vrvTie);
+    return true;
+}
+
+bool MeiInput::ReadMeiTrill(Object *parent, pugi::xml_node trill)
+{
+    Trill *vrvTrill = new Trill();
+    SetMeiUuid(trill, vrvTrill);
+    
+    ReadTimePointInterface(trill, vrvTrill);
+    vrvTrill->ReadColor(trill);
+    vrvTrill->ReadPlacement(trill);
+    
+    parent->AddChild(vrvTrill);
     return true;
 }
 
@@ -2256,6 +2388,9 @@ bool MeiInput::ReadMeiLayerChildren(Object *parent, pugi::xml_node parentNode, O
         // content
         else if (elementName == "accid") {
             success = ReadMeiAccid(parent, xmlElement);
+        }
+        else if (elementName == "artic") {
+            success = ReadMeiArtic(parent, xmlElement);
         }
         else if (elementName == "barLine") {
             success = ReadMeiBarLine(parent, xmlElement);
@@ -2359,8 +2494,22 @@ bool MeiInput::ReadMeiAccid(Object *parent, pugi::xml_node accid)
     ReadPositionInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
     vrvAccid->ReadAccidLog(accid);
+    vrvAccid->ReadColor(accid);
 
     parent->AddChild(vrvAccid);
+    return true;
+}
+
+bool MeiInput::ReadMeiArtic(Object *parent, pugi::xml_node artic)
+{
+    Artic *vrvArtic = new Artic();
+    ReadLayerElement(artic, vrvArtic);
+
+    vrvArtic->ReadArticulation(artic);
+    vrvArtic->ReadColor(artic);
+    vrvArtic->ReadPlacement(artic);
+
+    parent->AddChild(vrvArtic);
     return true;
 }
 
@@ -2390,6 +2539,7 @@ bool MeiInput::ReadMeiBeatRpt(Object *parent, pugi::xml_node beatRpt)
     BeatRpt *vrvBeatRpt = new BeatRpt();
     ReadLayerElement(beatRpt, vrvBeatRpt);
 
+    vrvBeatRpt->ReadColor(beatRpt);
     vrvBeatRpt->ReadBeatRptVis(beatRpt);
 
     parent->AddChild(vrvBeatRpt);
@@ -2416,6 +2566,15 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
     vrvChord->ReadStemsCmn(chord);
     vrvChord->ReadTiepresent(chord);
     vrvChord->ReadVisibility(chord);
+
+    AttArticulation artic;
+    artic.ReadArticulation(chord);
+    if (artic.HasArtic()) {
+        Artic *vrvArtic = new Artic();
+        vrvArtic->IsAttribute(true);
+        vrvArtic->SetArtic(artic.GetArtic());
+        vrvChord->AddChild(vrvArtic);
+    }
 
     parent->AddChild(vrvChord);
     return ReadMeiLayerChildren(vrvChord, chord, vrvChord);
@@ -2527,8 +2686,10 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
 {
     MRest *vrvMRest = new MRest();
     ReadLayerElement(mRest, vrvMRest);
+    ReadPositionInterface(mRest, vrvMRest);
 
     vrvMRest->ReadVisibility(mRest);
+    vrvMRest->ReadFermatapresent(mRest);
 
     parent->AddChild(vrvMRest);
     return true;
@@ -2582,6 +2743,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
     vrvNote->ReadAccidentalPerformed(note);
+    vrvNote->ReadColor(note);
     vrvNote->ReadColoration(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadNoteLogMensural(note);
@@ -2589,6 +2751,15 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadStemsCmn(note);
     vrvNote->ReadTiepresent(note);
     vrvNote->ReadVisibility(note);
+
+    AttArticulation artic;
+    artic.ReadArticulation(note);
+    if (artic.HasArtic()) {
+        Artic *vrvArtic = new Artic();
+        vrvArtic->IsAttribute(true);
+        vrvArtic->SetArtic(artic.GetArtic());
+        vrvNote->AddChild(vrvArtic);
+    }
 
     parent->AddChild(vrvNote);
     return ReadMeiLayerChildren(vrvNote, note, vrvNote);
@@ -2601,6 +2772,7 @@ bool MeiInput::ReadMeiRest(Object *parent, pugi::xml_node rest)
 
     ReadDurationInterface(rest, vrvRest);
     ReadPositionInterface(rest, vrvRest);
+    vrvRest->ReadColor(rest);
 
     parent->AddChild(vrvRest);
     return true;
@@ -2633,6 +2805,7 @@ bool MeiInput::ReadMeiSyl(Object *parent, pugi::xml_node syl)
     Syl *vrvSyl = new Syl();
     ReadLayerElement(syl, vrvSyl);
 
+    vrvSyl->ReadLang(syl);
     vrvSyl->ReadTypography(syl);
     vrvSyl->ReadSylLog(syl);
 
@@ -2658,6 +2831,8 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
     Verse *vrvVerse = new Verse();
     ReadLayerElement(verse, vrvVerse);
 
+    vrvVerse->ReadColor(verse);
+    vrvVerse->ReadLang(verse);
     vrvVerse->ReadCommon(verse);
 
     parent->AddChild(vrvVerse);
@@ -2708,7 +2883,9 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
 {
     Rend *vrvRend = new Rend();
 
+    vrvRend->ReadColor(rend);
     vrvRend->ReadCommon(rend);
+    vrvRend->ReadLang(rend);
     vrvRend->ReadTypography(rend);
 
     parent->AddChild(vrvRend);
@@ -2762,6 +2939,7 @@ bool MeiInput::ReadScoreDefInterface(pugi::xml_node element, ScoreDefInterface *
     interface->ReadCleffingLog(element);
     interface->ReadKeySigDefaultLog(element);
     interface->ReadKeySigDefaultVis(element);
+    interface->ReadLyricstyle(element);
     interface->ReadMensuralLog(element);
     interface->ReadMensuralShared(element);
     interface->ReadMeterSigDefaultLog(element);

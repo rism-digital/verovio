@@ -2,7 +2,7 @@ Verovio is a fast, portable and lightweight library for engraving [Music Encodin
 
 See the JavaScript toolkit running in the [MEI Viewer](http://www.verovio.org/mei-viewer.xhtml) and check out the [tutorial](http://www.verovio.org/tutorial.xhtml) for its web integration and for enabling user interaction.
 
-![Choice interaction](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/movies/choice.gif)
+![Choice interaction](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/movies/reflow.gif)
 
 Verovio can also render Plain and Easy (PAE) code and DARMS code and has a basic MusicXML import function. It is designed as a tool usable as a one-step conversion tool and it is written in pure standard C++ with no dependencies on third-party frameworks and libraries.
 
@@ -23,6 +23,6 @@ If you are willing to contribute to Verovio, please follow the [contribution](do
 Example output
 --------------
 
-This page was generated with version 0.9.12-dev-03f3615
+This page was generated with version 0.9.13-dev-b953d3b
 
-![Example page](/images/page-0.9.12-dev-03f3615.png)
+![Example page](https://raw.githubusercontent.com/rism-ch/verovio/gh-pages/images/verovio-exp-0.9.13-dev.png)

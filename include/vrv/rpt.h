@@ -21,7 +21,7 @@ namespace vrv {
 /**
  * This class models the MEI <beatRpt>
  */
-class BeatRpt : public LayerElement, public AttBeatRptVis {
+class BeatRpt : public LayerElement, public AttColor, public AttBeatRptVis {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
