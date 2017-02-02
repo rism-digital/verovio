@@ -361,7 +361,7 @@ void ScoreDef::SetDrawingWidth(int drawingWidth)
 //----------------------------------------------------------------------------
 
 StaffGrp::StaffGrp()
-    : Object()
+    : Object("staffgrp-")
     , ObjectListInterface()
     , AttCommon()
     , AttCommonPart()

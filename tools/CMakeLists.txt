@@ -63,6 +63,7 @@ add_executable (
     ../src/pugi/pugixml.cpp
     ../libmei/attconverter.cpp
     ../libmei/atts_cmn.cpp
+    ../libmei/atts_cmnornaments.cpp
     ../libmei/atts_critapp.cpp
     ../libmei/atts_externalsymbols.cpp
     ../libmei/atts_mei.cpp
