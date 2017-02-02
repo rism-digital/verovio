@@ -1103,6 +1103,7 @@ void MeiOutput::WriteMeiVerse(pugi::xml_node currentNode, Verse *verse)
     verse->WriteColor(currentNode);
     verse->WriteLang(currentNode);
     verse->WriteCommon(currentNode);
+    verse->WriteTypography(currentNode);
 }
 
 void MeiOutput::WriteMeiSyl(pugi::xml_node currentNode, Syl *syl)
@@ -1161,6 +1162,7 @@ void MeiOutput::WritePositionInterface(pugi::xml_node element, PositionInterface
 {
     assert(interface);
 
+    interface->WriteStaffloc(element);
     interface->WriteStafflocPitched(element);
 }
 
@@ -2855,7 +2857,8 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
     vrvVerse->ReadColor(verse);
     vrvVerse->ReadLang(verse);
     vrvVerse->ReadCommon(verse);
-
+    vrvVerse->ReadTypography(verse);
+    
     parent->AddChild(vrvVerse);
     return ReadMeiLayerChildren(vrvVerse, verse, vrvVerse);
 }
@@ -2950,6 +2953,7 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
 
 bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
+    interface->ReadStaffloc(element);
     interface->ReadStafflocPitched(element);
     return true;
 }

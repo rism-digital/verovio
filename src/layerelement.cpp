@@ -885,13 +885,16 @@ int LayerElement::SetDrawingXY(FunctorParams *functorParams)
         if (rest->GetPloc() == PITCHNAME_NONE) {
             bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
             bool isFirstLayer = false;
+            int staffLoc = 4;
             if (hasMultipleLayer) {
                 Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
                 assert(firstLayer);
                 if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
             }
-            this->SetDrawingY(this->GetDrawingY()
-                + params->m_view->CalculateRestPosY(staffY, rest->GetActualDur(), hasMultipleLayer, isFirstLayer));
+            if (rest->HasLoc()) {
+                staffLoc = rest->GetLoc();
+            }
+            this->SetDrawingY(this->GetDrawingY() + params->m_view->CalculateRestPosY(staffY, rest->GetActualDur(), staffLoc, hasMultipleLayer, isFirstLayer));
         }
         else {
             this->SetDrawingY(this->GetDrawingY()
