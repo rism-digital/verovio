@@ -20,12 +20,14 @@
 #include "fermata.h"
 #include "hairpin.h"
 #include "harm.h"
+#include "mordent.h"
 #include "octave.h"
 #include "pedal.h"
 #include "slur.h"
 #include "tempo.h"
 #include "timeinterface.h"
 #include "trill.h"
+#include "turn.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -141,6 +143,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         // harm above by default
         m_place = harm->HasPlace() ? harm->GetPlace() : STAFFREL_above;
     }
+    else if (object->Is(MORDENT)) {
+        Mordent *mordent = dynamic_cast<Mordent *>(object);
+        assert(mordent);
+        // mordent above by default;
+        m_place = mordent->HasPlace() ? mordent->GetPlace() : STAFFREL_above;
+    }
     else if (object->Is(OCTAVE)) {
         Octave *octave = dynamic_cast<Octave *>(object);
         assert(octave);
@@ -164,6 +172,12 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
         assert(trill);
         // trill above by default;
         m_place = trill->HasPlace() ? trill->GetPlace() : STAFFREL_above;
+    }
+    else if (object->Is(TURN)) {
+        Turn *turn = dynamic_cast<Turn *>(object);
+        assert(turn);
+        // turn above by default;
+        m_place = turn->HasPlace() ? turn->GetPlace() : STAFFREL_above;
     }
     else {
         m_place = STAFFREL_NONE;
