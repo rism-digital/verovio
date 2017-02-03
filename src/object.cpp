@@ -778,6 +778,7 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
     assert(params);
 
     params->m_flatList->push_back(this);
+    // LogDebug("List %d", params->m_flatList->size());
 
     return FUNCTOR_CONTINUE;
 }
@@ -963,6 +964,11 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = params->m_currentStaffDef;
+        staff->m_drawingLines = params->m_currentStaffDef->GetLines();
+        staff->m_drawingNotationType = params->m_currentStaffDef->GetNotationtype();
+        if (params->m_currentStaffDef->HasScale()) {
+            staff->m_drawingStaffSize = params->m_currentStaffDef->GetScale();
+        }
         return FUNCTOR_CONTINUE;
     }
 

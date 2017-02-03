@@ -99,9 +99,9 @@ public:
      */
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
-    void SetDrawingXRel(int drawingXRel);
+    void SetDrawingXRel(int drawingXRel) { m_drawingXRel = drawingXRel; }
     int GetDrawingYRel() const { return m_drawingYRel; }
-    void SetDrawingYRel(int drawingYRel);
+    void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; }
     ///@}
 
     /**
@@ -167,9 +167,9 @@ public:
     virtual int PrepareTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * See Object::SetDrawingXY
+     * See Object::SetAlignmentPitchPos
      */
-    virtual int SetDrawingXY(FunctorParams *functorParams);
+    virtual int SetAlignmentPitchPos(FunctorParams *functorParams);
 
     /**
      * See Object::FindTimeSpanningLayerElements
@@ -199,7 +199,7 @@ public:
     BeamElementCoord *m_beamElementCoord;
     /**
      * This stores a pointer to the cross-staff (if any) and the appropriate layer
-     * Initialized in LayerElement::SetDrawingXY
+     * See Object::PrepareCrossStaff
      */
     Staff *m_crossStaff;
     Layer *m_crossLayer;

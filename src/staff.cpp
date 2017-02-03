@@ -93,6 +93,15 @@ int Staff::GetDrawingY() const
 
     return (system->GetDrawingY() + m_staffAlignment->GetYRel());
 }
+    
+int Staff::CalcPitchPosYRel(Doc *doc, int loc)
+{
+    assert(doc);
+    
+    // the staff loc offset is based on the number of lines: 0 with 1 line, 2 with 2, etc
+    int staffLocOffset = (this->m_drawingLines - 1) * 2;
+    return (loc - staffLocOffset) * doc->GetDrawingUnit(this->m_drawingStaffSize);
+}
 
 //----------------------------------------------------------------------------
 // Staff functor methods
@@ -168,24 +177,6 @@ int Staff::ResetDrawing(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 };
 
-int Staff::SetDrawingXY(FunctorParams *functorParams)
-{
-    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
-    assert(params);
-
-    params->m_currentStaff = this;
-
-    // Setting the drawing values for the staff (lines, scale)
-    if (StaffDef *staffDef = params->m_doc->m_scoreDef.GetStaffDef(this->GetN())) {
-        this->m_drawingLines = staffDef->GetLines();
-        this->m_drawingNotationType = staffDef->GetNotationtype();
-        if (staffDef->HasScale()) {
-            this->m_drawingStaffSize = staffDef->GetScale();
-        }
-    }
-
-    return FUNCTOR_CONTINUE;
-}
 
 int Staff::PrepareRpt(FunctorParams *functorParams)
 {

@@ -64,7 +64,15 @@ public:
      * Return the index position of the staff in its measure parent
      */
     int GetStaffIdx() const { return Object::GetIdx(); }
+    
+    /**
+     * Calculate the yRel for the staff given a @loc value
+     */
+    int CalcPitchPosYRel(Doc *doc, int loc);
 
+    /**
+     * Getter for the StaffAlignment
+     */
     StaffAlignment *GetAlignment() const { return m_staffAlignment; }
 
     //----------//
@@ -95,11 +103,6 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
-
-    /**
-     * See Object::SetDrawingXY
-     */
-    virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareRpt

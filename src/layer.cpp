@@ -176,11 +176,11 @@ Clef *Layer::GetClef(LayerElement *test)
     return GetCurrentClef();
 }
 
-int Layer::GetClefOffset(LayerElement *test)
+int Layer::GetClefLocOffset(LayerElement *test)
 {
     Clef *clef = GetClef(test);
     if (!clef) return 0;
-    return clef->GetClefOffset();
+    return clef->GetClefLocOffset();
 }
 
 Clef *Layer::GetCurrentClef() const
@@ -332,6 +332,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     assert(params);
 
     params->m_scoreDefRole = CAUTIONARY_SCOREDEF;
+    params->m_time = params->m_measureAligner->GetMaxTime();
 
     if (this->GetCautionStaffDefClef()) {
         GetCautionStaffDefClef()->AlignHorizontally(params);
@@ -371,16 +372,6 @@ int Layer::PrepareProcessingLists(FunctorParams *functorParams)
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
     params->m_layerTree.child[staff->GetN()].child[this->GetN()];
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Layer::SetDrawingXY(FunctorParams *functorParams)
-{
-    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
-    assert(params);
-
-    params->m_currentLayer = this;
 
     return FUNCTOR_CONTINUE;
 }

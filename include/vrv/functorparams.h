@@ -861,6 +861,26 @@ public:
     SaveParams(FileOutputStream *output) { m_output = output; }
     FileOutputStream *m_output;
 };
+    
+//----------------------------------------------------------------------------
+// SetAlignmentPitchPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer doc
+ * member 1: a pointer to the view
+ **/
+
+class SetAlignmentPitchPosParams : public FunctorParams {
+public:
+    SetAlignmentPitchPosParams(Doc *doc, View *view)
+    {
+        m_doc = doc;
+        m_view = view;
+    }
+    Doc *m_doc;
+    View *m_view;
+};
 
 //----------------------------------------------------------------------------
 // SetAlignmentXPosParams
@@ -1028,40 +1048,6 @@ public:
     Measure *m_previousMeasure;
     System *m_currentSystem;
     bool m_drawLabels;
-};
-
-//----------------------------------------------------------------------------
-// SetDrawingXYParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer doc
- * member 1: a pointer to the current system
- * member 2: a pointer to the current measure
- * member 3: a pointer to the current staff
- * member 4: a pointer to the current layer
- * member 5: a pointer to the view
- * member 6: a bool indicating if we are processing layer elements or not
- * member 7: a pointer to the functor for passing it to the timestamps
-**/
-
-class SetDrawingXYParams : public FunctorParams {
-public:
-    SetDrawingXYParams(Doc *doc, View *view, Functor *functor)
-    {
-        m_doc = doc;
-        m_currentMeasure = NULL;
-        m_currentStaff = NULL;
-        m_currentLayer = NULL;
-        m_view = view;
-        m_functor = functor;
-    }
-    Doc *m_doc;
-    Measure *m_currentMeasure;
-    Staff *m_currentStaff;
-    Layer *m_currentLayer;
-    View *m_view;
-    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------

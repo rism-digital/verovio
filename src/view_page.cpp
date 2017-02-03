@@ -52,11 +52,6 @@ void View::DrawCurrentPage(DeviceContext *dc, bool background)
     m_currentPage = m_doc->SetDrawingPage(m_pageIdx);
 
     int i;
-    Functor setDrawingXY(&Object::SetDrawingXY);
-    SetDrawingXYParams setDrawingXYParams(m_doc, this, &setDrawingXY);
-    // First pass without processing the LayerElements - we need this for cross-staff going down because
-    // the elements will need the position of the staff below to have been set before
-    m_currentPage->Process(&setDrawingXY, &setDrawingXYParams);
 
     // Keep the width of the initial scoreDef
     SetScoreDefDrawingWidth(dc, &m_currentPage->m_drawingScoreDef);
@@ -722,32 +717,6 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
 // View - Staff
 //----------------------------------------------------------------------------
 
-int View::CalculatePitchPosY(Staff *staff, data_PITCHNAME pname, int dec_clef, int oct)
-{
-    assert(staff); // Pointer to staff cannot be NULL
-
-    static char touches[]
-        = { PITCHNAME_c, PITCHNAME_d, PITCHNAME_e, PITCHNAME_f, PITCHNAME_g, PITCHNAME_a, PITCHNAME_b };
-    int y_int;
-    char *ptouche, i;
-    ptouche = &touches[0];
-
-    // Old Wolfgang code with octave stored in an unsigned char - this could be refactored
-    oct -= OCTAVE_OFFSET;
-    y_int = ((dec_clef + oct * 7) - 9) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    // if (staff->m_drawingLines > 5) {
-    y_int -= ((staff->m_drawingLines - 5) * 2) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
-    //}
-
-    /* exprime distance separant m_drawingY de
-    position 1e Si, corrigee par dec_clef et oct. Elle est additionnee
-    ensuite, donc elle doit etre NEGATIVE si plus bas que m_drawingY */
-    for (i = 0; i < (signed)sizeof(touches); i++) {
-        if (*(ptouche + i) == pname) return (y_int += ((i + 1) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize)));
-    }
-    return 0;
-}
-
 int View::CalculateRestPosY(Staff *staff, char duration, int location, bool hasMultipleLayer, bool isFirstLayer)
 {
     assert(staff); // Pointer to staff cannot be NULL
@@ -941,7 +910,7 @@ int View::CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave)
 
     Clef *clef = layer->GetClef(pelement);
     if (clef) {
-        yb += (clef->GetClefOffset()) * m_doc->GetDrawingUnit(staffSize); // UT1 reel
+        yb += (clef->GetClefLocOffset()) * m_doc->GetDrawingUnit(staffSize); // UT1 reel
     }
     yb -= 4 * m_doc->GetDrawingOctaveSize(staffSize); // UT, note la plus grave
 

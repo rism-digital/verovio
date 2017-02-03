@@ -54,4 +54,10 @@ bool PitchInterface::HasIdenticalPitchInterface(PitchInterface *otherPitchInterf
     */
 }
 
+int PitchInterface::CalcLoc(data_PITCHNAME pname, int oct, int clefLocOffset)
+{
+    // E.g., C4 with clef C1: (4 - 4 * 7) + (1 - 1) + 0;
+    return ((oct - OCTAVE_OFFSET) * 7 + (pname - 1) + clefLocOffset);
+}
+
 } // namespace vrv

@@ -726,7 +726,7 @@ public:
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int SetAlignmentPitchPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     ///@}
 

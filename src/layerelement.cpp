@@ -74,7 +74,7 @@ void LayerElement::Reset()
     m_scoreDefRole = NONE;
     m_alignment = NULL;
     m_beamElementCoord = NULL;
-    
+
     m_crossStaff = NULL;
     m_crossLayer = NULL;
 }
@@ -136,25 +136,23 @@ Beam *LayerElement::IsInBeam()
 int LayerElement::GetDrawingX() const
 {
     assert(m_alignment);
-    
-    Measure *measure = dynamic_cast<Measure*>(this->GetFirstParent(MEASURE));
+
+    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
     assert(measure);
     return (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel());
 }
-    
+
 int LayerElement::GetDrawingY() const
 {
     // First look if we have a crossStaff situation
     Object *object = m_crossStaff;
     // Otherwise get the first staff
-    if (!object)
-        object = this->GetFirstParent(STAFF);
+    if (!object) object = this->GetFirstParent(STAFF);
     // Otherwise the first measure (this is the case with barLineAttr
-    if (!object)
-        object = this->GetFirstParent(MEASURE);
-    
+    if (!object) object = this->GetFirstParent(MEASURE);
+
     assert(object);
-    return object->GetDrawingY() - this->GetDrawingYRel();
+    return object->GetDrawingY() + this->GetDrawingYRel();
 }
 
 int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type)
@@ -350,6 +348,10 @@ int LayerElement::GetXRel() const
 int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_drawingXRel = 0;
+    // Exception here: the LayerElement::m_drawingYRel position is already set for horizontal alignment
+    // See Object::SetAlignmentPitchPos - for this reason we need to reset it here and not in ResetVerticalAlignment
+    m_drawingYRel = 0;
+    
     m_alignment = NULL;
     if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
@@ -362,7 +364,7 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 
 int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    m_drawingYRel = 0;
+    // Nothing to do since m_drawingYRel is reset in ResetHorizontalAlignment and set in SetAlignmentPitchPos
     
     return FUNCTOR_CONTINUE;
 }
@@ -500,24 +502,131 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+
+int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
+{
+    SetAlignmentPitchPosParams *params = dynamic_cast<SetAlignmentPitchPosParams *>(functorParams);
+    assert(params);
+
+    /*
+    // First pass, only set the X position
+    if (params->m_processLayerElements == false) {
+        // Here we set the appropriate x value to be used for drawing
+        // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
+        // With Transcription documents, we use the m_xAbs
+        if (this->m_xAbs == VRV_UNSET) {
+            assert(params->m_doc->GetType() == Raw);
+            this->SetDrawingX(this->GetXRel() + params->m_currentMeasure->GetDrawingX());
+            // Grace notes, also take into account the GraceAlignment
+            if (this->Is(NOTE)) {
+                Note *note = dynamic_cast<Note *>(this);
+                assert(note);
+                if (note->HasGraceAlignment()) {
+                    this->SetDrawingX(this->GetDrawingX() - note->GetAlignment()->GetGraceAligner()->GetWidth()
+                        + note->GetGraceAlignment()->GetXRel());
+                }
+            }
+        }
+        else {
+            assert(params->m_doc->GetType() == Transcription);
+            this->SetDrawingX(this->m_xAbs);
+        }
+        return FUNCTOR_CONTINUE;
+    }
+    */
+
+    LayerElement *layerElementY = this;
+    Staff *staffY = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
+    assert(staffY);
+    Layer *layerY = dynamic_cast<Layer*>(this->GetFirstParent(LAYER));
+    assert(layerY);
     
-    
+    if (m_crossStaff && m_crossLayer) {
+        layerElementY = m_crossLayer->GetAtPos(this->GetDrawingX());
+        assert(layerElementY);
+        staffY = m_crossStaff;
+        layerY = m_crossLayer;
+    }
+
+    // Adjust m_drawingYRel for notes and rests, etc.
+    if (this->Is(ACCID)) {
+        Accid *accid = dynamic_cast<Accid *>(this);
+        assert(accid);
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        if (note) {
+            accid->SetDrawingYRel(note->GetDrawingYRel());
+        }
+        else {
+            // do something for accid that are not children of a note - e.g., mensural?
+            int loc = PitchInterface::CalcLoc(accid->GetPloc(), accid->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+            // Override it if we have a @loc ?
+            if (accid->HasLoc()) loc = accid->GetLoc();
+            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+        }
+    }
+    else if (this->Is(CUSTOS) || this->Is(DOT)) {
+        PositionInterface *interface = dynamic_cast<PositionInterface*>(this);
+        assert(interface);
+        int loc = PitchInterface::CalcLoc(interface->GetPloc(), interface->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+        if (interface->HasLoc()) loc = interface->GetLoc();
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+    }
+    else if (this->Is(NOTE)) {
+        Note *note = dynamic_cast<Note *>(this);
+        assert(note);
+        int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
+        // Once we have AttLoc on Note
+        // if (note->HasLoc()) loc = note->GetLoc();
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+    }
+    else if (this->Is(REST)) {
+        Rest *rest = dynamic_cast<Rest *>(this);
+        assert(rest);
+        // Automatically calculate rest position, if so requested
+        if (rest->GetPloc() == PITCHNAME_NONE) {
+            // Limitation: GetLayerCount does not take into account editorial markup
+            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
+            bool isFirstLayer = false;
+            if (hasMultipleLayer) {
+                Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
+                assert(firstLayer);
+                if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
+            }
+            // We should change this and use the new PitchInterface::CalcLoc (or similar method)
+            // to calculate a loc if none if provided. The use Staff::CalcPitchPosYRel to calculate the y.
+            // See above for notes
+            int staffLoc = 4;
+            if (rest->HasLoc()) staffLoc = rest->GetLoc();
+            this->SetDrawingYRel(params->m_view->CalculateRestPosY(
+                      staffY, rest->GetActualDur(), staffLoc, hasMultipleLayer, isFirstLayer));
+        }
+        else {
+            int loc = PitchInterface::CalcLoc(rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+            // Override it if we have a @loc ?
+            if (rest->HasLoc()) loc = rest->GetLoc();
+            this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+        }
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
-    
+
     LogDebug("%s", this->GetClassName().c_str());
-    
+
     // we should have processed aligned before
     assert(this->GetAlignment());
-    
+
     if (!this->HasToBeAligned()) {
         // if nothing to do with this type of element
         // this happens for example with Artic where only ArticPart children are aligned
         return FUNCTOR_CONTINUE;
     }
-    
+
     if (!this->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
         assert(false); // quite drastic but this should never happen. If nothing has to be drawn
@@ -525,59 +634,59 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
         // then the BB should be set to empty with  Object::SetEmptyBB()
         return FUNCTOR_CONTINUE;
     }
-    
+
     if (this->HasEmptyBB()) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     // We add it to the upcoming bouding boxes
     params->m_upcomingBoundingBoxes.push_back(this);
-    
+
     int selfLeft = this->GetAlignment()->GetXRel() + this->GetSelfX1();
     int offset = selfLeft - params->m_minPos;
     if (offset < 0) {
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
         params->m_cumulatedXShift += (-offset);
     }
-    
-    params->m_minPos = this->GetAlignment()->GetXRel() + this->GetSelfX2();
-    
+
+    params->m_upcomingMinPos = std::max(this->GetAlignment()->GetXRel() + this->GetSelfX2(), params->m_upcomingMinPos);
+
     return FUNCTOR_CONTINUE;
-    
+
     // The negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
     //  ---- = negative offset
     int negative_offset = -(this->GetSelfX1());
-    
+
     // Increase negative_offset by the symbol type's left margin, unless it's a note
     // that's part of a ligature.
     if (!this->IsGraceNote() && !this->IsInLigature())
         negative_offset += (params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-                            / PARAM_DENOMINATOR);
-    
+            / PARAM_DENOMINATOR);
+
     // This should never happen but can with glyphs not exactly registered at x=0 in the SMuFL font used
     if (negative_offset < 0) negative_offset = 0;
-    
+
     // with a grace note, also take into account the full width of the group given by the GraceAligner
     /*if (current->GetAlignment()->HasGraceAligner()) {
         negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth()
         + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
     }*/
-    
+
     int currentX = this->GetAlignment()->GetXRel();
     // with grace note, take into account the position of the note in the grace group
     /*if (current->IsGraceNote()) {
         Note *note = dynamic_cast<Note *>(current);
         currentX += note->GetGraceAlignment()->GetXRel();
     }*/
-    
+
     // check if the element overlaps with the preceeding one given by (*minPos)
     int overlap = params->m_minPos - currentX + negative_offset;
-    
+
     if ((currentX - negative_offset) < params->m_minPos) {
         this->GetAlignment()->SetXShift(overlap);
     }
-    
+
     // do not adjust the min pos and the max width since this is already handled by
     // the GraceAligner
     /*
@@ -587,43 +696,41 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
     */
-    
+
     // the next minimal position is given by the right side of the bounding box + the spacing of the element
     int width = this->GetSelfX2();
-    
+
     // Move to right by the symbol type's right margin, unless it's a note that's
     // part of a ligature.
     if (!this->HasEmptyBB() && !this->IsInLigature())
         width += params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-        / PARAM_DENOMINATOR;
+            / PARAM_DENOMINATOR;
     params->m_minPos = this->GetAlignment()->GetXRel() + width;
     this->GetAlignment()->SetMaxWidth(width);
-    
 
-    
     /*
-     
+
      // starting new layer
      if (this->Is(LAYER)) {
      params->m_minPos = params->m_layerMinPos;
      return FUNCTOR_CONTINUE;
      }
-     
+
      if (!this->IsLayerElement()) {
      return FUNCTOR_CONTINUE;
      }
-     
+
      LayerElement *current = dynamic_cast<LayerElement *>(this);
      assert(current);
-     
+
      // we should have processed aligned before
      assert(current->GetAlignment());
-     
+
      if (!current->HasToBeAligned()) {
      // if nothing to do with this type of element
      return FUNCTOR_CONTINUE;
      }
-     
+
      if (!current->HasUpdatedBB()) {
      // if nothing was drawn, do not take it into account
      assert(false); // quite drastic but this should never happen. If nothing has to be drawn
@@ -631,49 +738,49 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
      // then the BB should be set to empty with  Object::SetEmptyBB()
      return FUNCTOR_CONTINUE;
      }
-     
+
      if ((current->Is(NOTE)) && current->GetFirstParent(CHORD, MAX_CHORD_DEPTH)) {
      return FUNCTOR_CONTINUE;
      }
-     
+
      if ((current->Is(ACCID)) && current->GetFirstParent(NOTE, MAX_ACCID_DEPTH)) {
      return FUNCTOR_CONTINUE;
      }
-     
+
      // The negative offset is the part of the bounding box that overflows on the left
      // |____x_____|
      //  ---- = negative offset
      int negative_offset = -(current->m_contentBB_x1);
-     
+
      // Increase negative_offset by the symbol type's left margin, unless it's a note
      // that's part of a ligature.
      if (!current->IsGraceNote() && !current->IsInLigature())
      negative_offset += (params->m_doc->GetLeftMargin(current->GetClassId()) * params->m_doc->GetDrawingUnit(100)
      / PARAM_DENOMINATOR);
-     
+
      // This should never happen but can with glyphs not exactly registered at x=0 in the SMuFL font used
      if (negative_offset < 0) negative_offset = 0;
-     
+
      // with a grace note, also take into account the full width of the group given by the GraceAligner
      if (current->GetAlignment()->HasGraceAligner()) {
      negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth()
      + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
      }
-     
+
      int currentX = current->GetAlignment()->GetXRel();
      // with grace note, take into account the position of the note in the grace group
      if (current->IsGraceNote()) {
      Note *note = dynamic_cast<Note *>(current);
      currentX += note->GetGraceAlignment()->GetXRel();
      }
-     
+
      // check if the element overlaps with the preceeding one given by (*minPos)
      int overlap = params->m_minPos - currentX + negative_offset;
-     
+
      if ((currentX - negative_offset) < params->m_minPos) {
      current->GetAlignment()->SetXShift(overlap);
      }
-     
+
      // do not adjust the min pos and the max width since this is already handled by
      // the GraceAligner
      if (current->IsGraceNote()) {
@@ -681,10 +788,10 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
      current->GetAlignment()->SetMaxWidth(0);
      return FUNCTOR_CONTINUE;
      }
-     
+
      // the next minimal position is given by the right side of the bounding box + the spacing of the element
      int width = current->m_contentBB_x2;
-     
+
      // Move to right by the symbol type's right margin, unless it's a note that's
      // part of a ligature.
      if (!current->HasEmptyBB() && !current->IsInLigature())
@@ -692,46 +799,46 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
      / PARAM_DENOMINATOR;
      params->m_minPos = current->GetAlignment()->GetXRel() + width;
      current->GetAlignment()->SetMaxWidth(width);
-     
+
      */
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
 {
     PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
     assert(params);
-    
+
     m_crossStaff = NULL;
     m_crossLayer = NULL;
-    
+
     // Look for cross-staff situations
     // If we have one, make is available in m_crossStaff
     DurationInterface *durElement = this->GetDurationInterface();
     if (!durElement || !durElement->HasStaff()) {
         return FUNCTOR_CONTINUE;
     }
-    
+
     AttCommonNComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
     m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByAttComparison(&comparisonFirst, 1));
     if (!m_crossStaff) {
         LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0),
-                       this->GetUuid().c_str());
+            this->GetUuid().c_str());
         return FUNCTOR_CONTINUE;
     }
-    
-    Staff *parentStaff = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
+
+    Staff *parentStaff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(parentStaff);
     // Check if we have a cross-staff to itself...
     if (m_crossStaff == parentStaff) {
         LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff",
-                   durElement->GetStaff().at(0), this->GetUuid().c_str());
+            durElement->GetStaff().at(0), this->GetUuid().c_str());
         m_crossStaff = NULL;
         return FUNCTOR_CONTINUE;
     }
-    
-    Layer *parentLayer = dynamic_cast<Layer*>(this->GetFirstParent(LAYER));
+
+    Layer *parentLayer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
     assert(parentLayer);
     // Now try to get the corresponding layer - for now look for the same layer @n
     int layerN = parentLayer->GetN();
@@ -741,7 +848,7 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
         LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
-                   durElement->GetStaff().at(0), this->GetUuid().c_str());
+            durElement->GetStaff().at(0), this->GetUuid().c_str());
         m_crossStaff = NULL;
     }
 
@@ -782,135 +889,6 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
             iter++;
         }
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int LayerElement::SetDrawingXY(FunctorParams *functorParams)
-{
-    /*
-    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
-    assert(params);
-
-    // First pass, only set the X position
-    if (params->m_processLayerElements == false) {
-        // Here we set the appropriate x value to be used for drawing
-        // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
-        // With Transcription documents, we use the m_xAbs
-        if (this->m_xAbs == VRV_UNSET) {
-            assert(params->m_doc->GetType() == Raw);
-            this->SetDrawingX(this->GetXRel() + params->m_currentMeasure->GetDrawingX());
-            // Grace notes, also take into account the GraceAlignment
-            if (this->Is(NOTE)) {
-                Note *note = dynamic_cast<Note *>(this);
-                assert(note);
-                if (note->HasGraceAlignment()) {
-                    this->SetDrawingX(this->GetDrawingX() - note->GetAlignment()->GetGraceAligner()->GetWidth()
-                        + note->GetGraceAlignment()->GetXRel());
-                }
-            }
-        }
-        else {
-            assert(params->m_doc->GetType() == Transcription);
-            this->SetDrawingX(this->m_xAbs);
-        }
-        return FUNCTOR_CONTINUE;
-    }
-
-    LayerElement *layerElementY = this;
-
-    // Look for cross-staff situations
-    // If we have one, make is available in m_crossStaff
-    DurationInterface *durElement = this->GetDurationInterface();
-    if (durElement && durElement->HasStaff()) {
-        AttCommonNComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
-        m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByAttComparison(&comparisonFirst, 1));
-        if (m_crossStaff) {
-            if (m_crossStaff == params->m_currentStaff)
-                LogWarning("The cross staff reference '%d' for element '%s' seems to be identical to the parent staff",
-                    durElement->GetStaff().at(0), this->GetUuid().c_str());
-            // Now try to get the corresponding layer - for now look for the same layer @n
-            int layerN = params->m_currentLayer->GetN();
-            // When we will have allowed @layer in <note>, we will have to do:
-            // int layerN = durElement->HasLayer() ? durElement->GetLayer() : (*currentLayer)->GetN();
-            AttCommonNComparison comparisonFirstLayer(LAYER, layerN);
-            m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
-            if (m_crossLayer) {
-                // Now we need to yet the element at the same position in the cross-staff layer of getting the right
-                // clef
-                layerElementY = m_crossLayer->GetAtPos(this->GetDrawingX());
-            }
-            else {
-                LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
-                    durElement->GetStaff().at(0), this->GetUuid().c_str());
-            }
-        }
-        else {
-            LogWarning("Could not get the cross staff reference '%d' for element '%s'", durElement->GetStaff().at(0),
-                this->GetUuid().c_str());
-        }
-        // If we have a @layer we probably also want to change the layer element (for getting the right clef if
-        // different)
-    }
-    else {
-        m_crossStaff = NULL;
-        m_crossLayer = NULL;
-    }
-
-    Staff *staffY = m_crossStaff ? m_crossStaff : params->m_currentStaff;
-    Layer *layerY = m_crossLayer ? m_crossLayer : params->m_currentLayer;
-
-    // Here we set the appropriate Y value to be used for drawing
-    if (this->m_xAbs == VRV_UNSET) {
-        assert(params->m_doc->GetType() == Raw);
-        this->SetDrawingY(staffY->GetDrawingY());
-    }
-    else {
-        assert(params->m_doc->GetType() == Transcription);
-        this->SetDrawingY(staffY->GetDrawingY());
-    }
-
-    // Finally, adjust Y for notes and rests
-    if (this->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(this);
-        assert(note);
-        this->SetDrawingY(this->GetDrawingY()
-            + params->m_view->CalculatePitchPosY(
-                  staffY, note->GetPname(), layerY->GetClefOffset(layerElementY), note->GetOct()));
-    }
-    else if (this->Is(REST)) {
-        Rest *rest = dynamic_cast<Rest *>(this);
-        assert(rest);
-        // Automatically calculate rest position, if so requested
-        if (rest->GetPloc() == PITCHNAME_NONE) {
-            bool hasMultipleLayer = (staffY->GetLayerCount() > 1);
-            bool isFirstLayer = false;
-            int staffLoc = 4;
-            if (hasMultipleLayer) {
-                Layer *firstLayer = dynamic_cast<Layer *>(staffY->FindChildByType(LAYER));
-                assert(firstLayer);
-                if (firstLayer->GetN() == layerY->GetN()) isFirstLayer = true;
-            }
-            if (rest->HasLoc()) {
-                staffLoc = rest->GetLoc();
-            }
-            this->SetDrawingY(this->GetDrawingY() + params->m_view->CalculateRestPosY(staffY, rest->GetActualDur(), staffLoc, hasMultipleLayer, isFirstLayer));
-        }
-        else {
-            this->SetDrawingY(this->GetDrawingY()
-                + params->m_view->CalculatePitchPosY(
-                      staffY, rest->GetPloc(), layerY->GetClefOffset(layerElementY), rest->GetOloc()));
-        }
-    }
-    else if (this->Is(ACCID)) {
-        Accid *accid = dynamic_cast<Accid *>(this);
-        assert(accid);
-        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
-        if (note) {
-            accid->SetDrawingY(note->GetDrawingY());
-        }
-    }
-    */
 
     return FUNCTOR_CONTINUE;
 }

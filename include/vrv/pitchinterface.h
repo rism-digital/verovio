@@ -38,6 +38,12 @@ public:
      * Checks if the LayerElement has a PitchInterface and compares attributes
      */
     bool HasIdenticalPitchInterface(PitchInterface *otherPitchInterface);
+    
+    /**
+     * Calculate the loc for a pitch and octave and considerting the clef loc offset.
+     * E.g., return 0 for and C4 with clef C1, -2 with clef G2.
+     */
+    static int CalcLoc(data_PITCHNAME pname, int oct, int clefLocOffset);
 
 private:
     //

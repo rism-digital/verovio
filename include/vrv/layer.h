@@ -72,7 +72,7 @@ public:
      * Return the clef offset for the position x.
      * The method uses Layer::GetClef first to find the clef before test.
      */
-    int GetClefOffset(LayerElement *test);
+    int GetClefLocOffset(LayerElement *test);
 
     /**
      * @name Set and get the stem direction of the layer.
@@ -143,11 +143,6 @@ public:
      * See Object::PrepareProcessingLists
      */
     virtual int PrepareProcessingLists(FunctorParams *functorParams);
-
-    /**
-     * See Object::SetDrawingXY
-     */
-    virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareRpt

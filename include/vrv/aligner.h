@@ -491,6 +491,11 @@ public:
      * should be the same for all staves/layers.
      */
     void SetMaxTime(double time);
+    
+    /**
+     * Return the max time of the measure (i.e., the right measure alignment time)
+     */
+    double GetMaxTime() const;
 
     /**
      * @name Set and Get the non-justifiable margin (right and left scoreDefs)

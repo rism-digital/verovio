@@ -315,6 +315,14 @@ void MeasureAligner::SetMaxTime(double time)
     }
 }
 
+double MeasureAligner::GetMaxTime() const
+{
+    // we have to have a m_rightBarLineAlignment
+    assert(m_rightBarLineAlignment);
+    
+    return m_rightAlignment->GetTime();
+}
+    
 //----------------------------------------------------------------------------
 // GraceAligner
 //----------------------------------------------------------------------------
@@ -836,7 +844,7 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
     
-    //params->m_minPos = params->m_upcomingMinPos;
+    params->m_minPos = params->m_upcomingMinPos;
     
     // No upcoming bounding boxes, we keep the previous ones (e.g., the alignment has nothing for this staff)
     // Eventually we might want to have a more sophisticated pruning algorithm
