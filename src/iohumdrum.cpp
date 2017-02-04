@@ -2392,6 +2392,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
 
         handleGroupStarts(tg, elements, pointers, layerdata, i);
+    	addOrnamentMarkers(layerdata[i]);
 
         if (layerdata[i]->isChord()) {
             Chord *chord = new Chord;
@@ -5179,7 +5180,6 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
     if (chartable['S'] || chartable['$']) {
         addTurn(object, token);
     }
-    addOrnamentMarkers(token);
 }
 
 //////////////////////////////
