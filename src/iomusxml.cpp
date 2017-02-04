@@ -498,9 +498,10 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     assert(root);
     pugi::xpath_node workTitle = root.select_single_node("/score-partwise/work/work-title");
     pugi::xpath_node movementTitle = root.select_single_node("/score-partwise/movement-title");
+    pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
 
     // <fileDesc> /////////////
-    pugi::xml_node fileDesc = m_doc->m_header.append_child("fileDesc");
+    pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
     pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
     pugi::xml_node meiTitle = titleStmt.append_child("title");
     if (movementTitle)
@@ -511,7 +512,7 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pubStmt.append_child(pugi::node_pcdata);
 
-    pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
+    pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
     pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
     pugi::xml_node app = appInfo.append_child("application");
     pugi::xml_node appName = app.append_child("name");

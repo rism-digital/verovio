@@ -544,14 +544,11 @@ bool MeiOutput::WriteMeiDoc(Doc *doc)
 
     // ---- header ----
 
-    pugi::xml_node meiHead = m_mei.append_child("meiHead");
-
     if (m_doc->m_header.first_child()) {
-        for (pugi::xml_node child = m_doc->m_header.first_child(); child; child = child.next_sibling()) {
-            meiHead.append_copy(child);
-        }
+        m_mei.append_copy(m_doc->m_header.first_child());
     }
     else {
+        pugi::xml_node meiHead = m_mei.append_child("meiHead");
         pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
         pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
         titleStmt.append_child("title");
@@ -1640,7 +1637,9 @@ bool MeiInput::ReadMei(pugi::xml_node root)
     m_readingScoreBased = false;
 
     if (!root.empty() && (current = root.child("meiHead"))) {
-        ReadMeiHeader(current);
+        m_doc->m_header.reset();
+        // copy the complete header into the master document
+        m_doc->m_header.append_copy(current);
     }
     // music
     pugi::xml_node music;
@@ -1705,16 +1704,6 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         }
     }
     return success;
-}
-
-bool MeiInput::ReadMeiHeader(pugi::xml_node meiHead)
-{
-    m_doc->m_header.reset();
-    // copy all the nodes inside into the master document
-    for (pugi::xml_node child = meiHead.first_child(); child; child = child.next_sibling()) {
-        m_doc->m_header.append_copy(child);
-    }
-    return true;
 }
 
 bool MeiInput::ReadMeiSection(Object *parent, pugi::xml_node section)

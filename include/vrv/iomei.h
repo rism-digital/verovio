@@ -355,7 +355,6 @@ public:
 
 private:
     bool ReadMei(pugi::xml_node root);
-    bool ReadMeiHeader(pugi::xml_node meihead);
 
     /**
      * @name Methods for reading MEI score-based elements
