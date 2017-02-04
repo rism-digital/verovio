@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Wed Jan 25 22:51:57 PST 2017
+// Last Modified: Sat Feb  4 13:52:57 PST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -8046,6 +8046,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 			int rindex = rtracks[track];
 			for (k=0; k<subcount; k++) {
 				string subtok = infile[i].token(j)->getSubtoken(k);
+				int b40 = Convert::kernToBase40(subtok);
 				int diatonic = Convert::kernToBase7(subtok);
 				if (diatonic < 0) {
 					// Deal with extra-low notes later.
@@ -8074,6 +8075,27 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 						gdstates[rindex][diatonic] = -1000 + accid;
 					}
 					continue;
+				}
+
+				// check for accidentals on trills, mordents and turns.
+				if (subtok.find("t") != string::npos) {
+					// minor second trill
+					int trillnote     = b40 + 5;
+					int trilldiatonic = Convert::base40ToDiatonic(trillnote);
+					int trillaccid    = Convert::base40ToAccidental(trillnote);
+					if (dstates[rindex][trilldiatonic] != trillaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"trillAccidental", to_string(trillaccid));
+					}
+				} else if (subtok.find("T") != string::npos) {
+					// major second trill
+					int trillnote     = b40 + 6;
+					int trilldiatonic = Convert::base40ToDiatonic(trillnote);
+					int trillaccid    = Convert::base40ToAccidental(trillnote);
+					if (dstates[rindex][trilldiatonic] != trillaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"trillAccidental", to_string(trillaccid));
+					}
 				}
 
 				if (graceQ && (accid != gdstates[rindex][diatonic])) {
@@ -18361,9 +18383,30 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 		// lineindexn = attacks[i+1]->getLineIndex();
 
 		// variables for accompaniment voice
-		// int alineindexn = grid.cell(j, sliceindex);
+		// valid_acc determines if the accompaniment voice conforms to the 
+		// standards of all dissonant types except suspensions.
+		// bool valid_acc = false
+		// if (The dissonant voice moves out of the dissonance to a different at 
+		// 	    the same time or before the accompaniment voice moves to a 
+		// 	    different pitch class or a rest) {
+		// 	valid_acc = true;
+		// }
+		// valid_sus_acc determines if the accompaniment voice conforms to the 
+		// standards of the accompaniment voice for suspensions.
+		// bool valid_sus_acc = false
+		// if ((Condition 1: The accompaniment voice moved to a different pitch
+		// 	    class at the onset of this dissonant interval) &&
+		// 	(Condition 2: The dissonant voice stayed in place or repeated the
+		// 		same pitch at the onset of this dissonant interval) &&
+		// 	(Condition 3: The dissonant voice leaves its note before or at the
+		// 		same time as the accompaniment voice leaves its pitch class. 
+		// 		The accompaniment voice can leave its pitch class for another 
+		// 		note or for a rest.)) {
+		// 	valid_sus_acc = true;
+		// }
 
-		if ((dur <= durp) && (lev >= levp) && (lev >= levn)) { // weak dissonances
+		if ((dur <= durp) && (lev >= levp) && (lev >= levn) // && (valid_acc)
+			) { // weak dissonances
 			if (intp == -1) { // descending dissonances
 				if (intn == -1) {
 					results[lineindex] = "pd"; // downward passing tone
@@ -18398,15 +18441,29 @@ void Tool_dissonant::doAnalysisForVoice(vector<string>& results, NoteGrid& grid,
 				results[lineindex] = "iau"; // incomplete anterior upper neighbor
 			}
 		} else if ((durp >= 2) && (dur == 1) && (lev < levn) &&
-			(intp == -1) && (intn == -1)) {
+			(intp == -1) && (intn == -1) // && (valid_acc)
+			) {
 			results[lineindex] = "dq"; // dissonant third quarter
-		} else if (i < ((int)attacks.size() - 2)) { // expand the analysis window
+		}
+
+		// else if ((valid_sus_acc) &&
+		// 	     ((interval2 == -1) ||
+		// 	      ((interval2 == 0) && (interval3 == -1)) ||
+		// 	      ((interval2 == -2) && (interval3 == 1)))) {
+		// 	results[lineindex] = "s"; // suspension
+		// } else if ((valid_acc) && (interval1 == -2) && (interval2 == 1) &&
+		// 	     (results[attacks[i-1]->getLineIndex()] == "s")) {
+		// 	results[lineindex] = "so"; // suspension ornament
+		// }
+
+		else if (i < ((int)attacks.size() - 2)) { // expand the analysis window
 			double interval3 = *attacks[i+2] - *attacks[i+1];
 			HumNum durnn = attacks[i+2]->getDuration();	// dur of note after next
 			double levnn = attacks[i+2]->getMetricLevel(); // lev of note after next
 
 			if ((dur == durn) && (lev == 1) && (levn == 2) && (levnn == 0) &&
-				(intp == -1) && (intn == -1) && (interval3 == 1)) {
+				(intp == -1) && (intn == -1) && (interval3 == 1) // && (valid_acc)
+				) {
 				results[lineindex] = "ci"; // chanson idiom
 			}
 		}

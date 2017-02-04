@@ -2392,7 +2392,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         }
 
         handleGroupStarts(tg, elements, pointers, layerdata, i);
-    	addOrnamentMarkers(layerdata[i]);
 
         if (layerdata[i]->isChord()) {
             Chord *chord = new Chord;
@@ -2405,9 +2404,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             pointers.pop_back();
             processSlurs(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
-            processDirection(layerdata[i], staffindex);
             addArticulations(chord, layerdata[i]);
             addOrnaments(chord, layerdata[i]);
+            processDirection(layerdata[i], staffindex);
         }
         else if (layerdata[i]->isRest()) {
             if (layerdata[i]->find("yy") != string::npos) {
@@ -2439,7 +2438,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             convertNote(note, layerdata[i], staffindex);
             processSlurs(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
-            processDirection(layerdata[i], staffindex);
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
                 note->SetStemLen(0);
             }
@@ -2448,6 +2446,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             colorNote(note, *layerdata[i], line, field);
             addArticulations(note, layerdata[i]);
             addOrnaments(note, layerdata[i]);
+            processDirection(layerdata[i], staffindex);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -2706,7 +2705,7 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
     if (!token) {
         return;
     }
-    else if (strchr(token->c_str(), ':') != NULL) { // arpeggio
+    if (strchr(token->c_str(), ':') != NULL) { // arpeggio
         token->setValue("LO", "TX", "t", "arp.");
         token->setValue("LO", "TX", "a", "true");
     }
@@ -5180,6 +5179,8 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
     if (chartable['S'] || chartable['$']) {
         addTurn(object, token);
     }
+
+    addOrnamentMarkers(token);
 }
 
 //////////////////////////////
@@ -5360,26 +5361,38 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
 
 void HumdrumInput::addTrill(hum::HTp token)
 {
-    size_t tpos = token->find("T");
-    if (tpos == string::npos) {
-        tpos = token->find("t");
+    int subtok = 0;
+    size_t tpos = std::string::npos;
+    for (int i = 0; i < token->size(); i++) {
+        if (token->at(i) == ' ') {
+            subtok++;
+            continue;
+        }
+        if ((token->at(i) == 't') || (token->at(i) == 'T')) {
+            tpos = i;
+            if (i < token->size() - 1) {
+                // deal with TT or tt for trills with wavy lines
+                if ((token->at(i + 1) == 't') || (token->at(i + 1) == 'T')) {
+                    tpos++;
+                }
+            }
+        }
     }
-    if (tpos == string::npos) {
-        // no trill on note(s)
+    if (tpos == std::string::npos) {
+        // no trill on a note
         return;
     }
 
     // int layer = m_currentlayer; // maybe place below if in layer 2
     int staff = m_currentstaff;
-
     Trill *trill = new Trill;
     appendElement(m_measure, trill);
     setStaff(trill, staff);
+
     // using tstamp for now, but @startid is perhaps better?
     hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
     trill->SetTstamp(tstamp.getFloat());
     setLocationId(trill, token);
-
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.above) {
@@ -5392,6 +5405,42 @@ void HumdrumInput::addTrill(hum::HTp token)
             if ((*token)[tpos + 1] == m_signifiers.below) {
                 trill->SetPlace(STAFFREL_below);
             }
+        }
+    }
+
+    std::string accid = token->getValue("auto", to_string(subtok), "trillAccidental");
+    bool hasaccid = accid.empty() ? false : true;
+    int accidval = 0;
+    if (hasaccid) {
+        accidval = stoi(accid);
+        switch (accidval) {
+            case 0:
+                token->setValue("LO", "TX", "t", "tr\u266e"); // unicode natural
+                token->setValue("LO", "TX", "a", "true");
+                // trill->SetAccidUpper(ACCIDENTAL_EXPLICIT_n);
+                break;
+
+            case 1:
+                token->setValue("LO", "TX", "t", "tr\u266f"); // unicode sharp
+                token->setValue("LO", "TX", "a", "true");
+                // trill->SetAccidUpper(ACCIDENTAL_EXPLICIT_s);
+                break;
+            case 2:
+                token->setValue("LO", "TX", "t", "tr\u0001d12a"); // unicode double-sharp
+                token->setValue("LO", "TX", "a", "true");
+                // trill->SetAccidUpper(ACCIDENTAL_EXPLICIT_x);
+                break;
+
+            case -1:
+                token->setValue("LO", "TX", "t", "tr\u266d"); // unicode flat
+                token->setValue("LO", "TX", "a", "true");
+                // trill->SetAccidUpper(ACCIDENTAL_EXPLICIT_f);
+                break;
+            case -2:
+                token->setValue("LO", "TX", "t", "tr\u0001d12b"); // unicode double-flat
+                token->setValue("LO", "TX", "a", "true");
+                // trill->SetAccidUpper(ACCIDENTAL_EXPLICIT_ff);
+                break;
         }
     }
 }
