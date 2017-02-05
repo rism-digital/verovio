@@ -102,14 +102,14 @@ AttOrnam::~AttOrnam()
 
 void AttOrnam::ResetOrnam()
 {
-    m_ornam = ORNAM_cmn_NONE;
+    m_ornam = "";
 }
 
 bool AttOrnam::ReadOrnam(pugi::xml_node element)
 {
     bool hasAttribute = false;
     if (element.attribute("ornam")) {
-        this->SetOrnam(StrToOrnamCmn(element.attribute("ornam").value()));
+        this->SetOrnam(StrToStr(element.attribute("ornam").value()));
         element.remove_attribute("ornam");
         hasAttribute = true;
     }
@@ -120,7 +120,7 @@ bool AttOrnam::WriteOrnam(pugi::xml_node element)
 {
     bool wroteAttribute = false;
     if (this->HasOrnam()) {
-        element.append_attribute("ornam") = OrnamCmnToStr(this->GetOrnam()).c_str();
+        element.append_attribute("ornam") = StrToStr(this->GetOrnam()).c_str();
         wroteAttribute = true;
     }
     return wroteAttribute;
@@ -128,7 +128,7 @@ bool AttOrnam::WriteOrnam(pugi::xml_node element)
 
 bool AttOrnam::HasOrnam() const
 {
-    return (m_ornam != ORNAM_cmn_NONE);
+    return (m_ornam != "");
 }
 
 /* include <attornam> */
@@ -273,7 +273,7 @@ bool Att::SetCmnornaments(Object *element, std::string attrType, std::string att
         AttOrnam *att = dynamic_cast<AttOrnam *>(element);
         assert(att);
         if (attrType == "ornam") {
-            att->SetOrnam(att->StrToOrnamCmn(attrValue));
+            att->SetOrnam(att->StrToStr(attrValue));
             return true;
         }
     }
@@ -321,7 +321,7 @@ void Att::GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes)
         const AttOrnam *att = dynamic_cast<const AttOrnam *>(element);
         assert(att);
         if (att->HasOrnam()) {
-            attributes->push_back(std::make_pair("ornam", att->OrnamCmnToStr(att->GetOrnam())));
+            attributes->push_back(std::make_pair("ornam", att->StrToStr(att->GetOrnam())));
         }
     }
     if (element->HasAttClass(ATT_ORNAMENTACCID)) {

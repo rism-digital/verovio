@@ -321,6 +321,10 @@ int System::AdjustFloatingPostioners(FunctorParams *functorParams)
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = DIR;
     m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = MORDENT;
+    m_systemAligner.Process(params->m_functor, params);
+    params->m_classId = TURN;
+    m_systemAligner.Process(params->m_functor, params);
     params->m_classId = TRILL;
     m_systemAligner.Process(params->m_functor, params);
     params->m_classId = FERMATA;

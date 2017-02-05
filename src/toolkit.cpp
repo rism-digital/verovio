@@ -191,7 +191,7 @@ bool Toolkit::SetOutputFormat(std::string const &outformat)
     else if (outformat == "midi") {
         m_outformat = MIDI;
     }
-    else {
+    else if (outformat != "svg") {
         LogError("Output format can only be: mei, humdrum, midi or svg");
         return false;
     }
@@ -1097,6 +1097,7 @@ bool Toolkit::Set(std::string elementId, std::string attrType, std::string attrV
     if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
     if (Att::SetCmn(element, attrType, attrValue)) return true;
+    if (Att::SetCmnornaments(element, attrType, attrValue)) return true;
     if (Att::SetCritapp(element, attrType, attrValue)) return true;
     if (Att::SetExternalsymbols(element, attrType, attrValue)) return true;
     if (Att::SetMei(element, attrType, attrValue)) return true;

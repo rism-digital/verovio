@@ -245,6 +245,7 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     attributes->clear();
 
     Att::GetCmn(this, attributes);
+    Att::GetCmnornaments(this, attributes);
     Att::GetCritapp(this, attributes);
     Att::GetExternalsymbols(this, attributes);
     Att::GetMei(this, attributes);
@@ -407,7 +408,7 @@ void Object::GenerateUuid()
     int nr = std::rand();
     char str[17];
     // I do not want to use a stream for doing this!
-    snprintf(str, 16, "%016d", nr);
+    snprintf(str, 17, "%016d", nr);
 
     m_uuid = m_classid + std::string(str);
     std::transform(m_uuid.begin(), m_uuid.end(), m_uuid.begin(), ::tolower);
