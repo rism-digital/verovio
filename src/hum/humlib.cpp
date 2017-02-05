@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sat Feb  4 13:52:57 PST 2017
+// Last Modified: Sun Feb  5 04:47:37 PST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -8095,6 +8095,42 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					if (dstates[rindex][trilldiatonic] != trillaccid) {
 						infile[i].token(j)->setValue("auto", to_string(k),
 								"trillAccidental", to_string(trillaccid));
+					}
+				} else if (subtok.find("M") != string::npos) {
+					// major second upper mordent
+					int auxnote     = b40 + 6;
+					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
+					int auxaccid    = Convert::base40ToAccidental(auxnote);
+					if (dstates[rindex][auxdiatonic] != auxaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"mordentUpperAccidental", to_string(auxaccid));
+					}
+				} else if (subtok.find("m") != string::npos) {
+					// minor second upper mordent
+					int auxnote     = b40 + 5;
+					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
+					int auxaccid    = Convert::base40ToAccidental(auxnote);
+					if (dstates[rindex][auxdiatonic] != auxaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"mordentUpperAccidental", to_string(auxaccid));
+					}
+				} else if (subtok.find("W") != string::npos) {
+					// major second upper mordent
+					int auxnote     = b40 - 6;
+					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
+					int auxaccid    = Convert::base40ToAccidental(auxnote);
+					if (dstates[rindex][auxdiatonic] != auxaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"mordentLowerAccidental", to_string(auxaccid));
+					}
+				} else if (subtok.find("w") != string::npos) {
+					// minor second upper mordent
+					int auxnote     = b40 - 5;
+					int auxdiatonic = Convert::base40ToDiatonic(auxnote);
+					int auxaccid    = Convert::base40ToAccidental(auxnote);
+					if (dstates[rindex][auxdiatonic] != auxaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"mordentLowerAccidental", to_string(auxaccid));
 					}
 				}
 

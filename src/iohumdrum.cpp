@@ -5280,32 +5280,45 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
 //////////////////////////////
 //
 // HumdrumInput::addMordent -- Add mordent for note.
-//   	M = mordent, major second top interval
-//   	m = mordent, minor second top interval
-//   	W = inverted mordent, major second top interval
-//   	w = inverted mordent, minor second top interval
+//   	M = upper mordent, major second interval
+//   	m = upper mordent, minor second interval
+//   	W = lower mordent, major second interval
+//   	w = lower mordent, minor second interval
 //
 //
 
 void HumdrumInput::addMordent(Object *linked, hum::HTp token)
 {
-    bool invertedQ = false;
-    size_t tpos = token->find("W");
-    if (tpos != std::string::npos) {
-        invertedQ = true;
-    }
-    else {
-        tpos = token->find("w");
-        if (tpos != std::string::npos) {
-            invertedQ = true;
+
+    bool lowerQ = false;
+    int subtok = 0;
+    size_t tpos = std::string::npos;
+    for (int i = 0; i < (int)token->size(); i++) {
+        char chit = token->at(i);
+        if (chit == ' ') {
+            subtok++;
+            continue;
         }
-        else {
-            tpos = token->find("M");
-            if (tpos == std::string::npos) {
-                tpos = token->find("m");
-            }
+        if (chit == 'w') {
+            tpos = i;
+            lowerQ = true;
+            break;
+        }
+        else if (chit == 'm') {
+            tpos = i;
+            break;
+        }
+        else if (chit == 'W') {
+            tpos = i;
+            lowerQ = true;
+            break;
+        }
+        else if (chit == 'M') {
+            tpos = i;
+            break;
         }
     }
+
     if (tpos == std::string::npos) {
         // no mordent on note
         return;
@@ -5313,7 +5326,6 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
 
     // int layer = m_currentlayer; // maybe place below if in layer 2
     int staff = m_currentstaff;
-
     Mordent *mordent = new Mordent;
     appendElement(m_measure, mordent);
     setStaff(mordent, staff);
@@ -5326,7 +5338,8 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     }
     setLocationId(mordent, token);
 
-    if (invertedQ) {
+    if (!lowerQ) {
+        // reversing for now
         mordent->SetForm(mordentLog_FORM_inv);
         // } else {
         //    mordent->SetForm(mordentLog_FORM_norm);
@@ -5347,6 +5360,59 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
             }
         }
     }
+
+    if (std::tolower(token->at(tpos)) == 'w') {
+        // lower mordent
+        std::string accid = token->getValue("auto", to_string(subtok), "mordentLowerAccidental");
+        bool hasaccid = accid.empty() ? false : true;
+        int accidval = 0;
+        if (hasaccid) {
+            accidval = stoi(accid);
+            switch (accidval) {
+                case -1:
+                    token->setValue("LO", "TX", "t", "ml\u266d"); // unicode flat
+                    token->setValue("LO", "TX", "a", "true");
+                    // mordent->SetAccidLower(ACCIDENTAL_EXPLICIT_f);
+                    break;
+                case 0:
+                    token->setValue("LO", "TX", "t", "ml\u266e"); // unicode natural
+                    token->setValue("LO", "TX", "a", "true");
+                    // mordent->SetAccidLower(ACCIDENTAL_EXPLICIT_n);
+                    break;
+                case +1:
+                    token->setValue("LO", "TX", "t", "ml\u266f"); // unicode sharp
+                    token->setValue("LO", "TX", "a", "true");
+                    // mordent->SetAccidLower(ACCIDENTAL_EXPLICIT_s);
+                    break;
+            }
+        }
+    }
+    else {
+        // upper mordent
+        std::string accid = token->getValue("auto", to_string(subtok), "mordentUpperAccidental");
+        bool hasaccid = accid.empty() ? false : true;
+        int accidval = 0;
+        if (hasaccid) {
+            accidval = stoi(accid);
+            switch (accidval) {
+                case -1:
+                    token->setValue("LO", "TX", "t", "mu\u266d"); // unicode flat
+                    token->setValue("LO", "TX", "a", "true");
+                    // mordent->SetAccidUpper(ACCIDENTAL_EXPLICIT_f);
+                    break;
+                case 0:
+                    token->setValue("LO", "TX", "t", "mu\u266e"); // unicode natural
+                    token->setValue("LO", "TX", "a", "true");
+                    // mordent->SetAccidUpper(ACCIDENTAL_EXPLICIT_n);
+                    break;
+                case +1:
+                    token->setValue("LO", "TX", "t", "mu\u266f"); // unicode sharp
+                    token->setValue("LO", "TX", "a", "true");
+                    // mordent->SetAccidUpper(ACCIDENTAL_EXPLICIT_s);
+                    break;
+            }
+        }
+    }
 }
 
 //////////////////////////////
@@ -5363,7 +5429,7 @@ void HumdrumInput::addTrill(hum::HTp token)
 {
     int subtok = 0;
     size_t tpos = std::string::npos;
-    for (int i = 0; i < token->size(); i++) {
+    for (int i = 0; i < (int)token->size(); i++) {
         if (token->at(i) == ' ') {
             subtok++;
             continue;
@@ -5425,22 +5491,26 @@ void HumdrumInput::addTrill(hum::HTp token)
                 token->setValue("LO", "TX", "a", "true");
                 // trill->SetAccidUpper(ACCIDENTAL_EXPLICIT_s);
                 break;
-            case 2:
-                token->setValue("LO", "TX", "t", "tr\u0001d12a"); // unicode double-sharp
-                token->setValue("LO", "TX", "a", "true");
-                // trill->SetAccidUpper(ACCIDENTAL_EXPLICIT_x);
-                break;
+
+            // case 2:
+            //    token->setValue("LO", "TX", "t", "tr\u0001\ud12a"); // unicode double-sharp
+            //    token->setValue("LO", "TX", "a", "true");
+            //    // trill->SetAccidUpper(ACCIDENTAL_EXPLICIT_x);
+            //    break;
 
             case -1:
                 token->setValue("LO", "TX", "t", "tr\u266d"); // unicode flat
                 token->setValue("LO", "TX", "a", "true");
                 // trill->SetAccidUpper(ACCIDENTAL_EXPLICIT_f);
                 break;
-            case -2:
-                token->setValue("LO", "TX", "t", "tr\u0001d12b"); // unicode double-flat
-                token->setValue("LO", "TX", "a", "true");
-                // trill->SetAccidUpper(ACCIDENTAL_EXPLICIT_ff);
-                break;
+
+                // case -2:
+                //	// see: http://www.fileformat.info/info/unicode/char/1d12b/index.htm
+                //    // token->setValue("LO", "TX", "t", "tr\ud834\udd2b"); // unicode double-flat
+                //    token->setValue("LO", "TX", "t", "tr\U0001d12b"); // unicode double-flat
+                //    token->setValue("LO", "TX", "a", "true");
+                //    // trill->SetAccidUpper(ACCIDENTAL_EXPLICIT_ff);
+                //    break;
         }
     }
 }
