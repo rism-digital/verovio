@@ -434,6 +434,11 @@ private:
     ///@}
 
     /**
+     * @name Internal methods used for drawing accidentals on ornaments
+     */
+    int GetOrnamentaccidCode(data_ACCIDENTAL_EXPLICIT ornamentaccid);
+
+    /**
      * Used for calculating clustered information/dot position
      */
     bool IsOnStaffLine(int y, Staff *staff);
