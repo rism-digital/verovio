@@ -1750,7 +1750,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
         int y = mordent->GetDrawingY();
 
         if (mordent->HasAccidlower()) {
-            int accid = GetOrnamentaccidGlyph(mordent->GetAccidlower());
+            int accid = Accid::GetOrnamentaccidGlyph(mordent->GetAccidlower());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
@@ -1890,7 +1890,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         int y = trill->GetDrawingY();
 
         if (trill->HasAccidlower()) {
-            int accid = GetOrnamentaccidGlyph(trill->GetAccidlower());
+            int accid = Accid::GetOrnamentaccidGlyph(trill->GetAccidlower());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
@@ -1939,7 +1939,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
         int y = turn->GetDrawingY();
 
         if (turn->HasAccidlower()) {
-            int accid = GetOrnamentaccidGlyph(turn->GetAccidlower());
+            int accid = Accid::GetOrnamentaccidGlyph(turn->GetAccidlower());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
@@ -1957,41 +1957,6 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     }
 
     dc->EndGraphic(turn, this);
-}
-
-int View::GetOrnamentaccidGlyph(data_ACCIDENTAL_EXPLICIT ornamentaccid)
-{
-    int symc = SMUFL_E261_accidentalNatural;
-    switch (ornamentaccid) {
-        case ACCIDENTAL_EXPLICIT_s: symc = SMUFL_E262_accidentalSharp; break;
-        case ACCIDENTAL_EXPLICIT_f: symc = SMUFL_E260_accidentalFlat; break;
-        case ACCIDENTAL_EXPLICIT_ss: symc = SMUFL_E269_accidentalSharpSharp; break;
-        case ACCIDENTAL_EXPLICIT_x: symc = SMUFL_E263_accidentalDoubleSharp; break;
-        case ACCIDENTAL_EXPLICIT_ff: symc = SMUFL_E264_accidentalDoubleFlat; break;
-        case ACCIDENTAL_EXPLICIT_sx:
-            symc = SMUFL_E265_accidentalTripleSharp;
-            break; // Missing in SMuFL
-        case ACCIDENTAL_EXPLICIT_xs: symc = SMUFL_E265_accidentalTripleSharp; break;
-        case ACCIDENTAL_EXPLICIT_ts:
-            symc = SMUFL_E265_accidentalTripleSharp;
-            break; // Missing in SMuFL
-        case ACCIDENTAL_EXPLICIT_tf: symc = SMUFL_E266_accidentalTripleFlat; break;
-        case ACCIDENTAL_EXPLICIT_n: symc = SMUFL_E261_accidentalNatural; break;
-        case ACCIDENTAL_EXPLICIT_nf: symc = SMUFL_E267_accidentalNaturalFlat; break;
-        case ACCIDENTAL_EXPLICIT_ns: symc = SMUFL_E268_accidentalNaturalSharp; break;
-        case ACCIDENTAL_EXPLICIT_su: symc = SMUFL_E274_accidentalThreeQuarterTonesSharpArrowUp; break;
-        case ACCIDENTAL_EXPLICIT_sd: symc = SMUFL_E275_accidentalQuarterToneSharpArrowDown; break;
-        case ACCIDENTAL_EXPLICIT_fu: symc = SMUFL_E270_accidentalQuarterToneFlatArrowUp; break;
-        case ACCIDENTAL_EXPLICIT_fd: symc = SMUFL_E271_accidentalThreeQuarterTonesFlatArrowDown; break;
-        case ACCIDENTAL_EXPLICIT_nu: symc = SMUFL_E272_accidentalQuarterToneSharpNaturalArrowUp; break;
-        case ACCIDENTAL_EXPLICIT_nd: symc = SMUFL_E273_accidentalQuarterToneFlatNaturalArrowDown; break;
-        case ACCIDENTAL_EXPLICIT_1qf: symc = SMUFL_E280_accidentalQuarterToneFlatStein; break;
-        case ACCIDENTAL_EXPLICIT_3qf: symc = SMUFL_E281_accidentalThreeQuarterTonesFlatZimmermann; break;
-        case ACCIDENTAL_EXPLICIT_1qs: symc = SMUFL_E282_accidentalQuarterToneSharpStein; break;
-        case ACCIDENTAL_EXPLICIT_3qs: symc = SMUFL_E283_accidentalThreeQuarterTonesSharpStein; break;
-        default: break;
-    }
-    return symc;
 }
 
 //----------------------------------------------------------------------------
