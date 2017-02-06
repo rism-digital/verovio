@@ -48,6 +48,11 @@ public:
      */
     std::wstring GetSymbolStr() const;
 
+    /**
+     * @name Method used for drawing accidentals on ornaments
+     */
+    static int GetOrnamentaccidGlyph(data_ACCIDENTAL_EXPLICIT ornamentaccid);
+
     //----------//
     // Functors //
     //----------//

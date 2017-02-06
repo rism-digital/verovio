@@ -1749,6 +1749,16 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, x, (*staffIter)->GetDrawingY());
         int y = mordent->GetDrawingY();
 
+        if (mordent->HasAccidlower()) {
+            int accid = Accid::GetOrnamentaccidGlyph(mordent->GetAccidlower());
+            std::wstring accidStr;
+            accidStr.push_back(accid);
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            // Adjust the y position
+            y = y + m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
+        }
+
         // Adjust the x position
         int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
 
@@ -1879,6 +1889,16 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, x, (*staffIter)->GetDrawingY());
         int y = trill->GetDrawingY();
 
+        if (trill->HasAccidlower()) {
+            int accid = Accid::GetOrnamentaccidGlyph(trill->GetAccidlower());
+            std::wstring accidStr;
+            accidStr.push_back(accid);
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            // Adjust the y position
+            y = y + m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
+        }
+
         // Adjust the x position
         int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
 
@@ -1917,6 +1937,16 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), turn, x, (*staffIter)->GetDrawingY());
         int y = turn->GetDrawingY();
+
+        if (turn->HasAccidlower()) {
+            int accid = Accid::GetOrnamentaccidGlyph(turn->GetAccidlower());
+            std::wstring accidStr;
+            accidStr.push_back(accid);
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            // Adjust the y position
+            y = y + m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
+        }
 
         // Adjust the x position
         int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
