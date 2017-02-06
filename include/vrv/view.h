@@ -436,7 +436,7 @@ private:
     /**
      * @name Internal methods used for drawing accidentals on ornaments
      */
-    int GetOrnamentaccidCode(data_ACCIDENTAL_EXPLICIT ornamentaccid);
+    int GetOrnamentaccidGlyph(data_ACCIDENTAL_EXPLICIT ornamentaccid);
 
     /**
      * Used for calculating clustered information/dot position
