@@ -479,6 +479,7 @@ void Doc::CastOffDoc()
 
     // Reset the scoreDef at the beginning of each system
     this->CollectScoreDefs(true);
+    contentPage->LayOutHorizontally();
     contentPage->LayOutVertically();
 
     // Detach the contentPage

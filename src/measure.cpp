@@ -400,7 +400,7 @@ int Measure::SetBoundingBoxXShift(FunctorParams *functorParams)
     std::vector<AttComparison *> filters;
     for(iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
         params->m_minPos = 0;
-        params->m_upcomingMinPos = 0;
+        params->m_upcomingMinPos = VRV_UNSET;
         params->m_cumulatedXShift = 0;
         filters.clear();
         // Create ad comparison object for each type / @n

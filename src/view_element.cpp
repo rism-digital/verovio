@@ -669,7 +669,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int size = (int)noteList.size();
     if (size > 0) {
         // set the default x position
-        int xAccid = chord->GetDrawingX() - (radius * 2);
+        int xAccid = -(radius * 2);
 
         // if chord is a down-stemmed non-cluster, it needs one more note diameter of space
         if ((chord->GetDrawingStemDir() == STEMDIRECTION_down) && (chord->m_clusters.size() > 0)) {
@@ -710,20 +710,17 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                 Accid *accidFwd = noteList.at(fwIdx)->GetDrawingAccid();
                 Accid *accidBwd = noteList.at(bwIdx)->GetDrawingAccid();
 
-                assert(false);
-                /*
                 // if the top note has an accidental, draw it and update prevAccid
-                accidFwd->SetDrawingX(xAccid);
+                accidFwd->SetDrawingXRel(xAccid);
                 CalculateAccidX(staff, accidFwd, chord, true);
                 // DrawAccid(dc, accidFwd, layer, staff, measure);
                 // same, except with an extra check that we're not doing the same note twice
                 if (fwIdx != bwIdx) {
-                    accidBwd->SetDrawingX(xAccid);
+                    accidBwd->SetDrawingXRel(xAccid);
                     CalculateAccidX(staff, accidBwd, chord, true);
                     // DrawAccid(dc, accidBwd, layer, staff, measure);
                     bwIdx--;
                 }
-                */
 
                 fwIdx++;
             }
@@ -1421,7 +1418,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 TextExtend extend;
                 dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
                 dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
-                accidXShift -= (extend.m_width + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+                // HARDCODED
+                accidXShift -= (extend.m_width + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
                 dc->ResetFont();
             }
             accid->SetDrawingXRel(accidXShift);
@@ -2267,8 +2265,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     // If we need to move the accidental horizontally, move it by currentX half-units.
     if (adjustHorizontally) {
         int xShift = currentX * halfUnit;
-        assert(false);
-        // accid->SetDrawingX(accid->GetDrawingX() - xShift);
+        accid->SetDrawingXRel(accid->GetDrawingXRel() - xShift);
 
         // mark the spaces as taken (true in accidSpace)
         for (int xIdx = currentX; xIdx > currentX - ACCID_WIDTH; xIdx--) {

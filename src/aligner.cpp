@@ -844,7 +844,11 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
     
-    params->m_minPos = params->m_upcomingMinPos;
+    if (params->m_upcomingMinPos != VRV_UNSET) {
+        params->m_minPos = params->m_upcomingMinPos;
+        // We reset it for the next aligner
+        params->m_upcomingMinPos = VRV_UNSET;
+    }
     
     // No upcoming bounding boxes, we keep the previous ones (e.g., the alignment has nothing for this staff)
     // Eventually we might want to have a more sophisticated pruning algorithm

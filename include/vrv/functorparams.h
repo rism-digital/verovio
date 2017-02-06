@@ -976,7 +976,7 @@ public:
     SetBoundingBoxXShiftParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
     {
         m_minPos = 0;
-        m_upcomingMinPos = 0;
+        m_upcomingMinPos = VRV_UNSET;
         m_cumulatedXShift = 0;
         m_staffNs = staffNs;
         //m_layerMinPos = 0;

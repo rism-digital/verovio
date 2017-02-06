@@ -134,7 +134,7 @@ Beam *LayerElement::IsInBeam()
 }
 
 int LayerElement::GetDrawingX() const
-{
+{    
     assert(m_alignment);
 
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
@@ -642,14 +642,16 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
     // We add it to the upcoming bouding boxes
     params->m_upcomingBoundingBoxes.push_back(this);
 
-    int selfLeft = this->GetAlignment()->GetXRel() + this->GetSelfX1();
+    int selfLeft = this->GetSelfLeft();
     int offset = selfLeft - params->m_minPos;
     if (offset < 0) {
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
+        // Also move the cumultated x shift and the minimum position for the next alignment accordingly
         params->m_cumulatedXShift += (-offset);
+        params->m_upcomingMinPos += (-offset);
     }
-
-    params->m_upcomingMinPos = std::max(this->GetAlignment()->GetXRel() + this->GetSelfX2(), params->m_upcomingMinPos);
+    
+    params->m_upcomingMinPos = std::max(this->GetSelfRight(), params->m_upcomingMinPos);
 
     return FUNCTOR_CONTINUE;
 
