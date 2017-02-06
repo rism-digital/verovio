@@ -784,6 +784,7 @@ void MeiOutput::WriteMeiMordent(pugi::xml_node currentNode, Mordent *mordent)
     WriteXmlId(currentNode, mordent);
     WriteTimePointInterface(currentNode, mordent);
     mordent->WriteColor(currentNode);
+    mordent->WriteOrnamentaccid(currentNode);
     mordent->WritePlacement(currentNode);
     mordent->WriteMordentLog(currentNode);
 };
@@ -860,6 +861,7 @@ void MeiOutput::WriteMeiTrill(pugi::xml_node currentNode, Trill *trill)
     WriteXmlId(currentNode, trill);
     WriteTimePointInterface(currentNode, trill);
     trill->WriteColor(currentNode);
+    trill->WriteOrnamentaccid(currentNode);
     trill->WritePlacement(currentNode);
 };
 
@@ -870,6 +872,7 @@ void MeiOutput::WriteMeiTurn(pugi::xml_node currentNode, Turn *turn)
     WriteXmlId(currentNode, turn);
     WriteTimePointInterface(currentNode, turn);
     turn->WriteColor(currentNode);
+    turn->WriteOrnamentaccid(currentNode);
     turn->WritePlacement(currentNode);
     turn->WriteTurnLog(currentNode);
 };
@@ -2278,6 +2281,7 @@ bool MeiInput::ReadMeiMordent(Object *parent, pugi::xml_node mordent)
 
     ReadTimePointInterface(mordent, vrvMordent);
     vrvMordent->ReadColor(mordent);
+    vrvMordent->ReadOrnamentaccid(mordent);
     vrvMordent->ReadPlacement(mordent);
     vrvMordent->ReadMordentLog(mordent);
 
@@ -2360,6 +2364,7 @@ bool MeiInput::ReadMeiTrill(Object *parent, pugi::xml_node trill)
 
     ReadTimePointInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
+    vrvTrill->ReadOrnamentaccid(trill);
     vrvTrill->ReadPlacement(trill);
 
     parent->AddChild(vrvTrill);
@@ -2373,6 +2378,7 @@ bool MeiInput::ReadMeiTurn(Object *parent, pugi::xml_node turn)
 
     ReadTimePointInterface(turn, vrvTurn);
     vrvTurn->ReadColor(turn);
+    vrvTurn->ReadOrnamentaccid(turn);
     vrvTurn->ReadPlacement(turn);
     vrvTurn->ReadTurnLog(turn);
 
