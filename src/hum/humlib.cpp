@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Feb  5 04:47:37 PST 2017
+// Last Modified: Tue Feb  7 00:03:54 PST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -8086,6 +8086,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					if (dstates[rindex][trilldiatonic] != trillaccid) {
 						infile[i].token(j)->setValue("auto", to_string(k),
 								"trillAccidental", to_string(trillaccid));
+						dstates[rindex][trilldiatonic] = -1000 + trillaccid;
 					}
 				} else if (subtok.find("T") != string::npos) {
 					// major second trill
@@ -8095,6 +8096,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					if (dstates[rindex][trilldiatonic] != trillaccid) {
 						infile[i].token(j)->setValue("auto", to_string(k),
 								"trillAccidental", to_string(trillaccid));
+						dstates[rindex][trilldiatonic] = -1000 + trillaccid;
 					}
 				} else if (subtok.find("M") != string::npos) {
 					// major second upper mordent
@@ -8104,6 +8106,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					if (dstates[rindex][auxdiatonic] != auxaccid) {
 						infile[i].token(j)->setValue("auto", to_string(k),
 								"mordentUpperAccidental", to_string(auxaccid));
+						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
 					}
 				} else if (subtok.find("m") != string::npos) {
 					// minor second upper mordent
@@ -8113,6 +8116,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					if (dstates[rindex][auxdiatonic] != auxaccid) {
 						infile[i].token(j)->setValue("auto", to_string(k),
 								"mordentUpperAccidental", to_string(auxaccid));
+						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
 					}
 				} else if (subtok.find("W") != string::npos) {
 					// major second upper mordent
@@ -8122,6 +8126,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					if (dstates[rindex][auxdiatonic] != auxaccid) {
 						infile[i].token(j)->setValue("auto", to_string(k),
 								"mordentLowerAccidental", to_string(auxaccid));
+						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
 					}
 				} else if (subtok.find("w") != string::npos) {
 					// minor second upper mordent
@@ -8131,8 +8136,10 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					if (dstates[rindex][auxdiatonic] != auxaccid) {
 						infile[i].token(j)->setValue("auto", to_string(k),
 								"mordentLowerAccidental", to_string(auxaccid));
+						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
 					}
 				}
+				// check for accidentals on turns here...
 
 				if (graceQ && (accid != gdstates[rindex][diatonic])) {
 					// accidental is different from the previous state so should be
