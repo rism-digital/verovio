@@ -19,7 +19,12 @@ namespace vrv {
 // Mordent
 //----------------------------------------------------------------------------
 
-class Mordent : public ControlElement, public TimePointInterface, public AttColor, public AttPlacement, public AttMordentLog {
+class Mordent : public ControlElement,
+                public TimePointInterface,
+                public AttColor,
+                public AttOrnamentaccid,
+                public AttPlacement,
+                public AttMordentLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
