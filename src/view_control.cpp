@@ -614,13 +614,13 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     // first should be the tie @curvedir
     if (slur->HasCurvedir()) {
-        drawingCurveDir
-            = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+        drawingCurveDir = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above
+                                                                            : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        drawingCurveDir
-            = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+        drawingCurveDir = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above
+                                                                          : curvature_CURVEDIR_below;
     }
     // look if in a chord
     else if (startParentChord) {
@@ -1321,13 +1321,13 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 
     // first should be the tie @curvedir
     if (tie->HasCurvedir()) {
-        drawingCurveDir
-            = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+        drawingCurveDir = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above
+                                                                           : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        drawingCurveDir
-            = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
+        drawingCurveDir = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above
+                                                                          : curvature_CURVEDIR_below;
     }
     // look if in a chord
     else if (parentChord1) {
@@ -1529,7 +1529,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     assert(measure);
     assert(dir);
 
-    // We cannot draw a dir that has no start position
+    // Cannot draw a dir that has no start position
     if (!dir->GetStart()) return;
 
     dc->StartGraphic(dir, "", dir->GetUuid());
@@ -1572,7 +1572,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     assert(measure);
     assert(dynam);
 
-    // We cannot draw dynamics that have no start position
+    // Cannot draw dynamics that have no start position
     if (!dynam->GetStart()) return;
 
     dc->StartGraphic(dynam, "", dynam->GetUuid());
@@ -1630,7 +1630,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     assert(measure);
     assert(fermata);
 
-    // We cannot draw a fermata that has no start position
+    // Cannot draw a fermata that has no start position
     if (!fermata->GetStart()) return;
 
     dc->StartGraphic(fermata, "", fermata->GetUuid());
@@ -1685,7 +1685,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     assert(measure);
     assert(harm);
 
-    // We cannot draw a harmony indication that has no start position
+    // Cannot draw a harmony indication that has no start position
     if (!harm->GetStart()) return;
 
     dc->StartGraphic(harm, "", harm->GetUuid());
@@ -1728,7 +1728,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     assert(measure);
     assert(mordent);
 
-    // We cannot draw a mordent that has no start position
+    // Cannot draw a mordent that has no start position
     if (!mordent->GetStart()) return;
 
     dc->StartGraphic(mordent, "", mordent->GetUuid());
@@ -1781,7 +1781,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             y += factor * m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
         }
         else if (mordent->HasAccidupper()) {
-            auto glyphHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
+            auto mordentHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
             int accid = Accid::GetOrnamentaccidGlyph(mordent->GetAccidupper());
             std::wstring accidStr;
             accidStr.push_back(accid);
@@ -1809,7 +1809,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
                 factor = 1.35;
                 xShift = -0.08;
             }
-            y -= factor * glyphHeight;
+            y -= factor * mordentHeight;
         }
 
         // Adjust the x position
@@ -1923,7 +1923,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     assert(measure);
     assert(trill);
 
-    // We cannot draw a trill that has no start position
+    // Cannot draw a trill that has no start position
     if (!trill->GetStart()) return;
 
     dc->StartGraphic(trill, "", trill->GetUuid());
@@ -1942,14 +1942,27 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, x, (*staffIter)->GetDrawingY());
         int y = trill->GetDrawingY();
 
+        // Upper and lower accidentals are currently exclusive, but sould both be allowed at the same time.
         if (trill->HasAccidlower()) {
+
             int accid = Accid::GetOrnamentaccidGlyph(trill->GetAccidlower());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
             DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
             // Adjust the y position
-            y = y + m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
+            y += m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
+        }
+        else if (trill->HasAccidupper()) {
+            auto trillHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
+            int accid = Accid::GetOrnamentaccidGlyph(trill->GetAccidupper());
+            std::wstring accidStr;
+            accidStr.push_back(accid);
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            // Adjust the y position
+            double factor = 1.5;
+            y -= factor * trillHeight;
         }
 
         // Adjust the x position
@@ -1970,7 +1983,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     assert(measure);
     assert(turn);
 
-    // We cannot draw a trill that has no start position
+    // Cannot draw a turn that has no start position
     if (!turn->GetStart()) return;
 
     dc->StartGraphic(turn, "", turn->GetUuid());
