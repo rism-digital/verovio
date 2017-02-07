@@ -298,12 +298,12 @@ void View::DrawArtic(
 
     /************** calculate the y position **************/
 
-    int staffYBottom = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+    int staffYBottom = -m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
-    int yInAbove = std::max(parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false), staffYBottom);
-    int yInBelow = std::min(parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false), staff->GetDrawingY());
-    int yOutAbove = std::max(yInAbove, staff->GetDrawingY());
-    int yOutBelow = std::min(yInBelow, staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize));
+    int yInAbove = std::max(parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), staffYBottom);
+    int yInBelow = std::min(parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), 0);
+    int yOutAbove = std::max(yInAbove, 0);
+    int yOutBelow = std::min(yInBelow, staffYBottom);
 
     artic->UpdateOutsidePartPosition(yOutAbove, yOutBelow, place, allowAbove);
     artic->UpdateInsidePartPosition(yInAbove, yInBelow, place);

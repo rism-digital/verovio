@@ -96,14 +96,12 @@ void Artic::UpdateOutsidePartPosition(int yAbove, int yBelow, data_STAFFREL plac
 
     if (place == STAFFREL_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_above;
 
-    assert(false);
-    /*
     outsidePart->SetPlace(place);
     if (place == STAFFREL_above)
-        outsidePart->SetDrawingY(yAbove);
+        outsidePart->SetDrawingYRel(yAbove);
     else
-        outsidePart->SetDrawingY(yBelow);
-    */
+        outsidePart->SetDrawingYRel(yBelow);
+
 }
 
 void Artic::UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place)
@@ -111,14 +109,11 @@ void Artic::UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place
     ArticPart *insidePart = GetInsidePart();
     if (!insidePart) return;
 
-    assert(false);
-    /*
     insidePart->SetPlace(place);
     if (place == STAFFREL_above)
-        insidePart->SetDrawingY(yAbove);
+        insidePart->SetDrawingYRel(yAbove);
     else
-        insidePart->SetDrawingY(yBelow);
-    */
+        insidePart->SetDrawingYRel(yBelow);
 }
 
 ArticPart *Artic::GetInsidePart()
@@ -323,13 +318,11 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
             if (insidePart->GetPlace() == STAFFREL_above) {
                 int inTop = insidePart->GetContentTop();
                 int outBottom = outsidePart->GetContentBottom();
-                assert(false);
                 if (inTop > outBottom) outsidePart->SetDrawingYRel(outBottom - inTop - margin);
             }
             else {
                 int inBottom = insidePart->GetContentBottom();
                 int outTop = outsidePart->GetContentTop();
-                assert(false);
                 if (inBottom < outTop) outsidePart->SetDrawingYRel(outTop - inBottom + margin);
             }
         }
@@ -387,7 +380,6 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
         // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
         int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {
-            assert(false);
             this->SetDrawingYRel(this->GetDrawingYRel() - shift);
             // this->SetColor("red");
         }
@@ -397,7 +389,6 @@ int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
         // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
         int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
         if (shift != 0) {
-            assert(false);
             this->SetDrawingYRel(this->GetDrawingYRel() - shift);
             // this->SetColor("green");
         }
