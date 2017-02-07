@@ -5479,37 +5479,21 @@ void HumdrumInput::addTrill(hum::HTp token)
     if (hasaccid) {
         accidval = stoi(accid);
         switch (accidval) {
-            case 0:
-                token->setValue("LO", "TX", "t", "tr\u266e"); // unicode natural
-                token->setValue("LO", "TX", "a", "true");
-                // trill->SetAccidupper(ACCIDENTAL_EXPLICIT_n);
-                break;
-
-            case 1:
-                token->setValue("LO", "TX", "t", "tr\u266f"); // unicode sharp
-                token->setValue("LO", "TX", "a", "true");
-                // trill->SetAccidupper(ACCIDENTAL_EXPLICIT_s);
-                break;
-
-            // case 2:
-            //    token->setValue("LO", "TX", "t", "tr\u0001\ud12a"); // unicode double-sharp
-            //    token->setValue("LO", "TX", "a", "true");
-            //    // trill->SetAccidupper(ACCIDENTAL_EXPLICIT_x);
-            //    break;
-
             case -1:
-                token->setValue("LO", "TX", "t", "tr\u266d"); // unicode flat
-                token->setValue("LO", "TX", "a", "true");
-                // trill->SetAccidupper(ACCIDENTAL_EXPLICIT_f);
+                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_f);
                 break;
-
-                // case -2:
-                //	// see: http://www.fileformat.info/info/unicode/char/1d12b/index.htm
-                //    // token->setValue("LO", "TX", "t", "tr\ud834\udd2b"); // unicode double-flat
-                //    token->setValue("LO", "TX", "t", "tr\U0001d12b"); // unicode double-flat
-                //    token->setValue("LO", "TX", "a", "true");
-                //    // trill->SetAccidupper(ACCIDENTAL_EXPLICIT_ff);
-                //    break;
+            case 0:
+                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_n);
+                break;
+            case 1:
+                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_s);
+                break;
+            case -2:
+                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_ff);
+                break;
+            case 2:
+                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_x);
+                break;
         }
     }
 }
