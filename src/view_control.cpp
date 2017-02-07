@@ -1728,7 +1728,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     assert(measure);
     assert(mordent);
 
-    // We cannot draw a trill that has no start position
+    // We cannot draw a mordent that has no start position
     if (!mordent->GetStart()) return;
 
     dc->StartGraphic(mordent, "", mordent->GetUuid());
@@ -1745,6 +1745,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
 
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = mordent->GetTstampStaves(measure);
+    double xShift = 0.0;
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
         system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, x, (*staffIter)->GetDrawingY());
         int y = mordent->GetDrawingY();
@@ -1756,11 +1757,63 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
             DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
             // Adjust the y position
-            y = y + m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
+            double factor = 1.0;
+            auto meiaccid = mordent->GetAccidlower();
+            // optimized vertical kerning for Leipzig font:
+            if (meiaccid == ACCIDENTAL_EXPLICIT_ff) {
+                factor = 1.20;
+                xShift = 0.14;
+            }
+            else if (meiaccid == ACCIDENTAL_EXPLICIT_f) {
+                factor = 1.20;
+                xShift = -0.02;
+            }
+            else if (meiaccid == ACCIDENTAL_EXPLICIT_n) {
+                factor = 0.90;
+                xShift = -0.04;
+            }
+            else if (meiaccid == ACCIDENTAL_EXPLICIT_s) {
+                factor = 1.15;
+            }
+            else if (meiaccid == ACCIDENTAL_EXPLICIT_x) {
+                factor = 2.00;
+            }
+            y += factor * m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
+        }
+        else if (mordent->HasAccidupper()) {
+            auto glyphHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
+            int accid = Accid::GetOrnamentaccidGlyph(mordent->GetAccidupper());
+            std::wstring accidStr;
+            accidStr.push_back(accid);
+            dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
+            DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
+            // Adjust the y position
+            double factor = 1.75;
+            auto meiaccid = mordent->GetAccidupper();
+            // optimized vertical kerning for Leipzig font:
+            if (meiaccid == ACCIDENTAL_EXPLICIT_ff) {
+                factor = 1.40;
+            }
+            else if (meiaccid == ACCIDENTAL_EXPLICIT_f) {
+                factor = 1.25;
+            }
+            else if (meiaccid == ACCIDENTAL_EXPLICIT_n) {
+                factor = 1.60;
+                xShift = -0.10;
+            }
+            else if (meiaccid == ACCIDENTAL_EXPLICIT_s) {
+                factor = 1.60;
+                xShift = -0.06;
+            }
+            else if (meiaccid == ACCIDENTAL_EXPLICIT_x) {
+                factor = 1.35;
+                xShift = -0.08;
+            }
+            y -= factor * glyphHeight;
         }
 
         // Adjust the x position
-        int drawingX = x - m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
+        int drawingX = x - (1 + xShift) * m_doc->GetGlyphWidth(code, (*staffIter)->m_drawingStaffSize, false) / 2;
 
         dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
         DrawSmuflString(dc, drawingX, y, str, false, (*staffIter)->m_drawingStaffSize);
