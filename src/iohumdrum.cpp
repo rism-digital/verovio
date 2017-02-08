@@ -2415,9 +2415,9 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             pointers.pop_back();
             processSlurs(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
-            processDirection(layerdata[i], staffindex);
             addArticulations(chord, layerdata[i]);
             addOrnaments(chord, layerdata[i]);
+            processDirection(layerdata[i], staffindex);
         }
         else if (layerdata[i]->isRest()) {
             if (layerdata[i]->find("yy") != string::npos) {
@@ -2449,7 +2449,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             convertNote(note, layerdata[i], staffindex);
             processSlurs(layerdata[i]);
             processDynamics(layerdata[i], staffindex);
-            processDirection(layerdata[i], staffindex);
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
                 note->SetStemLen(0);
             }
@@ -2458,6 +2457,7 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             colorNote(note, *layerdata[i], line, field);
             addArticulations(note, layerdata[i]);
             addOrnaments(note, layerdata[i]);
+            processDirection(layerdata[i], staffindex);
         }
 
         handleGroupEnds(tg[i], elements, pointers);
@@ -2716,7 +2716,7 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
     if (!token) {
         return;
     }
-    else if (strchr(token->c_str(), ':') != NULL) { // arpeggio
+    if (strchr(token->c_str(), ':') != NULL) { // arpeggio
         token->setValue("LO", "TX", "t", "arp.");
         token->setValue("LO", "TX", "a", "true");
     }
@@ -5190,6 +5190,7 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
     if (chartable['S'] || chartable['$']) {
         addTurn(object, token);
     }
+
     addOrnamentMarkers(token);
 }
 
@@ -5290,32 +5291,44 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
 //////////////////////////////
 //
 // HumdrumInput::addMordent -- Add mordent for note.
-//   	M = mordent, major second top interval
-//   	m = mordent, minor second top interval
-//   	W = inverted mordent, major second top interval
-//   	w = inverted mordent, minor second top interval
+//   	M = upper mordent, major second interval
+//   	m = upper mordent, minor second interval
+//   	W = lower mordent, major second interval
+//   	w = lower mordent, minor second interval
 //
 //
 
 void HumdrumInput::addMordent(Object *linked, hum::HTp token)
 {
-    bool invertedQ = false;
-    size_t tpos = token->find("W");
-    if (tpos != std::string::npos) {
-        invertedQ = true;
-    }
-    else {
-        tpos = token->find("w");
-        if (tpos != std::string::npos) {
-            invertedQ = true;
+    bool lowerQ = false;
+    int subtok = 0;
+    size_t tpos = std::string::npos;
+    for (int i = 0; i < (int)token->size(); i++) {
+        char chit = token->at(i);
+        if (chit == ' ') {
+            subtok++;
+            continue;
         }
-        else {
-            tpos = token->find("M");
-            if (tpos == std::string::npos) {
-                tpos = token->find("m");
-            }
+        if (chit == 'w') {
+            tpos = i;
+            lowerQ = true;
+            break;
+        }
+        else if (chit == 'm') {
+            tpos = i;
+            break;
+        }
+        else if (chit == 'W') {
+            tpos = i;
+            lowerQ = true;
+            break;
+        }
+        else if (chit == 'M') {
+            tpos = i;
+            break;
         }
     }
+
     if (tpos == std::string::npos) {
         // no mordent on note
         return;
@@ -5323,7 +5336,6 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
 
     // int layer = m_currentlayer; // maybe place below if in layer 2
     int staff = m_currentstaff;
-
     Mordent *mordent = new Mordent;
     appendElement(m_measure, mordent);
     setStaff(mordent, staff);
@@ -5336,7 +5348,8 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
     }
     setLocationId(mordent, token);
 
-    if (invertedQ) {
+    if (!lowerQ) {
+        // reversing for now
         mordent->SetForm(mordentLog_FORM_inv);
         // } else {
         //    mordent->SetForm(mordentLog_FORM_norm);
@@ -5357,6 +5370,59 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
             }
         }
     }
+
+    if (std::tolower(token->at(tpos)) == 'w') {
+        // lower mordent
+        std::string accid = token->getValue("auto", to_string(subtok), "mordentLowerAccidental");
+        bool hasaccid = accid.empty() ? false : true;
+        int accidval = 0;
+        if (hasaccid) {
+            accidval = stoi(accid);
+            switch (accidval) {
+                case -1:
+                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_f);
+                    break;
+                case 0:
+                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_n);
+                    break;
+                case +1:
+                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_s);
+                    break;
+                case -2:
+                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_ff);
+                    break;
+                case +2:
+                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_x);
+                    break;
+            }
+        }
+    }
+    else {
+        // upper mordent
+        std::string accid = token->getValue("auto", to_string(subtok), "mordentUpperAccidental");
+        bool hasaccid = accid.empty() ? false : true;
+        int accidval = 0;
+        if (hasaccid) {
+            accidval = stoi(accid);
+            switch (accidval) {
+                case -1:
+                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_f);
+                    break;
+                case 0:
+                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_n);
+                    break;
+                case +1:
+                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_s);
+                    break;
+                case -2:
+                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_ff);
+                    break;
+                case +2:
+                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_x);
+                    break;
+            }
+        }
+    }
 }
 
 //////////////////////////////
@@ -5371,26 +5437,38 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
 
 void HumdrumInput::addTrill(hum::HTp token)
 {
-    size_t tpos = token->find("T");
-    if (tpos == string::npos) {
-        tpos = token->find("t");
+    int subtok = 0;
+    size_t tpos = std::string::npos;
+    for (int i = 0; i < (int)token->size(); i++) {
+        if (token->at(i) == ' ') {
+            subtok++;
+            continue;
+        }
+        if ((token->at(i) == 't') || (token->at(i) == 'T')) {
+            tpos = i;
+            if (i < token->size() - 1) {
+                // deal with TT or tt for trills with wavy lines
+                if ((token->at(i + 1) == 't') || (token->at(i + 1) == 'T')) {
+                    tpos++;
+                }
+            }
+        }
     }
-    if (tpos == string::npos) {
-        // no trill on note(s)
+    if (tpos == std::string::npos) {
+        // no trill on a note
         return;
     }
 
     // int layer = m_currentlayer; // maybe place below if in layer 2
     int staff = m_currentstaff;
-
     Trill *trill = new Trill;
     appendElement(m_measure, trill);
     setStaff(trill, staff);
+
     // using tstamp for now, but @startid is perhaps better?
     hum::HumNum tstamp = getMeasureTstamp(token, staff - 1);
     trill->SetTstamp(tstamp.getFloat());
     setLocationId(trill, token);
-
     if (m_signifiers.above) {
         if (tpos < token->size() - 1) {
             if ((*token)[tpos + 1] == m_signifiers.above) {
@@ -5403,6 +5481,30 @@ void HumdrumInput::addTrill(hum::HTp token)
             if ((*token)[tpos + 1] == m_signifiers.below) {
                 trill->SetPlace(STAFFREL_below);
             }
+        }
+    }
+
+    std::string accid = token->getValue("auto", to_string(subtok), "trillAccidental");
+    bool hasaccid = accid.empty() ? false : true;
+    int accidval = 0;
+    if (hasaccid) {
+        accidval = stoi(accid);
+        switch (accidval) {
+            case -1:
+                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_f);
+                break;
+            case 0:
+                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_n);
+                break;
+            case 1:
+                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_s);
+                break;
+            case -2:
+                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_ff);
+                break;
+            case 2:
+                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_x);
+                break;
         }
     }
 }
