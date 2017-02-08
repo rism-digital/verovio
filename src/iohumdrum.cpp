@@ -701,6 +701,27 @@ void HumdrumInput::createHeader(void)
     if (respPeople.size() > 0) {
         insertRespStmt(titleStmt, respPeople);
     }
+    std::string ODT = getReferenceValue("ODT", references);
+    std::string OCY = getReferenceValue("OCY", references);
+    std::string OPC = getReferenceValue("OPC", references);
+    if (!ODT.empty() || !OCY.empty() || !OPC.empty()) {
+        pugi::xml_node creation = work.append_child("creation");
+        if (!ODT.empty()) {
+            pugi::xml_node date = creation.append_child("date");
+            date.append_attribute("analog") = "humdrum:ODT";
+            date.append_child(pugi::node_pcdata).set_value(ODT.c_str());
+        }
+        if (!OCY.empty()) {
+            pugi::xml_node country = creation.append_child("geogName");
+            country.append_attribute("analog") = "humdrum:OCY";
+            country.append_child(pugi::node_pcdata).set_value(OCY.c_str());
+        }
+        if (!OPC.empty()) {
+            pugi::xml_node place = creation.append_child("geogName");
+            place.append_attribute("analog") = "humdrum:OPC";
+            place.append_child(pugi::node_pcdata).set_value(OPC.c_str());
+        }
+    }
     std::string HAO = getReferenceValue("HAO", references);
     if (!HAO.empty()) {
         pugi::xml_node history = work.append_child("history");
