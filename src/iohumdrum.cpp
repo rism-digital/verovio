@@ -596,13 +596,15 @@ void HumdrumInput::createHeader(void)
         }
         else if (!refKey.compare(2, 1, "C")) {
             pugi::xml_node useRestrict = availability.append_child("useRestrict");
-            useRestrict.append_attribute("xml:id") = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
+            useRestrict.append_attribute("xml:id")
+                = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
             useRestrict.append_attribute("analog") = "humdrum:YEC";
             useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
         else if (!refKey.compare(2, 1, "M")) {
             pugi::xml_node useRestrict = availability.append_child("useRestrict");
-            useRestrict.append_attribute("xml:id") = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
+            useRestrict.append_attribute("xml:id")
+                = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
             useRestrict.append_attribute("analog") = "humdrum:YEM";
             useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
@@ -614,7 +616,8 @@ void HumdrumInput::createHeader(void)
         }
         else if (!refKey.compare(2, 1, "P")) {
             pugi::xml_node publisher = pubStmt.append_child("publisher");
-            publisher.append_attribute("xml:id") = StringFormat("publisher-L%d", references[i]->getLineNumber()).c_str();
+            publisher.append_attribute("xml:id")
+                = StringFormat("publisher-L%d", references[i]->getLineNumber()).c_str();
             publisher.append_attribute("analog") = "humdrum:YEP";
             publisher.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
         }
@@ -698,6 +701,22 @@ void HumdrumInput::createHeader(void)
     if (respPeople.size() > 0) {
         insertRespStmt(titleStmt, respPeople);
     }
+    std::string HAO = getReferenceValue("HAO", references);
+    if (!HAO.empty()) {
+        pugi::xml_node history = work.append_child("history");
+        history.append_attribute("analog") = "humdrum:HAO";
+        for (int i = 0; i < (int)references.size(); i++) {
+            std::string refKey = references[i]->getReferenceKey();
+            if (refKey.compare(0, 3, "HAO")) {
+                continue;
+            }
+            else {
+                pugi::xml_node histLine = history.append_child("p");
+                histLine.append_attribute("xml:id") = StringFormat("p-L%d", references[i]->getLineNumber()).c_str();
+                histLine.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+            }
+        }
+    }
 
     // <extMeta> /////////////
     if (references.size() > 0) {
@@ -750,10 +769,8 @@ void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::ve
     pugi::xml_node respStmt = titleStmt.append_child("respStmt");
     for (int i = 0; i < (int)respPeople.size(); i++) {
         pugi::xml_node person = respStmt.append_child("persName");
-        person.append_attribute("xml:id")
-            = StringFormat("persname-L%s", respPeople[i][3].c_str()).c_str();
-        person.append_attribute("analog")
-            = StringFormat("humdrum:%s", respPeople[i][2].c_str()).c_str();
+        person.append_attribute("xml:id") = StringFormat("persname-L%s", respPeople[i][3].c_str()).c_str();
+        person.append_attribute("analog") = StringFormat("humdrum:%s", respPeople[i][2].c_str()).c_str();
         person.append_attribute("role") = unescapeHtmlEntities(respPeople[i][1]).c_str();
         person.text().set(unescapeHtmlEntities(respPeople[i][0]).c_str());
     }
@@ -829,7 +846,8 @@ void HumdrumInput::insertExtMeta(std::vector<hum::HumdrumLine *> &references)
     xmldata << "\t<frames xmlns:humxml=\"http://www.humdrum.org/ns/humxml\">\n";
     for (int i = 0; i < (int)references.size(); i++) {
         std::string refKey = references[i]->getReferenceKey();
-        if (!(refKey.compare(0, 2, "OT") && refKey.compare(0, 2, "YE") && refKey.compare(0, 1, "X"))) {
+        if (!(refKey.compare(0, 3, "EED") && refKey.compare(0, 2, "HA") && refKey.compare(0, 2, "OT")
+                && refKey.compare(0, 2, "YE") && refKey.compare(0, 1, "X"))) {
             continue;
         }
         references[i]->printXml(xmldata, 4);
@@ -5387,21 +5405,11 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         if (hasaccid) {
             accidval = stoi(accid);
             switch (accidval) {
-                case -1:
-                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_f);
-                    break;
-                case 0:
-                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_n);
-                    break;
-                case +1:
-                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_s);
-                    break;
-                case -2:
-                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_ff);
-                    break;
-                case +2:
-                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_x);
-                    break;
+                case -1: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_f); break;
+                case 0: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_n); break;
+                case +1: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_s); break;
+                case -2: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_ff); break;
+                case +2: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_x); break;
             }
         }
     }
@@ -5413,21 +5421,11 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         if (hasaccid) {
             accidval = stoi(accid);
             switch (accidval) {
-                case -1:
-                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_f);
-                    break;
-                case 0:
-                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_n);
-                    break;
-                case +1:
-                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_s);
-                    break;
-                case -2:
-                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_ff);
-                    break;
-                case +2:
-                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_x);
-                    break;
+                case -1: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_f); break;
+                case 0: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_n); break;
+                case +1: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_s); break;
+                case -2: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_ff); break;
+                case +2: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_x); break;
             }
         }
     }
@@ -5498,21 +5496,11 @@ void HumdrumInput::addTrill(hum::HTp token)
     if (hasaccid) {
         accidval = stoi(accid);
         switch (accidval) {
-            case -1:
-                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_f);
-                break;
-            case 0:
-                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_n);
-                break;
-            case 1:
-                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_s);
-                break;
-            case -2:
-                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_ff);
-                break;
-            case 2:
-                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_x);
-                break;
+            case -1: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_f); break;
+            case 0: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_n); break;
+            case 1: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_s); break;
+            case -2: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_ff); break;
+            case 2: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_x); break;
         }
     }
 }
