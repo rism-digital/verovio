@@ -23,6 +23,7 @@
 #include "octave.h"
 #include "pedal.h"
 #include "slur.h"
+#include "staff.h"
 #include "tempo.h"
 #include "timeinterface.h"
 #include "trill.h"
@@ -174,6 +175,9 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
 void FloatingPositioner::ResetPositioner()
 {
     BoundingBox::ResetBoundingBox();
+    
+    m_objectX = NULL;
+    m_objectY = NULL;
 
     m_drawingYRel = 0;
     m_cuvrePoints[0] = Point(0, 0);
@@ -188,14 +192,22 @@ void FloatingPositioner::ResetPositioner()
 
 int FloatingPositioner::GetDrawingX() const
 {
-    assert(false);
-    //return m_drawingX;
+    assert(m_objectX);
+    return m_objectX->GetDrawingX();
 }
 
 int FloatingPositioner::GetDrawingY() const
 {
-    assert(false);
-    //return BoundingBox::GetDrawingY() - this->GetDrawingYRel();
+    assert(m_objectY);
+    return (m_objectY->GetDrawingY() - this->GetDrawingYRel());
+}
+void FloatingPositioner::SetObjectXY(Object *objectX, Object *objectY)
+{
+    assert(objectX);
+    assert(objectY);
+    
+    m_objectX = objectX;
+    m_objectY = objectY;
 }
 
 void FloatingPositioner::UpdateCurvePosition(

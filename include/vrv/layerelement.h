@@ -99,9 +99,9 @@ public:
      */
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
-    void SetDrawingXRel(int drawingXRel) { m_drawingXRel = drawingXRel; }
+    virtual void SetDrawingXRel(int drawingXRel) { m_drawingXRel = drawingXRel; }
     int GetDrawingYRel() const { return m_drawingYRel; }
-    void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; }
+    virtual void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; }
     ///@}
 
     /**
@@ -206,10 +206,6 @@ public:
 
 protected:
     Alignment *m_alignment;
-
-private:
-    /** Indicates whether it is a ScoreDef or StaffDef attribute */
-    ElementScoreDefRole m_scoreDefRole;
     
     /**
      * The Y drawing relative position of the object.
@@ -222,6 +218,10 @@ private:
      * It is re-computed everytime the object is drawn and it is not stored in the file.
      */
     int m_drawingXRel;
+
+private:
+    /** Indicates whether it is a ScoreDef or StaffDef attribute */
+    ElementScoreDefRole m_scoreDefRole;
 };
 
 } // namespace vrv

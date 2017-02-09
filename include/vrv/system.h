@@ -20,6 +20,7 @@ class DeviceContext;
 class Ending;
 class Measure;
 class ScoreDef;
+class Staff;
 
 //----------------------------------------------------------------------------
 // System
@@ -79,7 +80,7 @@ public:
      */
     int GetSystemIdx() const { return Object::GetIdx(); }
 
-    void SetCurrentFloatingPositioner(int staffN, FloatingObject *object, int x, int y);
+    void SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY);
 
     /**
      * @name Setter and getter of the drawing scoreDef

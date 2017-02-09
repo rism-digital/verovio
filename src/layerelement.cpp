@@ -621,7 +621,7 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
     // we should have processed aligned before
     assert(this->GetAlignment());
 
-    if (!this->HasToBeAligned()) {
+    if (!this->HasToBeAligned() || this->HasEmptyBB()) {
         // if nothing to do with this type of element
         // this happens for example with Artic where only ArticPart children are aligned
         return FUNCTOR_CONTINUE;
@@ -629,13 +629,10 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
 
     if (!this->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
-        assert(false); // quite drastic but this should never happen. If nothing has to be drawn
-        LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
-        // then the BB should be set to empty with  Object::SetEmptyBB()
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (this->HasEmptyBB()) {
+        assert(this->Is(BARLINE_ATTR_LEFT) || this->Is(BARLINE_ATTR_RIGHT));
+        // This should happen for invis barline attribute. Otherwise the BB should be set to empty with Object::SetEmptyBB()
+        // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
+        this->GetAlignment()->SetXRel(params->m_minPos);
         return FUNCTOR_CONTINUE;
     }
 

@@ -190,7 +190,7 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
     return -(box->GetContentBottom() + m_staffHeight);
 }
 
-void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, int x, int y)
+void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY)
 {
     auto item = std::find_if(m_floatingPositioners.begin(), m_floatingPositioners.end(),
         [object](FloatingPositioner *positioner) { return positioner->GetObject() == object; });
@@ -202,9 +202,7 @@ void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, int x,
         m_floatingPositioners.push_back(box);
         item = m_floatingPositioners.end() - 1;
     }
-    assert(false);
-    //(*item)->SetDrawingX(x);
-    //(*item)->SetDrawingY(y);
+    (*item)->SetObjectXY(objectX, objectY);
     // LogDebug("BB %d", item->second.m_contentBB_x1);
     object->SetCurrentFloatingPositioner((*item));
 }
@@ -827,10 +825,14 @@ int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
     else if (GetType() == ALIGNMENT_FULLMEASURE) {
-        params->m_minPos = std::max(this->GetXRel() + params->m_doc->m_drawingMinMeasureWidth, params->m_minPos);
+        params->m_measureWidth = this->GetXRel() + params->m_doc->m_drawingMinMeasureWidth;
     }
     else if (GetType() == ALIGNMENT_FULLMEASURE2) {
-        params->m_minPos = std::max(this->GetXRel() + 2 * params->m_doc->m_drawingMinMeasureWidth, params->m_minPos);
+        params->m_measureWidth = this->GetXRel() + 2 * params->m_doc->m_drawingMinMeasureWidth;
+    }
+    else if (m_type == ALIGNMENT_MEASURE_RIGHT_BARLINE) {
+        params->m_minPos = std::max(this->GetXRel(), params->m_measureWidth);
+        this->SetXRel(params->m_minPos);
     }
     else if (m_type == ALIGNMENT_MEASURE_END) {
         this->SetXRel(params->m_minPos);

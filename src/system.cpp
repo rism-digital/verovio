@@ -124,7 +124,7 @@ void System::SetDrawingAbbrLabelsWidth(int width)
     }
 }
 
-void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, int x, int y)
+void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY)
 {
     assert(object);
 
@@ -132,7 +132,7 @@ void System::SetCurrentFloatingPositioner(int staffN, FloatingObject *object, in
     if (m_systemAligner.GetChildCount() == 1) return;
     StaffAlignment *alignment = m_systemAligner.GetStaffAlignmentForStaffN(staffN);
     assert(alignment);
-    alignment->SetCurrentFloatingPositioner(object, x, y);
+    alignment->SetCurrentFloatingPositioner(object, objectX, objectY);
 }
 
 void System::SetDrawingScoreDef(ScoreDef *drawingScoreDef)

@@ -151,7 +151,7 @@ public:
     /**
      * Retrieves or creates the FloatingPositioner for the FloatingObject on this staff.
      */
-    void SetCurrentFloatingPositioner(FloatingObject *object, int x, int y);
+    void SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY);
 
     /**
      * @name Setter and getter of the staff from which the alignment is created alignment.

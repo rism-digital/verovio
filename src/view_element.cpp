@@ -297,7 +297,7 @@ void View::DrawArtic(
         place = STAFFREL_above;
 
     /************** calculate the y position **************/
-
+    
     int staffYBottom = -m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
     int yInAbove = std::max(parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), staffYBottom);

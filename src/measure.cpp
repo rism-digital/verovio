@@ -348,15 +348,8 @@ int Measure::AlignHorizontally(FunctorParams *functorParams)
     // point to it
     params->m_measureAligner = &m_measureAligner;
 
-    if (m_leftBarLine.GetForm() != BARRENDITION_NONE) {
-        m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment());
-    }
-
-    if (m_rightBarLine.GetForm() != BARRENDITION_NONE) {
-        m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment());
-    }
-
-    // LogDebug("\n ***** Align measure %d", this->GetN());
+    m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment());
+    m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment());
 
     assert(params->m_measureAligner);
 
@@ -402,6 +395,7 @@ int Measure::SetBoundingBoxXShift(FunctorParams *functorParams)
         params->m_minPos = 0;
         params->m_upcomingMinPos = VRV_UNSET;
         params->m_cumulatedXShift = 0;
+        params->m_measureWidth = 0;
         filters.clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;

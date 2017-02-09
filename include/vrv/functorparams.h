@@ -980,7 +980,7 @@ public:
         m_cumulatedXShift = 0;
         m_staffNs = staffNs;
         //m_layerMinPos = 0;
-        //m_measureWidth = 0;
+        m_measureWidth = 0;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
@@ -992,7 +992,7 @@ public:
     std::vector<BoundingBox*> m_boundingBoxes;
     std::vector<BoundingBox*> m_upcomingBoundingBoxes;
     //int m_layerMinPos;
-    //int m_measureWidth;
+    int m_measureWidth;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;

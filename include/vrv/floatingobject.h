@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class Alignment;
 class FloatingPositioner;
 class StaffAlignment;
 
@@ -134,12 +135,14 @@ public:
     virtual void ResetPositioner();
 
     /**
-     * @name Get and set the X and Y drawing position
+     * @name Get the X and Y drawing position
      */
     ///@{
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
     ///@}
+    
+    void SetObjectXY(Object *objectX, Object *objectY);
 
     FloatingObject *GetObject() const { return m_object; }
 
@@ -156,9 +159,13 @@ public:
      */
     ///@{
     int GetDrawingYRel() const { return m_drawingYRel; }
-    void SetDrawingYRel(int drawingYRel);
+    virtual void SetDrawingYRel(int drawingYRel);
     ///@}
 
+private:
+    Object *m_objectX;
+    Object *m_objectY;
+    
 protected:
     /**
      * The Y drawing relative position of the object.
