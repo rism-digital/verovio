@@ -580,42 +580,60 @@ void HumdrumInput::createHeader(void)
 
     // <pubStmt> /////////////
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
-    std::string EED = getReferenceValue("EED", references);
-    if (!EED.empty()) {
-        pugi::xml_node pubRespStmt = pubStmt.append_child("respStmt");
-        pugi::xml_node editor = pubRespStmt.append_child("persName");
-        editor.append_attribute("analog") = "humdrum:EED";
-        editor.append_attribute("role") = "editor";
-        editor.append_child(pugi::node_pcdata).set_value(EED.c_str());
-    }
-    std::string YEP = getReferenceValue("YEP", references);
-    if (!YEP.empty()) {
-        pugi::xml_node publisher = pubStmt.append_child("publisher");
-        publisher.append_attribute("analog") = "humdrum:YEP";
-        publisher.append_child(pugi::node_pcdata).set_value(YEP.c_str());
-    }
-    std::string YEN = getReferenceValue("YEN", references);
-    if (!YEN.empty()) {
-        pugi::xml_node pubPlace = pubStmt.append_child("pubPlace");
-        pubPlace.append_attribute("analog") = "humdrum:YEN";
-        pubPlace.append_child(pugi::node_pcdata).set_value(YEN.c_str());
-    }
-    std::string YER = getReferenceValue("YER", references);
-    if (!YER.empty()) {
-        pugi::xml_node pubDate = pubStmt.append_child("date");
-        pubDate.append_attribute("analog") = "humdrum:YER";
-        pubDate.append_child(pugi::node_pcdata).set_value(YER.c_str());
-    }
-    if (!getReferenceValue("YEC", references).empty() || !getReferenceValue("YEM", references).empty()) {
-        pugi::xml_node availability = pubStmt.append_child("availability");
-        for (int i = 0; i < (int)references.size(); i++) {
-            std::string key = references[i]->getReferenceKey();
-            if (key == "YEC" || key == "YEM") {
-                pugi::xml_node useRestrict = availability.append_child("useRestrict");
-                useRestrict.append_attribute("analog") = StringFormat("humdrum:%s", key.c_str()).c_str();
-                useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
-            }
+    pugi::xml_document availability;
+    for (int i = 0; i < (int)references.size(); i++) {
+        std::string refKey = references[i]->getReferenceKey();
+        if (refKey.compare(0, 2, "YE") && refKey.compare(0, 3, "EED")) {
+            continue;
         }
+        else if (!refKey.compare(0, 3, "EED")) {
+            pugi::xml_node pubRespStmt = pubStmt.prepend_child("respStmt");
+            pugi::xml_node editor = pubRespStmt.append_child("persName");
+            editor.append_attribute("xml:id") = StringFormat("persname-L%d", references[i]->getLineNumber()).c_str();
+            editor.append_attribute("analog") = "humdrum:EED";
+            editor.append_attribute("role") = "editor";
+            editor.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+        }
+        else if (!refKey.compare(2, 1, "C")) {
+            pugi::xml_node useRestrict = availability.append_child("useRestrict");
+            useRestrict.append_attribute("xml:id")
+                = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
+            useRestrict.append_attribute("analog") = "humdrum:YEC";
+            useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+        }
+        else if (!refKey.compare(2, 1, "M")) {
+            pugi::xml_node useRestrict = availability.append_child("useRestrict");
+            useRestrict.append_attribute("xml:id")
+                = StringFormat("userestrict-L%d", references[i]->getLineNumber()).c_str();
+            useRestrict.append_attribute("analog") = "humdrum:YEM";
+            useRestrict.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+        }
+        else if (!refKey.compare(2, 1, "N")) {
+            pugi::xml_node pubPlace = pubStmt.append_child("pubPlace");
+            pubPlace.append_attribute("xml:id") = StringFormat("pubplace-L%d", references[i]->getLineNumber()).c_str();
+            pubPlace.append_attribute("analog") = "humdrum:YEN";
+            pubPlace.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+        }
+        else if (!refKey.compare(2, 1, "P")) {
+            pugi::xml_node publisher = pubStmt.append_child("publisher");
+            publisher.append_attribute("xml:id")
+                = StringFormat("publisher-L%d", references[i]->getLineNumber()).c_str();
+            publisher.append_attribute("analog") = "humdrum:YEP";
+            publisher.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+        }
+        else if (!refKey.compare(2, 1, "R")) {
+            pugi::xml_node pubDate = pubStmt.append_child("date");
+            pubDate.append_attribute("xml:id") = StringFormat("date-L%d", references[i]->getLineNumber()).c_str();
+            pubDate.append_attribute("analog") = "humdrum:YER";
+            pubDate.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+        }
+    }
+    if (availability.first_child()) {
+        pugi::xml_node copyright = pubStmt.append_child("availability");
+        for (pugi::xml_node child = availability.first_child(); child; child = child.next_sibling()) {
+            copyright.append_copy(child);
+        }
+        availability.reset();
     }
 
     // <encodingDesc> /////////
@@ -683,6 +701,43 @@ void HumdrumInput::createHeader(void)
     if (respPeople.size() > 0) {
         insertRespStmt(titleStmt, respPeople);
     }
+    std::string ODT = getReferenceValue("ODT", references);
+    std::string OCY = getReferenceValue("OCY", references);
+    std::string OPC = getReferenceValue("OPC", references);
+    if (!ODT.empty() || !OCY.empty() || !OPC.empty()) {
+        pugi::xml_node creation = work.append_child("creation");
+        if (!ODT.empty()) {
+            pugi::xml_node date = creation.append_child("date");
+            date.append_attribute("analog") = "humdrum:ODT";
+            date.append_child(pugi::node_pcdata).set_value(ODT.c_str());
+        }
+        if (!OCY.empty()) {
+            pugi::xml_node country = creation.append_child("geogName");
+            country.append_attribute("analog") = "humdrum:OCY";
+            country.append_child(pugi::node_pcdata).set_value(OCY.c_str());
+        }
+        if (!OPC.empty()) {
+            pugi::xml_node place = creation.append_child("geogName");
+            place.append_attribute("analog") = "humdrum:OPC";
+            place.append_child(pugi::node_pcdata).set_value(OPC.c_str());
+        }
+    }
+    std::string HAO = getReferenceValue("HAO", references);
+    if (!HAO.empty()) {
+        pugi::xml_node history = work.append_child("history");
+        history.append_attribute("analog") = "humdrum:HAO";
+        for (int i = 0; i < (int)references.size(); i++) {
+            std::string refKey = references[i]->getReferenceKey();
+            if (refKey.compare(0, 3, "HAO")) {
+                continue;
+            }
+            else {
+                pugi::xml_node histLine = history.append_child("p");
+                histLine.append_attribute("xml:id") = StringFormat("p-L%d", references[i]->getLineNumber()).c_str();
+                histLine.append_child(pugi::node_pcdata).set_value(references[i]->getReferenceValue().c_str());
+            }
+        }
+    }
 
     // <extMeta> /////////////
     if (references.size() > 0) {
@@ -735,8 +790,8 @@ void HumdrumInput::insertRespStmt(pugi::xml_node &titleStmt, std::vector<std::ve
     pugi::xml_node respStmt = titleStmt.append_child("respStmt");
     for (int i = 0; i < (int)respPeople.size(); i++) {
         pugi::xml_node person = respStmt.append_child("persName");
-        person.append_attribute("analog")
-            = StringFormat("humdrum:%s", unescapeHtmlEntities(respPeople[i][2]).c_str()).c_str();
+        person.append_attribute("xml:id") = StringFormat("persname-L%s", respPeople[i][3].c_str()).c_str();
+        person.append_attribute("analog") = StringFormat("humdrum:%s", respPeople[i][2].c_str()).c_str();
         person.append_attribute("role") = unescapeHtmlEntities(respPeople[i][1]).c_str();
         person.text().set(unescapeHtmlEntities(respPeople[i][0]).c_str());
     }
@@ -790,10 +845,11 @@ void HumdrumInput::addPerson(std::vector<std::vector<string> > &respPeople, std:
     for (int i = 0; i < (int)references.size(); i++) {
         if (references[i]->getReferenceKey() == key) {
             respPeople.resize(respPeople.size() + 1);
-            respPeople.back().resize(3);
+            respPeople.back().resize(4);
             respPeople.back()[0] = references[i]->getReferenceValue();
             respPeople.back()[1] = role;
             respPeople.back()[2] = key;
+            respPeople.back()[3] = std::to_string(references[i]->getLineNumber());
         }
     }
 }
@@ -810,8 +866,9 @@ void HumdrumInput::insertExtMeta(std::vector<hum::HumdrumLine *> &references)
     xmldata << "<extMeta>\n";
     xmldata << "\t<frames xmlns:humxml=\"http://www.humdrum.org/ns/humxml\">\n";
     for (int i = 0; i < (int)references.size(); i++) {
-        std::string key = references[i]->getReferenceKey();
-        if (!(key.compare(0, 2, "OT") && key.compare(0, 2, "YE") && key.compare(0, 1, "X"))) {
+        std::string refKey = references[i]->getReferenceKey();
+        if (!(refKey.compare(0, 3, "EED") && refKey.compare(0, 2, "HA") && refKey.compare(0, 2, "OT")
+                && refKey.compare(0, 2, "YE") && refKey.compare(0, 1, "X"))) {
             continue;
         }
         references[i]->printXml(xmldata, 4);
@@ -890,6 +947,7 @@ void HumdrumInput::insertTitle(pugi::xml_node &titleStmt, const std::vector<hum:
         pugi::xml_node title = titleStmt.append_child("title");
         titlecount++;
         title.text().set(unescapeHtmlEntities(value).c_str());
+        title.append_attribute("xml:id") = StringFormat("title-L%d", references[i]->getLineNumber()).c_str();
         title.append_attribute("analog") = StringFormat("humdrum:%s", key.substr(0, 3).c_str()).c_str();
         if (key.compare(0, 3, "OTL") == 0) {
             if (!lang || plang) {
@@ -5368,21 +5426,11 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         if (hasaccid) {
             accidval = stoi(accid);
             switch (accidval) {
-                case -1:
-                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_f);
-                    break;
-                case 0:
-                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_n);
-                    break;
-                case +1:
-                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_s);
-                    break;
-                case -2:
-                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_ff);
-                    break;
-                case +2:
-                    mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_x);
-                    break;
+                case -1: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_f); break;
+                case 0: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_n); break;
+                case +1: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_s); break;
+                case -2: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_ff); break;
+                case +2: mordent->SetAccidlower(ACCIDENTAL_EXPLICIT_x); break;
             }
         }
     }
@@ -5394,21 +5442,11 @@ void HumdrumInput::addMordent(Object *linked, hum::HTp token)
         if (hasaccid) {
             accidval = stoi(accid);
             switch (accidval) {
-                case -1:
-                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_f);
-                    break;
-                case 0:
-                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_n);
-                    break;
-                case +1:
-                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_s);
-                    break;
-                case -2:
-                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_ff);
-                    break;
-                case +2:
-                    mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_x);
-                    break;
+                case -1: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_f); break;
+                case 0: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_n); break;
+                case +1: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_s); break;
+                case -2: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_ff); break;
+                case +2: mordent->SetAccidupper(ACCIDENTAL_EXPLICIT_x); break;
             }
         }
     }
@@ -5479,21 +5517,11 @@ void HumdrumInput::addTrill(hum::HTp token)
     if (hasaccid) {
         accidval = stoi(accid);
         switch (accidval) {
-            case -1:
-                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_f);
-                break;
-            case 0:
-                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_n);
-                break;
-            case 1:
-                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_s);
-                break;
-            case -2:
-                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_ff);
-                break;
-            case 2:
-                trill->SetAccidupper(ACCIDENTAL_EXPLICIT_x);
-                break;
+            case -1: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_f); break;
+            case 0: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_n); break;
+            case 1: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_s); break;
+            case -2: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_ff); break;
+            case 2: trill->SetAccidupper(ACCIDENTAL_EXPLICIT_x); break;
         }
     }
 }
