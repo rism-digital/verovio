@@ -1751,7 +1751,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
         int y = mordent->GetDrawingY();
 
         if (mordent->HasAccidlower()) {
-            int accid = Accid::GetOrnamentaccidGlyph(mordent->GetAccidlower());
+            wchar_t accid = Accid::GetAccidGlyph(mordent->GetAccidlower());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
@@ -1782,7 +1782,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
         }
         else if (mordent->HasAccidupper()) {
             auto mordentHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
-            int accid = Accid::GetOrnamentaccidGlyph(mordent->GetAccidupper());
+            int accid = Accid::GetAccidGlyph(mordent->GetAccidupper());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
@@ -1945,7 +1945,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         // Upper and lower accidentals are currently exclusive, but sould both be allowed at the same time.
         if (trill->HasAccidlower()) {
 
-            int accid = Accid::GetOrnamentaccidGlyph(trill->GetAccidlower());
+            wchar_t accid = Accid::GetAccidGlyph(trill->GetAccidlower());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
@@ -1955,7 +1955,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
         }
         else if (trill->HasAccidupper()) {
             auto trillHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
-            int accid = Accid::GetOrnamentaccidGlyph(trill->GetAccidupper());
+            wchar_t accid = Accid::GetAccidGlyph(trill->GetAccidupper());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
@@ -2005,7 +2005,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
         int y = turn->GetDrawingY();
 
         if (turn->HasAccidlower()) {
-            int accid = Accid::GetOrnamentaccidGlyph(turn->GetAccidlower());
+            wchar_t accid = Accid::GetAccidGlyph(turn->GetAccidlower());
             std::wstring accidStr;
             accidStr.push_back(accid);
             dc->SetFont(m_doc->GetDrawingSmuflFont((*staffIter)->m_drawingStaffSize, false));
