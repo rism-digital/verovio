@@ -202,11 +202,6 @@ public:
     virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams);
 
     /**
-     * See Object::IntegrateBoundingBoxXShift
-     */
-    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams);
-
-    /**
      * See Object::SetAlignmentXPos
      */
     virtual int SetAlignmentXPos(FunctorParams *functorParams);

@@ -350,11 +350,6 @@ public:
      */
     virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams);
 
-    /**
-     * Correct the X alignment once the content of a system has been aligned and laid out.
-     * Special case of functor redirected from Measure.
-     */
-    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams);
 
     /**
      * Set the position of the Alignment.
@@ -523,12 +518,6 @@ public:
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * Correct the X alignment once the the content of a system has been aligned and laid out.
-     * Special case of functor redirected from Measure.
-     */
-    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams);
 
     /**
      * Set the position of the Alignment.

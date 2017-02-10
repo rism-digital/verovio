@@ -754,16 +754,6 @@ int StaffAlignment::IntegrateBoundingBoxYShift(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int MeasureAligner::IntegrateBoundingBoxXShift(FunctorParams *functorParams)
-{
-    IntegrateBoundingBoxXShiftParams *params = dynamic_cast<IntegrateBoundingBoxXShiftParams *>(functorParams);
-    assert(params);
-
-    params->m_shift = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Alignment::IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams)
 {
     if (!m_graceAligner) {
@@ -790,28 +780,6 @@ int Alignment::IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::IntegrateBoundingBoxXShift(FunctorParams *functorParams)
-{
-    IntegrateBoundingBoxXShiftParams *params = dynamic_cast<IntegrateBoundingBoxXShiftParams *>(functorParams);
-    assert(params);
-
-    // We move the first left position according to style but not for aligners that are empty and not
-    // for the left barline because we want it to be at the 0 pos if nothing before it.
-    if ((params->m_shift == 0) && (m_type != ALIGNMENT_MEASURE_LEFT_BARLINE) && !m_layerElementsRef.empty()) {
-        params->m_shift = params->m_doc->GetLeftPosition() * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    }
-
-    // integrates the m_xShift into the m_xRel
-    m_xRel += m_xShift + params->m_shift;
-    // cumulate the shift value and the width
-    params->m_shift += m_xShift;
-
-    // reset member to 0
-    m_xShift = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
@@ -823,6 +791,12 @@ int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
     
     if (GetType() == ALIGNMENT_CONTAINER) {
         return FUNCTOR_SIBLINGS;
+    }
+    // A clef with a mRest or similar
+    else if ((GetType() == ALIGNMENT_CLEF) && (params->m_measureWidth != 0)) {
+        // The position of the clef is set by the meterSig - just make sure it is not
+        // smaller than the measureWidth currently being set
+        this->SetXRel(std::max(params->m_measureWidth, this->GetXRel()));
     }
     else if (GetType() == ALIGNMENT_FULLMEASURE) {
         params->m_measureWidth = this->GetXRel() + params->m_doc->m_drawingMinMeasureWidth;
@@ -975,16 +949,19 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
     // For clef changes, do not take into account the interval so we keep them left aligned
     // This is not perfect because the previous time is the one of the previous aligner and
     // there is maybe space between the last note and the clef on their layer
-    if (this->m_type == ALIGNMENT_CLEF) intervalTime = 0.0;
+    //if (this->m_type == ALIGNMENT_CLEF) intervalTime = 0.0;
 
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
             params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
-    m_xRel = params->m_previousXRel + intervalXRel * DEFINITION_FACTOR;
+    //if (this->m_type == ALIGNMENT_CLEF)
+        m_xRel = params->m_previousXRel;
+    //else
+        m_xRel = params->m_previousXRel + intervalXRel * DEFINITION_FACTOR;
     params->m_previousTime = m_time;
-    params->m_previousXRel = m_xRel;
+    params->m_previousXRel = params->m_previousXRel + intervalXRel * DEFINITION_FACTOR;
 
     return FUNCTOR_CONTINUE;
 }

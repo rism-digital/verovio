@@ -553,29 +553,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// IntegrateBoundingBoxXShiftParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the cumulated shift
- * member 3: the doc for accessing drawing parameters
- * member 4: the functor to be redirected to Aligner
-**/
-
-class IntegrateBoundingBoxXShiftParams : public FunctorParams {
-public:
-    IntegrateBoundingBoxXShiftParams(Doc *doc, Functor *functor)
-    {
-        m_shift = 0;
-        m_doc = doc;
-        m_functor = functor;
-    }
-    int m_shift;
-    Doc *m_doc;
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // IntegrateBoundingBoxYShiftParams
 //----------------------------------------------------------------------------
 

@@ -158,12 +158,6 @@ void Page::LayOutHorizontally()
     SetBoundingBoxXShiftParams setBoundingBoxXShiftParams(doc, &setBoundingBoxXShift, &setBoundingBoxXShiftEnd, doc->m_scoreDef.GetStaffNs());
     this->Process(&setBoundingBoxXShift, &setBoundingBoxXShiftParams, &setBoundingBoxXShiftEnd);
 
-    // Integrate the X bounding box shift of the elements
-    // Once the m_xShift have been calculated, move all positions accordingly
-    Functor integrateBoundingBoxXShift(&Object::IntegrateBoundingBoxXShift);
-    IntegrateBoundingBoxXShiftParams integrateBoundingBoxXShiftParams(doc, &integrateBoundingBoxXShift);
-    //this->Process(&integrateBoundingBoxXShift, &integrateBoundingBoxXShiftParams);
-
     // Adjust measure X position
     AlignMeasuresParams alignMeasuresParams;
     Functor alignMeasures(&Object::AlignMeasures);

@@ -505,13 +505,7 @@ public:
      * See Measure::IntegrateBoundingBoxXShift for actual implementation
      */
     virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Correct the X alignment once the content of a system has been aligned and laid out
-     * See Measure::IntegrateBoundingBoxXShift for actual implementation
-     */
-    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-
+    
     /**
      * Reset the horizontal alignment environment for various types for object.
      */

@@ -422,15 +422,6 @@ int Measure::IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::IntegrateBoundingBoxXShift(FunctorParams *functorParams)
-{
-    IntegrateBoundingBoxXShiftParams *params = dynamic_cast<IntegrateBoundingBoxXShiftParams *>(functorParams);
-    assert(params);
-
-    m_measureAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_SIBLINGS;
-}
 
 int Measure::SetAlignmentXPos(FunctorParams *functorParams)
 {
