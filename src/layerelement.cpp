@@ -332,7 +332,7 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         int meterUnit = 4;
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
-        if (meterSig && meterSig->HasCount()) meterUnit = meterSig->GetCount();
+        if (meterSig && meterSig->HasCount()) meterCount = meterSig->GetCount();
         return DUR_MAX / meterUnit * meterCount;
     }
     else {

@@ -946,22 +946,15 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         intervalTime = 0.0;
     }
 
-    // For clef changes, do not take into account the interval so we keep them left aligned
-    // This is not perfect because the previous time is the one of the previous aligner and
-    // there is maybe space between the last note and the clef on their layer
-    //if (this->m_type == ALIGNMENT_CLEF) intervalTime = 0.0;
-
     if (intervalTime > 0.0) {
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
             params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
-    //if (this->m_type == ALIGNMENT_CLEF)
-        m_xRel = params->m_previousXRel;
-    //else
-        m_xRel = params->m_previousXRel + intervalXRel * DEFINITION_FACTOR;
+
+    m_xRel = params->m_previousXRel + intervalXRel * DEFINITION_FACTOR;
     params->m_previousTime = m_time;
-    params->m_previousXRel = params->m_previousXRel + intervalXRel * DEFINITION_FACTOR;
+    params->m_previousXRel = m_xRel;
 
     return FUNCTOR_CONTINUE;
 }
