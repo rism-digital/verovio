@@ -208,51 +208,28 @@ void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, Object
 }
 
 //----------------------------------------------------------------------------
-// MeasureAligner
+// HorizontalAligner
 //----------------------------------------------------------------------------
 
-MeasureAligner::MeasureAligner() : Object()
+HorizontalAligner::HorizontalAligner() : Object()
 {
-    m_leftAlignment = NULL;
-    m_leftBarLineAlignment = NULL;
-    m_rightAlignment = NULL;
-    m_rightBarLineAlignment = NULL;
+    Reset();
 }
 
-MeasureAligner::~MeasureAligner()
+HorizontalAligner::~HorizontalAligner()
 {
 }
 
-void MeasureAligner::Reset()
+void HorizontalAligner::Reset()
 {
     Object::Reset();
-    m_nonJustifiableLeftMargin = 0;
-    m_leftAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_START);
-    AddAlignment(m_leftAlignment);
-    m_leftBarLineAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_LEFT_BARLINE);
-    AddAlignment(m_leftBarLineAlignment);
-    m_rightBarLineAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_RIGHT_BARLINE);
-    AddAlignment(m_rightBarLineAlignment);
-    m_rightAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_END);
-    AddAlignment(m_rightAlignment);
 }
 
-void MeasureAligner::AddAlignment(Alignment *alignment, int idx)
-{
-    alignment->SetParent(this);
-    if (idx == -1) {
-        m_children.push_back(alignment);
-    }
-    else {
-        InsertChild(alignment, idx);
-    }
-}
-
-Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
+Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType type, int &idx)
 {
     time = round(time * (pow(10, 10)) / pow(10, 10));
     int i;
-    int idx = -1; // the index if we reach the end.
+    idx = -1; // the index if we reach the end.
     Alignment *alignment = NULL;
     // First try to see if we already have something at the time position
     for (i = 0; i < GetAlignmentCount(); i++) {
@@ -275,9 +252,61 @@ Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
             break;
         }
     }
-    // nothing found
+    return NULL;
+}
+
+void HorizontalAligner::AddAlignment(Alignment *alignment, int idx)
+{
+    alignment->SetParent(this);
     if (idx == -1) {
-        if ((type != ALIGNMENT_MEASURE_END) && (!this->Is(GRACE_ALIGNER))) {
+        m_children.push_back(alignment);
+    }
+    else {
+        InsertChild(alignment, idx);
+    }
+}
+
+//----------------------------------------------------------------------------
+// MeasureAligner
+//----------------------------------------------------------------------------
+
+MeasureAligner::MeasureAligner() : HorizontalAligner()
+{
+    m_leftAlignment = NULL;
+    m_leftBarLineAlignment = NULL;
+    m_rightAlignment = NULL;
+    m_rightBarLineAlignment = NULL;
+
+    Reset();
+}
+
+MeasureAligner::~MeasureAligner()
+{
+}
+
+void MeasureAligner::Reset()
+{
+    HorizontalAligner::Reset();
+    m_nonJustifiableLeftMargin = 0;
+    m_leftAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_START);
+    AddAlignment(m_leftAlignment);
+    m_leftBarLineAlignment = new Alignment(-1.0 * DUR_MAX, ALIGNMENT_MEASURE_LEFT_BARLINE);
+    AddAlignment(m_leftBarLineAlignment);
+    m_rightBarLineAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_RIGHT_BARLINE);
+    AddAlignment(m_rightBarLineAlignment);
+    m_rightAlignment = new Alignment(0.0 * DUR_MAX, ALIGNMENT_MEASURE_END);
+    AddAlignment(m_rightAlignment);
+}
+
+Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
+{
+    int idx; // the index if we reach the end.
+    Alignment *alignment = this->SearchAlignmentAtTime(time, type, idx);
+    // we already have a alignment of the type at that time
+    if (alignment != NULL) return alignment;
+    // nothing found to the end
+    if (idx == -1) {
+        if (type != ALIGNMENT_MEASURE_END) {
             // This typically occurs when a tstamp event occurs after the last note of a measure
             int rightBarlineIdx = m_rightBarLineAlignment->GetIdx();
             assert(rightBarlineIdx != -1);
@@ -317,21 +346,42 @@ double MeasureAligner::GetMaxTime() const
 {
     // we have to have a m_rightBarLineAlignment
     assert(m_rightBarLineAlignment);
-    
+
     return m_rightAlignment->GetTime();
 }
-    
+
 //----------------------------------------------------------------------------
 // GraceAligner
 //----------------------------------------------------------------------------
 
 GraceAligner::GraceAligner() : MeasureAligner()
 {
-    m_totalWidth = 0;
+    Reset();
 }
 
 GraceAligner::~GraceAligner()
 {
+}
+
+void GraceAligner::Reset()
+{
+    HorizontalAligner::Reset();
+    m_totalWidth = 0;
+}
+
+Alignment *GraceAligner::GetAlignmentAtTime(double time, AlignmentType type)
+{
+    int idx; // the index if we reach the end.
+    Alignment *alignment = this->SearchAlignmentAtTime(time, type, idx);
+    // we already have a alignment of the type at that time
+    if (alignment != NULL) return alignment;
+    // nothing found until the end
+    if (idx == -1) {
+        idx = GetAlignmentCount();
+    }
+    Alignment *newAlignment = new Alignment(time, type);
+    AddAlignment(newAlignment, idx);
+    return newAlignment;
 }
 
 void GraceAligner::StackNote(Note *note)
@@ -393,23 +443,22 @@ Alignment::~Alignment()
 
 void Alignment::AddChild(Object *child)
 {
-    assert(dynamic_cast<AlignmentReference*>(child));
-    
+    assert(dynamic_cast<AlignmentReference *>(child));
+
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
 }
 
-
 void Alignment::AddLayerElementRef(LayerElement *element)
 {
     assert(element->IsLayerElement());
     m_layerElementsRef.push_back(element);
-    
+
     // -1 will be used for barlines attributes
     int n = -1;
     Staff *staffRef = element->m_crossStaff;
-    if (!staffRef) staffRef = dynamic_cast<Staff*>(element->GetFirstParent(STAFF));
+    if (!staffRef) staffRef = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
     if (staffRef) n = staffRef->GetN();
     AlignmentReference *alignmentRef = new AlignmentReference(n, element);
     this->AddChild(alignmentRef);
@@ -441,8 +490,7 @@ GraceAligner *Alignment::GetGraceAligner()
     }
     return m_graceAligner;
 }
-    
-    
+
 //----------------------------------------------------------------------------
 // AlignmentReference
 //----------------------------------------------------------------------------
@@ -450,14 +498,14 @@ GraceAligner *Alignment::GetGraceAligner()
 AlignmentReference::AlignmentReference() : Object(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
-    
+
     Reset();
 }
 
 AlignmentReference::AlignmentReference(int n, Object *elementRef) : Object(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
-    
+
     Reset();
     this->SetN(n);
     m_elementRef = elementRef;
@@ -467,7 +515,7 @@ void AlignmentReference::Reset()
 {
     Object::Reset();
     ResetCommon();
-    
+
     m_elementRef = NULL;
 }
 
@@ -784,11 +832,11 @@ int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
-    
+
     LogDebug("Alignment type %d", m_type);
-    
+
     this->SetXRel(this->GetXRel() + params->m_cumulatedXShift);
-    
+
     if (GetType() == ALIGNMENT_CONTAINER) {
         return FUNCTOR_SIBLINGS;
     }
@@ -819,20 +867,20 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
-    
+
     if (params->m_upcomingMinPos != VRV_UNSET) {
         params->m_minPos = params->m_upcomingMinPos;
         // We reset it for the next aligner
         params->m_upcomingMinPos = VRV_UNSET;
     }
-    
+
     // No upcoming bounding boxes, we keep the previous ones (e.g., the alignment has nothing for this staff)
     // Eventually we might want to have a more sophisticated pruning algorithm
     if (params->m_upcomingBoundingBoxes.empty()) return FUNCTOR_CONTINUE;
-    
+
     params->m_boundingBoxes = params->m_upcomingBoundingBoxes;
     params->m_upcomingBoundingBoxes.clear();
-    
+
     /*
 
     // Because these do not get shifted with their bounding box because their bounding box is calculated
@@ -868,20 +916,20 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
     else {
         this->SetXShift(params->m_minPos - this->GetXRel());
     }
-     
+
     */
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int AlignmentReference::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
-    
+
     LogDebug("AlignmentRef staff %d", GetN());
     this->m_elementRef->Process(params->m_functor, params, params->m_functorEnd);
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -889,7 +937,7 @@ int AlignmentReference::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -938,10 +986,10 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
 
     // Do not set an x pos for anything before the barline (including it)
     if (this->m_type <= ALIGNMENT_MEASURE_LEFT_BARLINE) return FUNCTOR_CONTINUE;
-    
+
     int intervalXRel = 0;
     double intervalTime = (m_time - params->m_previousTime);
-    
+
     if (this->m_type > ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         intervalTime = 0.0;
     }

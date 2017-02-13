@@ -293,7 +293,7 @@ public:
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT; }
     ///@}
-    
+
     virtual void AddChild(Object *object);
 
     void SetXRel(int x_rel);
@@ -349,7 +349,6 @@ public:
      * Special case that redirects the functor to the GraceAligner.
      */
     virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams);
-
 
     /**
      * Set the position of the Alignment.
@@ -418,7 +417,7 @@ private:
      */
     ArrayOfObjects m_layerElementsRef;
 };
-    
+
 //----------------------------------------------------------------------------
 // AlignmentReference
 //----------------------------------------------------------------------------
@@ -428,10 +427,10 @@ private:
  */
 class AlignmentReference : public Object, public AttCommon {
 public:
-     /**
-     * @name Constructors, destructors, reset methods
-     * Reset method reset all attribute classes
-     */
+    /**
+    * @name Constructors, destructors, reset methods
+    * Reset method reset all attribute classes
+    */
     ///@{
     AlignmentReference();
     AlignmentReference(int n, Object *elementRef);
@@ -439,7 +438,7 @@ public:
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
-    
+
     //----------//
     // Functors //
     //----------//
@@ -451,11 +450,57 @@ public:
     virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
     virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
     ///@}
-    
+
 private:
     Object *m_elementRef;
 };
-    
+
+//----------------------------------------------------------------------------
+// HorizontalAligner
+//----------------------------------------------------------------------------
+
+/**
+ * This class aligns the content horizontally
+ * It contains a vector of Alignment.
+ * It is not an abstract class but it should not be instanciated directly.
+ */
+class HorizontalAligner : public Object {
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@(
+    HorizontalAligner();
+    virtual ~HorizontalAligner();
+    virtual void Reset();
+    ///@}
+
+    int GetAlignmentCount() const { return (int)m_children.size(); }
+
+    //----------//
+    // Functors //
+    //----------//
+
+protected:
+    /**
+     * Search if an alignment of the type is already there at the time.
+     * If not, return in idx the position where it needs to be inserted (-1 if it is the end)
+     */
+    Alignment *SearchAlignmentAtTime(double time, AlignmentType type, int &idx);
+
+    /**
+     * Add an alignment at the appropriate position (at the end if -1)
+     */
+    void AddAlignment(Alignment *alignment, int idx = -1);
+
+private:
+    //
+public:
+    //
+private:
+};
+
 //----------------------------------------------------------------------------
 // MeasureAligner
 //----------------------------------------------------------------------------
@@ -464,20 +509,24 @@ private:
  * This class aligns the content of a measure
  * It contains a vector of Alignment
  */
-class MeasureAligner : public Object {
+class MeasureAligner : public HorizontalAligner {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@(
     MeasureAligner();
     virtual ~MeasureAligner();
     virtual ClassId GetClassId() const { return MEASURE_ALIGNER; }
-
-    int GetAlignmentCount() const { return (int)m_children.size(); }
+    virtual void Reset();
+    ///@}
 
     /**
-     * Reset the aligner (clear the content) and creates the start (left) and end (right) alignement
+     * Retrieve the alignmnet of the type at that time.
+     * The alignment object is added if not found.
+     * The maximum time position is also adjusted accordingly for end barline positioning
      */
-    virtual void Reset();
-
     Alignment *GetAlignmentAtTime(double time, AlignmentType type);
 
     /**
@@ -486,7 +535,7 @@ public:
      * should be the same for all staves/layers.
      */
     void SetMaxTime(double time);
-    
+
     /**
      * Return the max time of the measure (i.e., the right measure alignment time)
      */
@@ -533,8 +582,7 @@ public:
     virtual int JustifyX(FunctorParams *functorParams);
 
 private:
-    void AddAlignment(Alignment *alignment, int idx = -1);
-
+    //
 public:
     //
 private:
@@ -566,10 +614,22 @@ private:
  */
 class GraceAligner : public MeasureAligner {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@(
     GraceAligner();
     virtual ~GraceAligner();
     virtual ClassId GetClassId() const { return GRACE_ALIGNER; }
+    virtual void Reset();
+    ///@}
+
+    /**
+     * Retrieve the alignmnet of the type at that time.
+     * The alignment object is added if not found.
+     */
+    Alignment *GetAlignmentAtTime(double time, AlignmentType type);
 
     /**
      * Because the grace notes appear from left to right but need to be aligned
