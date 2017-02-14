@@ -302,7 +302,7 @@ void MusicXmlInput::CloseTie(Staff *staff, Layer *layer, Note *note, bool isClos
     }
 }
 
-void MusicXmlInput::OpenSlur(Staff *staff, Layer *layer, int number, LayerElement *element, Slur *slur)
+void MusicXmlInput::OpenSlur(Staff *staff, Layer *layer, int number, Slur *slur)
 {
     slur->SetStartid(m_ID);
     musicxml::OpenSlur openSlur(staff->GetN(), layer->GetN(), number);
@@ -1470,7 +1470,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                     meiSlur->AttCurvature::StrToCurvatureCurvedir(GetAttributeValue(slur, "placement").c_str()));
             // add it to the stack
             m_controlElements.push_back(std::make_pair(measureNum, meiSlur));
-            OpenSlur(staff, layer, slurNumber, element, meiSlur);
+            OpenSlur(staff, layer, slurNumber, meiSlur);
         }
         else if (HasAttributeWithValue(slur, "type", "stop")) {
             CloseSlur(staff, layer, slurNumber, element);
