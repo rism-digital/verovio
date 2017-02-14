@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.music-encoding.org/schema/3.0.0/mei-all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="3.0.0">
+    <meiHead>
+        <fileDesc>
+            <titleStmt>
+                <title>Turns example</title>
+            </titleStmt>
+            <pubStmt/>
+            <seriesStmt>
+                <title>Verovio feature examples</title>
+            </seriesStmt>
+        </fileDesc>
+    </meiHead>
+    <music>
+        <body>
+            <mdiv>
+                <score>
+                    <scoreDef>
+                        <staffGrp>
+                            <staffDef clef.shape="C" clef.line="1" n="1" lines="5" meter.count="3" meter.unit="4"/>
+                        </staffGrp>
+                    </scoreDef>
+                    <section>
+                        <measure>
+                            <staff n="1">
+                                <layer n="1">
+                                    <note dots="1" dur="4" oct="5" pname="g" stem.dir="down" tie="i"/>
+                                    <beam>
+                                        <note dots="1" dur="16" oct="5" pname="g" stem.dir="down"
+                                            tie="t"/>
+                                        <note dur="32" oct="5" pname="a" stem.dir="down"/>
+                                    </beam>
+                                </layer>
+                            </staff>
+                            <turn accidlower="s" delayed="true" place="above" staff="1" tstamp="2.75"/>
+                        </measure>
+                    </section>
+                </score>
+            </mdiv>
+        </body>
+    </music>
+</mei>
