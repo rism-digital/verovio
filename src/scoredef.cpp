@@ -345,6 +345,7 @@ std::vector<int> ScoreDef::GetStaffNs()
     std::vector<int> ns;
     StaffDef *staffDef = NULL;
     for (iter = childList->begin(); iter != childList->end(); ++iter) {
+        // It should be staffDef only, but double check.
         if (!(*iter)->Is(STAFFDEF)) continue;
         staffDef = dynamic_cast<StaffDef *>(*iter);
         assert(staffDef);

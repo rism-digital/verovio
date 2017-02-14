@@ -141,15 +141,16 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    SetBoundingBoxGraceXShiftParams setBoundingBoxGraceXShiftParams(doc);
     Functor setBoundingBoxGraceXShift(&Object::SetBoundingBoxGraceXShift);
-    this->Process(&setBoundingBoxGraceXShift, &setBoundingBoxGraceXShiftParams);
+    Functor setBoundingBoxGraceXShiftEnd(&Object::SetBoundingBoxGraceXShiftEnd);
+    SetBoundingBoxGraceXShiftParams setBoundingBoxGraceXShiftParams(doc, &setBoundingBoxGraceXShift, &setBoundingBoxGraceXShiftEnd, doc->m_scoreDef.GetStaffNs());
+    this->Process(&setBoundingBoxGraceXShift, &setBoundingBoxGraceXShiftParams, &setBoundingBoxGraceXShiftEnd);
 
     // Integrate the X bounding box shift of the elements
     // Once the m_xShift have been calculated, move all positions accordingly
     Functor integrateBoundingBoxGraceXShift(&Object::IntegrateBoundingBoxGraceXShift);
     IntegrateBoundingBoxGraceXShiftParams integrateBoundingBoxGraceXShiftParams(&integrateBoundingBoxGraceXShift);
-    this->Process(&integrateBoundingBoxGraceXShift, &integrateBoundingBoxGraceXShiftParams);
+    //this->Process(&integrateBoundingBoxGraceXShift, &integrateBoundingBoxGraceXShiftParams);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping

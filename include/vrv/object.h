@@ -521,7 +521,8 @@ public:
      * Lay out the X positions of the grace notes looking at the bounding boxes.
      * The m_xShift is updated appropriately
      */
-    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
+    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    virtual int SetBoundingBoxGraceXShiftEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.

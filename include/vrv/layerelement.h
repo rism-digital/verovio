@@ -147,6 +147,13 @@ public:
     virtual int AlignHorizontally(FunctorParams *functorParams);
     
     /**
+     * See Object::SetBoundingBoxGraceXShift
+     */
+    ///@{
+    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
+    ///@}
+    
+    /**
      * See Object::SetBoundingBoxXShift
      */
     virtual int SetBoundingBoxXShift(FunctorParams *functorParams);

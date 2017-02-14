@@ -90,7 +90,7 @@ public:
      * @name Setter and getter for the Algnment the grace note is pointing to (NULL by default)
      */
     ///@{
-    Alignment *GetGraceAlignment();
+    Alignment *GetGraceAlignment() const;
     void SetGraceAlignment(Alignment *graceAlignment);
     bool HasGraceAlignment() const { return (m_graceAlignment != NULL); }
     void ResetGraceAlignment() { m_graceAlignment = NULL; }

@@ -205,7 +205,14 @@ public:
      * See Object::SetAlignmentXPos
      */
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
-
+    
+    /**
+     * See Object::SetBoundingBoxGraceXShift
+     */
+    ///@{
+    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
+    ///@}
+    
     /**
      * See Object::SetBoundingBoxXShift
      */

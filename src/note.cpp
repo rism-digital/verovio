@@ -134,7 +134,7 @@ void Note::AddChild(Object *child)
     Modify();
 }
 
-Alignment *Note::GetGraceAlignment()
+Alignment *Note::GetGraceAlignment() const
 {
     assert(m_graceAlignment);
     return m_graceAlignment;

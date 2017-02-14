@@ -363,6 +363,14 @@ public:
     virtual int JustifyX(FunctorParams *functorParams);
 
     /**
+     * See Object::SetBoundingBoxGraceXShift
+     */
+    ///@{
+    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
+    virtual int SetBoundingBoxGraceXShiftEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
      * See Object::SetBoundingBoxXShift
      */
     ///@{
@@ -444,12 +452,14 @@ public:
     //----------//
 
     /**
+     * See Object::SetBoundingBoxGraceXShift
+     */
+    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
+    
+    /**
      * See Object::SetBoundingBoxXShift
      */
-    ///@{
     virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
-    ///@}
 
 private:
     Object *m_elementRef;
@@ -650,6 +660,18 @@ public:
     ///@{
     void SetWidth(int totalWidth) { m_totalWidth = totalWidth; }
     int GetWidth() const { return m_totalWidth; }
+    ///@}
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * See Object::SetBoundingBoxGraceXShift
+     */
+    ///@{
+    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
+    //virtual int SetBoundingBoxGraceXShiftEnd(FunctorParams *functorParams);
     ///@}
 
 private:

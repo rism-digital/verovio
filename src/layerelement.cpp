@@ -139,7 +139,19 @@ int LayerElement::GetDrawingX() const
 
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
     assert(measure);
-    return (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel());
+    
+    int graceNoteShift = 0;
+    // Grace notes, also take into account the GraceAlignment
+    if (this->Is(NOTE)) {
+        const Note *note = dynamic_cast<const Note *>(this);
+        assert(note);
+        if (note->HasGraceAlignment()) {
+            //note->GetGraceAlignment();
+            graceNoteShift = note->GetGraceAlignment()->GetXRel();
+        }
+    }
+    
+    return (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel() + graceNoteShift);
 }
 
 int LayerElement::GetDrawingY() const
@@ -492,7 +504,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         params->m_measureAligner->SetMaxTime(params->m_time + duration);
 
     m_alignment = params->m_measureAligner->GetAlignmentAtTime(params->m_time, type);
-    m_alignment->AddLayerElementRef(this);
+    if (type != ALIGNMENT_GRACENOTE)
+        m_alignment->AddLayerElementRef(this);
 
     if (this->IsGraceNote()) {
         GraceAligner *graceAligner = m_alignment->GetGraceAligner();
@@ -615,6 +628,30 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         }
     }
 
+    return FUNCTOR_CONTINUE;
+}
+
+int LayerElement::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+{
+    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    assert(params);
+    
+    if (!this->Is(NOTE)) return FUNCTOR_CONTINUE;
+    
+    Note *note = dynamic_cast<Note *>(this);
+    LogDebug("pname %d", note->GetPname());
+    
+    int selfRight = this->GetSelfRight();
+    int offset = selfRight - params->m_graceMaxPos;
+    if (offset > 0) {
+        note->GetGraceAlignment()->SetXRel(note->GetGraceAlignment()->GetXRel() - offset);
+        // Also move the cumultated x shift and the minimum position for the next alignment accordingly
+        params->m_graceCumulatedXShift += (-offset);
+        params->m_graceUpcomingMaxPos += (-offset);
+    }
+    
+    params->m_graceUpcomingMaxPos = std::min(this->GetSelfLeft(), params->m_graceUpcomingMaxPos);
+    
     return FUNCTOR_CONTINUE;
 }
 

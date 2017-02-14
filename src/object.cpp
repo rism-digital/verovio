@@ -1018,6 +1018,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+/*
 int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
 {
     SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
@@ -1040,7 +1041,7 @@ int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
         params->m_graceMinPos = 0;
         return FUNCTOR_CONTINUE;
     }
-
+    
     // we should have processed aligned before
     assert(note->GetGraceAlignment());
 
@@ -1075,6 +1076,7 @@ int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+*/
 
 int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 {

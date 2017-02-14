@@ -14,6 +14,7 @@
 
 //----------------------------------------------------------------------------
 
+#include "attcomparison.h"
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
@@ -400,7 +401,9 @@ void GraceAligner::AlignStack()
         double duration = note->LayerElement::GetAlignmentDuration(NULL, NULL, false);
         // Time goes backward with grace notes
         time -= duration;
-        note->SetGraceAlignment(this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT));
+        Alignment *alignment = this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT);
+        note->SetGraceAlignment(alignment);
+        alignment->AddLayerElementRef(note);
     }
     m_noteStack.clear();
 }
@@ -828,12 +831,65 @@ int Alignment::IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Alignment::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+{
+    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    assert(params);
+    
+    // We are in a Measure aligner - redirect to the GraceAligner when it is a ALIGNMENT_GRACENOTE
+    if (!params->m_isGraceAlignment) {
+        // Do not process AlignmentReference children if no GraceAligner
+        if (!m_graceAligner) return FUNCTOR_SIBLINGS;
+        assert(m_type == ALIGNMENT_GRACENOTE);
+        
+        // Change the flag for indicating that the alignment is child of a GraceAligner
+        params->m_isGraceAlignment = true;
+        
+        std::vector<int>::iterator iter;
+        std::vector<AttComparison *> filters;
+        for(iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
+            params->m_graceMaxPos = this->GetXRel();
+            params->m_graceUpcomingMaxPos = -VRV_UNSET;
+            params->m_graceCumulatedXShift = 0;
+            filters.clear();
+            // Create ad comparison object for each type / @n
+            AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
+            filters.push_back(&matchStaff);
+            
+            m_graceAligner->Process(params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
+        }
+        
+        // Change the flag back
+        params->m_isGraceAlignment = false;
+        
+        return FUNCTOR_CONTINUE;
+    }
+    
+    this->SetXRel(this->GetXRel() + params->m_graceCumulatedXShift);
+
+    return FUNCTOR_CONTINUE;
+}
+    
+int Alignment::SetBoundingBoxGraceXShiftEnd(FunctorParams *functorParams)
+{
+    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    assert(params);
+    
+    if (params->m_graceUpcomingMaxPos != -VRV_UNSET) {
+        params->m_graceMaxPos = params->m_graceUpcomingMaxPos;
+        // We reset it for the next aligner
+        params->m_graceUpcomingMaxPos = -VRV_UNSET;
+    }
+    
+    return FUNCTOR_CONTINUE;
+}
+
 int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
 
-    LogDebug("Alignment type %d", m_type);
+    //LogDebug("Alignment type %d", m_type);
 
     this->SetXRel(this->GetXRel() + params->m_cumulatedXShift);
 
@@ -881,62 +937,28 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
     params->m_boundingBoxes = params->m_upcomingBoundingBoxes;
     params->m_upcomingBoundingBoxes.clear();
 
-    /*
-
-    // Because these do not get shifted with their bounding box because their bounding box is calculated
-    // according to
-    // the width of the measure, their xShift has to be set 'by hand'
-    if (GetType() == ALIGNMENT_FULLMEASURE) {
-        params->m_minPos = std::max(this->GetXRel() + params->m_doc->m_drawingMinMeasureWidth, params->m_minPos);
-    }
-    else if (GetType() == ALIGNMENT_FULLMEASURE2) {
-        params->m_minPos = std::max(this->GetXRel() + 2 * params->m_doc->m_drawingMinMeasureWidth, params->m_minPos);
-    }
-
-    // Here we want to process only the alignments from the right barline to the end - this includes the right
-    // scoreDef
-    // if any
-    if (this->m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) return FUNCTOR_CONTINUE;
-
-    ArrayOfObjects::iterator iter;
-
-    // Because we are processing the elements vertically we need to reset minPos for each element
-    int previousMinPos = params->m_minPos;
-    for (iter = m_layerElementsRef.begin(); iter != m_layerElementsRef.end(); iter++) {
-        params->m_minPos = previousMinPos;
-        (*iter)->Process(params->m_functor, params);
-    }
-
-    // If we have elements for this alignment, then adjust the minPos
-    if (!m_layerElementsRef.empty()) {
-        params->m_minPos = this->GetXRel() + this->GetMaxWidth();
-    }
-    // Otherwise, just set its xShift because this was not done by the functor
-    // This includes ALIGNMENT_MEASURE_END alignments
-    else {
-        this->SetXShift(params->m_minPos - this->GetXRel());
-    }
-
-    */
-
     return FUNCTOR_CONTINUE;
 }
 
+    
+int AlignmentReference::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+{
+    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    assert(params);
+    
+    LogDebug("AlignmentRef staff %d", GetN());
+    this->m_elementRef->Process(params->m_functor, params);
+    
+    return FUNCTOR_CONTINUE;
+}
+    
 int AlignmentReference::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
     SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
     assert(params);
 
-    LogDebug("AlignmentRef staff %d", GetN());
+    //LogDebug("AlignmentRef staff %d", GetN());
     this->m_elementRef->Process(params->m_functor, params, params->m_functorEnd);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int AlignmentReference::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
-{
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
-    assert(params);
 
     return FUNCTOR_CONTINUE;
 }
@@ -1043,6 +1065,14 @@ int Alignment::JustifyX(FunctorParams *functorParams)
     if (m_type == ALIGNMENT_MEASURE_END) {
         params->m_measureXRel += this->m_xRel;
     }
+
+    return FUNCTOR_CONTINUE;
+}
+
+int GraceAligner::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+{
+    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    assert(params);
 
     return FUNCTOR_CONTINUE;
 }

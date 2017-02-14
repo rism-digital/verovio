@@ -922,20 +922,38 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the minimum position (i.e., the width of the previous element)
- * member 1: the Doc
-**/
+ * member 0: the maximum position
+ * member 1: the upcoming maximum position (i.e., the min pos for the next element)
+ * member 2: the cumulated shift on the previous aligners
+ * member 3: the list of staffN in the top-level scoreDef
+ * member 4: the flag indicating whereas the alignment is in a Measure or in a Grace
+ * member 5: the Doc
+ * member 6: the Functor to be redirected to MeasureAligner and GraceAligner
+ * member 7: the end Functor for redirection
+ **/
 
 class SetBoundingBoxGraceXShiftParams : public FunctorParams {
 public:
-    SetBoundingBoxGraceXShiftParams(Doc *doc)
+    SetBoundingBoxGraceXShiftParams(Doc *doc, Functor * functor, Functor *functorEnd, std::vector<int> staffNs)
     {
-        m_graceMinPos = 0;
+        m_graceMaxPos = 0;
+        m_graceUpcomingMaxPos = -VRV_UNSET;
+        m_graceCumulatedXShift = 0;
+        m_staffNs = staffNs;
+        m_isGraceAlignment = false;
         m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
     }
 
-    int m_graceMinPos;
+    int m_graceMaxPos;
+    int m_graceUpcomingMaxPos;
+    int m_graceCumulatedXShift;
+    std::vector<int> m_staffNs;
+    bool m_isGraceAlignment;
     Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -944,8 +962,15 @@ public:
 
 /**
  * member 0: the minimum position (i.e., the width of the previous element)
- * member 1: the maximum width in the current measure
- * member 2: the Doc
+ * member 1: the upcoming minimum position (i.e., the min pos for the next element)
+ * member 2: the cumulated shift on the previous aligners
+ * member 3: the list of staffN in the top-level scoreDef
+ * member 4: the bounding box in the previous aligner
+ * member 5: the upcoming bounding boxes (to be used in the next aligner)
+ * member 6: the maximum width in the current measure (for mRest, etc.)
+ * member 7: the Doc
+ * member 8: the Functor for redirection to the MeasureAligner
+ * member 9: the end Functor for redirection
 **/
 
 class SetBoundingBoxXShiftParams : public FunctorParams {
@@ -968,7 +993,6 @@ public:
     std::vector<int> m_staffNs;
     std::vector<BoundingBox*> m_boundingBoxes;
     std::vector<BoundingBox*> m_upcomingBoundingBoxes;
-    //int m_layerMinPos;
     int m_measureWidth;
     Doc *m_doc;
     Functor *m_functor;

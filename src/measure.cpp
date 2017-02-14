@@ -383,6 +383,16 @@ int Measure::AlignVertically(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+    
+int Measure::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+{
+    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    assert(params);
+    
+    m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
+    
+    return FUNCTOR_SIBLINGS;
+}
 
 int Measure::SetBoundingBoxXShift(FunctorParams *functorParams)
 {
