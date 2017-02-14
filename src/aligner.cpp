@@ -385,17 +385,19 @@ Alignment *GraceAligner::GetAlignmentAtTime(double time, AlignmentType type)
     return newAlignment;
 }
 
-void GraceAligner::StackNote(Note *note)
+void GraceAligner::StackGraceElement(LayerElement *element)
 {
-    m_noteStack.push_back(note);
+    // Nespresso: What else?
+    assert(element->Is(NOTE));
+    m_graceStack.push_back(element);
 }
 
 void GraceAligner::AlignStack()
 {
     int i;
     double time = 0.0;
-    for (i = (int)m_noteStack.size(); i > 0; i--) {
-        Note *note = dynamic_cast<Note *>(m_noteStack.at(i - 1));
+    for (i = (int)m_graceStack.size(); i > 0; i--) {
+        Note *note = dynamic_cast<Note*>(m_graceStack.at(i - 1));
         assert(note);
         // get the duration of the event
         double duration = note->LayerElement::GetAlignmentDuration(NULL, NULL, false);
@@ -404,8 +406,13 @@ void GraceAligner::AlignStack()
         Alignment *alignment = this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT);
         note->SetGraceAlignment(alignment);
         alignment->AddLayerElementRef(note);
+        // Now also align the accid (if any)
+        Accid *accid = note->GetDrawingAccid();
+        if (accid) {
+            accid->SetGraceAlignment(alignment);
+        }
     }
-    m_noteStack.clear();
+    m_graceStack.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -430,8 +437,6 @@ void Alignment::Reset()
 
     m_layerElementsRef.clear();
     m_xRel = 0;
-    m_xShift = 0;
-    m_maxWidth = 0;
     m_time = 0.0;
     m_type = ALIGNMENT_DEFAULT;
     m_graceAligner = NULL;
@@ -467,23 +472,9 @@ void Alignment::AddLayerElementRef(LayerElement *element)
     this->AddChild(alignmentRef);
 }
 
-void Alignment::SetXRel(int x_rel)
+void Alignment::SetXRel(int xRel)
 {
-    m_xRel = x_rel;
-}
-
-void Alignment::SetXShift(int xShift)
-{
-    if (xShift > m_xShift) {
-        m_xShift = xShift;
-    }
-}
-
-void Alignment::SetMaxWidth(int maxWidth)
-{
-    if (maxWidth > m_maxWidth) {
-        m_maxWidth = maxWidth;
-    }
+    m_xRel = xRel;
 }
 
 GraceAligner *Alignment::GetGraceAligner()
@@ -801,32 +792,6 @@ int StaffAlignment::IntegrateBoundingBoxYShift(FunctorParams *functorParams)
     // cumulate the shift value
     params->m_shift += m_yShift;
     m_yShift = 0;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Alignment::IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams)
-{
-    if (!m_graceAligner) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    int i;
-    int shift = 0;
-    for (i = 0; i < m_graceAligner->GetChildCount(); i++) {
-        Alignment *alignment = dynamic_cast<Alignment *>(m_graceAligner->GetChild(i));
-        assert(alignment);
-        alignment->SetXRel(alignment->GetXShift() + shift);
-        shift += alignment->GetXShift();
-    }
-
-    // Set the total width by looking at the position and maximum width of the last alignment
-    if (m_graceAligner->GetChildCount() == 0) {
-        return FUNCTOR_CONTINUE;
-    }
-    Alignment *alignment = dynamic_cast<Alignment *>(m_graceAligner->GetLast());
-    assert(alignment);
-    m_graceAligner->SetWidth(alignment->GetXRel() + alignment->GetMaxWidth());
 
     return FUNCTOR_CONTINUE;
 }

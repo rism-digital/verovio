@@ -73,6 +73,7 @@ void LayerElement::Reset()
 
     m_scoreDefRole = NONE;
     m_alignment = NULL;
+    m_graceAlignment = NULL;
     m_beamElementCoord = NULL;
 
     m_crossStaff = NULL;
@@ -131,6 +132,18 @@ Beam *LayerElement::IsInBeam()
         }
     }
     return NULL;
+}    
+
+Alignment *LayerElement::GetGraceAlignment() const
+{
+    assert(m_graceAlignment);
+    return m_graceAlignment;
+}
+
+void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
+{
+    assert(!m_graceAlignment && graceAlignment);
+    m_graceAlignment = graceAlignment;
 }
 
 int LayerElement::GetDrawingX() const
@@ -141,16 +154,10 @@ int LayerElement::GetDrawingX() const
     assert(measure);
     
     int graceNoteShift = 0;
-    // Grace notes, also take into account the GraceAlignment
-    if (this->Is(NOTE)) {
-        const Note *note = dynamic_cast<const Note *>(this);
-        assert(note);
-        if (note->HasGraceAlignment()) {
-            //note->GetGraceAlignment();
-            graceNoteShift = note->GetGraceAlignment()->GetXRel();
-        }
+    if (this->HasGraceAlignment()) {
+        graceNoteShift = this->GetGraceAlignment()->GetXRel();
     }
-    
+
     return (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel() + graceNoteShift);
 }
 
@@ -372,11 +379,7 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
     m_drawingYRel = 0;
     
     m_alignment = NULL;
-    if (this->Is(NOTE)) {
-        Note *note = dynamic_cast<Note *>(this);
-        assert(note);
-        note->ResetGraceAlignment();
-    }
+    m_graceAlignment = NULL;
 
     return FUNCTOR_CONTINUE;
 }
@@ -510,7 +513,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     if (this->IsGraceNote()) {
         GraceAligner *graceAligner = m_alignment->GetGraceAligner();
         // We know that this is a note
-        graceAligner->StackNote(dynamic_cast<Note *>(this));
+        graceAligner->StackGraceElement(this);
     }
 
     // LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str());
@@ -527,33 +530,6 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
 {
     SetAlignmentPitchPosParams *params = dynamic_cast<SetAlignmentPitchPosParams *>(functorParams);
     assert(params);
-
-    /*
-    // First pass, only set the X position
-    if (params->m_processLayerElements == false) {
-        // Here we set the appropriate x value to be used for drawing
-        // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
-        // With Transcription documents, we use the m_xAbs
-        if (this->m_xAbs == VRV_UNSET) {
-            assert(params->m_doc->GetType() == Raw);
-            this->SetDrawingX(this->GetXRel() + params->m_currentMeasure->GetDrawingX());
-            // Grace notes, also take into account the GraceAlignment
-            if (this->Is(NOTE)) {
-                Note *note = dynamic_cast<Note *>(this);
-                assert(note);
-                if (note->HasGraceAlignment()) {
-                    this->SetDrawingX(this->GetDrawingX() - note->GetAlignment()->GetGraceAligner()->GetWidth()
-                        + note->GetGraceAlignment()->GetXRel());
-                }
-            }
-        }
-        else {
-            assert(params->m_doc->GetType() == Transcription);
-            this->SetDrawingX(this->m_xAbs);
-        }
-        return FUNCTOR_CONTINUE;
-    }
-    */
 
     LayerElement *layerElementY = this;
     Staff *staffY = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
@@ -636,15 +612,15 @@ int LayerElement::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
     SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
     assert(params);
     
-    if (!this->Is(NOTE)) return FUNCTOR_CONTINUE;
+    if (!this->HasGraceAlignment()) return FUNCTOR_CONTINUE;
     
-    Note *note = dynamic_cast<Note *>(this);
-    LogDebug("pname %d", note->GetPname());
+    //Note *note = dynamic_cast<Note *>(this);
+    //LogDebug("pname %d", note->GetPname());
     
     int selfRight = this->GetSelfRight();
     int offset = selfRight - params->m_graceMaxPos;
     if (offset > 0) {
-        note->GetGraceAlignment()->SetXRel(note->GetGraceAlignment()->GetXRel() - offset);
+        this->GetGraceAlignment()->SetXRel(this->GetGraceAlignment()->GetXRel() - offset);
         // Also move the cumultated x shift and the minimum position for the next alignment accordingly
         params->m_graceCumulatedXShift += (-offset);
         params->m_graceUpcomingMaxPos += (-offset);
@@ -695,6 +671,8 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
     params->m_upcomingMinPos = std::max(this->GetSelfRight(), params->m_upcomingMinPos);
 
     return FUNCTOR_CONTINUE;
+    
+    /*
 
     // The negative offset is the part of the bounding box that overflows on the left
     // |____x_____|
@@ -711,17 +689,17 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
     if (negative_offset < 0) negative_offset = 0;
 
     // with a grace note, also take into account the full width of the group given by the GraceAligner
-    /*if (current->GetAlignment()->HasGraceAligner()) {
-        negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth()
-        + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-    }*/
+    //if (current->GetAlignment()->HasGraceAligner()) {
+      //  negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth()
+      //  + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
+    //}
 
     int currentX = this->GetAlignment()->GetXRel();
     // with grace note, take into account the position of the note in the grace group
-    /*if (current->IsGraceNote()) {
-        Note *note = dynamic_cast<Note *>(current);
-        currentX += note->GetGraceAlignment()->GetXRel();
-    }*/
+    //if (current->IsGraceNote()) {
+      //  Note *note = dynamic_cast<Note *>(current);
+      //  currentX += note->GetGraceAlignment()->GetXRel();
+    //}
 
     // check if the element overlaps with the preceeding one given by (*minPos)
     int overlap = params->m_minPos - currentX + negative_offset;
@@ -732,13 +710,13 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
 
     // do not adjust the min pos and the max width since this is already handled by
     // the GraceAligner
-    /*
-    if (current->IsGraceNote()) {
-        params->m_minPos = current->GetAlignment()->GetXRel();
-        current->GetAlignment()->SetMaxWidth(0);
-        return FUNCTOR_CONTINUE;
-    }
-    */
+    
+    //if (current->IsGraceNote()) {
+    //    params->m_minPos = current->GetAlignment()->GetXRel();
+    //    current->GetAlignment()->SetMaxWidth(0);
+    //    return FUNCTOR_CONTINUE;
+    //}
+
 
     // the next minimal position is given by the right side of the bounding box + the spacing of the element
     int width = this->GetSelfX2();
@@ -751,7 +729,7 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
     params->m_minPos = this->GetAlignment()->GetXRel() + width;
     this->GetAlignment()->SetMaxWidth(width);
 
-    /*
+
 
      // starting new layer
      if (this->Is(LAYER)) {

@@ -197,11 +197,6 @@ public:
     virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
-     * See Object::IntegrateBoundingBoxGraceXShift
-     */
-    virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams);
-
-    /**
      * See Object::SetAlignmentXPos
      */
     virtual int SetAlignmentXPos(FunctorParams *functorParams);

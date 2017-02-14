@@ -89,7 +89,6 @@ void Note::Reset()
     d_stemLen = 0;
     m_clusterPosition = 0;
     m_cluster = NULL;
-    m_graceAlignment = NULL;
 
     m_playingOnset = 0.0;
     m_playingOffset = 0.0;
@@ -132,18 +131,6 @@ void Note::AddChild(Object *child)
     child->SetParent(this);
     m_children.push_back(child);
     Modify();
-}
-
-Alignment *Note::GetGraceAlignment() const
-{
-    assert(m_graceAlignment);
-    return m_graceAlignment;
-}
-
-void Note::SetGraceAlignment(Alignment *graceAlignment)
-{
-    assert(!m_graceAlignment && graceAlignment);
-    m_graceAlignment = graceAlignment;
 }
 
 void Note::SetDrawingTieAttr()

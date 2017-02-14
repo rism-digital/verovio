@@ -121,6 +121,15 @@ public:
     Alignment *GetAlignment() const { return m_alignment; }
 
     int GetXRel() const;
+    
+    /**
+     * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)
+     */
+    ///@{
+    Alignment *GetGraceAlignment() const;
+    void SetGraceAlignment(Alignment *graceAlignment);
+    bool HasGraceAlignment() const { return (m_graceAlignment != NULL); }
+    ///@}
 
     /**
      * Returns the duration if the child element has a DurationInterface
@@ -213,6 +222,11 @@ public:
 
 protected:
     Alignment *m_alignment;
+    
+    /**
+     * An alignment for grace notes
+     */
+    Alignment *m_graceAlignment;
     
     /**
      * The Y drawing relative position of the object.

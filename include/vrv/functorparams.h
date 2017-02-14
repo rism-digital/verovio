@@ -539,20 +539,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// IntegrateBoundingBoxGraceXShiftParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the functor to be redirected to Aligner
-**/
-
-class IntegrateBoundingBoxGraceXShiftParams : public FunctorParams {
-public:
-    IntegrateBoundingBoxGraceXShiftParams(Functor *functor) { m_functor = functor; }
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
 // IntegrateBoundingBoxYShiftParams
 //----------------------------------------------------------------------------
 

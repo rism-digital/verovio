@@ -1419,7 +1419,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
                 dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
                 // HARDCODED
-                accidXShift -= (extend.m_width + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
+                accidXShift -= extend.m_width + m_doc->GetGraceSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
                 dc->ResetFont();
             }
             accid->SetDrawingXRel(accidXShift);

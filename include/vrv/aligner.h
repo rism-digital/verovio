@@ -296,14 +296,8 @@ public:
 
     virtual void AddChild(Object *object);
 
-    void SetXRel(int x_rel);
+    void SetXRel(int xRel);
     int GetXRel() const { return m_xRel; }
-
-    void SetXShift(int xShift);
-    int GetXShift() const { return m_xShift; }
-
-    void SetMaxWidth(int maxWidth);
-    int GetMaxWidth() const { return m_maxWidth; }
 
     /**
      * @name Set and get the time value of the alignment
@@ -345,12 +339,6 @@ public:
     //----------//
 
     /**
-     * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
-     * Special case that redirects the functor to the GraceAligner.
-     */
-    virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams);
-
-    /**
      * Set the position of the Alignment.
      * Looks at the time different with the previous Alignment.
      */
@@ -390,18 +378,6 @@ private:
      * the previous Alignement
      */
     int m_xRel;
-    /**
-     * Stores temporally the maximum amount we need to shift the element pointing to it for
-     * avoiding collisions. This is set in Object::SetBoundingBoxXShift and then
-     * integrated for all alignment in Alignment::IntegrateBoundingBoxXShift.
-     */
-    int m_xShift;
-    /**
-     * Stores temporally the maximum width of the of the element pointing to it.
-     * It is set and integrated as m_xShift and it is used only for shifting the
-     * alignment of the end of the measure (ALIGNMENT_MEASURE_END).
-     */
-    int m_maxWidth;
     /**
      * Stores the time at which the alignment occur.
      * It is set by Object::AlignHorizontally.
@@ -644,10 +620,10 @@ public:
     /**
      * Because the grace notes appear from left to right but need to be aligned
      * from right to left, we first need to stack them and align them eventually
-     * when we have all of them. This is done by GraceAligner::AlignNote called
+     * when we have all of them. This is done by GraceAligner::AlignStack called
      * at the end of each Layer in
      */
-    void StackNote(Note *note);
+    void StackGraceElement(LayerElement *object);
 
     /**
      * Align the notes in the reverse order
@@ -680,9 +656,9 @@ public:
     //
 private:
     /**
-     * The stack of notes where they are piled up before getting aligned
+     * The stack of object where they are piled up before getting aligned
      */
-    ArrayOfObjects m_noteStack;
+    ArrayOfObjects m_graceStack;
     /**
      * The witdth of the group of grace notes instanciated after the bounding
      * boxes X are integrated in Alignment::IntegrateBoundingBoxGraceXShift

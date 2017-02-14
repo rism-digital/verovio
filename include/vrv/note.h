@@ -87,16 +87,6 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for the Algnment the grace note is pointing to (NULL by default)
-     */
-    ///@{
-    Alignment *GetGraceAlignment() const;
-    void SetGraceAlignment(Alignment *graceAlignment);
-    bool HasGraceAlignment() const { return (m_graceAlignment != NULL); }
-    void ResetGraceAlignment() { m_graceAlignment = NULL; }
-    ///@}
-
-    /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
@@ -159,10 +149,6 @@ private:
      * The note with the initial attribute owns the Tie object and takes care of deleting it
      */
     Tie *m_drawingTieAttr;
-    /**
-     * An alignment for grace notes
-     */
-    Alignment *m_graceAlignment;
 };
 
 } // namespace vrv
