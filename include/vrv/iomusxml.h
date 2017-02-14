@@ -204,7 +204,7 @@ private:
     ///@{
     void OpenTie(Staff *staff, Layer *layer, Note *note, Tie *tie);
     void CloseTie(Staff *staff, Layer *layer, Note *note, bool isClosingTie);
-    void OpenSlur(Staff *staff, Layer *layer, int number, LayerElement *element, Slur *slur);
+    void OpenSlur(Staff *staff, Layer *layer, int number, Slur *slur);
     void CloseSlur(Staff *staff, Layer *layer, int number, LayerElement *element);
     ///@}
 

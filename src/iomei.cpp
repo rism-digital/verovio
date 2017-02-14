@@ -544,14 +544,11 @@ bool MeiOutput::WriteMeiDoc(Doc *doc)
 
     // ---- header ----
 
-    pugi::xml_node meiHead = m_mei.append_child("meiHead");
-
     if (m_doc->m_header.first_child()) {
-        for (pugi::xml_node child = m_doc->m_header.first_child(); child; child = child.next_sibling()) {
-            meiHead.append_copy(child);
-        }
+        m_mei.append_copy(m_doc->m_header.first_child());
     }
     else {
+        pugi::xml_node meiHead = m_mei.append_child("meiHead");
         pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
         pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
         titleStmt.append_child("title");
@@ -784,6 +781,7 @@ void MeiOutput::WriteMeiMordent(pugi::xml_node currentNode, Mordent *mordent)
     WriteXmlId(currentNode, mordent);
     WriteTimePointInterface(currentNode, mordent);
     mordent->WriteColor(currentNode);
+    mordent->WriteOrnamentaccid(currentNode);
     mordent->WritePlacement(currentNode);
     mordent->WriteMordentLog(currentNode);
 };
@@ -860,6 +858,7 @@ void MeiOutput::WriteMeiTrill(pugi::xml_node currentNode, Trill *trill)
     WriteXmlId(currentNode, trill);
     WriteTimePointInterface(currentNode, trill);
     trill->WriteColor(currentNode);
+    trill->WriteOrnamentaccid(currentNode);
     trill->WritePlacement(currentNode);
 };
 
@@ -870,6 +869,7 @@ void MeiOutput::WriteMeiTurn(pugi::xml_node currentNode, Turn *turn)
     WriteXmlId(currentNode, turn);
     WriteTimePointInterface(currentNode, turn);
     turn->WriteColor(currentNode);
+    turn->WriteOrnamentaccid(currentNode);
     turn->WritePlacement(currentNode);
     turn->WriteTurnLog(currentNode);
 };
@@ -1640,7 +1640,9 @@ bool MeiInput::ReadMei(pugi::xml_node root)
     m_readingScoreBased = false;
 
     if (!root.empty() && (current = root.child("meiHead"))) {
-        ReadMeiHeader(current);
+        m_doc->m_header.reset();
+        // copy the complete header into the master document
+        m_doc->m_header.append_copy(current);
     }
     // music
     pugi::xml_node music;
@@ -1705,16 +1707,6 @@ bool MeiInput::ReadMei(pugi::xml_node root)
         }
     }
     return success;
-}
-
-bool MeiInput::ReadMeiHeader(pugi::xml_node meiHead)
-{
-    m_doc->m_header.reset();
-    // copy all the nodes inside into the master document
-    for (pugi::xml_node child = meiHead.first_child(); child; child = child.next_sibling()) {
-        m_doc->m_header.append_copy(child);
-    }
-    return true;
 }
 
 bool MeiInput::ReadMeiSection(Object *parent, pugi::xml_node section)
@@ -2278,6 +2270,7 @@ bool MeiInput::ReadMeiMordent(Object *parent, pugi::xml_node mordent)
 
     ReadTimePointInterface(mordent, vrvMordent);
     vrvMordent->ReadColor(mordent);
+    vrvMordent->ReadOrnamentaccid(mordent);
     vrvMordent->ReadPlacement(mordent);
     vrvMordent->ReadMordentLog(mordent);
 
@@ -2360,6 +2353,7 @@ bool MeiInput::ReadMeiTrill(Object *parent, pugi::xml_node trill)
 
     ReadTimePointInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
+    vrvTrill->ReadOrnamentaccid(trill);
     vrvTrill->ReadPlacement(trill);
 
     parent->AddChild(vrvTrill);
@@ -2373,6 +2367,7 @@ bool MeiInput::ReadMeiTurn(Object *parent, pugi::xml_node turn)
 
     ReadTimePointInterface(turn, vrvTurn);
     vrvTurn->ReadColor(turn);
+    vrvTurn->ReadOrnamentaccid(turn);
     vrvTurn->ReadPlacement(turn);
     vrvTurn->ReadTurnLog(turn);
 
