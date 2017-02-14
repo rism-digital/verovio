@@ -274,6 +274,18 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
     }
 }
 
+    void MusicXmlInput::GenerateUuid(pugi::xml_node node)
+    {
+        int nr = std::rand();
+        char str[17];
+        // I do not want to use a stream for doing this!
+        snprintf(str, 17, "%016d", nr);
+        
+        std::string uuid = StringFormat("%s-%s", node.name(), str).c_str();
+        std::transform(uuid.begin(), uuid.end(), uuid.begin(), ::tolower);
+        node.append_attribute("xml:id").set_value(uuid.c_str());
+    }
+
 //////////////////////////////////////////////////////////////////////////////
 // Tie and slurs stack management
 
@@ -512,11 +524,16 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     pubStmt.append_child(pugi::node_pcdata);
 
     pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
+    GenerateUuid(encodingDesc);
     pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
+    GenerateUuid(appInfo);
     pugi::xml_node app = appInfo.append_child("application");
+    GenerateUuid(app);
     pugi::xml_node appName = app.append_child("name");
+    GenerateUuid(appName);
     appName.append_child(pugi::node_pcdata).set_value("Verovio");
     pugi::xml_node appText = app.append_child("p");
+    GenerateUuid(appText);
     appText.append_child(pugi::node_pcdata).set_value("Transcoded from MusicXML");
 
     // isodate and version
@@ -949,15 +966,23 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, i
     assert(node);
     assert(measure);
 
-    // We only need a <space> if a note follows
+    pugi::xpath_node prevNote = node.select_single_node("preceding-sibling::note[1]");
     pugi::xpath_node nextNote = node.select_single_node("following-sibling::note[1]");
+    Layer *layer = SelectLayer(nextNote.node(), measure);
     if (nextNote) {
-        Layer *layer = SelectLayer(nextNote.node(), measure);
+        // We need a <space> if a note follows
         std::string durStr = std::to_string(4 * m_ppq / atoi(GetContentOfChild(node, "duration").c_str()));
-
         Space *space = new Space();
         space->SetDur(space->AttDurationMusical::StrToDuration(durStr));
+        if (4 * m_ppq % atoi(GetContentOfChild(node, "duration").c_str()) != 0) space->SetDots(1);
         AddLayerElement(layer, space);
+    }
+    else if (!prevNote && !node.select_single_node("preceding-sibling::backup")) {
+        // If there is no previous or following note in the first layer, the measure seems to be empty
+        // We use here an invisible mRest, which should be replaced by mSpace, when available
+        MRest *mRest = new MRest();
+        mRest->SetVisible(BOOLEAN_false);
+        AddLayerElement(layer, mRest);
     }
 }
 

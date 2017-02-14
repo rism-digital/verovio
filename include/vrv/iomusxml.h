@@ -217,6 +217,13 @@ private:
     void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
 
     /**
+     * @name Helper method for generating additional IDs
+     */
+    ///@{
+    ///@}
+    void GenerateUuid(pugi::xml_node node);
+
+    /**
      * @name Methods for converting MusicXML string values to MEI attributes.
      */
     ///@{
