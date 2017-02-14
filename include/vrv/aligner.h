@@ -598,7 +598,7 @@ private:
  * This class aligns the content of a grace note group
  * It contains a vector of Alignment
  */
-class GraceAligner : public MeasureAligner {
+class GraceAligner : public HorizontalAligner {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

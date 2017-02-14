@@ -355,7 +355,7 @@ double MeasureAligner::GetMaxTime() const
 // GraceAligner
 //----------------------------------------------------------------------------
 
-GraceAligner::GraceAligner() : MeasureAligner()
+GraceAligner::GraceAligner() : HorizontalAligner()
 {
     Reset();
 }
