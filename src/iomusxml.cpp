@@ -274,17 +274,17 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
     }
 }
 
-    void MusicXmlInput::GenerateUuid(pugi::xml_node node)
-    {
-        int nr = std::rand();
-        char str[17];
-        // I do not want to use a stream for doing this!
-        snprintf(str, 17, "%016d", nr);
-        
-        std::string uuid = StringFormat("%s-%s", node.name(), str).c_str();
-        std::transform(uuid.begin(), uuid.end(), uuid.begin(), ::tolower);
-        node.append_attribute("xml:id").set_value(uuid.c_str());
-    }
+void MusicXmlInput::GenerateUuid(pugi::xml_node node)
+{
+    int nr = std::rand();
+    char str[17];
+    // I do not want to use a stream for doing this!
+    snprintf(str, 17, "%016d", nr);
+
+    std::string uuid = StringFormat("%s-%s", node.name(), str).c_str();
+    std::transform(uuid.begin(), uuid.end(), uuid.begin(), ::tolower);
+    node.append_attribute("xml:id").set_value(uuid.c_str());
+}
 
 //////////////////////////////////////////////////////////////////////////////
 // Tie and slurs stack management
@@ -524,7 +524,7 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pubStmt.append_child(pugi::node_pcdata);
 
-    pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
+    pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
     GenerateUuid(encodingDesc);
     pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
     GenerateUuid(appInfo);
@@ -595,7 +595,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 clefSign = it->select_single_node("clef/sign");
             }
             if (clefSign && HasContent(clefSign.node())) {
-                staffDef->SetClefShape(staffDef->AttCleffingLog::StrToClefshape(GetContent(clefSign.node())));
+                staffDef->SetClefShape(
+                    staffDef->AttCleffingLog::StrToClefshape(GetContent(clefSign.node()).substr(0, 4)));
             }
             // clef line
             pugi::xpath_node clefLine;
@@ -622,7 +623,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     staffDef->SetClefDis(OCTAVE_DIS_15);
                 if (change < 0)
                     staffDef->SetClefDisPlace(PLACE_below);
-                else
+                else if (change > 0)
                     staffDef->SetClefDisPlace(PLACE_above);
             }
             // key sig
@@ -654,7 +655,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (!linesStr.empty()) {
                 staffDef->SetLines(atoi(linesStr.c_str()));
             }
-            else staffDef->SetLines(5);
+            else
+                staffDef->SetLines(5);
             std::string scaleStr = staffDetails.node().select_single_node("staff-size").node().text().as_string();
             if (!scaleStr.empty()) {
                 staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr));
@@ -1114,7 +1116,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             AddLayerElement(layer, space);
         }
         // we assume /note without /type to be mRest
-        else if (typeStr.empty()) {
+        else if (typeStr.empty() || HasAttributeWithValue(rest.node(), "measure", "yes")) {
             MRest *mRest = new MRest();
             // if (cue) mRest->SetSize(SIZE_cue);
             if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
