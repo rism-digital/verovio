@@ -280,7 +280,7 @@ void MusicXmlInput::RemoveLastFromStack(ClassId classId)
         char str[17];
         // I do not want to use a stream for doing this!
         snprintf(str, 17, "%016d", nr);
-        
+
         std::string uuid = StringFormat("%s-%s", node.name(), str).c_str();
         std::transform(uuid.begin(), uuid.end(), uuid.begin(), ::tolower);
         node.append_attribute("xml:id").set_value(uuid.c_str());
@@ -622,7 +622,7 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                     staffDef->SetClefDis(OCTAVE_DIS_15);
                 if (change < 0)
                     staffDef->SetClefDisPlace(PLACE_below);
-                else
+                else if (change > 0)
                     staffDef->SetClefDisPlace(PLACE_above);
             }
             // key sig
