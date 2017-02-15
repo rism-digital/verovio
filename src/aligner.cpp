@@ -420,15 +420,10 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
     Alignment *leftAlignment = dynamic_cast<Alignment*>(this->GetFirst());
     if (!leftAlignment) return -VRV_UNSET;
     
-    std::vector<AttComparison *> filters;
-    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    filters.push_back(&matchStaff);
+    int minLeft, maxRight;
+    leftAlignment->GetLeftRight(staffN, minLeft, maxRight);
     
-    GetAlignmentLeftRightParams getAlignmentLeftRightParams;
-    Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
-    leftAlignment->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
-    
-    return getAlignmentLeftRightParams.m_minLeft;
+    return minLeft;
 }
 
 int GraceAligner::GetGraceGroupRight(int staffN)
@@ -436,15 +431,10 @@ int GraceAligner::GetGraceGroupRight(int staffN)
     Alignment *rightAlignment = dynamic_cast<Alignment*>(this->GetLast());
     if (!rightAlignment) return VRV_UNSET;
     
-    std::vector<AttComparison *> filters;
-    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    filters.push_back(&matchStaff);
+    int minLeft, maxRight;
+    rightAlignment->GetLeftRight(staffN, minLeft, maxRight);
     
-    GetAlignmentLeftRightParams getAlignmentLeftRightParams;
-    Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
-    rightAlignment->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
-    
-    return getAlignmentLeftRightParams.m_maxRight;
+    return maxRight;
 }
     
 //----------------------------------------------------------------------------
@@ -467,7 +457,6 @@ void Alignment::Reset()
 {
     Object::Reset();
 
-    m_layerElementsRef.clear();
     m_xRel = 0;
     m_time = 0.0;
     m_type = ALIGNMENT_DEFAULT;
@@ -493,7 +482,6 @@ void Alignment::AddChild(Object *child)
 void Alignment::AddLayerElementRef(LayerElement *element)
 {
     assert(element->IsLayerElement());
-    m_layerElementsRef.push_back(element);
 
     // -1 will be used for barlines attributes
     int n = -1;
@@ -508,6 +496,25 @@ void Alignment::SetXRel(int xRel)
 {
     m_xRel = xRel;
 }
+    
+void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
+{
+    GetAlignmentLeftRightParams getAlignmentLeftRightParams;
+    Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
+    
+    if (staffN != VRV_UNSET) {
+        std::vector<AttComparison *> filters;
+        AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+        filters.push_back(&matchStaff);
+        this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
+    }
+    else
+        this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams);
+    
+    minLeft = getAlignmentLeftRightParams.m_minLeft;
+    maxRight = getAlignmentLeftRightParams.m_maxRight;
+}
+
 
 GraceAligner *Alignment::GetGraceAligner()
 {
@@ -836,7 +843,11 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
     // We are in a Measure aligner - redirect to the GraceAligner when it is a ALIGNMENT_GRACENOTE
     if (!params->m_isGraceAlignment) {
         // Do not process AlignmentReference children if no GraceAligner
-        if (!m_graceAligner) return FUNCTOR_SIBLINGS;
+        if (!m_graceAligner) {
+            // We store the default alignment before we hit the grace alignment
+            if (m_type == ALIGNMENT_DEFAULT) params->m_rightDefaultAlignment = this;
+            return FUNCTOR_SIBLINGS;
+        }
         assert(m_type == ALIGNMENT_GRACENOTE);
         
         // Change the flag for indicating that the alignment is child of a GraceAligner
@@ -845,7 +856,17 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         std::vector<int>::iterator iter;
         std::vector<AttComparison *> filters;
         for(iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
-            params->m_graceMaxPos = this->GetXRel();
+            
+            int graceMaxPos = this->GetXRel();
+            // If we have a rightDefault, then this is (quite likely) the next note / chord
+            // Get its minimum left and make it the max right position of the grace group
+            if (params->m_rightDefaultAlignment) {
+                int minLeft, maxRight;
+                params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight);
+                if (minLeft != -VRV_UNSET) graceMaxPos = minLeft;
+            }
+            
+            params->m_graceMaxPos = graceMaxPos;
             params->m_graceUpcomingMaxPos = -VRV_UNSET;
             params->m_graceCumulatedXShift = 0;
             filters.clear();
@@ -916,7 +937,8 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
         assert(m_graceAligner);
         // Check if the left position of the group is on the left of the minPos
         // If not, move the aligment accordingly
-        
+        // We can set staffN as VRV_UNSET to align all staves (this should be an option)
+        // We can also define somewhere vector of staffDef@n to be aligned together 
         int left = m_graceAligner->GetGraceGroupLeft(params->m_staffN);
         if (left < params->m_minPos) {
             int offset = (params->m_minPos - left);
@@ -1009,20 +1031,6 @@ int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-
-/* Compute "ideal" horizontal space to allow for a given time interval, ignoring the need
-to keep consecutive symbols from overlapping or nearly overlapping: we assume spacing
-will be increased as necessary later to avoid that. For modern notation (CMN), ideal space
-is a function of time interval.
-
-For a discussion of the way engravers determine spacing, see Elaine Gould, _Behind Bars_,
-p. 39. But we need something more flexible, because, for example: (1) We're interested in
-music with notes of very long duration: say, music in mensural notation containing longas
-or maximas; such music is usually not spaced by duration, but we support spacing by
-duration if the user wishes, and standard engravers' rules would waste a lot of space.
-(2) For some purposes, spacing strictly proportional to duration is desirable. The most
-flexible solution might be to get ideal spacing from a user-definable table, but using a
-formula with parameters can come close and has other advantages. */
 
 int Alignment::HorizontalSpaceForDuration(
     double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear)

@@ -113,9 +113,10 @@ public:
  * member 2: the cumulated shift on the previous aligners
  * member 3: the list of staffN in the top-level scoreDef
  * member 4: the flag indicating whereas the alignment is in a Measure or in a Grace
- * member 5: the Doc
- * member 6: the Functor to be redirected to MeasureAligner and GraceAligner
- * member 7: the end Functor for redirection
+ * member 5: the pointer to the right ALIGNMENT_DEFAULT (if any)
+ * member 6: the Doc
+ * member 7: the Functor to be redirected to MeasureAligner and GraceAligner
+ * member 8: the end Functor for redirection
  **/
 
 class AdjustGraceXPosParams : public FunctorParams {
@@ -127,6 +128,7 @@ public:
         m_graceCumulatedXShift = 0;
         m_staffNs = staffNs;
         m_isGraceAlignment = false;
+        m_rightDefaultAlignment = NULL;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
@@ -137,6 +139,7 @@ public:
     int m_graceCumulatedXShift;
     std::vector<int> m_staffNs;
     bool m_isGraceAlignment;
+    Alignment *m_rightDefaultAlignment;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;

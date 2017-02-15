@@ -294,10 +294,18 @@ public:
     virtual ClassId GetClassId() const { return ALIGNMENT; }
     ///@}
 
+    /**
+     * Override the method of adding AlignmentReference children
+     */
     virtual void AddChild(Object *object);
 
+    /**
+     * @name Set and get the xRel value of the alignment
+     */
+    ///@{
     void SetXRel(int xRel);
     int GetXRel() const { return m_xRel; }
+    ///@}
 
     /**
      * @name Set and get the time value of the alignment
@@ -319,6 +327,13 @@ public:
     void SetType(AlignmentType type) { m_type = type; }
     AlignmentType GetType() const { return m_type; }
     ///@}
+    
+    /**
+     * Retrive the minimum left and maximum right position for the objects in an alignment.
+     * Returns (-)VRV_UNSET in nothing for the staff specified.
+     * Uses Object::GetAlignmentLeftRight
+     */
+    void GetLeftRight(int staffN, int &minLeft, int &maxRight);
 
     /**
      * Returns the GraceAligner for the Alignment.
@@ -331,6 +346,21 @@ public:
      */
     bool HasGraceAligner() const { return (m_graceAligner != NULL); }
 
+    /**
+     * Compute "ideal" horizontal space to allow for a given time interval, ignoring the need
+     * to keep consecutive symbols from overlapping or nearly overlapping: we assume spacing
+     * will be increased as necessary later to avoid that. For modern notation (CMN), ideal space
+     * is a function of time interval.
+     
+     * For a discussion of the way engravers determine spacing, see Elaine Gould, _Behind Bars_,
+     * p. 39. But we need something more flexible, because, for example: (1) We're interested in
+     * music with notes of very long duration: say, music in mensural notation containing longas
+     * or maximas; such music is usually not spaced by duration, but we support spacing by
+     * duration if the user wishes, and standard engravers' rules would waste a lot of space.
+     * (2) For some purposes, spacing strictly proportional to duration is desirable. The most
+     * flexible solution might be to get ideal spacing from a user-definable table, but using a
+     * formula with parameters can come close and has other advantages. 
+     */
     virtual int HorizontalSpaceForDuration(
         double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
 
@@ -396,10 +426,6 @@ private:
      * The Alignment owns it.
      */
     GraceAligner *m_graceAligner;
-    /**
-     * An array of all the LayerElement objects pointing to the alignment
-     */
-    ArrayOfObjects m_layerElementsRef;
 };
 
 //----------------------------------------------------------------------------
@@ -651,6 +677,7 @@ public:
     
     /**
      * @name Return the left / right position of the first / last note matching by staffN
+     * Setting staffN as VRV_UNSET will look for and align all staves.
      */
     ///@{
     int GetGraceGroupLeft(int staffN);

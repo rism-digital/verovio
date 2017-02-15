@@ -389,7 +389,10 @@ int Measure::AdjustGraceXPos(FunctorParams *functorParams)
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
     
-    m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
+    params->m_rightDefaultAlignment = NULL;
+    
+    // We process it backward because we want to get the rightDefaultAlignment
+    m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
     
     return FUNCTOR_SIBLINGS;
 }
