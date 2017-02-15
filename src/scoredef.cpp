@@ -335,13 +335,13 @@ StaffDef *ScoreDef::GetStaffDef(int n)
 
     return staffDef;
 }
-    
+
 std::vector<int> ScoreDef::GetStaffNs()
 {
     this->ResetList(this);
     ListOfObjects *childList = this->GetList(this);
     ListOfObjects::iterator iter;
-    
+
     std::vector<int> ns;
     StaffDef *staffDef = NULL;
     for (iter = childList->begin(); iter != childList->end(); ++iter) {

@@ -141,7 +141,7 @@ public:
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
     ///@}
-    
+
     void SetObjectXY(Object *objectX, Object *objectY);
 
     FloatingObject *GetObject() const { return m_object; }
@@ -165,7 +165,7 @@ public:
 private:
     Object *m_objectX;
     Object *m_objectY;
-    
+
 protected:
     /**
      * The Y drawing relative position of the object.

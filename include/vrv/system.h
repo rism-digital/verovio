@@ -51,7 +51,7 @@ public:
     ///@{
     virtual void AddChild(Object *object);
     ///@}
-    
+
     /**
      * @name Get the X and Y drawing position
      */

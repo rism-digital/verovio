@@ -85,7 +85,7 @@ public:
      */
     Beam *IsInBeam();
     ///@}
-    
+
     /**
      * @name Get the X and Y drawing position
      */
@@ -93,7 +93,7 @@ public:
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
     ///@}
-    
+
     /**
      * @name Get and set the X and Y drawing relative positions
      */
@@ -121,7 +121,7 @@ public:
     Alignment *GetAlignment() const { return m_alignment; }
 
     int GetXRel() const;
-    
+
     /**
      * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)
      */
@@ -154,24 +154,24 @@ public:
      * See Object::AlignHorizontally
      */
     virtual int AlignHorizontally(FunctorParams *functorParams);
-    
+
     /**
      * See Object::AdjustGraceXPos
      */
     ///@{
     virtual int AdjustGraceXPos(FunctorParams *functorParams);
     ///@}
-    
+
     /**
      * See Object::AdjustXPos
      */
     virtual int AdjustXPos(FunctorParams *functorParams);
-    
+
     /**
      * See Object::PrepareCrossStaff
      */
     virtual int PrepareCrossStaff(FunctorParams *functorParams);
-    
+
     /**
      * See Object::PrepareTimePointing
      */
@@ -222,18 +222,18 @@ public:
 
 protected:
     Alignment *m_alignment;
-    
+
     /**
      * An alignment for grace notes
      */
     Alignment *m_graceAlignment;
-    
+
     /**
      * The Y drawing relative position of the object.
      * It is re-computed everytime the object is drawn and it is not stored in the file.
      */
     int m_drawingYRel;
-    
+
     /**
      * The X drawing relative position of the object.
      * It is re-computed everytime the object is drawn and it is not stored in the file.

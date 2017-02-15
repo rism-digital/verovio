@@ -251,7 +251,7 @@ void Doc::PrepareDrawing()
         LogWarning(
             "%d time spanning elements could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
-    
+
     // Prepare the cross-staff pointers
     PrepareCrossStaffParams prepareCrossStaffParams;
     Functor prepareCrossStaff(&Object::PrepareCrossStaff);
@@ -281,7 +281,7 @@ void Doc::PrepareDrawing()
     // GetTie values and pitch and oct for matching notes
     std::vector<AttComparison *> filters;
     for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-        staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
@@ -309,7 +309,7 @@ void Doc::PrepareDrawing()
     }
 
     for (staves = prepareProcessingListsParams.m_layerTree.child.begin();
-        staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
+         staves != prepareProcessingListsParams.m_layerTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             filters.clear();
             // Create ad comparison object for each type / @n
@@ -326,7 +326,7 @@ void Doc::PrepareDrawing()
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     for (staves = prepareProcessingListsParams.m_verseTree.child.begin();
-        staves != prepareProcessingListsParams.m_verseTree.child.end(); ++staves) {
+         staves != prepareProcessingListsParams.m_verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';

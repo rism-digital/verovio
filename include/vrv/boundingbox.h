@@ -63,7 +63,7 @@ public:
     int GetContentTop() const { return (this->GetDrawingY() + m_contentBB_y2); }
     int GetContentLeft() const { return (this->GetDrawingX() + m_contentBB_x1); }
     int GetContentRight() const { return (this->GetDrawingX() + m_contentBB_x2); }
-    
+
     int GetSelfX1() const { return m_selfBB_x1; }
     int GetSelfX2() const { return m_selfBB_x2; }
     int GetSelfY1() const { return m_selfBB_y1; }
@@ -130,7 +130,7 @@ private:
     bool m_updatedBBoxY;
     /** buffer for De-Casteljau algorithm */
     static int s_deCasteljau[4][4];
-    
+
     int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
     int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
 };

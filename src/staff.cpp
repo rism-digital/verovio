@@ -83,21 +83,21 @@ void Staff::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 int Staff::GetDrawingY() const
 {
     if (!m_staffAlignment) return 0;
-    
-    System *system = dynamic_cast<System*>(this->GetFirstParent(SYSTEM));
+
+    System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
     assert(system);
 
     return (system->GetDrawingY() + m_staffAlignment->GetYRel());
 }
-    
+
 int Staff::CalcPitchPosYRel(Doc *doc, int loc)
 {
     assert(doc);
-    
+
     // the staff loc offset is based on the number of lines: 0 with 1 line, 2 with 2, etc
     int staffLocOffset = (this->m_drawingLines - 1) * 2;
     return (loc - staffLocOffset) * doc->GetDrawingUnit(this->m_drawingStaffSize);
@@ -176,7 +176,6 @@ int Staff::ResetDrawing(FunctorParams *functorParams)
     this->m_timeSpanningElements.clear();
     return FUNCTOR_CONTINUE;
 };
-
 
 int Staff::PrepareRpt(FunctorParams *functorParams)
 {

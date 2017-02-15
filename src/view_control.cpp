@@ -180,7 +180,6 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         if (!Check(last)) return;
         x2 = last->GetDrawingX() + last->GetRightBarLineXRel();
         spanningType = SPANNING_MIDDLE;
-        
     }
 
     std::vector<Staff *>::iterator staffIter;

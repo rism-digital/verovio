@@ -118,10 +118,10 @@ void Measure::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 int Measure::GetDrawingX() const
 {
-    System *system = dynamic_cast<System*>(this->GetFirstParent(SYSTEM));
+    System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
     assert(system);
     return (system->GetDrawingX() + this->GetDrawingXRel());
 }
@@ -383,17 +383,17 @@ int Measure::AlignVertically(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Measure::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
-    
+
     params->m_rightDefaultAlignment = NULL;
-    
+
     // We process it backward because we want to get the rightDefaultAlignment
     m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
-    
+
     return FUNCTOR_SIBLINGS;
 }
 
@@ -401,10 +401,10 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 {
     AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
-    
+
     std::vector<int>::iterator iter;
     std::vector<AttComparison *> filters;
-    for(iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
+    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
         params->m_minPos = 0;
         params->m_upcomingMinPos = VRV_UNSET;
         params->m_cumulatedXShift = 0;
@@ -418,7 +418,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         ns.push_back(*iter);
         AttCommonNComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
-        
+
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
 
@@ -558,14 +558,14 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Measure::PrepareCrossStaff(FunctorParams *functorParams)
 {
     PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
     assert(params);
-    
+
     params->m_currentMeasure = this;
-    
+
     return FUNCTOR_CONTINUE;
 }
 

@@ -696,12 +696,12 @@ void View::DrawMeasure(DeviceContext *dc, Measure *measure, System *system)
     DrawMeasureChildren(dc, measure, measure, system);
 
     if (measure->GetDrawingLeftBarLine() != BARRENDITION_NONE) {
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetLeftBarLine()->GetDrawingX(),
-            measure->GetLeftBarLine());
+        DrawScoreDef(
+            dc, &m_drawingScoreDef, measure, measure->GetLeftBarLine()->GetDrawingX(), measure->GetLeftBarLine());
     }
     if (measure->GetDrawingRightBarLine() != BARRENDITION_NONE) {
-        DrawScoreDef(dc, &m_drawingScoreDef, measure, measure->GetRightBarLine()->GetDrawingX(),
-            measure->GetRightBarLine());
+        DrawScoreDef(
+            dc, &m_drawingScoreDef, measure, measure->GetRightBarLine()->GetDrawingX(), measure->GetRightBarLine());
     }
 
     if (measure->IsMeasuredMusic()) {
@@ -723,7 +723,7 @@ int View::CalculateRestPosY(Staff *staff, char duration, int location, bool hasM
 
     int staff_space = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     int offset = 9;
-    
+
     switch (duration) {
         case DUR_LG: offset -= 1; break;
         case DUR_BR: offset += 0; break;
@@ -826,8 +826,8 @@ void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
     Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     if (!layer || !layer->HasStaffDef()) return;
 
-    //StaffDef staffDef;
-    //dc->StartGraphic(&staffDef, "", staffDef.GetUuid());
+    // StaffDef staffDef;
+    // dc->StartGraphic(&staffDef, "", staffDef.GetUuid());
 
     // draw the scoreDef if required
     if (layer->GetStaffDefClef()) {
@@ -843,7 +843,7 @@ void View::DrawStaffDef(DeviceContext *dc, Staff *staff, Measure *measure)
         DrawLayerElement(dc, layer->GetStaffDefMeterSig(), layer, staff, measure);
     }
 
-    //dc->EndGraphic(&staffDef, this);
+    // dc->EndGraphic(&staffDef, this);
 }
 
 void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *measure)
@@ -856,8 +856,8 @@ void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *meas
     Layer *layer = dynamic_cast<Layer *>(staff->FindChildByType(LAYER));
     if (!layer || !layer->HasCautionStaffDef()) return;
 
-    //StaffDef staffDef;
-    //dc->StartGraphic(&staffDef, "cautionary", staffDef.GetUuid());
+    // StaffDef staffDef;
+    // dc->StartGraphic(&staffDef, "cautionary", staffDef.GetUuid());
 
     // draw the scoreDef if required
     if (layer->GetCautionStaffDefClef()) {
@@ -873,7 +873,7 @@ void View::DrawStaffDefCautionary(DeviceContext *dc, Staff *staff, Measure *meas
         DrawLayerElement(dc, layer->GetCautionStaffDefMeterSig(), layer, staff, measure);
     }
 
-    //dc->EndGraphic(&staffDef, this);
+    // dc->EndGraphic(&staffDef, this);
 }
 
 //----------------------------------------------------------------------------

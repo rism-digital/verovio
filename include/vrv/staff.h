@@ -51,7 +51,7 @@ public:
     ///@{
     virtual void AddChild(Object *object);
     ///@}
-    
+
     /**
      * @name Get the Y drawing position
      */
@@ -64,7 +64,7 @@ public:
      * Return the index position of the staff in its measure parent
      */
     int GetStaffIdx() const { return Object::GetIdx(); }
-    
+
     /**
      * Calculate the yRel for the staff given a @loc value
      */

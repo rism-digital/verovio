@@ -138,7 +138,7 @@ public:
      * Get the staffDef with number n (NULL if not found).
      */
     StaffDef *GetStaffDef(int n);
-    
+
     /**
      * Return all the @n values of the staffDef in a scoreDef
      */

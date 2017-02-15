@@ -62,12 +62,12 @@ public:
      * The TimestampAttr it not added as child of the measure but to the Measure::m_timestamps array.
      */
     void AddTimestamp(TimestampAttr *timestampAttr);
-    
+
     /**
      * Get the X drawing position
      */
     virtual int GetDrawingX() const;
-    
+
     /**
      * @name Get and set the X drawing relative positions
      */
@@ -75,7 +75,6 @@ public:
     int GetDrawingXRel() const { return m_drawingXRel; }
     void SetDrawingXRel(int drawingXRel);
     ///@}
-
 
     /**
      * Return the index position of the measure in its system parent
@@ -200,14 +199,14 @@ public:
      * See Object::SetAlignmentXPos
      */
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
-    
+
     /**
      * See Object::AdjustGraceXPos
      */
     ///@{
     virtual int AdjustGraceXPos(FunctorParams *functorParams);
     ///@}
-    
+
     /**
      * See Object::AdjustXPos
      */
@@ -244,7 +243,7 @@ public:
      * See Object::FillStaffCurrentTimeSpanningEnd
      */
     virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams);
-    
+
     /**
      * See Object::PrepareCrossStaff
      */

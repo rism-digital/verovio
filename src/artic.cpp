@@ -93,7 +93,7 @@ void Artic::UpdateOutsidePartPosition(int yAbove, int yBelow, data_STAFFREL plac
 {
     ArticPart *outsidePart = GetOutsidePart();
     if (!outsidePart) return;
-    
+
     // This is not great: in order to avoid m_drawingYRel to be overwritten by each call of DrawAccid we
     // check the value here. Otherwise the adjusted value (See AdjustArtic and AdjustArticWithSlurs will be lost)
     if (outsidePart->GetDrawingYRel() != 0) return;
@@ -105,14 +105,13 @@ void Artic::UpdateOutsidePartPosition(int yAbove, int yBelow, data_STAFFREL plac
         outsidePart->SetDrawingYRel(yAbove);
     else
         outsidePart->SetDrawingYRel(yBelow);
-
 }
 
 void Artic::UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place)
 {
     ArticPart *insidePart = GetInsidePart();
     if (!insidePart) return;
-    
+
     // See comment in Artic::UpdateOutsidePartPosition
     if (insidePart->GetDrawingYRel() != 0) return;
 
@@ -313,12 +312,14 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
             if (insidePart->GetPlace() == STAFFREL_above) {
                 int inTop = insidePart->GetContentTop();
                 int outBottom = outsidePart->GetContentBottom();
-                if (inTop > outBottom) outsidePart->SetDrawingYRel(outsidePart->GetDrawingYRel() + inTop - outBottom + margin);
+                if (inTop > outBottom)
+                    outsidePart->SetDrawingYRel(outsidePart->GetDrawingYRel() + inTop - outBottom + margin);
             }
             else {
                 int inBottom = insidePart->GetContentBottom();
                 int outTop = outsidePart->GetContentTop();
-                if (inBottom < outTop) outsidePart->SetDrawingYRel(outsidePart->GetDrawingYRel() + outTop - inBottom + margin);
+                if (inBottom < outTop)
+                    outsidePart->SetDrawingYRel(outsidePart->GetDrawingYRel() + outTop - inBottom + margin);
             }
         }
     }

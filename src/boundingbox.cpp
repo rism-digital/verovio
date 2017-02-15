@@ -46,7 +46,7 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 
     int min_x = std::min(x1, x2);
     int max_x = std::max(x1, x2);
-    
+
     int drawingX = GetDrawingX();
 
     min_x -= drawingX;
@@ -68,7 +68,7 @@ void BoundingBox::UpdateContentBBoxY(int y1, int y2)
     int max_y = std::max(y1, y2);
 
     int drawingY = GetDrawingY();
-    
+
     min_y -= drawingY;
     max_y -= drawingY;
 
@@ -88,7 +88,7 @@ void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
     int max_x = std::max(x1, x2);
 
     int drawingX = GetDrawingX();
-    
+
     min_x -= drawingX;
     max_x -= drawingX;
 
@@ -108,7 +108,7 @@ void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
     int max_y = std::max(y1, y2);
 
     int drawingY = GetDrawingY();
-    
+
     min_y -= drawingY;
     max_y -= drawingY;
 
@@ -119,7 +119,7 @@ void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
 
     // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
 }
- 
+
 /*
 int BoundingBox::GetDrawingX() const
 {

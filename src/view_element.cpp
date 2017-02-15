@@ -297,11 +297,13 @@ void View::DrawArtic(
         place = STAFFREL_above;
 
     /************** calculate the y position **************/
-    
+
     int staffYBottom = -m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
-    int yInAbove = std::max(parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), staffYBottom);
-    int yInBelow = std::min(parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), 0);
+    int yInAbove
+        = std::max(parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), staffYBottom);
+    int yInBelow
+        = std::min(parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), 0);
     int yOutAbove = std::max(yInAbove, 0);
     int yOutBelow = std::min(yInBelow, staffYBottom);
 
@@ -1419,7 +1421,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
                 dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
                 // HARDCODED
-                accidXShift -= extend.m_width + m_doc->GetGraceSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
+                accidXShift
+                    -= extend.m_width + m_doc->GetGraceSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
                 dc->ResetFont();
             }
             accid->SetDrawingXRel(accidXShift);

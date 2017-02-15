@@ -191,8 +191,8 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
         }
 
         assert(false);
-        //accid->SetDrawingX(xAccid);
-        //accid->SetDrawingY(noteY);
+        // accid->SetDrawingX(xAccid);
+        // accid->SetDrawingY(noteY);
     }
 
     DrawLayerChildren(dc, note, layer, staff, measure);

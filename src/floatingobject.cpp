@@ -175,7 +175,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
 void FloatingPositioner::ResetPositioner()
 {
     BoundingBox::ResetBoundingBox();
-    
+
     m_objectX = NULL;
     m_objectY = NULL;
 
@@ -205,7 +205,7 @@ void FloatingPositioner::SetObjectXY(Object *objectX, Object *objectY)
 {
     assert(objectX);
     assert(objectY);
-    
+
     m_objectX = objectX;
     m_objectY = objectY;
 }

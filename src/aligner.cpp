@@ -397,7 +397,7 @@ void GraceAligner::AlignStack()
     int i;
     double time = 0.0;
     for (i = (int)m_graceStack.size(); i > 0; i--) {
-        Note *note = dynamic_cast<Note*>(m_graceStack.at(i - 1));
+        Note *note = dynamic_cast<Note *>(m_graceStack.at(i - 1));
         assert(note);
         // get the duration of the event
         double duration = note->LayerElement::GetAlignmentDuration(NULL, NULL, false);
@@ -417,26 +417,26 @@ void GraceAligner::AlignStack()
 
 int GraceAligner::GetGraceGroupLeft(int staffN)
 {
-    Alignment *leftAlignment = dynamic_cast<Alignment*>(this->GetFirst());
+    Alignment *leftAlignment = dynamic_cast<Alignment *>(this->GetFirst());
     if (!leftAlignment) return -VRV_UNSET;
-    
+
     int minLeft, maxRight;
     leftAlignment->GetLeftRight(staffN, minLeft, maxRight);
-    
+
     return minLeft;
 }
 
 int GraceAligner::GetGraceGroupRight(int staffN)
 {
-    Alignment *rightAlignment = dynamic_cast<Alignment*>(this->GetLast());
+    Alignment *rightAlignment = dynamic_cast<Alignment *>(this->GetLast());
     if (!rightAlignment) return VRV_UNSET;
-    
+
     int minLeft, maxRight;
     rightAlignment->GetLeftRight(staffN, minLeft, maxRight);
-    
+
     return maxRight;
 }
-    
+
 //----------------------------------------------------------------------------
 // Alignment
 //----------------------------------------------------------------------------
@@ -496,12 +496,12 @@ void Alignment::SetXRel(int xRel)
 {
     m_xRel = xRel;
 }
-    
+
 void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
 {
     GetAlignmentLeftRightParams getAlignmentLeftRightParams;
     Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
-    
+
     if (staffN != VRV_UNSET) {
         std::vector<AttComparison *> filters;
         AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
@@ -510,11 +510,10 @@ void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
     }
     else
         this->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams);
-    
+
     minLeft = getAlignmentLeftRightParams.m_minLeft;
     maxRight = getAlignmentLeftRightParams.m_maxRight;
 }
-
 
 GraceAligner *Alignment::GetGraceAligner()
 {
@@ -839,7 +838,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
-    
+
     // We are in a Measure aligner - redirect to the GraceAligner when it is a ALIGNMENT_GRACENOTE
     if (!params->m_isGraceAlignment) {
         // Do not process AlignmentReference children if no GraceAligner
@@ -849,14 +848,14 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             return FUNCTOR_SIBLINGS;
         }
         assert(m_type == ALIGNMENT_GRACENOTE);
-        
+
         // Change the flag for indicating that the alignment is child of a GraceAligner
         params->m_isGraceAlignment = true;
-        
+
         std::vector<int>::iterator iter;
         std::vector<AttComparison *> filters;
-        for(iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
-            
+        for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
+
             int graceMaxPos = this->GetXRel();
             // If we have a rightDefault, then this is (quite likely) the next note / chord
             // Get its minimum left and make it the max right position of the grace group
@@ -865,7 +864,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight);
                 if (minLeft != -VRV_UNSET) graceMaxPos = minLeft;
             }
-            
+
             params->m_graceMaxPos = graceMaxPos;
             params->m_graceUpcomingMaxPos = -VRV_UNSET;
             params->m_graceCumulatedXShift = 0;
@@ -873,32 +872,33 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             // Create ad comparison object for each type / @n
             AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
             filters.push_back(&matchStaff);
-            
-            m_graceAligner->Process(params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
+
+            m_graceAligner->Process(
+                params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
         }
-        
+
         // Change the flag back
         params->m_isGraceAlignment = false;
-        
+
         return FUNCTOR_CONTINUE;
     }
-    
+
     this->SetXRel(this->GetXRel() + params->m_graceCumulatedXShift);
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Alignment::AdjustGraceXPosEnd(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
-    
+
     if (params->m_graceUpcomingMaxPos != -VRV_UNSET) {
         params->m_graceMaxPos = params->m_graceUpcomingMaxPos;
         // We reset it for the next aligner
         params->m_graceUpcomingMaxPos = -VRV_UNSET;
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -907,7 +907,7 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
     AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
-    //LogDebug("Alignment type %d", m_type);
+    // LogDebug("Alignment type %d", m_type);
 
     this->SetXRel(this->GetXRel() + params->m_cumulatedXShift);
 
@@ -938,7 +938,7 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
         // Check if the left position of the group is on the left of the minPos
         // If not, move the aligment accordingly
         // We can set staffN as VRV_UNSET to align all staves (this should be an option)
-        // We can also define somewhere vector of staffDef@n to be aligned together 
+        // We can also define somewhere vector of staffDef@n to be aligned together
         int left = m_graceAligner->GetGraceGroupLeft(params->m_staffN);
         if (left < params->m_minPos) {
             int offset = (params->m_minPos - left);
@@ -946,7 +946,7 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
             params->m_minPos += offset;
             params->m_cumulatedXShift += offset;
         }
-        
+
         // Check if the right position of the group is on the right of the minPos
         // Inf not move the minPos (but not the alignment)
         int right = m_graceAligner->GetGraceGroupRight(params->m_staffN);
@@ -954,9 +954,8 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
             int offset = (right - params->m_minPos);
             params->m_minPos += offset;
         }
-        
+
         params->m_upcomingMinPos = std::max(right, params->m_upcomingMinPos);
-        
     }
 
     return FUNCTOR_CONTINUE;
@@ -987,33 +986,33 @@ int AlignmentReference::GetAlignmentLeftRight(FunctorParams *functorParams)
 {
     GetAlignmentLeftRightParams *params = dynamic_cast<GetAlignmentLeftRightParams *>(functorParams);
     assert(params);
-    
+
     int refLeft = GetObject()->GetContentLeft();
     if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
 
     int refRight = GetObject()->GetContentRight();
     if (params->m_maxRight < refRight) params->m_maxRight = refRight;
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
-    
+
     LogDebug("AlignmentRef staff %d", GetN());
     this->m_elementRef->Process(params->m_functor, params);
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int AlignmentReference::AdjustXPos(FunctorParams *functorParams)
 {
     AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
-    //LogDebug("AlignmentRef staff %d", GetN());
+    // LogDebug("AlignmentRef staff %d", GetN());
     this->m_elementRef->Process(params->m_functor, params, params->m_functorEnd);
 
     return FUNCTOR_CONTINUE;

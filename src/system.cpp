@@ -91,7 +91,7 @@ void System::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 int System::GetDrawingX() const
 {
     return m_drawingXRel;

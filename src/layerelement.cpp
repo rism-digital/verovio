@@ -132,7 +132,7 @@ Beam *LayerElement::IsInBeam()
         }
     }
     return NULL;
-}    
+}
 
 Alignment *LayerElement::GetGraceAlignment() const
 {
@@ -147,12 +147,12 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 }
 
 int LayerElement::GetDrawingX() const
-{    
+{
     assert(m_alignment);
 
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
     assert(measure);
-    
+
     int graceNoteShift = 0;
     if (this->HasGraceAlignment()) {
         graceNoteShift = this->GetGraceAlignment()->GetXRel();
@@ -377,7 +377,7 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
     // Exception here: the LayerElement::m_drawingYRel position is already set for horizontal alignment
     // See Object::SetAlignmentPitchPos - for this reason we need to reset it here and not in ResetVerticalAlignment
     m_drawingYRel = 0;
-    
+
     m_alignment = NULL;
     m_graceAlignment = NULL;
 
@@ -387,7 +387,7 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 int LayerElement::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     // Nothing to do since m_drawingYRel is reset in ResetHorizontalAlignment and set in SetAlignmentPitchPos
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -507,8 +507,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         params->m_measureAligner->SetMaxTime(params->m_time + duration);
 
     m_alignment = params->m_measureAligner->GetAlignmentAtTime(params->m_time, type);
-    if (type != ALIGNMENT_GRACENOTE)
-        m_alignment->AddLayerElementRef(this);
+    if (type != ALIGNMENT_GRACENOTE) m_alignment->AddLayerElementRef(this);
 
     if (this->IsGraceNote()) {
         GraceAligner *graceAligner = m_alignment->GetGraceAligner();
@@ -532,11 +531,11 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     assert(params);
 
     LayerElement *layerElementY = this;
-    Staff *staffY = dynamic_cast<Staff*>(this->GetFirstParent(STAFF));
+    Staff *staffY = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staffY);
-    Layer *layerY = dynamic_cast<Layer*>(this->GetFirstParent(LAYER));
+    Layer *layerY = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
     assert(layerY);
-    
+
     if (m_crossStaff && m_crossLayer) {
         layerElementY = m_crossLayer->GetAtPos(this->GetDrawingX());
         assert(layerElementY);
@@ -554,16 +553,18 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         }
         else {
             // do something for accid that are not children of a note - e.g., mensural?
-            int loc = PitchInterface::CalcLoc(accid->GetPloc(), accid->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+            int loc
+                = PitchInterface::CalcLoc(accid->GetPloc(), accid->GetOloc(), layerY->GetClefLocOffset(layerElementY));
             // Override it if we have a @loc ?
             if (accid->HasLoc()) loc = accid->GetLoc();
             this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
         }
     }
     else if (this->Is(CUSTOS) || this->Is(DOT)) {
-        PositionInterface *interface = dynamic_cast<PositionInterface*>(this);
+        PositionInterface *interface = dynamic_cast<PositionInterface *>(this);
         assert(interface);
-        int loc = PitchInterface::CalcLoc(interface->GetPloc(), interface->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+        int loc = PitchInterface::CalcLoc(
+            interface->GetPloc(), interface->GetOloc(), layerY->GetClefLocOffset(layerElementY));
         if (interface->HasLoc()) loc = interface->GetLoc();
         this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
     }
@@ -594,10 +595,11 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             int staffLoc = 4;
             if (rest->HasLoc()) staffLoc = rest->GetLoc();
             this->SetDrawingYRel(params->m_view->CalculateRestPosY(
-                      staffY, rest->GetActualDur(), staffLoc, hasMultipleLayer, isFirstLayer));
+                staffY, rest->GetActualDur(), staffLoc, hasMultipleLayer, isFirstLayer));
         }
         else {
-            int loc = PitchInterface::CalcLoc(rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
+            int loc
+                = PitchInterface::CalcLoc(rest->GetPloc(), rest->GetOloc(), layerY->GetClefLocOffset(layerElementY));
             // Override it if we have a @loc ?
             if (rest->HasLoc()) loc = rest->GetLoc();
             this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
@@ -611,9 +613,9 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
-    
+
     if (!this->HasGraceAlignment()) return FUNCTOR_CONTINUE;
-    
+
     int selfRight = this->GetSelfRight();
     int offset = selfRight - params->m_graceMaxPos;
     if (offset > 0) {
@@ -622,9 +624,9 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
         params->m_graceCumulatedXShift += (-offset);
         params->m_graceUpcomingMaxPos += (-offset);
     }
-    
+
     params->m_graceUpcomingMaxPos = std::min(this->GetSelfLeft(), params->m_graceUpcomingMaxPos);
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -648,7 +650,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     if (!this->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
         assert(this->Is(BARLINE_ATTR_LEFT) || this->Is(BARLINE_ATTR_RIGHT));
-        // This should happen for invis barline attribute. Otherwise the BB should be set to empty with Object::SetEmptyBB()
+        // This should happen for invis barline attribute. Otherwise the BB should be set to empty with
+        // Object::SetEmptyBB()
         // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
         selfLeft = this->GetAlignment()->GetXRel();
     }
@@ -657,7 +660,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         params->m_upcomingBoundingBoxes.push_back(this);
         selfLeft = this->GetSelfLeft();
     }
-    
+
     int offset = selfLeft - params->m_minPos;
     if (offset < 0) {
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
@@ -665,12 +668,12 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         params->m_cumulatedXShift += (-offset);
         params->m_upcomingMinPos += (-offset);
     }
-    
+
     int selfRight = this->HasUpdatedBB() ? this->GetSelfRight() : this->GetAlignment()->GetXRel();
     params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
 
     return FUNCTOR_CONTINUE;
-    
+
     /*
 
     // The negative offset is the part of the bounding box that overflows on the left
@@ -709,7 +712,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     // do not adjust the min pos and the max width since this is already handled by
     // the GraceAligner
-    
+
     //if (current->IsGraceNote()) {
     //    params->m_minPos = current->GetAlignment()->GetXRel();
     //    current->GetAlignment()->SetMaxWidth(0);

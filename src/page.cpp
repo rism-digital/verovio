@@ -124,7 +124,7 @@ void Page::LayOutHorizontally()
         setAlignmentXPosParams.m_longestActualDur = longestActualDur;
         this->Process(&setAlignmentX, &setAlignmentXPosParams);
     }
-    
+
     // Set the pitch / pos alignement
     // Once View::CalculateRestPosY will be move to Staff we will not need to pass a view anymore
     View view;
@@ -143,7 +143,8 @@ void Page::LayOutHorizontally()
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor adjustGraceXPos(&Object::AdjustGraceXPos);
     Functor adjustGraceXPosEnd(&Object::AdjustGraceXPosEnd);
-    AdjustGraceXPosParams adjustGraceXPosParams(doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_scoreDef.GetStaffNs());
+    AdjustGraceXPosParams adjustGraceXPosParams(
+        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_scoreDef.GetStaffNs());
     this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes

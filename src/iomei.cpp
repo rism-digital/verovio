@@ -2858,7 +2858,7 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
     vrvVerse->ReadLang(verse);
     vrvVerse->ReadCommon(verse);
     vrvVerse->ReadTypography(verse);
-    
+
     parent->AddChild(vrvVerse);
     return ReadMeiLayerChildren(vrvVerse, verse, vrvVerse);
 }

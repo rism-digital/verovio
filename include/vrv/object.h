@@ -265,7 +265,7 @@ public:
      * Return the index position of the object in its parent (-1 if not found)
      */
     int GetIdx() const;
-    
+
     /**
      * @name Get the X and Y drawing position
      */
@@ -499,7 +499,7 @@ public:
      */
     virtual int AlignMeasures(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
     virtual int AlignMeasuresEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    
+
     /**
      * Reset the horizontal alignment environment for various types for object.
      */
@@ -517,7 +517,7 @@ public:
      */
     virtual int AdjustGraceXPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
     virtual int AdjustGraceXPosEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
-    
+
     /**
      * Retrieve the minimum left and maximum right for an alignment.
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight
@@ -627,7 +627,7 @@ public:
      * @name Functors for preparing drawing
      */
     ///@{
-    
+
     /**
      * See cross-staff / layer pointers on LayerElement
      */

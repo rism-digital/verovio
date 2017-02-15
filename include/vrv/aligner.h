@@ -327,7 +327,7 @@ public:
     void SetType(AlignmentType type) { m_type = type; }
     AlignmentType GetType() const { return m_type; }
     ///@}
-    
+
     /**
      * Retrive the minimum left and maximum right position for the objects in an alignment.
      * Returns (-)VRV_UNSET in nothing for the staff specified.
@@ -351,7 +351,7 @@ public:
      * to keep consecutive symbols from overlapping or nearly overlapping: we assume spacing
      * will be increased as necessary later to avoid that. For modern notation (CMN), ideal space
      * is a function of time interval.
-     
+
      * For a discussion of the way engravers determine spacing, see Elaine Gould, _Behind Bars_,
      * p. 39. But we need something more flexible, because, for example: (1) We're interested in
      * music with notes of very long duration: say, music in mensural notation containing longas
@@ -359,7 +359,7 @@ public:
      * duration if the user wishes, and standard engravers' rules would waste a lot of space.
      * (2) For some purposes, spacing strictly proportional to duration is desirable. The most
      * flexible solution might be to get ideal spacing from a user-definable table, but using a
-     * formula with parameters can come close and has other advantages. 
+     * formula with parameters can come close and has other advantages.
      */
     virtual int HorizontalSpaceForDuration(
         double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
@@ -448,7 +448,7 @@ public:
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
-    
+
     /**
      * Getter for the Object
      */
@@ -457,17 +457,17 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::GetAlignmentLeftRight
      */
     virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
-    
+
     /**
      * See Object::AdjustGraceXPos
      */
     virtual int AdjustGraceXPos(FunctorParams *functorParams);
-    
+
     /**
      * See Object::AdjustXPos
      */
@@ -673,8 +673,7 @@ public:
     void SetWidth(int totalWidth) { m_totalWidth = totalWidth; }
     int GetWidth() const { return m_totalWidth; }
     ///@}
-    
-    
+
     /**
      * @name Return the left / right position of the first / last note matching by staffN
      * Setting staffN as VRV_UNSET will look for and align all staves.
@@ -683,7 +682,7 @@ public:
     int GetGraceGroupLeft(int staffN);
     int GetGraceGroupRight(int staffN);
     ///@{
-    
+
     //----------//
     // Functors //
     //----------//

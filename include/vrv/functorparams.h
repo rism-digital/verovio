@@ -102,7 +102,7 @@ public:
     AdjustArticWithSlursParams(Doc *doc) { m_doc = doc; }
     Doc *m_doc;
 };
-    
+
 //----------------------------------------------------------------------------
 // AdjustGraceXPosParams
 //----------------------------------------------------------------------------
@@ -121,7 +121,7 @@ public:
 
 class AdjustGraceXPosParams : public FunctorParams {
 public:
-    AdjustGraceXPosParams(Doc *doc, Functor * functor, Functor *functorEnd, std::vector<int> staffNs)
+    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
     {
         m_graceMaxPos = 0;
         m_graceUpcomingMaxPos = -VRV_UNSET;
@@ -133,7 +133,7 @@ public:
         m_functor = functor;
         m_functorEnd = functorEnd;
     }
-    
+
     int m_graceMaxPos;
     int m_graceUpcomingMaxPos;
     int m_graceCumulatedXShift;
@@ -211,7 +211,7 @@ public:
         m_cumulatedXShift = 0;
         m_staffN = 0;
         m_staffNs = staffNs;
-        //m_layerMinPos = 0;
+        // m_layerMinPos = 0;
         m_measureWidth = 0;
         m_doc = doc;
         m_functor = functor;
@@ -222,8 +222,8 @@ public:
     int m_cumulatedXShift;
     int m_staffN;
     std::vector<int> m_staffNs;
-    std::vector<BoundingBox*> m_boundingBoxes;
-    std::vector<BoundingBox*> m_upcomingBoundingBoxes;
+    std::vector<BoundingBox *> m_boundingBoxes;
+    std::vector<BoundingBox *> m_upcomingBoundingBoxes;
     int m_measureWidth;
     Doc *m_doc;
     Functor *m_functor;
@@ -625,7 +625,7 @@ public:
     int m_transSemi;
     int m_currentBpm;
 };
-    
+
 //----------------------------------------------------------------------------
 // GetAlignmentLeftRightParams
 //----------------------------------------------------------------------------
@@ -645,7 +645,7 @@ public:
     int m_minLeft;
     int m_maxRight;
 };
-    
+
 //----------------------------------------------------------------------------
 // IntegrateBoundingBoxYShiftParams
 //----------------------------------------------------------------------------
@@ -748,10 +748,7 @@ public:
 
 class PrepareCrossStaffParams : public FunctorParams {
 public:
-    PrepareCrossStaffParams()
-    {
-        m_currentMeasure = NULL;
-    }
+    PrepareCrossStaffParams() { m_currentMeasure = NULL; }
     Measure *m_currentMeasure;
 };
 
@@ -932,7 +929,7 @@ public:
     SaveParams(FileOutputStream *output) { m_output = output; }
     FileOutputStream *m_output;
 };
-    
+
 //----------------------------------------------------------------------------
 // SetAlignmentPitchPosParams
 //----------------------------------------------------------------------------

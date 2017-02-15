@@ -66,7 +66,7 @@ public:
 private:
     int m_n;
 };
-    
+
 //----------------------------------------------------------------------------
 // AttCommonNComparisonAny
 //----------------------------------------------------------------------------
@@ -75,12 +75,12 @@ private:
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
 class AttCommonNComparisonAny : public AttComparison {
-    
+
 public:
     AttCommonNComparisonAny(ClassId AttClassId, std::vector<int> ns) : AttComparison(AttClassId) { m_ns = ns; }
-    
+
     void SetNs(std::vector<int> ns) { m_ns = ns; }
-    
+
     virtual bool operator()(Object *object)
     {
         if (!MatchesType(object)) return false;
@@ -90,7 +90,7 @@ public:
         assert(element);
         return (std::find(m_ns.begin(), m_ns.end(), element->GetN()) != m_ns.end());
     }
-    
+
 private:
     std::vector<int> m_ns;
 };

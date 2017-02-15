@@ -441,20 +441,18 @@ void Object::AddChild(Object *child)
     // This should never happen because the method should be overridden
     assert(false);
 }
-    
-    
-    int Object::GetDrawingX() const
-    {
-        assert(m_parent);
-        return m_parent->GetDrawingX();
-        
-    }
-    
-    int Object::GetDrawingY() const
-    {
-        assert(m_parent);
-        return m_parent->GetDrawingY();
-    }
+
+int Object::GetDrawingX() const
+{
+    assert(m_parent);
+    return m_parent->GetDrawingX();
+}
+
+int Object::GetDrawingY() const
+{
+    assert(m_parent);
+    return m_parent->GetDrawingY();
+}
 
 int Object::GetChildIndex(const Object *child)
 {
@@ -1041,7 +1039,7 @@ int Object::AdjustGraceXPos(FunctorParams *functorParams)
         params->m_graceMinPos = 0;
         return FUNCTOR_CONTINUE;
     }
-    
+
     // we should have processed aligned before
     assert(note->GetGraceAlignment());
 
