@@ -415,6 +415,38 @@ void GraceAligner::AlignStack()
     m_graceStack.clear();
 }
 
+int GraceAligner::GetGraceGroupLeft(int staffN)
+{
+    Alignment *leftAlignment = dynamic_cast<Alignment*>(this->GetFirst());
+    if (!leftAlignment) return -VRV_UNSET;
+    
+    std::vector<AttComparison *> filters;
+    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+    filters.push_back(&matchStaff);
+    
+    GetAlignmentLeftRightParams getAlignmentLeftRightParams;
+    Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
+    leftAlignment->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
+    
+    return getAlignmentLeftRightParams.m_minLeft;
+}
+
+int GraceAligner::GetGraceGroupRight(int staffN)
+{
+    Alignment *rightAlignment = dynamic_cast<Alignment*>(this->GetLast());
+    if (!rightAlignment) return VRV_UNSET;
+    
+    std::vector<AttComparison *> filters;
+    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+    filters.push_back(&matchStaff);
+    
+    GetAlignmentLeftRightParams getAlignmentLeftRightParams;
+    Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
+    rightAlignment->Process(&getAlignmentLeftRight, &getAlignmentLeftRightParams, NULL, &filters);
+    
+    return getAlignmentLeftRightParams.m_maxRight;
+}
+    
 //----------------------------------------------------------------------------
 // Alignment
 //----------------------------------------------------------------------------
@@ -796,9 +828,9 @@ int StaffAlignment::IntegrateBoundingBoxYShift(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
 {
-    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
     
     // We are in a Measure aligner - redirect to the GraceAligner when it is a ALIGNMENT_GRACENOTE
@@ -835,9 +867,9 @@ int Alignment::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
     
-int Alignment::SetBoundingBoxGraceXShiftEnd(FunctorParams *functorParams)
+int Alignment::AdjustGraceXPosEnd(FunctorParams *functorParams)
 {
-    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
     
     if (params->m_graceUpcomingMaxPos != -VRV_UNSET) {
@@ -849,9 +881,9 @@ int Alignment::SetBoundingBoxGraceXShiftEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
+int Alignment::AdjustXPos(FunctorParams *functorParams)
 {
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
     //LogDebug("Alignment type %d", m_type);
@@ -880,13 +912,37 @@ int Alignment::SetBoundingBoxXShift(FunctorParams *functorParams)
     else if (m_type == ALIGNMENT_MEASURE_END) {
         this->SetXRel(params->m_minPos);
     }
+    else if (m_type == ALIGNMENT_GRACENOTE) {
+        assert(m_graceAligner);
+        // Check if the left position of the group is on the left of the minPos
+        // If not, move the aligment accordingly
+        
+        int left = m_graceAligner->GetGraceGroupLeft(params->m_staffN);
+        if (left < params->m_minPos) {
+            int offset = (params->m_minPos - left);
+            this->SetXRel(this->GetXRel() + offset);
+            params->m_minPos += offset;
+            params->m_cumulatedXShift += offset;
+        }
+        
+        // Check if the right position of the group is on the right of the minPos
+        // Inf not move the minPos (but not the alignment)
+        int right = m_graceAligner->GetGraceGroupRight(params->m_staffN);
+        if (right > params->m_minPos) {
+            int offset = (right - params->m_minPos);
+            params->m_minPos += offset;
+        }
+        
+        params->m_upcomingMinPos = std::max(right, params->m_upcomingMinPos);
+        
+    }
 
     return FUNCTOR_CONTINUE;
 }
 
-int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
+int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
 {
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
     if (params->m_upcomingMinPos != VRV_UNSET) {
@@ -905,10 +961,23 @@ int Alignment::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-    
-int AlignmentReference::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+int AlignmentReference::GetAlignmentLeftRight(FunctorParams *functorParams)
 {
-    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    GetAlignmentLeftRightParams *params = dynamic_cast<GetAlignmentLeftRightParams *>(functorParams);
+    assert(params);
+    
+    int refLeft = GetObject()->GetContentLeft();
+    if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
+
+    int refRight = GetObject()->GetContentRight();
+    if (params->m_maxRight < refRight) params->m_maxRight = refRight;
+    
+    return FUNCTOR_CONTINUE;
+}
+    
+int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
+{
+    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
     
     LogDebug("AlignmentRef staff %d", GetN());
@@ -917,9 +986,9 @@ int AlignmentReference::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
     
-int AlignmentReference::SetBoundingBoxXShift(FunctorParams *functorParams)
+int AlignmentReference::AdjustXPos(FunctorParams *functorParams)
 {
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
     //LogDebug("AlignmentRef staff %d", GetN());
@@ -1030,14 +1099,6 @@ int Alignment::JustifyX(FunctorParams *functorParams)
     if (m_type == ALIGNMENT_MEASURE_END) {
         params->m_measureXRel += this->m_xRel;
     }
-
-    return FUNCTOR_CONTINUE;
-}
-
-int GraceAligner::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
-{
-    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
-    assert(params);
 
     return FUNCTOR_CONTINUE;
 }

@@ -202,17 +202,17 @@ public:
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
     
     /**
-     * See Object::SetBoundingBoxGraceXShift
+     * See Object::AdjustGraceXPos
      */
     ///@{
-    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
     ///@}
     
     /**
-     * See Object::SetBoundingBoxXShift
+     * See Object::AdjustXPos
      */
     ///@{
-    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
+    virtual int AdjustXPos(FunctorParams *functorParams);
     ///@}
 
     /**

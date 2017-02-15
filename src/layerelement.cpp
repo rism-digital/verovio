@@ -607,15 +607,12 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 {
-    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
     
     if (!this->HasGraceAlignment()) return FUNCTOR_CONTINUE;
-    
-    //Note *note = dynamic_cast<Note *>(this);
-    //LogDebug("pname %d", note->GetPname());
     
     int selfRight = this->GetSelfRight();
     int offset = selfRight - params->m_graceMaxPos;
@@ -631,9 +628,9 @@ int LayerElement::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
+int LayerElement::AdjustXPos(FunctorParams *functorParams)
 {
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
     LogDebug("%s", this->GetClassName().c_str());
@@ -641,25 +638,26 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
     // we should have processed aligned before
     assert(this->GetAlignment());
 
-    if (!this->HasToBeAligned() || this->HasEmptyBB()) {
+    if (!this->HasToBeAligned()) {
         // if nothing to do with this type of element
         // this happens for example with Artic where only ArticPart children are aligned
         return FUNCTOR_CONTINUE;
     }
 
+    int selfLeft;
     if (!this->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
         assert(this->Is(BARLINE_ATTR_LEFT) || this->Is(BARLINE_ATTR_RIGHT));
         // This should happen for invis barline attribute. Otherwise the BB should be set to empty with Object::SetEmptyBB()
         // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
-        this->GetAlignment()->SetXRel(params->m_minPos);
-        return FUNCTOR_CONTINUE;
+        selfLeft = this->GetAlignment()->GetXRel();
     }
-
-    // We add it to the upcoming bouding boxes
-    params->m_upcomingBoundingBoxes.push_back(this);
-
-    int selfLeft = this->GetSelfLeft();
+    else {
+        // We add it to the upcoming bouding boxes
+        params->m_upcomingBoundingBoxes.push_back(this);
+        selfLeft = this->GetSelfLeft();
+    }
+    
     int offset = selfLeft - params->m_minPos;
     if (offset < 0) {
         this->GetAlignment()->SetXRel(this->GetAlignment()->GetXRel() - offset);
@@ -668,7 +666,8 @@ int LayerElement::SetBoundingBoxXShift(FunctorParams *functorParams)
         params->m_upcomingMinPos += (-offset);
     }
     
-    params->m_upcomingMinPos = std::max(this->GetSelfRight(), params->m_upcomingMinPos);
+    int selfRight = this->HasUpdatedBB() ? this->GetSelfRight() : this->GetAlignment()->GetXRel();
+    params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
 
     return FUNCTOR_CONTINUE;
     

@@ -1019,9 +1019,9 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
 }
 
 /*
-int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+int Object::AdjustGraceXPos(FunctorParams *functorParams)
 {
-    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
     // starting new layer

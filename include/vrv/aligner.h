@@ -351,19 +351,19 @@ public:
     virtual int JustifyX(FunctorParams *functorParams);
 
     /**
-     * See Object::SetBoundingBoxGraceXShift
+     * See Object::AdjustGraceXPos
      */
     ///@{
-    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
-    virtual int SetBoundingBoxGraceXShiftEnd(FunctorParams *functorParams);
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+    virtual int AdjustGraceXPosEnd(FunctorParams *functorParams);
     ///@}
 
     /**
-     * See Object::SetBoundingBoxXShift
+     * See Object::AdjustXPos
      */
     ///@{
-    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
+    virtual int AdjustXPos(FunctorParams *functorParams);
+    virtual int AdjustXPosEnd(FunctorParams *functorParams);
     ///@}
 
 private:
@@ -422,20 +422,30 @@ public:
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
+    
+    /**
+     * Getter for the Object
+     */
+    Object *GetObject() { return m_elementRef; }
 
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * See Object::SetBoundingBoxGraceXShift
-     */
-    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
     
     /**
-     * See Object::SetBoundingBoxXShift
+     * See Object::GetAlignmentLeftRight
      */
-    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
+    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+    
+    /**
+     * See Object::AdjustGraceXPos
+     */
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+    
+    /**
+     * See Object::AdjustXPos
+     */
+    virtual int AdjustXPos(FunctorParams *functorParams);
 
 private:
     Object *m_elementRef;
@@ -638,17 +648,18 @@ public:
     int GetWidth() const { return m_totalWidth; }
     ///@}
     
+    
+    /**
+     * @name Return the left / right position of the first / last note matching by staffN
+     */
+    ///@{
+    int GetGraceGroupLeft(int staffN);
+    int GetGraceGroupRight(int staffN);
+    ///@{
+    
     //----------//
     // Functors //
     //----------//
-    
-    /**
-     * See Object::SetBoundingBoxGraceXShift
-     */
-    ///@{
-    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
-    //virtual int SetBoundingBoxGraceXShiftEnd(FunctorParams *functorParams);
-    ///@}
 
 private:
     //

@@ -515,16 +515,22 @@ public:
      * Lay out the X positions of the grace notes looking at the bounding boxes.
      * The m_xShift is updated appropriately
      */
-    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
-    virtual int SetBoundingBoxGraceXShiftEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustGraceXPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustGraceXPosEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    
+    /**
+     * Retrieve the minimum left and maximum right for an alignment.
+     * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight
+     */
+    virtual int GetAlignmentLeftRight(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.
      * The m_xShift is updated appropriately
      * At the end, lay out the X positions of the staff content looking at the bounding boxes.
      */
-    virtual int SetBoundingBoxXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustXPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustXPosEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     ///@}
 

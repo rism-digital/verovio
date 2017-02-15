@@ -141,17 +141,17 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    Functor setBoundingBoxGraceXShift(&Object::SetBoundingBoxGraceXShift);
-    Functor setBoundingBoxGraceXShiftEnd(&Object::SetBoundingBoxGraceXShiftEnd);
-    SetBoundingBoxGraceXShiftParams setBoundingBoxGraceXShiftParams(doc, &setBoundingBoxGraceXShift, &setBoundingBoxGraceXShiftEnd, doc->m_scoreDef.GetStaffNs());
-    this->Process(&setBoundingBoxGraceXShift, &setBoundingBoxGraceXShiftParams, &setBoundingBoxGraceXShiftEnd);
+    Functor adjustGraceXPos(&Object::AdjustGraceXPos);
+    Functor adjustGraceXPosEnd(&Object::AdjustGraceXPosEnd);
+    AdjustGraceXPosParams adjustGraceXPosParams(doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_scoreDef.GetStaffNs());
+    this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    Functor setBoundingBoxXShift(&Object::SetBoundingBoxXShift);
-    Functor setBoundingBoxXShiftEnd(&Object::SetBoundingBoxXShiftEnd);
-    SetBoundingBoxXShiftParams setBoundingBoxXShiftParams(doc, &setBoundingBoxXShift, &setBoundingBoxXShiftEnd, doc->m_scoreDef.GetStaffNs());
-    this->Process(&setBoundingBoxXShift, &setBoundingBoxXShiftParams, &setBoundingBoxXShiftEnd);
+    Functor adjustXPos(&Object::AdjustXPos);
+    Functor adjustXPosEnd(&Object::AdjustXPosEnd);
+    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_scoreDef.GetStaffNs());
+    this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
     // Adjust measure X position
     AlignMeasuresParams alignMeasuresParams;
@@ -251,7 +251,7 @@ void Page::JustifyHorizontally()
     Functor justifyX(&Object::JustifyX);
     JustifyXParams justifyXParams(&justifyX);
     justifyXParams.m_systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar;
-    //this->Process(&justifyX, &justifyXParams);
+    this->Process(&justifyX, &justifyXParams);
 }
 
 int Page::GetContentHeight() const

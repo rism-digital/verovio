@@ -384,9 +384,9 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
     
-int Measure::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+int Measure::AdjustGraceXPos(FunctorParams *functorParams)
 {
-    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
     
     m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
@@ -394,9 +394,9 @@ int Measure::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::SetBoundingBoxXShift(FunctorParams *functorParams)
+int Measure::AdjustXPos(FunctorParams *functorParams)
 {
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
     
     std::vector<int>::iterator iter;
@@ -406,6 +406,7 @@ int Measure::SetBoundingBoxXShift(FunctorParams *functorParams)
         params->m_upcomingMinPos = VRV_UNSET;
         params->m_cumulatedXShift = 0;
         params->m_measureWidth = 0;
+        params->m_staffN = (*iter);
         filters.clear();
         // Create ad comparison object for each type / @n
         std::vector<int> ns;
