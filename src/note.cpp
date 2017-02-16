@@ -38,6 +38,7 @@ Note::Note()
     , AttColoration()
     , AttGraced()
     , AttNoteLogMensural()
+    , AttRelativesize()
     , AttStems()
     , AttStemsCmn()
     , AttTiepresent()
@@ -49,6 +50,7 @@ Note::Note()
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
+    RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -77,6 +79,7 @@ void Note::Reset()
     ResetColoration();
     ResetGraced();
     ResetNoteLogMensural();
+    ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();
@@ -165,7 +168,7 @@ void Note::ResetDrawingTieAttr()
 Accid *Note::GetDrawingAccid()
 {
     Accid *accid = dynamic_cast<Accid *>(this->FindChildByType(ACCID));
-    if (accid) accid->m_drawingCueSize = this->HasGrace();
+    if (accid && (this->HasGrace() || this->GetSize() == SIZE_cue)) accid->m_drawingCueSize = true;
     return accid;
 }
 

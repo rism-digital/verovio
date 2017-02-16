@@ -1255,7 +1255,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Chord *inChord = note->IsChordTone();
     Beam *inBeam = note->IsInBeam();
     bool inFTrem = note->IsInFTrem();
-    bool drawingCueSize = note->HasGrace();
+    bool drawingCueSize = false;
+    if (note->HasGrace() || note->GetSize() == SIZE_cue) drawingCueSize = true;
 
     int staffSize = staff->m_drawingStaffSize;
     int noteY = element->GetDrawingY();
@@ -1475,7 +1476,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
 
-    bool drawingCueSize = rest->IsCueSize();
+    bool drawingCueSize = false;
     int drawingDur = rest->GetActualDur();
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -1487,6 +1488,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // element->m_drawingStemEnd.y = element->GetDrawingY();
     // element->m_drawingStemStart.y = element->GetDrawingY();
 
+    if (rest->IsCueSize() || rest->GetSize() == SIZE_cue) drawingCueSize = true;
+    
     if (drawingDur > DUR_2) {
         x -= m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize) / 2;
     }
