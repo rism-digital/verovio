@@ -33,6 +33,7 @@ Chord::Chord()
     , StemmedDrawingInterface()
     , DurationInterface()
     , AttCommon()
+    , AttRelativesize()
     , AttStems()
     , AttStemsCmn()
     , AttTiepresent()
@@ -40,6 +41,7 @@ Chord::Chord()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -63,6 +65,7 @@ void Chord::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetCommon();
+    ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();
