@@ -163,7 +163,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     last = elementCount - 1;
 
     // We look only at the last note for checking if cue-sized. Somehow arbitrarily
-    params.m_cueSize = (*beamElementCoords).at(last)->m_element->IsCueSize();
+    params.m_cueSize = (*beamElementCoords).at(last)->m_element->IsGraceNote();
 
     /******************************************************************/
     // Calculate the beam slope and position
@@ -436,7 +436,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     params.m_stemDir = (dynamic_cast<AttStems *>(firstElement.m_element))->GetStemDir();
 
     // We look only at the first note for checking if cue-sized. Somehow arbitrarily
-    params.m_cueSize = firstElement.m_element->IsCueSize();
+    params.m_cueSize = firstElement.m_element->IsGraceNote();
 
     // x positions
     firstElement.m_x = firstElement.m_element->GetDrawingX();
@@ -651,7 +651,7 @@ void View::CalcBeam(
     verticalShift = ((params->m_shortestDur - DUR_8) * (params->m_beamWidth));
 
     // if the beam has smaller-size notes
-    if ((*beamElementCoords).at(last)->m_element->IsCueSize()) {
+    if ((*beamElementCoords).at(last)->m_element->IsGraceNote()) {
         verticalShift += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
     }
     else {

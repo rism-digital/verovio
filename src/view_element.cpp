@@ -216,7 +216,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
             // adjust the x position so it is centered
             wchar_t noteHead = (note->GetActualDur() < DUR_2) ? SMUFL_E0A2_noteheadWhole : SMUFL_E0A3_noteheadHalf;
-            int radius = m_doc->GetGlyphWidth(noteHead, staff->m_drawingStaffSize, note->IsCueSize());
+            int radius = m_doc->GetGlyphWidth(noteHead, staff->m_drawingStaffSize, note->IsGraceNote());
             x += (radius / 2);
         }
         TextExtend extend;
@@ -274,7 +274,7 @@ void View::DrawArtic(
     }
 
     stemDir = parentNote ? parentNote->GetDrawingStemDir() : parentChord->GetDrawingStemDir();
-    drawingCueSize = parent->IsCueSize();
+    drawingCueSize = parent->IsGraceNote();
 
     /************** placement **************/
 
@@ -512,7 +512,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         stemPoint = childChord->GetDrawingStemStart();
     }
     else {
-        drawingCueSize = childNote->IsCueSize();
+        drawingCueSize = childNote->IsGraceNote();
         stemDir = childNote->GetDrawingStemDir();
         stemMod = childNote->GetStemMod();
         stemPoint = childNote->GetDrawingStemStart();
@@ -584,7 +584,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int staffSize = staff->m_drawingStaffSize;
     int staffY = staff->GetDrawingY();
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
-    bool drawingCueSize = chord->IsCueSize();
+    bool drawingCueSize = chord->IsGraceNote();
     int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
     int fullUnit = m_doc->GetDrawingUnit(staffSize);
 
@@ -1251,7 +1251,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Chord *inChord = note->IsChordTone();
     Beam *inBeam = note->IsInBeam();
     bool inFTrem = note->IsInFTrem();
-    bool drawingCueSize = note->HasGrace();
+    bool drawingCueSize = note->IsGraceNote();
 
     int staffSize = staff->m_drawingStaffSize;
     int noteY = element->GetDrawingY();
@@ -1468,7 +1468,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
 
-    bool drawingCueSize = rest->IsCueSize();
+    bool drawingCueSize = rest->IsGraceNote();
     int drawingDur = rest->GetActualDur();
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -1624,13 +1624,16 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
 void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
 {
-    Note *note = dynamic_cast<Note *>(element);
-    assert(note);
+    DurationInterface *durInterface = dynamic_cast<DurationInterface *>(element);
+    assert(durInterface);
+    
+    StemmedDrawingInterface *stemInterface = dynamic_cast<StemmedDrawingInterface *>(element);
+    assert(stemInterface);
 
-    Staff *staff = dynamic_cast<Staff *>(note->GetFirstParent(STAFF));
+    Staff *staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
     assert(staff);
 
-    if (note->GetActualDur() < DUR_8) return;
+    if (durInterface->GetActualDur() < DUR_8) return;
 
     dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
     dc->SetBrush(AxBLACK, AxSOLID);
@@ -1640,10 +1643,10 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     int positionShiftY1 = positionShift * 2;
     int positionShiftX2 = positionShift * 3;
     int positionShiftY2 = positionShift * 6;
-    Point startPoint = note->GetDrawingStemStart();
+    Point startPoint = stemInterface->GetDrawingStemStart();
 
     // HARDCODED
-    if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
+    if (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
         dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPoint.y + positionShiftY1),
             ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPoint.y + positionShiftY2));
     }
@@ -1758,7 +1761,7 @@ void View::DrawLedgerLines(
     int staffY = staff->GetDrawingY();
     int staffSize = staff->m_drawingStaffSize;
     int betweenLines = m_doc->GetDrawingDoubleUnit(staffSize);
-    bool drawingCueSize = element->IsCueSize();
+    bool drawingCueSize = element->IsGraceNote();
     int ledge = m_doc->GetDrawingLedgerLineLength(staffSize, drawingCueSize);
     int noteDiameter = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize);
 
@@ -1969,7 +1972,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
     int drawingDur = (object->GetDurationInterface())->GetActualDur();
-    bool drawingCueSize = object->IsCueSize();
+    bool drawingCueSize = object->IsGraceNote();
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
 
     baseStem = m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
@@ -2044,10 +2047,14 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
     interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
     interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
     interface->SetDrawingStemDir(dir);
-
+    
     // cast to note is check when setting drawingCueSize value
-    if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_acc)) {
-        DrawAcciaccaturaSlash(dc, object);
+    if (drawingCueSize) {
+        assert(object->Is(NOTE) || object->Is(CHORD));
+        AttGraced *attGraced = dynamic_cast<AttGraced *>(object);
+        assert(attGraced);
+        if (attGraced->GetGrace() == GRACE_acc)
+            DrawAcciaccaturaSlash(dc, object);
     }
 }
 

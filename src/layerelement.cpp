@@ -97,10 +97,24 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
 
 bool LayerElement::IsGraceNote() const
 {
-    if (!this->Is(NOTE)) return false;
-    Note const *note = dynamic_cast<Note const *>(this);
-    assert(note);
-    return (note && note->HasGrace());
+    if (this->Is(NOTE)) {
+        Note const *note = dynamic_cast<Note const *>(this);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord)
+            return chord->HasGrace();
+        else
+            return (note->HasGrace());
+    }
+    else if (this->Is(CHORD)) {
+        Chord const *chord = dynamic_cast<Chord const *>(this);
+        assert(chord);
+        return (chord->HasGrace());
+    }
+    else {
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
+        return (note && (note->HasGrace()));
+    }
 }
 
 bool LayerElement::IsInLigature()
@@ -121,7 +135,7 @@ Beam *LayerElement::IsInBeam()
     Beam *beamParent = dynamic_cast<Beam *>(this->GetFirstParent(BEAM, MAX_BEAM_DEPTH));
     if (beamParent != NULL) {
         // This note is beamed and cue-sized
-        if (this->IsCueSize()) {
+        if (this->IsGraceNote()) {
             // If the note is part of the beam parent, this means we
             // have a beam of graced notes
             if (beamParent->GetListIndex(this) > -1) return beamParent;
@@ -281,17 +295,6 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
         }
     }
     return this->GetDrawingY();
-}
-
-bool LayerElement::IsCueSize()
-{
-    if (this->Is(NOTE)) {
-        const Note *note = dynamic_cast<const Note *>(this);
-        assert(note);
-        return (note->HasGrace());
-    }
-    Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
-    return (note && (note->HasGrace()));
 }
 
 void LayerElement::AdjustPname(int *pname, int *oct)
@@ -462,9 +465,6 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->Is(MRPT2) || this->Is(MULTIRPT)) {
         type = ALIGNMENT_FULLMEASURE2;
     }
-    else if (this->IsGraceNote()) {
-        type = ALIGNMENT_GRACENOTE;
-    }
     else if (this->Is(BEAM) || this->Is(TUPLET)) {
         type = ALIGNMENT_CONTAINER;
     }
@@ -493,6 +493,9 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         assert(note);
         m_alignment = note->GetAlignment();
         return FUNCTOR_CONTINUE;
+    }
+    else if (this->IsGraceNote()) {
+        type = ALIGNMENT_GRACENOTE;
     }
 
     // get the duration of the event

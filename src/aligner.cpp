@@ -388,7 +388,14 @@ Alignment *GraceAligner::GetAlignmentAtTime(double time, AlignmentType type)
 void GraceAligner::StackGraceElement(LayerElement *element)
 {
     // Nespresso: What else?
-    assert(element->Is(NOTE));
+    assert(element->Is(NOTE) || (element->Is(CHORD)));
+    
+    if (element->Is(NOTE)) {
+        Note *note = dynamic_cast<Note*>(element);
+        assert(note);
+        if (note->IsChordTone()) return;
+    }
+    
     m_graceStack.push_back(element);
 }
 
@@ -397,19 +404,29 @@ void GraceAligner::AlignStack()
     int i;
     double time = 0.0;
     for (i = (int)m_graceStack.size(); i > 0; i--) {
-        Note *note = dynamic_cast<Note *>(m_graceStack.at(i - 1));
-        assert(note);
+        LayerElement *element = dynamic_cast<LayerElement *>(m_graceStack.at(i - 1));
+        assert(element);
         // get the duration of the event
-        double duration = note->LayerElement::GetAlignmentDuration(NULL, NULL, false);
+        double duration = element->GetAlignmentDuration(NULL, NULL, false);
         // Time goes backward with grace notes
         time -= duration;
         Alignment *alignment = this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT);
-        note->SetGraceAlignment(alignment);
-        alignment->AddLayerElementRef(note);
-        // Now also align the accid (if any)
-        Accid *accid = note->GetDrawingAccid();
-        if (accid) {
-            accid->SetGraceAlignment(alignment);
+        element->SetGraceAlignment(alignment);
+        alignment->AddLayerElementRef(element);
+        
+        AttComparisonAny matchType({NOTE, ACCID});
+        ArrayOfObjects children;
+        ArrayOfObjects::iterator childrenIter;
+        element->FindAllChildByAttComparison(&children, &matchType);
+        
+        // Then the @n of each first staffDef
+        for (childrenIter = children.begin(); childrenIter != children.end(); childrenIter++) {
+            // Trick : FindAllChildByAttComparison include the element, which is probably a problem.
+            // With note, we want to set only accid, so make sure we do not set it twice
+            if (*childrenIter == element) continue;
+            LayerElement *childElement = dynamic_cast<LayerElement*>(*childrenIter);
+            assert(childElement);
+            childElement->SetGraceAlignment(alignment);
         }
     }
     m_graceStack.clear();
@@ -499,8 +516,8 @@ void Alignment::SetXRel(int xRel)
 
 void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
 {
-    GetAlignmentLeftRightParams getAlignmentLeftRightParams;
     Functor getAlignmentLeftRight(&Object::GetAlignmentLeftRight);
+    GetAlignmentLeftRightParams getAlignmentLeftRightParams(&getAlignmentLeftRight);
 
     if (staffN != VRV_UNSET) {
         std::vector<AttComparison *> filters;
@@ -986,13 +1003,9 @@ int AlignmentReference::GetAlignmentLeftRight(FunctorParams *functorParams)
 {
     GetAlignmentLeftRightParams *params = dynamic_cast<GetAlignmentLeftRightParams *>(functorParams);
     assert(params);
-
-    int refLeft = GetObject()->GetContentLeft();
-    if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
-
-    int refRight = GetObject()->GetContentRight();
-    if (params->m_maxRight < refRight) params->m_maxRight = refRight;
-
+    
+    this->GetObject()->Process(params->m_functor, params);
+    
     return FUNCTOR_CONTINUE;
 }
 

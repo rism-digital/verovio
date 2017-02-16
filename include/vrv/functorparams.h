@@ -637,13 +637,15 @@ public:
 
 class GetAlignmentLeftRightParams : public FunctorParams {
 public:
-    GetAlignmentLeftRightParams()
+    GetAlignmentLeftRightParams(Functor *functor)
     {
         m_minLeft = -VRV_UNSET;
         m_maxRight = VRV_UNSET;
+        m_functor = functor;
     }
     int m_minLeft;
     int m_maxRight;
+    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------

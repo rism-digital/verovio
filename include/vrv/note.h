@@ -90,7 +90,7 @@ public:
      * Overriding functions to return information from chord parent if any
      */
     ///@{
-    Chord *IsChordTone();
+    Chord *IsChordTone() const;
     int GetDrawingDur();
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}

@@ -522,7 +522,7 @@ public:
      * Retrieve the minimum left and maximum right for an alignment.
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight
      */
-    virtual int GetAlignmentLeftRight(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.

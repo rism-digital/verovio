@@ -254,7 +254,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     int staffY = staff->GetDrawingY();
     int baseStem, totalFlagStemHeight, flagStemHeight, nbFlags;
     int drawingDur = (object->GetDurationInterface())->GetActualDur();
-    bool drawingCueSize = object->IsCueSize();
+    bool drawingCueSize = object->IsGraceNote();
     int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
 
     baseStem = m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;

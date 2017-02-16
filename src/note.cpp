@@ -152,11 +152,11 @@ void Note::ResetDrawingTieAttr()
 Accid *Note::GetDrawingAccid()
 {
     Accid *accid = dynamic_cast<Accid *>(this->FindChildByType(ACCID));
-    if (accid) accid->m_drawingCueSize = this->HasGrace();
+    if (accid) accid->m_drawingCueSize = this->IsGraceNote();
     return accid;
 }
 
-Chord *Note::IsChordTone()
+Chord *Note::IsChordTone() const
 {
     return dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
 }
