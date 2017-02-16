@@ -1025,6 +1025,7 @@ void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
     mensur->WriteMensuralShared(currentNode);
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
+    mensur->WriteRelativesize(currentNode);
     mensur->WriteSlashcount(currentNode);
 }
 
@@ -2741,6 +2742,7 @@ bool MeiInput::ReadMeiMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadMensuralShared(mensur);
     vrvMensur->ReadMensurLog(mensur);
     vrvMensur->ReadMensurVis(mensur);
+    vrvMensur->ReadRelativesize(mensur);
     vrvMensur->ReadSlashcount(mensur);
 
     parent->AddChild(vrvMensur);
