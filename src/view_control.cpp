@@ -1415,7 +1415,7 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    int y = GetSylY(syl, staff);
+    int y = GetSylYRel(syl, staff);
     TextExtend extend;
 
     // The both correspond to the current system, which means no system break in-between (simple case)

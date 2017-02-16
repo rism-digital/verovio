@@ -1521,9 +1521,9 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     }
 
     // move the position back - to be updated HARDCODED also see View::DrawSylConnector and View::DrawSylConnectorLines
-    assert(false);
-    // syl->SetDrawingX(syl->GetStart()->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
-    // syl->SetDrawingY(GetSylY(syl, staff));
+    //assert(false);
+    syl->SetDrawingXRel(-m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
+    syl->SetDrawingYRel(GetSylYRel(syl, staff));
 
     dc->StartGraphic(syl, "", syl->GetUuid());
     dc->DeactivateGraphicY();
@@ -2311,11 +2311,11 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     return (currentX - accidWidthDiff == 0);
 }
 
-int View::GetSylY(Syl *syl, Staff *staff)
+int View::GetSylYRel(Syl *syl, Staff *staff)
 {
     assert(syl && staff);
 
-    int y = syl->GetStart()->GetDrawingY();
+    int y = 0; //syl->GetStart()->GetDrawingY();
     StaffAlignment *aligment = staff->GetAlignment();
     if (aligment) {
         FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
@@ -2323,7 +2323,7 @@ int View::GetSylY(Syl *syl, Staff *staff)
         int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
 
-        y = staff->GetDrawingY() - aligment->GetStaffHeight() - aligment->GetOverflowBelow()
+        y = - aligment->GetStaffHeight() - aligment->GetOverflowBelow()
             + (aligment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
     }
     return y;

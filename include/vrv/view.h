@@ -410,7 +410,7 @@ private:
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet *tuplet);
-    int GetSylY(Syl *syl, Staff *staff);
+    int GetSylYRel(Syl *syl, Staff *staff);
     ///@}
 
     /**
