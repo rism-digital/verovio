@@ -556,7 +556,7 @@ void HumdrumInput::createHeader(void)
     vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
     vector<vector<string> > respPeople;
     getRespPeople(respPeople, references);
-    pugi::xml_node fileDesc = m_doc->m_header.append_child("meiHead");
+    pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
 
     // <fileDesc> /////////////
     pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
@@ -817,7 +817,7 @@ void HumdrumInput::insertExtMeta(vector<hum::HumdrumLine *> &references)
         return;
     }
 
-    meiHead.append_copy(tmpdoc.document_element());
+    m_doc->m_header.first_child().append_copy(tmpdoc.document_element());
 }
 
 //////////////////////////////
