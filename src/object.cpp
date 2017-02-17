@@ -1075,20 +1075,20 @@ int Object::AdjustGraceXPos(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 */
-    
+
 int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 {
     GetAlignmentLeftRightParams *params = dynamic_cast<GetAlignmentLeftRightParams *>(functorParams);
     assert(params);
-    
+
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
-    
+
     int refLeft = this->GetSelfLeft();
     if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
-    
+
     int refRight = this->GetSelfRight();
     if (params->m_maxRight < refRight) params->m_maxRight = refRight;
-    
+
     return FUNCTOR_CONTINUE;
 }
 

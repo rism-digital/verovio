@@ -111,7 +111,7 @@ private:
      * Adjust the horizontal postition of the syl processing verse by verse
      */
     void AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc);
-    
+
     //
 public:
     /** Page width (MEI scoredef@page.width). Saved if != -1 */

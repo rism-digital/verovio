@@ -877,8 +877,8 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    //Custos *custos = dynamic_cast<Custos *>(element);
-    //assert(custos);
+    // Custos *custos = dynamic_cast<Custos *>(element);
+    // assert(custos);
 
     dc->StartGraphic(element, "", element->GetUuid());
 
@@ -1521,7 +1521,7 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     }
 
     // move the position back - to be updated HARDCODED also see View::DrawSylConnector and View::DrawSylConnectorLines
-    //assert(false);
+    // assert(false);
     syl->SetDrawingXRel(-m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
     syl->SetDrawingYRel(GetSylYRel(syl, staff));
 
@@ -1626,7 +1626,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
 {
     DurationInterface *durInterface = dynamic_cast<DurationInterface *>(element);
     assert(durInterface);
-    
+
     StemmedDrawingInterface *stemInterface = dynamic_cast<StemmedDrawingInterface *>(element);
     assert(stemInterface);
 
@@ -2047,14 +2047,13 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
     interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
     interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
     interface->SetDrawingStemDir(dir);
-    
+
     // cast to note is check when setting drawingCueSize value
     if (drawingCueSize) {
         assert(object->Is(NOTE) || object->Is(CHORD));
         AttGraced *attGraced = dynamic_cast<AttGraced *>(object);
         assert(attGraced);
-        if (attGraced->GetGrace() == GRACE_acc)
-            DrawAcciaccaturaSlash(dc, object);
+        if (attGraced->GetGrace() == GRACE_acc) DrawAcciaccaturaSlash(dc, object);
     }
 }
 
@@ -2323,7 +2322,7 @@ int View::GetSylYRel(Syl *syl, Staff *staff)
         int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
 
-        y = - aligment->GetStaffHeight() - aligment->GetOverflowBelow()
+        y = -aligment->GetStaffHeight() - aligment->GetOverflowBelow()
             + (aligment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
     }
     return y;

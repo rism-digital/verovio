@@ -94,7 +94,7 @@ public:
 private:
     std::vector<int> m_ns;
 };
-    
+
 //----------------------------------------------------------------------------
 // AttComparisonAny
 //----------------------------------------------------------------------------
@@ -103,18 +103,18 @@ private:
  * This class evaluates if the object is of a certain ClassId and has a @n of value n.
  */
 class AttComparisonAny : public AttComparison {
-    
+
 public:
     AttComparisonAny(std::vector<ClassId> classIds) : AttComparison(OBJECT) { m_classIds = classIds; }
-    
+
     void SetClassIds(std::vector<ClassId> classIds) { m_classIds = classIds; }
-    
+
     virtual bool operator()(Object *object)
     {
         ClassId classId = object->GetClassId();
         return (std::find(m_classIds.begin(), m_classIds.end(), classId) != m_classIds.end());
     }
-    
+
 private:
     std::vector<ClassId> m_classIds;
 };

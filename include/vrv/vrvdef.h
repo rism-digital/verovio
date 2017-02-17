@@ -201,7 +201,7 @@ typedef std::list<Object *> ListOfObjects;
 typedef std::vector<AttComparison *> ArrayOfAttComparisons;
 
 typedef std::vector<Note *> ChordCluster;
-    
+
 typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmentTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;

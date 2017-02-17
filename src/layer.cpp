@@ -387,19 +387,19 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     }
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Layer::AdjustSylSpacing(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
-    
+
     // reset it
     params->m_overlapingSyl.clear();
     params->m_previousSyl = NULL;
-    
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Layer::CalcMaxMeasureDuration(FunctorParams *functorParams)
 {
     CalcMaxMeasureDurationParams *params = dynamic_cast<CalcMaxMeasureDurationParams *>(functorParams);

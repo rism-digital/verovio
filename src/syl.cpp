@@ -125,26 +125,28 @@ int Syl::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     // Pass it to the pseudo functor of the interface
     return TimeSpanningInterface::InterfaceFillStaffCurrentTimeSpanning(functorParams, this);
 }
-    
+
 int Syl::AdjustSylSpacing(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
-    
-    if(!this->HasUpdatedHorizontalBB()) {
+
+    if (!this->HasUpdatedHorizontalBB()) {
         LogDebug("Syl %s is skipped in alignment - it is probably empty", this->GetUuid().c_str());
         return FUNCTOR_CONTINUE;
     }
-    
+
     if (params->m_previousSyl) {
-        int overlap = params->m_previousSyl->GetSelfRight() - this->GetSelfLeft(); // + params->m_doc->GetDrawingUnit(100);
+        int overlap
+            = params->m_previousSyl->GetSelfRight() - this->GetSelfLeft(); // + params->m_doc->GetDrawingUnit(100);
         if (overlap > 0) {
-            params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousSyl->GetAlignment(), this->GetAlignment(), overlap));
+            params->m_overlapingSyl.push_back(
+                std::make_tuple(params->m_previousSyl->GetAlignment(), this->GetAlignment(), overlap));
         }
     }
-    
+
     params->m_previousSyl = this;
-    
+
     return FUNCTOR_CONTINUE;
 }
 

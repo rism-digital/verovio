@@ -1451,9 +1451,9 @@ void View::DrawSylConnector(
         dc->StartGraphic(syl, "spanning-connector", "");
 
     dc->DeactivateGraphic();
-    
+
     DrawSylConnectorLines(dc, x1, x2, y, syl, staff);
-    
+
     dc->ReactivateGraphic();
     if (graphic) {
         dc->EndResumedGraphic(graphic, this);

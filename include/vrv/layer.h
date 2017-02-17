@@ -148,7 +148,7 @@ public:
      * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
-    
+
     /**
      * See Object::AdjustSylSpacing
      */

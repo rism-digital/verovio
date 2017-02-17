@@ -425,24 +425,25 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 
     return FUNCTOR_SIBLINGS;
 }
-    
+
 int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
 {
     AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
     assert(params);
-    
+
     // Here we also need to handle the last syl or the measure - we check the alignment with the right barline
     if (params->m_previousSyl) {
         int overlap = params->m_previousSyl->GetSelfRight() - this->GetRightBarLine()->GetAlignment()->GetXRel();
         if (overlap > 0) {
-           params->m_overlapingSyl.push_back(std::make_tuple(params->m_previousSyl->GetAlignment(), this->GetRightBarLine()->GetAlignment(), overlap));
+            params->m_overlapingSyl.push_back(std::make_tuple(
+                params->m_previousSyl->GetAlignment(), this->GetRightBarLine()->GetAlignment(), overlap));
         }
     }
 
     // Ajust the postion of the alignment according to what we have collected for this verse
     m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
     params->m_overlapingSyl.clear();
-    
+
     return FUNCTOR_CONTINUE;
 }
 

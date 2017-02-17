@@ -1,4 +1,4 @@
- /////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
 // Name:        page.cpp
 // Author:      Laurent Pugin
 // Created:     2005
@@ -153,13 +153,13 @@ void Page::LayOutHorizontally()
     Functor adjustXPosEnd(&Object::AdjustXPosEnd);
     AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_scoreDef.GetStaffNs());
     this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
-    
+
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
     PrepareProcessingListsParams prepareProcessingListsParams;
     Functor prepareProcessingLists(&Object::PrepareProcessingLists);
     this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
-    
+
     this->AdjustSylSpacingByVerse(prepareProcessingListsParams, doc);
 
     // Adjust measure X position
@@ -303,11 +303,11 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
     IntTree_t::iterator verses;
-    
+
     if (listsParams.m_verseTree.child.empty()) return;
-    
+
     std::vector<AttComparison *> filters;
-    
+
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     for (staves = listsParams.m_verseTree.child.begin(); staves != listsParams.m_verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
@@ -317,7 +317,7 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
                 AttCommonNComparison matchLayer(LAYER, layers->first);
                 AttCommonNComparison matchVerse(VERSE, verses->first);
                 filters = { &matchStaff, &matchLayer, &matchVerse };
-                
+
                 // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
                 // m_drawingLastNote is set only if the syl has a forward connector
                 AdjustSylSpacingParams adjustSylSpacingParams(doc);
@@ -328,5 +328,5 @@ void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Do
         }
     }
 }
-    
+
 } // namespace vrv

@@ -68,7 +68,7 @@ public:
      * See Object::FillStaffCurrentTimeSpanning
      */
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
-                
+
     /**
      * See Object::AdjustSylSpacing
      */

@@ -350,7 +350,7 @@ double MeasureAligner::GetMaxTime() const
 
     return m_rightAlignment->GetTime();
 }
-    
+
 void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments)
 {
     ArrayOfAdjustmentTuples::const_iterator iter;
@@ -370,10 +370,11 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         // We use a reverse iterator
         ArrayOfObjects::iterator alignIter;
         for (alignIter = m_children.begin(); alignIter != m_children.end(); alignIter++) {
-            Alignment *current = dynamic_cast<Alignment*>(*alignIter);
+            Alignment *current = dynamic_cast<Alignment *>(*alignIter);
             assert(current);
             // Nothing to do once we passed the start aligment
-            if (current->GetXRel() <= startX) continue;
+            if (current->GetXRel() <= startX)
+                continue;
             else if (current->GetXRel() >= endX) {
                 current->SetXRel(current->GetXRel() + dist);
                 continue;
@@ -425,13 +426,13 @@ void GraceAligner::StackGraceElement(LayerElement *element)
 {
     // Nespresso: What else?
     assert(element->Is(NOTE) || (element->Is(CHORD)));
-    
+
     if (element->Is(NOTE)) {
-        Note *note = dynamic_cast<Note*>(element);
+        Note *note = dynamic_cast<Note *>(element);
         assert(note);
         if (note->IsChordTone()) return;
     }
-    
+
     m_graceStack.push_back(element);
 }
 
@@ -449,18 +450,18 @@ void GraceAligner::AlignStack()
         Alignment *alignment = this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT);
         element->SetGraceAlignment(alignment);
         alignment->AddLayerElementRef(element);
-        
-        AttComparisonAny matchType({NOTE, ACCID});
+
+        AttComparisonAny matchType({ NOTE, ACCID });
         ArrayOfObjects children;
         ArrayOfObjects::iterator childrenIter;
         element->FindAllChildByAttComparison(&children, &matchType);
-        
+
         // Then the @n of each first staffDef
         for (childrenIter = children.begin(); childrenIter != children.end(); childrenIter++) {
             // Trick : FindAllChildByAttComparison include the element, which is probably a problem.
             // With note, we want to set only accid, so make sure we do not set it twice
             if (*childrenIter == element) continue;
-            LayerElement *childElement = dynamic_cast<LayerElement*>(*childrenIter);
+            LayerElement *childElement = dynamic_cast<LayerElement *>(*childrenIter);
             assert(childElement);
             childElement->SetGraceAlignment(alignment);
         }
@@ -1039,9 +1040,9 @@ int AlignmentReference::GetAlignmentLeftRight(FunctorParams *functorParams)
 {
     GetAlignmentLeftRightParams *params = dynamic_cast<GetAlignmentLeftRightParams *>(functorParams);
     assert(params);
-    
+
     this->GetObject()->Process(params->m_functor, params);
-    
+
     return FUNCTOR_CONTINUE;
 }
 
