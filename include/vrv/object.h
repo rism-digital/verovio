@@ -513,7 +513,8 @@ public:
 
     /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
-     * The m_xShift is updated appropriately
+     * The functor is redirected from the MeasureAligner and then from the appropriate
+     * alignment to the GraceAligner
      */
     virtual int AdjustGraceXPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
     virtual int AdjustGraceXPosEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
@@ -526,11 +527,17 @@ public:
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.
-     * The m_xShift is updated appropriately
-     * At the end, lay out the X positions of the staff content looking at the bounding boxes.
+     * The functor process by aligned-staff content, that is from a rediction in the 
+     * MeasureAligner and then staff by staff but taking into account cross-staff elements
      */
     virtual int AdjustXPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
     virtual int AdjustXPosEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * Adjust the spacing of the syl processing verse by verse
+     */
+    virtual int AdjustSylSpacing(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustSylSpacingEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     ///@}
 

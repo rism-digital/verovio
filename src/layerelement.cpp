@@ -638,8 +638,6 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
-    LogDebug("%s", this->GetClassName().c_str());
-
     // we should have processed aligned before
     assert(this->GetAlignment());
 

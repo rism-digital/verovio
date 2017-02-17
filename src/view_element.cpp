@@ -877,8 +877,8 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    Custos *custos = dynamic_cast<Custos *>(element);
-    assert(custos);
+    //Custos *custos = dynamic_cast<Custos *>(element);
+    //assert(custos);
 
     dc->StartGraphic(element, "", element->GetUuid());
 
@@ -2315,7 +2315,7 @@ int View::GetSylYRel(Syl *syl, Staff *staff)
 {
     assert(syl && staff);
 
-    int y = 0; //syl->GetStart()->GetDrawingY();
+    int y = 0;
     StaffAlignment *aligment = staff->GetAlignment();
     if (aligment) {
         FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);

@@ -185,6 +185,28 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustSylSpacingParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a vector adjustment tuples (Aligment start, Aligment end, distance)
+ * member 1: a pointer to the previous Syl
+ * member 2: the doc
+ **/
+
+class AdjustSylSpacingParams : public FunctorParams {
+public:
+    AdjustSylSpacingParams(Doc *doc)
+    {
+        m_previousSyl = NULL;
+        m_doc = doc;
+    }
+    ArrayOfAdjustmentTuples m_overlapingSyl;
+    Syl *m_previousSyl;
+    Doc *m_doc;
+};
+    
+//----------------------------------------------------------------------------
 // AdjustXPosParams
 //----------------------------------------------------------------------------
 

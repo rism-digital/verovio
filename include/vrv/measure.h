@@ -203,16 +203,17 @@ public:
     /**
      * See Object::AdjustGraceXPos
      */
-    ///@{
     virtual int AdjustGraceXPos(FunctorParams *functorParams);
-    ///@}
-
+    
     /**
      * See Object::AdjustXPos
      */
-    ///@{
     virtual int AdjustXPos(FunctorParams *functorParams);
-    ///@}
+    
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    virtual int AdjustSylSpacingEnd(FunctorParams *functorParams);
 
     /**
      * See Object::AlignMeasures

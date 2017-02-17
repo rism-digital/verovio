@@ -326,7 +326,7 @@ void Doc::PrepareDrawing()
 
     // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
     for (staves = prepareProcessingListsParams.m_verseTree.child.begin();
-         staves != prepareProcessingListsParams.m_verseTree.child.end(); ++staves) {
+        staves != prepareProcessingListsParams.m_verseTree.child.end(); ++staves) {
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
             for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
                 // std::cout << staves->first << " => " << layers->first << " => " << verses->first << '\n';

@@ -350,6 +350,42 @@ double MeasureAligner::GetMaxTime() const
 
     return m_rightAlignment->GetTime();
 }
+    
+void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments)
+{
+    ArrayOfAdjustmentTuples::const_iterator iter;
+    for (iter = adjustments.begin(); iter != adjustments.end(); iter++) {
+        Alignment *start = std::get<0>(*iter);
+        assert(start);
+        Alignment *end = std::get<1>(*iter);
+        assert(end);
+        int dist = std::get<2>(*iter);
+        if ((start->GetXRel() >= end->GetXRel()) || (dist == 0)) {
+            LogDebug("Trying to ajdust alignment at the same position of with a distance of 0;");
+            continue;
+        }
+        // We need to store them because they are going to be changed in the loop below
+        int startX = start->GetXRel();
+        int endX = end->GetXRel();
+        // We use a reverse iterator
+        ArrayOfObjects::iterator alignIter;
+        for (alignIter = m_children.begin(); alignIter != m_children.end(); alignIter++) {
+            Alignment *current = dynamic_cast<Alignment*>(*alignIter);
+            assert(current);
+            // Nothing to do once we passed the start aligment
+            if (current->GetXRel() <= startX) continue;
+            else if (current->GetXRel() >= endX) {
+                current->SetXRel(current->GetXRel() + dist);
+                continue;
+            }
+            else {
+                int ratio = (current->GetXRel() - startX) * 100 / (endX - startX);
+                int shift = dist * ratio / 100;
+                current->SetXRel(current->GetXRel() + shift);
+            }
+        }
+    }
+}
 
 //----------------------------------------------------------------------------
 // GraceAligner

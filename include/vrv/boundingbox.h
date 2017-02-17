@@ -75,10 +75,14 @@ public:
     ///@}
 
     /**
-     * Is true if the bounding box (self or content) has been updated at least once.
+     * @name Is true if the bounding box (self or content) has been updated at least once.
      * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
      */
+    ///@{
     bool HasUpdatedBB() const { return (m_updatedBBoxX && m_updatedBBoxY); }
+    bool HasUpdatedHorizontalBB() const { return (m_updatedBBoxX); }
+    bool HasUpdatedVerticalBB() const { return (m_updatedBBoxY); }
+    ///@}
 
     /**
      * Returns true if the bounding box has a horizontal overlap with the other one.

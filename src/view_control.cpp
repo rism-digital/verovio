@@ -1415,7 +1415,7 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    int y = GetSylYRel(syl, staff);
+    int y = syl->GetDrawingY();
     TextExtend extend;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
@@ -1444,15 +1444,20 @@ void View::DrawSylConnector(
         // nothing to adjust
     }
 
-    if (graphic)
+    if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
     else
         dc->StartGraphic(syl, "spanning-connector", "");
+
     dc->DeactivateGraphic();
+    
     DrawSylConnectorLines(dc, x1, x2, y, syl, staff);
+    
     dc->ReactivateGraphic();
-    if (graphic)
+    if (graphic) {
         dc->EndResumedGraphic(graphic, this);
+    }
     else
         dc->EndGraphic(syl, this);
 }

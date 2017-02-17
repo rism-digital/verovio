@@ -585,6 +585,13 @@ public:
      */
     Alignment *GetRightAlignment() const { return m_rightAlignment; }
     Alignment *GetRightBarLineAlignment() const { return m_rightBarLineAlignment; }
+    
+    /**
+     * Adjust the spacing of the measure looking at each tuple of start / end alignment and a distance.
+     * The distance is an expansion value (positive) of compression (negative).
+     * Called from Measure::AdjustSylSpacingEnd.
+     */
+    void AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments);
 
     //----------//
     // Functors //
