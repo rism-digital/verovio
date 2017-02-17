@@ -627,8 +627,10 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
         params->m_graceCumulatedXShift += (-offset);
         params->m_graceUpcomingMaxPos += (-offset);
     }
+    
+    int selfLeft = this->GetSelfLeft() - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(params->m_doc->GetGraceSize(100)) / PARAM_DENOMINATOR;
 
-    params->m_graceUpcomingMaxPos = std::min(this->GetSelfLeft(), params->m_graceUpcomingMaxPos);
+    params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
     return FUNCTOR_CONTINUE;
 }
@@ -659,7 +661,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     else {
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
-        selfLeft = this->GetSelfLeft();
+        selfLeft = this->GetSelfLeft() - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     }
 
     int offset = selfLeft - params->m_minPos;
@@ -670,161 +672,17 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         params->m_upcomingMinPos += (-offset);
     }
 
-    int selfRight = this->HasUpdatedBB() ? this->GetSelfRight() : this->GetAlignment()->GetXRel();
+    int selfRight;
+    if (!this->HasUpdatedBB())
+        selfRight = this->GetAlignment()->GetXRel();
+    else
+        selfRight = this->GetSelfRight() + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
+        / PARAM_DENOMINATOR;
+    
     params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
 
     return FUNCTOR_CONTINUE;
 
-    /*
-
-    // The negative offset is the part of the bounding box that overflows on the left
-    // |____x_____|
-    //  ---- = negative offset
-    int negative_offset = -(this->GetSelfX1());
-
-    // Increase negative_offset by the symbol type's left margin, unless it's a note
-    // that's part of a ligature.
-    if (!this->IsGraceNote() && !this->IsInLigature())
-        negative_offset += (params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-            / PARAM_DENOMINATOR);
-
-    // This should never happen but can with glyphs not exactly registered at x=0 in the SMuFL font used
-    if (negative_offset < 0) negative_offset = 0;
-
-    // with a grace note, also take into account the full width of the group given by the GraceAligner
-    //if (current->GetAlignment()->HasGraceAligner()) {
-      //  negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth()
-      //  + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-    //}
-
-    int currentX = this->GetAlignment()->GetXRel();
-    // with grace note, take into account the position of the note in the grace group
-    //if (current->IsGraceNote()) {
-      //  Note *note = dynamic_cast<Note *>(current);
-      //  currentX += note->GetGraceAlignment()->GetXRel();
-    //}
-
-    // check if the element overlaps with the preceeding one given by (*minPos)
-    int overlap = params->m_minPos - currentX + negative_offset;
-
-    if ((currentX - negative_offset) < params->m_minPos) {
-        this->GetAlignment()->SetXShift(overlap);
-    }
-
-    // do not adjust the min pos and the max width since this is already handled by
-    // the GraceAligner
-
-    //if (current->IsGraceNote()) {
-    //    params->m_minPos = current->GetAlignment()->GetXRel();
-    //    current->GetAlignment()->SetMaxWidth(0);
-    //    return FUNCTOR_CONTINUE;
-    //}
-
-
-    // the next minimal position is given by the right side of the bounding box + the spacing of the element
-    int width = this->GetSelfX2();
-
-    // Move to right by the symbol type's right margin, unless it's a note that's
-    // part of a ligature.
-    if (!this->HasEmptyBB() && !this->IsInLigature())
-        width += params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-            / PARAM_DENOMINATOR;
-    params->m_minPos = this->GetAlignment()->GetXRel() + width;
-    this->GetAlignment()->SetMaxWidth(width);
-
-
-
-     // starting new layer
-     if (this->Is(LAYER)) {
-     params->m_minPos = params->m_layerMinPos;
-     return FUNCTOR_CONTINUE;
-     }
-
-     if (!this->IsLayerElement()) {
-     return FUNCTOR_CONTINUE;
-     }
-
-     LayerElement *current = dynamic_cast<LayerElement *>(this);
-     assert(current);
-
-     // we should have processed aligned before
-     assert(current->GetAlignment());
-
-     if (!current->HasToBeAligned()) {
-     // if nothing to do with this type of element
-     return FUNCTOR_CONTINUE;
-     }
-
-     if (!current->HasUpdatedBB()) {
-     // if nothing was drawn, do not take it into account
-     assert(false); // quite drastic but this should never happen. If nothing has to be drawn
-     LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
-     // then the BB should be set to empty with  Object::SetEmptyBB()
-     return FUNCTOR_CONTINUE;
-     }
-
-     if ((current->Is(NOTE)) && current->GetFirstParent(CHORD, MAX_CHORD_DEPTH)) {
-     return FUNCTOR_CONTINUE;
-     }
-
-     if ((current->Is(ACCID)) && current->GetFirstParent(NOTE, MAX_ACCID_DEPTH)) {
-     return FUNCTOR_CONTINUE;
-     }
-
-     // The negative offset is the part of the bounding box that overflows on the left
-     // |____x_____|
-     //  ---- = negative offset
-     int negative_offset = -(current->m_contentBB_x1);
-
-     // Increase negative_offset by the symbol type's left margin, unless it's a note
-     // that's part of a ligature.
-     if (!current->IsGraceNote() && !current->IsInLigature())
-     negative_offset += (params->m_doc->GetLeftMargin(current->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-     / PARAM_DENOMINATOR);
-
-     // This should never happen but can with glyphs not exactly registered at x=0 in the SMuFL font used
-     if (negative_offset < 0) negative_offset = 0;
-
-     // with a grace note, also take into account the full width of the group given by the GraceAligner
-     if (current->GetAlignment()->HasGraceAligner()) {
-     negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth()
-     + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-     }
-
-     int currentX = current->GetAlignment()->GetXRel();
-     // with grace note, take into account the position of the note in the grace group
-     if (current->IsGraceNote()) {
-     Note *note = dynamic_cast<Note *>(current);
-     currentX += note->GetGraceAlignment()->GetXRel();
-     }
-
-     // check if the element overlaps with the preceeding one given by (*minPos)
-     int overlap = params->m_minPos - currentX + negative_offset;
-
-     if ((currentX - negative_offset) < params->m_minPos) {
-     current->GetAlignment()->SetXShift(overlap);
-     }
-
-     // do not adjust the min pos and the max width since this is already handled by
-     // the GraceAligner
-     if (current->IsGraceNote()) {
-     params->m_minPos = current->GetAlignment()->GetXRel();
-     current->GetAlignment()->SetMaxWidth(0);
-     return FUNCTOR_CONTINUE;
-     }
-
-     // the next minimal position is given by the right side of the bounding box + the spacing of the element
-     int width = current->m_contentBB_x2;
-
-     // Move to right by the symbol type's right margin, unless it's a note that's
-     // part of a ligature.
-     if (!current->HasEmptyBB() && !current->IsInLigature())
-     width += params->m_doc->GetRightMargin(current->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-     / PARAM_DENOMINATOR;
-     params->m_minPos = current->GetAlignment()->GetXRel() + width;
-     current->GetAlignment()->SetMaxWidth(width);
-
-     */
 
     return FUNCTOR_CONTINUE;
 }
