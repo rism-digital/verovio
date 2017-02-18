@@ -409,7 +409,6 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         params->m_minPos = 0;
         params->m_upcomingMinPos = VRV_UNSET;
         params->m_cumulatedXShift = 0;
-        params->m_measureWidth = 0;
         params->m_staffN = (*iter);
         filters.clear();
         // Create ad comparison object for each type / @n
@@ -421,6 +420,18 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         filters.push_back(&matchStaff);
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
+    }
+    
+    int minMeasureWidth = params->m_doc->m_drawingMinMeasureWidth;
+    // First try to see if we have a double measure length element
+    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
+    Alignment *fullMeasure2 = dynamic_cast<Alignment *>(m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+    if (fullMeasure2 != NULL) minMeasureWidth *= 2;
+    
+    int currentMeasureWidth = this->GetRightBarLineX1Rel() - this->GetLeftBarLineX2Rel();
+    if (currentMeasureWidth < minMeasureWidth) {
+        ArrayOfAdjustmentTuples boundaries { std::make_tuple(this->GetLeftBarLine()->GetAlignment(), this->GetRightBarLine()->GetAlignment(), minMeasureWidth - currentMeasureWidth) };
+        m_measureAligner.AdjustProportionally(boundaries);
     }
 
     return FUNCTOR_SIBLINGS;

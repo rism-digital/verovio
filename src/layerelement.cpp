@@ -674,7 +674,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     int selfRight;
     if (!this->HasUpdatedBB())
-        selfRight = this->GetAlignment()->GetXRel();
+        selfRight = this->GetAlignment()->GetXRel() + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     else
         selfRight = this->GetSelfRight() + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
         / PARAM_DENOMINATOR;

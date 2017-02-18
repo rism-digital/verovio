@@ -968,22 +968,6 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
     if (GetType() == ALIGNMENT_CONTAINER) {
         return FUNCTOR_SIBLINGS;
     }
-    // A clef with a mRest or similar
-    else if ((GetType() == ALIGNMENT_CLEF) && (params->m_measureWidth != 0)) {
-        // The position of the clef is set by the meterSig - just make sure it is not
-        // smaller than the measureWidth currently being set
-        this->SetXRel(std::max(params->m_measureWidth, this->GetXRel()));
-    }
-    else if (GetType() == ALIGNMENT_FULLMEASURE) {
-        params->m_measureWidth = this->GetXRel() + params->m_doc->m_drawingMinMeasureWidth;
-    }
-    else if (GetType() == ALIGNMENT_FULLMEASURE2) {
-        params->m_measureWidth = this->GetXRel() + 2 * params->m_doc->m_drawingMinMeasureWidth;
-    }
-    else if (m_type == ALIGNMENT_MEASURE_RIGHT_BARLINE) {
-        params->m_minPos = std::max(params->m_minPos, params->m_measureWidth);
-        this->SetXRel(params->m_minPos);
-    }
     else if (m_type == ALIGNMENT_MEASURE_END) {
         this->SetXRel(params->m_minPos);
     }

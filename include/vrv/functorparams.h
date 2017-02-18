@@ -218,10 +218,9 @@ public:
  * member 4: the list of staffN in the top-level scoreDef
  * member 5: the bounding box in the previous aligner
  * member 6: the upcoming bounding boxes (to be used in the next aligner)
- * member 7: the maximum width in the current measure (for mRest, etc.)
- * member 8: the Doc
- * member 9: the Functor for redirection to the MeasureAligner
- * member 10: the end Functor for redirection
+ * member 7: the Doc
+ * member 8: the Functor for redirection to the MeasureAligner
+ * member 9: the end Functor for redirection
  **/
 
 class AdjustXPosParams : public FunctorParams {
@@ -233,8 +232,6 @@ public:
         m_cumulatedXShift = 0;
         m_staffN = 0;
         m_staffNs = staffNs;
-        // m_layerMinPos = 0;
-        m_measureWidth = 0;
         m_doc = doc;
         m_functor = functor;
         m_functorEnd = functorEnd;
@@ -246,7 +243,6 @@ public:
     std::vector<int> m_staffNs;
     std::vector<BoundingBox *> m_boundingBoxes;
     std::vector<BoundingBox *> m_upcomingBoundingBoxes;
-    int m_measureWidth;
     Doc *m_doc;
     Functor *m_functor;
     Functor *m_functorEnd;
