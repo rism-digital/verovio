@@ -244,6 +244,8 @@ private:
     std::string m_filename;
     /** octave offset **/
     std::vector<int> m_octDis;
+    /** measure repeats **/
+    bool m_mRpt = false;
     /** MIDI ticks */
     int m_ppq;
     /** LastElementID **/
