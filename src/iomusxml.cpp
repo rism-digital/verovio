@@ -812,12 +812,13 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Measure *measure
             AddLayerElement(layer, meiClef);
         }
     }
-    
+
     pugi::xpath_node measureRepeat = node.select_single_node("measure-style/measure-repeat");
     if (measureRepeat) {
         if (GetAttributeValue(measureRepeat.node(), "type") == "start")
-        m_mRpt = true;
-        else m_mRpt = false;
+            m_mRpt = true;
+        else
+            m_mRpt = false;
     }
 }
 
@@ -838,14 +839,36 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, i
             measure->SetLeft(barRendition);
         }
         else if (HasAttributeWithValue(node, "location", "middle")) {
-            LogWarning("Unsupported barline location '%s'", GetAttributeValue(node, "location").c_str());
+            LogWarning("Unsupported barline location 'middle'");
         }
-        else
+        else {
             measure->SetRight(barRendition);
+        }
     }
     pugi::xpath_node ending = node.select_single_node("ending");
     if (ending) {
-        // LogWarning("Endings not supported");
+        LogWarning("Endings not supported");
+    }
+    // fermatas
+    // @tstamp and @staff have yet to be added
+    pugi::xpath_node xmlFermata = node.select_single_node("fermata");
+    if (xmlFermata) {
+        Fermata *fermata = new Fermata();
+        m_controlElements.push_back(std::make_pair(measureNum, fermata));
+        // color
+        std::string colorStr = GetAttributeValue(xmlFermata.node(), "color");
+        if (!colorStr.empty()) fermata->SetColor(colorStr.c_str());
+        // shape
+        fermata->SetShape(ConvertFermataShape(GetContent(xmlFermata.node())));
+        // form and place
+        if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
+            fermata->SetForm(fermataVis_FORM_inv);
+            fermata->SetPlace(STAFFREL_below);
+        }
+        else {
+            fermata->SetForm(fermataVis_FORM_norm);
+            fermata->SetPlace(STAFFREL_above);
+        }
     }
 }
 
@@ -1003,7 +1026,7 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, i
     }
     else if (!prevNote && !node.select_single_node("preceding-sibling::backup")) {
         // If there is no previous or following note in the first layer, the measure seems to be empty
-        // We use here an invisible mRest, which should be replaced by mSpace, when available
+        // an invisible mRest is used, which should be replaced by mSpace, when available
         MRest *mRest = new MRest();
         mRest->SetVisible(BOOLEAN_false);
         AddLayerElement(layer, mRest);
@@ -1050,7 +1073,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     assert(staff);
 
     LayerElement *element = NULL;
-    
+
     // for measure repeats add a single <mRpt> and return
     if (m_mRpt) {
         MRpt *mRpt = dynamic_cast<MRpt *>((*layer).GetFirst(MRPT));
