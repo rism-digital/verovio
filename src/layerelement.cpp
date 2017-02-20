@@ -230,14 +230,14 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPa
         return std::min(firstY, lastY);
     }
 }
-    
+
 void LayerElement::CenterDrawingX()
 {
     m_drawingXRel = 0;
- 
+
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
     assert(measure);
-    
+
     m_drawingXRel = measure->GetInnerCenterX() - this->GetDrawingX();
 }
 
@@ -617,8 +617,10 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
         params->m_graceCumulatedXShift += (-offset);
         params->m_graceUpcomingMaxPos += (-offset);
     }
-    
-    int selfLeft = this->GetSelfLeft() - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(params->m_doc->GetGraceSize(100)) / PARAM_DENOMINATOR;
+
+    int selfLeft = this->GetSelfLeft()
+        - params->m_doc->GetLeftMargin(this->GetClassId())
+            * params->m_doc->GetDrawingUnit(params->m_doc->GetGraceSize(100)) / PARAM_DENOMINATOR;
 
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
@@ -651,7 +653,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     else {
         // We add it to the upcoming bouding boxes
         params->m_upcomingBoundingBoxes.push_back(this);
-        selfLeft = this->GetSelfLeft() - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+        selfLeft = this->GetSelfLeft()
+            - params->m_doc->GetLeftMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
     }
 
     int offset = selfLeft - params->m_minPos;
@@ -664,15 +667,17 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     int selfRight;
     if (!this->HasUpdatedBB())
-        selfRight = this->GetAlignment()->GetXRel() + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+        selfRight = this->GetAlignment()->GetXRel()
+            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
+                / PARAM_DENOMINATOR;
     else
-        selfRight = this->GetSelfRight() + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-        / PARAM_DENOMINATOR;
-    
+        selfRight = this->GetSelfRight()
+            + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
+                / PARAM_DENOMINATOR;
+
     params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
 
     return FUNCTOR_CONTINUE;
-
 
     return FUNCTOR_CONTINUE;
 }

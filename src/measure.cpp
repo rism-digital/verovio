@@ -184,13 +184,11 @@ int Measure::GetWidth() const
     assert(m_measureAligner.GetRightAlignment());
     return m_measureAligner.GetRightAlignment()->GetXRel();
 }
-    
-    
+
 int Measure::GetInnerWidth() const
 {
     return (this->GetRightBarLineLeft() - this->GetLeftBarLineRight());
 }
-
 
 int Measure::GetInnerCenterX() const
 {
@@ -430,16 +428,18 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
-    
+
     int minMeasureWidth = params->m_doc->m_drawingMinMeasureWidth;
     // First try to see if we have a double measure length element
     MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
-    Alignment *fullMeasure2 = dynamic_cast<Alignment *>(m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+    Alignment *fullMeasure2
+        = dynamic_cast<Alignment *>(m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
     if (fullMeasure2 != NULL) minMeasureWidth *= 2;
-    
+
     int currentMeasureWidth = this->GetRightBarLineLeft() - this->GetLeftBarLineRight();
     if (currentMeasureWidth < minMeasureWidth) {
-        ArrayOfAdjustmentTuples boundaries { std::make_tuple(this->GetLeftBarLine()->GetAlignment(), this->GetRightBarLine()->GetAlignment(), minMeasureWidth - currentMeasureWidth) };
+        ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this->GetLeftBarLine()->GetAlignment(),
+            this->GetRightBarLine()->GetAlignment(), minMeasureWidth - currentMeasureWidth) };
         m_measureAligner.AdjustProportionally(boundaries);
     }
 

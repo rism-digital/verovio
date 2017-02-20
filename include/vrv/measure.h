@@ -135,12 +135,12 @@ public:
      * Return the width of the measure, including the barLine width
      */
     int GetWidth() const;
-    
+
     /**
      * Return the inner width of the measure
      */
     int GetInnerWidth() const;
-    
+
     /**
      * Return the center x of the inner of the measure
      */

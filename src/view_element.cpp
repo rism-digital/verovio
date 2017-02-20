@@ -1082,7 +1082,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(mRest);
 
     dc->StartGraphic(element, "", element->GetUuid());
-    
+
     mRest->CenterDrawingX();
 
     int y = element->GetDrawingY();
@@ -1110,7 +1110,7 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     MRpt *mRpt = dynamic_cast<MRpt *>(element);
     assert(mRpt);
-    
+
     mRpt->CenterDrawingX();
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1150,7 +1150,7 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     MultiRest *multiRest = dynamic_cast<MultiRest *>(element);
     assert(multiRest);
-    
+
     multiRest->CenterDrawingX();
 
     int x1, x2, y1, y2, length;
@@ -1224,7 +1224,7 @@ void View::DrawMultiRpt(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     MultiRpt *multiRpt = dynamic_cast<MultiRpt *>(element);
     assert(multiRpt);
-    
+
     multiRpt->CenterDrawingX();
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1695,11 +1695,11 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
     assert(element);
     assert(layer);
     assert(staff);
-    
+
     int x, y;
 
     x = element->GetDrawingX();
-    
+
     // We move the fermata position of half of the fermata size
     x -= m_doc->GetGlyphWidth(SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false) / 2;
 

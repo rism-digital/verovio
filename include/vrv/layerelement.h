@@ -46,7 +46,7 @@ public:
      * Copy assignment for resetting pointers
      */
     LayerElement &operator=(const LayerElement &element);
-    
+
     /**
      * Return true if the element has to be aligned horizontally
      * It typically set to false for mRest, mRpt, etc.
@@ -100,7 +100,7 @@ public:
     int GetDrawingYRel() const { return m_drawingYRel; }
     virtual void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; }
     ///@}
-    
+
     /**
      * Ajust the m_drawingYRel for the element to be centered on the inner content of the measure
      */
