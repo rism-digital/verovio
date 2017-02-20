@@ -684,7 +684,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 }
                 pugi::xpath_node beats = time.node().select_single_node("beats");
                 if (beats && HasContent(beats.node())) {
-                    staffDef->SetMeterCount(staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string()));
+                    m_meterCount = staffDef->AttMeterSigDefaultLog::StrToInt(beats.node().text().as_string());
+                    staffDef->SetMeterCount(m_meterCount);
                 }
                 pugi::xpath_node beatType = time.node().select_single_node("beat-type");
                 if (beatType && HasContent(beatType.node())) {
@@ -780,6 +781,9 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
         else if (IsElement(*it, "note")) {
             ReadMusicXmlNote(*it, measure, measureNum);
         }
+        else if (IsElement(*it, "print")) {
+            ReadMusicXmlPrint(*it, measure, measureNum);
+        }
     }
 
     return true;
@@ -834,6 +838,12 @@ void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, in
 
 void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, int measureNum)
 {
+    assert(node);
+    assert(measure);
+
+    Staff *staff = dynamic_cast<Staff *>(measure->GetChild(0));
+    assert(staff);
+
     data_BARRENDITION barRendition = BARRENDITION_NONE;
     std::string barStyle = GetContentOfChild(node, "bar-style");
     pugi::xpath_node repeat = node.select_single_node("repeat");
@@ -854,11 +864,20 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, i
         LogWarning("Endings not supported");
     }
     // fermatas
-    // @tstamp and @staff have yet to be added
     pugi::xpath_node xmlFermata = node.select_single_node("fermata");
     if (xmlFermata) {
         Fermata *fermata = new Fermata();
         m_controlElements.push_back(std::make_pair(measureNum, fermata));
+        if (HasAttributeWithValue(node, "location", "left")) {
+            fermata->SetTstamp(0);
+        }
+        else if (HasAttributeWithValue(node, "location", "middle")) {
+            LogWarning("Unsupported barline location 'middle'");
+        }
+        else {
+            fermata->SetTstamp(m_meterCount + 1);
+        }
+        fermata->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
         // color
         std::string colorStr = GetAttributeValue(xmlFermata.node(), "color");
         if (!colorStr.empty()) fermata->SetColor(colorStr.c_str());
@@ -1630,6 +1649,12 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             iter->second.m_endID = m_ID;
         }
     }
+}
+
+void MusicXmlInput::ReadMusicXmlPrint(pugi::xml_node node, Measure *measure, int measureNum)
+{
+    assert(node);
+    assert(measure);
 }
 
 //////////////////////////////////////////////////////////////////////////////

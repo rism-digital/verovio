@@ -103,17 +103,17 @@ public:
     virtual bool ImportString(std::string const &musicxml);
 
 private:
-    /**
+    /*
      * Top level method called from ImportFile or ImportString
      */
     bool ReadMusicXml(pugi::xml_node root);
 
-    /**
+    /*
      * Method to fill MEI header with title
      */
     void ReadMusicXmlTitle(pugi::xml_node title);
 
-    /**
+    /*
      * @name Top level methods for reading MusicXml part and measure elements.
      */
     ///@{
@@ -121,61 +121,62 @@ private:
     bool ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, int nbStaves, int staffOffset);
     ///@}
 
-    /**
+    /*
      * Methods for reading the first MusicXml attributes element as MEI staffDef.
      * Returns the number of staves in the part.
      */
     int ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, StaffGrp *staffGrp, int staffOffset);
 
-    /**
+    /*
      * @name Methods for reading the content of a MusicXml measure.
      */
     ///@{
-    void ReadMusicXmlAttributes(pugi::xml_node, Measure *measure, int measureNb);
-    void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, int measureNb);
-    void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, int measureNb);
-    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, int measureNb);
-    void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNb);
-    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, int measureNb);
-    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNb);
+    void ReadMusicXmlAttributes(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlBackup(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlBarLine(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlDirection(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlForward(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlHarmony(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlNote(pugi::xml_node, Measure *measure, int measureNum);
+    void ReadMusicXmlPrint(pugi::xml_node, Measure *measure, int measureNum);
     ///@}
 
-    /**
+    /*
      * Add a Measure to the section.
      * If the measure already exists it will move all its content.
      * The measure can contain only staves. Other elements must be stacked on m_floatingElements.
      */
     void AddMeasure(Section *section, Measure *measure, int i);
 
-    /**
+    /*
      * Add a Layer element to the layer or to the LayerElement at the top of m_elementStack.
      */
     void AddLayerElement(Layer *layer, LayerElement *element);
 
-    /**
+    /*
      * Returns the appropriate layer for a node looking at its MusicXml staff and voice elements.
      */
     Layer *SelectLayer(pugi::xml_node node, Measure *measure);
 
-    /**
+    /*
      * Returns the appropriate first layer of a staff.
      */
     Layer *SelectLayer(int staffNb, Measure *measure);
 
-    /**
+    /*
      * Returns the layer with @n=layerNb on the staff.
      * Creates the layer if not found.
      */
     Layer *SelectLayer(int layerNb, Staff *staff);
 
-    /**
+    /*
      * Remove the last ClassId element on top of m_elementStack.
      * For example, when closing a beam, we need to remove it from the stack, but it is not
      * necessary the top one (for example we can have an opened chord there).
      */
     void RemoveLastFromStack(ClassId classId);
 
-    /**
+    /*
      * @name Helper methods for checking presence of values of attributes or elements
      */
     ///@{
@@ -185,7 +186,7 @@ private:
     bool HasContent(pugi::xml_node);
     ///@}
 
-    /**
+    /*
      * @name Helper methods for retrieving attribute values or element content
      */
     ///@{
@@ -194,7 +195,7 @@ private:
     std::string GetContentOfChild(pugi::xml_node node, std::string child);
     ///@}
 
-    /**
+    /*
      * @name Methods for opening and closing ties and slurs.
      * Opened ties and slurs are stacked together with musicxml::OpenTie
      * and musicxml::OpenSlur objects.
@@ -208,7 +209,7 @@ private:
     void CloseSlur(Staff *staff, Layer *layer, int number, LayerElement *element);
     ///@}
 
-    /**
+    /*
      * @name Helper methods for rendering text elements
      */
     ///@{
@@ -216,14 +217,14 @@ private:
     void TextRendition(pugi::xpath_node_set words, ControlElement *element);
     void PrintMetronome(pugi::xml_node metronome, Tempo *tempo);
 
-    /**
+    /*
      * @name Helper method for generating additional IDs
      */
     ///@{
     ///@}
     void GenerateUuid(pugi::xml_node node);
 
-    /**
+    /*
      * @name Methods for converting MusicXML string values to MEI attributes.
      */
     ///@{
@@ -240,32 +241,34 @@ private:
     ///@}
 
 private:
-    /** The filename */
+    /* The filename */
     std::string m_filename;
-    /** octave offset **/
+    /* octave offset **/
     std::vector<int> m_octDis;
-    /** measure repeats **/
+    /* measure repeats **/
     bool m_mRpt = false;
-    /** MIDI ticks */
+    /* MIDI ticks */
     int m_ppq;
-    /** LastElementID **/
+    /* meter count */
+    int m_meterCount = 0;
+    /* LastElementID **/
     std::string m_ID;
-    /** The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
+    /* The stack for piling open LayerElements (beams, tuplets, chords, etc.)  */
     std::vector<LayerElement *> m_elementStack;
-    /** The stack for open slurs */
+    /* The stack for open slurs */
     std::vector<std::pair<Slur *, musicxml::OpenSlur> > m_slurStack;
-    /** The stack for open ties */
+    /* The stack for open ties */
     std::vector<std::pair<Tie *, musicxml::OpenTie> > m_tieStack;
-    /** The stack for hairpins */
+    /* The stack for hairpins */
     std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> > m_hairpinStack;
-    /** The stacks for ControlElements */
+    /* The stacks for ControlElements */
     std::vector<Dir *> m_dirStack;
     std::vector<Dynam *> m_dynamStack;
     std::vector<Harm *> m_harmStack;
     std::vector<Octave *> m_octaveStack;
     std::vector<Pedal *> m_pedalStack;
     std::vector<Tempo *> m_tempoStack;
-    /**
+    /*
      * The stack of floating elements (tie, slur, etc.) to be added at the
      * end of each measure
      */
