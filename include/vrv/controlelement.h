@@ -32,7 +32,7 @@ public:
     ControlElement(std::string classid);
     virtual ~ControlElement();
     virtual void Reset();
-    virtual ClassId Is() const { return CONTROL_ELEMENT; }
+    virtual ClassId GetClassId() const { return CONTROL_ELEMENT; }
     ///@}
 
     //----------//

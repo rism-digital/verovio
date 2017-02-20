@@ -200,7 +200,7 @@ void ScoreDef::Reset()
 
 void ScoreDef::AddChild(Object *child)
 {
-    if (child->Is() == STAFFGRP) {
+    if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -308,7 +308,7 @@ void ScoreDef::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        if ((*iter)->Is() != STAFFDEF) {
+        if (!(*iter)->Is(STAFFDEF)) {
             iter = childList->erase(iter);
         }
         else {
@@ -326,7 +326,7 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     ListOfObjects::iterator iter;
 
     for (iter = childList->begin(); iter != childList->end(); ++iter) {
-        if ((*iter)->Is() != STAFFDEF) continue;
+        if (!(*iter)->Is(STAFFDEF)) continue;
         staffDef = dynamic_cast<StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetN() == n) {
@@ -361,7 +361,7 @@ void ScoreDef::SetDrawingWidth(int drawingWidth)
 //----------------------------------------------------------------------------
 
 StaffGrp::StaffGrp()
-    : Object()
+    : Object("staffgrp-")
     , ObjectListInterface()
     , AttCommon()
     , AttCommonPart()
@@ -394,10 +394,10 @@ void StaffGrp::Reset()
 
 void StaffGrp::AddChild(Object *child)
 {
-    if (child->Is() == STAFFDEF) {
+    if (child->Is(STAFFDEF)) {
         assert(dynamic_cast<StaffDef *>(child));
     }
-    else if (child->Is() == STAFFGRP) {
+    else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -419,7 +419,7 @@ void StaffGrp::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        if ((*iter)->Is() != STAFFDEF) {
+        if (!(*iter)->Is(STAFFDEF)) {
             iter = childList->erase(iter);
         }
         else {

@@ -191,7 +191,7 @@ bool Toolkit::SetOutputFormat(std::string const &outformat)
     else if (outformat == "midi") {
         m_outformat = MIDI;
     }
-    else {
+    else if (outformat != "svg") {
         LogError("Output format can only be: mei, humdrum, midi or svg");
         return false;
     }
@@ -942,7 +942,7 @@ double Toolkit::GetTimeForElement(const std::string &xmlId)
 {
     Object *element = m_doc.FindChildByUuid(xmlId);
     double timeofElement = 0.0;
-    if (element->Is() == NOTE) {
+    if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         timeofElement = note->m_playingOnset * 1000 / 120;
@@ -1043,7 +1043,7 @@ bool Toolkit::Drag(std::string elementId, int x, int y)
 {
     if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
-    if (element->Is() == NOTE) {
+    if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         Layer *layer = dynamic_cast<Layer *>(note->GetFirstParent(LAYER));
@@ -1097,6 +1097,7 @@ bool Toolkit::Set(std::string elementId, std::string attrType, std::string attrV
     if (!m_doc.GetDrawingPage()) return false;
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
     if (Att::SetCmn(element, attrType, attrValue)) return true;
+    if (Att::SetCmnornaments(element, attrType, attrValue)) return true;
     if (Att::SetCritapp(element, attrType, attrValue)) return true;
     if (Att::SetExternalsymbols(element, attrType, attrValue)) return true;
     if (Att::SetMei(element, attrType, attrValue)) return true;

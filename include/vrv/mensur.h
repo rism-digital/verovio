@@ -41,7 +41,7 @@ public:
     virtual ~Mensur();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Mensur"; }
-    virtual ClassId Is() const { return MENSUR; }
+    virtual ClassId GetClassId() const { return MENSUR; }
     virtual Object *Clone() const { return new Mensur(*this); }
     ///@}
 

@@ -9,6 +9,7 @@
 #define __VRV_TRILL_H__
 
 #include "atts_cmn.h"
+#include "atts_cmnornaments.h"
 #include "controlelement.h"
 #include "timeinterface.h"
 
@@ -18,7 +19,7 @@ namespace vrv {
 // Trill
 //----------------------------------------------------------------------------
 
-class Trill : public ControlElement, public TimePointInterface, public AttColor, public AttPlacement {
+class Trill : public ControlElement, public TimePointInterface, public AttColor, public AttOrnamentaccid, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -29,7 +30,7 @@ public:
     virtual ~Trill();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Trill"; }
-    virtual ClassId Is() const { return TRILL; }
+    virtual ClassId GetClassId() const { return TRILL; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

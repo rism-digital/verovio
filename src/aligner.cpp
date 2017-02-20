@@ -172,7 +172,7 @@ void StaffAlignment::SetVerseCount(int verse_count)
 
 int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
 {
-    if (box->Is() == FLOATING_POSITIONER) {
+    if (box->Is(FLOATING_POSITIONER)) {
         FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
         assert(positioner);
         return positioner->GetDrawingY() + positioner->m_contentBB_y2;
@@ -182,7 +182,7 @@ int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
 
 int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
 {
-    if (box->Is() == FLOATING_POSITIONER) {
+    if (box->Is(FLOATING_POSITIONER)) {
         FloatingPositioner *positioner = dynamic_cast<FloatingPositioner *>(box);
         assert(positioner);
         return -(positioner->GetDrawingY() + positioner->m_contentBB_y1 + m_staffHeight);
@@ -278,7 +278,7 @@ Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
     }
     // nothing found
     if (idx == -1) {
-        if ((type != ALIGNMENT_MEASURE_END) && (this->Is() != GRACE_ALIGNER)) {
+        if ((type != ALIGNMENT_MEASURE_END) && (!this->Is(GRACE_ALIGNER))) {
             // This typically occurs when a tstamp event occurs after the last note of a measure
             int rightBarlineIdx = m_rightBarLineAlignment->GetIdx();
             assert(rightBarlineIdx != -1);
@@ -540,7 +540,7 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
     ArrayOfFloatingPositioners::iterator iter;
     for (iter = m_floatingPositioners.begin(); iter != m_floatingPositioners.end(); ++iter) {
         assert((*iter)->GetObject());
-        if ((*iter)->GetObject()->Is() != params->m_classId) continue;
+        if (!(*iter)->GetObject()->Is(params->m_classId)) continue;
 
         // for slurs and ties we do not need to adjust them, only add them to the overflow boxes if required
         if ((params->m_classId == SLUR) || (params->m_classId == TIE)) {
@@ -608,8 +608,9 @@ int StaffAlignment::AdjustFloatingPostionerGrps(FunctorParams *functorParams)
         [params](FloatingPositioner *positioner) {
             assert(positioner->GetObject());
             // search in the desired classIds
-            return ((std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->Is())
-                        != params->m_classIds.end())
+            return (
+                (std::find(params->m_classIds.begin(), params->m_classIds.end(), positioner->GetObject()->GetClassId())
+                    != params->m_classIds.end())
                 && (positioner->GetObject()->GetDrawingGrpId() != 0));
         });
 

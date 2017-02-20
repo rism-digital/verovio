@@ -39,7 +39,7 @@ public:
     virtual ~Tempo();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Tempo"; }
-    virtual ClassId Is() const { return TEMPO; }
+    virtual ClassId GetClassId() const { return TEMPO; }
     ///@}
 
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }

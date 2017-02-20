@@ -20,6 +20,26 @@ namespace vrv {
 enum DurExtreme { LONGEST = 0, SHORTEST };
 
 //----------------------------------------------------------------------------
+// IsAttributeComparison
+//----------------------------------------------------------------------------
+
+/**
+ * This class evaluates if the object is of a certain ClassId and is an attribute in the original MEI.
+ */
+class IsAttributeComparison : public AttComparison {
+
+public:
+    IsAttributeComparison(ClassId AttClassId) : AttComparison(AttClassId) {}
+
+    virtual bool operator()(Object *object)
+    {
+        if (!MatchesType(object)) return false;
+        if (object->IsAttribute()) return true;
+        return false;
+    }
+};
+
+//----------------------------------------------------------------------------
 // AttCommonNComparison
 //----------------------------------------------------------------------------
 
@@ -159,7 +179,7 @@ public:
     {
         if (!MatchesType(object)) return false;
         // This should not happen, but just in case
-        if (object->Is() != NOTE) return false;
+        if (!object->Is(NOTE)) return false;
         Note *note = dynamic_cast<Note *>(object);
         assert(note);
         return ((note->m_playingOnset < m_time) && (note->m_playingOffset > m_time));

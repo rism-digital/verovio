@@ -77,22 +77,22 @@ void EditorialElement::AddChild(Object *child)
     else if (child->IsTextElement()) {
         assert(dynamic_cast<TextElement *>(child));
     }
-    else if (child->Is() == LAYER) {
+    else if (child->Is(LAYER)) {
         assert(dynamic_cast<Layer *>(child));
     }
-    else if (child->Is() == MEASURE) {
+    else if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
     }
-    else if (child->Is() == SCOREDEF) {
+    else if (child->Is(SCOREDEF)) {
         assert(dynamic_cast<ScoreDef *>(child));
     }
-    else if (child->Is() == STAFF) {
+    else if (child->Is(STAFF)) {
         assert(dynamic_cast<Staff *>(child));
     }
-    else if (child->Is() == STAFFDEF) {
+    else if (child->Is(STAFFDEF)) {
         assert(dynamic_cast<Staff *>(child));
     }
-    else if (child->Is() == STAFFGRP) {
+    else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<Staff *>(child));
     }
     else {
@@ -199,10 +199,10 @@ App::~App()
 
 void App::AddChild(Object *child)
 {
-    if (child->Is() == LEM) {
+    if (child->Is(LEM)) {
         assert(dynamic_cast<Lem *>(child));
     }
-    else if (child->Is() == RDG) {
+    else if (child->Is(RDG)) {
         assert(dynamic_cast<Rdg *>(child));
     }
     else {
@@ -244,28 +244,28 @@ Choice::~Choice()
 
 void Choice::AddChild(Object *child)
 {
-    if (child->Is() == ABBR) {
+    if (child->Is(ABBR)) {
         assert(dynamic_cast<Abbr *>(child));
     }
-    else if (child->Is() == CHOICE) {
+    else if (child->Is(CHOICE)) {
         assert(dynamic_cast<Choice *>(child));
     }
-    else if (child->Is() == CORR) {
+    else if (child->Is(CORR)) {
         assert(dynamic_cast<Corr *>(child));
     }
-    else if (child->Is() == EXPAN) {
+    else if (child->Is(EXPAN)) {
         assert(dynamic_cast<Expan *>(child));
     }
-    else if (child->Is() == ORIG) {
+    else if (child->Is(ORIG)) {
         assert(dynamic_cast<Orig *>(child));
     }
-    else if (child->Is() == REG) {
+    else if (child->Is(REG)) {
         assert(dynamic_cast<Reg *>(child));
     }
-    else if (child->Is() == SIC) {
+    else if (child->Is(SIC)) {
         assert(dynamic_cast<Sic *>(child));
     }
-    else if (child->Is() == UNCLEAR) {
+    else if (child->Is(UNCLEAR)) {
         assert(dynamic_cast<Unclear *>(child));
     }
     else {

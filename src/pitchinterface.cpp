@@ -21,9 +21,8 @@ namespace vrv {
 // PitchInterface
 //----------------------------------------------------------------------------
 
-PitchInterface::PitchInterface() : Interface(), AttAccidental(), AttNoteGes(), AttOctave(), AttPitch()
+PitchInterface::PitchInterface() : Interface(), AttNoteGes(), AttOctave(), AttPitch()
 {
-    RegisterInterfaceAttClass(ATT_ACCIDENTAL);
     RegisterInterfaceAttClass(ATT_NOTEGES);
     RegisterInterfaceAttClass(ATT_OCTAVE);
     RegisterInterfaceAttClass(ATT_PITCH);
@@ -37,7 +36,6 @@ PitchInterface::~PitchInterface()
 
 void PitchInterface::Reset()
 {
-    ResetAccidental();
     ResetNoteGes();
     ResetOctave();
     ResetPitch();

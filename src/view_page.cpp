@@ -182,22 +182,22 @@ void View::DrawSystemList(DeviceContext *dc, System *system, const ClassId class
     ListOfObjects::iterator iter;
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
-        if (((*iter)->Is() == classId) && (classId == HAIRPIN)) {
+        if ((*iter)->Is(classId) && (classId == HAIRPIN)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
-        if (((*iter)->Is() == classId) && (classId == OCTAVE)) {
+        if ((*iter)->Is(classId) && (classId == OCTAVE)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
-        if (((*iter)->Is() == classId) && (classId == SYL)) {
+        if ((*iter)->Is(classId) && (classId == SYL)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
-        if (((*iter)->Is() == classId) && (classId == TIE)) {
+        if ((*iter)->Is(classId) && (classId == TIE)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
-        if (((*iter)->Is() == classId) && (classId == SLUR)) {
+        if ((*iter)->Is(classId) && (classId == SLUR)) {
             DrawTimeSpanningElement(dc, *iter, system);
         }
-        if (((*iter)->Is() == classId) && (classId == ENDING)) {
+        if ((*iter)->Is(classId) && (classId == ENDING)) {
             // cast to Ending check in DrawEnding
             DrawEnding(dc, dynamic_cast<Ending *>(*iter), system);
         }
@@ -996,7 +996,7 @@ void View::DrawLayerList(DeviceContext *dc, Layer *layer, Staff *staff, Measure 
     ListOfObjects::iterator iter;
 
     for (iter = drawingList->begin(); iter != drawingList->end(); ++iter) {
-        if (((*iter)->Is() == classId) && (classId == TUPLET)) {
+        if ((*iter)->Is(classId) && (classId == TUPLET)) {
             Tuplet *tuplet = dynamic_cast<Tuplet *>((*iter));
             assert(tuplet);
             dc->ResumeGraphic(tuplet, tuplet->GetUuid());
@@ -1022,12 +1022,12 @@ void View::DrawSystemChildren(DeviceContext *dc, Object *parent, System *system)
 
     Object *current;
     for (current = parent->GetFirst(); current; current = parent->GetNext()) {
-        if (current->Is() == MEASURE) {
+        if (current->Is(MEASURE)) {
             // cast to Measure check in DrawMeasure
             DrawMeasure(dc, dynamic_cast<Measure *>(current), system);
         }
         // scoreDef are not drawn directly, but anything else should not be possible
-        else if (current->Is() == SCOREDEF) {
+        else if (current->Is(SCOREDEF)) {
             // nothing to do, then
             ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(current);
             assert(scoreDef);
@@ -1056,7 +1056,7 @@ void View::DrawMeasureChildren(DeviceContext *dc, Object *parent, Measure *measu
 
     Object *current;
     for (current = parent->GetFirst(); current; current = parent->GetNext()) {
-        if (current->Is() == STAFF) {
+        if (current->Is(STAFF)) {
             // cast to Staff check in DrawStaff
             DrawStaff(dc, dynamic_cast<Staff *>(current), measure, system);
         }
@@ -1084,7 +1084,7 @@ void View::DrawStaffChildren(DeviceContext *dc, Object *parent, Staff *staff, Me
 
     Object *current;
     for (current = parent->GetFirst(); current; current = parent->GetNext()) {
-        if (current->Is() == LAYER) {
+        if (current->Is(LAYER)) {
             // cast to Layer check in DrawLayer
             DrawLayer(dc, dynamic_cast<Layer *>(current), staff, measure);
         }
@@ -1148,9 +1148,9 @@ void View::DrawTextChildren(DeviceContext *dc, Object *parent, int x, int y, boo
 void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *element, System *system)
 {
     assert(element);
-    if (element->Is() == APP)
+    if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
-    else if (element->Is() == CHOICE)
+    else if (element->Is(CHOICE))
         assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_TOPLEVEL);
 
     std::string boundaryStart;
@@ -1167,9 +1167,9 @@ void View::DrawSystemEditorialElement(DeviceContext *dc, EditorialElement *eleme
 void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *element, Measure *measure, System *system)
 {
     assert(element);
-    if (element->Is() == APP)
+    if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_MEASURE);
-    else if (element->Is() == CHOICE)
+    else if (element->Is(CHOICE))
         assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_MEASURE);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1182,9 +1182,9 @@ void View::DrawMeasureEditorialElement(DeviceContext *dc, EditorialElement *elem
 void View::DrawStaffEditorialElement(DeviceContext *dc, EditorialElement *element, Staff *staff, Measure *measure)
 {
     assert(element);
-    if (element->Is() == APP)
+    if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_STAFF);
-    else if (element->Is() == CHOICE)
+    else if (element->Is(CHOICE))
         assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_STAFF);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1198,9 +1198,9 @@ void View::DrawLayerEditorialElement(
     DeviceContext *dc, EditorialElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(element);
-    if (element->Is() == APP)
+    if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_LAYER);
-    else if (element->Is() == CHOICE)
+    else if (element->Is(CHOICE))
         assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_LAYER);
 
     dc->StartGraphic(element, "", element->GetUuid());
@@ -1213,9 +1213,9 @@ void View::DrawLayerEditorialElement(
 void View::DrawTextEditorialElement(DeviceContext *dc, EditorialElement *element, int x, int y, bool &setX, bool &setY)
 {
     assert(element);
-    if (element->Is() == APP)
+    if (element->Is(APP))
         assert((dynamic_cast<App *>(element))->GetLevel() == EDITORIAL_TEXT);
-    else if (element->Is() == CHOICE)
+    else if (element->Is(CHOICE))
         assert((dynamic_cast<Choice *>(element))->GetLevel() == EDITORIAL_TEXT);
 
     dc->StartTextGraphic(element, "", element->GetUuid());

@@ -69,7 +69,7 @@ void Ligature::ClearClusters()
 
 void Ligature::AddChild(Object *child)
 {
-    if (child->Is() == NOTE) {
+    if (child->Is(NOTE)) {
         assert(dynamic_cast<LayerElement *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -147,17 +147,6 @@ void Ligature::FilterList(ListOfObjects *childList)
         lastPitch = curPitch;
 
         iter++;
-    }
-}
-
-void Ligature::ResetAccidList()
-{
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
-        Note *note = dynamic_cast<Note *>(*it);
-        assert(note);
-        if (note->m_drawingAccid != NULL) {
-        }
     }
 }
 

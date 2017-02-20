@@ -38,6 +38,7 @@
 #include "measure.h"
 #include "mensur.h"
 #include "metersig.h"
+#include "mordent.h"
 #include "mrest.h"
 #include "multirest.h"
 #include "note.h"
@@ -59,6 +60,7 @@
 #include "tie.h"
 #include "trill.h"
 #include "tuplet.h"
+#include "turn.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -169,308 +171,317 @@ bool MeiOutput::WriteObject(Object *object)
     }
 
     // Containers and scoreDef related
-    if (object->Is() == DOC) {
+    if (object->Is(DOC)) {
         WriteMeiDoc(dynamic_cast<Doc *>(object));
         m_nodeStack.push_back(m_currentNode);
         return true;
     }
 
-    if (object->Is() == PAGE) {
+    if (object->Is(PAGE)) {
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("page");
             WriteMeiPage(m_currentNode, dynamic_cast<Page *>(object));
         }
     }
-    else if (object->Is() == SYSTEM) {
+    else if (object->Is(SYSTEM)) {
         if (!m_scoreBasedMEI) {
             m_currentNode = m_currentNode.append_child("system");
             WriteMeiSystem(m_currentNode, dynamic_cast<System *>(object));
         }
     }
-    else if (object->Is() == SECTION) {
+    else if (object->Is(SECTION)) {
         m_currentNode = m_currentNode.append_child("section");
         WriteMeiSection(m_currentNode, dynamic_cast<Section *>(object));
     }
-    else if (object->Is() == ENDING) {
+    else if (object->Is(ENDING)) {
         m_currentNode = m_currentNode.append_child("ending");
         WriteMeiEnding(m_currentNode, dynamic_cast<Ending *>(object));
     }
-    else if (object->Is() == PB) {
+    else if (object->Is(PB)) {
         m_currentNode = m_currentNode.append_child("pb");
         WriteMeiPb(m_currentNode, dynamic_cast<Pb *>(object));
     }
-    else if (object->Is() == SB) {
+    else if (object->Is(SB)) {
         m_currentNode = m_currentNode.append_child("sb");
         WriteMeiSb(m_currentNode, dynamic_cast<Sb *>(object));
     }
-    else if (object->Is() == SCOREDEF) {
+    else if (object->Is(SCOREDEF)) {
         m_currentNode = m_currentNode.append_child("scoreDef");
         WriteMeiScoreDef(m_currentNode, dynamic_cast<ScoreDef *>(object));
     }
-    else if (object->Is() == STAFFGRP) {
+    else if (object->Is(STAFFGRP)) {
         m_currentNode = m_currentNode.append_child("staffGrp");
         WriteMeiStaffGrp(m_currentNode, dynamic_cast<StaffGrp *>(object));
     }
-    else if (object->Is() == STAFFDEF) {
+    else if (object->Is(STAFFDEF)) {
         m_currentNode = m_currentNode.append_child("staffDef");
         WriteMeiStaffDef(m_currentNode, dynamic_cast<StaffDef *>(object));
     }
-    else if (object->Is() == MEASURE) {
+    else if (object->Is(MEASURE)) {
         m_currentNode = m_currentNode.append_child("measure");
         WriteMeiMeasure(m_currentNode, dynamic_cast<Measure *>(object));
     }
-    else if (object->Is() == STAFF) {
+    else if (object->Is(STAFF)) {
         m_currentNode = m_currentNode.append_child("staff");
         WriteMeiStaff(m_currentNode, dynamic_cast<Staff *>(object));
     }
-    else if (object->Is() == LAYER) {
+    else if (object->Is(LAYER)) {
         m_currentNode = m_currentNode.append_child("layer");
         WriteMeiLayer(m_currentNode, dynamic_cast<Layer *>(object));
     }
 
     // Measure elements
-    else if (object->Is() == ANCHORED_TEXT) {
+    else if (object->Is(ANCHORED_TEXT)) {
         m_currentNode = m_currentNode.append_child("anchoredText");
         WriteMeiAnchoredText(m_currentNode, dynamic_cast<AnchoredText *>(object));
     }
-    else if (object->Is() == DIR) {
+    else if (object->Is(DIR)) {
         m_currentNode = m_currentNode.append_child("dir");
         WriteMeiDir(m_currentNode, dynamic_cast<Dir *>(object));
     }
-    else if (object->Is() == DYNAM) {
+    else if (object->Is(DYNAM)) {
         m_currentNode = m_currentNode.append_child("dynam");
         WriteMeiDynam(m_currentNode, dynamic_cast<Dynam *>(object));
     }
-    else if (object->Is() == FERMATA) {
+    else if (object->Is(FERMATA)) {
         m_currentNode = m_currentNode.append_child("fermata");
         WriteMeiFermata(m_currentNode, dynamic_cast<Fermata *>(object));
     }
-    else if (object->Is() == HAIRPIN) {
+    else if (object->Is(HAIRPIN)) {
         m_currentNode = m_currentNode.append_child("hairpin");
         WriteMeiHairpin(m_currentNode, dynamic_cast<Hairpin *>(object));
     }
-    else if (object->Is() == HARM) {
+    else if (object->Is(HARM)) {
         m_currentNode = m_currentNode.append_child("harm");
         WriteMeiHarm(m_currentNode, dynamic_cast<Harm *>(object));
     }
-    else if (object->Is() == OCTAVE) {
+    else if (object->Is(MORDENT)) {
+        m_currentNode = m_currentNode.append_child("mordent");
+        WriteMeiMordent(m_currentNode, dynamic_cast<Mordent *>(object));
+    }
+    else if (object->Is(OCTAVE)) {
         m_currentNode = m_currentNode.append_child("octave");
         WriteMeiOctave(m_currentNode, dynamic_cast<Octave *>(object));
     }
-    else if (object->Is() == PEDAL) {
+    else if (object->Is(PEDAL)) {
         m_currentNode = m_currentNode.append_child("pedal");
         WriteMeiPedal(m_currentNode, dynamic_cast<Pedal *>(object));
     }
-    else if (object->Is() == SLUR) {
+    else if (object->Is(SLUR)) {
         m_currentNode = m_currentNode.append_child("slur");
         WriteMeiSlur(m_currentNode, dynamic_cast<Slur *>(object));
     }
-    else if (object->Is() == TEMPO) {
+    else if (object->Is(TEMPO)) {
         m_currentNode = m_currentNode.append_child("tempo");
         WriteMeiTempo(m_currentNode, dynamic_cast<Tempo *>(object));
     }
-    else if (object->Is() == TIE) {
+    else if (object->Is(TIE)) {
         m_currentNode = m_currentNode.append_child("tie");
         WriteMeiTie(m_currentNode, dynamic_cast<Tie *>(object));
     }
-    else if (object->Is() == TRILL) {
+    else if (object->Is(TRILL)) {
         m_currentNode = m_currentNode.append_child("trill");
         WriteMeiTrill(m_currentNode, dynamic_cast<Trill *>(object));
     }
+    else if (object->Is(TURN)) {
+        m_currentNode = m_currentNode.append_child("turn");
+        WriteMeiTurn(m_currentNode, dynamic_cast<Turn *>(object));
+    }
 
     // Layer elements
-    else if (object->Is() == ACCID) {
-        m_currentNode = m_currentNode.append_child("accid");
+    else if (object->Is(ACCID)) {
+        // Do not add a node for object representing an attribute
+        if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("accid");
         WriteMeiAccid(m_currentNode, dynamic_cast<Accid *>(object));
     }
-    else if (object->Is() == ARTIC) {
+    else if (object->Is(ARTIC)) {
         // Do not add a node for object representing an attribute
         if (!object->IsAttribute()) m_currentNode = m_currentNode.append_child("artic");
         WriteMeiArtic(m_currentNode, dynamic_cast<Artic *>(object));
     }
-    else if (object->Is() == BARLINE) {
+    else if (object->Is(BARLINE)) {
         m_currentNode = m_currentNode.append_child("barLine");
         WriteMeiBarLine(m_currentNode, dynamic_cast<BarLine *>(object));
     }
-    else if (object->Is() == BEAM) {
+    else if (object->Is(BEAM)) {
         m_currentNode = m_currentNode.append_child("beam");
         WriteMeiBeam(m_currentNode, dynamic_cast<Beam *>(object));
     }
-    else if (object->Is() == BEATRPT) {
+    else if (object->Is(BEATRPT)) {
         m_currentNode = m_currentNode.append_child("beatRpt");
         WriteMeiBeatRpt(m_currentNode, dynamic_cast<BeatRpt *>(object));
     }
-    else if (object->Is() == BTREM) {
+    else if (object->Is(BTREM)) {
         m_currentNode = m_currentNode.append_child("bTrem");
         WriteMeiBTrem(m_currentNode, dynamic_cast<BTrem *>(object));
     }
-    else if (object->Is() == CHORD) {
+    else if (object->Is(CHORD)) {
         m_currentNode = m_currentNode.append_child("chord");
         WriteMeiChord(m_currentNode, dynamic_cast<Chord *>(object));
     }
-    else if (object->Is() == CLEF) {
+    else if (object->Is(CLEF)) {
         m_currentNode = m_currentNode.append_child("clef");
         WriteMeiClef(m_currentNode, dynamic_cast<Clef *>(object));
     }
-    else if (object->Is() == CUSTOS) {
+    else if (object->Is(CUSTOS)) {
         m_currentNode = m_currentNode.append_child("custos");
         WriteMeiCustos(m_currentNode, dynamic_cast<Custos *>(object));
     }
-    else if (object->Is() == DOT) {
+    else if (object->Is(DOT)) {
         m_currentNode = m_currentNode.append_child("dot");
         WriteMeiDot(m_currentNode, dynamic_cast<Dot *>(object));
     }
-    else if (object->Is() == FTREM) {
+    else if (object->Is(FTREM)) {
         m_currentNode = m_currentNode.append_child("fTrem");
         WriteMeiFTrem(m_currentNode, dynamic_cast<FTrem *>(object));
     }
-    else if (object->Is() == KEYSIG) {
+    else if (object->Is(KEYSIG)) {
         m_currentNode = m_currentNode.append_child("keySig");
         WriteMeiKeySig(m_currentNode, dynamic_cast<KeySig *>(object));
     }
-    else if (object->Is() == LIGATURE) {
+    else if (object->Is(LIGATURE)) {
         LogError("WriteMeiLigature not implemented. (MeiOutput::WriteObject)");
         // m_currentNode = m_currentNode.append_child("ligature");
         // WriteMeiLigature(m_currentNode, dynamic_cast<KeySig *>(object));
     }
-    else if (object->Is() == MENSUR) {
+    else if (object->Is(MENSUR)) {
         m_currentNode = m_currentNode.append_child("mensur");
         WriteMeiMensur(m_currentNode, dynamic_cast<Mensur *>(object));
     }
-    else if (object->Is() == METERSIG) {
+    else if (object->Is(METERSIG)) {
         m_currentNode = m_currentNode.append_child("meterSig");
         WriteMeiMeterSig(m_currentNode, dynamic_cast<MeterSig *>(object));
     }
-    else if (object->Is() == MREST) {
+    else if (object->Is(MREST)) {
         m_currentNode = m_currentNode.append_child("mRest");
         WriteMeiMRest(m_currentNode, dynamic_cast<MRest *>(object));
     }
-    else if (object->Is() == MRPT) {
+    else if (object->Is(MRPT)) {
         m_currentNode = m_currentNode.append_child("mRpt");
         WriteMeiMRpt(m_currentNode, dynamic_cast<MRpt *>(object));
     }
-    else if (object->Is() == MRPT2) {
+    else if (object->Is(MRPT2)) {
         m_currentNode = m_currentNode.append_child("mRpt2");
         WriteMeiMRpt2(m_currentNode, dynamic_cast<MRpt2 *>(object));
     }
-    else if (object->Is() == MULTIREST) {
+    else if (object->Is(MULTIREST)) {
         m_currentNode = m_currentNode.append_child("multiRest");
         WriteMeiMultiRest(m_currentNode, dynamic_cast<MultiRest *>(object));
     }
-    else if (object->Is() == MULTIRPT) {
+    else if (object->Is(MULTIRPT)) {
         m_currentNode = m_currentNode.append_child("multiRpt");
         WriteMeiMultiRpt(m_currentNode, dynamic_cast<MultiRpt *>(object));
     }
-    else if (object->Is() == NOTE) {
+    else if (object->Is(NOTE)) {
         m_currentNode = m_currentNode.append_child("note");
         WriteMeiNote(m_currentNode, dynamic_cast<Note *>(object));
     }
-    else if (object->Is() == PROPORT) {
+    else if (object->Is(PROPORT)) {
         m_currentNode = m_currentNode.append_child("proport");
         WriteMeiProport(m_currentNode, dynamic_cast<Proport *>(object));
     }
-    else if (object->Is() == REST) {
+    else if (object->Is(REST)) {
         m_currentNode = m_currentNode.append_child("rest");
         WriteMeiRest(m_currentNode, dynamic_cast<Rest *>(object));
     }
-    else if (object->Is() == SPACE) {
+    else if (object->Is(SPACE)) {
         m_currentNode = m_currentNode.append_child("space");
         WriteMeiSpace(m_currentNode, dynamic_cast<Space *>(object));
     }
-    else if (object->Is() == SYL) {
+    else if (object->Is(SYL)) {
         m_currentNode = m_currentNode.append_child("syl");
         WriteMeiSyl(m_currentNode, dynamic_cast<Syl *>(object));
     }
-    else if (object->Is() == TUPLET) {
+    else if (object->Is(TUPLET)) {
         m_currentNode = m_currentNode.append_child("tuplet");
         WriteMeiTuplet(m_currentNode, dynamic_cast<Tuplet *>(object));
     }
-    else if (object->Is() == VERSE) {
+    else if (object->Is(VERSE)) {
         m_currentNode = m_currentNode.append_child("verse");
         WriteMeiVerse(m_currentNode, dynamic_cast<Verse *>(object));
     }
 
     // Text elements
-    else if (object->Is() == REND) {
+    else if (object->Is(REND)) {
         m_currentNode = m_currentNode.append_child("rend");
         WriteMeiRend(m_currentNode, dynamic_cast<Rend *>(object));
     }
-    else if (object->Is() == TEXT) {
+    else if (object->Is(TEXT)) {
         WriteMeiText(m_currentNode, dynamic_cast<Text *>(object));
     }
 
     // Editorial markup
-    else if (object->Is() == ABBR) {
+    else if (object->Is(ABBR)) {
         m_currentNode = m_currentNode.append_child("abbr");
         WriteMeiAbbr(m_currentNode, dynamic_cast<Abbr *>(object));
     }
-    else if (object->Is() == ADD) {
+    else if (object->Is(ADD)) {
         m_currentNode = m_currentNode.append_child("add");
         WriteMeiAdd(m_currentNode, dynamic_cast<Add *>(object));
     }
-    else if (object->Is() == ANNOT) {
+    else if (object->Is(ANNOT)) {
         m_currentNode = m_currentNode.append_child("annot");
         WriteMeiAnnot(m_currentNode, dynamic_cast<Annot *>(object));
     }
-    else if (object->Is() == APP) {
+    else if (object->Is(APP)) {
         m_currentNode = m_currentNode.append_child("app");
         WriteMeiApp(m_currentNode, dynamic_cast<App *>(object));
     }
-    else if (object->Is() == CHOICE) {
+    else if (object->Is(CHOICE)) {
         m_currentNode = m_currentNode.append_child("choice");
         WriteMeiChoice(m_currentNode, dynamic_cast<Choice *>(object));
     }
-    else if (object->Is() == CORR) {
+    else if (object->Is(CORR)) {
         m_currentNode = m_currentNode.append_child("corr");
         WriteMeiCorr(m_currentNode, dynamic_cast<Corr *>(object));
     }
-    else if (object->Is() == DAMAGE) {
+    else if (object->Is(DAMAGE)) {
         m_currentNode = m_currentNode.append_child("damage");
         WriteMeiDamage(m_currentNode, dynamic_cast<Damage *>(object));
     }
-    else if (object->Is() == DEL) {
+    else if (object->Is(DEL)) {
         m_currentNode = m_currentNode.append_child("del");
         WriteMeiDel(m_currentNode, dynamic_cast<Del *>(object));
     }
-    else if (object->Is() == EXPAN) {
+    else if (object->Is(EXPAN)) {
         m_currentNode = m_currentNode.append_child("epxan");
         WriteMeiExpan(m_currentNode, dynamic_cast<Expan *>(object));
     }
-    else if (object->Is() == LEM) {
+    else if (object->Is(LEM)) {
         m_currentNode = m_currentNode.append_child("lem");
         WriteMeiLem(m_currentNode, dynamic_cast<Lem *>(object));
     }
-    else if (object->Is() == ORIG) {
+    else if (object->Is(ORIG)) {
         m_currentNode = m_currentNode.append_child("orig");
         WriteMeiOrig(m_currentNode, dynamic_cast<Orig *>(object));
     }
-    else if (object->Is() == RDG) {
+    else if (object->Is(RDG)) {
         m_currentNode = m_currentNode.append_child("rdg");
         WriteMeiRdg(m_currentNode, dynamic_cast<Rdg *>(object));
     }
-    else if (object->Is() == REG) {
+    else if (object->Is(REG)) {
         m_currentNode = m_currentNode.append_child("reg");
         WriteMeiReg(m_currentNode, dynamic_cast<Reg *>(object));
     }
-    else if (object->Is() == RESTORE) {
+    else if (object->Is(RESTORE)) {
         m_currentNode = m_currentNode.append_child("restore");
         WriteMeiRestore(m_currentNode, dynamic_cast<Restore *>(object));
     }
-    else if (object->Is() == SIC) {
+    else if (object->Is(SIC)) {
         m_currentNode = m_currentNode.append_child("sic");
         WriteMeiSic(m_currentNode, dynamic_cast<Sic *>(object));
     }
-    else if (object->Is() == SUPPLIED) {
+    else if (object->Is(SUPPLIED)) {
         m_currentNode = m_currentNode.append_child("supplied");
         WriteMeiSupplied(m_currentNode, dynamic_cast<Supplied *>(object));
     }
-    else if (object->Is() == UNCLEAR) {
+    else if (object->Is(UNCLEAR)) {
         m_currentNode = m_currentNode.append_child("unclear");
         WriteMeiUnclear(m_currentNode, dynamic_cast<Unclear *>(object));
     }
 
     // BoundaryEnd - nothing to add - only
-    else if (object->Is() == BOUNDARY_END) {
+    else if (object->Is(BOUNDARY_END)) {
         if (m_scoreBasedMEI)
             return true;
         else {
@@ -485,8 +496,8 @@ bool MeiOutput::WriteObject(Object *object)
         assert(false); // let's make it stop because this should not happen
     }
 
-    // LogDebug("Current: %s ", m_currentNode.value());
-    m_nodeStack.push_back(m_currentNode);
+    // Object representing an attribute have no node to push
+    if (!object->IsAttribute()) m_nodeStack.push_back(m_currentNode);
 
     return true;
 }
@@ -502,10 +513,10 @@ bool MeiOutput::WriteObjectEnd(Object *object)
     else if (object->IsAttribute()) {
         return true;
     }
-    else if (m_scoreBasedMEI && (object->Is() == SYSTEM)) {
+    else if (m_scoreBasedMEI && (object->Is(SYSTEM))) {
         return true;
     }
-    else if (m_scoreBasedMEI && (object->Is() == PAGE)) {
+    else if (m_scoreBasedMEI && (object->Is(PAGE))) {
         return true;
     }
     m_nodeStack.pop_back();
@@ -533,14 +544,11 @@ bool MeiOutput::WriteMeiDoc(Doc *doc)
 
     // ---- header ----
 
-    pugi::xml_node meiHead = m_mei.append_child("meiHead");
-
     if (m_doc->m_header.first_child()) {
-        for (pugi::xml_node child = m_doc->m_header.first_child(); child; child = child.next_sibling()) {
-            meiHead.append_copy(child);
-        }
+        m_mei.append_copy(m_doc->m_header.first_child());
     }
     else {
+        pugi::xml_node meiHead = m_mei.append_child("meiHead");
         pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
         pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
         titleStmt.append_child("title");
@@ -766,6 +774,18 @@ void MeiOutput::WriteMeiHarm(pugi::xml_node currentNode, Harm *harm)
     harm->WriteLang(currentNode);
 };
 
+void MeiOutput::WriteMeiMordent(pugi::xml_node currentNode, Mordent *mordent)
+{
+    assert(mordent);
+
+    WriteXmlId(currentNode, mordent);
+    WriteTimePointInterface(currentNode, mordent);
+    mordent->WriteColor(currentNode);
+    mordent->WriteOrnamentaccid(currentNode);
+    mordent->WritePlacement(currentNode);
+    mordent->WriteMordentLog(currentNode);
+};
+
 void MeiOutput::WriteMeiOctave(pugi::xml_node currentNode, Octave *octave)
 {
     assert(octave);
@@ -838,7 +858,20 @@ void MeiOutput::WriteMeiTrill(pugi::xml_node currentNode, Trill *trill)
     WriteXmlId(currentNode, trill);
     WriteTimePointInterface(currentNode, trill);
     trill->WriteColor(currentNode);
+    trill->WriteOrnamentaccid(currentNode);
     trill->WritePlacement(currentNode);
+};
+
+void MeiOutput::WriteMeiTurn(pugi::xml_node currentNode, Turn *turn)
+{
+    assert(turn);
+
+    WriteXmlId(currentNode, turn);
+    WriteTimePointInterface(currentNode, turn);
+    turn->WriteColor(currentNode);
+    turn->WriteOrnamentaccid(currentNode);
+    turn->WritePlacement(currentNode);
+    turn->WriteTurnLog(currentNode);
 };
 
 void MeiOutput::WriteMeiLayer(pugi::xml_node currentNode, Layer *layer)
@@ -863,11 +896,20 @@ void MeiOutput::WriteMeiAccid(pugi::xml_node currentNode, Accid *accid)
 {
     assert(accid);
 
+    // Only write att.accidental and accidentalPerformed if representing an attribute
+    if (accid->IsAttribute()) {
+        accid->WriteAccidental(currentNode);
+        accid->WriteAccidentalPerformed(currentNode);
+        return;
+    }
+
     WriteLayerElement(currentNode, accid);
     WritePositionInterface(currentNode, accid);
     accid->WriteAccidental(currentNode);
+    accid->WriteAccidentalPerformed(currentNode);
     accid->WriteAccidLog(currentNode);
     accid->WriteColor(currentNode);
+    accid->WriteEnclosingchars(currentNode);
 }
 
 void MeiOutput::WriteMeiArtic(pugi::xml_node currentNode, Artic *artic)
@@ -1040,7 +1082,6 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     WriteLayerElement(currentNode, note);
     WriteDurationInterface(currentNode, note);
     WritePitchInterface(currentNode, note);
-    note->WriteAccidentalPerformed(currentNode);
     note->WriteColor(currentNode);
     note->WriteColoration(currentNode);
     note->WriteGraced(currentNode);
@@ -1143,7 +1184,6 @@ void MeiOutput::WritePitchInterface(pugi::xml_node element, PitchInterface *inte
 {
     assert(interface);
 
-    interface->WriteAccidental(element);
     interface->WriteNoteGes(element);
     interface->WriteOctave(element);
     interface->WritePitch(element);
@@ -1465,7 +1505,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         return true;
     }
     // filter for beam
-    else if (filterParent->Is() == BEAM) {
+    else if (filterParent->Is(BEAM)) {
         if (element == "beam") {
             return true;
         }
@@ -1489,7 +1529,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for bTrem
-    else if (filterParent->Is() == BTREM) {
+    else if (filterParent->Is(BTREM)) {
         if (element == "chord") {
             return true;
         }
@@ -1504,7 +1544,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for chord
-    else if (filterParent->Is() == CHORD) {
+    else if (filterParent->Is(CHORD)) {
         if (element == "note") {
             return true;
         }
@@ -1516,7 +1556,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for fTrem
-    else if (filterParent->Is() == FTREM) {
+    else if (filterParent->Is(FTREM)) {
         if (element == "chord") {
             return true;
         }
@@ -1531,7 +1571,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for ligature
-    else if (filterParent->Is() == LIGATURE) {
+    else if (filterParent->Is(LIGATURE)) {
         if (element == "note") {
             return true;
         }
@@ -1540,7 +1580,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for note
-    else if (filterParent->Is() == NOTE) {
+    else if (filterParent->Is(NOTE)) {
         if (element == "accid") {
             return true;
         }
@@ -1558,7 +1598,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for tuplet
-    else if (filterParent->Is() == TUPLET) {
+    else if (filterParent->Is(TUPLET)) {
         if (element == "beam") {
             return true;
         }
@@ -1579,7 +1619,7 @@ bool MeiInput::IsAllowed(std::string element, Object *filterParent)
         }
     }
     // filter for verse
-    else if (filterParent->Is() == VERSE) {
+    else if (filterParent->Is(VERSE)) {
         if (element == "syl") {
             return true;
         }
@@ -1600,7 +1640,9 @@ bool MeiInput::ReadMei(pugi::xml_node root)
     m_readingScoreBased = false;
 
     if (!root.empty() && (current = root.child("meiHead"))) {
-        ReadMeiHeader(current);
+        m_doc->m_header.reset();
+        // copy the complete header into the master document
+        m_doc->m_header.append_copy(current);
     }
     // music
     pugi::xml_node music;
@@ -1667,16 +1709,6 @@ bool MeiInput::ReadMei(pugi::xml_node root)
     return success;
 }
 
-bool MeiInput::ReadMeiHeader(pugi::xml_node meiHead)
-{
-    m_doc->m_header.reset();
-    // copy all the nodes inside into the master document
-    for (pugi::xml_node child = meiHead.first_child(); child; child = child.next_sibling()) {
-        m_doc->m_header.append_copy(child);
-    }
-    return true;
-}
-
 bool MeiInput::ReadMeiSection(Object *parent, pugi::xml_node section)
 {
     Section *vrvSection = new Section();
@@ -1728,7 +1760,7 @@ bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
         // unmeasured music
         else if (std::string(current.name()) == "staff") {
             if (!unmeasured) {
-                if (parent->Is() == SECTION) {
+                if (parent->Is(SECTION)) {
                     unmeasured = new Measure(false);
                     parent->AddChild(unmeasured);
                 }
@@ -1872,7 +1904,7 @@ bool MeiInput::ReadMeiSystem(Object *parent, pugi::xml_node system)
     }
 
     // This could be moved to an AddSystem method for consistency with AddLayerElement
-    if (parent->Is() == PAGE) {
+    if (parent->Is(PAGE)) {
         Page *page = dynamic_cast<Page *>(parent);
         assert(page);
         page->AddChild(vrvSystem);
@@ -1906,7 +1938,7 @@ bool MeiInput::ReadMeiSystemChildren(Object *parent, pugi::xml_node parentNode)
         // unmeasured music
         else if (std::string(current.name()) == "staff") {
             if (!unmeasured) {
-                if (parent->Is() == SYSTEM) {
+                if (parent->Is(SYSTEM)) {
                     System *system = dynamic_cast<System *>(parent);
                     assert(system);
                     unmeasured = new Measure(false);
@@ -2115,6 +2147,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         else if (std::string(current.name()) == "harm") {
             success = ReadMeiHarm(parent, current);
         }
+        else if (std::string(current.name()) == "mordent") {
+            success = ReadMeiMordent(parent, current);
+        }
         else if (std::string(current.name()) == "octave") {
             success = ReadMeiOctave(parent, current);
         }
@@ -2135,6 +2170,9 @@ bool MeiInput::ReadMeiMeasureChildren(Object *parent, pugi::xml_node parentNode)
         }
         else if (std::string(current.name()) == "trill") {
             success = ReadMeiTrill(parent, current);
+        }
+        else if (std::string(current.name()) == "turn") {
+            success = ReadMeiTurn(parent, current);
         }
         else if (std::string(current.name()) == "tupletSpan") {
             if (!ReadTupletSpanAsTuplet(dynamic_cast<Measure *>(parent), current)) {
@@ -2225,6 +2263,21 @@ bool MeiInput::ReadMeiHarm(Object *parent, pugi::xml_node harm)
     return ReadMeiTextChildren(vrvHarm, harm);
 }
 
+bool MeiInput::ReadMeiMordent(Object *parent, pugi::xml_node mordent)
+{
+    Mordent *vrvMordent = new Mordent();
+    SetMeiUuid(mordent, vrvMordent);
+
+    ReadTimePointInterface(mordent, vrvMordent);
+    vrvMordent->ReadColor(mordent);
+    vrvMordent->ReadOrnamentaccid(mordent);
+    vrvMordent->ReadPlacement(mordent);
+    vrvMordent->ReadMordentLog(mordent);
+
+    parent->AddChild(vrvMordent);
+    return true;
+}
+
 bool MeiInput::ReadMeiOctave(Object *parent, pugi::xml_node octave)
 {
     Octave *vrvOctave = new Octave();
@@ -2300,9 +2353,25 @@ bool MeiInput::ReadMeiTrill(Object *parent, pugi::xml_node trill)
 
     ReadTimePointInterface(trill, vrvTrill);
     vrvTrill->ReadColor(trill);
+    vrvTrill->ReadOrnamentaccid(trill);
     vrvTrill->ReadPlacement(trill);
 
     parent->AddChild(vrvTrill);
+    return true;
+}
+
+bool MeiInput::ReadMeiTurn(Object *parent, pugi::xml_node turn)
+{
+    Turn *vrvTurn = new Turn();
+    SetMeiUuid(turn, vrvTurn);
+
+    ReadTimePointInterface(turn, vrvTurn);
+    vrvTurn->ReadColor(turn);
+    vrvTurn->ReadOrnamentaccid(turn);
+    vrvTurn->ReadPlacement(turn);
+    vrvTurn->ReadTurnLog(turn);
+
+    parent->AddChild(vrvTurn);
     return true;
 }
 
@@ -2493,8 +2562,10 @@ bool MeiInput::ReadMeiAccid(Object *parent, pugi::xml_node accid)
 
     ReadPositionInterface(accid, vrvAccid);
     vrvAccid->ReadAccidental(accid);
+    vrvAccid->ReadAccidentalPerformed(accid);
     vrvAccid->ReadAccidLog(accid);
     vrvAccid->ReadColor(accid);
+    vrvAccid->ReadEnclosingchars(accid);
 
     parent->AddChild(vrvAccid);
     return true;
@@ -2742,7 +2813,6 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
 
     ReadDurationInterface(note, vrvNote);
     ReadPitchInterface(note, vrvNote);
-    vrvNote->ReadAccidentalPerformed(note);
     vrvNote->ReadColor(note);
     vrvNote->ReadColoration(note);
     vrvNote->ReadGraced(note);
@@ -2759,6 +2829,18 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
         vrvArtic->IsAttribute(true);
         vrvArtic->SetArtic(artic.GetArtic());
         vrvNote->AddChild(vrvArtic);
+    }
+
+    AttAccidental accidental;
+    accidental.ReadAccidental(note);
+    AttAccidentalPerformed accidentalPerformed;
+    accidentalPerformed.ReadAccidentalPerformed(note);
+    if (accidental.HasAccid() || accidentalPerformed.HasAccidGes()) {
+        Accid *vrvAccid = new Accid();
+        vrvAccid->IsAttribute(true);
+        vrvAccid->SetAccid(accidental.GetAccid());
+        vrvAccid->SetAccidGes(accidentalPerformed.GetAccidGes());
+        vrvNote->AddChild(vrvAccid);
     }
 
     parent->AddChild(vrvNote);
@@ -2921,7 +3003,6 @@ bool MeiInput::ReadDurationInterface(pugi::xml_node element, DurationInterface *
 
 bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interface)
 {
-    interface->ReadAccidental(element);
     interface->ReadNoteGes(element);
     interface->ReadOctave(element);
     interface->ReadPitch(element);

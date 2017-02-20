@@ -54,7 +54,7 @@ void Page::Reset()
 
 void Page::AddChild(Object *child)
 {
-    if (child->Is() == SYSTEM) {
+    if (child->Is(SYSTEM)) {
         assert(dynamic_cast<System *>(child));
     }
     else {

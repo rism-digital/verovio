@@ -31,6 +31,7 @@ class Harm;
 class Layer;
 class LayerElement;
 class Measure;
+class Mordent;
 class ControlElement;
 class Octave;
 class Page;
@@ -46,6 +47,7 @@ class Text;
 class TextElement;
 class Tie;
 class Trill;
+class Turn;
 class Tuplet;
 class Verse;
 
@@ -218,8 +220,7 @@ protected:
      * Defined in view_element.cpp
      */
     ///@{
-    void DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure,
-        Accid *prevAccid = NULL);
+    void DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
     void DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure,
         bool drawingList = false);
     void DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
@@ -268,7 +269,6 @@ protected:
     void DrawRestWhole(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
     void DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_STEMDIRECTION dir, int radius, int xn,
         int originY, int heightY = 0);
-    void DrawOrnamAttr(DeviceContext *dc, LayerElement *element, Staff *staff);
     ///@}
 
     /**
@@ -320,6 +320,7 @@ protected:
     void DrawHairpin(
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system);
+    void DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, System *system);
     void DrawOctave(
         DeviceContext *dc, Octave *octave, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
@@ -328,6 +329,7 @@ protected:
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system);
+    void DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *system);
     ///@}
 
     /**
@@ -387,7 +389,8 @@ protected:
     void DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin);
     void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
-    void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100);
+    void DrawSmuflString(
+        DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100, bool dimin = false);
     void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);

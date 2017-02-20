@@ -163,11 +163,11 @@ Clef *Layer::GetClef(LayerElement *test)
 
     // make sure list is set
     ResetList(this);
-    if (test->Is() != CLEF) {
+    if (!test->Is(CLEF)) {
         testObject = GetListFirstBackward(testObject, CLEF);
     }
 
-    if (testObject && testObject->Is() == CLEF) {
+    if (testObject && testObject->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(testObject);
         assert(clef);
         return clef;
