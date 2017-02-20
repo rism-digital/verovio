@@ -816,6 +816,14 @@ void MusicXmlInput::ReadMusicXmlAttributes(pugi::xml_node node, Measure *measure
             AddLayerElement(layer, meiClef);
         }
     }
+
+    pugi::xpath_node measureRepeat = node.select_single_node("measure-style/measure-repeat");
+    if (measureRepeat) {
+        if (GetAttributeValue(measureRepeat.node(), "type") == "start")
+            m_mRpt = true;
+        else
+            m_mRpt = false;
+    }
 }
 
 void MusicXmlInput::ReadMusicXmlBackup(pugi::xml_node node, Measure *measure, int measureNum)
@@ -835,14 +843,36 @@ void MusicXmlInput::ReadMusicXmlBarLine(pugi::xml_node node, Measure *measure, i
             measure->SetLeft(barRendition);
         }
         else if (HasAttributeWithValue(node, "location", "middle")) {
-            LogWarning("Unsupported barline location '%s'", GetAttributeValue(node, "location").c_str());
+            LogWarning("Unsupported barline location 'middle'");
         }
-        else
+        else {
             measure->SetRight(barRendition);
+        }
     }
     pugi::xpath_node ending = node.select_single_node("ending");
     if (ending) {
-        // LogWarning("Endings not supported");
+        LogWarning("Endings not supported");
+    }
+    // fermatas
+    // @tstamp and @staff have yet to be added
+    pugi::xpath_node xmlFermata = node.select_single_node("fermata");
+    if (xmlFermata) {
+        Fermata *fermata = new Fermata();
+        m_controlElements.push_back(std::make_pair(measureNum, fermata));
+        // color
+        std::string colorStr = GetAttributeValue(xmlFermata.node(), "color");
+        if (!colorStr.empty()) fermata->SetColor(colorStr.c_str());
+        // shape
+        fermata->SetShape(ConvertFermataShape(GetContent(xmlFermata.node())));
+        // form and place
+        if (HasAttributeWithValue(xmlFermata.node(), "type", "inverted")) {
+            fermata->SetForm(fermataVis_FORM_inv);
+            fermata->SetPlace(STAFFREL_below);
+        }
+        else {
+            fermata->SetForm(fermataVis_FORM_norm);
+            fermata->SetPlace(STAFFREL_above);
+        }
     }
 }
 
@@ -1000,7 +1030,7 @@ void MusicXmlInput::ReadMusicXmlForward(pugi::xml_node node, Measure *measure, i
     }
     else if (!prevNote && !node.select_single_node("preceding-sibling::backup")) {
         // If there is no previous or following note in the first layer, the measure seems to be empty
-        // We use here an invisible mRest, which should be replaced by mSpace, when available
+        // an invisible mRest is used, which should be replaced by mSpace, when available
         MRest *mRest = new MRest();
         mRest->SetVisible(BOOLEAN_false);
         AddLayerElement(layer, mRest);
@@ -1048,10 +1078,22 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
 
     LayerElement *element = NULL;
 
+    // for measure repeats add a single <mRpt> and return
+    if (m_mRpt) {
+        MRpt *mRpt = dynamic_cast<MRpt *>((*layer).GetFirst(MRPT));
+        if (!mRpt) {
+            mRpt = new MRpt();
+            AddLayerElement(layer, mRpt);
+        }
+        return;
+    }
+
     std::string noteColor = GetAttributeValue(node, "color");
 
-    pugi::xpath_node cue = node.select_single_node("cue");
     pugi::xpath_node notations = node.select_single_node("notations[not(@print-object='no')]");
+
+    bool cue = false;
+    if (node.select_single_node("cue") || node.select_single_node("type[@size='cue']")) cue = true;
 
     // duration string and dots
     std::string typeStr = GetContentOfChild(node, "type");
@@ -1159,8 +1201,8 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             if (!accidColor.empty()) accid->SetColor(accidColor.c_str());
             if (HasAttributeWithValue(accidental.node(), "cautionary", "yes")) accid->SetFunc(accidLog_FUNC_caution);
             if (HasAttributeWithValue(accidental.node(), "editorial", "yes")) accid->SetFunc(accidLog_FUNC_edit);
-            if (HasAttributeWithValue(accidental.node(), "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
             if (HasAttributeWithValue(accidental.node(), "bracket", "yes")) accid->SetEnclose(ENCLOSURE_brack);
+            if (HasAttributeWithValue(accidental.node(), "parentheses", "yes")) accid->SetEnclose(ENCLOSURE_paren);
             note->AddChild(accid);
         }
 
@@ -1189,7 +1231,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                     note->SetOct(atoi(octaveStr.c_str()));
             }
             std::string alterStr = GetContentOfChild(pitch.node(), "alter");
-            //
             if (!accidental && !alterStr.empty()) {
                 Accid *accid = dynamic_cast<Accid *>(note->GetFirst(ACCID));
                 if (!accid) {
