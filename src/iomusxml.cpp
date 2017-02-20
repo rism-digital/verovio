@@ -661,6 +661,10 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
             if (!scaleStr.empty()) {
                 staffDef->SetScale(staffDef->AttScalable::StrToPercent(scaleStr));
             }
+            pugi::xpath_node staffTuning = staffDetails.node().select_single_node("staff-tuning");
+            if (staffTuning) {
+                staffDef->SetNotationtype(NOTATIONTYPE_tab);
+            }
             // time
             pugi::xpath_node time;
             xpath = StringFormat("time[@number='%d']", i + 1);
