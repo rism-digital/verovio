@@ -192,7 +192,7 @@ int Measure::GetInnerWidth() const
 
 int Measure::GetInnerCenterX() const
 {
-    return (this->GetLeftBarLineRight() + this->GetInnerWidth() / 2);
+    return (this->GetDrawingX() + this->GetLeftBarLineRight() + this->GetInnerWidth() / 2);
 }
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
