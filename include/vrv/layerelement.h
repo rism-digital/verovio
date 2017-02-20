@@ -69,7 +69,9 @@ public:
      */
     ///@{
     /** Return true if the element is a grace note */
-    bool IsGraceNote() const;
+    bool IsGraceNote();
+    /** Return true if the element is has to be rederred as cue sized */
+    bool IsCueSize();
     /** Return true if the element is a note within a ligature */
     bool IsInLigature();
     /** Return true if the element is a note or a chord within a fTrem */

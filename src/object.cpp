@@ -1016,66 +1016,6 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-/*
-int Object::AdjustGraceXPos(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    // starting new layer
-    if (this->Is(LAYER)) {
-        params->m_graceMinPos = 0;
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (!this->Is(NOTE)) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    Note *note = dynamic_cast<Note *>(this);
-    assert(note);
-
-    if (!note->IsGraceNote() || note->IsChordTone()) {
-        params->m_graceMinPos = 0;
-        return FUNCTOR_CONTINUE;
-    }
-
-    // we should have processed aligned before
-    assert(note->GetGraceAlignment());
-
-    // the negative offset is the part of the bounding box that overflows on the left
-    // |____x_____|
-    //  ---- = negative offset
-    int negative_offset = -(note->GetContentX1())
-        + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-
-    if (params->m_graceMinPos > 0) {
-        //(*minPos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-    }
-
-    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used)
-    if (negative_offset < 0) negative_offset = 0;
-
-    // check if the element overlaps with the preceeding one given by (*minPos)
-    int overlap = params->m_graceMinPos - note->GetGraceAlignment()->GetXRel() + negative_offset;
-
-    if ((note->GetGraceAlignment()->GetXRel() - negative_offset) < params->m_graceMinPos) {
-        note->GetGraceAlignment()->SetXShift(overlap);
-    }
-
-    // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    params->m_graceMinPos = note->GetGraceAlignment()->GetXRel() + note->GetContentX2()
-        + params->m_doc->GetRightMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    //(*minPos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
-    // note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) *
-    // doc->GetDrawingUnit(100) /
-    // PARAM_DENOMINATOR);
-    note->GetGraceAlignment()->SetMaxWidth(note->GetContentX2());
-
-    return FUNCTOR_CONTINUE;
-}
-*/
-
 int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 {
     GetAlignmentLeftRightParams *params = dynamic_cast<GetAlignmentLeftRightParams *>(functorParams);
