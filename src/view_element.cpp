@@ -764,7 +764,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /************ Fermata attribute ************/
 
     if (chord->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff, measure);
+        DrawFermataAttr(dc, element, layer, staff);
     }
 
     dc->ResetPen();
@@ -1094,7 +1094,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     DrawRestWhole(dc, mRest->GetDrawingX(), y, DUR_1, 0, false, staff);
 
     if (mRest->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff, measure);
+        DrawFermataAttr(dc, element, layer, staff);
     }
 
     dc->EndGraphic(element, this);
@@ -1459,7 +1459,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     DrawLayerChildren(dc, note, layer, staff, measure);
 
     if (note->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff, measure);
+        DrawFermataAttr(dc, element, layer, staff);
     }
 }
 
@@ -1499,7 +1499,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     if (rest->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff, measure);
+        DrawFermataAttr(dc, element, layer, staff);
     }
 }
 
@@ -1689,24 +1689,18 @@ void View::DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *
     }
 }
 
-void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff)
 {
     assert(dc);
     assert(element);
     assert(layer);
     assert(staff);
-    assert(measure);
-
+    
     int x, y;
 
-    // We move the fermata position of half of the fermata size
     x = element->GetDrawingX();
-
-    if (element->Is(MREST)) {
-        int width = measure->GetRightBarLineLeft() - measure->GetLeftBarLineRight();
-        x = measure->GetDrawingX() + measure->GetLeftBarLineRight() + (width / 2);
-    }
-
+    
+    // We move the fermata position of half of the fermata size
     x -= m_doc->GetGlyphWidth(SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false) / 2;
 
     AttFermatapresent *fermatapresent = dynamic_cast<AttFermatapresent *>(element);
