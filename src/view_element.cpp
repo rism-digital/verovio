@@ -1082,16 +1082,16 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(mRest);
 
     dc->StartGraphic(element, "", element->GetUuid());
+    
+    mRest->CenterDrawingX();
 
-    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
-    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
     int y = element->GetDrawingY();
 
     // move it down according to the number of line in the staff
     y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
         - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-    DrawRestWhole(dc, xCentered, y, DUR_1, 0, false, staff);
+    DrawRestWhole(dc, mRest->GetDrawingX(), y, DUR_1, 0, false, staff);
 
     if (mRest->HasFermata()) {
         DrawFermataAttr(dc, element, layer, staff, measure);
@@ -1110,10 +1110,12 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     MRpt *mRpt = dynamic_cast<MRpt *>(element);
     assert(mRpt);
+    
+    mRpt->CenterDrawingX();
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E500_repeat1Bar, mRpt->m_drawingMeasureCount, false, staff, measure);
+    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E500_repeat1Bar, mRpt->m_drawingMeasureCount, false, staff);
 
     dc->EndGraphic(element, this);
 }
@@ -1128,12 +1130,12 @@ void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     MRpt2 *mRpt2 = dynamic_cast<MRpt2 *>(element);
     assert(mRpt2);
-    // in non debug
-    if (!mRpt2) return;
+
+    mRpt2->CenterDrawingX();
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, 2, true, staff, measure);
+    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, 2, true, staff);
 
     dc->EndGraphic(element, this);
 }
@@ -1148,13 +1150,15 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
 
     MultiRest *multiRest = dynamic_cast<MultiRest *>(element);
     assert(multiRest);
+    
+    multiRest->CenterDrawingX();
 
     int x1, x2, y1, y2, length;
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
-    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
+    int width = measure->GetInnerWidth();
+    int xCentered = multiRest->GetDrawingX();
 
     // We do not support more than three chars
     int num = std::min(multiRest->GetNum(), 999);
@@ -1220,10 +1224,12 @@ void View::DrawMultiRpt(DeviceContext *dc, LayerElement *element, Layer *layer, 
 
     MultiRpt *multiRpt = dynamic_cast<MultiRpt *>(element);
     assert(multiRpt);
+    
+    multiRpt->CenterDrawingX();
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, multiRpt->GetNum(), true, staff, measure);
+    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, multiRpt->GetNum(), true, staff);
 
     dc->EndGraphic(element, this);
 
@@ -1697,8 +1703,8 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
     x = element->GetDrawingX();
 
     if (element->Is(MREST)) {
-        int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
-        x = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
+        int width = measure->GetRightBarLineLeft() - measure->GetLeftBarLineRight();
+        x = measure->GetDrawingX() + measure->GetLeftBarLineRight() + (width / 2);
     }
 
     x -= m_doc->GetGlyphWidth(SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false) / 2;
@@ -1847,11 +1853,8 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
     dc->ResetFont();
 }
 
-void View::DrawMRptPart(DeviceContext *dc, int x, wchar_t smuflCode, int num, bool line, Staff *staff, Measure *measure)
+void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smuflCode, int num, bool line, Staff *staff)
 {
-    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
-    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
-
     int xSymbol = xCentered - m_doc->GetGlyphWidth(smuflCode, staff->m_drawingStaffSize, false) / 2;
     int y = staff->GetDrawingY();
     int ySymbol = y - staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);

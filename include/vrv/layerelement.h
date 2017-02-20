@@ -46,11 +46,12 @@ public:
      * Copy assignment for resetting pointers
      */
     LayerElement &operator=(const LayerElement &element);
-
+    
     /**
-     * Adjust the pname and the octave for values outside the range
+     * Return true if the element has to be aligned horizontally
+     * It typically set to false for mRest, mRpt, etc.
      */
-    static void AdjustPname(int *pname, int *oct);
+    virtual bool HasToBeAligned() const { return false; }
 
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
@@ -73,8 +74,6 @@ public:
     bool IsInLigature();
     /** Return true if the element is a note or a chord within a fTrem */
     bool IsInFTrem();
-    /** Return true if the element has to be aligned horizontally */
-    virtual bool HasToBeAligned() const { return false; }
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
@@ -101,6 +100,11 @@ public:
     int GetDrawingYRel() const { return m_drawingYRel; }
     virtual void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; }
     ///@}
+    
+    /**
+     * Ajust the m_drawingYRel for the element to be centered on the inner content of the measure
+     */
+    void CenterDrawingX();
 
     /**
      * Returns the drawing top and bottom taking into accound stem, etc.
@@ -117,8 +121,6 @@ public:
      * Alignment getter
      */
     Alignment *GetAlignment() const { return m_alignment; }
-
-    int GetXRel() const;
 
     /**
      * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)

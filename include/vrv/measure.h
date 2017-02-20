@@ -124,17 +124,27 @@ public:
      */
     ///@{
     int GetLeftBarLineXRel() const;
-    int GetLeftBarLineX1Rel() const;
-    int GetLeftBarLineX2Rel() const;
+    int GetLeftBarLineLeft() const;
+    int GetLeftBarLineRight() const;
     int GetRightBarLineXRel() const;
-    int GetRightBarLineX1Rel() const;
-    int GetRightBarLineX2Rel() const;
+    int GetRightBarLineLeft() const;
+    int GetRightBarLineRight() const;
     ///@}
 
     /**
      * Return the width of the measure, including the barLine width
      */
     int GetWidth() const;
+    
+    /**
+     * Return the inner width of the measure
+     */
+    int GetInnerWidth() const;
+    
+    /**
+     * Return the center x of the inner of the measure
+     */
+    int GetInnerCenterX() const;
 
     /**
      * @name Setter and getter of the drawing scoreDef

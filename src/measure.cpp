@@ -135,7 +135,7 @@ int Measure::GetLeftBarLineXRel() const
     return 0;
 }
 
-int Measure::GetLeftBarLineX1Rel() const
+int Measure::GetLeftBarLineLeft() const
 {
     int x = GetLeftBarLineXRel();
     if (m_leftBarLine.HasUpdatedBB()) {
@@ -144,7 +144,7 @@ int Measure::GetLeftBarLineX1Rel() const
     return x;
 }
 
-int Measure::GetLeftBarLineX2Rel() const
+int Measure::GetLeftBarLineRight() const
 {
     int x = GetLeftBarLineXRel();
     if (m_leftBarLine.HasUpdatedBB()) {
@@ -161,7 +161,7 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
-int Measure::GetRightBarLineX1Rel() const
+int Measure::GetRightBarLineLeft() const
 {
     int x = GetRightBarLineXRel();
     if (m_rightBarLine.HasUpdatedBB()) {
@@ -170,7 +170,7 @@ int Measure::GetRightBarLineX1Rel() const
     return x;
 }
 
-int Measure::GetRightBarLineX2Rel() const
+int Measure::GetRightBarLineRight() const
 {
     int x = GetRightBarLineXRel();
     if (m_rightBarLine.HasUpdatedBB()) {
@@ -182,10 +182,19 @@ int Measure::GetRightBarLineX2Rel() const
 int Measure::GetWidth() const
 {
     assert(m_measureAligner.GetRightAlignment());
-    if (m_measureAligner.GetRightAlignment()) {
-        return m_measureAligner.GetRightAlignment()->GetXRel();
-    }
-    return 0;
+    return m_measureAligner.GetRightAlignment()->GetXRel();
+}
+    
+    
+int Measure::GetInnerWidth() const
+{
+    return (this->GetRightBarLineLeft() - this->GetLeftBarLineRight());
+}
+
+
+int Measure::GetInnerCenterX() const
+{
+    return (this->GetLeftBarLineRight() + this->GetInnerWidth() / 2);
 }
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
@@ -428,7 +437,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
     Alignment *fullMeasure2 = dynamic_cast<Alignment *>(m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
     if (fullMeasure2 != NULL) minMeasureWidth *= 2;
     
-    int currentMeasureWidth = this->GetRightBarLineX1Rel() - this->GetLeftBarLineX2Rel();
+    int currentMeasureWidth = this->GetRightBarLineLeft() - this->GetLeftBarLineRight();
     if (currentMeasureWidth < minMeasureWidth) {
         ArrayOfAdjustmentTuples boundaries { std::make_tuple(this->GetLeftBarLine()->GetAlignment(), this->GetRightBarLine()->GetAlignment(), minMeasureWidth - currentMeasureWidth) };
         m_measureAligner.AdjustProportionally(boundaries);

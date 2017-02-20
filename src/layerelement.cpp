@@ -230,6 +230,16 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPa
         return std::min(firstY, lastY);
     }
 }
+    
+void LayerElement::CenterDrawingX()
+{
+    m_drawingXRel = 0;
+ 
+    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+    assert(measure);
+    
+    m_drawingXRel = measure->GetInnerCenterX() - this->GetDrawingX();
+}
 
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPartType type)
 {
@@ -297,18 +307,6 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
     return this->GetDrawingY();
 }
 
-void LayerElement::AdjustPname(int *pname, int *oct)
-{
-    if ((*pname) < PITCHNAME_c) {
-        if ((*oct) > 0) (*oct)--;
-        (*pname) = PITCHNAME_b;
-    }
-    else if ((*pname) > PITCHNAME_b) {
-        if ((*oct) < 7) (*oct)++;
-        (*pname) = PITCHNAME_c;
-    }
-}
-
 double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bool notGraceOnly)
 {
     if (this->IsGraceNote() && notGraceOnly) {
@@ -360,14 +358,6 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
     else {
         return 0.0;
     }
-}
-
-int LayerElement::GetXRel() const
-{
-    if (m_alignment) {
-        return m_alignment->GetXRel();
-    }
-    return 0;
 }
 
 //----------------------------------------------------------------------------
