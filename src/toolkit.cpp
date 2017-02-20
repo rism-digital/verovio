@@ -191,7 +191,7 @@ bool Toolkit::SetOutputFormat(std::string const &outformat)
     else if (outformat == "midi") {
         m_outformat = MIDI;
     }
-    else {
+    else if (outformat != "svg") {
         LogError("Output format can only be: mei, humdrum, midi or svg");
         return false;
     }

@@ -31,6 +31,7 @@ class Harm;
 class Layer;
 class LayerElement;
 class Measure;
+class Mordent;
 class ControlElement;
 class Octave;
 class Page;
@@ -46,6 +47,7 @@ class Text;
 class TextElement;
 class Tie;
 class Trill;
+class Turn;
 class Tuplet;
 class Verse;
 
@@ -317,6 +319,7 @@ protected:
     void DrawHairpin(
         DeviceContext *dc, Hairpin *hairpin, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *system);
+    void DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, System *system);
     void DrawOctave(
         DeviceContext *dc, Octave *octave, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *system);
@@ -325,6 +328,7 @@ protected:
     void DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *system);
     void DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, char spanningType, Object *graphic = NULL);
     void DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *system);
+    void DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *system);
     ///@}
 
     /**

@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        trill.h
+// Name:        mordent.h
 // Author:      Klaus Rettinghaus
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_TRILL_H__
-#define __VRV_TRILL_H__
+#ifndef __VRV_MORDENT_H__
+#define __VRV_MORDENT_H__
 
 #include "atts_cmn.h"
 #include "atts_cmnornaments.h"
@@ -16,21 +16,26 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Trill
+// Mordent
 //----------------------------------------------------------------------------
 
-class Trill : public ControlElement, public TimePointInterface, public AttColor, public AttOrnamentaccid, public AttPlacement {
+class Mordent : public ControlElement,
+                public TimePointInterface,
+                public AttColor,
+                public AttOrnamentaccid,
+                public AttPlacement,
+                public AttMordentLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method reset all attribute classes
      */
     ///@{
-    Trill();
-    virtual ~Trill();
+    Mordent();
+    virtual ~Mordent();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Trill"; }
-    virtual ClassId GetClassId() const { return TRILL; }
+    virtual std::string GetClassName() const { return "Mordent"; }
+    virtual ClassId GetClassId() const { return MORDENT; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

@@ -57,6 +57,7 @@ class Lem;
 class Measure;
 class Mensur;
 class MeterSig;
+class Mordent;
 class MRest;
 class MRpt;
 class MRpt2;
@@ -95,6 +96,7 @@ class Tie;
 class TimePointInterface;
 class TimeSpanningInterface;
 class Trill;
+class Turn;
 class Tuplet;
 class Unclear;
 class Verse;
@@ -215,12 +217,14 @@ private:
     void WriteMeiFermata(pugi::xml_node currentNode, Fermata *fermata);
     void WriteMeiHairpin(pugi::xml_node currentNode, Hairpin *hairpin);
     void WriteMeiHarm(pugi::xml_node currentNode, Harm *harm);
+    void WriteMeiMordent(pugi::xml_node currentNode, Mordent *mordent);
     void WriteMeiOctave(pugi::xml_node currentNode, Octave *octave);
     void WriteMeiPedal(pugi::xml_node currentNode, Pedal *pedal);
     void WriteMeiSlur(pugi::xml_node currentNode, Slur *slur);
     void WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo);
     void WriteMeiTie(pugi::xml_node currentNode, Tie *tie);
     void WriteMeiTrill(pugi::xml_node currentNode, Trill *trill);
+    void WriteMeiTurn(pugi::xml_node currentNode, Turn *turn);
     ///@}
 
     /**
@@ -351,7 +355,6 @@ public:
 
 private:
     bool ReadMei(pugi::xml_node root);
-    bool ReadMeiHeader(pugi::xml_node meihead);
 
     /**
      * @name Methods for reading MEI score-based elements
@@ -435,12 +438,14 @@ private:
     bool ReadMeiFermata(Object *parent, pugi::xml_node fermata);
     bool ReadMeiHairpin(Object *parent, pugi::xml_node hairpin);
     bool ReadMeiHarm(Object *parent, pugi::xml_node harm);
+    bool ReadMeiMordent(Object *parent, pugi::xml_node mordent);
     bool ReadMeiOctave(Object *parent, pugi::xml_node octave);
     bool ReadMeiPedal(Object *parent, pugi::xml_node pedal);
     bool ReadMeiSlur(Object *parent, pugi::xml_node slur);
     bool ReadMeiTempo(Object *parent, pugi::xml_node tempo);
     bool ReadMeiTie(Object *parent, pugi::xml_node tie);
     bool ReadMeiTrill(Object *parent, pugi::xml_node trill);
+    bool ReadMeiTurn(Object *parent, pugi::xml_node turn);
     ///@}
 
     /**

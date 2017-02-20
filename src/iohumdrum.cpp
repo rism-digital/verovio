@@ -556,9 +556,10 @@ void HumdrumInput::createHeader(void)
     vector<hum::HumdrumLine *> references = infile.getReferenceRecords();
     vector<vector<string> > respPeople;
     getRespPeople(respPeople, references);
+    pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
 
     // <fileDesc> /////////////
-    pugi::xml_node fileDesc = m_doc->m_header.append_child("fileDesc");
+    pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
     pugi::xml_node fileTitle = fileDesc.append_child("titleStmt");
 
     std::string OTL = getReferenceValue("OTL", references);
@@ -608,7 +609,7 @@ void HumdrumInput::createHeader(void)
     }
 
     // <encodingDesc> /////////
-    pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
+    pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
 
     // <appInfo> /////////
     pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
@@ -658,7 +659,7 @@ void HumdrumInput::createHeader(void)
     // <sourceDesc> /////////
 
     // <workDesc> /////////////
-    pugi::xml_node workDesc = m_doc->m_header.append_child("workDesc");
+    pugi::xml_node workDesc = meiHead.append_child("workDesc");
     pugi::xml_node work = workDesc.append_child("work");
 
     std::string SCT = getReferenceValue("SCT", references);
@@ -816,7 +817,7 @@ void HumdrumInput::insertExtMeta(vector<hum::HumdrumLine *> &references)
         return;
     }
 
-    m_doc->m_header.append_copy(tmpdoc.document_element());
+    m_doc->m_header.first_child().append_copy(tmpdoc.document_element());
 }
 
 //////////////////////////////

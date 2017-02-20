@@ -1,12 +1,12 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        trill.h
+// Name:        turn.h
 // Author:      Klaus Rettinghaus
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_TRILL_H__
-#define __VRV_TRILL_H__
+#ifndef __VRV_TURN_H__
+#define __VRV_TURN_H__
 
 #include "atts_cmn.h"
 #include "atts_cmnornaments.h"
@@ -16,21 +16,21 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Trill
+// Turn
 //----------------------------------------------------------------------------
 
-class Trill : public ControlElement, public TimePointInterface, public AttColor, public AttOrnamentaccid, public AttPlacement {
+class Turn : public ControlElement, public TimePointInterface, public AttColor, public AttOrnamentaccid, public AttPlacement, public AttTurnLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
      * Reset method reset all attribute classes
      */
     ///@{
-    Trill();
-    virtual ~Trill();
+    Turn();
+    virtual ~Turn();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Trill"; }
-    virtual ClassId GetClassId() const { return TRILL; }
+    virtual std::string GetClassName() const { return "Turn"; }
+    virtual ClassId GetClassId() const { return TURN; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

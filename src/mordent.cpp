@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        trill.cpp
+// Name:        mordent.cpp
 // Author:      Klaus Rettinghaus
 // Created:     2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "trill.h"
+#include "mordent.h"
 
 //----------------------------------------------------------------------------
 
@@ -18,34 +18,42 @@
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Trill
+// Mordent
 //----------------------------------------------------------------------------
 
-Trill::Trill() : ControlElement("trill-"), TimePointInterface(), AttColor(), AttOrnamentaccid(), AttPlacement()
+Mordent::Mordent()
+    : ControlElement("mordent-")
+    , TimePointInterface()
+    , AttColor()
+    , AttOrnamentaccid()
+    , AttPlacement()
+    , AttMordentLog()
 {
     RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_ORNAMENTACCID);
     RegisterAttClass(ATT_PLACEMENT);
+    RegisterAttClass(ATT_MORDENTLOG);
 
     Reset();
 }
 
-Trill::~Trill()
+Mordent::~Mordent()
 {
 }
 
-void Trill::Reset()
+void Mordent::Reset()
 {
     ControlElement::Reset();
     TimePointInterface::Reset();
     ResetColor();
     ResetOrnamentaccid();
     ResetPlacement();
+    ResetMordentLog();
 }
 
 //----------------------------------------------------------------------------
-// Trill functor methods
+// Mordent functor methods
 //----------------------------------------------------------------------------
 
 } // namespace vrv

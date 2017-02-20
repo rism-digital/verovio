@@ -26,6 +26,7 @@
 #include "harm.h"
 #include "layer.h"
 #include "measure.h"
+#include "mordent.h"
 #include "mrest.h"
 #include "note.h"
 #include "octave.h"
@@ -43,6 +44,7 @@
 #include "tie.h"
 #include "trill.h"
 #include "tuplet.h"
+#include "turn.h"
 #include "verse.h"
 #include "vrv.h"
 
@@ -397,7 +399,6 @@ bool MusicXmlInput::ReadMusicXml(pugi::xml_node root)
     pugi::xpath_node_set partListChildren = root.select_nodes("/score-partwise/part-list/*");
     for (pugi::xpath_node_set::const_iterator it = partListChildren.begin(); it != partListChildren.end(); ++it) {
         pugi::xpath_node xpathNode = *it;
-        m_octDis.push_back(0);
         if (IsElement(xpathNode.node(), "part-group")) {
             if (HasAttributeWithValue(xpathNode.node(), "type", "start")) {
                 StaffGrp *staffGrp = new StaffGrp();
@@ -497,9 +498,10 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     assert(root);
     pugi::xpath_node workTitle = root.select_single_node("/score-partwise/work/work-title");
     pugi::xpath_node movementTitle = root.select_single_node("/score-partwise/movement-title");
+    pugi::xml_node meiHead = m_doc->m_header.append_child("meiHead");
 
     // <fileDesc> /////////////
-    pugi::xml_node fileDesc = m_doc->m_header.append_child("fileDesc");
+    pugi::xml_node fileDesc = meiHead.append_child("fileDesc");
     pugi::xml_node titleStmt = fileDesc.append_child("titleStmt");
     pugi::xml_node meiTitle = titleStmt.append_child("title");
     if (movementTitle)
@@ -510,7 +512,7 @@ void MusicXmlInput::ReadMusicXmlTitle(pugi::xml_node root)
     pugi::xml_node pubStmt = fileDesc.append_child("pubStmt");
     pubStmt.append_child(pugi::node_pcdata);
 
-    pugi::xml_node encodingDesc = m_doc->m_header.append_child("encodingDesc");
+    pugi::xml_node encodingDesc = meiHead.append_child("encodingDesc");
     pugi::xml_node appInfo = encodingDesc.append_child("appInfo");
     pugi::xml_node app = appInfo.append_child("application");
     pugi::xml_node appName = app.append_child("name");
@@ -565,6 +567,8 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
                 // by default five line staves
                 staffDef->SetLines(5);
                 staffGrp->AddChild(staffDef);
+                // set initial octave shift
+                m_octDis.push_back(0);
             }
 
             // clef sign - first look if we have a clef-sign with the corresponding staff @number
@@ -1323,6 +1327,44 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         }
     }
 
+    // mordent
+    pugi::xpath_node xmlMordent = notations.node().select_single_node("ornaments/mordent");
+    if (xmlMordent) {
+        Mordent *mordent = new Mordent();
+        m_controlElements.push_back(std::make_pair(measureNum, mordent));
+        mordent->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        mordent->SetStartid("#" + element->GetUuid());
+        // color
+        std::string colorStr = GetAttributeValue(xmlMordent.node(), "color");
+        if (!colorStr.empty()) mordent->SetColor(colorStr.c_str());
+        // form
+        mordent->SetForm(mordentLog_FORM_norm);
+        // long
+        std::string elongation = GetAttributeValue(xmlMordent.node(), "long");
+        if (!elongation.empty()) mordent->SetLong(ConvertWordToBool(elongation.c_str()));
+        // place
+        std::string placeStr = GetAttributeValue(xmlMordent.node(), "placement");
+        if (!placeStr.empty()) mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(placeStr.c_str()));
+    }
+    pugi::xpath_node xmlMordentInv = notations.node().select_single_node("ornaments/inverted-mordent");
+    if (xmlMordentInv) {
+        Mordent *mordent = new Mordent();
+        m_controlElements.push_back(std::make_pair(measureNum, mordent));
+        mordent->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        mordent->SetStartid("#" + element->GetUuid());
+        // color
+        std::string colorStr = GetAttributeValue(xmlMordentInv.node(), "color");
+        if (!colorStr.empty()) mordent->SetColor(colorStr.c_str());
+        // form
+        mordent->SetForm(mordentLog_FORM_inv);
+        // long
+        std::string elongation = GetAttributeValue(xmlMordentInv.node(), "long");
+        if (!elongation.empty()) mordent->SetLong(ConvertWordToBool(elongation.c_str()));
+        // place
+        std::string placeStr = GetAttributeValue(xmlMordentInv.node(), "placement");
+        if (!placeStr.empty()) mordent->SetPlace(mordent->AttPlacement::StrToStaffrel(placeStr.c_str()));
+    }
+
     // trill
     pugi::xpath_node xmlTrill = notations.node().select_single_node("ornaments/trill-mark");
     if (xmlTrill) {
@@ -1336,6 +1378,38 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         // place
         std::string placeStr = GetAttributeValue(xmlTrill.node(), "placement");
         if (!placeStr.empty()) trill->SetPlace(trill->AttPlacement::StrToStaffrel(placeStr.c_str()));
+    }
+
+    // turn
+    pugi::xpath_node xmlTurn = notations.node().select_single_node("ornaments/turn");
+    if (xmlTurn) {
+        Turn *turn = new Turn();
+        m_controlElements.push_back(std::make_pair(measureNum, turn));
+        turn->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        turn->SetStartid("#" + element->GetUuid());
+        // color
+        std::string colorStr = GetAttributeValue(xmlTurn.node(), "color");
+        if (!colorStr.empty()) turn->SetColor(colorStr.c_str());
+        // form
+        turn->SetForm(turnLog_FORM_norm);
+        // place
+        std::string placeStr = GetAttributeValue(xmlTurn.node(), "placement");
+        if (!placeStr.empty()) turn->SetPlace(turn->AttPlacement::StrToStaffrel(placeStr.c_str()));
+    }
+    pugi::xpath_node xmlTurnInv = notations.node().select_single_node("ornaments/inverted-turn");
+    if (xmlTurnInv) {
+        Turn *turn = new Turn();
+        m_controlElements.push_back(std::make_pair(measureNum, turn));
+        turn->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
+        turn->SetStartid("#" + element->GetUuid());
+        // color
+        std::string colorStr = GetAttributeValue(xmlTurnInv.node(), "color");
+        if (!colorStr.empty()) turn->SetColor(colorStr.c_str());
+        // form
+        turn->SetForm(turnLog_FORM_inv);
+        // place
+        std::string placeStr = GetAttributeValue(xmlTurnInv.node(), "placement");
+        if (!placeStr.empty()) turn->SetPlace(turn->AttPlacement::StrToStaffrel(placeStr.c_str()));
     }
 
     // slur

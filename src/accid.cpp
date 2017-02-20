@@ -58,8 +58,31 @@ std::wstring Accid::GetSymbolStr() const
 {
     if (!this->HasAccid()) return L"";
 
+    wchar_t symc = GetAccidGlyph(this->GetAccid());
+    std::wstring symbolStr;
+
+    if (this->HasEnclose()) {
+        if (this->GetEnclose() == ENCLOSURE_brack) {
+            symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
+            symbolStr.push_back(symc);
+            symbolStr.push_back(SMUFL_E26D_accidentalBracketRight);
+        }
+        else {
+            symbolStr.push_back(SMUFL_E26A_accidentalParensLeft);
+            symbolStr.push_back(symc);
+            symbolStr.push_back(SMUFL_E26B_accidentalParensRight);
+        }
+    }
+    else {
+        symbolStr.push_back(symc);
+    }
+    return symbolStr;
+}
+
+wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_EXPLICIT accid)
+{
     int symc = SMUFL_E261_accidentalNatural;
-    switch (this->GetAccid()) {
+    switch (accid) {
         case ACCIDENTAL_EXPLICIT_s: symc = SMUFL_E262_accidentalSharp; break;
         case ACCIDENTAL_EXPLICIT_f: symc = SMUFL_E260_accidentalFlat; break;
         case ACCIDENTAL_EXPLICIT_ss: symc = SMUFL_E269_accidentalSharpSharp; break;
@@ -88,24 +111,7 @@ std::wstring Accid::GetSymbolStr() const
         case ACCIDENTAL_EXPLICIT_3qs: symc = SMUFL_E283_accidentalThreeQuarterTonesSharpStein; break;
         default: break;
     }
-    std::wstring symbolStr;
-
-    if (this->HasEnclose()) {
-        if (this->GetEnclose() == ENCLOSURE_brack) {
-            symbolStr.push_back(SMUFL_E26C_accidentalBracketLeft);
-            symbolStr.push_back(symc);
-            symbolStr.push_back(SMUFL_E26D_accidentalBracketRight);
-        }
-        else {
-            symbolStr.push_back(SMUFL_E26A_accidentalParensLeft);
-            symbolStr.push_back(symc);
-            symbolStr.push_back(SMUFL_E26B_accidentalParensRight);
-        }
-    }
-    else {
-        symbolStr.push_back(symc);
-    }
-    return symbolStr;
+    return symc;
 }
 
 //----------------------------------------------------------------------------
