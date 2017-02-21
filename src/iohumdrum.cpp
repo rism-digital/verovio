@@ -1394,8 +1394,8 @@ void HumdrumInput::addInstrumentDefinition(StaffDef *staffdef, hum::HTp partstar
     // staffdef->AddInstrDef(idef);
 
     // Allowing users to assign MIDI instrument numbers in data would be useful.
-    //	static HumInstrument imap;
-    //	int gmpc = imap.getGM(*instcode);
+    //  static HumInstrument imap;
+    //  int gmpc = imap.getGM(*instcode);
 
     //   m_staffdef.push_back(new StaffDef());
     //   m_staffgroup->AddStaffDef(m_staffdef.back());
@@ -2056,13 +2056,13 @@ bool HumdrumInput::convertStaffLayer(int track, int startline, int endline, int 
 
     if (layerdata.size() > 0) {
         if (layerdata[0]->size() > 0) {
-            setLocationId(m_layer, layerdata[0]);
+            setLocationIdNSuffix(m_layer, layerdata[0], layerindex + 1);
         }
     }
 
     if ((layerindex == 0) && (layerdata.size() > 0)) {
         if ((layerdata[0]->size() > 0) && (layerdata[0]->at(0) == '=')) {
-            setLocationId(m_staff, layerdata[0]);
+            setLocationIdNSuffix(m_staff, layerdata[0], layerindex + 1);
         }
     }
 
@@ -5245,10 +5245,10 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 //
 // HumdrumInput::addTurn -- Add turn for note.
 //  only one of these four possibilities:
-//   	S = turn
-//   	$ = inverted turn
-//   	SS = turn, centered between two notes
-//   	$$ = inverted turn, centered between two notes
+//      S = turn
+//      $ = inverted turn
+//      SS = turn, centered between two notes
+//      $$ = inverted turn, centered between two notes
 //
 //
 
@@ -5338,10 +5338,10 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
 //////////////////////////////
 //
 // HumdrumInput::addMordent -- Add mordent for note.
-//   	M = upper mordent, major second interval
-//   	m = upper mordent, minor second interval
-//   	W = lower mordent, major second interval
-//   	w = lower mordent, minor second interval
+//      M = upper mordent, major second interval
+//      m = upper mordent, minor second interval
+//      W = lower mordent, major second interval
+//      w = lower mordent, minor second interval
 //
 //
 
