@@ -1041,7 +1041,7 @@ int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
-    LogDebug("AlignmentRef staff %d", GetN());
+    //LogDebug("AlignmentRef staff %d", GetN());
     this->m_elementRef->Process(params->m_functor, params);
 
     return FUNCTOR_CONTINUE;
