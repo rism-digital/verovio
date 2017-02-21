@@ -978,7 +978,8 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
         // We can set staffN as VRV_UNSET to align all staves (this should be an option)
         // We can also define somewhere vector of staffDef@n to be aligned together
         int left = m_graceAligner->GetGraceGroupLeft(params->m_staffN);
-        left -= params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(params->m_doc->GetGraceSize(100))
+        // We also increase artificially the margin with the previous note
+        if (left != -VRV_UNSET) left -= params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(150)
             / PARAM_DENOMINATOR;
         if (left < params->m_minPos) {
             int offset = (params->m_minPos - left);
@@ -990,6 +991,9 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
         // Check if the right position of the group is on the right of the minPos
         // Inf not move the minPos (but not the alignment)
         int right = m_graceAligner->GetGraceGroupRight(params->m_staffN);
+        // We also reduce artificially the margin with the next note
+        if (right != VRV_UNSET) right -= params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75)
+            / PARAM_DENOMINATOR;
         if (right > params->m_minPos) {
             int offset = (right - params->m_minPos);
             params->m_minPos += offset;

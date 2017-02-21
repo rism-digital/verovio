@@ -671,7 +671,11 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int size = (int)noteList.size();
     if (size > 0) {
         // set the default x position
-        int xAccid = -(radius * 2);
+        int xAccid = -(radius);
+        // adjusting for grace notes - temporary
+        int space = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        if (drawingCueSize) space = space * m_doc->GetGraceSize(100) / 100;
+        xAccid -= space;
 
         // if chord is a down-stemmed non-cluster, it needs one more note diameter of space
         if ((chord->GetDrawingStemDir() == STEMDIRECTION_down) && (chord->m_clusters.size() > 0)) {
@@ -1427,8 +1431,9 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
                 dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
                 // HARDCODED
-                accidXShift
-                    -= extend.m_width + m_doc->GetGraceSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3);
+                int space = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
+                if (drawingCueSize) space = space * m_doc->GetGraceSize(100) / 100;
+                accidXShift -= (extend.m_width + space);
                 dc->ResetFont();
             }
             accid->SetDrawingXRel(accidXShift);
@@ -1651,15 +1656,24 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     int positionShiftX2 = positionShift * 3;
     int positionShiftY2 = positionShift * 6;
     Point startPoint = stemInterface->GetDrawingStemStart();
+    
+    int startPointY = startPoint.y;
+    if (element->Is(CHORD)) {
+        Chord *chord = dynamic_cast<Chord*>(element);
+        assert(chord);
+        int yMin, yMax;
+        chord->GetYExtremes(&yMin, &yMax);
+        startPointY = (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up) ? yMin : yMax;
+    }
 
     // HARDCODED
     if (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
-        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPoint.y + positionShiftY1),
-            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPoint.y + positionShiftY2));
+        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPointY + positionShiftY1),
+            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPointY + positionShiftY2));
     }
     else {
-        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPoint.y - positionShiftY1),
-            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPoint.y - positionShiftY2));
+        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPointY - positionShiftY1),
+            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPointY - positionShiftY2));
     }
 
     dc->ResetPen();
