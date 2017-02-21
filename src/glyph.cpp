@@ -105,5 +105,30 @@ void Glyph::GetBoundingBox(int *x, int *y, int *w, int *h)
     (*w) = m_width;
     (*h) = m_height;
 }
+    
+void Glyph::SetAnchor(std::string anchorStr, double x, double y)
+{
+    SMuFLGlyphAnchor anchorId;
+    if (anchorStr == "stemDownNW") anchorId = SMUFL_stemDownNW;
+    else if (anchorStr == "stemUpSE") anchorId = SMUFL_stemUpSE;
+    else if (anchorStr == "cutOutNE") anchorId = SMUFL_cutOutNE;
+    else if (anchorStr == "cutOutNW") anchorId = SMUFL_cutOutNW;
+    else if (anchorStr == "cutOutSE") anchorId = SMUFL_cutOutSE;
+    else if (anchorStr == "cutOutSW") anchorId = SMUFL_cutOutSW;
+    // Silently ignore unused anchors
+    else return;
+    m_anchors[anchorId] = Anchor(x, y);
+}
+    
+
+bool Glyph::HasAnchor(SMuFLGlyphAnchor anchor)
+{
+    return (m_anchors.count(anchor) == 1);
+}
+    
+const Anchor *Glyph::GetAnchor(SMuFLGlyphAnchor anchor)
+{
+    return &m_anchors[anchor];
+}
 
 } // namespace vrv

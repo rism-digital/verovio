@@ -301,6 +301,19 @@ enum EditorialLevel {
 };
 
 //----------------------------------------------------------------------------
+// The used SMuFL glyph anchors
+//----------------------------------------------------------------------------
+
+enum SMuFLGlyphAnchor {
+    SMUFL_stemDownNW = 0,
+    SMUFL_stemUpSE,
+    SMUFL_cutOutNE,
+    SMUFL_cutOutNW,
+    SMUFL_cutOutSE,
+    SMUFL_cutOutSW
+};
+
+//----------------------------------------------------------------------------
 // Types for layer element
 //----------------------------------------------------------------------------
 

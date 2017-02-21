@@ -11,7 +11,13 @@
 #include <algorithm>
 #include <string>
 
+//----------------------------------------------------------------------------
+
+#include "vrvdef.h"
+
 namespace vrv {
+
+class Anchor;
 
 /**
  * This class is used for storing a music font glyph.
@@ -61,6 +67,22 @@ public:
     int GetHorizAdvX() { return m_horizAdvX; }
     void SetHorizAdvX(double horizAdvX) { m_horizAdvX = (int)(horizAdvX * 10.0); }
     ///@}
+    
+    /**
+     * Add an anchor for the glyph.
+     * The string is turn into a SMuFLGlyphAnchor ("cutOutNE" => SMUFL_cutOutNE)
+     */
+    void SetAnchor(std::string anchorStr, double x, double y);
+    
+    /**
+     * Check if the glyph has anchor provided.
+     */
+    bool HasAnchor(SMuFLGlyphAnchor anchor);
+    
+    /**
+     * Return the SMuFL anchor for the glyph.
+     */
+    const Anchor *GetAnchor(SMuFLGlyphAnchor anchor);
 
 private:
     //
@@ -80,6 +102,36 @@ private:
     std::string m_path;
     /** The Unicode code in hexa as string */
     std::string m_codeStr;
+    /** A map of the available anchors */
+    std::map<SMuFLGlyphAnchor, Anchor> m_anchors;
+};
+
+/**
+ * This class is used for storing an anchor point of a music font glyph.
+ */
+class Anchor {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    Anchor() { m_x = 0; m_y = 0; }
+    Anchor(double x, double y) { m_x = x; m_y = y; }
+    virtual ~Anchor() {};
+    ///@}
+    
+    /** Get the x and y anchors */
+    double GetX() { return m_x; }
+    double GetY() { return m_y; }
+    
+private:
+    //
+public:
+    //
+private:
+    /** The anchor values */
+    double m_x;
+    double m_y;
 };
 
 } // namespace vrv
