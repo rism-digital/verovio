@@ -1759,7 +1759,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
             // Adjust the y position
             double factor = 1.0;
-            auto meiaccid = mordent->GetAccidlower();
+            data_ACCIDENTAL_EXPLICIT meiaccid = mordent->GetAccidlower();
             // optimized vertical kerning for Leipzig font:
             if (meiaccid == ACCIDENTAL_EXPLICIT_ff) {
                 factor = 1.20;
@@ -1782,7 +1782,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             y += factor * m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
         }
         else if (mordent->HasAccidupper()) {
-            auto mordentHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
+            double mordentHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
             int accid = Accid::GetAccidGlyph(mordent->GetAccidupper());
             std::wstring accidStr;
             accidStr.push_back(accid);
@@ -1790,7 +1790,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
             // Adjust the y position
             double factor = 1.75;
-            auto meiaccid = mordent->GetAccidupper();
+            data_ACCIDENTAL_EXPLICIT meiaccid = mordent->GetAccidupper();
             // optimized vertical kerning for Leipzig font:
             if (meiaccid == ACCIDENTAL_EXPLICIT_ff) {
                 factor = 1.40;
@@ -1955,7 +1955,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
             y += m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
         }
         else if (trill->HasAccidupper()) {
-            auto trillHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
+            double trillHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
             wchar_t accid = Accid::GetAccidGlyph(trill->GetAccidupper());
             std::wstring accidStr;
             accidStr.push_back(accid);
