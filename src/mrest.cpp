@@ -13,11 +13,12 @@ namespace vrv {
 // MRest
 //----------------------------------------------------------------------------
 
-MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttVisibility(), AttFermatapresent()
+MRest::MRest() : LayerElement("mrest-"), PositionInterface(), AttVisibility(), AttFermatapresent(), AttRelativesize()
 {
     RegisterInterface(PositionInterface::GetAttClasses(), PositionInterface::IsInterface());
     RegisterAttClass(ATT_VISIBILITY);
     RegisterAttClass(ATT_FERMATAPRESENT);
+    RegisterAttClass(ATT_RELATIVESIZE);
 
     Reset();
 }
@@ -32,6 +33,7 @@ void MRest::Reset()
     PositionInterface::Reset();
     ResetVisibility();
     ResetFermatapresent();
+    ResetRelativesize();
 }
 
 } // namespace vrv

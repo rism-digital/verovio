@@ -252,6 +252,11 @@ void Doc::PrepareDrawing()
             "%d time spanning elements could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
+    // Prepare the cross-staff pointers
+    PrepareCrossStaffParams prepareCrossStaffParams;
+    Functor prepareCrossStaff(&Object::PrepareCrossStaff);
+    this->Process(&prepareCrossStaff, &prepareCrossStaffParams);
+
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
     PrepareProcessingListsParams prepareProcessingListsParams;
@@ -474,6 +479,7 @@ void Doc::CastOffDoc()
 
     // Reset the scoreDef at the beginning of each system
     this->CollectScoreDefs(true);
+    contentPage->LayOutHorizontally();
     contentPage->LayOutVertically();
 
     // Detach the contentPage

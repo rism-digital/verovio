@@ -263,6 +263,8 @@ int DarmsInput::do_Clef(int pos, const char *data)
     else {
         // what the...
         LogWarning("DarmsInput: Invalid clef specification: %c", data[pos]);
+        // avoiding memory leak
+        delete mclef;
         return 0; // fail
     }
 

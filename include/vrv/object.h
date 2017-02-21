@@ -267,6 +267,14 @@ public:
     int GetIdx() const;
 
     /**
+     * @name Get the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
+
+    /**
      * Look for the Object in the children and return its position (-1 if not found)
      */
     int GetChildIndex(const Object *child);
@@ -493,18 +501,6 @@ public:
     virtual int AlignMeasuresEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Correct the X alignment once the content of a system has been aligned and laid out
-     * See Measure::IntegrateBoundingBoxXShift for actual implementation
-     */
-    virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Correct the X alignment once the content of a system has been aligned and laid out
-     * See Measure::IntegrateBoundingBoxXShift for actual implementation
-     */
-    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Reset the horizontal alignment environment for various types for object.
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
@@ -517,17 +513,31 @@ public:
 
     /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
-     * The m_xShift is updated appropriately
+     * The functor is redirected from the MeasureAligner and then from the appropriate
+     * alignment to the GraceAligner
      */
-    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
+    virtual int AdjustGraceXPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustGraceXPosEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * Retrieve the minimum left and maximum right for an alignment.
+     * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight
+     */
+    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.
-     * The m_xShift is updated appropriately
-     * At the end, lay out the X positions of the staff content looking at the bounding boxes.
+     * The functor process by aligned-staff content, that is from a rediction in the
+     * MeasureAligner and then staff by staff but taking into account cross-staff elements
      */
-    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
+    virtual int AdjustXPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustXPosEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the spacing of the syl processing verse by verse
+     */
+    virtual int AdjustSylSpacing(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustSylSpacingEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     ///@}
 
@@ -626,6 +636,11 @@ public:
     ///@{
 
     /**
+     * See cross-staff / layer pointers on LayerElement
+     */
+    virtual int PrepareCrossStaff(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
      */
     virtual int PrepareProcessingLists(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
@@ -713,7 +728,7 @@ public:
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int SetAlignmentPitchPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
