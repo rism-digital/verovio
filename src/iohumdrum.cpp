@@ -4503,6 +4503,23 @@ void HumdrumInput::convertChord(Chord *chord, hum::HTp token, int staffindex)
         convertNote(note, token, staffindex, j);
     }
 
+    // grace notes need to be done before rhythm since default
+    // duration is set to an eighth note.
+    if (token->find("qq") != string::npos) {
+        chord->SetGrace(GRACE_acc);
+        // set the visual duration to an eighth note if there
+        // is no rhythm specified (will be overwritten later
+        // if there is a rhythm).
+        chord->SetDur(DURATION_8);
+    }
+    else if (token->find("q") != string::npos) {
+        chord->SetGrace(GRACE_unacc);
+        // set the visual duration to an eighth note if there
+        // is no rhythm specified (will be overwritten later
+        // if there is a rhythm).
+        chord->SetDur(DURATION_8);
+    }
+
     convertRhythm(chord, token);
 
     // Stem direction of the chord.  If both up and down, then show up.
@@ -4772,20 +4789,22 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     }
     ss[staffindex].ottavanoteend = note;
 
-    // acc/unacc need to be switched in verovio, so switch also here later:
-    if (tstring.find("qq") != string::npos) {
-        note->SetGrace(GRACE_unacc);
-        // set the visual duration to an eighth note if there
-        // is no rhythm specified (will be overwritten later
-        // if there is a rhythm).
-        note->SetDur(DURATION_8);
-    }
-    else if (tstring.find("q") != string::npos) {
-        note->SetGrace(GRACE_acc);
-        // set the visual duration to an eighth note if there
-        // is no rhythm specified (will be overwritten later
-        // if there is a rhythm).
-        note->SetDur(DURATION_8);
+    if (!chordQ) {
+        // acc/unacc need to be switched in verovio, so switch also here later:
+        if (tstring.find("qq") != string::npos) {
+            note->SetGrace(GRACE_acc);
+            // set the visual duration to an eighth note if there
+            // is no rhythm specified (will be overwritten later
+            // if there is a rhythm).
+            note->SetDur(DURATION_8);
+        }
+        else if (tstring.find("q") != string::npos) {
+            note->SetGrace(GRACE_unacc);
+            // set the visual duration to an eighth note if there
+            // is no rhythm specified (will be overwritten later
+            // if there is a rhythm).
+            note->SetDur(DURATION_8);
+        }
     }
 
     // Add the pitch information
