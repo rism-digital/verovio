@@ -337,7 +337,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     interface->SetDrawingStemDir(dir);
 
     // cast to note is check when setting drawingCueSize value
-    if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_acc)) {
+    if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_unacc)) {
         DrawAcciaccaturaSlash(dc, object);
     }
 }

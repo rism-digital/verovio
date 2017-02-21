@@ -2065,7 +2065,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
         assert(object->Is(NOTE) || object->Is(CHORD));
         AttGraced *attGraced = dynamic_cast<AttGraced *>(object);
         assert(attGraced);
-        if (attGraced->GetGrace() == GRACE_acc) DrawAcciaccaturaSlash(dc, object);
+        if (attGraced->GetGrace() == GRACE_unacc) DrawAcciaccaturaSlash(dc, object);
     }
 }
 
