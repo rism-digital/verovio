@@ -442,6 +442,18 @@ void Object::AddChild(Object *child)
     assert(false);
 }
 
+int Object::GetDrawingX() const
+{
+    assert(m_parent);
+    return m_parent->GetDrawingX();
+}
+
+int Object::GetDrawingY() const
+{
+    assert(m_parent);
+    return m_parent->GetDrawingY();
+}
+
 int Object::GetChildIndex(const Object *child)
 {
     ArrayOfObjects::iterator iter;
@@ -764,6 +776,7 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
     assert(params);
 
     params->m_flatList->push_back(this);
+    // LogDebug("List %d", params->m_flatList->size());
 
     return FUNCTOR_CONTINUE;
 }
@@ -949,6 +962,11 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = params->m_currentStaffDef;
+        staff->m_drawingLines = params->m_currentStaffDef->GetLines();
+        staff->m_drawingNotationType = params->m_currentStaffDef->GetNotationtype();
+        if (params->m_currentStaffDef->HasScale()) {
+            staff->m_drawingStaffSize = params->m_currentStaffDef->GetScale();
+        }
         return FUNCTOR_CONTINUE;
     }
 
@@ -998,175 +1016,18 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 {
-    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    GetAlignmentLeftRightParams *params = dynamic_cast<GetAlignmentLeftRightParams *>(functorParams);
     assert(params);
 
-    // starting new layer
-    if (this->Is(LAYER)) {
-        params->m_graceMinPos = 0;
-        return FUNCTOR_CONTINUE;
-    }
+    if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
 
-    if (!this->Is(NOTE)) {
-        return FUNCTOR_CONTINUE;
-    }
+    int refLeft = this->GetSelfLeft();
+    if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
 
-    Note *note = dynamic_cast<Note *>(this);
-    assert(note);
-
-    if (!note->IsGraceNote() || note->IsChordTone()) {
-        params->m_graceMinPos = 0;
-        return FUNCTOR_CONTINUE;
-    }
-
-    // we should have processed aligned before
-    assert(note->GetGraceAlignment());
-
-    // the negative offset is the part of the bounding box that overflows on the left
-    // |____x_____|
-    //  ---- = negative offset
-    int negative_offset = -(note->m_contentBB_x1)
-        + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-
-    if (params->m_graceMinPos > 0) {
-        //(*minPos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-    }
-
-    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used)
-    if (negative_offset < 0) negative_offset = 0;
-
-    // check if the element overlaps with the preceeding one given by (*minPos)
-    int overlap = params->m_graceMinPos - note->GetGraceAlignment()->GetXRel() + negative_offset;
-
-    if ((note->GetGraceAlignment()->GetXRel() - negative_offset) < params->m_graceMinPos) {
-        note->GetGraceAlignment()->SetXShift(overlap);
-    }
-
-    // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    params->m_graceMinPos = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2
-        + params->m_doc->GetRightMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    //(*minPos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
-    // note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) *
-    // doc->GetDrawingUnit(100) /
-    // PARAM_DENOMINATOR);
-    note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
-{
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
-    assert(params);
-
-    // starting new layer
-    if (this->Is(LAYER)) {
-        params->m_minPos = params->m_layerMinPos;
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (!this->IsLayerElement()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    LayerElement *current = dynamic_cast<LayerElement *>(this);
-    assert(current);
-
-    // we should have processed aligned before
-    assert(current->GetAlignment());
-
-    if (!current->HasToBeAligned()) {
-        // if nothing to do with this type of element
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (!current->HasUpdatedBB()) {
-        // if nothing was drawn, do not take it into account
-        assert(false); // quite drastic but this should never happen. If nothing has to be drawn
-        LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
-        // then the BB should be set to empty with  Object::SetEmptyBB()
-        return FUNCTOR_CONTINUE;
-    }
-
-    if ((current->Is(NOTE)) && current->GetFirstParent(CHORD, MAX_CHORD_DEPTH)) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    if ((current->Is(ACCID)) && current->GetFirstParent(NOTE, MAX_ACCID_DEPTH)) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // The negative offset is the part of the bounding box that overflows on the left
-    // |____x_____|
-    //  ---- = negative offset
-    int negative_offset = -(current->m_contentBB_x1);
-
-    // Increase negative_offset by the symbol type's left margin, unless it's a note
-    // that's part of a ligature.
-    if (!current->IsGraceNote() && !current->IsInLigature())
-        negative_offset += (params->m_doc->GetLeftMargin(current->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-            / PARAM_DENOMINATOR);
-
-    // This should never happen but can with glyphs not exactly registered at x=0 in the SMuFL font used
-    if (negative_offset < 0) negative_offset = 0;
-
-    // with a grace note, also take into account the full width of the group given by the GraceAligner
-    if (current->GetAlignment()->HasGraceAligner()) {
-        negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth()
-            + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-    }
-
-    int currentX = current->GetAlignment()->GetXRel();
-    // with grace note, take into account the position of the note in the grace group
-    if (current->IsGraceNote()) {
-        Note *note = dynamic_cast<Note *>(current);
-        currentX += note->GetGraceAlignment()->GetXRel();
-    }
-
-    // check if the element overlaps with the preceeding one given by (*minPos)
-    int overlap = params->m_minPos - currentX + negative_offset;
-
-    if ((currentX - negative_offset) < params->m_minPos) {
-        current->GetAlignment()->SetXShift(overlap);
-    }
-
-    // do not adjust the min pos and the max width since this is already handled by
-    // the GraceAligner
-    if (current->IsGraceNote()) {
-        params->m_minPos = current->GetAlignment()->GetXRel();
-        current->GetAlignment()->SetMaxWidth(0);
-        return FUNCTOR_CONTINUE;
-    }
-
-    // the next minimal position is given by the right side of the bounding box + the spacing of the element
-    int width = current->m_contentBB_x2;
-
-    // Move to right by the symbol type's right margin, unless it's a note that's
-    // part of a ligature.
-    if (!current->HasEmptyBB() && !current->IsInLigature())
-        width += params->m_doc->GetRightMargin(current->GetClassId()) * params->m_doc->GetDrawingUnit(100)
-            / PARAM_DENOMINATOR;
-    params->m_minPos = current->GetAlignment()->GetXRel() + width;
-    current->GetAlignment()->SetMaxWidth(width);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
-{
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
-    assert(params);
-
-    // ending a layer
-    if (this->Is(LAYER)) {
-        // mininimum position is the with the layer
-        // we keep it if it's higher than what we had so far
-        // this will be used for shifting the right barLine
-        params->m_measureWidth = std::max(params->m_measureWidth, params->m_minPos);
-        return FUNCTOR_CONTINUE;
-    }
+    int refRight = this->GetSelfRight();
+    if (params->m_maxRight < refRight) params->m_maxRight = refRight;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1228,11 +1089,6 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
 
     LayerElement *current = dynamic_cast<LayerElement *>(this);
     assert(current);
-
-    if (!current->HasToBeAligned()) {
-        // if nothing to do with this type of element
-        // return FUNCTOR_CONTINUE;
-    }
 
     if (!current->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account

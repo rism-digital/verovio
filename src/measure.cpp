@@ -24,6 +24,7 @@
 #include "functorparams.h"
 #include "page.h"
 #include "staff.h"
+#include "syl.h"
 #include "system.h"
 #include "timeinterface.h"
 #include "timestamp.h"
@@ -46,6 +47,9 @@ Measure::Measure(bool measureMusic, int logMeasureNb) : Object("measure-"), AttC
     m_measureAligner.SetParent(this);
     // Idem for timestamps
     m_timestampAligner.SetParent(this);
+    // Idem for barlines
+    m_leftBarLine.SetParent(this);
+    m_rightBarLine.SetParent(this);
 
     // owned pointers need to be set to NULL;
     m_drawingScoreDef = NULL;
@@ -77,7 +81,6 @@ void Measure::Reset()
     m_timestampAligner.Reset();
     m_xAbs = VRV_UNSET;
     m_drawingXRel = 0;
-    m_drawingX = 0;
 
     // by default, we have a single barLine on the right (none on the left)
     m_rightBarLine.SetForm(this->GetRight());
@@ -117,6 +120,13 @@ void Measure::AddChild(Object *child)
     Modify();
 }
 
+int Measure::GetDrawingX() const
+{
+    System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
+    assert(system);
+    return (system->GetDrawingX() + this->GetDrawingXRel());
+}
+
 int Measure::GetLeftBarLineXRel() const
 {
     if (m_measureAligner.GetLeftBarLineAlignment()) {
@@ -125,20 +135,20 @@ int Measure::GetLeftBarLineXRel() const
     return 0;
 }
 
-int Measure::GetLeftBarLineX1Rel() const
+int Measure::GetLeftBarLineLeft() const
 {
     int x = GetLeftBarLineXRel();
     if (m_leftBarLine.HasUpdatedBB()) {
-        x += m_leftBarLine.m_contentBB_x1;
+        x += m_leftBarLine.GetContentX1();
     }
     return x;
 }
 
-int Measure::GetLeftBarLineX2Rel() const
+int Measure::GetLeftBarLineRight() const
 {
     int x = GetLeftBarLineXRel();
     if (m_leftBarLine.HasUpdatedBB()) {
-        x += m_leftBarLine.m_contentBB_x2;
+        x += m_leftBarLine.GetContentX2();
     }
     return x;
 }
@@ -151,20 +161,20 @@ int Measure::GetRightBarLineXRel() const
     return 0;
 }
 
-int Measure::GetRightBarLineX1Rel() const
+int Measure::GetRightBarLineLeft() const
 {
     int x = GetRightBarLineXRel();
     if (m_rightBarLine.HasUpdatedBB()) {
-        x += m_rightBarLine.m_contentBB_x1;
+        x += m_rightBarLine.GetContentX1();
     }
     return x;
 }
 
-int Measure::GetRightBarLineX2Rel() const
+int Measure::GetRightBarLineRight() const
 {
     int x = GetRightBarLineXRel();
     if (m_rightBarLine.HasUpdatedBB()) {
-        x += m_rightBarLine.m_contentBB_x2;
+        x += m_rightBarLine.GetContentX2();
     }
     return x;
 }
@@ -172,10 +182,17 @@ int Measure::GetRightBarLineX2Rel() const
 int Measure::GetWidth() const
 {
     assert(m_measureAligner.GetRightAlignment());
-    if (m_measureAligner.GetRightAlignment()) {
-        return m_measureAligner.GetRightAlignment()->GetXRel();
-    }
-    return 0;
+    return m_measureAligner.GetRightAlignment()->GetXRel();
+}
+
+int Measure::GetInnerWidth() const
+{
+    return (this->GetRightBarLineLeft() - this->GetLeftBarLineRight());
+}
+
+int Measure::GetInnerCenterX() const
+{
+    return (this->GetDrawingX() + this->GetLeftBarLineRight() + this->GetInnerWidth() / 2);
 }
 
 void Measure::SetDrawingScoreDef(ScoreDef *drawingScoreDef)
@@ -318,7 +335,6 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     m_drawingXRel = 0;
-    m_drawingX = 0;
     if (m_measureAligner.GetLeftAlignment()) {
         m_measureAligner.GetLeftAlignment()->SetXRel(0);
     }
@@ -340,15 +356,8 @@ int Measure::AlignHorizontally(FunctorParams *functorParams)
     // point to it
     params->m_measureAligner = &m_measureAligner;
 
-    if (m_leftBarLine.GetForm() != BARRENDITION_NONE) {
-        m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment());
-    }
-
-    if (m_rightBarLine.GetForm() != BARRENDITION_NONE) {
-        m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment());
-    }
-
-    // LogDebug("\n ***** Align measure %d", this->GetN());
+    m_leftBarLine.SetAlignment(m_measureAligner.GetLeftBarLineAlignment());
+    m_rightBarLine.SetAlignment(m_measureAligner.GetRightBarLineAlignment());
 
     assert(params->m_measureAligner);
 
@@ -383,57 +392,79 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Measure::SetBoundingBoxXShift(FunctorParams *functorParams)
+int Measure::AdjustGraceXPos(FunctorParams *functorParams)
 {
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
+    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
-    // we reset the measure width and the minimum position
-    params->m_measureWidth = 0;
-    params->m_layerMinPos = 0;
-    params->m_minPos = 0;
+    params->m_rightDefaultAlignment = NULL;
 
-    // Process the left scoreDef elements and the left barLine
-    m_measureAligner.Process(params->m_functor, params);
-
-    params->m_layerMinPos = params->m_minPos;
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
-{
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
-    assert(params);
-
-    // use the measure width as minimum position of the barLine
-    params->m_minPos = params->m_measureWidth;
-
-    // Process the right barLine and the right scoreDef elements
-    m_measureAligner.Process(params->m_functorEnd, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Measure::IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams)
-{
-    IntegrateBoundingBoxGraceXShiftParams *params
-        = dynamic_cast<IntegrateBoundingBoxGraceXShiftParams *>(functorParams);
-    assert(params);
-
-    m_measureAligner.Process(params->m_functor, params);
+    // We process it backward because we want to get the rightDefaultAlignment
+    m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, BACKWARD);
 
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::IntegrateBoundingBoxXShift(FunctorParams *functorParams)
+int Measure::AdjustXPos(FunctorParams *functorParams)
 {
-    IntegrateBoundingBoxXShiftParams *params = dynamic_cast<IntegrateBoundingBoxXShiftParams *>(functorParams);
+    AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
 
-    m_measureAligner.Process(params->m_functor, params);
+    std::vector<int>::iterator iter;
+    std::vector<AttComparison *> filters;
+    for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
+        params->m_minPos = 0;
+        params->m_upcomingMinPos = VRV_UNSET;
+        params->m_cumulatedXShift = 0;
+        params->m_staffN = (*iter);
+        filters.clear();
+        // Create ad comparison object for each type / @n
+        std::vector<int> ns;
+        // -1 for barline attributes that need to be taken into account each time
+        ns.push_back(-1);
+        ns.push_back(*iter);
+        AttCommonNComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
+        filters.push_back(&matchStaff);
+
+        m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
+    }
+
+    int minMeasureWidth = params->m_doc->m_drawingMinMeasureWidth;
+    // First try to see if we have a double measure length element
+    MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_FULLMEASURE2);
+    Alignment *fullMeasure2
+        = dynamic_cast<Alignment *>(m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
+    if (fullMeasure2 != NULL) minMeasureWidth *= 2;
+
+    int currentMeasureWidth = this->GetRightBarLineLeft() - this->GetLeftBarLineRight();
+    if (currentMeasureWidth < minMeasureWidth) {
+        ArrayOfAdjustmentTuples boundaries{ std::make_tuple(this->GetLeftBarLine()->GetAlignment(),
+            this->GetRightBarLine()->GetAlignment(), minMeasureWidth - currentMeasureWidth) };
+        m_measureAligner.AdjustProportionally(boundaries);
+    }
 
     return FUNCTOR_SIBLINGS;
+}
+
+int Measure::AdjustSylSpacingEnd(FunctorParams *functorParams)
+{
+    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
+    assert(params);
+
+    // Here we also need to handle the last syl or the measure - we check the alignment with the right barline
+    if (params->m_previousSyl) {
+        int overlap = params->m_previousSyl->GetSelfRight() - this->GetRightBarLine()->GetAlignment()->GetXRel();
+        if (overlap > 0) {
+            params->m_overlapingSyl.push_back(std::make_tuple(
+                params->m_previousSyl->GetAlignment(), this->GetRightBarLine()->GetAlignment(), overlap));
+        }
+    }
+
+    // Ajust the postion of the alignment according to what we have collected for this verse
+    m_measureAligner.AdjustProportionally(params->m_overlapingSyl);
+    params->m_overlapingSyl.clear();
+
+    return FUNCTOR_CONTINUE;
 }
 
 int Measure::SetAlignmentXPos(FunctorParams *functorParams)
@@ -526,39 +557,6 @@ int Measure::CastOffEncoding(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Measure::SetDrawingXY(FunctorParams *functorParams)
-{
-    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
-    assert(params);
-
-    params->m_currentMeasure = this;
-
-    // Second pass where we do just process layer elements
-    if (params->m_processLayerElements) {
-        // However, we need to process the timestamps
-        m_timestampAligner.Process(params->m_functor, params);
-        return FUNCTOR_CONTINUE;
-    }
-
-    // Here we set the appropriate y value to be used for drawing
-    // With Raw documents, we use m_drawingXRel that is calculated by the layout algorithm
-    // With Transcription documents, we use the m_xAbs
-    if (this->m_xAbs == VRV_UNSET) {
-        assert(params->m_doc->GetType() == Raw);
-        this->SetDrawingX(this->m_drawingXRel + params->m_currentSystem->GetDrawingX());
-    }
-    else {
-        assert(params->m_doc->GetType() == Transcription);
-        this->SetDrawingX(this->m_xAbs);
-    }
-
-    // Process the timestamps - we can do it already since the first pass in only taking care of X position for the
-    // LayerElements
-    m_timestampAligner.Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Measure::FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams)
 {
     FillStaffCurrentTimeSpanningParams *params = dynamic_cast<FillStaffCurrentTimeSpanningParams *>(functorParams);
@@ -599,6 +597,16 @@ int Measure::PrepareBoundaries(FunctorParams *functorParams)
 
     // Keep a pointer to the measure for when we are reaching the end (see BoundaryEnd::PrepareBoundaries)
     params->m_lastMeasure = this;
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Measure::PrepareCrossStaff(FunctorParams *functorParams)
+{
+    PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
+    assert(params);
+
+    params->m_currentMeasure = this;
 
     return FUNCTOR_CONTINUE;
 }

@@ -56,8 +56,6 @@ void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::st
 
 void BBoxDeviceContext::ResumeGraphic(Object *object, std::string gId)
 {
-    // I am not sure we actually have to reset the bounding box here...
-    object->BoundingBox::ResetBoundingBox();
     m_objects.push_back(object);
 }
 

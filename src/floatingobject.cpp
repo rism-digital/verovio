@@ -24,6 +24,7 @@
 #include "octave.h"
 #include "pedal.h"
 #include "slur.h"
+#include "staff.h"
 #include "tempo.h"
 #include "timeinterface.h"
 #include "trill.h"
@@ -189,6 +190,9 @@ void FloatingPositioner::ResetPositioner()
 {
     BoundingBox::ResetBoundingBox();
 
+    m_objectX = NULL;
+    m_objectY = NULL;
+
     m_drawingYRel = 0;
     m_cuvrePoints[0] = Point(0, 0);
     m_cuvrePoints[1] = Point(0, 0);
@@ -202,12 +206,22 @@ void FloatingPositioner::ResetPositioner()
 
 int FloatingPositioner::GetDrawingX() const
 {
-    return m_drawingX;
+    assert(m_objectX);
+    return m_objectX->GetDrawingX();
 }
 
 int FloatingPositioner::GetDrawingY() const
 {
-    return BoundingBox::GetDrawingY() - this->GetDrawingYRel();
+    assert(m_objectY);
+    return (m_objectY->GetDrawingY() - this->GetDrawingYRel());
+}
+void FloatingPositioner::SetObjectXY(Object *objectX, Object *objectY)
+{
+    assert(objectX);
+    assert(objectY);
+
+    m_objectX = objectX;
+    m_objectY = objectY;
 }
 
 void FloatingPositioner::UpdateCurvePosition(
@@ -263,13 +277,13 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
 
     if (horizOverlapingBBox == NULL) {
         if (this->m_place == STAFFREL_above) {
-            yRel = m_contentBB_y1;
+            yRel = GetContentY1();
             yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
                 / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
         }
         else {
-            yRel = staffAlignment->GetStaffHeight() + m_contentBB_y2;
+            yRel = staffAlignment->GetStaffHeight() + GetContentY2();
             yRel
                 += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
@@ -289,7 +303,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 }
                 return true;
             }
-            yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + m_contentBB_y1;
+            yRel = -staffAlignment->CalcOverflowAbove(horizOverlapingBBox) + GetContentY1();
             yRel -= doc->GetBottomMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize)
                 / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);
@@ -304,7 +318,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
                 return true;
             }
             yRel = staffAlignment->CalcOverflowBelow(horizOverlapingBBox) + staffAlignment->GetStaffHeight()
-                + m_contentBB_y2;
+                + GetContentY2();
             yRel
                 += doc->GetTopMargin(this->m_object->GetClassId()) * doc->GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
             this->SetDrawingYRel(yRel);

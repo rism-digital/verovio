@@ -50,7 +50,7 @@ void Clef::Reset()
     ResetOctavedisplacement();
 }
 
-int Clef::GetClefOffset() const
+int Clef::GetClefLocOffset() const
 {
     int offset = 0;
     if (GetShape() == CLEFSHAPE_G)

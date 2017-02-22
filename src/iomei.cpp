@@ -966,6 +966,8 @@ void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
     WriteLayerElement(currentNode, chord);
     WriteDurationInterface(currentNode, chord);
     chord->WriteCommon(currentNode);
+    chord->WriteGraced(currentNode);
+    chord->WriteRelativesize(currentNode);
     chord->WriteStems(currentNode);
     chord->WriteStemsCmn(currentNode);
     chord->WriteTiepresent(currentNode);
@@ -1024,6 +1026,7 @@ void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
     mensur->WriteMensuralShared(currentNode);
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
+    mensur->WriteRelativesize(currentNode);
     mensur->WriteSlashcount(currentNode);
 }
 
@@ -1043,6 +1046,7 @@ void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
     WritePositionInterface(currentNode, mRest);
     mRest->WriteVisibility(currentNode);
     mRest->WriteFermatapresent(currentNode);
+    mRest->WriteRelativesize(currentNode);
 }
 
 void MeiOutput::WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt)
@@ -1086,6 +1090,7 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     note->WriteColoration(currentNode);
     note->WriteGraced(currentNode);
     note->WriteNoteLogMensural(currentNode);
+    note->WriteRelativesize(currentNode);
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
     note->WriteTiepresent(currentNode);
@@ -1100,6 +1105,7 @@ void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
     WriteDurationInterface(currentNode, rest);
     WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
+    rest->WriteRelativesize(currentNode);
 }
 
 void MeiOutput::WriteMeiProport(pugi::xml_node currentNode, Proport *proport)
@@ -1135,6 +1141,7 @@ void MeiOutput::WriteMeiVerse(pugi::xml_node currentNode, Verse *verse)
     verse->WriteColor(currentNode);
     verse->WriteLang(currentNode);
     verse->WriteCommon(currentNode);
+    verse->WriteTypography(currentNode);
 }
 
 void MeiOutput::WriteMeiSyl(pugi::xml_node currentNode, Syl *syl)
@@ -1193,6 +1200,7 @@ void MeiOutput::WritePositionInterface(pugi::xml_node element, PositionInterface
 {
     assert(interface);
 
+    interface->WriteStaffloc(element);
     interface->WriteStafflocPitched(element);
 }
 
@@ -2633,6 +2641,8 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
 
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadCommon(chord);
+    vrvChord->ReadGraced(chord);
+    vrvChord->ReadRelativesize(chord);
     vrvChord->ReadStems(chord);
     vrvChord->ReadStemsCmn(chord);
     vrvChord->ReadTiepresent(chord);
@@ -2736,6 +2746,7 @@ bool MeiInput::ReadMeiMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadMensuralShared(mensur);
     vrvMensur->ReadMensurLog(mensur);
     vrvMensur->ReadMensurVis(mensur);
+    vrvMensur->ReadRelativesize(mensur);
     vrvMensur->ReadSlashcount(mensur);
 
     parent->AddChild(vrvMensur);
@@ -2761,6 +2772,7 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
 
     vrvMRest->ReadVisibility(mRest);
     vrvMRest->ReadFermatapresent(mRest);
+    vrvMRest->ReadRelativesize(mRest);
 
     parent->AddChild(vrvMRest);
     return true;
@@ -2817,6 +2829,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadColoration(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadNoteLogMensural(note);
+    vrvNote->ReadRelativesize(note);
     vrvNote->ReadStems(note);
     vrvNote->ReadStemsCmn(note);
     vrvNote->ReadTiepresent(note);
@@ -2855,6 +2868,7 @@ bool MeiInput::ReadMeiRest(Object *parent, pugi::xml_node rest)
     ReadDurationInterface(rest, vrvRest);
     ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
+    vrvRest->ReadRelativesize(rest);
 
     parent->AddChild(vrvRest);
     return true;
@@ -2916,6 +2930,7 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
     vrvVerse->ReadColor(verse);
     vrvVerse->ReadLang(verse);
     vrvVerse->ReadCommon(verse);
+    vrvVerse->ReadTypography(verse);
 
     parent->AddChild(vrvVerse);
     return ReadMeiLayerChildren(vrvVerse, verse, vrvVerse);
@@ -3011,6 +3026,7 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
 
 bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
+    interface->ReadStaffloc(element);
     interface->ReadStafflocPitched(element);
     return true;
 }
