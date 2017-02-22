@@ -18,7 +18,13 @@ int Mensur::s_numBase = 2;
 //----------------------------------------------------------------------------
 
 Mensur::Mensur()
-    : LayerElement("mensur-"), AttDurationRatio(), AttMensuralShared(), AttMensurLog(), AttMensurVis(), AttSlashcount()
+    : LayerElement("mensur-")
+    , AttDurationRatio()
+    , AttMensuralShared()
+    , AttMensurLog()
+    , AttMensurVis()
+    , AttRelativesize()
+    , AttSlashcount()
 {
     Init();
 }
@@ -48,6 +54,7 @@ void Mensur::Init()
     RegisterAttClass(ATT_MENSURALSHARED);
     RegisterAttClass(ATT_MENSURLOG);
     RegisterAttClass(ATT_METERSIGVIS);
+    RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_SLASHCOUNT);
 
     Reset();
@@ -64,6 +71,7 @@ void Mensur::Reset()
     ResetMensuralShared();
     ResetMensurLog();
     ResetMensurVis();
+    ResetRelativesize();
     ResetSlashcount();
 }
 

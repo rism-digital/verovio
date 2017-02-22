@@ -199,11 +199,12 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     std::wstring accidStr = accid->GetSymbolStr();
     bool center = false;
 
+    int x = accid->GetDrawingX();
+    int y = accid->GetDrawingY();
+
     if (accid->GetFunc() == accidLog_FUNC_edit) {
         center = true;
         accid->m_drawingCueSize = true;
-        // position is currently only above the staff
-        int y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
         if (note) {
@@ -216,17 +217,14 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // adjust the x position so it is centered
             wchar_t noteHead = (note->GetActualDur() < DUR_2) ? SMUFL_E0A2_noteheadWhole : SMUFL_E0A3_noteheadHalf;
             int radius = m_doc->GetGlyphWidth(noteHead, staff->m_drawingStaffSize, note->IsCueSize());
-            accid->SetDrawingX(accid->GetDrawingX() + radius / 2);
+            x += (radius / 2);
         }
         TextExtend extend;
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->m_drawingCueSize));
         dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
         dc->ResetFont();
-        accid->SetDrawingY(y + extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+        y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
-
-    int x = accid->GetDrawingX();
-    int y = accid->GetDrawingY();
 
     DrawSmuflString(dc, x, y, accidStr, center, staff->m_drawingStaffSize, accid->m_drawingCueSize);
 
@@ -300,12 +298,14 @@ void View::DrawArtic(
 
     /************** calculate the y position **************/
 
-    int staffYBottom = staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+    int staffYBottom = -m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
-    int yInAbove = std::max(parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false), staffYBottom);
-    int yInBelow = std::min(parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false), staff->GetDrawingY());
-    int yOutAbove = std::max(yInAbove, staff->GetDrawingY());
-    int yOutBelow = std::min(yInBelow, staff->GetDrawingY() - m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize));
+    int yInAbove
+        = std::max(parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), staffYBottom);
+    int yInBelow
+        = std::min(parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), 0);
+    int yOutAbove = std::max(yInAbove, 0);
+    int yOutBelow = std::min(yInBelow, staffYBottom);
 
     artic->UpdateOutsidePartPosition(yOutAbove, yOutBelow, place, allowAbove);
     artic->UpdateInsidePartPosition(yInAbove, yInBelow, place);
@@ -671,7 +671,11 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     int size = (int)noteList.size();
     if (size > 0) {
         // set the default x position
-        int xAccid = chord->GetDrawingX() - (radius * 2);
+        int xAccid = -(radius);
+        // adjusting for grace notes - temporary
+        int space = m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
+        if (drawingCueSize) space = space * m_doc->GetGraceSize(100) / 100;
+        xAccid -= space;
 
         // if chord is a down-stemmed non-cluster, it needs one more note diameter of space
         if ((chord->GetDrawingStemDir() == STEMDIRECTION_down) && (chord->m_clusters.size() > 0)) {
@@ -713,12 +717,12 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
                 Accid *accidBwd = noteList.at(bwIdx)->GetDrawingAccid();
 
                 // if the top note has an accidental, draw it and update prevAccid
-                accidFwd->SetDrawingX(xAccid);
+                accidFwd->SetDrawingXRel(xAccid);
                 CalculateAccidX(staff, accidFwd, chord, true);
                 // DrawAccid(dc, accidFwd, layer, staff, measure);
                 // same, except with an extra check that we're not doing the same note twice
                 if (fwIdx != bwIdx) {
-                    accidBwd->SetDrawingX(xAccid);
+                    accidBwd->SetDrawingXRel(xAccid);
                     CalculateAccidX(staff, accidBwd, chord, true);
                     // DrawAccid(dc, accidBwd, layer, staff, measure);
                     bwIdx--;
@@ -764,7 +768,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /************ Fermata attribute ************/
 
     if (chord->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff, measure);
+        DrawFermataAttr(dc, element, layer, staff);
     }
 
     dc->ResetPen();
@@ -856,11 +860,11 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
 
     bool cueSize = false;
-    // force cue size for intermediate clefs
-    if (clef->GetFirstParent(LAYER)) cueSize = true;
-
-    // if (!cueSize)
-    //    x -= m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2;
+    if (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF) {
+        cueSize = true;
+        // HARDCODED
+        x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
+    }
 
     dc->StartGraphic(element, "", element->GetUuid());
 
@@ -877,13 +881,10 @@ void View::DrawCustos(DeviceContext *dc, LayerElement *element, Layer *layer, St
     assert(staff);
     assert(measure);
 
-    Custos *custos = dynamic_cast<Custos *>(element);
-    assert(custos);
+    // Custos *custos = dynamic_cast<Custos *>(element);
+    // assert(custos);
 
     dc->StartGraphic(element, "", element->GetUuid());
-
-    element->SetDrawingY(element->GetDrawingY()
-        + CalculatePitchPosY(staff, custos->GetPloc(), layer->GetClefOffset(element), custos->GetOloc()));
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -908,9 +909,6 @@ void View::DrawDot(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     assert(dot);
 
     dc->StartGraphic(element, "", element->GetUuid());
-
-    element->SetDrawingY(element->GetDrawingY()
-        + CalculatePitchPosY(staff, dot->GetPloc(), layer->GetClefOffset(element), dot->GetOloc()));
 
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
@@ -995,6 +993,9 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
     // HARDCODED
     int step = m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, false) * TEMP_KEYSIG_STEP;
 
+    int clefLocOffset = layer->GetClefLocOffset(element);
+    int loc;
+
     // Show cancellation if C major (0) or if any cancellation and show cancellation (showchange) is true (false by
     // default)
     if ((keySig->GetScoreDefRole() != SYSTEM_SCOREDEF)
@@ -1003,9 +1004,9 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         if (keySig->GetAlterationType() != keySig->m_drawingCancelAccidType) {
             for (i = 0; i < keySig->m_drawingCancelAccidCount; i++) {
                 data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
-                y = staff->GetDrawingY() + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
-                                               KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c));
-                ;
+                loc = PitchInterface::CalcLoc(
+                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
+                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
                 DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
                 x += step;
@@ -1015,9 +1016,9 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
         else if (keySig->GetAlterationNumber() < keySig->m_drawingCancelAccidCount) {
             for (i = keySig->GetAlterationNumber(); i < keySig->m_drawingCancelAccidCount; i++) {
                 data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->m_drawingCancelAccidType, i);
-                y = staff->GetDrawingY() + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
-                                               KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c));
-                ;
+                loc = PitchInterface::CalcLoc(
+                    pitch, KeySig::GetOctave(keySig->m_drawingCancelAccidType, pitch, c), clefLocOffset);
+                y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
                 DrawSmuflCode(dc, x, y, SMUFL_E261_accidentalNatural, staff->m_drawingStaffSize, false);
                 x += step;
@@ -1027,9 +1028,8 @@ void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, St
 
     for (i = 0; i < keySig->GetAlterationNumber(); i++) {
         data_PITCHNAME pitch = KeySig::GetAlterationAt(keySig->GetAlterationType(), i);
-        y = staff->GetDrawingY() + CalculatePitchPosY(staff, pitch, layer->GetClefOffset(element),
-                                       KeySig::GetOctave(keySig->GetAlterationType(), pitch, c));
-        ;
+        loc = PitchInterface::CalcLoc(pitch, KeySig::GetOctave(keySig->GetAlterationType(), pitch, c), clefLocOffset);
+        y = staff->GetDrawingY() + staff->CalcPitchPosYRel(m_doc, loc);
 
         if (keySig->GetAlterationType() == ACCIDENTAL_EXPLICIT_f)
             symb = SMUFL_E260_accidentalFlat;
@@ -1087,18 +1087,18 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
-    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
+    mRest->CenterDrawingX();
+
     int y = element->GetDrawingY();
 
     // move it down according to the number of line in the staff
     y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
         - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
-    DrawRestWhole(dc, xCentered, y, DUR_1, 0, false, staff);
+    DrawRestWhole(dc, mRest->GetDrawingX(), y, DUR_1, 0, false, staff);
 
     if (mRest->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff, measure);
+        DrawFermataAttr(dc, element, layer, staff);
     }
 
     dc->EndGraphic(element, this);
@@ -1115,9 +1115,11 @@ void View::DrawMRpt(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     MRpt *mRpt = dynamic_cast<MRpt *>(element);
     assert(mRpt);
 
+    mRpt->CenterDrawingX();
+
     dc->StartGraphic(element, "", element->GetUuid());
 
-    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E500_repeat1Bar, mRpt->m_drawingMeasureCount, false, staff, measure);
+    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E500_repeat1Bar, mRpt->m_drawingMeasureCount, false, staff);
 
     dc->EndGraphic(element, this);
 }
@@ -1132,12 +1134,12 @@ void View::DrawMRpt2(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     MRpt2 *mRpt2 = dynamic_cast<MRpt2 *>(element);
     assert(mRpt2);
-    // in non debug
-    if (!mRpt2) return;
+
+    mRpt2->CenterDrawingX();
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, 2, true, staff, measure);
+    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, 2, true, staff);
 
     dc->EndGraphic(element, this);
 }
@@ -1153,12 +1155,14 @@ void View::DrawMultiRest(DeviceContext *dc, LayerElement *element, Layer *layer,
     MultiRest *multiRest = dynamic_cast<MultiRest *>(element);
     assert(multiRest);
 
+    multiRest->CenterDrawingX();
+
     int x1, x2, y1, y2, length;
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
-    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
+    int width = measure->GetInnerWidth();
+    int xCentered = multiRest->GetDrawingX();
 
     // We do not support more than three chars
     int num = std::min(multiRest->GetNum(), 999);
@@ -1225,9 +1229,11 @@ void View::DrawMultiRpt(DeviceContext *dc, LayerElement *element, Layer *layer, 
     MultiRpt *multiRpt = dynamic_cast<MultiRpt *>(element);
     assert(multiRpt);
 
+    multiRpt->CenterDrawingX();
+
     dc->StartGraphic(element, "", element->GetUuid());
 
-    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, multiRpt->GetNum(), true, staff, measure);
+    DrawMRptPart(dc, element->GetDrawingX(), SMUFL_E501_repeat2Bars, multiRpt->GetNum(), true, staff);
 
     dc->EndGraphic(element, this);
 
@@ -1255,20 +1261,18 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Chord *inChord = note->IsChordTone();
     Beam *inBeam = note->IsInBeam();
     bool inFTrem = note->IsInFTrem();
-    bool drawingCueSize = note->HasGrace();
+    bool drawingCueSize = note->IsCueSize();
 
     int staffSize = staff->m_drawingStaffSize;
     int noteY = element->GetDrawingY();
-    int xLedger, xNote, xAccid, xStem;
+    int noteX = inChord ? inChord->GetDrawingX() : element->GetDrawingX();
+    int noteXShift, accidXShift;
     int drawingDur;
     int staffY = staff->GetDrawingY();
     wchar_t fontNo;
     int verticalCenter = 0;
     bool flippedNotehead = false;
     bool doubleLengthLedger = false;
-
-    xStem = inChord ? inChord->GetDrawingX() : element->GetDrawingX();
-    xLedger = xStem;
 
     drawingDur = note->GetDrawingDur();
     drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
@@ -1308,7 +1312,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
             // if stem goes down, move ledger start to the left and expand it by a full radius
             if (!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
-                xLedger -= radius;
                 doubleLengthLedger = true;
             }
         }
@@ -1318,31 +1321,30 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
             // if stem goes up, move ledger start to the right and expand it by a full radius
             if (!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
-                xLedger += radius;
                 doubleLengthLedger = true;
             }
         }
 
         // positions notehead
         if (!flippedNotehead) {
-            xNote = xStem - radius;
+            noteXShift = -radius;
         }
         else {
             // if we have a flipped notehead, we need to be in a chord
             assert(inChord);
             if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
-                xNote = xStem + radius - m_doc->GetDrawingStemWidth(staffSize);
+                noteXShift = radius - m_doc->GetDrawingStemWidth(staffSize);
             }
             else if (note->GetDrawingStemDir() == STEMDIRECTION_down) {
-                xNote = xStem - radius * 3 + m_doc->GetDrawingStemWidth(staffSize);
+                noteXShift = -radius * 3 + m_doc->GetDrawingStemWidth(staffSize);
             }
             else {
-                xNote = xStem - radius;
+                noteXShift = -radius;
             }
         }
     }
     else {
-        xNote = xStem - radius;
+        noteXShift = -radius;
     }
 
     /************** Ledger lines: **************/
@@ -1391,7 +1393,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         else
             fontNo = SMUFL_E0A2_noteheadWhole;
 
-        DrawSmuflCode(dc, xNote, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
+        DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
     }
     // Other values
     else {
@@ -1402,19 +1404,19 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             fontNo = SMUFL_E0A4_noteheadBlack;
         }
 
-        DrawSmuflCode(dc, xNote, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
+        DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
 
         // Stemless note (@stem.len="0")
         if (note->HasStemLen() && note->GetStemLen() == 0) {
             // Store the start and end values
             StemmedDrawingInterface *interface = note->GetStemmedDrawingInterface();
             assert(interface);
-            interface->SetDrawingStemStart(Point(xStem, noteY));
-            interface->SetDrawingStemEnd(Point(xStem, noteY));
+            interface->SetDrawingStemStart(Point(noteX, noteY));
+            interface->SetDrawingStemEnd(Point(noteX, noteY));
             interface->SetDrawingStemDir(note->GetDrawingStemDir());
         }
         else if (!(inBeam && drawingDur > DUR_4) && !inFTrem && !inChord) {
-            DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, xStem, noteY);
+            DrawStem(dc, note, staff, note->GetDrawingStemDir(), radius, noteX, noteY);
         }
     }
 
@@ -1423,25 +1425,28 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (!inChord) {
         Accid *accid = note->GetDrawingAccid();
         if (accid) {
-            xAccid = xNote;
+            accidXShift = noteXShift;
             if (accid->GetFunc() != accidLog_FUNC_edit) {
                 TextExtend extend;
                 dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
                 dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
-                xAccid -= (extend.m_width + m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+                // HARDCODED
+                int space = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
+                if (drawingCueSize) space = space * m_doc->GetGraceSize(100) / 100;
+                accidXShift -= (extend.m_width + space);
                 dc->ResetFont();
             }
-            accid->SetDrawingX(xAccid);
+            accid->SetDrawingXRel(accidXShift);
         }
 
         if (note->GetDots()) {
             int xDot;
             if (note->GetActualDur() < DUR_2
                 || (note->GetActualDur() > DUR_8 && !inBeam && (note->GetDrawingStemDir() == STEMDIRECTION_up))) {
-                xDot = xStem + m_doc->GetDrawingUnit(staffSize) * 7 / 2;
+                xDot = noteX + m_doc->GetDrawingUnit(staffSize) * 7 / 2;
             }
             else {
-                xDot = xStem + m_doc->GetDrawingUnit(staffSize) * 5 / 2;
+                xDot = noteX + m_doc->GetDrawingUnit(staffSize) * 5 / 2;
             }
 
             DrawDots(dc, xDot, noteY, note->GetDots(), staff);
@@ -1459,9 +1464,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     DrawLayerChildren(dc, note, layer, staff, measure);
 
     if (note->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff, measure);
+        DrawFermataAttr(dc, element, layer, staff);
     }
-
 }
 
 void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1477,6 +1481,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     bool drawingCueSize = rest->IsCueSize();
     int drawingDur = rest->GetActualDur();
+    
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
@@ -1486,7 +1491,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // 2);
     // element->m_drawingStemEnd.y = element->GetDrawingY();
     // element->m_drawingStemStart.y = element->GetDrawingY();
-
+    
     if (drawingDur > DUR_2) {
         x -= m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize) / 2;
     }
@@ -1500,7 +1505,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
 
     if (rest->HasFermata()) {
-        DrawFermataAttr(dc, element, layer, staff, measure);
+        DrawFermataAttr(dc, element, layer, staff);
     }
 }
 
@@ -1528,8 +1533,9 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     }
 
     // move the position back - to be updated HARDCODED also see View::DrawSylConnector and View::DrawSylConnectorLines
-    syl->SetDrawingX(syl->GetStart()->GetDrawingX() - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
-    syl->SetDrawingY(GetSylY(syl, staff));
+    // assert(false);
+    syl->SetDrawingXRel(-m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2);
+    syl->SetDrawingYRel(GetSylYRel(syl, staff));
 
     dc->StartGraphic(syl, "", syl->GetUuid());
     dc->DeactivateGraphicY();
@@ -1630,13 +1636,16 @@ void View::DrawVerse(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
 void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
 {
-    Note *note = dynamic_cast<Note *>(element);
-    assert(note);
+    DurationInterface *durInterface = dynamic_cast<DurationInterface *>(element);
+    assert(durInterface);
 
-    Staff *staff = dynamic_cast<Staff *>(note->GetFirstParent(STAFF));
+    StemmedDrawingInterface *stemInterface = dynamic_cast<StemmedDrawingInterface *>(element);
+    assert(stemInterface);
+
+    Staff *staff = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
     assert(staff);
 
-    if (note->GetActualDur() < DUR_8) return;
+    if (durInterface->GetActualDur() < DUR_8) return;
 
     dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
     dc->SetBrush(AxBLACK, AxSOLID);
@@ -1646,16 +1655,25 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     int positionShiftY1 = positionShift * 2;
     int positionShiftX2 = positionShift * 3;
     int positionShiftY2 = positionShift * 6;
-    Point startPoint = note->GetDrawingStemStart();
+    Point startPoint = stemInterface->GetDrawingStemStart();
+    
+    int startPointY = startPoint.y;
+    if (element->Is(CHORD)) {
+        Chord *chord = dynamic_cast<Chord*>(element);
+        assert(chord);
+        int yMin, yMax;
+        chord->GetYExtremes(&yMin, &yMax);
+        startPointY = (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up) ? yMin : yMax;
+    }
 
     // HARDCODED
-    if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
-        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPoint.y + positionShiftY1),
-            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPoint.y + positionShiftY2));
+    if (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
+        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPointY + positionShiftY1),
+            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPointY + positionShiftY2));
     }
     else {
-        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPoint.y - positionShiftY1),
-            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPoint.y - positionShiftY2));
+        dc->DrawLine(ToDeviceContextX(startPoint.x - positionShiftX1), ToDeviceContextY(startPointY - positionShiftY1),
+            ToDeviceContextX(startPoint.x + positionShiftX2), ToDeviceContextY(startPointY - positionShiftY2));
     }
 
     dc->ResetPen();
@@ -1686,24 +1704,18 @@ void View::DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *
     }
 }
 
-void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff)
 {
     assert(dc);
     assert(element);
     assert(layer);
     assert(staff);
-    assert(measure);
 
     int x, y;
 
-    // We move the fermata position of half of the fermata size
     x = element->GetDrawingX();
 
-    if (element->Is(MREST)) {
-        int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
-        x = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
-    }
-
+    // We move the fermata position of half of the fermata size
     x -= m_doc->GetGlyphWidth(SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false) / 2;
 
     AttFermatapresent *fermatapresent = dynamic_cast<AttFermatapresent *>(element);
@@ -1850,11 +1862,8 @@ void View::DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int num
     dc->ResetFont();
 }
 
-void View::DrawMRptPart(DeviceContext *dc, int x, wchar_t smuflCode, int num, bool line, Staff *staff, Measure *measure)
+void View::DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smuflCode, int num, bool line, Staff *staff)
 {
-    int width = measure->GetRightBarLineX1Rel() - measure->GetLeftBarLineX2Rel();
-    int xCentered = measure->GetDrawingX() + measure->GetLeftBarLineX2Rel() + (width / 2);
-
     int xSymbol = xCentered - m_doc->GetGlyphWidth(smuflCode, staff->m_drawingStaffSize, false) / 2;
     int y = staff->GetDrawingY();
     int ySymbol = y - staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
@@ -2052,8 +2061,11 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
     interface->SetDrawingStemDir(dir);
 
     // cast to note is check when setting drawingCueSize value
-    if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_acc)) {
-        DrawAcciaccaturaSlash(dc, object);
+    if (drawingCueSize) {
+        assert(object->Is(NOTE) || object->Is(CHORD));
+        AttGraced *attGraced = dynamic_cast<AttGraced *>(object);
+        assert(attGraced);
+        if (attGraced->GetGrace() == GRACE_unacc) DrawAcciaccaturaSlash(dc, object);
     }
 }
 
@@ -2274,7 +2286,7 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     // If we need to move the accidental horizontally, move it by currentX half-units.
     if (adjustHorizontally) {
         int xShift = currentX * halfUnit;
-        accid->SetDrawingX(accid->GetDrawingX() - xShift);
+        accid->SetDrawingXRel(accid->GetDrawingXRel() - xShift);
 
         // mark the spaces as taken (true in accidSpace)
         for (int xIdx = currentX; xIdx > currentX - ACCID_WIDTH; xIdx--) {
@@ -2310,11 +2322,11 @@ bool View::CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjust
     return (currentX - accidWidthDiff == 0);
 }
 
-int View::GetSylY(Syl *syl, Staff *staff)
+int View::GetSylYRel(Syl *syl, Staff *staff)
 {
     assert(syl && staff);
 
-    int y = syl->GetStart()->GetDrawingY();
+    int y = 0;
     StaffAlignment *aligment = staff->GetAlignment();
     if (aligment) {
         FontInfo *lyricFont = m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
@@ -2322,7 +2334,7 @@ int View::GetSylY(Syl *syl, Staff *staff)
         int height = m_doc->GetTextGlyphHeight(L'I', lyricFont, false);
         int margin = m_doc->GetBottomMargin(SYL) * m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
 
-        y = staff->GetDrawingY() - aligment->GetStaffHeight() - aligment->GetOverflowBelow()
+        y = -aligment->GetStaffHeight() - aligment->GetOverflowBelow()
             + (aligment->GetVerseCount() - syl->m_drawingVerse) * (height + descender + margin) + (descender);
     }
     return y;

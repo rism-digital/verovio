@@ -43,6 +43,7 @@ class Note : public LayerElement,
              public AttColoration,
              public AttGraced,
              public AttNoteLogMensural,
+             public AttRelativesize,
              public AttStems,
              public AttStemsCmn,
              public AttTiepresent,
@@ -87,20 +88,10 @@ public:
     ///@}
 
     /**
-     * @name Setter and getter for the Algnment the grace note is pointing to (NULL by default)
-     */
-    ///@{
-    Alignment *GetGraceAlignment();
-    void SetGraceAlignment(Alignment *graceAlignment);
-    bool HasGraceAlignment() const { return (m_graceAlignment != NULL); }
-    void ResetGraceAlignment() { m_graceAlignment = NULL; }
-    ///@}
-
-    /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
-    Chord *IsChordTone();
+    Chord *IsChordTone() const;
     int GetDrawingDur();
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
@@ -159,10 +150,6 @@ private:
      * The note with the initial attribute owns the Tie object and takes care of deleting it
      */
     Tie *m_drawingTieAttr;
-    /**
-     * An alignment for grace notes
-     */
-    Alignment *m_graceAlignment;
 };
 
 } // namespace vrv

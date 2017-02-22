@@ -15,8 +15,9 @@ namespace vrv {
 // PositionInterface
 //----------------------------------------------------------------------------
 
-PositionInterface::PositionInterface() : Interface(), AttStafflocPitched()
+PositionInterface::PositionInterface() : Interface(), AttStaffloc(), AttStafflocPitched()
 {
+    RegisterInterfaceAttClass(ATT_STAFFLOC);
     RegisterInterfaceAttClass(ATT_STAFFLOCPITCHED);
 
     Reset();
@@ -28,12 +29,16 @@ PositionInterface::~PositionInterface()
 
 void PositionInterface::Reset()
 {
+    ResetStaffloc();
     ResetStafflocPitched();
 }
 
 bool PositionInterface::HasIdenticalPositionInterface(PositionInterface *otherPositionInterface)
 {
     if (!otherPositionInterface) {
+        return false;
+    }
+    if (this->GetLoc() != otherPositionInterface->GetLoc()) {
         return false;
     }
     if (this->GetOloc() != otherPositionInterface->GetOloc()) {
