@@ -698,6 +698,7 @@ void MeiOutput::WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     WriteScoreDefInterface(currentNode, staffDef);
     staffDef->WriteCommon(currentNode);
     staffDef->WriteCommonPart(currentNode);
+    staffDef->WriteDistances(currentNode);
     staffDef->WriteLabelsAddl(currentNode);
     staffDef->WriteNotationtype(currentNode);
     staffDef->WriteScalable(currentNode);
@@ -2094,6 +2095,7 @@ bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
 
     vrvStaffDef->ReadCommon(staffDef);
     vrvStaffDef->ReadCommonPart(staffDef);
+    vrvStaffDef->ReadDistances(staffDef);
     vrvStaffDef->ReadLabelsAddl(staffDef);
     vrvStaffDef->ReadNotationtype(staffDef);
     vrvStaffDef->ReadScalable(staffDef);
