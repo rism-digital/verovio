@@ -9,7 +9,7 @@
 #define __VRV_EXPANSION_H__
 
 #include "atts_shared.h"
-//#include "systemelement.h"
+#include "systemelement.h"
 
 namespace vrv {
 

@@ -28,6 +28,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
+#include "expansion.h"
 #include "fermata.h"
 #include "functorparams.h"
 #include "hairpin.h"
@@ -196,6 +197,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(ENDING)) {
         m_currentNode = m_currentNode.append_child("ending");
         WriteMeiEnding(m_currentNode, dynamic_cast<Ending *>(object));
+    }
+    else if (object->Is(EXPANSION)) {
+        m_currentNode = m_currentNode.append_child("expansion");
+        WriteMeiExpansion(m_currentNode, dynamic_cast<Expansion *>(object));
     }
     else if (object->Is(PB)) {
         m_currentNode = m_currentNode.append_child("pb");
@@ -649,6 +654,16 @@ void MeiOutput::WriteMeiEnding(pugi::xml_node currentNode, Ending *ending)
 
     WriteXmlId(currentNode, ending);
     ending->WriteCommon(currentNode);
+}
+
+void MeiOutput::WriteMeiExpansion(pugi::xml_node currentNode, Expansion *expansion)
+{
+    assert(expansion);
+
+    WriteXmlId(currentNode, expansion);
+    expansion->WriteCommon(currentNode);
+    expansion->WriteCommonPart(currentNode);
+    expansion->WritePlist(currentNode);
 }
 
 void MeiOutput::WriteMeiPb(pugi::xml_node currentNode, Pb *pb)
@@ -1736,7 +1751,7 @@ bool MeiInput::ReadMeiSection(Object *parent, pugi::xml_node section)
 bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
 {
     assert(
-        dynamic_cast<Section *>(parent) || dynamic_cast<Ending *>(parent) || dynamic_cast<EditorialElement *>(parent));
+        dynamic_cast<Section *>(parent) || dynamic_cast<Ending *>(parent) || dynamic_cast<Expansion *>(parent) || dynamic_cast<EditorialElement *>(parent));
 
     bool success = true;
     pugi::xml_node current;
@@ -1752,6 +1767,9 @@ bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
             // we should not endings with unmeasured music ... (?)
             assert(!unmeasured);
             success = ReadMeiEnding(parent, current);
+        }
+        else if (std::string(current.name()) == "expansion") {
+            success = ReadMeiExpansion(parent, current);
         }
         else if (std::string(current.name()) == "scoreDef") {
             success = ReadMeiScoreDef(parent, current);
@@ -1805,6 +1823,22 @@ bool MeiInput::ReadMeiEnding(Object *parent, pugi::xml_node ending)
     parent->AddChild(vrvEnding);
     if (m_readingScoreBased)
         return ReadMeiSectionChildren(vrvEnding, ending);
+    else
+        return true;
+}
+
+bool MeiInput::ReadMeiExpansion(Object *parent, pugi::xml_node expansion)
+{
+    Expansion *vrvExpansion = new Expansion();
+    SetMeiUuid(expansion, vrvExpansion);
+
+    vrvExpansion->ReadCommon(expansion);
+    vrvExpansion->ReadCommonPart(expansion);
+    vrvExpansion->ReadPlist(expansion);
+
+    parent->AddChild(vrvExpansion);
+    if (m_readingScoreBased)
+        return ReadMeiSectionChildren(vrvExpansion, expansion);
     else
         return true;
 }
