@@ -228,7 +228,6 @@ void HorizontalAligner::Reset()
 
 Alignment *HorizontalAligner::SearchAlignmentAtTime(double time, AlignmentType type, int &idx)
 {
-    time = round(time * (pow(10, 10)) / pow(10, 10));
     int i;
     idx = -1; // the index if we reach the end.
     Alignment *alignment = NULL;
@@ -302,6 +301,7 @@ void MeasureAligner::Reset()
 Alignment *MeasureAligner::GetAlignmentAtTime(double time, AlignmentType type)
 {
     int idx; // the index if we reach the end.
+    time = round(time * (pow(10, 10)) / pow(10, 10));
     Alignment *alignment = this->SearchAlignmentAtTime(time, type, idx);
     // we already have a alignment of the type at that time
     if (alignment != NULL) return alignment;
@@ -410,6 +410,7 @@ void GraceAligner::Reset()
 Alignment *GraceAligner::GetAlignmentAtTime(double time, AlignmentType type)
 {
     int idx; // the index if we reach the end.
+    time = round(time * (pow(10, 10)) / pow(10, 10));
     Alignment *alignment = this->SearchAlignmentAtTime(time, type, idx);
     // we already have a alignment of the type at that time
     if (alignment != NULL) return alignment;
@@ -917,6 +918,10 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 int minLeft, maxRight;
                 params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight);
                 if (minLeft != -VRV_UNSET) graceMaxPos = minLeft;
+            }
+            else {
+                // This happens when grace notes are at the end of a measure before a barline
+                graceMaxPos -= params->m_doc->GetDrawingUnit(100);
             }
 
             params->m_graceMaxPos = graceMaxPos;
