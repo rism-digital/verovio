@@ -1183,7 +1183,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         // we assume /note without /type to be mRest
         else if (typeStr.empty() || HasAttributeWithValue(rest.node(), "measure", "yes")) {
             MRest *mRest = new MRest();
-            // if (cue) mRest->SetSize(SIZE_cue);
+            if (cue) mRest->SetSize(SIZE_cue);
             if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
             if (notations.node().select_single_node("fermata")) {
@@ -1199,7 +1199,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             element = rest;
             rest->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) rest->SetDots(dots);
-            // if (cue) rest->SetSize(SIZE_cue);
+            if (cue) rest->SetSize(SIZE_cue);
             if (!stepStr.empty()) rest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) rest->SetOloc(atoi(octaveStr.c_str()));
             AddLayerElement(layer, rest);
@@ -1271,7 +1271,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 chord->SetDur(ConvertTypeToDur(typeStr));
                 if (dots > 0) chord->SetDots(dots);
                 chord->SetStemDir(stemDir);
-                // if (cue) chord->SetSize(SIZE_cue);
+                if (cue) chord->SetSize(SIZE_cue);
                 if (tremSlashNum != "0") chord->SetStemMod(chord->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
                 AddLayerElement(layer, chord);
                 m_elementStack.push_back(chord);
@@ -1300,7 +1300,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             note->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) note->SetDots(dots);
             note->SetStemDir(stemDir);
-            // if (cue) note->SetSize(SIZE_cue);
+            if (cue) note->SetSize(SIZE_cue);
             if (tremSlashNum != "0") note->SetStemMod(note->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
         }
 
