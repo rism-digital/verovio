@@ -12,6 +12,7 @@
 		2D2A799A1A69812C000A441B /* chord.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2D2A79991A69812C000A441B /* chord.cpp */; };
 		4067E4C81DDDAF0000C6E059 /* fermata.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4067E4C71DDDAF0000C6E059 /* fermata.cpp */; };
 		40910FEC1E42734C00DB1FA5 /* mordent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40910FEA1E42734C00DB1FA5 /* mordent.cpp */; };
+		40ABF1FF1E5DF23B00F32F41 /* expansion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */; };
 		40D0D5E21E3BD7FE00E6BF5C /* turn.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40D0D5E01E3BD7FE00E6BF5C /* turn.cpp */; };
 		40F910081E2799740081B7BB /* trill.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 40F910071E2799740081B7BB /* trill.cpp */; };
 		4D09FAED1D78B8C40099FDFE /* atts_midi.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29051940BCC100C76319 /* atts_midi.cpp */; };
@@ -427,6 +428,8 @@
 		4067E4C91DDDAF6400C6E059 /* fermata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fermata.h; path = include/vrv/fermata.h; sourceTree = "<group>"; };
 		40910FEA1E42734C00DB1FA5 /* mordent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mordent.cpp; path = src/mordent.cpp; sourceTree = "<group>"; };
 		40910FEB1E42734C00DB1FA5 /* mordent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mordent.h; path = include/vrv/mordent.h; sourceTree = "<group>"; };
+		40ABF1FD1E5DF23B00F32F41 /* expansion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = expansion.h; path = include/vrv/expansion.h; sourceTree = "<group>"; };
+		40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = expansion.cpp; path = src/expansion.cpp; sourceTree = "<group>"; };
 		40CA06441E351125009CFDD7 /* grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grid.h; path = include/hum/grid.h; sourceTree = "<group>"; };
 		40CA06451E351125009CFDD7 /* GridMeasure.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridMeasure.h; path = include/hum/GridMeasure.h; sourceTree = "<group>"; };
 		40CA06461E351125009CFDD7 /* GridPart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GridPart.h; path = include/hum/GridPart.h; sourceTree = "<group>"; };
@@ -786,6 +789,8 @@
 				4DF4407B1D511CEE00152B7E /* boundary.h */,
 				4DF440761D39575500152B7E /* ending.cpp */,
 				4DF440741D39567A00152B7E /* ending.h */,
+				40ABF1FE1E5DF23B00F32F41 /* expansion.cpp */,
+				40ABF1FD1E5DF23B00F32F41 /* expansion.h */,
 				4D95D4F11D6E042400B2B856 /* section.cpp */,
 				4D95D4F01D6E041E00B2B856 /* section.h */,
 				4D95D4F81D718D4A00B2B856 /* systemelement.cpp */,
@@ -1527,6 +1532,7 @@
 				8F086F0D188539540037FD8E /* vrv.cpp in Sources */,
 				4D22C41918890E6100D0831F /* mrest.cpp in Sources */,
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
+				40ABF1FF1E5DF23B00F32F41 /* expansion.cpp in Sources */,
 				152886C51C9CA86100B515BB /* ligature.cpp in Sources */,
 				4D95D4F61D71866200B2B856 /* controlelement.cpp in Sources */,
 				4D983005192E959E00320037 /* main.cpp in Sources */,

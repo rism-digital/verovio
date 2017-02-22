@@ -453,6 +453,7 @@ StaffDef::StaffDef()
     : ScoreDefElement("staffdef-")
     , AttCommon()
     , AttCommonPart()
+    , AttDistances()
     , AttLabelsAddl()
     , AttNotationtype()
     , AttScalable()
@@ -461,6 +462,7 @@ StaffDef::StaffDef()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_DISTANCES);
     RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_NOTATIONTYPE);
     RegisterAttClass(ATT_SCALABLE);
@@ -480,6 +482,7 @@ void StaffDef::Reset()
     StaffDefDrawingInterface::Reset();
     ResetCommon();
     ResetCommonPart();
+    ResetDistances();
     ResetLabelsAddl();
     ResetNotationtype();
     ResetScalable();

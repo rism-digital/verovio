@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        ending.h
+// Name:        ending.cpp
 // Author:      Laurent Pugin
 // Created:     14/07/2016
 // Copyright (c) Authors and others. All rights reserved.
