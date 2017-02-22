@@ -36,7 +36,7 @@ void Expansion::Reset()
 {
     SystemElement::Reset();
     ResetCommon();
-    ReadCommonPart();
+    ResetCommonPart();
     ResetPlist();
 }
 
