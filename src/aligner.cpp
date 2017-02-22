@@ -919,6 +919,10 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight);
                 if (minLeft != -VRV_UNSET) graceMaxPos = minLeft;
             }
+            else {
+                // This happens when grace notes are at the end of a measure before a barline
+                graceMaxPos -= params->m_doc->GetDrawingUnit(100);
+            }
 
             params->m_graceMaxPos = graceMaxPos;
             params->m_graceUpcomingMaxPos = -VRV_UNSET;
