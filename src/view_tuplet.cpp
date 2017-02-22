@@ -121,7 +121,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         // Copy the generated coordinates
         center->x = x;
         center->y = y;
-        direction = firstNote->GetDrawingStemDir(); // stem direction is the same for all notes
+        if (firstNote) direction = firstNote->GetDrawingStemDir(); // stem direction is the same for all notes
     }
     else {
         // There are unbeamed notes of two different beams

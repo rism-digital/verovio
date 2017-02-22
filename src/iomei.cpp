@@ -2983,7 +2983,7 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
             break;
         }
         elementName = std::string(xmlElement.name());
-        if (!IsAllowed(elementName, filter)) {
+        if (!IsAllowed(elementName, filter) && filter) {
             std::string meiElementName = filter->GetClassName();
             std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
