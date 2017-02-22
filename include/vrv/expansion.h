@@ -43,10 +43,6 @@ public:
     // Functors //
     //----------//
 
-    //----------//
-    // Functors //
-    //----------//
-
 protected:
     //
 private:
