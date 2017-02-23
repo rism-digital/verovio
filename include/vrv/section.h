@@ -50,8 +50,10 @@ public:
     /**
      * See Object::ConvertToPageBased
      */
+    ///@{
     virtual int ConvertToPageBased(FunctorParams *functorParams);
     virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::PrepareBoundaries
@@ -62,16 +64,6 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffSystems
-     */
-    virtual int CastOffSystems(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
 
 private:
     //
@@ -106,16 +98,6 @@ public:
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffSystems
-     */
-    virtual int CastOffSystems(FunctorParams *functorParams);
 
     /**
      * See Object::CastOffEncoding
@@ -155,16 +137,6 @@ public:
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffSystems
-     */
-    virtual int CastOffSystems(FunctorParams *functorParams);
 
     /**
      * See Object::CastOffEncoding

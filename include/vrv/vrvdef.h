@@ -91,6 +91,7 @@ enum ClassId {
     SYSTEM_ELEMENT,
     BOUNDARY_END,
     ENDING,
+    EXPANSION,
     PB,
     SB,
     SECTION,

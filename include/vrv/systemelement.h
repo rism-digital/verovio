@@ -38,6 +38,21 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * See Object::ConvertToPageBased
+     */
+    virtual int ConvertToPageBased(FunctorParams *functorParams);
+    
+    /**
+     * See Object::CastOffSystems
+     */
+    virtual int CastOffSystems(FunctorParams *functorParams);
+    
+    /**
+     * See Object::CastOffEncoding
+     */
+    virtual int CastOffEncoding(FunctorParams *functorParams);
 
 private:
     //
