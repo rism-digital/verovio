@@ -396,6 +396,8 @@ int Measure::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
+    
+    m_measureAligner.PushAlignmentsRight();
 
     params->m_rightDefaultAlignment = NULL;
 

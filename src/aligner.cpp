@@ -362,8 +362,8 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         assert(end);
         int dist = std::get<2>(*iter);
         if ((start->GetXRel() >= end->GetXRel()) || (dist == 0)) {
-            LogDebug("Trying to ajdust alignment at the same position of with a distance of 0;");
-            continue;
+            LogDebug("Trying to ajdust alignment at the same position or with a distance of 0;");
+            //continue;
         }
         // We need to store them because they are going to be changed in the loop below
         int startX = start->GetXRel();
@@ -385,6 +385,23 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
                 int shift = dist * ratio / 100;
                 current->SetXRel(current->GetXRel() + shift);
             }
+        }
+    }
+}
+    
+void MeasureAligner::PushAlignmentsRight()
+{
+    Alignment *previous = NULL;
+    ArrayOfObjects::reverse_iterator riter;
+    for (riter = m_children.rbegin(); riter != m_children.rend(); riter++) {
+        Alignment *current = dynamic_cast<Alignment *>(*riter);
+        assert(current);
+        
+        if ((current->GetType() == ALIGNMENT_GRACENOTE) || (current->GetType() == ALIGNMENT_CONTAINER)) {
+            if (previous) current->SetXRel(previous->GetXRel());
+        }
+        else {
+            previous = current;
         }
     }
 }
@@ -433,8 +450,8 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
     // This should never happen because we must have hit the left barline in the loop above
     if (!rightAlignment || (maxRight == VRV_UNSET)) return;
 
-    // Check if the left position of the group is on the left of the previous maxRight
-    // If not, move the aligment accordingly
+    // Check if the left position of the group is on the right of the previous maxRight
+    // If not, move the aligments accordingly
     int left = alignment->GetGraceAligner()->GetGraceGroupLeft(staffN);
     // We also set artificially the margin with the previous note
     if (left != -VRV_UNSET) left -= doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
