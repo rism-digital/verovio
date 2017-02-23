@@ -22,10 +22,7 @@ class Expansion;
 /**
  * This class represents a MEI expansion.
  */
-class Expansion : public SystemElement,
-                  public AttCommon,
-                  public AttCommonPart,
-                  public AttPlist {
+class Expansion : public SystemElement, public AttCommon, public AttCommonPart, public AttPlist {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

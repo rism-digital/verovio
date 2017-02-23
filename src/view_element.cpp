@@ -1094,7 +1094,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // move it down according to the number of line in the staff
     y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
         - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    
+
     if (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) {
         y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         DrawRestBreve(dc, mRest->GetDrawingX(), y, staff);
@@ -1486,7 +1486,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     bool drawingCueSize = rest->IsCueSize();
     int drawingDur = rest->GetActualDur();
-    
+
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
@@ -1496,7 +1496,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // 2);
     // element->m_drawingStemEnd.y = element->GetDrawingY();
     // element->m_drawingStemStart.y = element->GetDrawingY();
-    
+
     if (drawingDur > DUR_2) {
         x -= m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize) / 2;
     }
@@ -1661,10 +1661,10 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     int positionShiftX2 = positionShift * 3;
     int positionShiftY2 = positionShift * 6;
     Point startPoint = stemInterface->GetDrawingStemStart();
-    
+
     int startPointY = startPoint.y;
     if (element->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord*>(element);
+        Chord *chord = dynamic_cast<Chord *>(element);
         assert(chord);
         int yMin, yMax;
         chord->GetYExtremes(&yMin, &yMax);

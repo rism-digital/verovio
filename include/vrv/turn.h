@@ -19,7 +19,12 @@ namespace vrv {
 // Turn
 //----------------------------------------------------------------------------
 
-class Turn : public ControlElement, public TimePointInterface, public AttColor, public AttOrnamentaccid, public AttPlacement, public AttTurnLog {
+class Turn : public ControlElement,
+             public TimePointInterface,
+             public AttColor,
+             public AttOrnamentaccid,
+             public AttPlacement,
+             public AttTurnLog {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

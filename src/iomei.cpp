@@ -1750,8 +1750,8 @@ bool MeiInput::ReadMeiSection(Object *parent, pugi::xml_node section)
 
 bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
 {
-    assert(
-        dynamic_cast<Section *>(parent) || dynamic_cast<Ending *>(parent) || dynamic_cast<Expansion *>(parent) || dynamic_cast<EditorialElement *>(parent));
+    assert(dynamic_cast<Section *>(parent) || dynamic_cast<Ending *>(parent) || dynamic_cast<Expansion *>(parent)
+        || dynamic_cast<EditorialElement *>(parent));
 
     bool success = true;
     pugi::xml_node current;
