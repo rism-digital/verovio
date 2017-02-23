@@ -593,6 +593,12 @@ public:
      */
     void AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments);
 
+    /**
+     * Adjust the spacing for the grace note group(s) of the alignment on staffN
+     * The alignment need to be of ALIGNMENT_GRACENOTE type
+     */
+    void AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int staffN);
+
     //----------//
     // Functors //
     //----------//
