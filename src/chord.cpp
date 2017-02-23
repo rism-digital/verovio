@@ -172,6 +172,7 @@ void Chord::FilterList(ListOfObjects *childList)
                 lastNote->m_cluster = curCluster;
                 lastNote->m_clusterPosition = (int)curCluster->size();
             }
+            assert(curCluster);
             curCluster->push_back(curNote);
             curNote->m_cluster = curCluster;
             curNote->m_clusterPosition = (int)curCluster->size();

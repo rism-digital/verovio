@@ -1094,8 +1094,13 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // move it down according to the number of line in the staff
     y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
         - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-
-    DrawRestWhole(dc, mRest->GetDrawingX(), y, DUR_1, 0, false, staff);
+    
+    if (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) {
+        y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
+        DrawRestBreve(dc, mRest->GetDrawingX(), y, staff);
+    }
+    else
+        DrawRestWhole(dc, mRest->GetDrawingX(), y, DUR_1, 0, false, staff);
 
     if (mRest->HasFermata()) {
         DrawFermataAttr(dc, element, layer, staff);

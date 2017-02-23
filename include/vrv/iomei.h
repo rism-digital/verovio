@@ -46,6 +46,7 @@ class DurationInterface;
 class Dynam;
 class Ending;
 class Expan;
+class Expansion;
 class Fermata;
 class FloatingElement;
 class FTrem;
@@ -157,6 +158,7 @@ private:
     ///@{
     void WriteMeiSection(pugi::xml_node currentNode, Section *section);
     void WriteMeiEnding(pugi::xml_node currentNote, Ending *ending);
+    void WriteMeiExpansion(pugi::xml_node currentNote, Expansion *expansion);
     void WriteMeiPb(pugi::xml_node currentNode, Pb *pb);
     void WriteMeiSb(pugi::xml_node currentNode, Sb *sb);
     ///@}
@@ -363,6 +365,7 @@ private:
     bool ReadMeiSection(Object *parent, pugi::xml_node section);
     bool ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode);
     bool ReadMeiEnding(Object *parent, pugi::xml_node ending);
+    bool ReadMeiExpansion(Object *parent, pugi::xml_node expansion);
     bool ReadMeiPb(Object *parent, pugi::xml_node pb);
     bool ReadMeiSb(Object *parent, pugi::xml_node sb);
     ///@}

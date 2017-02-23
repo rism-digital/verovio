@@ -307,7 +307,7 @@ void View::DrawStaffGrp(
             dc->EndText();
 
             // also store in the system the maximum width with abbreviations
-            if (!abbreviations && (abbrLabel.length() > 0)) {
+            if (system && !abbreviations && (abbrLabel.length() > 0)) {
                 dc->GetTextExtent(abbrLabel, &extend);
                 system->SetDrawingAbbrLabelsWidth(extend.m_width + space);
             }
