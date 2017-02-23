@@ -119,31 +119,30 @@ bool LayerElement::IsGraceNote()
         if (child) return child->IsGraceNote();
     }
     // For accid, look at the parent note
-    else if (this->Is(ACCID))  {
+    else if (this->Is(ACCID)) {
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
         return (note && (note->HasGrace()));
     }
     return false;
 }
-    
+
 bool LayerElement::IsCueSize()
 {
     if (this->IsGraceNote()) return true;
-    
+
     // This cover the case when the @size is given on the element
     if (this->HasAttClass(ATT_RELATIVESIZE)) {
-        AttRelativesize *att = dynamic_cast<AttRelativesize*>(this);
+        AttRelativesize *att = dynamic_cast<AttRelativesize *>(this);
         assert(att);
         if (att->HasSize()) return (att->GetSize() == SIZE_cue);
     }
-    
+
     // For note, we also need to look at the parent chord
     if (this->Is(NOTE)) {
         Note const *note = dynamic_cast<Note const *>(this);
         assert(note);
         Chord *chord = note->IsChordTone();
-        if (chord)
-            return chord->IsCueSize();
+        if (chord) return chord->IsCueSize();
     }
     // For tuplet, we also need to look at the first note or chord
     else if (this->Is(TUPLET)) {
@@ -155,12 +154,10 @@ bool LayerElement::IsCueSize()
     // For accid, look at the parent note
     else if (this->Is(ACCID)) {
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
-        if (note)
-            return note->IsCueSize();
+        if (note) return note->IsCueSize();
     }
     return false;
 }
-
 
 bool LayerElement::IsInLigature()
 {

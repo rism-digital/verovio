@@ -19,7 +19,11 @@ namespace vrv {
 // Trill
 //----------------------------------------------------------------------------
 
-class Trill : public ControlElement, public TimePointInterface, public AttColor, public AttOrnamentaccid, public AttPlacement {
+class Trill : public ControlElement,
+              public TimePointInterface,
+              public AttColor,
+              public AttOrnamentaccid,
+              public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

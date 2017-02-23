@@ -271,7 +271,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     std::wstring notes;
 
     bool drawingCueSize = tuplet->IsCueSize();
-    
+
     dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
 
     if (tuplet->GetNum() > 0) {
@@ -288,8 +288,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     int txt_x = center.x - (extend.m_width / 2);
     // we need to move down the figure of half of it height, which is about an accid width;
     // also, cue size is not supported. Does it has to?
-    int txt_y
-        = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, drawingCueSize);
+    int txt_y = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, drawingCueSize);
 
     if (tuplet->GetNum() && (tuplet->GetNumVisible() != BOOLEAN_false)) {
         DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->m_drawingStaffSize);
