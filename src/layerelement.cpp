@@ -159,10 +159,15 @@ bool LayerElement::IsCueSize()
     return false;
 }
 
-bool LayerElement::IsInLigature()
+bool LayerElement::IsFirstInLigature()
 {
     if (!this->Is(NOTE)) return false;
-    return (this->GetFirstParent(LIGATURE, MAX_LIGATURE_DEPTH));
+    Object *ligature = this->GetFirstParent(LIGATURE, MAX_LIGATURE_DEPTH);
+    if (!ligature) return false;
+    if (ligature->GetFirst(NOTE) == this)
+        return false;
+    else
+        return true;
 }
 
 bool LayerElement::IsInFTrem()
@@ -498,7 +503,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->Is(MRPT2) || this->Is(MULTIRPT)) {
         type = ALIGNMENT_FULLMEASURE2;
     }
-    else if (this->Is(BEAM) || this->Is(TUPLET)) {
+    else if (this->Is(BEAM) || this->Is(LIGATURE) || this->Is(TUPLET)) {
         type = ALIGNMENT_CONTAINER;
     }
     else if (this->Is(DOT)) {
@@ -692,6 +697,11 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
         // Object::SetEmptyBB()
         // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
         selfLeft = this->GetAlignment()->GetXRel();
+    }
+    else if (this->IsFirstInLigature()) {
+        // We add it to the upcoming bouding boxes
+        params->m_upcomingBoundingBoxes.push_back(this);
+        selfLeft = this->GetSelfLeft();
     }
     else {
         // We add it to the upcoming bouding boxes
