@@ -117,8 +117,7 @@ void View::DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2,
 
 /* Draw an empty ("void") diamond with its top lefthand point at (x1, y1). */
 
-void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill,
-                       int linewidth)
+void View::DrawDiamond(DeviceContext *dc, int x1, int y1, int height, int width, bool fill, int linewidth)
 {
     Point p[4];
 
