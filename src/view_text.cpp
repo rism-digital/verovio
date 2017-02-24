@@ -56,7 +56,10 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, int x, int y, bool &setX, boo
     if (rend->HasFontname() || rend->HasFontsize() || rend->HasFontstyle() || rend->HasFontweight()) {
         customFont = true;
         if (rend->HasFontname()) rendFont.SetFaceName(rend->GetFontname().c_str());
-        if (rend->HasFontsize()) rendFont.SetPointSize(rend->GetFontsize());
+        if (rend->HasFontsize()) {
+            const data_FONTSIZE &fs = rend->GetFontsize();
+            if (fs.GetType() == FONTSIZE_point) rendFont.SetPointSize(fs.GetValue());
+        }
         if (rend->HasFontstyle()) rendFont.SetStyle(rend->GetFontstyle());
         if (rend->HasFontweight()) rendFont.SetWeight(rend->GetFontweight());
     }

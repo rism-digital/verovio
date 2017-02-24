@@ -114,6 +114,49 @@ enum data_DURATION {
     DURATION_fusa,
     DURATION_semifusa
 };
+    
+/**
+ * MEI data.FONTSIZE
+ * Since it can contain different subtype we need a dedicated class for it.
+ */
+
+enum FontSizeType { FONTSIZE_NONE = 0, FONTSIZE_point, FONTSIZE_percent, FONTSIZE_term };
+
+class data_FONTSIZE {
+public:
+    data_FONTSIZE()
+    {
+        m_value = VRV_UNSET;
+        m_term = FONTSIZETERM_NONE;
+    }
+    data_FONTSIZE(FontSizeType type)
+    {
+        m_type = type;
+        m_value = VRV_UNSET;
+        m_term = FONTSIZETERM_NONE;
+    }
+    virtual ~data_FONTSIZE() {}
+
+    FontSizeType GetType() const { return m_type; }
+
+    double GetValue() const { return m_value; }
+    void SetValue(double value) { m_value = value; }
+
+    data_FONTSIZETERM GetTerm() const { return m_term; }
+    void SetTerm(data_FONTSIZETERM term) { m_term = term; }
+
+    // comparison
+    bool operator==(const data_FONTSIZE &fs) const
+    {
+        return ((m_type == fs.GetType()) && (m_value == fs.GetValue()) && (m_term == fs.GetTerm()));
+    }
+    bool operator!=(const data_FONTSIZE &fs) const { return !(*this == fs); }
+
+protected:
+    double m_value;
+    data_FONTSIZETERM m_term;
+    FontSizeType m_type;
+};
 
 /**
  * MEI data.KEYSIGNATURE

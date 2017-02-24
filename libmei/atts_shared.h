@@ -2678,8 +2678,8 @@ public:
     std::string GetLyricName() const { return m_lyricName; }
     bool HasLyricName() const;
     //
-    void SetLyricSize(int lyricSize_) { m_lyricSize = lyricSize_; }
-    int GetLyricSize() const { return m_lyricSize; }
+    void SetLyricSize(data_FONTSIZE lyricSize_) { m_lyricSize = lyricSize_; }
+    data_FONTSIZE GetLyricSize() const { return m_lyricSize; }
     bool HasLyricSize() const;
     //
     void SetLyricStyle(data_FONTSTYLE lyricStyle_) { m_lyricStyle = lyricStyle_; }
@@ -2699,7 +2699,7 @@ private:
     /** Sets the font name default value for lyrics. **/
     std::string m_lyricName;
     /** Sets the default font size value for lyrics. **/
-    int m_lyricSize;
+    data_FONTSIZE m_lyricSize;
     /** Sets the default font style value for lyrics. **/
     data_FONTSTYLE m_lyricStyle;
     /** Sets the default font weight value for lyrics. **/
@@ -3457,8 +3457,8 @@ public:
     std::string GetMusicName() const { return m_musicName; }
     bool HasMusicName() const;
     //
-    void SetMusicSize(int musicSize_) { m_musicSize = musicSize_; }
-    int GetMusicSize() const { return m_musicSize; }
+    void SetMusicSize(data_FONTSIZE musicSize_) { m_musicSize = musicSize_; }
+    data_FONTSIZE GetMusicSize() const { return m_musicSize; }
     bool HasMusicSize() const;
     ///@}
 
@@ -3466,7 +3466,7 @@ private:
     /** Sets the default music font name. **/
     std::string m_musicName;
     /** Sets the default music font size. **/
-    int m_musicSize;
+    data_FONTSIZE m_musicSize;
 
     /* include <attmusic.size> */
 };
@@ -5545,8 +5545,8 @@ public:
     std::string GetTextName() const { return m_textName; }
     bool HasTextName() const;
     //
-    void SetTextSize(int textSize_) { m_textSize = textSize_; }
-    int GetTextSize() const { return m_textSize; }
+    void SetTextSize(data_FONTSIZE textSize_) { m_textSize = textSize_; }
+    data_FONTSIZE GetTextSize() const { return m_textSize; }
     bool HasTextSize() const;
     //
     void SetTextStyle(data_FONTSTYLE textStyle_) { m_textStyle = textStyle_; }
@@ -5573,7 +5573,7 @@ private:
      * Provides a default value for the font size of text (other than lyrics) when this
      * information is not provided on the individual elements.
      **/
-    int m_textSize;
+    data_FONTSIZE m_textSize;
     /**
      * Provides a default value for the font style of text (other than lyrics) when
      * this information is not provided on the individual elements.
@@ -5920,8 +5920,8 @@ public:
     std::string GetFontname() const { return m_fontname; }
     bool HasFontname() const;
     //
-    void SetFontsize(int fontsize_) { m_fontsize = fontsize_; }
-    int GetFontsize() const { return m_fontsize; }
+    void SetFontsize(data_FONTSIZE fontsize_) { m_fontsize = fontsize_; }
+    data_FONTSIZE GetFontsize() const { return m_fontsize; }
     bool HasFontsize() const;
     //
     void SetFontstyle(data_FONTSTYLE fontstyle_) { m_fontstyle = fontstyle_; }
@@ -5943,7 +5943,7 @@ private:
      * inch, relative terms, e.g., "small", "larger", etc., or percentage values
      * relative to "normal" size, e.g., "125%".
      **/
-    int m_fontsize;
+    data_FONTSIZE m_fontsize;
     /** Records the style of a font, i.e, italic, oblique, or normal. **/
     data_FONTSTYLE m_fontstyle;
     /** Used to indicate bold type. **/
