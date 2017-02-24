@@ -180,17 +180,16 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     /************** accidental **************/
 
-    if (note->m_drawingAccid) {
+    Accid *accid = note->GetDrawingAccid();
+    if (accid) {
         int xAccid = xNote;
-        if (note->m_drawingAccid->GetFunc() != accidLog_FUNC_edit) {
+        if (accid->GetFunc() != accidLog_FUNC_edit) {
             xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, false);
         }
 
-        note->m_drawingAccid->SetDrawingX(xAccid);
-        note->m_drawingAccid->SetDrawingY(noteY);
-
-        // postpone drawing the accidental until later if it's in a chord or if it is not an attribute
-        if (note->m_isDrawingAccidAttr) DrawAccid(dc, note->m_drawingAccid, layer, staff, measure);
+        assert(false);
+        // accid->SetDrawingX(xAccid);
+        // accid->SetDrawingY(noteY);
     }
 
     DrawLayerChildren(dc, note, layer, staff, measure);
@@ -388,7 +387,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     interface->SetDrawingStemDir(dir);
 
     // cast to note is check when setting drawingCueSize value
-    if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_acc)) {
+    if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_unacc)) {
         DrawAcciaccaturaSlash(dc, object);
     }
 }

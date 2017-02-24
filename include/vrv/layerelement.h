@@ -39,7 +39,7 @@ public:
     LayerElement(std::string classid);
     virtual ~LayerElement();
     virtual void Reset();
-    virtual ClassId Is() const { return LAYER_ELEMENT; }
+    virtual ClassId GetClassId() const { return LAYER_ELEMENT; }
     ///@}
 
     /**
@@ -48,9 +48,10 @@ public:
     LayerElement &operator=(const LayerElement &element);
 
     /**
-     * Adjust the pname and the octave for values outside the range
+     * Return true if the element has to be aligned horizontally
+     * It typically set to false for mRest, mRpt, etc.
      */
-    static void AdjustPname(int *pname, int *oct);
+    virtual bool HasToBeAligned() const { return false; }
 
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
@@ -68,15 +69,13 @@ public:
      */
     ///@{
     /** Return true if the element is a grace note */
-    bool IsGraceNote() const;
-    /** Return true if the element is a note or a note child and the note has a @grace */
+    bool IsGraceNote();
+    /** Return true if the element is has to be rederred as cue sized */
     bool IsCueSize();
     /** Return true if the element is a note within a ligature */
     bool IsInLigature();
     /** Return true if the element is a note or a chord within a fTrem */
     bool IsInFTrem();
-    /** Return true if the element has to be aligned horizontally */
-    virtual bool HasToBeAligned() const { return false; }
     /**
      * Return the beam parent if in beam
      * Look if the note or rest is in a beam.
@@ -85,6 +84,29 @@ public:
      */
     Beam *IsInBeam();
     ///@}
+
+    /**
+     * @name Get the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
+
+    /**
+     * @name Get and set the X and Y drawing relative positions
+     */
+    ///@{
+    int GetDrawingXRel() const { return m_drawingXRel; }
+    virtual void SetDrawingXRel(int drawingXRel) { m_drawingXRel = drawingXRel; }
+    int GetDrawingYRel() const { return m_drawingYRel; }
+    virtual void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; }
+    ///@}
+
+    /**
+     * Ajust the m_drawingYRel for the element to be centered on the inner content of the measure
+     */
+    void CenterDrawingX();
 
     /**
      * Returns the drawing top and bottom taking into accound stem, etc.
@@ -102,7 +124,14 @@ public:
      */
     Alignment *GetAlignment() const { return m_alignment; }
 
-    int GetXRel() const;
+    /**
+     * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)
+     */
+    ///@{
+    Alignment *GetGraceAlignment() const;
+    void SetGraceAlignment(Alignment *graceAlignment);
+    bool HasGraceAlignment() const { return (m_graceAlignment != NULL); }
+    ///@}
 
     /**
      * Returns the duration if the child element has a DurationInterface
@@ -129,6 +158,23 @@ public:
     virtual int AlignHorizontally(FunctorParams *functorParams);
 
     /**
+     * See Object::AdjustGraceXPos
+     */
+    ///@{
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+    ///@}
+
+    /**
+     * See Object::AdjustXPos
+     */
+    virtual int AdjustXPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareCrossStaff
+     */
+    virtual int PrepareCrossStaff(FunctorParams *functorParams);
+
+    /**
      * See Object::PrepareTimePointing
      */
     virtual int PrepareTimePointing(FunctorParams *functorParams);
@@ -139,9 +185,9 @@ public:
     virtual int PrepareTimeSpanning(FunctorParams *functorParams);
 
     /**
-     * See Object::SetDrawingXY
+     * See Object::SetAlignmentPitchPos
      */
-    virtual int SetDrawingXY(FunctorParams *functorParams);
+    virtual int SetAlignmentPitchPos(FunctorParams *functorParams);
 
     /**
      * See Object::FindTimeSpanningLayerElements
@@ -171,13 +217,30 @@ public:
     BeamElementCoord *m_beamElementCoord;
     /**
      * This stores a pointer to the cross-staff (if any) and the appropriate layer
-     * Initialized in LayerElement::SetDrawingXY
+     * See Object::PrepareCrossStaff
      */
     Staff *m_crossStaff;
     Layer *m_crossLayer;
 
 protected:
     Alignment *m_alignment;
+
+    /**
+     * An alignment for grace notes
+     */
+    Alignment *m_graceAlignment;
+
+    /**
+     * The Y drawing relative position of the object.
+     * It is re-computed everytime the object is drawn and it is not stored in the file.
+     */
+    int m_drawingYRel;
+
+    /**
+     * The X drawing relative position of the object.
+     * It is re-computed everytime the object is drawn and it is not stored in the file.
+     */
+    int m_drawingXRel;
 
 private:
     /** Indicates whether it is a ScoreDef or StaffDef attribute */

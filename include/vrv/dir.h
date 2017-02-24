@@ -20,7 +20,11 @@ class TextElement;
 // Dir
 //----------------------------------------------------------------------------
 
-class Dir : public ControlElement, public TextListInterface, public TextDirInterface, public TimeSpanningInterface {
+class Dir : public ControlElement,
+            public TextListInterface,
+            public TextDirInterface,
+            public TimeSpanningInterface,
+            public AttLang {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -31,7 +35,7 @@ public:
     virtual ~Dir();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Dir"; }
-    virtual ClassId Is() const { return DIR; }
+    virtual ClassId GetClassId() const { return DIR; }
     ///@}
 
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }

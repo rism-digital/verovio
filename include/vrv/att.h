@@ -46,9 +46,10 @@ public:
     ///@{
     // static bool SetAnalysis(Object *element, std::string attrType, std::string attrValue);
     static bool SetCmn(Object *element, std::string attrType, std::string attrValue);
-    // static bool SetCmnornaments(Object *element, std::string attrType, std::string attrValue);
+    static bool SetCmnornaments(Object *element, std::string attrType, std::string attrValue);
     static bool SetCritapp(Object *element, std::string attrType, std::string attrValue);
     // static bool SetEdittrans(Object *element, std::string attrType, std::string attrValue);
+    static bool SetExternalsymbols(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFacsimile(Object *element, std::string attrType, std::string attrValue);
     // static bool SetFigtable(Object *element, std::string attrType, std::string attrValue);
     // static bool SetHarmony(Object *element, std::string attrType, std::string attrValue);
@@ -69,23 +70,24 @@ public:
      */
     // static void GetAnalysis(Object *element, ArrayOfStrAttr *attributes);
     static void GetCmn(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetCmnornaments(Object *element, ArrayOfStrAttr *attributes);
+    static void GetCmnornaments(const Object *element, ArrayOfStrAttr *attributes);
     static void GetCritapp(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetEdittrans(Object *element, ArrayOfStrAttr *attributes);
-    // static void GetFacsimile(Object *element, ArrayOfStrAttr *attributes);
-    // static void GetFigtable(Object *element, ArrayOfStrAttr *attributes);
-    // static void GetHarmony(Object *element, ArrayOfStrAttr *attributes);
-    // static void GetHeader(Object *element, ArrayOfStrAttr *attributes);
-    // static void GetLyrics(Object *element, ArrayOfStrAttr *attributes);
+    // static void GetEdittrans(const Object *element, ArrayOfStrAttr *attributes);
+    static void GetExternalsymbols(const Object *element, ArrayOfStrAttr *attributes);
+    // static void GetFacsimile(const Object *element, ArrayOfStrAttr *attributes);
+    // static void GetFigtable(const Object *element, ArrayOfStrAttr *attributes);
+    // static void GetHarmony(const Object *element, ArrayOfStrAttr *attributes);
+    // static void GetHeader(const Object *element, ArrayOfStrAttr *attributes);
+    // static void GetLyrics(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMei(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMensural(const Object *element, ArrayOfStrAttr *attributes);
     static void GetMidi(const Object *element, ArrayOfStrAttr *attributes);
     static void GetPagebased(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetPerformance(Object *element, ArrayOfStrAttr *attributes);
-    // static void GetNeumes(Object *element, ArrayOfStrAttr *attributes);
+    // static void GetPerformance(const Object *element, ArrayOfStrAttr *attributes);
+    // static void GetNeumes(const Object *element, ArrayOfStrAttr *attributes);
     static void GetShared(const Object *element, ArrayOfStrAttr *attributes);
-    // static void GetTablature(Object *element, ArrayOfStrAttr *attributes);
-    // static void GetUsersymbols(Object *element, ArrayOfStrAttr *attributes);
+    // static void GetTablature(const Object *element, ArrayOfStrAttr *attributes);
+    // static void GetUsersymbols(const Object *element, ArrayOfStrAttr *attributes);
     ///@}
 
 public:
@@ -96,12 +98,14 @@ public:
     ///@{
     std::string DblToStr(double data) const;
     std::string IntToStr(int data) const;
+    std::string WcharTToStr(wchar_t data) const;
     ///@}
 
     /** @name Basic converters for reading */
     ///@{
     double StrToDbl(std::string value) const;
     int StrToInt(std::string value) const;
+    wchar_t StrToWcharT(std::string value) const;
     ///@}
 
     /** @name Converters for writing and reading */

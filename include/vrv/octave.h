@@ -19,7 +19,11 @@ namespace vrv {
 // Octave
 //----------------------------------------------------------------------------
 
-class Octave : public ControlElement, public TimeSpanningInterface, public AttColor, public AttLinerendBase, public AttOctavedisplacement {
+class Octave : public ControlElement,
+               public TimeSpanningInterface,
+               public AttColor,
+               public AttLinerendBase,
+               public AttOctavedisplacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -30,7 +34,7 @@ public:
     virtual ~Octave();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Octave"; }
-    virtual ClassId Is() const { return OCTAVE; }
+    virtual ClassId GetClassId() const { return OCTAVE; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

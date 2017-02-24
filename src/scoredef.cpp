@@ -200,7 +200,7 @@ void ScoreDef::Reset()
 
 void ScoreDef::AddChild(Object *child)
 {
-    if (child->Is() == STAFFGRP) {
+    if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -308,7 +308,7 @@ void ScoreDef::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        if ((*iter)->Is() != STAFFDEF) {
+        if (!(*iter)->Is(STAFFDEF)) {
             iter = childList->erase(iter);
         }
         else {
@@ -319,14 +319,13 @@ void ScoreDef::FilterList(ListOfObjects *childList)
 
 StaffDef *ScoreDef::GetStaffDef(int n)
 {
-    StaffDef *staffDef = NULL;
-
     this->ResetList(this);
     ListOfObjects *childList = this->GetList(this);
     ListOfObjects::iterator iter;
 
+    StaffDef *staffDef = NULL;
     for (iter = childList->begin(); iter != childList->end(); ++iter) {
-        if ((*iter)->Is() != STAFFDEF) continue;
+        if (!(*iter)->Is(STAFFDEF)) continue;
         staffDef = dynamic_cast<StaffDef *>(*iter);
         assert(staffDef);
         if (staffDef->GetN() == n) {
@@ -335,6 +334,24 @@ StaffDef *ScoreDef::GetStaffDef(int n)
     }
 
     return staffDef;
+}
+
+std::vector<int> ScoreDef::GetStaffNs()
+{
+    this->ResetList(this);
+    ListOfObjects *childList = this->GetList(this);
+    ListOfObjects::iterator iter;
+
+    std::vector<int> ns;
+    StaffDef *staffDef = NULL;
+    for (iter = childList->begin(); iter != childList->end(); ++iter) {
+        // It should be staffDef only, but double check.
+        if (!(*iter)->Is(STAFFDEF)) continue;
+        staffDef = dynamic_cast<StaffDef *>(*iter);
+        assert(staffDef);
+        ns.push_back(staffDef->GetN());
+    }
+    return ns;
 }
 
 void ScoreDef::SetRedrawFlags(bool clef, bool keySig, bool mensur, bool meterSig, bool applyToAll)
@@ -361,7 +378,7 @@ void ScoreDef::SetDrawingWidth(int drawingWidth)
 //----------------------------------------------------------------------------
 
 StaffGrp::StaffGrp()
-    : Object()
+    : Object("staffgrp-")
     , ObjectListInterface()
     , AttCommon()
     , AttCommonPart()
@@ -394,10 +411,10 @@ void StaffGrp::Reset()
 
 void StaffGrp::AddChild(Object *child)
 {
-    if (child->Is() == STAFFDEF) {
+    if (child->Is(STAFFDEF)) {
         assert(dynamic_cast<StaffDef *>(child));
     }
-    else if (child->Is() == STAFFGRP) {
+    else if (child->Is(STAFFGRP)) {
         assert(dynamic_cast<StaffGrp *>(child));
     }
     else if (child->IsEditorialElement()) {
@@ -419,7 +436,7 @@ void StaffGrp::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        if ((*iter)->Is() != STAFFDEF) {
+        if (!(*iter)->Is(STAFFDEF)) {
             iter = childList->erase(iter);
         }
         else {
@@ -436,6 +453,7 @@ StaffDef::StaffDef()
     : ScoreDefElement("staffdef-")
     , AttCommon()
     , AttCommonPart()
+    , AttDistances()
     , AttLabelsAddl()
     , AttNotationtype()
     , AttScalable()
@@ -444,6 +462,7 @@ StaffDef::StaffDef()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_DISTANCES);
     RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_NOTATIONTYPE);
     RegisterAttClass(ATT_SCALABLE);
@@ -463,6 +482,7 @@ void StaffDef::Reset()
     StaffDefDrawingInterface::Reset();
     ResetCommon();
     ResetCommonPart();
+    ResetDistances();
     ResetLabelsAddl();
     ResetNotationtype();
     ResetScalable();

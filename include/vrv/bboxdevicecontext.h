@@ -43,7 +43,7 @@ public:
     ///@{
     BBoxDeviceContext(View *view, int width, int height, unsigned char update = BBOX_BOTH);
     virtual ~BBoxDeviceContext();
-    virtual ClassId Is() const { return BBOX_DEVICE_CONTEXT; }
+    virtual ClassId GetClassId() const { return BBOX_DEVICE_CONTEXT; }
     ///@}
 
     /**
@@ -155,8 +155,6 @@ private:
     View *m_view;
 
     void UpdateBB(int x1, int y1, int x2, int y2);
-
-    void ApproximateBezierBoundingBox(Point bezier[], Point *pos, int *width, int *height);
 };
 
 } // namespace vrv

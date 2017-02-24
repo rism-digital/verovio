@@ -14,6 +14,7 @@
 namespace vrv {
 
 class DeviceContext;
+class PrepareProcessingListsParams;
 class Staff;
 class System;
 
@@ -37,7 +38,7 @@ public:
     virtual ~Page();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Page"; }
-    virtual ClassId Is() const { return PAGE; }
+    virtual ClassId GetClassId() const { return PAGE; }
     ///@}
 
     /**
@@ -106,6 +107,11 @@ public:
     //----------//
 
 private:
+    /**
+     * Adjust the horizontal postition of the syl processing verse by verse
+     */
+    void AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc);
+
     //
 public:
     /** Page width (MEI scoredef@page.width). Saved if != -1 */

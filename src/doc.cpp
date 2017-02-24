@@ -108,7 +108,7 @@ void Doc::AddChild(Object *child)
 {
     assert(!m_scoreBuffer); // Children cannot be added if a score buffer was created;
 
-    if (child->Is() == PAGE) {
+    if (child->Is(PAGE)) {
         assert(dynamic_cast<Page *>(child));
     }
     else {
@@ -140,7 +140,6 @@ void Doc::Refresh()
 void Doc::ExportMIDI(MidiFile *midiFile)
 {
     CalcMaxMeasureDurationParams calcMaxMeasureDurationParams;
-    if (m_scoreDef.HasMidiBpm()) calcMaxMeasureDurationParams.m_currentBpm = m_scoreDef.GetMidiBpm();
 
     // We first calculate the maximum duration of each measure
     Functor calcMaxMeasureDuration(&Object::CalcMaxMeasureDuration);
@@ -163,6 +162,11 @@ void Doc::ExportMIDI(MidiFile *midiFile)
     IntTree_t::iterator staves;
     IntTree_t::iterator layers;
 
+    // Set tempo
+    if (m_scoreDef.HasMidiBpm()) {
+        midiFile->addTempo(0, 0, m_scoreDef.GetMidiBpm());
+    }
+
     // Process notes and chords, rests, spaces layer by layer
     // track 0 (included by default) is reserved for meta messages common to all tracks
     int midiTrack = 1;
@@ -174,10 +178,12 @@ void Doc::ExportMIDI(MidiFile *midiFile)
         // Get the transposition (semi-tone) value for the staff
         if (StaffDef *staffDef = this->m_scoreDef.GetStaffDef(staves->first)) {
             if (staffDef->HasTransSemi()) transSemi = staffDef->GetTransSemi();
+            midiTrack = staffDef->GetN();
+            midiFile->addTrack();
+            if (staffDef->HasLabel()) midiFile->addTrackName(midiTrack, 0, staffDef->GetLabel());
         }
 
         for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
-            midiFile->addTrack(1);
             filters.clear();
             // Create ad comparison object for each type / @n
             AttCommonNComparison matchStaff(STAFF, staves->first);
@@ -187,15 +193,13 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
             GenerateMIDIParams generateMIDIParams(midiFile);
             generateMIDIParams.m_maxValues = calcMaxMeasureDurationParams.m_maxValues;
+            generateMIDIParams.m_midiTrack = midiTrack;
             generateMIDIParams.m_transSemi = transSemi;
             Functor generateMIDI(&Object::GenerateMIDI);
             Functor generateMIDIEnd(&Object::GenerateMIDIEnd);
 
-            if (m_scoreDef.HasMidiBpm()) generateMIDIParams.m_currentBpm = m_scoreDef.GetMidiBpm();
             // LogDebug("Exporting track %d ----------------", midiTrack);
             this->Process(&generateMIDI, &generateMIDIParams, &generateMIDIEnd, &filters);
-
-            midiTrack++;
         }
     }
 
@@ -247,6 +251,11 @@ void Doc::PrepareDrawing()
         LogWarning(
             "%d time spanning elements could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
+
+    // Prepare the cross-staff pointers
+    PrepareCrossStaffParams prepareCrossStaffParams;
+    Functor prepareCrossStaff(&Object::PrepareCrossStaff);
+    this->Process(&prepareCrossStaff, &prepareCrossStaffParams);
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
@@ -470,6 +479,7 @@ void Doc::CastOffDoc()
 
     // Reset the scoreDef at the beginning of each system
     this->CollectScoreDefs(true);
+    contentPage->LayOutHorizontally();
     contentPage->LayOutVertically();
 
     // Detach the contentPage

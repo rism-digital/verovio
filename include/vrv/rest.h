@@ -21,7 +21,11 @@ namespace vrv {
 /**
  * This class models the MEI <rest> element.
  */
-class Rest : public LayerElement, public DurationInterface, public PositionInterface, public AttColor {
+class Rest : public LayerElement,
+             public DurationInterface,
+             public PositionInterface,
+             public AttColor,
+             public AttRelativesize {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -32,7 +36,7 @@ public:
     virtual ~Rest();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Rest"; }
-    virtual ClassId Is() const { return REST; }
+    virtual ClassId GetClassId() const { return REST; }
     ///@}
 
     virtual PositionInterface *GetPositionInterface() { return dynamic_cast<PositionInterface *>(this); }

@@ -33,7 +33,7 @@ public:
     virtual ~AnchoredText();
     virtual void Reset();
     virtual std::string GetClassName() const { return "AnchoredText"; }
-    virtual ClassId Is() const { return ANCHORED_TEXT; }
+    virtual ClassId GetClassId() const { return ANCHORED_TEXT; }
     ///@}
 
     virtual TextDirInterface *GetTextDirInterface() { return dynamic_cast<TextDirInterface *>(this); }

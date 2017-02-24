@@ -25,7 +25,7 @@ namespace vrv {
 
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 9
-#define VERSION_REVISION 13
+#define VERSION_REVISION 14
 // Adds "-dev" in the version number - should be set to false for releases
 #define VERSION_DEV true
 
@@ -35,7 +35,7 @@ namespace vrv {
 
 /**
  * The ClassIds are used to identify Object child classes through the Object::Is virtual method.
- * Each Object child class has to have its own id and has to override the Is() method.
+ * Each Object child class has to have its own id and has to override the GetClassId() method.
  * Base classes (e.g., LayerElement) that are never instanciated have boundary ids
  * used for checking if an Object is child of a base class. See for example
  * Object::IsLayerElement.
@@ -48,6 +48,7 @@ enum ClassId {
     FLOATING_POSITIONER,
     //
     ALIGNMENT,
+    ALIGNMENT_REFERENCE,
     CLEF_ATTR,
     DOC,
     GRACE_ALIGNER,
@@ -90,6 +91,7 @@ enum ClassId {
     SYSTEM_ELEMENT,
     BOUNDARY_END,
     ENDING,
+    EXPANSION,
     PB,
     SB,
     SECTION,
@@ -102,11 +104,14 @@ enum ClassId {
     FERMATA,
     HAIRPIN,
     HARM,
+    MORDENT,
     OCTAVE,
     PEDAL,
     SLUR,
     TEMPO,
     TIE,
+    TRILL,
+    TURN,
     CONTROL_ELEMENT_max,
     // Ids for LayerElement child classes
     LAYER_ELEMENT,
@@ -179,6 +184,7 @@ enum InterfaceId {
 // Typedefs
 //----------------------------------------------------------------------------
 
+class Alignment;
 class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
@@ -198,6 +204,8 @@ typedef std::list<Object *> ListOfObjects;
 typedef std::vector<AttComparison *> ArrayOfAttComparisons;
 
 typedef std::vector<Note *> ChordCluster;
+
+typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmentTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 

@@ -5,10 +5,13 @@
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
+#include "object.h"
+
 //----------------------------------------------------------------------------
 
 #include <assert.h>
 #include <iostream>
+#include <math.h>
 #include <sstream>
 
 //----------------------------------------------------------------------------
@@ -37,156 +40,6 @@
 #include "vrv.h"
 
 namespace vrv {
-
-//----------------------------------------------------------------------------
-// BoundingBox
-//----------------------------------------------------------------------------
-
-BoundingBox::BoundingBox()
-{
-    ResetBoundingBox();
-}
-
-ClassId BoundingBox::Is() const
-{
-    // we should always have the method overridden
-    assert(false);
-    return BOUNDING_BOX;
-};
-
-void BoundingBox::UpdateContentBBoxX(int x1, int x2)
-{
-    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
-
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
-
-    min_x -= m_drawingX;
-    max_x -= m_drawingX;
-
-    if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
-    if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
-
-    m_updatedBBoxX = true;
-    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // GetClassName().c_str());
-}
-
-void BoundingBox::UpdateContentBBoxY(int y1, int y2)
-{
-    // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
-
-    int min_y = std::min(y1, y2);
-    int max_y = std::max(y1, y2);
-
-    min_y -= m_drawingY;
-    max_y -= m_drawingY;
-
-    if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
-    if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
-
-    m_updatedBBoxY = true;
-    // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
-    // GetClassName().c_str());
-}
-
-void BoundingBox::UpdateSelfBBoxX(int x1, int x2)
-{
-    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-
-    int min_x = std::min(x1, x2);
-    int max_x = std::max(x1, x2);
-
-    min_x -= m_drawingX;
-    max_x -= m_drawingX;
-
-    if (m_selfBB_x1 > min_x) m_selfBB_x1 = min_x;
-    if (m_selfBB_x2 < max_x) m_selfBB_x2 = max_x;
-
-    m_updatedBBoxX = true;
-
-    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-}
-
-void BoundingBox::UpdateSelfBBoxY(int y1, int y2)
-{
-    // LogDebug("SB Was: %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-
-    int min_y = std::min(y1, y2);
-    int max_y = std::max(y1, y2);
-
-    min_y -= m_drawingY;
-    max_y -= m_drawingY;
-
-    if (m_selfBB_y1 > min_y) m_selfBB_y1 = min_y;
-    if (m_selfBB_y2 < max_y) m_selfBB_y2 = max_y;
-
-    m_updatedBBoxY = true;
-
-    // LogDebug("SB Is:  %i %i %i %i", m_selfBB_x1,m_selfBB_y1, m_selfBB_x2, m_selfBB_y2);
-}
-
-void BoundingBox::ResetBoundingBox()
-{
-    m_contentBB_x1 = 0xFFFFFFF;
-    m_contentBB_y1 = 0xFFFFFFF;
-    m_contentBB_x2 = -0xFFFFFFF;
-    m_contentBB_y2 = -0xFFFFFFF;
-    m_selfBB_x1 = 0xFFFFFFF;
-    m_selfBB_y1 = 0xFFFFFFF;
-    m_selfBB_x2 = -0xFFFFFFF;
-    m_selfBB_y2 = -0xFFFFFFF;
-
-    m_updatedBBoxX = false;
-    m_updatedBBoxY = false;
-}
-
-void BoundingBox::SetEmptyBB()
-{
-    m_contentBB_x1 = 0;
-    m_contentBB_y1 = 0;
-    m_contentBB_x2 = 0;
-    m_contentBB_y2 = 0;
-    m_selfBB_x1 = 0;
-    m_selfBB_y1 = 0;
-    m_selfBB_x2 = 0;
-    m_selfBB_y2 = 0;
-
-    m_updatedBBoxX = true;
-    m_updatedBBoxY = true;
-}
-
-bool BoundingBox::HasEmptyBB()
-{
-    return (HasUpdatedBB() && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
-        && (m_contentBB_y2 == 0));
-}
-
-bool BoundingBox::HasContentBB()
-{
-    return ((m_contentBB_x1 != 0xFFFF) && (m_contentBB_y1 != 0xFFFF) && (m_contentBB_x2 != -0xFFFF)
-        && (m_contentBB_y2 != -0xFFFF));
-}
-
-bool BoundingBox::HasSelfBB()
-{
-    return ((m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF));
-}
-
-bool BoundingBox::HorizontalOverlap(const BoundingBox *other) const
-{
-    assert(other);
-
-    if (m_drawingX + m_contentBB_x2 < other->GetDrawingX() + other->m_contentBB_x1) return false;
-    if (m_drawingX + m_contentBB_x1 > other->GetDrawingX() + other->m_contentBB_x2) return false;
-    return true;
-}
-
-int BoundingBox::CalcVerticalOverlap(const BoundingBox *other) const
-{
-    assert(other);
-    return 0;
-}
 
 //----------------------------------------------------------------------------
 // Object
@@ -277,7 +130,7 @@ void Object::Init(std::string classid)
     Reset();
 }
 
-ClassId Object::Is() const
+ClassId Object::GetClassId() const
 {
     // we should always have the method overridden
     assert(false);
@@ -298,7 +151,7 @@ void Object::RegisterInterface(std::vector<AttClassId> *attClasses, InterfaceId 
 
 bool Object::IsBoundaryElement()
 {
-    if (this->IsEditorialElement() || (this->Is() == ENDING) || (this->Is() == SECTION)) {
+    if (this->IsEditorialElement() || this->Is(ENDING) || this->Is(SECTION)) {
         BoundaryStartInterface *interface = dynamic_cast<BoundaryStartInterface *>(this);
         assert(interface);
         return (interface->IsBoundary());
@@ -311,7 +164,7 @@ void Object::MoveChildrenFrom(Object *sourceParent, int idx, bool allowTypeChang
     if (this == sourceParent) {
         assert("Object cannot be copied to itself");
     }
-    if (!allowTypeChange && (this->Is() != sourceParent->Is())) {
+    if (!allowTypeChange && (this->GetClassId() != sourceParent->GetClassId())) {
         assert("Object must be of the same type");
     }
 
@@ -392,7 +245,12 @@ int Object::GetAttributes(ArrayOfStrAttr *attributes) const
     attributes->clear();
 
     Att::GetCmn(this, attributes);
+    Att::GetCmnornaments(this, attributes);
+    Att::GetCritapp(this, attributes);
+    Att::GetExternalsymbols(this, attributes);
+    Att::GetMei(this, attributes);
     Att::GetMensural(this, attributes);
+    Att::GetMidi(this, attributes);
     Att::GetPagebased(this, attributes);
     Att::GetShared(this, attributes);
 
@@ -478,7 +336,7 @@ void Object::ClearRelinquishedChildren()
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end();) {
         if ((*iter)->m_parent != this) {
-            m_children.erase(iter);
+            iter = m_children.erase(iter);
         }
         else
             iter++;
@@ -517,10 +375,10 @@ Object *Object::FindChildExtremeByAttComparison(AttComparison *attComparison, in
 }
 
 void Object::FindAllChildByAttComparison(
-    ArrayOfObjects *objects, AttComparison *attComparison, int deepness, bool direction)
+    ArrayOfObjects *objects, AttComparison *attComparison, int deepness, bool direction, bool clear)
 {
     assert(objects);
-    objects->clear();
+    if (clear) objects->clear();
 
     Functor findAllByAttComparison(&Object::FindAllByAttComparison);
     FindAllByAttComparisonParams findAllByAttComparisonParams(attComparison, objects);
@@ -550,7 +408,7 @@ void Object::GenerateUuid()
     int nr = std::rand();
     char str[17];
     // I do not want to use a stream for doing this!
-    snprintf(str, 16, "%016d", nr);
+    snprintf(str, 17, "%016d", nr);
 
     m_uuid = m_classid + std::string(str);
     std::transform(m_uuid.begin(), m_uuid.end(), m_uuid.begin(), ::tolower);
@@ -582,6 +440,18 @@ void Object::AddChild(Object *child)
 {
     // This should never happen because the method should be overridden
     assert(false);
+}
+
+int Object::GetDrawingX() const
+{
+    assert(m_parent);
+    return m_parent->GetDrawingX();
+}
+
+int Object::GetDrawingY() const
+{
+    assert(m_parent);
+    return m_parent->GetDrawingY();
 }
 
 int Object::GetChildIndex(const Object *child)
@@ -618,7 +488,7 @@ Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
         return NULL;
     }
 
-    if (m_parent->Is() == classId) {
+    if (m_parent->GetClassId() == classId) {
         return m_parent;
     }
     else {
@@ -632,7 +502,7 @@ Object *Object::GetLastParentNot(const ClassId classId, int maxDepth)
         return NULL;
     }
 
-    if (m_parent->Is() == classId) {
+    if (m_parent->GetClassId() == classId) {
         return this;
     }
     else {
@@ -694,7 +564,7 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                     // if yes, we will use it (*attComparisonIter) for evaluating if the object matches
                     // the attribute (see below)
                     Object *o = *iter;
-                    if (o->Is() == (*attComparisonIter)->GetType()) {
+                    if (o->GetClassId() == (*attComparisonIter)->GetType()) {
                         hasAttComparison = true;
                         break;
                     }
@@ -789,7 +659,9 @@ int ObjectListInterface::GetListIndex(const Object *listElement)
 Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId classId)
 {
     ListOfObjects::iterator it = m_list.begin();
-    std::advance(it, GetListIndex(startFrom));
+    int idx = GetListIndex(startFrom);
+    if (idx == -1) return NULL;
+    std::advance(it, idx);
     it = std::find_if(it, m_list.end(), ObjectComparison(classId));
     return (it == m_list.end()) ? NULL : *it;
 }
@@ -797,7 +669,9 @@ Object *ObjectListInterface::GetListFirst(const Object *startFrom, const ClassId
 Object *ObjectListInterface::GetListFirstBackward(Object *startFrom, const ClassId classId)
 {
     ListOfObjects::iterator it = m_list.begin();
-    std::advance(it, GetListIndex(startFrom));
+    int idx = GetListIndex(startFrom);
+    if (idx == -1) return NULL;
+    std::advance(it, idx);
     ListOfObjects::reverse_iterator rit(it);
     rit = std::find_if(rit, m_list.rend(), ObjectComparison(classId));
     return (rit == m_list.rend()) ? NULL : *rit;
@@ -859,7 +733,7 @@ void TextListInterface::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        if (((*iter)->Is() != TEXT)) {
+        if (!(*iter)->Is(TEXT)) {
             // remove anything that is not an LayerElement (e.g. Verse, Syl, etc)
             iter = childList->erase(iter);
             continue;
@@ -902,6 +776,7 @@ int Object::AddLayerElementToFlatList(FunctorParams *functorParams)
     assert(params);
 
     params->m_flatList->push_back(this);
+    // LogDebug("List %d", params->m_flatList->size());
 
     return FUNCTOR_CONTINUE;
 }
@@ -979,7 +854,7 @@ int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
     assert(params->m_currentScoreDef);
 
     // starting a new staff
-    if (this->Is() == STAFF) {
+    if (this->Is(STAFF)) {
         Staff *staff = dynamic_cast<Staff *>(this);
         assert(staff);
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
@@ -987,7 +862,7 @@ int Object::SetCautionaryScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new layer
-    if (this->Is() == LAYER) {
+    if (this->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(this);
         assert(layer);
         layer->SetDrawingCautionValues(params->m_currentStaffDef);
@@ -1005,7 +880,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     assert(params->m_upcomingScoreDef);
 
     // starting a new page
-    if (this->Is() == PAGE) {
+    if (this->Is(PAGE)) {
         Page *page = dynamic_cast<Page *>(this);
         assert(page);
         if (page->m_parent->GetChildIndex(page) == 0) {
@@ -1017,7 +892,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new system
-    if (this->Is() == SYSTEM) {
+    if (this->Is(SYSTEM)) {
         System *system = dynamic_cast<System *>(this);
         assert(system);
         // This is the only thing we do for now - we need to wait until we reach the first measure
@@ -1026,7 +901,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new measure
-    if (this->Is() == MEASURE) {
+    if (this->Is(MEASURE)) {
         Measure *measure = dynamic_cast<Measure *>(this);
         assert(measure);
         bool systemBreak = false;
@@ -1064,7 +939,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new scoreDef
-    if (this->Is() == SCOREDEF) {
+    if (this->Is(SCOREDEF)) {
         ScoreDef *scoreDef = dynamic_cast<ScoreDef *>(this);
         assert(scoreDef);
         // Replace the current scoreDef with the new one, including its content (staffDef) - this also sets
@@ -1074,24 +949,29 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new staffDef
-    if (this->Is() == STAFFDEF) {
+    if (this->Is(STAFFDEF)) {
         StaffDef *staffDef = dynamic_cast<StaffDef *>(this);
         assert(staffDef);
         params->m_upcomingScoreDef->ReplaceDrawingValues(staffDef);
     }
 
     // starting a new staff
-    if (this->Is() == STAFF) {
+    if (this->Is(STAFF)) {
         Staff *staff = dynamic_cast<Staff *>(this);
         assert(staff);
         params->m_currentStaffDef = params->m_currentScoreDef->GetStaffDef(staff->GetN());
         assert(staff->m_drawingStaffDef == NULL);
         staff->m_drawingStaffDef = params->m_currentStaffDef;
+        staff->m_drawingLines = params->m_currentStaffDef->GetLines();
+        staff->m_drawingNotationType = params->m_currentStaffDef->GetNotationtype();
+        if (params->m_currentStaffDef->HasScale()) {
+            staff->m_drawingStaffSize = params->m_currentStaffDef->GetScale();
+        }
         return FUNCTOR_CONTINUE;
     }
 
     // starting a new layer
-    if (this->Is() == LAYER) {
+    if (this->Is(LAYER)) {
         Layer *layer = dynamic_cast<Layer *>(this);
         assert(layer);
         // setting the layer stem direction. Alternatively, this could be done in
@@ -1110,7 +990,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new clef
-    if (this->Is() == CLEF) {
+    if (this->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(this);
         assert(clef);
         assert(params->m_currentStaffDef);
@@ -1122,7 +1002,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     }
 
     // starting a new keysig
-    if (this->Is() == KEYSIG) {
+    if (this->Is(KEYSIG)) {
         KeySig *keysig = dynamic_cast<KeySig *>(this);
         assert(keysig);
         assert(params->m_currentStaffDef);
@@ -1136,178 +1016,18 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Object::SetBoundingBoxGraceXShift(FunctorParams *functorParams)
+int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
 {
-    SetBoundingBoxGraceXShiftParams *params = dynamic_cast<SetBoundingBoxGraceXShiftParams *>(functorParams);
+    GetAlignmentLeftRightParams *params = dynamic_cast<GetAlignmentLeftRightParams *>(functorParams);
     assert(params);
 
-    // starting new layer
-    if (this->Is() == LAYER) {
-        params->m_graceMinPos = 0;
-        return FUNCTOR_CONTINUE;
-    }
+    if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
 
-    if (this->Is() != NOTE) {
-        return FUNCTOR_CONTINUE;
-    }
+    int refLeft = this->GetSelfLeft();
+    if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;
 
-    Note *note = dynamic_cast<Note *>(this);
-    assert(note);
-
-    if (!note->IsGraceNote() || note->IsChordTone()) {
-        params->m_graceMinPos = 0;
-        return FUNCTOR_CONTINUE;
-    }
-
-    // we should have processed aligned before
-    assert(note->GetGraceAlignment());
-
-    // the negative offset is the part of the bounding box that overflows on the left
-    // |____x_____|
-    //  ---- = negative offset
-    int negative_offset = -(note->m_contentBB_x1)
-        + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-
-    if (params->m_graceMinPos > 0) {
-        //(*minPos) += (doc->GetLeftMargin(&typeid(*note)) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-    }
-
-    // this should never happen (but can with glyphs not exactly registered at position x=0 in the SMuFL font used)
-    if (negative_offset < 0) negative_offset = 0;
-
-    // check if the element overlaps with the preceeding one given by (*minPos)
-    int overlap = params->m_graceMinPos - note->GetGraceAlignment()->GetXRel() + negative_offset;
-
-    if ((note->GetGraceAlignment()->GetXRel() - negative_offset) < params->m_graceMinPos) {
-        note->GetGraceAlignment()->SetXShift(overlap);
-    }
-
-    // the next minimal position if given by the right side of the bounding box + the spacing of the element
-    params->m_graceMinPos = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2
-        + params->m_doc->GetRightMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    //(*minPos) = note->GetGraceAlignment()->GetXRel() + note->m_contentBB_x2;
-    // note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2 + doc->GetRightMargin(&typeid(*note)) *
-    // doc->GetDrawingUnit(100) /
-    // PARAM_DENOMINATOR);
-    note->GetGraceAlignment()->SetMaxWidth(note->m_contentBB_x2);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::SetBoundingBoxXShift(FunctorParams *functorParams)
-{
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
-    assert(params);
-
-    // starting new layer
-    if (this->Is() == LAYER) {
-        params->m_minPos = params->m_layerMinPos;
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (!this->IsLayerElement()) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    LayerElement *current = dynamic_cast<LayerElement *>(this);
-    assert(current);
-
-    // we should have processed aligned before
-    assert(current->GetAlignment());
-
-    if (!current->HasToBeAligned()) {
-        // if nothing to do with this type of element
-        return FUNCTOR_CONTINUE;
-    }
-
-    if (!current->HasUpdatedBB()) {
-        // if nothing was drawn, do not take it into account
-        LogWarning("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
-        /* Comment out following assert() for now: DrawCustos() doesn't draw anything, so it
-            triggers this error.
-        assert(false); // quite drastic but this should never happen. If nothing has to be drawn
-        				// then the BB should be set to empty with  Object::SetEmptyBB()
-         */
-        return FUNCTOR_CONTINUE;
-    }
-
-    if ((current->Is() == NOTE) && current->GetFirstParent(CHORD, MAX_CHORD_DEPTH)) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    if ((current->Is() == ACCID) && current->GetFirstParent(NOTE, MAX_ACCID_DEPTH)) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    //LogDebug("SetBoundingBoxXShift: '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
-    // The negative offset is the part of the bounding box that overflows on the left
-    // |____x_____|
-    //  ---- = negative offset
-    int negative_offset = -(current->m_contentBB_x1);
-
-    // Increase negative_offset by the symbol type's left margin, unless it's a note
-    // that's part of a ligature.
-    if (!current->IsGraceNote() && !current->IsInLigature())
-        negative_offset
-            += (params->m_doc->GetLeftMargin(current->Is()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-
-    // This should never happen but can with glyphs not exactly registered at x=0 in the SMuFL font used
-    if (negative_offset < 0) negative_offset = 0;
-
-    // with a grace note, also take into account the full width of the group given by the GraceAligner
-    if (current->GetAlignment()->HasGraceAligner()) {
-        negative_offset += current->GetAlignment()->GetGraceAligner()->GetWidth()
-            + (params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR);
-    }
-
-    int currentX = current->GetAlignment()->GetXRel();
-    // with grace note, take into account the position of the note in the grace group
-    if (current->IsGraceNote()) {
-        Note *note = dynamic_cast<Note *>(current);
-        currentX += note->GetGraceAlignment()->GetXRel();
-    }
-
-    // check if the element overlaps with the preceeding one given by (*minPos)
-    int overlap = params->m_minPos - currentX + negative_offset;
-
-    if ((currentX - negative_offset) < params->m_minPos) {
-        current->GetAlignment()->SetXShift(overlap);
-    }
-
-    // do not adjust the min pos and the max width since this is already handled by
-    // the GraceAligner
-    if (current->IsGraceNote()) {
-        params->m_minPos = current->GetAlignment()->GetXRel();
-        current->GetAlignment()->SetMaxWidth(0);
-        return FUNCTOR_CONTINUE;
-    }
-
-    // the next minimal position is given by the right side of the bounding box + the spacing of the element
-    int width = current->m_contentBB_x2;
-
-    // Move to right by the symbol type's right margin, unless it's a note that's
-    // part of a ligature.
-    if (!current->HasEmptyBB() && !current->IsInLigature())
-        width += params->m_doc->GetRightMargin(current->Is()) * params->m_doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
-    params->m_minPos = current->GetAlignment()->GetXRel() + width;
-    current->GetAlignment()->SetMaxWidth(width);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int Object::SetBoundingBoxXShiftEnd(FunctorParams *functorParams)
-{
-    SetBoundingBoxXShiftParams *params = dynamic_cast<SetBoundingBoxXShiftParams *>(functorParams);
-    assert(params);
-
-    // ending a layer
-    if (this->Is() == LAYER) {
-        // mininimum position is the with the layer
-        // we keep it if it's higher than what we had so far
-        // this will be used for shifting the right barLine
-        params->m_measureWidth = std::max(params->m_measureWidth, params->m_minPos);
-        return FUNCTOR_CONTINUE;
-    }
+    int refRight = this->GetSelfRight();
+    if (params->m_maxRight < refRight) params->m_maxRight = refRight;
 
     return FUNCTOR_CONTINUE;
 }
@@ -1318,7 +1038,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     assert(params);
 
     // starting a new staff
-    if (this->Is() == STAFF) {
+    if (this->Is(STAFF)) {
         Staff *currentStaff = dynamic_cast<Staff *>(this);
         assert(currentStaff);
         assert(currentStaff->GetAlignment());
@@ -1331,7 +1051,7 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
     }
 
     // starting new layer
-    if (this->Is() == LAYER) {
+    if (this->Is(LAYER)) {
         Layer *currentLayer = dynamic_cast<Layer *>(this);
         assert(currentLayer);
         // set scoreDef attr
@@ -1362,18 +1082,13 @@ int Object::SetOverflowBBoxes(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    if (this->Is() == SYL) {
+    if (this->Is(SYL)) {
         // We don't want to add the syl to the overflow since lyrics require a full line anyway
         return FUNCTOR_CONTINUE;
     }
 
     LayerElement *current = dynamic_cast<LayerElement *>(this);
     assert(current);
-
-    if (!current->HasToBeAligned()) {
-        // if nothing to do with this type of element
-        // return FUNCTOR_CONTINUE;
-    }
 
     if (!current->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
@@ -1412,7 +1127,7 @@ int Object::SetOverflowBBoxesEnd(FunctorParams *functorParams)
     assert(params);
 
     // starting new layer
-    if (this->Is() == LAYER) {
+    if (this->Is(LAYER)) {
         Layer *currentLayer = dynamic_cast<Layer *>(this);
         assert(currentLayer);
         // set scoreDef attr

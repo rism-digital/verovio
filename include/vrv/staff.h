@@ -42,7 +42,7 @@ public:
     virtual ~Staff();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Staff"; }
-    virtual ClassId Is() const { return STAFF; }
+    virtual ClassId GetClassId() const { return STAFF; }
     ///@}
 
     /**
@@ -52,6 +52,12 @@ public:
     virtual void AddChild(Object *object);
     ///@}
 
+    /**
+     * @name Get the Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingY() const;
+
     int GetLayerCount() const { return (int)m_children.size(); }
 
     /**
@@ -60,13 +66,14 @@ public:
     int GetStaffIdx() const { return Object::GetIdx(); }
 
     /**
-     * Return the default horizontal spacing of staves.
+     * Calculate the yRel for the staff given a @loc value
      */
-    int GetVerticalSpacing();
+    int CalcPitchPosYRel(Doc *doc, int loc);
 
+    /**
+     * Getter for the StaffAlignment
+     */
     StaffAlignment *GetAlignment() const { return m_staffAlignment; }
-
-    int GetYRel() const;
 
     //----------//
     // Functors //
@@ -96,11 +103,6 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
-
-    /**
-     * See Object::SetDrawingXY
-     */
-    virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareRpt

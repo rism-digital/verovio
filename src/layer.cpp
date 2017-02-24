@@ -163,11 +163,11 @@ Clef *Layer::GetClef(LayerElement *test)
 
     // make sure list is set
     ResetList(this);
-    if (test->Is() != CLEF) {
+    if (!test->Is(CLEF)) {
         testObject = GetListFirstBackward(testObject, CLEF);
     }
 
-    if (testObject && testObject->Is() == CLEF) {
+    if (testObject && testObject->Is(CLEF)) {
         Clef *clef = dynamic_cast<Clef *>(testObject);
         assert(clef);
         return clef;
@@ -176,11 +176,11 @@ Clef *Layer::GetClef(LayerElement *test)
     return GetCurrentClef();
 }
 
-int Layer::GetClefOffset(LayerElement *test)
+int Layer::GetClefLocOffset(LayerElement *test)
 {
     Clef *clef = GetClef(test);
     if (!clef) return 0;
-    return clef->GetClefOffset();
+    return clef->GetClefLocOffset();
 }
 
 Clef *Layer::GetCurrentClef() const
@@ -221,11 +221,22 @@ void Layer::SetDrawingStaffDefValues(StaffDef *currentStaffDef)
     // Remove any previous value in the Layer
     this->ResetStaffDefObjects();
 
-    if (currentStaffDef->DrawClef()) this->m_staffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
-    if (currentStaffDef->DrawKeySig()) this->m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
-    if (currentStaffDef->DrawMensur()) this->m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
-    if (currentStaffDef->DrawMeterSig())
+    if (currentStaffDef->DrawClef()) {
+        this->m_staffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
+        this->m_staffDefClef->SetParent(this);
+    }
+    if (currentStaffDef->DrawKeySig()) {
+        this->m_staffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+        this->m_staffDefKeySig->SetParent(this);
+    }
+    if (currentStaffDef->DrawMensur()) {
+        this->m_staffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
+        this->m_staffDefMensur->SetParent(this);
+    }
+    if (currentStaffDef->DrawMeterSig()) {
         this->m_staffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
+        this->m_staffDefMeterSig->SetParent(this);
+    }
 
     // Don't draw on the next one
     currentStaffDef->SetDrawClef(false);
@@ -241,12 +252,23 @@ void Layer::SetDrawingCautionValues(StaffDef *currentStaffDef)
         return;
     }
 
-    if (currentStaffDef->DrawClef()) this->m_cautionStaffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
+    if (currentStaffDef->DrawClef()) {
+        this->m_cautionStaffDefClef = new Clef(*currentStaffDef->GetCurrentClef());
+        this->m_cautionStaffDefClef->SetParent(this);
+    }
     // special case - see above
-    if (currentStaffDef->DrawKeySig()) this->m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
-    if (currentStaffDef->DrawMensur()) this->m_cautionStaffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
-    if (currentStaffDef->DrawMeterSig())
+    if (currentStaffDef->DrawKeySig()) {
+        this->m_cautionStaffDefKeySig = new KeySig(*currentStaffDef->GetCurrentKeySig());
+        this->m_cautionStaffDefKeySig->SetParent(this);
+    }
+    if (currentStaffDef->DrawMensur()) {
+        this->m_cautionStaffDefMensur = new Mensur(*currentStaffDef->GetCurrentMensur());
+        this->m_cautionStaffDefMensur->SetParent(this);
+    }
+    if (currentStaffDef->DrawMeterSig()) {
         this->m_cautionStaffDefMeterSig = new MeterSig(*currentStaffDef->GetCurrentMeterSig());
+        this->m_cautionStaffDefMeterSig->SetParent(this);
+    }
 
     // Don't draw on the next one
     currentStaffDef->SetDrawClef(false);
@@ -310,6 +332,7 @@ int Layer::AlignHorizontallyEnd(FunctorParams *functorParams)
     assert(params);
 
     params->m_scoreDefRole = CAUTIONARY_SCOREDEF;
+    params->m_time = params->m_measureAligner->GetMaxTime();
 
     if (this->GetCautionStaffDefClef()) {
         GetCautionStaffDefClef()->AlignHorizontally(params);
@@ -353,58 +376,6 @@ int Layer::PrepareProcessingLists(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int Layer::SetDrawingXY(FunctorParams *functorParams)
-{
-    SetDrawingXYParams *params = dynamic_cast<SetDrawingXYParams *>(functorParams);
-    assert(params);
-
-    params->m_currentLayer = this;
-
-    // Second pass where we do just process layer elements
-    if (params->m_processLayerElements) {
-        return FUNCTOR_CONTINUE;
-    }
-
-    // set the values for the scoreDef elements when required
-    if (this->GetStaffDefClef()) {
-        this->GetStaffDefClef()->SetDrawingX(
-            this->GetStaffDefClef()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetStaffDefKeySig()) {
-        this->GetStaffDefKeySig()->SetDrawingX(
-            this->GetStaffDefKeySig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetStaffDefMensur()) {
-        this->GetStaffDefMensur()->SetDrawingX(
-            this->GetStaffDefMensur()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetStaffDefMeterSig()) {
-        this->GetStaffDefMeterSig()->SetDrawingX(
-            this->GetStaffDefMeterSig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-
-    // Cautionary values
-    // set the values for the scoreDef elements when required
-    if (this->GetCautionStaffDefClef()) {
-        this->GetCautionStaffDefClef()->SetDrawingX(
-            this->GetCautionStaffDefClef()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetCautionStaffDefKeySig()) {
-        this->GetCautionStaffDefKeySig()->SetDrawingX(
-            this->GetCautionStaffDefKeySig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetCautionStaffDefMensur()) {
-        this->GetCautionStaffDefMensur()->SetDrawingX(
-            this->GetCautionStaffDefMensur()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-    if (this->GetCautionStaffDefMeterSig()) {
-        this->GetCautionStaffDefMeterSig()->SetDrawingX(
-            this->GetCautionStaffDefMeterSig()->GetXRel() + params->m_currentMeasure->GetDrawingX());
-    }
-
-    return FUNCTOR_CONTINUE;
-}
-
 int Layer::PrepareRpt(FunctorParams *functorParams)
 {
     PrepareRptParams *params = dynamic_cast<PrepareRptParams *>(functorParams);
@@ -414,6 +385,18 @@ int Layer::PrepareRpt(FunctorParams *functorParams)
     if (params->m_currentMRpt && !this->FindChildByType(MRPT)) {
         params->m_currentMRpt = NULL;
     }
+    return FUNCTOR_CONTINUE;
+}
+
+int Layer::AdjustSylSpacing(FunctorParams *functorParams)
+{
+    AdjustSylSpacingParams *params = dynamic_cast<AdjustSylSpacingParams *>(functorParams);
+    assert(params);
+
+    // reset it
+    params->m_overlapingSyl.clear();
+    params->m_previousSyl = NULL;
+
     return FUNCTOR_CONTINUE;
 }
 

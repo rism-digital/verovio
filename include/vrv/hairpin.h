@@ -18,7 +18,11 @@ namespace vrv {
 // Hairpin
 //----------------------------------------------------------------------------
 
-class Hairpin : public ControlElement, public TimeSpanningInterface, public AttColor, public AttHairpinLog, public AttPlacement {
+class Hairpin : public ControlElement,
+                public TimeSpanningInterface,
+                public AttColor,
+                public AttHairpinLog,
+                public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -29,7 +33,7 @@ public:
     virtual ~Hairpin();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Hairpin"; }
-    virtual ClassId Is() const { return HAIRPIN; }
+    virtual ClassId GetClassId() const { return HAIRPIN; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }

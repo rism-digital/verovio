@@ -15,6 +15,7 @@
 
 #include "attcomparison.h"
 #include "doc.h"
+#include "floatingobject.h"
 #include "functorparams.h"
 #include "smufl.h"
 #include "staff.h"
@@ -22,10 +23,11 @@
 
 namespace vrv {
 
-std::vector<data_ARTICULATION> Artic::s_outStaffArtic
-    = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_marc_stacc, ARTICULATION_upbow };
+std::vector<data_ARTICULATION> Artic::s_outStaffArtic = { ARTICULATION_acc, ARTICULATION_dnbow, ARTICULATION_marc,
+    ARTICULATION_marc_stacc, ARTICULATION_upbow, ARTICULATION_harm };
 
-std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow };
+std::vector<data_ARTICULATION> Artic::s_aboveStaffArtic
+    = { ARTICULATION_dnbow, ARTICULATION_marc, ARTICULATION_upbow, ARTICULATION_harm };
 
 //----------------------------------------------------------------------------
 // Artic
@@ -55,7 +57,7 @@ void Artic::Reset()
 
 void Artic::AddChild(Object *child)
 {
-    if (child->Is() == ARTIC_PART) {
+    if (child->Is(ARTIC_PART)) {
         assert(dynamic_cast<ArticPart *>(child));
     }
     else {
@@ -92,13 +94,17 @@ void Artic::UpdateOutsidePartPosition(int yAbove, int yBelow, data_STAFFREL plac
     ArticPart *outsidePart = GetOutsidePart();
     if (!outsidePart) return;
 
+    // This is not great: in order to avoid m_drawingYRel to be overwritten by each call of DrawAccid we
+    // check the value here. Otherwise the adjusted value (See AdjustArtic and AdjustArticWithSlurs will be lost)
+    if (outsidePart->GetDrawingYRel() != 0) return;
+
     if (place == STAFFREL_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_above;
 
     outsidePart->SetPlace(place);
     if (place == STAFFREL_above)
-        outsidePart->SetDrawingY(yAbove);
+        outsidePart->SetDrawingYRel(yAbove);
     else
-        outsidePart->SetDrawingY(yBelow);
+        outsidePart->SetDrawingYRel(yBelow);
 }
 
 void Artic::UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place)
@@ -106,11 +112,14 @@ void Artic::UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place
     ArticPart *insidePart = GetInsidePart();
     if (!insidePart) return;
 
+    // See comment in Artic::UpdateOutsidePartPosition
+    if (insidePart->GetDrawingYRel() != 0) return;
+
     insidePart->SetPlace(place);
     if (place == STAFFREL_above)
-        insidePart->SetDrawingY(yAbove);
+        insidePart->SetDrawingYRel(yAbove);
     else
-        insidePart->SetDrawingY(yBelow);
+        insidePart->SetDrawingYRel(yBelow);
 }
 
 ArticPart *Artic::GetInsidePart()
@@ -148,9 +157,9 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
             // case ARTICULATION_smear;
             // case ARTICULATION_shake;
             case ARTICULATION_dnbow: return SMUFL_E610_stringsDownBow;
-            case ARTICULATION_upbow:
-                return SMUFL_E612_stringsUpBow;
-            // case ARTICULATION_harm;
+            case ARTICULATION_upbow: return SMUFL_E612_stringsUpBow;
+            case ARTICULATION_harm:
+                return SMUFL_E614_stringsHarmonic;
             // case ARTICULATION_snap;
             // case ARTICULATION_fingernail;
             case ARTICULATION_ten_stacc:
@@ -182,8 +191,9 @@ wchar_t Artic::GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place)
                 return SMUFL_E4A7_articStaccatissimoBelow;
             //
             case ARTICULATION_dnbow: return SMUFL_E611_stringsDownBowTurned;
-            case ARTICULATION_upbow:
-                return SMUFL_E613_stringsUpBowTurned;
+            case ARTICULATION_upbow: return SMUFL_E613_stringsUpBowTurned;
+            case ARTICULATION_harm:
+                return SMUFL_E614_stringsHarmonic;
             //
             case ARTICULATION_ten_stacc:
                 return SMUFL_E4B3_articTenutoStaccatoBelow;
@@ -245,24 +255,7 @@ void ArticPart::Reset()
     ResetArticulation();
     ResetColor();
     ResetPlacement();
-
-    m_drawingYRel = 0;
 }
-
-int ArticPart::GetDrawingY() const
-{
-    return BoundingBox::GetDrawingY() - this->GetDrawingYRel();
-}
-
-void ArticPart::SetDrawingYRel(int drawingYRel)
-{
-    if (GetPlace() == STAFFREL_above) {
-        if (drawingYRel < m_drawingYRel) m_drawingYRel = drawingYRel;
-    }
-    else {
-        if (drawingYRel > m_drawingYRel) m_drawingYRel = drawingYRel;
-    }
-};
 
 bool ArticPart::AlwaysAbove()
 {
@@ -280,13 +273,27 @@ bool ArticPart::AlwaysAbove()
     return false;
 }
 
+void ArticPart::AddSlurPositioner(FloatingPositioner *positioner, bool start)
+{
+    if (start) {
+        if (std::find(m_startSlurPositioners.begin(), m_startSlurPositioners.end(), positioner)
+            == m_startSlurPositioners.end())
+            m_startSlurPositioners.push_back(positioner);
+    }
+    else {
+        if (std::find(m_endSlurPositioners.begin(), m_endSlurPositioners.end(), positioner)
+            == m_endSlurPositioners.end())
+            m_endSlurPositioners.push_back(positioner);
+    }
+}
+
 //----------------------------------------------------------------------------
 // Functor methods
 //----------------------------------------------------------------------------
 
-int Artic::AdjustArticulations(FunctorParams *functorParams)
+int Artic::AdjustArtic(FunctorParams *functorParams)
 {
-    AdjustArticulationsParams *params = dynamic_cast<AdjustArticulationsParams *>(functorParams);
+    AdjustArticParams *params = dynamic_cast<AdjustArticParams *>(functorParams);
     assert(params);
 
     ArticPart *insidePart = this->GetInsidePart();
@@ -298,19 +305,21 @@ int Artic::AdjustArticulations(FunctorParams *functorParams)
 
         Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
         assert(staff);
-        int margin = params->m_doc->GetTopMargin(insidePart->Is())
+        int margin = params->m_doc->GetTopMargin(insidePart->GetClassId())
             * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
 
         if (insidePart->GetPlace() == outsidePart->GetPlace()) {
             if (insidePart->GetPlace() == STAFFREL_above) {
                 int inTop = insidePart->GetContentTop();
                 int outBottom = outsidePart->GetContentBottom();
-                if (inTop > outBottom) outsidePart->SetDrawingYRel(outBottom - inTop - margin);
+                if (inTop > outBottom)
+                    outsidePart->SetDrawingYRel(outsidePart->GetDrawingYRel() + inTop - outBottom + margin);
             }
             else {
                 int inBottom = insidePart->GetContentBottom();
                 int outTop = outsidePart->GetContentTop();
-                if (inBottom < outTop) outsidePart->SetDrawingYRel(outTop - inBottom + margin);
+                if (inBottom < outTop)
+                    outsidePart->SetDrawingYRel(outsidePart->GetDrawingYRel() + outTop - inBottom + margin);
             }
         }
     }
@@ -349,9 +358,39 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
 
 int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
 {
-    m_drawingYRel = 0;
+    m_startSlurPositioners.clear();
+    m_endSlurPositioners.clear();
 
     return FUNCTOR_CONTINUE;
+}
+
+int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
+{
+    AdjustArticWithSlursParams *params = dynamic_cast<AdjustArticWithSlursParams *>(functorParams);
+    assert(params);
+
+    if (m_startSlurPositioners.empty() && m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;
+
+    std::vector<FloatingPositioner *>::iterator iter;
+    for (iter = m_endSlurPositioners.begin(); iter != m_endSlurPositioners.end(); iter++) {
+        // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
+        int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
+        if (shift != 0) {
+            this->SetDrawingYRel(this->GetDrawingYRel() + shift);
+            // this->SetColor("red");
+        }
+    }
+
+    for (iter = m_startSlurPositioners.begin(); iter != m_startSlurPositioners.end(); iter++) {
+        // if (this->Encloses((*iter)->m_cuvrePoints[1])) this->SetColor("red");
+        int shift = this->Intersects((*iter), params->m_doc->GetDrawingUnit(100));
+        if (shift != 0) {
+            this->SetDrawingYRel(this->GetDrawingYRel() + shift);
+            // this->SetColor("green");
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 } // namespace vrv

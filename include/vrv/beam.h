@@ -33,7 +33,7 @@ public:
     virtual ~Beam();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Beam"; }
-    virtual ClassId Is() const { return BEAM; }
+    virtual ClassId GetClassId() const { return BEAM; }
     ///@}
 
     int GetNoteCount() const { return this->GetChildCount(NOTE); }

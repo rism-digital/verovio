@@ -44,7 +44,7 @@ public:
     ScoreDefElement(std::string classid);
     virtual ~ScoreDefElement();
     virtual void Reset();
-    virtual ClassId Is() const { return SCOREDEF_ELEMENT; }
+    virtual ClassId GetClassId() const { return SCOREDEF_ELEMENT; }
     ///@}
 
     virtual ScoreDefInterface *GetScoreDefInterface() { return dynamic_cast<ScoreDefInterface *>(this); }
@@ -117,7 +117,7 @@ public:
     virtual ~ScoreDef();
     virtual void Reset();
     virtual std::string GetClassName() const { return "ScoreDef"; }
-    virtual ClassId Is() const { return SCOREDEF; }
+    virtual ClassId GetClassId() const { return SCOREDEF; }
     ///@}
 
     virtual void AddChild(Object *object);
@@ -138,6 +138,11 @@ public:
      * Get the staffDef with number n (NULL if not found).
      */
     StaffDef *GetStaffDef(int n);
+
+    /**
+     * Return all the @n values of the staffDef in a scoreDef
+     */
+    std::vector<int> GetStaffNs();
 
     /**
      * Set the redraw flag to all staffDefs.
@@ -227,7 +232,7 @@ public:
     virtual Object *Clone() const { return new StaffGrp(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "StaffGrp"; }
-    virtual ClassId Is() const { return STAFFGRP; }
+    virtual ClassId GetClassId() const { return STAFFGRP; }
     ///@}
 
     /**
@@ -266,6 +271,7 @@ class StaffDef : public ScoreDefElement,
                  public StaffDefDrawingInterface,
                  public AttCommon,
                  public AttCommonPart,
+                 public AttDistances,
                  public AttLabelsAddl,
                  public AttNotationtype,
                  public AttScalable,
@@ -282,7 +288,7 @@ public:
     virtual Object *Clone() const { return new StaffDef(*this); }
     virtual void Reset();
     virtual std::string GetClassName() const { return "StaffDef"; }
-    virtual ClassId Is() const { return STAFFDEF; }
+    virtual ClassId GetClassId() const { return STAFFDEF; }
     ///@}
 
     //----------//

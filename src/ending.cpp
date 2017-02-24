@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        ending.h
+// Name:        ending.cpp
 // Author:      Laurent Pugin
 // Created:     14/07/2016
 // Copyright (c) Authors and others. All rights reserved.
@@ -47,13 +47,13 @@ void Ending::Reset()
 
 void Ending::AddChild(Object *child)
 {
-    if (child->Is() == MEASURE) {
+    if (child->Is(MEASURE)) {
         assert(dynamic_cast<Measure *>(child));
     }
     else if (child->IsSystemElement()) {
         assert(dynamic_cast<SystemElement *>(child));
         // here we are actually allowing ending withing ending, which is wrong
-        if (child->Is() == ENDING) {
+        if (child->Is(ENDING)) {
             LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
             assert(false);
         }

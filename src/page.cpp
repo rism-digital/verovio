@@ -54,7 +54,7 @@ void Page::Reset()
 
 void Page::AddChild(Object *child)
 {
-    if (child->Is() == SYSTEM) {
+    if (child->Is(SYSTEM)) {
         assert(dynamic_cast<System *>(child));
     }
     else {
@@ -125,38 +125,42 @@ void Page::LayOutHorizontally()
         this->Process(&setAlignmentX, &setAlignmentXPosParams);
     }
 
-    // Render it for filling the bounding box
+    // Set the pitch / pos alignement
+    // Once View::CalculateRestPosY will be move to Staff we will not need to pass a view anymore
     View view;
-    BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     view.SetDoc(doc);
+    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc, &view);
+    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
+    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+
+    // Render it for filling the bounding box
+    BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    SetBoundingBoxGraceXShiftParams setBoundingBoxGraceXShiftParams(doc);
-    Functor setBoundingBoxGraceXShift(&Object::SetBoundingBoxGraceXShift);
-    this->Process(&setBoundingBoxGraceXShift, &setBoundingBoxGraceXShiftParams);
-
-    // Integrate the X bounding box shift of the elements
-    // Once the m_xShift have been calculated, move all positions accordingly
-    Functor integrateBoundingBoxGraceXShift(&Object::IntegrateBoundingBoxGraceXShift);
-    IntegrateBoundingBoxGraceXShiftParams integrateBoundingBoxGraceXShiftParams(&integrateBoundingBoxGraceXShift);
-    this->Process(&integrateBoundingBoxGraceXShift, &integrateBoundingBoxGraceXShiftParams);
+    Functor adjustXPos(&Object::AdjustXPos);
+    Functor adjustXPosEnd(&Object::AdjustXPosEnd);
+    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_scoreDef.GetStaffNs());
+    this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    Functor setBoundingBoxXShift(&Object::SetBoundingBoxXShift);
-    Functor setBoundingBoxXShiftEnd(&Object::SetBoundingBoxXShiftEnd);
-    SetBoundingBoxXShiftParams setBoundingBoxXShiftParams(doc, &setBoundingBoxXShift, &setBoundingBoxXShiftEnd);
-    this->Process(&setBoundingBoxXShift, &setBoundingBoxXShiftParams, &setBoundingBoxXShiftEnd);
+    Functor adjustGraceXPos(&Object::AdjustGraceXPos);
+    Functor adjustGraceXPosEnd(&Object::AdjustGraceXPosEnd);
+    AdjustGraceXPosParams adjustGraceXPosParams(
+        doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_scoreDef.GetStaffNs());
+    this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
 
-    // Integrate the X bounding box shift of the elements
-    // Once the m_xShift have been calculated, move all positions accordingly
-    Functor integrateBoundingBoxXShift(&Object::IntegrateBoundingBoxXShift);
-    IntegrateBoundingBoxXShiftParams integrateBoundingBoxXShiftParams(doc, &integrateBoundingBoxXShift);
-    this->Process(&integrateBoundingBoxXShift, &integrateBoundingBoxXShiftParams);
+    // We need to populate processing lists for processing the document by Layer (for matching @tie) and
+    // by Verse (for matching syllable connectors)
+    PrepareProcessingListsParams prepareProcessingListsParams;
+    Functor prepareProcessingLists(&Object::PrepareProcessingLists);
+    this->Process(&prepareProcessingLists, &prepareProcessingListsParams);
+
+    this->AdjustSylSpacingByVerse(prepareProcessingListsParams, doc);
 
     // Adjust measure X position
     AlignMeasuresParams alignMeasuresParams;
@@ -194,9 +198,14 @@ void Page::LayOutVertically()
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of outside articulations
-    AdjustArticulationsParams adjustArticulationsParams(doc);
-    Functor adjustArticulations(&Object::AdjustArticulations);
-    this->Process(&adjustArticulations, &adjustArticulationsParams);
+    AdjustArticParams adjustArticParams(doc);
+    Functor adjustArtic(&Object::AdjustArtic);
+    this->Process(&adjustArtic, &adjustArticParams);
+
+    // Adjust the position of outside articulations with slurs end and start positions
+    AdjustArticWithSlursParams adjustArticWithSlursParams(doc);
+    Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
+    this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
 
     // Fill the arrays of bounding boxes (above and below) for each staff alignment for which the box overflows.
     SetOverflowBBoxesParams setOverflowBBoxesParams(doc);
@@ -287,6 +296,37 @@ int Page::GetContentWidth() const
 
     // we include the left margin and the right margin
     return first->m_drawingTotalWidth + first->m_systemLeftMar + first->m_systemRightMar;
+}
+
+void Page::AdjustSylSpacingByVerse(PrepareProcessingListsParams &listsParams, Doc *doc)
+{
+    IntTree_t::iterator staves;
+    IntTree_t::iterator layers;
+    IntTree_t::iterator verses;
+
+    if (listsParams.m_verseTree.child.empty()) return;
+
+    std::vector<AttComparison *> filters;
+
+    // Same for the lyrics, but Verse by Verse since Syl are TimeSpanningInterface elements for handling connectors
+    for (staves = listsParams.m_verseTree.child.begin(); staves != listsParams.m_verseTree.child.end(); ++staves) {
+        for (layers = staves->second.child.begin(); layers != staves->second.child.end(); ++layers) {
+            for (verses = layers->second.child.begin(); verses != layers->second.child.end(); ++verses) {
+                // Create ad comparison object for each type / @n
+                AttCommonNComparison matchStaff(STAFF, staves->first);
+                AttCommonNComparison matchLayer(LAYER, layers->first);
+                AttCommonNComparison matchVerse(VERSE, verses->first);
+                filters = { &matchStaff, &matchLayer, &matchVerse };
+
+                // The first pass sets m_drawingFirstNote and m_drawingLastNote for each syl
+                // m_drawingLastNote is set only if the syl has a forward connector
+                AdjustSylSpacingParams adjustSylSpacingParams(doc);
+                Functor adjustSylSpacing(&Object::AdjustSylSpacing);
+                Functor adjustSylSpacingEnd(&Object::AdjustSylSpacingEnd);
+                this->Process(&adjustSylSpacing, &adjustSylSpacingParams, &adjustSylSpacingEnd, &filters);
+            }
+        }
+    }
 }
 
 } // namespace vrv

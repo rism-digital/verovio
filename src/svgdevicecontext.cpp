@@ -168,6 +168,14 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         }
     }
 
+    if (object->HasAttClass(ATT_LANG)) {
+        AttLang *att = dynamic_cast<AttLang *>(object);
+        assert(att);
+        if (att->HasLang()) {
+            m_currentNode.append_attribute("xml:lang") = att->GetLang().c_str();
+        }
+    }
+
     if (object->HasAttClass(ATT_VISIBILITY)) {
         AttVisibility *att = dynamic_cast<AttVisibility *>(object);
         assert(att);
@@ -199,6 +207,14 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         AttColor *att = dynamic_cast<AttColor *>(object);
         assert(att);
         if (att->HasColor()) m_currentNode.append_attribute("fill") = att->GetColor().c_str();
+    }
+
+    if (object->HasAttClass(ATT_LANG)) {
+        AttLang *att = dynamic_cast<AttLang *>(object);
+        assert(att);
+        if (att->HasLang()) {
+            m_currentNode.append_attribute("xml:lang") = att->GetLang().c_str();
+        }
     }
 }
 
@@ -364,7 +380,8 @@ void SvgDeviceContext::DrawEllipse(int x, int y, int width, int height)
     if (currentPen.GetOpacity() != 1.0) ellipseChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     if (currentPen.GetWidth() > 0) {
         ellipseChild.append_attribute("stroke-width") = currentPen.GetWidth();
-        ellipseChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+        ellipseChild.append_attribute("stroke")
+            = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
     }
 }
 
@@ -435,7 +452,8 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
     if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
     if (currentPen.GetWidth() > 0) {
         pathChild.append_attribute("stroke-width") = currentPen.GetWidth();
-        pathChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+        pathChild.append_attribute("stroke")
+            = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
     }
 }
 
@@ -507,7 +525,13 @@ void SvgDeviceContext::DrawRoundedRectangle(int x, int y, int width, int height,
     rectChild.append_attribute("height") = height;
     rectChild.append_attribute("width") = width;
     if (radius != 0) rectChild.append_attribute("rx") = radius;
-    // rectChild.append_attribute("fill-opacity") = "0.0"; // for empty rectangles with bounding boxes
+    // for empty rectangles with bounding boxes
+    /*
+    rectChild.append_attribute("fill-opacity") = "0.0";
+    rectChild.append_attribute("stroke-opacity") = "1.0";
+    rectChild.append_attribute("stroke-width") = "10";
+    rectChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
+    */
 }
 
 void SvgDeviceContext::StartText(int x, int y, char alignment)
@@ -718,15 +742,15 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         }
 
         SetPen(AxRED, 10, AxDOT_DASH);
-        SetBrush(AxWHITE, AxTRANSPARENT);
+        // SetBrush(AxWHITE, AxTRANSPARENT);
         StartGraphic(object, "self-bounding-box", "0");
         if (object->HasSelfBB()) {
-            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->m_selfBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + box->m_selfBB_y1),
-                view->ToDeviceContextX(object->GetDrawingX() + box->m_selfBB_x2)
-                    - view->ToDeviceContextX(object->GetDrawingX() + box->m_selfBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + box->m_selfBB_y2)
-                    - view->ToDeviceContextY(object->GetDrawingY() + box->m_selfBB_y1));
+            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
+                view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()),
+                view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX2())
+                    - view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
+                view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY2())
+                    - view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()));
         }
 
         EndGraphic(object, NULL);
@@ -734,12 +758,12 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         SetPen(AxBLUE, 10, AxDOT_DASH);
         StartGraphic(object, "content-bounding-box", "0");
         if (object->HasContentBB()) {
-            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->m_contentBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + box->m_contentBB_y1),
-                view->ToDeviceContextX(object->GetDrawingX() + box->m_contentBB_x2)
-                    - view->ToDeviceContextX(object->GetDrawingX() + box->m_contentBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + box->m_contentBB_y2)
-                    - view->ToDeviceContextY(object->GetDrawingY() + box->m_contentBB_y1));
+            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
+                view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()),
+                view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX2())
+                    - view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
+                view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY2())
+                    - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
         }
         EndGraphic(object, NULL);
 

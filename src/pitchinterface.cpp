@@ -21,9 +21,8 @@ namespace vrv {
 // PitchInterface
 //----------------------------------------------------------------------------
 
-PitchInterface::PitchInterface() : Interface(), AttAccidental(), AttNoteGes(), AttOctave(), AttPitch()
+PitchInterface::PitchInterface() : Interface(), AttNoteGes(), AttOctave(), AttPitch()
 {
-    RegisterInterfaceAttClass(ATT_ACCIDENTAL);
     RegisterInterfaceAttClass(ATT_NOTEGES);
     RegisterInterfaceAttClass(ATT_OCTAVE);
     RegisterInterfaceAttClass(ATT_PITCH);
@@ -37,7 +36,6 @@ PitchInterface::~PitchInterface()
 
 void PitchInterface::Reset()
 {
-    ResetAccidental();
     ResetNoteGes();
     ResetOctave();
     ResetPitch();
@@ -54,6 +52,24 @@ bool PitchInterface::HasIdenticalPitchInterface(PitchInterface *otherPitchInterf
         return false;
     }
     */
+}
+
+int PitchInterface::CalcLoc(data_PITCHNAME pname, int oct, int clefLocOffset)
+{
+    // E.g., C4 with clef C1: (4 - 4 * 7) + (1 - 1) + 0;
+    return ((oct - OCTAVE_OFFSET) * 7 + (pname - 1) + clefLocOffset);
+}
+
+void PitchInterface::AdjustPname(int &pname, int &oct)
+{
+    if (pname < PITCHNAME_c) {
+        if (oct > 0) oct--;
+        pname = PITCHNAME_b;
+    }
+    else if (pname > PITCHNAME_b) {
+        if (oct < 7) oct++;
+        pname = PITCHNAME_c;
+    }
 }
 
 } // namespace vrv

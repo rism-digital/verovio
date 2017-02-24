@@ -76,17 +76,73 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustArticulationsParams
+// AdjustArticParams
 //----------------------------------------------------------------------------
 
 /**
  * member 0: the Doc
  **/
 
-class AdjustArticulationsParams : public FunctorParams {
+class AdjustArticParams : public FunctorParams {
 public:
-    AdjustArticulationsParams(Doc *doc) { m_doc = doc; }
+    AdjustArticParams(Doc *doc) { m_doc = doc; }
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustArticWithSlursParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the Doc
+ **/
+
+class AdjustArticWithSlursParams : public FunctorParams {
+public:
+    AdjustArticWithSlursParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustGraceXPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the maximum position
+ * member 1: the upcoming maximum position (i.e., the min pos for the next element)
+ * member 2: the cumulated shift on the previous aligners
+ * member 3: the list of staffN in the top-level scoreDef
+ * member 4: the flag indicating whereas the alignment is in a Measure or in a Grace
+ * member 5: the pointer to the right ALIGNMENT_DEFAULT (if any)
+ * member 6: the Doc
+ * member 7: the Functor to be redirected to MeasureAligner and GraceAligner
+ * member 8: the end Functor for redirection
+ **/
+
+class AdjustGraceXPosParams : public FunctorParams {
+public:
+    AdjustGraceXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
+    {
+        m_graceMaxPos = 0;
+        m_graceUpcomingMaxPos = -VRV_UNSET;
+        m_graceCumulatedXShift = 0;
+        m_staffNs = staffNs;
+        m_isGraceAlignment = false;
+        m_rightDefaultAlignment = NULL;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+
+    int m_graceMaxPos;
+    int m_graceUpcomingMaxPos;
+    int m_graceCumulatedXShift;
+    std::vector<int> m_staffNs;
+    bool m_isGraceAlignment;
+    Alignment *m_rightDefaultAlignment;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -126,6 +182,70 @@ public:
     AdjustFloatingPostionerGrpsParams(Doc *doc) { m_doc = doc; }
     std::vector<ClassId> m_classIds;
     Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustSylSpacingParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a vector adjustment tuples (Aligment start, Aligment end, distance)
+ * member 1: a pointer to the previous Syl
+ * member 2: the doc
+ **/
+
+class AdjustSylSpacingParams : public FunctorParams {
+public:
+    AdjustSylSpacingParams(Doc *doc)
+    {
+        m_previousSyl = NULL;
+        m_doc = doc;
+    }
+    ArrayOfAdjustmentTuples m_overlapingSyl;
+    Syl *m_previousSyl;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
+// AdjustXPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the minimum position (i.e., the width of the previous element)
+ * member 1: the upcoming minimum position (i.e., the min pos for the next element)
+ * member 2: the cumulated shift on the previous aligners
+ * member 3: the @n of the staff currently processed (used for grace note alignment)
+ * member 4: the list of staffN in the top-level scoreDef
+ * member 5: the bounding box in the previous aligner
+ * member 6: the upcoming bounding boxes (to be used in the next aligner)
+ * member 7: the Doc
+ * member 8: the Functor for redirection to the MeasureAligner
+ * member 9: the end Functor for redirection
+ **/
+
+class AdjustXPosParams : public FunctorParams {
+public:
+    AdjustXPosParams(Doc *doc, Functor *functor, Functor *functorEnd, std::vector<int> staffNs)
+    {
+        m_minPos = 0;
+        m_upcomingMinPos = VRV_UNSET;
+        m_cumulatedXShift = 0;
+        m_staffN = 0;
+        m_staffNs = staffNs;
+        m_doc = doc;
+        m_functor = functor;
+        m_functorEnd = functorEnd;
+    }
+    int m_minPos;
+    int m_upcomingMinPos;
+    int m_cumulatedXShift;
+    int m_staffN;
+    std::vector<int> m_staffNs;
+    std::vector<BoundingBox *> m_boundingBoxes;
+    std::vector<BoundingBox *> m_upcomingBoundingBoxes;
+    Doc *m_doc;
+    Functor *m_functor;
+    Functor *m_functorEnd;
 };
 
 //----------------------------------------------------------------------------
@@ -509,7 +629,7 @@ public:
     GenerateMIDIParams(MidiFile *midiFile)
     {
         m_midiFile = midiFile;
-        m_midiTrack = 0;
+        m_midiTrack = 1;
         m_currentMeasureTime = 0.0;
         m_totalTime = 0.0;
         m_transSemi = 0;
@@ -525,39 +645,24 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// IntegrateBoundingBoxGraceXShiftParams
+// GetAlignmentLeftRightParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the functor to be redirected to Aligner
-**/
+ * member 0: the min left
+ * member 1: the max right
+ **/
 
-class IntegrateBoundingBoxGraceXShiftParams : public FunctorParams {
+class GetAlignmentLeftRightParams : public FunctorParams {
 public:
-    IntegrateBoundingBoxGraceXShiftParams(Functor *functor) { m_functor = functor; }
-    Functor *m_functor;
-};
-
-//----------------------------------------------------------------------------
-// IntegrateBoundingBoxXShiftParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the cumulated shift
- * member 3: the doc for accessing drawing parameters
- * member 4: the functor to be redirected to Aligner
-**/
-
-class IntegrateBoundingBoxXShiftParams : public FunctorParams {
-public:
-    IntegrateBoundingBoxXShiftParams(Doc *doc, Functor *functor)
+    GetAlignmentLeftRightParams(Functor *functor)
     {
-        m_shift = 0;
-        m_doc = doc;
+        m_minLeft = -VRV_UNSET;
+        m_maxRight = VRV_UNSET;
         m_functor = functor;
     }
-    int m_shift;
-    Doc *m_doc;
+    int m_minLeft;
+    int m_maxRight;
     Functor *m_functor;
 };
 
@@ -651,6 +756,20 @@ public:
     }
     Ending *m_previousEnding;
     int m_drawingGrpId;
+};
+
+//----------------------------------------------------------------------------
+// PrepareCrossStaffParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer to the current measure
+ **/
+
+class PrepareCrossStaffParams : public FunctorParams {
+public:
+    PrepareCrossStaffParams() { m_currentMeasure = NULL; }
+    Measure *m_currentMeasure;
 };
 
 //----------------------------------------------------------------------------
@@ -832,6 +951,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// SetAlignmentPitchPosParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: a pointer doc
+ * member 1: a pointer to the view
+ **/
+
+class SetAlignmentPitchPosParams : public FunctorParams {
+public:
+    SetAlignmentPitchPosParams(Doc *doc, View *view)
+    {
+        m_doc = doc;
+        m_view = view;
+    }
+    Doc *m_doc;
+    View *m_view;
+};
+
+//----------------------------------------------------------------------------
 // SetAlignmentXPosParams
 //----------------------------------------------------------------------------
 
@@ -890,56 +1029,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// SetBoundingBoxGraceXShiftParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the minimum position (i.e., the width of the previous element)
- * member 1: the Doc
-**/
-
-class SetBoundingBoxGraceXShiftParams : public FunctorParams {
-public:
-    SetBoundingBoxGraceXShiftParams(Doc *doc)
-    {
-        m_graceMinPos = 0;
-        m_doc = doc;
-    }
-
-    int m_graceMinPos;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
-// SetBoundingBoxXShiftParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the minimum position (i.e., the width of the previous element)
- * member 1: the maximum width in the current measure
- * member 2: the Doc
-**/
-
-class SetBoundingBoxXShiftParams : public FunctorParams {
-public:
-    SetBoundingBoxXShiftParams(Doc *doc, Functor *functor, Functor *functorEnd)
-    {
-        m_minPos = 0;
-        m_layerMinPos = 0;
-        m_measureWidth = 0;
-        m_doc = doc;
-        m_functor = functor;
-        m_functorEnd = functorEnd;
-    }
-    int m_minPos;
-    int m_layerMinPos;
-    int m_measureWidth;
-    Doc *m_doc;
-    Functor *m_functor;
-    Functor *m_functorEnd;
-};
-
-//----------------------------------------------------------------------------
 // SetCautionaryScoreDefParams
 //----------------------------------------------------------------------------
 
@@ -989,44 +1078,6 @@ public:
     Measure *m_previousMeasure;
     System *m_currentSystem;
     bool m_drawLabels;
-};
-
-//----------------------------------------------------------------------------
-// SetDrawingXYParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: a pointer doc
- * member 1: a pointer to the current system
- * member 2: a pointer to the current measure
- * member 3: a pointer to the current staff
- * member 4: a pointer to the current layer
- * member 5: a pointer to the view
- * member 6: a bool indicating if we are processing layer elements or not
- * member 7: a pointer to the functor for passing it to the timestamps
-**/
-
-class SetDrawingXYParams : public FunctorParams {
-public:
-    SetDrawingXYParams(Doc *doc, View *view, Functor *functor)
-    {
-        m_doc = doc;
-        m_currentSystem = NULL;
-        m_currentMeasure = NULL;
-        m_currentStaff = NULL;
-        m_currentLayer = NULL;
-        m_view = view;
-        m_processLayerElements = false;
-        m_functor = functor;
-    }
-    Doc *m_doc;
-    System *m_currentSystem;
-    Measure *m_currentMeasure;
-    Staff *m_currentStaff;
-    Layer *m_currentLayer;
-    View *m_view;
-    bool m_processLayerElements;
-    Functor *m_functor;
 };
 
 //----------------------------------------------------------------------------

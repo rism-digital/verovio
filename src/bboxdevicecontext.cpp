@@ -56,8 +56,6 @@ void BBoxDeviceContext::StartGraphic(Object *object, std::string gClass, std::st
 
 void BBoxDeviceContext::ResumeGraphic(Object *object, std::string gId)
 {
-    // I am not sure we actually have to reset the bounding box here...
-    object->BoundingBox::ResetBoundingBox();
     m_objects.push_back(object);
 }
 
@@ -123,11 +121,12 @@ void BBoxDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4]
 {
     Point pos;
     int width, height;
+    int minYPos, maxYPos;
 
-    ApproximateBezierBoundingBox(bezier1, &pos, &width, &height);
+    BoundingBox::ApproximateBezierBoundingBox(bezier1, pos, width, height, minYPos, maxYPos);
     // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
     UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
-    ApproximateBezierBoundingBox(bezier2, &pos, &width, &height);
+    BoundingBox::ApproximateBezierBoundingBox(bezier2, pos, width, height, minYPos, maxYPos);
     // LogDebug("x %d, y %d, width %d, height %d", pos.x, pos.y, width, height);
     UpdateBB(pos.x, pos.y, pos.x + width, pos.y + height);
 }
@@ -329,65 +328,6 @@ void BBoxDeviceContext::UpdateBB(int x1, int y1, int x2, int y2)
         if (!m_isDeactivatedX) (m_objects.at(i))->UpdateContentBBoxX(m_view->ToLogicalX(x1), m_view->ToLogicalX(x2));
         if (!m_isDeactivatedY) (m_objects.at(i))->UpdateContentBBoxY(m_view->ToLogicalY(y1), m_view->ToLogicalY(y2));
     }
-}
-
-void BBoxDeviceContext::ApproximateBezierBoundingBox(Point bezier[], Point *pos, int *width, int *height)
-{
-    int ax = bezier[0].x;
-    int ay = bezier[0].y;
-    int bx = bezier[1].x;
-    int by = bezier[1].y;
-    int cx = bezier[2].x;
-    int cy = bezier[2].y;
-    int dx = bezier[3].x;
-    int dy = bezier[3].y;
-
-    double px, py, qx, qy, rx, ry, sx, sy, tx, ty, tobx, toby, tocx, tocy, todx, tody, toqx, toqy, torx, tory, totx,
-        toty;
-    int x, y, minx, miny, maxx, maxy;
-
-    minx = miny = -VRV_UNSET;
-    maxx = maxy = VRV_UNSET;
-
-    tobx = bx - ax;
-    toby = by - ay; // directions
-    tocx = cx - bx;
-    tocy = cy - by;
-    todx = dx - cx;
-    tody = dy - cy;
-    double step = 1.0 / 40.0; // precision
-    int i;
-    for (i = 0; i < 41; i++) {
-        double d = i * step;
-        px = ax + d * tobx;
-        py = ay + d * toby;
-        qx = bx + d * tocx;
-        qy = by + d * tocy;
-        rx = cx + d * todx;
-        ry = cy + d * tody;
-        toqx = qx - px;
-        toqy = qy - py;
-        torx = rx - qx;
-        tory = ry - qy;
-
-        sx = px + d * toqx;
-        sy = py + d * toqy;
-        tx = qx + d * torx;
-        ty = qy + d * tory;
-        totx = tx - sx;
-        toty = ty - sy;
-
-        x = sx + d * totx;
-        y = sy + d * toty;
-        minx = std::min(minx, x);
-        miny = std::min(miny, y);
-        maxx = std::max(maxx, x);
-        maxy = std::max(maxy, y);
-    }
-    pos->x = minx;
-    pos->y = miny;
-    (*width) = maxx - minx;
-    (*height) = maxy - miny;
 }
 
 } // namespace vrv

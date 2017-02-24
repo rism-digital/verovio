@@ -1,1 +1,16 @@
 wget https://raw.githubusercontent.com/craigsapp/humlib/master/src/humlib.cpp -O humlib.cpp
+
+// Alpha version of musicxml2hum converter:
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/GridMeasure.cpp -O GridMeasure.cpp
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/GridPart.cpp -O GridPart.cpp
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/GridSide.cpp -O GridSide.cpp
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/GridSlice.cpp -O GridSlice.cpp
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/GridStaff.cpp -O GridStaff.cpp
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/GridVoice.cpp -O GridVoice.cpp
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/HumGrid.cpp -O HumGrid.cpp
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/MxmlEvent.cpp -O MxmlEvent.cpp
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/MxmlMeasure.cpp -O MxmlMeasure.cpp
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/MxmlPart.cpp -O MxmlPart.cpp
+wget https://raw.githubusercontent.com/craigsapp/musicxml2hum/master/src/tool-musicxml2hum.cpp -O tool-musicxml2hum.cpp
+
+

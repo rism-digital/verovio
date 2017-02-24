@@ -101,7 +101,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
 
         // yes they are in a beam
         x = firstElement->GetDrawingX()
-            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->m_selfBB_x2) / 2;
+            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->GetSelfX2()) / 2;
 
         // align the center point at the exact center of the first an last stem
         // TUPLET_OFFSET is summed so it does not collide with the stem
@@ -121,7 +121,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         // Copy the generated coordinates
         center->x = x;
         center->y = y;
-        direction = firstNote->GetDrawingStemDir(); // stem direction is the same for all notes
+        if (firstNote) direction = firstNote->GetDrawingStemDir(); // stem direction is the same for all notes
     }
     else {
         // There are unbeamed notes of two different beams
@@ -131,18 +131,18 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         // In this case use the center of the notehead to calculate the exact center
         // as it looks better
         x = firstElement->GetDrawingX()
-            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->m_selfBB_x2) / 2;
+            + (lastElement->GetDrawingX() - firstElement->GetDrawingX() + lastElement->GetSelfX2()) / 2;
 
         // Return the start and end position for the brackes
         // starting from the first edge and last of the BBoxes
-        start->x = firstElement->m_selfBB_x1 + firstElement->GetDrawingX();
-        end->x = lastElement->m_selfBB_x2 + lastElement->GetDrawingX();
+        start->x = firstElement->GetSelfX1() + firstElement->GetDrawingX();
+        end->x = lastElement->GetSelfX2() + lastElement->GetDrawingX();
 
         // The first step is to calculate all the stem directions
         // cycle into the elements and count the up and down dirs
         ListOfObjects::iterator iter = tupletChildren->begin();
         while (iter != tupletChildren->end()) {
-            if ((*iter)->Is() == NOTE) {
+            if ((*iter)->Is(NOTE)) {
                 Note *currentNote = dynamic_cast<Note *>(*iter);
                 assert(currentNote);
                 if (currentNote->GetDrawingStemDir() == STEMDIRECTION_up)
@@ -185,7 +185,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             // average. In this case we offset down or up all the points
             iter = tupletChildren->begin();
             while (iter != tupletChildren->end()) {
-                if ((*iter)->Is() == NOTE) {
+                if ((*iter)->Is(NOTE)) {
                     Note *currentNote = dynamic_cast<Note *>(*iter);
                     assert(currentNote);
 
@@ -220,7 +220,7 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             // Find the tallest stem and set y to it (with the offset distance)
             iter = tupletChildren->begin();
             while (iter != tupletChildren->end()) {
-                if ((*iter)->Is() == NOTE) {
+                if ((*iter)->Is(NOTE)) {
                     Note *currentNote = dynamic_cast<Note *>(*iter);
                     assert(currentNote);
 
@@ -267,17 +267,16 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
 
     tuplet->ResetList(tuplet);
 
-    int txt_length = 0;
-    int txt_height = 0;
-
+    TextExtend extend;
     std::wstring notes;
 
-    //
-    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, tuplet->IsCueSize()));
+    bool drawingCueSize = tuplet->IsCueSize();
+
+    dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
 
     if (tuplet->GetNum() > 0) {
         notes = IntToTupletFigures((short int)tuplet->GetNum());
-        dc->GetSmuflTextExtent(notes, &txt_length, &txt_height);
+        dc->GetSmuflTextExtent(notes, &extend);
     }
 
     Point start, end, center;
@@ -286,11 +285,10 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
     // Calculate position for number 0x82
     // since the number is slanted, move the center left
     // by 4 pixels so it seems more centered to the eye
-    int txt_x = center.x - (txt_length / 2);
+    int txt_x = center.x - (extend.m_width / 2);
     // we need to move down the figure of half of it height, which is about an accid width;
     // also, cue size is not supported. Does it has to?
-    int txt_y
-        = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, tuplet->IsCueSize());
+    int txt_y = center.y - m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staff->m_drawingStaffSize, drawingCueSize);
 
     if (tuplet->GetNum() && (tuplet->GetNumVisible() != BOOLEAN_false)) {
         DrawSmuflString(dc, txt_x, txt_y, notes, false, staff->m_drawingStaffSize);
@@ -317,7 +315,7 @@ void View::DrawTupletPostponed(DeviceContext *dc, Tuplet *tuplet, Layer *layer, 
         // x = 10 pixels before the number
         int x = txt_x - 40;
         // xa = just after, the number is abundant so I do not add anything
-        int xa = txt_x + txt_length + 20;
+        int xa = txt_x + extend.m_width + 20;
 
         // calculate the y coords in the slope
         double y1 = (double)start.y + m * (x - (double)start.x);

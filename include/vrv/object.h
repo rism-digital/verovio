@@ -17,6 +17,7 @@
 //----------------------------------------------------------------------------
 
 #include "attclasses.h"
+#include "boundingbox.h"
 #include "vrvdef.h"
 
 namespace vrv {
@@ -65,92 +66,6 @@ typedef std::map<int, LayerN_VerserN_t> StaffN_LayerN_VerseN_t;
 #define BACKWARD false
 
 //----------------------------------------------------------------------------
-// BoundingBox
-//----------------------------------------------------------------------------
-
-/**
- * This class represents a basic object in the layout domain
- */
-class BoundingBox {
-public:
-    // constructors and destructors
-    BoundingBox();
-    virtual ~BoundingBox(){};
-    virtual ClassId Is() const;
-
-    virtual void UpdateContentBBoxX(int x1, int x2);
-    virtual void UpdateContentBBoxY(int y1, int y2);
-    virtual void UpdateSelfBBoxX(int x1, int x2);
-    virtual void UpdateSelfBBoxY(int y1, int y2);
-    bool HasContentBB();
-    bool HasSelfBB();
-    void SetEmptyBB();
-    bool HasEmptyBB();
-
-    /**
-     * Reset the bounding box values
-     */
-    virtual void ResetBoundingBox();
-
-    /**
-     * @name Get and set the X and Y drawing position
-     */
-    ///@{
-    virtual int GetDrawingX() const { return m_drawingX; }
-    virtual int GetDrawingY() const { return m_drawingY; }
-    void SetDrawingX(int drawingX) { m_drawingX = drawingX; }
-    void SetDrawingY(int drawingY) { m_drawingY = drawingY; }
-    ///@}
-
-    /**
-     * @name Get positions for self and content
-     */
-    ///@{
-    int GetSelfBottom() const { return (this->GetDrawingY() + m_selfBB_y1); }
-    int GetSelfTop() const { return (this->GetDrawingY() + m_selfBB_y2); }
-    int GetSelfLeft() const { return (this->GetDrawingX() + m_selfBB_x1); }
-    int GetSelfRight() const { return (this->GetDrawingX() + m_selfBB_x2); }
-    int GetContentBottom() const { return (this->GetDrawingY() + m_contentBB_y1); }
-    int GetContentTop() const { return (this->GetDrawingY() + m_contentBB_y2); }
-    int GetContentLeft() const { return (this->GetDrawingX() + m_contentBB_x1); }
-    int GetContentRight() const { return (this->GetDrawingX() + m_contentBB_x2); }
-    ///@}
-
-    /**
-     * Is true if the bounding box (self or content) has been updated at least once.
-     * We need this to avoid not updating bounding boxes to screw up the layout with their initial values.
-     */
-    bool HasUpdatedBB() const { return (m_updatedBBoxX && m_updatedBBoxY); }
-
-    /**
-     * Returns true if the bounding box has a horizontal overlap with the other one.
-     */
-    bool HorizontalOverlap(const BoundingBox *other) const;
-
-    int CalcVerticalOverlap(const BoundingBox *other) const;
-
-private:
-    bool m_updatedBBoxX;
-    bool m_updatedBBoxY;
-
-protected:
-    /**
-     * The Y drawing position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingY;
-    /**
-     * The X drawing position of the object.
-     * It is re-computed everytime the object is drawn and it is not stored in the file.
-     */
-    int m_drawingX;
-
-public:
-    int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
-    int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
-};
-
-//----------------------------------------------------------------------------
 // Object
 //----------------------------------------------------------------------------
 
@@ -167,7 +82,7 @@ public:
     Object();
     Object(std::string classid);
     virtual ~Object();
-    virtual ClassId Is() const;
+    virtual ClassId GetClassId() const;
     virtual std::string GetClassName() const { return "[MISSING]"; }
     ///@}
 
@@ -187,12 +102,27 @@ public:
      * See classId enum.
      */
     ///@{
-    bool IsControlElement() const { return (this->Is() > CONTROL_ELEMENT && this->Is() < CONTROL_ELEMENT_max); }
-    bool IsEditorialElement() const { return (this->Is() > EDITORIAL_ELEMENT && this->Is() < EDITORIAL_ELEMENT_max); }
-    bool IsLayerElement() const { return (this->Is() > LAYER_ELEMENT && this->Is() < LAYER_ELEMENT_max); }
-    bool IsScoreDefElement() const { return (this->Is() > SCOREDEF_ELEMENT && this->Is() < SCOREDEF_ELEMENT_max); }
-    bool IsSystemElement() const { return (this->Is() > SYSTEM_ELEMENT && this->Is() < SYSTEM_ELEMENT_max); }
-    bool IsTextElement() const { return (this->Is() > TEXT_ELEMENT && this->Is() < TEXT_ELEMENT_max); }
+    bool IsControlElement() const
+    {
+        return (this->GetClassId() > CONTROL_ELEMENT && this->GetClassId() < CONTROL_ELEMENT_max);
+    }
+    bool IsEditorialElement() const
+    {
+        return (this->GetClassId() > EDITORIAL_ELEMENT && this->GetClassId() < EDITORIAL_ELEMENT_max);
+    }
+    bool IsLayerElement() const
+    {
+        return (this->GetClassId() > LAYER_ELEMENT && this->GetClassId() < LAYER_ELEMENT_max);
+    }
+    bool IsScoreDefElement() const
+    {
+        return (this->GetClassId() > SCOREDEF_ELEMENT && this->GetClassId() < SCOREDEF_ELEMENT_max);
+    }
+    bool IsSystemElement() const
+    {
+        return (this->GetClassId() > SYSTEM_ELEMENT && this->GetClassId() < SYSTEM_ELEMENT_max);
+    }
+    bool IsTextElement() const { return (this->GetClassId() > TEXT_ELEMENT && this->GetClassId() < TEXT_ELEMENT_max); }
     ///@}
 
     /**
@@ -337,6 +267,14 @@ public:
     int GetIdx() const;
 
     /**
+     * @name Get the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
+
+    /**
      * Look for the Object in the children and return its position (-1 if not found)
      */
     int GetChildIndex(const Object *child);
@@ -383,7 +321,7 @@ public:
      * Deepness allow to limit the depth search (EditorialElements are not count)
      */
     void FindAllChildByAttComparison(ArrayOfObjects *objects, AttComparison *attComparison,
-        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD);
+        int deepness = UNLIMITED_DEPTH, bool direction = FORWARD, bool clear = true);
 
     /**
      * Give up ownership of the child at the idx position (NULL if not found)
@@ -529,7 +467,12 @@ public:
     /**
      * Adjust the position the outside articulations.
      */
-    virtual int AdjustArticulations(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustArtic(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the position the outside articulations with slur.
+     */
+    virtual int AdjustArticWithSlurs(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
      * Adjust the position of all floating positionner, staff by staff.
@@ -558,18 +501,6 @@ public:
     virtual int AlignMeasuresEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     /**
-     * Correct the X alignment once the content of a system has been aligned and laid out
-     * See Measure::IntegrateBoundingBoxXShift for actual implementation
-     */
-    virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Correct the X alignment once the content of a system has been aligned and laid out
-     * See Measure::IntegrateBoundingBoxXShift for actual implementation
-     */
-    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-
-    /**
      * Reset the horizontal alignment environment for various types for object.
      */
     virtual int ResetHorizontalAlignment(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
@@ -582,17 +513,31 @@ public:
 
     /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
-     * The m_xShift is updated appropriately
+     * The functor is redirected from the MeasureAligner and then from the appropriate
+     * alignment to the GraceAligner
      */
-    virtual int SetBoundingBoxGraceXShift(FunctorParams *functorParams);
+    virtual int AdjustGraceXPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustGraceXPosEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+
+    /**
+     * Retrieve the minimum left and maximum right for an alignment.
+     * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight
+     */
+    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.
-     * The m_xShift is updated appropriately
-     * At the end, lay out the X positions of the staff content looking at the bounding boxes.
+     * The functor process by aligned-staff content, that is from a rediction in the
+     * MeasureAligner and then staff by staff but taking into account cross-staff elements
      */
-    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
+    virtual int AdjustXPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int AdjustXPosEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Adjust the spacing of the syl processing verse by verse
+     */
+    virtual int AdjustSylSpacing(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
+    virtual int AdjustSylSpacingEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; };
 
     ///@}
 
@@ -691,6 +636,11 @@ public:
     ///@{
 
     /**
+     * See cross-staff / layer pointers on LayerElement
+     */
+    virtual int PrepareCrossStaff(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
      */
     virtual int PrepareProcessingLists(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
@@ -729,7 +679,6 @@ public:
     /**
      * Process by Layer and set drawing pointers.
      * Set Dot::m_drawingNote for Dot elements in mensural mode
-     * Set Note::m_drawingAccid for Note elements having an Accid child
      */
     virtual int PreparePointersByLayer(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
@@ -779,7 +728,7 @@ public:
     /**
      * Set the drawing position (m_drawingX and m_drawingY) values for objects
      */
-    virtual int SetDrawingXY(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    virtual int SetAlignmentPitchPos(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -1076,7 +1025,7 @@ public:
         if (m_classId == UNSPECIFIED) {
             return true;
         }
-        return (object->Is() == m_classId);
+        return (object->GetClassId() == m_classId);
     }
 
 private:

@@ -94,8 +94,8 @@ public:
      * to the default value)
      **/
     ///@{
-    void SetOrnam(data_ORNAM_cmn ornam_) { m_ornam = ornam_; }
-    data_ORNAM_cmn GetOrnam() const { return m_ornam; }
+    void SetOrnam(std::string ornam_) { m_ornam = ornam_; }
+    std::string GetOrnam() const { return m_ornam; }
     bool HasOrnam() const;
     ///@}
 
@@ -105,7 +105,7 @@ private:
      * If visual information about the ornament is needed, then one of the elements
      * that represents an ornament (mordent, trill, or turn) should be employed.
      **/
-    data_ORNAM_cmn m_ornam;
+    std::string m_ornam;
 
     /* include <attornam> */
 };

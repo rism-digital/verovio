@@ -44,7 +44,7 @@ public:
     virtual ~Ligature();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Ligature"; }
-    virtual ClassId Is() const { return LIGATURE; }
+    virtual ClassId GetClassId() const { return LIGATURE; }
     ///@}
 
     virtual DurationInterface *GetDurationInterface() { return dynamic_cast<DurationInterface *>(this); }

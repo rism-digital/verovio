@@ -35,7 +35,7 @@ public:
     virtual ~Section();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Section"; }
-    virtual ClassId Is() const { return SECTION; }
+    virtual ClassId GetClassId() const { return SECTION; }
     ///@}
 
     /**
@@ -50,8 +50,10 @@ public:
     /**
      * See Object::ConvertToPageBased
      */
+    ///@{
     virtual int ConvertToPageBased(FunctorParams *functorParams);
     virtual int ConvertToPageBasedEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::PrepareBoundaries
@@ -62,16 +64,6 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffSystems
-     */
-    virtual int CastOffSystems(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffEncoding
-     */
-    virtual int CastOffEncoding(FunctorParams *functorParams);
 
 private:
     //
@@ -100,22 +92,12 @@ public:
     virtual ~Pb();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Pb"; }
-    virtual ClassId Is() const { return PB; }
+    virtual ClassId GetClassId() const { return PB; }
     ///@}
 
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffSystems
-     */
-    virtual int CastOffSystems(FunctorParams *functorParams);
 
     /**
      * See Object::CastOffEncoding
@@ -149,22 +131,12 @@ public:
     virtual ~Sb();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Sb"; }
-    virtual ClassId Is() const { return SB; }
+    virtual ClassId GetClassId() const { return SB; }
     ///@}
 
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * See Object::ConvertToPageBased
-     */
-    virtual int ConvertToPageBased(FunctorParams *functorParams);
-
-    /**
-     * See Object::CastOffSystems
-     */
-    virtual int CastOffSystems(FunctorParams *functorParams);
 
     /**
      * See Object::CastOffEncoding

@@ -30,6 +30,7 @@ class TextElement;
 class Syl : public LayerElement,
             public TextListInterface,
             public TimeSpanningInterface,
+            public AttLang,
             public AttTypography,
             public AttSylLog {
 public:
@@ -42,7 +43,7 @@ public:
     virtual ~Syl();
     virtual void Reset();
     virtual std::string GetClassName() const { return "Syl"; }
-    virtual ClassId Is() const { return SYL; }
+    virtual ClassId GetClassId() const { return SYL; }
     ///@}
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
@@ -67,6 +68,11 @@ public:
      * See Object::FillStaffCurrentTimeSpanning
      */
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    virtual int AdjustSylSpacing(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing

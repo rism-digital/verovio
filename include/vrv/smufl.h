@@ -79,6 +79,18 @@ enum {
     SMUFL_E269_accidentalSharpSharp = 0xE269,
     SMUFL_E26A_accidentalParensLeft = 0xE26A,
     SMUFL_E26B_accidentalParensRight = 0xE26B,
+    SMUFL_E26C_accidentalBracketLeft = 0xE26C,
+    SMUFL_E26D_accidentalBracketRight = 0xE26D,
+    SMUFL_E270_accidentalQuarterToneFlatArrowUp = 0xE270,
+    SMUFL_E271_accidentalThreeQuarterTonesFlatArrowDown = 0xE271,
+    SMUFL_E272_accidentalQuarterToneSharpNaturalArrowUp = 0xE272,
+    SMUFL_E273_accidentalQuarterToneFlatNaturalArrowDown = 0xE273,
+    SMUFL_E274_accidentalThreeQuarterTonesSharpArrowUp = 0xE274,
+    SMUFL_E275_accidentalQuarterToneSharpArrowDown = 0xE275,
+    SMUFL_E280_accidentalQuarterToneFlatStein = 0xE280,
+    SMUFL_E281_accidentalThreeQuarterTonesFlatZimmermann = 0xE281,
+    SMUFL_E282_accidentalQuarterToneSharpStein = 0xE282,
+    SMUFL_E283_accidentalThreeQuarterTonesSharpStein = 0xE283,
     SMUFL_E4A0_articAccentAbove = 0xE4A0,
     SMUFL_E4A1_articAccentBelow = 0xE4A1,
     SMUFL_E4A2_articStaccatoAbove = 0xE4A2,
@@ -181,6 +193,7 @@ enum {
     SMUFL_E611_stringsDownBowTurned = 0xE611,
     SMUFL_E612_stringsUpBow = 0xE612,
     SMUFL_E613_stringsUpBowTurned = 0xE613,
+    SMUFL_E614_stringsHarmonic = 0xE614,
     SMUFL_E650_keyboardPedalPed = 0xE650,
     SMUFL_E655_keyboardPedalUp = 0xE655,
     SMUFL_E880_tuplet0 = 0xE880,
@@ -221,7 +234,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 196
+#define SMUFL_COUNT 209
 
 } // vrv namespace
 

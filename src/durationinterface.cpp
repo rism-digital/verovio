@@ -148,10 +148,10 @@ int DurationInterface::GetActualDur() const
 
 int DurationInterface::GetNoteOrChordDur(LayerElement *element)
 {
-    if (element->Is() == CHORD) {
+    if (element->Is(CHORD)) {
         return this->GetActualDur();
     }
-    else if (element->Is() == NOTE) {
+    else if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
         Chord *chord = note->IsChordTone();
