@@ -126,6 +126,7 @@ class data_FONTSIZE {
 public:
     data_FONTSIZE()
     {
+        m_type = FONTSIZE_NONE;
         m_value = VRV_UNSET;
         m_term = FONTSIZETERM_NONE;
     }
