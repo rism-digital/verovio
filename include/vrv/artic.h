@@ -120,7 +120,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class models a sub-part of an artic element and has not direct MEI correspondant.
+ * This class models a sub-part of an artic element and has not direct MEI equivlatent.
  */
 
 class ArticPart : public LayerElement, public AttArticulation, public AttColor, public AttPlacement {
@@ -162,8 +162,10 @@ public:
     /**
      * Overwritten version of Save that avoids anything to be written
      */
+    ///@{
     virtual int Save(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
     virtual int SaveEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * See Object::AdjustArticWithSlurs
