@@ -592,7 +592,7 @@ public:
      * Called from Measure::AdjustSylSpacingEnd.
      */
     void AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments);
-    
+
     /**
      * Push all the ALIGNMENT_GRACENOTE and ALIGNMENT_CONTAINER to the right.
      * This is necessary to make sure they align with the next alignment content.

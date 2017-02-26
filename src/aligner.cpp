@@ -363,7 +363,7 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         int dist = std::get<2>(*iter);
         if ((start->GetXRel() >= end->GetXRel()) || (dist == 0)) {
             LogDebug("Trying to ajdust alignment at the same position or with a distance of 0;");
-            //continue;
+            continue;
         }
         // We need to store them because they are going to be changed in the loop below
         int startX = start->GetXRel();
@@ -388,7 +388,7 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         }
     }
 }
-    
+
 void MeasureAligner::PushAlignmentsRight()
 {
     Alignment *previous = NULL;
@@ -396,7 +396,7 @@ void MeasureAligner::PushAlignmentsRight()
     for (riter = m_children.rbegin(); riter != m_children.rend(); riter++) {
         Alignment *current = dynamic_cast<Alignment *>(*riter);
         assert(current);
-        
+
         if ((current->GetType() == ALIGNMENT_GRACENOTE) || (current->GetType() == ALIGNMENT_CONTAINER)) {
             if (previous) current->SetXRel(previous->GetXRel());
         }
