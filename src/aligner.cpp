@@ -18,6 +18,7 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
+#include "measure.h"
 #include "note.h"
 #include "staff.h"
 #include "style.h"
@@ -361,7 +362,7 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
         assert(end);
         int dist = std::get<2>(*iter);
         if ((start->GetXRel() >= end->GetXRel()) || (dist == 0)) {
-            LogDebug("Trying to ajdust alignment at the same position of with a distance of 0;");
+            LogDebug("Trying to ajdust alignment at the same position or with a distance of 0;");
             continue;
         }
         // We need to store them because they are going to be changed in the loop below
@@ -385,6 +386,79 @@ void MeasureAligner::AdjustProportionally(const ArrayOfAdjustmentTuples &adjustm
                 current->SetXRel(current->GetXRel() + shift);
             }
         }
+    }
+}
+
+void MeasureAligner::PushAlignmentsRight()
+{
+    Alignment *previous = NULL;
+    ArrayOfObjects::reverse_iterator riter;
+    for (riter = m_children.rbegin(); riter != m_children.rend(); riter++) {
+        Alignment *current = dynamic_cast<Alignment *>(*riter);
+        assert(current);
+
+        if ((current->GetType() == ALIGNMENT_GRACENOTE) || (current->GetType() == ALIGNMENT_CONTAINER)) {
+            if (previous) current->SetXRel(previous->GetXRel());
+        }
+        else {
+            previous = current;
+        }
+    }
+}
+
+void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int staffN)
+{
+    assert(doc);
+    assert(alignment);
+    assert(alignment->GetType() == ALIGNMENT_GRACENOTE);
+    assert(alignment->GetGraceAligner());
+
+    Measure *measure = dynamic_cast<Measure *>(this->m_parent);
+    assert(measure);
+
+    int maxRight = VRV_UNSET;
+    Alignment *rightAlignment = NULL;
+
+    // We can set staffN as VRV_UNSET to align all staves (this should be an option)
+    // We can also define somewhere vector of staffDef@n to be aligned together
+    // For this we would need an alternate version GetLeftRight that can take a vector of staffNs
+    // staffN = VRV_UNSET;
+
+    bool found = false;
+    ArrayOfObjects::reverse_iterator riter;
+    for (riter = m_children.rbegin(); riter != m_children.rend(); riter++) {
+        if (!found) {
+            if ((*riter) == alignment) found = true;
+            continue;
+        }
+
+        rightAlignment = dynamic_cast<Alignment *>(*riter);
+        assert(rightAlignment);
+
+        // Do not go beyond the left bar line
+        if (rightAlignment->GetType() == ALIGNMENT_MEASURE_LEFT_BARLINE) {
+            maxRight = measure->GetLeftBarLineRight();
+            break;
+        }
+
+        int minLeft;
+        rightAlignment->GetLeftRight(staffN, minLeft, maxRight);
+
+        if (maxRight != VRV_UNSET) break;
+    }
+
+    // This should never happen because we must have hit the left barline in the loop above
+    if (!rightAlignment || (maxRight == VRV_UNSET)) return;
+
+    // Check if the left position of the group is on the right of the previous maxRight
+    // If not, move the aligments accordingly
+    int left = alignment->GetGraceAligner()->GetGraceGroupLeft(staffN);
+    // We also set artificially the margin with the previous note
+    if (left != -VRV_UNSET) left -= doc->GetLeftMargin(NOTE) * doc->GetDrawingUnit(100) / PARAM_DENOMINATOR;
+    if (left < maxRight) {
+        int spacing = (maxRight - left);
+        ArrayOfAdjustmentTuples boundaries{ std::make_tuple(rightAlignment, alignment, spacing) };
+        this->AdjustProportionally(boundaries);
     }
 }
 
@@ -907,6 +981,10 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         // Change the flag for indicating that the alignment is child of a GraceAligner
         params->m_isGraceAlignment = true;
 
+        // Get the parent measure Aligner
+        MeasureAligner *measureAligner = dynamic_cast<MeasureAligner *>(this->GetFirstParent(MEASURE_ALIGNER));
+        assert(measureAligner);
+
         std::vector<int>::iterator iter;
         std::vector<AttComparison *> filters;
         for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
@@ -917,7 +995,9 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             if (params->m_rightDefaultAlignment) {
                 int minLeft, maxRight;
                 params->m_rightDefaultAlignment->GetLeftRight(*iter, minLeft, maxRight);
-                if (minLeft != -VRV_UNSET) graceMaxPos = minLeft;
+                if (minLeft != -VRV_UNSET)
+                    graceMaxPos = minLeft
+                        - params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75) / PARAM_DENOMINATOR;
             }
             else {
                 // This happens when grace notes are at the end of a measure before a barline
@@ -934,6 +1014,12 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
 
             m_graceAligner->Process(
                 params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
+
+            // There was not grace notes for that staff
+            if (params->m_graceCumulatedXShift == 0) continue;
+
+            // Now we need to adjust the space for the grace not group
+            measureAligner->AdjustGraceNoteSpacing(params->m_doc, this, (*iter));
         }
 
         // Change the flag back
@@ -942,6 +1028,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
+    // This is happening when aligning the grace aligner itself
     this->SetXRel(this->GetXRel() + params->m_graceCumulatedXShift);
 
     return FUNCTOR_CONTINUE;
@@ -975,36 +1062,6 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
     }
     else if (m_type == ALIGNMENT_MEASURE_END) {
         this->SetXRel(params->m_minPos);
-    }
-    else if (m_type == ALIGNMENT_GRACENOTE) {
-        assert(m_graceAligner);
-        // Check if the left position of the group is on the left of the minPos
-        // If not, move the aligment accordingly
-        // We can set staffN as VRV_UNSET to align all staves (this should be an option)
-        // We can also define somewhere vector of staffDef@n to be aligned together
-        int left = m_graceAligner->GetGraceGroupLeft(params->m_staffN);
-        // We also set artificially the margin with the previous note
-        if (left != -VRV_UNSET) left -= params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(100)
-            / PARAM_DENOMINATOR;
-        if (left < params->m_minPos) {
-            int offset = (params->m_minPos - left);
-            this->SetXRel(this->GetXRel() + offset);
-            params->m_minPos += offset;
-            params->m_cumulatedXShift += offset;
-        }
-
-        // Check if the right position of the group is on the right of the minPos
-        // Inf not move the minPos (but not the alignment)
-        int right = m_graceAligner->GetGraceGroupRight(params->m_staffN);
-        // We also reduce artificially the margin with the next note
-        if (right != VRV_UNSET) right -= params->m_doc->GetLeftMargin(NOTE) * params->m_doc->GetDrawingUnit(75)
-            / PARAM_DENOMINATOR;
-        if (right > params->m_minPos) {
-            int offset = (right - params->m_minPos);
-            params->m_minPos += offset;
-        }
-
-        params->m_upcomingMinPos = std::max(right, params->m_upcomingMinPos);
     }
 
     return FUNCTOR_CONTINUE;
@@ -1046,7 +1103,7 @@ int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
-    //LogDebug("AlignmentRef staff %d", GetN());
+    // LogDebug("AlignmentRef staff %d", GetN());
     this->m_elementRef->Process(params->m_functor, params);
 
     return FUNCTOR_CONTINUE;

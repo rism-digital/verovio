@@ -141,18 +141,18 @@ void Page::LayOutHorizontally()
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
+    Functor adjustXPos(&Object::AdjustXPos);
+    Functor adjustXPosEnd(&Object::AdjustXPosEnd);
+    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_scoreDef.GetStaffNs());
+    this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
+
+    // Adjust the X shift of the Alignment looking at the bounding boxes
+    // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor adjustGraceXPos(&Object::AdjustGraceXPos);
     Functor adjustGraceXPosEnd(&Object::AdjustGraceXPosEnd);
     AdjustGraceXPosParams adjustGraceXPosParams(
         doc, &adjustGraceXPos, &adjustGraceXPosEnd, doc->m_scoreDef.GetStaffNs());
     this->Process(&adjustGraceXPos, &adjustGraceXPosParams, &adjustGraceXPosEnd);
-
-    // Adjust the X shift of the Alignment looking at the bounding boxes
-    // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
-    Functor adjustXPos(&Object::AdjustXPos);
-    Functor adjustXPosEnd(&Object::AdjustXPosEnd);
-    AdjustXPosParams adjustXPosParams(doc, &adjustXPos, &adjustXPosEnd, doc->m_scoreDef.GetStaffNs());
-    this->Process(&adjustXPos, &adjustXPosParams, &adjustXPosEnd);
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)

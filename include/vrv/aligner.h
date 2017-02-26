@@ -593,6 +593,18 @@ public:
      */
     void AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments);
 
+    /**
+     * Push all the ALIGNMENT_GRACENOTE and ALIGNMENT_CONTAINER to the right.
+     * This is necessary to make sure they align with the next alignment content.
+     */
+    void PushAlignmentsRight();
+
+    /**
+     * Adjust the spacing for the grace note group(s) of the alignment on staffN
+     * The alignment need to be of ALIGNMENT_GRACENOTE type
+     */
+    void AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int staffN);
+
     //----------//
     // Functors //
     //----------//
