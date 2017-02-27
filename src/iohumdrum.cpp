@@ -2203,14 +2203,14 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
 
     if (tg.beamstart && tg.tupletstart) {
         if (tg.priority == 'T') {
-            insertTuplet(elements, pointers, tg, token, ss[staffindex].suppress_beam_tuplet);
+            insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_beam_tuplet);
             beam = insertBeam(elements, pointers, tg);
             setBeamLocationId(beam, tgs, layerdata, layerindex);
         }
         else {
             beam = insertBeam(elements, pointers, tg);
             setBeamLocationId(beam, tgs, layerdata, layerindex);
-            insertTuplet(elements, pointers, tg, token, ss[staffindex].suppress_beam_tuplet);
+            insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_beam_tuplet);
         }
     }
     else if (tg.beamstart) {
@@ -2218,7 +2218,7 @@ void HumdrumInput::handleGroupStarts(const std::vector<humaux::HumdrumBeamAndTup
         setBeamLocationId(beam, tgs, layerdata, layerindex);
     }
     else if (tg.tupletstart) {
-        insertTuplet(elements, pointers, tg, token, ss[staffindex].suppress_bracket_tuplet);
+        insertTuplet(elements, pointers, tgs, layerdata, layerindex, ss[staffindex].suppress_bracket_tuplet);
     }
 
     if (tg.gbeamstart) {
@@ -3650,12 +3650,17 @@ void HumdrumInput::analyzeLayerBeams(
 // HumdrumInput::insertTuplet --
 //
 
-void HumdrumInput::insertTuplet(std::vector<string> &elements, std::vector<void *> &pointers,
-    const humaux::HumdrumBeamAndTuplet &tg, hum::HTp token, bool suppress)
+void HumdrumInput::insertTuplet(std::vector<std::string> &elements, std::vector<void *> &pointers,
+    const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> layerdata, int layerindex,
+    bool suppress)
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
+    hum::HTp token = layerdata[layerindex];
+    const humaux::HumdrumBeamAndTuplet &tg = tgs[layerindex];
+
     Tuplet *tuplet = new Tuplet;
+    setTupletLocationId(tuplet, tgs, layerdata, layerindex);
     appendElement(elements, pointers, tuplet);
     elements.push_back("tuplet");
     pointers.push_back((void *)tuplet);
@@ -3665,9 +3670,12 @@ void HumdrumInput::insertTuplet(std::vector<string> &elements, std::vector<void 
         // If the music contains lyrics, force the tuplet above the staff.
         tuplet->SetBracketPlace(PLACE_above);
     }
-
-    tuplet->SetNum(tg.num * tg.numscale);
-    tuplet->SetNumbase(tg.numbase * tg.numscale);
+    double scale = tg.numscale;
+    if (scale == 0.0) {
+        scale = 1.0;
+    }
+    tuplet->SetNum(tg.num * scale);
+    tuplet->SetNumbase(tg.numbase * scale);
     if (suppress) {
         // This shouldn't be needed, but just in case.
         // The visibility of the bracket is determined
@@ -4252,28 +4260,91 @@ void HumdrumInput::prepareBeamAndTupletGroups(
                     }
                 }
             }
-            if (tg[i].beamstart && tg[i].tupletstart) {
-                if (tg[i].bracket > 0) {
-                    tg[i].priority = 'T'; // open tuplet first
-                }
-                else {
-                    tg[i].priority = 'B'; // open beam first
-                }
-            }
-            else if (tg[i].beamend && tg[i].tupletend) {
-                if (tg[i].bracket > 0) {
-                    // tg[i].priority = 'B'; // close beam first
-                    tg[i].priority = 'T'; // maybe close tuplet first (check more cases)
-                }
-                else {
-                    tg[i].priority = 'T'; // close tuplet first
-                }
-            }
-            else {
-                tg[i].priority = ' ';
-            }
         }
     }
+
+    resolveTupletBeamTie(tg);
+}
+
+//////////////////////////////
+//
+// HumdrumInput::resolveTupletBeamTie -- When a tuplet and beam both start or end
+//   on the same note, figure out which one should be first, last.
+//
+
+void HumdrumInput::resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg)
+{
+    for (int i = 0; i < tg.size(); i++) {
+        if (tg[i].beamstart && tg[i].tupletstart) {
+            resolveTupletBeamStartTie(tg, i);
+        }
+        else if (tg[i].beamend && tg[i].tupletend) {
+            resolveTupletBeamEndTie(tg, i);
+        }
+        else {
+            tg[i].priority = ' ';
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::resolveTupletBeamStartTie -- When a tuplet and a beam start
+//    on the same note, determine which one should be opened first (the one
+//    which is contained by the other will be opened last, and if there is a tie,
+//    the tuplet will be opened first.
+//
+
+void HumdrumInput::resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index)
+{
+
+    // presumably tumnum and beamnum are non-zero...
+    int tupnum = tg[index].tupletstart;
+    int beamnum = tg[index].beamstart;
+    for (int i = index; i < (int)tg.size(); i++) {
+        if (tg[i].beamend == beamnum) {
+            // beam ends before tuplet does, so tuplet should be give priority.
+            tg[index].priority = 'T'; // open tuplet first
+            return;
+        }
+        if (tg[i].tupletend == tupnum) {
+            // tuplet ends before beam does, so beam should be opened first.
+            tg[index].priority = 'B'; // open beam first
+            return;
+        }
+    }
+    // strange problem
+    tg[index].priority = ' ';
+}
+
+//////////////////////////////
+//
+// HumdrumInput::resolveTupletBeamEndTie -- When a tuplet and a beam end
+//    on the same note, determine which one should be closed first (the one
+//    which is contained by the other will be closed first, and if there is a tie,
+//    the tuplet will be closed last.
+//
+
+void HumdrumInput::resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index)
+{
+
+    // presumably tumnum and beamnum are non-zero...
+    int tupnum = tg[index].tupletend;
+    int beamnum = tg[index].beamend;
+    for (int i = index; i >= 0; i--) {
+        if (tg[i].beamstart == beamnum) {
+            // beam starts after tuplet does, so beam should be closed first.
+            tg[index].priority = 'B'; // close beam first
+            return;
+        }
+        if (tg[i].tupletstart == tupnum) {
+            // tuplet starts after beam does, so tuplet should be closed first.
+            tg[index].priority = 'T'; // close tuplet first
+            return;
+        }
+    }
+    // strange problem
+    tg[index].priority = ' ';
 }
 
 //////////////////////////////
@@ -6447,6 +6518,45 @@ void HumdrumInput::setBeamLocationId(Object *object, const std::vector<humaux::H
     int endindex = -1;
     for (int i = startindex + 1; i < (int)tgs.size(); i++) {
         if (tgs[i].beamend == startnum) {
+            endnum = startnum;
+            endindex = i;
+            break;
+        }
+    }
+
+    if (endindex > 0) {
+        hum::HTp endtoken = layerdata[endindex];
+        int endline = endtoken->getLineNumber();
+        int endfield = endtoken->getFieldNumber();
+        id += "-L" + to_string(endline);
+        id += "F" + to_string(endfield);
+    }
+
+    object->SetUuid(id);
+}
+
+/////////////////////////////
+//
+// HumdrumInput::setTupletLocationId --
+//
+
+void HumdrumInput::setTupletLocationId(Object *object, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
+    std::vector<hum::HTp> &layerdata, int startindex)
+{
+    int startnum = tgs[startindex].tupletstart;
+    hum::HTp starttoken = layerdata[startindex];
+    int startline = starttoken->getLineNumber();
+    int startfield = starttoken->getFieldNumber();
+
+    std::string id = object->GetClassName();
+    std::transform(id.begin(), id.end(), id.begin(), ::tolower);
+    id += "-L" + to_string(startline);
+    id += "F" + to_string(startfield);
+
+    int endnum = -1;
+    int endindex = -1;
+    for (int i = startindex + 1; i < (int)tgs.size(); i++) {
+        if (tgs[i].tupletend == startnum) {
             endnum = startnum;
             endindex = i;
             break;

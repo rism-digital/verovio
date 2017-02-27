@@ -263,7 +263,8 @@ protected:
         const std::vector<hum::HTp> &layerdata, std::vector<humaux::HumdrumBeamAndTuplet> &hg);
     void printGroupInfo(std::vector<humaux::HumdrumBeamAndTuplet> &tg, const std::vector<hum::HTp> &layerdata);
     void insertTuplet(std::vector<std::string> &elements, std::vector<void *> &pointers,
-        const humaux::HumdrumBeamAndTuplet &tg, hum::HTp token, bool suppress);
+        const std::vector<humaux::HumdrumBeamAndTuplet> &tgs, std::vector<hum::HTp> layerdata, int layerindex,
+        bool suppress);
     vrv::Beam *insertBeam(
         std::vector<std::string> &elements, std::vector<void *> &pointers, const humaux::HumdrumBeamAndTuplet &tg);
     vrv::Beam *insertGBeam(
@@ -304,6 +305,8 @@ protected:
     void setTieLocationId(vrv::Object *object, hum::HTp tiestart, int sindex, hum::HTp tieend, int eindex);
     void setBeamLocationId(vrv::Object *object, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
         std::vector<hum::HTp> &layerdata, int startindex);
+    void setTupletLocationId(vrv::Object *object, const std::vector<humaux::HumdrumBeamAndTuplet> &tgs,
+        std::vector<hum::HTp> &layerdata, int startindex);
     void addMidiTempo(vrv::ScoreDef &m_scoreDef, hum::HTp kernpart);
     void addInstrumentDefinition(vrv::StaffDef *staffdef, hum::HTp partstart);
     void addOrnamentMarkers(hum::HTp token);
@@ -317,6 +320,9 @@ protected:
     void addSystemKeyTimeChange(int startline, int endline);
     void prepareEndings(void);
     int getDirection(const string &token, const std::string &target);
+    void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
+    void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
+    void resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
