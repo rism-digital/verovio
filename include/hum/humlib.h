@@ -74,7 +74,6 @@ using std::stringstream;
 using std::to_string;
 using std::vector;
 
-#define USING_URI 1
 #ifdef USING_URI
 	#include <sys/types.h>   /* socket, connect */
 	#include <sys/socket.h>  /* socket, connect */
