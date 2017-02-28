@@ -36,14 +36,14 @@ enum AlignmentType {
     ALIGNMENT_SCOREDEF_METERSIG,
     ALIGNMENT_MEASURE_LEFT_BARLINE,
     // Justifiable
+    ALIGNMENT_GRACENOTE,
+    ALIGNMENT_CONTAINER,
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF,
     ALIGNMENT_KEYSIG,
     ALIGNMENT_MENSUR,
     ALIGNMENT_METERSIG,
     ALIGNMENT_DOT,
-    ALIGNMENT_GRACENOTE,
-    ALIGNMENT_CONTAINER,
     ALIGNMENT_FULLMEASURE,
     ALIGNMENT_FULLMEASURE2,
     ALIGNMENT_ACCID,
@@ -327,7 +327,7 @@ public:
     void SetType(AlignmentType type) { m_type = type; }
     AlignmentType GetType() const { return m_type; }
     ///@}
-    
+
     /**
      * Check if the element is of on of the types
      */
