@@ -303,7 +303,7 @@ public:
      * @name Set and get the xRel value of the alignment
      */
     ///@{
-    void SetXRel(int xRel);
+    void SetXRel(int xRel) { m_xRel = xRel; }
     int GetXRel() const { return m_xRel; }
     ///@}
 
@@ -327,6 +327,11 @@ public:
     void SetType(AlignmentType type) { m_type = type; }
     AlignmentType GetType() const { return m_type; }
     ///@}
+    
+    /**
+     * Check if the element is of on of the types
+     */
+    bool IsOfType(const std::vector<AlignmentType> &types);
 
     /**
      * Retrive the minimum left and maximum right position for the objects in an alignment.

@@ -396,8 +396,7 @@ void MeasureAligner::PushAlignmentsRight()
     for (riter = m_children.rbegin(); riter != m_children.rend(); riter++) {
         Alignment *current = dynamic_cast<Alignment *>(*riter);
         assert(current);
-
-        if ((current->GetType() == ALIGNMENT_GRACENOTE) || (current->GetType() == ALIGNMENT_CONTAINER)) {
+        if (current->IsOfType({ ALIGNMENT_GRACENOTE, ALIGNMENT_CONTAINER })) {
             if (previous) current->SetXRel(previous->GetXRel());
         }
         else {
@@ -500,7 +499,7 @@ Alignment *GraceAligner::GetAlignmentAtTime(double time, AlignmentType type)
 void GraceAligner::StackGraceElement(LayerElement *element)
 {
     // Nespresso: What else?
-    assert(element->Is(NOTE) || (element->Is(CHORD)));
+    assert(element->Is({ NOTE, CHORD }));
 
     if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
@@ -621,9 +620,9 @@ void Alignment::AddLayerElementRef(LayerElement *element)
     this->AddChild(alignmentRef);
 }
 
-void Alignment::SetXRel(int xRel)
+bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
 {
-    m_xRel = xRel;
+    return (std::find(types.begin(), types.end(), m_type) != types.end());
 }
 
 void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)

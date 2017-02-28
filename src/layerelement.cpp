@@ -233,7 +233,7 @@ int LayerElement::GetDrawingY() const
 int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type)
 {
     // It would not crash otherwise but there is not reason to call it
-    assert((this->Is(NOTE)) || (this->Is(CHORD)));
+    assert(this->Is({ NOTE, CHORD }));
 
     ArticPart *firstArticPart = NULL;
     ArticPart *lastArticPart = NULL;
@@ -285,7 +285,7 @@ void LayerElement::CenterDrawingX()
 
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPartType type)
 {
-    if ((this->Is(NOTE)) || (this->Is(CHORD))) {
+    if (this->Is({ NOTE, CHORD })) {
         if (withArtic) {
             int articY = GetDrawingArticulationTopOrBottom(STAFFREL_above, type);
             if (articY != VRV_UNSET) return articY;
@@ -318,7 +318,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPa
 
 int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, ArticPartType type)
 {
-    if ((this->Is(NOTE)) || (this->Is(CHORD))) {
+    if (this->Is({ NOTE, CHORD })) {
         if (withArtic) {
             int articY = GetDrawingArticulationTopOrBottom(STAFFREL_below, type);
             if (articY != -VRV_UNSET) return articY;
@@ -394,7 +394,7 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         return timestampAttr->GetTimestampAttrAlignmentDuration(meterUnit);
     }
     // We align all full measure element to the current time signature, even the ones that last longer than one measure
-    else if (this->Is(MREST) || this->Is(MULTIREST) || this->Is(MRPT) || this->Is(MRPT2) || this->Is(MULTIREST)) {
+    else if (this->Is({ MREST, MULTIREST, MRPT, MRPT2, MULTIREST })) {
         int meterUnit = 4;
         int meterCount = 4;
         if (meterSig && meterSig->HasUnit()) meterUnit = meterSig->GetUnit();
@@ -495,13 +495,13 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
             type = ALIGNMENT_SCOREDEF_METERSIG;
         }
     }
-    else if (this->Is(MULTIREST) || this->Is(MREST) || this->Is(MRPT)) {
+    else if (this->Is({ MULTIREST, MREST, MRPT })) {
         type = ALIGNMENT_FULLMEASURE;
     }
-    else if (this->Is(MRPT2) || this->Is(MULTIRPT)) {
+    else if (this->Is({ MRPT2, MULTIRPT })) {
         type = ALIGNMENT_FULLMEASURE2;
     }
-    else if (this->Is(BEAM) || this->Is(TUPLET)) {
+    else if (this->Is({ BEAM, TUPLET })) {
         type = ALIGNMENT_CONTAINER;
     }
     else if (this->Is(DOT)) {
@@ -516,7 +516,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
         type = ALIGNMENT_ACCID;
     }
-    else if (this->Is(ARTIC) || this->Is(ARTIC_PART) || this->Is(SYL)) {
+    else if (this->Is({ ARTIC, ARTIC_PART, SYL })) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
@@ -599,7 +599,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
         }
     }
-    else if (this->Is(CUSTOS) || this->Is(DOT)) {
+    else if (this->Is({ CUSTOS, DOT })) {
         PositionInterface *interface = dynamic_cast<PositionInterface *>(this);
         assert(interface);
         int loc = PitchInterface::CalcLoc(
@@ -690,7 +690,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int selfLeft;
     if (!this->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
-        assert(this->Is(BARLINE_ATTR_LEFT) || this->Is(BARLINE_ATTR_RIGHT));
+        assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
         // This should happen for invis barline attribute. Otherwise the BB should be set to empty with
         // Object::SetEmptyBB()
         // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());

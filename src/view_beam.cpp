@@ -120,7 +120,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             }
 
             // Skip rests
-            if ((current->Is(NOTE)) || (current->Is(CHORD))) {
+            if (current->Is({ NOTE, CHORD })) {
                 // look at the stemDir to see if we have multiple stem Dir
                 if (!params.m_hasMultipleStemDir) {
                     assert(dynamic_cast<AttStems *>(current));

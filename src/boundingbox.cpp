@@ -40,6 +40,11 @@ ClassId BoundingBox::GetClassId() const
     return BOUNDING_BOX;
 };
 
+bool BoundingBox::Is(const std::vector<ClassId> &classIds)
+{
+    return (std::find(classIds.begin(), classIds.end(), this->GetClassId()) != classIds.end());
+}
+
 void BoundingBox::UpdateContentBBoxX(int x1, int x2)
 {
     // LogDebug("CB Was: %i %i %i %i", m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2);
@@ -205,7 +210,7 @@ int BoundingBox::Intersects(FloatingPositioner *curve, int margin) const
 {
     assert(curve);
     assert(curve->GetObject());
-    assert((curve->GetObject()->Is(SLUR)) || (curve->GetObject()->Is(TIE)));
+    assert(curve->GetObject()->Is({ SLUR, TIE }));
 
     // for lisability
     Point p1 = curve->m_cuvrePoints[0];
