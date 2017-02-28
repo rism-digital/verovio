@@ -362,6 +362,9 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
         if (tuplet) {
             num = tuplet->GetNum();
             numbase = tuplet->GetNumbase();
+            // 0 is not valid in MEI anyway - just correct it silently
+            if (num == 0) num = 1;
+            if (numbase == 0) numbase = 1;
         }
         DurationInterface *duration = this->GetDurationInterface();
         assert(duration);
