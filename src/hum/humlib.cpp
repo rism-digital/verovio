@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Feb  7 00:03:54 PST 2017
+// Last Modified: Mon Feb 27 21:12:02 PST 2017
 // Filename:      /include/humlib.cpp
 // URL:           https://github.com/craigsapp/humlib/blob/master/src/humlib.cpp
 // Syntax:        C++11
@@ -1477,6 +1477,32 @@ string Convert::keyNumberToKern(int number) {
       default: return "*k[]";
    }
 }
+
+
+
+//////////////////////////////
+//
+// Convert::base7ToBase40 -- Convert a base7 value to a base-40 value
+//   (without accidentals).  Negative values are not allowed, but not
+//   checked for.
+//
+
+int Convert::base7ToBase40(int base7) {
+	int octave = base7 / 7;
+	int b7pc = base7 % 7;
+	int b40pc = 0;
+	switch (b7pc) {
+		case 0: b40pc =  0; break; // C
+		case 1: b40pc =  6; break; // D
+		case 2: b40pc = 12; break; // E
+		case 3: b40pc = 17; break; // F
+		case 4: b40pc = 23; break; // G
+		case 5: b40pc = 29; break; // A
+		case 6: b40pc = 35; break; // B
+	}
+	return octave * 40 + 2 + b40pc;
+}
+
 
 
 
@@ -8077,6 +8103,7 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 					continue;
 				}
 
+				size_t loc;
 				// check for accidentals on trills, mordents and turns.
 				if (subtok.find("t") != string::npos) {
 					// minor second trill
@@ -8138,8 +8165,119 @@ bool HumdrumFileContent::analyzeKernAccidentals(void) {
 								"mordentLowerAccidental", to_string(auxaccid));
 						dstates[rindex][auxdiatonic] = -1000 + auxaccid;
 					}
+
+				} else if ((loc = subtok.find("$")) != string::npos) {
+
+					int turndiatonic = Convert::base40ToDiatonic(b40);
+					// int turnaccid = Convert::base40ToAccidental(b40);
+					// inverted turn
+					int lowerint = 0;
+					int upperint = 0;
+					if (loc < subtok.size()-1) {
+						if (subtok[loc+1] == 's') {
+							lowerint = -5;
+						} else if (subtok[loc+1] == 'S') {
+							lowerint = -6;
+						}
+					}
+					if (loc < subtok.size()-2) {
+						if (subtok[loc+2] == 's') {
+							upperint = +5;
+						} else if (subtok[loc+2] == 'S') {
+							upperint = +6;
+						}
+					}
+					int lowerdiatonic = turndiatonic - 1;
+					// Maybe also need to check for forced accidental state...
+					int loweraccid = dstates[rindex][lowerdiatonic];
+					int lowerb40 = Convert::base7ToBase40(lowerdiatonic) + loweraccid;
+					int upperdiatonic = turndiatonic + 1;
+					// Maybe also need to check for forced accidental state...
+					int upperaccid = dstates[rindex][upperdiatonic];
+					int upperb40 = Convert::base7ToBase40(upperdiatonic) + upperaccid;
+					if (lowerint == 0) {
+						// need to calculate lower interval (but it will not appear
+						// below the inverted turn, just calculating for performance
+						// rendering.
+						lowerint = lowerb40 - b40;
+						lowerb40 = b40 + lowerint;
+					}
+					if (upperint == 0) {
+						// need to calculate upper interval (but it will not appear
+						// above the inverted turn, just calculating for performance
+						// rendering.
+						upperint = upperb40 - b40;
+						upperb40 = b40 + upperint;
+					}
+					int uacc = Convert::base40ToAccidental(b40 + upperint);
+					int bacc = Convert::base40ToAccidental(b40 + lowerint);
+					if (uacc != upperaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"turnUpperAccidental", to_string(uacc));
+						dstates[rindex][upperdiatonic] = -1000 + uacc;
+					}
+					if (bacc != loweraccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"turnLowerAccidental", to_string(bacc));
+						dstates[rindex][lowerdiatonic] = -1000 + bacc;
+					}
+
+				} else if ((loc = subtok.find("S")) != string::npos) {
+
+					int turndiatonic = Convert::base40ToDiatonic(b40);
+					// int turnaccid = Convert::base40ToAccidental(b40);
+					// regular turn
+					int lowerint = 0;
+					int upperint = 0;
+					if (loc < subtok.size()-1) {
+						if (subtok[loc+1] == 's') {
+							upperint = +5;
+						} else if (subtok[loc+1] == 'S') {
+							upperint = +6;
+						}
+					}
+					if (loc < subtok.size()-2) {
+						if (subtok[loc+2] == 's') {
+							lowerint = -5;
+						} else if (subtok[loc+2] == 'S') {
+							lowerint = -6;
+						}
+					}
+					int lowerdiatonic = turndiatonic - 1;
+					// Maybe also need to check for forced accidental state...
+					int loweraccid = dstates[rindex][lowerdiatonic];
+					int lowerb40 = Convert::base7ToBase40(lowerdiatonic) + loweraccid;
+					int upperdiatonic = turndiatonic + 1;
+					// Maybe also need to check for forced accidental state...
+					int upperaccid = dstates[rindex][upperdiatonic];
+					int upperb40 = Convert::base7ToBase40(upperdiatonic) + upperaccid;
+					if (lowerint == 0) {
+						// need to calculate lower interval (but it will not appear
+						// below the inverted turn, just calculating for performance
+						// rendering.
+						lowerint = lowerb40 - b40;
+						lowerb40 = b40 + lowerint;
+					}
+					if (upperint == 0) {
+						// need to calculate upper interval (but it will not appear
+						// above the inverted turn, just calculating for performance
+						// rendering.
+						upperint = upperb40 - b40;
+						upperb40 = b40 + upperint;
+					}
+					int uacc = Convert::base40ToAccidental(b40 + upperint);
+					int bacc = Convert::base40ToAccidental(b40 + lowerint);
+					if (uacc != upperaccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"turnUpperAccidental", to_string(uacc));
+						dstates[rindex][upperdiatonic] = -1000 + uacc;
+					}
+					if (bacc != loweraccid) {
+						infile[i].token(j)->setValue("auto", to_string(k),
+								"turnLowerAccidental", to_string(bacc));
+						dstates[rindex][lowerdiatonic] = -1000 + bacc;
+					}
 				}
-				// check for accidentals on turns here...
 
 				if (graceQ && (accid != gdstates[rindex][diatonic])) {
 					// accidental is different from the previous state so should be

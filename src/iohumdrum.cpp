@@ -5295,10 +5295,6 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
 //////////////////////////////
 //
 // HumdrumInput::addOrnaments --
-//   S = turn
-//   $ = inverted turn
-//   SS = turn centered between two notes
-//   $$ = inverted turn centered between two notes
 //   M  = mordent, majaor second for top interval
 //   m  = mordent, minor second for top interval
 //   W  = inverted mordent, major second for top interval
@@ -5307,6 +5303,13 @@ void HumdrumInput::addFermata(hum::HTp token, Object *parent)
 //   t  = trill, minor second
 //   TT  = trill, major second with wavy line after it
 //   tt  = trill, minor second with wavy line after it
+//
+//   S[Ss]?[Ss]? = turn
+//   $[Ss]?[Ss]? = inverted turn
+//
+//   These are not used anymore:
+//   SS = turn centered between two notes
+//   $$ = inverted turn centered between two notes
 //
 
 void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
@@ -5336,41 +5339,31 @@ void HumdrumInput::addOrnaments(Object *object, hum::HTp token)
 //
 // HumdrumInput::addTurn -- Add turn for note.
 //  only one of these four possibilities:
-//      S = turn
-//      $ = inverted turn
+//      S[Ss]?[Ss]? = turn
+//      $[Ss]?[Ss]? = inverted turn
+//
+//  Not used anymore:
 //      SS = turn, centered between two notes
 //      $$ = inverted turn, centered between two notes
 //
+// Assuming not in chord for now.
 //
 
 void HumdrumInput::addTurn(Object *linked, hum::HTp token)
 {
+    int subtok = 0;
     bool invertedQ = false;
-    bool centeredQ = false;
+    bool centeredQ = true; // always assuming centered for now
 
     size_t tpos;
 
-    tpos = token->find("SS");
+    tpos = token->find("$");
     if (tpos != std::string::npos) {
-        centeredQ = true;
-        tpos += 1;
+        invertedQ = true;
     }
     else {
-        tpos = token->find("$$");
-        if (tpos != std::string::npos) {
-            invertedQ = true;
-            centeredQ = true;
-            tpos += 1;
-        }
-        else {
-            tpos = token->find("$");
-            if (tpos != std::string::npos) {
-                invertedQ = true;
-            }
-            else {
-                tpos = token->find("S");
-            }
-        }
+        tpos = token->find("S");
+        invertedQ = false;
     }
     if (tpos == std::string::npos) {
         // no turn on note
@@ -5404,8 +5397,9 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
 
     if (invertedQ) {
         turn->SetForm(turnLog_FORM_inv);
-        // } else {
-        //    turn->SetForm(turnLog_FORM_norm);
+    }
+    else {
+        turn->SetForm(turnLog_FORM_norm);
     }
 
     setLocationId(turn, token);
@@ -5422,6 +5416,36 @@ void HumdrumInput::addTurn(Object *linked, hum::HTp token)
             if ((*token)[tpos + 1] == m_signifiers.below) {
                 turn->SetPlace(STAFFREL_below);
             }
+        }
+    }
+
+    // check for lower accidental on turn
+    std::string loweraccid = token->getValue("auto", to_string(subtok), "turnLowerAccidental");
+    bool hasloweraccid = loweraccid.empty() ? false : true;
+    int loweraccidval = 0;
+    if (hasloweraccid) {
+        loweraccidval = stoi(loweraccid);
+        switch (loweraccidval) {
+            case -1: turn->SetAccidlower(ACCIDENTAL_EXPLICIT_f); break;
+            case 0: turn->SetAccidlower(ACCIDENTAL_EXPLICIT_n); break;
+            case +1: turn->SetAccidlower(ACCIDENTAL_EXPLICIT_s); break;
+            case -2: turn->SetAccidlower(ACCIDENTAL_EXPLICIT_ff); break;
+            case +2: turn->SetAccidlower(ACCIDENTAL_EXPLICIT_x); break;
+        }
+    }
+
+    // check for upper accidental on turn
+    std::string upperaccid = token->getValue("auto", to_string(subtok), "turnUpperAccidental");
+    bool hasupperaccid = upperaccid.empty() ? false : true;
+    int upperaccidval = 0;
+    if (hasupperaccid) {
+        upperaccidval = stoi(upperaccid);
+        switch (upperaccidval) {
+            case -1: turn->SetAccidupper(ACCIDENTAL_EXPLICIT_f); break;
+            case 0: turn->SetAccidupper(ACCIDENTAL_EXPLICIT_n); break;
+            case +1: turn->SetAccidupper(ACCIDENTAL_EXPLICIT_s); break;
+            case -2: turn->SetAccidupper(ACCIDENTAL_EXPLICIT_ff); break;
+            case +2: turn->SetAccidupper(ACCIDENTAL_EXPLICIT_x); break;
         }
     }
 }

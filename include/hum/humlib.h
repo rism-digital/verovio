@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Sun Feb  5 04:47:37 PST 2017
+// Last Modified: Mon Feb 27 21:12:02 PST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -2384,6 +2384,7 @@ class Convert {
 		static int     transToBase40        (const string& input);
 		static int     base40IntervalToLineOfFifths(int trans);
 		static string  keyNumberToKern      (int number);
+		static int     base7ToBase40        (int base7);
 
 		// data-type specific (other than pitch/rhythm),
 		// defined in Convert-kern.cpp
