@@ -2486,7 +2486,21 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
                 processSlurs(layerdata[i]);
                 processDynamics(layerdata[i], staffindex);
                 processDirection(layerdata[i], staffindex);
+                int line = layerdata[i]->getLineIndex();
+                int field = layerdata[i]->getFieldIndex();
+                colorRest(rest, *layerdata[i], line, field);
             }
+        }
+        else if (!layerdata[i]->isNote()) {
+            // this is probably a **recip value without note or rest information
+            // so print it as a space (invisible rest).
+            Space *irest = new Space;
+            setLocationId(irest, layerdata[i]);
+            appendElement(elements, pointers, irest);
+            convertRhythm(irest, layerdata[i]);
+            processSlurs(layerdata[i]);
+            processDynamics(layerdata[i], staffindex);
+            processDirection(layerdata[i], staffindex);
         }
         else {
             // should be a note
@@ -2714,6 +2728,29 @@ void HumdrumInput::colorNote(Note *note, const std::string &token, int line, int
     for (int i = 0; i < (int)m_signifiers.mark.size(); i++) {
         if (token.find(m_signifiers.mark[i]) != string::npos) {
             note->SetColor(m_signifiers.mcolor[i]);
+            break;
+        }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::colorRest --
+//
+
+void HumdrumInput::colorRest(Rest *rest, const std::string &token, int line, int field)
+{
+    std::string spinecolor;
+    if (m_has_color_spine) {
+        spinecolor = getSpineColor(line, field);
+    }
+    if (spinecolor != "") {
+        rest->SetColor(spinecolor);
+    }
+
+    for (int i = 0; i < (int)m_signifiers.mark.size(); i++) {
+        if (token.find(m_signifiers.mark[i]) != string::npos) {
+            rest->SetColor(m_signifiers.mcolor[i]);
             break;
         }
     }

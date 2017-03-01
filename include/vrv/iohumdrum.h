@@ -314,6 +314,7 @@ protected:
     void parseSignifiers(hum::HumdrumFile &infile);
     std::string getAutoClef(hum::HTp partstart, int partnumber);
     void colorNote(vrv::Note *note, const std::string &token, int line, int field);
+    void colorRest(vrv::Rest *rest, const std::string &token, int line, int field);
     std::string getSpineColor(int line, int field);
     void checkForColorSpine(hum::HumdrumFile &infile);
     std::vector<int> analyzeMultiRest(hum::HumdrumFile &infile);
