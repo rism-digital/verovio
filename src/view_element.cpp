@@ -205,6 +205,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     if (accid->GetFunc() == accidLog_FUNC_edit) {
         center = true;
         accid->m_drawingCueSize = true;
+        y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
         if (note) {
@@ -1728,7 +1729,7 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
     data_PLACE place = fermatapresent->GetFermata();
 
     // First case, notes
-    if ((element->Is(NOTE)) || (element->Is(CHORD))) {
+    if (element->Is({ NOTE, CHORD })) {
         if (place == PLACE_above) {
             // check if the notehead is in the staff.
             int top = element->GetDrawingTop(m_doc, staff->m_drawingStaffSize, true, ARTIC_PART_OUTSIDE);
@@ -1759,7 +1760,7 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
             DrawSmuflCode(dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false);
         }
     }
-    else if ((element->Is(REST)) || (element->Is(MREST))) {
+    else if (element->Is({ REST, MREST })) {
         if (place == PLACE_above) {
             y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             DrawSmuflCode(dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);
@@ -2067,7 +2068,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
 
     // cast to note is check when setting drawingCueSize value
     if (drawingCueSize) {
-        assert(object->Is(NOTE) || object->Is(CHORD));
+        assert(object->Is({ NOTE, CHORD }));
         AttGraced *attGraced = dynamic_cast<AttGraced *>(object);
         assert(attGraced);
         if (attGraced->GetGrace() == GRACE_unacc) DrawAcciaccaturaSlash(dc, object);

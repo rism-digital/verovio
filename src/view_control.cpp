@@ -127,7 +127,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if ((element->Is(SLUR)) || (element->Is(HAIRPIN)) || (element->Is(OCTAVE)) || (element->Is(TIE))) return;
+            if (element->Is({ SLUR, HAIRPIN, OCTAVE, TIE })) return;
         }
     }
 
