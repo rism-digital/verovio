@@ -180,7 +180,12 @@ public:
     char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
     char above = '\0'; // !!!RDF**kern: i = above (previous signifier is "above")
 
-    // coloring of notes (add rests later):
+	string space_color; // !!!RDF**kern: show spaces color=hotpink
+	string ispace_color; // !!!RDF**kern: show invisible rests color=chartreuse
+	string irest_color; // !!!RDF**kern: show implicit spaces color=blueviolet
+	string rspace_color; // !!!RDF**kern: show recip spaces color=royalblue
+
+    // coloring of notes
     // !!!RDF**kern: i = marked note, color="#553325"
     // !!!RDF**kern: i = matched note, color=red
     // !!!RDF**kern: i = color="blue"
@@ -189,7 +194,10 @@ public:
     // !!!RDF**kern: i = marked note
     std::vector<char> mark;
     std::vector<std::string> mcolor;
+
 };
+
+
 
 #endif /* NO_HUMDRUM_SUPPORT */
 

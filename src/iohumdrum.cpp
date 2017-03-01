@@ -2468,7 +2468,8 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             processDirection(layerdata[i], staffindex);
         }
         else if (layerdata[i]->isRest()) {
-            if (layerdata[i]->find("yy") != string::npos) {
+            if ((layerdata[i]->find("yy") != string::npos) && m_signifiers.irest_color.empty()
+                && m_signifiers.space_color.empty()) {
                 // Invisible rest (or note which should be invisible.
                 Space *irest = new Space;
                 setLocationId(irest, layerdata[i]);
@@ -2494,13 +2495,29 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         else if (!layerdata[i]->isNote()) {
             // this is probably a **recip value without note or rest information
             // so print it as a space (invisible rest).
-            Space *irest = new Space;
-            setLocationId(irest, layerdata[i]);
-            appendElement(elements, pointers, irest);
-            convertRhythm(irest, layerdata[i]);
-            processSlurs(layerdata[i]);
-            processDynamics(layerdata[i], staffindex);
-            processDirection(layerdata[i], staffindex);
+            if ((!m_signifiers.rspace_color.empty()) || (!m_signifiers.space_color.empty())) {
+                // This should be invisible but someone wants it visible
+                // and colored.
+                Rest *rest = new Rest;
+                setLocationId(rest, layerdata[i]);
+                appendElement(elements, pointers, rest);
+                convertRest(rest, layerdata[i]);
+                processSlurs(layerdata[i]);
+                processDynamics(layerdata[i], staffindex);
+                processDirection(layerdata[i], staffindex);
+                int line = layerdata[i]->getLineIndex();
+                int field = layerdata[i]->getFieldIndex();
+                colorRest(rest, *layerdata[i], line, field);
+            }
+            else {
+                Space *irest = new Space;
+                setLocationId(irest, layerdata[i]);
+                appendElement(elements, pointers, irest);
+                convertRhythm(irest, layerdata[i]);
+                processSlurs(layerdata[i]);
+                processDynamics(layerdata[i], staffindex);
+                processDirection(layerdata[i], staffindex);
+            }
         }
         else {
             // should be a note
@@ -2741,7 +2758,7 @@ void HumdrumInput::colorNote(Note *note, const std::string &token, int line, int
 void HumdrumInput::colorRest(Rest *rest, const std::string &token, int line, int field)
 {
     std::string spinecolor;
-    if (m_has_color_spine) {
+    if (m_has_color_spine && (line >= 0) && (field >= 0)) {
         spinecolor = getSpineColor(line, field);
     }
     if (spinecolor != "") {
@@ -2752,6 +2769,33 @@ void HumdrumInput::colorRest(Rest *rest, const std::string &token, int line, int
         if (token.find(m_signifiers.mark[i]) != string::npos) {
             rest->SetColor(m_signifiers.mcolor[i]);
             break;
+        }
+    }
+    if (token.find("yy") != std::string::npos) {
+        // invisible rest that was probably sent here specifically be colored
+        if (!m_signifiers.irest_color.empty()) {
+            rest->SetColor(m_signifiers.irest_color);
+        }
+        else if (!m_signifiers.space_color.empty()) {
+            rest->SetColor(m_signifiers.space_color);
+        }
+    }
+    else if (token == "") {
+        // implicit space that should be colored as a rest
+        if (!m_signifiers.ispace_color.empty()) {
+            rest->SetColor(m_signifiers.ispace_color);
+        }
+        else if (!m_signifiers.space_color.empty()) {
+            rest->SetColor(m_signifiers.space_color);
+        }
+    }
+    else if (token.find("r") == std::string::npos) {
+        // explicit space that should be colored as a rest
+        if (!m_signifiers.rspace_color.empty()) {
+            rest->SetColor(m_signifiers.rspace_color);
+        }
+        else if (!m_signifiers.space_color.empty()) {
+            rest->SetColor(m_signifiers.space_color);
         }
     }
 }
@@ -2819,10 +2863,32 @@ void HumdrumInput::addOrnamentMarkers(hum::HTp token)
 
 void HumdrumInput::addSpace(std::vector<string> &elements, std::vector<void *> &pointers, hum::HumNum duration)
 {
+
+    bool visible = false;
+    if ((!m_signifiers.ispace_color.empty()) || (!m_signifiers.space_color.empty())) {
+        visible = true;
+    }
+
     while (duration > 0) {
-        Space *space = new Space;
-        appendElement(elements, pointers, space);
-        duration -= setDuration(space, duration);
+        if (visible) {
+            Rest *rest = new Rest;
+            // setLocationId(rest, layerdata[i]);
+            // convertRest(rest, layerdata[i]);
+            // processSlurs(layerdata[i]);
+            // processDynamics(layerdata[i], staffindex);
+            // processDirection(layerdata[i], staffindex);
+            // int line = layerdata[i]->getLineIndex();
+            // int field = layerdata[i]->getFieldIndex();
+            // colorRest(rest, "", line, field);
+            colorRest(rest, "", -1, -1);
+            appendElement(elements, pointers, rest);
+            duration -= setDuration(rest, duration);
+        }
+        else {
+            Space *space = new Space;
+            appendElement(elements, pointers, space);
+            duration -= setDuration(space, duration);
+        }
     }
 }
 
@@ -6767,8 +6833,48 @@ void HumdrumInput::parseSignifiers(hum::HumdrumFile &infile)
             continue;
         }
         std::string value = refs[i]->getReferenceValue();
-        auto equals = value.find('=');
+        auto equals = value.substr(0, 8).find('=');
         if (equals == string::npos) {
+            // meta signifiers (no actual signifier)
+
+            // colored spaces (meta signifiers)
+            // !!!RDF**kern: show spaces color=hotpink
+            // !!!RDF**kern: show invisible rests color=chartreuse
+            // !!!RDF**kern: show implicit spaces color=purple
+            // !!!RDF**kern: show recip spaces color=royalblue
+            if (value.find("show space") != string::npos) {
+                if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
+                    m_signifiers.space_color = hre.getMatch(1);
+                }
+                else {
+                    m_signifiers.space_color = "hotpink";
+                }
+            }
+            if (value.find("show invisible rest") != string::npos) {
+                if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
+                    m_signifiers.irest_color = hre.getMatch(1);
+                }
+                else {
+                    m_signifiers.irest_color = "chartreuse";
+                }
+            }
+            if (value.find("show implicit space") != string::npos) {
+                if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
+                    m_signifiers.ispace_color = hre.getMatch(1);
+                }
+                else {
+                    m_signifiers.ispace_color = "blueviolet";
+                }
+            }
+            if (value.find("show recip space") != string::npos) {
+                if (hre.search(value, "color\\s*=\\s*\"?([^\"\\s]+)\"?")) {
+                    m_signifiers.rspace_color = hre.getMatch(1);
+                }
+                else {
+                    m_signifiers.rspace_color = "royalblue";
+                }
+            }
+
             continue;
         }
         char signifier = 0;
