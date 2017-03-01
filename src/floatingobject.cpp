@@ -240,7 +240,7 @@ void FloatingPositioner::UpdateCurvePosition(
 int FloatingPositioner::CalcXMinMaxY(const Point points[4])
 {
     assert(this->GetObject());
-    assert((this->GetObject()->Is(SLUR)) || (this->GetObject()->Is(TIE)));
+    assert(this->GetObject()->Is({ SLUR, TIE }));
     assert(m_cuvreDir != curvature_CURVEDIR_NONE);
 
     if (m_cuvreXMinMaxY != -1) return m_cuvreXMinMaxY;
@@ -295,7 +295,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             assert(curve->m_object);
         }
         if (this->m_place == STAFFREL_above) {
-            if (curve && ((curve->m_object->Is(SLUR)) || (curve->m_object->Is(TIE)))) {
+            if (curve && curve->m_object->Is({ SLUR, TIE })) {
                 int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -309,7 +309,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             this->SetDrawingYRel(yRel);
         }
         else {
-            if (curve && ((curve->m_object->Is(SLUR)) || (curve->m_object->Is(TIE)))) {
+            if (curve && curve->m_object->Is({ SLUR, TIE })) {
                 int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);

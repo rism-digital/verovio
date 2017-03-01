@@ -28,6 +28,7 @@ public:
     virtual ~BoundingBox(){};
     virtual ClassId GetClassId() const;
     bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
+    bool Is(const std::vector<ClassId> &classIds);
 
     virtual void UpdateContentBBoxX(int x1, int x2);
     virtual void UpdateContentBBoxY(int y1, int y2);

@@ -479,7 +479,11 @@ void Doc::CastOffDoc()
 
     // Reset the scoreDef at the beginning of each system
     this->CollectScoreDefs(true);
+
+    // Here we redo the alignment because of the new scoreDefs
+    // We can actually optimise this and have a custom version that does not redo all the calculation
     contentPage->LayOutHorizontally();
+
     contentPage->LayOutVertically();
 
     // Detach the contentPage

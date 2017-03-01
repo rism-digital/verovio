@@ -36,14 +36,14 @@ enum AlignmentType {
     ALIGNMENT_SCOREDEF_METERSIG,
     ALIGNMENT_MEASURE_LEFT_BARLINE,
     // Justifiable
+    ALIGNMENT_GRACENOTE,
+    ALIGNMENT_CONTAINER,
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF,
     ALIGNMENT_KEYSIG,
     ALIGNMENT_MENSUR,
     ALIGNMENT_METERSIG,
     ALIGNMENT_DOT,
-    ALIGNMENT_GRACENOTE,
-    ALIGNMENT_CONTAINER,
     ALIGNMENT_FULLMEASURE,
     ALIGNMENT_FULLMEASURE2,
     ALIGNMENT_ACCID,
@@ -303,7 +303,7 @@ public:
      * @name Set and get the xRel value of the alignment
      */
     ///@{
-    void SetXRel(int xRel);
+    void SetXRel(int xRel) { m_xRel = xRel; }
     int GetXRel() const { return m_xRel; }
     ///@}
 
@@ -327,6 +327,11 @@ public:
     void SetType(AlignmentType type) { m_type = type; }
     AlignmentType GetType() const { return m_type; }
     ///@}
+
+    /**
+     * Check if the element is of on of the types
+     */
+    bool IsOfType(const std::vector<AlignmentType> &types);
 
     /**
      * Retrive the minimum left and maximum right position for the objects in an alignment.
@@ -592,6 +597,18 @@ public:
      * Called from Measure::AdjustSylSpacingEnd.
      */
     void AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments);
+
+    /**
+     * Push all the ALIGNMENT_GRACENOTE and ALIGNMENT_CONTAINER to the right.
+     * This is necessary to make sure they align with the next alignment content.
+     */
+    void PushAlignmentsRight();
+
+    /**
+     * Adjust the spacing for the grace note group(s) of the alignment on staffN
+     * The alignment need to be of ALIGNMENT_GRACENOTE type
+     */
+    void AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int staffN);
 
     //----------//
     // Functors //

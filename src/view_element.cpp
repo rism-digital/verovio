@@ -1094,7 +1094,7 @@ void View::DrawMRest(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // move it down according to the number of line in the staff
     y -= staff->m_drawingLines / 2 * m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize)
         - m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
-    
+
     if (measure->m_measureAligner.GetMaxTime() >= (DUR_MAX * 2)) {
         y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
         DrawRestBreve(dc, mRest->GetDrawingX(), y, staff);
@@ -1486,7 +1486,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     bool drawingCueSize = rest->IsCueSize();
     int drawingDur = rest->GetActualDur();
-    
+
     int x = element->GetDrawingX();
     int y = element->GetDrawingY();
 
@@ -1496,7 +1496,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // 2);
     // element->m_drawingStemEnd.y = element->GetDrawingY();
     // element->m_drawingStemStart.y = element->GetDrawingY();
-    
+
     if (drawingDur > DUR_2) {
         x -= m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, drawingCueSize) / 2;
     }
@@ -1661,10 +1661,10 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     int positionShiftX2 = positionShift * 3;
     int positionShiftY2 = positionShift * 6;
     Point startPoint = stemInterface->GetDrawingStemStart();
-    
+
     int startPointY = startPoint.y;
     if (element->Is(CHORD)) {
-        Chord *chord = dynamic_cast<Chord*>(element);
+        Chord *chord = dynamic_cast<Chord *>(element);
         assert(chord);
         int yMin, yMax;
         chord->GetYExtremes(&yMin, &yMax);
@@ -1728,7 +1728,7 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
     data_PLACE place = fermatapresent->GetFermata();
 
     // First case, notes
-    if ((element->Is(NOTE)) || (element->Is(CHORD))) {
+    if (element->Is({ NOTE, CHORD })) {
         if (place == PLACE_above) {
             // check if the notehead is in the staff.
             int top = element->GetDrawingTop(m_doc, staff->m_drawingStaffSize, true, ARTIC_PART_OUTSIDE);
@@ -1759,7 +1759,7 @@ void View::DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *laye
             DrawSmuflCode(dc, x, y, SMUFL_E4C1_fermataBelow, staff->m_drawingStaffSize, false);
         }
     }
-    else if ((element->Is(REST)) || (element->Is(MREST))) {
+    else if (element->Is({ REST, MREST })) {
         if (place == PLACE_above) {
             y = staff->GetDrawingY() + m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
             DrawSmuflCode(dc, x, y, SMUFL_E4C0_fermataAbove, staff->m_drawingStaffSize, false);
@@ -2067,7 +2067,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
 
     // cast to note is check when setting drawingCueSize value
     if (drawingCueSize) {
-        assert(object->Is(NOTE) || object->Is(CHORD));
+        assert(object->Is({ NOTE, CHORD }));
         AttGraced *attGraced = dynamic_cast<AttGraced *>(object);
         assert(attGraced);
         if (attGraced->GetGrace() == GRACE_unacc) DrawAcciaccaturaSlash(dc, object);
