@@ -205,6 +205,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     if (accid->GetFunc() == accidLog_FUNC_edit) {
         center = true;
         accid->m_drawingCueSize = true;
+        y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
         if (note) {
