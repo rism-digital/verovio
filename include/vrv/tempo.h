@@ -28,6 +28,7 @@ class Tempo : public ControlElement,
               public TextDirInterface,
               public TimePointInterface,
               public AttLang,
+              public AttMmtempo,
               public AttMiditempo {
 public:
     /**
