@@ -316,6 +316,7 @@ void MusicXmlInput::CloseTie(Staff *staff, Layer *layer, Note *note, bool isClos
 
 void MusicXmlInput::OpenSlur(Staff *staff, Layer *layer, int number, Slur *slur)
 {
+    // No staff is set as slurs can appear across staves
     slur->SetStartid(m_ID);
     musicxml::OpenSlur openSlur(staff->GetN(), layer->GetN(), number);
     m_slurStack.push_back(std::make_pair(slur, openSlur));
@@ -370,13 +371,12 @@ void MusicXmlInput::TextRendition(pugi::xpath_node_set words, ControlElement *el
 void MusicXmlInput::PrintMetronome(pugi::xml_node metronome, Tempo *tempo)
 {
     std::string mm = GetContent(metronome.select_single_node("per-minute").node());
-    // att.mmtempo has yet to be implemented
-    // if (atoi(mm.c_str())) tempo->SetMm(atoi(mm.c_str()));
+    if (atoi(mm.c_str())) tempo->SetMm(mm.c_str());
     if (metronome.select_single_node("beat-unit").node()) {
-        // tempo->SetMmUnit(ConvertTypeToDur(GetContent(metronome.select_single_node("beat-unit").node())));
+        tempo->SetMmUnit(ConvertTypeToDur(GetContent(metronome.select_single_node("beat-unit").node())));
     }
     if (metronome.select_single_node("beat-unit-dot")) {
-        // tempo->SetMmDots((int)metronome.select_nodes("beat-unit-dot").size());
+        tempo->SetMmDots((int)metronome.select_nodes("beat-unit-dot").size());
     }
     Text *text = new Text();
     text->SetText(UTF8to16(StringFormat("M.M. = %s", mm.c_str())));
@@ -1017,10 +1017,11 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
             if (!lang.empty()) tempo->SetLang(lang.c_str());
         }
         if (!placeStr.empty()) tempo->SetPlace(tempo->AttPlacement::StrToStaffrel(placeStr.c_str()));
-        int midiTempo = atoi(GetAttributeValue(node.select_single_node("sound").node(), "tempo").c_str());
-        if (midiTempo) tempo->SetMidiBpm(midiTempo);
         if (words.size() != 0) TextRendition(words, tempo);
-        if (metronome) PrintMetronome(metronome.node(), tempo);
+        if (metronome)
+            PrintMetronome(metronome.node(), tempo);
+        else
+            tempo->SetMidiBpm(atoi(GetAttributeValue(node.select_single_node("sound").node(), "tempo").c_str()));
         m_controlElements.push_back(std::make_pair(measureNum, tempo));
         m_tempoStack.push_back(tempo);
     }
@@ -1544,6 +1545,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     }
 
     // slur
+    // cross staff slurs won't work
     pugi::xpath_node_set slurs = notations.node().select_nodes("slur");
     for (pugi::xpath_node_set::const_iterator it = slurs.begin(); it != slurs.end(); ++it) {
         pugi::xml_node slur = it->node();
@@ -1646,6 +1648,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         std::vector<std::pair<Hairpin *, musicxml::OpenHairpin> >::iterator iter;
         for (iter = m_hairpinStack.begin(); iter != m_hairpinStack.end(); iter++) {
             if (!iter->first->HasStartid()) {
+                iter->first->SetStaff(staff->Att::StrToXsdPositiveIntegerList(std::to_string(staff->GetN())));
                 iter->first->SetStartid(m_ID);
             }
             iter->second.m_endID = m_ID;
