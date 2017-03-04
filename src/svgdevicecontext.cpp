@@ -755,12 +755,12 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         // SetBrush(AxWHITE, AxTRANSPARENT);
         StartGraphic(object, "self-bounding-box", "0");
         if (object->HasSelfBB()) {
-            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->m_selfBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + box->m_selfBB_y1),
-                view->ToDeviceContextX(object->GetDrawingX() + box->m_selfBB_x2)
-                    - view->ToDeviceContextX(object->GetDrawingX() + box->m_selfBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + box->m_selfBB_y2)
-                    - view->ToDeviceContextY(object->GetDrawingY() + box->m_selfBB_y1));
+            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
+                view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()),
+                view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX2())
+                    - view->ToDeviceContextX(object->GetDrawingX() + box->GetSelfX1()),
+                view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY2())
+                    - view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()));
         }
 
         EndGraphic(object, NULL);
@@ -768,12 +768,12 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
         SetPen(AxBLUE, 10, AxDOT_DASH);
         StartGraphic(object, "content-bounding-box", "0");
         if (object->HasContentBB()) {
-            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->m_contentBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + box->m_contentBB_y1),
-                view->ToDeviceContextX(object->GetDrawingX() + box->m_contentBB_x2)
-                    - view->ToDeviceContextX(object->GetDrawingX() + box->m_contentBB_x1),
-                view->ToDeviceContextY(object->GetDrawingY() + box->m_contentBB_y2)
-                    - view->ToDeviceContextY(object->GetDrawingY() + box->m_contentBB_y1));
+            this->DrawRectangle(view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
+                view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()),
+                view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX2())
+                    - view->ToDeviceContextX(object->GetDrawingX() + box->GetContentX1()),
+                view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY2())
+                    - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
         }
         EndGraphic(object, NULL);
 

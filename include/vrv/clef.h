@@ -45,7 +45,7 @@ public:
     /**
      * Return the offset of the clef
      */
-    int GetClefOffset() const;
+    int GetClefLocOffset() const;
 
     /**
      * Return a clef id based on the various parameters

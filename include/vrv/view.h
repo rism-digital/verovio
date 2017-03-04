@@ -141,8 +141,7 @@ public:
      * Defined in view_element.cpp
      */
     ///@{
-    int CalculatePitchPosY(Staff *staff, data_PITCHNAME pname, int dec_clef, int oct);
-    int CalculateRestPosY(Staff *staff, char duration, bool hasMultipleLayer, bool isFirstLayer);
+    int CalculateRestPosY(Staff *staff, char duration, int location, bool hasMultipleLayer, bool isFirstLayer);
     int CalculatePitchCode(Layer *layer, int y_n, int x_pos, int *octave);
     ///@}
 
@@ -257,12 +256,12 @@ protected:
     ///@{
     void DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element);
     void DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff);
-    void DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure);
+    void DrawFermataAttr(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
     void DrawLedgerLines(
         DeviceContext *dc, LayerElement *element, Staff *staff, bool aboveStaff, bool doubleLength, int skip, int n);
     void DrawLigatureNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff);
     void DrawMeterSigFigures(DeviceContext *dc, int x, int y, int num, int numBase, Staff *staff);
-    void DrawMRptPart(DeviceContext *dc, int x, wchar_t smulfCode, int num, bool line, Staff *staff, Measure *measure);
+    void DrawMRptPart(DeviceContext *dc, int xCentered, wchar_t smulfCode, int num, bool line, Staff *staff);
     void DrawRestBreve(DeviceContext *dc, int x, int y, Staff *staff);
     void DrawRestLong(DeviceContext *dc, int x, int y, Staff *staff);
     void DrawRestQuarter(DeviceContext *dc, int x, int y, int valeur, unsigned char dots, bool cueSize, Staff *staff);
@@ -415,7 +414,7 @@ private:
     std::wstring IntToTimeSigFigures(unsigned short number);
     std::wstring IntToSmuflFigures(unsigned short number, int offset);
     bool OneBeamInTuplet(Tuplet *tuplet);
-    int GetSylY(Syl *syl, Staff *staff);
+    int GetSylYRel(Syl *syl, Staff *staff);
     ///@}
 
     /**

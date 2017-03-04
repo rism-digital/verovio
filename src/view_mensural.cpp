@@ -190,8 +190,9 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
             xAccid -= 1.5 * m_doc->GetGlyphWidth(SMUFL_E262_accidentalSharp, staffSize, false);
         }
 
-        accid->SetDrawingX(xAccid);
-        accid->SetDrawingY(noteY);
+        assert(false);
+        // accid->SetDrawingX(xAccid);
+        // accid->SetDrawingY(noteY);
     }
 
     DrawLayerChildren(dc, note, layer, staff, measure);
@@ -336,7 +337,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     interface->SetDrawingStemDir(dir);
 
     // cast to note is check when setting drawingCueSize value
-    if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_acc)) {
+    if (drawingCueSize && ((dynamic_cast<Note *>(object))->GetGrace() == GRACE_unacc)) {
         DrawAcciaccaturaSlash(dc, object);
     }
 }

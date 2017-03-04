@@ -33,6 +33,8 @@ Chord::Chord()
     , StemmedDrawingInterface()
     , DurationInterface()
     , AttCommon()
+    , AttGraced()
+    , AttRelativesize()
     , AttStems()
     , AttStemsCmn()
     , AttTiepresent()
@@ -40,6 +42,8 @@ Chord::Chord()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_GRACED);
+    RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -63,6 +67,8 @@ void Chord::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetCommon();
+    ResetGraced();
+    ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();
@@ -166,6 +172,7 @@ void Chord::FilterList(ListOfObjects *childList)
                 lastNote->m_cluster = curCluster;
                 lastNote->m_clusterPosition = (int)curCluster->size();
             }
+            assert(curCluster);
             curCluster->push_back(curNote);
             curNote->m_cluster = curCluster;
             curNote->m_clusterPosition = (int)curCluster->size();

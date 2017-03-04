@@ -64,6 +64,19 @@ public:
     void AddTimestamp(TimestampAttr *timestampAttr);
 
     /**
+     * Get the X drawing position
+     */
+    virtual int GetDrawingX() const;
+
+    /**
+     * @name Get and set the X drawing relative positions
+     */
+    ///@{
+    int GetDrawingXRel() const { return m_drawingXRel; }
+    void SetDrawingXRel(int drawingXRel);
+    ///@}
+
+    /**
      * Return the index position of the measure in its system parent
      */
     int GetMeasureIdx() const { return Object::GetIdx(); }
@@ -101,8 +114,6 @@ public:
     BarLine *const GetRightBarLine() { return &m_rightBarLine; }
     ///@}
 
-    // int GetXRel() const;
-
     /**
      * Return the non-justifiable left margin for the measure
      */
@@ -113,17 +124,27 @@ public:
      */
     ///@{
     int GetLeftBarLineXRel() const;
-    int GetLeftBarLineX1Rel() const;
-    int GetLeftBarLineX2Rel() const;
+    int GetLeftBarLineLeft() const;
+    int GetLeftBarLineRight() const;
     int GetRightBarLineXRel() const;
-    int GetRightBarLineX1Rel() const;
-    int GetRightBarLineX2Rel() const;
+    int GetRightBarLineLeft() const;
+    int GetRightBarLineRight() const;
     ///@}
 
     /**
      * Return the width of the measure, including the barLine width
      */
     int GetWidth() const;
+
+    /**
+     * Return the inner width of the measure
+     */
+    int GetInnerWidth() const;
+
+    /**
+     * Return the center x of the inner of the measure
+     */
+    int GetInnerCenterX() const;
 
     /**
      * @name Setter and getter of the drawing scoreDef
@@ -185,27 +206,24 @@ public:
     virtual int AlignVertically(FunctorParams *functorParams);
 
     /**
-     * See Object::IntegrateBoundingBoxGraceXShift
-     */
-    virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams);
-
-    /**
-     * See Object::IntegrateBoundingBoxXShift
-     */
-    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams);
-
-    /**
      * See Object::SetAlignmentXPos
      */
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
 
     /**
-     * See Object::SetBoundingBoxXShift
+     * See Object::AdjustGraceXPos
      */
-    ///@{
-    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
-    ///@}
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustXPos
+     */
+    virtual int AdjustXPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustSylSpacing
+     */
+    virtual int AdjustSylSpacingEnd(FunctorParams *functorParams);
 
     /**
      * See Object::AlignMeasures
@@ -228,11 +246,6 @@ public:
     virtual int CastOffEncoding(FunctorParams *functorParams);
 
     /**
-     * See Object::SetDrawingXY
-     */
-    virtual int SetDrawingXY(FunctorParams *functorParams);
-
-    /**
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
@@ -241,6 +254,11 @@ public:
      * See Object::FillStaffCurrentTimeSpanningEnd
      */
     virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareCrossStaff
+     */
+    virtual int PrepareCrossStaff(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareFloatingGrps

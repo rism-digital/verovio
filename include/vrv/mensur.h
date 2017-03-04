@@ -28,6 +28,7 @@ class Mensur : public LayerElement,
                public AttMensuralShared,
                public AttMensurLog,
                public AttMensurVis,
+               public AttRelativesize,
                public AttSlashcount {
 public:
     /**

@@ -1,11 +1,11 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        mordent.cpp
+// Name:        expansion.cpp
 // Author:      Klaus Rettinghaus
-// Created:     2017
+// Created:     22/02/2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#include "mordent.h"
+#include "expansion.h"
 
 //----------------------------------------------------------------------------
 
@@ -13,42 +13,35 @@
 
 //----------------------------------------------------------------------------
 
-#include "aligner.h"
-
 namespace vrv {
 
 //----------------------------------------------------------------------------
-// Mordent
+// Expansion
 //----------------------------------------------------------------------------
 
-Mordent::Mordent()
-    : ControlElement("mordent-"), TimePointInterface(), AttColor(), AttOrnamentaccid(), AttPlacement(), AttMordentLog()
+Expansion::Expansion() : SystemElement("expansion-"), AttCommon(), AttPlist()
 {
-    RegisterInterface(TimePointInterface::GetAttClasses(), TimePointInterface::IsInterface());
-    RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_ORNAMENTACCID);
-    RegisterAttClass(ATT_PLACEMENT);
-    RegisterAttClass(ATT_MORDENTLOG);
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_PLIST);
 
     Reset();
 }
 
-Mordent::~Mordent()
+Expansion::~Expansion()
 {
 }
 
-void Mordent::Reset()
+void Expansion::Reset()
 {
-    ControlElement::Reset();
-    TimePointInterface::Reset();
-    ResetColor();
-    ResetOrnamentaccid();
-    ResetPlacement();
-    ResetMordentLog();
+    SystemElement::Reset();
+    ResetCommon();
+    ResetCommonPart();
+    ResetPlist();
 }
 
 //----------------------------------------------------------------------------
-// Mordent functor methods
+// Expansion functor methods
 //----------------------------------------------------------------------------
 
 } // namespace vrv

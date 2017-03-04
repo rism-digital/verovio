@@ -140,6 +140,11 @@ public:
     StaffDef *GetStaffDef(int n);
 
     /**
+     * Return all the @n values of the staffDef in a scoreDef
+     */
+    std::vector<int> GetStaffNs();
+
+    /**
      * Set the redraw flag to all staffDefs.
      * This is necessary at the beginning or when a scoreDef occurs.
      * Only true flags are applied, unless applyToAll is set to true.
@@ -266,6 +271,7 @@ class StaffDef : public ScoreDefElement,
                  public StaffDefDrawingInterface,
                  public AttCommon,
                  public AttCommonPart,
+                 public AttDistances,
                  public AttLabelsAddl,
                  public AttNotationtype,
                  public AttScalable,

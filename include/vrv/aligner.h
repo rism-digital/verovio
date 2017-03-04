@@ -8,6 +8,7 @@
 #ifndef __VRV_ALIGNER_H__
 #define __VRV_ALIGNER_H__
 
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -35,16 +36,16 @@ enum AlignmentType {
     ALIGNMENT_SCOREDEF_METERSIG,
     ALIGNMENT_MEASURE_LEFT_BARLINE,
     // Justifiable
+    ALIGNMENT_FULLMEASURE,
+    ALIGNMENT_FULLMEASURE2,
+    ALIGNMENT_GRACENOTE,
+    ALIGNMENT_CONTAINER,
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF,
     ALIGNMENT_KEYSIG,
     ALIGNMENT_MENSUR,
     ALIGNMENT_METERSIG,
     ALIGNMENT_DOT,
-    ALIGNMENT_GRACENOTE,
-    ALIGNMENT_CONTAINER,
-    ALIGNMENT_FULLMEASURE,
-    ALIGNMENT_FULLMEASURE2,
     ALIGNMENT_ACCID,
     ALIGNMENT_DEFAULT,
     // Non-justifiable
@@ -150,7 +151,7 @@ public:
     /**
      * Retrieves or creates the FloatingPositioner for the FloatingObject on this staff.
      */
-    void SetCurrentFloatingPositioner(FloatingObject *object, int x, int y);
+    void SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY);
 
     /**
      * @name Setter and getter of the staff from which the alignment is created alignment.
@@ -293,14 +294,18 @@ public:
     virtual ClassId GetClassId() const { return ALIGNMENT; }
     ///@}
 
-    void SetXRel(int x_rel);
+    /**
+     * Override the method of adding AlignmentReference children
+     */
+    virtual void AddChild(Object *object);
+
+    /**
+     * @name Set and get the xRel value of the alignment
+     */
+    ///@{
+    void SetXRel(int xRel) { m_xRel = xRel; }
     int GetXRel() const { return m_xRel; }
-
-    void SetXShift(int xShift);
-    int GetXShift() const { return m_xShift; }
-
-    void SetMaxWidth(int maxWidth);
-    int GetMaxWidth() const { return m_maxWidth; }
+    ///@}
 
     /**
      * @name Set and get the time value of the alignment
@@ -324,6 +329,18 @@ public:
     ///@}
 
     /**
+     * Check if the element is of on of the types
+     */
+    bool IsOfType(const std::vector<AlignmentType> &types);
+
+    /**
+     * Retrive the minimum left and maximum right position for the objects in an alignment.
+     * Returns (-)VRV_UNSET in nothing for the staff specified.
+     * Uses Object::GetAlignmentLeftRight
+     */
+    void GetLeftRight(int staffN, int &minLeft, int &maxRight);
+
+    /**
      * Returns the GraceAligner for the Alignment.
      * Create it if necessary.
      */
@@ -334,24 +351,27 @@ public:
      */
     bool HasGraceAligner() const { return (m_graceAligner != NULL); }
 
+    /**
+     * Compute "ideal" horizontal space to allow for a given time interval, ignoring the need
+     * to keep consecutive symbols from overlapping or nearly overlapping: we assume spacing
+     * will be increased as necessary later to avoid that. For modern notation (CMN), ideal space
+     * is a function of time interval.
+
+     * For a discussion of the way engravers determine spacing, see Elaine Gould, _Behind Bars_,
+     * p. 39. But we need something more flexible, because, for example: (1) We're interested in
+     * music with notes of very long duration: say, music in mensural notation containing longas
+     * or maximas; such music is usually not spaced by duration, but we support spacing by
+     * duration if the user wishes, and standard engravers' rules would waste a lot of space.
+     * (2) For some purposes, spacing strictly proportional to duration is desirable. The most
+     * flexible solution might be to get ideal spacing from a user-definable table, but using a
+     * formula with parameters can come close and has other advantages.
+     */
     virtual int HorizontalSpaceForDuration(
         double intervalTime, int maxActualDur, double spacingLinear, double spacingNonLinear);
 
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * Correct the X alignment of grace notes once the content of a system has been aligned and laid out.
-     * Special case that redirects the functor to the GraceAligner.
-     */
-    virtual int IntegrateBoundingBoxGraceXShift(FunctorParams *functorParams);
-
-    /**
-     * Correct the X alignment once the content of a system has been aligned and laid out.
-     * Special case of functor redirected from Measure.
-     */
-    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams);
 
     /**
      * Set the position of the Alignment.
@@ -366,12 +386,19 @@ public:
     virtual int JustifyX(FunctorParams *functorParams);
 
     /**
-     * Lay out the X positions of the staff content looking that the bounding boxes.
-     * The m_xShift is updated appropriately
+     * See Object::AdjustGraceXPos
      */
     ///@{
-    virtual int SetBoundingBoxXShift(FunctorParams *functorParams);
-    virtual int SetBoundingBoxXShiftEnd(FunctorParams *functorParams);
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+    virtual int AdjustGraceXPosEnd(FunctorParams *functorParams);
+    ///@}
+
+    /**
+     * See Object::AdjustXPos
+     */
+    ///@{
+    virtual int AdjustXPos(FunctorParams *functorParams);
+    virtual int AdjustXPosEnd(FunctorParams *functorParams);
     ///@}
 
 private:
@@ -386,18 +413,6 @@ private:
      * the previous Alignement
      */
     int m_xRel;
-    /**
-     * Stores temporally the maximum amount we need to shift the element pointing to it for
-     * avoiding collisions. This is set in Object::SetBoundingBoxXShift and then
-     * integrated for all alignment in Alignment::IntegrateBoundingBoxXShift.
-     */
-    int m_xShift;
-    /**
-     * Stores temporally the maximum width of the of the element pointing to it.
-     * It is set and integrated as m_xShift and it is used only for shifting the
-     * alignment of the end of the measure (ALIGNMENT_MEASURE_END).
-     */
-    int m_maxWidth;
     /**
      * Stores the time at which the alignment occur.
      * It is set by Object::AlignHorizontally.
@@ -416,10 +431,101 @@ private:
      * The Alignment owns it.
      */
     GraceAligner *m_graceAligner;
+};
+
+//----------------------------------------------------------------------------
+// AlignmentReference
+//----------------------------------------------------------------------------
+
+/**
+ * This class stores an alignement position elements will point to
+ */
+class AlignmentReference : public Object, public AttCommon {
+public:
     /**
-     * An array of all the LayerElement objects pointing to the alignment
+    * @name Constructors, destructors, reset methods
+    * Reset method reset all attribute classes
+    */
+    ///@{
+    AlignmentReference();
+    AlignmentReference(int n, Object *elementRef);
+    virtual ~AlignmentReference() {}
+    virtual void Reset();
+    virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
+    ///@}
+
+    /**
+     * Getter for the Object
      */
-    ArrayOfObjects m_layerElementsRef;
+    Object *GetObject() { return m_elementRef; }
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::GetAlignmentLeftRight
+     */
+    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustGraceXPos
+     */
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::AdjustXPos
+     */
+    virtual int AdjustXPos(FunctorParams *functorParams);
+
+private:
+    Object *m_elementRef;
+};
+
+//----------------------------------------------------------------------------
+// HorizontalAligner
+//----------------------------------------------------------------------------
+
+/**
+ * This class aligns the content horizontally
+ * It contains a vector of Alignment.
+ * It is not an abstract class but it should not be instanciated directly.
+ */
+class HorizontalAligner : public Object {
+public:
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@(
+    HorizontalAligner();
+    virtual ~HorizontalAligner();
+    virtual void Reset();
+    ///@}
+
+    int GetAlignmentCount() const { return (int)m_children.size(); }
+
+    //----------//
+    // Functors //
+    //----------//
+
+protected:
+    /**
+     * Search if an alignment of the type is already there at the time.
+     * If not, return in idx the position where it needs to be inserted (-1 if it is the end)
+     */
+    Alignment *SearchAlignmentAtTime(double time, AlignmentType type, int &idx);
+
+    /**
+     * Add an alignment at the appropriate position (at the end if -1)
+     */
+    void AddAlignment(Alignment *alignment, int idx = -1);
+
+private:
+    //
+public:
+    //
+private:
 };
 
 //----------------------------------------------------------------------------
@@ -430,20 +536,24 @@ private:
  * This class aligns the content of a measure
  * It contains a vector of Alignment
  */
-class MeasureAligner : public Object {
+class MeasureAligner : public HorizontalAligner {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@(
     MeasureAligner();
     virtual ~MeasureAligner();
     virtual ClassId GetClassId() const { return MEASURE_ALIGNER; }
-
-    int GetAlignmentCount() const { return (int)m_children.size(); }
+    virtual void Reset();
+    ///@}
 
     /**
-     * Reset the aligner (clear the content) and creates the start (left) and end (right) alignement
+     * Retrieve the alignmnet of the type at that time.
+     * The alignment object is added if not found.
+     * The maximum time position is also adjusted accordingly for end barline positioning
      */
-    virtual void Reset();
-
     Alignment *GetAlignmentAtTime(double time, AlignmentType type);
 
     /**
@@ -452,6 +562,11 @@ public:
      * should be the same for all staves/layers.
      */
     void SetMaxTime(double time);
+
+    /**
+     * Return the max time of the measure (i.e., the right measure alignment time)
+     */
+    double GetMaxTime() const;
 
     /**
      * @name Set and Get the non-justifiable margin (right and left scoreDefs)
@@ -476,15 +591,28 @@ public:
     Alignment *GetRightAlignment() const { return m_rightAlignment; }
     Alignment *GetRightBarLineAlignment() const { return m_rightBarLineAlignment; }
 
+    /**
+     * Adjust the spacing of the measure looking at each tuple of start / end alignment and a distance.
+     * The distance is an expansion value (positive) of compression (negative).
+     * Called from Measure::AdjustSylSpacingEnd.
+     */
+    void AdjustProportionally(const ArrayOfAdjustmentTuples &adjustments);
+
+    /**
+     * Push all the ALIGNMENT_GRACENOTE and ALIGNMENT_CONTAINER to the right.
+     * This is necessary to make sure they align with the next alignment content.
+     */
+    void PushAlignmentsRight();
+
+    /**
+     * Adjust the spacing for the grace note group(s) of the alignment on staffN
+     * The alignment need to be of ALIGNMENT_GRACENOTE type
+     */
+    void AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int staffN);
+
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * Correct the X alignment once the the content of a system has been aligned and laid out.
-     * Special case of functor redirected from Measure.
-     */
-    virtual int IntegrateBoundingBoxXShift(FunctorParams *functorParams);
 
     /**
      * Set the position of the Alignment.
@@ -500,8 +628,7 @@ public:
     virtual int JustifyX(FunctorParams *functorParams);
 
 private:
-    void AddAlignment(Alignment *alignment, int idx = -1);
-
+    //
 public:
     //
 private:
@@ -531,20 +658,32 @@ private:
  * This class aligns the content of a grace note group
  * It contains a vector of Alignment
  */
-class GraceAligner : public MeasureAligner {
+class GraceAligner : public HorizontalAligner {
 public:
-    // constructors and destructors
+    /**
+     * @name Constructors, destructors, reset and class name methods
+     * Reset method resets all attribute classes
+     */
+    ///@(
     GraceAligner();
     virtual ~GraceAligner();
     virtual ClassId GetClassId() const { return GRACE_ALIGNER; }
+    virtual void Reset();
+    ///@}
+
+    /**
+     * Retrieve the alignmnet of the type at that time.
+     * The alignment object is added if not found.
+     */
+    Alignment *GetAlignmentAtTime(double time, AlignmentType type);
 
     /**
      * Because the grace notes appear from left to right but need to be aligned
      * from right to left, we first need to stack them and align them eventually
-     * when we have all of them. This is done by GraceAligner::AlignNote called
+     * when we have all of them. This is done by GraceAligner::AlignStack called
      * at the end of each Layer in
      */
-    void StackNote(Note *note);
+    void StackGraceElement(LayerElement *object);
 
     /**
      * Align the notes in the reverse order
@@ -559,15 +698,28 @@ public:
     int GetWidth() const { return m_totalWidth; }
     ///@}
 
+    /**
+     * @name Return the left / right position of the first / last note matching by staffN
+     * Setting staffN as VRV_UNSET will look for and align all staves.
+     */
+    ///@{
+    int GetGraceGroupLeft(int staffN);
+    int GetGraceGroupRight(int staffN);
+    ///@{
+
+    //----------//
+    // Functors //
+    //----------//
+
 private:
     //
 public:
     //
 private:
     /**
-     * The stack of notes where they are piled up before getting aligned
+     * The stack of object where they are piled up before getting aligned
      */
-    ArrayOfObjects m_noteStack;
+    ArrayOfObjects m_graceStack;
     /**
      * The witdth of the group of grace notes instanciated after the bounding
      * boxes X are integrated in Alignment::IntegrateBoundingBoxGraceXShift

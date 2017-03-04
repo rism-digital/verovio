@@ -48,6 +48,7 @@ enum ClassId {
     FLOATING_POSITIONER,
     //
     ALIGNMENT,
+    ALIGNMENT_REFERENCE,
     CLEF_ATTR,
     DOC,
     GRACE_ALIGNER,
@@ -90,6 +91,7 @@ enum ClassId {
     SYSTEM_ELEMENT,
     BOUNDARY_END,
     ENDING,
+    EXPANSION,
     PB,
     SB,
     SECTION,
@@ -182,6 +184,7 @@ enum InterfaceId {
 // Typedefs
 //----------------------------------------------------------------------------
 
+class Alignment;
 class AttComparison;
 class BeamElementCoord;
 class BoundingBox;
@@ -201,6 +204,8 @@ typedef std::list<Object *> ListOfObjects;
 typedef std::vector<AttComparison *> ArrayOfAttComparisons;
 
 typedef std::vector<Note *> ChordCluster;
+
+typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmentTuples;
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 

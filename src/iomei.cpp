@@ -28,6 +28,7 @@
 #include "dynam.h"
 #include "editorial.h"
 #include "ending.h"
+#include "expansion.h"
 #include "fermata.h"
 #include "functorparams.h"
 #include "hairpin.h"
@@ -196,6 +197,10 @@ bool MeiOutput::WriteObject(Object *object)
     else if (object->Is(ENDING)) {
         m_currentNode = m_currentNode.append_child("ending");
         WriteMeiEnding(m_currentNode, dynamic_cast<Ending *>(object));
+    }
+    else if (object->Is(EXPANSION)) {
+        m_currentNode = m_currentNode.append_child("expansion");
+        WriteMeiExpansion(m_currentNode, dynamic_cast<Expansion *>(object));
     }
     else if (object->Is(PB)) {
         m_currentNode = m_currentNode.append_child("pb");
@@ -651,6 +656,16 @@ void MeiOutput::WriteMeiEnding(pugi::xml_node currentNode, Ending *ending)
     ending->WriteCommon(currentNode);
 }
 
+void MeiOutput::WriteMeiExpansion(pugi::xml_node currentNode, Expansion *expansion)
+{
+    assert(expansion);
+
+    WriteXmlId(currentNode, expansion);
+    expansion->WriteCommon(currentNode);
+    expansion->WriteCommonPart(currentNode);
+    expansion->WritePlist(currentNode);
+}
+
 void MeiOutput::WriteMeiPb(pugi::xml_node currentNode, Pb *pb)
 {
     assert(pb);
@@ -698,6 +713,7 @@ void MeiOutput::WriteMeiStaffDef(pugi::xml_node currentNode, StaffDef *staffDef)
     WriteScoreDefInterface(currentNode, staffDef);
     staffDef->WriteCommon(currentNode);
     staffDef->WriteCommonPart(currentNode);
+    staffDef->WriteDistances(currentNode);
     staffDef->WriteLabelsAddl(currentNode);
     staffDef->WriteNotationtype(currentNode);
     staffDef->WriteScalable(currentNode);
@@ -839,6 +855,7 @@ void MeiOutput::WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo)
     WriteTimePointInterface(currentNode, tempo);
     tempo->WriteLang(currentNode);
     tempo->WriteMiditempo(currentNode);
+    tempo->WriteMmtempo(currentNode);
 }
 
 void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
@@ -966,6 +983,8 @@ void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
     WriteLayerElement(currentNode, chord);
     WriteDurationInterface(currentNode, chord);
     chord->WriteCommon(currentNode);
+    chord->WriteGraced(currentNode);
+    chord->WriteRelativesize(currentNode);
     chord->WriteStems(currentNode);
     chord->WriteStemsCmn(currentNode);
     chord->WriteTiepresent(currentNode);
@@ -1024,6 +1043,7 @@ void MeiOutput::WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur)
     mensur->WriteMensuralShared(currentNode);
     mensur->WriteMensurLog(currentNode);
     mensur->WriteMensurVis(currentNode);
+    mensur->WriteRelativesize(currentNode);
     mensur->WriteSlashcount(currentNode);
 }
 
@@ -1043,6 +1063,7 @@ void MeiOutput::WriteMeiMRest(pugi::xml_node currentNode, MRest *mRest)
     WritePositionInterface(currentNode, mRest);
     mRest->WriteVisibility(currentNode);
     mRest->WriteFermatapresent(currentNode);
+    mRest->WriteRelativesize(currentNode);
 }
 
 void MeiOutput::WriteMeiMRpt(pugi::xml_node currentNode, MRpt *mRpt)
@@ -1086,6 +1107,7 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     note->WriteColoration(currentNode);
     note->WriteGraced(currentNode);
     note->WriteNoteLogMensural(currentNode);
+    note->WriteRelativesize(currentNode);
     note->WriteStems(currentNode);
     note->WriteStemsCmn(currentNode);
     note->WriteTiepresent(currentNode);
@@ -1100,6 +1122,7 @@ void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
     WriteDurationInterface(currentNode, rest);
     WritePositionInterface(currentNode, rest);
     rest->WriteColor(currentNode);
+    rest->WriteRelativesize(currentNode);
 }
 
 void MeiOutput::WriteMeiProport(pugi::xml_node currentNode, Proport *proport)
@@ -1135,6 +1158,7 @@ void MeiOutput::WriteMeiVerse(pugi::xml_node currentNode, Verse *verse)
     verse->WriteColor(currentNode);
     verse->WriteLang(currentNode);
     verse->WriteCommon(currentNode);
+    verse->WriteTypography(currentNode);
 }
 
 void MeiOutput::WriteMeiSyl(pugi::xml_node currentNode, Syl *syl)
@@ -1193,6 +1217,7 @@ void MeiOutput::WritePositionInterface(pugi::xml_node element, PositionInterface
 {
     assert(interface);
 
+    interface->WriteStaffloc(element);
     interface->WriteStafflocPitched(element);
 }
 
@@ -1726,8 +1751,8 @@ bool MeiInput::ReadMeiSection(Object *parent, pugi::xml_node section)
 
 bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
 {
-    assert(
-        dynamic_cast<Section *>(parent) || dynamic_cast<Ending *>(parent) || dynamic_cast<EditorialElement *>(parent));
+    assert(dynamic_cast<Section *>(parent) || dynamic_cast<Ending *>(parent) || dynamic_cast<Expansion *>(parent)
+        || dynamic_cast<EditorialElement *>(parent));
 
     bool success = true;
     pugi::xml_node current;
@@ -1743,6 +1768,9 @@ bool MeiInput::ReadMeiSectionChildren(Object *parent, pugi::xml_node parentNode)
             // we should not endings with unmeasured music ... (?)
             assert(!unmeasured);
             success = ReadMeiEnding(parent, current);
+        }
+        else if (std::string(current.name()) == "expansion") {
+            success = ReadMeiExpansion(parent, current);
         }
         else if (std::string(current.name()) == "scoreDef") {
             success = ReadMeiScoreDef(parent, current);
@@ -1796,6 +1824,22 @@ bool MeiInput::ReadMeiEnding(Object *parent, pugi::xml_node ending)
     parent->AddChild(vrvEnding);
     if (m_readingScoreBased)
         return ReadMeiSectionChildren(vrvEnding, ending);
+    else
+        return true;
+}
+
+bool MeiInput::ReadMeiExpansion(Object *parent, pugi::xml_node expansion)
+{
+    Expansion *vrvExpansion = new Expansion();
+    SetMeiUuid(expansion, vrvExpansion);
+
+    vrvExpansion->ReadCommon(expansion);
+    vrvExpansion->ReadCommonPart(expansion);
+    vrvExpansion->ReadPlist(expansion);
+
+    parent->AddChild(vrvExpansion);
+    if (m_readingScoreBased)
+        return ReadMeiSectionChildren(vrvExpansion, expansion);
     else
         return true;
 }
@@ -2086,6 +2130,7 @@ bool MeiInput::ReadMeiStaffDef(Object *parent, pugi::xml_node staffDef)
 
     vrvStaffDef->ReadCommon(staffDef);
     vrvStaffDef->ReadCommonPart(staffDef);
+    vrvStaffDef->ReadDistances(staffDef);
     vrvStaffDef->ReadLabelsAddl(staffDef);
     vrvStaffDef->ReadNotationtype(staffDef);
     vrvStaffDef->ReadScalable(staffDef);
@@ -2328,6 +2373,7 @@ bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
     ReadTimePointInterface(tempo, vrvTempo);
     vrvTempo->ReadLang(tempo);
     vrvTempo->ReadMiditempo(tempo);
+    vrvTempo->ReadMmtempo(tempo);
 
     parent->AddChild(vrvTempo);
     return ReadMeiTextChildren(vrvTempo, tempo);
@@ -2633,6 +2679,8 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
 
     ReadDurationInterface(chord, vrvChord);
     vrvChord->ReadCommon(chord);
+    vrvChord->ReadGraced(chord);
+    vrvChord->ReadRelativesize(chord);
     vrvChord->ReadStems(chord);
     vrvChord->ReadStemsCmn(chord);
     vrvChord->ReadTiepresent(chord);
@@ -2736,6 +2784,7 @@ bool MeiInput::ReadMeiMensur(Object *parent, pugi::xml_node mensur)
     vrvMensur->ReadMensuralShared(mensur);
     vrvMensur->ReadMensurLog(mensur);
     vrvMensur->ReadMensurVis(mensur);
+    vrvMensur->ReadRelativesize(mensur);
     vrvMensur->ReadSlashcount(mensur);
 
     parent->AddChild(vrvMensur);
@@ -2761,6 +2810,7 @@ bool MeiInput::ReadMeiMRest(Object *parent, pugi::xml_node mRest)
 
     vrvMRest->ReadVisibility(mRest);
     vrvMRest->ReadFermatapresent(mRest);
+    vrvMRest->ReadRelativesize(mRest);
 
     parent->AddChild(vrvMRest);
     return true;
@@ -2817,6 +2867,7 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadColoration(note);
     vrvNote->ReadGraced(note);
     vrvNote->ReadNoteLogMensural(note);
+    vrvNote->ReadRelativesize(note);
     vrvNote->ReadStems(note);
     vrvNote->ReadStemsCmn(note);
     vrvNote->ReadTiepresent(note);
@@ -2855,6 +2906,7 @@ bool MeiInput::ReadMeiRest(Object *parent, pugi::xml_node rest)
     ReadDurationInterface(rest, vrvRest);
     ReadPositionInterface(rest, vrvRest);
     vrvRest->ReadColor(rest);
+    vrvRest->ReadRelativesize(rest);
 
     parent->AddChild(vrvRest);
     return true;
@@ -2916,6 +2968,7 @@ bool MeiInput::ReadMeiVerse(Object *parent, pugi::xml_node verse)
     vrvVerse->ReadColor(verse);
     vrvVerse->ReadLang(verse);
     vrvVerse->ReadCommon(verse);
+    vrvVerse->ReadTypography(verse);
 
     parent->AddChild(vrvVerse);
     return ReadMeiLayerChildren(vrvVerse, verse, vrvVerse);
@@ -2932,7 +2985,7 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
             break;
         }
         elementName = std::string(xmlElement.name());
-        if (!IsAllowed(elementName, filter)) {
+        if (!IsAllowed(elementName, filter) && filter) {
             std::string meiElementName = filter->GetClassName();
             std::transform(meiElementName.begin(), meiElementName.begin() + 1, meiElementName.begin(), ::tolower);
             LogWarning("Element <%s> within <%s> is not supported and will be ignored ", xmlElement.name(),
@@ -3011,6 +3064,7 @@ bool MeiInput::ReadPitchInterface(pugi::xml_node element, PitchInterface *interf
 
 bool MeiInput::ReadPositionInterface(pugi::xml_node element, PositionInterface *interface)
 {
+    interface->ReadStaffloc(element);
     interface->ReadStafflocPitched(element);
     return true;
 }

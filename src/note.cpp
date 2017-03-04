@@ -38,6 +38,7 @@ Note::Note()
     , AttColoration()
     , AttGraced()
     , AttNoteLogMensural()
+    , AttRelativesize()
     , AttStems()
     , AttStemsCmn()
     , AttTiepresent()
@@ -49,6 +50,7 @@ Note::Note()
     RegisterAttClass(ATT_COLORATION);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
+    RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -77,6 +79,7 @@ void Note::Reset()
     ResetColoration();
     ResetGraced();
     ResetNoteLogMensural();
+    ResetRelativesize();
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();
@@ -89,7 +92,6 @@ void Note::Reset()
     d_stemLen = 0;
     m_clusterPosition = 0;
     m_cluster = NULL;
-    m_graceAlignment = NULL;
 
     m_playingOnset = 0.0;
     m_playingOffset = 0.0;
@@ -134,18 +136,6 @@ void Note::AddChild(Object *child)
     Modify();
 }
 
-Alignment *Note::GetGraceAlignment()
-{
-    assert(m_graceAlignment);
-    return m_graceAlignment;
-}
-
-void Note::SetGraceAlignment(Alignment *graceAlignment)
-{
-    assert(!m_graceAlignment && graceAlignment);
-    m_graceAlignment = graceAlignment;
-}
-
 void Note::SetDrawingTieAttr()
 {
     assert(!this->m_drawingTieAttr);
@@ -165,11 +155,11 @@ void Note::ResetDrawingTieAttr()
 Accid *Note::GetDrawingAccid()
 {
     Accid *accid = dynamic_cast<Accid *>(this->FindChildByType(ACCID));
-    if (accid) accid->m_drawingCueSize = this->HasGrace();
+    if (accid) accid->m_drawingCueSize = this->IsCueSize();
     return accid;
 }
 
-Chord *Note::IsChordTone()
+Chord *Note::IsChordTone() const
 {
     return dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
 }

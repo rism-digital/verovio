@@ -1,43 +1,40 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        trill.h
+// Name:        expansion.h
 // Author:      Klaus Rettinghaus
-// Created:     2017
+// Created:     22/02/2017
 // Copyright (c) Authors and others. All rights reserved.
 /////////////////////////////////////////////////////////////////////////////
 
-#ifndef __VRV_TRILL_H__
-#define __VRV_TRILL_H__
+#ifndef __VRV_EXPANSION_H__
+#define __VRV_EXPANSION_H__
 
-#include "atts_cmn.h"
-#include "atts_cmnornaments.h"
-#include "controlelement.h"
-#include "timeinterface.h"
+#include "atts_shared.h"
+#include "systemelement.h"
 
 namespace vrv {
 
+class Expansion;
+
 //----------------------------------------------------------------------------
-// Trill
+// Expansion
 //----------------------------------------------------------------------------
 
-class Trill : public ControlElement,
-              public TimePointInterface,
-              public AttColor,
-              public AttOrnamentaccid,
-              public AttPlacement {
+/**
+ * This class represents a MEI expansion.
+ */
+class Expansion : public SystemElement, public AttCommon, public AttCommonPart, public AttPlist {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
-     * Reset method reset all attribute classes
+     * Reset method resets all attribute classes
      */
     ///@{
-    Trill();
-    virtual ~Trill();
+    Expansion();
+    virtual ~Expansion();
     virtual void Reset();
-    virtual std::string GetClassName() const { return "Trill"; }
-    virtual ClassId GetClassId() const { return TRILL; }
+    virtual std::string GetClassName() const { return "Expansion"; }
+    virtual ClassId GetClassId() const { return EXPANSION; }
     ///@}
-
-    virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
 
     //----------//
     // Functors //

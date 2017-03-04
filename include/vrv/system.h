@@ -20,6 +20,7 @@ class DeviceContext;
 class Ending;
 class Measure;
 class ScoreDef;
+class Staff;
 
 //----------------------------------------------------------------------------
 // System
@@ -52,6 +53,14 @@ public:
     ///@}
 
     /**
+     * @name Get the X and Y drawing position
+     */
+    ///@{
+    virtual int GetDrawingX() const;
+    virtual int GetDrawingY() const;
+    ///@}
+
+    /**
      * @name Set and get the labels drawing width (normal and abbreviated)
      */
     ///@{
@@ -67,16 +76,11 @@ public:
     int GetHeight() const;
 
     /**
-     * Return the default horizontal spacing of system.
-     */
-    int GetVerticalSpacing() const;
-
-    /**
      * Return the index position of the system in its page parent
      */
     int GetSystemIdx() const { return Object::GetIdx(); }
 
-    void SetCurrentFloatingPositioner(int staffN, FloatingObject *object, int x, int y);
+    void SetCurrentFloatingPositioner(int staffN, FloatingObject *object, Object *objectX, Object *objectY);
 
     /**
      * @name Setter and getter of the drawing scoreDef
@@ -160,11 +164,6 @@ public:
      * See Object::UnCastOff
      */
     virtual int UnCastOff(FunctorParams *functorParams);
-
-    /**
-     * See Object::SetDrawingXY
-     */
-    virtual int SetDrawingXY(FunctorParams *functorParams);
 
     /**
      * See Object::CastOffSystemsEnd

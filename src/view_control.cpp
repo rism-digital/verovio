@@ -127,7 +127,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if ((element->Is(SLUR)) || (element->Is(HAIRPIN)) || (element->Is(OCTAVE)) || (element->Is(TIE))) return;
+            if (element->Is({ SLUR, HAIRPIN, OCTAVE, TIE })) return;
         }
     }
 
@@ -141,7 +141,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
     System *parentSystem2 = dynamic_cast<System *>(interface->GetEnd()->GetFirstParent(SYSTEM));
 
     int x1, x2;
-    // Staff *staff = NULL;
+    Object *objectX = NULL;
     Measure *measure = NULL;
     Object *graphic = NULL;
     char spanningType = SPANNING_START_END;
@@ -152,6 +152,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = interface->GetStartMeasure();
         if (!Check(measure)) return;
         x1 = interface->GetStart()->GetDrawingX();
+        objectX = interface->GetStart();
         x2 = interface->GetEnd()->GetDrawingX();
         graphic = element;
     }
@@ -161,6 +162,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
         x1 = interface->GetStart()->GetDrawingX();
+        objectX = interface->GetStart();
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
         graphic = element;
         spanningType = SPANNING_START;
@@ -171,11 +173,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
-        MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_DEFAULT);
-        Alignment *pos
-            = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
-        x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
-                 : measure->GetDrawingX();
+        x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
+        objectX = measure->GetLeftBarLine();
         x2 = interface->GetEnd()->GetDrawingX();
         spanningType = SPANNING_END;
     }
@@ -186,11 +185,8 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         // We need the position of the first default in the first measure for x1
-        MeasureAlignerTypeComparison alignmentComparison(ALIGNMENT_DEFAULT);
-        Alignment *pos
-            = dynamic_cast<Alignment *>(measure->m_measureAligner.FindChildByAttComparison(&alignmentComparison, 1));
-        x1 = pos ? measure->GetDrawingX() + pos->GetXRel() - 2 * m_doc->GetDrawingDoubleUnit(100)
-                 : measure->GetDrawingX();
+        x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
+        objectX = measure->GetLeftBarLine();
         // We need the last measure of the system for x2
         Measure *last = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(last)) return;
@@ -205,7 +201,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         // TimeSpanning element are not necessary floating elements (e.g., syl) - we have a bounding box only for them
         if (element->IsControlElement())
             system->SetCurrentFloatingPositioner(
-                (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), x1, (*staffIter)->GetDrawingY());
+                (*staffIter)->GetN(), dynamic_cast<ControlElement *>(element), objectX, *staffIter);
 
         if (element->Is(HAIRPIN)) {
             // cast to Harprin check in DrawHairpin
@@ -614,13 +610,13 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
 
     // first should be the tie @curvedir
     if (slur->HasCurvedir()) {
-        drawingCurveDir = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above
-                                                                            : curvature_CURVEDIR_below;
+        drawingCurveDir
+            = (slur->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        drawingCurveDir = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above
-                                                                          : curvature_CURVEDIR_below;
+        drawingCurveDir
+            = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
     else if (startParentChord) {
@@ -1321,13 +1317,13 @@ void View::DrawTie(DeviceContext *dc, Tie *tie, int x1, int x2, Staff *staff, ch
 
     // first should be the tie @curvedir
     if (tie->HasCurvedir()) {
-        drawingCurveDir = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above
-                                                                           : curvature_CURVEDIR_below;
+        drawingCurveDir
+            = (tie->GetCurvedir() == curvature_CURVEDIR_above) ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // then layer direction trumps note direction
     else if (layer1 && layer1->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        drawingCurveDir = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above
-                                                                          : curvature_CURVEDIR_below;
+        drawingCurveDir
+            = layer1->GetDrawingStemDir() == STEMDIRECTION_up ? curvature_CURVEDIR_above : curvature_CURVEDIR_below;
     }
     // look if in a chord
     else if (parentChord1) {
@@ -1431,7 +1427,7 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    int y = GetSylY(syl, staff);
+    int y = syl->GetDrawingY();
     TextExtend extend;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
@@ -1460,15 +1456,20 @@ void View::DrawSylConnector(
         // nothing to adjust
     }
 
-    if (graphic)
+    if (graphic) {
         dc->ResumeGraphic(graphic, graphic->GetUuid());
+    }
     else
         dc->StartGraphic(syl, "spanning-connector", "");
+
     dc->DeactivateGraphic();
+
     DrawSylConnectorLines(dc, x1, x2, y, syl, staff);
+
     dc->ReactivateGraphic();
-    if (graphic)
+    if (graphic) {
         dc->EndResumedGraphic(graphic, this);
+    }
     else
         dc->EndGraphic(syl, this);
 }
@@ -1545,7 +1546,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, x, (*staffIter)->GetDrawingY());
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dir, dir->GetStart(), *staffIter);
 
         int y = dir->GetDrawingY();
 
@@ -1594,7 +1595,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, x, (*staffIter)->GetDrawingY());
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), dynam, dynam->GetStart(), *staffIter);
 
         int y = dynam->GetDrawingY();
 
@@ -1664,7 +1665,7 @@ void View::DrawFermata(DeviceContext *dc, Fermata *fermata, Measure *measure, Sy
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = fermata->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, x, (*staffIter)->GetDrawingY());
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), fermata, fermata->GetStart(), *staffIter);
         int y = fermata->GetDrawingY();
 
         // Adjust the x position
@@ -1701,7 +1702,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = harm->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, x, (*staffIter)->GetDrawingY());
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), harm, harm->GetStart(), *staffIter);
 
         int y = harm->GetDrawingY();
 
@@ -1747,7 +1748,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
     std::vector<Staff *> staffList = mordent->GetTstampStaves(measure);
     double xShift = 0.0;
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, x, (*staffIter)->GetDrawingY());
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), mordent, mordent->GetStart(), *staffIter);
         int y = mordent->GetDrawingY();
 
         if (mordent->HasAccidlower()) {
@@ -1758,7 +1759,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
             // Adjust the y position
             double factor = 1.0;
-            auto meiaccid = mordent->GetAccidlower();
+            data_ACCIDENTAL_EXPLICIT meiaccid = mordent->GetAccidlower();
             // optimized vertical kerning for Leipzig font:
             if (meiaccid == ACCIDENTAL_EXPLICIT_ff) {
                 factor = 1.20;
@@ -1781,7 +1782,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             y += factor * m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
         }
         else if (mordent->HasAccidupper()) {
-            auto mordentHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
+            double mordentHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
             int accid = Accid::GetAccidGlyph(mordent->GetAccidupper());
             std::wstring accidStr;
             accidStr.push_back(accid);
@@ -1789,7 +1790,7 @@ void View::DrawMordent(DeviceContext *dc, Mordent *mordent, Measure *measure, Sy
             DrawSmuflString(dc, x, y, accidStr, true, (*staffIter)->m_drawingStaffSize / 2, false);
             // Adjust the y position
             double factor = 1.75;
-            auto meiaccid = mordent->GetAccidupper();
+            data_ACCIDENTAL_EXPLICIT meiaccid = mordent->GetAccidupper();
             // optimized vertical kerning for Leipzig font:
             if (meiaccid == ACCIDENTAL_EXPLICIT_ff) {
                 factor = 1.40;
@@ -1844,7 +1845,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = pedal->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, x, (*staffIter)->GetDrawingY());
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), pedal, pedal->GetStart(), *staffIter);
         // Basic method that use bounding box
         int y = pedal->GetDrawingY();
 
@@ -1896,7 +1897,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, x, (*staffIter)->GetDrawingY());
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), tempo, tempo->GetStart(), *staffIter);
 
         tempoTxt.SetPointSize(m_doc->GetDrawingLyricFont((*staffIter)->m_drawingStaffSize)->GetPointSize());
 
@@ -1939,7 +1940,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = trill->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, x, (*staffIter)->GetDrawingY());
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), trill, trill->GetStart(), *staffIter);
         int y = trill->GetDrawingY();
 
         // Upper and lower accidentals are currently exclusive, but sould both be allowed at the same time.
@@ -1954,7 +1955,7 @@ void View::DrawTrill(DeviceContext *dc, Trill *trill, Measure *measure, System *
             y += m_doc->GetGlyphHeight(accid, (*staffIter)->m_drawingStaffSize, true) / 2;
         }
         else if (trill->HasAccidupper()) {
-            auto trillHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
+            double trillHeight = m_doc->GetGlyphHeight(code, (*staffIter)->m_drawingStaffSize, false);
             wchar_t accid = Accid::GetAccidGlyph(trill->GetAccidupper());
             std::wstring accidStr;
             accidStr.push_back(accid);
@@ -2001,7 +2002,7 @@ void View::DrawTurn(DeviceContext *dc, Turn *turn, Measure *measure, System *sys
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = turn->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), turn, x, (*staffIter)->GetDrawingY());
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), turn, turn->GetStart(), *staffIter);
         int y = turn->GetDrawingY();
 
         if (turn->HasAccidlower()) {
@@ -2095,6 +2096,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     if (!parentSystem1 || !parentSystem2) return;
 
     int x1, x2;
+    Object *objectX;
     Measure *measure = NULL;
     char spanningType = SPANNING_START_END;
 
@@ -2102,6 +2104,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     if ((system == parentSystem1) && (system == parentSystem2)) {
         measure = ending->GetMeasure();
         x1 = measure->GetDrawingX();
+        objectX = measure;
         // if it is the first measure of the system use the left barline position
         if (system->GetFirst(MEASURE) == measure) x1 += measure->GetLeftBarLineXRel();
         x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
@@ -2112,6 +2115,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
         x1 = ending->GetMeasure()->GetDrawingX();
+        objectX = measure;
         // if it is the first measure of the system use the left barline position
         if (system->GetFirst(MEASURE) == ending->GetMeasure()) x1 += ending->GetMeasure()->GetLeftBarLineXRel();
         x2 = measure->GetDrawingX() + measure->GetRightBarLineXRel();
@@ -2123,6 +2127,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
+        objectX = measure->GetLeftBarLine();
         x2 = endingEndBoundary->GetMeasure()->GetDrawingX() + endingEndBoundary->GetMeasure()->GetRightBarLineXRel();
         spanningType = SPANNING_END;
     }
@@ -2133,6 +2138,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, FORWARD));
         if (!Check(measure)) return;
         x1 = measure->GetDrawingX() + measure->GetLeftBarLineXRel();
+        objectX = measure->GetLeftBarLine();
         // We need the last measure of the system for x2
         measure = dynamic_cast<Measure *>(system->FindChildByType(MEASURE, 1, BACKWARD));
         if (!Check(measure)) return;
@@ -2160,7 +2166,7 @@ void View::DrawEnding(DeviceContext *dc, Ending *ending, System *system)
     }
 
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
-        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), ending, x1, (*staffIter)->GetDrawingY());
+        system->SetCurrentFloatingPositioner((*staffIter)->GetN(), ending, objectX, *staffIter);
 
         int y1 = ending->GetDrawingY();
 
