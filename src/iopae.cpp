@@ -234,9 +234,9 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         else if (incipit[i] == '{') {
             // current_note.beam = 1;
             if (current_note.tuplet_note > 0)
-            current_note.beam = BEAM_TUPLET;
+                current_note.beam = BEAM_TUPLET;
             else
-            current_note.beam = BEAM_INITIAL;
+                current_note.beam = BEAM_INITIAL;
             in_beam++;
         }
 
