@@ -233,6 +233,8 @@ typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
  */
 enum FunctorCode { FUNCTOR_CONTINUE = 0, FUNCTOR_SIBLINGS, FUNCTOR_STOP };
 
+#define UNUSED(x) {(void)x;}
+
 //----------------------------------------------------------------------------
 // Maximum number of levels between parent and children for optimizing search
 //----------------------------------------------------------------------------
