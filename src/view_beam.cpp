@@ -129,8 +129,8 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                         if ((params.m_stemDir != STEMDIRECTION_NONE) && (params.m_stemDir != currentStemDir)) {
                             params.m_hasMultipleStemDir = true;
                         }
+                        params.m_stemDir = currentStemDir;
                     }
-                    params.m_stemDir = currentStemDir;
                 }
             }
             // keep the shortest dur in the beam
@@ -535,7 +535,7 @@ void View::CalcBeam(
     assert(staff);
     assert(beamElementCoords);
 
-    int y1, y2, avgY, yExtreme, high, low, verticalCenter, verticalShift;
+    int y1, y2, avgY, high, low, verticalCenter, verticalShift;
     double xr, verticalShiftFactor;
 
     // loop
@@ -554,15 +554,14 @@ void View::CalcBeam(
     /******************************************************************/
     // initialization
 
-    high = avgY = 0.0;
+    avgY = 0;
+    high = VRV_UNSET;
     low = -VRV_UNSET;
     params->m_verticalBoost = 0.0;
 
     verticalShiftFactor = 3.0;
     verticalCenter = staff->GetDrawingY()
         - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2); // center point of the staff
-    yExtreme = verticalCenter; // value of farthest y point on the staff from verticalCenter minus verticalCenter; used
-    // if beamHasChord = true
 
     int last = elementCount - 1;
 
@@ -587,7 +586,7 @@ void View::CalcBeam(
             (*beamElementCoords).at(i)->m_yTop = yMax;
             (*beamElementCoords).at(i)->m_yBottom = yMin;
 
-            avgY += (*beamElementCoords).at(i)->m_y + ((yMax - yMin) / 2);
+            avgY += ((yMax + yMin) / 2);
 
             // highest and lowest value;
             high = std::max(yMax, high);
@@ -611,7 +610,7 @@ void View::CalcBeam(
     /******************************************************************/
     // Set the stem direction
 
-    yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
+    // yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
     avgY /= elementCount;
 
     // If we have one stem direction in the beam, then don't look at the layer
@@ -620,11 +619,11 @@ void View::CalcBeam(
 
     // Automatic stem direction if nothing in the notes or in the layer
     if (params->m_stemDir == STEMDIRECTION_NONE) {
-        if (params->m_beamHasChord)
+        /*if (params->m_beamHasChord)
             params->m_stemDir = (yExtreme < verticalCenter)
                 ? STEMDIRECTION_up
                 : STEMDIRECTION_down; // if it has a chord, go by the most extreme position
-        else
+        else */
             params->m_stemDir
                 = (avgY < verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down; // otherwise go by average
     }

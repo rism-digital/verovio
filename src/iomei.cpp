@@ -855,6 +855,7 @@ void MeiOutput::WriteMeiTempo(pugi::xml_node currentNode, Tempo *tempo)
     WriteTimePointInterface(currentNode, tempo);
     tempo->WriteLang(currentNode);
     tempo->WriteMiditempo(currentNode);
+    tempo->WriteMmtempo(currentNode);
 }
 
 void MeiOutput::WriteMeiTie(pugi::xml_node currentNode, Tie *tie)
@@ -2372,6 +2373,7 @@ bool MeiInput::ReadMeiTempo(Object *parent, pugi::xml_node tempo)
     ReadTimePointInterface(tempo, vrvTempo);
     vrvTempo->ReadLang(tempo);
     vrvTempo->ReadMiditempo(tempo);
+    vrvTempo->ReadMmtempo(tempo);
 
     parent->AddChild(vrvTempo);
     return ReadMeiTextChildren(vrvTempo, tempo);
