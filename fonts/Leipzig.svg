@@ -26,7 +26,7 @@ Version 5.2.20 - adding some anchor points (accidentals)
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20161003 at Tue Feb 21 17:57:15 2017
+Created by FontForge 20161003 at Mon Mar  6 16:23:14 2017
  By laurent
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
@@ -196,7 +196,7 @@ d="M414 186v169h17v-164l44 14v-91l-44 -14v-165l44 12v-91l-44 -13v-155h-17v150l-7
 l-14 15h-80l-14 -15v-55h-74v72h60l26 30v38l-28 29h-58v71z" />
     <glyph glyph-name="uniE268" unicode="&#xe268;" horiz-adv-x="377" 
 d="M0 -188v539h18v-191l139 22v-533h-17v186zM18 -100l122 17v176l-122 -19v-174zM316 186v169h17v-164l44 14v-91l-44 -14v-165l44 12v-91l-44 -13v-155h-17v150l-76 -22v-155h-17v149l-43 -13v90l43 14v167l-43 -14v92l43 13v169h17v-163zM240 73v-167l76 22v168z" />
-    <glyph glyph-name="uniE269" unicode="&#xe269;" horiz-adv-x="413" 
+    <glyph glyph-name="uniE269" unicode="&#xe269;" horiz-adv-x="412" 
 d="M136 186v169h17v-164l44 14v-91l-44 -14v-165l44 12v-91l-44 -13v-155h-17v150l-76 -22v-155h-17v149l-43 -13v90l43 14v167l-43 -14v92l43 13v169h17v-163zM60 73v-167l76 22v168zM351 186v169h17v-164l44 14v-91l-44 -14v-165l44 12v-91l-44 -13v-155h-17v150l-76 -22
 v-155h-17v149l-43 -13v90l43 14v167l-43 -14v92l43 13v169h17v-163zM275 73v-167l76 22v168z" />
     <glyph glyph-name="uniE26A" unicode="&#xe26a;" horiz-adv-x="163" 

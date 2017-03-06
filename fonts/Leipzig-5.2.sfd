@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1487696235
+ModificationTime: 1488813971
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -50,7 +50,7 @@ NameList: Adobe Glyph List
 DisplaySize: -72
 AntiAlias: 1
 FitToEm: 1
-WinInfo: 57906 18 7
+WinInfo: 57870 18 7
 BeginPrivate: 0
 EndPrivate
 TeXData: 1 0 0 346030 173015 115343 0 1048576 115343 783286 444596 497025 792723 393216 433062 380633 303038 157286 324010 404750 52429 2506097 1059062 262144
@@ -1664,10 +1664,10 @@ Encoding: 57954 57954 25
 Width: 197
 VWidth: 2048
 Flags: HW
-AnchorPoint: "cutOutNO" 14 186 basechar 0
-AnchorPoint: "cutOutNE" 180 232 basechar 0
-AnchorPoint: "cutOutSE" 176 -188 basechar 0
-AnchorPoint: "cutOutSO" 18 -236 basechar 0
+AnchorPoint: "cutOutNO" 40 161 basechar 0
+AnchorPoint: "cutOutNE" 156 211 basechar 0
+AnchorPoint: "cutOutSE" 156 -160 basechar 0
+AnchorPoint: "cutOutSO" 40 -205 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -1694,8 +1694,8 @@ SplineSet
  43 -99 l 1
  43 68 l 1
  0 54 l 1
- 0 146 l 1
- 43 159 l 1
+ 0 146 l 5
+ 43 159 l 5
  43 328 l 1
  60 328 l 1
  60 165 l 1
@@ -1713,8 +1713,8 @@ Encoding: 57953 57953 26
 Width: 157
 VWidth: 2048
 Flags: HW
-AnchorPoint: "cutOutSO" 58 211 basechar 0
-AnchorPoint: "cutOutSE" 104 -225 basechar 0
+AnchorPoint: "cutOutSO" 21 184 basechar 0
+AnchorPoint: "cutOutSE" 137 -190 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -1740,8 +1740,8 @@ Encoding: 57952 57952 27
 Width: 200
 VWidth: 2048
 Flags: HW
-AnchorPoint: "cutOutSE" 124 -110 basechar 0
-AnchorPoint: "cutOutNE" 50 174 basechar 0
+AnchorPoint: "cutOutSE" 108 -86 basechar 0
+AnchorPoint: "cutOutNE" 24 141 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -1773,8 +1773,8 @@ Encoding: 57956 57956 28
 Width: 388
 VWidth: 2048
 Flags: HW
-AnchorPoint: "cutOutSE" 330 -111 basechar 0
-AnchorPoint: "cutOutNO" 265 190 basechar 0
+AnchorPoint: "cutOutSE" 308 -75 basechar 0
+AnchorPoint: "cutOutNO" 214 142 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -1824,8 +1824,8 @@ Encoding: 57958 57958 29
 Width: 578
 VWidth: 2048
 Flags: HW
-AnchorPoint: "cutOutSE" 514 -115 basechar 0
-AnchorPoint: "cutOutNE" 438 172 basechar 0
+AnchorPoint: "cutOutSE" 492 -78 basechar 0
+AnchorPoint: "cutOutNE" 404 142 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -1893,6 +1893,9 @@ Encoding: 57959 57959 30
 Width: 378
 VWidth: 2048
 Flags: HW
+AnchorPoint: "cutOutNE" 204 139 basechar 0
+AnchorPoint: "cutOutSE" 292 -80 basechar 0
+AnchorPoint: "cutOutSO" 135 -195 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -1979,10 +1982,10 @@ Encoding: 57957 57957 32
 Width: 475
 VWidth: 2048
 Flags: HW
-AnchorPoint: "cutOutNE" 460 230 basechar 0
-AnchorPoint: "cutOutSE" 460 -192 basechar 0
-AnchorPoint: "cutOutSO" 240 -162 basechar 0
-AnchorPoint: "cutOutNO" 278 182 basechar 0
+AnchorPoint: "cutOutNE" 435 209 basechar 0
+AnchorPoint: "cutOutSE" 435 -161 basechar 0
+AnchorPoint: "cutOutSO" 274 -125 basechar 0
+AnchorPoint: "cutOutNO" 274 124 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -2057,9 +2060,9 @@ Encoding: 57960 57960 33
 Width: 377
 VWidth: 2048
 Flags: HW
-AnchorPoint: "cutOutSE" 360 -202 basechar 0
-AnchorPoint: "cutOutSO" 98 -228 basechar 0
-AnchorPoint: "cutOutNE" 365 228 basechar 0
+AnchorPoint: "cutOutSE" 337 -162 basechar 0
+AnchorPoint: "cutOutSO" 136 -193 basechar 0
+AnchorPoint: "cutOutNE" 337 210 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -2116,13 +2119,13 @@ EndChar
 
 StartChar: uniE269
 Encoding: 57961 57961 34
-Width: 413
+Width: 412
 VWidth: 2048
 Flags: HW
-AnchorPoint: "cutOutNE" 402 242 basechar 0
-AnchorPoint: "cutOutSE" 399 -194 basechar 0
-AnchorPoint: "cutOutSO" 13 -248 basechar 0
-AnchorPoint: "cutOutNO" 13 198 basechar 0
+AnchorPoint: "cutOutNE" 370 207 basechar 0
+AnchorPoint: "cutOutSE" 371 -159 basechar 0
+AnchorPoint: "cutOutSO" 40 -205 basechar 0
+AnchorPoint: "cutOutNO" 40 164 basechar 0
 LayerCount: 2
 Fore
 SplineSet
