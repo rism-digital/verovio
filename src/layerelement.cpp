@@ -205,15 +205,23 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 int LayerElement::GetDrawingX() const
 {
     assert(m_alignment);
-
-    Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
+    
+    // First get the first layerElement parent (if any) and use its position if they share the same alignment
+    LayerElement *parent = dynamic_cast<LayerElement*>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
+    if (parent && (parent->GetAlignment() == this->GetAlignment())) {
+        return (parent->GetDrawingX() + this->GetDrawingXRel());
+    }
+    
+    // Otherwise get the measure
+    Object *measure = this->GetFirstParent(MEASURE);
+    
     assert(measure);
-
+    
     int graceNoteShift = 0;
     if (this->HasGraceAlignment()) {
         graceNoteShift = this->GetGraceAlignment()->GetXRel();
     }
-
+    
     return (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel() + graceNoteShift);
 }
 
@@ -221,12 +229,15 @@ int LayerElement::GetDrawingY() const
 {
     // First look if we have a crossStaff situation
     Object *object = m_crossStaff;
+    // Otherwise get the first layerElement parent (if any) but only if the element is not directly relative to staff (e.g., artic, syl)
+    if (!object && !this->IsRelativeToStaff()) object = this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
     // Otherwise get the first staff
     if (!object) object = this->GetFirstParent(STAFF);
     // Otherwise the first measure (this is the case with barLineAttr
     if (!object) object = this->GetFirstParent(MEASURE);
 
     assert(object);
+    
     return object->GetDrawingY() + this->GetDrawingYRel();
 }
 
@@ -297,7 +308,7 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPa
                 int yChordMax = 0, yChordMin = 0;
                 Chord *chord = dynamic_cast<Chord *>(this);
                 assert(chord);
-                chord->GetYExtremes(&yChordMax, &yChordMin);
+                chord->GetYExtremes(yChordMax, yChordMin);
                 return yChordMax + doc->GetDrawingUnit(staffSize);
             }
             else
@@ -330,7 +341,7 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
                 int yChordMax = 0, yChordMin = 0;
                 Chord *chord = dynamic_cast<Chord *>(this);
                 assert(chord);
-                chord->GetYExtremes(&yChordMax, &yChordMin);
+                chord->GetYExtremes(yChordMax, yChordMin);
                 return yChordMin - doc->GetDrawingUnit(staffSize);
             }
             else
@@ -588,7 +599,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         assert(accid);
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         if (note) {
-            accid->SetDrawingYRel(note->GetDrawingYRel());
+            //accid->SetDrawingYRel(note->GetDrawingYRel());
         }
         else {
             // do something for accid that are not children of a note - e.g., mensural?
@@ -690,8 +701,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     int selfLeft;
     if (!this->HasUpdatedBB()) {
         // if nothing was drawn, do not take it into account
-        assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
-        // This should happen for invis barline attribute. Otherwise the BB should be set to empty with
+        // assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
+        // This should happen for invis barline attribute but also chords in beam. Otherwise the BB should be set to empty with
         // Object::SetEmptyBB()
         // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
         selfLeft = this->GetAlignment()->GetXRel();
@@ -739,9 +750,18 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     // Look for cross-staff situations
     // If we have one, make is available in m_crossStaff
     DurationInterface *durElement = this->GetDurationInterface();
-    if (!durElement || !durElement->HasStaff()) {
+    if (!durElement) return FUNCTOR_CONTINUE;
+    
+    // If we have not @staff, set to what we had before (quite likely NULL for all non cross staff cases)
+    if (!durElement->HasStaff()) {
+        m_crossStaff = params->m_currentCrossStaff;
+        m_crossLayer = params->m_currentCrossLayer;
         return FUNCTOR_CONTINUE;
     }
+    
+    // We have a @staff, set the current pointers to NULL before assigning them
+    params->m_currentCrossStaff = NULL;
+    params->m_currentCrossLayer = NULL;
 
     AttCommonNComparison comparisonFirst(STAFF, durElement->GetStaff().at(0));
     m_crossStaff = dynamic_cast<Staff *>(params->m_currentMeasure->FindChildByAttComparison(&comparisonFirst, 1));
@@ -770,11 +790,34 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     AttCommonNComparison comparisonFirstLayer(LAYER, layerN);
     m_crossLayer = dynamic_cast<Layer *>(m_crossStaff->FindChildByAttComparison(&comparisonFirstLayer, 1));
     if (!m_crossLayer) {
+        // We should actually just pick the first one
         LogWarning("Could not get the layer with cross-staff reference '%d' for element '%s'",
             durElement->GetStaff().at(0), this->GetUuid().c_str());
         m_crossStaff = NULL;
     }
+    
+    params->m_currentCrossStaff = m_crossStaff;
+    params->m_currentCrossLayer = m_crossLayer;
 
+    return FUNCTOR_CONTINUE;
+}
+    
+int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
+{
+    PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
+    assert(params);
+
+    DurationInterface *durElement = this->GetDurationInterface();
+    if (!durElement) return FUNCTOR_CONTINUE;
+    
+    // If we have  @staff, set reset it to NULL - this can be problematic if we have different @staff attributes
+    // in the the children of one element. We do not consider this now because it seems over the top
+    // We would need to look at the @n attribute and to have a stack to handle this properly
+    if (durElement->HasStaff()) {
+        params->m_currentCrossStaff = NULL;
+        params->m_currentCrossLayer = NULL;
+    }
+    
     return FUNCTOR_CONTINUE;
 }
 

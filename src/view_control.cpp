@@ -649,10 +649,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         // first get the min max of the chord (if any)
         if (startParentChord) {
-            startParentChord->GetYExtremes(&yChordMax, &yChordMin);
+            startParentChord->GetYExtremes(yChordMax, yChordMin);
         }
         else if (startChord) {
-            startChord->GetYExtremes(&yChordMax, &yChordMin);
+            startChord->GetYExtremes(yChordMax, yChordMin);
         }
         // slur is up
         if (drawingCurveDir == curvature_CURVEDIR_above) {
@@ -694,10 +694,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         // get the min max of the chord if any
         if (endParentChord) {
-            endParentChord->GetYExtremes(&yChordMax, &yChordMin);
+            endParentChord->GetYExtremes(yChordMax, yChordMin);
         }
         else if (endChord) {
-            endChord->GetYExtremes(&yChordMax, &yChordMin);
+            endChord->GetYExtremes(yChordMax, yChordMin);
         }
         // get the stem direction of the end
         // slur is up

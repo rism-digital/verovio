@@ -255,7 +255,8 @@ void Doc::PrepareDrawing()
     // Prepare the cross-staff pointers
     PrepareCrossStaffParams prepareCrossStaffParams;
     Functor prepareCrossStaff(&Object::PrepareCrossStaff);
-    this->Process(&prepareCrossStaff, &prepareCrossStaffParams);
+    Functor prepareCrossStaffEnd(&Object::PrepareCrossStaffEnd);
+    this->Process(&prepareCrossStaff, &prepareCrossStaffParams, &prepareCrossStaffEnd);
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)

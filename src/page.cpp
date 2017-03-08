@@ -188,6 +188,11 @@ void Page::LayOutVertically()
     AlignVerticallyParams alignVerticallyParams(doc);
     Functor alignVertically(&Object::AlignVertically);
     this->Process(&alignVertically, &alignVerticallyParams);
+    
+    // Adjust the position of outside articulations
+    AdjustArticParams adjustArticParams(doc);
+    Functor adjustArtic(&Object::AdjustArtic);
+    this->Process(&adjustArtic, &adjustArticParams);
 
     // Render it for filling the bounding box
     View view;
@@ -196,11 +201,6 @@ void Page::LayOutVertically()
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
-
-    // Adjust the position of outside articulations
-    AdjustArticParams adjustArticParams(doc);
-    Functor adjustArtic(&Object::AdjustArtic);
-    this->Process(&adjustArtic, &adjustArticParams);
 
     // Adjust the position of outside articulations with slurs end and start positions
     AdjustArticWithSlursParams adjustArticWithSlursParams(doc);

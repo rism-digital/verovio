@@ -46,17 +46,6 @@ public:
     void SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur);
 
     /**
-     * Update the outside ArticPart (place and drawingY)
-     * If allowAbove is true it will place the above if the content requires so (even if place below if given)
-     */
-    void UpdateOutsidePartPosition(int yAbove, int yBelow, data_STAFFREL place, bool allowAbove);
-
-    /**
-     * Update the inside ArticPart (place and drawingY)
-     */
-    void UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place);
-
-    /**
      * Static method that retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
      */
     static wchar_t GetSmuflCode(data_ARTICULATION artic, data_STAFFREL place);
@@ -139,6 +128,9 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+    
+    /** Override the method since it is align to the staff */
+    virtual bool IsRelativeToStaff() const { return true; }
 
     /**
      * @name Set and get the type of the alignment

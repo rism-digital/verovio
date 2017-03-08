@@ -350,6 +350,8 @@ public:
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
     Object *GetFirstParent(const ClassId classId, int maxSteps = -1) const;
+    
+    Object *GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
 
     /**
      * Return the last parent that is NOT of the specified type.
@@ -448,14 +450,18 @@ public:
     /**
      * Convert top-level all container (section, endings) and editorial elements to boundary elements.
      */
+    ///@{
     virtual int ConvertToPageBased(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int ConvertToPageBasedEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Save the content of any object by calling the appropriate FileOutputStream method.
      */
+    ///@{
     virtual int Save(FunctorParams *functorParams);
     virtual int SaveEnd(FunctorParams *functorParams);
+    ///@}
 
     ///@}
 
@@ -490,15 +496,19 @@ public:
      * It creates it if no other note or event occurs at its position.
      * At the end, for each Layer, align the grace note stacked in GraceAlignment.
      */
+    ///@{
     virtual int AlignHorizontally(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int AlignHorizontallyEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Align the measures by adjusting the m_drawingXRel position looking at the MeasureAligner.
      * At the end, store the width of the system in the MeasureAligner for justification.
      */
+    ///@{
     virtual int AlignMeasures(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int AlignMeasuresEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Reset the horizontal alignment environment for various types for object.
@@ -516,8 +526,10 @@ public:
      * The functor is redirected from the MeasureAligner and then from the appropriate
      * alignment to the GraceAligner
      */
+    ///@{
     virtual int AdjustGraceXPos(FunctorParams *) { return FUNCTOR_CONTINUE; };
     virtual int AdjustGraceXPosEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     /**
      * Retrieve the minimum left and maximum right for an alignment.
@@ -530,14 +542,18 @@ public:
      * The functor process by aligned-staff content, that is from a rediction in the
      * MeasureAligner and then staff by staff but taking into account cross-staff elements
      */
+    ///@{
     virtual int AdjustXPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int AdjustXPosEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Adjust the spacing of the syl processing verse by verse
      */
+    ///@{
     virtual int AdjustSylSpacing(FunctorParams *) { return FUNCTOR_CONTINUE; };
     virtual int AdjustSylSpacingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; };
+    ///@}
 
     ///@}
 
@@ -638,7 +654,10 @@ public:
     /**
      * See cross-staff / layer pointers on LayerElement
      */
+    ///@{
     virtual int PrepareCrossStaff(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareCrossStaffEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Builds a tree of ints (IntTree) with the staff/layer/verse numbers and for staff/layer to be then processed.
@@ -648,24 +667,30 @@ public:
     /**
      * Match start for TimePointingInterface elements (such as fermata or harm).
      */
+    ///@{
     virtual int PrepareTimePointing(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareTimePointingEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Match start and end for TimeSpanningInterface elements (such as tie or slur).
      * If fillList is set to false, only the remaining elements will be matched.
      * This is used when processing a second time in the other direction
      */
+    ///@{
     virtual int PrepareTimeSpanning(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareTimeSpanningEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Match start and end for TimeSpanningInterface elements with tstamp(2) attributes.
      * It is performed only on TimeSpanningInterface elements withouth @startid (or @endid).
      * It adds to the start (and end) measure a TimeStampAttr to the Measure::m_tstamps.
      */
+    ///@{
     virtual int PrepareTimestamps(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareTimestampsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Process Chord and Note for matching @tie by processing by Layer and by looking
@@ -673,8 +698,10 @@ public:
      * At the end, processes Chord and Note for matching @tie by processing by Layer; resets the
      * Chord pointer to NULL at the end of a chord.
      */
+    ///@{
     virtual int PrepareTieAttr(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareTieAttrEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Process by Layer and set drawing pointers.
@@ -687,8 +714,10 @@ public:
      * The functor is processed by staff/layer/verse using an ArrayOfAttComparisons filter.
      * At the end, the functor is processed by doc at the end of a document of closing opened syl.
      */
+    ///@{
     virtual int PrepareLyrics(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int PrepareLyricsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Functor for setting the artic parts.
@@ -717,8 +746,10 @@ public:
      * where required. For Note with DrawingTieAttr, the functor is redirected to the tie object.
      * At the end, remove the TimeSpanningInterface element from the list when the last measure is reached.
      */
+    ///@{
     virtual int FillStaffCurrentTimeSpanning(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int FillStaffCurrentTimeSpanningEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Reset the drawing values before calling PrepareDrawing after changes.
@@ -758,8 +789,10 @@ public:
      * Fill a page by adding systems with the appropriate length.
      * At the end, add all the pending objects where reaching the end
      */
+    ///@{
     virtual int CastOffSystems(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int CastOffSystemsEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      *
@@ -787,8 +820,10 @@ public:
     /**
      * Export the object to a MidiFile
      */
+    ///@{
     virtual int GenerateMIDI(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int GenerateMIDIEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * Calculate the maximum duration of each measure.

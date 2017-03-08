@@ -582,7 +582,7 @@ void View::CalcBeam(
         if ((*beamElementCoords).at(i)->m_element->Is(CHORD)) {
             Chord *chord = dynamic_cast<Chord *>((*beamElementCoords).at(i)->m_element);
             assert(chord);
-            chord->GetYExtremes(&yMax, &yMin);
+            chord->GetYExtremes(yMax, yMin);
             (*beamElementCoords).at(i)->m_yTop = yMax;
             (*beamElementCoords).at(i)->m_yBottom = yMin;
 

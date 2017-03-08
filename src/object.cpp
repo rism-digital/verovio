@@ -481,7 +481,7 @@ void Object::FillFlatList(ListOfObjects *flatList)
     AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
-
+    
 Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
@@ -493,6 +493,20 @@ Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
     }
     else {
         return (m_parent->GetFirstParent(classId, maxDepth - 1));
+    }
+}
+    
+Object *Object::GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
+{
+    if ((maxDepth == 0) || !m_parent) {
+        return NULL;
+    }
+    
+    if ((m_parent->GetClassId() > classIdMin) && (m_parent->GetClassId() < classIdMax)) {
+        return m_parent;
+    }
+    else {
+        return (m_parent->GetFirstParentInRange(classIdMin, classIdMax, maxDepth - 1));
     }
 }
 

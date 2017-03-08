@@ -36,7 +36,7 @@ public:
     virtual void UpdateSelfBBoxY(int y1, int y2);
     bool HasContentBB();
     bool HasSelfBB();
-    void SetEmptyBB();
+    void SetEmptyBB(bool onlyIfUnset = false);
     bool HasEmptyBB();
 
     /**

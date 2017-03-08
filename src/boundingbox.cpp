@@ -60,7 +60,6 @@ void BoundingBox::UpdateContentBBoxX(int x1, int x2)
     if (m_contentBB_x1 > min_x) m_contentBB_x1 = min_x;
     if (m_contentBB_x2 < max_x) m_contentBB_x2 = max_x;
 
-    m_updatedBBoxX = true;
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
     // GetClassName().c_str());
 }
@@ -80,7 +79,6 @@ void BoundingBox::UpdateContentBBoxY(int y1, int y2)
     if (m_contentBB_y1 > min_y) m_contentBB_y1 = min_y;
     if (m_contentBB_y2 < max_y) m_contentBB_y2 = max_y;
 
-    m_updatedBBoxY = true;
     // LogDebug("CB Is:  %i %i %i %i %s", m_contentBB_x1,m_contentBB_y1, m_contentBB_x2, m_contentBB_y2,
     // GetClassName().c_str());
 }
@@ -143,21 +141,23 @@ int BoundingBox::GetDrawingY() const
 
 void BoundingBox::ResetBoundingBox()
 {
-    m_contentBB_x1 = 0xFFFFFFF;
-    m_contentBB_y1 = 0xFFFFFFF;
-    m_contentBB_x2 = -0xFFFFFFF;
-    m_contentBB_y2 = -0xFFFFFFF;
-    m_selfBB_x1 = 0xFFFFFFF;
-    m_selfBB_y1 = 0xFFFFFFF;
-    m_selfBB_x2 = -0xFFFFFFF;
-    m_selfBB_y2 = -0xFFFFFFF;
+    m_contentBB_x1 = -VRV_UNSET;
+    m_contentBB_y1 = -VRV_UNSET;
+    m_contentBB_x2 = VRV_UNSET;
+    m_contentBB_y2 = VRV_UNSET;
+    m_selfBB_x1 = -VRV_UNSET;
+    m_selfBB_y1 = -VRV_UNSET;
+    m_selfBB_x2 = VRV_UNSET;
+    m_selfBB_y2 = VRV_UNSET;
 
     m_updatedBBoxX = false;
     m_updatedBBoxY = false;
 }
 
-void BoundingBox::SetEmptyBB()
+void BoundingBox::SetEmptyBB(bool onlyIfUnset)
 {
+    //if (onlyIfUnset && this->HasContentBB() && this->HasSelfBB()) return;
+    
     m_contentBB_x1 = 0;
     m_contentBB_y1 = 0;
     m_contentBB_x2 = 0;
@@ -179,13 +179,13 @@ bool BoundingBox::HasEmptyBB()
 
 bool BoundingBox::HasContentBB()
 {
-    return ((m_contentBB_x1 != 0xFFFF) && (m_contentBB_y1 != 0xFFFF) && (m_contentBB_x2 != -0xFFFF)
-        && (m_contentBB_y2 != -0xFFFF));
+    return ((m_contentBB_x1 != -VRV_UNSET) && (m_contentBB_y1 != -VRV_UNSET) && (m_contentBB_x2 != VRV_UNSET)
+        && (m_contentBB_y2 != VRV_UNSET));
 }
 
 bool BoundingBox::HasSelfBB()
 {
-    return ((m_selfBB_x1 != 0xFFFF) && (m_selfBB_y1 != 0xFFFF) && (m_selfBB_x2 != -0xFFFF) && (m_selfBB_y2 != -0xFFFF));
+    return ((m_selfBB_x1 != -VRV_UNSET) && (m_selfBB_y1 != -VRV_UNSET) && (m_selfBB_x2 != VRV_UNSET) && (m_selfBB_y2 != VRV_UNSET));
 }
 
 bool BoundingBox::HorizontalOverlap(const BoundingBox *other) const
