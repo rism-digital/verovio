@@ -936,7 +936,7 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
 
     if (!spanningContentPoints.empty()) {
         AdjustSlurCurve(
-            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, curveDir, slurAngle);
+            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, curveDir, slurAngle, true);
         // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
         AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2,
             curveDir, &slurAngle, false);
@@ -1061,11 +1061,9 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
     maxHeight = dist / (maxHeightFactor * (TEMP_SLUR_CURVE_FACTOR
                                               + 5)); // 5 is the minimum - can be increased for limiting curvature
-    if (posRatio) {
-        // Do we want to set a max height?
-        // maxHeight = std::min(maxHeight, m_doc->GetDrawingStaffSize(100));
-    }
-
+    
+    maxHeight = std::max(maxHeight, currentHeight);
+    
     bool hasReachedMaxHeight = false;
 
     if (maxHeight > currentHeight) {
@@ -1126,32 +1124,29 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
             }
         }
     }
+    
+    if (hasReachedMaxHeight) return maxHeight;
 
-    // Check if we need further adjustment of the points with the adjusted curve
-    /*
+    // Check if we need further adjustment of the points with the curve
     bezier[1] = *c1;
     bezier[2] = *c2;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-        y = View::CalcBezierAtPosition(bezier, itPoint->second.x);
-        if (up) {
-            //if (y > itPoint->second.y) itPoint = spanningPoints->erase(itPoint);
-            //else itPoint++;
+        y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
+        if (curveDir == curvature_CURVEDIR_above) {
+            if (y >= itPoint->second.y) itPoint = spanningPoints->erase(itPoint);
+            else
+                itPoint++;
         }
         else {
-            //if (y < itPoint->second.y) itPoint = spanningPoints->erase(itPoint);
-            //else itPoint++;
+            if (y <= itPoint->second.y) itPoint = spanningPoints->erase(itPoint);
+            else
+                itPoint++;
         }
-        itPoint++;
     }
 
-    // We will need to adjust the further if the list is not empty
-    return (!spanningPoints->empty());
-    */
+    if (!spanningPoints->empty()) return maxHeight;
 
-    if (hasReachedMaxHeight)
-        return maxHeight;
-    else
-        return 0;
+    return 0;
 }
 
 void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2,
@@ -1427,7 +1422,7 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    int y = syl->GetDrawingY();
+    int y = staff->GetDrawingY() + GetSylYRel(syl, staff);
     TextExtend extend;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
