@@ -189,6 +189,17 @@ Beam *LayerElement::IsInBeam()
     }
     return NULL;
 }
+    
+Staff *LayerElement::GetParentCrossStaff() const
+{
+    if (m_crossStaff) return m_crossStaff;
+    
+    LayerElement *parent = dynamic_cast<LayerElement*>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
+    
+    if (parent) return parent->GetParentCrossStaff();
+    
+    return NULL;
+}
 
 Alignment *LayerElement::GetGraceAlignment() const
 {
@@ -451,6 +462,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
+        m_alignment->AddLayerElementRef(this);
         return FUNCTOR_CONTINUE;
     }
 
@@ -532,6 +544,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
         m_alignment = note->GetAlignment();
+        m_alignment->AddLayerElementRef(this);
         return FUNCTOR_CONTINUE;
     }
     else if (this->Is(VERSE)) {
@@ -588,7 +601,6 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
 
     if (m_crossStaff && m_crossLayer) {
         layerElementY = m_crossLayer->GetAtPos(this->GetDrawingX());
-        assert(layerElementY);
         staffY = m_crossStaff;
         layerY = m_crossLayer;
     }
@@ -695,7 +707,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     if (!this->HasToBeAligned()) {
         // if nothing to do with this type of element
         // this happens for example with Artic where only ArticPart children are aligned
-        return FUNCTOR_CONTINUE;
+        return FUNCTOR_SIBLINGS;
     }
 
     int selfLeft;
@@ -734,9 +746,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     params->m_upcomingMinPos = std::max(selfRight, params->m_upcomingMinPos);
 
-    return FUNCTOR_CONTINUE;
-
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)

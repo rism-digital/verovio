@@ -150,6 +150,7 @@ LayerElement *Layer::GetAtPos(int x)
         if (nextLayerElement->GetDrawingX() > x) return element;
         element = nextLayerElement;
     }
+    // This can be NULL if the layer is empty
     return element;
 }
 

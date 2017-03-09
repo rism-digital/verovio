@@ -589,12 +589,9 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                         // the attribute value matches, process the object
                         // LogDebug("%s ", (*iter)->GetClassName().c_str());
                         (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
-                        break;
                     }
-                    else {
-                        // the attribute value does not match, skip this child
-                        continue;
-                    }
+                    // continue to the next child
+                    continue;
                 }
             }
             // we will end here if there is no filter at all or for the current child type
