@@ -613,7 +613,7 @@ void Alignment::AddLayerElementRef(LayerElement *element)
 
     // -1 will be used for barlines attributes
     int n = -1;
-    Staff *staffRef = element->GetParentCrossStaff();
+    Staff *staffRef = element->GetCrossStaff();
     if (!staffRef) staffRef = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
     if (staffRef) n = staffRef->GetN();
     AlignmentReference *alignmentRef = new AlignmentReference(n, element);
@@ -1008,8 +1008,8 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             params->m_graceCumulatedXShift = 0;
             filters.clear();
             // Create ad comparison object for each type / @n
-            AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
-            filters.push_back(&matchStaff);
+            //AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
+            //filters.push_back(&matchStaff);
 
             m_graceAligner->Process(
                 params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);

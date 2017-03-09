@@ -190,13 +190,13 @@ Beam *LayerElement::IsInBeam()
     return NULL;
 }
     
-Staff *LayerElement::GetParentCrossStaff() const
+Staff *LayerElement::GetCrossStaff() const
 {
     if (m_crossStaff) return m_crossStaff;
     
     LayerElement *parent = dynamic_cast<LayerElement*>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
     
-    if (parent) return parent->GetParentCrossStaff();
+    if (parent) return parent->GetCrossStaff();
     
     return NULL;
 }
@@ -238,9 +238,10 @@ int LayerElement::GetDrawingX() const
 
 int LayerElement::GetDrawingY() const
 {
-    // First look if we have a crossStaff situation
-    Object *object = m_crossStaff;
-    // Otherwise get the first layerElement parent (if any) but only if the element is not directly relative to staff (e.g., artic, syl)
+    Object *object = NULL;
+    // Otherwise look if we have a crossStaff situation
+    if (!object) object = this->m_crossStaff; //GetCrossStaff();
+    // First get the first layerElement parent (if any) but only if the element is not directly relative to staff (e.g., artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
     // Otherwise get the first staff
     if (!object) object = this->GetFirstParent(STAFF);
@@ -535,6 +536,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         if (note) {
             m_alignment = note->GetAlignment();
+            m_alignment->AddLayerElementRef(this);
             return FUNCTOR_CONTINUE;
         }
         type = ALIGNMENT_ACCID;
@@ -552,6 +554,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
         m_alignment = note->GetAlignment();
+        m_alignment->AddLayerElementRef(this);
         return FUNCTOR_CONTINUE;
     }
     else if (this->IsGraceNote()) {
