@@ -67,10 +67,6 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     
     int elementCount = (int)beamChildren->size();
     int last = elementCount - 1;
-    
-    for (i = 0; i < elementCount; i++) {
-        (*beamElementCoords).at(i)->m_x = (*beamElementCoords).at(i)->m_element->GetDrawingX();
-    }
 
     /******************************************************************/
     // Calculate the beam slope and position
@@ -309,14 +305,10 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     BeamElementCoord *firstElement = (*beamElementCoords).at(0);
     BeamElementCoord *secondElement = (*beamElementCoords).at(1);
 
-    // x positions
-    firstElement->m_x = firstElement->m_element->GetDrawingX();
-    secondElement->m_x = secondElement->m_element->GetDrawingX();
-
     /******************************************************************/
     // Calculate the beam slope and position
 
-    //CalcBeam(layer, staff, beamElementCoords, elementCount, &fTrem->m_drawingParams);
+    CalcBeam(layer, staff, beamElementCoords, elementCount, &fTrem->m_drawingParams);
 
     /******************************************************************/
     // Start the grahic
@@ -327,9 +319,6 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // Draw the children
 
     DrawLayerChildren(dc, fTrem, layer, staff, measure);
-    
-    dc->EndGraphic(element, this);
-    return;
 
     /******************************************************************/
     // Draw the stems and the bars
@@ -431,7 +420,11 @@ void View::CalcBeam(
 
     /******************************************************************/
     // initialization
-
+    
+    for (i = 0; i < elementCount; i++) {
+        (*beamElementCoords).at(i)->m_x = (*beamElementCoords).at(i)->m_element->GetDrawingX();
+    }
+    
     avgY = 0;
     high = VRV_UNSET;
     low = -VRV_UNSET;
