@@ -92,6 +92,7 @@ downloads:
     };
 
     function load_data(data) {
+
         set_options();
 
         console.time("loading");
@@ -597,10 +598,38 @@ downloads:
         });
     });
     
+    //var vrvToolkit;
+    
     // Preload the WASM module - 
-    var Module = {};
+    var Module = {
+      noInitialRun: false,
+      onRuntimeInitialized: function() {
+          // Load the default file or the file passed in the URL
+          
+          var file = getParameterByName("file");
+
+          if (!file || (file.length == 0)) {
+              file = "examples/downloads/Chopin_Etude_op.10_no.9.mei";
+          }
+
+          vrvToolkit = new verovio.toolkit();
+          console.log("Loaded!");
+          console.log(vrvToolkit.getVersion());
+
+          $.ajax({
+              url: file
+              , dataType: "text"
+              , success: function(data) {
+                  outputFilename = file.replace(/^.*[\\\/]/, '')
+                  load_data( data );
+              }
+          });
+      }
+    };
+    
+
     var xhr=new XMLHttpRequest();
-    xhr.open( 'GET','{{ site.baseurl }}/javascript/develop/verovio-toolkit-wasm.wasm',true );
+    xhr.open( 'GET','{{ site.baseurl }}/javascript/develop/verovio.wasm',true );
     xhr.responseType='arraybuffer';
     xhr.onload=function(){
         Module.wasmBinary=xhr.response;
