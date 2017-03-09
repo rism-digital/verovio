@@ -512,7 +512,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->Is({ MRPT2, MULTIRPT })) {
         type = ALIGNMENT_FULLMEASURE2;
     }
-    else if (this->Is({ BEAM, TUPLET })) {
+    else if (this->Is({ BEAM, FTREM, TUPLET })) {
         type = ALIGNMENT_CONTAINER;
     }
     else if (this->Is(DOT)) {
