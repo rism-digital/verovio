@@ -341,6 +341,9 @@ int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
     if (m_measureAligner.GetRightAlignment()) {
         m_measureAligner.GetRightAlignment()->SetXRel(0);
     }
+    
+    Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
+    m_timestampAligner.Process(&resetHorizontalAlignment, NULL);
 
     return FUNCTOR_CONTINUE;
 }

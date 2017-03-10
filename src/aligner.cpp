@@ -642,9 +642,14 @@ void Alignment::AddLayerElementRef(LayerElement *element)
 
     // -1 will be used for barlines attributes
     int n = -1;
-    Staff *staffRef = element->GetCrossStaff();
-    if (!staffRef) staffRef = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
-    if (staffRef) n = staffRef->GetN();
+    // -2 will be used for timestamps
+    if (element->Is(TIMESTAMP_ATTR))
+        n = -2;
+    else {
+        Staff *staffRef = element->GetCrossStaff();
+        if (!staffRef) staffRef = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
+        if (staffRef) n = staffRef->GetN();
+    }
     AlignmentReference *alignmentRef = new AlignmentReference(n, element);
     this->AddChild(alignmentRef);
 }

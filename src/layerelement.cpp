@@ -469,6 +469,8 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     AlignHorizontallyParams *params = dynamic_cast<AlignHorizontallyParams *>(functorParams);
     assert(params);
 
+    assert(!m_alignment);
+    
     this->SetScoreDefRole(params->m_scoreDefRole);
     
     bool isGraceNote = this->IsGraceNote();
@@ -600,12 +602,12 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         }
     }
 
-    // LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str());
-
-    // increase the time position, but only when not a timestamp (it would actually do nothing)
     if (!this->Is(TIMESTAMP_ATTR)) {
+        // increase the time position, but only when not a timestamp (it would actually do nothing)
         params->m_time += duration;
     }
+    
+    // LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str());
 
     return FUNCTOR_CONTINUE;
 }

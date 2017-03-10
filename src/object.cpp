@@ -439,6 +439,7 @@ void Object::SetParent(Object *parent)
 void Object::AddChild(Object *child)
 {
     // This should never happen because the method should be overridden
+    LogDebug("Parent %s - Child %s", this->GetClassName().c_str(), child->GetClassName().c_str());
     assert(false);
 }
 
