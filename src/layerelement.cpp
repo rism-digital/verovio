@@ -220,7 +220,7 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 int LayerElement::GetDrawingX() const
 {
     if (!m_alignment) {
-        assert(this->Is({ BEAM, FTREM, TUPLET }));
+        //assert(this->Is({ BEAM, FTREM, TUPLET }));
         // Here we just get the measure position - no cast to Measure is necessary
         Object *measure = this->GetFirstParent(MEASURE);
         assert(measure);

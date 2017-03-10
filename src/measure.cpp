@@ -414,7 +414,12 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 {
     AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
+    
+    params->m_minPos = 0;
+    params->m_upcomingMinPos = VRV_UNSET;
+    params->m_cumulatedXShift = 0;
 
+    /*
     std::vector<int>::iterator iter;
     std::vector<AttComparison *> filters;
     for (iter = params->m_staffNs.begin(); iter != params->m_staffNs.end(); iter++) {
@@ -431,8 +436,11 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
         AttCommonNComparisonAny matchStaff(ALIGNMENT_REFERENCE, ns);
         filters.push_back(&matchStaff);
 
-        m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
+        //m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
+    */
+    
+    m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
 
     int minMeasureWidth = params->m_doc->m_drawingMinMeasureWidth;
     // First try to see if we have a double measure length element

@@ -635,23 +635,36 @@ void Alignment::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
+    
+AlignmentReference *Alignment::GetAlignmentReference(int staffN)
+{
+    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+    AlignmentReference *alignmentRef = dynamic_cast<AlignmentReference*>(this->FindChildByAttComparison(&matchStaff, 1));
+    if (!alignmentRef) {
+        alignmentRef = new AlignmentReference();
+        alignmentRef->SetN(staffN);
+        this->AddChild(alignmentRef);
+    }
+    return alignmentRef;
+}
 
 void Alignment::AddLayerElementRef(LayerElement *element)
 {
     assert(element->IsLayerElement());
 
     // -1 will be used for barlines attributes
-    int n = -1;
+    int staffN = -1;
     // -2 will be used for timestamps
     if (element->Is(TIMESTAMP_ATTR))
-        n = -2;
+        staffN = -2;
     else {
         Staff *staffRef = element->GetCrossStaff();
         if (!staffRef) staffRef = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
-        if (staffRef) n = staffRef->GetN();
+        if (staffRef) staffN = staffRef->GetN();
     }
-    AlignmentReference *alignmentRef = new AlignmentReference(n, element);
-    this->AddChild(alignmentRef);
+    AlignmentReference *alignmentRef = GetAlignmentReference(staffN);
+    alignmentRef->AddChild(element);
+    //this->AddChild(alignmentRef);
 }
 
 bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
@@ -696,21 +709,28 @@ AlignmentReference::AlignmentReference() : Object(), AttCommon()
     Reset();
 }
 
-AlignmentReference::AlignmentReference(int n, Object *elementRef) : Object(), AttCommon()
+AlignmentReference::AlignmentReference(int n) : Object(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
     Reset();
     this->SetN(n);
-    m_elementRef = elementRef;
 }
 
 void AlignmentReference::Reset()
 {
     Object::Reset();
     ResetCommon();
-
-    m_elementRef = NULL;
+}
+    
+    
+void AlignmentReference::AddChild(Object *child)
+{
+    assert(dynamic_cast<LayerElement *>(child));
+    
+    //child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
 }
 
 //----------------------------------------------------------------------------
@@ -1120,6 +1140,7 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+/*
 int AlignmentReference::GetAlignmentLeftRight(FunctorParams *functorParams)
 {
     GetAlignmentLeftRightParams *params = dynamic_cast<GetAlignmentLeftRightParams *>(functorParams);
@@ -1151,6 +1172,7 @@ int AlignmentReference::AdjustXPos(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+*/
 
 int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
 {

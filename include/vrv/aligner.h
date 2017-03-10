@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class AlignmentReference;
 class FloatingObject;
 class GraceAligner;
 class MeasureAligner;
@@ -295,6 +296,8 @@ public:
      * Override the method of adding AlignmentReference children
      */
     virtual void AddChild(Object *object);
+    
+    AlignmentReference *GetAlignmentReference(int staffN);
 
     /**
      * @name Set and get the xRel value of the alignment
@@ -445,16 +448,16 @@ public:
     */
     ///@{
     AlignmentReference();
-    AlignmentReference(int n, Object *elementRef);
+    AlignmentReference(int n);
     virtual ~AlignmentReference() {}
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
-
+    
     /**
-     * Getter for the Object
+     * Override the method of adding AlignmentReference children
      */
-    Object *GetObject() { return m_elementRef; }
+    virtual void AddChild(Object *object);
 
     //----------//
     // Functors //
@@ -463,20 +466,19 @@ public:
     /**
      * See Object::GetAlignmentLeftRight
      */
-    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+    //virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustGraceXPos
      */
-    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+    //virtual int AdjustGraceXPos(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustXPos
      */
-    virtual int AdjustXPos(FunctorParams *functorParams);
+    //virtual int AdjustXPos(FunctorParams *functorParams);
 
 private:
-    Object *m_elementRef;
 };
 
 //----------------------------------------------------------------------------
