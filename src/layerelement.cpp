@@ -118,10 +118,14 @@ bool LayerElement::IsGraceNote()
         LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
         if (child) return child->IsGraceNote();
     }
-    // For accid, look at the parent note
-    else if (this->Is(ACCID)) {
+    // For accid, artic, etc.. look at the parent note / chord
+    else {
+        // For an accid we expect to be the child of a note - the note will lookup at the chord parent in necessary
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
-        return (note && (note->HasGrace()));
+        if (note) return note->IsGraceNote();
+        // For an artic we can be direct child of a chord
+        Chord *chord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_ACCID_DEPTH));
+        if (chord) return chord->IsGraceNote();
     }
     return false;
 }
@@ -236,8 +240,8 @@ int LayerElement::GetDrawingX() const
     int graceNoteShift = 0;
     if (this->HasGraceAlignment()) {
         graceNoteShift = this->GetGraceAlignment()->GetXRel();
-        // const Note *note = dynamic_cast<const Note*>(this);
-        // LogDebug("Grace Note %d  Shift %d", note->GetPname(), graceNoteShift);
+        //const Note *note = dynamic_cast<const Note*>(this);
+        //LogDebug("Grace Note %d  Shift %d", note->GetPname(), graceNoteShift);
     }
     
     return (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel() + graceNoteShift);
@@ -466,21 +470,21 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     assert(params);
 
     this->SetScoreDefRole(params->m_scoreDefRole);
+    
+    bool isGraceNote = this->IsGraceNote();
+    
+    AlignmentType type = ALIGNMENT_DEFAULT;
 
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
-        m_alignment->AddLayerElementRef(this);
-        return FUNCTOR_CONTINUE;
     }
     
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, FTREM, TUPLET })) {
         return FUNCTOR_CONTINUE;
     }
-
-    AlignmentType type = ALIGNMENT_DEFAULT;
-    if (this->Is(BARLINE)) {
+    else if (this->Is(BARLINE)) {
         type = ALIGNMENT_BARLINE;
     }
     else if (this->Is(CLEF)) {
@@ -543,51 +547,57 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->Is(ACCID)) {
         // Refer to the note parent (if any?)
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
-        if (note) {
+        if (note)
             m_alignment = note->GetAlignment();
-            m_alignment->AddLayerElementRef(this);
-            return FUNCTOR_CONTINUE;
-        }
-        type = ALIGNMENT_ACCID;
+        else
+            type = ALIGNMENT_ACCID;
     }
     else if (this->Is({ ARTIC, ARTIC_PART, SYL })) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
         m_alignment = note->GetAlignment();
-        m_alignment->AddLayerElementRef(this);
-        return FUNCTOR_CONTINUE;
     }
     else if (this->Is(VERSE)) {
         // Idem
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         assert(note);
         m_alignment = note->GetAlignment();
-        m_alignment->AddLayerElementRef(this);
-        return FUNCTOR_CONTINUE;
     }
     else if (this->IsGraceNote()) {
         type = ALIGNMENT_GRACENOTE;
     }
+    
+    double duration = 0.0;
+    // We have already an alignment with grace note children - skip this
+    if (!m_alignment) {
+        // get the duration of the event
+        duration = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig);
 
-    // get the duration of the event
-    double duration = this->GetAlignmentDuration(params->m_currentMensur, params->m_currentMeterSig);
+        // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
+        // So use it as current time - we can do this because the timestamp loop is redirected from the measure
+        // The time will be reset to 0.0 when starting a new layer anyway
+        if (this->Is(TIMESTAMP_ATTR))
+            params->m_time = duration;
+        else
+            params->m_measureAligner->SetMaxTime(params->m_time + duration);
 
-    // For timestamp, what we get from GetAlignmentDuration is actually the position of the timestamp
-    // So use it as current time - we can do this because the timestamp loop is redirected from the measure
-    // The time will be reset to 0.0 when starting a new layer anyway
-    if (this->Is(TIMESTAMP_ATTR))
-        params->m_time = duration;
-    else
-        params->m_measureAligner->SetMaxTime(params->m_time + duration);
-
-    m_alignment = params->m_measureAligner->GetAlignmentAtTime(params->m_time, type);
-    if (type != ALIGNMENT_GRACENOTE) m_alignment->AddLayerElementRef(this);
-
-    if (this->IsGraceNote()) {
-        GraceAligner *graceAligner = m_alignment->GetGraceAligner();
-        // We know that this is a note
-        graceAligner->StackGraceElement(this);
+        m_alignment = params->m_measureAligner->GetAlignmentAtTime(params->m_time, type);
+        assert(m_alignment);
+    }
+    
+    if (m_alignment->GetType() != ALIGNMENT_GRACENOTE) {
+        m_alignment->AddLayerElementRef(this);
+    }
+    // For grace note aligner do not add them to the reference list because they will be processed by their original hierarchy from the GraceAligner
+    else {
+        assert(isGraceNote);
+        if (this->Is(CHORD) || (this->Is(NOTE) && !chordParent)) {
+            GraceAligner *graceAligner = m_alignment->GetGraceAligner();
+            // We know that this is a note or a chord - we stack them and they will be added at the end of the layer
+            // This will also see it for all their children
+            graceAligner->StackGraceElement(this);
+        }
     }
 
     // LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str());
@@ -687,6 +697,8 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
+    
+    if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
 
     if (!this->HasGraceAlignment()) return FUNCTOR_CONTINUE;
 

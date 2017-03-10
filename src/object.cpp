@@ -1033,6 +1033,8 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
     assert(params);
 
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
+    
+    if (!this->HasUpdatedBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
     int refLeft = this->GetSelfLeft();
     if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;

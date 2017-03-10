@@ -113,32 +113,31 @@ void Beam::FilterList(ListOfObjects *childList)
             continue;
         }
         else {
-            // Drop notes that are signaled as grace notes
-
-            if ((*iter)->Is(NOTE)) {
-                Note *n = dynamic_cast<Note *>(*iter);
-                assert(n);
-                // if we are at the beginning of the beam
-                // and the note is cueSize
-                // assume all the beam is of grace notes
-                if (childList->begin() == iter) {
-                    if (n->HasGrace()) firstNoteGrace = true;
-                }
-
-                // if the first note in beam was NOT a grace
-                // we have grace notes embedded in a beam
-                // drop them
-                if (!firstNoteGrace && n->HasGrace() == true) iter = childList->erase(iter);
-                // also remove notes within chords
-                else if (n->IsChordTone())
+            LayerElement *element = dynamic_cast<LayerElement*>(*iter);
+            assert(element);
+            // if we are at the beginning of the beam
+            // and the note is cueSize
+            // assume all the beam is of grace notes
+            if (childList->begin() == iter) {
+                if (element->IsGraceNote()) firstNoteGrace = true;
+            }
+            // if the first note in beam was NOT a grace
+            // we have grace notes embedded in a beam
+            // drop them
+            if (!firstNoteGrace && element->IsGraceNote()) {
+                iter = childList->erase(iter);
+                continue;
+            }
+            // also remove notes within chords
+            if (element->Is(NOTE)) {
+                Note *note = dynamic_cast<Note *>(element);
+                assert(note);
+                if (note->IsChordTone()) {
                     iter = childList->erase(iter);
-                else
-                    iter++;
+                    continue;
+                }
             }
-            else {
-                // if it is a Rest, do not drop
-                iter++;
-            }
+            iter++;
         }
     }
 

@@ -448,7 +448,8 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
     }
 
     // This should never happen because we must have hit the left barline in the loop above
-    if (!rightAlignment || (maxRight == VRV_UNSET)) return;
+    if (!rightAlignment || (maxRight == VRV_UNSET))
+        return;
 
     // Check if the left position of the group is on the right of the previous maxRight
     // If not, move the aligments accordingly
@@ -546,7 +547,12 @@ void GraceAligner::AlignStack()
 
 int GraceAligner::GetGraceGroupLeft(int staffN)
 {
-    Alignment *leftAlignment = dynamic_cast<Alignment *>(this->GetFirst());
+    // First we need to get the left alignment with an alignment reference with staffN
+    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+    Object *reference = this->FindChildByAttComparison(&matchStaff);
+    if (!reference) return -VRV_UNSET;
+    // The alignment is its parent
+    Alignment *leftAlignment = dynamic_cast<Alignment *>(reference->m_parent);
     if (!leftAlignment) return -VRV_UNSET;
 
     int minLeft, maxRight;
@@ -557,6 +563,9 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
 
 int GraceAligner::GetGraceGroupRight(int staffN)
 {
+    // See GraceAligner::GetGraceGroupLeft
+    // We do not need to search of the alignment with staffN here because all grace note groups
+    // Have their right note aligned, so getting the last is fine
     Alignment *rightAlignment = dynamic_cast<Alignment *>(this->GetLast());
     if (!rightAlignment) return VRV_UNSET;
 
@@ -1025,7 +1034,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
 
             params->m_graceMaxPos = graceMaxPos;
             params->m_graceUpcomingMaxPos = -VRV_UNSET;
-            params->m_graceCumulatedXShift = 0;
+            params->m_graceCumulatedXShift = VRV_UNSET;
             filters.clear();
             // Create ad comparison object for each type / @n
             AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
@@ -1035,7 +1044,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
 
             // There was not grace notes for that staff
-            if (params->m_graceCumulatedXShift == 0) continue;
+            if (params->m_graceCumulatedXShift == VRV_UNSET) continue;
 
             // Now we need to adjust the space for the grace not group
             measureAligner->AdjustGraceNoteSpacing(params->m_doc, this, (*iter));
@@ -1046,9 +1055,11 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
 
         return FUNCTOR_CONTINUE;
     }
-
-    // This is happening when aligning the grace aligner itself
-    this->SetXRel(this->GetXRel() + params->m_graceCumulatedXShift);
+    
+    if (params->m_graceCumulatedXShift != VRV_UNSET) {
+        // This is happening when aligning the grace aligner itself
+        this->SetXRel(this->GetXRel() + params->m_graceCumulatedXShift);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -1119,7 +1130,7 @@ int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
-    // LogDebug("AlignmentRef staff %d", GetN());
+    // LogDebug("Grace - AlignmentRef staff %d", GetN());
     this->m_elementRef->Process(params->m_functor, params);
 
     return FUNCTOR_CONTINUE;

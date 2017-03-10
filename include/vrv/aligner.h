@@ -24,8 +24,6 @@ class TimestampAttr;
 /**
  * Alignment types for aligning types together.
  * For example, we align notes and rests (default) together, clefs separately, etc.
- * The container is a generic alignment for tuplet, chords, beams, etc.; we need
- * this to avoid notes aligning to it
  */
 enum AlignmentType {
     ALIGNMENT_MEASURE_START = 0,
@@ -38,7 +36,6 @@ enum AlignmentType {
     // Justifiable
     ALIGNMENT_FULLMEASURE,
     ALIGNMENT_FULLMEASURE2,
-    ALIGNMENT_GRACENOTE,
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF,
     ALIGNMENT_KEYSIG,
@@ -46,6 +43,7 @@ enum AlignmentType {
     ALIGNMENT_METERSIG,
     ALIGNMENT_DOT,
     ALIGNMENT_ACCID,
+    ALIGNMENT_GRACENOTE,
     ALIGNMENT_DEFAULT,
     // Non-justifiable
     ALIGNMENT_MEASURE_RIGHT_BARLINE,
