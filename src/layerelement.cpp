@@ -215,7 +215,13 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 
 int LayerElement::GetDrawingX() const
 {
-    assert(m_alignment);
+    if (!m_alignment) {
+        assert(this->Is({ BEAM, FTREM, TUPLET }));
+        // Here we just get the measure position - no cast to Measure is necessary
+        Object *measure = this->GetFirstParent(MEASURE);
+        assert(measure);
+        return measure->GetDrawingX(); 
+    }
     
     // First get the first layerElement parent (if any) and use its position if they share the same alignment
     LayerElement *parent = dynamic_cast<LayerElement*>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
@@ -223,14 +229,15 @@ int LayerElement::GetDrawingX() const
         return (parent->GetDrawingX() + this->GetDrawingXRel());
     }
     
-    // Otherwise get the measure
+    // Otherwise get the measure - no cast to Measure is necessary
     Object *measure = this->GetFirstParent(MEASURE);
-    
     assert(measure);
     
     int graceNoteShift = 0;
     if (this->HasGraceAlignment()) {
         graceNoteShift = this->GetGraceAlignment()->GetXRel();
+        // const Note *note = dynamic_cast<const Note*>(this);
+        // LogDebug("Grace Note %d  Shift %d", note->GetPname(), graceNoteShift);
     }
     
     return (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel() + graceNoteShift);
@@ -466,6 +473,11 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         m_alignment->AddLayerElementRef(this);
         return FUNCTOR_CONTINUE;
     }
+    
+    // We do not align these (formely container). Any other?
+    else if (this->Is({ BEAM, FTREM, TUPLET })) {
+        return FUNCTOR_CONTINUE;
+    }
 
     AlignmentType type = ALIGNMENT_DEFAULT;
     if (this->Is(BARLINE)) {
@@ -524,9 +536,6 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     else if (this->Is({ MRPT2, MULTIRPT })) {
         type = ALIGNMENT_FULLMEASURE2;
-    }
-    else if (this->Is({ BEAM, FTREM, TUPLET })) {
-        type = ALIGNMENT_CONTAINER;
     }
     else if (this->Is(DOT)) {
         type = ALIGNMENT_DOT;
@@ -681,6 +690,11 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     if (!this->HasGraceAlignment()) return FUNCTOR_CONTINUE;
 
+    if (!this->HasUpdatedBB() || this->HasEmptyBB()) {
+        // if nothing was drawn, do not take it into account
+        return FUNCTOR_CONTINUE;
+    }
+    
     int selfRight = this->GetSelfRight();
     int offset = selfRight - params->m_graceMaxPos;
     if (offset > 0) {
@@ -714,7 +728,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
 
     int selfLeft;
-    if (!this->HasUpdatedBB()) {
+    if (!this->HasUpdatedBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
         // assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
         // This should happen for invis barline attribute but also chords in beam. Otherwise the BB should be set to empty with
@@ -738,7 +752,7 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     }
 
     int selfRight;
-    if (!this->HasUpdatedBB())
+    if (!this->HasUpdatedBB() || this->HasEmptyBB())
         selfRight = this->GetAlignment()->GetXRel()
             + params->m_doc->GetRightMargin(this->GetClassId()) * params->m_doc->GetDrawingUnit(100)
                 / PARAM_DENOMINATOR;

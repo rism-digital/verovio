@@ -39,7 +39,6 @@ enum AlignmentType {
     ALIGNMENT_FULLMEASURE,
     ALIGNMENT_FULLMEASURE2,
     ALIGNMENT_GRACENOTE,
-    ALIGNMENT_CONTAINER,
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF,
     ALIGNMENT_KEYSIG,
@@ -706,6 +705,12 @@ public:
     int GetGraceGroupLeft(int staffN);
     int GetGraceGroupRight(int staffN);
     ///@{
+    
+    /**
+     * Set an linear defaut position for each grace note
+     * This is called from the SetAlignmentXPos Functor.
+     */
+    void SetGraceAligmentXPos(Doc *doc);
 
     //----------//
     // Functors //

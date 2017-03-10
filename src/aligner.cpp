@@ -20,6 +20,7 @@
 #include "functorparams.h"
 #include "measure.h"
 #include "note.h"
+#include "smufl.h"
 #include "staff.h"
 #include "style.h"
 #include "timestamp.h"
@@ -396,7 +397,7 @@ void MeasureAligner::PushAlignmentsRight()
     for (riter = m_children.rbegin(); riter != m_children.rend(); riter++) {
         Alignment *current = dynamic_cast<Alignment *>(*riter);
         assert(current);
-        if (current->IsOfType({ ALIGNMENT_GRACENOTE, ALIGNMENT_CONTAINER })) {
+        if (current->IsOfType({ ALIGNMENT_GRACENOTE })) {
             if (previous) current->SetXRel(previous->GetXRel());
         }
         else {
@@ -563,6 +564,25 @@ int GraceAligner::GetGraceGroupRight(int staffN)
     rightAlignment->GetLeftRight(staffN, minLeft, maxRight);
 
     return maxRight;
+}
+    
+void GraceAligner::SetGraceAligmentXPos(Doc *doc)
+{
+    assert(doc);
+
+    ArrayOfObjects::reverse_iterator childrenIter;
+    
+    int i = 0;
+    // Then the @n of each first staffDef
+    for (childrenIter = m_children.rbegin(); childrenIter != m_children.rend(); childrenIter++) {
+        Alignment *alignment = dynamic_cast<Alignment *>(*childrenIter);
+        assert(alignment);
+        // We space with a notehead (non grace size) which seems to be a reasonable default spacing with margin
+        // Ideally we should look at the duration in that alignmment and also the maximum staff scaling for this aligner
+        alignment->SetXRel(-i * doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, 100, false));
+        i++;
+    }
+
 }
 
 //----------------------------------------------------------------------------
@@ -1008,8 +1028,8 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
             params->m_graceCumulatedXShift = 0;
             filters.clear();
             // Create ad comparison object for each type / @n
-            //AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
-            //filters.push_back(&matchStaff);
+            AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
+            filters.push_back(&matchStaff);
 
             m_graceAligner->Process(
                 params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
@@ -1056,10 +1076,7 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
 
     this->SetXRel(this->GetXRel() + params->m_cumulatedXShift);
 
-    if (GetType() == ALIGNMENT_CONTAINER) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else if (m_type == ALIGNMENT_MEASURE_END) {
+    if (m_type == ALIGNMENT_MEASURE_END) {
         this->SetXRel(params->m_minPos);
     }
 
@@ -1162,6 +1179,10 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         intervalXRel = HorizontalSpaceForDuration(intervalTime, params->m_longestActualDur,
             params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
+    }
+    
+    if (m_graceAligner) {
+        m_graceAligner->SetGraceAligmentXPos(params->m_doc);
     }
 
     m_xRel = params->m_previousXRel + intervalXRel * DEFINITION_FACTOR;

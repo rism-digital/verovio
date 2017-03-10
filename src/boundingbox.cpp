@@ -40,7 +40,7 @@ ClassId BoundingBox::GetClassId() const
     return BOUNDING_BOX;
 };
 
-bool BoundingBox::Is(const std::vector<ClassId> &classIds)
+bool BoundingBox::Is(const std::vector<ClassId> &classIds) const
 {
     return (std::find(classIds.begin(), classIds.end(), this->GetClassId()) != classIds.end());
 }
