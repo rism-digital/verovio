@@ -19,6 +19,7 @@
 #include "floatingobject.h"
 #include "glyph.h"
 #include "layerelement.h"
+#include "staff.h"
 #include "view.h"
 #include "vrv.h"
 
@@ -159,6 +160,25 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         m_currentNode.append_attribute("id") = gId.c_str();
     }
 
+    // this sets staffDef styles for lyrics
+    if (object->Is(STAFF)) {
+        Staff *staff = dynamic_cast<Staff *>(object);
+        std::string styleStr;
+        if (staff->m_drawingStaffDef->HasLyricFam()) {
+            styleStr.append("font-family:" + staff->m_drawingStaffDef->GetLyricFam() + ";");
+        }
+        if (staff->m_drawingStaffDef->HasLyricName()) {
+            styleStr.append("font-family:" + staff->m_drawingStaffDef->GetLyricName() + ";");
+        }
+        if (staff->m_drawingStaffDef->HasLyricStyle()) {
+            styleStr.append("font-style:" + staff->AttConverter::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
+        }
+        if (staff->m_drawingStaffDef->HasLyricWeight()) {
+            styleStr.append("font-weight:" + staff->AttConverter::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
+        }
+        if (!styleStr.empty()) m_currentNode.append_attribute("style") = styleStr.c_str();
+    }
+    
     if (object->HasAttClass(ATT_COLOR)) {
         AttColor *att = dynamic_cast<AttColor *>(object);
         assert(att);
@@ -180,15 +200,8 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         AttTypography *att = dynamic_cast<AttTypography *>(object);
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
-        if (att->GetFontstyle() != FONTSTYLE_NONE) {
-            if (att->GetFontstyle() == FONTSTYLE_italic) m_currentNode.append_attribute("font-style") = "italic";
-            else if (att->GetFontstyle() == FONTSTYLE_normal) m_currentNode.append_attribute("font-style") = "normal";
-            else if (att->GetFontstyle() == FONTSTYLE_oblique) m_currentNode.append_attribute("font-style") = "oblique";
-        }
-        if (att->GetFontweight() != FONTWEIGHT_NONE) {
-            if (att->GetFontweight() == FONTWEIGHT_bold) m_currentNode.append_attribute("font-weight") = "bold";
-            else m_currentNode.append_attribute("font-weight") = "normal";
-        }
+        if (att->HasFontstyle()) m_currentNode.append_attribute("font-style") = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+        if (att->HasFontweight()) m_currentNode.append_attribute("font-weight") = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
     }
 
     if (object->HasAttClass(ATT_VISIBILITY)) {
@@ -236,15 +249,8 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         AttTypography *att = dynamic_cast<AttTypography *>(object);
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
-        if (att->GetFontstyle() != FONTSTYLE_NONE) {
-            if (att->GetFontstyle() == FONTSTYLE_italic) m_currentNode.append_attribute("font-style") = "italic";
-            else if (att->GetFontstyle() == FONTSTYLE_normal) m_currentNode.append_attribute("font-style") = "normal";
-            else if (att->GetFontstyle() == FONTSTYLE_oblique) m_currentNode.append_attribute("font-style") = "oblique";
-        }
-        if (att->GetFontweight() != FONTWEIGHT_NONE) {
-            if (att->GetFontweight() == FONTWEIGHT_bold) m_currentNode.append_attribute("font-weight") = "bold";
-            else m_currentNode.append_attribute("font-weight") = "normal";
-        }
+        if (att->HasFontstyle()) m_currentNode.append_attribute("font-style") = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+        if (att->HasFontweight()) m_currentNode.append_attribute("font-weight") = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
     }
 }
 
