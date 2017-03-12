@@ -85,6 +85,15 @@ public:
     virtual ClassId GetClassId() const;
     virtual std::string GetClassName() const { return "[MISSING]"; }
     ///@}
+    
+    /**
+     * Make an object a reference object that do not own children.
+     * This cannot be un-done and should be set before any other object is added.
+     */
+    ///@{
+    void SetAsReferenceObject();
+    bool IsReferenceObject() const { return m_isReferencObject; }
+    ///@}
 
     /**
      * Wrapper for checking if an element is a floating object (system elements and control elements)
@@ -273,6 +282,9 @@ public:
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
     ///@}
+    
+    virtual void ResetCachedDrawingX() const;
+    virtual void ResetCachedDrawingY() const;
 
     /**
      * Look for the Object in the children and return its position (-1 if not found)
@@ -859,6 +871,12 @@ private:
     std::string m_classid;
     std::string m_svgclass;
     static unsigned long s_objectCounter;
+    
+    /**
+     * A reference object do not own children.
+     * Destructor will not delete them.
+     */
+    bool m_isReferencObject;
 
     /**
      * Indicates whether the object content is up-to-date or not.

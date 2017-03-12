@@ -59,6 +59,8 @@ Beam::~Beam()
 void Beam::Reset()
 {
     LayerElement::Reset();
+    
+    ClearCoords();
 }
 
 void Beam::AddChild(Object *child)

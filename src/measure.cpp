@@ -122,9 +122,18 @@ void Measure::AddChild(Object *child)
 
 int Measure::GetDrawingX() const
 {
+    if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
+    
     System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
     assert(system);
-    return (system->GetDrawingX() + this->GetDrawingXRel());
+    m_cachedDrawingX = system->GetDrawingX() + this->GetDrawingXRel();
+    return m_cachedDrawingX;
+}
+    
+void Measure::SetDrawingXRel(int drawingXRel)
+{
+    ResetCachedDrawingX();
+    m_drawingXRel = drawingXRel;
 }
 
 int Measure::GetLeftBarLineXRel() const
@@ -334,7 +343,7 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
 
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
-    m_drawingXRel = 0;
+    SetDrawingXRel(0);
     if (m_measureAligner.GetLeftAlignment()) {
         m_measureAligner.GetLeftAlignment()->SetXRel(0);
     }
@@ -496,10 +505,10 @@ int Measure::JustifyX(FunctorParams *functorParams)
     assert(params);
 
     if (params->m_measureXRel > 0) {
-        this->m_drawingXRel = params->m_measureXRel;
+        SetDrawingXRel(params->m_measureXRel);
     }
     else {
-        params->m_measureXRel = this->m_drawingXRel;
+        params->m_measureXRel = GetDrawingXRel();
     }
 
     m_measureAligner.Process(params->m_functor, params);
@@ -512,7 +521,7 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = dynamic_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    this->m_drawingXRel = params->m_shift;
+    SetDrawingXRel(params->m_shift);
 
     params->m_shift += this->GetWidth();
     params->m_justifiableWidth += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();

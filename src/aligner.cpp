@@ -642,10 +642,17 @@ AlignmentReference *Alignment::GetAlignmentReference(int staffN)
     AlignmentReference *alignmentRef = dynamic_cast<AlignmentReference*>(this->FindChildByAttComparison(&matchStaff, 1));
     if (!alignmentRef) {
         alignmentRef = new AlignmentReference();
+        alignmentRef->SetAsReferenceObject();
         alignmentRef->SetN(staffN);
         this->AddChild(alignmentRef);
     }
     return alignmentRef;
+}
+    
+void Alignment::SetXRel(int xRel)
+{
+    ResetCachedDrawingX();
+    m_xRel = xRel;
 }
 
 void Alignment::AddLayerElementRef(LayerElement *element)
@@ -717,6 +724,10 @@ AlignmentReference::AlignmentReference(int n) : Object(), AttCommon()
     this->SetN(n);
 }
 
+AlignmentReference::~AlignmentReference()
+{
+}
+    
 void AlignmentReference::Reset()
 {
     Object::Reset();
@@ -728,7 +739,10 @@ void AlignmentReference::AddChild(Object *child)
 {
     assert(dynamic_cast<LayerElement *>(child));
     
-    //child->SetParent(this);
+    // Specical case where we do not set the parent because the reference will not have ownership
+    // Children will be treated as relinquished objects in the desctructor
+    // However, we need to make sure the child has a parent (somewhere else)
+    assert(child->m_parent && this->IsReferenceObject());
     m_children.push_back(child);
     Modify();
 }
@@ -1223,7 +1237,7 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         m_graceAligner->SetGraceAligmentXPos(params->m_doc);
     }
 
-    m_xRel = params->m_previousXRel + intervalXRel * DEFINITION_FACTOR;
+    SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
 
@@ -1251,8 +1265,8 @@ int Alignment::JustifyX(FunctorParams *functorParams)
     }
     else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         // All elements up to the next barline, move them but also take into account the leftBarlineX
-        this->m_xRel = ceil((((double)this->m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
-            + params->m_leftBarLineX);
+        SetXRel(ceil((((double)this->m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
+            + params->m_leftBarLineX));
     }
     else {
         //  Now more the right barline and all right scoreDef elements

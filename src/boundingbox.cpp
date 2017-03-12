@@ -149,6 +149,9 @@ void BoundingBox::ResetBoundingBox()
     m_selfBB_y1 = -VRV_UNSET;
     m_selfBB_x2 = VRV_UNSET;
     m_selfBB_y2 = VRV_UNSET;
+    
+    m_cachedDrawingX = VRV_UNSET;
+    m_cachedDrawingY = VRV_UNSET;
 
     m_updatedBBoxX = false;
     m_updatedBBoxY = false;
@@ -171,19 +174,19 @@ void BoundingBox::SetEmptyBB(bool onlyIfUnset)
     m_updatedBBoxY = true;
 }
 
-bool BoundingBox::HasEmptyBB()
+bool BoundingBox::HasEmptyBB() const
 {
     return (HasUpdatedBB() && (m_contentBB_x1 == 0) && (m_contentBB_y1 == 0) && (m_contentBB_x2 == 0)
         && (m_contentBB_y2 == 0));
 }
 
-bool BoundingBox::HasContentBB()
+bool BoundingBox::HasContentBB() const
 {
     return ((m_contentBB_x1 != -VRV_UNSET) && (m_contentBB_y1 != -VRV_UNSET) && (m_contentBB_x2 != VRV_UNSET)
         && (m_contentBB_y2 != VRV_UNSET));
 }
 
-bool BoundingBox::HasSelfBB()
+bool BoundingBox::HasSelfBB() const
 {
     return ((m_selfBB_x1 != -VRV_UNSET) && (m_selfBB_y1 != -VRV_UNSET) && (m_selfBB_x2 != VRV_UNSET) && (m_selfBB_y2 != VRV_UNSET));
 }

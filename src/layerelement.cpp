@@ -219,18 +219,22 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 
 int LayerElement::GetDrawingX() const
 {
+    if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
+    
     if (!m_alignment) {
         //assert(this->Is({ BEAM, FTREM, TUPLET }));
         // Here we just get the measure position - no cast to Measure is necessary
         Object *measure = this->GetFirstParent(MEASURE);
         assert(measure);
-        return measure->GetDrawingX(); 
+        m_cachedDrawingX = measure->GetDrawingX();
+        return m_cachedDrawingX;
     }
     
     // First get the first layerElement parent (if any) and use its position if they share the same alignment
     LayerElement *parent = dynamic_cast<LayerElement*>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
     if (parent && (parent->GetAlignment() == this->GetAlignment())) {
-        return (parent->GetDrawingX() + this->GetDrawingXRel());
+        m_cachedDrawingX = (parent->GetDrawingX() + this->GetDrawingXRel());
+        return m_cachedDrawingX;
     }
     
     // Otherwise get the measure - no cast to Measure is necessary
@@ -244,11 +248,14 @@ int LayerElement::GetDrawingX() const
         //LogDebug("Grace Note %d  Shift %d", note->GetPname(), graceNoteShift);
     }
     
-    return (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel() + graceNoteShift);
+    m_cachedDrawingX = (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel() + graceNoteShift);
+    return m_cachedDrawingX;
 }
 
 int LayerElement::GetDrawingY() const
 {
+    if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
+    
     Object *object = NULL;
     // Otherwise look if we have a crossStaff situation
     if (!object) object = this->m_crossStaff; //GetCrossStaff();
@@ -261,7 +268,8 @@ int LayerElement::GetDrawingY() const
 
     assert(object);
     
-    return object->GetDrawingY() + this->GetDrawingYRel();
+    m_cachedDrawingY = object->GetDrawingY() + this->GetDrawingYRel();
+    return m_cachedDrawingY;
 }
 
 int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type)
@@ -306,15 +314,27 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPa
         return std::min(firstY, lastY);
     }
 }
+    
+void LayerElement::SetDrawingXRel(int drawingXRel)
+{
+    ResetCachedDrawingX();
+    m_drawingXRel = drawingXRel;
+}
+
+void LayerElement::SetDrawingYRel(int drawingYRel)
+{
+    ResetCachedDrawingY();
+    m_drawingYRel = drawingYRel;
+}
 
 void LayerElement::CenterDrawingX()
 {
-    m_drawingXRel = 0;
+    SetDrawingXRel(0);
 
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
     assert(measure);
 
-    m_drawingXRel = measure->GetInnerCenterX() - this->GetDrawingX();
+   SetDrawingXRel(measure->GetInnerCenterX() - this->GetDrawingX());
 }
 
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPartType type)
@@ -446,10 +466,10 @@ double LayerElement::GetAlignmentDuration(Mensur *mensur, MeterSig *meterSig, bo
 
 int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
-    m_drawingXRel = 0;
+    SetDrawingXRel(0);
     // Exception here: the LayerElement::m_drawingYRel position is already set for horizontal alignment
     // See Object::SetAlignmentPitchPos - for this reason we need to reset it here and not in ResetVerticalAlignment
-    m_drawingYRel = 0;
+    SetDrawingYRel(0);
 
     m_alignment = NULL;
     m_graceAlignment = NULL;
@@ -472,8 +492,6 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     assert(!m_alignment);
     
     this->SetScoreDefRole(params->m_scoreDefRole);
-    
-    bool isGraceNote = this->IsGraceNote();
     
     AlignmentType type = ALIGNMENT_DEFAULT;
 
@@ -593,7 +611,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     }
     // For grace note aligner do not add them to the reference list because they will be processed by their original hierarchy from the GraceAligner
     else {
-        assert(isGraceNote);
+        assert(this->IsGraceNote());
         if (this->Is(CHORD) || (this->Is(NOTE) && !chordParent)) {
             GraceAligner *graceAligner = m_alignment->GetGraceAligner();
             // We know that this is a note or a chord - we stack them and they will be added at the end of the layer
@@ -701,6 +719,10 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     assert(params);
     
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
+    
+    // With non grace alignment we do not need to do this because all the LayerElement are added as children of the Alignment
+    // Here not (only parent chords or notes) so we need to reset the cache by hand
+    this->ResetCachedDrawingX();
 
     if (!this->HasGraceAlignment()) return FUNCTOR_CONTINUE;
 

@@ -76,10 +76,10 @@ Object::Object(const Object &object) : BoundingBox(object)
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
     m_parent = NULL;
     m_classid = object.m_classid;
+    m_isReferencObject = object.m_isReferencObject;
     m_svgclass = object.m_svgclass;
     m_uuid = object.m_uuid; // for now copy the uuid - to be decided
     m_isModified = true;
-
     int i;
     for (i = 0; i < (int)object.m_children.size(); i++) {
         Object *current = object.m_children.at(i);
@@ -98,6 +98,7 @@ Object &Object::operator=(const Object &object)
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
         m_parent = NULL;
         m_classid = object.m_classid;
+        m_isReferencObject = object.m_isReferencObject;
         m_svgclass = object.m_svgclass;
         m_uuid = object.m_uuid; // for now copy the uuid - to be decided
         m_isModified = true;
@@ -125,6 +126,7 @@ void Object::Init(std::string classid)
     m_isAttribute = false;
     m_isModified = true;
     m_classid = classid;
+    m_isReferencObject = false;
     this->GenerateUuid();
 
     Reset();
@@ -136,6 +138,13 @@ ClassId Object::GetClassId() const
     assert(false);
     return OBJECT;
 };
+    
+void Object::SetAsReferenceObject()
+{
+    assert(m_children.empty());
+    
+    m_isReferencObject = true;
+}
 
 void Object::Reset()
 {
@@ -223,6 +232,11 @@ bool Object::HasSVGClass(void)
 
 void Object::ClearChildren()
 {
+    if (m_isReferencObject) {
+        m_children.clear();
+        return;
+    }
+    
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         // we need to check if this is the parent
@@ -453,6 +467,28 @@ int Object::GetDrawingY() const
 {
     assert(m_parent);
     return m_parent->GetDrawingY();
+}
+
+    
+void Object::ResetCachedDrawingX() const
+{
+    //if (m_cachedDrawingX == VRV_UNSET) return;
+    m_cachedDrawingX = VRV_UNSET;
+    ArrayOfObjects::const_iterator iter;
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        (*iter)->ResetCachedDrawingX();
+    }
+    
+}
+
+void Object::ResetCachedDrawingY() const
+{
+    //if (m_cachedDrawingY == VRV_UNSET) return;
+    m_cachedDrawingY = VRV_UNSET;
+    ArrayOfObjects::const_iterator iter;
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        (*iter)->ResetCachedDrawingY();
+    }
 }
 
 int Object::GetChildIndex(const Object *child)

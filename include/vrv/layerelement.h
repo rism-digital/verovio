@@ -104,9 +104,9 @@ public:
      */
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
-    virtual void SetDrawingXRel(int drawingXRel) { m_drawingXRel = drawingXRel; }
+    virtual void SetDrawingXRel(int drawingXRel);
     int GetDrawingYRel() const { return m_drawingYRel; }
-    virtual void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; }
+    virtual void SetDrawingYRel(int drawingYRel);
     ///@}
 
     /**

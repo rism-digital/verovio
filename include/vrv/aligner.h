@@ -303,7 +303,7 @@ public:
      * @name Set and get the xRel value of the alignment
      */
     ///@{
-    void SetXRel(int xRel) { m_xRel = xRel; }
+    void SetXRel(int xRel);
     int GetXRel() const { return m_xRel; }
     ///@}
 
@@ -449,7 +449,7 @@ public:
     ///@{
     AlignmentReference();
     AlignmentReference(int n);
-    virtual ~AlignmentReference() {}
+    virtual ~AlignmentReference();
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}

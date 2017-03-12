@@ -34,10 +34,10 @@ public:
     virtual void UpdateContentBBoxY(int y1, int y2);
     virtual void UpdateSelfBBoxX(int x1, int x2);
     virtual void UpdateSelfBBoxY(int y1, int y2);
-    bool HasContentBB();
-    bool HasSelfBB();
+    bool HasContentBB() const;
+    bool HasSelfBB() const;
     void SetEmptyBB(bool onlyIfUnset = false);
-    bool HasEmptyBB();
+    bool HasEmptyBB() const;
 
     /**
      * Reset the bounding box values
@@ -51,6 +51,9 @@ public:
     virtual int GetDrawingX() const = 0;
     virtual int GetDrawingY() const = 0;
     ///@}
+    
+    virtual void ResetCachedDrawingX() const = 0;
+    virtual void ResetCachedDrawingY() const = 0;
 
     /**
      * @name Get positions for self and content
@@ -138,6 +141,10 @@ private:
 
     int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
     int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
+
+protected:
+    mutable int m_cachedDrawingX;
+    mutable int m_cachedDrawingY;
 };
 
 } // namespace vrv
