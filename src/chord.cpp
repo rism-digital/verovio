@@ -32,6 +32,7 @@ Chord::Chord()
     , DrawingListInterface()
     , StemmedDrawingInterface()
     , DurationInterface()
+    , AttColor()
     , AttCommon()
     , AttGraced()
     , AttRelativesize()
@@ -41,6 +42,7 @@ Chord::Chord()
     , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_RELATIVESIZE);
@@ -66,6 +68,7 @@ void Chord::Reset()
     DrawingListInterface::Reset();
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
+    ResetColor();
     ResetCommon();
     ResetGraced();
     ResetRelativesize();
