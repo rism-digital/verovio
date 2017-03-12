@@ -548,8 +548,15 @@ void GraceAligner::AlignStack()
 int GraceAligner::GetGraceGroupLeft(int staffN)
 {
     // First we need to get the left alignment with an alignment reference with staffN
-    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    Object *reference = this->FindChildByAttComparison(&matchStaff);
+    Object *reference = NULL;
+    if (staffN != VRV_UNSET) {
+        AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+        reference = this->FindChildByAttComparison(&matchStaff);
+    }
+    else {
+        AttComparison matchStaff(ALIGNMENT_REFERENCE);
+        reference = this->FindChildByAttComparison(&matchStaff);
+    }
     if (!reference) return -VRV_UNSET;
     // The alignment is its parent
     Alignment *leftAlignment = dynamic_cast<Alignment *>(reference->m_parent);
