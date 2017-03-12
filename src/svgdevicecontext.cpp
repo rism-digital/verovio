@@ -163,6 +163,10 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     // this sets staffDef styles for lyrics
     if (object->Is(STAFF)) {
         Staff *staff = dynamic_cast<Staff *>(object);
+        assert(staff);
+        
+        assert(staff->m_drawingStaffDef);
+        
         std::string styleStr;
         if (staff->m_drawingStaffDef->HasLyricFam()) {
             styleStr.append("font-family:" + staff->m_drawingStaffDef->GetLyricFam() + ";");
