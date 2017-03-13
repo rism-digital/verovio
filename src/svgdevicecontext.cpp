@@ -180,10 +180,10 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
             styleStr.append("font-family:" + staff->m_drawingStaffDef->GetLyricName() + ";");
         }
         if (staff->m_drawingStaffDef->HasLyricStyle()) {
-            styleStr.append("font-style:" + staff->AttConverter::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
+            styleStr.append("font-style:" + staff->AttCommon::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
         }
         if (staff->m_drawingStaffDef->HasLyricWeight()) {
-            styleStr.append("font-weight:" + staff->AttConverter::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
+            styleStr.append("font-weight:" + staff->AttCommon::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
         }
         if (!styleStr.empty()) m_currentNode.append_attribute("style") = styleStr.c_str();
     }
