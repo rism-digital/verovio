@@ -8,6 +8,7 @@
 #ifndef __VRV_TEXT_ELEMENT_H__
 #define __VRV_TEXT_ELEMENT_H__
 
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -16,7 +17,7 @@ namespace vrv {
 // TextElement
 //----------------------------------------------------------------------------
 
-class TextElement : public Object {
+class TextElement : public Object, public AttCommon, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

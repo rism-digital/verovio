@@ -24,7 +24,7 @@ class Section;
  * This class represents a MEI section.
  * It can be both a container (in score-based MEI) and a boundary (in page-based MEI)
  */
-class Section : public SystemElement, public BoundaryStartInterface, public AttCommon, public AttCommonPart {
+class Section : public SystemElement, public BoundaryStartInterface, public AttCommonPart {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -81,7 +81,7 @@ private:
  * This class represents a MEI pb in score-based MEI.
  * In page-based MEI, it remains as is as. Actuall pages are represented by Page objects.
  */
-class Pb : public SystemElement, public AttCommon, public AttCommonPart {
+class Pb : public SystemElement, public AttCommonPart {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -120,7 +120,7 @@ private:
  * This class represents a MEI sb in score-based MEI.
  * In page-based MEI, it remains as is as. Actuall systems are represented by System objects.
  */
-class Sb : public SystemElement, public AttCommon, public AttCommonPart {
+class Sb : public SystemElement, public AttCommonPart {
 public:
     /**
      * @name Constructors, destructors, and other standard methods

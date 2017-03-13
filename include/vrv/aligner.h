@@ -70,8 +70,6 @@ public:
     virtual ~SystemAligner();
     virtual ClassId GetClassId() const { return SYSTEM_ALIGNER; }
 
-    int GetStaffAlignmentCount() const { return (int)m_children.size(); }
-
     /**
      * Reset the aligner (clear the content) and creates the end (bottom) alignement
      */
@@ -297,8 +295,6 @@ public:
      */
     virtual void AddChild(Object *object);
     
-    AlignmentReference *GetAlignmentReference(int staffN);
-
     /**
      * @name Set and get the xRel value of the alignment
      */
@@ -316,7 +312,8 @@ public:
     ///@}
 
     /**
-     *
+     * Add the LayerElement to the appropriate AlignmentReference child.
+     * Looks at the cross-staff situation (@staff or parent @staff).
      */
     void AddLayerElementRef(LayerElement *element);
 
@@ -402,7 +399,12 @@ public:
     ///@}
 
 private:
-    //
+    /**
+     * Retrieve the AlignmentReference with staffN.
+     * Create and add it as child if not found.
+     */
+     AlignmentReference *GetAlignmentReference(int staffN);
+
 public:
     //
 private:
@@ -438,7 +440,10 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class stores an alignement position elements will point to
+ * This class stores a references of LayerElements for a staff.
+ * The staff identification (@n) is given by the attCommon and takes into accound 
+ * cross-staff situations.
+ * Its children of the alignment are references.
  */
 class AlignmentReference : public Object, public AttCommon {
 public:
@@ -462,21 +467,6 @@ public:
     //----------//
     // Functors //
     //----------//
-
-    /**
-     * See Object::GetAlignmentLeftRight
-     */
-    //virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    //virtual int AdjustGraceXPos(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustXPos
-     */
-    //virtual int AdjustXPos(FunctorParams *functorParams);
 
 private:
 };

@@ -34,9 +34,10 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n) : Object("staff-"), AttCommon()
+Staff::Staff(int n) : Object("staff-"), AttCommon(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
 
     Reset();
     SetN(n);
@@ -50,6 +51,7 @@ void Staff::Reset()
 {
     Object::Reset();
     ResetCommon();
+    ResetTyped();
 
     m_drawingStaffSize = 100;
     m_drawingLines = 5;

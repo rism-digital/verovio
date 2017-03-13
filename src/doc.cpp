@@ -489,7 +489,7 @@ void Doc::CastOffDoc()
 
     // Detach the contentPage
     this->DetachChild(0);
-    assert(contentPage && !contentPage->m_parent);
+    assert(contentPage && !contentPage->GetParent());
 
     Page *currentPage = new Page();
     this->AddChild(currentPage);
@@ -543,7 +543,7 @@ void Doc::CastOffEncodingDoc()
 
     // Detach the contentPage
     this->DetachChild(0);
-    assert(contentPage && !contentPage->m_parent);
+    assert(contentPage && !contentPage->GetParent());
 
     Page *page = new Page();
     this->AddChild(page);
