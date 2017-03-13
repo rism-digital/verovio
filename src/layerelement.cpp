@@ -53,19 +53,27 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-")
+LayerElement::LayerElement() : Object("le-"), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+    
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : Object(classid)
+LayerElement::LayerElement(std::string classid) : Object(classid), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+    
     Reset();
 }
 
 void LayerElement::Reset()
 {
     Object::Reset();
+    ResetCommon();
+    ResetTyped();
 
     m_xAbs = VRV_UNSET;
     m_drawingYRel = 0;
@@ -89,7 +97,7 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
     // not self assignement
     if (this != &element) {
         // pointers have to be NULL
-        m_parent = NULL;
+        ResetParent();
         m_alignment = NULL;
     }
     return *this;

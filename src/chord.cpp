@@ -33,7 +33,6 @@ Chord::Chord()
     , StemmedDrawingInterface()
     , DurationInterface()
     , AttColor()
-    , AttCommon()
     , AttGraced()
     , AttRelativesize()
     , AttStems()
@@ -43,7 +42,6 @@ Chord::Chord()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_COLOR);
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_RELATIVESIZE);
     RegisterAttClass(ATT_STEMS);
@@ -69,7 +67,6 @@ void Chord::Reset()
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetColor();
-    ResetCommon();
     ResetGraced();
     ResetRelativesize();
     ResetStems();
@@ -114,14 +111,6 @@ void Chord::AddChild(Object *child)
     Modify();
 }
 
-bool compare_pitch(Object *first, Object *second)
-{
-    Note *n1 = dynamic_cast<Note *>(first);
-    Note *n2 = dynamic_cast<Note *>(second);
-    assert(n1 && n2);
-    return (n1->GetDiatonicPitch() < n2->GetDiatonicPitch());
-}
-
 void Chord::FilterList(ListOfObjects *childList)
 {
     // Retain only note children of chords
@@ -134,7 +123,7 @@ void Chord::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
     }
 
-    childList->sort(compare_pitch);
+    std::sort(childList->begin(), childList->end(), DiatonicSort());
 
     iter = childList->begin();
 

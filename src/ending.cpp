@@ -27,10 +27,8 @@ namespace vrv {
 // Ending
 //----------------------------------------------------------------------------
 
-Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttCommon()
+Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface()
 {
-    RegisterAttClass(ATT_COMMON);
-
     Reset();
 }
 
@@ -42,7 +40,6 @@ void Ending::Reset()
 {
     SystemElement::Reset();
     BoundaryStartInterface::Reset();
-    ResetCommon();
 }
 
 void Ending::AddChild(Object *child)
@@ -125,7 +122,7 @@ int Ending::CastOffSystems(FunctorParams *functorParams)
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->m_parent));
+    assert(dynamic_cast<System *>(this->GetParent()));
 
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild

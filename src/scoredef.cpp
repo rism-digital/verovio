@@ -28,9 +28,11 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDefInterface()
+ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDefInterface(), AttCommon(), AttTyped()
 {
     RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
@@ -43,6 +45,8 @@ void ScoreDefElement::Reset()
 {
     Object::Reset();
     ScoreDefInterface::Reset();
+    ResetCommon();
+    ResetTyped();
 }
 
 bool ScoreDefElement::HasClefInfo() const
@@ -385,12 +389,14 @@ StaffGrp::StaffGrp()
     , AttLabelsAddl()
     , AttStaffgroupingsym()
     , AttStaffGrpVis()
+    , AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_STAFFGRPVIS);
+    RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
@@ -407,6 +413,7 @@ void StaffGrp::Reset()
     ResetLabelsAddl();
     ResetStaffgroupingsym();
     ResetStaffGrpVis();
+    ResetTyped();
 }
 
 void StaffGrp::AddChild(Object *child)
@@ -451,7 +458,6 @@ void StaffGrp::FilterList(ListOfObjects *childList)
 
 StaffDef::StaffDef()
     : ScoreDefElement("staffdef-")
-    , AttCommon()
     , AttCommonPart()
     , AttDistances()
     , AttLabelsAddl()
@@ -511,7 +517,7 @@ int ScoreDef::CastOffSystems(FunctorParams *functorParams)
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->m_parent));
+    assert(dynamic_cast<System *>(this->GetParent()));
 
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild

@@ -199,7 +199,7 @@ class TimeSpanningInterface;
 
 typedef std::vector<Object *> ArrayOfObjects;
 
-typedef std::list<Object *> ListOfObjects;
+typedef std::vector<Object *> ListOfObjects;
 
 typedef std::vector<AttComparison *> ArrayOfAttComparisons;
 

@@ -56,12 +56,12 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, Doc *doc
         this->m_children.pop_back();
     }
 
-    if (idx < GetStaffAlignmentCount()) {
+    if (idx < GetChildCount()) {
         this->m_children.push_back(m_bottomAlignment);
         return dynamic_cast<StaffAlignment *>(m_children.at(idx));
     }
     // check that we are searching for the next one (not a gap)
-    assert(idx == GetStaffAlignmentCount());
+    assert(idx == GetChildCount());
     // LogDebug("Creating staff alignment");
 
     // This is the first time we are looking for it (e.g., first staff)
@@ -82,7 +82,7 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
 {
     StaffAlignment *alignment = NULL;
     int i;
-    for (i = 0; i < this->GetStaffAlignmentCount(); i++) {
+    for (i = 0; i < this->GetChildCount(); i++) {
         alignment = dynamic_cast<StaffAlignment *>(m_children.at(i));
         assert(alignment);
 
@@ -413,7 +413,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
     assert(alignment->GetType() == ALIGNMENT_GRACENOTE);
     assert(alignment->GetGraceAligner());
 
-    Measure *measure = dynamic_cast<Measure *>(this->m_parent);
+    Measure *measure = dynamic_cast<Measure *>(this->GetParent());
     assert(measure);
 
     int maxRight = VRV_UNSET;
@@ -548,18 +548,17 @@ void GraceAligner::AlignStack()
 int GraceAligner::GetGraceGroupLeft(int staffN)
 {
     // First we need to get the left alignment with an alignment reference with staffN
-    Object *reference = NULL;
+    Alignment *leftAlignment = NULL;
     if (staffN != VRV_UNSET) {
         AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-        reference = this->FindChildByAttComparison(&matchStaff);
+        Object *reference = this->FindChildByAttComparison(&matchStaff);
+        if (!reference) return -VRV_UNSET;
+        // The alignment is its parent
+        leftAlignment = dynamic_cast<Alignment *>(reference->GetParent());
     }
-    else {
-        AttComparison matchStaff(ALIGNMENT_REFERENCE);
-        reference = this->FindChildByAttComparison(&matchStaff);
-    }
-    if (!reference) return -VRV_UNSET;
-    // The alignment is its parent
-    Alignment *leftAlignment = dynamic_cast<Alignment *>(reference->m_parent);
+    else
+        leftAlignment = dynamic_cast<Alignment *>(this->GetFirst());
+    // Return if nothing found
     if (!leftAlignment) return -VRV_UNSET;
 
     int minLeft, maxRight;
@@ -648,9 +647,7 @@ AlignmentReference *Alignment::GetAlignmentReference(int staffN)
     AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
     AlignmentReference *alignmentRef = dynamic_cast<AlignmentReference*>(this->FindChildByAttComparison(&matchStaff, 1));
     if (!alignmentRef) {
-        alignmentRef = new AlignmentReference();
-        alignmentRef->SetAsReferenceObject();
-        alignmentRef->SetN(staffN);
+        alignmentRef = new AlignmentReference(staffN);
         this->AddChild(alignmentRef);
     }
     return alignmentRef;
@@ -678,7 +675,6 @@ void Alignment::AddLayerElementRef(LayerElement *element)
     }
     AlignmentReference *alignmentRef = GetAlignmentReference(staffN);
     alignmentRef->AddChild(element);
-    //this->AddChild(alignmentRef);
 }
 
 bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
@@ -721,6 +717,8 @@ AlignmentReference::AlignmentReference() : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
+    
+    this->SetAsReferenceObject();
 }
 
 AlignmentReference::AlignmentReference(int n) : Object(), AttCommon()
@@ -728,6 +726,8 @@ AlignmentReference::AlignmentReference(int n) : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
+    
+    this->SetAsReferenceObject();
     this->SetN(n);
 }
 
@@ -749,7 +749,7 @@ void AlignmentReference::AddChild(Object *child)
     // Specical case where we do not set the parent because the reference will not have ownership
     // Children will be treated as relinquished objects in the desctructor
     // However, we need to make sure the child has a parent (somewhere else)
-    assert(child->m_parent && this->IsReferenceObject());
+    assert(child->GetParent() && this->IsReferenceObject());
     m_children.push_back(child);
     Modify();
 }
@@ -1160,40 +1160,6 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-
-/*
-int AlignmentReference::GetAlignmentLeftRight(FunctorParams *functorParams)
-{
-    GetAlignmentLeftRightParams *params = dynamic_cast<GetAlignmentLeftRightParams *>(functorParams);
-    assert(params);
-
-    this->GetObject()->Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
-{
-    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
-    assert(params);
-
-    // LogDebug("Grace - AlignmentRef staff %d", GetN());
-    this->m_elementRef->Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
-int AlignmentReference::AdjustXPos(FunctorParams *functorParams)
-{
-    AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
-    assert(params);
-
-    // LogDebug("AlignmentRef staff %d", GetN());
-    this->m_elementRef->Process(params->m_functor, params, params->m_functorEnd);
-
-    return FUNCTOR_CONTINUE;
-}
-*/
 
 int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
 {

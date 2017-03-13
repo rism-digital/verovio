@@ -35,7 +35,7 @@ class StaffDef;
  * information about clef, key signature, etc. This information can be either
  * attributes (implemented) of the ScoreDefInterface or elements (not implemented).
  */
-class ScoreDefElement : public Object, public ScoreDefInterface {
+class ScoreDefElement : public Object, public ScoreDefInterface, public AttCommon, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods.
@@ -220,7 +220,8 @@ class StaffGrp : public Object,
                  public AttCommonPart,
                  public AttLabelsAddl,
                  public AttStaffgroupingsym,
-                 public AttStaffGrpVis {
+                 public AttStaffGrpVis,
+                 public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -269,7 +270,6 @@ private:
  */
 class StaffDef : public ScoreDefElement,
                  public StaffDefDrawingInterface,
-                 public AttCommon,
                  public AttCommonPart,
                  public AttDistances,
                  public AttLabelsAddl,

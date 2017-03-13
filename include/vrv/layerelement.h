@@ -8,6 +8,7 @@
 #ifndef __VRV_LAYER_ELEMENT_H__
 #define __VRV_LAYER_ELEMENT_H__
 
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -28,7 +29,7 @@ class Staff;
  * This class is a base class for the Layer (<layer>) content.
  * It is not an abstract class but should not be instantiated directly.
  */
-class LayerElement : public Object {
+class LayerElement : public Object, public AttCommon, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

@@ -29,13 +29,11 @@ Ligature::Ligature()
     , ObjectListInterface()
     , StemmedDrawingInterface()
     , DurationInterface()
-    , AttCommon()
     , AttStems()
     , AttStemsCmn()
     , AttTiepresent()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -55,7 +53,6 @@ void Ligature::Reset()
     LayerElement::Reset();
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
-    ResetCommon();
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();
@@ -86,14 +83,6 @@ void Ligature::AddChild(Object *child)
     Modify();
 }
 
-bool compare_pitchL(Object *first, Object *second)
-{
-    Note *n1 = dynamic_cast<Note *>(first);
-    Note *n2 = dynamic_cast<Note *>(second);
-    assert(n1 && n2);
-    return (n1->GetDiatonicPitch() < n2->GetDiatonicPitch());
-}
-
 void Ligature::FilterList(ListOfObjects *childList)
 {
     // Retain only note children of ligatures
@@ -122,8 +111,6 @@ void Ligature::FilterList(ListOfObjects *childList)
             }
         }
     }
-
-    childList->sort(compare_pitchL);
 
     iter = childList->begin();
 

@@ -29,8 +29,11 @@ namespace vrv {
 // System
 //----------------------------------------------------------------------------
 
-System::System() : Object("system-"), DrawingListInterface()
+System::System() : Object("system-"), DrawingListInterface(), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+    
     // We set parent to it because we want to access the parent doc from the aligners
     m_systemAligner.SetParent(this);
 
@@ -50,6 +53,8 @@ void System::Reset()
 {
     Object::Reset();
     DrawingListInterface::Reset();
+    ResetCommon();
+    ResetTyped();
 
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
@@ -277,8 +282,10 @@ int System::JustifyX(FunctorParams *functorParams)
     JustifyXParams *params = dynamic_cast<JustifyXParams *>(functorParams);
     assert(params);
 
-    assert(m_parent);
-    assert(m_parent->m_parent);
+    assert(GetParent());
+    assert(GetParent()->GetParent());
+    
+    Object *parent = GetParent();
 
     params->m_measureXRel = 0;
     int margins = this->m_systemLeftMar + this->m_systemRightMar;
@@ -294,8 +301,8 @@ int System::JustifyX(FunctorParams *functorParams)
 
     // Check if we are on the last page and on the last system - do no justify it if ratio > 1.25
     // Eventually we should make this a parameter
-    if ((m_parent->GetIdx() == m_parent->m_parent->GetChildCount() - 1)
-        && (this->GetIdx() == m_parent->GetChildCount() - 1)) {
+    if ((parent->GetIdx() == parent->GetParent()->GetChildCount() - 1)
+        && (this->GetIdx() == parent->GetChildCount() - 1)) {
         // HARDCODED
         if (params->m_justifiableRatio > 1.25) {
             return FUNCTOR_STOP;
