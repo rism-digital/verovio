@@ -19,6 +19,7 @@
 #include "floatingobject.h"
 #include "glyph.h"
 #include "layerelement.h"
+#include "staff.h"
 #include "view.h"
 #include "vrv.h"
 
@@ -164,6 +165,29 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         m_currentNode.append_attribute("id") = gId.c_str();
     }
 
+    // this sets staffDef styles for lyrics
+    if (object->Is(STAFF)) {
+        Staff *staff = dynamic_cast<Staff *>(object);
+        assert(staff);
+        
+        assert(staff->m_drawingStaffDef);
+        
+        std::string styleStr;
+        if (staff->m_drawingStaffDef->HasLyricFam()) {
+            styleStr.append("font-family:" + staff->m_drawingStaffDef->GetLyricFam() + ";");
+        }
+        if (staff->m_drawingStaffDef->HasLyricName()) {
+            styleStr.append("font-family:" + staff->m_drawingStaffDef->GetLyricName() + ";");
+        }
+        if (staff->m_drawingStaffDef->HasLyricStyle()) {
+            styleStr.append("font-style:" + staff->AttConverter::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
+        }
+        if (staff->m_drawingStaffDef->HasLyricWeight()) {
+            styleStr.append("font-weight:" + staff->AttConverter::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
+        }
+        if (!styleStr.empty()) m_currentNode.append_attribute("style") = styleStr.c_str();
+    }
+    
     if (object->HasAttClass(ATT_COLOR)) {
         AttColor *att = dynamic_cast<AttColor *>(object);
         assert(att);
@@ -179,6 +203,14 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         if (att->HasLang()) {
             m_currentNode.append_attribute("xml:lang") = att->GetLang().c_str();
         }
+    }
+
+    if (object->HasAttClass(ATT_TYPOGRAPHY)) {
+        AttTypography *att = dynamic_cast<AttTypography *>(object);
+        assert(att);
+        if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
+        if (att->HasFontstyle()) m_currentNode.append_attribute("font-style") = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+        if (att->HasFontweight()) m_currentNode.append_attribute("font-weight") = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
     }
 
     if (object->HasAttClass(ATT_VISIBILITY)) {
@@ -220,6 +252,14 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         if (att->HasLang()) {
             m_currentNode.append_attribute("xml:lang") = att->GetLang().c_str();
         }
+    }
+
+    if (object->HasAttClass(ATT_TYPOGRAPHY)) {
+        AttTypography *att = dynamic_cast<AttTypography *>(object);
+        assert(att);
+        if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
+        if (att->HasFontstyle()) m_currentNode.append_attribute("font-style") = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+        if (att->HasFontweight()) m_currentNode.append_attribute("font-weight") = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
     }
 }
 
@@ -616,25 +656,6 @@ void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtex
     }
     if (m_fontStack.top()->GetPointSize() != 0) {
         textChild.append_attribute("font-size") = StringFormat("%dpx", m_fontStack.top()->GetPointSize()).c_str();
-    }
-    if (m_fontStack.top()->GetStyle() != FONTSTYLE_NONE) {
-        if (m_fontStack.top()->GetStyle() == FONTSTYLE_italic) {
-            textChild.append_attribute("font-style") = "italic";
-        }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_normal) {
-            textChild.append_attribute("font-style") = "normal";
-        }
-        else if (m_fontStack.top()->GetStyle() == FONTSTYLE_oblique) {
-            textChild.append_attribute("font-style") = "oblique";
-        }
-    }
-    if (m_fontStack.top()->GetWeight() != FONTWEIGHT_NONE) {
-        if (m_fontStack.top()->GetWeight() == FONTWEIGHT_bold) {
-            textChild.append_attribute("font-weight") = "bold";
-        }
-        else if (m_fontStack.top()->GetWeight() == FONTWEIGHT_normal) {
-            textChild.append_attribute("font-weight") = "normal";
-        }
     }
     textChild.append_attribute("class") = "text";
     textChild.append_attribute("xml:space") = "preserve";

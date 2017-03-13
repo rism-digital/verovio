@@ -1474,22 +1474,8 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->SetBrush(m_currentColour, AxSOLID);
 
     FontInfo currentFont;
-    if (syl->HasFontstyle()) {
+    if (staff->m_drawingStaffDef) {
         currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        currentFont.SetStyle(syl->GetFontstyle());
-        dc->SetFont(&currentFont);
-    }
-    else if (staff->m_drawingStaffDef) {
-        currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        if (staff->m_drawingStaffDef->HasLyricName()) {
-            currentFont.SetFaceName(staff->m_drawingStaffDef->GetLyricName().c_str());
-        }
-        if (staff->m_drawingStaffDef->HasLyricStyle()) {
-            currentFont.SetStyle(staff->m_drawingStaffDef->GetLyricStyle());
-        }
-        if (staff->m_drawingStaffDef->HasLyricWeight()) {
-            currentFont.SetWeight(staff->m_drawingStaffDef->GetLyricWeight());
-        }
         dc->SetFont(&currentFont);
     }
     else {
