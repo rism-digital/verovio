@@ -32,6 +32,7 @@ Chord::Chord()
     , DrawingListInterface()
     , StemmedDrawingInterface()
     , DurationInterface()
+    , AttColor()
     , AttCommon()
     , AttGraced()
     , AttRelativesize()
@@ -41,6 +42,7 @@ Chord::Chord()
     , AttVisibility()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
+    RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_RELATIVESIZE);
@@ -66,6 +68,7 @@ void Chord::Reset()
     DrawingListInterface::Reset();
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
+    ResetColor();
     ResetCommon();
     ResetGraced();
     ResetRelativesize();
@@ -125,25 +128,10 @@ void Chord::FilterList(ListOfObjects *childList)
     ListOfObjects::iterator iter = childList->begin();
 
     while (iter != childList->end()) {
-        if (!(*iter)->IsLayerElement()) {
-            // remove anything that is not an LayerElement
+        if ((*iter)->Is(NOTE))
+            iter++;
+        else
             iter = childList->erase(iter);
-            continue;
-        }
-        if (!(*iter)->HasInterface(INTERFACE_DURATION)) {
-            // remove anything that has not a DurationInterface
-            iter = childList->erase(iter);
-            continue;
-        }
-        else {
-            if ((*iter)->Is(NOTE)) {
-                iter++;
-            }
-            else {
-                // if it is not a note, drop it
-                iter = childList->erase(iter);
-            }
-        }
     }
 
     childList->sort(compare_pitch);
@@ -242,7 +230,7 @@ void Chord::ResetAccidSpace(int fullUnit)
      */
     int accidHeight = ACCID_HEIGHT * halfUnit;
     int yMax = 0, yMin = 0;
-    this->GetYExtremes(&yMax, &yMin);
+    this->GetYExtremes(yMax, yMin);
     m_accidSpaceTop = yMax + (accidHeight / 2);
     m_accidSpaceBot = yMin - (accidHeight / 2);
     int height = (m_accidSpaceTop - m_accidSpaceBot) / halfUnit;
@@ -258,31 +246,41 @@ void Chord::ResetAccidSpace(int fullUnit)
     }
 }
 
-void Chord::GetYExtremes(int *yMax, int *yMin)
+void Chord::GetYExtremes(int &yMax, int &yMin)
 {
-    bool passed = false;
-    int y1;
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = dynamic_cast<Note *>(*it);
-        if (!note) continue;
-        y1 = note->GetDrawingY();
-        if (!passed) {
-            *yMax = y1;
-            *yMin = y1;
-            passed = true;
-        }
-        else {
-            if (y1 > *yMax) {
-                *yMax = y1;
-            }
-            else if (y1 < *yMin) {
-                *yMin = y1;
-            }
-        }
+    
+    // The first note is the bottom
+    yMin = childList->front()->GetDrawingY();
+    // The last note is the top
+    yMax = childList->back()->GetDrawingY();
+}
+    
+void Chord::GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow)
+{
+    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+    
+    staffAbove = NULL;
+    staffBelow = NULL;
+
+    // We assume that we have a cross-staff chord we cannot have further cross-staffed notes
+    if (m_crossStaff) return;
+    
+    // The first note is the bottom
+    Note *bottomNote = dynamic_cast<Note*>(childList->front());
+    assert(bottomNote);
+    if (bottomNote->m_crossStaff && bottomNote->m_crossLayer) {
+        staffBelow = bottomNote->m_crossStaff;
     }
-    assert(passed);
+    
+    // The last note is the top
+    Note *topNote = dynamic_cast<Note*>(childList->back());
+    assert(topNote);
+    if (topNote->m_crossStaff && topNote->m_crossLayer) {
+        staffAbove = topNote->m_crossStaff;
+    }
 }
 
 void Chord::SetDrawingStemDir(data_STEMDIRECTION stemDir)

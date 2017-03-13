@@ -45,6 +45,9 @@ public:
     virtual std::string GetClassName() const { return "Syl"; }
     virtual ClassId GetClassId() const { return SYL; }
     ///@}
+    
+    /** Override the method since it is align to the staff */
+    virtual bool IsRelativeToStaff() const { return true; }
 
     virtual TimePointInterface *GetTimePointInterface() { return dynamic_cast<TimePointInterface *>(this); }
     virtual TimeSpanningInterface *GetTimeSpanningInterface() { return dynamic_cast<TimeSpanningInterface *>(this); }

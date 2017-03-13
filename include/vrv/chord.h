@@ -34,6 +34,7 @@ class Chord : public LayerElement,
               public DrawingListInterface,
               public StemmedDrawingInterface,
               public DurationInterface,
+              public AttColor,
               public AttCommon,
               public AttGraced,
               public AttRelativesize,
@@ -70,7 +71,9 @@ public:
 
     virtual void FilterList(ListOfObjects *childlist);
 
-    void GetYExtremes(int *yMax, int *yMin);
+    void GetYExtremes(int &yMax, int &yMin);
+                  
+    void GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow);
 
     /**
      * Returns list of notes that have accidentals

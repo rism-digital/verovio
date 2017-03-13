@@ -52,6 +52,12 @@ public:
      * It typically set to false for mRest, mRpt, etc.
      */
     virtual bool HasToBeAligned() const { return false; }
+    
+    /**
+     * Return true if the element is relative to the staff and not to its parent.
+     * It typically set to true for syl or artic.
+     */
+    virtual bool IsRelativeToStaff() const { return false; }
 
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
@@ -98,9 +104,9 @@ public:
      */
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
-    virtual void SetDrawingXRel(int drawingXRel) { m_drawingXRel = drawingXRel; }
+    virtual void SetDrawingXRel(int drawingXRel);
     int GetDrawingYRel() const { return m_drawingYRel; }
-    virtual void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; }
+    virtual void SetDrawingYRel(int drawingYRel);
     ///@}
 
     /**
@@ -124,6 +130,11 @@ public:
      */
     Alignment *GetAlignment() const { return m_alignment; }
 
+    /**
+     * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff
+     */
+    Staff *GetCrossStaff() const;
+    
     /**
      * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)
      */
@@ -172,7 +183,10 @@ public:
     /**
      * See Object::PrepareCrossStaff
      */
+    ///@{
     virtual int PrepareCrossStaff(FunctorParams *functorParams);
+    virtual int PrepareCrossStaffEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::PrepareTimePointing
@@ -197,8 +211,10 @@ public:
     /**
      * See Object::GenerateMIDI
      */
+    ///@{
     virtual int GenerateMIDI(FunctorParams *functorParams);
     virtual int GenerateMIDIEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::CalcMaxMeasureDuration

@@ -304,11 +304,6 @@ public:
      * This is the top left position of the measure.
      */
     int m_xAbs;
-    /**
-     * The X relative position of the measure.
-     * It is used internally when calculating the layout and it is not stored in the file.
-     */
-    int m_drawingXRel;
 
     /**
      * The measure aligner that holds the x positions of the content of the measure
@@ -316,6 +311,13 @@ public:
     MeasureAligner m_measureAligner;
 
     TimestampAligner m_timestampAligner;
+    
+protected:
+    /**
+     * The X relative position of the measure.
+     * It is used internally when calculating the layout and it is not stored in the file.
+     */
+    int m_drawingXRel;
 
 private:
     bool m_measuredMusic;
