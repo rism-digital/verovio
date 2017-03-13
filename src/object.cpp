@@ -77,7 +77,6 @@ Object::Object(const Object &object) : BoundingBox(object)
     m_parent = NULL;
     m_classid = object.m_classid;
     m_isReferencObject = object.m_isReferencObject;
-    m_svgclass = object.m_svgclass;
     m_uuid = object.m_uuid; // for now copy the uuid - to be decided
     m_isModified = true;
     int i;
@@ -99,7 +98,6 @@ Object &Object::operator=(const Object &object)
         m_parent = NULL;
         m_classid = object.m_classid;
         m_isReferencObject = object.m_isReferencObject;
-        m_svgclass = object.m_svgclass;
         m_uuid = object.m_uuid; // for now copy the uuid - to be decided
         m_isModified = true;
 
@@ -197,7 +195,7 @@ void Object::MoveItselfTo(Object *targetParent)
     assert(m_parent);
     assert(m_parent != targetParent);
 
-    Object *relinquishedObject = this->m_parent->Relinquish(this->GetIdx());
+    Object *relinquishedObject = this->GetParent()->Relinquish(this->GetIdx());
     assert(relinquishedObject && (relinquishedObject == this));
     targetParent->AddChild(relinquishedObject);
 }
@@ -206,29 +204,6 @@ void Object::SetUuid(std::string uuid)
 {
     m_uuid = uuid;
 };
-
-std::string Object::GetSVGClass(void)
-{
-    return m_svgclass;
-}
-
-void Object::SetSVGClass(const std::string &classcontent)
-{
-    m_svgclass = classcontent;
-}
-
-void Object::AddSVGClass(const std::string &classname)
-{
-    if (HasSVGClass()) {
-        m_svgclass += " ";
-    }
-    m_svgclass += classname;
-}
-
-bool Object::HasSVGClass(void)
-{
-    return !m_svgclass.empty();
-}
 
 void Object::ClearChildren()
 {
@@ -241,7 +216,7 @@ void Object::ClearChildren()
     for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         // we need to check if this is the parent
         // ownership might have been given up with Relinquish
-        if ((*iter)->m_parent == this) {
+        if ((*iter)->GetParent() == this) {
             delete *iter;
         }
     }
@@ -313,7 +288,7 @@ int Object::GetIdx() const
 void Object::InsertChild(Object *element, int idx)
 {
     // With this method we require the parent to be set before
-    assert(element->m_parent == this);
+    assert(element->GetParent() == this);
 
     if (idx >= (int)m_children.size()) {
         m_children.push_back(element);
@@ -329,7 +304,7 @@ Object *Object::DetachChild(int idx)
         return NULL;
     }
     Object *child = m_children.at(idx);
-    child->m_parent = NULL;
+    child->ResetParent();
     ArrayOfObjects::iterator iter = m_children.begin();
     m_children.erase(iter + (idx));
     return child;
@@ -341,7 +316,7 @@ Object *Object::Relinquish(int idx)
         return NULL;
     }
     Object *child = m_children.at(idx);
-    child->m_parent = NULL;
+    child->ResetParent();
     return child;
 }
 
@@ -349,7 +324,7 @@ void Object::ClearRelinquishedChildren()
 {
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end();) {
-        if ((*iter)->m_parent != this) {
+        if ((*iter)->GetParent() != this) {
             iter = m_children.erase(iter);
         }
         else
@@ -931,7 +906,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     if (this->Is(PAGE)) {
         Page *page = dynamic_cast<Page *>(this);
         assert(page);
-        if (page->m_parent->GetChildIndex(page) == 0) {
+        if (page->GetParent()->GetChildIndex(page) == 0) {
             params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false);
             params->m_drawLabels = true;
         }
@@ -1025,8 +1000,8 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         // setting the layer stem direction. Alternatively, this could be done in
         // View::DrawLayer. If this (and other things) is kept here, renaming the method to something
         // more generic (PrepareDrawing?) might be a good idea...
-        if (layer->m_parent->GetChildCount() > 1) {
-            if (layer->m_parent->GetChildIndex(layer) == 0) {
+        if (layer->GetParent()->GetChildCount() > 1) {
+            if (layer->GetParent()->GetChildIndex(layer) == 0) {
                 layer->SetDrawingStemDir(STEMDIRECTION_up);
             }
             else {

@@ -30,6 +30,10 @@ public:
     bool Is(ClassId classId) const { return (this->GetClassId() == classId); }
     bool Is(const std::vector<ClassId> &classIds) const;
 
+    /**
+     * @name Methods for updating the bounding boxes and for providing information about their status.
+     */
+    ///@{
     virtual void UpdateContentBBoxX(int x1, int x2);
     virtual void UpdateContentBBoxY(int y1, int y2);
     virtual void UpdateSelfBBoxX(int x1, int x2);
@@ -38,6 +42,7 @@ public:
     bool HasSelfBB() const;
     void SetEmptyBB(bool onlyIfUnset = false);
     bool HasEmptyBB() const;
+    ///@}
 
     /**
      * Reset the bounding box values
@@ -45,15 +50,22 @@ public:
     virtual void ResetBoundingBox();
 
     /**
-     * @name Get the X and Y drawing position
+     * @name Get the X and Y drawing position.
+     * Pure virtual methods
      */
     ///@{
     virtual int GetDrawingX() const = 0;
     virtual int GetDrawingY() const = 0;
     ///@}
     
+    /**
+     * @name Reset the cached values of the drawingX and Y values.
+     * Pure virtual methods.
+     */
+    ///@{
     virtual void ResetCachedDrawingX() const = 0;
     virtual void ResetCachedDrawingY() const = 0;
+    ///@}
 
     /**
      * @name Get positions for self and content
@@ -134,17 +146,37 @@ public:
         const Point bezier[4], Point &pos, int &width, int &height, int &minYPos, int &maxYPos);
 
 private:
+    /**
+     * Flags for indicating whereas the bouding box was updated or not
+     */
+    ///@{
     bool m_updatedBBoxX;
     bool m_updatedBBoxY;
-    /** buffer for De-Casteljau algorithm */
-    static int s_deCasteljau[4][4];
-
+    ///@}
+    
+    /**
+     * Bounding box positions
+     */
+    ///@{
     int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
     int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
+    ///@}
+    
+    /** 
+     * Buffer for De-Casteljau algorithm 
+     */
+    static int s_deCasteljau[4][4];
 
 protected:
+    /**
+     * The cached version of the drawingX and drawingY values.
+     * These are reset by ResetCachedDrawingX/Y methods when necessary.
+     * Mutable because to be updated in GetDrawingX/Y const.
+     */
+    ///@{
     mutable int m_cachedDrawingX;
     mutable int m_cachedDrawingY;
+    ///@}
 };
 
 } // namespace vrv

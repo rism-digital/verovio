@@ -86,14 +86,6 @@ void Ligature::AddChild(Object *child)
     Modify();
 }
 
-bool compare_pitchL(Object *first, Object *second)
-{
-    Note *n1 = dynamic_cast<Note *>(first);
-    Note *n2 = dynamic_cast<Note *>(second);
-    assert(n1 && n2);
-    return (n1->GetDiatonicPitch() < n2->GetDiatonicPitch());
-}
-
 void Ligature::FilterList(ListOfObjects *childList)
 {
     // Retain only note children of ligatures
@@ -122,8 +114,6 @@ void Ligature::FilterList(ListOfObjects *childList)
             }
         }
     }
-
-    childList->sort(compare_pitchL);
 
     iter = childList->begin();
 

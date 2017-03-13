@@ -114,14 +114,6 @@ void Chord::AddChild(Object *child)
     Modify();
 }
 
-bool compare_pitch(Object *first, Object *second)
-{
-    Note *n1 = dynamic_cast<Note *>(first);
-    Note *n2 = dynamic_cast<Note *>(second);
-    assert(n1 && n2);
-    return (n1->GetDiatonicPitch() < n2->GetDiatonicPitch());
-}
-
 void Chord::FilterList(ListOfObjects *childList)
 {
     // Retain only note children of chords
@@ -134,7 +126,7 @@ void Chord::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
     }
 
-    childList->sort(compare_pitch);
+    std::sort(childList->begin(), childList->end(), DiatonicSort());
 
     iter = childList->begin();
 

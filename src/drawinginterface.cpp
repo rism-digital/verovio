@@ -33,9 +33,16 @@ void DrawingListInterface::Reset()
 
 void DrawingListInterface::AddToDrawingList(Object *object)
 {
+    if (std::find(m_drawingList.begin(), m_drawingList.end(), object) == m_drawingList.end()) {
+        // someName not in name, add it
+        m_drawingList.push_back(object);
+    }
+    
+    /*
     m_drawingList.push_back(object);
     m_drawingList.sort();
     m_drawingList.unique();
+     */
 }
 
 ListOfObjects *DrawingListInterface::GetDrawingList()

@@ -82,7 +82,7 @@ void Page::LayOut(bool force)
 
 void Page::LayOutHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -171,7 +171,7 @@ void Page::LayOutHorizontally()
 
 void Page::LayOutVertically()
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -245,7 +245,7 @@ void Page::LayOutVertically()
 
 void Page::JustifyHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
 
     if (!doc->GetJustificationX()) {
@@ -265,7 +265,7 @@ void Page::JustifyHorizontally()
 
 int Page::GetContentHeight() const
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -279,7 +279,7 @@ int Page::GetContentHeight() const
 
 int Page::GetContentWidth() const
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
     // in non debug
     if (!doc) return 0;

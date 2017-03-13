@@ -3629,13 +3629,13 @@ bool MeiInput::ReadTupletSpanAsTuplet(Measure *measure, pugi::xml_node tupletSpa
     LayerElement *startChild = dynamic_cast<LayerElement *>(start->GetLastParentNot(LAYER));
     LayerElement *endChild = dynamic_cast<LayerElement *>(end->GetLastParentNot(LAYER));
 
-    if (!startChild || !endChild || (startChild->m_parent != endChild->m_parent)) {
+    if (!startChild || !endChild || (startChild->GetParent() != endChild->GetParent())) {
         LogWarning("Start and end elements for <tupletSpan> '%s' not in the same layer", tuplet->GetUuid().c_str());
         delete tuplet;
         return false;
     }
 
-    Layer *parentLayer = dynamic_cast<Layer *>(startChild->m_parent);
+    Layer *parentLayer = dynamic_cast<Layer *>(startChild->GetParent());
     assert(parentLayer);
 
     int startIdx = startChild->GetIdx();

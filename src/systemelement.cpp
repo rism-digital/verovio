@@ -61,7 +61,7 @@ int SystemElement::CastOffSystems(FunctorParams *functorParams)
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->m_parent));
+    assert(dynamic_cast<System *>(this->GetParent()));
 
     // Special case where we use the Relinquish method.
     SystemElement *element = dynamic_cast<SystemElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));

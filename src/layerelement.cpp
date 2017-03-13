@@ -89,7 +89,7 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
     // not self assignement
     if (this != &element) {
         // pointers have to be NULL
-        m_parent = NULL;
+        ResetParent();
         m_alignment = NULL;
     }
     return *this;

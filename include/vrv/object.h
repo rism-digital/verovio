@@ -88,7 +88,7 @@ public:
     
     /**
      * Make an object a reference object that do not own children.
-     * This cannot be un-done and should be set before any other object is added.
+     * This cannot be un-done and has to be set before any child is added.
      */
     ///@{
     void SetAsReferenceObject();
@@ -257,12 +257,23 @@ public:
      * Return the last child of the object (if any, NULL otherwise)
      */
     Object *GetLast() const;
+    
+    /**
+     * Get the parent of the Object
+     */
+    Object *GetParent() const { return m_parent; }
 
     /**
      * Set the parent of the Object.
      * The current parent is expected to be NULL.
      */
     void SetParent(Object *parent);
+    
+    /**
+     * Reset the parent of the Object.
+     * The current parent is not expected to be NULL.
+     */
+    void ResetParent() { m_parent = NULL; }
 
     /**
      * Base method for adding children.
@@ -283,8 +294,14 @@ public:
     virtual int GetDrawingY() const;
     ///@}
     
+    /**
+     * @name Reset the cached values of the drawingX and Y values.
+     * Reset all children recursively
+     */
+    ///@{
     virtual void ResetCachedDrawingX() const;
     virtual void ResetCachedDrawingY() const;
+    ///@}
 
     /**
      * Look for the Object in the children and return its position (-1 if not found)
@@ -851,7 +868,14 @@ protected:
     void ClearChildren();
 
 private:
+    /**
+     * Method for generating the uuid.
+     */
     void GenerateUuid();
+    
+    /**
+     * Initialisation method taking a uuid prefix argument.
+     */
     void Init(std::string);
 
 public:
@@ -861,16 +885,26 @@ public:
      */
     ArrayOfStrAttr m_unsupported;
 
-    Object *m_parent;
-
 protected:
+    /**
+     * A vector of child objects.
+     * Unless SetAsReferenceObject is set or with detached and relinquished, the children are own by it.
+     */
     ArrayOfObjects m_children;
 
 private:
+    /**
+     * A pointer to the parent object;
+     */
+    Object *m_parent;
+    
+    /**
+     * Members for storing / generating uuids
+     */
+    ///@{
     std::string m_uuid;
     std::string m_classid;
-    std::string m_svgclass;
-    static unsigned long s_objectCounter;
+    ///@}
     
     /**
      * A reference object do not own children.
@@ -891,8 +925,10 @@ private:
      * See Object::IterGetFirst, Object::IterGetNext and Object::IterIsNotEnd
      * Values are set when GetFirst is called (which is mandatory)
      */
+    ///@{
     ArrayOfObjects::iterator m_iteratorEnd, m_iteratorCurrent;
     ClassId m_iteratorElementType;
+    ///@}
 
     /**
      * A vector for storing the list of AttClassId (MEI att classes) implemented.
@@ -915,6 +951,11 @@ private:
      * For example, a Artic child in Note for an original @artic
      */
     bool m_isAttribute;
+    
+    /**
+     * A static counter for uuid generation.
+     */
+    static unsigned long s_objectCounter;
 };
 
 //----------------------------------------------------------------------------

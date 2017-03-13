@@ -125,7 +125,7 @@ int Ending::CastOffSystems(FunctorParams *functorParams)
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->m_parent));
+    assert(dynamic_cast<System *>(this->GetParent()));
 
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild
