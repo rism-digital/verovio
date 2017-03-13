@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class AlignmentReference;
 class FloatingObject;
 class GraceAligner;
 class MeasureAligner;
@@ -24,8 +25,6 @@ class TimestampAttr;
 /**
  * Alignment types for aligning types together.
  * For example, we align notes and rests (default) together, clefs separately, etc.
- * The container is a generic alignment for tuplet, chords, beams, etc.; we need
- * this to avoid notes aligning to it
  */
 enum AlignmentType {
     ALIGNMENT_MEASURE_START = 0,
@@ -38,8 +37,6 @@ enum AlignmentType {
     // Justifiable
     ALIGNMENT_FULLMEASURE,
     ALIGNMENT_FULLMEASURE2,
-    ALIGNMENT_GRACENOTE,
-    ALIGNMENT_CONTAINER,
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF,
     ALIGNMENT_KEYSIG,
@@ -47,6 +44,7 @@ enum AlignmentType {
     ALIGNMENT_METERSIG,
     ALIGNMENT_DOT,
     ALIGNMENT_ACCID,
+    ALIGNMENT_GRACENOTE,
     ALIGNMENT_DEFAULT,
     // Non-justifiable
     ALIGNMENT_MEASURE_RIGHT_BARLINE,
@@ -298,12 +296,14 @@ public:
      * Override the method of adding AlignmentReference children
      */
     virtual void AddChild(Object *object);
+    
+    AlignmentReference *GetAlignmentReference(int staffN);
 
     /**
      * @name Set and get the xRel value of the alignment
      */
     ///@{
-    void SetXRel(int xRel) { m_xRel = xRel; }
+    void SetXRel(int xRel);
     int GetXRel() const { return m_xRel; }
     ///@}
 
@@ -448,16 +448,16 @@ public:
     */
     ///@{
     AlignmentReference();
-    AlignmentReference(int n, Object *elementRef);
-    virtual ~AlignmentReference() {}
+    AlignmentReference(int n);
+    virtual ~AlignmentReference();
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
-
+    
     /**
-     * Getter for the Object
+     * Override the method of adding AlignmentReference children
      */
-    Object *GetObject() { return m_elementRef; }
+    virtual void AddChild(Object *object);
 
     //----------//
     // Functors //
@@ -466,20 +466,19 @@ public:
     /**
      * See Object::GetAlignmentLeftRight
      */
-    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+    //virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustGraceXPos
      */
-    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+    //virtual int AdjustGraceXPos(FunctorParams *functorParams);
 
     /**
      * See Object::AdjustXPos
      */
-    virtual int AdjustXPos(FunctorParams *functorParams);
+    //virtual int AdjustXPos(FunctorParams *functorParams);
 
 private:
-    Object *m_elementRef;
 };
 
 //----------------------------------------------------------------------------
@@ -706,6 +705,12 @@ public:
     int GetGraceGroupLeft(int staffN);
     int GetGraceGroupRight(int staffN);
     ///@{
+    
+    /**
+     * Set an linear defaut position for each grace note
+     * This is called from the SetAlignmentXPos Functor.
+     */
+    void SetGraceAligmentXPos(Doc *doc);
 
     //----------//
     // Functors //

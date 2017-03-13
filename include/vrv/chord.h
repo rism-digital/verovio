@@ -71,7 +71,9 @@ public:
 
     virtual void FilterList(ListOfObjects *childlist);
 
-    void GetYExtremes(int *yMax, int *yMin);
+    void GetYExtremes(int &yMax, int &yMin);
+                  
+    void GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow);
 
     /**
      * Returns list of notes that have accidentals

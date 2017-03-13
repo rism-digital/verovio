@@ -189,6 +189,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
 void FloatingPositioner::ResetPositioner()
 {
     BoundingBox::ResetBoundingBox();
+    ResetCachedDrawingY();
 
     m_objectX = NULL;
     m_objectY = NULL;
@@ -215,6 +216,18 @@ int FloatingPositioner::GetDrawingY() const
     assert(m_objectY);
     return (m_objectY->GetDrawingY() - this->GetDrawingYRel());
 }
+    
+    
+void FloatingPositioner::ResetCachedDrawingX() const
+{
+    m_cachedDrawingX = VRV_UNSET;
+}
+
+void FloatingPositioner::ResetCachedDrawingY() const
+{
+    m_cachedDrawingY = VRV_UNSET;
+}
+
 void FloatingPositioner::SetObjectXY(Object *objectX, Object *objectY)
 {
     assert(objectX);
@@ -259,6 +272,7 @@ int FloatingPositioner::CalcXMinMaxY(const Point points[4])
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)
 {
+    ResetCachedDrawingY();
     if (m_place == STAFFREL_above) {
         if (drawingYRel < m_drawingYRel) m_drawingYRel = drawingYRel;
     }

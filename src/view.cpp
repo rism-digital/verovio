@@ -16,6 +16,7 @@
 
 #include "doc.h"
 #include "page.h"
+#include "vrv.h"
 
 namespace vrv {
 

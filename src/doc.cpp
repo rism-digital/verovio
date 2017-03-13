@@ -255,7 +255,8 @@ void Doc::PrepareDrawing()
     // Prepare the cross-staff pointers
     PrepareCrossStaffParams prepareCrossStaffParams;
     Functor prepareCrossStaff(&Object::PrepareCrossStaff);
-    this->Process(&prepareCrossStaff, &prepareCrossStaffParams);
+    Functor prepareCrossStaffEnd(&Object::PrepareCrossStaffEnd);
+    this->Process(&prepareCrossStaff, &prepareCrossStaffParams, &prepareCrossStaffEnd);
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
@@ -482,7 +483,7 @@ void Doc::CastOffDoc()
 
     // Here we redo the alignment because of the new scoreDefs
     // We can actually optimise this and have a custom version that does not redo all the calculation
-    contentPage->LayOutHorizontally();
+    //contentPage->LayOutHorizontally();
 
     contentPage->LayOutVertically();
 
