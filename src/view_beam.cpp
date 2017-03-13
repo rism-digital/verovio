@@ -40,21 +40,8 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Beam *beam = dynamic_cast<Beam *>(element);
     assert(beam);
 
-    LayerElement *current;
-
-    BeamParams params;
-    params.m_changingDur = false;
-    params.m_beamHasChord = false;
-    params.m_hasMultipleStemDir = false;
-    params.m_cueSize = false;
-    params.m_shortestDur = 0;
-    params.m_stemDir = STEMDIRECTION_NONE;
-
-    // position in the beam element list
-    int elementCount, last;
-
     // duration variables
-    int lastDur, currentDur, testDur;
+    int testDur;
 
     // temporary coordinates
     int x1, x2, y1, y2;
@@ -70,8 +57,6 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     /******************************************************************/
     // initialization
 
-    lastDur = elementCount = 0;
-
     ListOfObjects *beamChildren = beam->GetList(beam);
 
     // Should we assert this at the beginning?
@@ -79,96 +64,14 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
     const ArrayOfBeamElementCoords *beamElementCoords = beam->GetElementCoords();
-
-    // current point to the first Note in the layed out layer
-    current = dynamic_cast<LayerElement *>(beamChildren->front());
-    // Beam list should contain only DurationInterface objects
-    assert(current->GetDurationInterface());
-
-    lastDur = (current->GetDurationInterface())->GetActualDur();
-
-    /******************************************************************/
-    // Populate BeamElementCoord for each element in the beam
-    // This could be moved to Beam::InitCoord for optimization because there should be no
-    // need for redoing it everytime it is drawn.
-
-    data_STEMDIRECTION currentStemDir;
-
-    ListOfObjects::iterator iter = beamChildren->begin();
-    do {
-        // Beam list should contain only DurationInterface objects
-        assert(current->GetDurationInterface());
-        currentDur = (current->GetDurationInterface())->GetActualDur();
-
-        if (current->Is(CHORD)) {
-            params.m_beamHasChord = true;
-        }
-
-        // Can it happen? With rests?
-        if (currentDur > DUR_4) {
-            (*beamElementCoords).at(elementCount)->m_element = current;
-            current->m_beamElementCoord = (*beamElementCoords).at(elementCount);
-            (*beamElementCoords).at(elementCount)->m_x = current->GetDrawingX();
-            (*beamElementCoords).at(elementCount)->m_dur = currentDur;
-
-            // Look at beam breaks
-            (*beamElementCoords).at(elementCount)->m_breaksec = 0;
-            AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary *>(current);
-            if (beamsecondary && beamsecondary->HasBreaksec()) {
-                if (!params.m_changingDur) params.m_changingDur = true;
-                (*beamElementCoords).at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
-            }
-
-            // Skip rests
-            if ((current->Is(NOTE)) || (current->Is(CHORD))) {
-                // look at the stemDir to see if we have multiple stem Dir
-                if (!params.m_hasMultipleStemDir) {
-                    assert(dynamic_cast<AttStems *>(current));
-                    currentStemDir = (dynamic_cast<AttStems *>(current))->GetStemDir();
-                    if (currentStemDir != STEMDIRECTION_NONE) {
-                        if ((params.m_stemDir != STEMDIRECTION_NONE) && (params.m_stemDir != currentStemDir)) {
-                            params.m_hasMultipleStemDir = true;
-                        }
-                    }
-                    params.m_stemDir = currentStemDir;
-                }
-            }
-            // keep the shortest dur in the beam
-            params.m_shortestDur = std::max(currentDur, params.m_shortestDur);
-            // check if we have more than duration in the beam
-            if (!params.m_changingDur && currentDur != lastDur) params.m_changingDur = true;
-            lastDur = currentDur;
-
-            elementCount++;
-        }
-
-        iter++;
-        if (iter == beamChildren->end()) {
-            break;
-        }
-        current = dynamic_cast<LayerElement *>(*iter);
-        if (current == NULL) {
-            LogDebug("Error accessing element in Beam list");
-            return;
-        }
-
-    } while (1);
-
-    // elementCount must be greater than 0 here
-    if (elementCount == 0) {
-        LogDebug("Beam with no notes of duration > 8 detected. Exiting DrawBeam.");
-        return;
-    }
-
-    last = elementCount - 1;
-
-    // We look only at the last note for checking if cue-sized. Somehow arbitrarily
-    params.m_cueSize = (*beamElementCoords).at(last)->m_element->IsCueSize();
+    
+    int elementCount = (int)beamChildren->size();
+    int last = elementCount - 1;
 
     /******************************************************************/
     // Calculate the beam slope and position
 
-    CalcBeam(layer, staff, beamElementCoords, elementCount, &params);
+    CalcBeam(layer, staff, beamElementCoords, elementCount, &beam->m_drawingParams);
 
     /******************************************************************/
     // Start the Beam graphic and draw the children
@@ -197,14 +100,14 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // Number of bars to draw - if we do not have changing values, draw
     // the number of bars according to the shortestDur value. Otherwise draw
     // only one bar and the others will be drawn separately.
-    fullBars = !params.m_changingDur ? (params.m_shortestDur - DUR_4) : 1;
+    fullBars = !beam->m_drawingParams.m_changingDur ? (beam->m_drawingParams.m_shortestDur - DUR_4) : 1;
 
     // Adjust the x position of the first and last element for taking into account the stem width
     (*beamElementCoords).at(0)->m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
     (*beamElementCoords).at(last)->m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
 
     // Shift direction
-    shiftY = (params.m_stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;
+    shiftY = (beam->m_drawingParams.m_stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;
 
     y1 = (*beamElementCoords).at(0)->m_yBeam;
     y2 = (*beamElementCoords).at(last)->m_yBeam;
@@ -219,22 +122,22 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     // s_y = 0 and s_y2 = 0 respectively
 
     for (j = 0; j < fullBars; j++) {
-        polygonHeight = params.m_beamWidthBlack * shiftY;
+        polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
         DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
         y1 += polygonHeight;
         y2 += polygonHeight;
 
         // dy1 must == 0 for accelerando beams
         if (!dy1)
-            y1 += (params.m_beamWidthBlack * shiftY) * -1;
+            y1 += (beam->m_drawingParams.m_beamWidthBlack * shiftY) * -1;
         else
-            y1 += dy1 * params.m_beamWidthWhite;
+            y1 += dy1 * beam->m_drawingParams.m_beamWidthWhite;
 
         // reverse for retardendo beam
         if (!dy2)
-            y2 += (params.m_beamWidthBlack * shiftY) * -1;
+            y2 += (beam->m_drawingParams.m_beamWidthBlack * shiftY) * -1;
         else
-            y2 += dy2 * params.m_beamWidthWhite;
+            y2 += dy2 * beam->m_drawingParams.m_beamWidthWhite;
     }
 
     /******************************************************************/
@@ -260,19 +163,19 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
     int noteCount = (int)noteIndexes.size();
 
-    if (params.m_changingDur && noteCount > 0) {
+    if (beam->m_drawingParams.m_changingDur && noteCount > 0) {
         testDur = DUR_8 + fullBars;
-        barY = params.m_beamWidth;
+        barY = beam->m_drawingParams.m_beamWidth;
 
-        if (params.m_stemDir == STEMDIRECTION_up) {
+        if (beam->m_drawingParams.m_stemDir == STEMDIRECTION_up) {
             barY = -barY;
         }
 
         int fractBeamWidth
-            = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, params.m_cueSize) * 7 / 10;
+            = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, beam->m_drawingParams.m_cueSize) * 7 / 10;
 
         // loop
-        while (testDur <= params.m_shortestDur) {
+        while (testDur <= beam->m_drawingParams.m_shortestDur) {
             // true at the beginning of a beam or after a breakSec
             bool start = true;
 
@@ -334,28 +237,28 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                     if (i >= noteCount - 1) continue; // assert for debug and skip otherwise
                     y1 = (*beamElementCoords).at(idx)->m_yBeam + barY;
                     y2 = (*beamElementCoords).at(noteIndexes.at(i + 1))->m_yBeam + barY;
-                    polygonHeight = params.m_beamWidthBlack * shiftY;
+                    polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, (*beamElementCoords).at(idx)->m_x, y1,
                         (*beamElementCoords).at(noteIndexes.at(i + 1))->m_x, y2, polygonHeight);
                 }
                 else if ((*beamElementCoords).at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_RIGHT) {
                     y1 = (*beamElementCoords).at(idx)->m_yBeam + barY;
                     int x2 = (*beamElementCoords).at(idx)->m_x + fractBeamWidth;
-                    y2 = params.m_startingY + params.m_verticalBoost + barY + params.m_beamSlope * x2;
-                    polygonHeight = params.m_beamWidthBlack * shiftY;
+                    y2 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY + beam->m_drawingParams.m_beamSlope * x2;
+                    polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, (*beamElementCoords).at(idx)->m_x, y1, x2, y2, polygonHeight);
                 }
                 else if ((*beamElementCoords).at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_LEFT) {
                     y2 = (*beamElementCoords).at(idx)->m_yBeam + barY;
                     int x1 = (*beamElementCoords).at(idx)->m_x - fractBeamWidth;
-                    y1 = params.m_startingY + params.m_verticalBoost + barY + params.m_beamSlope * x1;
-                    polygonHeight = params.m_beamWidthBlack * shiftY;
+                    y1 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY + beam->m_drawingParams.m_beamSlope * x1;
+                    polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, x1, y1, (*beamElementCoords).at(idx)->m_x, y2, polygonHeight);
                 }
             }
 
             testDur += 1;
-            barY += shiftY * params.m_beamWidth;
+            barY += shiftY * beam->m_drawingParams.m_beamWidth;
         } // end of while
     } // end of drawing partial bars
 
@@ -369,7 +272,10 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(layer);
     assert(staff);
     assert(measure);
-
+    
+    FTrem *fTrem = dynamic_cast<FTrem *>(element);
+    assert(fTrem);
+    
     // temporary coordinates
     int x1, x2, y1, y2;
 
@@ -380,72 +286,29 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // loop
     int i, j;
-
-    FTrem *fTrem = dynamic_cast<FTrem *>(element);
-    assert(fTrem);
-
-    ArrayOfBeamElementCoords beamElementCoords;
-    BeamElementCoord firstElement;
-    BeamElementCoord secondElement;
-    beamElementCoords.push_back(&firstElement);
-    beamElementCoords.push_back(&secondElement);
-
-    int elementCount = 2;
-
+    
+    /******************************************************************/
+    // initialization
+    
     ListOfObjects *fTremChildren = fTrem->GetList(fTrem);
-
+    
     // Should we assert this at the beginning?
     if (fTremChildren->empty()) {
         return;
     }
-    // current point to the first Note in the layed out layer
-    firstElement.m_element = dynamic_cast<LayerElement *>(fTremChildren->front());
-    // fTrem list should contain only DurationInterface objects
-    assert(firstElement.m_element->GetDurationInterface());
-    // current point to the first Note in the layed out layer
-    secondElement.m_element = dynamic_cast<LayerElement *>(fTremChildren->back());
-    // fTrem list should contain only DurationInterface objects
-    assert(secondElement.m_element->GetDurationInterface());
-    // Should we assert this at the beginning?
-    if (firstElement.m_element == secondElement.m_element) {
-        return;
-    }
+    const ArrayOfBeamElementCoords *beamElementCoords = fTrem->GetElementCoords();
+    
+    assert(beamElementCoords->size() == 2);
+    
+    int elementCount = 2;
 
-    BeamParams params;
-    params.m_changingDur = false;
-    params.m_beamHasChord = false;
-    params.m_hasMultipleStemDir = false;
-    params.m_cueSize = false;
-    // adjust params.m_shortestDur depending on the number of slashes
-    params.m_shortestDur = std::max(DUR_8, DUR_1 + fTrem->GetSlash());
-    params.m_stemDir = STEMDIRECTION_NONE;
-
-    // We look only at the first one for the duration since both are expected to be the same
-    assert(dynamic_cast<AttDurationMusical *>(firstElement.m_element));
-    int dur = (dynamic_cast<AttDurationMusical *>(firstElement.m_element))->GetDur();
-
-    if (firstElement.m_element->Is(CHORD)) {
-        params.m_beamHasChord = true;
-    }
-    if (secondElement.m_element->Is(CHORD)) {
-        params.m_beamHasChord = true;
-    }
-
-    // For now look at the stemDir only on the first note
-    assert(dynamic_cast<AttStems *>(firstElement.m_element));
-    params.m_stemDir = (dynamic_cast<AttStems *>(firstElement.m_element))->GetStemDir();
-
-    // We look only at the first note for checking if cue-sized. Somehow arbitrarily
-    params.m_cueSize = firstElement.m_element->IsCueSize();
-
-    // x positions
-    firstElement.m_x = firstElement.m_element->GetDrawingX();
-    secondElement.m_x = secondElement.m_element->GetDrawingX();
+    BeamElementCoord *firstElement = (*beamElementCoords).at(0);
+    BeamElementCoord *secondElement = (*beamElementCoords).at(1);
 
     /******************************************************************/
     // Calculate the beam slope and position
 
-    CalcBeam(layer, staff, &beamElementCoords, elementCount, &params);
+    CalcBeam(layer, staff, beamElementCoords, elementCount, &fTrem->m_drawingParams);
 
     /******************************************************************/
     // Start the grahic
@@ -459,10 +322,14 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     /******************************************************************/
     // Draw the stems and the bars
+    
+    // We look only at the first one for the duration since both are expected to be the same
+    assert(dynamic_cast<AttDurationMusical *>(firstElement->m_element));
+    int dur = (dynamic_cast<AttDurationMusical *>(firstElement->m_element))->GetDur();
 
     if (dur > DUR_1) {
         for (i = 0; i < elementCount; i++) {
-            LayerElement *el = beamElementCoords.at(i)->m_element;
+            LayerElement *el = (*beamElementCoords).at(i)->m_element;
             if (((el->Is(NOTE)) && !(dynamic_cast<Note *>(el))->IsChordTone()) || (el->Is(CHORD))) {
                 StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
                 assert(interface);
@@ -478,50 +345,50 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     fullBars = fTrem->GetSlash();
 
     // Adjust the x position of the first and last element for taking into account the stem width
-    firstElement.m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    secondElement.m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    firstElement->m_x -= (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    secondElement->m_x += (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
 
     // Shift direction
-    shiftY = (params.m_stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;
-    polygonHeight = params.m_beamWidthBlack * shiftY;
+    shiftY = (fTrem->m_drawingParams.m_stemDir == STEMDIRECTION_down) ? 1.0 : -1.0;
+    polygonHeight = fTrem->m_drawingParams.m_beamWidthBlack * shiftY;
 
-    y1 = firstElement.m_yBeam;
-    y2 = secondElement.m_yBeam;
+    y1 = firstElement->m_yBeam;
+    y2 = secondElement->m_yBeam;
 
-    x1 = firstElement.m_x;
-    x2 = secondElement.m_x;
+    x1 = firstElement->m_x;
+    x2 = secondElement->m_x;
 
     dy1 = shiftY;
     dy2 = shiftY;
 
-    int space = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, params.m_cueSize);
+    int space = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, fTrem->m_drawingParams.m_cueSize);
     // for non-stem notes the bar should be shortenend
     if (dur < DUR_2) {
         x1 += 2 * space;
-        y1 += 2 * space * params.m_beamSlope;
+        y1 += 2 * space * fTrem->m_drawingParams.m_beamSlope;
         x2 -= 2 * space;
-        y2 -= 2 * space * params.m_beamSlope;
+        y2 -= 2 * space * fTrem->m_drawingParams.m_beamSlope;
     }
     else if (dur == DUR_4) {
         x1 += space;
-        y1 += space * params.m_beamSlope;
+        y1 += space * fTrem->m_drawingParams.m_beamSlope;
         x2 -= space;
-        y2 -= space * params.m_beamSlope;
+        y2 -= space * fTrem->m_drawingParams.m_beamSlope;
     }
 
     for (j = 0; j < fullBars; j++) {
         DrawObliquePolygon(dc, x1, y1, x2, y2, polygonHeight);
         y1 += polygonHeight;
         y2 += polygonHeight;
-        y1 += dy1 * params.m_beamWidthWhite;
-        y2 += dy2 * params.m_beamWidthWhite;
+        y1 += dy1 * fTrem->m_drawingParams.m_beamWidthWhite;
+        y2 += dy2 * fTrem->m_drawingParams.m_beamWidthWhite;
 
         // shorten the bar after having drawn the first one (but the first one)
         if ((j == 0) && (dur > DUR_1) && (dur != DUR_4)) {
             x1 += space;
-            y1 += space * params.m_beamSlope;
+            y1 += space * fTrem->m_drawingParams.m_beamSlope;
             x2 -= space;
-            y2 -= space * params.m_beamSlope;
+            y2 -= space * fTrem->m_drawingParams.m_beamSlope;
         }
     }
 
@@ -529,13 +396,13 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 }
 
 void View::CalcBeam(
-    Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount, BeamParams *params)
+    Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount, BeamDrawingParams *params)
 {
     assert(layer);
     assert(staff);
     assert(beamElementCoords);
 
-    int y1, y2, avgY, yExtreme, high, low, verticalCenter, verticalShift;
+    int y1, y2, avgY, high, low, verticalCenter, verticalShift;
     double xr, verticalShiftFactor;
 
     // loop
@@ -553,16 +420,19 @@ void View::CalcBeam(
 
     /******************************************************************/
     // initialization
-
-    high = avgY = 0.0;
+    
+    for (i = 0; i < elementCount; i++) {
+        (*beamElementCoords).at(i)->m_x = (*beamElementCoords).at(i)->m_element->GetDrawingX();
+    }
+    
+    avgY = 0;
+    high = VRV_UNSET;
     low = -VRV_UNSET;
     params->m_verticalBoost = 0.0;
 
     verticalShiftFactor = 3.0;
     verticalCenter = staff->GetDrawingY()
         - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2); // center point of the staff
-    yExtreme = verticalCenter; // value of farthest y point on the staff from verticalCenter minus verticalCenter; used
-    // if beamHasChord = true
 
     int last = elementCount - 1;
 
@@ -583,11 +453,11 @@ void View::CalcBeam(
         if ((*beamElementCoords).at(i)->m_element->Is(CHORD)) {
             Chord *chord = dynamic_cast<Chord *>((*beamElementCoords).at(i)->m_element);
             assert(chord);
-            chord->GetYExtremes(&yMax, &yMin);
+            chord->GetYExtremes(yMax, yMin);
             (*beamElementCoords).at(i)->m_yTop = yMax;
             (*beamElementCoords).at(i)->m_yBottom = yMin;
 
-            avgY += (*beamElementCoords).at(i)->m_y + ((yMax - yMin) / 2);
+            avgY += ((yMax + yMin) / 2);
 
             // highest and lowest value;
             high = std::max(yMax, high);
@@ -611,7 +481,7 @@ void View::CalcBeam(
     /******************************************************************/
     // Set the stem direction
 
-    yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
+    // yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
     avgY /= elementCount;
 
     // If we have one stem direction in the beam, then don't look at the layer
@@ -620,11 +490,11 @@ void View::CalcBeam(
 
     // Automatic stem direction if nothing in the notes or in the layer
     if (params->m_stemDir == STEMDIRECTION_NONE) {
-        if (params->m_beamHasChord)
+        /*if (params->m_beamHasChord)
             params->m_stemDir = (yExtreme < verticalCenter)
                 ? STEMDIRECTION_up
                 : STEMDIRECTION_down; // if it has a chord, go by the most extreme position
-        else
+        else */
             params->m_stemDir
                 = (avgY < verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down; // otherwise go by average
     }

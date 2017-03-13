@@ -31,7 +31,7 @@ class Staff;
  * A System is contained in a Page.
  * It contains Staff objects.
 */
-class System : public Object, public DrawingListInterface {
+class System : public Object, public DrawingListInterface, public AttCommon, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, and other standard methods
@@ -58,6 +58,16 @@ public:
     ///@{
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
+    ///@}
+    
+    /**
+     * @name Get and set the X and Y drawing relative positions
+     */
+    ///@{
+    int GetDrawingXRel() const { return m_drawingXRel; }
+    virtual void SetDrawingXRel(int drawingXRel);
+    int GetDrawingYRel() const { return m_drawingYRel; }
+    virtual void SetDrawingYRel(int drawingYRel);
     ///@}
 
     /**
@@ -184,20 +194,10 @@ public:
      */
     int m_yAbs;
     /**
-     * The Y relative position of the system.
-     * It is used internally when calculating the layout and it is not stored in the file.
-     */
-    int m_drawingYRel;
-    /**
      * The x absolute position of the  system for facsimile layouts.
      * This is the top left corner of the system.
      */
     int m_xAbs;
-    /**
-     * The X relative position of the system.
-     * It is used internally when calculating the layout and it is not stored in the file.
-     */
-    int m_drawingXRel;
     /**
      * The width used by the labels at the left of the system.
      * It is used internally when calculating the layout and it is not stored in the file.
@@ -213,6 +213,18 @@ public:
     int m_drawingTotalWidth;
     int m_drawingJustifiableWidth;
     ///@}
+    
+protected:
+    /**
+     * The X relative position of the system.
+     * It is used internally when calculating the layout and it is not stored in the file.
+     */
+    int m_drawingXRel;
+    /**
+     * The Y relative position of the system.
+     * It is used internally when calculating the layout and it is not stored in the file.
+     */
+    int m_drawingYRel;
 
 private:
     ScoreDef *m_drawingScoreDef;

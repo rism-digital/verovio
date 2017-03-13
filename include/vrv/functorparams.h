@@ -768,8 +768,14 @@ public:
 
 class PrepareCrossStaffParams : public FunctorParams {
 public:
-    PrepareCrossStaffParams() { m_currentMeasure = NULL; }
+    PrepareCrossStaffParams() {
+        m_currentMeasure = NULL;
+        m_currentCrossStaff = NULL;
+        m_currentCrossLayer = NULL;
+    }
     Measure *m_currentMeasure;
+    Staff *m_currentCrossStaff;
+    Layer *m_currentCrossLayer;
 };
 
 //----------------------------------------------------------------------------

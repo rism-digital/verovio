@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class AlignmentReference;
 class FloatingObject;
 class GraceAligner;
 class MeasureAligner;
@@ -24,8 +25,6 @@ class TimestampAttr;
 /**
  * Alignment types for aligning types together.
  * For example, we align notes and rests (default) together, clefs separately, etc.
- * The container is a generic alignment for tuplet, chords, beams, etc.; we need
- * this to avoid notes aligning to it
  */
 enum AlignmentType {
     ALIGNMENT_MEASURE_START = 0,
@@ -36,17 +35,16 @@ enum AlignmentType {
     ALIGNMENT_SCOREDEF_METERSIG,
     ALIGNMENT_MEASURE_LEFT_BARLINE,
     // Justifiable
+    ALIGNMENT_FULLMEASURE,
+    ALIGNMENT_FULLMEASURE2,
     ALIGNMENT_BARLINE,
     ALIGNMENT_CLEF,
     ALIGNMENT_KEYSIG,
     ALIGNMENT_MENSUR,
     ALIGNMENT_METERSIG,
     ALIGNMENT_DOT,
-    ALIGNMENT_GRACENOTE,
-    ALIGNMENT_CONTAINER,
-    ALIGNMENT_FULLMEASURE,
-    ALIGNMENT_FULLMEASURE2,
     ALIGNMENT_ACCID,
+    ALIGNMENT_GRACENOTE,
     ALIGNMENT_DEFAULT,
     // Non-justifiable
     ALIGNMENT_MEASURE_RIGHT_BARLINE,
@@ -71,8 +69,6 @@ public:
     SystemAligner();
     virtual ~SystemAligner();
     virtual ClassId GetClassId() const { return SYSTEM_ALIGNER; }
-
-    int GetStaffAlignmentCount() const { return (int)m_children.size(); }
 
     /**
      * Reset the aligner (clear the content) and creates the end (bottom) alignement
@@ -298,7 +294,7 @@ public:
      * Override the method of adding AlignmentReference children
      */
     virtual void AddChild(Object *object);
-
+    
     /**
      * @name Set and get the xRel value of the alignment
      */
@@ -316,7 +312,8 @@ public:
     ///@}
 
     /**
-     *
+     * Add the LayerElement to the appropriate AlignmentReference child.
+     * Looks at the cross-staff situation (@staff or parent @staff).
      */
     void AddLayerElementRef(LayerElement *element);
 
@@ -327,6 +324,11 @@ public:
     void SetType(AlignmentType type) { m_type = type; }
     AlignmentType GetType() const { return m_type; }
     ///@}
+
+    /**
+     * Check if the element is of on of the types
+     */
+    bool IsOfType(const std::vector<AlignmentType> &types);
 
     /**
      * Retrive the minimum left and maximum right position for the objects in an alignment.
@@ -397,7 +399,12 @@ public:
     ///@}
 
 private:
-    //
+    /**
+     * Retrieve the AlignmentReference with staffN.
+     * Create and add it as child if not found.
+     */
+     AlignmentReference *GetAlignmentReference(int staffN);
+
 public:
     //
 private:
@@ -433,7 +440,10 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class stores an alignement position elements will point to
+ * This class stores a references of LayerElements for a staff.
+ * The staff identification (@n) is given by the attCommon and takes into accound 
+ * cross-staff situations.
+ * Its children of the alignment are references.
  */
 class AlignmentReference : public Object, public AttCommon {
 public:
@@ -443,38 +453,22 @@ public:
     */
     ///@{
     AlignmentReference();
-    AlignmentReference(int n, Object *elementRef);
-    virtual ~AlignmentReference() {}
+    AlignmentReference(int n);
+    virtual ~AlignmentReference();
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
-
+    
     /**
-     * Getter for the Object
+     * Override the method of adding AlignmentReference children
      */
-    Object *GetObject() { return m_elementRef; }
+    virtual void AddChild(Object *object);
 
     //----------//
     // Functors //
     //----------//
 
-    /**
-     * See Object::GetAlignmentLeftRight
-     */
-    virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustGraceXPos
-     */
-    virtual int AdjustGraceXPos(FunctorParams *functorParams);
-
-    /**
-     * See Object::AdjustXPos
-     */
-    virtual int AdjustXPos(FunctorParams *functorParams);
-
 private:
-    Object *m_elementRef;
 };
 
 //----------------------------------------------------------------------------
@@ -701,6 +695,12 @@ public:
     int GetGraceGroupLeft(int staffN);
     int GetGraceGroupRight(int staffN);
     ///@{
+    
+    /**
+     * Set an linear defaut position for each grace note
+     * This is called from the SetAlignmentXPos Functor.
+     */
+    void SetGraceAligmentXPos(Doc *doc);
 
     //----------//
     // Functors //

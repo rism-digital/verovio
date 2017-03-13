@@ -76,10 +76,9 @@ Object::Object(const Object &object) : BoundingBox(object)
     ResetBoundingBox(); // It does not make sense to keep the values of the BBox
     m_parent = NULL;
     m_classid = object.m_classid;
-    m_svgclass = object.m_svgclass;
+    m_isReferencObject = object.m_isReferencObject;
     m_uuid = object.m_uuid; // for now copy the uuid - to be decided
     m_isModified = true;
-
     int i;
     for (i = 0; i < (int)object.m_children.size(); i++) {
         Object *current = object.m_children.at(i);
@@ -98,7 +97,7 @@ Object &Object::operator=(const Object &object)
         ResetBoundingBox(); // It does not make sense to keep the values of the BBox
         m_parent = NULL;
         m_classid = object.m_classid;
-        m_svgclass = object.m_svgclass;
+        m_isReferencObject = object.m_isReferencObject;
         m_uuid = object.m_uuid; // for now copy the uuid - to be decided
         m_isModified = true;
 
@@ -125,6 +124,7 @@ void Object::Init(std::string classid)
     m_isAttribute = false;
     m_isModified = true;
     m_classid = classid;
+    m_isReferencObject = false;
     this->GenerateUuid();
 
     Reset();
@@ -136,6 +136,13 @@ ClassId Object::GetClassId() const
     assert(false);
     return OBJECT;
 };
+    
+void Object::SetAsReferenceObject()
+{
+    assert(m_children.empty());
+    
+    m_isReferencObject = true;
+}
 
 void Object::Reset()
 {
@@ -188,7 +195,7 @@ void Object::MoveItselfTo(Object *targetParent)
     assert(m_parent);
     assert(m_parent != targetParent);
 
-    Object *relinquishedObject = this->m_parent->Relinquish(this->GetIdx());
+    Object *relinquishedObject = this->GetParent()->Relinquish(this->GetIdx());
     assert(relinquishedObject && (relinquishedObject == this));
     targetParent->AddChild(relinquishedObject);
 }
@@ -198,36 +205,18 @@ void Object::SetUuid(std::string uuid)
     m_uuid = uuid;
 };
 
-std::string Object::GetSVGClass(void)
-{
-    return m_svgclass;
-}
-
-void Object::SetSVGClass(const std::string &classcontent)
-{
-    m_svgclass = classcontent;
-}
-
-void Object::AddSVGClass(const std::string &classname)
-{
-    if (HasSVGClass()) {
-        m_svgclass += " ";
-    }
-    m_svgclass += classname;
-}
-
-bool Object::HasSVGClass(void)
-{
-    return !m_svgclass.empty();
-}
-
 void Object::ClearChildren()
 {
+    if (m_isReferencObject) {
+        m_children.clear();
+        return;
+    }
+    
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         // we need to check if this is the parent
         // ownership might have been given up with Relinquish
-        if ((*iter)->m_parent == this) {
+        if ((*iter)->GetParent() == this) {
             delete *iter;
         }
     }
@@ -299,7 +288,7 @@ int Object::GetIdx() const
 void Object::InsertChild(Object *element, int idx)
 {
     // With this method we require the parent to be set before
-    assert(element->m_parent == this);
+    assert(element->GetParent() == this);
 
     if (idx >= (int)m_children.size()) {
         m_children.push_back(element);
@@ -315,7 +304,7 @@ Object *Object::DetachChild(int idx)
         return NULL;
     }
     Object *child = m_children.at(idx);
-    child->m_parent = NULL;
+    child->ResetParent();
     ArrayOfObjects::iterator iter = m_children.begin();
     m_children.erase(iter + (idx));
     return child;
@@ -327,7 +316,7 @@ Object *Object::Relinquish(int idx)
         return NULL;
     }
     Object *child = m_children.at(idx);
-    child->m_parent = NULL;
+    child->ResetParent();
     return child;
 }
 
@@ -335,7 +324,7 @@ void Object::ClearRelinquishedChildren()
 {
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end();) {
-        if ((*iter)->m_parent != this) {
+        if ((*iter)->GetParent() != this) {
             iter = m_children.erase(iter);
         }
         else
@@ -439,6 +428,7 @@ void Object::SetParent(Object *parent)
 void Object::AddChild(Object *child)
 {
     // This should never happen because the method should be overridden
+    LogDebug("Parent %s - Child %s", this->GetClassName().c_str(), child->GetClassName().c_str());
     assert(false);
 }
 
@@ -452,6 +442,28 @@ int Object::GetDrawingY() const
 {
     assert(m_parent);
     return m_parent->GetDrawingY();
+}
+
+    
+void Object::ResetCachedDrawingX() const
+{
+    //if (m_cachedDrawingX == VRV_UNSET) return;
+    m_cachedDrawingX = VRV_UNSET;
+    ArrayOfObjects::const_iterator iter;
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        (*iter)->ResetCachedDrawingX();
+    }
+    
+}
+
+void Object::ResetCachedDrawingY() const
+{
+    //if (m_cachedDrawingY == VRV_UNSET) return;
+    m_cachedDrawingY = VRV_UNSET;
+    ArrayOfObjects::const_iterator iter;
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        (*iter)->ResetCachedDrawingY();
+    }
 }
 
 int Object::GetChildIndex(const Object *child)
@@ -481,7 +493,7 @@ void Object::FillFlatList(ListOfObjects *flatList)
     AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
-
+    
 Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
@@ -493,6 +505,20 @@ Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
     }
     else {
         return (m_parent->GetFirstParent(classId, maxDepth - 1));
+    }
+}
+    
+Object *Object::GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
+{
+    if ((maxDepth == 0) || !m_parent) {
+        return NULL;
+    }
+    
+    if ((m_parent->GetClassId() > classIdMin) && (m_parent->GetClassId() < classIdMax)) {
+        return m_parent;
+    }
+    else {
+        return (m_parent->GetFirstParentInRange(classIdMin, classIdMax, maxDepth - 1));
     }
 }
 
@@ -575,12 +601,9 @@ void Object::Process(Functor *functor, FunctorParams *functorParams, Functor *en
                         // the attribute value matches, process the object
                         // LogDebug("%s ", (*iter)->GetClassName().c_str());
                         (*iter)->Process(functor, functorParams, endFunctor, filters, deepness, direction);
-                        break;
                     }
-                    else {
-                        // the attribute value does not match, skip this child
-                        continue;
-                    }
+                    // continue to the next child
+                    continue;
                 }
             }
             // we will end here if there is no filter at all or for the current child type
@@ -883,7 +906,7 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
     if (this->Is(PAGE)) {
         Page *page = dynamic_cast<Page *>(this);
         assert(page);
-        if (page->m_parent->GetChildIndex(page) == 0) {
+        if (page->GetParent()->GetChildIndex(page) == 0) {
             params->m_upcomingScoreDef->SetRedrawFlags(true, true, true, true, false);
             params->m_drawLabels = true;
         }
@@ -977,8 +1000,8 @@ int Object::SetCurrentScoreDef(FunctorParams *functorParams)
         // setting the layer stem direction. Alternatively, this could be done in
         // View::DrawLayer. If this (and other things) is kept here, renaming the method to something
         // more generic (PrepareDrawing?) might be a good idea...
-        if (layer->m_parent->GetChildCount() > 1) {
-            if (layer->m_parent->GetChildIndex(layer) == 0) {
+        if (layer->GetParent()->GetChildCount() > 1) {
+            if (layer->GetParent()->GetChildIndex(layer) == 0) {
                 layer->SetDrawingStemDir(STEMDIRECTION_up);
             }
             else {
@@ -1022,6 +1045,8 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
     assert(params);
 
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
+    
+    if (!this->HasUpdatedBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
     int refLeft = this->GetSelfLeft();
     if (params->m_minLeft > refLeft) params->m_minLeft = refLeft;

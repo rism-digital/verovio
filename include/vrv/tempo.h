@@ -28,7 +28,8 @@ class Tempo : public ControlElement,
               public TextDirInterface,
               public TimePointInterface,
               public AttLang,
-              public AttMiditempo {
+              public AttMiditempo,
+              public AttMmtempo {
 public:
     /**
      * @name Constructors, destructors, reset methods
