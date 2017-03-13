@@ -53,19 +53,27 @@ namespace vrv {
 // LayerElement
 //----------------------------------------------------------------------------
 
-LayerElement::LayerElement() : Object("le-")
+LayerElement::LayerElement() : Object("le-"), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+    
     Reset();
 }
 
-LayerElement::LayerElement(std::string classid) : Object(classid)
+LayerElement::LayerElement(std::string classid) : Object(classid), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+    
     Reset();
 }
 
 void LayerElement::Reset()
 {
     Object::Reset();
+    ResetCommon();
+    ResetTyped();
 
     m_xAbs = VRV_UNSET;
     m_drawingYRel = 0;

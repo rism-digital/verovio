@@ -28,9 +28,11 @@ namespace vrv {
 // ScoreDefElement
 //----------------------------------------------------------------------------
 
-ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDefInterface()
+ScoreDefElement::ScoreDefElement(std::string classid) : Object(classid), ScoreDefInterface(), AttCommon(), AttTyped()
 {
     RegisterInterface(ScoreDefInterface::GetAttClasses(), ScoreDefInterface::IsInterface());
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
@@ -43,6 +45,8 @@ void ScoreDefElement::Reset()
 {
     Object::Reset();
     ScoreDefInterface::Reset();
+    ResetCommon();
+    ResetTyped();
 }
 
 bool ScoreDefElement::HasClefInfo() const
@@ -385,12 +389,14 @@ StaffGrp::StaffGrp()
     , AttLabelsAddl()
     , AttStaffgroupingsym()
     , AttStaffGrpVis()
+    , AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
     RegisterAttClass(ATT_LABELSADDL);
     RegisterAttClass(ATT_STAFFGROUPINGSYM);
     RegisterAttClass(ATT_STAFFGRPVIS);
+    RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
@@ -407,6 +413,7 @@ void StaffGrp::Reset()
     ResetLabelsAddl();
     ResetStaffgroupingsym();
     ResetStaffGrpVis();
+    ResetTyped();
 }
 
 void StaffGrp::AddChild(Object *child)
@@ -451,7 +458,6 @@ void StaffGrp::FilterList(ListOfObjects *childList)
 
 StaffDef::StaffDef()
     : ScoreDefElement("staffdef-")
-    , AttCommon()
     , AttCommonPart()
     , AttDistances()
     , AttLabelsAddl()

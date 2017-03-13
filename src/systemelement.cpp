@@ -22,13 +22,19 @@ namespace vrv {
 // SystemElement
 //----------------------------------------------------------------------------
 
-SystemElement::SystemElement() : FloatingObject("se")
+SystemElement::SystemElement() : FloatingObject("se"), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+    
     Reset();
 }
 
-SystemElement::SystemElement(std::string classid) : FloatingObject(classid)
+SystemElement::SystemElement(std::string classid) : FloatingObject(classid), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+    
     Reset();
 }
 
@@ -39,6 +45,8 @@ SystemElement::~SystemElement()
 void SystemElement::Reset()
 {
     FloatingObject::Reset();
+    ResetCommon();
+    ResetTyped();
 }
 
 //----------------------------------------------------------------------------

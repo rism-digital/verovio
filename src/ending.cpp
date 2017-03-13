@@ -27,10 +27,8 @@ namespace vrv {
 // Ending
 //----------------------------------------------------------------------------
 
-Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface(), AttCommon()
+Ending::Ending() : SystemElement("ending-"), BoundaryStartInterface()
 {
-    RegisterAttClass(ATT_COMMON);
-
     Reset();
 }
 
@@ -42,7 +40,6 @@ void Ending::Reset()
 {
     SystemElement::Reset();
     BoundaryStartInterface::Reset();
-    ResetCommon();
 }
 
 void Ending::AddChild(Object *child)

@@ -29,13 +29,11 @@ Ligature::Ligature()
     , ObjectListInterface()
     , StemmedDrawingInterface()
     , DurationInterface()
-    , AttCommon()
     , AttStems()
     , AttStemsCmn()
     , AttTiepresent()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
@@ -55,7 +53,6 @@ void Ligature::Reset()
     LayerElement::Reset();
     StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
-    ResetCommon();
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();

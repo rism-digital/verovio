@@ -30,7 +30,6 @@ class Ligature : public LayerElement,
                  public ObjectListInterface,
                  public StemmedDrawingInterface,
                  public DurationInterface,
-                 public AttCommon,
                  public AttStems,
                  public AttStemsCmn,
                  public AttTiepresent {

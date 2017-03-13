@@ -206,11 +206,6 @@ public:
     void ResetUuid();
     static void SeedUuid(unsigned int seed = 0);
 
-    void SetSVGClass(const std::string &classcontent);
-    void AddSVGClass(const std::string &classname);
-    std::string GetSVGClass(void);
-    bool HasSVGClass(void);
-
     std::string GetComment() const { return m_comment; }
     void SetComment(std::string comment) { m_comment = comment; }
     bool HasComment(void) { return !m_comment.empty(); }
