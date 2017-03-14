@@ -78,8 +78,8 @@ void Doc::Reset()
     m_drawingSpacingLinear = DEFAULT_SPACING_LINEAR;
     m_drawingSpacingNonLinear = DEFAULT_SPACING_NON_LINEAR;
 
-    m_spacingStaff = m_style->m_spacingStaff;
-    m_spacingSystem = m_style->m_spacingSystem;
+    m_spacingStaff = m_style->m_spacingStaff.GetValue();
+    m_spacingSystem = m_style->m_spacingSystem.GetValue();
 
     m_drawingPage = NULL;
     m_drawingJustifyX = true;
@@ -597,7 +597,7 @@ int Doc::GetGlyphHeight(wchar_t code, int staffSize, bool graceSize) const
     assert(glyph);
     glyph->GetBoundingBox(&x, &y, &w, &h);
     h = h * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
-    if (graceSize) h = h * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    if (graceSize) h = h * this->m_style->m_graceNum / this->m_style->m_graceDen.GetValue();
     h = h * staffSize / 100;
     return h;
 }
@@ -609,7 +609,7 @@ int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
     assert(glyph);
     glyph->GetBoundingBox(&x, &y, &w, &h);
     w = w * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
-    if (graceSize) w = w * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    if (graceSize) w = w * this->m_style->m_graceNum / this->m_style->m_graceDen.GetValue();
     w = w * staffSize / 100;
     return w;
 }
@@ -621,7 +621,7 @@ int Doc::GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const
     assert(glyph);
     glyph->GetBoundingBox(&x, &y, &w, &h);
     y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
-    if (graceSize) y = y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    if (graceSize) y = y * this->m_style->m_graceNum / this->m_style->m_graceDen.GetValue();
     y = y * staffSize / 100;
     return y;
 }
@@ -635,7 +635,7 @@ int Doc::GetTextGlyphHeight(wchar_t code, FontInfo *font, bool graceSize) const
     assert(glyph);
     glyph->GetBoundingBox(&x, &y, &w, &h);
     h = h * font->GetPointSize() / glyph->GetUnitsPerEm();
-    if (graceSize) h = h * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    if (graceSize) h = h * this->m_style->m_graceNum / this->m_style->m_graceDen.GetValue();
     return h;
 }
 
@@ -648,7 +648,7 @@ int Doc::GetTextGlyphWidth(wchar_t code, FontInfo *font, bool graceSize) const
     assert(glyph);
     glyph->GetBoundingBox(&x, &y, &w, &h);
     w = w * font->GetPointSize() / glyph->GetUnitsPerEm();
-    if (graceSize) w = w * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    if (graceSize) w = w * this->m_style->m_graceNum / this->m_style->m_graceDen.GetValue();
     return w;
 }
 
@@ -661,7 +661,7 @@ int Doc::GetTextGlyphDescender(wchar_t code, FontInfo *font, bool graceSize) con
     assert(glyph);
     glyph->GetBoundingBox(&x, &y, &w, &h);
     y = y * font->GetPointSize() / glyph->GetUnitsPerEm();
-    if (graceSize) y = y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    if (graceSize) y = y * this->m_style->m_graceNum / this->m_style->m_graceDen.GetValue();
     return y;
 }
 
@@ -692,17 +692,17 @@ int Doc::GetDrawingBrevisWidth(int staffSize) const
 
 int Doc::GetDrawingBarLineWidth(int staffSize) const
 {
-    return m_style->m_barLineWidth * staffSize / 100;
+    return m_style->m_barLineWidth.GetValue() * staffSize / 100;
 }
 
 int Doc::GetDrawingStaffLineWidth(int staffSize) const
 {
-    return m_style->m_staffLineWidth * staffSize / 100;
+    return m_style->m_staffLineWidth.GetValue() * staffSize / 100;
 }
 
 int Doc::GetDrawingStemWidth(int staffSize) const
 {
-    return m_style->m_stemWidth * staffSize / 100;
+    return m_style->m_stemWidth.GetValue() * staffSize / 100;
 }
 
 int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin) const
@@ -715,7 +715,7 @@ int Doc::GetDrawingDynamHeight(int staffSize, bool withMargin) const
 
 int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin) const
 {
-    int size = m_style->m_hairpinSize * GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
+    int size = m_style->m_hairpinSize.GetValue() * GetDrawingUnit(staffSize) / PARAM_DENOMINATOR;
     // This should be styled
     if (withMargin) size += GetDrawingUnit(staffSize);
     return size;
@@ -724,33 +724,33 @@ int Doc::GetDrawingHairpinSize(int staffSize, bool withMargin) const
 int Doc::GetDrawingBeamWidth(int staffSize, bool graceSize) const
 {
     int value = m_drawingBeamWidth * staffSize / 100;
-    if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    if (graceSize) value = value * this->m_style->m_graceNum.GetValue() / this->m_style->m_graceDen.GetValue();
     return value;
 }
 
 int Doc::GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const
 {
     int value = m_drawingBeamWhiteWidth * staffSize / 100;
-    if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    if (graceSize) value = value * this->m_style->m_graceNum.GetValue() / this->m_style->m_graceDen.GetValue();
     return value;
 }
 
 int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize) const
 {
     int value = m_drawingLedgerLine * staffSize / 100;
-    if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    if (graceSize) value = value * this->m_style->m_graceNum.GetValue() / this->m_style->m_graceDen.GetValue();
     return value;
 }
 
 int Doc::GetGraceSize(int value) const
 {
-    return value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    return value * this->m_style->m_graceNum.GetValue() / this->m_style->m_graceDen.GetValue();
 }
 
 FontInfo *Doc::GetDrawingSmuflFont(int staffSize, bool graceSize)
 {
     int value = m_drawingSmuflFontSize * staffSize / 100;
-    if (graceSize) value = value * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    if (graceSize) value = value * this->m_style->m_graceNum.GetValue() / this->m_style->m_graceDen.GetValue();
     m_drawingSmuflFont.SetPointSize(value);
     return &m_drawingSmuflFont;
 }

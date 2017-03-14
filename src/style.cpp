@@ -179,6 +179,7 @@ Style::Style()
     
     m_measureNumber.Read("interval");
 
+    /*
     m_unit = DEFAULT_UNIT * DEFINITION_FACTOR;
     m_landscape = false;
     m_barLineWidth = (unsigned short)(DEFAULT_BARLINE_WITDH * DEFINITION_FACTOR);
@@ -188,13 +189,13 @@ Style::Style()
     /**
      * Used for initializing Doc::m_drawingBeamMin/MaxSlope and used in
      * View::DrawBeamPostponed
-     */
+     *
     m_beamMaxSlope = 10;
     m_beamMinSlope = 0;
 
     /**
      * graceNum and Den for cue-sized notes.
-     */
+     *
     m_graceNum = 5;
     m_graceDen = 7;
 
@@ -212,17 +213,17 @@ Style::Style()
 
     m_minMeasureWidth = (short)(DEFAULT_MEASURE_WIDTH * PARAM_DENOMINATOR);
 
-    /** ties and slurs */
+    /** ties and slurs *
     m_tieThickness = DEFAULT_TIE_THICKNESS * PARAM_DENOMINATOR;
     m_minSlurHeight = DEFAULT_MIN_SLUR_HEIGHT * PARAM_DENOMINATOR;
     m_maxSlurHeight = DEFAULT_MAX_SLUR_HEIGHT * PARAM_DENOMINATOR;
 
     m_slurThickness = DEFAULT_SLUR_THICKNESS * PARAM_DENOMINATOR;
 
-    /** The left spacing */
+    /** The left spacing *
     m_leftPosition = DEFAULT_LEFT_POSITION * PARAM_DENOMINATOR;
 
-    /** The layout left margin by element */
+    /** The layout left margin by element *
     m_leftMarginAccid = DEFAULT_LEFT_MARGIN_ACCID * PARAM_DENOMINATOR;
     m_leftMarginBarLine = DEFAULT_LEFT_MARGIN_BARLINE * PARAM_DENOMINATOR;
     m_leftMarginBarLineAttrLeft = DEFAULT_LEFT_MARGIN_BARLINE_ATTR_LEFT * PARAM_DENOMINATOR;
@@ -239,10 +240,10 @@ Style::Style()
     m_leftMarginMultiRpt = DEFAULT_LEFT_MARGIN_MULTIRPT * PARAM_DENOMINATOR;
     m_leftMarginNote = DEFAULT_LEFT_MARGIN_NOTE * PARAM_DENOMINATOR;
     m_leftMarginRest = DEFAULT_LEFT_MARGIN_REST * PARAM_DENOMINATOR;
-    /** The default left margin */
+    /** The default left margin *
     m_leftMarginDefault = DEFAULT_LEFT_MARGIN_DEFAULT * PARAM_DENOMINATOR;
 
-    /** The layout right margin by element */
+    /** The layout right margin by element *
     m_rightMarginAccid = DEFAULT_RIGHT_MARGIN_ACCID * PARAM_DENOMINATOR;
     m_rightMarginBarLine = DEFAULT_RIGHT_MARGIN_BARLINE * PARAM_DENOMINATOR;
     m_rightMarginBarLineAttrLeft = DEFAULT_RIGHT_MARGIN_BARLINE_ATTR_LEFT * PARAM_DENOMINATOR;
@@ -259,14 +260,15 @@ Style::Style()
     m_rightMarginMultiRpt = DEFAULT_RIGHT_MARGIN_MULTIRPT * PARAM_DENOMINATOR;
     m_rightMarginNote = DEFAULT_RIGHT_MARGIN_NOTE * PARAM_DENOMINATOR;
     m_rightMarginRest = DEFAULT_RIGHT_MARGIN_REST * PARAM_DENOMINATOR;
-    /** The default right margin */
+    /** The default right margin *
     m_rightMarginDefault = DEFAULT_RIGHT_MARGIN_DEFAULT * PARAM_DENOMINATOR;
 
-    /** The default right margin */
+    /** The default right margin *
     m_bottomMarginDefault = DEFAULT_BOTTOM_MARGIN_DEFAULT * PARAM_DENOMINATOR;
 
-    /** The default right margin */
+    /** The default right margin *
     m_topMarginDefault = DEFAULT_TOP_MARGIN_DEFAULT * PARAM_DENOMINATOR;
+    */
 }
 
 Style::~Style()
