@@ -2522,7 +2522,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
         else {
             // should be a note
             note = new Note;
-            note->SetSVGClass("highlight");
             setLocationId(note, layerdata[i]);
             appendElement(elements, pointers, note);
             convertNote(note, layerdata[i], staffindex);
@@ -2745,6 +2744,7 @@ void HumdrumInput::colorNote(Note *note, const std::string &token, int line, int
     for (int i = 0; i < (int)m_signifiers.mark.size(); i++) {
         if (token.find(m_signifiers.mark[i]) != string::npos) {
             note->SetColor(m_signifiers.mcolor[i]);
+            note->SetType("highlight");  // Allow type to be set from data later.
             break;
         }
     }
