@@ -16,6 +16,7 @@
 #include "artic.h"
 #include "attcomparison.h"
 #include "editorial.h"
+#include "elementpart.h"
 #include "functorparams.h"
 #include "slur.h"
 #include "syl.h"
@@ -116,6 +117,15 @@ void Note::AddChild(Object *child)
     }
     else if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
+    }
+    else if (child->Is(FLAG)) {
+        assert(dynamic_cast<Flag *>(child));
+    }
+    else if (child->Is(NOTEHEAD)) {
+        assert(dynamic_cast<NoteHead *>(child));
+    }
+    else if (child->Is(STEM)) {
+        assert(dynamic_cast<Stem *>(child));
     }
     else if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));

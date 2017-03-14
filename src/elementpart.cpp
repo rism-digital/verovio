@@ -36,6 +36,7 @@ NoteHead::NoteHead() : LayerElement("notehead-")
 {
     
     Reset();
+    IsAttribute(true);
 }
 
 NoteHead::~NoteHead()
@@ -55,6 +56,7 @@ Stem::Stem() : LayerElement("stem-")
 {
  
     Reset();
+    IsAttribute(true);
 }
 
 Stem::~Stem()

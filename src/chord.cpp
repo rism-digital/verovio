@@ -15,6 +15,7 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
+#include "elementpart.h"
 #include "editorial.h"
 #include "functorparams.h"
 #include "note.h"
@@ -95,8 +96,17 @@ void Chord::AddChild(Object *child)
     if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
     }
+    else if (child->Is(FLAG)) {
+        assert(dynamic_cast<Flag *>(child));
+    }
     else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
+    }
+    else if (child->Is(NOTEHEAD)) {
+        assert(dynamic_cast<NoteHead *>(child));
+    }
+    else if (child->Is(STEM)) {
+        assert(dynamic_cast<Stem *>(child));
     }
     else if (child->IsEditorialElement()) {
         assert(dynamic_cast<EditorialElement *>(child));

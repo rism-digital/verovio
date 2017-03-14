@@ -76,14 +76,6 @@ public:
     //----------//
     // Functors //
     //----------//
-    
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    virtual int Save(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    ///@}
 
 private:
     //
@@ -117,14 +109,6 @@ public:
     //----------//
     // Functors //
     //----------//
-    
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    virtual int Save(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    ///@}
     
 private:
     //
