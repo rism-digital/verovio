@@ -249,7 +249,7 @@ void Doc::PrepareDrawing()
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareTimestampsParams.m_timeSpanningInterfaces.empty()) {
         LogWarning(
-            "%d time spanning elements could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
+            "%d time spanning element(s) could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
     // Prepare the cross-staff pointers
