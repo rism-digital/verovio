@@ -580,6 +580,13 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         else
             type = ALIGNMENT_ACCID;
     }
+    else if (this->Is({FLAG, STEM, NOTEHEAD})) {
+        // Refer to the note parent (if any?)
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        if (note)
+            m_alignment = note->GetAlignment();
+        return FUNCTOR_CONTINUE;
+    }
     else if (this->Is({ ARTIC, ARTIC_PART, SYL })) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));

@@ -449,17 +449,15 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // Get stem values from the chord or note child
     if (childChord) {
         Stem *stem = dynamic_cast<Stem*>(childChord->FindChildByType(STEM));
-        assert(stem);
         stemDir = childChord->GetDrawingStemDir();
-        stemMod = stem->GetStemMod();
+        stemMod = stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
         stemPoint = childChord->GetDrawingStemStart();
     }
     else {
         Stem *stem = dynamic_cast<Stem*>(childNote->FindChildByType(STEM));
-        assert(stem);
         drawingCueSize = childNote->IsCueSize();
         stemDir = childNote->GetDrawingStemDir();
-        stemMod = stem->GetStemMod();
+        stemMod =  stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
         stemPoint = childNote->GetDrawingStemStart();
     }
 
@@ -553,9 +551,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         chord->GetYExtremes(yMax, yMin);
 
         Stem *stem = dynamic_cast<Stem*>(chord->FindChildByType(STEM));
-        assert(stem);
-        
-        if (stem->HasStemDir()) {
+        if (stem && stem->HasStemDir()) {
             chord->SetDrawingStemDir(stem->GetStemDir());
         }
         else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
@@ -1246,8 +1242,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
     if (!inChord && !inBeam && !inFTrem) {
         Stem *stem = dynamic_cast<Stem*>(note->FindChildByType(STEM));
-        assert(stem);
-        if (stem->HasStemDir()) {
+        if (stem && stem->HasStemDir()) {
             note->SetDrawingStemDir(stem->GetStemDir());
         }
         else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
@@ -1367,10 +1362,9 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
 
         Stem *stem = dynamic_cast<Stem*>(note->FindChildByType(STEM));
-        assert(stem);
         
         // Stemless note (@stem.len="0")
-        if (stem->HasStemLen() && stem->GetStemLen() == 0) {
+        if (stem && stem->HasStemLen() && stem->GetStemLen() == 0) {
             // Store the start and end values
             StemmedDrawingInterface *interface = note->GetStemmedDrawingInterface();
             assert(interface);
@@ -1441,6 +1435,8 @@ void View::DrawNoteHead(DeviceContext *dc, LayerElement *element, Layer *layer, 
     
     NoteHead *noteHead = dynamic_cast<NoteHead *>(element);
     assert(noteHead);
+    
+    int x = noteHead->GetDrawingX();
 }
 
 void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

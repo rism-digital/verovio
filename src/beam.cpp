@@ -245,9 +245,11 @@ void Beam::InitCoords(ListOfObjects *childList)
                 // look at the stemDir to see if we have multiple stem Dir
                 if (!m_drawingParams.m_hasMultipleStemDir) {
                     Stem *stem = dynamic_cast<Stem*>(current->FindChildByType(STEM));
-                    assert(stem);
-                    assert(dynamic_cast<AttStems *>(stem));
-                    currentStemDir = (dynamic_cast<AttStems *>(stem))->GetStemDir();
+                    currentStemDir = STEMDIRECTION_NONE;
+                    if (stem) {
+                        assert(dynamic_cast<AttStems *>(stem));
+                        currentStemDir = (dynamic_cast<AttStems *>(stem))->GetStemDir();
+                    }
                     if (currentStemDir != STEMDIRECTION_NONE) {
                         if ((m_drawingParams.m_stemDir != STEMDIRECTION_NONE) && (m_drawingParams.m_stemDir != currentStemDir)) {
                             m_drawingParams.m_hasMultipleStemDir = true;

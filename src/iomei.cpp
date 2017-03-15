@@ -2799,16 +2799,17 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
         vrvChord->AddChild(vrvArtic);
     }
     
-    Flag *flag = new Flag();
-    vrvChord->AddChild(flag);
+    if ((vrvChord->GetDur() > DUR_4) && !vrvChord->IsInBeam()) {
+        Flag *flag = new Flag();
+        //vrvChord->AddChild(flag);
+    }
     
-    Stem *stem = new Stem();
-    stem->ReadStems(chord);
-    stem->ReadStemsCmn(chord);
-    vrvChord->AddChild(stem);
-    
-    NoteHead *noteHead = new NoteHead();
-    vrvChord->AddChild(noteHead);
+    if (vrvChord->GetDur() > DUR_1) {
+        Stem *stem = new Stem();
+        stem->ReadStems(chord);
+        stem->ReadStemsCmn(chord);
+        //vrvChord->AddChild(stem);
+    }
 
     parent->AddChild(vrvChord);
     return ReadMeiLayerChildren(vrvChord, chord, vrvChord);
@@ -3005,17 +3006,19 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
         vrvAccid->SetAccidGes(accidentalPerformed.GetAccidGes());
         vrvNote->AddChild(vrvAccid);
     }
+
     
-    Flag *flag = new Flag();
-    vrvNote->AddChild(flag);
+    if ((vrvNote->GetDur() > DUR_4) && !vrvNote->IsInBeam() && !vrvNote->IsChordTone()) {
+        Flag *flag = new Flag();
+        //vrvNote->AddChild(flag);
+    }
     
-    Stem *stem = new Stem();
-    stem->ReadStems(note);
-    stem->ReadStemsCmn(note);
-    vrvNote->AddChild(stem);
-    
-    NoteHead *noteHead = new NoteHead();
-    vrvNote->AddChild(noteHead);
+    if ((vrvNote->GetDur() > DUR_1) && !vrvNote->IsChordTone()) {
+        Stem *stem = new Stem();
+        stem->ReadStems(note);
+        stem->ReadStemsCmn(note);
+        //vrvNote->AddChild(stem);
+    }
 
     parent->AddChild(vrvNote);
     return ReadMeiLayerChildren(vrvNote, note, vrvNote);
