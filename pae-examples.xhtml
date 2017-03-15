@@ -34,7 +34,7 @@ version-footer: true
     }
 
     var incipits = [
-    
+
 "@clef:G-2\n\
 @keysig:xFCGD\n\
 @timesig:3/8\n\
@@ -87,97 +87,97 @@ version-footer: true
 </script>
 
 <div class="row">
-    
+
     <div class="col-md-3 sidebar-offcanvas" id="sidebar" role="navigation">
         <div class="panel panel-default">
             {% include other-sidebar.html %}
         </div>
     </div>
-    
+
     <div class="col-md-9">
         <div class="panel-body">
-            
-            <h3>Plain and Easy Input</h3>
-            
+
+            <h3>Plaine &amp; Easie Input</h3>
+
             <p>
-                The Plain and Easy (PAE) code is a simple music code for transcribing short monophonic incipits. It is mostly used by the Répertoire International des Sources Musicales (RISM) for inventorying the music incipits of the manuscripts. More information about the syntax is available on the <a href="http://www.iaml.info/en/activities/projects/plain_and_easy_code" target="_blank">IAML</a> website.
+                The Plaine &amp; Easie Code is a library standard that enables entering music incipits in modern or mensural notation. It is mostly used by the <a href="http://www.rism.info" target="_blank">Répertoire International des Sources Musicales (RISM)</a> for inventorying the music incipits of the manuscripts. More information about the syntax is available on the <a href="http://www.iaml.info/plaine-easie-code" target="_blank">IAML</a> website.
             </p>
-            
+
             <p>
                 The examples below show some features of the PAE code. They are all rendered dynamically in the web-browser with the <a href="{{ site.baseurl }}/javascript.xhtml">JavaScript toolkit</a> version of Verovio.
             </p>
-            
+
             <h4>Beams and tuplets</h4>
             <div id="svg_pae0" style="overflow:auto;"/>
             <p>
                 <div class="highlight"><pre><code id="code_pae0"></code></pre></div>
             </p>
-            
+
             <h4>Measure rests and key and time signature changes</h4>
             <div id="svg_pae1" style="overflow:auto;"/>
             <p>
                 <div class="highlight"><pre><code id="code_pae1"></code></pre></div>
             </p>
-            
+
             <h4>Clef changes</h4>
             <div id="svg_pae2" style="overflow:auto;"/>
             <p>
                 <div class="highlight"><pre><code id="code_pae2"></code></pre></div>
             </p>
-            
+
             <h4>Trills and fermata</h4>
             <div id="svg_pae3" style="overflow:auto;"/>
             <p>
                 <div class="highlight"><pre><code id="code_pae3"></code></pre></div>
             </p>
-            
+
             <h4>Ties</h4>
             <div id="svg_pae4" style="overflow:auto;"/>
             <p>
                 <div class="highlight"><pre><code id="code_pae4"></code></pre></div>
             </p>
-            
+
             <h4>Grace notes (accaciature)</h4>
             <div id="svg_pae5" style="overflow:auto;"/>
             <p>
                 <div class="highlight"><pre><code id="code_pae5"></code></pre></div>
             </p>
-            
+
             <h4>Grace notes (appogiature)</h4>
             <div id="svg_pae6" style="overflow:auto;"/>
             <p>
                 <div class="highlight"><pre><code id="code_pae6"></code></pre></div>
             </p>
-            
+
             <h4>Rhythmic patterns</h4>
             <div id="svg_pae7" style="overflow:auto;"/>
             <p>
                 <div class="highlight"><pre><code id="code_pae7"></code></pre></div>
             </p>
-            
+
             <h4>Abbreviated writing</h4>
             <div id="svg_pae8" style="overflow:auto;"/>
             <p>
                 <div class="highlight"><pre><code id="code_pae8"></code></pre></div>
             </p>
-            
-            
+
+
         </div>
     </div>
-    
+
 </div>
 
 <script type="text/javascript">
 //<![CDATA[
 
     $( document ).ready(function() {
-        
+
         // adjust the zoom for small screens
         width = $('#svg_pae1').width();
         if ( width < zoom * pageWidth / 100 ) {
             zoom = width * 100 / pageWidth;
         }
-        
+
         /*
         var mei;
         $.get( "{{ site.baseurl }}/examples/features/tuplets-4.mei" , function( data ) {
@@ -189,12 +189,12 @@ version-footer: true
             }
         });
         */
-        
+
         for (i = 0; i < incipits.length; i++) {
             load_data( incipits[i], $('#svg_pae' + i) );
             $('#code_pae' + i).html( incipits[i] );
         }
-    
+
     });
 //]]>
 </script>

@@ -6,13 +6,13 @@ active: how
 how-active: how-js
 methods:
   - ["bool edit(editorAction)", "Experimental method for editing the loaded data. Returns true on success and false otherwise."]
-  
+
   - ["object getElementsAtTime(millisec)", "Returns a JSON object with all the notes that are being played as a certain time. This can be called only if <code>renderToMidi</code> has been called previously."]
 
   - ["object getElementAttr(xmlId)", "Returns a JSON object with all the attributes for the element with the corresponding xmlId."]
 
   - ["string getLog()", "Returns the log message of the last performed operation, for example after having called <code>loadData</code>."]
-  
+
   - ["string getMEI(page, scoreBased)", "Returns the MEI data loaded in the toolkit. If a page number is provide (i.e. > 0), then only that page is exported. In score-based MEI, then only the <code>section</code> element will be output. Set scoreBased to 1 for standard score-based MEI and 0 for the internal page-based MEI."]
 
   - ["int getPageCount()", "Returns the number of pages. This can be called once the data has been loaded with <code>loadData</code>. Page numbering is 1-based."]
@@ -42,16 +42,16 @@ methods:
             {% include how-sidebar.html %}
         </div>
     </div>
-    
+
     <div class="col-md-9">
         <div class="panel-body">
             <h3>JavaScript toolkit</h3>
             <p>
-                Verovio can be compiled to JavaScript using the <a href="http://www.emscripten.org" target="_blank">Emscripten</a> LLVM-to-JavaScript compiler. In this case, it behaves similarly to the command-line tool but in the web-browser. The SVG output of Verovio can be directly fed to HTML objects for display. This approach is particularly interesting because it makes Verovio an in-browser music Plain and Easy or MEI typesetter. The <a href="{{ site.baseurl }}/mei-viewer.xhtml">MEI Viewer</a> illustrates its possible use.
+                Verovio can be compiled to JavaScript using the <a href="http://www.emscripten.org" target="_blank">Emscripten</a> LLVM-to-JavaScript compiler. In this case, it behaves similarly to the command-line tool but in the web-browser. The SVG output of Verovio can be directly fed to HTML objects for display. This approach is particularly interesting because it makes Verovio an in-browser music Plaine and Easie or MEI typesetter. The <a href="{{ site.baseurl }}/mei-viewer.xhtml">MEI Viewer</a> illustrates its possible use.
             </p>
-            
+
             <h4>Basic usage</h4>
-            
+
             <p>
                 The JavaScript version of Verovio is available as a toolkit that makes it very easy to integrate.
             </p>
@@ -78,7 +78,7 @@ methods:
                     </button>
                 </a>
             </p>
-            
+
             <p>
                 See the  <a href="{{ site.baseurl }}/tutorial.xhtml">tutorial</a> for additional information about the integration of the JavaScript toolkit in web environments.
             </p>
@@ -101,7 +101,7 @@ options = {
             <p>
                 In addition to the constructor and destructor, the Verovio JavaScript toolkit provides a certain number of methods for manipulating the data.
             </p>
-            
+
             {% for method in page.methods %}
             <div class="panel panel-default">
                 <div class="panel-heading panel-option"><code>{{ method[0] }}</code></div>
@@ -110,7 +110,7 @@ options = {
                     </div>
             </div>
             {% endfor %}
-            
+
             <h4>Compatibility</h4>
             <p>
                 The Verovio JavaScript toolkit has been tested with recent versions of the most widely used web-browsers. Internet Explorer requires at least version 10.
@@ -124,7 +124,7 @@ options = {
                     <img src="{{ site.baseurl }}/images/browsers/ie.png" width="48"/>
                     <img src="{{ site.baseurl }}/images/browsers/maxthon.png" width="48"/>
                     <img src="{{ site.baseurl }}/images/browsers/android.png" width="48"/>
-                    <img src="{{ site.baseurl }}/images/browsers/dolphin.png" width="48"/>    
+                    <img src="{{ site.baseurl }}/images/browsers/dolphin.png" width="48"/>
                 </div>
             </div>
         </div>
