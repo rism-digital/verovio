@@ -23,7 +23,7 @@
                         </staffGrp>
                     </scoreDef>
                     <section>
-                        <measure>
+                        <measure label="feature-example">
                             <staff n="1">
                                 <layer n="1">
                                     <note dots="1" dur="4" oct="5" pname="g" stem.dir="down" tie="i"/>
