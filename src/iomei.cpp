@@ -2801,14 +2801,14 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
     
     if ((vrvChord->GetDur() > DUR_4) && !vrvChord->IsInBeam()) {
         Flag *flag = new Flag();
-        //vrvChord->AddChild(flag);
+        vrvChord->AddChild(flag);
     }
     
     if (vrvChord->GetDur() > DUR_1) {
         Stem *stem = new Stem();
         stem->ReadStems(chord);
         stem->ReadStemsCmn(chord);
-        //vrvChord->AddChild(stem);
+        vrvChord->AddChild(stem);
     }
 
     parent->AddChild(vrvChord);
@@ -3010,14 +3010,14 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     
     if ((vrvNote->GetDur() > DUR_4) && !vrvNote->IsInBeam() && !vrvNote->IsChordTone()) {
         Flag *flag = new Flag();
-        //vrvNote->AddChild(flag);
+        vrvNote->AddChild(flag);
     }
     
     if ((vrvNote->GetDur() > DUR_1) && !vrvNote->IsChordTone()) {
         Stem *stem = new Stem();
         stem->ReadStems(note);
         stem->ReadStemsCmn(note);
-        //vrvNote->AddChild(stem);
+        vrvNote->AddChild(stem);
     }
 
     parent->AddChild(vrvNote);
