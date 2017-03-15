@@ -19,6 +19,7 @@
 #include "chord.h"
 #include "clef.h"
 #include "doc.h"
+#include "elementpart.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -1153,6 +1154,12 @@ void PaeInput::parseNote(pae::Note *note)
     }
     else {
         Note *mnote = new Note();
+        Flag *flag = new Flag();
+        mnote->AddChild(flag);
+        Stem *stem = new Stem();
+        mnote->AddChild(stem);
+        NoteHead *noteHead = new NoteHead();
+        mnote->AddChild(noteHead);
 
         mnote->SetPname(note->pitch);
         mnote->SetOct(note->octave);
@@ -1169,7 +1176,7 @@ void PaeInput::parseNote(pae::Note *note)
         if ((mnote->GetDur() == DURATION_128) && (mnote->GetDots() == 1)) {
             mnote->SetDur(DURATION_4);
             mnote->SetDots(0);
-            mnote->SetStemLen(0);
+            stem->SetStemLen(0);
         }
 
         if (note->fermata) {
@@ -1222,14 +1229,18 @@ void PaeInput::parseNote(pae::Note *note)
         assert(mnote);
         mnote->SetDur(DURATION_8);
         mnote->SetGrace(GRACE_acc);
-        mnote->SetStemDir(STEMDIRECTION_up);
+        Stem *stem = dynamic_cast<Stem*>(mnote->FindChildByType(STEM));
+        assert(stem);
+        stem->SetStemDir(STEMDIRECTION_up);
     }
 
     if ((note->appoggiatura > 0) && (element->Is(NOTE))) {
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         mnote->SetGrace(GRACE_unacc);
-        mnote->SetStemDir(STEMDIRECTION_up);
+        Stem *stem = dynamic_cast<Stem*>(mnote->FindChildByType(STEM));
+        assert(stem);
+        stem->SetStemDir(STEMDIRECTION_up);
     }
 
     if (note->beam == BEAM_INITIAL) {

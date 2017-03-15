@@ -52,8 +52,10 @@ void NoteHead::Reset()
 // Stem
 //----------------------------------------------------------------------------
 
-Stem::Stem() : LayerElement("stem-")
+Stem::Stem() : LayerElement("stem-"), AttStems(), AttStemsCmn()
 {
+    RegisterAttClass(ATT_STEMS);
+    RegisterAttClass(ATT_STEMSCMN);
  
     Reset();
     IsAttribute(true);
@@ -66,6 +68,8 @@ Stem::~Stem()
 void Stem::Reset()
 {
     LayerElement::Reset();
+    ResetStems();
+    ResetStemsCmn();
 }
 
 } // namespace vrv

@@ -16,6 +16,7 @@
 
 #include "devicecontext.h"
 #include "doc.h"
+#include "elementpart.h"
 #include "layer.h"
 #include "ligature.h"
 #include "mensur.h"
@@ -74,10 +75,13 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     }
 
     /************** Stem/notehead direction: **************/
+    
+    Stem *stem = dynamic_cast<Stem*>(note->FindChildByType(STEM));
+    assert(stem);
 
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
-    if (note->HasStemDir()) {
-        note->SetDrawingStemDir(note->GetStemDir());
+    if (stem->HasStemDir()) {
+        note->SetDrawingStemDir(stem->GetStemDir());
     }
     else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
         note->SetDrawingStemDir(layer->GetDrawingStemDir());

@@ -37,8 +37,6 @@ class Chord : public LayerElement,
               public AttColor,
               public AttGraced,
               public AttRelativesize,
-              public AttStems,
-              public AttStemsCmn,
               public AttTiepresent,
               public AttVisibility {
 public:

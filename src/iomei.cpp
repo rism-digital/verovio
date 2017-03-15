@@ -27,6 +27,7 @@
 #include "dot.h"
 #include "dynam.h"
 #include "editorial.h"
+#include "elementpart.h"
 #include "ending.h"
 #include "expansion.h"
 #include "fermata.h"
@@ -1016,8 +1017,6 @@ void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
     chord->WriteColor(currentNode);
     chord->WriteGraced(currentNode);
     chord->WriteRelativesize(currentNode);
-    chord->WriteStems(currentNode);
-    chord->WriteStemsCmn(currentNode);
     chord->WriteTiepresent(currentNode);
     chord->WriteVisibility(currentNode);
 }
@@ -1048,6 +1047,18 @@ void MeiOutput::WriteMeiDot(pugi::xml_node currentNode, Dot *dot)
     WritePositionInterface(currentNode, dot);
 }
 
+void MeiOutput::WriteMeiFlag(pugi::xml_node currentNode, Flag *flag)
+{
+    assert(flag);
+    
+    // Nothing to write if representing an attribute
+    if (flag->IsAttribute()) {
+        return;
+    }
+    
+    WriteLayerElement(currentNode, flag);
+}
+    
 void MeiOutput::WriteMeiFTrem(pugi::xml_node currentNode, FTrem *fTrem)
 {
     assert(fTrem);
@@ -1139,10 +1150,20 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     note->WriteGraced(currentNode);
     note->WriteNoteLogMensural(currentNode);
     note->WriteRelativesize(currentNode);
-    note->WriteStems(currentNode);
-    note->WriteStemsCmn(currentNode);
     note->WriteTiepresent(currentNode);
     note->WriteVisibility(currentNode);
+}
+    
+void MeiOutput::WriteMeiNoteHead(pugi::xml_node currentNode, NoteHead *noteHead)
+{
+    assert(noteHead);
+    
+    // Nothing to write if representing an attribute
+    if (noteHead->IsAttribute()) {
+        return;
+    }
+    
+    WriteLayerElement(currentNode, noteHead);
 }
 
 void MeiOutput::WriteMeiRest(pugi::xml_node currentNode, Rest *rest)
@@ -1169,6 +1190,20 @@ void MeiOutput::WriteMeiSpace(pugi::xml_node currentNode, Space *space)
 
     WriteLayerElement(currentNode, space);
     WriteDurationInterface(currentNode, space);
+}
+    
+void MeiOutput::WriteMeiStem(pugi::xml_node currentNode, Stem *stem)
+{
+    assert(stem);
+    
+    // Nothing to write if representing an attribute
+    if (stem->IsAttribute()) {
+        stem->WriteStems(currentNode);
+        stem->WriteStemsCmn(currentNode);
+        return;
+    }
+    
+    WriteLayerElement(currentNode, stem);
 }
 
 void MeiOutput::WriteMeiTuplet(pugi::xml_node currentNode, Tuplet *tuplet)
@@ -2752,8 +2787,6 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
     vrvChord->ReadColor(chord);
     vrvChord->ReadGraced(chord);
     vrvChord->ReadRelativesize(chord);
-    vrvChord->ReadStems(chord);
-    vrvChord->ReadStemsCmn(chord);
     vrvChord->ReadTiepresent(chord);
     vrvChord->ReadVisibility(chord);
 
@@ -2765,6 +2798,17 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
         vrvArtic->SetArtic(artic.GetArtic());
         vrvChord->AddChild(vrvArtic);
     }
+    
+    Flag *flag = new Flag();
+    vrvChord->AddChild(flag);
+    
+    Stem *stem = new Stem();
+    stem->ReadStems(chord);
+    stem->ReadStemsCmn(chord);
+    vrvChord->AddChild(stem);
+    
+    NoteHead *noteHead = new NoteHead();
+    vrvChord->AddChild(noteHead);
 
     parent->AddChild(vrvChord);
     return ReadMeiLayerChildren(vrvChord, chord, vrvChord);
@@ -2938,8 +2982,6 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
     vrvNote->ReadGraced(note);
     vrvNote->ReadNoteLogMensural(note);
     vrvNote->ReadRelativesize(note);
-    vrvNote->ReadStems(note);
-    vrvNote->ReadStemsCmn(note);
     vrvNote->ReadTiepresent(note);
     vrvNote->ReadVisibility(note);
 
@@ -2963,6 +3005,17 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
         vrvAccid->SetAccidGes(accidentalPerformed.GetAccidGes());
         vrvNote->AddChild(vrvAccid);
     }
+    
+    Flag *flag = new Flag();
+    vrvNote->AddChild(flag);
+    
+    Stem *stem = new Stem();
+    stem->ReadStems(note);
+    stem->ReadStemsCmn(note);
+    vrvNote->AddChild(stem);
+    
+    NoteHead *noteHead = new NoteHead();
+    vrvNote->AddChild(noteHead);
 
     parent->AddChild(vrvNote);
     return ReadMeiLayerChildren(vrvNote, note, vrvNote);

@@ -8,6 +8,8 @@
 #ifndef __VRV_ELEMENT_PART_H__
 #define __VRV_ELEMENT_PART_H__
 
+#include "atts_cmn.h"
+#include "atts_shared.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -36,14 +38,6 @@ public:
     //----------//
     // Functors //
     //----------//
-    
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    virtual int Save(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    ///@}
     
 private:
     //
@@ -92,7 +86,7 @@ private:
 /**
  * This class models a stem as a layer element part and has not direct MEI equivlatent.
  */
-class Stem : public LayerElement {
+class Stem : public LayerElement, public AttStems, public AttStemsCmn {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods

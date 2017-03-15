@@ -36,8 +36,6 @@ Chord::Chord()
     , AttColor()
     , AttGraced()
     , AttRelativesize()
-    , AttStems()
-    , AttStemsCmn()
     , AttTiepresent()
     , AttVisibility()
 {
@@ -45,8 +43,6 @@ Chord::Chord()
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_RELATIVESIZE);
-    RegisterAttClass(ATT_STEMS);
-    RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
     RegisterAttClass(ATT_VISIBILITY);
 
@@ -70,8 +66,6 @@ void Chord::Reset()
     ResetColor();
     ResetGraced();
     ResetRelativesize();
-    ResetStems();
-    ResetStemsCmn();
     ResetTiepresent();
     ResetVisibility();
 

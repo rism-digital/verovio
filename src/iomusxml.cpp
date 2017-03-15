@@ -21,6 +21,7 @@
 #include "dir.h"
 #include "doc.h"
 #include "dynam.h"
+#include "elementpart.h"
 #include "fermata.h"
 #include "hairpin.h"
 #include "harm.h"
@@ -1210,6 +1211,13 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     }
     else {
         Note *note = new Note();
+        Flag *flag = new Flag();
+        note->AddChild(flag);
+        Stem *stem = new Stem();
+        note->AddChild(stem);
+        NoteHead *noteHead = new NoteHead();
+        note->AddChild(noteHead);
+        
         element = note;
         note->SetVisible(ConvertWordToBool(GetAttributeValue(node, "print-object")));
         if (!noteColor.empty()) note->SetColor(noteColor.c_str());
@@ -1271,11 +1279,18 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         if (nextIsChord) {
             if (m_elementStack.empty() || !m_elementStack.back()->Is(CHORD)) {
                 Chord *chord = new Chord();
+                Flag *cflag = new Flag();
+                chord->AddChild(cflag);
+                Stem *cstem = new Stem();
+                chord->AddChild(cstem);
+                NoteHead *cnoteHead = new NoteHead();
+                chord->AddChild(cnoteHead);
+                
                 chord->SetDur(ConvertTypeToDur(typeStr));
                 if (dots > 0) chord->SetDots(dots);
-                chord->SetStemDir(stemDir);
+                cstem->SetStemDir(stemDir);
                 if (cue) chord->SetSize(SIZE_cue);
-                if (tremSlashNum != "0") chord->SetStemMod(chord->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
+                if (tremSlashNum != "0") cstem->SetStemMod(cstem->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
                 AddLayerElement(layer, chord);
                 m_elementStack.push_back(chord);
                 element = chord;
@@ -1291,7 +1306,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             }
             else if (slashStr == "yes") {
                 note->SetGrace(GRACE_unacc);
-                note->SetStemMod(STEMMODIFIER_1slash);
+                stem->SetStemMod(STEMMODIFIER_1slash);
             }
             else {
                 note->SetGrace(GRACE_unknown);
@@ -1302,9 +1317,9 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         if (m_elementStack.empty() || !m_elementStack.back()->Is(CHORD)) {
             note->SetDur(ConvertTypeToDur(typeStr));
             if (dots > 0) note->SetDots(dots);
-            note->SetStemDir(stemDir);
+            stem->SetStemDir(stemDir);
             if (cue) note->SetSize(SIZE_cue);
-            if (tremSlashNum != "0") note->SetStemMod(note->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
+            if (tremSlashNum != "0") stem->SetStemMod(stem->AttStems::StrToStemmodifier(tremSlashNum + "slash"));
         }
 
         // verse / syl

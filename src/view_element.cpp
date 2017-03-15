@@ -25,6 +25,7 @@
 #include "doc.h"
 #include "dot.h"
 #include "dynam.h"
+#include "elementpart.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -102,6 +103,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(FTREM)) {
         DrawFTrem(dc, element, layer, staff, measure);
     }
+    else if (element->Is(FLAG)) {
+        DrawFlag(dc, element, layer, staff, measure);
+    }
     else if (element->Is(KEYSIG)) {
         DrawKeySig(dc, element, layer, staff, measure);
     }
@@ -132,6 +136,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(NOTE)) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
+    else if (element->Is(NOTEHEAD)) {
+        DrawNoteHead(dc, element, layer, staff, measure);
+    }
     else if (element->Is(PROPORT)) {
         DrawProport(dc, element, layer, staff, measure);
     }
@@ -140,6 +147,9 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     }
     else if (element->Is(SPACE)) {
         DrawSpace(dc, element, layer, staff, measure);
+    }
+    else if (element->Is(STEM)) {
+        DrawStem(dc, element, layer, staff, measure);
     }
     else if (element->Is(SYL)) {
         DrawSyl(dc, element, layer, staff, measure);
@@ -438,14 +448,18 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // Get stem values from the chord or note child
     if (childChord) {
+        Stem *stem = dynamic_cast<Stem*>(childChord->FindChildByType(STEM));
+        assert(stem);
         stemDir = childChord->GetDrawingStemDir();
-        stemMod = childChord->GetStemMod();
+        stemMod = stem->GetStemMod();
         stemPoint = childChord->GetDrawingStemStart();
     }
     else {
+        Stem *stem = dynamic_cast<Stem*>(childNote->FindChildByType(STEM));
+        assert(stem);
         drawingCueSize = childNote->IsCueSize();
         stemDir = childNote->GetDrawingStemDir();
-        stemMod = childNote->GetStemMod();
+        stemMod = stem->GetStemMod();
         stemPoint = childNote->GetDrawingStemStart();
     }
 
@@ -538,8 +552,11 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         int yMax, yMin;
         chord->GetYExtremes(yMax, yMin);
 
-        if (chord->HasStemDir()) {
-            chord->SetDrawingStemDir(chord->GetStemDir());
+        Stem *stem = dynamic_cast<Stem*>(chord->FindChildByType(STEM));
+        assert(stem);
+        
+        if (stem->HasStemDir()) {
+            chord->SetDrawingStemDir(stem->GetStemDir());
         }
         else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
             chord->SetDrawingStemDir(layer->GetDrawingStemDir());
@@ -871,6 +888,18 @@ void View::DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *
         DrawRest(dc, element, layer, staff, measure);
         dc->EndGraphic(element, this);
     }
+}
+    
+void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+    
+    Flag *flag = dynamic_cast<Flag *>(element);
+    assert(flag);
 }
 
 void View::DrawKeySig(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1216,8 +1245,10 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
     if (!inChord && !inBeam && !inFTrem) {
-        if (note->HasStemDir()) {
-            note->SetDrawingStemDir(note->GetStemDir());
+        Stem *stem = dynamic_cast<Stem*>(note->FindChildByType(STEM));
+        assert(stem);
+        if (stem->HasStemDir()) {
+            note->SetDrawingStemDir(stem->GetStemDir());
         }
         else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
             note->SetDrawingStemDir(layer->GetDrawingStemDir());
@@ -1335,8 +1366,11 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
         DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
 
+        Stem *stem = dynamic_cast<Stem*>(note->FindChildByType(STEM));
+        assert(stem);
+        
         // Stemless note (@stem.len="0")
-        if (note->HasStemLen() && note->GetStemLen() == 0) {
+        if (stem->HasStemLen() && stem->GetStemLen() == 0) {
             // Store the start and end values
             StemmedDrawingInterface *interface = note->GetStemmedDrawingInterface();
             assert(interface);
@@ -1396,6 +1430,18 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         DrawFermataAttr(dc, element, layer, staff);
     }
 }
+    
+void View::DrawNoteHead(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+    
+    NoteHead *noteHead = dynamic_cast<NoteHead *>(element);
+    assert(noteHead);
+}
 
 void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
@@ -1451,6 +1497,18 @@ void View::DrawSpace(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->StartGraphic(element, "", element->GetUuid());
     dc->DrawPlaceholder(ToDeviceContextX(element->GetDrawingX()), ToDeviceContextY(element->GetDrawingY()));
     dc->EndGraphic(element, this);
+}
+
+void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+{
+    assert(dc);
+    assert(element);
+    assert(layer);
+    assert(staff);
+    assert(measure);
+    
+    Stem *stem = dynamic_cast<Stem *>(element);
+    assert(stem);
 }
 
 void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

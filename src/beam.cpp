@@ -14,6 +14,7 @@
 //----------------------------------------------------------------------------
 
 #include "editorial.h"
+#include "elementpart.h"
 #include "note.h"
 #include "rest.h"
 #include "tuplet.h"
@@ -243,8 +244,10 @@ void Beam::InitCoords(ListOfObjects *childList)
             if (current->Is({ NOTE, CHORD })) {
                 // look at the stemDir to see if we have multiple stem Dir
                 if (!m_drawingParams.m_hasMultipleStemDir) {
-                    assert(dynamic_cast<AttStems *>(current));
-                    currentStemDir = (dynamic_cast<AttStems *>(current))->GetStemDir();
+                    Stem *stem = dynamic_cast<Stem*>(current->FindChildByType(STEM));
+                    assert(stem);
+                    assert(dynamic_cast<AttStems *>(stem));
+                    currentStemDir = (dynamic_cast<AttStems *>(stem))->GetStemDir();
                     if (currentStemDir != STEMDIRECTION_NONE) {
                         if ((m_drawingParams.m_stemDir != STEMDIRECTION_NONE) && (m_drawingParams.m_stemDir != currentStemDir)) {
                             m_drawingParams.m_hasMultipleStemDir = true;
