@@ -159,7 +159,6 @@ void Note::ResetDrawingTieAttr()
 Accid *Note::GetDrawingAccid()
 {
     Accid *accid = dynamic_cast<Accid *>(this->FindChildByType(ACCID));
-    if (accid) accid->m_drawingCueSize = this->IsCueSize();
     return accid;
 }
 
@@ -265,6 +264,9 @@ int Note::PreparePointersByLayer(FunctorParams *functorParams)
 
 int Note::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+    
     this->ResetDrawingTieAttr();
     return FUNCTOR_CONTINUE;
 };

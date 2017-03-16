@@ -208,11 +208,9 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
 void Doc::PrepareDrawing()
 {
-    FunctorParams params;
-
     if (m_drawingPreparationDone) {
         Functor resetDrawing(&Object::ResetDrawing);
-        this->Process(&resetDrawing, &params);
+        this->Process(&resetDrawing, NULL);
     }
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
@@ -252,6 +250,10 @@ void Doc::PrepareDrawing()
             "%d time spanning elements could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
+    // Prepare the drawing cue size
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
+    
     // Prepare the cross-staff pointers
     PrepareCrossStaffParams prepareCrossStaffParams;
     Functor prepareCrossStaff(&Object::PrepareCrossStaff);

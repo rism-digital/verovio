@@ -180,6 +180,11 @@ public:
      * See Object::AdjustXPos
      */
     virtual int AdjustXPos(FunctorParams *functorParams);
+    
+    /**
+     * See Object::PrepareDrawingCueSize
+     */
+    virtual int PrepareDrawingCueSize(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareCrossStaff
@@ -221,6 +226,11 @@ public:
      * See Object::CalcMaxMeasureDuration
      */
     virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
+    
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *);
 
 private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
@@ -260,8 +270,14 @@ protected:
     int m_drawingXRel;
 
 private:
-    /** Indicates whether it is a ScoreDef or StaffDef attribute */
+    /** 
+     * Indicates whether it is a ScoreDef or StaffDef attribute 
+     */
     ElementScoreDefRole m_scoreDefRole;
+    /**
+     * The cached drawing cue size set by PrepareDarwingCueSize
+     */
+    bool m_drawingCueSize;
 };
 
 } // namespace vrv

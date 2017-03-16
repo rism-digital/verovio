@@ -78,6 +78,7 @@ void LayerElement::Reset()
     m_xAbs = VRV_UNSET;
     m_drawingYRel = 0;
     m_drawingXRel = 0;
+    m_drawingCueSize = false;
 
     m_scoreDefRole = NONE;
     m_alignment = NULL;
@@ -140,35 +141,7 @@ bool LayerElement::IsGraceNote()
 
 bool LayerElement::IsCueSize()
 {
-    if (this->IsGraceNote()) return true;
-
-    // This cover the case when the @size is given on the element
-    if (this->HasAttClass(ATT_RELATIVESIZE)) {
-        AttRelativesize *att = dynamic_cast<AttRelativesize *>(this);
-        assert(att);
-        if (att->HasSize()) return (att->GetSize() == SIZE_cue);
-    }
-
-    // For note, we also need to look at the parent chord
-    if (this->Is(NOTE)) {
-        Note const *note = dynamic_cast<Note const *>(this);
-        assert(note);
-        Chord *chord = note->IsChordTone();
-        if (chord) return chord->IsCueSize();
-    }
-    // For tuplet, we also need to look at the first note or chord
-    else if (this->Is(TUPLET)) {
-        AttComparisonAny matchType({ NOTE, CHORD });
-        ArrayOfObjects children;
-        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
-        if (child) return child->IsCueSize();
-    }
-    // For accid, look at the parent note
-    else if (this->Is(ACCID)) {
-        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
-        if (note) return note->IsCueSize();
-    }
-    return false;
+    return m_drawingCueSize;
 }
 
 bool LayerElement::IsInLigature()
@@ -816,6 +789,46 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
 
     return FUNCTOR_SIBLINGS;
 }
+    
+int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
+{
+    if (this->IsGraceNote()) {
+        m_drawingCueSize = true;
+    }
+    // This cover the case when the @size is given on the element
+    else if (this->HasAttClass(ATT_RELATIVESIZE)) {
+        AttRelativesize *att = dynamic_cast<AttRelativesize *>(this);
+        assert(att);
+        if (att->HasSize()) m_drawingCueSize = (att->GetSize() == SIZE_cue);
+    }
+    // For note, we also need to look at the parent chord
+    else if (this->Is(NOTE)) {
+        Note const *note = dynamic_cast<Note const *>(this);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord) m_drawingCueSize = chord->IsCueSize();
+    }
+    // For tuplet, we also need to look at the first note or chord
+    else if (this->Is(TUPLET)) {
+        AttComparisonAny matchType({ NOTE, CHORD });
+        ArrayOfObjects children;
+        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
+        if (child) m_drawingCueSize = child->IsCueSize();
+    }
+    // For accid, look at the parent if @func="edit" or otherwise to the parent note
+    else if (this->Is(ACCID)) {
+        Accid const *accid = dynamic_cast<Accid *>(this);
+        assert(accid);
+        if (accid->GetFunc() == accidLog_FUNC_edit) m_drawingCueSize = true;
+        else {
+            Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
+            if (note) m_drawingCueSize =  note->IsCueSize();
+        }
+    }
+    
+    return FUNCTOR_CONTINUE;
+    
+}
 
 int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
 {
@@ -1112,5 +1125,12 @@ int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+    
+int LayerElement::ResetDrawing(FunctorParams *)
+{
+    m_drawingCueSize = false;
+    
+    return FUNCTOR_CONTINUE;
+};
 
 } // namespace vrv

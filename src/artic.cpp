@@ -426,6 +426,9 @@ int Artic::PrepareArtic(FunctorParams *functorParams)
 
 int Artic::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+    
     // Remove all ArticPart children
     ClearChildren();
 
