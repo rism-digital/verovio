@@ -752,7 +752,7 @@ public:
      * Functor for setting the artic parts.
      * Splits the artic content into different artic parts if necessary
      */
-    virtual int PrepareArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareLayerElementParts(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
@@ -1006,7 +1006,7 @@ public:
     ListOfObjects *GetList(Object *node);
 
 private:
-    ListOfObjects m_list;
+    mutable ListOfObjects m_list;
     ListOfObjects::iterator m_iteratorCurrent;
 
 protected:

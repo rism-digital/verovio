@@ -192,6 +192,13 @@ bool Note::IsClusterExtreme() const
 // Functors methods
 //----------------------------------------------------------------------------
 
+int Note::PrepareLayerElementParts(FunctorParams *functorParams)
+{
+    SetDrawingStem(dynamic_cast<Stem*>(this->FindChildByType(STEM)));
+    
+    return FUNCTOR_CONTINUE;
+};
+    
 int Note::PrepareTieAttr(FunctorParams *functorParams)
 {
     PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
@@ -267,6 +274,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
     
+    this->ResetDrawingStem();
     this->ResetDrawingTieAttr();
     return FUNCTOR_CONTINUE;
 };

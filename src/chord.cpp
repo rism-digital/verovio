@@ -262,18 +262,39 @@ void Chord::GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow)
     if (m_crossStaff) return;
     
     // The first note is the bottom
-    Note *bottomNote = dynamic_cast<Note*>(childList->front());
+    Note *bottomNote = this->GetBottomNote();
     assert(bottomNote);
     if (bottomNote->m_crossStaff && bottomNote->m_crossLayer) {
         staffBelow = bottomNote->m_crossStaff;
     }
     
     // The last note is the top
-    Note *topNote = dynamic_cast<Note*>(childList->back());
+    Note *topNote = this->GetTopNote();
     assert(topNote);
     if (topNote->m_crossStaff && topNote->m_crossLayer) {
         staffAbove = topNote->m_crossStaff;
     }
+}
+    
+Note *Chord::GetTopNote()
+{
+    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+    
+    Note *topNote = dynamic_cast<Note*>(childList->back());
+    assert(topNote);
+    return topNote;
+}
+
+Note *Chord::GetBottomNote()
+{
+    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    // The first note is the bottom
+    Note *bottomNote = dynamic_cast<Note*>(childList->front());
+    assert(bottomNote);
+    return bottomNote;
 }
 
 void Chord::SetDrawingStemDir(data_STEMDIRECTION stemDir)
@@ -316,6 +337,15 @@ void Chord::SetDrawingStemEnd(Point stemEnd)
 // Functors methods
 //----------------------------------------------------------------------------
 
+    
+int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
+{
+    SetDrawingStem(dynamic_cast<Stem*>(this->FindChildByType(STEM)));
+    
+    return FUNCTOR_CONTINUE;
+};
+
+    
 int Chord::PrepareTieAttr(FunctorParams *functorParams)
 {
     PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
@@ -337,4 +367,15 @@ int Chord::PrepareTieAttrEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+    
+    
+int Chord::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+    
+    this->ResetDrawingStem();
+    return FUNCTOR_CONTINUE;
+};
+
 }

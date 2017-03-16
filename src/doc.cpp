@@ -394,9 +394,8 @@ void Doc::PrepareDrawing()
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams);
 
-    FunctorParams prepareArticParams;
-    Functor prepareArtic(&Object::PrepareArtic);
-    this->Process(&prepareArtic, &prepareArticParams);
+    Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
+    this->Process(&prepareLayerElementParts, NULL);
 
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t

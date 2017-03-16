@@ -71,6 +71,9 @@ public:
     void GetYExtremes(int &yMax, int &yMin);
                   
     void GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow);
+                  
+    Note *GetTopNote();
+    Note *GetBottomNote();
 
     /**
      * Returns list of notes that have accidentals
@@ -106,10 +109,20 @@ public:
     //----------//
 
     /**
+     * See Object::PrepareLayerElementParts
+     */
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
+                  
+    /**
      * See Object::PrepareTieAttr
      */
     virtual int PrepareTieAttr(FunctorParams *functorParams);
     virtual int PrepareTieAttrEnd(FunctorParams *functorParams);
+                  
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
 
 protected:
     /**

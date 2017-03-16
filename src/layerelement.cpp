@@ -652,6 +652,17 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
         }
     }
+    else if (this->Is(CHORD)) {
+        // The y position is set to the top note one
+        Chord *chord = dynamic_cast<Chord *>(this);
+        assert(chord);
+        Note *note = chord->GetTopNote();
+        assert(note);
+        int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
+        // Once we have AttLoc on Note
+        // if (note->HasLoc()) loc = note->GetLoc();
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+    }
     else if (this->Is({ CUSTOS, DOT })) {
         PositionInterface *interface = dynamic_cast<PositionInterface *>(this);
         assert(interface);
@@ -663,10 +674,14 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     else if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
+        Chord *chord = note->IsChordTone();
         int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
         // Once we have AttLoc on Note
         // if (note->HasLoc()) loc = note->GetLoc();
-        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+        int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
+        // Make it relative to the top note one (see above)
+        if (chord) yRel -= chord->GetDrawingYRel();
+        this->SetDrawingYRel(yRel);
     }
     else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);

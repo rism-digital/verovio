@@ -403,7 +403,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Artic::PrepareArtic(FunctorParams *functorParams)
+int Artic::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     std::vector<data_ARTICULATION> insideSlur;
     std::vector<data_ARTICULATION> outsideSlur;

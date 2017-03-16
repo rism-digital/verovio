@@ -41,7 +41,7 @@ public:
     /**
      * Split the articulation content into an array with the values to be displayed inside the staff / slur
      * and the values to be displayed outside.
-     * Used by Artic::PrepareArtic that then creates the corresponding ArticPart objects.
+     * Used by Artic::PrepareLayerElementParts that then creates the corresponding ArticPart objects.
      */
     void SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur);
 
@@ -80,9 +80,9 @@ public:
     virtual int AdjustArtic(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareArtic
+     * See Object::PrepareLayerElementParts
      */
-    virtual int PrepareArtic(FunctorParams *functorParams);
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing

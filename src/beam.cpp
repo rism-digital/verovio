@@ -244,7 +244,9 @@ void Beam::InitCoords(ListOfObjects *childList)
             if (current->Is({ NOTE, CHORD })) {
                 // look at the stemDir to see if we have multiple stem Dir
                 if (!m_drawingParams.m_hasMultipleStemDir) {
-                    Stem *stem = dynamic_cast<Stem*>(current->FindChildByType(STEM));
+                    StemmedDrawingInterface *interface = current->GetStemmedDrawingInterface();
+                    assert(interface);
+                    Stem *stem = interface->GetDrawingStem();
                     currentStemDir = STEMDIRECTION_NONE;
                     if (stem) {
                         assert(dynamic_cast<AttStems *>(stem));

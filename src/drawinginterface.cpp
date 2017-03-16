@@ -9,6 +9,11 @@
 
 //----------------------------------------------------------------------------
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
+#include "elementpart.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -135,6 +140,19 @@ void StemmedDrawingInterface::Reset()
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingStemStart = Point(0, 0);
     m_drawingStemEnd = Point(0, 0);
+    m_drawingStem = NULL;
+}
+    
+void StemmedDrawingInterface::SetDrawingStem(Stem *stem)
+{
+    assert(!m_drawingStem);
+    
+    m_drawingStem = stem;
+}
+    
+void StemmedDrawingInterface::ResetDrawingStem()
+{
+    m_drawingStem = NULL;
 }
 
 void StemmedDrawingInterface::SetDrawingStemDir(data_STEMDIRECTION stemDir)

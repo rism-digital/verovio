@@ -108,6 +108,11 @@ public:
     //----------//
 
     /**
+    * See Object::PrepareLayerElementParts
+    */
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
+                 
+    /**
      * See Object::PrepareTieAttr
      */
     virtual int PrepareTieAttr(FunctorParams *functorParams);

@@ -447,13 +447,13 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // Get stem values from the chord or note child
     if (childChord) {
-        Stem *stem = dynamic_cast<Stem*>(childChord->FindChildByType(STEM));
+        Stem *stem = childChord->GetDrawingStem();
         stemDir = childChord->GetDrawingStemDir();
         stemMod = stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
         stemPoint = childChord->GetDrawingStemStart();
     }
     else {
-        Stem *stem = dynamic_cast<Stem*>(childNote->FindChildByType(STEM));
+        Stem *stem = childNote->GetDrawingStem();
         drawingCueSize = childNote->IsCueSize();
         stemDir = childNote->GetDrawingStemDir();
         stemMod =  stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
@@ -549,7 +549,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         int yMax, yMin;
         chord->GetYExtremes(yMax, yMin);
 
-        Stem *stem = dynamic_cast<Stem*>(chord->FindChildByType(STEM));
+        Stem *stem = chord->GetDrawingStem();
         if (stem && stem->HasStemDir()) {
             chord->SetDrawingStemDir(stem->GetStemDir());
         }
@@ -1240,7 +1240,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
     if (!inChord && !inBeam && !inFTrem) {
-        Stem *stem = dynamic_cast<Stem*>(note->FindChildByType(STEM));
+        Stem *stem = note->GetDrawingStem();
         if (stem && stem->HasStemDir()) {
             note->SetDrawingStemDir(stem->GetStemDir());
         }
@@ -1360,7 +1360,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
         DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
 
-        Stem *stem = dynamic_cast<Stem*>(note->FindChildByType(STEM));
+        Stem *stem = note->GetDrawingStem();
         
         // Stemless note (@stem.len="0")
         if (stem && stem->HasStemLen() && stem->GetStemLen() == 0) {
