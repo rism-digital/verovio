@@ -180,10 +180,10 @@ public:
     char below = '\0'; // !!!RDF**kern: i = below (previous signifier is "below")
     char above = '\0'; // !!!RDF**kern: i = above (previous signifier is "above")
 
-	string space_color; // !!!RDF**kern: show spaces color=hotpink
-	string ispace_color; // !!!RDF**kern: show invisible rests color=chartreuse
-	string irest_color; // !!!RDF**kern: show implicit spaces color=blueviolet
-	string rspace_color; // !!!RDF**kern: show recip spaces color=royalblue
+    string space_color; // !!!RDF**kern: show spaces color=hotpink
+    string ispace_color; // !!!RDF**kern: show invisible rests color=chartreuse
+    string irest_color; // !!!RDF**kern: show implicit spaces color=blueviolet
+    string rspace_color; // !!!RDF**kern: show recip spaces color=royalblue
 
     // coloring of notes
     // !!!RDF**kern: i = marked note, color="#553325"
@@ -194,10 +194,7 @@ public:
     // !!!RDF**kern: i = marked note
     std::vector<char> mark;
     std::vector<std::string> mcolor;
-
 };
-
-
 
 #endif /* NO_HUMDRUM_SUPPORT */
 
@@ -332,6 +329,9 @@ protected:
     void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
     void resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
+    void appendTypeTag(vrv::Note *note, const std::string &tag);
+    void embedQstampInClass(vrv::Note *note, hum::HTp token);
+    void embedBase40PitchInClass(vrv::Note *note, const std::string &token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);

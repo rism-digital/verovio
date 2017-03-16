@@ -2530,9 +2530,6 @@ bool HumdrumInput::fillContentsOfLayer(int track, int startline, int endline, in
             if (m_signifiers.nostem && layerdata[i]->find(m_signifiers.nostem) != string::npos) {
                 note->SetStemLen(0);
             }
-            int line = layerdata[i]->getLineIndex();
-            int field = layerdata[i]->getFieldIndex();
-            colorNote(note, *layerdata[i], line, field);
             addArticulations(note, layerdata[i]);
             addOrnaments(note, layerdata[i]);
             processDirection(layerdata[i], staffindex);
@@ -2728,6 +2725,44 @@ int HumdrumInput::getDirection(const string &token, const std::string &target)
 
 //////////////////////////////
 //
+// HumdrumInput::embedBase40PitchInClass --
+//
+
+void HumdrumInput::embedBase40PitchInClass(Note *note, const std::string &token)
+{
+    int base40 = hum::Convert::kernToBase40(token);
+    stringstream ss;
+    ss << "b40-" << base40;
+    appendTypeTag(note, ss.str());
+}
+
+//////////////////////////////
+//
+// HumdrumInput::embedQstampInClass --
+//
+
+void HumdrumInput::embedQstampInClass(Note *note, hum::HTp token)
+{
+    hum::HumNum starttime = token->getDurationFromStart();
+    hum::HumNum endtime = starttime + token->getDuration();
+    stringstream sson;
+    stringstream ssoff;
+    sson << "qon-" << starttime.getNumerator();
+    if (starttime.getDenominator() != 1) {
+        sson << "_" << starttime.getDenominator();
+    }
+    ssoff << "qoff-" << endtime.getNumerator();
+    if (endtime.getDenominator() != 1) {
+        ssoff << "_" << endtime.getDenominator();
+    }
+    appendTypeTag(note, sson.str());
+    appendTypeTag(note, ssoff.str());
+
+    // ggg
+}
+
+//////////////////////////////
+//
 // HumdrumInput::colorNote --
 //
 
@@ -2742,11 +2777,30 @@ void HumdrumInput::colorNote(Note *note, const std::string &token, int line, int
     }
 
     for (int i = 0; i < (int)m_signifiers.mark.size(); i++) {
-        if (token.find(m_signifiers.mark[i]) != string::npos) {
+        if (token.find(m_signifiers.mark[i]) != std::string::npos) {
             note->SetColor(m_signifiers.mcolor[i]);
-            note->SetType("highlight");  // Allow type to be set from data later.
+            appendTypeTag(note, "marked");
             break;
         }
+    }
+}
+
+//////////////////////////////
+//
+// HumdrumInput::appendTypeTag -- add a space before tag if there is
+//     already content in @type.
+//
+
+void HumdrumInput::appendTypeTag(Note *note, const std::string &tag)
+{
+    if (note->GetType().empty()) {
+        note->SetType(tag); // Allow type to be set from data later.
+    }
+    else {
+        std::string newtag = note->GetType();
+        newtag += " ";
+        newtag += tag;
+        note->SetType(newtag);
     }
 }
 
@@ -4957,6 +5011,8 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     int line = token->getLineIndex();
     int field = token->getFieldIndex();
     colorNote(note, tstring, line, field);
+    embedQstampInClass(note, token);
+    embedBase40PitchInClass(note, tstring);
 
     if ((ss[staffindex].ottavameasure != NULL) && (ss[staffindex].ottavanotestart == NULL)) {
         ss[staffindex].ottavanotestart = note;
