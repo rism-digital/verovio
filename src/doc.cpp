@@ -249,13 +249,14 @@ void Doc::PrepareDrawing()
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareTimestampsParams.m_timeSpanningInterfaces.empty()) {
         LogWarning(
-            "%d time spanning elements could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
+            "%d time spanning element(s) could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
     // Prepare the cross-staff pointers
     PrepareCrossStaffParams prepareCrossStaffParams;
     Functor prepareCrossStaff(&Object::PrepareCrossStaff);
-    this->Process(&prepareCrossStaff, &prepareCrossStaffParams);
+    Functor prepareCrossStaffEnd(&Object::PrepareCrossStaffEnd);
+    this->Process(&prepareCrossStaff, &prepareCrossStaffParams, &prepareCrossStaffEnd);
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
@@ -482,13 +483,13 @@ void Doc::CastOffDoc()
 
     // Here we redo the alignment because of the new scoreDefs
     // We can actually optimise this and have a custom version that does not redo all the calculation
-    contentPage->LayOutHorizontally();
+    //contentPage->LayOutHorizontally();
 
     contentPage->LayOutVertically();
 
     // Detach the contentPage
     this->DetachChild(0);
-    assert(contentPage && !contentPage->m_parent);
+    assert(contentPage && !contentPage->GetParent());
 
     Page *currentPage = new Page();
     this->AddChild(currentPage);
@@ -542,7 +543,7 @@ void Doc::CastOffEncodingDoc()
 
     // Detach the contentPage
     this->DetachChild(0);
-    assert(contentPage && !contentPage->m_parent);
+    assert(contentPage && !contentPage->GetParent());
 
     Page *page = new Page();
     this->AddChild(page);

@@ -17,6 +17,44 @@ namespace vrv {
 #define MAX_DURATION_PARTIALS 16
 
 enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
+    
+    
+//----------------------------------------------------------------------------
+// BeamDrawingParams
+//----------------------------------------------------------------------------
+
+/**
+ * Class for storing drawing parameters when calculating beams.
+ * See View::DrawBeam and View::CalcBeam
+ */
+
+class BeamDrawingParams {
+public:
+    /**
+     * @name Constructors, destructors, and other standard methods
+     */
+    ///@{
+    BeamDrawingParams();
+    virtual ~BeamDrawingParams() {}
+    
+    void Reset();
+    
+    // values to be set before calling CalcBeam
+    bool m_changingDur;
+    bool m_beamHasChord;
+    bool m_hasMultipleStemDir;
+    bool m_cueSize;
+    int m_shortestDur;
+    data_STEMDIRECTION m_stemDir;
+    
+    // values set by CalcBeam
+    int m_beamWidth;
+    int m_beamWidthBlack;
+    int m_beamWidthWhite;
+    double m_startingY; // the initial position of the beam
+    double m_beamSlope; // the slope of the beam
+    double m_verticalBoost; // extra height to ensure the beam clears all the noteheads
+};
 
 //----------------------------------------------------------------------------
 // Beam
@@ -85,7 +123,8 @@ protected:
 private:
     //
 public:
-    //
+    /** */
+    BeamDrawingParams m_drawingParams;
 private:
     /**
      * An array of coordinates for each element
@@ -115,41 +154,6 @@ public:
     int m_breaksec;
     char m_partialFlags[MAX_DURATION_PARTIALS];
     LayerElement *m_element;
-};
-
-//----------------------------------------------------------------------------
-// BeamParams
-//----------------------------------------------------------------------------
-
-/**
- * Class for storing drawing parameters when calculating beams.
- * See View::DrawBeam and View::CalcBeam
- */
-
-class BeamParams {
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     */
-    ///@{
-    BeamParams(){};
-    virtual ~BeamParams(){};
-
-    // values to be set before calling CalcBeam
-    bool m_changingDur;
-    bool m_beamHasChord;
-    bool m_hasMultipleStemDir;
-    bool m_cueSize;
-    int m_shortestDur;
-    data_STEMDIRECTION m_stemDir;
-
-    // values set by CalcBeam
-    int m_beamWidth;
-    int m_beamWidthBlack;
-    int m_beamWidthWhite;
-    double m_startingY; // the initial position of the beam
-    double m_beamSlope; // the slope of the beam
-    double m_verticalBoost; // extra height to ensure the beam clears all the noteheads
 };
 
 } // namespace vrv

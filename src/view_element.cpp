@@ -233,7 +233,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 }
 
 void View::DrawArtic(
-    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure, bool drawingList)
+    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(element);
@@ -244,86 +244,13 @@ void View::DrawArtic(
     Artic *artic = dynamic_cast<Artic *>(element);
     assert(artic);
 
-    Chord *chord = dynamic_cast<Chord *>(artic->GetFirstParent(CHORD));
-    if (chord && !drawingList) {
-        dc->StartGraphic(element, "", element->GetUuid());
-        dc->EndGraphic(element, this);
-        chord->AddToDrawingList(artic);
-        return;
-    }
-
-    /************** Get the parent and the stem direction **************/
-
-    LayerElement *parent = NULL;
-    Note *parentNote = NULL;
-    Chord *parentChord = dynamic_cast<Chord *>(artic->GetFirstParent(CHORD));
-    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-    data_STAFFREL place = STAFFREL_NONE;
-    bool drawingCueSize = false;
-
-    if (!parentChord) {
-        parentNote = dynamic_cast<Note *>(artic->GetFirstParent(NOTE));
-        parent = parentNote;
-    }
-    else {
-        parent = parentChord;
-    }
-
-    if (!parentChord && !parentNote) {
-        // no parent chord or note, nothing we can do...
-        return;
-    }
-
-    stemDir = parentNote ? parentNote->GetDrawingStemDir() : parentChord->GetDrawingStemDir();
-    drawingCueSize = parent->IsCueSize();
-
-    /************** placement **************/
-
-    bool allowAbove = true;
-
-    // for now we ignore within @place
-    if (artic->HasPlace() && (artic->GetPlace() != STAFFREL_within)) {
-        place = artic->GetPlace();
-        // If we have a place indication do not allow to be changed to above
-        allowAbove = false;
-    }
-    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
-        place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? STAFFREL_above : STAFFREL_below;
-        // If we have more than one layer do not allow to be changed to above
-        allowAbove = false;
-    }
-    else if (stemDir == STEMDIRECTION_up)
-        place = STAFFREL_below;
-    else
-        place = STAFFREL_above;
-
-    /************** calculate the y position **************/
-
-    int staffYBottom = -m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
-    // Avoid in artic to be in legder lines
-    int yInAbove
-        = std::max(parent->GetDrawingTop(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), staffYBottom);
-    int yInBelow
-        = std::min(parent->GetDrawingBottom(m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), 0);
-    int yOutAbove = std::max(yInAbove, 0);
-    int yOutBelow = std::min(yInBelow, staffYBottom);
-
-    artic->UpdateOutsidePartPosition(yOutAbove, yOutBelow, place, allowAbove);
-    artic->UpdateInsidePartPosition(yInAbove, yInBelow, place);
-
     /************** draw the artic **************/
 
-    if (drawingList)
-        dc->ResumeGraphic(element, element->GetUuid());
-    else
-        dc->StartGraphic(element, "", element->GetUuid());
+    dc->StartGraphic(element, "", element->GetUuid());
 
     DrawLayerChildren(dc, artic, layer, staff, measure);
 
-    if (drawingList)
-        dc->EndResumedGraphic(element, this);
-    else
-        dc->EndGraphic(element, this);
+    dc->EndGraphic(element, this);
 }
 
 void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -365,7 +292,10 @@ void View::DrawArticPart(DeviceContext *dc, LayerElement *element, Layer *layer,
         code = Artic::GetSmuflCode(*articIter, articPart->GetPlace());
 
         // Skip it if we do not have it in the font (for now - we should log / document this somewhere)
-        if (code == 0) continue;
+        if (code == 0) {
+            articPart->SetEmptyBB(true);
+            continue;
+        }
 
         if (articPart->GetType() == ARTIC_PART_INSIDE) {
             // If we are above the top of the  staff, just pile them up
@@ -579,6 +509,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     Chord *chord = dynamic_cast<Chord *>(element);
     assert(chord);
+    
+    if (chord->m_crossStaff) staff = chord->m_crossStaff;
 
     chord->ResetDrawingList();
 
@@ -604,7 +536,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     // (unless we're in a beam or in an fTrem)
     if (!inBeam && !inFTrem) {
         int yMax, yMin;
-        chord->GetYExtremes(&yMax, &yMin);
+        chord->GetYExtremes(yMax, yMin);
 
         if (chord->HasStemDir()) {
             chord->SetDrawingStemDir(chord->GetStemDir());
@@ -774,15 +706,6 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     dc->ResetPen();
     dc->ResetBrush();
-
-    ListOfObjects *drawingList = chord->GetDrawingList();
-    ListOfObjects::iterator listIter;
-
-    for (listIter = drawingList->begin(); listIter != drawingList->end(); ++listIter) {
-        if (((*listIter)->Is(ARTIC))) {
-            DrawArtic(dc, dynamic_cast<LayerElement *>(*listIter), layer, staff, measure, true);
-        }
-    }
 }
 
 void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -861,7 +784,7 @@ void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     y -= m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (staff->m_drawingLines - clef->GetLine());
 
     bool cueSize = false;
-    if (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF) {
+    if (clef->GetAlignment() && (clef->GetAlignment()->GetType() == ALIGNMENT_CLEF)) {
         cueSize = true;
         // HARDCODED
         x -= m_doc->GetGlyphWidth(sym, staff->m_drawingStaffSize, cueSize) * 1.35;
@@ -1484,6 +1407,8 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
+    
+    if (rest->m_crossStaff) staff = rest->m_crossStaff;
 
     bool drawingCueSize = rest->IsCueSize();
     int drawingDur = rest->GetActualDur();
@@ -1549,22 +1474,8 @@ void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff
     dc->SetBrush(m_currentColour, AxSOLID);
 
     FontInfo currentFont;
-    if (syl->HasFontstyle()) {
+    if (staff->m_drawingStaffDef) {
         currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        currentFont.SetStyle(syl->GetFontstyle());
-        dc->SetFont(&currentFont);
-    }
-    else if (staff->m_drawingStaffDef) {
-        currentFont = *m_doc->GetDrawingLyricFont(staff->m_drawingStaffSize);
-        if (staff->m_drawingStaffDef->HasLyricName()) {
-            currentFont.SetFaceName(staff->m_drawingStaffDef->GetLyricName().c_str());
-        }
-        if (staff->m_drawingStaffDef->HasLyricStyle()) {
-            currentFont.SetStyle(staff->m_drawingStaffDef->GetLyricStyle());
-        }
-        if (staff->m_drawingStaffDef->HasLyricWeight()) {
-            currentFont.SetWeight(staff->m_drawingStaffDef->GetLyricWeight());
-        }
         dc->SetFont(&currentFont);
     }
     else {
@@ -1668,7 +1579,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
         Chord *chord = dynamic_cast<Chord *>(element);
         assert(chord);
         int yMin, yMax;
-        chord->GetYExtremes(&yMin, &yMax);
+        chord->GetYExtremes(yMin, yMax);
         startPointY = (stemInterface->GetDrawingStemDir() == STEMDIRECTION_up) ? yMin : yMax;
     }
 
@@ -2412,7 +2323,7 @@ void View::PrepareChordDots(DeviceContext *dc, Chord *chord, int x, int y, unsig
 
     // finally, make sure it's not outside the acceptable extremes of the chord
     int yMax, yMin;
-    chord->GetYExtremes(&yMax, &yMin);
+    chord->GetYExtremes(yMax, yMin);
     if (y > (yMax + fullUnit)) return;
     if (y < (yMin - fullUnit)) return;
 

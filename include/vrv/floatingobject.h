@@ -141,6 +141,9 @@ public:
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
     ///@}
+    
+    virtual void ResetCachedDrawingX() const;
+    virtual void ResetCachedDrawingY() const;
 
     void SetObjectXY(Object *objectX, Object *objectY);
 

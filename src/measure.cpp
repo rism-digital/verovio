@@ -36,11 +36,12 @@ namespace vrv {
 // Measure
 //----------------------------------------------------------------------------
 
-Measure::Measure(bool measureMusic, int logMeasureNb) : Object("measure-"), AttCommon(), AttMeasureLog(), AttPointing()
+Measure::Measure(bool measureMusic, int logMeasureNb) : Object("measure-"), AttCommon(), AttMeasureLog(), AttPointing(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_MEASURELOG);
     RegisterAttClass(ATT_POINTING);
+    RegisterAttClass(ATT_TYPED);
 
     m_measuredMusic = measureMusic;
     // We set parent to it because we want to access the parent doc from the aligners
@@ -72,6 +73,7 @@ void Measure::Reset()
     ResetCommon();
     ResetMeasureLog();
     ResetPointing();
+    ResetTyped();
 
     if (m_drawingScoreDef) {
         delete m_drawingScoreDef;
@@ -122,9 +124,18 @@ void Measure::AddChild(Object *child)
 
 int Measure::GetDrawingX() const
 {
+    if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
+    
     System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
     assert(system);
-    return (system->GetDrawingX() + this->GetDrawingXRel());
+    m_cachedDrawingX = system->GetDrawingX() + this->GetDrawingXRel();
+    return m_cachedDrawingX;
+}
+    
+void Measure::SetDrawingXRel(int drawingXRel)
+{
+    ResetCachedDrawingX();
+    m_drawingXRel = drawingXRel;
 }
 
 int Measure::GetLeftBarLineXRel() const
@@ -334,13 +345,16 @@ void Measure::SetDrawingBarLines(Measure *previous, bool systemBreak, bool score
 
 int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
-    m_drawingXRel = 0;
+    SetDrawingXRel(0);
     if (m_measureAligner.GetLeftAlignment()) {
         m_measureAligner.GetLeftAlignment()->SetXRel(0);
     }
     if (m_measureAligner.GetRightAlignment()) {
         m_measureAligner.GetRightAlignment()->SetXRel(0);
     }
+    
+    Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
+    m_timestampAligner.Process(&resetHorizontalAlignment, NULL);
 
     return FUNCTOR_CONTINUE;
 }
@@ -411,6 +425,10 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 {
     AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
+    
+    params->m_minPos = 0;
+    params->m_upcomingMinPos = VRV_UNSET;
+    params->m_cumulatedXShift = 0;
 
     std::vector<int>::iterator iter;
     std::vector<AttComparison *> filters;
@@ -430,6 +448,8 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
+    
+    //m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
 
     int minMeasureWidth = params->m_doc->m_drawingMinMeasureWidth;
     // First try to see if we have a double measure length element
@@ -485,10 +505,10 @@ int Measure::JustifyX(FunctorParams *functorParams)
     assert(params);
 
     if (params->m_measureXRel > 0) {
-        this->m_drawingXRel = params->m_measureXRel;
+        SetDrawingXRel(params->m_measureXRel);
     }
     else {
-        params->m_measureXRel = this->m_drawingXRel;
+        params->m_measureXRel = GetDrawingXRel();
     }
 
     m_measureAligner.Process(params->m_functor, params);
@@ -501,7 +521,7 @@ int Measure::AlignMeasures(FunctorParams *functorParams)
     AlignMeasuresParams *params = dynamic_cast<AlignMeasuresParams *>(functorParams);
     assert(params);
 
-    this->m_drawingXRel = params->m_shift;
+    SetDrawingXRel(params->m_shift);
 
     params->m_shift += this->GetWidth();
     params->m_justifiableWidth += this->GetRightBarLineXRel() - this->GetLeftBarLineXRel();
@@ -631,6 +651,10 @@ int Measure::PrepareTimePointingEnd(FunctorParams *functorParams)
 {
     PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
     assert(params);
+    
+    if (!params->m_timePointingInterfaces.empty()) {
+        LogWarning("%d time pointing element(s) could not be matched in mesure %s", params->m_timePointingInterfaces.size(), this->GetUuid().c_str());
+    }
 
     ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
     while (iter != params->m_timePointingInterfaces.end()) {

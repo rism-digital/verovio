@@ -82,7 +82,7 @@ void Page::LayOut(bool force)
 
 void Page::LayOutHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -171,7 +171,7 @@ void Page::LayOutHorizontally()
 
 void Page::LayOutVertically()
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -188,6 +188,11 @@ void Page::LayOutVertically()
     AlignVerticallyParams alignVerticallyParams(doc);
     Functor alignVertically(&Object::AlignVertically);
     this->Process(&alignVertically, &alignVerticallyParams);
+    
+    // Adjust the position of outside articulations
+    AdjustArticParams adjustArticParams(doc);
+    Functor adjustArtic(&Object::AdjustArtic);
+    this->Process(&adjustArtic, &adjustArticParams);
 
     // Render it for filling the bounding box
     View view;
@@ -196,11 +201,6 @@ void Page::LayOutVertically()
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
-
-    // Adjust the position of outside articulations
-    AdjustArticParams adjustArticParams(doc);
-    Functor adjustArtic(&Object::AdjustArtic);
-    this->Process(&adjustArtic, &adjustArticParams);
 
     // Adjust the position of outside articulations with slurs end and start positions
     AdjustArticWithSlursParams adjustArticWithSlursParams(doc);
@@ -245,7 +245,7 @@ void Page::LayOutVertically()
 
 void Page::JustifyHorizontally()
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
 
     if (!doc->GetJustificationX()) {
@@ -265,7 +265,7 @@ void Page::JustifyHorizontally()
 
 int Page::GetContentHeight() const
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
 
     // Doc::SetDrawingPage should have been called before
@@ -274,12 +274,12 @@ int Page::GetContentHeight() const
 
     System *last = dynamic_cast<System *>(m_children.back());
     assert(last);
-    return doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->m_drawingYRel + last->GetHeight();
+    return doc->m_drawingPageHeight - doc->m_drawingPageTopMar - last->GetDrawingYRel() + last->GetHeight();
 }
 
 int Page::GetContentWidth() const
 {
-    Doc *doc = dynamic_cast<Doc *>(m_parent);
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
     assert(doc);
     // in non debug
     if (!doc) return 0;

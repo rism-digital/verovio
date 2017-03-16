@@ -29,9 +29,8 @@ namespace vrv {
 // Section
 //----------------------------------------------------------------------------
 
-Section::Section() : SystemElement("section-"), BoundaryStartInterface(), AttCommon(), AttCommonPart()
+Section::Section() : SystemElement("section-"), BoundaryStartInterface(), AttCommonPart()
 {
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
 
     Reset();
@@ -77,9 +76,8 @@ void Section::AddChild(Object *child)
 // Pb
 //----------------------------------------------------------------------------
 
-Pb::Pb() : SystemElement("pb-"), AttCommon(), AttCommonPart()
+Pb::Pb() : SystemElement("pb-"), AttCommonPart()
 {
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
 
     Reset();
@@ -92,7 +90,6 @@ Pb::~Pb()
 void Pb::Reset()
 {
     SystemElement::Reset();
-    ResetCommon();
     ResetCommonPart();
 }
 
@@ -100,9 +97,8 @@ void Pb::Reset()
 // Sb
 //----------------------------------------------------------------------------
 
-Sb::Sb() : SystemElement("pb-"), AttCommon(), AttCommonPart()
+Sb::Sb() : SystemElement("pb-"), AttCommonPart()
 {
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
 
     Reset();
@@ -115,7 +111,6 @@ Sb::~Sb()
 void Sb::Reset()
 {
     SystemElement::Reset();
-    ResetCommon();
     ResetCommonPart();
 }
 
