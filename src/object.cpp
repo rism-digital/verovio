@@ -400,7 +400,6 @@ void Object::GenerateUuid()
     snprintf(str, 17, "%016d", nr);
 
     m_uuid = m_classid + std::string(str);
-    std::transform(m_uuid.begin(), m_uuid.end(), m_uuid.begin(), ::tolower);
 }
 
 void Object::ResetUuid()

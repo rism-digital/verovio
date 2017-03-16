@@ -903,6 +903,9 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
 {
     PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
     assert(params);
+    
+    // Do not look for tstamp pointing to these
+    if (this->Is({ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE})) return FUNCTOR_CONTINUE;
 
     ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
     while (iter != params->m_timePointingInterfaces.end()) {
@@ -922,6 +925,9 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
 {
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
+    
+    // Do not look for tstamp pointing to these
+    if (this->Is({ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE})) return FUNCTOR_CONTINUE;
 
     ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
