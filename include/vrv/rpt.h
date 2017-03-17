@@ -128,6 +128,15 @@ public:
      *
      */
     const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; }
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * See Object::CalcDrawingStemDir
+     */
+    virtual int CalcDrawingStemDir(FunctorParams *functorParams);
 
 private:
     //

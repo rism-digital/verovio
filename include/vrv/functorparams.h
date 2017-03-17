@@ -351,6 +351,23 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CalcDrawingStemDirParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the doc
+ **/
+
+class CalcDrawingStemDirParams : public FunctorParams {
+public:
+    CalcDrawingStemDirParams(Doc *doc)
+    {
+        m_doc = doc;
+    }
+    Doc *m_doc;
+};
+    
+//----------------------------------------------------------------------------
 // CalcMaxMeasureDurationParams
 //----------------------------------------------------------------------------
 

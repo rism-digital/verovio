@@ -26,6 +26,7 @@ enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
 /**
  * Class for storing drawing parameters when calculating beams.
  * See View::DrawBeam and View::CalcBeam
+ * This could be turned into a BeamDrawingInterface
  */
 
 class BeamDrawingParams {
@@ -38,6 +39,8 @@ public:
     virtual ~BeamDrawingParams() {}
     
     void Reset();
+    
+    void CalcBeam(Layer *layer, Staff *staff, Doc *doc, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount);
     
     // values to be set before calling CalcBeam
     bool m_changingDur;
@@ -95,6 +98,15 @@ public:
      *
      */
     const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; }
+    
+    //----------//
+    // Functors //
+    //----------//
+    
+    /**
+     * See Object::CalcDrawingStemDir
+     */
+    virtual int CalcDrawingStemDir(FunctorParams *functorParams);
 
 protected:
     /**

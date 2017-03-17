@@ -133,6 +133,10 @@ void Page::LayOutHorizontally()
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
+    CalcDrawingStemDirParams calcDrawingStemDirParams(doc);
+    Functor calcDrawingStemDir(&Object::CalcDrawingStemDir);
+    this->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
+    
     // Render it for filling the bounding box
     BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     // Do not do the layout in this view - otherwise we will loop...

@@ -9,14 +9,20 @@
 
 //----------------------------------------------------------------------------
 
-#include "assert.h"
+#include <assert.h>
+#include <math.h>
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
+#include "functorparams.h"
+#include "layer.h"
 #include "note.h"
 #include "rest.h"
+#include "smufl.h"
+#include "staff.h"
 #include "tuplet.h"
 #include "vrv.h"
 
@@ -41,6 +47,252 @@ void BeamDrawingParams::Reset()
     m_cueSize = false;
     m_shortestDur = 0;
     m_stemDir = STEMDIRECTION_NONE;
+}
+    
+    
+void BeamDrawingParams::CalcBeam(
+              Layer *layer, Staff *staff, Doc *doc, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount)
+{
+    assert(layer);
+    assert(staff);
+    assert(doc);
+    
+    int y1, y2, avgY, high, low, verticalCenter, verticalShift;
+    double xr, verticalShiftFactor;
+    
+    // loop
+    int i;
+    
+    // position x for the stem (normal and cue-sized)
+    int stemX[2];
+    
+    // For slope calculation and linear regression
+    double s_x = 0.0; // sum of all x(n) for n in beamElementCoord
+    double s_y = 0.0; // sum of all y(n)
+    double s_xy = 0.0; // sum of (x(n) * y(n))
+    double s_x2 = 0.0; // sum of all x(n)^2
+    double s_y2 = 0.0; // sum of all y(n)^2
+    
+    /******************************************************************/
+    // initialization
+    
+    for (i = 0; i < elementCount; i++) {
+        (*beamElementCoords).at(i)->m_x = (*beamElementCoords).at(i)->m_element->GetDrawingX();
+    }
+    
+    avgY = 0;
+    high = VRV_UNSET;
+    low = -VRV_UNSET;
+    this->m_verticalBoost = 0.0;
+    
+    verticalShiftFactor = 3.0;
+    verticalCenter = staff->GetDrawingY()
+    - (doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2); // center point of the staff
+    
+    int last = elementCount - 1;
+    
+    // x-offset values for stem bases, dx[y] where y = element->m_cueSize
+    stemX[0] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false) / 2
+    - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    stemX[1] = doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true) / 2
+    - (doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
+    
+    /******************************************************************/
+    // Calculate the extreme values
+    
+    int yMax = 0, yMin = 0;
+    int curY;
+    // elementCount holds the last one
+    for (i = 0; i < elementCount; i++) {
+        
+        if ((*beamElementCoords).at(i)->m_element->Is(CHORD)) {
+            Chord *chord = dynamic_cast<Chord *>((*beamElementCoords).at(i)->m_element);
+            assert(chord);
+            chord->GetYExtremes(yMax, yMin);
+            (*beamElementCoords).at(i)->m_yTop = yMax;
+            (*beamElementCoords).at(i)->m_yBottom = yMin;
+            
+            avgY += ((yMax + yMin) / 2);
+            
+            // highest and lowest value;
+            high = std::max(yMax, high);
+            low = std::min(yMin, low);
+        }
+        else {
+            (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_element->GetDrawingY();
+            
+            // highest and lowest value;
+            high = std::max((*beamElementCoords).at(i)->m_y, high);
+            low = std::min((*beamElementCoords).at(i)->m_y, low);
+            
+            curY = (*beamElementCoords).at(i)->m_element->GetDrawingY();
+            (*beamElementCoords).at(i)->m_yTop = curY;
+            (*beamElementCoords).at(i)->m_yBottom = curY;
+            avgY += (*beamElementCoords).at(i)->m_y;
+        }
+    }
+    
+    /******************************************************************/
+    // Set the stem direction
+    
+    // yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
+    avgY /= elementCount;
+    
+    // If we have one stem direction in the beam, then don't look at the layer
+    if (this->m_stemDir == STEMDIRECTION_NONE)
+        this->m_stemDir = layer->GetDrawingStemDir(); // force layer direction if it exists
+    
+    // Automatic stem direction if nothing in the notes or in the layer
+    if (this->m_stemDir == STEMDIRECTION_NONE) {
+        /*if (this->m_beamHasChord)
+         this->m_stemDir = (yExtreme < verticalCenter)
+         ? STEMDIRECTION_up
+         : STEMDIRECTION_down; // if it has a chord, go by the most extreme position
+         else */
+        this->m_stemDir
+        = (avgY < verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down; // otherwise go by average
+    }
+    
+    if (this->m_stemDir == STEMDIRECTION_up) { // set stem direction for all the notes
+        for (i = 0; i < elementCount; i++) {
+            (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_yTop;
+        }
+    }
+    else {
+        for (i = 0; i < elementCount; i++) {
+            (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_yBottom;
+        }
+    }
+    
+    this->m_beamWidthBlack = doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, this->m_cueSize);
+    this->m_beamWidthWhite = doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, this->m_cueSize);
+    this->m_beamWidth = this->m_beamWidthBlack + this->m_beamWidthWhite;
+    
+    /******************************************************************/
+    // Calculate the slope doing a linear regression
+    
+    // The vertical shift depends on the shortestDur value we have in the beam
+    verticalShift = ((this->m_shortestDur - DUR_8) * (this->m_beamWidth));
+    
+    // if the beam has smaller-size notes
+    if ((*beamElementCoords).at(last)->m_element->IsCueSize()) {
+        verticalShift += doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
+    }
+    else {
+        verticalShift += (this->m_shortestDur > DUR_8)
+        ? doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * verticalShiftFactor
+        : doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (verticalShiftFactor + 0.5);
+    }
+    
+    // swap x position and verticalShift direction with stem down
+    if (this->m_stemDir == STEMDIRECTION_down) {
+        stemX[0] = -stemX[0];
+        stemX[1] = -stemX[1];
+        verticalShift = -verticalShift;
+    }
+    
+    for (i = 0; i < elementCount; i++) {
+        // change the stem dir for all objects
+        if ((*beamElementCoords).at(i)->m_element->Is(NOTE)) {
+            ((Note *)(*beamElementCoords).at(i)->m_element)->SetDrawingStemDir(this->m_stemDir);
+        }
+        else if ((*beamElementCoords).at(i)->m_element->Is(CHORD)) {
+            ((Chord *)(*beamElementCoords).at(i)->m_element)->SetDrawingStemDir(this->m_stemDir);
+        }
+        
+        (*beamElementCoords).at(i)->m_yBeam = (*beamElementCoords).at(i)->m_y + verticalShift;
+        (*beamElementCoords).at(i)->m_x += stemX[this->m_cueSize];
+        
+        s_y += (*beamElementCoords).at(i)->m_yBeam;
+        s_y2 += (*beamElementCoords).at(i)->m_yBeam * (*beamElementCoords).at(i)->m_yBeam;
+        s_x += (*beamElementCoords).at(i)->m_x;
+        s_x2 += (*beamElementCoords).at(i)->m_x * (*beamElementCoords).at(i)->m_x;
+        s_xy += (*beamElementCoords).at(i)->m_x * (*beamElementCoords).at(i)->m_yBeam;
+    }
+    
+    y1 = elementCount * s_xy - s_x * s_y;
+    xr = elementCount * s_x2 - s_x * s_x;
+    
+    // Prevent division by 0
+    if (y1 && xr) {
+        this->m_beamSlope = y1 / xr;
+    }
+    else {
+        this->m_beamSlope = 0.0;
+    }
+    
+    /* Correction esthetique : */
+    if (fabs(this->m_beamSlope) < doc->m_drawingBeamMinSlope) this->m_beamSlope = 0.0;
+    if (fabs(this->m_beamSlope) > doc->m_drawingBeamMaxSlope)
+        this->m_beamSlope = (this->m_beamSlope > 0) ? doc->m_drawingBeamMaxSlope : -doc->m_drawingBeamMaxSlope;
+    /* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
+    
+    this->m_startingY = (s_y - this->m_beamSlope * s_x) / elementCount;
+    
+    /******************************************************************/
+    // Calculate the stem lengths
+    
+    // first check that the stem length is long enough (to be improved?)
+    double oldYPos; // holds y position before calculation to determine if beam needs extra height
+    double expectedY;
+    for (i = 0; i < elementCount; i++) {
+        oldYPos = (*beamElementCoords).at(i)->m_yBeam;
+        expectedY
+        = this->m_startingY + this->m_verticalBoost + this->m_beamSlope * (*beamElementCoords).at(i)->m_x;
+        
+        // if the stem is not long enough, add extra stem length needed to all members of the beam
+        if ((this->m_stemDir == STEMDIRECTION_up && (oldYPos > expectedY))
+            || (this->m_stemDir == STEMDIRECTION_down && (oldYPos < expectedY))) {
+            this->m_verticalBoost += oldYPos - expectedY;
+        }
+    }
+    for (i = 0; i < elementCount; i++) {
+        (*beamElementCoords).at(i)->m_yBeam
+        = this->m_startingY + this->m_verticalBoost + this->m_beamSlope * (*beamElementCoords).at(i)->m_x;
+    }
+    
+    // then check that the stem length reaches the center for the staff
+    double minDistToCenter = -VRV_UNSET;
+    for (i = 0; i < elementCount; i++) {
+        if ((this->m_stemDir == STEMDIRECTION_up)
+            && ((*beamElementCoords).at(i)->m_yBeam - verticalCenter < minDistToCenter)) {
+            minDistToCenter = (*beamElementCoords).at(i)->m_yBeam - verticalCenter;
+        }
+        else if ((this->m_stemDir == STEMDIRECTION_down)
+                 && (verticalCenter - (*beamElementCoords).at(i)->m_yBeam < minDistToCenter)) {
+            minDistToCenter = verticalCenter - (*beamElementCoords).at(i)->m_yBeam;
+        }
+    }
+    minDistToCenter += (this->m_beamWidthBlack / 2) + doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
+    if (minDistToCenter < 0) {
+        this->m_startingY += (this->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
+        for (i = 0; i < elementCount; i++) {
+            (*beamElementCoords).at(i)->m_yBeam
+            += (this->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
+        }
+    }
+    
+    for (i = 0; i < elementCount; i++) {
+        if (this->m_stemDir == STEMDIRECTION_up) {
+            y1 = (*beamElementCoords).at(i)->m_yBeam - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            y2 = (*beamElementCoords).at(i)->m_yBottom + doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
+        }
+        else {
+            y1 = (*beamElementCoords).at(i)->m_yBeam + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+            y2 = (*beamElementCoords).at(i)->m_yTop - doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
+        }
+        
+        // All notes and chords get their stem value stored
+        LayerElement *el = (*beamElementCoords).at(i)->m_element;
+        if ((el->Is(NOTE)) || (el->Is(CHORD))) {
+            StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
+            assert(interface);
+            
+            interface->SetDrawingStemDir(this->m_stemDir);
+            interface->SetDrawingStemStart(Point((*beamElementCoords).at(i)->m_x, y2));
+            interface->SetDrawingStemEnd(Point((*beamElementCoords).at(i)->m_x, y1));
+        }
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -310,6 +562,35 @@ void Beam::ClearCoords()
 BeamElementCoord::~BeamElementCoord()
 {
     if (m_element) m_element->m_beamElementCoord = NULL;
+}
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int Beam::CalcDrawingStemDir(FunctorParams *functorParams)
+{
+    CalcDrawingStemDirParams *params = dynamic_cast<CalcDrawingStemDirParams *>(functorParams);
+    assert(params);
+    
+    ListOfObjects *beamChildren = this->GetList(this);
+    
+    // Should we assert this at the beginning?
+    if (beamChildren->empty()) {
+        return FUNCTOR_CONTINUE;
+    }
+    const ArrayOfBeamElementCoords *beamElementCoords = this->GetElementCoords();
+    
+    int elementCount = (int)beamChildren->size();
+    
+    Layer *layer = dynamic_cast<Layer*>(this->GetFirstParent(LAYER));
+    assert(layer);
+    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+    assert(staff);
+    
+    this->m_drawingParams.CalcBeam(layer, staff, params->m_doc, beamElementCoords, elementCount);
+    
+    return FUNCTOR_CONTINUE;
 }
 
 } // namespace vrv

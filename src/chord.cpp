@@ -251,10 +251,7 @@ void Chord::GetYExtremes(int &yMax, int &yMin)
 }
     
 void Chord::GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow)
-{
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
-    
+{    
     staffAbove = NULL;
     staffBelow = NULL;
 
@@ -337,6 +334,11 @@ void Chord::SetDrawingStemEnd(Point stemEnd)
 // Functors methods
 //----------------------------------------------------------------------------
 
+int Chord::CalcDrawingStemDir(FunctorParams *functorParams)
+{
+  
+    return FUNCTOR_CONTINUE;
+}
     
 int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 {

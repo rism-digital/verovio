@@ -544,6 +544,16 @@ public:
      * Looks at the time difference from the previous Alignment.
      */
     virtual int SetAlignmentXPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     */
+    virtual int SetAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * Set the drawing stems positions, including for beams.
+     */
+    virtual int CalcDrawingStemDir(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
@@ -784,11 +794,6 @@ public:
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
     virtual int ResetDrawing(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
-     */
-    virtual int SetAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 

@@ -106,6 +106,11 @@ public:
     //----------//
     // Functors //
     //----------//
+                 
+     /**
+      * See Object::CalcDrawingStemDir
+      */
+     virtual int CalcDrawingStemDir(FunctorParams *functorParams);
 
     /**
     * See Object::PrepareLayerElementParts
