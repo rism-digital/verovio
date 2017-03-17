@@ -1828,6 +1828,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     assert(measure);
     assert(pedal);
 
+    // Cannot draw a pedal that has no start position
     if (!pedal->GetStart()) return;
 
     dc->StartGraphic(pedal, "", pedal->GetUuid());
@@ -1867,6 +1868,9 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     assert(system);
     assert(measure);
     assert(tempo);
+    
+    // Cannot draw a tempo that has no start position
+    if (!tempo->GetStart()) return;
 
     dc->StartGraphic(tempo, "", tempo->GetUuid());
 

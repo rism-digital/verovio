@@ -319,8 +319,9 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
         return UNKNOWN;
     }
 
-    // Assume that the input is DARMS if other input types were not detected.
-    return DARMS;
+    // Assume that the input is MEI if other input types were not detected.
+    // This means that DARMS cannot be auto detected.
+    return MEI;
 }
 
 bool Toolkit::SetFont(std::string const &font)

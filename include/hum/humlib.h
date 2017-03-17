@@ -1,7 +1,7 @@
 //
 // Programmer:    Craig Stuart Sapp <craig@ccrma.stanford.edu>
 // Creation Date: Sat Aug  8 12:24:49 PDT 2015
-// Last Modified: Tue Jan 24 05:36:04 PST 2017
+// Last Modified: Mon Feb 27 21:12:02 PST 2017
 // Filename:      humlib.h
 // URL:           https://github.com/craigsapp/humlib/blob/master/include/humlib.h
 // Syntax:        C++11
@@ -74,7 +74,6 @@ using std::stringstream;
 using std::to_string;
 using std::vector;
 
-#define USING_URI 1
 #ifdef USING_URI
 	#include <sys/types.h>   /* socket, connect */
 	#include <sys/socket.h>  /* socket, connect */
@@ -1147,8 +1146,8 @@ class HumdrumToken : public string, public HumHash {
 		void     setParameters             (HTp ptok);
 		void     setParameters             (const string& pdata, HTp ptok = NULL);
 		int      getStrandIndex            (void) const;
-		int      getSlurStartElisionLevel  (void) const;
-		int      getSlurEndElisionLevel    (void) const;
+		int      getSlurStartElisionLevel  (int index = 0) const;
+		int      getSlurEndElisionLevel    (int index = 0) const;
 		HTp      getSlurStartToken         (int number = 0);
 		HTp      getSlurEndToken           (int number = 0);
 		ostream& printCsv                  (ostream& out = cout);
@@ -2385,6 +2384,7 @@ class Convert {
 		static int     transToBase40        (const string& input);
 		static int     base40IntervalToLineOfFifths(int trans);
 		static string  keyNumberToKern      (int number);
+		static int     base7ToBase40        (int base7);
 
 		// data-type specific (other than pitch/rhythm),
 		// defined in Convert-kern.cpp
@@ -2393,8 +2393,8 @@ class Convert {
 		static bool isKernNoteAttack        (const string& kerndata);
 		static bool hasKernSlurStart        (const string& kerndata);
 		static bool hasKernSlurEnd          (const string& kerndata);
-		static int  getKernSlurStartElisionLevel(const string& kerndata);
-		static int  getKernSlurEndElisionLevel  (const string& kerndata);
+		static int  getKernSlurStartElisionLevel(const string& kerndata, int index);
+		static int  getKernSlurEndElisionLevel  (const string& kerndata, int index);
 
 		static bool isKernSecondaryTiedNote (const string& kerndata);
 		static string getKernPitchAttributes(const string& kerndata);

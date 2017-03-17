@@ -1187,15 +1187,10 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         // we assume /note without /type to be mRest
         else if (typeStr.empty() || HasAttributeWithValue(rest.node(), "measure", "yes")) {
             MRest *mRest = new MRest();
+            element = mRest;
             if (cue) mRest->SetSize(SIZE_cue);
             if (!stepStr.empty()) mRest->SetPloc(ConvertStepToPitchName(stepStr));
             if (!octaveStr.empty()) mRest->SetOloc(atoi(octaveStr.c_str()));
-            if (notations.node().select_single_node("fermata")) {
-                if (HasAttributeWithValue(notations.node().select_single_node("fermata").node(), "type", "inverted"))
-                    mRest->SetFermata(PLACE_below);
-                else
-                    mRest->SetFermata(PLACE_above);
-            }
             AddLayerElement(layer, mRest);
         }
         else {
@@ -1430,7 +1425,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
     }
 
     // element will be NULL in case of mRest
-    if (!element) return;
+    // if (!element) return;
 
     m_ID = "#" + element->GetUuid();
 
