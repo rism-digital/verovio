@@ -149,7 +149,7 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     if (gClass.length() > 0) {
         baseClass.append(" " + gClass);
     }
-    
+
     if (object->HasAttClass(ATT_TYPED)) {
         AttTyped *att = dynamic_cast<AttTyped *>(object);
         assert(att);
@@ -169,9 +169,9 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     if (object->Is(STAFF)) {
         Staff *staff = dynamic_cast<Staff *>(object);
         assert(staff);
-        
+
         assert(staff->m_drawingStaffDef);
-        
+
         std::string styleStr;
         if (staff->m_drawingStaffDef->HasLyricFam()) {
             styleStr.append("font-family:" + staff->m_drawingStaffDef->GetLyricFam() + ";");
@@ -180,14 +180,16 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
             styleStr.append("font-family:" + staff->m_drawingStaffDef->GetLyricName() + ";");
         }
         if (staff->m_drawingStaffDef->HasLyricStyle()) {
-            styleStr.append("font-style:" + staff->AttCommon::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
+            styleStr.append(
+                "font-style:" + staff->AttCommon::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
         }
         if (staff->m_drawingStaffDef->HasLyricWeight()) {
-            styleStr.append("font-weight:" + staff->AttCommon::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
+            styleStr.append(
+                "font-weight:" + staff->AttCommon::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
         }
         if (!styleStr.empty()) m_currentNode.append_attribute("style") = styleStr.c_str();
     }
-    
+
     if (object->HasAttClass(ATT_COLOR)) {
         AttColor *att = dynamic_cast<AttColor *>(object);
         assert(att);
@@ -209,8 +211,12 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         AttTypography *att = dynamic_cast<AttTypography *>(object);
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
-        if (att->HasFontstyle()) m_currentNode.append_attribute("font-style") = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
-        if (att->HasFontweight()) m_currentNode.append_attribute("font-weight") = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
+        if (att->HasFontstyle())
+            m_currentNode.append_attribute("font-style")
+                = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+        if (att->HasFontweight())
+            m_currentNode.append_attribute("font-weight")
+                = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
     }
 
     if (object->HasAttClass(ATT_VISIBILITY)) {
@@ -258,8 +264,12 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         AttTypography *att = dynamic_cast<AttTypography *>(object);
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
-        if (att->HasFontstyle()) m_currentNode.append_attribute("font-style") = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
-        if (att->HasFontweight()) m_currentNode.append_attribute("font-weight") = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
+        if (att->HasFontstyle())
+            m_currentNode.append_attribute("font-style")
+                = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+        if (att->HasFontweight())
+            m_currentNode.append_attribute("font-weight")
+                = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
     }
 }
 

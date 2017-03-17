@@ -89,7 +89,7 @@ void Staff::AddChild(Object *child)
 int Staff::GetDrawingY() const
 {
     if (!m_staffAlignment) return 0;
-    
+
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
 
     System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));

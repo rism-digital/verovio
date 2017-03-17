@@ -112,18 +112,18 @@ public:
      * Only Note or Chord elements will be actually added to the fTrem.
      */
     virtual void AddChild(Object *object);
-    
+
     /**
      * Initializes the m_beamElementCoords vector objects.
      * This is called by FTrem::FilterList
      */
     void InitCoords(ListOfObjects *childList);
-    
+
     /**
      * Clear the m_beamElementCoords vector and delete all the objects.
      */
     void ClearCoords();
-    
+
     /**
      *
      */
@@ -140,6 +140,7 @@ protected:
 public:
     /** */
     BeamDrawingParams m_drawingParams;
+
 private:
     /**
      * An array of coordinates for each element

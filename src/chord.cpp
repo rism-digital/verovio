@@ -239,33 +239,33 @@ void Chord::GetYExtremes(int &yMax, int &yMin)
 {
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
-    
+
     // The first note is the bottom
     yMin = childList->front()->GetDrawingY();
     // The last note is the top
     yMax = childList->back()->GetDrawingY();
 }
-    
+
 void Chord::GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow)
 {
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
-    
+
     staffAbove = NULL;
     staffBelow = NULL;
 
     // We assume that we have a cross-staff chord we cannot have further cross-staffed notes
     if (m_crossStaff) return;
-    
+
     // The first note is the bottom
-    Note *bottomNote = dynamic_cast<Note*>(childList->front());
+    Note *bottomNote = dynamic_cast<Note *>(childList->front());
     assert(bottomNote);
     if (bottomNote->m_crossStaff && bottomNote->m_crossLayer) {
         staffBelow = bottomNote->m_crossStaff;
     }
-    
+
     // The last note is the top
-    Note *topNote = dynamic_cast<Note*>(childList->back());
+    Note *topNote = dynamic_cast<Note *>(childList->back());
     assert(topNote);
     if (topNote->m_crossStaff && topNote->m_crossLayer) {
         staffAbove = topNote->m_crossStaff;
