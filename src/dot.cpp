@@ -58,7 +58,7 @@ int Dot::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
-    
+
     this->m_drawingNote = NULL;
     return FUNCTOR_CONTINUE;
 };

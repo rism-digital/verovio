@@ -15,8 +15,8 @@
 //----------------------------------------------------------------------------
 
 #include "artic.h"
-#include "elementpart.h"
 #include "editorial.h"
+#include "elementpart.h"
 #include "functorparams.h"
 #include "note.h"
 #include "vrv.h"
@@ -243,28 +243,28 @@ void Chord::GetYExtremes(int &yMax, int &yMin)
 {
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
-    
+
     // The first note is the bottom
     yMin = childList->front()->GetDrawingY();
     // The last note is the top
     yMax = childList->back()->GetDrawingY();
 }
-    
+
 void Chord::GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow)
-{    
+{
     staffAbove = NULL;
     staffBelow = NULL;
 
     // We assume that we have a cross-staff chord we cannot have further cross-staffed notes
     if (m_crossStaff) return;
-    
+
     // The first note is the bottom
     Note *bottomNote = this->GetBottomNote();
     assert(bottomNote);
     if (bottomNote->m_crossStaff && bottomNote->m_crossLayer) {
         staffBelow = bottomNote->m_crossStaff;
     }
-    
+
     // The last note is the top
     Note *topNote = this->GetTopNote();
     assert(topNote);
@@ -272,13 +272,13 @@ void Chord::GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow)
         staffAbove = topNote->m_crossStaff;
     }
 }
-    
+
 Note *Chord::GetTopNote()
 {
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized
     assert(childList->size() > 0);
-    
-    Note *topNote = dynamic_cast<Note*>(childList->back());
+
+    Note *topNote = dynamic_cast<Note *>(childList->back());
     assert(topNote);
     return topNote;
 }
@@ -289,7 +289,7 @@ Note *Chord::GetBottomNote()
     assert(childList->size() > 0);
 
     // The first note is the bottom
-    Note *bottomNote = dynamic_cast<Note*>(childList->front());
+    Note *bottomNote = dynamic_cast<Note *>(childList->front());
     assert(bottomNote);
     return bottomNote;
 }
@@ -336,18 +336,17 @@ void Chord::SetDrawingStemEnd(Point stemEnd)
 
 int Chord::CalcDrawingStemDir(FunctorParams *functorParams)
 {
-  
+
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    SetDrawingStem(dynamic_cast<Stem*>(this->FindChildByType(STEM)));
-    
+    SetDrawingStem(dynamic_cast<Stem *>(this->FindChildByType(STEM)));
+
     return FUNCTOR_CONTINUE;
 };
 
-    
 int Chord::PrepareTieAttr(FunctorParams *functorParams)
 {
     PrepareTieAttrParams *params = dynamic_cast<PrepareTieAttrParams *>(functorParams);
@@ -369,15 +368,13 @@ int Chord::PrepareTieAttrEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
-    
+
 int Chord::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
-    
+
     this->ResetDrawingStem();
     return FUNCTOR_CONTINUE;
 };
-
 }

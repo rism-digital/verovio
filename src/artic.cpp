@@ -263,16 +263,16 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
 {
     AdjustArticParams *params = dynamic_cast<AdjustArticParams *>(functorParams);
     assert(params);
-    
+
     /************** Get the parent and the stem direction **************/
-    
+
     LayerElement *parent = NULL;
     Note *parentNote = NULL;
     Chord *parentChord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD));
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
     data_STAFFREL place = STAFFREL_NONE;
     bool drawingCueSize = false;
-    
+
     if (!parentChord) {
         parentNote = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         parent = parentNote;
@@ -280,24 +280,24 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     else {
         parent = parentChord;
     }
-    
+
     if (!parentChord && !parentNote) {
         // no parent chord or note, nothing we can do...
         return FUNCTOR_CONTINUE;
     }
-    
+
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
     Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
     assert(layer);
-    
+
     stemDir = parentNote ? parentNote->GetDrawingStemDir() : parentChord->GetDrawingStemDir();
     drawingCueSize = parent->IsCueSize();
-    
+
     /************** placement **************/
-    
+
     bool allowAbove = true;
-    
+
     // for now we ignore within @place
     if (this->HasPlace() && (this->GetPlace() != STAFFREL_within)) {
         place = this->GetPlace();
@@ -313,28 +313,29 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         place = STAFFREL_below;
     else
         place = STAFFREL_above;
-    
+
     /************** set it to both the inside and outside part **************/
-    
+
     ArticPart *insidePart = this->GetInsidePart();
     ArticPart *outsidePart = this->GetOutsidePart();
-    
+
     if (insidePart) {
         insidePart->SetPlace(place);
     }
-    
+
     if (outsidePart) {
         // If allowAbove is true it will place the above if the content requires so (even if place below if given)
         if (place == STAFFREL_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_above;
         outsidePart->SetPlace(place);
     }
-    
+
     /************** calculate the y position **************/
-    
+
     Staff *staffAbove = NULL;
     Staff *staffBelow = NULL;
-    
-    // Cross-staff handling of articulation will need to be re-thought. We can look at assiging a cross-staff to the appropriate ArticPart
+
+    // Cross-staff handling of articulation will need to be re-thought. We can look at assiging a cross-staff to the
+    // appropriate ArticPart
     // (see below) - For chords, we need to distinguish cross-staff chords and cross-staff chord notes
     if (parent->m_crossStaff && parent->m_crossLayer) {
         staff = parent->m_crossStaff;
@@ -344,17 +345,18 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     else if (parentChord) {
         parentChord->GetCrossStaffExtemes(staffAbove, staffBelow);
     }
-    
-    int staffYBottom = - params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+
+    int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
     // Avoid in artic to be in legder lines
-    int yInAbove
-    = std::max(parent->GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), staffYBottom);
+    int yInAbove = std::max(
+        parent->GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), staffYBottom);
     int yInBelow
-    = std::min(parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), 0);
+        = std::min(parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), 0);
     int yOutAbove = std::max(yInAbove, 0);
     int yOutBelow = std::min(yInBelow, staffYBottom);
 
-    // Does not work properly with chords, needs rethinking - It might be better to make artic or articPart relative to notes
+    // Does not work properly with chords, needs rethinking - It might be better to make artic or articPart relative to
+    // notes
     // The problem is that in MEI artic are children of chord element and not of the notes
     if (insidePart) {
         if (insidePart->GetPlace() == STAFFREL_above) {
@@ -366,7 +368,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
             insidePart->m_crossStaff = staffBelow;
         }
     }
-    
+
     if (outsidePart) {
         if (outsidePart->GetPlace() == STAFFREL_above) {
             outsidePart->SetDrawingYRel(yOutAbove);
@@ -378,7 +380,8 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         }
     }
 
-    // If we have both an inside and outside part we need to move the outside part away when they are both on the same side
+    // If we have both an inside and outside part we need to move the outside part away when they are both on the same
+    // side
     if (insidePart && outsidePart) {
 
         int margin = params->m_doc->GetTopMargin(insidePart->GetClassId())
@@ -428,7 +431,7 @@ int Artic::ResetDrawing(FunctorParams *functorParams)
 {
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
-    
+
     // Remove all ArticPart children
     ClearChildren();
 

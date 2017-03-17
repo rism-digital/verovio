@@ -253,7 +253,7 @@ void Doc::PrepareDrawing()
     // Prepare the drawing cue size
     Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
     this->Process(&prepareDrawingCueSize, NULL);
-    
+
     // Prepare the cross-staff pointers
     PrepareCrossStaffParams prepareCrossStaffParams;
     Functor prepareCrossStaff(&Object::PrepareCrossStaff);
@@ -484,7 +484,7 @@ void Doc::CastOffDoc()
 
     // Here we redo the alignment because of the new scoreDefs
     // We can actually optimise this and have a custom version that does not redo all the calculation
-    //contentPage->LayOutHorizontally();
+    // contentPage->LayOutHorizontally();
 
     contentPage->LayOutVertically();
 

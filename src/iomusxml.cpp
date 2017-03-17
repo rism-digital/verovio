@@ -1217,7 +1217,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
         note->AddChild(stem);
         NoteHead *noteHead = new NoteHead();
         note->AddChild(noteHead);
-        
+
         element = note;
         note->SetVisible(ConvertWordToBool(GetAttributeValue(node, "print-object")));
         if (!noteColor.empty()) note->SetColor(noteColor.c_str());
@@ -1285,7 +1285,7 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
                 chord->AddChild(cstem);
                 NoteHead *cnoteHead = new NoteHead();
                 chord->AddChild(cnoteHead);
-                
+
                 chord->SetDur(ConvertTypeToDur(typeStr));
                 if (dots > 0) chord->SetDots(dots);
                 cstem->SetStemDir(stemDir);

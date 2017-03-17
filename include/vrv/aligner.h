@@ -294,7 +294,7 @@ public:
      * Override the method of adding AlignmentReference children
      */
     virtual void AddChild(Object *object);
-    
+
     /**
      * @name Set and get the xRel value of the alignment
      */
@@ -403,7 +403,7 @@ private:
      * Retrieve the AlignmentReference with staffN.
      * Create and add it as child if not found.
      */
-     AlignmentReference *GetAlignmentReference(int staffN);
+    AlignmentReference *GetAlignmentReference(int staffN);
 
 public:
     //
@@ -441,7 +441,7 @@ private:
 
 /**
  * This class stores a references of LayerElements for a staff.
- * The staff identification (@n) is given by the attCommon and takes into accound 
+ * The staff identification (@n) is given by the attCommon and takes into accound
  * cross-staff situations.
  * Its children of the alignment are references.
  */
@@ -458,7 +458,7 @@ public:
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
-    
+
     /**
      * Override the method of adding AlignmentReference children
      */
@@ -695,7 +695,7 @@ public:
     int GetGraceGroupLeft(int staffN);
     int GetGraceGroupRight(int staffN);
     ///@{
-    
+
     /**
      * Set an linear defaut position for each grace note
      * This is called from the SetAlignmentXPos Functor.

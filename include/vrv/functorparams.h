@@ -360,13 +360,10 @@ public:
 
 class CalcDrawingStemDirParams : public FunctorParams {
 public:
-    CalcDrawingStemDirParams(Doc *doc)
-    {
-        m_doc = doc;
-    }
+    CalcDrawingStemDirParams(Doc *doc) { m_doc = doc; }
     Doc *m_doc;
 };
-    
+
 //----------------------------------------------------------------------------
 // CalcMaxMeasureDurationParams
 //----------------------------------------------------------------------------
@@ -785,7 +782,8 @@ public:
 
 class PrepareCrossStaffParams : public FunctorParams {
 public:
-    PrepareCrossStaffParams() {
+    PrepareCrossStaffParams()
+    {
         m_currentMeasure = NULL;
         m_currentCrossStaff = NULL;
         m_currentCrossLayer = NULL;

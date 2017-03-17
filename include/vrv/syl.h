@@ -45,7 +45,7 @@ public:
     virtual std::string GetClassName() const { return "Syl"; }
     virtual ClassId GetClassId() const { return SYL; }
     ///@}
-    
+
     /** Override the method since it is align to the staff */
     virtual bool IsRelativeToStaff() const { return true; }
 

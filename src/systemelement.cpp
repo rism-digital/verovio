@@ -26,7 +26,7 @@ SystemElement::SystemElement() : FloatingObject("se"), AttCommon(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
-    
+
     Reset();
 }
 
@@ -34,7 +34,7 @@ SystemElement::SystemElement(std::string classid) : FloatingObject(classid), Att
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
-    
+
     Reset();
 }
 

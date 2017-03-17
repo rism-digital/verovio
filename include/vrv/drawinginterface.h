@@ -20,7 +20,6 @@ namespace vrv {
 class Object;
 class Stem;
 
-
 //----------------------------------------------------------------------------
 // DrawingListInterface
 //----------------------------------------------------------------------------
@@ -175,11 +174,10 @@ public:
     virtual ~StemmedDrawingInterface();
     virtual void Reset();
     ///@}
-    
+
     void SetDrawingStem(Stem *stem);
     Stem *GetDrawingStem() const { return m_drawingStem; }
     void ResetDrawingStem();
-    
 
     /**
      * @name Set and get the stem direction and stem positions

@@ -53,7 +53,7 @@ public:
      * It typically set to false for mRest, mRpt, etc.
      */
     virtual bool HasToBeAligned() const { return false; }
-    
+
     /**
      * Return true if the element is relative to the staff and not to its parent.
      * It typically set to true for syl or artic.
@@ -135,7 +135,7 @@ public:
      * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff
      */
     Staff *GetCrossStaff() const;
-    
+
     /**
      * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)
      */
@@ -180,7 +180,7 @@ public:
      * See Object::AdjustXPos
      */
     virtual int AdjustXPos(FunctorParams *functorParams);
-    
+
     /**
      * See Object::PrepareDrawingCueSize
      */
@@ -226,7 +226,7 @@ public:
      * See Object::CalcMaxMeasureDuration
      */
     virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
-    
+
     /**
      * See Object::ResetDrawing
      */
@@ -270,8 +270,8 @@ protected:
     int m_drawingXRel;
 
 private:
-    /** 
-     * Indicates whether it is a ScoreDef or StaffDef attribute 
+    /**
+     * Indicates whether it is a ScoreDef or StaffDef attribute
      */
     ElementScoreDefRole m_scoreDefRole;
     /**

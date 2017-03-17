@@ -57,7 +57,7 @@ public:
     virtual int GetDrawingX() const = 0;
     virtual int GetDrawingY() const = 0;
     ///@}
-    
+
     /**
      * @name Reset the cached values of the drawingX and Y values.
      * Pure virtual methods.
@@ -153,7 +153,7 @@ private:
     bool m_updatedBBoxX;
     bool m_updatedBBoxY;
     ///@}
-    
+
     /**
      * Bounding box positions
      */
@@ -161,9 +161,9 @@ private:
     int m_contentBB_x1, m_contentBB_y1, m_contentBB_x2, m_contentBB_y2;
     int m_selfBB_x1, m_selfBB_y1, m_selfBB_x2, m_selfBB_y2;
     ///@}
-    
-    /** 
-     * Buffer for De-Casteljau algorithm 
+
+    /**
+     * Buffer for De-Casteljau algorithm
      */
     static int s_deCasteljau[4][4];
 

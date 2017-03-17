@@ -42,7 +42,7 @@ void DrawingListInterface::AddToDrawingList(Object *object)
         // someName not in name, add it
         m_drawingList.push_back(object);
     }
-    
+
     /*
     m_drawingList.push_back(object);
     m_drawingList.sort();
@@ -142,14 +142,14 @@ void StemmedDrawingInterface::Reset()
     m_drawingStemEnd = Point(0, 0);
     m_drawingStem = NULL;
 }
-    
+
 void StemmedDrawingInterface::SetDrawingStem(Stem *stem)
 {
     assert(!m_drawingStem);
-    
+
     m_drawingStem = stem;
 }
-    
+
 void StemmedDrawingInterface::ResetDrawingStem()
 {
     m_drawingStem = NULL;

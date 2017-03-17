@@ -1229,7 +1229,7 @@ void PaeInput::parseNote(pae::Note *note)
         assert(mnote);
         mnote->SetDur(DURATION_8);
         mnote->SetGrace(GRACE_acc);
-        Stem *stem = dynamic_cast<Stem*>(mnote->FindChildByType(STEM));
+        Stem *stem = dynamic_cast<Stem *>(mnote->FindChildByType(STEM));
         assert(stem);
         stem->SetStemDir(STEMDIRECTION_up);
     }
@@ -1238,7 +1238,7 @@ void PaeInput::parseNote(pae::Note *note)
         Note *mnote = dynamic_cast<Note *>(element);
         assert(mnote);
         mnote->SetGrace(GRACE_unacc);
-        Stem *stem = dynamic_cast<Stem*>(mnote->FindChildByType(STEM));
+        Stem *stem = dynamic_cast<Stem *>(mnote->FindChildByType(STEM));
         assert(stem);
         stem->SetStemDir(STEMDIRECTION_up);
     }

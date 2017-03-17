@@ -36,7 +36,8 @@ namespace vrv {
 // Measure
 //----------------------------------------------------------------------------
 
-Measure::Measure(bool measureMusic, int logMeasureNb) : Object("measure-"), AttCommon(), AttMeasureLog(), AttPointing(), AttTyped()
+Measure::Measure(bool measureMusic, int logMeasureNb)
+    : Object("measure-"), AttCommon(), AttMeasureLog(), AttPointing(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_MEASURELOG);
@@ -125,13 +126,13 @@ void Measure::AddChild(Object *child)
 int Measure::GetDrawingX() const
 {
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
-    
+
     System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
     assert(system);
     m_cachedDrawingX = system->GetDrawingX() + this->GetDrawingXRel();
     return m_cachedDrawingX;
 }
-    
+
 void Measure::SetDrawingXRel(int drawingXRel)
 {
     ResetCachedDrawingX();
@@ -352,7 +353,7 @@ int Measure::ResetHorizontalAlignment(FunctorParams *functorParams)
     if (m_measureAligner.GetRightAlignment()) {
         m_measureAligner.GetRightAlignment()->SetXRel(0);
     }
-    
+
     Functor resetHorizontalAlignment(&Object::ResetHorizontalAlignment);
     m_timestampAligner.Process(&resetHorizontalAlignment, NULL);
 
@@ -425,7 +426,7 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 {
     AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
     assert(params);
-    
+
     params->m_minPos = 0;
     params->m_upcomingMinPos = VRV_UNSET;
     params->m_cumulatedXShift = 0;
@@ -448,8 +449,8 @@ int Measure::AdjustXPos(FunctorParams *functorParams)
 
         m_measureAligner.Process(params->m_functor, params, params->m_functorEnd, &filters);
     }
-    
-    //m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
+
+    // m_measureAligner.Process(params->m_functor, params, params->m_functorEnd);
 
     int minMeasureWidth = params->m_doc->m_drawingMinMeasureWidth;
     // First try to see if we have a double measure length element

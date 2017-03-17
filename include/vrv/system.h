@@ -59,7 +59,7 @@ public:
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
     ///@}
-    
+
     /**
      * @name Get and set the X and Y drawing relative positions
      */
@@ -213,7 +213,7 @@ public:
     int m_drawingTotalWidth;
     int m_drawingJustifiableWidth;
     ///@}
-    
+
 protected:
     /**
      * The X relative position of the system.

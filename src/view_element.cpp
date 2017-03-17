@@ -241,8 +241,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->EndGraphic(element, this);
 }
 
-void View::DrawArtic(
-    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(element);
@@ -456,7 +455,7 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         Stem *stem = childNote->GetDrawingStem();
         drawingCueSize = childNote->IsCueSize();
         stemDir = childNote->GetDrawingStemDir();
-        stemMod =  stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
+        stemMod = stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
         stemPoint = childNote->GetDrawingStemStart();
     }
 
@@ -520,7 +519,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     Chord *chord = dynamic_cast<Chord *>(element);
     assert(chord);
-    
+
     if (chord->m_crossStaff) staff = chord->m_crossStaff;
 
     chord->ResetDrawingList();
@@ -884,7 +883,7 @@ void View::DrawDurationElement(DeviceContext *dc, LayerElement *element, Layer *
         dc->EndGraphic(element, this);
     }
 }
-    
+
 void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -892,7 +891,7 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(layer);
     assert(staff);
     assert(measure);
-    
+
     Flag *flag = dynamic_cast<Flag *>(element);
     assert(flag);
 }
@@ -1361,7 +1360,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
 
         Stem *stem = note->GetDrawingStem();
-        
+
         // Stemless note (@stem.len="0")
         if (stem && stem->HasStemLen() && stem->GetStemLen() == 0) {
             // Store the start and end values
@@ -1423,7 +1422,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         DrawFermataAttr(dc, element, layer, staff);
     }
 }
-    
+
 void View::DrawNoteHead(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
@@ -1431,10 +1430,10 @@ void View::DrawNoteHead(DeviceContext *dc, LayerElement *element, Layer *layer, 
     assert(layer);
     assert(staff);
     assert(measure);
-    
+
     NoteHead *noteHead = dynamic_cast<NoteHead *>(element);
     assert(noteHead);
-    
+
     int x = noteHead->GetDrawingX();
 }
 
@@ -1448,7 +1447,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
-    
+
     if (rest->m_crossStaff) staff = rest->m_crossStaff;
 
     bool drawingCueSize = rest->IsCueSize();
@@ -1501,7 +1500,7 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     assert(layer);
     assert(staff);
     assert(measure);
-    
+
     Stem *stem = dynamic_cast<Stem *>(element);
     assert(stem);
 }

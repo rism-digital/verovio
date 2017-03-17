@@ -106,17 +106,17 @@ public:
     //----------//
     // Functors //
     //----------//
-                 
-     /**
-      * See Object::CalcDrawingStemDir
-      */
-     virtual int CalcDrawingStemDir(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcDrawingStemDir
+     */
+    virtual int CalcDrawingStemDir(FunctorParams *functorParams);
 
     /**
     * See Object::PrepareLayerElementParts
     */
     virtual int PrepareLayerElementParts(FunctorParams *functorParams);
-                 
+
     /**
      * See Object::PrepareTieAttr
      */
@@ -163,8 +163,7 @@ private:
      */
     Tie *m_drawingTieAttr;
 };
-    
-    
+
 //----------------------------------------------------------------------------
 // DiatonicSort
 //----------------------------------------------------------------------------
@@ -175,10 +174,10 @@ private:
  * See Object::GetFirst or Object::GetNext
  */
 class DiatonicSort {
-    
+
 public:
     DiatonicSort() {}
-    
+
     bool operator()(const Object *first, const Object *second) const
     {
         const Note *n1 = dynamic_cast<const Note *>(first);
@@ -187,7 +186,6 @@ public:
         return (n1->GetDiatonicPitch() < n2->GetDiatonicPitch());
     }
 };
-
 
 } // namespace vrv
 

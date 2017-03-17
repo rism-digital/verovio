@@ -128,7 +128,7 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
-    
+
     /** Override the method since it is align to the staff */
     virtual bool IsRelativeToStaff() const { return true; }
 

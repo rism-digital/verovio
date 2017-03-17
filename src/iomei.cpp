@@ -630,11 +630,11 @@ void MeiOutput::WriteMeiSystem(pugi::xml_node currentNode, System *system)
     system->WriteCommon(currentNode);
     system->WriteTyped(currentNode);
 }
-    
+
 void MeiOutput::WriteSystemElement(pugi::xml_node currentNode, SystemElement *systemElement)
 {
     assert(systemElement);
-    
+
     WriteXmlId(currentNode, systemElement);
     systemElement->WriteCommon(currentNode);
     systemElement->WriteTyped(currentNode);
@@ -696,7 +696,7 @@ void MeiOutput::WriteMeiSb(pugi::xml_node currentNode, Sb *sb)
 void MeiOutput::WriteScoreDefElement(pugi::xml_node currentNode, ScoreDefElement *scoreDefElement)
 {
     assert(scoreDefElement);
-    
+
     WriteXmlId(currentNode, scoreDefElement);
     scoreDefElement->WriteCommon(currentNode);
     scoreDefElement->WriteTyped(currentNode);
@@ -753,7 +753,7 @@ void MeiOutput::WriteMeiMeasure(pugi::xml_node currentNode, Measure *measure)
 void MeiOutput::WriteControlElement(pugi::xml_node currentNode, ControlElement *controlElement)
 {
     assert(controlElement);
-    
+
     WriteXmlId(currentNode, controlElement);
     controlElement->WriteCommon(currentNode);
     controlElement->WriteTyped(currentNode);
@@ -1050,15 +1050,15 @@ void MeiOutput::WriteMeiDot(pugi::xml_node currentNode, Dot *dot)
 void MeiOutput::WriteMeiFlag(pugi::xml_node currentNode, Flag *flag)
 {
     assert(flag);
-    
+
     // Nothing to write if representing an attribute
     if (flag->IsAttribute()) {
         return;
     }
-    
+
     WriteLayerElement(currentNode, flag);
 }
-    
+
 void MeiOutput::WriteMeiFTrem(pugi::xml_node currentNode, FTrem *fTrem)
 {
     assert(fTrem);
@@ -1153,16 +1153,16 @@ void MeiOutput::WriteMeiNote(pugi::xml_node currentNode, Note *note)
     note->WriteTiepresent(currentNode);
     note->WriteVisibility(currentNode);
 }
-    
+
 void MeiOutput::WriteMeiNoteHead(pugi::xml_node currentNode, NoteHead *noteHead)
 {
     assert(noteHead);
-    
+
     // Nothing to write if representing an attribute
     if (noteHead->IsAttribute()) {
         return;
     }
-    
+
     WriteLayerElement(currentNode, noteHead);
 }
 
@@ -1191,18 +1191,18 @@ void MeiOutput::WriteMeiSpace(pugi::xml_node currentNode, Space *space)
     WriteLayerElement(currentNode, space);
     WriteDurationInterface(currentNode, space);
 }
-    
+
 void MeiOutput::WriteMeiStem(pugi::xml_node currentNode, Stem *stem)
 {
     assert(stem);
-    
+
     // Nothing to write if representing an attribute
     if (stem->IsAttribute()) {
         stem->WriteStems(currentNode);
         stem->WriteStemsCmn(currentNode);
         return;
     }
-    
+
     WriteLayerElement(currentNode, stem);
 }
 
@@ -1235,17 +1235,15 @@ void MeiOutput::WriteMeiSyl(pugi::xml_node currentNode, Syl *syl)
     syl->WriteTypography(currentNode);
     syl->WriteSylLog(currentNode);
 }
-    
-    
+
 void MeiOutput::WriteTextElement(pugi::xml_node currentNode, TextElement *textElement)
 {
     assert(textElement);
-    
+
     WriteXmlId(currentNode, textElement);
     textElement->WriteCommon(currentNode);
     textElement->WriteTyped(currentNode);
 }
-
 
 void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 {
@@ -1895,7 +1893,7 @@ bool MeiInput::ReadSystemElement(pugi::xml_node element, SystemElement *object)
     SetMeiUuid(element, object);
     object->ReadCommon(element);
     object->ReadTyped(element);
-    
+
     return true;
 }
 
@@ -2110,14 +2108,13 @@ bool MeiInput::ReadMeiBoundaryEnd(Object *parent, pugi::xml_node boundaryEnd)
     parent->AddChild(vrvBoundaryEnd);
     return true;
 }
-    
-    
+
 bool MeiInput::ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object)
 {
     SetMeiUuid(element, object);
     object->ReadCommon(element);
     object->ReadTyped(element);
-    
+
     return true;
 }
 
@@ -2329,7 +2326,7 @@ bool MeiInput::ReadControlElement(pugi::xml_node element, ControlElement *object
     SetMeiUuid(element, object);
     object->ReadCommon(element);
     object->ReadTyped(element);
-    
+
     return true;
 }
 
@@ -2798,12 +2795,12 @@ bool MeiInput::ReadMeiChord(Object *parent, pugi::xml_node chord)
         vrvArtic->SetArtic(artic.GetArtic());
         vrvChord->AddChild(vrvArtic);
     }
-    
+
     if ((vrvChord->GetDur() > DUR_4) && !vrvChord->IsInBeam()) {
         Flag *flag = new Flag();
         vrvChord->AddChild(flag);
     }
-    
+
     if (vrvChord->GetDur() > DUR_1) {
         Stem *stem = new Stem();
         stem->ReadStems(chord);
@@ -3007,12 +3004,11 @@ bool MeiInput::ReadMeiNote(Object *parent, pugi::xml_node note)
         vrvNote->AddChild(vrvAccid);
     }
 
-    
     if ((vrvNote->GetDur() > DUR_4) && !vrvNote->IsInBeam() && !vrvNote->IsChordTone()) {
         Flag *flag = new Flag();
         vrvNote->AddChild(flag);
     }
-    
+
     if ((vrvNote->GetDur() > DUR_1) && !vrvNote->IsChordTone()) {
         Stem *stem = new Stem();
         stem->ReadStems(note);
@@ -3138,14 +3134,13 @@ bool MeiInput::ReadMeiTextChildren(Object *parent, pugi::xml_node parentNode, Ob
     }
     return success;
 }
-    
-    
+
 bool MeiInput::ReadTextElement(pugi::xml_node element, TextElement *object)
 {
     SetMeiUuid(element, object);
     object->ReadCommon(element);
     object->ReadTyped(element);
-    
+
     return true;
 }
 

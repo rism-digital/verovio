@@ -15,7 +15,7 @@ namespace vrv {
 
 Flag::Flag() : LayerElement("flag-")
 {
-    
+
     Reset();
 }
 
@@ -34,7 +34,7 @@ void Flag::Reset()
 
 NoteHead::NoteHead() : LayerElement("notehead-")
 {
-    
+
     Reset();
     IsAttribute(true);
 }
@@ -47,7 +47,7 @@ void NoteHead::Reset()
 {
     LayerElement::Reset();
 }
-    
+
 //----------------------------------------------------------------------------
 // Stem
 //----------------------------------------------------------------------------
@@ -56,7 +56,7 @@ Stem::Stem() : LayerElement("stem-"), AttStems(), AttStemsCmn()
 {
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
- 
+
     Reset();
     IsAttribute(true);
 }

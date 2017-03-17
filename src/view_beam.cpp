@@ -64,7 +64,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
     const ArrayOfBeamElementCoords *beamElementCoords = beam->GetElementCoords();
-    
+
     int elementCount = (int)beamChildren->size();
     int last = elementCount - 1;
 
@@ -172,7 +172,8 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
 
         int fractBeamWidth
-            = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, beam->m_drawingParams.m_cueSize) * 7 / 10;
+            = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, beam->m_drawingParams.m_cueSize)
+            * 7 / 10;
 
         // loop
         while (testDur <= beam->m_drawingParams.m_shortestDur) {
@@ -244,14 +245,16 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 else if ((*beamElementCoords).at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_RIGHT) {
                     y1 = (*beamElementCoords).at(idx)->m_yBeam + barY;
                     int x2 = (*beamElementCoords).at(idx)->m_x + fractBeamWidth;
-                    y2 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY + beam->m_drawingParams.m_beamSlope * x2;
+                    y2 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY
+                        + beam->m_drawingParams.m_beamSlope * x2;
                     polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, (*beamElementCoords).at(idx)->m_x, y1, x2, y2, polygonHeight);
                 }
                 else if ((*beamElementCoords).at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_LEFT) {
                     y2 = (*beamElementCoords).at(idx)->m_yBeam + barY;
                     int x1 = (*beamElementCoords).at(idx)->m_x - fractBeamWidth;
-                    y1 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY + beam->m_drawingParams.m_beamSlope * x1;
+                    y1 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY
+                        + beam->m_drawingParams.m_beamSlope * x1;
                     polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, x1, y1, (*beamElementCoords).at(idx)->m_x, y2, polygonHeight);
                 }
@@ -272,10 +275,10 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(layer);
     assert(staff);
     assert(measure);
-    
+
     FTrem *fTrem = dynamic_cast<FTrem *>(element);
     assert(fTrem);
-    
+
     // temporary coordinates
     int x1, x2, y1, y2;
 
@@ -286,20 +289,20 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // loop
     int i, j;
-    
+
     /******************************************************************/
     // initialization
-    
+
     ListOfObjects *fTremChildren = fTrem->GetList(fTrem);
-    
+
     // Should we assert this at the beginning?
     if (fTremChildren->empty()) {
         return;
     }
     const ArrayOfBeamElementCoords *beamElementCoords = fTrem->GetElementCoords();
-    
+
     assert(beamElementCoords->size() == 2);
-    
+
     int elementCount = 2;
 
     BeamElementCoord *firstElement = (*beamElementCoords).at(0);
@@ -322,7 +325,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     /******************************************************************/
     // Draw the stems and the bars
-    
+
     // We look only at the first one for the duration since both are expected to be the same
     assert(dynamic_cast<AttDurationMusical *>(firstElement->m_element));
     int dur = (dynamic_cast<AttDurationMusical *>(firstElement->m_element))->GetDur();

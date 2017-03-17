@@ -34,11 +34,11 @@ public:
     virtual std::string GetClassName() const { return "Flag"; }
     virtual ClassId GetClassId() const { return FLAG; }
     ///@}
-    
+
     //----------//
     // Functors //
     //----------//
-    
+
 private:
     //
 public:
@@ -66,7 +66,7 @@ public:
     virtual std::string GetClassName() const { return "NoteHead"; }
     virtual ClassId GetClassId() const { return NOTEHEAD; }
     ///@}
-    
+
     //----------//
     // Functors //
     //----------//
@@ -77,8 +77,7 @@ public:
     //
 private:
 };
-    
-    
+
 //----------------------------------------------------------------------------
 // Stem
 //----------------------------------------------------------------------------
@@ -99,11 +98,11 @@ public:
     virtual std::string GetClassName() const { return "Stem"; }
     virtual ClassId GetClassId() const { return STEM; }
     ///@}
-    
+
     //----------//
     // Functors //
     //----------//
-    
+
 private:
     //
 public:

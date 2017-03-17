@@ -150,20 +150,21 @@ void FTrem::FilterList(ListOfObjects *childList)
         }
         iter++;
     }
-    
+
     InitCoords(childList);
 }
-    
+
 void FTrem::InitCoords(ListOfObjects *childList)
 {
     ClearCoords();
-    
+
     if (childList->empty()) {
         return;
     }
-    
+
     BeamElementCoord *firstElement = new BeamElementCoord;
-    BeamElementCoord *secondElement = new BeamElementCoord;;
+    BeamElementCoord *secondElement = new BeamElementCoord;
+    ;
     m_beamElementCoords.push_back(firstElement);
     m_beamElementCoords.push_back(secondElement);
 
@@ -179,7 +180,6 @@ void FTrem::InitCoords(ListOfObjects *childList)
     if (firstElement->m_element == secondElement->m_element) {
         return;
     }
-    
 
     this->m_drawingParams.m_changingDur = false;
     this->m_drawingParams.m_beamHasChord = false;
@@ -188,18 +188,18 @@ void FTrem::InitCoords(ListOfObjects *childList)
     // adjust beam->m_drawingParams.m_shortestDur depending on the number of slashes
     this->m_drawingParams.m_shortestDur = std::max(DUR_8, DUR_1 + this->GetSlash());
     this->m_drawingParams.m_stemDir = STEMDIRECTION_NONE;
-    
+
     if (firstElement->m_element->Is(CHORD)) {
         this->m_drawingParams.m_beamHasChord = true;
     }
     if (secondElement->m_element->Is(CHORD)) {
         this->m_drawingParams.m_beamHasChord = true;
     }
-    
+
     // For now look at the stemDir only on the first note
     assert(dynamic_cast<AttStems *>(firstElement->m_element));
     this->m_drawingParams.m_stemDir = (dynamic_cast<AttStems *>(firstElement->m_element))->GetStemDir();
-    
+
     // We look only at the first note for checking if cue-sized. Somehow arbitrarily
     this->m_drawingParams.m_cueSize = firstElement->m_element->IsCueSize();
 }
@@ -212,7 +212,7 @@ void FTrem::ClearCoords()
     }
     m_beamElementCoords.clear();
 }
-    
+
 //----------------------------------------------------------------------------
 // MRpt
 //----------------------------------------------------------------------------
@@ -296,31 +296,31 @@ int MRpt::PrepareRpt(FunctorParams *functorParams)
     params->m_currentMRpt = this;
     return FUNCTOR_CONTINUE;
 }
-    
+
 int FTrem::CalcDrawingStemDir(FunctorParams *functorParams)
 {
     CalcDrawingStemDirParams *params = dynamic_cast<CalcDrawingStemDirParams *>(functorParams);
     assert(params);
-    
+
     ListOfObjects *fTremChildren = this->GetList(this);
-    
+
     // Should we assert this at the beginning?
     if (fTremChildren->empty()) {
         return FUNCTOR_CONTINUE;
     }
     const ArrayOfBeamElementCoords *beamElementCoords = this->GetElementCoords();
-    
+
     assert(beamElementCoords->size() == 2);
-    
+
     int elementCount = 2;
-    
-    Layer *layer = dynamic_cast<Layer*>(this->GetFirstParent(LAYER));
+
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
     assert(layer);
     Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
     assert(staff);
-    
+
     this->m_drawingParams.CalcBeam(layer, staff, params->m_doc, beamElementCoords, elementCount);
-    
+
     return FUNCTOR_CONTINUE;
 }
 

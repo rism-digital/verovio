@@ -75,7 +75,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     }
 
     /************** Stem/notehead direction: **************/
-    
+
     Stem *stem = note->GetDrawingStem();
 
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;

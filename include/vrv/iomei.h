@@ -512,7 +512,7 @@ private:
     bool ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
     bool ReadSystemElement(pugi::xml_node element, SystemElement *object);
     bool ReadTextElement(pugi::xml_node element, TextElement *object);
-    
+
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);

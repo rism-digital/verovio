@@ -136,11 +136,11 @@ ClassId Object::GetClassId() const
     assert(false);
     return OBJECT;
 };
-    
+
 void Object::SetAsReferenceObject()
 {
     assert(m_children.empty());
-    
+
     m_isReferencObject = true;
 }
 
@@ -211,7 +211,7 @@ void Object::ClearChildren()
         m_children.clear();
         return;
     }
-    
+
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         // we need to check if this is the parent
@@ -443,21 +443,19 @@ int Object::GetDrawingY() const
     return m_parent->GetDrawingY();
 }
 
-    
 void Object::ResetCachedDrawingX() const
 {
-    //if (m_cachedDrawingX == VRV_UNSET) return;
+    // if (m_cachedDrawingX == VRV_UNSET) return;
     m_cachedDrawingX = VRV_UNSET;
     ArrayOfObjects::const_iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
         (*iter)->ResetCachedDrawingX();
     }
-    
 }
 
 void Object::ResetCachedDrawingY() const
 {
-    //if (m_cachedDrawingY == VRV_UNSET) return;
+    // if (m_cachedDrawingY == VRV_UNSET) return;
     m_cachedDrawingY = VRV_UNSET;
     ArrayOfObjects::const_iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
@@ -492,7 +490,7 @@ void Object::FillFlatList(ListOfObjects *flatList)
     AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
-    
+
 Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
@@ -506,13 +504,13 @@ Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
         return (m_parent->GetFirstParent(classId, maxDepth - 1));
     }
 }
-    
+
 Object *Object::GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
     }
-    
+
     if ((m_parent->GetClassId() > classIdMin) && (m_parent->GetClassId() < classIdMax)) {
         return m_parent;
     }
@@ -1044,7 +1042,7 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
     assert(params);
 
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
-    
+
     if (!this->HasUpdatedBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
     int refLeft = this->GetSelfLeft();
