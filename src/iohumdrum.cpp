@@ -2741,7 +2741,7 @@ void HumdrumInput::embedBase40PitchInClass(Note *note, const std::string &token)
 // HumdrumInput::embedQstampInClass --
 //
 
-void HumdrumInput::embedQstampInClass(Note *note, hum::HTp token)
+void HumdrumInput::embedQstampInClass(Note *note, hum::HTp token, const std::string &tstring)
 {
     hum::HumNum starttime = token->getDurationFromStart();
     hum::HumNum endtime = starttime + token->getDuration();
@@ -2758,7 +2758,34 @@ void HumdrumInput::embedQstampInClass(Note *note, hum::HTp token)
     appendTypeTag(note, sson.str());
     appendTypeTag(note, ssoff.str());
 
-    // ggg
+    /*
+            if (tstring.find("[") != std::string::npos) {
+            hum::HumNum realendtime = starttime + token->getTiedDuration();
+            stringstream ssofftied;
+            ssofftied << "qoff-tied-" << realendtime.getNumerator();
+            if (realendtime.getDenominator() != 1) {
+                    ssoff << "_" << realendtime.getDenominator();
+            }
+            }
+    */
+}
+
+//////////////////////////////
+//
+// HumdrumInput::embedTieInformation --
+//
+
+void HumdrumInput::embedTieInformation(Note *note, const std::string &token)
+{
+    if (token.find("[") != std::string::npos) {
+        appendTypeTag(note, "tie-start");
+    }
+    else if (token.find("]") != std::string::npos) {
+        appendTypeTag(note, "tie-stop");
+    }
+    else if (token.find("_") != std::string::npos) {
+        appendTypeTag(note, "tie-cont");
+    }
 }
 
 //////////////////////////////
@@ -2791,7 +2818,7 @@ void HumdrumInput::colorNote(Note *note, const std::string &token, int line, int
 //     already content in @type.
 //
 
-void HumdrumInput::appendTypeTag(Note *note, const std::string &tag)
+template <class ELEMENT> void HumdrumInput::appendTypeTag(ELEMENT *note, const std::string &tag)
 {
     if (note->GetType().empty()) {
         note->SetType(tag); // Allow type to be set from data later.
@@ -2801,19 +2828,6 @@ void HumdrumInput::appendTypeTag(Note *note, const std::string &tag)
         newtag += " ";
         newtag += tag;
         note->SetType(newtag);
-    }
-}
-
-void HumdrumInput::appendTypeTag(Measure *measure, const std::string &tag)
-{
-    if (measure->GetType().empty()) {
-        measure->SetType(tag); // Allow type to be set from data later.
-    }
-    else {
-        std::string newtag = measure->GetType();
-        newtag += " ";
-        newtag += tag;
-        measure->SetType(newtag);
     }
 }
 
@@ -5024,8 +5038,9 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     int line = token->getLineIndex();
     int field = token->getFieldIndex();
     colorNote(note, tstring, line, field);
-    embedQstampInClass(note, token);
+    embedQstampInClass(note, token, tstring);
     embedBase40PitchInClass(note, tstring);
+    embedTieInformation(note, tstring);
 
     if ((ss[staffindex].ottavameasure != NULL) && (ss[staffindex].ottavanotestart == NULL)) {
         ss[staffindex].ottavanotestart = note;

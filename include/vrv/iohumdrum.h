@@ -329,10 +329,9 @@ protected:
     void resolveTupletBeamTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg);
     void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
     void resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
-    void appendTypeTag(vrv::Note *note, const std::string &tag);
-    void appendTypeTag(Measure *measure, const std::string &tag);
-    void embedQstampInClass(vrv::Note *note, hum::HTp token);
+    void embedQstampInClass(vrv::Note *note, hum::HTp token, const std::string &tstring);
     void embedBase40PitchInClass(vrv::Note *note, const std::string &token);
+    void embedTieInformation(Note *note, const std::string &token);
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -360,6 +359,7 @@ protected:
 
     template <class ELEMENT> void addTextElement(ELEMENT *element, const std::string &content);
     template <class ELEMENT> void checkForAutoStem(ELEMENT element, hum::HTp token);
+    template <class ELEMENT> void appendTypeTag(ELEMENT *element, const std::string &tag);
 
     /// Static functions ////////////////////////////////////////////////////
     static std::string unescapeHtmlEntities(const std::string &input);
