@@ -49,7 +49,6 @@ class Ending;
 class Expan;
 class Expansion;
 class Fermata;
-class Flag;
 class FloatingElement;
 class FTrem;
 class Hairpin;
@@ -67,7 +66,6 @@ class MRpt2;
 class MultiRest;
 class MultiRpt;
 class Note;
-class NoteHead;
 class Octave;
 class Orig;
 class Pb;
@@ -90,7 +88,6 @@ class Sic;
 class Slur;
 class Space;
 class Staff;
-class Stem;
 class Supplied;
 class Syl;
 class System;
@@ -199,7 +196,6 @@ private:
     void WriteMeiClef(pugi::xml_node currentNode, Clef *clef);
     void WriteMeiCustos(pugi::xml_node currentNode, Custos *custos);
     void WriteMeiDot(pugi::xml_node currentNode, Dot *dot);
-    void WriteMeiFlag(pugi::xml_node currentNode, Flag *flag);
     void WriteMeiFTrem(pugi::xml_node currentNode, FTrem *fTrem);
     void WriteMeiKeySig(pugi::xml_node currentNode, KeySig *keySig);
     void WriteMeiMensur(pugi::xml_node currentNode, Mensur *mensur);
@@ -210,11 +206,9 @@ private:
     void WriteMeiMultiRest(pugi::xml_node currentNode, MultiRest *multiRest);
     void WriteMeiMultiRpt(pugi::xml_node currentNode, MultiRpt *multiRpt);
     void WriteMeiNote(pugi::xml_node currentNode, Note *note);
-    void WriteMeiNoteHead(pugi::xml_node currentNode, NoteHead *noteHead);
     void WriteMeiProport(pugi::xml_node currentNode, Proport *proport);
     void WriteMeiRest(pugi::xml_node currentNode, Rest *rest);
     void WriteMeiSpace(pugi::xml_node currentNode, Space *space);
-    void WriteMeiStem(pugi::xml_node currentNode, Stem *stem);
     void WriteMeiTuplet(pugi::xml_node currentNode, Tuplet *tuplet);
     ///@}
 

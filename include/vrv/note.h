@@ -48,6 +48,8 @@ class Note : public LayerElement,
              public AttGraced,
              public AttNoteLogMensural,
              public AttRelativesize,
+             public AttStems,
+             public AttStemsCmn,
              public AttTiepresent,
              public AttVisibility {
 public:

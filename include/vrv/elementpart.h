@@ -38,6 +38,14 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * Overwritten version of Save that avoids anything to be written
+     */
+    ///@{
+    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
 private:
     //
@@ -70,7 +78,15 @@ public:
     //----------//
     // Functors //
     //----------//
-
+    
+    /**
+     * Overwritten version of Save that avoids anything to be written
+     */
+    ///@{
+    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
+    
 private:
     //
 public:
@@ -102,6 +118,14 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * Overwritten version of Save that avoids anything to be written
+     */
+    ///@{
+    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
 private:
     //

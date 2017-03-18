@@ -40,6 +40,8 @@ Note::Note()
     , AttGraced()
     , AttNoteLogMensural()
     , AttRelativesize()
+    , AttStems()
+    , AttStemsCmn()
     , AttTiepresent()
     , AttVisibility()
 {
@@ -50,6 +52,8 @@ Note::Note()
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_NOTELOGMENSURAL);
     RegisterAttClass(ATT_RELATIVESIZE);
+    RegisterAttClass(ATT_STEMS);
+    RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
     RegisterAttClass(ATT_VISIBILITY);
 
@@ -77,6 +81,8 @@ void Note::Reset()
     ResetGraced();
     ResetNoteLogMensural();
     ResetRelativesize();
+    ResetStems();
+    ResetStemsCmn();
     ResetTiepresent();
     ResetVisibility();
 
@@ -202,7 +208,36 @@ int Note::CalcDrawingStemDir(FunctorParams *functorParams)
 
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    SetDrawingStem(dynamic_cast<Stem *>(this->FindChildByType(STEM)));
+    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM));
+    Flag *currentFlag = dynamic_cast<Flag *>(this->FindChildByType(FLAG));
+    
+    if ((this->GetDur() > DUR_4) && !this->IsInBeam() && !this->IsChordTone()) {
+        if (!currentFlag) {
+            currentFlag = new Flag();
+            this->AddChild(currentFlag);
+        }
+    }
+    // This will happen only if the duration has changed or the chord was put in a beam
+    else if (currentFlag) {
+        this->DeleteChild(currentFlag);
+        currentFlag = NULL;
+    }
+    
+    if ((this->GetDur() > DUR_1) && !this->IsChordTone()) {
+        if (!currentStem) {
+            currentStem = new Stem();
+            this->AddChild(currentStem);
+        }
+        currentStem->AttStems::operator=(*this);
+        currentStem->AttStemsCmn::operator=(*this);
+    }
+    // This will happen only if the duration has changed
+    else if (currentStem) {
+        this->DeleteChild(currentStem);
+        currentStem = NULL;
+    }
+    
+    SetDrawingStem(currentStem);
 
     return FUNCTOR_CONTINUE;
 };

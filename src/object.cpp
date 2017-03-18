@@ -382,14 +382,19 @@ Object *Object::GetChild(int idx) const
     return m_children.at(idx);
 }
 
-void Object::RemoveChildAt(int idx)
+bool Object::DeleteChild(Object *child)
 {
-    if (idx >= (int)m_children.size()) {
-        return;
+    auto it = std::find(m_children.begin(), m_children.end(), child);
+    if(it != m_children.end()) {
+        m_children.erase(it);
+        delete child;
+        this->Modify();
+        return true;
     }
-    delete m_children.at(idx);
-    ArrayOfObjects::iterator iter = m_children.begin();
-    m_children.erase(iter + (idx));
+    else {
+        assert(false);
+        return false;
+    }
 }
 
 void Object::GenerateUuid()

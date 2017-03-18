@@ -36,6 +36,8 @@ Chord::Chord()
     , AttColor()
     , AttGraced()
     , AttRelativesize()
+    , AttStems()
+    , AttStemsCmn()
     , AttTiepresent()
     , AttVisibility()
 {
@@ -43,6 +45,8 @@ Chord::Chord()
     RegisterAttClass(ATT_COLOR);
     RegisterAttClass(ATT_GRACED);
     RegisterAttClass(ATT_RELATIVESIZE);
+    RegisterAttClass(ATT_STEMS);
+    RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
     RegisterAttClass(ATT_VISIBILITY);
 
@@ -66,6 +70,8 @@ void Chord::Reset()
     ResetColor();
     ResetGraced();
     ResetRelativesize();
+    ResetStems();
+    ResetStemsCmn();
     ResetTiepresent();
     ResetVisibility();
 
@@ -342,7 +348,36 @@ int Chord::CalcDrawingStemDir(FunctorParams *functorParams)
 
 int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 {
-    SetDrawingStem(dynamic_cast<Stem *>(this->FindChildByType(STEM)));
+    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM));
+    Flag *currentFlag = dynamic_cast<Flag *>(this->FindChildByType(FLAG));
+    
+    if ((this->GetDur() > DUR_4) && !this->IsInBeam()) {
+        if (!currentFlag) {
+            currentFlag = new Flag();
+            this->AddChild(currentFlag);
+        }
+    }
+    // This will happen only if the duration has changed or the chord was put in a beam
+    else if (currentFlag) {
+        this->DeleteChild(currentFlag);
+        currentFlag = NULL;
+    }
+    
+    if (this->GetDur() > DUR_1) {
+        if (!currentStem) {
+            currentStem = new Stem();
+            this->AddChild(currentStem);
+        }
+        currentStem->AttStems::operator=(*this);
+        currentStem->AttStemsCmn::operator=(*this);
+    }
+    // This will happen only if the duration has changed
+    else if (currentStem) {
+        this->DeleteChild(currentStem);
+        currentStem = NULL;
+    }
+    
+    SetDrawingStem(currentStem);
 
     return FUNCTOR_CONTINUE;
 };

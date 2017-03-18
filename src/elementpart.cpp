@@ -36,7 +36,6 @@ NoteHead::NoteHead() : LayerElement("notehead-")
 {
 
     Reset();
-    IsAttribute(true);
 }
 
 NoteHead::~NoteHead()
@@ -58,7 +57,6 @@ Stem::Stem() : LayerElement("stem-"), AttStems(), AttStemsCmn()
     RegisterAttClass(ATT_STEMSCMN);
 
     Reset();
-    IsAttribute(true);
 }
 
 Stem::~Stem()
