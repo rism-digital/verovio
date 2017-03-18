@@ -176,8 +176,7 @@ Point StemmedDrawingInterface::GetDrawingStemStart()
 Point StemmedDrawingInterface::GetDrawingStemEnd()
 {
     assert(m_drawingStem);
-    int len = (GetDrawingStemDir() == STEMDIRECTION_up) ? GetDrawingStemLen() : -GetDrawingStemLen();
-    return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY() + len);
+    return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY() - GetDrawingStemLen());
 }
 
 } // namespace vrv
