@@ -7,6 +7,14 @@
 
 #include "elementpart.h"
 
+//----------------------------------------------------------------------------
+
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
+#include "vrv.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -71,6 +79,22 @@ void Stem::Reset()
 
     m_drawingStemDir = STEMDIRECTION_NONE;
     m_drawingStemLen = 0;
+}
+    
+    
+void Stem::AddChild(Object *child)
+{
+    if (child->Is(FLAG)) {
+        assert(dynamic_cast<Flag *>(child));
+    }
+    else {
+        LogError("Adding '%s' to a '%s'", child->GetClassName().c_str(), this->GetClassName().c_str());
+        assert(false);
+    }
+    
+    child->SetParent(this);
+    m_children.push_back(child);
+    Modify();
 }
 
 //----------------------------------------------------------------------------

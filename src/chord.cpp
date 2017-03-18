@@ -95,9 +95,6 @@ void Chord::AddChild(Object *child)
     if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
     }
-    else if (child->Is(FLAG)) {
-        assert(dynamic_cast<Flag *>(child));
-    }
     else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
     }
@@ -116,9 +113,9 @@ void Chord::AddChild(Object *child)
     }
 
     child->SetParent(this);
-    // Flag and Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
+    // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
     // for the drawing order in the SVG output
-    if (child->Is({ FLAG, STEM }))
+    if (child->Is(STEM))
         m_children.insert(m_children.begin(), child);
     else
         m_children.push_back(child);
@@ -317,7 +314,9 @@ int Chord::CalcDrawingStemDir(FunctorParams *functorParams)
 int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM));
-    Flag *currentFlag = dynamic_cast<Flag *>(this->FindChildByType(FLAG));
+    Flag *currentFlag = NULL;
+    if (currentStem)
+        currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG));
 
     if (this->GetDur() > DUR_1) {
         if (!currentStem) {
@@ -329,19 +328,25 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     }
     // This will happen only if the duration has changed
     else if (currentStem) {
-        if (this->DeleteChild(currentStem)) currentFlag = NULL;
-    }
-
-    if ((this->GetDur() > DUR_4) && !this->IsInBeam()) {
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            this->AddChild(currentFlag);
+        if (this->DeleteChild(currentStem)) {
+            currentStem = NULL;
+            // The currentFlag (if any) will have been deleted above
+            currentFlag = NULL;
         }
     }
-    // This will happen only if the duration has changed or the chord was put in a beam
+    
+    if ((this->GetDur() > DUR_4) && !this->IsInBeam()) {
+        // We should have a stem at this stage
+        assert(currentStem);
+        if (!currentFlag) {
+            currentFlag = new Flag();
+            currentStem->AddChild(currentFlag);
+        }
+    }
+    // This will happen only if the duration has changed (no flag required anymore)
     else if (currentFlag) {
-        if (this->DeleteChild(currentFlag)) currentFlag = NULL;
-        ;
+        assert(currentStem);
+        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
     }
 
     SetDrawingStem(currentStem);

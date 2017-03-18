@@ -114,6 +114,11 @@ public:
     virtual std::string GetClassName() const { return "Stem"; }
     virtual ClassId GetClassId() const { return STEM; }
     ///@}
+    
+    /**
+     * Add an element (only flag supported) to a stem.
+     */
+    virtual void AddChild(Object *object);
 
     /**
      * @name Setter and getter for darwing stem direction and length
