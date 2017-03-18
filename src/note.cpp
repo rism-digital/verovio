@@ -219,8 +219,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     }
     // This will happen only if the duration has changed or the chord was put in a beam
     else if (currentFlag) {
-        this->DeleteChild(currentFlag);
-        currentFlag = NULL;
+        if (this->DeleteChild(currentFlag)) currentFlag = NULL;
     }
     
     if ((this->GetDur() > DUR_1) && !this->IsChordTone()) {
@@ -233,8 +232,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     }
     // This will happen only if the duration has changed
     else if (currentStem) {
-        this->DeleteChild(currentStem);
-        currentStem = NULL;
+        if (this->DeleteChild(currentStem)) currentStem = NULL;
     }
     
     SetDrawingStem(currentStem);
@@ -288,6 +286,7 @@ int Note::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     if (this->m_drawingTieAttr) {
         return this->m_drawingTieAttr->FillStaffCurrentTimeSpanning(functorParams);
     }
+    
     return FUNCTOR_CONTINUE;
 }
 
@@ -319,6 +318,7 @@ int Note::ResetDrawing(FunctorParams *functorParams)
 
     this->ResetDrawingStem();
     this->ResetDrawingTieAttr();
+    
     return FUNCTOR_CONTINUE;
 };
 

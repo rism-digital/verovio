@@ -359,8 +359,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     }
     // This will happen only if the duration has changed or the chord was put in a beam
     else if (currentFlag) {
-        this->DeleteChild(currentFlag);
-        currentFlag = NULL;
+        if (this->DeleteChild(currentFlag)) currentFlag = NULL;;
     }
     
     if (this->GetDur() > DUR_1) {
@@ -373,8 +372,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     }
     // This will happen only if the duration has changed
     else if (currentStem) {
-        this->DeleteChild(currentStem);
-        currentStem = NULL;
+        if (this->DeleteChild(currentStem)) currentFlag = NULL;
     }
     
     SetDrawingStem(currentStem);
@@ -410,6 +408,7 @@ int Chord::ResetDrawing(FunctorParams *functorParams)
     LayerElement::ResetDrawing(functorParams);
 
     this->ResetDrawingStem();
+    
     return FUNCTOR_CONTINUE;
 };
 }
