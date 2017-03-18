@@ -38,7 +38,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * Overwritten version of Save that avoids anything to be written
      */
@@ -78,7 +78,7 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * Overwritten version of Save that avoids anything to be written
      */
@@ -86,7 +86,7 @@ public:
     virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
-    
+
 private:
     //
 public:
@@ -115,10 +115,20 @@ public:
     virtual ClassId GetClassId() const { return STEM; }
     ///@}
 
+    /**
+     * @name Setter and getter for darwing stem direction and length
+     */
+    ///@{
+    data_STEMDIRECTION GetDrawingStemDir() { return m_drawingStemDir; }
+    void SetDrawingStemDir(data_STEMDIRECTION drawingStemDir) { m_drawingStemDir = drawingStemDir; }
+    int GetDrawingStemLen() { return m_drawingStemLen; }
+    void SetDrawingStemLen(int drawingStemLen) { m_drawingStemLen = drawingStemLen; }
+    ///@}
+
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * Overwritten version of Save that avoids anything to be written
      */
@@ -127,11 +137,24 @@ public:
     virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 private:
     //
 public:
     //
 private:
+    /**
+     *
+     */
+    data_STEMDIRECTION m_drawingStemDir;
+    /**
+     *
+     */
+    int m_drawingStemLen;
 };
 
 } // namespace vrv

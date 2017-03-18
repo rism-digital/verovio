@@ -652,9 +652,10 @@ int Measure::PrepareTimePointingEnd(FunctorParams *functorParams)
 {
     PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
     assert(params);
-    
+
     if (!params->m_timePointingInterfaces.empty()) {
-        LogWarning("%d time pointing element(s) could not be matched in mesure %s", params->m_timePointingInterfaces.size(), this->GetUuid().c_str());
+        LogWarning("%d time pointing element(s) could not be matched in mesure %s",
+            params->m_timePointingInterfaces.size(), this->GetUuid().c_str());
     }
 
     ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();

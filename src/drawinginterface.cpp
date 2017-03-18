@@ -137,52 +137,47 @@ StemmedDrawingInterface::~StemmedDrawingInterface()
 
 void StemmedDrawingInterface::Reset()
 {
-    m_drawingStemDir = STEMDIRECTION_NONE;
-    m_drawingStemStart = Point(0, 0);
-    m_drawingStemEnd = Point(0, 0);
     m_drawingStem = NULL;
 }
 
 void StemmedDrawingInterface::SetDrawingStem(Stem *stem)
 {
-    assert(!m_drawingStem);
-
     m_drawingStem = stem;
-}
-
-void StemmedDrawingInterface::ResetDrawingStem()
-{
-    m_drawingStem = NULL;
 }
 
 void StemmedDrawingInterface::SetDrawingStemDir(data_STEMDIRECTION stemDir)
 {
-    m_drawingStemDir = stemDir;
+    if (m_drawingStem) m_drawingStem->SetDrawingStemDir(stemDir);
 }
 
 data_STEMDIRECTION StemmedDrawingInterface::GetDrawingStemDir()
 {
-    return m_drawingStemDir;
+    if (m_drawingStem) return m_drawingStem->GetDrawingStemDir();
+    return STEMDIRECTION_NONE;
 }
 
-void StemmedDrawingInterface::SetDrawingStemStart(Point stemStart)
+void StemmedDrawingInterface::SetDrawingStemLen(int stemLen)
 {
-    m_drawingStemStart = stemStart;
+    if (m_drawingStem) m_drawingStem->SetDrawingStemLen(stemLen);
+}
+
+int StemmedDrawingInterface::GetDrawingStemLen()
+{
+    if (m_drawingStem) return m_drawingStem->GetDrawingStemLen();
+    return 0;
 }
 
 Point StemmedDrawingInterface::GetDrawingStemStart()
 {
-    return m_drawingStemStart;
-}
-
-void StemmedDrawingInterface::SetDrawingStemEnd(Point stemEnd)
-{
-    m_drawingStemEnd = stemEnd;
+    assert(m_drawingStem);
+    return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY());
 }
 
 Point StemmedDrawingInterface::GetDrawingStemEnd()
 {
-    return m_drawingStemEnd;
+    assert(m_drawingStem);
+    int len = (GetDrawingStemDir() == STEMDIRECTION_up) ? GetDrawingStemLen() : -GetDrawingStemLen();
+    return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY() + len);
 }
 
 } // namespace vrv

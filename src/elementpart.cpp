@@ -68,6 +68,24 @@ void Stem::Reset()
     LayerElement::Reset();
     ResetStems();
     ResetStemsCmn();
+
+    m_drawingStemDir = STEMDIRECTION_NONE;
+    m_drawingStemLen = 0;
 }
+
+//----------------------------------------------------------------------------
+// Functors methods
+//----------------------------------------------------------------------------
+
+int Stem::ResetDrawing(FunctorParams *functorParams)
+{
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
+    m_drawingStemDir = STEMDIRECTION_NONE;
+    m_drawingStemLen = 0;
+
+    return FUNCTOR_CONTINUE;
+};
 
 } // namespace vrv

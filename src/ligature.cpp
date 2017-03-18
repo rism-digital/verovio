@@ -39,8 +39,6 @@ Ligature::Ligature()
     RegisterAttClass(ATT_TIEPRESENT);
 
     Reset();
-
-    m_drawingStemDir = STEMDIRECTION_NONE;
 }
 
 Ligature::~Ligature()
@@ -146,39 +144,6 @@ int Ligature::PositionInLigature(Note *note)
     if ((size % 2) && (position == (size - 1) / 2)) return 0;
     if (position < (size / 2)) return -1;
     return 1;
-}
-
-void Ligature::SetDrawingStemDir(data_STEMDIRECTION stemDir)
-{
-    m_drawingStemDir = stemDir;
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = dynamic_cast<Note *>(*it);
-        if (!note) continue;
-        note->SetDrawingStemDir(stemDir);
-    }
-}
-
-void Ligature::SetDrawingStemStart(Point stemStart)
-{
-    m_drawingStemStart = stemStart;
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = dynamic_cast<Note *>(*it);
-        if (!note) continue;
-        note->SetDrawingStemStart(stemStart);
-    }
-}
-
-void Ligature::SetDrawingStemEnd(Point stemEnd)
-{
-    m_drawingStemEnd = stemEnd;
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = dynamic_cast<Note *>(*it);
-        if (!note) continue;
-        note->SetDrawingStemEnd(stemEnd);
-    }
 }
 
 //----------------------------------------------------------------------------

@@ -335,8 +335,9 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     // Store the start and end values
     StemmedDrawingInterface *interface = object->GetStemmedDrawingInterface();
     assert(interface);
-    interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
-    interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
+    assert(false);
+    // interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
+    // interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
     interface->SetDrawingStemDir(dir);
 
     // cast to note is check when setting drawingCueSize value

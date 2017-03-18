@@ -385,7 +385,7 @@ Object *Object::GetChild(int idx) const
 bool Object::DeleteChild(Object *child)
 {
     auto it = std::find(m_children.begin(), m_children.end(), child);
-    if(it != m_children.end()) {
+    if (it != m_children.end()) {
         m_children.erase(it);
         delete child;
         this->Modify();

@@ -177,35 +177,29 @@ public:
 
     void SetDrawingStem(Stem *stem);
     Stem *GetDrawingStem() const { return m_drawingStem; }
-    void ResetDrawingStem();
 
     /**
      * @name Set and get the stem direction and stem positions
-     * The methods are virtual because they need to be overridden for Chords.
+     * Wrapper that passes values to the Stem object.
      */
     ///@{
-    virtual void SetDrawingStemDir(data_STEMDIRECTION stemDir);
-    virtual data_STEMDIRECTION GetDrawingStemDir();
-    virtual void SetDrawingStemStart(Point stemStart);
-    virtual Point GetDrawingStemStart();
-    virtual void SetDrawingStemEnd(Point stemEnd);
-    virtual Point GetDrawingStemEnd();
+    void SetDrawingStemDir(data_STEMDIRECTION stemDir);
+    data_STEMDIRECTION GetDrawingStemDir();
+
+    void SetDrawingStemLen(int drawingStemLen);
+    int GetDrawingStemLen();
+
+    // virtual void SetDrawingStemStart(Point stemStart);
+    Point GetDrawingStemStart();
+    // virtual void SetDrawingStemEnd(Point stemEnd);
+    Point GetDrawingStemEnd();
     ///@}
 
 protected:
     /**
-     *
+     * A pointer to the child Stem set by PrepareLayerElementParts
      */
     Stem *m_drawingStem;
-    /**
-     * If this is a note, store here the stem coordinates (useful for ex. tuplets)
-     */
-    Point m_drawingStemStart; // beginning point, the one near the note
-    Point m_drawingStemEnd; // end point (!), near beam or flag
-    /**
-     * Stem direction as drawn
-     */
-    data_STEMDIRECTION m_drawingStemDir;
 };
 
 } // namespace vrv

@@ -363,7 +363,7 @@ public:
      * This has to be used when children are moved but then the parent is not deleted.
      */
     void ClearRelinquishedChildren();
-    
+
     /**
      * Remove and delete the child.
      * Return false if the child could not be found. In that case it will not be deleted.

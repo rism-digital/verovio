@@ -84,18 +84,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     DrawLayerChildren(dc, beam, layer, staff, measure);
 
     /******************************************************************/
-    // Draw the stems and the beam full bars
-
-    for (i = 0; i < elementCount; i++) {
-        LayerElement *el = (*beamElementCoords).at(i)->m_element;
-        if (((el->Is(NOTE)) && !(dynamic_cast<Note *>(el))->IsChordTone()) || (el->Is(CHORD))) {
-            StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
-            assert(interface);
-
-            DrawVerticalLine(dc, interface->GetDrawingStemStart().y, interface->GetDrawingStemEnd().y,
-                interface->GetDrawingStemStart().x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
-        }
-    }
+    // Draw the beam full bars
 
     // Number of bars to draw - if we do not have changing values, draw
     // the number of bars according to the shortestDur value. Otherwise draw

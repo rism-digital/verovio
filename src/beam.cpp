@@ -282,10 +282,13 @@ void BeamDrawingParams::CalcBeam(
         if ((el->Is(NOTE)) || (el->Is(CHORD))) {
             StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
             assert(interface);
-
-            interface->SetDrawingStemDir(this->m_stemDir);
-            interface->SetDrawingStemStart(Point((*beamElementCoords).at(i)->m_x, y2));
-            interface->SetDrawingStemEnd(Point((*beamElementCoords).at(i)->m_x, y1));
+            Stem *stem = interface->GetDrawingStem();
+            assert(stem);
+            stem->SetDrawingStemDir(this->m_stemDir);
+            // Since the value were calculated relatively to the element position, adjust them
+            stem->SetDrawingXRel((*beamElementCoords).at(i)->m_x - el->GetDrawingX());
+            stem->SetDrawingYRel(y2 - el->GetDrawingY());
+            stem->SetDrawingStemLen(y2 - y1);
         }
     }
 }

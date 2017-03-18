@@ -1868,7 +1868,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     assert(system);
     assert(measure);
     assert(tempo);
-    
+
     // Cannot draw a tempo that has no start position
     if (!tempo->GetStart()) return;
 

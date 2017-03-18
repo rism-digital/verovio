@@ -148,6 +148,15 @@ void FTrem::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
+        // also remove notes within chords
+        if ((*iter)->Is(NOTE)) {
+            Note *note = dynamic_cast<Note *>(*iter);
+            assert(note);
+            if (note->IsChordTone()) {
+                iter = childList->erase(iter);
+                continue;
+            }
+        }
         iter++;
     }
 
@@ -164,7 +173,7 @@ void FTrem::InitCoords(ListOfObjects *childList)
 
     BeamElementCoord *firstElement = new BeamElementCoord;
     BeamElementCoord *secondElement = new BeamElementCoord;
-    ;
+
     m_beamElementCoords.push_back(firstElement);
     m_beamElementCoords.push_back(secondElement);
 

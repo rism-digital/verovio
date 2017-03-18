@@ -1366,8 +1366,9 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             // Store the start and end values
             StemmedDrawingInterface *interface = note->GetStemmedDrawingInterface();
             assert(interface);
-            interface->SetDrawingStemStart(Point(noteX, noteY));
-            interface->SetDrawingStemEnd(Point(noteX, noteY));
+            assert(false);
+            // interface->SetDrawingStemStart(Point(noteX, noteY));
+            // interface->SetDrawingStemEnd(Point(noteX, noteY));
             interface->SetDrawingStemDir(note->GetDrawingStemDir());
         }
         else if (!(inBeam && drawingDur > DUR_4) && !inFTrem && !inChord) {
@@ -1503,6 +1504,13 @@ void View::DrawStem(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Stem *stem = dynamic_cast<Stem *>(element);
     assert(stem);
+
+    dc->StartGraphic(element, "", element->GetUuid());
+
+    DrawVerticalLine(dc, stem->GetDrawingY(), stem->GetDrawingY() - stem->GetDrawingStemLen(), stem->GetDrawingX(),
+        m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+
+    dc->EndGraphic(element, this);
 }
 
 void View::DrawSyl(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -2025,8 +2033,9 @@ void View::DrawStem(DeviceContext *dc, LayerElement *object, Staff *staff, data_
     // Store the start and end values
     StemmedDrawingInterface *interface = object->GetStemmedDrawingInterface();
     assert(interface);
-    interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
-    interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
+    assert(false);
+    // interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
+    // interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
     interface->SetDrawingStemDir(dir);
 
     // cast to note is check when setting drawingCueSize value

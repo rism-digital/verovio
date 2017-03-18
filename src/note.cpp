@@ -89,7 +89,6 @@ void Note::Reset()
     // tie pointers
     ResetDrawingTieAttr();
 
-    m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
     m_clusterPosition = 0;
     m_cluster = NULL;
@@ -142,7 +141,12 @@ void Note::AddChild(Object *child)
     }
 
     child->SetParent(this);
-    m_children.push_back(child);
+    // Flag and Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
+    // for the drawing order in the SVG output
+    if (child->Is({ FLAG, STEM }))
+        m_children.insert(m_children.begin(), child);
+    else
+        m_children.push_back(child);
     Modify();
 }
 
@@ -210,18 +214,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM));
     Flag *currentFlag = dynamic_cast<Flag *>(this->FindChildByType(FLAG));
-    
-    if ((this->GetDur() > DUR_4) && !this->IsInBeam() && !this->IsChordTone()) {
-        if (!currentFlag) {
-            currentFlag = new Flag();
-            this->AddChild(currentFlag);
-        }
-    }
-    // This will happen only if the duration has changed or the chord was put in a beam
-    else if (currentFlag) {
-        if (this->DeleteChild(currentFlag)) currentFlag = NULL;
-    }
-    
+
     if ((this->GetDur() > DUR_1) && !this->IsChordTone()) {
         if (!currentStem) {
             currentStem = new Stem();
@@ -234,7 +227,18 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     else if (currentStem) {
         if (this->DeleteChild(currentStem)) currentStem = NULL;
     }
-    
+
+    if ((this->GetDur() > DUR_4) && !this->IsInBeam() && !this->IsChordTone()) {
+        if (!currentFlag) {
+            currentFlag = new Flag();
+            this->AddChild(currentFlag);
+        }
+    }
+    // This will happen only if the duration has changed or the chord was put in a beam
+    else if (currentFlag) {
+        if (this->DeleteChild(currentFlag)) currentFlag = NULL;
+    }
+
     SetDrawingStem(currentStem);
 
     return FUNCTOR_CONTINUE;
@@ -286,7 +290,7 @@ int Note::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     if (this->m_drawingTieAttr) {
         return this->m_drawingTieAttr->FillStaffCurrentTimeSpanning(functorParams);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -316,9 +320,8 @@ int Note::ResetDrawing(FunctorParams *functorParams)
     // Call parent one too
     LayerElement::ResetDrawing(functorParams);
 
-    this->ResetDrawingStem();
     this->ResetDrawingTieAttr();
-    
+
     return FUNCTOR_CONTINUE;
 };
 
