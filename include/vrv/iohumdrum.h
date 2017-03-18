@@ -330,6 +330,7 @@ protected:
     void resolveTupletBeamStartTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
     void resolveTupletBeamEndTie(std::vector<humaux::HumdrumBeamAndTuplet> &tg, int index);
     void appendTypeTag(vrv::Note *note, const std::string &tag);
+    void appendTypeTag(Measure *measure, const std::string &tag);
     void embedQstampInClass(vrv::Note *note, hum::HTp token);
     void embedBase40PitchInClass(vrv::Note *note, const std::string &token);
 

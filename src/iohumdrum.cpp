@@ -2804,6 +2804,19 @@ void HumdrumInput::appendTypeTag(Note *note, const std::string &tag)
     }
 }
 
+void HumdrumInput::appendTypeTag(Measure *measure, const std::string &tag)
+{
+    if (measure->GetType().empty()) {
+        measure->SetType(tag); // Allow type to be set from data later.
+    }
+    else {
+        std::string newtag = measure->GetType();
+        newtag += " ";
+        newtag += tag;
+        measure->SetType(newtag);
+    }
+}
+
 //////////////////////////////
 //
 // HumdrumInput::colorRest --
@@ -6101,6 +6114,10 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
     if (measurenumber >= 0) {
         m_measure->SetN(measurenumber);
     }
+
+    stringstream measuretag;
+    measuretag << "m-" << measurenumber;
+    appendTypeTag(m_measure, measuretag.str());
 
     setSystemMeasureStyle(startline, endline);
 }
