@@ -17,8 +17,7 @@ namespace vrv {
 #define MAX_DURATION_PARTIALS 16
 
 enum { PARTIAL_NONE = 0, PARTIAL_THROUGH, PARTIAL_RIGHT, PARTIAL_LEFT };
-    
-    
+
 //----------------------------------------------------------------------------
 // BeamDrawingParams
 //----------------------------------------------------------------------------
@@ -36,9 +35,9 @@ public:
     ///@{
     BeamDrawingParams();
     virtual ~BeamDrawingParams() {}
-    
+
     void Reset();
-    
+
     // values to be set before calling CalcBeam
     bool m_changingDur;
     bool m_beamHasChord;
@@ -46,7 +45,7 @@ public:
     bool m_cueSize;
     int m_shortestDur;
     data_STEMDIRECTION m_stemDir;
-    
+
     // values set by CalcBeam
     int m_beamWidth;
     int m_beamWidthBlack;
@@ -125,6 +124,7 @@ private:
 public:
     /** */
     BeamDrawingParams m_drawingParams;
+
 private:
     /**
      * An array of coordinates for each element

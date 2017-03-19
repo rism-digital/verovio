@@ -20,13 +20,11 @@
 #include "vrv.h"
 
 namespace vrv {
-    
-    
+
 //----------------------------------------------------------------------------
 // BeamDrawingParams
 //----------------------------------------------------------------------------
 
-    
 BeamDrawingParams::BeamDrawingParams()
 {
     Reset();
@@ -59,7 +57,7 @@ Beam::~Beam()
 void Beam::Reset()
 {
     LayerElement::Reset();
-    
+
     ClearCoords();
 }
 
@@ -115,7 +113,7 @@ void Beam::FilterList(ListOfObjects *childList)
             continue;
         }
         else {
-            LayerElement *element = dynamic_cast<LayerElement*>(*iter);
+            LayerElement *element = dynamic_cast<LayerElement *>(*iter);
             assert(element);
             // if we are at the beginning of the beam
             // and the note is cueSize
@@ -185,52 +183,52 @@ bool Beam::IsLastInBeam(LayerElement *element)
 void Beam::InitCoords(ListOfObjects *childList)
 {
     ClearCoords();
-    
+
     if (childList->empty()) {
         return;
     }
-    
+
     // duration variables
     int lastDur, currentDur;
-    
+
     m_beamElementCoords.reserve(childList->size());
     int i;
     for (i = 0; i < (int)childList->size(); i++) {
         m_beamElementCoords.push_back(new BeamElementCoord());
     }
-    
+
     // current point to the first Note in the layed out layer
     LayerElement *current = dynamic_cast<LayerElement *>(childList->front());
     // Beam list should contain only DurationInterface objects
     assert(current->GetDurationInterface());
-    
+
     lastDur = (current->GetDurationInterface())->GetActualDur();
-    
+
     /******************************************************************/
     // Populate BeamElementCoord for each element in the beam
     // This could be moved to Beam::InitCoord for optimization because there should be no
     // need for redoing it everytime it is drawn.
-    
+
     data_STEMDIRECTION currentStemDir;
-    
+
     int elementCount = 0;
-    
+
     ListOfObjects::iterator iter = childList->begin();
     do {
         // Beam list should contain only DurationInterface objects
         assert(current->GetDurationInterface());
         currentDur = (current->GetDurationInterface())->GetActualDur();
-        
+
         if (current->Is(CHORD)) {
             m_drawingParams.m_beamHasChord = true;
         }
-        
+
         // Can it happen? With rests?
         if (currentDur > DUR_4) {
             m_beamElementCoords.at(elementCount)->m_element = current;
             current->m_beamElementCoord = m_beamElementCoords.at(elementCount);
             m_beamElementCoords.at(elementCount)->m_dur = currentDur;
-            
+
             // Look at beam breaks
             m_beamElementCoords.at(elementCount)->m_breaksec = 0;
             AttBeamsecondary *beamsecondary = dynamic_cast<AttBeamsecondary *>(current);
@@ -238,7 +236,7 @@ void Beam::InitCoords(ListOfObjects *childList)
                 if (!m_drawingParams.m_changingDur) m_drawingParams.m_changingDur = true;
                 m_beamElementCoords.at(elementCount)->m_breaksec = beamsecondary->GetBreaksec();
             }
-            
+
             // Skip rests
             if (current->Is({ NOTE, CHORD })) {
                 // look at the stemDir to see if we have multiple stem Dir
@@ -246,7 +244,8 @@ void Beam::InitCoords(ListOfObjects *childList)
                     assert(dynamic_cast<AttStems *>(current));
                     currentStemDir = (dynamic_cast<AttStems *>(current))->GetStemDir();
                     if (currentStemDir != STEMDIRECTION_NONE) {
-                        if ((m_drawingParams.m_stemDir != STEMDIRECTION_NONE) && (m_drawingParams.m_stemDir != currentStemDir)) {
+                        if ((m_drawingParams.m_stemDir != STEMDIRECTION_NONE)
+                            && (m_drawingParams.m_stemDir != currentStemDir)) {
                             m_drawingParams.m_hasMultipleStemDir = true;
                         }
                         m_drawingParams.m_stemDir = currentStemDir;
@@ -258,10 +257,10 @@ void Beam::InitCoords(ListOfObjects *childList)
             // check if we have more than duration in the beam
             if (!m_drawingParams.m_changingDur && currentDur != lastDur) m_drawingParams.m_changingDur = true;
             lastDur = currentDur;
-            
+
             elementCount++;
         }
-        
+
         iter++;
         if (iter == childList->end()) {
             break;
@@ -271,22 +270,21 @@ void Beam::InitCoords(ListOfObjects *childList)
             LogDebug("Error accessing element in Beam list");
             return;
         }
-        
+
     } while (1);
-    
+
     // elementCount must be greater than 0 here
     if (elementCount == 0) {
         LogDebug("Beam with no notes of duration > 8 detected. Exiting DrawBeam.");
         return;
     }
-    
+
     int last = elementCount - 1;
-    
+
     // We look only at the last note for checking if cue-sized. Somehow arbitrarily
     m_drawingParams.m_cueSize = m_beamElementCoords.at(last)->m_element->IsCueSize();
-
 }
-    
+
 void Beam::ClearCoords()
 {
     ArrayOfBeamElementCoords::iterator iter;

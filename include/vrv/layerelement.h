@@ -53,7 +53,7 @@ public:
      * It typically set to false for mRest, mRpt, etc.
      */
     virtual bool HasToBeAligned() const { return false; }
-    
+
     /**
      * Return true if the element is relative to the staff and not to its parent.
      * It typically set to true for syl or artic.
@@ -135,7 +135,7 @@ public:
      * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff
      */
     Staff *GetCrossStaff() const;
-    
+
     /**
      * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)
      */

@@ -248,8 +248,8 @@ void Doc::PrepareDrawing()
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareTimestampsParams.m_timeSpanningInterfaces.empty()) {
-        LogWarning(
-            "%d time spanning element(s) could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
+        LogWarning("%d time spanning element(s) could not be matched",
+            prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
     // Prepare the cross-staff pointers
@@ -483,7 +483,7 @@ void Doc::CastOffDoc()
 
     // Here we redo the alignment because of the new scoreDefs
     // We can actually optimise this and have a custom version that does not redo all the calculation
-    //contentPage->LayOutHorizontally();
+    // contentPage->LayOutHorizontally();
 
     contentPage->LayOutVertically();
 

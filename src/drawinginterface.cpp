@@ -37,7 +37,7 @@ void DrawingListInterface::AddToDrawingList(Object *object)
         // someName not in name, add it
         m_drawingList.push_back(object);
     }
-    
+
     /*
     m_drawingList.push_back(object);
     m_drawingList.sort();

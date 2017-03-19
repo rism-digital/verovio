@@ -57,7 +57,7 @@ LayerElement::LayerElement() : Object("le-"), AttCommon(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
-    
+
     Reset();
 }
 
@@ -65,7 +65,7 @@ LayerElement::LayerElement(std::string classid) : Object(classid), AttCommon(), 
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
-    
+
     Reset();
 }
 
@@ -201,15 +201,15 @@ Beam *LayerElement::IsInBeam()
     }
     return NULL;
 }
-    
+
 Staff *LayerElement::GetCrossStaff() const
 {
     if (m_crossStaff) return m_crossStaff;
-    
-    LayerElement *parent = dynamic_cast<LayerElement*>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
-    
+
+    LayerElement *parent = dynamic_cast<LayerElement *>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
+
     if (parent) return parent->GetCrossStaff();
-    
+
     return NULL;
 }
 
@@ -228,34 +228,34 @@ void LayerElement::SetGraceAlignment(Alignment *graceAlignment)
 int LayerElement::GetDrawingX() const
 {
     if (m_cachedDrawingX != VRV_UNSET) return m_cachedDrawingX;
-    
+
     if (!m_alignment) {
-        //assert(this->Is({ BEAM, FTREM, TUPLET }));
+        // assert(this->Is({ BEAM, FTREM, TUPLET }));
         // Here we just get the measure position - no cast to Measure is necessary
         Object *measure = this->GetFirstParent(MEASURE);
         assert(measure);
         m_cachedDrawingX = measure->GetDrawingX();
         return m_cachedDrawingX;
     }
-    
+
     // First get the first layerElement parent (if any) and use its position if they share the same alignment
-    LayerElement *parent = dynamic_cast<LayerElement*>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
+    LayerElement *parent = dynamic_cast<LayerElement *>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
     if (parent && (parent->GetAlignment() == this->GetAlignment())) {
         m_cachedDrawingX = (parent->GetDrawingX() + this->GetDrawingXRel());
         return m_cachedDrawingX;
     }
-    
+
     // Otherwise get the measure - no cast to Measure is necessary
     Object *measure = this->GetFirstParent(MEASURE);
     assert(measure);
-    
+
     int graceNoteShift = 0;
     if (this->HasGraceAlignment()) {
         graceNoteShift = this->GetGraceAlignment()->GetXRel();
-        //const Note *note = dynamic_cast<const Note*>(this);
-        //LogDebug("Grace Note %d  Shift %d", note->GetPname(), graceNoteShift);
+        // const Note *note = dynamic_cast<const Note*>(this);
+        // LogDebug("Grace Note %d  Shift %d", note->GetPname(), graceNoteShift);
     }
-    
+
     m_cachedDrawingX = (measure->GetDrawingX() + m_alignment->GetXRel() + this->GetDrawingXRel() + graceNoteShift);
     return m_cachedDrawingX;
 }
@@ -263,11 +263,12 @@ int LayerElement::GetDrawingX() const
 int LayerElement::GetDrawingY() const
 {
     if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
-    
+
     Object *object = NULL;
     // Otherwise look if we have a crossStaff situation
-    if (!object) object = this->m_crossStaff; //GetCrossStaff();
-    // First get the first layerElement parent (if any) but only if the element is not directly relative to staff (e.g., artic, syl)
+    if (!object) object = this->m_crossStaff; // GetCrossStaff();
+    // First get the first layerElement parent (if any) but only if the element is not directly relative to staff (e.g.,
+    // artic, syl)
     if (!object && !this->IsRelativeToStaff()) object = this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max);
     // Otherwise get the first staff
     if (!object) object = this->GetFirstParent(STAFF);
@@ -275,7 +276,7 @@ int LayerElement::GetDrawingY() const
     if (!object) object = this->GetFirstParent(MEASURE);
 
     assert(object);
-    
+
     m_cachedDrawingY = object->GetDrawingY() + this->GetDrawingYRel();
     return m_cachedDrawingY;
 }
@@ -322,7 +323,7 @@ int LayerElement::GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPa
         return std::min(firstY, lastY);
     }
 }
-    
+
 void LayerElement::SetDrawingXRel(int drawingXRel)
 {
     ResetCachedDrawingX();
@@ -342,7 +343,7 @@ void LayerElement::CenterDrawingX()
     Measure *measure = dynamic_cast<Measure *>(this->GetFirstParent(MEASURE));
     assert(measure);
 
-   SetDrawingXRel(measure->GetInnerCenterX() - this->GetDrawingX());
+    SetDrawingXRel(measure->GetInnerCenterX() - this->GetDrawingX());
 }
 
 int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPartType type)
@@ -498,16 +499,16 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     assert(params);
 
     assert(!m_alignment);
-    
+
     this->SetScoreDefRole(params->m_scoreDefRole);
-    
+
     AlignmentType type = ALIGNMENT_DEFAULT;
 
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
     if (chordParent) {
         m_alignment = chordParent->GetAlignment();
     }
-    
+
     // We do not align these (formely container). Any other?
     else if (this->Is({ BEAM, FTREM, TUPLET })) {
         return FUNCTOR_CONTINUE;
@@ -595,7 +596,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
     else if (this->IsGraceNote()) {
         type = ALIGNMENT_GRACENOTE;
     }
-    
+
     double duration = 0.0;
     // We have already an alignment with grace note children - skip this
     if (!m_alignment) {
@@ -613,11 +614,12 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         m_alignment = params->m_measureAligner->GetAlignmentAtTime(params->m_time, type);
         assert(m_alignment);
     }
-    
+
     if (m_alignment->GetType() != ALIGNMENT_GRACENOTE) {
         m_alignment->AddLayerElementRef(this);
     }
-    // For grace note aligner do not add them to the reference list because they will be processed by their original hierarchy from the GraceAligner
+    // For grace note aligner do not add them to the reference list because they will be processed by their original
+    // hierarchy from the GraceAligner
     else {
         assert(this->IsGraceNote());
         if (this->Is(CHORD) || (this->Is(NOTE) && !chordParent)) {
@@ -632,7 +634,7 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         // increase the time position, but only when not a timestamp (it would actually do nothing)
         params->m_time += duration;
     }
-    
+
     // LogDebug("AlignHorizontally: Time %f - %s", (*time), this->GetClassName().c_str());
 
     return FUNCTOR_CONTINUE;
@@ -661,7 +663,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         assert(accid);
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         if (note) {
-            //accid->SetDrawingYRel(note->GetDrawingYRel());
+            // accid->SetDrawingYRel(note->GetDrawingYRel());
         }
         else {
             // do something for accid that are not children of a note - e.g., mensural?
@@ -725,10 +727,11 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
-    
+
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
-    
-    // With non grace alignment we do not need to do this because all the LayerElement are added as children of the Alignment
+
+    // With non grace alignment we do not need to do this because all the LayerElement are added as children of the
+    // Alignment
     // Here not (only parent chords or notes) so we need to reset the cache by hand
     this->ResetCachedDrawingX();
 
@@ -738,7 +741,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
         // if nothing was drawn, do not take it into account
         return FUNCTOR_CONTINUE;
     }
-    
+
     int selfRight = this->GetSelfRight();
     int offset = selfRight - params->m_graceMaxPos;
     if (offset > 0) {
@@ -775,7 +778,8 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     if (!this->HasUpdatedBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
         // assert(this->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT }));
-        // This should happen for invis barline attribute but also chords in beam. Otherwise the BB should be set to empty with
+        // This should happen for invis barline attribute but also chords in beam. Otherwise the BB should be set to
+        // empty with
         // Object::SetEmptyBB()
         // LogDebug("Nothing drawn for '%s' '%s'", this->GetClassName().c_str(), this->GetUuid().c_str());
         selfLeft = this->GetAlignment()->GetXRel();
@@ -822,14 +826,14 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
     // If we have one, make is available in m_crossStaff
     DurationInterface *durElement = this->GetDurationInterface();
     if (!durElement) return FUNCTOR_CONTINUE;
-    
+
     // If we have not @staff, set to what we had before (quite likely NULL for all non cross staff cases)
     if (!durElement->HasStaff()) {
         m_crossStaff = params->m_currentCrossStaff;
         m_crossLayer = params->m_currentCrossLayer;
         return FUNCTOR_CONTINUE;
     }
-    
+
     // We have a @staff, set the current pointers to NULL before assigning them
     params->m_currentCrossStaff = NULL;
     params->m_currentCrossLayer = NULL;
@@ -866,13 +870,13 @@ int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
             durElement->GetStaff().at(0), this->GetUuid().c_str());
         m_crossStaff = NULL;
     }
-    
+
     params->m_currentCrossStaff = m_crossStaff;
     params->m_currentCrossLayer = m_crossLayer;
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
 {
     PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
@@ -880,7 +884,7 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
 
     DurationInterface *durElement = this->GetDurationInterface();
     if (!durElement) return FUNCTOR_CONTINUE;
-    
+
     // If we have  @staff, set reset it to NULL - this can be problematic if we have different @staff attributes
     // in the the children of one element. We do not consider this now because it seems over the top
     // We would need to look at the @n attribute and to have a stack to handle this properly
@@ -888,7 +892,7 @@ int LayerElement::PrepareCrossStaffEnd(FunctorParams *functorParams)
         params->m_currentCrossStaff = NULL;
         params->m_currentCrossLayer = NULL;
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 

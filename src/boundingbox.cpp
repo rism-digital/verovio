@@ -149,7 +149,7 @@ void BoundingBox::ResetBoundingBox()
     m_selfBB_y1 = -VRV_UNSET;
     m_selfBB_x2 = VRV_UNSET;
     m_selfBB_y2 = VRV_UNSET;
-    
+
     m_cachedDrawingX = VRV_UNSET;
     m_cachedDrawingY = VRV_UNSET;
 
@@ -159,8 +159,8 @@ void BoundingBox::ResetBoundingBox()
 
 void BoundingBox::SetEmptyBB(bool onlyIfUnset)
 {
-    //if (onlyIfUnset && this->HasContentBB() && this->HasSelfBB()) return;
-    
+    // if (onlyIfUnset && this->HasContentBB() && this->HasSelfBB()) return;
+
     m_contentBB_x1 = 0;
     m_contentBB_y1 = 0;
     m_contentBB_x2 = 0;
@@ -188,7 +188,8 @@ bool BoundingBox::HasContentBB() const
 
 bool BoundingBox::HasSelfBB() const
 {
-    return ((m_selfBB_x1 != -VRV_UNSET) && (m_selfBB_y1 != -VRV_UNSET) && (m_selfBB_x2 != VRV_UNSET) && (m_selfBB_y2 != VRV_UNSET));
+    return ((m_selfBB_x1 != -VRV_UNSET) && (m_selfBB_y1 != -VRV_UNSET) && (m_selfBB_x2 != VRV_UNSET)
+        && (m_selfBB_y2 != VRV_UNSET));
 }
 
 bool BoundingBox::HorizontalOverlap(const BoundingBox *other) const

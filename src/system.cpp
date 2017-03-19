@@ -33,7 +33,7 @@ System::System() : Object("system-"), DrawingListInterface(), AttCommon(), AttTy
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
-    
+
     // We set parent to it because we want to access the parent doc from the aligners
     m_systemAligner.SetParent(this);
 
@@ -108,7 +108,7 @@ int System::GetDrawingY() const
     m_cachedDrawingY = 0;
     return m_drawingYRel;
 }
-    
+
 void System::SetDrawingXRel(int drawingXRel)
 {
     ResetCachedDrawingX();
@@ -284,7 +284,7 @@ int System::JustifyX(FunctorParams *functorParams)
 
     assert(GetParent());
     assert(GetParent()->GetParent());
-    
+
     Object *parent = GetParent();
 
     params->m_measureXRel = 0;

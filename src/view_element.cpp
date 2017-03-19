@@ -232,8 +232,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     dc->EndGraphic(element, this);
 }
 
-void View::DrawArtic(
-    DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
+void View::DrawArtic(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
 {
     assert(dc);
     assert(element);
@@ -509,7 +508,7 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     Chord *chord = dynamic_cast<Chord *>(element);
     assert(chord);
-    
+
     if (chord->m_crossStaff) staff = chord->m_crossStaff;
 
     chord->ResetDrawingList();
@@ -1407,7 +1406,7 @@ void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Rest *rest = dynamic_cast<Rest *>(element);
     assert(rest);
-    
+
     if (rest->m_crossStaff) staff = rest->m_crossStaff;
 
     bool drawingCueSize = rest->IsCueSize();

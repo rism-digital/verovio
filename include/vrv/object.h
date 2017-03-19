@@ -85,7 +85,7 @@ public:
     virtual ClassId GetClassId() const;
     virtual std::string GetClassName() const { return "[MISSING]"; }
     ///@}
-    
+
     /**
      * Make an object a reference object that do not own children.
      * This cannot be un-done and has to be set before any child is added.
@@ -252,7 +252,7 @@ public:
      * Return the last child of the object (if any, NULL otherwise)
      */
     Object *GetLast() const;
-    
+
     /**
      * Get the parent of the Object
      */
@@ -263,7 +263,7 @@ public:
      * The current parent is expected to be NULL.
      */
     void SetParent(Object *parent);
-    
+
     /**
      * Reset the parent of the Object.
      * The current parent is not expected to be NULL.
@@ -288,7 +288,7 @@ public:
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
     ///@}
-    
+
     /**
      * @name Reset the cached values of the drawingX and Y values.
      * Reset all children recursively
@@ -374,7 +374,7 @@ public:
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
     Object *GetFirstParent(const ClassId classId, int maxSteps = -1) const;
-    
+
     Object *GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
 
     /**
@@ -867,7 +867,7 @@ private:
      * Method for generating the uuid.
      */
     void GenerateUuid();
-    
+
     /**
      * Initialisation method taking a uuid prefix argument.
      */
@@ -892,7 +892,7 @@ private:
      * A pointer to the parent object;
      */
     Object *m_parent;
-    
+
     /**
      * Members for storing / generating uuids
      */
@@ -900,7 +900,7 @@ private:
     std::string m_uuid;
     std::string m_classid;
     ///@}
-    
+
     /**
      * A reference object do not own children.
      * Destructor will not delete them.
@@ -946,7 +946,7 @@ private:
      * For example, a Artic child in Note for an original @artic
      */
     bool m_isAttribute;
-    
+
     /**
      * A static counter for uuid generation.
      */

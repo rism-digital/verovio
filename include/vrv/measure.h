@@ -311,7 +311,7 @@ public:
     MeasureAligner m_measureAligner;
 
     TimestampAligner m_timestampAligner;
-    
+
 protected:
     /**
      * The X relative position of the measure.

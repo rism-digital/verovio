@@ -935,8 +935,8 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     Point adjustedRotatedC2 = rotatedC2;
 
     if (!spanningContentPoints.empty()) {
-        AdjustSlurCurve(
-            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, curveDir, slurAngle, true);
+        AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, curveDir,
+            slurAngle, true);
         // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
         AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2,
             curveDir, &slurAngle, false);
@@ -1061,9 +1061,9 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
     maxHeight = dist / (maxHeightFactor * (TEMP_SLUR_CURVE_FACTOR
                                               + 5)); // 5 is the minimum - can be increased for limiting curvature
-    
+
     maxHeight = std::max(maxHeight, currentHeight);
-    
+
     bool hasReachedMaxHeight = false;
 
     if (maxHeight > currentHeight) {
@@ -1124,7 +1124,7 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
             }
         }
     }
-    
+
     if (hasReachedMaxHeight) return maxHeight;
 
     // Check if we need further adjustment of the points with the curve
@@ -1133,12 +1133,14 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
         y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
         if (curveDir == curvature_CURVEDIR_above) {
-            if (y >= itPoint->second.y) itPoint = spanningPoints->erase(itPoint);
+            if (y >= itPoint->second.y)
+                itPoint = spanningPoints->erase(itPoint);
             else
                 itPoint++;
         }
         else {
-            if (y <= itPoint->second.y) itPoint = spanningPoints->erase(itPoint);
+            if (y <= itPoint->second.y)
+                itPoint = spanningPoints->erase(itPoint);
             else
                 itPoint++;
         }
@@ -1866,7 +1868,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     assert(system);
     assert(measure);
     assert(tempo);
-    
+
     // Cannot draw a tempo that has no start position
     if (!tempo->GetStart()) return;
 
