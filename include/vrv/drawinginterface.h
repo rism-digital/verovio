@@ -189,8 +189,8 @@ public:
     int GetDrawingStemLen();
     ///@}
 
-    Point GetDrawingStemStart();
-    Point GetDrawingStemEnd();
+    Point GetDrawingStemStart(Object *object = NULL);
+    Point GetDrawingStemEnd(Object *object = NULL);
 
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize) = 0;
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize) = 0;

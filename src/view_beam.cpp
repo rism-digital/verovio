@@ -325,8 +325,8 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             if (((el->Is(NOTE)) && !(dynamic_cast<Note *>(el))->IsChordTone()) || (el->Is(CHORD))) {
                 StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
                 assert(interface);
-                DrawVerticalLine(dc, interface->GetDrawingStemStart().y, interface->GetDrawingStemEnd().y,
-                    interface->GetDrawingStemStart().x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+                DrawVerticalLine(dc, interface->GetDrawingStemStart(el).y, interface->GetDrawingStemEnd(el).y,
+                    interface->GetDrawingStemStart(el).x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
             }
         }
     }

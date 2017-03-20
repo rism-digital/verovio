@@ -221,8 +221,8 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // Check if the note is on the top line or above (add a unit for the note head half size)
             if (note->GetDrawingY() >= y) y = note->GetDrawingY() + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
             // Check if the top of the stem is above
-            if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd().y > y))
-                y = note->GetDrawingStemEnd().y;
+            if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y))
+                y = note->GetDrawingStemEnd(note).y;
 
             // adjust the x position so it is centered
             wchar_t noteHead = (note->GetActualDur() < DUR_2) ? SMUFL_E0A2_noteheadWhole : SMUFL_E0A3_noteheadHalf;
@@ -449,14 +449,14 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         Stem *stem = childChord->GetDrawingStem();
         stemDir = childChord->GetDrawingStemDir();
         stemMod = stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
-        stemPoint = childChord->GetDrawingStemStart();
+        stemPoint = childChord->GetDrawingStemStart(childChord);
     }
     else {
         Stem *stem = childNote->GetDrawingStem();
         drawingCueSize = childNote->IsCueSize();
         stemDir = childNote->GetDrawingStemDir();
         stemMod = stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
-        stemPoint = childNote->GetDrawingStemStart();
+        stemPoint = childNote->GetDrawingStemStart(childNote);
     }
 
     int beamWidthBlack = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize);
@@ -525,14 +525,11 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     chord->ResetDrawingList();
 
     int staffSize = staff->m_drawingStaffSize;
-    int staffY = staff->GetDrawingY();
-    int verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
     bool drawingCueSize = chord->IsCueSize();
     int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
     int fullUnit = m_doc->GetDrawingUnit(staffSize);
 
     Beam *inBeam = chord->IsInBeam();
-    bool inFTrem = chord->IsInFTrem();
 
     /************ Ledger line reset ************/
 
@@ -868,7 +865,6 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     Stem *stem = dynamic_cast<Stem *>(flag->GetFirstParent(STEM));
     assert(stem);
 
-    int i;
     int x = flag->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
     int y = flag->GetDrawingY();
     bool drawingCueSize = flag->IsCueSize();
@@ -1206,7 +1202,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     Chord *inChord = note->IsChordTone();
     Beam *inBeam = note->IsInBeam();
-    bool inFTrem = note->IsInFTrem();
     bool drawingCueSize = note->IsCueSize();
 
     int staffSize = staff->m_drawingStaffSize;
@@ -1597,7 +1592,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     int positionShiftY1 = positionShift * 2;
     int positionShiftX2 = positionShift * 3;
     int positionShiftY2 = positionShift * 6;
-    Point startPoint = stemInterface->GetDrawingStemStart();
+    Point startPoint = stemInterface->GetDrawingStemStart(element);
 
     int startPointY = startPoint.y;
     if (element->Is(CHORD)) {

@@ -72,6 +72,10 @@ public:
 
     void GetYExtremes(int &yMax, int &yMin);
 
+    int GetYTop();
+
+    int GetYBottom();
+
     void GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow);
 
     Note *GetTopNote();

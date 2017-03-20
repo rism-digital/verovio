@@ -17,6 +17,7 @@
 #include "elementpart.h"
 #include "layerelement.h"
 #include "note.h"
+#include "object.h"
 
 namespace vrv {
 
@@ -169,15 +170,31 @@ int StemmedDrawingInterface::GetDrawingStemLen()
     return 0;
 }
 
-Point StemmedDrawingInterface::GetDrawingStemStart()
+Point StemmedDrawingInterface::GetDrawingStemStart(Object *object)
 {
-    assert(m_drawingStem);
+    assert(m_drawingStem || object);
+    if (object && !m_drawingStem) {
+        assert(this == dynamic_cast<StemmedDrawingInterface *>(object));
+        return Point(object->GetDrawingX(), object->GetDrawingY());
+    }
     return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY());
 }
 
-Point StemmedDrawingInterface::GetDrawingStemEnd()
+Point StemmedDrawingInterface::GetDrawingStemEnd(Object *object)
 {
-    assert(m_drawingStem);
+    assert(m_drawingStem || object);
+    if (object && !m_drawingStem) {
+        assert(this == dynamic_cast<StemmedDrawingInterface *>(object));
+        if (!m_drawingStem) {
+            // Somehow arbitrary for chord - stem end it the bottom with no stem
+            if (object->Is(CHORD)) {
+                Chord *chord = dynamic_cast<Chord *>(object);
+                assert(chord);
+                return Point(object->GetDrawingX(), chord->GetYBottom());
+            }
+            return Point(object->GetDrawingX(), object->GetDrawingY());
+        }
+    }
     return Point(m_drawingStem->GetDrawingX(), m_drawingStem->GetDrawingY() - GetDrawingStemLen());
 }
 

@@ -261,6 +261,24 @@ void Chord::GetYExtremes(int &yMax, int &yMin)
     yMax = childList->back()->GetDrawingY();
 }
 
+int Chord::GetYTop()
+{
+    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    // The last note is the top
+    return childList->back()->GetDrawingY();
+}
+
+int Chord::GetYBottom()
+{
+    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    // The first note is the bottom
+    return childList->front()->GetDrawingY();
+}
+
 void Chord::GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow)
 {
     staffAbove = NULL;
