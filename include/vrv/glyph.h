@@ -46,7 +46,7 @@ public:
     void SetBoundingBox(double x, double y, double w, double h);
 
     /** Get the units per EM */
-    int GetUnitsPerEm() { return m_unitsPerEm; }
+    int GetUnitsPerEm() const { return m_unitsPerEm; }
 
     /** Get the path */
     std::string GetPath() { return m_path; }

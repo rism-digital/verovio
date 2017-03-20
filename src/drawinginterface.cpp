@@ -13,8 +13,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "chord.h"
 #include "elementpart.h"
 #include "layerelement.h"
+#include "note.h"
 
 namespace vrv {
 

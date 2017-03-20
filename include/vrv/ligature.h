@@ -28,7 +28,6 @@ namespace vrv {
 
 class Ligature : public LayerElement,
                  public ObjectListInterface,
-                 public StemmedDrawingInterface,
                  public DurationInterface,
                  public AttStems,
                  public AttStemsCmn,

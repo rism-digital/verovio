@@ -35,9 +35,17 @@ public:
     virtual ClassId GetClassId() const { return FLAG; }
     ///@}
 
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() const { return true; }
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::CalcDrawingStemDir
+     */
+    virtual int CalcDrawingStemDir(FunctorParams *functorParams);
 
     /**
      * Overwritten version of Save that avoids anything to be written
@@ -47,10 +55,17 @@ public:
     virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
     ///@}
 
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *functorParams);
+
 private:
     //
 public:
-    //
+    /** The number of flags to be drawn */
+    int m_drawingNbFlags;
+
 private:
 };
 
@@ -114,7 +129,10 @@ public:
     virtual std::string GetClassName() const { return "Stem"; }
     virtual ClassId GetClassId() const { return STEM; }
     ///@}
-    
+
+    /** Override the method since alignment is required */
+    virtual bool HasToBeAligned() const { return true; }
+
     /**
      * Add an element (only flag supported) to a stem.
      */

@@ -105,6 +105,9 @@ public:
      */
     int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; }
 
+    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
+    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
+
     //----------//
     // Functors //
     //----------//

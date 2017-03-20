@@ -268,20 +268,23 @@ void BeamDrawingParams::CalcBeam(
     }
 
     for (i = 0; i < elementCount; i++) {
-        if (this->m_stemDir == STEMDIRECTION_up) {
-            y1 = (*beamElementCoords).at(i)->m_yBeam - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-            y2 = (*beamElementCoords).at(i)->m_yBottom + doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
-        }
-        else {
-            y1 = (*beamElementCoords).at(i)->m_yBeam + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-            y2 = (*beamElementCoords).at(i)->m_yTop - doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
-        }
-
         // All notes and chords get their stem value stored
         LayerElement *el = (*beamElementCoords).at(i)->m_element;
         if ((el->Is(NOTE)) || (el->Is(CHORD))) {
             StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
             assert(interface);
+
+            if (this->m_stemDir == STEMDIRECTION_up) {
+                y1 = (*beamElementCoords).at(i)->m_yBeam - doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                y2 = (*beamElementCoords).at(i)->m_yBottom
+                    + interface->GetStemUpSE(doc, staff->m_drawingStaffSize, this->m_cueSize).y;
+            }
+            else {
+                y1 = (*beamElementCoords).at(i)->m_yBeam + doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
+                y2 = (*beamElementCoords).at(i)->m_yTop
+                    + interface->GetStemDownNW(doc, staff->m_drawingStaffSize, this->m_cueSize).y;
+            }
+
             Stem *stem = interface->GetDrawingStem();
             assert(stem);
             stem->SetDrawingStemDir(this->m_stemDir);

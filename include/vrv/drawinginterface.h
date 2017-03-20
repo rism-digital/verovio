@@ -185,15 +185,15 @@ public:
     ///@{
     void SetDrawingStemDir(data_STEMDIRECTION stemDir);
     data_STEMDIRECTION GetDrawingStemDir();
-
     void SetDrawingStemLen(int drawingStemLen);
     int GetDrawingStemLen();
-
-    // virtual void SetDrawingStemStart(Point stemStart);
-    Point GetDrawingStemStart();
-    // virtual void SetDrawingStemEnd(Point stemEnd);
-    Point GetDrawingStemEnd();
     ///@}
+
+    Point GetDrawingStemStart();
+    Point GetDrawingStemEnd();
+
+    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize) = 0;
+    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize) = 0;
 
 protected:
     /**

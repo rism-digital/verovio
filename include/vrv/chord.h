@@ -96,6 +96,9 @@ public:
      */
     void ResetAccidSpace(int fullUnit);
 
+    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
+    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
+
     //----------//
     // Functors //
     //----------//

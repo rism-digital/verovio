@@ -15,10 +15,14 @@
 
 #include "artic.h"
 #include "attcomparison.h"
+#include "doc.h"
 #include "editorial.h"
 #include "elementpart.h"
 #include "functorparams.h"
+#include "layer.h"
 #include "slur.h"
+#include "smufl.h"
+#include "staff.h"
 #include "syl.h"
 #include "tie.h"
 #include "verse.h"
@@ -195,6 +199,28 @@ bool Note::IsClusterExtreme() const
         return false;
 }
 
+Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
+{
+    double x = 0.0;
+    double y = 312.5;
+
+    Glyph *glyph = Resources::GetGlyph(SMUFL_E0A3_noteheadHalf);
+    assert(glyph);
+    Point p = doc->ConvertFontPoint(glyph, x, y, staffSize, graceSize);
+    return p;
+}
+
+Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
+{
+    double x = 0.0;
+    double y = -312.5;
+
+    Glyph *glyph = Resources::GetGlyph(SMUFL_E0A3_noteheadHalf);
+    assert(glyph);
+    Point p = doc->ConvertFontPoint(glyph, x, y, staffSize, graceSize);
+    return p;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
@@ -204,6 +230,91 @@ int Note::CalcDrawingStemDir(FunctorParams *functorParams)
     CalcDrawingStemDirParams *params = dynamic_cast<CalcDrawingStemDirParams *>(functorParams);
     assert(params);
 
+    // Set it to NULL first
+    params->m_currentNote = NULL;
+
+    // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
+    // be processed either
+    if (this->IsInBeam() || this->IsInFTrem()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    if (this->IsChordTone()) {
+        assert(params->m_currentChord);
+        return FUNCTOR_CONTINUE;
+    }
+
+    // This now need should be NULL;
+    params->m_currentChord = NULL;
+
+    // No stem
+    if (this->GetDur() < DUR_2) {
+        LogDebug("Duration is longer than halfnote, there should be no stem");
+        return FUNCTOR_SIBLINGS;
+    }
+
+    Stem *stem = this->GetDrawingStem();
+    if (!stem) {
+        LogDebug("Stem is missing, something went wrong");
+        return FUNCTOR_SIBLINGS;
+    }
+
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    assert(layer);
+
+    if (this->m_crossStaff) staff = this->m_crossStaff;
+
+    // Cache the in params to avoid further lookup
+    params->m_currentStaff = staff;
+    params->m_currentLayer = layer;
+    params->m_currentNote = this;
+
+    int staffSize = staff->m_drawingStaffSize;
+    int staffY = staff->GetDrawingY();
+    int verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+    bool drawingCueSize = this->IsCueSize();
+    int radius = params->m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
+    // adjust the radius in order to take the stem width into account
+    radius -= params->m_doc->GetDrawingStemWidth(staffSize) / 2;
+
+    /************ Set the direction ************/
+
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+
+    if (stem->HasStemDir()) {
+        stemDir = stem->GetStemDir();
+    }
+    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+        stemDir = layer->GetDrawingStemDir();
+    }
+    else {
+        stemDir = (this->GetDrawingY() >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+    }
+
+    this->SetDrawingStemDir(stemDir);
+
+    /************ Set the position and the length ************/
+
+    int baseStem = -params->m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
+    if (drawingCueSize) baseStem = params->m_doc->GetGraceSize(baseStem);
+
+    if (stemDir == STEMDIRECTION_up) {
+        Point p = this->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
+        baseStem += p.y;
+        stem->SetDrawingYRel(p.y);
+        stem->SetDrawingXRel(radius);
+        this->SetDrawingStemLen(baseStem);
+    }
+    else {
+        Point p = this->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
+        baseStem -= p.y;
+        stem->SetDrawingYRel(p.y);
+        stem->SetDrawingXRel(-radius);
+        this->SetDrawingStemLen(-baseStem);
+    }
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -211,8 +322,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM));
     Flag *currentFlag = NULL;
-    if (currentStem)
-        currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG));
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG));
 
     if ((this->GetDur() > DUR_1) && !this->IsChordTone()) {
         if (!currentStem) {

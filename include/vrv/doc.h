@@ -17,6 +17,7 @@ class MidiFile;
 namespace vrv {
 
 class FontInfo;
+class Glyph;
 class Page;
 class Score;
 
@@ -99,6 +100,8 @@ public:
     int GetDrawingLedgerLineLength(int staffSize, bool graceSize) const;
     int GetGraceSize(int value) const;
     ///@}
+
+    Point ConvertFontPoint(const Glyph *glyph, double x, double y, int staffSize, bool graceSize) const;
 
     /**
      * @name Get the height or width for a text glyph taking into account the grace size.

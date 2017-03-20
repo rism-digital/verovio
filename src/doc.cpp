@@ -626,6 +626,24 @@ int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
     return w;
 }
 
+Point Doc::ConvertFontPoint(const Glyph *glyph, double x, double y, int staffSize, bool graceSize) const
+{
+    assert(glyph);
+
+    Point point;
+    point.x = x * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    point.y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    if (graceSize) {
+        point.y = point.y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+        point.y = point.y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    }
+    if (staffSize != 100) {
+        point.x = point.x * staffSize / 100;
+        point.y = point.y * staffSize / 100;
+    }
+    return point;
+}
+
 int Doc::GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const
 {
     int x, y, w, h;

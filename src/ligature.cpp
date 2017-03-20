@@ -25,13 +25,7 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Ligature::Ligature()
-    : LayerElement("ligature-")
-    , ObjectListInterface()
-    , StemmedDrawingInterface()
-    , DurationInterface()
-    , AttStems()
-    , AttStemsCmn()
-    , AttTiepresent()
+    : LayerElement("ligature-"), ObjectListInterface(), DurationInterface(), AttStems(), AttStemsCmn(), AttTiepresent()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
     RegisterAttClass(ATT_STEMS);
@@ -49,7 +43,6 @@ Ligature::~Ligature()
 void Ligature::Reset()
 {
     LayerElement::Reset();
-    StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
     ResetStems();
     ResetStemsCmn();
