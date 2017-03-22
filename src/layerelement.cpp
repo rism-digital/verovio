@@ -853,6 +853,10 @@ int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
             if (note) m_drawingCueSize = note->IsCueSize();
         }
     }
+    else if (this->Is({FLAG, STEM})) {
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
+        if (note) m_drawingCueSize = note->IsCueSize();
+    }
 
     return FUNCTOR_CONTINUE;
 }

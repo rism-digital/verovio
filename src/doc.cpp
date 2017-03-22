@@ -250,10 +250,6 @@ void Doc::PrepareDrawing()
             prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
-    // Prepare the drawing cue size
-    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
-    this->Process(&prepareDrawingCueSize, NULL);
-
     // Prepare the cross-staff pointers
     PrepareCrossStaffParams prepareCrossStaffParams;
     Functor prepareCrossStaff(&Object::PrepareCrossStaff);
@@ -396,6 +392,10 @@ void Doc::PrepareDrawing()
 
     Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
     this->Process(&prepareLayerElementParts, NULL);
+    
+    // Prepare the drawing cue size
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
 
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
