@@ -66,7 +66,6 @@ SvgDeviceContext::SvgDeviceContext(int width, int height) : DeviceContext()
     m_svgNode.append_attribute("version") = "1.1";
     m_svgNode.append_attribute("xmlns") = "http://www.w3.org/2000/svg";
     m_svgNode.append_attribute("xmlns:xlink") = "http://www.w3.org/1999/xlink";
-    m_svgNode.append_attribute("overflow") = "visible";
 
     // start the stack
     m_svgNodeStack.push_back(m_svgNode);
@@ -135,6 +134,11 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         decl.append_attribute("encoding") = "UTF-8";
         decl.append_attribute("standalone") = "no";
     }
+
+    // add description statement
+    pugi::xml_node desc = m_svgNode.prepend_child("desc");
+    desc.append_child(pugi::node_pcdata)
+        .set_value(StringFormat("Engraved by Verovio %s", GetVersion().c_str()).c_str());
 
     // save the glyph data to m_outdata
     m_svgDoc.save(m_outdata, "\t", output_flags);
@@ -397,9 +401,10 @@ void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d")
         = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
-            bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
-            bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
-            ).c_str();
+              bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
+              bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
+              )
+              .c_str();
     // pathChild.append_attribute("fill") = "#000000";
     // pathChild.append_attribute("fill-opacity") = "1";
     pathChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
@@ -499,8 +504,8 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
 
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)),
-        abs(int(ry)), fArc, fSweep, int(xe),
-        int(ye)).c_str();
+                                          abs(int(ry)), fArc, fSweep, int(xe), int(ye))
+                                          .c_str();
     // pathChild.append_attribute("fill") = "#000000";
     if (currentBrush.GetOpacity() != 1.0) pathChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
     if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
