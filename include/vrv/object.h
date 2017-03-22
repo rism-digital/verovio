@@ -554,7 +554,7 @@ public:
     /**
      * Set the drawing stems positions, including for beams.
      */
-    virtual int CalcDrawingStemDir(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int CalcStem(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.

@@ -686,8 +686,11 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         // Once we have AttLoc on Note
         // if (note->HasLoc()) loc = note->GetLoc();
         int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
-        // Make it relative to the top note one (see above)
-        if (chord) yRel -= chord->GetDrawingYRel();
+        // Make it relative to the top note one (see above) but not for cross-staff notes in chords
+        if (chord && !m_crossStaff) {
+            yRel -= chord->GetDrawingYRel();
+        }
+
         this->SetDrawingYRel(yRel);
     }
     else if (this->Is(REST)) {

@@ -306,9 +306,9 @@ int MRpt::PrepareRpt(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int FTrem::CalcDrawingStemDir(FunctorParams *functorParams)
+int FTrem::CalcStem(FunctorParams *functorParams)
 {
-    CalcDrawingStemDirParams *params = dynamic_cast<CalcDrawingStemDirParams *>(functorParams);
+    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     ListOfObjects *fTremChildren = this->GetList(this);

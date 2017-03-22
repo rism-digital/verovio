@@ -104,9 +104,9 @@ public:
     //----------//
 
     /**
-     * See Object::CalcDrawingStemDir
+     * See Object::CalcStem
      */
-    virtual int CalcDrawingStemDir(FunctorParams *functorParams);
+    virtual int CalcStem(FunctorParams *functorParams);
 
 protected:
     /**

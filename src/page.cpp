@@ -133,8 +133,8 @@ void Page::LayOutHorizontally()
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
-    CalcDrawingStemDirParams calcDrawingStemDirParams(doc);
-    Functor calcDrawingStemDir(&Object::CalcDrawingStemDir);
+    CalcStemParams calcDrawingStemDirParams(doc);
+    Functor calcDrawingStemDir(&Object::CalcStem);
     this->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
 
     // Render it for filling the bounding box

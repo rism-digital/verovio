@@ -76,10 +76,12 @@ public:
 
     int GetYBottom();
 
-    void GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow);
-
     Note *GetTopNote();
     Note *GetBottomNote();
+
+    void GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow);
+
+    bool HasCrossStaff();
 
     /**
      * Returns list of notes that have accidentals
@@ -108,9 +110,9 @@ public:
     //----------//
 
     /**
-     * See Object::CalcDrawingStemDir
+     * See Object::CalcStem
      */
-    virtual int CalcDrawingStemDir(FunctorParams *functorParams);
+    virtual int CalcStem(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareLayerElementParts

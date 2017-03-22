@@ -569,9 +569,9 @@ BeamElementCoord::~BeamElementCoord()
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Beam::CalcDrawingStemDir(FunctorParams *functorParams)
+int Beam::CalcStem(FunctorParams *functorParams)
 {
-    CalcDrawingStemDirParams *params = dynamic_cast<CalcDrawingStemDirParams *>(functorParams);
+    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     ListOfObjects *beamChildren = this->GetList(this);

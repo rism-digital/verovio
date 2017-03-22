@@ -26,6 +26,7 @@
 #include "dot.h"
 #include "dynam.h"
 #include "elementpart.h"
+#include "functorparams.h"
 #include "keysig.h"
 #include "layer.h"
 #include "measure.h"
@@ -521,6 +522,17 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(chord);
 
     if (chord->m_crossStaff) staff = chord->m_crossStaff;
+
+    // For cross staff chords we need to re-calculate the stem because the staff position might have changed
+    if (chord->HasCrossStaff()) {
+        SetAlignmentPitchPosParams setAlignmentPitchPosParams(this->m_doc, this);
+        Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
+        chord->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+
+        CalcStemParams calcDrawingStemDirParams(this->m_doc);
+        Functor calcDrawingStemDir(&Object::CalcStem);
+        chord->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
+    }
 
     chord->ResetDrawingList();
 
@@ -1223,7 +1235,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         radius += radius / 3;
     }
 
-    /************** Stem/notehead direction: **************/
+    /************** notehead direction **************/
 
     // if the note is clustered, calculations are different
     if (note->m_cluster) {
@@ -1280,7 +1292,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int staffBot = staffY - m_doc->GetDrawingStaffSize(staffSize) - m_doc->GetDrawingUnit(staffSize);
 
     // if the note is not in the staff
-    if (!is_in(noteY, staffTop, staffBot)) {
+    if (!isIn(noteY, staffTop, staffBot)) {
         int distance, highestNewLine, numLines;
 
         bool aboveStaff = (noteY > staffTop);

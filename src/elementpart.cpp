@@ -106,9 +106,9 @@ void Stem::AddChild(Object *child)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Flag::CalcDrawingStemDir(FunctorParams *functorParams)
+int Flag::CalcStem(FunctorParams *functorParams)
 {
-    CalcDrawingStemDirParams *params = dynamic_cast<CalcDrawingStemDirParams *>(functorParams);
+    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     if (!params->m_currentStaff || !params->m_currentLayer) {

@@ -158,7 +158,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     int staffBot = staffY - m_doc->GetDrawingStaffSize(staffSize) - m_doc->GetDrawingUnit(staffSize);
 
     // if the note is not in the staff
-    if (!is_in(noteY, staffTop, staffBot)) {
+    if (!isIn(noteY, staffTop, staffBot)) {
         int distance, highestNewLine, numLines;
         bool aboveStaff = (noteY > staffTop);
 

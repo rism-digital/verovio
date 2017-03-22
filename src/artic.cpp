@@ -343,7 +343,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         staffBelow = staff;
     }
     else if (parentChord) {
-        parentChord->GetCrossStaffExtemes(staffAbove, staffBelow);
+        parentChord->GetCrossStaffExtremes(staffAbove, staffBelow);
     }
 
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);

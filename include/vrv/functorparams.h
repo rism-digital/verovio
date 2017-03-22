@@ -351,33 +351,6 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// CalcDrawingStemDirParams
-//----------------------------------------------------------------------------
-
-/**
- * member 0: the current staff (to avoid additional lookup)
- * member 1: the current layer (ditto)
- * member 2: the doc
- **/
-
-class CalcDrawingStemDirParams : public FunctorParams {
-public:
-    CalcDrawingStemDirParams(Doc *doc)
-    {
-        m_currentStaff = NULL;
-        m_currentLayer = NULL;
-        m_currentChord = NULL;
-        m_currentNote = NULL;
-        m_doc = doc;
-    }
-    Staff *m_currentStaff;
-    Layer *m_currentLayer;
-    Chord *m_currentChord;
-    Note *m_currentNote;
-    Doc *m_doc;
-};
-
-//----------------------------------------------------------------------------
 // CalcMaxMeasureDurationParams
 //----------------------------------------------------------------------------
 
@@ -417,6 +390,33 @@ public:
     }
     StaffAlignment *m_previous;
     Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// CalcStemParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the current staff (to avoid additional lookup)
+ * member 1: the current layer (ditto)
+ * member 2: the doc
+ **/
+
+class CalcStemParams : public FunctorParams {
+public:
+    CalcStemParams(Doc *doc)
+    {
+        m_currentStaff = NULL;
+        m_currentLayer = NULL;
+        m_currentChord = NULL;
+        m_currentNote = NULL;
+        m_doc = doc;
+    }
+    Staff *m_currentStaff;
+    Layer *m_currentLayer;
+    Chord *m_currentChord;
+    Note *m_currentNote;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------

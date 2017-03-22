@@ -233,7 +233,7 @@ typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 #define DEFINITION_FACTOR 10
 #define PARAM_DENOMINATOR 10
 
-#define is_in(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
+#define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
 /**
  * Codes returned by Functors.

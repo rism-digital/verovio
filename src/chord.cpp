@@ -156,7 +156,7 @@ void Chord::FilterList(ListOfObjects *childList)
         assert(curNote);
         curPitch = curNote->GetDiatonicPitch();
 
-        if (curPitch - lastPitch == 1) {
+        if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff() == lastNote->GetCrossStaff())) {
             if (!lastNote->m_cluster) {
                 curCluster = new ChordCluster();
                 m_clusters.push_back(curCluster);
@@ -279,7 +279,28 @@ int Chord::GetYBottom()
     return childList->front()->GetDrawingY();
 }
 
-void Chord::GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow)
+Note *Chord::GetTopNote()
+{
+    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    Note *topNote = dynamic_cast<Note *>(childList->back());
+    assert(topNote);
+    return topNote;
+}
+
+Note *Chord::GetBottomNote()
+{
+    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
+    assert(childList->size() > 0);
+
+    // The first note is the bottom
+    Note *bottomNote = dynamic_cast<Note *>(childList->front());
+    assert(bottomNote);
+    return bottomNote;
+}
+
+void Chord::GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow)
 {
     staffAbove = NULL;
     staffBelow = NULL;
@@ -302,25 +323,14 @@ void Chord::GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow)
     }
 }
 
-Note *Chord::GetTopNote()
+bool Chord::HasCrossStaff()
 {
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
+    Staff *staffAbove = NULL;
+    Staff *staffBelow = NULL;
 
-    Note *topNote = dynamic_cast<Note *>(childList->back());
-    assert(topNote);
-    return topNote;
-}
+    this->GetCrossStaffExtremes(staffAbove, staffBelow);
 
-Note *Chord::GetBottomNote()
-{
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    assert(childList->size() > 0);
-
-    // The first note is the bottom
-    Note *bottomNote = dynamic_cast<Note *>(childList->front());
-    assert(bottomNote);
-    return bottomNote;
+    return (staffAbove != staffBelow);
 }
 
 Point Chord::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
@@ -341,9 +351,9 @@ Point Chord::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Chord::CalcDrawingStemDir(FunctorParams *functorParams)
+int Chord::CalcStem(FunctorParams *functorParams)
 {
-    CalcDrawingStemDirParams *params = dynamic_cast<CalcDrawingStemDirParams *>(functorParams);
+    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     // Set them to NULL in any case

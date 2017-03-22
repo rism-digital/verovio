@@ -225,9 +225,9 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
 // Functors methods
 //----------------------------------------------------------------------------
 
-int Note::CalcDrawingStemDir(FunctorParams *functorParams)
+int Note::CalcStem(FunctorParams *functorParams)
 {
-    CalcDrawingStemDirParams *params = dynamic_cast<CalcDrawingStemDirParams *>(functorParams);
+    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
     // Set it to NULL first
@@ -355,7 +355,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
         if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
     }
 
-    SetDrawingStem(currentStem);
+    if (!this->IsChordTone()) SetDrawingStem(currentStem);
 
     return FUNCTOR_CONTINUE;
 };
