@@ -67,6 +67,16 @@ enum {
     SMUFL_E224_tremolo5 = 0xE224,
     SMUFL_E240_flag8thUp = 0xE240,
     SMUFL_E241_flag8thDown = 0xE241,
+    SMUFL_E242_flag16thUp = 0xE242,
+    SMUFL_E243_flag16thDown = 0xE243,
+    SMUFL_E244_flag32ndUp = 0xE244,
+    SMUFL_E245_flag32ndDown = 0xE245,
+    SMUFL_E246_flag64thUp = 0xE246,
+    SMUFL_E247_flag64thDown = 0xE247,
+    SMUFL_E248_flag128thUp = 0xE248,
+    SMUFL_E249_flag128thDown = 0xE249,
+    SMUFL_E24A_flag256thUp = 0xE24A,
+    SMUFL_E24B_flag256thDown = 0xE24B,
     SMUFL_E260_accidentalFlat = 0xE260,
     SMUFL_E261_accidentalNatural = 0xE261,
     SMUFL_E262_accidentalSharp = 0xE262,
@@ -234,7 +244,7 @@ enum {
 };
 
 /** The number of glyphs for verification **/
-#define SMUFL_COUNT 209
+#define SMUFL_COUNT 219
 
 } // vrv namespace
 
