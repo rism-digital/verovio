@@ -122,9 +122,6 @@ void Note::AddChild(Object *child)
     else if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
     }
-    else if (child->Is(NOTEHEAD)) {
-        assert(dynamic_cast<NoteHead *>(child));
-    }
     else if (child->Is(STEM)) {
         assert(dynamic_cast<Stem *>(child));
     }

@@ -137,9 +137,6 @@ void View::DrawLayerElement(DeviceContext *dc, LayerElement *element, Layer *lay
     else if (element->Is(NOTE)) {
         DrawDurationElement(dc, element, layer, staff, measure);
     }
-    else if (element->Is(NOTEHEAD)) {
-        DrawNoteHead(dc, element, layer, staff, measure);
-    }
     else if (element->Is(PROPORT)) {
         DrawProport(dc, element, layer, staff, measure);
     }
@@ -1382,20 +1379,6 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     if (note->HasFermata()) {
         DrawFermataAttr(dc, element, layer, staff);
     }
-}
-
-void View::DrawNoteHead(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
-{
-    assert(dc);
-    assert(element);
-    assert(layer);
-    assert(staff);
-    assert(measure);
-
-    NoteHead *noteHead = dynamic_cast<NoteHead *>(element);
-    assert(noteHead);
-
-    int x = noteHead->GetDrawingX();
 }
 
 void View::DrawRest(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)

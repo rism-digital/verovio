@@ -140,7 +140,6 @@ enum ClassId {
     MULTIREST,
     MULTIRPT,
     NOTE,
-    NOTEHEAD,
     PROPORT,
     REST,
     SPACE,

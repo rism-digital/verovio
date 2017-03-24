@@ -70,46 +70,6 @@ private:
 };
 
 //----------------------------------------------------------------------------
-// NoteHead
-//----------------------------------------------------------------------------
-
-/**
- * This class models a stem as a layer element part and has not direct MEI equivlatent.
- */
-class NoteHead : public LayerElement {
-public:
-    /**
-     * @name Constructors, destructors, reset and class name methods
-     * Reset method resets all attribute classes
-     */
-    ///@{
-    NoteHead();
-    virtual ~NoteHead();
-    virtual void Reset();
-    virtual std::string GetClassName() const { return "NoteHead"; }
-    virtual ClassId GetClassId() const { return NOTEHEAD; }
-    ///@}
-
-    //----------//
-    // Functors //
-    //----------//
-
-    /**
-     * Overwritten version of Save that avoids anything to be written
-     */
-    ///@{
-    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
-    ///@}
-
-private:
-    //
-public:
-    //
-private:
-};
-
-//----------------------------------------------------------------------------
 // Stem
 //----------------------------------------------------------------------------
 

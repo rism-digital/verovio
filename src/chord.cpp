@@ -102,9 +102,6 @@ void Chord::AddChild(Object *child)
     else if (child->Is(NOTE)) {
         assert(dynamic_cast<Note *>(child));
     }
-    else if (child->Is(NOTEHEAD)) {
-        assert(dynamic_cast<NoteHead *>(child));
-    }
     else if (child->Is(STEM)) {
         assert(dynamic_cast<Stem *>(child));
     }
