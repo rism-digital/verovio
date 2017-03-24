@@ -526,7 +526,7 @@ void GraceAligner::AlignStack()
         element->SetGraceAlignment(alignment);
         alignment->AddLayerElementRef(element);
 
-        AttComparisonAny matchType({ NOTE, ACCID });
+        AttComparisonAny matchType({ ACCID, FLAG, NOTE, STEM });
         ArrayOfObjects children;
         ArrayOfObjects::iterator childrenIter;
         element->FindAllChildByAttComparison(&children, &matchType);
