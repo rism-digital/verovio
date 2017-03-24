@@ -37,6 +37,11 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+    
+    wchar_t GetSmuflCode(data_STEMDIRECTION stemDir);
+    
+    Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code);
+    Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code);
 
     //----------//
     // Functors //
