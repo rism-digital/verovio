@@ -117,7 +117,8 @@ void Glyph::SetAnchor(std::string anchorStr, double x, double y)
     else if (anchorStr == "cutOutSW") anchorId = SMUFL_cutOutSW;
     // Silently ignore unused anchors
     else return;
-    m_anchors[anchorId] = Anchor(x, y);
+    // Anchor points are given as staff spaces (upm / 4)
+    m_anchors[anchorId] = Point(x * this->GetUnitsPerEm() / 4, y * this->GetUnitsPerEm() / 4);
 }
     
 
@@ -126,7 +127,7 @@ bool Glyph::HasAnchor(SMuFLGlyphAnchor anchor)
     return (m_anchors.count(anchor) == 1);
 }
     
-const Anchor *Glyph::GetAnchor(SMuFLGlyphAnchor anchor)
+const Point *Glyph::GetAnchor(SMuFLGlyphAnchor anchor)
 {
     return &m_anchors[anchor];
 }

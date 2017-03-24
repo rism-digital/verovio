@@ -13,11 +13,10 @@
 
 //----------------------------------------------------------------------------
 
+#include "devicecontextbase.h"
 #include "vrvdef.h"
 
 namespace vrv {
-
-class Anchor;
 
 /**
  * This class is used for storing a music font glyph.
@@ -82,7 +81,7 @@ public:
     /**
      * Return the SMuFL anchor for the glyph.
      */
-    const Anchor *GetAnchor(SMuFLGlyphAnchor anchor);
+    const Point *GetAnchor(SMuFLGlyphAnchor anchor);
 
 private:
     //
@@ -103,35 +102,7 @@ private:
     /** The Unicode code in hexa as string */
     std::string m_codeStr;
     /** A map of the available anchors */
-    std::map<SMuFLGlyphAnchor, Anchor> m_anchors;
-};
-
-/**
- * This class is used for storing an anchor point of a music font glyph.
- */
-class Anchor {
-public:
-    /**
-     * @name Constructors, destructors, and other standard methods
-     */
-    ///@{
-    Anchor() { m_x = 0; m_y = 0; }
-    Anchor(double x, double y) { m_x = x; m_y = y; }
-    virtual ~Anchor() {};
-    ///@}
-    
-    /** Get the x and y anchors */
-    double GetX() { return m_x; }
-    double GetY() { return m_y; }
-    
-private:
-    //
-public:
-    //
-private:
-    /** The anchor values */
-    double m_x;
-    double m_y;
+    std::map<SMuFLGlyphAnchor, Point> m_anchors;
 };
 
 } // namespace vrv

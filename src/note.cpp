@@ -19,6 +19,7 @@
 #include "editorial.h"
 #include "elementpart.h"
 #include "functorparams.h"
+#include "glyph.h"
 #include "layer.h"
 #include "slur.h"
 #include "smufl.h"
@@ -201,23 +202,55 @@ bool Note::IsClusterExtreme() const
 
 Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
 {
-    double x = 0.0;
-    double y = 312.5;
+    int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
+    if (graceSize) defaultYShift = doc->GetGraceSize(defaultYShift);
+    // x default is always set to 0 because it is unused for now
+    Point p(0, defaultYShift);
 
-    Glyph *glyph = Resources::GetGlyph(SMUFL_E0A3_noteheadHalf);
+    // Here we should get the notehead value
+    wchar_t code = SMUFL_E0A4_noteheadBlack;
+    
+    // Use the default for standard quarter and half note heads
+    if ((code == SMUFL_E0A3_noteheadHalf) || (code == SMUFL_E0A4_noteheadBlack)) {
+        return p;
+    }
+    
+    Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
-    Point p = doc->ConvertFontPoint(glyph, x, y, staffSize, graceSize);
+    
+    if (glyph->HasAnchor(SMUFL_stemUpSE)) {
+        const Point *anchor = glyph->GetAnchor(SMUFL_stemUpSE);
+        assert(anchor);
+        p = doc->ConvertFontPoint(glyph, *anchor, staffSize, graceSize);
+    }
+
     return p;
 }
 
 Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
 {
-    double x = 0.0;
-    double y = -312.5;
+    int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
+    if (graceSize) defaultYShift = doc->GetGraceSize(defaultYShift);
+    // x default is always set to 0 because it is unused for now
+    Point p(0, -defaultYShift);
 
-    Glyph *glyph = Resources::GetGlyph(SMUFL_E0A3_noteheadHalf);
+    // Here we should get the notehead value
+    wchar_t code = SMUFL_E0A4_noteheadBlack;
+    
+    // Use the default for standard quarter and half note heads
+    if ((code == SMUFL_E0A3_noteheadHalf) || (code == SMUFL_E0A4_noteheadBlack)) {
+        return p;
+    }
+    
+    Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
-    Point p = doc->ConvertFontPoint(glyph, x, y, staffSize, graceSize);
+    
+    if (glyph->HasAnchor(SMUFL_stemDownNW)) {
+        const Point *anchor = glyph->GetAnchor(SMUFL_stemDownNW);
+        assert(anchor);
+        p = doc->ConvertFontPoint(glyph, *anchor, staffSize, graceSize);
+    }
+    
     return p;
 }
 

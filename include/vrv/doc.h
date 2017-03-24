@@ -101,7 +101,7 @@ public:
     int GetGraceSize(int value) const;
     ///@}
 
-    Point ConvertFontPoint(const Glyph *glyph, double x, double y, int staffSize, bool graceSize) const;
+    Point ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staffSize, bool graceSize) const;
 
     /**
      * @name Get the height or width for a text glyph taking into account the grace size.

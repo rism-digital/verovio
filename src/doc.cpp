@@ -626,15 +626,15 @@ int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
     return w;
 }
 
-Point Doc::ConvertFontPoint(const Glyph *glyph, double x, double y, int staffSize, bool graceSize) const
+Point Doc::ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staffSize, bool graceSize) const
 {
     assert(glyph);
 
     Point point;
-    point.x = x * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
-    point.y = y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    point.x = fontPoint.x * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    point.y = fontPoint.y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
     if (graceSize) {
-        point.y = point.y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+        point.x = point.x * this->m_style->m_graceNum / this->m_style->m_graceDen;
         point.y = point.y * this->m_style->m_graceNum / this->m_style->m_graceDen;
     }
     if (staffSize != 100) {
