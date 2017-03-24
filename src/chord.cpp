@@ -382,6 +382,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     params->m_layer = layer;
     params->m_interface = this;
     params->m_dur = this->GetActualDur();
+    params->m_isGraceNote = this->IsGraceNote();
 
     /************ Set the direction ************/
 

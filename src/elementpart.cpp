@@ -149,7 +149,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     int baseStem = 0;
     // Use the given one if any
     if (this->HasStemLen()) {
-        baseStem = this->GetStemLen();
+        baseStem = this->GetStemLen() * -params->m_doc->GetDrawingUnit(staffSize);
     }
     else {
         baseStem = -params->m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
@@ -189,7 +189,13 @@ int Stem::CalcStem(FunctorParams *functorParams)
 
     // Do not adjust the length if given in the encoding - however, the stem will be extend with the SMuFL
     // extension from 32th - this can be improved
-    if (this->HasStemLen()) return FUNCTOR_CONTINUE;
+    if (this->HasStemLen()) {
+        if ((this->GetStemLen() == 0) && flag) flag->m_drawingNbFlags = 0;
+        return FUNCTOR_CONTINUE;
+    }
+
+    // Do not adjust the length of grace notes - this is debatable and should probably become as styling option
+    if (params->m_isGraceNote) return FUNCTOR_CONTINUE;
 
     int flagHeight = 0;
 
@@ -207,17 +213,15 @@ int Stem::CalcStem(FunctorParams *functorParams)
     }
 
     int endY = this->GetDrawingY() - this->GetDrawingStemLen() + flagHeight;
-    if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-        if (endY < params->m_verticalCenter) {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() + (endY - params->m_verticalCenter));
-            if (flag) flag->SetDrawingYRel(-this->GetDrawingStemLen());
-        }
-    }
-    else {
-        if (endY > params->m_verticalCenter) {
-            this->SetDrawingStemLen(this->GetDrawingStemLen() + (endY - params->m_verticalCenter));
-            if (flag) flag->SetDrawingYRel(-this->GetDrawingStemLen());
-        }
+    bool adjust = false;
+    if ((this->GetDrawingStemDir() == STEMDIRECTION_up) && (endY < params->m_verticalCenter))
+        adjust = true;
+    else if ((this->GetDrawingStemDir() == STEMDIRECTION_down) && (endY > params->m_verticalCenter))
+        adjust = true;
+
+    if (adjust) {
+        this->SetDrawingStemLen(this->GetDrawingStemLen() + (endY - params->m_verticalCenter));
+        if (flag) flag->SetDrawingYRel(-this->GetDrawingStemLen());
     }
 
     return FUNCTOR_CONTINUE;
