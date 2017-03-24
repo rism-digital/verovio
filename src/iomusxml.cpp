@@ -742,7 +742,7 @@ bool MusicXmlInput::ReadMusicXmlMeasure(pugi::xml_node node, Measure *measure, i
     assert(measure);
 
     int measureNum = atoi(GetAttributeValue(node, "number").c_str());
-    if (measure > 0) measure->SetN(measureNum);
+    if (measure != NULL) measure->SetN(measureNum);
 
     int i = 0;
     for (i = 0; i < nbStaves; i++) {

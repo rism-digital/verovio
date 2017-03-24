@@ -43,7 +43,7 @@ $FLAGS .= " -s OUTLINING_LIMIT=10000";
 $FLAGS .= " -s TOTAL_MEMORY=192*1024*1024";
 $FLAGS .= " -s TOTAL_STACK=96*1024*1024";
 
-my ($FLAGS_NAME, $WEBWORKER, $WEBWORKER_NAME, $VERSION, $CHATTY);
+my ($FLAGS_NAME, $VERSION, $CHATTY);
 
 
 sub print_help {
@@ -55,7 +55,6 @@ Options:
 -l      Light version with no increased memory allocation
 -r DIR  Verovio root directory
 -v N    Version number (e.g., 1.0.0); no number by default
--w      WebWorker-compatible build
 -x      Font exclusion list (case-sensitive)
 -D      Disable DARMS importer
 -H      Disable Humdrum importer
@@ -113,9 +112,7 @@ if ($chattyQ) {
 }
 
 if ($webworkerQ) {
-	print "Building with webworker compatibility.\n";
-	$WEBWORKER = 1;
-	$WEBWORKER_NAME = "-webworker";
+	print "Warning: the -w flag for WebWorker compatibility is no longer necessary.\n";
 }
 
 if (!$nohumdrum) {
@@ -127,7 +124,7 @@ if ($helpQ) {
 	exit 2;
 }
 
-my $FILENAME = "verovio-toolkit$FLAGS_NAME$WEBWORKER_NAME.js";
+my $FILENAME = "verovio-toolkit$FLAGS_NAME.js";
 
 my $DATA_DIR  = "data";
 my $BUILD_DIR = "build";
@@ -197,11 +194,7 @@ if ($? == 0) {
 	print " Done.\n";
 
 	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
-	if ($WEBWORKER) {
-		`cat $BUILD_DIR/verovio.js verovio-proxy.js > $BUILD_DIR/$FILENAME`;
-	} else {
-		`cat $BUILD_DIR/verovio.js verovio-proxy.js verovio-unload-listener.js > $BUILD_DIR/$FILENAME`;
-	}
+	`cat $BUILD_DIR/verovio.js verovio-proxy.js > $BUILD_DIR/$FILENAME`;
 
 	# create a gzip version
 	`(cd $BUILD_DIR && gzip -c $FILENAME > $FILENAME.gz)`;
