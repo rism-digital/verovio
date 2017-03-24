@@ -406,16 +406,20 @@ class CalcStemParams : public FunctorParams {
 public:
     CalcStemParams(Doc *doc)
     {
-        m_currentStaff = NULL;
-        m_currentLayer = NULL;
-        m_currentChord = NULL;
-        m_currentNote = NULL;
+        m_chordStemLength = 0;
+        m_verticalCenter = 0;
+        m_dur = DUR_1;
+        m_staff = NULL;
+        m_layer = NULL;
+        m_interface = NULL;
         m_doc = doc;
     }
-    Staff *m_currentStaff;
-    Layer *m_currentLayer;
-    Chord *m_currentChord;
-    Note *m_currentNote;
+    int m_chordStemLength;
+    int m_verticalCenter;
+    int m_dur;
+    Staff *m_staff;
+    Layer *m_layer;
+    StemmedDrawingInterface *m_interface;
     Doc *m_doc;
 };
 

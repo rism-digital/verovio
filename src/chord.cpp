@@ -357,8 +357,7 @@ int Chord::CalcStem(FunctorParams *functorParams)
     assert(params);
 
     // Set them to NULL in any case
-    params->m_currentChord = NULL;
-    params->m_currentNote = NULL;
+    params->m_interface = NULL;
 
     // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
     // be processed either
@@ -367,17 +366,13 @@ int Chord::CalcStem(FunctorParams *functorParams)
     }
 
     // No stem
-    if (this->GetDur() < DUR_2) {
+    if (this->GetActualDur() < DUR_2) {
         LogDebug("Duratin is longer than halfnote, there should be no stem");
         return FUNCTOR_SIBLINGS;
     }
 
     Stem *stem = this->GetDrawingStem();
-    if (!stem) {
-        LogDebug("Stem is missing, something went wrong");
-        return FUNCTOR_SIBLINGS;
-    }
-
+    assert(stem);
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
     Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
@@ -386,25 +381,23 @@ int Chord::CalcStem(FunctorParams *functorParams)
     if (this->m_crossStaff) staff = this->m_crossStaff;
 
     // Cache the in params to avoid further lookup
-    params->m_currentStaff = staff;
-    params->m_currentLayer = layer;
-    params->m_currentChord = this;
-
-    int staffSize = staff->m_drawingStaffSize;
-    int staffY = staff->GetDrawingY();
-    int verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
-    bool drawingCueSize = this->IsCueSize();
-    int radius = params->m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
-    // adjust the radius in order to take the stem width into account
-    radius -= params->m_doc->GetDrawingStemWidth(staffSize) / 2;
-
+    params->m_staff = staff;
+    params->m_layer = layer;
+    params->m_interface = this;
+    params->m_dur = this->GetActualDur();
+    
     /************ Set the direction ************/
-
+    
     int yMax, yMin;
     this->GetYExtremes(yMax, yMin);
-
+    params->m_chordStemLength = yMin - yMax;
+    
+    int staffY = staff->GetDrawingY();
+    int staffSize = staff->m_drawingStaffSize;
+    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+    
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-
+    
     if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();
     }
@@ -412,44 +405,17 @@ int Chord::CalcStem(FunctorParams *functorParams)
         stemDir = layer->GetDrawingStemDir();
     }
     else {
-        stemDir = (yMax - verticalCenter >= verticalCenter - yMin) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        stemDir = (yMax - params->m_verticalCenter >= params->m_verticalCenter - yMin) ? STEMDIRECTION_down : STEMDIRECTION_up;
     }
-
+    
     this->SetDrawingStemDir(stemDir);
-
-    /************ Set the length (in any given ************/
-
-    if (stem->HasStemLen()) {
-        if (stemDir == STEMDIRECTION_up) {
-            this->SetDrawingStemLen(-stem->GetStemLen());
-        }
-        else {
-            this->SetDrawingStemLen(stem->GetStemLen());
-        }
-    }
-
-    /************ Set the position and the length ************/
-
-    int baseStem = -params->m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
-    if (drawingCueSize) baseStem = params->m_doc->GetGraceSize(baseStem);
-    baseStem += (yMin - yMax);
-
-    if (stemDir == STEMDIRECTION_up) {
-        Point p = this->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
-        baseStem += p.y;
-        stem->SetDrawingYRel(yMin - this->GetDrawingY() + p.y);
-        stem->SetDrawingXRel(radius);
-        // Do not override the length if it is given
-        if (!stem->HasStemLen()) this->SetDrawingStemLen(baseStem);
-    }
-    else {
-        Point p = this->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
-        baseStem -= p.y;
-        stem->SetDrawingYRel(p.y);
-        stem->SetDrawingXRel(-radius);
-        // Do not override the length if it is given
-        if (!stem->HasStemLen()) this->SetDrawingStemLen(-baseStem);
-    }
+    
+    // Position the stem to the bottom note when up
+    if (stemDir == STEMDIRECTION_up)
+        stem->SetDrawingYRel(yMin - this->GetDrawingY());
+    // And to the top note when down
+    else
+        stem->SetDrawingYRel(0);
 
     return FUNCTOR_CONTINUE;
 }

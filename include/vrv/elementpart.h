@@ -48,11 +48,6 @@ public:
     //----------//
 
     /**
-     * See Object::CalcStem
-     */
-    virtual int CalcStem(FunctorParams *functorParams);
-
-    /**
      * Overwritten version of Save that avoids anything to be written
      */
     ///@{
@@ -156,6 +151,11 @@ public:
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *functorParams);
 
     /**
      * Overwritten version of Save that avoids anything to be written

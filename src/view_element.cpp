@@ -879,25 +879,9 @@ void View::DrawFlag(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     int x = flag->GetDrawingX() - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize) / 2;
     int y = flag->GetDrawingY();
-    
-    
-    //bool drawingCueSize = flag->IsCueSize();
-    //int flagStemHeight = m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
 
     dc->StartGraphic(element, "", element->GetUuid());
 
-    /*
-    if (stem->GetDrawingStemDir() == STEMDIRECTION_up) {
-        for (int i = 0; i < flag->m_drawingNbFlags; i++)
-            DrawSmuflCode(
-                dc, x, y + (i * flagStemHeight), SMUFL_E240_flag8thUp, staff->m_drawingStaffSize, drawingCueSize);
-    }
-    else {
-        for (int i = 0; i < flag->m_drawingNbFlags; i++)
-            DrawSmuflCode(
-                dc, x, y - (i * flagStemHeight), SMUFL_E241_flag8thDown, staff->m_drawingStaffSize, drawingCueSize);
-    }
-    */
     wchar_t code = flag->GetSmuflCode(stem->GetDrawingStemDir());
     DrawSmuflCode(dc, x, y, code, staff->m_drawingStaffSize, flag->IsCueSize());
 

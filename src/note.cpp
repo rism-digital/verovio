@@ -230,9 +230,6 @@ int Note::CalcStem(FunctorParams *functorParams)
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
 
-    // Set it to NULL first
-    params->m_currentNote = NULL;
-
     // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
     // be processed either
     if (this->IsInBeam() || this->IsInFTrem()) {
@@ -240,25 +237,22 @@ int Note::CalcStem(FunctorParams *functorParams)
     }
 
     if (this->IsChordTone()) {
-        assert(params->m_currentChord);
+        assert(params->m_interface);
         return FUNCTOR_CONTINUE;
     }
 
-    // This now need should be NULL;
-    params->m_currentChord = NULL;
+    // This now need should be NULL and the chord stem length will be 0
+    params->m_interface = NULL;
+    params->m_chordStemLength = 0;
 
     // No stem
-    if (this->GetDur() < DUR_2) {
+    if (this->GetActualDur() < DUR_2) {
         LogDebug("Duration is longer than halfnote, there should be no stem");
         return FUNCTOR_SIBLINGS;
     }
 
     Stem *stem = this->GetDrawingStem();
-    if (!stem) {
-        LogDebug("Stem is missing, something went wrong");
-        return FUNCTOR_SIBLINGS;
-    }
-
+    assert(stem);
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
     Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
@@ -267,18 +261,16 @@ int Note::CalcStem(FunctorParams *functorParams)
     if (this->m_crossStaff) staff = this->m_crossStaff;
 
     // Cache the in params to avoid further lookup
-    params->m_currentStaff = staff;
-    params->m_currentLayer = layer;
-    params->m_currentNote = this;
+    params->m_staff = staff;
+    params->m_layer = layer;
+    params->m_interface = this;
+    params->m_dur = this->GetActualDur();
 
     int staffSize = staff->m_drawingStaffSize;
     int staffY = staff->GetDrawingY();
-    int verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
-    bool drawingCueSize = this->IsCueSize();
-    int radius = params->m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
-    // adjust the radius in order to take the stem width into account
-    radius -= params->m_doc->GetDrawingStemWidth(staffSize) / 2;
-
+    
+    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+    
     /************ Set the direction ************/
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
@@ -290,30 +282,13 @@ int Note::CalcStem(FunctorParams *functorParams)
         stemDir = layer->GetDrawingStemDir();
     }
     else {
-        stemDir = (this->GetDrawingY() >= verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        stemDir = (this->GetDrawingY() >= params->m_verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
     }
 
     this->SetDrawingStemDir(stemDir);
-
-    /************ Set the position and the length ************/
-
-    int baseStem = -params->m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
-    if (drawingCueSize) baseStem = params->m_doc->GetGraceSize(baseStem);
-
-    if (stemDir == STEMDIRECTION_up) {
-        Point p = this->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
-        baseStem += p.y;
-        stem->SetDrawingYRel(p.y);
-        stem->SetDrawingXRel(radius);
-        this->SetDrawingStemLen(baseStem);
-    }
-    else {
-        Point p = this->GetStemDownNW(params->m_doc, staffSize, drawingCueSize);
-        baseStem -= p.y;
-        stem->SetDrawingYRel(p.y);
-        stem->SetDrawingXRel(-radius);
-        this->SetDrawingStemLen(-baseStem);
-    }
+    
+    // Make sure the relative position of the stem is the same
+    stem->SetDrawingYRel(0);
 
     return FUNCTOR_CONTINUE;
 }
