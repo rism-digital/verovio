@@ -209,15 +209,15 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
 
     // Here we should get the notehead value
     wchar_t code = SMUFL_E0A4_noteheadBlack;
-    
+
     // Use the default for standard quarter and half note heads
     if ((code == SMUFL_E0A3_noteheadHalf) || (code == SMUFL_E0A4_noteheadBlack)) {
         return p;
     }
-    
+
     Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
-    
+
     if (glyph->HasAnchor(SMUFL_stemUpSE)) {
         const Point *anchor = glyph->GetAnchor(SMUFL_stemUpSE);
         assert(anchor);
@@ -236,21 +236,21 @@ Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
 
     // Here we should get the notehead value
     wchar_t code = SMUFL_E0A4_noteheadBlack;
-    
+
     // Use the default for standard quarter and half note heads
     if ((code == SMUFL_E0A3_noteheadHalf) || (code == SMUFL_E0A4_noteheadBlack)) {
         return p;
     }
-    
+
     Glyph *glyph = Resources::GetGlyph(code);
     assert(glyph);
-    
+
     if (glyph->HasAnchor(SMUFL_stemDownNW)) {
         const Point *anchor = glyph->GetAnchor(SMUFL_stemDownNW);
         assert(anchor);
         p = doc->ConvertFontPoint(glyph, *anchor, staffSize, graceSize);
     }
-    
+
     return p;
 }
 
@@ -301,9 +301,9 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     int staffSize = staff->m_drawingStaffSize;
     int staffY = staff->GetDrawingY();
-    
+
     params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
-    
+
     /************ Set the direction ************/
 
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
@@ -319,7 +319,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     }
 
     this->SetDrawingStemDir(stemDir);
-    
+
     // Make sure the relative position of the stem is the same
     stem->SetDrawingYRel(0);
 

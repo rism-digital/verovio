@@ -42,7 +42,7 @@ void Flag::Reset()
 {
     LayerElement::Reset();
 }
-    
+
 wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
 {
     if (stemDir == STEMDIRECTION_up) {
@@ -68,11 +68,11 @@ wchar_t Flag::GetSmuflCode(data_STEMDIRECTION stemDir)
         }
     }
 }
-    
+
 Point Flag::GetStemUpSE(Doc *doc, int staffSize, bool graceSize, wchar_t &code)
 {
     code = this->GetSmuflCode(STEMDIRECTION_up);
-    
+
     int h = doc->GetGlyphHeight(code, staffSize, graceSize);
     return Point(0, h + doc->GetGlyphDescender(code, staffSize, graceSize));
 }
@@ -83,7 +83,6 @@ Point Flag::GetStemDownNW(Doc *doc, int staffSize, bool graceSize, wchar_t &code
 
     return Point(0, doc->GetGlyphDescender(code, staffSize, graceSize));
 }
-
 
 //----------------------------------------------------------------------------
 // NoteHead
@@ -148,24 +147,24 @@ void Stem::AddChild(Object *child)
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
-    
+
 int Stem::CalcStem(FunctorParams *functorParams)
 {
     CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
     assert(params);
-    
+
     assert(params->m_staff);
     assert(params->m_layer);
     assert(params->m_interface);
-    
+
     int staffSize = params->m_staff->m_drawingStaffSize;
     bool drawingCueSize = this->IsCueSize();
     int radius = params->m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
     // adjust the radius in order to take the stem width into account
     radius -= params->m_doc->GetDrawingStemWidth(staffSize) / 2;
-    
+
     /************ Set the position, the length and adjust to the note head ************/
-    
+
     int baseStem = 0;
     // Use the given one if any
     if (this->HasStemLen()) {
@@ -179,7 +178,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
     // Also, the given stem length is understood as being mesured from the center of the note.
     // This means that it will be adjusted according to the note head (see below
     baseStem += params->m_chordStemLength;
-    
+
     if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
         Point p = params->m_interface->GetStemUpSE(params->m_doc, staffSize, drawingCueSize);
         baseStem += p.y;
@@ -194,25 +193,25 @@ int Stem::CalcStem(FunctorParams *functorParams)
         this->SetDrawingXRel(-radius);
         this->SetDrawingStemLen(-baseStem);
     }
-    
+
     /************ Set the flag (if necessary) and adjust the length ************/
-    
+
     Flag *flag = NULL;
 
     // SMUFL flags cover some additional stem length from the 32th only
     if (params->m_dur > DUR_4) {
-        flag = dynamic_cast<Flag*>(this->FindChildByType(FLAG));
+        flag = dynamic_cast<Flag *>(this->FindChildByType(FLAG));
         assert(flag);
         flag->m_drawingNbFlags = params->m_dur - DUR_4;
         flag->SetDrawingYRel(-this->GetDrawingStemLen());
     }
-    
+
     // Do not adjust the length if given in the encoding - however, the stem will be extend with the SMuFL
     // extension from 32th - this can be improved
     if (this->HasStemLen()) return FUNCTOR_CONTINUE;
-    
+
     int flagHeight = 0;
-    
+
     // SMUFL flags cover some additional stem length from the 32th only
     if (params->m_dur > DUR_16) {
         assert(flag);
@@ -225,7 +224,7 @@ int Stem::CalcStem(FunctorParams *functorParams)
         // Trick for shortening the stem with DUR_8
         flagHeight = stemEnd.y;
     }
-    
+
     int endY = this->GetDrawingY() - this->GetDrawingStemLen() + flagHeight;
     if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
         if (endY < params->m_verticalCenter) {
@@ -239,7 +238,6 @@ int Stem::CalcStem(FunctorParams *functorParams)
             if (flag) flag->SetDrawingYRel(-this->GetDrawingStemLen());
         }
     }
-
 
     return FUNCTOR_CONTINUE;
 }

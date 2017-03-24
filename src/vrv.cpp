@@ -173,15 +173,15 @@ bool Resources::LoadFont(std::string fontName)
             glyph->SetBoundingBox(x, y, width, height);
             if (current.attribute("h-a-x")) glyph->SetHorizAdvX(atof(current.attribute("h-a-x").value()));
         }
-        
+
         if (!glyph) continue;
-        
+
         // load anchors
         pugi::xml_node anchor;
         for (anchor = current.child("a"); anchor; anchor = anchor.next_sibling("a")) {
             if (anchor.attribute("n")) {
                 std::string name = std::string(anchor.attribute("n").value());
-                 // No check for possible x and y missing attributes - not very safe.
+                // No check for possible x and y missing attributes - not very safe.
                 glyph->SetAnchor(name, atof(anchor.attribute("x").value()), atof(anchor.attribute("y").value()));
             }
         }

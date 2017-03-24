@@ -385,19 +385,19 @@ int Chord::CalcStem(FunctorParams *functorParams)
     params->m_layer = layer;
     params->m_interface = this;
     params->m_dur = this->GetActualDur();
-    
+
     /************ Set the direction ************/
-    
+
     int yMax, yMin;
     this->GetYExtremes(yMax, yMin);
     params->m_chordStemLength = yMin - yMax;
-    
+
     int staffY = staff->GetDrawingY();
     int staffSize = staff->m_drawingStaffSize;
     params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
-    
+
     data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
-    
+
     if (stem->HasStemDir()) {
         stemDir = stem->GetStemDir();
     }
@@ -405,14 +405,14 @@ int Chord::CalcStem(FunctorParams *functorParams)
         stemDir = layer->GetDrawingStemDir();
     }
     else {
-        stemDir = (yMax - params->m_verticalCenter >= params->m_verticalCenter - yMin) ? STEMDIRECTION_down : STEMDIRECTION_up;
+        stemDir = (yMax - params->m_verticalCenter >= params->m_verticalCenter - yMin) ? STEMDIRECTION_down
+                                                                                       : STEMDIRECTION_up;
     }
-    
+
     this->SetDrawingStemDir(stemDir);
-    
+
     // Position the stem to the bottom note when up
-    if (stemDir == STEMDIRECTION_up)
-        stem->SetDrawingYRel(yMin - this->GetDrawingY());
+    if (stemDir == STEMDIRECTION_up) stem->SetDrawingYRel(yMin - this->GetDrawingY());
     // And to the top note when down
     else
         stem->SetDrawingYRel(0);

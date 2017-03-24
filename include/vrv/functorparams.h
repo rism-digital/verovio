@@ -397,9 +397,13 @@ public:
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the current staff (to avoid additional lookup)
- * member 1: the current layer (ditto)
- * member 2: the doc
+ * member 0: the additional length for a chord stem (between the top and bottom note)
+ * member 1: the vertical center of the staff
+ * member 2: the actual duration of the chord / note
+ * member 3: the current staff (to avoid additional lookup)
+ * member 4: the current layer (ditto)
+ * member 5: the chord or note to which the stem belongs
+ * member 6: the doc
  **/
 
 class CalcStemParams : public FunctorParams {

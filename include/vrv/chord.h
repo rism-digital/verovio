@@ -70,17 +70,29 @@ public:
 
     virtual void FilterList(ListOfObjects *childlist);
 
+    /**
+     * Return the maximum and minimum Y positions of the notes in the chord
+     */
     void GetYExtremes(int &yMax, int &yMin);
 
-    int GetYTop();
-
-    int GetYBottom();
-
+    /**
+     * Return the top or bottom note or their Y position
+     */
+    ///@{
     Note *GetTopNote();
     Note *GetBottomNote();
+    int GetYTop();
+    int GetYBottom();
+    ///@}
 
+    /**
+     * Return the cross staff above or below (if  any).
+     */
     void GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow);
 
+    /**
+     * Return true if the chord has some cross staff notes.
+     */
     bool HasCrossStaff();
 
     /**
@@ -102,8 +114,14 @@ public:
      */
     void ResetAccidSpace(int fullUnit);
 
+    /**
+     * Get the stem up / stem down attachment point.
+     * If necessary look at the glyph anchor (if any).
+     */
+    ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
+    ///@}
 
     //----------//
     // Functors //

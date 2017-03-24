@@ -66,18 +66,18 @@ public:
     int GetHorizAdvX() { return m_horizAdvX; }
     void SetHorizAdvX(double horizAdvX) { m_horizAdvX = (int)(horizAdvX * 10.0); }
     ///@}
-    
+
     /**
      * Add an anchor for the glyph.
      * The string is turn into a SMuFLGlyphAnchor ("cutOutNE" => SMUFL_cutOutNE)
      */
     void SetAnchor(std::string anchorStr, double x, double y);
-    
+
     /**
      * Check if the glyph has anchor provided.
      */
     bool HasAnchor(SMuFLGlyphAnchor anchor);
-    
+
     /**
      * Return the SMuFL anchor for the glyph.
      */

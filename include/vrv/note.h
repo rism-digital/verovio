@@ -105,8 +105,14 @@ public:
      */
     int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; }
 
+    /**
+     * Get the stem up / stem down attachment point.
+     * If necessary look at the glyph anchor (if any).
+     */
+    ///@{
     virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
     virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
+    ///@}
 
     //----------//
     // Functors //

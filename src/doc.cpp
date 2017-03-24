@@ -392,7 +392,7 @@ void Doc::PrepareDrawing()
 
     Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
     this->Process(&prepareLayerElementParts, NULL);
-    
+
     // Prepare the drawing cue size
     Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
     this->Process(&prepareDrawingCueSize, NULL);
