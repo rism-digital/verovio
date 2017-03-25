@@ -579,16 +579,16 @@
             <description>Flags</description>
             <glyph glyph-code="E240" smufl-name="flag8thUp"/>
             <glyph glyph-code="E241" smufl-name="flag8thDown"/>
-            <!--<glyph glyph-code="E242" smufl-name="flag16thUp"/>-->
-            <!--<glyph glyph-code="E243" smufl-name="flag16thDown"/>-->
-            <!--<glyph glyph-code="E244" smufl-name="flag32ndUp"/>-->
-            <!--<glyph glyph-code="E245" smufl-name="flag32ndDown"/>-->
-            <!--<glyph glyph-code="E246" smufl-name="flag64thUp"/>-->
-            <!--<glyph glyph-code="E247" smufl-name="flag64thDown"/>-->
-            <!--<glyph glyph-code="E248" smufl-name="flag128thUp"/>-->
-            <!--<glyph glyph-code="E249" smufl-name="flag128thDown"/>-->
-            <!--<glyph glyph-code="E24A" smufl-name="flag256thUp"/>-->
-            <!--<glyph glyph-code="E24B" smufl-name="flag256thDown"/>-->
+            <glyph glyph-code="E242" smufl-name="flag16thUp"/>
+            <glyph glyph-code="E243" smufl-name="flag16thDown"/>
+            <glyph glyph-code="E244" smufl-name="flag32ndUp"/>
+            <glyph glyph-code="E245" smufl-name="flag32ndDown"/>
+            <glyph glyph-code="E246" smufl-name="flag64thUp"/>
+            <glyph glyph-code="E247" smufl-name="flag64thDown"/>
+            <glyph glyph-code="E248" smufl-name="flag128thUp"/>
+            <glyph glyph-code="E249" smufl-name="flag128thDown"/>
+            <glyph glyph-code="E24A" smufl-name="flag256thUp"/>
+            <glyph glyph-code="E24B" smufl-name="flag256thDown"/>
             <!--<glyph glyph-code="E24C" smufl-name="flag512thUp"/>-->
             <!--<glyph glyph-code="E24D" smufl-name="flag512thDown"/>-->
             <!--<glyph glyph-code="E24E" smufl-name="flag1024thUp"/>-->

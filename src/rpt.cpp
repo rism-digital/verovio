@@ -17,7 +17,9 @@
 #include "chord.h"
 #include "editorial.h"
 #include "functorparams.h"
+#include "layer.h"
 #include "note.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -146,6 +148,15 @@ void FTrem::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
+        // also remove notes within chords
+        if ((*iter)->Is(NOTE)) {
+            Note *note = dynamic_cast<Note *>(*iter);
+            assert(note);
+            if (note->IsChordTone()) {
+                iter = childList->erase(iter);
+                continue;
+            }
+        }
         iter++;
     }
 
@@ -162,7 +173,7 @@ void FTrem::InitCoords(ListOfObjects *childList)
 
     BeamElementCoord *firstElement = new BeamElementCoord;
     BeamElementCoord *secondElement = new BeamElementCoord;
-    ;
+
     m_beamElementCoords.push_back(firstElement);
     m_beamElementCoords.push_back(secondElement);
 
@@ -292,6 +303,33 @@ int MRpt::PrepareRpt(FunctorParams *functorParams)
         this->m_drawingMeasureCount = params->m_currentMRpt->m_drawingMeasureCount + 1;
     }
     params->m_currentMRpt = this;
+    return FUNCTOR_CONTINUE;
+}
+
+int FTrem::CalcStem(FunctorParams *functorParams)
+{
+    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    assert(params);
+
+    ListOfObjects *fTremChildren = this->GetList(this);
+
+    // Should we assert this at the beginning?
+    if (fTremChildren->empty()) {
+        return FUNCTOR_CONTINUE;
+    }
+    const ArrayOfBeamElementCoords *beamElementCoords = this->GetElementCoords();
+
+    assert(beamElementCoords->size() == 2);
+
+    int elementCount = 2;
+
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    assert(layer);
+    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+    assert(staff);
+
+    this->m_drawingParams.CalcBeam(layer, staff, params->m_doc, beamElementCoords, elementCount);
+
     return FUNCTOR_CONTINUE;
 }
 

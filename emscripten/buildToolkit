@@ -40,8 +40,8 @@ $FLAGS .= " --memory-init-file 0";
 $FLAGS .= " -std=c++11";
 $FLAGS .= " -s ASM_JS=1";
 $FLAGS .= " -s OUTLINING_LIMIT=10000";
-$FLAGS .= " -s TOTAL_MEMORY=128*1024*1024";
-$FLAGS .= " -s TOTAL_STACK=64*1024*1024";
+$FLAGS .= " -s TOTAL_MEMORY=192*1024*1024";
+$FLAGS .= " -s TOTAL_STACK=96*1024*1024";
 
 my ($FLAGS_NAME, $VERSION, $CHATTY);
 

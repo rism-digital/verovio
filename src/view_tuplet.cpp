@@ -111,11 +111,13 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
         y = firstElement->GetDrawingY();
         if (firstNote && lastNote) {
             if (firstNote->GetDrawingStemDir() == STEMDIRECTION_up)
-                y = lastNote->GetDrawingStemEnd().y
-                    + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 + TUPLET_OFFSET;
+                y = lastNote->GetDrawingStemEnd(lastNote).y
+                    + (firstNote->GetDrawingStemEnd(firstNote).y - lastNote->GetDrawingStemEnd(lastNote).y) / 2
+                    + TUPLET_OFFSET;
             else
-                y = lastNote->GetDrawingStemEnd().y
-                    + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 - TUPLET_OFFSET;
+                y = lastNote->GetDrawingStemEnd(lastNote).y
+                    + (firstNote->GetDrawingStemEnd(firstNote).y - lastNote->GetDrawingStemEnd(lastNote).y) / 2
+                    - TUPLET_OFFSET;
         }
 
         // Copy the generated coordinates
@@ -166,16 +168,18 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
             y = firstElement->GetDrawingY();
             if (firstNote && lastNote) {
                 if (direction == STEMDIRECTION_up) { // up
-                    y = lastNote->GetDrawingStemEnd().y
-                        + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 + TUPLET_OFFSET;
-                    start->y = firstNote->GetDrawingStemEnd().y + TUPLET_OFFSET;
-                    end->y = lastNote->GetDrawingStemEnd().y + TUPLET_OFFSET;
+                    y = lastNote->GetDrawingStemEnd(lastNote).y
+                        + (firstNote->GetDrawingStemEnd(firstNote).y - lastNote->GetDrawingStemEnd(lastNote).y) / 2
+                        + TUPLET_OFFSET;
+                    start->y = firstNote->GetDrawingStemEnd(firstNote).y + TUPLET_OFFSET;
+                    end->y = lastNote->GetDrawingStemEnd(lastNote).y + TUPLET_OFFSET;
                 }
                 else {
-                    y = lastNote->GetDrawingStemEnd().y
-                        + (firstNote->GetDrawingStemEnd().y - lastNote->GetDrawingStemEnd().y) / 2 - TUPLET_OFFSET;
-                    start->y = firstNote->GetDrawingStemEnd().y - TUPLET_OFFSET;
-                    end->y = lastNote->GetDrawingStemEnd().y - TUPLET_OFFSET;
+                    y = lastNote->GetDrawingStemEnd(lastNote).y
+                        + (firstNote->GetDrawingStemEnd(firstNote).y - lastNote->GetDrawingStemEnd(lastNote).y) / 2
+                        - TUPLET_OFFSET;
+                    start->y = firstNote->GetDrawingStemEnd(firstNote).y - TUPLET_OFFSET;
+                    end->y = lastNote->GetDrawingStemEnd(lastNote).y - TUPLET_OFFSET;
                 }
             }
 
@@ -192,16 +196,16 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
                     if (direction == STEMDIRECTION_up) {
                         // The note is more than the avg, adjust to y the difference
                         // from this note to the avg
-                        if (currentNote->GetDrawingStemEnd().y + TUPLET_OFFSET > y) {
-                            int offset = y - (currentNote->GetDrawingStemEnd().y + TUPLET_OFFSET);
+                        if (currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET > y) {
+                            int offset = y - (currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET);
                             y -= offset;
                             end->y -= offset;
                             start->y -= offset;
                         }
                     }
                     else {
-                        if (currentNote->GetDrawingStemEnd().y - TUPLET_OFFSET < y) {
-                            int offset = y - (currentNote->GetDrawingStemEnd().y - TUPLET_OFFSET);
+                        if (currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET < y) {
+                            int offset = y - (currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET);
                             y -= offset;
                             end->y -= offset;
                             start->y -= offset;
@@ -226,12 +230,12 @@ data_STEMDIRECTION View::GetTupletCoordinates(Tuplet *tuplet, Layer *layer, Poin
 
                     if (currentNote->GetDrawingStemDir() == direction) {
                         if (direction == STEMDIRECTION_up) {
-                            if (y == 0 || currentNote->GetDrawingStemEnd().y + TUPLET_OFFSET >= y)
-                                y = currentNote->GetDrawingStemEnd().y + TUPLET_OFFSET;
+                            if (y == 0 || currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET >= y)
+                                y = currentNote->GetDrawingStemEnd(currentNote).y + TUPLET_OFFSET;
                         }
                         else {
-                            if (y == 0 || currentNote->GetDrawingStemEnd().y - TUPLET_OFFSET <= y)
-                                y = currentNote->GetDrawingStemEnd().y - TUPLET_OFFSET;
+                            if (y == 0 || currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET <= y)
+                                y = currentNote->GetDrawingStemEnd(currentNote).y - TUPLET_OFFSET;
                         }
                     }
                     else {

@@ -11,6 +11,11 @@
 #include <algorithm>
 #include <string>
 
+//----------------------------------------------------------------------------
+
+#include "devicecontextbase.h"
+#include "vrvdef.h"
+
 namespace vrv {
 
 /**
@@ -46,7 +51,7 @@ public:
     void SetBoundingBox(double x, double y, double w, double h);
 
     /** Get the units per EM */
-    int GetUnitsPerEm() { return m_unitsPerEm; }
+    int GetUnitsPerEm() const { return m_unitsPerEm; }
 
     /** Get the path */
     std::string GetPath() { return m_path; }
@@ -61,6 +66,22 @@ public:
     int GetHorizAdvX() { return m_horizAdvX; }
     void SetHorizAdvX(double horizAdvX) { m_horizAdvX = (int)(horizAdvX * 10.0); }
     ///@}
+
+    /**
+     * Add an anchor for the glyph.
+     * The string is turn into a SMuFLGlyphAnchor ("cutOutNE" => SMUFL_cutOutNE)
+     */
+    void SetAnchor(std::string anchorStr, double x, double y);
+
+    /**
+     * Check if the glyph has anchor provided.
+     */
+    bool HasAnchor(SMuFLGlyphAnchor anchor);
+
+    /**
+     * Return the SMuFL anchor for the glyph.
+     */
+    const Point *GetAnchor(SMuFLGlyphAnchor anchor);
 
 private:
     //
@@ -80,6 +101,8 @@ private:
     std::string m_path;
     /** The Unicode code in hexa as string */
     std::string m_codeStr;
+    /** A map of the available anchors */
+    std::map<SMuFLGlyphAnchor, Point> m_anchors;
 };
 
 } // namespace vrv

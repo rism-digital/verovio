@@ -60,12 +60,7 @@ public:
 private:
     //
 public:
-    /**
-     * Indicates if is cue size for accid object created for @accid.
-     * See Note::PreparePointersByLayer and View::DrawAccid
-     */
-    bool m_drawingCueSize;
-
+    //
 private:
 };
 

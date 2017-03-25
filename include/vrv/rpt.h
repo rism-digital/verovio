@@ -129,6 +129,15 @@ public:
      */
     const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; }
 
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *functorParams);
+
 private:
     //
 protected:
