@@ -66,6 +66,7 @@ SvgDeviceContext::SvgDeviceContext(int width, int height) : DeviceContext()
     m_svgNode.append_attribute("version") = "1.1";
     m_svgNode.append_attribute("xmlns") = "http://www.w3.org/2000/svg";
     m_svgNode.append_attribute("xmlns:xlink") = "http://www.w3.org/1999/xlink";
+    m_svgNode.append_attribute("overflow") = "visible";
 
     // start the stack
     m_svgNodeStack.push_back(m_svgNode);
