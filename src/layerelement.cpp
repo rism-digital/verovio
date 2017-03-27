@@ -181,13 +181,17 @@ Beam *LayerElement::IsInBeam()
     return NULL;
 }
 
-Staff *LayerElement::GetCrossStaff() const
+Staff *LayerElement::GetCrossStaff(Layer *&layer) const
 {
-    if (m_crossStaff) return m_crossStaff;
+    if (m_crossStaff) {
+        assert(m_crossLayer);
+        layer = m_crossLayer;
+        return m_crossStaff;
+    }
 
     LayerElement *parent = dynamic_cast<LayerElement *>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
 
-    if (parent) return parent->GetCrossStaff();
+    if (parent) return parent->GetCrossStaff(layer);
 
     return NULL;
 }

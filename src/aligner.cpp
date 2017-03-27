@@ -18,6 +18,7 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
+#include "layer.h"
 #include "measure.h"
 #include "note.h"
 #include "smufl.h"
@@ -640,13 +641,19 @@ void Alignment::AddChild(Object *child)
     Modify();
 }
 
-AlignmentReference *Alignment::GetAlignmentReference(int staffN)
+AlignmentReference *Alignment::GetAlignmentReference(int staffN, int layerN)
 {
-    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    AlignmentReference *alignmentRef
-        = dynamic_cast<AlignmentReference *>(this->FindChildByAttComparison(&matchStaff, 1));
+    ArrayOfObjects::iterator iter;
+    AlignmentReference *alignmentRef = NULL;
+    // Then the @n of each first staffDef
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        alignmentRef = dynamic_cast<AlignmentReference *>(*iter);
+        assert(alignmentRef);
+        if ((alignmentRef->GetN() == staffN) && (alignmentRef->GetLayerN() == layerN))
+            break;
+    }
     if (!alignmentRef) {
-        alignmentRef = new AlignmentReference(staffN);
+        alignmentRef = new AlignmentReference(staffN, layerN);
         this->AddChild(alignmentRef);
     }
     return alignmentRef;
@@ -662,17 +669,40 @@ void Alignment::AddLayerElementRef(LayerElement *element)
 {
     assert(element->IsLayerElement());
 
+    // 0 will be used for barlines attributes or timestamps
+    int layerN = 0;
+    
     // -1 will be used for barlines attributes
     int staffN = -1;
     // -2 will be used for timestamps
     if (element->Is(TIMESTAMP_ATTR))
         staffN = -2;
     else {
-        Staff *staffRef = element->GetCrossStaff();
-        if (!staffRef) staffRef = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
-        if (staffRef) staffN = staffRef->GetN();
+        Layer *layerRef = NULL;
+        Staff *staffRef = element->GetCrossStaff(layerRef);
+        // We have a cross-staff situation
+        if (staffRef) {
+            assert(layerRef);
+            // We set cross-staff layers to the negative value in the alignment references in order to distinct them
+            layerN = -layerRef->GetN();
+            staffN = staffRef->GetN();
+        }
+        // Non cross staff normal case
+        else {
+            layerRef = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+            if (layerRef)
+                staffRef = dynamic_cast<Staff *>(layerRef->GetFirstParent(STAFF));
+            if (staffRef) {
+                layerN = layerRef->GetN();
+                staffN = staffRef->GetN();
+            }
+            // staffN and layerN remain unsed for barLine attributes and timestamps
+            else {
+                assert(element->Is({BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT, TIMESTAMP_ATTR}));
+            }
+        }
     }
-    AlignmentReference *alignmentRef = GetAlignmentReference(staffN);
+    AlignmentReference *alignmentRef = GetAlignmentReference(staffN, layerN);
     alignmentRef->AddChild(element);
 }
 
@@ -720,14 +750,15 @@ AlignmentReference::AlignmentReference() : Object(), AttCommon()
     this->SetAsReferenceObject();
 }
 
-AlignmentReference::AlignmentReference(int n) : Object(), AttCommon()
+AlignmentReference::AlignmentReference(int staffN, int layerN) : Object(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
     Reset();
 
     this->SetAsReferenceObject();
-    this->SetN(n);
+    this->SetN(staffN);
+    m_layerN = layerN;
 }
 
 AlignmentReference::~AlignmentReference()
@@ -738,6 +769,8 @@ void AlignmentReference::Reset()
 {
     Object::Reset();
     ResetCommon();
+    
+    m_layerN = 0;
 }
 
 void AlignmentReference::AddChild(Object *child)
