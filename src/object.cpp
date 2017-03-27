@@ -136,11 +136,11 @@ ClassId Object::GetClassId() const
     assert(false);
     return OBJECT;
 };
-    
+
 void Object::SetAsReferenceObject()
 {
     assert(m_children.empty());
-    
+
     m_isReferencObject = true;
 }
 
@@ -211,7 +211,7 @@ void Object::ClearChildren()
         m_children.clear();
         return;
     }
-    
+
     ArrayOfObjects::iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); ++iter) {
         // we need to check if this is the parent
@@ -382,14 +382,19 @@ Object *Object::GetChild(int idx) const
     return m_children.at(idx);
 }
 
-void Object::RemoveChildAt(int idx)
+bool Object::DeleteChild(Object *child)
 {
-    if (idx >= (int)m_children.size()) {
-        return;
+    auto it = std::find(m_children.begin(), m_children.end(), child);
+    if (it != m_children.end()) {
+        m_children.erase(it);
+        delete child;
+        this->Modify();
+        return true;
     }
-    delete m_children.at(idx);
-    ArrayOfObjects::iterator iter = m_children.begin();
-    m_children.erase(iter + (idx));
+    else {
+        assert(false);
+        return false;
+    }
 }
 
 void Object::GenerateUuid()
@@ -400,7 +405,6 @@ void Object::GenerateUuid()
     snprintf(str, 17, "%016d", nr);
 
     m_uuid = m_classid + std::string(str);
-    std::transform(m_uuid.begin(), m_uuid.end(), m_uuid.begin(), ::tolower);
 }
 
 void Object::ResetUuid()
@@ -444,21 +448,19 @@ int Object::GetDrawingY() const
     return m_parent->GetDrawingY();
 }
 
-    
 void Object::ResetCachedDrawingX() const
 {
-    //if (m_cachedDrawingX == VRV_UNSET) return;
+    // if (m_cachedDrawingX == VRV_UNSET) return;
     m_cachedDrawingX = VRV_UNSET;
     ArrayOfObjects::const_iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
         (*iter)->ResetCachedDrawingX();
     }
-    
 }
 
 void Object::ResetCachedDrawingY() const
 {
-    //if (m_cachedDrawingY == VRV_UNSET) return;
+    // if (m_cachedDrawingY == VRV_UNSET) return;
     m_cachedDrawingY = VRV_UNSET;
     ArrayOfObjects::const_iterator iter;
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
@@ -493,7 +495,7 @@ void Object::FillFlatList(ListOfObjects *flatList)
     AddLayerElementToFlatListParams addLayerElementToFlatListParams(flatList);
     this->Process(&addToFlatList, &addLayerElementToFlatListParams);
 }
-    
+
 Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
@@ -507,13 +509,13 @@ Object *Object::GetFirstParent(const ClassId classId, int maxDepth) const
         return (m_parent->GetFirstParent(classId, maxDepth - 1));
     }
 }
-    
+
 Object *Object::GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth) const
 {
     if ((maxDepth == 0) || !m_parent) {
         return NULL;
     }
-    
+
     if ((m_parent->GetClassId() > classIdMin) && (m_parent->GetClassId() < classIdMax)) {
         return m_parent;
     }
@@ -1045,7 +1047,7 @@ int Object::GetAlignmentLeftRight(FunctorParams *functorParams)
     assert(params);
 
     if (!this->IsLayerElement()) return FUNCTOR_CONTINUE;
-    
+
     if (!this->HasUpdatedBB() || this->HasEmptyBB()) return FUNCTOR_CONTINUE;
 
     int refLeft = this->GetSelfLeft();

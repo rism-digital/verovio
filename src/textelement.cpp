@@ -23,7 +23,7 @@ TextElement::TextElement() : Object("te-"), AttCommon(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
-    
+
     Reset();
 }
 
@@ -31,7 +31,7 @@ TextElement::TextElement(std::string classid) : Object(classid), AttCommon(), At
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
-    
+
     Reset();
 }
 

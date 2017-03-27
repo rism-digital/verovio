@@ -1,16 +1,25 @@
 var system = require('system');
 var fs = require('fs');
 
-if (system.args.length != 3) {
+if (system.args.length != 4) {
     console.log("Usage: generate-bbox.js svg_input_file bbox_output_file ");
     phantom.exit(1);
 }
 
 var address = system.args[1];
 var output = system.args[2];
+var metadata = system.args[3];
+
+var content = JSON.parse(fs.read(metadata));
+var glyphAnchors;
+if (content.hasOwnProperty("glyphsWithAnchors")) {
+    glyphAnchors = content["glyphsWithAnchors"];
+}
+
 var page = require('webpage').create();
 
-function serialize() {
+
+function serialize(glyphAnchors) {
     
     var items = document.documentElement.getElementsByTagName('path');
     var bb = null;
@@ -34,7 +43,7 @@ function serialize() {
     var i;
     for (i = 0; i < items.length; i++) {
         item = items[i];
-        impl += "   <g c=\"" + item.getAttribute("id").toUpperCase() + "\" "; 
+        impl += "\t<g c=\"" + item.getAttribute("id").toUpperCase() + "\" "; 
         r = item.getBBox();
         
         // add the bb value to the implementation
@@ -46,7 +55,30 @@ function serialize() {
             impl += "h-a-x=\"" + item.getAttribute("horiz-adv-x") + "\" ";
         }
         
-        impl += "/>\n";
+        
+        
+        if (glyphAnchors) {
+            var anchor = undefined;
+            var testId = "uni" + item.getAttribute("id");
+            var testName  = item.getAttribute("name");
+            if (glyphAnchors.hasOwnProperty(testId)) {
+                anchor = glyphAnchors[testId]
+            }
+            else if (glyphAnchors.hasOwnProperty(testName)) {
+                anchor = glyphAnchors[testName]
+            }
+            if (anchor) {
+                impl += ">";
+                Object.keys(anchor).forEach(function(key) {
+                    impl += "\n\t\t<a n=\"" + key + "\" x=\"" + anchor[key][0] + "\" y=\"" + anchor[key][1] + "\"/>"
+                });
+                impl += "\n\t</g>\n";
+            }
+            else
+                impl += "/>\n";
+        }
+        else
+            impl += "/>\n";
     }
     
     impl += "</bounding-boxes>\n";
@@ -59,7 +91,8 @@ function extract() {
         if (status != 'success') {
             console.log("Failed to open the page.");
         } else {
-            var code = page.evaluate(serialize);
+            var code = page.evaluate(serialize, glyphAnchors);
+            //console.log(code);
             try {
                 // We write the impl to the file...
                 fs.write(output, code, 'w');

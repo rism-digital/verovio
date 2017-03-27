@@ -85,7 +85,7 @@ public:
     virtual ClassId GetClassId() const;
     virtual std::string GetClassName() const { return "[MISSING]"; }
     ///@}
-    
+
     /**
      * Make an object a reference object that do not own children.
      * This cannot be un-done and has to be set before any child is added.
@@ -252,7 +252,7 @@ public:
      * Return the last child of the object (if any, NULL otherwise)
      */
     Object *GetLast() const;
-    
+
     /**
      * Get the parent of the Object
      */
@@ -263,7 +263,7 @@ public:
      * The current parent is expected to be NULL.
      */
     void SetParent(Object *parent);
-    
+
     /**
      * Reset the parent of the Object.
      * The current parent is not expected to be NULL.
@@ -288,7 +288,7 @@ public:
     virtual int GetDrawingX() const;
     virtual int GetDrawingY() const;
     ///@}
-    
+
     /**
      * @name Reset the cached values of the drawingX and Y values.
      * Reset all children recursively
@@ -365,16 +365,17 @@ public:
     void ClearRelinquishedChildren();
 
     /**
-     * Remove and delete the child at the idx position.
+     * Remove and delete the child.
+     * Return false if the child could not be found. In that case it will not be deleted.
      */
-    void RemoveChildAt(int idx);
+    bool DeleteChild(Object *child);
 
     /**
      * Return the first parent of the specified type.
      * The maxSteps parameter limits the search to a certain number of level if not -1.
      */
     Object *GetFirstParent(const ClassId classId, int maxSteps = -1) const;
-    
+
     Object *GetFirstParentInRange(const ClassId classIdMin, const ClassId classIdMax, int maxDepth = -1) const;
 
     /**
@@ -546,6 +547,16 @@ public:
     virtual int SetAlignmentXPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     */
+    virtual int SetAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Set the drawing stems positions, including for beams.
+     */
+    virtual int CalcStem(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
      * The functor is redirected from the MeasureAligner and then from the appropriate
      * alignment to the GraceAligner
@@ -676,6 +687,11 @@ public:
     ///@{
 
     /**
+     * Set the drawing cue size of all LayerElement
+     */
+    virtual int PrepareDrawingCueSize(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * See cross-staff / layer pointers on LayerElement
      */
     ///@{
@@ -747,7 +763,7 @@ public:
      * Functor for setting the artic parts.
      * Splits the artic content into different artic parts if necessary
      */
-    virtual int PrepareArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareLayerElementParts(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
@@ -779,11 +795,6 @@ public:
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
     virtual int ResetDrawing(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
-     */
-    virtual int SetAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -867,7 +878,7 @@ private:
      * Method for generating the uuid.
      */
     void GenerateUuid();
-    
+
     /**
      * Initialisation method taking a uuid prefix argument.
      */
@@ -892,7 +903,7 @@ private:
      * A pointer to the parent object;
      */
     Object *m_parent;
-    
+
     /**
      * Members for storing / generating uuids
      */
@@ -900,7 +911,7 @@ private:
     std::string m_uuid;
     std::string m_classid;
     ///@}
-    
+
     /**
      * A reference object do not own children.
      * Destructor will not delete them.
@@ -946,7 +957,7 @@ private:
      * For example, a Artic child in Note for an original @artic
      */
     bool m_isAttribute;
-    
+
     /**
      * A static counter for uuid generation.
      */
@@ -1001,7 +1012,7 @@ public:
     ListOfObjects *GetList(Object *node);
 
 private:
-    ListOfObjects m_list;
+    mutable ListOfObjects m_list;
     ListOfObjects::iterator m_iteratorCurrent;
 
 protected:

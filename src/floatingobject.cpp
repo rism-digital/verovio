@@ -216,8 +216,7 @@ int FloatingPositioner::GetDrawingY() const
     assert(m_objectY);
     return (m_objectY->GetDrawingY() - this->GetDrawingYRel());
 }
-    
-    
+
 void FloatingPositioner::ResetCachedDrawingX() const
 {
     m_cachedDrawingX = VRV_UNSET;

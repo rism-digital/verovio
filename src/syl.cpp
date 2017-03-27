@@ -152,6 +152,9 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
 
 int Syl::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
     // Pass it to the pseudo functor of the interface
     return TimeSpanningInterface::InterfaceResetDrawing(functorParams, this);
 };

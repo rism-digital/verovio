@@ -448,8 +448,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
     }
 
     // This should never happen because we must have hit the left barline in the loop above
-    if (!rightAlignment || (maxRight == VRV_UNSET))
-        return;
+    if (!rightAlignment || (maxRight == VRV_UNSET)) return;
 
     // Check if the left position of the group is on the right of the previous maxRight
     // If not, move the aligments accordingly
@@ -527,7 +526,7 @@ void GraceAligner::AlignStack()
         element->SetGraceAlignment(alignment);
         alignment->AddLayerElementRef(element);
 
-        AttComparisonAny matchType({ NOTE, ACCID });
+        AttComparisonAny matchType({ ACCID, FLAG, NOTE, STEM });
         ArrayOfObjects children;
         ArrayOfObjects::iterator childrenIter;
         element->FindAllChildByAttComparison(&children, &matchType);
@@ -580,13 +579,13 @@ int GraceAligner::GetGraceGroupRight(int staffN)
 
     return maxRight;
 }
-    
+
 void GraceAligner::SetGraceAligmentXPos(Doc *doc)
 {
     assert(doc);
 
     ArrayOfObjects::reverse_iterator childrenIter;
-    
+
     int i = 0;
     // Then the @n of each first staffDef
     for (childrenIter = m_children.rbegin(); childrenIter != m_children.rend(); childrenIter++) {
@@ -597,7 +596,6 @@ void GraceAligner::SetGraceAligmentXPos(Doc *doc)
         alignment->SetXRel(-i * doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, 100, false));
         i++;
     }
-
 }
 
 //----------------------------------------------------------------------------
@@ -641,18 +639,19 @@ void Alignment::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
-    AlignmentReference *alignmentRef = dynamic_cast<AlignmentReference*>(this->FindChildByAttComparison(&matchStaff, 1));
+    AlignmentReference *alignmentRef
+        = dynamic_cast<AlignmentReference *>(this->FindChildByAttComparison(&matchStaff, 1));
     if (!alignmentRef) {
         alignmentRef = new AlignmentReference(staffN);
         this->AddChild(alignmentRef);
     }
     return alignmentRef;
 }
-    
+
 void Alignment::SetXRel(int xRel)
 {
     ResetCachedDrawingX();
@@ -717,7 +716,7 @@ AlignmentReference::AlignmentReference() : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
-    
+
     this->SetAsReferenceObject();
 }
 
@@ -726,7 +725,7 @@ AlignmentReference::AlignmentReference(int n) : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
-    
+
     this->SetAsReferenceObject();
     this->SetN(n);
 }
@@ -734,18 +733,17 @@ AlignmentReference::AlignmentReference(int n) : Object(), AttCommon()
 AlignmentReference::~AlignmentReference()
 {
 }
-    
+
 void AlignmentReference::Reset()
 {
     Object::Reset();
     ResetCommon();
 }
-    
-    
+
 void AlignmentReference::AddChild(Object *child)
 {
     assert(dynamic_cast<LayerElement *>(child));
-    
+
     // Specical case where we do not set the parent because the reference will not have ownership
     // Children will be treated as relinquished objects in the desctructor
     // However, we need to make sure the child has a parent (somewhere else)
@@ -1101,7 +1099,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
 
         return FUNCTOR_CONTINUE;
     }
-    
+
     if (params->m_graceCumulatedXShift != VRV_UNSET) {
         // This is happening when aligning the grace aligner itself
         this->SetXRel(this->GetXRel() + params->m_graceCumulatedXShift);
@@ -1205,7 +1203,7 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
             params->m_doc->GetSpacingLinear(), params->m_doc->GetSpacingNonLinear());
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
-    
+
     if (m_graceAligner) {
         m_graceAligner->SetGraceAligmentXPos(params->m_doc);
     }

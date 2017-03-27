@@ -64,14 +64,14 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         return;
     }
     const ArrayOfBeamElementCoords *beamElementCoords = beam->GetElementCoords();
-    
+
     int elementCount = (int)beamChildren->size();
     int last = elementCount - 1;
 
     /******************************************************************/
     // Calculate the beam slope and position
 
-    CalcBeam(layer, staff, beamElementCoords, elementCount, &beam->m_drawingParams);
+    beam->m_drawingParams.CalcBeam(layer, staff, m_doc, beamElementCoords, elementCount);
 
     /******************************************************************/
     // Start the Beam graphic and draw the children
@@ -84,18 +84,7 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     DrawLayerChildren(dc, beam, layer, staff, measure);
 
     /******************************************************************/
-    // Draw the stems and the beam full bars
-
-    for (i = 0; i < elementCount; i++) {
-        LayerElement *el = (*beamElementCoords).at(i)->m_element;
-        if (((el->Is(NOTE)) && !(dynamic_cast<Note *>(el))->IsChordTone()) || (el->Is(CHORD))) {
-            StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
-            assert(interface);
-
-            DrawVerticalLine(dc, interface->GetDrawingStemStart().y, interface->GetDrawingStemEnd().y,
-                interface->GetDrawingStemStart().x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
-        }
-    }
+    // Draw the beam full bars
 
     // Number of bars to draw - if we do not have changing values, draw
     // the number of bars according to the shortestDur value. Otherwise draw
@@ -172,7 +161,8 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
         }
 
         int fractBeamWidth
-            = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, beam->m_drawingParams.m_cueSize) * 7 / 10;
+            = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, beam->m_drawingParams.m_cueSize)
+            * 7 / 10;
 
         // loop
         while (testDur <= beam->m_drawingParams.m_shortestDur) {
@@ -244,14 +234,16 @@ void View::DrawBeam(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
                 else if ((*beamElementCoords).at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_RIGHT) {
                     y1 = (*beamElementCoords).at(idx)->m_yBeam + barY;
                     int x2 = (*beamElementCoords).at(idx)->m_x + fractBeamWidth;
-                    y2 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY + beam->m_drawingParams.m_beamSlope * x2;
+                    y2 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY
+                        + beam->m_drawingParams.m_beamSlope * x2;
                     polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, (*beamElementCoords).at(idx)->m_x, y1, x2, y2, polygonHeight);
                 }
                 else if ((*beamElementCoords).at(idx)->m_partialFlags[testDur - DUR_8] == PARTIAL_LEFT) {
                     y2 = (*beamElementCoords).at(idx)->m_yBeam + barY;
                     int x1 = (*beamElementCoords).at(idx)->m_x - fractBeamWidth;
-                    y1 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY + beam->m_drawingParams.m_beamSlope * x1;
+                    y1 = beam->m_drawingParams.m_startingY + beam->m_drawingParams.m_verticalBoost + barY
+                        + beam->m_drawingParams.m_beamSlope * x1;
                     polygonHeight = beam->m_drawingParams.m_beamWidthBlack * shiftY;
                     DrawObliquePolygon(dc, x1, y1, (*beamElementCoords).at(idx)->m_x, y2, polygonHeight);
                 }
@@ -272,10 +264,10 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     assert(layer);
     assert(staff);
     assert(measure);
-    
+
     FTrem *fTrem = dynamic_cast<FTrem *>(element);
     assert(fTrem);
-    
+
     // temporary coordinates
     int x1, x2, y1, y2;
 
@@ -286,20 +278,20 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // loop
     int i, j;
-    
+
     /******************************************************************/
     // initialization
-    
+
     ListOfObjects *fTremChildren = fTrem->GetList(fTrem);
-    
+
     // Should we assert this at the beginning?
     if (fTremChildren->empty()) {
         return;
     }
     const ArrayOfBeamElementCoords *beamElementCoords = fTrem->GetElementCoords();
-    
+
     assert(beamElementCoords->size() == 2);
-    
+
     int elementCount = 2;
 
     BeamElementCoord *firstElement = (*beamElementCoords).at(0);
@@ -308,7 +300,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /******************************************************************/
     // Calculate the beam slope and position
 
-    CalcBeam(layer, staff, beamElementCoords, elementCount, &fTrem->m_drawingParams);
+    fTrem->m_drawingParams.CalcBeam(layer, staff, m_doc, beamElementCoords, elementCount);
 
     /******************************************************************/
     // Start the grahic
@@ -322,7 +314,7 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     /******************************************************************/
     // Draw the stems and the bars
-    
+
     // We look only at the first one for the duration since both are expected to be the same
     assert(dynamic_cast<AttDurationMusical *>(firstElement->m_element));
     int dur = (dynamic_cast<AttDurationMusical *>(firstElement->m_element))->GetDur();
@@ -333,8 +325,8 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             if (((el->Is(NOTE)) && !(dynamic_cast<Note *>(el))->IsChordTone()) || (el->Is(CHORD))) {
                 StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
                 assert(interface);
-                DrawVerticalLine(dc, interface->GetDrawingStemStart().y, interface->GetDrawingStemEnd().y,
-                    interface->GetDrawingStemStart().x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
+                DrawVerticalLine(dc, interface->GetDrawingStemStart(el).y, interface->GetDrawingStemEnd(el).y,
+                    interface->GetDrawingStemStart(el).x, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize));
             }
         }
     }
@@ -393,252 +385,6 @@ void View::DrawFTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     }
 
     dc->EndGraphic(element, this);
-}
-
-void View::CalcBeam(
-    Layer *layer, Staff *staff, const ArrayOfBeamElementCoords *beamElementCoords, int elementCount, BeamDrawingParams *params)
-{
-    assert(layer);
-    assert(staff);
-    assert(beamElementCoords);
-
-    int y1, y2, avgY, high, low, verticalCenter, verticalShift;
-    double xr, verticalShiftFactor;
-
-    // loop
-    int i;
-
-    // position x for the stem (normal and cue-sized)
-    int stemX[2];
-
-    // For slope calculation and linear regression
-    double s_x = 0.0; // sum of all x(n) for n in beamElementCoord
-    double s_y = 0.0; // sum of all y(n)
-    double s_xy = 0.0; // sum of (x(n) * y(n))
-    double s_x2 = 0.0; // sum of all x(n)^2
-    double s_y2 = 0.0; // sum of all y(n)^2
-
-    /******************************************************************/
-    // initialization
-    
-    for (i = 0; i < elementCount; i++) {
-        (*beamElementCoords).at(i)->m_x = (*beamElementCoords).at(i)->m_element->GetDrawingX();
-    }
-    
-    avgY = 0;
-    high = VRV_UNSET;
-    low = -VRV_UNSET;
-    params->m_verticalBoost = 0.0;
-
-    verticalShiftFactor = 3.0;
-    verticalCenter = staff->GetDrawingY()
-        - (m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * 2); // center point of the staff
-
-    int last = elementCount - 1;
-
-    // x-offset values for stem bases, dx[y] where y = element->m_cueSize
-    stemX[0] = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, false) / 2
-        - (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-    stemX[1] = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staff->m_drawingStaffSize, true) / 2
-        - (m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize)) / 2;
-
-    /******************************************************************/
-    // Calculate the extreme values
-
-    int yMax = 0, yMin = 0;
-    int curY;
-    // elementCount holds the last one
-    for (i = 0; i < elementCount; i++) {
-
-        if ((*beamElementCoords).at(i)->m_element->Is(CHORD)) {
-            Chord *chord = dynamic_cast<Chord *>((*beamElementCoords).at(i)->m_element);
-            assert(chord);
-            chord->GetYExtremes(yMax, yMin);
-            (*beamElementCoords).at(i)->m_yTop = yMax;
-            (*beamElementCoords).at(i)->m_yBottom = yMin;
-
-            avgY += ((yMax + yMin) / 2);
-
-            // highest and lowest value;
-            high = std::max(yMax, high);
-            low = std::min(yMin, low);
-        }
-        else {
-            (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_element->GetDrawingY();
-
-            // highest and lowest value;
-            high = std::max((*beamElementCoords).at(i)->m_y, high);
-            low = std::min((*beamElementCoords).at(i)->m_y, low);
-
-            curY = (*beamElementCoords).at(i)->m_element->GetDrawingY();
-            (*beamElementCoords).at(i)->m_y = curY;
-            (*beamElementCoords).at(i)->m_yTop = curY;
-            (*beamElementCoords).at(i)->m_yBottom = curY;
-            avgY += (*beamElementCoords).at(i)->m_y;
-        }
-    }
-
-    /******************************************************************/
-    // Set the stem direction
-
-    // yExtreme = (abs(high - verticalCenter) > abs(low - verticalCenter) ? high : low);
-    avgY /= elementCount;
-
-    // If we have one stem direction in the beam, then don't look at the layer
-    if (params->m_stemDir == STEMDIRECTION_NONE)
-        params->m_stemDir = layer->GetDrawingStemDir(); // force layer direction if it exists
-
-    // Automatic stem direction if nothing in the notes or in the layer
-    if (params->m_stemDir == STEMDIRECTION_NONE) {
-        /*if (params->m_beamHasChord)
-            params->m_stemDir = (yExtreme < verticalCenter)
-                ? STEMDIRECTION_up
-                : STEMDIRECTION_down; // if it has a chord, go by the most extreme position
-        else */
-            params->m_stemDir
-                = (avgY < verticalCenter) ? STEMDIRECTION_up : STEMDIRECTION_down; // otherwise go by average
-    }
-
-    if (params->m_stemDir == STEMDIRECTION_up) { // set stem direction for all the notes
-        for (i = 0; i < elementCount; i++) {
-            (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_yTop;
-        }
-    }
-    else {
-        for (i = 0; i < elementCount; i++) {
-            (*beamElementCoords).at(i)->m_y = (*beamElementCoords).at(i)->m_yBottom;
-        }
-    }
-
-    params->m_beamWidthBlack = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, params->m_cueSize);
-    params->m_beamWidthWhite = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, params->m_cueSize);
-    params->m_beamWidth = params->m_beamWidthBlack + params->m_beamWidthWhite;
-
-    /******************************************************************/
-    // Calculate the slope doing a linear regression
-
-    // The vertical shift depends on the shortestDur value we have in the beam
-    verticalShift = ((params->m_shortestDur - DUR_8) * (params->m_beamWidth));
-
-    // if the beam has smaller-size notes
-    if ((*beamElementCoords).at(last)->m_element->IsCueSize()) {
-        verticalShift += m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 5;
-    }
-    else {
-        verticalShift += (params->m_shortestDur > DUR_8)
-            ? m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * verticalShiftFactor
-            : m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize) * (verticalShiftFactor + 0.5);
-    }
-
-    // swap x position and verticalShift direction with stem down
-    if (params->m_stemDir == STEMDIRECTION_down) {
-        stemX[0] = -stemX[0];
-        stemX[1] = -stemX[1];
-        verticalShift = -verticalShift;
-    }
-
-    for (i = 0; i < elementCount; i++) {
-        // change the stem dir for all objects
-        if ((*beamElementCoords).at(i)->m_element->Is(NOTE)) {
-            ((Note *)(*beamElementCoords).at(i)->m_element)->SetDrawingStemDir(params->m_stemDir);
-        }
-        else if ((*beamElementCoords).at(i)->m_element->Is(CHORD)) {
-            ((Chord *)(*beamElementCoords).at(i)->m_element)->SetDrawingStemDir(params->m_stemDir);
-        }
-
-        (*beamElementCoords).at(i)->m_yBeam = (*beamElementCoords).at(i)->m_y + verticalShift;
-        (*beamElementCoords).at(i)->m_x += stemX[params->m_cueSize];
-
-        s_y += (*beamElementCoords).at(i)->m_yBeam;
-        s_y2 += (*beamElementCoords).at(i)->m_yBeam * (*beamElementCoords).at(i)->m_yBeam;
-        s_x += (*beamElementCoords).at(i)->m_x;
-        s_x2 += (*beamElementCoords).at(i)->m_x * (*beamElementCoords).at(i)->m_x;
-        s_xy += (*beamElementCoords).at(i)->m_x * (*beamElementCoords).at(i)->m_yBeam;
-    }
-
-    y1 = elementCount * s_xy - s_x * s_y;
-    xr = elementCount * s_x2 - s_x * s_x;
-
-    // Prevent division by 0
-    if (y1 && xr) {
-        params->m_beamSlope = y1 / xr;
-    }
-    else {
-        params->m_beamSlope = 0.0;
-    }
-
-    /* Correction esthetique : */
-    if (fabs(params->m_beamSlope) < m_doc->m_drawingBeamMinSlope) params->m_beamSlope = 0.0;
-    if (fabs(params->m_beamSlope) > m_doc->m_drawingBeamMaxSlope)
-        params->m_beamSlope = (params->m_beamSlope > 0) ? m_doc->m_drawingBeamMaxSlope : -m_doc->m_drawingBeamMaxSlope;
-    /* pente correcte: entre 0 et env 0.4 (0.2 a 0.4) */
-
-    params->m_startingY = (s_y - params->m_beamSlope * s_x) / elementCount;
-
-    /******************************************************************/
-    // Calculate the stem lengths
-
-    // first check that the stem length is long enough (to be improved?)
-    double oldYPos; // holds y position before calculation to determine if beam needs extra height
-    double expectedY;
-    for (i = 0; i < elementCount; i++) {
-        oldYPos = (*beamElementCoords).at(i)->m_yBeam;
-        expectedY
-            = params->m_startingY + params->m_verticalBoost + params->m_beamSlope * (*beamElementCoords).at(i)->m_x;
-
-        // if the stem is not long enough, add extra stem length needed to all members of the beam
-        if ((params->m_stemDir == STEMDIRECTION_up && (oldYPos > expectedY))
-            || (params->m_stemDir == STEMDIRECTION_down && (oldYPos < expectedY))) {
-            params->m_verticalBoost += oldYPos - expectedY;
-        }
-    }
-    for (i = 0; i < elementCount; i++) {
-        (*beamElementCoords).at(i)->m_yBeam
-            = params->m_startingY + params->m_verticalBoost + params->m_beamSlope * (*beamElementCoords).at(i)->m_x;
-    }
-
-    // then check that the stem length reaches the center for the staff
-    double minDistToCenter = -VRV_UNSET;
-    for (i = 0; i < elementCount; i++) {
-        if ((params->m_stemDir == STEMDIRECTION_up)
-            && ((*beamElementCoords).at(i)->m_yBeam - verticalCenter < minDistToCenter)) {
-            minDistToCenter = (*beamElementCoords).at(i)->m_yBeam - verticalCenter;
-        }
-        else if ((params->m_stemDir == STEMDIRECTION_down)
-            && (verticalCenter - (*beamElementCoords).at(i)->m_yBeam < minDistToCenter)) {
-            minDistToCenter = verticalCenter - (*beamElementCoords).at(i)->m_yBeam;
-        }
-    }
-    minDistToCenter += (params->m_beamWidthBlack / 2) + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
-    if (minDistToCenter < 0) {
-        params->m_startingY += (params->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
-        for (i = 0; i < elementCount; i++) {
-            (*beamElementCoords).at(i)->m_yBeam
-                += (params->m_stemDir == STEMDIRECTION_down) ? minDistToCenter : -minDistToCenter;
-        }
-    }
-
-    for (i = 0; i < elementCount; i++) {
-        if (params->m_stemDir == STEMDIRECTION_up) {
-            y1 = (*beamElementCoords).at(i)->m_yBeam - m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-            y2 = (*beamElementCoords).at(i)->m_yBottom + m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
-        }
-        else {
-            y1 = (*beamElementCoords).at(i)->m_yBeam + m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize);
-            y2 = (*beamElementCoords).at(i)->m_yTop - m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / 4;
-        }
-
-        // All notes and chords get their stem value stored
-        LayerElement *el = (*beamElementCoords).at(i)->m_element;
-        if ((el->Is(NOTE)) || (el->Is(CHORD))) {
-            StemmedDrawingInterface *interface = el->GetStemmedDrawingInterface();
-            assert(interface);
-
-            interface->SetDrawingStemDir(params->m_stemDir);
-            interface->SetDrawingStemStart(Point((*beamElementCoords).at(i)->m_x, y2));
-            interface->SetDrawingStemEnd(Point((*beamElementCoords).at(i)->m_x, y1));
-        }
-    }
 }
 
 } // namespace vrv

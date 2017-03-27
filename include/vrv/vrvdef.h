@@ -128,6 +128,7 @@ enum ClassId {
     CLEF,
     CUSTOS,
     DOT,
+    FLAG,
     FTREM,
     KEYSIG,
     LIGATURE,
@@ -142,6 +143,7 @@ enum ClassId {
     PROPORT,
     REST,
     SPACE,
+    STEM,
     SYL,
     TIMESTAMP_ATTR,
     TUPLET,
@@ -230,7 +232,7 @@ typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
 #define DEFINITION_FACTOR 10
 #define PARAM_DENOMINATOR 10
 
-#define is_in(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
+#define isIn(x, a, b) (((x) >= std::min((a), (b))) && ((x) <= std::max((a), (b))))
 
 /**
  * Codes returned by Functors.
@@ -299,6 +301,19 @@ enum EditorialLevel {
     EDITORIAL_LAYER,
     EDITORIAL_NOTE,
     EDITORIAL_TEXT
+};
+
+//----------------------------------------------------------------------------
+// The used SMuFL glyph anchors
+//----------------------------------------------------------------------------
+
+enum SMuFLGlyphAnchor {
+    SMUFL_stemDownNW = 0,
+    SMUFL_stemUpSE,
+    SMUFL_cutOutNE,
+    SMUFL_cutOutNW,
+    SMUFL_cutOutSE,
+    SMUFL_cutOutSW
 };
 
 //----------------------------------------------------------------------------

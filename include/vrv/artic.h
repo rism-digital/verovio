@@ -41,7 +41,7 @@ public:
     /**
      * Split the articulation content into an array with the values to be displayed inside the staff / slur
      * and the values to be displayed outside.
-     * Used by Artic::PrepareArtic that then creates the corresponding ArticPart objects.
+     * Used by Artic::PrepareLayerElementParts that then creates the corresponding ArticPart objects.
      */
     void SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur);
 
@@ -80,9 +80,9 @@ public:
     virtual int AdjustArtic(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareArtic
+     * See Object::PrepareLayerElementParts
      */
-    virtual int PrepareArtic(FunctorParams *functorParams);
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing
@@ -109,7 +109,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class models a sub-part of an artic element and has not direct MEI correspondant.
+ * This class models a sub-part of an artic element and has not direct MEI equivlatent.
  */
 
 class ArticPart : public LayerElement, public AttArticulation, public AttColor, public AttPlacement {
@@ -128,7 +128,7 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
-    
+
     /** Override the method since it is align to the staff */
     virtual bool IsRelativeToStaff() const { return true; }
 
@@ -154,8 +154,10 @@ public:
     /**
      * Overwritten version of Save that avoids anything to be written
      */
+    ///@{
     virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
     virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * See Object::AdjustArticWithSlurs

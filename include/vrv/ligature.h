@@ -28,7 +28,6 @@ namespace vrv {
 
 class Ligature : public LayerElement,
                  public ObjectListInterface,
-                 public StemmedDrawingInterface,
                  public DurationInterface,
                  public AttStems,
                  public AttStemsCmn,
@@ -74,16 +73,6 @@ public:
      * Further documentation is in chord.cpp comments. ??
      */
     void ResetAccidSpace(int fullUnit);
-
-    /**
-     * @name Set and get the stem direction and stem positions
-     * The methods are overriding the interface because we want to apply it to child notes
-     */
-    ///@{
-    virtual void SetDrawingStemDir(data_STEMDIRECTION stemDir);
-    virtual void SetDrawingStemStart(Point stemStart);
-    virtual void SetDrawingStemEnd(Point stemEnd);
-    ///@}
 
     //----------//
     // Functors //
