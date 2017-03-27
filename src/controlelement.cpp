@@ -23,7 +23,7 @@ ControlElement::ControlElement() : FloatingObject("me"), AttCommon(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
-    
+
     Reset();
 }
 
@@ -31,7 +31,7 @@ ControlElement::ControlElement(std::string classid) : FloatingObject(classid), A
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
-    
+
     Reset();
 }
 

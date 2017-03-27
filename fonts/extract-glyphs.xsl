@@ -43,7 +43,7 @@
             </xsl:result-document>
 
             <!-- write the glyph to the bounding box svg file -->
-            <path xmlns="http://www.w3.org/2000/svg" id="{$glyphCode}" horiz-adv-x="{@horiz-adv-x}">
+            <path xmlns="http://www.w3.org/2000/svg" name="{$smuflName}" id="{$glyphCode}" horiz-adv-x="{@horiz-adv-x}">
                 <xsl:attribute name="transform">
                     <xsl:text>scale(1,-1)</xsl:text>
                 </xsl:attribute>

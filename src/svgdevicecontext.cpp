@@ -136,6 +136,11 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         decl.append_attribute("standalone") = "no";
     }
 
+    // add description statement
+    pugi::xml_node desc = m_svgNode.prepend_child("desc");
+    desc.append_child(pugi::node_pcdata)
+        .set_value(StringFormat("Engraved by Verovio %s", GetVersion().c_str()).c_str());
+
     // save the glyph data to m_outdata
     m_svgDoc.save(m_outdata, "\t", output_flags);
 
@@ -149,7 +154,7 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     if (gClass.length() > 0) {
         baseClass.append(" " + gClass);
     }
-    
+
     if (object->HasAttClass(ATT_TYPED)) {
         AttTyped *att = dynamic_cast<AttTyped *>(object);
         assert(att);
@@ -169,9 +174,9 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     if (object->Is(STAFF)) {
         Staff *staff = dynamic_cast<Staff *>(object);
         assert(staff);
-        
+
         assert(staff->m_drawingStaffDef);
-        
+
         std::string styleStr;
         if (staff->m_drawingStaffDef->HasLyricFam()) {
             styleStr.append("font-family:" + staff->m_drawingStaffDef->GetLyricFam() + ";");
@@ -180,14 +185,16 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
             styleStr.append("font-family:" + staff->m_drawingStaffDef->GetLyricName() + ";");
         }
         if (staff->m_drawingStaffDef->HasLyricStyle()) {
-            styleStr.append("font-style:" + staff->AttCommon::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
+            styleStr.append(
+                "font-style:" + staff->AttCommon::FontstyleToStr(staff->m_drawingStaffDef->GetLyricStyle()) + ";");
         }
         if (staff->m_drawingStaffDef->HasLyricWeight()) {
-            styleStr.append("font-weight:" + staff->AttCommon::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
+            styleStr.append(
+                "font-weight:" + staff->AttCommon::FontweightToStr(staff->m_drawingStaffDef->GetLyricWeight()) + ";");
         }
         if (!styleStr.empty()) m_currentNode.append_attribute("style") = styleStr.c_str();
     }
-    
+
     if (object->HasAttClass(ATT_COLOR)) {
         AttColor *att = dynamic_cast<AttColor *>(object);
         assert(att);
@@ -209,8 +216,12 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
         AttTypography *att = dynamic_cast<AttTypography *>(object);
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
-        if (att->HasFontstyle()) m_currentNode.append_attribute("font-style") = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
-        if (att->HasFontweight()) m_currentNode.append_attribute("font-weight") = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
+        if (att->HasFontstyle())
+            m_currentNode.append_attribute("font-style")
+                = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+        if (att->HasFontweight())
+            m_currentNode.append_attribute("font-weight")
+                = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
     }
 
     if (object->HasAttClass(ATT_VISIBILITY)) {
@@ -258,8 +269,12 @@ void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std:
         AttTypography *att = dynamic_cast<AttTypography *>(object);
         assert(att);
         if (att->HasFontname()) m_currentNode.append_attribute("font-family") = att->GetFontname().c_str();
-        if (att->HasFontstyle()) m_currentNode.append_attribute("font-style") = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
-        if (att->HasFontweight()) m_currentNode.append_attribute("font-weight") = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
+        if (att->HasFontstyle())
+            m_currentNode.append_attribute("font-style")
+                = att->AttConverter::FontstyleToStr(att->GetFontstyle()).c_str();
+        if (att->HasFontweight())
+            m_currentNode.append_attribute("font-weight")
+                = att->AttConverter::FontweightToStr(att->GetFontweight()).c_str();
     }
 }
 
@@ -387,9 +402,10 @@ void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d")
         = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
-            bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
-            bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
-            ).c_str();
+              bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
+              bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
+              )
+              .c_str();
     // pathChild.append_attribute("fill") = "#000000";
     // pathChild.append_attribute("fill-opacity") = "1";
     pathChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
@@ -489,8 +505,8 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
 
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)),
-        abs(int(ry)), fArc, fSweep, int(xe),
-        int(ye)).c_str();
+                                          abs(int(ry)), fArc, fSweep, int(xe), int(ye))
+                                          .c_str();
     // pathChild.append_attribute("fill") = "#000000";
     if (currentBrush.GetOpacity() != 1.0) pathChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
     if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
