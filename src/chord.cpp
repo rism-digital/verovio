@@ -147,7 +147,7 @@ void Chord::FilterList(ListOfObjects *childList)
     ChordCluster *curCluster = NULL;
 
     iter++;
-    
+
     Layer *layer1 = NULL;
     Layer *layer2 = NULL;
 

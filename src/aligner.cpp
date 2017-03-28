@@ -649,8 +649,7 @@ AlignmentReference *Alignment::GetAlignmentReference(int staffN, int layerN)
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
         alignmentRef = dynamic_cast<AlignmentReference *>(*iter);
         assert(alignmentRef);
-        if ((alignmentRef->GetN() == staffN) && (alignmentRef->GetLayerN() == layerN))
-            break;
+        if ((alignmentRef->GetN() == staffN) && (alignmentRef->GetLayerN() == layerN)) break;
     }
     if (!alignmentRef) {
         alignmentRef = new AlignmentReference(staffN, layerN);
@@ -671,7 +670,7 @@ void Alignment::AddLayerElementRef(LayerElement *element)
 
     // 0 will be used for barlines attributes or timestamps
     int layerN = 0;
-    
+
     // -1 will be used for barlines attributes
     int staffN = -1;
     // -2 will be used for timestamps
@@ -690,15 +689,14 @@ void Alignment::AddLayerElementRef(LayerElement *element)
         // Non cross staff normal case
         else {
             layerRef = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
-            if (layerRef)
-                staffRef = dynamic_cast<Staff *>(layerRef->GetFirstParent(STAFF));
+            if (layerRef) staffRef = dynamic_cast<Staff *>(layerRef->GetFirstParent(STAFF));
             if (staffRef) {
                 layerN = layerRef->GetN();
                 staffN = staffRef->GetN();
             }
             // staffN and layerN remain unsed for barLine attributes and timestamps
             else {
-                assert(element->Is({BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT, TIMESTAMP_ATTR}));
+                assert(element->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT, TIMESTAMP_ATTR }));
             }
         }
     }
@@ -769,7 +767,7 @@ void AlignmentReference::Reset()
 {
     Object::Reset();
     ResetCommon();
-    
+
     m_layerN = 0;
 }
 
