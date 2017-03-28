@@ -59,6 +59,16 @@ void View::DrawRend(DeviceContext *dc, Rend *rend, int x, int y, bool &setX, boo
     }
     if (customFont) dc->SetFont(&rendFont);
 
+    if (rend->HasHalign()) {
+        char alignment = LEFT;
+        if (rend->GetHalign() == HORIZONTALALIGNMENT_right)
+            alignment = RIGHT;
+        else if (rend->GetHalign() == HORIZONTALALIGNMENT_center)
+            alignment = CENTER;
+        // Justified remains unsupported
+        dc->SetTextAlignment(alignment);
+    }
+
     DrawTextChildren(dc, rend, x, y, setX, setY);
 
     if (customFont) dc->ResetFont();

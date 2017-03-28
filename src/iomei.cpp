@@ -1216,6 +1216,7 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 
     WriteTextElement(currentNode, rend);
     rend->WriteColor(currentNode);
+    rend->WriteHorizontalalign(currentNode);
     rend->WriteCommon(currentNode);
     rend->WriteLang(currentNode);
     rend->WriteTypography(currentNode);
@@ -3095,6 +3096,7 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
     ReadTextElement(rend, vrvRend);
 
     vrvRend->ReadColor(rend);
+    vrvRend->ReadHorizontalalign(rend);
     vrvRend->ReadLang(rend);
     vrvRend->ReadTypography(rend);
 
