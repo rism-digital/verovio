@@ -403,7 +403,7 @@ private:
      * Retrieve the AlignmentReference with staffN.
      * Create and add it as child if not found.
      */
-    AlignmentReference *GetAlignmentReference(int staffN);
+    AlignmentReference *GetAlignmentReference(int staffN, int layerN);
 
 public:
     //
@@ -453,11 +453,17 @@ public:
     */
     ///@{
     AlignmentReference();
-    AlignmentReference(int n);
+    AlignmentReference(int staffN, int layerN);
     virtual ~AlignmentReference();
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
+
+    /**
+     * Return the layer number in the alignment reference.
+     * For cross staff references, the layer number is negative (e.g., layer@n="2" it "-2").
+     */
+    int GetLayerN() const { return m_layerN; }
 
     /**
      * Override the method of adding AlignmentReference children
@@ -469,6 +475,10 @@ public:
     //----------//
 
 private:
+    /**
+     * The layer number in the alignment reference.
+     */
+    int m_layerN;
 };
 
 //----------------------------------------------------------------------------

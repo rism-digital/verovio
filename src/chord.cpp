@@ -148,12 +148,15 @@ void Chord::FilterList(ListOfObjects *childList)
 
     iter++;
 
+    Layer *layer1 = NULL;
+    Layer *layer2 = NULL;
+
     while (iter != childList->end()) {
         curNote = dynamic_cast<Note *>(*iter);
         assert(curNote);
         curPitch = curNote->GetDiatonicPitch();
 
-        if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff() == lastNote->GetCrossStaff())) {
+        if ((curPitch - lastPitch < 2) && (curNote->GetCrossStaff(layer1) == lastNote->GetCrossStaff(layer2))) {
             if (!lastNote->m_cluster) {
                 curCluster = new ChordCluster();
                 m_clusters.push_back(curCluster);
