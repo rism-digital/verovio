@@ -132,9 +132,10 @@ public:
     Alignment *GetAlignment() const { return m_alignment; }
 
     /**
-     * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff
+     * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff.
+     * Also set the corresponding m_crossLayer to layer if a cross staff is found.
      */
-    Staff *GetCrossStaff() const;
+    Staff *GetCrossStaff(Layer *&layer) const;
 
     /**
      * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)
