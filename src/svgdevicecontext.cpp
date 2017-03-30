@@ -652,19 +652,6 @@ void SvgDeviceContext::EndText()
     m_currentNode = m_svgNodeStack.back();
 }
 
-void SvgDeviceContext::SetTextAlignment(char alignment)
-{
-    std::string anchor = "start";
-    if (alignment == RIGHT) {
-        anchor = "end";
-    }
-    if (alignment == CENTER) {
-        anchor = "middle";
-    }
-
-    m_currentNode.append_attribute("text-anchor") = anchor.c_str();
-}
-
 void SvgDeviceContext::DrawText(const std::string &text, const std::wstring wtext)
 {
     assert(m_fontStack.top());
