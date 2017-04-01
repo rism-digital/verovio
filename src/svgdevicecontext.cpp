@@ -136,6 +136,11 @@ void SvgDeviceContext::Commit(bool xml_declaration)
         decl.append_attribute("standalone") = "no";
     }
 
+    // add description statement
+    pugi::xml_node desc = m_svgNode.prepend_child("desc");
+    desc.append_child(pugi::node_pcdata)
+        .set_value(StringFormat("Engraved by Verovio %s", GetVersion().c_str()).c_str());
+
     // save the glyph data to m_outdata
     m_svgDoc.save(m_outdata, "\t", output_flags);
 

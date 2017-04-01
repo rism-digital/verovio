@@ -70,9 +70,30 @@ public:
 
     virtual void FilterList(ListOfObjects *childlist);
 
+    /**
+     * Return the maximum and minimum Y positions of the notes in the chord
+     */
     void GetYExtremes(int &yMax, int &yMin);
 
-    void GetCrossStaffExtemes(Staff *staffAbove, Staff *staffBelow);
+    /**
+     * Return the top or bottom note or their Y position
+     */
+    ///@{
+    Note *GetTopNote();
+    Note *GetBottomNote();
+    int GetYTop();
+    int GetYBottom();
+    ///@}
+
+    /**
+     * Return the cross staff above or below (if  any).
+     */
+    void GetCrossStaffExtremes(Staff *&staffAbove, Staff *&staffBelow);
+
+    /**
+     * Return true if the chord has some cross staff notes.
+     */
+    bool HasCrossStaff();
 
     /**
      * Returns list of notes that have accidentals
@@ -94,18 +115,27 @@ public:
     void ResetAccidSpace(int fullUnit);
 
     /**
-     * @name Set and get stem direction and stem positions
-     * The methods are overriding the interface because we want to apply it to child notes
+     * Get the stem up / stem down attachment point.
+     * If necessary look at the glyph anchor (if any).
      */
     ///@{
-    virtual void SetDrawingStemDir(data_STEMDIRECTION stemDir);
-    virtual void SetDrawingStemStart(Point stemStart);
-    virtual void SetDrawingStemEnd(Point stemEnd);
+    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
+    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
     ///@}
 
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *functorParams);
+
+    /**
+     * See Object::PrepareLayerElementParts
+     */
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareTieAttr

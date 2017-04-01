@@ -365,9 +365,10 @@ public:
     void ClearRelinquishedChildren();
 
     /**
-     * Remove and delete the child at the idx position.
+     * Remove and delete the child.
+     * Return false if the child could not be found. In that case it will not be deleted.
      */
-    void RemoveChildAt(int idx);
+    bool DeleteChild(Object *child);
 
     /**
      * Return the first parent of the specified type.
@@ -546,6 +547,16 @@ public:
     virtual int SetAlignmentXPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
+     * Set the drawing position (m_drawingX and m_drawingY) values for objects
+     */
+    virtual int SetAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
+     * Set the drawing stems positions, including for beams.
+     */
+    virtual int CalcStem(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
      * The functor is redirected from the MeasureAligner and then from the appropriate
      * alignment to the GraceAligner
@@ -676,6 +687,11 @@ public:
     ///@{
 
     /**
+     * Set the drawing cue size of all LayerElement
+     */
+    virtual int PrepareDrawingCueSize(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
+    /**
      * See cross-staff / layer pointers on LayerElement
      */
     ///@{
@@ -747,7 +763,7 @@ public:
      * Functor for setting the artic parts.
      * Splits the artic content into different artic parts if necessary
      */
-    virtual int PrepareArtic(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int PrepareLayerElementParts(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Functor for setting mRpt drawing numbers (if required)
@@ -779,11 +795,6 @@ public:
      * Reset the drawing values before calling PrepareDrawing after changes.
      */
     virtual int ResetDrawing(FunctorParams *) { return FUNCTOR_CONTINUE; }
-
-    /**
-     * Set the drawing position (m_drawingX and m_drawingY) values for objects
-     */
-    virtual int SetAlignmentPitchPos(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     ///@}
 
@@ -1001,7 +1012,7 @@ public:
     ListOfObjects *GetList(Object *node);
 
 private:
-    ListOfObjects m_list;
+    mutable ListOfObjects m_list;
     ListOfObjects::iterator m_iteratorCurrent;
 
 protected:

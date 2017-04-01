@@ -343,7 +343,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
         staffBelow = staff;
     }
     else if (parentChord) {
-        parentChord->GetCrossStaffExtemes(staffAbove, staffBelow);
+        parentChord->GetCrossStaffExtremes(staffAbove, staffBelow);
     }
 
     int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
@@ -406,7 +406,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Artic::PrepareArtic(FunctorParams *functorParams)
+int Artic::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     std::vector<data_ARTICULATION> insideSlur;
     std::vector<data_ARTICULATION> outsideSlur;
@@ -429,6 +429,9 @@ int Artic::PrepareArtic(FunctorParams *functorParams)
 
 int Artic::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
     // Remove all ArticPart children
     ClearChildren();
 

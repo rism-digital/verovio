@@ -78,6 +78,7 @@ void LayerElement::Reset()
     m_xAbs = VRV_UNSET;
     m_drawingYRel = 0;
     m_drawingXRel = 0;
+    m_drawingCueSize = false;
 
     m_scoreDefRole = NONE;
     m_alignment = NULL;
@@ -90,6 +91,10 @@ void LayerElement::Reset()
 
 LayerElement::~LayerElement()
 {
+    // set the pointer of the m_beamElementCoord to NULL;
+    if (m_beamElementCoord) {
+        m_beamElementCoord->m_element = NULL;
+    }
 }
 
 LayerElement &LayerElement::operator=(const LayerElement &element)
@@ -99,6 +104,8 @@ LayerElement &LayerElement::operator=(const LayerElement &element)
         // pointers have to be NULL
         ResetParent();
         m_alignment = NULL;
+        m_graceAlignment = NULL;
+        m_beamElementCoord = NULL;
     }
     return *this;
 }
@@ -140,35 +147,7 @@ bool LayerElement::IsGraceNote()
 
 bool LayerElement::IsCueSize()
 {
-    if (this->IsGraceNote()) return true;
-
-    // This cover the case when the @size is given on the element
-    if (this->HasAttClass(ATT_RELATIVESIZE)) {
-        AttRelativesize *att = dynamic_cast<AttRelativesize *>(this);
-        assert(att);
-        if (att->HasSize()) return (att->GetSize() == SIZE_cue);
-    }
-
-    // For note, we also need to look at the parent chord
-    if (this->Is(NOTE)) {
-        Note const *note = dynamic_cast<Note const *>(this);
-        assert(note);
-        Chord *chord = note->IsChordTone();
-        if (chord) return chord->IsCueSize();
-    }
-    // For tuplet, we also need to look at the first note or chord
-    else if (this->Is(TUPLET)) {
-        AttComparisonAny matchType({ NOTE, CHORD });
-        ArrayOfObjects children;
-        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
-        if (child) return child->IsCueSize();
-    }
-    // For accid, look at the parent note
-    else if (this->Is(ACCID)) {
-        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
-        if (note) return note->IsCueSize();
-    }
-    return false;
+    return m_drawingCueSize;
 }
 
 bool LayerElement::IsInLigature()
@@ -202,13 +181,17 @@ Beam *LayerElement::IsInBeam()
     return NULL;
 }
 
-Staff *LayerElement::GetCrossStaff() const
+Staff *LayerElement::GetCrossStaff(Layer *&layer) const
 {
-    if (m_crossStaff) return m_crossStaff;
+    if (m_crossStaff) {
+        assert(m_crossLayer);
+        layer = m_crossLayer;
+        return m_crossStaff;
+    }
 
     LayerElement *parent = dynamic_cast<LayerElement *>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
 
-    if (parent) return parent->GetCrossStaff();
+    if (parent) return parent->GetCrossStaff(layer);
 
     return NULL;
 }
@@ -370,10 +353,10 @@ int LayerElement::GetDrawingTop(Doc *doc, int staffSize, bool withArtic, ArticPa
         StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
         if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
-            return stemmedDrawingInterface->GetDrawingStemEnd().y;
+            return stemmedDrawingInterface->GetDrawingStemEnd(this).y;
         }
         else {
-            return stemmedDrawingInterface->GetDrawingStemStart().y + doc->GetDrawingUnit(staffSize);
+            return stemmedDrawingInterface->GetDrawingStemStart(this).y + doc->GetDrawingUnit(staffSize);
         }
     }
     return this->GetDrawingY();
@@ -403,10 +386,10 @@ int LayerElement::GetDrawingBottom(Doc *doc, int staffSize, bool withArtic, Arti
         StemmedDrawingInterface *stemmedDrawingInterface = this->GetStemmedDrawingInterface();
         assert(stemmedDrawingInterface);
         if (stemmedDrawingInterface->GetDrawingStemDir() == STEMDIRECTION_up) {
-            return stemmedDrawingInterface->GetDrawingStemStart().y - doc->GetDrawingUnit(staffSize);
+            return stemmedDrawingInterface->GetDrawingStemStart(this).y - doc->GetDrawingUnit(staffSize);
         }
         else {
-            return stemmedDrawingInterface->GetDrawingStemEnd().y;
+            return stemmedDrawingInterface->GetDrawingStemEnd(this).y;
         }
     }
     return this->GetDrawingY();
@@ -581,6 +564,12 @@ int LayerElement::AlignHorizontally(FunctorParams *functorParams)
         else
             type = ALIGNMENT_ACCID;
     }
+    else if (this->Is({ FLAG, STEM })) {
+        // Refer to the note parent (if any?)
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        assert(note);
+        m_alignment = note->GetAlignment();
+    }
     else if (this->Is({ ARTIC, ARTIC_PART, SYL })) {
         // Refer to the note parent
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
@@ -674,6 +663,17 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
             this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
         }
     }
+    else if (this->Is(CHORD)) {
+        // The y position is set to the top note one
+        Chord *chord = dynamic_cast<Chord *>(this);
+        assert(chord);
+        Note *note = chord->GetTopNote();
+        assert(note);
+        int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
+        // Once we have AttLoc on Note
+        // if (note->HasLoc()) loc = note->GetLoc();
+        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+    }
     else if (this->Is({ CUSTOS, DOT })) {
         PositionInterface *interface = dynamic_cast<PositionInterface *>(this);
         assert(interface);
@@ -685,10 +685,17 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
     else if (this->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(this);
         assert(note);
+        Chord *chord = note->IsChordTone();
         int loc = PitchInterface::CalcLoc(note->GetPname(), note->GetOct(), layerY->GetClefLocOffset(layerElementY));
         // Once we have AttLoc on Note
         // if (note->HasLoc()) loc = note->GetLoc();
-        this->SetDrawingYRel(staffY->CalcPitchPosYRel(params->m_doc, loc));
+        int yRel = staffY->CalcPitchPosYRel(params->m_doc, loc);
+        // Make it relative to the top note one (see above) but not for cross-staff notes in chords
+        if (chord && !m_crossStaff) {
+            yRel -= chord->GetDrawingYRel();
+        }
+
+        this->SetDrawingYRel(yRel);
     }
     else if (this->Is(REST)) {
         Rest *rest = dynamic_cast<Rest *>(this);
@@ -814,6 +821,50 @@ int LayerElement::AdjustXPos(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
+int LayerElement::PrepareDrawingCueSize(FunctorParams *functorParams)
+{
+    if (this->IsGraceNote()) {
+        m_drawingCueSize = true;
+    }
+    // This cover the case when the @size is given on the element
+    else if (this->HasAttClass(ATT_RELATIVESIZE)) {
+        AttRelativesize *att = dynamic_cast<AttRelativesize *>(this);
+        assert(att);
+        if (att->HasSize()) m_drawingCueSize = (att->GetSize() == SIZE_cue);
+    }
+    // For note, we also need to look at the parent chord
+    else if (this->Is(NOTE)) {
+        Note const *note = dynamic_cast<Note const *>(this);
+        assert(note);
+        Chord *chord = note->IsChordTone();
+        if (chord) m_drawingCueSize = chord->IsCueSize();
+    }
+    // For tuplet, we also need to look at the first note or chord
+    else if (this->Is(TUPLET)) {
+        AttComparisonAny matchType({ NOTE, CHORD });
+        ArrayOfObjects children;
+        LayerElement *child = dynamic_cast<LayerElement *>(this->FindChildByAttComparison(&matchType));
+        if (child) m_drawingCueSize = child->IsCueSize();
+    }
+    // For accid, look at the parent if @func="edit" or otherwise to the parent note
+    else if (this->Is(ACCID)) {
+        Accid const *accid = dynamic_cast<Accid *>(this);
+        assert(accid);
+        if (accid->GetFunc() == accidLog_FUNC_edit)
+            m_drawingCueSize = true;
+        else {
+            Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
+            if (note) m_drawingCueSize = note->IsCueSize();
+        }
+    }
+    else if (this->Is({ FLAG, STEM })) {
+        Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
+        if (note) m_drawingCueSize = note->IsCueSize();
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int LayerElement::PrepareCrossStaff(FunctorParams *functorParams)
 {
     PrepareCrossStaffParams *params = dynamic_cast<PrepareCrossStaffParams *>(functorParams);
@@ -901,6 +952,9 @@ int LayerElement::PrepareTimePointing(FunctorParams *functorParams)
     PrepareTimePointingParams *params = dynamic_cast<PrepareTimePointingParams *>(functorParams);
     assert(params);
 
+    // Do not look for tstamp pointing to these
+    if (this->Is({ ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
+
     ArrayOfPointingInterClassIdPairs::iterator iter = params->m_timePointingInterfaces.begin();
     while (iter != params->m_timePointingInterfaces.end()) {
         if (iter->first->SetStartOnly(this)) {
@@ -919,6 +973,9 @@ int LayerElement::PrepareTimeSpanning(FunctorParams *functorParams)
 {
     PrepareTimeSpanningParams *params = dynamic_cast<PrepareTimeSpanningParams *>(functorParams);
     assert(params);
+
+    // Do not look for tstamp pointing to these
+    if (this->Is({ ARTIC, ARTIC_PART, BEAM, FLAG, TUPLET, STEM, VERSE })) return FUNCTOR_CONTINUE;
 
     ArrayOfSpanningInterClassIdPairs::iterator iter = params->m_timeSpanningInterfaces.begin();
     while (iter != params->m_timeSpanningInterfaces.end()) {
@@ -1103,5 +1160,12 @@ int LayerElement::CalcMaxMeasureDuration(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+
+int LayerElement::ResetDrawing(FunctorParams *)
+{
+    m_drawingCueSize = false;
+
+    return FUNCTOR_CONTINUE;
+};
 
 } // namespace vrv
