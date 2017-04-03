@@ -5285,6 +5285,15 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             bool dashbegin = false;
             bool dashend = false;
             bool extender = false;
+            for (int z = 1; z < content.size() - 1; z++) {
+                // Use underscore for elision symbol
+                // (later use @con="b" when verovio allows it).
+                // Also possibly make elision symbols optional.
+                if ((content[z] == ' ') && (content[z + 1] != '\'')) {
+                    // the later condition is to not elide "ma 'l"
+                    content[z] = '_';
+                }
+            }
             if (content.back() == '-') {
                 dashend = true;
                 content.pop_back();
