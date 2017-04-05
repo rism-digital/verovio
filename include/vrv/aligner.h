@@ -348,7 +348,7 @@ public:
      * Returns true if the aligner has a GraceAligner
      */
     bool HasGraceAligner() const { return (m_graceAligner != NULL); }
-    
+
     /**
      *
      */
@@ -469,7 +469,7 @@ public:
      * Override the method of adding AlignmentReference children
      */
     virtual void AddChild(Object *object);
-    
+
     /**
      *
      */
@@ -478,11 +478,16 @@ public:
     //----------//
     // Functors //
     //----------//
-    
+
     /**
      * See Object::AdjustGraceXPos
      */
     virtual int AdjustGraceXPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::AjustAccidX
+     */
+    virtual int AdjustAccidX(FunctorParams *);
 
 private:
     //

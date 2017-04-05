@@ -76,6 +76,26 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustAccidXParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the Functor to be redirected to MeasureAligner and GraceAligner
+ * member 1: the Doc
+ **/
+
+class AdjustAccidXParams : public FunctorParams {
+public:
+    AdjustAccidXParams(Doc *doc, Functor *functor)
+    {
+        m_functor = functor;
+        m_doc = doc;
+    }
+    Functor *m_functor;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AdjustArticParams
 //----------------------------------------------------------------------------
 

@@ -91,7 +91,7 @@ public:
      */
     Beam *IsInBeam();
     ///@}
-    
+
     /**
      * @name Get and set the layerN drawing value
      */

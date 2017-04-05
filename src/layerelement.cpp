@@ -741,7 +741,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     assert(params);
 
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
-    
+
     LogDebug("Aligning %s", this->GetClassName().c_str());
 
     // With non grace alignment we do not need to do this

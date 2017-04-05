@@ -143,6 +143,11 @@ void Page::LayOutHorizontally()
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
 
+    // Adjust the X position of the accidentals, including in chords
+    Functor adjustAccidX(&Object::AdjustAccidX);
+    AdjustAccidXParams adjustAccidXParams(doc, &adjustAccidX);
+    this->Process(&adjustAccidX, &adjustAccidXParams);
+
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
     Functor adjustXPos(&Object::AdjustXPos);

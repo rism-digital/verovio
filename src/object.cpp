@@ -309,18 +309,18 @@ Object *Object::DetachChild(int idx)
     m_children.erase(iter + (idx));
     return child;
 }
-    
+
 bool Object::HasChild(Object *child) const
 {
     ArrayOfObjects::const_iterator iter;
-    
+
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
         if ((child == (*iter)) || (*iter)->HasChild(child)) return true;
     }
-    
+
     return false;
-}    
-    
+}
+
 Object *Object::Relinquish(int idx)
 {
     if (idx >= (int)m_children.size()) {

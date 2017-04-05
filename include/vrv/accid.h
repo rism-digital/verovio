@@ -64,6 +64,30 @@ public:
 private:
 };
 
+//----------------------------------------------------------------------------
+// AccidSpaceSort
+//----------------------------------------------------------------------------
+
+/**
+ * Sort Object by drawing Y value or by layerN
+ */
+class AccidSpaceSort {
+
+public:
+    AccidSpaceSort() {}
+
+    bool operator()(const Accid *first, const Accid *second) const
+    {
+        if (first->GetDrawingY() < second->GetDrawingY())
+            return true;
+        else if (first->GetDrawingY() > second->GetDrawingY())
+            return false;
+        // with unissons, look at the layer @n
+        else
+            return (first->GetAlignmentLayerN() < second->GetAlignmentLayerN());
+    }
+};
+
 } // namespace vrv
 
 #endif

@@ -313,7 +313,7 @@ public:
      * The parent pointer is set to NULL.
      */
     Object *DetachChild(int idx);
-    
+
     /**
      * Return true if the object has the child Object as child (reference of direct).
      * Processes in depth-first.
@@ -577,6 +577,8 @@ public:
      * Used in GraceAligner::GetGraceGroupLeft and GraceAligner::GetGraceGroupRight
      */
     virtual int GetAlignmentLeftRight(FunctorParams *functorParams);
+
+    virtual int AdjustAccidX(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Lay out the X positions of the staff content looking at the bounding boxes.

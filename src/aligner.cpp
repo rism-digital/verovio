@@ -531,7 +531,7 @@ void GraceAligner::AlignStack()
         ArrayOfObjects::iterator childrenIter;
         element->FindAllChildByAttComparison(&children, &matchType);
         alignment->AddLayerElementRef(element);
-        
+
         // Set the grace alignmnet to all children
         for (childrenIter = children.begin(); childrenIter != children.end(); childrenIter++) {
             // Trick : FindAllChildByAttComparison include the element, which is probably a problem.
@@ -646,7 +646,7 @@ AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
     AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
     AlignmentReference *alignmentRef
-    = dynamic_cast<AlignmentReference *>(this->FindChildByAttComparison(&matchStaff, 1));
+        = dynamic_cast<AlignmentReference *>(this->FindChildByAttComparison(&matchStaff, 1));
     if (!alignmentRef) {
         alignmentRef = new AlignmentReference(staffN);
         this->AddChild(alignmentRef);
@@ -731,17 +731,20 @@ GraceAligner *Alignment::GetGraceAligner()
     }
     return m_graceAligner;
 }
-    
+
 void Alignment::AddToAccidSpace(Accid *accid)
 {
     assert(accid);
-    
+
+    // Do not added them if no @accid (e.g., @accid.ges only)
+    if (!accid->HasAccid()) return;
+
     ArrayOfObjects::iterator iter;
     AlignmentReference *reference = NULL;
-    
+
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
         if ((*iter)->HasChild(accid)) {
-            reference = dynamic_cast<AlignmentReference*>(*iter);
+            reference = dynamic_cast<AlignmentReference *>(*iter);
             assert(reference);
             reference->AddToAccidSpace(accid);
         }
@@ -782,7 +785,7 @@ void AlignmentReference::Reset()
 {
     Object::Reset();
     ResetCommon();
-    
+
     m_accidSpaceTemp.clear();
 }
 
@@ -797,14 +800,13 @@ void AlignmentReference::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
-    
+
 void AlignmentReference::AddToAccidSpace(Accid *accid)
 {
     assert(accid);
-    
+
     m_accidSpaceTemp.push_back(accid);
 }
-
 
 //----------------------------------------------------------------------------
 // TimestampAligner
@@ -1212,19 +1214,42 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
-    
+
     ArrayOfObjects::iterator childrenIter;
-    
+
     // Because we are processing grace notes aligment backward (see Alignment::AdjustGraceXPos) we need
     // to process the children (LayerElement) "by hand" in FORWARD manner
     // (filters can be NULL because filtering was already applied in the parent)
     for (childrenIter = m_children.begin(); childrenIter != m_children.end(); childrenIter++) {
         (*childrenIter)->Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, FORWARD);
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
+{
+    AdjustAccidXParams *params = dynamic_cast<AdjustAccidXParams *>(functorParams);
+    assert(params);
+
+    if (m_accidSpaceTemp.empty()) return FUNCTOR_SIBLINGS;
+
+    std::sort(m_accidSpaceTemp.begin(), m_accidSpaceTemp.end(), AccidSpaceSort());
+
+    int count = (int)m_accidSpaceTemp.size();
+    int i, j;
+    int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
+    // Zig-zag processing
+    for (i = 0, j = count - 1; i < middle; i++, j--) {
+        LogDebug("%d", m_accidSpaceTemp.at(i)->GetAccid());
+        // Break with odd number of elements once the middle is reached
+        if (i == j) break;
+        LogDebug("%d", m_accidSpaceTemp.at(j)->GetAccid());
     }
 
     return FUNCTOR_SIBLINGS;

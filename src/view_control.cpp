@@ -1539,7 +1539,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
 
     bool setX = false;
     bool setY = false;
-    
+
     char alignment = dir->GetAlignment();
     // Dir are left aligned by default;
     if (alignment == 0) alignment = LEFT;
@@ -1592,7 +1592,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
 
     bool setX = false;
     bool setY = false;
-    
+
     char alignment = dynam->GetAlignment();
     // Dynam are left aligned by default;
     if (alignment == 0) alignment = LEFT;
@@ -1703,7 +1703,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
 
     bool setX = false;
     bool setY = false;
-    
+
     char alignment = harm->GetAlignment();
     // Harm are centered aligned by default;
     if (alignment == 0) alignment = CENTER;
@@ -1906,7 +1906,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
 
     bool setX = false;
     bool setY = false;
-    
+
     char alignment = tempo->GetAlignment();
     // Tempo are left aligned by default;
     if (alignment == 0) alignment = LEFT;

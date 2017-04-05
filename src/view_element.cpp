@@ -586,6 +586,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     // navigate through list of notes, starting with outside and working in
 
+    /*
+
     chord->ResetAccidList();
     std::vector<Note *> noteList = chord->m_accidList;
     int size = (int)noteList.size();
@@ -653,6 +655,8 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             fwIdx = idx;
         }
     }
+
+    */
 
     /************ Draw children (notes) ************/
 

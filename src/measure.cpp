@@ -407,6 +407,16 @@ int Measure::AlignVertically(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Measure::AdjustAccidX(FunctorParams *functorParams)
+{
+    AdjustAccidXParams *params = dynamic_cast<AdjustAccidXParams *>(functorParams);
+    assert(params);
+
+    m_measureAligner.Process(params->m_functor, params);
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Measure::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
