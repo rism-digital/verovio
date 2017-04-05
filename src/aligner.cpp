@@ -525,14 +525,14 @@ void GraceAligner::AlignStack()
         time -= duration;
         Alignment *alignment = this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT);
         element->SetGraceAlignment(alignment);
-        alignment->AddLayerElementRef(element);
 
         AttComparisonAny matchType({ ACCID, FLAG, NOTE, STEM });
         ArrayOfObjects children;
         ArrayOfObjects::iterator childrenIter;
         element->FindAllChildByAttComparison(&children, &matchType);
-
-        // Then the @n of each first staffDef
+        alignment->AddLayerElementRef(element);
+        
+        // Set the grace alignmnet to all children
         for (childrenIter = children.begin(); childrenIter != children.end(); childrenIter++) {
             // Trick : FindAllChildByAttComparison include the element, which is probably a problem.
             // With note, we want to set only accid, so make sure we do not set it twice
@@ -540,6 +540,7 @@ void GraceAligner::AlignStack()
             LayerElement *childElement = dynamic_cast<LayerElement *>(*childrenIter);
             assert(childElement);
             childElement->SetGraceAlignment(alignment);
+            alignment->AddLayerElementRef(childElement);
         }
     }
     m_graceStack.clear();
@@ -641,18 +642,13 @@ void Alignment::AddChild(Object *child)
     Modify();
 }
 
-AlignmentReference *Alignment::GetAlignmentReference(int staffN, int layerN)
+AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
-    ArrayOfObjects::iterator iter;
-    AlignmentReference *alignmentRef = NULL;
-    // Then the @n of each first staffDef
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
-        alignmentRef = dynamic_cast<AlignmentReference *>(*iter);
-        assert(alignmentRef);
-        if ((alignmentRef->GetN() == staffN) && (alignmentRef->GetLayerN() == layerN)) break;
-    }
+    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+    AlignmentReference *alignmentRef
+    = dynamic_cast<AlignmentReference *>(this->FindChildByAttComparison(&matchStaff, 1));
     if (!alignmentRef) {
-        alignmentRef = new AlignmentReference(staffN, layerN);
+        alignmentRef = new AlignmentReference(staffN);
         this->AddChild(alignmentRef);
     }
     return alignmentRef;
@@ -700,8 +696,9 @@ void Alignment::AddLayerElementRef(LayerElement *element)
             }
         }
     }
-    AlignmentReference *alignmentRef = GetAlignmentReference(staffN, layerN);
+    AlignmentReference *alignmentRef = GetAlignmentReference(staffN);
     alignmentRef->AddChild(element);
+    element->SetAlignmentLayerN(layerN);
 }
 
 bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
@@ -734,6 +731,25 @@ GraceAligner *Alignment::GetGraceAligner()
     }
     return m_graceAligner;
 }
+    
+void Alignment::AddToAccidSpace(Accid *accid)
+{
+    assert(accid);
+    
+    ArrayOfObjects::iterator iter;
+    AlignmentReference *reference = NULL;
+    
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        if ((*iter)->HasChild(accid)) {
+            reference = dynamic_cast<AlignmentReference*>(*iter);
+            assert(reference);
+            reference->AddToAccidSpace(accid);
+        }
+    }
+
+    // We assert it because we want to make sure a reference was found (it should in all cases)
+    assert(reference);
+}
 
 //----------------------------------------------------------------------------
 // AlignmentReference
@@ -748,7 +764,7 @@ AlignmentReference::AlignmentReference() : Object(), AttCommon()
     this->SetAsReferenceObject();
 }
 
-AlignmentReference::AlignmentReference(int staffN, int layerN) : Object(), AttCommon()
+AlignmentReference::AlignmentReference(int staffN) : Object(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
@@ -756,7 +772,6 @@ AlignmentReference::AlignmentReference(int staffN, int layerN) : Object(), AttCo
 
     this->SetAsReferenceObject();
     this->SetN(staffN);
-    m_layerN = layerN;
 }
 
 AlignmentReference::~AlignmentReference()
@@ -767,8 +782,8 @@ void AlignmentReference::Reset()
 {
     Object::Reset();
     ResetCommon();
-
-    m_layerN = 0;
+    
+    m_accidSpaceTemp.clear();
 }
 
 void AlignmentReference::AddChild(Object *child)
@@ -782,6 +797,14 @@ void AlignmentReference::AddChild(Object *child)
     m_children.push_back(child);
     Modify();
 }
+    
+void AlignmentReference::AddToAccidSpace(Accid *accid)
+{
+    assert(accid);
+    
+    m_accidSpaceTemp.push_back(accid);
+}
+
 
 //----------------------------------------------------------------------------
 // TimestampAligner
@@ -1188,6 +1211,23 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
     params->m_upcomingBoundingBoxes.clear();
 
     return FUNCTOR_CONTINUE;
+}
+    
+int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
+{
+    AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
+    assert(params);
+    
+    ArrayOfObjects::iterator childrenIter;
+    
+    // Because we are processing grace notes aligment backward (see Alignment::AdjustGraceXPos) we need
+    // to process the children (LayerElement) "by hand" in FORWARD manner
+    // (filters can be NULL because filtering was already applied in the parent)
+    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); childrenIter++) {
+        (*childrenIter)->Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, FORWARD);
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)

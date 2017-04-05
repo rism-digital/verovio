@@ -13,6 +13,7 @@
 
 namespace vrv {
 
+class Accid;
 class AlignmentReference;
 class FloatingObject;
 class GraceAligner;
@@ -347,6 +348,11 @@ public:
      * Returns true if the aligner has a GraceAligner
      */
     bool HasGraceAligner() const { return (m_graceAligner != NULL); }
+    
+    /**
+     *
+     */
+    void AddToAccidSpace(Accid *accid);
 
     /**
      * Compute "ideal" horizontal space to allow for a given time interval, ignoring the need
@@ -403,7 +409,7 @@ private:
      * Retrieve the AlignmentReference with staffN.
      * Create and add it as child if not found.
      */
-    AlignmentReference *GetAlignmentReference(int staffN, int layerN);
+    AlignmentReference *GetAlignmentReference(int staffN);
 
 public:
     //
@@ -453,32 +459,40 @@ public:
     */
     ///@{
     AlignmentReference();
-    AlignmentReference(int staffN, int layerN);
+    AlignmentReference(int staffN);
     virtual ~AlignmentReference();
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
 
     /**
-     * Return the layer number in the alignment reference.
-     * For cross staff references, the layer number is negative (e.g., layer@n="2" it "-2").
-     */
-    int GetLayerN() const { return m_layerN; }
-
-    /**
      * Override the method of adding AlignmentReference children
      */
     virtual void AddChild(Object *object);
+    
+    /**
+     *
+     */
+    void AddToAccidSpace(Accid *accid);
 
     //----------//
     // Functors //
     //----------//
+    
+    /**
+     * See Object::AdjustGraceXPos
+     */
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
 
 private:
+    //
+public:
+    //
+private:
     /**
-     * The layer number in the alignment reference.
+     *
      */
-    int m_layerN;
+    std::vector<Accid *> m_accidSpaceTemp;
 };
 
 //----------------------------------------------------------------------------

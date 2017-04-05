@@ -313,6 +313,12 @@ public:
      * The parent pointer is set to NULL.
      */
     Object *DetachChild(int idx);
+    
+    /**
+     * Return true if the object has the child Object as child (reference of direct).
+     * Processes in depth-first.
+     */
+    bool HasChild(Object *child) const;
 
     /**
      * Look for a child with the specified uuid (returns NULL if not found)

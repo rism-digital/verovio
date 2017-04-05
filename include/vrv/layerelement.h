@@ -91,6 +91,14 @@ public:
      */
     Beam *IsInBeam();
     ///@}
+    
+    /**
+     * @name Get and set the layerN drawing value
+     */
+    ///@{
+    int GetAlignmentLayerN() const { return m_alignmentLayerN; }
+    void SetAlignmentLayerN(int alignmentLayerN) { m_alignmentLayerN = alignmentLayerN; }
+    ///@}
 
     /**
      * @name Get the X and Y drawing position
@@ -279,6 +287,11 @@ private:
      * The cached drawing cue size set by PrepareDarwingCueSize
      */
     bool m_drawingCueSize;
+    /**
+     * The cached alignment layer @n.
+     * This also stores the negative values for identifying cross-staff
+     */
+    int m_alignmentLayerN;
 };
 
 } // namespace vrv

@@ -83,6 +83,7 @@ void LayerElement::Reset()
     m_scoreDefRole = NONE;
     m_alignment = NULL;
     m_graceAlignment = NULL;
+    m_alignmentLayerN = VRV_UNSET;
     m_beamElementCoord = NULL;
 
     m_crossStaff = NULL;
@@ -465,6 +466,7 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 
     m_alignment = NULL;
     m_graceAlignment = NULL;
+    m_alignmentLayerN = VRV_UNSET;
 
     return FUNCTOR_CONTINUE;
 }
@@ -652,7 +654,10 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         assert(accid);
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
         if (note) {
-            // accid->SetDrawingYRel(note->GetDrawingYRel());
+            if (note->HasGraceAlignment())
+                note->GetGraceAlignment()->AddToAccidSpace(accid);
+            else
+                m_alignment->AddToAccidSpace(accid);
         }
         else {
             // do something for accid that are not children of a note - e.g., mensural?
@@ -736,17 +741,17 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
     assert(params);
 
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
+    
+    LogDebug("Aligning %s", this->GetClassName().c_str());
 
-    // With non grace alignment we do not need to do this because all the LayerElement are added as children of the
-    // Alignment
-    // Here not (only parent chords or notes) so we need to reset the cache by hand
+    // With non grace alignment we do not need to do this
     this->ResetCachedDrawingX();
 
-    if (!this->HasGraceAlignment()) return FUNCTOR_CONTINUE;
+    if (!this->HasGraceAlignment()) return FUNCTOR_SIBLINGS;
 
     if (!this->HasUpdatedBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
-        return FUNCTOR_CONTINUE;
+        return FUNCTOR_SIBLINGS;
     }
 
     int selfRight = this->GetSelfRight();
@@ -764,7 +769,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 int LayerElement::AdjustXPos(FunctorParams *functorParams)
