@@ -412,6 +412,8 @@ int Measure::AdjustAccidX(FunctorParams *functorParams)
     AdjustAccidXParams *params = dynamic_cast<AdjustAccidXParams *>(functorParams);
     assert(params);
 
+    params->m_currentMeasure = this;
+
     m_measureAligner.Process(params->m_functor, params);
 
     return FUNCTOR_CONTINUE;

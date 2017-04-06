@@ -192,12 +192,43 @@ bool BoundingBox::HasSelfBB() const
         && (m_selfBB_y2 != VRV_UNSET));
 }
 
-bool BoundingBox::HorizontalOverlap(const BoundingBox *other) const
+bool BoundingBox::HorizontalOverlap(const BoundingBox *other, int margin) const
 {
     assert(other);
 
-    if (this->GetContentRight() < other->GetContentLeft()) return false;
-    if (this->GetContentLeft() > other->GetContentRight()) return false;
+    if (!this->HasContentBB() || !other->HasContentBB()) return false;
+    if (this->GetContentRight() <= other->GetContentLeft() - margin) return false;
+    if (this->GetContentLeft() >= other->GetContentRight() + margin) return false;
+    return true;
+}
+
+bool BoundingBox::VerticalOverlap(const BoundingBox *other, int margin) const
+{
+    assert(other);
+
+    if (!this->HasContentBB() || !other->HasContentBB()) return false;
+    if (this->GetContentTop() <= other->GetContentBottom() - margin) return false;
+    if (this->GetContentBottom() >= other->GetContentTop() + margin) return false;
+    return true;
+}
+
+bool BoundingBox::HorizontalSelfOverlap(const BoundingBox *other, int margin) const
+{
+    assert(other);
+
+    if (!this->HasSelfBB() || !other->HasSelfBB()) return false;
+    if (this->GetSelfRight() <= other->GetSelfLeft() - margin) return false;
+    if (this->GetSelfLeft() >= other->GetSelfRight() + margin) return false;
+    return true;
+}
+
+bool BoundingBox::VerticalSelfOverlap(const BoundingBox *other, int margin) const
+{
+    assert(other);
+
+    if (!this->HasSelfBB() || !other->HasSelfBB()) return false;
+    if (this->GetSelfTop() <= other->GetSelfBottom() - margin) return false;
+    if (this->GetSelfBottom() >= other->GetSelfTop() + margin) return false;
     return true;
 }
 

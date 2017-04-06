@@ -101,9 +101,14 @@ public:
     ///@}
 
     /**
-     * Returns true if the bounding box has a horizontal overlap with the other one.
+     * @name Return true if the bounding box has a horizontal / vertical overlap with the other one.
      */
-    bool HorizontalOverlap(const BoundingBox *other) const;
+    ///@{
+    bool HorizontalOverlap(const BoundingBox *other, int margin = 0) const;
+    bool VerticalOverlap(const BoundingBox *other, int margin = 0) const;
+    bool HorizontalSelfOverlap(const BoundingBox *other, int margin = 0) const;
+    bool VerticalSelfOverlap(const BoundingBox *other, int margin = 0) const;
+    ///@}
 
     bool Encloses(const Point point) const;
 

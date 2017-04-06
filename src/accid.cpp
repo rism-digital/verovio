@@ -13,9 +13,11 @@
 
 //----------------------------------------------------------------------------
 
+#include "doc.h"
 #include "functorparams.h"
 #include "note.h"
 #include "smufl.h"
+#include "vrv.h"
 
 namespace vrv {
 
@@ -75,6 +77,45 @@ std::wstring Accid::GetSymbolStr() const
         symbolStr.push_back(symc);
     }
     return symbolStr;
+}
+
+bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids)
+{
+    assert(element);
+    assert(doc);
+
+    if (this == element) return false;
+
+    int stemWidth = doc->GetDrawingStemWidth(staffSize);
+
+    if (!this->VerticalSelfOverlap(element, stemWidth)) return false;
+
+    if (element->Is(ACCID)) {
+        if (!this->HorizontalSelfOverlap(element, stemWidth)) {
+            // There is enough space on the right of the accidental, but maybe we will need to
+            // adjust it again (see recursive call below), so keep the accidental that is on the left
+            leftAccids.push_back(dynamic_cast<Accid *>(element));
+            return false;
+        }
+    }
+
+    int xRelShift = element->GetSelfLeft() - this->GetSelfRight() - stemWidth;
+    // Move only to the left
+    if (xRelShift < 0) {
+        this->SetDrawingXRel(this->GetDrawingXRel() + xRelShift);
+        // We have some accidentals on the left, check again with all of these
+        if (!leftAccids.empty()) {
+            std::vector<Accid *> leftAccidsSubset;
+            std::vector<Accid *>::iterator iter;
+            // Recursively adjust all accidental that are on the left because enough space was previousy available
+            for (iter = leftAccids.begin(); iter != leftAccids.end(); iter++) {
+                this->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccidsSubset);
+            }
+        }
+        return true;
+    }
+
+    return false;
 }
 
 wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_EXPLICIT accid)

@@ -475,6 +475,11 @@ public:
      */
     void AddToAccidSpace(Accid *accid);
 
+    /**
+     * See Object::AjustAccidX
+     */
+    void AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize);
+
     //----------//
     // Functors //
     //----------//

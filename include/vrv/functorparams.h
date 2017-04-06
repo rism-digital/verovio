@@ -88,9 +88,11 @@ class AdjustAccidXParams : public FunctorParams {
 public:
     AdjustAccidXParams(Doc *doc, Functor *functor)
     {
+        m_currentMeasure = NULL;
         m_functor = functor;
         m_doc = doc;
     }
+    Measure *m_currentMeasure;
     Functor *m_functor;
     Doc *m_doc;
 };

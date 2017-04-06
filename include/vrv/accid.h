@@ -13,6 +13,8 @@
 
 namespace vrv {
 
+class AlignmentReference;
+
 //----------------------------------------------------------------------------
 // Accid
 //----------------------------------------------------------------------------
@@ -47,6 +49,8 @@ public:
      * This will include brackets
      */
     std::wstring GetSymbolStr() const;
+
+    bool AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<Accid *> &leftAccids);
 
     /**
      * @name Method used for drawing accidentals on ornaments

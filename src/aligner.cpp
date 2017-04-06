@@ -808,6 +808,17 @@ void AlignmentReference::AddToAccidSpace(Accid *accid)
     m_accidSpaceTemp.push_back(accid);
 }
 
+void AlignmentReference::AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize)
+{
+    std::vector<Accid *> leftAccids;
+
+    ArrayOfObjects::iterator iter;
+    // bottom one
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        accid->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccids);
+    }
+}
+
 //----------------------------------------------------------------------------
 // TimestampAligner
 //----------------------------------------------------------------------------
@@ -1239,6 +1250,10 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
 
     if (m_accidSpaceTemp.empty()) return FUNCTOR_SIBLINGS;
 
+    assert(params->m_doc);
+    StaffDef *staffDef = params->m_doc->m_scoreDef.GetStaffDef(this->GetN());
+    int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
+
     std::sort(m_accidSpaceTemp.begin(), m_accidSpaceTemp.end(), AccidSpaceSort());
 
     int count = (int)m_accidSpaceTemp.size();
@@ -1246,10 +1261,14 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
     // Zig-zag processing
     for (i = 0, j = count - 1; i < middle; i++, j--) {
-        LogDebug("%d", m_accidSpaceTemp.at(i)->GetAccid());
+        // bottom one
+        this->AdjustAccidWithAccidSpace(m_accidSpaceTemp.at(i), params->m_doc, staffSize);
+
         // Break with odd number of elements once the middle is reached
         if (i == j) break;
-        LogDebug("%d", m_accidSpaceTemp.at(j)->GetAccid());
+
+        // top one
+        this->AdjustAccidWithAccidSpace(m_accidSpaceTemp.at(j), params->m_doc, staffSize);
     }
 
     return FUNCTOR_SIBLINGS;
