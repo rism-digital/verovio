@@ -188,7 +188,6 @@ int Chord::PositionInChord(Note *note)
     return 1;
 }
 
-
 void Chord::GetYExtremes(int &yMax, int &yMin)
 {
     ListOfObjects *childList = this->GetList(this); // make sure it's initialized

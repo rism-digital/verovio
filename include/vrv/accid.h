@@ -45,6 +45,16 @@ public:
     virtual bool HasToBeAligned() const { return true; }
 
     /**
+     * @name Set and get drawing octave flag
+     */
+    ///@{
+    void SetDrawingOctave(bool isDrawingOctave) { m_isDrawingOctave = isDrawingOctave; }
+    bool GetDrawingOctave() const { return m_isDrawingOctave; }
+    void SetDrawingOctaveAccid(Accid *drawingOctave) { m_drawingOctave = drawingOctave; }
+    Accid *GetDrawingOctaveAccid() const { return m_drawingOctave; }
+    ///@}
+
+    /**
      * Retrieve SMuFL string for the accidental.
      * This will include brackets
      */
@@ -61,11 +71,18 @@ public:
     // Functors //
     //----------//
 
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+
 private:
     //
 public:
     //
 private:
+    Accid *m_drawingOctave;
+    bool m_isDrawingOctave;
 };
 
 //----------------------------------------------------------------------------

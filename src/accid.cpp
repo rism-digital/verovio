@@ -157,4 +157,14 @@ wchar_t Accid::GetAccidGlyph(data_ACCIDENTAL_EXPLICIT accid)
 // Functor methods
 //----------------------------------------------------------------------------
 
+int Accid::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    LayerElement::ResetHorizontalAlignment(functorParams);
+
+    m_isDrawingOctave = false;
+    m_drawingOctave = NULL;
+
+    return FUNCTOR_CONTINUE;
+}
+
 } // namespace vrv

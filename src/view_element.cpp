@@ -205,7 +205,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /************** editorial accidental **************/
 
     std::wstring accidStr = accid->GetSymbolStr();
-    bool center = false;
+    bool center = true;
 
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();

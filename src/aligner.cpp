@@ -1256,19 +1256,53 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
 
     std::sort(m_accidSpace.begin(), m_accidSpace.end(), AccidSpaceSort());
 
+    // Detect the octave and mark them
+    std::vector<Accid *>::iterator iter, octaveIter;
+    for (iter = m_accidSpace.begin(); iter != m_accidSpace.end() - 1; iter++) {
+        Note *note = dynamic_cast<Note *>((*iter)->GetFirstParent(NOTE));
+        assert(note);
+        if (!note) continue;
+        for (octaveIter = iter + 1; octaveIter != m_accidSpace.end(); octaveIter++) {
+            Note *octave = dynamic_cast<Note *>((*octaveIter)->GetFirstParent(NOTE));
+            assert(octave);
+            if (!octave) continue;
+            // Same pitch, different octave, same accid - for now?
+            if ((note->GetPname() == octave->GetPname()) && (note->GetOct() != octave->GetOct())
+                && ((*iter)->GetAccid() == (*octaveIter)->GetAccid())) {
+                (*iter)->SetDrawingOctaveAccid(*octaveIter);
+                (*octaveIter)->SetDrawingOctave(true);
+            }
+        }
+    }
+
     int count = (int)m_accidSpace.size();
     int i, j;
+
+    // Align the octaves
+    for (i = 0; i < count - 1; i++) {
+        if (m_accidSpace.at(i)->GetDrawingOctaveAccid() != NULL) {
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i)->GetDrawingOctaveAccid(), params->m_doc, staffSize);
+            int minXRel = std::min(
+                m_accidSpace.at(i)->GetDrawingXRel(), m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel());
+            m_accidSpace.at(i)->SetDrawingXRel(minXRel);
+            m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(minXRel);
+        }
+    }
+
     int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
     // Zig-zag processing
     for (i = 0, j = count - 1; i < middle; i++, j--) {
-        // bottom one
-        this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
+        // bottom one - but skip octaves
+        if (!m_accidSpace.at(i)->GetDrawingOctaveAccid() && !m_accidSpace.at(i)->GetDrawingOctave())
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
 
         // Break with odd number of elements once the middle is reached
         if (i == j) break;
 
-        // top one
-        this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize);
+        // top one - but skip octaves
+        if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize);
     }
 
     return FUNCTOR_SIBLINGS;
