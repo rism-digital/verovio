@@ -56,11 +56,6 @@ public:
     virtual void FilterList(ListOfObjects *childlist);
 
     /**
-     * Returns list of notes that have accidentals
-     */
-    void ResetAccidList();
-
-    /**
      * Return information about the note's position in the ligature ??
      */
     ///@{
