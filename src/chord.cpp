@@ -177,20 +177,6 @@ void Chord::FilterList(ListOfObjects *childList)
     }
 }
 
-void Chord::ResetAccidList()
-{
-    m_accidList.clear();
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::reverse_iterator it = childList->rbegin(); it != childList->rend(); it++) {
-        Note *note = dynamic_cast<Note *>(*it);
-        assert(note);
-        Accid *accid = note->GetDrawingAccid();
-        if (accid && accid->HasAccid()) {
-            m_accidList.push_back(note);
-        }
-    }
-}
-
 int Chord::PositionInChord(Note *note)
 {
     int size = (int)this->GetList(this)->size();
@@ -202,53 +188,6 @@ int Chord::PositionInChord(Note *note)
     return 1;
 }
 
-/**
- * Creates a 2D grid of width (# of accidentals + 1) * 4 and of height (highest accid - lowest accid) / (half a drawing
- * unit)
- */
-void Chord::ResetAccidSpace(int fullUnit)
-{
-    m_accidSpace.clear();
-    m_accidSpaceBot = 0;
-    m_accidSpaceTop = 0;
-
-    // if there are no accidentals in the chord, we don't need to plan for any
-    if (m_accidList.size() == 0) return;
-
-    // dimensional units, other variables
-    int halfUnit = fullUnit / 2;
-    int idx, setIdx;
-
-    /*
-     * Prepare for the situation where every accidental conflicts horizontally:
-     *    -Assume each accidental to be 2 drawing units wide, drawn to 1/2-unit detail (ACCID_WIDTH should be
-     * represented in half-units)
-     *    -Prepare each line to account for one extra accidental so we can guarantee the grid has enough space
-     *    -Set m_accidSpaceLeft to be used for asserts during drawing
-     */
-    int accidLineLength = (int)m_accidList.size() * ACCID_WIDTH;
-
-    /*
-     * Each accidental's Y position will be its vertical center; set the grid extremes to account for that
-     * Resize m_accidSpace to be as tall as possibly necessary; must accomodate every accidental stacked vertically.
-     */
-    int accidHeight = ACCID_HEIGHT * halfUnit;
-    int yMax = 0, yMin = 0;
-    this->GetYExtremes(yMax, yMin);
-    m_accidSpaceTop = yMax + (accidHeight / 2);
-    m_accidSpaceBot = yMin - (accidHeight / 2);
-    int height = (m_accidSpaceTop - m_accidSpaceBot) / halfUnit;
-    assert(height >= 0);
-    m_accidSpace.resize(height);
-
-    // Resize each row in m_accidSpace to be the proper length; set all the bools to false
-    std::vector<bool> *accidLine;
-    for (idx = 0; idx < (int)m_accidSpace.size(); idx++) {
-        accidLine = &m_accidSpace.at(idx);
-        accidLine->resize(accidLineLength);
-        for (setIdx = 0; setIdx < accidLineLength; setIdx++) accidLine->at(setIdx) = false;
-    }
-}
 
 void Chord::GetYExtremes(int &yMax, int &yMin)
 {

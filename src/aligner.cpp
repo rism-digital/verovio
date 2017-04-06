@@ -786,7 +786,7 @@ void AlignmentReference::Reset()
     Object::Reset();
     ResetCommon();
 
-    m_accidSpaceTemp.clear();
+    m_accidSpace.clear();
 }
 
 void AlignmentReference::AddChild(Object *child)
@@ -805,7 +805,7 @@ void AlignmentReference::AddToAccidSpace(Accid *accid)
 {
     assert(accid);
 
-    m_accidSpaceTemp.push_back(accid);
+    m_accidSpace.push_back(accid);
 }
 
 void AlignmentReference::AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize)
@@ -1248,27 +1248,27 @@ int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
     AdjustAccidXParams *params = dynamic_cast<AdjustAccidXParams *>(functorParams);
     assert(params);
 
-    if (m_accidSpaceTemp.empty()) return FUNCTOR_SIBLINGS;
+    if (m_accidSpace.empty()) return FUNCTOR_SIBLINGS;
 
     assert(params->m_doc);
     StaffDef *staffDef = params->m_doc->m_scoreDef.GetStaffDef(this->GetN());
     int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
 
-    std::sort(m_accidSpaceTemp.begin(), m_accidSpaceTemp.end(), AccidSpaceSort());
+    std::sort(m_accidSpace.begin(), m_accidSpace.end(), AccidSpaceSort());
 
-    int count = (int)m_accidSpaceTemp.size();
+    int count = (int)m_accidSpace.size();
     int i, j;
     int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
     // Zig-zag processing
     for (i = 0, j = count - 1; i < middle; i++, j--) {
         // bottom one
-        this->AdjustAccidWithAccidSpace(m_accidSpaceTemp.at(i), params->m_doc, staffSize);
+        this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
 
         // Break with odd number of elements once the middle is reached
         if (i == j) break;
 
         // top one
-        this->AdjustAccidWithAccidSpace(m_accidSpaceTemp.at(j), params->m_doc, staffSize);
+        this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize);
     }
 
     return FUNCTOR_SIBLINGS;

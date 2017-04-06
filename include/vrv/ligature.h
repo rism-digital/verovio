@@ -68,12 +68,6 @@ public:
     int PositionInLigature(Note *note);
     ///@}
 
-    /**
-     * Prepares a 2D grid of booleans to track where accidentals are placed. ??
-     * Further documentation is in chord.cpp comments. ??
-     */
-    void ResetAccidSpace(int fullUnit);
-
     //----------//
     // Functors //
     //----------//

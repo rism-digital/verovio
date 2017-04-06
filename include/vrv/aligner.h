@@ -502,7 +502,7 @@ private:
     /**
      *
      */
-    std::vector<Accid *> m_accidSpaceTemp;
+    std::vector<Accid *> m_accidSpace;
 };
 
 //----------------------------------------------------------------------------

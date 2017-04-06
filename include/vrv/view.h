@@ -444,11 +444,6 @@ private:
      */
     void PrepareChordDots(DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff);
 
-    /**
-     * Changes and/or calculates the horizontal alignment of accidentals to prevent overlapping
-     */
-    bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjustHorizontally);
-
 public:
     /** Document */
     Doc *m_doc;

@@ -109,12 +109,6 @@ public:
     ///@}
 
     /**
-     * Prepares a 2D grid of booleans to track where accidentals are placed.
-     * Further documentation is in chord.cpp comments.
-     */
-    void ResetAccidSpace(int fullUnit);
-
-    /**
      * Get the stem up / stem down attachment point.
      * If necessary look at the glyph anchor (if any).
      */
@@ -165,13 +159,6 @@ public:
      * Positions of dots in the chord to avoid overlapping
      */
     std::list<int> m_dots;
-
-    /**
-     * Variables related to preventing overlapping in the X dimension for accidentals
-     */
-    std::vector<Note *> m_accidList;
-    std::vector<std::vector<bool> > m_accidSpace;
-    int m_accidSpaceTop, m_accidSpaceBot, m_accidSpaceLeft;
 };
 
 } // namespace vrv
