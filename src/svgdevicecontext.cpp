@@ -688,7 +688,7 @@ std::string FilenameLookup(unsigned char c)
     return glyph;
 }
 
-void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y)
+void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
 {
     assert(m_fontStack.top());
 
@@ -696,7 +696,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y)
 
     // print chars one by one
     for (unsigned int i = 0; i < text.length(); i++) {
-        wchar_t c = text[i];
+        wchar_t c = text.at(i);
         Glyph *glyph = Resources::GetGlyph(c);
         if (!glyph) {
             continue;
@@ -793,8 +793,42 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                     - view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()));
         }
 
+        SetPen(AxBLACK, 1, AxSOLID);
+        SetBrush(AxBLACK, AxSOLID);
+
+        std::vector<SMuFLGlyphAnchor> anchors = { SMUFL_cutOutNE, SMUFL_cutOutNW, SMUFL_cutOutSE, SMUFL_cutOutSW };
+        std::vector<SMuFLGlyphAnchor>::iterator iter;
+
+        for (iter = anchors.begin(); iter != anchors.end(); iter++) {
+            if (object->GetBoundingBoxGlyph() != 0) {
+                Glyph *glyph = Resources::GetGlyph(object->GetBoundingBoxGlyph());
+                assert(glyph);
+
+                if (glyph->HasAnchor(*iter)) {
+                    const Point *fontPoint = glyph->GetAnchor(*iter);
+                    assert(fontPoint);
+                    Point p;
+                    int x, y, w, h;
+                    glyph->GetBoundingBox(&x, &y, &w, &h);
+                    int smuflGlyphFontSize = object->GetBoundingBoxGlyphFontSize();
+
+                    p.x = object->GetSelfLeft() - x * smuflGlyphFontSize / glyph->GetUnitsPerEm();
+                    p.x += (fontPoint->x * smuflGlyphFontSize / glyph->GetUnitsPerEm());
+                    p.y = object->GetSelfBottom() - y * smuflGlyphFontSize / glyph->GetUnitsPerEm();
+                    p.y += (fontPoint->y * smuflGlyphFontSize / glyph->GetUnitsPerEm());
+
+                    SetPen(AxGREEN, 10, AxSOLID);
+                    SetBrush(AxGREEN, AxSOLID);
+                    this->DrawCircle(view->ToDeviceContextX(p.x), view->ToDeviceContextY(p.y), 5);
+                    SetPen(AxBLACK, 1, AxSOLID);
+                    SetBrush(AxBLACK, AxSOLID);
+                }
+            }
+        }
+
         EndGraphic(object, NULL);
 
+        /*
         SetPen(AxBLUE, 10, AxDOT_DASH);
         StartGraphic(object, "content-bounding-box", "0");
         if (object->HasContentBB()) {
@@ -806,6 +840,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                     - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
         }
         EndGraphic(object, NULL);
+        */
 
         SetPen(AxBLACK, 1, AxSOLID);
         SetBrush(AxBLACK, AxSOLID);

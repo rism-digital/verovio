@@ -234,7 +234,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    DrawSmuflString(dc, x, y, accidStr, center, staff->m_drawingStaffSize, accid->IsCueSize());
+    DrawSmuflString(dc, x, y, accidStr, center, staff->m_drawingStaffSize, accid->IsCueSize(), true);
 
     dc->EndGraphic(element, this);
 }

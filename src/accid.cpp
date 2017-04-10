@@ -92,7 +92,7 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
     if (!this->VerticalSelfOverlap(element, verticalMargin)) return false;
 
     if (element->Is(ACCID)) {
-        if (!this->HorizontalSelfOverlap(element, horizontalMargin)) {
+        if (!this->HorizontalLeftOverlap(element, doc, horizontalMargin, verticalMargin)) {
             // There is enough space on the right of the accidental, but maybe we will need to
             // adjust it again (see recursive call below), so keep the accidental that is on the left
             leftAccids.push_back(dynamic_cast<Accid *>(element));
@@ -100,10 +100,15 @@ bool Accid::AdjustX(LayerElement *element, Doc *doc, int staffSize, std::vector<
         }
     }
 
-    int xRelShift = element->GetSelfLeft() - this->GetSelfRight() - horizontalMargin;
+    int xRelShift = 0;
+    if (element->Is(STEM))
+        xRelShift = this->GetSelfRight() - element->GetSelfLeft() + horizontalMargin;
+    else
+        xRelShift = this->HorizontalRightOverlap(element, doc, horizontalMargin, verticalMargin);
+
     // Move only to the left
-    if (xRelShift < 0) {
-        this->SetDrawingXRel(this->GetDrawingXRel() + xRelShift);
+    if (xRelShift > 0) {
+        this->SetDrawingXRel(this->GetDrawingXRel() - xRelShift);
         // We have some accidentals on the left, check again with all of these
         if (!leftAccids.empty()) {
             std::vector<Accid *> leftAccidsSubset;

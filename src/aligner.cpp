@@ -897,7 +897,7 @@ int StaffAlignment::CalcStaffOverlap(FunctorParams *functorParams)
         auto end = m_overflowAboveBBoxes.end();
         while (i != end) {
             // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
-            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalOverlap(elem); });
+            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
             if (i != end) {
                 // calculate the vertical overlap and see if this is more than the expected space
                 int overflowBelow = params->m_previous->CalcOverflowBelow(*iter);
@@ -975,7 +975,7 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         auto end = overflowBoxes->end();
         while (i != end) {
             // find all the overflowing elements from the staff that overlap horizonatally
-            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalOverlap(elem); });
+            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
             if (i != end) {
                 // update the yRel accordingly
                 (*iter)->CalcDrawingYRel(params->m_doc, this, *i);

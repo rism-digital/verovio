@@ -14,6 +14,9 @@
 
 namespace vrv {
 
+class Doc;
+class Glyph;
+
 //----------------------------------------------------------------------------
 // BoundingBox
 //----------------------------------------------------------------------------
@@ -42,6 +45,15 @@ public:
     bool HasSelfBB() const;
     void SetEmptyBB(bool onlyIfUnset = false);
     bool HasEmptyBB() const;
+    ///@}
+
+    /**
+     * Set and get the smuflGlyph / fontsize for a bounding box that is the one of a single SMuFL glyph.
+     */
+    ///@{
+    void SetBoundingBoxGlyph(wchar_t smuflGlyph, int fontSize);
+    wchar_t GetBoundingBoxGlyph() const { return m_smuflGlyph; }
+    int GetBoundingBoxGlyphFontSize() const { return m_smuflGlyphFontSize; }
     ///@}
 
     /**
@@ -79,7 +91,7 @@ public:
     int GetContentTop() const { return (this->GetDrawingY() + m_contentBB_y2); }
     int GetContentLeft() const { return (this->GetDrawingX() + m_contentBB_x1); }
     int GetContentRight() const { return (this->GetDrawingX() + m_contentBB_x2); }
-
+    //
     int GetSelfX1() const { return m_selfBB_x1; }
     int GetSelfX2() const { return m_selfBB_x2; }
     int GetSelfY1() const { return m_selfBB_y1; }
@@ -102,16 +114,34 @@ public:
 
     /**
      * @name Return true if the bounding box has a horizontal / vertical overlap with the other one.
+     * Makes an overal bounding box overlap calculation without looking at anchor points
      */
     ///@{
-    bool HorizontalOverlap(const BoundingBox *other, int margin = 0) const;
-    bool VerticalOverlap(const BoundingBox *other, int margin = 0) const;
+    bool HorizontalContentOverlap(const BoundingBox *other, int margin = 0) const;
+    bool VerticalContentOverlap(const BoundingBox *other, int margin = 0) const;
     bool HorizontalSelfOverlap(const BoundingBox *other, int margin = 0) const;
     bool VerticalSelfOverlap(const BoundingBox *other, int margin = 0) const;
     ///@}
 
+    /**
+     * @name Return the overlap on the left / right / top / bottom looking at bounding box anchor points
+     */
+    ///@{
+    int HorizontalLeftOverlap(const BoundingBox *other, Doc *doc, int margin = 0, int vMargin = 0) const;
+    int HorizontalRightOverlap(const BoundingBox *other, Doc *doc, int margin = 0, int vMaring = 0) const;
+    int VerticalTopOverlap(const BoundingBox *other, Doc *doc, int margin = 0, int hMargin = 0) const;
+    int VerticalBottomOverlap(const BoundingBox *other, Doc *doc, int margin = 0, int hMargin = 0) const;
+    ////}
+
+    /**
+     * Return true if the bounding box encloses the point.
+     */
     bool Encloses(const Point point) const;
 
+    /**
+     * Return true if the bounding box intersects with the curve represented by the FloatingPositioner.
+     * The Object pointed by the FloatingPositioner is expected to be a SLUR or a TIE
+     */
     int Intersects(FloatingPositioner *curve, int margin = 0) const;
 
     /**
@@ -147,9 +177,57 @@ public:
         *y2 = tmp;
     }
 
+    /**
+     * Approximate the bounding box of a bezier taking into accound the height and the width.
+     */
     static void ApproximateBezierBoundingBox(
         const Point bezier[4], Point &pos, int &width, int &height, int &minYPos, int &maxYPos);
 
+    /**
+     * Calculate the left / right / top / bottom overlap of two rectangle taking into account the margin / v-h-Margins
+     */
+    ///@{
+    static int RectLeftOverlap(const Point rect1[2], const Point rect2[2], int margin, int vMargin);
+    static int RectRightOverlap(const Point rect1[2], const Point rect2[2], int margin, int vMargin);
+    static int RectTopOverlap(const Point rect1[2], const Point rect2[2], int margin, int hMargin);
+    static int RectBottomOverlap(const Point rect1[2], const Point rect2[2], int margin, int hMargin);
+    ///@}
+
+private:
+    /**
+     * Get the rectangles covering the inside of a bounding box given two anchors (e.g., NW and NE, or NE and SE)
+     * Looks at the anchors for the smufl glpyh (if any) and return the number of rectangles needed to represent the
+     * bounding box.
+     * Return 1 with no smufl glyph or no anchor, 2 with on anchor point, and 3 with 2 anchor points.
+     */
+    int GetRectangles(
+        const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Point rect[3][2], Doc *doc) const;
+
+    /**
+     * Calculate the rectangles with 2 anchor points.
+     * Return false (and one single rectangle) when anchor points are out of the boundaries.
+     */
+    bool GetGlyph2PointRectangles(const SMuFLGlyphAnchor &anchor1, const SMuFLGlyphAnchor &anchor2, Glyph *glyph1,
+        Point rect[3][2], Doc *doc) const;
+
+    /**
+     * Calculate the rectangles with 1 anchor point.
+     * Return false (and one single rectangle) when anchor points are out of the boundaries.
+     */
+    bool GetGlyph1PointRectangles(const SMuFLGlyphAnchor &anchor, Glyph *glyph, Point rect[2][2], Doc *doc) const;
+
+public:
+    //
+protected:
+    /**
+     * The cached version of the drawingX and drawingY values.
+     * These are reset by ResetCachedDrawingX/Y methods when necessary.
+     * Mutable because to be updated in GetDrawingX/Y const.
+     */
+    ///@{
+    mutable int m_cachedDrawingX;
+    mutable int m_cachedDrawingY;
+    ///@}
 private:
     /**
      * Flags for indicating whereas the bouding box was updated or not
@@ -168,20 +246,20 @@ private:
     ///@}
 
     /**
+     * The SMuFL glyph when anchor bounding box calculation is desired.
+     * Currently only one glyph is supported. Eventually, we could have start / end glyph
+     */
+    wchar_t m_smuflGlyph;
+
+    /**
+     * The font size for the smufl glyph used for calculating the bounding box rectangles.
+     */
+    int m_smuflGlyphFontSize;
+
+    /**
      * Buffer for De-Casteljau algorithm
      */
     static int s_deCasteljau[4][4];
-
-protected:
-    /**
-     * The cached version of the drawingX and drawingY values.
-     * These are reset by ResetCachedDrawingX/Y methods when necessary.
-     * Mutable because to be updated in GetDrawingX/Y const.
-     */
-    ///@{
-    mutable int m_cachedDrawingX;
-    mutable int m_cachedDrawingY;
-    ///@}
 };
 
 } // namespace vrv
