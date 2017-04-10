@@ -24,14 +24,15 @@ Version 5.2.18 - adding accid square brackets and reviewing bow directions
 Version 5.2.19 - adding some quartertone accidentals (Gould and Stein-Zimmermann)
 Version 5.2.20 - adding some anchor points (accidentals)
 Version 5.2.21 - adding stem flags (16th to 256th)
+Version 5.2.22 - fixing anchor point names
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20161003 at Fri Mar 24 07:07:50 2017
+Created by FontForge 20161003 at Mon Apr 10 20:08:54 2017
  By laurent
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.21
+Version 5.2.22
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="274" >
