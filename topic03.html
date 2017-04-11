@@ -19,12 +19,12 @@ $(".dynam" ).attr("fill", "#d00").attr("stroke", "#d00");
 $(".measure .staff:nth-child(2)" ).attr("fill", "#00e").attr("stroke", "#00e");
 {% endhighlight %}
 
-<p>In the forth staff this will color only the staffDef glyphs, i.e. clefs, keys and meter signatures at the beginning of each line.</p>
+<p>In the fourth staff this will color only the staffDef glyphs, i.e. clefs, keys and meter signatures at the beginning of each line.</p>
 {% highlight javascript %}
 $(".measure .staff:nth-child(4) .staffDef" ).attr("fill", "#0c0").attr("stroke", "#0c0");
 {% endhighlight %}
 
-<p>Finally in the forth staff this greys out all measures following the forth.</p>
+<p>Finally in the fourth staff this greys out all measures following the fourth.</p>
 {% highlight javascript %}
 $(".system .measure:gt(4) .staff:nth-child(4)").attr("fill", "#ccc").attr("stroke", "#ccc");
 {% endhighlight %}
