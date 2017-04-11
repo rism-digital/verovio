@@ -3,9 +3,9 @@ FontName: Leipzig
 FullName: Leipzig
 FamilyName: Leipzig
 Weight: Regular
-Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.22
-UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.2.16 - adding mensural rests+AAoA-Version 5.2.17 - correcting mensural rests position+AAoA-Version 5.2.18 - adding accid square brackets and reviewing bow directions+AAoA-Version 5.2.19 - adding some quartertone accidentals (Gould and Stein-Zimmermann)+AAoA-Version 5.2.20 - adding some anchor points (accidentals)+AAoA-Version 5.2.21 - adding stem flags (16th to 256th)+AAoA-Version 5.2.22 - fixing anchor point names"
-Version: 5.2.22
+Copyright: Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. \nThis font is licensed under the SIL Open Font License \\(http://scripts.sil.org/OFL\\).\nVersion 5.2.23
+UComments: "2014-03-21: Created.+AAoA-Version 5.2.0 - adding glyphs (dynamics, ornaments, mensural note heads, etc)+AAoA-Version 5.2.1 - adding repeats+AAoA-Version 5.2.2 - fixing size of some glpyhs+AAoA-Version 5.2.3 - adding mensural clefs+AAoA-Version 5.2.4 - adding more dynam glyphs+AAoA-Version 5.2.5 - adding more dynam glyphs+AAoA-Version 5.2.6 - adding some octaves glyphs+AAoA-Version 5.2.7 - adjusting pedal glyphs+AAoA-Version 5.2.8 - adding perc clef+AAoA-Version 5.2.9 - adding two mensural clefs+AAoA-Version 5.2.10 - adding articulations and two fermatas and bow directions+AAoA-Version 5.2.11 - adding harmonic and reviewing bows+AAoA-Version 5.2.12 - reviewing artic width+AAoA-Version 5.2.13 - adding (very)short/long fermata and breath comma+AAoA-Version 5.2.14 - adding mensural stems+AAoA-Version 5.2.15 - changing ascent/descent to 750/250+AAoA-Version 5.2.16 - adding mensural rests+AAoA-Version 5.2.17 - correcting mensural rests position+AAoA-Version 5.2.18 - adding accid square brackets and reviewing bow directions+AAoA-Version 5.2.19 - adding some quartertone accidentals (Gould and Stein-Zimmermann)+AAoA-Version 5.2.20 - adding some anchor points (accidentals)+AAoA-Version 5.2.21 - adding stem flags (16th to 256th)+AAoA-Version 5.2.22 - fixing anchor point names+AAoA-Version 5.2.23 - adding anchor points to all accidentals"
+Version: 5.2.23
 ItalicAngle: 0
 UnderlinePosition: -50
 UnderlineWidth: 50
@@ -21,7 +21,7 @@ OS2Version: 0
 OS2_WeightWidthSlopeOnly: 0
 OS2_UseTypoMetrics: 1
 CreationTime: 1395388130
-ModificationTime: 1491847734
+ModificationTime: 1491891335
 PfmFamily: 17
 TTFWeight: 500
 TTFWidth: 5
@@ -10835,6 +10835,8 @@ Encoding: 57968 57968 206
 Width: 221
 VWidth: 2048
 Flags: HW
+AnchorPoint: "cutOutSE" 126 -91 basechar 0
+AnchorPoint: "cutOutNE" 141 143 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -10879,6 +10881,8 @@ Encoding: 57969 57969 207
 Width: 220
 VWidth: 2048
 Flags: HW
+AnchorPoint: "cutOutSE" 147 -68 basechar 0
+AnchorPoint: "cutOutNE" 133 145 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -10890,7 +10894,7 @@ SplineSet
  76 -193 l 1,3,-1
  36 -246 l 1,4,-1
  23 -246 l 1,5,-1
- -20 -193 l 5,6,-1
+ -20 -193 l 1,6,-1
  -46 -193 l 1,0,-1
 22 494 m 1,7,-1
  42 494 l 1,8,-1
@@ -10927,6 +10931,8 @@ Encoding: 57970 57970 208
 Width: 178
 VWidth: 2048
 Flags: HW
+AnchorPoint: "cutOutNE" 117 196 basechar 0
+AnchorPoint: "cutOutSW" 158 -207 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -10936,8 +10942,8 @@ SplineSet
  38 172 l 1
  177 196 l 1
  177 -377 l 1
- 160 -377 l 1
- 160 -177 l 1
+ 160 -377 l 5
+ 160 -177 l 5
  20 -202 l 1
 38 -108 m 1
  160 -89 l 1
@@ -10950,16 +10956,18 @@ SplineSet
  76 324 l 1
  31 377 l 1
  23 377 l 1
- -20 324 l 5
+ -20 324 l 1
  -46 324 l 1
 EndSplineSet
 EndChar
 
 StartChar: uniE273
 Encoding: 57971 57971 209
-Width: 155
+Width: 157
 VWidth: 2048
 Flags: HW
+AnchorPoint: "cutOutSW" 67 -207 basechar 0
+AnchorPoint: "cutOutNE" 19 193 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -10975,7 +10983,7 @@ SplineSet
 221 -324 m 1
  148 -485 l 1
  73 -324 l 1
- 99 -324 l 5
+ 99 -324 l 1
  142 -377 l 1
  155 -377 l 1
  195 -324 l 1
@@ -10990,9 +10998,12 @@ EndChar
 
 StartChar: uniE274
 Encoding: 57972 57972 210
-Width: 198
+Width: 197
 VWidth: 2048
 Flags: HW
+AnchorPoint: "cutOutSW" 41 -218 basechar 0
+AnchorPoint: "cutOutSE" 156 -172 basechar 0
+AnchorPoint: "cutOutNE" 155 220 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -11036,16 +11047,19 @@ SplineSet
  98 300 l 1
  58 353 l 1
  45 353 l 1
- 2 300 l 5
+ 2 300 l 1
  -24 300 l 1
 EndSplineSet
 EndChar
 
 StartChar: uniE275
 Encoding: 57973 57973 211
-Width: 198
+Width: 197
 VWidth: 2048
 Flags: HW
+AnchorPoint: "cutOutSE" 155 -171 basechar 0
+AnchorPoint: "cutOutNE" 156 216 basechar 0
+AnchorPoint: "cutOutNW" 40 174 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -11096,32 +11110,34 @@ EndChar
 
 StartChar: uniE280
 Encoding: 57984 57984 212
-Width: 200
+Width: 198
 VWidth: 2048
 Flags: HW
+AnchorPoint: "cutOutSW" 92 -83 basechar 0
+AnchorPoint: "cutOutNW" 175 146 basechar 0
 LayerCount: 2
 Fore
 SplineSet
-178 110 m 5
- 146 126 124 137 85 137 c 4
- 59 137 50 134 31 124 c 4
- 18 117 7 104 4 86 c 6
- 0 61 l 5
- 0 33 16 4 45 -28 c 4
- 68 -53 84 -72 110 -96 c 6
- 198 -175 l 5
- 198 469 l 5
- 178 469 l 5
- 178 110 l 5
-108 106 m 5
- 140 106 156 96 178 77 c 5
- 178 -117 l 5
- 147 -86 124 -58 107 -33 c 4
- 86 -1 75 26 75 51 c 4
- 75 60 74 67 74 71 c 4
- 74 85 77 92 85 101 c 5
- 93 104 l 5
- 108 106 l 5
+178 110 m 1
+ 146 126 124 137 85 137 c 0
+ 59 137 50 134 31 124 c 0
+ 18 117 7 104 4 86 c 2
+ 0 61 l 1
+ 0 33 16 4 45 -28 c 0
+ 68 -53 84 -72 110 -96 c 2
+ 198 -175 l 1
+ 198 469 l 1
+ 178 469 l 1
+ 178 110 l 1
+108 106 m 1
+ 140 106 156 96 178 77 c 1
+ 178 -117 l 1
+ 147 -86 124 -58 107 -33 c 0
+ 86 -1 75 26 75 51 c 0
+ 75 60 74 67 74 71 c 0
+ 74 85 77 92 85 101 c 1
+ 93 104 l 1
+ 108 106 l 1
 EndSplineSet
 EndChar
 
@@ -11130,6 +11146,10 @@ Encoding: 57985 57985 213
 Width: 416
 VWidth: 2048
 Flags: HW
+AnchorPoint: "cutOutSE" 334 -77 basechar 0
+AnchorPoint: "cutOutSW" 86 -80 basechar 0
+AnchorPoint: "cutOutNE" 243 147 basechar 0
+AnchorPoint: "cutOutNW" 175 146 basechar 0
 LayerCount: 2
 Fore
 SplineSet
@@ -11181,30 +11201,34 @@ Encoding: 57986 57986 214
 Width: 106
 VWidth: 2048
 Flags: HW
+AnchorPoint: "cutOutSE" 64 -187 basechar 0
+AnchorPoint: "cutOutSW" 40 -203 basechar 0
+AnchorPoint: "cutOutNE" 63 180 basechar 0
+AnchorPoint: "cutOutNW" 40 163 basechar 0
 LayerCount: 2
 Fore
 SplineSet
-106 179 m 5
- 106 88 l 5
- 62 74 l 5
- 62 -91 l 5
- 106 -79 l 5
- 106 -170 l 5
- 60 -184 l 5
- 60 -339 l 5
- 43 -339 l 5
- 43 -190 l 5
- 0 -203 l 5
- 0 -113 l 5
- 43 -99 l 5
- 43 68 l 5
- 0 54 l 5
- 0 146 l 5
- 43 159 l 5
- 43 328 l 5
- 60 328 l 5
- 60 165 l 5
- 106 179 l 5
+106 179 m 1
+ 106 88 l 1
+ 62 74 l 1
+ 62 -91 l 1
+ 106 -79 l 1
+ 106 -170 l 1
+ 60 -184 l 1
+ 60 -339 l 1
+ 43 -339 l 1
+ 43 -190 l 1
+ 0 -203 l 1
+ 0 -113 l 1
+ 43 -99 l 1
+ 43 68 l 1
+ 0 54 l 1
+ 0 146 l 1
+ 43 159 l 1
+ 43 328 l 1
+ 60 328 l 1
+ 60 165 l 1
+ 106 179 l 1
 EndSplineSet
 EndChar
 
@@ -11213,6 +11237,10 @@ Encoding: 57987 57987 215
 Width: 303
 VWidth: 2048
 Flags: HW
+AnchorPoint: "cutOutSE" 263 -160 basechar 0
+AnchorPoint: "cutOutSW" 39 -237 basechar 0
+AnchorPoint: "cutOutNE" 263 204 basechar 0
+AnchorPoint: "cutOutNW" 39 129 basechar 0
 LayerCount: 2
 Fore
 SplineSet

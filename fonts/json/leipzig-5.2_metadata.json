@@ -30,7 +30,7 @@
         "tupletBracketThickness": "0.16"
     },
     "fontName": "Leipzig-5.2",
-    "fontVersion": "5.2.22",
+    "fontVersion": "5.2.23",
     "glyphBBoxes": {
         "uniE003": {
             "bBoxNE": [
@@ -3055,6 +3055,138 @@
             "cutOutSW": [
                 0.16,
                 -0.82
+            ]
+        },
+        "uniE270": {
+            "cutOutNE": [
+                0.564,
+                0.572
+            ],
+            "cutOutSE": [
+                0.504,
+                -0.364
+            ]
+        },
+        "uniE271": {
+            "cutOutNE": [
+                0.532,
+                0.58
+            ],
+            "cutOutSE": [
+                0.588,
+                -0.272
+            ]
+        },
+        "uniE272": {
+            "cutOutNE": [
+                0.468,
+                0.784
+            ],
+            "cutOutSW": [
+                0.632,
+                -0.828
+            ]
+        },
+        "uniE273": {
+            "cutOutNE": [
+                0.076,
+                0.772
+            ],
+            "cutOutSW": [
+                0.268,
+                -0.828
+            ]
+        },
+        "uniE274": {
+            "cutOutNE": [
+                0.62,
+                0.88
+            ],
+            "cutOutSE": [
+                0.624,
+                -0.688
+            ],
+            "cutOutSW": [
+                0.164,
+                -0.872
+            ]
+        },
+        "uniE275": {
+            "cutOutNE": [
+                0.624,
+                0.864
+            ],
+            "cutOutNW": [
+                0.16,
+                0.696
+            ],
+            "cutOutSE": [
+                0.62,
+                -0.684
+            ]
+        },
+        "uniE280": {
+            "cutOutNW": [
+                0.7,
+                0.584
+            ],
+            "cutOutSW": [
+                0.368,
+                -0.332
+            ]
+        },
+        "uniE281": {
+            "cutOutNE": [
+                0.972,
+                0.588
+            ],
+            "cutOutNW": [
+                0.7,
+                0.584
+            ],
+            "cutOutSE": [
+                1.336,
+                -0.308
+            ],
+            "cutOutSW": [
+                0.344,
+                -0.32
+            ]
+        },
+        "uniE282": {
+            "cutOutNE": [
+                0.252,
+                0.72
+            ],
+            "cutOutNW": [
+                0.16,
+                0.652
+            ],
+            "cutOutSE": [
+                0.256,
+                -0.748
+            ],
+            "cutOutSW": [
+                0.16,
+                -0.812
+            ]
+        },
+        "uniE283": {
+            "cutOutNE": [
+                1.052,
+                0.816
+            ],
+            "cutOutNW": [
+                0.156,
+                0.516
+            ],
+            "cutOutSE": [
+                1.052,
+                -0.64
+            ],
+            "cutOutSW": [
+                0.156,
+                -0.948
             ]
         }
     }
