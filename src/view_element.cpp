@@ -1193,11 +1193,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
             if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
                 noteXShift = radius - m_doc->GetDrawingStemWidth(staffSize);
             }
-            else if (note->GetDrawingStemDir() == STEMDIRECTION_down) {
-                noteXShift = -radius * 3 + m_doc->GetDrawingStemWidth(staffSize);
-            }
             else {
-                noteXShift = -radius;
+                noteXShift = -radius * 3 + m_doc->GetDrawingStemWidth(staffSize);
             }
         }
     }
