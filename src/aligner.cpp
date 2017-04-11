@@ -763,7 +763,7 @@ AlignmentReference::AlignmentReference() : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
-
+    
     this->SetAsReferenceObject();
 }
 
@@ -772,7 +772,7 @@ AlignmentReference::AlignmentReference(int staffN) : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
-
+    
     this->SetAsReferenceObject();
     this->SetN(staffN);
 }
@@ -817,6 +817,21 @@ void AlignmentReference::AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int s
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
         accid->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccids);
     }
+}
+    
+void AlignmentReference::AddLegerLineAbove(int count, short left, short right)
+{
+    if (m_ledgerLinesAbove.size() < count)
+        m_ledgerLinesAbove.resize(count);
+    int i = 0;
+    for(i = 0; i < count; i++) {
+        m_ledgerLinesAbove[i].AddDash(left, right);
+    }
+}
+    
+void AlignmentReference::AddLegerLineBelow(int count, short left, short right)
+{
+    
 }
 
 //----------------------------------------------------------------------------

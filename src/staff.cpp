@@ -109,6 +109,52 @@ int Staff::CalcPitchPosYRel(Doc *doc, int loc)
 }
 
 //----------------------------------------------------------------------------
+// LedgerLine
+//----------------------------------------------------------------------------
+
+LedgerLine::LedgerLine()
+{
+    Reset();
+}
+
+LedgerLine::~LedgerLine()
+{
+}
+
+void LedgerLine::Reset()
+{
+    m_dashes.clear();
+}
+
+void LedgerLine::AddDash(short left, short right)
+{
+    assert(left < right);
+    
+    std::list<std::pair<short, short> >::iterator iter;
+    
+    // First add the dash
+    for (iter = m_dashes.begin(); iter != m_dashes.end(); iter++) {
+        if (iter->first > left) break;
+    }
+    m_dashes.insert(iter, std::make_pair(left, right));
+
+    // Merge overlapping dashes
+    std::list<std::pair<short, short> >::iterator previous = m_dashes.begin();
+    iter = m_dashes.begin();
+    iter++;
+    while (iter != m_dashes.end()) {
+        if (previous->second > iter->first) {
+            previous->second = std::max(iter->second, previous->second);
+            iter = m_dashes.erase(iter);
+        }
+        else {
+            previous = iter;
+            iter++;
+        }
+    }
+}
+
+//----------------------------------------------------------------------------
 // Staff functor methods
 //----------------------------------------------------------------------------
 

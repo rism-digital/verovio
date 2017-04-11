@@ -146,6 +146,42 @@ private:
      */
     StaffAlignment *m_staffAlignment;
 };
+    
+//----------------------------------------------------------------------------
+// LedgerLine
+//----------------------------------------------------------------------------
+
+/**
+ * This is a class with no MEI equivalent for representing legder lines.
+ * A ledger line is represented by a list of dashes.
+ * Each dash is represented by a pair of points (left - right).
+ */
+class LedgerLine {
+public:
+    /**
+     * @name Constructors, destructors, reset methods
+     * Reset method reset all attribute classes
+     */
+    ///@{
+    LedgerLine();
+    virtual ~LedgerLine();
+    virtual void Reset();
+    ///@}
+    
+    void AddDash(short left, short right);
+    
+protected:
+    //
+private:
+    //
+public:
+    //
+protected:
+    //
+private:
+    /** A list of dashes */
+    std::list<std::pair<short, short> > m_dashes;
+};
 
 } // namespace vrv
 

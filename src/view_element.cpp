@@ -1138,7 +1138,7 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     int staffSize = staff->m_drawingStaffSize;
     int noteY = element->GetDrawingY();
     int noteX = inChord ? inChord->GetDrawingX() : element->GetDrawingX();
-    int noteXShift, accidXShift;
+    int noteXShift;
     int drawingDur;
     int staffY = staff->GetDrawingY();
     wchar_t fontNo;

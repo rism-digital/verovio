@@ -17,6 +17,7 @@ class Accid;
 class AlignmentReference;
 class FloatingObject;
 class GraceAligner;
+class LedgerLine;
 class MeasureAligner;
 class Note;
 class StaffAlignment;
@@ -479,6 +480,14 @@ public:
      * See Object::AjustAccidX
      */
     void AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize);
+    
+    /**
+     *
+     */
+    ///@{
+    void AddLegerLineAbove(int count, short left, short right);
+    void AddLegerLineBelow(int count, short left, short right);
+    ///@}
 
     //----------//
     // Functors //
@@ -503,6 +512,14 @@ private:
      *
      */
     std::vector<Accid *> m_accidSpace;
+    
+    /**
+     *
+     */
+    ///@{
+    std::vector<LedgerLine> m_ledgerLinesAbove;
+    std::vector<LedgerLine> m_ledgerLinesBelow;
+    ///@}
 };
 
 //----------------------------------------------------------------------------
