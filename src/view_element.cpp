@@ -1266,19 +1266,8 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     if (!inChord) {
         Accid *accid = note->GetDrawingAccid();
-        if (accid) {
-            accidXShift = noteXShift;
-            if (accid->GetFunc() != accidLog_FUNC_edit) {
-                TextExtend extend;
-                dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, drawingCueSize));
-                dc->GetSmuflTextExtent(accid->GetSymbolStr(), &extend);
-                // HARDCODED
-                int space = m_doc->GetDrawingUnit(staff->m_drawingStaffSize) * 2 / 3;
-                if (drawingCueSize) space = space * m_doc->GetGraceSize(100) / 100;
-                accidXShift -= (extend.m_width + space);
-                dc->ResetFont();
-            }
-            accid->SetDrawingXRel(accidXShift);
+        if (accid && (accid->GetFunc() == accidLog_FUNC_edit)) {
+              accid->SetDrawingXRel(noteXShift);
         }
 
         if (note->GetDots()) {

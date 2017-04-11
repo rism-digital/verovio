@@ -653,6 +653,8 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Accid *accid = dynamic_cast<Accid *>(this);
         assert(accid);
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        // We should probably also avoid to add editorial accidentals to the accid space
+        // However, since they are placed above by View::DrawNote it works without avoiding it
         if (note) {
             if (note->HasGraceAlignment())
                 note->GetGraceAlignment()->AddToAccidSpace(accid);
