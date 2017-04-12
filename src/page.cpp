@@ -271,6 +271,28 @@ void Page::JustifyHorizontally()
     justifyXParams.m_systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar;
     this->Process(&justifyX, &justifyXParams);
 }
+    
+void Page::LayOutPitchPos()
+{
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    assert(doc);
+    
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
+    
+    // Set the pitch / pos alignement
+    // Once View::CalculateRestPosY will be move to Staff we will not need to pass a view anymore
+    View view;
+    view.SetDoc(doc);
+    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc, &view);
+    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
+    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+    
+    CalcStemParams calcDrawingStemDirParams(doc);
+    Functor calcDrawingStemDir(&Object::CalcStem);
+    this->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
+}
 
 int Page::GetContentHeight() const
 {

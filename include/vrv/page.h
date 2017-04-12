@@ -86,6 +86,11 @@ public:
      * Justifiy the content of the page (system/staves) vertically
      */
     void JustifyVertically();
+    
+    /**
+     * Lay out the pitch positions and stems (without redoing the entire layout)
+     */
+    void LayOutPitchPos();
 
     /**
      * Return the height of the content by looking at the last system of the page.

@@ -28,6 +28,8 @@
 #include "svgdevicecontext.h"
 #include "vrv.h"
 
+#include "functorparams.h"
+
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
@@ -780,6 +782,18 @@ void Toolkit::RedoLayout()
 
     m_doc.UnCastOffDoc();
     m_doc.CastOffDoc();
+}
+    
+void Toolkit::RedoPagePitchPosLayout()
+{
+    Page *page = m_doc.GetDrawingPage();
+    
+    if (!page) {
+        LogError("No page to re-layout");
+        return;
+    }
+    
+    page->LayOutPitchPos();
 }
 
 std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
