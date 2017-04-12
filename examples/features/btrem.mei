@@ -37,14 +37,6 @@
                             </staff>
                             <staff n="2">
                                 <layer n="1">
-                                    <beam>
-                                        <bTrem>
-                                            <note pname="d" oct="4" dur="16" stem.mod="2slash"/>
-                                        </bTrem>
-                                        <bTrem>
-                                            <note pname="f" oct="4" dur="8" stem.mod="2slash"/>
-                                        </bTrem>
-                                    </beam>
                                     <fTrem slash="3">
                                         <note pname="d" oct="4" dur="2"/>
                                         <note pname="f" oct="4" dur="2"/>
@@ -63,7 +55,7 @@
                                         <note pname="f" oct="4"/>
                                     </chord>
                                     <rest dur="4"/>
-                                    <bTrem>
+                                    <bTrem measperf="256">
                                         <chord dur="2" stem.mod="3slash">
                                             <note pname="f" oct="4"/>
                                             <note pname="a" oct="4"/>
