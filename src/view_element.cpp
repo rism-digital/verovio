@@ -456,6 +456,18 @@ void View::DrawBTrem(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         stemMod = stem ? stem->GetStemMod() : STEMMODIFIER_NONE;
         stemPoint = childNote->GetDrawingStemStart(childNote);
     }
+    
+    if (bTrem->HasMeasperf()) {
+        switch(bTrem->GetMeasperf()) {
+            case (DUR_8): stemMod = STEMMODIFIER_1slash; break;
+            case (DUR_16): stemMod = STEMMODIFIER_2slash; break;
+            case (DUR_32): stemMod = STEMMODIFIER_3slash; break;
+            case (DUR_64): stemMod = STEMMODIFIER_4slash; break;
+            case (DUR_128): stemMod = STEMMODIFIER_5slash; break;
+            case (DUR_256): stemMod = STEMMODIFIER_6slash; break;
+            default: break;
+        }
+    }
 
     int beamWidthBlack = m_doc->GetDrawingBeamWidth(staff->m_drawingStaffSize, drawingCueSize);
     int beamWidthWhite = m_doc->GetDrawingBeamWhiteWidth(staff->m_drawingStaffSize, drawingCueSize);
