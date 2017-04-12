@@ -1043,7 +1043,14 @@ const char *Toolkit::GetHumdrumBuffer()
 bool Toolkit::Drag(std::string elementId, int x, int y)
 {
     if (!m_doc.GetDrawingPage()) return false;
+    
+    // Try to get the element on the current drawing page
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
+
+    // If it wasn't there, go back up to the whole doc
+    if (!element) {
+        element = m_doc.FindChildByUuid(elementId);
+    }
     if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);
