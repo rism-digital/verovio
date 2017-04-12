@@ -266,6 +266,11 @@ int Note::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
+    // We currently have no stem object with mensural notes
+    if (this->IsMensural()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    
     if (this->IsChordTone()) {
         assert(params->m_interface);
         return FUNCTOR_CONTINUE;
@@ -331,7 +336,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
     Flag *currentFlag = NULL;
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG));
 
-    if ((this->GetDur() > DUR_1) && !this->IsChordTone()) {
+    if ((this->GetActualDur() > DUR_1) && !this->IsChordTone() && !this->IsMensural()) {
         if (!currentStem) {
             currentStem = new Stem();
             this->AddChild(currentStem);
@@ -348,7 +353,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
         }
     }
 
-    if ((this->GetDur() > DUR_4) && !this->IsInBeam() && !this->IsChordTone()) {
+    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsChordTone() && !this->IsMensural()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {

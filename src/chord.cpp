@@ -366,7 +366,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
     Flag *currentFlag = NULL;
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG));
 
-    if (this->GetDur() > DUR_1) {
+    if (this->GetActualDur() > DUR_1) {
         if (!currentStem) {
             currentStem = new Stem();
             this->AddChild(currentStem);
@@ -383,7 +383,7 @@ int Chord::PrepareLayerElementParts(FunctorParams *functorParams)
         }
     }
 
-    if ((this->GetDur() > DUR_4) && !this->IsInBeam()) {
+    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {

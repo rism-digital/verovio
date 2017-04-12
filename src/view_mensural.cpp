@@ -299,7 +299,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     // this will not work if the pseudo size is changed
     int shortening = 0.9 * m_doc->GetDrawingUnit(staffSize);
 
-    int stemY1 = (dir == STEMDIRECTION_up) ? y1 + shortening : y1 - shortening;
+    int stemY1 = (dir == STEMDIRECTION_up) ? y1 - shortening : y1 + shortening;
     int stemY2 = y2;
     if (drawingDur > DUR_4) {
         // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
@@ -314,9 +314,9 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
         DrawFilledRectangle(dc, x2 - halfStemWidth, stemY1, x2 + halfStemWidth, stemY2);
 
         if (drawingDur > DUR_4) {
-            DrawSmuflCode(dc, x2 - halfStemWidth, y2, SMUFL_E240_flag8thUp, staff->m_drawingStaffSize, drawingCueSize);
+            DrawSmuflCode(dc, x2 - halfStemWidth, y2, SMUFL_E241_flag8thDown, staff->m_drawingStaffSize, drawingCueSize);
             for (int i = 0; i < nbFlags; i++)
-                DrawSmuflCode(dc, x2 - halfStemWidth, y2 - (i + 1) * flagStemHeight, SMUFL_E240_flag8thUp,
+                DrawSmuflCode(dc, x2 - halfStemWidth, y2 - (i + 1) * flagStemHeight, SMUFL_E241_flag8thDown,
                     staff->m_drawingStaffSize, drawingCueSize);
         }
     }
@@ -325,9 +325,9 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
 
         if (drawingDur > DUR_4) {
             DrawSmuflCode(
-                dc, x2 - halfStemWidth, y2, SMUFL_E241_flag8thDown, staff->m_drawingStaffSize, drawingCueSize);
+                dc, x2 - halfStemWidth, y2, SMUFL_E240_flag8thUp, staff->m_drawingStaffSize, drawingCueSize);
             for (int i = 0; i < nbFlags; i++)
-                DrawSmuflCode(dc, x2 - halfStemWidth, y2 + (i + 1) * flagStemHeight, SMUFL_E241_flag8thDown,
+                DrawSmuflCode(dc, x2 - halfStemWidth, y2 + (i + 1) * flagStemHeight, SMUFL_E240_flag8thUp,
                     staff->m_drawingStaffSize, drawingCueSize);
         }
     }
@@ -335,7 +335,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     // Store the start and end values
     StemmedDrawingInterface *interface = object->GetStemmedDrawingInterface();
     assert(interface);
-    assert(false);
+    //assert(false);
     // interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
     // interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
     interface->SetDrawingStemDir(dir);

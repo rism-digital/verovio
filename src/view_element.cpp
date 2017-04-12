@@ -1532,27 +1532,16 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     dc->ResetBrush();
 }
 
-bool IsMensuralStaff(Staff *staff);
-bool IsMensuralStaff(Staff *staff)
-{
-    bool isMensural = (staff->m_drawingNotationType == NOTATIONTYPE_mensural
-        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_white
-        || staff->m_drawingNotationType == NOTATIONTYPE_mensural_black);
-    return isMensural;
-}
-
 void View::DrawDots(DeviceContext *dc, int x, int y, unsigned char dots, Staff *staff)
 {
     int i;
-    int useStaffSize = staff->m_drawingStaffSize;
-    if (IsMensuralStaff(staff)) useStaffSize *= TEMP_MAUGDOT_SIZE_FACTOR;
 
     if (IsOnStaffLine(y, staff)) {
-        y += m_doc->GetDrawingUnit(useStaffSize);
+        y += m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
     for (i = 0; i < dots; i++) {
-        DrawDot(dc, x, y, useStaffSize);
-        x += m_doc->GetDrawingDoubleUnit(useStaffSize);
+        DrawDot(dc, x, y, staff->m_drawingStaffSize);
+        x += m_doc->GetDrawingDoubleUnit(staff->m_drawingStaffSize);
     }
 }
 
