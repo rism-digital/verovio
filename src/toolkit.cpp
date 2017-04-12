@@ -28,6 +28,8 @@
 #include "svgdevicecontext.h"
 #include "vrv.h"
 
+#include "functorparams.h"
+
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
@@ -319,8 +321,9 @@ FileFormat Toolkit::IdentifyInputFormat(const string &data)
         return UNKNOWN;
     }
 
-    // Assume that the input is DARMS if other input types were not detected.
-    return DARMS;
+    // Assume that the input is MEI if other input types were not detected.
+    // This means that DARMS cannot be auto detected.
+    return MEI;
 }
 
 bool Toolkit::SetFont(std::string const &font)
@@ -779,6 +782,18 @@ void Toolkit::RedoLayout()
 
     m_doc.UnCastOffDoc();
     m_doc.CastOffDoc();
+}
+    
+void Toolkit::RedoPagePitchPosLayout()
+{
+    Page *page = m_doc.GetDrawingPage();
+    
+    if (!page) {
+        LogError("No page to re-layout");
+        return;
+    }
+    
+    page->LayOutPitchPos();
 }
 
 std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)

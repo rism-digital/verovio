@@ -332,25 +332,28 @@ int main(int argc, char **argv)
         display_usage();
         exit(1);
     }
-
-    // Make sure the user uses a valid Resource path
-    // Save many headaches for empty SVGs
-    if (!dir_exists(vrv::Resources::GetPath())) {
-        cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found; please use -r option."
-             << endl;
-        exit(1);
-    }
-
-    // Load the music font from the resource directory
-    if (!Resources::InitFonts()) {
-        cerr << "The music font could not be loaded; please check the contents of the resource directory." << endl;
-        exit(1);
-    }
-
-    // Load a specified font
-    if (!font.empty() && !toolkit.SetFont(font)) {
-        cerr << "Font '" << font << "' could not be loaded." << endl;
-        exit(1);
+    
+    // If we output svg or do not request no layout to be performed then we need the font
+    if ((outformat == "svg") || !toolkit.GetNoLayout()) {
+        // Make sure the user uses a valid Resource path
+        // Save many headaches for empty SVGs
+        if (!dir_exists(vrv::Resources::GetPath())) {
+            cerr << "The resources path " << vrv::Resources::GetPath() << " could not be found; please use -r option."
+            << endl;
+            exit(1);
+        }
+        
+        // Load the music font from the resource directory
+        if (!Resources::InitFonts()) {
+            cerr << "The music font could not be loaded; please check the contents of the resource directory." << endl;
+            exit(1);
+        }
+        
+        // Load a specified font
+        if (!font.empty() && !toolkit.SetFont(font)) {
+            cerr << "Font '" << font << "' could not be loaded." << endl;
+            exit(1);
+        }
     }
 
     if (outformat != "svg" && outformat != "mei" && outformat != "midi" && outformat != "humdrum") {

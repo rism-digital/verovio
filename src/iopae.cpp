@@ -44,6 +44,7 @@ namespace vrv {
 
 #define BEAM_INITIAL 0x01
 #define BEAM_MEDIAL 0x02
+#define BEAM_TUPLET 0x03
 #define BEAM_TERMINAL 0x04
 
 // User interface variables:
@@ -232,7 +233,10 @@ void PaeInput::parsePlainAndEasy(std::istream &infile)
         // beaming starts
         else if (incipit[i] == '{') {
             // current_note.beam = 1;
-            current_note.beam = BEAM_INITIAL;
+            if (current_note.tuplet_note > 0)
+                current_note.beam = BEAM_TUPLET;
+            else
+                current_note.beam = BEAM_INITIAL;
             in_beam++;
         }
 
@@ -1239,6 +1243,10 @@ void PaeInput::parseNote(pae::Note *note)
         newTuplet->SetNum(note->tuplet_notes);
         newTuplet->SetNumbase(note->tuplet_notes);
         pushContainer(newTuplet);
+    }
+
+    if (note->beam == BEAM_TUPLET) {
+        pushContainer(new Beam());
     }
 
     // note in a chord

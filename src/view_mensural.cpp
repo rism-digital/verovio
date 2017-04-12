@@ -16,6 +16,7 @@
 
 #include "devicecontext.h"
 #include "doc.h"
+#include "elementpart.h"
 #include "layer.h"
 #include "ligature.h"
 #include "mensur.h"
@@ -77,9 +78,11 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
 
     /************** Stem/notehead direction: **************/
 
+    Stem *stem = note->GetDrawingStem();
+
     verticalCenter = staffY - m_doc->GetDrawingDoubleUnit(staffSize) * 2;
-    if (note->HasStemDir()) {
-        note->SetDrawingStemDir(note->GetStemDir());
+    if (stem && stem->HasStemDir()) {
+        note->SetDrawingStemDir(stem->GetStemDir());
     }
     else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
         note->SetDrawingStemDir(layer->GetDrawingStemDir());
@@ -155,7 +158,7 @@ void View::DrawMensuralNote(DeviceContext *dc, LayerElement *element, Layer *lay
     int staffBot = staffY - m_doc->GetDrawingStaffSize(staffSize) - m_doc->GetDrawingUnit(staffSize);
 
     // if the note is not in the staff
-    if (!is_in(noteY, staffTop, staffBot)) {
+    if (!isIn(noteY, staffTop, staffBot)) {
         int distance, highestNewLine, numLines;
         bool aboveStaff = (noteY > staffTop);
 
@@ -380,8 +383,9 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     // Store the start and end values
     StemmedDrawingInterface *interface = object->GetStemmedDrawingInterface();
     assert(interface);
-    interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
-    interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
+    //assert(false);
+    // interface->SetDrawingStemStart(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y1));
+    // interface->SetDrawingStemEnd(Point(x2 - (m_doc->GetDrawingStemWidth(staffSize) / 2), y2));
     interface->SetDrawingStemDir(dir);
 
     // cast to note is check when setting drawingCueSize value

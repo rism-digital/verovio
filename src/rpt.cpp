@@ -17,7 +17,9 @@
 #include "chord.h"
 #include "editorial.h"
 #include "functorparams.h"
+#include "layer.h"
 #include "note.h"
+#include "staff.h"
 #include "vrv.h"
 
 namespace vrv {
@@ -53,8 +55,10 @@ double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit) const
 // BTrem
 //----------------------------------------------------------------------------
 
-BTrem::BTrem() : LayerElement("btrem-")
+BTrem::BTrem() : LayerElement("btrem-"), AttTremmeasured()
 {
+    RegisterAttClass(ATT_TREMMEASURED);
+    
     Reset();
 }
 
@@ -65,6 +69,7 @@ BTrem::~BTrem()
 void BTrem::Reset()
 {
     LayerElement::Reset();
+    ResetTremmeasured();
 }
 
 void BTrem::AddChild(Object *child)
@@ -94,21 +99,24 @@ void BTrem::AddChild(Object *child)
 // FTrem
 //----------------------------------------------------------------------------
 
-FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), AttSlashcount()
+FTrem::FTrem() : LayerElement("ftrem-"), ObjectListInterface(), AttSlashcount(), AttTremmeasured()
 {
     RegisterAttClass(ATT_SLASHCOUNT);
+    RegisterAttClass(ATT_TREMMEASURED);
 
     Reset();
 }
 
 FTrem::~FTrem()
 {
+    ClearCoords();
 }
 
 void FTrem::Reset()
 {
     LayerElement::Reset();
     ResetSlashcount();
+    ResetTremmeasured();
 }
 
 void FTrem::AddChild(Object *child)
@@ -145,8 +153,78 @@ void FTrem::FilterList(ListOfObjects *childList)
             iter = childList->erase(iter);
             continue;
         }
+        // also remove notes within chords
+        if ((*iter)->Is(NOTE)) {
+            Note *note = dynamic_cast<Note *>(*iter);
+            assert(note);
+            if (note->IsChordTone()) {
+                iter = childList->erase(iter);
+                continue;
+            }
+        }
         iter++;
     }
+
+    InitCoords(childList);
+}
+
+void FTrem::InitCoords(ListOfObjects *childList)
+{
+    ClearCoords();
+
+    if (childList->empty()) {
+        return;
+    }
+
+    BeamElementCoord *firstElement = new BeamElementCoord;
+    BeamElementCoord *secondElement = new BeamElementCoord;
+
+    m_beamElementCoords.push_back(firstElement);
+    m_beamElementCoords.push_back(secondElement);
+
+    // current point to the first Note in the layed out layer
+    firstElement->m_element = dynamic_cast<LayerElement *>(childList->front());
+    // fTrem list should contain only DurationInterface objects
+    assert(firstElement->m_element->GetDurationInterface());
+    // current point to the first Note in the layed out layer
+    secondElement->m_element = dynamic_cast<LayerElement *>(childList->back());
+    // fTrem list should contain only DurationInterface objects
+    assert(secondElement->m_element->GetDurationInterface());
+    // Should we assert this at the beginning?
+    if (firstElement->m_element == secondElement->m_element) {
+        return;
+    }
+
+    this->m_drawingParams.m_changingDur = false;
+    this->m_drawingParams.m_beamHasChord = false;
+    this->m_drawingParams.m_hasMultipleStemDir = false;
+    this->m_drawingParams.m_cueSize = false;
+    // adjust beam->m_drawingParams.m_shortestDur depending on the number of slashes
+    this->m_drawingParams.m_shortestDur = std::max(DUR_8, DUR_1 + this->GetSlash());
+    this->m_drawingParams.m_stemDir = STEMDIRECTION_NONE;
+
+    if (firstElement->m_element->Is(CHORD)) {
+        this->m_drawingParams.m_beamHasChord = true;
+    }
+    if (secondElement->m_element->Is(CHORD)) {
+        this->m_drawingParams.m_beamHasChord = true;
+    }
+
+    // For now look at the stemDir only on the first note
+    assert(dynamic_cast<AttStems *>(firstElement->m_element));
+    this->m_drawingParams.m_stemDir = (dynamic_cast<AttStems *>(firstElement->m_element))->GetStemDir();
+
+    // We look only at the first note for checking if cue-sized. Somehow arbitrarily
+    this->m_drawingParams.m_cueSize = firstElement->m_element->IsCueSize();
+}
+
+void FTrem::ClearCoords()
+{
+    ArrayOfBeamElementCoords::iterator iter;
+    for (iter = m_beamElementCoords.begin(); iter != m_beamElementCoords.end(); ++iter) {
+        delete *iter;
+    }
+    m_beamElementCoords.clear();
 }
 
 //----------------------------------------------------------------------------
@@ -230,6 +308,33 @@ int MRpt::PrepareRpt(FunctorParams *functorParams)
         this->m_drawingMeasureCount = params->m_currentMRpt->m_drawingMeasureCount + 1;
     }
     params->m_currentMRpt = this;
+    return FUNCTOR_CONTINUE;
+}
+
+int FTrem::CalcStem(FunctorParams *functorParams)
+{
+    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    assert(params);
+
+    ListOfObjects *fTremChildren = this->GetList(this);
+
+    // Should we assert this at the beginning?
+    if (fTremChildren->empty()) {
+        return FUNCTOR_CONTINUE;
+    }
+    const ArrayOfBeamElementCoords *beamElementCoords = this->GetElementCoords();
+
+    assert(beamElementCoords->size() == 2);
+
+    int elementCount = 2;
+
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    assert(layer);
+    Staff *staff = dynamic_cast<Staff *>(layer->GetFirstParent(STAFF));
+    assert(staff);
+
+    this->m_drawingParams.CalcBeam(layer, staff, params->m_doc, beamElementCoords, elementCount);
+
     return FUNCTOR_CONTINUE;
 }
 

@@ -8,6 +8,7 @@
 #ifndef __VRV_LAYER_ELEMENT_H__
 #define __VRV_LAYER_ELEMENT_H__
 
+#include "atts_shared.h"
 #include "object.h"
 
 namespace vrv {
@@ -28,7 +29,7 @@ class Staff;
  * This class is a base class for the Layer (<layer>) content.
  * It is not an abstract class but should not be instantiated directly.
  */
-class LayerElement : public Object {
+class LayerElement : public Object, public AttCommon, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -52,6 +53,12 @@ public:
      * It typically set to false for mRest, mRpt, etc.
      */
     virtual bool HasToBeAligned() const { return false; }
+
+    /**
+     * Return true if the element is relative to the staff and not to its parent.
+     * It typically set to true for syl or artic.
+     */
+    virtual bool IsRelativeToStaff() const { return false; }
 
     /**
      * @name Set and get the flag for indication whether it is a ScoreDef or StaffDef attribute.
@@ -86,6 +93,14 @@ public:
     ///@}
 
     /**
+     * @name Get and set the layerN drawing value
+     */
+    ///@{
+    int GetAlignmentLayerN() const { return m_alignmentLayerN; }
+    void SetAlignmentLayerN(int alignmentLayerN) { m_alignmentLayerN = alignmentLayerN; }
+    ///@}
+
+    /**
      * @name Get the X and Y drawing position
      */
     ///@{
@@ -98,9 +113,9 @@ public:
      */
     ///@{
     int GetDrawingXRel() const { return m_drawingXRel; }
-    virtual void SetDrawingXRel(int drawingXRel) { m_drawingXRel = drawingXRel; }
+    virtual void SetDrawingXRel(int drawingXRel);
     int GetDrawingYRel() const { return m_drawingYRel; }
-    virtual void SetDrawingYRel(int drawingYRel) { m_drawingYRel = drawingYRel; }
+    virtual void SetDrawingYRel(int drawingYRel);
     ///@}
 
     /**
@@ -123,6 +138,12 @@ public:
      * Alignment getter
      */
     Alignment *GetAlignment() const { return m_alignment; }
+
+    /**
+     * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff.
+     * Also set the corresponding m_crossLayer to layer if a cross staff is found.
+     */
+    Staff *GetCrossStaff(Layer *&layer) const;
 
     /**
      * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)
@@ -170,9 +191,17 @@ public:
     virtual int AdjustXPos(FunctorParams *functorParams);
 
     /**
+     * See Object::PrepareDrawingCueSize
+     */
+    virtual int PrepareDrawingCueSize(FunctorParams *functorParams);
+
+    /**
      * See Object::PrepareCrossStaff
      */
+    ///@{
     virtual int PrepareCrossStaff(FunctorParams *functorParams);
+    virtual int PrepareCrossStaffEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::PrepareTimePointing
@@ -197,13 +226,20 @@ public:
     /**
      * See Object::GenerateMIDI
      */
+    ///@{
     virtual int GenerateMIDI(FunctorParams *functorParams);
     virtual int GenerateMIDIEnd(FunctorParams *functorParams);
+    ///@}
 
     /**
      * See Object::CalcMaxMeasureDuration
      */
     virtual int CalcMaxMeasureDuration(FunctorParams *functorParams);
+
+    /**
+     * See Object::ResetDrawing
+     */
+    virtual int ResetDrawing(FunctorParams *);
 
 private:
     int GetDrawingArticulationTopOrBottom(data_STAFFREL place, ArticPartType type);
@@ -243,8 +279,19 @@ protected:
     int m_drawingXRel;
 
 private:
-    /** Indicates whether it is a ScoreDef or StaffDef attribute */
+    /**
+     * Indicates whether it is a ScoreDef or StaffDef attribute
+     */
     ElementScoreDefRole m_scoreDefRole;
+    /**
+     * The cached drawing cue size set by PrepareDarwingCueSize
+     */
+    bool m_drawingCueSize;
+    /**
+     * The cached alignment layer @n.
+     * This also stores the negative values for identifying cross-staff
+     */
+    int m_alignmentLayerN;
 };
 
 } // namespace vrv

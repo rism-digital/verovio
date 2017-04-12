@@ -138,7 +138,7 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
 
     if (params->m_previousSyl) {
         int overlap
-            = params->m_previousSyl->GetSelfRight() - this->GetSelfLeft(); // + params->m_doc->GetDrawingUnit(100);
+            = params->m_previousSyl->GetSelfRight() - this->GetSelfLeft() + params->m_doc->GetDrawingDoubleUnit(100);
         if (overlap > 0) {
             params->m_overlapingSyl.push_back(
                 std::make_tuple(params->m_previousSyl->GetAlignment(), this->GetAlignment(), overlap));
@@ -152,6 +152,9 @@ int Syl::AdjustSylSpacing(FunctorParams *functorParams)
 
 int Syl::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
     // Pass it to the pseudo functor of the interface
     return TimeSpanningInterface::InterfaceResetDrawing(functorParams, this);
 };

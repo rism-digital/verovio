@@ -41,20 +41,9 @@ public:
     /**
      * Split the articulation content into an array with the values to be displayed inside the staff / slur
      * and the values to be displayed outside.
-     * Used by Artic::PrepareArtic that then creates the corresponding ArticPart objects.
+     * Used by Artic::PrepareLayerElementParts that then creates the corresponding ArticPart objects.
      */
     void SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<data_ARTICULATION> *outsideSlur);
-
-    /**
-     * Update the outside ArticPart (place and drawingY)
-     * If allowAbove is true it will place the above if the content requires so (even if place below if given)
-     */
-    void UpdateOutsidePartPosition(int yAbove, int yBelow, data_STAFFREL place, bool allowAbove);
-
-    /**
-     * Update the inside ArticPart (place and drawingY)
-     */
-    void UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place);
 
     /**
      * Static method that retrieves the appropriate SMuFL code for a data_ARTICULATION with data_STAFFREL
@@ -91,9 +80,9 @@ public:
     virtual int AdjustArtic(FunctorParams *functorParams);
 
     /**
-     * See Object::PrepareArtic
+     * See Object::PrepareLayerElementParts
      */
-    virtual int PrepareArtic(FunctorParams *functorParams);
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
      * See Object::ResetDrawing
@@ -120,7 +109,7 @@ private:
 //----------------------------------------------------------------------------
 
 /**
- * This class models a sub-part of an artic element and has not direct MEI correspondant.
+ * This class models a sub-part of an artic element and has not direct MEI equivlatent.
  */
 
 class ArticPart : public LayerElement, public AttArticulation, public AttColor, public AttPlacement {
@@ -139,6 +128,9 @@ public:
 
     /** Override the method since alignment is required */
     virtual bool HasToBeAligned() const { return true; }
+
+    /** Override the method since it is align to the staff */
+    virtual bool IsRelativeToStaff() const { return true; }
 
     /**
      * @name Set and get the type of the alignment
@@ -162,8 +154,10 @@ public:
     /**
      * Overwritten version of Save that avoids anything to be written
      */
-    virtual int Save(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
-    virtual int SaveEnd(FunctorParams *functorParams) { return FUNCTOR_CONTINUE; }
+    ///@{
+    virtual int Save(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    virtual int SaveEnd(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    ///@}
 
     /**
      * See Object::AdjustArticWithSlurs

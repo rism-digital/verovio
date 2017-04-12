@@ -127,7 +127,7 @@ void View::DrawTimeSpanningElement(DeviceContext *dc, Object *element, System *s
         BBoxDeviceContext *bBoxDC = dynamic_cast<BBoxDeviceContext *>(dc);
         assert(bBoxDC);
         if (!bBoxDC->UpdateVerticalValues()) {
-            if ((element->Is(SLUR)) || (element->Is(HAIRPIN)) || (element->Is(OCTAVE)) || (element->Is(TIE))) return;
+            if (element->Is({ SLUR, HAIRPIN, OCTAVE, TIE })) return;
         }
     }
 
@@ -649,10 +649,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_START)) {
         // first get the min max of the chord (if any)
         if (startParentChord) {
-            startParentChord->GetYExtremes(&yChordMax, &yChordMin);
+            startParentChord->GetYExtremes(yChordMax, yChordMin);
         }
         else if (startChord) {
-            startChord->GetYExtremes(&yChordMax, &yChordMin);
+            startChord->GetYExtremes(yChordMax, yChordMin);
         }
         // slur is up
         if (drawingCurveDir == curvature_CURVEDIR_above) {
@@ -694,10 +694,10 @@ void View::DrawSlur(DeviceContext *dc, Slur *slur, int x1, int x2, Staff *staff,
     if ((spanningType == SPANNING_START_END) || (spanningType == SPANNING_END)) {
         // get the min max of the chord if any
         if (endParentChord) {
-            endParentChord->GetYExtremes(&yChordMax, &yChordMin);
+            endParentChord->GetYExtremes(yChordMax, yChordMin);
         }
         else if (endChord) {
-            endChord->GetYExtremes(&yChordMax, &yChordMin);
+            endChord->GetYExtremes(yChordMax, yChordMin);
         }
         // get the stem direction of the end
         // slur is up
@@ -935,8 +935,8 @@ float View::AdjustSlur(Slur *slur, Staff *staff, int layerN, curvature_CURVEDIR 
     Point adjustedRotatedC2 = rotatedC2;
 
     if (!spanningContentPoints.empty()) {
-        AdjustSlurCurve(
-            slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, curveDir, slurAngle);
+        AdjustSlurCurve(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2, curveDir,
+            slurAngle, true);
         // Use the adjusted control points for adjusting the position (p1, p2 and angle will be updated)
         AdjustSlurPosition(slur, &spanningContentPoints, p1, &rotatedP2, &adjustedRotatedC1, &adjustedRotatedC2,
             curveDir, &slurAngle, false);
@@ -1061,10 +1061,8 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
     float maxHeightFactor = std::max(0.2f, fabsf(angle));
     maxHeight = dist / (maxHeightFactor * (TEMP_SLUR_CURVE_FACTOR
                                               + 5)); // 5 is the minimum - can be increased for limiting curvature
-    if (posRatio) {
-        // Do we want to set a max height?
-        // maxHeight = std::min(maxHeight, m_doc->GetDrawingStaffSize(100));
-    }
+
+    maxHeight = std::max(maxHeight, currentHeight);
 
     bool hasReachedMaxHeight = false;
 
@@ -1127,31 +1125,30 @@ int View::AdjustSlurCurve(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoi
         }
     }
 
-    // Check if we need further adjustment of the points with the adjusted curve
-    /*
+    if (hasReachedMaxHeight) return maxHeight;
+
+    // Check if we need further adjustment of the points with the curve
     bezier[1] = *c1;
     bezier[2] = *c2;
     for (itPoint = spanningPoints->begin(); itPoint != spanningPoints->end();) {
-        y = View::CalcBezierAtPosition(bezier, itPoint->second.x);
-        if (up) {
-            //if (y > itPoint->second.y) itPoint = spanningPoints->erase(itPoint);
-            //else itPoint++;
+        y = BoundingBox::CalcBezierAtPosition(bezier, itPoint->second.x);
+        if (curveDir == curvature_CURVEDIR_above) {
+            if (y >= itPoint->second.y)
+                itPoint = spanningPoints->erase(itPoint);
+            else
+                itPoint++;
         }
         else {
-            //if (y < itPoint->second.y) itPoint = spanningPoints->erase(itPoint);
-            //else itPoint++;
+            if (y <= itPoint->second.y)
+                itPoint = spanningPoints->erase(itPoint);
+            else
+                itPoint++;
         }
-        itPoint++;
     }
 
-    // We will need to adjust the further if the list is not empty
-    return (!spanningPoints->empty());
-    */
+    if (!spanningPoints->empty()) return maxHeight;
 
-    if (hasReachedMaxHeight)
-        return maxHeight;
-    else
-        return 0;
+    return 0;
 }
 
 void View::AdjustSlurPosition(Slur *slur, ArrayOfLayerElementPointPairs *spanningPoints, Point *p1, Point *p2,
@@ -1427,7 +1424,7 @@ void View::DrawSylConnector(
     assert(syl->GetStart() && syl->GetEnd());
     if (!syl->GetStart() || !syl->GetEnd()) return;
 
-    int y = syl->GetDrawingY();
+    int y = staff->GetDrawingY() + GetSylYRel(syl, staff);
     TextExtend extend;
 
     // The both correspond to the current system, which means no system break in-between (simple case)
@@ -1543,6 +1540,10 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     bool setX = false;
     bool setY = false;
 
+    char alignment = dir->GetAlignment();
+    // Dir are left aligned by default;
+    if (alignment == 0) alignment = LEFT;
+
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
@@ -1555,7 +1556,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dirTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
         DrawTextChildren(dc, dir, x, y, setX, setY);
         dc->EndText();
 
@@ -1592,6 +1593,10 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     bool setX = false;
     bool setY = false;
 
+    char alignment = dynam->GetAlignment();
+    // Dynam are left aligned by default;
+    if (alignment == 0) alignment = LEFT;
+
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
@@ -1612,7 +1617,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             dc->SetBrush(m_currentColour, AxSOLID);
             dc->SetFont(&dynamTxt);
 
-            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
             DrawTextChildren(dc, dynam, x, y, setX, setY);
             dc->EndText();
 
@@ -1699,6 +1704,10 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     bool setX = false;
     bool setY = false;
 
+    char alignment = harm->GetAlignment();
+    // Harm are centered aligned by default;
+    if (alignment == 0) alignment = CENTER;
+
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = harm->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
@@ -1711,7 +1720,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dirTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
         DrawTextChildren(dc, harm, x, y, setX, setY);
         dc->EndText();
 
@@ -1831,6 +1840,7 @@ void View::DrawPedal(DeviceContext *dc, Pedal *pedal, Measure *measure, System *
     assert(measure);
     assert(pedal);
 
+    // Cannot draw a pedal that has no start position
     if (!pedal->GetStart()) return;
 
     dc->StartGraphic(pedal, "", pedal->GetUuid());
@@ -1871,6 +1881,9 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     assert(measure);
     assert(tempo);
 
+    // Cannot draw a tempo that has no start position
+    if (!tempo->GetStart()) return;
+
     dc->StartGraphic(tempo, "", tempo->GetUuid());
 
     FontInfo tempoTxt;
@@ -1894,6 +1907,10 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     bool setX = false;
     bool setY = false;
 
+    char alignment = tempo->GetAlignment();
+    // Tempo are left aligned by default;
+    if (alignment == 0) alignment = LEFT;
+
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
@@ -1906,7 +1923,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
         DrawTextChildren(dc, tempo, x, y, setX, setY);
         dc->EndText();
 

@@ -189,6 +189,7 @@ FloatingPositioner::FloatingPositioner(FloatingObject *object) : BoundingBox()
 void FloatingPositioner::ResetPositioner()
 {
     BoundingBox::ResetBoundingBox();
+    ResetCachedDrawingY();
 
     m_objectX = NULL;
     m_objectY = NULL;
@@ -215,6 +216,17 @@ int FloatingPositioner::GetDrawingY() const
     assert(m_objectY);
     return (m_objectY->GetDrawingY() - this->GetDrawingYRel());
 }
+
+void FloatingPositioner::ResetCachedDrawingX() const
+{
+    m_cachedDrawingX = VRV_UNSET;
+}
+
+void FloatingPositioner::ResetCachedDrawingY() const
+{
+    m_cachedDrawingY = VRV_UNSET;
+}
+
 void FloatingPositioner::SetObjectXY(Object *objectX, Object *objectY)
 {
     assert(objectX);
@@ -240,7 +252,7 @@ void FloatingPositioner::UpdateCurvePosition(
 int FloatingPositioner::CalcXMinMaxY(const Point points[4])
 {
     assert(this->GetObject());
-    assert((this->GetObject()->Is(SLUR)) || (this->GetObject()->Is(TIE)));
+    assert(this->GetObject()->Is({ SLUR, TIE }));
     assert(m_cuvreDir != curvature_CURVEDIR_NONE);
 
     if (m_cuvreXMinMaxY != -1) return m_cuvreXMinMaxY;
@@ -259,6 +271,7 @@ int FloatingPositioner::CalcXMinMaxY(const Point points[4])
 
 void FloatingPositioner::SetDrawingYRel(int drawingYRel)
 {
+    ResetCachedDrawingY();
     if (m_place == STAFFREL_above) {
         if (drawingYRel < m_drawingYRel) m_drawingYRel = drawingYRel;
     }
@@ -295,7 +308,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             assert(curve->m_object);
         }
         if (this->m_place == STAFFREL_above) {
-            if (curve && ((curve->m_object->Is(SLUR)) || (curve->m_object->Is(TIE)))) {
+            if (curve && curve->m_object->Is({ SLUR, TIE })) {
                 int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);
@@ -309,7 +322,7 @@ bool FloatingPositioner::CalcDrawingYRel(Doc *doc, StaffAlignment *staffAlignmen
             this->SetDrawingYRel(yRel);
         }
         else {
-            if (curve && ((curve->m_object->Is(SLUR)) || (curve->m_object->Is(TIE)))) {
+            if (curve && curve->m_object->Is({ SLUR, TIE })) {
                 int shift = this->Intersects(curve, doc->GetDrawingUnit(staffSize));
                 if (shift != 0) {
                     this->SetDrawingYRel(this->GetDrawingYRel() - shift);

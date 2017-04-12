@@ -34,27 +34,27 @@ my $VEROVIO_ROOT  = "..";
 # Memory is increased (TOTAL_STACK) for processing large files (tested up to 7MB)
 # Empirically, the memory amount required is roughly 5 times the file size.
 # This can be disabled in the light version, which uses the default memory settings.
-my $ASM = "-O3";
-$ASM .= " -DNDEBUG";
-$ASM .= " --memory-init-file 0";
-$ASM .= " -std=c++11";
-$ASM .= " -s ASM_JS=1";
-$ASM .= " -s OUTLINING_LIMIT=10000";
-$ASM .= " -s TOTAL_MEMORY=128*1024*1024";
-$ASM .= " -s TOTAL_STACK=64*1024*1024";
+my $FLAGS = "-O3";
+$FLAGS .= " -DNDEBUG";
+$FLAGS .= " --memory-init-file 0";
+$FLAGS .= " -std=c++11";
+$FLAGS .= " -s ASM_JS=1";
+$FLAGS .= " -s OUTLINING_LIMIT=10000";
+$FLAGS .= " -s TOTAL_MEMORY=192*1024*1024";
+$FLAGS .= " -s TOTAL_STACK=96*1024*1024";
 
-my ($ASM_NAME, $WEBWORKER, $WEBWORKER_NAME, $VERSION, $CHATTY);
+my ($FLAGS_NAME, $VERSION, $CHATTY);
 
 
 sub print_help {
 print <<"EOT";
 
 Options:
+-a      Webassembly version
 -c      Chatty mode: display compiler progress
 -l      Light version with no increased memory allocation
 -r DIR  Verovio root directory
 -v N    Version number (e.g., 1.0.0); no number by default
--w      WebWorker-compatible build
 -x      Font exclusion list (case-sensitive)
 -D      Disable DARMS importer
 -H      Disable Humdrum importer
@@ -66,10 +66,11 @@ EOT
 
 
 # Parse command-line options
-my ($lightQ, $version, $chattyQ, $webworkerQ, $helpQ, $exclusion);
+my ($wasmQ, $lightQ, $version, $chattyQ, $webworkerQ, $helpQ, $exclusion);
 my ($nopae, $nohumdrum, $nomusicxml, $nodarms);
 Getopt::Long::Configure("bundling");
 GetOptions (
+   'a|wasm'        => \$wasmQ,
    'c|chatty'      => \$chattyQ,
    'h|?|help'      => \$helpQ,
    'l|light'       => \$lightQ,
@@ -86,10 +87,23 @@ GetOptions (
 
 # Process command-line options:
 
+if ($wasmQ) {
+	print "Creating WASM toolkit version\n";
+	$FLAGS = "-O3";
+	$FLAGS .= " -DNDEBUG";
+	$FLAGS .= " --memory-init-file 0";
+	$FLAGS .= " -std=c++11";
+	$FLAGS .= " -s WASM=1";
+	$FLAGS .= " -s OUTLINING_LIMIT=10000";
+	$FLAGS .= " -s TOTAL_MEMORY=256*1024*1024";
+	$FLAGS .= " -s TOTAL_STACK=128*1024*1024";
+	$FLAGS_NAME = "-wasm";
+}
+
 if ($lightQ) {
 	print "Creating low-memory (light) toolkit version\n";
-	$ASM = "-O3 -DNDEBUG --memory-init-file 0 -std=c++11 -s ASM_JS=1";
-	$ASM_NAME = "-light";
+	$FLAGS = "-O3 -DNDEBUG --memory-init-file 0 -std=c++11 -s ASM_JS=1";
+	$FLAGS_NAME = "-light";
 }
 
 if ($chattyQ) {
@@ -98,13 +112,11 @@ if ($chattyQ) {
 }
 
 if ($webworkerQ) {
-	print "Building with webworker compatibility.\n";
-	$WEBWORKER = 1;
-	$WEBWORKER_NAME = "-webworker";
+	print "Warning: the -w flag for WebWorker compatibility is no longer necessary.\n";
 }
 
 if (!$nohumdrum) {
-    $ASM_NAME .= "-hum";
+    $FLAGS_NAME .= "-hum";
 }
 
 if ($helpQ) {
@@ -112,7 +124,7 @@ if ($helpQ) {
 	exit 2;
 }
 
-my $FILENAME = "verovio-toolkit$ASM_NAME$WEBWORKER_NAME.js";
+my $FILENAME = "verovio-toolkit$FLAGS_NAME.js";
 
 my $DATA_DIR  = "data";
 my $BUILD_DIR = "build";
@@ -165,6 +177,7 @@ $exports .= "'_vrvToolkit_getPageWithElement',";
 $exports .= "'_vrvToolkit_getTimeForElement',";
 $exports .= "'_vrvToolkit_loadData',";
 $exports .= "'_vrvToolkit_redoLayout',";
+$exports .= "'_vrvToolkit_redoPagePitchPosLayout',";
 $exports .= "'_vrvToolkit_renderData',";
 $exports .= "'_vrvToolkit_renderPage',";
 $exports .= "'_vrvToolkit_renderToMidi',";
@@ -173,7 +186,7 @@ $exports .= "'_vrvToolkit_edit',";
 $exports .= "'_vrvToolkit_getElementAttr'";
 $exports .= "]\"";
 
-my $command = "$PYTHON $EMCC $CHATTY $includes $defines $ASM $sources $embed $exports $output";
+my $command = "$PYTHON $EMCC $CHATTY $includes $defines $FLAGS $sources $embed $exports $output";
 print "Compiling...";
 print "$command\n" if $CHATTY;
 `$command`;
@@ -182,11 +195,7 @@ if ($? == 0) {
 	print " Done.\n";
 
 	# the wrapper is necessary with closure 1 for avoiding to conflict with globals
-	if ($WEBWORKER) {
-		`cat $BUILD_DIR/verovio.js verovio-proxy.js > $BUILD_DIR/$FILENAME`;
-	} else {
-		`cat $BUILD_DIR/verovio.js verovio-proxy.js verovio-unload-listener.js > $BUILD_DIR/$FILENAME`;
-	}
+	`cat $BUILD_DIR/verovio.js verovio-proxy.js > $BUILD_DIR/$FILENAME`;
 
 	# create a gzip version
 	`(cd $BUILD_DIR && gzip -c $FILENAME > $FILENAME.gz)`;

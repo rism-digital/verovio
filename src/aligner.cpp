@@ -18,8 +18,10 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
+#include "layer.h"
 #include "measure.h"
 #include "note.h"
+#include "smufl.h"
 #include "staff.h"
 #include "style.h"
 #include "timestamp.h"
@@ -55,12 +57,12 @@ StaffAlignment *SystemAligner::GetStaffAlignment(int idx, Staff *staff, Doc *doc
         this->m_children.pop_back();
     }
 
-    if (idx < GetStaffAlignmentCount()) {
+    if (idx < GetChildCount()) {
         this->m_children.push_back(m_bottomAlignment);
         return dynamic_cast<StaffAlignment *>(m_children.at(idx));
     }
     // check that we are searching for the next one (not a gap)
-    assert(idx == GetStaffAlignmentCount());
+    assert(idx == GetChildCount());
     // LogDebug("Creating staff alignment");
 
     // This is the first time we are looking for it (e.g., first staff)
@@ -81,7 +83,7 @@ StaffAlignment *SystemAligner::GetStaffAlignmentForStaffN(int staffN) const
 {
     StaffAlignment *alignment = NULL;
     int i;
-    for (i = 0; i < this->GetStaffAlignmentCount(); i++) {
+    for (i = 0; i < this->GetChildCount(); i++) {
         alignment = dynamic_cast<StaffAlignment *>(m_children.at(i));
         assert(alignment);
 
@@ -396,8 +398,7 @@ void MeasureAligner::PushAlignmentsRight()
     for (riter = m_children.rbegin(); riter != m_children.rend(); riter++) {
         Alignment *current = dynamic_cast<Alignment *>(*riter);
         assert(current);
-
-        if ((current->GetType() == ALIGNMENT_GRACENOTE) || (current->GetType() == ALIGNMENT_CONTAINER)) {
+        if (current->IsOfType({ ALIGNMENT_GRACENOTE })) {
             if (previous) current->SetXRel(previous->GetXRel());
         }
         else {
@@ -413,7 +414,7 @@ void MeasureAligner::AdjustGraceNoteSpacing(Doc *doc, Alignment *alignment, int 
     assert(alignment->GetType() == ALIGNMENT_GRACENOTE);
     assert(alignment->GetGraceAligner());
 
-    Measure *measure = dynamic_cast<Measure *>(this->m_parent);
+    Measure *measure = dynamic_cast<Measure *>(this->GetParent());
     assert(measure);
 
     int maxRight = VRV_UNSET;
@@ -500,7 +501,7 @@ Alignment *GraceAligner::GetAlignmentAtTime(double time, AlignmentType type)
 void GraceAligner::StackGraceElement(LayerElement *element)
 {
     // Nespresso: What else?
-    assert(element->Is(NOTE) || (element->Is(CHORD)));
+    assert(element->Is({ NOTE, CHORD }));
 
     if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
@@ -524,14 +525,14 @@ void GraceAligner::AlignStack()
         time -= duration;
         Alignment *alignment = this->GetAlignmentAtTime(time, ALIGNMENT_DEFAULT);
         element->SetGraceAlignment(alignment);
-        alignment->AddLayerElementRef(element);
 
-        AttComparisonAny matchType({ NOTE, ACCID });
+        AttComparisonAny matchType({ ACCID, FLAG, NOTE, STEM });
         ArrayOfObjects children;
         ArrayOfObjects::iterator childrenIter;
         element->FindAllChildByAttComparison(&children, &matchType);
+        alignment->AddLayerElementRef(element);
 
-        // Then the @n of each first staffDef
+        // Set the grace alignmnet to all children
         for (childrenIter = children.begin(); childrenIter != children.end(); childrenIter++) {
             // Trick : FindAllChildByAttComparison include the element, which is probably a problem.
             // With note, we want to set only accid, so make sure we do not set it twice
@@ -539,6 +540,7 @@ void GraceAligner::AlignStack()
             LayerElement *childElement = dynamic_cast<LayerElement *>(*childrenIter);
             assert(childElement);
             childElement->SetGraceAlignment(alignment);
+            alignment->AddLayerElementRef(childElement);
         }
     }
     m_graceStack.clear();
@@ -546,7 +548,18 @@ void GraceAligner::AlignStack()
 
 int GraceAligner::GetGraceGroupLeft(int staffN)
 {
-    Alignment *leftAlignment = dynamic_cast<Alignment *>(this->GetFirst());
+    // First we need to get the left alignment with an alignment reference with staffN
+    Alignment *leftAlignment = NULL;
+    if (staffN != VRV_UNSET) {
+        AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+        Object *reference = this->FindChildByAttComparison(&matchStaff);
+        if (!reference) return -VRV_UNSET;
+        // The alignment is its parent
+        leftAlignment = dynamic_cast<Alignment *>(reference->GetParent());
+    }
+    else
+        leftAlignment = dynamic_cast<Alignment *>(this->GetFirst());
+    // Return if nothing found
     if (!leftAlignment) return -VRV_UNSET;
 
     int minLeft, maxRight;
@@ -557,6 +570,9 @@ int GraceAligner::GetGraceGroupLeft(int staffN)
 
 int GraceAligner::GetGraceGroupRight(int staffN)
 {
+    // See GraceAligner::GetGraceGroupLeft
+    // We do not need to search of the alignment with staffN here because all grace note groups
+    // Have their right note aligned, so getting the last is fine
     Alignment *rightAlignment = dynamic_cast<Alignment *>(this->GetLast());
     if (!rightAlignment) return VRV_UNSET;
 
@@ -564,6 +580,24 @@ int GraceAligner::GetGraceGroupRight(int staffN)
     rightAlignment->GetLeftRight(staffN, minLeft, maxRight);
 
     return maxRight;
+}
+
+void GraceAligner::SetGraceAligmentXPos(Doc *doc)
+{
+    assert(doc);
+
+    ArrayOfObjects::reverse_iterator childrenIter;
+
+    int i = 0;
+    // Then the @n of each first staffDef
+    for (childrenIter = m_children.rbegin(); childrenIter != m_children.rend(); childrenIter++) {
+        Alignment *alignment = dynamic_cast<Alignment *>(*childrenIter);
+        assert(alignment);
+        // We space with a notehead (non grace size) which seems to be a reasonable default spacing with margin
+        // Ideally we should look at the duration in that alignmment and also the maximum staff scaling for this aligner
+        alignment->SetXRel(-i * doc->GetGlyphWidth(SMUFL_E0A4_noteheadBlack, 100, false));
+        i++;
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -608,22 +642,68 @@ void Alignment::AddChild(Object *child)
     Modify();
 }
 
-void Alignment::AddLayerElementRef(LayerElement *element)
+AlignmentReference *Alignment::GetAlignmentReference(int staffN)
 {
-    assert(element->IsLayerElement());
-
-    // -1 will be used for barlines attributes
-    int n = -1;
-    Staff *staffRef = element->m_crossStaff;
-    if (!staffRef) staffRef = dynamic_cast<Staff *>(element->GetFirstParent(STAFF));
-    if (staffRef) n = staffRef->GetN();
-    AlignmentReference *alignmentRef = new AlignmentReference(n, element);
-    this->AddChild(alignmentRef);
+    AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, staffN);
+    AlignmentReference *alignmentRef
+        = dynamic_cast<AlignmentReference *>(this->FindChildByAttComparison(&matchStaff, 1));
+    if (!alignmentRef) {
+        alignmentRef = new AlignmentReference(staffN);
+        this->AddChild(alignmentRef);
+    }
+    return alignmentRef;
 }
 
 void Alignment::SetXRel(int xRel)
 {
+    ResetCachedDrawingX();
     m_xRel = xRel;
+}
+
+void Alignment::AddLayerElementRef(LayerElement *element)
+{
+    assert(element->IsLayerElement());
+
+    // 0 will be used for barlines attributes or timestamps
+    int layerN = 0;
+
+    // -1 will be used for barlines attributes
+    int staffN = -1;
+    // -2 will be used for timestamps
+    if (element->Is(TIMESTAMP_ATTR))
+        staffN = -2;
+    else {
+        Layer *layerRef = NULL;
+        Staff *staffRef = element->GetCrossStaff(layerRef);
+        // We have a cross-staff situation
+        if (staffRef) {
+            assert(layerRef);
+            // We set cross-staff layers to the negative value in the alignment references in order to distinct them
+            layerN = -layerRef->GetN();
+            staffN = staffRef->GetN();
+        }
+        // Non cross staff normal case
+        else {
+            layerRef = dynamic_cast<Layer *>(element->GetFirstParent(LAYER));
+            if (layerRef) staffRef = dynamic_cast<Staff *>(layerRef->GetFirstParent(STAFF));
+            if (staffRef) {
+                layerN = layerRef->GetN();
+                staffN = staffRef->GetN();
+            }
+            // staffN and layerN remain unsed for barLine attributes and timestamps
+            else {
+                assert(element->Is({ BARLINE_ATTR_LEFT, BARLINE_ATTR_RIGHT, TIMESTAMP_ATTR }));
+            }
+        }
+    }
+    AlignmentReference *alignmentRef = GetAlignmentReference(staffN);
+    alignmentRef->AddChild(element);
+    element->SetAlignmentLayerN(layerN);
+}
+
+bool Alignment::IsOfType(const std::vector<AlignmentType> &types)
+{
+    return (std::find(types.begin(), types.end(), m_type) != types.end());
 }
 
 void Alignment::GetLeftRight(int staffN, int &minLeft, int &maxRight)
@@ -652,6 +732,28 @@ GraceAligner *Alignment::GetGraceAligner()
     return m_graceAligner;
 }
 
+void Alignment::AddToAccidSpace(Accid *accid)
+{
+    assert(accid);
+
+    // Do not added them if no @accid (e.g., @accid.ges only)
+    if (!accid->HasAccid()) return;
+
+    ArrayOfObjects::iterator iter;
+    AlignmentReference *reference = NULL;
+
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        if ((*iter)->HasChild(accid)) {
+            reference = dynamic_cast<AlignmentReference *>(*iter);
+            assert(reference);
+            reference->AddToAccidSpace(accid);
+        }
+    }
+
+    // We assert it because we want to make sure a reference was found (it should in all cases)
+    assert(reference);
+}
+
 //----------------------------------------------------------------------------
 // AlignmentReference
 //----------------------------------------------------------------------------
@@ -661,15 +763,22 @@ AlignmentReference::AlignmentReference() : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
+
+    this->SetAsReferenceObject();
 }
 
-AlignmentReference::AlignmentReference(int n, Object *elementRef) : Object(), AttCommon()
+AlignmentReference::AlignmentReference(int staffN) : Object(), AttCommon()
 {
     RegisterAttClass(ATT_COMMON);
 
     Reset();
-    this->SetN(n);
-    m_elementRef = elementRef;
+
+    this->SetAsReferenceObject();
+    this->SetN(staffN);
+}
+
+AlignmentReference::~AlignmentReference()
+{
 }
 
 void AlignmentReference::Reset()
@@ -677,7 +786,37 @@ void AlignmentReference::Reset()
     Object::Reset();
     ResetCommon();
 
-    m_elementRef = NULL;
+    m_accidSpace.clear();
+}
+
+void AlignmentReference::AddChild(Object *child)
+{
+    assert(dynamic_cast<LayerElement *>(child));
+
+    // Specical case where we do not set the parent because the reference will not have ownership
+    // Children will be treated as relinquished objects in the desctructor
+    // However, we need to make sure the child has a parent (somewhere else)
+    assert(child->GetParent() && this->IsReferenceObject());
+    m_children.push_back(child);
+    Modify();
+}
+
+void AlignmentReference::AddToAccidSpace(Accid *accid)
+{
+    assert(accid);
+
+    m_accidSpace.push_back(accid);
+}
+
+void AlignmentReference::AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize)
+{
+    std::vector<Accid *> leftAccids;
+
+    ArrayOfObjects::iterator iter;
+    // bottom one
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        accid->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccids);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -758,7 +897,7 @@ int StaffAlignment::CalcStaffOverlap(FunctorParams *functorParams)
         auto end = m_overflowAboveBBoxes.end();
         while (i != end) {
             // find all the elements from the bottom staff that have an overflow at the top with an horizontal overap
-            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalOverlap(elem); });
+            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
             if (i != end) {
                 // calculate the vertical overlap and see if this is more than the expected space
                 int overflowBelow = params->m_previous->CalcOverflowBelow(*iter);
@@ -836,7 +975,7 @@ int StaffAlignment::AdjustFloatingPostioners(FunctorParams *functorParams)
         auto end = overflowBoxes->end();
         while (i != end) {
             // find all the overflowing elements from the staff that overlap horizonatally
-            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalOverlap(elem); });
+            i = std::find_if(i, end, [iter](BoundingBox *elem) { return (*iter)->HorizontalContentOverlap(elem); });
             if (i != end) {
                 // update the yRel accordingly
                 (*iter)->CalcDrawingYRel(params->m_doc, this, *i);
@@ -1006,7 +1145,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
 
             params->m_graceMaxPos = graceMaxPos;
             params->m_graceUpcomingMaxPos = -VRV_UNSET;
-            params->m_graceCumulatedXShift = 0;
+            params->m_graceCumulatedXShift = VRV_UNSET;
             filters.clear();
             // Create ad comparison object for each type / @n
             AttCommonNComparison matchStaff(ALIGNMENT_REFERENCE, (*iter));
@@ -1016,7 +1155,7 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
                 params->m_functor, params, params->m_functorEnd, &filters, UNLIMITED_DEPTH, BACKWARD);
 
             // There was not grace notes for that staff
-            if (params->m_graceCumulatedXShift == 0) continue;
+            if (params->m_graceCumulatedXShift == VRV_UNSET) continue;
 
             // Now we need to adjust the space for the grace not group
             measureAligner->AdjustGraceNoteSpacing(params->m_doc, this, (*iter));
@@ -1028,8 +1167,10 @@ int Alignment::AdjustGraceXPos(FunctorParams *functorParams)
         return FUNCTOR_CONTINUE;
     }
 
-    // This is happening when aligning the grace aligner itself
-    this->SetXRel(this->GetXRel() + params->m_graceCumulatedXShift);
+    if (params->m_graceCumulatedXShift != VRV_UNSET) {
+        // This is happening when aligning the grace aligner itself
+        this->SetXRel(this->GetXRel() + params->m_graceCumulatedXShift);
+    }
 
     return FUNCTOR_CONTINUE;
 }
@@ -1057,10 +1198,7 @@ int Alignment::AdjustXPos(FunctorParams *functorParams)
 
     this->SetXRel(this->GetXRel() + params->m_cumulatedXShift);
 
-    if (GetType() == ALIGNMENT_CONTAINER) {
-        return FUNCTOR_SIBLINGS;
-    }
-    else if (m_type == ALIGNMENT_MEASURE_END) {
+    if (m_type == ALIGNMENT_MEASURE_END) {
         this->SetXRel(params->m_minPos);
     }
 
@@ -1088,36 +1226,86 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
-int AlignmentReference::GetAlignmentLeftRight(FunctorParams *functorParams)
-{
-    GetAlignmentLeftRightParams *params = dynamic_cast<GetAlignmentLeftRightParams *>(functorParams);
-    assert(params);
-
-    this->GetObject()->Process(params->m_functor, params);
-
-    return FUNCTOR_CONTINUE;
-}
-
 int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
 {
     AdjustGraceXPosParams *params = dynamic_cast<AdjustGraceXPosParams *>(functorParams);
     assert(params);
 
-    // LogDebug("AlignmentRef staff %d", GetN());
-    this->m_elementRef->Process(params->m_functor, params);
+    ArrayOfObjects::iterator childrenIter;
 
-    return FUNCTOR_CONTINUE;
+    // Because we are processing grace notes aligment backward (see Alignment::AdjustGraceXPos) we need
+    // to process the children (LayerElement) "by hand" in FORWARD manner
+    // (filters can be NULL because filtering was already applied in the parent)
+    for (childrenIter = m_children.begin(); childrenIter != m_children.end(); childrenIter++) {
+        (*childrenIter)->Process(params->m_functor, params, params->m_functorEnd, NULL, UNLIMITED_DEPTH, FORWARD);
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
-int AlignmentReference::AdjustXPos(FunctorParams *functorParams)
+int AlignmentReference::AdjustAccidX(FunctorParams *functorParams)
 {
-    AdjustXPosParams *params = dynamic_cast<AdjustXPosParams *>(functorParams);
+    AdjustAccidXParams *params = dynamic_cast<AdjustAccidXParams *>(functorParams);
     assert(params);
 
-    // LogDebug("AlignmentRef staff %d", GetN());
-    this->m_elementRef->Process(params->m_functor, params, params->m_functorEnd);
+    if (m_accidSpace.empty()) return FUNCTOR_SIBLINGS;
 
-    return FUNCTOR_CONTINUE;
+    assert(params->m_doc);
+    StaffDef *staffDef = params->m_doc->m_scoreDef.GetStaffDef(this->GetN());
+    int staffSize = (staffDef && staffDef->HasScale()) ? staffDef->GetScale() : 100;
+
+    std::sort(m_accidSpace.begin(), m_accidSpace.end(), AccidSpaceSort());
+
+    // Detect the octave and mark them
+    std::vector<Accid *>::iterator iter, octaveIter;
+    for (iter = m_accidSpace.begin(); iter != m_accidSpace.end() - 1; iter++) {
+        Note *note = dynamic_cast<Note *>((*iter)->GetFirstParent(NOTE));
+        assert(note);
+        if (!note) continue;
+        for (octaveIter = iter + 1; octaveIter != m_accidSpace.end(); octaveIter++) {
+            Note *octave = dynamic_cast<Note *>((*octaveIter)->GetFirstParent(NOTE));
+            assert(octave);
+            if (!octave) continue;
+            // Same pitch, different octave, same accid - for now?
+            if ((note->GetPname() == octave->GetPname()) && (note->GetOct() != octave->GetOct())
+                && ((*iter)->GetAccid() == (*octaveIter)->GetAccid())) {
+                (*iter)->SetDrawingOctaveAccid(*octaveIter);
+                (*octaveIter)->SetDrawingOctave(true);
+            }
+        }
+    }
+
+    int count = (int)m_accidSpace.size();
+    int i, j;
+
+    // Align the octaves
+    for (i = 0; i < count - 1; i++) {
+        if (m_accidSpace.at(i)->GetDrawingOctaveAccid() != NULL) {
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i)->GetDrawingOctaveAccid(), params->m_doc, staffSize);
+            int minXRel = std::min(
+                m_accidSpace.at(i)->GetDrawingXRel(), m_accidSpace.at(i)->GetDrawingOctaveAccid()->GetDrawingXRel());
+            m_accidSpace.at(i)->SetDrawingXRel(minXRel);
+            m_accidSpace.at(i)->GetDrawingOctaveAccid()->SetDrawingXRel(minXRel);
+        }
+    }
+
+    int middle = (count % 2) ? (count / 2) + 1 : (count / 2);
+    // Zig-zag processing
+    for (i = 0, j = count - 1; i < middle; i++, j--) {
+        // bottom one - but skip octaves
+        if (!m_accidSpace.at(i)->GetDrawingOctaveAccid() && !m_accidSpace.at(i)->GetDrawingOctave())
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(i), params->m_doc, staffSize);
+
+        // Break with odd number of elements once the middle is reached
+        if (i == j) break;
+
+        // top one - but skip octaves
+        if (!m_accidSpace.at(j)->GetDrawingOctaveAccid() && !m_accidSpace.at(j)->GetDrawingOctave())
+            this->AdjustAccidWithAccidSpace(m_accidSpace.at(j), params->m_doc, staffSize);
+    }
+
+    return FUNCTOR_SIBLINGS;
 }
 
 int MeasureAligner::SetAlignmentXPos(FunctorParams *functorParams)
@@ -1165,7 +1353,11 @@ int Alignment::SetAlignmentXPos(FunctorParams *functorParams)
         // LogDebug("SetAlignmentXPos: intervalTime=%.2f intervalXRel=%d", intervalTime, intervalXRel);
     }
 
-    m_xRel = params->m_previousXRel + intervalXRel * DEFINITION_FACTOR;
+    if (m_graceAligner) {
+        m_graceAligner->SetGraceAligmentXPos(params->m_doc);
+    }
+
+    SetXRel(params->m_previousXRel + intervalXRel * DEFINITION_FACTOR);
     params->m_previousTime = m_time;
     params->m_previousXRel = m_xRel;
 
@@ -1193,8 +1385,8 @@ int Alignment::JustifyX(FunctorParams *functorParams)
     }
     else if (m_type < ALIGNMENT_MEASURE_RIGHT_BARLINE) {
         // All elements up to the next barline, move them but also take into account the leftBarlineX
-        this->m_xRel = ceil((((double)this->m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
-            + params->m_leftBarLineX);
+        SetXRel(ceil((((double)this->m_xRel - (double)params->m_leftBarLineX) * params->m_justifiableRatio)
+            + params->m_leftBarLineX));
     }
     else {
         //  Now more the right barline and all right scoreDef elements

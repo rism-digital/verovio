@@ -208,11 +208,9 @@ void Doc::ExportMIDI(MidiFile *midiFile)
 
 void Doc::PrepareDrawing()
 {
-    FunctorParams params;
-
     if (m_drawingPreparationDone) {
         Functor resetDrawing(&Object::ResetDrawing);
-        this->Process(&resetDrawing, &params);
+        this->Process(&resetDrawing, NULL);
     }
 
     // Try to match all spanning elements (slur, tie, etc) by processing backwards
@@ -248,14 +246,15 @@ void Doc::PrepareDrawing()
 
     // If some are still there, then it is probably an issue in the encoding
     if (!prepareTimestampsParams.m_timeSpanningInterfaces.empty()) {
-        LogWarning(
-            "%d time spanning elements could not be matched", prepareTimestampsParams.m_timeSpanningInterfaces.size());
+        LogWarning("%d time spanning element(s) could not be matched",
+            prepareTimestampsParams.m_timeSpanningInterfaces.size());
     }
 
     // Prepare the cross-staff pointers
     PrepareCrossStaffParams prepareCrossStaffParams;
     Functor prepareCrossStaff(&Object::PrepareCrossStaff);
-    this->Process(&prepareCrossStaff, &prepareCrossStaffParams);
+    Functor prepareCrossStaffEnd(&Object::PrepareCrossStaffEnd);
+    this->Process(&prepareCrossStaff, &prepareCrossStaffParams, &prepareCrossStaffEnd);
 
     // We need to populate processing lists for processing the document by Layer (for matching @tie) and
     // by Verse (for matching syllable connectors)
@@ -391,9 +390,12 @@ void Doc::PrepareDrawing()
     Functor prepareFloatingGrps(&Object::PrepareFloatingGrps);
     this->Process(&prepareFloatingGrps, &prepareFloatingGrpsParams);
 
-    FunctorParams prepareArticParams;
-    Functor prepareArtic(&Object::PrepareArtic);
-    this->Process(&prepareArtic, &prepareArticParams);
+    Functor prepareLayerElementParts(&Object::PrepareLayerElementParts);
+    this->Process(&prepareLayerElementParts, NULL);
+
+    // Prepare the drawing cue size
+    Functor prepareDrawingCueSize(&Object::PrepareDrawingCueSize);
+    this->Process(&prepareDrawingCueSize, NULL);
 
     /*
     // Alternate solution with StaffN_LayerN_VerseN_t
@@ -479,12 +481,16 @@ void Doc::CastOffDoc()
 
     // Reset the scoreDef at the beginning of each system
     this->CollectScoreDefs(true);
-    contentPage->LayOutHorizontally();
+
+    // Here we redo the alignment because of the new scoreDefs
+    // We can actually optimise this and have a custom version that does not redo all the calculation
+    // contentPage->LayOutHorizontally();
+
     contentPage->LayOutVertically();
 
     // Detach the contentPage
     this->DetachChild(0);
-    assert(contentPage && !contentPage->m_parent);
+    assert(contentPage && !contentPage->GetParent());
 
     Page *currentPage = new Page();
     this->AddChild(currentPage);
@@ -538,7 +544,7 @@ void Doc::CastOffEncodingDoc()
 
     // Detach the contentPage
     this->DetachChild(0);
-    assert(contentPage && !contentPage->m_parent);
+    assert(contentPage && !contentPage->GetParent());
 
     Page *page = new Page();
     this->AddChild(page);
@@ -618,6 +624,24 @@ int Doc::GetGlyphWidth(wchar_t code, int staffSize, bool graceSize) const
     if (graceSize) w = w * this->m_style->m_graceNum / this->m_style->m_graceDen;
     w = w * staffSize / 100;
     return w;
+}
+
+Point Doc::ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staffSize, bool graceSize) const
+{
+    assert(glyph);
+
+    Point point;
+    point.x = fontPoint.x * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    point.y = fontPoint.y * m_drawingSmuflFontSize / glyph->GetUnitsPerEm();
+    if (graceSize) {
+        point.x = point.x * this->m_style->m_graceNum / this->m_style->m_graceDen;
+        point.y = point.y * this->m_style->m_graceNum / this->m_style->m_graceDen;
+    }
+    if (staffSize != 100) {
+        point.x = point.x * staffSize / 100;
+        point.y = point.y * staffSize / 100;
+    }
+    return point;
 }
 
 int Doc::GetGlyphDescender(wchar_t code, int staffSize, bool graceSize) const

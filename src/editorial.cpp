@@ -30,18 +30,21 @@ namespace vrv {
 // EditorialElement
 //----------------------------------------------------------------------------
 
-EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), AttCommon(), AttCommonPart()
+EditorialElement::EditorialElement() : Object("ee-"), BoundaryStartInterface(), AttCommon(), AttCommonPart(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
 
-EditorialElement::EditorialElement(std::string classid) : Object(classid), AttCommon()
+EditorialElement::EditorialElement(std::string classid)
+    : Object(classid), vrv::BoundaryStartInterface(), AttCommon(), AttCommonPart(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_COMMONPART);
+    RegisterAttClass(ATT_TYPED);
 
     Reset();
 }
@@ -52,6 +55,7 @@ void EditorialElement::Reset()
     BoundaryStartInterface::Reset();
     ResetCommon();
     ResetCommonPart();
+    ResetTyped();
 
     m_visibility = Visible;
 }
@@ -578,7 +582,7 @@ int EditorialElement::CastOffSystems(FunctorParams *functorParams)
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->m_parent));
+    assert(dynamic_cast<System *>(this->GetParent()));
 
     // Special case where we use the Relinquish method.
     // We want to move the measure to the currentSystem. However, we cannot use DetachChild

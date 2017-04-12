@@ -76,6 +76,28 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// AdjustAccidXParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the Functor to be redirected to MeasureAligner and GraceAligner
+ * member 1: the Doc
+ **/
+
+class AdjustAccidXParams : public FunctorParams {
+public:
+    AdjustAccidXParams(Doc *doc, Functor *functor)
+    {
+        m_currentMeasure = NULL;
+        m_functor = functor;
+        m_doc = doc;
+    }
+    Measure *m_currentMeasure;
+    Functor *m_functor;
+    Doc *m_doc;
+};
+
+//----------------------------------------------------------------------------
 // AdjustArticParams
 //----------------------------------------------------------------------------
 
@@ -390,6 +412,44 @@ public:
     }
     StaffAlignment *m_previous;
     Functor *m_functor;
+};
+
+//----------------------------------------------------------------------------
+// CalcStemParams
+//----------------------------------------------------------------------------
+
+/**
+ * member 0: the additional length for a chord stem (between the top and bottom note)
+ * member 1: the vertical center of the staff
+ * member 2: the actual duration of the chord / note
+ * member 3: the flag for grace notes (stem is not extended)
+ * member 4: the current staff (to avoid additional lookup)
+ * member 5: the current layer (ditto)
+ * member 6: the chord or note to which the stem belongs
+ * member 7: the doc
+ **/
+
+class CalcStemParams : public FunctorParams {
+public:
+    CalcStemParams(Doc *doc)
+    {
+        m_chordStemLength = 0;
+        m_verticalCenter = 0;
+        m_dur = DUR_1;
+        m_isGraceNote = false;
+        m_staff = NULL;
+        m_layer = NULL;
+        m_interface = NULL;
+        m_doc = doc;
+    }
+    int m_chordStemLength;
+    int m_verticalCenter;
+    int m_dur;
+    bool m_isGraceNote;
+    Staff *m_staff;
+    Layer *m_layer;
+    StemmedDrawingInterface *m_interface;
+    Doc *m_doc;
 };
 
 //----------------------------------------------------------------------------
@@ -768,8 +828,15 @@ public:
 
 class PrepareCrossStaffParams : public FunctorParams {
 public:
-    PrepareCrossStaffParams() { m_currentMeasure = NULL; }
+    PrepareCrossStaffParams()
+    {
+        m_currentMeasure = NULL;
+        m_currentCrossStaff = NULL;
+        m_currentCrossLayer = NULL;
+    }
     Measure *m_currentMeasure;
+    Staff *m_currentCrossStaff;
+    Layer *m_currentCrossLayer;
 };
 
 //----------------------------------------------------------------------------

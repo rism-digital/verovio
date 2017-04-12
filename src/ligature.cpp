@@ -25,24 +25,14 @@ namespace vrv {
 //----------------------------------------------------------------------------
 
 Ligature::Ligature()
-    : LayerElement("ligature-")
-    , ObjectListInterface()
-    , StemmedDrawingInterface()
-    , DurationInterface()
-    , AttCommon()
-    , AttStems()
-    , AttStemsCmn()
-    , AttTiepresent()
+    : LayerElement("ligature-"), ObjectListInterface(), DurationInterface(), AttStems(), AttStemsCmn(), AttTiepresent()
 {
     RegisterInterface(DurationInterface::GetAttClasses(), DurationInterface::IsInterface());
-    RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_STEMS);
     RegisterAttClass(ATT_STEMSCMN);
     RegisterAttClass(ATT_TIEPRESENT);
 
     Reset();
-
-    m_drawingStemDir = STEMDIRECTION_NONE;
 }
 
 Ligature::~Ligature()
@@ -53,9 +43,7 @@ Ligature::~Ligature()
 void Ligature::Reset()
 {
     LayerElement::Reset();
-    StemmedDrawingInterface::Reset();
     DurationInterface::Reset();
-    ResetCommon();
     ResetStems();
     ResetStemsCmn();
     ResetTiepresent();
@@ -86,14 +74,6 @@ void Ligature::AddChild(Object *child)
     Modify();
 }
 
-bool compare_pitchL(Object *first, Object *second)
-{
-    Note *n1 = dynamic_cast<Note *>(first);
-    Note *n2 = dynamic_cast<Note *>(second);
-    assert(n1 && n2);
-    return (n1->GetDiatonicPitch() < n2->GetDiatonicPitch());
-}
-
 void Ligature::FilterList(ListOfObjects *childList)
 {
     // Retain only note children of ligatures
@@ -122,8 +102,6 @@ void Ligature::FilterList(ListOfObjects *childList)
             }
         }
     }
-
-    childList->sort(compare_pitchL);
 
     iter = childList->begin();
 
@@ -159,39 +137,6 @@ int Ligature::PositionInLigature(Note *note)
     if ((size % 2) && (position == (size - 1) / 2)) return 0;
     if (position < (size / 2)) return -1;
     return 1;
-}
-
-void Ligature::SetDrawingStemDir(data_STEMDIRECTION stemDir)
-{
-    m_drawingStemDir = stemDir;
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = dynamic_cast<Note *>(*it);
-        if (!note) continue;
-        note->SetDrawingStemDir(stemDir);
-    }
-}
-
-void Ligature::SetDrawingStemStart(Point stemStart)
-{
-    m_drawingStemStart = stemStart;
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = dynamic_cast<Note *>(*it);
-        if (!note) continue;
-        note->SetDrawingStemStart(stemStart);
-    }
-}
-
-void Ligature::SetDrawingStemEnd(Point stemEnd)
-{
-    m_drawingStemEnd = stemEnd;
-    ListOfObjects *childList = this->GetList(this); // make sure it's initialized
-    for (ListOfObjects::iterator it = childList->begin(); it != childList->end(); it++) {
-        Note *note = dynamic_cast<Note *>(*it);
-        if (!note) continue;
-        note->SetDrawingStemEnd(stemEnd);
-    }
 }
 
 //----------------------------------------------------------------------------

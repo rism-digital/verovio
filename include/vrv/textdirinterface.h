@@ -22,7 +22,7 @@ namespace vrv {
  * as <dir>, <tempo>, or <dynam>
  * It is not an abstract class but should not be instanciated directly.
  */
-class TextDirInterface : public Interface, public AttCommon, public AttPlacement {
+class TextDirInterface : public Interface, public AttPlacement {
 public:
     /**
      * @name Constructors, destructors, reset methods

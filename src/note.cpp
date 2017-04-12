@@ -15,9 +15,15 @@
 
 #include "artic.h"
 #include "attcomparison.h"
+#include "doc.h"
 #include "editorial.h"
+#include "elementpart.h"
 #include "functorparams.h"
+#include "glyph.h"
+#include "layer.h"
 #include "slur.h"
+#include "smufl.h"
+#include "staff.h"
 #include "syl.h"
 #include "tie.h"
 #include "verse.h"
@@ -88,7 +94,6 @@ void Note::Reset()
     // tie pointers
     ResetDrawingTieAttr();
 
-    m_drawingStemDir = STEMDIRECTION_NONE;
     d_stemLen = 0;
     m_clusterPosition = 0;
     m_cluster = NULL;
@@ -117,6 +122,9 @@ void Note::AddChild(Object *child)
     else if (child->Is(ARTIC)) {
         assert(dynamic_cast<Artic *>(child));
     }
+    else if (child->Is(STEM)) {
+        assert(dynamic_cast<Stem *>(child));
+    }
     else if (child->Is(SYL)) {
         assert(dynamic_cast<Syl *>(child));
     }
@@ -132,7 +140,12 @@ void Note::AddChild(Object *child)
     }
 
     child->SetParent(this);
-    m_children.push_back(child);
+    // Stem are always added by PrepareLayerElementParts (for now) and we want them to be in the front
+    // for the drawing order in the SVG output
+    if (child->Is(STEM))
+        m_children.insert(m_children.begin(), child);
+    else
+        m_children.push_back(child);
     Modify();
 }
 
@@ -155,7 +168,6 @@ void Note::ResetDrawingTieAttr()
 Accid *Note::GetDrawingAccid()
 {
     Accid *accid = dynamic_cast<Accid *>(this->FindChildByType(ACCID));
-    if (accid) accid->m_drawingCueSize = this->IsCueSize();
     return accid;
 }
 
@@ -185,9 +197,180 @@ bool Note::IsClusterExtreme() const
         return false;
 }
 
+Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
+{
+    int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
+    if (graceSize) defaultYShift = doc->GetGraceSize(defaultYShift);
+    // x default is always set to 0 because it is unused for now
+    Point p(0, defaultYShift);
+
+    // Here we should get the notehead value
+    wchar_t code = SMUFL_E0A4_noteheadBlack;
+
+    // Use the default for standard quarter and half note heads
+    if ((code == SMUFL_E0A3_noteheadHalf) || (code == SMUFL_E0A4_noteheadBlack)) {
+        return p;
+    }
+
+    Glyph *glyph = Resources::GetGlyph(code);
+    assert(glyph);
+
+    if (glyph->HasAnchor(SMUFL_stemUpSE)) {
+        const Point *anchor = glyph->GetAnchor(SMUFL_stemUpSE);
+        assert(anchor);
+        p = doc->ConvertFontPoint(glyph, *anchor, staffSize, graceSize);
+    }
+
+    return p;
+}
+
+Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
+{
+    int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
+    if (graceSize) defaultYShift = doc->GetGraceSize(defaultYShift);
+    // x default is always set to 0 because it is unused for now
+    Point p(0, -defaultYShift);
+
+    // Here we should get the notehead value
+    wchar_t code = SMUFL_E0A4_noteheadBlack;
+
+    // Use the default for standard quarter and half note heads
+    if ((code == SMUFL_E0A3_noteheadHalf) || (code == SMUFL_E0A4_noteheadBlack)) {
+        return p;
+    }
+
+    Glyph *glyph = Resources::GetGlyph(code);
+    assert(glyph);
+
+    if (glyph->HasAnchor(SMUFL_stemDownNW)) {
+        const Point *anchor = glyph->GetAnchor(SMUFL_stemDownNW);
+        assert(anchor);
+        p = doc->ConvertFontPoint(glyph, *anchor, staffSize, graceSize);
+    }
+
+    return p;
+}
+
 //----------------------------------------------------------------------------
 // Functors methods
 //----------------------------------------------------------------------------
+
+int Note::CalcStem(FunctorParams *functorParams)
+{
+    CalcStemParams *params = dynamic_cast<CalcStemParams *>(functorParams);
+    assert(params);
+
+    // Stems have been calculated previously in Beam or FTrem - siblings becasue flags do not need to
+    // be processed either
+    if (this->IsInBeam() || this->IsInFTrem()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
+    // We currently have no stem object with mensural notes
+    if (this->IsMensural()) {
+        return FUNCTOR_SIBLINGS;
+    }
+    
+    if (this->IsChordTone()) {
+        assert(params->m_interface);
+        return FUNCTOR_CONTINUE;
+    }
+
+    // This now need should be NULL and the chord stem length will be 0
+    params->m_interface = NULL;
+    params->m_chordStemLength = 0;
+
+    // No stem
+    if (this->GetActualDur() < DUR_2) {
+        // Duration is longer than halfnote, there should be no stem
+        assert(!this->GetDrawingStem());
+        return FUNCTOR_SIBLINGS;
+    }
+
+    Stem *stem = this->GetDrawingStem();
+    assert(stem);
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    assert(layer);
+
+    if (this->m_crossStaff) staff = this->m_crossStaff;
+
+    // Cache the in params to avoid further lookup
+    params->m_staff = staff;
+    params->m_layer = layer;
+    params->m_interface = this;
+    params->m_dur = this->GetActualDur();
+    params->m_isGraceNote = this->IsGraceNote();
+
+    int staffSize = staff->m_drawingStaffSize;
+    int staffY = staff->GetDrawingY();
+
+    params->m_verticalCenter = staffY - params->m_doc->GetDrawingDoubleUnit(staffSize) * 2;
+
+    /************ Set the direction ************/
+
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+
+    if (stem->HasStemDir()) {
+        stemDir = stem->GetStemDir();
+    }
+    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+        stemDir = layer->GetDrawingStemDir();
+    }
+    else {
+        stemDir = (this->GetDrawingY() >= params->m_verticalCenter) ? STEMDIRECTION_down : STEMDIRECTION_up;
+    }
+
+    this->SetDrawingStemDir(stemDir);
+
+    // Make sure the relative position of the stem is the same
+    stem->SetDrawingYRel(0);
+
+    return FUNCTOR_CONTINUE;
+}
+
+int Note::PrepareLayerElementParts(FunctorParams *functorParams)
+{
+    Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM));
+    Flag *currentFlag = NULL;
+    if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG));
+
+    if ((this->GetActualDur() > DUR_1) && !this->IsChordTone() && !this->IsMensural()) {
+        if (!currentStem) {
+            currentStem = new Stem();
+            this->AddChild(currentStem);
+        }
+        currentStem->AttStems::operator=(*this);
+        currentStem->AttStemsCmn::operator=(*this);
+    }
+    // This will happen only if the duration has changed
+    else if (currentStem) {
+        if (this->DeleteChild(currentStem)) {
+            currentStem = NULL;
+            // The currentFlag (if any) will have been deleted above
+            currentFlag = NULL;
+        }
+    }
+
+    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsChordTone() && !this->IsMensural()) {
+        // We should have a stem at this stage
+        assert(currentStem);
+        if (!currentFlag) {
+            currentFlag = new Flag();
+            currentStem->AddChild(currentFlag);
+        }
+    }
+    // This will happen only if the duration has changed (no flag required anymore)
+    else if (currentFlag) {
+        assert(currentStem);
+        if (currentStem->DeleteChild(currentFlag)) currentFlag = NULL;
+    }
+
+    if (!this->IsChordTone()) SetDrawingStem(currentStem);
+
+    return FUNCTOR_CONTINUE;
+};
 
 int Note::PrepareTieAttr(FunctorParams *functorParams)
 {
@@ -235,6 +418,7 @@ int Note::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
     if (this->m_drawingTieAttr) {
         return this->m_drawingTieAttr->FillStaffCurrentTimeSpanning(functorParams);
     }
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -261,7 +445,11 @@ int Note::PreparePointersByLayer(FunctorParams *functorParams)
 
 int Note::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
     this->ResetDrawingTieAttr();
+
     return FUNCTOR_CONTINUE;
 };
 

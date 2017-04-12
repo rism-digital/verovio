@@ -22,13 +22,19 @@ namespace vrv {
 // SystemElement
 //----------------------------------------------------------------------------
 
-SystemElement::SystemElement() : FloatingObject("se")
+SystemElement::SystemElement() : FloatingObject("se"), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+
     Reset();
 }
 
-SystemElement::SystemElement(std::string classid) : FloatingObject(classid)
+SystemElement::SystemElement(std::string classid) : FloatingObject(classid), AttCommon(), AttTyped()
 {
+    RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
+
     Reset();
 }
 
@@ -39,6 +45,8 @@ SystemElement::~SystemElement()
 void SystemElement::Reset()
 {
     FloatingObject::Reset();
+    ResetCommon();
+    ResetTyped();
 }
 
 //----------------------------------------------------------------------------
@@ -61,7 +69,7 @@ int SystemElement::CastOffSystems(FunctorParams *functorParams)
     assert(params);
 
     // Since the functor returns FUNCTOR_SIBLINGS we should never go lower than the system children
-    assert(dynamic_cast<System *>(this->m_parent));
+    assert(dynamic_cast<System *>(this->GetParent()));
 
     // Special case where we use the Relinquish method.
     SystemElement *element = dynamic_cast<SystemElement *>(params->m_contentSystem->Relinquish(this->GetIdx()));

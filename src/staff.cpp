@@ -34,9 +34,10 @@ namespace vrv {
 // Staff
 //----------------------------------------------------------------------------
 
-Staff::Staff(int n) : Object("staff-"), AttCommon()
+Staff::Staff(int n) : Object("staff-"), AttCommon(), AttTyped()
 {
     RegisterAttClass(ATT_COMMON);
+    RegisterAttClass(ATT_TYPED);
 
     Reset();
     SetN(n);
@@ -50,6 +51,7 @@ void Staff::Reset()
 {
     Object::Reset();
     ResetCommon();
+    ResetTyped();
 
     m_drawingStaffSize = 100;
     m_drawingLines = 5;
@@ -88,10 +90,13 @@ int Staff::GetDrawingY() const
 {
     if (!m_staffAlignment) return 0;
 
+    if (m_cachedDrawingY != VRV_UNSET) return m_cachedDrawingY;
+
     System *system = dynamic_cast<System *>(this->GetFirstParent(SYSTEM));
     assert(system);
 
-    return (system->GetDrawingY() + m_staffAlignment->GetYRel());
+    m_cachedDrawingY = system->GetDrawingY() + m_staffAlignment->GetYRel();
+    return m_cachedDrawingY;
 }
 
 int Staff::CalcPitchPosYRel(Doc *doc, int loc)

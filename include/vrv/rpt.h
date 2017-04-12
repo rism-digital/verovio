@@ -10,6 +10,7 @@
 
 #include "atts_cmn.h"
 #include "atts_shared.h"
+#include "beam.h"
 #include "layerelement.h"
 
 namespace vrv {
@@ -58,7 +59,7 @@ private:
 /**
  * This class models the MEI <bTrem>
  */
-class BTrem : public LayerElement {
+class BTrem : public LayerElement, public AttTremmeasured {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -92,7 +93,7 @@ private:
 /**
  * This class models the MEI <fTrem>
  */
-class FTrem : public LayerElement, public ObjectListInterface, public AttSlashcount {
+class FTrem : public LayerElement, public ObjectListInterface, public AttSlashcount, public AttTremmeasured  {
 public:
     /**
      * @name Constructors, destructors, reset and class name methods
@@ -112,6 +113,31 @@ public:
      */
     virtual void AddChild(Object *object);
 
+    /**
+     * Initializes the m_beamElementCoords vector objects.
+     * This is called by FTrem::FilterList
+     */
+    void InitCoords(ListOfObjects *childList);
+
+    /**
+     * Clear the m_beamElementCoords vector and delete all the objects.
+     */
+    void ClearCoords();
+
+    /**
+     *
+     */
+    const ArrayOfBeamElementCoords *GetElementCoords() const { return &m_beamElementCoords; }
+
+    //----------//
+    // Functors //
+    //----------//
+
+    /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *functorParams);
+
 private:
     //
 protected:
@@ -121,8 +147,14 @@ protected:
     virtual void FilterList(ListOfObjects *childList);
 
 public:
-    //
+    /** */
+    BeamDrawingParams m_drawingParams;
+
 private:
+    /**
+     * An array of coordinates for each element
+     **/
+    mutable ArrayOfBeamElementCoords m_beamElementCoords;
 };
 
 //----------------------------------------------------------------------------

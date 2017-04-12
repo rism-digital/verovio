@@ -142,6 +142,9 @@ public:
     virtual int GetDrawingY() const;
     ///@}
 
+    virtual void ResetCachedDrawingX() const;
+    virtual void ResetCachedDrawingY() const;
+
     void SetObjectXY(Object *objectX, Object *objectY);
 
     FloatingObject *GetObject() const { return m_object; }

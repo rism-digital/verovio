@@ -30,7 +30,7 @@ class TimestampAttr;
  * It contains Layer objects.
  * For internally simplication of processing, unmeasured music is contained in one single measure object
  */
-class Measure : public Object, public AttCommon, public AttMeasureLog, public AttPointing {
+class Measure : public Object, public AttCommon, public AttMeasureLog, public AttPointing, public AttTyped {
 
 public:
     /**
@@ -211,6 +211,11 @@ public:
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
 
     /**
+     * See Object::AjustAccidX
+     */
+    virtual int AdjustAccidX(FunctorParams *);
+
+    /**
      * See Object::AdjustGraceXPos
      */
     virtual int AdjustGraceXPos(FunctorParams *functorParams);
@@ -304,11 +309,6 @@ public:
      * This is the top left position of the measure.
      */
     int m_xAbs;
-    /**
-     * The X relative position of the measure.
-     * It is used internally when calculating the layout and it is not stored in the file.
-     */
-    int m_drawingXRel;
 
     /**
      * The measure aligner that holds the x positions of the content of the measure
@@ -316,6 +316,13 @@ public:
     MeasureAligner m_measureAligner;
 
     TimestampAligner m_timestampAligner;
+
+protected:
+    /**
+     * The X relative position of the measure.
+     * It is used internally when calculating the layout and it is not stored in the file.
+     */
+    int m_drawingXRel;
 
 private:
     bool m_measuredMusic;

@@ -39,8 +39,8 @@ enum {
 };
 
 enum {
-    /*  text alignme */
-    LEFT = 0,
+    /*  text alignment */
+    LEFT = 1,
     RIGHT,
     CENTER
 };

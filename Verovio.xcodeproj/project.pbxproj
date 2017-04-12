@@ -259,6 +259,7 @@
 		4DDBBCC51C2EBAE7001AB50A /* view_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */; };
 		4DDBBCC61C2EBAE7001AB50A /* view_text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DDBBCC41C2EBAE7001AB50A /* view_text.cpp */; };
 		4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEE29091940BCC100C76319 /* atts_shared.cpp */; };
+		4DEEDE641E617C930087E8BC /* elementpart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DEEDE631E617C930087E8BC /* elementpart.cpp */; };
 		4DF289FD1A7545CC00BA9F7D /* timeinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 4DF289FC1A7545CC00BA9F7D /* timeinterface.h */; };
 		4DF289FF1A7545E500BA9F7D /* timeinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */; };
 		4DF28A001A7545E500BA9F7D /* timeinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */; };
@@ -588,6 +589,8 @@
 		4DEE290A1940BCC100C76319 /* atts_shared.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_shared.h; path = libmei/atts_shared.h; sourceTree = "<group>"; };
 		4DEE290B1940BCC100C76319 /* atts_tablature.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = atts_tablature.cpp; path = libmei/atts_tablature.cpp; sourceTree = "<group>"; };
 		4DEE290C1940BCC100C76319 /* atts_tablature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = atts_tablature.h; path = libmei/atts_tablature.h; sourceTree = "<group>"; };
+		4DEEDE621E617C880087E8BC /* elementpart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = elementpart.h; path = include/vrv/elementpart.h; sourceTree = "<group>"; };
+		4DEEDE631E617C930087E8BC /* elementpart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = elementpart.cpp; path = src/elementpart.cpp; sourceTree = "<group>"; };
 		4DF289FC1A7545CC00BA9F7D /* timeinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = timeinterface.h; path = include/vrv/timeinterface.h; sourceTree = "<group>"; };
 		4DF289FE1A7545E500BA9F7D /* timeinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = timeinterface.cpp; path = src/timeinterface.cpp; sourceTree = "<group>"; };
 		4DF28A021A754DE400BA9F7D /* controlelement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = controlelement.h; path = include/vrv/controlelement.h; sourceTree = "<group>"; };
@@ -1086,12 +1089,14 @@
 				4DC34BA019BC4A70006175CD /* custos.h */,
 				4DC34BA719BC4A83006175CD /* dot.cpp */,
 				4DC34BA119BC4A70006175CD /* dot.h */,
+				4DEEDE631E617C930087E8BC /* elementpart.cpp */,
+				4DEEDE621E617C880087E8BC /* elementpart.h */,
 				8F086EC5188539540037FD8E /* keysig.cpp */,
 				8F59291C18854BF800FE51AD /* keysig.h */,
 				8F086EC7188539540037FD8E /* layerelement.cpp */,
 				8F59291E18854BF800FE51AD /* layerelement.h */,
-				152886C11C9CA2E000B515BB /* ligature.h */,
 				152886C41C9CA86100B515BB /* ligature.cpp */,
+				152886C11C9CA2E000B515BB /* ligature.h */,
 				8F086ECA188539540037FD8E /* mensur.cpp */,
 				8F59292118854BF800FE51AD /* mensur.h */,
 				4D763EC51987D04D003FCAB5 /* metersig.cpp */,
@@ -1534,6 +1539,7 @@
 				4DA60EE61B6307B9006E2DFC /* textdirinterface.cpp in Sources */,
 				40ABF1FF1E5DF23B00F32F41 /* expansion.cpp in Sources */,
 				152886C51C9CA86100B515BB /* ligature.cpp in Sources */,
+				4DEEDE641E617C930087E8BC /* elementpart.cpp in Sources */,
 				4D95D4F61D71866200B2B856 /* controlelement.cpp in Sources */,
 				4D983005192E959E00320037 /* main.cpp in Sources */,
 				4DEE291B1940BCC100C76319 /* atts_shared.cpp in Sources */,
@@ -1765,7 +1771,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
 					"$(inherited)",
 					NO_HUMDRUM_SUPPORT,
 				);

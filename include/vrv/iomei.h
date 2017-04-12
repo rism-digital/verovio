@@ -36,6 +36,7 @@ class BTrem;
 class Choice;
 class Chord;
 class Clef;
+class ControlElement;
 class Corr;
 class Custos;
 class Damage;
@@ -79,6 +80,7 @@ class Rest;
 class Restore;
 class Score;
 class ScoreDef;
+class ScoreDefElement;
 class ScoreDefInterface;
 class Sb;
 class Section;
@@ -89,6 +91,7 @@ class Staff;
 class Supplied;
 class Syl;
 class System;
+class SystemElement;
 class Tempo;
 class Text;
 class TextDirInterface;
@@ -278,8 +281,13 @@ private:
      * Call WriteDurationInferface from WriteNote, for example.
      */
     ///@{
-    void WriteLayerElement(pugi::xml_node currentNode, LayerElement *element);
-    void WriteEditorialElement(pugi::xml_node currentNode, EditorialElement *element);
+    void WriteControlElement(pugi::xml_node element, ControlElement *object);
+    void WriteEditorialElement(pugi::xml_node element, EditorialElement *object);
+    void WriteLayerElement(pugi::xml_node element, LayerElement *object);
+    void WriteScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
+    void WriteSystemElement(pugi::xml_node element, SystemElement *object);
+    void WriteTextElement(pugi::xml_node element, TextElement *object);
+    //
     void WriteDurationInterface(pugi::xml_node currentNode, DurationInterface *interface);
     void WritePitchInterface(pugi::xml_node currentNode, PitchInterface *interface);
     void WritePositionInterface(pugi::xml_node currentNode, PositionInterface *interface);
@@ -492,8 +500,13 @@ private:
      * @name Methods for reading MEI LayerElement, EidtorialElement and interfaces
      */
     ///@{
-    bool ReadLayerElement(pugi::xml_node element, LayerElement *object);
+    bool ReadControlElement(pugi::xml_node element, ControlElement *object);
     bool ReadEditorialElement(pugi::xml_node element, EditorialElement *object);
+    bool ReadLayerElement(pugi::xml_node element, LayerElement *object);
+    bool ReadScoreDefElement(pugi::xml_node element, ScoreDefElement *object);
+    bool ReadSystemElement(pugi::xml_node element, SystemElement *object);
+    bool ReadTextElement(pugi::xml_node element, TextElement *object);
+
     bool ReadDurationInterface(pugi::xml_node element, DurationInterface *interface);
     bool ReadPitchInterface(pugi::xml_node element, PitchInterface *interface);
     bool ReadPositionInterface(pugi::xml_node element, PositionInterface *interface);

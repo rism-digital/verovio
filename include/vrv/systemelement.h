@@ -8,6 +8,7 @@
 #ifndef __VRV_SYSTEM_ELEMENT_H__
 #define __VRV_SYSTEM_ELEMENT_H__
 
+#include "atts_shared.h"
 #include "devicecontextbase.h"
 #include "floatingobject.h"
 
@@ -21,7 +22,7 @@ namespace vrv {
  * This class represents elements appearing within a measure.
  * It is not an abstract class but should not be instanciated directly.
  */
-class SystemElement : public FloatingObject {
+class SystemElement : public FloatingObject, public AttCommon, public AttTyped {
 public:
     /**
      * @name Constructors, destructors, reset methods

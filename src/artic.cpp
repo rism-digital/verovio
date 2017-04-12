@@ -17,6 +17,7 @@
 #include "doc.h"
 #include "floatingobject.h"
 #include "functorparams.h"
+#include "layer.h"
 #include "smufl.h"
 #include "staff.h"
 #include "vrv.h"
@@ -87,39 +88,6 @@ void Artic::SplitArtic(std::vector<data_ARTICULATION> *insideSlur, std::vector<d
         else
             insideSlur->push_back(*iter);
     }
-}
-
-void Artic::UpdateOutsidePartPosition(int yAbove, int yBelow, data_STAFFREL place, bool allowAbove)
-{
-    ArticPart *outsidePart = GetOutsidePart();
-    if (!outsidePart) return;
-
-    // This is not great: in order to avoid m_drawingYRel to be overwritten by each call of DrawAccid we
-    // check the value here. Otherwise the adjusted value (See AdjustArtic and AdjustArticWithSlurs will be lost)
-    if (outsidePart->GetDrawingYRel() != 0) return;
-
-    if (place == STAFFREL_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_above;
-
-    outsidePart->SetPlace(place);
-    if (place == STAFFREL_above)
-        outsidePart->SetDrawingYRel(yAbove);
-    else
-        outsidePart->SetDrawingYRel(yBelow);
-}
-
-void Artic::UpdateInsidePartPosition(int yAbove, int yBelow, data_STAFFREL place)
-{
-    ArticPart *insidePart = GetInsidePart();
-    if (!insidePart) return;
-
-    // See comment in Artic::UpdateOutsidePartPosition
-    if (insidePart->GetDrawingYRel() != 0) return;
-
-    insidePart->SetPlace(place);
-    if (place == STAFFREL_above)
-        insidePart->SetDrawingYRel(yAbove);
-    else
-        insidePart->SetDrawingYRel(yBelow);
 }
 
 ArticPart *Artic::GetInsidePart()
@@ -296,15 +264,126 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     AdjustArticParams *params = dynamic_cast<AdjustArticParams *>(functorParams);
     assert(params);
 
+    /************** Get the parent and the stem direction **************/
+
+    LayerElement *parent = NULL;
+    Note *parentNote = NULL;
+    Chord *parentChord = dynamic_cast<Chord *>(this->GetFirstParent(CHORD));
+    data_STEMDIRECTION stemDir = STEMDIRECTION_NONE;
+    data_STAFFREL place = STAFFREL_NONE;
+    bool drawingCueSize = false;
+
+    if (!parentChord) {
+        parentNote = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        parent = parentNote;
+    }
+    else {
+        parent = parentChord;
+    }
+
+    if (!parentChord && !parentNote) {
+        // no parent chord or note, nothing we can do...
+        return FUNCTOR_CONTINUE;
+    }
+
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+    Layer *layer = dynamic_cast<Layer *>(this->GetFirstParent(LAYER));
+    assert(layer);
+
+    stemDir = parentNote ? parentNote->GetDrawingStemDir() : parentChord->GetDrawingStemDir();
+    drawingCueSize = parent->IsCueSize();
+
+    /************** placement **************/
+
+    bool allowAbove = true;
+
+    // for now we ignore within @place
+    if (this->HasPlace() && (this->GetPlace() != STAFFREL_within)) {
+        place = this->GetPlace();
+        // If we have a place indication do not allow to be changed to above
+        allowAbove = false;
+    }
+    else if (layer->GetDrawingStemDir() != STEMDIRECTION_NONE) {
+        place = (layer->GetDrawingStemDir() == STEMDIRECTION_up) ? STAFFREL_above : STAFFREL_below;
+        // If we have more than one layer do not allow to be changed to above
+        allowAbove = false;
+    }
+    else if (stemDir == STEMDIRECTION_up)
+        place = STAFFREL_below;
+    else
+        place = STAFFREL_above;
+
+    /************** set it to both the inside and outside part **************/
+
     ArticPart *insidePart = this->GetInsidePart();
     ArticPart *outsidePart = this->GetOutsidePart();
 
-    if (!outsidePart) return FUNCTOR_SIBLINGS;
-
     if (insidePart) {
+        insidePart->SetPlace(place);
+    }
 
-        Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
-        assert(staff);
+    if (outsidePart) {
+        // If allowAbove is true it will place the above if the content requires so (even if place below if given)
+        if (place == STAFFREL_below && allowAbove && outsidePart->AlwaysAbove()) place = STAFFREL_above;
+        outsidePart->SetPlace(place);
+    }
+
+    /************** calculate the y position **************/
+
+    Staff *staffAbove = NULL;
+    Staff *staffBelow = NULL;
+
+    // Cross-staff handling of articulation will need to be re-thought. We can look at assiging a cross-staff to the
+    // appropriate ArticPart
+    // (see below) - For chords, we need to distinguish cross-staff chords and cross-staff chord notes
+    if (parent->m_crossStaff && parent->m_crossLayer) {
+        staff = parent->m_crossStaff;
+        staffAbove = staff;
+        staffBelow = staff;
+    }
+    else if (parentChord) {
+        parentChord->GetCrossStaffExtremes(staffAbove, staffBelow);
+    }
+
+    int staffYBottom = -params->m_doc->GetDrawingStaffSize(staff->m_drawingStaffSize);
+    // Avoid in artic to be in legder lines
+    int yInAbove = std::max(
+        parent->GetDrawingTop(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), staffYBottom);
+    int yInBelow
+        = std::min(parent->GetDrawingBottom(params->m_doc, staff->m_drawingStaffSize, false) - staff->GetDrawingY(), 0);
+    int yOutAbove = std::max(yInAbove, 0);
+    int yOutBelow = std::min(yInBelow, staffYBottom);
+
+    // Does not work properly with chords, needs rethinking - It might be better to make artic or articPart relative to
+    // notes
+    // The problem is that in MEI artic are children of chord element and not of the notes
+    if (insidePart) {
+        if (insidePart->GetPlace() == STAFFREL_above) {
+            insidePart->SetDrawingYRel(yInAbove);
+            insidePart->m_crossStaff = staffAbove;
+        }
+        else {
+            insidePart->SetDrawingYRel(yInBelow);
+            insidePart->m_crossStaff = staffBelow;
+        }
+    }
+
+    if (outsidePart) {
+        if (outsidePart->GetPlace() == STAFFREL_above) {
+            outsidePart->SetDrawingYRel(yOutAbove);
+            outsidePart->m_crossStaff = staffAbove;
+        }
+        else {
+            outsidePart->SetDrawingYRel(yOutBelow);
+            outsidePart->m_crossStaff = staffBelow;
+        }
+    }
+
+    // If we have both an inside and outside part we need to move the outside part away when they are both on the same
+    // side
+    if (insidePart && outsidePart) {
+
         int margin = params->m_doc->GetTopMargin(insidePart->GetClassId())
             * params->m_doc->GetDrawingUnit(staff->m_drawingStaffSize) / PARAM_DENOMINATOR;
 
@@ -327,7 +406,7 @@ int Artic::AdjustArtic(FunctorParams *functorParams)
     return FUNCTOR_SIBLINGS;
 }
 
-int Artic::PrepareArtic(FunctorParams *functorParams)
+int Artic::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     std::vector<data_ARTICULATION> insideSlur;
     std::vector<data_ARTICULATION> outsideSlur;
@@ -350,6 +429,9 @@ int Artic::PrepareArtic(FunctorParams *functorParams)
 
 int Artic::ResetDrawing(FunctorParams *functorParams)
 {
+    // Call parent one too
+    LayerElement::ResetDrawing(functorParams);
+
     // Remove all ArticPart children
     ClearChildren();
 

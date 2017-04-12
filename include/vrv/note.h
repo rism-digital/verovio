@@ -8,6 +8,10 @@
 #ifndef __VRV_NOTE_H__
 #define __VRV_NOTE_H__
 
+#include <assert.h>
+
+//----------------------------------------------------------------------------
+
 #include "accid.h"
 #include "atts_mensural.h"
 #include "atts_shared.h"
@@ -101,9 +105,28 @@ public:
      */
     int GetDiatonicPitch() const { return this->GetPname() + (int)this->GetOct() * 7; }
 
+    /**
+     * Get the stem up / stem down attachment point.
+     * If necessary look at the glyph anchor (if any).
+     */
+    ///@{
+    virtual Point GetStemUpSE(Doc *doc, int staffSize, bool graceSize);
+    virtual Point GetStemDownNW(Doc *doc, int staffSize, bool graceSize);
+    ///@}
+
     //----------//
     // Functors //
     //----------//
+
+    /**
+     * See Object::CalcStem
+     */
+    virtual int CalcStem(FunctorParams *functorParams);
+
+    /**
+    * See Object::PrepareLayerElementParts
+    */
+    virtual int PrepareLayerElementParts(FunctorParams *functorParams);
 
     /**
      * See Object::PrepareTieAttr
@@ -150,6 +173,29 @@ private:
      * The note with the initial attribute owns the Tie object and takes care of deleting it
      */
     Tie *m_drawingTieAttr;
+};
+
+//----------------------------------------------------------------------------
+// DiatonicSort
+//----------------------------------------------------------------------------
+
+/**
+ * Unary predicate for comparing object types.
+ * This is used for example in std::find_if.
+ * See Object::GetFirst or Object::GetNext
+ */
+class DiatonicSort {
+
+public:
+    DiatonicSort() {}
+
+    bool operator()(const Object *first, const Object *second) const
+    {
+        const Note *n1 = dynamic_cast<const Note *>(first);
+        const Note *n2 = dynamic_cast<const Note *>(second);
+        assert(n1 && n2);
+        return (n1->GetDiatonicPitch() < n2->GetDiatonicPitch());
+    }
 };
 
 } // namespace vrv

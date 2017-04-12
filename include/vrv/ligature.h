@@ -28,9 +28,7 @@ namespace vrv {
 
 class Ligature : public LayerElement,
                  public ObjectListInterface,
-                 public StemmedDrawingInterface,
                  public DurationInterface,
-                 public AttCommon,
                  public AttStems,
                  public AttStemsCmn,
                  public AttTiepresent {
@@ -60,32 +58,11 @@ public:
     virtual void FilterList(ListOfObjects *childlist);
 
     /**
-     * Returns list of notes that have accidentals
-     */
-    void ResetAccidList();
-
-    /**
      * Return information about the note's position in the ligature ??
      */
     ///@{
     /** Return 0 if the note is the middle note, -1 if below it and 1 if above */
     int PositionInLigature(Note *note);
-    ///@}
-
-    /**
-     * Prepares a 2D grid of booleans to track where accidentals are placed. ??
-     * Further documentation is in chord.cpp comments. ??
-     */
-    void ResetAccidSpace(int fullUnit);
-
-    /**
-     * @name Set and get the stem direction and stem positions
-     * The methods are overriding the interface because we want to apply it to child notes
-     */
-    ///@{
-    virtual void SetDrawingStemDir(data_STEMDIRECTION stemDir);
-    virtual void SetDrawingStemStart(Point stemStart);
-    virtual void SetDrawingStemEnd(Point stemEnd);
     ///@}
 
     //----------//
