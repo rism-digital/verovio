@@ -286,7 +286,9 @@ void BeamDrawingParams::CalcBeam(
             }
 
             Stem *stem = interface->GetDrawingStem();
-            assert(stem);
+            // This is the case with fTrem on whole notes
+            if (!stem) continue;
+
             stem->SetDrawingStemDir(this->m_stemDir);
             // Since the value were calculated relatively to the element position, adjust them
             stem->SetDrawingXRel((*beamElementCoords).at(i)->m_x - el->GetDrawingX());

@@ -305,7 +305,8 @@ int Chord::CalcStem(FunctorParams *functorParams)
 
     // No stem
     if (this->GetActualDur() < DUR_2) {
-        //LogDebug("Duration is longer than halfnote, there should be no stem");
+        // Duration is longer than halfnote, there should be no stem
+        assert(!this->GetDrawingStem());
         return FUNCTOR_SIBLINGS;
     }
 
