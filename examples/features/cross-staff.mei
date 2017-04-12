@@ -28,7 +28,7 @@
                         </staffGrp>
                     </scoreDef>
                     <section>
-                        <measure n="1">
+                        <measure n="1" label="feature-example">
                             <staff n="1">
                                 <layer n="1">
                                     <chord dur="4" stem.dir="up">

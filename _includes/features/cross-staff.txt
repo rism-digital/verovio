@@ -1,12 +1,35 @@
-<beam>
-  <chord dur="16">
-    <note dur="16" oct="4" pname="f"/>
-    <note dur="16" oct="5" pname="c"/>
-  </chord>
-  <note dur="16" oct="3" pname="c" staff="2"/>
-  <note dur="16" oct="3" pname="a" staff="2"/>
-  <chord dur="16">
-    <note dur="16" oct="4" pname="e"/>
-    <note dur="16" oct="5" pname="c"/>
-  </chord>
-</beam>
+<measure n="1">
+  <staff n="1">
+    <layer n="1">
+      <chord dur="4" stem.dir="up">
+        <note oct="3" pname="d" staff="2"/>
+        <note oct="4" pname="c" staff="2"/>
+        <note oct="4" pname="d"/>
+        <note oct="4" pname="a"/>
+      </chord>
+      <chord dur="4" stem.dir="up" staff="2">
+        <note oct="3" pname="d"/>
+        <note oct="4" pname="c"/>
+        <note oct="4" pname="d"/>
+        <note oct="4" pname="a"/>
+      </chord>
+    </layer>
+  </staff>
+  <staff n="2">
+    <layer n="1">
+      <space dur="2"/>
+      <chord dur="4" stem.dir="up">
+        <note oct="3" pname="d"/>
+        <note oct="4" pname="c"/>
+        <note oct="4" pname="d" staff="1"/>
+        <note oct="4" pname="a" staff="1"/>
+      </chord>
+      <chord dur="4" stem.dir="up" staff="1">
+        <note oct="3" pname="d"/>
+        <note oct="4" pname="c"/>
+        <note oct="4" pname="d"/>
+        <note oct="4" pname="a"/>
+      </chord>
+    </layer>
+  </staff>
+</measure>

@@ -55,8 +55,8 @@
                                         <note pname="f" oct="4"/>
                                     </chord>
                                     <rest dur="4"/>
-                                    <bTrem>
-                                        <chord dur="2" stem.mod="3slash">
+                                    <bTrem measperf="16">
+                                        <chord dur="2">
                                             <note pname="f" oct="4"/>
                                             <note pname="a" oct="4"/>
                                         </chord>
