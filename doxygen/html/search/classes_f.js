@@ -8,6 +8,7 @@ var searchData=
   ['point',['Point',['../classvrv_1_1_point.html',1,'vrv']]],
   ['positioninterface',['PositionInterface',['../classvrv_1_1_position_interface.html',1,'vrv']]],
   ['prepareboundariesparams',['PrepareBoundariesParams',['../classvrv_1_1_prepare_boundaries_params.html',1,'vrv']]],
+  ['preparecrossstaffparams',['PrepareCrossStaffParams',['../classvrv_1_1_prepare_cross_staff_params.html',1,'vrv']]],
   ['preparefloatinggrpsparams',['PrepareFloatingGrpsParams',['../classvrv_1_1_prepare_floating_grps_params.html',1,'vrv']]],
   ['preparelyricsparams',['PrepareLyricsParams',['../classvrv_1_1_prepare_lyrics_params.html',1,'vrv']]],
   ['preparepointersbylayerparams',['PreparePointersByLayerParams',['../classvrv_1_1_prepare_pointers_by_layer_params.html',1,'vrv']]],

@@ -20,16 +20,17 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 ".html",
-"classvrv_1_1_b_box_device_context.html#a81a65990133af8c54468edb54f20f43b",
-"classvrv_1_1_clef.html#ac656e02b8e73887754669744b69647ed",
-"classvrv_1_1_ending.html",
-"classvrv_1_1_humdrum_input.html#a62445e9c421ab41da179794984bd7012",
-"classvrv_1_1_measure.html#a1316c3bad7998ca546beaa7aab282791",
-"classvrv_1_1_object.html#a96d9c4551b064ee187a3545f0350df30",
-"classvrv_1_1_rest.html#ac2e0729ba072ce8f71db15dae59f839c",
-"classvrv_1_1_staff_grp.html#aa5cb41c0c9cbfda06ec1512ad4c09581",
-"classvrv_1_1_time_point_interface.html#a28c0d2e97af7e3b9a28898175dff2867",
-"classvrv_1_1_view.html#aafac411031b669991917681ad56660b2"
+"classvrv_1_1_att.html#ac54c2bc1ed18f89ffdca0c6203d09f0c",
+"classvrv_1_1_calc_stem_params.html#a34687d23c98f5d4fa46fbeedfb5a9f50",
+"classvrv_1_1_doc.html#a991351c9ef13a9d6c3d957aee2d84292",
+"classvrv_1_1_font_info.html#a223dcbf61b65804454d8debc2fd5c209",
+"classvrv_1_1_justify_x_params.html",
+"classvrv_1_1_measure_aligner.html#aa46abc4ed23893053af6638052db07a4",
+"classvrv_1_1_object.html#ad507cfd401ea330cca65a4891b90da80",
+"classvrv_1_1_score_def.html#a24599b07e4ea1e57697cf91c71e273c7",
+"classvrv_1_1_style.html#a1d4c19d7d49dd03a53cde51d2cb77a80",
+"classvrv_1_1_time_spanning_interface.html#a2c3289cd6592a1ea9280b21e41382576",
+"classvrv_1_1_view.html#ab49c1d2616ee599ba55a638e42295810"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

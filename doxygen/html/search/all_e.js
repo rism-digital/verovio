@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['object',['Object',['../classvrv_1_1_object.html',1,'vrv']]],
-  ['object',['Object',['../classvrv_1_1_object.html#a8be4ecf7908559751e728551718a8bfc',1,'vrv::Object']]],
+  ['object',['Object',['../classvrv_1_1_object.html',1,'vrv::Object'],['../classvrv_1_1_object.html#a8be4ecf7908559751e728551718a8bfc',1,'vrv::Object::Object()']]],
   ['objectcomparison',['ObjectComparison',['../classvrv_1_1_object_comparison.html',1,'vrv']]],
   ['objectlistinterface',['ObjectListInterface',['../classvrv_1_1_object_list_interface.html',1,'vrv']]],
   ['octave',['Octave',['../classvrv_1_1_octave.html',1,'vrv']]],
