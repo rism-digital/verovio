@@ -47,7 +47,7 @@ public:
     ///@}
 
     /**
-     *
+     * Delete all the legder line arrays.
      */
     void ClearLedgerLines();
 
@@ -82,7 +82,7 @@ public:
     StaffAlignment *GetAlignment() const { return m_staffAlignment; }
 
     /**
-     *
+     * Return the ledger line arrays (NULL if none)
      */
     ///@{
     ArrayOfLedgerLines *GetLedgerLinesAbove() { return m_ledgerLinesAbove; }
@@ -92,7 +92,8 @@ public:
     ///@}
 
     /**
-     *
+     * Add the ledger lines above or below.
+     * If necessary creates the ledger line array.
      */
     ///@{
     void AddLegerLineAbove(int count, short left, short right, bool cueSize);
@@ -135,7 +136,7 @@ public:
 
 private:
     /**
-     *
+     * Add the ledger line dashes to the legderline array.
      */
     void AddLegerLines(ArrayOfLedgerLines *lines, int count, short left, short right);
 
@@ -155,6 +156,9 @@ public:
      */
     int m_drawingStaffSize;
 
+    /**
+     * A vector of all the spanning elements overlapping with the previous measure
+     */
     std::vector<Object *> m_timeSpanningElements;
 
     /**
@@ -203,6 +207,10 @@ public:
     virtual void Reset();
     ///@}
 
+    /**
+     * Add a dash to the ledger line object.
+     * If necessary merges overlapping dashes.
+     */
     void AddDash(short left, short right);
 
 protected:
@@ -210,12 +218,15 @@ protected:
 private:
     //
 public:
-    //
+    /**
+     * A list of dashes relative to the staff position.
+     */
+    std::list<std::pair<short, short> > m_dashes;
+
 protected:
     //
-public:
-    /** A list of dashes */
-    std::list<std::pair<short, short> > m_dashes;
+private:
+    //
 };
 
 } // namespace vrv
