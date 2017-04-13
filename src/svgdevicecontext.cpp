@@ -237,6 +237,21 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     // GetColour(currentPen.GetColour()).c_str(), currentPen.GetOpacity(), GetColour(currentBrush.GetColour()).c_str(),
     // currentBrush.GetOpacity()).c_str();
 }
+    
+void SvgDeviceContext::StartCustomGraphic(std::string name, std::string gClass, std::string gId)
+{
+    if (gClass.length() > 0) {
+        name.append(" " + gClass);
+    }
+    
+    m_currentNode = m_currentNode.append_child("g");
+    m_svgNodeStack.push_back(m_currentNode);
+    m_currentNode.append_attribute("class") = name.c_str();
+    if (gId.length() > 0) {
+        m_currentNode.append_attribute("id") = gId.c_str();
+    }
+}
+
 
 void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std::string gId)
 {
@@ -295,6 +310,13 @@ void SvgDeviceContext::EndGraphic(Object *object, View *view)
     m_currentNode = m_svgNodeStack.back();
 }
 
+    
+void SvgDeviceContext::EndCustomGraphic()
+{
+    m_svgNodeStack.pop_back();
+    m_currentNode = m_svgNodeStack.back();
+}
+    
 void SvgDeviceContext::EndResumedGraphic(Object *object, View *view)
 {
     DrawSvgBoundingBox(object, view);

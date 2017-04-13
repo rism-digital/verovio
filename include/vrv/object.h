@@ -561,6 +561,11 @@ public:
      * Set the drawing stems positions, including for beams.
      */
     virtual int CalcStem(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * Set the note head flipped positions
+     */
+    virtual int CalcChordNoteHeads(FunctorParams *) { return FUNCTOR_CONTINUE; }
 
     /**
      * Lay out the X positions of the grace notes looking at the bounding boxes.
@@ -620,6 +625,12 @@ public:
      * Calculate the overlap of the staff aligmnents by looking at the overflow bounding boxes
      */
     virtual int CalcStaffOverlap(FunctorParams *) { return FUNCTOR_CONTINUE; }
+    
+    /**
+     * Set the note head flipped positions and calc the ledger lines
+     */
+    virtual int CalcLedgerLines(FunctorParams *) { return FUNCTOR_CONTINUE; }
+
 
     /**
      * Correct the Y alignment once the content of a system has been aligned and laid out

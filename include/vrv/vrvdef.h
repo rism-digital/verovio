@@ -192,6 +192,7 @@ class BeamElementCoord;
 class BoundingBox;
 class FloatingPositioner;
 class LayerElement;
+class LedgerLine;
 class Note;
 class Object;
 class Point;
@@ -211,8 +212,6 @@ typedef std::vector<std::tuple<Alignment *, Alignment *, int> > ArrayOfAdjustmen
 
 typedef std::vector<BeamElementCoord *> ArrayOfBeamElementCoords;
 
-typedef std::map<Staff *, std::vector<char> > MapOfLedgerLineFlags;
-
 typedef std::vector<std::pair<LayerElement *, Point> > ArrayOfLayerElementPointPairs;
 
 typedef std::vector<std::pair<Object *, data_MEASUREBEAT> > ArrayOfObjectBeatPairs;
@@ -224,6 +223,8 @@ typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfSpannin
 typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 
 typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
+    
+typedef std::vector<LedgerLine> ArrayOfLedgerLines;
 
 //----------------------------------------------------------------------------
 // Global defines

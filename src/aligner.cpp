@@ -731,6 +731,23 @@ GraceAligner *Alignment::GetGraceAligner()
     }
     return m_graceAligner;
 }
+    
+AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, int staffN)
+{
+    ArrayOfObjects::iterator iter;
+    AlignmentReference *reference = NULL;
+    
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        reference = dynamic_cast<AlignmentReference *>(*iter);
+        if (reference->GetN() == staffN) {
+            return reference;
+        }
+        else if (staffN == VRV_UNSET) {
+            if ((*iter)->HasChild(element)) return reference;
+        }
+    }
+    return reference;
+}
 
 void Alignment::AddToAccidSpace(Accid *accid)
 {
@@ -738,20 +755,10 @@ void Alignment::AddToAccidSpace(Accid *accid)
 
     // Do not added them if no @accid (e.g., @accid.ges only)
     if (!accid->HasAccid()) return;
-
-    ArrayOfObjects::iterator iter;
-    AlignmentReference *reference = NULL;
-
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
-        if ((*iter)->HasChild(accid)) {
-            reference = dynamic_cast<AlignmentReference *>(*iter);
-            assert(reference);
-            reference->AddToAccidSpace(accid);
-        }
-    }
-
-    // We assert it because we want to make sure a reference was found (it should in all cases)
+    
+    AlignmentReference *reference = this->GetReferenceWithElement(accid);
     assert(reference);
+    reference->AddToAccidSpace(accid);
 }
 
 //----------------------------------------------------------------------------
@@ -763,7 +770,7 @@ AlignmentReference::AlignmentReference() : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
-
+    
     this->SetAsReferenceObject();
 }
 
@@ -772,7 +779,7 @@ AlignmentReference::AlignmentReference(int staffN) : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
-
+    
     this->SetAsReferenceObject();
     this->SetN(staffN);
 }

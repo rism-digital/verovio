@@ -17,6 +17,7 @@ class Accid;
 class AlignmentReference;
 class FloatingObject;
 class GraceAligner;
+class LedgerLine;
 class MeasureAligner;
 class Note;
 class StaffAlignment;
@@ -349,6 +350,11 @@ public:
      */
     bool HasGraceAligner() const { return (m_graceAligner != NULL); }
 
+    /**
+     *
+     */
+    AlignmentReference *GetReferenceWithElement(LayerElement *element, int staffN = VRV_UNSET);
+    
     /**
      *
      */
