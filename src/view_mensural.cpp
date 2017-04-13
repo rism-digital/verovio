@@ -263,8 +263,8 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     baseStem = m_doc->GetDrawingUnit(staffSize) * STANDARD_STEMLENGTH;
     flagStemHeight = m_doc->GetDrawingDoubleUnit(staffSize);
     if (drawingCueSize) {
-        baseStem = m_doc->GetGraceSize(baseStem);
-        flagStemHeight = m_doc->GetGraceSize(flagStemHeight);
+        baseStem = m_doc->GetCueSize(baseStem);
+        flagStemHeight = m_doc->GetCueSize(flagStemHeight);
     }
 
     nbFlags = drawingDur - DUR_8;
@@ -303,7 +303,7 @@ void View::DrawMensuralStem(DeviceContext *dc, LayerElement *object, Staff *staf
     int stemY2 = y2;
     if (drawingDur > DUR_4) {
         // if we have flags, shorten the stem to make sure we have a nice overlap with the flag glyph
-        int shortener = (drawingCueSize) ? m_doc->GetGraceSize(m_doc->GetDrawingUnit(staffSize))
+        int shortener = (drawingCueSize) ? m_doc->GetCueSize(m_doc->GetDrawingUnit(staffSize))
                                          : m_doc->GetDrawingUnit(staffSize);
         stemY2 = (dir == STEMDIRECTION_up) ? y2 - shortener : y2 + shortener;
     }

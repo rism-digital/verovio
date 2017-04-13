@@ -60,7 +60,19 @@ public:
 //----------------------------------------------------------------------------
 // Child classes of FunctorParams
 //----------------------------------------------------------------------------
+    
+/**
+ * This is a basic FunctorParams with only the doc pointer for cases where
+ * it is the only parameter needed.
+ * member 0: the Doc
+ **/
 
+class FunctorDocParams : public FunctorParams {
+public:
+    FunctorDocParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+    
 //----------------------------------------------------------------------------
 // AddLayerElementToFlatListParams
 //----------------------------------------------------------------------------
@@ -101,29 +113,13 @@ public:
 // AdjustArticParams
 //----------------------------------------------------------------------------
 
-/**
- * member 0: the Doc
- **/
-
-class AdjustArticParams : public FunctorParams {
-public:
-    AdjustArticParams(Doc *doc) { m_doc = doc; }
-    Doc *m_doc;
-};
+// Use FunctorDocParams
 
 //----------------------------------------------------------------------------
 // AdjustArticWithSlursParams
 //----------------------------------------------------------------------------
 
-/**
- * member 0: the Doc
- **/
-
-class AdjustArticWithSlursParams : public FunctorParams {
-public:
-    AdjustArticWithSlursParams(Doc *doc) { m_doc = doc; }
-    Doc *m_doc;
-};
+// Use FunctorDocParams
 
 //----------------------------------------------------------------------------
 // AdjustGraceXPosParams
@@ -371,6 +367,12 @@ public:
     int m_staffN;
     Doc *m_doc;
 };
+    
+//----------------------------------------------------------------------------
+// CalcChordNoteHeads
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
 
 //----------------------------------------------------------------------------
 // CalcMaxMeasureDurationParams
@@ -393,6 +395,12 @@ public:
     double m_currentValue;
     int m_currentBpm;
 };
+
+//----------------------------------------------------------------------------
+// CalcLedgerLine
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
 
 //----------------------------------------------------------------------------
 // CalcStaffOverlapParams

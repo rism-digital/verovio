@@ -731,6 +731,23 @@ GraceAligner *Alignment::GetGraceAligner()
     }
     return m_graceAligner;
 }
+    
+AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, int staffN)
+{
+    ArrayOfObjects::iterator iter;
+    AlignmentReference *reference = NULL;
+    
+    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
+        reference = dynamic_cast<AlignmentReference *>(*iter);
+        if (reference->GetN() == staffN) {
+            return reference;
+        }
+        else if (staffN == VRV_UNSET) {
+            if ((*iter)->HasChild(element)) return reference;
+        }
+    }
+    return reference;
+}
 
 void Alignment::AddToAccidSpace(Accid *accid)
 {
@@ -738,20 +755,10 @@ void Alignment::AddToAccidSpace(Accid *accid)
 
     // Do not added them if no @accid (e.g., @accid.ges only)
     if (!accid->HasAccid()) return;
-
-    ArrayOfObjects::iterator iter;
-    AlignmentReference *reference = NULL;
-
-    for (iter = m_children.begin(); iter != m_children.end(); iter++) {
-        if ((*iter)->HasChild(accid)) {
-            reference = dynamic_cast<AlignmentReference *>(*iter);
-            assert(reference);
-            reference->AddToAccidSpace(accid);
-        }
-    }
-
-    // We assert it because we want to make sure a reference was found (it should in all cases)
+    
+    AlignmentReference *reference = this->GetReferenceWithElement(accid);
     assert(reference);
+    reference->AddToAccidSpace(accid);
 }
 
 //----------------------------------------------------------------------------
@@ -817,21 +824,6 @@ void AlignmentReference::AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int s
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
         accid->AdjustX(dynamic_cast<LayerElement *>(*iter), doc, staffSize, leftAccids);
     }
-}
-    
-void AlignmentReference::AddLegerLineAbove(int count, short left, short right)
-{
-    if (m_ledgerLinesAbove.size() < count)
-        m_ledgerLinesAbove.resize(count);
-    int i = 0;
-    for(i = 0; i < count; i++) {
-        m_ledgerLinesAbove[i].AddDash(left, right);
-    }
-}
-    
-void AlignmentReference::AddLegerLineBelow(int count, short left, short right)
-{
-    
 }
 
 //----------------------------------------------------------------------------

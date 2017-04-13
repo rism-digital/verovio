@@ -701,7 +701,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         if (chord && !m_crossStaff) {
             yRel -= chord->GetDrawingYRel();
         }
-
+        note->SetDrawingLoc(loc);
         this->SetDrawingYRel(yRel);
     }
     else if (this->Is(REST)) {
@@ -744,7 +744,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
 
-    LogDebug("Aligning %s", this->GetClassName().c_str());
+    // LogDebug("Aligning %s", this->GetClassName().c_str());
 
     // With non grace alignment we do not need to do this
     this->ResetCachedDrawingX();
@@ -767,7 +767,7 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     int selfLeft = this->GetSelfLeft()
         - params->m_doc->GetLeftMargin(this->GetClassId())
-            * params->m_doc->GetDrawingUnit(params->m_doc->GetGraceSize(100)) / PARAM_DENOMINATOR;
+            * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100)) / PARAM_DENOMINATOR;
 
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 

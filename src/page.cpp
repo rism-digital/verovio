@@ -137,6 +137,10 @@ void Page::LayOutHorizontally()
     Functor calcDrawingStemDir(&Object::CalcStem);
     this->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
 
+    FunctorDocParams calcChordNoteHeadsParams(doc);
+    Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
+    this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
+    
     // Render it for filling the bounding box
     BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     // Do not do the layout in this view - otherwise we will loop...
@@ -190,6 +194,10 @@ void Page::LayOutVertically()
     // Reset the vertical alignment
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
     this->Process(&resetVerticalAlignment, NULL);
+    
+    FunctorDocParams calcLegerLinesParams(doc);
+    Functor calcLedgerLines(&Object::CalcLedgerLines);
+    this->Process(&calcLedgerLines, &calcLegerLinesParams);
 
     // Align the content of the page using system aligners
     // After this:
@@ -199,7 +207,7 @@ void Page::LayOutVertically()
     this->Process(&alignVertically, &alignVerticallyParams);
 
     // Adjust the position of outside articulations
-    AdjustArticParams adjustArticParams(doc);
+    FunctorDocParams adjustArticParams(doc);
     Functor adjustArtic(&Object::AdjustArtic);
     this->Process(&adjustArtic, &adjustArticParams);
 
@@ -212,7 +220,7 @@ void Page::LayOutVertically()
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of outside articulations with slurs end and start positions
-    AdjustArticWithSlursParams adjustArticWithSlursParams(doc);
+    FunctorDocParams adjustArticWithSlursParams(doc);
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
     this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
 

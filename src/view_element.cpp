@@ -205,13 +205,11 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
     /************** editorial accidental **************/
 
     std::wstring accidStr = accid->GetSymbolStr();
-    bool center = true;
 
     int x = accid->GetDrawingX();
     int y = accid->GetDrawingY();
 
     if (accid->GetFunc() == accidLog_FUNC_edit) {
-        center = true;
         y = staff->GetDrawingY();
         // look at the note position and adjust it if necessary
         Note *note = dynamic_cast<Note *>(accid->GetFirstParent(NOTE, MAX_ACCID_DEPTH));
@@ -221,11 +219,6 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             // Check if the top of the stem is above
             if ((note->GetDrawingStemDir() == STEMDIRECTION_up) && (note->GetDrawingStemEnd(note).y > y))
                 y = note->GetDrawingStemEnd(note).y;
-
-            // adjust the x position so it is centered
-            wchar_t noteHead = (note->GetActualDur() < DUR_2) ? SMUFL_E0A2_noteheadWhole : SMUFL_E0A3_noteheadHalf;
-            int radius = m_doc->GetGlyphWidth(noteHead, staff->m_drawingStaffSize, note->IsCueSize());
-            x += (radius / 2);
         }
         TextExtend extend;
         dc->SetFont(m_doc->GetDrawingSmuflFont(staff->m_drawingStaffSize, accid->IsCueSize()));
@@ -234,7 +227,7 @@ void View::DrawAccid(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
         y += extend.m_descent + m_doc->GetDrawingUnit(staff->m_drawingStaffSize);
     }
 
-    DrawSmuflString(dc, x, y, accidStr, center, staff->m_drawingStaffSize, accid->IsCueSize(), true);
+    DrawSmuflString(dc, x, y, accidStr, true, staff->m_drawingStaffSize, accid->IsCueSize(), true);
 
     dc->EndGraphic(element, this);
 }
@@ -540,11 +533,6 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
 
     Beam *inBeam = chord->IsInBeam();
 
-    /************ Ledger line reset ************/
-
-    // if there are double-length lines, we only need to draw single-length after they've been drawn
-    chord->m_drawingLedgerLines.clear();
-
     /************ Dots ************/
 
     chord->m_dots.clear();
@@ -582,49 +570,15 @@ void View::DrawChord(DeviceContext *dc, LayerElement *element, Layer *layer, Sta
             DrawDots(dc, dotsX, *it, numDots, staff);
     }
 
-    /************ Accidentals ************/
-
-    // Nothing to do anymore
-
-    /************ Draw children (notes) ************/
+    /************ Draw children (notes, accidentals, etc) ************/
 
     DrawLayerChildren(dc, chord, layer, staff, measure);
-
-    /************ Ledger lines ************/
-
-    dc->SetPen(m_currentColour, ToDeviceContextX(m_doc->GetDrawingStaffLineWidth(staffSize)), AxSOLID);
-    dc->SetBrush(m_currentColour, AxTRANSPARENT);
-
-    MapOfLedgerLineFlags::iterator iter;
-    for (iter = chord->m_drawingLedgerLines.begin(); iter != chord->m_drawingLedgerLines.end(); iter++) {
-
-        std::vector<char> *legerLines = &(*iter).second;
-
-        // if there are double-length lines, we only need to draw single-length after they've been drawn
-        (*legerLines).at(0) -= (*legerLines).at(1);
-        (*legerLines).at(2) -= (*legerLines).at(3);
-
-        // double-length lines below the staff
-        DrawLedgerLines(dc, chord, (*iter).first, false, true, 0, (*legerLines).at(1));
-
-        // remainder single-length lines below the staff
-        DrawLedgerLines(dc, chord, (*iter).first, false, false, (*legerLines).at(1), (*legerLines).at(0));
-
-        // double-length lines above the staff
-        DrawLedgerLines(dc, chord, (*iter).first, true, true, 0, (*legerLines).at(3));
-
-        // remainder single-length lines above the staff
-        DrawLedgerLines(dc, chord, (*iter).first, true, false, (*legerLines).at(3), (*legerLines).at(2));
-    }
 
     /************ Fermata attribute ************/
 
     if (chord->HasFermata()) {
         DrawFermataAttr(dc, element, layer, staff);
     }
-
-    dc->ResetPen();
-    dc->ResetBrush();
 }
 
 void View::DrawClef(DeviceContext *dc, LayerElement *element, Layer *layer, Staff *staff, Measure *measure)
@@ -1137,104 +1091,17 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
 
     int staffSize = staff->m_drawingStaffSize;
     int noteY = element->GetDrawingY();
-    int noteX = inChord ? inChord->GetDrawingX() : element->GetDrawingX();
+    int noteX = element->GetDrawingX();
     int noteXShift;
     int drawingDur;
-    int staffY = staff->GetDrawingY();
     wchar_t fontNo;
-    bool flippedNotehead = false;
-    bool doubleLengthLedger = false;
 
     drawingDur = note->GetDrawingDur();
     drawingDur = ((note->GetColored() == BOOLEAN_true) && drawingDur > DUR_1) ? (drawingDur + 1) : drawingDur;
 
-    int radius = m_doc->GetGlyphWidth(SMUFL_E0A3_noteheadHalf, staffSize, drawingCueSize) / 2;
-
-    if (drawingDur <= DUR_1) {
-        radius += radius / 3;
-    }
-
-    /************** notehead direction **************/
-
-    // if the note is clustered, calculations are different
-    if (note->m_cluster) {
-        if (note->GetDrawingStemDir() == STEMDIRECTION_down) {
-            // stem down/even cluster = noteheads start on left (incorrect side)
-            if (note->m_cluster->size() % 2 == 0) {
-                flippedNotehead = (note->m_clusterPosition % 2 != 0);
-            }
-            // else they start on normal side
-            else {
-                flippedNotehead = (note->m_clusterPosition % 2 == 0);
-            }
-
-            // if stem goes down, move ledger start to the left and expand it by a full radius
-            if (!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
-                doubleLengthLedger = true;
-            }
-        }
-        else {
-            // flipped noteheads start on normal side no matter what
-            flippedNotehead = (note->m_clusterPosition % 2 == 0);
-
-            // if stem goes up, move ledger start to the right and expand it by a full radius
-            if (!(note->IsClusterExtreme() && IsOnStaffLine(noteY, staff))) {
-                doubleLengthLedger = true;
-            }
-        }
-
-        // positions notehead
-        if (!flippedNotehead) {
-            noteXShift = -radius;
-        }
-        else {
-            // if we have a flipped notehead, we need to be in a chord
-            assert(inChord);
-            if (note->GetDrawingStemDir() == STEMDIRECTION_up) {
-                noteXShift = radius - m_doc->GetDrawingStemWidth(staffSize);
-            }
-            else {
-                noteXShift = -radius * 3 + m_doc->GetDrawingStemWidth(staffSize);
-            }
-        }
-    }
-    else {
-        noteXShift = -radius;
-    }
-
-    /************** Ledger lines: **************/
-
-    int staffTop = staffY + m_doc->GetDrawingUnit(staffSize);
-    int staffBot = staffY - m_doc->GetDrawingStaffSize(staffSize) - m_doc->GetDrawingUnit(staffSize);
-
-    // if the note is not in the staff
-    if (!isIn(noteY, staffTop, staffBot)) {
-        int distance, highestNewLine, numLines;
-
-        bool aboveStaff = (noteY > staffTop);
-
-        distance = (aboveStaff ? (noteY - staffY) : staffY - m_doc->GetDrawingStaffSize(staffSize) - noteY);
-        highestNewLine
-            = ((distance % m_doc->GetDrawingDoubleUnit(staffSize) > 0) ? (distance - m_doc->GetDrawingUnit(staffSize))
-                                                                       : distance);
-        numLines = highestNewLine / m_doc->GetDrawingDoubleUnit(staffSize);
-
-        // if this is in a chord, we don't want to draw it yet, but we want to keep track of the maxima
-        if (inChord) {
-            if (inChord->m_drawingLedgerLines.count(staff) == 0) {
-                std::vector<char> legerLines;
-                legerLines.resize(4);
-                inChord->m_drawingLedgerLines[staff] = legerLines;
-            }
-            int idx = doubleLengthLedger + aboveStaff * 2; // 2x2 array
-            std::vector<char> *legerLines = &inChord->m_drawingLedgerLines.at(staff);
-            (*legerLines).at(idx) = ledgermax(numLines, (*legerLines).at(idx));
-        }
-        // we do want to go ahead and draw if it's not in a chord
-        else {
-            DrawLedgerLines(dc, note, staff, aboveStaff, false, 0, numLines);
-        }
-    }
+    int radius = note->GetDrawingRadius(m_doc, staffSize, drawingCueSize);
+        
+    noteXShift = -radius;
 
     /************** Noteheads: **************/
 
@@ -1252,12 +1119,10 @@ void View::DrawNote(DeviceContext *dc, LayerElement *element, Layer *layer, Staf
     }
     // Other values
     else {
-        if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2) {
+        if ((note->GetColored() == BOOLEAN_true) || drawingDur == DUR_2)
             fontNo = SMUFL_E0A3_noteheadHalf;
-        }
-        else {
+        else
             fontNo = SMUFL_E0A4_noteheadBlack;
-        }
 
         DrawSmuflCode(dc, noteX + noteXShift, noteY, fontNo, staff->m_drawingStaffSize, drawingCueSize);
     }
@@ -1490,7 +1355,7 @@ void View::DrawAcciaccaturaSlash(DeviceContext *dc, LayerElement *element)
     dc->SetPen(AxBLACK, m_doc->GetDrawingStemWidth(staff->m_drawingStaffSize), AxSOLID);
     dc->SetBrush(AxBLACK, AxSOLID);
 
-    int positionShift = m_doc->GetGraceSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
+    int positionShift = m_doc->GetCueSize(m_doc->GetDrawingUnit(staff->m_drawingStaffSize));
     int positionShiftX1 = positionShift * 3 / 2;
     int positionShiftY1 = positionShift * 2;
     int positionShiftX2 = positionShift * 3;

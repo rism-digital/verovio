@@ -15,6 +15,7 @@ namespace vrv {
 
 class DeviceContext;
 class Layer;
+class LedgerLine;
 class StaffAlignment;
 class StaffDef;
 class Syl;
@@ -44,6 +45,11 @@ public:
     virtual std::string GetClassName() const { return "Staff"; }
     virtual ClassId GetClassId() const { return STAFF; }
     ///@}
+    
+    /**
+     *
+     */
+    void ClearLedgerLines();
 
     /**
      * @name Methods for adding allowed content
@@ -74,7 +80,25 @@ public:
      * Getter for the StaffAlignment
      */
     StaffAlignment *GetAlignment() const { return m_staffAlignment; }
-
+    
+    /**
+     *
+     */
+    ///@{
+    ArrayOfLedgerLines *GetLedgerLinesAbove() { return m_ledgerLinesAbove; }
+    ArrayOfLedgerLines *GetLedgerLinesAboveCue() { return m_ledgerLinesAboveCue; }
+    ArrayOfLedgerLines *GetLedgerLinesBelow() { return m_ledgerLinesBelow; }
+    ArrayOfLedgerLines *GetLedgerLinesBelowCue() { return m_ledgerLinesBelowCue; }
+    ///@}
+    
+    /**
+     *
+     */
+    ///@{
+    void AddLegerLineAbove(int count, short left, short right, bool cueSize);
+    void AddLegerLineBelow(int count, short left, short right, bool cueSize);
+    ///@}
+    
     //----------//
     // Functors //
     //----------//
@@ -108,6 +132,12 @@ public:
      * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
+    
+private:
+    /**
+     *
+     */
+    void AddLegerLines(ArrayOfLedgerLines *lines, int count, short left, short right);
 
 public:
     /**
@@ -119,11 +149,6 @@ public:
      * Notation type (CMN, mensural, black mensural, etc.), from the staffDef
      */
     int m_drawingNotationType;
-
-    /**
-     * Total drawing height from top of the top line to bottom of the bottom line
-     */
-    int m_drawingHeight;
 
     /**
      * The drawing staff size (scale), from the staffDef
@@ -145,6 +170,16 @@ private:
      * A pointer to a StaffAlignment for aligning the staves
      */
     StaffAlignment *m_staffAlignment;
+    
+    /**
+     * A pointer to the legder lines (above / below and normal / cue)
+     */
+    ///@{
+    ArrayOfLedgerLines *m_ledgerLinesAbove;
+    ArrayOfLedgerLines *m_ledgerLinesBelow;
+    ArrayOfLedgerLines *m_ledgerLinesAboveCue;
+    ArrayOfLedgerLines *m_ledgerLinesBelowCue;
+    ///@}
 };
     
 //----------------------------------------------------------------------------
@@ -178,7 +213,7 @@ public:
     //
 protected:
     //
-private:
+public:
     /** A list of dashes */
     std::list<std::pair<short, short> > m_dashes;
 };

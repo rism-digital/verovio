@@ -55,8 +55,6 @@ Chord::Chord()
     RegisterAttClass(ATT_VISIBILITY);
 
     Reset();
-
-    m_drawingLedgerLines.clear();
 }
 
 Chord::~Chord()

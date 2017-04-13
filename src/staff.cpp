@@ -39,12 +39,19 @@ Staff::Staff(int n) : Object("staff-"), AttCommon(), AttTyped()
     RegisterAttClass(ATT_COMMON);
     RegisterAttClass(ATT_TYPED);
 
+    // owned pointers need to be set to NULL;
+    m_ledgerLinesAbove = NULL;
+    m_ledgerLinesBelow = NULL;
+    m_ledgerLinesAboveCue = NULL;
+    m_ledgerLinesBelowCue = NULL;
+    
     Reset();
     SetN(n);
 }
 
 Staff::~Staff()
 {
+    ClearLedgerLines();
 }
 
 void Staff::Reset()
@@ -60,6 +67,28 @@ void Staff::Reset()
     m_staffAlignment = NULL;
     m_timeSpanningElements.clear();
     m_drawingStaffDef = NULL;
+    
+    ClearLedgerLines();
+}
+    
+void Staff::ClearLedgerLines()
+{
+    if (m_ledgerLinesAbove) {
+        delete m_ledgerLinesAbove;
+        m_ledgerLinesAbove = NULL;
+    }
+    if (m_ledgerLinesBelow) {
+        delete m_ledgerLinesBelow;
+        m_ledgerLinesBelow = NULL;
+    }
+    if (m_ledgerLinesAboveCue) {
+        delete m_ledgerLinesAboveCue;
+        m_ledgerLinesAboveCue = NULL;
+    }
+    if (m_ledgerLinesBelowCue) {
+        delete m_ledgerLinesBelowCue;
+        m_ledgerLinesBelowCue = NULL;
+    }
 }
 
 void Staff::AddChild(Object *child)
@@ -106,6 +135,48 @@ int Staff::CalcPitchPosYRel(Doc *doc, int loc)
     // the staff loc offset is based on the number of lines: 0 with 1 line, 2 with 2, etc
     int staffLocOffset = (this->m_drawingLines - 1) * 2;
     return (loc - staffLocOffset) * doc->GetDrawingUnit(this->m_drawingStaffSize);
+}
+    
+void Staff::AddLegerLineAbove(int count, short left, short right, bool cueSize)
+{
+    if (cueSize) {
+        if (m_ledgerLinesAboveCue == NULL)
+            m_ledgerLinesAboveCue = new ArrayOfLedgerLines;
+        AddLegerLines(m_ledgerLinesAboveCue, count, left, right);
+        
+    }
+    else {
+        if (m_ledgerLinesAbove == NULL)
+            m_ledgerLinesAbove = new ArrayOfLedgerLines;
+        AddLegerLines(m_ledgerLinesAbove, count, left, right);
+    }
+}
+
+void Staff::AddLegerLineBelow(int count, short left, short right, bool cueSize)
+{
+    if (cueSize) {
+        if (m_ledgerLinesBelowCue == NULL)
+            m_ledgerLinesBelowCue = new ArrayOfLedgerLines;
+        AddLegerLines(m_ledgerLinesBelowCue, count, left, right);
+        
+    }
+    else {
+        if (m_ledgerLinesBelow == NULL)
+            m_ledgerLinesBelow = new ArrayOfLedgerLines;
+        AddLegerLines(m_ledgerLinesBelow, count, left, right);
+    }
+}
+    
+void Staff::AddLegerLines(ArrayOfLedgerLines *lines, int count, short left, short right)
+{
+    assert(lines);
+    
+    if (lines->size() < count)
+        lines->resize(count);
+    int i = 0;
+    for(i = 0; i < count; i++) {
+        lines->at(i).AddDash(left, right);
+    }
 }
 
 //----------------------------------------------------------------------------
@@ -168,6 +239,8 @@ int Staff::UnsetCurrentScoreDef(FunctorParams *functorParams)
 int Staff::ResetVerticalAlignment(FunctorParams *functorParams)
 {
     m_staffAlignment = NULL;
+    
+    ClearLedgerLines();
 
     return FUNCTOR_CONTINUE;
 }
@@ -225,6 +298,7 @@ int Staff::FillStaffCurrentTimeSpanning(FunctorParams *functorParams)
 int Staff::ResetDrawing(FunctorParams *functorParams)
 {
     this->m_timeSpanningElements.clear();
+    ClearLedgerLines();
     return FUNCTOR_CONTINUE;
 };
 

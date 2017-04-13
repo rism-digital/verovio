@@ -353,6 +353,11 @@ public:
     /**
      *
      */
+    AlignmentReference *GetReferenceWithElement(LayerElement *element, int staffN = VRV_UNSET);
+    
+    /**
+     *
+     */
     void AddToAccidSpace(Accid *accid);
 
     /**
@@ -480,14 +485,6 @@ public:
      * See Object::AjustAccidX
      */
     void AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize);
-    
-    /**
-     *
-     */
-    ///@{
-    void AddLegerLineAbove(int count, short left, short right);
-    void AddLegerLineBelow(int count, short left, short right);
-    ///@}
 
     //----------//
     // Functors //
@@ -512,14 +509,6 @@ private:
      *
      */
     std::vector<Accid *> m_accidSpace;
-    
-    /**
-     *
-     */
-    ///@{
-    std::vector<LedgerLine> m_ledgerLinesAbove;
-    std::vector<LedgerLine> m_ledgerLinesBelow;
-    ///@}
 };
 
 //----------------------------------------------------------------------------

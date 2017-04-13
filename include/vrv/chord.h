@@ -147,15 +147,6 @@ public:
     mutable std::list<ChordCluster *> m_clusters;
 
     /**
-     * Number of ledger lines for the chord where:
-     * Staff * is each staff for which the chord has notes and maps to:
-     * a four char vector acting as a 2D array (2x2) where:
-     * [0][x] is single-length, [1][x] is double-length
-     * [x][0] is below staff, [x][1] is above staff
-     */
-    MapOfLedgerLineFlags m_drawingLedgerLines;
-
-    /**
      * Positions of dots in the chord to avoid overlapping
      */
     std::list<int> m_dots;
