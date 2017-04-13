@@ -124,11 +124,6 @@ public:
     virtual void EndText() = 0;
 
     /**
-     * Changing the alignment of the text previously set (generally by StartText)
-     */
-    virtual void SetTextAlignment(char alignment) = 0;
-
-    /**
      * Move a text to the specified position, for example when starting a new line.
      * This method should be called only between a StartText and EndText call.
      */

@@ -244,11 +244,6 @@ void BBoxDeviceContext::EndText()
     m_drawingText = false;
 }
 
-void BBoxDeviceContext::SetTextAlignment(char alignment)
-{
-    m_textAlignment = alignment;
-}
-
 void BBoxDeviceContext::MoveTextTo(int x, int y)
 {
     assert(m_drawingText);
