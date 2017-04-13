@@ -181,7 +181,7 @@ int StaffAlignment::CalcOverflowAbove(BoundingBox *box)
         assert(positioner);
         return positioner->GetContentTop();
     }
-    return box->GetContentTop();
+    return box->GetSelfTop();
 }
 
 int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
@@ -191,7 +191,7 @@ int StaffAlignment::CalcOverflowBelow(BoundingBox *box)
         assert(positioner);
         return -(positioner->GetContentBottom() + m_staffHeight);
     }
-    return -(box->GetContentBottom() + m_staffHeight);
+    return -(box->GetSelfBottom() + m_staffHeight);
 }
 
 void StaffAlignment::SetCurrentFloatingPositioner(FloatingObject *object, Object *objectX, Object *objectY)
