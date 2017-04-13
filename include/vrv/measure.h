@@ -211,6 +211,11 @@ public:
     virtual int SetAlignmentXPos(FunctorParams *functorParams);
 
     /**
+     * See Object::AjustAccidX
+     */
+    virtual int AdjustAccidX(FunctorParams *);
+
+    /**
      * See Object::AdjustGraceXPos
      */
     virtual int AdjustGraceXPos(FunctorParams *functorParams);

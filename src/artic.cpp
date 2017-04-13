@@ -261,7 +261,7 @@ void ArticPart::AddSlurPositioner(FloatingPositioner *positioner, bool start)
 
 int Artic::AdjustArtic(FunctorParams *functorParams)
 {
-    AdjustArticParams *params = dynamic_cast<AdjustArticParams *>(functorParams);
+    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     /************** Get the parent and the stem direction **************/
@@ -448,7 +448,7 @@ int ArticPart::ResetVerticalAlignment(FunctorParams *functorParams)
 
 int ArticPart::AdjustArticWithSlurs(FunctorParams *functorParams)
 {
-    AdjustArticWithSlursParams *params = dynamic_cast<AdjustArticWithSlursParams *>(functorParams);
+    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
 
     if (m_startSlurPositioners.empty() && m_endSlurPositioners.empty()) return FUNCTOR_CONTINUE;

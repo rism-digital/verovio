@@ -13,9 +13,11 @@
 
 namespace vrv {
 
+class Accid;
 class AlignmentReference;
 class FloatingObject;
 class GraceAligner;
+class LedgerLine;
 class MeasureAligner;
 class Note;
 class StaffAlignment;
@@ -349,6 +351,16 @@ public:
     bool HasGraceAligner() const { return (m_graceAligner != NULL); }
 
     /**
+     *
+     */
+    AlignmentReference *GetReferenceWithElement(LayerElement *element, int staffN = VRV_UNSET);
+    
+    /**
+     *
+     */
+    void AddToAccidSpace(Accid *accid);
+
+    /**
      * Compute "ideal" horizontal space to allow for a given time interval, ignoring the need
      * to keep consecutive symbols from overlapping or nearly overlapping: we assume spacing
      * will be increased as necessary later to avoid that. For modern notation (CMN), ideal space
@@ -403,7 +415,7 @@ private:
      * Retrieve the AlignmentReference with staffN.
      * Create and add it as child if not found.
      */
-    AlignmentReference *GetAlignmentReference(int staffN, int layerN);
+    AlignmentReference *GetAlignmentReference(int staffN);
 
 public:
     //
@@ -453,32 +465,50 @@ public:
     */
     ///@{
     AlignmentReference();
-    AlignmentReference(int staffN, int layerN);
+    AlignmentReference(int staffN);
     virtual ~AlignmentReference();
     virtual void Reset();
     virtual ClassId GetClassId() const { return ALIGNMENT_REFERENCE; }
     ///@}
 
     /**
-     * Return the layer number in the alignment reference.
-     * For cross staff references, the layer number is negative (e.g., layer@n="2" it "-2").
-     */
-    int GetLayerN() const { return m_layerN; }
-
-    /**
      * Override the method of adding AlignmentReference children
      */
     virtual void AddChild(Object *object);
+
+    /**
+     *
+     */
+    void AddToAccidSpace(Accid *accid);
+
+    /**
+     * See Object::AjustAccidX
+     */
+    void AdjustAccidWithAccidSpace(Accid *accid, Doc *doc, int staffSize);
 
     //----------//
     // Functors //
     //----------//
 
+    /**
+     * See Object::AdjustGraceXPos
+     */
+    virtual int AdjustGraceXPos(FunctorParams *functorParams);
+
+    /**
+     * See Object::AjustAccidX
+     */
+    virtual int AdjustAccidX(FunctorParams *);
+
+private:
+    //
+public:
+    //
 private:
     /**
-     * The layer number in the alignment reference.
+     *
      */
-    int m_layerN;
+    std::vector<Accid *> m_accidSpace;
 };
 
 //----------------------------------------------------------------------------

@@ -772,7 +772,7 @@ int Doc::GetDrawingLedgerLineLength(int staffSize, bool graceSize) const
     return value;
 }
 
-int Doc::GetGraceSize(int value) const
+int Doc::GetCueSize(int value) const
 {
     return value * this->m_style->m_graceNum / this->m_style->m_graceDen;
 }

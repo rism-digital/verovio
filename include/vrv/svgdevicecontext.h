@@ -85,7 +85,7 @@ public:
     virtual void DrawRotatedText(const std::string &text, int x, int y, double angle);
     virtual void DrawRoundedRectangle(int x, int y, int width, int height, double radius);
     virtual void DrawText(const std::string &text, const std::wstring wtext = L"");
-    virtual void DrawMusicText(const std::wstring &text, int x, int y);
+    virtual void DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph = false);
     virtual void DrawSpline(int n, Point points[]);
     virtual void DrawBackgroundImage(int x = 0, int y = 0);
     ///@}
@@ -110,6 +110,14 @@ public:
     virtual void EndGraphic(Object *object, View *view);
     ///@}
 
+    /**
+     * @name Method for starting and ending a graphic custom graphic that do not correspond to an Object
+     */
+    ///@{
+    virtual void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = "");
+    virtual void EndCustomGraphic();
+    ///@}
+    
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      */

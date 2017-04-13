@@ -98,7 +98,7 @@ public:
     int GetDrawingBeamWidth(int staffSize, bool graceSize) const;
     int GetDrawingBeamWhiteWidth(int staffSize, bool graceSize) const;
     int GetDrawingLedgerLineLength(int staffSize, bool graceSize) const;
-    int GetGraceSize(int value) const;
+    int GetCueSize(int value) const;
     ///@}
 
     Point ConvertFontPoint(const Glyph *glyph, const Point &fontPoint, int staffSize, bool graceSize) const;
