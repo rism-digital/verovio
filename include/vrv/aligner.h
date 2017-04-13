@@ -409,6 +409,11 @@ public:
     virtual int AdjustXPos(FunctorParams *functorParams);
     virtual int AdjustXPosEnd(FunctorParams *functorParams);
     ///@}
+    
+    /**
+     * See Object::AjustAccidX
+     */
+    virtual int AdjustAccidX(FunctorParams *);
 
 private:
     /**

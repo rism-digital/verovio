@@ -1232,6 +1232,17 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
+    
+int Alignment::AdjustAccidX(FunctorParams *functorParams)
+{
+    AdjustAccidXParams *params = dynamic_cast<AdjustAccidXParams *>(functorParams);
+    assert(params);
+    
+    if (this->m_graceAligner)
+        this->m_graceAligner->Process(params->m_functor, functorParams);
+    
+    return FUNCTOR_CONTINUE;
+}
 
 int AlignmentReference::AdjustGraceXPos(FunctorParams *functorParams)
 {
