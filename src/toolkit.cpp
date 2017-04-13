@@ -783,16 +783,16 @@ void Toolkit::RedoLayout()
     m_doc.UnCastOffDoc();
     m_doc.CastOffDoc();
 }
-    
+
 void Toolkit::RedoPagePitchPosLayout()
 {
     Page *page = m_doc.GetDrawingPage();
-    
+
     if (!page) {
         LogError("No page to re-layout");
         return;
     }
-    
+
     page->LayOutPitchPos();
 }
 
@@ -1057,7 +1057,7 @@ const char *Toolkit::GetHumdrumBuffer()
 bool Toolkit::Drag(std::string elementId, int x, int y)
 {
     if (!m_doc.GetDrawingPage()) return false;
-    
+
     // Try to get the element on the current drawing page
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
 

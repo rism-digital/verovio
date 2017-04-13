@@ -45,7 +45,7 @@ public:
     virtual std::string GetClassName() const { return "Staff"; }
     virtual ClassId GetClassId() const { return STAFF; }
     ///@}
-    
+
     /**
      *
      */
@@ -80,7 +80,7 @@ public:
      * Getter for the StaffAlignment
      */
     StaffAlignment *GetAlignment() const { return m_staffAlignment; }
-    
+
     /**
      *
      */
@@ -90,7 +90,7 @@ public:
     ArrayOfLedgerLines *GetLedgerLinesBelow() { return m_ledgerLinesBelow; }
     ArrayOfLedgerLines *GetLedgerLinesBelowCue() { return m_ledgerLinesBelowCue; }
     ///@}
-    
+
     /**
      *
      */
@@ -98,7 +98,7 @@ public:
     void AddLegerLineAbove(int count, short left, short right, bool cueSize);
     void AddLegerLineBelow(int count, short left, short right, bool cueSize);
     ///@}
-    
+
     //----------//
     // Functors //
     //----------//
@@ -132,7 +132,7 @@ public:
      * See Object::PrepareRpt
      */
     virtual int PrepareRpt(FunctorParams *functorParams);
-    
+
 private:
     /**
      *
@@ -170,7 +170,7 @@ private:
      * A pointer to a StaffAlignment for aligning the staves
      */
     StaffAlignment *m_staffAlignment;
-    
+
     /**
      * A pointer to the legder lines (above / below and normal / cue)
      */
@@ -181,7 +181,7 @@ private:
     ArrayOfLedgerLines *m_ledgerLinesBelowCue;
     ///@}
 };
-    
+
 //----------------------------------------------------------------------------
 // LedgerLine
 //----------------------------------------------------------------------------
@@ -202,9 +202,9 @@ public:
     virtual ~LedgerLine();
     virtual void Reset();
     ///@}
-    
+
     void AddDash(short left, short right);
-    
+
 protected:
     //
 private:

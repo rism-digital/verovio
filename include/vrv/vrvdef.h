@@ -223,7 +223,7 @@ typedef std::vector<std::pair<TimeSpanningInterface *, ClassId> > ArrayOfSpannin
 typedef std::vector<FloatingPositioner *> ArrayOfFloatingPositioners;
 
 typedef std::vector<BoundingBox *> ArrayOfBoundingBoxes;
-    
+
 typedef std::vector<LedgerLine> ArrayOfLedgerLines;
 
 //----------------------------------------------------------------------------

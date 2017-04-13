@@ -58,7 +58,7 @@ double BeatRpt::GetBeatRptAlignmentDuration(int meterUnit) const
 BTrem::BTrem() : LayerElement("btrem-"), AttTremmeasured()
 {
     RegisterAttClass(ATT_TREMMEASURED);
-    
+
     Reset();
 }
 

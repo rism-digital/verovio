@@ -354,7 +354,7 @@ public:
      *
      */
     AlignmentReference *GetReferenceWithElement(LayerElement *element, int staffN = VRV_UNSET);
-    
+
     /**
      *
      */
@@ -409,7 +409,7 @@ public:
     virtual int AdjustXPos(FunctorParams *functorParams);
     virtual int AdjustXPosEnd(FunctorParams *functorParams);
     ///@}
-    
+
     /**
      * See Object::AjustAccidX
      */

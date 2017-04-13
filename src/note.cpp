@@ -99,7 +99,7 @@ void Note::Reset()
 
     m_playingOnset = 0.0;
     m_playingOffset = 0.0;
-    
+
     m_drawingLoc = 0;
 }
 
@@ -197,11 +197,11 @@ bool Note::IsClusterExtreme() const
     else
         return false;
 }
-    
+
 int Note::GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const
 {
     assert(doc);
-    
+
     wchar_t code = SMUFL_E0A3_noteheadHalf;
     if (this->GetDrawingDur() <= DUR_1) {
         code = SMUFL_E0A2_noteheadWhole;
@@ -282,7 +282,7 @@ int Note::CalcStem(FunctorParams *functorParams)
     if (this->IsMensural()) {
         return FUNCTOR_SIBLINGS;
     }
-    
+
     if (this->IsChordTone()) {
         assert(params->m_interface);
         return FUNCTOR_CONTINUE;
@@ -346,24 +346,24 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
 {
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
-    
+
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
-    
+
     // Nothing to do for notes that are not in a cluster
     if (!this->m_cluster) return FUNCTOR_SIBLINGS;
-    
+
     if (this->m_crossStaff) staff = this->m_crossStaff;
-    
+
     bool drawingCueSize = this->IsCueSize();
     int staffSize = staff->m_drawingStaffSize;
 
     int radius = this->GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
 
     /************** notehead direction **************/
-    
+
     bool flippedNotehead = false;
-    
+
     // if the note is clustered, calculations are different
     if (this->GetDrawingStemDir() == STEMDIRECTION_down) {
         // stem down/even cluster = noteheads start on left (incorrect side)
@@ -379,43 +379,42 @@ int Note::CalcChordNoteHeads(FunctorParams *functorParams)
         // flipped noteheads start on normal side no matter what
         flippedNotehead = (this->m_clusterPosition % 2 == 0);
     }
-    
+
     // positions notehead
     if (flippedNotehead) {
         if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
-           this->SetDrawingXRel(2 * radius - params->m_doc->GetDrawingStemWidth(staffSize));
+            this->SetDrawingXRel(2 * radius - params->m_doc->GetDrawingStemWidth(staffSize));
         }
         else {
-           this->SetDrawingXRel(-2 * radius + params->m_doc->GetDrawingStemWidth(staffSize));
+            this->SetDrawingXRel(-2 * radius + params->m_doc->GetDrawingStemWidth(staffSize));
         }
     }
 
     return FUNCTOR_SIBLINGS;
 }
-    
+
 int Note::CalcLedgerLines(FunctorParams *functorParams)
 {
     FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
     assert(params);
-    
+
     Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
     assert(staff);
-    
+
     if (this->m_crossStaff) staff = this->m_crossStaff;
-    
+
     bool drawingCueSize = this->IsCueSize();
     int staffSize = staff->m_drawingStaffSize;
     int staffX = staff->GetDrawingX();
     int radius = GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
 
     /************** Ledger lines: **************/
-    
+
     int linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
     int linesBelow = -(this->GetDrawingLoc()) / 2;
-    
-    if ((linesAbove <= 0) && (linesBelow <= 0))
-        return FUNCTOR_CONTINUE;
-    
+
+    if ((linesAbove <= 0) && (linesBelow <= 0)) return FUNCTOR_CONTINUE;
+
     // HARDCODED
     int leftExtender = 2.5 * params->m_doc->GetDrawingStemWidth(staffSize);
     int rightExtender = 2.5 * params->m_doc->GetDrawingStemWidth(staffSize);
@@ -423,22 +422,22 @@ int Note::CalcLedgerLines(FunctorParams *functorParams)
         leftExtender = 1.75 * params->m_doc->GetDrawingStemWidth(staffSize);
         rightExtender = 1.25 * params->m_doc->GetDrawingStemWidth(staffSize);
     }
-    
+
     if (drawingCueSize) {
         leftExtender = params->m_doc->GetCueSize(leftExtender);
         rightExtender = params->m_doc->GetCueSize(rightExtender);
     }
-    
+
     int left = this->GetDrawingX() - radius - leftExtender - staffX;
     int right = this->GetDrawingX() + radius + rightExtender - staffX;
-    
+
     if (linesAbove > 0) {
         staff->AddLegerLineAbove(linesAbove, left, right, drawingCueSize);
     }
     else {
         staff->AddLegerLineBelow(linesBelow, left, right, drawingCueSize);
     }
-    
+
     return FUNCTOR_CONTINUE;
 }
 
@@ -568,9 +567,9 @@ int Note::ResetDrawing(FunctorParams *functorParams)
 int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
 {
     LayerElement::ResetHorizontalAlignment(functorParams);
-    
-    m_drawingLoc= 0;
-    
+
+    m_drawingLoc = 0;
+
     return FUNCTOR_CONTINUE;
 }
 

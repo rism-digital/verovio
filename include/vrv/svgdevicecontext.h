@@ -117,7 +117,7 @@ public:
     virtual void StartCustomGraphic(std::string name, std::string gClass = "", std::string gId = "");
     virtual void EndCustomGraphic();
     ///@}
-    
+
     /**
      * @name Methods for re-starting and ending a graphic for objects drawn in separate steps
      */

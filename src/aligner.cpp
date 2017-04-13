@@ -731,12 +731,12 @@ GraceAligner *Alignment::GetGraceAligner()
     }
     return m_graceAligner;
 }
-    
+
 AlignmentReference *Alignment::GetReferenceWithElement(LayerElement *element, int staffN)
 {
     ArrayOfObjects::iterator iter;
     AlignmentReference *reference = NULL;
-    
+
     for (iter = m_children.begin(); iter != m_children.end(); iter++) {
         reference = dynamic_cast<AlignmentReference *>(*iter);
         if (reference->GetN() == staffN) {
@@ -755,7 +755,7 @@ void Alignment::AddToAccidSpace(Accid *accid)
 
     // Do not added them if no @accid (e.g., @accid.ges only)
     if (!accid->HasAccid()) return;
-    
+
     AlignmentReference *reference = this->GetReferenceWithElement(accid);
     assert(reference);
     reference->AddToAccidSpace(accid);
@@ -770,7 +770,7 @@ AlignmentReference::AlignmentReference() : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
-    
+
     this->SetAsReferenceObject();
 }
 
@@ -779,7 +779,7 @@ AlignmentReference::AlignmentReference(int staffN) : Object(), AttCommon()
     RegisterAttClass(ATT_COMMON);
 
     Reset();
-    
+
     this->SetAsReferenceObject();
     this->SetN(staffN);
 }
@@ -1232,15 +1232,14 @@ int Alignment::AdjustXPosEnd(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 }
-    
+
 int Alignment::AdjustAccidX(FunctorParams *functorParams)
 {
     AdjustAccidXParams *params = dynamic_cast<AdjustAccidXParams *>(functorParams);
     assert(params);
-    
-    if (this->m_graceAligner)
-        this->m_graceAligner->Process(params->m_functor, functorParams);
-    
+
+    if (this->m_graceAligner) this->m_graceAligner->Process(params->m_functor, functorParams);
+
     return FUNCTOR_CONTINUE;
 }
 

@@ -147,7 +147,7 @@ public:
      * For example with a new page (sceen) height or a new zoom level.
      */
     void RedoLayout();
-    
+
     /**
      * Redo the layout of the pitch postitions of the current drawing page.
      * Only the note vertical positions are recalculated with this method.

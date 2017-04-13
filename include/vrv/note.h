@@ -90,7 +90,7 @@ public:
     void SetDrawingTieAttr();
     Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
     ///@}
-                 
+
     void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
     int GetDrawingLoc() const { return m_drawingLoc; }
 
@@ -102,7 +102,7 @@ public:
     int GetDrawingDur() const;
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
-        
+
     int GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const;
 
     /**
@@ -127,12 +127,12 @@ public:
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
-                 
+
     /**
      * See Object::CalcChordNoteHeads
      */
     virtual int CalcChordNoteHeads(FunctorParams *functorParams);
-                 
+
     /**
      * See Object::CalcLedgerLines
      */
@@ -167,7 +167,7 @@ public:
      * See Object::ResetDrawing
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
-                 
+
     /**
      * See Object::ResetHorizontalAlignment
      */
@@ -190,7 +190,7 @@ private:
      * The note with the initial attribute owns the Tie object and takes care of deleting it
      */
     Tie *m_drawingTieAttr;
-                 
+
     /** drawing loc */
     int m_drawingLoc;
 };
