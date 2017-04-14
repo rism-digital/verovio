@@ -83,6 +83,7 @@ void LayerElement::Reset()
     m_scoreDefRole = NONE;
     m_alignment = NULL;
     m_graceAlignment = NULL;
+    m_alignmentLayerN = VRV_UNSET;
     m_beamElementCoord = NULL;
 
     m_crossStaff = NULL;
@@ -181,13 +182,17 @@ Beam *LayerElement::IsInBeam()
     return NULL;
 }
 
-Staff *LayerElement::GetCrossStaff() const
+Staff *LayerElement::GetCrossStaff(Layer *&layer) const
 {
-    if (m_crossStaff) return m_crossStaff;
+    if (m_crossStaff) {
+        assert(m_crossLayer);
+        layer = m_crossLayer;
+        return m_crossStaff;
+    }
 
     LayerElement *parent = dynamic_cast<LayerElement *>(this->GetFirstParentInRange(LAYER_ELEMENT, LAYER_ELEMENT_max));
 
-    if (parent) return parent->GetCrossStaff();
+    if (parent) return parent->GetCrossStaff(layer);
 
     return NULL;
 }
@@ -461,6 +466,7 @@ int LayerElement::ResetHorizontalAlignment(FunctorParams *functorParams)
 
     m_alignment = NULL;
     m_graceAlignment = NULL;
+    m_alignmentLayerN = VRV_UNSET;
 
     return FUNCTOR_CONTINUE;
 }
@@ -647,8 +653,13 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         Accid *accid = dynamic_cast<Accid *>(this);
         assert(accid);
         Note *note = dynamic_cast<Note *>(this->GetFirstParent(NOTE));
+        // We should probably also avoid to add editorial accidentals to the accid space
+        // However, since they are placed above by View::DrawNote it works without avoiding it
         if (note) {
-            // accid->SetDrawingYRel(note->GetDrawingYRel());
+            if (note->HasGraceAlignment())
+                note->GetGraceAlignment()->AddToAccidSpace(accid);
+            else
+                m_alignment->AddToAccidSpace(accid);
         }
         else {
             // do something for accid that are not children of a note - e.g., mensural?
@@ -690,7 +701,7 @@ int LayerElement::SetAlignmentPitchPos(FunctorParams *functorParams)
         if (chord && !m_crossStaff) {
             yRel -= chord->GetDrawingYRel();
         }
-
+        note->SetDrawingLoc(loc);
         this->SetDrawingYRel(yRel);
     }
     else if (this->Is(REST)) {
@@ -733,16 +744,16 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     if (params->m_graceCumulatedXShift == VRV_UNSET) params->m_graceCumulatedXShift = 0;
 
-    // With non grace alignment we do not need to do this because all the LayerElement are added as children of the
-    // Alignment
-    // Here not (only parent chords or notes) so we need to reset the cache by hand
+    // LogDebug("Aligning %s", this->GetClassName().c_str());
+
+    // With non grace alignment we do not need to do this
     this->ResetCachedDrawingX();
 
-    if (!this->HasGraceAlignment()) return FUNCTOR_CONTINUE;
+    if (!this->HasGraceAlignment()) return FUNCTOR_SIBLINGS;
 
     if (!this->HasUpdatedBB() || this->HasEmptyBB()) {
         // if nothing was drawn, do not take it into account
-        return FUNCTOR_CONTINUE;
+        return FUNCTOR_SIBLINGS;
     }
 
     int selfRight = this->GetSelfRight();
@@ -756,11 +767,11 @@ int LayerElement::AdjustGraceXPos(FunctorParams *functorParams)
 
     int selfLeft = this->GetSelfLeft()
         - params->m_doc->GetLeftMargin(this->GetClassId())
-            * params->m_doc->GetDrawingUnit(params->m_doc->GetGraceSize(100)) / PARAM_DENOMINATOR;
+            * params->m_doc->GetDrawingUnit(params->m_doc->GetCueSize(100)) / PARAM_DENOMINATOR;
 
     params->m_graceUpcomingMaxPos = std::min(selfLeft, params->m_graceUpcomingMaxPos);
 
-    return FUNCTOR_CONTINUE;
+    return FUNCTOR_SIBLINGS;
 }
 
 int LayerElement::AdjustXPos(FunctorParams *functorParams)

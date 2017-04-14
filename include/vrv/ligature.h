@@ -56,23 +56,12 @@ public:
     virtual void FilterList(ListOfObjects *childlist);
 
     /**
-     * Returns list of notes that have accidentals
-     */
-    void ResetAccidList();
-
-    /**
      * Return information about the note's position in the ligature ??
      */
     ///@{
     /** Return 0 if the note is the middle note, -1 if below it and 1 if above */
     int PositionInLigature(Note *note);
     ///@}
-
-    /**
-     * Prepares a 2D grid of booleans to track where accidentals are placed. ??
-     * Further documentation is in chord.cpp comments. ??
-     */
-    void ResetAccidSpace(int fullUnit);
 
     //----------//
     // Functors //

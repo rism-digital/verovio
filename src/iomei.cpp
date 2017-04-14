@@ -1005,6 +1005,7 @@ void MeiOutput::WriteMeiBTrem(pugi::xml_node currentNode, BTrem *bTrem)
     assert(bTrem);
 
     WriteLayerElement(currentNode, bTrem);
+    bTrem->WriteTremmeasured(currentNode);
 }
 
 void MeiOutput::WriteMeiChord(pugi::xml_node currentNode, Chord *chord)
@@ -1054,6 +1055,7 @@ void MeiOutput::WriteMeiFTrem(pugi::xml_node currentNode, FTrem *fTrem)
 
     WriteLayerElement(currentNode, fTrem);
     fTrem->WriteSlashcount(currentNode);
+    fTrem->WriteTremmeasured(currentNode);
 }
 
 void MeiOutput::WriteMeiKeySig(pugi::xml_node currentNode, KeySig *keySig)
@@ -1216,6 +1218,7 @@ void MeiOutput::WriteMeiRend(pugi::xml_node currentNode, Rend *rend)
 
     WriteTextElement(currentNode, rend);
     rend->WriteColor(currentNode);
+    rend->WriteHorizontalalign(currentNode);
     rend->WriteCommon(currentNode);
     rend->WriteLang(currentNode);
     rend->WriteTypography(currentNode);
@@ -2497,8 +2500,8 @@ bool MeiInput::ReadMeiStaff(Object *parent, pugi::xml_node staff)
         vrvStaff->m_yAbs = atoi(staff.attribute("uly").value()) * DEFINITION_FACTOR;
     }
 
-    if (!vrvStaff->HasN()) {
-        LogWarning("No @n on <staff> might yield unpredictable results");
+    if (!vrvStaff->HasN() || (vrvStaff->GetN() == 0)) {
+        LogWarning("No @n on <staff> or a value of 0 might yield unpredictable results");
     }
 
     parent->AddChild(vrvStaff);
@@ -2536,8 +2539,8 @@ bool MeiInput::ReadMeiLayer(Object *parent, pugi::xml_node layer)
     vrvLayer->ReadCommon(layer);
     vrvLayer->ReadTyped(layer);
 
-    if (!vrvLayer->HasN()) {
-        LogWarning("No @n on <layer> might yield unpredictable results");
+    if (!vrvLayer->HasN() || (vrvLayer->GetN() == 0)) {
+        LogWarning("No @n on <layer> or a value of 0 might yield unpredictable results");
     }
 
     parent->AddChild(vrvLayer);
@@ -2736,6 +2739,8 @@ bool MeiInput::ReadMeiBTrem(Object *parent, pugi::xml_node bTrem)
     BTrem *vrvBTrem = new BTrem();
     ReadLayerElement(bTrem, vrvBTrem);
 
+    vrvBTrem->ReadTremmeasured(bTrem);
+
     parent->AddChild(vrvBTrem);
     return ReadMeiLayerChildren(vrvBTrem, bTrem, vrvBTrem);
 }
@@ -2808,6 +2813,7 @@ bool MeiInput::ReadMeiFTrem(Object *parent, pugi::xml_node fTrem)
     ReadLayerElement(fTrem, vrvFTrem);
 
     vrvFTrem->ReadSlashcount(fTrem);
+    vrvFTrem->ReadTremmeasured(fTrem);
 
     parent->AddChild(vrvFTrem);
     return ReadMeiLayerChildren(vrvFTrem, fTrem, vrvFTrem);
@@ -3095,6 +3101,7 @@ bool MeiInput::ReadMeiRend(Object *parent, pugi::xml_node rend)
     ReadTextElement(rend, vrvRend);
 
     vrvRend->ReadColor(rend);
+    vrvRend->ReadHorizontalalign(rend);
     vrvRend->ReadLang(rend);
     vrvRend->ReadTypography(rend);
 

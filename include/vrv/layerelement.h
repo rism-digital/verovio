@@ -93,6 +93,14 @@ public:
     ///@}
 
     /**
+     * @name Get and set the layerN drawing value
+     */
+    ///@{
+    int GetAlignmentLayerN() const { return m_alignmentLayerN; }
+    void SetAlignmentLayerN(int alignmentLayerN) { m_alignmentLayerN = alignmentLayerN; }
+    ///@}
+
+    /**
      * @name Get the X and Y drawing position
      */
     ///@{
@@ -132,9 +140,10 @@ public:
     Alignment *GetAlignment() const { return m_alignment; }
 
     /**
-     * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff
+     * Look for a cross or a a parent LayerElement (note, chord, rest) with a cross staff.
+     * Also set the corresponding m_crossLayer to layer if a cross staff is found.
      */
-    Staff *GetCrossStaff() const;
+    Staff *GetCrossStaff(Layer *&layer) const;
 
     /**
      * @name Setter and getter for the Alignment the grace note is pointing to (NULL by default)
@@ -278,6 +287,11 @@ private:
      * The cached drawing cue size set by PrepareDarwingCueSize
      */
     bool m_drawingCueSize;
+    /**
+     * The cached alignment layer @n.
+     * This also stores the negative values for identifying cross-staff
+     */
+    int m_alignmentLayerN;
 };
 
 } // namespace vrv

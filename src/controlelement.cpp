@@ -13,6 +13,8 @@
 
 //----------------------------------------------------------------------------
 
+#include "text.h"
+
 namespace vrv {
 
 //----------------------------------------------------------------------------
@@ -44,6 +46,19 @@ void ControlElement::Reset()
     FloatingObject::Reset();
     ResetCommon();
     ResetTyped();
+}
+
+char ControlElement::GetAlignment()
+{
+    Rend *rend = dynamic_cast<Rend *>(this->FindChildByType(REND));
+    if (!rend || !rend->HasHalign()) return 0;
+
+    switch (rend->GetHalign()) {
+        case (HORIZONTALALIGNMENT_center): return CENTER;
+        case (HORIZONTALALIGNMENT_right): return RIGHT;
+        case (HORIZONTALALIGNMENT_left): return LEFT;
+        default: return 0;
+    }
 }
 
 //----------------------------------------------------------------------------

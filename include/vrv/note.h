@@ -91,14 +91,19 @@ public:
     Tie *GetDrawingTieAttr() const { return m_drawingTieAttr; }
     ///@}
 
+    void SetDrawingLoc(int drawingLoc) { m_drawingLoc = drawingLoc; }
+    int GetDrawingLoc() const { return m_drawingLoc; }
+
     /**
      * Overriding functions to return information from chord parent if any
      */
     ///@{
     Chord *IsChordTone() const;
-    int GetDrawingDur();
+    int GetDrawingDur() const;
     bool IsClusterExtreme() const; // used to find if it is the highest or lowest note in a cluster
     ///@}
+
+    int GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const;
 
     /**
      * Returns a single integer representing pitch and octave.
@@ -122,6 +127,16 @@ public:
      * See Object::CalcStem
      */
     virtual int CalcStem(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcChordNoteHeads
+     */
+    virtual int CalcChordNoteHeads(FunctorParams *functorParams);
+
+    /**
+     * See Object::CalcLedgerLines
+     */
+    virtual int CalcLedgerLines(FunctorParams *functorParams);
 
     /**
     * See Object::PrepareLayerElementParts
@@ -153,12 +168,14 @@ public:
      */
     virtual int ResetDrawing(FunctorParams *functorParams);
 
+    /**
+     * See Object::ResetHorizontalAlignment
+     */
+    virtual int ResetHorizontalAlignment(FunctorParams *functorParams);
+
 private:
     //
 public:
-    /** drawing stem length */
-    int d_stemLen;
-
     /** flags for determining clusters in chord **/
     ChordCluster *m_cluster; // cluster this belongs to
     int m_clusterPosition; // 1-indexed position in said cluster; 0 if does not have position
@@ -173,6 +190,9 @@ private:
      * The note with the initial attribute owns the Tie object and takes care of deleting it
      */
     Tie *m_drawingTieAttr;
+
+    /** drawing loc */
+    int m_drawingLoc;
 };
 
 //----------------------------------------------------------------------------

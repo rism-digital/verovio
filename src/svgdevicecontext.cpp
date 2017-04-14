@@ -238,6 +238,20 @@ void SvgDeviceContext::StartGraphic(Object *object, std::string gClass, std::str
     // currentBrush.GetOpacity()).c_str();
 }
 
+void SvgDeviceContext::StartCustomGraphic(std::string name, std::string gClass, std::string gId)
+{
+    if (gClass.length() > 0) {
+        name.append(" " + gClass);
+    }
+
+    m_currentNode = m_currentNode.append_child("g");
+    m_svgNodeStack.push_back(m_currentNode);
+    m_currentNode.append_attribute("class") = name.c_str();
+    if (gId.length() > 0) {
+        m_currentNode.append_attribute("id") = gId.c_str();
+    }
+}
+
 void SvgDeviceContext::StartTextGraphic(Object *object, std::string gClass, std::string gId)
 {
     std::string baseClass = object->GetClassName();
@@ -291,6 +305,12 @@ void SvgDeviceContext::ResumeGraphic(Object *object, std::string gId)
 void SvgDeviceContext::EndGraphic(Object *object, View *view)
 {
     DrawSvgBoundingBox(object, view);
+    m_svgNodeStack.pop_back();
+    m_currentNode = m_svgNodeStack.back();
+}
+
+void SvgDeviceContext::EndCustomGraphic()
+{
     m_svgNodeStack.pop_back();
     m_currentNode = m_svgNodeStack.back();
 }
@@ -402,10 +422,9 @@ void SvgDeviceContext::DrawComplexBezierPath(Point bezier1[4], Point bezier2[4])
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d")
         = StringFormat("M%d,%d C%d,%d %d,%d %d,%d C%d,%d %d,%d %d,%d", bezier1[0].x, bezier1[0].y, // M command
-              bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
-              bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
-              )
-              .c_str();
+            bezier1[1].x, bezier1[1].y, bezier1[2].x, bezier1[2].y, bezier1[3].x, bezier1[3].y, // First bezier
+            bezier2[2].x, bezier2[2].y, bezier2[1].x, bezier2[1].y, bezier2[0].x, bezier2[0].y // Second Bezier
+            ).c_str();
     // pathChild.append_attribute("fill") = "#000000";
     // pathChild.append_attribute("fill-opacity") = "1";
     pathChild.append_attribute("stroke") = StringFormat("#%s", GetColour(m_penStack.top().GetColour()).c_str()).c_str();
@@ -505,8 +524,8 @@ void SvgDeviceContext::DrawEllipticArc(int x, int y, int width, int height, doub
 
     pugi::xml_node pathChild = AppendChild("path");
     pathChild.append_attribute("d") = StringFormat("M%d %d A%d %d 0.0 %d %d %d %d", int(xs), int(ys), abs(int(rx)),
-                                          abs(int(ry)), fArc, fSweep, int(xe), int(ye))
-                                          .c_str();
+        abs(int(ry)), fArc, fSweep, int(xe),
+        int(ye)).c_str();
     // pathChild.append_attribute("fill") = "#000000";
     if (currentBrush.GetOpacity() != 1.0) pathChild.append_attribute("fill-opacity") = currentBrush.GetOpacity();
     if (currentPen.GetOpacity() != 1.0) pathChild.append_attribute("stroke-opacity") = currentPen.GetOpacity();
@@ -689,7 +708,7 @@ std::string FilenameLookup(unsigned char c)
     return glyph;
 }
 
-void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y)
+void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, bool setSmuflGlyph)
 {
     assert(m_fontStack.top());
 
@@ -697,7 +716,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y)
 
     // print chars one by one
     for (unsigned int i = 0; i < text.length(); i++) {
-        wchar_t c = text[i];
+        wchar_t c = text.at(i);
         Glyph *glyph = Resources::GetGlyph(c);
         if (!glyph) {
             continue;
@@ -794,8 +813,42 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                     - view->ToDeviceContextY(object->GetDrawingY() + box->GetSelfY1()));
         }
 
+        SetPen(AxBLACK, 1, AxSOLID);
+        SetBrush(AxBLACK, AxSOLID);
+
+        std::vector<SMuFLGlyphAnchor> anchors = { SMUFL_cutOutNE, SMUFL_cutOutNW, SMUFL_cutOutSE, SMUFL_cutOutSW };
+        std::vector<SMuFLGlyphAnchor>::iterator iter;
+
+        for (iter = anchors.begin(); iter != anchors.end(); iter++) {
+            if (object->GetBoundingBoxGlyph() != 0) {
+                Glyph *glyph = Resources::GetGlyph(object->GetBoundingBoxGlyph());
+                assert(glyph);
+
+                if (glyph->HasAnchor(*iter)) {
+                    const Point *fontPoint = glyph->GetAnchor(*iter);
+                    assert(fontPoint);
+                    Point p;
+                    int x, y, w, h;
+                    glyph->GetBoundingBox(&x, &y, &w, &h);
+                    int smuflGlyphFontSize = object->GetBoundingBoxGlyphFontSize();
+
+                    p.x = object->GetSelfLeft() - x * smuflGlyphFontSize / glyph->GetUnitsPerEm();
+                    p.x += (fontPoint->x * smuflGlyphFontSize / glyph->GetUnitsPerEm());
+                    p.y = object->GetSelfBottom() - y * smuflGlyphFontSize / glyph->GetUnitsPerEm();
+                    p.y += (fontPoint->y * smuflGlyphFontSize / glyph->GetUnitsPerEm());
+
+                    SetPen(AxGREEN, 10, AxSOLID);
+                    SetBrush(AxGREEN, AxSOLID);
+                    this->DrawCircle(view->ToDeviceContextX(p.x), view->ToDeviceContextY(p.y), 5);
+                    SetPen(AxBLACK, 1, AxSOLID);
+                    SetBrush(AxBLACK, AxSOLID);
+                }
+            }
+        }
+
         EndGraphic(object, NULL);
 
+        /*
         SetPen(AxBLUE, 10, AxDOT_DASH);
         StartGraphic(object, "content-bounding-box", "0");
         if (object->HasContentBB()) {
@@ -807,6 +860,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                     - view->ToDeviceContextY(object->GetDrawingY() + box->GetContentY1()));
         }
         EndGraphic(object, NULL);
+        */
 
         SetPen(AxBLACK, 1, AxSOLID);
         SetBrush(AxBLACK, AxSOLID);

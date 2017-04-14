@@ -1540,6 +1540,10 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
     bool setX = false;
     bool setY = false;
 
+    char alignment = dir->GetAlignment();
+    // Dir are left aligned by default;
+    if (alignment == 0) alignment = LEFT;
+
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dir->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
@@ -1552,7 +1556,7 @@ void View::DrawDir(DeviceContext *dc, Dir *dir, Measure *measure, System *system
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dirTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
         DrawTextChildren(dc, dir, x, y, setX, setY);
         dc->EndText();
 
@@ -1589,6 +1593,10 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
     bool setX = false;
     bool setY = false;
 
+    char alignment = dynam->GetAlignment();
+    // Dynam are left aligned by default;
+    if (alignment == 0) alignment = LEFT;
+
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = dynam->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
@@ -1609,7 +1617,7 @@ void View::DrawDynam(DeviceContext *dc, Dynam *dynam, Measure *measure, System *
             dc->SetBrush(m_currentColour, AxSOLID);
             dc->SetFont(&dynamTxt);
 
-            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+            dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
             DrawTextChildren(dc, dynam, x, y, setX, setY);
             dc->EndText();
 
@@ -1696,6 +1704,10 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
     bool setX = false;
     bool setY = false;
 
+    char alignment = harm->GetAlignment();
+    // Harm are centered aligned by default;
+    if (alignment == 0) alignment = CENTER;
+
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = harm->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
@@ -1708,7 +1720,7 @@ void View::DrawHarm(DeviceContext *dc, Harm *harm, Measure *measure, System *sys
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&dirTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), CENTER);
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
         DrawTextChildren(dc, harm, x, y, setX, setY);
         dc->EndText();
 
@@ -1895,6 +1907,10 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
     bool setX = false;
     bool setY = false;
 
+    char alignment = tempo->GetAlignment();
+    // Tempo are left aligned by default;
+    if (alignment == 0) alignment = LEFT;
+
     std::vector<Staff *>::iterator staffIter;
     std::vector<Staff *> staffList = tempo->GetTstampStaves(measure);
     for (staffIter = staffList.begin(); staffIter != staffList.end(); staffIter++) {
@@ -1907,7 +1923,7 @@ void View::DrawTempo(DeviceContext *dc, Tempo *tempo, Measure *measure, System *
         dc->SetBrush(m_currentColour, AxSOLID);
         dc->SetFont(&tempoTxt);
 
-        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), LEFT);
+        dc->StartText(ToDeviceContextX(x), ToDeviceContextY(y), alignment);
         DrawTextChildren(dc, tempo, x, y, setX, setY);
         dc->EndText();
 
