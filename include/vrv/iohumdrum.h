@@ -235,7 +235,7 @@ protected:
     void setClef(StaffDef *part, const std::string &clef);
     void setTimeSig(StaffDef *part, const std::string &timesig);
     void setMeterSymbol(StaffDef *part, const std::string &metersig);
-    void fillPartInfo(hum::HTp partstart, int partnumber);
+    void fillPartInfo(hum::HTp partstart, int partnumber, int partcount);
     void storeStaffLayerTokensForMeasure(int startline, int endline);
     void calculateReverseKernIndex(void);
     void prepareTimeSigDur(void);

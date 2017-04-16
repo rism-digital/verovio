@@ -1129,7 +1129,7 @@ void HumdrumInput::prepareStaffGroup(void)
     for (int i = 0; i < (int)kernstarts.size(); i++) {
         m_staffdef.push_back(new StaffDef());
         m_staffgroup->AddChild(m_staffdef.back());
-        fillPartInfo(kernstarts[i], i + 1);
+        fillPartInfo(kernstarts[i], i + 1, (int)kernstarts.size());
     }
     if (kernstarts.size() > 0) {
         addMidiTempo(m_doc->m_scoreDef, kernstarts[0]);
@@ -1179,7 +1179,7 @@ void HumdrumInput::addMidiTempo(ScoreDef &m_scoreDef, hum::HTp kernpart)
 //    in the future.
 //
 
-void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber)
+void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber, int partcount)
 {
     std::vector<humaux::StaffStateVariables> &ss = m_staffstates;
 
@@ -1206,7 +1206,9 @@ void HumdrumInput::fillPartInfo(hum::HTp partstart, int partnumber)
             keysig = *part;
         }
         else if (part->compare(0, 3, "*I'") == 0) {
-            abbreviation = part->substr(3);
+            if (partcount > 1) {
+                abbreviation = part->substr(3);
+            }
         }
         else if (part->compare(0, 3, "*I\"") == 0) {
             label = part->substr(3);
