@@ -109,12 +109,6 @@ public:
     ///@}
 
     /**
-     * Prepares a 2D grid of booleans to track where accidentals are placed.
-     * Further documentation is in chord.cpp comments.
-     */
-    void ResetAccidSpace(int fullUnit);
-
-    /**
      * Get the stem up / stem down attachment point.
      * If necessary look at the glyph anchor (if any).
      */
@@ -153,25 +147,9 @@ public:
     mutable std::list<ChordCluster *> m_clusters;
 
     /**
-     * Number of ledger lines for the chord where:
-     * Staff * is each staff for which the chord has notes and maps to:
-     * a four char vector acting as a 2D array (2x2) where:
-     * [0][x] is single-length, [1][x] is double-length
-     * [x][0] is below staff, [x][1] is above staff
-     */
-    MapOfLedgerLineFlags m_drawingLedgerLines;
-
-    /**
      * Positions of dots in the chord to avoid overlapping
      */
     std::list<int> m_dots;
-
-    /**
-     * Variables related to preventing overlapping in the X dimension for accidentals
-     */
-    std::vector<Note *> m_accidList;
-    std::vector<std::vector<bool> > m_accidSpace;
-    int m_accidSpaceTop, m_accidSpaceBot, m_accidSpaceLeft;
 };
 
 } // namespace vrv

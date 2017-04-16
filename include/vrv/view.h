@@ -165,6 +165,7 @@ protected:
     void DrawBarLines(DeviceContext *dc, Measure *measure, StaffGrp *staffGrp, BarLine *barLine);
     void DrawBarLine(DeviceContext *dc, int y_top, int y_bottom, BarLine *barLine);
     void DrawBarLineDots(DeviceContext *dc, StaffDef *staffDef, Staff *staff, BarLine *barLine);
+    void DrawLedgerLines(DeviceContext *dc, Staff *staff, ArrayOfLedgerLines *lines, bool below, bool cueSize);
     void DrawMeasure(DeviceContext *dc, Measure *measure, System *system);
     void DrawStaff(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
     void DrawStaffLines(DeviceContext *dc, Staff *staff, Measure *measure, System *system);
@@ -382,11 +383,12 @@ protected:
     ///@{
     void DrawVerticalLine(DeviceContext *dc, int y1, int y2, int x1, int nbr);
     void DrawHorizontalLine(DeviceContext *dc, int x1, int x2, int y1, int nbr);
-    void DrawSmuflCode(DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin);
+    void DrawSmuflCode(
+        DeviceContext *dc, int x, int y, wchar_t code, int staffSize, bool dimin, bool setBBGlyph = false);
     void DrawThickBezierCurve(DeviceContext *dc, Point bezier[4], int thickness, int staffSize, float angle = 0.0);
     void DrawPartFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2, int fillSection);
-    void DrawSmuflString(
-        DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100, bool dimin = false);
+    void DrawSmuflString(DeviceContext *dc, int x, int y, std::wstring s, bool center, int staffSize = 100,
+        bool dimin = false, bool setBBGlyph = false);
     void DrawLyricString(DeviceContext *dc, int x, int y, std::wstring s, int staffSize = 100);
     void DrawFilledRectangle(DeviceContext *dc, int x1, int y1, int x2, int y2);
     void DrawObliquePolygon(DeviceContext *dc, int x1, int y1, int x2, int y2, int height);
@@ -443,11 +445,6 @@ private:
      * Make sure dots on chords are vertically aligned correctly
      */
     void PrepareChordDots(DeviceContext *dc, Chord *chord, int x, int y, unsigned char dots, Staff *staff);
-
-    /**
-     * Changes and/or calculates the horizontal alignment of accidentals to prevent overlapping
-     */
-    bool CalculateAccidX(Staff *staff, Accid *accid, Chord *chord, bool adjustHorizontally);
 
 public:
     /** Document */

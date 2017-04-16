@@ -28,6 +28,8 @@
 #include "svgdevicecontext.h"
 #include "vrv.h"
 
+#include "functorparams.h"
+
 //----------------------------------------------------------------------------
 
 #include "MidiFile.h"
@@ -782,6 +784,18 @@ void Toolkit::RedoLayout()
     m_doc.CastOffDoc();
 }
 
+void Toolkit::RedoPagePitchPosLayout()
+{
+    Page *page = m_doc.GetDrawingPage();
+
+    if (!page) {
+        LogError("No page to re-layout");
+        return;
+    }
+
+    page->LayOutPitchPos();
+}
+
 std::string Toolkit::RenderToSvg(int pageNo, bool xml_declaration)
 {
     // Page number is one-based - correct it to 0-based first
@@ -1043,7 +1057,14 @@ const char *Toolkit::GetHumdrumBuffer()
 bool Toolkit::Drag(std::string elementId, int x, int y)
 {
     if (!m_doc.GetDrawingPage()) return false;
+
+    // Try to get the element on the current drawing page
     Object *element = m_doc.GetDrawingPage()->FindChildByUuid(elementId);
+
+    // If it wasn't there, go back up to the whole doc
+    if (!element) {
+        element = m_doc.FindChildByUuid(elementId);
+    }
     if (element->Is(NOTE)) {
         Note *note = dynamic_cast<Note *>(element);
         assert(note);

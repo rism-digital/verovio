@@ -94,12 +94,13 @@ void Note::Reset()
     // tie pointers
     ResetDrawingTieAttr();
 
-    d_stemLen = 0;
     m_clusterPosition = 0;
     m_cluster = NULL;
 
     m_playingOnset = 0.0;
     m_playingOffset = 0.0;
+
+    m_drawingLoc = 0;
 }
 
 void Note::AddChild(Object *child)
@@ -176,7 +177,7 @@ Chord *Note::IsChordTone() const
     return dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
 }
 
-int Note::GetDrawingDur()
+int Note::GetDrawingDur() const
 {
     Chord *chordParent = dynamic_cast<Chord *>(this->GetFirstParent(CHORD, MAX_CHORD_DEPTH));
     if (chordParent) {
@@ -197,10 +198,21 @@ bool Note::IsClusterExtreme() const
         return false;
 }
 
+int Note::GetDrawingRadius(Doc *doc, int staffSize, bool isCueSize) const
+{
+    assert(doc);
+
+    wchar_t code = SMUFL_E0A3_noteheadHalf;
+    if (this->GetDrawingDur() <= DUR_1) {
+        code = SMUFL_E0A2_noteheadWhole;
+    }
+    return doc->GetGlyphWidth(code, staffSize, isCueSize) / 2;
+}
+
 Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
-    if (graceSize) defaultYShift = doc->GetGraceSize(defaultYShift);
+    if (graceSize) defaultYShift = doc->GetCueSize(defaultYShift);
     // x default is always set to 0 because it is unused for now
     Point p(0, defaultYShift);
 
@@ -227,7 +239,7 @@ Point Note::GetStemUpSE(Doc *doc, int staffSize, bool graceSize)
 Point Note::GetStemDownNW(Doc *doc, int staffSize, bool graceSize)
 {
     int defaultYShift = doc->GetDrawingUnit(staffSize) / 4;
-    if (graceSize) defaultYShift = doc->GetGraceSize(defaultYShift);
+    if (graceSize) defaultYShift = doc->GetCueSize(defaultYShift);
     // x default is always set to 0 because it is unused for now
     Point p(0, -defaultYShift);
 
@@ -266,6 +278,11 @@ int Note::CalcStem(FunctorParams *functorParams)
         return FUNCTOR_SIBLINGS;
     }
 
+    // We currently have no stem object with mensural notes
+    if (this->IsMensural()) {
+        return FUNCTOR_SIBLINGS;
+    }
+
     if (this->IsChordTone()) {
         assert(params->m_interface);
         return FUNCTOR_CONTINUE;
@@ -277,7 +294,8 @@ int Note::CalcStem(FunctorParams *functorParams)
 
     // No stem
     if (this->GetActualDur() < DUR_2) {
-        LogDebug("Duration is longer than halfnote, there should be no stem");
+        // Duration is longer than halfnote, there should be no stem
+        assert(!this->GetDrawingStem());
         return FUNCTOR_SIBLINGS;
     }
 
@@ -324,13 +342,112 @@ int Note::CalcStem(FunctorParams *functorParams)
     return FUNCTOR_CONTINUE;
 }
 
+int Note::CalcChordNoteHeads(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+
+    // Nothing to do for notes that are not in a cluster
+    if (!this->m_cluster) return FUNCTOR_SIBLINGS;
+
+    if (this->m_crossStaff) staff = this->m_crossStaff;
+
+    bool drawingCueSize = this->IsCueSize();
+    int staffSize = staff->m_drawingStaffSize;
+
+    int radius = this->GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
+
+    /************** notehead direction **************/
+
+    bool flippedNotehead = false;
+
+    // if the note is clustered, calculations are different
+    if (this->GetDrawingStemDir() == STEMDIRECTION_down) {
+        // stem down/even cluster = noteheads start on left (incorrect side)
+        if (this->m_cluster->size() % 2 == 0) {
+            flippedNotehead = (this->m_clusterPosition % 2 != 0);
+        }
+        // else they start on normal side
+        else {
+            flippedNotehead = (this->m_clusterPosition % 2 == 0);
+        }
+    }
+    else {
+        // flipped noteheads start on normal side no matter what
+        flippedNotehead = (this->m_clusterPosition % 2 == 0);
+    }
+
+    // positions notehead
+    if (flippedNotehead) {
+        if (this->GetDrawingStemDir() == STEMDIRECTION_up) {
+            this->SetDrawingXRel(2 * radius - params->m_doc->GetDrawingStemWidth(staffSize));
+        }
+        else {
+            this->SetDrawingXRel(-2 * radius + params->m_doc->GetDrawingStemWidth(staffSize));
+        }
+    }
+
+    return FUNCTOR_SIBLINGS;
+}
+
+int Note::CalcLedgerLines(FunctorParams *functorParams)
+{
+    FunctorDocParams *params = dynamic_cast<FunctorDocParams *>(functorParams);
+    assert(params);
+
+    Staff *staff = dynamic_cast<Staff *>(this->GetFirstParent(STAFF));
+    assert(staff);
+
+    if (this->m_crossStaff) staff = this->m_crossStaff;
+
+    bool drawingCueSize = this->IsCueSize();
+    int staffSize = staff->m_drawingStaffSize;
+    int staffX = staff->GetDrawingX();
+    int radius = GetDrawingRadius(params->m_doc, staffSize, drawingCueSize);
+
+    /************** Ledger lines: **************/
+
+    int linesAbove = (this->GetDrawingLoc() - staff->m_drawingLines * 2 + 2) / 2;
+    int linesBelow = -(this->GetDrawingLoc()) / 2;
+
+    if ((linesAbove <= 0) && (linesBelow <= 0)) return FUNCTOR_CONTINUE;
+
+    // HARDCODED
+    int leftExtender = 2.5 * params->m_doc->GetDrawingStemWidth(staffSize);
+    int rightExtender = 2.5 * params->m_doc->GetDrawingStemWidth(staffSize);
+    if (drawingCueSize || (this->GetDrawingDur() > DUR_8)) {
+        leftExtender = 1.75 * params->m_doc->GetDrawingStemWidth(staffSize);
+        rightExtender = 1.25 * params->m_doc->GetDrawingStemWidth(staffSize);
+    }
+
+    if (drawingCueSize) {
+        leftExtender = params->m_doc->GetCueSize(leftExtender);
+        rightExtender = params->m_doc->GetCueSize(rightExtender);
+    }
+
+    int left = this->GetDrawingX() - radius - leftExtender - staffX;
+    int right = this->GetDrawingX() + radius + rightExtender - staffX;
+
+    if (linesAbove > 0) {
+        staff->AddLegerLineAbove(linesAbove, left, right, drawingCueSize);
+    }
+    else {
+        staff->AddLegerLineBelow(linesBelow, left, right, drawingCueSize);
+    }
+
+    return FUNCTOR_CONTINUE;
+}
+
 int Note::PrepareLayerElementParts(FunctorParams *functorParams)
 {
     Stem *currentStem = dynamic_cast<Stem *>(this->FindChildByType(STEM));
     Flag *currentFlag = NULL;
     if (currentStem) currentFlag = dynamic_cast<Flag *>(currentStem->FindChildByType(FLAG));
 
-    if ((this->GetDur() > DUR_1) && !this->IsChordTone()) {
+    if ((this->GetActualDur() > DUR_1) && !this->IsChordTone() && !this->IsMensural()) {
         if (!currentStem) {
             currentStem = new Stem();
             this->AddChild(currentStem);
@@ -347,7 +464,7 @@ int Note::PrepareLayerElementParts(FunctorParams *functorParams)
         }
     }
 
-    if ((this->GetDur() > DUR_4) && !this->IsInBeam() && !this->IsChordTone()) {
+    if ((this->GetActualDur() > DUR_4) && !this->IsInBeam() && !this->IsChordTone() && !this->IsMensural()) {
         // We should have a stem at this stage
         assert(currentStem);
         if (!currentFlag) {
@@ -446,5 +563,14 @@ int Note::ResetDrawing(FunctorParams *functorParams)
 
     return FUNCTOR_CONTINUE;
 };
+
+int Note::ResetHorizontalAlignment(FunctorParams *functorParams)
+{
+    LayerElement::ResetHorizontalAlignment(functorParams);
+
+    m_drawingLoc = 0;
+
+    return FUNCTOR_CONTINUE;
+}
 
 } // namespace vrv

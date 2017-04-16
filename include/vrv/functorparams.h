@@ -61,6 +61,18 @@ public:
 // Child classes of FunctorParams
 //----------------------------------------------------------------------------
 
+/**
+ * This is a basic FunctorParams with only the doc pointer for cases where
+ * it is the only parameter needed.
+ * member 0: the Doc
+ **/
+
+class FunctorDocParams : public FunctorParams {
+public:
+    FunctorDocParams(Doc *doc) { m_doc = doc; }
+    Doc *m_doc;
+};
+
 //----------------------------------------------------------------------------
 // AddLayerElementToFlatListParams
 //----------------------------------------------------------------------------
@@ -76,32 +88,38 @@ public:
 };
 
 //----------------------------------------------------------------------------
-// AdjustArticParams
+// AdjustAccidXParams
 //----------------------------------------------------------------------------
 
 /**
- * member 0: the Doc
+ * member 0: the Functor to be redirected to MeasureAligner and GraceAligner
+ * member 1: the Doc
  **/
 
-class AdjustArticParams : public FunctorParams {
+class AdjustAccidXParams : public FunctorParams {
 public:
-    AdjustArticParams(Doc *doc) { m_doc = doc; }
+    AdjustAccidXParams(Doc *doc, Functor *functor)
+    {
+        m_currentMeasure = NULL;
+        m_functor = functor;
+        m_doc = doc;
+    }
+    Measure *m_currentMeasure;
+    Functor *m_functor;
     Doc *m_doc;
 };
+
+//----------------------------------------------------------------------------
+// AdjustArticParams
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
 
 //----------------------------------------------------------------------------
 // AdjustArticWithSlursParams
 //----------------------------------------------------------------------------
 
-/**
- * member 0: the Doc
- **/
-
-class AdjustArticWithSlursParams : public FunctorParams {
-public:
-    AdjustArticWithSlursParams(Doc *doc) { m_doc = doc; }
-    Doc *m_doc;
-};
+// Use FunctorDocParams
 
 //----------------------------------------------------------------------------
 // AdjustGraceXPosParams
@@ -351,6 +369,12 @@ public:
 };
 
 //----------------------------------------------------------------------------
+// CalcChordNoteHeads
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
+
+//----------------------------------------------------------------------------
 // CalcMaxMeasureDurationParams
 //----------------------------------------------------------------------------
 
@@ -371,6 +395,12 @@ public:
     double m_currentValue;
     int m_currentBpm;
 };
+
+//----------------------------------------------------------------------------
+// CalcLedgerLine
+//----------------------------------------------------------------------------
+
+// Use FunctorDocParams
 
 //----------------------------------------------------------------------------
 // CalcStaffOverlapParams

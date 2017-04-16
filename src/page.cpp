@@ -137,11 +137,20 @@ void Page::LayOutHorizontally()
     Functor calcDrawingStemDir(&Object::CalcStem);
     this->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
 
+    FunctorDocParams calcChordNoteHeadsParams(doc);
+    Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
+    this->Process(&calcChordNoteHeads, &calcChordNoteHeadsParams);
+
     // Render it for filling the bounding box
     BBoxDeviceContext bBoxDC(&view, 0, 0, BBOX_HORIZONTAL_ONLY);
     // Do not do the layout in this view - otherwise we will loop...
     view.SetPage(this->GetIdx(), false);
     view.DrawCurrentPage(&bBoxDC, false);
+
+    // Adjust the X position of the accidentals, including in chords
+    Functor adjustAccidX(&Object::AdjustAccidX);
+    AdjustAccidXParams adjustAccidXParams(doc, &adjustAccidX);
+    this->Process(&adjustAccidX, &adjustAccidXParams);
 
     // Adjust the X shift of the Alignment looking at the bounding boxes
     // Look at each LayerElement and change the m_xShift if the bounding box is overlapping
@@ -186,6 +195,10 @@ void Page::LayOutVertically()
     Functor resetVerticalAlignment(&Object::ResetVerticalAlignment);
     this->Process(&resetVerticalAlignment, NULL);
 
+    FunctorDocParams calcLegerLinesParams(doc);
+    Functor calcLedgerLines(&Object::CalcLedgerLines);
+    this->Process(&calcLedgerLines, &calcLegerLinesParams);
+
     // Align the content of the page using system aligners
     // After this:
     // - each Staff object will then have its StaffAlignment pointer initialized
@@ -194,7 +207,7 @@ void Page::LayOutVertically()
     this->Process(&alignVertically, &alignVerticallyParams);
 
     // Adjust the position of outside articulations
-    AdjustArticParams adjustArticParams(doc);
+    FunctorDocParams adjustArticParams(doc);
     Functor adjustArtic(&Object::AdjustArtic);
     this->Process(&adjustArtic, &adjustArticParams);
 
@@ -207,7 +220,7 @@ void Page::LayOutVertically()
     view.DrawCurrentPage(&bBoxDC, false);
 
     // Adjust the position of outside articulations with slurs end and start positions
-    AdjustArticWithSlursParams adjustArticWithSlursParams(doc);
+    FunctorDocParams adjustArticWithSlursParams(doc);
     Functor adjustArticWithSlurs(&Object::AdjustArticWithSlurs);
     this->Process(&adjustArticWithSlurs, &adjustArticWithSlursParams);
 
@@ -265,6 +278,28 @@ void Page::JustifyHorizontally()
     JustifyXParams justifyXParams(&justifyX);
     justifyXParams.m_systemFullWidth = doc->m_drawingPageWidth - doc->m_drawingPageLeftMar - doc->m_drawingPageRightMar;
     this->Process(&justifyX, &justifyXParams);
+}
+
+void Page::LayOutPitchPos()
+{
+    Doc *doc = dynamic_cast<Doc *>(GetParent());
+    assert(doc);
+
+    // Doc::SetDrawingPage should have been called before
+    // Make sure we have the correct page
+    assert(this == doc->GetDrawingPage());
+
+    // Set the pitch / pos alignement
+    // Once View::CalculateRestPosY will be move to Staff we will not need to pass a view anymore
+    View view;
+    view.SetDoc(doc);
+    SetAlignmentPitchPosParams setAlignmentPitchPosParams(doc, &view);
+    Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
+    this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
+
+    CalcStemParams calcDrawingStemDirParams(doc);
+    Functor calcDrawingStemDir(&Object::CalcStem);
+    this->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
 }
 
 int Page::GetContentHeight() const

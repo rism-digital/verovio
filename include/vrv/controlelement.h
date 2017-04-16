@@ -35,7 +35,7 @@ public:
     virtual void Reset();
     virtual ClassId GetClassId() const { return CONTROL_ELEMENT; }
     ///@}
-    
+
     /**
      * Check if the ControlElement has a Rend child and return its @halign equivalent (if any)
      */

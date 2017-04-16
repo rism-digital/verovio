@@ -24,14 +24,16 @@ Version 5.2.18 - adding accid square brackets and reviewing bow directions
 Version 5.2.19 - adding some quartertone accidentals (Gould and Stein-Zimmermann)
 Version 5.2.20 - adding some anchor points (accidentals)
 Version 5.2.21 - adding stem flags (16th to 256th)
+Version 5.2.22 - fixing anchor point names
+Version 5.2.23 - adding anchor points to all accidentals
 -->
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1">
 <metadata>
-Created by FontForge 20161003 at Fri Mar 24 07:07:50 2017
+Created by FontForge 20161003 at Tue Apr 11 08:15:35 2017
  By laurent
 Created by Etienne Darbellay, Jean-Francois Marti and Laurent Pugin. 
 This font is licensed under the SIL Open Font License \(http://scripts.sil.org/OFL\).
-Version 5.2.21
+Version 5.2.23
 </metadata>
 <defs>
 <font id="Leipzig" horiz-adv-x="274" >
@@ -967,13 +969,13 @@ c-10.6667 -12.6667 -20.6667 -24.6667 -30 -36c-9.33333 -11.3333 -21 -23 -35 -35l-
 c0.666667 9.33333 1 16.3333 1 21c0 6 -0.666667 11.3333 -2 16s-4.33333 9.66667 -9 15z" />
     <glyph glyph-name="uniE272" unicode="&#xe272;" horiz-adv-x="178" 
 d="M20 -202v579h18v-205l139 24v-573h-17v200zM38 -108l122 19v189l-122 -20v-188zM-46 324l75 161l73 -161h-26l-45 53h-8l-43 -53h-26z" />
-    <glyph glyph-name="uniE273" unicode="&#xe273;" horiz-adv-x="155" 
+    <glyph glyph-name="uniE273" unicode="&#xe273;" horiz-adv-x="157" 
 d="M157 -377h-17v200l-140 -25v579h18v-205l139 24v-573zM221 -324l-73 -161l-75 161h26l43 -53h13l40 53h26zM140 -89v189l-122 -20v-188z" />
-    <glyph glyph-name="uniE274" unicode="&#xe274;" horiz-adv-x="198" 
+    <glyph glyph-name="uniE274" unicode="&#xe274;" horiz-adv-x="197" 
 d="M136 200v182h17v-177l44 15v-97l-44 -15v-178l44 13v-98l-44 -14v-167h-17v162l-76 -24v-166h-17v160l-43 -14v97l43 15v179l-43 -15v99l43 14v182h17v-176zM60 78v-179l76 24v180zM-24 300l75 161l73 -161h-26l-40 53h-13l-43 -53h-26z" />
-    <glyph glyph-name="uniE275" unicode="&#xe275;" horiz-adv-x="198" 
+    <glyph glyph-name="uniE275" unicode="&#xe275;" horiz-adv-x="197" 
 d="M-25 -312l75 -161l73 161h-26l-40 -53h-13l-41 53h-28zM136 200v182h17v-177l44 15v-97l-44 -15v-178l44 13v-98l-44 -14v-167h-17v162l-76 -24v-166h-17v160l-43 -14v97l43 15v179l-43 -15v99l43 14v182h17v-176zM60 78v-179l76 24v180z" />
-    <glyph glyph-name="uniE280" unicode="&#xe280;" horiz-adv-x="200" 
+    <glyph glyph-name="uniE280" unicode="&#xe280;" horiz-adv-x="198" 
 d="M178 110c-32 16 -54 27 -93 27c-26 0 -35 -3 -54 -13c-13 -7 -24 -20 -27 -38l-4 -25c0 -28 16 -57 45 -89c23 -25 39 -44 65 -68l88 -79v644h-20v-359zM108 106c32 0 48 -10 70 -29v-194c-31 31 -54 59 -71 84c-21 32 -32 59 -32 84c0 9 -1 16 -1 20c0 14 3 21 11 30
 l8 3z" />
     <glyph glyph-name="uniE281" unicode="&#xe281;" horiz-adv-x="416" 
