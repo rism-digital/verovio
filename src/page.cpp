@@ -133,9 +133,9 @@ void Page::LayOutHorizontally()
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
-    CalcStemParams calcDrawingStemDirParams(doc);
-    Functor calcDrawingStemDir(&Object::CalcStem);
-    this->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
+    CalcStemParams calcStemParams(doc);
+    Functor calcStem(&Object::CalcStem);
+    this->Process(&calcStem, &calcStemParams);
 
     FunctorDocParams calcChordNoteHeadsParams(doc);
     Functor calcChordNoteHeads(&Object::CalcChordNoteHeads);
@@ -297,9 +297,9 @@ void Page::LayOutPitchPos()
     Functor setAlignmentPitchPos(&Object::SetAlignmentPitchPos);
     this->Process(&setAlignmentPitchPos, &setAlignmentPitchPosParams);
 
-    CalcStemParams calcDrawingStemDirParams(doc);
-    Functor calcDrawingStemDir(&Object::CalcStem);
-    this->Process(&calcDrawingStemDir, &calcDrawingStemDirParams);
+    CalcStemParams calcStemParams(doc);
+    Functor calcStem(&Object::CalcStem);
+    this->Process(&calcStem, &calcStemParams);
 }
 
 int Page::GetContentHeight() const
