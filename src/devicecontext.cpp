@@ -165,7 +165,7 @@ void DeviceContext::AddGlyphToTextExtend(Glyph *glyph, TextExtend *extend)
     int x, y, partial_w, partial_h, adv_x;
     double tmp;
 
-    glyph->GetBoundingBox(&x, &y, &partial_w, &partial_h);
+    glyph->GetBoundingBox(x, y, partial_w, partial_h);
 
     tmp = partial_w * m_fontStack.top()->GetPointSize();
     partial_w = ceil(tmp / (double)glyph->GetUnitsPerEm());

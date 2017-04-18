@@ -145,10 +145,16 @@ public:
     int Intersects(FloatingPositioner *curve, int margin = 0) const;
 
     /**
+     * Swap values.
+     * This is useful for example when switching to the device context world.
+     */
+    static void Swap(int &v1, int &v2);
+    
+    /**
      * Swap the points passed as reference.
      * This is useful for example when calculating bezier positions.
      */
-    static void SwapPoints(Point *x1, Point *x2);
+    static void SwapPoints(Point &p1, Point &p2);
 
     /**
      * Calculate the position of a point after a rotation of rot_alpha around the center
@@ -165,17 +171,6 @@ public:
      */
     static void CalcThickBezier(
         const Point bezier[4], int thickness, float angle, Point *topBezier, Point *bottomBezier);
-
-    /**
-     * Swap values passed as reference.
-     * This is useful for example when switching to the device context world.
-     */
-    static void SwapY(int *y1, int *y2)
-    {
-        int tmp = *y1;
-        *y1 = *y2;
-        *y2 = tmp;
-    }
 
     /**
      * Approximate the bounding box of a bezier taking into accound the height and the width.

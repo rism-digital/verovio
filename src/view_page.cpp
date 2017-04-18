@@ -451,7 +451,7 @@ void View::DrawBrace(DeviceContext *dc, int x, int y1, int y2, int staffSize)
     int penWidth = m_doc->GetDrawingStemWidth(100);
     y1 -= penWidth;
     y2 += penWidth;
-    BoundingBox::SwapY(&y1, &y2);
+    BoundingBox::Swap(y1, y2);
 
     int ymed, xdec, fact;
 

@@ -742,7 +742,7 @@ void SvgDeviceContext::DrawMusicText(const std::wstring &text, int x, int y, boo
         if (glyph->GetHorizAdvX() > 0)
             x += glyph->GetHorizAdvX() * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         else {
-            glyph->GetBoundingBox(&gx, &gy, &w, &h);
+            glyph->GetBoundingBox(gx, gy, w, h);
             x += w * m_fontStack.top()->GetPointSize() / glyph->GetUnitsPerEm();
         }
     }
@@ -829,7 +829,7 @@ void SvgDeviceContext::DrawSvgBoundingBox(Object *object, View *view)
                     assert(fontPoint);
                     Point p;
                     int x, y, w, h;
-                    glyph->GetBoundingBox(&x, &y, &w, &h);
+                    glyph->GetBoundingBox(x, y, w, h);
                     int smuflGlyphFontSize = object->GetBoundingBoxGlyphFontSize();
 
                     p.x = object->GetSelfLeft() - x * smuflGlyphFontSize / glyph->GetUnitsPerEm();
