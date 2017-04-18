@@ -555,11 +555,11 @@ int MusicXmlInput::ReadMusicXmlPartAttributesAsStaffDef(pugi::xml_node node, Sta
 
     for (pugi::xml_node::iterator it = node.begin(); it != node.end(); ++it) {
         // We read all attribute elements until we reach something else
-        // However, print might be present too. What else? This is not clear and not robust.
-        if (!IsElement(*it, "attributes") && !IsElement(*it, "print") && !IsElement(*it, "sound")) break;
+        // barline, print, and sound elements may be present
+        if (!IsElement(*it, "attributes") && !IsElement(*it, "barline") && !IsElement(*it, "print") && !IsElement(*it, "sound")) break;
 
         // we do not want to read it again, just change the name
-        it->set_name("mei-read");
+        if (IsElement(*it, "attributes")) it->set_name("mei-read");
 
         // First get the number of staves in the part
         pugi::xpath_node staves = it->select_single_node("staves");
@@ -1004,6 +1004,7 @@ void MusicXmlInput::ReadMusicXmlDirection(pugi::xml_node node, Measure *measure,
         if (!placeStr.empty()) pedal->SetPlace(pedal->AttPlacement::StrToStaffrel(placeStr.c_str()));
         std::string pedalType = GetAttributeValue(xmlPedal.node(), "type");
         if (!pedalType.empty()) pedal->SetDir(ConvertPedalTypeToDir(pedalType));
+        if (pedalType == "stop") pedal->SetStartid(m_ID);
         m_controlElements.push_back(std::make_pair(measureNum, pedal));
         m_pedalStack.push_back(pedal);
     }
@@ -1408,9 +1409,6 @@ void MusicXmlInput::ReadMusicXmlNote(pugi::xml_node node, Measure *measure, int 
             }
         }
     }
-
-    // element will be NULL in case of mRest
-    // if (!element) return;
 
     m_ID = "#" + element->GetUuid();
 
