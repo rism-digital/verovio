@@ -11,7 +11,7 @@
                 <date>2017-04-18</date>
             </pubStmt>
             <notesStmt>
-                <annot>Verovio transforms humdrum sections *> to MEI "<section>" elements, additionally transferring the expansion list *>[A,B] to MEI "<expansion>".</annot>
+                <annot>Verovio transforms humdrum sections *> to MEI "section" elements, additionally transferring the expansion list *>[A,B] to MEI "expansion".</annot>
             </notesStmt>
         </fileDesc>
         <encodingDesc>
@@ -29,26 +29,6 @@
                 </titleStmt>
             </work>
         </workDesc>
-        <extMeta>
-            <frames xmlns:humxml="http://www.humdrum.org/ns/humxml">
-                <metaFrame n="6" token="!!!OMD: Minuet" xml:id="loc6">
-                    <frameInfo>
-                        <startTime float="0" />
-                        <frameType>reference</frameType>
-                        <referenceKey>OMD</referenceKey>
-                        <referenceValue>Minuet</referenceValue>
-                    </frameInfo>
-                </metaFrame>
-                <metaFrame n="18" token="!!!OMD: Trio" xml:id="loc18">
-                    <frameInfo>
-                        <startTime float="12" />
-                        <frameType>reference</frameType>
-                        <referenceKey>OMD</referenceKey>
-                        <referenceValue>Trio</referenceValue>
-                    </frameInfo>
-                </metaFrame>
-            </frames>
-        </extMeta>
     </meiHead>
     <music>
         <body>
