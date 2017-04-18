@@ -11,7 +11,7 @@
                 <date>2017-04-18</date>
             </pubStmt>
             <notesStmt>
-                <annot>Verovio offers options to align the element "<harm>" representing a chord symbol in relation to the "@tstamp" attribute.</annot>
+                <annot>Verovio offers options to align the element "harm" representing a chord symbol in relation to the "tstamp" attribute.</annot>
             </notesStmt>
         </fileDesc>
         <encodingDesc>
@@ -28,6 +28,7 @@
                 </titleStmt>
             </work>
         </workDesc>
+    </meiHead>
     <music>
         <body>
             <mdiv>
@@ -61,3 +62,4 @@
             </mdiv>
         </body>
     </music>
+  </mei>
