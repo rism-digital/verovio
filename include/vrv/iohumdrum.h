@@ -332,6 +332,7 @@ protected:
     void embedQstampInClass(vrv::Note *note, hum::HTp token, const std::string &tstring);
     void embedBase40PitchInClass(vrv::Note *note, const std::string &token);
     void embedTieInformation(Note *note, const std::string &token);
+    bool getTypeOption(void) { return m_type; }
 
     // header related functions: ///////////////////////////////////////////
     void createHeader(void);
@@ -481,6 +482,9 @@ private:
 
     // m_has_color_spine == true if a color spine is present.
     bool m_has_color_spine = false;
+
+    // m_type == true means add type markup in Humdrum-to-MEI conversion.
+    bool m_type = true;
 
 #endif /* NO_HUMDRUM_SUPPORT */
 };

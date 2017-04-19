@@ -5040,9 +5040,11 @@ void HumdrumInput::convertNote(Note *note, hum::HTp token, int staffindex, int s
     int line = token->getLineIndex();
     int field = token->getFieldIndex();
     colorNote(note, tstring, line, field);
-    embedQstampInClass(note, token, tstring);
-    embedBase40PitchInClass(note, tstring);
-    embedTieInformation(note, tstring);
+    if (getTypeOption()) {
+        embedQstampInClass(note, token, tstring);
+        embedBase40PitchInClass(note, tstring);
+        embedTieInformation(note, tstring);
+    }
 
     if ((ss[staffindex].ottavameasure != NULL) && (ss[staffindex].ottavanotestart == NULL)) {
         ss[staffindex].ottavanotestart = note;
@@ -5311,17 +5313,34 @@ void HumdrumInput::convertVerses(Note *note, hum::HTp token, int subtoken)
             if (dashbegin && dashend) {
                 syl->SetWordpos(sylLog_WORDPOS_m);
                 syl->SetCon(sylLog_CON_d);
+                if (getTypeOption()) {
+                    appendTypeTag(syl, "m");
+                }
             }
             else if (dashbegin) {
                 syl->SetWordpos(sylLog_WORDPOS_t);
+                if (getTypeOption()) {
+                    appendTypeTag(syl, "t");
+                }
             }
             else if (dashend) {
                 syl->SetWordpos(sylLog_WORDPOS_i);
                 syl->SetCon(sylLog_CON_d);
+                if (getTypeOption()) {
+                    appendTypeTag(syl, "i");
+                }
             }
             else if (extender) {
                 syl->SetWordpos(sylLog_WORDPOS_t);
                 syl->SetCon(sylLog_CON_u);
+                if (getTypeOption()) {
+                    appendTypeTag(syl, "t");
+                }
+            }
+            else {
+                if (getTypeOption()) {
+                    appendTypeTag(syl, "t");
+                }
             }
             // remove the last dash in a line (double dash which indicates
             // a dash in the original word separator).
@@ -6141,9 +6160,11 @@ void HumdrumInput::setupSystemMeasure(int startline, int endline)
         m_measure->SetN(measurenumber);
     }
 
-    stringstream measuretag;
-    measuretag << "m-" << measurenumber;
-    appendTypeTag(m_measure, measuretag.str());
+    if (getTypeOption()) {
+        stringstream measuretag;
+        measuretag << "m-" << measurenumber;
+        appendTypeTag(m_measure, measuretag.str());
+    }
 
     setSystemMeasureStyle(startline, endline);
 }
